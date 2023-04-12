@@ -1759,11 +1759,6 @@
   resolved "https://registry.npmjs.org/@types/node/-/node-18.15.11.tgz"
   integrity sha512-E5Kwq2n4SbMzQOn6wnmBjuK9ouqlURrcZDVfbo9ftDDTFt3nk7ZKK4GMOzoYgnpQJKcxwQw+lGaBvvlMo0qN/Q==
 
-"@types/node@^16.4.10":
-  version "16.18.22"
-  resolved "https://registry.npmjs.org/@types/node/-/node-16.18.22.tgz"
-  integrity sha512-LJSIirgASa1LicFGTUFwDY7BfKDtLIbijqDLkH47LxEo/jtdrtiZ4/kLPD99bEQhTcPcuh6KhDllHqRxygJD2w==
-
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
   resolved "https://registry.npmjs.org/@types/normalize-package-data/-/normalize-package-data-2.4.1.tgz"
@@ -8402,22 +8397,6 @@ ts-node@^10.9.1:
     v8-compile-cache-lib "^3.0.1"
     yn "3.1.1"
 
-ts-rmb-client-base@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/ts-rmb-client-base/-/ts-rmb-client-base-1.0.0.tgz"
-  integrity sha512-a4jHR1P1fJYVaL88SNrgt+xHNOyrgx/vgENx/xlMDNQ7R9WVUdCTrrxQ3smCvMhsiRa2YnasuGzoIvDAbyHiDg==
-
-ts-rmb-redis-client@1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/ts-rmb-redis-client/-/ts-rmb-redis-client-1.1.2.tgz#1c0fab88d6b388f483cb788f9f73fa1c0ef9a7dd"
-  integrity sha512-6eFtOWAf+OshnmA89VU9DKx5OMO3GbMf8lbYH4+OUI1cGaaIjT1syXLb6+FE6vfV2rXFxj1dEtw4bxPPyhsjOQ==
-  dependencies:
-    "@types/node" "^16.4.10"
-    redis "^4.3.1"
-    ts-rmb-client-base "1.0.0"
-    typescript "^4.3.5"
-    uuid4 "^2.0.2"
-
 tsconfig-paths-webpack-plugin@^4.0.0:
   version "4.0.1"
   resolved "https://registry.npmjs.org/tsconfig-paths-webpack-plugin/-/tsconfig-paths-webpack-plugin-4.0.1.tgz"
@@ -8578,7 +8557,7 @@ typescript@*:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.4.tgz#b217fd20119bd61a94d4011274e0ab369058da3b"
   integrity sha512-cW9T5W9xY37cc+jfEnaUvX91foxtHkza3Nw3wkoF4sSlKn0MONdkdEndig/qPBWXNkmplh3NzayQzCiHM4/hqw==
 
-"typescript@^3 || ^4", typescript@^4.3.5, typescript@^4.7.4:
+"typescript@^3 || ^4", typescript@^4.7.4:
   version "4.9.5"
   resolved "https://registry.npmjs.org/typescript/-/typescript-4.9.5.tgz"
   integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==
