@@ -1,0 +1,6 @@
+{
+    "network": "qa",
+    "mnemonic": "miss secret news run cliff lens exist clerk lucky cube fall soldier",
+    "storeSecret": "secret",
+    "keypairType": "sr25519"
+}

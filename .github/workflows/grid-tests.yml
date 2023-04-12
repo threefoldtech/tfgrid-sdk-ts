@@ -1,0 +1,62 @@
+name: grid tests
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  tests:
+    runs-on: ubuntu-20.04
+    env:
+      NETWORK: ${{ secrets.NETWORK }}
+      RMB_PROXY: true
+      STORE_SECRET: secret
+      MNEMONIC: ${{ secrets.MNEMONIC }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up node 16
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: 'yarn'
+      - name: Install Yggdrasil and Add Peers
+        run: |
+          sudo apt-get update
+          sudo apt-get install dirmngr
+          gpg --fetch-keys https://neilalexander.s3.dualstack.eu-west-2.amazonaws.com/deb/key.txt
+          gpg --export 569130E8CA20FBC4CB3FDE555898470A764B32C9 | sudo apt-key add -
+          echo 'deb http://neilalexander.s3.dualstack.eu-west-2.amazonaws.com/deb/ debian yggdrasil' | sudo tee /etc/apt/sources.list.d/yggdrasil.list
+          sudo apt-get update
+          sudo apt-get install yggdrasil
+          sudo systemctl enable yggdrasil
+          PEERS=$(curl https://raw.githubusercontent.com/threefoldtech/zos-config/main/development.json | jq '.yggdrasil.peers[]' -r | sed 's/\//\\\//g' | sed -z 's/\n/\\n/g')
+          sudo  sed -i -- 's/Peers\: \[\]/Peers: [\n'"$PEERS"']/g' /etc/yggdrasil.conf
+          sudo systemctl start yggdrasil
+      - name: Generate SSH Key
+        run: |
+          ssh-keygen -t ed25519 -N '' -f ~/.ssh/id_ed25519
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git libtool tmux redis net-tools
+      - name: Install
+        run: yarn
+      - name: Run tests 
+        run: yarn workspace @threefold/grid_client test --runInBand --ci --coverage --colors
+      - name: Cleanup
+        continue-on-error: true
+        run: yarn run ts-node --project tsconfig-node.json packages/grid/tests/global_teardown.ts
+      - name: Upload coverage to Codecov
+        if: success()
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()    
+        with:
+          name: JEST Tests           
+          path: packages/grid/tests/test-reports/report.xml
+          reporter: jest-junit
+          fail-on-error: false

@@ -1,0 +1,33 @@
+{
+    "compilerOptions": {
+        "module": "ES2015",
+        "target": "es6",
+        "lib": [
+            "DOM",
+            "ES6",
+            "DOM.Iterable",
+            "ScriptHost",
+            "ES2016.Array.Include"
+        ],
+        "types": [
+            "node"
+        ],
+        "declaration": true,
+        "declarationMap": true,
+        "outDir": "./dist/es6",
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "moduleResolution": "node",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "baseUrl": ".",
+        "skipLibCheck": true /* Skip type checking all .d.ts files. */
+
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "src/server/*"
+    ]
+}

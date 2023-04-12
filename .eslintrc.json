@@ -1,0 +1,34 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true,
+        "node": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": "latest"
+    },
+    "plugins": [
+        "@typescript-eslint",
+        "prettier",
+        "simple-import-sort"
+    ],
+    "rules": {
+        "no-console": "off",
+        "no-async-promise-executor": "off",
+        "prettier/prettier": "error",
+        "@typescript-eslint/no-var-requires": "off",
+        "simple-import-sort/imports": "error",
+        "prefer-spread":"off"
+    },
+    "ignorePatterns": [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/docs/**",
+        "/packages/rmb_direct_client/lib/types/lib/**"
+    ]
+}

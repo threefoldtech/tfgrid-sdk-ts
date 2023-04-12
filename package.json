@@ -1,0 +1,29 @@
+{
+  "name": "@threefold/root",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "@typescript-eslint/parser": "^5.57.0",
+    "eslint": "^8.37.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "husky": "^8.0.3",
+    "lerna": "^6.6.1",
+    "lint-staged": "^13.2.0",
+    "prettier": "^2.8.7"
+  },
+  "scripts": {
+    "prepare": "husky install",
+    "lint": "eslint -c .eslintrc.json . --fix",
+    "check-lint": "eslint -c .eslintrc.json ."
+  },
+  "lint-staged": {
+    "*.{ts,js}": [
+      "eslint -c .eslintrc.json . --fix"
+    ]
+  },
+  "dependencies": {}
+}

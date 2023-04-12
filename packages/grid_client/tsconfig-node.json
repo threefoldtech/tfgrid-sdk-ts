@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "esnext",
+        "lib": [
+            "ESNext",
+            "DOM"
+        ],
+        "types": [
+            "node",
+            "jest"
+        ],
+        "declaration": true,
+        "declarationMap": true,
+        "outDir": "./dist/node",
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "allowJs": true,
+        "baseUrl": ".",
+        "skipLibCheck": true /* Skip type checking all .d.ts files. */
+
+    },
+    "include": [
+        "src/**/*"
+    ]
+}

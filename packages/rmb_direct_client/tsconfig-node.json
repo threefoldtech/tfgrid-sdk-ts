@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "esnext",
+        "declaration": true,
+        "outDir": "./dist/node",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+    },
+    "include": [
+        "lib/**/*"
+    ]
+}
