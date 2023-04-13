@@ -2,3 +2,14 @@ node_modules/
 dist/
 yarn-error.log
 packages/grid/docs/tests/
+
+packages/weblets/public/build/
+packages/weblets/playground/public/build/
+
+.DS_Store
+
+.build
+.vscode
+
+package-lock.json
+yarn-error.log
