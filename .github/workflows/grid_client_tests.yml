@@ -1,4 +1,4 @@
-name: grid tests
+name: Grid Client Tests
 
 on:
   schedule:
