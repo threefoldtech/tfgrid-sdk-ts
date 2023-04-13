@@ -40,7 +40,7 @@ jobs:
           yarn install
           cd packages/weblets
           yarn install
-          cd packages/weblets/playground
+          cd playground
           yarn install
 
       - name: Build
