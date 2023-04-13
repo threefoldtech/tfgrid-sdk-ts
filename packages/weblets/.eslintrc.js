@@ -21,4 +21,5 @@ module.exports = {
   settings: {
     "svelte3/typescript": true, // load TypeScript as peer dependency
   },
+  ignorePatterns: ["playground/public/build/elements/*", "*.config.*", "*global.css"],
 };
