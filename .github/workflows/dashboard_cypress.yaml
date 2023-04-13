@@ -1,4 +1,4 @@
-name: Cypress Tests
+name: Dashboard Cypress Tests
 
 on:
   schedule:
