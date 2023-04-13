@@ -1,17 +1,18 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
+
+import { checkKeplr } from "../utils/checkKeplr";
+import AddProposal from "../views/AddProposal.vue";
 import Cosmos from "../views/CosmosView.vue";
+import Delegate from "../views/Delegate.vue";
 import Eth from "../views/EthView.vue";
+import GovDeposit from "../views/GovDeposit.vue";
+import GovDetails from "../views/GovDetails.vue";
 import ListEth from "../views/ListEth.vue";
-import TextProposal from "../views/TextProposal.vue";
 import ListGov from "../views/ListGov.vue";
 import ListValidators from "../views/ListValidators.vue";
-import GovDetails from "../views/GovDetails.vue";
-import GovDeposit from "../views/GovDeposit.vue";
-import Delegate from "../views/Delegate.vue";
-import AddProposal from "../views/AddProposal.vue";
 import SoftwareProposal from "../views/SoftwareProposal.vue";
-import { checkKeplr } from "../utils/checkKeplr";
+import TextProposal from "../views/TextProposal.vue";
 
 Vue.use(VueRouter);
 

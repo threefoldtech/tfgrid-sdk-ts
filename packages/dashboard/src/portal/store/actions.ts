@@ -1,8 +1,9 @@
-import { PortalState } from "./state";
+import { web3AccountsSubscribe, web3Enable } from "@polkadot/extension-dapp";
 import type { ActionContext } from "vuex";
-import { web3Enable, web3AccountsSubscribe } from "@polkadot/extension-dapp";
+
 import { getProposal, getProposals } from "../lib/dao";
 import { getFarm } from "../lib/farms";
+import { PortalState } from "./state";
 
 export default {
   async subscribeAccounts({ commit }: ActionContext<PortalState, PortalState>) {

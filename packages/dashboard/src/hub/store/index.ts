@@ -1,7 +1,8 @@
-import { checkKeplr } from "../utils/checkKeplr";
-import { Config, loadConfig } from "../utils/config";
 import Vue from "vue";
 import Vuex, { ActionContext, ModuleTree } from "vuex";
+
+import { checkKeplr } from "../utils/checkKeplr";
+import { Config, loadConfig } from "../utils/config";
 
 Vue.use(Vuex);
 

@@ -1,6 +1,7 @@
 import { byInternet } from "country-code-lookup";
-import { INode } from "./../graphql/api";
+
 import { GetDataQueryType } from "../graphql/api";
+import { INode } from "./../graphql/api";
 import { IState } from "./state";
 
 export enum MutationTypes {

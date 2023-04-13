@@ -1,8 +1,9 @@
-import { IGridProxyFarm } from "./../graphql/api";
 import type { ActionContext } from "vuex";
-import type { IState } from "./state";
-import { MutationTypes } from "./mutations";
+
 import getChainData from "../utils/getChainData";
+import { IGridProxyFarm } from "./../graphql/api";
+import { MutationTypes } from "./mutations";
+import type { IState } from "./state";
 export enum ActionTypes {
   INIT_POLICIES = "explorer/initPolicies",
   INIT_PRICING_POLICIES = "explorer/initPricingPolicies",

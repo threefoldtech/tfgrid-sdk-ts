@@ -1,4 +1,5 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
+
 import config from "../config";
 
 export async function connect() {

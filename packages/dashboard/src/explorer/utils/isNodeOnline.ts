@@ -1,5 +1,6 @@
-import { INode } from "../graphql/api";
 import moment from "moment";
+
+import { INode } from "../graphql/api";
 
 export default function isNodeOnline(node: INode) {
   const { updatedAt } = node;

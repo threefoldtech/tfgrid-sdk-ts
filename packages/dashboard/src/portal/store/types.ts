@@ -1,5 +1,5 @@
-import { accountInterface } from "./state";
 import { balanceInterface } from "./../lib/balance";
+import { accountInterface } from "./state";
 
 export declare type TwinType = {
   id: string;
