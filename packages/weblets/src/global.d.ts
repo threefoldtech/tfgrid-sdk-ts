@@ -1,16 +1,16 @@
 /// <reference types="svelte" />
 
-import * as grid3_client from "grid3_client";
-import * as buffer from "buffer";
 import * as bip39 from "bip39";
+import * as buffer from "buffer";
+import type { NetworkEnv } from "grid3_client";
+import * as grid3_client from "grid3_client";
 
+import balanceStore from "./stores/balance";
 // stores
 import baseConfigStore from "./stores/baseConfig";
+import currentDeploymentStore from "./stores/currentDeployment";
 import deploymentStore from "./stores/deploymentStore";
 import notificationStore from "./stores/notifications";
-import currentDeploymentStore from "./stores/currentDeployment";
-import balanceStore from "./stores/balance";
-import type { NetworkEnv } from "grid3_client";
 
 interface AppConfigs {
   grid3_client: typeof grid3_client;

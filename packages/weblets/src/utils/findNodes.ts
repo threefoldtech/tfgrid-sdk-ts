@@ -1,6 +1,7 @@
+import type { FilterOptions } from "grid3_client";
+
 import type { ISelectOption } from "../types";
 import type { IProfile } from "../types/Profile";
-import type { FilterOptions } from "grid3_client";
 
 export default function findNodes(
   filters: FilterOptions,

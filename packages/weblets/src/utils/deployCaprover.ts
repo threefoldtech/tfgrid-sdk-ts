@@ -1,9 +1,9 @@
 import type Caprover from "../types/caprover";
 import { Network } from "../types/kubernetes";
 import type { IProfile } from "../types/Profile";
-import checkVMExist from "./prepareDeployment";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
+import checkVMExist from "./prepareDeployment";
 import rootFs from "./rootFs";
 import { InternalSolutionProviderID } from "./solutionProvider";
 

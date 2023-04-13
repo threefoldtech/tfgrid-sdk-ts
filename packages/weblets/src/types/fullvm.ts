@@ -1,13 +1,14 @@
-import VM from "./vm";
 import { v4 } from "uuid";
+
+import isValidInteger from "../utils/isValidInteger";
 import validateName, {
   validateDisk,
   validateDiskName,
   validateEntryPoint,
   validateFlistvalue,
 } from "../utils/validateName";
-import isValidInteger from "../utils/isValidInteger";
 import type { IFormField } from ".";
+import VM from "./vm";
 
 export default class FullVM extends VM {
   public name = `VM${v4().split("-")[0]}`;

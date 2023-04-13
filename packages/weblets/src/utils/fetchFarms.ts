@@ -1,7 +1,8 @@
 import type { FilterOptions } from "grid3_client";
+
 import type { IProfile } from "../types/Profile";
-import gqlApi from "./gqlApi";
 import { getBlockedFarmsIDs } from "./findNodes";
+import gqlApi from "./gqlApi";
 import paginatedFetcher from "./paginatedFetcher";
 
 const queryCount = `

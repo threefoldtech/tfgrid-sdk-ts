@@ -1,4 +1,4 @@
-import type { default as Kubernetes, Base } from "../types/kubernetes";
+import type { Base, default as Kubernetes } from "../types/kubernetes";
 import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";

@@ -1,4 +1,5 @@
 import type { GridClient } from "grid3_client";
+
 import type { IProfile } from "../types/Profile";
 import formatConsumption from "./formatConsumption";
 import getGrid from "./getGrid";

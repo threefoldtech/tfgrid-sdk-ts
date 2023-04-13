@@ -1,4 +1,5 @@
 import { v4 } from "uuid";
+
 import isValidInteger from "../utils/isValidInteger";
 
 export default class QSFS {

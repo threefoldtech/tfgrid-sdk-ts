@@ -1,6 +1,7 @@
-import type { IProfile } from "../types/Profile";
 import type { GridClient } from "grid3_client";
+
 import type { IStore } from "../types/istore";
+import type { IProfile } from "../types/Profile";
 
 export default async function getGrid<T>(
   profile: IProfile,

@@ -1,9 +1,7 @@
 import type Algorand from "../types/algorand";
-import type { IProfile } from "../types/Profile";
-
 import { Network } from "../types/kubernetes";
+import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
-
 import deploy from "./deploy";
 import checkVMExist from "./prepareDeployment";
 import { InternalSolutionProviderID } from "./solutionProvider";

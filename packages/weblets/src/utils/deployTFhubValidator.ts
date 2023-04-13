@@ -1,12 +1,11 @@
-import type TFhubValidator from "../types/TFhubValidator";
-import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
-
+import type { IProfile } from "../types/Profile";
+import type TFhubValidator from "../types/TFhubValidator";
+import { configVariables, getNetwork, setStakeAmount } from "../utils/tfhubValidatorConf";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
-import rootFs from "./rootFs";
 import checkVMExist from "./prepareDeployment";
-import { configVariables, setStakeAmount, getNetwork } from "../utils/tfhubValidatorConf";
+import rootFs from "./rootFs";
 import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployTFhubValidator(profile: IProfile, tfhubValidator: TFhubValidator) {

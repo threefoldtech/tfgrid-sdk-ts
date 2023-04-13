@@ -1,6 +1,7 @@
-import type { IStore } from "./../stores/currentDeployment";
-import { solutionList } from "../stores/solutionsList";
 import type { NodeInfo } from "grid3_client";
+
+import { solutionList } from "../stores/solutionsList";
+import type { IStore } from "./../stores/currentDeployment";
 
 export interface GatewayNodes {
   nodeDomain: string;

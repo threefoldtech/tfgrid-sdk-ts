@@ -1,8 +1,7 @@
-import type { default as VM, Disk, Env } from "../types/vm";
-
-import type { IProfile } from "../types/Profile";
-import deploy from "./deploy";
 import type { IStore } from "../stores/currentDeployment";
+import type { IProfile } from "../types/Profile";
+import type { default as VM, Disk, Env } from "../types/vm";
+import deploy from "./deploy";
 import checkVMExist from "./prepareDeployment";
 import { InternalSolutionProviderID } from "./solutionProvider";
 

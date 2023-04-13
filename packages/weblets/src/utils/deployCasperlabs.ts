@@ -1,14 +1,12 @@
 import type { default as Casperlabs } from "../types/casperlabs";
-
-import type { IProfile } from "../types/Profile";
-import deploy from "./deploy";
-
-import { getUniqueDomainName, GatewayNodes, selectSpecificGatewayNode } from "./gatewayHelpers";
-import rootFs from "./rootFs";
-import createNetwork from "./createNetwork";
 import { Network } from "../types/kubernetes";
+import type { IProfile } from "../types/Profile";
+import createNetwork from "./createNetwork";
+import deploy from "./deploy";
 import destroy from "./destroy";
+import { GatewayNodes, getUniqueDomainName, selectSpecificGatewayNode } from "./gatewayHelpers";
 import checkVMExist, { checkGW } from "./prepareDeployment";
+import rootFs from "./rootFs";
 import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployCasperlabs(data: Casperlabs, profile: IProfile, gateway: GatewayNodes) {

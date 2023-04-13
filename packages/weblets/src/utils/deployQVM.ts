@@ -1,10 +1,10 @@
-import type QSFS from "../types/qsfs";
 import type { IProfile } from "../types/Profile";
+import type QSFS from "../types/qsfs";
 import type VM from "../types/vm";
 import deploy from "./deploy";
 import deployVM from "./deployVM";
-import checkVMExist from "./prepareDeployment";
 import getGrid from "./getGrid";
+import checkVMExist from "./prepareDeployment";
 import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default function deployQvm(vm: VM, QSFS: QSFS, profile: IProfile) {

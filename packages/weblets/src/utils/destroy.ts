@@ -1,5 +1,5 @@
-import type { IStore } from "./../stores/currentDeployment";
 import type { IProfile } from "../types/Profile";
+import type { IStore } from "./../stores/currentDeployment";
 
 export default async function destroy(profile: IProfile, type: IStore["type"], name: string) {
   const { mnemonics } = profile;

@@ -1,12 +1,11 @@
 import type { default as Owncloud } from "../types/owncloud";
 import type { IProfile } from "../types/Profile";
-import checkVMExist, { checkGW } from "./prepareDeployment";
 import deploy from "./deploy";
 import destroy from "./destroy";
-import { InternalSolutionProviderID } from "./solutionProvider";
-
-import { getUniqueDomainName, GatewayNodes, selectSpecificGatewayNode } from "./gatewayHelpers";
+import { GatewayNodes, getUniqueDomainName, selectSpecificGatewayNode } from "./gatewayHelpers";
+import checkVMExist, { checkGW } from "./prepareDeployment";
 import rootFs from "./rootFs";
+import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployOwncloud(data: Owncloud, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>

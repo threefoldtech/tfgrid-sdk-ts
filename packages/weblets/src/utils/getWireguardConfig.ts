@@ -1,7 +1,8 @@
 import type { NetworkGetModel } from "grid3_client";
 import { get } from "svelte/store";
-import getGrid from "./getGrid";
+
 import type { IProfile } from "../types/Profile";
+import getGrid from "./getGrid";
 
 export default async function getWireguardConfig(network: NetworkGetModel) {
   try {
