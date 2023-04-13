@@ -21,4 +21,4 @@ If you've a specific approach to discuss, describe it here clearly.
 
 ### More
 
-Write more details here if needed
+Write more details here if needed about the feature
