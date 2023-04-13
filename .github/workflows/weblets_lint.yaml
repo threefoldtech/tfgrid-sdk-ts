@@ -3,9 +3,12 @@ name: Lint
 on:
   push:
     branches: [development]
+    paths:
+      - "packages/weblets/**"
   pull_request:
     branches: [development]
-
+    paths:
+      - "packages/weblets/**"
 jobs:
   lint:
     runs-on: ubuntu-latest
