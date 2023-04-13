@@ -1,0 +1,39 @@
+* {
+  font-family: "Lato", sans-serif;
+}
+.v-btn__content {
+  text-transform: capitalize;
+  padding: 0px 23px;
+  min-width: 92px;
+}
+
+.v-btn {
+  margin-right: 6px;
+  font-weight: 900 !important;
+  padding: 0px 1px !important;
+}
+
+.v-btn--icon.v-size--default {
+  width: 50px !important;
+}
+h2 {
+  font-weight: 400;
+}
+
+.item__title {
+  font-size: 1rem !important;
+  padding: 5px;
+}
+
+.item__img {
+  padding: 5px !important;
+}
+
+.item__data {
+  font-size: 24px !important;
+  margin-top: 5px !important;
+}
+
+.v-application p {
+  margin-bottom: 0px !important;
+}
