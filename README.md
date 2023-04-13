@@ -1,6 +1,6 @@
 # tfgrid-sdk-ts
 
-This repo contains the typescript clients for Threefold grid.
+This repo contains the typescript clients and projects for Threefold grid.
 
 ## Packages
 
