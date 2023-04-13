@@ -1,4 +1,4 @@
-name: Build and push a new docker image based on project release tag.
+name: Dashboard Docker Build/Push
 
 on:
   release:
