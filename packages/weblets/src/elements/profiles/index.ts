@@ -1,0 +1,1 @@
+import "./Profiles.wc.svelte";

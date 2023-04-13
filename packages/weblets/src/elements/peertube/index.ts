@@ -1,0 +1,1 @@
+import "./Peertube.wc.svelte";

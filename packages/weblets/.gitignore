@@ -1,0 +1,12 @@
+/node_modules/
+/public/build/
+playground/public/build/
+dist/
+
+.DS_Store
+
+.build
+.vscode
+
+package-lock.json
+yarn-error.log

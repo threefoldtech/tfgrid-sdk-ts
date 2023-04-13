@@ -1,0 +1,1 @@
+import "./Inca.wc.svelte";

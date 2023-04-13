@@ -1,0 +1,1 @@
+import "./FarmingCalculator.wc.svelte";

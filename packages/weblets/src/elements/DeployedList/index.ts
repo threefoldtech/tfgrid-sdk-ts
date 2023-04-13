@@ -1,0 +1,1 @@
+import "./DeployedList.wc.svelte";
