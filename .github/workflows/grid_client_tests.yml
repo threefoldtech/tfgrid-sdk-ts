@@ -41,7 +41,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y git libtool tmux redis net-tools
       - name: Install
-        run: yarn
+        run: |
+          yarn
+          lerna run build
       - name: Run tests
         run: yarn workspace @threefold/grid_client test --runInBand --ci --coverage --colors
       - name: Cleanup
