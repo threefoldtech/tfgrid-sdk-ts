@@ -1,9 +1,9 @@
 /// <reference types="svelte" />
 
-import * as bip39 from "bip39";
-import * as buffer from "buffer";
 import type { NetworkEnv } from "@threefold/grid_client";
 import * as grid3_client from "@threefold/grid_client";
+import * as bip39 from "bip39";
+import * as buffer from "buffer";
 
 import balanceStore from "./stores/balance";
 // stores
