@@ -45,6 +45,6 @@ jobs:
 
       - name: Build
         run: |
-          lenra run build
+          lerna run build
           cd packages/weblets
           yarn build:app
