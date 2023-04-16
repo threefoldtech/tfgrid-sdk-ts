@@ -2,6 +2,7 @@ import { Client as RMBClient } from "@threefold/rmb_direct_client";
 import * as PATH from "path";
 import urlJoin from "url-join";
 
+import { Graphql } from "./clients";
 import { TFClient } from "./clients/tf-grid/client";
 import { ClientOptions, GridClientConfig, NetworkEnv } from "./config";
 import { send } from "./helpers";
@@ -170,7 +171,8 @@ class GridClient {
     }
 
     try {
-      await send("get", urls.graphql, "", {});
+      const gql = new Graphql(urls.graphql);
+      await gql.query("query { __typename }");
     } catch (err) {
       console.log(err.message);
       throw Error("failed to connect to Graphql server");
