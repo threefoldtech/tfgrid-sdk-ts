@@ -9,7 +9,7 @@ The target is to make a private Mesh connection between the nodes so they can re
 This configuration is set on each node using [network workload](../src/zos/znet.ts)
 
 - `ip_range`: an ip range to be used for this network, it needs to be private ip range, normally a /16 subnet is used (e.g. `10.20.0.0/16`)
-- `subnet`:  a subnet to be used for this network, it should be a subnet of the entire network ip range, normally a /24 subnet is used for the node (e.g. `10.20.1.0/24`)
+- `subnet`: a subnet to be used for this network, it should be a subnet of the entire network ip range, normally a /24 subnet is used for the node (e.g. `10.20.1.0/24`)
 - `wireguard_private_key`: an x25519 secret key generated for this node (e.g. `h1UkGZvWGUkBPcs+EyzGTpzr50+vOz1z50nN8szQ260=`)
 - `wireguard_listen_port`: a random free port on this node, the used ports can be gotten by sending a request over RMB to the node with command `zos.network.list_wg_ports` (e.g. `7788`)
 - `peers`: A list of peers (other nodes or a user access) that they will be on the same network.
@@ -19,7 +19,7 @@ Each Peer should have this configuration:
 - `subnet`: the subnet set for the other node (e.g. 10.20.2.0/24)
 - `wireguard_public_key`: the public key related to the secret key generated of the node (e.g. `BA2U9NoQD92r1LkSf46WMJgl/eJ3+2dK9FyrX2/+y0E=`)
 - `allowed_ips`: this should be the node's subnet and the wireguard routing ip that should start with `100.64` then the 2nd and 3rd part of the node's subnet `["10.20.2.0/24", "100.64.20.2/32"]`
-- `endpoint`: an endpoint for the node, this should be public, if the node is an access node, it can be gotten by sending a request over RMB to the node with command `zos.network.public_config_get` , but if it's not an access node, the command should be `zos.network.interfaces` and get `zos` interface  (e.g. `[2a10:b600:0:9:ec4:7aff:fe30:2d50]:5848`)
+- `endpoint`: an endpoint for the node, this should be public, if the node is an access node, it can be gotten by sending a request over RMB to the node with command `zos.network.public_config_get` , but if it's not an access node, the command should be `zos.network.interfaces` and get `zos` interface (e.g. `[2a10:b600:0:9:ec4:7aff:fe30:2d50]:5848`)
 
 ## Exceptions
 
@@ -131,7 +131,7 @@ In the example, we will try to make a network with 2 normal nodes, one access no
 }
 ```
 
-#### Node 2 
+#### Node 2
 
 ```ts
 {

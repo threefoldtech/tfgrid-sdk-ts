@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16
-          cache: 'yarn'
+          cache: "yarn"
       - name: Install Yggdrasil and Add Peers
         run: |
           sudo apt-get update
@@ -42,7 +42,7 @@ jobs:
           sudo apt-get install -y git libtool tmux redis net-tools
       - name: Install
         run: yarn
-      - name: Run tests 
+      - name: Run tests
         run: yarn workspace @threefold/grid_client test --runInBand --ci --coverage --colors
       - name: Cleanup
         continue-on-error: true
@@ -54,9 +54,9 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Test Report
         uses: dorny/test-reporter@v1
-        if: success() || failure()    
+        if: success() || failure()
         with:
-          name: JEST Tests           
+          name: JEST Tests
           path: packages/grid/tests/test-reports/report.xml
           reporter: jest-junit
           fail-on-error: false

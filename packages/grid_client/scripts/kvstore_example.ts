@@ -5,36 +5,36 @@ import { log } from "./utils";
 KVStore example usage:
 */
 async function main() {
-    //For creating grid3 client with KVStore, you need to specify the KVStore storage type in the pram:
+  //For creating grid3 client with KVStore, you need to specify the KVStore storage type in the pram:
 
-    const gridClient = await getClient();
+  const gridClient = await getClient();
 
-    //then every module will use the KVStore to save its configuration and restore it.
+  //then every module will use the KVStore to save its configuration and restore it.
 
-    // also you can use it like this:
-    const db = gridClient.kvstore;
+  // also you can use it like this:
+  const db = gridClient.kvstore;
 
-    // set key
-    const key = "hamada";
-    const exampleObj = {
-        key1: "value1",
-        key2: 2,
-    };
-    // set key
-    await db.set({ key, value: JSON.stringify(exampleObj) });
+  // set key
+  const key = "hamada";
+  const exampleObj = {
+    key1: "value1",
+    key2: 2,
+  };
+  // set key
+  await db.set({ key, value: JSON.stringify(exampleObj) });
 
-    // list all the keys
-    const keys = await db.list();
-    log(keys);
+  // list all the keys
+  const keys = await db.list();
+  log(keys);
 
-    // get the key
-    const data = await db.get({ key });
-    log(JSON.parse(data));
+  // get the key
+  const data = await db.get({ key });
+  log(JSON.parse(data));
 
-    // remove the key
-    await db.remove({ key });
+  // remove the key
+  await db.remove({ key });
 
-    await gridClient.disconnect();
+  await gridClient.disconnect();
 }
 
 main();

@@ -14,20 +14,20 @@ Add network and account's mnemonics in `config.json` in [server directory](./src
 
 ```json
 {
-    "network": "<network environment dev, qa or test>",
-    "mnemonic": "<your account mnemonics>",
-    "storeSecret": "", // secret used for encrypting/decrypting the values in tfkvStore
-    "keypairType": "sr25519" // keypair type for the account created on substrate
+  "network": "<network environment dev, qa or test>",
+  "mnemonic": "<your account mnemonics>",
+  "storeSecret": "", // secret used for encrypting/decrypting the values in tfkvStore
+  "keypairType": "sr25519" // keypair type for the account created on substrate
 }
 ```
 
 You can also use another configuration file by using `--config` or `-c` option.
 
-````bash
+```bash
  yarn grid_http_server -c pathToConfigFile.json
- # or 
+ # or
  yarn grid_http_server --config pathToConfigFile.json
-````
+```
 
 ## Life cycle
 
@@ -52,17 +52,17 @@ Put the following content in a file `test_twin.ts`
 import axios from "axios";
 
 async function main() {
-    const payload = { 'id': 1 }
-    axios
-      .post("http://localhost:3000/twins/get", payload)
-      .then(function (response: any) {
-          console.log(response);
-      })
-      .catch(function (error: any) {
-          console.log(error.response.data);
+  const payload = { id: 1 };
+  axios
+    .post("http://localhost:3000/twins/get", payload)
+    .then(function (response: any) {
+      console.log(response);
+    })
+    .catch(function (error: any) {
+      console.log(error.response.data);
     });
 }
-main()
+main();
 ```
 
 And then run this file by `yarn run ts-node test_twin.ts`

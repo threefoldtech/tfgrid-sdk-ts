@@ -1,80 +1,80 @@
 {
-    "name": "@threefold/grid_client",
-    "author": "Ahmed Hanafy",
-    "version": "0.0.1",
-    "license": "ISC",
-    "homepage": "https://github.com/threefoldtech/grid3_client_ts/blob/development/packages/grid/README.md",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/threefoldtech/grid3_client_ts.git"
-    },
-    "publishConfig": {
-        "access": "public"
-    },
-    "dependencies": {
-        "@jimber/pkid": "1.0.4",
-        "@noble/secp256k1": "^1.7.1",
-        "@threefold/rmb_direct_client": "^0.0.1",
-        "@threefold/rmb_peer_server": "^0.0.1",
-        "algosdk": "^1.19.0",
-        "appdata-path": "^1.0.0",
-        "await-lock": "^2.1.0",
-        "axios": "^0.27.2",
-        "bip39": "^3.0.4",
-        "buffer": "^6.0.3",
-        "class-transformer": "^0.5.1",
-        "class-validator": "^0.14.0",
-        "crypto-js": "^4.1.1",
-        "decimal.js": "^10.3.1",
-        "exponential-backoff": "^3.1.0",
-        "express": "^4.18.1",
-        "http-server": "^14.1.1",
-        "libsodium-wrappers": "^0.7.10",
-        "netaddr": "^1.1.0",
-        "private-ip": "^2.3.3",
-        "reflect-metadata": "^0.1.13",
-        "stellar-sdk": "^10.4.1",
-        "tfgrid-api-client": "1.27.0",
-        "tweetnacl": "^1.0.3",
-        "tweetnacl-util": "^0.15.1",
-        "typescript": "^4.7.4",
-        "url-join": "^4.0.1",
-        "url-parse": "^1.5.10",
-        "uuid4": "^2.0.2"
-    },
-    "devDependencies": {
-        "@types/jest": "^29.2.6",
-        "jest": "^29.3.1",
-        "jest-junit": "^14.0.1",
-        "node-ssh": "^13.0.0",
-        "npm-run-all": "^4.1.5",
-        "random-ipv6": "^1.0.2",
-        "ts-jest": "^29.0.5",
-        "ts-node": "^10.9.1",
-        "tsconfig-paths-webpack-plugin": "^4.0.0",
-        "typedoc": "^0.22.10"
-    },
-    "main": "./dist/node/index.js",
-    "module": "./dist/es6/index.js",
-    "exports": {
-        "require": "./dist/node/index.js",
-        "import": "./dist/es6/index.js"
-    },
-    "types": "dist/es6/index.d.ts",
-    "files": [
-        "/dist"
-    ],
-    "bin": {
-        "twinserver": "./dist/node/server/rmb_server.js"
-    },
-    "private": false,
-    "scripts": {
-        "build": "npm-run-all es6-build node-build",
-        "node-build": "tsc --build tsconfig-node.json",
-        "es6-build": "tsc --build tsconfig-es6.json",
-        "rmb_server": "ts-node --project tsconfig-node.json src/server/rmb_server.ts",
-        "generate-docs": "typedoc --tsconfig tsconfig-es6.json src/index.ts --out docs/api",
-        "serve-docs": "http-server docs/api",
-        "test": "jest"
-    }
+  "name": "@threefold/grid_client",
+  "author": "Ahmed Hanafy",
+  "version": "0.0.1",
+  "license": "ISC",
+  "homepage": "https://github.com/threefoldtech/grid3_client_ts/blob/development/packages/grid/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/threefoldtech/grid3_client_ts.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@jimber/pkid": "1.0.4",
+    "@noble/secp256k1": "^1.7.1",
+    "@threefold/rmb_direct_client": "^0.0.1",
+    "@threefold/rmb_peer_server": "^0.0.1",
+    "algosdk": "^1.19.0",
+    "appdata-path": "^1.0.0",
+    "await-lock": "^2.1.0",
+    "axios": "^0.27.2",
+    "bip39": "^3.0.4",
+    "buffer": "^6.0.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0",
+    "crypto-js": "^4.1.1",
+    "decimal.js": "^10.3.1",
+    "exponential-backoff": "^3.1.0",
+    "express": "^4.18.1",
+    "http-server": "^14.1.1",
+    "libsodium-wrappers": "^0.7.10",
+    "netaddr": "^1.1.0",
+    "private-ip": "^2.3.3",
+    "reflect-metadata": "^0.1.13",
+    "stellar-sdk": "^10.4.1",
+    "tfgrid-api-client": "1.27.0",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.1",
+    "typescript": "^4.7.4",
+    "url-join": "^4.0.1",
+    "url-parse": "^1.5.10",
+    "uuid4": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.2.6",
+    "jest": "^29.3.1",
+    "jest-junit": "^14.0.1",
+    "node-ssh": "^13.0.0",
+    "npm-run-all": "^4.1.5",
+    "random-ipv6": "^1.0.2",
+    "ts-jest": "^29.0.5",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths-webpack-plugin": "^4.0.0",
+    "typedoc": "^0.22.10"
+  },
+  "main": "./dist/node/index.js",
+  "module": "./dist/es6/index.js",
+  "exports": {
+    "require": "./dist/node/index.js",
+    "import": "./dist/es6/index.js"
+  },
+  "types": "dist/es6/index.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "bin": {
+    "twinserver": "./dist/node/server/rmb_server.js"
+  },
+  "private": false,
+  "scripts": {
+    "build": "npm-run-all es6-build node-build",
+    "node-build": "tsc --build tsconfig-node.json",
+    "es6-build": "tsc --build tsconfig-es6.json",
+    "rmb_server": "ts-node --project tsconfig-node.json src/server/rmb_server.ts",
+    "generate-docs": "typedoc --tsconfig tsconfig-es6.json src/index.ts --out docs/api",
+    "serve-docs": "http-server docs/api",
+    "test": "jest"
+  }
 }

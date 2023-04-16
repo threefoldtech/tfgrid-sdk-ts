@@ -25,7 +25,7 @@ jobs:
         if: ${{ github.ref == 'refs/heads/development' }}
         run: |
           VERSION=$GITHUB_SHA
-          echo VERSION=${VERSION:0:7} >> $GITHUB_ENV 
+          echo VERSION=${VERSION:0:7} >> $GITHUB_ENV
 
       - name: Args in case test
         if: |

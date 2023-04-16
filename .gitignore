@@ -1,7 +1,7 @@
 node_modules/
 dist/
 yarn-error.log
-packages/grid/docs/tests/
+packages/grid_client/docs/tests/
 
 packages/weblets/public/build/
 packages/weblets/playground/public/build/

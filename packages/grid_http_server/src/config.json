@@ -1,6 +1,6 @@
 {
-    "network": "dev",
-    "mnemonic": "",
-    "storeSecret": "",
-    "keypairType": "sr25519"
+  "network": "dev",
+  "mnemonic": "",
+  "storeSecret": "",
+  "keypairType": "sr25519"
 }

@@ -6,11 +6,11 @@
 
 ```json
 {
-    "network": "dev", // dev, qa or test  -> 
-    "mnemonic": "", 
-    "rmb_proxy": true,
-    "storeSecret": "secret",
-    "ssh_key": ""
+  "network": "dev", // dev, qa or test  ->
+  "mnemonic": "",
+  "rmb_proxy": true,
+  "storeSecret": "secret",
+  "ssh_key": ""
 }
 ```
 

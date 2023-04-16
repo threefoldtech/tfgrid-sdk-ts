@@ -11,8 +11,9 @@
 ### Test Configuration
 
 - You can use any of the following methods for adding your configuration.
-  
+
   - First Method (Environment Variables):
+
     - Export your configuration as environment variables
     - `export MNEMONIC="<mnemonics>"`
     - `export NETWORK="<network>"` # dev, qa, test or main.
@@ -27,9 +28,9 @@
 ### Running the tests
 
 - Running a single test file:
-  
+
   - `yarn test tests/modules/<test_file.test.ts>`
-  
+
 - Running all of the tests:
-  
+
   - `yarn test --runInBand`

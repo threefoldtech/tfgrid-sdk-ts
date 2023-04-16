@@ -5,17 +5,17 @@ import { validateInput } from "../helpers/validator";
 import { FarmIdModel } from "./models";
 
 class Farms {
-    client: TFClient;
+  client: TFClient;
 
-    constructor(public config: GridClientConfig) {
-        this.client = new TFClient(config.substrateURL, config.mnemonic, config.storeSecret, config.keypairType);
-    }
+  constructor(public config: GridClientConfig) {
+    this.client = new TFClient(config.substrateURL, config.mnemonic, config.storeSecret, config.keypairType);
+  }
 
-    @expose
-    @validateInput
-    async getFarmByID(options: FarmIdModel) {
-        return await this.client.farms.getFarmByID(options.farmId);
-    }
+  @expose
+  @validateInput
+  async getFarmByID(options: FarmIdModel) {
+    return await this.client.farms.getFarmByID(options.farmId);
+  }
 }
 
 export { Farms as farms };

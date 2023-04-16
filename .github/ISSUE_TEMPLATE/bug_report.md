@@ -1,11 +1,11 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
-
+title: ""
+labels: ""
+assignees: ""
 ---
+
 ### Search first
 
 Search for similar issues first, if not complete the following template

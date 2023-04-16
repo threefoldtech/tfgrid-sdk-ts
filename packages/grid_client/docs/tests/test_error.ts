@@ -1,11 +1,9 @@
 async function test() {
-    throw Error("e");
+  throw Error("e");
 }
 
-
 async function main() {
-
-    await test();
+  await test();
 }
 main();
 // test().then().catch(err => {

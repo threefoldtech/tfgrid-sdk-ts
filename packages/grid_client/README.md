@@ -55,7 +55,7 @@ yarn install
 
 - project name: it's a name to isolate the deployments into a namespace.
 
-    **Note:** only network can't be isolated, all project can see the same network.
+  **Note:** only network can't be isolated, all project can see the same network.
 
 ### Create client instance
 
@@ -63,25 +63,25 @@ yarn install
 
 - or you can check more advanced configuration [here](./docs/client_configuration.md).
 
-    ```ts
-    async function getClient(): Promise<GridClient> {
+  ```ts
+  async function getClient(): Promise<GridClient> {
     const gridClient = new GridClient({
-        network: config.network,
-        mnemonic: config.mnemonic,
+      network: config.network,
+      mnemonic: config.mnemonic,
     });
     await gridClient.connect();
 
     return gridClient;
-    }
-    ```
+  }
+  ```
 
 - You can set your configurations through environment variables or [JSON config file](./scripts/config.json) as seen [here](./scripts/client_loader.ts).
 
 - With clientOptions being added, all urls are now configured. So, you can easily get the proxy URL for the used network simply by:
 
-    ```ts
-    const proxyURL = gridClient.clientOptions.proxyURL
-    ```
+  ```ts
+  const proxyURL = gridClient.clientOptions.proxyURL;
+  ```
 
 for more details, check [client options](./src/client.ts)
 
@@ -97,9 +97,9 @@ gridClient.disconnect();
 
 - After creating a client instance you can call it in any of your scripts using `getClient()`.
 
-    ```ts
-    const grid3 = getClient();
-    ```
+  ```ts
+  const grid3 = getClient();
+  ```
 
 - And then you can use this client instance with any of the client [modules](./docs/module.md).
 
@@ -123,46 +123,38 @@ gridClient.disconnect();
 
 - Before Running the scripts make sure you have a `tsconfig.json` file. here is an example file.
 
-    ```json
-    {
-        "compilerOptions": {
-            "noImplicitAny": false,
-            "module": "commonjs",
-            "target": "esnext",
-            "lib": [
-                "ESNext",
-                "DOM"
-            ],
-            "types": [
-                "node",
-                "jest"
-            ],
-            "declaration": true,
-            "declarationMap": true,
-            "outDir": "./dist/node",
-            "esModuleInterop": true,
-            "emitDecoratorMetadata": true,
-            "experimentalDecorators": true,
-            "allowJs": true,
-            "baseUrl": "."
-        },
-        "include": [
-            "src/**/*"
-        ]
-    }
-    ```
+  ```json
+  {
+    "compilerOptions": {
+      "noImplicitAny": false,
+      "module": "commonjs",
+      "target": "esnext",
+      "lib": ["ESNext", "DOM"],
+      "types": ["node", "jest"],
+      "declaration": true,
+      "declarationMap": true,
+      "outDir": "./dist/node",
+      "esModuleInterop": true,
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "allowJs": true,
+      "baseUrl": "."
+    },
+    "include": ["src/**/*"]
+  }
+  ```
 
 - After following the previous examples to create a client instance and using it in a script, you can then execute this script using [ts-node](https://www.npmjs.com/ts-node).
 
-    ```bash
-    npx ts-node --project tsconfig-node.json filename.ts
-    ```
+  ```bash
+  npx ts-node --project tsconfig-node.json filename.ts
+  ```
 
-    or
+  or
 
-    ```bash
-    yarn run ts-node --project tsconfig-node.json filename.ts
-    ```
+  ```bash
+  yarn run ts-node --project tsconfig-node.json filename.ts
+  ```
 
 ## Usage examples
 
