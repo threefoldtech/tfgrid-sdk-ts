@@ -347,14 +347,16 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
-import { default as PrivateIp } from "private-ip";
-import { byteToGB, generateNodeSummary, generateReceipt, getNodeUptimePercentage } from "@/portal/lib/nodes";
-import { addNodePublicConfig, deleteNode, nodeInterface } from "@/portal/lib/farms";
-import { hex2a } from "@/portal/lib/util";
-import ReceiptsCalendar from "./ReceiptsCalendar.vue";
 import jsPDF from "jspdf";
+import { default as PrivateIp } from "private-ip";
+import { Component, Prop, Vue } from "vue-property-decorator";
+
 import config from "@/portal/config";
+import { addNodePublicConfig, deleteNode, nodeInterface } from "@/portal/lib/farms";
+import { byteToGB, generateNodeSummary, generateReceipt, getNodeUptimePercentage } from "@/portal/lib/nodes";
+import { hex2a } from "@/portal/lib/util";
+
+import ReceiptsCalendar from "./ReceiptsCalendar.vue";
 
 @Component({
   name: "FarmNodesTable",
@@ -480,7 +482,7 @@ export default class FarmNodesTable extends Vue {
   // }
 
   downloadAllReceipts() {
-    let docSum = new jsPDF();
+    const docSum = new jsPDF();
     generateNodeSummary(docSum, this.nodes);
     docSum.addPage();
 
@@ -498,7 +500,7 @@ export default class FarmNodesTable extends Vue {
     return byteToGB(capacity);
   }
   saveConfig() {
-    var config: {
+    const config: {
       ip4: { ip: string; gw: string };
       ip6?: { ip: string; gw: string };
       domain?: string;

@@ -7,24 +7,24 @@ import { BaseModule } from "./base";
 import { NetworkGetModel } from "./models";
 
 class NetworkModule extends BaseModule {
-    moduleName = "networks";
+  moduleName = "networks";
 
-    constructor(public config: GridClientConfig) {
-        super(config);
-    }
+  constructor(public config: GridClientConfig) {
+    super(config);
+  }
 
-    @expose
-    async list(): Promise<string[]> {
-        return await this._list();
-    }
+  @expose
+  async list(): Promise<string[]> {
+    return await this._list();
+  }
 
-    @expose
-    @validateInput
-    async getWireGuardConfigs(options: NetworkGetModel) {
-        const path = PATH.join(this.getDeploymentPath(options.name), "info.json");
-        const networkInfo = await this.backendStorage.load(path);
-        return networkInfo["wireguardConfigs"];
-    }
+  @expose
+  @validateInput
+  async getWireGuardConfigs(options: NetworkGetModel) {
+    const path = PATH.join(this.getDeploymentPath(options.name), "info.json");
+    const networkInfo = await this.backendStorage.load(path);
+    return networkInfo["wireguardConfigs"];
+  }
 }
 
 export { NetworkModule as networks };

@@ -1,8 +1,9 @@
 import { v4 } from "uuid";
+
 import isValidInteger from "../utils/isValidInteger";
 import rootFs from "../utils/rootFs";
-import NodeID from "./nodeId";
 import validateName, { validatePrivateIPRange } from "../utils/validateName";
+import NodeID from "./nodeId";
 
 export abstract class Base {
   public constructor(

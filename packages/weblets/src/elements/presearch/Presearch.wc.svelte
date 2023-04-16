@@ -1,29 +1,27 @@
 <svelte:options tag="tf-presearch" />
 
 <script lang="ts">
-  import Presearch from "../../types/presearch";
-  import type { IProfile } from "../../types/Profile";
-  import type { IFormField, ITab } from "../../types";
-  import deployPresearch from "../../utils/deployPresearch";
-  import rootFs from "../../utils/rootFs";
-
+  import Alert from "../../components/Alert.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import Input from "../../components/Input.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
-
+  import type { IFormField, ITab } from "../../types";
+  import Presearch from "../../types/presearch";
+  import type { IProfile } from "../../types/Profile";
+  import deployPresearch from "../../utils/deployPresearch";
+  import { display } from "../../utils/display";
   // utils
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, { isInvalid, validatePreCode} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
-  import { display } from "../../utils/display";
   import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
+  import rootFs from "../../utils/rootFs";
+  import validateName, { isInvalid, validatePreCode} from "../../utils/validateName"; // prettier-ignore
 
-  let data = new Presearch();
+  const data = new Presearch();
   let profile: IProfile;
 
   let loading = false;

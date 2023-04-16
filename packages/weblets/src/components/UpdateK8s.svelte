@@ -2,25 +2,26 @@
 
 <script lang="ts">
   // libs
-  import type { IProfile } from "../types/Profile";
-  import { Worker } from "../types/kubernetes";
   import type { IFormField } from "../types";
+  import { Worker } from "../types/kubernetes";
+  import type { IProfile } from "../types/Profile";
   import validateName, { isInvalid, validateCpu, validateDisk, validateKubernetesMemory } from "../utils/validateName"; // prettier-ignore
   const { AddWorkerModel, DeleteWorkerModel } = window.configs?.grid3_client ?? {}; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   // components
-  import Alert from "./Alert.svelte";
-  import Input from "./Input.svelte";
-  import SelectNodeId from "./SelectNodeId.svelte";
-  import getGrid from "../utils/getGrid";
-  import DeployBtn from "./DeployBtn.svelte";
   import { createEventDispatcher } from "svelte";
-  import Table from "./Table.svelte";
-  import RootFsSize from "./RootFsSize.svelte";
+
+  import getGrid from "../utils/getGrid";
   import rootFs from "../utils/rootFs";
-  import DialogueMsg from "./DialogueMsg.svelte";
   import { InternalSolutionProviderID } from "../utils/solutionProvider";
+  import Alert from "./Alert.svelte";
+  import DeployBtn from "./DeployBtn.svelte";
+  import DialogueMsg from "./DialogueMsg.svelte";
+  import Input from "./Input.svelte";
+  import RootFsSize from "./RootFsSize.svelte";
+  import SelectNodeId from "./SelectNodeId.svelte";
+  import Table from "./Table.svelte";
 
   const dispatch = createEventDispatcher<{ closed: boolean }>();
 
@@ -121,7 +122,7 @@
           .then(({ deleted, updated }) => {
             if (deleted.length > 0 || updated.length > 0) {
               shouldBeUpdated = true;
-              let r = removing;
+              const r = removing;
               requestAnimationFrame(() => {
                 workers = workers.filter(({ name }) => name !== r); // prettier-ignore
               });

@@ -1,4 +1,5 @@
 import { Chart } from "chart.js";
+
 import type FarmingProfile from "../types/FarmingProfile";
 
 export function buildPieChart(canvas: HTMLCanvasElement) {

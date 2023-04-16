@@ -1,4 +1,5 @@
 import { v4 } from "uuid";
+
 import VM from "./vm";
 
 export default class NodePilot extends VM {

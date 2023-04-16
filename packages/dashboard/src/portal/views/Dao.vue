@@ -211,7 +211,8 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { getProposals, vote, proposalInterface } from "../lib/dao";
+
+import { getProposals, proposalInterface, vote } from "../lib/dao";
 import { getFarm, getNodesByFarm } from "../lib/farms";
 @Component({
   name: "Dao",

@@ -1,4 +1,5 @@
 module.exports = {
+  root: true,
   env: {
     browser: true,
     es2021: true,
@@ -21,4 +22,5 @@ module.exports = {
   settings: {
     "svelte3/typescript": true, // load TypeScript as peer dependency
   },
+  ignorePatterns: ["playground/public/build/elements/*", "*.config.*", "*global.css"],
 };

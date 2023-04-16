@@ -15,11 +15,12 @@
 </template>
 
 <script lang="ts">
+import { formatUnits } from "ethers/lib/utils";
 import { Component, Vue } from "vue-property-decorator";
+
+import VoteCircle from "../components/VoteCircle.vue";
 import { CosmosStakingV1Beta1QueryValidatorsResponse } from "../rest/cosmos";
 import { listValidators } from "../utils/gov";
-import { formatUnits } from "ethers/lib/utils";
-import VoteCircle from "../components/VoteCircle.vue";
 
 @Component({
   name: "ListGov",
@@ -40,7 +41,7 @@ export default class ListGov extends Vue {
   error: string | null = null;
 
   async normalizeStakedTokens() {
-    let validators = this.validators || [];
+    const validators = this.validators || [];
     for (const validator of validators) {
       validator.tokens =
         formatUnits(validator.tokens || "0", this.$store.state.hub.config.tft_decimals) +

@@ -42,8 +42,10 @@
   </v-expansion-panels>
 </template>
 <script lang="ts">
-import { Component, Vue, Prop } from "vue-property-decorator";
+import { Component, Prop, Vue } from "vue-property-decorator";
+
 import { hex2a } from "@/portal/lib/util";
+
 import CreateIP from "./CreateIP.vue";
 import DeleteIP from "./DeleteIP.vue";
 interface ipInterface {

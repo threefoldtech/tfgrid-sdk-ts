@@ -1,12 +1,10 @@
+import { Network } from "../types/kubernetes";
 import type Presearch from "../types/presearch";
 import type { IProfile } from "../types/Profile";
-
-import { Network } from "../types/kubernetes";
 import createNetwork from "./createNetwork";
-
-import rootFs from "./rootFs";
 import deploy from "./deploy";
 import checkVMExist from "./prepareDeployment";
+import rootFs from "./rootFs";
 import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployPresearch(data: Presearch, profile: IProfile) {

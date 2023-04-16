@@ -85,18 +85,19 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
-import DetailsV2 from "../components/DetailsV2.vue";
-import { getFarmsQuery, getPricingPolicies, IFarm, IFetchPaginatedData } from "../graphql/api";
-import Layout from "../components/Layout.vue";
-import { IPaginationData } from "../store/state";
-import { PAGE_LIMIT } from "../json/constants";
-import InFilterV2 from "../components/InFilterV2.vue";
-import IFilterOptions from "../types/FilterOptions";
-import getFarmPublicIPs from "../utils/getFarmPublicIps";
 import gql from "graphql-tag";
-import equalArrays from "../utils/equalArrays";
+import { Component, Vue, Watch } from "vue-property-decorator";
+
+import DetailsV2 from "../components/DetailsV2.vue";
+import InFilterV2 from "../components/InFilterV2.vue";
+import Layout from "../components/Layout.vue";
 import LayoutFilters from "../components/LayoutFilters.vue";
+import { getFarmsQuery, getPricingPolicies, IFarm, IFetchPaginatedData } from "../graphql/api";
+import { PAGE_LIMIT } from "../json/constants";
+import { IPaginationData } from "../store/state";
+import IFilterOptions from "../types/FilterOptions";
+import equalArrays from "../utils/equalArrays";
+import getFarmPublicIPs from "../utils/getFarmPublicIps";
 @Component({
   components: {
     Layout,

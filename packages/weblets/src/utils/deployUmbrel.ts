@@ -1,11 +1,10 @@
-import type { default as Umbrel } from "../types/umbrel";
-import type { IProfile } from "../types/Profile";
 import { Network } from "../types/kubernetes";
-
+import type { IProfile } from "../types/Profile";
+import type { default as Umbrel } from "../types/umbrel";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
-import rootFs from "./rootFs";
 import checkVMExist from "./prepareDeployment";
+import rootFs from "./rootFs";
 import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployUmbrel(data: Umbrel, profile: IProfile) {

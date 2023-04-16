@@ -1,8 +1,9 @@
+import { GetterTree } from "vuex";
+
+import toTeraOrGigaOrPeta from "../filters/toTeraOrGigaOrPeta";
 import { GetDataQueryType } from "../graphql/api";
 import { applyFilters, comparisonFilter, conditionFilter, inFilter, rangeFilter } from "../utils/filters";
-import { GetterTree } from "vuex";
 import { IState } from "./state";
-import toTeraOrGigaOrPeta from "../filters/toTeraOrGigaOrPeta";
 
 type ExtractKeyOf<T, K extends keyof T> = T[K] extends Array<infer Q> ? keyof Q : T[K]; // prettier-ignore
 type ExtractValue<T, K extends keyof T> = T[K] extends Array<infer Q> ? Q : T[K]; // prettier-ignore

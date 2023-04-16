@@ -6,6 +6,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+
 import { Actions } from "./store";
 import { checkKeplr } from "./utils/checkKeplr";
 import { ensureChain } from "./utils/keplr";

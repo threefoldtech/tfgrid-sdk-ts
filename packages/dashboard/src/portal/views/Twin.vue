@@ -71,10 +71,12 @@
 </template>
 
 <script lang="ts">
-import WelcomeWindow from "../components/WelcomeWindow.vue";
 import { Component, Vue } from "vue-property-decorator";
-import { deleteTwin, updateRelay } from "../lib/twin";
+
 import config from "@/portal/config";
+
+import WelcomeWindow from "../components/WelcomeWindow.vue";
+import { deleteTwin, updateRelay } from "../lib/twin";
 import { TwinType } from "../store/types";
 
 @Component({

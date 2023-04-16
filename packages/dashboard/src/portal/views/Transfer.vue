@@ -47,11 +47,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { checkAddress, transfer } from "../lib/transfer";
 import QrcodeVue from "qrcode.vue";
-import { accountInterface } from "../store/state";
+import { Component, Vue } from "vue-property-decorator";
+
 import { balanceInterface, getBalance } from "../lib/balance";
+import { checkAddress, transfer } from "../lib/transfer";
+import { accountInterface } from "../store/state";
 
 @Component({
   name: "TransferView",

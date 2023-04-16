@@ -1,6 +1,7 @@
+import { v4 } from "uuid";
+
 import generatePassword from "../utils/generatePassword";
 import VM, { Disk } from "./vm";
-import { v4 } from "uuid";
 const length = Math.floor(Math.random() * 5) + 10;
 export default class Peertube extends VM {
   public name = `PT${v4().split("-")[0]}`;

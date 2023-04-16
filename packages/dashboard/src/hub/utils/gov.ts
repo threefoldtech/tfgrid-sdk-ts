@@ -1,24 +1,25 @@
+import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
+import { BigNumber } from "ethers";
+
 import {
-  CosmosGovV1Beta1QueryProposalsResponse,
   Api,
-  CosmosGovV1Beta1QueryProposalResponse,
-  CosmosGovV1Beta1QueryParamsResponse,
-  CosmosGovV1Beta1QueryVotesResponse,
   CosmosGovV1Beta1QueryDepositsResponse,
+  CosmosGovV1Beta1QueryParamsResponse,
+  CosmosGovV1Beta1QueryProposalResponse,
+  CosmosGovV1Beta1QueryProposalsResponse,
   CosmosGovV1Beta1QueryTallyResultResponse,
+  CosmosGovV1Beta1QueryVotesResponse,
   CosmosStakingV1Beta1QueryValidatorsResponse,
 } from "../rest/cosmos";
-import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
-import { snakeToCamelCase } from "./camel";
-import { myRegistry } from "./registry";
+import { Coin } from "../types/cosmos/base/v1beta1/coin";
+import { TextProposal, VoteOption } from "../types/cosmos/gov/v1beta1/gov";
 import { MsgDeposit, MsgSubmitProposal, MsgVote } from "../types/cosmos/gov/v1beta1/tx";
 import { MsgDelegate } from "../types/cosmos/staking/v1beta1/tx";
-import { TextProposal, VoteOption } from "../types/cosmos/gov/v1beta1/gov";
-import { Any } from "../types/google/protobuf/any";
-import { BigNumber } from "ethers";
-import { Coin } from "../types/cosmos/base/v1beta1/coin";
-import { submitWithCheck } from "./txs";
 import { SoftwareUpgradeProposal } from "../types/cosmos/upgrade/v1beta1/upgrade";
+import { Any } from "../types/google/protobuf/any";
+import { snakeToCamelCase } from "./camel";
+import { myRegistry } from "./registry";
+import { submitWithCheck } from "./txs";
 
 async function listProposals(
   cosmos_rest: string,

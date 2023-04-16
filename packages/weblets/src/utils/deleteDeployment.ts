@@ -1,4 +1,5 @@
-import type { GridClient } from "grid3_client";
+import type { GridClient } from "@threefold/grid_client";
+
 import type { IStore } from "./../stores/currentDeployment";
 import { getUniqueDomainName } from "./gatewayHelpers";
 

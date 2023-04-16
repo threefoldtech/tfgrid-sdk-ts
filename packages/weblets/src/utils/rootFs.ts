@@ -1,4 +1,5 @@
 import { Decimal } from "decimal.js";
+
 import { validateCpu, validateMemory } from "./validateName";
 
 const GB = 1024;

@@ -39,10 +39,11 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { accountInterface } from "../store/state";
-import WelcomeWindow from "../components/WelcomeWindow.vue";
-import Account from "./Account.vue";
+
 import FundsCard from "../components/FundsCard.vue";
+import WelcomeWindow from "../components/WelcomeWindow.vue";
+import { accountInterface } from "../store/state";
+import Account from "./Account.vue";
 
 @Component({
   name: "AccountsView",

@@ -21,11 +21,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
 import { BigNumber } from "ethers";
-import { delegate } from "../utils/gov";
-import CustomAlert from "../components/CustomAlert.vue";
 import { parseUnits } from "ethers/lib/utils";
+import { Component, Vue } from "vue-property-decorator";
+
+import CustomAlert from "../components/CustomAlert.vue";
+import { delegate } from "../utils/gov";
 
 @Component({
   name: "GovDeposit",

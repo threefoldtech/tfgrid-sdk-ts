@@ -7,10 +7,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
-import api from "@/utils/api";
-import { parse } from "marked";
 import fm from "front-matter";
+import { parse } from "marked";
+import { Component, Vue, Watch } from "vue-property-decorator";
+
+import api from "@/utils/api";
 
 @Component({
   name: "MDViewer",

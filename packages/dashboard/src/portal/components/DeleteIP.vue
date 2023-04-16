@@ -26,8 +26,9 @@
   </div>
 </template>
 <script lang="ts">
+import { Component, Prop, Vue } from "vue-property-decorator";
+
 import { hex2a } from "@/portal/lib/util";
-import { Component, Vue, Prop } from "vue-property-decorator";
 @Component({
   name: "DeleteIP",
 })

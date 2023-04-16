@@ -46,11 +46,12 @@
   </v-container>
 </template>
 <script lang="ts">
-import { VueConstructor } from "vue";
-import { Component, Vue, Prop, Ref, Watch } from "vue-property-decorator";
-import { generateReceipt, getTime, receiptInterface } from "../lib/nodes";
 import { jsPDF } from "jspdf";
+import { VueConstructor } from "vue";
+import { Component, Prop, Ref, Vue, Watch } from "vue-property-decorator";
+
 import { nodeInterface } from "../lib/farms";
+import { generateReceipt, getTime, receiptInterface } from "../lib/nodes";
 
 interface eventInterface {
   start: Date;
@@ -94,7 +95,7 @@ export default class ReceiptsCalendar extends Vue {
     doc.save(`node_${this.node.nodeId}_receipts.pdf`);
   }
   getEvents() {
-    let events: eventInterface[] = [];
+    const events: eventInterface[] = [];
     this.node.receipts.map((rec: receiptInterface) => {
       if (rec.measuredUptime) {
         events.push({

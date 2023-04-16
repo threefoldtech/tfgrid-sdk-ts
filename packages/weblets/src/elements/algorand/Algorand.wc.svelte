@@ -1,27 +1,25 @@
 <svelte:options tag="tf-algorand" />
 
 <script lang="ts">
-  import Algorand from "../../types/algorand";
-  import type { IProfile } from "../../types/Profile";
-  import type { IFormField, ITab } from "../../types";
-  import deployAlgorand from "../../utils/deployAlgorand";
-  import rootFs from "../../utils/rootFs";
-
+  import Alert from "../../components/Alert.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import Input from "../../components/Input.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
-
+  import type { IFormField, ITab } from "../../types";
+  import Algorand from "../../types/algorand";
+  import type { IProfile } from "../../types/Profile";
+  import deployAlgorand from "../../utils/deployAlgorand";
+  import { getResources } from "../../utils/getAlgoResources";
   // utils
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, { isInvalid, validateAlgoCpu, validateAlgoMemory, validateAlgoStorage, validateMnemonicsAlgorand} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
-  import { getResources } from "../../utils/getAlgoResources";
   import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
+  import rootFs from "../../utils/rootFs";
+  import validateName, { isInvalid, validateAlgoCpu, validateAlgoMemory, validateAlgoStorage, validateMnemonicsAlgorand} from "../../utils/validateName"; // prettier-ignore
 
   let data = new Algorand();
   let profile: IProfile;

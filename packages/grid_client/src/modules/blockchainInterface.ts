@@ -1,41 +1,41 @@
 import {
-    BlockchainAssetsModel,
-    BlockchainCreateModel,
-    BlockchainCreateResultModel,
-    BlockchainDeleteModel,
-    BlockchainGetModel,
-    BlockchainGetResultModel,
-    BlockchainInitModel,
-    BlockchainListModel,
-    BlockchainListResultModel,
-    BlockchainPayModel,
-    BlockchainSignModel,
+  BlockchainAssetsModel,
+  BlockchainCreateModel,
+  BlockchainCreateResultModel,
+  BlockchainDeleteModel,
+  BlockchainGetModel,
+  BlockchainGetResultModel,
+  BlockchainInitModel,
+  BlockchainListModel,
+  BlockchainListResultModel,
+  BlockchainPayModel,
+  BlockchainSignModel,
 } from ".";
 
 export enum blockchainType {
-    algorand = "algorand",
-    stellar = "stellar",
-    tfchain = "tfchain",
+  algorand = "algorand",
+  stellar = "stellar",
+  tfchain = "tfchain",
 }
 
 interface blockchainInterface {
-    create(options: BlockchainCreateModel): Promise<BlockchainCreateResultModel>;
+  create(options: BlockchainCreateModel): Promise<BlockchainCreateResultModel>;
 
-    init(options: BlockchainInitModel);
+  init(options: BlockchainInitModel);
 
-    delete(options: BlockchainDeleteModel);
+  delete(options: BlockchainDeleteModel);
 
-    list(options: BlockchainListModel): Promise<BlockchainListResultModel[]>;
+  list(options: BlockchainListModel): Promise<BlockchainListResultModel[]>;
 
-    select?(options: BlockchainGetModel);
+  select?(options: BlockchainGetModel);
 
-    get(options: BlockchainGetModel): Promise<BlockchainGetResultModel>;
+  get(options: BlockchainGetModel): Promise<BlockchainGetResultModel>;
 
-    assets(options: BlockchainGetModel): Promise<BlockchainAssetsModel>;
+  assets(options: BlockchainGetModel): Promise<BlockchainAssetsModel>;
 
-    sign(options: BlockchainSignModel);
+  sign(options: BlockchainSignModel);
 
-    pay(options: BlockchainPayModel);
+  pay(options: BlockchainPayModel);
 }
 
 export default blockchainInterface;

@@ -1,7 +1,8 @@
 <svelte:options tag="tf-select-profile" />
 
 <script lang="ts">
-  import { onMount, createEventDispatcher, onDestroy } from "svelte";
+  import { createEventDispatcher, onDestroy, onMount } from "svelte";
+
   import type { Profile } from "../stores/baseConfig";
 
   const dispatch = createEventDispatcher<{ profile: Profile }>();

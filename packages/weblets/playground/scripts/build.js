@@ -1,7 +1,7 @@
-import { readdirSync, copyFile, rmdir, mkdirSync } from "fs";
-import { promisify } from "util";
-import { join } from "path";
 import { exec } from "child_process";
+import { copyFile, mkdirSync, readdirSync, rmdir } from "fs";
+import { join } from "path";
+import { promisify } from "util";
 const PREFIX = "tf";
 
 const asyncExec = promisify(exec);

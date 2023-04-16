@@ -7,23 +7,29 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.58.0",
     "@typescript-eslint/parser": "^5.57.0",
+    "@vue/eslint-config-typescript": "^11.0.2",
     "eslint": "^8.37.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-cypress": "^2.13.2",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-simple-import-sort": "^10.0.0",
+    "eslint-plugin-svelte3": "^4.0.0",
+    "eslint-plugin-vue": "^9.10.0",
     "husky": "^8.0.3",
     "lerna": "^6.6.1",
     "lint-staged": "^13.2.0",
-    "prettier": "^2.8.7"
+    "prettier": "^2.8.7",
+    "prettier-plugin-svelte": "^2.10.0"
   },
   "scripts": {
     "prepare": "husky install",
     "lint": "eslint -c .eslintrc.json . --fix",
-    "check-lint": "eslint -c .eslintrc.json ."
+    "check-eslint": "eslint -c .eslintrc.json .",
+    "check-prettier": "prettier .prettierrc ."
   },
   "lint-staged": {
-    "*.{ts,js}": [
-      "eslint -c .eslintrc.json . --fix"
-    ]
+    "*.{js,jsx,ts,tsx,css,scss,svelte,yaml}": "eslint -c .eslintrc.json --fix",
+    "*.{js,ts,css,scss,md,svelte,yaml}": "prettier .prettierrc . --write"
   },
   "dependencies": {}
 }

@@ -1,12 +1,12 @@
 import type Discourse from "../types/discourse";
-import { getUniqueDomainName, GatewayNodes, selectSpecificGatewayNode } from "./gatewayHelpers";
 import { Network } from "../types/kubernetes";
 import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
-import rootFs from "./rootFs";
 import destroy from "./destroy";
+import { GatewayNodes, getUniqueDomainName, selectSpecificGatewayNode } from "./gatewayHelpers";
 import checkVMExist, { checkGW } from "./prepareDeployment";
+import rootFs from "./rootFs";
 import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployDiscourse(data: Discourse, profile: IProfile, gateway: GatewayNodes) {

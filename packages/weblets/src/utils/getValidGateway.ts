@@ -1,4 +1,4 @@
-import type { GridClient } from "grid3_client";
+import type { GridClient } from "@threefold/grid_client";
 
 export function isValidName(name: string) {
   const filter1 = new RegExp(/[^a-z\d]/i);

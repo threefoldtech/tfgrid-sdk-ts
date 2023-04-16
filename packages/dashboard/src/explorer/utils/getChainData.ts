@@ -1,6 +1,7 @@
-import { IState } from "../store/state";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import { ActionContext } from "vuex";
+
+import { IState } from "../store/state";
 
 export default async function getChainData({ state }: ActionContext<IState, IState>) {
   const URL = window.configs.APP_API_URL;

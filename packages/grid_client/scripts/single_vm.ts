@@ -26,7 +26,7 @@ vm.rootfs_size = 0;
 vm.flist = "https://hub.grid.tf/tf-official-apps/base:latest.flist";
 vm.entrypoint = "/sbin/zinit init";
 vm.env = {
-    SSH_KEY: config.ssh_key,
+  SSH_KEY: config.ssh_key,
 };
 // vm.ip = "10.249.2.5" // create a machine with specific private ip
 
@@ -39,21 +39,21 @@ vms.metadata = "";
 vms.description = "test deploying VMs via ts grid3 client";
 
 async function main() {
-    const grid3 = await getClient();
+  const grid3 = await getClient();
 
-    // deploy vms
-    const res = await grid3.machines.deploy(vms);
-    log(res);
+  // deploy vms
+  const res = await grid3.machines.deploy(vms);
+  log(res);
 
-    // get the deployment
-    const l = await grid3.machines.getObj(vms.name);
-    log(l);
+  // get the deployment
+  const l = await grid3.machines.getObj(vms.name);
+  log(l);
 
-    // // delete
-    // const d = await grid3.machines.delete({ name: vms.name });
-    // log(d);
+  // // delete
+  // const d = await grid3.machines.delete({ name: vms.name });
+  // log(d);
 
-    await grid3.disconnect();
+  await grid3.disconnect();
 }
 
 main();

@@ -21,9 +21,10 @@
   </v-card>
 </template>
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
-import IFilterOptions from "../types/FilterOptions";
 import { debounce } from "lodash";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+
+import IFilterOptions from "../types/FilterOptions";
 import { inputValidation } from "../utils/validations";
 type TContent = string | number | Array<string | number>;
 @Component({

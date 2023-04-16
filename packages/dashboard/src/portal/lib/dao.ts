@@ -1,6 +1,7 @@
-import { hex2a } from "./util";
-import moment from "moment";
 import { web3FromAddress } from "@polkadot/extension-dapp";
+import moment from "moment";
+
+import { hex2a } from "./util";
 export interface ayesAndNayesInterface {
   farmId: number;
   weight: number;

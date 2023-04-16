@@ -1,10 +1,11 @@
 import Vue from "vue";
 import Vuex, { ModuleTree } from "vuex";
+
 import { balanceInterface, getBalance } from "../lib/balance";
 import { getTwin, getTwinID } from "../lib/twin";
+import { hex2a } from "../lib/util";
 import { accountInterface } from "./state";
 import { UserCredentials } from "./types";
-import { hex2a } from "../lib/util";
 
 Vue.use(Vuex);
 

@@ -1,13 +1,12 @@
+import { Network } from "../types/kubernetes";
 import type { default as Peertube } from "../types/peertube";
 import type { IProfile } from "../types/Profile";
-import { Network } from "../types/kubernetes";
-
-import { getUniqueDomainName, selectSpecificGatewayNode, GatewayNodes } from "./gatewayHelpers";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
-import rootFs from "./rootFs";
 import destroy from "./destroy";
+import { GatewayNodes, getUniqueDomainName, selectSpecificGatewayNode } from "./gatewayHelpers";
 import checkVMExist, { checkGW } from "./prepareDeployment";
+import rootFs from "./rootFs";
 import { InternalSolutionProviderID } from "./solutionProvider";
 
 export default async function deployPeertube(data: Peertube, profile: IProfile, gateway: GatewayNodes) {

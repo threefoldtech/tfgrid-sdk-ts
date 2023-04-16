@@ -1,4 +1,5 @@
 import { get, writable } from "svelte/store";
+
 import getBalance from "../utils/getBalance";
 
 interface IStore {

@@ -2,30 +2,29 @@
 
 <script lang="ts">
   // Types
-  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
-  import type { IProfile } from "../../types/Profile";
-  import { Disk, Env } from "../../types/vm";
-  import Casperlabs from "../../types/casperlabs";
-  // Modules
-  import deployCasperlabs from "../../utils/deployCasperlabs";
+  import Alert from "../../components/Alert.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import Input from "../../components/Input.svelte";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
-  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
+  import Casperlabs from "../../types/casperlabs";
+  import type { IProfile } from "../../types/Profile";
+  import { Disk, Env } from "../../types/vm";
+  // Modules
+  import deployCasperlabs from "../../utils/deployCasperlabs";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import { noActiveProfile } from "../../utils/message";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
   import validateName, { isInvalid } from "../../utils/validateName";
 
-  import { noActiveProfile } from "../../utils/message";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
-  import type { GatewayNodes } from "../../utils/gatewayHelpers";
-  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
-
-  let data = new Casperlabs();
+  const data = new Casperlabs();
   let invalid = true;
   let gateway: GatewayNodes;
 

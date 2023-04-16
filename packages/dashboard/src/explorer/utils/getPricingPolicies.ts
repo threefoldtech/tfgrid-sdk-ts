@@ -1,4 +1,5 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
+
 import types from "@/types.json";
 const URL = window.configs.APP_API_URL;
 

@@ -2,24 +2,25 @@
 
 <script lang="ts">
   // libs
-  import type { IProfile } from "../types/Profile";
   import { IFormField, IPackage, SelectCapacityUpdate } from "../types";
+  import type { IProfile } from "../types/Profile";
   import validateName, { isInvalid } from "../utils/validateName"; // prettier-ignore
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   // components
-  import Alert from "./Alert.svelte";
-  import Input from "./Input.svelte";
-  import SelectNodeId from "./SelectNodeId.svelte";
-  import DeployBtn from "./DeployBtn.svelte";
   import { createEventDispatcher, onMount } from "svelte";
-  import Table from "./Table.svelte";
-  import rootFs from "../utils/rootFs";
+
   import { CapWorker } from "../types/caprover";
-  import SelectCapacity from "./SelectCapacity.svelte";
   import getGrid from "../utils/getGrid";
-  import DialogueMsg from "./DialogueMsg.svelte";
+  import rootFs from "../utils/rootFs";
   import { InternalSolutionProviderID } from "../utils/solutionProvider";
+  import Alert from "./Alert.svelte";
+  import DeployBtn from "./DeployBtn.svelte";
+  import DialogueMsg from "./DialogueMsg.svelte";
+  import Input from "./Input.svelte";
+  import SelectCapacity from "./SelectCapacity.svelte";
+  import SelectNodeId from "./SelectNodeId.svelte";
+  import Table from "./Table.svelte";
   const { AddMachineModel, DeleteMachineModel, DiskModel } = window.configs?.grid3_client ?? {}; // prettier-ignore
 
   const dispatch = createEventDispatcher<{ closed: boolean }>();
@@ -147,7 +148,7 @@
       .then(({ deleted, updated }) => {
         if (deleted.length > 0 || updated.length > 0) {
           shouldBeUpdated = true;
-          let r = removing;
+          const r = removing;
           requestAnimationFrame(() => {
             workers = workers.filter(({ name }) => name !== r); // prettier-ignore
           });

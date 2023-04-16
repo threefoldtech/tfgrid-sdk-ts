@@ -1,8 +1,9 @@
 import { v4 } from "uuid";
+
+import isValidInteger from "../utils/isValidInteger";
+import { configVariables, getNetwork } from "../utils/tfhubValidatorConf";
 import NodeID from "./nodeId";
 import { Disk } from "./vm";
-import isValidInteger from "../utils/isValidInteger";
-import { getNetwork, configVariables } from "../utils/tfhubValidatorConf";
 
 interface ITFHubValidator {
   name: string;

@@ -1,23 +1,25 @@
 <svelte:options tag="tf-qvm" />
 
 <script lang="ts">
-  import VM, { Env } from "../../types/vm";
-  import QSFS from "../../types/qsfs";
-  import type { IFormField, ITab } from "../../types";
-  import deployQVM from "../../utils/deployQVM";
-  import type { IProfile } from "../../types/Profile";
-
+  import AddBtn from "../../components/AddBtn.svelte";
+  import Alert from "../../components/Alert.svelte";
+  import DeleteBtn from "../../components/DeleteBtn.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import Input from "../../components/Input.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import DeleteBtn from "../../components/DeleteBtn.svelte";
-  import AddBtn from "../../components/AddBtn.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
+  import type { IFormField, ITab } from "../../types";
+  import type { IProfile } from "../../types/Profile";
+  import QSFS from "../../types/qsfs";
+  import VM, { Env } from "../../types/vm";
+  import deployQVM from "../../utils/deployQVM";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import isInvalidFlist from "../../utils/isInvalidFlist";
+  import { noActiveProfile } from "../../utils/message";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
   import validateName, {
     isInvalid,
     validateCpu,
@@ -31,9 +33,6 @@
     validateQsfsSecret,
     validateZdbCount,
   } from "../../utils/validateName";
-  import { noActiveProfile } from "../../utils/message";
-  import isInvalidFlist from "../../utils/isInvalidFlist";
-  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -41,14 +40,14 @@
     { label: "QSFS", value: "qsfs" },
   ];
 
-  let data = new VM();
-  let qsfs = new QSFS();
+  const data = new VM();
+  const qsfs = new QSFS();
   data.name = "QVM" + data.id.split("-")[0];
   data.cpu = 1;
   data.memory = 2048;
 
   // prettier-ignore
-  let baseFields: IFormField[] = [
+  const baseFields: IFormField[] = [
     { label: "CPU (vCores)", symbol: 'cpu', placeholder: 'CPU vCores', type: 'number', validator: validateCpu, invalid: false, disabled: true},
     { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false, disabled: true},
     { label: "Public IPv4", symbol: "publicIp", placeholder: "", type: 'checkbox' },

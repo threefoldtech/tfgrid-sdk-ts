@@ -1,4 +1,5 @@
 import { writable } from "svelte/store";
+
 import type { IStore } from "../types/istore";
 
 function createCurrentDeploymentStore() {

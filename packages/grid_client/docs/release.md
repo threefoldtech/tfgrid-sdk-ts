@@ -11,7 +11,7 @@ To create a new release there are some steps is required:
 - Install node modules using
 
 ```ts
-yarn
+yarn;
 ```
 
 If you're using npm, you'll need to install the modules using

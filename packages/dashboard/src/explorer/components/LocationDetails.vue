@@ -14,9 +14,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import Map from "./Map.vue";
 import { byCountry } from "country-code-lookup";
+import { Component, Prop, Vue } from "vue-property-decorator";
+
+import Map from "./Map.vue";
 
 @Component({
   components: {

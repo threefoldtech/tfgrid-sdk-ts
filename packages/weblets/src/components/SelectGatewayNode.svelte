@@ -2,7 +2,8 @@
 
 <script lang="ts">
   import { onMount } from "svelte";
-  import { LoadGatewayNodes, GatewayNodes } from "../utils/gatewayHelpers";
+
+  import { GatewayNodes, LoadGatewayNodes } from "../utils/gatewayHelpers";
   import Input from "./Input.svelte";
 
   let gateways: GatewayNodes[] = [];

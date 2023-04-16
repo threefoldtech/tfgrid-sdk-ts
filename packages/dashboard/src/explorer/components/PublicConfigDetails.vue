@@ -55,6 +55,7 @@
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+
 import { IPublicConfig } from "../graphql/api";
 import DatesDetails from "./DatesDetails.vue";
 

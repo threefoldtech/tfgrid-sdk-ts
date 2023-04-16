@@ -1,18 +1,18 @@
 {
   "name": "@threefold/grid_http_server",
   "author": "Ahmed Hanafy",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "ISC",
-  "homepage": "https://github.com/threefoldtech/grid3_client_ts/blob/development/packages/grid/README.md",
+  "homepage": "https://github.com/threefoldtech/tfgrid-sdk-ts/blob/development/packages/grid_http_server/README.md",
   "repository": {
     "type": "git",
-    "url": "https://github.com/threefoldtech/grid3_client_ts.git"
+    "url": "https://github.com/threefoldtech/tfgrid-sdk-ts.git"
   },
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
-    "@threefold/grid_client": "^0.0.1",
+    "@threefold/grid_client": "^0.0.2",
     "express": "^4.18.1",
     "http-server": "^14.1.1",
     "typescript": "^4.7.4"

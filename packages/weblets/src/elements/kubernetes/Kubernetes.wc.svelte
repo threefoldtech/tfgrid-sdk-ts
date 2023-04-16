@@ -2,35 +2,34 @@
 
 <script lang="ts">
   const deploymentStore = window.configs?.deploymentStore;
-  import Kubernetes, { Worker } from "../../types/kubernetes";
-  import deployKubernetes from "../../utils/deployKubernetes";
-  import type { IFormField, ITab } from "../../types";
-  import type { IProfile } from "../../types/Profile";
-
-  // Components
-  import Input from "../../components/Input.svelte";
-  import Tabs from "../../components/Tabs.svelte";
-  import SelectProfile from "../../components/SelectProfile.svelte";
+  import AddBtn from "../../components/AddBtn.svelte";
   import Alert from "../../components/Alert.svelte";
   import DeleteBtn from "../../components/DeleteBtn.svelte";
-  import AddBtn from "../../components/AddBtn.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
+  // Components
+  import Input from "../../components/Input.svelte";
+  import RootFsSize from "../../components/RootFsSize.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
+  import SelectProfile from "../../components/SelectProfile.svelte";
+  import Tabs from "../../components/Tabs.svelte";
+  import type { IFormField, ITab } from "../../types";
+  import Kubernetes, { Worker } from "../../types/kubernetes";
+  import type { IProfile } from "../../types/Profile";
+  import deployKubernetes from "../../utils/deployKubernetes";
+  import { display } from "../../utils/display";
+  import getWireguardConfig from "../../utils/getWireguardConfig";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import { noActiveProfile } from "../../utils/message";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
   import validateName, {
     isInvalid,
     validateCpu,
     validateDisk,
-    validatePrivateIPRange,
     validateKubernetesMemory,
+    validatePrivateIPRange,
     validateToken,
   } from "../../utils/validateName";
-  import { noActiveProfile } from "../../utils/message";
-  import RootFsSize from "../../components/RootFsSize.svelte";
-  import { display } from "../../utils/display";
-  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
-  import getWireguardConfig from "../../utils/getWireguardConfig";
 
   // prettier-ignore
   const tabs: ITab[] = [
@@ -62,7 +61,7 @@
     { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
   ];
 
-  let data = new Kubernetes();
+  const data = new Kubernetes();
   const currentDeployment = window.configs?.currentDeploymentStore;
 
   let active = "config";

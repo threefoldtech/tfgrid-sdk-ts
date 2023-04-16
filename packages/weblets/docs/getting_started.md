@@ -1,6 +1,6 @@
 ## Weblets project
 
-Weblets are a web components which provide a UI to deploy workloads on TF Grid 3. all the backend functionality is provided by [grid_client](https://github.com/threefoldtech/grid3_client_ts). It is a reusable component that can be injected in a HTML or a Node Web app.
+Weblets are a web components which provide a UI to deploy workloads on TF Grid 3. all the backend functionality is provided by [grid_client](https://github.com/threefoldtech/tfgrid-sdk-ts/tree/development/packages/grid_client). It is a reusable component that can be injected in a HTML or a Node Web app.
 
 ## Repo structure
 

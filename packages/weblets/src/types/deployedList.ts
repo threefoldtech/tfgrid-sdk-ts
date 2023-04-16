@@ -1,7 +1,8 @@
+import type { GridClient } from "@threefold/grid_client";
+
+import formatConsumption from "../utils/formatConsumption";
 import getGrid from "../utils/getGrid";
 import type { IProfile } from "./Profile";
-import type { GridClient } from "grid3_client";
-import formatConsumption from "../utils/formatConsumption";
 
 export interface IListReturn<T = any> {
   total: number;

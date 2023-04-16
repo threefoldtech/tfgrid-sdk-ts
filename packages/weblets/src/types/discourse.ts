@@ -1,11 +1,11 @@
-import { v4 } from "uuid";
-import isValidInteger from "../utils/isValidInteger";
-import NodeID from "./nodeId";
-import type { IFormField } from ".";
-import { validateRequiredEmail, validateRequiredPassword, validateRequiredPortNumber } from "../utils/validateName";
-import { validateRequiredHostName } from "../utils/validateDomainName";
-
 import TweetNACL from "tweetnacl";
+import { v4 } from "uuid";
+
+import isValidInteger from "../utils/isValidInteger";
+import { validateRequiredHostName } from "../utils/validateDomainName";
+import { validateRequiredEmail, validateRequiredPassword, validateRequiredPortNumber } from "../utils/validateName";
+import type { IFormField } from ".";
+import NodeID from "./nodeId";
 import { Disk } from "./vm";
 
 function generatePubKey(): string {

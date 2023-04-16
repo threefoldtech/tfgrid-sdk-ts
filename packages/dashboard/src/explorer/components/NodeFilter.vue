@@ -25,10 +25,11 @@
 </template>
 
 <script lang="ts">
-import { MutationTypes } from "../store/mutations";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
-import { inputValidation } from "../utils/validations";
+
 import { ActionTypes } from "../store/actions";
+import { MutationTypes } from "../store/mutations";
+import { inputValidation } from "../utils/validations";
 
 @Component({})
 export default class InFilter extends Vue {

@@ -1,7 +1,8 @@
 /* eslint-disable no-useless-escape */
+import isPrivateIP from "private-ip";
+
 import type { IFormField } from "../types";
 import { getResources } from "./getAlgoResources";
-import isPrivateIP from "private-ip";
 
 const PRECODE_REGEX = /[a-zA-Z0-9]{32}$/;
 const ALPHA_NUMS_ONLY_REGEX = /^\w+$/;

@@ -1,7 +1,7 @@
-import VM from "./vm";
 import { v4 } from "uuid";
 
 import isValidInteger from "../utils/isValidInteger";
+import VM from "./vm";
 
 export default class Casperlabs extends VM {
   public id = v4();

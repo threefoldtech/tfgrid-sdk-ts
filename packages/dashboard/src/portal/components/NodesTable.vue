@@ -79,10 +79,11 @@
 </template>
 
 <script lang="ts">
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+
 import NodeActionBtn from "../components/NodeActionBtn.vue";
 import NodeDetails from "../components/NodeDetails.vue";
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
-import { getDNodes, ITab, getFarmDetails } from "../lib/nodes";
+import { getDNodes, getFarmDetails, ITab } from "../lib/nodes";
 import { byteToGB } from "../lib/nodes";
 
 @Component({
@@ -143,7 +144,7 @@ export default class NodesTable extends Vue {
     try {
       this.dNodeError = false;
       this.dNodeLoading = true;
-      let res = await getFarmDetails(event.item.farm.id);
+      const res = await getFarmDetails(event.item.farm.id);
       if (Array.isArray(res) && !res.length) throw new Error("Can't resolve farm data");
       event.item.farm.name = res[0].name;
       event.item.farm.farmCertType = res[0].certificationType;
@@ -166,7 +167,7 @@ export default class NodesTable extends Vue {
     this.nodes = [];
     this.loading = true;
 
-    let { dNodes, count } = await getDNodes(
+    const { dNodes, count } = await getDNodes(
       this.$api,
       this.address,
       this.twinId,

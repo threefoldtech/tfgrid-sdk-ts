@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "build": "rollup -c",
-    "build:app": "yarn build && sh scripts/build.sh && cd playground && yarn build",
-    "serve:app": "yarn build && sh scripts/build.sh && cd playground && yarn serve",
+    "rollup-build": "rollup -c",
+    "build:app": "yarn rollup-build && sh scripts/build.sh && cd playground && yarn build",
+    "serve:app": "yarn rollup-build && sh scripts/build.sh && cd playground && yarn serve",
     "dev": "webpack serve --content-base public",
     "start": "sirv public --no-clear",
     "check": "svelte-check --tsconfig ./tsconfig.json",
@@ -13,10 +13,6 @@
     "check-prettier": "npx prettier .prettierrc .",
     "deps": "sh scripts/install_deps.sh",
     "serve": "serve ./dist"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,css,scss,svelte,yaml}": "eslint --fix",
-    "*.{js,ts,css,scss,md,svelte,yaml}": "prettier --write"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
@@ -29,6 +25,7 @@
     "@types/js-yaml": "^4.0.4",
     "@types/marked": "^3.0.2",
     "@types/uuid": "^8.3.1",
+    "@typescript-eslint/eslint-plugin": "^5.43.0",
     "@typescript-eslint/parser": "^5.43.0",
     "autoprefixer": "^10.3.7",
     "clean-webpack-plugin": "^4.0.0",
@@ -74,6 +71,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",
+    "@threefold/grid_client": "^0.0.2",
     "add": "^2.0.6",
     "bip39": "^3.0.4",
     "buffer": "^6.0.3",
@@ -83,7 +81,6 @@
     "cypress": "^10.1.0",
     "decimal.js": "^10.3.1",
     "front-matter": "^4.0.2",
-    "grid3_client": "2.1.0-rc2",
     "js-yaml": "^4.1.0",
     "marked": "^3.0.8",
     "page": "^1.11.6",

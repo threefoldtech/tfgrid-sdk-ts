@@ -1,4 +1,5 @@
 import { ApiPromise } from "@polkadot/api";
+
 import { PortalState } from "./state";
 
 export enum PortalMutationTypes {

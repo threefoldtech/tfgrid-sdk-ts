@@ -1,8 +1,9 @@
-name: Build and push a new docker image based on project release tag.
+name: Dashboard Docker Build/Push
 
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   Build-and-push-docker-image:
@@ -25,6 +26,6 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: "{{defaultContext}}:packages/dashboard"
+          context: packages/dashboard
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/tfgrid_dashboard:${{ steps.previoustag.outputs.tag }}

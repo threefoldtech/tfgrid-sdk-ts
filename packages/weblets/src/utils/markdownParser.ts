@@ -1,5 +1,5 @@
-import { use, parse } from "marked";
 import fm from "front-matter";
+import { parse, use } from "marked";
 
 /* Config Default markdown here */
 use({

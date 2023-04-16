@@ -40,11 +40,12 @@
 </template>
 
 <script lang="ts">
-import { GravityV1QueryPendingSendToEthResponse } from "../rest/cosmos";
 import { BigNumber } from "ethers";
-import { Component, Vue } from "vue-property-decorator";
 import { formatUnits } from "ethers/lib/utils";
-import { pendingSendToEth, cancelSendToEth } from "../utils";
+import { Component, Vue } from "vue-property-decorator";
+
+import { GravityV1QueryPendingSendToEthResponse } from "../rest/cosmos";
+import { cancelSendToEth, pendingSendToEth } from "../utils";
 
 @Component({
   name: "ListEth",

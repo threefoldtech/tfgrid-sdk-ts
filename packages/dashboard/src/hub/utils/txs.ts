@@ -1,7 +1,8 @@
-import { Api, CosmosBankV1Beta1QueryBalanceResponse } from "../rest/cosmos";
 import { EncodeObject } from "@cosmjs/proto-signing";
-import { DeliverTxResponse, GasPrice, SigningStargateClient, StdFee, calculateFee } from "@cosmjs/stargate";
+import { calculateFee, DeliverTxResponse, GasPrice, SigningStargateClient, StdFee } from "@cosmjs/stargate";
 import { BigNumber } from "ethers";
+
+import { Api, CosmosBankV1Beta1QueryBalanceResponse } from "../rest/cosmos";
 import { snakeToCamelCase } from "./camel";
 
 async function accountBalance(

@@ -1,8 +1,9 @@
 import { v4 } from "uuid";
-import isValidInteger from "../utils/isValidInteger";
+
 import generatePassword from "../utils/generatePassword";
-import NodeID from "./nodeId";
+import isValidInteger from "../utils/isValidInteger";
 import { SelectCapacityUpdate } from "./index";
+import NodeID from "./nodeId";
 const length = Math.floor(Math.random() * 5) + 10;
 export default class Caprover {
   constructor(

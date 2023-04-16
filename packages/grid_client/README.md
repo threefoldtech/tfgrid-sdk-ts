@@ -1,13 +1,12 @@
-# grid3_client_ts
+# grid_client
 
-[![npm version](https://img.shields.io/npm/v/grid3_client.svg)](https://badge.fury.io/js/grid3_client)
-[![Build](https://github.com/threefoldtech/grid3_client_ts/actions/workflows/build.yml/badge.svg)](https://github.com/threefoldtech/grid3_client_ts/actions/workflows/build.yml)
-[![tests](https://github.com/threefoldtech/grid3_client_ts/actions/workflows/tests.yml/badge.svg)](https://github.com/threefoldtech/grid3_client_ts/actions/workflows/tests.yml)
-[![code coverage](https://codecov.io/gh/threefoldtech/grid3_client_ts/branch/development/graph/badge.svg)](https://codecov.io/gh/threefoldtech/grid3_client_ts/branch/development)
+[![npm version](https://img.shields.io/npm/v/@threefold/grid_client.svg)](https://www.npmjs.com/package/@threefold/grid_client)
+[![Build](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml)
+[![tests](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/grid_client_tests.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/grid_client_tests.yml)
 
-Github repo: [grid3_client_ts](https://github.com/threefoldtech/grid3_client_ts.git)
+Github repo: [grid_client](https://github.com/threefoldtech/tfgrid-sdk-ts.git)
 
-grid3_client is a client used for deploying workloads (VMs, ZDBs, k8s, etc.) on grid3.
+grid_client is a client used for deploying workloads (VMs, ZDBs, k8s, etc.) on grid3.
 
 ## Prerequisites
 
@@ -34,7 +33,7 @@ yarn add @threefold/grid_client
 - Clone the repository
 
 ```bash
-git clone https://github.com/threefoldtech/grid3_client_ts.git
+git clone https://github.com/threefoldtech/tfgrid-sdk-ts.git
 ```
 
 - Install it
@@ -55,7 +54,7 @@ yarn install
 
 - project name: it's a name to isolate the deployments into a namespace.
 
-    **Note:** only network can't be isolated, all project can see the same network.
+  **Note:** only network can't be isolated, all project can see the same network.
 
 ### Create client instance
 
@@ -63,25 +62,25 @@ yarn install
 
 - or you can check more advanced configuration [here](./docs/client_configuration.md).
 
-    ```ts
-    async function getClient(): Promise<GridClient> {
+  ```ts
+  async function getClient(): Promise<GridClient> {
     const gridClient = new GridClient({
-        network: config.network,
-        mnemonic: config.mnemonic,
+      network: config.network,
+      mnemonic: config.mnemonic,
     });
     await gridClient.connect();
 
     return gridClient;
-    }
-    ```
+  }
+  ```
 
 - You can set your configurations through environment variables or [JSON config file](./scripts/config.json) as seen [here](./scripts/client_loader.ts).
 
 - With clientOptions being added, all urls are now configured. So, you can easily get the proxy URL for the used network simply by:
 
-    ```ts
-    const proxyURL = gridClient.clientOptions.proxyURL
-    ```
+  ```ts
+  const proxyURL = gridClient.clientOptions.proxyURL;
+  ```
 
 for more details, check [client options](./src/client.ts)
 
@@ -97,9 +96,9 @@ gridClient.disconnect();
 
 - After creating a client instance you can call it in any of your scripts using `getClient()`.
 
-    ```ts
-    const grid3 = getClient();
-    ```
+  ```ts
+  const grid3 = getClient();
+  ```
 
 - And then you can use this client instance with any of the client [modules](./docs/module.md).
 
@@ -123,60 +122,43 @@ gridClient.disconnect();
 
 - Before Running the scripts make sure you have a `tsconfig.json` file. here is an example file.
 
-    ```json
-    {
-        "compilerOptions": {
-            "noImplicitAny": false,
-            "module": "commonjs",
-            "target": "esnext",
-            "lib": [
-                "ESNext",
-                "DOM"
-            ],
-            "types": [
-                "node",
-                "jest"
-            ],
-            "declaration": true,
-            "declarationMap": true,
-            "outDir": "./dist/node",
-            "esModuleInterop": true,
-            "emitDecoratorMetadata": true,
-            "experimentalDecorators": true,
-            "allowJs": true,
-            "baseUrl": "."
-        },
-        "include": [
-            "src/**/*"
-        ]
-    }
-    ```
+  ```json
+  {
+    "compilerOptions": {
+      "noImplicitAny": false,
+      "module": "commonjs",
+      "target": "esnext",
+      "lib": ["ESNext", "DOM"],
+      "types": ["node", "jest"],
+      "declaration": true,
+      "declarationMap": true,
+      "outDir": "./dist/node",
+      "esModuleInterop": true,
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "allowJs": true,
+      "baseUrl": "."
+    },
+    "include": ["src/**/*"]
+  }
+  ```
 
 - After following the previous examples to create a client instance and using it in a script, you can then execute this script using [ts-node](https://www.npmjs.com/ts-node).
 
-    ```bash
-    npx ts-node --project tsconfig-node.json filename.ts
-    ```
-
-    or
-
-    ```bash
-    yarn run ts-node --project tsconfig-node.json filename.ts
-    ```
+  ```bash
+  yarn run ts-node --project tsconfig-node.json filename.ts
+  ```
 
 ## Usage examples
 
 - [Scripts](./scripts/README.md)
-- [HTTP Server](./docs/http_server.md)
-- [RMB Server](./docs/rmb_server.md)
 
 ## API Docs
 
-<https://threefoldtech.github.io/grid3_client_ts/api/>
+<https://threefoldtech.github.io/tfgrid-sdk-ts/packages/grid_client/docs/api/index.html>
 
 ## Testing
 
-- [Test setup](./docs/test_setup.md)
 - [How to run tests](./docs/tests.md)
 
 ## Related Documentations

@@ -3,17 +3,17 @@ import vmPage from "../page-objects/vm-page";
 import utils from "../utils/utils";
 
 describe("Weblets", function () {
-  let vmName = "VM" + utils.generateString(5);
-  let envVarKey = "TestKey" + utils.generateString(5);
-  let envVarValue = "Value" + utils.generateString(5);
-  let diskName = "DISK" + utils.generateString(5);
-  let mountPoint = "/mnt/" + utils.generateString(5);
+  const vmName = "VM" + utils.generateString(5);
+  const envVarKey = "TestKey" + utils.generateString(5);
+  const envVarValue = "Value" + utils.generateString(5);
+  const diskName = "DISK" + utils.generateString(5);
+  const mountPoint = "/mnt/" + utils.generateString(5);
 
-  let cpu = utils.generateInt(1, 5);
-  let memory = utils.generateInt(256, 2048);
-  let rootFs = utils.generateInt(2, 3);
-  let diskSize = utils.generateInt(1, 20);
-  let farmName = "Freefarm";
+  const cpu = utils.generateInt(1, 5);
+  const memory = utils.generateInt(256, 2048);
+  const rootFs = utils.generateInt(2, 3);
+  const diskSize = utils.generateInt(1, 20);
+  const farmName = "Freefarm";
 
   before(function () {
     //Load data from fixtures/credentials.json

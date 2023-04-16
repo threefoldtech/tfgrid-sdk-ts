@@ -60,10 +60,11 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from "vue-property-decorator";
 import { parse } from "marked";
+import { Component, Vue, Watch } from "vue-property-decorator";
+
 import type { IStore } from "../../../src/types/istore";
-let userAgent = navigator.userAgent;
+const userAgent = navigator.userAgent;
 
 if (!userAgent.match(/chrome|chromium|crios/i)) {
   window.alert("Please notice that only Chrome based browsers are supported.");

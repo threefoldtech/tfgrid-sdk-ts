@@ -1,6 +1,6 @@
 # This workflow will do a clean install of node dependencies, cache/restore them, build the source code using yarn build:app
 
-name: build
+name: Weblets Build
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      NODE_OPTIONS: "--max-old-space-size=6144"
+      NODE_OPTIONS: "--max-old-space-size=8192"
 
     strategy:
       matrix:
@@ -40,11 +40,11 @@ jobs:
           yarn install
           cd packages/weblets
           yarn install
-          cd packages/weblets/playground
+          cd playground
           yarn install
 
       - name: Build
         run: |
-          lenra run build
+          lerna run build
           cd packages/weblets
           yarn build:app

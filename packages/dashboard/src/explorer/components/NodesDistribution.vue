@@ -13,10 +13,11 @@
   </v-card>
 </template>
 <script lang="ts">
-import { Component, Vue, Watch, Prop } from "vue-property-decorator";
-import Map from "./Map.vue";
 import { createPopper, Instance } from "@popperjs/core/lib/popper-lite";
 import { byCountry } from "country-code-lookup";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+
+import Map from "./Map.vue";
 
 function generateGetBoundingClientRect(x = 0, y = 0) {
   return () => ({

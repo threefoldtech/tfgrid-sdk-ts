@@ -132,13 +132,14 @@
 </template>
 
 <script lang="ts">
-import { VoteOption } from "../types/cosmos/gov/v1beta1/gov";
-import { submitVote, getProposal } from "../utils/gov";
-import { Component, Vue } from "vue-property-decorator";
-import { marked } from "marked";
-import CustomAlert from "../components/CustomAlert.vue";
-import { pool } from "../utils/staking";
 import { formatUnits } from "ethers/lib/utils";
+import { marked } from "marked";
+import { Component, Vue } from "vue-property-decorator";
+
+import CustomAlert from "../components/CustomAlert.vue";
+import { VoteOption } from "../types/cosmos/gov/v1beta1/gov";
+import { getProposal,submitVote } from "../utils/gov";
+import { pool } from "../utils/staking";
 
 interface IAction {
   label: string;

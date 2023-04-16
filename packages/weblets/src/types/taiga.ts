@@ -1,10 +1,11 @@
-import VM from "./vm";
+import { v4 } from "uuid";
+
 import generatePassword from "../utils/generatePassword";
 import isValidInteger from "../utils/isValidInteger";
+import validateDomainName from "../utils/validateDomainName";
 import { validateEmail, validateOptionalEmail } from "../utils/validateName";
 import validateName from "../utils/validateName";
-import validateDomainName from "../utils/validateDomainName";
-import { v4 } from "uuid";
+import VM from "./vm";
 const length = Math.floor(Math.random() * 5) + 10;
 export default class Taiga extends VM {
   /* Superuser settings */

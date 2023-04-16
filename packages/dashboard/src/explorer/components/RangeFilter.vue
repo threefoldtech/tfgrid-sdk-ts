@@ -46,9 +46,10 @@
   </v-card>
 </template>
 <script lang="ts">
-import { MutationTypes } from "../store/mutations";
 import { Component, Prop, Vue } from "vue-property-decorator";
+
 import toTera from "../filters/toTera";
+import { MutationTypes } from "../store/mutations";
 // import { inputValidation } from "../utils/validations"
 @Component({})
 export default class RangeFilter extends Vue {

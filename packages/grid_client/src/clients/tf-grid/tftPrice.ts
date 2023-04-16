@@ -1,16 +1,16 @@
 import { TFClient } from "./client";
 
 class TFTPrice {
-    tfclient: TFClient;
+  tfclient: TFClient;
 
-    constructor(client: TFClient) {
-        this.tfclient = client;
-    }
+  constructor(client: TFClient) {
+    this.tfclient = client;
+  }
 
-    async getPrice(): Promise<number> {
-        const priceInMili = await this.tfclient.queryChain(this.tfclient.client.tftPrice, []);
-        return priceInMili / 1000;
-    }
+  async getPrice(): Promise<number> {
+    const priceInMili = await this.tfclient.queryChain(this.tfclient.client.tftPrice, []);
+    return priceInMili / 1000;
+  }
 }
 
 export { TFTPrice };

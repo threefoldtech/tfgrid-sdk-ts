@@ -8,28 +8,28 @@ import { Nodes } from "../primitives";
 import { pingFarmModel } from "./models";
 
 class Farmerbot {
-    client: TFClient;
-    nodes: Nodes;
-    farmerBot: FarmerBot;
-    rmb: RMB;
+  client: TFClient;
+  nodes: Nodes;
+  farmerBot: FarmerBot;
+  rmb: RMB;
 
-    constructor(public config: GridClientConfig) {
-        this.client = new TFClient(config.substrateURL, config.mnemonic, config.storeSecret, config.keypairType);
-        this.farmerBot = new FarmerBot(this.config);
-        this.rmb = new RMB(config.rmbClient);
-    }
+  constructor(public config: GridClientConfig) {
+    this.client = new TFClient(config.substrateURL, config.mnemonic, config.storeSecret, config.keypairType);
+    this.farmerBot = new FarmerBot(this.config);
+    this.rmb = new RMB(config.rmbClient);
+  }
 
-    @expose
-    @validateInput
-    async pingFarm(options: pingFarmModel) {
-        return await this.farmerBot.pingFarm(options);
-    }
+  @expose
+  @validateInput
+  async pingFarm(options: pingFarmModel) {
+    return await this.farmerBot.pingFarm(options);
+  }
 
-    @expose
-    @validateInput
-    async findNode(options: FarmerBotFindNodeModel) {
-        return await this.farmerBot.findNode(options);
-    }
+  @expose
+  @validateInput
+  async findNode(options: FarmerBotFindNodeModel) {
+    return await this.farmerBot.findNode(options);
+  }
 }
 
 export { Farmerbot as farmerbot };

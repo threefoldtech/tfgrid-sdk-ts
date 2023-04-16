@@ -70,9 +70,10 @@
   </v-card>
 </template>
 <script lang="ts">
-import { ILocation } from "../graphql/api";
-import { Component, Prop, Vue } from "vue-property-decorator";
 import { byCountry } from "country-code-lookup";
+import { Component, Prop, Vue } from "vue-property-decorator";
+
+import { ILocation } from "../graphql/api";
 
 @Component({})
 export default class CountryDetails extends Vue {

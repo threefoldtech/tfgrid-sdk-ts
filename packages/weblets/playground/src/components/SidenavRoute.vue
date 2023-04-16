@@ -12,8 +12,9 @@
 </template>
 
 <script lang="ts">
-import { ISidenavRoute } from "@/types/Sidenav";
 import { Component, Prop, Vue } from "vue-property-decorator";
+
+import { ISidenavRoute } from "@/types/Sidenav";
 
 @Component({
   name: "SidenavRoute",

@@ -1,0 +1,9 @@
+# Ignore artifacts:
+build
+coverage
+weblets-chart
+dist
+charts
+index.yaml
+hub
+api

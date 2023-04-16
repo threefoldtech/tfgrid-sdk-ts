@@ -1,26 +1,27 @@
 <svelte:options tag="tf-deployedlist" />
 
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
-  import type { IProfile } from "../../types/Profile";
-  import type { DeploymentTab, ITab } from "../../types";
-  import DeployedList from "../../types/deployedList";
-  import deleteDeployment from "../../utils/deleteDeployment";
+  import type { GridClient } from "grid3_client";
+  import { onDestroy, onMount } from "svelte";
+
+  import Alert from "../../components/Alert.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import DialogueMsg from "../../components/DialogueMsg.svelte";
   // components
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import Tabs from "../../components/Tabs.svelte";
   import Table from "../../components/Table.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import { noActiveProfile } from "../../utils/message";
-  import UpdateK8s from "../../components/UpdateK8s.svelte";
+  import Tabs from "../../components/Tabs.svelte";
   import UpdateCapRover from "../../components/UpdateCapRover.svelte";
-  import type { IAction } from "../../types/table-action";
-  import DialogueMsg from "../../components/DialogueMsg.svelte";
-  import getGrid from "../../utils/getGrid";
+  import UpdateK8s from "../../components/UpdateK8s.svelte";
   import type { IStore } from "../../stores/currentDeployment";
-  import type { GridClient } from "grid3_client";
+  import type { DeploymentTab, ITab } from "../../types";
+  import DeployedList from "../../types/deployedList";
+  import type { IProfile } from "../../types/Profile";
+  import type { IAction } from "../../types/table-action";
+  import deleteDeployment from "../../utils/deleteDeployment";
+  import getGrid from "../../utils/getGrid";
   import getWireguardConfig from "../../utils/getWireguardConfig";
+  import { noActiveProfile } from "../../utils/message";
   type TabsType = IStore["type"];
   export let tab: TabsType = undefined;
 
@@ -125,7 +126,7 @@
   function _createK8sRows(rows: any[]) {
     return rows.map((row, i) => {
       const { name, master, workers, consumption } = row;
-      let publicIp = master.publicIP ?? ({} as any);
+      const publicIp = master.publicIP ?? ({} as any);
       master.publicIP ? (publicIp.ip = publicIp.ip.split("/")[0]) : (publicIp.ip = "None");
       master.publicIP ? (publicIp.ip6 = publicIp.ip6.split("/")[0]) : (publicIp.ip6 = "None");
       return [i + 1, name, publicIp.ip, publicIp.ip6, master.planetary, workers, consumption]; // prettier-ignore
@@ -134,7 +135,8 @@
 
   function _createVMRow(rows: any[]) {
     return rows.map((row, i) => {
-      let { name, publicIp, publicIp6, planetary, flist, consumption } = row;
+      let { publicIp, publicIp6 } = row;
+      const { name, planetary, flist, consumption } = row;
       const _flist =
         typeof flist === "string" ? flist.replace("https://hub.grid.tf/", "").replace(".flist", "") : flist;
       publicIp = publicIp != "None" ? publicIp.split("/")[0] : "None";

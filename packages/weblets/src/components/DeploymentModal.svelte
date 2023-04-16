@@ -2,12 +2,12 @@
 
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
+
   import type { ITab } from "../types";
   import copy from "../utils/copy";
-
+  import FormatData from "./FormatData.svelte";
   // components
   import Tabs from "./Tabs.svelte";
-  import FormatData from "./FormatData.svelte";
 
   const dispatch = createEventDispatcher<{ closed: void }>();
   const tabs: ITab[] = [

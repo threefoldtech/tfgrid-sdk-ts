@@ -6,27 +6,27 @@ import { BatchModel } from "./models";
 import { checkBalance } from "./utils";
 
 interface Extrinsic {
-    extrinsic: [];
+  extrinsic: [];
 }
 
 class Utility {
-    client: TFClient;
+  client: TFClient;
 
-    constructor(public config: GridClientConfig) {
-        this.client = new TFClient(config.substrateURL, config.mnemonic, config.storeSecret, config.keypairType);
-    }
+  constructor(public config: GridClientConfig) {
+    this.client = new TFClient(config.substrateURL, config.mnemonic, config.storeSecret, config.keypairType);
+  }
 
-    @expose
-    @checkBalance
-    async batch(options: BatchModel) {
-        return await this.client.utility.batch(options.extrinsics);
-    }
+  @expose
+  @checkBalance
+  async batch(options: BatchModel) {
+    return await this.client.utility.batch(options.extrinsics);
+  }
 
-    @expose
-    @checkBalance
-    async batchAll(options: BatchModel) {
-        return await this.client.utility.batchAll(options.extrinsics);
-    }
+  @expose
+  @checkBalance
+  async batchAll(options: BatchModel) {
+    return await this.client.utility.batchAll(options.extrinsics);
+  }
 }
 
 export { Utility as utility };

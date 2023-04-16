@@ -2,17 +2,18 @@
 
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
+
   import type { IFormField, ISelectOption } from "../types";
-  import type { IProfile } from "../types/Profile";
-  import findNodes from "../utils/findNodes";
-  import fetchFarms from "../utils/fetchFarms";
-  import { fetchCountries } from "../utils/fetchCountries";
   import NodeID from "../types/nodeId";
+  import type { IProfile } from "../types/Profile";
+  import { fetchCountries } from "../utils/fetchCountries";
+  import fetchFarms from "../utils/fetchFarms";
+  import findNodes from "../utils/findNodes";
+  import getGrid from "../utils/getGrid";
+  import gqlApi from "../utils/gqlApi";
   // components
   import Input from "./Input.svelte";
-  import gqlApi from "../utils/gqlApi";
   import MultiSelect from "./MultiSelect.svelte";
-  import getGrid from "../utils/getGrid";
 
   const dispatch = createEventDispatcher<{
     fetch: ISelectOption[];
@@ -60,7 +61,7 @@
   };
 
   // prettier-ignore
-  let nodeSelectionField: IFormField = {
+  const nodeSelectionField: IFormField = {
     label: "Node Selection",
     type: "select",
     symbol: "value",
@@ -278,7 +279,7 @@
 
               const { total_resources: total, used_resources: used } = node.capacity;
               // prettier-ignore
-              let hasEnoughResources =
+              const hasEnoughResources =
                 (total.sru - used.sru) / 1024 ** 3 >= (filters?.sru ?? ssd) &&
                 (total.mru - used.mru) / 1024 ** 3 >= (filters?.mru ?? Math.round(memory / 1024));
               if (!hasEnoughResources) {
@@ -349,7 +350,7 @@
 
   async function pingNode(node: number) {
     if (node && status == "valid") {
-      let grid = await getGrid(profile, grid => grid, "");
+      const grid = await getGrid(profile, grid => grid, "");
       try {
         status = null;
         nodeIdField.disabled = nodeSelectionField.disabled = validating = true;
@@ -425,7 +426,7 @@
         downNodes = upNodes = [];
         if (e.detail.length >= multiple) {
           e.detail.forEach(async node => {
-            let k = await pingNode(node);
+            const k = await pingNode(node);
             if (!k) downNodes = [...downNodes, node];
             else upNodes = [...upNodes, node];
           });

@@ -1,32 +1,32 @@
 {
-    "name": "@threefold/rmb_peer_client",
-    "author": "Ahmed Hanafy",
-    "version": "0.0.1",
-    "license": "ISC",
-    "homepage": "https://github.com/threefoldtech/grid3_client_ts/blob/development/packages/grid/README.md",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/threefoldtech/grid3_client_ts.git"
-    },
-    "publishConfig": {
-        "access": "public"
-    },
-    "dependencies": {
-        "redis": "^4.3.1",
-        "typescript": "^4.7.4",
-        "uuid4": "^2.0.2"
-    },
-    "devDependencies": {
-        "@types/uuid4": "^2.0.0",
-        "ts-node": "^10.9.1"
-    },
-    "main": "./dist/index.js",
-    "types": "dist/index.d.ts",
-    "files": [
-        "/dist"
-    ],
-    "private": false,
-    "scripts": {
-        "build": "tsc --build tsconfig.json"
-    }
+  "name": "@threefold/rmb_peer_client",
+  "author": "Ahmed Hanafy",
+  "version": "0.0.2",
+  "license": "ISC",
+  "homepage": "https://github.com/threefoldtech/tfgrid-sdk-ts/blob/development/packages/rmb_peer_client/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/threefoldtech/tfgrid-sdk-ts.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "redis": "^4.3.1",
+    "typescript": "^4.7.4",
+    "uuid4": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/uuid4": "^2.0.0",
+    "ts-node": "^10.9.1"
+  },
+  "main": "./dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "private": false,
+  "scripts": {
+    "build": "tsc --build tsconfig.json"
+  }
 }

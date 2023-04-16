@@ -1,11 +1,11 @@
 import Vue from "vue";
+import VueApollo from "vue-apollo";
 
 import dateFiler from "./filters/date";
 import optionTitleFiler from "./filters/optionTitle";
-import toTeraOrGigaOrPeta from "./filters/toTeraOrGigaOrPeta";
 import secondToRedable from "./filters/secondToRedable";
+import toTeraOrGigaOrPeta from "./filters/toTeraOrGigaOrPeta";
 import apolloProvider from "./plugins/apollo";
-import VueApollo from "vue-apollo";
 
 Vue.use(VueApollo);
 Vue.filter("date", dateFiler);
