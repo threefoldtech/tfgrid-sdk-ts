@@ -17,9 +17,7 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v4.2.0
         with:
-          build: |
-            yarn policies set-version 1.18.0
-            yarn workspace @threefold/dashboard add -D cypress
+          build: yarn workspace @threefold/dashboard add -WD cypress
           start: yarn workspace @threefold/dashboard serve
           wait-on: "http://localhost:8080"
           wait-on-timeout: 60
