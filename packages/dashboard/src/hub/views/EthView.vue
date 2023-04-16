@@ -29,14 +29,15 @@
 </template>
 
 <script lang="ts">
+import { debounce } from "debounce";
+import { BigNumber } from "ethers";
+import { formatUnits, parseUnits } from "ethers/lib/utils";
 import { Component, Vue } from "vue-property-decorator";
+
+import CustomAlert from "../components/CustomAlert.vue";
 import { sendToEth, sendToEthFees } from "../utils";
 import { Config } from "../utils/config";
 import { validateBSCAddress } from "../utils/eth";
-import { formatUnits, parseUnits } from "ethers/lib/utils";
-import { BigNumber } from "ethers";
-import CustomAlert from "../components/CustomAlert.vue";
-import { debounce } from "debounce";
 
 @Component({
   name: "EthView",
@@ -65,7 +66,7 @@ export default class Eth extends Vue {
     if (this.empty) return;
     try {
       const { destination, amount } = this;
-      let amountBN: BigNumber = this.parseAmount(amount);
+      const amountBN: BigNumber = this.parseAmount(amount);
       const config = this.$store.state.hub.config as Config;
       if (this.error?.startsWith("Can't estimate transaction fees: ")) {
         this.error = null;
@@ -100,7 +101,7 @@ export default class Eth extends Vue {
   }
 
   get total_amount() {
-    let bridge_fees = this.$store.state.hub.config.bridge_fees || BigNumber.from(0);
+    const bridge_fees = this.$store.state.hub.config.bridge_fees || BigNumber.from(0);
     const decimals = this.$store.state.hub.config.tft_decimals || 0;
     let amountBN = BigNumber.from(0);
     let txFeesBN = BigNumber.from(0);

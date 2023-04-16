@@ -2,9 +2,10 @@
 
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
+
   import type { IFormField, IPackage, Packages, SelectCapacityUpdate } from "../types";
-  import Input from "./Input.svelte";
   import { isInvalid, validateCpu, validateDisk, validateMemory } from "../utils/validateName";
+  import Input from "./Input.svelte";
 
   const dispatch = createEventDispatcher<{ update: SelectCapacityUpdate }>();
 

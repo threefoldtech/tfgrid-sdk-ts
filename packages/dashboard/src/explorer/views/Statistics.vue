@@ -19,11 +19,11 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import { req } from "../plugins/axios";
-import toTeraOrGigaOrPeta from "../filters/toTeraOrGigaOrPeta";
 
 import Layout from "../components/Layout.vue";
 import StatisticsCard from "../components/StatisticsCard.vue";
+import toTeraOrGigaOrPeta from "../filters/toTeraOrGigaOrPeta";
+import { req } from "../plugins/axios";
 
 interface Stats {
   nodes: number;

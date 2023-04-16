@@ -2,37 +2,36 @@
 
 <script lang="ts">
   // Types
-  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
-  import type { IProfile } from "../../types/Profile";
-  import { Disk, Env } from "../../types/vm";
-  import Owncloud from "../../types/owncloud";
-  // Modules
-  import deployOwncloud from "../../utils/deployOwncloud";
+  import Alert from "../../components/Alert.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import Input from "../../components/Input.svelte";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
+  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
+  import Owncloud from "../../types/owncloud";
+  import type { IProfile } from "../../types/Profile";
+  import { Disk, Env } from "../../types/vm";
+  // Modules
+  import deployOwncloud from "../../utils/deployOwncloud";
+  import { display } from "../../utils/display";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import { noActiveProfile } from "../../utils/message";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
+  import { validateRequiredHostName } from "../../utils/validateDomainName";
   import validateName, {
     isInvalid,
-    validateRequiredPassword,
     validateRequiredEmail,
+    validateRequiredPassword,
     validateRequiredPortNumber,
   } from "../../utils/validateName";
-  import { validateRequiredHostName } from "../../utils/validateDomainName";
 
-  import { noActiveProfile } from "../../utils/message";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
-  import type { GatewayNodes } from "../../utils/gatewayHelpers";
-  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
-  import { display } from "../../utils/display";
-  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
-
-  let data = new Owncloud();
+  const data = new Owncloud();
   let gateway: GatewayNodes;
   let invalid = true;
   let editable: boolean;
@@ -58,7 +57,7 @@
 
   const nameField: IFormField = { label: "Name", placeholder: "Owncloud Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
-  let adminFields: IFormField[] = [
+  const adminFields: IFormField[] = [
     {
       label: "Username",
       symbol: "adminUsername",
@@ -77,7 +76,7 @@
     },
   ];
 
-  let mailFields: IFormField[] = [
+  const mailFields: IFormField[] = [
     {
       label: "From Email Address",
       symbol: "smtpFromEmail",

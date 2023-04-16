@@ -6,26 +6,25 @@
 
   const deploymentStore = window.configs?.deploymentStore;
 
-  import { Disk, Env } from "../../types/vm";
-  import deployFunkwhale from "../../utils/deployFunkwhale";
-
-  // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
-  import Tabs from "../../components/Tabs.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
   import Alert from "../../components/Alert.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
   import Modal from "../../components/DeploymentModal.svelte";
-  import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, { isInvalid, validateEmail, validatePassword } from "../../utils/validateName";
-  import { noActiveProfile } from "../../utils/message";
-  import rootFs from "../../utils/rootFs";
-  import Funkwhale from "../../types/funkwhale";
+  import Input from "../../components/Input.svelte";
   import SelectCapacity from "../../components/SelectCapacity.svelte";
   import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
+  // Components
+  import SelectProfile from "../../components/SelectProfile.svelte";
+  import Tabs from "../../components/Tabs.svelte";
+  import Funkwhale from "../../types/funkwhale";
+  import { Disk, Env } from "../../types/vm";
+  import deployFunkwhale from "../../utils/deployFunkwhale";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import { noActiveProfile } from "../../utils/message";
   import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
+  import rootFs from "../../utils/rootFs";
+  import validateName, { isInvalid, validateEmail, validatePassword } from "../../utils/validateName";
 
   const data = new Funkwhale();
   data.disks = [new Disk()];

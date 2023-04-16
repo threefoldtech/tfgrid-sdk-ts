@@ -2,29 +2,28 @@
 
 <script lang="ts">
   // Types
-  import { IFormField, ITab, IPackage, SelectCapacityUpdate } from "../../types";
+  import Alert from "../../components/Alert.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import Input from "../../components/Input.svelte";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
+  // Components
+  import SelectProfile from "../../components/SelectProfile.svelte";
+  import Tabs from "../../components/Tabs.svelte";
+  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
+  import Peertube from "../../types/peertube";
   import type { IProfile } from "../../types/Profile";
   // Modules
   import { Env } from "../../types/vm";
-  import Peertube from "../../types/peertube";
   import deployPeertube from "../../utils/deployPeertube";
-  // Components
-  import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
-  import Tabs from "../../components/Tabs.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
-  import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, { isInvalid, validateEmail, validatePassword } from "../../utils/validateName";
-
-  import { noActiveProfile } from "../../utils/message";
-  import rootFs from "../../utils/rootFs";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
-  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import { noActiveProfile } from "../../utils/message";
   import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
+  import rootFs from "../../utils/rootFs";
+  import validateName, { isInvalid, validateEmail, validatePassword } from "../../utils/validateName";
   // Values
 
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
@@ -44,7 +43,7 @@
   let selectCapacity = new SelectCapacityUpdate();
 
   const deploymentStore = window.configs?.deploymentStore;
-  let data = new Peertube();
+  const data = new Peertube();
 
   let active = "base";
   let loading = false;

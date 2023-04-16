@@ -2,6 +2,7 @@
 
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
+
   import type { IAction } from "../types/table-action";
 
   const dispatch = createEventDispatcher<{ selected: any[] }>();

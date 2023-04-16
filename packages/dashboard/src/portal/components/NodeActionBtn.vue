@@ -36,8 +36,9 @@
   </v-container>
 </template>
 <script lang="ts">
-import { cancelRentContract, createRentContract, getActiveContracts, getNodeByID } from "@/portal/lib/nodes";
 import { Component, Prop, Vue } from "vue-property-decorator";
+
+import { cancelRentContract, createRentContract, getActiveContracts, getNodeByID } from "@/portal/lib/nodes";
 
 @Component({
   name: "NodeActionBtn",

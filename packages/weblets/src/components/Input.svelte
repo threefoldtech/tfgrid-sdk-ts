@@ -2,8 +2,9 @@
 
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import type { IFormField } from "../types";
   import { v4 } from "uuid";
+
+  import type { IFormField } from "../types";
 
   const dispatch = createEventDispatcher<{ input: Event }>();
   export let field: IFormField;
@@ -29,12 +30,12 @@
     const target = e.target as HTMLInputElement;
     const isNum = target.getAttribute("data-type") === "number";
     if (field.validator) {
-      let __err = field.validator(target.value);
+      const __err = field.validator(target.value);
       _error = typeof __err === "string" ? __err : undefined;
       invalid = !!__err;
       /* Hack for now */
     } else if (isNum) {
-      let __err = +target.value <= 0 || isNaN(+target.value) ? "Value must be positive" : null;
+      const __err = +target.value <= 0 || isNaN(+target.value) ? "Value must be positive" : null;
       _error = typeof __err === "string" ? __err : undefined;
       invalid = !!__err;
     }

@@ -126,8 +126,9 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
-import Layout from "../components/Layout.vue";
+
 import { calCU, calSU, getPrices } from "../../portal/lib/nodes";
+import Layout from "../components/Layout.vue";
 
 type priceType = {
   label?: string;
@@ -317,7 +318,7 @@ export default class Calculator extends Vue {
 
     let dedicatedPackage = "none";
     let sharedPackage = "none";
-    for (let pkg in this.discountPackages) {
+    for (const pkg in this.discountPackages) {
       if (balance > dedicatedPrice * this.discountPackages[pkg].duration) {
         dedicatedPackage = pkg;
       }

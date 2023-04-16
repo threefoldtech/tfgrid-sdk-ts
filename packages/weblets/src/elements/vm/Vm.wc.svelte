@@ -1,22 +1,27 @@
 <svelte:options tag="tf-vm" />
 
 <script lang="ts">
-  import VM, { Disk, Env } from "../../types/vm";
-  import type { IFlist, IFormField, ITab } from "../../types";
-  import deployVM from "../../utils/deployVM";
-  import type { IProfile } from "../../types/Profile";
-
+  import AddBtn from "../../components/AddBtn.svelte";
+  import Alert from "../../components/Alert.svelte";
+  import DeleteBtn from "../../components/DeleteBtn.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import Input from "../../components/Input.svelte";
+  import RootFsSize from "../../components/RootFsSize.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import DeleteBtn from "../../components/DeleteBtn.svelte";
-  import AddBtn from "../../components/AddBtn.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
+  import type { IFlist, IFormField, ITab } from "../../types";
+  import type { IProfile } from "../../types/Profile";
+  import VM, { Disk, Env } from "../../types/vm";
+  import deployVM from "../../utils/deployVM";
+  import { display } from "../../utils/display";
+  import getWireguardConfig from "../../utils/getWireguardConfig";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import isInvalidFlist from "../../utils/isInvalidFlist";
+  import { noActiveProfile } from "../../utils/message";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
   import validateName, {
     isInvalid,
     validateCpu,
@@ -27,12 +32,6 @@
     validateMemory,
     validatePrivateIPRange,
   } from "../../utils/validateName";
-  import { noActiveProfile } from "../../utils/message";
-  import isInvalidFlist from "../../utils/isInvalidFlist";
-  import RootFsSize from "../../components/RootFsSize.svelte";
-  import { display } from "../../utils/display";
-  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
-  import getWireguardConfig from "../../utils/getWireguardConfig";
 
   const tabs: ITab[] = [
     { label: "Config", value: "config" },
@@ -41,10 +40,10 @@
     // { label: "Advanced", value: "advanced" },
   ];
 
-  let data = new VM();
+  const data = new VM();
 
   // prettier-ignore
-  let baseFields: IFormField[] = [
+  const baseFields: IFormField[] = [
     { label: "CPU (vCores)", symbol: 'cpu', placeholder: 'CPU vCores', type: 'number', validator: validateCpu, invalid: false},
     { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateMemory, invalid: false },
     { label: "Public IPv4", symbol: "publicIp", placeholder: "", type: 'checkbox' },

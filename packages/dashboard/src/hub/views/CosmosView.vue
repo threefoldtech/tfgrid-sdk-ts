@@ -17,13 +17,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { sendToCosmos } from "../utils";
-import { Config } from "../utils/config";
-import { parseUnits } from "ethers/lib/utils";
-import CustomAlert from "../components/CustomAlert.vue";
 import { bech32 } from "bech32";
 import { BigNumber } from "ethers";
+import { parseUnits } from "ethers/lib/utils";
+import { Component, Vue } from "vue-property-decorator";
+
+import CustomAlert from "../components/CustomAlert.vue";
+import { sendToCosmos } from "../utils";
+import { Config } from "../utils/config";
 
 @Component({
   name: "CosmosView",
@@ -78,7 +79,7 @@ export default class Cosmos extends Vue {
     try {
       const { destination } = this;
       const config = this.$store.state.hub.config as Config;
-      let amount = this.parseAmount();
+      const amount = this.parseAmount();
 
       sendToCosmos(config.tft_token_contract_address, config.gravity_contract_address, destination, amount)
         .then(() => {

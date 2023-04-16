@@ -45,17 +45,18 @@
 </template>
 
 <script lang="ts">
-import { IFarm, ILocation, INode, IPublicConfig, ITwin } from "../graphql/api";
 import { Component, Prop, Vue } from "vue-property-decorator";
-import CountryDetails from "./CountryDetails.vue";
-import NodeDetails from "./NodeDetails.vue";
-import FarmDetails from "./FarmDetails.vue";
-import LocationDetails from "./LocationDetails.vue";
-import TwinDetails from "./TwinDetails.vue";
-import PublicConfigDetails from "./PublicConfigDetails.vue";
-import InterfacesDetails from "./InterfacesDetails.vue";
-import NodeUsedResources from "./NodeUsedResources.vue";
+
+import { IFarm, ILocation, INode, IPublicConfig, ITwin } from "../graphql/api";
 import mediaMatcher from "../utils/mediaMatcher";
+import CountryDetails from "./CountryDetails.vue";
+import FarmDetails from "./FarmDetails.vue";
+import InterfacesDetails from "./InterfacesDetails.vue";
+import LocationDetails from "./LocationDetails.vue";
+import NodeDetails from "./NodeDetails.vue";
+import NodeUsedResources from "./NodeUsedResources.vue";
+import PublicConfigDetails from "./PublicConfigDetails.vue";
+import TwinDetails from "./TwinDetails.vue";
 
 @Component({
   components: {

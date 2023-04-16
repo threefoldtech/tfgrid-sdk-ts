@@ -116,13 +116,14 @@
 </template>
 
 <script lang="ts">
+import gql from "graphql-tag";
 import { Component, Vue } from "vue-property-decorator";
+
 import DetailsV2 from "../components/DetailsV2.vue";
-import { INode } from "../graphql/api";
 import Layout from "../components/Layout.vue";
 import LayoutFilters from "../components/LayoutFilters.vue";
-import gql from "graphql-tag";
 import NodeFilter from "../components/NodeFilter.vue";
+import { INode } from "../graphql/api";
 import { ActionTypes } from "../store/actions";
 import { MutationTypes } from "../store/mutations";
 

@@ -1,31 +1,29 @@
 <svelte:options tag="tf-subsquid" />
 
 <script lang="ts">
-  import Subsquid from "../../types/subsquid";
-  import type { IProfile } from "../../types/Profile";
-  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
-  import deploySubsquid from "../../utils/deploySubsquid";
-  import { Disk } from "../../types/vm";
-
+  import Alert from "../../components/Alert.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import Input from "../../components/Input.svelte";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
-
+  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
+  import type { IProfile } from "../../types/Profile";
+  import Subsquid from "../../types/subsquid";
+  import { Disk } from "../../types/vm";
+  import deploySubsquid from "../../utils/deploySubsquid";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
   // utils
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, { isInvalid ,validateEndpoint} from "../../utils/validateName"; // prettier-ignore
   import { noActiveProfile } from "../../utils/message";
-  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
-  import type { GatewayNodes } from "../../utils/gatewayHelpers";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
   import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
+  import validateName, { isInvalid ,validateEndpoint} from "../../utils/validateName"; // prettier-ignore
 
-  let data = new Subsquid();
+  const data = new Subsquid();
   let profile: IProfile;
   let gateway: GatewayNodes;
 

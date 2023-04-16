@@ -4,8 +4,9 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import Sidenav from "./components/Sidebar.vue";
+
 import Navbar from "./components/Navbar.vue";
+import Sidenav from "./components/Sidebar.vue";
 import { ActionTypes } from "./store/actions";
 
 @Component({

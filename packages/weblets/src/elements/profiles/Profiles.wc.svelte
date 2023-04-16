@@ -2,6 +2,7 @@
 
 <script lang="ts" context="module">
   import { form } from "tf-svelte-rx-forms";
+
   import QrCode from "../../components/QrCode.svelte";
   import {
     generateSSH,
@@ -112,7 +113,7 @@
 
   // SSH
   let sshLoading = false;
-  let sshError = "";
+  const sshError = "";
   $: sshKey$ = $sshKey;
   $: sshIsDisabled = !mnemonics$.valid || sshLoading;
   $: sshInvalid = (sshKey$.touched || sshKey$.dirty) && !sshKey$.valid && !sshIsDisabled;

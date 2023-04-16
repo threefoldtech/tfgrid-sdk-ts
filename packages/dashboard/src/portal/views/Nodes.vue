@@ -16,8 +16,9 @@
 </template>
 
 <script lang="ts">
-import NodesTable from "../components/NodesTable.vue";
 import { Component, Vue } from "vue-property-decorator";
+
+import NodesTable from "../components/NodesTable.vue";
 import { ITab } from "../lib/nodes";
 
 @Component({

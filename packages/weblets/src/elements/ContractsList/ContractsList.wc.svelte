@@ -1,30 +1,29 @@
 <svelte:options tag="tf-contractslist" />
 
 <script lang="ts">
-  import getGrid from "../../utils/getGrid";
-  import type { IProfile } from "../../types/Profile";
-
+  import Alert from "../../components/Alert.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import DialogueMsg from "../../components/DialogueMsg.svelte";
   // components
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import Alert from "../../components/Alert.svelte";
   import Table from "../../components/Table.svelte";
-  import { noActiveProfile } from "../../utils/message";
-  import Modal from "../../components/DeploymentModal.svelte";
+  import type { IProfile } from "../../types/Profile";
   import type { IContract } from "../../utils/getContractsConsumption";
   import getContractsConsumption from "../../utils/getContractsConsumption";
-  import DialogueMsg from "../../components/DialogueMsg.svelte";
+  import getGrid from "../../utils/getGrid";
+  import { noActiveProfile } from "../../utils/message";
 
   let profile: IProfile;
   let contracts: IContract[] = [];
   let loading = false;
   let selectedContracts: IContract[] = [];
-  let selectedContractsIDS: number[] = [];
+  const selectedContractsIDS: number[] = [];
   let deleting = false;
   let deletingType: "all" | "selected" = null;
   let selectedRows: number[] = [];
-  let name: string = null;
+  const name: string = null;
   let opened = false;
-  let deleteAllopened = false;
+  const deleteAllopened = false;
   let loadingDetails: string = null;
   let infoToShow: object;
 
@@ -81,7 +80,7 @@
               contracts = [...names, ...nodes, ...rents];
             })
             .then(async () => {
-              for (let contract of contracts) {
+              for (const contract of contracts) {
                 if (contract.state === "GracePeriod") {
                   const res = await grid.contracts.getDeletionTime({
                     id: +contract.id,
@@ -108,7 +107,7 @@
 
   async function getContractDetails(contractId: number) {
     loadingDetails = contractId as unknown as string;
-    let deployment = await getGrid(
+    const deployment = await getGrid(
       profile,
       grid =>
         grid.zos

@@ -25,9 +25,10 @@
   </v-card>
 </template>
 <script lang="ts">
+import { Component, Prop, Vue } from "vue-property-decorator";
+
 import { MutationTypes } from "../store/mutations";
 import { IState } from "../store/state";
-import { Component, Prop, Vue } from "vue-property-decorator";
 import { inputValidation } from "../utils/validations";
 @Component({})
 export default class InFilter extends Vue {

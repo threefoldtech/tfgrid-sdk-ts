@@ -1,29 +1,28 @@
 <svelte:options tag="tf-validator" />
 
 <script lang="ts">
+  import Alert from "../../components/Alert.svelte";
   import DeployBtn from "../../components/DeployBtn.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
   import Input from "../../components/Input.svelte";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
   import SelectProfile from "../../components/SelectProfile.svelte";
+  import Tabs from "../../components/Tabs.svelte";
   import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
   import type { IProfile } from "../../types/Profile";
-
-  import Modal from "../../components/DeploymentModal.svelte";
   import TFhubValidator from "../../types/TFhubValidator";
-  import Alert from "../../components/Alert.svelte";
-  import { noActiveProfile } from "../../utils/message";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
   import deployTFhubValidator from "../../utils/deployTFhubValidator";
+  import { noActiveProfile } from "../../utils/message";
+  import rootFs from "../../utils/rootFs";
+  import { syncValidateMnemonics } from "../../utils/validateMnemonics";
   import validateName, {
     isInvalid,
-    validateStakeAmount,
     validateBSCAddress,
     validateBSCPrivateKey,
     validateethereumRpc,
+    validateStakeAmount,
   } from "../../utils/validateName";
-  import { syncValidateMnemonics } from "../../utils/validateMnemonics";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
-  import rootFs from "../../utils/rootFs";
-  import Tabs from "../../components/Tabs.svelte";
 
   const currentDeployment = window.configs?.currentDeploymentStore;
   const deploymentStore = window.configs?.deploymentStore;

@@ -19,10 +19,11 @@
 
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
-import Sidenav from "@/components/Sidenav.vue";
-import api from "@/utils/api";
-import { ISidenav } from "@/types/Sidenav";
 import { Route } from "vue-router";
+
+import Sidenav from "@/components/Sidenav.vue";
+import { ISidenav } from "@/types/Sidenav";
+import api from "@/utils/api";
 import { findInitialPage } from "@/utils/sidenav";
 
 @Component({
@@ -58,7 +59,7 @@ export default class App extends Vue {
     "algorand",
     "qvm",
     "umbrel",
-    "wordpress"
+    "wordpress",
   ];
   sidenav: ISidenav | null = null;
 

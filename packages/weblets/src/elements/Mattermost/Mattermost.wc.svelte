@@ -1,32 +1,31 @@
 <svelte:options tag="tf-mattermost" />
 
 <script lang="ts">
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Input from "../../components/Input.svelte";
-  import SelectProfile from "../../components/SelectProfile.svelte";
-  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
-  import type { IProfile } from "../../types/Profile";
-
-  import Modal from "../../components/DeploymentModal.svelte";
-  import Mattermost from "../../types/mattermost";
   import Alert from "../../components/Alert.svelte";
-  import { noActiveProfile } from "../../utils/message";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import Input from "../../components/Input.svelte";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
   import SelectNodeId from "../../components/SelectNodeId.svelte";
+  import SelectProfile from "../../components/SelectProfile.svelte";
+  import Tabs from "../../components/Tabs.svelte";
+  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
+  import Mattermost from "../../types/mattermost";
+  import type { IProfile } from "../../types/Profile";
   import deployMattermost from "../../utils/deployMattermost";
+  import { display } from "../../utils/display";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import { noActiveProfile } from "../../utils/message";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
+  import rootFs from "../../utils/rootFs";
+  import { validateRequiredHostName } from "../../utils/validateDomainName";
   import validateName, {
     isInvalid,
     validateRequiredEmail,
-    validateRequiredPortNumber,
     validateRequiredPassword,
+    validateRequiredPortNumber,
   } from "../../utils/validateName";
-  import { validateRequiredHostName } from "../../utils/validateDomainName";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
-  import rootFs from "../../utils/rootFs";
-  import Tabs from "../../components/Tabs.svelte";
-  import type { GatewayNodes } from "../../utils/gatewayHelpers";
-  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
-  import { display } from "../../utils/display";
-  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   const currentDeployment = window.configs?.currentDeploymentStore;
   const deploymentStore = window.configs?.deploymentStore;

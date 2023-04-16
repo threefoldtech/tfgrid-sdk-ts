@@ -1,32 +1,30 @@
 <svelte:options tag="tf-wordpress" />
 
 <script lang="ts">
-  import Wordpress from "../../types/wordpress";
-  import type { IProfile } from "../../types/Profile";
-  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
-  import deployWordpress from "../../utils/deployWordpress";
-  import { Disk } from "../../types/vm";
-
+  import Alert from "../../components/Alert.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import Input from "../../components/Input.svelte";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
-
+  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
+  import type { IProfile } from "../../types/Profile";
+  import { Disk } from "../../types/vm";
+  import Wordpress from "../../types/wordpress";
+  import deployWordpress from "../../utils/deployWordpress";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
   //util
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, { isInvalid, validateRequiredEmail, validateRequiredPassword } from "../../utils/validateName";
   import { noActiveProfile } from "../../utils/message";
-  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
-  import type { GatewayNodes } from "../../utils/gatewayHelpers";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
   import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
   import rootFs from "../../utils/rootFs";
+  import validateName, { isInvalid, validateRequiredEmail, validateRequiredPassword } from "../../utils/validateName";
 
-  let data = new Wordpress();
+  const data = new Wordpress();
   data.disks = [new Disk()];
   let profile: IProfile;
   let gateway: GatewayNodes;
@@ -48,7 +46,7 @@
   let modalData: object;
 
   const tabs: ITab[] = [{ label: "Config", value: "config" }];
-  let fields: IFormField[] = [
+  const fields: IFormField[] = [
     {
       label: "Name",
       symbol: "name",

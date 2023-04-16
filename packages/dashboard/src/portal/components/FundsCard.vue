@@ -34,9 +34,10 @@
   </v-container>
 </template>
 <script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
+
 import config from "@/portal/config";
 import { balanceInterface, getBalance, getMoreFunds } from "@/portal/lib/balance";
-import { Component, Vue } from "vue-property-decorator";
 
 @Component({
   name: "FundsCard",

@@ -221,19 +221,20 @@
 </template>
 
 <script lang="ts">
+import { StrKey } from "stellar-sdk";
+import { Component, Vue, Watch } from "vue-property-decorator";
+
 import FarmNodesTable from "../components/FarmNodesTable.vue";
 import PublicIPTable from "../components/PublicIPTable.vue";
-import { Component, Vue, Watch } from "vue-property-decorator";
 import {
-  createFarm,
   batchCreateIP,
+  createFarm,
   deleteFarm,
   deleteIP,
   getFarm,
   getNodesByFarmID,
   setFarmPayoutV2Address,
 } from "../lib/farms";
-import { StrKey } from "stellar-sdk";
 
 @Component({
   name: "FarmsView",
@@ -346,7 +347,7 @@ export default class FarmsView extends Vue {
     console.log(`Request nodes with params. farmids: ${this.farmsIds}, page: ${this.page}, size: ${this.size}`);
 
     this.loadingNodes = true;
-    let { nodes, count } = await getNodesByFarmID(this.farmsIds, this.page, this.size);
+    const { nodes, count } = await getNodesByFarmID(this.farmsIds, this.page, this.size);
     this.nodes = nodes;
     this.count = count;
     this.loadingNodes = false;
@@ -634,7 +635,7 @@ export default class FarmsView extends Vue {
   async updatePubConfigs(nodeid: any, config: any) {
     this.loadingNodes = true;
 
-    let current = this.nodes.findIndex((n: any) => n.nodeId == nodeid);
+    const current = this.nodes.findIndex((n: any) => n.nodeId == nodeid);
     this.nodes[current].publicConfig = {
       ipv4: config?.ip4.ip || "",
       gw4: config?.ip4.gw || "",

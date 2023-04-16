@@ -190,11 +190,13 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+
+import config from "@/portal/config";
+
+import FundsCard from "./portal/components/FundsCard.vue";
+import WelcomeWindow from "./portal/components/WelcomeWindow.vue";
 import { connect } from "./portal/lib/connect";
 import { accountInterface } from "./portal/store/state";
-import WelcomeWindow from "./portal/components/WelcomeWindow.vue";
-import FundsCard from "./portal/components/FundsCard.vue";
-import config from "@/portal/config";
 
 interface SidenavItem {
   label: string;

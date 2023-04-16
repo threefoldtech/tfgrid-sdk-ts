@@ -1,38 +1,37 @@
 <svelte:options tag="tf-taiga" />
 
 <script lang="ts">
-  import { Disk, Env } from "../../types/vm";
-  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
-  import deployTaiga from "../../utils/deployTaiga";
-  import type { IProfile } from "../../types/Profile";
-  import Taiga from "../../types/taiga";
-
+  import Alert from "../../components/Alert.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import Input from "../../components/Input.svelte";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
+  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
+  import type { IProfile } from "../../types/Profile";
+  import Taiga from "../../types/taiga";
+  import { Disk, Env } from "../../types/vm";
+  import deployTaiga from "../../utils/deployTaiga";
+  import { display } from "../../utils/display";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import { noActiveProfile } from "../../utils/message";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
+  import validateDomainName from "../../utils/validateDomainName";
   import validateName, {
     isInvalid,
     validateEmail,
     validatePassword,
     validateRequiredEmail,
-    validateRequiredPortNumber,
     validateRequiredPassword,
+    validateRequiredPortNumber,
   } from "../../utils/validateName";
-  import { noActiveProfile } from "../../utils/message";
-  import validateDomainName from "../../utils/validateDomainName";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
-  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
-  import type { GatewayNodes } from "../../utils/gatewayHelpers";
-  import { display } from "../../utils/display";
-  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
-  let data = new Taiga();
+  const data = new Taiga();
   let gateway: GatewayNodes;
   let invalid = true;
   let editable: boolean;
@@ -49,7 +48,7 @@
   ];
   const nameField: IFormField = { label: "Name", placeholder: "Taiga Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }; // prettier-ignore
 
-  let adminFields: IFormField[] = [
+  const adminFields: IFormField[] = [
     {
       label: "Username",
       symbol: "adminUsername",
@@ -76,7 +75,7 @@
     },
   ];
 
-  let mailFields: IFormField[] = [
+  const mailFields: IFormField[] = [
     {
       label: "From Email Address",
       symbol: "smtpFromEmail",

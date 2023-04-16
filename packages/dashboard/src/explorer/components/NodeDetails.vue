@@ -234,10 +234,11 @@
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+
 import { INode, INodeStatistics } from "../graphql/api";
-import DatesDetails from "./DatesDetails.vue";
-import mediaMatcher from "../utils/mediaMatcher";
 import isNodeOnline from "../utils/isNodeOnline";
+import mediaMatcher from "../utils/mediaMatcher";
+import DatesDetails from "./DatesDetails.vue";
 
 function createItem(value: string, key?: keyof INode) {
   key = key ? key : (value.toLocaleLowerCase() as any);

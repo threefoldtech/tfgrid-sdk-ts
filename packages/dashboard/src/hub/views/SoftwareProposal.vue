@@ -34,12 +34,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import OsInput from "../components/OsInput.vue";
-import { submitSoftwareUpgradeProposal } from "../utils/gov";
 import { parseUnits } from "ethers/lib/utils";
-import { SoftwareUpgradeProposal } from "../types/cosmos/upgrade/v1beta1/upgrade";
 import Long from "long";
+import { Component, Vue } from "vue-property-decorator";
+
+import OsInput from "../components/OsInput.vue";
+import { SoftwareUpgradeProposal } from "../types/cosmos/upgrade/v1beta1/upgrade";
+import { submitSoftwareUpgradeProposal } from "../utils/gov";
 
 @Component({
   name: "SoftwareProposal",

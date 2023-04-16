@@ -16,10 +16,11 @@
   </v-card>
 </template>
 <script lang="ts">
+import { Component, Prop, Vue } from "vue-property-decorator";
+
 import { MutationTypes } from "../store/mutations";
 import { IState } from "../store/state";
 import { IOP } from "../utils/filters";
-import { Component, Prop, Vue } from "vue-property-decorator";
 import { inputValidation } from "../utils/validations";
 @Component({})
 export default class ComparisonFilter extends Vue {

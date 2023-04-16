@@ -3,13 +3,13 @@
 <script lang="ts">
   import { onMount } from "svelte";
 
-  // libs
-  import baseConfigStore from "../../stores/baseConfig";
-  import deploymentStore from "../../stores/deploymentStore";
-  import notificationStore from "../../stores/notifications";
-  import currentDeploymentStore from "../../stores/currentDeployment";
   import LogsInfo from "../../components/LogsInfo.svelte";
   import balanceStore from "../../stores/balance";
+  // libs
+  import baseConfigStore from "../../stores/baseConfig";
+  import currentDeploymentStore from "../../stores/currentDeployment";
+  import deploymentStore from "../../stores/deploymentStore";
+  import notificationStore from "../../stores/notifications";
 
   window.configs = window.configs || ({} as any);
   window.configs.baseConfig = baseConfigStore;

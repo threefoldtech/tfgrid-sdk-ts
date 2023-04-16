@@ -1,14 +1,14 @@
 <svelte:options tag="tf-farming-calculator" />
 
 <script lang="ts">
-  import FarmingProfile, { Certification, ProfileTypes } from "../../types/FarmingProfile";
-  import { onMount } from "svelte";
   import { Chart, registerables } from "chart.js";
-  import { buildPieChart, buildLineChart } from "../../utils/FarmingCalculatorCharts";
+  import { onMount } from "svelte";
 
   // Components
   import Input from "../../components/Input.svelte";
   import type { IFormField } from "../../types";
+  import FarmingProfile, { Certification, ProfileTypes } from "../../types/FarmingProfile";
+  import { buildLineChart, buildPieChart } from "../../utils/FarmingCalculatorCharts";
 
   const profiles = [
     new FarmingProfile({

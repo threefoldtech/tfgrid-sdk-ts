@@ -1,41 +1,39 @@
 <svelte:options tag="tf-nodepilot" />
 
 <script lang="ts">
-  import { Disk, Env } from "../../types/vm";
-  import NodePilot from "../../types/nodepilot";
-
-  import type { IFlist, IFormField, ITab } from "../../types";
-  import deployVM from "../../utils/deployVM";
-  import type { IProfile } from "../../types/Profile";
-
+  import AddBtn from "../../components/AddBtn.svelte";
+  import Alert from "../../components/Alert.svelte";
+  import DeleteBtn from "../../components/DeleteBtn.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import Input from "../../components/Input.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import DeleteBtn from "../../components/DeleteBtn.svelte";
-  import AddBtn from "../../components/AddBtn.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
+  import type { IFlist, IFormField, ITab } from "../../types";
+  import NodePilot from "../../types/nodepilot";
+  import type { IProfile } from "../../types/Profile";
+  import { Disk, Env } from "../../types/vm";
+  import deployVM from "../../utils/deployVM";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import { noActiveProfile } from "../../utils/message";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
   import validateName, {
     isInvalid,
-    validateNPCpu,
     validateFlistvalue,
     validateKey,
     validateKeyValue,
+    validateNPCpu,
     validateNPMemory,
   } from "../../utils/validateName";
-  import { noActiveProfile } from "../../utils/message";
-  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
 
   const tabs: ITab[] = [{ label: "Config", value: "config" }];
 
-  let data = new NodePilot();
+  const data = new NodePilot();
 
   // prettier-ignore
-  let baseFields: IFormField[] = [
+  const baseFields: IFormField[] = [
     { label: "CPU (vCores)", symbol: 'cpu', placeholder: 'CPU vCores', type: 'number', validator: validateNPCpu, invalid: false},
     { label: "Memory (MB)", symbol: 'memory', placeholder: 'Your Memory in MB', type: 'number', validator: validateNPMemory, invalid: false },
     ];
@@ -57,9 +55,9 @@
     data.publicIp6 = true;
     data.planetary = false;
 
-    let disk1 = new Disk();
+    const disk1 = new Disk();
     disk1.size = 15;
-    let disk2 = new Disk();
+    const disk2 = new Disk();
     disk2.size = 100;
     data.disks = [disk1, disk2];
   }

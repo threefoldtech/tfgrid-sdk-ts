@@ -122,12 +122,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import config from "../config";
-import { getDepositFee, getWithdrawFee, withdraw } from "../lib/swap";
 import QrcodeVue from "qrcode.vue";
-import { balanceInterface, getBalance } from "../lib/balance";
 import { default as StellarSdk, StrKey } from "stellar-sdk";
+import { Component, Vue } from "vue-property-decorator";
+
+import config from "../config";
+import { balanceInterface, getBalance } from "../lib/balance";
+import { getDepositFee, getWithdrawFee, withdraw } from "../lib/swap";
 
 @Component({
   name: "TransferView",

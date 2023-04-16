@@ -14,8 +14,9 @@
   </v-card>
 </template>
 <script lang="ts">
-import { MutationTypes } from "../store/mutations";
 import { Component, Prop, Vue } from "vue-property-decorator";
+
+import { MutationTypes } from "../store/mutations";
 
 @Component({})
 export default class ConditionFilter extends Vue {

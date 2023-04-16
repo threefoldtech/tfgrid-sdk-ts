@@ -1,31 +1,30 @@
 <svelte:options tag="tf-caprover" />
 
 <script lang="ts">
-  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
-  import { CapWorker, default as Caprover } from "../../types/caprover";
-  import deployCaprover from "../../utils/deployCaprover";
-  import type { IProfile } from "../../types/Profile";
-
+  import AddBtn from "../../components/AddBtn.svelte";
+  import Alert from "../../components/Alert.svelte";
+  import DeleteBtn from "../../components/DeleteBtn.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import Input from "../../components/Input.svelte";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
-  import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, { isInvalid, validatePassword } from "../../utils/validateName";
-  import validateDomainName from "../../utils/validateDomainName";
-  import { noActiveProfile } from "../../utils/message";
-  import rootFs from "../../utils/rootFs";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
-  import AddBtn from "../../components/AddBtn.svelte";
-  import DeleteBtn from "../../components/DeleteBtn.svelte";
+  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
+  import { CapWorker, default as Caprover } from "../../types/caprover";
+  import type { IProfile } from "../../types/Profile";
+  import deployCaprover from "../../utils/deployCaprover";
   import { display } from "../../utils/display";
+  import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import { noActiveProfile } from "../../utils/message";
   import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
+  import rootFs from "../../utils/rootFs";
+  import validateDomainName from "../../utils/validateDomainName";
+  import validateName, { isInvalid, validatePassword } from "../../utils/validateName";
 
-  let data = new Caprover();
+  const data = new Caprover();
   let loading = false;
   let success = false;
   let failed = false;
@@ -82,7 +81,7 @@
 
     deployCaprover(data, profile)
       .then(async grid => {
-        let vms = await grid.machines.getObj(data.name);
+        const vms = await grid.machines.getObj(data.name);
         success = true;
         modalData = vms;
         deploymentStore.set(0);

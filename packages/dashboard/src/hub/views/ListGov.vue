@@ -109,11 +109,12 @@
 </template>
 
 <script lang="ts">
+import { formatUnits } from "ethers/lib/utils";
 import { Component, Vue } from "vue-property-decorator";
+
+import VoteCircle from "../components/VoteCircle.vue";
 import { CosmosGovV1Beta1QueryParamsResponse, CosmosGovV1Beta1QueryProposalsResponse } from "../rest/cosmos";
 import { listProposals, parameters, tally } from "../utils/gov";
-import { formatUnits } from "ethers/lib/utils";
-import VoteCircle from "../components/VoteCircle.vue";
 
 @Component({
   name: "ListGov",
@@ -148,10 +149,10 @@ export default class ListGov extends Vue {
   }
 
   async fillPendingProposalsVotes() {
-    let proposals = this.proposals || [];
+    const proposals = this.proposals || [];
     for (const proposal of proposals) {
       if (proposal.status == "PROPOSAL_STATUS_VOTING_PERIOD") {
-        let currentTally = await tally(this.$store.state.hub.config.cosmos_rest, proposal.proposalId || "");
+        const currentTally = await tally(this.$store.state.hub.config.cosmos_rest, proposal.proposalId || "");
         proposal.finalTallyResult = currentTally.tally;
       }
     }

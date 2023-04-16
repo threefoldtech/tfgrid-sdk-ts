@@ -1,8 +1,9 @@
 <svelte:options tag="tf-tabs" />
 
 <script lang="ts">
-  import type { ITab } from "../types";
   import { createEventDispatcher, onMount } from "svelte";
+
+  import type { ITab } from "../types";
 
   const dispatch = createEventDispatcher<{ removed: number; select: string; init: void }>();
 

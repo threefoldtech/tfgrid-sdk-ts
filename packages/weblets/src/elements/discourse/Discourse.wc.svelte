@@ -1,27 +1,27 @@
 <svelte:options tag="tf-discourse" />
 
 <script lang="ts">
-  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
-  import { default as Discourse } from "../../types/discourse";
-  import deployDiscourse from "../../utils/deployDiscourse";
-  import type { IProfile } from "../../types/Profile";
-  import rootFs from "../../utils/rootFs";
+  import Alert from "../../components/Alert.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import Input from "../../components/Input.svelte";
+  import SelectCapacity from "../../components/SelectCapacity.svelte";
+  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
   // Components
   import SelectProfile from "../../components/SelectProfile.svelte";
-  import Input from "../../components/Input.svelte";
   import Tabs from "../../components/Tabs.svelte";
-  import DeployBtn from "../../components/DeployBtn.svelte";
-  import Alert from "../../components/Alert.svelte";
-  import SelectNodeId from "../../components/SelectNodeId.svelte";
-  import Modal from "../../components/DeploymentModal.svelte";
-  import hasEnoughBalance from "../../utils/hasEnoughBalance";
-  import validateName, { isInvalid, validateEmail } from "../../utils/validateName";
-  import { noActiveProfile } from "../../utils/message";
-  import SelectCapacity from "../../components/SelectCapacity.svelte";
-  import type { GatewayNodes } from "../../utils/gatewayHelpers";
-  import SelectGatewayNode from "../../components/SelectGatewayNode.svelte";
+  import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
+  import { default as Discourse } from "../../types/discourse";
+  import type { IProfile } from "../../types/Profile";
+  import deployDiscourse from "../../utils/deployDiscourse";
   import { display } from "../../utils/display";
+  import type { GatewayNodes } from "../../utils/gatewayHelpers";
+  import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import { noActiveProfile } from "../../utils/message";
   import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
+  import rootFs from "../../utils/rootFs";
+  import validateName, { isInvalid, validateEmail } from "../../utils/validateName";
 
   const data = new Discourse();
 

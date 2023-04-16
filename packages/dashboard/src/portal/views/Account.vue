@@ -82,15 +82,17 @@
 
 <script lang="ts">
 import axios from "axios";
-import { Component, Vue } from "vue-property-decorator";
-import { createTwin } from "../lib/twin";
 import md5 from "md5";
-import { acceptTermsAndCondition, userAcceptedTermsAndConditions } from "../lib/accepttc";
-import WelcomeWindow from "../components/WelcomeWindow.vue";
-import { activateThroughActivationService } from "../lib/activation";
-import Twin from "./Twin.vue";
-import { accountInterface } from "../store/state";
+import { Component, Vue } from "vue-property-decorator";
+
 import config from "@/portal/config";
+
+import WelcomeWindow from "../components/WelcomeWindow.vue";
+import { acceptTermsAndCondition, userAcceptedTermsAndConditions } from "../lib/accepttc";
+import { activateThroughActivationService } from "../lib/activation";
+import { createTwin } from "../lib/twin";
+import { accountInterface } from "../store/state";
+import Twin from "./Twin.vue";
 
 @Component({
   name: "AccountView",
@@ -125,7 +127,7 @@ export default class AccountView extends Vue {
   async mounted() {
     if (this.$api) {
       this.openDialog = !(await userAcceptedTermsAndConditions(this.$api, this.$route.params.accountID));
-      let document = await axios.get(this.documentLink);
+      const document = await axios.get(this.documentLink);
       this.documentHash = md5(document.data);
       this.selectedName = this.items.filter(item => item.id === this.selectedItem.item_id)[0].name;
     } else {
