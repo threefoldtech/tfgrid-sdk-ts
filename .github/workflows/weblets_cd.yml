@@ -8,6 +8,7 @@ on:
       - development
     paths:
       - "packages/weblets/**"
+  workflow_dispatch:
 
 concurrency:
   # one instance of runing pipeline allowed per branch.
