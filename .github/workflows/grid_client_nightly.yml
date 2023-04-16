@@ -52,40 +52,40 @@ jobs:
         id: dynamicsinglevm
         continue-on-error: true
         run: |
-          yarn run ts-node --project packages/grid/tsconfig-node.json packages/grid/scripts/dynamic_single_vm.ts
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/dynamic_single_vm.ts
       - name: Run test multiple vms
         id: multiplevm
         continue-on-error: true
         run: |
-          yarn run ts-node --project packages/grid/tsconfig-node.json packages/grid/scripts/multiple_vms.ts
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/multiple_vms.ts
       - name: Run test kubernetes
         id: kubernetes
         continue-on-error: true
         run: |
-          yarn run ts-node --project packages/grid/tsconfig-node.json packages/grid/scripts/kubernetes.ts
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/kubernetes.ts
       - name: Run test vm with qsfs
         id: vmqsfs
         continue-on-error: true
         run: |
-          yarn run ts-node --project packages/grid/tsconfig-node.json packages/grid/scripts/vm_with_qsfs.ts
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/vm_with_qsfs.ts
       - name: Run test kubernetes with qsfs
         id: kubernetesqsfs
         continue-on-error: true
         run: |
-          yarn run ts-node --project packages/grid/tsconfig-node.json packages/grid/scripts/kubernetes_with_qsfs.ts
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/kubernetes_with_qsfs.ts
       - name: Run test kvstore
         id: kvstore
         continue-on-error: true
         run: |
-          yarn run ts-node --project packages/grid/tsconfig-node.json packages/grid/scripts/kvstore_example.ts
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/kvstore_example.ts
       - name: Run test zdb
         id: zdb
         continue-on-error: true
         run: |
-          yarn run ts-node --project packages/grid/tsconfig-node.json packages/grid/scripts/zdb.ts
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/zdb.ts
       - name: Cleanup - Delete all contracts
         run: |
-          yarn run ts-node --project packages/grid/tsconfig-node.json packages/grid/scripts/delete_all_contracts.ts
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/delete_all_contracts.ts
       - name: Check test script status
         if: |
           steps.dynamicsinglevm.outcome != 'success' ||
