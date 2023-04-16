@@ -1571,15 +1571,15 @@
   resolved "https://registry.yarnpkg.com/@substrate/ss58-registry/-/ss58-registry-1.23.0.tgz#6212bf871a882da98799f8dc51de0944d4152b88"
   integrity sha512-LuQje7n48GXSsp1aGI6UEmNVtlh7OzQ6CN1Hd9VGUrshADwMB0lRZ5bxnffmqDR4vVugI7h0NN0AONhIW1eHGg==
 
-"@threefold/grid_client@0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-0.0.1.tgz#4be7665e262aa523509488fd501ebda71d46c439"
-  integrity sha512-Fsygx6bydncd4F7oziiS2Tye5CPJNmpva94gg8BSQb3cBp8nsBdbo4D6TTFV3FE2e5WLRQSSFllMXIaV5qe81Q==
+"@threefold/grid_client@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-0.0.2.tgz#e58a56c40ecc7cd87e67bdb92b7955fccf0ff621"
+  integrity sha512-xAj2jnkGTotDQ7feYwXDkLJVE00MsKfOJNRGdFv/9N9Hk2R+hkPUfiiGjyTfYYfetY3jPTtUOKa+dqXrxak95Q==
   dependencies:
     "@jimber/pkid" "1.0.4"
     "@noble/secp256k1" "^1.7.1"
-    "@threefold/rmb_direct_client" "^0.0.1"
-    "@threefold/rmb_peer_server" "^0.0.1"
+    "@threefold/rmb_direct_client" "^0.0.2"
+    "@threefold/rmb_peer_server" "^0.0.2"
     algosdk "^1.19.0"
     appdata-path "^1.0.0"
     await-lock "^2.1.0"
@@ -1606,10 +1606,10 @@
     url-parse "^1.5.10"
     uuid4 "^2.0.2"
 
-"@threefold/rmb_direct_client@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-0.0.1.tgz#906f11464862dda71d161cc6063c1043e671c88f"
-  integrity sha512-VObtWIaV/7W3dRS7jnC0KcG3DhGXu3Kbymgbg60JOY31eWppMXh57UE1+RH89qU2YKEKhgddwnT6drgSqBcTCQ==
+"@threefold/rmb_direct_client@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-0.0.2.tgz#1a3cb0c940538465cdcb877bfc15fa94c1dea237"
+  integrity sha512-3IRYSUcw6XxfQ4wdIROHaXXY6yJD1fcPXmQh0yCYXpjB44w2Xf60eyHf+4RyGNhnzReq3iGtVfxmfWfj+H+J/w==
   dependencies:
     "@noble/secp256k1" "^1.7.1"
     "@polkadot/api" "^8.9.1"
@@ -1622,10 +1622,10 @@
     uuid "^8.3.2"
     ws "^8.12.0"
 
-"@threefold/rmb_peer_server@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@threefold/rmb_peer_server/-/rmb_peer_server-0.0.1.tgz#c4a4907b9096ba90ec662f7fcad6b5f340f2d78a"
-  integrity sha512-PxG4InkxdaXuEf1y0RiSSz59yw8S08yrq2gDuaUBPoJBVZr3uBPAu6RFuC3LCyj6xMhp6Ek46uiL2TFF4/d96Q==
+"@threefold/rmb_peer_server@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@threefold/rmb_peer_server/-/rmb_peer_server-0.0.2.tgz#35b51de6e23f68614ea0d6e2fc32d5fcb6ce3565"
+  integrity sha512-c17/hBlC6Tr+UCLLxXXsD3cYu8EeZvTkFAFBTuwGZqp02jqjzt9/fPwEM/+UCi8Sv3MVAmcENeC6SRVJAQwUaQ==
   dependencies:
     redis "^4.3.1"
     typescript "^4.7.4"
