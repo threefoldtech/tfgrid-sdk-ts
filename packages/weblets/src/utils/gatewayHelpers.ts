@@ -1,4 +1,4 @@
-import type { NodeInfo } from "grid3_client";
+import type { NodeInfo } from "@threefold/grid_client";
 
 import { solutionList } from "../stores/solutionsList";
 import type { IStore } from "./../stores/currentDeployment";

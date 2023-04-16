@@ -1,4 +1,4 @@
-import type { FilterOptions } from "grid3_client";
+import type { FilterOptions } from "@threefold/grid_client";
 
 import type { ISelectOption } from "../types";
 import type { IProfile } from "../types/Profile";

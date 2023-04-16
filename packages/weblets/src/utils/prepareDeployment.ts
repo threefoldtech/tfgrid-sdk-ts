@@ -1,4 +1,4 @@
-import type { GridClient } from "grid3_client";
+import type { GridClient } from "@threefold/grid_client";
 
 import type { IStore } from "./../stores/currentDeployment";
 export default async function checkVMExist(grid: GridClient, type: IStore["type"], name) {

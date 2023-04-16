@@ -1571,6 +1571,65 @@
   resolved "https://registry.yarnpkg.com/@substrate/ss58-registry/-/ss58-registry-1.23.0.tgz#6212bf871a882da98799f8dc51de0944d4152b88"
   integrity sha512-LuQje7n48GXSsp1aGI6UEmNVtlh7OzQ6CN1Hd9VGUrshADwMB0lRZ5bxnffmqDR4vVugI7h0NN0AONhIW1eHGg==
 
+"@threefold/grid_client@0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-0.0.1.tgz#4be7665e262aa523509488fd501ebda71d46c439"
+  integrity sha512-Fsygx6bydncd4F7oziiS2Tye5CPJNmpva94gg8BSQb3cBp8nsBdbo4D6TTFV3FE2e5WLRQSSFllMXIaV5qe81Q==
+  dependencies:
+    "@jimber/pkid" "1.0.4"
+    "@noble/secp256k1" "^1.7.1"
+    "@threefold/rmb_direct_client" "^0.0.1"
+    "@threefold/rmb_peer_server" "^0.0.1"
+    algosdk "^1.19.0"
+    appdata-path "^1.0.0"
+    await-lock "^2.1.0"
+    axios "^0.27.2"
+    bip39 "^3.0.4"
+    buffer "^6.0.3"
+    class-transformer "^0.5.1"
+    class-validator "^0.14.0"
+    crypto-js "^4.1.1"
+    decimal.js "^10.3.1"
+    exponential-backoff "^3.1.0"
+    express "^4.18.1"
+    http-server "^14.1.1"
+    libsodium-wrappers "^0.7.10"
+    netaddr "^1.1.0"
+    private-ip "^2.3.3"
+    reflect-metadata "^0.1.13"
+    stellar-sdk "^10.4.1"
+    tfgrid-api-client "1.27.0"
+    tweetnacl "^1.0.3"
+    tweetnacl-util "^0.15.1"
+    typescript "^4.7.4"
+    url-join "^4.0.1"
+    url-parse "^1.5.10"
+    uuid4 "^2.0.2"
+
+"@threefold/rmb_direct_client@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-0.0.1.tgz#906f11464862dda71d161cc6063c1043e671c88f"
+  integrity sha512-VObtWIaV/7W3dRS7jnC0KcG3DhGXu3Kbymgbg60JOY31eWppMXh57UE1+RH89qU2YKEKhgddwnT6drgSqBcTCQ==
+  dependencies:
+    "@noble/secp256k1" "^1.7.1"
+    "@polkadot/api" "^8.9.1"
+    base64url "^3.0.1"
+    bip39 "^3.1.0"
+    buffer "^6.0.3"
+    crypto-js "^4.1.1"
+    google-protobuf "^3.21.2"
+    js-crypto-aes "^1.0.4"
+    uuid "^8.3.2"
+    ws "^8.12.0"
+
+"@threefold/rmb_peer_server@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@threefold/rmb_peer_server/-/rmb_peer_server-0.0.1.tgz#c4a4907b9096ba90ec662f7fcad6b5f340f2d78a"
+  integrity sha512-PxG4InkxdaXuEf1y0RiSSz59yw8S08yrq2gDuaUBPoJBVZr3uBPAu6RFuC3LCyj6xMhp6Ek46uiL2TFF4/d96Q==
+  dependencies:
+    redis "^4.3.1"
+    typescript "^4.7.4"
+
 "@types/babel__core@^7.1.0":
   version "7.1.16"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.1.16.tgz#bc12c74b7d65e82d29876b5d0baf5c625ac58702"
@@ -1733,7 +1792,7 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-"@types/node@*", "@types/node@>= 8", "@types/node@^16.4.10":
+"@types/node@*", "@types/node@>= 8":
   version "16.11.6"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.6.tgz#6bef7a2a0ad684cf6e90fcfe31cecabd9ce0a3ae"
   integrity sha512-ua7PgUoeQFjmWPcoo9khiPum3Pd60k4/2ZGXt18sm2Slk0W0xZTqt5Y0Ny1NyBiN1EVQ/+FaF9NcY4Qe6rwk5w==
@@ -5689,41 +5748,6 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   version "4.2.8"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
-
-grid3_client@2.1.0-rc2:
-  version "2.1.0-rc2"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-2.1.0-rc2.tgz#02c458e24c022263b8eee6858714e6684df01a6b"
-  integrity sha512-Uxncqskvnzk5nIpahTgFphvtyfGqRKgHRiJ1QcSR7JEQqcElnYXFB/+XWEiwjQEpesTgBE3VunEMXYhmdZUM3w==
-  dependencies:
-    "@jimber/pkid" "1.0.4"
-    "@noble/secp256k1" "^1.7.1"
-    algosdk "^1.19.0"
-    appdata-path "^1.0.0"
-    await-lock "^2.1.0"
-    axios "^0.27.2"
-    bip39 "^3.0.4"
-    buffer "^6.0.3"
-    class-transformer "^0.5.1"
-    class-validator "^0.14.0"
-    crypto-js "^4.1.1"
-    decimal.js "^10.3.1"
-    exponential-backoff "^3.1.0"
-    express "^4.18.1"
-    http-server "^14.1.1"
-    libsodium-wrappers "^0.7.10"
-    netaddr "^1.1.0"
-    private-ip "^2.3.3"
-    reflect-metadata "^0.1.13"
-    rmb-sdk-ts "1.1.3"
-    stellar-sdk "^10.4.1"
-    tfgrid-api-client "1.27.0"
-    ts-rmb-redis-client "1.0.0"
-    tweetnacl "^1.0.3"
-    tweetnacl-util "^0.15.1"
-    typescript "^4.7.4"
-    url-join "^4.0.1"
-    url-parse "^1.5.10"
-    uuid4 "^2.0.2"
 
 growly@^1.3.0:
   version "1.3.0"
@@ -9692,22 +9716,6 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rmb-sdk-ts@1.1.3:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/rmb-sdk-ts/-/rmb-sdk-ts-1.1.3.tgz#aeb5b8cc29d198bad3af9087a7d72c9cc2ecb25c"
-  integrity sha512-TonPoPsTwBO/ieO8J5zYC9yyEYROa3lvPQqRgtMYjfQK+5t8itzuQbuTc/ZvfztdEeKCpOvYA7YMj/DR1PSsxA==
-  dependencies:
-    "@noble/secp256k1" "^1.7.1"
-    "@polkadot/api" "^8.9.1"
-    base64url "^3.0.1"
-    bip39 "^3.1.0"
-    buffer "^6.0.3"
-    crypto-js "^4.1.1"
-    google-protobuf "^3.21.2"
-    js-crypto-aes "^1.0.4"
-    uuid "^8.3.2"
-    ws "^8.12.0"
-
 rsvp@^4.8.4:
   version "4.8.5"
   resolved "https://registry.yarnpkg.com/rsvp/-/rsvp-4.8.5.tgz#c8f155311d167f68f21e168df71ec5b083113734"
@@ -10845,22 +10853,6 @@ ts-pnp@^1.1.6:
   resolved "https://registry.yarnpkg.com/ts-pnp/-/ts-pnp-1.2.0.tgz#a500ad084b0798f1c3071af391e65912c86bca92"
   integrity sha512-csd+vJOb/gkzvcCHgTGSChYpy5f1/XKNsmvBGO4JXS+z1v2HobugDz4s1IeFXM3wZB44uczs+eazB5Q/ccdhQw==
 
-ts-rmb-client-base@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/ts-rmb-client-base/-/ts-rmb-client-base-1.0.0.tgz#8c30d62cca413713956c804da5e1e54c0770395d"
-  integrity sha512-a4jHR1P1fJYVaL88SNrgt+xHNOyrgx/vgENx/xlMDNQ7R9WVUdCTrrxQ3smCvMhsiRa2YnasuGzoIvDAbyHiDg==
-
-ts-rmb-redis-client@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/ts-rmb-redis-client/-/ts-rmb-redis-client-1.0.0.tgz#2fc40ecd7e309b0e2b2fadfb05d8dae7d51630ed"
-  integrity sha512-w06lGkB9kafbabuN0jexbjLW0eqE3nTz4OVSb2k/K8ivedQCv9edZyBbjhyidnGmYL7KF/SN3DVZIcyD3FKzOA==
-  dependencies:
-    "@types/node" "^16.4.10"
-    redis "^4.3.1"
-    ts-rmb-client-base "1.0.0"
-    typescript "^4.3.5"
-    uuid4 "^2.0.2"
-
 tsconfig@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/tsconfig/-/tsconfig-7.0.0.tgz#84538875a4dc216e5c4a5432b3a4dec3d54e91b7"
@@ -10990,11 +10982,6 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
-
-typescript@^4.3.5:
-  version "4.4.4"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.4.tgz#2cd01a1a1f160704d3101fd5a58ff0f9fcb8030c"
-  integrity sha512-DqGhF5IKoBl8WNf8C1gu8q0xZSInh9j1kJJMqT3a94w1JzVaBU4EXOSMrz9yDqMT0xt3selp83fuFMQ0uzv6qA==
 
 typescript@^4.7.4:
   version "4.7.4"

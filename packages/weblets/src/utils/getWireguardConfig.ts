@@ -1,4 +1,4 @@
-import type { NetworkGetModel } from "grid3_client";
+import type { NetworkGetModel } from "@threefold/grid_client";
 import { get } from "svelte/store";
 
 import type { IProfile } from "../types/Profile";

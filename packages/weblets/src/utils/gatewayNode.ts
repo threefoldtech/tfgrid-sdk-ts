@@ -1,4 +1,4 @@
-import type { Nodes } from "grid3_client";
+import type { Nodes } from "@threefold/grid_client";
 
 export async function gatewayNodes(nodes: Nodes) {
   const gwNodes = await nodes.getAccessNodes();

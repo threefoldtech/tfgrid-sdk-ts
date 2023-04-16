@@ -3741,11 +3741,6 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.18.42.tgz#fa39b2dc8e0eba61bdf51c66502f84e23b66e114"
   integrity sha512-xefu+RBie4xWlK8hwAzGh3npDz/4VhF6icY/shU+zv/1fNn+ZVG7T7CRwe9LId9sAYRPxI+59QBPuKL3WpyGRg==
 
-"@types/node@^16.4.10":
-  version "16.18.23"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.18.23.tgz#b6e934fe427eb7081d0015aad070acb3373c3c90"
-  integrity sha512-XAMpaw1s1+6zM+jn2tmw8MyaRDIJfXxqmIQIS0HfoGYPuf7dUWeiUKopwq13KFX9lEp1+THGtlaaYx39Nxr58g==
-
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
   resolved "https://registry.npmjs.org/@types/normalize-package-data/-/normalize-package-data-2.4.1.tgz"
@@ -9232,41 +9227,6 @@ graphql@^15.5.1:
   version "15.8.0"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-15.8.0.tgz#33410e96b012fa3bdb1091cc99a94769db212b38"
   integrity sha512-5gghUc24tP9HRznNpV2+FIoq3xKkj5dTQqf4v0CpdPbFVwFkWoxOM+o+2OC9ZSvjEMTjfmG9QT+gcvggTwW1zw==
-
-grid3_client@2.1.0-rc2:
-  version "2.1.0-rc2"
-  resolved "https://registry.yarnpkg.com/grid3_client/-/grid3_client-2.1.0-rc2.tgz#02c458e24c022263b8eee6858714e6684df01a6b"
-  integrity sha512-Uxncqskvnzk5nIpahTgFphvtyfGqRKgHRiJ1QcSR7JEQqcElnYXFB/+XWEiwjQEpesTgBE3VunEMXYhmdZUM3w==
-  dependencies:
-    "@jimber/pkid" "1.0.4"
-    "@noble/secp256k1" "^1.7.1"
-    algosdk "^1.19.0"
-    appdata-path "^1.0.0"
-    await-lock "^2.1.0"
-    axios "^0.27.2"
-    bip39 "^3.0.4"
-    buffer "^6.0.3"
-    class-transformer "^0.5.1"
-    class-validator "^0.14.0"
-    crypto-js "^4.1.1"
-    decimal.js "^10.3.1"
-    exponential-backoff "^3.1.0"
-    express "^4.18.1"
-    http-server "^14.1.1"
-    libsodium-wrappers "^0.7.10"
-    netaddr "^1.1.0"
-    private-ip "^2.3.3"
-    reflect-metadata "^0.1.13"
-    rmb-sdk-ts "1.1.3"
-    stellar-sdk "^10.4.1"
-    tfgrid-api-client "1.27.0"
-    ts-rmb-redis-client "1.0.0"
-    tweetnacl "^1.0.3"
-    tweetnacl-util "^0.15.1"
-    typescript "^4.7.4"
-    url-join "^4.0.1"
-    url-parse "^1.5.10"
-    uuid4 "^2.0.2"
 
 gzip-size@^6.0.0:
   version "6.0.0"
@@ -14834,22 +14794,6 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^3.0.0"
     inherits "^2.0.1"
 
-rmb-sdk-ts@1.1.3:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/rmb-sdk-ts/-/rmb-sdk-ts-1.1.3.tgz#aeb5b8cc29d198bad3af9087a7d72c9cc2ecb25c"
-  integrity sha512-TonPoPsTwBO/ieO8J5zYC9yyEYROa3lvPQqRgtMYjfQK+5t8itzuQbuTc/ZvfztdEeKCpOvYA7YMj/DR1PSsxA==
-  dependencies:
-    "@noble/secp256k1" "^1.7.1"
-    "@polkadot/api" "^8.9.1"
-    base64url "^3.0.1"
-    bip39 "^3.1.0"
-    buffer "^6.0.3"
-    crypto-js "^4.1.1"
-    google-protobuf "^3.21.2"
-    js-crypto-aes "^1.0.4"
-    uuid "^8.3.2"
-    ws "^8.12.0"
-
 rollup-plugin-css-only@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/rollup-plugin-css-only/-/rollup-plugin-css-only-3.1.0.tgz#6a701cc5b051c6b3f0961e69b108a9a118e1b1df"
@@ -16478,22 +16422,6 @@ ts-node@^10.4.0, ts-node@^10.9.1:
     v8-compile-cache-lib "^3.0.1"
     yn "3.1.1"
 
-ts-rmb-client-base@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/ts-rmb-client-base/-/ts-rmb-client-base-1.0.0.tgz#8c30d62cca413713956c804da5e1e54c0770395d"
-  integrity sha512-a4jHR1P1fJYVaL88SNrgt+xHNOyrgx/vgENx/xlMDNQ7R9WVUdCTrrxQ3smCvMhsiRa2YnasuGzoIvDAbyHiDg==
-
-ts-rmb-redis-client@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/ts-rmb-redis-client/-/ts-rmb-redis-client-1.0.0.tgz#2fc40ecd7e309b0e2b2fadfb05d8dae7d51630ed"
-  integrity sha512-w06lGkB9kafbabuN0jexbjLW0eqE3nTz4OVSb2k/K8ivedQCv9edZyBbjhyidnGmYL7KF/SN3DVZIcyD3FKzOA==
-  dependencies:
-    "@types/node" "^16.4.10"
-    redis "^4.3.1"
-    ts-rmb-client-base "1.0.0"
-    typescript "^4.3.5"
-    uuid4 "^2.0.2"
-
 tsconfig-paths-webpack-plugin@^4.0.0:
   version "4.0.1"
   resolved "https://registry.npmjs.org/tsconfig-paths-webpack-plugin/-/tsconfig-paths-webpack-plugin-4.0.1.tgz"
@@ -16686,7 +16614,7 @@ typescript@*:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.4.tgz#b217fd20119bd61a94d4011274e0ab369058da3b"
   integrity sha512-cW9T5W9xY37cc+jfEnaUvX91foxtHkza3Nw3wkoF4sSlKn0MONdkdEndig/qPBWXNkmplh3NzayQzCiHM4/hqw==
 
-"typescript@^3 || ^4", typescript@^4.3.5, typescript@^4.4.4, typescript@^4.7.4:
+"typescript@^3 || ^4", typescript@^4.4.4, typescript@^4.7.4:
   version "4.9.5"
   resolved "https://registry.npmjs.org/typescript/-/typescript-4.9.5.tgz"
   integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==
