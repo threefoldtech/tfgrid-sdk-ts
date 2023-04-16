@@ -11,10 +11,6 @@
     "check-prettier": "npx prettier .prettierrc .",
     "test": "jest"
   },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,vue}": "eslint --fix",
-    "*.{js,ts,css,md,vue,yaml}": "prettier --write"
-  },
   "dependencies": {
     "1x": "^0.0.0",
     "@cosmjs/proto-signing": "^0.28.4",

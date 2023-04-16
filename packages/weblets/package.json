@@ -14,10 +14,6 @@
     "deps": "sh scripts/install_deps.sh",
     "serve": "serve ./dist"
   },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,css,scss,svelte,yaml}": "eslint --fix",
-    "*.{js,ts,css,scss,md,svelte,yaml}": "prettier --write"
-  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-json": "^4.1.0",
