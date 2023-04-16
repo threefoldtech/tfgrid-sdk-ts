@@ -28,4 +28,6 @@ jobs:
       - name: Install
         run: yarn
       - name: Lint
-        run: yarn check-lint
+        run: |
+          yarn check-eslint
+          yarn check-prettier

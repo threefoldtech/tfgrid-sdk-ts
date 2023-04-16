@@ -24,7 +24,7 @@
   "scripts": {
     "prepare": "husky install",
     "lint": "eslint -c .eslintrc.json . --fix",
-    "check-lint": "eslint -c .eslintrc.json .",
+    "check-eslint": "eslint -c .eslintrc.json .",
     "check-prettier": "prettier .prettierrc ."
   },
   "lint-staged": {
