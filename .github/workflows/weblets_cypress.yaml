@@ -37,9 +37,7 @@ jobs:
         uses: cypress-io/github-action@v5.1.0
         with:
           browser: chrome
-          start: |
-            cd packages/weblets
-            yarn serve:app
+          start: yarn workspace @threefold/weblets serve:app
           wait-on: "http://localhost:8080/"
           wait-on-timeout: 350
           project: ./packages/weblets
