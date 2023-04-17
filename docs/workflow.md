@@ -21,3 +21,22 @@ Runs daily for the last code and installs dependencies, runs tests and checks if
 ## [Grid Client Nightly](/.github/workflows/grid_client_nightly.yml)
 
 Runs daily on all networks for the relevant release and it will check if the latest version runs without errors.
+
+## [Dashboard Docker](/.github/workflows/dashboard_docker.yaml)
+
+On **Release** published: It will build and push a new docker image based on project release tag.
+
+The current VERSION (Which is passed by the Operations team) and GQL_URL environment variables will be propagated into the builds [build-env.sh](../packages/dashboard/scripts/build-env.sh), The values of those arguments could be as follows:
+
+```bash
+TFCHAIN_NETWORK = "dev | qa | test | main | custom";
+VERSION = "release tag";
+```
+
+## [Dashboard Cypress](/.github/workflows/dashboard_cypress.yaml)
+
+Runs daily for the last code and it will check if the code in Explorer passed the test cases using Cypress.
+
+## [Selenium](/.github/workflows/dashboard_selenium.yaml)
+
+Runs daily for the last code and it will check if the code in Portal passed the test cases using Selenium.
