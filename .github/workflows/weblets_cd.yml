@@ -63,3 +63,4 @@ jobs:
           port: ${{ secrets.PORT }}
           source: "packages/weblets/dist/"
           target: "${{ secrets.DEV_REMOTE_DIR }}"
+          strip_components: 3
