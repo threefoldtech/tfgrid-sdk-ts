@@ -2,27 +2,31 @@
 
 There are some pipelines to make sure everything works fine, here is an idea about them:
 
-## [Build](/.github/workflows/build.yml)
+## Grid Clients
+
+### [Build](/.github/workflows/build.yml)
 
 On **Pull Request**, and **Push** to development branch: It will do a clean install of node dependencies, cache/restore them to make the process faster, and build the source code using `lerna run build`.
 
-## [Publish](/.github/workflows/publish.yml)
+### [Publish](/.github/workflows/publish.yml)
 
 On **Release**: It will do a clean install of node dependencies, cache/restore them to make the process faster, and build the source code using `lerna run build` then publish the latest version to npm. Also it build a docker image for grid client from the released version.
 
-## [Lint](/.github/workflows/lint.yml)
+### [Lint](/.github/workflows/lint.yml)
 
 On **Pull Request**, and **Push** to development branch: It will check if the code formatted well using Eslint and Prettier.
 
-## [Grid Client Tests](/.github/workflows/grid_client_tests.yml)
+### [Grid Client Tests](/.github/workflows/grid_client_tests.yml)
 
 Runs daily for the last code and installs dependencies, runs tests and checks if tests passes or not.
 
-## [Grid Client Nightly](/.github/workflows/grid_client_nightly.yml)
+### [Grid Client Nightly](/.github/workflows/grid_client_nightly.yml)
 
 Runs daily on all networks for the relevant release and it will check if the latest version runs without errors.
 
-## [Dashboard Docker](/.github/workflows/dashboard_docker.yaml)
+## Dashboard
+
+### [Docker](/.github/workflows/dashboard_docker.yaml)
 
 On **Release** published: It will build and push a new docker image based on project release tag.
 
@@ -33,10 +37,35 @@ TFCHAIN_NETWORK = "dev | qa | test | main | custom";
 VERSION = "release tag";
 ```
 
-## [Dashboard Cypress](/.github/workflows/dashboard_cypress.yaml)
+### [Cypress](/.github/workflows/dashboard_cypress.yaml)
 
 Runs daily for the last code and it will check if the code in Explorer passed the test cases using Cypress.
 
-## [Selenium](/.github/workflows/dashboard_selenium.yaml)
+### [Selenium](/.github/workflows/dashboard_selenium.yaml)
 
 Runs daily for the last code and it will check if the code in Portal passed the test cases using Selenium.
+
+## Weblets
+
+### [Build](/.github/workflows/weblets_build.yaml)
+
+On **Pull Request**, and **Push** to development branch that has changes in the weblets package: It will do a clean install of node dependencies, cache/restore them to make the process faster, and build the source code using `yarn build:app`.
+
+### [Docker](/.github/workflows/weblets_docker.yml)
+
+On **Push** to development branch that has changes in the weblets package, and on **Release** published: It will build and push a new docker image based on project release tag or the first 7 chars of the commit hash.
+
+We are using _VERSION_, and _NETWORK_ arguments in this workflow that will be propagated into the builds [config](/packages/weblets/scripts/build-env.sh), The values of those arguments could be as follows:
+
+```js
+NETWORK = "dev" | "qa" | "test" | "main" (default: dev)
+VERSION = "release tag or the first 7 chars of commit hash"
+```
+
+### [CD](/.github/workflows/weblets_cd.yml)
+
+On **Push** to development branch: It will do a clean install of node dependencies, cache/restore them, build the source code and deploy to staging server by Copying the artifacts using ssh to `play.dev.grid.tf`.
+
+### [Cypress](/.github/workflows/weblets_cypress.yaml)
+
+Runs daily for the last code and it will check if the code passed the test cases using Cypress.
