@@ -1,3 +1,5 @@
+import { setTimeout } from "timers/promises";
+
 import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel, randomChoice } from "../../src";
 import { config, getClient } from "../client_loader";
 import { generateInt, log, splitIP } from "../utils";
@@ -190,15 +192,34 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   expect(gatewayResult[0].backends).toStrictEqual(backends);
 
   const domain = "https://" + gatewayResult[0].domain;
+  let reachable = false;
 
-  //Verify that the domain points to VM and lists the directories available in the VM
-  exec("curl " + domain, function (_, stdout) {
-    log(stdout);
-    expect(stdout).toContain("Directory listing for /");
-    expect(stdout).toContain("bin/");
-    expect(stdout).toContain("dev/");
-    expect(stdout).toContain("etc/");
-  });
+  for (let i = 0; i < 15; i++) {
+    fetch(domain, { mode: "no-cors" })
+      .then(r => {
+        log("gateway is reachable");
+        reachable = true;
+        i = 15;
+      })
+      .catch(e => {
+        log("gateway is not reachable");
+      });
+    const wait = await setTimeout(10000, "Waiting for gateway to be ready");
+    log(wait);
+  }
+
+  if (reachable) {
+    //Verify that the domain points to VM and lists the directories available in the VM
+    exec("curl " + domain, function (_, stdout) {
+      log(stdout);
+      expect(stdout).toContain("Directory listing for /");
+      expect(stdout).toContain("bin/");
+      expect(stdout).toContain("dev/");
+      expect(stdout).toContain("etc/");
+    });
+  } else {
+    throw new Error("Gateway is unreachable after multiple retries");
+  }
 });
 
 afterEach(async () => {
