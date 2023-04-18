@@ -28,7 +28,7 @@
     "check-prettier": "prettier .prettierrc ."
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,css,scss,svelte,yaml}": "eslint -c .eslintrc.json --fix",
+    "*.{js,jsx,ts,tsx,css,scss,svelte}": "eslint -c .eslintrc.json --fix",
     "*.{js,ts,css,scss,md,svelte,yaml}": "prettier .prettierrc --write"
   },
   "dependencies": {}
