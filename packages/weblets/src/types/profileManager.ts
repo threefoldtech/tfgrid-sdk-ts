@@ -11,7 +11,7 @@ export const noBalanceMessage = "Your balance is not enough.";
 export const mnemonics = fb.control<string>(
   "",
   [
-    validators.required("Mnemonics is required."),
+    validators.required("Mnemonics are required."),
     ctrl => {
       if (!window.configs.bip39.validateMnemonic(ctrl.value)) {
         return { message: "Mnemonic doesn't seem to be valid." };
