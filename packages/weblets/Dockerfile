@@ -17,7 +17,10 @@ COPY . .
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 
 # install project dependencies
-RUN yarn deps
+RUN yarn deps 
+
+# update playground with the new grid client version
+RUN cd playground && yarn add @threefold/grid_client@${VERSION}
 
 # build project solutions
 RUN yarn build:app
