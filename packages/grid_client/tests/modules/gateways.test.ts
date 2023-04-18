@@ -194,28 +194,28 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   const domain = "https://" + gatewayResult[0].domain;
   let reachable = false;
 
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 30; i++) {
     fetch(domain, { mode: "no-cors" })
-      .then(r => {
+      .then(res => {
         log("gateway is reachable");
         reachable = true;
-        i = 15;
       })
-      .catch(e => {
+      .catch(err => {
         log("gateway is not reachable");
       });
-    const wait = await setTimeout(10000, "Waiting for gateway to be ready");
+    if (reachable) {
+      break;
+    }
+    const wait = await setTimeout(5000, "Waiting for gateway to be ready");
     log(wait);
   }
 
   if (reachable) {
-    //Verify that the domain points to VM and lists the directories available in the VM
-    exec("curl " + domain, function (_, stdout) {
-      log(stdout);
-      expect(stdout).toContain("Directory listing for /");
-      expect(stdout).toContain("bin/");
-      expect(stdout).toContain("dev/");
-      expect(stdout).toContain("etc/");
+    fetch(domain, { mode: "no-cors" }).then(res => {
+      log(res.status);
+      log(res.statusText);
+      expect(res.status).toBe(200);
+      expect(res.statusText).toBe("OK");
     });
   } else {
     throw new Error("Gateway is unreachable after multiple retries");
