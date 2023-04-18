@@ -17,20 +17,20 @@ COPY . .
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 
 # install project dependencies
-RUN yarn deps 
+RUN yarn install && yarn workspace @threefold/weblets deps
 
 # update playground with the new grid client version
-RUN cd playground && yarn add @threefold/grid_client@${VERSION}
+RUN cd packages/weblets/playground && yarn add @threefold/grid_client@${VERSION}
 
 # build project solutions
-RUN yarn build:app
+RUN yarn lerna run build --no-private && yarn workspace @threefold/weblets build:app
 
 # install nginx
 FROM nginx:1.19-alpine
 
 # serve the build files using nginx
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY --from=build /app/scripts/build-env.sh /usr/share/nginx/html
+COPY --from=build /app/packages/weblets/dist /usr/share/nginx/html
+COPY --from=build /app/packages/weblets/scripts/build-env.sh /usr/share/nginx/html
 
 WORKDIR /usr/share/nginx/html
 RUN apk add --no-cache bash
