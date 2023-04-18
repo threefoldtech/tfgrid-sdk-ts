@@ -1,6 +1,6 @@
 {
   "name": "@threefold/weblets",
-  "version": "0.0.1",
+  "version": "2.0.0-rc1",
   "private": true,
   "scripts": {
     "rollup-build": "rollup -c",
