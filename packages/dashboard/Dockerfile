@@ -1,5 +1,5 @@
 # stage 1
-FROM node:14.17.0-alpine as build
+FROM node:16 as build
 
 WORKDIR /app
 
@@ -7,20 +7,19 @@ WORKDIR /app
 COPY . /app/
 
 # Install yarn and build project
-RUN yarn cache clean
 RUN yarn install
-RUN npm run build
+RUN yarn lerna run build --no-private && yarn workspace @threefold/dashboard build
 
 # stage 2
 FROM nginx:1.16.0-alpine
 
 # Copy dist from stage(1) 
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY --from=build /app/scripts/build-env.sh /usr/share/nginx/html
+COPY --from=build /app/packages/dashboard/dist /usr/share/nginx/html
+COPY --from=build /app/packages/dashboard/scripts/build-env.sh /usr/share/nginx/html
 
 # Add custom nginx conf
 RUN rm /etc/nginx/conf.d/default.conf
-COPY /nginx.conf /etc/nginx/conf.d
+COPY ./packages/dashboard/nginx.conf /etc/nginx/conf.d
 
 WORKDIR /usr/share/nginx/html
 RUN apk add --no-cache bash
