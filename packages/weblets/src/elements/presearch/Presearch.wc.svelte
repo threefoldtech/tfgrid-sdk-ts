@@ -166,7 +166,7 @@
           {profile}
           on:fetch={({ detail }) => (data.selection.nodes = detail)}
           nodes={data.selection.nodes}
-          exclusiveFor="research"
+          exclusiveFor="presearch"
         />
       </section>
       <section style={display(active, "restore")}>
