@@ -1,6 +1,5 @@
 name: Weblets Docker Build/Push
 on:
-  push:
   release:
     types: [published]
 
