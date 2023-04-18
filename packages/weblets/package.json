@@ -71,7 +71,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",
-    "@threefold/grid_client": "^0.0.2",
+    "@threefold/grid_client": "^2.0.0-rc1",
     "add": "^2.0.6",
     "bip39": "^3.0.4",
     "buffer": "^6.0.3",
