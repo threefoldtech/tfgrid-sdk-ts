@@ -2,6 +2,8 @@ import configparser
 import random
 import string
 import os
+import json
+
 
 def get_seed():
     config = configparser.ConfigParser()
@@ -9,7 +11,7 @@ def get_seed():
     seed = config['Utils']['seed']
     if (seed == ''):
         try:
-            seed = os.environ["TFCHAIN_MNEMONICS"]
+            seed = json.loads(os.environ["TFCHAIN_MNEMONICS"])["TFCHAIN_MNEMONICS"]
         except:
             print("You must add account seed either in Config.ini or by exporting TFCHAIN_MNEMONICS.")
     return str(seed)
