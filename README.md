@@ -24,3 +24,9 @@ yarn install
 ```bash
 lerna run build
 ```
+
+## Related Documentations
+
+- [Configure the editor/IDE](./docs/editor_config.md)
+- [Pipelines documentation](./docs/workflows.md)
+- [Release process](./docs/release.md)
