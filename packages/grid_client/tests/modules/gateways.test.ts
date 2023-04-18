@@ -211,12 +211,21 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   }
 
   if (reachable) {
-    fetch(domain, { mode: "no-cors" }).then(res => {
-      log(res.status);
-      log(res.statusText);
-      expect(res.status).toBe(200);
-      expect(res.statusText).toBe("OK");
-    });
+    fetch(domain, { mode: "no-cors" })
+      .then(res => {
+        log(res.status);
+        log(res.statusText);
+        expect(res.status).toBe(200);
+        expect(res.statusText).toBe("OK");
+        return res.text();
+      })
+      .then(data => {
+        log(data);
+        expect(data).toContain("Directory listing for /");
+        expect(data).toContain("bin/");
+        expect(data).toContain("dev/");
+        expect(data).toContain("etc/");
+      });
   } else {
     throw new Error("Gateway is unreachable after multiple retries");
   }
