@@ -24,7 +24,7 @@ jobs:
       - name: Yarn deps
         run: |
           yarn
-          lerna run build
+          lerna run build --no-private
           cd packages/weblets
           yarn deps
       - name: Generate SSH Key

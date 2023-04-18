@@ -10,7 +10,7 @@ On **Pull Request**, and **Push** to development branch: It will do a clean inst
 
 ### [Publish](/.github/workflows/publish.yml)
 
-On **Release**: It will do a clean install of node dependencies, cache/restore them to make the process faster, and build the source code using `lerna run build` then publish the latest version to npm. Also it build a docker image for grid client from the released version.
+On **Release**: It will do a clean install of node dependencies, cache/restore them to make the process faster, and build the source code using `lerna run build --no-private` then publish the latest version to npm. Also it build a docker image for grid client from the released version.
 
 ### [Lint](/.github/workflows/lint.yml)
 

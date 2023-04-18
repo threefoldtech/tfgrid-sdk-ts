@@ -47,7 +47,7 @@ jobs:
 
       - name: Build in case development
         run: |
-          lerna run build
+          lerna run build --no-private
           cd packages/weblets
           VERSION=$GITHUB_SHA
           VERSION=${VERSION:0:7} NETWORK=dev yarn build:app

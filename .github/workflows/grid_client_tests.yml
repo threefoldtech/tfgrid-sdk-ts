@@ -43,7 +43,7 @@ jobs:
       - name: Install
         run: |
           yarn
-          lerna run build
+          lerna run build --no-private
       - name: Run tests
         run: yarn workspace @threefold/grid_client test --runInBand --ci --coverage --colors
       - name: Cleanup

@@ -49,7 +49,7 @@ jobs:
       - name: Install
         run: |
           yarn
-          lerna run build
+          lerna run build --no-private
       - name: Run test dynamic single vm
         id: dynamicsinglevm
         continue-on-error: true

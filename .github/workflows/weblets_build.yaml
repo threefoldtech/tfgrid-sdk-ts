@@ -45,6 +45,6 @@ jobs:
 
       - name: Build
         run: |
-          lerna run build
+          lerna run build --no-private
           cd packages/weblets
           yarn build:app

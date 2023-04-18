@@ -28,7 +28,7 @@ jobs:
       - name: Install
         run: yarn
       - name: Build
-        run: lerna run build
+        run: lerna run build --no-private
       - name: Publish
         run: |
           yarn workspace @threefold/rmb_direct_client publish
