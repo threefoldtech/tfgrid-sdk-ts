@@ -32,12 +32,12 @@ jobs:
           ssh-keygen -t ed25519 -N '' -f ~/.ssh/id_ed25519
       - name: Write the cypress.env.json file
         run: |
-          echo '${{ secrets.TFCHAIN_MNEMONICS }}' > cypress.env.json
+          echo '${{ secrets.TFCHAIN_MNEMONICS }}' > packages/weblets/cypress.env.json
       - name: Cypress run
         uses: cypress-io/github-action@v5.1.0
         with:
           browser: chrome
           start: yarn workspace @threefold/weblets serve:app
           wait-on: "http://localhost:8080/"
-          wait-on-timeout: 350
+          wait-on-timeout: 500
           project: ./packages/weblets
