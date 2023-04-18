@@ -59,7 +59,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ghcr.io/threefoldtech/grid_client
           tags: |
             type=semver,pattern={{version}}
       - name: Build and push Docker image
