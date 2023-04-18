@@ -2,19 +2,7 @@
 
 To create a new release there are some steps is required:
 
-## 1. Update Versions
-
-1- This can be done by running this command:
-
-```bash
-lerna version
-```
-
-This command will Update the versions of all packages and also it will update the package version if it's used as a dependency in the other packages in the monorepo except the playground package as it's an inner package in the weblets package.
-
-2- Update the grid client package manually in the playground.
-
-## 2. Update Charts file
+## Update Charts file
 
 - In [dashboard chart.yaml](../packages/dashboard/charts/tfgrid-dashboard/Chart.yaml) and [weblets chart.yaml](../packages/weblets/weblets-chart/Chart.yaml) replace the value of `appVersion` with the new release tag.
 - In [dashboard values.yaml](../packages/dashboard/charts/tfgrid-dashboard/values.yaml) and [weblets values.yaml](../packages/weblets/weblets-chart/values.yaml) replace the value of `tag` with the new release tag.
@@ -25,7 +13,19 @@ This command will Update the versions of all packages and also it will update th
 appVersion: "x.x.x"
 ```
 
-## 3. Create a new release
+## Update Versions
+
+- This can be done by running this command:
+
+  ```bash
+  lerna version --force-publish
+  ```
+
+  This command will Update the versions of all packages and also it will update the package version if it's used as a dependency in the other packages in the monorepo except the playground package as it's an inner package in the weblets package.
+
+- Update the grid client package manually in the playground.
+
+## Create a new release
 
 Create a new release on GitHub with same value of `version` in `package.json` of the root package.
 
@@ -35,7 +35,7 @@ While you're creating a new release you also have to create a new tag the same a
 
 Once you release, Publish workflow will start and will push the new released version to npm and build containers for the released projects.
 
-## 4. Create a new issue on [tf_operations](https://github.com/threefoldtech/tf_operations)
+## Create a new issue on [tf_operations](https://github.com/threefoldtech/tf_operations)
 
 Create a new issue for each project of type `Update Request` (the dashboard and the weblets) and mention the following:
 
