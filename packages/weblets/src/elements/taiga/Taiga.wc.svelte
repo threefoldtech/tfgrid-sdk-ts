@@ -77,7 +77,7 @@
 
   const mailFields: IFormField[] = [
     {
-      label: "Support Email Address",
+      label: "Email Address",
       symbol: "smtpFromEmail",
       placeholder: "support@example.com",
       type: "text",
