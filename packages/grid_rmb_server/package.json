@@ -25,7 +25,7 @@
     "/dist"
   ],
   "bin": {
-    "grid_rmb_server": "./dist/server/server.js"
+    "grid_rmb_server": "./dist/server.js"
   },
   "private": false,
   "scripts": {
