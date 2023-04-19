@@ -29,4 +29,4 @@ jobs:
       - name: Install
         run: yarn
       - name: Build
-        run: lerna run build
+        run: lerna run build --no-private
