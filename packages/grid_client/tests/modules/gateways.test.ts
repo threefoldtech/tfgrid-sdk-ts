@@ -1,3 +1,4 @@
+import axios from "axios";
 import { setTimeout } from "timers/promises";
 
 import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel, randomChoice } from "../../src";
@@ -195,7 +196,8 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   let reachable = false;
 
   for (let i = 0; i < 30; i++) {
-    fetch(domain, { mode: "no-cors" })
+    axios
+      .get(domain)
       .then(res => {
         log("gateway is reachable");
         reachable = true;
@@ -211,21 +213,17 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   }
 
   if (reachable) {
-    fetch(domain, { mode: "no-cors" })
-      .then(res => {
-        log(res.status);
-        log(res.statusText);
-        expect(res.status).toBe(200);
-        expect(res.statusText).toBe("OK");
-        return res.text();
-      })
-      .then(data => {
-        log(data);
-        expect(data).toContain("Directory listing for /");
-        expect(data).toContain("bin/");
-        expect(data).toContain("dev/");
-        expect(data).toContain("etc/");
-      });
+    axios.get(domain).then(res => {
+      log(res.status);
+      log(res.statusText);
+      log(res.data);
+      expect(res.status).toBe(200);
+      expect(res.statusText).toBe("OK");
+      expect(res.data).toContain("Directory listing for /");
+      expect(res.data).toContain("bin/");
+      expect(res.data).toContain("dev/");
+      expect(res.data).toContain("etc/");
+    });
   } else {
     throw new Error("Gateway is unreachable after multiple retries");
   }
