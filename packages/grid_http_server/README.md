@@ -1,6 +1,6 @@
 # Http server
 
-Http server is an express http server that exposes the functionality of the grid3 client over http requests.
+Http server is an express http server that exposes the functionality of the [grid client](../grid_client/README.md) over http requests.
 
 ## Installation
 
