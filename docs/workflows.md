@@ -6,7 +6,7 @@ There are some pipelines to make sure everything works fine, here is an idea abo
 
 ### [Build](/.github/workflows/build.yml)
 
-On **Pull Request**, and **Push** to development branch: It will do a clean install of node dependencies, cache/restore them to make the process faster, and build the source code using `lerna run build`.
+On **Pull Request**, and **Push** to development branch: It will do a clean install of node dependencies, cache/restore them to make the process faster, and build the source code using `lerna run build --no-private`.
 
 ### [Publish](/.github/workflows/publish.yml)
 
@@ -25,6 +25,10 @@ Runs daily for the last code and installs dependencies, runs tests and checks if
 Runs daily on all networks for the relevant release and it will check if the latest version runs without errors.
 
 ## Dashboard
+
+### [Build](/.github/workflows/dashboard_build.yaml)
+
+On **Pull Request**, and **Push** to development branch that has changes in the dashboard package: It will do a clean install of node dependencies, cache/restore them to make the process faster, and build the source code using `yarn workspace @threefold/dashboard build`.
 
 ### [Docker](/.github/workflows/dashboard_docker.yaml)
 
