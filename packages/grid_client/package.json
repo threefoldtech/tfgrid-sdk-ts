@@ -15,7 +15,6 @@
     "@jimber/pkid": "1.0.4",
     "@noble/secp256k1": "^1.7.1",
     "@threefold/rmb_direct_client": "^2.0.0-rc2",
-    "@threefold/rmb_peer_server": "^2.0.0-rc2",
     "algosdk": "^1.19.0",
     "appdata-path": "^1.0.0",
     "await-lock": "^2.1.0",
