@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@open-wc/webpack-import-meta-loader": "^0.4.7",
-    "@threefold/grid_client": "^2.0.0-rc1",
+    "@threefold/grid_client": "^2.0.0-rc2",
     "axios": "^0.24.0",
     "bip39": "^3.0.4",
     "buffer": "^6.0.3",
