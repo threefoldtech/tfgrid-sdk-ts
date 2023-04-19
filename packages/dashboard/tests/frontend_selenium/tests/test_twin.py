@@ -61,7 +61,8 @@ def test_create_twin_relay(browser):
     assert twin_page.wait_for('Twin created!')
     assert relay in browser.page_source
     twin_page.Check_Balance()
-    assert twin_page.wait_for('Free: 0.097')
+    assert twin_page.wait_for('Total: 0.097')
+    assert twin_page.wait_for('Transferable: 0.097')
     assert twin_page.wait_for('Reserved (Locked): 0 TFT')
 
 
