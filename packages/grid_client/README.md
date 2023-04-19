@@ -1,7 +1,6 @@
 # grid_client
 
 [![npm version](https://img.shields.io/npm/v/@threefold/grid_client.svg)](https://www.npmjs.com/package/@threefold/grid_client)
-[![Build](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml)
 [![tests](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/grid_client_tests.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/grid_client_tests.yml)
 
 Github repo: [grid_client](https://github.com/threefoldtech/tfgrid-sdk-ts.git)
@@ -48,7 +47,7 @@ yarn install
 
 - Network environment: should select dev environment, qa, test or main.
 
-- Mnemonic: 12 words for your account. [create one](https://library.threefold.me/info/manual/#/getstarted/manual__dashboard_portal_polkadot_create_account)
+- Mnemonic: 12 words for your account. [create one](https://manual.grid.tf/getstarted/TF_Dashboard/TF_Dashboard.html#create-polkadot-extension-account)
 
 - Store secret: it's any word that will be used for encrypting/decrypting the keys on threefold key-value store.
 
@@ -163,9 +162,5 @@ gridClient.disconnect();
 
 ## Related Documentations
 
-- [Configure the editor/IDE](./docs/editor_config.md)
 - [Contribution Guide](./docs/contribution.md)
 - [Grid Client documentation](https://manual.grid.tf/javascript/grid3_javascript_readme.html)
-
-- [Pipelines documentation](./docs/workflows.md)
-- [Release process](./docs/release.md)
