@@ -11,19 +11,19 @@ Install the recommended version of the pip package listed below for a stable run
 | [PyVirtualDisplay](https://pypi.org/project/PyVirtualDisplay/)   | `3.0`    |
 | [webdriver-manager](https://pypi.org/project/webdriver-manager/) | `3.8.3`  |
 
-# Running selenium
+## Running selenium
 
-## First
+### First
 
 - In the root directory run `yarn install & yarn serve`
-- If the port in serve changes from `8080` for any reason, you should change the variable `port` in `tests/frontend selenium/Config.ini` to the new value.
-- Add account `Twin Mnemonic`, `Twin With A Node Mnemonic` and `Stellar Address` either in `tests/frontend selenium/Config.ini` or by exporting `TFCHAIN_MNEMONICS`, `TFCHAIN_NODE_MNEMONICS` and `STELLAR_ADDRESS`.
+- If the port in serve changes from `8080` for any reason, you should change the variable `port` in [config.ini](../tests/frontend_selenium/Config.ini) to the new value.
+- Add account `Twin Mnemonic`, `Twin With A Node Mnemonic` and `Stellar Address` either in [config.ini](../tests/frontend_selenium/Config.ini) or by exporting `TFCHAIN_MNEMONICS`, `TFCHAIN_NODE_MNEMONICS` and `STELLAR_ADDRESS`.
 - Xvfb might also need to be installed using `sudo apt install xvfb`.
 
-## Second
+### Second
 
 - You need to leave the server running and open new terminal.
-- Change direcotry to frontend selenium through the command line using `cd tests/frontend_selenium`
+- Change directory to frontend selenium through the command line using `cd /packages/dashboard/tests/frontend_selenium`
 - You can run selenium with pytest through the command line using `python3 -m pytest -v`
 
 ### More options to run tests
