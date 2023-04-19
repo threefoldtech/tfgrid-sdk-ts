@@ -1,4 +1,6 @@
-## Perequisites
+# Contribution
+
+## Prerequisites
 
 - Make sure you go through the [getting started](./getting_started.md) guide first.
 - Have some knowledge of [Typescript](https://www.typescriptlang.org/docs/) and [Svelte](https://svelte.dev/docs).
@@ -38,7 +40,7 @@ We are going to add new weblet called `demo` .
 5. Build `Demo.wc.svelte`.
 
    ```sh
-   yarn build
+   yarn rollup-build
    ```
 
    Find the output in the `.build/` directory.
@@ -88,5 +90,5 @@ The `index.html` file should be like the following.
 
 ## Add Weblet to The Playground
 
-1. Deploy the weblet in the playground app by appending the weblet to the elements list in `playground/src/App.vue`
-2. Create new tab in the sideNav by appending the weblet list with new class of `Weblet` in `playground/src/views/Editor.vue`
+1. Deploy the weblet in the playground app by appending the weblet to the elements list in `packages/weblets/playground/src/App.vue`
+2. Create new tab in the sideNav by appending the weblet list with new class of `Weblet` in `packages/weblets/playground/src/views/Editor.vue`
