@@ -3420,65 +3420,6 @@
   resolved "https://registry.npmjs.org/@substrate/ss58-registry/-/ss58-registry-1.39.0.tgz"
   integrity sha512-qZYpuE6n+mwew+X71dOur/CbMXj6rNW27o63JeJwdQH/GvcSKm3JLNhd+bGzwUKg0D/zD30Qc6p4JykArzM+tA==
 
-"@threefold/grid_client@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-0.0.2.tgz#e58a56c40ecc7cd87e67bdb92b7955fccf0ff621"
-  integrity sha512-xAj2jnkGTotDQ7feYwXDkLJVE00MsKfOJNRGdFv/9N9Hk2R+hkPUfiiGjyTfYYfetY3jPTtUOKa+dqXrxak95Q==
-  dependencies:
-    "@jimber/pkid" "1.0.4"
-    "@noble/secp256k1" "^1.7.1"
-    "@threefold/rmb_direct_client" "^0.0.2"
-    "@threefold/rmb_peer_server" "^0.0.2"
-    algosdk "^1.19.0"
-    appdata-path "^1.0.0"
-    await-lock "^2.1.0"
-    axios "^0.27.2"
-    bip39 "^3.0.4"
-    buffer "^6.0.3"
-    class-transformer "^0.5.1"
-    class-validator "^0.14.0"
-    crypto-js "^4.1.1"
-    decimal.js "^10.3.1"
-    exponential-backoff "^3.1.0"
-    express "^4.18.1"
-    http-server "^14.1.1"
-    libsodium-wrappers "^0.7.10"
-    netaddr "^1.1.0"
-    private-ip "^2.3.3"
-    reflect-metadata "^0.1.13"
-    stellar-sdk "^10.4.1"
-    tfgrid-api-client "1.27.0"
-    tweetnacl "^1.0.3"
-    tweetnacl-util "^0.15.1"
-    typescript "^4.7.4"
-    url-join "^4.0.1"
-    url-parse "^1.5.10"
-    uuid4 "^2.0.2"
-
-"@threefold/rmb_direct_client@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-0.0.2.tgz#1a3cb0c940538465cdcb877bfc15fa94c1dea237"
-  integrity sha512-3IRYSUcw6XxfQ4wdIROHaXXY6yJD1fcPXmQh0yCYXpjB44w2Xf60eyHf+4RyGNhnzReq3iGtVfxmfWfj+H+J/w==
-  dependencies:
-    "@noble/secp256k1" "^1.7.1"
-    "@polkadot/api" "^8.9.1"
-    base64url "^3.0.1"
-    bip39 "^3.1.0"
-    buffer "^6.0.3"
-    crypto-js "^4.1.1"
-    google-protobuf "^3.21.2"
-    js-crypto-aes "^1.0.4"
-    uuid "^8.3.2"
-    ws "^8.12.0"
-
-"@threefold/rmb_peer_server@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@threefold/rmb_peer_server/-/rmb_peer_server-0.0.2.tgz#35b51de6e23f68614ea0d6e2fc32d5fcb6ce3565"
-  integrity sha512-c17/hBlC6Tr+UCLLxXXsD3cYu8EeZvTkFAFBTuwGZqp02jqjzt9/fPwEM/+UCi8Sv3MVAmcENeC6SRVJAQwUaQ==
-  dependencies:
-    redis "^4.3.1"
-    typescript "^4.7.4"
-
 "@tootallnate/once@2":
   version "2.0.0"
   resolved "https://registry.npmjs.org/@tootallnate/once/-/once-2.0.0.tgz"

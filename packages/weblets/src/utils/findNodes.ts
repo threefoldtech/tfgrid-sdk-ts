@@ -31,13 +31,14 @@ export default function findNodes(
 
         let pageNumber = 1;
         // check if there are more pages
-        while (availableNodes.length === 0) {
+        while (availableNodes.length != 0) {
           try {
             pageNumber += 1;
             availableNodes = await nodes.filterNodes({
               ...filters,
               page: pageNumber,
             });
+
             availableNodes = exclude(blockedNodes, availableNodes);
           } catch (err) {
             console.log("End of the pages.");
