@@ -1,8 +1,9 @@
 # Grid Weblets
 
-![Version: 1.0.0](https://img.shields.io/github/v/release/threefoldtech/grid_weblets)
-[![CI-CD](https://github.com/threefoldtech/grid_weblets/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/threefoldtech/grid_weblets/actions/workflows/ci-cd.yml)
-[![Cypress Tests](https://github.com/threefoldtech/grid_weblets/actions/workflows/test.yaml/badge.svg)](https://github.com/threefoldtech/grid_weblets/actions/workflows/test.yaml)
+
+![GitHub package.json version (subfolder of monorepo)](https://img.shields.io/github/package-json/v/threefoldtech/tfgrid-sdk-ts?filename=packages%2Fweblets%2Fpackage.json)
+[![Weblets CD](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cd.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cd.yml)
+[![Weblets Cypress Tests](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cypress.yaml/badge.svg?branch=development)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cypress.yaml)
 
 ## Introduction
 
