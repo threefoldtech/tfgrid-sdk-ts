@@ -10,6 +10,7 @@ packages/weblets/playground/public/build/
 
 .build
 .vscode
+.hypothesis
 
 package-lock.json
 yarn-error.log
