@@ -1,6 +1,6 @@
 # TFGrid Dashboard
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/threefoldtech/tfgrid-sdk-ts)
+![GitHub package.json version (subfolder of monorepo)](https://img.shields.io/github/package-json/v/threefoldtech/tfgrid-sdk-ts?filename=packages%2Fdashboard%2Fpackage.json)
 [![Build](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/dashboard_build.yaml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/dashboard_build.yaml)
 [![Selenium _Tests](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/dashboard_selenium.yaml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/dashboard_selenium.yaml)
 [![Cypress Tests](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/dashboard_cypress.yaml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/dashboard_cypress.yaml)
