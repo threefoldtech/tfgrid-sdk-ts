@@ -11,4 +11,4 @@ Module should be:
 
 For more details about modules, check [Module Docs](./module.md)
 
-**Note:** Some of Grid client modules depend on the [Chain](https://github.com/threefoldtech/tfchain_client_js). Make sure the module is added to the chain first then use the released version of the Chain before adding the module to the Client.
+**Note:** Some of Grid client modules depend on the [Chain](https://github.com/threefoldtech/tfchain/tree/development/clients/tfchain-client-js). Make sure the module is added to the chain first then use the released version of the Chain before adding the module to the Client.
