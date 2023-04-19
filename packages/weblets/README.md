@@ -1,8 +1,9 @@
 # Grid Weblets
 
-![Version: 1.0.0](https://img.shields.io/github/v/release/threefoldtech/grid_weblets)
-[![CI-CD](https://github.com/threefoldtech/grid_weblets/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/threefoldtech/grid_weblets/actions/workflows/ci-cd.yml)
-[![Cypress Tests](https://github.com/threefoldtech/grid_weblets/actions/workflows/test.yaml/badge.svg)](https://github.com/threefoldtech/grid_weblets/actions/workflows/test.yaml)
+![Version: 1.0.0](https://img.shields.io/github/v/release/threefoldtech/tfgrid-sdk-ts)
+[![build](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_build.yaml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_build.yaml)
+[![CI-CD](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cd.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cd.yml)
+[![Cypress Tests](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cypress.yaml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cypress.yaml)
 
 ## Introduction
 
@@ -24,30 +25,29 @@ It solves such problem where you had to write complex HTML (and associated style
 - **Clone the repository**
 
   ```bash
-  git clone https://github.com/threefoldtech/grid_weblets.git
+  git clone https://github.com/threefoldtech/tfgrid-sdk-ts.git
   ```
 
 ## Getting Started
 
 > For detailed information you can read the [Getting Started](./docs/getting_started.md) documentation.
 
-Before running the Weblets, in your terminal move to the project directory, then install the required dependencies using `yarn deps`, it runs [install_deps.sh](./scripts/install_deps.sh), that will handle the installation of Weblets and playground dependencies
+Before running the Weblets, in your terminal move to the project directory, then install the required dependencies using `yarn workspace @threefold/weblets deps`, it runs [install_deps.sh](./scripts/install_deps.sh), that will handle the installation of Weblets and playground dependencies
 
 ```bash
-cd grid_weblets
-yarn deps
+yarn workspace @threefold/weblets deps
 ```
 
 - **Run Weblets in Development mode**
 
 ```bash
-yarn serve:app
+yarn workspace @threefold/weblets serve:app
 ```
 
 - **Run Weblets in Production mode**
 
 ```bash
-yarn build:app
+yarn workspace @threefold/weblets build:app
 ```
 
 This will generate the production build in the `dist` directory, which can be served using [Caddy](https://caddyserver.com/) or [NGINX](https://www.nginx.com/)
@@ -56,7 +56,7 @@ You can run the playground in different modes. by editing the config file in `pl
 For an automated generation of the config file you can use the script `build-env` in `scripts/` it will generate the config file based on your env-vars.
 
 ```bash
-cd playground/public
+cd packages/weblets/playground/public
 bash ../../scripts/build-env.sh
 ```
 
@@ -71,9 +71,6 @@ The main testing tool that is used in Weblets is [Cypress](https://www.cypress.i
 
 ## Related Documentations
 
-- [Configure the editor/IDE](./docs/editor_config.md)
 - [Contributing Guide](./docs/contributing.md)
-- [Weblets documentation](https://manual.grid.tf/weblets/weblets_profile_manager.html?highlight=profile#profile-manager)
+- [Weblets Documentation](https://manual.grid.tf/weblets/weblets_home.html)
 - [Troubleshooting](./docs/config.md)
-- [Pipelines documentation](./docs/workflows.md)
-- [Releasing process](./docs/releasing.md)
