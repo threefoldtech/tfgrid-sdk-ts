@@ -4,8 +4,24 @@ Http server is an express http server that exposes the functionality of the grid
 
 ## Installation
 
+### External Package
+
 ```bash
-yarn install @threefold/grid_http_server
+yarn add @threefold/grid_http_server
+```
+
+### Local Usage
+
+- Clone the repository
+
+```bash
+git clone https://github.com/threefoldtech/tfgrid-sdk-ts.git
+```
+
+- Install it
+
+```bash
+yarn install
 ```
 
 ## Configuration
@@ -21,14 +37,6 @@ Add network and account's mnemonics in `config.json` in [server directory](./src
 }
 ```
 
-You can also use another configuration file by using `--config` or `-c` option.
-
-```bash
- yarn grid_http_server -c pathToConfigFile.json
- # or
- yarn grid_http_server --config pathToConfigFile.json
-```
-
 ## Life cycle
 
 - User from the outside sends an http post request(with payload) to the HTTP server.
@@ -39,8 +47,24 @@ You can also use another configuration file by using `--config` or `-c` option.
 
 ## Running
 
+### Locally
+
 ```bash
-yarn run grid_http_server
+yarn start
+```
+
+### In External Package
+
+```bash
+yarn grid_http_server
+```
+
+You can also use another configuration file by using `--config` or `-c` option.
+
+```bash
+ yarn grid_http_server -c pathToConfigFile.json
+ # or
+ yarn grid_http_server --config pathToConfigFile.json
 ```
 
 ## Usage
