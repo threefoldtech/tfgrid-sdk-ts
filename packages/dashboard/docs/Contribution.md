@@ -2,7 +2,7 @@
 
 ## src
 
-```
+```bash
 .
 ├── assets
 ├── Dashboard.vue
@@ -19,29 +19,31 @@
 └── store
 ```
 
-#### Assets
+### Assets
 
 - to add images to the project go to the assets folder and add the images you want to use in your project
 - to add global styles to the project go to the assets folder then to the css folder and add the styles you want to use in your project
 
-#### router
+### router
 
-##### What is the purpose of the router?
+#### What is the purpose of the router?
 
 - the router is the main component of the project it is responsible for routing the user to the right component
 - the router can have nested routes to navigate to different components
 
-##### How to use the router?
+#### How to use the router?
 
 - simply import the component that you want to route to
 - then append it to the routes array in this form :
-  ```
+
+  ```ts
   {
     component: <Component>,
     path: "/<path>",
     children: <Nested-Router>,
   }
   ```
+
 - If you want to create new Category in the sidebar then you need to create a new component and add it to the router
 
 #### If you want to create new Category in the sidebar
@@ -49,7 +51,7 @@
 - you create a new folder with the name of the category and inside it components,router (these will be the nested routes),Assets,lib (for manipulative functions) folder
 - example explorer folder:
 
-```
+```bash
 .
 ├── assets
 ├── components
@@ -72,7 +74,7 @@
 
 - you need to import
 
-  ```
+  ```ts
   import { Component, Vue } from "vue-property-decorator";
   import Sidenav from "./components/Sidebar.vue";
   import Navbar from "./components/Navbar.vue";
@@ -80,7 +82,8 @@
   ```
 
 - you need to add the components to the components object
-  ```
+
+  ```ts
   components: {
     Sidenav,
     Navbar,
@@ -91,35 +94,31 @@
 
 - you need to add the router to the router object
 
-```
+```ts
 import { RouteConfig } from "vue-router";
 
-
-
 export const explorerRouter: RouteConfig[] = [
-{
-path: "/explorer/statistics",
-name: "Statistics",
-component: () => import("../views/Statistics.vue"),
-},
-{
-path: "/explorer/nodes",
-name: "Nodes",
-component: () => import("../views/Nodes.vue"),
-},
-{
-path: "/explorer/farms",
-name: "Farms",
-component: () => import("../views/Farms.vue"),
-},
+  {
+    path: "/explorer/statistics",
+    name: "Statistics",
+    component: () => import("../views/Statistics.vue"),
+  },
+  {
+    path: "/explorer/nodes",
+    name: "Nodes",
+    component: () => import("../views/Nodes.vue"),
+  },
+  {
+    path: "/explorer/farms",
+    name: "Farms",
+    component: () => import("../views/Farms.vue"),
+  },
 ];
-
-
 ```
 
 #### In the views folder
 
-```
+```bash
 .
 ├── Farms.vue
 ├── Nodes.vue
@@ -130,7 +129,7 @@ component: () => import("../views/Farms.vue"),
 - each component should have a name and a template
 - for example : Statistics.vue
 
-```
+```js
 <template>
   <Layout pageName="Statistics" v-if="stats" :noFilter="true">
     <v-row>
@@ -160,7 +159,7 @@ component: () => import("../views/Farms.vue"),
 - you need to add the components that you want to use in the views
 - for example : StatisticsCard.vue
 
-```
+```js
 <template>
   <v-card class="mx-auto" max-width="300">
     <v-card-title class="headline">{{ item.title }}</v-card-title>
@@ -189,10 +188,9 @@ component: () => import("../views/Farms.vue"),
 #### In the plugins folder
 
 - here you have your plugins files example:
-  - axios.ts = > where you can add your <a href="https://axios-http.com/docs/instance">axios</a> Instance configuration base url,headers,etc
-  - apollo.ts => where you can add your <a href="https://www.apollographql.com/docs/">apollo</a>
-    configuration
-  - vuetify.ts => where you can add your <a href="https://vuetifyjs.com/en/getting-started/quick-start/">vuetify</a> configuration
+  - axios.ts = > where you can add your [axios](https://axios-http.com/docs/instance) Instance configuration base url,headers,etc
+  - apollo.ts => where you can add your [apollo](https://www.apollographql.com/docs/) configuration
+  - vuetify.ts => where you can add your [vuetify](https://vuetifyjs.com/en/getting-started/quick-start/) configuration
 
 #### In the utils folder
 
