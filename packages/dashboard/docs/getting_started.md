@@ -35,7 +35,7 @@ To get a local copy up and running follow these simple example steps:
 - Enter the following:
 
   ```bash
-  git clone https://github.com/threefoldtech/tfgrid_dashboard.git
+  git clone https://github.com/threefoldtech/tfgrid-sdk-ts.git
   ```
 
 - Press Enter to create your local clone.
@@ -43,14 +43,14 @@ To get a local copy up and running follow these simple example steps:
 - Navigate to the cloned repository by running:
 
   ```bash
-  cd tfgrid_dashboard
+  cd tfgrid-sdk-ts
   ```
 
 - Adjust your config.js file as per your environment:
 
   ```bash
   export VERSION="v1.3.0-rc4"
-  cd public
+  cd packages/dashboard/public
   source ../scripts/build-env.sh
   # these commands will generate a config file for you against `devnet`
   ```
@@ -62,7 +62,7 @@ To get a local copy up and running follow these simple example steps:
   ```bash
   export VERSION="v1.3.0-rc4"
   export TFCHAIN_NETWORK="custom"
-  cd public
+  cd packages/dashboard/public
   source ../scripts/build-env.sh
 
   # The terminal will ask you about the required env vars, see below.
@@ -107,4 +107,4 @@ yarn serve
 
 Contributions, issues, and feature requests are welcome!
 
-Feel free to check the [issues page](https://github.com/threefoldtech/tfgrid_dashboard/issues).
+Feel free to check the [issues page](https://github.com/threefoldtech/tfgrid-sdk-ts/issues).
