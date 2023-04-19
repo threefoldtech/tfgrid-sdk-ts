@@ -7,7 +7,7 @@ import { SSH_REGEX } from "../utils/validateName";
 
 const networkEnv = window.env?.NETWORK ?? process.env.NETWORK;
 
-export const noBalanceMessage = "Your balance is not enough.";
+export const noBalanceMessage = "Please fund your wallet then refresh.";
 export const mnemonics = fb.control<string>(
   "",
   [
