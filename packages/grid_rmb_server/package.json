@@ -17,6 +17,7 @@
     "typescript": "^4.7.4"
   },
   "devDependencies": {
+    "@threefold/rmb_peer_client": "^2.0.0-rc2",
     "ts-node": "^10.9.1"
   },
   "main": "./dist/index.js",
@@ -25,7 +26,7 @@
     "/dist"
   ],
   "bin": {
-    "grid_rmb_server": "./dist/server/server.js"
+    "grid_rmb_server": "./dist/server.js"
   },
   "private": false,
   "scripts": {

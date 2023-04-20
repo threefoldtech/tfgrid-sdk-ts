@@ -1,11 +1,37 @@
 # Twin server
 
-Twin server is an [RMB](https://github.com/threefoldtech/rmb-rs) server that exposes the functionality of the grid3 client over RMB.
+[![Version](https://img.shields.io/npm/v/@threefold/grid_rmb_server?color=blue)](https://www.npmjs.com/package/@threefold/grid_rmb_server)
+[![Lint](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/lint.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/lint.yml)
+[![Build](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml)
+
+Twin server is an [RMB](https://github.com/threefoldtech/rmb-rs) server that exposes the functionality of the [grid client](../grid_client/README.md) over RMB.
 
 ## Prerequisites
 
 - [Redis server](https://redis.io)
 - [rmb-peer](https://github.com/threefoldtech/rmb-rs) should be installed and running
+
+## Installation
+
+### External Package
+
+```bash
+yarn add @threefold/grid_rmb_server
+```
+
+### Local Usage
+
+- Clone the repository
+
+```bash
+git clone https://github.com/threefoldtech/tfgrid-sdk-ts.git
+```
+
+- Install it
+
+```bash
+yarn install
+```
 
 ## Configuration
 
@@ -32,8 +58,24 @@ Add network and account's mnemonics in `config.json` in [server directory](./src
 
 ## Running
 
+### Locally
+
 ```bash
-yarn run grid_rmb_server
+yarn start
+```
+
+### In External Package
+
+```bash
+yarn grid_rmb_server
+```
+
+You can also use another configuration file by using `--config` or `-c` option.
+
+```bash
+ yarn grid_rmb_server -c pathToConfigFile.json
+ # or
+ yarn grid_rmb_server --config pathToConfigFile.json
 ```
 
 ## Usage
