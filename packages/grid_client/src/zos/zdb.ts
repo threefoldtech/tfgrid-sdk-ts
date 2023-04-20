@@ -25,9 +25,9 @@ class Zdb extends WorkloadData {
 }
 
 class ZdbResult extends WorkloadDataResult {
-  @Expose() Namespace: string;
-  @Expose() IPs: string[];
-  @Expose() Port: number;
+  @Expose() namespace: string;
+  @Expose() ips: string[];
+  @Expose() port: number;
 }
 
 export { Zdb, ZdbResult, ZdbModes };

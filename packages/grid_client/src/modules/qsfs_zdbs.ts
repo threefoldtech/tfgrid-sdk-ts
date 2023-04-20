@@ -100,9 +100,9 @@ class QSFSZdbsModule extends BaseModule {
     const qsfsZdbs = { meta: [], groups: [] };
     for (const zdb of zdbs) {
       const zdbBackend = new ZdbBackend();
-      zdbBackend.namespace = zdb.result.data.Namespace;
+      zdbBackend.namespace = zdb.result.data.namespace;
       zdbBackend.password = zdb.data.password;
-      zdbBackend.address = `[${zdb.result.data.IPs[1]}]:${zdb.result.data.Port}`;
+      zdbBackend.address = `[${zdb.result.data.ips[1]}]:${zdb.result.data.port}`;
       zdbBackend["size"] = zdb.data.size;
       zdbBackend["contractId"] = zdb["contractId"];
       zdbBackend["nodeId"] = zdb["nodeId"];
