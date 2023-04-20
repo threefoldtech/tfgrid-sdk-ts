@@ -1,6 +1,6 @@
 # Grid Weblets
 
-![Version](https://img.shields.io/github/v/release/threefoldtech/tfgrid-sdk-ts)
+![Version](https://img.shields.io/github/package-json/v/threefoldtech/tfgrid-sdk-ts?color=blue&filename=packages%2Fweblets%2Fpackage.json)
 [![Build](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_build.yaml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_build.yaml)
 [![CD](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cd.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cd.yml)
 [![Cypress](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cypress.yaml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cypress.yaml)
