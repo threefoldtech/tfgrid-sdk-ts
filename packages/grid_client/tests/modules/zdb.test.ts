@@ -110,14 +110,14 @@ test("TC1236 - ZDB: Deploy ZDBs", async () => {
   expect(result[0].password).toBe(password);
   expect(result[0].metadata).toBe(metadata);
   expect(result[0].description).toBe(description);
-  expect(result[0].resData["Namespace"]).toContain(name);
-  expect(result[0].resData["IPs"]).toBeDefined();
-  expect(result[0].resData["Port"]).toBeDefined();
+  expect(result[0].resData["namespace"]).toContain(name);
+  expect(result[0].resData["ips"]).toBeDefined();
+  expect(result[0].resData["port"]).toBeDefined();
 
   //Get Namespace and Connection data from the deployment result
-  const namespace = result[0].resData["Namespace"];
-  const host = result[0].resData["IPs"][1];
-  const port = result[0].resData["Port"];
+  const namespace = result[0].resData["namespace"];
+  const host = result[0].resData["ips"][1];
+  const port = result[0].resData["port"];
 
   //Create a redis client.
   const client = createClient({
