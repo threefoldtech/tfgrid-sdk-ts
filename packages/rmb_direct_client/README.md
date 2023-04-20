@@ -1,5 +1,9 @@
 # RMB Direct Client
 
+[![Version](https://img.shields.io/npm/v/@threefold/rmb_direct_client?color=blue)](https://www.npmjs.com/package/@threefold/rmb_direct_client)
+[![Lint](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/lint.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/lint.yml)
+[![Build](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml)
+
 This is a `Typescript` client that can be used to build both **services**, and **clients**
 that can talk over the `rmb`.
 

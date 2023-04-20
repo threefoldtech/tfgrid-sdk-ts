@@ -1,9 +1,10 @@
 # TFGrid Dashboard
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/threefoldtech/tfgrid-sdk-ts)
+![Version](https://img.shields.io/github/v/release/threefoldtech/tfgrid-sdk-ts)
 [![Build](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/dashboard_build.yaml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/dashboard_build.yaml)
-[![Selenium _Tests](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/dashboard_selenium.yaml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/dashboard_selenium.yaml)
-[![Cypress Tests](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/dashboard_cypress.yaml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/dashboard_cypress.yaml)
+[![Selenium](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/dashboard_selenium.yaml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/dashboard_selenium.yaml)
+[![Cypress](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/dashboard_cypress.yaml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/dashboard_cypress.yaml)
+[![Docker](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/dashboard_docker.yaml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/dashboard_docker.yaml)
 
 ## Introduction
 

@@ -1,5 +1,9 @@
 # Twin server
 
+[![Version](https://img.shields.io/npm/v/@threefold/grid_rmb_server?color=blue)](https://www.npmjs.com/package/@threefold/grid_rmb_server)
+[![Lint](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/lint.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/lint.yml)
+[![Build](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml)
+
 Twin server is an [RMB](https://github.com/threefoldtech/rmb-rs) server that exposes the functionality of the [grid client](../grid_client/README.md) over RMB.
 
 ## Prerequisites

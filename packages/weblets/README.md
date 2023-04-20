@@ -1,9 +1,10 @@
 # Grid Weblets
 
-![Version: 1.0.0](https://img.shields.io/github/v/release/threefoldtech/tfgrid-sdk-ts)
-[![build](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_build.yaml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_build.yaml)
-[![CI-CD](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cd.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cd.yml)
-[![Cypress Tests](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cypress.yaml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cypress.yaml)
+![Version](https://img.shields.io/github/v/release/threefoldtech/tfgrid-sdk-ts)
+[![Build](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_build.yaml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_build.yaml)
+[![CD](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cd.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cd.yml)
+[![Cypress](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cypress.yaml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_cypress.yaml)
+[![Docker](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_docker.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/weblets_docker.yml)
 
 ## Introduction
 

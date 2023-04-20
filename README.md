@@ -1,5 +1,10 @@
 # tfgrid-sdk-ts
 
+![Version](https://img.shields.io/github/lerna-json/v/threefoldtech/tfgrid-sdk-ts/development?color=blue&label=version)
+[![Lint](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/lint.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/lint.yml)
+[![Build](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml)
+[![Code Coverage](https://codecov.io/gh/threefoldtech/tfgrid-sdk-ts/branch/development/graph/badge.svg)](https://codecov.io/gh/threefoldtech/tfgrid-sdk-ts)
+
 This repo contains the typescript clients and projects for Threefold grid.
 
 ## Packages

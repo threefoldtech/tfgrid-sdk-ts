@@ -1,7 +1,11 @@
 # grid_client
 
-[![npm version](https://img.shields.io/npm/v/@threefold/grid_client.svg)](https://www.npmjs.com/package/@threefold/grid_client)
-[![tests](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/grid_client_tests.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/grid_client_tests.yml)
+[![Version](https://img.shields.io/npm/v/@threefold/grid_client?color=blue)](https://www.npmjs.com/package/@threefold/grid_client)
+[![Lint](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/lint.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/lint.yml)
+[![Build](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml)
+[![Tests](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/grid_client_tests.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/grid_client_tests.yml)
+[![Nightly](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/grid_client_nightly.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/grid_client_nightly.yml)
+[![Code Coverage](https://codecov.io/gh/threefoldtech/tfgrid-sdk-ts/branch/development/graph/badge.svg)](https://codecov.io/gh/threefoldtech/tfgrid-sdk-ts)
 
 Github repo: [grid_client](https://github.com/threefoldtech/tfgrid-sdk-ts.git)
 
