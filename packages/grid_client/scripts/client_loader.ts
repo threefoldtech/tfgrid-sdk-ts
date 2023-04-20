@@ -10,7 +10,7 @@ const storeSecret = env.STORE_SECRET;
 const ssh_key = env.SSH_KEY;
 let config;
 
-if (network === undefined || mnemonic === undefined || storeSecret === undefined || ssh_key === undefined) {
+if (network === undefined || mnemonic === undefined || ssh_key === undefined) {
   console.log("Credentials not all found in env variables. Loading all credentials from default config.json...");
   config = JSON.parse(fs.readFileSync(path.join(__dirname, "./config.json"), "utf-8"));
 } else {

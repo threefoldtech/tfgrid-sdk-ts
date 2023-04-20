@@ -1,6 +1,6 @@
 {
   "network": "dev",
   "mnemonic": "",
-  "storeSecret": "secret",
+  "storeSecret": "",
   "ssh_key": ""
 }
