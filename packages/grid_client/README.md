@@ -5,7 +5,7 @@
 [![Build](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/build.yml)
 [![Tests](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/grid_client_tests.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/grid_client_tests.yml)
 [![Nightly](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/grid_client_nightly.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/grid_client_nightly.yml)
-[![Code Coverage](https://codecov.io/gh/threefoldtech/tfgrid-sdk-ts/branch/development/graph/badge.svg)](https://codecov.io/gh/threefoldtech/tfgrid-sdk-ts)
+[![Code Coverage](https://codecov.io/gh/threefoldtech/tfgrid-sdk-ts/branch/development/graph/badge.svg?flag=GridClient)](https://app.codecov.io/gh/threefoldtech/tfgrid-sdk-ts/flags?flags=GridClient)
 
 Github repo: [grid_client](https://github.com/threefoldtech/tfgrid-sdk-ts.git)
 
