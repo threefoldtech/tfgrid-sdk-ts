@@ -7,6 +7,7 @@ class GWPrimitive {
     tls_passthrough: boolean,
     backends: string[],
     name: string,
+    network?: string,
     metadata = "",
     description = "",
     version = 0,
@@ -15,6 +16,7 @@ class GWPrimitive {
     fqdnObj.fqdn = fqdn;
     fqdnObj.tls_passthrough = tls_passthrough;
     fqdnObj.backends = backends;
+    fqdnObj.network = network;
 
     const fqdn_workload = new Workload();
     fqdn_workload.version = version;
@@ -32,31 +34,34 @@ class GWPrimitive {
     tls_passthrough: boolean,
     backends: string[],
     name: string,
+    network?: string,
     metadata = "",
     description = "",
     old_version = 1,
   ): Workload {
-    return this.createFQDN(fqdn, tls_passthrough, backends, name, metadata, description, old_version + 1);
+    return this.createFQDN(fqdn, tls_passthrough, backends, name, network, metadata, description, old_version + 1);
   }
 
   createName(
     name: string,
     tls_passthrough: boolean,
     backends: string[],
+    network?: string,
     metadata = "",
     description = "",
     version = 0,
   ): Workload {
-    const nameOnj = new GatewayNameProxy();
-    nameOnj.name = name;
-    nameOnj.tls_passthrough = tls_passthrough;
-    nameOnj.backends = backends;
+    const nameObj = new GatewayNameProxy();
+    nameObj.name = name;
+    nameObj.tls_passthrough = tls_passthrough;
+    nameObj.backends = backends;
+    nameObj.network = network;
 
     const name_workload = new Workload();
     name_workload.version = version;
     name_workload.name = name;
     name_workload.type = WorkloadTypes.gatewaynameproxy;
-    name_workload.data = nameOnj;
+    name_workload.data = nameObj;
     name_workload.metadata = metadata;
     name_workload.description = description;
 
@@ -67,11 +72,12 @@ class GWPrimitive {
     name: string,
     tls_passthrough: boolean,
     backends: string[],
+    network?: string,
     metadata = "",
     description = "",
     old_version = 1,
   ): Workload {
-    return this.createName(name, tls_passthrough, backends, metadata, description, old_version + 1);
+    return this.createName(name, tls_passthrough, backends, network, metadata, description, old_version + 1);
   }
 }
 export { GWPrimitive };

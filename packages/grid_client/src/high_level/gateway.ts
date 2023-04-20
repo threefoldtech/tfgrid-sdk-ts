@@ -8,6 +8,7 @@ class GatewayHL extends HighLevelBase {
     node_id: number,
     tls_passthrough: boolean,
     backends: string[],
+    network: string,
     metadata: string,
     description: string,
     fqdn = "",
@@ -17,9 +18,9 @@ class GatewayHL extends HighLevelBase {
     const gw = new GWPrimitive();
     const workloads = [];
     if (fqdn != "") {
-      workloads.push(gw.createFQDN(fqdn, tls_passthrough, backends, name, metadata, description));
+      workloads.push(gw.createFQDN(fqdn, tls_passthrough, backends, name, network, metadata, description));
     } else {
-      workloads.push(gw.createName(name, tls_passthrough, backends, metadata, description));
+      workloads.push(gw.createName(name, tls_passthrough, backends, network, metadata, description));
     }
     const deploymentFactory = new DeploymentFactory(this.config);
     const deployment = deploymentFactory.create(workloads, 1626394539, metadata, description, 0);
