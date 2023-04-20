@@ -105,8 +105,8 @@ class Client {
       if (!this.twin) {
         throw new Error({ message: "twin does not exist, please create a twin first" });
       }
-      if (!this.twin.pk) {
-        const pk = generatePublicKey(this.mnemonics);
+      const pk = generatePublicKey(this.mnemonics);
+      if (this.twin.pk !== pk) {
         await applyExtrinsic(setPublicKey, [this.mnemonics, pk, this.api!, this.relayUrl, this.keypairType]);
         this.twin.pk = pk;
       }
