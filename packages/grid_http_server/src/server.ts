@@ -97,7 +97,7 @@ class HttpServer {
   }
 }
 
-if (!(config.network && config.mnemonic && config.storeSecret)) {
+if (!(config.network && config.mnemonic)) {
   throw new Error(`Invalid config. Please fill the config.json file with the correct data`);
 }
 
