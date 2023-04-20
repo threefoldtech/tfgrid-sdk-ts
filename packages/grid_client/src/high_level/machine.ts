@@ -40,6 +40,7 @@ class VMHL extends HighLevelBase {
     qsfsDisks: QSFSDiskModel[] = [],
     qsfsProjectName = "",
     addAccess = false,
+    accessNodeId = 0,
     ip = "",
     corex = false,
     solutionProviderID: number,
@@ -157,15 +158,25 @@ class VMHL extends HighLevelBase {
         }
       }
     }
-    if (!Object.keys(accessNodes).includes(nodeId.toString()) && !hasAccessNode && addAccess) {
+    if (
+      (!Object.keys(accessNodes).includes(nodeId.toString()) || nodeId !== accessNodeId) &&
+      !hasAccessNode &&
+      addAccess
+    ) {
       // add node to any access node and deploy it
-      const filteredAccessNodes = [];
+      const filteredAccessNodes: number[] = [];
       for (const accessNodeId of Object.keys(accessNodes)) {
         if (accessNodes[accessNodeId]["ipv4"]) {
-          filteredAccessNodes.push(accessNodeId);
+          filteredAccessNodes.push(+accessNodeId);
         }
       }
-      const access_node_id = Number(randomChoice(filteredAccessNodes));
+      let access_node_id = randomChoice(filteredAccessNodes);
+      if (accessNodeId) {
+        if (!filteredAccessNodes.includes(accessNodeId))
+          throw Error(`Node ${accessNodeId} is not an access not or maybe it's down`);
+
+        access_node_id = accessNodeId;
+      }
       access_net_workload = await network.addNode(access_node_id, networkMetadata, description, accessNodeSubnet);
       wgConfig = await network.addAccess(access_node_id, true);
     }
