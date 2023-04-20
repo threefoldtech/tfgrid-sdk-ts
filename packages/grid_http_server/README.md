@@ -73,6 +73,12 @@ You can also use another configuration file by using `--config` or `-c` option.
 
 ## Usage
 
+All APIs supported can be executed by sending a post request to the server. To execute a method on a module, the module name followed by the method name should be sent on the request endpoint to be like `http://localhost:3000/{module}/{method}` and the arguments should be sent in request's body.
+
+There is a ping endpoint as well to make sure that the server is up and running `http://localhost:3000/ping`
+
+### Example
+
 This is an example of getting a twin.
 Put the following content in a file `test_twin.ts`
 

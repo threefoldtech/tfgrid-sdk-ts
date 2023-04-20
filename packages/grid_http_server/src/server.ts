@@ -83,7 +83,7 @@ class HttpServer {
 
   run() {
     // ping-pong the server
-    this.server.use("/ping", (req, res, next) => res.status(404).json("pong"));
+    this.server.use("/ping", (req, res, next) => res.status(200).json("pong"));
 
     /** Error handling */
     this.server.use((req, res, next) => {
@@ -97,7 +97,7 @@ class HttpServer {
   }
 }
 
-if (!(config.network && config.mnemonic && config.storeSecret)) {
+if (!(config.network && config.mnemonic)) {
   throw new Error(`Invalid config. Please fill the config.json file with the correct data`);
 }
 

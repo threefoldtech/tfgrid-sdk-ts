@@ -14,7 +14,7 @@ Module should be:
 ### Twins
 
 **Note:** Each network has its own relay. So, the relay would be
-"wss://relay.${network}.grid.tf" in all networks except for main. It would be "wss://relay.grid.tf".
+"relay.${network}.grid.tf" in all networks except for main. It would be "relay.grid.tf".
 
 - **Create**
 
@@ -1051,7 +1051,7 @@ single master and multiple workers.
   It will create a new account on tfchain.
 
   **Note:** Each network has its own relay. So, the relay would be
-  "wss://relay.${network}.grid.tf" in all networks except for main. It would be "wss://relay.grid.tf".
+  "relay.${network}.grid.tf" in all networks except for main. It would be "relay.grid.tf".
 
   cmd: `twinserver.tfchain.create`
 
