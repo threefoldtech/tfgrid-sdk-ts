@@ -13,7 +13,7 @@ class Twins {
   getPublicKey(mnemonic: string) {
     const seed = bip39.mnemonicToSeedSync(mnemonic);
     const privKey = new Uint8Array(seed).slice(0, 32);
-    const pk = Buffer.from(secp.getPublicKey(privKey, true)).toString("hex");
+    const pk = "0x" + Buffer.from(secp.getPublicKey(privKey, true)).toString("hex");
     return pk;
   }
 
