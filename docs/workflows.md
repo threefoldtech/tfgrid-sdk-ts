@@ -57,7 +57,7 @@ On **Pull Request**, and **Push** to development branch that has changes in the 
 
 ### [Docker](/.github/workflows/weblets_docker.yml)
 
-On **Push** to development branch that has changes in the weblets package, and on **Release** published: It will build and push a new docker image based on project release tag or the first 7 chars of the commit hash.
+On **Release** published: It will build and push a new docker image based on project release tag.
 
 We are using _VERSION_, and _NETWORK_ arguments in this workflow that will be propagated into the builds [config](/packages/weblets/scripts/build-env.sh), The values of those arguments could be as follows:
 
@@ -73,3 +73,9 @@ On **Push** to development branch: It will do a clean install of node dependenci
 ### [Cypress](/.github/workflows/weblets_cypress.yaml)
 
 Runs daily for the last code and it will check if the code passed the test cases using Cypress.
+
+## Stats
+
+### [Docker](/.github/workflows/stats_docker.yaml)
+
+On **Release** published: It will build and push a new docker image based on project release tag.
