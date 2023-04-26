@@ -4,8 +4,8 @@ To create a new release there are some steps is required:
 
 ## Update Charts file
 
-- In [dashboard chart.yaml](../packages/dashboard/charts/tfgrid-dashboard/Chart.yaml) and [weblets chart.yaml](../packages/weblets/weblets-chart/Chart.yaml) replace the value of `appVersion` with the new release tag.
-- In [dashboard values.yaml](../packages/dashboard/charts/tfgrid-dashboard/values.yaml) and [weblets values.yaml](../packages/weblets/weblets-chart/values.yaml) replace the value of `tag` with the new release tag.
+- In [dashboard Chart.yaml](../packages/dashboard/charts/tfgrid-dashboard/Chart.yaml), [weblets Chart.yaml](../packages/weblets/weblets-chart/Chart.yaml), and [stats Chart.yaml](../packages/stats/chart/Chart.yaml) replace the value of `appVersion` with the new release tag.
+- In [dashboard values.yaml](../packages/dashboard/charts/tfgrid-dashboard/values.yaml), [weblets values.yaml](../packages/weblets/weblets-chart/values.yaml), and [stats values.yaml](../packages/stats/chart/values.yaml) replace the value of `tag` with the new release tag.
 
 > NOTE: You can release or prerelease on ANY network. No tags are needed for releases & use x.x.x-rcx for prereleases.
 
