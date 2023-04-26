@@ -76,6 +76,10 @@ Runs daily for the last code and it will check if the code passed the test cases
 
 ## Stats
 
+### [Build](/.github/workflows/stats_build.yaml)
+
+On **Pull Request**, and **Push** to development branch that has changes in the stats package: It will do a clean install of node dependencies, cache/restore them to make the process faster, and build the source code using `yarn workspace @threefold/stats build`.
+
 ### [Docker](/.github/workflows/stats_docker.yaml)
 
 On **Release** published: It will build and push a new docker image based on project release tag.
