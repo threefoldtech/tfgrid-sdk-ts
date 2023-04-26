@@ -96,21 +96,21 @@
           </v-list-item>
           <v-divider />
 
-          <v-list-item>
+          <v-list-item v-if="nodeStatistics?.users.workloads">
             <v-list-item-content>
               <v-list-item-title> Number of Workloads </v-list-item-title>
             </v-list-item-content>
             {{ nodeStatistics.users.workloads }}
           </v-list-item>
-          <v-divider />
+          <v-divider v-if="nodeStatistics?.users.workloads" />
 
-          <v-list-item>
+          <v-list-item v-if="nodeStatistics?.users.workloads">
             <v-list-item-content>
               <v-list-item-title> Number of Deployments </v-list-item-title>
             </v-list-item-content>
             {{ nodeStatistics.users.deployments }}
           </v-list-item>
-          <v-divider />
+          <v-divider v-if="nodeStatistics?.users.workloads" />
 
           <v-list-item v-if="zosVersion">
             <v-list-item-content>
