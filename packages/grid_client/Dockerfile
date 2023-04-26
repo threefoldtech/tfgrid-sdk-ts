@@ -1,6 +1,6 @@
 FROM alpine
 
-ARG GRID3_CLIENT_VERSION
-RUN apk add nodejs npm curl && npm install --global yarn && yarn add @threefold/grid_client@${GRID3_CLIENT_VERSION}
+ARG GRID_VERSION
+RUN apk add nodejs npm curl && npm install --global yarn && yarn add @threefold/grid_client@${GRID_VERSION}
 
 ENTRYPOINT [ "yarn" ]
