@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: threefolddev/tfgrid-stats
+  repository: ghcr.io/threefoldtech/stats
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "v2.0.0-rc3"
