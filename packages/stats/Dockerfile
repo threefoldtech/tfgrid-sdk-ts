@@ -1,12 +1,12 @@
-FROM node:12 AS build
+FROM node:16 AS build
 
 WORKDIR /app
 
-COPY package.json ./
-COPY yarn.lock ./
-RUN yarn install
-COPY . ./
-RUN yarn run build
+COPY . /app/
 
-FROM nginx:1.19-alpine
-COPY --from=build /app/public /usr/share/nginx/html
+# Install yarn and build project
+RUN yarn install
+RUN yarn lerna run build --no-private && yarn workspace @threefold/stats build
+
+FROM nginx:1.16.0-alpine
+COPY --from=build /app/packages/stats/public /usr/share/nginx/html
