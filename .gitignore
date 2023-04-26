@@ -3,7 +3,7 @@ dist/
 yarn-error.log
 packages/grid_client/docs/tests/
 
-packages/weblets/public/build/
+public/build/
 packages/weblets/playground/public/build/
 
 .DS_Store
