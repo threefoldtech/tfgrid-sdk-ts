@@ -98,7 +98,7 @@
       .then(async (data: any) => {
         deploymentStore.set(0);
         success = true;
-        const wireguard = await getWireguardConfig({ name: data.interfaces[0].network });
+        const wireguard = await getWireguardConfig({ name: data.masters[0].interfaces[0].network });
         if (wireguard) {
           data.wireguard = wireguard[0];
         }
