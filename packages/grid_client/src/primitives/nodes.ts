@@ -321,6 +321,7 @@ class Nodes {
       ipv4: options.accessNodeV4,
       ipv6: options.accessNodeV6,
       gateway: options.gateway,
+      certification_type: options.certified ? "Certified" : "",
       farm_ids: [options.farmId],
       farm_name: options.farmName,
       country: options.country,
