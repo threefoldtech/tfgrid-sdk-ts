@@ -132,7 +132,9 @@ class Client {
       if (c && c.readyState == c.OPEN) {
         c.close();
       }
-      throw new Error({ message: `Unable to connect due to ${err.message}` });
+      throw new Error({
+        message: `Unable to establish a connection with the RMB server. Please check your internet connection and try again. If the problem persists, please contact our support.`,
+      });
     }
   }
 
