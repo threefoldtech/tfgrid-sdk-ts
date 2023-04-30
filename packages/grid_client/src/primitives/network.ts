@@ -588,7 +588,8 @@ PersistentKeepalive = 25\nEndpoint = ${endpoint}`;
 
   async _save(network): Promise<void> {
     const path = PATH.join(this.getNetworksPath(), this.name, "info.json");
-    await this.backendStorage.dump(path, network);
+    const current = await this.backendStorage.load(path);
+    if (JSON.stringify(current) !== JSON.stringify(network)) await this.backendStorage.dump(path, network);
   }
 
   async delete(): Promise<void> {
