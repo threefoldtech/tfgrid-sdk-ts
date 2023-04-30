@@ -118,7 +118,7 @@ class TFClient {
           reject(res);
         }
         const { events = [], status } = res;
-        if (status.isFinalized) {
+        if (status.isInBlock) {
           events.forEach(({ phase, event: { data, method, section } }) => {
             console.log(`phase: ${phase}, section: ${section}, method: ${method}`);
             if (section === "system" && method === "ExtrinsicFailed") {
