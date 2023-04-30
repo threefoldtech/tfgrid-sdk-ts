@@ -1537,14 +1537,14 @@
   resolved "https://registry.yarnpkg.com/@substrate/ss58-registry/-/ss58-registry-1.23.0.tgz#6212bf871a882da98799f8dc51de0944d4152b88"
   integrity sha512-LuQje7n48GXSsp1aGI6UEmNVtlh7OzQ6CN1Hd9VGUrshADwMB0lRZ5bxnffmqDR4vVugI7h0NN0AONhIW1eHGg==
 
-"@threefold/grid_client@^2.0.0-rc3":
-  version "2.0.0-rc3"
-  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.0.0-rc3.tgz#a7c9c859b7a1cd03b4b767d295855d24e9e0a4cc"
-  integrity sha512-rPDJl9vPHrSTThQXGsMmM3ybStpGsHb6s3WafK4L0YZJ1LxlAGzaEuGWxT1+oRaTB+7nTTcZAoLY3bsuHO6l1A==
+"@threefold/grid_client@^2.0.0-rc4":
+  version "2.0.0-rc4"
+  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.0.0-rc4.tgz#aa16641d1fff84a07765cda7d8e5e6effcc2a237"
+  integrity sha512-s/fGSnv7iIwhjE8hyWILiNiV9r2FwJFU77UQLbzmx/QW8CEKTa7jvFAvEO3nE2IuQVEViJ7hDy5r2cYitqilZg==
   dependencies:
     "@jimber/pkid" "1.0.4"
     "@noble/secp256k1" "^1.7.1"
-    "@threefold/rmb_direct_client" "^2.0.0-rc3"
+    "@threefold/rmb_direct_client" "^2.0.0-rc4"
     algosdk "^1.19.0"
     appdata-path "^1.0.0"
     await-lock "^2.1.0"
@@ -1571,10 +1571,10 @@
     url-parse "^1.5.10"
     uuid4 "^2.0.2"
 
-"@threefold/rmb_direct_client@^2.0.0-rc3":
-  version "2.0.0-rc3"
-  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-2.0.0-rc3.tgz#492d9fef3a87b966c30b3609c5c8c9dd64e84bc5"
-  integrity sha512-rh9EVVF+JngfL788iUNCtkLYjkdiyW2yhPdVtXsapn12fIBBU5kXWy2TaAiv3WPPJ41DtHhu35P7BZwSJQaMeA==
+"@threefold/rmb_direct_client@^2.0.0-rc4":
+  version "2.0.0-rc4"
+  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-2.0.0-rc4.tgz#ba561fa068b73e04252aee4a97c53653749524d8"
+  integrity sha512-ejG0VbtBIDBDq0737eDCMm7GacuD62ChvRCFyume+U3Ybcjzx1fWhNDmbcuGspinOkEefRuSa7mcjggPVkiTJA==
   dependencies:
     "@noble/secp256k1" "^1.7.1"
     "@polkadot/api" "^8.9.1"
