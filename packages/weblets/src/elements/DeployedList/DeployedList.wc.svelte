@@ -656,22 +656,21 @@
             message={`Listing ${active == "Casperlabs" ? "Casperlab" : get_solution_label(active)}s...`}
           />
         {:then rows}
-          {#if rows.data.length}
-            {#if rows.data.length !== rows.total}
-              <Alert
-                type="warning"
-                message={`
-                Failed to load 
-                <strong>${rows.total - rows.data.length}</strong> 
-                out of ${rows.total} Deployments`}
-              />
-            {/if}
+          {#if rows.data.length && rows.data.length === rows.total}
             <Table
               rowsData={rows.data}
               headers={_vmHeader}
               rows={_createVMRow(rows.data)}
               actions={actions[active](rows.data)}
               on:selected={_onSelectRowHandler}
+            />
+          {:else if rows.data.length !== rows.total}
+            <Alert
+              type="warning"
+              message={`
+              Failed to load 
+              <strong>${rows.total - rows.data.length}</strong> 
+              out of ${rows.total} Deployments`}
             />
           {:else}
             <Alert
