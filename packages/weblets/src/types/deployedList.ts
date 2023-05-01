@@ -1,9 +1,9 @@
 import type { GridClient } from "@threefold/grid_client";
 
+import type { IStore } from "../stores/currentDeployment";
 import formatConsumption from "../utils/formatConsumption";
 import getGrid from "../utils/getGrid";
 import type { IProfile } from "./Profile";
-
 export interface IListReturn<T = any> {
   total: number;
   data: T[];
@@ -104,7 +104,8 @@ export default class DeployedList {
             details: data,
           });
         })
-        .catch(() => res(null));
+        .catch(e => console.log(e));
+      return res(null);
     });
   }
 
@@ -140,7 +141,7 @@ export default class DeployedList {
     }
   }
 
-  public async loadDeployments(type?: string): Promise<IListReturn> {
+  public async loadDeployments(type?: IStore["type"]): Promise<IListReturn> {
     // if no type? list the all the vms in the default namespace. "Old deployment scenario for VM"
     if (!type) return this.loadVm();
 
@@ -148,20 +149,23 @@ export default class DeployedList {
      * Deployments of the same type can be in
      */
 
-    // 1. default namespace: filtered by the project name in the flist
-    const deps1 = await this.loadVm().then(vms => {
-      return vms.data.filter(vm => vm.flist.toLowerCase().includes(type.toLowerCase()));
-    });
+    // 1. uppercase project name as namespace.
+    const deps1 = await this.loadVm(type);
 
-    // 2. uppercase project name as namespace.
-    const deps2 = await this.loadVm(type);
+    // 2. lowercase project name as namespace.
+    const deps2 = await this.loadVm(type.toLowerCase());
 
-    // 3. lowercase project name as namespace.
-    const deps3 = await this.loadVm(type.toLowerCase());
-
+    // load orphan deployments to VM
+    if (type === "VM") {
+      const depsOrphan = await this.loadVm();
+      return {
+        total: depsOrphan.total + deps1.total + deps2.total,
+        data: [...depsOrphan.data, ...deps1.data, ...deps2.data],
+      };
+    }
     return {
-      total: deps1.length + deps2.total + deps3.total,
-      data: [...deps1, ...deps2.data, ...deps3.data],
+      total: deps1.total + deps2.total,
+      data: [...deps1.data, ...deps2.data],
     };
   }
 
