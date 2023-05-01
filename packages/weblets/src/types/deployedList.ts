@@ -104,8 +104,10 @@ export default class DeployedList {
             details: data,
           });
         })
-        .catch(e => console.log(e));
-      return res(null);
+        .catch(e => {
+          console.log(e);
+          return res(null);
+        });
     });
   }
 
