@@ -106,7 +106,7 @@ export default class DeployedList {
         })
         .catch(e => {
           console.log(e);
-          return res(null);
+          return res(undefined);
         });
     });
   }

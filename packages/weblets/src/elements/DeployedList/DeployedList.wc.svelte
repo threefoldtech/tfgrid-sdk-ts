@@ -666,13 +666,15 @@
                 out of ${rows.total} Deployments`}
               />
             {/if}
-            <Table
-              rowsData={rows.data}
-              headers={_vmHeader}
-              rows={_createVMRow(rows.data)}
-              actions={actions[active](rows.data)}
-              on:selected={_onSelectRowHandler}
-            />
+            {#if rows.data.length}
+              <Table
+                rowsData={rows.data}
+                headers={_vmHeader}
+                rows={_createVMRow(rows.data)}
+                actions={actions[active](rows.data)}
+                on:selected={_onSelectRowHandler}
+              />
+            {/if}
           {:else}
             <Alert
               type="gray"
