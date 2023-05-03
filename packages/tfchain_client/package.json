@@ -1,21 +1,18 @@
 {
-  "name": "tfchain_client_ts",
-  "version": "1.0.0",
+  "name": "@threefold/tfchain_client",
+  "version": "2.0.0-rc4",
   "description": "A client for TF chain",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky install",
     "build": "npm-run-all es6-build node-build",
     "node-build": "tsc --build tsconfig-node.json",
     "es6-build": "tsc --build tsconfig-es6.json",
-    "lint": "eslint -c .eslintrc.json . --fix",
-    "check-lint": "eslint -c .eslintrc.json .",
     "generate-docs": "typedoc --tsconfig tsconfig-es6.json src/index.ts --out docs/api",
     "serve-docs": "http-server docs/api"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AhmedHanafy725/tfchain_client_ts.git"
+    "url": "https://github.com/threefoldtech/tfgrid-sdk-ts.git"
   },
   "keywords": [
     "tfchain"
@@ -23,9 +20,9 @@
   "author": "Ahmed Hanafy",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/AhmedHanafy725/tfchain_client_ts/issues"
+    "url": "https://github.com/threefoldtech/tfgrid-sdk-ts/issues"
   },
-  "homepage": "https://github.com/AhmedHanafy725/tfchain_client_ts#readme",
+  "homepage": "https://github.com/threefoldtech/tfgrid-sdk-ts/tree/development/packages/tfchain_client/README.md",
   "main": "./dist/node/index.js",
   "module": "./dist/es6/index.js",
   "exports": {
@@ -36,11 +33,6 @@
   "files": [
     "/dist"
   ],
-  "lint-staged": {
-    "*.{ts,js}": [
-      "eslint -c .eslintrc.json --fix"
-    ]
-  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.55.0",
     "@typescript-eslint/parser": "^5.55.0",
