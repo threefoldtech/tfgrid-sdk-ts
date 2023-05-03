@@ -31,4 +31,4 @@ class QueryPricingPolicies {
   }
 }
 
-export { QueryPricingPolicies, PricingPolicy };
+export { QueryPricingPolicies, PricingPolicy, Resource };

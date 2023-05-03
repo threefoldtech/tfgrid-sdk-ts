@@ -300,4 +300,15 @@ class Contracts extends QueryContracts {
   }
 }
 
-export { Contracts, Contract, QueryContracts };
+export {
+  Contracts,
+  Contract,
+  QueryContracts,
+  ContractType,
+  State,
+  ServiceContract,
+  NameContract,
+  NodeContract,
+  RentContract,
+  ServiceState,
+};

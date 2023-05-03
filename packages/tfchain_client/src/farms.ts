@@ -38,4 +38,4 @@ class QueryFarms {
   }
 }
 
-export { QueryFarms, Farm };
+export { QueryFarms, Farm, Certification, FarmingPolicyLimits };
