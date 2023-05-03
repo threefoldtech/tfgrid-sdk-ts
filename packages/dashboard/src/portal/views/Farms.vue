@@ -639,8 +639,8 @@ export default class FarmsView extends Vue {
     this.nodes[current].publicConfig = {
       ipv4: config?.ip4.ip || "",
       gw4: config?.ip4.gw || "",
-      ipv6: config?.ip6.ip || "",
-      gw6: config?.ip6.gw || "",
+      ipv6: config?.ip6?.ip || "",
+      gw6: config?.ip6?.gw || "",
       domain: config?.domain || "",
     };
 
