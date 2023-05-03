@@ -37,6 +37,8 @@ jobs:
           yarn workspace @threefold/grid_client publish
           yarn workspace @threefold/grid_http_server publish
           yarn workspace @threefold/grid_rmb_server publish
+          yarn workspace @threefold/tfchain_client publish
+
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
