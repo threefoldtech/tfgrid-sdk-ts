@@ -30,15 +30,7 @@ jobs:
       - name: Build
         run: lerna run build --no-private
       - name: Publish
-        run: |
-          yarn workspace @threefold/rmb_direct_client publish
-          yarn workspace @threefold/rmb_peer_client publish
-          yarn workspace @threefold/rmb_peer_server publish
-          yarn workspace @threefold/grid_client publish
-          yarn workspace @threefold/grid_http_server publish
-          yarn workspace @threefold/grid_rmb_server publish
-          yarn workspace @threefold/tfchain_client publish
-
+        run: lerna run publish --no-private
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
