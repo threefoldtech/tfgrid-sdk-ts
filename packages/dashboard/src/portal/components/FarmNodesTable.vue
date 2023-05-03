@@ -647,10 +647,9 @@ export default class FarmNodesTable extends Vue {
       if (this.gw6) {
         this.ip6ErrorMessage = "This field is required";
         return false;
-      } else {
-        this.gw6ErrorMessage = "";
-        return true;
       }
+      this.gw6ErrorMessage = "";
+      return true;
     }
     const IPv4SegmentFormat = "(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])";
     const IPv4AddressFormat = `(${IPv4SegmentFormat}[.]){3}${IPv4SegmentFormat}`;
@@ -706,10 +705,9 @@ export default class FarmNodesTable extends Vue {
       if (this.ip6) {
         this.gw6ErrorMessage = "This field is required";
         return false;
-      } else {
-        this.ip6ErrorMessage = "";
-        return true;
       }
+      this.ip6ErrorMessage = "";
+      return true;
     }
     if (PrivateIp(this.gw6.split("/")[0])) {
       this.gw6ErrorMessage = "Gateway is not public";
