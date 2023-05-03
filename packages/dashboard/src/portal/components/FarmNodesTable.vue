@@ -514,8 +514,7 @@ export default class FarmNodesTable extends Vue {
         gw: this.gw4,
       },
     };
-
-    if (this.ip6 != "")
+    if (this.ip6 != "" && this.gw6 != "")
       config.ip6 = {
         ip: this.ip6,
         gw: this.gw6,
@@ -605,8 +604,7 @@ export default class FarmNodesTable extends Vue {
   }
   openPublicConfig(node: nodeInterface) {
     // disable remove config btn
-    if (node.publicConfig.ipv4 && node.publicConfig.gw4 && node.publicConfig.ipv6 && node.publicConfig.gw6)
-      this.hasPublicConfig = true;
+    if (node.publicConfig.ipv4 && node.publicConfig.gw4) this.hasPublicConfig = true;
     else this.hasPublicConfig = false;
 
     this.nodeToEdit = node;
