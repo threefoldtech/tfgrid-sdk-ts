@@ -18,6 +18,7 @@ import { QueryPricingPolicies } from "./pricing_policies";
 import { TermsAndConditions } from "./terms_and_conditions";
 import { QueryTFTPrice } from "./tft_price";
 import { QueryTwins, Twins } from "./twins";
+import type { Extrinsic, ExtrinsicResult, PatchExtrinsicOptions } from "./types";
 import { Utility } from "./utility";
 import { isEnvNode } from "./utils";
 
@@ -238,6 +239,18 @@ class Client extends QueryClient {
   }
   async applyAllExtrinsics<T>(extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[]): Promise<T> {
     return this.utility.batchAll<T>(extrinsics);
+  }
+
+  patchExtrinsic<R>(extrinsic: Extrinsic, options: PatchExtrinsicOptions<R> = {}): ExtrinsicResult<R> {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
+
+    (<any>extrinsic).apply = async () => {
+      const res = await self.applyExtrinsic(extrinsic, options.resultSections);
+      if (options.map) return options.map(res);
+      return res;
+    };
+    return extrinsic as ExtrinsicResult<R>;
   }
 }
 
