@@ -132,7 +132,7 @@ class Client extends QueryClient {
   kvstore: KVStore = new KVStore(this);
   twins: Twins = new Twins(this);
 
-  url: string;
+  declare url: string;
   mnemonicOrSecret?: string;
   keypairType: KeypairType;
   extSigner?: ExtSigner;
