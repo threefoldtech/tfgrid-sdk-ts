@@ -123,10 +123,8 @@
                 <v-flex class="text-left">Stellar Payout Address</v-flex>
               </v-col>
               <v-col v-if="item.v2address">
-                <v-row
-                  class="d-flex align-baseline justify-between pl-3"
-                >
-                    <v-text-field
+                <v-row class="d-flex align-baseline justify-between pl-3">
+                  <v-text-field
                     outlined
                     class="pt-1 text-caption"
                     dense
@@ -135,8 +133,8 @@
                     :readonly="!!item.v2address"
                     :append-icon="'mdi-pencil'"
                     @click:append="openV2AddressDialog = true"
-                    >
-                    </v-text-field>
+                  >
+                  </v-text-field>
                 </v-row>
               </v-col>
               <v-col v-else>
@@ -185,6 +183,7 @@
             </v-row>
 
             <PublicIPTable
+              class="pt-4"
               :ips="item.publicIps"
               :deleteIP="deletePublicIP"
               :loadingDelete="loadingDeleteIP"
