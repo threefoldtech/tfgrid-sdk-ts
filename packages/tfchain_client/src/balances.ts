@@ -7,13 +7,17 @@ interface Balance {
   feeFrozen: number;
 }
 
+interface QueryBalancesGetOptions {
+  address: string;
+}
+
 class QueryBalances {
   constructor(public client: QueryClient) {
     this.client = client;
   }
 
-  async get(address: string): Promise<Balance> {
-    const { data } = await this.client.checkConnectionAndApply(this.client.api.query.system.account, [address]);
+  async get(options: QueryBalancesGetOptions): Promise<Balance> {
+    const { data } = await this.client.checkConnectionAndApply(this.client.api.query.system.account, [options.address]);
     const balance: Balance = {
       free: data.free.toJSON(),
       reserved: data.reserved.toJSON(),
@@ -49,7 +53,7 @@ class Balances extends QueryBalances {
   }
 
   async getMyBalance(): Promise<Balance> {
-    return this.get(this.client.address);
+    return this.get({ address: this.client.address });
   }
 }
 

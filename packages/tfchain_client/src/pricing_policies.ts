@@ -20,13 +20,19 @@ interface PricingPolicy {
   discountForDedicationNodes: number;
 }
 
+interface QueryPricingGetOptions {
+  id: number;
+}
+
 class QueryPricingPolicies {
   constructor(public client: QueryClient) {
     this.client = client;
   }
 
-  async get(id: number): Promise<PricingPolicy> {
-    const res = await this.client.checkConnectionAndApply(this.client.api.query.tfgridModule.pricingPolicies, [id]);
+  async get(options: QueryPricingGetOptions): Promise<PricingPolicy> {
+    const res = await this.client.checkConnectionAndApply(this.client.api.query.tfgridModule.pricingPolicies, [
+      options.id,
+    ]);
     return res.toPrimitive();
   }
 }

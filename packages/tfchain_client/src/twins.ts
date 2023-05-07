@@ -8,22 +8,30 @@ interface Twin {
   pk: string;
 }
 
+interface QueryTwinsGetOptions {
+  id: number;
+}
+
+interface QueryTwinsGetTwinByAccountIdOptions {
+  accountId: string;
+}
+
 class QueryTwins {
   constructor(public client: QueryClient) {
     this.client = client;
   }
 
-  async get(id: number): Promise<Twin> {
-    if (isNaN(id) || id <= 0) {
+  async get(options: QueryTwinsGetOptions): Promise<Twin> {
+    if (isNaN(options.id) || options.id <= 0) {
       throw Error("Invalid twin id. Twin id must be postive integer");
     }
-    const res = await this.client.checkConnectionAndApply(this.client.api.query.tfgridModule.twins, [id]);
+    const res = await this.client.checkConnectionAndApply(this.client.api.query.tfgridModule.twins, [options.id]);
     return res.toPrimitive();
   }
 
-  async getTwinIdByAccountId(accountId: string): Promise<number> {
+  async getTwinIdByAccountId(options: QueryTwinsGetTwinByAccountIdOptions): Promise<number> {
     const res = await this.client.checkConnectionAndApply(this.client.api.query.tfgridModule.twinIdByAccountID, [
-      accountId,
+      options.accountId,
     ]);
     return res.toPrimitive();
   }
@@ -57,7 +65,7 @@ class Twins extends QueryTwins {
   }
 
   async getMyTwinId(): Promise<number> {
-    return this.getTwinIdByAccountId(this.client.address);
+    return this.getTwinIdByAccountId({ accountId: this.client.address });
   }
 }
 

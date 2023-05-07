@@ -55,42 +55,65 @@ interface ServiceContract {
   state: ServiceState;
 }
 
+interface QueryContractsGetOptions {
+  id: number;
+}
+
+interface QueryContractsGetContractByActiveRentOptions {
+  nodeId: number;
+}
+
+interface QueryContractGetContractByNameOptions {
+  name: string;
+}
+
+interface QueryContractGetContractByIdAndHashOptions {
+  nodeId: number;
+  hash: string;
+}
+
+interface QueryContractGetServiceOptions {
+  serviceId: number;
+}
+
 class QueryContracts {
   constructor(public client: QueryClient) {
     this.client = client;
   }
 
-  async get(id: number): Promise<Contract> {
-    const res = await this.client.checkConnectionAndApply(this.client.api.query.smartContractModule.contracts, [id]);
+  async get(options: QueryContractsGetOptions): Promise<Contract> {
+    const res = await this.client.checkConnectionAndApply(this.client.api.query.smartContractModule.contracts, [
+      options.id,
+    ]);
     return res.toPrimitive();
   }
 
-  async getContractIdByActiveRentForNode(nodeId: number): Promise<number> {
+  async getContractIdByActiveRentForNode(options: QueryContractsGetContractByActiveRentOptions): Promise<number> {
     const res = await this.client.checkConnectionAndApply(
       this.client.api.query.smartContractModule.activeRentContractForNode,
-      [nodeId],
+      [options.nodeId],
     );
     return res.toPrimitive();
   }
 
-  async getContractIdByName(name: string): Promise<number> {
+  async getContractIdByName(options: QueryContractGetContractByNameOptions): Promise<number> {
     const res = await this.client.checkConnectionAndApply(
       this.client.api.query.smartContractModule.contractIDByNameRegistration,
-      [name],
+      [options.name],
     );
     return res.toPrimitive();
   }
 
-  async getContractIdByNodeIdAndHash(nodeId: number, hash: string): Promise<number> {
+  async getContractIdByNodeIdAndHash(options: QueryContractGetContractByIdAndHashOptions): Promise<number> {
     const res = await this.client.checkConnectionAndApply(
       this.client.api.query.smartContractModule.contractIDByNodeIDAndHash,
-      [nodeId, hash],
+      [options.nodeId, options.hash],
     );
     return res.toPrimitive();
   }
 
-  async getDeletionTime(id: number): Promise<number> {
-    const contract = await this.get(id);
+  async getDeletionTime(options: QueryContractsGetOptions): Promise<number> {
+    const contract = await this.get(options);
     if (!contract || contract.state.created === null) return 0;
 
     const blockNumber = contract.state.gracePeriod;
@@ -103,13 +126,13 @@ class QueryContracts {
 
       return gracePeriodStartTime + TWO_WEEKS;
     } catch (err) {
-      throw Error(`Error getting current block number for contract ${id} deletion: ${err}`);
+      throw Error(`Error getting current block number for contract ${options.id} deletion: ${err}`);
     }
   }
 
-  async getService(serviceId: number): Promise<ServiceContract> {
+  async getService(options: QueryContractGetServiceOptions): Promise<ServiceContract> {
     const res = await this.client.checkConnectionAndApply(this.client.api.query.smartContractModule.serviceContracts, [
-      serviceId,
+      options.serviceId,
     ]);
     return res.toPrimitive();
   }
@@ -161,15 +184,15 @@ export interface SetServiceMetadataOptions {
   metadata: string;
 }
 
-interface CreateNameOptions {
+export interface CreateNameOptions {
   name: string;
 }
 
-interface CancelOptions {
+export interface CancelOptions {
   id: number;
 }
 
-interface CancelServiceOptions {
+export interface CancelServiceOptions {
   serviceId: number;
 }
 
@@ -212,7 +235,7 @@ class Contracts extends QueryContracts {
   }
 
   async cancel(options: CancelOptions) {
-    const contract = await this.get(options.id);
+    const contract = await this.get(options);
     if (!contract) {
       return;
     }
