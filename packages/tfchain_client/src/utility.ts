@@ -10,7 +10,7 @@ class Utility {
     this.client = client;
   }
 
-  async batch<T>(extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[]): Promise<T | void> {
+  async batch<T>(extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[]): Promise<T> {
     if (extrinsics.length > 0) {
       const resultSections = this.extractResultSections(extrinsics);
       const batchExtrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.utility.batch, [extrinsics]);
@@ -18,13 +18,13 @@ class Utility {
     }
   }
 
-  async batchAll<T>(extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[]): Promise<T | void> {
+  async batchAll<T>(extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[]): Promise<T> {
     if (extrinsics.length > 0) {
       const resultSections = this.extractResultSections(extrinsics);
       const batchAllExtrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.utility.batchAll, [
         extrinsics,
       ]);
-      return this.client.applyExtrinsic<T>(batchAllExtrinsic, resultSections);
+      return this.client.applyExtrinsic<T>(batchAllExtrinsic, resultSections) as T;
     }
   }
 
