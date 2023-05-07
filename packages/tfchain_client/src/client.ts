@@ -113,6 +113,13 @@ class QueryClient {
   }
 }
 
+export interface ClientOptions {
+  url: string;
+  mnemonicOrSecret?: string;
+  keypairType?: KeypairType;
+  extSigner?: ExtSigner;
+}
+
 class Client extends QueryClient {
   static lock: AwaitLock = new AwaitLock();
   keypair: KeyringPair;
@@ -124,26 +131,33 @@ class Client extends QueryClient {
   termsAndConditions: TermsAndConditions = new TermsAndConditions(this);
   kvstore: KVStore = new KVStore(this);
   twins: Twins = new Twins(this);
-  constructor(
-    public url: string,
-    public mnemonicOrSecret: string,
-    public keypairType: KeypairType = "sr25519",
-    public extSigner: ExtSigner | null = null,
-  ) {
-    super(url);
-    if (!SUPPORTED_KEYPAIR_TYPES.includes(keypairType)) {
-      throw Error(`Keypair type ${keypairType} is not a valid type. Should be either of: ${SUPPORTED_KEYPAIR_TYPES}`);
+
+  url: string;
+  mnemonicOrSecret?: string;
+  keypairType: KeypairType;
+  extSigner?: ExtSigner;
+
+  constructor(options: ClientOptions) {
+    if (!options.url) throw Error("url should be provided");
+    super(options.url);
+
+    this.extSigner = options.extSigner;
+    this.keypairType = options.keypairType || "sr25519";
+
+    if (!SUPPORTED_KEYPAIR_TYPES.includes(this.keypairType)) {
+      throw Error(
+        `Keypair type ${this.keypairType} is not a valid type. Should be either of: ${SUPPORTED_KEYPAIR_TYPES}`,
+      );
     }
-    if (!url) {
-      throw Error("url should be provided");
-    }
-    if ((!mnemonicOrSecret && !extSigner) || (mnemonicOrSecret && extSigner)) {
+
+    if ((options.mnemonicOrSecret && options.extSigner) || !(options.mnemonicOrSecret || options.extSigner)) {
       throw Error("mnemonicOrSecret or extension signer should be provided");
     }
 
-    if (mnemonicOrSecret && !validateMnemonic(this.mnemonicOrSecret)) {
+    if (options.mnemonicOrSecret && !validateMnemonic(options.mnemonicOrSecret)) {
       throw Error("Invalid mnemonic! Must be bip39 compliant");
     }
+    this.mnemonicOrSecret = options.mnemonicOrSecret;
   }
 
   async loadKeyPairOrSigner(): Promise<void> {
