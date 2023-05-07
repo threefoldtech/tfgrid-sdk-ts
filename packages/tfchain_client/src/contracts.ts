@@ -1,6 +1,3 @@
-import { SubmittableExtrinsic } from "@polkadot/api-base/types";
-import { ISubmittableResult } from "@polkadot/types/types";
-
 import { Client, QueryClient } from "./client";
 import { PublicIp } from "./types";
 
