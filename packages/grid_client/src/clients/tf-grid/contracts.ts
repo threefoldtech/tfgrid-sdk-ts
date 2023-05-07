@@ -1,170 +1,60 @@
+import { Contracts } from "@threefold/tfchain_client";
 import { Decimal } from "decimal.js";
 
 import { ContractStates } from "../../modules";
 import { Graphql } from "../graphql/client";
-import { TFClient } from "./client";
 
-const TWO_WEEKS = 1209600000;
+export interface ListContractByTwinIdOptions {
+  graphqlURL: string;
+  twinId: number;
+  stateList?: ContractStates[];
+}
 
-class Contracts {
-  tfclient: TFClient;
+export interface ListContractByAddressOptions {
+  graphqlURL: string;
+  accountId: string;
+  stateList?: ContractStates[];
+}
 
-  constructor(client: TFClient) {
-    this.tfclient = client;
-  }
-  async createNode(nodeID: number, hash: string, data: string, publicIPs: number, solutionProviderID: number) {
-    return await this.tfclient.applyExtrinsic(
-      this.tfclient.client.createNodeContract,
-      [nodeID, data, hash, publicIPs, solutionProviderID],
-      "smartContractModule",
-      ["ContractCreated"],
-    );
-  }
+export interface ListMyContractOptions {
+  graphqlURL: string;
+  stateList?: ContractStates[];
+}
 
-  async createName(name: string) {
-    return await this.tfclient.applyExtrinsic(this.tfclient.client.createNameContract, [name], "smartContractModule", [
-      "ContractCreated",
-    ]);
-  }
+export interface GetConsumptionOptions {
+  graphqlURL: string;
+  id: number;
+}
 
-  async createRentContract(nodeId: number, solutionProviderID: number) {
-    return await this.tfclient.applyExtrinsic(
-      this.tfclient.client.createRentContract,
-      [nodeId, solutionProviderID],
-      "smartContractModule",
-      ["ContractCreated"],
-    );
-  }
+export interface CancelMyContractOptions {
+  graphqlURL: string;
+}
 
-  async activeRentContractForNode(nodeId: number) {
-    return await this.tfclient.queryChain(this.tfclient.client.activeRentContractForNode, [nodeId]);
-  }
-
-  async updateNode(id: number, data: string, hash: string) {
-    return await this.tfclient.applyExtrinsic(
-      this.tfclient.client.updateNodeContract,
-      [id, data, hash],
-      "smartContractModule",
-      ["ContractUpdated"],
-    );
-  }
-
-  async cancel(id: number) {
-    const contract = await this.get(id);
-    if (!contract) {
-      return id;
-    }
-    return await this.tfclient.applyExtrinsic(this.tfclient.client.cancelContract, [id], "smartContractModule", [
-      "NodeContractCanceled",
-      "NameContractCanceled",
-      "RentContractCanceled",
-      "ContractCanceled",
-    ]);
-  }
-
-  async createServiceContract(serviceAccount: string, consumerAccount: string) {
-    return await this.tfclient.applyExtrinsic(
-      this.tfclient.client.createServiceContract,
-      [serviceAccount, consumerAccount],
-      "smartContractModule",
-      ["ServiceContractCreated"],
-    );
-  }
-
-  async serviceContractApprove(serviceContractId: number, approve: boolean) {
-    return await this.tfclient.applyExtrinsic(
-      this.tfclient.client.serviceContractApprove,
-      [serviceContractId, approve],
-      "smartContractModule",
-      ["ServiceContractApproved"],
-    );
-  }
-
-  async serviceContractBill(serviceContractId: number, variableAmount: number, metadata: string) {
-    return await this.tfclient.applyExtrinsic(
-      this.tfclient.client.serviceContractBill,
-      [serviceContractId, variableAmount, metadata],
-      "smartContractModule",
-      ["ServiceContractBilled"],
-    );
-  }
-
-  async serviceContractCancel(serviceContractId: number) {
-    return await this.tfclient.applyExtrinsic(
-      this.tfclient.client.serviceContractCancel,
-      [serviceContractId],
-      "smartContractModule",
-      ["ServiceContractCanceled"],
-    );
-  }
-
-  async setServiceContractFees(serviceContractId: number, baseFee: number, variableFee: number) {
-    return await this.tfclient.applyExtrinsic(
-      this.tfclient.client.setServiceContractFees,
-      [serviceContractId, baseFee, variableFee],
-      "smartContractModule",
-      ["ServiceContractFeesSet"],
-    );
-  }
-
-  async setServiceContractMetadata(serviceContractId: number, metadata: string) {
-    return await this.tfclient.applyExtrinsic(
-      this.tfclient.client.setServiceContractMetadata,
-      [serviceContractId, metadata],
-      "smartContractModule",
-      ["ServiceContractMetadataSet"],
-    );
-  }
-
-  async getServiceContract(serviceContractId: number) {
-    return await this.tfclient.queryChain(this.tfclient.client.getServiceContract, [serviceContractId]);
-  }
-  async get(id: number) {
-    return this.tfclient
-      .queryChain(this.tfclient.client.getContractByID, [id])
-      .then(res => {
-        return res;
-      })
-      .catch(err => {
-        throw Error(`Error getting contract ${id}: ${err}`);
-      });
-  }
-
-  async getContractIdByNodeIdAndHash(nodeId: number, hash: string) {
-    return await this.tfclient.queryChain(this.tfclient.client.contractIDByNodeIDAndHash, [nodeId, hash]);
-  }
-
-  async getNameContract(name: string) {
-    return await this.tfclient.queryChain(this.tfclient.client.contractIDByNameRegistration, [name]);
-  }
-
-  async listContractsByTwinId(
-    graphqlURL,
-    twinId,
-    stateList: ContractStates[] = [ContractStates.Created, ContractStates.GracePeriod],
-  ) {
-    const state = `[${stateList.join(", ")}]`;
-    const gqlClient = new Graphql(graphqlURL);
-    const options = `(where: {twinID_eq: ${twinId}, state_in: ${state}}, orderBy: twinID_ASC)`;
+class TFContracts extends Contracts {
+  async listContractsByTwinId(options: ListContractByTwinIdOptions) {
+    options.stateList = options.stateList || [ContractStates.Created, ContractStates.GracePeriod];
+    const state = `[${options.stateList.join(", ")}]`;
+    const gqlClient = new Graphql(options.graphqlURL);
+    const opts = `(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, orderBy: twinID_ASC)`;
     try {
-      const nameContractsCount = await gqlClient.getItemTotalCount("nameContracts", options);
-      const nodeContractsCount = await gqlClient.getItemTotalCount("nodeContracts", options);
-      const rentContractsCount = await gqlClient.getItemTotalCount("rentContracts", options);
+      const nameContractsCount = await gqlClient.getItemTotalCount("nameContracts", opts);
+      const nodeContractsCount = await gqlClient.getItemTotalCount("nodeContracts", opts);
+      const rentContractsCount = await gqlClient.getItemTotalCount("rentContracts", opts);
       const body = `query getContracts($nameContractsCount: Int!, $nodeContractsCount: Int!, $rentContractsCount: Int!){
-                nameContracts(where: {twinID_eq: ${twinId}, state_in: ${state}}, limit: $nameContractsCount) {
+                nameContracts(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, limit: $nameContractsCount) {
                   contractID
                   state
                   name
                   createdAt
                 }
-                nodeContracts(where: {twinID_eq: ${twinId}, state_in: ${state}}, limit: $nodeContractsCount) {
+                nodeContracts(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, limit: $nodeContractsCount) {
                   contractID
                   deploymentData
                   state
                   createdAt
                   nodeID
                 }
-                rentContracts(where: {twinID_eq: ${twinId}, state_in: ${state}}, limit: $rentContractsCount) {
+                rentContracts(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, limit: $rentContractsCount) {
                   contractID
                   state
                   createdAt
@@ -179,18 +69,18 @@ class Contracts {
 
       return response["data"];
     } catch (err) {
-      throw Error(`Error listing contracts by twin id ${twinId}: ${err}`);
+      throw Error(`Error listing contracts by twin id ${options.twinId}: ${err}`);
     }
   }
+
   /**
    * Get contract consumption per hour in TFT.
    *
-   * @param  {number} id
-   * @param  {string} graphqlURL
+   * @param  {GetConsumptionOptions} options
    * @returns {Promise<number>}
    */
-  async getConsumption(id: number, graphqlURL: string): Promise<number> {
-    const gqlClient = new Graphql(graphqlURL);
+  async getConsumption(options: GetConsumptionOptions): Promise<number> {
+    const gqlClient = new Graphql(options.graphqlURL);
     const body = `query getConsumption($contractId: BigInt!){
             contractBillReports(where: {contractID_eq: $contractId}, limit: 2 , orderBy: timestamp_DESC) {
                 amountBilled
@@ -207,7 +97,7 @@ class Contracts {
               }
           }`;
     try {
-      const response = await gqlClient.query(body, { contractId: id });
+      const response = await gqlClient.query(body, { contractId: options.id });
       const billReports = response["data"]["contractBillReports"];
       if (billReports.length === 0) {
         return 0;
@@ -238,27 +128,35 @@ class Contracts {
           .toNumber();
       }
     } catch (err) {
-      throw Error(`Error getting consumption for contract ${id}: ${err}`);
+      throw Error(`Error getting consumption for contract ${options.id}: ${err}`);
     }
   }
 
-  async listContractsByAddress(graphqlURL, address) {
-    const twinId = await this.tfclient.twins.getTwinIdByAccountId(address);
-    return await this.listContractsByTwinId(graphqlURL, twinId);
+  async listContractsByAddress(options: ListContractByAddressOptions) {
+    const twinId = await this.client.twins.getTwinIdByAccountId({ accountId: options.accountId });
+    return await this.listContractsByTwinId({
+      graphqlURL: options.graphqlURL,
+      twinId: twinId,
+      stateList: options.stateList,
+    });
   }
 
-  async listMyContracts(graphqlURL, state?: ContractStates[]) {
-    const twinId = await this.tfclient.twins.getMyTwinId();
-    return await this.listContractsByTwinId(graphqlURL, twinId, state);
+  async listMyContracts(options: ListMyContractOptions) {
+    const twinId = await this.client.twins.getMyTwinId();
+    return await this.listContractsByTwinId({
+      graphqlURL: options.graphqlURL,
+      twinId: twinId,
+      stateList: options.stateList,
+    });
   }
 
   /**
    * WARNING: Please be careful when executing this method, it will delete all your contracts.
-   * @param  {string} graphqlURL
-   * @returns Promise
+   * @param  {CancelMyContractOptions} options
+   * @returns {Promise<Record<string, number>[]>}
    */
-  async cancelMyContracts(graphqlURL: string): Promise<Record<string, number>[]> {
-    const allContracts = await this.listMyContracts(graphqlURL);
+  async cancelMyContracts(options: CancelMyContractOptions): Promise<Record<string, number>[]> {
+    const allContracts = await this.listMyContracts(options);
     const contracts = [
       ...allContracts["nameContracts"],
       ...allContracts["nodeContracts"],
@@ -275,29 +173,11 @@ class Contracts {
   async batchCancelContracts(ids: number[]): Promise<number[]> {
     const extrinsics = [];
     for (const id of ids) {
-      extrinsics.push(this.tfclient.client.api.tx.smartContractModule.cancelContract(id));
+      extrinsics.push(this.cancel({ id }));
     }
-    await this.tfclient.utility.batchAll(extrinsics);
+    await this.client.applyAllExtrinsics(extrinsics);
     return ids;
-  }
-
-  async getDeletionTime(contractId: number): Promise<number> {
-    const contract = await this.get(contractId);
-    if (!contract || contract.state.created === null) return 0;
-
-    const blockNumber = contract.state["gracePeriod"];
-
-    try {
-      const currentBlockNumber = +(await this.tfclient.queryChain(this.tfclient.client.api.query.system.number, []));
-
-      // each block takes 6 seconds
-      const gracePeriodStartTime = new Date().getTime() - (currentBlockNumber - blockNumber) * 6000;
-
-      return gracePeriodStartTime + TWO_WEEKS;
-    } catch (err) {
-      throw Error(`Error getting current block number for contract ${contractId} deletion: ${err}`);
-    }
   }
 }
 
-export { Contracts };
+export { TFContracts };

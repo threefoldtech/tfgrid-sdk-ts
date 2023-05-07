@@ -1,10 +1,13 @@
 import { Client } from "@threefold/tfchain_client";
 
 import { KeypairType } from "../../zos/deployment";
+import { TFContracts } from ".";
 import { TFBalances } from "./balances";
 
 class TFClient extends Client {
   balances: TFBalances = new TFBalances(this);
+  contracts: TFContracts = new TFContracts(this);
+
   constructor(
     public url: string,
     public mnemonic: string,
