@@ -124,15 +124,19 @@
               </v-col>
               <v-col v-if="item.v2address">
                 <v-row
-                  class="d-flex align-baseline justify-between"
-                  style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden"
+                  class="d-flex align-baseline justify-between pl-3"
                 >
-                  <v-row style="margin: 0">
-                    <span style="font-size: small">
-                      {{ item.v2address }}
-                    </span>
-                  </v-row>
-                  <v-btn x-small @click="openV2AddressDialog = true">Edit</v-btn>
+                    <v-text-field
+                    outlined
+                    class="pt-1 text-caption"
+                    dense
+                    hide-details
+                    :value="item.v2address"
+                    :readonly="!!item.v2address"
+                    :append-icon="'mdi-pencil'"
+                    @click:append="openV2AddressDialog = true"
+                    >
+                    </v-text-field>
                 </v-row>
               </v-col>
               <v-col v-else>
@@ -175,7 +179,7 @@
               </v-col>
               <v-col>
                 <v-flex>
-                  <v-btn x-small v-bind:href="'https://v3.bootstrap.grid.tf/'" target="blank">view bootstrap</v-btn>
+                  <v-btn small v-bind:href="'https://v3.bootstrap.grid.tf/'" target="blank">view bootstrap</v-btn>
                 </v-flex>
               </v-col>
             </v-row>
