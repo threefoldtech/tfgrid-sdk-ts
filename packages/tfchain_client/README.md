@@ -21,6 +21,8 @@ there are 2 types of client. one for just query the chain and the other one for 
 ### Query Client
 
 ```ts
+import { QueryClient } from "./src/client";
+
 const cl = new QueryClient("wss://tfchain.dev.grid.tf");
 await cl.connect();
 const c = await cl.contracts.get(19530);
@@ -31,6 +33,8 @@ cl.disconnect();
 ### Full Client
 
 ```ts
+import { Client } from "./src/client";
+
 const cl = new Client("wss://tfchain.dev.grid.tf", "<your mnemonic>", "sr25519");
 await cl.connect();
 const contract = await cl.contracts.createName("hamada");

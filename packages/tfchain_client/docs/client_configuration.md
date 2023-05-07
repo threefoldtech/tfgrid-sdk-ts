@@ -5,6 +5,8 @@
 it only requires the websocket url.
 
 ```ts
+import { QueryClient } from "./src/client";
+
 const cl = new QueryClient("wss://tfchain.dev.grid.tf");
 await cl.connect();
 const c = await cl.contracts.get(19530);
@@ -24,6 +26,8 @@ it requires:
 > **Note:** mnemonic or the extSigner can be used to sign transactions.
 
 ```ts
+import { Client } from "./src/client";
+
 const cl = new Client("wss://tfchain.dev.grid.tf", "<your mnemonic>", "sr25519");
 await cl.connect();
 const contract = await cl.contracts.createName("hamada");
