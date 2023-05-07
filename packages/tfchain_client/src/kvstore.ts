@@ -1,29 +1,19 @@
-import { SubmittableExtrinsic } from "@polkadot/api-base/types";
-import { ISubmittableResult } from "@polkadot/types/types";
-
 import { Client } from "./client";
+import type { Extrinsic } from "./types";
 
 class KVStore {
   constructor(public client: Client) {
     this.client = client;
   }
 
-  async setExtrinsic(key: string, value: string): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>> {
-    return this.client.checkConnectionAndApply(this.client.api.tx.tfkvStore.set, [key, value]);
+  async set(key: string, value: string) {
+    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfkvStore.set, [key, value]);
+    return this.client.patchExtrinsic<void>(extrinsic);
   }
 
-  async set(key: string, value: string): Promise<void> {
-    const extrinsic = await this.setExtrinsic(key, value);
-    return this.client.applyExtrinsic<void>(extrinsic);
-  }
-
-  async deleteExtrinsic(key: string): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>> {
-    return this.client.checkConnectionAndApply(this.client.api.tx.tfkvStore.delete, [key]);
-  }
-
-  async delete(key: string): Promise<void> {
-    const extrinsic = await this.deleteExtrinsic(key);
-    return this.client.applyExtrinsic<void>(extrinsic);
+  async delete(key: string) {
+    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfkvStore.delete, [key]);
+    return this.client.patchExtrinsic<void>(extrinsic);
   }
 
   async get(key: string): Promise<string> {
@@ -47,9 +37,9 @@ class KVStore {
 
   async deleteAll(): Promise<number[]> {
     const keys = await this.list();
-    const extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = [];
+    const extrinsics: Extrinsic[] = [];
     for (const k of keys) {
-      extrinsics.push(await this.deleteExtrinsic(k));
+      extrinsics.push(await this.delete(k));
     }
     return this.client.applyAllExtrinsics<number[]>(extrinsics);
   }
