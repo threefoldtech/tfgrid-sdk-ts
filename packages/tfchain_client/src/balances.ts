@@ -7,7 +7,7 @@ interface Balance {
   feeFrozen: number;
 }
 
-interface QueryBalancesGetOptions {
+export interface QueryBalancesGetOptions {
   address: string;
 }
 
