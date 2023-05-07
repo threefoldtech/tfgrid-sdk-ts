@@ -27,13 +27,17 @@ interface Farm {
   farmingPolicyLimits: FarmingPolicyLimits;
 }
 
+interface QueryFarmsGetOptions {
+  id: number;
+}
+
 class QueryFarms {
   constructor(public client: QueryClient) {
     this.client = client;
   }
 
-  async get(id: number): Promise<Farm> {
-    const res = await this.client.checkConnectionAndApply(this.client.api.query.tfgridModule.farms, [id]);
+  async get(options: QueryFarmsGetOptions): Promise<Farm> {
+    const res = await this.client.checkConnectionAndApply(this.client.api.query.tfgridModule.farms, [options.id]);
     return res.toPrimitive();
   }
 }

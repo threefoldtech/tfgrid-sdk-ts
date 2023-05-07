@@ -18,6 +18,7 @@ import { QueryPricingPolicies } from "./pricing_policies";
 import { TermsAndConditions } from "./terms_and_conditions";
 import { QueryTFTPrice } from "./tft_price";
 import { QueryTwins, Twins } from "./twins";
+import type { Extrinsic, ExtrinsicResult, PatchExtrinsicOptions } from "./types";
 import { Utility } from "./utility";
 import { isEnvNode } from "./utils";
 
@@ -121,6 +122,13 @@ class QueryClient {
   }
 }
 
+export interface ClientOptions {
+  url: string;
+  mnemonicOrSecret?: string;
+  keypairType?: KeypairType;
+  extSigner?: ExtSigner;
+}
+
 class Client extends QueryClient {
   static lock: AwaitLock = new AwaitLock();
   keypair: KeyringPair;
@@ -132,26 +140,33 @@ class Client extends QueryClient {
   termsAndConditions: TermsAndConditions = new TermsAndConditions(this);
   kvstore: KVStore = new KVStore(this);
   twins: Twins = new Twins(this);
-  constructor(
-    public url: string,
-    public mnemonicOrSecret: string,
-    public keypairType: KeypairType = "sr25519",
-    public extSigner: ExtSigner | null = null,
-  ) {
-    super(url);
-    if (!SUPPORTED_KEYPAIR_TYPES.includes(keypairType)) {
-      throw Error(`Keypair type ${keypairType} is not a valid type. Should be either of: ${SUPPORTED_KEYPAIR_TYPES}`);
+
+  declare url: string;
+  mnemonicOrSecret?: string;
+  keypairType: KeypairType;
+  extSigner?: ExtSigner;
+
+  constructor(options: ClientOptions) {
+    if (!options.url) throw Error("url should be provided");
+    super(options.url);
+
+    this.extSigner = options.extSigner;
+    this.keypairType = options.keypairType || "sr25519";
+
+    if (!SUPPORTED_KEYPAIR_TYPES.includes(this.keypairType)) {
+      throw Error(
+        `Keypair type ${this.keypairType} is not a valid type. Should be either of: ${SUPPORTED_KEYPAIR_TYPES}`,
+      );
     }
-    if (!url) {
-      throw Error("url should be provided");
-    }
-    if ((!mnemonicOrSecret && !extSigner) || (mnemonicOrSecret && extSigner)) {
+
+    if ((options.mnemonicOrSecret && options.extSigner) || !(options.mnemonicOrSecret || options.extSigner)) {
       throw Error("mnemonicOrSecret or extension signer should be provided");
     }
 
-    if (mnemonicOrSecret && !validateMnemonic(this.mnemonicOrSecret)) {
+    if (options.mnemonicOrSecret && !validateMnemonic(options.mnemonicOrSecret)) {
       throw Error("Invalid mnemonic! Must be bip39 compliant");
     }
+    this.mnemonicOrSecret = options.mnemonicOrSecret;
   }
 
   async loadKeyPairOrSigner(): Promise<void> {
@@ -217,9 +232,7 @@ class Client extends QueryClient {
       }
     });
     return promise
-      .then((res: T) => {
-        return res;
-      })
+      .then((res: any) => res as T)
       .catch(e => {
         throw Error(
           `Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error: ${
@@ -243,8 +256,20 @@ class Client extends QueryClient {
     }
     return result;
   }
-  async applyAllExtrinsics<T>(extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[]): Promise<T> {
+  async applyAllExtrinsics<T>(extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[]) {
     return this.utility.batchAll<T>(extrinsics);
+  }
+
+  patchExtrinsic<R>(extrinsic: Extrinsic, options: PatchExtrinsicOptions<R> = {}): ExtrinsicResult<R> {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
+
+    (<any>extrinsic).apply = async () => {
+      const res = await self.applyExtrinsic(extrinsic, options.resultSections);
+      if (options.map) return options.map(res);
+      return res;
+    };
+    return extrinsic as ExtrinsicResult<R>;
   }
 }
 

@@ -1,36 +1,32 @@
-import { SubmittableExtrinsic } from "@polkadot/api-base/types";
-import { ISubmittableResult } from "@polkadot/types/types";
-
 import { Client } from "./client";
+
+export interface SetPowerOptions {
+  nodeId: number;
+  power: boolean;
+}
 
 class Nodes {
   constructor(public client: Client) {
     this.client = client;
   }
 
-  async setPowerExtrinsic(
-    nodeId: number,
-    power: boolean,
-  ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>> {
-    let powerTarget;
-    if (power) {
+  async setPower(options: SetPowerOptions) {
+    let powerTarget: { up?: boolean; down?: boolean };
+    if (options.power) {
       powerTarget = {
-        up: power,
+        up: options.power,
       };
     } else {
       powerTarget = {
-        down: !power,
+        down: !options.power,
       };
     }
-    return this.client.checkConnectionAndApply(this.client.api.tx.tfgridModule.changePowerTarget, [
-      nodeId,
+
+    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfgridModule.changePowerTarget, [
+      options.nodeId,
       powerTarget,
     ]);
-  }
-
-  async setPower(nodeId: number, power: boolean): Promise<void> {
-    const extrinsic = await this.setPowerExtrinsic(nodeId, power);
-    await this.client.applyExtrinsic(extrinsic);
+    return this.client.patchExtrinsic<void>(extrinsic);
   }
 }
 

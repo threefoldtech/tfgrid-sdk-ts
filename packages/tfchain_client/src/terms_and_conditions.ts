@@ -1,26 +1,21 @@
-import { SubmittableExtrinsic } from "@polkadot/api-base/types";
-import { ISubmittableResult } from "@polkadot/types/types";
-
 import { Client } from "./client";
+
+export interface AcceptOptions {
+  documentLink: string;
+  documentHash: string;
+}
 
 class TermsAndConditions {
   constructor(public client: Client) {
     this.client = client;
   }
 
-  async acceptExtrinsic(
-    documentLink: string,
-    documentHash: string,
-  ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>> {
-    return this.client.checkConnectionAndApply(this.client.api.tx.tfgridModule.userAcceptTc, [
-      documentLink,
-      documentHash,
+  async accept(options: AcceptOptions) {
+    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfgridModule.userAcceptTc, [
+      options.documentLink,
+      options.documentHash,
     ]);
-  }
-
-  async accept(documentLink: string, documentHash: string): Promise<void> {
-    const extrinsic = await this.acceptExtrinsic(documentLink, documentHash);
-    return this.client.applyExtrinsic<void>(extrinsic);
+    return this.client.patchExtrinsic<void>(extrinsic);
   }
 }
 

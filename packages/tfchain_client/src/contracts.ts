@@ -1,6 +1,3 @@
-import { SubmittableExtrinsic } from "@polkadot/api-base/types";
-import { ISubmittableResult } from "@polkadot/types/types";
-
 import { Client, QueryClient } from "./client";
 import { PublicIp } from "./types";
 
@@ -58,42 +55,65 @@ interface ServiceContract {
   state: ServiceState;
 }
 
+interface QueryContractsGetOptions {
+  id: number;
+}
+
+interface QueryContractsGetContractByActiveRentOptions {
+  nodeId: number;
+}
+
+interface QueryContractGetContractByNameOptions {
+  name: string;
+}
+
+interface QueryContractGetContractByIdAndHashOptions {
+  nodeId: number;
+  hash: string;
+}
+
+interface QueryContractGetServiceOptions {
+  serviceId: number;
+}
+
 class QueryContracts {
   constructor(public client: QueryClient) {
     this.client = client;
   }
 
-  async get(id: number): Promise<Contract> {
-    const res = await this.client.checkConnectionAndApply(this.client.api.query.smartContractModule.contracts, [id]);
+  async get(options: QueryContractsGetOptions): Promise<Contract> {
+    const res = await this.client.checkConnectionAndApply(this.client.api.query.smartContractModule.contracts, [
+      options.id,
+    ]);
     return res.toPrimitive();
   }
 
-  async getContractIdByActiveRentForNode(nodeId: number): Promise<number> {
+  async getContractIdByActiveRentForNode(options: QueryContractsGetContractByActiveRentOptions): Promise<number> {
     const res = await this.client.checkConnectionAndApply(
       this.client.api.query.smartContractModule.activeRentContractForNode,
-      [nodeId],
+      [options.nodeId],
     );
     return res.toPrimitive();
   }
 
-  async getContractIdByName(name: string): Promise<number> {
+  async getContractIdByName(options: QueryContractGetContractByNameOptions): Promise<number> {
     const res = await this.client.checkConnectionAndApply(
       this.client.api.query.smartContractModule.contractIDByNameRegistration,
-      [name],
+      [options.name],
     );
     return res.toPrimitive();
   }
 
-  async getContractIdByNodeIdAndHash(nodeId: number, hash: string): Promise<number> {
+  async getContractIdByNodeIdAndHash(options: QueryContractGetContractByIdAndHashOptions): Promise<number> {
     const res = await this.client.checkConnectionAndApply(
       this.client.api.query.smartContractModule.contractIDByNodeIDAndHash,
-      [nodeId, hash],
+      [options.nodeId, options.hash],
     );
     return res.toPrimitive();
   }
 
-  async getDeletionTime(id: number): Promise<number> {
-    const contract = await this.get(id);
+  async getDeletionTime(options: QueryContractsGetOptions): Promise<number> {
+    const contract = await this.get(options);
     if (!contract || contract.state.created === null) return 0;
 
     const blockNumber = contract.state.gracePeriod;
@@ -106,16 +126,74 @@ class QueryContracts {
 
       return gracePeriodStartTime + TWO_WEEKS;
     } catch (err) {
-      throw Error(`Error getting current block number for contract ${id} deletion: ${err}`);
+      throw Error(`Error getting current block number for contract ${options.id} deletion: ${err}`);
     }
   }
 
-  async getService(serviceId: number): Promise<ServiceContract> {
+  async getService(options: QueryContractGetServiceOptions): Promise<ServiceContract> {
     const res = await this.client.checkConnectionAndApply(this.client.api.query.smartContractModule.serviceContracts, [
-      serviceId,
+      options.serviceId,
     ]);
     return res.toPrimitive();
   }
+}
+
+export interface CreateNodeOptions {
+  nodeID: number;
+  hash: string;
+  data: string;
+  numberOfPublicIPs: number;
+  solutionProviderId: number;
+}
+
+export interface UpdateNodeOptions {
+  id: number;
+  hash: string;
+  data: string;
+}
+
+export interface CreateRentOptions {
+  nodeId: number;
+  solutionProviderId?: number;
+}
+
+export interface CreateServiceOptions {
+  serviceAccount: string;
+  consumerAccount: string;
+}
+
+export interface ApproveServiceOptions {
+  serviceId: number;
+  approve: boolean;
+}
+
+export interface BillServiceOptions {
+  serviceId: number;
+  variableAmount: number;
+  metadata: string;
+}
+
+export interface SetServiceFeesOptions {
+  serviceId: number;
+  baseFee: number;
+  variableFee: number;
+}
+
+export interface SetServiceMetadataOptions {
+  serviceId: number;
+  metadata: string;
+}
+
+export interface CreateNameOptions {
+  name: string;
+}
+
+export interface CancelOptions {
+  id: number;
+}
+
+export interface CancelServiceOptions {
+  serviceId: number;
 }
 
 class Contracts extends QueryContracts {
@@ -123,180 +201,105 @@ class Contracts extends QueryContracts {
     super(client);
     this.client = client;
   }
-  async createNodeExtrinsic(
-    nodeID: number,
-    hash: string,
-    data: string,
-    numberOfPublicIPs: number,
-    solutionProviderId: number,
-  ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>> {
-    return this.client.checkConnectionAndApply(this.client.api.tx.smartContractModule.createNodeContract, [
-      nodeID,
-      hash,
-      data,
-      numberOfPublicIPs,
-      solutionProviderId,
-    ]);
+
+  async createNode(options: CreateNodeOptions) {
+    const extrinsic = await this.client.checkConnectionAndApply(
+      this.client.api.tx.smartContractModule.createNodeContract,
+      [options.nodeID, options.hash, options.data, options.numberOfPublicIPs, options.solutionProviderId],
+    );
+    return this.client.patchExtrinsic<Contract>(extrinsic);
   }
 
-  async createNode(
-    nodeID: number,
-    hash: string,
-    data: string,
-    numberOfPublicIPs: number,
-    solutionProviderId: number,
-  ): Promise<Contract> {
-    const extrinsic = await this.createNodeExtrinsic(nodeID, hash, data, numberOfPublicIPs, solutionProviderId);
-    return this.client.applyExtrinsic<Contract>(extrinsic);
+  async updateNode(options: UpdateNodeOptions) {
+    const extrinsic = await this.client.checkConnectionAndApply(
+      this.client.api.tx.smartContractModule.updateNodeContract,
+      [options.id, options.hash, options.data],
+    );
+    return this.client.patchExtrinsic<Contract>(extrinsic);
   }
 
-  async updateNodeExtrinsic(
-    id: number,
-    hash: string,
-    data: string,
-  ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>> {
-    return this.client.checkConnectionAndApply(this.client.api.tx.smartContractModule.updateNodeContract, [
-      id,
-      hash,
-      data,
-    ]);
+  async createName(options: CreateNameOptions) {
+    const extrinsic = await this.client.checkConnectionAndApply(
+      this.client.api.tx.smartContractModule.createNameContract,
+      [options.name],
+    );
+    return this.client.patchExtrinsic<Contract>(extrinsic);
   }
 
-  async updateNode(id: number, hash: string, data: string): Promise<Contract> {
-    const extrinsic = await this.updateNodeExtrinsic(id, hash, data);
-    return this.client.applyExtrinsic<Contract>(extrinsic);
+  async createRent(options: CreateRentOptions) {
+    const extrinsic = await this.client.checkConnectionAndApply(
+      this.client.api.tx.smartContractModule.createRentContract,
+      [options.nodeId, options.solutionProviderId],
+    );
+    return this.client.patchExtrinsic<Contract>(extrinsic);
   }
 
-  async createNameExtrinsic(name: string): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>> {
-    return this.client.checkConnectionAndApply(this.client.api.tx.smartContractModule.createNameContract, [name]);
-  }
-
-  async createName(name: string): Promise<Contract> {
-    const extrinsic = await this.createNameExtrinsic(name);
-    return this.client.applyExtrinsic<Contract>(extrinsic);
-  }
-
-  async createRentExtrinsic(
-    nodeId: number,
-    solutionProviderId?: number,
-  ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>> {
-    return this.client.checkConnectionAndApply(this.client.api.tx.smartContractModule.createRentContract, [
-      nodeId,
-      solutionProviderId,
-    ]);
-  }
-
-  async createRent(nodeId: number, solutionProviderId?: number): Promise<Contract> {
-    const extrinsic = await this.createRentExtrinsic(nodeId, solutionProviderId);
-    return this.client.applyExtrinsic<Contract>(extrinsic);
-  }
-
-  async cancelExtrinsic(id: number): Promise<SubmittableExtrinsic<"promise", ISubmittableResult> | undefined> {
-    const contract = await this.get(id);
+  async cancel(options: CancelOptions) {
+    const contract = await this.get(options);
     if (!contract) {
       return;
     }
-    return this.client.checkConnectionAndApply(this.client.api.tx.smartContractModule.cancelContract, [id]);
-  }
-
-  async cancel(id: number): Promise<number> {
-    const extrinsic = await this.cancelExtrinsic(id);
-    if (extrinsic) return this.client.applyExtrinsic<number>(extrinsic);
-    return id;
-  }
-
-  async createServiceExtrinsic(
-    serviceAccount: string,
-    consumerAccount: string,
-  ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>> {
-    return this.client.checkConnectionAndApply(this.client.api.tx.smartContractModule.serviceContractCreate, [
-      serviceAccount,
-      consumerAccount,
+    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.smartContractModule.cancelContract, [
+      options.id,
     ]);
+    return this.client.patchExtrinsic(extrinsic, { map: () => options.id });
   }
 
-  async createService(serviceAccount: string, consumerAccount: string): Promise<ServiceContract> {
-    const extrinsic = await this.createServiceExtrinsic(serviceAccount, consumerAccount);
-    return this.client.applyExtrinsic<ServiceContract>(extrinsic);
+  async createService(options: CreateServiceOptions) {
+    const extrinsic = await this.client.checkConnectionAndApply(
+      this.client.api.tx.smartContractModule.serviceContractCreate,
+      [options.serviceAccount, options.consumerAccount],
+    );
+    return this.client.patchExtrinsic<ServiceContract>(extrinsic);
   }
-  async approveServiceExtrinsic(
-    serviceId: number,
-    approve: boolean,
-  ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>> {
-    if (approve) {
-      return this.client.checkConnectionAndApply(this.client.api.tx.smartContractModule.serviceContractApprove, [
-        serviceId,
-      ]);
+
+  async approveService(options: ApproveServiceOptions) {
+    let extrinsic: any;
+    if (options.approve) {
+      extrinsic = await this.client.checkConnectionAndApply(
+        this.client.api.tx.smartContractModule.serviceContractApprove,
+        [options.serviceId],
+      );
     } else {
-      return this.client.checkConnectionAndApply(this.client.api.tx.smartContractModule.serviceContractReject, [
-        serviceId,
-      ]);
+      extrinsic = await this.client.checkConnectionAndApply(
+        this.client.api.tx.smartContractModule.serviceContractReject,
+        [options.serviceId],
+      );
     }
+    return this.client.patchExtrinsic<ServiceContract>(extrinsic);
   }
 
-  async approveService(serviceId: number, approve: boolean): Promise<ServiceContract> {
-    const extrinsic = await this.approveServiceExtrinsic(serviceId, approve);
-    return this.client.applyExtrinsic<ServiceContract>(extrinsic);
+  async billService(options: BillServiceOptions) {
+    const extrinsic = await this.client.checkConnectionAndApply(
+      this.client.api.tx.smartContractModule.serviceContractBill,
+      [options.serviceId, options.variableAmount, options.metadata],
+    );
+    return this.client.patchExtrinsic<ServiceContract>(extrinsic);
   }
 
-  async billServiceExtrinsic(
-    serviceId: number,
-    variableAmount: number,
-    metadata: string,
-  ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>> {
-    return this.client.checkConnectionAndApply(this.client.api.tx.smartContractModule.serviceContractBill, [
-      serviceId,
-      variableAmount,
-      metadata,
-    ]);
+  async cancelService(options: CancelServiceOptions) {
+    const extrinsic = await this.client.checkConnectionAndApply(
+      this.client.api.tx.smartContractModule.serviceContractCancel,
+      [options.serviceId],
+    );
+    return this.client.patchExtrinsic(extrinsic, { map: () => options.serviceId });
   }
 
-  async billService(serviceId: number, variableAmount: number, metadata: string): Promise<ServiceContract> {
-    const extrinsic = await this.billServiceExtrinsic(serviceId, variableAmount, metadata);
-    return this.client.applyExtrinsic<ServiceContract>(extrinsic);
+  async setServiceFees(options: SetServiceFeesOptions) {
+    const extrinsic = await this.client.checkConnectionAndApply(
+      this.client.api.tx.smartContractModule.serviceContractSetFees,
+      [options.serviceId, options.baseFee, options.variableFee],
+    );
+    return this.client.patchExtrinsic<ServiceContract>(extrinsic);
   }
 
-  async cancelServiceExtrinsic(serviceId: number): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>> {
-    return this.client.checkConnectionAndApply(this.client.api.tx.smartContractModule.serviceContractCancel, [
-      serviceId,
-    ]);
-  }
+  async setServiceMetadata(options: SetServiceMetadataOptions) {
+    const extrinsic = await this.client.checkConnectionAndApply(
+      this.client.api.tx.smartContractModule.serviceContractSetMetadata,
+      [options.serviceId, options.metadata],
+    );
 
-  async cancelService(serviceId: number): Promise<number> {
-    const extrinsic = await this.cancelServiceExtrinsic(serviceId);
-    return this.client.applyExtrinsic<number>(extrinsic);
-  }
-
-  async setServiceFeesExtrinsic(
-    serviceId: number,
-    baseFee: number,
-    variableFee: number,
-  ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>> {
-    return this.client.checkConnectionAndApply(this.client.api.tx.smartContractModule.serviceContractSetFees, [
-      serviceId,
-      baseFee,
-      variableFee,
-    ]);
-  }
-
-  async setServiceFees(serviceId: number, baseFee: number, variableFee: number): Promise<ServiceContract> {
-    const extrinsic = await this.setServiceFeesExtrinsic(serviceId, baseFee, variableFee);
-    return this.client.applyExtrinsic<ServiceContract>(extrinsic);
-  }
-
-  async setServiceMetadataExtrinsic(
-    serviceId: number,
-    metadata: string,
-  ): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>> {
-    return this.client.checkConnectionAndApply(this.client.api.tx.smartContractModule.serviceContractSetMetadata, [
-      serviceId,
-      metadata,
-    ]);
-  }
-
-  async setServiceMetadata(serviceId: number, metadata: string): Promise<ServiceContract> {
-    const extrinsic = await this.setServiceMetadataExtrinsic(serviceId, metadata);
-    return this.client.applyExtrinsic<ServiceContract>(extrinsic);
+    return this.client.patchExtrinsic<ServiceContract>(extrinsic);
   }
 }
 

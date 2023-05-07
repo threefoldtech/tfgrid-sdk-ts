@@ -1,6 +1,3 @@
-import { SubmittableExtrinsic } from "@polkadot/api-base/types";
-import { ISubmittableResult } from "@polkadot/types/types";
-
 import { Client, QueryClient } from "./client";
 
 interface Twin {
@@ -11,25 +8,38 @@ interface Twin {
   pk: string;
 }
 
+interface QueryTwinsGetOptions {
+  id: number;
+}
+
+interface QueryTwinsGetTwinByAccountIdOptions {
+  accountId: string;
+}
+
 class QueryTwins {
   constructor(public client: QueryClient) {
     this.client = client;
   }
 
-  async get(id: number): Promise<Twin> {
-    if (isNaN(id) || id <= 0) {
+  async get(options: QueryTwinsGetOptions): Promise<Twin> {
+    if (isNaN(options.id) || options.id <= 0) {
       throw Error("Invalid twin id. Twin id must be postive integer");
     }
-    const res = await this.client.checkConnectionAndApply(this.client.api.query.tfgridModule.twins, [id]);
+    const res = await this.client.checkConnectionAndApply(this.client.api.query.tfgridModule.twins, [options.id]);
     return res.toPrimitive();
   }
 
-  async getTwinIdByAccountId(accountId: string): Promise<number> {
+  async getTwinIdByAccountId(options: QueryTwinsGetTwinByAccountIdOptions): Promise<number> {
     const res = await this.client.checkConnectionAndApply(this.client.api.query.tfgridModule.twinIdByAccountID, [
-      accountId,
+      options.accountId,
     ]);
     return res.toPrimitive();
   }
+}
+
+export interface TwinOptions {
+  relay: string;
+  pk: string;
 }
 
 class Twins extends QueryTwins {
@@ -38,26 +48,24 @@ class Twins extends QueryTwins {
     this.client = client;
   }
 
-  async createExtrinsic(relay: string, pk: string): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>> {
-    return this.client.checkConnectionAndApply(this.client.api.tx.tfgridModule.createTwin, [relay, pk]);
+  async create(options: TwinOptions) {
+    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfgridModule.createTwin, [
+      options.relay,
+      options.pk,
+    ]);
+    return this.client.patchExtrinsic<void>(extrinsic);
   }
 
-  async create(relay: string, pk: string): Promise<void> {
-    const extrinsic = await this.createExtrinsic(relay, pk);
-    return this.client.applyExtrinsic<void>(extrinsic);
-  }
-
-  async updateExtrinsic(relay: string, pk: string): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>> {
-    return this.client.checkConnectionAndApply(this.client.api.tx.tfgridModule.updateTwin, [relay, pk]);
-  }
-
-  async update(relay: string, pk: string): Promise<Twin> {
-    const extrinsic = await this.updateExtrinsic(relay, pk);
-    return this.client.applyExtrinsic<Twin>(extrinsic);
+  async updateExtrinsic(options: TwinOptions) {
+    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfgridModule.updateTwin, [
+      options.relay,
+      options.pk,
+    ]);
+    return this.client.patchExtrinsic<Twin>(extrinsic);
   }
 
   async getMyTwinId(): Promise<number> {
-    return this.getTwinIdByAccountId(this.client.address);
+    return this.getTwinIdByAccountId({ accountId: this.client.address });
   }
 }
 

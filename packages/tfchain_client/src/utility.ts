@@ -17,6 +17,7 @@ class Utility {
       return this.client.applyExtrinsic<T>(batchExtrinsic, resultSections);
     }
   }
+
   async batchAll<T>(extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[]): Promise<T> {
     if (extrinsics.length > 0) {
       const resultSections = this.extractResultSections(extrinsics);
