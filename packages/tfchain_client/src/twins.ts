@@ -1,6 +1,3 @@
-import { SubmittableExtrinsic } from "@polkadot/api-base/types";
-import { ISubmittableResult } from "@polkadot/types/types";
-
 import { Client, QueryClient } from "./client";
 
 interface Twin {
@@ -32,28 +29,31 @@ class QueryTwins {
   }
 }
 
+export interface TwinOptions {
+  relay: string;
+  pk: string;
+}
+
 class Twins extends QueryTwins {
   constructor(public client: Client) {
     super(client);
     this.client = client;
   }
 
-  async createExtrinsic(relay: string, pk: string): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>> {
-    return this.client.checkConnectionAndApply(this.client.api.tx.tfgridModule.createTwin, [relay, pk]);
+  async create(options: TwinOptions) {
+    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfgridModule.createTwin, [
+      options.relay,
+      options.pk,
+    ]);
+    return this.client.patchExtrinsic<void>(extrinsic);
   }
 
-  async create(relay: string, pk: string): Promise<void> {
-    const extrinsic = await this.createExtrinsic(relay, pk);
-    return this.client.applyExtrinsic<void>(extrinsic);
-  }
-
-  async updateExtrinsic(relay: string, pk: string): Promise<SubmittableExtrinsic<"promise", ISubmittableResult>> {
-    return this.client.checkConnectionAndApply(this.client.api.tx.tfgridModule.updateTwin, [relay, pk]);
-  }
-
-  async update(relay: string, pk: string): Promise<Twin> {
-    const extrinsic = await this.updateExtrinsic(relay, pk);
-    return this.client.applyExtrinsic<Twin>(extrinsic);
+  async updateExtrinsic(options: TwinOptions) {
+    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfgridModule.updateTwin, [
+      options.relay,
+      options.pk,
+    ]);
+    return this.client.patchExtrinsic<Twin>(extrinsic);
   }
 
   async getMyTwinId(): Promise<number> {
