@@ -211,9 +211,7 @@ class Client extends QueryClient {
       }
     });
     return promise
-      .then((res: T) => {
-        return res;
-      })
+      .then((res: any) => res as T)
       .catch(e => {
         throw Error(
           `Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error: ${
@@ -237,7 +235,7 @@ class Client extends QueryClient {
     }
     return result;
   }
-  async applyAllExtrinsics<T>(extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[]): Promise<T> {
+  async applyAllExtrinsics<T>(extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[]) {
     return this.utility.batchAll<T>(extrinsics);
   }
 
