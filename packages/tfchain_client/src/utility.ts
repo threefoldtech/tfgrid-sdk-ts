@@ -24,7 +24,7 @@ class Utility {
       const batchAllExtrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.utility.batchAll, [
         extrinsics,
       ]);
-      return this.client.applyExtrinsic<T>(batchAllExtrinsic, resultSections) as T;
+      return this.client.applyExtrinsic<T>(batchAllExtrinsic, resultSections);
     }
   }
 
