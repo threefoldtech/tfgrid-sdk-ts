@@ -28,6 +28,15 @@ interface ExtSigner {
   signer: Signer;
 }
 
+enum ExtrinsicState {
+  ExtrinsicSuccess = "ExtrinsicSuccess",
+  ExtrinsicFailed = "ExtrinsicFailed",
+}
+
+const BATCH_METHODS = ["batch", "batchAll"];
+const SYSTEM = "system";
+const UTILITY = "utility";
+
 class QueryClient {
   static connections: Map<string, ApiPromise> = new Map();
   private connectingLock = new AwaitLock();
@@ -176,21 +185,19 @@ class Client extends QueryClient {
         }
         const { events = [], status } = res;
         const resultData: T[] = [];
-        if (!(extrinsic.method.section === "utility" && ["batch", "batchAll"].includes(extrinsic.method.method))) {
+        if (!(extrinsic.method.section === UTILITY && BATCH_METHODS.includes(extrinsic.method.method))) {
           resultSections.push(extrinsic.method.section);
         }
         if (status.isInBlock) {
           events.forEach(({ phase, event: { data, method, section } }) => {
             console.log(`phase: ${phase}, section: ${section}, method: ${method}, data: ${data}`);
-            if (section === "system" && method === "ExtrinsicFailed") {
+            if (section === SYSTEM && method === ExtrinsicState.ExtrinsicFailed) {
               const errorIndex = parseInt(data.toJSON()[0].module.error.replace(/0+$/g, ""));
               reject(errorIndex);
             } else if (resultSections.includes(section)) {
               resultData.push(data.toPrimitive()[0]);
-            } else if (section === "system" && method === "ExtrinsicSuccess") {
-              if (
-                !(extrinsic.method.section === "utility" && ["batch", "batchAll"].includes(extrinsic.method.method))
-              ) {
+            } else if (section === SYSTEM && method === ExtrinsicState.ExtrinsicSuccess) {
+              if (!(extrinsic.method.section === UTILITY && BATCH_METHODS.includes(extrinsic.method.method))) {
                 if (resultData.length > 0) resolve(resultData[0]);
                 else resolve(undefined);
               } else resolve(resultData);
