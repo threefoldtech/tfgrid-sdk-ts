@@ -1,25 +1,37 @@
 import { Client } from "./client";
 import type { Extrinsic } from "./types";
 
+interface KVStoreSetOptions {
+  key: string;
+  value: string;
+}
+
+interface KVStoreGetOptions {
+  key: string;
+}
+
 class KVStore {
   constructor(public client: Client) {
     this.client = client;
   }
 
-  async set(key: string, value: string) {
-    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfkvStore.set, [key, value]);
+  async set(options: KVStoreSetOptions) {
+    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfkvStore.set, [
+      options.key,
+      options.value,
+    ]);
     return this.client.patchExtrinsic<void>(extrinsic);
   }
 
-  async delete(key: string) {
-    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfkvStore.delete, [key]);
+  async delete(options: KVStoreGetOptions) {
+    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfkvStore.delete, [options.key]);
     return this.client.patchExtrinsic<void>(extrinsic);
   }
 
-  async get(key: string): Promise<string> {
+  async get(options: KVStoreGetOptions): Promise<string> {
     const res = await this.client.checkConnectionAndApply(this.client.api.query.tfkvStore.tfkvStore, [
       this.client.address,
-      key,
+      options.key,
     ]);
     return res.toPrimitive();
   }
@@ -38,8 +50,8 @@ class KVStore {
   async deleteAll(): Promise<number[]> {
     const keys = await this.list();
     const extrinsics: Extrinsic[] = [];
-    for (const k of keys) {
-      extrinsics.push(await this.delete(k));
+    for (const key of keys) {
+      extrinsics.push(await this.delete({ key }));
     }
     return this.client.applyAllExtrinsics<number[]>(extrinsics);
   }

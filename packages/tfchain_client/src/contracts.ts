@@ -161,6 +161,18 @@ export interface SetServiceMetadataOptions {
   metadata: string;
 }
 
+interface CreateNameOptions {
+  name: string;
+}
+
+interface CancelOptions {
+  id: number;
+}
+
+interface CancelServiceOptions {
+  serviceId: number;
+}
+
 class Contracts extends QueryContracts {
   constructor(public client: Client) {
     super(client);
@@ -183,10 +195,10 @@ class Contracts extends QueryContracts {
     return this.client.patchExtrinsic<Contract>(extrinsic);
   }
 
-  async createName(name: string) {
+  async createName(options: CreateNameOptions) {
     const extrinsic = await this.client.checkConnectionAndApply(
       this.client.api.tx.smartContractModule.createNameContract,
-      [name],
+      [options.name],
     );
     return this.client.patchExtrinsic<Contract>(extrinsic);
   }
@@ -199,15 +211,15 @@ class Contracts extends QueryContracts {
     return this.client.patchExtrinsic<Contract>(extrinsic);
   }
 
-  async cancel(id: number) {
-    const contract = await this.get(id);
+  async cancel(options: CancelOptions) {
+    const contract = await this.get(options.id);
     if (!contract) {
       return;
     }
     const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.smartContractModule.cancelContract, [
-      id,
+      options.id,
     ]);
-    return this.client.patchExtrinsic(extrinsic, { map: () => id });
+    return this.client.patchExtrinsic(extrinsic, { map: () => options.id });
   }
 
   async createService(options: CreateServiceOptions) {
@@ -242,12 +254,12 @@ class Contracts extends QueryContracts {
     return this.client.patchExtrinsic<ServiceContract>(extrinsic);
   }
 
-  async cancelService(serviceId: number) {
+  async cancelService(options: CancelServiceOptions) {
     const extrinsic = await this.client.checkConnectionAndApply(
       this.client.api.tx.smartContractModule.serviceContractCancel,
-      [serviceId],
+      [options.serviceId],
     );
-    return this.client.patchExtrinsic(extrinsic, { map: () => serviceId });
+    return this.client.patchExtrinsic(extrinsic, { map: () => options.serviceId });
   }
 
   async setServiceFees(options: SetServiceFeesOptions) {
