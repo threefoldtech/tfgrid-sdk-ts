@@ -17,13 +17,13 @@ class TFTwins extends Twins {
   async create(options: TwinOptions) {
     const pk = this.getPublicKey(this.client.mnemonicOrSecret);
 
-    return this.client.twins.create({ pk, relay: options.relay });
+    return super.create({ pk, relay: options.relay });
   }
 
   async update(options: TwinOptions) {
     const pk = this.getPublicKey(this.client.mnemonicOrSecret);
 
-    return this.client.twins.update({ pk, relay: options.relay });
+    return super.update({ pk, relay: options.relay });
   }
 }
 

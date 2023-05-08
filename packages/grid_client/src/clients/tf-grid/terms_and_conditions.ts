@@ -10,7 +10,7 @@ class TFTermsAndConditions extends TermsAndConditions {
   async accept(options: AcceptOptions) {
     const document = await axios.get(options.documentLink);
     const documentHash = md5(document.data).toString();
-    return await this.client.termsAndConditions.accept({ documentHash, documentLink: options.documentLink });
+    return await super.accept({ documentHash, documentLink: options.documentLink });
   }
 }
 
