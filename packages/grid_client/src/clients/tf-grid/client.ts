@@ -1,14 +1,16 @@
-import { Client } from "@threefold/tfchain_client";
+import { Client, Twins } from "@threefold/tfchain_client";
 
 import { KeypairType } from "../../zos/deployment";
 import { TFBalances } from "./balances";
 import { TFContracts } from "./contracts";
 import { TFTPrice } from "./tftPrice";
+import { TFTwins } from "./twins";
 
 class TFClient extends Client {
   balances: TFBalances = new TFBalances(this);
   contracts: TFContracts = new TFContracts(this);
   tftPrice: TFTPrice = new TFTPrice(this);
+  twins: TFTwins = new TFTwins(this);
 
   constructor(
     public url: string,
