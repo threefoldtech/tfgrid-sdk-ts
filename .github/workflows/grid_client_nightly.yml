@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 jobs:
   deployment-scripts:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -22,22 +22,22 @@ jobs:
       SSH_KEY: ${{ secrets.SSH_KEY }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         if: ${{ env.NETWORK == 'dev' }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         if: ${{ env.NETWORK == 'qa' }}
         with:
           ref: refs/tags/v0.0.1
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         if: ${{ env.NETWORK == 'test' }}
         with:
           ref: refs/tags/v0.0.1
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         if: ${{ env.NETWORK == 'main' }}
         with:
           ref: refs/tags/v0.0.1
       - name: Set up node 16
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 16
           cache: "yarn"
