@@ -1,15 +1,14 @@
 import * as secp from "@noble/secp256k1";
+import { Twins } from "@threefold/tfchain_client";
 import * as bip39 from "bip39";
 
 import { TFClient } from "./client";
 
-class Twins {
-  tfclient: TFClient;
+interface TwinOptions {
+  relay: string;
+}
 
-  constructor(client: TFClient) {
-    this.tfclient = client;
-  }
-
+class TFTwins extends Twins {
   getPublicKey(mnemonic: string) {
     const seed = bip39.mnemonicToSeedSync(mnemonic);
     const privKey = new Uint8Array(seed).slice(0, 32);
@@ -17,39 +16,17 @@ class Twins {
     return pk;
   }
 
-  async create(relay: string) {
-    const pk = this.getPublicKey(this.tfclient.mnemonic);
+  async create(options: TwinOptions) {
+    const pk = this.getPublicKey(this.client.mnemonicOrSecret);
 
-    return this.tfclient.applyExtrinsic(this.tfclient.client.createTwin, [relay, pk], "tfgridModule", ["TwinStored"]);
+    return this.client.twins.create({ pk, relay: options.relay });
   }
 
-  async update(relay: string) {
-    const pk = this.getPublicKey(this.tfclient.mnemonic);
+  async update(options: TwinOptions) {
+    const pk = this.getPublicKey(this.client.mnemonicOrSecret);
 
-    return this.tfclient.applyExtrinsic(this.tfclient.client.updateTwin, [relay, pk], "tfgridModule", ["TwinUpdated"]);
-  }
-
-  async get(id: number) {
-    return await this.tfclient.queryChain(this.tfclient.client.getTwinByID, [id]);
-  }
-
-  async getMyTwinId(): Promise<number> {
-    await this.tfclient.connect();
-    const pubKey = this.tfclient.client.address;
-    return this.getTwinIdByAccountId(pubKey);
-  }
-
-  async getTwinIdByAccountId(publicKey: string): Promise<number> {
-    return await this.tfclient.queryChain(this.tfclient.client.getTwinIdByAccountId, [publicKey]);
-  }
-
-  async list() {
-    return await this.tfclient.queryChain(this.tfclient.client.listTwins, []);
-  }
-
-  async delete(id: number) {
-    return this.tfclient.applyExtrinsic(this.tfclient.client.deleteTwin, [id], "tfgridModule", ["TwinDeleted"]);
+    return this.client.twins.update({ pk, relay: options.relay });
   }
 }
 
-export { Twins };
+export { TFTwins };

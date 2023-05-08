@@ -56,7 +56,7 @@ class Twins extends QueryTwins {
     return this.client.patchExtrinsic<void>(extrinsic);
   }
 
-  async updateExtrinsic(options: TwinOptions) {
+  async update(options: TwinOptions) {
     const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfgridModule.updateTwin, [
       options.relay,
       options.pk,
