@@ -43,7 +43,7 @@ class VMHL extends HighLevelBase {
     accessNodeId = 0,
     ip = "",
     corex = false,
-    solutionProviderID: number,
+    solutionProviderId: number,
     zlogsOutput?: string,
   ): Promise<[TwinDeployment[], string]> {
     const deployments: TwinDeployment[] = [];
@@ -200,7 +200,7 @@ class VMHL extends HighLevelBase {
       }
       if (znet_workload) {
         const deployment = deploymentFactory.create([znet_workload], 0, networkMetadata, description, 0);
-        deployments.push(new TwinDeployment(deployment, Operations.deploy, 0, nodeId, network, solutionProviderID));
+        deployments.push(new TwinDeployment(deployment, Operations.deploy, 0, nodeId, network, solutionProviderId));
       }
     } else if (znet_workload) {
       // node not exist on the network
@@ -210,14 +210,14 @@ class VMHL extends HighLevelBase {
         znet_workload["data"] = network.updateNetwork(znet_workload.data);
       }
       const deployment = deploymentFactory.create([znet_workload], 0, networkMetadata, description, 0);
-      deployments.push(new TwinDeployment(deployment, Operations.deploy, 0, nodeId, network, solutionProviderID));
+      deployments.push(new TwinDeployment(deployment, Operations.deploy, 0, nodeId, network, solutionProviderId));
     }
     if (access_net_workload) {
       // network is not exist, and the node provide is not an access node
       const accessNodeId = access_net_workload.data["node_id"];
       access_net_workload["data"] = network.updateNetwork(access_net_workload.data);
       const deployment = deploymentFactory.create([access_net_workload], 0, networkMetadata, description, 0);
-      deployments.push(new TwinDeployment(deployment, Operations.deploy, 0, accessNodeId, network, solutionProviderID));
+      deployments.push(new TwinDeployment(deployment, Operations.deploy, 0, accessNodeId, network, solutionProviderId));
     }
 
     // vm
@@ -259,7 +259,7 @@ class VMHL extends HighLevelBase {
     // NOTE: expiration is not used for zos deployment
     const deployment = deploymentFactory.create(workloads, 0, metadata, description, 0);
 
-    deployments.push(new TwinDeployment(deployment, Operations.deploy, publicIps, nodeId, network, solutionProviderID));
+    deployments.push(new TwinDeployment(deployment, Operations.deploy, publicIps, nodeId, network, solutionProviderId));
     return [deployments, wgConfig];
   }
 

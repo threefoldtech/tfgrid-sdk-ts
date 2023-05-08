@@ -10,15 +10,17 @@ export interface KVStoreBatchRemoveOptions {
   keys: string[];
 }
 class TFKVStore extends KVStore {
-  client: TFClient;
+  constructor(public client: TFClient) {
+    super(client);
+  }
 
   async set(options: KVStoreSetOptions) {
     const encryptedValue = this.encrypt(options.value);
-    return this.client.kvstore.set({ key: options.key, value: encryptedValue });
+    return this.client.kvStore.set({ key: options.key, value: encryptedValue });
   }
 
   async get(options: KVStoreGetOptions) {
-    const encryptedValue = await this.client.kvstore.get(options);
+    const encryptedValue = await this.client.kvStore.get(options);
     if (encryptedValue) {
       try {
         return this.decrypt(encryptedValue);

@@ -139,10 +139,10 @@ class QueryContracts {
 }
 
 export interface CreateNodeOptions {
-  nodeID: number;
+  nodeId: number;
   hash: string;
   data: string;
-  numberOfPublicIPs: number;
+  numberOfPublicIps: number;
   solutionProviderId: number;
 }
 
@@ -205,7 +205,7 @@ class Contracts extends QueryContracts {
   async createNode(options: CreateNodeOptions) {
     const extrinsic = await this.client.checkConnectionAndApply(
       this.client.api.tx.smartContractModule.createNodeContract,
-      [options.nodeID, options.hash, options.data, options.numberOfPublicIPs, options.solutionProviderId],
+      [options.nodeId, options.hash, options.data, options.numberOfPublicIps, options.solutionProviderId],
     );
     return this.client.patchExtrinsic<Contract>(extrinsic);
   }

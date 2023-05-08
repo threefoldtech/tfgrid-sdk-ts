@@ -5,7 +5,7 @@ import { crop } from "./utils";
 
 const SPLIT_SIZE = 1490;
 
-class TFKVStore implements BackendStorageInterface {
+class TFKVStoreBackend implements BackendStorageInterface {
   client: TFClient;
   constructor(url: string, mnemonic: string, storeSecret: string | Uint8Array, keypairType: KeypairType) {
     this.client = new TFClient(url, mnemonic, storeSecret, keypairType);
@@ -18,13 +18,13 @@ class TFKVStore implements BackendStorageInterface {
     }
     const splits = this.split(key, value);
     for (const k of Object.keys(splits)) {
-      await this.client.kvStore.set(k, splits[k]);
+      await this.client.kvStore.set({ key: k, value: splits[k] });
     }
   }
 
   @crop
   async get(key: string) {
-    let value = await this.client.kvStore.get(key);
+    let value = await this.client.kvStore.get({ key });
     if (!value) {
       return '""';
     }
@@ -33,7 +33,7 @@ class TFKVStore implements BackendStorageInterface {
     while (val) {
       i++;
       key = `${key}.${i}`;
-      val = await this.client.kvStore.get(key);
+      val = await this.client.kvStore.get({ key });
       value = `${value}${val}`;
     }
     return value;
@@ -41,11 +41,11 @@ class TFKVStore implements BackendStorageInterface {
 
   @crop
   async remove(key: string) {
-    const value = await this.client.kvStore.get(key);
+    const value = await this.client.kvStore.get({ key });
     if (!value) {
       return;
     }
-    return await this.client.kvStore.remove(key);
+    return (await this.client.kvStore.delete({ key })).apply();
   }
 
   @crop
@@ -80,4 +80,4 @@ class TFKVStore implements BackendStorageInterface {
   }
 }
 
-export { TFKVStore };
+export { TFKVStoreBackend };

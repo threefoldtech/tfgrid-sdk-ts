@@ -46,7 +46,7 @@ class QSFSZdbsModule extends BaseModule {
         true,
         options.metadata || metadata,
         options.description,
-        options.solutionProviderID,
+        options.solutionProviderId,
       );
       twinDeployments.push(twinDeployment);
     }

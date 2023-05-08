@@ -53,7 +53,7 @@ class Twins extends QueryTwins {
       options.relay,
       options.pk,
     ]);
-    return this.client.patchExtrinsic<void>(extrinsic);
+    return this.client.patchExtrinsic<Twin>(extrinsic);
   }
 
   async update(options: TwinOptions) {

@@ -14,12 +14,12 @@ class KVStore {
   @validateInput
   @checkBalance
   async set(options: KVStoreSetModel) {
-    return await this.client.kvStore.set(options.key, options.value);
+    return (await this.client.kvStore.set(options)).apply();
   }
   @expose
   @validateInput
   async get(options: KVStoreGetModel) {
-    return await this.client.kvStore.get(options.key);
+    return await this.client.kvStore.get(options);
   }
 
   @expose
@@ -32,21 +32,21 @@ class KVStore {
   @validateInput
   @checkBalance
   async remove(options: KVStoreRemoveModel) {
-    return await this.client.kvStore.remove(options.key);
+    return (await this.client.kvStore.delete(options)).apply();
   }
 
   @expose
   @validateInput
   @checkBalance
   async removeAll(): Promise<string[]> {
-    return await this.client.kvStore.removeAll();
+    return this.client.kvStore.deleteAll();
   }
 
   @expose
   @validateInput
   @checkBalance
   async batchRemove(options: KVStoreBatchRemoveModel): Promise<string[]> {
-    return await this.client.kvStore.batchRemove(options.keys);
+    return await this.client.kvStore.batchRemove(options);
   }
 }
 

@@ -46,7 +46,7 @@ class GWModule extends BaseModule {
       options.metadata || metadata,
       options.description,
       options.fqdn,
-      options.solutionProviderID,
+      options.solutionProviderId,
     );
     const contracts = await this.twinDeploymentHandler.handle(twinDeployments);
     await this.save(options.name, contracts);
@@ -74,7 +74,7 @@ class GWModule extends BaseModule {
       options.metadata || metadata,
       options.description,
       "",
-      options.solutionProviderID,
+      options.solutionProviderId,
     );
     const contracts = await this.twinDeploymentHandler.handle(twinDeployments);
     await this.save(options.name, contracts);

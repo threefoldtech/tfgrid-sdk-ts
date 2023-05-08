@@ -23,10 +23,10 @@ class TwinDeploymentHandler {
   }
 
   async createNameContract(name: string) {
-    const c = await this.tfclient.contracts.getNameContract(name);
+    const c = await this.tfclient.contracts.getContractIdByName({ name });
     if (!c) {
       try {
-        const contract = await this.tfclient.contracts.createName(name);
+        const contract = await (await this.tfclient.contracts.createName({ name })).apply();
         events.emit("logs", `Name contract with id: ${contract["contractId"]} has been created`);
         this.addedNameContracts.push(name);
         return contract;
@@ -39,7 +39,7 @@ class TwinDeploymentHandler {
   }
 
   async deleteNameContract(name: string): Promise<void> {
-    const c = await this.tfclient.contracts.getNameContract(name);
+    const c = await this.tfclient.contracts.getContractIdByName({ name });
     if (!c) {
       events.emit("logs", `Couldn't find a name contract with name ${name} to delete`);
     } else {
@@ -48,29 +48,31 @@ class TwinDeploymentHandler {
     }
   }
 
-  async deploy(deployment: Deployment, node_id: number, publicIps: number, solutionProviderID: number) {
+  async deploy(deployment: Deployment, node_id: number, publicIps: number, solutionProviderId: number) {
     let contract;
     try {
-      contract = await this.tfclient.contracts.createNode(
-        node_id,
-        deployment.challenge_hash(),
-        deployment.metadata,
-        publicIps,
-        solutionProviderID,
-      );
-      events.emit("logs", `Contract with id: ${contract["contractId"]} has been created`);
+      contract = await (
+        await this.tfclient.contracts.createNode({
+          nodeId: node_id,
+          hash: deployment.challenge_hash(),
+          data: deployment.metadata,
+          numberOfPublicIps: publicIps,
+          solutionProviderId: solutionProviderId,
+        })
+      ).apply();
+      events.emit("logs", `Contract with id: ${contract.contractId} has been created`);
     } catch (e) {
       throw Error(`Failed to create contract on node: ${node_id} due to ${e}`);
     }
 
     try {
-      deployment.contract_id = contract["contractId"];
+      deployment.contract_id = contract.contractId;
       const payload = JSON.stringify(deployment);
       const node_twin_id = await this.nodes.getNodeTwinId(node_id);
       await this.rmb.request([node_twin_id], "zos.deployment.deploy", payload);
     } catch (e) {
       await this.rollback({
-        created: [{ contractId: contract["contractId"] }],
+        created: [{ contractId: contract.contractId }],
         updated: [],
       });
       throw Error(`Failed to deploy on node ${node_id} due to ${e}`);
@@ -80,32 +82,34 @@ class TwinDeploymentHandler {
 
   async update(deployment: Deployment) {
     // TODO: update the contract with public when it is available
-    const old_contract = await this.tfclient.contracts.get(deployment.contract_id);
+    const old_contract = await this.tfclient.contracts.get({ id: deployment.contract_id });
     let contract;
     try {
-      contract = await this.tfclient.contracts.updateNode(
-        deployment.contract_id,
-        old_contract["contractType"]["nodeContract"]["deploymentData"],
-        deployment.challenge_hash(),
-      );
-      events.emit("logs", `Contract with id: ${contract["contractId"]} has been updated`);
+      contract = await (
+        await this.tfclient.contracts.updateNode({
+          id: deployment.contract_id,
+          data: old_contract["contractType"]["nodeContract"]["deploymentData"],
+          hash: deployment.challenge_hash(),
+        })
+      ).apply();
+      events.emit("logs", `Contract with id: ${contract.contractId} has been updated`);
     } catch (e) {
       throw Error(`Failed to update contract ${contract} due to ${e}`);
     }
-    const node_id = contract["contractType"]["nodeContract"]["nodeId"];
+    const node_id = contract.contractType.nodeContract.nodeId;
     try {
       const payload = JSON.stringify(deployment);
       const node_twin_id = await this.nodes.getNodeTwinId(node_id);
       await this.rmb.request([node_twin_id], "zos.deployment.update", payload);
     } catch (e) {
-      throw Error(`Failed to update deployment on node ${node_id} with contract ${contract["contractId"]} due to ${e}`);
+      throw Error(`Failed to update deployment on node ${node_id} with contract ${contract.contractId} due to ${e}`);
     }
     return contract;
   }
 
   async delete(contract_id: number): Promise<number> {
     try {
-      await this.tfclient.contracts.cancel(contract_id);
+      await (await this.tfclient.contracts.cancel({ id: contract_id })).apply();
     } catch (err) {
       throw Error(`Failed to cancel contract ${contract_id} due to: ${err}`);
     }
@@ -282,7 +286,7 @@ class TwinDeploymentHandler {
 
       const contract_id = twinDeployment.deployment.contract_id;
       if (contract_id) {
-        const contract = await this.tfclient.contracts.get(contract_id);
+        const contract = await this.tfclient.contracts.get({ id: contract_id });
         const node_id = contract["contractType"]["nodeContract"]["nodeId"];
         deploymentMap[contract_id][0].nodeId = node_id;
       }
@@ -387,7 +391,7 @@ class TwinDeploymentHandler {
     for (const c of contracts.created) {
       if (c.state !== "Deleted") {
         events.emit("logs", `Deleting contract id ${c.contractId}`);
-        await this.tfclient.contracts.cancel(c.contractId);
+        await this.tfclient.contracts.cancel({ id: c.contractId });
       }
     }
 
@@ -441,7 +445,7 @@ class TwinDeploymentHandler {
             twinDeployment.deployment,
             twinDeployment.nodeId,
             twinDeployment.publicIps,
-            twinDeployment.solutionProviderID,
+            twinDeployment.solutionProviderId,
           );
           twinDeployment.deployment.contract_id = contract["contractId"];
           if (

@@ -47,13 +47,14 @@ class KVStore {
     return keys;
   }
 
-  async deleteAll() {
-    const keys = await this.list();
+  async deleteAll(): Promise<string[]> {
+    const keys: string[] = await this.list();
     const extrinsics: Extrinsic[] = [];
     for (const key of keys) {
       extrinsics.push(await this.delete({ key }));
     }
-    return this.client.applyAllExtrinsics<number[]>(extrinsics);
+    await this.client.applyAllExtrinsics<number[]>(extrinsics);
+    return keys;
   }
 }
 

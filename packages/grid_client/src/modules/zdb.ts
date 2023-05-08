@@ -40,7 +40,7 @@ class ZdbsModule extends BaseModule {
         instance.publicNamespace,
         options.metadata || metadata,
         options.description,
-        instance.solutionProviderID,
+        instance.solutionProviderId,
       );
       twinDeployments.push(twinDeployment);
     }
@@ -137,7 +137,7 @@ class ZdbsModule extends BaseModule {
       options.publicNamespace,
       oldDeployments[0].metadata,
       oldDeployments[0].metadata,
-      options.solutionProviderID,
+      options.solutionProviderId,
     );
 
     return await this._add(options.deployment_name, options.node_id, oldDeployments, [twinDeployment]);

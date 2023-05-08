@@ -97,7 +97,7 @@ class GridClient {
 
     if (!isConnecting) {
       await tfclient.connect();
-      this.rmbClient.api = tfclient.client.api;
+      this.rmbClient.api = tfclient.api;
       try {
         await this.rmbClient.connect();
       } catch (e) {
@@ -216,19 +216,12 @@ class GridClient {
   }
 
   async disconnect(): Promise<void> {
-    for (const key of Object.keys(TFClient.clients)) {
-      await TFClient.clients[key].disconnect();
-    }
     for (const key of Object.keys(GridClient.rmbClients)) {
       await GridClient.rmbClients[key].close();
     }
   }
 
   async disconnectAndExit(): Promise<void> {
-    // this should be only used by nodejs process
-    for (const key of Object.keys(TFClient.clients)) {
-      await TFClient.clients[key].disconnect();
-    }
     for (const key of Object.keys(GridClient.rmbClients)) {
       await GridClient.rmbClients[key].close();
     }

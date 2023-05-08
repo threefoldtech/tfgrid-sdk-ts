@@ -124,11 +124,11 @@ class Nodes {
       GridClient.config.keypairType,
     );
     return tfclient.contracts
-      .get(contractId)
+      .get({ id: contractId })
       .then(contract => {
-        if (!contract["contractType"]["nodeContract"])
+        if (!contract.contractType.nodeContract)
           throw Error(`Couldn't get node id for this contract ${contractId}. It's not a node contract`);
-        return contract["contractType"]["nodeContract"]["nodeId"];
+        return contract.contractType.nodeContract.nodeId;
       })
       .catch(err => {
         throw Error(`Error getting node ID from contract ID ${contractId}: ${err}`);

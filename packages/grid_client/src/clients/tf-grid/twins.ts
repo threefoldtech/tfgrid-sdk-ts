@@ -2,8 +2,6 @@ import * as secp from "@noble/secp256k1";
 import { Twins } from "@threefold/tfchain_client";
 import * as bip39 from "bip39";
 
-import { TFClient } from "./client";
-
 interface TwinOptions {
   relay: string;
 }

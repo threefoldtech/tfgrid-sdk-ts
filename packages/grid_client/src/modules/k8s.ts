@@ -112,7 +112,7 @@ class K8sModule extends BaseModule {
         options.network.accessNodeId,
         master.ip,
         master.corex,
-        master.solutionProviderID!,
+        master.solutionProviderId!,
         master.zlogsOutput,
       );
 
@@ -155,7 +155,7 @@ class K8sModule extends BaseModule {
         options.network.accessNodeId,
         worker.ip,
         worker.corex,
-        worker.solutionProviderID!,
+        worker.solutionProviderId!,
         worker.zlogsOutput,
       );
 
@@ -289,7 +289,7 @@ class K8sModule extends BaseModule {
       0,
       options.ip,
       options.corex,
-      options.solutionProviderID!,
+      options.solutionProviderId!,
       options.zlogsOutput,
     );
 

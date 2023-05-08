@@ -206,7 +206,7 @@ class Network {
     );
     await tfclient.connect();
     for (const node of network["nodes"]) {
-      const contract = await tfclient.contracts.get(node.contract_id);
+      const contract = await tfclient.contracts.get({ id: node.contract_id });
       if (contract === null) continue;
       const node_twin_id = await this.capacity.getNodeTwinId(node.node_id);
       const payload = JSON.stringify({ contract_id: node.contract_id });

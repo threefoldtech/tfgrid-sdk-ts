@@ -138,7 +138,7 @@ class Client extends QueryClient {
   balances: Balances = new Balances(this);
   nodes: Nodes = new Nodes(this);
   termsAndConditions: TermsAndConditions = new TermsAndConditions(this);
-  kvstore: KVStore = new KVStore(this);
+  kvStore: KVStore = new KVStore(this);
   twins: Twins = new Twins(this);
 
   declare url: string;

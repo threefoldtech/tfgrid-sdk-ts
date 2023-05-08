@@ -228,7 +228,7 @@ class BaseModule {
         this.config.storeSecret,
         this.config.keypairType,
       );
-      const c = await tfClient.contracts.get(contract["contract_id"]);
+      const c = await tfClient.contracts.get({ id: contract["contract_id"] });
       if (c === null) {
         await this.save(name, { created: [], deleted: [{ contractId: contract["contract_id"] }] });
         continue;

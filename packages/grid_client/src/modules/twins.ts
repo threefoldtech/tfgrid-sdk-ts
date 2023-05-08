@@ -15,20 +15,20 @@ class Twins {
   @validateInput
   @checkBalance
   async create(options: TwinCreateModel) {
-    return await this.client.twins.create(options.relay);
+    return (await this.client.twins.create(options)).apply();
   }
 
   @expose
   @validateInput
   @checkBalance
   async update(options: TwinCreateModel) {
-    return await this.client.twins.update(options.relay);
+    return (await this.client.twins.update(options)).apply();
   }
 
   @expose
   @validateInput
   async get(options: TwinGetModel) {
-    return await this.client.twins.get(options.id);
+    return await this.client.twins.get(options);
   }
 
   @expose
@@ -40,19 +40,7 @@ class Twins {
   @expose
   @validateInput
   async get_twin_id_by_account_id(options: TwinGetByAccountIdModel) {
-    return await this.client.twins.getTwinIdByAccountId(options.public_key);
-  }
-
-  @expose
-  @validateInput
-  async list() {
-    return await this.client.twins.list();
-  }
-  @expose
-  @validateInput
-  @checkBalance
-  async delete(options: TwinDeleteModel) {
-    return await this.client.twins.delete(options.id);
+    return await this.client.twins.getTwinIdByAccountId({ accountId: options.public_key });
   }
 }
 

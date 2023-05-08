@@ -59,54 +59,56 @@ class Contracts {
   @validateInput
   @checkBalance
   async create_node(options: NodeContractCreateModel) {
-    return await this.client.contracts.createNode(
-      options.node_id,
-      options.hash,
-      options.data,
-      options.public_ip,
-      options.solutionProviderID,
-    );
+    return (
+      await this.client.contracts.createNode({
+        nodeId: options.node_id,
+        hash: options.hash,
+        data: options.data,
+        numberOfPublicIps: options.public_ip,
+        solutionProviderId: options.solutionProviderId,
+      })
+    ).apply();
   }
   @expose
   @validateInput
   @checkBalance
   async create_name(options: NameContractCreateModel) {
-    return await this.client.contracts.createName(options.name);
+    return (await this.client.contracts.createName(options)).apply();
   }
   @expose
   @validateInput
   async get(options: ContractGetModel) {
-    return await this.client.contracts.get(options.id);
+    return this.client.contracts.get(options);
   }
   @expose
   @validateInput
   async get_contract_id_by_node_id_and_hash(options: ContractGetByNodeIdAndHashModel) {
-    return await this.client.contracts.getContractIdByNodeIdAndHash(options.node_id, options.hash);
+    return this.client.contracts.getContractIdByNodeIdAndHash({ nodeId: options.node_id, hash: options.hash });
   }
 
   @expose
   @validateInput
   async get_name_contract(options: NameContractGetModel) {
-    return await this.client.contracts.getNameContract(options.name);
+    return this.client.contracts.getContractIdByName(options);
   }
 
   @expose
   @validateInput
   async activeRentContractForNode(options: RentContractGetModel) {
-    return await this.client.contracts.activeRentContractForNode(options.nodeId);
+    return this.client.contracts.getContractIdByActiveRentForNode(options);
   }
 
   @expose
   @validateInput
   @checkBalance
   async update_node(options: NodeContractUpdateModel) {
-    return await this.client.contracts.updateNode(options.id, options.data, options.hash);
+    return (await this.client.contracts.updateNode(options)).apply();
   }
   @expose
   @validateInput
   @checkBalance
   async cancel(options: ContractCancelModel) {
-    const deletedContract = await this.client.contracts.cancel(options.id);
+    const deletedContract = await (await this.client.contracts.cancel(options)).apply();
     await this.invalidateDeployment(options.id);
     return deletedContract;
   }
@@ -114,73 +116,68 @@ class Contracts {
   @expose
   @validateInput
   async listMyContracts(options?: ContractState) {
-    return await this.client.contracts.listMyContracts(this.config.graphqlURL, options?.state);
+    return this.client.contracts.listMyContracts({ graphqlURL: this.config.graphqlURL, stateList: options?.state });
   }
 
   @expose
   @validateInput
   async listContractsByTwinId(options: ContractsByTwinId) {
-    return await this.client.contracts.listContractsByTwinId(this.config.graphqlURL, options.twinId);
+    return this.client.contracts.listContractsByTwinId({ graphqlURL: this.config.graphqlURL, twinId: options.twinId });
   }
 
   @expose
   @validateInput
   async listContractsByAddress(options: ContractsByAddress) {
-    return await this.client.contracts.listContractsByAddress(this.config.graphqlURL, options.address);
+    return this.client.contracts.listContractsByAddress({
+      graphqlURL: this.config.graphqlURL,
+      accountId: options.address,
+    });
   }
 
   @expose
   @validateInput
   @checkBalance
   async createServiceContract(options: CreateServiceContractModel) {
-    return await this.client.contracts.createServiceContract(options.serviceAccount, options.consumerAccount);
+    return (await this.client.contracts.createService(options)).apply();
   }
   @expose
   @validateInput
   @checkBalance
   async approveServiceContract(options: ServiceContractApproveModel) {
-    return await this.client.contracts.serviceContractApprove(options.serviceContractId, options.approve);
+    return (await this.client.contracts.approveService(options)).apply();
   }
 
   @expose
   @validateInput
   @checkBalance
   async billServiceContract(options: ServiceContractBillModel) {
-    return await this.client.contracts.serviceContractBill(
-      options.serviceContractId,
-      options.variableAmount,
-      options.metadata,
-    );
+    return (await this.client.contracts.billService(options)).apply();
   }
 
   @expose
   @validateInput
   @checkBalance
   async cancelServiceContract(options: ServiceContractCancelModel) {
-    return await this.client.contracts.serviceContractCancel(options.serviceContractId);
+    return (await this.client.contracts.cancelService(options)).apply();
   }
 
   @expose
   @validateInput
   @checkBalance
   async setFeesServiceContract(options: SetServiceContractFeesModel) {
-    return await this.client.contracts.setServiceContractFees(
-      options.serviceContractId,
-      options.baseFee,
-      options.variableFee,
-    );
+    return (await this.client.contracts.setServiceFees(options)).apply();
   }
 
   @expose
   @validateInput
   @checkBalance
   async setMetadataServiceContract(options: SetServiceContractMetadataModel) {
-    return await this.client.contracts.setServiceContractMetadata(options.serviceContractId, options.metadata);
+    return (await this.client.contracts.setServiceMetadata(options)).apply();
   }
   @expose
   @validateInput
   async getServiceContract(options: GetServiceContractModel) {
-    return await this.client.contracts.getServiceContract(options.serviceContractId);
+    return this.client.contracts.getService(options);
   }
   /**
    * WARNING: Please be careful when executing this method, it will delete all your contracts.
@@ -190,7 +187,7 @@ class Contracts {
   @validateInput
   @checkBalance
   async cancelMyContracts(): Promise<Record<string, number>[]> {
-    const contracts = await this.client.contracts.cancelMyContracts(this.config.graphqlURL);
+    const contracts = await this.client.contracts.cancelMyContracts({ graphqlURL: this.config.graphqlURL });
     for (const contract of contracts) {
       await this.invalidateDeployment(contract.contractId);
     }
@@ -217,13 +214,13 @@ class Contracts {
   @expose
   @validateInput
   async getConsumption(options: ContractConsumption): Promise<number> {
-    return await this.client.contracts.getConsumption(options.id, this.config.graphqlURL);
+    return this.client.contracts.getConsumption({ id: options.id, graphqlURL: this.config.graphqlURL });
   }
 
   @expose
   @validateInput
   async getDeletionTime(options: ContractGetModel): Promise<string | number> {
-    return await this.client.contracts.getDeletionTime(options.id);
+    return this.client.contracts.getDeletionTime(options);
   }
 }
 

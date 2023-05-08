@@ -101,7 +101,7 @@ test("TC1228 - VM: Deploy a VM", async () => {
           SSH_KEY: config.ssh_key,
           Test_KEY: envVarValue,
         },
-        solutionProviderID: null,
+        solutionProviderId: null,
       },
     ],
     metadata: metadata,

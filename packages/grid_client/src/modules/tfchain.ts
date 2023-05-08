@@ -9,7 +9,8 @@ import MD5 from "crypto-js/md5";
 import { backOff } from "exponential-backoff";
 import * as PATH from "path";
 
-import { Balance, TFClient } from "../clients";
+import { TFBalances } from "../clients/tf-grid/balances";
+import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
@@ -84,11 +85,8 @@ class TFChain implements blockchainInterface {
   async init(options: TfchainWalletInitModel) {
     const client = new TFClient(this.substrateURL, options.secret, this.storeSecret, this.keypairType);
     await client.connect();
-    if (!client.isConnected()) {
-      throw Error(`could not connect account with given mnemonics`);
-    }
     await this.save(options.name, client.mnemonic);
-    return client.client.address;
+    return client.address;
   }
 
   async getMnemonics(name: string) {
@@ -107,7 +105,7 @@ class TFChain implements blockchainInterface {
     await client.connect();
     return {
       name: options.name,
-      public_key: client.client.address,
+      public_key: client.address,
       mnemonic: mnemonics,
       blockchain_type: blockchainType.tfchain,
     };
@@ -125,7 +123,7 @@ class TFChain implements blockchainInterface {
     try {
       const path = this.getPath();
       await this.backendStorage.update(path, options.name, options.secret, StorageUpdateAction.add);
-      return client.client.address;
+      return client.address;
     } catch (e) {
       throw Error(`could not update account mnemonics: ${e}`);
     }
@@ -148,7 +146,7 @@ class TFChain implements blockchainInterface {
       const client = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
       accounts.push({
         name: name,
-        public_key: client.client.address,
+        public_key: client.address,
         blockchain_type: blockchainType.tfchain,
       });
     }
@@ -164,11 +162,11 @@ class TFChain implements blockchainInterface {
     }
     const mnemonics = await this.getMnemonics(options.name);
     const client = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
-    const accountBalance = new Balance(client);
-    const balance = await accountBalance.get(client.client.address);
+    const accountBalance = new TFBalances(client);
+    const balance = await accountBalance.get({ address: client.address });
     return {
       name: options.name,
-      public_key: client.client.address,
+      public_key: client.address,
       blockchain_type: blockchainType.tfchain,
       assets: [
         {
@@ -184,8 +182,8 @@ class TFChain implements blockchainInterface {
   async balanceByAddress(options: TfchainWalletBalanceByAddressModel) {
     const client = new TFClient(this.substrateURL, this.mnemonic, this.storeSecret, this.keypairType);
     await client.connect();
-    const accountBalance = new Balance(client);
-    return await accountBalance.get(options.address);
+    const accountBalance = new TFBalances(client);
+    return await accountBalance.get(options);
   }
 
   @expose
@@ -193,9 +191,9 @@ class TFChain implements blockchainInterface {
   async pay(options: TfchainWalletTransferModel) {
     const mnemonics = await this.getMnemonics(options.name);
     const sourceClient = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
-    const accountBalance = new Balance(sourceClient);
+    const accountBalance = new TFBalances(sourceClient);
     try {
-      await accountBalance.transfer(options.address_dest, options.amount);
+      await (await accountBalance.transfer({ address: options.address_dest, amount: options.amount })).apply();
     } catch (e) {
       throw Error(`Could not complete transfer transaction: ${e}`);
     }
@@ -235,18 +233,24 @@ class TFChain implements blockchainInterface {
     const client = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
     await client.connect();
     await axios.post(this.activationURL, {
-      substrateAccountID: client.client.address,
+      substrateAccountID: client.address,
     });
-    await backOff(() => client.terms.acceptTermsAndConditions("https://library.threefold.me/info/legal/#/"), {
-      delayFirstAttempt: true,
-      startingDelay: 1000,
-      maxDelay: 5000,
-      timeMultiple: 1.25,
-    });
-    const ret = await client.twins.create(relay);
+    await backOff(
+      async () =>
+        (
+          await client.termsAndConditions.accept({ documentLink: "https://library.threefold.me/info/legal/#/" })
+        ).apply(),
+      {
+        delayFirstAttempt: true,
+        startingDelay: 1000,
+        maxDelay: 5000,
+        timeMultiple: 1.25,
+      },
+    );
+    const ret = await (await client.twins.create({ relay })).apply();
 
     return {
-      public_key: client.client.address,
+      public_key: client.address,
       mnemonic: mnemonics,
       twinId: ret.id,
     };

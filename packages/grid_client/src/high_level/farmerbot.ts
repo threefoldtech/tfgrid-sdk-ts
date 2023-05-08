@@ -55,7 +55,7 @@ class FarmerBot {
   }
 
   async findNode(options: FarmerBotFindNodeModel) {
-    const farm = await this.client.farms.getFarmByID(options.farmId);
+    const farm = await this.client.farms.get({ id: options.farmId });
     const startDate = new Date();
     const myTwinID = this.config.twinId;
     const farmerBotActionJobPublicModel: FarmerBotActionJobPublicModel = {
@@ -107,7 +107,7 @@ class FarmerBot {
   }
 
   async pingFarm(options: pingFarmModel) {
-    const farm = await this.client.farms.getFarmByID(options.farmId);
+    const farm = await this.client.farms.get({ id: options.farmId });
 
     const startDate = new Date();
     const myTwinID = this.config.twinId;

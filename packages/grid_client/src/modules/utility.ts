@@ -1,7 +1,6 @@
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
-import { validateInput } from "../helpers/validator";
 import { BatchModel } from "./models";
 import { checkBalance } from "./utils";
 

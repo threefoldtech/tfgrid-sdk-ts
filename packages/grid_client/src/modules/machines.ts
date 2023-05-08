@@ -68,7 +68,7 @@ class MachinesModule extends BaseModule {
         options.network.accessNodeId,
         machine.ip,
         machine.corex,
-        machine.solutionProviderID!,
+        machine.solutionProviderId!,
         machine.zlogsOutput,
       );
       twinDeployments = twinDeployments.concat(TDeployments);
@@ -182,7 +182,7 @@ class MachinesModule extends BaseModule {
       0,
       options.ip,
       options.corex,
-      options.solutionProviderID!,
+      options.solutionProviderId!,
       options.zlogsOutput,
     );
     return await this._add(options.deployment_name, options.node_id, oldDeployments, twinDeployments, network);
