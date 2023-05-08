@@ -4,6 +4,7 @@ import { KeypairType } from "../../zos/deployment";
 import { TFBalances } from "./balances";
 import { TFContracts } from "./contracts";
 import { TFKVStore } from "./kvstore";
+import { TFTermsAndConditions } from "./terms_and_conditions";
 import { TFTPrice } from "./tftPrice";
 import { TFTwins } from "./twins";
 
@@ -12,7 +13,8 @@ class TFClient extends Client {
   contracts: TFContracts = new TFContracts(this);
   tftPrice: TFTPrice = new TFTPrice(this);
   twins: TFTwins = new TFTwins(this);
-  kvstore: TFKVStore = new TFKVStore(this);
+  kvStore: TFKVStore = new TFKVStore(this);
+  termsAndConditions: TFTermsAndConditions = new TFTermsAndConditions(this);
 
   constructor(
     public url: string,
