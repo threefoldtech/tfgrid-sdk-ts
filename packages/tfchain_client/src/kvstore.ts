@@ -1,12 +1,12 @@
 import { Client } from "./client";
 import type { Extrinsic } from "./types";
 
-interface KVStoreSetOptions {
+export interface KVStoreSetOptions {
   key: string;
   value: string;
 }
 
-interface KVStoreGetOptions {
+export interface KVStoreGetOptions {
   key: string;
 }
 

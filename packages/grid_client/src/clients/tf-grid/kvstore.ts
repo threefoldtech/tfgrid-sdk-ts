@@ -1,3 +1,4 @@
+import { KVStore, KVStoreGetOptions, KVStoreSetOptions } from "@threefold/tfchain_client";
 import Crypto from "crypto-js";
 import nacl from "tweetnacl";
 import utils from "tweetnacl-util";
@@ -5,62 +6,45 @@ import utils from "tweetnacl-util";
 import { randomNonce } from "../../helpers/utils";
 import { TFClient } from "./client";
 
-class KVStore {
-  tfclient: TFClient;
+export interface KVStoreBatchRemoveOptions {
+  keys: string[];
+}
+class TFKVStore extends KVStore {
+  client: TFClient;
 
-  constructor(client: TFClient) {
-    this.tfclient = client;
+  async set(options: KVStoreSetOptions) {
+    const encryptedValue = this.encrypt(options.value);
+    return this.client.kvstore.set({ key: options.key, value: encryptedValue });
   }
 
-  async set(key: string, value: string) {
-    const encryptedValue = this.encrypt(value);
-    return await this.tfclient.applyExtrinsic(this.tfclient.client.tfStoreSet, [key, encryptedValue], "tfkvStore", [
-      "EntrySet",
-    ]);
-  }
-
-  async get(key: string) {
-    const encryptedValue = await this.tfclient.queryChain(this.tfclient.client.tfStoreGet, [key]);
+  async get(options: KVStoreGetOptions) {
+    const encryptedValue = await this.client.kvstore.get(options);
     if (encryptedValue) {
       try {
         return this.decrypt(encryptedValue);
       } catch (e) {
-        throw Error(`Couldn't decrypt key: ${key}`);
+        throw Error(`Couldn't decrypt key: ${options.key}`);
       }
     }
     return encryptedValue;
   }
 
-  async list() {
-    return await this.tfclient.queryChain(this.tfclient.client.tfStoreList, []);
-  }
-
-  async remove(key: string) {
-    return this.tfclient.applyExtrinsic(this.tfclient.client.tfStoreRemove, [key], "tfkvStore", ["EntryTaken"]);
-  }
-
-  async removeAll(): Promise<string[]> {
-    const keys = await this.list();
-    await this.batchRemove(keys);
-    return keys;
-  }
-
-  async batchRemove(keys: string[]): Promise<string[]> {
+  async batchRemove(options: KVStoreBatchRemoveOptions): Promise<string[]> {
     const extrinsics = [];
-    for (const k of keys) {
-      extrinsics.push(this.tfclient.client.api.tx.tfkvStore.delete(k));
+    for (const key of options.keys) {
+      extrinsics.push(await this.delete({ key }));
     }
-    await this.tfclient.utility.batchAll(extrinsics);
-    return keys;
+    await this.client.applyAllExtrinsics(extrinsics);
+    return options.keys;
   }
 
   getSecretAsBytes(): Uint8Array {
-    if (typeof this.tfclient.storeSecret === "string") {
-      const hashed = Crypto.SHA256(this.tfclient.storeSecret);
+    if (typeof this.client.storeSecret === "string") {
+      const hashed = Crypto.SHA256(this.client.storeSecret);
       const asBase64 = Crypto.enc.Base64.stringify(hashed);
       return utils.decodeBase64(asBase64);
     }
-    return this.tfclient.storeSecret;
+    return this.client.storeSecret;
   }
 
   encrypt(message) {
@@ -81,4 +65,4 @@ class KVStore {
   }
 }
 
-export { KVStore };
+export { TFKVStore };
