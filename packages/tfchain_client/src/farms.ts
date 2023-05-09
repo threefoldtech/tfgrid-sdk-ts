@@ -1,5 +1,6 @@
 import { QueryClient } from "./client";
 import { PublicIp } from "./types";
+import { checkConnection } from "./utils";
 
 enum Certification {
   Certified = "Certified",
@@ -36,9 +37,10 @@ class QueryFarms {
     this.client = client;
   }
 
+  @checkConnection
   async get(options: QueryFarmsGetOptions): Promise<Farm> {
-    const res = await this.client.checkConnectionAndApply(this.client.api.query.tfgridModule.farms, [options.id]);
-    return res.toPrimitive();
+    const res = await this.client.api.query.tfgridModule.farms(options.id);
+    return res.toPrimitive() as unknown as Farm;
   }
 }
 

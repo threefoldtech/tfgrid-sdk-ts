@@ -1,4 +1,5 @@
 import { Client } from "./client";
+import { checkConnection } from "./utils";
 
 export interface AcceptOptions {
   documentLink: string;
@@ -10,11 +11,9 @@ class TermsAndConditions {
     this.client = client;
   }
 
+  @checkConnection
   async accept(options: AcceptOptions) {
-    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfgridModule.userAcceptTc, [
-      options.documentLink,
-      options.documentHash,
-    ]);
+    const extrinsic = await this.client.api.tx.tfgridModule.userAcceptTc(options.documentLink, options.documentHash);
     return this.client.patchExtrinsic<void>(extrinsic);
   }
 }

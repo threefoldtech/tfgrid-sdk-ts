@@ -1,4 +1,5 @@
 import { QueryClient } from "./client";
+import { checkConnection } from "./utils";
 
 interface Resource {
   value: number;
@@ -29,11 +30,10 @@ class QueryPricingPolicies {
     this.client = client;
   }
 
+  @checkConnection
   async get(options: QueryPricingGetOptions): Promise<PricingPolicy> {
-    const res = await this.client.checkConnectionAndApply(this.client.api.query.tfgridModule.pricingPolicies, [
-      options.id,
-    ]);
-    return res.toPrimitive();
+    const res = await this.client.api.query.tfgridModule.pricingPolicies(options.id);
+    return res.toPrimitive() as unknown as PricingPolicy;
   }
 }
 

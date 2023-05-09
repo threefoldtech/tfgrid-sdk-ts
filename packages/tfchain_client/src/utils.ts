@@ -4,4 +4,12 @@ function isEnvNode(): boolean {
   );
 }
 
+export function checkConnection(target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
+  const originalMethod = descriptor.value;
+  descriptor.value = async function (...args) {
+    await this.client.connect();
+    return originalMethod.apply(this, args);
+  };
+}
+
 export { isEnvNode };

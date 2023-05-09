@@ -115,11 +115,6 @@ class QueryClient {
     await this.disconnect();
     process.exit(0);
   }
-
-  async checkConnectionAndApply(func: (args: unknown[]) => unknown, args: unknown[]) {
-    await this.connect();
-    return await func.apply(this, args);
-  }
 }
 
 export interface ClientOptions {

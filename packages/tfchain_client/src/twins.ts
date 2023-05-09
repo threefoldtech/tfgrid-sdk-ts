@@ -1,4 +1,5 @@
 import { Client, QueryClient } from "./client";
+import { checkConnection } from "./utils";
 
 interface Twin {
   id: number;
@@ -21,19 +22,19 @@ class QueryTwins {
     this.client = client;
   }
 
+  @checkConnection
   async get(options: QueryTwinsGetOptions): Promise<Twin> {
     if (isNaN(options.id) || options.id <= 0) {
       throw Error("Invalid twin id. Twin id must be postive integer");
     }
-    const res = await this.client.checkConnectionAndApply(this.client.api.query.tfgridModule.twins, [options.id]);
-    return res.toPrimitive();
+    const res = await this.client.api.query.tfgridModule.twins(options.id);
+    return res.toPrimitive() as unknown as Twin;
   }
 
+  @checkConnection
   async getTwinIdByAccountId(options: QueryTwinsGetTwinByAccountIdOptions): Promise<number> {
-    const res = await this.client.checkConnectionAndApply(this.client.api.query.tfgridModule.twinIdByAccountID, [
-      options.accountId,
-    ]);
-    return res.toPrimitive();
+    const res = await this.client.api.query.tfgridModule.twinIdByAccountID(options.accountId);
+    return res.toPrimitive() as number;
   }
 }
 
@@ -48,19 +49,15 @@ class Twins extends QueryTwins {
     this.client = client;
   }
 
+  @checkConnection
   async create(options: TwinOptions) {
-    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfgridModule.createTwin, [
-      options.relay,
-      options.pk,
-    ]);
+    const extrinsic = await this.client.api.tx.tfgridModule.createTwin(options.relay, options.pk);
     return this.client.patchExtrinsic<Twin>(extrinsic);
   }
 
+  @checkConnection
   async update(options: TwinOptions) {
-    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfgridModule.updateTwin, [
-      options.relay,
-      options.pk,
-    ]);
+    const extrinsic = await this.client.api.tx.tfgridModule.updateTwin(options.relay, options.pk);
     return this.client.patchExtrinsic<Twin>(extrinsic);
   }
 
