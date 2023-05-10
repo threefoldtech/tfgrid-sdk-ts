@@ -20,7 +20,13 @@ class Twins {
       if (secret.startsWith("0x")) {
         secret = secret.substring(2);
       }
-      privKey = Buffer.from(secret, "hex");
+
+      const hexRegex = /^[0-9a-fA-F]+$/;
+      if (hexRegex.test(secret)) {
+        privKey = Buffer.from(secret, "hex");
+      } else {
+        throw new Error("Invalid seed. Please enter a valid seed format.");
+      }
     }
     const pk = "0x" + Buffer.from(secp.getPublicKey(privKey, true)).toString("hex");
 
