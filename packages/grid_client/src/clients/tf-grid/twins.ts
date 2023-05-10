@@ -1,5 +1,4 @@
-import * as secp from "@noble/secp256k1";
-import * as bip39 from "bip39";
+import { generatePublicKey } from "@threefold/rmb_direct_client";
 
 import { TFClient } from "./client";
 
@@ -10,37 +9,13 @@ class Twins {
     this.tfclient = client;
   }
 
-  getPublicKey(secret: string) {
-    let privKey;
-
-    if (bip39.validateMnemonic(secret)) {
-      const seed = bip39.mnemonicToSeedSync(secret);
-      privKey = new Uint8Array(seed).slice(0, 32);
-    } else {
-      if (secret.startsWith("0x")) {
-        secret = secret.substring(2);
-      }
-
-      const hexRegex = /^[0-9a-fA-F]+$/;
-      if (hexRegex.test(secret)) {
-        privKey = Buffer.from(secret, "hex");
-      } else {
-        throw new Error("Invalid seed. Please enter a valid seed format.");
-      }
-    }
-    const pk = "0x" + Buffer.from(secp.getPublicKey(privKey, true)).toString("hex");
-
-    return pk;
-  }
-
   async create(relay: string) {
-    const pk = this.getPublicKey(this.tfclient.mnemonic);
-
+    const pk = generatePublicKey(this.tfclient.mnemonic);
     return this.tfclient.applyExtrinsic(this.tfclient.client.createTwin, [relay, pk], "tfgridModule", ["TwinStored"]);
   }
 
   async update(relay: string) {
-    const pk = this.getPublicKey(this.tfclient.mnemonic);
+    const pk = generatePublicKey(this.tfclient.mnemonic);
 
     return this.tfclient.applyExtrinsic(this.tfclient.client.updateTwin, [relay, pk], "tfgridModule", ["TwinUpdated"]);
   }

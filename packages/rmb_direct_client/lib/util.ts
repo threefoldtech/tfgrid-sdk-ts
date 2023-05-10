@@ -10,10 +10,47 @@ export async function createGridCL(chainUrl: string) {
   return cl;
 }
 
-export function generatePublicKey(mnemonic: string) {
-  const seed = bip39.mnemonicToSeedSync(mnemonic);
-  const privKey = new Uint8Array(seed).slice(0, 32);
-  const pk = "0x" + Buffer.from(secp.getPublicKey(privKey, true)).toString("hex");
+function isValidHex(hex: string) {
+  const hexRegex = /^[0-9a-fA-F]+$/;
+  if (hexRegex.test(hex)) {
+    return true;
+  } else {
+    false;
+  }
+}
+
+function getPublicKeyFromHexOrFalse(seed: string) {
+  if (!isValidHex(seed)) {
+    return false;
+  }
+  try {
+    const pk = "0x" + Buffer.from(secp.getPublicKey(seed, true)).toString("hex");
+    return pk;
+  } catch (error) {
+    return false;
+  }
+}
+
+function getPublicKeyFromBuffer(privateKey: Buffer) {
+  return "0x" + Buffer.from(secp.getPublicKey(privateKey, true)).toString("hex");
+}
+
+export function generatePublicKey(secret: string) {
+  let privKey;
+
+  if (secret.startsWith("0x")) {
+    secret = secret.substring(2);
+  }
+
+  if (bip39.validateMnemonic(secret)) {
+    const seed = bip39.mnemonicToSeedSync(secret);
+    privKey = new Uint8Array(seed).slice(0, 32);
+    return getPublicKeyFromBuffer(privKey);
+  }
+  const pk = getPublicKeyFromHexOrFalse(secret);
+  if (!pk) {
+    throw new Error("Invalid seed. Couldn't get public key from the provided seed.");
+  }
   return pk;
 }
 
