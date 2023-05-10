@@ -72,6 +72,6 @@
     "generate-docs": "typedoc --tsconfig tsconfig-es6.json src/index.ts --out docs/api",
     "serve-docs": "http-server docs/api",
     "test": "jest",
-    "publish": "yarn publish"
+    "publish": "yarn publish --non-interactive"
   }
 }
