@@ -61,6 +61,7 @@ class Twins extends QueryTwins {
     return this.client.patchExtrinsic<Twin>(extrinsic);
   }
 
+  @checkConnection
   async getMyTwinId(): Promise<number> {
     return this.getTwinIdByAccountId({ accountId: this.client.address });
   }

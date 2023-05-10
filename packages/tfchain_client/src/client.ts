@@ -185,8 +185,6 @@ class Client extends QueryClient {
     extrinsic: SubmittableExtrinsic<"promise", ISubmittableResult>,
     resultSections: string[] = [""],
   ): Promise<T> {
-    await this.connect();
-
     const promise = new Promise(async (resolve, reject) => {
       function callback(res) {
         if (res instanceof Error) {
