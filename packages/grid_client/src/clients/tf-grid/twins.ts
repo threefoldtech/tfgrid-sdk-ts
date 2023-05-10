@@ -10,10 +10,22 @@ class Twins {
     this.tfclient = client;
   }
 
-  getPublicKey(mnemonic: string) {
-    const seed = bip39.mnemonicToSeedSync(mnemonic);
-    const privKey = new Uint8Array(seed).slice(0, 32);
-    const pk = "0x" + Buffer.from(secp.getPublicKey(privKey, true)).toString("hex");
+  getPublicKey(secret: string) {
+    let privKey;
+    let pk;
+
+    if (bip39.validateMnemonic(secret)) {
+      const seed = bip39.mnemonicToSeedSync(secret);
+      privKey = new Uint8Array(seed).slice(0, 32);
+      pk = "0x" + Buffer.from(secp.getPublicKey(privKey, true)).toString("hex");
+    } else {
+      if (secret.startsWith("0x")) {
+        secret = secret.substring(2);
+      }
+      privKey = Buffer.from(secret, "hex");
+      pk = "0x" + Buffer.from(secp.getPublicKey(privKey, true)).toString("hex");
+    }
+
     return pk;
   }
 
