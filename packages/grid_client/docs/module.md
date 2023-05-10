@@ -46,18 +46,6 @@ Module should be:
 
   payload: `'{"public_key": <substrate account id>}'`
 
-- **List**
-
-  cmd: `twinserver.twins.list`
-
-  payload: `""`
-
-- **Delete**
-
-  cmd: `twinserver.twins.delete`
-
-  payload: `'{"id": <twin id>}'`
-
 ### Contracts
 
 - **Create Node**
@@ -118,37 +106,37 @@ Module should be:
 
   cmd: `twinserver.contracts.approveServiceContract`
 
-  payload: `'{"serviceContractId": <service contract id>, "approve": <approval of service contract>}'`
+  payload: `'{"serviceId": <service contract id>, "approve": <approval of service contract>}'`
 
 - **Bill Service Contract**
 
   cmd: `twinserver.contracts.billServiceContract`
 
-  payload: `'{"serviceContractId": <service contract id>, "variableAmount": <bill amount>, "metadata": <metadata>}'`
+  payload: `'{"serviceId": <service contract id>, "variableAmount": <bill amount>, "metadata": <metadata>}'`
 
 - **Cancel Service Contract**
 
   cmd: `twinserver.contracts.cancelServiceContract`
 
-  payload: `'{"serviceContractId": <service contract id>}'`
+  payload: `'{"serviceId": <service contract id>}'`
 
 - **Set Fees of Service Contract**
 
   cmd: `twinserver.contracts.setFeesServiceContract`
 
-  payload: `'{"serviceContractId": <service contract id>, "baseFee": <base fee of serivce contract>, "variableFee": <variable fee of serivce contract>}'`
+  payload: `'{"serviceId": <service contract id>, "baseFee": <base fee of serivce contract>, "variableFee": <variable fee of serivce contract>}'`
 
 - **Set Metadata of Service Contract**
 
   cmd: `twinserver.contracts.setMetadataServiceContract`
 
-  payload: `'{"serviceContractId": <service contract id>, "metadata": <metadata>}'`
+  payload: `'{"serviceId": <service contract id>, "metadata": <metadata>}'`
 
 - **Get Service Contract**
 
   cmd: `twinserver.contracts.getServiceContract`
 
-  payload: `'{"serviceContractId": <service contract id>}'`
+  payload: `'{"serviceId": <service contract id>}'`
 
 ### ZOS
 
