@@ -173,7 +173,7 @@ class TFContracts extends Contracts {
   async batchCancelContracts(ids: number[]): Promise<number[]> {
     const extrinsics = [];
     for (const id of ids) {
-      extrinsics.push(this.cancel({ id }));
+      extrinsics.push(await this.cancel({ id }));
     }
     await this.client.applyAllExtrinsics(extrinsics);
     return ids;
