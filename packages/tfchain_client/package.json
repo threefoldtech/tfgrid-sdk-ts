@@ -1,6 +1,6 @@
 {
   "name": "@threefold/tfchain_client",
-  "version": "2.0.0-rc4",
+  "version": "2.0.0-rc5",
   "description": "A client for TF chain",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,7 +9,7 @@
     "es6-build": "tsc --build tsconfig-es6.json",
     "generate-docs": "typedoc --tsconfig tsconfig-es6.json src/index.ts --out docs/api",
     "serve-docs": "http-server docs/api",
-    "publish": "yarn publish"
+    "publish": "yarn publish --non-interactive"
   },
   "repository": {
     "type": "git",

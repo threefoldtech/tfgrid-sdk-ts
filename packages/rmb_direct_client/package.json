@@ -1,6 +1,6 @@
 {
   "name": "@threefold/rmb_direct_client",
-  "version": "2.0.0-rc4",
+  "version": "2.0.0-rc5",
   "repository": {
     "type": "git",
     "url": "https://github.com/threefoldtech/tfgrid-sdk-ts.git"
@@ -20,7 +20,7 @@
     "build": "npm-run-all es6-build node-build",
     "node-build": "tsc --build tsconfig-node.json",
     "es6-build": "tsc --build tsconfig-es6.json",
-    "publish": "yarn publish"
+    "publish": "yarn publish --non-interactive"
   },
   "dependencies": {
     "@noble/secp256k1": "^1.7.1",
