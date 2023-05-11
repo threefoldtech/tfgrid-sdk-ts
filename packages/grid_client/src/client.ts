@@ -217,14 +217,14 @@ class GridClient {
   }
 
   async disconnect(): Promise<void> {
-    await this.tfclient.disconnect();
+    if (this.tfclient) await this.tfclient.disconnect();
     for (const key of Object.keys(GridClient.rmbClients)) {
       await GridClient.rmbClients[key].close();
     }
   }
 
   async disconnectAndExit(): Promise<void> {
-    await this.tfclient.disconnect();
+    if (this.tfclient) await this.tfclient.disconnect();
     for (const key of Object.keys(GridClient.rmbClients)) {
       await GridClient.rmbClients[key].close();
     }
