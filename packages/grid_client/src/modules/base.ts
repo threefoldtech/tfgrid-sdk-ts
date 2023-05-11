@@ -489,6 +489,10 @@ class BaseModule {
       }
     }
     finalTwinDeployments.push(twinDeployment);
+    const networkTwinDeployment = twinDeployments.pop();
+    if (networkTwinDeployment) {
+      finalTwinDeployments.push(networkTwinDeployment);
+    }
     const contracts = await this.twinDeploymentHandler.handle(finalTwinDeployments);
     await this.save(deployment_name, contracts);
     return { contracts: contracts };
