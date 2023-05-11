@@ -86,6 +86,7 @@ class TFChain implements blockchainInterface {
     const client = new TFClient(this.substrateURL, options.secret, this.storeSecret, this.keypairType);
     await client.connect();
     await this.save(options.name, client.mnemonic);
+    await client.disconnect();
     return client.address;
   }
 
@@ -103,12 +104,14 @@ class TFChain implements blockchainInterface {
     const mnemonics = await this.getMnemonics(options.name);
     const client = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
     await client.connect();
-    return {
+    const account = {
       name: options.name,
       public_key: client.address,
       mnemonic: mnemonics,
       blockchain_type: blockchainType.tfchain,
     };
+    await client.disconnect();
+    return account;
   }
 
   @expose
@@ -123,10 +126,11 @@ class TFChain implements blockchainInterface {
     try {
       const path = this.getPath();
       await this.backendStorage.update(path, options.name, options.secret, StorageUpdateAction.add);
-      return client.address;
     } catch (e) {
       throw Error(`could not update account mnemonics: ${e}`);
     }
+    await client.disconnect();
+    return client.address;
   }
 
   @expose
@@ -144,13 +148,14 @@ class TFChain implements blockchainInterface {
     for (const name of Object.keys(data)) {
       const mnemonics = await this.getMnemonics(name);
       const client = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
+      await client.connect();
       accounts.push({
         name: name,
         public_key: client.address,
         blockchain_type: blockchainType.tfchain,
       });
+      await client.disconnect();
     }
-
     return accounts;
   }
 
@@ -162,9 +167,9 @@ class TFChain implements blockchainInterface {
     }
     const mnemonics = await this.getMnemonics(options.name);
     const client = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
-    const accountBalance = new TFBalances(client);
-    const balance = await accountBalance.get({ address: client.address });
-    return {
+    await client.connect();
+    const balance = await client.balances.get({ address: client.address });
+    const assets = {
       name: options.name,
       public_key: client.address,
       blockchain_type: blockchainType.tfchain,
@@ -175,6 +180,8 @@ class TFChain implements blockchainInterface {
         },
       ],
     };
+    await client.disconnect();
+    return assets;
   }
 
   @expose
@@ -182,8 +189,9 @@ class TFChain implements blockchainInterface {
   async balanceByAddress(options: TfchainWalletBalanceByAddressModel) {
     const client = new TFClient(this.substrateURL, this.mnemonic, this.storeSecret, this.keypairType);
     await client.connect();
-    const accountBalance = new TFBalances(client);
-    return await accountBalance.get(options);
+    const balance = await client.balances.get(options);
+    await client.disconnect();
+    return balance;
   }
 
   @expose
@@ -191,12 +199,13 @@ class TFChain implements blockchainInterface {
   async pay(options: TfchainWalletTransferModel) {
     const mnemonics = await this.getMnemonics(options.name);
     const sourceClient = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
-    const accountBalance = new TFBalances(sourceClient);
+    await sourceClient.connect();
     try {
-      await (await accountBalance.transfer({ address: options.address_dest, amount: options.amount })).apply();
+      await (await sourceClient.balances.transfer({ address: options.address_dest, amount: options.amount })).apply();
     } catch (e) {
       throw Error(`Could not complete transfer transaction: ${e}`);
     }
+    await sourceClient.disconnect();
   }
 
   @expose
@@ -236,19 +245,19 @@ class TFChain implements blockchainInterface {
       substrateAccountID: client.address,
     });
     await backOff(
-      async () =>
-        (
-          await client.termsAndConditions.accept({ documentLink: "https://library.threefold.me/info/legal/#/" })
-        ).apply(),
+      () =>
+        client.termsAndConditions.accept({ documentLink: "https://library.threefold.me/info/legal/#/" }).then(res => {
+          return res.apply();
+        }),
       {
         delayFirstAttempt: true,
-        startingDelay: 1000,
+        startingDelay: 5000,
         maxDelay: 5000,
         timeMultiple: 1.25,
       },
     );
     const ret = await (await client.twins.create({ relay })).apply();
-
+    await client.disconnect();
     return {
       public_key: client.address,
       mnemonic: mnemonics,
