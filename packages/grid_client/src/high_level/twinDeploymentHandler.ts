@@ -178,8 +178,8 @@ class TwinDeploymentHandler {
   async saveNetworks(twinDeployments: TwinDeployment[]) {
     const savedNetworkNames: string[] = [];
     for (const twinDeployment of twinDeployments) {
-      if (savedNetworkNames.includes(twinDeployment.network.name)) continue;
       if (twinDeployment.network) {
+        if (savedNetworkNames.includes(twinDeployment.network.name)) continue;
         savedNetworkNames.push(twinDeployment.network.name);
         if (twinDeployment.operation === Operations.delete) {
           await twinDeployment.network.save();
