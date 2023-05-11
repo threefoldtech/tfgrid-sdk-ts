@@ -18,7 +18,7 @@ class TFKVStoreBackend implements BackendStorageInterface {
     }
     const splits = this.split(key, value);
     for (const k of Object.keys(splits)) {
-      await this.client.kvStore.set({ key: k, value: splits[k] });
+      await (await this.client.kvStore.set({ key: k, value: splits[k] })).apply();
     }
   }
 
