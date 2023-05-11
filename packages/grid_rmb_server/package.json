@@ -31,7 +31,6 @@
   "private": false,
   "scripts": {
     "build": "tsc --build tsconfig.json",
-    "start": "ts-node --project tsconfig.json src/index.ts",
-    "publish": "yarn publish --non-interactive"
+    "start": "ts-node --project tsconfig.json src/index.ts"
   }
 }

@@ -25,7 +25,6 @@
   ],
   "private": false,
   "scripts": {
-    "build": "tsc --build tsconfig.json",
-    "publish": "yarn publish --non-interactive"
+    "build": "tsc --build tsconfig.json"
   }
 }
