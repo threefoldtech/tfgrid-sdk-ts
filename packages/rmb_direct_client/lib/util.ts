@@ -31,7 +31,7 @@ export function generatePublicKey(secret: string) {
       privKey = secret.substring(2);
     }
 
-    if (!isValidSeed(privKey) || privKey.length !== 32) {
+    if (!isValidSeed(privKey) || privKey.length !== 64) {
       throw new Error("Invalid seed. Couldn't get public key from the provided seed.");
     }
   }
