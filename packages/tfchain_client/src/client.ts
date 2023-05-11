@@ -48,14 +48,14 @@ class QueryClient {
   tftPrice: QueryTFTPrice = new QueryTFTPrice(this);
   pricingPolicies: QueryPricingPolicies = new QueryPricingPolicies(this);
   twins: QueryTwins = new QueryTwins(this);
-  constructor(public url: string) {
-    if (!url) {
+  constructor(public url: string) {}
+
+  async loadKeyPairOrSigner(): Promise<void> {} // to be overridden in the full client
+  checkInputs(): void {
+    if (!this.url) {
       throw Error("url should be provided");
     }
   }
-
-  async loadKeyPairOrSigner(): Promise<void> {} // to be overridden in the full client
-
   private async wait(connection = true): Promise<void> {
     const start = new Date().getTime();
     while (new Date().getTime() < start + 10 * 1000) {
@@ -67,6 +67,7 @@ class QueryClient {
   }
 
   async connect() {
+    this.checkInputs();
     await this.loadKeyPairOrSigner();
     if (this.api && this.api.isConnected) return;
     if (Object.keys(QueryClient.connections).includes(this.url)) {
@@ -142,26 +143,27 @@ class Client extends QueryClient {
   extSigner?: ExtSigner;
 
   constructor(options: ClientOptions) {
-    if (!options.url) throw Error("url should be provided");
     super(options.url);
-
     this.extSigner = options.extSigner;
     this.keypairType = options.keypairType || "sr25519";
+    this.mnemonicOrSecret = options.mnemonicOrSecret;
+  }
 
+  checkInputs(): void {
+    if (!this.url) throw Error("url should be provided");
     if (!SUPPORTED_KEYPAIR_TYPES.includes(this.keypairType)) {
       throw Error(
         `Keypair type ${this.keypairType} is not a valid type. Should be either of: ${SUPPORTED_KEYPAIR_TYPES}`,
       );
     }
 
-    if ((options.mnemonicOrSecret && options.extSigner) || !(options.mnemonicOrSecret || options.extSigner)) {
+    if ((this.mnemonicOrSecret && this.extSigner) || !(this.mnemonicOrSecret || this.extSigner)) {
       throw Error("mnemonicOrSecret or extension signer should be provided");
     }
 
-    if (options.mnemonicOrSecret && !validateMnemonic(options.mnemonicOrSecret)) {
+    if (this.mnemonicOrSecret && !validateMnemonic(this.mnemonicOrSecret)) {
       throw Error("Invalid mnemonic! Must be bip39 compliant");
     }
-    this.mnemonicOrSecret = options.mnemonicOrSecret;
   }
 
   async loadKeyPairOrSigner(): Promise<void> {
