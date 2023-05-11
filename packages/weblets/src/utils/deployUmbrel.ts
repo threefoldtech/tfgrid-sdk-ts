@@ -50,7 +50,7 @@ export default async function deployUmbrel(data: Umbrel, profile: IProfile) {
   machine.flist = "https://hub.grid.tf/tf-official-apps/umbrel-latest.flist";
   machine.rootfs_size = rootFs(cpu, memory);
   machine.entrypoint = "/sbin/zinit init";
-  machine.solutionProviderID = InternalSolutionProviderID;
+  machine.solutionProviderId = InternalSolutionProviderID;
 
   machine.env = {
     SSH_KEY: profile.sshKey,

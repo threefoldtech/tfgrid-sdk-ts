@@ -79,7 +79,7 @@ async function deployOwncloudVM(profile: IProfile, data: Owncloud) {
   vm.rootfs_size = rootFs(cpu, memory);
   vm.flist = "https://hub.grid.tf/tf-official-apps/owncloud-10.9.1.flist";
   vm.entrypoint = "/sbin/zinit init";
-  vm.solutionProviderID = InternalSolutionProviderID;
+  vm.solutionProviderId = InternalSolutionProviderID;
 
   let smtp_secure = "none";
   let emailName = "";
@@ -141,7 +141,7 @@ async function deployPrefixGateway(profile: IProfile, domainName: string, backen
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80`];
-  gw.solutionProviderID = InternalSolutionProviderID;
+  gw.solutionProviderId = InternalSolutionProviderID;
 
   const metadate = {
     type: "gateway",

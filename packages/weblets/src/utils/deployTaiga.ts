@@ -92,7 +92,7 @@ async function deployTaigaVM(profile: IProfile, data: Taiga) {
     EMAIL_HOST_USER: smtpHostUser,
     EMAIL_HOST_PASSWORD: smtpHostPassword,
   };
-  vm.solutionProviderID = InternalSolutionProviderID;
+  vm.solutionProviderId = InternalSolutionProviderID;
 
   const vms = new MachinesModel();
   vms.name = name;
@@ -124,7 +124,7 @@ async function deployPrefixGateway(profile: IProfile, domainName: string, backen
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:9000/`];
-  gw.solutionProviderID = InternalSolutionProviderID;
+  gw.solutionProviderId = InternalSolutionProviderID;
 
   const metadate = {
     type: "gateway",

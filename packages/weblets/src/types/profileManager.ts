@@ -67,7 +67,7 @@ export function getTwinAndAddress(mnemonics: string): Promise<GetTwinAndAddress 
   return getGrid({ networkEnv, mnemonics } as any, _ => _, "")
     .then(grid => Promise.all([Promise.resolve(grid), grid.twins.get_my_twin_id()]))
     .then(([grid, twinId]) => {
-      getTwinAndAddressData.set(mnemonics, { twinId, address: grid.twins.client.client.address });
+      getTwinAndAddressData.set(mnemonics, { twinId, address: grid.twins.client.address });
       return getTwinAndAddressData.get(mnemonics);
     })
     .catch(() => null);
@@ -134,7 +134,7 @@ export async function migrate(mnemonics: string, storeSecret: string) {
   for (const key of keys) {
     const [v1, e1] = await resolve(oldDB.get({ key }));
     if (!e1) {
-      extrinsics.push(newDB.client.client.api.tx.tfkvStore.set(key, newDB.client.kvStore.encrypt(v1)));
+      extrinsics.push(newDB.client.api.tx.tfkvStore.set(key, newDB.client.kvStore.encrypt(v1)));
       continue;
     }
 

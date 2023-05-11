@@ -91,7 +91,7 @@ async function depoloyDiscourseVM(data: Discourse, profile: IProfile) {
   machines.machines = [machine];
   machines.network = network;
   machines.description = "discourse machine/node";
-  machine.solutionProviderID = InternalSolutionProviderID;
+  machine.solutionProviderId = InternalSolutionProviderID;
 
   const metadate = {
     type: "vm",
@@ -117,7 +117,7 @@ async function deployPrefixGateway(profile: IProfile, domainName: string, backen
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:88`];
-  gw.solutionProviderID = InternalSolutionProviderID;
+  gw.solutionProviderId = InternalSolutionProviderID;
 
   const metadate = {
     type: "gateway",

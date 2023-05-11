@@ -46,6 +46,6 @@ function createNode(data: Base) {
   node.public_ip6 = data.publicIp6;
   node.rootfs_size = data.rootFs;
   node.planetary = data.planetary;
-  node.solutionProviderID = InternalSolutionProviderID;
+  node.solutionProviderId = InternalSolutionProviderID;
   return node;
 }

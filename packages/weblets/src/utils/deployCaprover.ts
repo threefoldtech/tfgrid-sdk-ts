@@ -41,7 +41,7 @@ export default async function deployCaprover(data: Caprover, profile: IProfile) 
     DEFAULT_PASSWORD: password,
     CAPTAIN_IS_DEBUG: "true",
   };
-  machine.solutionProviderID = InternalSolutionProviderID;
+  machine.solutionProviderId = InternalSolutionProviderID;
 
   const machines = new MachinesModel();
   machines.name = name;
@@ -73,7 +73,7 @@ export default async function deployCaprover(data: Caprover, profile: IProfile) 
       SWM_NODE_MODE: "worker",
       PUBLIC_KEY: publicKey,
     };
-    workerModel.solutionProviderID = InternalSolutionProviderID;
+    workerModel.solutionProviderId = InternalSolutionProviderID;
 
     machines.machines.push(workerModel);
   }

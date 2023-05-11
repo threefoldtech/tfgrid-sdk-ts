@@ -81,7 +81,7 @@ async function deployFunkwhaleVM(profile: IProfile, data: Funkwhale) {
     DJANGO_SUPERUSER_USERNAME: adminUsername,
     DJANGO_SUPERUSER_PASSWORD: adminPassword,
   };
-  vm.solutionProviderID = InternalSolutionProviderID;
+  vm.solutionProviderId = InternalSolutionProviderID;
 
   // VMS Specs
   const vms = new MachinesModel();
@@ -114,7 +114,7 @@ async function deployPrefixGateway(profile: IProfile, domainName: string, backen
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80/`];
-  gw.solutionProviderID = InternalSolutionProviderID;
+  gw.solutionProviderId = InternalSolutionProviderID;
 
   const metadate = {
     type: "gateway",

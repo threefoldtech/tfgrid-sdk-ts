@@ -61,7 +61,7 @@ async function depoloyAlgorandVM(data: Algorand, profile: IProfile) {
     FIRST_ROUND: `${firstRound}`,
     LAST_ROUND: `${lastRound}`,
   };
-  machine.solutionProviderID = InternalSolutionProviderID;
+  machine.solutionProviderId = InternalSolutionProviderID;
 
   // Machines specs
   const machines = new MachinesModel();

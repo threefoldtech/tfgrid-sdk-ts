@@ -76,7 +76,7 @@ async function deployCasperlabsVM(profile: IProfile, data: Casperlabs) {
     SSH_KEY: profile.sshKey,
     CASPERLABS_HOSTNAME: domain,
   };
-  vm.solutionProviderID = InternalSolutionProviderID;
+  vm.solutionProviderId = InternalSolutionProviderID;
 
   // vms specs
   const vms = new MachinesModel();
@@ -110,7 +110,7 @@ async function deployPrefixGateway(profile: IProfile, domainName: string, backen
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:80`];
-  gw.solutionProviderID = InternalSolutionProviderID;
+  gw.solutionProviderId = InternalSolutionProviderID;
 
   const metadate = {
     type: "gateway",
