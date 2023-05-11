@@ -25,16 +25,17 @@ export function generatePublicKey(secret: string) {
   if (bip39.validateMnemonic(secret)) {
     const seed = bip39.mnemonicToSeedSync(secret);
     privKey = new Uint8Array(seed).slice(0, 32);
+  } else {
+    privKey = secret;
+    if (secret.startsWith("0x")) {
+      privKey = secret.substring(2);
+    }
+
+    if (!isValidSeed(privKey) || privKey.length !== 32) {
+      throw new Error("Invalid seed. Couldn't get public key from the provided seed.");
+    }
   }
 
-  privKey = secret;
-  if (secret.startsWith("0x")) {
-    privKey = secret.substring(2);
-  }
-
-  if (!isValidSeed(privKey) || privKey.length !== 32) {
-    throw new Error("Invalid seed. Couldn't get public key from the provided seed.");
-  }
   return getPublicKey(privKey);
 }
 
