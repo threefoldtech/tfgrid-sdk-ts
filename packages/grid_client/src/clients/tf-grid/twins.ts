@@ -15,7 +15,7 @@ class Twins {
   }
 
   async update(relay: string) {
-    const pk = generatePublicKey(this.tfclient.mnemonic);
+    const pk = generatePublicKey("0xd295609611604aaffd54e3b472b62a11cf9c4a300ffc31c18631e2d31e0746b6");
 
     return this.tfclient.applyExtrinsic(this.tfclient.client.updateTwin, [relay, pk], "tfgridModule", ["TwinUpdated"]);
   }

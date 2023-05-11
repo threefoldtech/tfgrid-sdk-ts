@@ -16,33 +16,26 @@ function isValidSeed(seed: string) {
 }
 
 function getPublicKey(privateKey: Buffer | string) {
-  if (typeof privateKey === "string" && privateKey.length > 32) {
-    privateKey.substring(0, 64);
-  }
   return "0x" + Buffer.from(secp.getPublicKey(privateKey, true)).toString("hex");
 }
 
 export function generatePublicKey(secret: string) {
   let privKey;
-  let pk;
 
   if (bip39.validateMnemonic(secret)) {
     const seed = bip39.mnemonicToSeedSync(secret);
     privKey = new Uint8Array(seed).slice(0, 32);
-    return getPublicKey(privKey);
   }
 
+  privKey = secret;
   if (secret.startsWith("0x")) {
-    secret = secret.substring(2);
+    privKey = secret.substring(2);
   }
 
-  if (isValidSeed(secret)) {
-    pk = getPublicKey(secret);
-  }
-  if (!pk) {
+  if (!isValidSeed(privKey) || privKey.length !== 32) {
     throw new Error("Invalid seed. Couldn't get public key from the provided seed.");
   }
-  return pk;
+  return getPublicKey(privKey);
 }
 
 export async function setPublicKey(
