@@ -8,8 +8,7 @@
     "node-build": "tsc --build tsconfig-node.json",
     "es6-build": "tsc --build tsconfig-es6.json",
     "generate-docs": "typedoc --tsconfig tsconfig-es6.json src/index.ts --out docs/api",
-    "serve-docs": "http-server docs/api",
-    "publish": "yarn publish --non-interactive"
+    "serve-docs": "http-server docs/api"
   },
   "repository": {
     "type": "git",
