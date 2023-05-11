@@ -179,7 +179,6 @@ class DedicatePage:
         tables = ["rentable", "rented"]
         for table in tables:
             self.browser.find_element(By.XPATH, "//*[contains(text(), '"+table.capitalize()+"')]").click()
-            WebDriverWait(self.browser, 30).until(EC.invisibility_of_element_located((By.XPATH, "//*[contains(text(), 'loading nodes ...')]")))
             if(self.browser.find_element(By.XPATH, f"//*[@id='app']/div[1]/div[3]/div/div/div/div[2]/div/div[1]/table/tbody/tr").text == 'No data available'):
                 continue 
             for i in range(1, len(self.browser.find_elements(By.XPATH, f"//*[@id='{table}']{self.table_xpath}"))+1):

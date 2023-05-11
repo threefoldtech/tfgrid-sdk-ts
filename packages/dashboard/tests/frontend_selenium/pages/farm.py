@@ -1,4 +1,3 @@
-import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -28,7 +27,8 @@ class FarmPage:
     public_ip_list=(By.XPATH ,'//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/tbody/tr[2]/td/div/div[8]/div/button/div')
     add_ip_button=(By.XPATH ,'//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/tbody/tr[2]/td/div/div[8]/div/div/div/div/header/div/div/button/span')
     ip_text_field=(By.XPATH ,'/html/body/div[1]/div[5]/div/div/div[2]/form/div/div/div[1]/div/input')
-    path=(By.XPATH,'/html/body/div[1]/div[5]/div/div/div[1]/form/div/div/div[1]/div/input')
+    add_stellar_address=(By.XPATH,'/html/body/div[1]/div[5]/div/div/div[1]/form/div/div/div[1]/div/input')
+    edit_stellar_address=(By.XPATH,'//*[@id="app"]/div[1]/div[3]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div[6]/div[2]/div/div/div/div/div[2]/div/button')
     gateway_text_field=(By.XPATH ,'/html/body/div[1]/div[5]/div/div/div[2]/div[2]/div/div[1]/div/input')
     save_button=(By.XPATH ,'//*[@id="app"]/div[5]/div/div/div[3]/button[3]')
     close_button=(By.XPATH ,'//*[@id="app"]/div[5]/div/div/div[3]/button[1]')
@@ -36,7 +36,7 @@ class FarmPage:
     zero=(By.XPATH,'//html/body/main/div[1]/div/h1')
     table_farm_name=(By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/tbody/tr[1]/td[3]')
     table = (By.XPATH,'//table/tbody/tr')
-    stellar_payout_address = (By.XPATH,'//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/tbody/tr[2]/td/div/div[6]/div[2]/div/div/span')
+    stellar_payout_address = (By.XPATH,'/html/body/div[1]/div[1]/div[3]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div[6]/div[2]/div/div/div/div/div[1]/input')
     ip_dropdown = (By.XPATH,'//*[@id="app"]/div[5]/div/div/div[2]/div[1]/div/div[1]/div[1]/div')
     range_selection=(By.XPATH, "//*[contains(text(), 'Range')]")
     from_ip_input = (By.XPATH, "/html/body/div[1]/div[5]/div/div/div[2]/form/div/div/div[1]/div/input") 
@@ -215,13 +215,16 @@ class FarmPage:
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.details_arrow))
         WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.details_arrow))
         self.browser.find_element(*self.details_arrow).click()
-        self.browser.find_element(*self.add_v2_button).click()
 
     def add_farmpayout_address(self, data):
-        self.browser.find_element(*self.path).send_keys(Keys.CONTROL + "a")
-        self.browser.find_element(*self.path).send_keys(Keys.DELETE)
-        self.browser.find_element(*self.path).send_keys(data)
+        self.browser.find_element(*self.add_stellar_address).send_keys(Keys.CONTROL + "a")
+        self.browser.find_element(*self.add_stellar_address).send_keys(Keys.DELETE)
+        self.browser.find_element(*self.add_stellar_address).send_keys(data)
         return self.browser.find_element(*self.submit_button)
+
+    def farmpayout_address_value(self):
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.edit_stellar_address))
+        return self.browser.find_element(*self.stellar_payout_address).get_attribute("value")
     
     def setup_gateway(self, data, farm_name):
         self.search_functionality(farm_name)
@@ -298,7 +301,7 @@ class FarmPage:
         details = []
         for i in range(5): 
             details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}{str(i+1)}]/div[2]/div/span").text) #[Farm ID, Farm Name, Linked Twin ID, Certification Type, Linked Pricing Policy ID]
-        details.append(self.browser.find_element(*self.stellar_payout_address).text)
+        details.append(self.browser.find_element(*self.stellar_payout_address).get_attribute("value"))
         for i in range(len(self.browser.find_elements(By.XPATH, self.farm_public_ips))):
             details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[1]").text) # IP
             details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[3]").text) # Deployed Contract ID

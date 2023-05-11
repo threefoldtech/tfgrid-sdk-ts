@@ -152,6 +152,7 @@ def test_farmpayout_address(browser):
     assert farm_page.wait_for(farm_name)
     farm_page.search_functionality("")    
     farm_page.setup_farmpayout_address(farm_name)
+    browser.find_element(*farm_page.add_v2_button).click()
     cases = [' ', 'dgdd',generate_string(), 'gdhjP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6Bcfg']
     for case in cases:
         assert farm_page.add_farmpayout_address(case).is_enabled()==False
@@ -161,16 +162,16 @@ def test_farmpayout_address(browser):
     polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('Transaction submitted')
     assert farm_page.wait_for('Address added!')
-    assert farm_page.wait_for('Edit')
-    assert farm_page.wait_for('GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG')
+    assert farm_page.farmpayout_address_value() == 'GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG'
     farm_page.close_detail()
     case = "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4"
     farm_page.setup_farmpayout_address(farm_name)
+    browser.find_element(*farm_page.edit_stellar_address).click()
     farm_page.add_farmpayout_address(case).click()
     polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('Transaction submitted')
     assert farm_page.wait_for('Address added!')
-    assert farm_page.wait_for('GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4')
+    assert farm_page.farmpayout_address_value() == 'GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4'
 
 
 def test_ip(browser):
@@ -355,6 +356,7 @@ def test_farm_details(browser):
     farm_page.search_functionality("")    
     case = "GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG"
     farm_page.setup_farmpayout_address(farm_name)
+    browser.find_element(*farm_page.add_v2_button).click()
     farm_page.add_farmpayout_address(case).click()
     polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('Address added!')
@@ -364,7 +366,6 @@ def test_farm_details(browser):
     farm_page.add_gateway(gateway).click()
     polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('IP created!')
-    assert farm_page.wait_for('Edit')
     farm_page.close_detail()
     farm_details = farm_page.farm_detials(farm_name)
     grid_farm_details = grid_proxy.get_farm_details(farm_details[1])
