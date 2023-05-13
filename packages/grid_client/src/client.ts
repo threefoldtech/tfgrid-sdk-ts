@@ -98,7 +98,6 @@ class GridClient {
 
     if (!isConnecting) {
       await this.tfclient.connect();
-      this.rmbClient.api = this.tfclient.api;
       try {
         await this.rmbClient.connect();
       } catch (e) {
