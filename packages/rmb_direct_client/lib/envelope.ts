@@ -2,19 +2,21 @@ import { ApiPromise, Keyring } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { waitReady } from "@polkadot/wasm-crypto";
+import { Client as TFClient } from "@threefold/tfchain_client";
 import { Buffer } from "buffer";
 import * as cryptoJs from "crypto-js";
 import aes from "js-crypto-aes";
 
 import { createShared, KPType, sign } from "./sign";
 import { Address, Envelope, Error, Request, Response } from "./types/lib/types";
-import { getTwinFromTwinID, hexStringToArrayBuffer } from "./util";
+import { hexStringToArrayBuffer } from "./util";
+
 class ClientEnvelope extends Envelope {
   signer!: KeyringPair;
   chainUrl: string;
   twin: any;
 
-  constructor(signer: KeyringPair | undefined, envelope: Envelope, chainUrl: string, public api: ApiPromise) {
+  constructor(signer: KeyringPair | undefined, envelope: Envelope, chainUrl: string, public tfclient: TFClient) {
     super({
       uid: envelope.uid,
       tags: envelope.tags,
@@ -36,7 +38,6 @@ class ClientEnvelope extends Envelope {
 
     this.chainUrl = chainUrl;
     this.schema = "application/json";
-    this.api = api;
 
     if (signer) {
       this.signer = signer;
@@ -75,7 +76,7 @@ class ClientEnvelope extends Envelope {
       }
       // get twin of sender from twinid
 
-      this.twin = await getTwinFromTwinID(this.api, this.source.twin);
+      this.twin = await this.tfclient.twins.get({ id: this.source.twin });
 
       // get sender pk from twin , update signer to be of sender
       await this.getSigner(sigType);
