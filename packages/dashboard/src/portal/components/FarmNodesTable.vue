@@ -253,6 +253,8 @@
                 dense
                 hint="IPV6 address in format x:x:x:x:x:x:x:x"
                 persistent-hint
+                ref="ip6Ref"
+                @input="gw6Validate"
                 :error-messages="ip6ErrorMessage"
                 :rules="[ip6check]"
               ></v-text-field>
@@ -265,6 +267,8 @@
                 type="string"
                 hint="Gateway for the IP in ipv6 format "
                 persistent-hint
+                ref="gw6Ref"
+                @input="ip6Validate"
                 :error-messages="gw6ErrorMessage"
                 :rules="[gw6Check]"
               ></v-text-field>
@@ -510,8 +514,7 @@ export default class FarmNodesTable extends Vue {
         gw: this.gw4,
       },
     };
-
-    if (this.ip6 != "")
+    if (this.ip6 != "" && this.gw6 != "")
       config.ip6 = {
         ip: this.ip6,
         gw: this.gw6,
@@ -601,8 +604,7 @@ export default class FarmNodesTable extends Vue {
   }
   openPublicConfig(node: nodeInterface) {
     // disable remove config btn
-    if (node.publicConfig.ipv4 && node.publicConfig.gw4 && node.publicConfig.ipv6 && node.publicConfig.gw6)
-      this.hasPublicConfig = true;
+    if (node.publicConfig.ipv4 && node.publicConfig.gw4) this.hasPublicConfig = true;
     else this.hasPublicConfig = false;
 
     this.nodeToEdit = node;
@@ -636,8 +638,19 @@ export default class FarmNodesTable extends Vue {
       return false;
     }
   }
+  ip6Validate() {
+    const ip6Ref = this.$refs.ip6Ref as unknown as { validate(): void };
+    ip6Ref?.validate();
+  }
   ip6check() {
-    if (!this.ip6) return true;
+    if (!this.ip6) {
+      if (this.gw6) {
+        this.ip6ErrorMessage = "This field is required";
+        return false;
+      }
+      this.gw6ErrorMessage = "";
+      return true;
+    }
     const IPv4SegmentFormat = "(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])";
     const IPv4AddressFormat = `(${IPv4SegmentFormat}[.]){3}${IPv4SegmentFormat}`;
 
@@ -683,8 +696,19 @@ export default class FarmNodesTable extends Vue {
       return false;
     }
   }
+  gw6Validate() {
+    const gw6Ref = this.$refs.gw6Ref as unknown as { validate(): void };
+    gw6Ref?.validate();
+  }
   gw6Check() {
-    if (!this.gw6) return true;
+    if (!this.gw6) {
+      if (this.ip6) {
+        this.gw6ErrorMessage = "This field is required";
+        return false;
+      }
+      this.ip6ErrorMessage = "";
+      return true;
+    }
     if (PrivateIp(this.gw6.split("/")[0])) {
       this.gw6ErrorMessage = "Gateway is not public";
       return false;

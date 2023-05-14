@@ -178,8 +178,8 @@ class TwinDeploymentHandler {
   async saveNetworks(twinDeployments: TwinDeployment[]) {
     const savedNetworkNames: string[] = [];
     for (const twinDeployment of twinDeployments) {
-      if (savedNetworkNames.includes(twinDeployment.network.name)) continue;
       if (twinDeployment.network) {
+        if (savedNetworkNames.includes(twinDeployment.network.name)) continue;
         savedNetworkNames.push(twinDeployment.network.name);
         if (twinDeployment.operation === Operations.delete) {
           await twinDeployment.network.save();
@@ -202,7 +202,7 @@ class TwinDeploymentHandler {
       const network_workloads = twinDeployment.deployment.workloads.filter(
         workload => workload.type === WorkloadTypes.network,
       );
-      if (network_workloads.length > 0) {
+      if (network_workloads.length > 0 || twinDeployment.publicIps > 0) {
         deployments.push(twinDeployment);
         continue;
       }

@@ -10,11 +10,33 @@ export async function createGridCL(chainUrl: string) {
   return cl;
 }
 
-export function generatePublicKey(mnemonic: string) {
-  const seed = bip39.mnemonicToSeedSync(mnemonic);
-  const privKey = new Uint8Array(seed).slice(0, 32);
-  const pk = "0x" + Buffer.from(secp.getPublicKey(privKey, true)).toString("hex");
-  return pk;
+function isValidSeed(seed: string) {
+  const hexRegex = /^[0-9a-fA-F]+$/;
+  return hexRegex.test(seed) ? true : false;
+}
+
+function getPublicKey(privateKey: Buffer | string) {
+  return "0x" + Buffer.from(secp.getPublicKey(privateKey, true)).toString("hex");
+}
+
+export function generatePublicKey(secret: string) {
+  let privKey;
+
+  if (bip39.validateMnemonic(secret)) {
+    const seed = bip39.mnemonicToSeedSync(secret);
+    privKey = new Uint8Array(seed).slice(0, 32);
+  } else {
+    privKey = secret;
+    if (secret.startsWith("0x")) {
+      privKey = secret.substring(2);
+    }
+
+    if (!isValidSeed(privKey) || privKey.length !== 64) {
+      throw new Error("Invalid seed. Couldn't get public key from the provided seed.");
+    }
+  }
+
+  return getPublicKey(privKey);
 }
 
 export async function setPublicKey(
