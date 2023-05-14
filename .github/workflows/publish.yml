@@ -26,18 +26,11 @@ jobs:
           cache: "yarn"
 
       - name: Install
-        run: yarn
+        run: yarn --pure-lockfile
       - name: Build
         run: lerna run build --no-private
       - name: Publish
-        run: |
-          yarn workspace @threefold/tfchain_client publish
-          yarn workspace @threefold/rmb_direct_client publish
-          yarn workspace @threefold/rmb_peer_client publish
-          yarn workspace @threefold/rmb_peer_server publish
-          yarn workspace @threefold/grid_client publish
-          yarn workspace @threefold/grid_http_server publish
-          yarn workspace @threefold/grid_rmb_server publish
+        run: lerna publish from-package --yes
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
