@@ -3,10 +3,11 @@ import { Buffer } from "buffer";
 import * as PATH from "path";
 import { default as StellarSdk } from "stellar-sdk";
 
+import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
-import { appPath, BackendStorage, StorageUpdateAction } from "../storage/backend";
+import { appPath, BackendStorage, BackendStorageType, StorageUpdateAction } from "../storage/backend";
 import {
   BlockchainAssetModel,
   BlockchainAssetsModel,
@@ -30,8 +31,9 @@ class Stellar implements blockchainInterface {
   fileName = "stellar.json";
   backendStorage: BackendStorage;
   mnemonic: string;
+  tfClient: TFClient;
 
-  constructor(config: GridClientConfig) {
+  constructor(public config: GridClientConfig) {
     this.mnemonic = config.mnemonic;
     this.backendStorage = new BackendStorage(
       config.backendStorageType,
@@ -41,6 +43,12 @@ class Stellar implements blockchainInterface {
       config.keypairType,
       config.backendStorage,
       config.seed,
+    );
+    this.tfClient = new TFClient(
+      this.config.substrateURL,
+      this.config.mnemonic,
+      this.config.storeSecret,
+      this.config.keypairType,
     );
   }
 
@@ -58,7 +66,11 @@ class Stellar implements blockchainInterface {
     if (data[name]) {
       throw Error(`A wallet with the same name ${name} already exists`);
     }
-    await this.backendStorage.update(path, name, secret);
+    const updateOperations = await this.backendStorage.update(path, name, secret);
+    if (this.config.backendStorageType === BackendStorageType.tfkvstore) {
+      await this.tfClient.connect();
+      await this.tfClient.applyAllExtrinsics(updateOperations);
+    }
   }
 
   async getWalletSecret(name: string) {
@@ -274,7 +286,11 @@ class Stellar implements blockchainInterface {
     if (!data[options.name]) {
       throw Error(`Couldn't find a wallet with name ${options.name}`);
     }
-    await this.backendStorage.update(path, options.name, "", StorageUpdateAction.delete);
+    const updateOperations = await this.backendStorage.update(path, options.name, "", StorageUpdateAction.delete);
+    if (this.config.backendStorageType === BackendStorageType.tfkvstore) {
+      await this.tfClient.connect();
+      await this.tfClient.applyAllExtrinsics(updateOperations);
+    }
     return "Deleted";
   }
 }
