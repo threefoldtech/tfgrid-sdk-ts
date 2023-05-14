@@ -52,6 +52,13 @@ class Stellar implements blockchainInterface {
     );
   }
 
+  private async saveIfKVStoreBackend(extrinsics) {
+    if (this.config.backendStorageType === BackendStorageType.tfkvstore) {
+      await this.tfClient.connect();
+      await this.tfClient.applyAllExtrinsics(extrinsics);
+    }
+  }
+
   async _load() {
     const path = PATH.join(appPath, this.fileName);
     let data = await this.backendStorage.load(path);
@@ -67,10 +74,7 @@ class Stellar implements blockchainInterface {
       throw Error(`A wallet with the same name ${name} already exists`);
     }
     const updateOperations = await this.backendStorage.update(path, name, secret);
-    if (this.config.backendStorageType === BackendStorageType.tfkvstore) {
-      await this.tfClient.connect();
-      await this.tfClient.applyAllExtrinsics(updateOperations);
-    }
+    await this.saveIfKVStoreBackend(updateOperations);
   }
 
   async getWalletSecret(name: string) {
@@ -287,10 +291,7 @@ class Stellar implements blockchainInterface {
       throw Error(`Couldn't find a wallet with name ${options.name}`);
     }
     const updateOperations = await this.backendStorage.update(path, options.name, "", StorageUpdateAction.delete);
-    if (this.config.backendStorageType === BackendStorageType.tfkvstore) {
-      await this.tfClient.connect();
-      await this.tfClient.applyAllExtrinsics(updateOperations);
-    }
+    await this.saveIfKVStoreBackend(updateOperations);
     return "Deleted";
   }
 }
