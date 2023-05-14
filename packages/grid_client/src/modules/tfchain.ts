@@ -14,7 +14,7 @@ import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
-import { appPath, BackendStorage, StorageUpdateAction } from "../storage/backend";
+import { appPath, BackendStorage, BackendStorageType, StorageUpdateAction } from "../storage/backend";
 import { KeypairType } from "../zos";
 import blockchainInterface, { blockchainType } from "./blockchainInterface";
 import {
@@ -40,7 +40,9 @@ class TFChain implements blockchainInterface {
   storeSecret: string;
   keypairType: KeypairType;
   network: string;
-  constructor(config: GridClientConfig) {
+  tfClient: TFClient;
+
+  constructor(public config: GridClientConfig) {
     this.backendStorage = new BackendStorage(
       config.backendStorageType,
       config.substrateURL,
@@ -56,6 +58,12 @@ class TFChain implements blockchainInterface {
     this.storeSecret = config.storeSecret as string;
     this.keypairType = config.keypairType;
     this.network = config.network;
+    this.tfClient = new TFClient(
+      this.config.substrateURL,
+      this.config.mnemonic,
+      this.config.storeSecret,
+      this.config.keypairType,
+    );
   }
 
   getPath() {
@@ -72,12 +80,20 @@ class TFChain implements blockchainInterface {
     return [path, data];
   }
 
+  private async saveIfKVStoreBackend(extrinsics) {
+    if (this.config.backendStorageType === BackendStorageType.tfkvstore) {
+      await this.tfClient.connect();
+      await this.tfClient.applyAllExtrinsics(extrinsics);
+    }
+  }
+
   async save(name: string, mnemonic: string) {
     const [path, data] = await this._load();
     if (data[name]) {
       throw Error(`An account with the same name ${name} already exists`);
     }
-    await this.backendStorage.update(path, name, mnemonic);
+    const updateOperations = await this.backendStorage.update(path, name, mnemonic);
+    await this.saveIfKVStoreBackend(updateOperations);
   }
 
   @expose
@@ -125,7 +141,13 @@ class TFChain implements blockchainInterface {
 
     try {
       const path = this.getPath();
-      await this.backendStorage.update(path, options.name, options.secret, StorageUpdateAction.add);
+      const updateOperations = await this.backendStorage.update(
+        path,
+        options.name,
+        options.secret,
+        StorageUpdateAction.add,
+      );
+      await this.saveIfKVStoreBackend(updateOperations);
     } catch (e) {
       throw Error(`could not update account mnemonics: ${e}`);
     }
@@ -215,7 +237,8 @@ class TFChain implements blockchainInterface {
       throw Error(`Couldn't find an account with name ${options.name}`);
     }
     const path = this.getPath();
-    await this.backendStorage.update(path, options.name, "", StorageUpdateAction.delete);
+    const updateOperations = await this.backendStorage.update(path, options.name, "", StorageUpdateAction.delete);
+    await this.saveIfKVStoreBackend(updateOperations);
     return "Deleted";
   }
 
