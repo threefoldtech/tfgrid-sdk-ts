@@ -43,7 +43,7 @@
                 You receive {{ item.applyedDiscount.first }}% discount if you reserve an entire
                 <a
                   target="_blank"
-                  href="https://library.threefold.me/info/threefold#/cloud/threefold__pricing?id=dedicated-servers"
+                  href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html#billing--pricing"
                   style="color: blue"
                   >node</a
                 >
