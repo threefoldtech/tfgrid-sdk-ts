@@ -2,10 +2,11 @@ import { default as AlgoSdk } from "algosdk";
 import axios from "axios";
 import * as PATH from "path";
 
+import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { validateInput } from "../helpers";
 import { expose } from "../helpers/expose";
-import { appPath, BackendStorage, StorageUpdateAction } from "../storage";
+import { appPath, BackendStorage, BackendStorageType, StorageUpdateAction } from "../storage";
 import blockchainInterface, { blockchainType } from "./blockchainInterface";
 import {
   AlgorandAccountAssetsFromAddressModel,
@@ -28,7 +29,9 @@ class Algorand implements blockchainInterface {
   baseUrl = "http://node.testnet.algoexplorerapi.io/";
   backendStorage: BackendStorage;
   fileName = "algorand.json";
-  constructor(config: GridClientConfig) {
+  tfClient: TFClient;
+
+  constructor(public config: GridClientConfig) {
     this.backendStorage = new BackendStorage(
       config.backendStorageType,
       config.substrateURL,
@@ -38,13 +41,28 @@ class Algorand implements blockchainInterface {
       config.backendStorage,
       config.seed,
     );
+    this.tfClient = new TFClient(
+      this.config.substrateURL,
+      this.config.mnemonic,
+      this.config.storeSecret,
+      this.config.keypairType,
+    );
   }
+
+  private async saveIfKVStoreBackend(extrinsics) {
+    if (this.config.backendStorageType === BackendStorageType.tfkvstore) {
+      await this.tfClient.connect();
+      await this.tfClient.applyAllExtrinsics(extrinsics);
+    }
+  }
+
   async save(name: string, value: string) {
     const [path, data] = await this._load();
     if (data[name]) {
       throw Error(`A wallet with the same name ${name} already exists`);
     }
-    await this.backendStorage.update(path, name, value);
+    const updateOperations = await this.backendStorage.update(path, name, value);
+    await this.saveIfKVStoreBackend(updateOperations);
   }
   async _load() {
     const path = PATH.join(appPath, this.fileName);
@@ -82,7 +100,8 @@ class Algorand implements blockchainInterface {
     if (!data[options.name]) {
       throw Error(`Couldn't find a wallet with name ${options.name}`);
     }
-    await this.backendStorage.update(path, options.name, "", StorageUpdateAction.delete);
+    const updateOperations = await this.backendStorage.update(path, options.name, "", StorageUpdateAction.delete);
+    await this.saveIfKVStoreBackend(updateOperations);
     return "Deleted";
   }
   @expose
