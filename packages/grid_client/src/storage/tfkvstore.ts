@@ -1,3 +1,6 @@
+import { SubmittableExtrinsic } from "@polkadot/api-base/types";
+import { ISubmittableResult } from "@polkadot/types/types";
+
 import { TFClient } from "../clients/tf-grid/client";
 import { KeypairType } from "../zos/deployment";
 import BackendStorageInterface from "./BackendStorageInterface";
@@ -16,10 +19,12 @@ class TFKVStoreBackend implements BackendStorageInterface {
     if (!value || value === '""') {
       return await this.remove(key);
     }
+    const extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = [];
     const splits = this.split(key, value);
     for (const k of Object.keys(splits)) {
-      await (await this.client.kvStore.set({ key: k, value: splits[k] })).apply();
+      extrinsics.push(await this.client.kvStore.set({ key: k, value: splits[k] }));
     }
+    return extrinsics;
   }
 
   @crop
@@ -45,7 +50,16 @@ class TFKVStoreBackend implements BackendStorageInterface {
     if (!value) {
       return;
     }
-    return (await this.client.kvStore.delete({ key })).apply();
+    let i = 0;
+    let val = value;
+    const extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = [];
+    while (val) {
+      extrinsics.push(await this.client.kvStore.delete({ key }));
+      i++;
+      key = `${key}.${i}`;
+      val = await this.client.kvStore.get({ key });
+    }
+    return extrinsics;
   }
 
   @crop
