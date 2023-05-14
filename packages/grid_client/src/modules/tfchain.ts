@@ -82,8 +82,11 @@ class TFChain implements blockchainInterface {
 
   private async saveIfKVStoreBackend(extrinsics) {
     if (this.config.backendStorageType === BackendStorageType.tfkvstore) {
-      await this.tfClient.connect();
-      await this.tfClient.applyAllExtrinsics(extrinsics);
+      extrinsics = extrinsics.filter(e => e !== undefined);
+      if (extrinsics.length > 0) {
+        await this.tfClient.connect();
+        await this.tfClient.applyAllExtrinsics(extrinsics);
+      }
     }
   }
 

@@ -91,8 +91,11 @@ class BaseModule {
       backendOperations = backendOperations.concat(await this.backendStorage.dump(wireguardPath, "")); // left for cleaning up the old deployment after deletion
     }
     if (this.config.backendStorageType === BackendStorageType.tfkvstore) {
-      await this.tfClient.connect();
-      await this.tfClient.applyAllExtrinsics(backendOperations);
+      backendOperations = backendOperations.filter(e => e !== undefined);
+      if (backendOperations.length > 0) {
+        await this.tfClient.connect();
+        await this.tfClient.applyAllExtrinsics(backendOperations);
+      }
     }
   }
 
