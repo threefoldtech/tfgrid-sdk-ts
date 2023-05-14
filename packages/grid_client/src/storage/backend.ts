@@ -98,7 +98,7 @@ class BackendStorage {
     } else if (action === StorageUpdateAction.delete) {
       delete storedData[field];
     }
-    await this.dump(key, storedData);
+    return await this.dump(key, storedData);
   }
 }
 
