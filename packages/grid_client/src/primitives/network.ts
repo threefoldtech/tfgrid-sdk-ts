@@ -10,7 +10,7 @@ import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
 import { getRandomNumber, randomChoice } from "../helpers/utils";
-import { BackendStorage } from "../storage/backend";
+import { BackendStorage, BackendStorageType } from "../storage/backend";
 import { Deployment } from "../zos/deployment";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { Peer, Znet } from "../zos/znet";
@@ -45,6 +45,7 @@ class Network {
   _accessNodes: number[] = [];
   rmb: RMB;
   wireguardConfig: string;
+  tfClient: TFClient;
 
   constructor(public name: string, public ipRange: string, public config: GridClientConfig) {
     if (Addr(ipRange).prefix !== 16) {
@@ -64,6 +65,19 @@ class Network {
     );
     this.rmb = new RMB(config.rmbClient);
     this.capacity = new Nodes(this.config.graphqlURL, this.config.proxyURL, this.config.rmbClient);
+    this.tfClient = new TFClient(
+      this.config.substrateURL,
+      this.config.mnemonic,
+      this.config.storeSecret,
+      this.config.keypairType,
+    );
+  }
+
+  private async saveIfKVStoreBackend(extrinsics) {
+    if (this.config.backendStorageType === BackendStorageType.tfkvstore) {
+      await this.tfClient.connect();
+      await this.tfClient.applyAllExtrinsics(extrinsics);
+    }
   }
 
   async addAccess(node_id: number, ipv4: boolean): Promise<string> {
@@ -198,15 +212,10 @@ class Network {
     if (network["ip_range"] !== this.ipRange) {
       throw Error(`The same network name ${this.name} with a different ip range already exists`);
     }
-    const tfclient = new TFClient(
-      this.config.substrateURL,
-      this.config.mnemonic,
-      this.config.storeSecret,
-      this.config.keypairType,
-    );
-    await tfclient.connect();
+
+    await this.tfClient.connect();
     for (const node of network["nodes"]) {
-      const contract = await tfclient.contracts.get({ id: node.contract_id });
+      const contract = await this.tfClient.contracts.get({ id: node.contract_id });
       if (contract === null) continue;
       const node_twin_id = await this.capacity.getNodeTwinId(node.node_id);
       const payload = JSON.stringify({ contract_id: node.contract_id });
@@ -589,13 +598,17 @@ PersistentKeepalive = 25\nEndpoint = ${endpoint}`;
   async _save(network): Promise<void> {
     const path = PATH.join(this.getNetworksPath(), this.name, "info.json");
     const current = await this.backendStorage.load(path);
-    if (JSON.stringify(current) !== JSON.stringify(network)) await this.backendStorage.dump(path, network);
+    if (JSON.stringify(current) !== JSON.stringify(network)) {
+      const updateOperations = await this.backendStorage.dump(path, network);
+      await this.saveIfKVStoreBackend(updateOperations);
+    }
   }
 
   async delete(): Promise<void> {
     events.emit("logs", `Deleting network ${this.name}`);
     const path = PATH.join(this.getNetworksPath(), this.name, "info.json");
-    await this.backendStorage.dump(path, "");
+    const updateOperations = await this.backendStorage.dump(path, "");
+    await this.saveIfKVStoreBackend(updateOperations);
   }
 
   async generatePeers(): Promise<void> {
