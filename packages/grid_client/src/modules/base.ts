@@ -85,7 +85,7 @@ class BaseModule {
       backendOperations = backendOperations.concat(await this.backendStorage.dump(contractPath, ""));
     }
     if (StoreContracts.length !== 0) {
-      await this.backendStorage.dump(contractsPath, StoreContracts);
+      backendOperations = backendOperations.concat(await this.backendStorage.dump(contractsPath, StoreContracts));
     } else {
       backendOperations = backendOperations.concat(await this.backendStorage.dump(contractsPath, ""));
       backendOperations = backendOperations.concat(await this.backendStorage.dump(wireguardPath, "")); // left for cleaning up the old deployment after deletion
