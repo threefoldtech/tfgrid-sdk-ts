@@ -185,7 +185,8 @@ class Client extends QueryClient {
 
   private async _applyExtrinsic<T>(
     extrinsic: SubmittableExtrinsic<"promise", ISubmittableResult>,
-    resultSections: string[] = [""],
+    resultSections: string[] = [],
+    resultEvents: string[] = [],
   ): Promise<T> {
     const promise = new Promise(async (resolve, reject) => {
       function callback(res) {
@@ -204,7 +205,10 @@ class Client extends QueryClient {
             if (section === SYSTEM && method === ExtrinsicState.ExtrinsicFailed) {
               const errorIndex = parseInt(data.toJSON()[0].module.error.replace(/0+$/g, ""));
               reject(errorIndex);
-            } else if (resultSections.includes(section)) {
+            } else if (
+              resultSections.includes(section) &&
+              (resultEvents.length === 0 || (resultEvents.length > 0 && resultEvents.includes(method)))
+            ) {
               resultData.push(data.toPrimitive()[0]);
             } else if (section === SYSTEM && method === ExtrinsicState.ExtrinsicSuccess) {
               if (!(extrinsic.method.section === UTILITY && BATCH_METHODS.includes(extrinsic.method.method))) {
@@ -239,31 +243,34 @@ class Client extends QueryClient {
   async applyExtrinsic<T>(
     extrinsic: SubmittableExtrinsic<"promise", ISubmittableResult>,
     resultSections: string[] = [""],
+    resultEvents: string[] = [],
   ): Promise<T> {
     await Client.lock.acquireAsync();
     console.log("Lock acquired");
     let result;
     try {
-      result = await this._applyExtrinsic<T>(extrinsic, resultSections);
+      result = await this._applyExtrinsic<T>(extrinsic, resultSections, resultEvents);
     } finally {
       Client.lock.release();
       console.log("Lock released");
     }
     return result;
   }
-  async applyAllExtrinsics<T>(extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[]) {
+  async applyAllExtrinsics<T>(extrinsics: ExtrinsicResult<T>[]) {
     return this.utility.batchAll<T>(extrinsics);
   }
 
   patchExtrinsic<R>(extrinsic: Extrinsic, options: PatchExtrinsicOptions<R> = {}): ExtrinsicResult<R> {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
-
     (<any>extrinsic).apply = async () => {
-      const res = await self.applyExtrinsic(extrinsic, options.resultSections);
+      const res = await self.applyExtrinsic(extrinsic, options.resultSections, options.resultEvents);
       if (options.map) return options.map(res);
       return res;
     };
+    (<any>extrinsic).resultEvents = options.resultEvents;
+    (<any>extrinsic).resultSections = options.resultSections;
+
     return extrinsic as ExtrinsicResult<R>;
   }
 }

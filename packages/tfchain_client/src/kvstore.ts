@@ -1,5 +1,5 @@
 import { Client } from "./client";
-import type { Extrinsic } from "./types";
+import type { Extrinsic, ExtrinsicResult } from "./types";
 import { checkConnection } from "./utils";
 
 export interface KVStoreSetOptions {
@@ -46,11 +46,11 @@ class KVStore {
 
   async deleteAll(): Promise<string[]> {
     const keys: string[] = await this.list();
-    const extrinsics: Extrinsic[] = [];
+    const extrinsics: ExtrinsicResult<void>[] = [];
     for (const key of keys) {
       extrinsics.push(await this.delete({ key }));
     }
-    await this.client.applyAllExtrinsics<number[]>(extrinsics);
+    await this.client.applyAllExtrinsics<void>(extrinsics);
     return keys;
   }
 }
