@@ -1,6 +1,7 @@
 import { Addr } from "netaddr";
 
 import { GridClientConfig } from "../config";
+import { events } from "../helpers/events";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { VMHL } from "../high_level/machine";
@@ -86,7 +87,7 @@ class MachinesModule extends BaseModule {
     if (await this.exists(options.name)) {
       throw Error(`Another machine deployment with the same name ${options.name} already exists`);
     }
-
+    events.emit("logs", `Start creating the machine deployment with name ${options.name}`);
     const [twinDeployments, , wireguardConfig] = await this._createDeployment(options);
     const contracts = await this.twinDeploymentHandler.handle(twinDeployments);
     await this.save(options.name, contracts);
@@ -117,6 +118,7 @@ class MachinesModule extends BaseModule {
   @validateInput
   @checkBalance
   async delete(options: MachinesDeleteModel) {
+    events.emit("logs", `Start deleting the machine deployment with name ${options.name}`);
     return await this._delete(options.name);
   }
 
@@ -152,6 +154,8 @@ class MachinesModule extends BaseModule {
       throw Error(
         `There is another machine with the same name "${options.name}" in the same deployment ${options.deployment_name}`,
       );
+
+    events.emit("logs", `Start adding machine: ${options.name} to deployment: ${options.deployment_name}`);
     const workload = (
       await this._getWorkloadsByTypes(options.deployment_name, oldDeployments, [WorkloadTypes.zmachine])
     )[0];
@@ -195,6 +199,7 @@ class MachinesModule extends BaseModule {
     if (!(await this.exists(options.deployment_name))) {
       throw Error(`There are no machine deployments with the name: ${options.deployment_name}`);
     }
+    events.emit("logs", `Start deleting machine: ${options.name} from deployment: ${options.deployment_name}`);
     return await this._deleteInstance(this.vm, options.deployment_name, options.name);
   }
 }

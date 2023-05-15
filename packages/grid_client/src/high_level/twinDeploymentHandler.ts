@@ -6,7 +6,6 @@ import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
 import { validateObject } from "../helpers/validator";
 import { DeploymentFactory, Nodes } from "../primitives/index";
-import { Deployment } from "../zos/deployment";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { Operations, TwinDeployment } from "./models";
 class TwinDeploymentHandler {
@@ -461,6 +460,7 @@ class TwinDeploymentHandler {
       nameExtrinsics = nameExtrinsics.concat(extrinsics.nameExtrinsics);
       deletedExtrinsics = deletedExtrinsics.concat(extrinsics.deletedExtrinsics);
     }
+    events.emit("logs", "Creating contracts");
     const extrinsicResults: Contract[] = await this.tfclient.applyAllExtrinsics<Contract>([
       ...nodeExtrinsics,
       ...nameExtrinsics,
@@ -472,7 +472,7 @@ class TwinDeploymentHandler {
     try {
       for (const twinDeployment of twinDeployments) {
         if (twinDeployment.operation === Operations.deploy) {
-          events.emit("logs", `Deploying on node_id: ${twinDeployment.nodeId}`);
+          events.emit("logs", `Sending deployment to node_id: ${twinDeployment.nodeId}`);
           for (const contract of extrinsicResults) {
             if (twinDeployment.deployment.challenge_hash() === contract.contractType.nodeContract.deploymentHash) {
               twinDeployment.deployment.contract_id = contract.contractId;

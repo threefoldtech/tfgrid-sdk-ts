@@ -1,6 +1,7 @@
 import { Addr } from "netaddr";
 
 import { GridClientConfig } from "../config";
+import { events } from "../helpers/events";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { KubernetesHL } from "../high_level/kubernetes";
@@ -176,6 +177,7 @@ class K8sModule extends BaseModule {
       throw Error(`Another k8s deployment with the same name ${options.name} already exists`);
     }
 
+    events.emit("logs", `Start creating the cluster with name ${options.name}`);
     const [deployments, , wireguardConfig] = await this._createDeployment(options);
     const contracts = await this.twinDeploymentHandler.handle(deployments);
     await this.save(options.name, contracts);
@@ -211,6 +213,7 @@ class K8sModule extends BaseModule {
   @validateInput
   @checkBalance
   async delete(options: K8SDeleteModel) {
+    events.emit("logs", `Start deleting the cluster with name ${options.name}`);
     return await this._delete(options.name);
   }
 
@@ -258,6 +261,7 @@ class K8sModule extends BaseModule {
       throw Error(
         `There is another worker with the same name "${options.name}" in this cluster ${options.deployment_name}`,
       );
+    events.emit("logs", `Start adding worker: ${options.name} to cluster: ${options.deployment_name}`);
     const masterWorkloads = await this._getMastersWorkload(options.deployment_name, oldDeployments);
     if (masterWorkloads.length === 0) {
       throw Error("Couldn't get master node");
@@ -303,6 +307,7 @@ class K8sModule extends BaseModule {
     if (!(await this.exists(options.deployment_name))) {
       throw Error(`There is no k8s deployment with the name: ${options.deployment_name}`);
     }
+    events.emit("logs", `Start deleting worker: ${options.name} from cluster: ${options.deployment_name}`);
     return await this._deleteInstance(this.kubernetes, options.deployment_name, options.name);
   }
 }
