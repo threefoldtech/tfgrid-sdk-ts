@@ -13,8 +13,8 @@ class TwinDeployment {
     public operation: Operations,
     public publicIps: number,
     public nodeId: number,
-    public network: Network = null,
-    public solutionProviderId: number = null,
+    public network: Network | null = null,
+    public solutionProviderId: number | null = null,
   ) {}
 }
 

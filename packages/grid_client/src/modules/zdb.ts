@@ -20,8 +20,8 @@ class ZdbsModule extends BaseModule {
   }
 
   async _createDeployment(options: ZDBSModel): Promise<TwinDeployment[]> {
-    const twinDeployments = [];
-    const zdbs_names = [];
+    const twinDeployments: TwinDeployment[] = [];
+    const zdbs_names: string[] = [];
     const metadata = JSON.stringify({
       type: "zdb",
       name: options.name,

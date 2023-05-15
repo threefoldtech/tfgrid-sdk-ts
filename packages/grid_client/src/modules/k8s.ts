@@ -85,8 +85,8 @@ class K8sModule extends BaseModule {
       name: options.name,
       projectName: this.config.projectName,
     });
-    const masters_names = [];
-    const workers_names = [];
+    const masters_names: string[] = [];
+    const workers_names: string[] = [];
     for (const master of options.masters) {
       if (masters_names.includes(master.name))
         throw Error(`Another master with the same name ${master.name} already exists`);

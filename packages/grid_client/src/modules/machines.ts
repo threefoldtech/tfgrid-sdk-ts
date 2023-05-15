@@ -40,7 +40,7 @@ class MachinesModule extends BaseModule {
       projectName: this.config.projectName,
     });
 
-    const machines_names = [];
+    const machines_names: string[] = [];
 
     for (const machine of options.machines) {
       if (machines_names.includes(machine.name))

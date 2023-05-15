@@ -227,11 +227,11 @@ class BaseModule {
     }
   }
 
-  async _get(name: string) {
+  async _get(name: string): Promise<Deployment[]> {
+    const deployments: Deployment[] = [];
     if (!(await this._list()).includes(name)) {
-      return [];
+      return deployments;
     }
-    const deployments = [];
     const contracts = await this.getDeploymentContracts(name);
     if (contracts.length === 0) {
       await this.save(name, { created: [], deleted: [] });
@@ -275,8 +275,8 @@ class BaseModule {
     twinDeployments: TwinDeployment[],
     network: Network = null,
   ) {
-    let finalTwinDeployments = [];
-    const doneDeploymentIPWorkloadNames = [];
+    let finalTwinDeployments: TwinDeployment[] = [];
+    const doneDeploymentIPWorkloadNames: string[] = [];
 
     for (let oldDeployment of oldDeployments) {
       oldDeployment = await this.deploymentFactory.fromObj(oldDeployment);
@@ -331,7 +331,7 @@ class BaseModule {
     twinDeployments: TwinDeployment[],
     network: Network = null,
   ) {
-    let finalTwinDeployments = [];
+    let finalTwinDeployments: TwinDeployment[] = [];
 
     for (let oldDeployment of oldDeployments) {
       oldDeployment = await this.deploymentFactory.fromObj(oldDeployment);
@@ -369,7 +369,7 @@ class BaseModule {
   ) {
     for (let oldDeployment of oldDeployments) {
       let pubIPOldWorkload = "";
-      const zmachineOldWorkloads = [];
+      const zmachineOldWorkloads: string[] = [];
       oldDeployment.workloads.forEach(workload => {
         if (workload.type === WorkloadTypes.ip && workload.data["v4"]) pubIPOldWorkload = workload.name;
         else if (workload.type === WorkloadTypes.zmachine) zmachineOldWorkloads.push(workload.name);
@@ -387,7 +387,7 @@ class BaseModule {
         }
 
         let pubIPTwinWorkload = "";
-        const zmachineTwinWorkloads = [];
+        const zmachineTwinWorkloads: string[] = [];
         pubIPTwinDeployment.deployment.workloads.forEach(workload => {
           if (workload.type === WorkloadTypes.ip && workload.data["v4"]) pubIPTwinWorkload = workload.name;
           else if (workload.type === WorkloadTypes.zmachine) zmachineTwinWorkloads.push(workload.name);
@@ -429,7 +429,7 @@ class BaseModule {
     twinDeployments: TwinDeployment[],
     network: Network = null,
   ) {
-    let finalTwinDeployments = [];
+    let finalTwinDeployments: TwinDeployment[] = [];
     finalTwinDeployments = twinDeployments.filter(d => d.operation === Operations.update);
     twinDeployments = this.twinDeploymentHandler.deployMerge(twinDeployments);
     const deploymentNodeIds = await this._getDeploymentNodeIds(name);
@@ -473,8 +473,8 @@ class BaseModule {
     twinDeployments: TwinDeployment[],
     network: Network = null,
   ) {
-    const finalTwinDeployments = twinDeployments.filter(d => d.operation === Operations.update);
-    const twinDeployment = twinDeployments.pop();
+    const finalTwinDeployments: TwinDeployment[] = twinDeployments.filter(d => d.operation === Operations.update);
+    const twinDeployment: TwinDeployment = twinDeployments.pop();
     const contract_id = await this._getContractIdFromNodeId(deployment_name, node_id);
     if (contract_id && twinDeployment.publicIps == 0) {
       for (let oldDeployment of oldDeployments) {

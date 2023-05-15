@@ -18,8 +18,8 @@ class ZdbHL extends HighLevelBase {
     publicNamespace: boolean,
     metadata = "",
     description = "",
-    solutionProviderId: number,
-  ) {
+    solutionProviderId?: number,
+  ): Promise<TwinDeployment> {
     if (!(await this.nodes.nodeHasResources(node_id, { hru: disk_size }))) {
       throw Error(`Node ${node_id} doesn't have enough resources: hru=${disk_size}`);
     }
