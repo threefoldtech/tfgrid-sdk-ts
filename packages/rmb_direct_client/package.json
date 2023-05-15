@@ -1,6 +1,6 @@
 {
   "name": "@threefold/rmb_direct_client",
-  "version": "2.0.0-rc7",
+  "version": "2.0.0-rc8",
   "repository": {
     "type": "git",
     "url": "https://github.com/threefoldtech/tfgrid-sdk-ts.git"
