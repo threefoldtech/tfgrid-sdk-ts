@@ -39,7 +39,8 @@ class KVStore {
     const res = await this.client.api.query.tfkvStore.tfkvStore.entries(this.client.address);
     const keys: string[] = [];
     for (const key of res) {
-      keys.push(key[0].toHuman()[1]);
+      const k = key[0].toHuman();
+      if (k) keys.push(k[1]);
     }
     return keys;
   }
