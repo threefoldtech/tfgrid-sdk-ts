@@ -441,6 +441,7 @@ class TwinDeploymentHandler {
     await this.validate(twinDeployments);
     await this.checkNodesCapacity(twinDeployments);
     const contracts = { created: [], updated: [], deleted: [] };
+    const resultContracts = { created: [], updated: [], deleted: [] };
     let nodeExtrinsics: ExtrinsicResult<Contract>[] = [];
     let nameExtrinsics: ExtrinsicResult<Contract>[] = [];
     let deletedExtrinsics: ExtrinsicResult<number>[] = [];
@@ -481,7 +482,8 @@ class TwinDeploymentHandler {
                   twinDeployment.deployment.workloads[0].type === WorkloadTypes.network
                 )
               )
-                break;
+                resultContracts.created.push(contract);
+              break;
             }
           }
           await this.sendToNode(twinDeployment);
@@ -504,7 +506,8 @@ class TwinDeploymentHandler {
                   twinDeployment.deployment.workloads[0].type === WorkloadTypes.network
                 )
               )
-                break;
+                resultContracts.updated.push(contract);
+              break;
             }
           }
           await this.sendToNode(twinDeployment);
@@ -514,7 +517,7 @@ class TwinDeploymentHandler {
       const deletedResult = await this.tfclient.applyAllExtrinsics<number>(deletedExtrinsics);
       if (deletedExtrinsics.length > 0) {
         for (const id of deletedResult) {
-          contracts.deleted.push({ contractId: id });
+          resultContracts.deleted.push({ contractId: id });
           events.emit("logs", `Deployment has been deleted with contract_id: ${id}`);
         }
       }
@@ -524,7 +527,7 @@ class TwinDeploymentHandler {
       await this.rollback(contracts);
       throw Error(e);
     }
-    return contracts;
+    return resultContracts;
   }
 }
 
