@@ -16,6 +16,7 @@ class Utility {
       const batchExtrinsic = await this.client.api.tx.utility.batch(extrinsics);
       return this.client.applyExtrinsic<T[]>(batchExtrinsic, resultSections, resultEvents);
     }
+    return [];
   }
 
   @checkConnection
@@ -25,6 +26,7 @@ class Utility {
       const batchAllExtrinsic = await this.client.api.tx.utility.batchAll(extrinsics);
       return this.client.applyExtrinsic<T[]>(batchAllExtrinsic, resultSections, resultEvents);
     }
+    return [];
   }
 
   private extractResultSectionsAndEvents<T>(extrinsics: ExtrinsicResult<T>[]) {
