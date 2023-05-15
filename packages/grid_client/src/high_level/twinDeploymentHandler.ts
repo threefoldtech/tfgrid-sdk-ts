@@ -1,6 +1,4 @@
-import { SubmittableExtrinsic } from "@polkadot/api-base/types";
-import { ISubmittableResult } from "@polkadot/types/types";
-import { Contract } from "@threefold/tfchain_client";
+import { Contract, ExtrinsicResult } from "@threefold/tfchain_client";
 
 import { RMB } from "../clients";
 import { TFClient } from "../clients/tf-grid/client";
@@ -330,7 +328,7 @@ class TwinDeploymentHandler {
   async rollback(contracts) {
     // cancel all created contracts and leave the updated ones.
     events.emit("logs", "Rolling back deployments");
-    const extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = [];
+    const extrinsics: ExtrinsicResult<number | Contract>[] = [];
     // delete name contracts for the updated deployment
     for (const name of this.addedNameContracts) {
       const extrinsic = await this.deleteNameContract(name);
@@ -351,10 +349,9 @@ class TwinDeploymentHandler {
       const updated_deployement = await this.getDeploymentFromFactory(updated_contract_id);
 
       const original_deployment = this.original_deployments.pop();
-      const update_deployment_res = await this.deploymentFactory.UpdateDeployment(
-        updated_deployement,
-        original_deployment,
-      );
+      let update_deployment_res;
+      if (original_deployment)
+        update_deployment_res = await this.deploymentFactory.UpdateDeployment(updated_deployement, original_deployment);
 
       if (update_deployment_res) {
         update_deployment_res.version += 1;
@@ -383,10 +380,10 @@ class TwinDeploymentHandler {
     }
   }
 
-  async PrepareExtrinsic(twinDeployment: TwinDeployment) {
-    const nodeExtrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = [];
-    const nameExtrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = [];
-    const deletedExtrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = [];
+  async PrepareExtrinsic(twinDeployment: TwinDeployment, contracts) {
+    const nodeExtrinsics: ExtrinsicResult<Contract>[] = [];
+    const nameExtrinsics: ExtrinsicResult<Contract>[] = [];
+    const deletedExtrinsics: ExtrinsicResult<number>[] = [];
     if (twinDeployment.operation === Operations.deploy) {
       events.emit("logs", `Deploying on node_id: ${twinDeployment.nodeId}`);
       for (const workload of twinDeployment.deployment.workloads) {
@@ -421,6 +418,7 @@ class TwinDeploymentHandler {
         hash: twinDeployment.deployment.challenge_hash(),
       });
       nodeExtrinsics.push(extrinsic);
+      contracts.updated.push(old_contract);
     } else if (twinDeployment.operation === Operations.delete) {
       events.emit("logs", `Deleting deployment with contract_id: ${twinDeployment.deployment.contract_id}`);
       for (const workload of twinDeployment.deployment.workloads) {
@@ -443,9 +441,9 @@ class TwinDeploymentHandler {
     await this.validate(twinDeployments);
     await this.checkNodesCapacity(twinDeployments);
     const contracts = { created: [], updated: [], deleted: [] };
-    let nodeExtrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = [];
-    let nameExtrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = [];
-    let deletedExtrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = [];
+    let nodeExtrinsics: ExtrinsicResult<Contract>[] = [];
+    let nameExtrinsics: ExtrinsicResult<Contract>[] = [];
+    let deletedExtrinsics: ExtrinsicResult<number>[] = [];
     //TODO: check if it can be done to save the deployment here instead of doing this in the module.
     for (const twinDeployment of twinDeployments) {
       for (const workload of twinDeployment.deployment.workloads) {
@@ -457,15 +455,19 @@ class TwinDeploymentHandler {
           workload["data"] = twinDeployment.network.updateNetwork(workload.data);
         }
       }
-      const extrinsics = await this.PrepareExtrinsic(twinDeployment);
+      const extrinsics = await this.PrepareExtrinsic(twinDeployment, contracts);
       nodeExtrinsics = nodeExtrinsics.concat(extrinsics.nodeExtrinsics);
       nameExtrinsics = nameExtrinsics.concat(extrinsics.nameExtrinsics);
       deletedExtrinsics = deletedExtrinsics.concat(extrinsics.deletedExtrinsics);
     }
-    const extrinsicResults: Contract[] = await this.tfclient.applyAllExtrinsics<Contract[]>([
+    const extrinsicResults: Contract[] = await this.tfclient.applyAllExtrinsics<Contract>([
       ...nodeExtrinsics,
       ...nameExtrinsics,
     ]);
+    for (const contract of extrinsicResults) {
+      const updatedContract = contracts.updated.filter(c => c["contractId"] === contract.contractId);
+      if (updatedContract.length === 0) contracts.created.push(contract);
+    }
     try {
       for (const twinDeployment of twinDeployments) {
         if (twinDeployment.operation === Operations.deploy) {
@@ -479,8 +481,7 @@ class TwinDeploymentHandler {
                   twinDeployment.deployment.workloads[0].type === WorkloadTypes.network
                 )
               )
-                contracts.created.push(contract);
-              break;
+                break;
             }
           }
           await this.sendToNode(twinDeployment);
@@ -503,15 +504,14 @@ class TwinDeploymentHandler {
                   twinDeployment.deployment.workloads[0].type === WorkloadTypes.network
                 )
               )
-                contracts.updated.push(contract);
-              break;
+                break;
             }
           }
           await this.sendToNode(twinDeployment);
           events.emit("logs", `Deployment has been updated with contract_id: ${twinDeployment.deployment.contract_id}`);
         }
       }
-      const deletedResult = await this.tfclient.applyAllExtrinsics<number[]>(deletedExtrinsics);
+      const deletedResult = await this.tfclient.applyAllExtrinsics<number>(deletedExtrinsics);
       if (deletedExtrinsics.length > 0) {
         for (const id of deletedResult) {
           contracts.deleted.push({ contractId: id });

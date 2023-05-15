@@ -1,5 +1,4 @@
-import { SubmittableExtrinsic } from "@polkadot/api-base/types";
-import { ISubmittableResult } from "@polkadot/types/types";
+import { ExtrinsicResult } from "@threefold/tfchain_client";
 import { default as AlgoSdk } from "algosdk";
 import { Expose, Transform, Type } from "class-transformer";
 import {
@@ -574,8 +573,8 @@ class SUModel {
   @Expose() @IsNumber() @IsNotEmpty() @Min(0) sru: number; // GB
 }
 
-class BatchModel {
-  @ArrayNotEmpty() @ValidateNested({ each: true }) extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[];
+class BatchModel<T> {
+  @ArrayNotEmpty() @ValidateNested({ each: true }) extrinsics: ExtrinsicResult<T>[];
 }
 
 class ZOSNodeModel {

@@ -17,13 +17,13 @@ class Utility {
 
   @expose
   @checkBalance
-  async batch(options: BatchModel) {
+  async batch<T>(options: BatchModel<T>) {
     return await this.client.utility.batch(options.extrinsics);
   }
 
   @expose
   @checkBalance
-  async batchAll(options: BatchModel) {
+  async batchAll<T>(options: BatchModel<T>) {
     return await this.client.utility.batchAll(options.extrinsics);
   }
 }
