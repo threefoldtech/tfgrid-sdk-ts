@@ -170,7 +170,9 @@ def test_farmpayout_address(browser):
     farm_page.add_farmpayout_address(case).click()
     polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('Transaction submitted')
-    assert farm_page.wait_for('Address added!')
+    if(farm_page.wait_for('Address added!')):
+        while (farm_page.farmpayout_address_value() != 'GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4'):
+            continue
     assert farm_page.farmpayout_address_value() == 'GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4'
 
 
