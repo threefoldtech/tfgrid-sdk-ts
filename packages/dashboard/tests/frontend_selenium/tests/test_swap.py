@@ -92,7 +92,7 @@ def test_how_it_done(browser):
     """
     swap_page, _, _ = before_test_setup(browser)
     swap_page.transfer_chain()
-    assert swap_page.how_it_done() in 'https://library.threefold.me/info/manual/#/manual__grid3_stellar_tfchain_bridge'
+    assert swap_page.how_it_done() in 'https://manual.grid.tf/getstarted/TF_Dashboard/TF_Dashboard.html?highlight=transfer#transfer-tft-from-stellar-chain-to-tfchain'
 
 
 def test_check_deposit(browser):

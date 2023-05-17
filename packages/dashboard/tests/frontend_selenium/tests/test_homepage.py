@@ -56,7 +56,7 @@ def test_manual_page(browser):
       Result: User should be navigated to the manual page.
     """
     dashboard_page, _ = before_test_setup(browser)
-    assert dashboard_page.navigate_to_manual() == 'https://library.threefold.me/info/manual/#/'
+    assert dashboard_page.navigate_to_manual() == 'https://manual.grid.tf/getstarted/tfgrid3_getstarted.html'
 
 
 def test_polka_connection(browser):

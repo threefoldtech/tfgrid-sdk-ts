@@ -114,7 +114,7 @@
         color="primary"
         :target="'blank'"
         class="text-decoration-none"
-        :href="'https://library.threefold.me/info/manual/#/manual__grid3_stellar_tfchain_bridge'"
+        :href="'https://manual.grid.tf/TF_Farmer_Guide/TF_Complete_Farmer_Guide/farmer_guide.html?highlight=bridge#how-to-use-the-tfchain-stellar-bridge'"
         >How is it done?</a
       >
     </v-container>
