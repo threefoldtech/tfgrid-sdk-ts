@@ -121,7 +121,7 @@ class Network {
     return this.wireguardConfig;
   }
 
-  async addNode(node_id: number, metadata = "", description = "", subnet = ""): Promise<Workload> {
+  async addNode(node_id: number, metadata = "", description = "", subnet = ""): Promise<Workload | undefined> {
     if (this.nodeExists(node_id)) {
       return;
     }
@@ -164,7 +164,7 @@ class Network {
     }
     events.emit("logs", `Deleting node ${node_id} from network ${this.name}`);
     let contract_id = 0;
-    const nodes = [];
+    const nodes: Node[] = [];
     for (const node of this.nodes) {
       if (node.node_id !== node_id) {
         nodes.push(node);
@@ -186,6 +186,7 @@ class Network {
         return net;
       }
     }
+    return znet;
   }
 
   updateNetworkDeployments(): void {
@@ -301,13 +302,13 @@ class Network {
     return wg;
   }
 
-  getPublicKey(privateKey: string) {
+  getPublicKey(privateKey: string): string {
     const privKey = Buffer.from(privateKey, "base64");
     const keypair = TweetNACL.box.keyPair.fromSecretKey(privKey);
     return Buffer.from(keypair.publicKey).toString("base64");
   }
 
-  async getNodeWGPublicKey(node_id: number): Promise<string> {
+  async getNodeWGPublicKey(node_id: number): Promise<string | undefined> {
     for (const net of this.networks) {
       if (net["node_id"] == node_id) {
         return this.getPublicKey(net.wireguard_private_key);
@@ -315,7 +316,7 @@ class Network {
     }
   }
 
-  getNodeWGListeningPort(node_id: number): number {
+  getNodeWGListeningPort(node_id: number): number | undefined {
     for (const net of this.networks) {
       if (net["node_id"] == node_id) {
         return net.wireguard_listen_port;
@@ -323,7 +324,7 @@ class Network {
     }
   }
 
-  getFreeIP(node_id: number, subnet = ""): string {
+  getFreeIP(node_id: number, subnet = ""): string | undefined {
     let ip;
     if (!this.nodeExists(node_id) && subnet) {
       ip = Addr(subnet).mask(32).increment().increment();
@@ -385,7 +386,7 @@ class Network {
     return ip;
   }
 
-  getNodeSubnet(node_id: number): string {
+  getNodeSubnet(node_id: number): string | undefined {
     for (const net of this.networks) {
       if (net["node_id"] === node_id) {
         return net.subnet;
@@ -434,7 +435,7 @@ class Network {
   }
 
   async getAccessPoints(): Promise<AccessPoint[]> {
-    const nodesWGPubkeys = [];
+    const nodesWGPubkeys: string[] = [];
     for (const network of this.networks) {
       const pubkey = this.getPublicKey(network.wireguard_private_key);
       nodesWGPubkeys.push(pubkey);
