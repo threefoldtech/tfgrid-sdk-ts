@@ -26,6 +26,9 @@ class QueryBalances {
     };
     return balance;
   }
+  // Lis deposit
+  // listen event
+  // write validator function
 }
 
 export interface BalanceTransferOptions {
