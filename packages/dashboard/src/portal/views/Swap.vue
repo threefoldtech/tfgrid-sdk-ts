@@ -224,7 +224,6 @@ export default class TransferView extends Vue {
       this.isValidSwap = false;
       return;
     }
-    this.targetError = "";
     this.validatingAddress = false;
     return;
   }
