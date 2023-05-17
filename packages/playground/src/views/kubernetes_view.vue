@@ -7,18 +7,18 @@
 </template>
 
 <script lang="ts">
-import { ProjectName } from '../types'
-import TfDeploymentList from '../weblets/tf_deployment_list.vue'
-import TfKubernetes from '../weblets/tf_kubernetes.vue'
+import { ProjectName } from "../types";
+import TfDeploymentList from "../weblets/tf_deployment_list.vue";
+import TfKubernetes from "../weblets/tf_kubernetes.vue";
 
 export default {
-  name: 'KubernetesView',
+  name: "KubernetesView",
   components: {
     TfKubernetes,
     TfDeploymentList,
   },
   setup() {
-    return { name: ProjectName.Kubernetes }
+    return { name: ProjectName.Kubernetes };
   },
-}
+};
 </script>

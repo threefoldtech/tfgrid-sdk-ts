@@ -3,11 +3,7 @@
     <template #title>Deploy a Node Pilot</template>
     <template #subtitle>
       Deploy a new Node Pilot on the Threefold Grid
-      <a
-        class="app-link"
-        href="https://manual.grid.tf/weblets/weblets_nodepilot.html"
-        target="_blank"
-      >
+      <a class="app-link" href="https://manual.grid.tf/weblets/weblets_nodepilot.html" target="_blank">
         Quick start documentation
       </a>
       .
@@ -70,33 +66,33 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString } from '@threefold/grid_client'
-import { type Ref, ref } from 'vue'
+import { generateString } from "@threefold/grid_client";
+import { type Ref, ref } from "vue";
 
-import { useLayout } from '../components/weblet_layout.vue'
-import { useProfileManager } from '../stores'
-import { type Farm, ProjectName } from '../types'
-import { deployVM } from '../utils/deploy_vm'
-import { getGrid } from '../utils/grid'
+import { useLayout } from "../components/weblet_layout.vue";
+import { useProfileManager } from "../stores";
+import { type Farm, ProjectName } from "../types";
+import { deployVM } from "../utils/deploy_vm";
+import { getGrid } from "../utils/grid";
 
-const layout = useLayout()
-const valid = ref(false)
-const profileManager = useProfileManager()
+const layout = useLayout();
+const valid = ref(false);
+const profileManager = useProfileManager();
 
-const name = ref('NP' + generateString(8))
-const cpu = ref(8)
-const memory = ref(8192)
-const farm = ref() as Ref<Farm>
+const name = ref("NP" + generateString(8));
+const cpu = ref(8);
+const memory = ref(8192);
+const farm = ref() as Ref<Farm>;
 
 async function deploy() {
-  layout.value.setStatus('deploy')
+  layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.NodePilot.toLowerCase()
+  const projectName = ProjectName.NodePilot.toLowerCase();
 
   try {
-    const grid = await getGrid(profileManager.profile!, projectName)
+    const grid = await getGrid(profileManager.profile!, projectName);
 
-    await layout.value.validateBalance(grid!)
+    await layout.value.validateBalance(grid!);
 
     const vm = await deployVM(grid!, {
       name: name.value,
@@ -105,47 +101,47 @@ async function deploy() {
           name: name.value,
           cpu: cpu.value,
           memory: memory.value,
-          flist: 'https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist',
-          entryPoint: '/',
+          flist: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
+          entryPoint: "/",
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
           publicIpv4: true,
           publicIpv6: true,
           planetary: false,
-          envs: [{ key: 'SSH_KEY', value: profileManager.profile!.ssh }],
+          envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
           rootFilesystemSize: 2,
           disks: [
             {
               size: 15,
-              mountPoint: '/mnt/' + generateString(10),
+              mountPoint: "/mnt/" + generateString(10),
             },
             {
               size: 15,
-              mountPoint: '/mnt/' + generateString(10),
+              mountPoint: "/mnt/" + generateString(10),
             },
           ],
         },
       ],
-    })
+    });
 
-    layout.value.reloadDeploymentsList()
-    layout.value.setStatus('success', 'Successfully deployed a node pilot instance.')
-    layout.value.openDialog(vm, { SSH_KEY: 'Public SSH Key' })
+    layout.value.reloadDeploymentsList();
+    layout.value.setStatus("success", "Successfully deployed a node pilot instance.");
+    layout.value.openDialog(vm, { SSH_KEY: "Public SSH Key" });
   } catch (e) {
-    layout.value.setStatus('failed', normalizeError(e, 'Failed to deploy a Node Pilot instance.'))
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Node Pilot instance."));
   }
 }
 </script>
 
 <script lang="ts">
-import SelectFarmId from '../components/select_farm.vue'
-import { normalizeError } from '../utils/helpers'
+import SelectFarmId from "../components/select_farm.vue";
+import { normalizeError } from "../utils/helpers";
 
 export default {
-  name: 'NodePilot',
+  name: "NodePilot",
   components: {
     SelectFarmId,
   },
-}
+};
 </script>

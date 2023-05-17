@@ -27,27 +27,27 @@
 </template>
 
 <script lang="ts" setup>
-import rootFs from '../utils/root_fs'
+import rootFs from "../utils/root_fs";
 
-defineProps<{ modelValue: CaproverWorker }>()
+defineProps<{ modelValue: CaproverWorker }>();
 </script>
 
 <script lang="ts">
-import { generateString } from '@threefold/grid_client'
+import { generateString } from "@threefold/grid_client";
 
-import type { CaproverWorker } from '../types'
-import SelectFarm from './select_farm.vue'
-import SelectSolutionFlavor from './select_solution_flavor.vue'
+import type { CaproverWorker } from "../types";
+import SelectFarm from "./select_farm.vue";
+import SelectSolutionFlavor from "./select_solution_flavor.vue";
 
-export function createWorker(name: string = 'WR' + generateString(9)): CaproverWorker {
-  return { name }
+export function createWorker(name: string = "WR" + generateString(9)): CaproverWorker {
+  return { name };
 }
 
 export default {
-  name: 'CaproverWorker',
+  name: "CaproverWorker",
   components: {
     SelectSolutionFlavor,
     SelectFarm,
   },
-}
+};
 </script>

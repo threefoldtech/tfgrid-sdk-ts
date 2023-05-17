@@ -1,34 +1,34 @@
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
 export interface Profile {
-  mnemonic: string
-  ssh: string
-  twinId: number
-  address: string
+  mnemonic: string;
+  ssh: string;
+  twinId: number;
+  address: string;
 }
 
 interface State {
-  profile: Profile | null
+  profile: Profile | null;
 }
 
-const useProfileManager = defineStore('profile-manager', {
+const useProfileManager = defineStore("profile-manager", {
   state: (): State => {
-    return { profile: null }
+    return { profile: null };
   },
 
   actions: {
     set(profile: Profile | null) {
-      this.profile = profile
+      this.profile = profile;
     },
     updateSSH(ssh: string) {
       if (this.profile) {
-        this.profile.ssh = ssh
+        this.profile.ssh = ssh;
       }
     },
     clear() {
-      this.profile = null
+      this.profile = null;
     },
   },
-})
+});
 
-export { useProfileManager }
+export { useProfileManager };

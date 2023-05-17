@@ -3,13 +3,13 @@
 </template>
 
 <script lang="ts" setup>
-import { usePasswordInput } from '../hooks'
+import { usePasswordInput } from "../hooks";
 
-const props = usePasswordInput()
+const props = usePasswordInput();
 </script>
 
 <script lang="ts">
 export default {
-  name: 'PasswordInputWrapper',
-}
+  name: "PasswordInputWrapper",
+};
 </script>

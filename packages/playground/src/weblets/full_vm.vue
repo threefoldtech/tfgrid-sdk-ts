@@ -22,7 +22,7 @@
           :rules="[
             validators.required('Name is required.'),
             validators.isAlphanumeric('Name should consist of letters only.'),
-            (name) => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+            name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
             validators.minLength('Name minLength is 2 chars.', 2),
             validators.maxLength('Name maxLength is 15 chars.', 15),
           ]"
@@ -69,12 +69,7 @@
           ]"
           #="{ props }"
         >
-          <v-text-field
-            label="Disk Size (GB)"
-            type="number"
-            v-model.number="diskSize"
-            v-bind="props"
-          />
+          <v-text-field label="Disk Size (GB)" type="number" v-model.number="diskSize" v-bind="props" />
         </input-validator>
 
         <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
@@ -100,7 +95,7 @@
             :value="disks[index].name"
             :rules="[
               validators.required('Disk name is required.'),
-              (name) => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+              name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
               validators.minLength('Disk minLength is 2 chars.', 2),
               validators.isAlphanumeric('Disk name only accepts alphanumeric chars.'),
               validators.maxLength('Disk maxLength is 15 chars.', 15),
@@ -119,93 +114,86 @@
             ]"
             #="{ props }"
           >
-            <v-text-field
-              label="Size (GB)"
-              type="number"
-              v-model.number="disks[index].size"
-              v-bind="props"
-            />
+            <v-text-field label="Size (GB)" type="number" v-model.number="disks[index].size" v-bind="props" />
           </input-validator>
         </ExpandableLayout>
       </template>
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid">
-        Deploy
-      </v-btn>
+      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid"> Deploy </v-btn>
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
-import { generateString } from '@threefold/grid_client'
-import { type Ref, ref } from 'vue'
+import { generateString } from "@threefold/grid_client";
+import { type Ref, ref } from "vue";
 
-import { useLayout } from '../components/weblet_layout.vue'
-import { useProfileManager } from '../stores'
-import { type Farm, type Flist, ProjectName } from '../types'
-import { deployVM, type Disk } from '../utils/deploy_vm'
-import { getGrid } from '../utils/grid'
-import { normalizeError } from '../utils/helpers'
+import { useLayout } from "../components/weblet_layout.vue";
+import { useProfileManager } from "../stores";
+import { type Farm, type Flist, ProjectName } from "../types";
+import { deployVM, type Disk } from "../utils/deploy_vm";
+import { getGrid } from "../utils/grid";
+import { normalizeError } from "../utils/helpers";
 
-const layout = useLayout()
-const tabs = ref()
-const profileManager = useProfileManager()
+const layout = useLayout();
+const tabs = ref();
+const profileManager = useProfileManager();
 
 const images: VmImage[] = [
   {
-    name: 'Ubuntu-22.04',
-    flist: 'https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist',
-    entryPoint: '/init.sh',
+    name: "Ubuntu-22.04",
+    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist",
+    entryPoint: "/init.sh",
   },
   {
-    name: 'Ubuntu-20.04',
-    flist: 'https://hub.grid.tf/tf-official-vms/ubuntu-20.04-lts.flist',
-    entryPoint: '/init.sh',
+    name: "Ubuntu-20.04",
+    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-20.04-lts.flist",
+    entryPoint: "/init.sh",
   },
   {
-    name: 'Ubuntu-18.04',
-    flist: 'https://hub.grid.tf/tf-official-vms/ubuntu-18.04-lts.flist',
-    entryPoint: '/init.sh',
+    name: "Ubuntu-18.04",
+    flist: "https://hub.grid.tf/tf-official-vms/ubuntu-18.04-lts.flist",
+    entryPoint: "/init.sh",
   },
   {
-    name: 'Nixos-22.11',
-    flist: 'https://hub.grid.tf/tf-official-vms/nixos-22.11.flist',
-    entryPoint: '/init.sh',
+    name: "Nixos-22.11",
+    flist: "https://hub.grid.tf/tf-official-vms/nixos-22.11.flist",
+    entryPoint: "/init.sh",
   },
-]
+];
 
-const name = ref('VM' + generateString(8))
-const flist = ref<Flist>()
-const cpu = ref(4)
-const memory = ref(8192)
-const diskSize = ref(50)
-const ipv4 = ref(false)
-const ipv6 = ref(false)
-const planetary = ref(true)
-const wireguard = ref(false)
-const farm = ref() as Ref<Farm>
-const disks = ref<Disk[]>([])
+const name = ref("VM" + generateString(8));
+const flist = ref<Flist>();
+const cpu = ref(4);
+const memory = ref(8192);
+const diskSize = ref(50);
+const ipv4 = ref(false);
+const ipv6 = ref(false);
+const planetary = ref(true);
+const wireguard = ref(false);
+const farm = ref() as Ref<Farm>;
+const disks = ref<Disk[]>([]);
 
 function addDisk() {
-  const name = generateString(7)
+  const name = generateString(7);
   disks.value.push({
-    name: 'DISK' + name,
+    name: "DISK" + name,
     size: 50,
-    mountPoint: '/mnt/' + name,
-  })
+    mountPoint: "/mnt/" + name,
+  });
 }
 
 async function deploy() {
-  layout.value.setStatus('deploy')
+  layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Fullvm.toLowerCase()
+  const projectName = ProjectName.Fullvm.toLowerCase();
 
   try {
-    const grid = await getGrid(profileManager.profile!, projectName)
+    const grid = await getGrid(profileManager.profile!, projectName);
 
-    await layout.value.validateBalance(grid!)
+    await layout.value.validateBalance(grid!);
 
     const vm = await deployVM(grid!, {
       name: name.value,
@@ -219,40 +207,37 @@ async function deploy() {
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
-          disks: [{ size: diskSize.value, mountPoint: '/' }, ...disks.value],
+          disks: [{ size: diskSize.value, mountPoint: "/" }, ...disks.value],
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           planetary: planetary.value,
-          envs: [{ key: 'SSH_KEY', value: profileManager.profile!.ssh }],
+          envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
           rootFilesystemSize: 2,
         },
       ],
       network: { addAccess: wireguard.value },
-    })
+    });
 
-    layout.value.reloadDeploymentsList()
-    layout.value.setStatus('success', 'Successfully deployed a full virtual machine instance.')
-    layout.value.openDialog(vm, { SSH_KEY: 'Public SSH Key' })
+    layout.value.reloadDeploymentsList();
+    layout.value.setStatus("success", "Successfully deployed a full virtual machine instance.");
+    layout.value.openDialog(vm, { SSH_KEY: "Public SSH Key" });
   } catch (e) {
-    layout.value.setStatus(
-      'failed',
-      normalizeError(e, 'Failed to deploy a full virtual machine instance.')
-    )
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a full virtual machine instance."));
   }
 }
 </script>
 
 <script lang="ts">
-import ExpandableLayout from '../components/expandable_layout.vue'
-import SelectFarm from '../components/select_farm.vue'
-import SelectVmImage, { type VmImage } from '../components/select_vm_image.vue'
+import ExpandableLayout from "../components/expandable_layout.vue";
+import SelectFarm from "../components/select_farm.vue";
+import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
 
 export default {
-  name: 'FullVm',
+  name: "FullVm",
   components: {
     SelectVmImage,
     SelectFarm,
     ExpandableLayout,
   },
-}
+};
 </script>

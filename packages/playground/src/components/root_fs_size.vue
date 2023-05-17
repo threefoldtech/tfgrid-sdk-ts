@@ -3,10 +3,7 @@
     <div :style="{ width: '100%' }" class="mr-4">
       <input-validator
         :value="value"
-        :rules="[
-          validators.required('Root File System is required.'),
-          dynamicValidateRootFs(validators),
-        ]"
+        :rules="[validators.required('Root File System is required.'), dynamicValidateRootFs(validators)]"
         ref="input"
         #="{ props }"
       >
@@ -29,42 +26,42 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { ref, watch } from "vue";
 
-import type { Validators } from '../types'
-import rootFs from '../utils/root_fs'
+import type { Validators } from "../types";
+import rootFs from "../utils/root_fs";
 
-const props = defineProps<{ cpu?: number; memory?: number; modelValue?: number }>()
-const emits = defineEmits<{ (event: 'update:model-value', value: number): void }>()
+const props = defineProps<{ cpu?: number; memory?: number; modelValue?: number }>();
+const emits = defineEmits<{ (event: "update:model-value", value: number): void }>();
 
-const input = ref()
+const input = ref();
 
-const value = ref(rootFs(props.cpu ?? 0, props.memory ?? 0))
-watch(value, (value) => emits('update:model-value', value), { immediate: true })
+const value = ref(rootFs(props.cpu ?? 0, props.memory ?? 0));
+watch(value, value => emits("update:model-value", value), { immediate: true });
 
-const edit = ref(false)
+const edit = ref(false);
 
 watch(
   () => [edit.value, props.cpu || 0, props.memory || 0] as const,
   async ([edit, cpu, memory]) => {
-    await input.value.validate(value.value)
+    await input.value.validate(value.value);
 
     if (!edit) {
-      value.value = rootFs(cpu, memory)
+      value.value = rootFs(cpu, memory);
     }
-  }
-)
+  },
+);
 
 function dynamicValidateRootFs(validators: Validators) {
   return (value: string) => {
-    const min = rootFs(props.cpu ?? 0, props.memory ?? 0)
-    return validators.min(`Root File System min value is ${min}GB.`, min)(value)
-  }
+    const min = rootFs(props.cpu ?? 0, props.memory ?? 0);
+    return validators.min(`Root File System min value is ${min}GB.`, min)(value);
+  };
 }
 </script>
 
 <script lang="ts">
 export default {
-  name: 'RootFsSize',
-}
+  name: "RootFsSize",
+};
 </script>

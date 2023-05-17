@@ -7,18 +7,18 @@
 </template>
 
 <script lang="ts">
-import { ProjectName } from '../types'
-import TfCaprover from '../weblets/tf_caprover.vue'
-import TfDeploymentList from '../weblets/tf_deployment_list.vue'
+import { ProjectName } from "../types";
+import TfCaprover from "../weblets/tf_caprover.vue";
+import TfDeploymentList from "../weblets/tf_deployment_list.vue";
 
 export default {
-  name: 'CaproverView',
+  name: "CaproverView",
   components: {
     TfCaprover,
     TfDeploymentList,
   },
   setup() {
-    return { name: ProjectName.Caprover }
+    return { name: ProjectName.Caprover };
   },
-}
+};
 </script>

@@ -15,16 +15,16 @@
 
 <script lang="ts" setup>
 defineProps<{
-  tooltip: string
-  icon: `mdi-${string}`
-  color?: string
-  href?: string
-}>()
-defineEmits(['click'])
+  tooltip: string;
+  icon: `mdi-${string}`;
+  color?: string;
+  href?: string;
+}>();
+defineEmits(["click"]);
 </script>
 
 <script lang="ts">
 export default {
-  name: 'IconActionBtn',
-}
+  name: "IconActionBtn",
+};
 </script>

@@ -2,13 +2,8 @@
   <weblet-layout ref="layout">
     <template #title>Deploy a Algorand Instance </template>
     <template #subtitle>
-      Algorand (ALGO) is a blockchain platform and cryptocurrency designed to function like a major
-      payments processor.
-      <a
-        target="_blank"
-        href="https://manual.grid.tf/weblets/weblets_algorand.html"
-        class="app-link"
-      >
+      Algorand (ALGO) is a blockchain platform and cryptocurrency designed to function like a major payments processor.
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_algorand.html" class="app-link">
         Quick start documentation
       </a>
     </template>
@@ -62,10 +57,8 @@
             :value="account"
             :rules="[
               validators.required('Mnemonic is required.'),
-              (value) => {
-                return validators.isAlpha('Mnemonic can contain only alphabetic characters.')(
-                  value.replace(/\s/g, '')
-                )
+              value => {
+                return validators.isAlpha('Mnemonic can contain only alphabetic characters.')(value.replace(/\s/g, ''));
               },
               customAccountValidation,
             ]"
@@ -143,44 +136,44 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString } from '@threefold/grid_client'
-import { computed, type Ref, ref, watch } from 'vue'
+import { generateString } from "@threefold/grid_client";
+import { computed, type Ref, ref, watch } from "vue";
 
-import { useLayout } from '../components/weblet_layout.vue'
-import { useProfileManager } from '../stores'
-import { type Farm, ProjectName, type Validators } from '../types'
-import { deployVM } from '../utils/deploy_vm'
-import { getGrid } from '../utils/grid'
+import { useLayout } from "../components/weblet_layout.vue";
+import { useProfileManager } from "../stores";
+import { type Farm, ProjectName, type Validators } from "../types";
+import { deployVM } from "../utils/deploy_vm";
+import { getGrid } from "../utils/grid";
 
-const layout = useLayout()
-const valid = ref(false)
-const lastRoundInput = ref()
-const profileManager = useProfileManager()
+const layout = useLayout();
+const valid = ref(false);
+const lastRoundInput = ref();
+const profileManager = useProfileManager();
 
-const name = ref('al' + generateString(9))
-const ipv4 = ref(false)
-const cpu = ref() as Ref<number>
-const memory = ref() as Ref<number>
-const storage = ref() as Ref<number>
-const network = ref('mainnet')
-const type = ref('default')
-const account = ref('')
-const wordsLength = computed(() => (account.value ? account.value.split(' ').length : 0))
-const firstRound = ref(24000000)
-const lastRound = ref(26000000)
-const farm = ref() as Ref<Farm>
+const name = ref("al" + generateString(9));
+const ipv4 = ref(false);
+const cpu = ref() as Ref<number>;
+const memory = ref() as Ref<number>;
+const storage = ref() as Ref<number>;
+const network = ref("mainnet");
+const type = ref("default");
+const account = ref("");
+const wordsLength = computed(() => (account.value ? account.value.split(" ").length : 0));
+const firstRound = ref(24000000);
+const lastRound = ref(26000000);
+const farm = ref() as Ref<Farm>;
 
-watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()))
+watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()));
 
 async function deploy() {
-  layout.value.setStatus('deploy')
+  layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Algorand.toLowerCase()
+  const projectName = ProjectName.Algorand.toLowerCase();
 
   try {
-    const grid = await getGrid(profileManager.profile!, projectName)
+    const grid = await getGrid(profileManager.profile!, projectName);
 
-    await layout.value.validateBalance(grid!)
+    await layout.value.validateBalance(grid!);
 
     const vm = await deployVM(grid!, {
       name: name.value,
@@ -192,75 +185,75 @@ async function deploy() {
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
-          flist: 'https://hub.grid.tf/tf-official-apps/algorand-latest.flist',
-          entryPoint: '/sbin/zinit init',
+          flist: "https://hub.grid.tf/tf-official-apps/algorand-latest.flist",
+          entryPoint: "/sbin/zinit init",
           rootFilesystemSize: storage.value,
           publicIpv4: ipv4.value,
           planetary: true,
           disks:
-            type.value === 'indexer'
+            type.value === "indexer"
               ? [
                   {
                     size: 50,
-                    mountPoint: '/var/lib/docker',
+                    mountPoint: "/var/lib/docker",
                   },
                 ]
               : [],
           envs: [
-            { key: 'SSH_KEY', value: profileManager.profile!.ssh },
-            { key: 'NETWORK', value: network.value },
-            { key: 'NODE_TYPE', value: type.value },
-            ...(type.value === 'participant'
+            { key: "SSH_KEY", value: profileManager.profile!.ssh },
+            { key: "NETWORK", value: network.value },
+            { key: "NODE_TYPE", value: type.value },
+            ...(type.value === "participant"
               ? [
-                  { key: 'ACCOUNT_MNEMONICS', value: account.value },
-                  { key: 'FIRST_ROUND', value: firstRound.value.toString() },
-                  { key: 'LAST_ROUND', value: lastRound.value.toString() },
+                  { key: "ACCOUNT_MNEMONICS", value: account.value },
+                  { key: "FIRST_ROUND", value: firstRound.value.toString() },
+                  { key: "LAST_ROUND", value: lastRound.value.toString() },
                 ]
               : []),
           ],
         },
       ],
-    })
+    });
 
-    layout.value.reloadDeploymentsList()
-    layout.value.setStatus('success', 'Successfully deployed an alogrand node.')
+    layout.value.reloadDeploymentsList();
+    layout.value.setStatus("success", "Successfully deployed an alogrand node.");
     layout.value.openDialog(vm, {
-      SSH_KEY: 'Public SSH Key',
-      NETWORK: 'Network',
-      NODE_TYPE: 'Node Type',
-      ACCOUNT_MNEMONICS: 'Account Mnemonic',
-      FIRST_ROUND: 'First Round',
-      LAST_ROUND: 'Last Round',
-    })
+      SSH_KEY: "Public SSH Key",
+      NETWORK: "Network",
+      NODE_TYPE: "Node Type",
+      ACCOUNT_MNEMONICS: "Account Mnemonic",
+      FIRST_ROUND: "First Round",
+      LAST_ROUND: "Last Round",
+    });
   } catch (e) {
-    layout.value.setStatus('failed', normalizeError(e, 'Failed to deploy an alogrand node.'))
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy an alogrand node."));
   }
 }
 
 function customAccountValidation(value: string) {
-  if (value.split(' ').length !== 25) {
-    return { message: 'Mnemonic must have 25 words separated by spaces.' }
+  if (value.split(" ").length !== 25) {
+    return { message: "Mnemonic must have 25 words separated by spaces." };
   }
 }
 
 function customLastRoundValidation(validators: Validators) {
   return (value: string) => {
-    const min = firstRound.value
-    return validators.min(`Last round must be greater than ${min}`, min + 1)(value)
-  }
+    const min = firstRound.value;
+    return validators.min(`Last round must be greater than ${min}`, min + 1)(value);
+  };
 }
 </script>
 
 <script lang="ts">
-import AlgorandCapacity from '../components/algorand_capacity.vue'
-import SelectFarm from '../components/select_farm.vue'
-import { normalizeError } from '../utils/helpers'
+import AlgorandCapacity from "../components/algorand_capacity.vue";
+import SelectFarm from "../components/select_farm.vue";
+import { normalizeError } from "../utils/helpers";
 
 export default {
-  name: 'TfAlgorand',
+  name: "TfAlgorand",
   components: {
     SelectFarm,
     AlgorandCapacity,
   },
-}
+};
 </script>

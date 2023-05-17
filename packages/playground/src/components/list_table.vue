@@ -56,34 +56,34 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { ref, watch } from "vue";
 
-import type { VDataTableHeader } from '../types'
+import type { VDataTableHeader } from "../types";
 
 const props = defineProps<{
-  headers: VDataTableHeader
-  items: any[]
-  loading: boolean
-  deleting: boolean
-  modelValue: any[]
-  noDataText?: string
-}>()
-const emits = defineEmits<{ (event: 'update:model-value', value: any[]): void }>()
+  headers: VDataTableHeader;
+  items: any[];
+  loading: boolean;
+  deleting: boolean;
+  modelValue: any[];
+  noDataText?: string;
+}>();
+const emits = defineEmits<{ (event: "update:model-value", value: any[]): void }>();
 
-const selectedItems = ref<any[]>([])
-watch(selectedItems, (is) => emits('update:model-value', is))
+const selectedItems = ref<any[]>([]);
+watch(selectedItems, is => emits("update:model-value", is));
 
 function onUpdateSelection() {
   if (selectedItems.value.length === props.items.length) {
-    selectedItems.value = []
+    selectedItems.value = [];
   } else {
-    selectedItems.value = props.items.slice()
+    selectedItems.value = props.items.slice();
   }
 }
 </script>
 
 <script lang="ts">
 export default {
-  name: 'ListTable',
-}
+  name: "ListTable",
+};
 </script>

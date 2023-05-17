@@ -43,84 +43,81 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref } from "vue";
 
-import { useProfileManager } from '../stores'
-import { ProjectName } from '../types'
-import { deleteWorker, deployWorker, loadK8S } from '../utils/deploy_k8s'
-import { getGrid } from '../utils/grid'
+import { useProfileManager } from "../stores";
+import { ProjectName } from "../types";
+import { deleteWorker, deployWorker, loadK8S } from "../utils/deploy_k8s";
+import { getGrid } from "../utils/grid";
 
-const props = defineProps<{ data: K8S }>()
-const emits = defineEmits<{ (event: 'close'): void; (event: 'update:k8s', data: any): void }>()
+const props = defineProps<{ data: K8S }>();
+const emits = defineEmits<{ (event: "close"): void; (event: "update:k8s", data: any): void }>();
 
-const profileManager = useProfileManager()
+const profileManager = useProfileManager();
 
-const worker = ref(createWorker())
-const selectedWorkers = ref<any[]>([])
-const deleting = ref(false)
+const worker = ref(createWorker());
+const selectedWorkers = ref<any[]>([]);
+const deleting = ref(false);
 
 function calcDiskSize(disks: { size: number }[]) {
-  return disks.reduce((t, d) => t + d.size, 0) / 1024 ** 3
+  return disks.reduce((t, d) => t + d.size, 0) / 1024 ** 3;
 }
 
 async function deploy(layout: any) {
-  layout.setStatus('deploy')
-  const grid = await getGrid(profileManager.profile!, ProjectName.Kubernetes)
-  console.log(props.data.deploymentName)
+  layout.setStatus("deploy");
+  const grid = await getGrid(profileManager.profile!, ProjectName.Kubernetes);
+  console.log(props.data.deploymentName);
 
   deployWorker(grid!, {
     ...worker.value,
     deploymentName: props.data.deploymentName,
   })
-    .then((data) => {
-      layout.setStatus(
-        'success',
-        `Successfully add a new worker to '${props.data.deploymentName}' Cluster.`
-      )
+    .then(data => {
+      layout.setStatus("success", `Successfully add a new worker to '${props.data.deploymentName}' Cluster.`);
 
-      emits('update:k8s', data)
+      emits("update:k8s", data);
     })
-    .catch((error) => {
-      const e = typeof error === 'string' ? error : error.message
-      layout.setStatus('failed', e)
-    })
+    .catch(error => {
+      const e = typeof error === "string" ? error : error.message;
+      layout.setStatus("failed", e);
+    });
 }
 
 async function onDelete(cb: (workers: any[]) => void) {
-  deleting.value = true
-  const grid = await getGrid(profileManager.profile!, ProjectName.Kubernetes)
+  deleting.value = true;
+  const grid = await getGrid(profileManager.profile!, ProjectName.Kubernetes);
 
   for (const worker of selectedWorkers.value) {
     try {
       await deleteWorker(grid!, {
         deploymentName: props.data.deploymentName,
         name: worker.name,
-      })
+      });
     } catch (e) {
-      console.log('Error while deleting worker', e)
+      console.log("Error while deleting worker", e);
     }
   }
 
-  selectedWorkers.value = []
-  const data = await loadK8S(grid!, props.data.deploymentName)
-  emits('update:k8s', data)
-  cb(data.workers)
-  deleting.value = false
+  selectedWorkers.value = [];
+  const data = await loadK8S(grid!, props.data.deploymentName);
+  emits("update:k8s", data);
+  cb(data.workers);
+  deleting.value = false;
 }
 </script>
 
 <script lang="ts">
-import ListTable from '../components/list_table.vue'
-import type { K8S } from '../utils/load_deployment'
-import K8SWorker, { createWorker } from './k8s_worker.vue'
-import ManageWorkerDialog from './manage_worker_dialog.vue'
+import ListTable from "../components/list_table.vue";
+import type { K8S } from "../utils/load_deployment";
+import K8SWorker, { createWorker } from "./k8s_worker.vue";
+import ManageWorkerDialog from "./manage_worker_dialog.vue";
 
 export default {
-  name: 'ManageK8SWorkerDialog',
+  name: "ManageK8SWorkerDialog",
   components: {
     K8SWorker,
     ListTable,
     ManageWorkerDialog,
   },
-}
+};
 </script>

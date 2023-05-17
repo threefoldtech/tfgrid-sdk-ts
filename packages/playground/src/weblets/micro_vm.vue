@@ -21,7 +21,7 @@
           :value="name"
           :rules="[
             validators.required('Name is required.'),
-            (name) => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+            name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
             validators.isAlphanumeric('Name should consist of alphabets & numbers only.'),
             validators.minLength('Name minLength is 2 chars.', 2),
             validators.maxLength('Name maxLength is 15 chars.', 15),
@@ -83,7 +83,7 @@
             :value="envs[index].key"
             :rules="[
               validators.required('Key name is required.'),
-              (key) => validators.isAlpha('Key must start with alphabet char.')(key[0]),
+              key => validators.isAlpha('Key must start with alphabet char.')(key[0]),
               validators.pattern('Invalid key format.', { pattern: /^[^0-9_\s][a-zA-Z0-9_]+$/ }),
               validators.maxLength('Key max length is 128 chars.', 128),
             ]"
@@ -97,13 +97,7 @@
             :rules="[validators.required('Value is required.')]"
             #="{ props }"
           >
-            <v-textarea
-              label="Value"
-              v-model="envs[index].value"
-              no-resize
-              :spellcheck="false"
-              v-bind="props"
-            />
+            <v-textarea label="Value" v-model="envs[index].value" no-resize :spellcheck="false" v-bind="props" />
           </input-validator>
         </ExpandableLayout>
       </template>
@@ -115,10 +109,9 @@
             :value="disks[index].name"
             :rules="[
               validators.required('Disk name is required.'),
-              validators.pattern(
-                'Disk name can\'t start with a number, a non-alphanumeric character or a whitespace',
-                { pattern: /^[A-Za-z]/ }
-              ),
+              validators.pattern('Disk name can\'t start with a number, a non-alphanumeric character or a whitespace', {
+                pattern: /^[A-Za-z]/,
+              }),
               validators.minLength('Disk minLength is 2 chars.', 2),
               validators.isAlphanumeric('Disk name only accepts alphanumeric chars.'),
               validators.maxLength('Disk maxLength is 15 chars.', 15),
@@ -137,104 +130,97 @@
             ]"
             #="{ props }"
           >
-            <v-text-field
-              label="Size (GB)"
-              type="number"
-              v-model.number="disks[index].size"
-              v-bind="props"
-            />
+            <v-text-field label="Size (GB)" type="number" v-model.number="disks[index].size" v-bind="props" />
           </input-validator>
         </ExpandableLayout>
       </template>
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" :disabled="tabs?.invalid" @click="deploy"
-        >Deploy</v-btn
-      >
+      <v-btn color="primary" variant="tonal" :disabled="tabs?.invalid" @click="deploy">Deploy</v-btn>
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
-import { generateString } from '@threefold/grid_client'
-import { type Ref, ref } from 'vue'
+import { generateString } from "@threefold/grid_client";
+import { type Ref, ref } from "vue";
 
-import { useLayout } from '../components/weblet_layout.vue'
-import { useProfileManager } from '../stores'
-import { type Farm, type Flist, ProjectName } from '../types'
-import { deployVM, type Disk, type Env } from '../utils/deploy_vm'
-import { getGrid } from '../utils/grid'
+import { useLayout } from "../components/weblet_layout.vue";
+import { useProfileManager } from "../stores";
+import { type Farm, type Flist, ProjectName } from "../types";
+import { deployVM, type Disk, type Env } from "../utils/deploy_vm";
+import { getGrid } from "../utils/grid";
 
-const layout = useLayout()
-const tabs = ref()
-const profileManager = useProfileManager()
+const layout = useLayout();
+const tabs = ref();
+const profileManager = useProfileManager();
 
 const images = [
   {
-    name: 'Ubuntu-22.04',
-    flist: 'https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist',
-    entryPoint: '/sbin/zinit init',
+    name: "Ubuntu-22.04",
+    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
+    entryPoint: "/sbin/zinit init",
   },
   {
-    name: 'Alpine-3',
-    flist: 'https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist',
-    entryPoint: '/entrypoint.sh',
+    name: "Alpine-3",
+    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist",
+    entryPoint: "/entrypoint.sh",
   },
   {
-    name: 'CentOS-8',
-    flist: 'https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist',
-    entryPoint: '/entrypoint.sh',
+    name: "CentOS-8",
+    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist",
+    entryPoint: "/entrypoint.sh",
   },
   {
-    name: 'Nixos',
-    flist: 'https://hub.grid.tf/tf-official-vms/nixos-micro-latest.flist',
-    entryPoint: '/entrypoint.sh',
+    name: "Nixos",
+    flist: "https://hub.grid.tf/tf-official-vms/nixos-micro-latest.flist",
+    entryPoint: "/entrypoint.sh",
   },
-]
+];
 
-const name = ref('VM' + generateString(8))
-const flist = ref<Flist>()
-const rootFsSize = ref(2) as Ref<number>
-const cpu = ref(4)
-const memory = ref(8192)
-const ipv4 = ref(false)
-const ipv6 = ref(false)
-const planetary = ref(true)
-const wireguard = ref(false)
-const farm = ref() as Ref<Farm>
-const envs = ref<Env[]>([])
-const disks = ref<Disk[]>([])
+const name = ref("VM" + generateString(8));
+const flist = ref<Flist>();
+const rootFsSize = ref(2) as Ref<number>;
+const cpu = ref(4);
+const memory = ref(8192);
+const ipv4 = ref(false);
+const ipv6 = ref(false);
+const planetary = ref(true);
+const wireguard = ref(false);
+const farm = ref() as Ref<Farm>;
+const envs = ref<Env[]>([]);
+const disks = ref<Disk[]>([]);
 
 function layoutMount() {
   if (envs.value.length > 0) {
-    envs.value.splice(0, 1)
+    envs.value.splice(0, 1);
   }
 
   envs.value.unshift({
-    key: 'SSH_KEY',
+    key: "SSH_KEY",
     value: profileManager.profile!.ssh,
-  })
+  });
 }
 
 function addDisk() {
-  const name = generateString(5)
+  const name = generateString(5);
   disks.value.push({
-    name: 'DISK' + name,
+    name: "DISK" + name,
     size: 50,
-    mountPoint: '/mnt/' + name,
-  })
+    mountPoint: "/mnt/" + name,
+  });
 }
 
 async function deploy() {
-  layout.value.setStatus('deploy')
+  layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.VM.toLowerCase()
+  const projectName = ProjectName.VM.toLowerCase();
 
   try {
-    const grid = await getGrid(profileManager.profile!, projectName)
+    const grid = await getGrid(profileManager.profile!, projectName);
 
-    await layout.value.validateBalance(grid!)
+    await layout.value.validateBalance(grid!);
 
     const vm = await deployVM(grid!, {
       name: name.value,
@@ -259,34 +245,31 @@ async function deploy() {
           rootFilesystemSize: rootFsSize.value,
         },
       ],
-    })
+    });
 
-    layout.value.reloadDeploymentsList()
-    layout.value.setStatus('success', 'Successfully deployed a micro virtual machine.')
-    layout.value.openDialog(vm, { SSH_KEY: 'Public SSH Key' })
+    layout.value.reloadDeploymentsList();
+    layout.value.setStatus("success", "Successfully deployed a micro virtual machine.");
+    layout.value.openDialog(vm, { SSH_KEY: "Public SSH Key" });
   } catch (e) {
-    layout.value.setStatus(
-      'failed',
-      normalizeError(e, 'Failed to deploy micro virtual machine instance.')
-    )
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy micro virtual machine instance."));
   }
 }
 </script>
 
 <script lang="ts">
-import ExpandableLayout from '../components/expandable_layout.vue'
-import RootFsSize from '../components/root_fs_size.vue'
-import SelectFarm from '../components/select_farm.vue'
-import SelectVmImage from '../components/select_vm_image.vue'
-import { normalizeError } from '../utils/helpers'
+import ExpandableLayout from "../components/expandable_layout.vue";
+import RootFsSize from "../components/root_fs_size.vue";
+import SelectFarm from "../components/select_farm.vue";
+import SelectVmImage from "../components/select_vm_image.vue";
+import { normalizeError } from "../utils/helpers";
 
 export default {
-  name: 'MicroVm',
+  name: "MicroVm",
   components: {
     SelectVmImage,
     RootFsSize,
     SelectFarm,
     ExpandableLayout,
   },
-}
+};
 </script>

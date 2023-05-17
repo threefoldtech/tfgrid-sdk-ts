@@ -14,11 +14,11 @@
 </template>
 
 <script lang="ts" setup>
-defineProps<{ label: string; data: any; textarea?: boolean }>()
+defineProps<{ label: string; data: any; textarea?: boolean }>();
 </script>
 
 <script lang="ts">
 export default {
-  name: 'CopyReadonlyInput',
-}
+  name: "CopyReadonlyInput",
+};
 </script>

@@ -39,15 +39,7 @@
       <v-card-actions>
         <v-spacer />
         <slot name="footer-actions" v-if="!status" />
-        <v-btn
-          v-else
-          color="secondary"
-          variant="text"
-          :loading="status === 'deploy'"
-          @click="reset"
-        >
-          Back
-        </v-btn>
+        <v-btn v-else color="secondary" variant="text" :loading="status === 'deploy'" @click="reset"> Back </v-btn>
       </v-card-actions>
     </template>
   </v-card>
@@ -62,11 +54,11 @@
 </template>
 
 <script lang="ts" setup>
-import { events, type GridClient } from '@threefold/grid_client'
-import { computed, ref, watch } from 'vue'
+import { events, type GridClient } from "@threefold/grid_client";
+import { computed, ref, watch } from "vue";
 
-import { useProfileManager } from '../stores'
-import { loadBalance } from '../utils/grid'
+import { useProfileManager } from "../stores";
+import { loadBalance } from "../utils/grid";
 
 const props = defineProps({
   disableAlerts: {
@@ -74,114 +66,114 @@ const props = defineProps({
     required: false,
     default: false,
   },
-})
-const emits = defineEmits<{ (event: 'mount'): void; (event: 'back'): void }>()
+});
+const emits = defineEmits<{ (event: "mount"): void; (event: "back"): void }>();
 
-const profileManager = useProfileManager()
+const profileManager = useProfileManager();
 
-const status = ref<WebletStatus>()
-const message = ref<string>()
+const status = ref<WebletStatus>();
+const message = ref<string>();
 function onLogMessage(msg: string) {
-  if (typeof msg === 'string') {
-    message.value = msg
+  if (typeof msg === "string") {
+    message.value = msg;
   }
 }
 
-watch(status, (s) => {
-  if (s === 'deploy') events.addListener('logs', onLogMessage)
-  else events.removeListener('logs', onLogMessage)
-})
+watch(status, s => {
+  if (s === "deploy") events.addListener("logs", onLogMessage);
+  else events.removeListener("logs", onLogMessage);
+});
 const alertType = computed(() => {
-  if (status.value === 'deploy') return 'info'
-  else if (status.value === 'failed') return 'error'
-  return 'success'
-})
+  if (status.value === "deploy") return "info";
+  else if (status.value === "failed") return "error";
+  return "success";
+});
 
-const dialogData = ref()
-const environments = ref()
-const onlyJson = ref()
+const dialogData = ref();
+const environments = ref();
+const onlyJson = ref();
 defineExpose({
   async validateBalance(grid: GridClient, min = 2) {
-    message.value = 'Checking your balance...'
+    message.value = "Checking your balance...";
 
-    const balance = await loadBalance(grid)
-    const b = balance.free - balance.locked
+    const balance = await loadBalance(grid);
+    const b = balance.free - balance.locked;
 
     if (b < min) {
-      throw new Error(`You have ${b.toFixed(2)} TFT but it's required to have at least ${min} TFT.`)
+      throw new Error(`You have ${b.toFixed(2)} TFT but it's required to have at least ${min} TFT.`);
     }
-    message.value = 'You have enough TFT to continue...'
-    return balance
+    message.value = "You have enough TFT to continue...";
+    return balance;
   },
 
   setStatus(s: WebletStatus, m?: string) {
-    if (s !== 'deploy' && !m) {
-      throw new Error('Message need to be passed while settingStatus.')
+    if (s !== "deploy" && !m) {
+      throw new Error("Message need to be passed while settingStatus.");
     }
 
-    message.value = m ? m : 'Preparing to deploy...'
-    status.value = s
+    message.value = m ? m : "Preparing to deploy...";
+    status.value = s;
   },
 
   openDialog(data?: any, envs?: { [key: string]: string | boolean } | false, json?: boolean) {
-    dialogData.value = data
-    environments.value = envs
-    onlyJson.value = json
+    dialogData.value = data;
+    environments.value = envs;
+    onlyJson.value = json;
   },
 
   status: computed(() => status.value),
 
   reloadDeploymentsList,
-})
+});
 
 function reset() {
-  status.value = undefined
-  message.value = undefined
-  emits('back')
+  status.value = undefined;
+  message.value = undefined;
+  emits("back");
 }
 
-const deploymentListManager = useDeploymentListManager()
+const deploymentListManager = useDeploymentListManager();
 function reloadDeploymentsList() {
-  deploymentListManager?.load()
+  deploymentListManager?.load();
 }
 
 watch(
   () => !!profileManager.profile || props.disableAlerts,
   (value, oldValue) => {
     if (value && value !== oldValue) {
-      reset()
-      emits('mount')
+      reset();
+      emits("mount");
     }
   },
-  { immediate: true }
-)
+  { immediate: true },
+);
 </script>
 
 <script lang="ts">
-import type { ComputedRef, Ref } from 'vue'
+import type { ComputedRef, Ref } from "vue";
 
-import type { Balance } from '../utils/grid'
-import DeploymentDataDialog from './deployment_data_dialog.vue'
-import { useDeploymentListManager } from './deployment_list_manager.vue'
+import type { Balance } from "../utils/grid";
+import DeploymentDataDialog from "./deployment_data_dialog.vue";
+import { useDeploymentListManager } from "./deployment_list_manager.vue";
 
-export type WebletStatus = 'deploy' | 'success' | 'failed'
+export type WebletStatus = "deploy" | "success" | "failed";
 
 export interface WebletLayout {
-  validateBalance(grid: GridClient, min?: number): Promise<Balance>
-  setStatus(status: WebletStatus, message?: string): void
-  openDialog(data: any, envs?: { [key: string]: string | boolean } | false, json?: boolean): void
-  status: ComputedRef<WebletStatus>
-  reloadDeploymentsList(): void
+  validateBalance(grid: GridClient, min?: number): Promise<Balance>;
+  setStatus(status: WebletStatus, message?: string): void;
+  openDialog(data: any, envs?: { [key: string]: string | boolean } | false, json?: boolean): void;
+  status: ComputedRef<WebletStatus>;
+  reloadDeploymentsList(): void;
 }
 
 export function useLayout() {
-  return ref() as Ref<WebletLayout>
+  return ref() as Ref<WebletLayout>;
 }
 
 export default {
-  name: 'WebletLayout',
+  name: "WebletLayout",
   components: {
     DeploymentDataDialog,
   },
-}
+};
 </script>

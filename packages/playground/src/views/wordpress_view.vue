@@ -7,18 +7,18 @@
 </template>
 
 <script lang="ts">
-import { ProjectName } from '../types'
-import TfDeploymentList from '../weblets/tf_deployment_list.vue'
-import TFWordpress from '../weblets/tf_wordpress.vue'
+import { ProjectName } from "../types";
+import TfDeploymentList from "../weblets/tf_deployment_list.vue";
+import TFWordpress from "../weblets/tf_wordpress.vue";
 
 export default {
-  name: 'WordpressView',
+  name: "WordpressView",
   components: {
     TFWordpress,
     TfDeploymentList,
   },
   setup() {
-    return { name: ProjectName.Wordpress }
+    return { name: ProjectName.Wordpress };
   },
-}
+};
 </script>

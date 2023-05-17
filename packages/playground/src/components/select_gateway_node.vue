@@ -36,38 +36,38 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref } from "vue";
 
-import { useProfileManager } from '../stores'
-import type { GatewayNode } from '../types'
-import { loadGatewayNodes } from '../utils/gateway'
-import { getGrid } from '../utils/grid'
+import { useProfileManager } from "../stores";
+import type { GatewayNode } from "../types";
+import { loadGatewayNodes } from "../utils/gateway";
+import { getGrid } from "../utils/grid";
 
-const props = defineProps<{ modelValue?: GatewayNode }>()
-const emits = defineEmits<{ (event: 'update:model-value', value: GatewayNode): void }>()
+const props = defineProps<{ modelValue?: GatewayNode }>();
+const emits = defineEmits<{ (event: "update:model-value", value: GatewayNode): void }>();
 
-const profileManager = useProfileManager()
+const profileManager = useProfileManager();
 
-const loading = ref(false)
-const items = ref<any[]>([])
-const page = ref(1)
-const size = 50
+const loading = ref(false);
+const items = ref<any[]>([]);
+const page = ref(1);
+const size = 50;
 
-onMounted(loadNextPage)
+onMounted(loadNextPage);
 async function loadNextPage() {
-  loading.value = true
-  const grid = await getGrid(profileManager.profile!)
-  const nodes = await loadGatewayNodes(grid!, { page: page.value++, size })
+  loading.value = true;
+  const grid = await getGrid(profileManager.profile!);
+  const nodes = await loadGatewayNodes(grid!, { page: page.value++, size });
 
   if (nodes.length === 0 || nodes.length < size) {
-    page.value = -1
+    page.value = -1;
   }
 
-  items.value = items.value.concat(nodes.map(normalizeGatewayNode))
-  loading.value = false
+  items.value = items.value.concat(nodes.map(normalizeGatewayNode));
+  loading.value = false;
 
   if (!props.modelValue && items.value.length > 0) {
-    emits('update:model-value', items.value[0])
+    emits("update:model-value", items.value[0]);
   }
 }
 
@@ -75,12 +75,12 @@ function normalizeGatewayNode(item: any): GatewayNode {
   return {
     id: +item.nodeId,
     domain: item.publicConfig.domain,
-  }
+  };
 }
 </script>
 
 <script lang="ts">
 export default {
-  name: 'SelectGatewayNode',
-}
+  name: "SelectGatewayNode",
+};
 </script>

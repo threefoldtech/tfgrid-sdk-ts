@@ -44,12 +44,12 @@
 </template>
 
 <script lang="ts" setup>
-import type { PropType } from 'vue'
-import { computed, ref, watch } from 'vue'
+import type { PropType } from "vue";
+import { computed, ref, watch } from "vue";
 
-import type { solutionFlavor } from '../types'
+import type { solutionFlavor } from "../types";
 
-type Package = PropType<solutionFlavor>
+type Package = PropType<solutionFlavor>;
 
 const props = defineProps({
   minimum: { type: Object as Package, default: () => ({ cpu: 1, memory: 1024, disk: 100 }) },
@@ -58,11 +58,11 @@ const props = defineProps({
     type: Object as Package,
     default: () => ({ cpu: 4, memory: 1024 * 4, disk: 500 }),
   },
-})
-const emits = defineEmits<{ (event: 'update:model-value', value?: solutionFlavor): void }>()
+});
+const emits = defineEmits<{ (event: "update:model-value", value?: solutionFlavor): void }>();
 
 const packages = computed(() => {
-  const { minimum, standard, recommended } = props
+  const { minimum, standard, recommended } = props;
   return [
     {
       title: `Minimum(CPU: ${minimum.cpu} vCores, Memory: ${minimum.memory} MB, Disk: ${minimum.disk} GB)`,
@@ -76,38 +76,38 @@ const packages = computed(() => {
       title: `Recommended(CPU: ${recommended.cpu} vCores, Memory: ${recommended.memory} MB, Disk: ${recommended.disk} GB)`,
       value: recommended,
     },
-    { title: 'Custom', value: 'custom' },
-  ]
-})
+    { title: "Custom", value: "custom" },
+  ];
+});
 
-const solution = ref(packages.value[0].value)
-const cpu = ref<number>()
-const memory = ref<number>()
-const disk = ref<number>()
+const solution = ref(packages.value[0].value);
+const cpu = ref<number>();
+const memory = ref<number>();
+const disk = ref<number>();
 
 watch(
   solution,
-  (value) => {
-    if (value === 'custom' || typeof value === 'string') return
-    cpu.value = value.cpu
-    memory.value = value.memory
-    disk.value = value.disk
+  value => {
+    if (value === "custom" || typeof value === "string") return;
+    cpu.value = value.cpu;
+    memory.value = value.memory;
+    disk.value = value.disk;
   },
-  { immediate: true }
-)
+  { immediate: true },
+);
 
 watch(
   [cpu, memory, disk],
   ([cpu, memory, disk]) => {
-    const value = cpu && memory && disk ? { cpu, memory, disk } : undefined
-    emits('update:model-value', value)
+    const value = cpu && memory && disk ? { cpu, memory, disk } : undefined;
+    emits("update:model-value", value);
   },
-  { immediate: true }
-)
+  { immediate: true },
+);
 </script>
 
 <script lang="ts">
 export default {
-  name: 'SelectSolutionFlavor',
-}
+  name: "SelectSolutionFlavor",
+};
 </script>

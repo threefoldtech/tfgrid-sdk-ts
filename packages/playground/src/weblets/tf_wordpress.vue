@@ -2,13 +2,9 @@
   <weblet-layout ref="layout">
     <template #title>Deploy a Wordpress Instance </template>
     <template #subtitle>
-      WordPress is the simplest, most popular way to create your own website or blog. In fact,
-      WordPress powers over 43.3% of all the websites on the Internet.
-      <a
-        target="_blank"
-        href="https://manual.grid.tf/weblets/weblets_wordpress.html"
-        class="app-link"
-      >
+      WordPress is the simplest, most popular way to create your own website or blog. In fact, WordPress powers over
+      43.3% of all the websites on the Internet.
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_wordpress.html" class="app-link">
         Quick start documentation
       </a>
     </template>
@@ -48,11 +44,7 @@
           ]"
           #="{ props: validatorProps }"
         >
-          <v-text-field
-            label="Password"
-            v-model="password"
-            v-bind="{ ...props, ...validatorProps }"
-          />
+          <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
         </input-validator>
       </password-input-wrapper>
 
@@ -92,49 +84,49 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString, type GridClient } from '@threefold/grid_client'
-import { type Ref, ref } from 'vue'
+import { generateString, type GridClient } from "@threefold/grid_client";
+import { type Ref, ref } from "vue";
 
-import { useLayout } from '../components/weblet_layout.vue'
-import { useProfileManager } from '../stores'
-import type { Farm, GatewayNode, solutionFlavor as SolutionFlavor } from '../types'
-import { ProjectName } from '../types'
-import { deployVM } from '../utils/deploy_vm'
-import { deployGatewayName, getSubdomain, rollbackDeployment } from '../utils/gateway'
-import { getGrid } from '../utils/grid'
-import { normalizeError } from '../utils/helpers'
+import { useLayout } from "../components/weblet_layout.vue";
+import { useProfileManager } from "../stores";
+import type { Farm, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
+import { ProjectName } from "../types";
+import { deployVM } from "../utils/deploy_vm";
+import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
+import { getGrid } from "../utils/grid";
+import { normalizeError } from "../utils/helpers";
 
-const layout = useLayout()
-const valid = ref(false)
-const profileManager = useProfileManager()
+const layout = useLayout();
+const valid = ref(false);
+const profileManager = useProfileManager();
 
-const name = ref('WP' + generateString(9))
-const username = ref('admin')
-const email = ref('')
-const password = ref(generateString(12))
-const solution = ref() as Ref<SolutionFlavor>
-const gateway = ref() as Ref<GatewayNode>
-const farm = ref() as Ref<Farm>
+const name = ref("WP" + generateString(9));
+const username = ref("admin");
+const email = ref("");
+const password = ref(generateString(12));
+const solution = ref() as Ref<SolutionFlavor>;
+const gateway = ref() as Ref<GatewayNode>;
+const farm = ref() as Ref<Farm>;
 
 async function deploy() {
-  layout.value.setStatus('deploy')
+  layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Wordpress.toLowerCase()
+  const projectName = ProjectName.Wordpress.toLowerCase();
 
   const subdomain = getSubdomain({
     deploymentName: name.value,
     projectName,
     twinId: profileManager.profile!.twinId,
-  })
-  const domain = subdomain + '.' + gateway.value.domain
+  });
+  const domain = subdomain + "." + gateway.value.domain;
 
-  let grid: GridClient | null
-  let vm: any
+  let grid: GridClient | null;
+  let vm: any;
 
   try {
-    grid = await getGrid(profileManager.profile!, projectName)
+    grid = await getGrid(profileManager.profile!, projectName);
 
-    await layout.value.validateBalance(grid!)
+    await layout.value.validateBalance(grid!);
 
     vm = await deployVM(grid!, {
       name: name.value,
@@ -146,69 +138,66 @@ async function deploy() {
           disks: [
             {
               size: solution.value.disk,
-              mountPoint: '/var/www/html',
+              mountPoint: "/var/www/html",
             },
           ],
-          flist: 'https://hub.grid.tf/tf-official-apps/tf-wordpress-latest.flist',
-          entryPoint: '/init.sh',
+          flist: "https://hub.grid.tf/tf-official-apps/tf-wordpress-latest.flist",
+          entryPoint: "/init.sh",
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
           envs: [
-            { key: 'SSH_KEY', value: domain },
-            { key: 'MYSQL_USER', value: username.value },
-            { key: 'MYSQL_PASSWORD', value: password.value },
-            { key: 'ADMIN_EMAIL', value: email.value },
-            { key: 'WP_URL', value: domain },
+            { key: "SSH_KEY", value: domain },
+            { key: "MYSQL_USER", value: username.value },
+            { key: "MYSQL_PASSWORD", value: password.value },
+            { key: "ADMIN_EMAIL", value: email.value },
+            { key: "WP_URL", value: domain },
           ],
         },
       ],
-    })
+    });
   } catch (e) {
-    return layout.value.setStatus(
-      'failed',
-      normalizeError(e, 'Failed to deploy a Wordpress instance.')
-    )
+    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Wordpress instance."));
   }
 
   try {
-    layout.value.setStatus('deploy', 'Preparing to deploy gateway...')
+    layout.value.setStatus("deploy", "Preparing to deploy gateway...");
 
     await deployGatewayName(grid!, {
       name: subdomain,
       nodeId: gateway.value.id,
       backends: [`http://[${vm[0].planetary}]:80`],
-    })
+    });
 
-    layout.value.reloadDeploymentsList()
-    layout.value.setStatus('success', 'Successfully deployed a Wordpress instance.')
+    layout.value.reloadDeploymentsList();
+    layout.value.setStatus("success", "Successfully deployed a Wordpress instance.");
     layout.value.openDialog(vm, {
-      SSH_KEY: 'Public SSH Key',
-      MYSQL_USER: 'Mysql User',
-      MYSQL_PASSWORD: 'Mysql Password',
-      ADMIN_EMAIL: 'Admin Email',
-      WP_URL: 'WP URL',
-    })
+      SSH_KEY: "Public SSH Key",
+      MYSQL_USER: "Mysql User",
+      MYSQL_PASSWORD: "Mysql Password",
+      ADMIN_EMAIL: "Admin Email",
+      WP_URL: "WP URL",
+    });
   } catch (e) {
-    layout.value.setStatus('deploy', 'Rollbacking back due to fail to deploy gateway...')
+    layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
-    await rollbackDeployment(grid!, name.value)
-    layout.value.setStatus('failed', normalizeError(e, 'Failed to deploy a Wordpress instance.'))
+    await rollbackDeployment(grid!, name.value);
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Wordpress instance."));
   }
 }
 </script>
 
 <script lang="ts">
-import SelectFarm from '../components/select_farm.vue'
-import SelectGatewayNode from '../components/select_gateway_node.vue'
-import SelectSolutionFlavor from '../components/select_solution_flavor.vue'
+import SelectFarm from "../components/select_farm.vue";
+import SelectGatewayNode from "../components/select_gateway_node.vue";
+import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 
 export default {
-  name: 'TFWordpress',
+  name: "TFWordpress",
   components: {
     SelectSolutionFlavor,
     SelectGatewayNode,
     SelectFarm,
   },
-}
+};
 </script>

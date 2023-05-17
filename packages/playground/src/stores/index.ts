@@ -1,1 +1,1 @@
-export { useProfileManager } from './profile_manager'
+export { useProfileManager } from "./profile_manager";

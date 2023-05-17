@@ -10,13 +10,7 @@
       <template #title><slot name="title"></slot> </template>
 
       <template #header-actions>
-        <v-btn-toggle
-          divided
-          v-model="showType"
-          mandatory
-          :disabled="layout?.status || deleting"
-          class="mt-2"
-        >
+        <v-btn-toggle divided v-model="showType" mandatory :disabled="layout?.status || deleting" class="mt-2">
           <v-btn variant="outlined" :disabled="workers.length === 0"> List </v-btn>
           <v-btn variant="outlined"> Deploy </v-btn>
         </v-btn-toggle>
@@ -50,18 +44,14 @@
         >
           Deploy
         </v-btn>
-        <v-btn color="error" variant="tonal" v-if="!deleting" @click="$emit('close')">
-          Close
-        </v-btn>
+        <v-btn color="error" variant="tonal" v-if="!deleting" @click="$emit('close')"> Close </v-btn>
       </template>
     </weblet-layout>
   </v-dialog>
 
   <v-dialog width="50%" v-model="deletingDialog">
     <v-card>
-      <v-card-title class="text-h5">
-        Are you sure you want to delete the following workers?
-      </v-card-title>
+      <v-card-title class="text-h5"> Are you sure you want to delete the following workers? </v-card-title>
       <v-card-text>
         <v-chip class="ma-1" color="primary" label v-for="w in selectedWorkers" :key="w.name">
           {{ w.name }}
@@ -77,33 +67,33 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const props = defineProps<{ workers: any[]; selectedWorkers: any[]; deleting: boolean }>()
+const props = defineProps<{ workers: any[]; selectedWorkers: any[]; deleting: boolean }>();
 const emits = defineEmits<{
-  (event: 'close'): void
-  (event: 'delete', cb: (workers: any[]) => void): void
-  (event: 'deploy', layout: any): void
-  (event: 'back'): void
-}>()
+  (event: "close"): void;
+  (event: "delete", cb: (workers: any[]) => void): void;
+  (event: "deploy", layout: any): void;
+  (event: "back"): void;
+}>();
 
-const layout = ref()
-const showType = ref(props.workers.length === 0 ? 1 : 0)
-const valid = ref(true)
-const deletingDialog = ref(false)
+const layout = ref();
+const showType = ref(props.workers.length === 0 ? 1 : 0);
+const valid = ref(true);
+const deletingDialog = ref(false);
 
 function onDelete() {
-  deletingDialog.value = false
-  emits('delete', (workers) => {
+  deletingDialog.value = false;
+  emits("delete", workers => {
     if (workers.length === 0) {
-      showType.value = 1
+      showType.value = 1;
     }
-  })
+  });
 }
 </script>
 
 <script lang="ts">
 export default {
-  name: 'ManageWorkerDialog',
-}
+  name: "ManageWorkerDialog",
+};
 </script>

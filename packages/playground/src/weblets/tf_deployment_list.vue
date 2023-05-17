@@ -4,15 +4,11 @@
       Deployment List
       {{
         $props.projectName
-          ? '(' +
-            (tabs.find((tab) => tab.value === $props.projectName)?.title ?? $props.projectName) +
-            ')'
-          : ''
+          ? "(" + (tabs.find(tab => tab.value === $props.projectName)?.title ?? $props.projectName) + ")"
+          : ""
       }}
     </template>
-    <template #subtitle v-if="!$props.projectName">
-      List your own deployments for different solutions
-    </template>
+    <template #subtitle v-if="!$props.projectName"> List your own deployments for different solutions </template>
     <d-tabs
       :tabs="tabs"
       :model-value="activeTab"
@@ -21,12 +17,7 @@
       destroy
       :hide-tabs="!!$props.projectName"
     >
-      <VmDeploymentTable
-        :projectName="tabs[activeTab].value"
-        v-model="selectedItems"
-        :deleting="deleting"
-        ref="table"
-      >
+      <VmDeploymentTable :projectName="tabs[activeTab].value" v-model="selectedItems" :deleting="deleting" ref="table">
         <template #Fullvm-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
@@ -197,12 +188,7 @@
               })
             "
           />
-          <IconActionBtn
-            tooltip="Preview"
-            color="info"
-            icon="mdi-web"
-            :href="item.value[0].env.SITE_URL"
-          />
+          <IconActionBtn tooltip="Preview" color="info" icon="mdi-web" :href="item.value[0].env.SITE_URL" />
         </template>
 
         <template #Discourse-actions="{ item }">
@@ -379,12 +365,7 @@
               })
             "
           />
-          <IconActionBtn
-            tooltip="Preview"
-            color="info"
-            icon="mdi-web"
-            :href="'https://' + item.value[0].env.WP_URL"
-          />
+          <IconActionBtn tooltip="Preview" color="info" icon="mdi-web" :href="'https://' + item.value[0].env.WP_URL" />
           <IconActionBtn
             tooltip="Admin Panel"
             color="secondary"
@@ -453,12 +434,7 @@
         <strong>Are you sure you want to delete the following deployments?</strong>
       </v-card-title>
       <v-card-text>
-        <v-chip
-          class="ma-1"
-          color="primary"
-          v-for="item in selectedItems"
-          :key="item.deploymentName"
-        >
+        <v-chip class="ma-1" color="primary" v-for="item in selectedItems" :key="item.deploymentName">
           {{ item.deploymentName }}
         </v-chip>
       </v-card-text>
@@ -472,89 +448,89 @@
 </template>
 
 <script lang="ts" setup>
-import { getCurrentInstance, onUnmounted, type Ref, ref, watch } from 'vue'
+import { getCurrentInstance, onUnmounted, type Ref, ref, watch } from "vue";
 
-import type { Tab } from '../components/dynamic_tabs.vue'
-import { useProfileManager } from '../stores'
-import { deleteDeployment } from '../utils/delete_deployment'
-import { getGrid, updateGrid } from '../utils/grid'
+import type { Tab } from "../components/dynamic_tabs.vue";
+import { useProfileManager } from "../stores";
+import { deleteDeployment } from "../utils/delete_deployment";
+import { getGrid, updateGrid } from "../utils/grid";
 
-const props = defineProps<{ projectName?: ProjectName }>()
+const props = defineProps<{ projectName?: ProjectName }>();
 
 const tabs: Tab[] = [
-  { title: 'Full Virtual Machine', value: 'Fullvm', imgPath: 'images/icons/vm.png' },
-  { title: 'Micro Virtual Machine', value: 'VM', imgPath: 'images/icons/vm.png' },
-  { title: 'Kubernetes', value: 'Kubernetes', imgPath: 'images/icons/kubernetes.png' },
-  { title: 'CapRover', value: 'CapRover', imgPath: 'images/icons/caprover.png' },
-  { title: 'Peertube', value: 'Peertube', imgPath: 'images/icons/peertube.png' },
-  { title: 'Funkwhale', value: 'Funkwhale', imgPath: 'images/icons/funkwhale.png' },
-  { title: 'Mattermost', value: 'Mattermost', imgPath: 'images/icons/mattermost.png' },
-  { title: 'Discourse', value: 'Discourse', imgPath: 'images/icons/discourse.png' },
-  { title: 'Taiga', value: 'Taiga', imgPath: 'images/icons/taiga.png' },
-  { title: 'Owncloud', value: 'Owncloud', imgPath: 'images/icons/owncloud.png' },
-  { title: 'Presearch', value: 'Presearch', imgPath: 'images/icons/presearch.png' },
-  { title: 'Subsquid', value: 'Subsquid', imgPath: 'images/icons/subsquid.png' },
-  { title: 'Casperlabs', value: 'Casperlabs', imgPath: 'images/icons/casperlabs.png' },
-  { title: 'Algorand', value: 'Algorand', imgPath: 'images/icons/algorand.png' },
-  { title: 'Node Pilot', value: 'NodePilot', imgPath: 'images/icons/vm.png' },
-  { title: 'Umbrel', value: 'Umbrel', imgPath: 'images/icons/umbrel.png' },
-  { title: 'Wordpress', value: 'Wordpress', imgPath: 'images/icons/wordpress.png' },
-]
+  { title: "Full Virtual Machine", value: "Fullvm", imgPath: "images/icons/vm.png" },
+  { title: "Micro Virtual Machine", value: "VM", imgPath: "images/icons/vm.png" },
+  { title: "Kubernetes", value: "Kubernetes", imgPath: "images/icons/kubernetes.png" },
+  { title: "CapRover", value: "CapRover", imgPath: "images/icons/caprover.png" },
+  { title: "Peertube", value: "Peertube", imgPath: "images/icons/peertube.png" },
+  { title: "Funkwhale", value: "Funkwhale", imgPath: "images/icons/funkwhale.png" },
+  { title: "Mattermost", value: "Mattermost", imgPath: "images/icons/mattermost.png" },
+  { title: "Discourse", value: "Discourse", imgPath: "images/icons/discourse.png" },
+  { title: "Taiga", value: "Taiga", imgPath: "images/icons/taiga.png" },
+  { title: "Owncloud", value: "Owncloud", imgPath: "images/icons/owncloud.png" },
+  { title: "Presearch", value: "Presearch", imgPath: "images/icons/presearch.png" },
+  { title: "Subsquid", value: "Subsquid", imgPath: "images/icons/subsquid.png" },
+  { title: "Casperlabs", value: "Casperlabs", imgPath: "images/icons/casperlabs.png" },
+  { title: "Algorand", value: "Algorand", imgPath: "images/icons/algorand.png" },
+  { title: "Node Pilot", value: "NodePilot", imgPath: "images/icons/vm.png" },
+  { title: "Umbrel", value: "Umbrel", imgPath: "images/icons/umbrel.png" },
+  { title: "Wordpress", value: "Wordpress", imgPath: "images/icons/wordpress.png" },
+];
 
-const profileManager = useProfileManager()
+const profileManager = useProfileManager();
 
-const layout = ref()
-const dialog = ref<string>()
-const selectedItems = ref<any[]>([])
-const deleting = ref(false)
-const deletingDialog = ref(false)
-const table = ref() as Ref<{ loadDeployments(): void }>
+const layout = ref();
+const dialog = ref<string>();
+const selectedItems = ref<any[]>([]);
+const deleting = ref(false);
+const deletingDialog = ref(false);
+const table = ref() as Ref<{ loadDeployments(): void }>;
 
-const _idx = tabs.findIndex((t) => t.value === props.projectName)
-const activeTab = ref(!props.projectName ? 0 : _idx) as Ref<number>
-watch(activeTab, () => (selectedItems.value = []))
+const _idx = tabs.findIndex(t => t.value === props.projectName);
+const activeTab = ref(!props.projectName ? 0 : _idx) as Ref<number>;
+watch(activeTab, () => (selectedItems.value = []));
 
 async function onDelete() {
-  deletingDialog.value = false
-  deleting.value = true
-  const grid = await getGrid(profileManager.profile!)
+  deletingDialog.value = false;
+  deleting.value = true;
+  const grid = await getGrid(profileManager.profile!);
   for (const item of selectedItems.value) {
     try {
       await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
         name: item.deploymentName,
         projectName: item.projectName,
-      })
+      });
     } catch (e: any) {
-      console.log('Error while deleting deployment', e.message)
+      console.log("Error while deleting deployment", e.message);
     }
   }
-  selectedItems.value = []
-  table.value?.loadDeployments()
-  deleting.value = false
+  selectedItems.value = [];
+  table.value?.loadDeployments();
+  deleting.value = false;
 }
 
 /* List Manager */
-const { uid } = getCurrentInstance() as { uid: number }
-const deploymentListManager = useDeploymentListManager()
+const { uid } = getCurrentInstance() as { uid: number };
+const deploymentListManager = useDeploymentListManager();
 
 deploymentListManager?.register(uid, () => {
-  return table.value?.loadDeployments
-})
+  return table.value?.loadDeployments;
+});
 
-onUnmounted(() => deploymentListManager?.unregister(uid))
+onUnmounted(() => deploymentListManager?.unregister(uid));
 </script>
 
 <script lang="ts">
-import { useDeploymentListManager } from '../components/deployment_list_manager.vue'
-import IconActionBtn from '../components/icon_action_btn.vue'
-import K8sDeploymentTable from '../components/k8s_deployment_table.vue'
-import ManageCaproverWorkerDialog from '../components/manage_caprover_worker_dialog.vue'
-import ManageK8SWorkerDialog from '../components/manage_k8s_worker_dialog.vue'
-import VmDeploymentTable from '../components/vm_deployment_table.vue'
-import type { ProjectName } from '../types'
+import { useDeploymentListManager } from "../components/deployment_list_manager.vue";
+import IconActionBtn from "../components/icon_action_btn.vue";
+import K8sDeploymentTable from "../components/k8s_deployment_table.vue";
+import ManageCaproverWorkerDialog from "../components/manage_caprover_worker_dialog.vue";
+import ManageK8SWorkerDialog from "../components/manage_k8s_worker_dialog.vue";
+import VmDeploymentTable from "../components/vm_deployment_table.vue";
+import type { ProjectName } from "../types";
 
 export default {
-  name: 'TfDeploymentList',
+  name: "TfDeploymentList",
   components: {
     VmDeploymentTable,
     IconActionBtn,
@@ -562,5 +538,5 @@ export default {
     ManageK8SWorkerDialog,
     ManageCaproverWorkerDialog,
   },
-}
+};
 </script>

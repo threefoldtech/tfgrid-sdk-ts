@@ -40,114 +40,98 @@
       #="{ props }"
       ref="storageInput"
     >
-      <v-text-field
-        label="Storage Size (GB)"
-        type="number"
-        v-model.number="storage"
-        v-bind="props"
-      />
+      <v-text-field label="Storage Size (GB)" type="number" v-model.number="storage" v-bind="props" />
     </input-validator>
   </template>
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { ref, watch } from "vue";
 
-import type { Validators } from '../types'
+import type { Validators } from "../types";
 
-const props = defineProps<{ network: string; type: string }>()
+const props = defineProps<{ network: string; type: string }>();
 const emits = defineEmits<{
-  (event: 'update:cpu', value?: number): void
-  (event: 'update:memory', value?: number): void
-  (event: 'update:storage', value?: number): void
-}>()
+  (event: "update:cpu", value?: number): void;
+  (event: "update:memory", value?: number): void;
+  (event: "update:storage", value?: number): void;
+}>();
 
-const cpuInput = ref()
-const memoryInput = ref()
-const storageInput = ref()
+const cpuInput = ref();
+const memoryInput = ref();
+const storageInput = ref();
 
-const custom = ref(false)
+const custom = ref(false);
 
-const cpu = ref(2)
-const memory = ref(4096)
-const storage = ref(100)
+const cpu = ref(2);
+const memory = ref(4096);
+const storage = ref(100);
 
-watch(cpu, (cpu) => emits('update:cpu', cpu), { immediate: true })
-watch(memory, (memory) => emits('update:memory', memory), { immediate: true })
-watch(storage, (storage) => emits('update:storage', storage), { immediate: true })
+watch(cpu, cpu => emits("update:cpu", cpu), { immediate: true });
+watch(memory, memory => emits("update:memory", memory), { immediate: true });
+watch(storage, storage => emits("update:storage", storage), { immediate: true });
 
 watch(
   () => [custom.value, props.network, props.type] as const,
   ([custom, network, type]) => {
     if (!custom) {
-      const min = getMinCapacity(network, type)
-      cpu.value = min.cpu
-      memory.value = min.memory
-      storage.value = min.storage
+      const min = getMinCapacity(network, type);
+      cpu.value = min.cpu;
+      memory.value = min.memory;
+      storage.value = min.storage;
     } else {
-      cpuInput.value?.validate(cpu.value?.toString())
-      memoryInput.value?.validate(memory.value?.toString())
-      storageInput.value?.validate(storage.value?.toString())
+      cpuInput.value?.validate(cpu.value?.toString());
+      memoryInput.value?.validate(memory.value?.toString());
+      storageInput.value?.validate(storage.value?.toString());
     }
-  }
-)
+  },
+);
 
 function customCpuValidation(validators: Validators) {
   return (value: string) => {
-    const min = getMinCapacity(props.network, props.type)
-    const maybeError = validators.min(`CPU min is ${min.cpu} cores.`, min.cpu)(value)
-    return maybeError ? maybeError : validators.max('CPU max is 32 cores.', 32)(value)
-  }
+    const min = getMinCapacity(props.network, props.type);
+    const maybeError = validators.min(`CPU min is ${min.cpu} cores.`, min.cpu)(value);
+    return maybeError ? maybeError : validators.max("CPU max is 32 cores.", 32)(value);
+  };
 }
 
 function customMemoryValidation(validators: Validators) {
   return (value: string) => {
-    const min = getMinCapacity(props.network, props.type)
-    const maybeError = validators.min(
-      `Minimum allowed memory is ${min.memory} GB.`,
-      min.memory
-    )(value)
-    return maybeError
-      ? maybeError
-      : validators.max('Maximum allowed memory is 256 GB.', 256 * 1024)(value)
-  }
+    const min = getMinCapacity(props.network, props.type);
+    const maybeError = validators.min(`Minimum allowed memory is ${min.memory} GB.`, min.memory)(value);
+    return maybeError ? maybeError : validators.max("Maximum allowed memory is 256 GB.", 256 * 1024)(value);
+  };
 }
 
 function customStorageValidation(validators: Validators) {
   return (value: string) => {
-    const min = getMinCapacity(props.network, props.type)
-    const maybeError = validators.min(
-      `Minimum allowed storage size is ${min.storage} GB.`,
-      min.storage
-    )(value)
+    const min = getMinCapacity(props.network, props.type);
+    const maybeError = validators.min(`Minimum allowed storage size is ${min.storage} GB.`, min.storage)(value);
     return maybeError
       ? maybeError
-      : validators.max(
-          `Maximum allowed storage size is ${min.storage + 200} GB.`,
-          min.storage + 200
-        )(value)
-  }
+      : validators.max(`Maximum allowed storage size is ${min.storage + 200} GB.`, min.storage + 200)(value);
+  };
 }
 
 function getMinCapacity(network: string, type: string) {
-  if (type == 'relay' && network == 'mainnet') {
-    return { cpu: 4, memory: 1024 * 8, storage: 950 }
+  if (type == "relay" && network == "mainnet") {
+    return { cpu: 4, memory: 1024 * 8, storage: 950 };
   }
 
-  if (type == 'indexer' && network == 'testnet') {
-    return { cpu: 4, memory: 1024 * 8, storage: 1300 }
+  if (type == "indexer" && network == "testnet") {
+    return { cpu: 4, memory: 1024 * 8, storage: 1300 };
   }
 
-  if (type == 'indexer' && network == 'mainnet') {
-    return { cpu: 4, memory: 1024 * 8, storage: 1500 }
+  if (type == "indexer" && network == "mainnet") {
+    return { cpu: 4, memory: 1024 * 8, storage: 1500 };
   }
 
-  return { cpu: 2, memory: 4 * 1024, storage: 100 }
+  return { cpu: 2, memory: 4 * 1024, storage: 100 };
 }
 </script>
 
 <script lang="ts">
 export default {
-  name: 'AlgorandCapacity',
-}
+  name: "AlgorandCapacity",
+};
 </script>

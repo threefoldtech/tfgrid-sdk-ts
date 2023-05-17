@@ -3,7 +3,7 @@
     :value="$props.modelValue.name"
     :rules="[
       validators.required('Name is required.'),
-      (name) => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+      name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
       validators.isAlphanumeric('Name should consist of alphabets & numbers only.'),
       validators.minLength('Name minimum length is 2 chars.', 2),
       validators.maxLength('Name max length is 15 chars.', 15),
@@ -23,12 +23,7 @@
     ]"
     #="{ props }"
   >
-    <v-text-field
-      label="CPU (vCores)"
-      type="number"
-      v-model.number="$props.modelValue.cpu"
-      v-bind="props"
-    />
+    <v-text-field label="CPU (vCores)" type="number" v-model.number="$props.modelValue.cpu" v-bind="props" />
   </input-validator>
 
   <input-validator
@@ -41,12 +36,7 @@
     ]"
     #="{ props }"
   >
-    <v-text-field
-      label="Memory (MB)"
-      type="number"
-      v-model.number="$props.modelValue.memory"
-      v-bind="props"
-    />
+    <v-text-field label="Memory (MB)" type="number" v-model.number="$props.modelValue.memory" v-bind="props" />
   </input-validator>
 
   <input-validator
@@ -59,12 +49,7 @@
     ]"
     #="{ props }"
   >
-    <v-text-field
-      label="Disk Size (GB)"
-      type="number"
-      v-model.number="$props.modelValue.diskSize"
-      v-bind="props"
-    />
+    <v-text-field label="Disk Size (GB)" type="number" v-model.number="$props.modelValue.diskSize" v-bind="props" />
   </input-validator>
 
   <v-switch label="Public IPv4" inset color="primary" v-model="$props.modelValue.ipv4" />
@@ -89,17 +74,17 @@
 </template>
 
 <script lang="ts" setup>
-defineProps<{ modelValue: K8SWorker }>()
+defineProps<{ modelValue: K8SWorker }>();
 </script>
 
 <script lang="ts">
-import { generateString } from '@threefold/grid_client'
+import { generateString } from "@threefold/grid_client";
 
-import type { Farm, K8SWorker } from '../types'
-import RootFsSize from './root_fs_size.vue'
-import SelectFarm from './select_farm.vue'
+import type { Farm, K8SWorker } from "../types";
+import RootFsSize from "./root_fs_size.vue";
+import SelectFarm from "./select_farm.vue";
 
-export function createWorker(name: string = 'WR' + generateString(9)): K8SWorker {
+export function createWorker(name: string = "WR" + generateString(9)): K8SWorker {
   return {
     name,
     cpu: 1,
@@ -110,14 +95,14 @@ export function createWorker(name: string = 'WR' + generateString(9)): K8SWorker
     planetary: true,
     rootFsSize: 2,
     farm: undefined as Farm | undefined,
-  }
+  };
 }
 
 export default {
-  name: 'K8SWorker',
+  name: "K8SWorker",
   components: {
     SelectFarm,
     RootFsSize,
   },
-}
+};
 </script>

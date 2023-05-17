@@ -7,18 +7,18 @@
 </template>
 
 <script lang="ts">
-import { ProjectName } from '../types'
-import MicroVm from '../weblets/micro_vm.vue'
-import TfDeploymentList from '../weblets/tf_deployment_list.vue'
+import { ProjectName } from "../types";
+import MicroVm from "../weblets/micro_vm.vue";
+import TfDeploymentList from "../weblets/tf_deployment_list.vue";
 
 export default {
-  name: 'MicroVirtualMachine',
+  name: "MicroVirtualMachine",
   components: {
     MicroVm,
     TfDeploymentList,
   },
   setup() {
-    return { name: ProjectName.VM }
+    return { name: ProjectName.VM };
   },
-}
+};
 </script>

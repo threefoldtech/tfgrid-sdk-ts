@@ -15,19 +15,19 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const props = defineProps({ data: String })
-const openSnackbar = ref(false)
+const props = defineProps({ data: String });
+const openSnackbar = ref(false);
 
 function copy() {
-  navigator.clipboard.writeText(props.data || '')
-  openSnackbar.value = true
+  navigator.clipboard.writeText(props.data || "");
+  openSnackbar.value = true;
 }
 </script>
 
 <script lang="ts">
 export default {
-  name: 'CopyInputWrapper',
-}
+  name: "CopyInputWrapper",
+};
 </script>

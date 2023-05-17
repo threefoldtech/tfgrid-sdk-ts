@@ -1,9 +1,9 @@
 <script lang="ts">
 export default {
-  name: 'HighlightLight',
-}
+  name: "HighlightLight",
+};
 </script>
 
 <style lang="scss">
-@import 'highlight.js/styles/atom-one-light.css';
+@import "highlight.js/styles/atom-one-light.css";
 </style>

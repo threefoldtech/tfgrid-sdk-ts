@@ -2,8 +2,8 @@
   <weblet-layout ref="layout">
     <template #title>Deploy an Umbrel Instance </template>
     <template #subtitle>
-      Umbrel is an OS for running a personal server in your home. Self-host open source apps like
-      Nextcloud, Bitcoin node, and more.
+      Umbrel is an OS for running a personal server in your home. Self-host open source apps like Nextcloud, Bitcoin
+      node, and more.
       <a target="_blank" href="https://manual.grid.tf/weblets/weblets_umbrel.html" class="app-link">
         Quick start documentation
       </a>
@@ -44,11 +44,7 @@
           ]"
           #="{ props: validatorProps }"
         >
-          <v-text-field
-            label="Password"
-            v-model="password"
-            v-bind="{ ...props, ...validatorProps }"
-          />
+          <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
         </input-validator>
       </password-input-wrapper>
 
@@ -73,38 +69,38 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString } from '@threefold/grid_client'
-import { type Ref, ref } from 'vue'
+import { generateString } from "@threefold/grid_client";
+import { type Ref, ref } from "vue";
 
-import { useLayout } from '../components/weblet_layout.vue'
-import { useProfileManager } from '../stores'
-import type { Farm, solutionFlavor as SolutionFlavor } from '../types'
-import { ProjectName } from '../types'
-import { deployVM } from '../utils/deploy_vm'
-import { getGrid } from '../utils/grid'
-import { normalizeError } from '../utils/helpers'
-import rootFs from '../utils/root_fs'
+import { useLayout } from "../components/weblet_layout.vue";
+import { useProfileManager } from "../stores";
+import type { Farm, solutionFlavor as SolutionFlavor } from "../types";
+import { ProjectName } from "../types";
+import { deployVM } from "../utils/deploy_vm";
+import { getGrid } from "../utils/grid";
+import { normalizeError } from "../utils/helpers";
+import rootFs from "../utils/root_fs";
 
-const layout = useLayout()
-const valid = ref(false)
-const profileManager = useProfileManager()
+const layout = useLayout();
+const valid = ref(false);
+const profileManager = useProfileManager();
 
-const name = ref('UM' + generateString(9))
-const username = ref('admin')
-const password = ref(generateString(12))
-const ipv4 = ref(false)
-const solution = ref() as Ref<SolutionFlavor>
-const farm = ref() as Ref<Farm>
+const name = ref("UM" + generateString(9));
+const username = ref("admin");
+const password = ref(generateString(12));
+const ipv4 = ref(false);
+const solution = ref() as Ref<SolutionFlavor>;
+const farm = ref() as Ref<Farm>;
 
 async function deploy() {
-  layout.value.setStatus('deploy')
+  layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Umbrel.toLowerCase()
+  const projectName = ProjectName.Umbrel.toLowerCase();
 
   try {
-    const grid = await getGrid(profileManager.profile!, projectName)
+    const grid = await getGrid(profileManager.profile!, projectName);
 
-    await layout.value.validateBalance(grid!)
+    await layout.value.validateBalance(grid!);
 
     const vm = await deployVM(grid!, {
       name: name.value,
@@ -116,54 +112,54 @@ async function deploy() {
           disks: [
             {
               size: 10,
-              mountPoint: '/var/lib/docker',
+              mountPoint: "/var/lib/docker",
             },
             {
               size: solution.value.disk,
-              mountPoint: '/umbrelDisk',
+              mountPoint: "/umbrelDisk",
             },
           ],
-          flist: 'https://hub.grid.tf/tf-official-apps/umbrel-latest.flist',
-          entryPoint: '/sbin/zinit init',
+          flist: "https://hub.grid.tf/tf-official-apps/umbrel-latest.flist",
+          entryPoint: "/sbin/zinit init",
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
           planetary: true,
           publicIpv4: ipv4.value,
           envs: [
-            { key: 'SSH_KEY', value: profileManager.profile!.ssh },
-            { key: 'USERNAME', value: username.value },
-            { key: 'PASSWORD', value: password.value },
-            { key: 'UMBREL_DISK', value: '/umbrelDisk' },
+            { key: "SSH_KEY", value: profileManager.profile!.ssh },
+            { key: "USERNAME", value: username.value },
+            { key: "PASSWORD", value: password.value },
+            { key: "UMBREL_DISK", value: "/umbrelDisk" },
           ],
           rootFilesystemSize: rootFs(solution.value.cpu, solution.value.memory),
         },
       ],
-    })
+    });
 
-    layout.value.reloadDeploymentsList()
-    layout.value.setStatus('success', 'Successfully deployed an Umbrel instance.')
+    layout.value.reloadDeploymentsList();
+    layout.value.setStatus("success", "Successfully deployed an Umbrel instance.");
     layout.value.openDialog(vm, {
-      SSH_KEY: 'Public SSH Key',
-      USERNAME: 'Username',
-      PASSWORD: 'Password',
-      UMBREL_DISK: 'Umbrel Disk',
-    })
+      SSH_KEY: "Public SSH Key",
+      USERNAME: "Username",
+      PASSWORD: "Password",
+      UMBREL_DISK: "Umbrel Disk",
+    });
   } catch (e) {
-    layout.value.setStatus('failed', normalizeError(e, 'Failed to deploy an Umbrel instance.'))
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy an Umbrel instance."));
   }
 }
 </script>
 
 <script lang="ts">
-import SelectFarm from '../components/select_farm.vue'
-import SelectSolutionFlavor from '../components/select_solution_flavor.vue'
+import SelectFarm from "../components/select_farm.vue";
+import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 
 export default {
-  name: 'TfUmbrel',
+  name: "TfUmbrel",
   components: {
     SelectSolutionFlavor,
     SelectFarm,
   },
-}
+};
 </script>

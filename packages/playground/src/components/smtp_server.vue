@@ -40,20 +40,13 @@
         ]"
         #="{ props: validatorProps }"
       >
-        <v-text-field
-          label="Password"
-          v-model="$props.modelValue.password"
-          v-bind="{ ...props, ...validatorProps }"
-        />
+        <v-text-field label="Password" v-model="$props.modelValue.password" v-bind="{ ...props, ...validatorProps }" />
       </input-validator>
     </password-input-wrapper>
 
     <input-validator
       :value="$props.modelValue.email"
-      :rules="[
-        validators.required('Email is required.'),
-        validators.isEmail('Please provide a valid email address.'),
-      ]"
+      :rules="[validators.required('Email is required.'), validators.isEmail('Please provide a valid email address.')]"
       v-if="email"
       #="{ props }"
     >
@@ -67,10 +60,7 @@
 
     <input-validator
       :value="$props.modelValue.hostname"
-      :rules="[
-        validators.required('Hostname is required.'),
-        validators.isURL('Please provide a valid hostname.'),
-      ]"
+      :rules="[validators.required('Hostname is required.'), validators.isURL('Please provide a valid hostname.')]"
       #="{ props }"
     >
       <v-text-field label="Hostname" v-model="$props.modelValue.hostname" v-bind="props" />
@@ -78,10 +68,7 @@
 
     <input-validator
       :value="$props.modelValue.port"
-      :rules="[
-        validators.required('Port is required.'),
-        validators.isPort('Please provide a valid port.'),
-      ]"
+      :rules="[validators.required('Port is required.'), validators.isPort('Please provide a valid port.')]"
       #="{ props }"
     >
       <v-text-field label="Port" v-model.number="$props.modelValue.port" v-bind="props" />
@@ -94,33 +81,33 @@
 
 <script lang="ts" setup>
 defineProps<{
-  modelValue: SMTPServer
-  ssl?: boolean
-  tls?: boolean
-  email?: boolean
-  persistent?: boolean
-}>()
+  modelValue: SMTPServer;
+  ssl?: boolean;
+  tls?: boolean;
+  email?: boolean;
+  persistent?: boolean;
+}>();
 </script>
 
 <script lang="ts">
-import { generateString } from '@threefold/grid_client'
+import { generateString } from "@threefold/grid_client";
 
-import type { SMTPServer } from '../types'
+import type { SMTPServer } from "../types";
 
 export function createSMTPServer(options: Partial<SMTPServer> = {}): SMTPServer {
   return {
     enabled: options.enabled || false,
-    username: options.username || '',
-    email: options.email || '',
-    hostname: options.hostname || 'smtp.gmail.com',
+    username: options.username || "",
+    email: options.email || "",
+    hostname: options.hostname || "smtp.gmail.com",
     port: options.port || 587,
     tls: options.tls || false,
     ssl: options.ssl || false,
     password: options.password || generateString(12),
-  }
+  };
 }
 
 export default {
-  name: 'SmtpServer',
-}
+  name: "SmtpServer",
+};
 </script>

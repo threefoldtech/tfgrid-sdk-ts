@@ -14,60 +14,53 @@
         return-object
         :model-value="shouldBeUpdated ? undefined : farm"
         @update:model-value="farm = $event"
-        :error-messages="
-          !loading && !farms.length
-            ? 'No farms where found with the specified resources.'
-            : undefined
-        "
+        :error-messages="!loading && !farms.length ? 'No farms where found with the specified resources.' : undefined"
       />
     </input-validator>
   </section>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, type PropType, ref, watch } from 'vue'
+import { onMounted, type PropType, ref, watch } from "vue";
 
-import { useProfileManager } from '../stores/profile_manager'
-import type { Farm } from '../types'
-import { getFarms } from '../utils/get_farms'
-import { getGrid } from '../utils/grid'
+import { useProfileManager } from "../stores/profile_manager";
+import type { Farm } from "../types";
+import { getFarms } from "../utils/get_farms";
+import { getGrid } from "../utils/grid";
 
 export interface Filters {
-  publicIp?: boolean
-  cpu?: number
-  memory?: number
-  ssd?: number
-  disk?: number
+  publicIp?: boolean;
+  cpu?: number;
+  memory?: number;
+  ssd?: number;
+  disk?: number;
 }
 
 const props = defineProps({
   modelValue: { type: Object as PropType<Farm> },
   country: String,
   filters: { default: () => ({} as Filters), type: Object as PropType<Filters> },
-})
-const emits = defineEmits<{ (event: 'update:modelValue', value?: Farm): void }>()
+});
+const emits = defineEmits<{ (event: "update:modelValue", value?: Farm): void }>();
 
-const profileManager = useProfileManager()
-const country = ref<string>()
+const profileManager = useProfileManager();
+const country = ref<string>();
 
-const farm = ref<Farm>()
+const farm = ref<Farm>();
 watch([farm, country], ([f, c]) =>
-  emits(
-    'update:modelValue',
-    f ? { farmID: f.farmID, name: f.name, country: c ?? undefined } : undefined
-  )
-)
+  emits("update:modelValue", f ? { farmID: f.farmID, name: f.name, country: c ?? undefined } : undefined),
+);
 
-const loading = ref(false)
-const farms = ref<Farm[]>([])
+const loading = ref(false);
+const farms = ref<Farm[]>([]);
 async function loadFarms() {
-  loading.value = true
+  loading.value = true;
 
-  const oldFarm = farm.value
-  farm.value = undefined
+  const oldFarm = farm.value;
+  farm.value = undefined;
 
-  const grid = await getGrid(profileManager.profile!)
-  const filters = props.filters
+  const grid = await getGrid(profileManager.profile!);
+  const filters = props.filters;
   farms.value = await getFarms(grid!, {
     country: country.value,
     cru: filters.cpu,
@@ -76,21 +69,21 @@ async function loadFarms() {
     sru: filters.ssd,
     publicIPs: filters.publicIp,
     availableFor: grid!.twinId,
-  })
+  });
 
   if (oldFarm) {
-    farm.value = farms.value.find((f) => f.name === oldFarm.name)
+    farm.value = farms.value.find(f => f.name === oldFarm.name);
   }
 
   if (!farm.value) {
-    farm.value = farms.value[0]
+    farm.value = farms.value[0];
   }
 
-  loading.value = false
+  loading.value = false;
 }
-onMounted(loadFarms)
+onMounted(loadFarms);
 
-const shouldBeUpdated = ref(false)
+const shouldBeUpdated = ref(false);
 watch(
   () => ({ ...props.filters, country: country.value }),
   (value, oldValue) => {
@@ -102,26 +95,26 @@ watch(
       value.publicIp === oldValue.publicIp &&
       value.country === oldValue.country
     )
-      return
+      return;
 
-    shouldBeUpdated.value = true
-  }
-)
+    shouldBeUpdated.value = true;
+  },
+);
 
 watch([loading, shouldBeUpdated], async ([l, s]) => {
-  if (l || !s) return
-  shouldBeUpdated.value = false
-  await loadFarms()
-})
+  if (l || !s) return;
+  shouldBeUpdated.value = false;
+  await loadFarms();
+});
 </script>
 
 <script lang="ts">
-import SelectCountry from './select_country.vue'
+import SelectCountry from "./select_country.vue";
 
 export default {
-  name: 'SelectFarm',
+  name: "SelectFarm",
   components: {
     SelectCountry,
   },
-}
+};
 </script>

@@ -24,23 +24,11 @@
 
               <v-switch inset label="Public IP" v-if="!contract.publicIP" />
               <template v-else>
-                <CopyReadonlyInput
-                  label="Public IPv4"
-                  :data="contract.publicIP.ip"
-                  v-if="contract.publicIP.ip"
-                />
-                <CopyReadonlyInput
-                  label="Public IPv6"
-                  :data="contract.publicIP.ip6"
-                  v-if="contract.publicIP.ip6"
-                />
+                <CopyReadonlyInput label="Public IPv4" :data="contract.publicIP.ip" v-if="contract.publicIP.ip" />
+                <CopyReadonlyInput label="Public IPv6" :data="contract.publicIP.ip6" v-if="contract.publicIP.ip6" />
               </template>
 
-              <CopyReadonlyInput
-                label="Planetary Network IP"
-                :data="contract.planetary"
-                v-if="contract.planetary"
-              />
+              <CopyReadonlyInput label="Planetary Network IP" :data="contract.planetary" v-if="contract.planetary" />
               <v-switch inset label="Planetary Network IP" v-else />
 
               <CopyReadonlyInput label="Network Name" :data="contract.interfaces[0].network" />
@@ -53,11 +41,7 @@
                 :data="Math.ceil(disk.size / (1024 * 1024 * 1024))"
               />
               <CopyReadonlyInput label="WireGuard IP" :data="contract.interfaces[0].ip" />
-              <CopyReadonlyInput
-                label="WireGuard Config"
-                :data="contract.wireguard"
-                v-if="contract.wireguard"
-              />
+              <CopyReadonlyInput label="WireGuard Config" :data="contract.wireguard" v-if="contract.wireguard" />
               <CopyReadonlyInput label="Flist" :data="contract.flist" v-if="contract.flist" />
               <template v-if="environments !== false">
                 <template v-for="key of Object.keys(contract.env)" :key="key">
@@ -99,8 +83,8 @@
 </template>
 
 <script lang="ts" setup>
-import hljs from 'highlight.js'
-import { computed, type PropType, ref } from 'vue'
+import hljs from "highlight.js";
+import { computed, type PropType, ref } from "vue";
 
 const props = defineProps({
   data: {
@@ -117,42 +101,42 @@ const props = defineProps({
     required: false,
     default: () => false,
   },
-})
-defineEmits<{ (event: 'close'): void }>()
+});
+defineEmits<{ (event: "close"): void }>();
 
-const showType = ref(props.onlyJson ? 1 : 0)
-const activeTab = ref(0)
+const showType = ref(props.onlyJson ? 1 : 0);
+const activeTab = ref(0);
 const contracts = computed(() => {
-  if (!props.data) return []
-  if ('masters' in props.data) return [...props.data.masters, ...props.data.workers]
-  return Array.isArray(props.data) ? props.data : [props.data]
-})
-const contract = computed(() => contracts.value?.[activeTab.value] ?? {})
-const code = computed(() => JSON.stringify(props.data || {}, undefined, 2))
-const html = computed(() => hljs.highlight(code.value, { language: 'json' }).value)
+  if (!props.data) return [];
+  if ("masters" in props.data) return [...props.data.masters, ...props.data.workers];
+  return Array.isArray(props.data) ? props.data : [props.data];
+});
+const contract = computed(() => contracts.value?.[activeTab.value] ?? {});
+const code = computed(() => JSON.stringify(props.data || {}, undefined, 2));
+const html = computed(() => hljs.highlight(code.value, { language: "json" }).value);
 
 function copy() {
-  navigator.clipboard.writeText(code.value)
+  navigator.clipboard.writeText(code.value);
 }
 
 function getLabel(key: string): string {
-  if (props.environments !== false && typeof props.environments[key] === 'string') {
-    return props.environments[key] as string
+  if (props.environments !== false && typeof props.environments[key] === "string") {
+    return props.environments[key] as string;
   }
-  return key
+  return key;
 }
 </script>
 
 <script lang="ts">
-import CopyReadonlyInput from './copy_readonly_input.vue'
-import { HighlightDark, HighlightLight } from './highlight_themes'
+import CopyReadonlyInput from "./copy_readonly_input.vue";
+import { HighlightDark, HighlightLight } from "./highlight_themes";
 
 export default {
-  name: 'DeploymentDataDialog',
+  name: "DeploymentDataDialog",
   components: {
     CopyReadonlyInput,
     HighlightDark,
     HighlightLight,
   },
-}
+};
 </script>

@@ -7,18 +7,18 @@
 </template>
 
 <script lang="ts">
-import { ProjectName } from '../types'
-import TfCasperlabs from '../weblets/tf_casperlabs.vue'
-import TfDeploymentList from '../weblets/tf_deployment_list.vue'
+import { ProjectName } from "../types";
+import TfCasperlabs from "../weblets/tf_casperlabs.vue";
+import TfDeploymentList from "../weblets/tf_deployment_list.vue";
 
 export default {
-  name: 'CasperlabsView',
+  name: "CasperlabsView",
   components: {
     TfDeploymentList,
     TfCasperlabs,
   },
   setup() {
-    return { name: ProjectName.Casperlabs }
+    return { name: ProjectName.Casperlabs };
   },
-}
+};
 </script>

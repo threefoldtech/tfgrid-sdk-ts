@@ -7,18 +7,18 @@
 </template>
 
 <script lang="ts">
-import { ProjectName } from '../types'
-import TfDeploymentList from '../weblets/tf_deployment_list.vue'
-import Presearch from '../weblets/tf_presearch.vue'
+import { ProjectName } from "../types";
+import TfDeploymentList from "../weblets/tf_deployment_list.vue";
+import Presearch from "../weblets/tf_presearch.vue";
 
 export default {
-  name: 'PresearchView',
+  name: "PresearchView",
   components: {
     Presearch,
     TfDeploymentList,
   },
   setup() {
-    return { name: ProjectName.Presearch }
+    return { name: ProjectName.Presearch };
   },
-}
+};
 </script>

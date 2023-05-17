@@ -3,12 +3,12 @@
 </template>
 
 <script lang="ts">
-import TfContractsList from '../weblets/tf_contracts_list.vue'
+import TfContractsList from "../weblets/tf_contracts_list.vue";
 
 export default {
-  name: 'ContractsList',
+  name: "ContractsList",
   components: {
     TfContractsList,
   },
-}
+};
 </script>

@@ -7,18 +7,18 @@
 </template>
 
 <script lang="ts">
-import { ProjectName } from '../types'
-import TfDeploymentList from '../weblets/tf_deployment_list.vue'
-import NodePilot from '../weblets/tf_node_pilot.vue'
+import { ProjectName } from "../types";
+import TfDeploymentList from "../weblets/tf_deployment_list.vue";
+import NodePilot from "../weblets/tf_node_pilot.vue";
 
 export default {
-  name: 'NodePilotView',
+  name: "NodePilotView",
   components: {
     NodePilot,
     TfDeploymentList,
   },
   setup() {
-    return { name: ProjectName.NodePilot }
+    return { name: ProjectName.NodePilot };
   },
-}
+};
 </script>

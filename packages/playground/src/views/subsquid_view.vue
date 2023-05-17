@@ -7,18 +7,18 @@
 </template>
 
 <script lang="ts">
-import { ProjectName } from '../types'
-import TfDeploymentList from '../weblets/tf_deployment_list.vue'
-import Subsquid from '../weblets/tf_subsquid.vue'
+import { ProjectName } from "../types";
+import TfDeploymentList from "../weblets/tf_deployment_list.vue";
+import Subsquid from "../weblets/tf_subsquid.vue";
 
 export default {
-  name: 'SubsquidView',
+  name: "SubsquidView",
   components: {
     Subsquid,
     TfDeploymentList,
   },
   setup() {
-    return { name: ProjectName.Subsquid }
+    return { name: ProjectName.Subsquid };
   },
-}
+};
 </script>

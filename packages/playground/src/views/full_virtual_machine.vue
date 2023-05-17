@@ -7,18 +7,18 @@
 </template>
 
 <script lang="ts">
-import { ProjectName } from '../types'
-import FullVm from '../weblets/full_vm.vue'
-import TfDeploymentList from '../weblets/tf_deployment_list.vue'
+import { ProjectName } from "../types";
+import FullVm from "../weblets/full_vm.vue";
+import TfDeploymentList from "../weblets/tf_deployment_list.vue";
 
 export default {
-  name: 'FullVirtualMachine',
+  name: "FullVirtualMachine",
   components: {
     FullVm,
     TfDeploymentList,
   },
   setup() {
-    return { name: ProjectName.Fullvm }
+    return { name: ProjectName.Fullvm };
   },
-}
+};
 </script>

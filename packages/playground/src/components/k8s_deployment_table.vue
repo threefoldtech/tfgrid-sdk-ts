@@ -1,8 +1,6 @@
 <template>
   <v-alert v-if="!loading && count && items.length < count" type="warning" variant="tonal">
-    Failed to load <strong>{{ count - items.length }}</strong> deployment{{
-      count - items.length > 1 ? 's' : ''
-    }}.
+    Failed to load <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
   </v-alert>
 
   <ListTable
@@ -33,15 +31,15 @@
     </template>
 
     <template #[`item.ipv4`]="{ item }">
-      {{ item.value.masters[0].publicIP?.ip || 'None' }}
+      {{ item.value.masters[0].publicIP?.ip || "None" }}
     </template>
 
     <template #[`item.ipv6`]="{ item }">
-      {{ item.value.masters[0].publicIP?.ip6 || 'None' }}
+      {{ item.value.masters[0].publicIP?.ip6 || "None" }}
     </template>
 
     <template #[`item.planetary`]="{ item }">
-      {{ item.value.masters[0].planetary || 'None' }}
+      {{ item.value.masters[0].planetary || "None" }}
     </template>
 
     <template #[`item.workers`]="{ item }">
@@ -53,11 +51,7 @@
     </template>
 
     <template #[`item.actions`]="{ item }">
-      <v-chip
-        color="error"
-        variant="tonal"
-        v-if="deleting && ($props.modelValue || []).includes(item.value)"
-      >
+      <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item.value)">
         Deleting...
       </v-chip>
       <v-btn-group variant="tonal" v-else>
@@ -68,50 +62,50 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref } from "vue";
 
-import { useProfileManager } from '../stores'
-import { getGrid, updateGrid } from '../utils/grid'
-import { loadK8s, mergeLoadedDeployments } from '../utils/load_deployment'
+import { useProfileManager } from "../stores";
+import { getGrid, updateGrid } from "../utils/grid";
+import { loadK8s, mergeLoadedDeployments } from "../utils/load_deployment";
 
-const profileManager = useProfileManager()
+const profileManager = useProfileManager();
 
 const props = defineProps<{
-  projectName: string
-  modelValue: any[]
-  deleting: boolean
-}>()
-defineEmits<{ (event: 'update:model-value', value: any[]): void }>()
+  projectName: string;
+  modelValue: any[];
+  deleting: boolean;
+}>();
+defineEmits<{ (event: "update:model-value", value: any[]): void }>();
 
-const count = ref<number>()
-const items = ref<any[]>([])
-const loading = ref(false)
+const count = ref<number>();
+const items = ref<any[]>([]);
+const loading = ref(false);
 
-onMounted(loadDeployments)
+onMounted(loadDeployments);
 async function loadDeployments() {
-  items.value = []
-  loading.value = true
-  const grid = await getGrid(profileManager.profile!, props.projectName)
-  const chunk1 = await loadK8s(grid!)
-  const chunk2 = await loadK8s(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }))
-  const chunk3 = await loadK8s(updateGrid(grid!, { projectName: '' }))
+  items.value = [];
+  loading.value = true;
+  const grid = await getGrid(profileManager.profile!, props.projectName);
+  const chunk1 = await loadK8s(grid!);
+  const chunk2 = await loadK8s(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }));
+  const chunk3 = await loadK8s(updateGrid(grid!, { projectName: "" }));
 
-  const clusters = mergeLoadedDeployments(chunk1, chunk2, chunk3)
-  count.value = clusters.count
-  items.value = clusters.items
-  loading.value = false
+  const clusters = mergeLoadedDeployments(chunk1, chunk2, chunk3);
+  count.value = clusters.count;
+  items.value = clusters.items;
+  loading.value = false;
 }
 
-defineExpose({ loadDeployments })
+defineExpose({ loadDeployments });
 </script>
 
 <script lang="ts">
-import ListTable from './list_table.vue'
+import ListTable from "./list_table.vue";
 
 export default {
-  name: 'K8sDeploymentTable',
+  name: "K8sDeploymentTable",
   components: {
     ListTable,
   },
-}
+};
 </script>

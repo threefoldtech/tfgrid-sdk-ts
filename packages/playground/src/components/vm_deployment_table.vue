@@ -1,8 +1,6 @@
 <template>
   <v-alert v-if="!loading && count && items.length < count" type="warning" variant="tonal">
-    Failed to load <strong>{{ count - items.length }}</strong> deployment{{
-      count - items.length > 1 ? 's' : ''
-    }}.
+    Failed to load <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
   </v-alert>
 
   <ListTable
@@ -33,22 +31,22 @@
     </template>
 
     <template #[`item.ipv4`]="{ item }">
-      {{ item.value[0].publicIP?.ip || 'None' }}
+      {{ item.value[0].publicIP?.ip || "None" }}
     </template>
 
     <template #[`item.ipv6`]="{ item }">
-      {{ item.value[0].publicIP?.ip6 || 'None' }}
+      {{ item.value[0].publicIP?.ip6 || "None" }}
     </template>
 
     <template #[`item.planetary`]="{ item }">
-      {{ item.value[0].planetary || 'None' }}
+      {{ item.value[0].planetary || "None" }}
     </template>
 
     <template #[`item.flist`]="{ item }">
       <v-tooltip :text="item.value[0].flist" location="bottom right">
         <template #activator="{ props }">
           <p v-bind="props">
-            {{ item.value[0].flist.replace('https://hub.grid.tf/', '').replace('.flist', '') }}
+            {{ item.value[0].flist.replace("https://hub.grid.tf/", "").replace(".flist", "") }}
           </p>
         </template>
       </v-tooltip>
@@ -58,11 +56,7 @@
       {{ item.value[0].billing }}
     </template>
     <template #[`item.actions`]="{ item }">
-      <v-chip
-        color="error"
-        variant="tonal"
-        v-if="deleting && ($props.modelValue || []).includes(item.value)"
-      >
+      <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item.value)">
         Deleting...
       </v-chip>
       <v-btn-group variant="tonal" v-else>
@@ -73,61 +67,60 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref } from "vue";
 
-import { useProfileManager } from '../stores'
-import { getGrid, updateGrid } from '../utils/grid'
-import { loadVms, mergeLoadedDeployments } from '../utils/load_deployment'
+import { useProfileManager } from "../stores";
+import { getGrid, updateGrid } from "../utils/grid";
+import { loadVms, mergeLoadedDeployments } from "../utils/load_deployment";
 
-const profileManager = useProfileManager()
+const profileManager = useProfileManager();
 
 const props = defineProps<{
-  projectName: string
-  modelValue: any[]
-  deleting: boolean
-}>()
-defineEmits<{ (event: 'update:model-value', value: any[]): void }>()
+  projectName: string;
+  modelValue: any[];
+  deleting: boolean;
+}>();
+defineEmits<{ (event: "update:model-value", value: any[]): void }>();
 
-const loading = ref(false)
-const count = ref<number>()
-const items = ref<any[]>([])
+const loading = ref(false);
+const count = ref<number>();
+const items = ref<any[]>([]);
 
-onMounted(loadDeployments)
+onMounted(loadDeployments);
 async function loadDeployments() {
-  items.value = []
-  loading.value = true
-  const grid = await getGrid(profileManager.profile!, props.projectName)
-  const chunk1 = await loadVms(grid!)
-  const chunk2 = await loadVms(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }))
+  items.value = [];
+  loading.value = true;
+  const grid = await getGrid(profileManager.profile!, props.projectName);
+  const chunk1 = await loadVms(grid!);
+  const chunk2 = await loadVms(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }));
   const filter =
     props.projectName === ProjectName.VM
       ? undefined
-      : ([vm]: [{ flist: string }]) =>
-          vm.flist.replace(/-/g, '').includes(props.projectName.toLowerCase())
+      : ([vm]: [{ flist: string }]) => vm.flist.replace(/-/g, "").includes(props.projectName.toLowerCase());
 
   const chunk3 =
     props.projectName === ProjectName.Fullvm
       ? { count: 0, items: [] }
-      : await loadVms(updateGrid(grid!, { projectName: '' }), { filter })
-  const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any)
+      : await loadVms(updateGrid(grid!, { projectName: "" }), { filter });
+  const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
 
-  count.value = vms.count
-  items.value = vms.items
+  count.value = vms.count;
+  items.value = vms.items;
 
-  loading.value = false
+  loading.value = false;
 }
 
-defineExpose({ loadDeployments })
+defineExpose({ loadDeployments });
 </script>
 
 <script lang="ts">
-import { ProjectName } from '../types'
-import ListTable from './list_table.vue'
+import { ProjectName } from "../types";
+import ListTable from "./list_table.vue";
 
 export default {
-  name: 'VmDeploymentTable',
+  name: "VmDeploymentTable",
   components: {
     ListTable,
   },
-}
+};
 </script>

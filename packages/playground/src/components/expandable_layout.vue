@@ -20,21 +20,21 @@
 </template>
 
 <script lang="ts" setup>
-const props = defineProps<{ modelValue: any[] }>()
+const props = defineProps<{ modelValue: any[] }>();
 const emits = defineEmits<{
-  (event: 'update:modelValue', value: any[]): void
-  (event: 'add'): void
-}>()
+  (event: "update:modelValue", value: any[]): void;
+  (event: "add"): void;
+}>();
 
 function remove(i: number) {
-  const items = [...props.modelValue]
-  items.splice(i, 1)
-  emits('update:modelValue', items)
+  const items = [...props.modelValue];
+  items.splice(i, 1);
+  emits("update:modelValue", items);
 }
 </script>
 
 <script lang="ts">
 export default {
-  name: 'ExpandableLayout',
-}
+  name: "ExpandableLayout",
+};
 </script>

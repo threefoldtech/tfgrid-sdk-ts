@@ -2,10 +2,7 @@
   <weblet-layout ref="layout" @mount="onMount">
     <template #title>Contracts List</template>
     <template #subtitle>
-      <a
-        class="app-link"
-        href="https://manual.grid.tf/tfchain/tfchain_external_service_contract.html"
-        target="_blank"
+      <a class="app-link" href="https://manual.grid.tf/tfchain/tfchain_external_service_contract.html" target="_blank"
         >Quick start documentation</a
       >
     </template>
@@ -72,17 +69,9 @@
 
   <v-dialog width="70%" v-model="deletingDialog">
     <v-card>
-      <v-card-title class="text-h5">
-        Are you sure you want to delete the following contracts?
-      </v-card-title>
+      <v-card-title class="text-h5"> Are you sure you want to delete the following contracts? </v-card-title>
       <v-card-text>
-        <v-chip
-          class="ma-1"
-          color="primary"
-          label
-          v-for="c in selectedContracts"
-          :key="c.contractId"
-        >
+        <v-chip class="ma-1" color="primary" label v-for="c in selectedContracts" :key="c.contractId">
           {{ c.contractId }}
         </v-chip>
       </v-card-text>
@@ -96,106 +85,100 @@
 </template>
 
 <script lang="ts" setup>
-import { ContractStates } from '@threefold/grid_client'
-import { ref } from 'vue'
+import { ContractStates } from "@threefold/grid_client";
+import { ref } from "vue";
 
-import { useProfileManager } from '../stores'
-import type { VDataTableHeader } from '../types'
-import { getUserContracts, type NormalizedContract } from '../utils/contracts'
-import { getGrid } from '../utils/grid'
+import { useProfileManager } from "../stores";
+import type { VDataTableHeader } from "../types";
+import { getUserContracts, type NormalizedContract } from "../utils/contracts";
+import { getGrid } from "../utils/grid";
 
-const layout = ref()
-const profileManager = useProfileManager()
-const contracts = ref<NormalizedContract[]>([])
-const loading = ref(false)
-const selectedContracts = ref<NormalizedContract[]>([])
+const layout = ref();
+const profileManager = useProfileManager();
+const contracts = ref<NormalizedContract[]>([]);
+const loading = ref(false);
+const selectedContracts = ref<NormalizedContract[]>([]);
 const headers: VDataTableHeader = [
-  { title: '#', key: 'index' },
-  { title: 'PLACEHOLDER', key: 'data-table-select' },
-  { title: 'ID', key: 'contractId' },
-  { title: 'Type', key: 'type' },
-  { title: 'State', key: 'state' },
-  { title: 'Billing Rate', key: 'consumption' },
-  { title: 'Solution Type', key: 'solutionType' },
-  { title: 'Solution Name', key: 'solutionName' },
-  { title: 'Created At', key: 'createdAt' },
-  { title: 'Expiration', key: 'expiration' },
-  { title: 'Actions', key: 'actions', sortable: false },
-]
+  { title: "#", key: "index" },
+  { title: "PLACEHOLDER", key: "data-table-select" },
+  { title: "ID", key: "contractId" },
+  { title: "Type", key: "type" },
+  { title: "State", key: "state" },
+  { title: "Billing Rate", key: "consumption" },
+  { title: "Solution Type", key: "solutionType" },
+  { title: "Solution Name", key: "solutionName" },
+  { title: "Created At", key: "createdAt" },
+  { title: "Expiration", key: "expiration" },
+  { title: "Actions", key: "actions", sortable: false },
+];
 
 async function onMount() {
-  loading.value = true
-  contracts.value = []
-  const grid = await getGrid(profileManager.profile!)
-  contracts.value = await getUserContracts(grid!)
-  loading.value = false
+  loading.value = true;
+  contracts.value = [];
+  const grid = await getGrid(profileManager.profile!);
+  contracts.value = await getUserContracts(grid!);
+  loading.value = false;
 }
 
-const loadingContractId = ref<number>()
+const loadingContractId = ref<number>();
 async function onShowDetails(contractId: number) {
-  loading.value = true
-  loadingContractId.value = contractId
+  loading.value = true;
+  loadingContractId.value = contractId;
   try {
-    const grid = await getGrid(profileManager.profile!)
-    const deployment = await grid!.zos.getDeployment({ contractId })
-    layout.value.openDialog(deployment, false, true)
+    const grid = await getGrid(profileManager.profile!);
+    const deployment = await grid!.zos.getDeployment({ contractId });
+    layout.value.openDialog(deployment, false, true);
   } catch (e) {
-    layout.value.setStatus(
-      'failed',
-      normalizeError(e, `Failed to load details of contract(${contractId})`)
-    )
+    layout.value.setStatus("failed", normalizeError(e, `Failed to load details of contract(${contractId})`));
   }
-  loadingContractId.value = undefined
-  loading.value = false
+  loadingContractId.value = undefined;
+  loading.value = false;
 }
 
 function getStateColor(state: ContractStates): string {
   switch (state) {
     case ContractStates.Created:
-      return 'success'
+      return "success";
     case ContractStates.Deleted:
-      return 'error'
+      return "error";
     case ContractStates.GracePeriod:
-      return 'warning'
+      return "warning";
     case ContractStates.OutOfFunds:
-      return 'info'
+      return "info";
   }
 }
 
-const deletingDialog = ref(false)
-const deleting = ref(false)
+const deletingDialog = ref(false);
+const deleting = ref(false);
 async function onDelete() {
-  deletingDialog.value = false
-  deleting.value = true
+  deletingDialog.value = false;
+  deleting.value = true;
   try {
-    const grid = await getGrid(profileManager.profile!)
+    const grid = await getGrid(profileManager.profile!);
     if (selectedContracts.value.length === contracts.value.length) {
-      await grid!.contracts.cancelMyContracts()
+      await grid!.contracts.cancelMyContracts();
     } else {
       await grid!.contracts.batchCancelContracts({
-        ids: selectedContracts.value.map((c) => c.contractId),
-      })
+        ids: selectedContracts.value.map(c => c.contractId),
+      });
     }
-    contracts.value = contracts.value!.filter((c) => !selectedContracts.value.includes(c))
-    selectedContracts.value = []
+    contracts.value = contracts.value!.filter(c => !selectedContracts.value.includes(c));
+    selectedContracts.value = [];
   } catch (e) {
-    layout.value.setStatus(
-      'failed',
-      normalizeError(e, `Failed to delete some of the selected contracts.`)
-    )
+    layout.value.setStatus("failed", normalizeError(e, `Failed to delete some of the selected contracts.`));
   }
-  deleting.value = false
+  deleting.value = false;
 }
 </script>
 
 <script lang="ts">
-import ListTable from '../components/list_table.vue'
-import { normalizeError } from '../utils/helpers'
+import ListTable from "../components/list_table.vue";
+import { normalizeError } from "../utils/helpers";
 
 export default {
-  name: 'TfContractsList',
+  name: "TfContractsList",
   components: {
     ListTable,
   },
-}
+};
 </script>

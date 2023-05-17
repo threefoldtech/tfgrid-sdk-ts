@@ -9,24 +9,24 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch } from 'vue'
-import { useTheme } from 'vuetify'
+import { onMounted, ref, watch } from "vue";
+import { useTheme } from "vuetify";
 
-const theme = useTheme()
-const light = ref(false)
+const theme = useTheme();
+const light = ref(false);
 
-const KEY = 'APP_CURRENT_THEME'
+const KEY = "APP_CURRENT_THEME";
 
-watch(light, (light) => (theme.global.name.value = light ? 'light' : 'dark'))
-watch(theme.global.name, (theme) => localStorage.setItem(KEY, theme))
+watch(light, light => (theme.global.name.value = light ? "light" : "dark"));
+watch(theme.global.name, theme => localStorage.setItem(KEY, theme));
 onMounted(() => {
-  const theme = localStorage.getItem('APP_CURRENT_THEME')
-  light.value = theme === 'light'
-})
+  const theme = localStorage.getItem("APP_CURRENT_THEME");
+  light.value = theme === "light";
+});
 </script>
 
 <script lang="ts">
 export default {
-  name: 'AppTheme',
-}
+  name: "AppTheme",
+};
 </script>

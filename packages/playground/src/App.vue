@@ -26,12 +26,7 @@
             :active="$route.path === item.route"
           >
             <template v-slot:prepend v-if="item.icon">
-              <v-img
-                class="mr-4"
-                width="26"
-                :src="baseUrl + 'images/icons/' + item.icon"
-                :alt="item.title"
-              />
+              <v-img class="mr-4" width="26" :src="baseUrl + 'images/icons/' + item.icon" :alt="item.title" />
             </template>
 
             <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -75,82 +70,82 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
-const $route = useRoute()
-const $router = useRouter()
+const $route = useRoute();
+const $router = useRouter();
 watch(
   () => $route.meta,
-  (meta) => (document.title = 'TF Playground' + (meta && 'title' in meta ? ` | ${meta.title}` : ``))
-)
+  meta => (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
+);
 
 const routes: AppRoute[] = [
   {
-    title: 'Deployments',
+    title: "Deployments",
     items: [
-      { title: 'Full Virtual Machine', icon: 'vm.png', route: '/' },
-      { title: 'Micro Virtual Machine', icon: 'vm.png', route: '/vm' },
-      { title: 'Kubernetes', icon: 'kubernetes.png', route: '/kubernetes' },
-      { title: 'CapRover', icon: 'caprover.png', route: '/caprover' },
-      { title: 'Peertube', icon: 'peertube.png', route: '/peertube' },
-      { title: 'Funkwhale', icon: 'funkwhale.png', route: '/funkwhale' },
-      { title: 'Mattermost', icon: 'mattermost.png', route: '/mattermost' },
-      { title: 'Discourse', icon: 'discourse.png', route: '/discourse' },
-      { title: 'Taiga', icon: 'taiga.png', route: '/taiga' },
-      { title: 'Owncloud', icon: 'owncloud.png', route: '/owncloud' },
-      { title: 'Presearch', icon: 'presearch.png', route: '/presearch' },
-      { title: 'Subsquid', icon: 'subsquid.png', route: '/subsquid' },
-      { title: 'Casperlabs', icon: 'casperlabs.png', route: '/casperlabs' },
-      { title: 'Algorand', icon: 'algorand.png', route: '/algorand' },
-      { title: 'Node Pilot', icon: 'vm.png', route: '/nodepilot' },
-      { title: 'Wordpress', icon: 'wordpress.png', route: '/wordpress' },
-      { title: 'Umbrel', icon: 'umbrel.png', route: '/umbrel' },
+      { title: "Full Virtual Machine", icon: "vm.png", route: "/" },
+      { title: "Micro Virtual Machine", icon: "vm.png", route: "/vm" },
+      { title: "Kubernetes", icon: "kubernetes.png", route: "/kubernetes" },
+      { title: "CapRover", icon: "caprover.png", route: "/caprover" },
+      { title: "Peertube", icon: "peertube.png", route: "/peertube" },
+      { title: "Funkwhale", icon: "funkwhale.png", route: "/funkwhale" },
+      { title: "Mattermost", icon: "mattermost.png", route: "/mattermost" },
+      { title: "Discourse", icon: "discourse.png", route: "/discourse" },
+      { title: "Taiga", icon: "taiga.png", route: "/taiga" },
+      { title: "Owncloud", icon: "owncloud.png", route: "/owncloud" },
+      { title: "Presearch", icon: "presearch.png", route: "/presearch" },
+      { title: "Subsquid", icon: "subsquid.png", route: "/subsquid" },
+      { title: "Casperlabs", icon: "casperlabs.png", route: "/casperlabs" },
+      { title: "Algorand", icon: "algorand.png", route: "/algorand" },
+      { title: "Node Pilot", icon: "vm.png", route: "/nodepilot" },
+      { title: "Wordpress", icon: "wordpress.png", route: "/wordpress" },
+      { title: "Umbrel", icon: "umbrel.png", route: "/umbrel" },
     ],
   },
   {
-    title: 'My Account',
+    title: "My Account",
     items: [
-      { title: 'Contracts', route: '/contractslist' },
-      { title: 'Deployments', route: '/deployedlist' },
+      { title: "Contracts", route: "/contractslist" },
+      { title: "Deployments", route: "/deployedlist" },
     ],
   },
-]
+];
 
 // eslint-disable-next-line no-undef
-const network = process.env.NETWORK as string
+const network = process.env.NETWORK as string;
 
-const permanent = window.innerWidth > 980
-const openSidebar = ref(permanent)
+const permanent = window.innerWidth > 980;
+const openSidebar = ref(permanent);
 
-const baseUrl = import.meta.env.BASE_URL
+const baseUrl = import.meta.env.BASE_URL;
 </script>
 
 <script lang="ts">
-import AppTheme from './components/app_theme.vue'
-import DeploymentListManager from './components/deployment_list_manager.vue'
-import DisclaimerToolbar from './components/disclaimer_toolbar.vue'
-import ProfileManager from './weblets/profile_manager.vue'
+import AppTheme from "./components/app_theme.vue";
+import DeploymentListManager from "./components/deployment_list_manager.vue";
+import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
+import ProfileManager from "./weblets/profile_manager.vue";
 
 interface AppRoute {
-  title: string
-  items: AppRouteItem[]
+  title: string;
+  items: AppRouteItem[];
 }
 
 interface AppRouteItem {
-  title: string
-  route: string
-  icon?: string
+  title: string;
+  route: string;
+  icon?: string;
 }
 export default {
-  name: 'App',
+  name: "App",
   components: {
     DisclaimerToolbar,
     ProfileManager,
     DeploymentListManager,
     AppTheme,
   },
-}
+};
 </script>
 
 <style lang="scss" global>
