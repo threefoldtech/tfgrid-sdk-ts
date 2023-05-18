@@ -18,12 +18,11 @@ import { QueryPricingPolicies } from "./pricing_policies";
 import { TermsAndConditions } from "./terms_and_conditions";
 import { QueryTFTPrice } from "./tft_price";
 import { QueryTwins, Twins } from "./twins";
-import type { Extrinsic, ExtrinsicResult, PatchExtrinsicOptions } from "./types";
+import type { Extrinsic, ExtrinsicResult, PatchExtrinsicOptions, validatorFunctionType } from "./types";
 import { Utility } from "./utility";
 import { isEnvNode } from "./utils";
 
 const SUPPORTED_KEYPAIR_TYPES = ["sr25519", "ed25519"];
-
 interface ExtSigner {
   address: string;
   signer: Signer;
@@ -119,6 +118,92 @@ class QueryClient {
   async checkConnectionAndApply(func: (args: unknown[]) => unknown, args: unknown[]) {
     await this.connect();
     return await func.apply(this, args);
+  }
+
+  /**
+   * Checks if the given section exists within the API events.
+   *
+   * @param {ApiPromise} api - The Polkadot API object.
+   * @param {string} section - The section to check within the API events.
+   * @returns {boolean} - True if the section exists within the API events, false otherwise.
+   */
+  private checkSection(api: ApiPromise, section: string): boolean {
+    const sections = Object.keys(api.events);
+    if (sections.includes(section)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Checks if the given method exists within the specified section of the API events.
+   *
+   * @param {ApiPromise} api - The Polkadot API object.
+   * @param {string} section - The section of the API events to check.
+   * @param {string} method - The method to check within the section.
+   * @returns {boolean} - True if the method exists within the section, false otherwise.
+   */
+  private checkMethod(api, section, method) {
+    const Methods = Object.keys(api.events[section]);
+    if (Methods.includes(method)) {
+      return true;
+    } else return false;
+  }
+
+  /**
+   * Listens for a specific event on the chain and resolves when the event matches the specified conditions.
+   *
+   * @param {ApiPromise} api - The API instance connected to the blockchain.
+   * @param {string} section - The section of the event to listen for.
+   * @param {string} method - The method of the event to listen for.
+   * @param {string} key - The key to validate in the event data.
+   * @param {string} value - The expected value of the validated key in the event data.
+   * @param {validatorFunctionType} validator - The validator function to validate the event data.
+   * @param {number} time - The timeout value in milliseconds. Default is 2 minutes.
+   * @returns {Promise<object>} - A promise that resolves with the event data when the event matches the conditions.
+   * @throws {Error} - If the section or method is not defined on the chain.
+   * @rejects  If no response is received within the given time or if an error occurs during validation.
+   */
+  async listenForEvent(
+    api: ApiPromise,
+    section: string,
+    method: string,
+    key: string,
+    value: string,
+    validator: validatorFunctionType,
+    time = 120000,
+  ): Promise<object> {
+    if (!this.checkSection(api, section)) {
+      throw new Error(`<${section}> is not defined on the chain`);
+    }
+    if (!this.checkMethod(api, section, method)) {
+      throw new Error(`<${method}> is not defined on the chain under ${section}`);
+    }
+    return new Promise(async (resolve, reject) => {
+      const unsubscribe = (await api.query.system.events(events => {
+        const timeout = setTimeout(() => {
+          unsubscribe();
+          reject(`Timeout: No response within ${time / 60000} minutes`);
+        }, time);
+        for (const { event } of events) {
+          if (event.section === section && event.method === method) {
+            try {
+              if (validator(key, value, event.data)) {
+                clearTimeout(timeout);
+                resolve(event.data);
+                return;
+              }
+            } catch (error) {
+              reject(`Cannot reach "${key}" with error:\n\t${error}`);
+              return;
+            } finally {
+              unsubscribe();
+            }
+          }
+        }
+      })) as unknown as () => void;
+    });
   }
 }
 
