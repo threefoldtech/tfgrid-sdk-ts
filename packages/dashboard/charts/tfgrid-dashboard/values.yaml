@@ -26,6 +26,8 @@ image:
       value: ""
     - name: "PLAYGROUND_URL"
       value: ""
+    - name: "MANUAL_URL"
+      value: ""
     - name: "RELAY_DOMAIN"
       value: ""
 

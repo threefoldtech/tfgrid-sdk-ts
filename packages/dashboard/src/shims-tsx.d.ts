@@ -24,6 +24,7 @@ interface AppConfigs {
   APP_GAS_PRICE: string;
   APP_CHAIN_ID: string;
   PLAYGROUND_URL: string;
+  MANUAL_URL: string;
 }
 declare let process: {
   env: {
