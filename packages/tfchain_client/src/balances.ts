@@ -26,9 +26,37 @@ class QueryBalances {
     };
     return balance;
   }
-  // Lis deposit
-  // listen event
-  // write validator function
+
+  /**
+   * Checks if the specified key in the event data matches the provided value.
+   * @private
+   * @param {string} key - The key to compare in the event data.
+   * @param {string} value - The value to compare against the key in the event data.
+   * @param {object} eventData - The event data object to check.
+   * @returns {boolean} Returns true if the key in the event data matches the provided value, otherwise false.
+   */
+  private mintCheck(key: string, value: string, eventData: object): boolean {
+    console.log(eventData[0][key].toPrimitive() === value);
+    if (eventData[0][key].toPrimitive() === value) return true;
+    else return false;
+  }
+
+  /**
+   * Listens for the "MintCompleted" event on the TFT Bridge Module and resolves when the specified key-value pair is validated in the event data.
+   * @param {"target" | "amount"} key - The key to validate in the event data ("target" or "amount").
+   * @param {string} value - The expected value of the validated key in the event data.
+   * @returns {Promise<object>} A promise that resolves with the event data when the specified key-value pair is validated in the event data.
+   */
+  async listenToMintCompleted(key: "target" | "amount", value: string): Promise<object> {
+    return await this.client.listenForEvent(
+      this.client.api,
+      "tftBridgeModule",
+      "MintCompleted",
+      key,
+      value,
+      this.mintCheck,
+    );
+  }
 }
 
 export interface BalanceTransferOptions {
