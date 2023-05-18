@@ -452,6 +452,13 @@ export default class Dashboard extends Vue {
       hyperlink: true,
       children: [],
     },
+    {
+      label: "Manual",
+      icon: "book-open-page-variant-outline",
+      prefix: window.configs.MANUAL_URL,
+      hyperlink: true,
+      children: [],
+    },
   ];
   toggle() {
     this.$root.$emit("closeSidebar");
