@@ -16,8 +16,6 @@ COPY . .
 # install project dependencies
 RUN yarn install
 
-# update playground with the new grid client version
-RUN yarn add @threefold/grid_client@${VERSION}
 
 # build project solutions
 RUN yarn lerna run build --no-private && yarn workspace @threefold/playground build

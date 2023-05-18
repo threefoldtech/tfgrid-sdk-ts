@@ -6,6 +6,7 @@ packages/grid_client/docs/tests/
 packages/weblets/public/build/
 packages/weblets/playground/public/build/
 packages/stats/public/build/
+packages/playground/dist/
 
 .DS_Store
 
