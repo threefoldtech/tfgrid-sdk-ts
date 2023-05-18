@@ -618,7 +618,7 @@ PersistentKeepalive = 25\nEndpoint = ${endpoint}`;
   async generatePeers(): Promise<void> {
     events.emit("logs", `Generating peers for network ${this.name}`);
     const hiddenNodeAccessNodesIds = {};
-    const hiddenNodes = [];
+    const hiddenNodes: AccessPoint[] = [];
     for (const net of this.networks) {
       if (this.networks.length === 1) {
         continue;
@@ -637,7 +637,7 @@ PersistentKeepalive = 25\nEndpoint = ${endpoint}`;
       }
       const accessNode = randomChoice(accessNodes);
       hiddenNodeAccessNodesIds[net["node_id"]] = accessNode;
-      const hiddenNode = new AccessPoint();
+      const hiddenNode: AccessPoint = new AccessPoint();
       hiddenNode.node_id = accessNode;
       hiddenNode.subnet = net.subnet;
       hiddenNode.wireguard_public_key = this.getPublicKey(net.wireguard_private_key);
@@ -651,7 +651,7 @@ PersistentKeepalive = 25\nEndpoint = ${endpoint}`;
         if (n["node_id"] === net["node_id"]) {
           continue;
         }
-        const allowed_ips = [];
+        const allowed_ips: string[] = [];
         if (Object.keys(hiddenNodeAccessNodesIds).includes(String(n["node_id"]))) {
           if (net["node_id"] !== +hiddenNodeAccessNodesIds[n["node_id"]]) {
             continue;
@@ -693,7 +693,7 @@ PersistentKeepalive = 25\nEndpoint = ${endpoint}`;
       }
       for (const accessPoint of accessPoints) {
         if (n["node_id"] === accessPoint.node_id) {
-          const allowed_ips = [];
+          const allowed_ips: string[] = [];
           allowed_ips.push(accessPoint.subnet);
           allowed_ips.push(this.wgRoutingIP(accessPoint.subnet));
           const peer = new Peer();
