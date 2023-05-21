@@ -19,7 +19,8 @@ class QueryTFTBridge {
       "target",
       address,
       (key = "target", address: string, eventData: unknown): boolean => {
-        if ((eventData as [][])[0][key].toPrimitive() === address) return true;
+        if ((eventData as [{ [key: string]: { toPrimitive(): string } }])[0][key].toPrimitive() === address)
+          return true;
         else return false;
       },
     );
