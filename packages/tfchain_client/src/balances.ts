@@ -36,7 +36,6 @@ class QueryBalances {
    * @returns {boolean} Returns true if the key in the event data matches the provided value, otherwise false.
    */
   private mintCheck(key: string, value: string, eventData: object): boolean {
-    console.log(eventData[0][key].toPrimitive() === value);
     if (eventData[0][key].toPrimitive() === value) return true;
     else return false;
   }
