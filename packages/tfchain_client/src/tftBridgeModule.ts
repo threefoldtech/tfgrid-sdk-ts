@@ -25,13 +25,13 @@ class QueryTFTBridge {
    * @rejects {string} If no response is received within the given time or if an error occurs during validation.
    */
   async listenToMintCompleted(address: string): Promise<number> {
-    const eventData = (await this.client.listenForEvent(
+    const eventData = await this.client.listenForEvent(
       "tftBridgeModule",
       "MintCompleted",
       "target",
       address,
       this.mintCheck,
-    )) as object;
+    );
     return eventData[0].amount.toPrimitive();
   }
 }
