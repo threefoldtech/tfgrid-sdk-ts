@@ -162,32 +162,34 @@ class QueryClient {
    * @throws {Error} - If the section or method is not defined on the chain.
    * @rejects  If no response is received within the given time or if an error occurs during validation.
    */
-  async listenForEvent(
+  async listenForEvent<T>(
     section: string,
     method: string,
     key: string,
     value: string,
     validator: validatorFunctionType,
     time = 120000,
-  ): Promise<object> {
+  ): Promise<T> {
     if (!this.checkSection(section)) {
       throw new Error(`<${section}> is not defined on the chain`);
     }
     if (!this.checkMethod(section, method)) {
       throw new Error(`<${method}> is not defined on the chain under ${section}`);
     }
-    return new Promise(async (resolve, reject) => {
+
+    return new Promise<T>(async (resolve, reject) => {
       const unsubscribe = (await this.api.query.system.events(events => {
         const timeout = setTimeout(() => {
           unsubscribe();
           reject(`Timeout: No response within ${time / 60000} minutes`);
         }, time);
+
         for (const { event } of events) {
           if (event.section === section && event.method === method) {
             try {
               if (validator(key, value, event.data)) {
                 clearTimeout(timeout);
-                resolve(event.data);
+                resolve(event.data as unknown as T);
                 return;
               }
             } catch (error) {
