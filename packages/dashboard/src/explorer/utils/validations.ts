@@ -30,8 +30,8 @@ export function inputValidation(value: string, key: string): string {
   let errorMsg = "";
 
   if (numericFields.includes(key)) {
-    if (isNaN(+value) || specialChars.test(value) || +value < 0 || value.includes("e")) {
-      errorMsg = "This field must be a number.";
+    if (isNaN(+value) || specialChars.test(value) || +value <= 0 || value.includes("e")) {
+      errorMsg = "This field must be a number and larger than 0.";
       return errorMsg;
     }
   } else if (countryFields.includes(key)) {
