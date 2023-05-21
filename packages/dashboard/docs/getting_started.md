@@ -86,6 +86,7 @@ To get a local copy up and running follow these simple example steps:
   - SUBSTRATE_URL
   - ACTIVATION_SERVICE_URL
   - PLAYGROUND_URL
+  - MANUAL_URL
   - RELAY_DOMAIN
 
 To try the project locally you can easy clone the repo and run the following commands:
