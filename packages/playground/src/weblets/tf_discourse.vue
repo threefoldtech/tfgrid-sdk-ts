@@ -1,5 +1,10 @@
 <template>
-  <weblet-layout ref="layout">
+  <weblet-layout
+    ref="layout"
+    :cpu="solution?.cpu"
+    :memory="solution?.memory"
+    :disk="(solution?.disk ?? 0) + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
+  >
     <template #title> Deploy a Discourse Instance </template>
     <template #subtitle>
       Discourse is the 100% open source discussion platform built for the next decade of the Internet. Use it as a

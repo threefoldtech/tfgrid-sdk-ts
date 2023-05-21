@@ -1,5 +1,5 @@
 <template>
-  <weblet-layout ref="layout">
+  <weblet-layout ref="layout" :cpu="solution?.cpu" :memory="solution?.memory" :disk="solution?.disk">
     <template #title>Deploy a Funkwhale Instance </template>
     <template #subtitle>
       Funkwhale is social platform to enjoy and share music. Funkwhale is a community-driven project that lets you
@@ -66,7 +66,14 @@
 
       <SelectSolutionFlavor v-model="solution" />
       <SelectGatewayNode v-model="gateway" />
-      <SelectFarm v-model="farm" />
+      <SelectFarm
+        :filters="{
+          cpu: solution?.cpu,
+          memory: solution?.memory,
+          ssd: solution?.disk,
+        }"
+        v-model="farm"
+      />
     </form-validator>
 
     <template #footer-actions>

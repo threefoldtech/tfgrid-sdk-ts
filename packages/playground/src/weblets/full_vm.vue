@@ -1,5 +1,10 @@
 <template>
-  <weblet-layout ref="layout">
+  <weblet-layout
+    ref="layout"
+    :cpu="cpu"
+    :memory="memory"
+    :disk="disks.reduce((total, disk) => total + disk.size, diskSize + 2)"
+  >
     <template #title>Deploy a Full Virtual Machine</template>
     <template #subtitle
       >Deploy a new full virtual machine on the Threefold Grid
@@ -82,7 +87,7 @@
             cpu,
             memory,
             publicIp: ipv4,
-            ssd: disks.reduce((total, disk) => total + disk.size, diskSize),
+            ssd: disks.reduce((total, disk) => total + disk.size, diskSize + 2),
           }"
           v-model="farm"
         />

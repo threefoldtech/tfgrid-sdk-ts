@@ -1,5 +1,5 @@
 <template>
-  <weblet-layout ref="layout">
+  <weblet-layout ref="layout" :cpu="cpu" :memory="memory" :disk="32">
     <template #title>Deploy a Node Pilot</template>
     <template #subtitle>
       Deploy a new Node Pilot on the Threefold Grid

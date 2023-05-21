@@ -1,5 +1,5 @@
 <template>
-  <weblet-layout ref="layout">
+  <weblet-layout ref="layout" :cpu="solution?.cpu" :memory="solution?.memory" :disk="solution?.disk">
     <template #title>Deploy a Subsquid Instance </template>
     <template #subtitle>
       Subsquid indexer is a piece of software that reads all the blocks from a Substrate based blockchain, decodes and

@@ -1,5 +1,12 @@
 <template>
-  <weblet-layout ref="layout">
+  <weblet-layout
+    ref="layout"
+    :cpu="workers.reduce((cpu, worker) => cpu + worker.cpu, master.cpu)"
+    :memory="workers.reduce((memory, worker) => memory + worker.memory, master.memory)"
+    :disk="
+      workers.reduce((disk, worker) => disk + worker.diskSize + worker.rootFsSize, master.diskSize + master.rootFsSize)
+    "
+  >
     <template #title>Deploy a Kubernetes</template>
     <template #subtitle>
       Kubernetes is the standard container orchestration tool. On the TF grid, Kubernetes clusters can be deployed out

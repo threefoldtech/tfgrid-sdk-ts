@@ -1,5 +1,11 @@
 <template>
-  <weblet-layout ref="layout" @mount="layoutMount">
+  <weblet-layout
+    ref="layout"
+    @mount="layoutMount"
+    :cpu="cpu"
+    :memory="memory"
+    :disk="disks.reduce((total, disk) => total + disk.size, rootFsSize)"
+  >
     <template #title>Deploy a Micro Virtual Machine </template>
     <template #subtitle
       >Deploy a new micro virtual machine on the Threefold Grid

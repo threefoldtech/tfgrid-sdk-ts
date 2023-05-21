@@ -1,5 +1,10 @@
 <template>
-  <weblet-layout ref="layout">
+  <weblet-layout
+    ref="layout"
+    :cpu="solution?.cpu"
+    :memory="solution?.memory"
+    :disk="(solution?.disk ?? 0) + 10 + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
+  >
     <template #title>Deploy an Umbrel Instance </template>
     <template #subtitle>
       Umbrel is an OS for running a personal server in your home. Self-host open source apps like Nextcloud, Bitcoin

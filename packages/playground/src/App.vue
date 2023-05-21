@@ -163,7 +163,7 @@ export default {
 .app-link {
   text-decoration: none;
   font-weight: bold;
-  color: #0d47a1;
+  color: #3d7ad4;
   cursor: pointer;
 }
 

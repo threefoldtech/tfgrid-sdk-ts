@@ -1,5 +1,16 @@
 <template>
-  <weblet-layout ref="layout">
+  <weblet-layout
+    ref="layout"
+    :cpu="workers.reduce((cpu, worker) => cpu + (worker.solution?.cpu ?? 0), leader.solution?.cpu ?? 0)"
+    :memory="workers.reduce((memory, worker) => memory + (worker.solution?.memory ?? 0), leader.solution?.memory ?? 0)"
+    :disk="
+      workers.reduce(
+        (disk, worker) =>
+          disk + (worker.solution?.disk ?? 0) + rootFs(worker.solution?.cpu ?? 0, worker.solution?.memory ?? 0),
+        leader.solution?.disk ?? 0 + rootFs(leader.solution?.cpu ?? 0, leader.solution?.memory ?? 0),
+      )
+    "
+  >
     <template #title>Deploy Caprover</template>
     <template #subtitle>
       CapRover is an extremely easy to use app/database deployment & web server manager for your NodeJS, Python, PHP,

@@ -1,5 +1,5 @@
 <template>
-  <weblet-layout ref="layout">
+  <weblet-layout ref="layout" :cpu="solution?.cpu" :memory="solution?.memory" :disk="solution?.disk">
     <template #title>Deploy a Wordpress Instance </template>
     <template #subtitle>
       WordPress is the simplest, most popular way to create your own website or blog. In fact, WordPress powers over

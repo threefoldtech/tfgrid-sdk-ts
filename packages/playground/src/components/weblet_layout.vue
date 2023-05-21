@@ -8,6 +8,18 @@
         <v-card-subtitle v-if="$slots.subtitle" :style="{ whiteSpace: 'initial' }">
           <slot name="subtitle" />
         </v-card-subtitle>
+
+        <v-alert class="mt-2 mx-4" :style="{ fontSize: '1.2rem' }" type="info" variant="tonal" v-if="showPrice">
+          Based on your specifications and TFChain TFT balance, your deployment cost is
+          <span class="font-weight-black">{{ costLoading ? "Calculating..." : cost }}</span> USD/Month.
+          <a
+            class="d-block app-link text-decoration-underline"
+            target="_blank"
+            href="https://manual.grid.tf/cloud/cloudunits_pricing.html?highlight=pricing#cloud-unit-pricing"
+          >
+            Learn how to unlock discounts.
+          </a>
+        </v-alert>
       </div>
       <v-spacer />
       <div class="mr-4" v-if="$slots['header-actions']">
@@ -55,16 +67,29 @@
 
 <script lang="ts" setup>
 import { events, type GridClient } from "@threefold/grid_client";
+import debounce from "lodash/debounce.js";
 import { computed, ref, watch } from "vue";
 
 import { useProfileManager } from "../stores";
-import { loadBalance } from "../utils/grid";
+import { getGrid, loadBalance } from "../utils/grid";
 
 const props = defineProps({
   disableAlerts: {
     type: Boolean,
     required: false,
     default: false,
+  },
+  cpu: {
+    type: Number,
+    required: false,
+  },
+  memory: {
+    type: Number,
+    required: false,
+  },
+  disk: {
+    type: Number,
+    required: false,
   },
 });
 const emits = defineEmits<{ (event: "mount"): void; (event: "back"): void }>();
@@ -147,6 +172,42 @@ watch(
   },
   { immediate: true },
 );
+
+/* Calculate Price */
+const showPrice = computed(() => !!profileManager.profile && props.cpu && props.memory && props.disk);
+const cost = ref<number>();
+const costLoading = ref(false);
+const shouldUpdateCost = ref(false);
+watch(
+  () => [props.cpu, props.memory, props.disk],
+  debounce((value, oldValue) => {
+    if (oldValue && value[0] === oldValue[0] && value[1] === oldValue[1] && value[2] === oldValue[2]) return;
+    shouldUpdateCost.value = true;
+  }, 500),
+  { immediate: true },
+);
+
+watch(
+  () => [profileManager.profile, costLoading.value, shouldUpdateCost.value] as const,
+  ([profile, loading, shouldUpdate]) => {
+    if (!profile || loading || !shouldUpdate) return;
+    shouldUpdateCost.value = false;
+    loadCost(profile);
+  },
+);
+
+async function loadCost(profile: { mnemonic: string }) {
+  costLoading.value = true;
+  const grid = await getGrid(profile);
+  const { sharedPrice } = await grid!.calculator.calculateWithMyBalance({
+    cru: typeof props.cpu === "number" ? props.cpu : 0,
+    sru: typeof props.disk === "number" ? props.disk : 0,
+    mru: typeof props.disk === "number" ? (props.memory ?? 0) / 1024 : 0,
+    hru: 0,
+  });
+  cost.value = sharedPrice;
+  costLoading.value = false;
+}
 </script>
 
 <script lang="ts">

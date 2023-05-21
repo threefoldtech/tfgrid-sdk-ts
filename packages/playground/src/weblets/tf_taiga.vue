@@ -1,5 +1,10 @@
 <template>
-  <weblet-layout ref="layout">
+  <weblet-layout
+    ref="layout"
+    :cpu="solution?.cpu"
+    :memory="solution?.memory"
+    :disk="solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
+  >
     <template #title>Deploy a Taiga Instance</template>
     <template #subtitle>
       Taiga is the project management tool for multi-functional agile teams. It has a rich feature set and at the same
@@ -72,7 +77,7 @@
           :filters="{
             cpu: solution?.cpu,
             memory: solution?.memory,
-            ssd: solution?.disk,
+            ssd: solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
             publicIp: false,
           }"
           v-model="farm"

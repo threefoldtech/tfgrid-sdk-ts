@@ -1,5 +1,10 @@
 <template>
-  <weblet-layout ref="layout">
+  <weblet-layout
+    ref="layout"
+    :cpu="solution?.cpu"
+    :memory="solution?.memory"
+    :disk="solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
+  >
     <template #title>Deploy an Owncloud Instance </template>
     <template #subtitle>
       Owncloud develops and provides open-source software for content collaboration, allowing teams to easily share and
@@ -61,7 +66,7 @@
           :filters="{
             cpu: solution?.cpu,
             memory: solution?.memory,
-            ssd: solution?.disk,
+            ssd: solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
             publicIp: false,
           }"
           v-model="farm"
