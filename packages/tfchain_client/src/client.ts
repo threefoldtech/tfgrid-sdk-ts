@@ -17,6 +17,7 @@ import { Nodes } from "./nodes";
 import { QueryPricingPolicies } from "./pricing_policies";
 import { TermsAndConditions } from "./terms_and_conditions";
 import { QueryTFTPrice } from "./tft_price";
+import { QueryTFTBridge } from "./tftBridgeModule";
 import { QueryTwins, Twins } from "./twins";
 import type { Extrinsic, ExtrinsicResult, PatchExtrinsicOptions, validatorFunctionType } from "./types";
 import { Utility } from "./utility";
@@ -44,6 +45,7 @@ class QueryClient {
   contracts: QueryContracts = new QueryContracts(this);
   balances: QueryBalances = new QueryBalances(this);
   farms: QueryFarms = new QueryFarms(this);
+  tftBridge: QueryTFTBridge = new QueryTFTBridge(this);
   tftPrice: QueryTFTPrice = new QueryTFTPrice(this);
   pricingPolicies: QueryPricingPolicies = new QueryPricingPolicies(this);
   twins: QueryTwins = new QueryTwins(this);
