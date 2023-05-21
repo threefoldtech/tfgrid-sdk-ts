@@ -30,13 +30,13 @@ class QueryBalances {
   /**
    * Checks if the specified key in the event data matches the provided value.
    * @private
-   * @param {string} key - The key to compare in the event data.
-   * @param {string} value - The value to compare against the key in the event data.
+   * @param {string} [key="target"] - The key to validate in the event data.
+   * @param {string} address - The expected value of the validated key in the event data.
    * @param {object} eventData - The event data object to check.
    * @returns {boolean} Returns true if the key in the event data matches the provided value, otherwise false.
    */
-  private mintCheck(key: string, value: string, eventData: object): boolean {
-    if (eventData[0][key].toPrimitive() === value) return true;
+  private mintCheck(key = "target", address: string, eventData: object): boolean {
+    if (eventData[0][key].toPrimitive() === address) return true;
     else return false;
   }
 
