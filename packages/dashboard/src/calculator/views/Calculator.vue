@@ -6,9 +6,7 @@
         <i class="fa fa-calculator" aria-hidden="true"></i>
       </h1>
       <span class="link">
-        <a href="https://library.threefold.me/info/threefold/#/tfgrid/pricing/threefold__pricing" target="_blank"
-          >Threefold Pricing</a
-        >
+        <a href="https://manual.grid.tf/cloud/cloudunits_pricing.html" target="_blank">Threefold Pricing</a>
       </span>
     </div>
 
