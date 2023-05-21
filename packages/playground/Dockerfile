@@ -32,4 +32,4 @@ RUN apk add --no-cache bash
 RUN chmod +x build-env.sh
 
 EXPOSE 80
-CMD ["/bin/bash", "-c", "/usr/share/nginx/html/build-env.sh && nginx -g \"daemon off;\""]
+CMD ["/bin/bash", "-c", "/usr/share/nginx/html/build-env.sh && nginx"]
