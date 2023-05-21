@@ -35,7 +35,7 @@
       </v-list>
 
       <template v-if="version">
-        <div class="d-flex justify-end">
+        <div class="version">
           <v-chip color="primary">
             {{ version }}
           </v-chip>
@@ -190,5 +190,11 @@ export default {
 .v-btn {
   text-transform: capitalize !important;
   font-size: 1rem !important;
+}
+
+.version {
+  position: absolute;
+  bottom: 0;
+  right: 7%;
 }
 </style>
