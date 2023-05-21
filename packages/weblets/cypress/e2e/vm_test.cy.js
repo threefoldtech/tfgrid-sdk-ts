@@ -12,10 +12,13 @@ describe("Weblets", function () {
   const cpu = utils.generateInt(1, 5);
   const memory = utils.generateInt(256, 2048);
   const rootFs = utils.generateInt(2, 3);
-  const diskSize = utils.generateInt(1, 20);
+  const diskSize = utils.generateInt(1, 10);
   const farmName = "Freefarm";
 
-  before(function () {
+  beforeEach(function () {
+    //URL can be changed from basUrl in cypress.config.ts
+    cy.visit("/");
+
     //Load data from fixtures/credentials.json
     cy.fixture("credentials.json").then(function (credentials) {
       this.credentials = credentials;
@@ -30,9 +33,6 @@ describe("Weblets", function () {
         });
       }
     });
-
-    //URL can be changed from basUrl in cypress.config.ts
-    cy.visit("/");
   });
 
   after(function () {
@@ -65,6 +65,9 @@ describe("Weblets", function () {
             - Deploy the vm
         **********************************************/
 
+    //Activate the profile
+    profileManager.ActivateProfileManager(this.credentials.Mnemonics, this.credentials.SSH_KEY);
+
     //Navigate to the Virtual Machine Tab
     vmPage.Navigate();
 
@@ -80,6 +83,12 @@ describe("Weblets", function () {
             - Select a deployment from the deployment list
             - Delete the deployment
         *************************************************/
+
+    //Activate the profile
+    profileManager.ActivateProfileManager(this.credentials.Mnemonics, this.credentials.SSH_KEY);
+
+    //Navigate to the Virtual Machine Tab
+    vmPage.Navigate();
 
     //Delete the deployment
     vmPage.Delete(vmName);
