@@ -42,19 +42,22 @@ class QueryBalances {
 
   /**
    * Listens for the "MintCompleted" event on the TFT Bridge Module and resolves when the specified key-value pair is validated in the event data.
-   * @param {"target" | "amount"} key - The key to validate in the event data ("target" or "amount").
-   * @param {string} value - The expected value of the validated key in the event data.
-   * @returns {Promise<object>} A promise that resolves with the event data when the specified key-value pair is validated in the event data.
+   *
+   * @param {string} address - The expected value of the validated key in the event data.
+   * @returns {Promise<number>} A promise that resolves with the amount TFT transferred from the bridge.
+   * @throws {Error} If the section or method is not defined on the chain, or if an error occurs during validation.
+   * @rejects {string} If no response is received within the given time or if an error occurs during validation.
    */
-  async listenToMintCompleted(key: "target" | "amount", value: string): Promise<object> {
-    return await this.client.listenForEvent(
+  async listenToMintCompleted(address: string): Promise<number> {
+    const eventData = await this.client.listenForEvent(
       this.client.api,
       "tftBridgeModule",
       "MintCompleted",
-      key,
-      value,
+      "target",
+      address,
       this.mintCheck,
     );
+    return eventData[0].amount.toPrimitive();
   }
 }
 
