@@ -50,7 +50,6 @@ class QueryBalances {
    */
   async listenToMintCompleted(address: string): Promise<number> {
     const eventData = await this.client.listenForEvent(
-      this.client.api,
       "tftBridgeModule",
       "MintCompleted",
       "target",

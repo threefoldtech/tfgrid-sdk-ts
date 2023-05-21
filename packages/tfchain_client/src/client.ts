@@ -123,12 +123,11 @@ class QueryClient {
   /**
    * Checks if the given section exists within the API events.
    *
-   * @param {ApiPromise} api - The Polkadot API object.
    * @param {string} section - The section to check within the API events.
    * @returns {boolean} - True if the section exists within the API events, false otherwise.
    */
-  private checkSection(api: ApiPromise, section: string): boolean {
-    const sections = Object.keys(api.events);
+  private checkSection(section: string): boolean {
+    const sections = Object.keys(this.api.events);
     if (sections.includes(section)) {
       return true;
     } else {
@@ -139,14 +138,13 @@ class QueryClient {
   /**
    * Checks if the given method exists within the specified section of the API events.
    *
-   * @param {ApiPromise} api - The Polkadot API object.
    * @param {string} section - The section of the API events to check.
    * @param {string} method - The method to check within the section.
    * @returns {boolean} - True if the method exists within the section, false otherwise.
    */
-  private checkMethod(api, section, method) {
-    const Methods = Object.keys(api.events[section]);
-    if (Methods.includes(method)) {
+  private checkMethod(section, method) {
+    const methods = Object.keys(this.api.events[section]);
+    if (methods.includes(method)) {
       return true;
     } else return false;
   }
@@ -154,7 +152,6 @@ class QueryClient {
   /**
    * Listens for a specific event on the chain and resolves when the event matches the specified conditions.
    *
-   * @param {ApiPromise} api - The API instance connected to the blockchain.
    * @param {string} section - The section of the event to listen for.
    * @param {string} method - The method of the event to listen for.
    * @param {string} key - The key to validate in the event data.
@@ -166,7 +163,6 @@ class QueryClient {
    * @rejects  If no response is received within the given time or if an error occurs during validation.
    */
   async listenForEvent(
-    api: ApiPromise,
     section: string,
     method: string,
     key: string,
@@ -174,14 +170,14 @@ class QueryClient {
     validator: validatorFunctionType,
     time = 120000,
   ): Promise<object> {
-    if (!this.checkSection(api, section)) {
+    if (!this.checkSection(section)) {
       throw new Error(`<${section}> is not defined on the chain`);
     }
-    if (!this.checkMethod(api, section, method)) {
+    if (!this.checkMethod(section, method)) {
       throw new Error(`<${method}> is not defined on the chain under ${section}`);
     }
     return new Promise(async (resolve, reject) => {
-      const unsubscribe = (await api.query.system.events(events => {
+      const unsubscribe = (await this.api.query.system.events(events => {
         const timeout = setTimeout(() => {
           unsubscribe();
           reject(`Timeout: No response within ${time / 60000} minutes`);
