@@ -24,8 +24,8 @@ class QueryTFTBridge {
    * @throws {Error} If the section or method is not defined on the chain, or if an error occurs during validation.
    * @rejects {string} If no response is received within the given time or if an error occurs during validation.
    */
-  async listenToMintCompleted(address: string): Promise<number> {
-    const eventData = await this.client.listenForEvent(
+  async listenToMintCompleted(address: string) {
+    const eventData = await this.client.listenForEvent<{ amount: { toPrimitive(): number } }[]>(
       "tftBridgeModule",
       "MintCompleted",
       "target",
