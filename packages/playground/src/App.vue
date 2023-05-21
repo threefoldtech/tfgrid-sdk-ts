@@ -33,6 +33,14 @@
           </v-list-item>
         </template>
       </v-list>
+
+      <template v-if="version">
+        <div class="d-flex justify-end">
+          <v-chip color="primary">
+            {{ version }}
+          </v-chip>
+        </div>
+      </template>
     </v-navigation-drawer>
 
     <v-main>
@@ -79,6 +87,9 @@ watch(
   () => $route.meta,
   meta => (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
 );
+
+// eslint-disable-next-line no-undef
+const version = process.env.VERSION as any;
 
 const routes: AppRoute[] = [
   {
