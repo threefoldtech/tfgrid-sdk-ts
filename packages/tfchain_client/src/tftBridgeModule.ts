@@ -3,18 +3,6 @@ class QueryTFTBridge {
   constructor(public client: QueryClient) {
     this.client = client;
   }
-  /**
-   * Checks if the specified key in the event data matches the provided value.
-   * @private
-   * @param {string} [key="target"] - The key to validate in the event data.
-   * @param {string} address - The expected value of the validated key in the event data.
-   * @param {object} eventData - The event data object to check.
-   * @returns {boolean} Returns true if the key in the event data matches the provided value, otherwise false.
-   */
-  private mintCheck(key = "target", address: string, eventData: object): boolean {
-    if (eventData[0][key].toPrimitive() === address) return true;
-    else return false;
-  }
 
   /**
    * Listens for the "MintCompleted" event on the TFT Bridge Module and resolves when the specified key-value pair is validated in the event data.
@@ -30,7 +18,10 @@ class QueryTFTBridge {
       "MintCompleted",
       "target",
       address,
-      this.mintCheck,
+      (key = "target", address: string, eventData: unknown): boolean => {
+        if ((eventData as [][])[0][key].toPrimitive() === address) return true;
+        else return false;
+      },
     );
     return eventData[0].amount.toPrimitive();
   }

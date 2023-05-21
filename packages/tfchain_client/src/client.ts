@@ -170,6 +170,7 @@ class QueryClient {
     validator: validatorFunctionType,
     time = 120000,
   ): Promise<T> {
+    if (!this.api) throw new Error(`Connection is not established`);
     if (!this.checkSection(section)) {
       throw new Error(`<${section}> is not defined on the chain`);
     }
