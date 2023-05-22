@@ -17,7 +17,7 @@ import { Nodes } from "./nodes";
 import { QueryPricingPolicies } from "./pricing_policies";
 import { TermsAndConditions } from "./terms_and_conditions";
 import { QueryTFTPrice } from "./tft_price";
-import { QueryTFTBridge } from "./tftBridgeModule";
+import { QueryTFTBridge } from "./tftBridge";
 import { QueryTwins, Twins } from "./twins";
 import type { Extrinsic, ExtrinsicResult, PatchExtrinsicOptions, validatorFunctionType } from "./types";
 import { Utility } from "./utility";
