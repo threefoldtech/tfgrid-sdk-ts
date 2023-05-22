@@ -156,8 +156,6 @@ class QueryClient {
    *
    * @param {string} section - The section of the event to listen for.
    * @param {string} method - The method of the event to listen for.
-   * @param {string} key - The key to validate in the event data.
-   * @param {string} value - The expected value of the validated key in the event data.
    * @param {validatorFunctionType} validator - The validator function to validate the event data.
    * @param {number} time - The timeout value in milliseconds. Default is 2 minutes.
    * @returns {Promise<object>} - A promise that resolves with the event data when the event matches the conditions.
@@ -167,8 +165,6 @@ class QueryClient {
   async listenForEvent<T>(
     section: string,
     method: string,
-    key: string,
-    value: string,
     validator: validatorFunctionType,
     time = 120000,
   ): Promise<T> {
@@ -190,13 +186,13 @@ class QueryClient {
         for (const { event } of events) {
           if (event.section === section && event.method === method) {
             try {
-              if (validator(key, value, event.data)) {
+              if (validator(event.data)) {
                 clearTimeout(timeout);
                 resolve(event.data as unknown as T);
                 return;
               }
             } catch (error) {
-              reject(`Cannot reach "${key}" with error:\n\t${error}`);
+              reject(`Cannot reach the key with error:\n\t${error}`);
               return;
             } finally {
               unsubscribe();

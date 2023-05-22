@@ -13,15 +13,14 @@ class QueryTFTBridge {
    * @rejects {string} If no response is received within the given time or if an error occurs during validation.
    */
   async listenToMintCompleted(address: string) {
-    function mintCheck(key = "target", address: string, eventData: unknown): boolean {
-      if ((eventData as [{ [key: string]: { toPrimitive(): string } }])[0][key].toPrimitive() === address) return true;
+    function mintCheck(eventData: unknown): boolean {
+      if ((eventData as [{ [key: string]: { toPrimitive(): string } }])[0]["target"].toPrimitive() === address)
+        return true;
       else return false;
     }
     const eventData = await this.client.listenForEvent<{ amount: { toPrimitive(): number } }[]>(
       "tftBridgeModule",
       "MintCompleted",
-      "target",
-      address,
       mintCheck,
     );
     return eventData[0].amount.toPrimitive();
