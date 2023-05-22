@@ -52,25 +52,22 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 
-import { INode } from "../graphql/api";
+import { INodeStatistics } from "../graphql/api";
 
 @Component({})
 export default class NodeUsedResources extends Vue {
-  @Prop({ required: true }) node!: INode;
+  @Prop({ required: true }) nodeStatistics!: INodeStatistics;
+  @Prop({ required: true }) nodeStatus!: boolean;
   resources: any[] = [];
   loader = false;
-
-  get nodeStatus(): boolean {
-    return this.node.status;
-  }
 
   getNodeUsedResources() {
     this.loader = true;
 
     return ["cru", "sru", "hru", "mru"].map((i, idx) => {
       const value =
-        this.node.capacity.total_resources[i] != 0
-          ? (this.node.capacity.used_resources[i] / this.node.capacity.total_resources[i]) * 100
+        this.nodeStatistics.total[i] != 0
+          ? ((this.nodeStatistics.used[i] + this.nodeStatistics.system[i]) / this.nodeStatistics.total[i]) * 100
           : NaN; // prettier-ignore, validate if the total is zero so the usage is set to NaN else do the division
       this.loader = false;
       return {

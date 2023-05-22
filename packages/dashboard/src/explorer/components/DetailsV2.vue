@@ -4,7 +4,7 @@
       <div class="content" v-if="!loading">
         <v-row>
           <v-col v-if="node">
-            <NodeUsedResources :node="node" />
+            <NodeUsedResources :nodeStatistics="nodeStatistics" :nodeStatus="node.status" />
           </v-col>
         </v-row>
         <v-row>
