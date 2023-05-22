@@ -165,7 +165,7 @@ export default class TransferView extends Vue {
       const receivedDeposit = await this.client.tftBridge.listenToMintCompleted(
         this.$store.state.credentials.account.address,
       );
-      this.$toasted.show(`You have received ${receivedDeposit / 10000000}`);
+      this.$toasted.show(`You have received ${receivedDeposit / 10000000} TFT`);
       getBalance(this.$api, this.$store.state.credentials.account.address).then((balance: balanceInterface) => {
         this.$store.state.credentials.balance.free = balance.free;
       });
