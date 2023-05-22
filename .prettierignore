@@ -2,6 +2,7 @@
 build
 coverage
 weblets-chart
+playground-charts
 dist
 charts
 index.yaml
