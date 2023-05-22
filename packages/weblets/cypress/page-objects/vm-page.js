@@ -298,7 +298,7 @@ class Virtualmachine {
         ************************/
 
     //Deploy VM
-    this.getDeployBtn.wait(20000).click();
+    this.getDeployBtn.wait(30000).click();
 
     //Verify that the vm is deployed from the Details Modal box
     this.getDeploymentModalBox.should("be.visible");
@@ -328,6 +328,7 @@ class Virtualmachine {
     this.getDeleteConfirmationBtn.click({ force: true });
 
     //Verify that the vm was deleted
+    this.getDeploymentList.scrollIntoView();
     this.getDeploymentNotFoundText.should("be.visible");
   }
 }

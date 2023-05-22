@@ -17,13 +17,13 @@ import { Nodes } from "./nodes";
 import { QueryPricingPolicies } from "./pricing_policies";
 import { TermsAndConditions } from "./terms_and_conditions";
 import { QueryTFTPrice } from "./tft_price";
+import { QueryTFTBridge } from "./tftBridgeModule";
 import { QueryTwins, Twins } from "./twins";
-import type { Extrinsic, ExtrinsicResult, PatchExtrinsicOptions } from "./types";
+import type { Extrinsic, ExtrinsicResult, PatchExtrinsicOptions, validatorFunctionType } from "./types";
 import { Utility } from "./utility";
 import { isEnvNode } from "./utils";
 
 const SUPPORTED_KEYPAIR_TYPES = ["sr25519", "ed25519"];
-
 interface ExtSigner {
   address: string;
   signer: Signer;
@@ -45,6 +45,7 @@ class QueryClient {
   contracts: QueryContracts = new QueryContracts(this);
   balances: QueryBalances = new QueryBalances(this);
   farms: QueryFarms = new QueryFarms(this);
+  tftBridge: QueryTFTBridge = new QueryTFTBridge(this);
   tftPrice: QueryTFTPrice = new QueryTFTPrice(this);
   pricingPolicies: QueryPricingPolicies = new QueryPricingPolicies(this);
   twins: QueryTwins = new QueryTwins(this);
@@ -115,6 +116,87 @@ class QueryClient {
     // this should be only used by nodejs process
     await this.disconnect();
     process.exit(0);
+  }
+
+  /**
+   * Checks if the given section exists within the API events.
+   *
+   * @param {string} section - The section to check within the API events.
+   * @returns {boolean} - True if the section exists within the API events, false otherwise.
+   */
+  private checkSection(section: string): boolean {
+    const sections = Object.keys(this.api.events);
+    if (sections.includes(section)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Checks if the given method exists within the specified section of the API events.
+   *
+   * @param {string} section - The section of the API events to check.
+   * @param {string} method - The method to check within the section.
+   * @returns {boolean} - True if the method exists within the section, false otherwise.
+   */
+  private checkMethod(section, method) {
+    const methods = Object.keys(this.api.events[section]);
+    if (methods.includes(method)) {
+      return true;
+    } else return false;
+  }
+
+  /**
+   * Listens for a specific event on the chain and resolves when the event matches the specified conditions.
+   *
+   * @param {string} section - The section of the event to listen for.
+   * @param {string} method - The method of the event to listen for.
+   * @param {validatorFunctionType} validator - The validator function to validate the event data.
+   * @param {number} timeoutInMinutes - The timeout value in minutes. Default is 2 minutes.
+   * @returns {Promise<object>} - A promise that resolves with the event data when the event matches the conditions.
+   * @throws {Error} - If the section or method is not defined on the chain.
+   * @rejects  If no response is received within the given time or if an error occurs during validation.
+   */
+  async listenForEvent<T>(
+    section: string,
+    method: string,
+    validator: validatorFunctionType,
+    timeoutInMinutes = 2,
+  ): Promise<T> {
+    await this.connect();
+    if (!this.checkSection(section)) {
+      throw new Error(`<${section}> is not defined on the chain`);
+    }
+    if (!this.checkMethod(section, method)) {
+      throw new Error(`<${method}> is not defined on the chain under ${section}`);
+    }
+
+    return new Promise<T>(async (resolve, reject) => {
+      const unsubscribe = (await this.api.query.system.events(events => {
+        const timeout = setTimeout(() => {
+          unsubscribe();
+          reject(`Timeout: No response within ${timeoutInMinutes} minutes`);
+        }, timeoutInMinutes * 60000);
+
+        for (const { event } of events) {
+          if (event.section === section && event.method === method) {
+            try {
+              if (validator(event.data)) {
+                clearTimeout(timeout);
+                resolve(event.data as unknown as T);
+                return;
+              }
+            } catch (error) {
+              reject(`Cannot reach the key with error:\n\t${error}`);
+              return;
+            } finally {
+              unsubscribe();
+            }
+          }
+        }
+      })) as unknown as () => void;
+    });
   }
 }
 

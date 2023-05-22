@@ -38,7 +38,7 @@
     <h4 class="has-text-centered has-text-weight-bold">
       Scan the QRcode using <a
         target="_blank"
-        href="https://library.threefold.me/info/threefold#/tokens/threefold__threefold_connect"
+        href="https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html"
         rel="noreferrer"
       >
         ThreeFold Connect

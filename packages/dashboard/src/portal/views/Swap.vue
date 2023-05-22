@@ -57,6 +57,8 @@
                 v-model="target"
                 :label="selectedName.toUpperCase() + ' Target Wallet Address'"
                 :error-messages="targetError"
+                :disabled="validatingAddress"
+                :loading="validatingAddress"
                 :rules="[() => !!target || 'This field is required', swapAddressCheck]"
               >
               </v-text-field>
@@ -82,7 +84,7 @@
             <v-btn
               class="primary white--text"
               @click="withdrawTFT(target, amount)"
-              :disabled="!isValidSwap"
+              :disabled="!isValidSwap || validatingAddress"
               :loading="loadingWithdraw"
               >Submit</v-btn
             >
@@ -114,7 +116,7 @@
         color="primary"
         :target="'blank'"
         class="text-decoration-none"
-        :href="'https://library.threefold.me/info/manual/#/manual__grid3_stellar_tfchain_bridge'"
+        :href="'https://manual.grid.tf/TF_Farmer_Guide/TF_Complete_Farmer_Guide/farmer_guide.html?highlight=bridge#how-to-use-the-tfchain-stellar-bridge'"
         >How is it done?</a
       >
     </v-container>
@@ -153,6 +155,7 @@ export default class TransferView extends Vue {
   loadingWithdraw = false;
   targetError = "";
   server = new StellarSdk.Server(config.horizonUrl);
+  validatingAddress = false;
 
   mounted() {
     if (this.$api && this.$store.state.credentials.initialized) {
@@ -181,44 +184,49 @@ export default class TransferView extends Vue {
     this.$store.commit("UNSET_CREDENTIALS");
   }
 
-  async swapAddressCheck() {
-    if (this.target.length > 0) {
-      const isValid = StrKey.isValidEd25519PublicKey(this.target);
-      const blockedAddresses = [
-        "GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC",
-        "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4",
-      ];
-      if (blockedAddresses.includes(this.target)) {
-        this.targetError = "Blocked Address";
-        return false;
-      }
-
-      if (!isValid || this.target.match(/\W/)) {
-        this.targetError = "invalid address";
-        return false;
-      }
-
-      if (this.selectedName == "stellar") {
-        try {
-          // check if the account provided exists on stellar
-          const account = await this.server.loadAccount(this.target);
-          // check if the account provided has the appropriate trustlines
-          const includes = account.balances.find(
-            (b: { asset_code: string; asset_issuer: string }) =>
-              b.asset_code === "TFT" && b.asset_issuer === config.tftAssetIssuer,
-          );
-          if (!includes) {
-            this.targetError = "Address does not have a valid trustline to TFT";
-            return false;
-          }
-        } catch (error) {
-          this.targetError = "Address not found";
-          return false;
-        }
-      }
-      this.targetError = "";
-      return true;
+  swapAddressCheck() {
+    this.targetError = "";
+    if (!this.target) return true;
+    const isValid = StrKey.isValidEd25519PublicKey(this.target);
+    const blockedAddresses = [
+      "GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC",
+      "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4",
+    ];
+    if (blockedAddresses.includes(this.target)) {
+      this.targetError = "Blocked Address";
+      return false;
     }
+    if (!isValid || this.target.match(/\W/)) {
+      this.targetError = "invalid address";
+      return false;
+    }
+    this.targetError = "";
+    this.validatingAddress = true;
+    this.isValidSwap = false;
+    if (this.selectedName == "stellar") this.validateAddress();
+    return true;
+  }
+  async validateAddress() {
+    try {
+      // check if the account provided exists on stellar
+      const account = await this.server.loadAccount(this.target);
+      // check if the account provided has the appropriate trustlines
+      const includes = account.balances.find(
+        (b: { asset_code: string; asset_issuer: string }) =>
+          b.asset_code === "TFT" && b.asset_issuer === config.tftAssetIssuer,
+      );
+      if (!includes) throw new Error("invalid trustline");
+    } catch (e) {
+      this.targetError =
+        (e as Error).message === "invalid trustline"
+          ? "Address does not have a valid trustline to TFT"
+          : "Address not found";
+      this.validatingAddress = false;
+      this.isValidSwap = false;
+      return;
+    }
+    this.validatingAddress = false;
+    return;
   }
   public async withdrawTFT(target: string, amount: number) {
     this.loadingWithdraw = true;
