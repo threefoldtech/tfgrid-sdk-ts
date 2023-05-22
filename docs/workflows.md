@@ -74,6 +74,27 @@ On **Push** to development branch: It will do a clean install of node dependenci
 
 Runs daily for the last code and it will check if the code passed the test cases using Cypress.
 
+## Playground
+
+### [Build](/.github/workflows/playground_build.yml)
+
+On **Pull Request**, and **Push** to development branch that has changes in the playground package: It will do a clean install of node dependencies, cache/restore them to make the process faster, and build the source code using `yarn build:app`.
+
+### [Docker](/.github/workflows/playground_docker.yml)
+
+On **Release** published: It will build and push a new docker image based on project release tag.
+
+We are using _VERSION_, and _NETWORK_ arguments in this workflow that will be propagated into the builds [config](/packages/playground/scripts/build-env.sh), The values of those arguments could be as follows:
+
+```js
+NETWORK = "dev" | "qa" | "test" | "main" (default: dev)
+VERSION = "release tag or the first 7 chars of commit hash"
+```
+
+### [CD](/.github/workflows/playground_cd.yml)
+
+On **Push** to development branch: It will do a clean install of node dependencies, cache/restore them, build the source code and deploy to staging server by Copying the artifacts using ssh to `play.dev.grid.tf`.
+
 ## Stats
 
 ### [Build](/.github/workflows/stats_build.yaml)
