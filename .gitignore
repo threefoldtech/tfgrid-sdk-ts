@@ -6,6 +6,7 @@ packages/grid_client/docs/tests/
 packages/weblets/public/build/
 packages/weblets/playground/public/build/
 packages/stats/public/build/
+packages/playground/dist/
 
 .DS_Store
 
@@ -15,3 +16,12 @@ packages/stats/public/build/
 
 package-lock.json
 yarn-error.log
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*

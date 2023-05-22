@@ -3,7 +3,9 @@ import { ApiPromise, WsProvider } from "@polkadot/api";
 import { Keyring } from "@polkadot/api";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import * as bip39 from "bip39";
+import { Buffer } from "buffer";
 import * as cryptoJs from "crypto-js";
+
 export async function createGridCL(chainUrl: string) {
   const provider = new WsProvider(chainUrl);
   const cl = await ApiPromise.create({ provider });

@@ -1,6 +1,8 @@
 import * as secp from "@noble/secp256k1";
 import { KeyringPair } from "@polkadot/keyring/types";
 import * as bip39 from "bip39";
+import { Buffer } from "buffer";
+
 export enum KPType {
   sr25519 = "sr25519",
   ed25519 = "ed25519",
