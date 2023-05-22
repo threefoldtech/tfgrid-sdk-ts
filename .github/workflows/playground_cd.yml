@@ -56,5 +56,5 @@ jobs:
           rm: true
           port: ${{ secrets.PORT }}
           source: "packages/playground/dist/"
-          target: "${{ secrets.DEV_REMOTE_DIR }}"
+          target: "${{ secrets.PLAYGROUND_REMOTE_DIR }}"
           strip_components: 3
