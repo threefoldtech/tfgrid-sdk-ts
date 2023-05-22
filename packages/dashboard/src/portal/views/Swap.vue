@@ -124,9 +124,10 @@
 </template>
 
 <script lang="ts">
+import { QueryClient } from "@threefold/tfchain_client";
 import QrcodeVue from "qrcode.vue";
 import { default as StellarSdk, StrKey } from "stellar-sdk";
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 
 import config from "../config";
 import { balanceInterface, getBalance } from "../lib/balance";
@@ -156,6 +157,23 @@ export default class TransferView extends Vue {
   targetError = "";
   server = new StellarSdk.Server(config.horizonUrl);
   validatingAddress = false;
+  client = new QueryClient(window.configs.APP_API_URL);
+  // Watchers
+  @Watch("openDepositDialog") async listenForMint() {
+    if (!this.openDepositDialog) return;
+    try {
+      const receivedDeposit = await this.client.tftBridge.listenToMintCompleted(
+        this.$store.state.credentials.account.address,
+      );
+      this.$toasted.show(`You have received ${receivedDeposit / 10000000}`);
+      getBalance(this.$api, this.$store.state.credentials.account.address).then((balance: balanceInterface) => {
+        this.$store.state.credentials.balance.free = balance.free;
+      });
+    } catch (error) {
+      console.log(error);
+      this.openDepositDialog = false;
+    }
+  }
 
   mounted() {
     if (this.$api && this.$store.state.credentials.initialized) {
@@ -185,7 +203,7 @@ export default class TransferView extends Vue {
   }
 
   swapAddressCheck() {
-      this.targetError = "";
+    this.targetError = "";
     if (!this.target) return true;
     const isValid = StrKey.isValidEd25519PublicKey(this.target);
     const blockedAddresses = [
