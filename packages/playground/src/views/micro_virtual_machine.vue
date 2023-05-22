@@ -1,8 +1,10 @@
 <template>
-  <MicroVm />
+  <div>
+    <MicroVm />
 
-  <div class="mt-4">
-    <TfDeploymentList :project-name="name" />
+    <div class="mt-4">
+      <TfDeploymentList :project-name="name" />
+    </div>
   </div>
 </template>
 
