@@ -78,7 +78,7 @@ Runs daily for the last code and it will check if the code passed the test cases
 
 ### [Build](/.github/workflows/playground_build.yml)
 
-On **Pull Request**, and **Push** to development branch that has changes in the playground package: It will do a clean install of node dependencies, cache/restore them to make the process faster, and build the source code using `yarn build:app`.
+On **Pull Request**, and **Push** to development branch that has changes in the playground package: It will do a clean install of node dependencies, cache/restore them to make the process faster, and build the source code using `yarn build`.
 
 ### [Docker](/.github/workflows/playground_docker.yml)
 
