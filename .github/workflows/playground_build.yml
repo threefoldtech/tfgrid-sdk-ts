@@ -36,8 +36,6 @@ jobs:
       - name: Install dependencies
         run: |
           yarn install
-          cd packages/playground
-          yarn install
 
 
       - name: Build
