@@ -41,7 +41,7 @@ Create a new issue for each project of type `Update Request` (Dashboard, Weblets
 
 - **Release link**
 
-  Make sure to chage the '<tag>' in the link with the required tag
+  Make sure to change the '<tag>' in the link with the required tag
 
 - **Charts directory link**
 
