@@ -118,9 +118,13 @@ export default class Details extends Vue {
           this.data.node = await fetch(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}`).then(res =>
             res.json(),
           );
-          this.data.nodeStatistics = await fetch(
-            `${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/statistics`,
-          ).then(res => res.json());
+          try {
+            this.data.nodeStatistics = await fetch(
+              `${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/statistics`,
+            ).then(res => res.json());
+          } catch (error) {
+            console.log(error);
+          }
           this.data.node.status = this.data.node.status === "up";
         }
       })
