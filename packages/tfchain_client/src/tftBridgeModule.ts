@@ -8,11 +8,12 @@ class QueryTFTBridge {
    * Listens for the "MintCompleted" event on the TFT Bridge Module and resolves when the specified key-value pair is validated in the event data.
    *
    * @param {string} address - The expected value of the validated key in the event data.
+   * @param {number} timeoutInMinutes - The timeout value in minutes. Default is 2 minutes.
    * @returns {Promise<number>} A promise that resolves with the amount TFT transferred from the bridge.
    * @throws {Error} If the section or method is not defined on the chain, or if an error occurs during validation.
    * @rejects {string} If no response is received within the given time or if an error occurs during validation.
    */
-  async listenToMintCompleted(address: string) {
+  async listenToMintCompleted(address: string, timeoutInMinutes = 2) {
     function mintCheck(eventData: unknown): boolean {
       if ((eventData as [{ [key: string]: { toPrimitive(): string } }])[0]["target"].toPrimitive() === address)
         return true;
@@ -22,6 +23,7 @@ class QueryTFTBridge {
       "tftBridgeModule",
       "MintCompleted",
       mintCheck,
+      timeoutInMinutes,
     );
     return eventData[0].amount.toPrimitive();
   }

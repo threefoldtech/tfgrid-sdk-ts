@@ -157,7 +157,7 @@ class QueryClient {
    * @param {string} section - The section of the event to listen for.
    * @param {string} method - The method of the event to listen for.
    * @param {validatorFunctionType} validator - The validator function to validate the event data.
-   * @param {number} time - The timeout value in milliseconds. Default is 2 minutes.
+   * @param {number} timeoutInMinutes - The timeout value in minutes. Default is 2 minutes.
    * @returns {Promise<object>} - A promise that resolves with the event data when the event matches the conditions.
    * @throws {Error} - If the section or method is not defined on the chain.
    * @rejects  If no response is received within the given time or if an error occurs during validation.
@@ -166,7 +166,7 @@ class QueryClient {
     section: string,
     method: string,
     validator: validatorFunctionType,
-    time = 120000,
+    timeoutInMinutes = 2,
   ): Promise<T> {
     await this.connect();
     if (!this.checkSection(section)) {
@@ -180,8 +180,8 @@ class QueryClient {
       const unsubscribe = (await this.api.query.system.events(events => {
         const timeout = setTimeout(() => {
           unsubscribe();
-          reject(`Timeout: No response within ${time / 60000} minutes`);
-        }, time);
+          reject(`Timeout: No response within ${timeoutInMinutes} minutes`);
+        }, timeoutInMinutes * 60000);
 
         for (const { event } of events) {
           if (event.section === section && event.method === method) {
