@@ -36,7 +36,7 @@ export async function deployGatewayName(grid: GridClient, options: DeployGateway
   gateway.node_id = options.nodeId;
   gateway.tls_passthrough = options.tlsPassthrough || false;
   gateway.backends = options.backends;
-  gateway.solutionProviderID = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
+  gateway.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
 
   return grid.gateway.deploy_name(gateway);
 }
