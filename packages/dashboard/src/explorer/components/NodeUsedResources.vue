@@ -78,7 +78,7 @@ export default class NodeUsedResources extends Vue {
     });
   }
   created() {
-    if (this.nodeStatus) {
+    if (this.nodeStatus && this.nodeStatistics) {
       const resources = this.getNodeUsedResources();
       if (resources) {
         this.resources = resources;
