@@ -1,48 +1,15 @@
 <template>
   <v-container>
-    <v-container v-if="openDepositDialog">
-      <v-dialog transition="dialog-bottom-transition" max-width="900" v-model="openDepositDialog">
-        <v-card>
-          <v-toolbar color="primary" dark>Deposit TFT</v-toolbar>
-          <v-card-text>
-            <v-container>
-              <v-row>
-                <v-col>
-                  Send a {{ selectedName.toUpperCase() }} transaction with your TFT's to deposit to:
-                  <ul>
-                    <li>
-                      Destination: <b>{{ depositWallet }}</b>
-                    </li>
-                    <li>
-                      Memo Text: <b>twin_{{ $store.state.credentials.twin.id }}</b>
-                    </li>
-                  </ul>
-                </v-col>
-                <v-divider class="mx-4" vertical></v-divider>
-                <v-col>
-                  Or use Threefold connect to scan this qr code:
-                  <div class="d-flex justify-center">
-                    <qrcode-vue
-                      :value="qrCodeText"
-                      :size="200"
-                      level="M"
-                      render-as="svg"
-                      style="background: white; padding: 6%"
-                    />
-                  </div>
-                </v-col>
-              </v-row>
-              <v-row class="d-flex row justify-center"
-                >Amount: should be larger than {{ depositFee }}TFT (deposit fee is: {{ depositFee }}TFT)</v-row
-              >
-            </v-container>
-          </v-card-text>
-          <v-card-actions class="justify-end">
-            <v-btn @click="openDepositDialog = false" class="grey lighten-2 black--text">Close</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-container>
+    <DepositDialog
+      v-if="openDepositDialog"
+      :selectedName="selectedName"
+      :depositWallet="depositWallet"
+      :qrCodeText="qrCodeText"
+      :depositFee="depositFee"
+      :openDepositDialog="openDepositDialog"
+      @close="openDepositDialog = false"
+    >
+    </DepositDialog>
     <v-container v-if="openWithdrawDialog">
       <v-dialog transition="dialog-bottom-transition" max-width="900" v-model="openWithdrawDialog">
         <v-card>
@@ -124,18 +91,17 @@
 </template>
 
 <script lang="ts">
-import { QueryClient } from "@threefold/tfchain_client";
-import QrcodeVue from "qrcode.vue";
 import { default as StellarSdk, StrKey } from "stellar-sdk";
-import { Component, Vue, Watch } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
 
+import DepositDialog from "../components/DepositDialog.vue";
 import config from "../config";
 import { balanceInterface, getBalance } from "../lib/balance";
 import { getDepositFee, getWithdrawFee, withdraw } from "../lib/swap";
 
 @Component({
   name: "TransferView",
-  components: { QrcodeVue },
+  components: { DepositDialog },
 })
 export default class TransferView extends Vue {
   openDepositDialog = false;
@@ -157,23 +123,6 @@ export default class TransferView extends Vue {
   targetError = "";
   server = new StellarSdk.Server(config.horizonUrl);
   validatingAddress = false;
-  client = new QueryClient(window.configs.APP_API_URL);
-  // Watchers
-  @Watch("openDepositDialog") async listenForMint() {
-    if (!this.openDepositDialog) return;
-    try {
-      const receivedDeposit = await this.client.tftBridge.listenToMintCompleted(
-        this.$store.state.credentials.account.address,
-      );
-      this.$toasted.show(`You have received ${receivedDeposit / 10000000} TFT`);
-      getBalance(this.$api, this.$store.state.credentials.account.address).then((balance: balanceInterface) => {
-        this.$store.state.credentials.balance.free = balance.free;
-      });
-    } catch (error) {
-      console.log(error);
-      this.openDepositDialog = false;
-    }
-  }
 
   mounted() {
     if (this.$api && this.$store.state.credentials.initialized) {
