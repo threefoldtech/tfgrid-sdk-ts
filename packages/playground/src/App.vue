@@ -9,21 +9,6 @@
           }"
         >
           <v-list>
-            <!-- <v-list-item class="d-flex justify-center">
-          <v-img :src="baseUrl + 'images/logoTF.png'" width="160px" />
-        </v-list-item>
-
-        <v-list-item class="justify-center">
-          <AppTheme />
-        </v-list-item>
-
-        <v-list-item :style="{ marginTop: '-30px', marginBottom: '10px' }">
-          <v-btn class="capitalize" block :style="{ pointerEvents: 'none' }" variant="text" color="primary">
-            {{ network }}net
-          </v-btn>
-        </v-list-item>
-        <v-divider /> -->
-
             <template v-for="route in routes" :key="route.title">
               <v-list-subheader>{{ route.title }}</v-list-subheader>
               <v-list-item
