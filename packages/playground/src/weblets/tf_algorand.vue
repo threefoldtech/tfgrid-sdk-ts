@@ -1,5 +1,11 @@
 <template>
-  <weblet-layout ref="layout" :cpu="cpu" :memory="memory" :disk="storage + (type === 'indexer' ? 50 : 0)">
+  <weblet-layout
+    ref="layout"
+    :cpu="cpu"
+    :memory="memory"
+    :disk="storage + (type === 'indexer' ? 50 : 0)"
+    title-image="images/icons/algorand.png"
+  >
     <template #title>Deploy a Algorand Instance </template>
     <template #subtitle>
       Algorand (ALGO) is a blockchain platform and cryptocurrency designed to function like a major payments processor.

@@ -4,6 +4,7 @@
     :cpu="solution?.cpu"
     :memory="solution?.memory"
     :disk="(solution?.disk ?? 0) + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
+    title-image="images/icons/discourse.png"
   >
     <template #title> Deploy a Discourse Instance </template>
     <template #subtitle>

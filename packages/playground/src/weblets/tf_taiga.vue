@@ -4,6 +4,7 @@
     :cpu="solution?.cpu"
     :memory="solution?.memory"
     :disk="solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
+    title-image="images/icons/taiga.png"
   >
     <template #title>Deploy a Taiga Instance</template>
     <template #subtitle>

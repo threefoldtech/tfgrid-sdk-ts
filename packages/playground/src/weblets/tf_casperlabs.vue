@@ -1,5 +1,11 @@
 <template>
-  <weblet-layout ref="layout" :cpu="solution?.cpu" :memory="solution?.memory" :disk="solution?.disk">
+  <weblet-layout
+    ref="layout"
+    :cpu="solution?.cpu"
+    :memory="solution?.memory"
+    :disk="solution?.disk"
+    title-image="images/icons/casperlabs.png"
+  >
     <template #title>Deploy a Casperlabs Instance </template>
     <template #subtitle>
       Casper Network is a blockchain protocol built from the ground up to remain true to core Web3 principles and adapt

@@ -2,7 +2,13 @@
   <v-card>
     <section class="d-flex align-center">
       <div>
-        <v-card-title v-if="$slots.title" class="font-weight-bold">
+        <v-card-title v-if="$slots.title" class="font-weight-bold d-flex align-center title">
+          <img
+            :src="baseUrl + titleImage"
+            alt="title image"
+            v-if="titleImage"
+            :style="{ filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})` }"
+          />
           <slot name="title" />
         </v-card-title>
         <v-card-subtitle v-if="$slots.subtitle" :style="{ whiteSpace: 'initial' }">
@@ -91,9 +97,13 @@ const props = defineProps({
     type: Number,
     required: false,
   },
+  titleImage: {
+    type: String,
+    required: false,
+  },
 });
 const emits = defineEmits<{ (event: "mount"): void; (event: "back"): void }>();
-
+const baseUrl = import.meta.env.BASE_URL;
 const profileManager = useProfileManager();
 
 const status = ref<WebletStatus>();
@@ -238,3 +248,10 @@ export default {
   },
 };
 </script>
+
+<style>
+.title img {
+  margin-right: 5px;
+  max-height: 24px;
+}
+</style>
