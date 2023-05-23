@@ -48,6 +48,7 @@
 </template>
 
 <script lang="ts">
+import axios from "axios";
 import { DocumentNode } from "graphql";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
@@ -119,9 +120,11 @@ export default class Details extends Vue {
             res.json(),
           );
           try {
-            this.data.nodeStatistics = await fetch(
-              `${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/statistics`,
-            ).then(res => res.json());
+            this.data.nodeStatistics = await (
+              await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/statistics`, {
+                timeout: 3000,
+              })
+            ).data;
           } catch (error) {
             console.log(error);
           }
