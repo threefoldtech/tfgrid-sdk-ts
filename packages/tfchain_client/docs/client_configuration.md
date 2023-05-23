@@ -28,9 +28,9 @@ it requires:
 ```ts
 import { Client } from "./src/client";
 
-const cl = new Client("wss://tfchain.dev.grid.tf", "<your mnemonic>", "sr25519");
+const cl = new Client({ url: "wss://tfchain.dev.grid.tf", mnemonicOrSecret: "<your mnemonic>" });
 await cl.connect();
-const contract = await cl.contracts.createName("hamada");
+const contract = await (await cl.contracts.createName("hamada")).apply();
 console.log(contract);
 await cl.disconnect();
 ```

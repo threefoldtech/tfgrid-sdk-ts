@@ -20,7 +20,7 @@ class Nodes {
       throw Error(`Node Already rented by user with twinId ${rentContract.twinId}`);
     }
     try {
-      const res = await this.client.contracts.createRentContract(options.nodeId, options.solutionProviderID);
+      const res = await (await this.client.contracts.createRent(options)).apply();
       events.emit("logs", `Rent contract with id: ${res["contractId"]} has been created`);
       return res;
     } catch (e) {
@@ -38,7 +38,7 @@ class Nodes {
       return rentContract;
     }
     try {
-      const res = await this.client.contracts.cancel(rentContract.rentContractId);
+      const res = await (await this.client.contracts.cancel({ id: rentContract.rentContractId })).apply();
       events.emit("logs", `Rent contract for node ${options.nodeId} has been deleted`);
       return res;
     } catch (e) {
@@ -63,11 +63,7 @@ class Nodes {
   @validateInput
   @checkBalance
   async setNodePower(options: NodePowerModel) {
-    try {
-      return await this.client.nodePower.set(options.nodeId, options.power);
-    } catch (e) {
-      throw Error(e);
-    }
+    return (await this.client.nodes.setPower(options)).apply();
   }
 }
 

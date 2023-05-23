@@ -53,7 +53,7 @@ export async function loadProfile(grid: GridClient): Promise<Profile> {
     mnemonic: grid.clientOptions!.mnemonic,
     ssh: await readSSH(grid),
     twinId: grid!.twinId,
-    address: grid.twins.client.client.address,
+    address: grid.tfclient.address,
   };
 }
 

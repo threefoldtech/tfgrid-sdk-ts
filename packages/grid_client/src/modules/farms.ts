@@ -14,7 +14,7 @@ class Farms {
   @expose
   @validateInput
   async getFarmByID(options: FarmIdModel) {
-    return await this.client.farms.getFarmByID(options.farmId);
+    return this.client.farms.get(options);
   }
 }
 

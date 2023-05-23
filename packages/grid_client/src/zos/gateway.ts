@@ -7,7 +7,7 @@ class GatewayFQDNProxy extends WorkloadData {
   @Expose() @IsFQDN() fqdn: string;
   @Expose() @IsBoolean() tls_passthrough: boolean;
   @Expose() @ArrayNotEmpty() @IsUrl({ protocols: ["http", "https"] }, { each: true }) backends: string[];
-  @Expose() @IsString() @IsOptional() network: string;
+  @Expose() @IsString() @IsOptional() network?: string;
 
   challenge(): string {
     let out = "";
@@ -25,7 +25,7 @@ class GatewayNameProxy extends WorkloadData {
   @Expose() @IsString() @IsNotEmpty() name: string;
   @Expose() @IsBoolean() tls_passthrough: boolean;
   @Expose() @ArrayNotEmpty() @IsUrl({ protocols: ["http", "https"] }, { each: true }) backends: string[];
-  @Expose() @IsString() @IsOptional() network: string;
+  @Expose() @IsString() @IsOptional() network?: string;
 
   challenge(): string {
     let out = "";

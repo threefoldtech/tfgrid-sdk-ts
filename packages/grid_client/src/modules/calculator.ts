@@ -35,13 +35,13 @@ class Calculator {
     return options.hru / 1200 + options.sru / 200;
   }
   async getPrices() {
-    const pricing = await this.client.pricingPolcy.getPricingPolicyById(1);
+    const pricing = await this.client.pricingPolicies.get({ id: 1 });
     return pricing;
   }
   @expose
   @validateInput
   async tftPrice() {
-    const pricing = await this.client.tftPrice.getPrice();
+    const pricing = await this.client.tftPrice.get();
     return pricing;
   }
   @validateInput
@@ -116,7 +116,7 @@ class Calculator {
   }
 
   async calculateWithMyBalance(options: CalculatorModel) {
-    const balances = await this.client.balance.getMyBalance();
+    const balances = await this.client.balances.getMyBalance();
     const balance = balances["free"];
     const calculate = await this.calculate({
       cru: options.cru,

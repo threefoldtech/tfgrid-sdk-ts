@@ -1,4 +1,5 @@
 import { Client } from "./client";
+import { checkConnection } from "./utils";
 
 export interface SetPowerOptions {
   nodeId: number;
@@ -10,6 +11,7 @@ class Nodes {
     this.client = client;
   }
 
+  @checkConnection
   async setPower(options: SetPowerOptions) {
     let powerTarget: { up?: boolean; down?: boolean };
     if (options.power) {
@@ -22,10 +24,7 @@ class Nodes {
       };
     }
 
-    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfgridModule.changePowerTarget, [
-      options.nodeId,
-      powerTarget,
-    ]);
+    const extrinsic = await this.client.api.tx.tfgridModule.changePowerTarget(options.nodeId, powerTarget);
     return this.client.patchExtrinsic<void>(extrinsic);
   }
 }

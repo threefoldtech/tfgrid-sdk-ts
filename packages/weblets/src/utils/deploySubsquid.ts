@@ -80,7 +80,7 @@ async function deploySubsquidVM(profile: IProfile, data: Subsquid) {
     CHAIN_ENDPOINT: endPoint,
     SUBSQUID_WEBSERVER_HOSTNAME: domain,
   };
-  vm.solutionProviderID = InternalSolutionProviderID;
+  vm.solutionProviderId = InternalSolutionProviderID;
 
   // VMS Specs
   const vms = new MachinesModel();
@@ -113,7 +113,7 @@ async function deployPrefixGateway(profile: IProfile, domainName: string, backen
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:4444`];
-  gw.solutionProviderID = InternalSolutionProviderID;
+  gw.solutionProviderId = InternalSolutionProviderID;
 
   const metadate = {
     type: "gateway",

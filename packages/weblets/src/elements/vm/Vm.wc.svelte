@@ -213,9 +213,7 @@
     <h4 class="is-size-4">Deploy a Micro Virtual Machine</h4>
     <p>
       Deploy a new micro virtual machine on the Threefold Grid
-      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_vm.html">
-        Quick start documentation</a
-      >
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_vm.html"> Quick start documentation</a>
     </p>
     <hr />
 

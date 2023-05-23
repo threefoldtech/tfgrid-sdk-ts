@@ -13,19 +13,19 @@ class Balance {
   @expose
   @validateInput
   async get(options: BalanceGetModel) {
-    return await this.client.balance.get(options.address);
+    return await this.client.balances.get(options);
   }
   @expose
   @validateInput
   @checkBalance
   async transfer(options: BalanceTransferModel) {
-    return await this.client.balance.transfer(options.address, options.amount);
+    return await (await this.client.balances.transfer(options)).apply();
   }
 
   @expose
   @validateInput
   async getMyBalance() {
-    return await this.client.balance.getMyBalance();
+    return await this.client.balances.getMyBalance();
   }
 }
 

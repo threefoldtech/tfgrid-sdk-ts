@@ -58,7 +58,7 @@ async function createMachine(grid: GridClient, machine: Machine, nodePicker: Nod
   vm.flist = machine.flist;
   vm.entrypoint = machine.entryPoint;
   vm.env = createEnvs(machine.envs);
-  vm.solutionProviderID = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
+  vm.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
   vm.qsfs_disks = createQsfsDisks(machine.qsfsDisks);
   return vm;
 }
@@ -171,7 +171,7 @@ export async function addMachine(grid: GridClient, options: AddMachineOptions) {
   machine.qsfs_disks = createQsfsDisks(options.qsfsDisks);
   machine.rootfs_size = options.rootFilesystemSize || 0;
   machine.env = createEnvs(options.envs);
-  machine.solutionProviderID = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
+  machine.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
 
   await grid.machines.add_machine(machine);
   return loadVM(grid, options.deploymentName);

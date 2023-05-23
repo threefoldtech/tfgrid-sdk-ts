@@ -1,4 +1,5 @@
 import { GridClientConfig } from "../config";
+import { events } from "../helpers/events";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { TwinDeployment } from "../high_level/models";
@@ -46,7 +47,7 @@ class QSFSZdbsModule extends BaseModule {
         true,
         options.metadata || metadata,
         options.description,
-        options.solutionProviderID,
+        options.solutionProviderId,
       );
       twinDeployments.push(twinDeployment);
     }
@@ -58,8 +59,9 @@ class QSFSZdbsModule extends BaseModule {
   @checkBalance
   async deploy(options: QSFSZDBSModel) {
     if (await this.exists(options.name)) {
-      throw Error(`Another QSFS zdbs deployment with the same name ${options.name} already exists`);
+      throw Error(`Another QSFS ZDBs deployment with the same name ${options.name} already exists`);
     }
+    events.emit("logs", `Start creating the QSFS ZDBs deployment with name ${options.name}`);
     const twinDeployments = await this._createDeployment(options);
     const contracts = await this.twinDeploymentHandler.handle(twinDeployments);
     await this.save(options.name, contracts);
@@ -81,6 +83,7 @@ class QSFSZdbsModule extends BaseModule {
   @validateInput
   @checkBalance
   async delete(options: QSFSZDBDeleteModel) {
+    events.emit("logs", `Start deleting the QSFS ZDBs deployment with name ${options.name}`);
     return await this._delete(options.name);
   }
 

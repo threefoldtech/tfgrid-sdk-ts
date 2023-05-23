@@ -59,7 +59,7 @@ async function createWorker(grid: GridClient, data: K8SWorker, nodePicker: NodeP
   worker.public_ip6 = data.ipv6;
   worker.rootfs_size = data.rootFsSize;
   worker.planetary = data.planetary;
-  worker.solutionProviderID = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
+  worker.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
   return worker;
 }
 
@@ -96,7 +96,7 @@ export async function deployWorker(grid: GridClient, options: K8SWorker & { depl
   worker.planetary = options.planetary;
   worker.rootfs_size = options.rootFsSize;
   worker.node_id = worker.node_id = +randomChoice(await grid.capacity.filterNodes(filters)).nodeId;
-  worker.solutionProviderID = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
+  worker.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
 
   await grid.k8s.add_worker(worker);
   return loadK8S(grid, options.deploymentName);

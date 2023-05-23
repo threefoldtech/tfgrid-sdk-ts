@@ -12,7 +12,7 @@ import { ZdbHL } from "../high_level/zdb";
 import { DeploymentFactory } from "../primitives/deployment";
 import { Network } from "../primitives/network";
 import { Nodes } from "../primitives/nodes";
-import { BackendStorage } from "../storage/backend";
+import { BackendStorage, BackendStorageType } from "../storage/backend";
 import { Deployment } from "../zos/deployment";
 import { PublicIPResult } from "../zos/public_ip";
 import { Workload, WorkloadTypes } from "../zos/workload";
@@ -26,6 +26,7 @@ class BaseModule {
   deploymentFactory: DeploymentFactory;
   twinDeploymentHandler: TwinDeploymentHandler;
   backendStorage: BackendStorage;
+  tfClient: TFClient;
 
   constructor(public config: GridClientConfig) {
     this.projectName = config.projectName;
@@ -40,6 +41,12 @@ class BaseModule {
       config.keypairType,
       config.backendStorage,
       config.seed,
+    );
+    this.tfClient = new TFClient(
+      this.config.substrateURL,
+      this.config.mnemonic,
+      this.config.storeSecret,
+      this.config.keypairType,
     );
   }
 
@@ -61,6 +68,7 @@ class BaseModule {
     const wireguardPath = PATH.join(this.getDeploymentPath(name), `${name}.conf`);
     const oldContracts = await this.getDeploymentContracts(name);
     let StoreContracts = oldContracts;
+    let backendOperations = [];
 
     for (const contract of contracts["created"]) {
       StoreContracts.push({
@@ -69,18 +77,25 @@ class BaseModule {
       });
       const contractPath = PATH.join(this.config.storePath, "contracts", `${contract["contractId"]}.json`);
       const contractInfo = { projectName: this.projectName, moduleName: this.moduleName, deploymentName: name };
-      await this.backendStorage.dump(contractPath, contractInfo);
+      backendOperations = backendOperations.concat(await this.backendStorage.dump(contractPath, contractInfo));
     }
     for (const contract of contracts["deleted"]) {
       StoreContracts = StoreContracts.filter(c => c["contract_id"] !== contract["contractId"]);
       const contractPath = PATH.join(this.config.storePath, "contracts", `${contract["contractId"]}.json`);
-      await this.backendStorage.dump(contractPath, "");
+      backendOperations = backendOperations.concat(await this.backendStorage.dump(contractPath, ""));
     }
     if (StoreContracts.length !== 0) {
-      await this.backendStorage.dump(contractsPath, StoreContracts);
+      backendOperations = backendOperations.concat(await this.backendStorage.dump(contractsPath, StoreContracts));
     } else {
-      await this.backendStorage.dump(contractsPath, "");
-      await this.backendStorage.dump(wireguardPath, ""); // left for cleaning up the old deployment after deletion
+      backendOperations = backendOperations.concat(await this.backendStorage.dump(contractsPath, ""));
+      backendOperations = backendOperations.concat(await this.backendStorage.dump(wireguardPath, "")); // left for cleaning up the old deployment after deletion
+    }
+    if (this.config.backendStorageType === BackendStorageType.tfkvstore) {
+      backendOperations = backendOperations.filter(e => e !== undefined);
+      if (backendOperations.length > 0) {
+        await this.tfClient.connect();
+        await this.tfClient.applyAllExtrinsics(backendOperations);
+      }
     }
   }
 
@@ -212,23 +227,18 @@ class BaseModule {
     }
   }
 
-  async _get(name: string) {
+  async _get(name: string): Promise<Deployment[]> {
+    const deployments: Deployment[] = [];
     if (!(await this._list()).includes(name)) {
-      return [];
+      return deployments;
     }
-    const deployments = [];
     const contracts = await this.getDeploymentContracts(name);
     if (contracts.length === 0) {
       await this.save(name, { created: [], deleted: [] });
     }
+    await this.tfClient.connect();
     for (const contract of contracts) {
-      const tfClient = new TFClient(
-        this.config.substrateURL,
-        this.config.mnemonic,
-        this.config.storeSecret,
-        this.config.keypairType,
-      );
-      const c = await tfClient.contracts.get(contract["contract_id"]);
+      const c = await this.tfClient.contracts.get({ id: contract["contract_id"] });
       if (c === null) {
         await this.save(name, { created: [], deleted: [{ contractId: contract["contract_id"] }] });
         continue;
@@ -265,8 +275,8 @@ class BaseModule {
     twinDeployments: TwinDeployment[],
     network: Network = null,
   ) {
-    let finalTwinDeployments = [];
-    const doneDeploymentIPWorkloadNames = [];
+    let finalTwinDeployments: TwinDeployment[] = [];
+    const doneDeploymentIPWorkloadNames: string[] = [];
 
     for (let oldDeployment of oldDeployments) {
       oldDeployment = await this.deploymentFactory.fromObj(oldDeployment);
@@ -321,7 +331,7 @@ class BaseModule {
     twinDeployments: TwinDeployment[],
     network: Network = null,
   ) {
-    let finalTwinDeployments = [];
+    let finalTwinDeployments: TwinDeployment[] = [];
 
     for (let oldDeployment of oldDeployments) {
       oldDeployment = await this.deploymentFactory.fromObj(oldDeployment);
@@ -359,7 +369,7 @@ class BaseModule {
   ) {
     for (let oldDeployment of oldDeployments) {
       let pubIPOldWorkload = "";
-      const zmachineOldWorkloads = [];
+      const zmachineOldWorkloads: string[] = [];
       oldDeployment.workloads.forEach(workload => {
         if (workload.type === WorkloadTypes.ip && workload.data["v4"]) pubIPOldWorkload = workload.name;
         else if (workload.type === WorkloadTypes.zmachine) zmachineOldWorkloads.push(workload.name);
@@ -377,7 +387,7 @@ class BaseModule {
         }
 
         let pubIPTwinWorkload = "";
-        const zmachineTwinWorkloads = [];
+        const zmachineTwinWorkloads: string[] = [];
         pubIPTwinDeployment.deployment.workloads.forEach(workload => {
           if (workload.type === WorkloadTypes.ip && workload.data["v4"]) pubIPTwinWorkload = workload.name;
           else if (workload.type === WorkloadTypes.zmachine) zmachineTwinWorkloads.push(workload.name);
@@ -419,7 +429,7 @@ class BaseModule {
     twinDeployments: TwinDeployment[],
     network: Network = null,
   ) {
-    let finalTwinDeployments = [];
+    let finalTwinDeployments: TwinDeployment[] = [];
     finalTwinDeployments = twinDeployments.filter(d => d.operation === Operations.update);
     twinDeployments = this.twinDeploymentHandler.deployMerge(twinDeployments);
     const deploymentNodeIds = await this._getDeploymentNodeIds(name);
@@ -463,8 +473,8 @@ class BaseModule {
     twinDeployments: TwinDeployment[],
     network: Network = null,
   ) {
-    const finalTwinDeployments = twinDeployments.filter(d => d.operation === Operations.update);
-    const twinDeployment = twinDeployments.pop();
+    const finalTwinDeployments: TwinDeployment[] = twinDeployments.filter(d => d.operation === Operations.update);
+    const twinDeployment: TwinDeployment = twinDeployments.pop();
     const contract_id = await this._getContractIdFromNodeId(deployment_name, node_id);
     if (contract_id && twinDeployment.publicIps == 0) {
       for (let oldDeployment of oldDeployments) {
@@ -489,6 +499,10 @@ class BaseModule {
       }
     }
     finalTwinDeployments.push(twinDeployment);
+    const networkTwinDeployment = twinDeployments.pop();
+    if (networkTwinDeployment) {
+      finalTwinDeployments.push(networkTwinDeployment);
+    }
     const contracts = await this.twinDeploymentHandler.handle(finalTwinDeployments);
     await this.save(deployment_name, contracts);
     return { contracts: contracts };

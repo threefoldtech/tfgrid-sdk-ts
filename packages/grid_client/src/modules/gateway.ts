@@ -1,4 +1,5 @@
 import { GridClientConfig } from "../config";
+import { events } from "../helpers/events";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { GatewayHL } from "../high_level/gateway";
@@ -32,6 +33,7 @@ class GWModule extends BaseModule {
     if (await this.exists(options.name)) {
       throw Error(`Another gateway deployment with the same name ${options.name} already exists`);
     }
+    events.emit("logs", `Start creating the gateway deployment with name ${options.name}`);
     const metadata = JSON.stringify({
       type: "gateway",
       name: options.name,
@@ -46,7 +48,7 @@ class GWModule extends BaseModule {
       options.metadata || metadata,
       options.description,
       options.fqdn,
-      options.solutionProviderID,
+      options.solutionProviderId,
     );
     const contracts = await this.twinDeploymentHandler.handle(twinDeployments);
     await this.save(options.name, contracts);
@@ -60,6 +62,7 @@ class GWModule extends BaseModule {
     if (await this.exists(options.name)) {
       throw Error(`Another gateway deployment with the same name ${options.name} already exists`);
     }
+    events.emit("logs", `Start creating the gateway deployment with name ${options.name}`);
     const metadata = JSON.stringify({
       type: "gateway",
       name: options.name,
@@ -74,7 +77,7 @@ class GWModule extends BaseModule {
       options.metadata || metadata,
       options.description,
       "",
-      options.solutionProviderID,
+      options.solutionProviderId,
     );
     const contracts = await this.twinDeploymentHandler.handle(twinDeployments);
     await this.save(options.name, contracts);
@@ -96,6 +99,7 @@ class GWModule extends BaseModule {
   @validateInput
   @checkBalance
   async delete_fqdn(options: GatewayFQDNDeleteModel) {
+    events.emit("logs", `Start deleting the ZDB deployment with name ${options.name}`);
     return await this._delete(options.name);
   }
 
@@ -109,6 +113,7 @@ class GWModule extends BaseModule {
   @validateInput
   @checkBalance
   async delete_name(options: GatewayNameDeleteModel) {
+    events.emit("logs", `Start deleting the ZDB deployment with name ${options.name}`);
     return await this._delete(options.name);
   }
 

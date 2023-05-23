@@ -87,7 +87,7 @@ class Deployment {
     return result;
   }
   to_hex(bs): string {
-    const encoded = [];
+    const encoded: string[] = [];
     for (let i = 0; i < bs.length; i++) {
       encoded.push("0123456789abcdef"[(bs[i] >> 4) & 15]);
       encoded.push("0123456789abcdef"[bs[i] & 15]);

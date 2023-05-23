@@ -1,4 +1,5 @@
 import { GridClientConfig } from "../config";
+import { events } from "../helpers/events";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { TwinDeployment } from "../high_level/models";
@@ -19,8 +20,8 @@ class ZdbsModule extends BaseModule {
   }
 
   async _createDeployment(options: ZDBSModel): Promise<TwinDeployment[]> {
-    const twinDeployments = [];
-    const zdbs_names = [];
+    const twinDeployments: TwinDeployment[] = [];
+    const zdbs_names: string[] = [];
     const metadata = JSON.stringify({
       type: "zdb",
       name: options.name,
@@ -40,7 +41,7 @@ class ZdbsModule extends BaseModule {
         instance.publicNamespace,
         options.metadata || metadata,
         options.description,
-        instance.solutionProviderID,
+        instance.solutionProviderId,
       );
       twinDeployments.push(twinDeployment);
     }
@@ -54,6 +55,7 @@ class ZdbsModule extends BaseModule {
     if (await this.exists(options.name)) {
       throw Error(`Another zdb deployment with the same name ${options.name} already exists`);
     }
+    events.emit("logs", `Start creating the ZDB deployment with name ${options.name}`);
     const twinDeployments = await this._createDeployment(options);
     const contracts = await this.twinDeploymentHandler.handle(twinDeployments);
     await this.save(options.name, contracts);
@@ -101,6 +103,7 @@ class ZdbsModule extends BaseModule {
   @validateInput
   @checkBalance
   async delete(options: ZDBDeleteModel) {
+    events.emit("logs", `Start deleting the ZDB deployment with name ${options.name}`);
     return await this._delete(options.name);
   }
 
@@ -128,6 +131,7 @@ class ZdbsModule extends BaseModule {
       throw Error(
         `There is another zdb with the same name "${options.name}" in this deployment ${options.deployment_name}`,
       );
+    events.emit("logs", `Start adding ZDB instance: ${options.name} to deployment: ${options.deployment_name}`);
     const twinDeployment = await this.zdb.create(
       options.name,
       options.node_id,
@@ -137,7 +141,7 @@ class ZdbsModule extends BaseModule {
       options.publicNamespace,
       oldDeployments[0].metadata,
       oldDeployments[0].metadata,
-      options.solutionProviderID,
+      options.solutionProviderId,
     );
 
     return await this._add(options.deployment_name, options.node_id, oldDeployments, [twinDeployment]);
@@ -150,6 +154,7 @@ class ZdbsModule extends BaseModule {
     if (!(await this.exists(options.deployment_name))) {
       throw Error(`There is no zdb deployment with name: ${options.deployment_name}`);
     }
+    events.emit("logs", `Start deleting ZDB instance: ${options.name} from deployment: ${options.deployment_name}`);
     return await this._deleteInstance(this.zdb, options.deployment_name, options.name);
   }
 }

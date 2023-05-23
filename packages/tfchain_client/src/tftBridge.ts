@@ -1,4 +1,5 @@
 import { QueryClient } from "./client";
+import { checkConnection } from "./utils";
 class QueryTFTBridge {
   constructor(public client: QueryClient) {
     this.client = client;
@@ -13,6 +14,7 @@ class QueryTFTBridge {
    * @throws {Error} If the section or method is not defined on the chain, or if an error occurs during validation.
    * @rejects {string} If no response is received within the given time or if an error occurs during validation.
    */
+  @checkConnection
   async listenToMintCompleted(address: string, timeoutInMinutes = 2) {
     function mintCheck(eventData: unknown): boolean {
       if ((eventData as [{ [key: string]: { toPrimitive(): string } }])[0]["target"].toPrimitive() === address)

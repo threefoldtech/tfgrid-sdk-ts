@@ -1,3 +1,6 @@
+import { SubmittableExtrinsic } from "@polkadot/api-base/types";
+import { ISubmittableResult } from "@polkadot/types/types";
+
 import { TFClient } from "../clients/tf-grid/client";
 import { KeypairType } from "../zos/deployment";
 import BackendStorageInterface from "./BackendStorageInterface";
@@ -5,7 +8,7 @@ import { crop } from "./utils";
 
 const SPLIT_SIZE = 1490;
 
-class TFKVStore implements BackendStorageInterface {
+class TFKVStoreBackend implements BackendStorageInterface {
   client: TFClient;
   constructor(url: string, mnemonic: string, storeSecret: string | Uint8Array, keypairType: KeypairType) {
     this.client = new TFClient(url, mnemonic, storeSecret, keypairType);
@@ -16,15 +19,17 @@ class TFKVStore implements BackendStorageInterface {
     if (!value || value === '""') {
       return await this.remove(key);
     }
+    const extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = [];
     const splits = this.split(key, value);
     for (const k of Object.keys(splits)) {
-      await this.client.kvStore.set(k, splits[k]);
+      extrinsics.push(await this.client.kvStore.set({ key: k, value: splits[k] }));
     }
+    return extrinsics;
   }
 
   @crop
   async get(key: string) {
-    let value = await this.client.kvStore.get(key);
+    let value = await this.client.kvStore.get({ key });
     if (!value) {
       return '""';
     }
@@ -33,7 +38,7 @@ class TFKVStore implements BackendStorageInterface {
     while (val) {
       i++;
       key = `${key}.${i}`;
-      val = await this.client.kvStore.get(key);
+      val = await this.client.kvStore.get({ key });
       value = `${value}${val}`;
     }
     return value;
@@ -41,11 +46,20 @@ class TFKVStore implements BackendStorageInterface {
 
   @crop
   async remove(key: string) {
-    const value = await this.client.kvStore.get(key);
+    const value = await this.client.kvStore.get({ key });
     if (!value) {
       return;
     }
-    return await this.client.kvStore.remove(key);
+    let i = 0;
+    let val = value;
+    const extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = [];
+    while (val) {
+      extrinsics.push(await this.client.kvStore.delete({ key }));
+      i++;
+      key = `${key}.${i}`;
+      val = await this.client.kvStore.get({ key });
+    }
+    return extrinsics;
   }
 
   @crop
@@ -80,4 +94,4 @@ class TFKVStore implements BackendStorageInterface {
   }
 }
 
-export { TFKVStore };
+export { TFKVStoreBackend };

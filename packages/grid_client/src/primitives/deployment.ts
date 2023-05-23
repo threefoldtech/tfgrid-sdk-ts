@@ -36,12 +36,12 @@ class DeploymentFactory {
   async UpdateDeployment(
     oldDeployment: Deployment,
     newDeployment: Deployment,
-    network: Network = null,
-  ): Promise<Deployment> {
-    const oldWorkloadNames = [];
-    const newWorkloadNames = [];
-    const deletedWorkloads = [];
-    const newWorkloads = [];
+    network: Network | null = null,
+  ): Promise<Deployment | undefined> {
+    const oldWorkloadNames: string[] = [];
+    const newWorkloadNames: string[] = [];
+    const deletedWorkloads: Workload[] = [];
+    const newWorkloads: Workload[] = [];
     let foundUpdate = false;
     const deploymentVersion = oldDeployment.version;
     for (const workload of oldDeployment.workloads) {
@@ -82,8 +82,10 @@ class DeploymentFactory {
           const oldIp = workload.data["network"]["interfaces"][0]["ip"];
           const newIp = w.data["network"]["interfaces"][0]["ip"];
           if (newIp !== oldIp) {
-            network.deleteReservedIp(node_id, newIp);
-            w.data["network"]["interfaces"][0]["ip"] = oldIp;
+            if (network) {
+              network.deleteReservedIp(node_id, newIp);
+              w.data["network"]["interfaces"][0]["ip"] = oldIp;
+            }
           }
         }
         if (w.challenge() === workload.challenge()) {
@@ -104,7 +106,7 @@ class DeploymentFactory {
     oldDeployment.workloads = oldDeployment.workloads.filter(item => !deletedWorkloads.includes(item));
 
     if (!foundUpdate) {
-      return null;
+      return;
     }
     return oldDeployment;
   }

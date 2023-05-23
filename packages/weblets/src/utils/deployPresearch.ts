@@ -42,7 +42,7 @@ async function depoloyPresearchVM(data: Presearch, profile: IProfile) {
     PRESEARCH_BACKUP_PRI_KEY: privateRestoreKey,
     PRESEARCH_BACKUP_PUB_KEY: publicRestoreKey,
   };
-  machine.solutionProviderID = InternalSolutionProviderID;
+  machine.solutionProviderId = InternalSolutionProviderID;
 
   // Machines specs
   const machines = new MachinesModel();

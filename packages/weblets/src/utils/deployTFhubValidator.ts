@@ -76,7 +76,7 @@ function _deployTfHubValidator(profile: IProfile, tfhubValidator: TFhubValidator
     ORCHESTRATOR_FEES: orchestrator_fees,
     SSH_KEY: profile.sshKey,
   };
-  vm.solutionProviderID = InternalSolutionProviderID;
+  vm.solutionProviderId = InternalSolutionProviderID;
 
   const vms = new MachinesModel();
   vms.name = name;

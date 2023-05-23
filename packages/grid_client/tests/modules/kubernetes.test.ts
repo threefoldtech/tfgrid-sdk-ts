@@ -175,7 +175,7 @@ test.skip("TC1231 - Kubernetes: Deploy a Kubernetes Cluster (https://github.com/
   log(res);
 
   //Contracts Assertions
-  expect(res.contracts.created).toHaveLength(4);
+  expect(res.contracts.created).toHaveLength(2);
   expect(res.contracts.updated).toHaveLength(0);
   expect(res.contracts.deleted).toHaveLength(0);
 
@@ -451,7 +451,7 @@ test.skip("TC1232 - Kubernetes: Add Worker (https://github.com/threefoldtech/tf-
   log(res);
 
   //Contract Assertions
-  expect(res.contracts.created).toHaveLength(4);
+  expect(res.contracts.created).toHaveLength(2);
   expect(res.contracts.updated).toHaveLength(0);
   expect(res.contracts.deleted).toHaveLength(0);
 
@@ -691,7 +691,7 @@ test("TC1233 - Kubernetes: Delete Worker", async () => {
   log(res);
 
   //Contract Assertions
-  expect(res.contracts.created).toHaveLength(4);
+  expect(res.contracts.created).toHaveLength(2);
   expect(res.contracts.updated).toHaveLength(0);
   expect(res.contracts.deleted).toHaveLength(0);
 

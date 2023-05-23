@@ -81,7 +81,7 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
     PT_INITIAL_ROOT_PASSWORD: adminPassword,
     PEERTUBE_WEBSERVER_HOSTNAME: domain,
   };
-  vm.solutionProviderID = InternalSolutionProviderID;
+  vm.solutionProviderId = InternalSolutionProviderID;
 
   // VMS Specs
   const vms = new MachinesModel();
@@ -115,7 +115,7 @@ async function deployPrefixGateway(profile: IProfile, domainName: string, backen
   gw.node_id = publicNodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${backend}]:9000`];
-  gw.solutionProviderID = InternalSolutionProviderID;
+  gw.solutionProviderId = InternalSolutionProviderID;
 
   const metadate = {
     type: "gateway",

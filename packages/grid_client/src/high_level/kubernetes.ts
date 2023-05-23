@@ -30,7 +30,7 @@ class KubernetesHL extends HighLevelBase {
     accessNodeId = 0,
     ip = "",
     corex = false,
-    solutionProviderID: number,
+    solutionProviderId: number,
     zlogsOutput?: string,
   ) {
     events.emit("logs", `Creating a master with name: ${name} on node: ${nodeId}, network: ${network.name}`);
@@ -71,7 +71,7 @@ class KubernetesHL extends HighLevelBase {
       accessNodeId,
       ip,
       corex,
-      solutionProviderID,
+      solutionProviderId,
       zlogsOutput,
     );
   }
@@ -98,7 +98,7 @@ class KubernetesHL extends HighLevelBase {
     accessNodeId = 0,
     ip = "",
     corex = false,
-    solutionProviderID: number,
+    solutionProviderId: number,
     zlogsOutput?: string,
   ) {
     events.emit("logs", `Creating a worker with name: ${name} on node: ${nodeId}, network: ${network.name}`);
@@ -139,7 +139,7 @@ class KubernetesHL extends HighLevelBase {
       accessNodeId,
       ip,
       corex,
-      solutionProviderID,
+      solutionProviderId,
       zlogsOutput,
     );
   }

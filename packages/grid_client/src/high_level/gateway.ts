@@ -12,7 +12,7 @@ class GatewayHL extends HighLevelBase {
     metadata: string,
     description: string,
     fqdn = "",
-    solutionProviderID: number,
+    solutionProviderId: number,
   ): Promise<TwinDeployment[]> {
     const public_ips = 0;
     const gw = new GWPrimitive();
@@ -26,7 +26,7 @@ class GatewayHL extends HighLevelBase {
     const deployment = deploymentFactory.create(workloads, 1626394539, metadata, description, 0);
     const twinDeployments = [];
     twinDeployments.push(
-      new TwinDeployment(deployment, Operations.deploy, public_ips, node_id, null, solutionProviderID),
+      new TwinDeployment(deployment, Operations.deploy, public_ips, node_id, null, solutionProviderId),
     );
     return twinDeployments;
   }

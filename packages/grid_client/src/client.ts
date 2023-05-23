@@ -18,6 +18,7 @@ class GridClient {
   static rmbClients: Record<string, RMBClient> = {};
   static connecting = new Set<string>();
   rmbClient: RMBClient;
+  tfclient: TFClient;
   machines: modules.machines;
   k8s: modules.k8s;
   zdbs: modules.zdbs;
@@ -75,7 +76,7 @@ class GridClient {
     const isConnecting = GridClient.connecting.has(key);
     GridClient.connecting.add(key); // Add Client to connecting set.
 
-    const tfclient = new TFClient(
+    this.tfclient = new TFClient(
       urls.substrate,
       this.clientOptions.mnemonic,
       this.clientOptions.storeSecret,
@@ -96,8 +97,7 @@ class GridClient {
     }
 
     if (!isConnecting) {
-      await tfclient.connect();
-      this.rmbClient.api = tfclient.client.api;
+      await this.tfclient.connect();
       try {
         await this.rmbClient.connect();
       } catch (e) {
@@ -120,7 +120,7 @@ class GridClient {
     }
 
     try {
-      this.twinId = await tfclient.twins.getMyTwinId();
+      this.twinId = await this.tfclient.twins.getMyTwinId();
       if (!this.twinId) {
         throw Error(`Couldn't find a user for the provided mnemonic on ${this.clientOptions.network} network.`);
       }
@@ -216,19 +216,14 @@ class GridClient {
   }
 
   async disconnect(): Promise<void> {
-    for (const key of Object.keys(TFClient.clients)) {
-      await TFClient.clients[key].disconnect();
-    }
+    if (this.tfclient) await this.tfclient.disconnect();
     for (const key of Object.keys(GridClient.rmbClients)) {
       await GridClient.rmbClients[key].close();
     }
   }
 
   async disconnectAndExit(): Promise<void> {
-    // this should be only used by nodejs process
-    for (const key of Object.keys(TFClient.clients)) {
-      await TFClient.clients[key].disconnect();
-    }
+    if (this.tfclient) await this.tfclient.disconnect();
     for (const key of Object.keys(GridClient.rmbClients)) {
       await GridClient.rmbClients[key].close();
     }

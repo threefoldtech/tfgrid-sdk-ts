@@ -9,11 +9,12 @@ import MD5 from "crypto-js/md5";
 import { backOff } from "exponential-backoff";
 import * as PATH from "path";
 
-import { Balance, TFClient } from "../clients";
+import { TFBalances } from "../clients/tf-grid/balances";
+import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
-import { appPath, BackendStorage, StorageUpdateAction } from "../storage/backend";
+import { appPath, BackendStorage, BackendStorageType, StorageUpdateAction } from "../storage/backend";
 import { KeypairType } from "../zos";
 import blockchainInterface, { blockchainType } from "./blockchainInterface";
 import {
@@ -39,7 +40,9 @@ class TFChain implements blockchainInterface {
   storeSecret: string;
   keypairType: KeypairType;
   network: string;
-  constructor(config: GridClientConfig) {
+  tfClient: TFClient;
+
+  constructor(public config: GridClientConfig) {
     this.backendStorage = new BackendStorage(
       config.backendStorageType,
       config.substrateURL,
@@ -55,6 +58,12 @@ class TFChain implements blockchainInterface {
     this.storeSecret = config.storeSecret as string;
     this.keypairType = config.keypairType;
     this.network = config.network;
+    this.tfClient = new TFClient(
+      this.config.substrateURL,
+      this.config.mnemonic,
+      this.config.storeSecret,
+      this.config.keypairType,
+    );
   }
 
   getPath() {
@@ -71,12 +80,23 @@ class TFChain implements blockchainInterface {
     return [path, data];
   }
 
+  private async saveIfKVStoreBackend(extrinsics) {
+    if (this.config.backendStorageType === BackendStorageType.tfkvstore) {
+      extrinsics = extrinsics.filter(e => e !== undefined);
+      if (extrinsics.length > 0) {
+        await this.tfClient.connect();
+        await this.tfClient.applyAllExtrinsics(extrinsics);
+      }
+    }
+  }
+
   async save(name: string, mnemonic: string) {
     const [path, data] = await this._load();
     if (data[name]) {
       throw Error(`An account with the same name ${name} already exists`);
     }
-    await this.backendStorage.update(path, name, mnemonic);
+    const updateOperations = await this.backendStorage.update(path, name, mnemonic);
+    await this.saveIfKVStoreBackend(updateOperations);
   }
 
   @expose
@@ -84,11 +104,9 @@ class TFChain implements blockchainInterface {
   async init(options: TfchainWalletInitModel) {
     const client = new TFClient(this.substrateURL, options.secret, this.storeSecret, this.keypairType);
     await client.connect();
-    if (!client.isConnected()) {
-      throw Error(`could not connect account with given mnemonics`);
-    }
     await this.save(options.name, client.mnemonic);
-    return client.client.address;
+    await client.disconnect();
+    return client.address;
   }
 
   async getMnemonics(name: string) {
@@ -105,12 +123,14 @@ class TFChain implements blockchainInterface {
     const mnemonics = await this.getMnemonics(options.name);
     const client = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
     await client.connect();
-    return {
+    const account = {
       name: options.name,
-      public_key: client.client.address,
+      public_key: client.address,
       mnemonic: mnemonics,
       blockchain_type: blockchainType.tfchain,
     };
+    await client.disconnect();
+    return account;
   }
 
   @expose
@@ -124,11 +144,18 @@ class TFChain implements blockchainInterface {
 
     try {
       const path = this.getPath();
-      await this.backendStorage.update(path, options.name, options.secret, StorageUpdateAction.add);
-      return client.client.address;
+      const updateOperations = await this.backendStorage.update(
+        path,
+        options.name,
+        options.secret,
+        StorageUpdateAction.add,
+      );
+      await this.saveIfKVStoreBackend(updateOperations);
     } catch (e) {
       throw Error(`could not update account mnemonics: ${e}`);
     }
+    await client.disconnect();
+    return client.address;
   }
 
   @expose
@@ -146,13 +173,14 @@ class TFChain implements blockchainInterface {
     for (const name of Object.keys(data)) {
       const mnemonics = await this.getMnemonics(name);
       const client = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
+      await client.connect();
       accounts.push({
         name: name,
-        public_key: client.client.address,
+        public_key: client.address,
         blockchain_type: blockchainType.tfchain,
       });
+      await client.disconnect();
     }
-
     return accounts;
   }
 
@@ -164,11 +192,11 @@ class TFChain implements blockchainInterface {
     }
     const mnemonics = await this.getMnemonics(options.name);
     const client = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
-    const accountBalance = new Balance(client);
-    const balance = await accountBalance.get(client.client.address);
-    return {
+    await client.connect();
+    const balance = await client.balances.get({ address: client.address });
+    const assets = {
       name: options.name,
-      public_key: client.client.address,
+      public_key: client.address,
       blockchain_type: blockchainType.tfchain,
       assets: [
         {
@@ -177,6 +205,8 @@ class TFChain implements blockchainInterface {
         },
       ],
     };
+    await client.disconnect();
+    return assets;
   }
 
   @expose
@@ -184,8 +214,9 @@ class TFChain implements blockchainInterface {
   async balanceByAddress(options: TfchainWalletBalanceByAddressModel) {
     const client = new TFClient(this.substrateURL, this.mnemonic, this.storeSecret, this.keypairType);
     await client.connect();
-    const accountBalance = new Balance(client);
-    return await accountBalance.get(options.address);
+    const balance = await client.balances.get(options);
+    await client.disconnect();
+    return balance;
   }
 
   @expose
@@ -193,12 +224,13 @@ class TFChain implements blockchainInterface {
   async pay(options: TfchainWalletTransferModel) {
     const mnemonics = await this.getMnemonics(options.name);
     const sourceClient = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
-    const accountBalance = new Balance(sourceClient);
+    await sourceClient.connect();
     try {
-      await accountBalance.transfer(options.address_dest, options.amount);
+      await (await sourceClient.balances.transfer({ address: options.address_dest, amount: options.amount })).apply();
     } catch (e) {
       throw Error(`Could not complete transfer transaction: ${e}`);
     }
+    await sourceClient.disconnect();
   }
 
   @expose
@@ -208,7 +240,8 @@ class TFChain implements blockchainInterface {
       throw Error(`Couldn't find an account with name ${options.name}`);
     }
     const path = this.getPath();
-    await this.backendStorage.update(path, options.name, "", StorageUpdateAction.delete);
+    const updateOperations = await this.backendStorage.update(path, options.name, "", StorageUpdateAction.delete);
+    await this.saveIfKVStoreBackend(updateOperations);
     return "Deleted";
   }
 
@@ -235,18 +268,24 @@ class TFChain implements blockchainInterface {
     const client = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
     await client.connect();
     await axios.post(this.activationURL, {
-      substrateAccountID: client.client.address,
+      substrateAccountID: client.address,
     });
-    await backOff(() => client.terms.acceptTermsAndConditions("https://library.threefold.me/info/legal/#/"), {
-      delayFirstAttempt: true,
-      startingDelay: 1000,
-      maxDelay: 5000,
-      timeMultiple: 1.25,
-    });
-    const ret = await client.twins.create(relay);
-
+    await backOff(
+      () =>
+        client.termsAndConditions.accept({ documentLink: "https://library.threefold.me/info/legal/#/" }).then(res => {
+          return res.apply();
+        }),
+      {
+        delayFirstAttempt: true,
+        startingDelay: 5000,
+        maxDelay: 5000,
+        timeMultiple: 1.25,
+      },
+    );
+    const ret = await (await client.twins.create({ relay })).apply();
+    await client.disconnect();
     return {
-      public_key: client.client.address,
+      public_key: client.address,
       mnemonic: mnemonics,
       twinId: ret.id,
     };

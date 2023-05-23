@@ -1,16 +1,10 @@
 import * as secp from "@noble/secp256k1";
-import { ApiPromise, WsProvider } from "@polkadot/api";
+import { ApiPromise } from "@polkadot/api";
 import { Keyring } from "@polkadot/api";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import * as bip39 from "bip39";
 import { Buffer } from "buffer";
 import * as cryptoJs from "crypto-js";
-
-export async function createGridCL(chainUrl: string) {
-  const provider = new WsProvider(chainUrl);
-  const cl = await ApiPromise.create({ provider });
-  return cl;
-}
 
 function isValidSeed(seed: string) {
   const hexRegex = /^[0-9a-fA-F]+$/;
@@ -39,30 +33,6 @@ export function generatePublicKey(secret: string) {
   }
 
   return getPublicKey(privKey);
-}
-
-export async function setPublicKey(
-  mnemonic: string,
-  pk: string,
-  api: ApiPromise,
-  relay: string,
-  scheme: KeypairType,
-  callback: any,
-) {
-  relay = relay.replace("wss://", "").replace("/", "");
-  const keyring = new Keyring({ type: scheme });
-  const key = keyring.addFromUri(mnemonic);
-  const nonce = await api.rpc.system.accountNextIndex(key.address);
-  return api.tx.tfgridModule.updateTwin(relay, pk).signAndSend(key, { nonce }, callback);
-}
-
-export async function getTwinFromTwinID(api: ApiPromise, twinId: number) {
-  return (await api.query.tfgridModule.twins(twinId)).toJSON();
-}
-
-export async function getTwinFromTwinAddress(api: ApiPromise, address: string) {
-  const twinId = await api.query.tfgridModule.twinIdByAccountID(address);
-  return (await api.query.tfgridModule.twins(Number(twinId))).toJSON();
 }
 
 export function hexStringToArrayBuffer(hexString) {
@@ -99,32 +69,4 @@ export function wordArrayToUint8Array(data: cryptoJs.lib.WordArray) {
     dataArray[i] = (data.words[i >>> 0x2] >>> (0x18 - (i % 0x4) * 0x8)) & 0xff;
   }
   return new Uint8Array(dataArray);
-}
-
-export async function applyExtrinsic(func: any, args: any[]) {
-  return new Promise(async (resolve, reject) => {
-    function callback(res) {
-      if (res instanceof Error) {
-        console.error(res);
-        reject(res);
-      }
-      const { events = [], status } = res;
-      if (status.isFinalized) {
-        events.forEach(({ phase, event: { data, method, section } }) => {
-          console.log(`phase: ${phase}, section: ${section}, method: ${method}`);
-          if (section === "system" && method === "ExtrinsicFailed") {
-            reject(`Failed to apply ${func.name} in module 'system' with ${args.slice(0, -1)}`);
-          } else if (section === "system" && method === "ExtrinsicSuccess") {
-            resolve(data.toJSON()[0]);
-          }
-        });
-      }
-    }
-    try {
-      args.push(callback);
-      await func.apply(null, args);
-    } catch (e) {
-      reject(e);
-    }
-  });
 }

@@ -10,7 +10,8 @@ export interface PublicIp {
 export interface PatchExtrinsicOptions<T> {
   map?: (value: unknown) => T;
   resultSections?: string[];
+  resultEvents?: string[];
 }
 export type Extrinsic = SubmittableExtrinsic<"promise", ISubmittableResult>;
-export type ExtrinsicResult<T> = Extrinsic & { apply(): Promise<T> };
+export type ExtrinsicResult<T> = Extrinsic & { apply(): Promise<T>; resultEvents: string[]; resultSections: string[] };
 export type validatorFunctionType = (eventData: unknown) => boolean;

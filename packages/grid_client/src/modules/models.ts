@@ -1,4 +1,4 @@
-import { ISubmittableResult } from "@polkadot/types/types";
+import { ExtrinsicResult } from "@threefold/tfchain_client";
 import { default as AlgoSdk } from "algosdk";
 import { Expose, Transform, Type } from "class-transformer";
 import {
@@ -98,7 +98,7 @@ class MachineModel {
   @Expose() env: Record<string, unknown>;
   @Expose() @IsOptional() @IsIP() ip?: string;
   @Expose() @IsOptional() @IsBoolean() corex?: boolean;
-  @Expose() @IsInt() @IsOptional() solutionProviderID?: number;
+  @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
   @Expose() @IsString() @IsOptional() zlogsOutput?: string;
 }
 
@@ -136,7 +136,7 @@ class KubernetesNodeModel {
   @Expose() @IsBoolean() planetary: boolean;
   @Expose() @IsOptional() @IsIP() ip?: string;
   @Expose() @IsOptional() @IsBoolean() corex?: boolean;
-  @Expose() @IsInt() @IsOptional() solutionProviderID?: number;
+  @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
   @Expose() @IsString() @IsOptional() zlogsOutput?: string;
 }
 
@@ -171,7 +171,7 @@ class ZDBModel {
   @Expose() @Min(0.25) disk_size: number; // in GB
   @Expose() @IsBoolean() publicNamespace: boolean;
   @Expose() @IsString() @IsNotEmpty() password: string;
-  @Expose() @IsInt() @IsOptional() solutionProviderID?: number;
+  @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
 }
 
 class ZDBSModel {
@@ -199,7 +199,7 @@ class QSFSZDBSModel {
   @Expose() @IsString() @IsNotEmpty() password: string;
   @Expose() @IsString() @IsOptional() metadata?: string;
   @Expose() @IsString() @IsOptional() description?: string;
-  @Expose() @IsInt() @IsOptional() solutionProviderID?: number;
+  @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
 }
 
 class QSFSZDBGetModel extends BaseGetDeleteModel {}
@@ -215,7 +215,7 @@ class GatewayFQDNModel {
   @Expose() @IsString() @IsOptional() metadata?: string;
   @Expose() @IsString() @IsOptional() description?: string;
   @Expose() @ArrayNotEmpty() @IsUrl({ protocols: ["http", "https"] }, { each: true }) backends: string[];
-  @Expose() @IsInt() @IsOptional() solutionProviderID?: number;
+  @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
 }
 
 class GatewayFQDNGetModel extends BaseGetDeleteModel {}
@@ -233,7 +233,7 @@ class GatewayNameModel extends BaseGatewayNameModel {
   @Expose() @IsString() @IsOptional() metadata?: string;
   @Expose() @IsString() @IsOptional() description?: string;
   @Expose() @ArrayNotEmpty() @IsUrl({ protocols: ["http", "https"] }, { each: true }) backends: string[];
-  @Expose() @IsInt() @IsOptional() solutionProviderID?: number;
+  @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
 }
 
 class GatewayNameGetModel extends BaseGatewayNameModel {}
@@ -253,7 +253,7 @@ class NodeContractCreateModel {
   @Expose() @IsString() @IsNotEmpty() hash: string;
   @Expose() @IsString() @IsDefined() data: string;
   @Expose() @IsInt() @Min(0) public_ip: number;
-  @Expose() @IsInt() @IsOptional() solutionProviderID?: number;
+  @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
 }
 
 class NameContractCreateModel {
@@ -261,7 +261,7 @@ class NameContractCreateModel {
 }
 class RentContractCreateModel {
   @Expose() @IsInt() @IsNotEmpty() nodeId: number;
-  @Expose() @IsInt() @IsOptional() solutionProviderID?: number;
+  @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
 }
 class RentContractGetModel {
   @Expose() @IsInt() @IsNotEmpty() nodeId: number;
@@ -285,31 +285,31 @@ class CreateServiceContractModel {
 }
 
 class ServiceContractApproveModel {
-  @Expose() @IsInt() @Min(1) serviceContractId: number;
+  @Expose() @IsInt() @Min(1) serviceId: number;
   @Expose() @IsBoolean() approve: boolean;
 }
 
 class ServiceContractBillModel {
-  @Expose() @IsInt() @Min(1) serviceContractId: number;
+  @Expose() @IsInt() @Min(1) serviceId: number;
   @Expose() @IsInt() @Min(1) variableAmount: number;
   @Expose() @IsString() @IsNotEmpty() metadata: string;
 }
 
 class ServiceContractCancelModel {
-  @Expose() @IsInt() @Min(1) serviceContractId: number;
+  @Expose() @IsInt() @Min(1) serviceId: number;
 }
 class SetServiceContractFeesModel {
-  @Expose() @IsInt() @Min(1) serviceContractId: number;
+  @Expose() @IsInt() @Min(1) serviceId: number;
   @Expose() @IsInt() @Min(1) baseFee: number;
   @Expose() @IsInt() @Min(1) variableFee: number;
 }
 class SetServiceContractMetadataModel {
-  @Expose() @IsInt() @Min(1) serviceContractId: number;
+  @Expose() @IsInt() @Min(1) serviceId: number;
   @Expose() @IsString() @IsNotEmpty() metadata: string;
 }
 
 class GetServiceContractModel {
-  @Expose() @IsInt() @Min(1) serviceContractId: number;
+  @Expose() @IsInt() @Min(1) serviceId: number;
 }
 class NameContractGetModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
@@ -573,8 +573,8 @@ class SUModel {
   @Expose() @IsNumber() @IsNotEmpty() @Min(0) sru: number; // GB
 }
 
-class BatchModel {
-  @ArrayNotEmpty() @ValidateNested({ each: true }) extrinsics: ISubmittableResult[];
+class BatchModel<T> {
+  @ArrayNotEmpty() @ValidateNested({ each: true }) extrinsics: ExtrinsicResult<T>[];
 }
 
 class ZOSNodeModel {
@@ -587,7 +587,7 @@ class NodePowerModel {
 }
 
 class FarmIdModel {
-  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) id: number;
 }
 
 class pingFarmModel {

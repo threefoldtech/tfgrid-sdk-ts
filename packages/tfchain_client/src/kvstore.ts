@@ -1,12 +1,13 @@
 import { Client } from "./client";
-import type { Extrinsic } from "./types";
+import type { Extrinsic, ExtrinsicResult } from "./types";
+import { checkConnection } from "./utils";
 
-interface KVStoreSetOptions {
+export interface KVStoreSetOptions {
   key: string;
   value: string;
 }
 
-interface KVStoreGetOptions {
+export interface KVStoreGetOptions {
   key: string;
 }
 
@@ -15,45 +16,43 @@ class KVStore {
     this.client = client;
   }
 
+  @checkConnection
   async set(options: KVStoreSetOptions) {
-    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfkvStore.set, [
-      options.key,
-      options.value,
-    ]);
+    const extrinsic = await this.client.api.tx.tfkvStore.set(options.key, options.value);
     return this.client.patchExtrinsic<void>(extrinsic);
   }
 
+  @checkConnection
   async delete(options: KVStoreGetOptions) {
-    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.tfkvStore.delete, [options.key]);
+    const extrinsic = await this.client.api.tx.tfkvStore.delete(options.key);
     return this.client.patchExtrinsic<void>(extrinsic);
   }
 
+  @checkConnection
   async get(options: KVStoreGetOptions): Promise<string> {
-    const res = await this.client.checkConnectionAndApply(this.client.api.query.tfkvStore.tfkvStore, [
-      this.client.address,
-      options.key,
-    ]);
-    return res.toPrimitive();
+    const res = await this.client.api.query.tfkvStore.tfkvStore(this.client.address, options.key);
+    return res.toPrimitive() as string;
   }
 
+  @checkConnection
   async list(): Promise<string[]> {
-    const res = await this.client.checkConnectionAndApply(this.client.api.query.tfkvStore.tfkvStore.entries, [
-      this.client.address,
-    ]);
+    const res = await this.client.api.query.tfkvStore.tfkvStore.entries(this.client.address);
     const keys: string[] = [];
     for (const key of res) {
-      keys.push(key[0].toHuman()[1]);
+      const k = key[0].toHuman();
+      if (k) keys.push(k[1]);
     }
     return keys;
   }
 
-  async deleteAll() {
-    const keys = await this.list();
-    const extrinsics: Extrinsic[] = [];
+  async deleteAll(): Promise<string[]> {
+    const keys: string[] = await this.list();
+    const extrinsics: ExtrinsicResult<void>[] = [];
     for (const key of keys) {
       extrinsics.push(await this.delete({ key }));
     }
-    return this.client.applyAllExtrinsics<number[]>(extrinsics);
+    await this.client.applyAllExtrinsics<void>(extrinsics);
+    return keys;
   }
 }
 

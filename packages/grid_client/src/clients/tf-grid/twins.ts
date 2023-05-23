@@ -1,46 +1,20 @@
 import { generatePublicKey } from "@threefold/rmb_direct_client";
+import { Twins } from "@threefold/tfchain_client";
 
-import { TFClient } from "./client";
+interface TwinOptions {
+  relay: string;
+}
 
-class Twins {
-  tfclient: TFClient;
-
-  constructor(client: TFClient) {
-    this.tfclient = client;
+class TFTwins extends Twins {
+  async create(options: TwinOptions) {
+    const pk = generatePublicKey(this.client.mnemonicOrSecret);
+    return super.create({ pk, relay: options.relay });
   }
 
-  async create(relay: string) {
-    const pk = generatePublicKey(this.tfclient.mnemonic);
-    return this.tfclient.applyExtrinsic(this.tfclient.client.createTwin, [relay, pk], "tfgridModule", ["TwinStored"]);
-  }
-
-  async update(relay: string) {
-    const pk = generatePublicKey(this.tfclient.mnemonic);
-
-    return this.tfclient.applyExtrinsic(this.tfclient.client.updateTwin, [relay, pk], "tfgridModule", ["TwinUpdated"]);
-  }
-
-  async get(id: number) {
-    return await this.tfclient.queryChain(this.tfclient.client.getTwinByID, [id]);
-  }
-
-  async getMyTwinId(): Promise<number> {
-    await this.tfclient.connect();
-    const pubKey = this.tfclient.client.address;
-    return this.getTwinIdByAccountId(pubKey);
-  }
-
-  async getTwinIdByAccountId(publicKey: string): Promise<number> {
-    return await this.tfclient.queryChain(this.tfclient.client.getTwinIdByAccountId, [publicKey]);
-  }
-
-  async list() {
-    return await this.tfclient.queryChain(this.tfclient.client.listTwins, []);
-  }
-
-  async delete(id: number) {
-    return this.tfclient.applyExtrinsic(this.tfclient.client.deleteTwin, [id], "tfgridModule", ["TwinDeleted"]);
+  async update(options: TwinOptions) {
+    const pk = generatePublicKey(this.client.mnemonicOrSecret);
+    return super.update({ pk, relay: options.relay });
   }
 }
 
-export { Twins };
+export { TFTwins };

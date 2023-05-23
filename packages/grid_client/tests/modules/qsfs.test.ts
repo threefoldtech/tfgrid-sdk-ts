@@ -202,7 +202,7 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
           SSH_KEY: config.ssh_key,
           TEST_KEY: envVarValue,
         },
-        solutionProviderID: null,
+        solutionProviderId: null,
       },
     ],
     metadata: metadata,

@@ -101,7 +101,7 @@ test("TC1228 - VM: Deploy a VM", async () => {
           SSH_KEY: config.ssh_key,
           Test_KEY: envVarValue,
         },
-        solutionProviderID: null,
+        solutionProviderId: null,
       },
     ],
     metadata: metadata,
@@ -112,7 +112,7 @@ test("TC1228 - VM: Deploy a VM", async () => {
   log(res);
 
   //Contracts Assertions
-  expect(res.contracts.created).toHaveLength(2);
+  expect(res.contracts.created).toHaveLength(1);
   expect(res.contracts.updated).toHaveLength(0);
   expect(res.contracts.deleted).toHaveLength(0);
 
@@ -274,7 +274,7 @@ test("TC1229 - VM: Deploy a VM With a Disk", async () => {
           SSH_KEY: config.ssh_key,
           Test_KEY: envVarValue,
         },
-        solutionProviderID: null,
+        solutionProviderId: null,
       },
     ],
     metadata: metadata,
@@ -285,7 +285,7 @@ test("TC1229 - VM: Deploy a VM With a Disk", async () => {
   log(res);
 
   //Contracts Assertions
-  expect(res.contracts.created).toHaveLength(2);
+  expect(res.contracts.created).toHaveLength(1);
   expect(res.contracts.updated).toHaveLength(0);
   expect(res.contracts.deleted).toHaveLength(0);
 
@@ -477,7 +477,7 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
   log(res);
 
   //Contracts Assertions
-  expect(res.contracts.created).toHaveLength(4);
+  expect(res.contracts.created).toHaveLength(2);
   expect(res.contracts.updated).toHaveLength(0);
   expect(res.contracts.deleted).toHaveLength(0);
 

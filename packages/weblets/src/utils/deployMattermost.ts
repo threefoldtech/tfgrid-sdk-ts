@@ -55,7 +55,7 @@ function _deployMatterMost(profile: IProfile, mattermost: Mattermost) {
     SSH_KEY: profile.sshKey,
     MATTERMOST_DOMAIN: domain,
   };
-  vm.solutionProviderID = InternalSolutionProviderID;
+  vm.solutionProviderId = InternalSolutionProviderID;
 
   const vms = new MachinesModel();
   vms.name = name;
@@ -87,7 +87,7 @@ function _deployGateway(profile: IProfile, name: string, ip: string, nodeId: num
   gw.node_id = nodeId;
   gw.tls_passthrough = false;
   gw.backends = [`http://[${ip}]:8000`];
-  gw.solutionProviderID = InternalSolutionProviderID;
+  gw.solutionProviderId = InternalSolutionProviderID;
 
   const metadate = {
     type: "gateway",

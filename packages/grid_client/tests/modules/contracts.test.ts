@@ -226,7 +226,7 @@ test("TC1273 - Contracts: Update Node Contract", async () => {
   expect(newRes.contractType.nodeContract.deploymentData).toBeDefined();
 });
 
-afterEach(async () => {
+afterAll(async () => {
   await gridClient.contracts
     .cancelMyContracts()
     .then(cancellation_res => {

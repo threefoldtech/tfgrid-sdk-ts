@@ -1,5 +1,6 @@
 import { Client, QueryClient } from "./client";
 import { PublicIp } from "./types";
+import { checkConnection } from "./utils";
 
 const TWO_WEEKS = 1209600000;
 
@@ -81,37 +82,31 @@ class QueryContracts {
     this.client = client;
   }
 
+  @checkConnection
   async get(options: QueryContractsGetOptions): Promise<Contract> {
-    const res = await this.client.checkConnectionAndApply(this.client.api.query.smartContractModule.contracts, [
-      options.id,
-    ]);
-    return res.toPrimitive();
+    const res = await this.client.api.query.smartContractModule.contracts(options.id);
+    return res.toPrimitive() as unknown as Contract;
   }
 
+  @checkConnection
   async getContractIdByActiveRentForNode(options: QueryContractsGetContractByActiveRentOptions): Promise<number> {
-    const res = await this.client.checkConnectionAndApply(
-      this.client.api.query.smartContractModule.activeRentContractForNode,
-      [options.nodeId],
-    );
-    return res.toPrimitive();
+    const res = await this.client.api.query.smartContractModule.activeRentContractForNode(options.nodeId);
+    return res.toPrimitive() as number;
   }
 
+  @checkConnection
   async getContractIdByName(options: QueryContractGetContractByNameOptions): Promise<number> {
-    const res = await this.client.checkConnectionAndApply(
-      this.client.api.query.smartContractModule.contractIDByNameRegistration,
-      [options.name],
-    );
-    return res.toPrimitive();
+    const res = await this.client.api.query.smartContractModule.contractIDByNameRegistration(options.name);
+    return res.toPrimitive() as number;
   }
 
+  @checkConnection
   async getContractIdByNodeIdAndHash(options: QueryContractGetContractByIdAndHashOptions): Promise<number> {
-    const res = await this.client.checkConnectionAndApply(
-      this.client.api.query.smartContractModule.contractIDByNodeIDAndHash,
-      [options.nodeId, options.hash],
-    );
-    return res.toPrimitive();
+    const res = await this.client.api.query.smartContractModule.contractIDByNodeIDAndHash(options.nodeId, options.hash);
+    return res.toPrimitive() as number;
   }
 
+  @checkConnection
   async getDeletionTime(options: QueryContractsGetOptions): Promise<number> {
     const contract = await this.get(options);
     if (!contract || contract.state.created === null) return 0;
@@ -119,7 +114,7 @@ class QueryContracts {
     const blockNumber = contract.state.gracePeriod;
 
     try {
-      const currentBlockNumber = +(await this.client.checkConnectionAndApply(this.client.api.query.system.number, []));
+      const currentBlockNumber = +(await this.client.api.query.system.number());
 
       // each block takes 6 seconds
       const gracePeriodStartTime = new Date().getTime() - (currentBlockNumber - blockNumber) * 6000;
@@ -130,19 +125,18 @@ class QueryContracts {
     }
   }
 
+  @checkConnection
   async getService(options: QueryContractGetServiceOptions): Promise<ServiceContract> {
-    const res = await this.client.checkConnectionAndApply(this.client.api.query.smartContractModule.serviceContracts, [
-      options.serviceId,
-    ]);
-    return res.toPrimitive();
+    const res = await this.client.api.query.smartContractModule.serviceContracts(options.serviceId);
+    return res.toPrimitive() as unknown as ServiceContract;
   }
 }
 
 export interface CreateNodeOptions {
-  nodeID: number;
+  nodeId: number;
   hash: string;
   data: string;
-  numberOfPublicIPs: number;
+  numberOfPublicIps: number;
   solutionProviderId: number;
 }
 
@@ -202,103 +196,108 @@ class Contracts extends QueryContracts {
     this.client = client;
   }
 
+  @checkConnection
   async createNode(options: CreateNodeOptions) {
-    const extrinsic = await this.client.checkConnectionAndApply(
-      this.client.api.tx.smartContractModule.createNodeContract,
-      [options.nodeID, options.hash, options.data, options.numberOfPublicIPs, options.solutionProviderId],
+    const extrinsic = await this.client.api.tx.smartContractModule.createNodeContract(
+      options.nodeId,
+      options.hash,
+      options.data,
+      options.numberOfPublicIps,
+      options.solutionProviderId,
     );
     return this.client.patchExtrinsic<Contract>(extrinsic);
   }
 
+  @checkConnection
   async updateNode(options: UpdateNodeOptions) {
-    const extrinsic = await this.client.checkConnectionAndApply(
-      this.client.api.tx.smartContractModule.updateNodeContract,
-      [options.id, options.hash, options.data],
+    const extrinsic = await this.client.api.tx.smartContractModule.updateNodeContract(
+      options.id,
+      options.hash,
+      options.data,
     );
     return this.client.patchExtrinsic<Contract>(extrinsic);
   }
 
+  @checkConnection
   async createName(options: CreateNameOptions) {
-    const extrinsic = await this.client.checkConnectionAndApply(
-      this.client.api.tx.smartContractModule.createNameContract,
-      [options.name],
-    );
+    const extrinsic = await this.client.api.tx.smartContractModule.createNameContract(options.name);
     return this.client.patchExtrinsic<Contract>(extrinsic);
   }
 
+  @checkConnection
   async createRent(options: CreateRentOptions) {
-    const extrinsic = await this.client.checkConnectionAndApply(
-      this.client.api.tx.smartContractModule.createRentContract,
-      [options.nodeId, options.solutionProviderId],
+    const extrinsic = await this.client.api.tx.smartContractModule.createRentContract(
+      options.nodeId,
+      options.solutionProviderId,
     );
     return this.client.patchExtrinsic<Contract>(extrinsic);
   }
 
+  @checkConnection
   async cancel(options: CancelOptions) {
     const contract = await this.get(options);
     if (!contract) {
       return;
     }
-    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.smartContractModule.cancelContract, [
-      options.id,
-    ]);
-    return this.client.patchExtrinsic(extrinsic, { map: () => options.id });
+    const extrinsic = await this.client.api.tx.smartContractModule.cancelContract(options.id);
+    return this.client.patchExtrinsic(extrinsic, {
+      map: () => options.id,
+      resultEvents: ["NodeContractCanceled", "NameContractCanceled", "RentContractCanceled", "ContractCanceled"],
+    });
   }
 
+  @checkConnection
   async createService(options: CreateServiceOptions) {
-    const extrinsic = await this.client.checkConnectionAndApply(
-      this.client.api.tx.smartContractModule.serviceContractCreate,
-      [options.serviceAccount, options.consumerAccount],
+    const extrinsic = await this.client.api.tx.smartContractModule.serviceContractCreate(
+      options.serviceAccount,
+      options.consumerAccount,
     );
     return this.client.patchExtrinsic<ServiceContract>(extrinsic);
   }
 
+  @checkConnection
   async approveService(options: ApproveServiceOptions) {
     let extrinsic: any;
     if (options.approve) {
-      extrinsic = await this.client.checkConnectionAndApply(
-        this.client.api.tx.smartContractModule.serviceContractApprove,
-        [options.serviceId],
-      );
+      extrinsic = await this.client.api.tx.smartContractModule.serviceContractApprove(options.serviceId);
     } else {
-      extrinsic = await this.client.checkConnectionAndApply(
-        this.client.api.tx.smartContractModule.serviceContractReject,
-        [options.serviceId],
-      );
+      extrinsic = await this.client.api.tx.smartContractModule.serviceContractReject(options.serviceId);
     }
     return this.client.patchExtrinsic<ServiceContract>(extrinsic);
   }
 
+  @checkConnection
   async billService(options: BillServiceOptions) {
-    const extrinsic = await this.client.checkConnectionAndApply(
-      this.client.api.tx.smartContractModule.serviceContractBill,
-      [options.serviceId, options.variableAmount, options.metadata],
+    const extrinsic = await this.client.api.tx.smartContractModule.serviceContractBill(
+      options.serviceId,
+      options.variableAmount,
+      options.metadata,
     );
     return this.client.patchExtrinsic<ServiceContract>(extrinsic);
   }
 
+  @checkConnection
   async cancelService(options: CancelServiceOptions) {
-    const extrinsic = await this.client.checkConnectionAndApply(
-      this.client.api.tx.smartContractModule.serviceContractCancel,
-      [options.serviceId],
-    );
+    const extrinsic = await this.client.api.tx.smartContractModule.serviceContractCancel(options.serviceId);
     return this.client.patchExtrinsic(extrinsic, { map: () => options.serviceId });
   }
 
+  @checkConnection
   async setServiceFees(options: SetServiceFeesOptions) {
-    const extrinsic = await this.client.checkConnectionAndApply(
-      this.client.api.tx.smartContractModule.serviceContractSetFees,
-      [options.serviceId, options.baseFee, options.variableFee],
+    const extrinsic = await this.client.api.tx.smartContractModule.serviceContractSetFees(
+      options.serviceId,
+      options.baseFee,
+      options.variableFee,
     );
     return this.client.patchExtrinsic<ServiceContract>(extrinsic);
   }
 
+  @checkConnection
   async setServiceMetadata(options: SetServiceMetadataOptions) {
-    const extrinsic = await this.client.checkConnectionAndApply(
-      this.client.api.tx.smartContractModule.serviceContractSetMetadata,
-      [options.serviceId, options.metadata],
+    const extrinsic = await this.client.api.tx.smartContractModule.serviceContractSetMetadata(
+      options.serviceId,
+      options.metadata,
     );
-
     return this.client.patchExtrinsic<ServiceContract>(extrinsic);
   }
 }

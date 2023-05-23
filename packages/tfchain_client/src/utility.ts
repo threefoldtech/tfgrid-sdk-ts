@@ -1,7 +1,6 @@
-import { SubmittableExtrinsic } from "@polkadot/api-base/types";
-import { ISubmittableResult } from "@polkadot/types/types";
-
 import { Client } from "./client";
+import { ExtrinsicResult } from "./types";
+import { checkConnection } from "./utils";
 
 class Utility {
   client: Client;
@@ -10,30 +9,38 @@ class Utility {
     this.client = client;
   }
 
-  async batch<T>(extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[]): Promise<T> {
+  @checkConnection
+  async batch<T>(extrinsics: ExtrinsicResult<T>[]): Promise<T[]> {
     if (extrinsics.length > 0) {
-      const resultSections = this.extractResultSections(extrinsics);
-      const batchExtrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.utility.batch, [extrinsics]);
-      return this.client.applyExtrinsic<T>(batchExtrinsic, resultSections);
+      const { resultSections, resultEvents } = this.extractResultSectionsAndEvents(extrinsics);
+      const batchExtrinsic = await this.client.api.tx.utility.batch(extrinsics);
+      return this.client.applyExtrinsic<T[]>(batchExtrinsic, resultSections, resultEvents);
     }
+    return [];
   }
 
-  async batchAll<T>(extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[]): Promise<T> {
+  @checkConnection
+  async batchAll<T>(extrinsics: ExtrinsicResult<T>[]): Promise<T[]> {
     if (extrinsics.length > 0) {
-      const resultSections = this.extractResultSections(extrinsics);
-      const batchAllExtrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.utility.batchAll, [
-        extrinsics,
-      ]);
-      return this.client.applyExtrinsic<T>(batchAllExtrinsic, resultSections);
+      const { resultSections, resultEvents } = this.extractResultSectionsAndEvents(extrinsics);
+      const batchAllExtrinsic = await this.client.api.tx.utility.batchAll(extrinsics);
+      return this.client.applyExtrinsic<T[]>(batchAllExtrinsic, resultSections, resultEvents);
     }
+    return [];
   }
 
-  private extractResultSections(extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[]) {
-    const resultSections: string[] = [];
+  private extractResultSectionsAndEvents<T>(extrinsics: ExtrinsicResult<T>[]) {
+    let resultEvents: string[] = [];
+    let resultSections: string[] = [];
     for (const extrinsic of extrinsics) {
+      if (extrinsic.resultSections && extrinsic.resultSections.length > 0)
+        resultSections = resultSections.concat(extrinsic.resultSections);
       resultSections.push(extrinsic.method.section);
+      if (extrinsic.resultEvents && extrinsic.resultEvents.length > 0)
+        resultEvents = resultEvents.concat(extrinsic.resultEvents);
     }
-    return resultSections;
+
+    return { resultSections, resultEvents };
   }
 }
 

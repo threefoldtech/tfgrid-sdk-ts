@@ -25,7 +25,7 @@ export default async function deployVM(data: VM, profile: IProfile, type: IStore
   vm.flist = flist;
   vm.entrypoint = entrypoint;
   vm.env = type == "VM" ? createEnvs(envs) : { SSH_KEY: profile.sshKey };
-  vm.solutionProviderID = InternalSolutionProviderID;
+  vm.solutionProviderId = InternalSolutionProviderID;
 
   /*QSFS*/
   if (qsfsDisk) {

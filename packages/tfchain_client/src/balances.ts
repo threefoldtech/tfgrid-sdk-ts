@@ -1,4 +1,5 @@
 import { Client, QueryClient } from "./client";
+import { checkConnection } from "./utils";
 
 interface Balance {
   free: number;
@@ -7,7 +8,7 @@ interface Balance {
   feeFrozen: number;
 }
 
-interface QueryBalancesGetOptions {
+export interface QueryBalancesGetOptions {
   address: string;
 }
 
@@ -16,13 +17,14 @@ class QueryBalances {
     this.client = client;
   }
 
+  @checkConnection
   async get(options: QueryBalancesGetOptions): Promise<Balance> {
-    const { data } = await this.client.checkConnectionAndApply(this.client.api.query.system.account, [options.address]);
+    const res = await this.client.api.query.system.account(options.address);
     const balance: Balance = {
-      free: data.free.toJSON(),
-      reserved: data.reserved.toJSON(),
-      miscFrozen: data.miscFrozen.toJSON(),
-      feeFrozen: data.feeFrozen.toJSON(),
+      free: res["data"].free.toJSON(),
+      reserved: res["data"].reserved.toJSON(),
+      miscFrozen: res["data"].miscFrozen.toJSON(),
+      feeFrozen: res["data"].feeFrozen.toJSON(),
     };
     return balance;
   }
@@ -39,19 +41,17 @@ class Balances extends QueryBalances {
     this.client = client;
   }
 
+  @checkConnection
   async transfer(options: BalanceTransferOptions) {
     if (isNaN(options.amount) || options.amount <= 0) {
       throw Error("Amount must be a positive numeric value");
     }
 
-    const extrinsic = await this.client.checkConnectionAndApply(this.client.api.tx.balances.transfer, [
-      options.address,
-      options.amount,
-    ]);
-
+    const extrinsic = await this.client.api.tx.balances.transfer(options.address, options.amount);
     return this.client.patchExtrinsic(extrinsic, { map: () => options.amount });
   }
 
+  @checkConnection
   async getMyBalance(): Promise<Balance> {
     return this.get({ address: this.client.address });
   }

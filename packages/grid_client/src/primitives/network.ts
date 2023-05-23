@@ -10,7 +10,7 @@ import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
 import { getRandomNumber, randomChoice } from "../helpers/utils";
-import { BackendStorage } from "../storage/backend";
+import { BackendStorage, BackendStorageType } from "../storage/backend";
 import { Deployment } from "../zos/deployment";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { Peer, Znet } from "../zos/znet";
@@ -45,6 +45,7 @@ class Network {
   _accessNodes: number[] = [];
   rmb: RMB;
   wireguardConfig: string;
+  tfClient: TFClient;
 
   constructor(public name: string, public ipRange: string, public config: GridClientConfig) {
     if (Addr(ipRange).prefix !== 16) {
@@ -64,6 +65,22 @@ class Network {
     );
     this.rmb = new RMB(config.rmbClient);
     this.capacity = new Nodes(this.config.graphqlURL, this.config.proxyURL, this.config.rmbClient);
+    this.tfClient = new TFClient(
+      this.config.substrateURL,
+      this.config.mnemonic,
+      this.config.storeSecret,
+      this.config.keypairType,
+    );
+  }
+
+  private async saveIfKVStoreBackend(extrinsics) {
+    if (this.config.backendStorageType === BackendStorageType.tfkvstore) {
+      extrinsics = extrinsics.filter(e => e !== undefined);
+      if (extrinsics.length > 0) {
+        await this.tfClient.connect();
+        await this.tfClient.applyAllExtrinsics(extrinsics);
+      }
+    }
   }
 
   async addAccess(node_id: number, ipv4: boolean): Promise<string> {
@@ -104,7 +121,7 @@ class Network {
     return this.wireguardConfig;
   }
 
-  async addNode(node_id: number, metadata = "", description = "", subnet = ""): Promise<Workload> {
+  async addNode(node_id: number, metadata = "", description = "", subnet = ""): Promise<Workload | undefined> {
     if (this.nodeExists(node_id)) {
       return;
     }
@@ -147,7 +164,7 @@ class Network {
     }
     events.emit("logs", `Deleting node ${node_id} from network ${this.name}`);
     let contract_id = 0;
-    const nodes = [];
+    const nodes: Node[] = [];
     for (const node of this.nodes) {
       if (node.node_id !== node_id) {
         nodes.push(node);
@@ -169,6 +186,7 @@ class Network {
         return net;
       }
     }
+    return znet;
   }
 
   updateNetworkDeployments(): void {
@@ -198,15 +216,10 @@ class Network {
     if (network["ip_range"] !== this.ipRange) {
       throw Error(`The same network name ${this.name} with a different ip range already exists`);
     }
-    const tfclient = new TFClient(
-      this.config.substrateURL,
-      this.config.mnemonic,
-      this.config.storeSecret,
-      this.config.keypairType,
-    );
-    await tfclient.connect();
+
+    await this.tfClient.connect();
     for (const node of network["nodes"]) {
-      const contract = await tfclient.contracts.get(node.contract_id);
+      const contract = await this.tfClient.contracts.get({ id: node.contract_id });
       if (contract === null) continue;
       const node_twin_id = await this.capacity.getNodeTwinId(node.node_id);
       const payload = JSON.stringify({ contract_id: node.contract_id });
@@ -289,13 +302,13 @@ class Network {
     return wg;
   }
 
-  getPublicKey(privateKey: string) {
+  getPublicKey(privateKey: string): string {
     const privKey = Buffer.from(privateKey, "base64");
     const keypair = TweetNACL.box.keyPair.fromSecretKey(privKey);
     return Buffer.from(keypair.publicKey).toString("base64");
   }
 
-  async getNodeWGPublicKey(node_id: number): Promise<string> {
+  async getNodeWGPublicKey(node_id: number): Promise<string | undefined> {
     for (const net of this.networks) {
       if (net["node_id"] == node_id) {
         return this.getPublicKey(net.wireguard_private_key);
@@ -303,7 +316,7 @@ class Network {
     }
   }
 
-  getNodeWGListeningPort(node_id: number): number {
+  getNodeWGListeningPort(node_id: number): number | undefined {
     for (const net of this.networks) {
       if (net["node_id"] == node_id) {
         return net.wireguard_listen_port;
@@ -311,7 +324,7 @@ class Network {
     }
   }
 
-  getFreeIP(node_id: number, subnet = ""): string {
+  getFreeIP(node_id: number, subnet = ""): string | undefined {
     let ip;
     if (!this.nodeExists(node_id) && subnet) {
       ip = Addr(subnet).mask(32).increment().increment();
@@ -373,7 +386,7 @@ class Network {
     return ip;
   }
 
-  getNodeSubnet(node_id: number): string {
+  getNodeSubnet(node_id: number): string | undefined {
     for (const net of this.networks) {
       if (net["node_id"] === node_id) {
         return net.subnet;
@@ -422,7 +435,7 @@ class Network {
   }
 
   async getAccessPoints(): Promise<AccessPoint[]> {
-    const nodesWGPubkeys = [];
+    const nodesWGPubkeys: string[] = [];
     for (const network of this.networks) {
       const pubkey = this.getPublicKey(network.wireguard_private_key);
       nodesWGPubkeys.push(pubkey);
@@ -589,19 +602,23 @@ PersistentKeepalive = 25\nEndpoint = ${endpoint}`;
   async _save(network): Promise<void> {
     const path = PATH.join(this.getNetworksPath(), this.name, "info.json");
     const current = await this.backendStorage.load(path);
-    if (JSON.stringify(current) !== JSON.stringify(network)) await this.backendStorage.dump(path, network);
+    if (JSON.stringify(current) !== JSON.stringify(network)) {
+      const updateOperations = await this.backendStorage.dump(path, network);
+      await this.saveIfKVStoreBackend(updateOperations);
+    }
   }
 
   async delete(): Promise<void> {
     events.emit("logs", `Deleting network ${this.name}`);
     const path = PATH.join(this.getNetworksPath(), this.name, "info.json");
-    await this.backendStorage.dump(path, "");
+    const updateOperations = await this.backendStorage.dump(path, "");
+    await this.saveIfKVStoreBackend(updateOperations);
   }
 
   async generatePeers(): Promise<void> {
     events.emit("logs", `Generating peers for network ${this.name}`);
     const hiddenNodeAccessNodesIds = {};
-    const hiddenNodes = [];
+    const hiddenNodes: AccessPoint[] = [];
     for (const net of this.networks) {
       if (this.networks.length === 1) {
         continue;
@@ -620,7 +637,7 @@ PersistentKeepalive = 25\nEndpoint = ${endpoint}`;
       }
       const accessNode = randomChoice(accessNodes);
       hiddenNodeAccessNodesIds[net["node_id"]] = accessNode;
-      const hiddenNode = new AccessPoint();
+      const hiddenNode: AccessPoint = new AccessPoint();
       hiddenNode.node_id = accessNode;
       hiddenNode.subnet = net.subnet;
       hiddenNode.wireguard_public_key = this.getPublicKey(net.wireguard_private_key);
@@ -634,7 +651,7 @@ PersistentKeepalive = 25\nEndpoint = ${endpoint}`;
         if (n["node_id"] === net["node_id"]) {
           continue;
         }
-        const allowed_ips = [];
+        const allowed_ips: string[] = [];
         if (Object.keys(hiddenNodeAccessNodesIds).includes(String(n["node_id"]))) {
           if (net["node_id"] !== +hiddenNodeAccessNodesIds[n["node_id"]]) {
             continue;
@@ -676,7 +693,7 @@ PersistentKeepalive = 25\nEndpoint = ${endpoint}`;
       }
       for (const accessPoint of accessPoints) {
         if (n["node_id"] === accessPoint.node_id) {
-          const allowed_ips = [];
+          const allowed_ips: string[] = [];
           allowed_ips.push(accessPoint.subnet);
           allowed_ips.push(this.wgRoutingIP(accessPoint.subnet));
           const peer = new Peer();

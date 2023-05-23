@@ -17,7 +17,7 @@ import { Nodes } from "./nodes";
 import { QueryPricingPolicies } from "./pricing_policies";
 import { TermsAndConditions } from "./terms_and_conditions";
 import { QueryTFTPrice } from "./tft_price";
-import { QueryTFTBridge } from "./tftBridgeModule";
+import { QueryTFTBridge } from "./tftBridge";
 import { QueryTwins, Twins } from "./twins";
 import type { Extrinsic, ExtrinsicResult, PatchExtrinsicOptions, validatorFunctionType } from "./types";
 import { Utility } from "./utility";
@@ -49,14 +49,14 @@ class QueryClient {
   tftPrice: QueryTFTPrice = new QueryTFTPrice(this);
   pricingPolicies: QueryPricingPolicies = new QueryPricingPolicies(this);
   twins: QueryTwins = new QueryTwins(this);
-  constructor(public url: string) {
-    if (!url) {
+  constructor(public url: string) {}
+
+  async loadKeyPairOrSigner(): Promise<void> {} // to be overridden in the full client
+  checkInputs(): void {
+    if (!this.url) {
       throw Error("url should be provided");
     }
   }
-
-  async loadKeyPairOrSigner(): Promise<void> {} // to be overridden in the full client
-
   private async wait(connection = true): Promise<void> {
     const start = new Date().getTime();
     while (new Date().getTime() < start + 10 * 1000) {
@@ -68,6 +68,7 @@ class QueryClient {
   }
 
   async connect() {
+    this.checkInputs();
     await this.loadKeyPairOrSigner();
     if (this.api && this.api.isConnected) return;
     if (Object.keys(QueryClient.connections).includes(this.url)) {
@@ -115,11 +116,6 @@ class QueryClient {
     // this should be only used by nodejs process
     await this.disconnect();
     process.exit(0);
-  }
-
-  async checkConnectionAndApply(func: (args: unknown[]) => unknown, args: unknown[]) {
-    await this.connect();
-    return await func.apply(this, args);
   }
 
   /**
@@ -220,7 +216,7 @@ class Client extends QueryClient {
   balances: Balances = new Balances(this);
   nodes: Nodes = new Nodes(this);
   termsAndConditions: TermsAndConditions = new TermsAndConditions(this);
-  kvstore: KVStore = new KVStore(this);
+  kvStore: KVStore = new KVStore(this);
   twins: Twins = new Twins(this);
 
   declare url: string;
@@ -229,26 +225,27 @@ class Client extends QueryClient {
   extSigner?: ExtSigner;
 
   constructor(options: ClientOptions) {
-    if (!options.url) throw Error("url should be provided");
     super(options.url);
-
     this.extSigner = options.extSigner;
     this.keypairType = options.keypairType || "sr25519";
+    this.mnemonicOrSecret = options.mnemonicOrSecret;
+  }
 
+  checkInputs(): void {
+    if (!this.url) throw Error("url should be provided");
     if (!SUPPORTED_KEYPAIR_TYPES.includes(this.keypairType)) {
       throw Error(
         `Keypair type ${this.keypairType} is not a valid type. Should be either of: ${SUPPORTED_KEYPAIR_TYPES}`,
       );
     }
 
-    if ((options.mnemonicOrSecret && options.extSigner) || !(options.mnemonicOrSecret || options.extSigner)) {
+    if ((this.mnemonicOrSecret && this.extSigner) || !(this.mnemonicOrSecret || this.extSigner)) {
       throw Error("mnemonicOrSecret or extension signer should be provided");
     }
 
-    if (options.mnemonicOrSecret && !validateMnemonic(options.mnemonicOrSecret)) {
+    if (this.mnemonicOrSecret && !validateMnemonic(this.mnemonicOrSecret)) {
       throw Error("Invalid mnemonic! Must be bip39 compliant");
     }
-    this.mnemonicOrSecret = options.mnemonicOrSecret;
   }
 
   async loadKeyPairOrSigner(): Promise<void> {
@@ -270,10 +267,9 @@ class Client extends QueryClient {
 
   private async _applyExtrinsic<T>(
     extrinsic: SubmittableExtrinsic<"promise", ISubmittableResult>,
-    resultSections: string[] = [""],
+    resultSections: string[] = [],
+    resultEvents: string[] = [],
   ): Promise<T> {
-    await this.connect();
-
     const promise = new Promise(async (resolve, reject) => {
       function callback(res) {
         if (res instanceof Error) {
@@ -291,7 +287,10 @@ class Client extends QueryClient {
             if (section === SYSTEM && method === ExtrinsicState.ExtrinsicFailed) {
               const errorIndex = parseInt(data.toJSON()[0].module.error.replace(/0+$/g, ""));
               reject(errorIndex);
-            } else if (resultSections.includes(section)) {
+            } else if (
+              resultSections.includes(section) &&
+              (resultEvents.length === 0 || (resultEvents.length > 0 && resultEvents.includes(method)))
+            ) {
               resultData.push(data.toPrimitive()[0]);
             } else if (section === SYSTEM && method === ExtrinsicState.ExtrinsicSuccess) {
               if (!(extrinsic.method.section === UTILITY && BATCH_METHODS.includes(extrinsic.method.method))) {
@@ -326,31 +325,34 @@ class Client extends QueryClient {
   async applyExtrinsic<T>(
     extrinsic: SubmittableExtrinsic<"promise", ISubmittableResult>,
     resultSections: string[] = [""],
+    resultEvents: string[] = [],
   ): Promise<T> {
     await Client.lock.acquireAsync();
     console.log("Lock acquired");
     let result;
     try {
-      result = await this._applyExtrinsic<T>(extrinsic, resultSections);
+      result = await this._applyExtrinsic<T>(extrinsic, resultSections, resultEvents);
     } finally {
       Client.lock.release();
       console.log("Lock released");
     }
     return result;
   }
-  async applyAllExtrinsics<T>(extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[]) {
+  async applyAllExtrinsics<T>(extrinsics: ExtrinsicResult<T>[]) {
     return this.utility.batchAll<T>(extrinsics);
   }
 
   patchExtrinsic<R>(extrinsic: Extrinsic, options: PatchExtrinsicOptions<R> = {}): ExtrinsicResult<R> {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
-
     (<any>extrinsic).apply = async () => {
-      const res = await self.applyExtrinsic(extrinsic, options.resultSections);
+      const res = await self.applyExtrinsic(extrinsic, options.resultSections, options.resultEvents);
       if (options.map) return options.map(res);
       return res;
     };
+    (<any>extrinsic).resultEvents = options.resultEvents;
+    (<any>extrinsic).resultSections = options.resultSections;
+
     return extrinsic as ExtrinsicResult<R>;
   }
 }

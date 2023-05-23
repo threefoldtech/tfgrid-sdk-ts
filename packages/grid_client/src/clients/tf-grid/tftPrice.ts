@@ -1,14 +1,8 @@
-import { TFClient } from "./client";
+import { QueryTFTPrice } from "@threefold/tfchain_client";
 
-class TFTPrice {
-  tfclient: TFClient;
-
-  constructor(client: TFClient) {
-    this.tfclient = client;
-  }
-
-  async getPrice(): Promise<number> {
-    const priceInMili = await this.tfclient.queryChain(this.tfclient.client.tftPrice, []);
+class TFTPrice extends QueryTFTPrice {
+  async get(): Promise<number> {
+    const priceInMili = await super.get();
     return priceInMili / 1000;
   }
 }

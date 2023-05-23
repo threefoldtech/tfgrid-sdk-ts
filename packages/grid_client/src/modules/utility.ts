@@ -1,7 +1,6 @@
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
-import { validateInput } from "../helpers/validator";
 import { BatchModel } from "./models";
 import { checkBalance } from "./utils";
 
@@ -18,13 +17,13 @@ class Utility {
 
   @expose
   @checkBalance
-  async batch(options: BatchModel) {
+  async batch<T>(options: BatchModel<T>) {
     return await this.client.utility.batch(options.extrinsics);
   }
 
   @expose
   @checkBalance
-  async batchAll(options: BatchModel) {
+  async batchAll<T>(options: BatchModel<T>) {
     return await this.client.utility.batchAll(options.extrinsics);
   }
 }

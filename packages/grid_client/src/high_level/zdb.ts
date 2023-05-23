@@ -18,8 +18,8 @@ class ZdbHL extends HighLevelBase {
     publicNamespace: boolean,
     metadata = "",
     description = "",
-    solutionProviderID: number,
-  ) {
+    solutionProviderId?: number,
+  ): Promise<TwinDeployment> {
     if (!(await this.nodes.nodeHasResources(node_id, { hru: disk_size }))) {
       throw Error(`Node ${node_id} doesn't have enough resources: hru=${disk_size}`);
     }
@@ -28,7 +28,7 @@ class ZdbHL extends HighLevelBase {
     const zdbFactory = new ZdbPrimitive();
     const zdbWorkload = zdbFactory.create(name, disk_size, mode, password, publicNamespace, metadata, description);
     const deployment = deploymentFactory.create([zdbWorkload], 1626394539, metadata, description, 0);
-    return new TwinDeployment(deployment, Operations.deploy, 0, node_id, null, solutionProviderID);
+    return new TwinDeployment(deployment, Operations.deploy, 0, node_id, null, solutionProviderId);
   }
   async delete(deployment: Deployment, names: string[]) {
     return await this._delete(deployment, names, [WorkloadTypes.zdb]);

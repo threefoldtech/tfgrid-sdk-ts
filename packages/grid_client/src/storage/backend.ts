@@ -4,7 +4,7 @@ import * as PATH from "path";
 import { KeypairType } from "../zos/deployment";
 import BackendStorageInterface from "./BackendStorageInterface";
 import { PKID } from "./pkid";
-import { TFKVStore } from "./tfkvstore";
+import { TFKVStoreBackend } from "./tfkvstore";
 
 const appsPath = getAppDataPath();
 const appPath = PATH.join(appsPath, "grid3_client");
@@ -49,7 +49,7 @@ class BackendStorage {
         this.storage = new storage.LocalStorage();
       }
     } else if (type === BackendStorageType.tfkvstore) {
-      this.storage = new TFKVStore(substrateURL, mnemonic, storeSecret, keypairType);
+      this.storage = new TFKVStoreBackend(substrateURL, mnemonic, storeSecret, keypairType);
     } else if (type === BackendStorageType.pkid) {
       this.storage = new PKID(seed);
     } else if (type === BackendStorageType.fs) {
@@ -98,7 +98,7 @@ class BackendStorage {
     } else if (action === StorageUpdateAction.delete) {
       delete storedData[field];
     }
-    await this.dump(key, storedData);
+    return await this.dump(key, storedData);
   }
 }
 
