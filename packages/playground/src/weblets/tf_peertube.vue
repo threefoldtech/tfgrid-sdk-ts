@@ -1,5 +1,11 @@
 <template>
-  <weblet-layout ref="layout" :cpu="solution?.cpu" :memory="solution?.memory" :disk="solution?.disk">
+  <weblet-layout
+    ref="layout"
+    :cpu="solution?.cpu"
+    :memory="solution?.memory"
+    :disk="solution?.disk"
+    title-image="images/icons/peertube.png"
+  >
     <template #title>Deploy a Peertube Instance</template>
     <template #subtitle>
       Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services.

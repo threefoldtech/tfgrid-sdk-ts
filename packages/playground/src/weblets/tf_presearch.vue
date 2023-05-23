@@ -1,5 +1,5 @@
 <template>
-  <weblet-layout ref="layout" :cpu="cpu" :memory="memory" :disk="rootFsSize">
+  <weblet-layout ref="layout" :cpu="cpu" :memory="memory" :disk="rootFsSize" title-image="images/icons/presearch.png">
     <template #title>Deploy a Presearch Instance</template>
     <template #subtitle
       >Presearch is a community-powered, decentralized search engine that provides better results while protecting your

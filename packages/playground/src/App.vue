@@ -1,38 +1,49 @@
 <template>
   <v-app>
     <v-navigation-drawer width="280" :permanent="permanent" v-model="openSidebar" theme="dark">
-      <v-list>
-        <v-list-item>
-          <v-img :src="baseUrl + 'images/logoTF.png'" />
-        </v-list-item>
-        <v-list-item>
-          <v-card color="primary" variant="tonal">
-            <v-card-title class="text-center capitalize">{{ network }}net</v-card-title>
-          </v-card>
+      <div :style="{ paddingTop: '64px' }">
+        <div
+          :style="{
+            maxHeight: 'calc(100vh - 64px)',
+            overflowY: 'auto',
+          }"
+        >
+          <v-list>
+            <!-- <v-list-item class="d-flex justify-center">
+          <v-img :src="baseUrl + 'images/logoTF.png'" width="160px" />
         </v-list-item>
 
         <v-list-item class="justify-center">
           <AppTheme />
         </v-list-item>
 
-        <template v-for="route in routes" :key="route.title">
-          <v-list-subheader>{{ route.title }}</v-list-subheader>
-          <v-list-item
-            v-for="item in route.items"
-            :key="item.route"
-            :value="item.route"
-            @click="$router.push(item.route)"
-            active-color="primary"
-            :active="$route.path === item.route"
-          >
-            <template v-slot:prepend v-if="item.icon">
-              <v-img class="mr-4" width="26" :src="baseUrl + 'images/icons/' + item.icon" :alt="item.title" />
-            </template>
+        <v-list-item :style="{ marginTop: '-30px', marginBottom: '10px' }">
+          <v-btn class="capitalize" block :style="{ pointerEvents: 'none' }" variant="text" color="primary">
+            {{ network }}net
+          </v-btn>
+        </v-list-item>
+        <v-divider /> -->
 
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item>
-        </template>
-      </v-list>
+            <template v-for="route in routes" :key="route.title">
+              <v-list-subheader>{{ route.title }}</v-list-subheader>
+              <v-list-item
+                v-for="item in route.items"
+                :key="item.route"
+                :value="item.route"
+                @click="$router.push(item.route)"
+                active-color="primary"
+                :active="$route.path === item.route"
+              >
+                <template v-slot:prepend v-if="item.icon">
+                  <v-img class="mr-4" width="26" :src="baseUrl + 'images/icons/' + item.icon" :alt="item.title" />
+                </template>
+
+                <v-list-item-title>{{ item.title }}</v-list-item-title>
+              </v-list-item>
+            </template>
+          </v-list>
+        </div>
+      </div>
 
       <template v-if="version">
         <div class="version">
@@ -43,7 +54,26 @@
       </template>
     </v-navigation-drawer>
 
-    <v-main>
+    <v-main :style="{ paddingTop: '70px' }">
+      <v-toolbar
+        color="rgb(49, 49, 49)"
+        class="position-fixed"
+        theme="dark"
+        :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }"
+      >
+        <v-toolbar-title>
+          <v-img :src="baseUrl + 'images/logoTF.png'" width="160px" />
+        </v-toolbar-title>
+
+        <v-spacer></v-spacer>
+
+        <AppTheme />
+
+        <v-divider vertical />
+
+        <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
+      </v-toolbar>
+
       <DeploymentListManager>
         <v-container fluid>
           <div class="d-flex align-center">
@@ -194,7 +224,7 @@ export default {
 
 .version {
   position: absolute;
-  bottom: 0;
-  right: 7%;
+  bottom: 15px;
+  right: 25px;
 }
 </style>

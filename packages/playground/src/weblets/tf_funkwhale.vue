@@ -1,5 +1,11 @@
 <template>
-  <weblet-layout ref="layout" :cpu="solution?.cpu" :memory="solution?.memory" :disk="solution?.disk">
+  <weblet-layout
+    ref="layout"
+    :cpu="solution?.cpu"
+    :memory="solution?.memory"
+    :disk="solution?.disk"
+    title-image="images/icons/funkwhale.png"
+  >
     <template #title>Deploy a Funkwhale Instance </template>
     <template #subtitle>
       Funkwhale is social platform to enjoy and share music. Funkwhale is a community-driven project that lets you

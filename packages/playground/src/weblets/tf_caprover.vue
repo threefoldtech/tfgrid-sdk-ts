@@ -10,6 +10,7 @@
         leader.solution?.disk ?? 0 + rootFs(leader.solution?.cpu ?? 0, leader.solution?.memory ?? 0),
       )
     "
+    title-image="images/icons/caprover.png"
   >
     <template #title>Deploy Caprover</template>
     <template #subtitle>

@@ -4,6 +4,7 @@
     :cpu="solution?.cpu"
     :memory="solution?.memory"
     :disk="(solution?.disk ?? 0) + 10 + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
+    title-image="images/icons/umbrel.png"
   >
     <template #title>Deploy an Umbrel Instance </template>
     <template #subtitle>
