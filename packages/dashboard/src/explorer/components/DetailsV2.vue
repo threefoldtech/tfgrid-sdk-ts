@@ -122,7 +122,7 @@ export default class Details extends Vue {
           try {
             this.data.nodeStatistics = await (
               await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/statistics`, {
-                timeout: 3000,
+                timeout: 5000,
               })
             ).data;
           } catch (error) {
