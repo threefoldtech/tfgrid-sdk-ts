@@ -44,7 +44,7 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-icon medium v-on="on" v-bind="attrs"> mdi-information </v-icon>
               </template>
-              <span>silver boxes default serial number</span>
+              <span>The manufacturer didn't provide a proper serial number</span>
             </v-tooltip>
           </p>
         </template>
