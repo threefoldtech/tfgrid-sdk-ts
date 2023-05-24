@@ -41,7 +41,11 @@
 
       <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
 
-      <SelectSolutionFlavor v-model="solution" />
+      <SelectSolutionFlavor
+        v-model="solution"
+        :minimum="{ cpu: 1, memory: 1024, disk: 50 }"
+        :standard="{ cpu: 2, memory: 1024 * 2, disk: 100 }"
+      />
       <SelectGatewayNode v-model="gateway" />
       <SelectFarm
         :filters="{

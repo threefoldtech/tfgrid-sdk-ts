@@ -56,7 +56,12 @@
 
       <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
 
-      <SelectSolutionFlavor v-model="solution" />
+      <SelectSolutionFlavor
+        v-model="solution"
+        :minimum="{ cpu: 2, memory: 1024 * 2, disk: 10 }"
+        :standard="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
+        :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+      />
       <SelectFarm
         :filters="{
           cpu: solution?.cpu,
