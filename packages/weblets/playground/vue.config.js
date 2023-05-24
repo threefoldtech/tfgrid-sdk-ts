@@ -22,19 +22,12 @@ module.exports = {
           loader: require.resolve("@open-wc/webpack-import-meta-loader"),
           exclude: /\.vue$/,
         },
-
         {
-          test: /\.m?js$/,
-          include: /node_modules[/\\|]@polkadot/i,
+          test: /\.js$/,
           use: {
             loader: "babel-loader",
             options: {
-              presets: ["@babel/preset-env", "@vue/cli-plugin-babel/preset"],
-              plugins: [
-                "@babel/plugin-proposal-private-methods",
-                "@babel/plugin-proposal-class-properties",
-                "@babel/plugin-proposal-object-rest-spread",
-              ],
+              presets: ["@babel/env"],
             },
           },
         },
