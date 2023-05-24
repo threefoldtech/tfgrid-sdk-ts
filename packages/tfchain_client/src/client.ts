@@ -315,9 +315,16 @@ class Client extends QueryClient {
     return promise
       .then((res: any) => res as T)
       .catch(e => {
+        let section: string = extrinsic.method.section;
+        if (
+          extrinsic.method.section === UTILITY &&
+          BATCH_METHODS.includes(extrinsic.method.method) &&
+          resultSections.length > 0
+        )
+          section = resultSections[0];
         throw Error(
           `Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error: ${
-            Object.keys(this.api.errors[extrinsic.method.section])[+e]
+            Object.keys(this.api.errors[section])[+e]
           }`,
         );
       });
