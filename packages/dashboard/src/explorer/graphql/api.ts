@@ -101,8 +101,18 @@ export interface INodeStatisticsUser {
   workloads: number;
 }
 
+export interface INodeResources {
+  [key: string]: number;
+  cru: number;
+  hru: number;
+  mru: number;
+  sru: number;
+}
 export interface INodeStatistics {
   users: INodeStatisticsUser;
+  system: INodeResources;
+  total: INodeResources;
+  used: INodeResources;
 }
 
 export const PublicConfigType = gql`

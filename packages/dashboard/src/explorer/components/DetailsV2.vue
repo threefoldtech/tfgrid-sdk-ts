@@ -4,7 +4,7 @@
       <div class="content" v-if="!loading">
         <v-row>
           <v-col v-if="node">
-            <NodeUsedResources :node="node" />
+            <NodeUsedResources :nodeStatistics="nodeStatistics" :nodeStatus="node.status" />
           </v-col>
         </v-row>
         <v-row>
@@ -48,6 +48,7 @@
 </template>
 
 <script lang="ts">
+import axios from "axios";
 import { DocumentNode } from "graphql";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
@@ -118,9 +119,15 @@ export default class Details extends Vue {
           this.data.node = await fetch(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}`).then(res =>
             res.json(),
           );
-          this.data.nodeStatistics = await fetch(
-            `${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/statistics`,
-          ).then(res => res.json());
+          try {
+            this.data.nodeStatistics = await (
+              await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/statistics`, {
+                timeout: 5000,
+              })
+            ).data;
+          } catch (error) {
+            console.log(error);
+          }
           this.data.node.status = this.data.node.status === "up";
         }
       })
