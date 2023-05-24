@@ -52,11 +52,11 @@ import type { solutionFlavor } from "../types";
 type Package = PropType<solutionFlavor>;
 
 const props = defineProps({
-  minimum: { type: Object as Package, default: () => ({ cpu: 1, memory: 1024, disk: 100 }) },
-  standard: { type: Object as Package, default: () => ({ cpu: 2, memory: 1024 * 2, disk: 250 }) },
+  minimum: { type: Object as Package, default: () => ({ cpu: 1, memory: 1024 * 2, diskSize: 10 }) },
+  standard: { type: Object as Package, default: () => ({ cpu: 2, memory: 1024 * 2, diskSize: 100 }) },
   recommended: {
     type: Object as Package,
-    default: () => ({ cpu: 4, memory: 1024 * 4, disk: 500 }),
+    default: () => ({ cpu: 4, memory: 1024 * 4, disk: 100 }),
   },
 });
 const emits = defineEmits<{ (event: "update:model-value", value?: solutionFlavor): void }>();
