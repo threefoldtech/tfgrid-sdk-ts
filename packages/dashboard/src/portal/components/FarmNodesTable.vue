@@ -37,6 +37,18 @@
             {{ item.nodeId }}
           </p>
         </template>
+        <template v-slot:[`item.serialNumber`]="{ item }">
+          <p class="text-center mt-1 mb-0">
+            {{ item.serialNumber }}
+            <v-tooltip right v-if="item.serialNumber === `Default string`">
+              <template v-slot:activator="{ on, attrs }">
+                <v-icon medium v-on="on" v-bind="attrs"> mdi-information </v-icon>
+              </template>
+              <span>The manufacturer didn't provide a proper serial number</span>
+            </v-tooltip>
+          </p>
+        </template>
+
         <template v-slot:[`item.status`]="{ item }">
           <p class="text-center mt-1 mb-0">
             <v-chip :color="getStatus(item).color">{{ getStatus(item).status }}</v-chip>
