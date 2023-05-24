@@ -1,12 +1,17 @@
 <template>
-  <v-dialog scrollable width="80%" v-model="openManager">
+  <v-dialog
+    scrollable
+    width="80%"
+    :model-value="$props.modelValue"
+    @update:model-value="$emit('update:model-value', $event)"
+  >
     <template #activator="{ props }">
       <v-card v-bind="props" class="pa-3 d-inline-flex align-center">
         <v-progress-circular v-if="activating" class="mr-2" indeterminate color="primary" size="25" />
         <v-icon icon="mdi-account" size="x-large" class="mr-2" v-else />
         <div>
           <p v-if="!profileManager.profile">
-            <strong> Profile Manager</strong>
+            <strong>Connect your TFChain Wallet</strong>
           </p>
           <p v-else-if="loadingBalance">
             <strong>Loading...</strong>
@@ -24,7 +29,7 @@
     </template>
 
     <weblet-layout disable-alerts>
-      <template #title> Profile Manager </template>
+      <template #title> Connect your TFChain Wallet </template>
       <template #subtitle>
         Please visit
         <a class="app-link" href="https://manual.grid.tf/weblets/weblets_profile_manager.html" target="_blank">
@@ -33,44 +38,87 @@
         get started.
       </template>
 
-      <v-tooltip
-        text="Mnemonic are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonic or click the 'Create Account' button to create an account and generate mnemonic."
-        location="bottom"
-        max-width="700px"
+      <d-tabs
+        v-if="!profileManager.profile"
+        :tabs="[
+          { title: 'Login', value: 'login' },
+          { title: 'Register', value: 'register' },
+        ]"
+        v-model="activeTab"
       >
-        <template #activator="{ props: tooltipProps }">
-          <password-input-wrapper #="{ props: passwordInputProps }">
-            <form-validator v-model="isValidMnemonic">
+        <v-container>
+          <form-validator v-model="isValidForm">
+            <v-tooltip
+              v-if="activeTab === 1"
+              text="Mnemonic are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonic or click the 'Create Account' button to create an account and generate mnemonic."
+              location="bottom"
+              max-width="700px"
+            >
+              <template #activator="{ props: tooltipProps }">
+                <password-input-wrapper #="{ props: passwordInputProps }">
+                  <input-validator
+                    :value="mnemonic"
+                    :rules="[
+                      validators.required('Mnemonic is required.'),
+                      v => (validateMnemonic(v) ? undefined : { message: `Mnemonic doesn't seem to be valid.` }),
+                    ]"
+                    :async-rules="[
+                      mnemonic =>
+                        getGrid({ mnemonic })
+                          .then(() => undefined)
+                          .catch(() => ({ message: 'Failed to load grid for this user.' })),
+                    ]"
+                    valid-message="Mnemonic is valid."
+                    #="{ props: validationProps }"
+                  >
+                    <div v-bind="tooltipProps" v-show="!profileManager.profile">
+                      <v-text-field
+                        label="Mnemonic"
+                        placeholder="Please insert your mnemonic"
+                        autofocus
+                        v-model="mnemonic"
+                        v-bind="{ ...passwordInputProps, ...validationProps }"
+                      />
+                    </div>
+                  </input-validator>
+                </password-input-wrapper>
+              </template>
+            </v-tooltip>
+
+            <password-input-wrapper #="{ props: passwordInputProps }">
               <input-validator
-                ref="mnemonicInput"
-                :value="mnemonic"
+                :value="password"
                 :rules="[
-                  validators.required('Mnemonic is required.'),
-                  v => (validateMnemonic(v) ? undefined : { message: `Mnemonic doesn't seem to be valid.` }),
+                  validators.required('Password is required.'),
+                  validators.minLength('Password minLength is 6 chars.', 6),
+                  validatePassword,
                 ]"
-                :async-rules="[
-                  mnemonic =>
-                    getGrid({ mnemonic })
-                      .then(() => undefined)
-                      .catch(() => ({ message: 'Failed to load grid for this user.' })),
-                ]"
-                valid-message="Mnemonic is valid."
                 #="{ props: validationProps }"
               >
-                <div v-bind="tooltipProps" v-show="!profileManager.profile">
-                  <v-text-field
-                    label="Mnemonic"
-                    placeholder="Please insert your mnemonic"
-                    autofocus
-                    v-model="mnemonic"
-                    v-bind="{ ...passwordInputProps, ...validationProps }"
-                  />
-                </div>
+                <v-text-field
+                  label="Password"
+                  :autofocus="activeTab === 0"
+                  v-model="password"
+                  v-bind="{ ...passwordInputProps, ...validationProps }"
+                />
               </input-validator>
-            </form-validator>
-          </password-input-wrapper>
-        </template>
-      </v-tooltip>
+            </password-input-wrapper>
+          </form-validator>
+
+          <div class="d-flex justify-center">
+            <v-btn
+              color="primary"
+              variant="tonal"
+              @click="activeTab === 0 ? login() : storeAndLogin()"
+              :loading="activating"
+              :disabled="!isValidForm || creatingAccount"
+              size="large"
+            >
+              {{ activeTab === 0 ? "Login" : "Store and login" }}
+            </v-btn>
+          </div>
+        </v-container>
+      </d-tabs>
 
       <template v-if="profileManager.profile">
         <password-input-wrapper #="{ props }">
@@ -180,23 +228,14 @@
           <v-btn
             color="secondary"
             variant="tonal"
-            :disabled="isValidMnemonic"
+            :disabled="isValidForm"
             :loading="creatingAccount"
             @click="createNewAccount"
           >
             Don't have account? Create One
           </v-btn>
-          <v-btn
-            color="primary"
-            variant="tonal"
-            @click="activate(mnemonic)"
-            :loading="activating"
-            :disabled="!isValidMnemonic || creatingAccount"
-          >
-            Login
-          </v-btn>
         </template>
-        <v-btn color="error" variant="outlined" @click="openManager = false"> Close </v-btn>
+        <v-btn color="error" variant="outlined" @click="$emit('update:modelValue', false)"> Close </v-btn>
       </template>
     </weblet-layout>
   </v-dialog>
@@ -204,22 +243,34 @@
 
 <script lang="ts" setup>
 import { validateMnemonic } from "bip39";
-import { onMounted, type Ref, ref, watch } from "vue";
+import Cryptr from "cryptr";
+import md5 from "md5";
+import { onMounted, ref, watch } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
 import { useProfileManager } from "../stores";
 import { type Balance, createAccount, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
 import { downloadAsFile } from "../utils/helpers";
 
-const openManager = ref(true);
+defineProps({
+  modelValue: {
+    required: false,
+    default: () => true,
+    type: Boolean,
+  },
+});
+defineEmits<{ (event: "update:modelValue", value: boolean): void }>();
+
 const profileManager = useProfileManager();
 
 const mnemonic = ref("");
-const isValidMnemonic = ref(false);
-const mnemonicInput = ref() as Ref<{ validate(value: string): Promise<boolean>; touch(): void }>;
+const isValidForm = ref(false);
 
 const ssh = ref("");
 const balance = ref<Balance>();
+
+const activeTab = ref(0);
+const password = ref("");
 
 let interval: any;
 watch(
@@ -238,14 +289,14 @@ watch(
 );
 
 function logout() {
-  sessionStorage.removeItem("mnemonic");
+  sessionStorage.removeItem("password");
   profileManager.clear();
 }
 
 const activating = ref(false);
 async function activate(mnemonic: string) {
   activating.value = true;
-  sessionStorage.setItem("mnemonic", mnemonic);
+  sessionStorage.setItem("password", password.value);
   const grid = await getGrid({ mnemonic });
   const profile = await loadProfile(grid!);
   ssh.value = profile.ssh;
@@ -254,14 +305,10 @@ async function activate(mnemonic: string) {
 }
 
 onMounted(async () => {
-  const maybeMnemonic = sessionStorage.getItem("mnemonic");
-  if (!maybeMnemonic) return;
-  mnemonic.value = maybeMnemonic;
-  mnemonicInput.value?.touch();
-  if (await mnemonicInput.value?.validate(maybeMnemonic)) {
-    await activate(maybeMnemonic);
-    openManager.value = false;
-  }
+  const maybePassword = sessionStorage.getItem("password");
+  if (!maybePassword) return;
+  password.value = maybePassword;
+  login();
 });
 
 const creatingAccount = ref(false);
@@ -308,6 +355,29 @@ async function __loadBalance(profile: Profile) {
     loadingBalance.value = false;
   } catch {
     __loadBalance(profile);
+  }
+}
+
+function login() {
+  const mnemonicHash = localStorage.getItem(md5(password.value)) as string;
+  const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
+  const mnemonic = cryptr.decrypt(mnemonicHash);
+  activate(mnemonic);
+}
+
+function storeAndLogin() {
+  const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
+  const mnemonicHash = cryptr.encrypt(mnemonic.value);
+  console.log(password.value, mnemonicHash, md5(password.value));
+  localStorage.setItem(md5(password.value), mnemonicHash);
+  activate(mnemonic.value);
+}
+
+function validatePassword(value: string) {
+  if (activeTab.value === 0) {
+    if (!localStorage.getItem(md5(value))) {
+      return { message: "Please provide a valid password." };
+    }
   }
 }
 
