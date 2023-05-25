@@ -49,7 +49,7 @@
         variant="tonal"
         v-if="showPrice"
       >
-        Based on your specifications and TFChain TFT balance, your deployment cost is
+        Your deployment cost is
         <span class="font-weight-black">{{ costLoading ? "Calculating..." : cost }}</span> USD/Month.
         <a
           class="app-link text-decoration-underline"
