@@ -14,18 +14,6 @@
         <v-card-subtitle v-if="$slots.subtitle" :style="{ whiteSpace: 'initial' }">
           <slot name="subtitle" />
         </v-card-subtitle>
-
-        <v-alert class="mt-2 mx-4" :style="{ fontSize: '1.2rem' }" type="info" variant="tonal" v-if="showPrice">
-          Based on your specifications and TFChain TFT balance, your deployment cost is
-          <span class="font-weight-black">{{ costLoading ? "Calculating..." : cost }}</span> USD/Month.
-          <a
-            class="d-block app-link text-decoration-underline"
-            target="_blank"
-            href="https://manual.grid.tf/cloud/cloudunits_pricing.html?highlight=pricing#cloud-unit-pricing"
-          >
-            Learn how to unlock discounts.
-          </a>
-        </v-alert>
       </div>
       <v-spacer />
       <div class="mr-4" v-if="$slots['header-actions']">
@@ -53,6 +41,25 @@
     </v-card-text>
 
     <template v-if="$slots['footer-actions'] && (profileManager.profile || disableAlerts)">
+      <v-alert
+        v-show="!status"
+        class="mx-4"
+        :style="{ fontSize: '1.2rem' }"
+        type="info"
+        variant="tonal"
+        v-if="showPrice"
+      >
+        Your deployment costs
+        <span class="font-weight-black">{{ costLoading ? "Calculating..." : tft }}</span> TFTs or
+        <span class="font-weight-black">{{ costLoading ? "Calculating..." : usd }}</span> USD/month
+        <a
+          class="app-link text-decoration-underline"
+          target="_blank"
+          href="https://manual.grid.tf/cloud/cloudunits_pricing.html?highlight=pricing#cloud-unit-pricing"
+        >
+          Learn how to unlock discounts.
+        </a>
+      </v-alert>
       <v-divider class="mt-5" />
       <v-card-actions>
         <v-spacer />
@@ -185,7 +192,8 @@ watch(
 
 /* Calculate Price */
 const showPrice = computed(() => !!profileManager.profile && props.cpu && props.memory && props.disk);
-const cost = ref<number>();
+const usd = ref<number>();
+const tft = ref<number>();
 const costLoading = ref(false);
 const shouldUpdateCost = ref(false);
 watch(
@@ -215,7 +223,8 @@ async function loadCost(profile: { mnemonic: string }) {
     mru: typeof props.disk === "number" ? (props.memory ?? 0) / 1024 : 0,
     hru: 0,
   });
-  cost.value = sharedPrice;
+  usd.value = sharedPrice;
+  tft.value = parseFloat((usd.value / (await grid!.calculator.tftPrice())).toFixed(2));
   costLoading.value = false;
 }
 </script>
