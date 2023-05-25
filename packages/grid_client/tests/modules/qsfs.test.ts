@@ -291,7 +291,7 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
 });
 
 // Skipped until this issue is fixed: https://github.com/threefoldtech/tf-images/issues/133
-test.skip("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster (https://github.com/threefoldtech/tf-images/issues/133)", async () => {
+test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
      Test Cases: TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster
@@ -613,7 +613,7 @@ test.skip("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster (https://g
     });
 
     //Execute kubectl get nodes.
-    await masterSSH.execCommand("kubectl get nodes").then(async function (result) {
+    await masterSSH.execCommand("source /etc/profile && kubectl get nodes").then(async function (result) {
       log(result.stdout);
       expect(result.stdout).toContain(masterName.toLowerCase());
       expect(result.stdout).toContain(workerName.toLowerCase());

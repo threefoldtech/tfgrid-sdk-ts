@@ -24,7 +24,7 @@ beforeAll(async () => {
 const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
 
 // Skipped until this issue is fixed: https://github.com/threefoldtech/tf-images/issues/133
-test.skip("TC1231 - Kubernetes: Deploy a Kubernetes Cluster (https://github.com/threefoldtech/tf-images/issues/133)", async () => {
+test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
      Test Cases: TC1231 - Kubernetes: Deploy a Kubernetes Cluster
@@ -243,7 +243,7 @@ test.skip("TC1231 - Kubernetes: Deploy a Kubernetes Cluster (https://github.com/
     });
 
     //Execute kubectl get nodes.
-    await masterSSH.execCommand("kubectl get nodes").then(async function (result) {
+    await masterSSH.execCommand("source /etc/profile && kubectl get nodes").then(async function (result) {
       log(result.stdout);
       expect(result.stdout).toContain(masterName.toLowerCase());
       expect(result.stdout).toContain(workerName.toLowerCase());
@@ -279,7 +279,7 @@ test.skip("TC1231 - Kubernetes: Deploy a Kubernetes Cluster (https://github.com/
 });
 
 // Skipped until this issue is fixed: https://github.com/threefoldtech/tf-images/issues/133
-test.skip("TC1232 - Kubernetes: Add Worker (https://github.com/threefoldtech/tf-images/issues/133)", async () => {
+test("TC1232 - Kubernetes: Add Worker", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
      Test Cases: TC1232 - Kubernetes: Add Worker
@@ -498,7 +498,7 @@ test.skip("TC1232 - Kubernetes: Add Worker (https://github.com/threefoldtech/tf-
 
   //Execute kubectl get nodes.
   try {
-    await masterSSH.execCommand("kubectl get nodes").then(async function (result) {
+    await masterSSH.execCommand("source /etc/profile && kubectl get nodes").then(async function (result) {
       log(result.stdout);
       expect(result.stdout).toContain(masterName.toLowerCase());
       expect(result.stdout).toContain(workerName.toLowerCase());
