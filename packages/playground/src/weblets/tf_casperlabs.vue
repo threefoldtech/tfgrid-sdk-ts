@@ -108,7 +108,7 @@ async function deploy() {
           farmName: farm.value.name,
           country: farm.value.country,
           envs: [
-            { key: "SSH_KEY", value: domain },
+            { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "CASPERLABS_HOSTNAME", value: domain },
           ],
         },
