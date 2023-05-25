@@ -103,7 +103,7 @@ async function deploy() {
             },
           ],
           flist: "https://hub.grid.tf/tf-official-apps/casperlabs-latest.flist",
-          entryPoint: "/init.sh",
+          entryPoint: "/sbin/zinit init",
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
