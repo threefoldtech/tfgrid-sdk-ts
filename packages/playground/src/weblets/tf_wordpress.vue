@@ -153,7 +153,7 @@ async function deploy() {
           farmName: farm.value.name,
           country: farm.value.country,
           envs: [
-            { key: "SSH_KEY", value: domain },
+            { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "MYSQL_USER", value: username.value },
             { key: "MYSQL_PASSWORD", value: password.value },
             { key: "ADMIN_EMAIL", value: email.value },
