@@ -80,6 +80,13 @@ function onUpdateSelection() {
     selectedItems.value = props.items.slice();
   }
 }
+
+watch(
+  () => props.modelValue,
+  is => {
+    selectedItems.value = is;
+  },
+);
 </script>
 
 <script lang="ts">
