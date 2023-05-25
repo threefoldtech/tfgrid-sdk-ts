@@ -40,6 +40,7 @@ const props = defineProps({
   modelValue: { type: Object as PropType<Farm> },
   country: String,
   filters: { default: () => ({} as Filters), type: Object as PropType<Filters> },
+  exclusiveFor: String,
 });
 const emits = defineEmits<{ (event: "update:modelValue", value?: Farm): void }>();
 
@@ -61,15 +62,19 @@ async function loadFarms() {
 
   const grid = await getGrid(profileManager.profile!);
   const filters = props.filters;
-  farms.value = await getFarms(grid!, {
-    country: country.value,
-    cru: filters.cpu,
-    mru: filters.memory ? Math.round(filters.memory / 1024) : undefined,
-    hru: filters.disk,
-    sru: filters.ssd,
-    publicIPs: filters.publicIp,
-    availableFor: grid!.twinId,
-  });
+  farms.value = await getFarms(
+    grid!,
+    {
+      country: country.value,
+      cru: filters.cpu,
+      mru: filters.memory ? Math.round(filters.memory / 1024) : undefined,
+      hru: filters.disk,
+      sru: filters.ssd,
+      publicIPs: filters.publicIp,
+      availableFor: grid!.twinId,
+    },
+    { exclusiveFor: props.exclusiveFor },
+  );
 
   if (oldFarm) {
     farm.value = farms.value.find(f => f.name === oldFarm.name);
