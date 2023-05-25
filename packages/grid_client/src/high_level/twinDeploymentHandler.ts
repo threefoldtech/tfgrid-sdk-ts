@@ -460,7 +460,6 @@ class TwinDeploymentHandler {
       nameExtrinsics = nameExtrinsics.concat(extrinsics.nameExtrinsics);
       deletedExtrinsics = deletedExtrinsics.concat(extrinsics.deletedExtrinsics);
     }
-    events.emit("logs", "Creating contracts");
     const extrinsicResults: Contract[] = await this.tfclient.applyAllExtrinsics<Contract>([
       ...nodeExtrinsics,
       ...nameExtrinsics,
