@@ -49,8 +49,9 @@
         variant="tonal"
         v-if="showPrice"
       >
-        Your deployment cost is
-        <span class="font-weight-black">{{ costLoading ? "Calculating..." : cost }}</span> USD/Month.
+        Your deployment costs
+        <span class="font-weight-black">{{ costLoading ? "Calculating..." : tft }}</span> TFTs or
+        <span class="font-weight-black">{{ costLoading ? "Calculating..." : usd }}</span> USD/month
         <a
           class="app-link text-decoration-underline"
           target="_blank"
@@ -191,7 +192,8 @@ watch(
 
 /* Calculate Price */
 const showPrice = computed(() => !!profileManager.profile && props.cpu && props.memory && props.disk);
-const cost = ref<number>();
+const usd = ref<number>();
+const tft = ref<number>();
 const costLoading = ref(false);
 const shouldUpdateCost = ref(false);
 watch(
@@ -221,7 +223,8 @@ async function loadCost(profile: { mnemonic: string }) {
     mru: typeof props.disk === "number" ? (props.memory ?? 0) / 1024 : 0,
     hru: 0,
   });
-  cost.value = sharedPrice;
+  usd.value = sharedPrice;
+  tft.value = parseFloat((usd.value / (await grid!.calculator.tftPrice())).toFixed(2));
   costLoading.value = false;
 }
 </script>
