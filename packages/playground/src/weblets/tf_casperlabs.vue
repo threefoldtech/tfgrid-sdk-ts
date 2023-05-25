@@ -28,7 +28,12 @@
         <v-text-field label="Name" v-model="name" v-bind="props" />
       </input-validator>
 
-      <SelectSolutionFlavor v-model="solution" />
+      <SelectSolutionFlavor
+        v-model="solution"
+        :minimum="{ cpu: 1, memory: 1024 * 4, disk: 100 }"
+        :standard="{ cpu: 2, memory: 1024 * 16, disk: 500 }"
+        :recommended="{ cpu: 4, memory: 1024 * 32, disk: 1000 }"
+      />
       <SelectGatewayNode v-model="gateway" />
       <SelectFarm
         :filters="{

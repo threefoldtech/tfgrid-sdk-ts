@@ -72,7 +72,11 @@
           <v-text-field label="Email" v-bind="props" v-model="email" />
         </input-validator>
 
-        <SelectSolutionFlavor v-model="solution" />
+        <SelectSolutionFlavor
+          v-model="solution"
+          :minimum="{ cpu: 2, memory: 1024 * 2, disk: 100 }"
+          :standard="{ cpu: 2, memory: 1024 * 4, disk: 150 }"
+        />
         <SelectGatewayNode v-model="gateway" />
         <SelectFarm
           :filters="{

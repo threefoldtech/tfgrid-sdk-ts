@@ -61,7 +61,12 @@
           </input-validator>
         </password-input-wrapper>
 
-        <SelectSolutionFlavor v-model="solution" />
+        <SelectSolutionFlavor
+          v-model="solution"
+          :minimum="{ cpu: 2, memory: 1024 * 16, disk: 250 }"
+          :standard="{ cpu: 2, memory: 1024 * 16, disk: 500 }"
+          :recommended="{ cpu: 4, memory: 1024 * 16, disk: 1000 }"
+        />
         <SelectGatewayNode v-model="gateway" />
         <SelectFarm
           :filters="{

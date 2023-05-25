@@ -70,7 +70,11 @@
         </input-validator>
       </password-input-wrapper>
 
-      <SelectSolutionFlavor v-model="solution" />
+      <SelectSolutionFlavor
+        v-model="solution"
+        :minimum="{ cpu: 2, memory: 1024, disk: 50 }"
+        :standard="{ cpu: 2, memory: 1024 * 2, disk: 100 }"
+      />
       <SelectGatewayNode v-model="gateway" />
       <SelectFarm
         :filters="{
