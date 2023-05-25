@@ -117,7 +117,14 @@ async function deploy() {
 
     layout.value.reloadDeploymentsList();
     layout.value.setStatus("success", "Successfully deployed a Kubernetes cluster.");
-    layout.value.openDialog(k8s, { SSH_KEY: "Public SSH Key" });
+    layout.value.openDialog(k8s, {
+      SSH_KEY: "Public SSH Key",
+      K3S_TOKEN: { label: "K3S Token", type: "password" },
+      K3S_DATA_DIR: "K3S Data Directory",
+      K3S_FLANNEL_IFACE: "K3S Flannel Iface",
+      K3S_NODE_NAME: "K3S Node Name",
+      K3S_URL: "K3S URL",
+    });
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy kubernetes cluster."));
   }

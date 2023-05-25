@@ -294,7 +294,7 @@
                 SSH_KEY: 'Public SSH Key',
                 NETWORK: 'Network',
                 NODE_TYPE: 'Node Type',
-                ACCOUNT_MNEMONICS: 'Account Mnemonics',
+                ACCOUNT_MNEMONICS: { label: 'Account Mnemonics', type: 'password' },
                 FIRST_ROUND: 'First Round',
                 LAST_ROUND: 'Last Round',
               })
@@ -389,7 +389,7 @@
               @click="
                 layout.openDialog(item?.value, {
                   SSH_KEY: 'Public SSH Key',
-                  K3S_TOKEN: 'K3S Token',
+                  K3S_TOKEN: { label: 'K3S Token', type: 'password' },
                   K3S_DATA_DIR: 'K3S Data Directory',
                   K3S_FLANNEL_IFACE: 'K3S Flannel Iface',
                   K3S_NODE_NAME: 'K3S Node Name',
@@ -451,6 +451,7 @@
 import { getCurrentInstance, onUnmounted, type Ref, ref, watch } from "vue";
 
 import type { Tab } from "../components/dynamic_tabs.vue";
+import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { deleteDeployment } from "../utils/delete_deployment";
 import { getGrid, updateGrid } from "../utils/grid";
@@ -479,7 +480,7 @@ const tabs: Tab[] = [
 
 const profileManager = useProfileManager();
 
-const layout = ref();
+const layout = useLayout();
 const dialog = ref<string>();
 const selectedItems = ref<any[]>([]);
 const deleting = ref(false);

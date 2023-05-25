@@ -227,7 +227,7 @@ async function deploy() {
       SSH_KEY: "Public SSH Key",
       NETWORK: "Network",
       NODE_TYPE: "Node Type",
-      ACCOUNT_MNEMONICS: "Account Mnemonic",
+      ACCOUNT_MNEMONICS: { label: "Account Mnemonics", type: "password" },
       FIRST_ROUND: "First Round",
       LAST_ROUND: "Last Round",
     });
