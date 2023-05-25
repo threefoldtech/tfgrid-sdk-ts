@@ -232,7 +232,11 @@ export type WebletStatus = "deploy" | "success" | "failed";
 export interface WebletLayout {
   validateBalance(grid: GridClient, min?: number): Promise<Balance>;
   setStatus(status: WebletStatus, message?: string): void;
-  openDialog(data: any, envs?: { [key: string]: string | boolean } | false, json?: boolean): void;
+  openDialog(
+    data: any,
+    envs?: { [key: string]: string | boolean | { label: string; type?: string } } | false,
+    json?: boolean,
+  ): void;
   status: ComputedRef<WebletStatus>;
   reloadDeploymentsList(): void;
 }
