@@ -23,7 +23,6 @@ beforeAll(async () => {
 //Private IP Regex
 const ipRegex = /(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/;
 
-// Skipped until this issue is fixed: https://github.com/threefoldtech/tf-images/issues/133
 test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
@@ -278,7 +277,6 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
   }
 });
 
-// Skipped until this issue is fixed: https://github.com/threefoldtech/tf-images/issues/133
 test("TC1232 - Kubernetes: Add Worker", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
