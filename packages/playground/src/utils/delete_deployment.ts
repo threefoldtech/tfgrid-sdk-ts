@@ -2,33 +2,23 @@ import type { GridClient } from "@threefold/grid_client";
 
 import { ProjectName } from "@/types";
 
-import { loadVM } from "./deploy_vm";
 import { getSubdomain } from "./gateway";
 import { updateGrid } from "./grid";
 
 export interface DeleteDeploymentOptions {
   name: string;
   projectName: ProjectName;
+  k8s?: boolean;
 }
 
 export async function deleteDeployment(grid: GridClient, options: DeleteDeploymentOptions) {
-  /* Delete qsfs_zdbs */
-  if (options.projectName === ProjectName.QVM) {
-    const qvm = await loadVM(grid, options.name);
-    if ((<any>qvm)[0].mounts.length) {
-      await grid.qsfs_zdbs.delete({ name: (<any>qvm)[0].mounts[0].name });
-    }
-  }
-
   /* Delete gateway */
   if (solutionHasGateway(options.projectName)) {
     await deleteDeploymentGateway(grid, options);
   }
 
   /* Delete deployment */
-  return options.projectName === ProjectName.Kubernetes
-    ? grid.k8s.delete({ name: options.name })
-    : grid.machines.delete({ name: options.name });
+  return options.k8s ? grid.k8s.delete({ name: options.name }) : grid.machines.delete({ name: options.name });
 }
 
 export async function deleteDeploymentGateway(grid: GridClient, options: DeleteDeploymentOptions) {
