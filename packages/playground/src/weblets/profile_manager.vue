@@ -52,7 +52,7 @@
                   mnemonic =>
                     getGrid({ mnemonic })
                       .then(() => undefined)
-                      .catch(() => ({ message: 'Failed to load grid for this user.' })),
+                      .catch(e => ({ message: e })),
                 ]"
                 valid-message="Mnemonic is valid."
                 #="{ props: validationProps }"
