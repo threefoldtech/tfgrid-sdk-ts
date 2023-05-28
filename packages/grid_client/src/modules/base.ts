@@ -15,8 +15,10 @@ import { Nodes } from "../primitives/nodes";
 import { BackendStorage, BackendStorageType } from "../storage/backend";
 import { Deployment } from "../zos/deployment";
 import { PublicIPResult } from "../zos/public_ip";
+import { QuantumSafeFS, QuantumSafeFSResult } from "../zos/qsfs";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { Zmachine, ZmachineResult } from "../zos/zmachine";
+import { Zmount } from "../zos/zmount";
 
 class BaseModule {
   moduleName = "";
@@ -193,7 +195,7 @@ class BaseModule {
       mounts: data.mounts.map(m => ({
         name: m.name,
         mountPoint: m.mountpoint,
-        ...this._getDiskData(deployments, m.name),
+        ...this._getDiskData(deployments, m.name, workload["contractId"]),
       })),
       env: data.env,
       entrypoint: data.entrypoint,
@@ -204,22 +206,28 @@ class BaseModule {
     };
   }
 
-  _getDiskData(deployments, name) {
+  _getDiskData(deployments: Deployment[], name: string, contractId: number) {
     for (const deployment of deployments) {
+      if (deployment.contract_id !== contractId) continue;
       for (const workload of deployment.workloads) {
         if (workload.type === WorkloadTypes.zmount && workload.name === name) {
-          return { size: workload.data.size, state: workload.result.state, message: workload.result.message };
+          return {
+            size: (workload.data as Zmount).size,
+            state: workload.result.state,
+            message: workload.result.message,
+          };
         } else if (workload.type === WorkloadTypes.qsfs && workload.name === name) {
+          const data = workload.data as QuantumSafeFS;
           const metadata = JSON.parse(workload.metadata);
           return {
-            cache: workload.data.cache,
-            prefix: workload.data.config.meta.config.prefix,
-            minimal_shards: workload.data.config.minimal_shards,
-            expected_shards: workload.data.config.expected_shards,
+            cache: data.cache,
+            prefix: data.config.meta.config.prefix,
+            minimal_shards: data.config.minimal_shards,
+            expected_shards: data.config.expected_shards,
             qsfs_zdbs_name: metadata.qsfs_zdbs_name,
             state: workload.result.state,
             message: workload.result.message,
-            metricsEndpoint: workload.result.data.metrics_endpoint,
+            metricsEndpoint: (workload.result.data as QuantumSafeFSResult).metrics_endpoint,
             size: metadata.qsfs_size,
           };
         }
