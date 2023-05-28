@@ -27,7 +27,7 @@
     </template>
 
     <template #[`item.name`]="{ item }">
-      {{ item.value.masters[0].name }}
+      {{ item.value.deploymentName }}
     </template>
 
     <template #[`item.ipv4`]="{ item }">
