@@ -507,7 +507,6 @@ async function onDelete(k8s = false) {
       console.log("Error while deleting deployment", e.message);
     }
   }
-  console.log("done?");
 
   selectedItems.value = [];
   table.value?.loadDeployments();
