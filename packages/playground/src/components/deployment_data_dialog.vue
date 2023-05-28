@@ -45,9 +45,9 @@
               <CopyReadonlyInput label="Flist" :data="contract.flist" v-if="contract.flist" />
               <template v-if="environments !== false">
                 <template v-for="key of Object.keys(contract.env)" :key="key">
-                  <template v-if="environments[key] || !(key in environments)">
+                  <template v-if="(environments[key] || !(key in environments)) && contract.env[key]">
                     <v-switch
-                      v-if="contract.env[key] === 'true' || contract.env[key] === 'false'"
+                      v-if="contract.env[key].toLowerCase() === 'true' || contract.env[key].toLowerCase() === 'false'"
                       inset
                       color="primary"
                       :model-value="Boolean(contract.env[key])"
