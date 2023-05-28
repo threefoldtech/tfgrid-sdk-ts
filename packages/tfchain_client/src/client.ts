@@ -285,7 +285,8 @@ class Client extends QueryClient {
           events.forEach(({ phase, event: { data, method, section } }) => {
             console.log(`phase: ${phase}, section: ${section}, method: ${method}, data: ${data}`);
             if (section === SYSTEM && method === ExtrinsicState.ExtrinsicFailed) {
-              const errorIndex = parseInt(data.toJSON()[0].module.error.replace(/0+$/g, ""));
+              const [dispatchError, _] = data;
+              const errorIndex = dispatchError.asModule.error[0];
               reject(errorIndex);
             } else if (
               resultSections.includes(section) &&
@@ -315,9 +316,16 @@ class Client extends QueryClient {
     return promise
       .then((res: any) => res as T)
       .catch(e => {
+        let section: string = extrinsic.method.section;
+        if (
+          extrinsic.method.section === UTILITY &&
+          BATCH_METHODS.includes(extrinsic.method.method) &&
+          resultSections.length > 0
+        )
+          section = resultSections[0];
         throw Error(
           `Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error: ${
-            Object.keys(this.api.errors[extrinsic.method.section])[+e]
+            Object.keys(this.api.errors[section])[+e]
           }`,
         );
       });

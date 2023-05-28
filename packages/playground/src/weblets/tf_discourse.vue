@@ -27,6 +27,8 @@
           :value="name"
           :rules="[
             validators.required('Name is required.'),
+            validators.isAlphanumeric('Name should consist of letters only.'),
+            name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
             validators.minLength('Name minLength is 2 chars.', 2),
             validators.maxLength('Name maxLength is 15 chars.', 15),
           ]"
@@ -50,7 +52,11 @@
           />
         </input-validator>
 
-        <SelectSolutionFlavor v-model="solution" />
+        <SelectSolutionFlavor
+          v-model="solution"
+          :standard="{ cpu: 2, memory: 1024 * 2, disk: 50 }"
+          :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+        />
         <SelectGatewayNode v-model="gateway" />
         <SelectFarm
           :filters="{

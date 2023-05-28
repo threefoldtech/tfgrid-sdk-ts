@@ -80,22 +80,18 @@ class HighLevelBase {
     remainingWorkloads: Workload[],
     deletedMachineWorkloads: Workload[],
     node_id: number,
-  ): Promise<[TwinDeployment[], Workload[], number[], string[]]> {
+  ): Promise<[TwinDeployment[], Workload[], number[], string[], Network | null]> {
     const twinDeployments: TwinDeployment[] = [];
     const deletedNodes: number[] = [];
     const deletedIps: string[] = [];
     const deploymentFactory = new DeploymentFactory(this.config);
-    const loadedNetworks = {};
+    let network: Network | null = null;
     for (const workload of deletedMachineWorkloads) {
-      const networkName = workload.data["network"].interfaces[0].network;
-      const networkIpRange = Addr(workload.data["network"].interfaces[0].ip).mask(16).toString();
-      let network;
-      if (Object.keys(loadedNetworks).includes(networkName)) {
-        network = loadedNetworks[networkName];
-      } else {
+      if (!network) {
+        const networkName = workload.data["network"].interfaces[0].network;
+        const networkIpRange = Addr(workload.data["network"].interfaces[0].ip).mask(16).toString();
         network = new Network(networkName, networkIpRange, this.config);
         await network.load();
-        loadedNetworks[networkName] = network;
       }
       const machineIp = workload.data["network"].interfaces[0].ip;
       events.emit("logs", `Deleting ip: ${machineIp} from node: ${node_id}, network ${network.name}`);
@@ -124,7 +120,7 @@ class HighLevelBase {
           twinDeployments.push(new TwinDeployment(deployment, Operations.delete, 0, 0, network));
           remainingWorkloads = [];
         } else {
-          remainingWorkloads = remainingWorkloads.filter(item => item.name !== networkName);
+          remainingWorkloads = remainingWorkloads.filter(item => item.name !== network?.name);
           deletedIps.push(deletedIp);
           deletedNodes.push(node_id);
         }
@@ -138,7 +134,7 @@ class HighLevelBase {
           if (d.workloads.length === 1) {
             twinDeployments.push(new TwinDeployment(d, Operations.delete, 0, 0, network));
           } else {
-            d.workloads = d.workloads.filter(item => item.name !== networkName);
+            d.workloads = d.workloads.filter(item => item.name !== network?.name);
             twinDeployments.push(new TwinDeployment(d, Operations.update, 0, 0, network));
           }
         }
@@ -154,13 +150,13 @@ class HighLevelBase {
           if (d.workloads.length === 1) {
             twinDeployments.push(new TwinDeployment(d, Operations.delete, 0, 0, network));
           } else {
-            d.workloads = d.workloads.filter(item => item.name !== networkName);
+            d.workloads = d.workloads.filter(item => item.name !== network?.name);
             twinDeployments.push(new TwinDeployment(d, Operations.update, 0, 0, network));
           }
         }
       }
     }
-    return [twinDeployments, remainingWorkloads, deletedNodes, deletedIps];
+    return [twinDeployments, remainingWorkloads, deletedNodes, deletedIps, network];
   }
 
   async _delete(
@@ -194,23 +190,11 @@ class HighLevelBase {
     if (remainingWorkloads.length === 0 && deletedMachineWorkloads.length === 0) {
       twinDeployments.push(new TwinDeployment(deployment, Operations.delete, 0, 0));
     }
-    const [newTwinDeployments, newRemainingWorkloads, deletedNodes, deletedIps] = await this._deleteMachineNetwork(
-      deployment,
-      remainingWorkloads,
-      deletedMachineWorkloads,
-      node_id,
-    );
+    const [newTwinDeployments, newRemainingWorkloads, deletedNodes, deletedIps, network] =
+      await this._deleteMachineNetwork(deployment, remainingWorkloads, deletedMachineWorkloads, node_id);
     twinDeployments = twinDeployments.concat(newTwinDeployments);
     remainingWorkloads = newRemainingWorkloads;
     if (remainingWorkloads.length !== 0 && remainingWorkloads.length < numberOfWorkloads) {
-      let network: Network | null = null;
-      for (const workload of remainingWorkloads) {
-        if (workload.type === WorkloadTypes.network) {
-          network = new Network(workload.name, workload.data["ip_range"], this.config);
-          await network.load();
-          break;
-        }
-      }
       for (const deleteNode of deletedNodes) {
         await network!.deleteNode(deleteNode);
       }

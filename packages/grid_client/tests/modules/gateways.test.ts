@@ -131,7 +131,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   log(res);
 
   //Contracts Assertions
-  expect(res.contracts.created).toHaveLength(2);
+  expect(res.contracts.created).toHaveLength(1);
   expect(res.contracts.updated).toHaveLength(0);
   expect(res.contracts.deleted).toHaveLength(0);
 

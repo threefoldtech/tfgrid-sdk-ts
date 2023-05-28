@@ -11,7 +11,11 @@
     <v-text-field label="Name" v-model="$props.modelValue.name" v-bind="props" />
   </input-validator>
 
-  <SelectSolutionFlavor v-model="$props.modelValue.solution" />
+  <SelectSolutionFlavor
+    v-model="$props.modelValue.solution"
+    :minimum="{ cpu: 1, memory: 1024, disk: 50 }"
+    :standard="{ cpu: 2, memory: 1024 * 2, disk: 100 }"
+  />
 
   <SelectFarm
     :filters="{

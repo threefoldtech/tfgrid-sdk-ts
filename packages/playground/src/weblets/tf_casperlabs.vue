@@ -20,6 +20,8 @@
         :value="name"
         :rules="[
           validators.required('Name is required.'),
+          validators.isAlphanumeric('Name should consist of letters only.'),
+          name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
           validators.minLength('Name minLength is 2 chars.', 2),
           validators.maxLength('Name maxLength is 15 chars.', 15),
         ]"
@@ -28,7 +30,12 @@
         <v-text-field label="Name" v-model="name" v-bind="props" />
       </input-validator>
 
-      <SelectSolutionFlavor v-model="solution" />
+      <SelectSolutionFlavor
+        v-model="solution"
+        :minimum="{ cpu: 1, memory: 1024 * 4, disk: 100 }"
+        :standard="{ cpu: 2, memory: 1024 * 16, disk: 500 }"
+        :recommended="{ cpu: 4, memory: 1024 * 32, disk: 1000 }"
+      />
       <SelectGatewayNode v-model="gateway" />
       <SelectFarm
         :filters="{
@@ -103,12 +110,12 @@ async function deploy() {
             },
           ],
           flist: "https://hub.grid.tf/tf-official-apps/casperlabs-latest.flist",
-          entryPoint: "/init.sh",
+          entryPoint: "/sbin/zinit init",
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
           envs: [
-            { key: "SSH_KEY", value: domain },
+            { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "CASPERLABS_HOSTNAME", value: domain },
           ],
         },
