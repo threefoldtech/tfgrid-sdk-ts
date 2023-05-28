@@ -440,7 +440,9 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn color="error" variant="outlined" @click="onDelete">Delete</v-btn>
+        <v-btn color="error" variant="outlined" @click="onDelete(tabs[activeTab].value.toLowerCase() === 'kubernetes')">
+          Delete
+        </v-btn>
         <v-btn color="error" variant="tonal" @click="deletingDialog = false">Close</v-btn>
       </v-card-actions>
     </v-card>
@@ -490,7 +492,7 @@ const _idx = tabs.findIndex(t => t.value === props.projectName);
 const activeTab = ref(!props.projectName ? 0 : _idx) as Ref<number>;
 watch(activeTab, () => (selectedItems.value = []));
 
-async function onDelete() {
+async function onDelete(k8s = false) {
   deletingDialog.value = false;
   deleting.value = true;
   const grid = await getGrid(profileManager.profile!);
@@ -499,11 +501,13 @@ async function onDelete() {
       await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
         name: item.deploymentName,
         projectName: item.projectName,
+        k8s,
       });
     } catch (e: any) {
       console.log("Error while deleting deployment", e.message);
     }
   }
+
   selectedItems.value = [];
   table.value?.loadDeployments();
   deleting.value = false;

@@ -9,6 +9,7 @@ import { updateGrid } from "./grid";
 export interface DeleteDeploymentOptions {
   name: string;
   projectName: ProjectName;
+  k8s?: boolean;
 }
 
 export async function deleteDeployment(grid: GridClient, options: DeleteDeploymentOptions) {
@@ -26,9 +27,7 @@ export async function deleteDeployment(grid: GridClient, options: DeleteDeployme
   }
 
   /* Delete deployment */
-  return options.projectName === ProjectName.Kubernetes
-    ? grid.k8s.delete({ name: options.name })
-    : grid.machines.delete({ name: options.name });
+  return options.k8s ? grid.k8s.delete({ name: options.name }) : grid.machines.delete({ name: options.name });
 }
 
 export async function deleteDeploymentGateway(grid: GridClient, options: DeleteDeploymentOptions) {
