@@ -1,14 +1,14 @@
 <template>
-  <v-dialog
+  <VDialog
     scrollable
     width="80%"
     :model-value="$props.modelValue"
     @update:model-value="$emit('update:model-value', $event)"
   >
     <template #activator="{ props }">
-      <v-card v-bind="props" class="pa-3 d-inline-flex align-center">
-        <v-progress-circular v-if="activating" class="mr-2" indeterminate color="primary" size="25" />
-        <v-icon icon="mdi-account" size="x-large" class="mr-2" v-else />
+      <VCard v-bind="props" class="pa-3 d-inline-flex align-center">
+        <VProgressCircular v-if="activating" class="mr-2" indeterminate color="primary" size="25" />
+        <VIcon icon="mdi-account" size="x-large" class="mr-2" v-else />
         <div>
           <p v-if="!profileManager.profile">
             <strong>Connect your TFChain Wallet</strong>
@@ -25,10 +25,10 @@
             </p>
           </template>
         </div>
-      </v-card>
+      </VCard>
     </template>
 
-    <weblet-layout disable-alerts>
+    <WebletLayout disable-alerts>
       <template #title> Connect your TFChain Wallet </template>
       <template #subtitle>
         Please visit
@@ -38,7 +38,7 @@
         get started.
       </template>
 
-      <d-tabs
+      <DTabs
         v-if="!profileManager.profile"
         :tabs="[
           { title: 'Login', value: 'login' },
@@ -47,17 +47,17 @@
         v-model="activeTab"
         @tab:change="passwordInput.validate(password)"
       >
-        <v-container>
-          <form-validator v-model="isValidForm">
-            <v-tooltip
+        <VContainer>
+          <FormValidator v-model="isValidForm">
+            <VTooltip
               v-if="activeTab === 1"
               text="Mnemonic are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonic or click the 'Create Account' button to create an account and generate mnemonic."
               location="bottom"
               max-width="700px"
             >
               <template #activator="{ props: tooltipProps }">
-                <password-input-wrapper #="{ props: passwordInputProps }">
-                  <input-validator
+                <PasswordInputWrapper #="{ props: passwordInputProps }">
+                  <InputValidator
                     :value="mnemonic"
                     :rules="[
                       validators.required('Mnemonic is required.'),
@@ -73,7 +73,7 @@
                     #="{ props: validationProps }"
                   >
                     <div v-bind="tooltipProps" v-show="!profileManager.profile">
-                      <v-text-field
+                      <VTextField
                         label="Mnemonic"
                         placeholder="Please insert your mnemonic"
                         autofocus
@@ -81,13 +81,13 @@
                         v-bind="{ ...passwordInputProps, ...validationProps }"
                       />
                     </div>
-                  </input-validator>
-                </password-input-wrapper>
+                  </InputValidator>
+                </PasswordInputWrapper>
               </template>
-            </v-tooltip>
+            </VTooltip>
 
-            <password-input-wrapper #="{ props: passwordInputProps }">
-              <input-validator
+            <PasswordInputWrapper #="{ props: passwordInputProps }">
+              <InputValidator
                 :value="password"
                 :rules="[
                   validators.required('Password is required.'),
@@ -97,18 +97,18 @@
                 #="{ props: validationProps }"
                 ref="passwordInput"
               >
-                <v-text-field
+                <VTextField
                   label="Password"
                   :autofocus="activeTab === 0"
                   v-model="password"
                   v-bind="{ ...passwordInputProps, ...validationProps }"
                 />
-              </input-validator>
-            </password-input-wrapper>
-          </form-validator>
+              </InputValidator>
+            </PasswordInputWrapper>
+          </FormValidator>
 
           <div class="d-flex justify-center">
-            <v-btn
+            <VBtn
               color="primary"
               variant="tonal"
               @click="activeTab === 0 ? login() : storeAndLogin()"
@@ -117,21 +117,21 @@
               size="large"
             >
               {{ activeTab === 0 ? "Login" : "Store and login" }}
-            </v-btn>
+            </VBtn>
           </div>
-        </v-container>
-      </d-tabs>
+        </VContainer>
+      </DTabs>
 
       <template v-if="profileManager.profile">
-        <password-input-wrapper #="{ props }">
-          <v-text-field
+        <PasswordInputWrapper #="{ props }">
+          <VTextField
             label="Mnemonic"
             readonly
             v-model="profileManager.profile.mnemonic"
             v-bind="props"
             :disabled="activating || creatingAccount"
           />
-        </password-input-wrapper>
+        </PasswordInputWrapper>
 
         <section class="d-flex flex-column align-center">
           <p class="font-weight-bold mb-4">
@@ -158,14 +158,14 @@
           </div>
         </section>
 
-        <v-tooltip
+        <VTooltip
           text="SSH Keys are used to authenticate you to the deployment instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
           location="bottom"
           max-width="700px"
         >
           <template #activator="{ props }">
-            <copy-input-wrapper :data="profileManager.profile.ssh" #="{ props: copyInputProps }">
-              <v-textarea
+            <CopyInputWrapper :data="profileManager.profile.ssh" #="{ props: copyInputProps }">
+              <VTextarea
                 label="Public SSH Key"
                 no-resize
                 :spellcheck="false"
@@ -177,17 +177,17 @@
                     ? 'Updating your public ssh key.'
                     : generatingSSH
                     ? 'Generating a new public ssh key.'
-                    : undefined
+                    : sshHint
                 "
-                :persistent-hint="updatingSSH || generatingSSH"
+                :persistent-hint="updatingSSH || generatingSSH || !!sshHint"
               />
-            </copy-input-wrapper>
+            </CopyInputWrapper>
           </template>
-        </v-tooltip>
+        </VTooltip>
 
-        <v-row class="mb-3">
-          <v-spacer />
-          <v-btn
+        <VRow class="mb-3">
+          <VSpacer />
+          <VBtn
             color="secondary"
             variant="text"
             :disabled="!!ssh || updatingSSH || generatingSSH"
@@ -195,8 +195,8 @@
             @click="generateSSH"
           >
             Generate SSH Keys
-          </v-btn>
-          <v-btn
+          </VBtn>
+          <VBtn
             color="primary"
             variant="text"
             @click="updateSSH"
@@ -204,20 +204,20 @@
             :loading="updatingSSH"
           >
             Update Public SSH Key
-          </v-btn>
-        </v-row>
+          </VBtn>
+        </VRow>
 
-        <copy-input-wrapper :data="profileManager.profile.twinId.toString()" #="{ props }">
-          <v-text-field label="Twin ID" readonly v-model="profileManager.profile.twinId" v-bind="props" />
-        </copy-input-wrapper>
+        <CopyInputWrapper :data="profileManager.profile.twinId.toString()" #="{ props }">
+          <VTextField label="Twin ID" readonly v-model="profileManager.profile.twinId" v-bind="props" />
+        </CopyInputWrapper>
 
-        <copy-input-wrapper :data="profileManager.profile.address" #="{ props }">
-          <v-text-field label="Address" readonly v-model="profileManager.profile.address" v-bind="props" />
-        </copy-input-wrapper>
+        <CopyInputWrapper :data="profileManager.profile.address" #="{ props }">
+          <VTextField label="Address" readonly v-model="profileManager.profile.address" v-bind="props" />
+        </CopyInputWrapper>
       </template>
 
       <template #footer-actions>
-        <v-btn
+        <VBtn
           color="error"
           variant="tonal"
           @click="logout"
@@ -225,9 +225,9 @@
           :disabled="updatingSSH || generatingSSH || loadingBalance"
         >
           Logout
-        </v-btn>
+        </VBtn>
         <template v-else>
-          <v-btn
+          <VBtn
             color="secondary"
             variant="tonal"
             :disabled="isValidForm"
@@ -235,12 +235,12 @@
             @click="createNewAccount"
           >
             Don't have account? Create One
-          </v-btn>
+          </VBtn>
         </template>
-        <v-btn color="error" variant="outlined" @click="$emit('update:modelValue', false)"> Close </v-btn>
+        <VBtn color="error" variant="outlined" @click="$emit('update:modelValue', false)"> Close </VBtn>
       </template>
-    </weblet-layout>
-  </v-dialog>
+    </WebletLayout>
+  </VDialog>
 </template>
 
 <script lang="ts" setup>
@@ -267,8 +267,20 @@ const profileManager = useProfileManager();
 
 const mnemonic = ref("");
 const isValidForm = ref(false);
-
+const sshHint = ref("");
 const ssh = ref("");
+let sshTimeout: any;
+watch(sshHint, hint => {
+  if (hint) {
+    if (sshTimeout) {
+      clearTimeout(sshTimeout);
+    }
+    sshTimeout = setTimeout(() => {
+      sshHint.value = "";
+    }, 3000);
+  }
+});
+
 const balance = ref<Balance>();
 
 const activeTab = ref(0);
@@ -331,6 +343,7 @@ async function updateSSH() {
   await storeSSH(grid!, ssh.value);
   profileManager.updateSSH(ssh.value);
   updatingSSH.value = false;
+  sshHint.value = "SSH updated successfully";
 }
 
 const generatingSSH = ref(false);
@@ -345,8 +358,10 @@ async function generateSSH() {
   const grid = await getGrid(profileManager.profile!);
   await storeSSH(grid!, keys.publicKey);
   profileManager.updateSSH(keys.publicKey);
+  ssh.value = profileManager.profile!.ssh;
   downloadAsFile("id_rsa", keys.privateKey);
   generatingSSH.value = false;
+  sshHint.value = "SSH generated successfully";
 }
 
 const loadingBalance = ref(false);
