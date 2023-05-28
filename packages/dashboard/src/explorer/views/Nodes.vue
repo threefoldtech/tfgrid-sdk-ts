@@ -263,6 +263,7 @@ export default class Nodes extends Vue {
 
   getStatus(node: { status: string }) {
     if (node.status === "up") return { color: "green", status: "Up" };
+    else if (node.status === "standby") return { color: "orange", status: "Standby" };
     else return { color: "red", status: "Down" };
   }
 
