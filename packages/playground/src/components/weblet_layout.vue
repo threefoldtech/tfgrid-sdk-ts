@@ -26,9 +26,7 @@
     <v-card-text>
       <slot v-if="disableAlerts" />
       <template v-else>
-        <v-alert variant="tonal" type="info" v-show="!profileManager.profile">
-          Please activate a profile from the profile manager
-        </v-alert>
+        <v-alert variant="tonal" type="info" v-show="!profileManager.profile"> Please connect your wallet </v-alert>
 
         <v-alert variant="tonal" v-show="profileManager.profile && status" :type="alertType">
           {{ message }}
