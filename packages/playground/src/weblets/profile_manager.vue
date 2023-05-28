@@ -45,6 +45,7 @@
           { title: 'Register', value: 'register' },
         ]"
         v-model="activeTab"
+        @tab:change="passwordInput.validate(password)"
       >
         <v-container>
           <form-validator v-model="isValidForm">
@@ -94,6 +95,7 @@
                   validatePassword,
                 ]"
                 #="{ props: validationProps }"
+                ref="passwordInput"
               >
                 <v-text-field
                   label="Password"
@@ -245,7 +247,7 @@
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import md5 from "md5";
-import { onMounted, ref, watch } from "vue";
+import { onMounted, type Ref, ref, watch } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
 import { useProfileManager } from "../stores";
@@ -271,6 +273,7 @@ const balance = ref<Balance>();
 
 const activeTab = ref(0);
 const password = ref("");
+const passwordInput = ref() as Ref<{ validate(value: string): Promise<boolean> }>;
 
 let interval: any;
 watch(
