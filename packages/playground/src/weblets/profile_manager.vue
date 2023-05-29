@@ -177,9 +177,9 @@
                     ? 'Updating your public ssh key.'
                     : generatingSSH
                     ? 'Generating a new public ssh key.'
-                    : sshKeyHint
+                    : SSHKeyHint
                 "
-                :persistent-hint="updatingSSH || generatingSSH || !!sshKeyHint"
+                :persistent-hint="updatingSSH || generatingSSH || !!SSHKeyHint"
               />
             </CopyInputWrapper>
           </template>
@@ -267,16 +267,16 @@ const profileManager = useProfileManager();
 
 const mnemonic = ref("");
 const isValidForm = ref(false);
-const sshKeyHint = ref("");
+const SSHKeyHint = ref("");
 const ssh = ref("");
 let sshTimeout: any;
-watch(sshKeyHint, hint => {
+watch(SSHKeyHint, hint => {
   if (hint) {
     if (sshTimeout) {
       clearTimeout(sshTimeout);
     }
     sshTimeout = setTimeout(() => {
-      sshKeyHint.value = "";
+      SSHKeyHint.value = "";
     }, 3000);
   }
 });
@@ -343,7 +343,7 @@ async function updateSSH() {
   await storeSSH(grid!, ssh.value);
   profileManager.updateSSH(ssh.value);
   updatingSSH.value = false;
-  sshKeyHint.value = "SSH updated successfully.";
+  SSHKeyHint.value = "SSH key updated successfully.";
 }
 
 const generatingSSH = ref(false);
@@ -361,7 +361,7 @@ async function generateSSH() {
   ssh.value = profileManager.profile!.ssh;
   downloadAsFile("id_rsa", keys.privateKey);
   generatingSSH.value = false;
-  sshKeyHint.value = "SSH generated successfully.";
+  SSHKeyHint.value = "SSH key generated successfully.";
 }
 
 const loadingBalance = ref(false);
