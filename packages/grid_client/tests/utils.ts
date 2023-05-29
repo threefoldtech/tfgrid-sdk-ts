@@ -55,20 +55,20 @@ async function returnRelay() {
   return relay;
 }
 
-async function k8sWait(masterIP, masterName, workerName, waitTime, newWorkerName?) {
+async function k8sWait(k8sMasterIP, k8sMasterName, k8sWorkerName, waitTime, k8sNewWorkerName?) {
   let reachable = false;
   for (let i = 0; i < 40; i++) {
-    await masterIP.execCommand("source /etc/profile && kubectl get nodes").then(async function (result) {
+    await k8sMasterIP.execCommand("source /etc/profile && kubectl get nodes").then(async function (result) {
       const res = result.stdout;
-      if (typeof newWorkerName !== "undefined") {
+      if (typeof k8sNewWorkerName !== "undefined") {
         if (
-          res.includes(masterName.toLowerCase()) &&
-          res.includes(workerName.toLowerCase() && res.includes(newWorkerName.toLowerCase()))
+          res.includes(k8sMasterName.toLowerCase()) &&
+          res.includes(k8sWorkerName.toLowerCase() && res.includes(k8sNewWorkerName.toLowerCase()))
         ) {
           reachable = true;
         }
       } else {
-        if (res.includes(masterName.toLowerCase()) && res.includes(workerName.toLowerCase())) {
+        if (res.includes(k8sMasterName.toLowerCase()) && res.includes(k8sWorkerName.toLowerCase())) {
           reachable = true;
         }
       }
@@ -76,7 +76,7 @@ async function k8sWait(masterIP, masterName, workerName, waitTime, newWorkerName
     if (reachable) {
       break;
     }
-    setTimeout(waitTime, "Waiting for cluster to be ready");
+    setTimeout(waitTime);
   }
 }
 
