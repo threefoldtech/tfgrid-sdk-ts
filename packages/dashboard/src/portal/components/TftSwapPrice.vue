@@ -27,7 +27,7 @@ type SwapPrice = {
 @Component({
   name: "TftSwapPrice",
 })
-export default class FundsCard extends Vue {
+export default class TftSwapPrice extends Vue {
   $api: any;
   swaped = false;
   prices: SwapPrice[] = [
