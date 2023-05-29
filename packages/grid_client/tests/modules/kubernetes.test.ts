@@ -12,7 +12,7 @@ import {
 import { config, getClient } from "../client_loader";
 import { bytesToGB, generateInt, log, RemoteRun, splitIP } from "../utils";
 
-jest.setTimeout(300000);
+jest.setTimeout(500000);
 
 let gridClient: GridClient;
 
@@ -217,12 +217,24 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
   const workerPlanetaryIp = result.workers[0].planetary;
   const user = "root";
 
-  //Wait for 20 seconds until the master is ready
-  const wait = await setTimeout(20000, "Waiting for K8s to be ready");
-  log(wait);
-
   //SSH to the master
   const masterSSH = await RemoteRun(masterPlanetaryIp, user);
+
+  //Wait until the cluster is ready
+  let reachable = false;
+  for (let i = 0; i < 40; i++) {
+    await masterSSH.execCommand("source /etc/profile && kubectl get nodes").then(async function (result) {
+      const res = result.stdout;
+      if (res.includes(masterName.toLowerCase()) && res.includes(workerName.toLowerCase())) {
+        reachable = true;
+      }
+    });
+    if (reachable) {
+      break;
+    }
+    const wait = await setTimeout(5000, "Waiting for cluster to be ready");
+    log(wait);
+  }
 
   try {
     //Verify Master Resources(CPU)
@@ -487,12 +499,27 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
 
   const newWorkerPlanetaryIp = newResult.workers[1].planetary;
 
-  //Wait for 20 seconds until the master is ready
-  const wait2 = await setTimeout(20000, "Waiting for K8s to be ready");
-  log(wait2);
-
   //SSH to the master after the new worker is added.
   const masterSSH = await RemoteRun(masterPlanetaryIp, user);
+
+  //Wait until the cluster is ready
+  let reachable = false;
+  for (let i = 0; i < 40; i++) {
+    await masterSSH.execCommand("source /etc/profile && kubectl get nodes").then(async function (result) {
+      const res = result.stdout;
+      if (
+        res.includes(masterName.toLowerCase()) &&
+        res.includes(workerName.toLowerCase() && res.includes(newWorkerName.toLowerCase()))
+      ) {
+        reachable = true;
+      }
+    });
+    if (reachable) {
+      break;
+    }
+    const wait = await setTimeout(5000, "Waiting for cluster to be ready");
+    log(wait);
+  }
 
   //Execute kubectl get nodes.
   try {
@@ -725,4 +752,4 @@ afterEach(async () => {
 
 afterAll(async () => {
   return await gridClient.disconnect();
-});
+}, 10000);
