@@ -115,9 +115,25 @@ const filteredHeaders = computed(() => {
     { title: "Actions", key: "actions" },
   ];
 
-  if (props.projectName !== ProjectName.VM && props.projectName !== ProjectName.Fullvm) {
+  const IPV6Solutions = [ProjectName.VM, ProjectName.Fullvm] as string[];
+
+  const IPV4Solutions = [
+    ProjectName.VM,
+    ProjectName.Fullvm,
+    ProjectName.Presearch,
+    ProjectName.Algorand,
+    ProjectName.Subsquid,
+    ProjectName.Umbrel,
+  ] as string[];
+
+  if (!IPV6Solutions.includes(props.projectName)) {
     headers = headers.filter(h => h.key !== "ipv6");
   }
+
+  if (!IPV4Solutions.includes(props.projectName)) {
+    headers = headers.filter(h => h.key !== "ipv4");
+  }
+
   return headers;
 });
 
