@@ -10,7 +10,7 @@ import {
   randomChoice,
 } from "../../src";
 import { config, getClient } from "../client_loader";
-import { bytesToGB, generateInt, log, RemoteRun, splitIP } from "../utils";
+import { bytesToGB, generateInt, k8sWait, log, RemoteRun, splitIP } from "../utils";
 
 jest.setTimeout(300000);
 
@@ -587,27 +587,11 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
   const workerPlanetaryIp = result.workers[0].planetary;
   const user = "root";
 
-  // //Wait for 20 seconds until the master is ready
-  // const wait = await setTimeout(20000, "Waiting for K8s to be ready");
-  // log(wait);
-
   //SSH to the master
   const masterSSH = await RemoteRun(masterPlanetaryIp, user);
 
-  let reachable = false;
-  for (let i = 0; i < 40; i++) {
-    await masterSSH.execCommand("source /etc/profile && kubectl get nodes").then(async function (result) {
-      const res = result.stdout;
-      if (res.includes(masterName.toLowerCase()) && res.includes(workerName.toLowerCase())) {
-        reachable = true;
-      }
-    });
-    if (reachable) {
-      break;
-    }
-    const wait = await setTimeout(5000, "Waiting for K8s to be ready");
-    log(wait);
-  }
+  //Wait until the cluster is ready
+  await k8sWait(masterSSH, masterName, workerName, 5000);
 
   try {
     //Verify Master Resources(CPU)

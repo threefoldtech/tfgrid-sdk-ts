@@ -1,5 +1,3 @@
-import { setTimeout } from "timers/promises";
-
 import {
   AddWorkerModel,
   DeleteWorkerModel,
@@ -10,7 +8,7 @@ import {
   randomChoice,
 } from "../../src";
 import { config, getClient } from "../client_loader";
-import { bytesToGB, generateInt, log, RemoteRun, splitIP } from "../utils";
+import { bytesToGB, generateInt, k8sWait, log, RemoteRun, splitIP } from "../utils";
 
 jest.setTimeout(500000);
 
@@ -221,20 +219,7 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
   const masterSSH = await RemoteRun(masterPlanetaryIp, user);
 
   //Wait until the cluster is ready
-  let reachable = false;
-  for (let i = 0; i < 40; i++) {
-    await masterSSH.execCommand("source /etc/profile && kubectl get nodes").then(async function (result) {
-      const res = result.stdout;
-      if (res.includes(masterName.toLowerCase()) && res.includes(workerName.toLowerCase())) {
-        reachable = true;
-      }
-    });
-    if (reachable) {
-      break;
-    }
-    const wait = await setTimeout(5000, "Waiting for cluster to be ready");
-    log(wait);
-  }
+  await k8sWait(masterSSH, masterName, workerName, 5000);
 
   try {
     //Verify Master Resources(CPU)
@@ -503,23 +488,7 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
   const masterSSH = await RemoteRun(masterPlanetaryIp, user);
 
   //Wait until the cluster is ready
-  let reachable = false;
-  for (let i = 0; i < 40; i++) {
-    await masterSSH.execCommand("source /etc/profile && kubectl get nodes").then(async function (result) {
-      const res = result.stdout;
-      if (
-        res.includes(masterName.toLowerCase()) &&
-        res.includes(workerName.toLowerCase() && res.includes(newWorkerName.toLowerCase()))
-      ) {
-        reachable = true;
-      }
-    });
-    if (reachable) {
-      break;
-    }
-    const wait = await setTimeout(5000, "Waiting for cluster to be ready");
-    log(wait);
-  }
+  await k8sWait(masterSSH, masterName, workerName, 5000, newWorkerName);
 
   //Execute kubectl get nodes.
   try {
