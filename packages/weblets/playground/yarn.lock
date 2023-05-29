@@ -1529,7 +1529,7 @@
   resolved "https://registry.yarnpkg.com/@substrate/ss58-registry/-/ss58-registry-1.40.0.tgz#2223409c496271df786c1ca8496898896595441e"
   integrity sha512-QuU2nBql3J4KCnOWtWDw4n1K4JU0T79j54ZZvm/9nhsX6AIar13FyhsaBfs6QkJ2ixTQAnd7TocJIoJRWbqMZA==
 
-"@threefold/grid_client@^2.0.0-rc9":
+"@threefold/grid_client@^2.0.0-rc10":
   version "2.0.0-rc9"
   resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.0.0-rc9.tgz#93b5be4c966b5d3ba334237c91e55c2a7d7bb33e"
   integrity sha512-FGGbagG90xSI/rJF40p+eg1bf63sE9Y44hra4sDwbtcOmZgCpiR1Gk7KBBKwDLANgLnQmSPiXDIgGcMubZqGNg==
