@@ -1,9 +1,7 @@
-import * as secp from "@noble/secp256k1";
 import { Keyring } from "@polkadot/keyring";
 import { waitReady } from "@polkadot/wasm-crypto";
 import axios from "axios";
 import { generateMnemonic } from "bip39";
-import * as bip39 from "bip39";
 import { Buffer } from "buffer";
 import MD5 from "crypto-js/md5";
 import { backOff } from "exponential-backoff";
@@ -105,7 +103,6 @@ class TFChain implements blockchainInterface {
     const client = new TFClient(this.substrateURL, options.secret, this.storeSecret, this.keypairType);
     await client.connect();
     await this.save(options.name, client.mnemonic);
-    await client.disconnect();
     return client.address;
   }
 
@@ -129,7 +126,6 @@ class TFChain implements blockchainInterface {
       mnemonic: mnemonics,
       blockchain_type: blockchainType.tfchain,
     };
-    await client.disconnect();
     return account;
   }
 
@@ -154,7 +150,6 @@ class TFChain implements blockchainInterface {
     } catch (e) {
       throw Error(`could not update account mnemonics: ${e}`);
     }
-    await client.disconnect();
     return client.address;
   }
 
@@ -179,7 +174,6 @@ class TFChain implements blockchainInterface {
         public_key: client.address,
         blockchain_type: blockchainType.tfchain,
       });
-      await client.disconnect();
     }
     return accounts;
   }
@@ -205,7 +199,6 @@ class TFChain implements blockchainInterface {
         },
       ],
     };
-    await client.disconnect();
     return assets;
   }
 
@@ -215,7 +208,6 @@ class TFChain implements blockchainInterface {
     const client = new TFClient(this.substrateURL, this.mnemonic, this.storeSecret, this.keypairType);
     await client.connect();
     const balance = await client.balances.get(options);
-    await client.disconnect();
     return balance;
   }
 
@@ -230,7 +222,6 @@ class TFChain implements blockchainInterface {
     } catch (e) {
       throw Error(`Could not complete transfer transaction: ${e}`);
     }
-    await sourceClient.disconnect();
   }
 
   @expose
@@ -283,7 +274,6 @@ class TFChain implements blockchainInterface {
       },
     );
     const ret = await (await client.twins.create({ relay })).apply();
-    await client.disconnect();
     return {
       public_key: client.address,
       mnemonic: mnemonics,
