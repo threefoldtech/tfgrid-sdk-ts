@@ -16,3 +16,4 @@ List of related issues
 - [ ] Build pass
 - [ ] Documentation
 - [ ] Code format and docstrings
+- [ ] Screenshots/Video attached (needed for UI changes)
