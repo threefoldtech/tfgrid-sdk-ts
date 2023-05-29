@@ -1,73 +1,65 @@
 <template>
-  <v-alert v-if="!loading && count && items.length < count" type="warning" variant="tonal">
-    Failed to load <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
-  </v-alert>
+  <div>
+    <v-alert v-if="!loading && count && items.length < count" type="warning" variant="tonal">
+      Failed to load <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
+    </v-alert>
 
-  <ListTable
-    :headers="[
-      { title: '#', key: 'index' },
-      { title: 'PLACEHOLDER', key: 'data-table-select' },
-      { title: 'Name', key: 'name' },
-      { title: 'Public IPv4', key: 'ipv4' },
-      { title: 'Public IPv6', key: 'ipv6' },
-      { title: 'Planetary Network IP', key: 'planetary' },
-      { title: 'Flist', key: 'flist' },
-      { title: 'Billing Rate', key: 'billing' },
-      { title: 'Actions', key: 'actions' },
-    ]"
-    :items="items"
-    :loading="loading"
-    :deleting="deleting"
-    :model-value="$props.modelValue"
-    @update:model-value="$emit('update:model-value', $event)"
-    :no-data-text="`No ${projectName} deployments found on this account.`"
-  >
-    <template #[`item.index`]="{ item }">
-      {{ items.indexOf(item?.value) + 1 }}
-    </template>
+    <ListTable
+      :headers="filteredHeaders"
+      :items="items"
+      :loading="loading"
+      :deleting="deleting"
+      :model-value="$props.modelValue"
+      @update:model-value="$emit('update:model-value', $event)"
+      :no-data-text="`No ${projectName} deployments found on this account.`"
+    >
+      <template #[`item.index`]="{ item }">
+        {{ items.indexOf(item?.value) + 1 }}
+      </template>
 
-    <template #[`item.name`]="{ item }">
-      {{ item.value[0].name }}
-    </template>
+      <template #[`item.name`]="{ item }">
+        {{ item.value[0].name }}
+      </template>
 
-    <template #[`item.ipv4`]="{ item }">
-      {{ item.value[0].publicIP?.ip || "None" }}
-    </template>
+      <template #[`item.ipv4`]="{ item }">
+        {{ item.value[0].publicIP?.ip || "None" }}
+      </template>
 
-    <template #[`item.ipv6`]="{ item }">
-      {{ item.value[0].publicIP?.ip6 || "None" }}
-    </template>
+      <template #[`item.ipv6`]="{ item }">
+        {{ item.value[0].publicIP?.ip6 || "None" }}
+      </template>
 
-    <template #[`item.planetary`]="{ item }">
-      {{ item.value[0].planetary || "None" }}
-    </template>
+      <template #[`item.planetary`]="{ item }">
+        {{ item.value[0].planetary || "None" }}
+      </template>
 
-    <template #[`item.flist`]="{ item }">
-      <v-tooltip :text="item.value[0].flist" location="bottom right">
-        <template #activator="{ props }">
-          <p v-bind="props">
-            {{ item.value[0].flist.replace("https://hub.grid.tf/", "").replace(".flist", "") }}
-          </p>
-        </template>
-      </v-tooltip>
-    </template>
+      <template #[`item.flist`]="{ item }">
+        <v-tooltip :text="item.value[0].flist" location="bottom right">
+          <template #activator="{ props }">
+            <p v-bind="props">
+              {{ item.value[0].flist.replace("https://hub.grid.tf/", "").replace(".flist", "") }}
+            </p>
+          </template>
+        </v-tooltip>
+      </template>
 
-    <template #[`item.billing`]="{ item }">
-      {{ item.value[0].billing }}
-    </template>
-    <template #[`item.actions`]="{ item }">
-      <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item.value)">
-        Deleting...
-      </v-chip>
-      <v-btn-group variant="tonal" v-else>
-        <slot :name="projectName + '-actions'" :item="item"></slot>
-      </v-btn-group>
-    </template>
-  </ListTable>
+      <template #[`item.billing`]="{ item }">
+        {{ item.value[0].billing }}
+      </template>
+      <template #[`item.actions`]="{ item }">
+        <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item.value)">
+          Deleting...
+        </v-chip>
+        <v-btn-group variant="tonal" v-else>
+          <slot :name="projectName + '-actions'" :item="item"></slot>
+        </v-btn-group>
+      </template>
+    </ListTable>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
 import { getGrid, updateGrid } from "../utils/grid";
@@ -109,6 +101,41 @@ async function loadDeployments() {
 
   loading.value = false;
 }
+
+const filteredHeaders = computed(() => {
+  let headers = [
+    { title: "#", key: "index" },
+    { title: "PLACEHOLDER", key: "data-table-select" },
+    { title: "Name", key: "name" },
+    { title: "Public IPv4", key: "ipv4" },
+    { title: "Public IPv6", key: "ipv6" },
+    { title: "Planetary Network IP", key: "planetary" },
+    { title: "Flist", key: "flist" },
+    { title: "Billing Rate", key: "billing" },
+    { title: "Actions", key: "actions" },
+  ];
+
+  const IPV6Solutions = [ProjectName.VM, ProjectName.Fullvm] as string[];
+
+  const IPV4Solutions = [
+    ProjectName.VM,
+    ProjectName.Fullvm,
+    ProjectName.Presearch,
+    ProjectName.Algorand,
+    ProjectName.Subsquid,
+    ProjectName.Umbrel,
+  ] as string[];
+
+  if (!IPV6Solutions.includes(props.projectName)) {
+    headers = headers.filter(h => h.key !== "ipv6");
+  }
+
+  if (!IPV4Solutions.includes(props.projectName)) {
+    headers = headers.filter(h => h.key !== "ipv4");
+  }
+
+  return headers;
+});
 
 defineExpose({ loadDeployments });
 </script>
