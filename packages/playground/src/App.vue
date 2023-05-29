@@ -1,6 +1,12 @@
 <template>
   <v-app>
-    <v-navigation-drawer width="280" :permanent="permanent" v-model="openSidebar" theme="dark">
+    <v-navigation-drawer
+      width="280"
+      :permanent="permanent"
+      :model-value="hasActiveProfile && openSidebar"
+      @update:model-value="openSidebar = $event"
+      theme="dark"
+    >
       <div :style="{ paddingTop: '64px' }">
         <div
           :style="{
@@ -70,6 +76,7 @@
               icon="mdi-menu"
               variant="tonal"
               class="mr-2"
+              :disabled="!hasActiveProfile"
               v-if="!permanent"
             />
             <div :style="{ width: '100%' }" class="mb-4">
