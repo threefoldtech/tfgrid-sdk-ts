@@ -4,10 +4,8 @@ import axios from "axios";
 import { generateMnemonic } from "bip39";
 import { Buffer } from "buffer";
 import MD5 from "crypto-js/md5";
-import { backOff } from "exponential-backoff";
 import * as PATH from "path";
 
-import { TFBalances } from "../clients/tf-grid/balances";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
@@ -262,11 +260,14 @@ class TFChain implements blockchainInterface {
       substrateAccountID: client.address,
     });
     const start = new Date().getTime();
+    let balance = await client.balances.getMyBalance();
     while (new Date().getTime() < start + 10 * 1000) {
-      const balance = await client.balances.getMyBalance();
+      balance = await client.balances.getMyBalance();
       if (balance.free > 0) break;
-      console.log("waiting.....");
       await new Promise(f => setTimeout(f, 1000));
+    }
+    if (balance.free <= 0) {
+      throw Error("Couldn't activate the newly created account");
     }
     await (
       await client.termsAndConditions.accept({ documentLink: "https://library.threefold.me/info/legal/#/" })
