@@ -55,6 +55,7 @@
             ssd: rootFsSize,
             publicIp: ipv4,
           }"
+          exclusive-for="research"
           v-model="farm"
         />
       </template>
