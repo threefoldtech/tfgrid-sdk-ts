@@ -1,4 +1,5 @@
 import { default as md5 } from "crypto-js/md5";
+import { setTimeout } from "timers/promises";
 import { default as urlParser } from "url-parse";
 import { inspect } from "util";
 
@@ -54,4 +55,29 @@ async function returnRelay() {
   return relay;
 }
 
-export { log, generateHash, generateInt, splitIP, bytesToGB, RemoteRun, returnRelay };
+async function k8sWait(masterIP, masterName, workerName, waitTime, newWorkerName?) {
+  let reachable = false;
+  for (let i = 0; i < 40; i++) {
+    await masterIP.execCommand("source /etc/profile && kubectl get nodes").then(async function (result) {
+      const res = result.stdout;
+      if (typeof newWorkerName !== "undefined") {
+        if (
+          res.includes(masterName.toLowerCase()) &&
+          res.includes(workerName.toLowerCase() && res.includes(newWorkerName.toLowerCase()))
+        ) {
+          reachable = true;
+        }
+      } else {
+        if (res.includes(masterName.toLowerCase()) && res.includes(workerName.toLowerCase())) {
+          reachable = true;
+        }
+      }
+    });
+    if (reachable) {
+      break;
+    }
+    setTimeout(waitTime, "Waiting for cluster to be ready");
+  }
+}
+
+export { log, generateHash, generateInt, splitIP, bytesToGB, RemoteRun, returnRelay, k8sWait };
