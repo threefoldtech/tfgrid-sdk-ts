@@ -70,8 +70,8 @@
             :value="password"
             :rules="[
               validators.required('Password is required.'),
-              validators.minLength('Password minLength is 6 chars.', 6),
-              validators.maxLength('Password maxLength is 15 chars.', 15),
+              validators.minLength('Password must be at least 6 characters.', 6),
+              validators.maxLength('Password cannot exceed 15 characters.', 15),
             ]"
             #="{ props: validationProps }"
           >
