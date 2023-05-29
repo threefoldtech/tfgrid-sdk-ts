@@ -65,7 +65,7 @@ function calcDiskSize(disks: { size: number }[]) {
 
 async function deploy(layout: any) {
   layout.setStatus("deploy");
-  const grid = await getGrid(profileManager.profile!, ProjectName.Kubernetes);
+  const grid = await getGrid(profileManager.profile!);
   console.log(props.data.deploymentName);
 
   deployWorker(grid!, {
@@ -85,7 +85,7 @@ async function deploy(layout: any) {
 
 async function onDelete(cb: (workers: any[]) => void) {
   deleting.value = true;
-  const grid = await getGrid(profileManager.profile!, ProjectName.Kubernetes);
+  const grid = await getGrid(profileManager.profile!);
 
   for (const worker of selectedWorkers.value) {
     try {

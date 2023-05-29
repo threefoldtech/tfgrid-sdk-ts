@@ -8,7 +8,9 @@
           >Threefold Chain</v-toolbar-title
         >
 
-        <v-spacer></v-spacer>
+        <v-spacer>
+          <TftSwapPrice v-if="!loadingAPI" />
+        </v-spacer>
         <div class="d-flex">
           <FundsCard v-if="$store.state.credentials.initialized && $store.state.credentials.balance" />
           <div class="d-flex" style="align-items: center">
@@ -194,6 +196,7 @@ import { Component, Vue } from "vue-property-decorator";
 import config from "@/portal/config";
 
 import FundsCard from "./portal/components/FundsCard.vue";
+import TftSwapPrice from "./portal/components/TftSwapPrice.vue";
 import WelcomeWindow from "./portal/components/WelcomeWindow.vue";
 import { connect } from "./portal/lib/connect";
 import { accountInterface } from "./portal/store/state";
@@ -222,7 +225,7 @@ interface SidenavItem {
 
 @Component({
   name: "Dashboard",
-  components: { WelcomeWindow, FundsCard },
+  components: { WelcomeWindow, FundsCard, TftSwapPrice },
 })
 export default class Dashboard extends Vue {
   collapseOnScroll = true;

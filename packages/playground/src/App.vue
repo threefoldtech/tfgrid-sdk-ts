@@ -1,6 +1,12 @@
 <template>
   <v-app>
-    <v-navigation-drawer width="280" :permanent="permanent" v-model="openSidebar" theme="dark">
+    <v-navigation-drawer
+      width="280"
+      :permanent="permanent"
+      :model-value="hasActiveProfile && openSidebar"
+      @update:model-value="openSidebar = $event"
+      theme="dark"
+    >
       <div :style="{ paddingTop: '64px' }">
         <div
           :style="{
@@ -52,11 +58,13 @@
 
         <v-spacer></v-spacer>
 
-        <AppTheme />
-
-        <v-divider vertical />
-
         <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
+        <v-divider vertical />
+        <AppTheme />
+        <v-divider vertical />
+        <div class="mx-2">
+          <ProfileManager v-model="openProfile" />
+        </div>
       </v-toolbar>
 
       <DeploymentListManager>
@@ -68,20 +76,20 @@
               icon="mdi-menu"
               variant="tonal"
               class="mr-2"
+              :disabled="!hasActiveProfile"
               v-if="!permanent"
             />
-            <div :style="{ width: '100%' }">
+            <div :style="{ width: '100%' }" class="mb-4">
               <DisclaimerToolbar />
             </div>
           </div>
-          <div class="my-4 d-flex justify-end">
-            <ProfileManager />
-          </div>
+
           <div :style="{ position: 'relative' }">
             <router-view v-slot="{ Component }">
               <transition name="fade">
                 <div :key="$route.path">
-                  <component :is="Component"></component>
+                  <component :is="Component" v-if="hasActiveProfile"></component>
+                  <ConnectWalletLanding @openProfile="openProfile = true" v-else />
                 </div>
               </transition>
             </router-view>
@@ -93,11 +101,18 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+
+import { useProfileManager } from "./stores/profile_manager";
 
 const $route = useRoute();
 const $router = useRouter();
+const profileManager = useProfileManager();
+
+const openProfile = ref(true);
+const hasActiveProfile = computed(() => !!profileManager.profile);
+
 watch(
   () => $route.meta,
   meta => (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
@@ -149,6 +164,7 @@ const baseUrl = import.meta.env.BASE_URL;
 
 <script lang="ts">
 import AppTheme from "./components/app_theme.vue";
+import ConnectWalletLanding from "./components/connect_wallet_landing.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
 import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
 import ProfileManager from "./weblets/profile_manager.vue";
@@ -170,6 +186,7 @@ export default {
     ProfileManager,
     DeploymentListManager,
     AppTheme,
+    ConnectWalletLanding,
   },
 };
 </script>

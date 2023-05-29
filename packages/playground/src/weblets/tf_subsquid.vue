@@ -20,8 +20,10 @@
         :value="name"
         :rules="[
           validators.required('Name is required.'),
-          validators.minLength('Name minLength is 2 chars.', 2),
-          validators.maxLength('Name maxLength is 15 chars.', 15),
+          validators.isAlphanumeric('Name should consist of letters only.'),
+          name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+          validators.minLength('Name must be at least 2 characters.', 2),
+          validators.maxLength('Name cannot exceed 15 characters.', 15),
         ]"
         #="{ props }"
       >
@@ -41,7 +43,11 @@
 
       <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
 
-      <SelectSolutionFlavor v-model="solution" />
+      <SelectSolutionFlavor
+        v-model="solution"
+        :minimum="{ cpu: 1, memory: 1024, disk: 50 }"
+        :standard="{ cpu: 2, memory: 1024 * 2, disk: 100 }"
+      />
       <SelectGatewayNode v-model="gateway" />
       <SelectFarm
         :filters="{
@@ -118,7 +124,7 @@ async function deploy() {
             },
           ],
           flist: "https://hub.grid.tf/tf-official-apps/subsquid-latest.flist",
-          entryPoint: "/init.sh",
+          entryPoint: "/sbin/zinit init",
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,

@@ -20,8 +20,10 @@
         :value="name"
         :rules="[
           validators.required('Name is required.'),
-          validators.minLength('Name minLength is 2 chars.', 2),
-          validators.maxLength('Name maxLength is 15 chars.', 15),
+          validators.isAlphanumeric('Name should consist of letters only.'),
+          name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+          validators.minLength('Name must be at least 2 characters.', 2),
+          validators.maxLength('Name cannot exceed 15 characters.', 15),
         ]"
         #="{ props }"
       >
@@ -32,8 +34,8 @@
         :value="username"
         :rules="[
           validators.required('Username is required.'),
-          validators.minLength('Username minLength is 2 chars.', 2),
-          validators.maxLength('Username maxLength is 15 chars.', 15),
+          validators.minLength('Username must be at least 2 characters.', 2),
+          validators.maxLength('Username cannot exceed 15 characters.', 15),
         ]"
         #="{ props }"
       >
@@ -45,8 +47,8 @@
           :value="password"
           :rules="[
             validators.required('Password is required.'),
-            validators.minLength('Password minLength is 6 chars.', 6),
-            validators.maxLength('Password maxLength is 15 chars.', 15),
+            validators.minLength('Password must be at least 6 characters.', 6),
+            validators.maxLength('Password cannot exceed 15 characters.', 15),
           ]"
           #="{ props: validatorProps }"
         >
@@ -56,7 +58,12 @@
 
       <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
 
-      <SelectSolutionFlavor v-model="solution" />
+      <SelectSolutionFlavor
+        v-model="solution"
+        :minimum="{ cpu: 2, memory: 1024 * 2, disk: 10 }"
+        :standard="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
+        :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+      />
       <SelectFarm
         :filters="{
           cpu: solution?.cpu,

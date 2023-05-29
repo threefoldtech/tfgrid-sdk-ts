@@ -125,11 +125,8 @@ class TwinDeploymentHandler {
   }
 
   async saveNetworks(twinDeployments: TwinDeployment[]) {
-    const savedNetworkNames: string[] = [];
     for (const twinDeployment of twinDeployments) {
       if (twinDeployment.network) {
-        if (savedNetworkNames.includes(twinDeployment.network.name)) continue;
-        savedNetworkNames.push(twinDeployment.network.name);
         if (twinDeployment.operation === Operations.delete) {
           await twinDeployment.network.save();
           continue;
@@ -460,7 +457,6 @@ class TwinDeploymentHandler {
       nameExtrinsics = nameExtrinsics.concat(extrinsics.nameExtrinsics);
       deletedExtrinsics = deletedExtrinsics.concat(extrinsics.deletedExtrinsics);
     }
-    events.emit("logs", "Creating contracts");
     const extrinsicResults: Contract[] = await this.tfclient.applyAllExtrinsics<Contract>([
       ...nodeExtrinsics,
       ...nameExtrinsics,
