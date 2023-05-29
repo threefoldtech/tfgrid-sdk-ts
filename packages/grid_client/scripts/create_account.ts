@@ -1,4 +1,3 @@
-import { QueryClient } from "@threefold/tfchain_client";
 import { env } from "process";
 import { default as urlParser } from "url-parse";
 
