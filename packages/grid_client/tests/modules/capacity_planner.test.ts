@@ -214,4 +214,4 @@ test("TC1246 - Capacity Planner: Get Farm ID From Farm Name", async () => {
 
 afterAll(async () => {
   return await gridClient.disconnect();
-});
+}, 10000);

@@ -1,5 +1,3 @@
-import { setTimeout } from "timers/promises";
-
 import {
   AddWorkerModel,
   DeleteWorkerModel,
@@ -10,9 +8,9 @@ import {
   randomChoice,
 } from "../../src";
 import { config, getClient } from "../client_loader";
-import { bytesToGB, generateInt, log, RemoteRun, splitIP } from "../utils";
+import { bytesToGB, generateInt, k8sWait, log, RemoteRun, splitIP } from "../utils";
 
-jest.setTimeout(300000);
+jest.setTimeout(500000);
 
 let gridClient: GridClient;
 
@@ -217,12 +215,11 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
   const workerPlanetaryIp = result.workers[0].planetary;
   const user = "root";
 
-  //Wait for 20 seconds until the master is ready
-  const wait = await setTimeout(20000, "Waiting for K8s to be ready");
-  log(wait);
-
   //SSH to the master
   const masterSSH = await RemoteRun(masterPlanetaryIp, user);
+
+  //Wait until the cluster is ready
+  await k8sWait(masterSSH, masterName, workerName, 5000);
 
   try {
     //Verify Master Resources(CPU)
@@ -487,12 +484,11 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
 
   const newWorkerPlanetaryIp = newResult.workers[1].planetary;
 
-  //Wait for 20 seconds until the master is ready
-  const wait2 = await setTimeout(20000, "Waiting for K8s to be ready");
-  log(wait2);
-
   //SSH to the master after the new worker is added.
   const masterSSH = await RemoteRun(masterPlanetaryIp, user);
+
+  //Wait until the cluster is ready
+  await k8sWait(masterSSH, masterName, workerName, 5000, newWorkerName);
 
   //Execute kubectl get nodes.
   try {
@@ -725,4 +721,4 @@ afterEach(async () => {
 
 afterAll(async () => {
   return await gridClient.disconnect();
-});
+}, 10000);

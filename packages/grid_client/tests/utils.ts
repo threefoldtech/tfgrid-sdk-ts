@@ -1,4 +1,5 @@
 import { default as md5 } from "crypto-js/md5";
+import { setTimeout } from "timers/promises";
 import { default as urlParser } from "url-parse";
 import { inspect } from "util";
 
@@ -54,4 +55,29 @@ async function returnRelay() {
   return relay;
 }
 
-export { log, generateHash, generateInt, splitIP, bytesToGB, RemoteRun, returnRelay };
+async function k8sWait(masterSSHClient, k8sMasterName, k8sWorkerName, waitTime, k8sNewWorkerName?) {
+  let reachable = false;
+  for (let i = 0; i < 40; i++) {
+    await masterSSHClient.execCommand("source /etc/profile && kubectl get nodes").then(async function (result) {
+      const res = result.stdout;
+      if (typeof k8sNewWorkerName !== "undefined") {
+        if (
+          res.includes(k8sMasterName.toLowerCase()) &&
+          res.includes(k8sWorkerName.toLowerCase() && res.includes(k8sNewWorkerName.toLowerCase()))
+        ) {
+          reachable = true;
+        }
+      } else {
+        if (res.includes(k8sMasterName.toLowerCase()) && res.includes(k8sWorkerName.toLowerCase())) {
+          reachable = true;
+        }
+      }
+    });
+    if (reachable) {
+      break;
+    }
+    setTimeout(waitTime);
+  }
+}
+
+export { log, generateHash, generateInt, splitIP, bytesToGB, RemoteRun, returnRelay, k8sWait };

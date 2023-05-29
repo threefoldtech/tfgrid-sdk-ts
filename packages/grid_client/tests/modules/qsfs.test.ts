@@ -10,7 +10,7 @@ import {
   randomChoice,
 } from "../../src";
 import { config, getClient } from "../client_loader";
-import { bytesToGB, generateInt, log, RemoteRun, splitIP } from "../utils";
+import { bytesToGB, generateInt, k8sWait, log, RemoteRun, splitIP } from "../utils";
 
 jest.setTimeout(300000);
 
@@ -587,12 +587,11 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
   const workerPlanetaryIp = result.workers[0].planetary;
   const user = "root";
 
-  //Wait for 20 seconds until the master is ready
-  const wait = await setTimeout(20000, "Waiting for K8s to be ready");
-  log(wait);
-
   //SSH to the master
   const masterSSH = await RemoteRun(masterPlanetaryIp, user);
+
+  //Wait until the cluster is ready
+  await k8sWait(masterSSH, masterName, workerName, 5000);
 
   try {
     //Verify Master Resources(CPU)
@@ -687,4 +686,4 @@ afterEach(async () => {
 
 afterAll(async () => {
   return await gridClient.disconnect();
-});
+}, 10000);
