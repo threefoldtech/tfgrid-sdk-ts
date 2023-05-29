@@ -13,7 +13,7 @@ async function main() {
   // create disk Object
   const disk = new DiskModel();
   disk.name = "dynamicDisk";
-  disk.size = 8;
+  disk.size = 1;
   disk.mountpoint = "/testdisk";
 
   const vmQueryOptions: FilterOptions = {
