@@ -1,6 +1,6 @@
 ## Playground project
 
-Weblets are a web components which provide a UI to deploy workloads on TF Grid 3. All the backend functionality is provided by [grid_client](https://github.com/threefoldtech/tfgrid-sdk-ts/tree/development/packages/grid_client). It is a reusable component that can be injected in a HTML or a Node Web app.
+Playground is a web components which provide a UI to deploy workloads on TF Grid 3. All the backend functionality is provided by [grid_client](https://github.com/threefoldtech/tfgrid-sdk-ts/tree/development/packages/grid_client). It is a reusable component that can be injected in a HTML or a Node Web app.
 
 ## Usage
 

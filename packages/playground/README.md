@@ -1,46 +1,61 @@
 # Playground
 
-This template should help get you started developing with Vue 3 in Vite.
+![Version](https://img.shields.io/github/package-json/v/threefoldtech/tfgrid-sdk-ts?color=blue&filename=packages%2Fplayground%2Fpackage.json)
+[![Build](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/playground_build.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/playground_build.yml)
+[![CD](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/playground_cd.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/playground_cd.yml)
+[![Docker](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/playground_docker.yml/badge.svg)](https://github.com/threefoldtech/tfgrid-sdk-ts/actions/workflows/playground_docker.yml)
 
-## Recommended IDE Setup
+## Introduction
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+Playground is a Vue application that helps with deploying solutions on TF Grid v3. The backend for the playground is introduced with [grid client](https://manual.grid.tf/javascript/grid3_javascript_readme.html) which communicates to TF Chain and TF Grid over RMB.
 
-## Type Support for `.vue` Imports in TS
+## Installation
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+- **Prerequisite**
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+  - Nodejs 16^
+  - yarn
 
-1. Disable the built-in TypeScript Extension
-   1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-   2. Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+  > For troubleshooting please checkout this file [troubleshooting](./docs/config.md)
 
-## Customize configuration
+- **Clone the repository & Install Dependencies**
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+  ```bash
+  git clone https://github.com/threefoldtech/tfgrid-sdk-ts.git
+  cd tfgrid-sdk-ts
+  yarn install
+  ```
 
-## Project Setup
+## Getting Started
 
-```sh
-yarn
+> For detailed information you can read the [Getting Started](./docs/getting_started.md) documentation.
+
+- **Run playground in Development mode**
+
+```bash
+yarn workspace @threefold/playground dev
 ```
 
-### Compile and Hot-Reload for Development
+- **Run playground in Production mode**
 
-```sh
-yarn dev
+```bash
+yarn workspace @threefold/playground build
 ```
 
-### Type-Check, Compile and Minify for Production
+This will generate the production build in the `dist` directory, which can be served using [Caddy](https://caddyserver.com/) or [NGINX](https://www.nginx.com/)
 
-```sh
-yarn build
+You can run the playground in different modes. by editing the config file in `playground/src/config.js`
+For an automated generation of the config file you can use the script `build-env` in `scripts/` it will generate the config file based on your env-vars.
+
+```bash
+cd packages/playground/public
+bash ../../scripts/build-env.sh
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+More illustration on the build-env script [here](docs/build.md)
 
-```sh
-yarn lint
-```
+## Related Documentations
+
+- [Contributing Guide](./docs/contributing.md)
+- [playground Documentation](https://manual.grid.tf/weblets/weblets_home.html)
+- [Troubleshooting](./docs/config.md)
