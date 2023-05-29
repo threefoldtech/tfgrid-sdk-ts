@@ -254,26 +254,25 @@ class TFChain implements blockchainInterface {
     };
   }
 
-  async createAccount(relay: string) {
+  async createAccount(relay: string, disconnect = false) {
     const mnemonics = generateMnemonic();
     const client = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
     await client.connect();
     await axios.post(this.activationURL, {
       substrateAccountID: client.address,
     });
-    await backOff(
-      () =>
-        client.termsAndConditions.accept({ documentLink: "https://library.threefold.me/info/legal/#/" }).then(res => {
-          return res.apply();
-        }),
-      {
-        delayFirstAttempt: true,
-        startingDelay: 5000,
-        maxDelay: 5000,
-        timeMultiple: 1.25,
-      },
-    );
+    const start = new Date().getTime();
+    while (new Date().getTime() < start + 10 * 1000) {
+      const balance = await client.balances.getMyBalance();
+      if (balance.free > 0) break;
+      console.log("waiting.....");
+      await new Promise(f => setTimeout(f, 1000));
+    }
+    await (
+      await client.termsAndConditions.accept({ documentLink: "https://library.threefold.me/info/legal/#/" })
+    ).apply();
     const ret = await (await client.twins.create({ relay })).apply();
+    if (disconnect) await client.disconnect();
     return {
       public_key: client.address,
       mnemonic: mnemonics,
