@@ -59,7 +59,8 @@
     "vue-router": "^3.5.1",
     "vue-toasted": "^1.1.28",
     "vuetify": "^2.6.0",
-    "vuex": "^3.6.2"
+    "vuex": "^3.6.2",
+    "@threefold/tfchain_client": "^2.0.0-rc9" 
   },
   "devDependencies": {
     "@babel/plugin-syntax-top-level-await": "^7.14.5",
