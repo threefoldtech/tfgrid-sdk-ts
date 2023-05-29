@@ -31,7 +31,10 @@ export async function getFarms(grid: GridClient, filters: FilterOptions, options
 export async function getBlockedFarmSet(exclusiveFor: string): Promise<Set<number>> {
   const { totalCount } = await gqlClient.nodeContractsConnection(
     { totalCount: true },
-    { orderBy: ["id_ASC"], where: { deploymentData_contains: exclusiveFor, state_eq: "Created" } },
+    {
+      orderBy: ["id_ASC"],
+      where: { deploymentData_contains: exclusiveFor, state_eq: "Created", numberOfPublicIPs_eq: 0 },
+    },
   );
 
   const nodes = await gqlClient.nodeContracts(
