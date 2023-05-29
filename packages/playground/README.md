@@ -22,6 +22,7 @@ Playground is a Vue application that helps with deploying solutions on TF Grid v
 
   ```bash
   git clone https://github.com/threefoldtech/tfgrid-sdk-ts.git
+  cd tfgrid-sdk-ts
   yarn install
   ```
 
