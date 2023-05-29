@@ -1,15 +1,11 @@
-import * as secp from "@noble/secp256k1";
 import { Keyring } from "@polkadot/keyring";
 import { waitReady } from "@polkadot/wasm-crypto";
 import axios from "axios";
 import { generateMnemonic } from "bip39";
-import * as bip39 from "bip39";
 import { Buffer } from "buffer";
 import MD5 from "crypto-js/md5";
-import { backOff } from "exponential-backoff";
 import * as PATH from "path";
 
-import { TFBalances } from "../clients/tf-grid/balances";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
@@ -105,7 +101,6 @@ class TFChain implements blockchainInterface {
     const client = new TFClient(this.substrateURL, options.secret, this.storeSecret, this.keypairType);
     await client.connect();
     await this.save(options.name, client.mnemonic);
-    await client.disconnect();
     return client.address;
   }
 
@@ -129,7 +124,6 @@ class TFChain implements blockchainInterface {
       mnemonic: mnemonics,
       blockchain_type: blockchainType.tfchain,
     };
-    await client.disconnect();
     return account;
   }
 
@@ -154,7 +148,6 @@ class TFChain implements blockchainInterface {
     } catch (e) {
       throw Error(`could not update account mnemonics: ${e}`);
     }
-    await client.disconnect();
     return client.address;
   }
 
@@ -179,7 +172,6 @@ class TFChain implements blockchainInterface {
         public_key: client.address,
         blockchain_type: blockchainType.tfchain,
       });
-      await client.disconnect();
     }
     return accounts;
   }
@@ -205,7 +197,6 @@ class TFChain implements blockchainInterface {
         },
       ],
     };
-    await client.disconnect();
     return assets;
   }
 
@@ -215,7 +206,6 @@ class TFChain implements blockchainInterface {
     const client = new TFClient(this.substrateURL, this.mnemonic, this.storeSecret, this.keypairType);
     await client.connect();
     const balance = await client.balances.get(options);
-    await client.disconnect();
     return balance;
   }
 
@@ -230,7 +220,6 @@ class TFChain implements blockchainInterface {
     } catch (e) {
       throw Error(`Could not complete transfer transaction: ${e}`);
     }
-    await sourceClient.disconnect();
   }
 
   @expose
@@ -263,27 +252,28 @@ class TFChain implements blockchainInterface {
     };
   }
 
-  async createAccount(relay: string) {
+  async createAccount(relay: string, disconnect = false) {
     const mnemonics = generateMnemonic();
     const client = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
     await client.connect();
     await axios.post(this.activationURL, {
       substrateAccountID: client.address,
     });
-    await backOff(
-      () =>
-        client.termsAndConditions.accept({ documentLink: "https://library.threefold.me/info/legal/#/" }).then(res => {
-          return res.apply();
-        }),
-      {
-        delayFirstAttempt: true,
-        startingDelay: 5000,
-        maxDelay: 5000,
-        timeMultiple: 1.25,
-      },
-    );
+    const start = new Date().getTime();
+    let balance = await client.balances.getMyBalance();
+    while (new Date().getTime() < start + 10 * 1000) {
+      balance = await client.balances.getMyBalance();
+      if (balance.free > 0) break;
+      await new Promise(f => setTimeout(f, 1000));
+    }
+    if (balance.free <= 0) {
+      throw Error("Couldn't activate the newly created account");
+    }
+    await (
+      await client.termsAndConditions.accept({ documentLink: "https://library.threefold.me/info/legal/#/" })
+    ).apply();
     const ret = await (await client.twins.create({ relay })).apply();
-    await client.disconnect();
+    if (disconnect) await client.disconnect();
     return {
       public_key: client.address,
       mnemonic: mnemonics,

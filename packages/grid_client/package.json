@@ -25,7 +25,6 @@
     "class-validator": "^0.14.0",
     "crypto-js": "^4.1.1",
     "decimal.js": "^10.3.1",
-    "exponential-backoff": "^3.1.0",
     "libsodium-wrappers": "^0.7.10",
     "netaddr": "^1.1.0",
     "private-ip": "^2.3.3",

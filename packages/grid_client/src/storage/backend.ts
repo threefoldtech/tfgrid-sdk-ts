@@ -3,6 +3,7 @@ import * as PATH from "path";
 
 import { KeypairType } from "../zos/deployment";
 import BackendStorageInterface from "./BackendStorageInterface";
+import { LocalStorage } from "./localstorage";
 import { PKID } from "./pkid";
 import { TFKVStoreBackend } from "./tfkvstore";
 
@@ -45,8 +46,7 @@ class BackendStorage {
         const storage = require("./filesystem");
         this.storage = new storage.FS();
       } else {
-        const storage = require("./localstorage");
-        this.storage = new storage.LocalStorage();
+        this.storage = new LocalStorage();
       }
     } else if (type === BackendStorageType.tfkvstore) {
       this.storage = new TFKVStoreBackend(substrateURL, mnemonic, storeSecret, keypairType);

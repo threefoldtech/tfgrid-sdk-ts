@@ -21,9 +21,8 @@ async function main() {
   const urls = client.getDefaultUrls(network);
   const relay = urlParser(urls.relay).hostname;
 
-  const createdAccount = await client.tfchain.createAccount(relay);
+  const createdAccount = await client.tfchain.createAccount(relay, true);
   log(createdAccount);
-  client.disconnect();
 }
 
 main();
