@@ -55,10 +55,10 @@ async function returnRelay() {
   return relay;
 }
 
-async function k8sWait(k8sMasterIP, k8sMasterName, k8sWorkerName, waitTime, k8sNewWorkerName?) {
+async function k8sWait(masterSSHClient, k8sMasterName, k8sWorkerName, waitTime, k8sNewWorkerName?) {
   let reachable = false;
   for (let i = 0; i < 40; i++) {
-    await k8sMasterIP.execCommand("source /etc/profile && kubectl get nodes").then(async function (result) {
+    await masterSSHClient.execCommand("source /etc/profile && kubectl get nodes").then(async function (result) {
       const res = result.stdout;
       if (typeof k8sNewWorkerName !== "undefined") {
         if (
