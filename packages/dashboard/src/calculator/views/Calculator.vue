@@ -87,12 +87,13 @@
               </v-tooltip>
             </v-col>
           </v-row>
+          <!-- <v-row>
+          </v-row> -->
           <v-row>
-            <v-col cols="11" class="mx-auto">
+            <v-col cols="5" class="mx-auto">
               <v-switch label="Public IP (V4)" @change="IPV4Toggle" />
             </v-col>
-          </v-row>
-          <v-row>
+
             <v-col cols="5" class="mx-auto">
               <v-text-field
                 placeholder="Your Balance"
@@ -244,7 +245,7 @@ export default class Calculator extends Vue {
       const price = await this.calcPrice();
       const CU = calCU(+this.CRU, +this.MRU);
       const SU = calSU(+this.HRU, +this.SRU);
-      const IPV4 = this.IPV4 == true ? 1 : 0;
+      const IPV4 = this.IPV4 ? 1 : 0;
 
       const musd_month = (CU * price.cu.value + SU * price.su.value + IPV4 * price.ipu.value) * 24 * 30;
       const [dedicatedPrice, dedicatedPackage, sharedPrice, sharedPackage] = await this.calDiscount(musd_month);
