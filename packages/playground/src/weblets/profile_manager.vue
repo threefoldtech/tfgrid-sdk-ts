@@ -42,9 +42,10 @@
         v-if="!profileManager.profile"
         :tabs="[
           { title: 'Login', value: 'login' },
-          { title: 'Register', value: 'register' },
+          { title: 'Connect', value: 'register' },
         ]"
         v-model="activeTab"
+        :disabled="creatingAccount || activating"
         @tab:change="passwordInput.validate(password)"
       >
         <VContainer>
@@ -67,14 +68,25 @@
                     valid-message="Mnemonic is valid."
                     #="{ props: validationProps }"
                   >
-                    <div v-bind="tooltipProps" v-show="!profileManager.profile">
+                    <div v-bind="tooltipProps" v-show="!profileManager.profile" class="d-flex">
                       <VTextField
                         label="Mnemonic"
                         placeholder="Please insert your mnemonic"
                         autofocus
                         v-model="mnemonic"
                         v-bind="{ ...passwordInputProps, ...validationProps }"
+                        :disabled="creatingAccount || activating"
                       />
+                      <VBtn
+                        class="mt-2 ml-3"
+                        color="secondary"
+                        variant="tonal"
+                        :disabled="isValidForm"
+                        :loading="creatingAccount"
+                        @click="createNewAccount"
+                      >
+                        generate account
+                      </VBtn>
                     </div>
                   </InputValidator>
                 </PasswordInputWrapper>
@@ -92,12 +104,23 @@
                 #="{ props: validationProps }"
                 ref="passwordInput"
               >
-                <VTextField
-                  label="Password"
-                  :autofocus="activeTab === 0"
-                  v-model="password"
-                  v-bind="{ ...passwordInputProps, ...validationProps }"
-                />
+                <v-tooltip
+                  location="bottom"
+                  text="used to encrypt your mnemonic on your local system, and is used to login from the same device."
+                >
+                  <template #activator="{ props: tooltipProps }">
+                    <div v-bind="tooltipProps">
+                      <VTextField
+                        label="Password"
+                        :autofocus="activeTab === 0"
+                        v-model="password"
+                        v-bind="{ ...passwordInputProps, ...validationProps }"
+                        hint="used to encrypt your mnemonic on your local system, and is used to login from the same device."
+                        :disabled="creatingAccount || activating"
+                      />
+                    </div>
+                  </template>
+                </v-tooltip>
               </InputValidator>
             </PasswordInputWrapper>
           </FormValidator>
@@ -221,17 +244,6 @@
         >
           Logout
         </VBtn>
-        <template v-else>
-          <VBtn
-            color="secondary"
-            variant="tonal"
-            :disabled="isValidForm"
-            :loading="creatingAccount"
-            @click="createNewAccount"
-          >
-            Don't have an account? Create one
-          </VBtn>
-        </template>
         <VBtn color="error" variant="outlined" @click="$emit('update:modelValue', false)"> Close </VBtn>
       </template>
     </WebletLayout>
