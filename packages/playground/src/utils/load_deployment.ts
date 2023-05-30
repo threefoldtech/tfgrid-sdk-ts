@@ -55,9 +55,9 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     vms.map(vm => getWireguardConfig(grid, vm[0].interfaces[0].network).catch(() => [])),
   );
 
-  const data = vms.map((vm: any, index) => {
+  const data = vms.map((vm, index) => {
     vm[0].billing = formatConsumption(consumptions[index] as number);
-    vm.wireguard = wireguards[index][0];
+    vm[0].wireguard = wireguards[index][0];
     return vm;
   });
 
