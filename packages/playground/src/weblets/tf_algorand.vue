@@ -4,6 +4,7 @@
     :cpu="cpu"
     :memory="memory"
     :disk="storage + (type === 'indexer' ? 50 : 0)"
+    :ipv4="ipv4"
     title-image="images/icons/algorand.png"
   >
     <template #title>Deploy a Algorand Instance </template>

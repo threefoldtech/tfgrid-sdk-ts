@@ -1,5 +1,12 @@
 <template>
-  <weblet-layout ref="layout" :cpu="cpu" :memory="memory" :disk="rootFsSize" title-image="images/icons/presearch.png">
+  <weblet-layout
+    ref="layout"
+    :cpu="cpu"
+    :memory="memory"
+    :disk="rootFsSize"
+    :ipv4="ipv4"
+    title-image="images/icons/presearch.png"
+  >
     <template #title>Deploy a Presearch Instance</template>
     <template #subtitle
       >Presearch is a community-powered, decentralized search engine that provides better results while protecting your
