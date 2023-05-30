@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <div>
-      <v-app-bar :class="{ 'sidebar-opned': !mini }" color="#064663" dense dark fixed height="65">
+      <v-app-bar :class="{ 'sidebar-opened': !mini }" color="#064663" dense dark fixed height="65">
         <v-app-bar-nav-icon></v-app-bar-nav-icon>
 
         <v-toolbar-title class="font-weight-bold" @click="redirectToHomePage" style="cursor: pointer"
