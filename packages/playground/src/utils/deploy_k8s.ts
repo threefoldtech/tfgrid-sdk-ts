@@ -10,7 +10,7 @@ import {
 
 import type { K8SWorker } from "../types";
 import { createNetwork } from "./deploy_helpers";
-import getWireguardConfig from "./load_deployment";
+import { getWireguardConfig } from "./load_deployment";
 import { NodePicker } from "./node_picker";
 
 export async function deployK8s(grid: GridClient, options: DeployK8SOptions) {
