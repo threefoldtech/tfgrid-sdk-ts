@@ -1,6 +1,7 @@
-import type { GridClient, NetworkGetModel } from "@threefold/grid_client";
+import type { GridClient } from "@threefold/grid_client";
 
 import { formatConsumption } from "./contracts";
+import { updateGrid } from "./grid";
 import { normalizeError } from "./helpers";
 
 export interface LoadedDeployments<T> {
@@ -50,9 +51,13 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
       return grid.contracts.getConsumption({ id: vm[0].contractId }).catch(() => undefined);
     }),
   );
+  const wireguards = await Promise.all(
+    vms.map(vm => getWireguardConfig(grid, vm[0].interfaces[0].network).catch(() => [])),
+  );
 
-  const data = vms.map((vm, index) => {
+  const data = vms.map((vm: any, index) => {
     vm[0].billing = formatConsumption(consumptions[index] as number);
+    vm.wireguard = wireguards[index][0];
     return vm;
   });
 
@@ -62,7 +67,10 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   };
 }
 export default function getWireguardConfig(grid: GridClient, name: string) {
-  return grid.networks.getWireGuardConfigs({ name });
+  const projectName = grid.clientOptions!.projectName;
+  return updateGrid(grid, { projectName: "" })
+    .networks.getWireGuardConfigs({ name })
+    .finally(() => updateGrid(grid, { projectName }));
 }
 
 export type K8S = { masters: any[]; workers: any[]; deploymentName: string; wireguard?: any };

@@ -12,6 +12,7 @@ import {
 } from "@threefold/grid_client";
 
 import { createNetwork, type Network } from "./deploy_helpers";
+import getWireguardConfig from "./load_deployment";
 import { NodePicker } from "./node_picker";
 
 export async function deployVM(grid: GridClient, options: DeployVMOptions) {
@@ -29,6 +30,8 @@ export async function deployVM(grid: GridClient, options: DeployVMOptions) {
 export async function loadVM(grid: GridClient, name: string) {
   const vm = (await grid.machines.getObj(name)) as any;
   vm.deploymentName = name;
+  const wireguard = await getWireguardConfig(grid, vm[0].interfaces[0].network).catch(() => []);
+  vm.wireguard = wireguard[0];
   return vm;
 }
 
