@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <div>
-      <v-app-bar color="#064663" dense dark fixed height="65">
+      <v-app-bar :class="{ 'sidebar-opned': !mini }" color="#064663" dense dark fixed height="65">
         <v-app-bar-nav-icon></v-app-bar-nav-icon>
 
         <v-toolbar-title class="font-weight-bold" @click="redirectToHomePage" style="cursor: pointer"
@@ -33,7 +33,7 @@
                 >
                   <v-row class="d-flex align-center mx-0">
                     <p class="font-weight-black" style="font-size: 15px">{{ account.meta.name }}</p>
-
+                    <!-- Logout button -->
                     <v-btn icon class="mr-2" @click="redirectToHomePage">
                       <v-icon>mdi-logout theme-light-dark</v-icon>
                     </v-btn>
@@ -65,6 +65,7 @@
             >Threefold Chain</v-list-item-title
           >
 
+          <!-- Close Button -->
           <v-btn icon @click.stop="toggle()">
             <v-icon class="white--text">mdi-chevron-left</v-icon>
           </v-btn>
@@ -463,6 +464,7 @@ export default class Dashboard extends Vue {
       children: [],
     },
   ];
+
   toggle() {
     this.$root.$emit("closeSidebar");
   }
@@ -514,5 +516,8 @@ export default class Dashboard extends Vue {
 
 .theme--light.v-btn.v-btn--icon {
   color: rgba(0, 0, 0);
+}
+.sidebar-opened {
+  left: 500px !important;
 }
 </style>
