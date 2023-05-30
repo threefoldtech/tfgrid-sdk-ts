@@ -89,6 +89,10 @@
           </v-row>
           <v-row>
             <v-col cols="5" class="mx-auto">
+              <v-switch label="With a Public IP (V4)" @change="IPV4Toggle" />
+            </v-col>
+
+            <v-col cols="5" class="mx-auto">
               <v-text-field
                 placeholder="Your Balance"
                 :rules="[...inputValidators]"
@@ -143,6 +147,7 @@ type priceType = {
   },
 })
 export default class Calculator extends Vue {
+  IPV4 = false;
   CRU = "1";
   SRU = "25";
   MRU = "1";
@@ -153,6 +158,7 @@ export default class Calculator extends Vue {
   @Watch("MRU")
   @Watch("HRU")
   @Watch("balance")
+  @Watch("IPV4")
   @Watch("isValidInputs")
   calcWatcher() {
     this.calculate();
@@ -237,8 +243,11 @@ export default class Calculator extends Vue {
       const price = await this.calcPrice();
       const CU = calCU(+this.CRU, +this.MRU);
       const SU = calSU(+this.HRU, +this.SRU);
-      const musd_month = (CU * price.cu.value + SU * price.su.value) * 24 * 30;
+      const IPV4 = this.IPV4 ? 1 : 0;
+
+      const musd_month = (CU * price.cu.value + SU * price.su.value + IPV4 * price.ipu.value) * 24 * 30;
       const [dedicatedPrice, dedicatedPackage, sharedPrice, sharedPackage] = await this.calDiscount(musd_month);
+
       this.prices = [
         {
           label: "Dedicated Node Price",
@@ -264,6 +273,10 @@ export default class Calculator extends Vue {
       });
       return;
     }
+  }
+
+  IPV4Toggle() {
+    this.IPV4 = !this.IPV4;
   }
 
   async calcPrice() {
@@ -342,6 +355,7 @@ export default class Calculator extends Vue {
   margin-right: 0;
   margin-left: auto;
 }
+
 .calc_input {
   width: 100px;
   border-bottom: 1px solid rgb(175, 47, 47);
@@ -352,9 +366,11 @@ export default class Calculator extends Vue {
   background-color: #fff;
   outline: none;
 }
+
 .card {
   padding: 5rem;
 }
+
 .price-box {
   font-size: 1.3rem;
   font-weight: bold;
@@ -362,6 +378,7 @@ export default class Calculator extends Vue {
   margin: 0.2rem auto;
   border-radius: 5px;
 }
+
 .price {
   display: block;
   padding: 0.7rem;
@@ -369,10 +386,12 @@ export default class Calculator extends Vue {
   margin: 0 auto;
   text-align: center;
 }
+
 .name {
   font-weight: 900;
   text-transform: capitalize;
 }
+
 .link {
   align-self: end;
   display: inline-block;
