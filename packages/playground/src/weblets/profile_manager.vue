@@ -115,7 +115,6 @@
                         :autofocus="activeTab === 0"
                         v-model="password"
                         v-bind="{ ...passwordInputProps, ...validationProps }"
-                        hint="used to encrypt your mnemonic on your local system, and is used to login from the same device."
                         :disabled="creatingAccount || activating"
                       />
                     </div>
