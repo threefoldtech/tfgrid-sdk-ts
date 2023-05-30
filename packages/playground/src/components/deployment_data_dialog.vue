@@ -22,8 +22,7 @@
               <CopyReadonlyInput label="Name" :data="contract.name" />
               <CopyReadonlyInput label="Contract ID" :data="contract.contractId" />
 
-              <v-switch inset label="Public IP" v-if="!contract.publicIP" />
-              <template v-else>
+              <template v-if="contract.publicIP">
                 <CopyReadonlyInput label="Public IPv4" :data="contract.publicIP.ip" v-if="contract.publicIP.ip" />
                 <CopyReadonlyInput label="Public IPv6" :data="contract.publicIP.ip6" v-if="contract.publicIP.ip6" />
               </template>
