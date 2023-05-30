@@ -8,6 +8,7 @@ async function main() {
     mru: 1, // GB
     sru: 25,
     hru: 100,
+    ipv4u: false,
     balance: 1,
   };
 
