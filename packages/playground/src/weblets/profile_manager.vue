@@ -63,12 +63,7 @@
                       validators.required('Mnemonic is required.'),
                       v => (validateMnemonic(v) ? undefined : { message: `Mnemonic doesn't seem to be valid.` }),
                     ]"
-                    :async-rules="[
-                      mnemonic =>
-                        getGrid({ mnemonic })
-                          .then(() => undefined)
-                          .catch(e => ({ message: e })),
-                    ]"
+                    :async-rules="[validateMnInput]"
                     valid-message="Mnemonic is valid."
                     #="{ props: validationProps }"
                   >
@@ -252,6 +247,7 @@ import { generateKeyPair } from "web-ssh-keygen";
 
 import { useProfileManager } from "../stores";
 import { type Balance, createAccount, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
+import { normalizeError } from "../utils/helpers";
 import { downloadAsFile } from "../utils/helpers";
 
 defineProps({
@@ -317,6 +313,14 @@ async function activate(mnemonic: string) {
   ssh.value = profile.ssh;
   profileManager.set(profile);
   activating.value = false;
+}
+
+function validateMnInput(mnemonic: string) {
+  return getGrid({ mnemonic })
+    .then(() => undefined)
+    .catch(e => {
+      return { message: normalizeError(e, "Something went wrong. please try again.") };
+    });
 }
 
 onMounted(async () => {
