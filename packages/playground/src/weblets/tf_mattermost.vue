@@ -158,16 +158,7 @@ async function deploy() {
 
     layout.value.reloadDeploymentsList();
     layout.value.setStatus("success", "Successfully deployed a mattermost instance.");
-    layout.value.openDialog(vm, {
-      DB_PASSWORD: "Database Password",
-      SITE_URL: "Site URL",
-      SMTPUsername: "SMTP Username",
-      SMTPPassword: "SMTP Password",
-      SMTPServer: "SMTP Server",
-      SMTPPort: "SMTP Port",
-      SSH_KEY: "Public SSH Key",
-      MATTERMOST_DOMAIN: "Mattermost Domain",
-    });
+    layout.value.openDialog(vm, deploymentListEnvironments.mattermost);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
     await rollbackDeployment(grid!, name.value);
@@ -181,6 +172,7 @@ import SelectFarm from "../components/select_farm.vue";
 import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
+import { deploymentListEnvironments } from "../constants";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 

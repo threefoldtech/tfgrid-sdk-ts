@@ -177,18 +177,7 @@ async function deploy() {
 
     layout.value.reloadDeploymentsList();
     layout.value.setStatus("success", "Successfully deployed a discourse instance.");
-    layout.value.openDialog(vm, {
-      SSH_KEY: "Public SSH Key",
-      DISCOURSE_HOSTNAME: "Discourse Hostname",
-      DISCOURSE_DEVELOPER_EMAILS: "Discourse Developer Emails",
-      DISCOURSE_SMTP_ADDRESS: "Discourse SMTP Address",
-      DISCOURSE_SMTP_PORT: "Discourse SMTP Port",
-      DISCOURSE_SMTP_ENABLE_START_TLS: "Discourse SMTP Enable Start TLS",
-      DISCOURSE_SMTP_USER_NAME: "Discourse SMTP Username",
-      DISCOURSE_SMTP_PASSWORD: "Discourse SMTP Password",
-      THREEBOT_PRIVATE_KEY: "Threebot Private Key",
-      FLASK_SECRET_KEY: "Flask Secret Key",
-    });
+    layout.value.openDialog(vm, deploymentListEnvironments.discourse);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
     await rollbackDeployment(grid!, name.value);
@@ -207,6 +196,7 @@ import SelectFarm from "../components/select_farm.vue";
 import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
+import { deploymentListEnvironments } from "../constants";
 
 export default {
   name: "TfDiscourse",

@@ -44,19 +44,27 @@
               <CopyReadonlyInput label="Flist" :data="contract.flist" v-if="contract.flist" />
               <template v-if="environments !== false">
                 <template v-for="key of Object.keys(contract.env)" :key="key">
-                  <template v-if="environments[key] || !(key in environments)">
-                    <CopyReadonlyInput
-                      v-if="contract.env[key] !== 'true' && contract.env[key] !== 'false'"
-                      textarea
-                      :label="getLabel(key)"
-                      :data="contract.env[key]"
-                    />
+                  <template v-if="(environments[key] || !(key in environments)) && contract.env[key]">
                     <v-switch
-                      v-else
+                      v-if="contract.env[key].toLowerCase() === 'true' || contract.env[key].toLowerCase() === 'false'"
                       inset
                       color="primary"
-                      :model-value="Boolean(contract.env[key])"
+                      :model-value="getValue(key)"
                       :label="getLabel(key)"
+                    />
+                    <password-input-wrapper v-else-if="getType(key) === 'password'" :data="getValue(key)" #="{ props }">
+                      <v-text-field
+                        :label="getLabel(key)"
+                        variant="outlined"
+                        :model-value="getValue(key)"
+                        v-bind="props"
+                      />
+                    </password-input-wrapper>
+                    <CopyReadonlyInput
+                      v-else
+                      :label="getLabel(key)"
+                      :textarea="getType(key) === 'textarea'"
+                      :data="getValue(key)"
                     />
                   </template>
                 </template>
@@ -91,7 +99,10 @@ const props = defineProps({
     required: true,
   },
   environments: {
-    type: Object as PropType<{ [key: string]: string | boolean } | false>,
+    type: Object as PropType<
+      | { [key: string]: string | boolean | { label: string; type?: string; transform?: (value: string) => string } }
+      | false
+    >,
     required: false,
     default: () => ({}),
   },
@@ -119,10 +130,49 @@ function copy() {
 }
 
 function getLabel(key: string): string {
-  if (props.environments !== false && typeof props.environments[key] === "string") {
-    return props.environments[key] as string;
+  if (props.environments === false) {
+    return key;
   }
+
+  const env = props.environments[key];
+
+  if (typeof env === "string") {
+    return env;
+  }
+
+  if (typeof env === "object") {
+    return env.label || key;
+  }
+
   return key;
+}
+
+function getValue(key: string) {
+  const value = contract.value.env[key];
+  const transform = (props.environments || ({} as any))[key]?.transform || _transform;
+  return transform(value);
+}
+
+function _transform(value: string): any {
+  const v = value.toLowerCase();
+  if (v === "true" || v === "false") {
+    return Boolean(v);
+  }
+  return value;
+}
+
+function getType(key: string): string {
+  if (props.environments === false) {
+    return "text";
+  }
+
+  const env = props.environments[key];
+
+  if (typeof env === "object") {
+    return env.type || "text";
+  }
+
+  return "text";
 }
 </script>
 

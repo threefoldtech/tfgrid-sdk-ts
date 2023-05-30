@@ -183,13 +183,7 @@ async function deploy() {
 
     layout.value.reloadDeploymentsList();
     layout.value.setStatus("success", "Successfully deployed a Wordpress instance.");
-    layout.value.openDialog(vm, {
-      SSH_KEY: "Public SSH Key",
-      MYSQL_USER: "Mysql User",
-      MYSQL_PASSWORD: "Mysql Password",
-      ADMIN_EMAIL: "Admin Email",
-      WP_URL: "WP URL",
-    });
+    layout.value.openDialog(vm, deploymentListEnvironments.wordpress);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
@@ -203,6 +197,7 @@ async function deploy() {
 import SelectFarm from "../components/select_farm.vue";
 import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
+import { deploymentListEnvironments } from "../constants";
 
 export default {
   name: "TFWordpress",

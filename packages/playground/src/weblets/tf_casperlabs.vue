@@ -136,10 +136,7 @@ async function deploy() {
 
     layout.value.reloadDeploymentsList();
     layout.value.setStatus("success", "Successfully deployed a Casperlabs instance.");
-    layout.value.openDialog(vm, {
-      SSH_KEY: "SSH Key",
-      CASPERLABS_HOSTNAME: "Casperlabs Hostname",
-    });
+    layout.value.openDialog(vm, deploymentListEnvironments.casperlabs);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
@@ -153,6 +150,7 @@ async function deploy() {
 import SelectFarm from "../components/select_farm.vue";
 import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
+import { deploymentListEnvironments } from "../constants";
 
 export default {
   name: "TFCasperlabs",

@@ -226,14 +226,7 @@ async function deploy() {
 
     layout.value.reloadDeploymentsList();
     layout.value.setStatus("success", "Successfully deployed an alogrand node.");
-    layout.value.openDialog(vm, {
-      SSH_KEY: "Public SSH Key",
-      NETWORK: "Network",
-      NODE_TYPE: "Node Type",
-      ACCOUNT_MNEMONICS: "Account Mnemonic",
-      FIRST_ROUND: "First Round",
-      LAST_ROUND: "Last Round",
-    });
+    layout.value.openDialog(vm, deploymentListEnvironments.algorand);
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy an alogrand node."));
   }
@@ -256,6 +249,7 @@ function customLastRoundValidation(validators: Validators) {
 <script lang="ts">
 import AlgorandCapacity from "../components/algorand_capacity.vue";
 import SelectFarm from "../components/select_farm.vue";
+import { deploymentListEnvironments } from "../constants";
 import { normalizeError } from "../utils/helpers";
 
 export default {

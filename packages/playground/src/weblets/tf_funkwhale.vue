@@ -181,12 +181,7 @@ async function deploy() {
 
     layout.value.reloadDeploymentsList();
     layout.value.setStatus("success", "Successfully deployed a funkwhale instance.");
-    layout.value.openDialog(vm, {
-      FUNKWHALE_HOSTNAME: "Funkwhale Hostname",
-      DJANGO_SUPERUSER_EMAIL: "Django Superuser Email",
-      DJANGO_SUPERUSER_USERNAME: "Diango Superuser Username",
-      DJANGO_SUPERUSER_PASSWORD: "Django Superuser Password",
-    });
+    layout.value.openDialog(vm, deploymentListEnvironments.funkwhale);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
@@ -200,6 +195,7 @@ async function deploy() {
 import SelectFarm from "../components/select_farm.vue";
 import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
+import { deploymentListEnvironments } from "../constants";
 
 export default {
   name: "TfFunkwhale",

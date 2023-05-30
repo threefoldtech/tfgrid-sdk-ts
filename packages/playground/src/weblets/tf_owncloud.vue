@@ -196,19 +196,7 @@ async function deploy() {
 
     layout.value.reloadDeploymentsList();
     layout.value.setStatus("success", "Successfully deployed a owncloud instance.");
-    layout.value.openDialog(vm, {
-      SSH_KEY: "Public SSH Key",
-      OWNCLOUD_DOMAIN: "Owncloud Domain",
-      OWNCLOUD_ADMIN_USERNAME: "Owncloud Admin Username",
-      OWNCLOUD_ADMIN_PASSWORD: "Owncloud Admin Password",
-      OWNCLOUD_MAIL_SMTP_SECURE: "Owncloud Mail SMTP Secure",
-      OWNCLOUD_MAIL_DOMAIN: "Owncloud Mail Domain",
-      OWNCLOUD_MAIL_FROM_ADDRESS: "Owncloud Mail From Address",
-      OWNCLOUD_MAIL_SMTP_HOST: "Owncloud Mail SMTP Host",
-      OWNCLOUD_MAIL_SMTP_PORT: "Owncloud Mail SMTP Port",
-      OWNCLOUD_MAIL_SMTP_NAME: "Owncloud Mail SMTP Name",
-      OWNCLOUD_MAIL_SMTP_PASSWORD: "Owncloud Mail SMTP Password",
-    });
+    layout.value.openDialog(vm, deploymentListEnvironments.owncloud);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
     await rollbackDeployment(grid!, name.value);
@@ -222,6 +210,7 @@ import SelectFarm from "../components/select_farm.vue";
 import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
+import { deploymentListEnvironments } from "../constants";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 

@@ -227,7 +227,7 @@ async function deploy() {
 
     layout.value.reloadDeploymentsList();
     layout.value.setStatus("success", "Successfully deployed a full virtual machine instance.");
-    layout.value.openDialog(vm, { SSH_KEY: "Public SSH Key" });
+    layout.value.openDialog(vm, deploymentListEnvironments.vm);
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a full virtual machine instance."));
   }
@@ -238,6 +238,7 @@ async function deploy() {
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
+import { deploymentListEnvironments } from "../constants";
 
 export default {
   name: "FullVm",
