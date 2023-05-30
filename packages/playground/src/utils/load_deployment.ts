@@ -66,7 +66,7 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     items: data,
   };
 }
-export default function getWireguardConfig(grid: GridClient, name: string) {
+export function getWireguardConfig(grid: GridClient, name: string) {
   const projectName = grid.clientOptions!.projectName;
   return updateGrid(grid, { projectName: "" })
     .networks.getWireGuardConfigs({ name })
