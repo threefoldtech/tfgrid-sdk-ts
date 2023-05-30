@@ -69,7 +69,7 @@ export enum SolutionCode {
   tfhubvalidator = "tfvalidator",
   casperlabs = "cl",
   presearch = "ps",
-  capRover = "cp",
+  caprover = "cp",
   kubernetes = "k8s",
   machines = "vm",
   vm = "vm",
