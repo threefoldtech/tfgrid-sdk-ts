@@ -47,21 +47,17 @@ class Calculator {
   @validateInput
   private async pricing(options: CalculatorModel) {
     const price = await this.getPrices();
-    const CU = await this.calCU({ cru: options.cru, mru: options.mru });
-    const SU = await this.calSU({ hru: options.hru, sru: options.sru });
-    const musd_month = (CU * +price?.cu.value + SU * +price?.su.value) * 24 * 30;
+    const cu = await this.calCU({ cru: options.cru, mru: options.mru });
+    const su = await this.calSU({ hru: options.hru, sru: options.sru });
+    const ipv4u = options.ipv4u ? 1 : 0;
+    const musd_month = (cu * +price?.cu.value + su * +price?.su.value + ipv4u * price?.ipu.value) * 24 * 30;
     return { musd_month: musd_month, dedicatedDiscount: price.discountForDedicationNodes };
   }
   @expose
   @validateInput
   async calculate(options: CalculatorModel) {
     let balance = 0;
-    const pricing = await this.pricing({
-      cru: options.cru,
-      mru: options.mru,
-      hru: options.hru,
-      sru: options.sru,
-    });
+    const pricing = await this.pricing(options);
 
     // discount for Dedicated Nodes
     const discount = pricing.dedicatedDiscount;
@@ -117,12 +113,13 @@ class Calculator {
 
   async calculateWithMyBalance(options: CalculatorModel) {
     const balances = await this.client.balances.getMyBalance();
-    const balance = balances["free"];
+    const balance = balances.free;
     const calculate = await this.calculate({
       cru: options.cru,
       mru: options.mru,
       hru: options.hru,
       sru: options.sru,
+      ipv4u: options.ipv4u,
       balance: balance,
     });
     return calculate;

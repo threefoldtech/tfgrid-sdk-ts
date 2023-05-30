@@ -560,7 +560,8 @@ class CalculatorModel {
   @Expose() @IsNumber() @IsNotEmpty() @Min(0) mru: number; // GB
   @Expose() @IsNumber() @IsNotEmpty() @Min(0) sru: number; // GB
   @Expose() @IsNumber() @IsNotEmpty() @Min(0) hru: number; // GB
-  @Expose() @IsOptional() @IsNumber() @Min(0) balance?: number; // GB
+  @Expose() @IsBoolean() @IsNotEmpty() ipv4u: boolean;
+  @Expose() @IsOptional() @IsNumber() @Min(0) balance?: number;
 }
 
 class CUModel {
