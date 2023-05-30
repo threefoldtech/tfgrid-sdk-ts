@@ -518,6 +518,6 @@ export default class Dashboard extends Vue {
   color: rgba(0, 0, 0);
 }
 .sidebar-opened {
-  left: 500px !important;
+  left: 55px !important;
 }
 </style>
