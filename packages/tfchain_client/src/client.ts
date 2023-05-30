@@ -21,7 +21,7 @@ import { QueryTFTBridge } from "./tftBridge";
 import { QueryTwins, Twins } from "./twins";
 import type { Extrinsic, ExtrinsicResult, PatchExtrinsicOptions, validatorFunctionType } from "./types";
 import { Utility } from "./utility";
-import { isEnvNode } from "./utils";
+import { isEnvNode, isValidSeed } from "./utils";
 
 const SUPPORTED_KEYPAIR_TYPES = ["sr25519", "ed25519"];
 interface ExtSigner {
@@ -242,9 +242,18 @@ class Client extends QueryClient {
     if ((this.mnemonicOrSecret && this.extSigner) || !(this.mnemonicOrSecret || this.extSigner)) {
       throw Error("mnemonicOrSecret or extension signer should be provided");
     }
+    if (this.mnemonicOrSecret) {
+      if (!validateMnemonic(this.mnemonicOrSecret)) {
+        if (this.mnemonicOrSecret.includes(" "))
+          // seed shouldn't have spaces
+          throw Error("Invalid mnemonic! Must be bip39 compliant");
 
-    if (this.mnemonicOrSecret && !validateMnemonic(this.mnemonicOrSecret)) {
-      throw Error("Invalid mnemonic! Must be bip39 compliant");
+        if (!this.mnemonicOrSecret.startsWith("0x"))
+          throw Error("Invalid secret seed. secret seed should starts with 0x");
+        const secret = this.mnemonicOrSecret.substring(2);
+        if (secret.length !== 64) throw Error("Invalid secret length. Secret length should be 64");
+        if (!isValidSeed(secret)) throw Error("Invalid secret seed");
+      }
     }
   }
 

@@ -12,4 +12,9 @@ export function checkConnection(target: any, propertyKey: string | symbol, descr
   };
 }
 
-export { isEnvNode };
+function isValidSeed(seed: string) {
+  const hexRegex = /^[0-9a-fA-F]+$/;
+  return hexRegex.test(seed) ? true : false;
+}
+
+export { isEnvNode, isValidSeed };
