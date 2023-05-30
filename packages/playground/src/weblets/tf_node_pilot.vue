@@ -129,7 +129,7 @@ async function deploy() {
 
     layout.value.reloadDeploymentsList();
     layout.value.setStatus("success", "Successfully deployed a node pilot instance.");
-    layout.value.openDialog(vm, { SSH_KEY: "Public SSH Key" });
+    layout.value.openDialog(vm, deploymentListEnvironments.vm);
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Node Pilot instance."));
   }
@@ -138,6 +138,7 @@ async function deploy() {
 
 <script lang="ts">
 import SelectFarmId from "../components/select_farm.vue";
+import { deploymentListEnvironments } from "../constants";
 import { normalizeError } from "../utils/helpers";
 
 export default {

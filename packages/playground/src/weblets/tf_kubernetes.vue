@@ -117,14 +117,7 @@ async function deploy() {
 
     layout.value.reloadDeploymentsList();
     layout.value.setStatus("success", "Successfully deployed a Kubernetes cluster.");
-    layout.value.openDialog(k8s, {
-      SSH_KEY: "Public SSH Key",
-      K3S_TOKEN: { label: "K3S Token", type: "password" },
-      K3S_DATA_DIR: "K3S Data Directory",
-      K3S_FLANNEL_IFACE: "K3S Flannel Iface",
-      K3S_NODE_NAME: "K3S Node Name",
-      K3S_URL: "K3S URL",
-    });
+    layout.value.openDialog(k8s, deploymentListEnvironments.k8s);
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy kubernetes cluster."));
   }
@@ -134,6 +127,7 @@ async function deploy() {
 <script lang="ts">
 import ExpandableLayout from "../components/expandable_layout.vue";
 import K8SWorker from "../components/k8s_worker.vue";
+import { deploymentListEnvironments } from "../constants";
 import { normalizeError } from "../utils/helpers";
 
 export default {

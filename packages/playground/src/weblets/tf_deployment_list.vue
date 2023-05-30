@@ -22,11 +22,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-information-outline"
-            @click="
-              layout.openDialog(item?.value, {
-                SSH_KEY: 'Public SSH Key',
-              })
-            "
+            @click="layout.openDialog(item?.value, deploymentListEnvironments.vm)"
           />
         </template>
 
@@ -34,11 +30,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-information-outline"
-            @click="
-              layout.openDialog(item?.value, {
-                SSH_KEY: 'Public SSH Key',
-              })
-            "
+            @click="layout.openDialog(item?.value, deploymentListEnvironments.vm)"
           />
         </template>
 
@@ -46,16 +38,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-information-outline"
-            @click="
-              layout.openDialog(item?.value, {
-                SWM_NODE_MODE: 'Swarm Node Mode',
-                PUBLIC_KEY: 'Public SSH Key',
-                CAPROVER_ROOT_DOMAIN: false,
-                CAPTAIN_IMAGE_VERSION: 'Captain Image Version',
-                DEFAULT_PASSWORD: 'Default Password',
-                CAPTAIN_IS_DEBUG: 'Debug Mode',
-              })
-            "
+            @click="layout.openDialog(item?.value, deploymentListEnvironments.caprover)"
           />
           <IconActionBtn
             tooltip="Admin Panel"
@@ -83,14 +66,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-information-outline"
-            @click="
-              layout.openDialog(item?.value, {
-                SSH_KEY: 'Public SSH Key',
-                PEERTUBE_ADMIN_EMAIL: 'Peertube Admin Email',
-                PT_INITIAL_ROOT_PASSWORD: 'Peertube Initial Root Password',
-                PEERTUBE_WEBSERVER_HOSTNAME: 'Peertube Webserver Hostname',
-              })
-            "
+            @click="layout.openDialog(item?.value, deploymentListEnvironments.peertube)"
           />
           <IconActionBtn
             tooltip="Preview"
@@ -104,14 +80,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-information-outline"
-            @click="
-              layout.openDialog(item?.value, {
-                FUNKWHALE_HOSTNAME: 'Funkwhale Hostname',
-                DJANGO_SUPERUSER_EMAIL: 'Django Superuser Email',
-                DJANGO_SUPERUSER_USERNAME: 'Diango Superuser Username',
-                DJANGO_SUPERUSER_PASSWORD: 'Django Superuser Password',
-              })
-            "
+            @click="layout.openDialog(item?.value, deploymentListEnvironments.funkwhale)"
           />
           <IconActionBtn
             tooltip="Preview"
@@ -125,22 +94,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-information-outline"
-            @click="
-              layout.openDialog(item?.value, {
-                SSH_KEY: 'Public SSH Key',
-                DOMAIN_NAME: 'Domain Name',
-                ADMIN_USERNAME: 'Admin Username',
-                ADMIN_PASSWORD: 'Admin Password',
-                ADMIN_EMAIL: 'Admin Email',
-                DEFAULT_FROM_EMAIL: 'Default Form Email',
-                EMAIL_USE_TLS: 'Email Use TLS',
-                EMAIL_USE_SSL: 'Email Use SSL',
-                EMAIL_HOST: 'Email Host',
-                EMAIL_PORT: 'Email Port',
-                EMAIL_HOST_USER: 'Email Host User',
-                EMAIL_HOST_PASSWORD: 'Email Host Password',
-              })
-            "
+            @click="layout.openDialog(item?.value, deploymentListEnvironments.taiga)"
           />
           <IconActionBtn
             tooltip="Admin Panel"
@@ -160,14 +114,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-information-outline"
-            @click="
-              layout.openDialog(item?.value, {
-                SSH_KEY: 'Public SSH Key',
-                PRESEARCH_REGISTRATION_CODE: 'Presearch Registration Code',
-                PRESEARCH_BACKUP_PRI_KEY: 'Presearch Backup Private Key',
-                PRESEARCH_BACKUP_PUB_KEY: 'Presearch Backup Public Key',
-              })
-            "
+            @click="layout.openDialog(item?.value, deploymentListEnvironments.presearch)"
           />
         </template>
 
@@ -175,18 +122,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-information-outline"
-            @click="
-              layout.openDialog(item?.value, {
-                DB_PASSWORD: 'Database Password',
-                SITE_URL: 'Site URL',
-                SMTPUsername: 'SMTP Username',
-                SMTPPassword: 'SMTP Password',
-                SMTPServer: 'SMTP Server',
-                SMTPPort: 'SMTP Port',
-                SSH_KEY: 'Public SSH Key',
-                MATTERMOST_DOMAIN: 'Mattermost Domain',
-              })
-            "
+            @click="layout.openDialog(item?.value, deploymentListEnvironments.mattermost)"
           />
           <IconActionBtn tooltip="Preview" color="info" icon="mdi-web" :href="item.value[0].env.SITE_URL" />
         </template>
@@ -195,20 +131,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-information-outline"
-            @click="
-              layout.openDialog(item?.value, {
-                SSH_KEY: 'Public SSH Key',
-                DISCOURSE_HOSTNAME: 'Discourse Hostname',
-                DISCOURSE_DEVELOPER_EMAILS: 'Discourse Developer Emails',
-                DISCOURSE_SMTP_ADDRESS: 'Discourse SMTP Address',
-                DISCOURSE_SMTP_PORT: 'Discourse SMTP Port',
-                DISCOURSE_SMTP_ENABLE_START_TLS: 'Discourse SMTP Enable Start TLS',
-                DISCOURSE_SMTP_USER_NAME: 'Discourse SMTP Username',
-                DISCOURSE_SMTP_PASSWORD: 'Discourse SMTP Password',
-                THREEBOT_PRIVATE_KEY: 'Threebot Private Key',
-                FLASK_SECRET_KEY: 'Flask Secret Key',
-              })
-            "
+            @click="layout.openDialog(item?.value, deploymentListEnvironments.discourse)"
           />
           <IconActionBtn
             tooltip="Preview"
@@ -222,12 +145,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-information-outline"
-            @click="
-              layout.openDialog(item?.value, {
-                SSH_KEY: 'Public SSH Key',
-                CASPERLABS_HOSTNAME: 'Casperlabs Hostname',
-              })
-            "
+            @click="layout.openDialog(item?.value, deploymentListEnvironments.casperlabs)"
           />
           <IconActionBtn
             tooltip="Preview"
@@ -241,21 +159,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-information-outline"
-            @click="
-              layout.openDialog(item?.value, {
-                SSH_KEY: 'Public SSH Key',
-                OWNCLOUD_DOMAIN: 'Owncloud Domain',
-                OWNCLOUD_ADMIN_USERNAME: 'Owncloud Admin Username',
-                OWNCLOUD_ADMIN_PASSWORD: 'Owncloud Admin Password',
-                OWNCLOUD_MAIL_SMTP_SECURE: 'Owncloud Mail SMTP Secure',
-                OWNCLOUD_MAIL_DOMAIN: 'Owncloud Mail Domain',
-                OWNCLOUD_MAIL_FROM_ADDRESS: 'Owncloud Mail From Address',
-                OWNCLOUD_MAIL_SMTP_HOST: 'Owncloud Mail SMTP Host',
-                OWNCLOUD_MAIL_SMTP_PORT: 'Owncloud Mail SMTP Port',
-                OWNCLOUD_MAIL_SMTP_NAME: 'Owncloud Mail SMTP Name',
-                OWNCLOUD_MAIL_SMTP_PASSWORD: 'Owncloud Mail SMTP Password',
-              })
-            "
+            @click="layout.openDialog(item?.value, deploymentListEnvironments.owncloud)"
           />
           <IconActionBtn
             tooltip="Preview"
@@ -269,13 +173,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-information-outline"
-            @click="
-              layout.openDialog(item?.value, {
-                SSH_KEY: 'Public SSH Key',
-                CHAIN_ENDPOINT: 'Chain Endpoint',
-                SUBSQUID_WEBSERVER_HOSTNAME: 'Subsquid Webserver Hostname',
-              })
-            "
+            @click="layout.openDialog(item?.value, deploymentListEnvironments.subsquid)"
           />
           <IconActionBtn
             tooltip="Preview"
@@ -289,16 +187,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-information-outline"
-            @click="
-              layout.openDialog(item?.value, {
-                SSH_KEY: 'Public SSH Key',
-                NETWORK: 'Network',
-                NODE_TYPE: 'Node Type',
-                ACCOUNT_MNEMONICS: { label: 'Account Mnemonics', type: 'password' },
-                FIRST_ROUND: 'First Round',
-                LAST_ROUND: 'Last Round',
-              })
-            "
+            @click="layout.openDialog(item?.value, deploymentListEnvironments.algorand)"
           />
         </template>
 
@@ -306,11 +195,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-information-outline"
-            @click="
-              layout.openDialog(item?.value, {
-                SSH_KEY: 'Public SSH Key',
-              })
-            "
+            @click="layout.openDialog(item?.value, deploymentListEnvironments.vm)"
           />
           <IconActionBtn
             tooltip="Visit"
@@ -329,14 +214,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-information-outline"
-            @click="
-              layout.openDialog(item?.value, {
-                SSH_KEY: 'Public SSH Key',
-                USERNAME: 'Username',
-                PASSWORD: 'Password',
-                UMBREL_DISK: 'Umbrel Disk',
-              })
-            "
+            @click="layout.openDialog(item?.value, deploymentListEnvironments.umbrel)"
           />
           <IconActionBtn
             tooltip="Admin Panel"
@@ -355,15 +233,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-information-outline"
-            @click="
-              layout.openDialog(item?.value, {
-                SSH_KEY: 'Public SSH Key',
-                MYSQL_USER: 'Mysql User',
-                MYSQL_PASSWORD: 'Mysql Password',
-                ADMIN_EMAIL: 'Admin Email',
-                WP_URL: 'WP URL',
-              })
-            "
+            @click="layout.openDialog(item?.value, deploymentListEnvironments.wordpress)"
           />
           <IconActionBtn tooltip="Preview" color="info" icon="mdi-web" :href="'https://' + item.value[0].env.WP_URL" />
           <IconActionBtn
@@ -386,16 +256,7 @@
             <IconActionBtn
               tooltip="Show Details"
               icon="mdi-information-outline"
-              @click="
-                layout.openDialog(item?.value, {
-                  SSH_KEY: 'Public SSH Key',
-                  K3S_TOKEN: { label: 'K3S Token', type: 'password' },
-                  K3S_DATA_DIR: 'K3S Data Directory',
-                  K3S_FLANNEL_IFACE: 'K3S Flannel Iface',
-                  K3S_NODE_NAME: 'K3S Node Name',
-                  K3S_URL: 'K3S URL',
-                })
-              "
+              @click="layout.openDialog(item?.value, deploymentListEnvironments.k8s)"
             />
             <IconActionBtn
               icon="mdi-cog"
@@ -454,6 +315,7 @@ import { getCurrentInstance, onUnmounted, type Ref, ref, watch } from "vue";
 
 import type { Tab } from "../components/dynamic_tabs.vue";
 import { useLayout } from "../components/weblet_layout.vue";
+import { deploymentListEnvironments } from "../constants/deployment_list";
 import { useProfileManager } from "../stores";
 import { deleteDeployment } from "../utils/delete_deployment";
 import { getGrid, updateGrid } from "../utils/grid";

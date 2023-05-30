@@ -151,11 +151,7 @@ async function deploy() {
 
     layout.value.reloadDeploymentsList();
     layout.value.setStatus("success", "Successfully deployed a Subsquid instance.");
-    layout.value.openDialog(vm, {
-      SSH_KEY: "Public SSH Key",
-      SUBSQUID_WEBSERVER_HOSTNAME: "Subsquid Webserver Hostname",
-      CHAIN_ENDPOINT: "Chain Endpoint",
-    });
+    layout.value.openDialog(vm, deploymentListEnvironments.subsquid);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
@@ -169,6 +165,7 @@ async function deploy() {
 import SelectFarm from "../components/select_farm.vue";
 import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
+import { deploymentListEnvironments } from "../constants";
 
 export default {
   name: "TfSubsquid",

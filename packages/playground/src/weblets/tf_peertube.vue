@@ -158,12 +158,7 @@ async function deploy() {
 
     layout.value.reloadDeploymentsList();
     layout.value.setStatus("success", "Successfully deployed a peertube instance.");
-    layout.value.openDialog(vm, {
-      SSH_KEY: "Public SSH Key",
-      PEERTUBE_ADMIN_EMAIL: "Peertube Admin Email",
-      PT_INITIAL_ROOT_PASSWORD: "Peertube Initial Root Password",
-      PEERTUBE_WEBSERVER_HOSTNAME: "Peertube Webserver Hostname",
-    });
+    layout.value.openDialog(vm, deploymentListEnvironments.peertube);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
@@ -177,6 +172,7 @@ async function deploy() {
 import SelectFarm from "../components/select_farm.vue";
 import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
+import { deploymentListEnvironments } from "../constants";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 

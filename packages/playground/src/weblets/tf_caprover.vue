@@ -149,14 +149,7 @@ async function deploy() {
 
     layout.value.reloadDeploymentsList();
     layout.value.setStatus("success", "Successfully deployed a caprover instance.");
-    layout.value.openDialog(vm, {
-      SWM_NODE_MODE: "Swarm Node Mode",
-      PUBLIC_KEY: "Public SSH Key",
-      CAPROVER_ROOT_DOMAIN: false,
-      CAPTAIN_IMAGE_VERSION: "Captain Image Version",
-      DEFAULT_PASSWORD: "Default Password",
-      CAPTAIN_IS_DEBUG: "Debug Mode",
-    });
+    layout.value.openDialog(vm, deploymentListEnvironments.caprover);
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a caprover instance."));
   }
@@ -194,6 +187,7 @@ function normalizeCaproverWorker(worker: CW, envs: Env[]): Machine {
 <script lang="ts">
 import CaproverWorker, { createWorker } from "../components/caprover_worker.vue";
 import ExpandableLayout from "../components/expandable_layout.vue";
+import { deploymentListEnvironments } from "../constants";
 import rootFs from "../utils/root_fs";
 
 export default {

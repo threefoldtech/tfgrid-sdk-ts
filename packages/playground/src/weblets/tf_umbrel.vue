@@ -152,12 +152,7 @@ async function deploy() {
 
     layout.value.reloadDeploymentsList();
     layout.value.setStatus("success", "Successfully deployed an Umbrel instance.");
-    layout.value.openDialog(vm, {
-      SSH_KEY: "Public SSH Key",
-      USERNAME: "Username",
-      PASSWORD: "Password",
-      UMBREL_DISK: "Umbrel Disk",
-    });
+    layout.value.openDialog(vm, deploymentListEnvironments.umbrel);
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy an Umbrel instance."));
   }
@@ -167,6 +162,7 @@ async function deploy() {
 <script lang="ts">
 import SelectFarm from "../components/select_farm.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
+import { deploymentListEnvironments } from "../constants";
 
 export default {
   name: "TfUmbrel",

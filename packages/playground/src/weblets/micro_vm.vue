@@ -256,7 +256,7 @@ async function deploy() {
 
     layout.value.reloadDeploymentsList();
     layout.value.setStatus("success", "Successfully deployed a micro virtual machine.");
-    layout.value.openDialog(vm, { SSH_KEY: "Public SSH Key" });
+    layout.value.openDialog(vm, deploymentListEnvironments.vm);
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy micro virtual machine instance."));
   }
@@ -268,6 +268,7 @@ import ExpandableLayout from "../components/expandable_layout.vue";
 import RootFsSize from "../components/root_fs_size.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectVmImage from "../components/select_vm_image.vue";
+import { deploymentListEnvironments } from "../constants";
 import { normalizeError } from "../utils/helpers";
 
 export default {

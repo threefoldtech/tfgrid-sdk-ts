@@ -146,12 +146,7 @@ async function deploy() {
 
     layout.value.reloadDeploymentsList();
     layout.value.setStatus("success", "Successfully deployed a Presearch instance.");
-    layout.value.openDialog(vm, {
-      SSH_KEY: "Public SSH Key",
-      PRESEARCH_REGISTRATION_CODE: "Presearch Registration Code",
-      PRESEARCH_BACKUP_PRI_KEY: "Presearch Backup Private Key",
-      PRESEARCH_BACKUP_PUB_KEY: "Presearch Backup Public Key",
-    });
+    layout.value.openDialog(vm, deploymentListEnvironments.presearch);
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Presearch instance."));
   }
@@ -160,6 +155,7 @@ async function deploy() {
 
 <script lang="ts">
 import SelectFarm from "../components/select_farm.vue";
+import { deploymentListEnvironments } from "../constants";
 
 export default {
   name: "TFPresearch",

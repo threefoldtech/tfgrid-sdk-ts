@@ -204,20 +204,7 @@ async function deploy() {
 
     layout.value.reloadDeploymentsList();
     layout.value.setStatus("success", "Successfully deployed a taiga instance.");
-    layout.value.openDialog(vm, {
-      SSH_KEY: "Public SSH Key",
-      DOMAIN_NAME: "Domain Name",
-      ADMIN_USERNAME: "Admin Username",
-      ADMIN_PASSWORD: "Admin Password",
-      ADMIN_EMAIL: "Admin Email",
-      DEFAULT_FROM_EMAIL: "Default Form Email",
-      EMAIL_USE_TLS: "Email Use TLS",
-      EMAIL_USE_SSL: "Email Use SSL",
-      EMAIL_HOST: "Email Host",
-      EMAIL_PORT: "Email Port",
-      EMAIL_HOST_USER: "Email Host User",
-      EMAIL_HOST_PASSWORD: "Email Host Password",
-    });
+    layout.value.openDialog(vm, deploymentListEnvironments.taiga);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
     await rollbackDeployment(grid!, name.value);
@@ -231,6 +218,7 @@ import SelectFarm from "../components/select_farm.vue";
 import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
+import { deploymentListEnvironments } from "../constants";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 

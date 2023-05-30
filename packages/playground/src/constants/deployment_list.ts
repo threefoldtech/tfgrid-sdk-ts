@@ -5,7 +5,16 @@ function capitalize(value: string): string {
   return value[0].toUpperCase() + value.slice(1);
 }
 
-export const environments = {
+function prefixUrl(protocol: "http" | "https") {
+  return (value: string) => {
+    if (value.startsWith("http://") || value.startsWith("https://")) {
+      return value;
+    }
+    return protocol + value;
+  };
+}
+
+export const deploymentListEnvironments = {
   vm: { SSH_KEY: _ssh },
 
   algorand: {
@@ -132,6 +141,9 @@ export const environments = {
     MYSQL_USER: "Superuser User",
     MYSQL_PASSWORD: { label: "Superuser Password", type: "password" },
     ADMIN_EMAIL: "Superuser Email",
-    WP_URL: "WP URL",
+    WP_URL: {
+      label: "WP URL",
+      transform: prefixUrl("https"),
+    },
   },
 };
