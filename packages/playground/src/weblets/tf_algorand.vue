@@ -227,7 +227,7 @@ async function deploy() {
     layout.value.setStatus("success", "Successfully deployed an alogrand node.");
     layout.value.openDialog(vm, {
       SSH_KEY: "Public SSH Key",
-      NETWORK: "Network",
+      NETWORK: { label: "Network" },
       NODE_TYPE: "Node Type",
       ACCOUNT_MNEMONICS: { label: "Account Mnemonics", type: "password" },
       FIRST_ROUND: "First Round",

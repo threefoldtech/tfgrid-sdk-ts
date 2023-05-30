@@ -50,18 +50,14 @@
                       v-if="contract.env[key].toLowerCase() === 'true' || contract.env[key].toLowerCase() === 'false'"
                       inset
                       color="primary"
-                      :model-value="Boolean(contract.env[key])"
+                      :model-value="getValue(key)"
                       :label="getLabel(key)"
                     />
-                    <password-input-wrapper
-                      v-else-if="getType(key) === 'password'"
-                      :data="contract.env[key]"
-                      #="{ props }"
-                    >
+                    <password-input-wrapper v-else-if="getType(key) === 'password'" :data="getValue(key)" #="{ props }">
                       <v-text-field
                         :label="getLabel(key)"
                         variant="outlined"
-                        :model-value="contract.env[key]"
+                        :model-value="getValue(key)"
                         v-bind="props"
                       />
                     </password-input-wrapper>
@@ -69,7 +65,7 @@
                       v-else
                       :label="getLabel(key)"
                       :textarea="getType(key) === 'textarea'"
-                      :data="contract.env[key]"
+                      :data="getValue(key)"
                     />
                   </template>
                 </template>
@@ -104,7 +100,10 @@ const props = defineProps({
     required: true,
   },
   environments: {
-    type: Object as PropType<{ [key: string]: string | boolean | { label: string; type?: string } } | false>,
+    type: Object as PropType<
+      | { [key: string]: string | boolean | { label: string; type?: string; transform?: (value: string) => string } }
+      | false
+    >,
     required: false,
     default: () => ({}),
   },
@@ -147,6 +146,20 @@ function getLabel(key: string): string {
   }
 
   return key;
+}
+
+function getValue(key: string) {
+  const value = contract.value.env[key];
+  const transform = (props.environments || ({} as any))[key]?.transform || _transform;
+  return transform(value);
+}
+
+function _transform(value: string): any {
+  const v = value.toLowerCase();
+  if (v === "true" || v === "false") {
+    return Boolean(v);
+  }
+  return value;
 }
 
 function getType(key: string): string {
