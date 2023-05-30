@@ -1,6 +1,7 @@
 import type { GridClient } from "@threefold/grid_client";
 
 import { formatConsumption } from "./contracts";
+import { updateGrid } from "./grid";
 import { normalizeError } from "./helpers";
 
 export interface LoadedDeployments<T> {
@@ -50,9 +51,13 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
       return grid.contracts.getConsumption({ id: vm[0].contractId }).catch(() => undefined);
     }),
   );
+  const wireguards = await Promise.all(
+    vms.map(vm => getWireguardConfig(grid, vm[0].interfaces[0].network).catch(() => [])),
+  );
 
   const data = vms.map((vm, index) => {
     vm[0].billing = formatConsumption(consumptions[index] as number);
+    vm[0].wireguard = wireguards[index][0];
     return vm;
   });
 
@@ -61,8 +66,14 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     items: data,
   };
 }
+export function getWireguardConfig(grid: GridClient, name: string) {
+  const projectName = grid.clientOptions!.projectName;
+  return updateGrid(grid, { projectName: "" })
+    .networks.getWireGuardConfigs({ name })
+    .finally(() => updateGrid(grid, { projectName }));
+}
 
-export type K8S = { masters: any[]; workers: any[]; deploymentName: string };
+export type K8S = { masters: any[]; workers: any[]; deploymentName: string; wireguard?: any };
 export async function loadK8s(grid: GridClient) {
   const clusters = await grid.k8s.list();
   const promises = clusters.map(name => {
@@ -83,15 +94,19 @@ export async function loadK8s(grid: GridClient) {
       }
       return item;
     })
-    .filter(item => item && item.masters.length > 0) as { masters: any[] }[];
+    .filter(item => item && item.masters.length > 0) as K8S[];
   const consumptions = await Promise.all(
     k8s.map(cluster => {
       return grid.contracts.getConsumption({ id: cluster.masters[0].contractId }).catch(() => undefined);
     }),
   );
 
+  const wireguards = await Promise.all(
+    k8s.map(cluster => getWireguardConfig(grid, cluster.masters[0].interfaces[0].network).catch(() => [])),
+  );
   const data = k8s.map((cluster, index) => {
     cluster.masters[0].billing = formatConsumption(consumptions[index] as number);
+    cluster.wireguard = wireguards[index][0];
     return cluster as K8S;
   });
 

@@ -40,7 +40,13 @@
                 :data="Math.ceil(disk.size / (1024 * 1024 * 1024))"
               />
               <CopyReadonlyInput label="WireGuard IP" :data="contract.interfaces[0].ip" />
-              <CopyReadonlyInput label="WireGuard Config" :data="contract.wireguard" v-if="contract.wireguard" />
+              <CopyReadonlyInput label="WireGuard Config" textarea :data="data.wireguard" v-if="data.wireguard" />
+              <CopyReadonlyInput
+                v-else-if="data[0].wireguard"
+                label="WireGuard Config"
+                textarea
+                :data="data[0].wireguard"
+              />
               <CopyReadonlyInput label="Flist" :data="contract.flist" v-if="contract.flist" />
               <template v-if="environments !== false">
                 <template v-for="key of Object.keys(contract.env)" :key="key">

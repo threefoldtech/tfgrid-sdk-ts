@@ -10,6 +10,7 @@ import {
 
 import type { K8SWorker } from "../types";
 import { createNetwork } from "./deploy_helpers";
+import { getWireguardConfig } from "./load_deployment";
 import { NodePicker } from "./node_picker";
 
 export async function deployK8s(grid: GridClient, options: DeployK8SOptions) {
@@ -30,7 +31,10 @@ export async function deployK8s(grid: GridClient, options: DeployK8SOptions) {
   k8s.description = options.description;
   k8s.ssh_key = options.sshKey;
   await grid.k8s.deploy(k8s);
-  return loadK8S(grid, k8s.name);
+  const data = (await loadK8S(grid, k8s.name)) as { masters: any[]; workers: any[]; wireguard?: string };
+  const wireguard = await getWireguardConfig(grid, k8s.network.name).catch(() => []);
+  data.wireguard = wireguard[0];
+  return data;
 }
 
 export function loadK8S(grid: GridClient, name: string) {
