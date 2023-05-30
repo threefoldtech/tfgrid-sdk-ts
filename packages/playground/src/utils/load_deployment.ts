@@ -1,4 +1,4 @@
-import type { GridClient } from "@threefold/grid_client";
+import type { GridClient, NetworkGetModel } from "@threefold/grid_client";
 
 import { formatConsumption } from "./contracts";
 import { normalizeError } from "./helpers";
@@ -61,8 +61,11 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     items: data,
   };
 }
+export default function getWireguardConfig(grid: GridClient, name: string) {
+  return grid.networks.getWireGuardConfigs({ name });
+}
 
-export type K8S = { masters: any[]; workers: any[]; deploymentName: string };
+export type K8S = { masters: any[]; workers: any[]; deploymentName: string; wireguard?: any };
 export async function loadK8s(grid: GridClient) {
   const clusters = await grid.k8s.list();
   const promises = clusters.map(name => {
@@ -83,15 +86,19 @@ export async function loadK8s(grid: GridClient) {
       }
       return item;
     })
-    .filter(item => item && item.masters.length > 0) as { masters: any[] }[];
+    .filter(item => item && item.masters.length > 0) as K8S[];
   const consumptions = await Promise.all(
     k8s.map(cluster => {
       return grid.contracts.getConsumption({ id: cluster.masters[0].contractId }).catch(() => undefined);
     }),
   );
 
+  const wireguards = await Promise.all(
+    k8s.map(cluster => getWireguardConfig(grid, cluster.masters[0].interfaces[0].network).catch(() => [])),
+  );
   const data = k8s.map((cluster, index) => {
     cluster.masters[0].billing = formatConsumption(consumptions[index] as number);
+    cluster.wireguard = wireguards[index][0];
     return cluster as K8S;
   });
 
