@@ -87,11 +87,9 @@
               </v-tooltip>
             </v-col>
           </v-row>
-          <!-- <v-row>
-          </v-row> -->
           <v-row>
             <v-col cols="5" class="mx-auto">
-              <v-switch label="Public IP (V4)" @change="IPV4Toggle" />
+              <v-switch label="With a Public IP (V4)" @change="IPV4Toggle" />
             </v-col>
 
             <v-col cols="5" class="mx-auto">
