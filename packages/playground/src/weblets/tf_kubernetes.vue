@@ -6,6 +6,7 @@
     :disk="
       workers.reduce((disk, worker) => disk + worker.diskSize + worker.rootFsSize, master.diskSize + master.rootFsSize)
     "
+    :ivp4="master.ipv4"
     title-image="images/icons/kubernetes.png"
   >
     <template #title>Deploy a Kubernetes</template>

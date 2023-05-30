@@ -5,6 +5,7 @@
     :cpu="cpu"
     :memory="memory"
     :disk="disks.reduce((total, disk) => total + disk.size, rootFsSize)"
+    :ivp4="ipv4"
     title-image="images/icons/vm.png"
   >
     <template #title>Deploy a Micro Virtual Machine </template>

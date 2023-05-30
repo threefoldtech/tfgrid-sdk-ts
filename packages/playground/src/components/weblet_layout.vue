@@ -106,6 +106,11 @@ const props = defineProps({
     type: String,
     required: false,
   },
+  ivp4: {
+    type: Boolean,
+    required: false,
+    default: () => false,
+  },
 });
 const emits = defineEmits<{ (event: "mount"): void; (event: "back"): void }>();
 const baseUrl = import.meta.env.BASE_URL;
@@ -195,9 +200,16 @@ const tft = ref<number>();
 const costLoading = ref(false);
 const shouldUpdateCost = ref(false);
 watch(
-  () => [props.cpu, props.memory, props.disk],
+  () => [props.cpu, props.memory, props.disk, props.ivp4],
   debounce((value, oldValue) => {
-    if (oldValue && value[0] === oldValue[0] && value[1] === oldValue[1] && value[2] === oldValue[2]) return;
+    if (
+      oldValue &&
+      value[0] === oldValue[0] &&
+      value[1] === oldValue[1] &&
+      value[2] === oldValue[2] &&
+      value[3] === oldValue[3]
+    )
+      return;
     shouldUpdateCost.value = true;
   }, 500),
   { immediate: true },
@@ -220,6 +232,7 @@ async function loadCost(profile: { mnemonic: string }) {
     sru: typeof props.disk === "number" ? props.disk : 0,
     mru: typeof props.disk === "number" ? (props.memory ?? 0) / 1024 : 0,
     hru: 0,
+    ipv4u: props.ivp4,
   });
   usd.value = sharedPrice;
   tft.value = parseFloat((usd.value / (await grid!.calculator.tftPrice())).toFixed(2));

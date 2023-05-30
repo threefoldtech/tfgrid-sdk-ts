@@ -10,6 +10,7 @@
         leader.solution?.disk ?? 0 + rootFs(leader.solution?.cpu ?? 0, leader.solution?.memory ?? 0),
       )
     "
+    :ivp4="true"
     title-image="images/icons/caprover.png"
   >
     <template #title>Deploy Caprover</template>
