@@ -506,11 +506,12 @@ class BaseModule {
         break;
       }
     }
-    finalTwinDeployments.push(twinDeployment);
+    // pop and push the network deployment first before push the added machine to the list
     const networkTwinDeployment = twinDeployments.pop();
     if (networkTwinDeployment) {
       finalTwinDeployments.push(networkTwinDeployment);
     }
+    finalTwinDeployments.push(twinDeployment);
     const contracts = await this.twinDeploymentHandler.handle(finalTwinDeployments);
     await this.save(deployment_name, contracts);
     return { contracts: contracts };
