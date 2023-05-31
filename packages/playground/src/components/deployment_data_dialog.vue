@@ -48,6 +48,7 @@
                 :data="data[0].wireguard"
               />
               <CopyReadonlyInput label="Flist" :data="contract.flist" v-if="contract.flist" />
+              <CopyReadonlyInput label="Monitoring URL" :data="grafanaURL" />
               <template v-if="environments !== false">
                 <template v-for="key of Object.keys(contract.env)" :key="key">
                   <template v-if="(environments[key] || !(key in environments)) && contract.env[key]">
@@ -122,6 +123,7 @@ defineEmits<{ (event: "close"): void }>();
 
 const showType = ref(props.onlyJson ? 1 : 0);
 const activeTab = ref(0);
+const grafanaURL = ref("");
 const contracts = computed(() => {
   if (!props.data) return [];
   if ("masters" in props.data) return [...props.data.masters, ...props.data.workers];
@@ -130,6 +132,7 @@ const contracts = computed(() => {
 const contract = computed(() => contracts.value?.[activeTab.value] ?? {});
 const code = computed(() => JSON.stringify(props.data || {}, undefined, 2));
 const html = computed(() => hljs.highlight(code.value, { language: "json" }).value);
+const profileManager = useProfileManager();
 
 function copy() {
   navigator.clipboard.writeText(code.value);
@@ -159,6 +162,18 @@ function getValue(key: string) {
   return transform(value);
 }
 
+async function getGrafanaUrl() {
+  const grid = await getGrid(profileManager.profile!);
+  if (grid) {
+    const grafana = new GrafanaStatistics(grid, props.data);
+    grafana.getUrl().then(res => {
+      grafanaURL.value = res;
+    });
+  }
+  return grafanaURL.value;
+}
+getGrafanaUrl();
+
 function _transform(value: string): any {
   const v = value.toLowerCase();
   if (v === "true" || v === "false") {
@@ -183,6 +198,10 @@ function getType(key: string): string {
 </script>
 
 <script lang="ts">
+import { useProfileManager } from "@/stores/profile_manager";
+import { GrafanaStatistics } from "@/utils/getMetricsUrl";
+import { getGrid } from "@/utils/grid";
+
 import CopyReadonlyInput from "./copy_readonly_input.vue";
 import { HighlightDark, HighlightLight } from "./highlight_themes";
 
