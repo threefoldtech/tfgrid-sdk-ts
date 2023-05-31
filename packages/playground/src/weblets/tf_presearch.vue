@@ -100,8 +100,8 @@ const name = ref("ps" + generateString(8));
 const code = ref("");
 const ipv4 = ref(false);
 const planetary = ref(true);
-const cpu = 4;
-const memory = 8192;
+const cpu = 1;
+const memory = 512;
 const rootFsSize = rootFs(cpu, memory);
 const farm = ref() as Ref<Farm>;
 const privateRestoreKey = ref("");
@@ -149,6 +149,7 @@ async function deploy() {
               value: publicRestoreKey.value,
             },
           ],
+          rootFilesystemSize: rootFsSize,
         },
       ],
     });
