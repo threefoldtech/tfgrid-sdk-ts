@@ -55,7 +55,9 @@
 
         <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
         <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
-
+        <v-alert v-show="networkError" class="mb-2" type="warning" variant="tonal">
+          You must enable at least one of network options.
+        </v-alert>
         <SelectFarm
           :filters="{
             cpu,
@@ -75,14 +77,14 @@
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" :disabled="tabs?.invalid" @click="deploy"> Deploy </v-btn>
+      <v-btn color="primary" variant="tonal" :disabled="tabs?.invalid || networkError" @click="deploy"> Deploy </v-btn>
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
 import { generateString } from "@threefold/grid_client";
-import { type Ref, ref } from "vue";
+import { type Ref, ref, watch } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
@@ -106,7 +108,12 @@ const rootFsSize = rootFs(cpu, memory);
 const farm = ref() as Ref<Farm>;
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
+const networkError = ref(false);
 
+watch([planetary, ipv4], ([planetary, ipv4]) => {
+  if (!(ipv4 || planetary)) networkError.value = true;
+  else networkError.value = false;
+});
 async function deploy() {
   layout.value.setStatus("deploy");
 
