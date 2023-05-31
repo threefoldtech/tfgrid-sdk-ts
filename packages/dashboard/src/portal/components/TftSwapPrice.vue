@@ -38,17 +38,8 @@ export default class TftSwapPrice extends Vue {
 
   async mounted() {
     this.loading = true;
-
-    if (!this.$api) {
-      // In other pages the api takes more time to load, we wait on it one sec.
-      setTimeout(async () => {
-        this.prices[1].amount = await this.getTFTPrice();
-        this.loading = false;
-      }, 1000);
-    } else {
-      this.prices[1].amount = await this.getTFTPrice();
-      this.loading = false;
-    }
+    this.prices[1].amount = await this.getTFTPrice();
+    this.loading = false;
   }
 
   async priceSwap() {
