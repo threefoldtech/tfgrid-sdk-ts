@@ -3,6 +3,7 @@
     :value="$props.modelValue.name"
     :rules="[
       validators.required('Name is required.'),
+      validators.isLowercase('Name should consist of lowercase letters only.'),
       name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
       validators.isAlphanumeric('Name should consist of alphabets & numbers only.'),
       validators.minLength('Name minimum length is 2 chars.', 2),
@@ -84,7 +85,7 @@ import type { Farm, K8SWorker } from "../types";
 import RootFsSize from "./root_fs_size.vue";
 import SelectFarm from "./select_farm.vue";
 
-export function createWorker(name: string = "WR" + generateString(9)): K8SWorker {
+export function createWorker(name: string = "wr" + generateString(9)): K8SWorker {
   return {
     name,
     cpu: 1,

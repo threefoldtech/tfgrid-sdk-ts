@@ -27,6 +27,7 @@
           :value="name"
           :rules="[
             validators.required('Name is required.'),
+            validators.isLowercase('Name should consist of lowercase letters only.'),
             validators.isAlphanumeric('Name should consist of letters only.'),
             name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
             validators.minLength('Name must be at least 2 characters.', 2),
@@ -120,7 +121,7 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref("TG" + generateString(9));
+const name = ref("tg" + generateString(9));
 const username = ref("admin");
 const password = ref(generateString(12));
 const email = ref("");

@@ -20,6 +20,7 @@
         :value="name"
         :rules="[
           validators.required('Name is required.'),
+          validators.isLowercase('Name should consist of lowercase letters only.'),
           validators.isAlphanumeric('Name should consist of letters only.'),
           name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
           validators.minLength('Name must be at least 2 characters.', 2),
@@ -71,7 +72,7 @@ const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref("CL" + generateString(9));
+const name = ref("cl" + generateString(9));
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;
