@@ -4,9 +4,10 @@
       <div class="content" v-if="!loading">
         <v-row>
           <v-col v-if="node">
-            <NodeUsedResources :nodeStatistics="nodeStatistics" :nodeStatus="node.status" />
+            <NodeUsedResources :nodeStatistics="nodeStatistics" :nodeStatus="node.status" :grafanaUrl="grafanaUrl" />
           </v-col>
         </v-row>
+
         <v-row>
           <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="node">
             <NodeDetails :node="node" :nodeStatistics="nodeStatistics" />
@@ -53,6 +54,7 @@ import { DocumentNode } from "graphql";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
 import { ICountry, INode, INodeStatistics } from "../graphql/api";
+import { GrafanaStatistics } from "../utils/getMetricsUrl";
 import mediaMatcher from "../utils/mediaMatcher";
 import CountryDetails from "./CountryDetails.vue";
 import FarmDetails from "./FarmDetails.vue";
@@ -82,6 +84,7 @@ export default class Details extends Vue {
   @Prop() nodeId: any;
 
   loading = false;
+  grafanaUrl = "";
 
   data: any = {};
 
@@ -113,7 +116,6 @@ export default class Details extends Vue {
           res[key] = res[key][0];
           return res;
         }, data);
-
         // update with the data from grid proxy
         if (this.nodeId) {
           this.data.node = await fetch(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}`).then(res =>
@@ -129,6 +131,8 @@ export default class Details extends Vue {
             console.log(error);
           }
           this.data.node.status = this.data.node.status === "up";
+          const grafana: GrafanaStatistics = new GrafanaStatistics(this.data.node, this.data.twin.accountId);
+          this.grafanaUrl = grafana.getUrl();
         }
       })
       .catch(() => {
