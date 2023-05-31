@@ -32,8 +32,8 @@ export default class TftSwapPrice extends Vue {
   swaped = false;
   loading = false;
   prices: SwapPrice[] = [
-    { currency: "TFT", amount: 0 },
-    { currency: "USD", amount: 0 },
+    { currency: "TFT", amount: 1 },
+    { currency: "USD", amount: 1 },
   ];
 
   async mounted() {
