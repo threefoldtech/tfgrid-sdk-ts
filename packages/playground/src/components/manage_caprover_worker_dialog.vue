@@ -113,7 +113,7 @@ async function deploy(layout: any) {
   layout.setStatus("deploy");
 
   try {
-    const grid = await getGrid(profileManager.profile!, ProjectName.Caprover);
+    const grid = await getGrid(profileManager.profile!, ProjectName.Caprover.toLowerCase());
 
     await layout.validateBalance(grid);
 
@@ -153,7 +153,7 @@ async function deploy(layout: any) {
 
 async function onDelete(cb: (workers: any[]) => void) {
   deleting.value = true;
-  const grid = await getGrid(profileManager.profile!, ProjectName.Caprover);
+  const grid = await getGrid(profileManager.profile!, ProjectName.Caprover.toLowerCase());
   for (const worker of selectedWorkers.value) {
     console.log(props.master.name, worker.name);
 
