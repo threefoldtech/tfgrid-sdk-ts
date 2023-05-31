@@ -99,15 +99,6 @@ class GridClient {
     if (!isConnecting) {
       await this.tfclient.connect();
       try {
-        this.twinId = await this.tfclient.twins.getMyTwinId();
-        if (!this.twinId) {
-          throw Error(`Couldn't find a user for the provided mnemonic on ${this.clientOptions.network} network.`);
-        }
-      } catch (e) {
-        console.log(e);
-        throw Error(`Couldn't find a user for the provided mnemonic on ${this.clientOptions.network} network.`);
-      }
-      try {
         await this.rmbClient.connect();
       } catch (e) {
         throw Error(e.message);
@@ -126,6 +117,15 @@ class GridClient {
         };
         window.onunload = this.disconnect;
       }
+    }
+    try {
+      this.twinId = await this.tfclient.twins.getMyTwinId();
+      if (!this.twinId) {
+        throw Error(`Couldn't find a user for the provided mnemonic on ${this.clientOptions.network} network.`);
+      }
+    } catch (e) {
+      console.log(e);
+      throw Error(`Couldn't find a user for the provided mnemonic on ${this.clientOptions.network} network.`);
     }
     this._connect();
     GridClient.connecting.delete(key);
