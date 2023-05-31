@@ -10,7 +10,7 @@ function prefixUrl(protocol: "http" | "https") {
     if (value.startsWith("http://") || value.startsWith("https://")) {
       return value;
     }
-    return protocol + value;
+    return protocol + "://" + value;
   };
 }
 
