@@ -48,7 +48,7 @@
                 :data="data[0].wireguard"
               />
               <CopyReadonlyInput label="Flist" :data="contract.flist" v-if="contract.flist" />
-              <CopyReadonlyInput label="Grafana Node Statistics" :data="grafanaURL" />
+              <CopyReadonlyInput label="Monitoring URL" :data="grafanaURL" />
               <template v-if="environments !== false">
                 <template v-for="key of Object.keys(contract.env)" :key="key">
                   <template v-if="(environments[key] || !(key in environments)) && contract.env[key]">
@@ -167,7 +167,6 @@ async function getGrafanaUrl() {
   if (grid) {
     const grafana = new GrafanaStatistics(grid, props.data);
     grafana.getUrl().then(res => {
-      console.log("res: ", res);
       grafanaURL.value = res;
     });
   }
