@@ -56,7 +56,7 @@
         <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
         <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
         <v-alert v-show="networkError" class="mb-2" type="warning" variant="tonal">
-          You must enable at lest one of network options.
+          You must enable at least one of network options.
         </v-alert>
         <SelectFarm
           :filters="{
@@ -110,8 +110,8 @@ const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
 const networkError = ref(false);
 
-watch([planetary, ipv4], () => {
-  if (!(ipv4.value || planetary.value)) networkError.value = true;
+watch([planetary, ipv4], ([planetary, ipv4]) => {
+  if (!(ipv4 || planetary)) networkError.value = true;
   else networkError.value = false;
 });
 async function deploy() {

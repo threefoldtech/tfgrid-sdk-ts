@@ -75,7 +75,7 @@
         <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
         <v-switch color="primary" inset label="Add Wireguard Access" v-model="wireguard" />
         <v-alert v-show="networkError" class="mb-2" type="warning" variant="tonal">
-          You must enable at lest one of network options.
+          You must enable at least one of network options.
         </v-alert>
         <SelectFarm
           :filters="{
@@ -204,8 +204,8 @@ const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
 const networkError = ref(false);
 
-watch([planetary, ipv4, ipv6, wireguard], () => {
-  if (!(ipv6.value || ipv4.value || planetary.value || wireguard)) networkError.value = true;
+watch([planetary, ipv4, ipv6, wireguard], ([planetary, ipv4, ipv6, wireguard]) => {
+  if (!(ipv6 || ipv4 || planetary || wireguard)) networkError.value = true;
   else networkError.value = false;
 });
 function layoutMount() {
