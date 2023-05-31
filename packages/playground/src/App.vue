@@ -154,7 +154,7 @@ const routes: AppRoute[] = [
 ];
 
 // eslint-disable-next-line no-undef
-const network = process.env.NETWORK as string;
+const network = process.env.NETWORK || (window as any).env.NETWORK;
 
 const permanent = window.innerWidth > 980;
 const openSidebar = ref(permanent);

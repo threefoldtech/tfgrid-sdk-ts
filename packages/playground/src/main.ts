@@ -7,6 +7,8 @@ import App from "./App.vue";
 import { defineGlobals } from "./config";
 import router from "./router";
 
+console.log(window.env);
+
 const app = createApp(App);
 
 app.use(createPinia());

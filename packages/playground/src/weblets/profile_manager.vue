@@ -414,14 +414,7 @@ function validatePassword(value: string) {
   }
 }
 
-const bridge =
-  // eslint-disable-next-line no-undef
-  process.env.NETWORK === "test"
-    ? "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4"
-    : // eslint-disable-next-line no-undef
-    process.env.NETWORK === "main"
-    ? "GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC"
-    : "GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG";
+const bridge = (window as any).env.BRIDGE_TFT_ADDRESS;
 
 const apps = [
   {
