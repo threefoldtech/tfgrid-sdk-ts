@@ -33,6 +33,7 @@
           :value="name"
           :rules="[
             validators.required('Name is required.'),
+            validators.isLowercase('Name should consist of lowercase letters only.'),
             name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
             validators.isAlphanumeric('Name should consist of alphabets & numbers only.'),
             validators.minLength('Name minimum length is 2 chars.', 2),
@@ -91,9 +92,9 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref("K8S" + generateString(8));
+const name = ref("k8s" + generateString(8));
 const clusterToken = ref(generateString(10));
-const master = ref(createWorker("MR" + generateString(9)));
+const master = ref(createWorker("mr" + generateString(9)));
 const workers = ref<K8sWorker[]>([]);
 
 function addWorker() {

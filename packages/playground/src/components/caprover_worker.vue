@@ -2,6 +2,8 @@
   <input-validator
     :rules="[
       validators.required('Name is required.'),
+      validators.isLowercase('Name should consist of lowercase letters only.'),
+      validators.isLowercase('Name should consist of lowercase letters only.'),
       validators.minLength('Name minimum length is 2 chars.', 2),
       validators.maxLength('Name max length is 15 chars.', 15),
     ]"
@@ -43,7 +45,7 @@ import type { CaproverWorker } from "../types";
 import SelectFarm from "./select_farm.vue";
 import SelectSolutionFlavor from "./select_solution_flavor.vue";
 
-export function createWorker(name: string = "WR" + generateString(9)): CaproverWorker {
+export function createWorker(name: string = "wr" + generateString(9)): CaproverWorker {
   return { name };
 }
 

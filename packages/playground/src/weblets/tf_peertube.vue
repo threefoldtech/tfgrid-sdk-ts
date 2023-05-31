@@ -19,6 +19,7 @@
         :value="name"
         :rules="[
           validators.required('Name is required.'),
+          validators.isLowercase('Name should consist of lowercase letters only.'),
           validators.isAlphanumeric('Name should consist of letters only.'),
           name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
           validators.minLength('Name must be at least 2 characters.', 2),
@@ -88,7 +89,7 @@ const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref("PT" + generateString(9));
+const name = ref("pt" + generateString(9));
 const email = ref("");
 const password = ref(generateString(12));
 const solution = ref() as Ref<SolutionFlavor>;
