@@ -68,7 +68,7 @@
       </v-toolbar>
 
       <DeploymentListManager>
-        <v-container fluid>
+        <v-container fluid :style="{ paddingBottom: '100px' }">
           <div class="d-flex align-center">
             <v-btn
               color="primary"
