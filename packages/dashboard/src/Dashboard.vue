@@ -87,6 +87,10 @@
                 <strong>
                   {{ route.label }}
                 </strong>
+                <v-chip v-if="route.prefix.includes('play.')" class="ml-2" color="red" small text-color="white">
+                  Legacy
+                </v-chip>
+                <i class="fa-solid fa-flask-vial fa-beat ml-2" dark v-if="route.prefix.includes('playground')"></i>
               </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
@@ -447,7 +451,7 @@ export default class Dashboard extends Vue {
     {
       label: "Playground",
       icon: "open-in-new",
-      prefix: window.configs.PLAYGROUND_URL,
+      prefix: window.configs.PLAYGROUND_V2_URL,
       hyperlink: true,
       children: [],
     },
@@ -455,6 +459,13 @@ export default class Dashboard extends Vue {
       label: "Manual",
       icon: "book-open-page-variant-outline",
       prefix: window.configs.MANUAL_URL,
+      hyperlink: true,
+      children: [],
+    },
+    {
+      label: "Playground",
+      icon: "open-in-new",
+      prefix: window.configs.PLAYGROUND_URL,
       hyperlink: true,
       children: [],
     },

@@ -30,6 +30,7 @@ case $TFCHAIN_NETWORK in
     SUBSTRATE_URL='wss://tfchain.dev.grid.tf/ws'
     ACTIVATION_SERVICE_URL='https://activation.dev.grid.tf'
     PLAYGROUND_URL='https://play.dev.grid.tf'
+    PLAYGROUND_V2_URL='https://playground.dev.grid.tf'
     RELAY_DOMAIN='relay.dev.grid.tf'
     BRIDGE_TFT_ADDRESS=GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG
     STELLAR_NETWORK=test
@@ -40,6 +41,7 @@ case $TFCHAIN_NETWORK in
     SUBSTRATE_URL='wss://tfchain.qa.grid.tf/ws'
     ACTIVATION_SERVICE_URL='https://activation.qa.grid.tf'
     PLAYGROUND_URL='https://play.qa.grid.tf'
+    PLAYGROUND_V2_URL='https://playground.qa.grid.tf'
     RELAY_DOMAIN='relay.qa.grid.tf'
     BRIDGE_TFT_ADDRESS=GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG
     STELLAR_NETWORK=test
@@ -50,6 +52,7 @@ case $TFCHAIN_NETWORK in
     SUBSTRATE_URL='wss://tfchain.test.grid.tf/ws'
     ACTIVATION_SERVICE_URL='https://activation.test.grid.tf'
     PLAYGROUND_URL='https://play.test.grid.tf'
+    PLAYGROUND_V2_URL='https://playground.test.grid.tf'
     RELAY_DOMAIN='relay.test.grid.tf'
     BRIDGE_TFT_ADDRESS=GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4
     STELLAR_NETWORK=main
@@ -60,6 +63,7 @@ case $TFCHAIN_NETWORK in
     SUBSTRATE_URL='wss://tfchain.grid.tf/ws'
     ACTIVATION_SERVICE_URL='https://activation.grid.tf'
     PLAYGROUND_URL='https://play.grid.tf'
+    PLAYGROUND_V2_URL='https://playground.grid.tf'
     RELAY_DOMAIN='relay.grid.tf'
     BRIDGE_TFT_ADDRESS=GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC
     STELLAR_NETWORK=main
@@ -131,6 +135,7 @@ window.configs = {
   APP_GAS_PRICE: '$GAS_PRICE',
   APP_CHAIN_ID: '$CHAIN_ID',
   PLAYGROUND_URL: '$PLAYGROUND_URL',
+  PLAYGROUND_V2_URL: '$PLAYGROUND_V2_URL',
   MANUAL_URL: '$MANUAL_URL',
   RELAY: '$RELAY_DOMAIN',
 };
