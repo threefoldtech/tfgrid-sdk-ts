@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <div class="d-flex ml-5">
-      <div class="d-flex" style="align-items: center">
+      <div v-if="!loading" class="d-flex" style="align-items: center">
         <p>{{ prices[0].amount }} {{ prices[0].currency }}</p>
         <v-tooltip>
           <template v-slot:activator="{ on, attrs }">
@@ -30,13 +30,16 @@ type SwapPrice = {
 export default class TftSwapPrice extends Vue {
   $api: any;
   swaped = false;
+  loading = false;
   prices: SwapPrice[] = [
-    { currency: "TFT", amount: 1 },
+    { currency: "TFT", amount: 0 },
     { currency: "USD", amount: 0 },
   ];
 
   async mounted() {
+    this.loading = true;
     this.prices[1].amount = await this.getTFTPrice();
+    this.loading = false;
   }
 
   async priceSwap() {

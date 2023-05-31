@@ -284,11 +284,6 @@ export default class Dashboard extends Vue {
 
   async updated() {
     this.accounts = this.$store.state.portal.accounts;
-    if (this.$api && this.$route.path == "/") {
-      this.loadingAPI = false;
-    } else if (this.$route.path !== "/") {
-      this.loadingAPI = false;
-    }
   }
 
   async unmounted() {
