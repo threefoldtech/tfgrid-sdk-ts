@@ -8,12 +8,24 @@ image:
   repository: ghcr.io/threefoldtech/playground
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "2.0.0-rc10"
+  tag: "2.0.0-rc11"
   
   env:
-    - name: "NETWORK"
+    - name: "MODE"
       value: ""
-    - name: "VERSION"
+    - name: "GRAPHQL_URL"
+      value: ""
+    - name: "BRIDGE_TFT_ADDRESS"
+      value: ""
+    - name: "GRIDPROXY_URL"
+      value: ""
+    - name: "SUBSTRATE_URL"
+      value: ""
+    - name: "ACTIVATION_SERVICE_URL"
+      value: ""
+    - name: "RELAY_DOMAIN"
+      value: ""
+    - name: "STELLAR_NETWORK"
       value: ""
 
 
