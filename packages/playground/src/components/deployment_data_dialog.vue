@@ -36,7 +36,11 @@
               <CopyReadonlyInput
                 v-for="disk of contract.mounts"
                 :key="disk.name"
-                :label="'Disk( ' + disk.mountPoint + ' ) GB'"
+                :label="
+                  contract.metadata.includes('fullvm') && contract.mounts.indexOf(disk) > 0
+                    ? 'Disk'
+                    : 'Disk( ' + disk.mountPoint + ' ) GB'
+                "
                 :data="Math.ceil(disk.size / (1024 * 1024 * 1024))"
               />
               <CopyReadonlyInput label="WireGuard IP" :data="contract.interfaces[0].ip" />
