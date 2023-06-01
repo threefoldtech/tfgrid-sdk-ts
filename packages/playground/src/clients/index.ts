@@ -1,7 +1,9 @@
 import GridProxyClient, { Network } from "tf_gridproxy_client";
 import TFGridGqlClient, { Networks } from "tfgrid-gql";
 
-const gqlClient = new TFGridGqlClient(process.env.NETWORK as Networks);
-const gridProxyClient = new GridProxyClient(process.env.NETWORK as Network);
+const network = process.env.NETWORK || window.env.NETWORK;
+
+const gqlClient = new TFGridGqlClient(network as Networks);
+const gridProxyClient = new GridProxyClient(network as Network);
 
 export { gqlClient, gridProxyClient };

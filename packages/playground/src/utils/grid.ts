@@ -1,16 +1,26 @@
-import { BackendStorageType, GridClient, NetworkEnv } from "@threefold/grid_client";
+import { BackendStorageType, GridClient, type NetworkEnv } from "@threefold/grid_client";
 
 import type { Profile } from "../stores/profile_manager";
 
-const NETWORK = process.env.NETWORK as NetworkEnv;
+const network = (process.env.NETWORK as NetworkEnv) || window.env.NETWORK;
 
 export async function getGrid(profile: Pick<Profile, "mnemonic">, projectName?: string) {
   if (!profile) return null;
   const grid = new GridClient({
     mnemonic: profile.mnemonic,
-    network: NETWORK,
+    network,
     backendStorageType: BackendStorageType.tfkvstore,
     projectName,
+
+    ...(import.meta.env.DEV
+      ? {}
+      : {
+          substrateURL: window.env.SUBSTRATE_URL,
+          proxyURL: window.env.GRIDPROXY_URL,
+          graphqlURL: window.env.GRAPHQL_URL,
+          activationURL: window.env.ACTIVATION_SERVICE_URL,
+          relayURL: window.env.RELAY_DOMAIN,
+        }),
   });
   await grid.connect();
   return grid;
@@ -27,12 +37,12 @@ export function updateGrid(grid: GridClient, options: UpdateGridOptions) {
 
 export function createAccount() {
   const grid = new GridClient({
-    network: NETWORK,
+    network,
     mnemonic: "",
     storeSecret: "test",
   });
   grid._connect();
-  const relay = grid.getDefaultUrls(NETWORK).relay.slice(6);
+  const relay = grid.getDefaultUrls(network).relay.slice(6);
   return grid.tfchain.createAccount(relay);
 }
 

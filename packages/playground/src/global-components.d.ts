@@ -1,3 +1,5 @@
+import type { NetworkEnv } from "@threefold/grid_client";
+
 import CopyInputWrapper from "./components/copy_input_wrapper.vue";
 import DTabs from "./components/dynamic_tabs.vue";
 import FormValidator from "./components/form_validator.vue";
@@ -18,5 +20,22 @@ declare module "@vue/runtime-core" {
 
   interface ComponentCustomProperties {
     validators: typeof validators;
+  }
+}
+
+declare global {
+  interface Window {
+    env: {
+      NETWORK: NetworkEnv;
+      GRAPHQL_URL: string;
+      GRIDPROXY_URL: string;
+      SUBSTRATE_URL: string;
+      ACTIVATION_SERVICE_URL: string;
+      RELAY_DOMAIN: string;
+      BRIDGE_TFT_ADDRESS: string;
+      STELLAR_NETWORK: string;
+      STELLAR_HORIZON_URL: string;
+      TFT_ASSET_ISSUER: string;
+    };
   }
 }
