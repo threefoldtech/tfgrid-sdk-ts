@@ -532,7 +532,7 @@ export default class Dashboard extends Vue {
   color: rgba(0, 0, 0);
 }
 .sidebar-opened {
-  left: 55px !important;
+  left: 5rem !important;
 }
 @keyframes shake {
   0% {
