@@ -52,10 +52,10 @@
       class="white--text"
       permanent
       v-model="drawer"
-      width="300"
+      width="320"
       :mini-variant.sync="mini"
     >
-      <v-list>
+      <v-list :style="{ paddingBottom: '75px' }">
         <v-list-item class="px-2">
           <v-list-item-avatar>
             <v-img src="./assets/logo.png"></v-img>
@@ -83,14 +83,22 @@
               <v-icon class="white--text" v-text="'mdi-' + route.icon" />
             </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title class="white--text">
+              <v-list-item-title class="white--text" :style="{ textOverflow: 'initial' }">
                 <strong>
-                  {{ route.label }}
+                  {{ route.label === "Legacy Playground" ? "Playground" : route.label }}
                 </strong>
-                <v-chip v-if="route.prefix.includes('play.')" class="ml-2" color="red" small text-color="white">
+                <v-chip v-if="route.prefix.includes('play.')" class="ml-2" color="red" outlined small text-color="red">
                   Legacy
                 </v-chip>
-                <i class="fa-solid fa-flask-vial fa-beat ml-2" dark v-if="route.prefix.includes('playground')"></i>
+                <v-chip
+                  v-if="route.prefix.includes('playground')"
+                  class="ml-2 pulse-animation"
+                  color="#1AA18F"
+                  small
+                  text-color="white"
+                >
+                  Experimental
+                </v-chip>
               </v-list-item-title>
             </v-list-item-content>
           </v-list-item>
@@ -463,7 +471,7 @@ export default class Dashboard extends Vue {
       children: [],
     },
     {
-      label: "Playground",
+      label: "Legacy Playground",
       icon: "open-in-new",
       prefix: window.configs.PLAYGROUND_URL,
       hyperlink: true,
@@ -525,5 +533,26 @@ export default class Dashboard extends Vue {
 }
 .sidebar-opened {
   left: 55px !important;
+}
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  9.375% {
+    transform: translateX(-2px);
+  }
+  18.75% {
+    transform: translateX(2px);
+  }
+  28.125% {
+    transform: translateX(-2px);
+  }
+  37.5%,
+  100% {
+    transform: translateX(0);
+  }
+}
+.pulse-animation {
+  animation: shake 3.2s ease infinite;
 }
 </style>
