@@ -1,7 +1,4 @@
 import * as secp from "@noble/secp256k1";
-import { ApiPromise } from "@polkadot/api";
-import { Keyring } from "@polkadot/api";
-import { KeypairType } from "@polkadot/util-crypto/types";
 import * as bip39 from "bip39";
 import { Buffer } from "buffer";
 import * as cryptoJs from "crypto-js";

@@ -108,7 +108,9 @@ class Client {
       }
       const pk = generatePublicKey(this.mnemonics);
       if (this.twin.pk !== pk) {
-        await this.tfclient.twins.update({ pk, relay: this.relayUrl.replace("wss://", "").replace("/", "") });
+        await (
+          await this.tfclient.twins.update({ pk, relay: this.relayUrl.replace("wss://", "").replace("/", "") })
+        ).apply();
         this.twin.pk = pk;
       }
 
