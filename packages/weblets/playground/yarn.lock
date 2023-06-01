@@ -1529,15 +1529,15 @@
   resolved "https://registry.yarnpkg.com/@substrate/ss58-registry/-/ss58-registry-1.40.0.tgz#2223409c496271df786c1ca8496898896595441e"
   integrity sha512-QuU2nBql3J4KCnOWtWDw4n1K4JU0T79j54ZZvm/9nhsX6AIar13FyhsaBfs6QkJ2ixTQAnd7TocJIoJRWbqMZA==
 
-"@threefold/grid_client@2.0.0-rc11":
-  version "2.0.0-rc11"
-  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.0.0-rc11.tgz#05310c0e51bd357c9b84a45d9585ffa0be83395a"
-  integrity sha512-m/ZmhMVuDafHZUmEl3vCsZMWxNouDWwyFo3RW1t6zFEZ+eb1eoGagjWGT7dTAm2BmH0KNVjUvBtBVaTM4WCEBQ==
+"@threefold/grid_client@2.0.0-rc12":
+  version "2.0.0-rc12"
+  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.0.0-rc12.tgz#76cabaa353bff016407b49bd7acaeb8c96894a28"
+  integrity sha512-fa1nDDd60hLk54M2QEgB7yOqj0dNptGOerAhFYO+a5/dyo/0IUPzAg3yMXwKRfby2N1VC8aBDtvYRD1+r0XAeA==
   dependencies:
     "@jimber/pkid" "1.0.4"
     "@noble/secp256k1" "^1.7.1"
-    "@threefold/rmb_direct_client" "^2.0.0-rc11"
-    "@threefold/tfchain_client" "^2.0.0-rc11"
+    "@threefold/rmb_direct_client" "^2.0.0-rc12"
+    "@threefold/tfchain_client" "^2.0.0-rc12"
     algosdk "^1.19.0"
     appdata-path "^1.0.0"
     axios "^0.27.2"
@@ -1559,14 +1559,14 @@
     url-parse "^1.5.10"
     uuid4 "^2.0.2"
 
-"@threefold/rmb_direct_client@^2.0.0-rc11":
-  version "2.0.0-rc11"
-  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-2.0.0-rc11.tgz#6ec4de1ec83e5b2f69a4639c8de84fc8b9878837"
-  integrity sha512-/YCTzf8A0DEHFi97JacW59B6radIGzzBYO+oFSubEHt/Bchrf4YWbSY4cqOj2V68qWnYPRelMVN9X4j/e0tl3Q==
+"@threefold/rmb_direct_client@^2.0.0-rc12":
+  version "2.0.0-rc12"
+  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-2.0.0-rc12.tgz#7b2f35820e7433512600ec56671eb9c00df5ebf6"
+  integrity sha512-wUbq2T7nnkPf0tOlyRWycm58Y3yLwLgiHKHbjTLFpYJHPeVV87oDwUbc3jx51EB96eV2Eg3c5dt1EBg03ZYRUA==
   dependencies:
     "@noble/secp256k1" "^1.7.1"
     "@polkadot/api" "^8.9.1"
-    "@threefold/tfchain_client" "^2.0.0-rc11"
+    "@threefold/tfchain_client" "^2.0.0-rc12"
     base64url "^3.0.1"
     bip39 "^3.1.0"
     buffer "^6.0.3"
@@ -1576,10 +1576,10 @@
     uuid "^8.3.2"
     ws "^8.12.0"
 
-"@threefold/tfchain_client@^2.0.0-rc11":
-  version "2.0.0-rc11"
-  resolved "https://registry.yarnpkg.com/@threefold/tfchain_client/-/tfchain_client-2.0.0-rc11.tgz#f58cde4904d3bc342298f33aadafa51c6d2c2c3f"
-  integrity sha512-FkFo3tY6WGqv6+F16P/Md1Ofd0kpEfvGBRX1r7Hk0yjvdJ6bU2U5bh+68PNqDn9/VoeymTzWiVmzzk6IeJlJ6Q==
+"@threefold/tfchain_client@^2.0.0-rc12":
+  version "2.0.0-rc12"
+  resolved "https://registry.yarnpkg.com/@threefold/tfchain_client/-/tfchain_client-2.0.0-rc12.tgz#7c96663bb2d68ac4fa6bb77472a17f0ec8fa8121"
+  integrity sha512-uVIHyzLTjmQWSxJibKrp4icH452ju1XXUOOtk8v+l9P0xJw8kNopRTnNmxAYb0wngxSxfvFeZwmmtBR1ySxAfw==
   dependencies:
     "@polkadot/api" "^8.9.1"
     await-lock "^2.2.2"
