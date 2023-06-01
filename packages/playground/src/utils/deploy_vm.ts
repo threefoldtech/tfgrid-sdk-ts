@@ -54,7 +54,7 @@ async function createMachine(grid: GridClient, machine: Machine, nodePicker: Nod
   vm.disks = createDisks(machine.disks);
   vm.public_ip = machine.publicIpv4 || false;
   vm.public_ip6 = machine.publicIpv6 || false;
-  vm.planetary = machine.planetary || false;
+  vm.planetary = machine.planetary ?? true;
   vm.cpu = machine.cpu;
   vm.memory = machine.memory;
   vm.rootfs_size = machine.rootFilesystemSize || 0;
