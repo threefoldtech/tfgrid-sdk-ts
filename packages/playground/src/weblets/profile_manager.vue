@@ -197,7 +197,7 @@
                     : SSHKeyHint
                 "
                 :persistent-hint="updatingSSH || generatingSSH || !!SSHKeyHint"
-                :rules="[validateSSH]"
+                :rules="[value => !!value || 'SSH key is required']"
               />
             </CopyInputWrapper>
           </template>
@@ -413,14 +413,6 @@ function validatePassword(value: string) {
       return { message: "Please provide a valid password." };
     }
   }
-}
-const SSH_REGEX =
-  /^(sk-)?(ssh-rsa AAAAB3NzaC1yc2|ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNT|ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzOD|ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1Mj|ssh-ed25519 AAAAC3NzaC1lZDI1NTE5|ssh-dss AAAAB3NzaC1kc3)[0-9A-Za-z+/]+[=]{0,3}( .*)?$/;
-
-function validateSSH(value: string) {
-  if (value === "") return "SSH Value is required";
-  if (!SSH_REGEX.test(value)) return "Please enter a valid SSH key";
-  return true;
 }
 
 const bridge = (window as any).env.BRIDGE_TFT_ADDRESS;
