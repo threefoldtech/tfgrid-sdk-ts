@@ -101,11 +101,9 @@ export default {
 
     const getCapacityURL = (network: string) => {
       if (network === "main") {
-        const mainnetCapacityURL = "https://dashboard.grid.tf/explorer/statistics";
-        return mainnetCapacityURL;
+        return "https://dashboard.grid.tf/explorer/statistics";
       }
-      const capacityURL = `https://dashboard.${network}.grid.tf/explorer/statistics`;
-      return capacityURL;
+      return `https://dashboard.${network}.grid.tf/explorer/statistics`;
     };
 
     const capacityURL = getCapacityURL(network);
