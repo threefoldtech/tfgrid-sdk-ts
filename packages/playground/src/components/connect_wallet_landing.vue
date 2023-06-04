@@ -90,6 +90,7 @@
 </template>
 
 <script lang="ts">
+import { NetworkEnv } from "@threefold/grid_client";
 import { useTheme } from "vuetify";
 
 export default {
@@ -99,8 +100,8 @@ export default {
     const baseUrl = import.meta.env.BASE_URL;
     const network = process.env.NETWORK || (window as any).env.NETWORK;
 
-    const getCapacityURL = (network: string) => {
-      if (network === "main") {
+    const getCapacityURL = (network: NetworkEnv) => {
+      if (network === NetworkEnv.main) {
         return "https://dashboard.grid.tf/explorer/statistics";
       }
       return `https://dashboard.${network}.grid.tf/explorer/statistics`;
