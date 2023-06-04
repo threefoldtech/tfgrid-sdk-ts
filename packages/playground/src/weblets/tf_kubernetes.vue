@@ -102,6 +102,7 @@ function addWorker() {
 }
 
 async function deploy() {
+  layout.value.validateSsh();
   layout.value.setStatus("deploy");
 
   try {

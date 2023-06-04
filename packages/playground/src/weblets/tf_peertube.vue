@@ -97,6 +97,7 @@ const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;
 
 async function deploy() {
+  layout.value.validateSsh();
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.Peertube.toLowerCase();

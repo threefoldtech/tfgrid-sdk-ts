@@ -176,6 +176,7 @@ const farm = ref() as Ref<Farm>;
 watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()));
 
 async function deploy() {
+  layout.value.validateSsh();
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.Algorand.toLowerCase();

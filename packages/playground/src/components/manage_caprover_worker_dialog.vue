@@ -110,6 +110,7 @@ function updateCaprover() {
 }
 
 async function deploy(layout: any) {
+  layout.value.validateSsh();
   layout.setStatus("deploy");
 
   try {

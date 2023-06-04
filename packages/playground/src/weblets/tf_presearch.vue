@@ -115,6 +115,7 @@ watch([planetary, ipv4], ([planetary, ipv4]) => {
   else networkError.value = false;
 });
 async function deploy() {
+  layout.value.validateSsh();
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.Presearch.toLowerCase();

@@ -121,6 +121,7 @@ const farm = ref() as Ref<Farm>;
 const smtp = ref(createSMTPServer());
 
 async function deploy() {
+  layout.value.validateSsh();
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.Owncloud.toLowerCase();

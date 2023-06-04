@@ -119,6 +119,7 @@ const leader = ref(createWorker("cr" + generateString(9)));
 const workers = ref<CW[]>([]);
 
 async function deploy() {
+  layout.value.validateSsh();
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.Caprover.toLowerCase();

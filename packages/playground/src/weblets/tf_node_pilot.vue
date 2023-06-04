@@ -88,6 +88,7 @@ const memory = ref(8192);
 const farm = ref() as Ref<Farm>;
 
 async function deploy() {
+  layout.value.validateSsh();
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.NodePilot.toLowerCase();

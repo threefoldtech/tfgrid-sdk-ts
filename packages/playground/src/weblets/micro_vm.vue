@@ -229,6 +229,7 @@ function addDisk() {
 }
 
 async function deploy() {
+  layout.value.validateSsh();
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.VM.toLowerCase();
