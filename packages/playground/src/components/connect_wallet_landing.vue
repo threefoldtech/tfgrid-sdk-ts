@@ -99,17 +99,16 @@ export default {
     const baseUrl = import.meta.env.BASE_URL;
     const network = process.env.NETWORK || (window as any).env.NETWORK;
 
-    const getCapacityHref = () => {
-      let href = `https://dashboard.${network}.grid.tf/explorer/statistics`;
+    const getCapacityURL = (network: string) => {
       if (network === "main") {
-        href = "https://dashboard.grid.tf/explorer/statistics";
-        return href;
+        const mainnetCapacityURL = "https://dashboard.grid.tf/explorer/statistics";
+        return mainnetCapacityURL;
       }
-
+      const href = `https://dashboard.${network}.grid.tf/explorer/statistics`;
       return href;
     };
 
-    const capacityURL = getCapacityHref();
+    const capacityURL = getCapacityURL(network);
 
     return {
       theme,
