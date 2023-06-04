@@ -64,9 +64,7 @@
         </div>
 
         <div class="d-flex justify-center mt-16">
-          <v-btn color="primary" target="_blank" href="https://dashboard.grid.tf/explorer/statistics">
-            Explore ThreeFold Grid Capacity
-          </v-btn>
+          <v-btn color="primary" target="_blank" :href="capacityURL"> Explore ThreeFold Grid Capacity </v-btn>
         </div>
       </v-container>
     </div>
@@ -99,6 +97,19 @@ export default {
   setup() {
     const theme = useTheme();
     const baseUrl = import.meta.env.BASE_URL;
+    const network = process.env.NETWORK || (window as any).env.NETWORK;
+
+    const getCapacityHref = () => {
+      let href = `https://dashboard.${network}.grid.tf/explorer/statistics`;
+      if (network === "main") {
+        href = "https://dashboard.grid.tf/explorer/statistics";
+        return href;
+      }
+
+      return href;
+    };
+
+    const capacityURL = getCapacityHref();
 
     return {
       theme,
@@ -125,6 +136,7 @@ export default {
         },
       ],
       baseUrl,
+      capacityURL,
     };
   },
 };
