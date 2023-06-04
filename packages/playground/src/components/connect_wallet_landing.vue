@@ -92,13 +92,15 @@
 <script lang="ts">
 import { useTheme } from "vuetify";
 
-import capacityURL from "@/utils/getCapacityUrl";
+import { getCapacityURL } from "../utils/getCapacityUrl";
 
 export default {
   name: "ConnectWalletLanding",
   setup() {
     const theme = useTheme();
     const baseUrl = import.meta.env.BASE_URL;
+    const network = process.env.NETWORK || (window as any).env.NETWORK;
+    const capacityURL = getCapacityURL(network);
 
     return {
       theme,
