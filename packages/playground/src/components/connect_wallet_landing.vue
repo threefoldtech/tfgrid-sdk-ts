@@ -104,8 +104,8 @@ export default {
         const mainnetCapacityURL = "https://dashboard.grid.tf/explorer/statistics";
         return mainnetCapacityURL;
       }
-      const href = `https://dashboard.${network}.grid.tf/explorer/statistics`;
-      return href;
+      const capacityURL = `https://dashboard.${network}.grid.tf/explorer/statistics`;
+      return capacityURL;
     };
 
     const capacityURL = getCapacityURL(network);
