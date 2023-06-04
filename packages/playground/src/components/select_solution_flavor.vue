@@ -1,45 +1,47 @@
 <template>
-  <v-select label="Select" :items="packages" v-model="solution" />
+  <div>
+    <v-select label="Select" :items="packages" v-model="solution" />
 
-  <div v-if="solution === 'custom'">
-    <input-validator
-      :value="cpu"
-      :rules="[
-        validators.required('CPU is required.'),
-        validators.isInt('CPU must be a valid integer.'),
-        validators.min('CPU min is 1 cores.', 1),
-        validators.max('CPU max is 32 cores.', 32),
-      ]"
-      #="{ props }"
-    >
-      <v-text-field type="number" label="CPU (vCores)" v-model.number="cpu" v-bind="props" />
-    </input-validator>
+    <div v-if="solution === 'custom'">
+      <input-validator
+        :value="cpu"
+        :rules="[
+          validators.required('CPU is required.'),
+          validators.isInt('CPU must be a valid integer.'),
+          validators.min('CPU min is 1 cores.', 1),
+          validators.max('CPU max is 32 cores.', 32),
+        ]"
+        #="{ props }"
+      >
+        <v-text-field type="number" label="CPU (vCores)" v-model.number="cpu" v-bind="props" />
+      </input-validator>
 
-    <input-validator
-      :value="memory"
-      :rules="[
-        validators.required('Memory is required.'),
-        validators.isInt('Memory must be a valid integer.'),
-        validators.min('Minimum allowed memory is 256 MB.', 256),
-        validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
-      ]"
-      #="{ props }"
-    >
-      <v-text-field type="number" label="Memory (MB)" v-model.number="memory" v-bind="props" />
-    </input-validator>
+      <input-validator
+        :value="memory"
+        :rules="[
+          validators.required('Memory is required.'),
+          validators.isInt('Memory must be a valid integer.'),
+          validators.min('Minimum allowed memory is 256 MB.', 256),
+          validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
+        ]"
+        #="{ props }"
+      >
+        <v-text-field type="number" label="Memory (MB)" v-model.number="memory" v-bind="props" />
+      </input-validator>
 
-    <input-validator
-      :value="disk"
-      :rules="[
-        validators.required('Disk size is required.'),
-        validators.isInt('Disk size must be a valid integer.'),
-        validators.min('Minimum allowed disk size is 1 GB.', 1),
-        validators.max('Maximum allowed disk size is 10000 GB.', 10000),
-      ]"
-      #="{ props }"
-    >
-      <v-text-field type="number" label="Disk (GB)" v-model.number="disk" v-bind="props" />
-    </input-validator>
+      <input-validator
+        :value="disk"
+        :rules="[
+          validators.required('Disk size is required.'),
+          validators.isInt('Disk size must be a valid integer.'),
+          validators.min('Minimum allowed disk size is 1 GB.', 1),
+          validators.max('Maximum allowed disk size is 10000 GB.', 10000),
+        ]"
+        #="{ props }"
+      >
+        <v-text-field type="number" label="Disk (GB)" v-model.number="disk" v-bind="props" />
+      </input-validator>
+    </div>
   </div>
 </template>
 

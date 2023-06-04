@@ -28,7 +28,7 @@
           :rules="[
             validators.required('Name is required.'),
             validators.isLowercase('Name should consist of lowercase letters only.'),
-            validators.isAlphanumeric('Name should consist of letters only.'),
+            validators.isAlphanumeric('Name should consist of letters and numbers only.'),
             name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
             validators.minLength('Name must be at least 2 characters.', 2),
             validators.maxLength('Name cannot exceed 15 characters.', 15),
@@ -42,6 +42,9 @@
           :value="username"
           :rules="[
             validators.required('Username is required.'),
+            validators.isLowercase('Username should consist of lowercase letters only.'),
+            validators.isAlphanumeric('Username should consist of letters and numbers only.'),
+            username => validators.isAlpha('Username must start with alphabet char.')(username[0]),
             validators.minLength('Username must be at least 2 characters.', 2),
             validators.maxLength('Username cannot exceed 15 characters.', 15),
           ]"

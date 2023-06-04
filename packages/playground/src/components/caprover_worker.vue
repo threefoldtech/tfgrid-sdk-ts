@@ -3,9 +3,10 @@
     :rules="[
       validators.required('Name is required.'),
       validators.isLowercase('Name should consist of lowercase letters only.'),
-      validators.isLowercase('Name should consist of lowercase letters only.'),
-      validators.minLength('Name minimum length is 2 chars.', 2),
-      validators.maxLength('Name max length is 15 chars.', 15),
+      validators.isAlphanumeric('Name should consist of letters and numbers only.'),
+      name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+      validators.minLength('Name must be at least 2 characters.', 2),
+      validators.maxLength('Name cannot exceed 15 characters.', 15),
     ]"
     :value="$props.modelValue.name"
     #="{ props }"

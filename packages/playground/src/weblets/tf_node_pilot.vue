@@ -15,7 +15,7 @@
         :rules="[
           validators.required('Name is required.'),
           validators.isLowercase('Name should consist of lowercase letters only.'),
-          validators.isAlphanumeric('Name should consist of letters only.'),
+          validators.isAlphanumeric('Name should consist of letters and numbers only.'),
           name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
           validators.minLength('Name must be at least 2 characters.', 2),
           validators.maxLength('Name cannot exceed 15 characters.', 15),
@@ -30,7 +30,7 @@
         :rules="[
           validators.required('CPU is required.'),
           validators.isInt('CPU must be a valid integer.'),
-          validators.min('CPU min is 2 cores.', 2),
+          validators.min('CPU min is 8 cores.', 8),
           validators.max('CPU max is 32 cores.', 32),
         ]"
         #="{ props }"
@@ -43,7 +43,7 @@
         :rules="[
           validators.required('Memory is required.'),
           validators.isInt('Memory must be a valid integer.'),
-          validators.min('Minimum allowed memory is 256 MB.', 256),
+          validators.min('Minimum allowed memory is 8192 MB.', 8192),
           validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
         ]"
         #="{ props }"

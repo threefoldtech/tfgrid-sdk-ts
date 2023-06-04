@@ -1,48 +1,50 @@
 <template>
-  <v-switch color="primary" inset label="Set Custom Capacity" v-model="custom" />
+  <div>
+    <v-switch color="primary" inset label="Set Custom Capacity" v-model="custom" />
 
-  <slot></slot>
+    <slot></slot>
 
-  <template v-if="custom">
-    <input-validator
-      :value="cpu"
-      :rules="[
-        validators.required('CPU is required.'),
-        validators.isInt('CPU must be a valid integer.'),
-        customCpuValidation(validators),
-      ]"
-      #="{ props }"
-      ref="cpuInput"
-    >
-      <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
-    </input-validator>
+    <template v-if="custom">
+      <input-validator
+        :value="cpu"
+        :rules="[
+          validators.required('CPU is required.'),
+          validators.isInt('CPU must be a valid integer.'),
+          customCpuValidation(validators),
+        ]"
+        #="{ props }"
+        ref="cpuInput"
+      >
+        <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
+      </input-validator>
 
-    <input-validator
-      :value="memory"
-      :rules="[
-        validators.required('Memory is required.'),
-        validators.isInt('Memory must be a valid integer.'),
-        customMemoryValidation(validators),
-      ]"
-      #="{ props }"
-      ref="memoryInput"
-    >
-      <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
-    </input-validator>
+      <input-validator
+        :value="memory"
+        :rules="[
+          validators.required('Memory is required.'),
+          validators.isInt('Memory must be a valid integer.'),
+          customMemoryValidation(validators),
+        ]"
+        #="{ props }"
+        ref="memoryInput"
+      >
+        <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
+      </input-validator>
 
-    <input-validator
-      :value="storage"
-      :rules="[
-        validators.required('Storage size is required.'),
-        validators.isInt('Storage size must be a valid integer.'),
-        customStorageValidation(validators),
-      ]"
-      #="{ props }"
-      ref="storageInput"
-    >
-      <v-text-field label="Storage Size (GB)" type="number" v-model.number="storage" v-bind="props" />
-    </input-validator>
-  </template>
+      <input-validator
+        :value="storage"
+        :rules="[
+          validators.required('Storage size is required.'),
+          validators.isInt('Storage size must be a valid integer.'),
+          customStorageValidation(validators),
+        ]"
+        #="{ props }"
+        ref="storageInput"
+      >
+        <v-text-field label="Storage Size (GB)" type="number" v-model.number="storage" v-bind="props" />
+      </input-validator>
+    </template>
+  </div>
 </template>
 
 <script lang="ts" setup>
