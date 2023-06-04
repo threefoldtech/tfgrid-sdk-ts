@@ -119,12 +119,12 @@ const leader = ref(createWorker("cr" + generateString(9)));
 const workers = ref<CW[]>([]);
 
 async function deploy() {
-  layout.value.validateSsh();
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.Caprover.toLowerCase();
 
   try {
+    layout.value.validateSsh();
     const grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);

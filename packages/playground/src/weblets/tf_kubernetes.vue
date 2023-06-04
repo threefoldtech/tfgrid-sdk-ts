@@ -102,10 +102,10 @@ function addWorker() {
 }
 
 async function deploy() {
-  layout.value.validateSsh();
   layout.value.setStatus("deploy");
 
   try {
+    layout.value.validateSsh();
     const grid = await getGrid(profileManager.profile!);
 
     await layout.value.validateBalance(grid!);

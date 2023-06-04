@@ -108,12 +108,12 @@ const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
 
 async function deploy() {
-  layout.value.validateSsh();
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.Umbrel.toLowerCase();
 
   try {
+    layout.value.validateSsh();
     const grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);

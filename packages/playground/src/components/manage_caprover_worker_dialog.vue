@@ -110,10 +110,9 @@ function updateCaprover() {
 }
 
 async function deploy(layout: any) {
-  layout.value.validateSsh();
   layout.setStatus("deploy");
-
   try {
+    layout.value.validateSsh();
     const grid = await getGrid(profileManager.profile!, ProjectName.Caprover.toLowerCase());
 
     await layout.validateBalance(grid);

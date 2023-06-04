@@ -93,7 +93,6 @@ const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;
 
 async function deploy() {
-  layout.value.validateSsh();
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.Subsquid.toLowerCase();
@@ -109,6 +108,7 @@ async function deploy() {
   let vm: any;
 
   try {
+    layout.value.validateSsh();
     grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);

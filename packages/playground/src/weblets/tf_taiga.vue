@@ -132,7 +132,6 @@ const farm = ref() as Ref<Farm>;
 const smtp = ref(createSMTPServer());
 
 async function deploy() {
-  layout.value.validateSsh();
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.Taiga.toLowerCase();
@@ -148,6 +147,7 @@ async function deploy() {
   let vm: any;
 
   try {
+    layout.value.validateSsh();
     grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);

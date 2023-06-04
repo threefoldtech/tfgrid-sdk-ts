@@ -64,7 +64,6 @@ function calcDiskSize(disks: { size: number }[]) {
 }
 
 async function deploy(layout: any) {
-  layout.value.validateSsh();
   layout.setStatus("deploy");
   const grid = await getGrid(profileManager.profile!);
   console.log(props.data.deploymentName);

@@ -200,7 +200,6 @@ watch([planetary, ipv4, ipv6, wireguard], ([planetary, ipv4, ipv6, wireguard]) =
   else networkError.value = false;
 });
 async function deploy() {
-  layout.value.validateSsh();
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.Fullvm.toLowerCase();

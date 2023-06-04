@@ -115,12 +115,12 @@ watch([planetary, ipv4], ([planetary, ipv4]) => {
   else networkError.value = false;
 });
 async function deploy() {
-  layout.value.validateSsh();
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.Presearch.toLowerCase();
 
   try {
+    layout.value.validateSsh();
     const grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);
