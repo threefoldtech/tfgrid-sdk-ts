@@ -36,11 +36,7 @@
               <CopyReadonlyInput
                 v-for="disk of contract.mounts"
                 :key="disk.name"
-                :label="
-                  contract.metadata.includes('fullvm') && contract.mounts.indexOf(disk) > 0
-                    ? 'Disk'
-                    : 'Disk( ' + disk.mountPoint + ' ) GB'
-                "
+                :label="getDiskLabel(contract, disk)"
                 :data="Math.ceil(disk.size / (1024 * 1024 * 1024))"
               />
               <CopyReadonlyInput label="WireGuard IP" :data="contract.interfaces[0].ip" />
@@ -199,6 +195,13 @@ function getType(key: string): string {
 
   return "text";
 }
+
+function getDiskLabel(contract: any, disk: Disk) {
+  if (contract.metadata.includes("fullvm") && contract.mounts.indexOf(disk) > 0) {
+    return "Disk";
+  }
+  return "Disk( " + disk.mountPoint + " ) GB";
+}
 </script>
 
 <script lang="ts">
@@ -206,6 +209,7 @@ import { useProfileManager } from "@/stores/profile_manager";
 import { GrafanaStatistics } from "@/utils/getMetricsUrl";
 import { getGrid } from "@/utils/grid";
 
+import type { Disk } from "../utils/deploy_vm";
 import CopyReadonlyInput from "./copy_readonly_input.vue";
 import { HighlightDark, HighlightLight } from "./highlight_themes";
 
