@@ -24,15 +24,19 @@ export class GrafanaStatistics implements IGrafanaArgs {
   }
 
   async setAccountID() {
-    await this.grid.twins.get({ id: this.deployment[0].nodeId }).then(res => {
-      this.accountID = res.accountId;
-    });
+    if (this.deployment.length) {
+      await this.grid.twins.get({ id: this.deployment[0].nodeId }).then(res => {
+        this.accountID = res.accountId;
+      });
+    }
   }
 
   async setfarmID() {
-    await this.grid.nodes.getRent({ nodeId: this.deployment[0].nodeId }).then(res => {
-      this.farmID = res.farmId;
-    });
+    if (this.deployment.length) {
+      await this.grid.nodes.getRent({ nodeId: this.deployment[0].nodeId }).then(res => {
+        this.farmID = res.farmId;
+      });
+    }
   }
 
   async getUrl() {
