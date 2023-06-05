@@ -13,6 +13,7 @@ import {
   ContractConsumption,
   ContractGetByNodeIdAndHashModel,
   ContractGetModel,
+  ContractLockModel,
   ContractsByAddress,
   ContractsByTwinId,
   ContractState,
@@ -100,7 +101,7 @@ class Contracts {
 
   @expose
   @validateInput
-  async contractLock(options: ContractConsumption) {
+  async contractLock(options: ContractLockModel) {
     return this.client.contracts.contractLock(options);
   }
 
