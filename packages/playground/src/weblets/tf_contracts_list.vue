@@ -32,7 +32,22 @@
       </template>
 
       <template #[`item.state`]="{ item }">
-        <v-chip :color="getStateColor(item.value.state)">
+        <v-tooltip
+          v-if="item && item.value.state === ContractStates.GracePeriod"
+          :text="'Click here to view the amount you need to charge in order to unlock the contract.'"
+          location="top center"
+        >
+          <template #activator="{ props }">
+            <v-chip
+              @click.stop="contractLockDetails(item.value.contractId)"
+              v-bind="props"
+              :color="getStateColor(item.value.state)"
+            >
+              {{ item.value.state }}
+            </v-chip>
+          </template>
+        </v-tooltip>
+        <v-chip v-else :color="getStateColor(item.value.state)">
           {{ item.value.state }}
         </v-chip>
       </template>
@@ -82,6 +97,30 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <v-dialog width="70%" v-model="contractStateDialog">
+    <v-card>
+      <v-card-title class="text-h5">Contract lock Detalis</v-card-title>
+      <v-card-text>
+        <p v-if="loading" class="text-center">
+          <strong>Loading The Locked Amount...</strong>
+        </p>
+        <p v-else class="text-center">
+          Amount Locked <strong>{{ contractLocked?.amountLocked }}</strong>
+        </p>
+        <br />
+        <v-alert type="info" variant="tonal">
+          To unlock your contract from the grace period, please ensure that you fund your account with the displayed
+          amount. By doing so, you will meet the required balance and enable the contract to be released from the grace
+          period.
+        </v-alert>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="error" variant="tonal" @click="contractStateDialog = false"> Close </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -121,6 +160,8 @@ async function onMount() {
 }
 
 const loadingContractId = ref<number>();
+const contractLocked = ref<ContractLock>();
+
 async function onShowDetails(contractId: number) {
   loading.value = true;
   loadingContractId.value = contractId;
@@ -148,7 +189,23 @@ function getStateColor(state: ContractStates): string {
   }
 }
 
+async function contractLockDetails(contractId: number) {
+  contractStateDialog.value = true;
+  loading.value = true;
+  const grid = await getGrid(profileManager.profile!);
+  await grid?.contracts
+    .contractLock({ id: contractId })
+    .then((data: ContractLock) => {
+      contractLocked.value = data;
+    })
+    .catch(err => {
+      layout.value.setStatus("failed", normalizeError(err, `Failed to fetch the contract lock details.`));
+    });
+  loading.value = false;
+}
+
 const deletingDialog = ref(false);
+const contractStateDialog = ref(false);
 const deleting = ref(false);
 async function onDelete() {
   deletingDialog.value = false;
@@ -172,6 +229,8 @@ async function onDelete() {
 </script>
 
 <script lang="ts">
+import type { ContractLock } from "@threefold/tfchain_client";
+
 import ListTable from "../components/list_table.vue";
 import { normalizeError } from "../utils/helpers";
 

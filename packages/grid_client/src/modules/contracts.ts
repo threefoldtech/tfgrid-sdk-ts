@@ -100,6 +100,12 @@ class Contracts {
 
   @expose
   @validateInput
+  async contractLock(options: ContractConsumption) {
+    return this.client.contracts.contractLock(options);
+  }
+
+  @expose
+  @validateInput
   @checkBalance
   async update_node(options: NodeContractUpdateModel) {
     return (await this.client.contracts.updateNode(options)).apply();

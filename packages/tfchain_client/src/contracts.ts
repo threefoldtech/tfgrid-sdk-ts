@@ -12,6 +12,16 @@ interface NameContract {
   name: string;
 }
 
+export interface ContractLockOptions {
+  id: number;
+}
+
+export interface ContractLock {
+  amountLocked: number;
+  lockUpdated: number;
+  cycles: number;
+}
+
 interface NodeContract {
   nodeId: number;
   deploymentHash: string;
@@ -104,6 +114,12 @@ class QueryContracts {
   async getContractIdByNodeIdAndHash(options: QueryContractGetContractByIdAndHashOptions): Promise<number> {
     const res = await this.client.api.query.smartContractModule.contractIDByNodeIDAndHash(options.nodeId, options.hash);
     return res.toPrimitive() as number;
+  }
+
+  @checkConnection
+  async contractLock(options: ContractLockOptions): Promise<ContractLock> {
+    const res = await this.client.api.query.smartContractModule.contractLock(options.id);
+    return res.toPrimitive() as unknown as ContractLock;
   }
 
   @checkConnection
