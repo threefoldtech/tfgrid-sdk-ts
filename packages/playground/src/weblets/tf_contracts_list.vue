@@ -34,7 +34,7 @@
       <template #[`item.state`]="{ item }">
         <v-tooltip
           v-if="item && item.value.state === ContractStates.GracePeriod"
-          :text="'Click here to view the amount you need to charge in order to unlock the contract.'"
+          :text="'the number of tokens required to remove your contract from the grace period and restore functionality to your workloads.'"
           location="top center"
         >
           <template #activator="{ props }">
@@ -106,13 +106,13 @@
           <strong>Loading The Locked Amount...</strong>
         </p>
         <p v-else class="text-center">
-          Amount Locked <strong>{{ contractLocked?.amountLocked }}</strong>
+          Amount Locked <strong>{{ contractLocked?.amountLocked }} TFT</strong>
         </p>
         <br />
         <v-alert type="info" variant="tonal">
-          To unlock your contract from the grace period, please ensure that you fund your account with the displayed
-          amount. By doing so, you will meet the required balance and enable the contract to be released from the grace
-          period.
+          The contract is in a GracePeriod condition, which means that your workloads are suspended but not deleted; in
+          order to resume your workloads and restore their functionality, you must pay your account with the necessary
+          tokens.
         </v-alert>
       </v-card-text>
       <v-card-actions>
@@ -199,7 +199,8 @@ async function contractLockDetails(contractId: number) {
       contractLocked.value = data;
     })
     .catch(err => {
-      layout.value.setStatus("failed", normalizeError(err, `Failed to fetch the contract lock details.`));
+      layout.value.setStatus("failed", normalizeError(err, `Failed to fetch the contract ${contractId} lock details.`));
+      contractStateDialog.value = false;
     });
   loading.value = false;
 }
