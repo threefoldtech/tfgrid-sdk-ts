@@ -31,7 +31,7 @@ export class GrafanaStatistics implements IGrafanaArgs {
     }
   }
 
-  async setfarmID() {
+  async setFarmID() {
     if (this.deployment.length) {
       await this.grid.nodes.getRent({ nodeId: this.deployment[0].nodeId }).then(res => {
         this.farmID = res.farmId;
@@ -40,7 +40,7 @@ export class GrafanaStatistics implements IGrafanaArgs {
   }
 
   async getUrl() {
-    await this.setfarmID();
+    await this.setFarmID();
     await this.setAccountID();
     this.updateNetwork();
     const orgId = `orgId=${this.orgID}`;
