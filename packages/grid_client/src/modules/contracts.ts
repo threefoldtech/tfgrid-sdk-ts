@@ -13,6 +13,7 @@ import {
   ContractConsumption,
   ContractGetByNodeIdAndHashModel,
   ContractGetModel,
+  ContractLockModel,
   ContractsByAddress,
   ContractsByTwinId,
   ContractState,
@@ -96,6 +97,12 @@ class Contracts {
   @validateInput
   async activeRentContractForNode(options: RentContractGetModel) {
     return this.client.contracts.getContractIdByActiveRentForNode(options);
+  }
+
+  @expose
+  @validateInput
+  async contractLock(options: ContractLockModel) {
+    return this.client.contracts.contractLock(options);
   }
 
   @expose

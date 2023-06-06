@@ -345,6 +345,8 @@ class ContractConsumption {
   @Expose() @IsInt() @Min(1) id: number;
 }
 
+class ContractLockModel extends ContractConsumption {}
+
 class TwinCreateModel {
   @Expose() @IsString() @IsNotEmpty() relay: string;
 }
@@ -651,6 +653,7 @@ export {
   ContractsByTwinId,
   ContractsByAddress,
   ContractConsumption,
+  ContractLockModel,
   TwinCreateModel,
   TwinGetModel,
   TwinGetByAccountIdModel,
