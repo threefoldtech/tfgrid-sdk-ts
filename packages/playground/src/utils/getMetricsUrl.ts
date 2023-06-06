@@ -14,7 +14,6 @@ export class GrafanaStatistics implements IGrafanaArgs {
   public accountID = "";
   public grid: GridClient;
   public deployment: any;
-  public node!: Node;
   public farmID: number;
 
   constructor(grid: GridClient, deployment: any) {
@@ -26,11 +25,11 @@ export class GrafanaStatistics implements IGrafanaArgs {
 
   async setNodeAccountID() {
     if (this.deployment.length && this.deployment[0]["nodeId"]) {
-      this.node = await this.grid.nodes.get({ id: this.deployment[0].nodeId });
-      if (this.node) {
-        await this.grid.twins.get({ id: this.node.twinId }).then(res => {
+      const node = await this.grid.nodes.get({ id: this.deployment[0].nodeId });
+      if (node) {
+        await this.grid.twins.get({ id: node.twinId }).then(res => {
           this.accountID = res.accountId;
-          this.farmID = this.node.farmId;
+          this.farmID = node.farmId;
         });
       }
     }
