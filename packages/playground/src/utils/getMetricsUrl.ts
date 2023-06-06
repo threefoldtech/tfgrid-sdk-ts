@@ -1,7 +1,5 @@
 import type { GridClient } from "@threefold/grid_client";
 
-import type { Machine } from "./deploy_vm";
-
 export interface IGrafanaArgs {
   orgID: number;
   network: string;

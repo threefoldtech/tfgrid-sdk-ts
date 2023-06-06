@@ -1,4 +1,4 @@
-import { Client } from "./client";
+import { Client, QueryClient } from "./client";
 import { checkConnection } from "./utils";
 
 export interface SetPowerOptions {
@@ -6,9 +6,75 @@ export interface SetPowerOptions {
   power: boolean;
 }
 
-class Nodes {
-  constructor(public client: Client) {
+interface INodeStatistics {
+  id: number;
+  farmId: number;
+  twinId: number;
+  resources: INodeResources;
+  location: INodeLocation;
+  publicConfig: IPublicConfigType;
+  created: number;
+  farmingPolicyId: number;
+  interfaces: INetworkInterfaceType[];
+  certification: string;
+  secureBoot: boolean;
+  virtualized: boolean;
+  serialNumber: string;
+  connectionPrice: number;
+}
+
+interface INetworkInterfaceType {
+  name: string;
+  mac: string;
+  ips: string[];
+}
+
+interface IPConfigInterface {
+  ip: string;
+  gw: string;
+}
+interface IPublicConfigType {
+  ip4: IPConfigInterface;
+  ip6: IPConfigInterface;
+  domain: string;
+}
+
+interface INodeResources {
+  hru: number;
+  sru: number;
+  cru: number;
+  mru: number;
+}
+
+interface INodeLocation {
+  city: string;
+  country: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface QueryNodesGetOptions {
+  id: number;
+}
+
+class QueryNodes {
+  constructor(public client: QueryClient) {
     this.client = client;
+  }
+
+  @checkConnection
+  async get(options: QueryNodesGetOptions): Promise<INodeStatistics> {
+    if (isNaN(options.id) || options.id <= 0) {
+      throw Error("Invalid node id. Node id must be postive integer");
+    }
+    const res = await this.client.api.query.tfgridModule.nodes(options.id);
+    return res.toPrimitive() as unknown as INodeStatistics;
+  }
+}
+
+class Nodes extends QueryNodes {
+  constructor(public client: Client) {
+    super(client);
   }
 
   @checkConnection
@@ -29,4 +95,4 @@ class Nodes {
   }
 }
 
-export { Nodes };
+export { Nodes, QueryNodes };

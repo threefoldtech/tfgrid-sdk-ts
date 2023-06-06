@@ -13,7 +13,7 @@ import { Balances, QueryBalances } from "./balances";
 import { Contracts, QueryContracts } from "./contracts";
 import { QueryFarms } from "./farms";
 import { KVStore } from "./kvstore";
-import { Nodes } from "./nodes";
+import { Nodes, QueryNodes } from "./nodes";
 import { QueryPricingPolicies } from "./pricing_policies";
 import { TermsAndConditions } from "./terms_and_conditions";
 import { QueryTFTPrice } from "./tft_price";
@@ -49,6 +49,7 @@ class QueryClient {
   tftPrice: QueryTFTPrice = new QueryTFTPrice(this);
   pricingPolicies: QueryPricingPolicies = new QueryPricingPolicies(this);
   twins: QueryTwins = new QueryTwins(this);
+  nodes: QueryNodes = new QueryNodes(this);
   constructor(public url: string) {}
 
   async loadKeyPairOrSigner(): Promise<void> {} // to be overridden in the full client
