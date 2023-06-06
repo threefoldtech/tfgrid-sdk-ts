@@ -317,7 +317,7 @@ class Client extends QueryClient {
         if (this.keypair) {
           await extrinsic.signAndSend(this.keypair, { nonce }, callback);
         } else if (this.extSigner) {
-          extrinsic.signAndSend(this.address, { nonce, signer: this.extSigner.signer }, callback);
+          await extrinsic.signAndSend(this.address, { nonce, signer: this.extSigner.signer }, callback);
         }
       } catch (e) {
         reject(e);
