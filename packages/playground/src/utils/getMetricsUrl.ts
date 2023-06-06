@@ -2,47 +2,47 @@ import type { GridClient } from "@threefold/grid_client";
 
 export interface IGrafanaArgs {
   orgID: number;
-  network: string;
   farmID: number;
+  network: string;
   accountID: string;
 }
 
 export class GrafanaStatistics implements IGrafanaArgs {
   public orgID = 2;
   public network = "";
-  public farmID = 0;
   public accountID = "";
   public grid: GridClient;
   public deployment: any;
+  public farmID: number;
 
   constructor(grid: GridClient, deployment: any) {
     this.grid = grid;
     this.deployment = deployment;
     this.network = grid.clientOptions?.network || "dev";
+    this.farmID = 0;
   }
 
-  async setAccountID() {
-    await this.grid.twins.get({ id: this.deployment[0].nodeId }).then(res => {
-      this.accountID = res.accountId;
-    });
-  }
-
-  async setfarmID() {
-    await this.grid.nodes.getRent({ nodeId: this.deployment[0].nodeId }).then(res => {
-      this.farmID = res.farmId;
-    });
+  async setNodeAccountID() {
+    if (this.deployment.length && this.deployment[0]["nodeId"]) {
+      const node = await this.grid.nodes.get({ id: this.deployment[0].nodeId });
+      if (node) {
+        await this.grid.twins.get({ id: node.twinId }).then(res => {
+          this.accountID = res.accountId;
+          this.farmID = node.farmId;
+        });
+      }
+    }
   }
 
   async getUrl() {
-    await this.setfarmID();
-    await this.setAccountID();
+    await this.setNodeAccountID();
     this.updateNetwork();
     const orgId = `orgId=${this.orgID}`;
     const network = `var-network=${this.network}`;
     const farmID = `var-farm=${this.farmID}`;
     const nodeID = `var-node=${this.accountID}`;
 
-    const urlArgs = `${orgId}&refresh=30s&${network}&${farmID}&${nodeID}&var-diskdevices=%5Ba-z%5D%2B%7Cnvme%5B0-9%5D%2Bn%5B0-9%5D%2B%7Cmmcblk%5B0-9%5D%2B`;
+    const urlArgs = `${orgId}&refresh=30s&${network}&${farmID}&${nodeID}`;
     const url = `https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?${urlArgs}`;
     return url;
   }
