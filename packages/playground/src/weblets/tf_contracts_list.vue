@@ -81,10 +81,12 @@
       </v-btn>
     </template>
   </weblet-layout>
-
   <v-dialog width="70%" v-model="deletingDialog">
     <v-card>
-      <v-card-title class="text-h5"> Are you sure you want to delete the following contracts? </v-card-title>
+      <v-card-title class="text-h5 mt-2"> Are you sure you want to delete the following contracts? </v-card-title>
+      <v-alert class="ma-4" density="compact" type="warning" variant="tonal"
+        >Deleting contracts may take a while to complete.</v-alert
+      >
       <v-card-text>
         <v-chip class="ma-1" color="primary" label v-for="c in selectedContracts" :key="c.contractId">
           {{ c.contractId }}
@@ -121,6 +123,9 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+  <v-snackbar variant="tonal" color="error" v-model="snackbar" :timeout="5000">
+    Failed to delete some keys, You don't have enough tokens
+  </v-snackbar>
 </template>
 
 <script lang="ts" setup>
@@ -204,7 +209,7 @@ async function contractLockDetails(contractId: number) {
     });
   loading.value = false;
 }
-
+const snackbar = ref(false);
 const deletingDialog = ref(false);
 const contractStateDialog = ref(false);
 const deleting = ref(false);
@@ -223,7 +228,13 @@ async function onDelete() {
     contracts.value = contracts.value!.filter(c => !selectedContracts.value.includes(c));
     selectedContracts.value = [];
   } catch (e) {
-    layout.value.setStatus("failed", normalizeError(e, `Failed to delete some of the selected contracts.`));
+    if ((e as Error).message.includes("Inability to pay some fees")) {
+      contracts.value = contracts.value!.filter(c => !selectedContracts.value.includes(c));
+      selectedContracts.value = [];
+      snackbar.value = true;
+    } else {
+      layout.value.setStatus("failed", normalizeError(e, `Failed to delete some of the selected contracts.`));
+    }
   }
   deleting.value = false;
 }
