@@ -1,5 +1,4 @@
 import type { GridClient } from "@threefold/grid_client";
-import type { Node } from "@threefold/tfchain_client";
 
 export interface IGrafanaArgs {
   orgID: number;
