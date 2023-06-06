@@ -2,7 +2,13 @@ import { TFClient } from "../clients";
 import { GridClientConfig } from "../config";
 import { events, send, validateInput } from "../helpers";
 import { expose } from "../helpers/expose";
-import { NodePowerModel, RentContractCreateModel, RentContractDeleteModel, RentContractGetModel } from "./models";
+import {
+  NodeGetModel,
+  NodePowerModel,
+  RentContractCreateModel,
+  RentContractDeleteModel,
+  RentContractGetModel,
+} from "./models";
 import { checkBalance } from "./utils";
 
 class Nodes {
@@ -57,6 +63,12 @@ class Nodes {
       .catch(err => {
         throw Error(`Error getting rent for node ${options.nodeId}: ${err}`);
       });
+  }
+
+  @expose
+  @validateInput
+  async get(options: NodeGetModel) {
+    return await this.client.nodes.get(options);
   }
 
   @expose

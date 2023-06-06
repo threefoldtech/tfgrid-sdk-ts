@@ -6,7 +6,7 @@ export interface SetPowerOptions {
   power: boolean;
 }
 
-interface Node {
+export interface Node {
   id: number;
   farmId: number;
   twinId: number;
