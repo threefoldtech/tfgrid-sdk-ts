@@ -48,7 +48,6 @@
                 :data="data[0].wireguard"
               />
               <CopyReadonlyInput label="Flist" :data="contract.flist" v-if="contract.flist" />
-              <CopyReadonlyInput label="Monitoring URL" :data="grafanaURL" />
               <template v-if="environments !== false">
                 <template v-for="key of Object.keys(contract.env)" :key="key">
                   <template v-if="(environments[key] || !(key in environments)) && contract.env[key]">
@@ -76,6 +75,12 @@
                   </template>
                 </template>
               </template>
+              <CopyReadonlyInput label="Monitoring URL" :data="grafanaURL" v-if="!isLoading" />
+              <v-card :loading="isLoading" type="info" variant="tonal" v-else>
+                <v-card-text>
+                  <p>Generating metrics url...</p>
+                </v-card-text>
+              </v-card>
             </v-form>
           </template>
           <template v-else>
@@ -122,6 +127,7 @@ const props = defineProps({
 defineEmits<{ (event: "close"): void }>();
 
 const showType = ref(props.onlyJson ? 1 : 0);
+const isLoading = ref(false);
 const activeTab = ref(0);
 const grafanaURL = ref("");
 const contracts = computed(() => {
@@ -163,13 +169,15 @@ function getValue(key: string) {
 }
 
 async function getGrafanaUrl() {
+  isLoading.value = true;
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
     const grafana = new GrafanaStatistics(grid, props.data);
-    grafana.getUrl().then(res => {
+    await grafana.getUrl().then(res => {
       grafanaURL.value = res;
     });
   }
+  isLoading.value = false;
   return grafanaURL.value;
 }
 getGrafanaUrl();
