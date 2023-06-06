@@ -267,6 +267,10 @@ class RentContractGetModel {
   @Expose() @IsInt() @IsNotEmpty() nodeId: number;
 }
 
+class NodeGetModel {
+  @Expose() @IsInt() @IsNotEmpty() id: number;
+}
+
 class RentContractDeleteModel {
   @Expose() @IsInt() @IsNotEmpty() nodeId: number;
 }
@@ -712,4 +716,5 @@ export {
   SetServiceContractMetadataModel,
   GetServiceContractModel,
   NetworkGetModel,
+  NodeGetModel,
 };
