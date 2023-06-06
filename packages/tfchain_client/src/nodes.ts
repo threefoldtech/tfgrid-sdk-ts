@@ -6,16 +6,16 @@ export interface SetPowerOptions {
   power: boolean;
 }
 
-interface INodeStatistics {
+interface NodeStatistics {
   id: number;
   farmId: number;
   twinId: number;
-  resources: INodeResources;
-  location: INodeLocation;
-  publicConfig: IPublicConfigType;
+  resources: NodeResources;
+  location: NodeLocation;
+  publicConfig: PublicConfig;
   created: number;
   farmingPolicyId: number;
-  interfaces: INetworkInterfaceType[];
+  interfaces: NetworkInterfaceType[];
   certification: string;
   secureBoot: boolean;
   virtualized: boolean;
@@ -23,7 +23,7 @@ interface INodeStatistics {
   connectionPrice: number;
 }
 
-interface INetworkInterfaceType {
+interface NetworkInterfaceType {
   name: string;
   mac: string;
   ips: string[];
@@ -33,20 +33,20 @@ interface IPConfigInterface {
   ip: string;
   gw: string;
 }
-interface IPublicConfigType {
+interface PublicConfig {
   ip4: IPConfigInterface;
   ip6: IPConfigInterface;
   domain: string;
 }
 
-interface INodeResources {
+interface NodeResources {
   hru: number;
   sru: number;
   cru: number;
   mru: number;
 }
 
-interface INodeLocation {
+interface NodeLocation {
   city: string;
   country: string;
   latitude: number;
@@ -63,12 +63,12 @@ class QueryNodes {
   }
 
   @checkConnection
-  async get(options: QueryNodesGetOptions): Promise<INodeStatistics> {
+  async get(options: QueryNodesGetOptions): Promise<NodeStatistics> {
     if (isNaN(options.id) || options.id <= 0) {
       throw Error("Invalid node id. Node id must be postive integer");
     }
     const res = await this.client.api.query.tfgridModule.nodes(options.id);
-    return res.toPrimitive() as unknown as INodeStatistics;
+    return res.toPrimitive() as unknown as NodeStatistics;
   }
 }
 
