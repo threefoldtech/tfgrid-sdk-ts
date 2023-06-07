@@ -76,6 +76,7 @@ const inputStatus = ref<ValidatorStatus>();
 watch(inputStatus, s => {
   emits("update:valid", s === ValidatorStatus.VALID);
   form?.setValid(uid!, s === ValidatorStatus.VALID, reset);
+  form?.setPending(s === ValidatorStatus.PENDING);
   if (s) emits("update:status", s);
 });
 

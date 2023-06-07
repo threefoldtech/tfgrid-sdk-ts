@@ -90,6 +90,7 @@ export interface solutionFlavor {
 
 export interface FormValidatorService {
   setValid(uid: number, value: boolean, reset: () => void): void;
+  setPending(value: boolean): boolean;
   unregister(uid: number): void;
 }
 
