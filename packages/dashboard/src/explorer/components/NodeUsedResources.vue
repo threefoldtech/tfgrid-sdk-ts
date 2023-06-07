@@ -43,7 +43,7 @@
     </v-row>
     <v-row justify="center">
       <v-progress-circular v-if="loader" indeterminate color="primary" :size="50" class="mt-10 mb-10" />
-      <v-btn v-if="!loader" class="mt-5 primary" @click="openGrafanaUrl">Monitoring url</v-btn>
+      <v-btn v-if="nodeStatus && !loader" class="mt-5 primary" @click="openGrafanaUrl">Monitoring url</v-btn>
     </v-row>
     <div class="d-flex justify-center mt-6" v-if="!loader && !resources.length">
       <v-alert dense type="error"> Failed to fetch node resources info. </v-alert>
