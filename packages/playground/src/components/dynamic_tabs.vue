@@ -11,7 +11,10 @@
         :style="{ filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})` }"
       />
       {{ tab.title }}
-      <v-chip color="error" v-if="forms[tabs.indexOf(tab)]?.invalid" class="ml-1">invalid</v-chip>
+      <v-chip color="info" v-if="forms[tabs.indexOf(tab)]?.pending" class="ml-1">
+        Validating <v-progress-circular class="ml-1" indeterminate size="15" width="3" />
+      </v-chip>
+      <v-chip color="error" v-else-if="forms[tabs.indexOf(tab)]?.invalid" class="ml-1">invalid</v-chip>
     </v-tab>
   </v-tabs>
 
@@ -36,6 +39,8 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
 
+import { useFormRef } from "@/hooks/form_validator";
+
 export interface Tab {
   title: string;
   value: string;
@@ -55,7 +60,7 @@ const emits = defineEmits<{
   (event: "tab:change", value: number): void;
 }>();
 
-const forms = ref<any[]>([]);
+const forms = useFormRef(true);
 
 const activeTab = ref<number>(props.modelValue ?? 0);
 watch(activeTab, t => {
@@ -63,7 +68,7 @@ watch(activeTab, t => {
   emits("tab:change", t);
 });
 
-const valid = computed(() => forms.value.reduce((r, f) => r && f.valid, true));
+const valid = computed(() => forms.value.reduce((r, f) => r && f.valid.value, true));
 const invalid = computed(() => !valid.value);
 
 defineExpose({

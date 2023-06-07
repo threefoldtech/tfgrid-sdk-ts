@@ -4,7 +4,7 @@
 
     <SelectCountry v-model="country" />
 
-    <input-validator :rules="[validators.required('Farm is required.')]" :value="farm?.farmID">
+    <input-validator :rules="[validators.required('Farm is required.')]" :value="farm?.farmID" ref="farmInput">
       <v-autocomplete
         :disabled="loading"
         label="Farm Name"
@@ -22,6 +22,8 @@
 
 <script lang="ts" setup>
 import { onMounted, type PropType, ref, watch } from "vue";
+
+import { useInputRef } from "@/hooks/input_validator";
 
 import { useProfileManager } from "../stores/profile_manager";
 import type { Farm } from "../types";
@@ -44,6 +46,8 @@ const props = defineProps({
 });
 const emits = defineEmits<{ (event: "update:modelValue", value?: Farm): void }>();
 
+const farmInput = useInputRef();
+
 const profileManager = useProfileManager();
 const country = ref<string>();
 
@@ -55,10 +59,10 @@ watch([farm, country], ([f, c]) =>
 const loading = ref(false);
 const farms = ref<Farm[]>([]);
 async function loadFarms() {
-  loading.value = true;
+  farmInput.value?.setStatus(ValidatorStatus.Pending);
 
+  loading.value = true;
   const oldFarm = farm.value;
-  farm.value = undefined;
 
   const grid = await getGrid(profileManager.profile!);
   const filters = props.filters;
@@ -77,6 +81,8 @@ async function loadFarms() {
   );
 
   if (oldFarm) {
+    farm.value = undefined;
+    await nextTick();
     farm.value = farms.value.find(f => f.name === oldFarm.name);
   }
 
@@ -114,6 +120,10 @@ watch([loading, shouldBeUpdated], async ([l, s]) => {
 </script>
 
 <script lang="ts">
+import { nextTick } from "vue";
+
+import { ValidatorStatus } from "@/hooks/form_validator";
+
 import SelectCountry from "./select_country.vue";
 
 export default {
