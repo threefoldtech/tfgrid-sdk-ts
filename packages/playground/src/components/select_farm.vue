@@ -4,7 +4,12 @@
 
     <SelectCountry v-model="country" />
 
-    <input-validator :rules="[validators.required('Farm is required.')]" :value="farm?.farmID">
+    <input-validator
+      :rules="[validators.required('Farm is required.')]"
+      :value="farm?.farmID"
+      ref="farmInput"
+      :immediate="false"
+    >
       <v-autocomplete
         :disabled="loading"
         label="Farm Name"
@@ -12,7 +17,7 @@
         :loading="loading"
         item-title="name"
         return-object
-        :model-value="shouldBeUpdated ? undefined : farm"
+        :model-value="shouldBeUpdated || loading ? undefined : farm"
         @update:model-value="farm = $event"
         :error-messages="!loading && !farms.length ? 'No farms where found with the specified resources.' : undefined"
       />
@@ -44,6 +49,7 @@ const props = defineProps({
 });
 const emits = defineEmits<{ (event: "update:modelValue", value?: Farm): void }>();
 
+const farmInput = ref<{ setInputStatus(s: ValidatorStatus): void }>();
 const profileManager = useProfileManager();
 const country = ref<string>();
 
@@ -55,10 +61,10 @@ watch([farm, country], ([f, c]) =>
 const loading = ref(false);
 const farms = ref<Farm[]>([]);
 async function loadFarms() {
-  loading.value = true;
+  farmInput.value?.setInputStatus(ValidatorStatus.PENDING);
 
+  loading.value = true;
   const oldFarm = farm.value;
-  farm.value = undefined;
 
   const grid = await getGrid(profileManager.profile!);
   const filters = props.filters;
@@ -75,6 +81,9 @@ async function loadFarms() {
     },
     { exclusiveFor: props.exclusiveFor },
   );
+
+  farm.value = undefined;
+  await nextTick();
 
   if (oldFarm) {
     farm.value = farms.value.find(f => f.name === oldFarm.name);
@@ -114,6 +123,9 @@ watch([loading, shouldBeUpdated], async ([l, s]) => {
 </script>
 
 <script lang="ts">
+import { nextTick } from "vue";
+
+import { ValidatorStatus } from "./input_validator.vue";
 import SelectCountry from "./select_country.vue";
 
 export default {

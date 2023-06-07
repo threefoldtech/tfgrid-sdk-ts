@@ -5,17 +5,18 @@
 <script lang="ts" setup>
 import { computed, provide, ref, watch } from "vue";
 
+import { ValidatorStatus } from "./input_validator.vue";
+
 defineProps<{ modelValue?: boolean }>();
 const emits = defineEmits<{ (events: "update:modelValue", value: boolean): void }>();
 
-const inputsValidation = ref<{ [uid: number]: boolean }>({});
+const inputsValidation = ref<{ [uid: number]: ValidatorStatus }>({});
 const inputsReset = {} as { [uid: number]: () => void };
-const valid = computed(() => {
-  return Object.values(inputsValidation.value).reduce((v, c) => {
-    return v && c;
-  }, true);
-});
+const valid = computed(() => Object.values(inputsValidation.value).every(c => c === ValidatorStatus.VALID));
 const invalid = computed(() => !valid.value);
+const pending = computed(() => {
+  return Object.values(inputsValidation.value).some(c => c === ValidatorStatus.PENDING);
+});
 
 watch(
   valid,
@@ -25,9 +26,8 @@ watch(
   { immediate: true },
 );
 
-function setValid(uid: number, value: boolean, reset: () => void): void {
+function setStatus(uid: number, value: ValidatorStatus): void {
   inputsValidation.value[uid] = value;
-  inputsReset[uid] = reset;
 }
 
 function unregister(uid: number): void {
@@ -36,7 +36,7 @@ function unregister(uid: number): void {
 }
 
 provide("form:validator", {
-  setValid,
+  setStatus,
   unregister,
 });
 
@@ -47,6 +47,7 @@ defineExpose({
   },
   valid,
   invalid,
+  pending,
 });
 </script>
 

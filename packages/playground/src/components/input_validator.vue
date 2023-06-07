@@ -46,6 +46,11 @@ const props = defineProps({
     type: String,
     required: false,
   },
+  immediate: {
+    type: Boolean,
+    required: false,
+    default: () => true,
+  },
 });
 const emits = defineEmits<{
   (events: "update:status", value: ValidatorStatus): void;
@@ -73,11 +78,14 @@ const touched = computed(() => isTouched.value || initializedValidation.value);
 const errorMessage = ref<string>();
 const required = ref(false);
 const inputStatus = ref<ValidatorStatus>();
-watch(inputStatus, s => {
-  emits("update:valid", s === ValidatorStatus.VALID);
-  form?.setValid(uid!, s === ValidatorStatus.VALID, reset);
-  if (s) emits("update:status", s);
-});
+function setInputStatus(s: ValidatorStatus) {
+  if (inputStatus.value !== s) {
+    inputStatus.value = s;
+    emits("update:valid", s === ValidatorStatus.VALID);
+    form?.setStatus(uid!, s);
+    if (s) emits("update:status", s);
+  }
+}
 
 onMounted(async () => {
   // Check if the input is required
@@ -97,25 +105,19 @@ function onBlur() {
 }
 
 const onInput = debounce((value?: string | number) => validate(value?.toString() ?? ""), 250);
-watch(() => props.value, onInput, { immediate: true });
+watch(() => props.value, onInput, { immediate: props.immediate });
 
 defineExpose({
-  reset,
   validate,
   touch() {
     isTouched.value = true;
   },
+  setInputStatus,
 });
-function reset() {
-  isTouched.value = false;
-  initializedValidation.value = false;
-  errorMessage.value = undefined;
-  inputStatus.value = undefined;
-}
 
 async function validate(value: string): Promise<boolean> {
   errorMessage.value = undefined;
-  inputStatus.value = ValidatorStatus.PENDING;
+  setInputStatus(ValidatorStatus.PENDING);
   for (const rule of [...props.rules, ...props.asyncRules]) {
     const error = await rule(value);
     if (error) {
@@ -126,7 +128,7 @@ async function validate(value: string): Promise<boolean> {
   if (!initializedValidation.value && value) {
     initializedValidation.value = true;
   }
-  inputStatus.value = errorMessage.value ? ValidatorStatus.INVALID : ValidatorStatus.VALID;
+  setInputStatus(errorMessage.value ? ValidatorStatus.INVALID : ValidatorStatus.VALID);
   return inputStatus.value === ValidatorStatus.VALID;
 }
 </script>

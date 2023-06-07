@@ -1,5 +1,7 @@
 import type { VDataTable } from "vuetify/lib/labs/components";
 
+import type { ValidatorStatus } from "@/components/input_validator.vue";
+
 import type * as validators from "../utils/validators";
 
 export interface K8SWorker {
@@ -89,7 +91,7 @@ export interface solutionFlavor {
 }
 
 export interface FormValidatorService {
-  setValid(uid: number, value: boolean, reset: () => void): void;
+  setStatus(uid: number, value: ValidatorStatus): void;
   unregister(uid: number): void;
 }
 
