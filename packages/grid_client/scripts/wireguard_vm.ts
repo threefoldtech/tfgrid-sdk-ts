@@ -29,7 +29,7 @@ function createMachineModel(node: number) {
 }
 function createMachinesModel(vm: MachineModel, network: NetworkModel): MachinesModel {
   return {
-    name: "newVMs4",
+    name: "newVMs",
     network,
     machines: [vm],
     metadata: "",
@@ -73,7 +73,7 @@ async function main() {
   log(deployedVm);
 
   const vmPrivateIP = (deployedVm as { interfaces: { ip: string }[] }[])[0].interfaces[0].ip;
-  const gateway = createGwModel(gwNode, vmPrivateIP, network.name, "pyserver12", 8000);
+  const gateway = createGwModel(gwNode, vmPrivateIP, network.name, "pyserver1", 8000);
   log(`deploying gateway ${network.name} on node ${gwNode}`);
 
   const gatewayResult = await grid3.gateway.deploy_name(gateway);
@@ -85,9 +85,9 @@ async function main() {
   log(l);
 
   // delete
-  // const deletedMachines = await grid3.machines.delete({ name:  "newVMs4"});
+  // const deletedMachines = await grid3.machines.delete({ name:  machines.name});
   // log(deletedMachines);
-  // const deletedGW = await grid3.gateway.delete_name({ name: "pyserver12" });
+  // const deletedGW = await grid3.gateway.delete_name({ name: gateway.name});
   // log(deletedGW);
 
   await grid3.disconnect();
