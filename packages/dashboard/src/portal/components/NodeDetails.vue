@@ -167,7 +167,6 @@ export default class NodeDetails extends Vue {
     location: { country: string; city: string; long: string; lat: string };
     farm: { id: string; name: string; farmCertType: string; pubIps: string };
   };
-  @Prop({ required: true }) byteToGB!: any;
   loading = false;
 }
 </script>

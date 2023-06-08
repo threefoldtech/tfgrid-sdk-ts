@@ -71,7 +71,7 @@
           <strong style="color: #f44336">Failed to retrieve Node details</strong>
         </td>
         <td :colspan="headers.length" v-else>
-          <NodeDetails :node="item" :convert="convert" />
+          <NodeDetails :node="item" />
         </td>
       </template>
     </v-data-table>
