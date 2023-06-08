@@ -224,7 +224,11 @@ export function generateReceipt(doc: jsPDF, node: nodeInterface) {
   return doc;
 }
 export function byteToGB(capacity: number) {
-  return (capacity / 1024 / 1024 / 1024).toFixed(0);
+  return (capacity / 1024 / 1024 / 1024).toFixed(2);
+}
+
+export function byteToTB(capacity: number) {
+  return (capacity / (1024 * 1024 * 1024 * 1024)).toFixed(2);
 }
 export async function createRentContract(
   api: apiInterface,
