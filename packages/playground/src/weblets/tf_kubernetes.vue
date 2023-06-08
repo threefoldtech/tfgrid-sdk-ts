@@ -52,10 +52,10 @@
             validators.maxLength('Token max length is 15 chars.', 15),
             validators.isAlphanumeric('Token cannot contain any characters other than alphabets and numbers.'),
           ]"
-          #="{ props }"
+          #="{ props: validationProps }"
         >
-          <password-input-wrapper>
-            <v-text-field label="Cluster Token" v-bind="props" v-model="clusterToken" />
+          <password-input-wrapper #="{ props }">
+            <v-text-field label="Cluster Token" v-bind="{ ...props, ...validationProps }" v-model="clusterToken" />
           </password-input-wrapper>
         </input-validator>
       </template>

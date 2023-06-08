@@ -11,8 +11,22 @@
           </div>
 
           <v-tabs v-model="activeTab" align-tabs="center" class="my-4" v-if="showType === 0">
-            <v-tab v-for="item in contracts" :key="item.contractId" variant="tonal" color="primary">
-              {{ item.name }}
+            <v-tab
+              v-for="(item, index) in contracts"
+              :key="item.contractId"
+              variant="tonal"
+              color="primary"
+              :class="{ 'mr-4': index === 0 && hasMaster(item) }"
+            >
+              <v-tooltip
+                location="bottom"
+                :text="getMetadata(contract).projectName === 'caprover' ? 'Leader' : 'Master'"
+                :disabled="index !== 0 || !hasMaster(item)"
+              >
+                <template #activator="{ props }">
+                  <span v-bind="props">{{ item.name }}</span>
+                </template>
+              </v-tooltip>
             </v-tab>
           </v-tabs>
         </v-card-title>
@@ -28,7 +42,6 @@
               </template>
 
               <CopyReadonlyInput label="Planetary Network IP" :data="contract.planetary" v-if="contract.planetary" />
-              <v-switch inset label="Planetary Network IP" v-else />
 
               <CopyReadonlyInput label="Network Name" :data="contract.interfaces[0].network" />
               <CopyReadonlyInput label="CPU (vCores)" :data="contract.capacity.cpu" />
@@ -48,7 +61,6 @@
                 :data="data[0].wireguard"
               />
               <CopyReadonlyInput label="Flist" :data="contract.flist" v-if="contract.flist" />
-              <CopyReadonlyInput label="Monitoring URL" :data="grafanaURL" />
               <template v-if="environments !== false">
                 <template v-for="key of Object.keys(contract.env)" :key="key">
                   <template v-if="(environments[key] || !(key in environments)) && contract.env[key]">
@@ -76,6 +88,12 @@
                   </template>
                 </template>
               </template>
+              <CopyReadonlyInput label="Monitoring URL" :data="grafanaURL" v-if="!isLoading" />
+              <v-card :loading="isLoading" type="info" variant="tonal" v-else>
+                <v-card-text>
+                  <p>Generating metrics url...</p>
+                </v-card-text>
+              </v-card>
             </v-form>
           </template>
           <template v-else>
@@ -122,6 +140,7 @@ const props = defineProps({
 defineEmits<{ (event: "close"): void }>();
 
 const showType = ref(props.onlyJson ? 1 : 0);
+const isLoading = ref(false);
 const activeTab = ref(0);
 const grafanaURL = ref("");
 const contracts = computed(() => {
@@ -163,13 +182,15 @@ function getValue(key: string) {
 }
 
 async function getGrafanaUrl() {
+  isLoading.value = true;
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
     const grafana = new GrafanaStatistics(grid, props.data);
-    grafana.getUrl().then(res => {
+    await grafana.getUrl().then(res => {
       grafanaURL.value = res;
     });
   }
+  isLoading.value = false;
   return grafanaURL.value;
 }
 getGrafanaUrl();
@@ -201,6 +222,23 @@ function getDiskLabel(contract: any, disk: Disk) {
     return "Disk";
   }
   return "Disk( " + disk.mountPoint + " ) GB";
+}
+
+function getMetadata(contract: any): { type: string; projectName: string } {
+  try {
+    const metadata = JSON.parse(contract.metadata);
+    return {
+      type: (metadata.type || "").toLowerCase(),
+      projectName: (metadata.projectName || "").toLowerCase(),
+    };
+  } catch {
+    return { type: "", projectName: "" };
+  }
+}
+
+function hasMaster(contract: any): boolean {
+  const meta = getMetadata(contract);
+  return meta.type === "kubernetes" || meta.projectName === "caprover";
 }
 </script>
 

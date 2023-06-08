@@ -32,7 +32,22 @@
       </template>
 
       <template #[`item.state`]="{ item }">
-        <v-chip :color="getStateColor(item.value.state)">
+        <v-tooltip
+          v-if="item && item.value.state === ContractStates.GracePeriod"
+          :text="'the number of tokens required to remove your contract from the grace period and restore functionality to your workloads.'"
+          location="top center"
+        >
+          <template #activator="{ props }">
+            <v-chip
+              @click.stop="contractLockDetails(item.value.contractId)"
+              v-bind="props"
+              :color="getStateColor(item.value.state)"
+            >
+              {{ item.value.state }}
+            </v-chip>
+          </template>
+        </v-tooltip>
+        <v-chip v-else :color="getStateColor(item.value.state)">
           {{ item.value.state }}
         </v-chip>
       </template>
@@ -66,10 +81,10 @@
       </v-btn>
     </template>
   </weblet-layout>
-
   <v-dialog width="70%" v-model="deletingDialog">
     <v-card>
-      <v-card-title class="text-h5"> Are you sure you want to delete the following contracts? </v-card-title>
+      <v-card-title class="text-h5 mt-2"> Are you sure you want to delete the following contracts? </v-card-title>
+      <v-alert class="ma-4" type="warning" variant="tonal">Deleting contracts may take a while to complete.</v-alert>
       <v-card-text>
         <v-chip class="ma-1" color="primary" label v-for="c in selectedContracts" :key="c.contractId">
           {{ c.contractId }}
@@ -82,6 +97,33 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <v-dialog width="70%" v-model="contractStateDialog">
+    <v-card>
+      <v-card-title class="text-h5">Contract lock Detalis</v-card-title>
+      <v-card-text>
+        <p v-if="loading" class="text-center">
+          <strong>Loading The Locked Amount...</strong>
+        </p>
+        <p v-else class="text-center">
+          Amount Locked <strong>{{ contractLocked?.amountLocked }} TFT</strong>
+        </p>
+        <br />
+        <v-alert type="info" variant="tonal">
+          The contract is in a GracePeriod condition, which means that your workloads are suspended but not deleted; in
+          order to resume your workloads and restore their functionality, you must pay your account with the necessary
+          tokens.
+        </v-alert>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="error" variant="tonal" @click="contractStateDialog = false"> Close </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+  <v-snackbar variant="tonal" color="error" v-model="snackbar" :timeout="5000">
+    Failed to delete some keys, You don't have enough tokens
+  </v-snackbar>
 </template>
 
 <script lang="ts" setup>
@@ -121,6 +163,8 @@ async function onMount() {
 }
 
 const loadingContractId = ref<number>();
+const contractLocked = ref<ContractLock>();
+
 async function onShowDetails(contractId: number) {
   loading.value = true;
   loadingContractId.value = contractId;
@@ -148,7 +192,24 @@ function getStateColor(state: ContractStates): string {
   }
 }
 
+async function contractLockDetails(contractId: number) {
+  contractStateDialog.value = true;
+  loading.value = true;
+  const grid = await getGrid(profileManager.profile!);
+  await grid?.contracts
+    .contractLock({ id: contractId })
+    .then((data: ContractLock) => {
+      contractLocked.value = data;
+    })
+    .catch(err => {
+      layout.value.setStatus("failed", normalizeError(err, `Failed to fetch the contract ${contractId} lock details.`));
+      contractStateDialog.value = false;
+    });
+  loading.value = false;
+}
+const snackbar = ref(false);
 const deletingDialog = ref(false);
+const contractStateDialog = ref(false);
 const deleting = ref(false);
 async function onDelete() {
   deletingDialog.value = false;
@@ -165,13 +226,21 @@ async function onDelete() {
     contracts.value = contracts.value!.filter(c => !selectedContracts.value.includes(c));
     selectedContracts.value = [];
   } catch (e) {
-    layout.value.setStatus("failed", normalizeError(e, `Failed to delete some of the selected contracts.`));
+    if ((e as Error).message.includes("Inability to pay some fees")) {
+      contracts.value = contracts.value!.filter(c => !selectedContracts.value.includes(c));
+      selectedContracts.value = [];
+      snackbar.value = true;
+    } else {
+      layout.value.setStatus("failed", normalizeError(e, `Failed to delete some of the selected contracts.`));
+    }
   }
   deleting.value = false;
 }
 </script>
 
 <script lang="ts">
+import type { ContractLock } from "@threefold/tfchain_client";
+
 import ListTable from "../components/list_table.vue";
 import { normalizeError } from "../utils/helpers";
 

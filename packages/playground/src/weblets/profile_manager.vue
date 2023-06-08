@@ -46,7 +46,12 @@
         ]"
         v-model="activeTab"
         :disabled="creatingAccount || activating"
-        @tab:change="passwordInput.validate(password)"
+        @tab:change="
+          () => {
+            clearError();
+            passwordInput.validate(password);
+          }
+        "
       >
         <VContainer>
           <FormValidator v-model="isValidForm">
@@ -70,6 +75,7 @@
                   >
                     <div v-bind="tooltipProps" v-show="!profileManager.profile" class="d-flex">
                       <VTextField
+                        class="mb-2"
                         label="Mnemonic"
                         placeholder="Please insert your mnemonic"
                         autofocus
@@ -92,6 +98,10 @@
                 </PasswordInputWrapper>
               </template>
             </VTooltip>
+
+            <v-alert type="error" variant="tonal" class="mb-4" v-if="createAccountError && activeTab === 1">
+              {{ createAccountError }}
+            </v-alert>
 
             <PasswordInputWrapper #="{ props: passwordInputProps }">
               <InputValidator
@@ -122,6 +132,10 @@
                 </v-tooltip>
               </InputValidator>
             </PasswordInputWrapper>
+
+            <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="loginError">
+              {{ loginError }}
+            </v-alert>
           </FormValidator>
 
           <div class="d-flex justify-center">
@@ -316,14 +330,28 @@ function logout() {
 }
 
 const activating = ref(false);
+const loginError = ref<string | null>(null);
+const createAccountError = ref<string | null>(null);
+
+function clearError() {
+  loginError.value = null;
+  createAccountError.value = null;
+}
+
 async function activate(mnemonic: string) {
+  clearError();
   activating.value = true;
   sessionStorage.setItem("password", password.value);
-  const grid = await getGrid({ mnemonic });
-  const profile = await loadProfile(grid!);
-  ssh.value = profile.ssh;
-  profileManager.set(profile);
-  activating.value = false;
+  try {
+    const grid = await getGrid({ mnemonic });
+    const profile = await loadProfile(grid!);
+    ssh.value = profile.ssh;
+    profileManager.set(profile);
+  } catch (e) {
+    loginError.value = normalizeError(e, "Something went wrong while login.");
+  } finally {
+    activating.value = false;
+  }
 }
 
 function validateMnInput(mnemonic: string) {
@@ -343,12 +371,16 @@ onMounted(async () => {
 
 const creatingAccount = ref(false);
 async function createNewAccount() {
+  clearError();
   creatingAccount.value = true;
-  const account = await createAccount();
-  mnemonic.value = account.mnemonic;
-  creatingAccount.value = false;
-
-  activate(account.mnemonic);
+  try {
+    const account = await createAccount();
+    mnemonic.value = account.mnemonic;
+  } catch (e) {
+    createAccountError.value = normalizeError(e, "Something went wrong while creating new account.");
+  } finally {
+    creatingAccount.value = false;
+  }
 }
 
 const updatingSSH = ref(false);
@@ -401,7 +433,6 @@ function login() {
 function storeAndLogin() {
   const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
   const mnemonicHash = cryptr.encrypt(mnemonic.value);
-  console.log(password.value, mnemonicHash, md5(password.value));
   localStorage.setItem(md5(password.value), mnemonicHash);
   activate(mnemonic.value);
 }

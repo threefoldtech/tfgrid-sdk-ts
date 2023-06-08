@@ -13,7 +13,7 @@ import { Balances, QueryBalances } from "./balances";
 import { Contracts, QueryContracts } from "./contracts";
 import { QueryFarms } from "./farms";
 import { KVStore } from "./kvstore";
-import { Nodes } from "./nodes";
+import { Nodes, QueryNodes } from "./nodes";
 import { QueryPricingPolicies } from "./pricing_policies";
 import { TermsAndConditions } from "./terms_and_conditions";
 import { QueryTFTPrice } from "./tft_price";
@@ -49,6 +49,7 @@ class QueryClient {
   tftPrice: QueryTFTPrice = new QueryTFTPrice(this);
   pricingPolicies: QueryPricingPolicies = new QueryPricingPolicies(this);
   twins: QueryTwins = new QueryTwins(this);
+  nodes: QueryNodes = new QueryNodes(this);
   constructor(public url: string) {}
 
   async loadKeyPairOrSigner(): Promise<void> {} // to be overridden in the full client
@@ -314,9 +315,9 @@ class Client extends QueryClient {
       try {
         const nonce = await this.api.rpc.system.accountNextIndex(this.address);
         if (this.keypair) {
-          extrinsic.signAndSend(this.keypair, { nonce }, callback);
+          await extrinsic.signAndSend(this.keypair, { nonce }, callback);
         } else if (this.extSigner) {
-          extrinsic.signAndSend(this.address, { nonce, signer: this.extSigner.signer }, callback);
+          await extrinsic.signAndSend(this.address, { nonce, signer: this.extSigner.signer }, callback);
         }
       } catch (e) {
         reject(e);
@@ -334,7 +335,7 @@ class Client extends QueryClient {
           section = resultSections[0];
         throw Error(
           `Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error: ${
-            Object.keys(this.api.errors[section])[+e]
+            Object.keys(this.api.errors[section])[+e] ?? e
           }`,
         );
       });

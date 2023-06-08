@@ -1,4 +1,4 @@
-import { Contracts } from "@threefold/tfchain_client";
+import { ContractLockOptions, Contracts } from "@threefold/tfchain_client";
 import { Decimal } from "decimal.js";
 
 import { ContractStates } from "../../modules";
@@ -148,6 +148,13 @@ class TFContracts extends Contracts {
       twinId: twinId,
       stateList: options.stateList,
     });
+  }
+
+  async contractLock(options: ContractLockOptions) {
+    const res = await super.contractLock(options);
+    const amountLocked = new Decimal(res.amountLocked);
+    res.amountLocked = amountLocked.div(10 ** 7).toNumber();
+    return res;
   }
 
   /**

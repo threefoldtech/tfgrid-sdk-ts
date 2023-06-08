@@ -267,6 +267,10 @@ class RentContractGetModel {
   @Expose() @IsInt() @IsNotEmpty() nodeId: number;
 }
 
+class NodeGetModel {
+  @Expose() @IsInt() @IsNotEmpty() id: number;
+}
+
 class RentContractDeleteModel {
   @Expose() @IsInt() @IsNotEmpty() nodeId: number;
 }
@@ -340,6 +344,8 @@ class ContractsByAddress {
 class ContractConsumption {
   @Expose() @IsInt() @Min(1) id: number;
 }
+
+class ContractLockModel extends ContractConsumption {}
 
 class TwinCreateModel {
   @Expose() @IsString() @IsNotEmpty() relay: string;
@@ -647,6 +653,7 @@ export {
   ContractsByTwinId,
   ContractsByAddress,
   ContractConsumption,
+  ContractLockModel,
   TwinCreateModel,
   TwinGetModel,
   TwinGetByAccountIdModel,
@@ -712,4 +719,5 @@ export {
   SetServiceContractMetadataModel,
   GetServiceContractModel,
   NetworkGetModel,
+  NodeGetModel,
 };
