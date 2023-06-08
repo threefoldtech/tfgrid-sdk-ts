@@ -18,10 +18,10 @@
           </p>
           <template v-else-if="balance">
             <p>
-              Balance: <strong :style="{ color: '#76e2c8' }">{{ balance.free.toFixed(3) }} TFT</strong>
+              Balance: <strong :style="{ color: '#76e2c8' }">{{ normalizeBalance(balance.free, true) }} TFT</strong>
             </p>
             <p>
-              Locked: <strong :style="{ color: '#76e2c8' }">{{ balance.locked.toFixed(3) }} TFT</strong>
+              Locked: <strong :style="{ color: '#76e2c8' }">{{ normalizeBalance(balance.locked, true) }} TFT</strong>
             </p>
           </template>
         </div>
@@ -273,7 +273,7 @@ import { generateKeyPair } from "web-ssh-keygen";
 import { useProfileManager } from "../stores";
 import { type Balance, createAccount, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
-import { downloadAsFile } from "../utils/helpers";
+import { downloadAsFile, normalizeBalance } from "../utils/helpers";
 
 defineProps({
   modelValue: {

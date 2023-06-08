@@ -1,5 +1,6 @@
 import { ContractStates, type GridClient } from "@threefold/grid_client";
-import Decimal from "decimal.js";
+
+import { normalizeBalance } from "./helpers";
 
 export async function getUserContracts(grid: GridClient) {
   const res: any = await grid!.contracts.listMyContracts();
@@ -56,7 +57,7 @@ async function normalizeContract(
 export function formatConsumption(value: number): string {
   value = +value;
   if (isNaN(value) || value <= 0) return "No Data Available";
-  return new Decimal(value).toFixed(3) + " TFT/hour";
+  return normalizeBalance(value) + " TFT/hour";
 }
 
 export interface NormalizedContract {
