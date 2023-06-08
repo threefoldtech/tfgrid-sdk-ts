@@ -7,11 +7,11 @@
     <div v-for="(item, index) in modelValue" :key="item">
       <div class="d-flex">
         <div class="flex-grow-1 mr-4">
-          <slot :item="item" :index="index" :isStatic="static.includes(index)" />
+          <slot :item="item" :index="index" :isRequired="required.includes(index)" />
         </div>
         <div class="d-flex">
           <v-spacer />
-          <v-btn color="error" icon="mdi-delete-outline" @click="remove(index)" v-if="!static.includes(index)" />
+          <v-btn color="error" icon="mdi-delete-outline" @click="remove(index)" v-if="!required.includes(index)" />
         </div>
       </div>
       <v-divider class="mb-4" v-if="index + 1 < modelValue.length" />
@@ -27,7 +27,7 @@ const props = defineProps({
     type: Array as PropType<any[]>,
     required: true,
   },
-  static: {
+  required: {
     type: Array as PropType<number[]>,
     default: () => [],
   },

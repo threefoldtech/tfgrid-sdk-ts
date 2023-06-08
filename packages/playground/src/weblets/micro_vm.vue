@@ -89,7 +89,12 @@
       </template>
 
       <template #env>
-        <ExpandableLayout v-model="envs" @add="envs.push({ key: '', value: '' })" #="{ index, isStatic }" :static="[0]">
+        <ExpandableLayout
+          v-model="envs"
+          @add="envs.push({ key: '', value: '' })"
+          #="{ index, isRequired }"
+          :required="[0]"
+        >
           <input-validator
             :value="envs[index].key"
             :rules="[
@@ -100,7 +105,7 @@
             ]"
             #="{ props }"
           >
-            <v-text-field label="Name" v-model="envs[index].key" v-bind="props" :disabled="isStatic" />
+            <v-text-field label="Name" v-model="envs[index].key" v-bind="props" :disabled="isRequired" />
           </input-validator>
 
           <input-validator
