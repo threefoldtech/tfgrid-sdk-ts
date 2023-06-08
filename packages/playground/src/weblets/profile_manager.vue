@@ -40,10 +40,7 @@
 
       <DTabs
         v-if="!profileManager.profile"
-        :tabs="[
-          { title: 'Login', value: 'login' },
-          { title: 'Connect', value: 'register' },
-        ]"
+        :tabs="getTabs()"
         v-model="activeTab"
         :disabled="creatingAccount || activating"
         @tab:change="
@@ -284,6 +281,11 @@ defineProps({
 });
 defineEmits<{ (event: "update:modelValue", value: boolean): void }>();
 
+interface Credentials {
+  passwordHash?: string;
+  mnemonicHash?: string;
+}
+
 const profileManager = useProfileManager();
 
 const mnemonic = ref("");
@@ -291,6 +293,7 @@ const isValidForm = ref(false);
 const SSHKeyHint = ref("");
 const ssh = ref("");
 let sshTimeout: any;
+
 watch(SSHKeyHint, hint => {
   if (hint) {
     if (sshTimeout) {
@@ -303,12 +306,12 @@ watch(SSHKeyHint, hint => {
 });
 
 const balance = ref<Balance>();
-
 const activeTab = ref(0);
 const password = ref("");
 const passwordInput = ref() as Ref<{ validate(value: string): Promise<boolean> }>;
 
 let interval: any;
+
 watch(
   () => profileManager.profile,
   profile => {
@@ -363,10 +366,23 @@ function validateMnInput(mnemonic: string) {
 }
 
 onMounted(async () => {
-  const maybePassword = sessionStorage.getItem("password");
-  if (!maybePassword) return;
-  password.value = maybePassword;
-  login();
+  console.log("on mount");
+  if (isStoredCredentials()) {
+    activeTab.value = 0;
+    const credentials: Credentials = getCredentials();
+    const sessionPassword = sessionStorage.getItem("password");
+
+    if (!sessionPassword) return;
+
+    password.value = sessionPassword;
+
+    if (credentials.passwordHash) {
+      return login();
+    }
+  } else {
+    activeTab.value = 1;
+    return;
+  }
 });
 
 const creatingAccount = ref(false);
@@ -423,24 +439,71 @@ async function __loadBalance(profile: Profile) {
   }
 }
 
+function getTabs() {
+  let tabs = [];
+  if (isStoredCredentials()) {
+    tabs = [
+      { title: "Login", value: "login" },
+      { title: "Connect", value: "register" },
+    ];
+  } else {
+    tabs = [{ title: "Connect", value: "register" }];
+  }
+  return tabs;
+}
+
+function getCredentials() {
+  const getCredentials = localStorage.getItem("wallet");
+  let credentials: Credentials = {};
+
+  if (getCredentials) {
+    credentials = JSON.parse(getCredentials);
+  }
+  return credentials;
+}
+
+function setCredentials(passwordHash: string, mnemonicHash: string): Credentials {
+  const credentials: Credentials = {
+    passwordHash: passwordHash,
+    mnemonicHash: mnemonicHash,
+  };
+  localStorage.setItem("wallet", JSON.stringify(credentials));
+  return credentials;
+}
+
 function login() {
-  const mnemonicHash = localStorage.getItem(md5(password.value)) as string;
-  const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
-  const mnemonic = cryptr.decrypt(mnemonicHash);
-  activate(mnemonic);
+  const credentials: Credentials = getCredentials();
+  if (credentials.mnemonicHash && credentials.passwordHash) {
+    if (credentials.passwordHash === md5(password.value)) {
+      const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
+      const mnemonic = cryptr.decrypt(credentials.mnemonicHash);
+      activate(mnemonic);
+    } else {
+      // TODO: Handle else case.
+      return;
+    }
+  }
+}
+
+function isStoredCredentials() {
+  // We need to determine if this is the user's first visit in order to decide whether to show them the login tab or connect tab.
+  return localStorage.getItem("wallet") ? true : false;
 }
 
 function storeAndLogin() {
   const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
   const mnemonicHash = cryptr.encrypt(mnemonic.value);
-  localStorage.setItem(md5(password.value), mnemonicHash);
+  setCredentials(md5(password.value), mnemonicHash);
   activate(mnemonic.value);
 }
 
 function validatePassword(value: string) {
   if (activeTab.value === 0) {
-    if (!localStorage.getItem(md5(value))) {
-      return { message: "Please provide a valid password." };
+    if (!localStorage.getItem("wallet")) {
+      return { message: "We couldn't find a matching wallet for this password. Please connect your wallet first." };
+    }
+    if (getCredentials().passwordHash !== md5(password.value)) {
+      return { message: "We couldn't find a matching wallet for this password. Please connect your wallet first." };
     }
   }
 }
