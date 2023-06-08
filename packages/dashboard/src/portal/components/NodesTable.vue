@@ -20,13 +20,13 @@
       @item-expanded="getDNodeDetails"
     >
       <template v-slot:[`item.resources.mru`]="{ item }">
-        {{ byteToGB(item.resources.mru) }}
+        {{ convert(item.resources.mru) }}
       </template>
       <template v-slot:[`item.resources.sru`]="{ item }">
-        {{ byteToGB(item.resources.sru) }}
+        {{ convert(item.resources.sru) }}
       </template>
       <template v-slot:[`item.resources.hru`]="{ item }">
-        {{ byteToGB(item.resources.hru) }}
+        {{ convert(item.resources.hru) }}
       </template>
       <template v-slot:[`item.actions`]="{ item }">
         <NodeActionBtn :nodeId="item.nodeId" :status="item.rentStatus" @node-status-changed="onStatusUpdate()" />
@@ -71,7 +71,7 @@
           <strong style="color: #f44336">Failed to retrieve Node details</strong>
         </td>
         <td :colspan="headers.length" v-else>
-          <NodeDetails :node="item" :byteToGB="byteToGB" />
+          <NodeDetails :node="item" :convert="convert" />
         </td>
       </template>
     </v-data-table>
@@ -81,10 +81,10 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
+import toTeraOrGigaOrPeta from "../../explorer/filters/toTeraOrGigaOrPeta";
 import NodeActionBtn from "../components/NodeActionBtn.vue";
 import NodeDetails from "../components/NodeDetails.vue";
 import { getDNodes, getFarmDetails, ITab } from "../lib/nodes";
-import { byteToGB } from "../lib/nodes";
 
 @Component({
   name: "NodesTable",
@@ -110,9 +110,9 @@ export default class NodesTable extends Vue {
     { text: "Node ID", value: "nodeId", align: "center" },
     { text: "Location", value: "location.country", align: "center" },
     { text: "CRU", value: "resources.cru", align: "center" },
-    { text: "HRU (GB)", value: "resources.hru", align: "center" },
-    { text: "MRU (GB)", value: "resources.mru", align: "center" },
-    { text: "SRU (GB)", value: "resources.sru", align: "center" },
+    { text: "MRU", value: "resources.mru", align: "center" },
+    { text: "SRU", value: "resources.sru", align: "center" },
+    { text: "HRU", value: "resources.hru", align: "center" },
     { text: "Price (USD)", value: "discount", align: "center" },
     { text: "Actions", value: "actions", align: "center", sortable: false },
   ];
@@ -181,8 +181,8 @@ export default class NodesTable extends Vue {
     this.loading = false;
   }
 
-  byteToGB(capacity: number) {
-    return byteToGB(capacity);
+  convert(capacity: number) {
+    return toTeraOrGigaOrPeta(capacity.toString());
   }
 }
 </script>
