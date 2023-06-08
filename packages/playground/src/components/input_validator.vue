@@ -114,8 +114,14 @@ export default {
     };
     expose(obj);
 
+    const blured = ref(false);
+    function onBlur() {
+      blured.value = true;
+      validate();
+    }
+
     return {
-      onBlur: () => validate(),
+      onBlur: computed(() => (blured.value ? undefined : onBlur)),
       loading: computed(() => status.value === ValidatorStatus.Pending),
       errorMessages: computed(() => (error.value ? [error.value] : [])),
       showError: computed(() => Boolean(error.value)),
