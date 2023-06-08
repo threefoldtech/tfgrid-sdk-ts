@@ -26,7 +26,7 @@
         {{ byteToGB(item.resources.sru) }}
       </template>
       <template v-slot:[`item.resources.hru`]="{ item }">
-        {{ byteToGB(item.resources.hru) }}
+        {{ byteToTB(item.resources.hru) }}
       </template>
       <template v-slot:[`item.actions`]="{ item }">
         <NodeActionBtn :nodeId="item.nodeId" :status="item.rentStatus" @node-status-changed="onStatusUpdate()" />
@@ -83,7 +83,7 @@ import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
 import NodeActionBtn from "../components/NodeActionBtn.vue";
 import NodeDetails from "../components/NodeDetails.vue";
-import { getDNodes, getFarmDetails, ITab } from "../lib/nodes";
+import { byteToTB, getDNodes, getFarmDetails, ITab } from "../lib/nodes";
 import { byteToGB } from "../lib/nodes";
 
 @Component({
@@ -109,10 +109,10 @@ export default class NodesTable extends Vue {
   headers = [
     { text: "Node ID", value: "nodeId", align: "center" },
     { text: "Location", value: "location.country", align: "center" },
-    { text: "CRU", value: "resources.cru", align: "center" },
-    { text: "HRU (GB)", value: "resources.hru", align: "center" },
-    { text: "MRU (GB)", value: "resources.mru", align: "center" },
+    { text: "HRU (TB)", value: "resources.hru", align: "center" },
     { text: "SRU (GB)", value: "resources.sru", align: "center" },
+    { text: "MRU (GB)", value: "resources.mru", align: "center" },
+    { text: "CRU", value: "resources.cru", align: "center" },
     { text: "Price (USD)", value: "discount", align: "center" },
     { text: "Actions", value: "actions", align: "center", sortable: false },
   ];
@@ -183,6 +183,10 @@ export default class NodesTable extends Vue {
 
   byteToGB(capacity: number) {
     return byteToGB(capacity);
+  }
+
+  byteToTB(capacity: number) {
+    return byteToTB(capacity);
   }
 }
 </script>
