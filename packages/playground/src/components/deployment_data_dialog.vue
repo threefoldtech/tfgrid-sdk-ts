@@ -11,8 +11,22 @@
           </div>
 
           <v-tabs v-model="activeTab" align-tabs="center" class="my-4" v-if="showType === 0">
-            <v-tab v-for="item in contracts" :key="item.contractId" variant="tonal" color="primary">
-              {{ item.name }}
+            <v-tab
+              v-for="(item, index) in contracts"
+              :key="item.contractId"
+              variant="tonal"
+              color="primary"
+              :class="{ 'mr-4': index === 0 && hasMaster(item) }"
+            >
+              <v-tooltip
+                location="bottom"
+                :text="getMetadata(contract).projectName === 'caprover' ? 'Leader' : 'Master'"
+                :disabled="index !== 0 || !hasMaster(item)"
+              >
+                <template #activator="{ props }">
+                  <span v-bind="props">{{ item.name }}</span>
+                </template>
+              </v-tooltip>
             </v-tab>
           </v-tabs>
         </v-card-title>
@@ -208,6 +222,23 @@ function getDiskLabel(contract: any, disk: Disk) {
     return "Disk";
   }
   return "Disk( " + disk.mountPoint + " ) GB";
+}
+
+function getMetadata(contract: any): { type: string; projectName: string } {
+  try {
+    const metadata = JSON.parse(contract.metadata);
+    return {
+      type: (metadata.type || "").toLowerCase(),
+      projectName: (metadata.projectName || "").toLowerCase(),
+    };
+  } catch {
+    return { type: "", projectName: "" };
+  }
+}
+
+function hasMaster(contract: any): boolean {
+  const meta = getMetadata(contract);
+  return meta.type === "kubernetes" || meta.projectName === "caprover";
 }
 </script>
 
