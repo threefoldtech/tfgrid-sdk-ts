@@ -56,7 +56,7 @@ async function normalizeContract(
 export function formatConsumption(value: number): string {
   value = +value;
   if (isNaN(value) || value <= 0) return "No Data Available";
-  return new Decimal(value).toFixed(8) + " TFT/hour";
+  return new Decimal(value).toFixed(3) + " TFT/hour";
 }
 
 export interface NormalizedContract {

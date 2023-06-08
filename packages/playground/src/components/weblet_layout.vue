@@ -48,8 +48,8 @@
         v-if="showPrice"
       >
         Your deployment costs
-        <span class="font-weight-black">{{ costLoading ? "Calculating..." : tft }}</span> TFTs or
-        <span class="font-weight-black">{{ costLoading ? "Calculating..." : usd }}</span> USD/month
+        <span class="font-weight-black">{{ costLoading ? "Calculating..." : tft?.toFixed(3) }}</span> TFTs or
+        <span class="font-weight-black">{{ costLoading ? "Calculating..." : usd?.toFixed(3) }}</span> USD/month
         <a
           class="app-link text-decoration-underline"
           target="_blank"

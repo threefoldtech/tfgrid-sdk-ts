@@ -18,10 +18,10 @@
           </p>
           <template v-else-if="balance">
             <p>
-              Balance: <strong :style="{ color: '#76e2c8' }">{{ balance.free }} TFT</strong>
+              Balance: <strong :style="{ color: '#76e2c8' }">{{ balance.free.toFixed(3) }} TFT</strong>
             </p>
             <p>
-              Locked: <strong :style="{ color: '#76e2c8' }">{{ balance.locked }} TFT</strong>
+              Locked: <strong :style="{ color: '#76e2c8' }">{{ balance.locked.toFixed(3) }} TFT</strong>
             </p>
           </template>
         </div>
