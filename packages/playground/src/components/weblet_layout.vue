@@ -48,8 +48,8 @@
         v-if="showPrice"
       >
         Your deployment costs
-        <span class="font-weight-black">{{ costLoading ? "Calculating..." : tft }}</span> TFTs or
-        <span class="font-weight-black">{{ costLoading ? "Calculating..." : usd }}</span> USD/month
+        <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(tft) }}</span> TFTs or
+        <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span> USD/month
         <a
           class="app-link text-decoration-underline"
           target="_blank"
@@ -83,6 +83,7 @@ import { computed, ref, watch } from "vue";
 
 import { useProfileManager } from "../stores";
 import { getGrid, loadBalance } from "../utils/grid";
+import { normalizeBalance } from "../utils/helpers";
 
 const props = defineProps({
   disableAlerts: {
