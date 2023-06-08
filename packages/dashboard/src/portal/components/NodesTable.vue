@@ -109,10 +109,10 @@ export default class NodesTable extends Vue {
   headers = [
     { text: "Node ID", value: "nodeId", align: "center" },
     { text: "Location", value: "location.country", align: "center" },
-    { text: "HRU (TB)", value: "resources.hru", align: "center" },
-    { text: "SRU (GB)", value: "resources.sru", align: "center" },
-    { text: "MRU (GB)", value: "resources.mru", align: "center" },
     { text: "CRU", value: "resources.cru", align: "center" },
+    { text: "MRU (GB)", value: "resources.mru", align: "center" },
+    { text: "SRU (GB)", value: "resources.sru", align: "center" },
+    { text: "HRU (TB)", value: "resources.hru", align: "center" },
     { text: "Price (USD)", value: "discount", align: "center" },
     { text: "Actions", value: "actions", align: "center", sortable: false },
   ];
