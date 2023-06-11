@@ -124,6 +124,7 @@ async function deploy() {
   const projectName = ProjectName.Caprover.toLowerCase();
 
   try {
+    layout.value.validateSsh();
     const grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);

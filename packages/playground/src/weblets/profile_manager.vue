@@ -211,6 +211,7 @@
                     : SSHKeyHint
                 "
                 :persistent-hint="updatingSSH || generatingSSH || !!SSHKeyHint"
+                :rules="[value => !!value || 'SSH key is required']"
               />
             </CopyInputWrapper>
           </template>

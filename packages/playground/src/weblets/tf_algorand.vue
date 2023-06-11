@@ -181,6 +181,7 @@ async function deploy() {
   const projectName = ProjectName.Algorand.toLowerCase();
 
   try {
+    layout.value.validateSsh();
     const grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);

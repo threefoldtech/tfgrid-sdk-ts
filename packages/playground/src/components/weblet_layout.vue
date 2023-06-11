@@ -166,6 +166,11 @@ defineExpose({
     environments.value = envs;
     onlyJson.value = json;
   },
+  validateSsh() {
+    if (!profileManager.profile!.ssh) {
+      throw new Error("You must provide a SSH key to deploy");
+    }
+  },
 
   status: computed(() => status.value),
 
@@ -260,6 +265,7 @@ export interface WebletLayout {
   ): void;
   status: ComputedRef<WebletStatus>;
   reloadDeploymentsList(): void;
+  validateSsh(): void;
 }
 
 export function useLayout() {
