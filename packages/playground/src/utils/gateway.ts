@@ -29,6 +29,7 @@ export interface DeployGatewayNameOptions {
   nodeId: number;
   tlsPassthrough?: boolean;
   backends: `http://${string}`[];
+  networkName: string;
 }
 export async function deployGatewayName(grid: GridClient, options: DeployGatewayNameOptions) {
   const gateway = new GatewayNameModel();
@@ -36,6 +37,7 @@ export async function deployGatewayName(grid: GridClient, options: DeployGateway
   gateway.node_id = options.nodeId;
   gateway.tls_passthrough = options.tlsPassthrough || false;
   gateway.backends = options.backends;
+  gateway.network = options.networkName;
   gateway.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
 
   return grid.gateway.deploy_name(gateway);
