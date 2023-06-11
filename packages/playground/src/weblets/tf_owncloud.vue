@@ -138,12 +138,6 @@ async function deploy() {
   let grid: GridClient | null;
   let vm: any;
 
-  const network = {
-    name: "nw" + name.value.slice(0, 9).toLowerCase(),
-    accessNodeId: gateway.value.id,
-    addAccess: true,
-  };
-
   try {
     grid = await getGrid(profileManager.profile!, projectName);
 
@@ -151,7 +145,10 @@ async function deploy() {
 
     vm = await deployVM(grid!, {
       name: name.value,
-      network,
+      network: {
+        accessNodeId: gateway.value.id,
+        addAccess: true,
+      },
       machines: [
         {
           name: name.value,
@@ -202,8 +199,13 @@ async function deploy() {
     await deployGatewayName(grid!, {
       name: subdomain,
       nodeId: gateway.value.id,
-      backends: [`http://[${vm[0].planetary}]:80`],
-      networkName: network.name,
+      backends: [
+        {
+          ip: vm[0].interfaces[0].ip,
+          port: 80,
+        },
+      ],
+      networkName: vm[0].interfaces[0].network,
     });
 
     layout.value.reloadDeploymentsList();

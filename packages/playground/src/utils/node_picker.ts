@@ -1,4 +1,4 @@
-import type { NodeInfo } from "@threefold/grid_client";
+import { events, type NodeInfo } from "@threefold/grid_client";
 
 export class NodePicker {
   private nodes = new Map<number, number>();
@@ -15,12 +15,14 @@ export class NodePicker {
         }
       } else {
         this.nodes.set(id, 1);
+        events.emit("logs", `Picked nodeId: ${id} for 1 time.`);
         console.log("%c picked nodeId: " + id, "color: steelblue");
         return id;
       }
     }
 
     this.nodes.set(bestNode[0], bestNode[1] + 1);
+    events.emit("logs", `Picked nodeId: ${bestNode[0]} for ${bestNode[1] + 1} times.`);
     console.log("%c picked nodeId: " + bestNode[0], "color: steelblue");
     return bestNode[0];
   }
