@@ -51,103 +51,104 @@
         "
       >
         <VContainer>
-          <FormValidator v-model="isValidForm">
-            <VTooltip
-              v-if="activeTab === 1"
-              text="Mnemonic are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonic or click the 'Create Account' button to create an account and generate mnemonic."
-              location="bottom"
-              max-width="700px"
-            >
-              <template #activator="{ props: tooltipProps }">
-                <PasswordInputWrapper #="{ props: passwordInputProps }">
-                  <InputValidator
-                    :value="mnemonic"
-                    :rules="[
-                      validators.required('Mnemonic is required.'),
-                      v => (validateMnemonic(v) ? undefined : { message: `Mnemonic doesn't seem to be valid.` }),
-                    ]"
-                    :async-rules="[validateMnInput]"
-                    valid-message="Mnemonic is valid."
-                    #="{ props: validationProps }"
-                  >
-                    <div v-bind="tooltipProps" v-show="!profileManager.profile" class="d-flex">
-                      <VTextField
-                        class="mb-2"
-                        label="Mnemonic"
-                        placeholder="Please insert your mnemonic"
-                        autofocus
-                        v-model="mnemonic"
-                        v-bind="{ ...passwordInputProps, ...validationProps }"
-                        :disabled="creatingAccount || activating"
-                      />
-                      <VBtn
-                        class="mt-2 ml-3"
-                        color="secondary"
-                        variant="tonal"
-                        :disabled="isValidForm"
-                        :loading="creatingAccount"
-                        @click="createNewAccount"
-                      >
-                        generate account
-                      </VBtn>
-                    </div>
-                  </InputValidator>
-                </PasswordInputWrapper>
-              </template>
-            </VTooltip>
-
-            <v-alert type="error" variant="tonal" class="mb-4" v-if="createAccountError && activeTab === 1">
-              {{ createAccountError }}
-            </v-alert>
-
-            <PasswordInputWrapper #="{ props: passwordInputProps }">
-              <InputValidator
-                :value="password"
-                :rules="[
-                  validators.required('Password is required.'),
-                  validators.minLength('Password must be at least 6 characters.', 6),
-                  validatePassword,
-                ]"
-                #="{ props: validationProps }"
-                ref="passwordInput"
+          <form @submit.prevent="activeTab === 0 ? login() : storeAndLogin()">
+            <FormValidator v-model="isValidForm">
+              <VTooltip
+                v-if="activeTab === 1"
+                text="Mnemonic are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonic or click the 'Create Account' button to create an account and generate mnemonic."
+                location="bottom"
+                max-width="700px"
               >
-                <v-tooltip
-                  location="bottom"
-                  text="used to encrypt your mnemonic on your local system, and is used to login from the same device."
+                <template #activator="{ props: tooltipProps }">
+                  <PasswordInputWrapper #="{ props: passwordInputProps }">
+                    <InputValidator
+                      :value="mnemonic"
+                      :rules="[
+                        validators.required('Mnemonic is required.'),
+                        v => (validateMnemonic(v) ? undefined : { message: `Mnemonic doesn't seem to be valid.` }),
+                      ]"
+                      :async-rules="[validateMnInput]"
+                      valid-message="Mnemonic is valid."
+                      #="{ props: validationProps }"
+                    >
+                      <div v-bind="tooltipProps" v-show="!profileManager.profile" class="d-flex">
+                        <VTextField
+                          class="mb-2"
+                          label="Mnemonic"
+                          placeholder="Please insert your mnemonic"
+                          autofocus
+                          v-model="mnemonic"
+                          v-bind="{ ...passwordInputProps, ...validationProps }"
+                          :disabled="creatingAccount || activating"
+                        />
+                        <VBtn
+                          class="mt-2 ml-3"
+                          color="secondary"
+                          variant="tonal"
+                          :disabled="isValidForm"
+                          :loading="creatingAccount"
+                          @click="createNewAccount"
+                        >
+                          generate account
+                        </VBtn>
+                      </div>
+                    </InputValidator>
+                  </PasswordInputWrapper>
+                </template>
+              </VTooltip>
+
+              <v-alert type="error" variant="tonal" class="mb-4" v-if="createAccountError && activeTab === 1">
+                {{ createAccountError }}
+              </v-alert>
+
+              <PasswordInputWrapper #="{ props: passwordInputProps }">
+                <InputValidator
+                  :value="password"
+                  :rules="[
+                    validators.required('Password is required.'),
+                    validators.minLength('Password must be at least 6 characters.', 6),
+                    validatePassword,
+                  ]"
+                  #="{ props: validationProps }"
+                  ref="passwordInput"
                 >
-                  <template #activator="{ props: tooltipProps }">
-                    <div v-bind="tooltipProps">
-                      <VTextField
-                        label="Password"
-                        :autofocus="activeTab === 0"
-                        v-model="password"
-                        @keydown.enter="onKeyDown"
-                        v-bind="{ ...passwordInputProps, ...validationProps }"
-                        :disabled="creatingAccount || activating"
-                      />
-                    </div>
-                  </template>
-                </v-tooltip>
-              </InputValidator>
-            </PasswordInputWrapper>
+                  <v-tooltip
+                    location="bottom"
+                    text="used to encrypt your mnemonic on your local system, and is used to login from the same device."
+                  >
+                    <template #activator="{ props: tooltipProps }">
+                      <div v-bind="tooltipProps">
+                        <VTextField
+                          label="Password"
+                          :autofocus="activeTab === 0"
+                          v-model="password"
+                          v-bind="{ ...passwordInputProps, ...validationProps }"
+                          :disabled="creatingAccount || activating"
+                        />
+                      </div>
+                    </template>
+                  </v-tooltip>
+                </InputValidator>
+              </PasswordInputWrapper>
 
-            <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="loginError">
-              {{ loginError }}
-            </v-alert>
-          </FormValidator>
+              <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="loginError">
+                {{ loginError }}
+              </v-alert>
+            </FormValidator>
 
-          <div class="d-flex justify-center">
-            <VBtn
-              color="primary"
-              variant="tonal"
-              @click="activeTab === 0 ? login() : storeAndLogin()"
-              :loading="activating"
-              :disabled="!isValidForm || creatingAccount"
-              size="large"
-            >
-              {{ activeTab === 0 ? "Login" : "Store and login" }}
-            </VBtn>
-          </div>
+            <div class="d-flex justify-center">
+              <VBtn
+                type="submit"
+                color="primary"
+                variant="tonal"
+                :loading="activating"
+                :disabled="!isValidForm || creatingAccount"
+                size="large"
+              >
+                {{ activeTab === 0 ? "Login" : "Store and login" }}
+              </VBtn>
+            </div>
+          </form>
         </VContainer>
       </DTabs>
 
@@ -266,6 +267,7 @@ import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import md5 from "md5";
 import { onMounted, type Ref, ref, watch } from "vue";
+import { nextTick } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
 import { useProfileManager } from "../stores";
@@ -287,17 +289,11 @@ const props = defineProps({
 });
 defineEmits<{ (event: "update:modelValue", value: boolean): void }>();
 
-let mountedTimeout: any;
 watch(
   () => props.modelValue,
   m => {
     if (m) {
-      if (mountedTimeout) {
-        clearTimeout(mountedTimeout);
-      }
-      mountedTimeout = setTimeout(() => {
-        mounted();
-      });
+      nextTick().then(mounted);
     }
   },
 );
@@ -321,17 +317,8 @@ function mounted() {
   }
 }
 
-function onKeyDown() {
-  if (password.value.length >= 6) {
-    if (activeTab.value === 0) [login()];
-    else {
-      storeAndLogin();
-    }
-  }
-}
-
 function getCredentials() {
-  const getCredentials = localStorage.getItem("wallet");
+  const getCredentials = localStorage.getItem(WALLET_KEY);
   let credentials: Credentials = {};
 
   if (getCredentials) {
@@ -345,12 +332,12 @@ function setCredentials(passwordHash: string, mnemonicHash: string): Credentials
     passwordHash: passwordHash,
     mnemonicHash: mnemonicHash,
   };
-  localStorage.setItem("wallet", JSON.stringify(credentials));
+  localStorage.setItem(WALLET_KEY, JSON.stringify(credentials));
   return credentials;
 }
 
 function isStoredCredentials() {
-  return localStorage.getItem("wallet") ? true : false;
+  return localStorage.getItem(WALLET_KEY) ? true : false;
 }
 
 function getTabs() {
@@ -390,6 +377,9 @@ const balance = ref<Balance>();
 const activeTab = ref(0);
 const password = ref("");
 const passwordInput = ref() as Ref<{ validate(value: string): Promise<boolean> }>;
+
+const version = 1;
+const WALLET_KEY = "wallet.v" + version;
 
 let interval: any;
 watch(
@@ -523,7 +513,7 @@ function storeAndLogin() {
 
 function validatePassword(value: string) {
   if (activeTab.value === 0) {
-    if (!localStorage.getItem("wallet")) {
+    if (!localStorage.getItem(WALLET_KEY)) {
       return { message: "We couldn't find a matching wallet for this password. Please connect your wallet first." };
     }
     if (getCredentials().passwordHash !== md5(password.value)) {
