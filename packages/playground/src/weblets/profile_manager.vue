@@ -358,10 +358,10 @@ function getTabs() {
   if (isStoredCredentials()) {
     tabs = [
       { title: "Login", value: "login" },
-      { title: "Connect", value: "register" },
+      { title: "Connect your Wallet", value: "register" },
     ];
   } else {
-    tabs = [{ title: "Connect", value: "register" }];
+    tabs = [{ title: "Connect your Wallet", value: "register" }];
   }
   return tabs;
 }
