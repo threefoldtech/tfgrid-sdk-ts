@@ -1,6 +1,7 @@
 import { default as AlgoSdk } from "algosdk";
 import axios from "axios";
 import * as PATH from "path";
+import urlJoin from "url-join";
 
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
@@ -232,7 +233,7 @@ class Algorand implements blockchainInterface {
     console.log("transaction signed");
 
     try {
-      const submitted_txn = await axios.post(this.baseUrl + `v2/transactions`, signedTxn?.blob);
+      const submitted_txn = await axios.post(urlJoin(this.baseUrl, `v2/transactions`), signedTxn?.blob);
       return submitted_txn.data;
     } catch (error) {
       throw error.response.data.message;
