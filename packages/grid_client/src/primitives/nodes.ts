@@ -1,5 +1,6 @@
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
 import { default as PrivateIp } from "private-ip";
+import urlJoin from "url-join";
 
 import { GridClient } from "../client";
 import { RMB } from "../clients";
@@ -144,7 +145,7 @@ class Nodes {
     if (url) r = url;
     else r = this.proxyURL;
 
-    return send("get", `${r}/farms?page=${page}&size=${pageSize}`, "", {})
+    return send("get", urlJoin(r, `/farms?page=${page}&size=${pageSize}`), "", {})
       .then(res => {
         return res;
       })
@@ -176,7 +177,7 @@ class Nodes {
     let r: string;
     if (url) r = url;
     else r = this.proxyURL;
-    return send("get", `${r}/nodes?page=${page}&size=${pageSize}`, "", {})
+    return send("get", urlJoin(r, `/nodes?page=${page}&size=${pageSize}`), "", {})
       .then(ret => {
         return ret;
       })
@@ -208,7 +209,7 @@ class Nodes {
     if (url) r = url;
     else r = this.proxyURL;
 
-    return send("get", `${r}/nodes?farm_id=${farmId}&size=${nodesCount}`, "", {})
+    return send("get", urlJoin(r, `/nodes?farm_id=${farmId}&size=${nodesCount}`), "", {})
       .then(res => {
         if (res) return res;
         else throw new Error(`The farm with id ${farmId}: doesn't have any nodes`);
@@ -223,7 +224,7 @@ class Nodes {
     if (url) r = url;
     else r = this.proxyURL;
 
-    return send("get", `${r}/nodes?node_id=${nodeId}`, "", {})
+    return send("get", urlJoin(r, `/nodes?node_id=${nodeId}`), "", {})
       .then(ret => {
         if (ret.length !== 0) return ret[0];
       })
@@ -257,7 +258,7 @@ class Nodes {
     if (url) r = url;
     else r = this.proxyURL;
 
-    return send("get", `${r}/nodes/${nodeId}`, "", {})
+    return send("get", urlJoin(r, `/nodes/${nodeId}`), "", {})
       .then(res => {
         const node: NodeCapacity = res;
         const ret: NodeResources = { cru: 0, mru: 0, hru: 0, sru: 0, ipv4u: 0 };
@@ -285,7 +286,7 @@ class Nodes {
     url = url || this.proxyURL;
     const query = this.getUrlQuery(options);
     try {
-      nodes = await send("GET", `${url}/nodes?${query}`, "", {});
+      nodes = await send("get", urlJoin(url, `/nodes?${query}`), "", {});
     } catch {
       throw Error(`Invalid query: ${query}`);
     }
@@ -355,7 +356,7 @@ class Nodes {
   }
 
   async nodeAvailableForTwinId(nodeId: number, twinId: number): Promise<boolean> {
-    return send("GET", `${this.proxyURL}/nodes/${nodeId}`, "", {})
+    return send("get", urlJoin(this.proxyURL, `/nodes/${nodeId}`), "", {})
       .then(node => {
         if (node.rentedByTwinId != twinId && (node.dedicated || node.rentContractId != 0)) {
           return false;
