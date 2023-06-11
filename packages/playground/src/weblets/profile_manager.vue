@@ -40,10 +40,7 @@
 
       <DTabs
         v-if="!profileManager.profile"
-        :tabs="[
-          { title: 'Login', value: 'login' },
-          { title: 'Connect', value: 'register' },
-        ]"
+        :tabs="getTabs()"
         v-model="activeTab"
         :disabled="creatingAccount || activating"
         @tab:change="
@@ -124,6 +121,7 @@
                         label="Password"
                         :autofocus="activeTab === 0"
                         v-model="password"
+                        @keydown.enter="onKeyDown"
                         v-bind="{ ...passwordInputProps, ...validationProps }"
                         :disabled="creatingAccount || activating"
                       />
@@ -275,7 +273,12 @@ import { type Balance, createAccount, getGrid, loadBalance, loadProfile, storeSS
 import { normalizeError } from "../utils/helpers";
 import { downloadAsFile } from "../utils/helpers";
 
-defineProps({
+interface Credentials {
+  passwordHash?: string;
+  mnemonicHash?: string;
+}
+
+const props = defineProps({
   modelValue: {
     required: false,
     default: () => true,
@@ -284,6 +287,85 @@ defineProps({
 });
 defineEmits<{ (event: "update:modelValue", value: boolean): void }>();
 
+let mountedTimeout: any;
+watch(
+  () => props.modelValue,
+  m => {
+    if (m) {
+      if (mountedTimeout) {
+        clearTimeout(mountedTimeout);
+      }
+      mountedTimeout = setTimeout(() => {
+        mounted();
+      });
+    }
+  },
+);
+
+function mounted() {
+  if (isStoredCredentials()) {
+    activeTab.value = 0;
+    const credentials: Credentials = getCredentials();
+    const sessionPassword = sessionStorage.getItem("password");
+
+    if (!sessionPassword) return;
+
+    password.value = sessionPassword;
+
+    if (credentials.passwordHash) {
+      return login();
+    }
+  } else {
+    activeTab.value = 1;
+    return;
+  }
+}
+
+function onKeyDown() {
+  if (password.value.length >= 6) {
+    if (activeTab.value === 0) [login()];
+    else {
+      storeAndLogin();
+    }
+  }
+}
+
+function getCredentials() {
+  const getCredentials = localStorage.getItem("wallet");
+  let credentials: Credentials = {};
+
+  if (getCredentials) {
+    credentials = JSON.parse(getCredentials);
+  }
+  return credentials;
+}
+
+function setCredentials(passwordHash: string, mnemonicHash: string): Credentials {
+  const credentials: Credentials = {
+    passwordHash: passwordHash,
+    mnemonicHash: mnemonicHash,
+  };
+  localStorage.setItem("wallet", JSON.stringify(credentials));
+  return credentials;
+}
+
+function isStoredCredentials() {
+  return localStorage.getItem("wallet") ? true : false;
+}
+
+function getTabs() {
+  let tabs = [];
+  if (isStoredCredentials()) {
+    tabs = [
+      { title: "Login", value: "login" },
+      { title: "Connect", value: "register" },
+    ];
+  } else {
+    tabs = [{ title: "Connect", value: "register" }];
+  }
+  return tabs;
+}
+
 const profileManager = useProfileManager();
 
 const mnemonic = ref("");
@@ -291,6 +373,7 @@ const isValidForm = ref(false);
 const SSHKeyHint = ref("");
 const ssh = ref("");
 let sshTimeout: any;
+
 watch(SSHKeyHint, hint => {
   if (hint) {
     if (sshTimeout) {
@@ -363,10 +446,7 @@ function validateMnInput(mnemonic: string) {
 }
 
 onMounted(async () => {
-  const maybePassword = sessionStorage.getItem("password");
-  if (!maybePassword) return;
-  password.value = maybePassword;
-  login();
+  mounted();
 });
 
 const creatingAccount = ref(false);
@@ -424,23 +504,30 @@ async function __loadBalance(profile: Profile) {
 }
 
 function login() {
-  const mnemonicHash = localStorage.getItem(md5(password.value)) as string;
-  const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
-  const mnemonic = cryptr.decrypt(mnemonicHash);
-  activate(mnemonic);
+  const credentials: Credentials = getCredentials();
+  if (credentials.mnemonicHash && credentials.passwordHash) {
+    if (credentials.passwordHash === md5(password.value)) {
+      const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
+      const mnemonic = cryptr.decrypt(credentials.mnemonicHash);
+      activate(mnemonic);
+    }
+  }
 }
 
 function storeAndLogin() {
   const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
   const mnemonicHash = cryptr.encrypt(mnemonic.value);
-  localStorage.setItem(md5(password.value), mnemonicHash);
+  setCredentials(md5(password.value), mnemonicHash);
   activate(mnemonic.value);
 }
 
 function validatePassword(value: string) {
   if (activeTab.value === 0) {
-    if (!localStorage.getItem(md5(value))) {
-      return { message: "Please provide a valid password." };
+    if (!localStorage.getItem("wallet")) {
+      return { message: "We couldn't find a matching wallet for this password. Please connect your wallet first." };
+    }
+    if (getCredentials().passwordHash !== md5(password.value)) {
+      return { message: "We couldn't find a matching wallet for this password. Please connect your wallet first." };
     }
   }
 }
