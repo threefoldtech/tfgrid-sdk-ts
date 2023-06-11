@@ -1,3 +1,5 @@
+import urlJoin from "url-join";
+
 import { TFClient } from "../clients";
 import { GridClientConfig } from "../config";
 import { events, send, validateInput } from "../helpers";
