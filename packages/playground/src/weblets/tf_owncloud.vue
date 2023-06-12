@@ -114,7 +114,7 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref("mm" + generateString(9));
+const name = ref("oc" + generateString(9));
 const username = ref("admin");
 const password = ref(generateString(12));
 const solution = ref() as Ref<SolutionFlavor>;
