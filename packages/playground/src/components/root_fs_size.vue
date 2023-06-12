@@ -17,7 +17,9 @@
       </input-validator>
     </div>
 
-    <v-tooltip text="Toggle editing root filesystem size">
+    <v-tooltip
+      text="The 'Toggle Editing Root Filesystem Size' feature allows users to adjust the size of the root filesystem for their system, The root filesystem is the primary storage location for the operating system and its associated files."
+    >
       <template v-slot:activator="{ props }">
         <v-switch inset color="primary" v-model="edit" v-bind="props" />
       </template>
