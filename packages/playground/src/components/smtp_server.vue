@@ -22,13 +22,15 @@
         ]"
         #="{ props }"
       >
-        <v-text-field
-          label="Email"
-          placeholder="email@example.com"
-          v-model="$props.modelValue.username"
-          v-bind="props"
-          autofocus
-        />
+        <input-tooltip #="{ tooltipProps }" tooltip="Mattermost admin email.">
+          <v-text-field
+            label="Admin Email"
+            placeholder="email@example.com"
+            v-model="$props.modelValue.username"
+            v-bind="{ ...props, ...tooltipProps }"
+            autofocus
+          />
+        </input-tooltip>
       </input-validator>
 
       <password-input-wrapper #="{ props }">
@@ -41,11 +43,15 @@
           ]"
           #="{ props: validatorProps }"
         >
-          <v-text-field
-            label="Password"
-            v-model="$props.modelValue.password"
-            v-bind="{ ...props, ...validatorProps }"
-          />
+          <input-tooltip #="{ tooltipProps }" tooltip="Mattermost admin password.">
+            <v-text-field
+              label="Admin Password"
+              placeholder="email@example.com"
+              v-model="$props.modelValue.password"
+              v-bind="{ ...props, ...tooltipProps }"
+              autofocus
+            />
+          </input-tooltip>
         </input-validator>
       </password-input-wrapper>
 
@@ -58,12 +64,15 @@
         v-if="email"
         #="{ props }"
       >
-        <v-text-field
-          label="From Email Address"
-          placeholder="support@example.com"
-          v-bind="props"
-          v-model="$props.modelValue.email"
-        />
+        <input-tooltip #="{ tooltipProps }" tooltip="From email address.">
+          <v-text-field
+            label="From Email Address"
+            placeholder="email@example.com"
+            v-model="$props.modelValue.email"
+            v-bind="{ ...props, ...tooltipProps }"
+            autofocus
+          />
+        </input-tooltip>
       </input-validator>
 
       <input-validator
@@ -71,7 +80,15 @@
         :rules="[validators.required('Hostname is required.'), validators.isURL('Please provide a valid hostname.')]"
         #="{ props }"
       >
-        <v-text-field label="Hostname" v-model="$props.modelValue.hostname" v-bind="props" />
+        <input-tooltip #="{ tooltipProps }" tooltip="SMTP host server.">
+          <v-text-field
+            label="Hostname"
+            placeholder="email@example.com"
+            v-model="$props.modelValue.hostname"
+            v-bind="{ ...props, ...tooltipProps }"
+            autofocus
+          />
+        </input-tooltip>
       </input-validator>
 
       <input-validator
