@@ -148,7 +148,9 @@ class Algorand implements blockchainInterface {
   @expose
   @validateInput
   async assetsByAddress(options: AlgorandAccountAssetsFromAddressModel): Promise<BlockchainAssetModel[]> {
-    const assets = await axios.get(this.baseUrl + `v2/accounts/${options.address}/`).then(res => res.data.assets);
+    const assets = await axios
+      .get(urlJoin(this.baseUrl, `v2/accounts/${options.address}/`))
+      .then(res => res.data.assets);
     assets.forEach(asset => {
       asset["asset"] = asset["asset-id"];
       delete asset["asset-id"];
@@ -195,7 +197,7 @@ class Algorand implements blockchainInterface {
 
   @validateInput
   async createTransaction(options: AlgorandCreateTransactionModel) {
-    const params_fetched = await axios.get(this.baseUrl + `v2/transactions/params`).then(res => res.data);
+    const params_fetched = await axios.get(urlJoin(this.baseUrl, `v2/transactions/params`)).then(res => res.data);
     console.log("transaction params fetched");
     const request_params = {
       flatFee: true,
