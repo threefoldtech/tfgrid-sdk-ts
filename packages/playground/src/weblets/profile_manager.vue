@@ -221,7 +221,7 @@
           <VBtn
             color="secondary"
             variant="text"
-            :disabled="!!ssh || updatingSSH || generatingSSH"
+            :disabled="!!ssh || updatingSSH || generatingSSH || (balance && balance.free < 0.01)"
             :loading="generatingSSH"
             @click="generateSSH"
           >
