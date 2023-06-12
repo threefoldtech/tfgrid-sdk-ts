@@ -9,7 +9,7 @@
         </template>
       </v-tooltip>
     </div>
-    <v-divider :class="{ 'mb-2': true, 'mt-2': true }" />
+    <v-divider class="my-2" />
     <div v-for="(item, index) in modelValue" :key="item">
       <div class="d-flex">
         <div class="flex-grow-1 mr-4">
