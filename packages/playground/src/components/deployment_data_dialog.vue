@@ -24,7 +24,7 @@
                 :disabled="index !== 0 || !hasMaster(item)"
               >
                 <template #activator="{ props }">
-                  <span v-bind="props">{{ item.name }}</span>
+                  <span v-bind="props" class="text-lowercase">{{ item.name }}</span>
                 </template>
               </v-tooltip>
             </v-tab>
