@@ -91,9 +91,11 @@ async function loadFarms() {
     farm.value = farms.value[0];
   }
 
-  if (!farm.value && !initialized) {
-    initialized = true;
-    farmInput.value.setStatus(ValidatorStatus.Init);
+  if (!farm.value) {
+    farmInput.value.setStatus(initialized ? ValidatorStatus.Invalid : ValidatorStatus.Init);
+    if (!initialized) {
+      initialized = true;
+    }
   }
 
   loading.value = false;

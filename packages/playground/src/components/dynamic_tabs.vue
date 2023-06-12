@@ -68,7 +68,7 @@ watch(activeTab, t => {
   emits("tab:change", t);
 });
 
-const valid = computed(() => forms.value.reduce((r, f) => r && f.valid.value, true));
+const valid = computed(() => forms.value.reduce((r, f) => r && (f.valid as unknown as boolean), true));
 const invalid = computed(() => !valid.value);
 
 defineExpose({
