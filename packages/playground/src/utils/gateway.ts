@@ -24,18 +24,25 @@ export function getSubdomain(options: GetHostnameOptions) {
   );
 }
 
+export interface GatewayBackend {
+  ip: string;
+  port: number;
+}
+
 export interface DeployGatewayNameOptions {
   name: string;
   nodeId: number;
   tlsPassthrough?: boolean;
-  backends: `http://${string}`[];
+  backends: GatewayBackend[];
+  networkName: string;
 }
 export async function deployGatewayName(grid: GridClient, options: DeployGatewayNameOptions) {
   const gateway = new GatewayNameModel();
   gateway.name = options.name;
   gateway.node_id = options.nodeId;
   gateway.tls_passthrough = options.tlsPassthrough || false;
-  gateway.backends = options.backends;
+  gateway.backends = options.backends.map(({ ip, port }) => `http://${ip}:${port}`);
+  gateway.network = options.networkName;
   gateway.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
 
   return grid.gateway.deploy_name(gateway);

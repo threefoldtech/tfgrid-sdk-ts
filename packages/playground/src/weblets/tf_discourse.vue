@@ -131,6 +131,10 @@ async function deploy() {
 
     vm = await deployVM(grid!, {
       name: name.value,
+      network: {
+        addAccess: true,
+        accessNodeId: gateway.value.id,
+      },
       machines: [
         {
           name: name.value,
@@ -174,7 +178,13 @@ async function deploy() {
     await deployGatewayName(grid!, {
       name: subdomain,
       nodeId: gateway.value.id,
-      backends: [`http://[${vm[0].planetary}]:88`],
+      backends: [
+        {
+          ip: vm[0].interfaces[0].ip,
+          port: 88,
+        },
+      ],
+      networkName: vm[0].interfaces[0].network,
     });
 
     layout.value.reloadDeploymentsList();
