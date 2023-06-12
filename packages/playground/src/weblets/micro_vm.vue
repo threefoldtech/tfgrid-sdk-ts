@@ -153,7 +153,15 @@
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" :disabled="tabs?.invalid || networkError" @click="deploy">Deploy</v-btn>
+      <v-btn
+        class="mr-1"
+        color="primary"
+        variant="tonal"
+        width="90.75px"
+        :disabled="tabs?.invalid || networkError"
+        @click="deploy"
+        >Deploy</v-btn
+      >
     </template>
   </weblet-layout>
 </template>
