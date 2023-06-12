@@ -36,8 +36,8 @@
             <TwinDetails :twin="data.twin" :title="node ? 'Node Twin Details' : 'Farm Twin Details'" />
           </v-col>
 
-          <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="node && node.interfaces">
-            <InterfacesDetails :interfaces="node.interfaces" />
+          <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="node && interfaces">
+            <InterfacesDetails :interfaces="interfaces" />
           </v-col>
         </v-row>
       </div>
@@ -85,6 +85,7 @@ export default class Details extends Vue {
 
   loading = false;
   grafanaUrl = "";
+  interfaces = undefined;
 
   data: any = {};
 
@@ -117,6 +118,7 @@ export default class Details extends Vue {
           return res;
         }, data);
         // update with the data from grid proxy
+        this.interfaces = data.node.interfaces;
         if (this.nodeId) {
           this.data.node = await fetch(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}`).then(res =>
             res.json(),

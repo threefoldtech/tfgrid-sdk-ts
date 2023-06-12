@@ -103,7 +103,6 @@ export default class InFilter extends Vue {
     });
     this.$store.commit("explorer/" + MutationTypes.CLEAR_NODES_FILTER_KEY, this.filterKey);
     this.$store.commit("explorer/" + MutationTypes.SET_NODES_TABLE_PAGE_NUMBER, 1);
-    this.$store.dispatch(ActionTypes.REQUEST_NODES);
   }
 }
 </script>

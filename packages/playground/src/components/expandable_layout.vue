@@ -7,11 +7,11 @@
     <div v-for="(item, index) in modelValue" :key="item">
       <div class="d-flex">
         <div class="flex-grow-1 mr-4">
-          <slot :item="item" :index="index" />
+          <slot :item="item" :index="index" :isRequired="required.includes(index)" />
         </div>
         <div class="d-flex">
           <v-spacer />
-          <v-btn color="error" icon="mdi-delete-outline" @click="remove(index)" />
+          <v-btn color="error" icon="mdi-delete-outline" @click="remove(index)" v-if="!required.includes(index)" />
         </div>
       </div>
       <v-divider class="mb-4" v-if="index + 1 < modelValue.length" />
@@ -20,7 +20,18 @@
 </template>
 
 <script lang="ts" setup>
-const props = defineProps<{ modelValue: any[] }>();
+import type { PropType } from "vue";
+
+const props = defineProps({
+  modelValue: {
+    type: Array as PropType<any[]>,
+    required: true,
+  },
+  required: {
+    type: Array as PropType<number[]>,
+    default: () => [],
+  },
+});
 const emits = defineEmits<{
   (event: "update:modelValue", value: any[]): void;
   (event: "add"): void;

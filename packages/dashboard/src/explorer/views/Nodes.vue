@@ -141,10 +141,10 @@ export default class Nodes extends Vue {
     { text: "Farm ID", value: "farmId", align: "center", customAlign: "text-center" },
     { text: "Total Public IPs", value: "totalPublicIPs", align: "center", customAlign: "text-center" },
     { text: "Free Public IPs", value: "freePublicIPs", align: "center", customAlign: "text-center" },
-    { text: "HRU", value: "hru", align: "center", customAlign: "text-center", description: "Total HDD" },
-    { text: "SRU", value: "sru", align: "center", customAlign: "text-center", description: "Total SSD" },
-    { text: "MRU", value: "mru", align: "center", customAlign: "text-center", description: "Total Memory" },
     { text: "CRU", value: "cru", align: "center", customAlign: "text-center", description: "Total Cores" },
+    { text: "MRU", value: "mru", align: "center", customAlign: "text-center", description: "Total Memory" },
+    { text: "SRU", value: "sru", align: "center", customAlign: "text-center", description: "Total SSD" },
+    { text: "HRU", value: "hru", align: "center", customAlign: "text-center", description: "Total HDD" },
     { text: "Up Time", value: "uptime", align: "center", customAlign: "text-center" },
     { text: "Status", value: "status", align: "center", customAlign: "text-center" },
   ];

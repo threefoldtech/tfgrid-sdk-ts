@@ -18,10 +18,10 @@
           </p>
           <template v-else-if="balance">
             <p>
-              Balance: <strong>{{ balance.free }} TFT</strong>
+              Balance: <strong :style="{ color: '#76e2c8' }">{{ normalizeBalance(balance.free, true) }} TFT</strong>
             </p>
             <p>
-              Locked: <strong>{{ balance.locked }} TFT</strong>
+              Locked: <strong :style="{ color: '#76e2c8' }">{{ normalizeBalance(balance.locked, true) }} TFT</strong>
             </p>
           </template>
         </div>
@@ -209,6 +209,7 @@
                     : SSHKeyHint
                 "
                 :persistent-hint="updatingSSH || generatingSSH || !!SSHKeyHint"
+                :rules="[value => !!value || 'SSH key is required']"
               />
             </CopyInputWrapper>
           </template>
@@ -271,7 +272,7 @@ import { generateKeyPair } from "web-ssh-keygen";
 import { useProfileManager } from "../stores";
 import { type Balance, createAccount, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
-import { downloadAsFile } from "../utils/helpers";
+import { downloadAsFile, normalizeBalance } from "../utils/helpers";
 
 interface Credentials {
   passwordHash?: string;
