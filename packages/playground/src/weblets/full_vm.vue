@@ -36,7 +36,9 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Name" v-model="name" v-bind="props" />
+          <input-tooltip #="{ tooltipProps }" tooltip="name">
+            <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+          </input-tooltip>
         </input-validator>
 
         <SelectVmImage :images="images" v-model="flist" />
