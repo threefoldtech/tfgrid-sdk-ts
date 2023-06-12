@@ -17,7 +17,7 @@ import { getWireguardConfig } from "./load_deployment";
 import { NodePicker } from "./node_picker";
 
 export async function deployVM(grid: GridClient, options: DeployVMOptions) {
-  events.emit("logs", "Picking nodes to deploy.");
+  events.emit("logs", "Finding a suitable node to deploy on.");
   const nodePicker = new NodePicker();
   const vms = new MachinesModel();
   vms.name = options.name;
