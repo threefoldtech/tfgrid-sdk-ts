@@ -46,7 +46,7 @@
         @tab:change="
           () => {
             clearError();
-            passwordInput.validate(password);
+            clearFields();
           }
         "
       >
@@ -295,6 +295,15 @@ watch(
   m => {
     if (m) {
       nextTick().then(mounted);
+    } else {
+      nextTick().then(() => {
+        if (isStoredCredentials()) {
+          activeTab.value = 0;
+        } else {
+          activeTab.value = 1;
+        }
+        clearFields();
+      });
     }
   },
 );
@@ -410,6 +419,11 @@ const createAccountError = ref<string | null>(null);
 function clearError() {
   loginError.value = null;
   createAccountError.value = null;
+}
+
+function clearFields() {
+  password.value = "";
+  mnemonic.value = "";
 }
 
 async function activate(mnemonic: string) {
