@@ -50,7 +50,7 @@
     </form-validator>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" width="90.75px" @click="deploy" :disabled="!valid"> Deploy </v-btn>
+      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="!valid"> Deploy </v-btn>
     </template>
   </weblet-layout>
 </template>
