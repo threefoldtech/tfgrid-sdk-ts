@@ -145,7 +145,7 @@
                 :disabled="!isValidForm || creatingAccount"
                 size="large"
               >
-                {{ activeTab === 0 ? "Login" : "Store and login" }}
+                {{ activeTab === 0 ? "Login" : "Connect" }}
               </VBtn>
             </div>
           </form>
