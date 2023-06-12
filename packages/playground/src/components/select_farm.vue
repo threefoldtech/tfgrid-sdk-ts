@@ -1,6 +1,6 @@
 <template>
   <section>
-    <h6 class="text-h5 mb-4">Farm Filter</h6>
+    <h6 class="text-h5 mb-4">Choose a Location</h6>
 
     <SelectCountry v-model="country" />
 
