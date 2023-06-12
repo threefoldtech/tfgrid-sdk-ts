@@ -9,6 +9,7 @@
     hide-default-footer
     show-select
     v-model="selectedItems"
+    hide-no-data
   >
     <template #[`column.data-table-select`]>
       <v-checkbox-btn

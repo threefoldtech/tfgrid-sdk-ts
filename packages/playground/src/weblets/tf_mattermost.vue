@@ -104,6 +104,7 @@ async function deploy() {
   let vm: any;
 
   try {
+    layout.value.validateSsh();
     grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);
