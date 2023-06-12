@@ -5,6 +5,7 @@ import type { ValidatorStatus } from "./form_validator";
 export interface InputValidatorService {
   validate(): Promise<boolean>;
   setStatus(newStatus: ValidatorStatus): void;
+  reset(): void;
 }
 
 export function useInputRef(isArray: true): Ref<InputValidatorService[]>;

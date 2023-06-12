@@ -6,6 +6,7 @@
 import { computed, ref, watch } from "vue";
 
 import { type FormValidatorService, provideForm, ValidatorStatus } from "@/hooks/form_validator";
+import type { InputValidatorService } from "@/hooks/input_validator";
 
 export default {
   name: "FormValidator",
@@ -13,23 +14,23 @@ export default {
   emits: { "update:modelValue": (value: boolean) => value },
   setup(_, { emit, expose }) {
     const statusMap = ref(new Map<number, ValidatorStatus>());
-    const validateMap = new Map<number, () => Promise<boolean>>();
+    const serviceMap = new Map<number, InputValidatorService>();
 
     const valid = computed(() => [...statusMap.value.values()].every(status => status === ValidatorStatus.Valid));
     watch(valid, valid => emit("update:modelValue", valid), { immediate: true });
 
     const form: FormValidatorService = {
-      register(uid, validate) {
+      register(uid, service) {
         statusMap.value.set(uid, ValidatorStatus.Init);
-        validateMap.set(uid, validate);
+        serviceMap.set(uid, service);
       },
       unregister(uid) {
         statusMap.value.delete(uid);
-        validateMap.delete(uid);
+        serviceMap.delete(uid);
       },
 
       async validate() {
-        const valids = await Promise.all([...validateMap.values()].map(validate => validate()));
+        const valids = await Promise.all([...serviceMap.values()].map(({ validate }) => validate()));
         return valids.every(valid => valid);
       },
 
@@ -37,6 +38,10 @@ export default {
         if (statusMap.value.get(uid) !== status) {
           statusMap.value.set(uid, status);
         }
+      },
+
+      reset() {
+        [...serviceMap.values()].map(({ reset }) => reset());
       },
 
       valid,

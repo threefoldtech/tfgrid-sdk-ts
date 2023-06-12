@@ -1,5 +1,7 @@
 import { type ComputedRef, inject, provide, type Ref, ref } from "vue";
 
+import type { InputValidatorService } from "./input_validator";
+
 export enum ValidatorStatus {
   Valid = "VALID",
   Invalid = "INVALID",
@@ -8,10 +10,11 @@ export enum ValidatorStatus {
 }
 
 export interface FormValidatorService {
-  register(uid: number, validate: (value?: string | number | undefined) => Promise<boolean>): void;
+  register(uid: number, service: InputValidatorService): void;
   updateStatus(uid: number, status: ValidatorStatus): void;
   validate(): Promise<boolean>;
   unregister(uid: number): void;
+  reset(): void;
   valid: ComputedRef<boolean>;
   invalid: ComputedRef<boolean>;
   pending: ComputedRef<boolean>;

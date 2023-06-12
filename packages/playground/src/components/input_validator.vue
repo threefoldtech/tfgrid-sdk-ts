@@ -104,21 +104,25 @@ export default {
       { immediate: true },
     );
 
-    // Set Form connection
-    onMounted(() => form?.register(uid, validate));
-    onUnmounted(() => form?.unregister(uid));
-
-    const obj: InputValidatorService = {
-      validate,
-      setStatus,
-    };
-    expose(obj);
-
     const blured = ref(false);
     function onBlur() {
       blured.value = true;
       validate();
     }
+
+    // Set Form connection
+    const obj: InputValidatorService = {
+      validate,
+      setStatus,
+      reset() {
+        blured.value = false;
+        setStatus(ValidatorStatus.Init);
+        error.value = null;
+      },
+    };
+    onMounted(() => form?.register(uid, obj));
+    onUnmounted(() => form?.unregister(uid));
+    expose(obj);
 
     return {
       onBlur: computed(() => (blured.value ? undefined : onBlur)),
