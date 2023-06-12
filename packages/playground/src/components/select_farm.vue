@@ -58,6 +58,7 @@ watch([farm, country], ([f, c]) =>
 
 const loading = ref(false);
 const farms = ref<Farm[]>([]);
+let initialized = false;
 async function loadFarms() {
   farmInput.value?.setStatus(ValidatorStatus.Pending);
 
@@ -88,6 +89,11 @@ async function loadFarms() {
 
   if (!farm.value) {
     farm.value = farms.value[0];
+  }
+
+  if (!farm.value && !initialized) {
+    initialized = true;
+    farmInput.value.setStatus(ValidatorStatus.Init);
   }
 
   loading.value = false;
