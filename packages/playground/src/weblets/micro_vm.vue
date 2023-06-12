@@ -119,6 +119,7 @@
       </template>
 
       <template #disks>
+        <div class="text-subtitle-1 text-medium-emphasis">Add disks to your deployment</div>
         <ExpandableLayout v-model="disks" @add="addDisk" #="{ index }">
           <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
           <input-validator
