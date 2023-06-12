@@ -1,3 +1,5 @@
+import urlJoin from "url-join";
+
 import { TFClient } from "../clients";
 import { GridClientConfig } from "../config";
 import { events, send, validateInput } from "../helpers";
@@ -56,7 +58,7 @@ class Nodes {
   @validateInput
   async getRent(options: RentContractGetModel) {
     const proxyURL = this.config.proxyURL;
-    return send("get", `${proxyURL}/nodes/${options.nodeId}?dedicated=true`, "", {})
+    return send("get", urlJoin(proxyURL, `/nodes/${options.nodeId}?dedicated=true`), "", {})
       .then(res => {
         return res;
       })
