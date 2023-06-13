@@ -112,15 +112,6 @@
 
       <v-tooltip
         location="top"
-        text="TLS (Transport Layer Security) is a cryptographic protocol that ensures secure communication over a network. It provides encryption, authentication, and data integrity, making it an essential component for secure deployments."
-      >
-        <template v-slot:activator="{ props }">
-          <v-switch inset color="primary" label="Use TLS" v-if="tls" v-bind="props" />
-        </template>
-      </v-tooltip>
-
-      <v-tooltip
-        location="top"
         text="SSL (Secure Sockets Layer) is an older cryptographic protocol that was widely used for secure communication before being superseded by TLS. SSL and TLS are often used interchangeably, but technically TLS is the successor of SSL."
       >
         <template v-slot:activator="{ props }">
