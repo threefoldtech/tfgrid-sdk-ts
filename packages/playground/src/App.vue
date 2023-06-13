@@ -48,10 +48,9 @@
     <v-main :style="{ paddingTop: '70px' }">
       <v-toolbar
         color="rgb(49, 49, 49)"
-        class="position-fixed"
+        class="position-fixed pr-2"
         theme="dark"
         :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }"
-        :class="{ 'pr-2': !profileManager.profile || !$route.meta.info }"
       >
         <v-toolbar-title>
           <v-img :src="baseUrl + 'images/logoTF.png'" width="160px" />
@@ -64,10 +63,9 @@
         <AppTheme />
         <v-divider vertical class="mx-2" />
         <ProfileManager v-model="openProfile" />
-        <template v-if="profileManager.profile && $route.meta.info">
+        <!-- <template v-if="profileManager.profile && $route.meta.info">
           <v-divider vertical class="mx-2" />
-          <AppInfo />
-        </template>
+        </template> -->
       </v-toolbar>
 
       <DeploymentListManager>
@@ -84,6 +82,10 @@
             />
             <div :style="{ width: '100%' }" class="mb-4">
               <DisclaimerToolbar />
+
+              <div class="d-flex justify-end mt-4">
+                <AppInfo />
+              </div>
             </div>
           </div>
 

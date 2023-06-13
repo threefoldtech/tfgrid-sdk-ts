@@ -1,5 +1,5 @@
 <template>
-  <v-tooltip location="bottom" :text="tooltip">
+  <v-tooltip location="left" :text="tooltip">
     <template #activator="{ props }">
       <v-btn v-bind="props" icon="mdi-information" @click="setOpenInfo(true)" />
     </template>

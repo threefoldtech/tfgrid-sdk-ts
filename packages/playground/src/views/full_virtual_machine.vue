@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="border pa-4 rounded">
     <FullVm />
 
     <div class="mt-4">
