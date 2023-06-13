@@ -11,8 +11,6 @@
           :model-value="$props.ipv4"
           @update:model-value="$emit('update:ipv4', $event)"
         />
-      </v-expansion-panel-text>
-      <v-expansion-panel-text>
         <v-switch
           v-if="ipv6 !== null"
           hide-details
@@ -96,6 +94,6 @@ export default {
   opacity: 0.05;
 }
 .v-expansion-panel-title {
-  padding: 16px 13px;
+  padding: 21px 13px;
 }
 </style>
