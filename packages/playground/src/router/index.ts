@@ -94,11 +94,6 @@ const router = createRouter({
       meta: { title: "Contracts List" },
     },
     {
-      path: "/deployedlist",
-      component: () => import("../views/deployment_list.vue"),
-      meta: { title: "Deployment List" },
-    },
-    {
       path: "/:pathMatch(.*)*",
       component: () => import("../views/not_yet_implemented.vue"),
       meta: { title: "Not Yet Implemented" },
