@@ -1,6 +1,10 @@
 <template>
   <div>
-    <v-switch color="primary" inset label="Set Custom Capacity" v-model="custom" />
+    <v-tooltip location="top" text="Enable this option to set custom resources.">
+      <template v-slot:activator="{ props }">
+        <v-switch color="primary" inset label="Set Custom Capacity" v-model="custom" v-bind="props" />
+      </template>
+    </v-tooltip>
 
     <slot></slot>
 
@@ -15,7 +19,14 @@
         #="{ props }"
         ref="cpuInput"
       >
-        <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
+        <input-tooltip #="{ tooltipProps }" tooltip="the number of virtual cores allocated to your solution.">
+          <v-text-field
+            label="CPU (vCores)"
+            type="number"
+            v-model.number="cpu"
+            v-bind="{ ...props, ...tooltipProps }"
+          />
+        </input-tooltip>
       </input-validator>
 
       <input-validator
@@ -28,7 +39,17 @@
         #="{ props }"
         ref="memoryInput"
       >
-        <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
+        <input-tooltip
+          #="{ tooltipProps }"
+          tooltip="Memory (MB) refers to the amount of RAM (Random Access Memory) allocated to your solution."
+        >
+          <v-text-field
+            label="Memory (MB)"
+            type="number"
+            v-model.number="memory"
+            v-bind="{ ...props, ...tooltipProps }"
+          />
+        </input-tooltip>
       </input-validator>
 
       <input-validator
@@ -41,7 +62,17 @@
         #="{ props }"
         ref="storageInput"
       >
-        <v-text-field label="Storage Size (GB)" type="number" v-model.number="storage" v-bind="props" />
+        <input-tooltip
+          #="{ tooltipProps }"
+          tooltip="Disk Size (GB) refers to the storage capacity allocated to your solution, indicating the amount of space available to store files, data, and applications."
+        >
+          <v-text-field
+            label="Storage Size (GB)"
+            type="number"
+            v-model.number="storage"
+            v-bind="{ ...props, ...tooltipProps }"
+          />
+        </input-tooltip>
       </input-validator>
     </template>
   </div>

@@ -28,10 +28,19 @@
         ]"
         #="{ props }"
       >
-        <v-text-field label="Name" v-model="name" v-bind="props" />
+        <input-tooltip #="{ tooltipProps }" tooltip="Solution name.">
+          <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        </input-tooltip>
       </input-validator>
 
-      <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
+      <v-tooltip
+        location="top"
+        text="Public IPv4 refers to an Internet Protocol version 4 address that is globally unique and accessible over the internet."
+      >
+        <template v-slot:activator="{ props }">
+          <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
+        </template>
+      </v-tooltip>
 
       <AlgorandCapacity
         :network="network"
