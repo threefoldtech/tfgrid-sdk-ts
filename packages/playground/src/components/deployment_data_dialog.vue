@@ -10,13 +10,13 @@
             </v-btn-toggle>
           </div>
 
-          <v-tabs v-model="activeTab" align-tabs="center" class="my-4" v-if="showType === 0">
+          <v-tabs v-model="activeTab" align-tabs="center" class="my-4 mx-auto" v-if="showType === 0">
             <v-tab
               v-for="(item, index) in contracts"
               :key="item.contractId"
               variant="tonal"
               color="primary"
-              :class="{ 'mr-4': index === 0 && hasMaster(item) }"
+              class="mx-2"
             >
               <v-tooltip
                 location="bottom"
