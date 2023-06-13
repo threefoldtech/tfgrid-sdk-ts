@@ -117,7 +117,7 @@ const filteredHeaders = computed(() => {
     { title: "Public IPv6", key: "ipv6" },
     { title: "Planetary Network IP", key: "planetary" },
     { title: "Flist", key: "flist" },
-    { title: "Billing Rate", key: "billing" },
+    { title: "Cost", key: "billing" },
     { title: "Actions", key: "actions" },
   ];
 
