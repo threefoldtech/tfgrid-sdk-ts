@@ -1,17 +1,21 @@
 <template>
-  <v-expansion-panels variant="inset">
-    <v-expansion-panel title="Network" variant="outlined">
+  <v-expansion-panels variant="inset" class="mb-4" :readonly="error">
+    <v-expansion-panel title="Network">
       <v-expansion-panel-text>
         <v-switch
           v-if="ipv4 !== null"
+          hide-details
           color="primary"
           inset
           label="Public IPv4"
           :model-value="$props.ipv4"
           @update:model-value="$emit('update:ipv4', $event)"
         />
+      </v-expansion-panel-text>
+      <v-expansion-panel-text>
         <v-switch
           v-if="ipv6 !== null"
+          hide-details
           color="primary"
           inset
           label="Public IPv6"
@@ -20,6 +24,7 @@
         />
         <v-switch
           v-if="planetary !== null"
+          hide-details
           color="primary"
           inset
           label="Planetary Network"
@@ -28,13 +33,14 @@
         />
         <v-switch
           v-if="wireguard !== null"
+          hide-details
           color="primary"
           inset
           label="Add Wireguard Access"
           :modelValue="$props.wireguard"
           @update:modelValue="$emit('update:wireguard', $event)"
         />
-        <v-alert v-show="networkError" class="mb-2" type="warning" variant="tonal">
+        <v-alert v-show="error" class="mb-2" type="warning" variant="tonal">
           You must enable at least one of network options.
         </v-alert>
       </v-expansion-panel-text>
@@ -74,14 +80,19 @@ export default {
     if (props.ipv4 === null && props.ipv6 === null && props.planetary === null && props.wireguard === null) {
       throw new Error("You must provide at least one network  option");
     }
-    const networkError = computed(() => !(props.ipv4 || props.ipv6 || props.planetary || props.wireguard));
+    const error = computed(() => !(props.ipv4 || props.ipv6 || props.planetary || props.wireguard));
     expose({
-      networkError,
+      error,
     });
 
     return {
-      networkError,
+      error,
     };
   },
 };
 </script>
+<style>
+.v-expansion-panel-title__overlay {
+  opacity: 0.05;
+}
+</style>
