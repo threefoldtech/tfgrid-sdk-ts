@@ -273,7 +273,7 @@ import { generateKeyPair } from "web-ssh-keygen";
 
 import { useProfileManager } from "../stores";
 import { type Balance, createAccount, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
-import { normalizeError } from "../utils/helpers";
+import { isEnoughBalance, normalizeError } from "../utils/helpers";
 import { downloadAsFile, normalizeBalance } from "../utils/helpers";
 
 interface Credentials {
@@ -535,10 +535,6 @@ function validatePassword(value: string) {
       return { message: "We couldn't find a matching wallet for this password. Please connect your wallet first." };
     }
   }
-}
-
-function isEnoughBalance(balance: any): boolean {
-  return balance.free > 0.001 ? true : false;
 }
 
 const bridge = (window as any).env.BRIDGE_TFT_ADDRESS;
