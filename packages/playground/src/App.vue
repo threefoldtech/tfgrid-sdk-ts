@@ -151,10 +151,7 @@ const routes: AppRoute[] = [
   },
   {
     title: "My Account",
-    items: [
-      { title: "Contracts", route: "/contractslist" },
-      { title: "Deployments", route: "/deployedlist" },
-    ],
+    items: [{ title: "Contracts", route: "/contractslist" }],
   },
 ];
 

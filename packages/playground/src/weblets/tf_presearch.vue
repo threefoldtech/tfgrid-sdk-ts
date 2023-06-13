@@ -48,7 +48,7 @@
           ]"
           #="{ props }"
         >
-          <password-input-wrapper>
+          <password-input-wrapper #="{ props }">
             <v-text-field label="Presearch Registeration Code" v-bind="props" v-model="code" />
           </password-input-wrapper>
         </input-validator>
