@@ -1,11 +1,12 @@
 <template>
-  <div>
+  <view-layout>
+    <template #description> description if needed </template>
     <TfKubernetes />
 
-    <div class="mt-4">
+    <template #list>
       <TfDeploymentList :project-name="name" />
-    </div>
-  </div>
+    </template>
+  </view-layout>
 </template>
 
 <script lang="ts">

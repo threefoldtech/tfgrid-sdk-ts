@@ -5,6 +5,7 @@ import DTabs from "./components/dynamic_tabs.vue";
 import FormValidator from "./components/form_validator.vue";
 import InputValidator from "./components/input_validator.vue";
 import PasswordInputWrapper from "./components/password_input_wrapper.vue";
+import ViewLayout from "./components/view_layout.vue";
 import WebletLayout from "./components/weblet_layout.vue";
 import * as validators from "./utils/validators";
 
@@ -15,6 +16,7 @@ const GLOBAL_COMPONENTS: { [key: string]: Component } = {
   DTabs,
   InputValidator,
   FormValidator,
+  ViewLayout,
 };
 
 export function defineGlobals(app: App<Element>): void {

@@ -63,9 +63,6 @@
         <AppTheme />
         <v-divider vertical class="mx-2" />
         <ProfileManager v-model="openProfile" />
-        <!-- <template v-if="profileManager.profile && $route.meta.info">
-          <v-divider vertical class="mx-2" />
-        </template> -->
       </v-toolbar>
 
       <DeploymentListManager>
@@ -82,10 +79,6 @@
             />
             <div :style="{ width: '100%' }" class="mb-4">
               <DisclaimerToolbar />
-
-              <div class="d-flex justify-end mt-4">
-                <AppInfo />
-              </div>
             </div>
           </div>
 
