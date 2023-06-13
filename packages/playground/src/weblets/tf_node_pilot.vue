@@ -22,7 +22,9 @@
         ]"
         #="{ props }"
       >
-        <v-text-field label="Name" v-model="name" v-bind="props" />
+        <input-tooltip #="{ tooltipProps }" tooltip="Solution name.">
+          <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        </input-tooltip>
       </input-validator>
 
       <input-validator
@@ -35,7 +37,14 @@
         ]"
         #="{ props }"
       >
-        <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
+        <input-tooltip #="{ tooltipProps }" tooltip="the number of virtual cores allocated to your solution.">
+          <v-text-field
+            label="CPU (vCores)"
+            type="number"
+            v-model.number="cpu"
+            v-bind="{ ...props, ...tooltipProps }"
+          />
+        </input-tooltip>
       </input-validator>
 
       <input-validator
@@ -48,7 +57,17 @@
         ]"
         #="{ props }"
       >
-        <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
+        <input-tooltip
+          #="{ tooltipProps }"
+          tooltip="Memory (MB) refers to the amount of RAM (Random Access Memory) allocated to your solution."
+        >
+          <v-text-field
+            label="Memory (MB)"
+            type="number"
+            v-model.number="memory"
+            v-bind="{ ...props, ...tooltipProps }"
+          />
+        </input-tooltip>
       </input-validator>
 
       <SelectFarmId
