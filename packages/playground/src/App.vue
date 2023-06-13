@@ -51,6 +51,7 @@
         class="position-fixed"
         theme="dark"
         :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }"
+        :class="{ 'pr-2': !profileManager.profile || !$route.meta.info }"
       >
         <v-toolbar-title>
           <v-img :src="baseUrl + 'images/logoTF.png'" width="160px" />
@@ -59,12 +60,14 @@
         <v-spacer></v-spacer>
 
         <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
-        <v-divider vertical />
+        <v-divider vertical class="mx-2" />
         <AppTheme />
-        <v-divider vertical />
-        <div class="mx-2">
-          <ProfileManager v-model="openProfile" />
-        </div>
+        <v-divider vertical class="mx-2" />
+        <ProfileManager v-model="openProfile" />
+        <template v-if="profileManager.profile && $route.meta.info">
+          <v-divider vertical class="mx-2" />
+          <AppInfo />
+        </template>
       </v-toolbar>
 
       <DeploymentListManager>
@@ -163,6 +166,7 @@ const baseUrl = import.meta.env.BASE_URL;
 </script>
 
 <script lang="ts">
+import AppInfo from "./components/app_info.vue";
 import AppTheme from "./components/app_theme.vue";
 import ConnectWalletLanding from "./components/connect_wallet_landing.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
@@ -187,6 +191,7 @@ export default {
     DeploymentListManager,
     AppTheme,
     ConnectWalletLanding,
+    AppInfo,
   },
 };
 </script>

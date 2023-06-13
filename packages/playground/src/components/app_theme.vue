@@ -1,12 +1,7 @@
 <template>
   <v-tooltip location="bottom" :text="light ? 'Switch to dark mode' : 'Switch to light mode'">
     <template #activator="{ props }">
-      <v-btn
-        class="mr-2"
-        v-bind="props"
-        @click="light = !light"
-        :icon="light ? 'mdi-moon-waning-crescent' : 'mdi-brightness-4'"
-      />
+      <v-btn v-bind="props" @click="light = !light" :icon="light ? 'mdi-moon-waning-crescent' : 'mdi-brightness-4'" />
     </template>
   </v-tooltip>
 </template>

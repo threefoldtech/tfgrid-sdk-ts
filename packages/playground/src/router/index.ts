@@ -1,17 +1,42 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
+export interface InfoMeta {
+  /* Accepting md and html */
+  // Example "info/full-vm-md"
+  // Note: add page path as absolute one
+  // so it get prefixed with current baseUrl
+  page: string;
+  tooltip?: string;
+}
+
+export interface RouteMeta {
+  title: string;
+  info?: InfoMeta;
+}
+
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
     {
       path: "/",
       component: () => import("../views/full_virtual_machine.vue"),
-      meta: { title: "Full Virtual Machine" },
+      meta: {
+        title: "Full Virtual Machine",
+        info: {
+          page: "info/full_vm.md",
+          tooltip: "Show Full VM Details",
+        },
+      },
     },
     {
       path: "/vm",
       component: () => import("../views/micro_virtual_machine.vue"),
-      meta: { title: "Micro Virtual Machine" },
+      meta: {
+        title: "Micro Virtual Machine",
+        info: {
+          page: "info/full_vm.md",
+        },
+      },
     },
     {
       path: "/kubernetes",
