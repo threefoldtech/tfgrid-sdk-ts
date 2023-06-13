@@ -222,7 +222,7 @@
           <VBtn
             color="secondary"
             variant="text"
-            :disabled="!!ssh || updatingSSH || generatingSSH"
+            :disabled="!!ssh || updatingSSH || generatingSSH || !isEnoughBalance(balance)"
             :loading="generatingSSH"
             @click="generateSSH"
           >
@@ -274,7 +274,7 @@ import { generateKeyPair } from "web-ssh-keygen";
 
 import { useProfileManager } from "../stores";
 import { type Balance, createAccount, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
-import { normalizeError } from "../utils/helpers";
+import { isEnoughBalance, normalizeError } from "../utils/helpers";
 import { downloadAsFile, normalizeBalance } from "../utils/helpers";
 
 interface Credentials {
