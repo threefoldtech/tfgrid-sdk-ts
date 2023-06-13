@@ -21,7 +21,8 @@
               Balance: <strong :style="{ color: '#76e2c8' }">{{ normalizeBalance(balance.free, true) }} TFT</strong>
             </p>
             <p>
-              Locked: <strong :style="{ color: '#76e2c8' }">{{ normalizeBalance(balance.locked, true) }} TFT</strong>
+              Locked:
+              <strong :style="{ color: '#76e2c8' }">{{ normalizeBalance(balance.locked, true) || 0 }} TFT</strong>
             </p>
           </template>
         </div>
