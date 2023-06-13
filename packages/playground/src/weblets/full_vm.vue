@@ -79,8 +79,13 @@
         >
           <v-text-field label="Disk Size (GB)" type="number" v-model.number="diskSize" v-bind="props" />
         </input-validator>
-        <Network v-model:ipv4="ipv4" v-model:ipv6="ipv6" ref="network" />
-        {{ network.error }}
+        <Network
+          v-model:ipv4="ipv4"
+          v-model:ipv6="ipv6"
+          v-model:planetary="planetary"
+          v-model:wireguard="wireguard"
+          ref="network"
+        />
         <SelectFarm
           :filters="{
             cpu,
@@ -125,14 +130,14 @@
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid || network.error"> Deploy </v-btn>
+      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid || network?.error">Deploy </v-btn>
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
 import { generateString } from "@threefold/grid_client";
-import { type Ref, ref, watch } from "vue";
+import { type Ref, ref } from "vue";
 
 import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";

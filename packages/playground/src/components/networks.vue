@@ -1,6 +1,6 @@
 <template>
   <v-expansion-panels variant="inset" class="mb-4" :readonly="error">
-    <v-expansion-panel title="Network">
+    <v-expansion-panel title="Network" expand-icon="mdi-menu-down" collapse-icon="mdi-menu-up">
       <v-expansion-panel-text>
         <v-switch
           v-if="ipv4 !== null"
@@ -94,5 +94,8 @@ export default {
 <style>
 .v-expansion-panel-title__overlay {
   opacity: 0.05;
+}
+.v-expansion-panel-title {
+  padding: 16px 13px;
 }
 </style>
