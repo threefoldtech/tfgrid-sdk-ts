@@ -221,7 +221,7 @@
           <VBtn
             color="secondary"
             variant="text"
-            :disabled="!!ssh || updatingSSH || generatingSSH || (balance && balance.free < 0.01)"
+            :disabled="!!ssh || updatingSSH || generatingSSH || isEnoughBalance(balance)"
             :loading="generatingSSH"
             @click="generateSSH"
           >
@@ -535,6 +535,10 @@ function validatePassword(value: string) {
       return { message: "We couldn't find a matching wallet for this password. Please connect your wallet first." };
     }
   }
+}
+
+function isEnoughBalance(balance: any): boolean {
+  return balance.free < 0.001 ? true : false;
 }
 
 const bridge = (window as any).env.BRIDGE_TFT_ADDRESS;
