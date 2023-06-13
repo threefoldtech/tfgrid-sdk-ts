@@ -79,14 +79,8 @@
         >
           <v-text-field label="Disk Size (GB)" type="number" v-model.number="diskSize" v-bind="props" />
         </input-validator>
-
-        <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
-        <v-switch color="primary" inset label="Public IPv6" v-model="ipv6" />
-        <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
-        <v-switch color="primary" inset label="Add Wireguard Access" v-model="wireguard" />
-        <v-alert v-show="networkError" class="mb-2" type="warning" variant="tonal">
-          You must enable at least one of network options.
-        </v-alert>
+        <Network v-model:ipv4="ipv4" v-model:ipv6="ipv6" ref="network" />
+        {{ network.error }}
         <SelectFarm
           :filters="{
             cpu,
@@ -131,7 +125,7 @@
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid || networkError"> Deploy </v-btn>
+      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid || network.error"> Deploy </v-btn>
     </template>
   </weblet-layout>
 </template>
@@ -140,6 +134,7 @@
 import { generateString } from "@threefold/grid_client";
 import { type Ref, ref, watch } from "vue";
 
+import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type Farm, type Flist, ProjectName } from "../types";
@@ -185,7 +180,7 @@ const planetary = ref(true);
 const wireguard = ref(false);
 const farm = ref() as Ref<Farm>;
 const disks = ref<Disk[]>([]);
-const networkError = ref(false);
+const network = ref();
 
 function addDisk() {
   const name = generateString(7);
@@ -195,10 +190,7 @@ function addDisk() {
     mountPoint: "/mnt/" + name,
   });
 }
-watch([planetary, ipv4, ipv6, wireguard], ([planetary, ipv4, ipv6, wireguard]) => {
-  if (!(ipv6 || ipv4 || planetary || wireguard)) networkError.value = true;
-  else networkError.value = false;
-});
+
 async function deploy() {
   layout.value.setStatus("deploy");
 
