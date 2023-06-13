@@ -35,7 +35,9 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Name" v-model="name" v-bind="props" />
+          <input-tooltip #="{ tooltipProps }" tooltip="Solution name.">
+            <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+          </input-tooltip>
         </input-validator>
         <input-validator
           :value="email"
@@ -45,12 +47,14 @@
           ]"
           #="{ props }"
         >
-          <v-text-field
-            label="Email"
-            placeholder="This email will be used to login to your instance."
-            v-model="email"
-            v-bind="props"
-          />
+          <input-tooltip #="{ tooltipProps }" tooltip="This email will be used to login to your instance.">
+            <v-text-field
+              label="Email"
+              placeholder="This email will be used to login to your instance."
+              v-model="email"
+              v-bind="{ ...props, ...tooltipProps }"
+            />
+          </input-tooltip>
         </input-validator>
 
         <SelectSolutionFlavor

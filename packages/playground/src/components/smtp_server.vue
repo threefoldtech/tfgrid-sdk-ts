@@ -22,7 +22,7 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Mattermost admin email.">
+        <input-tooltip #="{ tooltipProps }" tooltip="SMTP admin email.">
           <v-text-field
             label="Admin Email"
             placeholder="email@example.com"
@@ -43,7 +43,7 @@
           ]"
           #="{ props: validatorProps }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="Mattermost admin password.">
+          <input-tooltip #="{ tooltipProps }" tooltip="SMTP admin password.">
             <v-text-field
               label="Admin Password"
               placeholder="email@example.com"
@@ -96,11 +96,37 @@
         :rules="[validators.required('Port is required.'), validators.isPort('Please provide a valid port.')]"
         #="{ props }"
       >
-        <v-text-field label="Port" v-model.number="$props.modelValue.port" v-bind="props" />
+        <input-tooltip #="{ tooltipProps }" tooltip="SMTP port server.">
+          <v-text-field label="Port" v-model.number="$props.modelValue.port" v-bind="{ ...props, ...tooltipProps }" />
+        </input-tooltip>
       </input-validator>
 
-      <v-switch inset color="primary" label="Use TLS" v-if="tls" />
-      <v-switch inset color="primary" label="Use SSL" v-if="ssl" />
+      <v-tooltip
+        location="top"
+        text="TLS (Transport Layer Security) is a cryptographic protocol that ensures secure communication over a network. It provides encryption, authentication, and data integrity, making it an essential component for secure deployments."
+      >
+        <template v-slot:activator="{ props }">
+          <v-switch inset color="primary" label="Use TLS" v-if="tls" v-bind="props" />
+        </template>
+      </v-tooltip>
+
+      <v-tooltip
+        location="top"
+        text="TLS (Transport Layer Security) is a cryptographic protocol that ensures secure communication over a network. It provides encryption, authentication, and data integrity, making it an essential component for secure deployments."
+      >
+        <template v-slot:activator="{ props }">
+          <v-switch inset color="primary" label="Use TLS" v-if="tls" v-bind="props" />
+        </template>
+      </v-tooltip>
+
+      <v-tooltip
+        location="top"
+        text="SSL (Secure Sockets Layer) is an older cryptographic protocol that was widely used for secure communication before being superseded by TLS. SSL and TLS are often used interchangeably, but technically TLS is the successor of SSL."
+      >
+        <template v-slot:activator="{ props }">
+          <v-switch inset color="primary" label="Use SSL" v-if="ssl" v-bind="props" />
+        </template>
+      </v-tooltip>
     </template>
   </div>
 </template>
