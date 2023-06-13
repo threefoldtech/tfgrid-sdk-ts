@@ -132,12 +132,18 @@ const filteredHeaders = computed(() => {
     ProjectName.Umbrel,
   ] as string[];
 
+  const flistSolutions = [ProjectName.VM, ProjectName.Fullvm] as string[];
+
   if (!IPV6Solutions.includes(props.projectName)) {
     headers = headers.filter(h => h.key !== "ipv6");
   }
 
   if (!IPV4Solutions.includes(props.projectName)) {
     headers = headers.filter(h => h.key !== "ipv4");
+  }
+
+  if (!flistSolutions.includes(props.projectName)) {
+    headers = headers.filter(h => h.key !== "flist");
   }
 
   return headers;
