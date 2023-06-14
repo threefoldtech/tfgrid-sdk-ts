@@ -365,7 +365,7 @@ export default class FarmsView extends Vue {
   callDeleteFarm() {
     this.loadingDeleteFarm = true;
     deleteFarm(
-      this.$route.params.accountID,
+      this.$store.state.credentials.account.address,
       this.$api,
       this.farmToDelete.id,
       (res: { events?: never[] | undefined; status: { type: string; asFinalized: string; isFinalized: string } }) => {
@@ -411,7 +411,7 @@ export default class FarmsView extends Vue {
   deletePublicIP(publicIP: any) {
     this.loadingDeleteIP = true;
     return deleteIP(
-      this.$route.params.accountID,
+      this.$store.state.credentials.account.address,
       this.$api,
       this.expanded[0].id,
       publicIP,
@@ -492,13 +492,18 @@ export default class FarmsView extends Vue {
         }
       };
       try {
-        batchCreateIP(this.$route.params.accountID, this.$api, this.expanded[0].id, publicIPs, gateway, callback).catch(
-          e => {
-            console.log("error from catch batch", e);
-            this.$toasted.show(`Transaction cancelled`);
-            this.loadingCreateIP = false;
-          },
-        );
+        batchCreateIP(
+          this.$store.state.credentials.account.address,
+          this.$api,
+          this.expanded[0].id,
+          publicIPs,
+          gateway,
+          callback,
+        ).catch(e => {
+          console.log("error from catch batch", e);
+          this.$toasted.show(`Transaction cancelled`);
+          this.loadingCreateIP = false;
+        });
       } catch (e) {
         reject(e);
         this.loadingCreateIP = false;
@@ -521,7 +526,7 @@ export default class FarmsView extends Vue {
     this.loadingCreateFarm = true;
 
     createFarm(
-      this.$route.params.accountID,
+      this.$store.state.credentials.account.address,
       this.$api,
       this.farmName,
       (res: { events?: never[] | undefined; status: { type: string; asFinalized: string; isFinalized: string } }) => {
@@ -583,7 +588,7 @@ export default class FarmsView extends Vue {
   public addV2Address() {
     this.loadingAddStellar = true;
     setFarmPayoutV2Address(
-      this.$route.params.accountID,
+      this.$store.state.credentials.account.address,
       this.$api,
       this.expanded[0].id, //farm ID
       this.v2_address,

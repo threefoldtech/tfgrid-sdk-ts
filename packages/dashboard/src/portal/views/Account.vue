@@ -122,13 +122,18 @@ export default class AccountView extends Vue {
         });
       }
     }
-    this.openDialog = !(await userAcceptedTermsAndConditions(this.$api, this.$route.params.accountID));
+    this.openDialog = !(await userAcceptedTermsAndConditions(this.$api, this.$store.state.credentials.account.address));
   }
   async mounted() {
     if (this.$api) {
-      this.openDialog = !(await userAcceptedTermsAndConditions(this.$api, this.$route.params.accountID));
-      const document = await axios.get(this.documentLink);
-      this.documentHash = md5(document.data);
+      if (this.$store.state.credentials.initialized) {
+        this.openDialog = !(await userAcceptedTermsAndConditions(
+          this.$api,
+          this.$store.state.credentials.account.address,
+        ));
+        const document = await axios.get(this.documentLink);
+        this.documentHash = md5(document.data);
+      }
       this.selectedName = this.items.filter(item => item.id === this.selectedItem.item_id)[0].name;
     } else {
       this.$toasted.show(`Can't connect to Polkadot API right now, please refresh the page or try again later`);
@@ -139,14 +144,14 @@ export default class AccountView extends Vue {
     }
   }
   unmounted() {
-    this.$route.params.accountID = "";
+    this.$store.state.credentials.account.address = "";
     this.$store.commit("UNSET_CREDENTIALS");
   }
 
   public async createTwinFunc(relay: string, pk: string | null) {
     this.loadingTwinCreate = true;
     await createTwin(
-      this.$route.params.accountID,
+      this.$store.state.credentials.account.address,
       this.$api,
       relay,
       pk,
@@ -173,7 +178,7 @@ export default class AccountView extends Vue {
               console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
               if (section === "tfgridModule" && method === "TwinStored") {
                 const selectedAccount: accountInterface = this.$store.state.portal.accounts.filter(
-                  (account: accountInterface) => account.address == this.$route.params.accountID,
+                  (account: accountInterface) => account.address == this.$store.state.credentials.account.address,
                 )[0];
                 selectedAccount.active = true;
                 this.$store.commit("SET_CREDENTIALS", { api: this.$api, account: selectedAccount });
@@ -196,10 +201,10 @@ export default class AccountView extends Vue {
   }
   public acceptTC() {
     this.loadingAcceptedTC = true;
-    activateThroughActivationService(this.$route.params.accountID);
+    activateThroughActivationService(this.$store.state.credentials.account.address);
     acceptTermsAndCondition(
       this.$api,
-      this.$route.params.accountID,
+      this.$store.state.credentials.account.address,
       this.documentLink,
       this.documentHash,
       (res: { events?: never[] | undefined; status: { type: string; asFinalized: string; isFinalized: string } }) => {
