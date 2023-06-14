@@ -23,6 +23,12 @@
             <p>
               Locked:
               <strong :style="{ color: '#76e2c8' }">{{ normalizeBalance(balance.locked, true) || 0 }} TFT</strong>
+              <IconActionBtn
+                tooltip="Locked balance documentation"
+                color="white"
+                icon="mdi-information-outline"
+                href="https://manual.grid.tf/tfchain/tfchain.html?highlight=locked#contract-locking"
+              />
             </p>
           </template>
         </div>
@@ -272,6 +278,7 @@ import { onMounted, type Ref, ref, watch } from "vue";
 import { nextTick } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
+import IconActionBtn from "../components/icon_action_btn.vue";
 import { useProfileManager } from "../stores";
 import { type Balance, createAccount, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
 import { isEnoughBalance, normalizeError } from "../utils/helpers";
@@ -562,6 +569,7 @@ export default {
   name: "ProfileManager",
   components: {
     QrcodeGenerator,
+    IconActionBtn,
   },
 };
 </script>
