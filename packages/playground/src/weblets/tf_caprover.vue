@@ -78,7 +78,7 @@
             ]"
             #="{ props: validationProps }"
           >
-            <input-tooltip #="{ tooltipProps }" tooltip="Solution admin password.">
+            <input-tooltip #="{ tooltipProps }" tooltip="Instance admin password.">
               <v-text-field
                 label="Password"
                 v-model="password"

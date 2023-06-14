@@ -41,7 +41,7 @@
           ]"
           #="{ props }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="Solution name.">
+          <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
             <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
           </input-tooltip>
         </input-validator>

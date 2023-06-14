@@ -36,7 +36,7 @@
           ]"
           #="{ props }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="Solution name.">
+          <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
             <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
           </input-tooltip>
         </input-validator>
@@ -53,7 +53,7 @@
           ]"
           #="{ props }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="the number of virtual cores allocated to your solution.">
+          <input-tooltip #="{ tooltipProps }" tooltip="the number of virtual cores allocated to your instance.">
             <v-text-field
               label="CPU (vCores)"
               type="number"
@@ -75,7 +75,7 @@
         >
           <input-tooltip
             #="{ tooltipProps }"
-            tooltip="Memory (MB) refers to the amount of RAM (Random Access Memory) allocated to your solution."
+            tooltip="Memory (MB) refers to the amount of RAM (Random Access Memory) allocated to your instance."
           >
             <v-text-field
               label="Memory (MB)"
@@ -98,7 +98,7 @@
         >
           <input-tooltip
             #="{ tooltipProps }"
-            tooltip="Disk Size (GB) refers to the storage capacity allocated to your solution, indicating the amount of space available to store files, data, and applications."
+            tooltip="Disk Size (GB) refers to the storage capacity allocated to your instance, indicating the amount of space available to store files, data, and applications."
           >
             <v-text-field
               label="Disk Size (GB)"
