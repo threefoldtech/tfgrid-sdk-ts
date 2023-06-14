@@ -26,7 +26,7 @@
     ]"
     #="{ props }"
   >
-    <input-tooltip #="{ tooltipProps }" tooltip="the number of virtual cores allocated to your solution.">
+    <input-tooltip #="{ tooltipProps }" tooltip="The number of virtual cores allocated to your instance.">
       <v-text-field
         label="CPU (vCores)"
         type="number"
@@ -46,10 +46,7 @@
     ]"
     #="{ props }"
   >
-    <input-tooltip
-      #="{ tooltipProps }"
-      tooltip="Memory (MB) refers to the amount of RAM (Random Access Memory) allocated to your solution."
-    >
+    <input-tooltip #="{ tooltipProps }" tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
       <v-text-field
         label="Memory (MB)"
         type="number"
@@ -81,7 +78,7 @@
 
   <v-tooltip
     location="top"
-    text="Public IPv4 refers to an Internet Protocol version 4 address that is globally unique and accessible over the internet."
+    text="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
   >
     <template v-slot:activator="{ props }">
       <v-switch color="primary" inset label="Public IPv4" v-model="$props.modelValue.ipv4" v-bind="props" />

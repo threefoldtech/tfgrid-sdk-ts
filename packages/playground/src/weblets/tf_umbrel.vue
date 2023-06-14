@@ -73,7 +73,7 @@
 
       <v-tooltip
         location="top"
-        text="Public IPv4 refers to an Internet Protocol version 4 address that is globally unique and accessible over the internet."
+        text="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
       >
         <template v-slot:activator="{ props }">
           <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />

@@ -53,7 +53,7 @@
           ]"
           #="{ props }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="the number of virtual cores allocated to your instance.">
+          <input-tooltip #="{ tooltipProps }" tooltip="The number of virtual cores allocated to your instance.">
             <v-text-field
               label="CPU (vCores)"
               type="number"
@@ -75,7 +75,7 @@
         >
           <input-tooltip
             #="{ tooltipProps }"
-            tooltip="Memory (MB) refers to the amount of RAM (Random Access Memory) allocated to your instance."
+            tooltip="The amount of RAM (Random Access Memory) allocated to your instance."
           >
             <v-text-field
               label="Memory (MB)"
@@ -98,7 +98,7 @@
         >
           <input-tooltip
             #="{ tooltipProps }"
-            tooltip="Disk Size (GB) refers to the storage capacity allocated to your instance, indicating the amount of space available to store files, data, and applications."
+            tooltip="The storage capacity allocated to your instance, indicating the amount of space available to store files, data, and applications."
           >
             <v-text-field
               label="Disk Size (GB)"
@@ -111,7 +111,7 @@
 
         <v-tooltip
           location="top"
-          text="Public IPv4 refers to an Internet Protocol version 4 address that is globally unique and accessible over the internet."
+          text="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
         >
           <template v-slot:activator="{ props }">
             <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
@@ -138,7 +138,7 @@
 
         <v-tooltip
           location="top"
-          text="Enabling WireGuard Access allows you to establish secure and encrypted connections to your network resources."
+          text="Enabling WireGuard Access allows you to establish private, secure, and encrypted connections to your instance."
         >
           <template v-slot:activator="{ props }">
             <v-switch color="primary" inset label="Add Wireguard Access" v-model="wireguard" v-bind="props" />

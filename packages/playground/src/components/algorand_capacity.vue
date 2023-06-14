@@ -19,7 +19,7 @@
         #="{ props }"
         ref="cpuInput"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="the number of virtual cores allocated to your solution.">
+        <input-tooltip #="{ tooltipProps }" tooltip="The number of virtual cores allocated to your instance.">
           <v-text-field
             label="CPU (vCores)"
             type="number"
@@ -41,7 +41,7 @@
       >
         <input-tooltip
           #="{ tooltipProps }"
-          tooltip="Memory (MB) refers to the amount of RAM (Random Access Memory) allocated to your solution."
+          tooltip="The amount of RAM (Random Access Memory) allocated to your instance."
         >
           <v-text-field
             label="Memory (MB)"
@@ -64,7 +64,7 @@
       >
         <input-tooltip
           #="{ tooltipProps }"
-          tooltip="Disk Size (GB) refers to the storage capacity allocated to your solution, indicating the amount of space available to store files, data, and applications."
+          tooltip="The storage capacity allocated to your instance, indicating the amount of space available to store files, data, and applications."
         >
           <v-text-field
             label="Storage Size (GB)"

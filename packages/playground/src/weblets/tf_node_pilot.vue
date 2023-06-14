@@ -37,7 +37,7 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="the number of virtual cores allocated to your instance.">
+        <input-tooltip #="{ tooltipProps }" tooltip="The number of virtual cores allocated to your instance.">
           <v-text-field
             label="CPU (vCores)"
             type="number"
@@ -59,7 +59,7 @@
       >
         <input-tooltip
           #="{ tooltipProps }"
-          tooltip="Memory (MB) refers to the amount of RAM (Random Access Memory) allocated to your instance."
+          tooltip="The amount of RAM (Random Access Memory) allocated to your instance."
         >
           <v-text-field
             label="Memory (MB)"
