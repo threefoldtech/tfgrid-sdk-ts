@@ -58,6 +58,29 @@ export enum ProjectName {
   Umbrel = "Umbrel",
 }
 
+export enum DeploymentTitle {
+  Kubernetes = "Clusters",
+  CapRover = "CapRover machines",
+  Discourse = "Discourse machines",
+  Funkwhale = "Funkwhale machines",
+  Mastodon = "Mastodon machines",
+  Mattermost = "Mattermost machines",
+  Owncloud = "Owncloud machines",
+  Peertube = "Peertube machines",
+  Subsquid = "Subsquid machines",
+  Taiga = "Taiga machines",
+  Wordpress = "Wordpress machines",
+  GatewayName = "Gateway names",
+  TFhubValidator = "TFhubValidator machines",
+  Casperlabs = "Casperlabs machines",
+  Presearch = "Presearch machines",
+  Qvm = "QSFS virtual machines",
+  VM = "Micro Virtual machines",
+  NodePilot = "Node Pilot machines",
+  Fullvm = "Full virtual machines",
+  Algorand = "Algorand machines",
+  Umbrel = "Umbrel machines",
+}
 export enum SolutionCode {
   peertube = "pt",
   funkwhale = "fw",

@@ -1,12 +1,7 @@
 <template>
   <weblet-layout ref="layout">
     <template #title>
-      Deployment List
-      {{
-        $props.projectName
-          ? "(" + (tabs.find(tab => tab.value === $props.projectName)?.title ?? $props.projectName) + ")"
-          : ""
-      }}
+      {{ DeploymentTitle[$props.projectName!] ?? "" }}
     </template>
     <template #subtitle v-if="!$props.projectName"> List your own deployments for different solutions </template>
     <d-tabs
@@ -317,9 +312,9 @@ import type { Tab } from "../components/dynamic_tabs.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { deploymentListEnvironments } from "../constants/deployment_list";
 import { useProfileManager } from "../stores";
+import { DeploymentTitle } from "../types";
 import { deleteDeployment } from "../utils/delete_deployment";
 import { getGrid, updateGrid } from "../utils/grid";
-
 const props = defineProps<{ projectName?: ProjectName }>();
 
 const tabs: Tab[] = [
