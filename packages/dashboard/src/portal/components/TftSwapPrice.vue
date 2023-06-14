@@ -9,7 +9,7 @@
               <v-icon>mdi-swap-horizontal</v-icon>
             </v-btn>
           </template>
-          <span>ThreeFold Price Swapping</span>
+          <span>TFT Exchange Rate</span>
         </v-tooltip>
         <p>{{ prices[1].amount }} {{ prices[1].currency }}</p>
       </div>
