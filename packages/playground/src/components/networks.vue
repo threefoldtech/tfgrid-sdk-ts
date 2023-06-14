@@ -61,6 +61,10 @@ import { computed } from "vue";
 export default {
   name: "Network",
   props: {
+    required: {
+      type: Boolean,
+      default: () => false,
+    },
     ipv4: {
       type: Boolean,
       default: () => null,
@@ -88,7 +92,7 @@ export default {
     if (props.ipv4 === null && props.ipv6 === null && props.planetary === null && props.wireguard === null) {
       throw new Error("You must provide at least one network  option");
     }
-    const error = computed(() => !(props.ipv4 || props.ipv6 || props.planetary || props.wireguard));
+    const error = computed(() => !(props.ipv4 || props.ipv6 || props.planetary || props.wireguard) && props.required);
     expose({
       error,
     });

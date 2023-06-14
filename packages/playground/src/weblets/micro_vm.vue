@@ -71,6 +71,7 @@
         </input-validator>
 
         <Network
+          required
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"

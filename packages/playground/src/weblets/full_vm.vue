@@ -80,6 +80,7 @@
           <v-text-field label="Disk Size (GB)" type="number" v-model.number="diskSize" v-bind="props" />
         </input-validator>
         <Network
+          required
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"

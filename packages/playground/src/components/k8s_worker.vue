@@ -53,10 +53,11 @@
     <v-text-field label="Disk Size (GB)" type="number" v-model.number="$props.modelValue.diskSize" v-bind="props" />
   </input-validator>
 
-  <v-switch label="Public IPv4" inset color="primary" v-model="$props.modelValue.ipv4" />
-  <v-switch label="Public IPv6" inset color="primary" v-model="$props.modelValue.ipv6" />
-  <v-switch label="Planetary Network" inset color="primary" v-model="$props.modelValue.planetary" />
-
+  <Network
+    v-model:ipv4="$props.modelValue.ipv4"
+    v-model:ipv6="$props.modelValue.ipv6"
+    v-model:planetary="$props.modelValue.planetary"
+  />
   <RootFsSize
     :cpu="$props.modelValue.cpu"
     :memory="$props.modelValue.memory"
@@ -82,6 +83,7 @@ defineProps<{ modelValue: K8SWorker }>();
 import { generateString } from "@threefold/grid_client";
 
 import type { Farm, K8SWorker } from "../types";
+import Network from "./networks.vue";
 import RootFsSize from "./root_fs_size.vue";
 import SelectFarm from "./select_farm.vue";
 
