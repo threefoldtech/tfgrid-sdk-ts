@@ -127,7 +127,7 @@ export default class NodesTable extends Vue {
   }
 
   async mounted() {
-    this.address = this.$route.params.accountID;
+    this.address = this.$store.state.credentials.account.address;
   }
 
   async onUpdateOptions(pageNumber: number, pageSize: number) {

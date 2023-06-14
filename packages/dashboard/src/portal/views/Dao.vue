@@ -292,7 +292,7 @@ export default class DaoView extends Vue {
     }
     this.loadingVote = true;
     vote(
-      this.$route.params.accountID,
+      this.$store.state.credentials.account.address,
       this.$api,
       this.selectedFarm,
       this.selectedProposal,
