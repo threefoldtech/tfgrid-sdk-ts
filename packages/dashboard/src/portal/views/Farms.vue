@@ -36,7 +36,7 @@
             @click="createFarmFromName"
             :loading="loadingCreateFarm"
             :disabled="!isValidFarmName"
-            >Submit</v-btn
+            >Create</v-btn
           >
           <v-btn @click="openCreateFarmDialog = false" color="grey lighten-2 black--text">Close</v-btn>
         </v-card-actions>
