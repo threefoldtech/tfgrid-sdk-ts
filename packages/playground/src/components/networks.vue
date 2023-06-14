@@ -1,6 +1,16 @@
 <template>
-  <v-expansion-panels variant="inset" class="mb-4" :readonly="error">
-    <v-expansion-panel title="Network" expand-icon="mdi-menu-down" collapse-icon="mdi-menu-up">
+  <v-expansion-panels variant="inset" class="mb-4">
+    <v-expansion-panel expand-icon="mdi-menu-down" collapse-icon="mdi-menu-up">
+      <template v-slot:title>
+        <span class="text-h6">Network</span>
+        <v-chip v-if="error" variant="text">
+          <v-icon color="warning" icon="mdi-alert-circle" />
+        </v-chip>
+        <v-chip v-if="ipv4" variant="outlined" size="small" class="ml-2"> IPV4 </v-chip>
+        <v-chip v-if="ipv6" variant="outlined" size="small" class="ml-2"> IPV6 </v-chip>
+        <v-chip v-if="planetary" variant="outlined" size="small" class="ml-2"> Planetary </v-chip>
+        <v-chip v-if="wireguard" variant="outlined" size="small" class="ml-2"> Wireguard </v-chip>
+      </template>
       <v-expansion-panel-text>
         <v-switch
           v-if="ipv4 !== null"
@@ -93,7 +103,8 @@ export default {
 .v-expansion-panel-title__overlay {
   opacity: 0.05;
 }
+
 .v-expansion-panel-title {
-  padding: 21px 13px;
+  padding: 13px 13px;
 }
 </style>
