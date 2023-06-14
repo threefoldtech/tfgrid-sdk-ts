@@ -27,7 +27,7 @@
 
       <v-list-item>
         <v-list-item-content>
-          <v-list-item-title> RELAY </v-list-item-title>
+          <v-list-item-title> Relay </v-list-item-title>
         </v-list-item-content>
         {{ twin.relay }}
       </v-list-item>
