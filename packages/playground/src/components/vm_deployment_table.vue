@@ -1,7 +1,13 @@
 <template>
   <div>
     <v-alert v-if="!loading && count && items.length < count" type="warning" variant="tonal">
-      Failed to load <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
+      Failed to load <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }};
+      <span>
+        This might happen because the node is down or it's not reachable or the deployment{{
+          count - items.length > 1 ? "s are" : " is"
+        }}
+        encrypted by another key.
+      </span>
     </v-alert>
 
     <ListTable

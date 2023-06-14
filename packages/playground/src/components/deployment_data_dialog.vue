@@ -10,21 +10,17 @@
             </v-btn-toggle>
           </div>
 
-          <v-tabs v-model="activeTab" align-tabs="center" class="my-4" v-if="showType === 0">
+          <v-tabs v-model="activeTab" align-tabs="center" class="my-4 mx-auto" v-if="showType === 0">
             <v-tab
               v-for="(item, index) in contracts"
               :key="item.contractId"
               variant="tonal"
               color="primary"
-              :class="{ 'mr-4': index === 0 && hasMaster(item) }"
+              class="mx-2"
             >
-              <v-tooltip
-                location="bottom"
-                :text="getMetadata(contract).projectName === 'caprover' ? 'Leader' : 'Master'"
-                :disabled="index !== 0 || !hasMaster(item)"
-              >
+              <v-tooltip location="bottom" :text="getTooltipText(item, index)" :disabled="!hasMaster(item)">
                 <template #activator="{ props }">
-                  <span v-bind="props">{{ item.name }}</span>
+                  <span v-bind="props" class="text-lowercase">{{ item.name }}</span>
                 </template>
               </v-tooltip>
             </v-tab>
@@ -54,12 +50,6 @@
               />
               <CopyReadonlyInput label="WireGuard IP" :data="contract.interfaces[0].ip" />
               <CopyReadonlyInput label="WireGuard Config" textarea :data="data.wireguard" v-if="data.wireguard" />
-              <CopyReadonlyInput
-                v-else-if="data[0].wireguard"
-                label="WireGuard Config"
-                textarea
-                :data="data[0].wireguard"
-              />
               <CopyReadonlyInput label="Flist" :data="contract.flist" v-if="contract.flist" />
               <template v-if="environments !== false">
                 <template v-for="key of Object.keys(contract.env)" :key="key">
@@ -239,6 +229,20 @@ function getMetadata(contract: any): { type: string; projectName: string } {
 function hasMaster(contract: any): boolean {
   const meta = getMetadata(contract);
   return meta.type === "kubernetes" || meta.projectName === "caprover";
+}
+
+function getTooltipText(contract: any, index: number) {
+  if (index === 0 && getMetadata(contract).projectName === "caprover") {
+    return "Leader";
+  }
+
+  if (index === 0 && getMetadata(contract).projectName === "kubernetes") {
+    return "Master";
+  }
+
+  if (index !== 0) {
+    return "Worker";
+  }
 }
 </script>
 
