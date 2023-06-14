@@ -35,7 +35,9 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Name" v-model="name" v-bind="props" />
+          <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
+            <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+          </input-tooltip>
         </input-validator>
 
         <input-validator
@@ -50,7 +52,9 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Username" v-model="username" v-bind="props" />
+          <input-tooltip #="{ tooltipProps }" tooltip="Admin username.">
+            <v-text-field label="Username" v-model="username" v-bind="{ ...props, ...tooltipProps }" />
+          </input-tooltip>
         </input-validator>
 
         <password-input-wrapper #="{ props }">
@@ -63,7 +67,13 @@
             ]"
             #="{ props: validatorProps }"
           >
-            <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
+            <input-tooltip #="{ tooltipProps }" tooltip="Admin password.">
+              <v-text-field
+                label="Password"
+                v-model="password"
+                v-bind="{ ...props, ...validatorProps, ...tooltipProps }"
+              />
+            </input-tooltip>
           </input-validator>
         </password-input-wrapper>
 
@@ -75,7 +85,9 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Email" v-bind="props" v-model="email" />
+          <input-tooltip #="{ tooltipProps }" tooltip="Admin email.">
+            <v-text-field label="Email" v-bind="{ ...props, ...tooltipProps }" v-model="email" />
+          </input-tooltip>
         </input-validator>
 
         <SelectSolutionFlavor

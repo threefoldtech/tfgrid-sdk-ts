@@ -37,7 +37,9 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Name" v-model="name" v-bind="props" />
+          <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
+            <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+          </input-tooltip>
         </input-validator>
 
         <SelectVmImage :images="images" v-model="flist" />
@@ -54,7 +56,14 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
+          <input-tooltip #="{ tooltipProps }" tooltip="The number of virtual cores allocated to your instance.">
+            <v-text-field
+              label="CPU (vCores)"
+              type="number"
+              v-model.number="cpu"
+              v-bind="{ ...props, ...tooltipProps }"
+            />
+          </input-tooltip>
         </input-validator>
 
         <input-validator
@@ -67,13 +76,55 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
+          <input-tooltip
+            #="{ tooltipProps }"
+            tooltip="The amount of RAM (Random Access Memory) allocated to your instance."
+          >
+            <v-text-field
+              label="Memory (MB)"
+              type="number"
+              v-model.number="memory"
+              v-bind="{ ...props, ...tooltipProps }"
+            />
+          </input-tooltip>
         </input-validator>
 
-        <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
-        <v-switch color="primary" inset label="Public IPv6" v-model="ipv6" />
-        <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
-        <v-switch color="primary" inset label="Add Wireguard Access" v-model="wireguard" />
+        <v-tooltip
+          location="top"
+          text="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
+        >
+          <template v-slot:activator="{ props }">
+            <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
+          </template>
+        </v-tooltip>
+
+        <v-tooltip
+          location="top"
+          text="Public IPv6 is the next-generation Internet Protocol that offers an expanded address space to connect a vast number of devices."
+        >
+          <template v-slot:activator="{ props }">
+            <v-switch color="primary" inset label="Public IPv6" v-model="ipv6" v-bind="props" />
+          </template>
+        </v-tooltip>
+
+        <v-tooltip
+          location="top"
+          text="The Planetary Network is a distributed network infrastructure that spans across multiple regions and countries, providing global connectivity."
+        >
+          <template v-slot:activator="{ props }">
+            <v-switch color="primary" inset label="Planetary Network" v-model="planetary" v-bind="props" />
+          </template>
+        </v-tooltip>
+
+        <v-tooltip
+          location="top"
+          text="Enabling WireGuard Access allows you to establish private, secure, and encrypted connections to your instance."
+        >
+          <template v-slot:activator="{ props }">
+            <v-switch color="primary" inset label="Add Wireguard Access" v-model="wireguard" v-bind="props" />
+          </template>
+        </v-tooltip>
+
         <v-alert v-show="networkError" class="mb-2" type="warning" variant="tonal">
           You must enable at least one of network options.
         </v-alert>
@@ -105,7 +156,14 @@
             ]"
             #="{ props }"
           >
-            <v-text-field label="Name" v-model="envs[index].key" v-bind="props" :disabled="isRequired" />
+            <input-tooltip #="{ tooltipProps }" tooltip="Environment key.">
+              <v-text-field
+                label="Name"
+                v-model="envs[index].key"
+                v-bind="{ ...props, ...tooltipProps }"
+                :disabled="isRequired"
+              />
+            </input-tooltip>
           </input-validator>
 
           <input-validator
@@ -113,7 +171,15 @@
             :rules="[validators.required('Value is required.')]"
             #="{ props }"
           >
-            <v-textarea label="Value" v-model="envs[index].value" no-resize :spellcheck="false" v-bind="props" />
+            <input-tooltip #="{ tooltipProps }" tooltip="Environment Value.">
+              <v-textarea
+                label="Value"
+                v-model="envs[index].value"
+                no-resize
+                :spellcheck="false"
+                v-bind="{ ...props, ...tooltipProps }"
+              />
+            </input-tooltip>
           </input-validator>
         </ExpandableLayout>
       </template>
@@ -134,7 +200,9 @@
             ]"
             #="{ props }"
           >
-            <v-text-field label="Name" v-model="disks[index].name" v-bind="props" />
+            <input-tooltip #="{ tooltipProps }" tooltip="Disk name.">
+              <v-text-field label="Name" v-model="disks[index].name" v-bind="{ ...props, ...tooltipProps }" />
+            </input-tooltip>
           </input-validator>
           <input-validator
             :value="disks[index].size"
@@ -146,7 +214,14 @@
             ]"
             #="{ props }"
           >
-            <v-text-field label="Size (GB)" type="number" v-model.number="disks[index].size" v-bind="props" />
+            <input-tooltip #="{ tooltipProps }" tooltip="Disk Size.">
+              <v-text-field
+                label="Size (GB)"
+                type="number"
+                v-model.number="disks[index].size"
+                v-bind="{ ...props, ...tooltipProps }"
+              />
+            </input-tooltip>
           </input-validator>
         </ExpandableLayout>
       </template>

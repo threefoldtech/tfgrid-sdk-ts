@@ -22,13 +22,15 @@
         ]"
         #="{ props }"
       >
-        <v-text-field
-          label="Email"
-          placeholder="email@example.com"
-          v-model="$props.modelValue.username"
-          v-bind="props"
-          autofocus
-        />
+        <input-tooltip #="{ tooltipProps }" tooltip="SMTP admin email.">
+          <v-text-field
+            label="Admin Email"
+            placeholder="email@example.com"
+            v-model="$props.modelValue.username"
+            v-bind="{ ...props, ...tooltipProps }"
+            autofocus
+          />
+        </input-tooltip>
       </input-validator>
 
       <password-input-wrapper #="{ props }">
@@ -41,11 +43,15 @@
           ]"
           #="{ props: validatorProps }"
         >
-          <v-text-field
-            label="Password"
-            v-model="$props.modelValue.password"
-            v-bind="{ ...props, ...validatorProps }"
-          />
+          <input-tooltip #="{ tooltipProps }" tooltip="SMTP admin password.">
+            <v-text-field
+              label="Admin Password"
+              placeholder="email@example.com"
+              v-model="$props.modelValue.password"
+              v-bind="{ ...props, ...tooltipProps }"
+              autofocus
+            />
+          </input-tooltip>
         </input-validator>
       </password-input-wrapper>
 
@@ -58,12 +64,15 @@
         v-if="email"
         #="{ props }"
       >
-        <v-text-field
-          label="From Email Address"
-          placeholder="support@example.com"
-          v-bind="props"
-          v-model="$props.modelValue.email"
-        />
+        <input-tooltip #="{ tooltipProps }" tooltip="From email address.">
+          <v-text-field
+            label="From Email Address"
+            placeholder="email@example.com"
+            v-model="$props.modelValue.email"
+            v-bind="{ ...props, ...tooltipProps }"
+            autofocus
+          />
+        </input-tooltip>
       </input-validator>
 
       <input-validator
@@ -71,7 +80,15 @@
         :rules="[validators.required('Hostname is required.'), validators.isURL('Please provide a valid hostname.')]"
         #="{ props }"
       >
-        <v-text-field label="Hostname" v-model="$props.modelValue.hostname" v-bind="props" />
+        <input-tooltip #="{ tooltipProps }" tooltip="SMTP host server.">
+          <v-text-field
+            label="Hostname"
+            placeholder="email@example.com"
+            v-model="$props.modelValue.hostname"
+            v-bind="{ ...props, ...tooltipProps }"
+            autofocus
+          />
+        </input-tooltip>
       </input-validator>
 
       <input-validator
@@ -79,11 +96,28 @@
         :rules="[validators.required('Port is required.'), validators.isPort('Please provide a valid port.')]"
         #="{ props }"
       >
-        <v-text-field label="Port" v-model.number="$props.modelValue.port" v-bind="props" />
+        <input-tooltip #="{ tooltipProps }" tooltip="SMTP port server.">
+          <v-text-field label="Port" v-model.number="$props.modelValue.port" v-bind="{ ...props, ...tooltipProps }" />
+        </input-tooltip>
       </input-validator>
 
-      <v-switch inset color="primary" label="Use TLS" v-if="tls" />
-      <v-switch inset color="primary" label="Use SSL" v-if="ssl" />
+      <v-tooltip
+        location="top"
+        text="TLS (Transport Layer Security) is a cryptographic protocol that ensures secure communication over a network. It provides encryption, authentication, and data integrity, making it an essential component for secure deployments."
+      >
+        <template v-slot:activator="{ props }">
+          <v-switch inset color="primary" label="Use TLS" v-if="tls" v-bind="props" />
+        </template>
+      </v-tooltip>
+
+      <v-tooltip
+        location="top"
+        text="SSL (Secure Sockets Layer) is an older cryptographic protocol that was widely used for secure communication before being superseded by TLS. SSL and TLS are often used interchangeably, but technically TLS is the successor of SSL."
+      >
+        <template v-slot:activator="{ props }">
+          <v-switch inset color="primary" label="Use SSL" v-if="ssl" v-bind="props" />
+        </template>
+      </v-tooltip>
     </template>
   </div>
 </template>
