@@ -61,8 +61,7 @@
         </input-validator>
       </password-input-wrapper>
 
-      <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
-
+      <Network v-model:ipv4="ipv4" />
       <SelectSolutionFlavor
         v-model="solution"
         :minimum="{ cpu: 2, memory: 1024 * 2, disk: 10 }"
@@ -166,6 +165,7 @@ async function deploy() {
 </script>
 
 <script lang="ts">
+import Network from "../components/networks.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";

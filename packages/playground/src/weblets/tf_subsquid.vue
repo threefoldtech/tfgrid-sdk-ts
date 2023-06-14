@@ -43,8 +43,7 @@
         <v-text-field label="Websockt Endpoint" v-model="endpoint" v-bind="props" />
       </input-validator>
 
-      <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
-
+      <Network v-model:ipv4="ipv4" />
       <SelectSolutionFlavor
         v-model="solution"
         :minimum="{ cpu: 1, memory: 1024, disk: 50 }"
@@ -175,6 +174,7 @@ async function deploy() {
 </script>
 
 <script lang="ts">
+import Network from "../components/networks.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
