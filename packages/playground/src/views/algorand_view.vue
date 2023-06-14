@@ -1,11 +1,11 @@
 <template>
-  <div>
+  <view-layout>
     <TfAlgorand />
 
-    <div class="mt-4">
+    <template #list>
       <TfDeploymentList :project-name="name" />
-    </div>
-  </div>
+    </template>
+  </view-layout>
 </template>
 
 <script lang="ts">

@@ -1,6 +1,6 @@
 <template>
   <div class="border px-4 pb-4 rounded position-relative mt-10" :class="{ 'pt-10': hasInfo, 'pt-6': !hasInfo }">
-    <div class="mb-6" v-if="$slots.description">
+    <div class="mb-6" :style="{ opacity: 'var(--v-medium-emphasis-opacity)' }" v-if="$slots.description">
       <slot name="description"></slot>
     </div>
     <div

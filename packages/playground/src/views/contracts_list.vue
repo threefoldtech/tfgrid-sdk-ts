@@ -1,5 +1,7 @@
 <template>
-  <TfContractsList />
+  <view-layout>
+    <TfContractsList />
+  </view-layout>
 </template>
 
 <script lang="ts">
