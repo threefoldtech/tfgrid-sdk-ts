@@ -545,7 +545,7 @@ export default class FarmNodesTable extends Vue {
   ) {
     this.loadingPublicConfig = true;
     addNodePublicConfig(
-      this.$route.params.accountID,
+      this.$store.state.credentials.account.address,
       this.$api,
       this.nodeToEdit.farmId,
       this.nodeToEdit.nodeId,
@@ -775,7 +775,7 @@ export default class FarmNodesTable extends Vue {
     this.loadingDelete = true;
     this.openDeleteDialog = false;
     deleteNode(
-      this.$route.params.accountID,
+      this.$store.state.credentials.account.address,
       this.$api,
       parseInt(this.nodeToDelete.id.split("-")[1]),
       (res: { events?: never[] | undefined; status: { type: string; asFinalized: string; isFinalized: string } }) => {

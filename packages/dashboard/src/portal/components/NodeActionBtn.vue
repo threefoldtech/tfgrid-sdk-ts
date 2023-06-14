@@ -60,7 +60,7 @@ export default class NodeActionBtn extends Vue {
     console.log(`reserving node ${nodeId}`);
     createRentContract(
       this.$api,
-      this.$route.params.accountID,
+      this.$store.state.credentials.account.address,
       nodeId,
       this.solutionProviderID,
       async (res: { status: { type: string; asFinalized: string; isFinalized: string } }) => {
@@ -102,7 +102,7 @@ export default class NodeActionBtn extends Vue {
 
       cancelRentContract(
         this.$api,
-        this.$route.params.accountID,
+        this.$store.state.credentials.account.address,
         rentedNode.rentContractId,
         async (res: { status: { type: string; asFinalized: string; isFinalized: string } }) => {
           console.log(res);
