@@ -1,7 +1,7 @@
 <template>
   <section>
     <div class="d-flex my-6">
-      <h4 class="font-weight-bold" v-if="title">{{ title }}</h4>
+      <v-card-subtitle class="text-subtitle-1 mt-3" v-if="title">{{ title }}</v-card-subtitle>
       <v-spacer />
       <v-tooltip text="Add">
         <template #activator="{ props }">
