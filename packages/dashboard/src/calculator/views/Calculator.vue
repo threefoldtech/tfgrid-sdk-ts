@@ -88,19 +88,33 @@
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="5" class="mx-auto">
+            <v-col cols="2" class="mx-auto">
               <v-switch label="With a Public IP (V4)" @change="IPV4Toggle" />
             </v-col>
-
+            <v-col cols="2" class="mx-auto">
+              <v-switch
+                label="Use current balance"
+                :disabled="!$store.state.credentials.account.address"
+                @change="getCurrentBalance"
+                v-model="useCurrentBalance"
+              />
+            </v-col>
             <v-col cols="5" class="mx-auto">
-              <v-text-field
-                placeholder="Your Balance"
-                :rules="[...inputValidators]"
-                label="Your Balance"
-                suffix="TFT"
-                v-model="balance"
-                outlined
-              ></v-text-field>
+              <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    v-bind="attrs"
+                    v-on="on"
+                    placeholder="Balance"
+                    :rules="[...inputValidators]"
+                    label="Balance"
+                    suffix="TFT"
+                    v-model="balance"
+                    outlined
+                  />
+                </template>
+                <span>The amount of TFT to calculate discount</span>
+              </v-tooltip>
             </v-col>
           </v-row>
         </div>
@@ -129,9 +143,9 @@
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
 
+import { balanceInterface, getBalance } from "../../portal/lib/balance";
 import { calCU, calSU, getPrices } from "../../portal/lib/nodes";
 import Layout from "../components/Layout.vue";
-
 type priceType = {
   label?: string;
   color: string;
@@ -170,6 +184,9 @@ export default class Calculator extends Vue {
   pricing: any;
   TFTPrice: number | undefined;
   isValidInputs = true;
+  useCurrentBalance = false;
+  _balanceTmp: string = this.balance;
+
   cruCheck() {
     // eslint-disable-next-line
     const CRURegex = /^\d+$/;
@@ -277,6 +294,7 @@ export default class Calculator extends Vue {
 
   IPV4Toggle() {
     this.IPV4 = !this.IPV4;
+    console.log("current balance: " + this.$store.state.credentials.balance.free);
   }
 
   async calcPrice() {
@@ -346,6 +364,21 @@ export default class Calculator extends Vue {
   async getTFTPrice(api: { query: { tftPriceModule: { tftPrice: any } } }) {
     const pricing = await api.query.tftPriceModule.tftPrice();
     return pricing.words[0] / 1000;
+  }
+  async getCurrentBalance() {
+    if (!this.useCurrentBalance) {
+      this.balance = this._balanceTmp;
+      return;
+    }
+    try {
+      getBalance(this.$api, this.$store.state.credentials.account.address).then((balance: balanceInterface) => {
+        this.$store.state.credentials.balance.free = balance.free;
+        this._balanceTmp = this.balance;
+        this.balance = balance.free.toString();
+      });
+    } catch (error) {
+      console.log("Can't fetch the current balance due to error: " + error);
+    }
   }
 }
 </script>
