@@ -1,7 +1,9 @@
 <template>
   <view-layout>
     <template #description
-      >Mattermost A single point of collaboration. Designed specifically for digital operations.
+      >Mattermost is an open-source, self-hostable online chat service with file sharing, search, and integrations. It
+      is designed as an internal chat for organisations and companies, and mostly markets itself as an open-source
+      alternative to Slack and Microsoft Teams.
       <a target="_blank" href="https://manual.grid.tf/weblets/weblets_mattermost.html" class="app-link">
         read more about Mattermost
       </a></template
