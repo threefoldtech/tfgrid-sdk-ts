@@ -61,7 +61,7 @@ export default class NodeUsedResources extends Vue {
   @Prop({ required: true }) nodeStatus!: boolean;
   @Prop({ required: true }) grafanaUrl!: string;
   resources: any[] = [];
-  renamedResources = ["Cores", "RAM", "SSD", "HDD"];
+  renamedResources = ["CPU", "RAM", "SSD", "HDD"];
   loader = false;
 
   getNodeUsedResources() {
