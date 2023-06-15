@@ -125,13 +125,12 @@ defineProps<{ modelValue: K8SWorker }>();
 </script>
 
 <script lang="ts">
-import { generateString } from "@threefold/grid_client";
-
 import type { Farm, K8SWorker } from "../types";
+import { generateName } from "../utils/strings";
 import RootFsSize from "./root_fs_size.vue";
 import SelectFarm from "./select_farm.vue";
 
-export function createWorker(name: string = "wr" + generateString(9)): K8SWorker {
+export function createWorker(name: string = generateName(9, { prefix: "wr" })): K8SWorker {
   return {
     name,
     cpu: 1,
