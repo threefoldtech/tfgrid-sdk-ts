@@ -99,7 +99,7 @@ const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref("pt" + generateString(9));
+const name = ref("pt" + generateString(9).toLowerCase());
 const email = ref("");
 const password = ref(generateString(12));
 const solution = ref() as Ref<SolutionFlavor>;

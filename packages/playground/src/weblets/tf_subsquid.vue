@@ -96,7 +96,7 @@ const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref("ss" + generateString(9));
+const name = ref("ss" + generateString(9).toLowerCase());
 const endpoint = ref("");
 const ipv4 = ref(false);
 const solution = ref() as Ref<SolutionFlavor>;

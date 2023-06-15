@@ -91,7 +91,7 @@ function createEnvs(envs: Env[] = []): { [key: string]: string } {
 function createDisks(disks: Disk[] = []): DiskModel[] {
   return disks.map(disk => {
     const d = new DiskModel();
-    d.name = disk.name || "DS" + generateString(10);
+    d.name = disk.name || "disk" + generateString(7).toLowerCase();
     d.size = disk.size;
     d.mountpoint = disk.mountPoint;
     return d;

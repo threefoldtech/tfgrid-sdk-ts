@@ -74,7 +74,7 @@ const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref("cl" + generateString(9));
+const name = ref("cl" + generateString(9).toLowerCase());
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;

@@ -120,7 +120,7 @@ const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref("um" + generateString(9));
+const name = ref("um" + generateString(9).toLowerCase());
 const username = ref("admin");
 const password = ref(generateString(12));
 const ipv4 = ref(false);

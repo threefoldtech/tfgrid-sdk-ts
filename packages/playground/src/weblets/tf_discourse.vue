@@ -106,7 +106,7 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref("dc" + generateString(9));
+const name = ref("dc" + generateString(9).toLowerCase());
 const email = ref("");
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;

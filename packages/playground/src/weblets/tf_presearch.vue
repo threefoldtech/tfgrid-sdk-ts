@@ -145,7 +145,7 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref("ps" + generateString(8));
+const name = ref("ps" + generateString(8).toLowerCase());
 const code = ref("");
 const ipv4 = ref(false);
 const planetary = ref(true);

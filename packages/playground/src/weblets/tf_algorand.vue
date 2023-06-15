@@ -169,7 +169,7 @@ const valid = ref(false);
 const lastRoundInput = ref();
 const profileManager = useProfileManager();
 
-const name = ref("al" + generateString(9));
+const name = ref("al" + generateString(9).toLowerCase());
 const ipv4 = ref(false);
 const cpu = ref() as Ref<number>;
 const memory = ref() as Ref<number>;

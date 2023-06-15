@@ -83,7 +83,7 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref("mm" + generateString(9));
+const name = ref("mm" + generateString(9).toLowerCase());
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;

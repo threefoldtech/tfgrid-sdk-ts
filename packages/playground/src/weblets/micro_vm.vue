@@ -270,7 +270,7 @@ const images = [
   },
 ];
 
-const name = ref("vm" + generateString(8));
+const name = ref("vm" + generateString(8).toLowerCase());
 const flist = ref<Flist>();
 const rootFsSize = ref(2) as Ref<number>;
 const cpu = ref(4);
@@ -300,9 +300,9 @@ function layoutMount() {
 }
 
 function addDisk() {
-  const name = generateString(5);
+  const name = generateString(5).toLowerCase();
   disks.value.push({
-    name: "DISK" + name,
+    name: "disk" + name,
     size: 50,
     mountPoint: "/mnt/" + name,
   });

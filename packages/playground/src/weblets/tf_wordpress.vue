@@ -128,7 +128,7 @@ const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref("wp" + generateString(9));
+const name = ref("wp" + generateString(9).toLowerCase());
 const username = ref("admin");
 const email = ref("");
 const password = ref(generateString(12));

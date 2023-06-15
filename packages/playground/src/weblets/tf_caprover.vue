@@ -123,7 +123,7 @@ const profileManager = useProfileManager();
 
 const domain = ref("");
 const password = ref(generateString(10));
-const leader = ref(createWorker("cr" + generateString(9)));
+const leader = ref(createWorker("cr" + generateString(9).toLowerCase()));
 const workers = ref<CW[]>([]);
 
 async function deploy() {

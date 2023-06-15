@@ -48,7 +48,7 @@ import type { CaproverWorker } from "../types";
 import SelectFarm from "./select_farm.vue";
 import SelectSolutionFlavor from "./select_solution_flavor.vue";
 
-export function createWorker(name: string = "wr" + generateString(9)): CaproverWorker {
+export function createWorker(name: string = "wr" + generateString(9).toLowerCase()): CaproverWorker {
   return { name };
 }
 

@@ -244,7 +244,7 @@ const images: VmImage[] = [
   },
 ];
 
-const name = ref("vm" + generateString(8));
+const name = ref("vm" + generateString(8).toLowerCase());
 const flist = ref<Flist>();
 const cpu = ref(4);
 const memory = ref(8192);
@@ -258,9 +258,9 @@ const disks = ref<Disk[]>([]);
 const networkError = ref(false);
 
 function addDisk() {
-  const name = generateString(7);
+  const name = generateString(7).toLowerCase();
   disks.value.push({
-    name: "DISK" + name,
+    name: "disk" + name,
     size: 50,
     mountPoint: "/mnt/" + name,
   });

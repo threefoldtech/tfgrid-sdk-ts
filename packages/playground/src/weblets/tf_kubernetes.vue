@@ -103,9 +103,9 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref("k8s" + generateString(8));
+const name = ref("k8s" + generateString(8).toLowerCase());
 const clusterToken = ref(generateString(10));
-const master = ref(createWorker("mr" + generateString(9)));
+const master = ref(createWorker("mr" + generateString(9).toLowerCase()));
 const workers = ref<K8sWorker[]>([]);
 
 function addWorker() {

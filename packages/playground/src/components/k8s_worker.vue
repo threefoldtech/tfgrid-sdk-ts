@@ -131,7 +131,7 @@ import type { Farm, K8SWorker } from "../types";
 import RootFsSize from "./root_fs_size.vue";
 import SelectFarm from "./select_farm.vue";
 
-export function createWorker(name: string = "wr" + generateString(9)): K8SWorker {
+export function createWorker(name: string = "wr" + generateString(9).toLowerCase()): K8SWorker {
   return {
     name,
     cpu: 1,
