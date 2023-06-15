@@ -312,7 +312,6 @@ import type { Tab } from "../components/dynamic_tabs.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { deploymentListEnvironments } from "../constants/deployment_list";
 import { useProfileManager } from "../stores";
-import { DeploymentTitle } from "../types";
 import { deleteDeployment } from "../utils/delete_deployment";
 import { getGrid, updateGrid } from "../utils/grid";
 const props = defineProps<{
