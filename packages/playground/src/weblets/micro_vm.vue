@@ -185,7 +185,12 @@
       </template>
 
       <template #disks>
-        <ExpandableLayout v-model="disks" @add="addDisk" #="{ index }">
+        <ExpandableLayout
+          v-model="disks"
+          @add="addDisk"
+          title="Add additional disk space to your micro virtual machine"
+          #="{ index }"
+        >
           <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
           <input-validator
             :value="disks[index].name"
