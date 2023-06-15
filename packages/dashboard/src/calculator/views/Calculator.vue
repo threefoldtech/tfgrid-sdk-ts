@@ -47,7 +47,7 @@
                     v-on="on"
                   ></v-text-field>
                 </template>
-                <span>The GB of memory</span>
+                <span>The Memory in GB</span>
               </v-tooltip>
             </v-col>
           </v-row>
