@@ -316,7 +316,7 @@ import { deleteDeployment } from "../utils/delete_deployment";
 import { getGrid, updateGrid } from "../utils/grid";
 const props = defineProps<{
   projectName?: ProjectName;
-  title: string;
+  title?: string;
 }>();
 
 const tabs: Tab[] = [
