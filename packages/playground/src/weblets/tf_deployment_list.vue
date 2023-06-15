@@ -1,7 +1,7 @@
 <template>
   <weblet-layout ref="layout">
     <template #title>
-      {{ title }}
+      {{ title || "Deployment List" }}
     </template>
     <template #subtitle v-if="!$props.projectName"> List your own deployments for different solutions </template>
     <d-tabs
