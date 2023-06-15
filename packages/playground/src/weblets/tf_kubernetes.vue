@@ -10,16 +10,6 @@
     title-image="images/icons/kubernetes.png"
   >
     <template #title>Deploy a Kubernetes</template>
-    <template #subtitle>
-      Kubernetes is the standard container orchestration tool. On the TF grid, Kubernetes clusters can be deployed out
-      of the box. We have implemented K3S, a full-blown Kubernetes offering that uses only half of the memory footprint.
-      It is packaged as a single binary and made more lightweight to run workloads in resource-constrained locations
-      (fits e.g. IoT, edge, ARM workloads).
-      <a href="https://manual.grid.tf/weblets/weblets_k8s.html" target="_blank" class="app-link">
-        Quick start documentation
-      </a>
-    </template>
-
     <d-tabs
       :tabs="[
         { title: 'Config', value: 'config' },

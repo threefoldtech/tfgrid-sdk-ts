@@ -7,13 +7,6 @@
     title-image="images/icons/casperlabs.png"
   >
     <template #title>Deploy a Casperlabs Instance </template>
-    <template #subtitle>
-      Casper Network is a blockchain protocol built from the ground up to remain true to core Web3 principles and adapt
-      to the needs of our evolving world.
-      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_casper.html" class="app-link">
-        Quick start documentation
-      </a>
-    </template>
 
     <form-validator v-model="valid">
       <input-validator

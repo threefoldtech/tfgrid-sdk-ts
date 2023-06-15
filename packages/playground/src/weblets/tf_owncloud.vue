@@ -6,14 +6,7 @@
     :disk="solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
     title-image="images/icons/owncloud.png"
   >
-    <template #title>Deploy an Owncloud Instance </template>
-    <template #subtitle>
-      Owncloud develops and provides open-source software for content collaboration, allowing teams to easily share and
-      work on files seamlessly regardless of device or location.
-      <a target="_blank" class="app-link" href="https://manual.grid.tf/weblets/weblets_owncloud.html">
-        Quick start documentation
-      </a>
-    </template>
+    <template #title>Deploy an OwnCloud Instance </template>
 
     <d-tabs
       :tabs="[

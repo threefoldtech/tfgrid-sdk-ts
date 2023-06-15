@@ -7,13 +7,6 @@
     title-image="images/icons/wordpress.png"
   >
     <template #title>Deploy a Wordpress Instance </template>
-    <template #subtitle>
-      WordPress is the simplest, most popular way to create your own website or blog. In fact, WordPress powers over
-      43.3% of all the websites on the Internet.
-      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_wordpress.html" class="app-link">
-        Quick start documentation
-      </a>
-    </template>
 
     <form-validator v-model="valid">
       <input-validator

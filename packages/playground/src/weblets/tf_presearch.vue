@@ -8,14 +8,6 @@
     title-image="images/icons/presearch.png"
   >
     <template #title>Deploy a Presearch Instance</template>
-    <template #subtitle
-      >Presearch is a community-powered, decentralized search engine that provides better results while protecting your
-      privacy and rewarding you when you search. This weblet deploys a Presearch node. Presearch Nodes are used to
-      process user search requests, and node operators earn Presearch PRE tokens for joining and supporting the network.
-      <a class="app-link" href="https://manual.grid.tf/weblets/weblets_presearch.html" target="_blank">
-        Quick start documentation
-      </a>
-    </template>
 
     <d-tabs
       :tabs="[

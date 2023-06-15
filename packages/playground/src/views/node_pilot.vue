@@ -1,5 +1,12 @@
 <template>
   <view-layout>
+    <template #description
+      >Deploy a new Node Pilot on the Threefold Grid
+      <a class="app-link" href="https://manual.grid.tf/weblets/weblets_nodepilot.html" target="_blank">
+        read more about NodePilot
+      </a></template
+    >
+
     <NodePilot />
 
     <template #list>

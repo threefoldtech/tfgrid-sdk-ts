@@ -1,16 +1,14 @@
 ---
-title: Full Virtual Machine
+title: Micro Virtual Machine
 subtitle: Information about Virtual Machine
 ---
 
-Deploy a full virtual machine on Threefold Grid, the full VM allows you to have a complete image with a custom kernel optimized for your own usecase.
-
-We provide a few images managed by Threefold like Ubuntu 22.04, and NixOS, but you can still use a custom one
+Deploy a micro virtual machine on Threefold Grid. We provide a few images managed by Threefold like Ubuntu 22.04, and NixOS, but you can still use a custom one
 
 <br />
 <br />
 
-#### Compared to MicroVMs
+#### Compared to Full VMs
 
 - Full VM contains a default disk attached to it which is not the case in the Micro VM where you needed to make sure to attach a disk to it or the VM will fail
 - The default disk is mounted on / so if you want to attach any additional disks, you have to choose a different mounting point

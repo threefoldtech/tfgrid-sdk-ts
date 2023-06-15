@@ -7,12 +7,6 @@
     title-image="images/icons/mattermost.png"
   >
     <template #title>Deploy a Mattermost Instance </template>
-    <template #subtitle>
-      Mattermost A single point of collaboration. Designed specifically for digital operations.
-      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_mattermost.html" class="app-link">
-        Quick start documentation
-      </a>
-    </template>
 
     <d-tabs
       :tabs="[

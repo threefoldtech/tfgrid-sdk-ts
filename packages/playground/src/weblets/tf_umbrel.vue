@@ -8,13 +8,6 @@
     title-image="images/icons/umbrel.png"
   >
     <template #title>Deploy an Umbrel Instance </template>
-    <template #subtitle>
-      Umbrel is an OS for running a personal server in your home. Self-host open source apps like Nextcloud, Bitcoin
-      node, and more.
-      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_umbrel.html" class="app-link">
-        Quick start documentation
-      </a>
-    </template>
 
     <form-validator v-model="valid">
       <input-validator

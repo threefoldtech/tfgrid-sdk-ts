@@ -1,5 +1,13 @@
 <template>
   <view-layout>
+    <template #description
+      >Subsquid indexer is a piece of software that reads all the blocks from a Substrate based blockchain, decodes and
+      stores them for processing in a later stage.
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_subsquid.html" class="app-link">
+        read more about subsquid
+      </a></template
+    >
+
     <Subsquid />
 
     <template #list>

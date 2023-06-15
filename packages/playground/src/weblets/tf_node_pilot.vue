@@ -1,14 +1,6 @@
 <template>
   <weblet-layout ref="layout" :cpu="cpu" :memory="memory" :disk="32" ivp4 title-image="images/icons/vm.png">
     <template #title>Deploy a Node Pilot</template>
-    <template #subtitle>
-      Deploy a new Node Pilot on the Threefold Grid
-      <a class="app-link" href="https://manual.grid.tf/weblets/weblets_nodepilot.html" target="_blank">
-        Quick start documentation
-      </a>
-      .
-    </template>
-
     <form-validator v-model="valid">
       <input-validator
         :value="name"

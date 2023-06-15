@@ -1,6 +1,6 @@
 <template>
   <view-layout>
-    <template #description> here goes description! write whatever markup u need </template>
+    <template #description>Deploy your own cloud-init based virtual machine</template>
 
     <FullVm />
 

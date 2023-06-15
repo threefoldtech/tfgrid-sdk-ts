@@ -1,5 +1,12 @@
 <template>
   <view-layout>
+    <template #description
+      >Mattermost A single point of collaboration. Designed specifically for digital operations.
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_mattermost.html" class="app-link">
+        read more about Mattermost
+      </a></template
+    >
+
     <TfMattermost />
 
     <template #list>
