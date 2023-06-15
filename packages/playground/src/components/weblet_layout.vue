@@ -50,8 +50,9 @@
         Your deployment costs
         <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(tft) }}</span> TFTs or
         <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span> USD/month
-        based on the cloud resources (CPU: {{ cpu }} Cores, RAM: {{ memory }} MB, SSD: {{ disk }} GB, Public IP:
-        {{ ivp4 ? "Enabled" : "Disabled" }}) selected
+        based on the cloud resources (CPU: {{ cpu }} Cores, RAM: {{ memory }} MB, SSD: {{ disk }} GB{{
+          ivp4 ? " , Public IP: Enabled" : ""
+        }}) selected
         <a href="https://manual.grid.tf/cloud/cloudunits_pricing.html" target="_blank" class="app-link">
           Learn more about the pricing and how to unlock discounts.
         </a>
