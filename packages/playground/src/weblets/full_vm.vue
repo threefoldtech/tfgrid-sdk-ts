@@ -36,7 +36,9 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Name" v-model="name" v-bind="props" />
+          <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
+            <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+          </input-tooltip>
         </input-validator>
 
         <SelectVmImage :images="images" v-model="flist" />
@@ -51,7 +53,14 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
+          <input-tooltip #="{ tooltipProps }" tooltip="The number of virtual cores allocated to your instance.">
+            <v-text-field
+              label="CPU (vCores)"
+              type="number"
+              v-model.number="cpu"
+              v-bind="{ ...props, ...tooltipProps }"
+            />
+          </input-tooltip>
         </input-validator>
 
         <input-validator
@@ -64,7 +73,17 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
+          <input-tooltip
+            #="{ tooltipProps }"
+            tooltip="The amount of RAM (Random Access Memory) allocated to your instance."
+          >
+            <v-text-field
+              label="Memory (MB)"
+              type="number"
+              v-model.number="memory"
+              v-bind="{ ...props, ...tooltipProps }"
+            />
+          </input-tooltip>
         </input-validator>
 
         <input-validator
@@ -77,7 +96,17 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Disk Size (GB)" type="number" v-model.number="diskSize" v-bind="props" />
+          <input-tooltip
+            #="{ tooltipProps }"
+            tooltip="The storage capacity allocated to your instance, indicating the amount of space available to store files, data, and applications."
+          >
+            <v-text-field
+              label="Disk Size (GB)"
+              type="number"
+              v-model.number="diskSize"
+              v-bind="{ ...props, ...tooltipProps }"
+            />
+          </input-tooltip>
         </input-validator>
         <Network
           required
@@ -112,7 +141,9 @@
             ]"
             #="{ props }"
           >
-            <v-text-field label="Name" v-model="disks[index].name" v-bind="props" />
+            <input-tooltip #="{ tooltipProps }" tooltip="Disk name.">
+              <v-text-field label="Name" v-model="disks[index].name" v-bind="{ ...props, ...tooltipProps }" />
+            </input-tooltip>
           </input-validator>
           <input-validator
             :value="disks[index].size"
@@ -124,7 +155,14 @@
             ]"
             #="{ props }"
           >
-            <v-text-field label="Size (GB)" type="number" v-model.number="disks[index].size" v-bind="props" />
+            <input-tooltip #="{ tooltipProps }" tooltip="Disk Size.">
+              <v-text-field
+                label="Size (GB)"
+                type="number"
+                v-model.number="disks[index].size"
+                v-bind="{ ...props, ...tooltipProps }"
+              />
+            </input-tooltip>
           </input-validator>
         </ExpandableLayout>
       </template>

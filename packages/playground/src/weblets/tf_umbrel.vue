@@ -29,7 +29,9 @@
         ]"
         #="{ props }"
       >
-        <v-text-field label="Name" v-model="name" v-bind="props" />
+        <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
+          <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        </input-tooltip>
       </input-validator>
 
       <input-validator
@@ -44,7 +46,9 @@
         ]"
         #="{ props }"
       >
-        <v-text-field label="Username" v-model="username" v-bind="props" />
+        <input-tooltip #="{ tooltipProps }" tooltip="Umbrel admin username.">
+          <v-text-field label="Username" v-model="username" v-bind="{ ...props, ...tooltipProps }" />
+        </input-tooltip>
       </input-validator>
 
       <password-input-wrapper #="{ props }">
@@ -57,7 +61,13 @@
           ]"
           #="{ props: validatorProps }"
         >
-          <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
+          <input-tooltip #="{ tooltipProps }" tooltip="Umbrel admin password.">
+            <v-text-field
+              label="Password"
+              v-model="password"
+              v-bind="{ ...props, ...tooltipProps, ...validatorProps }"
+            />
+          </input-tooltip>
         </input-validator>
       </password-input-wrapper>
 

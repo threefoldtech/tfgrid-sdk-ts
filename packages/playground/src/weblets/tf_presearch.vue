@@ -37,7 +37,9 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Name" v-model="name" v-bind="props" />
+          <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
+            <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+          </input-tooltip>
         </input-validator>
 
         <input-validator
@@ -49,7 +51,13 @@
           #="{ props }"
         >
           <password-input-wrapper>
-            <v-text-field label="Presearch Registeration Code" v-bind="props" v-model="code" />
+            <input-tooltip #="{ tooltipProps }" tooltip="Presearch Registeration Code.">
+              <v-text-field
+                label="Presearch Registeration Code"
+                v-bind="{ ...props, ...tooltipProps }"
+                v-model="code"
+              />
+            </input-tooltip>
           </password-input-wrapper>
         </input-validator>
 
@@ -67,8 +75,31 @@
       </template>
 
       <template #restore>
-        <v-textarea label="Private Presearch Restore Key" v-model="privateRestoreKey" no-resize :spellcheck="false" />
-        <v-textarea label="Public Presearch Restore Key" v-model="publicRestoreKey" no-resize :spellcheck="false" />
+        <input-tooltip
+          #="{ tooltipProps }"
+          tooltip="The Private Presearch Restore Key is a unique cryptographic key associated with your Presearch account."
+        >
+          <v-textarea
+            label="Private Presearch Restore Key"
+            v-bind="{ ...tooltipProps }"
+            v-model="privateRestoreKey"
+            no-resize
+            :spellcheck="false"
+          />
+        </input-tooltip>
+
+        <input-tooltip
+          #="{ tooltipProps }"
+          tooltip="The Public Presearch Restore Key is a unique cryptographic key associated with your Presearch account."
+        >
+          <v-textarea
+            label="Public Presearch Restore Key"
+            v-bind="{ ...tooltipProps }"
+            v-model="publicRestoreKey"
+            no-resize
+            :spellcheck="false"
+          />
+        </input-tooltip>
       </template>
     </d-tabs>
 

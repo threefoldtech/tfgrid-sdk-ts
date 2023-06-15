@@ -11,7 +11,9 @@
     ]"
     #="{ props }"
   >
-    <v-text-field label="Name" v-model="$props.modelValue.name" v-bind="props" />
+    <input-tooltip #="{ tooltipProps }" tooltip="Solution name.">
+      <v-text-field label="Name" v-model="$props.modelValue.name" v-bind="{ ...props, ...tooltipProps }" />
+    </input-tooltip>
   </input-validator>
 
   <input-validator
@@ -24,7 +26,14 @@
     ]"
     #="{ props }"
   >
-    <v-text-field label="CPU (vCores)" type="number" v-model.number="$props.modelValue.cpu" v-bind="props" />
+    <input-tooltip #="{ tooltipProps }" tooltip="The number of virtual cores allocated to your instance.">
+      <v-text-field
+        label="CPU (vCores)"
+        type="number"
+        v-model.number="$props.modelValue.cpu"
+        v-bind="{ ...props, ...tooltipProps }"
+      />
+    </input-tooltip>
   </input-validator>
 
   <input-validator
@@ -37,7 +46,14 @@
     ]"
     #="{ props }"
   >
-    <v-text-field label="Memory (MB)" type="number" v-model.number="$props.modelValue.memory" v-bind="props" />
+    <input-tooltip #="{ tooltipProps }" tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
+      <v-text-field
+        label="Memory (MB)"
+        type="number"
+        v-model.number="$props.modelValue.memory"
+        v-bind="{ ...props, ...tooltipProps }"
+      />
+    </input-tooltip>
   </input-validator>
 
   <input-validator
@@ -50,7 +66,14 @@
     ]"
     #="{ props }"
   >
-    <v-text-field label="Disk Size (GB)" type="number" v-model.number="$props.modelValue.diskSize" v-bind="props" />
+    <input-tooltip #="{ tooltipProps }" tooltip="Disk Size.">
+      <v-text-field
+        label="Size (GB)"
+        type="number"
+        v-model.number="$props.modelValue.diskSize"
+        v-bind="{ ...props, ...tooltipProps }"
+      />
+    </input-tooltip>
   </input-validator>
 
   <Network

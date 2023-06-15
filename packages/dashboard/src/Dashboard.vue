@@ -450,7 +450,7 @@ export default class Dashboard extends Vue {
       children: [],
     },
     {
-      label: "Zero-Os Hub",
+      label: "0-Hub",
       icon: "open-in-new",
       prefix: "https://hub.grid.tf/",
       hyperlink: true,

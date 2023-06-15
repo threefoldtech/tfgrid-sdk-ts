@@ -31,3 +31,7 @@ export function normalizeBalance(num: number | string | undefined, floor = false
 
   return (+num).toFixed(3).replace(/0+$/g, "");
 }
+
+export function isEnoughBalance(balance: any): boolean {
+  return balance.free > 0.001 ? true : false;
+}
