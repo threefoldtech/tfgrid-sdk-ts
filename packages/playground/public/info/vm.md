@@ -1,6 +1,5 @@
 ---
 title: Micro Virtual Machine
-subtitle: Information about Virtual Machine
 ---
 
 Deploy a micro virtual machine on Threefold Grid. We provide a few images managed by Threefold like Ubuntu 22.04, and NixOS, but you can still use a custom one

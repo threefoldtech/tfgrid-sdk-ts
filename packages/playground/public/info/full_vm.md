@@ -1,6 +1,5 @@
 ---
 title: Full Virtual Machine
-subtitle: Information about Virtual Machine
 ---
 
 Deploy a full virtual machine on Threefold Grid, the full VM allows you to have a complete image with a custom kernel optimized for your own usecase.
