@@ -89,15 +89,32 @@
           </v-row>
           <v-row>
             <v-col cols="2" class="mx-auto">
-              <v-switch label="With a Public IP (V4)" @change="IPV4Toggle" />
+              <v-tooltip bottom nudge-right="40">
+                <template v-slot:activator="{ on, attrs }">
+                  <div v-on="on" v-bind="attrs">
+                    <v-switch hide-details label="With a Public IP (V4)" @change="IPV4Toggle" />
+                  </div> </template
+                ><span
+                  >An Internet Protocol version 4 address that is globally unique and accessible over the internet</span
+                >
+              </v-tooltip>
             </v-col>
             <v-col cols="2" class="mx-auto">
-              <v-switch
-                label="Use current balance"
-                :disabled="!$store.state.credentials.account.address"
-                @change="getCurrentBalance"
-                v-model="useCurrentBalance"
-              />
+              <v-tooltip bottom nudge-left="20">
+                <template v-slot:activator="{ on, attrs }">
+                  <div v-on="on" v-bind="attrs">
+                    <v-switch
+                      hide-details
+                      label="Use current balance"
+                      :disabled="!$store.state.credentials.account.address"
+                      @change="getCurrentBalance"
+                      v-model="useCurrentBalance"
+                    />
+                  </div>
+                </template>
+                <span v-if="!$store.state.credentials.account.address">You should select/create an account first</span>
+                <span v-else>Use current balance to calculate the discount</span>
+              </v-tooltip>
             </v-col>
             <v-col cols="5" class="mx-auto">
               <v-tooltip top>
@@ -127,13 +144,21 @@
           :key="price.price"
           :style="{ color: price.color, background: price.backgroundColor }"
         >
-          <span class="price">
-            <span class="name">
-              {{ price.label !== undefined ? price.label + " " : " " }}
-              {{ price.packageName != "none" ? price.packageName + " Package" : "" }}</span
-            >
-            : ${{ price.price }}/month, {{ price.TFTs }} TFT/month
-          </span>
+          <v-tooltip bottom nudge-bottom="12">
+            <template v-slot:activator="{ on, attrs }">
+              <span class="price">
+                <p>
+                  Cost of reservation on a
+                  <span class="name">{{ price.label !== undefined ? price.label + " " : " " }}</span>
+                </p>
+                <span class="package"> {{ price.packageName != "none" ? price.packageName + " Package: " : "" }}</span>
+                ${{ price.price }}/month, {{ price.TFTs }} TFT/month
+                <span class="pl-2" dark right v-bind="attrs" v-on="on">
+                  <i class="fa-solid fa-circle-info"></i>
+                </span> </span
+            ></template>
+            <span>{{ price.info }}</span>
+          </v-tooltip>
         </div>
       </div>
     </v-card>
@@ -153,6 +178,7 @@ type priceType = {
   packageName: any;
   backgroundColor: string;
   TFTs: any;
+  info: string;
 };
 
 @Component({
@@ -267,20 +293,22 @@ export default class Calculator extends Vue {
 
       this.prices = [
         {
-          label: "Dedicated Node Price",
+          label: "Dedicated Node",
           price: `${dedicatedPrice}`,
           color: this.discountPackages[dedicatedPackage].color,
           packageName: dedicatedPackage,
           backgroundColor: this.discountPackages[dedicatedPackage].backgroundColor,
           TFTs: (+dedicatedPrice / this.TFTPrice).toFixed(2),
+          info: "A user can reserve an entire node then use it exclusively to deploy solutions",
         },
         {
-          label: "Shared Node Price",
+          label: "Shared Node",
           price: `${sharedPrice}`,
           color: "#868686",
           packageName: sharedPackage,
           backgroundColor: this.discountPackages[sharedPackage].backgroundColor,
           TFTs: (+sharedPrice / this.TFTPrice).toFixed(2),
+          info: "Shared Nodes allow several users to host various workloads on a single node",
         },
       ];
     } else {
@@ -421,6 +449,9 @@ export default class Calculator extends Vue {
 }
 
 .name {
+  font-weight: 900;
+}
+.package {
   font-weight: 900;
   text-transform: capitalize;
 }
