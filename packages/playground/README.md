@@ -24,6 +24,7 @@ Playground is a Vue application that helps with deploying solutions on TF Grid v
   git clone https://github.com/threefoldtech/tfgrid-sdk-ts.git
   cd tfgrid-sdk-ts
   yarn install
+  make build
   ```
 
 ## Getting Started
@@ -33,13 +34,13 @@ Playground is a Vue application that helps with deploying solutions on TF Grid v
 - **Run playground in Development mode**
 
 ```bash
-yarn workspace @threefold/playground dev
+make run project=playground
 ```
 
 - **Run playground in Production mode**
 
 ```bash
-yarn workspace @threefold/playground build
+make build project=playground
 ```
 
 This will generate the production build in the `dist` directory, which can be served using [Caddy](https://caddyserver.com/) or [NGINX](https://www.nginx.com/)
