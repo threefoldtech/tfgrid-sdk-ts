@@ -28,6 +28,7 @@
                 color="white"
                 icon="mdi-information-outline"
                 href="https://manual.grid.tf/tfchain/tfchain.html?highlight=locked#contract-locking"
+                height="24px"
               />
             </p>
           </template>
