@@ -35,7 +35,9 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Name" v-model="name" v-bind="props" />
+          <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
+            <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+          </input-tooltip>
         </input-validator>
         <input-validator
           :value="email"
@@ -45,12 +47,14 @@
           ]"
           #="{ props }"
         >
-          <v-text-field
-            label="Email"
-            placeholder="This email will be used to login to your instance."
-            v-model="email"
-            v-bind="props"
-          />
+          <input-tooltip #="{ tooltipProps }" tooltip="This email will be used to login to your instance.">
+            <v-text-field
+              label="Email"
+              placeholder="This email will be used to login to your instance."
+              v-model="email"
+              v-bind="{ ...props, ...tooltipProps }"
+            />
+          </input-tooltip>
         </input-validator>
 
         <SelectSolutionFlavor
@@ -83,7 +87,7 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString, type GridClient } from "@threefold/grid_client";
+import type { GridClient } from "@threefold/grid_client";
 import { Buffer } from "buffer";
 import TweetNACL from "tweetnacl";
 import { type Ref, ref } from "vue";
@@ -97,12 +101,13 @@ import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/ga
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
+import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref("dc" + generateString(9));
+const name = ref(generateName(9, { prefix: "dc" }));
 const email = ref("");
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
@@ -163,7 +168,7 @@ async function deploy() {
             { key: "DISCOURSE_SMTP_USER_NAME", value: smtp.value.username },
             { key: "DISCOURSE_SMTP_PASSWORD", value: smtp.value.password },
             { key: "THREEBOT_PRIVATE_KEY", value: generatePubKey() },
-            { key: "FLASK_SECRET_KEY", value: generateString(8) },
+            { key: "FLASK_SECRET_KEY", value: generatePassword(8) },
           ],
         },
       ],

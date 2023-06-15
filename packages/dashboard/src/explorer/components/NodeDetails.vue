@@ -50,15 +50,16 @@
 
           <v-list-item>
             <v-list-item-content>
-              <v-list-item-title> CPU Resource Unit </v-list-item-title>
+              <v-list-item-title> CPU </v-list-item-title>
             </v-list-item-content>
-            {{ node.capacity.total_resources.cru }} CPU
+            {{ node.capacity.total_resources.cru }}
+            {{ node.capacity.total_resources.cru > 1 ? "cores" : "core" }}
           </v-list-item>
           <v-divider />
 
           <v-list-item>
             <v-list-item-content>
-              <v-list-item-title> Disk Resource Unit (HDD) </v-list-item-title>
+              <v-list-item-title> Disk (HDD) </v-list-item-title>
             </v-list-item-content>
             {{ node.capacity.total_resources.hru | toTeraOrGigaOrPeta }}
           </v-list-item>
@@ -66,7 +67,7 @@
 
           <v-list-item>
             <v-list-item-content>
-              <v-list-item-title> Disk Resource Unit (SSD) </v-list-item-title>
+              <v-list-item-title> Disk (SSD) </v-list-item-title>
             </v-list-item-content>
             {{ node.capacity.total_resources.sru | toTeraOrGigaOrPeta }}
           </v-list-item>
@@ -74,7 +75,7 @@
 
           <v-list-item>
             <v-list-item-content>
-              <v-list-item-title> Memory Resource Unit </v-list-item-title>
+              <v-list-item-title> RAM </v-list-item-title>
             </v-list-item-content>
             {{ node.capacity.total_resources.mru | toTeraOrGigaOrPeta }}
           </v-list-item>

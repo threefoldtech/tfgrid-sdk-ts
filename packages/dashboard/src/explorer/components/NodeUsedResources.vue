@@ -61,11 +61,11 @@ export default class NodeUsedResources extends Vue {
   @Prop({ required: true }) nodeStatus!: boolean;
   @Prop({ required: true }) grafanaUrl!: string;
   resources: any[] = [];
+  renamedResources = ["CPU", "RAM", "SSD", "HDD"];
   loader = false;
 
   getNodeUsedResources() {
     this.loader = true;
-
     return ["cru", "sru", "hru", "mru"].map((i, idx) => {
       const value =
         this.nodeStatistics.total[i] != 0
@@ -75,7 +75,7 @@ export default class NodeUsedResources extends Vue {
       return {
         id: idx + 1,
         value: value.toFixed(2),
-        name: i.toUpperCase(),
+        name: this.renamedResources[idx],
       };
     });
   }
@@ -91,7 +91,7 @@ export default class NodeUsedResources extends Vue {
       }
     } else {
       this.resources = ["cru", "sru", "hru", "mru"].map((i, idx) => {
-        return { id: idx + 1, value: 0, name: i.toLocaleUpperCase() };
+        return { id: idx + 1, value: 0, name: this.renamedResources[idx] };
       });
     }
   }

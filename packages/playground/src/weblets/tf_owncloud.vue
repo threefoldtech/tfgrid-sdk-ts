@@ -35,7 +35,9 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Name" v-model="name" v-bind="props" />
+          <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
+            <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+          </input-tooltip>
         </input-validator>
 
         <input-validator
@@ -50,7 +52,9 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Username" v-model="username" v-bind="props" />
+          <input-tooltip #="{ tooltipProps }" tooltip="OwnCloud admin username.">
+            <v-text-field label="Username" v-model="username" v-bind="{ ...props, ...tooltipProps }" />
+          </input-tooltip>
         </input-validator>
 
         <password-input-wrapper #="{ props }">
@@ -63,7 +67,13 @@
             ]"
             #="{ props: validatorProps }"
           >
-            <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
+            <input-tooltip #="{ tooltipProps }" tooltip="OwnCloud admin password.">
+              <v-text-field
+                label="Password"
+                v-model="password"
+                v-bind="{ ...props, ...tooltipProps, ...validatorProps }"
+              />
+            </input-tooltip>
           </input-validator>
         </password-input-wrapper>
 
@@ -99,7 +109,7 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString, type GridClient } from "@threefold/grid_client";
+import type { GridClient } from "@threefold/grid_client";
 import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
@@ -109,14 +119,15 @@ import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
+import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref("oc" + generateString(9));
+const name = ref(generateName(9, { prefix: "oc" }));
 const username = ref("admin");
-const password = ref(generateString(12));
+const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;
