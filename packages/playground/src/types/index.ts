@@ -69,7 +69,6 @@ export const DeploymentTitle: { [key: string]: string } = {
   Subsquid: "Subsquid Instances",
   Taiga: "Taiga Instances",
   Wordpress: "Wordpress Instances",
-  TFhubValidator: "TFhubValidator Instances",
   Casperlabs: "Casperlabs Instances",
   Presearch: "Presearch Instances",
   VM: "Micro Virtual Machines",
