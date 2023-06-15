@@ -3,7 +3,7 @@
     <FullVm />
 
     <div class="mt-4">
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Virtual Machines" :project-name="name" />
     </div>
   </div>
 </template>

@@ -1,12 +1,7 @@
 <template>
   <weblet-layout ref="layout">
     <template #title>
-      Deployment List
-      {{
-        $props.projectName
-          ? "(" + (tabs.find(tab => tab.value === $props.projectName)?.title ?? $props.projectName) + ")"
-          : ""
-      }}
+      {{ title || "Deployment List" }}
     </template>
     <template #subtitle v-if="!$props.projectName"> List your own deployments for different solutions </template>
     <d-tabs
@@ -319,8 +314,10 @@ import { deploymentListEnvironments } from "../constants/deployment_list";
 import { useProfileManager } from "../stores";
 import { deleteDeployment } from "../utils/delete_deployment";
 import { getGrid, updateGrid } from "../utils/grid";
-
-const props = defineProps<{ projectName?: ProjectName }>();
+const props = defineProps<{
+  projectName?: ProjectName;
+  title?: string;
+}>();
 
 const tabs: Tab[] = [
   { title: "Full Virtual Machine", value: "Fullvm", imgPath: "images/icons/vm.png" },
