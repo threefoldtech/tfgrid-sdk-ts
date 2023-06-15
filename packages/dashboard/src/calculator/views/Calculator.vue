@@ -17,12 +17,12 @@
         <div class="card">
           <v-row>
             <v-col cols="5" class="mx-auto">
-              <v-tooltip right>
+              <v-tooltip offset="5" top>
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
                     placeholder="Enter number of CPUs"
                     :rules="[...inputValidators, cruCheck]"
-                    label="CRU"
+                    label="CPU"
                     suffix="vCores"
                     v-model="CRU"
                     outlined
@@ -30,16 +30,16 @@
                     v-on="on"
                   ></v-text-field>
                 </template>
-                <span>CPU</span>
+                <span>Number of virtual cores</span>
               </v-tooltip>
             </v-col>
             <v-col cols="5" class="mx-auto">
-              <v-tooltip right>
+              <v-tooltip top>
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
                     placeholder="Memory"
                     :rules="[...inputValidators, mruCheck]"
-                    label="MRU"
+                    label="RAM"
                     suffix="GB"
                     v-model="MRU"
                     outlined
@@ -47,18 +47,18 @@
                     v-on="on"
                   ></v-text-field>
                 </template>
-                <span>RAM</span>
+                <span>The GB of memory</span>
               </v-tooltip>
             </v-col>
           </v-row>
           <v-row>
             <v-col cols="5" class="mx-auto">
-              <v-tooltip right>
+              <v-tooltip top>
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
                     placeholder="SSD Storage"
                     :rules="[...inputValidators, diskCheck(SRU)]"
-                    label="SRU"
+                    label="Disk SSD"
                     suffix="GB"
                     v-model="SRU"
                     outlined
@@ -66,16 +66,16 @@
                     v-on="on"
                   ></v-text-field>
                 </template>
-                <span>SSD</span>
+                <span>The SSD capacity storage</span>
               </v-tooltip>
             </v-col>
             <v-col cols="5" class="mx-auto">
-              <v-tooltip right>
+              <v-tooltip top>
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
                     placeholder="HDD Storage"
                     :rules="[...inputValidators, diskCheck(HRU)]"
-                    label="HRU"
+                    label="Disk HDD"
                     suffix="GB"
                     v-model="HRU"
                     outlined
@@ -83,7 +83,7 @@
                     v-on="on"
                   ></v-text-field>
                 </template>
-                <span>HDD</span>
+                <span>The HDD capacity storage</span>
               </v-tooltip>
             </v-col>
           </v-row>
