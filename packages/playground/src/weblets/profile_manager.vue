@@ -23,13 +23,21 @@
             <p>
               Locked:
               <strong :style="{ color: '#76e2c8' }">{{ normalizeBalance(balance.locked, true) || 0 }} TFT</strong>
-              <IconActionBtn
-                tooltip="Locked balance documentation"
-                color="white"
-                icon="mdi-information-outline"
-                href="https://manual.grid.tf/tfchain/tfchain.html?highlight=locked#contract-locking"
-                height="24px"
-              />
+              <v-tooltip text="Locked balance documentation" location="bottom right">
+                <template #activator="{ props }">
+                  <v-btn
+                    @click.stop
+                    v-bind="props"
+                    color="white"
+                    icon="mdi-information-outline"
+                    height="24px"
+                    width="24px"
+                    class="ml-2"
+                    href="https://manual.grid.tf/tfchain/tfchain.html?highlight=locked#contract-locking"
+                    target="_blank"
+                  />
+                </template>
+              </v-tooltip>
             </p>
           </template>
         </div>
@@ -570,7 +578,6 @@ export default {
   name: "ProfileManager",
   components: {
     QrcodeGenerator,
-    IconActionBtn,
   },
 };
 </script>

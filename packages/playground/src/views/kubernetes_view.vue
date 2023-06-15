@@ -3,7 +3,7 @@
     <TfKubernetes />
 
     <div class="mt-4">
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Kubernetes Clusters" :project-name="name" />
     </div>
   </div>
 </template>

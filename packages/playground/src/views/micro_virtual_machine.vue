@@ -3,7 +3,7 @@
     <MicroVm />
 
     <div class="mt-4">
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Micro Virtual Machines" :project-name="name" />
     </div>
   </div>
 </template>

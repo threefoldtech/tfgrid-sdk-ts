@@ -133,9 +133,8 @@ defineProps<{
 </script>
 
 <script lang="ts">
-import { generateString } from "@threefold/grid_client";
-
 import type { SMTPServer } from "../types";
+import { generatePassword } from "../utils/strings";
 
 export function createSMTPServer(options: Partial<SMTPServer> = {}): SMTPServer {
   return {
@@ -146,7 +145,7 @@ export function createSMTPServer(options: Partial<SMTPServer> = {}): SMTPServer 
     port: options.port || 587,
     tls: options.tls || false,
     ssl: options.ssl || false,
-    password: options.password || generateString(12),
+    password: options.password || generatePassword(),
   };
 }
 

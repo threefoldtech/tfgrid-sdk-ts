@@ -3,7 +3,7 @@
     <TFWordpress />
 
     <div class="mt-4">
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="WordPress Instances" :project-name="name" />
     </div>
   </div>
 </template>

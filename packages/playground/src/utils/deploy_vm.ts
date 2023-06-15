@@ -4,7 +4,6 @@ import {
   DiskModel,
   events,
   type FilterOptions,
-  generateString,
   type GridClient,
   MachineModel,
   MachinesModel,
@@ -12,6 +11,7 @@ import {
   randomChoice,
 } from "@threefold/grid_client";
 
+import { generateName } from "../utils/strings";
 import { createNetwork, type Network } from "./deploy_helpers";
 import { getWireguardConfig } from "./load_deployment";
 import { NodePicker } from "./node_picker";
@@ -91,7 +91,7 @@ function createEnvs(envs: Env[] = []): { [key: string]: string } {
 function createDisks(disks: Disk[] = []): DiskModel[] {
   return disks.map(disk => {
     const d = new DiskModel();
-    d.name = disk.name || "DS" + generateString(10);
+    d.name = disk.name || generateName(7, { prefix: "disk" });
     d.size = disk.size;
     d.mountpoint = disk.mountPoint;
     return d;
