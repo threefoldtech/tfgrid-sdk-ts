@@ -57,6 +57,7 @@ export enum ProjectName {
   Qvm = "Qvm",
   Umbrel = "Umbrel",
 }
+
 export enum SolutionCode {
   peertube = "pt",
   funkwhale = "fw",
