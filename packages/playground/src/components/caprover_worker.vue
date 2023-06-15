@@ -42,13 +42,12 @@ defineProps<{ modelValue: CaproverWorker }>();
 </script>
 
 <script lang="ts">
-import { generateString } from "@threefold/grid_client";
-
 import type { CaproverWorker } from "../types";
+import { generateName } from "../utils/strings";
 import SelectFarm from "./select_farm.vue";
 import SelectSolutionFlavor from "./select_solution_flavor.vue";
 
-export function createWorker(name: string = "wr" + generateString(9).toLowerCase()): CaproverWorker {
+export function createWorker(name: string = generateName(9, { prefix: "wr" })): CaproverWorker {
   return { name };
 }
 

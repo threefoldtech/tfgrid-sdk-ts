@@ -89,7 +89,6 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString } from "@threefold/grid_client";
 import { ref } from "vue";
 
 import { createWorker } from "../components/k8s_worker.vue";
@@ -98,14 +97,15 @@ import { useProfileManager } from "../stores";
 import type { K8SWorker as K8sWorker } from "../types";
 import { deployK8s } from "../utils/deploy_k8s";
 import { getGrid } from "../utils/grid";
+import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref("k8s" + generateString(8).toLowerCase());
-const clusterToken = ref(generateString(10));
-const master = ref(createWorker("mr" + generateString(9).toLowerCase()));
+const name = ref(generateName(8, { prefix: "k8s" }));
+const clusterToken = ref(generatePassword(10));
+const master = ref(createWorker(generateName(9, { prefix: "mr" })));
 const workers = ref<K8sWorker[]>([]);
 
 function addWorker() {

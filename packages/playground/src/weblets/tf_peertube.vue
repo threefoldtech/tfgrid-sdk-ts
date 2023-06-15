@@ -85,7 +85,7 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString, GridClient } from "@threefold/grid_client";
+import type { GridClient } from "@threefold/grid_client";
 import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
@@ -94,14 +94,15 @@ import type { Farm, GatewayNode, solutionFlavor as SolutionFlavor } from "../typ
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
+import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref("pt" + generateString(9).toLowerCase());
+const name = ref(generateName(9, { prefix: "pt" }));
 const email = ref("");
-const password = ref(generateString(12));
+const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;
