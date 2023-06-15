@@ -3,7 +3,7 @@
     <TfCaprover />
 
     <div class="mt-4">
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="CapRover Clusters" :project-name="name" />
     </div>
   </div>
 </template>

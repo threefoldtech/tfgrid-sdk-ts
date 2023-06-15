@@ -3,7 +3,7 @@
     <TfFunkwhale />
 
     <div class="mt-4">
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Funkwhale Instances" :project-name="name" />
     </div>
   </div>
 </template>

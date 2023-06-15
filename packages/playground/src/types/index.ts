@@ -57,26 +57,6 @@ export enum ProjectName {
   Qvm = "Qvm",
   Umbrel = "Umbrel",
 }
-export const DeploymentTitle: { [key: string]: string } = {
-  Kubernetes: "Kubernetes Clusters",
-  CapRover: "CapRover Clusters",
-  Discourse: "Discourse Instances",
-  Funkwhale: "Funkwhale Instances",
-  Mastodon: "Mastodon Instances",
-  Mattermost: "Mattermost Instances",
-  Owncloud: "Owncloud Instances",
-  Peertube: "Peertube Instances",
-  Subsquid: "Subsquid Instances",
-  Taiga: "Taiga Instances",
-  Wordpress: "Wordpress Instances",
-  Casperlabs: "Casperlabs Instances",
-  Presearch: "Presearch Instances",
-  VM: "Micro Virtual Machines",
-  NodePilot: "Node Pilot Instances",
-  Fullvm: "Full virtual Machines",
-  Algorand: "Algorand Instances",
-  Umbrel: "Umbrel Instances",
-};
 export enum SolutionCode {
   peertube = "pt",
   funkwhale = "fw",
