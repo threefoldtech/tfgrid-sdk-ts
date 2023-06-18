@@ -24,6 +24,10 @@
 
             <v-btn v-else @click="disconnectWallet" color="red"> Disconnect </v-btn>
 
+            <a href="https://library.threefold.me/info/manual/#/manual__dashboard_readme" target="_blank">
+              <v-btn class="custom-button" color="white" style="color: black"> Manual</v-btn>
+            </a>
+
             <v-theme-provider root>
               <v-card v-if="filteredAccounts().length" style="width: max-content">
                 <v-card-text
@@ -531,27 +535,34 @@ export default class Dashboard extends Vue {
 .theme--light.v-btn.v-btn--icon {
   color: rgba(0, 0, 0);
 }
+
 .sidebar-opened {
   left: 5rem !important;
 }
+
 @keyframes shake {
   0% {
     transform: translateX(0);
   }
+
   9.375% {
     transform: translateX(-2px);
   }
+
   18.75% {
     transform: translateX(2px);
   }
+
   28.125% {
     transform: translateX(-2px);
   }
+
   37.5%,
   100% {
     transform: translateX(0);
   }
 }
+
 .pulse-animation {
   animation: shake 3.2s ease infinite;
 }
