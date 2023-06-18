@@ -22,6 +22,8 @@ class DashboardPage:
     decentralized_cloud_img = (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div/div/div[1]/div/div/div/div/div/div[1]/div[3]')
     explorer_map = (By.XPATH,'//*[@id="app"]/div[1]/div[3]/div/div[2]/section')
     threefold_guide_img = (By.XPATH, "//*[contains(text(), 'Your Guide to The ThreeFold Grid')]")
+    tft_swap = (By.XPATH, '//*[@id="app"]/div[1]/div[1]/header/div/div[2]/div/div/div/button/span/i')
+    tft_price = (By.XPATH, '//*[@id="app"]/div[1]/div[1]/header/div/div[2]/div/div/div/p[2]')
     
     def __init__(self, browser):
         self.browser = browser
@@ -70,4 +72,13 @@ class DashboardPage:
         return self.browser.find_element(*self.account_list).text
     
     def get_address(self, account):
-        return str(account[13:])
+        return str(account[13:]) 
+    
+    def tft_price_result(self):
+        return self.browser.find_element(*self.tft_price).text
+    
+    def tft_price_swap(self):
+        price = self.browser.find_element(*self.tft_price).text
+        self.browser.find_element(*self.tft_swap).click()
+        while (price == self.browser.find_element(*self.tft_price).text):
+            WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), '1 USD')]")))
