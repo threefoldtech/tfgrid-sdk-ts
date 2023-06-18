@@ -11,7 +11,7 @@
     <TfOwncloud />
 
     <template #list>
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Owncloud Instances" :project-name="name" />
     </template>
   </view-layout>
 </template>

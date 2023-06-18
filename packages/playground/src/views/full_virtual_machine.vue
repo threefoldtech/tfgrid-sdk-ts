@@ -5,7 +5,7 @@
     <FullVm />
 
     <template #list>
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Virtual Machines" :project-name="name" />
     </template>
   </view-layout>
 </template>

@@ -11,7 +11,7 @@
     <TfFunkwhale />
 
     <template #list>
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Funkwhale Instances" :project-name="name" />
     </template>
   </view-layout>
 </template>

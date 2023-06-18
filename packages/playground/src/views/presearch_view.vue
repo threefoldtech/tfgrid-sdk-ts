@@ -12,7 +12,7 @@
     <Presearch />
 
     <template #list>
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Presearch Instances" :project-name="name" />
     </template>
   </view-layout>
 </template>

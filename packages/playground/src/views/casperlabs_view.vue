@@ -11,7 +11,7 @@
     <tf-casperlabs />
 
     <template #list>
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Casperlabs Instances" :project-name="name" />
     </template>
   </view-layout>
 </template>

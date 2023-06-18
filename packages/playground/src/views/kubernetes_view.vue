@@ -13,7 +13,7 @@
     <TfKubernetes />
 
     <template #list>
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Kubernetes Clusters" :project-name="name" />
     </template>
   </view-layout>
 </template>

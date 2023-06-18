@@ -18,11 +18,7 @@
               color="primary"
               class="mx-2"
             >
-              <v-tooltip
-                location="bottom"
-                :text="getMetadata(contract).projectName === 'caprover' ? 'Leader' : 'Master'"
-                :disabled="index !== 0 || !hasMaster(item)"
-              >
+              <v-tooltip location="bottom" :text="getTooltipText(item, index)" :disabled="!hasMaster(item)">
                 <template #activator="{ props }">
                   <span v-bind="props" class="text-lowercase">{{ item.name }}</span>
                 </template>
@@ -233,6 +229,20 @@ function getMetadata(contract: any): { type: string; projectName: string } {
 function hasMaster(contract: any): boolean {
   const meta = getMetadata(contract);
   return meta.type === "kubernetes" || meta.projectName === "caprover";
+}
+
+function getTooltipText(contract: any, index: number) {
+  if (index === 0 && getMetadata(contract).projectName === "caprover") {
+    return "Leader";
+  }
+
+  if (index === 0 && getMetadata(contract).projectName === "kubernetes") {
+    return "Master";
+  }
+
+  if (index !== 0) {
+    return "Worker";
+  }
 }
 </script>
 

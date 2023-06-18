@@ -11,7 +11,7 @@
     <Subsquid />
 
     <template #list>
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Subsquid Instances" :project-name="name" />
     </template>
   </view-layout>
 </template>

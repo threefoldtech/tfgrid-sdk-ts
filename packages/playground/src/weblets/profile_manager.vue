@@ -23,6 +23,21 @@
             <p>
               Locked:
               <strong :style="{ color: '#76e2c8' }">{{ normalizeBalance(balance.locked, true) || 0 }} TFT</strong>
+              <v-tooltip text="Locked balance documentation" location="bottom right">
+                <template #activator="{ props }">
+                  <v-btn
+                    @click.stop
+                    v-bind="props"
+                    color="white"
+                    icon="mdi-information-outline"
+                    height="24px"
+                    width="24px"
+                    class="ml-2"
+                    href="https://manual.grid.tf/tfchain/tfchain.html?highlight=locked#contract-locking"
+                    target="_blank"
+                  />
+                </template>
+              </v-tooltip>
             </p>
           </template>
         </div>
@@ -222,7 +237,7 @@
           <VBtn
             color="secondary"
             variant="text"
-            :disabled="!!ssh || updatingSSH || generatingSSH"
+            :disabled="!!ssh || updatingSSH || generatingSSH || !isEnoughBalance(balance)"
             :loading="generatingSSH"
             @click="generateSSH"
           >
@@ -272,9 +287,10 @@ import { onMounted, type Ref, ref, watch } from "vue";
 import { nextTick } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
+import IconActionBtn from "../components/icon_action_btn.vue";
 import { useProfileManager } from "../stores";
 import { type Balance, createAccount, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
-import { normalizeError } from "../utils/helpers";
+import { isEnoughBalance, normalizeError } from "../utils/helpers";
 import { downloadAsFile, normalizeBalance } from "../utils/helpers";
 
 interface Credentials {

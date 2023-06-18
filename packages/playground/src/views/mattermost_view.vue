@@ -12,7 +12,7 @@
     <TfMattermost />
 
     <template #list>
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Mattermost Instances" :project-name="name" />
     </template>
   </view-layout>
 </template>

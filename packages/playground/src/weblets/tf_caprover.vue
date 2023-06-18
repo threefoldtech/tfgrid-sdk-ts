@@ -32,7 +32,9 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Domain" v-model="domain" v-bind="props" autofocus />
+          <input-tooltip #="{ tooltipProps }" tooltip="Domain name.">
+            <v-text-field label="Domain" v-model="domain" v-bind="{ ...props, ...tooltipProps }" />
+          </input-tooltip>
         </input-validator>
 
         <v-alert type="warning" variant="tonal" class="mb-6">
@@ -63,7 +65,13 @@
             ]"
             #="{ props: validationProps }"
           >
-            <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validationProps }" />
+            <input-tooltip #="{ tooltipProps }" tooltip="Instance admin password.">
+              <v-text-field
+                label="Password"
+                v-model="password"
+                v-bind="{ ...props, ...validationProps, ...tooltipProps }"
+              />
+            </input-tooltip>
           </input-validator>
         </password-input-wrapper>
       </template>
@@ -86,7 +94,6 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString } from "@threefold/grid_client";
 import { ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
@@ -95,14 +102,15 @@ import { type CaproverWorker as CW, ProjectName } from "../types";
 import { deployVM, type Env, type Machine } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
+import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
 const domain = ref("");
-const password = ref(generateString(10));
-const leader = ref(createWorker("cr" + generateString(9)));
+const password = ref(generatePassword(10));
+const leader = ref(createWorker(generateName(9, { prefix: "cr" })));
 const workers = ref<CW[]>([]);
 
 async function deploy() {

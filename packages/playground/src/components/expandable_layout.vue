@@ -1,9 +1,15 @@
 <template>
   <section>
-    <div class="d-flex mb-6">
+    <div class="d-flex my-6">
+      <v-card-subtitle class="text-subtitle-1 mt-3" v-if="title">{{ title }}</v-card-subtitle>
       <v-spacer />
-      <v-btn prepend-icon="mdi-plus" color="primary" @click="$emit('add')"> add </v-btn>
+      <v-tooltip text="Add">
+        <template #activator="{ props }">
+          <v-btn icon="mdi-plus" variant="tonal" color="primary" @click="$emit('add')" v-bind="props" />
+        </template>
+      </v-tooltip>
     </div>
+    <v-divider class="my-2" />
     <div v-for="(item, index) in modelValue" :key="item">
       <div class="d-flex">
         <div class="flex-grow-1 mr-4">
@@ -11,7 +17,17 @@
         </div>
         <div class="d-flex">
           <v-spacer />
-          <v-btn color="error" icon="mdi-delete-outline" @click="remove(index)" v-if="!required.includes(index)" />
+          <v-tooltip text="Remove">
+            <template #activator="{ props }">
+              <v-btn
+                color="error"
+                icon="mdi-delete-outline"
+                @click="remove(index)"
+                v-if="!required.includes(index)"
+                v-bind="props"
+              />
+            </template>
+          </v-tooltip>
         </div>
       </div>
       <v-divider class="mb-4" v-if="index + 1 < modelValue.length" />
@@ -31,6 +47,7 @@ const props = defineProps({
     type: Array as PropType<number[]>,
     default: () => [],
   },
+  title: String,
 });
 const emits = defineEmits<{
   (event: "update:modelValue", value: any[]): void;

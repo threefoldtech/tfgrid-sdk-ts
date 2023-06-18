@@ -28,7 +28,9 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Name" v-model="name" v-bind="props" />
+          <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
+            <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+          </input-tooltip>
         </input-validator>
 
         <SelectSolutionFlavor
@@ -60,7 +62,7 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString, type GridClient } from "@threefold/grid_client";
+import type { GridClient } from "@threefold/grid_client";
 import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
@@ -70,12 +72,13 @@ import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
+import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref("mm" + generateString(9));
+const name = ref(generateName(9, { prefix: "mm" }));
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;
@@ -129,7 +132,7 @@ async function deploy() {
           planetary: true,
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
-            { key: "DB_PASSWORD", value: generateString(12) },
+            { key: "DB_PASSWORD", value: generatePassword() },
             { key: "SITE_URL", value: "https://" + domain },
             { key: "MATTERMOST_DOMAIN", value: domain },
             ...(smtp.value.enabled

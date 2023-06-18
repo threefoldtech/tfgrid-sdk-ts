@@ -27,7 +27,9 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Name" v-model="name" v-bind="props" />
+          <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
+            <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+          </input-tooltip>
         </input-validator>
 
         <input-validator
@@ -42,7 +44,9 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Username" v-model="username" v-bind="props" />
+          <input-tooltip #="{ tooltipProps }" tooltip="Admin username.">
+            <v-text-field label="Username" v-model="username" v-bind="{ ...props, ...tooltipProps }" />
+          </input-tooltip>
         </input-validator>
 
         <password-input-wrapper #="{ props }">
@@ -55,7 +59,13 @@
             ]"
             #="{ props: validatorProps }"
           >
-            <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
+            <input-tooltip #="{ tooltipProps }" tooltip="Admin password.">
+              <v-text-field
+                label="Password"
+                v-model="password"
+                v-bind="{ ...props, ...validatorProps, ...tooltipProps }"
+              />
+            </input-tooltip>
           </input-validator>
         </password-input-wrapper>
 
@@ -67,7 +77,9 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Email" v-bind="props" v-model="email" />
+          <input-tooltip #="{ tooltipProps }" tooltip="Admin email.">
+            <v-text-field label="Email" v-bind="{ ...props, ...tooltipProps }" v-model="email" />
+          </input-tooltip>
         </input-validator>
 
         <SelectSolutionFlavor
@@ -101,7 +113,7 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString, type GridClient } from "@threefold/grid_client";
+import type { GridClient } from "@threefold/grid_client";
 import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
@@ -111,14 +123,15 @@ import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
+import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref("tg" + generateString(9));
+const name = ref(generateName(9, { prefix: "tg" }));
 const username = ref("admin");
-const password = ref(generateString(12));
+const password = ref(generatePassword());
 const email = ref("");
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;

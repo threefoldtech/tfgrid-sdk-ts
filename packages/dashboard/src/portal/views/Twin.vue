@@ -137,7 +137,7 @@ export default class TwinView extends Vue {
       return;
     }
     updateRelay(
-      this.$route.params.accountID,
+      this.$store.state.credentials.account.address,
       this.$api,
       this.selectedName,
       this.twin.pk,

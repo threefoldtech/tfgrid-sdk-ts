@@ -11,7 +11,7 @@
     <TfTaiga />
 
     <template #list>
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Taiga Instances" :project-name="name" />
     </template>
   </view-layout>
 </template>

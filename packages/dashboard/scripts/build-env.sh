@@ -9,11 +9,14 @@ echo -e "\nHINT:\e[1;10m The default selected STELLAR_NETWORK is\e[0m \e[1;32m$S
 # Check the current selected tf-chain network, there are 5 modes dev, qa, test, main and custom
 # the user should select one of them, otherwise will be devnet.
 
+if [ -d public]
+then
+    file="public/config.js"
+fi
+
 if [ -d dist ]
 then
     file="dist/config.js"
-else
-    file="config.js"
 fi
 
 if [ -z ${VERSION+x} ]

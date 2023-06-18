@@ -5,7 +5,7 @@
     <MicroVm />
 
     <template #list>
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Micro Virtual Machines" :project-name="name" />
     </template>
   </view-layout>
 </template>

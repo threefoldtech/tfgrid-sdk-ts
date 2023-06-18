@@ -11,7 +11,7 @@
     <NodePilot />
 
     <template #list>
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Node Pilot Instances" :project-name="name" />
     </template>
   </view-layout>
 </template>

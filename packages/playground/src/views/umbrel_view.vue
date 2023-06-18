@@ -11,7 +11,7 @@
     <TfUmbrel />
 
     <template #list>
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Umbrel Instances" :project-name="name" />
     </template>
   </view-layout>
 </template>

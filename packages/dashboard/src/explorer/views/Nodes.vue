@@ -19,7 +19,14 @@
             v-model="gatewayFilter"
             @change="requestNodes"
           />
-          <v-switch label="Online (Only)" v-model="onlineFilter" @change="requestNodes" />
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <div v-bind="attrs" v-on="on">
+                <v-switch label="Online (Only)" v-model="onlineFilter" @change="requestNodes" />
+              </div>
+            </template>
+            <span>Does not include Standby nodes</span>
+          </v-tooltip>
         </div>
       </div>
       <div class="d-flex justify-center">

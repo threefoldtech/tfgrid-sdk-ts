@@ -10,7 +10,7 @@
     <TfPeertube />
 
     <template #list>
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Peertube Instances" :project-name="name" />
     </template>
   </view-layout>
 </template>

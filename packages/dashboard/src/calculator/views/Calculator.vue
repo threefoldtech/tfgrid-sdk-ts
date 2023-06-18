@@ -17,12 +17,12 @@
         <div class="card">
           <v-row>
             <v-col cols="5" class="mx-auto">
-              <v-tooltip right>
+              <v-tooltip offset="5" top>
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
                     placeholder="Enter number of CPUs"
                     :rules="[...inputValidators, cruCheck]"
-                    label="CRU"
+                    label="CPU"
                     suffix="vCores"
                     v-model="CRU"
                     outlined
@@ -30,16 +30,16 @@
                     v-on="on"
                   ></v-text-field>
                 </template>
-                <span>CPU</span>
+                <span>Number of virtual cores</span>
               </v-tooltip>
             </v-col>
             <v-col cols="5" class="mx-auto">
-              <v-tooltip right>
+              <v-tooltip top>
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
                     placeholder="Memory"
                     :rules="[...inputValidators, mruCheck]"
-                    label="MRU"
+                    label="RAM"
                     suffix="GB"
                     v-model="MRU"
                     outlined
@@ -47,18 +47,18 @@
                     v-on="on"
                   ></v-text-field>
                 </template>
-                <span>RAM</span>
+                <span>The Memory in GB</span>
               </v-tooltip>
             </v-col>
           </v-row>
           <v-row>
             <v-col cols="5" class="mx-auto">
-              <v-tooltip right>
+              <v-tooltip top>
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
                     placeholder="SSD Storage"
                     :rules="[...inputValidators, diskCheck(SRU)]"
-                    label="SRU"
+                    label="Disk SSD"
                     suffix="GB"
                     v-model="SRU"
                     outlined
@@ -66,16 +66,16 @@
                     v-on="on"
                   ></v-text-field>
                 </template>
-                <span>SSD</span>
+                <span>The SSD capacity storage</span>
               </v-tooltip>
             </v-col>
             <v-col cols="5" class="mx-auto">
-              <v-tooltip right>
+              <v-tooltip top>
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
                     placeholder="HDD Storage"
                     :rules="[...inputValidators, diskCheck(HRU)]"
-                    label="HRU"
+                    label="Disk HDD"
                     suffix="GB"
                     v-model="HRU"
                     outlined
@@ -83,24 +83,55 @@
                     v-on="on"
                   ></v-text-field>
                 </template>
-                <span>HDD</span>
+                <span>The HDD capacity storage</span>
               </v-tooltip>
             </v-col>
           </v-row>
           <v-row>
-            <v-col cols="5" class="mx-auto">
-              <v-switch label="With a Public IP (V4)" @change="IPV4Toggle" />
+            <v-col cols="2" class="mx-auto">
+              <v-tooltip bottom nudge-right="40">
+                <template v-slot:activator="{ on, attrs }">
+                  <div v-on="on" v-bind="attrs">
+                    <v-switch hide-details label="With a Public IP (V4)" @change="IPV4Toggle" />
+                  </div> </template
+                ><span
+                  >An Internet Protocol version 4 address that is globally unique and accessible over the internet</span
+                >
+              </v-tooltip>
             </v-col>
-
+            <v-col cols="2" class="mx-auto">
+              <v-tooltip bottom nudge-left="20">
+                <template v-slot:activator="{ on, attrs }">
+                  <div v-on="on" v-bind="attrs">
+                    <v-switch
+                      hide-details
+                      label="Use current balance"
+                      :disabled="!$store.state.credentials.account.address"
+                      @change="getCurrentBalance"
+                      v-model="useCurrentBalance"
+                    />
+                  </div>
+                </template>
+                <span v-if="!$store.state.credentials.account.address">You should select/create an account first</span>
+                <span v-else>Use current balance to calculate the discount</span>
+              </v-tooltip>
+            </v-col>
             <v-col cols="5" class="mx-auto">
-              <v-text-field
-                placeholder="Your Balance"
-                :rules="[...inputValidators]"
-                label="Your Balance"
-                suffix="TFT"
-                v-model="balance"
-                outlined
-              ></v-text-field>
+              <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    v-bind="attrs"
+                    v-on="on"
+                    placeholder="Balance"
+                    :rules="[...inputValidators]"
+                    label="Balance"
+                    suffix="TFT"
+                    v-model="balance"
+                    outlined
+                  />
+                </template>
+                <span>The amount of TFT to calculate discount</span>
+              </v-tooltip>
             </v-col>
           </v-row>
         </div>
@@ -113,13 +144,21 @@
           :key="price.price"
           :style="{ color: price.color, background: price.backgroundColor }"
         >
-          <span class="price">
-            <span class="name">
-              {{ price.label !== undefined ? price.label + " " : " " }}
-              {{ price.packageName != "none" ? price.packageName + " Package" : "" }}</span
-            >
-            : ${{ price.price }}/month, {{ price.TFTs }} TFT/month
-          </span>
+          <v-tooltip bottom nudge-bottom="12">
+            <template v-slot:activator="{ on, attrs }">
+              <span class="price">
+                <p>
+                  Cost of reservation on a
+                  <span class="name">{{ price.label !== undefined ? price.label + " " : " " }}</span>
+                </p>
+                <span class="package"> {{ price.packageName != "none" ? price.packageName + " Package: " : "" }}</span>
+                ${{ price.price }}/month, {{ price.TFTs }} TFT/month
+                <span class="pl-2" dark right v-bind="attrs" v-on="on">
+                  <i class="fa-solid fa-circle-info"></i>
+                </span> </span
+            ></template>
+            <span>{{ price.info }}</span>
+          </v-tooltip>
         </div>
       </div>
     </v-card>
@@ -129,9 +168,9 @@
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
 
+import { balanceInterface, getBalance } from "../../portal/lib/balance";
 import { calCU, calSU, getPrices } from "../../portal/lib/nodes";
 import Layout from "../components/Layout.vue";
-
 type priceType = {
   label?: string;
   color: string;
@@ -139,6 +178,7 @@ type priceType = {
   packageName: any;
   backgroundColor: string;
   TFTs: any;
+  info: string;
 };
 
 @Component({
@@ -170,6 +210,9 @@ export default class Calculator extends Vue {
   pricing: any;
   TFTPrice: number | undefined;
   isValidInputs = true;
+  useCurrentBalance = false;
+  _balanceTmp: string = this.balance;
+
   cruCheck() {
     // eslint-disable-next-line
     const CRURegex = /^\d+$/;
@@ -250,20 +293,22 @@ export default class Calculator extends Vue {
 
       this.prices = [
         {
-          label: "Dedicated Node Price",
+          label: "Dedicated Node",
           price: `${dedicatedPrice}`,
           color: this.discountPackages[dedicatedPackage].color,
           packageName: dedicatedPackage,
           backgroundColor: this.discountPackages[dedicatedPackage].backgroundColor,
           TFTs: (+dedicatedPrice / this.TFTPrice).toFixed(2),
+          info: "A user can reserve an entire node then use it exclusively to deploy solutions",
         },
         {
-          label: "Shared Node Price",
+          label: "Shared Node",
           price: `${sharedPrice}`,
           color: "#868686",
           packageName: sharedPackage,
           backgroundColor: this.discountPackages[sharedPackage].backgroundColor,
           TFTs: (+sharedPrice / this.TFTPrice).toFixed(2),
+          info: "Shared Nodes allow several users to host various workloads on a single node",
         },
       ];
     } else {
@@ -277,6 +322,7 @@ export default class Calculator extends Vue {
 
   IPV4Toggle() {
     this.IPV4 = !this.IPV4;
+    console.log("current balance: " + this.$store.state.credentials.balance.free);
   }
 
   async calcPrice() {
@@ -347,6 +393,21 @@ export default class Calculator extends Vue {
     const pricing = await api.query.tftPriceModule.tftPrice();
     return pricing.words[0] / 1000;
   }
+  async getCurrentBalance() {
+    if (!this.useCurrentBalance) {
+      this.balance = this._balanceTmp;
+      return;
+    }
+    try {
+      getBalance(this.$api, this.$store.state.credentials.account.address).then((balance: balanceInterface) => {
+        this.$store.state.credentials.balance.free = balance.free;
+        this._balanceTmp = this.balance;
+        this.balance = balance.free.toString();
+      });
+    } catch (error) {
+      console.log("Can't fetch the current balance due to error: " + error);
+    }
+  }
 }
 </script>
 <style>
@@ -388,6 +449,9 @@ export default class Calculator extends Vue {
 }
 
 .name {
+  font-weight: 900;
+}
+.package {
   font-weight: 900;
   text-transform: capitalize;
 }

@@ -13,7 +13,7 @@
     <TfCaprover />
 
     <template #list>
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="CapRover Clusters" :project-name="name" />
     </template>
   </view-layout>
 </template>

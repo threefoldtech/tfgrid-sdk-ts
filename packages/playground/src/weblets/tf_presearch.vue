@@ -29,7 +29,9 @@
           ]"
           #="{ props }"
         >
-          <v-text-field label="Name" v-model="name" v-bind="props" />
+          <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
+            <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+          </input-tooltip>
         </input-validator>
 
         <input-validator
@@ -40,13 +42,35 @@
           ]"
           #="{ props }"
         >
-          <password-input-wrapper #="{ props }">
-            <v-text-field label="Presearch Registeration Code" v-bind="props" v-model="code" />
+          <password-input-wrapper>
+            <input-tooltip #="{ tooltipProps }" tooltip="Presearch Registeration Code.">
+              <v-text-field
+                label="Presearch Registeration Code"
+                v-bind="{ ...props, ...tooltipProps }"
+                v-model="code"
+              />
+            </input-tooltip>
           </password-input-wrapper>
         </input-validator>
 
-        <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
-        <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
+        <v-tooltip
+          location="top"
+          text="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
+        >
+          <template v-slot:activator="{ props }">
+            <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
+          </template>
+        </v-tooltip>
+
+        <v-tooltip
+          location="top"
+          text="The Planetary Network is a distributed network infrastructure that spans across multiple regions and countries, providing global connectivity."
+        >
+          <template v-slot:activator="{ props }">
+            <v-switch color="primary" inset label="Planetary Network" v-model="planetary" v-bind="props" />
+          </template>
+        </v-tooltip>
+
         <v-alert v-show="networkError" class="mb-2" type="warning" variant="tonal">
           You must enable at least one of network options.
         </v-alert>
@@ -63,8 +87,31 @@
       </template>
 
       <template #restore>
-        <v-textarea label="Private Presearch Restore Key" v-model="privateRestoreKey" no-resize :spellcheck="false" />
-        <v-textarea label="Public Presearch Restore Key" v-model="publicRestoreKey" no-resize :spellcheck="false" />
+        <input-tooltip
+          #="{ tooltipProps }"
+          tooltip="The Private Presearch Restore Key is a unique cryptographic key associated with your Presearch account."
+        >
+          <v-textarea
+            label="Private Presearch Restore Key"
+            v-bind="{ ...tooltipProps }"
+            v-model="privateRestoreKey"
+            no-resize
+            :spellcheck="false"
+          />
+        </input-tooltip>
+
+        <input-tooltip
+          #="{ tooltipProps }"
+          tooltip="The Public Presearch Restore Key is a unique cryptographic key associated with your Presearch account."
+        >
+          <v-textarea
+            label="Public Presearch Restore Key"
+            v-bind="{ ...tooltipProps }"
+            v-model="publicRestoreKey"
+            no-resize
+            :spellcheck="false"
+          />
+        </input-tooltip>
       </template>
     </d-tabs>
 
@@ -75,7 +122,6 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString } from "@threefold/grid_client";
 import { type Ref, ref, watch } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
@@ -85,12 +131,13 @@ import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
+import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref("ps" + generateString(8));
+const name = ref(generateName(8, { prefix: "ps" }));
 const code = ref("");
 const ipv4 = ref(false);
 const planetary = ref(true);

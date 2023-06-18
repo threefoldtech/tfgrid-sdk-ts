@@ -10,7 +10,7 @@
     <TFWordpress />
 
     <template #list>
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="WordPress Instances" :project-name="name" />
     </template>
   </view-layout>
 </template>

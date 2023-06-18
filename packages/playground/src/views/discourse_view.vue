@@ -11,7 +11,7 @@
     <TfDiscourse />
 
     <template #list>
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Discourse Instances" :project-name="name" />
     </template>
   </view-layout>
 </template>

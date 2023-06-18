@@ -48,9 +48,9 @@
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <v-btn
-          color="secondary"
-          variant="tonal"
+        <IconActionBtn
+          tooltip="Show Details"
+          icon="mdi-eye-outline"
           @click="
             item.value.type !== 'name'
               ? onShowDetails(item.value.contractId)
@@ -58,9 +58,7 @@
           "
           :disabled="(loading && loadingContractId !== item.value.contractId) || deleting"
           :loading="loadingContractId == item.value.contractId"
-        >
-          Show Details
-        </v-btn>
+        />
       </template>
     </ListTable>
 
@@ -125,6 +123,7 @@
 import { ContractStates } from "@threefold/grid_client";
 import { ref } from "vue";
 
+import IconActionBtn from "../components/icon_action_btn.vue";
 import { useProfileManager } from "../stores";
 import type { VDataTableHeader } from "../types";
 import { getUserContracts, type NormalizedContract } from "../utils/contracts";
@@ -243,6 +242,7 @@ export default {
   name: "TfContractsList",
   components: {
     ListTable,
+    IconActionBtn,
   },
 };
 </script>

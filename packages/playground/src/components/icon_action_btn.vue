@@ -8,6 +8,7 @@
         v-bind="props"
         :href="href"
         :target="href ? '_blank' : undefined"
+        :height="height"
       />
     </template>
   </v-tooltip>
@@ -19,6 +20,7 @@ defineProps<{
   icon: `mdi-${string}`;
   color?: string;
   href?: string;
+  height?: string;
 }>();
 defineEmits(["click"]);
 </script>

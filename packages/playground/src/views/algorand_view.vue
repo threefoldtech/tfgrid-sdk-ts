@@ -10,7 +10,7 @@
     <TfAlgorand />
 
     <template #list>
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Algorand Instances" :project-name="name" />
     </template>
   </view-layout>
 </template>

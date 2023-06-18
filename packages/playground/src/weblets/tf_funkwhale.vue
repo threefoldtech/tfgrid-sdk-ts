@@ -21,7 +21,9 @@
         ]"
         #="{ props }"
       >
-        <v-text-field label="Name" v-model="name" v-bind="props" />
+        <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
+          <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        </input-tooltip>
       </input-validator>
 
       <input-validator
@@ -36,7 +38,9 @@
         ]"
         #="{ props }"
       >
-        <v-text-field label="Username" v-model="username" v-bind="props" />
+        <input-tooltip #="{ tooltipProps }" tooltip="Funkwhale admin username.">
+          <v-text-field label="Username" v-model="username" v-bind="{ ...props, ...tooltipProps }" />
+        </input-tooltip>
       </input-validator>
 
       <input-validator
@@ -47,12 +51,14 @@
         ]"
         #="{ props }"
       >
-        <v-text-field
-          label="Email"
-          placeholder="This email will be used to login to your instance."
-          v-model="email"
-          v-bind="props"
-        />
+        <input-tooltip #="{ tooltipProps }" tooltip="Funkwhale admin email.">
+          <v-text-field
+            placeholder="This email will be used to login to your instance."
+            label="Email"
+            v-model="email"
+            v-bind="{ ...props, ...tooltipProps }"
+          />
+        </input-tooltip>
       </input-validator>
 
       <password-input-wrapper #="{ props }">
@@ -65,7 +71,13 @@
           ]"
           #="{ props: validatorProps }"
         >
-          <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
+          <input-tooltip #="{ tooltipProps }" tooltip="Funkwhale admin password.">
+            <v-text-field
+              label="Password"
+              v-model="password"
+              v-bind="{ ...props, ...validatorProps, ...tooltipProps }"
+            />
+          </input-tooltip>
         </input-validator>
       </password-input-wrapper>
 
@@ -92,7 +104,7 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString, type GridClient } from "@threefold/grid_client";
+import type { GridClient } from "@threefold/grid_client";
 import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
@@ -103,15 +115,16 @@ import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
+import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref("fw" + generateString(9));
+const name = ref(generateName(9, { prefix: "fw" }));
 const username = ref("admin");
 const email = ref("");
-const password = ref(generateString(12));
+const password = ref(generatePassword(12));
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;
