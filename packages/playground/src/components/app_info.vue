@@ -14,11 +14,13 @@
     <v-card v-if="loading" class="d-flex justify-center align-center pa-10">
       <v-progress-circular indeterminate size="50" color="primary" />
     </v-card>
-    <v-card v-else>
-      <v-card-title class="pb-0 font-weight-bold d-flex align-center" v-if="title">{{ title }}</v-card-title>
+    <v-card v-else class="markdown">
+      <v-card-title class="pb-0 font-weight-bold d-flex align-center text-h4 my-3" v-if="title">
+        {{ title }}
+      </v-card-title>
       <v-card-subtitle :style="{ whiteSpace: 'initial' }" v-if="subtitle">{{ subtitle }}</v-card-subtitle>
       <v-divider class="mt-2" v-if="title || subtitle" />
-      <v-card-text v-html="html" />
+      <v-card-text class="pb-16" v-html="html" />
 
       <v-divider />
       <v-card-actions class="d-flex justify-end">
@@ -62,7 +64,6 @@ export default {
         const markdown = await res.text();
 
         const { attributes, body } = fm<InfoFileMeta>(markdown);
-        console.log(attributes, body);
 
         title.value = attributes.title || "";
         subtitle.value = attributes.subtitle || "";
@@ -84,3 +85,21 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.markdown {
+  p {
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
+  }
+
+  ul {
+    list-style: square;
+    padding-left: 1rem;
+
+    li {
+      opacity: 0.8;
+    }
+  }
+}
+</style>

@@ -7,7 +7,6 @@ Deploy a full virtual machine on Threefold Grid, the full VM allows you to have 
 We provide a few images managed by Threefold like Ubuntu 22.04, and NixOS, but you can still use a custom one
 
 <br />
-<br />
 
 #### Compared to MicroVMs
 
@@ -15,6 +14,3 @@ We provide a few images managed by Threefold like Ubuntu 22.04, and NixOS, but y
 - The default disk is mounted on / so if you want to attach any additional disks, you have to choose a different mounting point
 - Only cloud init flists can be deployed on Full VM. You can check official Threefold flists here
 - In Full VM, you need to mount the additional disks manually after the VM is deployed
-
-<br />
-<br />

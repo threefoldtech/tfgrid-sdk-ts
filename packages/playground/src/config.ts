@@ -1,3 +1,4 @@
+import { marked } from "marked";
 import type { App, Component } from "vue";
 
 import CopyInputWrapper from "./components/copy_input_wrapper.vue";
@@ -22,6 +23,20 @@ const GLOBAL_COMPONENTS: { [key: string]: Component } = {
 export function defineGlobals(app: App<Element>): void {
   defineGlobalComponents(app);
   defineGlobalProps(app);
+
+  marked.use({
+    renderer: {
+      heading(text, level) {
+        const margin = Math.max(7 - level, 3);
+        return `<h${level} class="text-h${level} mb-${margin}">${text}</h${level}>`;
+      },
+      link(href, title, text) {
+        const t = title ? `title="${title}"` : "";
+        const h = `href="${href}"`;
+        return `<a class="app-link" target="_blank" ${t} ${h}>${text}</a>`;
+      },
+    },
+  });
 }
 
 function defineGlobalComponents(app: App<Element>) {

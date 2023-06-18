@@ -20,43 +20,22 @@ const router = createRouter({
     {
       path: "/",
       component: () => import("../views/full_virtual_machine.vue"),
-      meta: {
-        title: "Full Virtual Machine",
-        info: {
-          page: "info/full_vm.md",
-          tooltip: "Show Full VM Details",
-        },
-      },
+      meta: { title: "Full Virtual Machine", info: { page: "info/full_vm.md" } },
     },
     {
       path: "/vm",
       component: () => import("../views/micro_virtual_machine.vue"),
-      meta: {
-        title: "Micro Virtual Machine",
-        info: {
-          page: "info/vm.md",
-        },
-      },
+      meta: { title: "Micro Virtual Machine", info: { page: "info/vm.md" } },
     },
     {
       path: "/kubernetes",
       component: () => import("../views/kubernetes_view.vue"),
-      meta: {
-        title: "Kubernetes",
-        info: {
-          page: "info/kubernetes.md",
-        },
-      },
+      meta: { title: "Kubernetes", info: { page: "info/kubernetes.md" } },
     },
     {
       path: "/caprover",
       component: () => import("../views/caprover_view.vue"),
-      meta: {
-        title: "Caprover",
-        info: {
-          page: "info/caprover.md",
-        },
-      },
+      meta: { title: "Caprover", info: { page: "info/caprover.md" } },
     },
     {
       path: "/peertube",
@@ -126,7 +105,7 @@ const router = createRouter({
     {
       path: "/contractslist",
       component: () => import("../views/contracts_list.vue"),
-      meta: { title: "Contracts List", info: { page: "info/contracts_list.md" } },
+      meta: { title: "Contracts List" },
     },
     {
       path: "/:pathMatch(.*)*",
