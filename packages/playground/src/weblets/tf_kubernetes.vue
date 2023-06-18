@@ -9,7 +9,7 @@
     :ivp4="master.ipv4"
     title-image="images/icons/kubernetes.png"
   >
-    <template #title>Deploy a Kubernetes</template>
+    <template #title>Deploy a Kubernetes cluster</template>
     <d-tabs
       :tabs="[
         { title: 'Config', value: 'config' },

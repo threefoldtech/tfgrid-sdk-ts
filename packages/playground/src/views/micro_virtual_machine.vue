@@ -1,6 +1,6 @@
 <template>
   <view-layout>
-    <template #description>Deploy your own micro virtual machine</template>
+    <template #description>Deploy your own Micro Virtual Machine</template>
 
     <MicroVm />
 
