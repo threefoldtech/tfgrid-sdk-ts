@@ -16,17 +16,52 @@
         <v-btn @click="addTFT()" style="max-width: 90px" :loading="loadingAddTFT">GET TFT</v-btn>
       </v-card-actions>
     </v-card>
-    <v-dialog v-if="openBalance" v-model="openBalance" max-width="600">
+    <v-dialog v-if="openBalance" v-model="openBalance" max-width="400">
       <v-card>
-        <v-toolbar color="primary"> Balance Summary </v-toolbar>
+        <v-toolbar class="pa-10" height="90px" :elevation="8" extended color="primary">
+          <v-img
+            background-position="center center"
+            contain
+            height="90px"
+            src="../../assets/balance_summary.png"
+          ></v-img>
+        </v-toolbar>
+        <v-toolbar class="pa-5 mb-5 pb-4" height="25px" :elevation="0" extended color="primary">
+          <strong class="balance-summary-text">Balance Summary</strong>
+        </v-toolbar>
         <v-card-text class="pa-5">
           <v-container>
-            <v-row> Total: {{ balance.free }} TFT </v-row>
-            <v-row> Transferable: {{ balance.transferable }} TFT </v-row>
-            <v-row> Reserved (Locked): {{ balance.reserved }} TFT </v-row>
+            <v-row>
+              <v-col class="pt-0 pb-0"><strong>Total: </strong></v-col>
+              <v-col class="pt-0 pb-0 justify-end d-flex"
+                ><strong>{{ balance.free }} TFT</strong></v-col
+              >
+            </v-row>
+            <v-row>
+              <v-col class="pt-0 pb-0"><strong>Transferable: </strong></v-col>
+              <v-col class="pt-0 pb-0 justify-end d-flex"
+                ><strong>{{ balance.transferable }} TFT</strong></v-col
+              >
+            </v-row>
+            <v-row>
+              <v-col class="pt-0 pb-0">
+                <strong
+                  >Locked:
+                  <a
+                    target="_blank"
+                    href="https://manual.grid.tf/tfchain/tfchain.html?highlight=locked#contract-locking"
+                  >
+                    <v-icon style="font-size: 20px" color="primary" class="white--text">mdi-information-outline</v-icon>
+                  </a>
+                </strong>
+              </v-col>
+              <v-col class="pt-0 pb-0 justify-end d-flex">
+                <strong> {{ balance.reserved }} TFT </strong>
+              </v-col>
+            </v-row>
           </v-container>
         </v-card-text>
-        <v-card-actions class="justify-end">
+        <v-card-actions class="justify-center pb-10">
           <v-btn @click="openBalance = false" color="grey lighten-2 black--text">Close</v-btn>
         </v-card-actions>
       </v-card>
@@ -105,3 +140,13 @@ export default class FundsCard extends Vue {
   }
 }
 </script>
+
+<style>
+.balance-summary-text {
+  text-align: center;
+  width: 100%;
+  color: white;
+  font-weight: 900;
+  font-size: 21px;
+}
+</style>
