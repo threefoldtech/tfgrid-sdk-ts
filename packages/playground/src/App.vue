@@ -21,12 +21,19 @@
                 v-for="item in route.items"
                 :key="item.route"
                 :value="item.route"
-                @click="$router.push(item.route)"
+                @click="clickHandler(item)"
                 active-color="primary"
                 :active="$route.path === item.route"
               >
                 <template v-slot:prepend v-if="item.icon">
-                  <v-img class="mr-4" width="26" :src="baseUrl + 'images/icons/' + item.icon" :alt="item.title" />
+                  <v-img
+                    v-if="item.icon.includes('.')"
+                    class="mr-4"
+                    width="26"
+                    :src="baseUrl + 'images/icons/' + item.icon"
+                    :alt="item.title"
+                  />
+                  <v-icon v-else>{{ item.icon }}</v-icon>
                 </template>
 
                 <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -148,6 +155,10 @@ const routes: AppRoute[] = [
     title: "My Account",
     items: [{ title: "Contracts", route: "/contractslist" }],
   },
+  {
+    title: "External",
+    items: [{ title: "x", icon: "mdi-open-in-new", url: "https://google.com" }],
+  },
 ];
 
 // eslint-disable-next-line no-undef
@@ -157,6 +168,14 @@ const permanent = window.innerWidth > 980;
 const openSidebar = ref(permanent);
 
 const baseUrl = import.meta.env.BASE_URL;
+
+function clickHandler({ route, url }: AppRouteItem): void {
+  if (route) {
+    $router.push(route);
+  } else if (url) {
+    window.open(url, "_blank");
+  }
+}
 </script>
 
 <script lang="ts">
@@ -173,7 +192,8 @@ interface AppRoute {
 
 interface AppRouteItem {
   title: string;
-  route: string;
+  route?: string;
+  url?: string;
   icon?: string;
 }
 export default {
