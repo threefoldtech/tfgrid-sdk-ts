@@ -71,14 +71,12 @@
         </input-validator>
       </password-input-wrapper>
 
-      <v-tooltip
-        location="top"
-        text="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
+      <input-tooltip
+        #="{ props, tooltipProps }"
+        tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
       >
-        <template v-slot:activator="{ props }">
-          <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
-        </template>
-      </v-tooltip>
+        <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="{ ...props, ...tooltipProps }" />
+      </input-tooltip>
 
       <SelectSolutionFlavor
         v-model="solution"

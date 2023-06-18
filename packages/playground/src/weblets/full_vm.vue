@@ -109,41 +109,45 @@
           </input-tooltip>
         </input-validator>
 
-        <v-tooltip
-          location="top"
-          text="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
+        <input-tooltip
+          #="{ props, tooltipProps }"
+          tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
         >
-          <template v-slot:activator="{ props }">
-            <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
-          </template>
-        </v-tooltip>
+          <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="{ ...props, ...tooltipProps }" />
+        </input-tooltip>
 
-        <v-tooltip
-          location="top"
-          text="Public IPv6 is the next-generation Internet Protocol that offers an expanded address space to connect a vast number of devices."
+        <input-tooltip
+          #="{ props, tooltipProps }"
+          tooltip="Public IPv6 is the next-generation Internet Protocol that offers an expanded address space to connect a vast number of devices."
         >
-          <template v-slot:activator="{ props }">
-            <v-switch color="primary" inset label="Public IPv6" v-model="ipv6" v-bind="props" />
-          </template>
-        </v-tooltip>
+          <v-switch color="primary" inset label="Public IPv6" v-model="ipv6" v-bind="{ ...props, ...tooltipProps }" />
+        </input-tooltip>
 
-        <v-tooltip
-          location="top"
-          text="The Planetary Network is a distributed network infrastructure that spans across multiple regions and countries, providing global connectivity."
+        <input-tooltip
+          #="{ props, tooltipProps }"
+          tooltip="The Planetary Network is a distributed network infrastructure that spans across multiple regions and countries, providing global connectivity."
         >
-          <template v-slot:activator="{ props }">
-            <v-switch color="primary" inset label="Planetary Network" v-model="planetary" v-bind="props" />
-          </template>
-        </v-tooltip>
+          <v-switch
+            color="primary"
+            inset
+            label="Planetary Network"
+            v-model="planetary"
+            v-bind="{ ...props, ...tooltipProps }"
+          />
+        </input-tooltip>
 
-        <v-tooltip
-          location="top"
-          text="Enabling WireGuard Access allows you to establish private, secure, and encrypted connections to your instance."
+        <input-tooltip
+          #="{ props, tooltipProps }"
+          tooltip="Enabling WireGuard Access allows you to establish private, secure, and encrypted connections to your instance."
         >
-          <template v-slot:activator="{ props }">
-            <v-switch color="primary" inset label="Add Wireguard Access" v-model="wireguard" v-bind="props" />
-          </template>
-        </v-tooltip>
+          <v-switch
+            color="primary"
+            inset
+            label="Add Wireguard Access"
+            v-model="wireguard"
+            v-bind="{ ...props, ...tooltipProps }"
+          />
+        </input-tooltip>
 
         <v-alert v-show="networkError" class="mb-2" type="warning" variant="tonal">
           You must enable at least one of network options.

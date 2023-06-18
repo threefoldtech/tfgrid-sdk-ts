@@ -1,10 +1,14 @@
 <template>
   <div>
-    <v-tooltip location="top" text="Enable this option to set custom resources.">
-      <template v-slot:activator="{ props }">
-        <v-switch color="primary" inset label="Set Custom Capacity" v-model="custom" v-bind="props" />
-      </template>
-    </v-tooltip>
+    <input-tooltip #="{ props, tooltipProps }" tooltip="Enable this option to set custom resources.">
+      <v-switch
+        color="primary"
+        inset
+        label="Set Custom Capacity"
+        v-model="custom"
+        v-bind="{ ...props, ...tooltipProps }"
+      />
+    </input-tooltip>
 
     <slot></slot>
 

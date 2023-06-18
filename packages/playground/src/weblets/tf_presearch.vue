@@ -61,23 +61,25 @@
           </password-input-wrapper>
         </input-validator>
 
-        <v-tooltip
-          location="top"
-          text="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
+        <input-tooltip
+          #="{ props, tooltipProps }"
+          tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
         >
-          <template v-slot:activator="{ props }">
-            <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
-          </template>
-        </v-tooltip>
+          <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="{ ...props, ...tooltipProps }" />
+        </input-tooltip>
 
-        <v-tooltip
-          location="top"
-          text="The Planetary Network is a distributed network infrastructure that spans across multiple regions and countries, providing global connectivity."
+        <input-tooltip
+          #="{ props, tooltipProps }"
+          tooltip="The Planetary Network is a distributed network infrastructure that spans across multiple regions and countries, providing global connectivity."
         >
-          <template v-slot:activator="{ props }">
-            <v-switch color="primary" inset label="Planetary Network" v-model="planetary" v-bind="props" />
-          </template>
-        </v-tooltip>
+          <v-switch
+            color="primary"
+            inset
+            label="Planetary Network"
+            v-model="planetary"
+            v-bind="{ ...props, ...tooltipProps }"
+          />
+        </input-tooltip>
 
         <v-alert v-show="networkError" class="mb-2" type="warning" variant="tonal">
           You must enable at least one of network options.
