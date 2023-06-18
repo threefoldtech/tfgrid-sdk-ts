@@ -25,7 +25,7 @@
             <v-btn v-else @click="disconnectWallet" color="red"> Disconnect </v-btn>
 
             <a href="https://library.threefold.me/info/manual/#/manual__dashboard_readme" target="_blank">
-              <v-btn class="custom-button" color="white" style="color: black"> Manual</v-btn>
+              <v-btn class="custom-button" color="white" style="color: black"> Help</v-btn>
             </a>
 
             <v-theme-provider root>
