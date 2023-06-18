@@ -168,20 +168,15 @@ const routes: AppRoute[] = [
     items: [{ title: "Contracts", route: "/contractslist" }],
   },
   {
-    title: "External",
-    items: [{ title: "x", icon: "mdi-open-in-new", url: "https://google.com" }],
+    title: "Help",
+    items: [{ title: "Manual", icon: "mdi-open-in-new", url: "https://manual.grid.tf/" }],
   },
 ];
 
 const navbarLinks: NavbarLink[] = [
   {
     label: "Manual",
-    url: "https://google.com",
-    icon: "mdi-menu",
-  },
-  {
-    url: "https://google.com",
-    icon: "mdi-menu",
+    url: "https://manual.grid.tf/",
   },
 ];
 
