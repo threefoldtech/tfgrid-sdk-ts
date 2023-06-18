@@ -65,6 +65,18 @@
 
         <v-spacer></v-spacer>
 
+        <v-btn
+          v-for="(link, index) in navbarLinks"
+          :key="index"
+          color="var(--link-color)"
+          variant="text"
+          target="_blank"
+          :href="link.url"
+          :prepend-icon="link.icon && link.label ? link.icon : undefined"
+          :icon="link.icon && !link.label ? link.icon : undefined"
+          :text="link.label"
+        />
+        <v-divider vertical v-if="navbarLinks.length" />
         <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
         <v-divider vertical />
         <AppTheme />
@@ -161,6 +173,18 @@ const routes: AppRoute[] = [
   },
 ];
 
+const navbarLinks: NavbarLink[] = [
+  {
+    label: "Manual",
+    url: "https://google.com",
+    icon: "mdi-menu",
+  },
+  {
+    url: "https://google.com",
+    icon: "mdi-menu",
+  },
+];
+
 // eslint-disable-next-line no-undef
 const network = process.env.NETWORK || (window as any).env.NETWORK;
 
@@ -196,6 +220,13 @@ interface AppRouteItem {
   url?: string;
   icon?: string;
 }
+
+interface NavbarLink {
+  label?: string;
+  url: string;
+  icon?: string;
+}
+
 export default {
   name: "App",
   components: {
@@ -209,10 +240,14 @@ export default {
 </script>
 
 <style lang="scss" global>
+:root {
+  --link-color: #3d7ad4;
+}
+
 .app-link {
   text-decoration: none;
   font-weight: bold;
-  color: #3d7ad4;
+  color: var(--link-color);
   cursor: pointer;
 }
 
