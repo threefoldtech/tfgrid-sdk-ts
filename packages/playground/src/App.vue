@@ -175,7 +175,7 @@ const routes: AppRoute[] = [
 
 const navbarLinks: NavbarLink[] = [
   {
-    label: "Manual",
+    label: "Help",
     url: "https://manual.grid.tf/",
   },
 ];
