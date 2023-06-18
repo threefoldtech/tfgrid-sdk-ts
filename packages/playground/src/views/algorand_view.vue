@@ -3,7 +3,7 @@
     <TfAlgorand />
 
     <div class="mt-4">
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Algorand Instances" :project-name="name" />
     </div>
   </div>
 </template>

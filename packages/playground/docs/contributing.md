@@ -19,7 +19,7 @@ Note: Make sure to include the project name to ProjectName enum in [index.ts](..
   <div>
     <TfDemo />
     <div class="mt-4">
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="deployment list" :project-name="name" />
     </div>
   </div>
 </template>

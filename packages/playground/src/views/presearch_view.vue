@@ -3,7 +3,7 @@
     <Presearch />
 
     <div class="mt-4">
-      <TfDeploymentList :project-name="name" />
+      <TfDeploymentList title="Presearch Instances" :project-name="name" />
     </div>
   </div>
 </template>

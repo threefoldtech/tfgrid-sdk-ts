@@ -160,7 +160,12 @@
       </template>
 
       <template #disks>
-        <ExpandableLayout v-model="disks" @add="addDisk" #="{ index }">
+        <ExpandableLayout
+          v-model="disks"
+          @add="addDisk"
+          title="Add additional disk space to your full virtual machine"
+          #="{ index }"
+        >
           <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
           <input-validator
             :value="disks[index].name"
@@ -207,7 +212,6 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString } from "@threefold/grid_client";
 import { type Ref, ref, watch } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
@@ -216,6 +220,7 @@ import { type Farm, type Flist, ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
+import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
@@ -244,7 +249,7 @@ const images: VmImage[] = [
   },
 ];
 
-const name = ref("vm" + generateString(8));
+const name = ref(generateName(8, { prefix: "vm" }));
 const flist = ref<Flist>();
 const cpu = ref(4);
 const memory = ref(8192);
@@ -258,9 +263,9 @@ const disks = ref<Disk[]>([]);
 const networkError = ref(false);
 
 function addDisk() {
-  const name = generateString(7);
+  const name = generateName(7);
   disks.value.push({
-    name: "DISK" + name,
+    name: "disk" + name,
     size: 50,
     mountPoint: "/mnt/" + name,
   });
