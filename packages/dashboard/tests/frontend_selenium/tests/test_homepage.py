@@ -206,3 +206,19 @@ def test_search_by_invalid_name_address(browser, cases):
     dashboard_page.search_accounts(cases.lower())
     assert address not in address_list and address not in dashboard_page.accounts_list()
     assert len(account_list) == 0 and len(dashboard_page.accounts_list()) == 0
+
+
+def test_tft_price(browser):
+    """
+      Test Case: TC1674 - TFT price
+      Steps:
+          - Navigate to dashboard.
+          - Authenticate polkadot.
+          - Click on TFT swap icon.
+      Result: TFT in USD and vice versa.
+    """
+    dashboard_page, _ = before_test_setup(browser)
+    tft_in_usd = float(dashboard_page.tft_price_result()[:-4])
+    dashboard_page.tft_price_swap()
+    usd_in_tft = float(dashboard_page.tft_price_result()[:-4])
+    assert 0.99 < tft_in_usd * usd_in_tft < 1.1
