@@ -1,6 +1,16 @@
 <template>
   <div>
-    <v-select label="Select" :items="packages" v-model="solution" />
+    <input-tooltip
+      #="{ tooltipProps }"
+      tooltip="Refers to the process of choosing the appropriate computing resources and performance capabilities for a virtual instance or server. When provisioning a virtual machine or cloud instance, the 'Select instance capacity' step allows users to specify the desired CPU, memory, storage, and network resources for their virtual environment."
+    >
+      <v-select
+        label="Select instance capacity"
+        v-bind="{ ...props, ...tooltipProps }"
+        :items="packages"
+        v-model="solution"
+      />
+    </input-tooltip>
 
     <div v-if="solution === 'custom'">
       <input-validator
@@ -13,7 +23,14 @@
         ]"
         #="{ props }"
       >
-        <v-text-field type="number" label="CPU (vCores)" v-model.number="cpu" v-bind="props" />
+        <input-tooltip #="{ tooltipProps }" tooltip="The number of virtual cores allocated to your instance.">
+          <v-text-field
+            label="CPU (vCores)"
+            type="number"
+            v-model.number="cpu"
+            v-bind="{ ...props, ...tooltipProps }"
+          />
+        </input-tooltip>
       </input-validator>
 
       <input-validator
@@ -26,7 +43,17 @@
         ]"
         #="{ props }"
       >
-        <v-text-field type="number" label="Memory (MB)" v-model.number="memory" v-bind="props" />
+        <input-tooltip
+          #="{ tooltipProps }"
+          tooltip="The amount of RAM (Random Access Memory) allocated to your instance."
+        >
+          <v-text-field
+            label="Memory (MB)"
+            type="number"
+            v-model.number="memory"
+            v-bind="{ ...props, ...tooltipProps }"
+          />
+        </input-tooltip>
       </input-validator>
 
       <input-validator
@@ -34,12 +61,22 @@
         :rules="[
           validators.required('Disk size is required.'),
           validators.isInt('Disk size must be a valid integer.'),
-          validators.min('Minimum allowed disk size is 1 GB.', 1),
+          validators.min('Minimum allowed disk size is 15 GB.', 15),
           validators.max('Maximum allowed disk size is 10000 GB.', 10000),
         ]"
         #="{ props }"
       >
-        <v-text-field type="number" label="Disk (GB)" v-model.number="disk" v-bind="props" />
+        <input-tooltip
+          #="{ tooltipProps }"
+          tooltip="The storage capacity allocated to your instance, indicating the amount of space available to store files, data, and applications."
+        >
+          <v-text-field
+            label="Disk Size (GB)"
+            type="number"
+            v-model.number="disk"
+            v-bind="{ ...props, ...tooltipProps }"
+          />
+        </input-tooltip>
       </input-validator>
     </div>
   </div>

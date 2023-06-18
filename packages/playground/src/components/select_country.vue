@@ -1,12 +1,15 @@
 <template>
-  <v-autocomplete
-    :disabled="loading"
-    label="Country"
-    :items="countries"
-    clearable
-    :loading="loading"
-    v-model="country"
-  />
+  <input-tooltip #="{ tooltipProps }" tooltip="Select a country to deploy your instance inside it.">
+    <v-autocomplete
+      :disabled="loading"
+      label="Country"
+      :items="countries"
+      clearable
+      v-bind="{ ...tooltipProps }"
+      :loading="loading"
+      v-model="country"
+    />
+  </input-tooltip>
 </template>
 
 <script lang="ts" setup>
