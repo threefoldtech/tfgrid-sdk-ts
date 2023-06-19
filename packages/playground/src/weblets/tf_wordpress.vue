@@ -28,8 +28,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Instance name.">
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -45,8 +45,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Wordpress admin username.">
-          <v-text-field label="Username" v-model="username" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Wordpress admin username.">
+          <v-text-field label="Username" v-model="username" v-bind="{ ...props }" />
         </input-tooltip>
       </input-validator>
 
@@ -60,12 +60,8 @@
           ]"
           #="{ props: validatorProps }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="Wordpress admin password.">
-            <v-text-field
-              label="Password"
-              v-model="password"
-              v-bind="{ ...props, ...tooltipProps, ...validatorProps }"
-            />
+          <input-tooltip tooltip="Wordpress admin password.">
+            <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
           </input-tooltip>
         </input-validator>
       </password-input-wrapper>
@@ -78,12 +74,12 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Wordpress admin email.">
+        <input-tooltip tooltip="Wordpress admin email.">
           <v-text-field
             label="Email"
             placeholder="This email will be used to login to your instance."
             v-model="email"
-            v-bind="{ ...props, ...tooltipProps }"
+            v-bind="{ ...props }"
           />
         </input-tooltip>
       </input-validator>

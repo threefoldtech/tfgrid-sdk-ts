@@ -28,16 +28,17 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Instance name.">
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
       <input-tooltip
-        #="{ props, tooltipProps }"
+        #="{ props }"
+        inline
         tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
       >
-        <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="{ ...props, ...tooltipProps }" />
+        <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
       </input-tooltip>
 
       <AlgorandCapacity
@@ -47,10 +48,9 @@
         v-model:memory.number="memory"
         v-model:storage.number="storage"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Select a network to work against.">
+        <input-tooltip tooltip="Select a network to work against.">
           <v-select
             label="Network"
-            v-bind:="{ ...tooltipProps }"
             :items="[
               { title: 'Mainnet', value: 'mainnet' },
               { title: 'Testnet', value: 'testnet' },
@@ -61,10 +61,9 @@
           />
         </input-tooltip>
 
-        <input-tooltip #="{ tooltipProps }" tooltip="Select node type.">
+        <input-tooltip tooltip="Select node type.">
           <v-select
             label="Node Type"
-            v-bind:="{ ...tooltipProps }"
             :items="[
               { title: 'Default', value: 'default' },
               { title: 'Participant', value: 'participant' },
@@ -87,12 +86,12 @@
             ]"
             #="{ props }"
           >
-            <input-tooltip #="{ tooltipProps }" tooltip="Account Mnemonic.">
+            <input-tooltip tooltip="Account Mnemonic.">
               <v-text-field
                 label="Account Mnemonic"
                 placeholder="Algorand Account Mnemonic"
                 v-model.trim="account"
-                v-bind="{ ...props, ...tooltipProps }"
+                v-bind="props"
                 autofocus
                 counter
               >
@@ -113,12 +112,12 @@
             ]"
             #="{ props }"
           >
-            <input-tooltip #="{ tooltipProps }" tooltip="First Validation Block.">
+            <input-tooltip tooltip="First Validation Block.">
               <v-text-field
                 label="First Round"
                 placeholder="First Validation Block"
                 v-model.number="firstRound"
-                v-bind="{ ...props, ...tooltipProps }"
+                v-bind="props"
                 type="number"
               />
             </input-tooltip>
@@ -134,12 +133,12 @@
             #="{ props }"
             ref="lastRoundInput"
           >
-            <input-tooltip #="{ tooltipProps }" tooltip="Last Validation Block">
+            <input-tooltip tooltip="Last Validation Block">
               <v-text-field
                 label="Last Round"
                 placeholder="Last Validation Block"
                 v-model.number="lastRound"
-                v-bind="{ ...props, ...tooltipProps }"
+                v-bind="props"
                 type="number"
               />
             </input-tooltip>

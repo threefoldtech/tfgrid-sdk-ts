@@ -4,17 +4,14 @@
     :rules="[validators.required('Gateway node is required.')]"
     #="{ props }"
   >
-    <input-tooltip
-      #="{ tooltipProps }"
-      tooltip="Refers to the process of choosing a specific node within a network to act as the gateway."
-    >
+    <input-tooltip tooltip="Refers to the process of choosing a specific node within a network to act as the gateway.">
       <v-autocomplete
         label="Select gateway Node"
         placeholder="Please select a domain."
         :items="items"
         item-title="domain"
         return-object
-        v-bind="{ ...props, ...tooltipProps }"
+        v-bind="props"
         @update:model-value="$emit('update:model-value', $event)"
         :loading="items.length === 0 && loading"
         :disabled="items.length === 0 && loading"

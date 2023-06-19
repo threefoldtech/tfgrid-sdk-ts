@@ -37,8 +37,8 @@
           ]"
           #="{ props }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
-            <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+          <input-tooltip tooltip="Instance name.">
+            <v-text-field label="Name" v-model="name" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
@@ -51,34 +51,26 @@
           #="{ props }"
         >
           <password-input-wrapper>
-            <input-tooltip #="{ tooltipProps }" tooltip="Presearch Registeration Code.">
-              <v-text-field
-                label="Presearch Registeration Code"
-                v-bind="{ ...props, ...tooltipProps }"
-                v-model="code"
-              />
+            <input-tooltip tooltip="Presearch Registeration Code.">
+              <v-text-field label="Presearch Registeration Code" v-bind="props" v-model="code" />
             </input-tooltip>
           </password-input-wrapper>
         </input-validator>
 
         <input-tooltip
-          #="{ props, tooltipProps }"
+          #="props"
           tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
+          inline
         >
-          <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="{ ...props, ...tooltipProps }" />
+          <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
         </input-tooltip>
 
         <input-tooltip
-          #="{ props, tooltipProps }"
+          #="props"
+          inline
           tooltip="The Planetary Network is a distributed network infrastructure that spans across multiple regions and countries, providing global connectivity."
         >
-          <v-switch
-            color="primary"
-            inset
-            label="Planetary Network"
-            v-model="planetary"
-            v-bind="{ ...props, ...tooltipProps }"
-          />
+          <v-switch color="primary" inset label="Planetary Network" v-model="planetary" v-bind="props" />
         </input-tooltip>
 
         <v-alert v-show="networkError" class="mb-2" type="warning" variant="tonal">
@@ -98,29 +90,15 @@
 
       <template #restore>
         <input-tooltip
-          #="{ tooltipProps }"
           tooltip="The Private Presearch Restore Key is a unique cryptographic key associated with your Presearch account."
         >
-          <v-textarea
-            label="Private Presearch Restore Key"
-            v-bind="{ ...tooltipProps }"
-            v-model="privateRestoreKey"
-            no-resize
-            :spellcheck="false"
-          />
+          <v-textarea label="Private Presearch Restore Key" v-model="privateRestoreKey" no-resize :spellcheck="false" />
         </input-tooltip>
 
         <input-tooltip
-          #="{ tooltipProps }"
           tooltip="The Public Presearch Restore Key is a unique cryptographic key associated with your Presearch account."
         >
-          <v-textarea
-            label="Public Presearch Restore Key"
-            v-bind="{ ...tooltipProps }"
-            v-model="publicRestoreKey"
-            no-resize
-            :spellcheck="false"
-          />
+          <v-textarea label="Public Presearch Restore Key" v-model="publicRestoreKey" no-resize :spellcheck="false" />
         </input-tooltip>
       </template>
     </d-tabs>

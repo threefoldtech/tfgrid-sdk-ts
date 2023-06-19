@@ -36,8 +36,8 @@
           ]"
           #="{ props }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
-            <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+          <input-tooltip tooltip="Instance name.">
+            <v-text-field label="Name" v-model="name" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
@@ -53,13 +53,8 @@
           ]"
           #="{ props }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="The number of virtual cores allocated to your instance.">
-            <v-text-field
-              label="CPU (vCores)"
-              type="number"
-              v-model.number="cpu"
-              v-bind="{ ...props, ...tooltipProps }"
-            />
+          <input-tooltip tooltip="The number of virtual cores allocated to your instance.">
+            <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
@@ -73,16 +68,8 @@
           ]"
           #="{ props }"
         >
-          <input-tooltip
-            #="{ tooltipProps }"
-            tooltip="The amount of RAM (Random Access Memory) allocated to your instance."
-          >
-            <v-text-field
-              label="Memory (MB)"
-              type="number"
-              v-model.number="memory"
-              v-bind="{ ...props, ...tooltipProps }"
-            />
+          <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
+            <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
@@ -97,56 +84,38 @@
           #="{ props }"
         >
           <input-tooltip
-            #="{ tooltipProps }"
             tooltip="The storage capacity allocated to your instance, indicating the amount of space available to store files, data, and applications."
           >
-            <v-text-field
-              label="Disk Size (GB)"
-              type="number"
-              v-model.number="diskSize"
-              v-bind="{ ...props, ...tooltipProps }"
-            />
+            <v-text-field label="Disk Size (GB)" type="number" v-model.number="diskSize" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
         <input-tooltip
-          #="{ props, tooltipProps }"
+          inline
           tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
         >
-          <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="{ ...props, ...tooltipProps }" />
+          <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
         </input-tooltip>
 
         <input-tooltip
-          #="{ props, tooltipProps }"
+          inline
           tooltip="Public IPv6 is the next-generation Internet Protocol that offers an expanded address space to connect a vast number of devices."
         >
-          <v-switch color="primary" inset label="Public IPv6" v-model="ipv6" v-bind="{ ...props, ...tooltipProps }" />
+          <v-switch color="primary" inset label="Public IPv6" v-model="ipv6" />
         </input-tooltip>
 
         <input-tooltip
-          #="{ props, tooltipProps }"
+          inline
           tooltip="The Planetary Network is a distributed network infrastructure that spans across multiple regions and countries, providing global connectivity."
         >
-          <v-switch
-            color="primary"
-            inset
-            label="Planetary Network"
-            v-model="planetary"
-            v-bind="{ ...props, ...tooltipProps }"
-          />
+          <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
         </input-tooltip>
 
         <input-tooltip
-          #="{ props, tooltipProps }"
+          inline
           tooltip="Enabling WireGuard Access allows you to establish private, secure, and encrypted connections to your instance."
         >
-          <v-switch
-            color="primary"
-            inset
-            label="Add Wireguard Access"
-            v-model="wireguard"
-            v-bind="{ ...props, ...tooltipProps }"
-          />
+          <v-switch color="primary" inset label="Add Wireguard Access" v-model="wireguard" />
         </input-tooltip>
 
         <v-alert v-show="networkError" class="mb-2" type="warning" variant="tonal">
@@ -182,8 +151,8 @@
             ]"
             #="{ props }"
           >
-            <input-tooltip #="{ tooltipProps }" tooltip="Disk name.">
-              <v-text-field label="Name" v-model="disks[index].name" v-bind="{ ...props, ...tooltipProps }" />
+            <input-tooltip tooltip="Disk name.">
+              <v-text-field label="Name" v-model="disks[index].name" v-bind="props" />
             </input-tooltip>
           </input-validator>
           <input-validator
@@ -196,13 +165,8 @@
             ]"
             #="{ props }"
           >
-            <input-tooltip #="{ tooltipProps }" tooltip="Disk Size.">
-              <v-text-field
-                label="Size (GB)"
-                type="number"
-                v-model.number="disks[index].size"
-                v-bind="{ ...props, ...tooltipProps }"
-              />
+            <input-tooltip tooltip="Disk Size.">
+              <v-text-field label="Size (GB)" type="number" v-model.number="disks[index].size" v-bind="props" />
             </input-tooltip>
           </input-validator>
         </ExpandableLayout>

@@ -22,8 +22,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Instance name.">
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -37,13 +37,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="The number of virtual cores allocated to your instance.">
-          <v-text-field
-            label="CPU (vCores)"
-            type="number"
-            v-model.number="cpu"
-            v-bind="{ ...props, ...tooltipProps }"
-          />
+        <input-tooltip tooltip="The number of virtual cores allocated to your instance.">
+          <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -57,16 +52,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip
-          #="{ tooltipProps }"
-          tooltip="The amount of RAM (Random Access Memory) allocated to your instance."
-        >
-          <v-text-field
-            label="Memory (MB)"
-            type="number"
-            v-model.number="memory"
-            v-bind="{ ...props, ...tooltipProps }"
-          />
+        <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
+          <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
         </input-tooltip>
       </input-validator>
 

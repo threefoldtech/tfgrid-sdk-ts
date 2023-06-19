@@ -1,16 +1,28 @@
 <template>
-  <div ref="tooltipContainer">
+  <div class="d-flex">
     <v-tooltip :text="tooltip || 'None!'">
       <template #activator="{ props }">
         {{ getPropsRef(props) }}
-        <slot :tooltipProps="{ appendIcon }"></slot>
+        <div class="d-flex" :class="{ 'w-100': !inline }">
+          <slot></slot>
+          <span
+            :style="{ cursor: 'help', marginTop: '17.5px' }"
+            class="ml-3"
+            @mouseenter="propsRef?.onMouseenter"
+            @mouseleave="propsRef?.onMouseleave"
+            @focus="propsRef?.onFocus"
+            @blur="propsRef?.onBlur"
+          >
+            <v-icon>mdi-information</v-icon>
+          </span>
+        </div>
       </template>
     </v-tooltip>
   </div>
 </template>
 
 <script lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
+import { ref } from "vue";
 
 export default {
   name: "InputTooltip",
@@ -19,42 +31,24 @@ export default {
       type: String,
       required: true,
     },
+    inline: {
+      type: Boolean,
+      default: () => false,
+    },
   },
   setup() {
-    const tooltipContainer = ref<HTMLElement>();
     const appendIcon = "mdi-information";
 
-    let propsRef: any;
+    const propsRef = ref<any>();
     function getPropsRef(_props: any) {
-      propsRef = _props;
+      propsRef.value = _props;
       return null;
     }
 
-    onMounted(() => {
-      const icon = tooltipContainer.value?.querySelector<HTMLElement>(`i[class*="${appendIcon}"]`);
-      if (icon) {
-        icon.style.cursor = "help";
-        icon.onmouseenter = propsRef.onMouseenter;
-        icon.onmouseleave = propsRef.onMouseleave;
-        icon.onfocus = propsRef.onFocus;
-        icon.onblur = propsRef.onBlur;
-      }
-    });
-
-    onUnmounted(() => {
-      const icon = tooltipContainer.value?.querySelector<HTMLElement>(`i[class*="${appendIcon}"]`);
-      if (icon) {
-        icon.onmouseenter = null;
-        icon.onmouseleave = null;
-        icon.onfocus = null;
-        icon.onblur = null;
-      }
-    });
-
     return {
       appendIcon,
-      tooltipContainer,
       getPropsRef,
+      propsRef,
     };
   },
 };

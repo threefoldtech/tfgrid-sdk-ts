@@ -45,8 +45,8 @@
           ]"
           #="{ props }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="Domain name.">
-            <v-text-field label="Domain" v-model="domain" v-bind="{ ...props, ...tooltipProps }" />
+          <input-tooltip tooltip="Domain name.">
+            <v-text-field label="Domain" v-model="domain" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
@@ -78,12 +78,8 @@
             ]"
             #="{ props: validationProps }"
           >
-            <input-tooltip #="{ tooltipProps }" tooltip="Instance admin password.">
-              <v-text-field
-                label="Password"
-                v-model="password"
-                v-bind="{ ...props, ...validationProps, ...tooltipProps }"
-              />
+            <input-tooltip tooltip="Instance admin password.">
+              <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validationProps }" />
             </input-tooltip>
           </input-validator>
         </password-input-wrapper>
