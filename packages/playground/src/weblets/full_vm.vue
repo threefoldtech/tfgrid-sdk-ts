@@ -90,37 +90,17 @@
           </input-tooltip>
         </input-validator>
 
-        <input-tooltip
-          inline
-          tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
-        >
-          <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
+        <input-tooltip tooltip="Enable the network options to be able access your deployment">
+          <Network
+            required
+            ref="network"
+            v-model:ipv4="ipv4"
+            v-model:ipv6="ipv6"
+            v-model:planetary="planetary"
+            v-model:wireguard="wireguard"
+          />
         </input-tooltip>
 
-        <input-tooltip
-          inline
-          tooltip="Public IPv6 is the next-generation Internet Protocol that offers an expanded address space to connect a vast number of devices."
-        >
-          <v-switch color="primary" inset label="Public IPv6" v-model="ipv6" />
-        </input-tooltip>
-
-        <input-tooltip
-          inline
-          tooltip="The Planetary Network is a distributed network infrastructure that spans across multiple regions and countries, providing global connectivity."
-        >
-          <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
-        </input-tooltip>
-
-        <input-tooltip
-          inline
-          tooltip="Enabling WireGuard Access allows you to establish private, secure, and encrypted connections to your instance."
-        >
-          <v-switch color="primary" inset label="Add Wireguard Access" v-model="wireguard" />
-        </input-tooltip>
-
-        <v-alert v-show="networkError" class="mb-2" type="warning" variant="tonal">
-          You must enable at least one of network options.
-        </v-alert>
         <SelectFarm
           :filters="{
             cpu,
