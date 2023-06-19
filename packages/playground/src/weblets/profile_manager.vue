@@ -311,6 +311,7 @@ import { computed, onMounted, type Ref, ref, watch } from "vue";
 import { nextTick } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
+import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
 import { type Balance, createAccount, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
 import { isEnoughBalance, normalizeError } from "../utils/helpers";
@@ -429,7 +430,7 @@ const activeTab = ref(0);
 const password = ref("");
 const confirmPassword = ref("");
 const passwordInput = ref() as Ref<{ validate(value: string): Promise<boolean> }>;
-const confirmPasswordInput = ref() as Ref<{ validate(value: string): Promise<boolean> }>;
+const confirmPasswordInput = useInputRef();
 
 const version = 1;
 const WALLET_KEY = "wallet.v" + version;
@@ -448,6 +449,14 @@ watch(
     }
   },
   { immediate: true, deep: true },
+);
+
+watch(
+  password,
+  () => {
+    confirmPassword.value && confirmPasswordInput.value?.validate();
+  },
+  { immediate: true },
 );
 
 function logout() {
