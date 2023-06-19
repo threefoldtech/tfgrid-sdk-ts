@@ -74,7 +74,7 @@ class Network {
   }
 
   private async saveIfKVStoreBackend(extrinsics) {
-    if (this.config.backendStorageType === BackendStorageType.tfkvstore) {
+    if (this.config.backendStorageType === BackendStorageType.tfkvstore && extrinsics && extrinsics.length > 0) {
       extrinsics = extrinsics.filter(e => e !== undefined);
       if (extrinsics.length > 0) {
         await this.tfClient.connect();

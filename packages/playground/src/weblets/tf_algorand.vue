@@ -28,10 +28,19 @@
         ]"
         #="{ props }"
       >
-        <v-text-field label="Name" v-model="name" v-bind="props" />
+        <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
+          <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        </input-tooltip>
       </input-validator>
 
-      <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
+      <v-tooltip
+        location="top"
+        text="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
+      >
+        <template v-slot:activator="{ props }">
+          <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
+        </template>
+      </v-tooltip>
 
       <AlgorandCapacity
         :network="network"
@@ -146,7 +155,6 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString } from "@threefold/grid_client";
 import { computed, type Ref, ref, watch } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
@@ -154,13 +162,14 @@ import { useProfileManager } from "../stores";
 import { type Farm, ProjectName, type Validators } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
+import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const valid = ref(false);
 const lastRoundInput = ref();
 const profileManager = useProfileManager();
 
-const name = ref("al" + generateString(9));
+const name = ref(generateName(9, { prefix: "al" }));
 const ipv4 = ref(false);
 const cpu = ref() as Ref<number>;
 const memory = ref() as Ref<number>;

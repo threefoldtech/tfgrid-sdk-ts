@@ -2,7 +2,7 @@
   <weblet-layout ref="layout" @mount="onMount">
     <template #title>Contracts List</template>
     <template #subtitle>
-      <a class="app-link" href="https://manual.grid.tf/tfchain/tfchain_external_service_contract.html" target="_blank"
+      <a class="app-link" href="https://manual.grid.tf/tfchain/tfchain.html" target="_blank"
         >Quick start documentation</a
       >
     </template>

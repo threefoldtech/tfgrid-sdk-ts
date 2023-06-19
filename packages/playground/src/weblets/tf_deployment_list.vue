@@ -1,12 +1,7 @@
 <template>
   <weblet-layout ref="layout">
     <template #title>
-      Deployment List
-      {{
-        $props.projectName
-          ? "(" + (tabs.find(tab => tab.value === $props.projectName)?.title ?? $props.projectName) + ")"
-          : ""
-      }}
+      {{ title || "Deployment List" }}
     </template>
     <template #subtitle v-if="!$props.projectName"> List your own deployments for different solutions </template>
     <d-tabs
@@ -21,7 +16,7 @@
         <template #Fullvm-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
-            icon="mdi-information-outline"
+            icon="mdi-eye-outline"
             @click="layout.openDialog(item?.value, deploymentListEnvironments.vm)"
           />
         </template>
@@ -29,7 +24,7 @@
         <template #VM-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
-            icon="mdi-information-outline"
+            icon="mdi-eye-outline"
             @click="layout.openDialog(item?.value, deploymentListEnvironments.vm)"
           />
         </template>
@@ -37,7 +32,7 @@
         <template #CapRover-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
-            icon="mdi-information-outline"
+            icon="mdi-eye-outline"
             @click="layout.openDialog(item?.value, deploymentListEnvironments.caprover)"
           />
           <IconActionBtn
@@ -65,7 +60,7 @@
         <template #Peertube-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
-            icon="mdi-information-outline"
+            icon="mdi-eye-outline"
             @click="layout.openDialog(item?.value, deploymentListEnvironments.peertube)"
           />
           <IconActionBtn
@@ -79,7 +74,7 @@
         <template #Funkwhale-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
-            icon="mdi-information-outline"
+            icon="mdi-eye-outline"
             @click="layout.openDialog(item?.value, deploymentListEnvironments.funkwhale)"
           />
           <IconActionBtn
@@ -93,7 +88,7 @@
         <template #Taiga-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
-            icon="mdi-information-outline"
+            icon="mdi-eye-outline"
             @click="layout.openDialog(item?.value, deploymentListEnvironments.taiga)"
           />
           <IconActionBtn
@@ -113,7 +108,7 @@
         <template #Presearch-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
-            icon="mdi-information-outline"
+            icon="mdi-eye-outline"
             @click="layout.openDialog(item?.value, deploymentListEnvironments.presearch)"
           />
         </template>
@@ -121,7 +116,7 @@
         <template #Mattermost-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
-            icon="mdi-information-outline"
+            icon="mdi-eye-outline"
             @click="layout.openDialog(item?.value, deploymentListEnvironments.mattermost)"
           />
           <IconActionBtn tooltip="Preview" color="info" icon="mdi-web" :href="item.value[0].env.SITE_URL" />
@@ -130,7 +125,7 @@
         <template #Discourse-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
-            icon="mdi-information-outline"
+            icon="mdi-eye-outline"
             @click="layout.openDialog(item?.value, deploymentListEnvironments.discourse)"
           />
           <IconActionBtn
@@ -144,7 +139,7 @@
         <template #Casperlabs-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
-            icon="mdi-information-outline"
+            icon="mdi-eye-outline"
             @click="layout.openDialog(item?.value, deploymentListEnvironments.casperlabs)"
           />
           <IconActionBtn
@@ -158,7 +153,7 @@
         <template #Owncloud-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
-            icon="mdi-information-outline"
+            icon="mdi-eye-outline"
             @click="layout.openDialog(item?.value, deploymentListEnvironments.owncloud)"
           />
           <IconActionBtn
@@ -172,7 +167,7 @@
         <template #Subsquid-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
-            icon="mdi-information-outline"
+            icon="mdi-eye-outline"
             @click="layout.openDialog(item?.value, deploymentListEnvironments.subsquid)"
           />
           <IconActionBtn
@@ -186,7 +181,7 @@
         <template #Algorand-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
-            icon="mdi-information-outline"
+            icon="mdi-eye-outline"
             @click="layout.openDialog(item?.value, deploymentListEnvironments.algorand)"
           />
         </template>
@@ -194,7 +189,7 @@
         <template #NodePilot-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
-            icon="mdi-information-outline"
+            icon="mdi-eye-outline"
             @click="layout.openDialog(item?.value, deploymentListEnvironments.vm)"
           />
           <IconActionBtn
@@ -213,7 +208,7 @@
         <template #Umbrel-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
-            icon="mdi-information-outline"
+            icon="mdi-eye-outline"
             @click="layout.openDialog(item?.value, deploymentListEnvironments.umbrel)"
           />
           <IconActionBtn
@@ -232,7 +227,7 @@
         <template #Wordpress-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
-            icon="mdi-information-outline"
+            icon="mdi-eye-outline"
             @click="layout.openDialog(item?.value, deploymentListEnvironments.wordpress)"
           />
           <IconActionBtn tooltip="Preview" color="info" icon="mdi-web" :href="'https://' + item.value[0].env.WP_URL" />
@@ -255,7 +250,7 @@
           <template #actions="{ item }">
             <IconActionBtn
               tooltip="Show Details"
-              icon="mdi-information-outline"
+              icon="mdi-eye-outline"
               @click="layout.openDialog(item?.value, deploymentListEnvironments.k8s)"
             />
             <IconActionBtn
@@ -319,8 +314,10 @@ import { deploymentListEnvironments } from "../constants/deployment_list";
 import { useProfileManager } from "../stores";
 import { deleteDeployment } from "../utils/delete_deployment";
 import { getGrid, updateGrid } from "../utils/grid";
-
-const props = defineProps<{ projectName?: ProjectName }>();
+const props = defineProps<{
+  projectName?: ProjectName;
+  title?: string;
+}>();
 
 const tabs: Tab[] = [
   { title: "Full Virtual Machine", value: "Fullvm", imgPath: "images/icons/vm.png" },

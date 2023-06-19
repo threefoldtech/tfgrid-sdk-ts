@@ -4,17 +4,7 @@
       Please connect to your tfchain wallet <a class="app-link" @click="$emit('openProfile')">here</a>
     </v-alert>
     <div>
-      <div class="d-flex justify-center mt-8 mb-10">
-        <img
-          :style="{
-            maxWidth: '100%',
-            filter: `brightness(${theme.global.name.value === 'light' ? 0.2 : 1}`,
-          }"
-          :src="baseUrl + 'images/logoTF.png'"
-          alt="logo"
-        />
-      </div>
-      <h4 class="text-center text-h3">A Co-Owned Global Sovereign Internet</h4>
+      <h4 class="text-center text-h3 mt-16">A Co-Owned Global Sovereign Internet</h4>
       <v-container class="d-flex justify-center mt-4">
         <p class="text-center">
           ThreeFold is
@@ -29,17 +19,17 @@
       </v-container>
     </div>
 
-    <div
-      :style="{
-        backgroundImage: 'url(' + baseUrl + 'images/live-and-operational-background.png)',
-        padding: '100px 0',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center center',
-        minHeight: '850px',
-      }"
-      class="d-flex justify-center align-center"
-    >
-      <v-container>
+    <v-container>
+      <div
+        :style="{
+          backgroundImage: 'url(' + baseUrl + 'images/live-and-operational-background.png)',
+          padding: '100px 0',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center center',
+          minHeight: '850px',
+        }"
+      >
+        <!-- class="d-flex justify-center align-center" -->
         <div class="d-flex justify-center mb-10">
           <v-card flat class="py-1 px-2 d-inline-block m-auto">
             <h4 class="text-center text-h3">Live and Operational</h4>
@@ -66,8 +56,8 @@
         <div class="d-flex justify-center mt-16">
           <v-btn color="primary" target="_blank" :href="capacityURL"> Explore ThreeFold Grid Capacity </v-btn>
         </div>
-      </v-container>
-    </div>
+      </div>
+    </v-container>
 
     <v-container>
       <h4 class="text-center text-h3 mb-8">The <strong>Layer Zero</strong> for a Decentralized World</h4>
