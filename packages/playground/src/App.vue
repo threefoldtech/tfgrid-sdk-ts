@@ -21,12 +21,19 @@
                 v-for="item in route.items"
                 :key="item.route"
                 :value="item.route"
-                @click="$router.push(item.route)"
+                @click="clickHandler(item)"
                 active-color="primary"
                 :active="$route.path === item.route"
               >
                 <template v-slot:prepend v-if="item.icon">
-                  <v-img class="mr-4" width="26" :src="baseUrl + 'images/icons/' + item.icon" :alt="item.title" />
+                  <v-img
+                    v-if="item.icon.includes('.')"
+                    class="mr-4"
+                    width="26"
+                    :src="baseUrl + 'images/icons/' + item.icon"
+                    :alt="item.title"
+                  />
+                  <v-icon v-else>{{ item.icon }}</v-icon>
                 </template>
 
                 <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -58,6 +65,18 @@
 
         <v-spacer></v-spacer>
 
+        <v-btn
+          v-for="(link, index) in navbarLinks"
+          :key="index"
+          color="var(--link-color)"
+          variant="text"
+          target="_blank"
+          :href="link.url"
+          :prepend-icon="link.icon && link.label ? link.icon : undefined"
+          :icon="link.icon && !link.label ? link.icon : undefined"
+          :text="link.label"
+        />
+        <v-divider vertical v-if="navbarLinks.length" />
         <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
         <v-divider vertical class="mx-2" />
         <AppTheme />
@@ -146,6 +165,17 @@ const routes: AppRoute[] = [
     title: "My Account",
     items: [{ title: "Contracts", route: "/contractslist" }],
   },
+  {
+    title: "Help",
+    items: [{ title: "Manual", icon: "mdi-open-in-new", url: "https://manual.grid.tf/" }],
+  },
+];
+
+const navbarLinks: NavbarLink[] = [
+  {
+    label: "Help",
+    url: "https://manual.grid.tf/",
+  },
 ];
 
 // eslint-disable-next-line no-undef
@@ -155,6 +185,14 @@ const permanent = window.innerWidth > 980;
 const openSidebar = ref(permanent);
 
 const baseUrl = import.meta.env.BASE_URL;
+
+function clickHandler({ route, url }: AppRouteItem): void {
+  if (route) {
+    $router.push(route);
+  } else if (url) {
+    window.open(url, "_blank");
+  }
+}
 </script>
 
 <script lang="ts">
@@ -172,9 +210,17 @@ interface AppRoute {
 
 interface AppRouteItem {
   title: string;
-  route: string;
+  route?: string;
+  url?: string;
   icon?: string;
 }
+
+interface NavbarLink {
+  label?: string;
+  url: string;
+  icon?: string;
+}
+
 export default {
   name: "App",
   components: {
@@ -189,10 +235,14 @@ export default {
 </script>
 
 <style lang="scss" global>
+:root {
+  --link-color: #3d7ad4;
+}
+
 .app-link {
   text-decoration: none;
   font-weight: bold;
-  color: #3d7ad4;
+  color: var(--link-color);
   cursor: pointer;
 }
 
