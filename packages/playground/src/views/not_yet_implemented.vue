@@ -18,7 +18,7 @@ export default {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 65%;
+  width: 55%;
 }
 
 .text1 {
