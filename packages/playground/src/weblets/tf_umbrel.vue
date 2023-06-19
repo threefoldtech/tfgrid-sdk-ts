@@ -22,8 +22,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Instance name.">
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -39,8 +39,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Umbrel admin username.">
-          <v-text-field label="Username" v-model="username" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Umbrel admin username.">
+          <v-text-field label="Username" v-model="username" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -54,24 +54,19 @@
           ]"
           #="{ props: validatorProps }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="Umbrel admin password.">
-            <v-text-field
-              label="Password"
-              v-model="password"
-              v-bind="{ ...props, ...tooltipProps, ...validatorProps }"
-            />
+          <input-tooltip tooltip="Umbrel admin password.">
+            <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
           </input-tooltip>
         </input-validator>
       </password-input-wrapper>
 
-      <v-tooltip
-        location="top"
-        text="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
+      <input-tooltip
+        #="props"
+        inline
+        tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
       >
-        <template v-slot:activator="{ props }">
-          <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
-        </template>
-      </v-tooltip>
+        <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
+      </input-tooltip>
 
       <SelectSolutionFlavor
         v-model="solution"

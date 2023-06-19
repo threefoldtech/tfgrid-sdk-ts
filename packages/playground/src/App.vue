@@ -276,4 +276,10 @@ export default {
   bottom: 15px;
   right: 25px;
 }
+.v-tooltip > .v-overlay__content {
+  opacity: 10;
+  color: white;
+  font-weight: 900;
+  background-color: rgb(71, 70, 70);
+}
 </style>

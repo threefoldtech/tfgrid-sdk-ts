@@ -21,8 +21,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Instance name.">
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -38,8 +38,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Funkwhale admin username.">
-          <v-text-field label="Username" v-model="username" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Funkwhale admin username.">
+          <v-text-field label="Username" v-model="username" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -51,12 +51,12 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Funkwhale admin email.">
+        <input-tooltip tooltip="Funkwhale admin email.">
           <v-text-field
             placeholder="This email will be used to login to your instance."
             label="Email"
             v-model="email"
-            v-bind="{ ...props, ...tooltipProps }"
+            v-bind="props"
           />
         </input-tooltip>
       </input-validator>
@@ -71,12 +71,8 @@
           ]"
           #="{ props: validatorProps }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="Funkwhale admin password.">
-            <v-text-field
-              label="Password"
-              v-model="password"
-              v-bind="{ ...props, ...validatorProps, ...tooltipProps }"
-            />
+          <input-tooltip tooltip="Funkwhale admin password.">
+            <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
           </input-tooltip>
         </input-validator>
       </password-input-wrapper>

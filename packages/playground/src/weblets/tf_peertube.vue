@@ -20,8 +20,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Instance name.">
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -33,8 +33,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Peertube admin email.">
-          <v-text-field label="Admin Email" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Peertube admin email.">
+          <v-text-field label="Admin Email" v-model="email" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -48,12 +48,8 @@
           ]"
           #="{ props: validatorProps }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="Peertube admin password.">
-            <v-text-field
-              label="Admin Password"
-              v-model="password"
-              v-bind="{ ...props, ...validatorProps, ...tooltipProps }"
-            />
+          <input-tooltip tooltip="Peertube admin password.">
+            <v-text-field label="Admin Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
           </input-tooltip>
         </input-validator>
       </password-input-wrapper>

@@ -31,8 +31,8 @@
           ]"
           #="{ props }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
-            <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+          <input-tooltip tooltip="Instance name.">
+            <v-text-field label="Name" v-model="name" v-bind="{ ...props }" />
           </input-tooltip>
         </input-validator>
 
@@ -48,14 +48,9 @@
         >
           <password-input-wrapper #="{ props }">
             <input-tooltip
-              #="{ tooltipProps }"
               tooltip="The Kubernetes Cluster Token is a specially generated authentication token used for accessing and managing a Kubernetes cluster."
             >
-              <v-text-field
-                label="Cluster Token"
-                v-bind="{ ...props, ...validationProps, ...tooltipProps }"
-                v-model="clusterToken"
-              />
+              <v-text-field label="Cluster Token" v-bind="{ ...props, ...validationProps }" v-model="clusterToken" />
             </input-tooltip>
           </password-input-wrapper>
         </input-validator>

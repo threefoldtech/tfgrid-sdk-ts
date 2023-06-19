@@ -21,19 +21,18 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Instance name.">
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
-      <v-tooltip
-        location="top"
-        text="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
+      <input-tooltip
+        #="{ props }"
+        inline
+        tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
       >
-        <template v-slot:activator="{ props }">
-          <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
-        </template>
-      </v-tooltip>
+        <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
+      </input-tooltip>
 
       <AlgorandCapacity
         :network="network"
@@ -42,27 +41,31 @@
         v-model:memory.number="memory"
         v-model:storage.number="storage"
       >
-        <v-select
-          label="Network"
-          :items="[
-            { title: 'Mainnet', value: 'mainnet' },
-            { title: 'Testnet', value: 'testnet' },
-            { title: 'Betanet', value: 'betanet' },
-            { title: 'Devnet', value: 'devnet' },
-          ]"
-          v-model="network"
-        />
+        <input-tooltip tooltip="Select a network to work against.">
+          <v-select
+            label="Network"
+            :items="[
+              { title: 'Mainnet', value: 'mainnet' },
+              { title: 'Testnet', value: 'testnet' },
+              { title: 'Betanet', value: 'betanet' },
+              { title: 'Devnet', value: 'devnet' },
+            ]"
+            v-model="network"
+          />
+        </input-tooltip>
 
-        <v-select
-          label="Node Type"
-          :items="[
-            { title: 'Default', value: 'default' },
-            { title: 'Participant', value: 'participant' },
-            { title: 'Relay', value: 'relay' },
-            { title: 'Indexer', value: 'indexer' },
-          ]"
-          v-model="type"
-        />
+        <input-tooltip tooltip="Select node type.">
+          <v-select
+            label="Node Type"
+            :items="[
+              { title: 'Default', value: 'default' },
+              { title: 'Participant', value: 'participant' },
+              { title: 'Relay', value: 'relay' },
+              { title: 'Indexer', value: 'indexer' },
+            ]"
+            v-model="type"
+          />
+        </input-tooltip>
 
         <template v-if="type === 'participant'">
           <input-validator
@@ -76,19 +79,23 @@
             ]"
             #="{ props }"
           >
-            <v-text-field
-              label="Account Mnemonic"
-              placeholder="Algorand Account Mnemonic"
-              v-model.trim="account"
-              v-bind="props"
-              autofocus
-              counter
+            <input-tooltip
+              tooltip="Account mnemonic is the private key of your Algorand wallet and it consists of 24 words "
             >
-              <template #counter>
-                <span :class="{ 'text-red': wordsLength > 25 }">{{ wordsLength }}</span>
-                / 25
-              </template>
-            </v-text-field>
+              <v-text-field
+                label="Account Mnemonic"
+                placeholder="Algorand Account Mnemonic"
+                v-model.trim="account"
+                v-bind="props"
+                autofocus
+                counter
+              >
+                <template #counter>
+                  <span :class="{ 'text-red': wordsLength > 25 }">{{ wordsLength }}</span>
+                  / 25
+                </template>
+              </v-text-field>
+            </input-tooltip>
           </input-validator>
 
           <input-validator
@@ -100,13 +107,15 @@
             ]"
             #="{ props }"
           >
-            <v-text-field
-              label="First Round"
-              placeholder="First Validation Block"
-              v-model.number="firstRound"
-              v-bind="props"
-              type="number"
-            />
+            <input-tooltip tooltip="First Validation Block.">
+              <v-text-field
+                label="First Round"
+                placeholder="First Validation Block"
+                v-model.number="firstRound"
+                v-bind="props"
+                type="number"
+              />
+            </input-tooltip>
           </input-validator>
 
           <input-validator
@@ -119,13 +128,15 @@
             #="{ props }"
             ref="lastRoundInput"
           >
-            <v-text-field
-              label="Last Round"
-              placeholder="Last Validation Block"
-              v-model.number="lastRound"
-              v-bind="props"
-              type="number"
-            />
+            <input-tooltip tooltip="Last Validation Block">
+              <v-text-field
+                label="Last Round"
+                placeholder="Last Validation Block"
+                v-model.number="lastRound"
+                v-bind="props"
+                type="number"
+              />
+            </input-tooltip>
           </input-validator>
         </template>
       </AlgorandCapacity>
