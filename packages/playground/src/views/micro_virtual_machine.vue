@@ -1,11 +1,13 @@
 <template>
-  <div>
+  <view-layout>
+    <template #description>Deploy your own Micro Virtual Machine</template>
+
     <MicroVm />
 
-    <div class="mt-4">
+    <template #list>
       <TfDeploymentList title="Micro Virtual Machines" :project-name="name" />
-    </div>
-  </div>
+    </template>
+  </view-layout>
 </template>
 
 <script lang="ts">

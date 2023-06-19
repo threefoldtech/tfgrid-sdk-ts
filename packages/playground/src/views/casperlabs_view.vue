@@ -1,11 +1,19 @@
 <template>
-  <div>
+  <view-layout>
+    <template #description
+      >Casper Network is a blockchain protocol built from the ground up to remain true to core Web3 principles and adapt
+      to the needs of our evolving world.
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_casper.html" class="app-link">
+        read more about Casperlabs
+      </a></template
+    >
+
     <tf-casperlabs />
 
-    <div class="mt-4">
+    <template #list>
       <TfDeploymentList title="Casperlabs Instances" :project-name="name" />
-    </div>
-  </div>
+    </template>
+  </view-layout>
 </template>
 
 <script lang="ts">

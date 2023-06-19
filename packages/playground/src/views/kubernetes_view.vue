@@ -1,11 +1,21 @@
 <template>
-  <div>
+  <view-layout>
+    <template #description
+      >Kubernetes is the standard container orchestration tool. On the TF grid, Kubernetes clusters can be deployed out
+      of the box. We have implemented K3S, a full-blown Kubernetes offering that uses only half of the memory footprint.
+      It is packaged as a single binary and made more lightweight to run workloads in resource-constrained locations
+      (fits e.g. IoT, edge, ARM workloads).
+      <a href="https://manual.grid.tf/weblets/weblets_k8s.html" target="_blank" class="app-link">
+        read more about Kubernetes
+      </a></template
+    >
+
     <TfKubernetes />
 
-    <div class="mt-4">
+    <template #list>
       <TfDeploymentList title="Kubernetes Clusters" :project-name="name" />
-    </div>
-  </div>
+    </template>
+  </view-layout>
 </template>
 
 <script lang="ts">

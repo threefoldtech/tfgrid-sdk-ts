@@ -9,12 +9,6 @@
     title-image="images/icons/vm.png"
   >
     <template #title>Deploy a Micro Virtual Machine </template>
-    <template #subtitle
-      >Deploy a new micro virtual machine on the Threefold Grid
-      <a class="app-link" href="https://manual.grid.tf/weblets/weblets_vm.html" target="_blank">
-        Quick start documentation
-      </a>
-    </template>
 
     <d-tabs
       :tabs="[

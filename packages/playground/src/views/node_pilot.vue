@@ -1,11 +1,19 @@
 <template>
-  <div>
+  <view-layout>
+    <template #description
+      >Deploy, manage, and monetize crypto nodes with a few clicks. Seamless Docker integration brings enterprise-level
+      security and scalability.
+      <a class="app-link" href="https://manual.grid.tf/weblets/weblets_nodepilot.html" target="_blank">
+        read more about NodePilot
+      </a></template
+    >
+
     <NodePilot />
 
-    <div class="mt-4">
+    <template #list>
       <TfDeploymentList title="Node Pilot Instances" :project-name="name" />
-    </div>
-  </div>
+    </template>
+  </view-layout>
 </template>
 
 <script lang="ts">

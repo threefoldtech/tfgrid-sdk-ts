@@ -1,11 +1,18 @@
 <template>
-  <div>
+  <view-layout>
+    <template #description
+      >Algorand (ALGO) is a blockchain platform and cryptocurrency designed to function like a major payments processor.
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_algorand.html" class="app-link">
+        read more about Algorand
+      </a>
+    </template>
+
     <TfAlgorand />
 
-    <div class="mt-4">
+    <template #list>
       <TfDeploymentList title="Algorand Instances" :project-name="name" />
-    </div>
-  </div>
+    </template>
+  </view-layout>
 </template>
 
 <script lang="ts">

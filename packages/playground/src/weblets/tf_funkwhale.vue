@@ -7,13 +7,6 @@
     title-image="images/icons/funkwhale.png"
   >
     <template #title>Deploy a Funkwhale Instance </template>
-    <template #subtitle>
-      Funkwhale is social platform to enjoy and share music. Funkwhale is a community-driven project that lets you
-      listen and share music and audio within a decentralized, open network.
-      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_funkwhale.html" class="app-link">
-        Quick start documentation
-      </a>
-    </template>
 
     <form-validator v-model="valid">
       <input-validator
