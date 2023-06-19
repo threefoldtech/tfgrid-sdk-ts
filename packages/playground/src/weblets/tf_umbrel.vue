@@ -60,14 +60,9 @@
         </input-validator>
       </password-input-wrapper>
 
-      <input-tooltip
-        #="props"
-        inline
-        tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
-      >
-        <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
+      <input-tooltip tooltip="Enable the network options to be able access your deployment">
+        <Network v-model:ipv4="ipv4" />
       </input-tooltip>
-
       <SelectSolutionFlavor
         v-model="solution"
         :minimum="{ cpu: 2, memory: 1024 * 2, disk: 10 }"
