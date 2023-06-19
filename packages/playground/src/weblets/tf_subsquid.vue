@@ -40,9 +40,7 @@
         </input-tooltip>
       </input-validator>
 
-      <input-tooltip tooltip="Enable the network options to be able access your deployment">
-        <Network v-model:ipv4="ipv4" />
-      </input-tooltip>
+      <Network v-model:ipv4="ipv4" />
 
       <SelectSolutionFlavor
         v-model="solution"

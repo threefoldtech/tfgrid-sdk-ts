@@ -25,9 +25,7 @@
           <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
-      <input-tooltip tooltip="Enable the network options to be able access your deployment">
-        <Network v-model:ipv4="ipv4" />
-      </input-tooltip>
+      <Network v-model:ipv4="ipv4" />
       <AlgorandCapacity
         :network="network"
         :type="type"

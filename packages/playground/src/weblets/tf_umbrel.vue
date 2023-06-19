@@ -60,9 +60,8 @@
         </input-validator>
       </password-input-wrapper>
 
-      <input-tooltip tooltip="Enable the network options to be able access your deployment">
-        <Network v-model:ipv4="ipv4" />
-      </input-tooltip>
+      <Network v-model:ipv4="ipv4" />
+
       <SelectSolutionFlavor
         v-model="solution"
         :minimum="{ cpu: 2, memory: 1024 * 2, disk: 10 }"

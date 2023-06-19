@@ -90,17 +90,14 @@
           </input-tooltip>
         </input-validator>
 
-        <input-tooltip tooltip="Enable the network options to be able access your deployment">
-          <Network
-            required
-            ref="network"
-            v-model:ipv4="ipv4"
-            v-model:ipv6="ipv6"
-            v-model:planetary="planetary"
-            v-model:wireguard="wireguard"
-          />
-        </input-tooltip>
-
+        <Network
+          required
+          ref="network"
+          v-model:ipv4="ipv4"
+          v-model:ipv6="ipv6"
+          v-model:planetary="planetary"
+          v-model:wireguard="wireguard"
+        />
         <SelectFarm
           :filters="{
             cpu,
