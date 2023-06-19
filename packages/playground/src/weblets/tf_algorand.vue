@@ -86,7 +86,9 @@
             ]"
             #="{ props }"
           >
-            <input-tooltip tooltip="Account Mnemonic.">
+            <input-tooltip
+              tooltip="Account mnemonic is the private key of your Algorand wallet and it consists of 24 words "
+            >
               <v-text-field
                 label="Account Mnemonic"
                 placeholder="Algorand Account Mnemonic"

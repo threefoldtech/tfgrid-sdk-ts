@@ -8,7 +8,7 @@
     <input-tooltip
       v-if="!persistent"
       inline
-      tooltip="When the SMTP server is enabled, the system is capable of sending outgoing emails, while disabling it prevents the system from sending any emails through the SMTP server."
+      tooltip="When the SMTP server is enabled, the system is capable of sending outgoing emails through the SMTP server."
     >
       <v-switch color="primary" inset label="Toggle SMTP Server Enable" v-model="$props.modelValue.enabled" />
     </input-tooltip>

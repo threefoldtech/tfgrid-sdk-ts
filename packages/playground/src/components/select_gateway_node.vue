@@ -4,9 +4,11 @@
     :rules="[validators.required('Gateway node is required.')]"
     #="{ props }"
   >
-    <input-tooltip tooltip="Refers to the process of choosing a specific node within a network to act as the gateway.">
+    <input-tooltip
+      tooltip="Creates a subdomain for your instance on the selected domain to be able to access your instance from the browser."
+    >
       <v-autocomplete
-        label="Select gateway Node"
+        label="Select gateway"
         placeholder="Please select a domain."
         :items="items"
         item-title="domain"

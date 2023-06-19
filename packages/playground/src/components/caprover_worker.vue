@@ -11,7 +11,7 @@
     :value="$props.modelValue.name"
     #="{ props }"
   >
-    <input-tooltip tooltip="Solution name.">
+    <input-tooltip tooltip="Worker name.">
       <v-text-field label="Name" v-model="$props.modelValue.name" v-bind="props" />
     </input-tooltip>
   </input-validator>
