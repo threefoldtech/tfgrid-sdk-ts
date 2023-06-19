@@ -12,7 +12,9 @@ export function generateName(length = 12, options?: GenerateNameOptions): string
   const chars = "abcdefghijklmnopqrstuvwxyz";
   const nums = "0123456789";
 
-  return options?.prefix ?? "" + randomChoice(chars) + generateString(chars + nums, length - 1) + options?.suffix ?? "";
+  return (
+    (options?.prefix ?? "") + randomChoice(chars) + generateString(chars + nums, length - 1) + (options?.suffix ?? "")
+  );
 }
 
 function generateString(from: string, length: number): string {
