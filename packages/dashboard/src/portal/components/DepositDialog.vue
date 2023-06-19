@@ -1,6 +1,11 @@
 <template>
   <v-container>
-    <v-dialog transition="dialog-bottom-transition" max-width="900" v-model="openDepositDialog">
+    <v-dialog
+      transition="dialog-bottom-transition"
+      max-width="900"
+      v-model="depositDialog"
+      v-click-outside="handleClose"
+    >
       <v-card>
         <v-toolbar color="primary" dark>Deposit TFT</v-toolbar>
         <v-card-text>
@@ -62,8 +67,10 @@ export default class DepositDialog extends Vue {
   $api: any;
   client = new QueryClient(window.configs.APP_API_URL);
   private _destroyed = false;
+  depositDialog = false;
   async created() {
     if (!this.openDepositDialog) return;
+    this.depositDialog = true;
     try {
       const receivedDeposit = await this.client.tftBridge.listenToMintCompleted(
         this.$store.state.credentials.account.address,
@@ -84,6 +91,7 @@ export default class DepositDialog extends Vue {
   }
 
   handleClose() {
+    this.depositDialog = false;
     this.$emit("close");
   }
 }
