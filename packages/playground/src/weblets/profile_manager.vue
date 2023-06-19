@@ -69,6 +69,12 @@
         <VContainer>
           <form @submit.prevent="activeTab === 0 ? login() : storeAndLogin()">
             <FormValidator v-model="isValidForm">
+              <v-alert type="warning" variant="tonal" class="mb-6" v-if="activeTab === 1">
+                <p :style="{ maxWidth: '880px' }">
+                  To connect your wallet, you will need to enter your mnemonic which will be encrypted using the
+                  password. Mnemonic will never be shared outside of this device.
+                </p>
+              </v-alert>
               <VTooltip
                 v-if="activeTab === 1"
                 text="Mnemonic are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonic or click the 'Create Account' button to create an account and generate mnemonic."
@@ -92,7 +98,6 @@
                           class="mb-2"
                           label="Mnemonic"
                           placeholder="Please insert your mnemonic"
-                          autofocus
                           v-model="mnemonic"
                           v-bind="{ ...passwordInputProps, ...validationProps }"
                           :disabled="creatingAccount || activating"
@@ -117,6 +122,11 @@
                 {{ createAccountError }}
               </v-alert>
 
+              <v-alert type="warning" variant="tonal" class="mb-6" v-if="activeTab === 0">
+                <p :style="{ maxWidth: '880px' }">
+                  You will need to provide the password used while connecting your wallet.
+                </p>
+              </v-alert>
               <PasswordInputWrapper #="{ props: passwordInputProps }">
                 <InputValidator
                   :value="password"
@@ -130,13 +140,12 @@
                 >
                   <v-tooltip
                     location="bottom"
-                    text="used to encrypt your mnemonic on your local system, and is used to login from the same device."
+                    text="Used to encrypt your mnemonic on your local system, and is used to login from the same device."
                   >
                     <template #activator="{ props: tooltipProps }">
                       <div v-bind="tooltipProps">
                         <VTextField
                           label="Password"
-                          :autofocus="activeTab === 0"
                           v-model="password"
                           v-bind="{ ...passwordInputProps, ...validationProps }"
                           :disabled="creatingAccount || activating"
@@ -147,6 +156,21 @@
                 </InputValidator>
               </PasswordInputWrapper>
 
+              <PasswordInputWrapper #="{ props: confirmPasswordInputProps }" v-if="activeTab === 1">
+                <InputValidator
+                  :value="confirmPassword"
+                  :rules="[validators.required('This field is required.'), validateConfirmPassword]"
+                  #="{ props: validationProps }"
+                  ref="confirmPasswordInput"
+                >
+                  <VTextField
+                    label="Confirm Password"
+                    v-model="confirmPassword"
+                    v-bind="{ ...confirmPasswordInputProps, ...validationProps }"
+                    :disabled="creatingAccount || activating"
+                  />
+                </InputValidator>
+              </PasswordInputWrapper>
               <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="loginError">
                 {{ loginError }}
               </v-alert>
@@ -403,7 +427,9 @@ const balance = ref<Balance>();
 
 const activeTab = ref(0);
 const password = ref("");
+const confirmPassword = ref("");
 const passwordInput = ref() as Ref<{ validate(value: string): Promise<boolean> }>;
+const confirmPasswordInput = ref() as Ref<{ validate(value: string): Promise<boolean> }>;
 
 const version = 1;
 const WALLET_KEY = "wallet.v" + version;
@@ -440,6 +466,7 @@ function clearError() {
 
 function clearFields() {
   password.value = "";
+  confirmPassword.value = "";
   mnemonic.value = "";
 }
 
@@ -551,6 +578,12 @@ function validatePassword(value: string) {
     if (getCredentials().passwordHash !== md5(password.value)) {
       return { message: "We couldn't find a matching wallet for this password. Please connect your wallet first." };
     }
+  }
+}
+
+function validateConfirmPassword(value: string) {
+  if (value !== password.value) {
+    return { message: "Passwords should match." };
   }
 }
 
