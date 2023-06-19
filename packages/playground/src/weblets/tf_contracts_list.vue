@@ -26,7 +26,7 @@
       <template #[`item.state`]="{ item }">
         <v-tooltip
           v-if="item && item.value.state === ContractStates.GracePeriod"
-          :text="'the number of tokens required to remove your contract from the grace period and restore functionality to your workloads.'"
+          :text="'Click here to check the amount of tokens needed to unlock your contract and resume your workload.'"
           location="top center"
         >
           <template #activator="{ props }">
@@ -103,9 +103,9 @@
         </p>
         <br />
         <v-alert type="info" variant="tonal">
-          The contract is in a GracePeriod condition, which means that your workloads are suspended but not deleted; in
-          order to resume your workloads and restore their functionality, you must pay your account with the necessary
-          tokens.
+          The contract is in Grace Period, which means that your workloads are suspended but not deleted; in order to
+          resume your workloads and restore their functionality, Please fund your account with the amount mentioned
+          above.
         </v-alert>
       </v-card-text>
       <v-card-actions>
