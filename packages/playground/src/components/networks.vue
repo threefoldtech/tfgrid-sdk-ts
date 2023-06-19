@@ -13,11 +13,11 @@
       </template>
       <v-expansion-panel-text>
         <input-tooltip
+          v-if="ipv4 !== null"
           inline
           tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
         >
           <v-switch
-            v-if="ipv4 !== null"
             hide-details
             color="primary"
             inset
@@ -27,11 +27,11 @@
           />
         </input-tooltip>
         <input-tooltip
+          v-if="ipv6 !== null"
           inline
           tooltip="Public IPv6 is the next-generation Internet Protocol that offers an expanded address space to connect a vast number of devices."
         >
           <v-switch
-            v-if="ipv6 !== null"
             hide-details
             color="primary"
             inset
@@ -41,11 +41,11 @@
           />
         </input-tooltip>
         <input-tooltip
+          v-if="planetary !== null"
           inline
           tooltip="The Planetary Network is a distributed network infrastructure that spans across multiple regions and countries, providing global connectivity."
         >
           <v-switch
-            v-if="planetary !== null"
             hide-details
             color="primary"
             inset
@@ -55,11 +55,11 @@
           />
         </input-tooltip>
         <input-tooltip
+          v-if="wireguard !== null"
           inline
           tooltip="Enabling WireGuard Access allows you to establish private, secure, and encrypted connections to your instance."
         >
           <v-switch
-            v-if="wireguard !== null"
             hide-details
             color="primary"
             inset
