@@ -110,7 +110,7 @@ const router = createRouter({
     {
       path: "/:pathMatch(.*)*",
       component: () => import("../views/PageNotFound.vue"),
-      meta: { title: "Not Yet Implemented" },
+      meta: { title: "Page Not Found" },
     },
   ],
 });
