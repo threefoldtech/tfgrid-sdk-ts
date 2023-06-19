@@ -182,7 +182,7 @@
                 color="primary"
                 variant="tonal"
                 :loading="activating"
-                :disabled="!isValidForm || creatingAccount"
+                :disabled="!isValidForm || creatingAccount || isValidPasswords"
                 size="large"
               >
                 {{ activeTab === 0 ? "Login" : "Connect" }}
@@ -307,11 +307,10 @@
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import md5 from "md5";
-import { onMounted, type Ref, ref, watch } from "vue";
+import { computed, onMounted, type Ref, ref, watch } from "vue";
 import { nextTick } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
-import IconActionBtn from "../components/icon_action_btn.vue";
 import { useProfileManager } from "../stores";
 import { type Balance, createAccount, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
 import { isEnoughBalance, normalizeError } from "../utils/helpers";
@@ -411,6 +410,7 @@ const isValidForm = ref(false);
 const SSHKeyHint = ref("");
 const ssh = ref("");
 let sshTimeout: any;
+const isValidPasswords = computed(() => (!validateConfirmPassword(confirmPassword.value) ? false : true));
 
 watch(SSHKeyHint, hint => {
   if (hint) {
