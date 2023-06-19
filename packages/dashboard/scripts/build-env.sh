@@ -9,13 +9,6 @@ echo -e "\nHINT:\e[1;10m The default selected STELLAR_NETWORK is\e[0m \e[1;32m$S
 # Check the current selected tf-chain network, there are 5 modes dev, qa, test, main and custom
 # the user should select one of them, otherwise will be devnet.
 
-if [ -d dist ]
-then
-    file="dist/config.js"
-else
-    file="config.js"
-fi
-
 if [ -z ${VERSION+x} ]
 then
     echo -e "\n\e[1;50m \e[1;31mVERSION is required!\e[0m\n \e[1;3mPlease set it by executing the following command."
@@ -141,10 +134,15 @@ window.configs = {
 };
 "
 
-if [ -e $file ]
+echo -e "\e[1;32m$configs"
+
+
+if [ -d public ]
 then
-    rm $file
+    echo $configs > public/config.js
 fi
 
-echo $configs > $file
-echo -e "\e[1;32m$configs"
+if [ -d dist ]
+then
+    echo $configs > dist/config.js
+fi

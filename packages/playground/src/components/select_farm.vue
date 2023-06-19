@@ -5,17 +5,20 @@
     <SelectCountry v-model="country" />
 
     <input-validator :rules="[validators.required('Farm is required.')]" :value="farm?.farmID" ref="farmInput">
-      <v-autocomplete
-        :disabled="loading"
-        label="Farm Name"
-        :items="farms"
-        :loading="loading"
-        item-title="name"
-        return-object
-        :model-value="shouldBeUpdated ? undefined : farm"
-        @update:model-value="farm = $event"
-        :error-messages="!loading && !farms.length ? 'No farms where found with the specified resources.' : undefined"
-      />
+      <input-tooltip tooltip="The name of the farm that you want to deploy inside it.">
+        <v-autocomplete
+          :disabled="loading"
+          label="Farm Name"
+          v-bind="props"
+          :items="farms"
+          :loading="loading"
+          item-title="name"
+          return-object
+          :model-value="shouldBeUpdated ? undefined : farm"
+          @update:model-value="farm = $event"
+          :error-messages="!loading && !farms.length ? 'No farms where found with the specified resources.' : undefined"
+        />
+      </input-tooltip>
     </input-validator>
   </section>
 </template>

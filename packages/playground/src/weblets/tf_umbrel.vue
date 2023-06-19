@@ -8,13 +8,6 @@
     title-image="images/icons/umbrel.png"
   >
     <template #title>Deploy an Umbrel Instance </template>
-    <template #subtitle>
-      Umbrel is an OS for running a personal server in your home. Self-host open source apps like Nextcloud, Bitcoin
-      node, and more.
-      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_umbrel.html" class="app-link">
-        Quick start documentation
-      </a>
-    </template>
 
     <form-validator v-model="valid">
       <input-validator
@@ -29,8 +22,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Instance name.">
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -46,8 +39,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Umbrel admin username.">
-          <v-text-field label="Username" v-model="username" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Umbrel admin username.">
+          <v-text-field label="Username" v-model="username" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -61,17 +54,20 @@
           ]"
           #="{ props: validatorProps }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="Umbrel admin password.">
-            <v-text-field
-              label="Password"
-              v-model="password"
-              v-bind="{ ...props, ...tooltipProps, ...validatorProps }"
-            />
+          <input-tooltip tooltip="Umbrel admin password.">
+            <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
           </input-tooltip>
         </input-validator>
       </password-input-wrapper>
 
-      <Network v-model:ipv4="ipv4" />
+      <input-tooltip
+        #="props"
+        inline
+        tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
+      >
+        <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
+      </input-tooltip>
+
       <SelectSolutionFlavor
         v-model="solution"
         :minimum="{ cpu: 2, memory: 1024 * 2, disk: 10 }"
@@ -96,7 +92,6 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString } from "@threefold/grid_client";
 import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
@@ -107,14 +102,15 @@ import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
+import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref("um" + generateString(9));
+const name = ref(generateName(9, { prefix: "um" }));
 const username = ref("admin");
-const password = ref(generateString(12));
+const password = ref(generatePassword());
 const ipv4 = ref(false);
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;

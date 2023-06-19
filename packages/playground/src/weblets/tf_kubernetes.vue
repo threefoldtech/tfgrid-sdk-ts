@@ -9,17 +9,7 @@
     :ivp4="master.ipv4"
     title-image="images/icons/kubernetes.png"
   >
-    <template #title>Deploy a Kubernetes</template>
-    <template #subtitle>
-      Kubernetes is the standard container orchestration tool. On the TF grid, Kubernetes clusters can be deployed out
-      of the box. We have implemented K3S, a full-blown Kubernetes offering that uses only half of the memory footprint.
-      It is packaged as a single binary and made more lightweight to run workloads in resource-constrained locations
-      (fits e.g. IoT, edge, ARM workloads).
-      <a href="https://manual.grid.tf/weblets/weblets_k8s.html" target="_blank" class="app-link">
-        Quick start documentation
-      </a>
-    </template>
-
+    <template #title>Deploy a Kubernetes cluster</template>
     <d-tabs
       :tabs="[
         { title: 'Config', value: 'config' },
@@ -41,8 +31,8 @@
           ]"
           #="{ props }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
-            <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+          <input-tooltip tooltip="Instance name.">
+            <v-text-field label="Name" v-model="name" v-bind="{ ...props }" />
           </input-tooltip>
         </input-validator>
 
@@ -58,14 +48,9 @@
         >
           <password-input-wrapper #="{ props }">
             <input-tooltip
-              #="{ tooltipProps }"
               tooltip="The Kubernetes Cluster Token is a specially generated authentication token used for accessing and managing a Kubernetes cluster."
             >
-              <v-text-field
-                label="Cluster Token"
-                v-bind="{ ...props, ...validationProps, ...tooltipProps }"
-                v-model="clusterToken"
-              />
+              <v-text-field label="Cluster Token" v-bind="{ ...props, ...validationProps }" v-model="clusterToken" />
             </input-tooltip>
           </password-input-wrapper>
         </input-validator>
@@ -89,7 +74,6 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString } from "@threefold/grid_client";
 import { ref } from "vue";
 
 import { createWorker } from "../components/k8s_worker.vue";
@@ -98,14 +82,15 @@ import { useProfileManager } from "../stores";
 import type { K8SWorker as K8sWorker } from "../types";
 import { deployK8s } from "../utils/deploy_k8s";
 import { getGrid } from "../utils/grid";
+import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref("k8s" + generateString(8));
-const clusterToken = ref(generateString(10));
-const master = ref(createWorker("mr" + generateString(9)));
+const name = ref(generateName(8, { prefix: "k8s" }));
+const clusterToken = ref(generatePassword(10));
+const master = ref(createWorker(generateName(9, { prefix: "mr" })));
 const workers = ref<K8sWorker[]>([]);
 
 function addWorker() {

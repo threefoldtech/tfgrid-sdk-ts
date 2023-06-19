@@ -6,14 +6,7 @@
     :disk="solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
     title-image="images/icons/owncloud.png"
   >
-    <template #title>Deploy an Owncloud Instance </template>
-    <template #subtitle>
-      Owncloud develops and provides open-source software for content collaboration, allowing teams to easily share and
-      work on files seamlessly regardless of device or location.
-      <a target="_blank" class="app-link" href="https://manual.grid.tf/weblets/weblets_owncloud.html">
-        Quick start documentation
-      </a>
-    </template>
+    <template #title>Deploy an OwnCloud Instance </template>
 
     <d-tabs
       :tabs="[
@@ -35,8 +28,8 @@
           ]"
           #="{ props }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
-            <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+          <input-tooltip tooltip="Instance name.">
+            <v-text-field label="Name" v-model="name" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
@@ -52,8 +45,8 @@
           ]"
           #="{ props }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="OwnCloud admin username.">
-            <v-text-field label="Username" v-model="username" v-bind="{ ...props, ...tooltipProps }" />
+          <input-tooltip tooltip="OwnCloud admin username.">
+            <v-text-field label="Username" v-model="username" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
@@ -67,12 +60,8 @@
             ]"
             #="{ props: validatorProps }"
           >
-            <input-tooltip #="{ tooltipProps }" tooltip="OwnCloud admin password.">
-              <v-text-field
-                label="Password"
-                v-model="password"
-                v-bind="{ ...props, ...tooltipProps, ...validatorProps }"
-              />
+            <input-tooltip tooltip="OwnCloud admin password.">
+              <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
             </input-tooltip>
           </input-validator>
         </password-input-wrapper>
@@ -109,7 +98,7 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString, type GridClient } from "@threefold/grid_client";
+import type { GridClient } from "@threefold/grid_client";
 import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
@@ -119,14 +108,15 @@ import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
+import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref("oc" + generateString(9));
+const name = ref(generateName(9, { prefix: "oc" }));
 const username = ref("admin");
-const password = ref(generateString(12));
+const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;

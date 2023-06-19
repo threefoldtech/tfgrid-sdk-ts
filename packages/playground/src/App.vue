@@ -21,12 +21,19 @@
                 v-for="item in route.items"
                 :key="item.route"
                 :value="item.route"
-                @click="$router.push(item.route)"
+                @click="clickHandler(item)"
                 active-color="primary"
                 :active="$route.path === item.route"
               >
                 <template v-slot:prepend v-if="item.icon">
-                  <v-img class="mr-4" width="26" :src="baseUrl + 'images/icons/' + item.icon" :alt="item.title" />
+                  <v-img
+                    v-if="item.icon.includes('.')"
+                    class="mr-4"
+                    width="26"
+                    :src="baseUrl + 'images/icons/' + item.icon"
+                    :alt="item.title"
+                  />
+                  <v-icon v-else>{{ item.icon }}</v-icon>
                 </template>
 
                 <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -48,7 +55,7 @@
     <v-main :style="{ paddingTop: '70px' }">
       <v-toolbar
         color="rgb(49, 49, 49)"
-        class="position-fixed"
+        class="position-fixed pr-2"
         theme="dark"
         :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }"
       >
@@ -58,13 +65,23 @@
 
         <v-spacer></v-spacer>
 
+        <v-btn
+          v-for="(link, index) in navbarLinks"
+          :key="index"
+          color="var(--link-color)"
+          variant="text"
+          target="_blank"
+          :href="link.url"
+          :prepend-icon="link.icon && link.label ? link.icon : undefined"
+          :icon="link.icon && !link.label ? link.icon : undefined"
+          :text="link.label"
+        />
+        <v-divider vertical v-if="navbarLinks.length" />
         <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
-        <v-divider vertical />
+        <v-divider vertical class="mx-2" />
         <AppTheme />
-        <v-divider vertical />
-        <div class="mx-2">
-          <ProfileManager v-model="openProfile" />
-        </div>
+        <v-divider vertical class="mx-2" />
+        <ProfileManager v-model="openProfile" />
       </v-toolbar>
 
       <DeploymentListManager>
@@ -148,6 +165,17 @@ const routes: AppRoute[] = [
     title: "My Account",
     items: [{ title: "Contracts", route: "/contractslist" }],
   },
+  {
+    title: "Help",
+    items: [{ title: "Manual", icon: "mdi-open-in-new", url: "https://manual.grid.tf/" }],
+  },
+];
+
+const navbarLinks: NavbarLink[] = [
+  {
+    label: "Help",
+    url: "https://manual.grid.tf/",
+  },
 ];
 
 // eslint-disable-next-line no-undef
@@ -157,9 +185,18 @@ const permanent = window.innerWidth > 980;
 const openSidebar = ref(permanent);
 
 const baseUrl = import.meta.env.BASE_URL;
+
+function clickHandler({ route, url }: AppRouteItem): void {
+  if (route) {
+    $router.push(route);
+  } else if (url) {
+    window.open(url, "_blank");
+  }
+}
 </script>
 
 <script lang="ts">
+import AppInfo from "./components/app_info.vue";
 import AppTheme from "./components/app_theme.vue";
 import ConnectWalletLanding from "./components/connect_wallet_landing.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
@@ -173,9 +210,17 @@ interface AppRoute {
 
 interface AppRouteItem {
   title: string;
-  route: string;
+  route?: string;
+  url?: string;
   icon?: string;
 }
+
+interface NavbarLink {
+  label?: string;
+  url: string;
+  icon?: string;
+}
+
 export default {
   name: "App",
   components: {
@@ -184,15 +229,20 @@ export default {
     DeploymentListManager,
     AppTheme,
     ConnectWalletLanding,
+    AppInfo,
   },
 };
 </script>
 
 <style lang="scss" global>
+:root {
+  --link-color: #3d7ad4;
+}
+
 .app-link {
   text-decoration: none;
   font-weight: bold;
-  color: #3d7ad4;
+  color: var(--link-color);
   cursor: pointer;
 }
 
@@ -225,5 +275,11 @@ export default {
   position: absolute;
   bottom: 15px;
   right: 25px;
+}
+.v-tooltip > .v-overlay__content {
+  opacity: 10;
+  color: white;
+  font-weight: 900;
+  background-color: rgb(71, 70, 70);
 }
 </style>

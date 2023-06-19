@@ -7,13 +7,6 @@
     title-image="images/icons/peertube.png"
   >
     <template #title>Deploy a Peertube Instance</template>
-    <template #subtitle>
-      Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services.
-      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_peertube.html" class="app-link">
-        Quick start documentation
-      </a>
-    </template>
-
     <form-validator v-model="valid">
       <input-validator
         :value="name"
@@ -27,8 +20,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Instance name.">
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -40,8 +33,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Peertube admin email.">
-          <v-text-field label="Admin Email" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Peertube admin email.">
+          <v-text-field label="Admin Email" v-model="email" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -55,12 +48,8 @@
           ]"
           #="{ props: validatorProps }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="Peertube admin password.">
-            <v-text-field
-              label="Admin Password"
-              v-model="password"
-              v-bind="{ ...props, ...validatorProps, ...tooltipProps }"
-            />
+          <input-tooltip tooltip="Peertube admin password.">
+            <v-text-field label="Admin Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
           </input-tooltip>
         </input-validator>
       </password-input-wrapper>
@@ -85,7 +74,7 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString, GridClient } from "@threefold/grid_client";
+import type { GridClient } from "@threefold/grid_client";
 import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
@@ -94,14 +83,15 @@ import type { Farm, GatewayNode, solutionFlavor as SolutionFlavor } from "../typ
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
+import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref("pt" + generateString(9));
+const name = ref(generateName(9, { prefix: "pt" }));
 const email = ref("");
-const password = ref(generateString(12));
+const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;

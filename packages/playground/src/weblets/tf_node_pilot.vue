@@ -1,14 +1,6 @@
 <template>
   <weblet-layout ref="layout" :cpu="cpu" :memory="memory" :disk="32" ivp4 title-image="images/icons/vm.png">
     <template #title>Deploy a Node Pilot</template>
-    <template #subtitle>
-      Deploy a new Node Pilot on the Threefold Grid
-      <a class="app-link" href="https://manual.grid.tf/weblets/weblets_nodepilot.html" target="_blank">
-        Quick start documentation
-      </a>
-      .
-    </template>
-
     <form-validator v-model="valid">
       <input-validator
         :value="name"
@@ -22,8 +14,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Instance name.">
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -37,13 +29,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="The number of virtual cores allocated to your instance.">
-          <v-text-field
-            label="CPU (vCores)"
-            type="number"
-            v-model.number="cpu"
-            v-bind="{ ...props, ...tooltipProps }"
-          />
+        <input-tooltip tooltip="The number of virtual cores allocated to your instance.">
+          <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -57,16 +44,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip
-          #="{ tooltipProps }"
-          tooltip="The amount of RAM (Random Access Memory) allocated to your instance."
-        >
-          <v-text-field
-            label="Memory (MB)"
-            type="number"
-            v-model.number="memory"
-            v-bind="{ ...props, ...tooltipProps }"
-          />
+        <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
+          <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -88,7 +67,6 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString } from "@threefold/grid_client";
 import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
@@ -96,12 +74,13 @@ import { useProfileManager } from "../stores";
 import { type Farm, ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
+import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref("np" + generateString(8));
+const name = ref(generateName(8, { prefix: "np" }));
 const cpu = ref(8);
 const memory = ref(8192);
 const farm = ref() as Ref<Farm>;
@@ -137,11 +116,11 @@ async function deploy() {
           disks: [
             {
               size: 15,
-              mountPoint: "/mnt/" + generateString(10),
+              mountPoint: "/mnt/" + generateName(10),
             },
             {
               size: 15,
-              mountPoint: "/mnt/" + generateString(10),
+              mountPoint: "/mnt/" + generateName(10),
             },
           ],
         },

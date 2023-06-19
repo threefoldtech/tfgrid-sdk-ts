@@ -11,8 +11,8 @@
     ]"
     #="{ props }"
   >
-    <input-tooltip #="{ tooltipProps }" tooltip="Solution name.">
-      <v-text-field label="Name" v-model="$props.modelValue.name" v-bind="{ ...props, ...tooltipProps }" />
+    <input-tooltip tooltip="Node name.">
+      <v-text-field label="Name" v-model="$props.modelValue.name" v-bind="props" />
     </input-tooltip>
   </input-validator>
 
@@ -26,13 +26,8 @@
     ]"
     #="{ props }"
   >
-    <input-tooltip #="{ tooltipProps }" tooltip="The number of virtual cores allocated to your instance.">
-      <v-text-field
-        label="CPU (vCores)"
-        type="number"
-        v-model.number="$props.modelValue.cpu"
-        v-bind="{ ...props, ...tooltipProps }"
-      />
+    <input-tooltip tooltip="The number of virtual cores allocated to your instance.">
+      <v-text-field label="CPU (vCores)" type="number" v-model.number="$props.modelValue.cpu" v-bind="props" />
     </input-tooltip>
   </input-validator>
 
@@ -46,13 +41,8 @@
     ]"
     #="{ props }"
   >
-    <input-tooltip #="{ tooltipProps }" tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
-      <v-text-field
-        label="Memory (MB)"
-        type="number"
-        v-model.number="$props.modelValue.memory"
-        v-bind="{ ...props, ...tooltipProps }"
-      />
+    <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
+      <v-text-field label="Memory (MB)" type="number" v-model.number="$props.modelValue.memory" v-bind="props" />
     </input-tooltip>
   </input-validator>
 
@@ -66,21 +56,32 @@
     ]"
     #="{ props }"
   >
-    <input-tooltip #="{ tooltipProps }" tooltip="Disk Size.">
-      <v-text-field
-        label="Size (GB)"
-        type="number"
-        v-model.number="$props.modelValue.diskSize"
-        v-bind="{ ...props, ...tooltipProps }"
-      />
+    <input-tooltip tooltip="Disk Size.">
+      <v-text-field label="Size (GB)" type="number" v-model.number="$props.modelValue.diskSize" v-bind="props" />
     </input-tooltip>
   </input-validator>
 
-  <Network
-    v-model:ipv4="$props.modelValue.ipv4"
-    v-model:ipv6="$props.modelValue.ipv6"
-    v-model:planetary="$props.modelValue.planetary"
-  />
+  <input-tooltip
+    inline
+    tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
+  >
+    <v-switch color="primary" inset label="Public IPv4" v-model="$props.modelValue.ipv4" />
+  </input-tooltip>
+
+  <input-tooltip
+    inline
+    tooltip="Public IPv6 is the next-generation Internet Protocol that offers an expanded address space to connect a vast number of devices."
+  >
+    <v-switch color="primary" inset label="Public IPv6" v-model="$props.modelValue.ipv6" />
+  </input-tooltip>
+
+  <input-tooltip
+    inline
+    tooltip="The Planetary Network is a distributed network infrastructure that spans across multiple regions and countries, providing global connectivity."
+  >
+    <v-switch color="primary" inset label="Planetary Network" v-model="$props.modelValue.planetary" />
+  </input-tooltip>
+
   <RootFsSize
     :cpu="$props.modelValue.cpu"
     :memory="$props.modelValue.memory"
@@ -103,14 +104,12 @@ defineProps<{ modelValue: K8SWorker }>();
 </script>
 
 <script lang="ts">
-import { generateString } from "@threefold/grid_client";
-
 import type { Farm, K8SWorker } from "../types";
-import Network from "./networks.vue";
+import { generateName } from "../utils/strings";
 import RootFsSize from "./root_fs_size.vue";
 import SelectFarm from "./select_farm.vue";
 
-export function createWorker(name: string = "wr" + generateString(9)): K8SWorker {
+export function createWorker(name: string = generateName(9, { prefix: "wr" })): K8SWorker {
   return {
     name,
     cpu: 1,

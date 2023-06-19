@@ -7,13 +7,6 @@
     title-image="images/icons/casperlabs.png"
   >
     <template #title>Deploy a Casperlabs Instance </template>
-    <template #subtitle>
-      Casper Network is a blockchain protocol built from the ground up to remain true to core Web3 principles and adapt
-      to the needs of our evolving world.
-      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_casper.html" class="app-link">
-        Quick start documentation
-      </a>
-    </template>
 
     <form-validator v-model="valid">
       <input-validator
@@ -28,8 +21,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Instance name.">
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -58,7 +51,7 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString, type GridClient } from "@threefold/grid_client";
+import type { GridClient } from "@threefold/grid_client";
 import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
@@ -69,12 +62,13 @@ import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
+import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref("cl" + generateString(9));
+const name = ref(generateName(9, { prefix: "cl" }));
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;

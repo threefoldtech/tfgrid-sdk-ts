@@ -5,13 +5,13 @@
       <p v-else>Configure your SMTP Server.</p>
     </v-alert>
 
-    <v-switch
-      inset
-      v-model="$props.modelValue.enabled"
-      label="Toggle SMTP Server Enable"
+    <input-tooltip
       v-if="!persistent"
-      color="primary"
-    />
+      inline
+      tooltip="When the SMTP server is enabled, the system is capable of sending outgoing emails through the SMTP server."
+    >
+      <v-switch color="primary" inset label="Toggle SMTP Server Enable" v-model="$props.modelValue.enabled" />
+    </input-tooltip>
 
     <template v-if="$props.modelValue.enabled || persistent">
       <input-validator
@@ -22,12 +22,12 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="SMTP admin email.">
+        <input-tooltip tooltip="SMTP admin email.">
           <v-text-field
             label="Admin Email"
             placeholder="email@example.com"
             v-model="$props.modelValue.username"
-            v-bind="{ ...props, ...tooltipProps }"
+            v-bind="props"
             autofocus
           />
         </input-tooltip>
@@ -43,12 +43,12 @@
           ]"
           #="{ props: validatorProps }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="SMTP admin password.">
+          <input-tooltip tooltip="SMTP admin password.">
             <v-text-field
               label="Admin Password"
               placeholder="email@example.com"
               v-model="$props.modelValue.password"
-              v-bind="{ ...props, ...tooltipProps }"
+              v-bind="{ ...props, ...validatorProps }"
               autofocus
             />
           </input-tooltip>
@@ -64,12 +64,12 @@
         v-if="email"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="From email address.">
+        <input-tooltip tooltip="From email address.">
           <v-text-field
             label="From Email Address"
             placeholder="email@example.com"
             v-model="$props.modelValue.email"
-            v-bind="{ ...props, ...tooltipProps }"
+            v-bind="props"
             autofocus
           />
         </input-tooltip>
@@ -80,12 +80,12 @@
         :rules="[validators.required('Hostname is required.'), validators.isURL('Please provide a valid hostname.')]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="SMTP host server.">
+        <input-tooltip tooltip="SMTP host server.">
           <v-text-field
             label="Hostname"
             placeholder="email@example.com"
             v-model="$props.modelValue.hostname"
-            v-bind="{ ...props, ...tooltipProps }"
+            v-bind="props"
             autofocus
           />
         </input-tooltip>
@@ -96,28 +96,28 @@
         :rules="[validators.required('Port is required.'), validators.isPort('Please provide a valid port.')]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="SMTP port server.">
-          <v-text-field label="Port" v-model.number="$props.modelValue.port" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="SMTP port server.">
+          <v-text-field label="Port" v-model.number="$props.modelValue.port" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
-      <v-tooltip
-        location="top"
-        text="TLS (Transport Layer Security) is a cryptographic protocol that ensures secure communication over a network. It provides encryption, authentication, and data integrity, making it an essential component for secure deployments."
+      <input-tooltip
+        v-if="tls"
+        #="props"
+        inline
+        tooltip="TLS (Transport Layer Security) is a cryptographic protocol that ensures secure communication over a network. It provides encryption, authentication, and data integrity, making it an essential component for secure deployments."
       >
-        <template v-slot:activator="{ props }">
-          <v-switch inset color="primary" label="Use TLS" v-if="tls" v-bind="props" />
-        </template>
-      </v-tooltip>
+        <v-switch color="primary" inset label="Use TLS" v-bind="props" />
+      </input-tooltip>
 
-      <v-tooltip
-        location="top"
-        text="SSL (Secure Sockets Layer) is an older cryptographic protocol that was widely used for secure communication before being superseded by TLS. SSL and TLS are often used interchangeably, but technically TLS is the successor of SSL."
+      <input-tooltip
+        v-if="ssl"
+        #="props"
+        inline
+        tooltip="SSL (Secure Sockets Layer) is an older cryptographic protocol that was widely used for secure communication before being superseded by TLS. SSL and TLS are often used interchangeably, but technically TLS is the successor of SSL."
       >
-        <template v-slot:activator="{ props }">
-          <v-switch inset color="primary" label="Use SSL" v-if="ssl" v-bind="props" />
-        </template>
-      </v-tooltip>
+        <v-switch color="primary" inset label="Use SSL" v-bind="props" />
+      </input-tooltip>
     </template>
   </div>
 </template>
@@ -133,9 +133,8 @@ defineProps<{
 </script>
 
 <script lang="ts">
-import { generateString } from "@threefold/grid_client";
-
 import type { SMTPServer } from "../types";
+import { generatePassword } from "../utils/strings";
 
 export function createSMTPServer(options: Partial<SMTPServer> = {}): SMTPServer {
   return {
@@ -146,7 +145,7 @@ export function createSMTPServer(options: Partial<SMTPServer> = {}): SMTPServer 
     port: options.port || 587,
     tls: options.tls || false,
     ssl: options.ssl || false,
-    password: options.password || generateString(12),
+    password: options.password || generatePassword(),
   };
 }
 

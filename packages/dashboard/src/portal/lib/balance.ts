@@ -24,8 +24,8 @@ export async function getBalance(
   const res = await api.query.system.account(address);
 
   return {
-    free: res.data.free.toJSON() / 1e7,
-    transferable: (res.data.free.toJSON() - res.data.feeFrozen.toJSON()) / 1e7,
+    free: Math.floor((res.data.free.toJSON() / 1e7) * 1000) / 1000,
+    transferable: Math.floor(((res.data.free.toJSON() - res.data.feeFrozen.toJSON()) / 1e7) * 1000) / 1000,
     reserved: res.data.feeFrozen.toJSON() / 1e7,
   };
 }

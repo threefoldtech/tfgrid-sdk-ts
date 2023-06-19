@@ -1,11 +1,6 @@
 <template>
   <weblet-layout ref="layout" @mount="onMount">
     <template #title>Contracts List</template>
-    <template #subtitle>
-      <a class="app-link" href="https://manual.grid.tf/tfchain/tfchain.html" target="_blank"
-        >Quick start documentation</a
-      >
-    </template>
 
     <template #header-actions="{ hasProfile }">
       <v-btn
@@ -26,15 +21,12 @@
       :deleting="deleting"
       v-model="selectedContracts"
       no-data-text="No contracts found on this account."
+      v-bind:onClick:row="loading || deleting ? undefined : onClickRow"
     >
-      <template #[`item.index`]="{ item }">
-        {{ contracts.indexOf(item.value) + 1 }}
-      </template>
-
       <template #[`item.state`]="{ item }">
         <v-tooltip
           v-if="item && item.value.state === ContractStates.GracePeriod"
-          :text="'the number of tokens required to remove your contract from the grace period and restore functionality to your workloads.'"
+          :text="'Click here to check the amount of tokens needed to unlock your contract and resume your workload.'"
           location="top center"
         >
           <template #activator="{ props }">
@@ -53,19 +45,20 @@
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <v-btn
-          color="secondary"
-          variant="tonal"
-          @click="
-            item.value.type !== 'name'
-              ? onShowDetails(item.value.contractId)
-              : layout.openDialog(item.value, false, true)
-          "
-          :disabled="(loading && loadingContractId !== item.value.contractId) || deleting"
-          :loading="loadingContractId == item.value.contractId"
-        >
-          Show Details
-        </v-btn>
+        <v-tooltip text="Show Details">
+          <template #activator="{ props }">
+            <v-btn
+              color="secondary"
+              variant="tonal"
+              @click="showDetails(item.value)"
+              :disabled="(loading && loadingContractId !== item.value.contractId) || deleting"
+              :loading="loadingContractId == item.value.contractId"
+              v-bind="props"
+            >
+              <v-icon>mdi-eye-outline</v-icon>
+            </v-btn>
+          </template>
+        </v-tooltip>
       </template>
     </ListTable>
 
@@ -110,9 +103,9 @@
         </p>
         <br />
         <v-alert type="info" variant="tonal">
-          The contract is in a GracePeriod condition, which means that your workloads are suspended but not deleted; in
-          order to resume your workloads and restore their functionality, you must pay your account with the necessary
-          tokens.
+          The contract is in Grace Period, which means that your workloads are suspended but not deleted; in order to
+          resume your workloads and restore their functionality, Please fund your account with the amount mentioned
+          above.
         </v-alert>
       </v-card-text>
       <v-card-actions>
@@ -141,7 +134,6 @@ const contracts = ref<NormalizedContract[]>([]);
 const loading = ref(false);
 const selectedContracts = ref<NormalizedContract[]>([]);
 const headers: VDataTableHeader = [
-  { title: "#", key: "index" },
   { title: "PLACEHOLDER", key: "data-table-select" },
   { title: "ID", key: "contractId" },
   { title: "Type", key: "type" },
@@ -165,8 +157,13 @@ async function onMount() {
 const loadingContractId = ref<number>();
 const contractLocked = ref<ContractLock>();
 
-async function onShowDetails(contractId: number) {
+async function showDetails(value: any) {
+  if (value.type === "name") {
+    return layout.value.openDialog(value, false, true);
+  }
+
   loading.value = true;
+  const contractId: number = value.contractId;
   loadingContractId.value = contractId;
   try {
     const grid = await getGrid(profileManager.profile!);
@@ -174,10 +171,13 @@ async function onShowDetails(contractId: number) {
     layout.value.openDialog(deployment, false, true);
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, `Failed to load details of contract(${contractId})`));
+  } finally {
+    loadingContractId.value = undefined;
+    loading.value = false;
   }
-  loadingContractId.value = undefined;
-  loading.value = false;
 }
+
+const onClickRow = (_: any, data: any) => showDetails(data.item.value);
 
 function getStateColor(state: ContractStates): string {
   switch (state) {

@@ -19,10 +19,6 @@
       @update:model-value="$emit('update:model-value', $event)"
       :no-data-text="`No ${projectName} deployments found on this account.`"
     >
-      <template #[`item.index`]="{ item }">
-        {{ items.indexOf(item?.value) + 1 }}
-      </template>
-
       <template #[`item.name`]="{ item }">
         {{ item.value[0].name }}
       </template>
@@ -110,7 +106,6 @@ async function loadDeployments() {
 
 const filteredHeaders = computed(() => {
   let headers = [
-    { title: "#", key: "index" },
     { title: "PLACEHOLDER", key: "data-table-select" },
     { title: "Name", key: "name" },
     { title: "Public IPv4", key: "ipv4" },

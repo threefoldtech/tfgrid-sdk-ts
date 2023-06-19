@@ -1,11 +1,18 @@
 <template>
-  <div>
+  <view-layout>
+    <template #description
+      >Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services.
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_peertube.html" class="app-link">
+        read more about Peertube
+      </a></template
+    >
+
     <TfPeertube />
 
-    <div class="mt-4">
-      <TfDeploymentList :project-name="name" />
-    </div>
-  </div>
+    <template #list>
+      <TfDeploymentList title="Peertube Instances" :project-name="name" />
+    </template>
+  </view-layout>
 </template>
 
 <script lang="ts">

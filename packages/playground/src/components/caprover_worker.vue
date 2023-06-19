@@ -11,8 +11,8 @@
     :value="$props.modelValue.name"
     #="{ props }"
   >
-    <input-tooltip #="{ tooltipProps }" tooltip="Solution name.">
-      <v-text-field label="Name" v-model="$props.modelValue.name" v-bind="{ ...props, ...tooltipProps }" />
+    <input-tooltip tooltip="Node name.">
+      <v-text-field label="Name" v-model="$props.modelValue.name" v-bind="props" />
     </input-tooltip>
   </input-validator>
 
@@ -42,13 +42,12 @@ defineProps<{ modelValue: CaproverWorker }>();
 </script>
 
 <script lang="ts">
-import { generateString } from "@threefold/grid_client";
-
 import type { CaproverWorker } from "../types";
+import { generateName } from "../utils/strings";
 import SelectFarm from "./select_farm.vue";
 import SelectSolutionFlavor from "./select_solution_flavor.vue";
 
-export function createWorker(name: string = "wr" + generateString(9)): CaproverWorker {
+export function createWorker(name: string = generateName(9, { prefix: "wr" })): CaproverWorker {
   return { name };
 }
 

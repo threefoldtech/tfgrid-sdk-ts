@@ -7,13 +7,6 @@
     title-image="images/icons/wordpress.png"
   >
     <template #title>Deploy a Wordpress Instance </template>
-    <template #subtitle>
-      WordPress is the simplest, most popular way to create your own website or blog. In fact, WordPress powers over
-      43.3% of all the websites on the Internet.
-      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_wordpress.html" class="app-link">
-        Quick start documentation
-      </a>
-    </template>
 
     <form-validator v-model="valid">
       <input-validator
@@ -28,8 +21,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Instance name.">
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -45,8 +38,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Wordpress admin username.">
-          <v-text-field label="Username" v-model="username" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Wordpress admin username.">
+          <v-text-field label="Username" v-model="username" v-bind="{ ...props }" />
         </input-tooltip>
       </input-validator>
 
@@ -60,12 +53,8 @@
           ]"
           #="{ props: validatorProps }"
         >
-          <input-tooltip #="{ tooltipProps }" tooltip="Wordpress admin password.">
-            <v-text-field
-              label="Password"
-              v-model="password"
-              v-bind="{ ...props, ...tooltipProps, ...validatorProps }"
-            />
+          <input-tooltip tooltip="Wordpress admin password.">
+            <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
           </input-tooltip>
         </input-validator>
       </password-input-wrapper>
@@ -78,12 +67,12 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Wordpress admin email.">
+        <input-tooltip tooltip="Wordpress admin email.">
           <v-text-field
             label="Email"
             placeholder="This email will be used to login to your instance."
             v-model="email"
-            v-bind="{ ...props, ...tooltipProps }"
+            v-bind="{ ...props }"
           />
         </input-tooltip>
       </input-validator>
@@ -112,7 +101,7 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString, type GridClient } from "@threefold/grid_client";
+import type { GridClient } from "@threefold/grid_client";
 import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
@@ -123,15 +112,16 @@ import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
+import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref("wp" + generateString(9));
+const name = ref(generateName(9, { prefix: "wp" }));
 const username = ref("admin");
 const email = ref("");
-const password = ref(generateString(12));
+const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;

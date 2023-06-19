@@ -1,11 +1,13 @@
 <template>
-  <div>
+  <view-layout>
+    <template #description>Deploy your own cloud-init based virtual machine</template>
+
     <FullVm />
 
-    <div class="mt-4">
-      <TfDeploymentList :project-name="name" />
-    </div>
-  </div>
+    <template #list>
+      <TfDeploymentList title="Virtual Machines" :project-name="name" />
+    </template>
+  </view-layout>
 </template>
 
 <script lang="ts">

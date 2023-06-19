@@ -8,13 +8,6 @@
     title-image="images/icons/subsquid.png"
   >
     <template #title>Deploy a Subsquid Instance </template>
-    <template #subtitle>
-      Subsquid indexer is a piece of software that reads all the blocks from a Substrate based blockchain, decodes and
-      stores them for processing in a later stage.
-      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_subsquid.html" class="app-link">
-        Quick start documentation
-      </a>
-    </template>
 
     <form-validator v-model="valid">
       <input-validator
@@ -29,8 +22,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Instance name.">
+          <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -42,12 +35,18 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip #="{ tooltipProps }" tooltip="Subsquid websockt endpoint.">
-          <v-text-field label="Websockt Endpoint" v-model="endpoint" v-bind="{ ...props, ...tooltipProps }" />
+        <input-tooltip tooltip="Subsquid websockt endpoint.">
+          <v-text-field label="Websockt Endpoint" v-model="endpoint" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
-      <Network v-model:ipv4="ipv4" />
+      <input-tooltip
+        inline
+        tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
+      >
+        <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
+      </input-tooltip>
+
       <SelectSolutionFlavor
         v-model="solution"
         :minimum="{ cpu: 1, memory: 1024, disk: 50 }"
@@ -72,7 +71,7 @@
 </template>
 
 <script lang="ts" setup>
-import { generateString, type GridClient } from "@threefold/grid_client";
+import type { GridClient } from "@threefold/grid_client";
 import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
@@ -83,12 +82,13 @@ import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
+import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref("ss" + generateString(9));
+const name = ref(generateName(9, { prefix: "ss" }));
 const endpoint = ref("");
 const ipv4 = ref(false);
 const solution = ref() as Ref<SolutionFlavor>;
