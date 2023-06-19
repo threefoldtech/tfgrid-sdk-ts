@@ -5,7 +5,6 @@
 
   <ListTable
     :headers="[
-      { title: '#', key: 'index' },
       { title: 'PLACEHOLDER', key: 'data-table-select' },
       { title: 'Name', key: 'name' },
       { title: 'Public IPv4', key: 'ipv4' },
@@ -22,10 +21,6 @@
     @update:model-value="$emit('update:model-value', $event)"
     :no-data-text="`No Kubernetes deployments found on this account.`"
   >
-    <template #[`item.index`]="{ item }">
-      {{ items.indexOf(item?.value) + 1 }}
-    </template>
-
     <template #[`item.name`]="{ item }">
       {{ item.value.deploymentName }}
     </template>

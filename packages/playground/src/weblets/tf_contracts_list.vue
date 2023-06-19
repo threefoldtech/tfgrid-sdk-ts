@@ -26,11 +26,8 @@
       :deleting="deleting"
       v-model="selectedContracts"
       no-data-text="No contracts found on this account."
+      v-bind:onClick:row="loading || deleting ? undefined : onClickRow"
     >
-      <template #[`item.index`]="{ item }">
-        {{ contracts.indexOf(item.value) + 1 }}
-      </template>
-
       <template #[`item.state`]="{ item }">
         <v-tooltip
           v-if="item && item.value.state === ContractStates.GracePeriod"
@@ -53,17 +50,20 @@
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <IconActionBtn
-          tooltip="Show Details"
-          icon="mdi-eye-outline"
-          @click="
-            item.value.type !== 'name'
-              ? onShowDetails(item.value.contractId)
-              : layout.openDialog(item.value, false, true)
-          "
-          :disabled="(loading && loadingContractId !== item.value.contractId) || deleting"
-          :loading="loadingContractId == item.value.contractId"
-        />
+        <v-tooltip text="Show Details">
+          <template #activator="{ props }">
+            <v-btn
+              color="secondary"
+              variant="tonal"
+              @click="showDetails(item.value)"
+              :disabled="(loading && loadingContractId !== item.value.contractId) || deleting"
+              :loading="loadingContractId == item.value.contractId"
+              v-bind="props"
+            >
+              <v-icon>mdi-eye-outline</v-icon>
+            </v-btn>
+          </template>
+        </v-tooltip>
       </template>
     </ListTable>
 
@@ -128,7 +128,6 @@
 import { ContractStates } from "@threefold/grid_client";
 import { ref } from "vue";
 
-import IconActionBtn from "../components/icon_action_btn.vue";
 import { useProfileManager } from "../stores";
 import type { VDataTableHeader } from "../types";
 import { getUserContracts, type NormalizedContract } from "../utils/contracts";
@@ -140,7 +139,6 @@ const contracts = ref<NormalizedContract[]>([]);
 const loading = ref(false);
 const selectedContracts = ref<NormalizedContract[]>([]);
 const headers: VDataTableHeader = [
-  { title: "#", key: "index" },
   { title: "PLACEHOLDER", key: "data-table-select" },
   { title: "ID", key: "contractId" },
   { title: "Type", key: "type" },
@@ -164,8 +162,13 @@ async function onMount() {
 const loadingContractId = ref<number>();
 const contractLocked = ref<ContractLock>();
 
-async function onShowDetails(contractId: number) {
+async function showDetails(value: any) {
+  if (value.type === "name") {
+    return layout.value.openDialog(value, false, true);
+  }
+
   loading.value = true;
+  const contractId: number = value.contractId;
   loadingContractId.value = contractId;
   try {
     const grid = await getGrid(profileManager.profile!);
@@ -173,10 +176,13 @@ async function onShowDetails(contractId: number) {
     layout.value.openDialog(deployment, false, true);
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, `Failed to load details of contract(${contractId})`));
+  } finally {
+    loadingContractId.value = undefined;
+    loading.value = false;
   }
-  loadingContractId.value = undefined;
-  loading.value = false;
 }
+
+const onClickRow = (_: any, data: any) => showDetails(data.item.value);
 
 function getStateColor(state: ContractStates): string {
   switch (state) {
@@ -247,7 +253,6 @@ export default {
   name: "TfContractsList",
   components: {
     ListTable,
-    IconActionBtn,
   },
 };
 </script>
