@@ -84,7 +84,7 @@
         </input-validator>
 
         <v-tooltip
-          location="top"
+          location="top right"
           text="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
         >
           <template v-slot:activator="{ props }">
@@ -93,7 +93,7 @@
         </v-tooltip>
 
         <v-tooltip
-          location="top"
+          location="top right"
           text="Public IPv6 is the next-generation Internet Protocol that offers an expanded address space to connect a vast number of devices."
         >
           <template v-slot:activator="{ props }">
@@ -102,7 +102,7 @@
         </v-tooltip>
 
         <v-tooltip
-          location="top"
+          location="top right"
           text="The Planetary Network is a distributed network infrastructure that spans across multiple regions and countries, providing global connectivity."
         >
           <template v-slot:activator="{ props }">
@@ -111,7 +111,7 @@
         </v-tooltip>
 
         <v-tooltip
-          location="top"
+          location="top right"
           text="Enabling WireGuard Access allows you to establish private, secure, and encrypted connections to your instance."
         >
           <template v-slot:activator="{ props }">

@@ -27,7 +27,7 @@
       </input-validator>
 
       <v-tooltip
-        location="top"
+        location="top right"
         text="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
       >
         <template v-slot:activator="{ props }">
