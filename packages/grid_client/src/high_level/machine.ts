@@ -134,6 +134,17 @@ class VMHL extends HighLevelBase {
     }
 
     // TODO: make sure that the node is rented by the current loaded twin and has gpu
+    if (gpu && gpu.length > 0) {
+      const nodeTwinId = await this.nodes.getNodeTwinId(nodeId);
+      const gpuList = await this.rmb.request([nodeTwinId], "zos.gpu.list", "");
+      if (gpuList.length <= 0) {
+        throw Error(`The selected node ${nodeId} doesn't have gpu`);
+      }
+      const node = await this.nodes.getNode(nodeId);
+      if (node.rentedByTwinId !== this.config.twinId) {
+        throw Error(`This node ${nodeId} is not rented by the current user`);
+      }
+    }
 
     // validate user ip subnet in case of no networks already
     let userIPsubnet;
