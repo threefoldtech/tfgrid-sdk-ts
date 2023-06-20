@@ -35,7 +35,7 @@
               v-bind="props"
               :color="getStateColor(item.value.state)"
             >
-              {{ item.value.state }}
+              {{ item.value.state === ContractStates.GracePeriod ? "Grace Period" : item.value.state }}
             </v-chip>
           </template>
         </v-tooltip>
@@ -43,7 +43,12 @@
           {{ item.value.state }}
         </v-chip>
       </template>
-
+      <template #[`item.type`]="{ item }">
+        {{ capitalize(item.value.type) }}
+      </template>
+      <template #[`item.solutionType`]="{ item }">
+        {{ solutionType[item.value.solutionType] ?? item.value.solutionType }}
+      </template>
       <template #[`item.actions`]="{ item }">
         <v-tooltip text="Show Details">
           <template #activator="{ props }">
@@ -143,7 +148,7 @@ const headers: VDataTableHeader = [
   { title: "Solution Name", key: "solutionName" },
   { title: "Created At", key: "createdAt" },
   { title: "Expiration", key: "expiration" },
-  { title: "Actions", key: "actions", sortable: false },
+  { title: "Details", key: "actions", sortable: false },
 ];
 
 async function onMount() {
@@ -190,6 +195,9 @@ function getStateColor(state: ContractStates): string {
     case ContractStates.OutOfFunds:
       return "info";
   }
+}
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 async function contractLockDetails(contractId: number) {
@@ -242,6 +250,7 @@ async function onDelete() {
 import type { ContractLock } from "@threefold/tfchain_client";
 
 import ListTable from "../components/list_table.vue";
+import { solutionType } from "../types/index";
 import { normalizeError } from "../utils/helpers";
 
 export default {
