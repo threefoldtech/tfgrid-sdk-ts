@@ -45,6 +45,9 @@ interface NodeInfo {
   publicConfig: PublicConfig;
   status: string;
   certificationType: string;
+  hasGPU: boolean;
+  extraFee: number;
+  rentedByTwinId: number;
 }
 interface PublicConfig {
   domain: string;
