@@ -105,7 +105,7 @@ const router = createRouter({
     {
       path: "/contractslist",
       component: () => import("../views/contracts_list.vue"),
-      meta: { title: "Contracts List" },
+      meta: { title: "Contracts List", info: { page: "info/contracts_list.md" } },
     },
     {
       path: "/:pathMatch(.*)*",
