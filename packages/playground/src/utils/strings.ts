@@ -1,7 +1,7 @@
 import { randomChoice } from "@threefold/grid_client";
 
 export function generatePassword(length = 12): string {
-  return generateString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 #$%!", length);
+  return generateString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", length);
 }
 
 export interface GenerateNameOptions {
