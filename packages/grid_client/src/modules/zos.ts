@@ -98,6 +98,13 @@ class Zos {
     const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
     return await this.rmb.request([nodeTwinId], "zos.storage.pools", "");
   }
+
+  @expose
+  @validateInput
+  async getNodeGPUInfo(options: ZOSNodeModel) {
+    const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
+    return await this.rmb.request([nodeTwinId], "zos.gpu.list", "");
+  }
 }
 
 export { Zos as zos };
