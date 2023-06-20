@@ -9,7 +9,7 @@ jobs:
   cypress-run:
     runs-on: ubuntu-latest
     env:
-      NODE_OPTIONS: "--max-old-space-size=8192"
+      NODE_OPTIONS: "--max-old-space-size=8192 --openssl-legacy-provider"
     strategy:
       matrix:
         node-version: [18.x]
