@@ -19,8 +19,6 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    env:
-      NODE_OPTIONS: "--max-old-space-size=8192 --openssl-legacy-provider"
 
     strategy:
       matrix:
@@ -46,6 +44,8 @@ jobs:
           yarn install
 
       - name: Build in case development
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192 --openssl-legacy-provider"
         run: |
           lerna run build --no-private
           cd packages/weblets
