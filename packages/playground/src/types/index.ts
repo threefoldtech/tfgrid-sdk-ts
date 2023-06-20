@@ -82,6 +82,27 @@ export enum SolutionCode {
   wordpress = "wp",
 }
 
+export const solutionType: { [key: string]: string } = {
+  algorand: "Algorand",
+  caprover: "CapRover",
+  casperlabs: "Casperlabs",
+  discourse: "Discourse",
+  fullvm: "Full Virtual Machine",
+  funkwhale: "Funkwhale",
+  gatewayname: "Gateway Name",
+  kubernetes: "Kubernetes",
+  mattermost: "Mattermost",
+  nodepilot: "Node Pilot",
+  owncloud: "Owncloud",
+  peertube: "Peertube",
+  presearch: "Presearch",
+  subsquid: "Subsquid",
+  taiga: "Taiga",
+  umbrel: "Umbrel",
+  vm: "Micro Virtual Machine",
+  wordpress: "Wordpress",
+};
+
 export interface solutionFlavor {
   cpu: number;
   memory: number;
