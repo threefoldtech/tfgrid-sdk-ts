@@ -45,6 +45,7 @@ class VMHL extends HighLevelBase {
     corex = false,
     solutionProviderId: number,
     zlogsOutput?: string,
+    gpu: string[] = [],
   ): Promise<[TwinDeployment[], string]> {
     const deployments: TwinDeployment[] = [];
     const workloads: Workload[] = [];
@@ -120,6 +121,7 @@ class VMHL extends HighLevelBase {
     }
 
     // ipv4
+    // TODO: make sure that the farm has a free public ip before continuing the deployment
     let ipName = "";
     let publicIps = 0;
     if (publicIp || publicIp6) {
@@ -130,6 +132,8 @@ class VMHL extends HighLevelBase {
         publicIps++;
       }
     }
+
+    // TODO: make sure that the node is rented by the current loaded twin and has gpu
 
     // validate user ip subnet in case of no networks already
     let userIPsubnet;
@@ -247,6 +251,7 @@ class VMHL extends HighLevelBase {
         description,
         0,
         corex,
+        gpu,
       ),
     );
 

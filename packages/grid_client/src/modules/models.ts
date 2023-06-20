@@ -100,6 +100,7 @@ class MachineModel {
   @Expose() @IsOptional() @IsBoolean() corex?: boolean;
   @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
   @Expose() @IsString() @IsOptional() zlogsOutput?: string;
+  @Expose() @IsString({ each: true }) @IsOptional() gpu?: string[];
 }
 
 class MachinesModel {
@@ -138,6 +139,7 @@ class KubernetesNodeModel {
   @Expose() @IsOptional() @IsBoolean() corex?: boolean;
   @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
   @Expose() @IsString() @IsOptional() zlogsOutput?: string;
+  @Expose() @IsString({ each: true }) @IsOptional() gpu?: string[];
 }
 
 class K8SModel {
@@ -559,6 +561,7 @@ class FilterOptions {
   @Expose() @IsOptional() @IsInt() availableFor?: number;
   @Expose() @IsOptional() @IsInt() page?: number;
   @Expose() @IsOptional() @IsInt() size?: number;
+  @Expose() @IsOptional() @IsBoolean() has_gpu?: boolean;
 }
 
 class CalculatorModel {
