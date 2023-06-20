@@ -1,5 +1,6 @@
 import { Addr } from "netaddr";
 
+import { RMB } from "../clients/rmb/client";
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
 import { Operations, TwinDeployment } from "../high_level/models";
@@ -11,8 +12,11 @@ import { Workload, WorkloadTypes } from "../zos/workload";
 
 class HighLevelBase {
   nodes: Nodes;
+  rmb: RMB;
+
   constructor(public config: GridClientConfig) {
     this.nodes = new Nodes(this.config.graphqlURL, this.config.proxyURL, this.config.rmbClient);
+    this.rmb = new RMB(config.rmbClient);
   }
 
   _filterWorkloads(
