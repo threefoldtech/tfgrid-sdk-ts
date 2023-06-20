@@ -53,7 +53,7 @@ function createBalanceStore() {
       getBalance(profile)
         .then(balance => {
           fullStore.setBalance(balance.free);
-          fullStore.setLockedBalance(balance.feeFrozen);
+          fullStore.setLockedBalance(balance.frozen);
         })
         .catch(err => {
           console.log("Balance Error", err);
