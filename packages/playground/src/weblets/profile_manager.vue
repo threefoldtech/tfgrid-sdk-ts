@@ -159,7 +159,7 @@
               <PasswordInputWrapper #="{ props: confirmPasswordInputProps }" v-if="activeTab === 1">
                 <InputValidator
                   :value="confirmPassword"
-                  :rules="[validators.required('This field is required.'), validateConfirmPassword]"
+                  :rules="[validators.required('A confirmation password is required.'), validateConfirmPassword]"
                   #="{ props: validationProps }"
                   ref="confirmPasswordInput"
                 >
@@ -182,7 +182,7 @@
                 color="primary"
                 variant="tonal"
                 :loading="activating"
-                :disabled="!isValidForm || creatingAccount || isValidPasswords"
+                :disabled="!isValidForm || creatingAccount || (activeTab === 1 && isValidConnectConfirmationPassword)"
                 size="large"
               >
                 {{ activeTab === 0 ? "Login" : "Connect" }}
@@ -411,7 +411,9 @@ const isValidForm = ref(false);
 const SSHKeyHint = ref("");
 const ssh = ref("");
 let sshTimeout: any;
-const isValidPasswords = computed(() => (!validateConfirmPassword(confirmPassword.value) ? false : true));
+const isValidConnectConfirmationPassword = computed(() =>
+  !validateConfirmPassword(confirmPassword.value) ? false : true,
+);
 
 watch(SSHKeyHint, hint => {
   if (hint) {

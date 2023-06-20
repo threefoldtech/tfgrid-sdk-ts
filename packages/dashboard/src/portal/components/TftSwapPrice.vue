@@ -12,6 +12,14 @@
           <span>TFT Exchange Rate</span>
         </v-tooltip>
         <p>{{ prices[1].amount }} {{ prices[1].currency }}</p>
+        <v-tooltip>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn @click="openInfoLink" icon v-bind="attrs" v-on="on" class="d-flex align-center">
+              <v-icon>mdi-information</v-icon>
+            </v-btn>
+          </template>
+          <span>More information</span>
+        </v-tooltip>
       </div>
     </div>
   </v-container>
@@ -56,6 +64,13 @@ export default class TftSwapPrice extends Vue {
         { currency: "USD", amount: await this.getTFTPrice() },
       ];
     }
+  }
+
+  openInfoLink() {
+    window.open(
+      "https://stellar.expert/explorer/public/asset/TFT-GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47-1?asset[]=TFT-GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47-1&filter=markets&market=USDC-GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN-1",
+      "_blank",
+    );
   }
 
   async getTFTPrice() {
