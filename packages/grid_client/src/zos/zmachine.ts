@@ -1,5 +1,16 @@
 import { Expose, Transform, Type } from "class-transformer";
-import { IsBoolean, IsDefined, IsInt, IsIP, IsNotEmpty, IsString, Max, Min, ValidateNested } from "class-validator";
+import {
+  IsBoolean,
+  IsDefined,
+  IsInt,
+  IsIP,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+  ValidateNested,
+} from "class-validator";
 
 import { ComputeCapacity } from "./computecapacity";
 import { WorkloadData, WorkloadDataResult } from "./workload_base";
@@ -47,6 +58,7 @@ class Zmachine extends WorkloadData {
   @Expose() @IsString() @IsNotEmpty() entrypoint: string;
   @Expose() env: Record<string, unknown>;
   @Expose() @Transform(({ value }) => (value ? true : false)) @IsBoolean() corex: boolean;
+  @Expose() @IsString({ each: true }) @IsOptional() gpu?: string[];
 
   challenge(): string {
     let out = "";

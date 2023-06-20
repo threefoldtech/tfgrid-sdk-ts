@@ -39,6 +39,7 @@ class VMPrimitive {
     description = "",
     version = 0,
     corex = false,
+    gpu: string[] = [],
   ): Workload {
     const zmachine = new Zmachine();
     zmachine.flist = flist;
@@ -49,6 +50,7 @@ class VMPrimitive {
     zmachine.compute_capacity = this._createComputeCapacity(cpu, memory);
     zmachine.env = env;
     zmachine.corex = corex;
+    zmachine.gpu = gpu;
 
     const zmachine_workload = new Workload();
     zmachine_workload.version = version || 0;
