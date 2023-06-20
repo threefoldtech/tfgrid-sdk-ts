@@ -182,7 +182,7 @@
                 color="primary"
                 variant="tonal"
                 :loading="activating"
-                :disabled="!isValidForm || creatingAccount || isValidPasswords"
+                :disabled="!isValidForm || creatingAccount || (activeTab === 1 && isValidPasswords)"
                 size="large"
               >
                 {{ activeTab === 0 ? "Login" : "Connect" }}
