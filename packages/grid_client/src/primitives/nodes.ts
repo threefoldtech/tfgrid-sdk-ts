@@ -332,6 +332,7 @@ class Nodes {
       status: "up",
       page: options.page,
       size: options.size,
+      has_gpu: options.has_gpu,
     };
     if (options.gateway) {
       params["ipv4"] = true;
