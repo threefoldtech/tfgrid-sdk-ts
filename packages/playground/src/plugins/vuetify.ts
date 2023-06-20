@@ -18,16 +18,19 @@ const vuetify = createVuetify({
       dark: {
         dark: true,
         colors: {
-          primary: "#76E2C8",
-          info: "#DC8DE3",
+          primary: "#1AA18F",
+          info: "#14B874",
+          link: "#5eaff4",
+          warning: "#FFCC00",
         },
       },
       light: {
         dark: false,
         colors: {
           primary: "#1AA18F",
-          info: "#e61ef4",
           secondary: "#855DE0",
+          info: "#1AA18F",
+          link: "#5eaff4",
         },
       },
     },

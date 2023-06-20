@@ -282,4 +282,8 @@ export default {
   font-weight: 900;
   background-color: rgb(71, 70, 70);
 }
+
+a {
+  color: #5eaff4 !important;
+}
 </style>
