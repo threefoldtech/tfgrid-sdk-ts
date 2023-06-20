@@ -284,6 +284,6 @@ export default {
 }
 
 a {
-  color: #5eaff4 !important;
+  color: #5695ff !important;
 }
 </style>
