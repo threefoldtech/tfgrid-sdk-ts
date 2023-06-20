@@ -139,10 +139,12 @@ echo -e "\e[1;32m$configs"
 
 if [ -d public ]
 then
-    echo $configs > public/config.js
+echo $configs > public/config.js
 fi
 
 if [ -d dist ]
 then
-    echo $configs > dist/config.js
+echo $configs > dist/config.js
+else
+echo $configs > config.js
 fi
