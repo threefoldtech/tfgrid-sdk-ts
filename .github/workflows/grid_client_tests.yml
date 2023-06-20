@@ -15,7 +15,7 @@ jobs:
       MNEMONIC: ${{ secrets.MNEMONIC }}
     steps:
       - uses: actions/checkout@v2
-      - name: Set up node 16
+      - name: Set up node 18
         uses: actions/setup-node@v2
         with:
           node-version: 18
