@@ -880,9 +880,9 @@
     regenerator-runtime "^0.13.4"
 
 "@babel/runtime@^7.18.9", "@babel/runtime@^7.20.13", "@babel/runtime@^7.20.6":
-  version "7.22.3"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.22.3.tgz#0a7fce51d43adbf0f7b517a71f4c3aaca92ebcbb"
-  integrity sha512-XsDuspWKLUsxwCp6r7EhsExHtYfbe5oAGQ19kqngTdCPUoPQzOPdUbD/pB9PJiwb2ptYKQDjSJT3R6dC+EPqfQ==
+  version "7.22.5"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.22.5.tgz#8564dd588182ce0047d55d7a75e93921107b57ec"
+  integrity sha512-ecjvYlnAaZ/KVneE/OdKYBYfgXV3Ptu6zQWmgEF7vwKhQnvVS6bjMD2XYgj+SNvQ1GfK/pjgokfPkC/2CO8CuA==
   dependencies:
     regenerator-runtime "^0.13.11"
 
@@ -1139,9 +1139,9 @@
   integrity sha512-FZfhjEDbT5GRswV3C6uvLPHMiVD6lQBmpoX5+eSiPaMTXte/IKqI5dykDxzZB/WBeK/CDuQRBWarPdi3FNY2zQ==
 
 "@noble/hashes@^1.2.0":
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.0.tgz#085fd70f6d7d9d109671090ccae1d3bec62554a1"
-  integrity sha512-ilHEACi9DwqJB0pw7kv+Apvh50jiiSyR/cQ3y4W7lOR5mhvn/50FLUfsnfJz0BDZtl/RR16kXvptiv6q1msYZg==
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.1.tgz#8831ef002114670c603c458ab8b11328406953a9"
+  integrity sha512-EbqwksQwz9xDRGfDST86whPBgM65E0OH/pCgqW0GBVzO22bNE+NuIbeTb714+IfSjU3aRk47EUvXIb5bTsenKA==
 
 "@noble/secp256k1@1.7.1", "@noble/secp256k1@^1.7.1":
   version "1.7.1"
@@ -1529,15 +1529,15 @@
   resolved "https://registry.yarnpkg.com/@substrate/ss58-registry/-/ss58-registry-1.40.0.tgz#2223409c496271df786c1ca8496898896595441e"
   integrity sha512-QuU2nBql3J4KCnOWtWDw4n1K4JU0T79j54ZZvm/9nhsX6AIar13FyhsaBfs6QkJ2ixTQAnd7TocJIoJRWbqMZA==
 
-"@threefold/grid_client@2.0.0-rc12":
-  version "2.0.0-rc12"
-  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.0.0-rc12.tgz#76cabaa353bff016407b49bd7acaeb8c96894a28"
-  integrity sha512-fa1nDDd60hLk54M2QEgB7yOqj0dNptGOerAhFYO+a5/dyo/0IUPzAg3yMXwKRfby2N1VC8aBDtvYRD1+r0XAeA==
+"@threefold/grid_client@2.0.0-rc13":
+  version "2.0.0-rc13"
+  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.0.0-rc13.tgz#d0a665b716b286ae8a9ebb4ec9835ccc7d9e4f0b"
+  integrity sha512-HJsQMTQKRqXGT88DD5iWS2RTLrlPqnMNMNR+8JekAM2V98ivvGSlttvv1WWECk8ZcpXu3clIgDZjkxxzXqHfEw==
   dependencies:
     "@jimber/pkid" "1.0.4"
     "@noble/secp256k1" "^1.7.1"
-    "@threefold/rmb_direct_client" "^2.0.0-rc12"
-    "@threefold/tfchain_client" "^2.0.0-rc12"
+    "@threefold/rmb_direct_client" "^2.0.0-rc13"
+    "@threefold/tfchain_client" "^2.0.0-rc13"
     algosdk "^1.19.0"
     appdata-path "^1.0.0"
     axios "^0.27.2"
@@ -1559,14 +1559,14 @@
     url-parse "^1.5.10"
     uuid4 "^2.0.2"
 
-"@threefold/rmb_direct_client@^2.0.0-rc12":
-  version "2.0.0-rc12"
-  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-2.0.0-rc12.tgz#7b2f35820e7433512600ec56671eb9c00df5ebf6"
-  integrity sha512-wUbq2T7nnkPf0tOlyRWycm58Y3yLwLgiHKHbjTLFpYJHPeVV87oDwUbc3jx51EB96eV2Eg3c5dt1EBg03ZYRUA==
+"@threefold/rmb_direct_client@^2.0.0-rc13":
+  version "2.0.0-rc13"
+  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-2.0.0-rc13.tgz#2baf885ff6dd0f9e5f3e41105ae704821d924148"
+  integrity sha512-Cpjl9Rjc68J4Do6u2WzyFVSolOZC2tpGPrth9bhFwrKTI4PhMz00CHeW15lwnw4K7XMBqoSIrKwsr21CqSNuLQ==
   dependencies:
     "@noble/secp256k1" "^1.7.1"
     "@polkadot/api" "^8.9.1"
-    "@threefold/tfchain_client" "^2.0.0-rc12"
+    "@threefold/tfchain_client" "^2.0.0-rc13"
     base64url "^3.0.1"
     bip39 "^3.1.0"
     buffer "^6.0.3"
@@ -1576,10 +1576,10 @@
     uuid "^8.3.2"
     ws "^8.12.0"
 
-"@threefold/tfchain_client@^2.0.0-rc12":
-  version "2.0.0-rc12"
-  resolved "https://registry.yarnpkg.com/@threefold/tfchain_client/-/tfchain_client-2.0.0-rc12.tgz#7c96663bb2d68ac4fa6bb77472a17f0ec8fa8121"
-  integrity sha512-uVIHyzLTjmQWSxJibKrp4icH452ju1XXUOOtk8v+l9P0xJw8kNopRTnNmxAYb0wngxSxfvFeZwmmtBR1ySxAfw==
+"@threefold/tfchain_client@^2.0.0-rc13":
+  version "2.0.0-rc13"
+  resolved "https://registry.yarnpkg.com/@threefold/tfchain_client/-/tfchain_client-2.0.0-rc13.tgz#605128decde0b6814fea1c460b9c648914c8a8a1"
+  integrity sha512-XDN81kcDp9ETwIHXJmVqnFgTz3ARd/GndHxevTiW++bZuDq8Ku9C11Wbt8fVMJefcBFtmBZJMTfblbpFwbZWeg==
   dependencies:
     "@polkadot/api" "^8.9.1"
     await-lock "^2.2.2"
@@ -1758,9 +1758,9 @@
   integrity sha512-Exw4yUWMBXM3X+8oqzJNRqZSwUAaS4+7NdvHqQuFi/d+synz++xmX3QIf+BFqneW8N31R8Ky+sikfZUXq07ggQ==
 
 "@types/node@>= 8":
-  version "20.2.5"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.2.5.tgz#26d295f3570323b2837d322180dfbf1ba156fefb"
-  integrity sha512-JJulVEQXmiY9Px5axXHeYGLSjhkZEnD+MDPDGbCbIAbMslkKwmygtZFy1X6s/075Yo94sf8GuSlFfPzysQrWZQ==
+  version "20.3.1"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.3.1.tgz#e8a83f1aa8b649377bb1fb5d7bac5cb90e784dfe"
+  integrity sha512-EhcH/wvidPy1WeML3TtYFGR83UzjxeWRen9V402T8aUGYsCHOmfoisV3ZSg03gAFIbLq8TnWOJ0f4cALtnSEUg==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -7246,9 +7246,9 @@ levn@~0.3.0:
     type-check "~0.3.2"
 
 libphonenumber-js@^1.10.14:
-  version "1.10.31"
-  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.10.31.tgz#aab580894c263093a3085a02afcda7a742faeff1"
-  integrity sha512-qYTzElLePmz3X/6I0JPX5n87tu7jVIMtR/yRLi5PGVPvMCMSVTCR+079KmdNK005i4dBjFxY/bMYceI9IBp47w==
+  version "1.10.36"
+  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.10.36.tgz#ec74008ffbc488d7ad9ebd722b2773292d568033"
+  integrity sha512-NCPWES1poiS4NSzIS49mxHM5hCkSWov8wFICRKfL9narzimqAXlnAgNloHCt0BukZHbWt8TIStCdzLy7LXBYpQ==
 
 libsodium-wrappers@^0.7.10, libsodium-wrappers@^0.7.6:
   version "0.7.11"
@@ -10521,9 +10521,9 @@ tslib@^1.10.0, tslib@^1.8.0, tslib@^1.8.1:
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
 tslib@^2.1.0:
-  version "2.5.2"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.5.2.tgz#1b6f07185c881557b0ffa84b111a0106989e8338"
-  integrity sha512-5svOrSA2w3iGFDs1HibEVBGbDrAY82bFQ3HZ3ixB+88nsbsWQoKqDRb5UBYAUPEzbBn6dAp5gRNXglySbx1MlA==
+  version "2.5.3"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.5.3.tgz#24944ba2d990940e6e982c4bea147aba80209913"
+  integrity sha512-mSxlJJwl3BMEQCUNnxXBU9jP4JBktcEGhURcPR6VQVlnP0FdDEsIaz0C35dXNGLyRfrATNofF0F5p2KPxQgB+w==
 
 tslint@^5.20.1:
   version "5.20.1"
