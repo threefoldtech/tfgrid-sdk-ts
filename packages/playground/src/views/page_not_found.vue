@@ -1,15 +1,22 @@
 <template>
-  <img class="centered-img" src="images/404.png" />
+  <img class="centered-img" :src="baseUrl + 'images/404.png'" />
   <p class="text1">Oops. The page you were looking for doesn't exist.</p>
   <p class="text2">You may have mistyped address or the page may have been moved</p>
   <div style="text-align: center">
-    <a href="/" class="link-text"> Take me back to the home page</a>
+    <v-btn color="primary" variant="text" @click="$router.push('/')"> Take me back to the home page</v-btn>
   </div>
 </template>
 
+<script lang="ts" setup>
+import { useRouter } from "vue-router";
+
+const baseUrl = import.meta.env.BASE_URL;
+const $router = useRouter();
+</script>
+
 <script lang="ts">
 export default {
-  name: "NotYetImplemented",
+  name: "PageNotFound",
 };
 </script>
 
@@ -18,7 +25,8 @@ export default {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 55%;
+  width: 100%;
+  max-width: 700px;
 }
 
 .text1 {
