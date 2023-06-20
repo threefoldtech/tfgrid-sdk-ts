@@ -42,8 +42,9 @@
         </input-validator>
 
         <SelectVmImage :images="images" v-model="flist" />
+        <SelectResources />
 
-        <input-validator
+        <!-- <input-validator
           :value="cpu"
           :rules="[
             validators.required('CPU is required.'),
@@ -56,9 +57,9 @@
           <input-tooltip tooltip="The number of virtual cores allocated to your instance.">
             <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
           </input-tooltip>
-        </input-validator>
+        </input-validator> -->
 
-        <input-validator
+        <!-- <input-validator
           :value="memory"
           :rules="[
             validators.required('Memory is required.'),
@@ -71,9 +72,9 @@
           <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
             <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
           </input-tooltip>
-        </input-validator>
+        </input-validator> -->
 
-        <input-validator
+        <!-- <input-validator
           :value="diskSize"
           :rules="[
             validators.required('Disk size is required.'),
@@ -88,7 +89,7 @@
           >
             <v-text-field label="Disk Size (GB)" type="number" v-model.number="diskSize" v-bind="props" />
           </input-tooltip>
-        </input-validator>
+        </input-validator> -->
 
         <input-tooltip
           inline
@@ -288,6 +289,7 @@ async function deploy() {
 <script lang="ts">
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectFarm from "../components/select_farm.vue";
+import SelectResources from "../components/select_resources.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
 
@@ -295,6 +297,7 @@ export default {
   name: "FullVm",
   components: {
     SelectVmImage,
+    SelectResources,
     SelectFarm,
     ExpandableLayout,
   },
