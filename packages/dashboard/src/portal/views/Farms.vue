@@ -139,7 +139,14 @@
               </v-col>
               <v-col v-else>
                 <v-flex>
-                  <v-btn x-small @click="openV2AddressDialog = true">Add V2 Address</v-btn>
+                  <v-tooltip right>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn x-small @click="openV2AddressDialog = true" v-bind="attrs" v-on="on"
+                        >Stellar Address</v-btn
+                      >
+                    </template>
+                    <span> Where minting payouts get sent to </span>
+                  </v-tooltip>
                 </v-flex>
               </v-col>
               <v-dialog transition="dialog-bottom-transition" v-model="openV2AddressDialog" max-width="500">
@@ -176,9 +183,14 @@
                 <v-flex class="text-left">Bootstrap Node Image</v-flex>
               </v-col>
               <v-col>
-                <v-flex>
-                  <v-btn small v-bind:href="'https://v3.bootstrap.grid.tf/'" target="blank">view bootstrap</v-btn>
-                </v-flex>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-flex v-bind="attrs" v-on="on">
+                      <v-btn small v-bind:href="'https://v3.bootstrap.grid.tf/'" target="blank">ZOS Live Image</v-btn>
+                    </v-flex>
+                  </template>
+                  <span> Download a ZOS image for your farm nodes </span>
+                </v-tooltip>
               </v-col>
             </v-row>
 
