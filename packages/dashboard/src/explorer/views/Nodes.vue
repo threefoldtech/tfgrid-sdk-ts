@@ -148,7 +148,7 @@ export default class Nodes extends Vue {
     { text: "MRU", value: "mru", align: "center", customAlign: "text-center", description: "Total Memory" },
     { text: "SRU", value: "sru", align: "center", customAlign: "text-center", description: "Total SSD" },
     { text: "HRU", value: "hru", align: "center", customAlign: "text-center", description: "Total HDD" },
-    { text: "GPU", value: "has_gpu", align: "center", customAlign: "text-center", description: "Has GPU" },
+    { text: "GPU", value: "num_gpu", align: "center", customAlign: "text-center", description: "GPU card" },
     { text: "Up Time", value: "uptime", align: "center", customAlign: "text-center" },
     { text: "Status", value: "status", align: "center", customAlign: "text-center" },
   ];

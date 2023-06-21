@@ -39,6 +39,10 @@
           <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="node && interfaces">
             <InterfacesDetails :interfaces="interfaces" />
           </v-col>
+
+          <!-- <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4">
+              <InterfacesDetails :interfaces="interfaces" />
+            </v-col> -->
         </v-row>
       </div>
       <div v-if="loading" class="pt-10">
@@ -107,7 +111,6 @@ export default class Details extends Vue {
   @Watch("open", { immediate: true })
   onOpenChange() {
     if (!this.open) return;
-
     this.loading = true;
     const { query, variables } = this;
     this.$apollo
@@ -123,6 +126,19 @@ export default class Details extends Vue {
           this.data.node = await fetch(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}`).then(res =>
             res.json(),
           );
+
+          if (this.data.node.num_gpu) {
+            try {
+              this.data.nodeGPU = await (
+                await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/gpu`, {
+                  timeout: 5000,
+                })
+              ).data;
+            } catch (error) {
+              console.log(error);
+            }
+          }
+
           try {
             this.data.nodeStatistics = await (
               await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/statistics`, {

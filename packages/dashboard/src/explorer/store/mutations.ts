@@ -63,7 +63,7 @@ function fillNodesFields(state: IState, node: any, farms: any): INode {
     location: node.location,
     country: node.country,
     city: node.city,
-    has_gpu: node.has_gpu,
+    num_gpu: node.num_gpu,
     interfaces: [
       {
         name: "",
