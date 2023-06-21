@@ -40,9 +40,9 @@
             <InterfacesDetails :interfaces="interfaces" />
           </v-col>
 
-          <!-- <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4">
-              <InterfacesDetails :interfaces="interfaces" />
-            </v-col> -->
+          <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="node && nodeGPU">
+            <GPUDetails :nodeGPU="nodeGPU" />
+          </v-col>
         </v-row>
       </div>
       <div v-if="loading" class="pt-10">
@@ -62,6 +62,7 @@ import { GrafanaStatistics } from "../utils/getMetricsUrl";
 import mediaMatcher from "../utils/mediaMatcher";
 import CountryDetails from "./CountryDetails.vue";
 import FarmDetails from "./FarmDetails.vue";
+import GPUDetails from "./GPUDetails.vue";
 import InterfacesDetails from "./InterfacesDetails.vue";
 import LocationDetails from "./LocationDetails.vue";
 import NodeDetails from "./NodeDetails.vue";
@@ -78,6 +79,7 @@ import TwinDetails from "./TwinDetails.vue";
     TwinDetails,
     PublicConfigDetails,
     InterfacesDetails,
+    GPUDetails,
     NodeUsedResources,
   },
 })
@@ -90,6 +92,7 @@ export default class Details extends Vue {
   loading = false;
   grafanaUrl = "";
   interfaces = undefined;
+  nodeGPU = undefined;
 
   data: any = {};
 
@@ -129,7 +132,7 @@ export default class Details extends Vue {
 
           if (this.data.node.num_gpu) {
             try {
-              this.data.nodeGPU = await (
+              this.nodeGPU = await (
                 await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/gpu`, {
                   timeout: 5000,
                 })
