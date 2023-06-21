@@ -109,8 +109,8 @@ const router = createRouter({
     },
     {
       path: "/:pathMatch(.*)*",
-      component: () => import("../views/not_yet_implemented.vue"),
-      meta: { title: "Not Yet Implemented" },
+      component: () => import("../views/page_not_found.vue"),
+      meta: { title: "Page Not Found" },
     },
   ],
 });
