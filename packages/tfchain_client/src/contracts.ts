@@ -146,6 +146,12 @@ class QueryContracts {
     const res = await this.client.api.query.smartContractModule.serviceContracts(options.serviceId);
     return res.toPrimitive() as unknown as ServiceContract;
   }
+
+  @checkConnection
+  async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceOptions) {
+    const res = await this.client.api.query.smartContractModule.dedicatedNodesExtraFee(options.nodeId);
+    return res.toPrimitive() as number;
+  }
 }
 
 export interface CreateNodeOptions {
@@ -320,12 +326,6 @@ class Contracts extends QueryContracts {
   async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesOptions) {
     const extrinsic = this.client.api.tx.smartContractModule.setDedicatedNodeExtraFee(options.nodeId, options.extraFee);
     return this.client.patchExtrinsic<RentContract>(extrinsic);
-  }
-
-  @checkConnection
-  async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceOptions) {
-    const res = await this.client.api.query.smartContractModule.dedicatedNodesExtraFee(options.nodeId);
-    return res.toPrimitive() as number;
   }
 
   @checkConnection
