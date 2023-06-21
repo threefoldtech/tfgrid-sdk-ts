@@ -185,17 +185,16 @@ class Contracts {
 
   @expose
   @validateInput
-  async getServiceContract(options: GetServiceContractModel) {
-    return this.client.contracts.getService(options);
-  }
-
-  @expose
-  @validateInput
   @checkBalance
   async setMetadataServiceContract(options: SetServiceContractMetadataModel) {
     return (await this.client.contracts.setServiceMetadata(options)).apply();
   }
 
+  @expose
+  @validateInput
+  async getServiceContract(options: GetServiceContractModel) {
+    return this.client.contracts.getService(options);
+  }
   /**
    * WARNING: Please be careful when executing this method, it will delete all your contracts.
    * @returns Promise
