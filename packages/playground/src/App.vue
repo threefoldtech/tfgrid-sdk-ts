@@ -159,6 +159,7 @@ const routes: AppRoute[] = [
       { title: "Node Pilot", icon: "vm.png", route: "/nodepilot" },
       { title: "Wordpress", icon: "wordpress.png", route: "/wordpress" },
       { title: "Umbrel", icon: "umbrel.png", route: "/umbrel" },
+      { title: "Freeflow", icon: "freeflow.png", route: "/freeflow" },
     ],
   },
   {

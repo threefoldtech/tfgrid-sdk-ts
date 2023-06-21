@@ -103,6 +103,11 @@ const router = createRouter({
       meta: { title: "Umbrel", info: { page: "info/umbrel.md" } },
     },
     {
+      path: "/freeflow",
+      component: () => import("../views/freeflow_view.vue"),
+      meta: { title: "Freeflow", info: { page: "info/freeflow.md" } },
+    },
+    {
       path: "/contractslist",
       component: () => import("../views/contracts_list.vue"),
       meta: { title: "Contracts List", info: { page: "info/contracts_list.md" } },

@@ -56,6 +56,7 @@ export enum ProjectName {
   Algorand = "Algorand",
   Qvm = "Qvm",
   Umbrel = "Umbrel",
+  FreeFlow = "Freeflow",
 }
 
 export enum SolutionCode {
