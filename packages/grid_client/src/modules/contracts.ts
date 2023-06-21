@@ -97,6 +97,12 @@ class Contracts {
 
   @expose
   @validateInput
+  async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceModel) {
+    return this.client.contracts.getDedicatedNodeExtraFee(options);
+  }
+
+  @expose
+  @validateInput
   async activeRentContractForNode(options: RentContractGetModel) {
     return this.client.contracts.getContractIdByActiveRentForNode(options);
   }
@@ -196,11 +202,6 @@ class Contracts {
     return (await this.client.contracts.setServiceMetadata(options)).apply();
   }
 
-  @expose
-  @validateInput
-  async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceModel) {
-    return this.client.contracts.getDedicatedNodeExtraFee(options);
-  }
   /**
    * WARNING: Please be careful when executing this method, it will delete all your contracts.
    * @returns Promise
