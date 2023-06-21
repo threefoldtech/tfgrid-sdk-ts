@@ -4,11 +4,11 @@ import { log } from "./utils";
 async function main() {
   const grid3 = await getClient();
 
-  const node = { nodeId: 11 };
+  const node = { nodeId: 73 };
 
-  // const extraFees = await grid3.contracts.setDedicatedNodeExtraFee({ ...node, extraFee: 5 });
+  const extraFees = await grid3.contracts.setDedicatedNodeExtraFee({ ...node, extraFee: 5 });
 
-  // console.log(extraFees);
+  console.log(extraFees);
 
   grid3.contracts
     .getDedicatedNodeExtraFee(node)

@@ -1,5 +1,5 @@
 import { Client, QueryClient } from "./client";
-import { PublicIp } from "./types";
+import { ExtrinsicResult, PublicIp } from "./types";
 import { checkConnection } from "./utils";
 
 const TWO_WEEKS = 1209600000;
@@ -148,7 +148,7 @@ class QueryContracts {
   }
 
   @checkConnection
-  async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceOptions) {
+  async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceOptions): Promise<number> {
     const res = await this.client.api.query.smartContractModule.dedicatedNodesExtraFee(options.nodeId);
     return res.toPrimitive() as number;
   }
@@ -323,7 +323,7 @@ class Contracts extends QueryContracts {
   }
 
   @checkConnection
-  async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesOptions) {
+  async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesOptions): Promise<ExtrinsicResult<RentContract>> {
     const extrinsic = this.client.api.tx.smartContractModule.setDedicatedNodeExtraFee(options.nodeId, options.extraFee);
     return this.client.patchExtrinsic<RentContract>(extrinsic);
   }
