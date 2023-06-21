@@ -42,54 +42,12 @@
         </input-validator>
 
         <SelectVmImage :images="images" v-model="flist" />
-        <SelectResources />
-
-        <!-- <input-validator
-          :value="cpu"
-          :rules="[
-            validators.required('CPU is required.'),
-            validators.isInt('CPU must be a valid integer.'),
-            validators.min('CPU min is 1 cores.', 1),
-            validators.max('CPU max is 32 cores.', 32),
-          ]"
-          #="{ props }"
-        >
-          <input-tooltip tooltip="The number of virtual cores allocated to your instance.">
-            <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
-          </input-tooltip>
-        </input-validator> -->
-
-        <!-- <input-validator
-          :value="memory"
-          :rules="[
-            validators.required('Memory is required.'),
-            validators.isInt('Memory must be a valid integer.'),
-            validators.min('Minimum allowed memory is 256 MB.', 256),
-            validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
-          ]"
-          #="{ props }"
-        >
-          <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
-            <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
-          </input-tooltip>
-        </input-validator> -->
-
-        <!-- <input-validator
-          :value="diskSize"
-          :rules="[
-            validators.required('Disk size is required.'),
-            validators.isInt('Disk size must be a valid integer.'),
-            validators.min('Minimum allowed disk size is 15 GB.', 15),
-            validators.max('Maximum allowed disk size is 10000 GB.', 10000),
-          ]"
-          #="{ props }"
-        >
-          <input-tooltip
-            tooltip="The storage capacity allocated to your instance, indicating the amount of space available to store files, data, and applications."
-          >
-            <v-text-field label="Disk Size (GB)" type="number" v-model.number="diskSize" v-bind="props" />
-          </input-tooltip>
-        </input-validator> -->
+        <SelectSolutionFlavor
+          :minimum="{ cpu: 1, memory: 1024 * 1, disk: 25 }"
+          :standard="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
+          :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+          v-model="solution"
+        />
 
         <input-tooltip
           inline
@@ -185,6 +143,7 @@ import { type Ref, ref, watch } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
+import type { solutionFlavor as SolutionFlavor } from "../types";
 import { type Farm, type Flist, ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
@@ -194,6 +153,7 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
+const solution = ref() as Ref<SolutionFlavor>;
 
 const images: VmImage[] = [
   {
@@ -289,7 +249,7 @@ async function deploy() {
 <script lang="ts">
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectFarm from "../components/select_farm.vue";
-import SelectResources from "../components/select_resources.vue";
+import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
 
@@ -297,7 +257,7 @@ export default {
   name: "FullVm",
   components: {
     SelectVmImage,
-    SelectResources,
+    SelectSolutionFlavor,
     SelectFarm,
     ExpandableLayout,
   },
