@@ -313,13 +313,13 @@ class Contracts extends QueryContracts {
   }
 
   @checkConnection
-  async setExtraFees(options: SetDedicatedNodeExtraFeesOptions) {
+  async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesOptions) {
     const extrinsic = this.client.api.tx.smartContractModule.setDedicatedNodeExtraFee(options.nodeId, options.extraFee);
     return this.client.patchExtrinsic<RentContract>(extrinsic);
   }
 
   @checkConnection
-  async getDedicatedNodePrice(options: GetDedicatedNodePriceOptions) {
+  async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceOptions) {
     const res = await this.client.api.query.smartContractModule.dedicatedNodesExtraFee(options.nodeId);
     return res.toPrimitive() as number;
   }

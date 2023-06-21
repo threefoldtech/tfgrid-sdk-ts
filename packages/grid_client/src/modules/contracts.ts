@@ -180,8 +180,8 @@ class Contracts {
   @expose
   @validateInput
   @checkBalance
-  async setExtraFees(options: SetDedicatedNodeExtraFeesModel) {
-    return (await this.client.contracts.setExtraFees(options)).apply();
+  async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesModel) {
+    return (await this.client.contracts.setDedicatedNodeExtraFee(options)).apply();
   }
   @expose
   @validateInput
@@ -198,8 +198,8 @@ class Contracts {
 
   @expose
   @validateInput
-  async getDedicatedNodePrice(options: GetDedicatedNodePriceModel) {
-    return this.client.contracts.getDedicatedNodePrice(options);
+  async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceModel) {
+    return this.client.contracts.getDedicatedNodeExtraFee(options);
   }
   /**
    * WARNING: Please be careful when executing this method, it will delete all your contracts.
