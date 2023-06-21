@@ -185,12 +185,6 @@ class Contracts {
 
   @expose
   @validateInput
-  @checkBalance
-  async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesModel) {
-    return (await this.client.contracts.setDedicatedNodeExtraFee(options)).apply();
-  }
-  @expose
-  @validateInput
   async getServiceContract(options: GetServiceContractModel) {
     return this.client.contracts.getService(options);
   }
@@ -226,6 +220,13 @@ class Contracts {
       await this.invalidateDeployment(id);
     }
     return contracts;
+  }
+
+  @expose
+  @validateInput
+  @checkBalance
+  async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesModel) {
+    return (await this.client.contracts.setDedicatedNodeExtraFee(options)).apply();
   }
 
   /**
