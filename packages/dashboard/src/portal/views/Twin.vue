@@ -32,7 +32,7 @@
         </v-card>
       </v-dialog>
     </v-container>
-    <v-container style="width: 850px">
+    <v-container>
       <template v-if="$store.state.credentials.initialized && $store.state.credentials.twin.relay == 'null'">
         <div class="mt-4">
           <v-alert color="rgb(25, 130, 177)" dense type="info">
