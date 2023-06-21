@@ -18,6 +18,7 @@ export enum MutationTypes {
   SET_NODES_TABLE_PAGE_SIZE = "setNodesTablePageSize",
   SET_GATEWAY_FILTER = "setGatewayFilter",
   SET_UP_FILTER = "setUpFilter",
+  SET_GPU_FILTER = "setGPUFilter",
   SET_NODES = "setNodes",
   SET_NODES_FILTER = "setNodesFilter",
   CLEAR_NODES_FILTER = "clearNodesFilter",
@@ -62,6 +63,7 @@ function fillNodesFields(state: IState, node: any, farms: any): INode {
     location: node.location,
     country: node.country,
     city: node.city,
+    has_gpu: node.has_gpu,
     interfaces: [
       {
         name: "",
@@ -122,6 +124,9 @@ export default {
   },
   setGatewayFilter(state: IState, payload: boolean) {
     state.nodesGatewayFilter = payload;
+  },
+  setGPUFilter(state: IState, payload: boolean) {
+    state.nodesGPUFilter = payload;
   },
   setUpFilter(state: IState, payload: boolean) {
     state.nodesUpFilter = payload;

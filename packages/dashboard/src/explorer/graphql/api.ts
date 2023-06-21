@@ -94,6 +94,8 @@ export interface INode {
   certificationType: "Diy" | "Certified";
   farmingPolicyName: string;
   countryFullName: string;
+  has_gpu?: boolean;
+  extra_fee?: number;
 }
 
 export interface INodeStatisticsUser {

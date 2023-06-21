@@ -33,6 +33,7 @@ export default {
 
     if (state.nodesUpFilter) url += "&status=up";
     if (state.nodesGatewayFilter) url += "&ipv4=true&domain=true";
+    if (state.nodesGPUFilter) url += "&has_gpu=true";
 
     for (const key in state.nodesFilter) {
       let value = state.nodesFilter[key];
