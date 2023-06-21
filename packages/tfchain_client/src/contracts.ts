@@ -244,7 +244,7 @@ class Contracts extends QueryContracts {
 
   @checkConnection
   async createName(options: CreateNameOptions) {
-    const extrinsic = this.client.api.tx.smartContractModule.createNameContract(options.name);
+    const extrinsic = await this.client.api.tx.smartContractModule.createNameContract(options.name);
     return this.client.patchExtrinsic<Contract>(extrinsic);
   }
 
