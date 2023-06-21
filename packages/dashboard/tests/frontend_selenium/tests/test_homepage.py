@@ -215,10 +215,12 @@ def test_tft_price(browser):
           - Navigate to dashboard.
           - Authenticate polkadot.
           - Click on TFT swap icon.
-      Result: TFT in USD and vice versa.
+          - Get TFT price from stellar site.
+      Result: Assert TFT in USD and vice versa.
     """
     dashboard_page, _ = before_test_setup(browser)
     tft_in_usd = float(dashboard_page.tft_price_result()[:-4])
     dashboard_page.tft_price_swap()
     usd_in_tft = float(dashboard_page.tft_price_result()[:-4])
+    assert str(tft_in_usd) in dashboard_page.get_tft_price()
     assert 0.99 < tft_in_usd * usd_in_tft < 1.1

@@ -24,6 +24,8 @@ class DashboardPage:
     threefold_guide_img = (By.XPATH, "//*[contains(text(), 'Your Guide to The ThreeFold Grid')]")
     tft_swap = (By.XPATH, '//*[@id="app"]/div[1]/div[1]/header/div/div[2]/div/div/div/button/span/i')
     tft_price = (By.XPATH, '//*[@id="app"]/div[1]/div[1]/header/div/div[2]/div/div/div/p[2]')
+    tft_info = (By.XPATH, '//*[@id="app"]/div[1]/div[1]/header/div/div[2]/div/div/div/button[2]/span/i')
+    stellar_tft_price = (By.XPATH, '/html/body/div/div/div[3]/div/div/div[3]/div[1]/div[1]/dl/dd[9]/span')
     
     def __init__(self, browser):
         self.browser = browser
@@ -82,3 +84,10 @@ class DashboardPage:
         self.browser.find_element(*self.tft_swap).click()
         while (price == self.browser.find_element(*self.tft_price).text):
             WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), '1 USD')]")))
+
+    def get_tft_price(self):
+        self.browser.find_element(*self.tft_info).click()
+        WebDriverWait(self.browser, 30).until(EC.number_of_windows_to_be(2))
+        self.browser.switch_to.window(self.browser.window_handles[1])
+        return self.browser.find_element(*self.stellar_tft_price).text
+        
