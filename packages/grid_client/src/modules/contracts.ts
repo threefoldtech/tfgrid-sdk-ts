@@ -18,6 +18,7 @@ import {
   ContractsByTwinId,
   ContractState,
   CreateServiceContractModel,
+  GetDedicatedNodePriceModel,
   GetServiceContractModel,
   NameContractCreateModel,
   NameContractGetModel,
@@ -27,6 +28,7 @@ import {
   ServiceContractApproveModel,
   ServiceContractBillModel,
   ServiceContractCancelModel,
+  SetDedicatedNodeExtraFeesModel,
   SetServiceContractFeesModel,
   SetServiceContractMetadataModel,
 } from "./models";
@@ -178,13 +180,26 @@ class Contracts {
   @expose
   @validateInput
   @checkBalance
-  async setMetadataServiceContract(options: SetServiceContractMetadataModel) {
-    return (await this.client.contracts.setServiceMetadata(options)).apply();
+  async setExtraFees(options: SetDedicatedNodeExtraFeesModel) {
+    return (await this.client.contracts.setExtraFees(options)).apply();
   }
   @expose
   @validateInput
   async getServiceContract(options: GetServiceContractModel) {
     return this.client.contracts.getService(options);
+  }
+
+  @expose
+  @validateInput
+  @checkBalance
+  async setMetadataServiceContract(options: SetServiceContractMetadataModel) {
+    return (await this.client.contracts.setServiceMetadata(options)).apply();
+  }
+
+  @expose
+  @validateInput
+  async getDedicatedNodePrice(options: GetDedicatedNodePriceModel) {
+    return this.client.contracts.getDedicatedNodePrice(options);
   }
   /**
    * WARNING: Please be careful when executing this method, it will delete all your contracts.

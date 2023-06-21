@@ -188,6 +188,14 @@ export interface SetServiceFeesOptions {
   baseFee: number;
   variableFee: number;
 }
+export interface SetDedicatedNodeExtraFeesOptions {
+  nodeId: number;
+  extraFee: number;
+}
+
+export interface GetDedicatedNodePriceOptions {
+  nodeId: number;
+}
 
 export interface SetServiceMetadataOptions {
   serviceId: number;
@@ -214,7 +222,7 @@ class Contracts extends QueryContracts {
 
   @checkConnection
   async createNode(options: CreateNodeOptions) {
-    const extrinsic = await this.client.api.tx.smartContractModule.createNodeContract(
+    const extrinsic = this.client.api.tx.smartContractModule.createNodeContract(
       options.nodeId,
       options.hash,
       options.data,
@@ -226,23 +234,19 @@ class Contracts extends QueryContracts {
 
   @checkConnection
   async updateNode(options: UpdateNodeOptions) {
-    const extrinsic = await this.client.api.tx.smartContractModule.updateNodeContract(
-      options.id,
-      options.hash,
-      options.data,
-    );
+    const extrinsic = this.client.api.tx.smartContractModule.updateNodeContract(options.id, options.hash, options.data);
     return this.client.patchExtrinsic<Contract>(extrinsic);
   }
 
   @checkConnection
   async createName(options: CreateNameOptions) {
-    const extrinsic = await this.client.api.tx.smartContractModule.createNameContract(options.name);
+    const extrinsic = this.client.api.tx.smartContractModule.createNameContract(options.name);
     return this.client.patchExtrinsic<Contract>(extrinsic);
   }
 
   @checkConnection
   async createRent(options: CreateRentOptions) {
-    const extrinsic = await this.client.api.tx.smartContractModule.createRentContract(
+    const extrinsic = this.client.api.tx.smartContractModule.createRentContract(
       options.nodeId,
       options.solutionProviderId,
     );
@@ -255,7 +259,7 @@ class Contracts extends QueryContracts {
     if (!contract) {
       return;
     }
-    const extrinsic = await this.client.api.tx.smartContractModule.cancelContract(options.id);
+    const extrinsic = this.client.api.tx.smartContractModule.cancelContract(options.id);
     return this.client.patchExtrinsic(extrinsic, {
       map: () => options.id,
       resultEvents: ["NodeContractCanceled", "NameContractCanceled", "RentContractCanceled", "ContractCanceled"],
@@ -264,7 +268,7 @@ class Contracts extends QueryContracts {
 
   @checkConnection
   async createService(options: CreateServiceOptions) {
-    const extrinsic = await this.client.api.tx.smartContractModule.serviceContractCreate(
+    const extrinsic = this.client.api.tx.smartContractModule.serviceContractCreate(
       options.serviceAccount,
       options.consumerAccount,
     );
@@ -275,16 +279,16 @@ class Contracts extends QueryContracts {
   async approveService(options: ApproveServiceOptions) {
     let extrinsic: any;
     if (options.approve) {
-      extrinsic = await this.client.api.tx.smartContractModule.serviceContractApprove(options.serviceId);
+      extrinsic = this.client.api.tx.smartContractModule.serviceContractApprove(options.serviceId);
     } else {
-      extrinsic = await this.client.api.tx.smartContractModule.serviceContractReject(options.serviceId);
+      extrinsic = this.client.api.tx.smartContractModule.serviceContractReject(options.serviceId);
     }
     return this.client.patchExtrinsic<ServiceContract>(extrinsic);
   }
 
   @checkConnection
   async billService(options: BillServiceOptions) {
-    const extrinsic = await this.client.api.tx.smartContractModule.serviceContractBill(
+    const extrinsic = this.client.api.tx.smartContractModule.serviceContractBill(
       options.serviceId,
       options.variableAmount,
       options.metadata,
@@ -294,13 +298,13 @@ class Contracts extends QueryContracts {
 
   @checkConnection
   async cancelService(options: CancelServiceOptions) {
-    const extrinsic = await this.client.api.tx.smartContractModule.serviceContractCancel(options.serviceId);
+    const extrinsic = this.client.api.tx.smartContractModule.serviceContractCancel(options.serviceId);
     return this.client.patchExtrinsic(extrinsic, { map: () => options.serviceId });
   }
 
   @checkConnection
   async setServiceFees(options: SetServiceFeesOptions) {
-    const extrinsic = await this.client.api.tx.smartContractModule.serviceContractSetFees(
+    const extrinsic = this.client.api.tx.smartContractModule.serviceContractSetFees(
       options.serviceId,
       options.baseFee,
       options.variableFee,
@@ -309,8 +313,20 @@ class Contracts extends QueryContracts {
   }
 
   @checkConnection
+  async setExtraFees(options: SetDedicatedNodeExtraFeesOptions) {
+    const extrinsic = this.client.api.tx.smartContractModule.setDedicatedNodeExtraFee(options.nodeId, options.extraFee);
+    return this.client.patchExtrinsic<RentContract>(extrinsic);
+  }
+
+  @checkConnection
+  async getDedicatedNodePrice(options: GetDedicatedNodePriceOptions) {
+    const res = await this.client.api.query.smartContractModule.dedicatedNodesExtraFee(options.nodeId);
+    return res.toPrimitive() as number;
+  }
+
+  @checkConnection
   async setServiceMetadata(options: SetServiceMetadataOptions) {
-    const extrinsic = await this.client.api.tx.smartContractModule.serviceContractSetMetadata(
+    const extrinsic = this.client.api.tx.smartContractModule.serviceContractSetMetadata(
       options.serviceId,
       options.metadata,
     );

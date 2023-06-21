@@ -21,6 +21,7 @@ export interface Node {
   virtualized: boolean;
   serialNumber: string;
   connectionPrice: number;
+  hasGpu: number;
 }
 
 interface NetworkInterfaceType {
@@ -44,6 +45,7 @@ interface NodeResources {
   sru: number;
   cru: number;
   mru: number;
+  gpu: number;
 }
 
 interface NodeLocation {
