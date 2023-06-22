@@ -113,6 +113,7 @@ export default class NodesTable extends Vue {
     { text: "MRU", value: "resources.mru", align: "center" },
     { text: "SRU", value: "resources.sru", align: "center" },
     { text: "HRU", value: "resources.hru", align: "center" },
+    { text: "GPU", value: "resources.gpu", align: "center" },
     { text: "Price (USD)", value: "discount", align: "center" },
     { text: "Actions", value: "actions", align: "center", sortable: false },
   ];
@@ -175,7 +176,6 @@ export default class NodesTable extends Vue {
       this.pageNumber,
       this.pageSize,
     );
-
     this.nodes = dNodes;
     this.count = parseInt(count as string);
     this.loading = false;
