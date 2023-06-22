@@ -81,7 +81,7 @@
                   <v-list-item-title> Contract ID</v-list-item-title>
                 </v-list-item-content>
               </template>
-              <span>The contract id that reserve this GPU card</span>
+              <span>The contract id that reserves this GPU card</span>
             </v-tooltip>
             {{ gpuItem?.contract }}
           </v-list-item>
