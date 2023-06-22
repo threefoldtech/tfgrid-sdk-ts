@@ -44,6 +44,7 @@ export interface nodeInterface {
   status: string;
   certificationType: string;
   dedicated: boolean;
+  extraFee: number;
   rentContractId: number;
   rentedByTwinId: number;
   receipts: receiptInterface[];
