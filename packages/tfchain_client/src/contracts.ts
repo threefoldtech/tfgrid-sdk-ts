@@ -323,9 +323,9 @@ class Contracts extends QueryContracts {
   }
 
   @checkConnection
-  async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesOptions): Promise<ExtrinsicResult<ServiceContract>> {
+  async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesOptions) {
     const extrinsic = this.client.api.tx.smartContractModule.setDedicatedNodeExtraFee(options.nodeId, options.extraFee);
-    return this.client.patchExtrinsic<ServiceContract>(extrinsic);
+    return this.client.patchExtrinsic(extrinsic);
   }
 
   @checkConnection
