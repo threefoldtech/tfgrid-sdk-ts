@@ -609,6 +609,15 @@ class NetworkGetModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
 }
 
+class SetDedicatedNodeExtraFeesModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) extraFee: number;
+}
+
+class GetDedicatedNodePriceModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+}
+
 export {
   AlgorandAccountCreateModel,
   AlgorandAccountInitModel,
@@ -724,4 +733,6 @@ export {
   GetServiceContractModel,
   NetworkGetModel,
   NodeGetModel,
+  SetDedicatedNodeExtraFeesModel,
+  GetDedicatedNodePriceModel,
 };
