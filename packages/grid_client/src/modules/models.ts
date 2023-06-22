@@ -558,10 +558,11 @@ class FilterOptions {
   @Expose() @IsOptional() @IsString() country?: string;
   @Expose() @IsOptional() @IsString() city?: string;
   @Expose() @IsOptional() @IsBoolean() dedicated?: boolean;
-  @Expose() @IsOptional() @IsInt() availableFor?: number;
+  @Expose() @IsOptional() @IsInt() @Min(1) availableFor?: number;
   @Expose() @IsOptional() @IsInt() page?: number;
   @Expose() @IsOptional() @IsInt() size?: number;
-  @Expose() @IsOptional() @IsBoolean() has_gpu?: boolean;
+  @Expose() @IsOptional() @IsBoolean() hasGPU?: boolean;
+  @Expose() @IsOptional() @IsInt() @Min(1) rentedBy?: number;
 }
 
 class CalculatorModel {
