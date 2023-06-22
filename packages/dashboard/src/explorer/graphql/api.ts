@@ -102,7 +102,7 @@ export interface INodeGPU {
   id: string;
   vendor: string;
   device: string;
-  contract: number;
+  contract?: number;
 }
 export interface INodeStatisticsUser {
   deployments: number;
