@@ -172,6 +172,12 @@ export interface ITab {
   value: "rentable" | "rented" | "mine";
   index: number;
 }
+export interface INodeGPU {
+  id: string;
+  vendor: string;
+  device: string;
+  contract?: number;
+}
 
 export function generateReceipt(doc: jsPDF, node: nodeInterface) {
   doc.setFontSize(15);
@@ -286,6 +292,20 @@ export async function getNodeMintingFixupReceipts(nodeId: number) {
   );
 
   return nodeReceipts;
+}
+export async function getNodeGPUs(nodeId: number): Promise<INodeGPU[] | undefined> {
+  let nodeGPUs: INodeGPU[] | undefined;
+
+  try {
+    nodeGPUs = await (
+      await axios.get(`${config.gridproxyUrl}/nodes/${nodeId}/gpu`, {
+        timeout: 5000,
+      })
+    ).data;
+  } catch (err) {
+    nodeGPUs = undefined;
+  }
+  return nodeGPUs;
 }
 
 export async function getNodeUsedResources(nodeId: string) {
