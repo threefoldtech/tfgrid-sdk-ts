@@ -25,10 +25,11 @@ async function main() {
     rentedBy: grid3.twinId,
   };
 
+  const nodeId = +(await grid3.capacity.filterNodes(vmQueryOptions))[0].nodeId;
   // create vm node Object
   const vm = new MachineModel();
   vm.name = "vmgpu";
-  vm.node_id = +(await grid3.capacity.filterNodes(vmQueryOptions))[0].nodeId; // TODO: allow random choice
+  vm.node_id = nodeId;
   vm.disks = [disk];
   vm.public_ip = false;
   vm.planetary = true;
@@ -40,7 +41,12 @@ async function main() {
   vm.env = {
     SSH_KEY: config.ssh_key,
   };
-  vm.gpu = ["0000:0e:00.0/1002/744c"]; // gpu card's id, you can check the available gpu from the dashboard
+  let gpuList = await grid3.zos.getNodeGPUInfo({ nodeId: nodeId });
+  gpuList = gpuList.filter(g => g.contract === 0);
+  if (gpuList.length <= 0) {
+    throw Error(`Couldn't find GPU card available on node ${nodeId}`);
+  }
+  vm.gpu = [gpuList[0].id]; // gpu card's id, you can check the available gpu from the dashboard
 
   // create VMs Object
   const vms = new MachinesModel();
@@ -58,9 +64,9 @@ async function main() {
   const l = await grid3.machines.getObj(vms.name);
   log(l);
 
-  //   // delete
-  //   const d = await grid3.machines.delete({ name: vms.name });
-  //   log(d);
+  // // delete
+  // const d = await grid3.machines.delete({ name: vms.name });
+  // log(d);
 
   await grid3.disconnect();
 }
