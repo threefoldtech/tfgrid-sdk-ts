@@ -1,48 +1,93 @@
 <template>
-  <v-container>
+  <v-card flat color="transparent" tag="div">
     <v-list-item>
       <v-list-item-icon>
-        <v-icon size="40" class="mr-2">mdi-boom-gate-outline</v-icon>
+        <v-icon size="40" class="mr-2">mdi-expansion-card-variant</v-icon>
       </v-list-item-icon>
       <v-list-item-content>
         <v-list-item-title style="font-size: 30px"> GPU Details </v-list-item-title>
       </v-list-item-content>
     </v-list-item>
-    <v-card max-width="400px" max-height="100px">
-      <v-data-table
-        fixed-header
-        class="elevation-1"
-        align
-        :headers="headers"
-        :items="nodeGPU1"
-        hide-default-footer
-        :expanded="[expandedItem]"
-        @click:row="toggleExpanded"
-      >
-        <template v-slot:expanded-item="{ item }">
-          <v-list-item three-line>
+    <!-- Details -->
+    <v-row>
+      <v-col cols="12" class="pt-0">
+        <!-- :cols="screen_max_800.matches ? 12 : screen_max_1000.matches ? 6 : 4" -->
+        <v-list>
+          <v-list-item v-if="gpuItem">
             <v-list-item-content>
-              <v-list-item-title>Vendor</v-list-item-title>
-              <v-list-item-subtitle>
-                {{ item.vendor }}
-              </v-list-item-subtitle>
+              <v-row class="d-flex justify-space-between">
+                <v-tooltip top nudge-bottom="30">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-col v-bind="attrs" v-on="on" cols="3">
+                      <v-list-item-title class="pt-3"
+                        >Card ID
+                        <v-chip
+                          lose-icon="mdi-delete"
+                          :color="gpuItem.contract ? 'warning' : 'success'"
+                          small
+                          class="mb-1 ml-2"
+                          >{{ gpuItem.contract ? "Reserved" : "Available" }}</v-chip
+                        >
+                      </v-list-item-title>
+                    </v-col>
+                  </template>
+                  <span>Card id that's used in a deployment</span>
+                </v-tooltip>
 
-              <v-list-item-title>Device</v-list-item-title>
-              <v-list-item-subtitle>
-                {{ item.device }}
-              </v-list-item-subtitle>
-
-              <v-list-item-title>Rented by</v-list-item-title>
-              <v-list-item-subtitle>
-                {{ item.contract }}
-              </v-list-item-subtitle>
+                <v-col cols="6" class="mr-2">
+                  <v-select
+                    v-if="nodeGPUitems.length > 1"
+                    append-outer-icon="mdi-content-copy"
+                    hide-details
+                    solo
+                    v-model="gpuItem"
+                    :items="nodeGPUitems"
+                    @input.native="gpuItem = $event.srcElement.value.value"
+                    @click:append-outer="copy(gpuItem.id)"
+                  />
+                  <v-text-field
+                    v-else
+                    :value="gpuItem.id"
+                    readonly
+                    hide-details
+                    append-outer-icon="mdi-content-copy"
+                    @click:append-outer="copy(gpuItem.id)"
+                    solo
+                  ></v-text-field>
+                </v-col>
+              </v-row>
             </v-list-item-content>
           </v-list-item>
           <v-divider />
-        </template>
-      </v-data-table>
-    </v-card>
-  </v-container>
+          <v-list-item>
+            <v-list-item-content>
+              <v-list-item-title> Vendor </v-list-item-title>
+            </v-list-item-content>
+            {{ gpuItem?.vendor }}
+          </v-list-item>
+          <v-divider />
+
+          <v-list-item>
+            <v-list-item-content>
+              <v-list-item-title> Device </v-list-item-title>
+            </v-list-item-content>
+            {{ gpuItem?.device }}
+          </v-list-item>
+          <v-divider />
+          <v-list-item v-if="gpuItem.contract !== undefined">
+            <v-tooltip top nudge-bottom="30">
+              <template v-slot:activator="{ on, attrs }">
+                <v-list-item-content v-bind="attrs" v-on="on">
+                  <v-list-item-title> Contract ID</v-list-item-title>
+                </v-list-item-content>
+              </template>
+              <span>The contract id that reserve this GPU card</span>
+            </v-tooltip>
+            {{ gpuItem?.contract }}
+          </v-list-item>
+          <v-divider /> </v-list></v-col
+    ></v-row>
+  </v-card>
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
@@ -52,41 +97,22 @@ import { INodeGPU } from "../graphql/api";
 @Component({})
 export default class GPUDetails extends Vue {
   @Prop({ required: true }) nodeGPU!: INodeGPU[];
-  headers = [{ text: "Card ID", value: "id" }];
-  nodeGPU1 = [
-    {
-      id: "0000:0e:00.0/1002/744c",
-      vendor: "Advanced Micro Devices, Inc. [AMD/ATI]",
-      device: "Navi 31 [Radeon RX 7900 XT/7900 XTX]",
-      contract: 31540,
-    },
-    {
-      id: "0000:0e:00.0/100d2/744c",
-      vendor: "Advanced Micro Devices, Inc. [AMD/ATI]",
-      device: "Navi 31 [Radeon RX 7900 XT/7900 XTX]",
-      contract: 31540,
-    },
-    {
-      id: "0000:0e:00.0/1002s/744c",
-      vendor: "Advanced Micro Devices, Inc. [AMD/ATI]",
-      device: "Navi 31 [Radeon RX 7900 XT/7900 XTX]",
-      contract: 31540,
-    },
-    {
-      id: "0000:0e:00.0/100sa2/744c",
-      vendor: "Advanced Micro Devices, Inc. [AMD/ATI]",
-      device: "Navi 31 [Radeon RX 7900 XT/7900 XTX]",
-      contract: 31540,
-    },
-  ];
-  expandedItem: INodeGPU | null = null;
-  toggleExpanded(item: INodeGPU) {
-    console.log([item, item, item]);
-    if (this.expandedItem === item) {
-      this.expandedItem = null;
-    } else {
-      this.expandedItem = item;
-    }
+  nodeGPUitems: {
+    text: string;
+    value: INodeGPU;
+
+    disabled: false;
+  }[] = this.$props.nodeGPU.map((item: INodeGPU) => {
+    return {
+      text: item.id,
+      value: item,
+      disabled: false,
+    };
+  });
+
+  gpuItem = this.$props.nodeGPU[0];
+  copy(id: string) {
+    navigator.clipboard.writeText(id);
   }
 }
 </script>
