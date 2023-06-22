@@ -34,7 +34,7 @@
       <template v-slot:[`item.discount`]="{ item }">
         <v-tooltip bottom color="primary" close-delay="1000">
           <template v-slot:activator="{ on, attrs }">
-            <span v-bind="attrs" v-on="on">{{ item.discount }} *</span>
+            <span v-bind="attrs" v-on="on">{{ item.discount + (item.extraFee ? item.extraFee / 1000 : 0) }} *</span>
           </template>
           <span
             >Discounts: <br />
