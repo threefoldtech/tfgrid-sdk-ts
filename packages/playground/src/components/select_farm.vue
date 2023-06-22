@@ -1,7 +1,6 @@
 <template>
   <section>
     <h6 class="text-h5 mb-4">Choose a Location</h6>
-
     <SelectCountry v-model="country" />
 
     <input-validator :rules="[validators.required('Farm is required.')]" :value="farm?.farmID" ref="farmInput">
