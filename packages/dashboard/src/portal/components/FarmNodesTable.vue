@@ -326,17 +326,19 @@
       <!--extra fees dialog-->
       <v-dialog v-model="openExtraFeeDialogue" width="800">
         <v-card>
-          <v-card-title class="text-h5"> Add GPU fees to your node with ID: {{ nodeToEdit.nodeId }} </v-card-title>
+          <v-card-title class="text-h5"> Add Extra fees to your node with ID: {{ nodeToEdit.nodeId }} </v-card-title>
 
           <v-card-text class="text">
             <v-form v-model="isValidExtraFee">
               <v-text-field
                 class="mt-4"
-                label="GPU Fees"
+                label="Extra Fees"
                 v-model="extraFee"
                 required
                 outlined
                 dense
+                hint="Extra fees are in USD"
+                persistent-hint
                 type="number"
                 :error-messages="extraFeeErrorMessage"
                 :rules="[() => !!extraFee || 'This field is required']"
@@ -685,7 +687,6 @@ export default class FarmNodesTable extends Vue {
 
   async openExtraFee(node: nodeInterface) {
     this.nodeToEdit = node;
-    console.log("nodeId", this.nodeToEdit.nodeId);
     this.extraFee = await getDedicatedNodeExtraFee(this.$api, this.nodeToEdit.nodeId);
     this.openExtraFeeDialogue = true;
   }
