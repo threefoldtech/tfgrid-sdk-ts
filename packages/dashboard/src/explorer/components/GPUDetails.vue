@@ -15,48 +15,43 @@
         <v-list v-if="gpuItem">
           <v-list-item>
             <v-list-item-content>
-              <v-row class="d-flex justify-space-between">
-                <v-tooltip top nudge-bottom="30">
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-col v-bind="attrs" v-on="on" cols="3">
-                      <v-list-item-title class="pt-3"
-                        >Card ID
-                        <v-chip
-                          lose-icon="mdi-delete"
-                          :color="gpuItem.contract ? 'warning' : 'success'"
-                          small
-                          class="mb-1 ml-2"
-                          >{{ gpuItem.contract ? "Reserved" : "Available" }}</v-chip
-                        >
-                      </v-list-item-title>
-                    </v-col>
-                  </template>
-                  <span>Card id that's used in a deployment</span>
-                </v-tooltip>
-
-                <v-col cols="6" class="mr-2">
-                  <v-select
-                    v-if="nodeGPUitems.length > 1"
-                    append-outer-icon="mdi-content-copy"
-                    hide-details
-                    solo
-                    v-model="gpuItem"
-                    :items="nodeGPUitems"
-                    @input.native="gpuItem = $event.srcElement.value.value"
-                    @click:append-outer="copy(gpuItem.id)"
-                  />
-                  <v-text-field
-                    v-else
-                    :value="gpuItem.id"
-                    readonly
-                    hide-details
-                    append-outer-icon="mdi-content-copy"
-                    @click:append-outer="copy(gpuItem.id)"
-                    solo
-                  ></v-text-field>
-                </v-col>
-              </v-row>
+              <v-tooltip top nudge-bottom="30">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-list-item-title class="pt-3" v-bind="attrs" v-on="on"
+                    >Card ID
+                    <v-chip
+                      lose-icon="mdi-delete"
+                      :color="gpuItem.contract ? 'warning' : 'success'"
+                      small
+                      class="mb-1 ml-2"
+                      >{{ gpuItem.contract ? "Reserved" : "Available" }}</v-chip
+                    >
+                  </v-list-item-title>
+                </template>
+                <span>Card id that's used in a deployment</span>
+              </v-tooltip>
             </v-list-item-content>
+            <v-col class="mr-2">
+              <v-select
+                v-if="nodeGPUitems.length > 1"
+                append-outer-icon="mdi-content-copy"
+                hide-details
+                solo
+                v-model="gpuItem"
+                :items="nodeGPUitems"
+                @input.native="gpuItem = $event.srcElement.value.value"
+                @click:append-outer="copy(gpuItem.id)"
+              />
+              <v-text-field
+                v-else
+                :value="gpuItem.id"
+                readonly
+                hide-details
+                append-outer-icon="mdi-content-copy"
+                @click:append-outer="copy(gpuItem.id)"
+                solo
+              ></v-text-field>
+            </v-col>
           </v-list-item>
           <v-divider />
           <v-list-item>
