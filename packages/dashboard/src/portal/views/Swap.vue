@@ -40,6 +40,7 @@
                   () =>
                     (amount.toString().split('.').length > 1 ? amount.toString().split('.')[1].length <= 3 : true) ||
                     'Amount must have 3 decimals only',
+                  () => amount != 1 || 'Amount should be more than 1',
                   () => amount > 0 || 'Amount cannot be negative or 0',
                   () => amount < parseFloat($store.state.credentials.balance.free) || 'Amount cannot exceed balance',
                 ]"
