@@ -31,7 +31,7 @@
                 <span>Card id that's used in a deployment</span>
               </v-tooltip>
             </v-list-item-content>
-            <v-col class="mr-2">
+            <v-col class="mr-n4">
               <v-select
                 v-if="nodeGPUitems.length > 1"
                 append-outer-icon="mdi-content-copy"
