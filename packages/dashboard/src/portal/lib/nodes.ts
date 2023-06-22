@@ -467,7 +467,7 @@ export async function getDNodes(
     discount: any;
     applyedDiscount: { first: any; second: any };
     location: { country: any; city: any; long: any; lat: any };
-    resources: { cru: any; mru: any; hru: any; sru: any };
+    resources: { cru: any; mru: any; hru: any; sru: any; gpu: number };
     farm: { id: string; name?: string; farmCertType?: string; pubIps?: string };
     rentContractId: any;
     rentedByTwinId: any;
@@ -499,6 +499,7 @@ export async function getDNodes(
         mru: node.total_resources.mru,
         hru: node.total_resources.hru,
         sru: node.total_resources.sru,
+        gpu: node.num_gpu,
       },
       usedResources: {
         cru: node.used_resources.cru,
