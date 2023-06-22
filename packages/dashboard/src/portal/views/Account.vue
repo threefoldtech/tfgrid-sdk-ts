@@ -131,9 +131,9 @@ export default class AccountView extends Vue {
           this.$api,
           this.$store.state.credentials.account.address,
         ));
-        const document = await axios.get(this.documentLink);
-        this.documentHash = md5(document.data);
       }
+      const document = await axios.get(this.documentLink);
+      this.documentHash = md5(document.data);
       this.selectedName = this.items.filter(item => item.id === this.selectedItem.item_id)[0].name;
     } else {
       this.$toasted.show(`Can't connect to Polkadot API right now, please refresh the page or try again later`);
