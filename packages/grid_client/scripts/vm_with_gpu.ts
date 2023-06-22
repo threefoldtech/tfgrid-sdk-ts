@@ -19,13 +19,18 @@ async function main() {
   const vmQueryOptions: FilterOptions = {
     cru: 8,
     mru: 16, // GB
-    sru: 100,
+    sru: 1000,
     availableFor: grid3.twinId,
     hasGPU: true,
     rentedBy: grid3.twinId,
   };
 
-  const nodeId = +(await grid3.capacity.filterNodes(vmQueryOptions))[0].nodeId;
+  const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
+  if (nodes.length === 0) {
+    throw Error(`Couldn't find a node satisfying these filter options: ${JSON.stringify(vmQueryOptions)}`);
+  }
+  const nodeId = +nodes[0].nodeId;
+
   // create vm node Object
   const vm = new MachineModel();
   vm.name = "vmgpu";
