@@ -2,6 +2,7 @@ import axios from "axios";
 import { writable } from "svelte/store";
 
 export interface IStatsRes {
+  gpus: number;
   nodes: number;
   farms: number;
   countries: number;
