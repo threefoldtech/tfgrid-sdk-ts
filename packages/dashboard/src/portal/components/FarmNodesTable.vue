@@ -67,6 +67,15 @@
             </template>
             <span>Add a public config</span>
           </v-tooltip>
+
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon class="configIcon ml-2" medium v-on="on" v-bind="attrs" @click="openExtraFee(item)">
+                mdi-code-string
+              </v-icon>
+            </template>
+            <span>Add extra fees</span>
+          </v-tooltip>
         </template>
 
         <!--expanded node view-->
@@ -314,6 +323,43 @@
         </v-card>
       </v-dialog>
 
+      <!--extra fees dialog-->
+      <v-dialog v-model="openExtraFeeDialogue" width="800">
+        <v-card>
+          <v-card-title class="text-h5"> Add GPU fees to your node with ID: {{ nodeToEdit.nodeId }} </v-card-title>
+
+          <v-card-text class="text">
+            <v-form v-model="isValidExtraFee">
+              <v-text-field
+                class="mt-4"
+                label="GPU Fees"
+                v-model="extraFee"
+                required
+                outlined
+                dense
+                type="number"
+                :error-messages="extraFeeErrorMessage"
+                :rules="[() => !!extraFee || 'This field is required']"
+              ></v-text-field>
+            </v-form>
+          </v-card-text>
+
+          <v-divider></v-divider>
+
+          <v-card-actions class="justify-end py-4">
+            <v-btn color="grey lighten-2 black--text" @click="openExtraFeeDialogue = false"> Cancel </v-btn>
+            <v-btn
+              color="primary white--text"
+              @click="saveExtraFee(extraFee)"
+              :loading="loadingExtraFee"
+              :disabled="!isValidExtraFee"
+            >
+              Add Fees
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
       <!-- delete item dialog-->
       <v-dialog v-model="openDeleteDialog" max-width="700px">
         <v-card>
@@ -372,6 +418,7 @@ import { addNodePublicConfig, deleteNode, nodeInterface } from "@/portal/lib/far
 import { byteToGB, generateNodeSummary, generateReceipt, getNodeUptimePercentage } from "@/portal/lib/nodes";
 import { hex2a } from "@/portal/lib/util";
 
+import { getDedicatedNodeExtraFee, setDedicatedNodeExtraFee } from "../lib/nodes";
 import ReceiptsCalendar from "./ReceiptsCalendar.vue";
 
 @Component({
@@ -437,6 +484,7 @@ export default class FarmNodesTable extends Vue {
     status: "",
     certificationType: "",
     dedicated: true,
+    extraFee: 0,
     rentContractId: 0,
     rentedByTwinId: 0,
     receipts: [],
@@ -447,10 +495,12 @@ export default class FarmNodesTable extends Vue {
     id: "",
   };
   openPublicConfigDialog = false;
+  openExtraFeeDialogue = false;
   @Prop({ required: true }) nodes!: nodeInterface[];
   @Prop({ required: true }) loadingNodes!: boolean;
   @Prop({ required: true }) initLoading!: boolean;
   @Prop({ required: true }) count!: string;
+  extraFee = 0;
   searchTerm = "";
   ip4 = "";
   gw4 = "";
@@ -458,9 +508,11 @@ export default class FarmNodesTable extends Vue {
   gw6 = "";
   domain = "";
   loadingPublicConfig = false;
+  loadingExtraFee = false;
   $api: any;
   isValidPublicConfig = false;
   hasPublicConfig = false;
+  isValidExtraFee = false;
   openWarningDialog = false;
   openRemoveConfigWarningDialog = false;
   ip4ErrorMessage = "";
@@ -468,6 +520,7 @@ export default class FarmNodesTable extends Vue {
   ip6ErrorMessage = "";
   gw6ErrorMessage = "";
   domainErrorMessage = "";
+  extraFeeErrorMessage = "";
   receipts = [];
 
   updated() {
@@ -629,6 +682,45 @@ export default class FarmNodesTable extends Vue {
     }
     this.openPublicConfigDialog = true;
   }
+
+  async openExtraFee(node: nodeInterface) {
+    this.nodeToEdit = node;
+    console.log("nodeId", this.nodeToEdit.nodeId);
+    this.extraFee = await getDedicatedNodeExtraFee(this.$api, this.nodeToEdit.nodeId);
+    this.openExtraFeeDialogue = true;
+  }
+
+  saveExtraFee(fee: number) {
+    this.loadingExtraFee = true;
+
+    setDedicatedNodeExtraFee(
+      this.$api,
+      this.$store.state.credentials.account.address,
+      this.nodeToEdit.nodeId,
+      fee,
+      async (res: { status: { type: string; asFinalized: string; isFinalized: string } }) => {
+        console.log("res", res);
+        switch (res.status.type) {
+          case "Ready":
+            this.$toasted.show(`Transaction submitted: Setting extra fee to node ${this.nodeToEdit.nodeId}`);
+            break;
+          case "Finalized":
+            this.$toasted.show(`Transaction succeeded: Fee is added to node ${this.nodeToEdit.nodeId}`);
+            this.loadingExtraFee = false;
+            this.openExtraFeeDialogue = false;
+            break;
+        }
+      },
+    ).catch((err: { message: string }) => {
+      console.log(err.message);
+      this.$toasted.show(`Error:  ${err.message}`, {
+        type: "error",
+      });
+      this.loadingExtraFee = false;
+      this.openExtraFeeDialogue = false;
+    });
+  }
+
   openDelete(node: { id: string }) {
     this.nodeToDelete = node;
     this.openDeleteDialog = true;

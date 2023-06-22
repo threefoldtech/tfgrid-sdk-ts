@@ -246,9 +246,27 @@ export async function cancelRentContract(api: apiInterface, address: string, con
     .signAndSend(address, { signer: injector.signer }, callback);
 }
 
+export async function setDedicatedNodeExtraFee(
+  api: apiInterface,
+  address: string,
+  nodeId: number,
+  fee: number,
+  callback: any,
+) {
+  const injector = await web3FromAddress(address);
+  return api.tx.smartContractModule
+    .setDedicatedNodeExtraFee(nodeId, fee)
+    .signAndSend(address, { signer: injector.signer }, callback);
+}
+
 export async function getActiveContracts(api: apiInterface, nodeId: string) {
   console.log("getActiveContracts", api.query.smartContractModule.activeNodeContracts(nodeId));
   return await api.query.smartContractModule.activeNodeContracts(nodeId);
+}
+
+export async function getDedicatedNodeExtraFee(api: apiInterface, nodeId: number) {
+  console.log("getDedicatedNodeExtraFee", api.query.smartContractModule.dedicatedNodesExtraFee(nodeId));
+  return await api.query.smartContractModule.dedicatedNodesExtraFee(nodeId);
 }
 
 export async function getNodeMintingFixupReceipts(nodeId: number) {
