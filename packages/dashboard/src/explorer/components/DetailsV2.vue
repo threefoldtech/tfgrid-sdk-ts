@@ -43,6 +43,9 @@
           <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="node && nodeGPU">
             <GPUDetails :nodeGPU="nodeGPU" />
           </v-col>
+          <v-snackbar :timeout="2000" :value="gpuError" color="transparent" text>
+            <v-alert class="ma-2" dense outlined type="error"> Failed to receive node GPUs information </v-alert>
+          </v-snackbar>
         </v-row>
       </div>
       <div v-if="loading" class="pt-10">
@@ -57,7 +60,7 @@ import axios from "axios";
 import { DocumentNode } from "graphql";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
-import { ICountry, INode, INodeStatistics } from "../graphql/api";
+import { ICountry, INode, INodeGPU, INodeStatistics } from "../graphql/api";
 import { GrafanaStatistics } from "../utils/getMetricsUrl";
 import mediaMatcher from "../utils/mediaMatcher";
 import CountryDetails from "./CountryDetails.vue";
@@ -92,8 +95,8 @@ export default class Details extends Vue {
   loading = false;
   grafanaUrl = "";
   interfaces = undefined;
-  nodeGPU = undefined;
-
+  nodeGPU: INodeGPU[] | undefined;
+  gpuError = false;
   data: any = {};
 
   get node(): INode {
@@ -137,8 +140,10 @@ export default class Details extends Vue {
                   timeout: 5000,
                 })
               ).data;
+              this.gpuError = false;
             } catch (error) {
-              console.log(error);
+              this.gpuError = true;
+              this.nodeGPU = undefined;
             }
           }
 

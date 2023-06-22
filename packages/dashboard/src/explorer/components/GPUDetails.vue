@@ -12,8 +12,8 @@
     <v-row>
       <v-col cols="12" class="pt-0">
         <!-- :cols="screen_max_800.matches ? 12 : screen_max_1000.matches ? 6 : 4" -->
-        <v-list>
-          <v-list-item v-if="gpuItem">
+        <v-list v-if="gpuItem">
+          <v-list-item>
             <v-list-item-content>
               <v-row class="d-flex justify-space-between">
                 <v-tooltip top nudge-bottom="30">
@@ -85,7 +85,8 @@
             </v-tooltip>
             {{ gpuItem?.contract }}
           </v-list-item>
-          <v-divider /> </v-list></v-col
+          <v-divider />
+        </v-list> </v-col
     ></v-row>
   </v-card>
 </template>
