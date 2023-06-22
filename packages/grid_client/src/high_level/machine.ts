@@ -137,12 +137,15 @@ class VMHL extends HighLevelBase {
       const nodeTwinId = await this.nodes.getNodeTwinId(nodeId);
       const gpuList = await this.rmb.request([nodeTwinId], "zos.gpu.list", "");
       if (gpuList.length <= 0) {
-        throw Error(`The selected node ${nodeId} doesn't have gpu`);
+        throw Error(`The selected node ${nodeId} doesn't have GPU card`);
       }
       for (const g of gpu) {
         const found = gpuList.filter(item => item.id === g);
         if (found.length === 0) {
-          throw Error(`Couldn't find the gpu with id: ${g} in node: ${nodeId}`);
+          throw Error(`Couldn't find the GPU with id: "${g}" in node: ${nodeId}`);
+        }
+        if (found[0].contract !== 0) {
+          throw Error(`This GPU: "${g}" is currently in use by another VM with contract id: ${found[0].contract}`);
         }
       }
 
