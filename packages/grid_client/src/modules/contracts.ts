@@ -18,6 +18,7 @@ import {
   ContractsByTwinId,
   ContractState,
   CreateServiceContractModel,
+  GetDedicatedNodePriceModel,
   GetServiceContractModel,
   NameContractCreateModel,
   NameContractGetModel,
@@ -27,6 +28,7 @@ import {
   ServiceContractApproveModel,
   ServiceContractBillModel,
   ServiceContractCancelModel,
+  SetDedicatedNodeExtraFeesModel,
   SetServiceContractFeesModel,
   SetServiceContractMetadataModel,
 } from "./models";
@@ -91,6 +93,12 @@ class Contracts {
   @validateInput
   async get_name_contract(options: NameContractGetModel) {
     return this.client.contracts.getContractIdByName(options);
+  }
+
+  @expose
+  @validateInput
+  async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceModel) {
+    return this.client.contracts.getDedicatedNodeExtraFee(options);
   }
 
   @expose
@@ -181,6 +189,7 @@ class Contracts {
   async setMetadataServiceContract(options: SetServiceContractMetadataModel) {
     return (await this.client.contracts.setServiceMetadata(options)).apply();
   }
+
   @expose
   @validateInput
   async getServiceContract(options: GetServiceContractModel) {
@@ -210,6 +219,13 @@ class Contracts {
       await this.invalidateDeployment(id);
     }
     return contracts;
+  }
+
+  @expose
+  @validateInput
+  @checkBalance
+  async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesModel) {
+    return (await this.client.contracts.setDedicatedNodeExtraFee(options)).apply();
   }
 
   /**

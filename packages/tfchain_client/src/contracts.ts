@@ -146,6 +146,12 @@ class QueryContracts {
     const res = await this.client.api.query.smartContractModule.serviceContracts(options.serviceId);
     return res.toPrimitive() as unknown as ServiceContract;
   }
+
+  @checkConnection
+  async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceOptions): Promise<number> {
+    const res = await this.client.api.query.smartContractModule.dedicatedNodesExtraFee(options.nodeId);
+    return res.toPrimitive() as number;
+  }
 }
 
 export interface CreateNodeOptions {
@@ -187,6 +193,14 @@ export interface SetServiceFeesOptions {
   serviceId: number;
   baseFee: number;
   variableFee: number;
+}
+export interface SetDedicatedNodeExtraFeesOptions {
+  nodeId: number;
+  extraFee: number;
+}
+
+export interface GetDedicatedNodePriceOptions {
+  nodeId: number;
 }
 
 export interface SetServiceMetadataOptions {
@@ -306,6 +320,12 @@ class Contracts extends QueryContracts {
       options.variableFee,
     );
     return this.client.patchExtrinsic<ServiceContract>(extrinsic);
+  }
+
+  @checkConnection
+  async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesOptions) {
+    const extrinsic = this.client.api.tx.smartContractModule.setDedicatedNodeExtraFee(options.nodeId, options.extraFee);
+    return this.client.patchExtrinsic(extrinsic);
   }
 
   @checkConnection
