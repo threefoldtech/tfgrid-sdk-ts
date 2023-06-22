@@ -1,5 +1,5 @@
 import { Client, QueryClient } from "./client";
-import { ExtrinsicResult, PublicIp } from "./types";
+import { PublicIp } from "./types";
 import { checkConnection } from "./utils";
 
 const TWO_WEEKS = 1209600000;
