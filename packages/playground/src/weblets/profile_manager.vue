@@ -41,6 +41,20 @@
             </p>
           </template>
         </div>
+        <v-tooltip text="Logout" location="bottom" :disabled="!profileManager.profile">
+          <template #activator="{ props }">
+            <VBtn
+              color="error"
+              variant="tonal"
+              @click.stop="logout"
+              v-if="profileManager.profile"
+              :disabled="updatingSSH || generatingSSH || loadingBalance"
+              class="ml-2"
+              v-bind="props"
+              icon="mdi-logout"
+            />
+          </template>
+        </v-tooltip>
       </VCard>
     </template>
 
