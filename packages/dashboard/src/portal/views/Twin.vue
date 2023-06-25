@@ -62,13 +62,6 @@
               <v-list-item> {{ $store.state.credentials.twin.relay }} </v-list-item>
             </v-col>
           </v-row>
-          <!-- <v-list-item> ID: {{ $store.state.credentials.twin.id }} </v-list-item>
-          <v-divider></v-divider>
-
-          <v-list-item> Address: {{ $store.state.credentials.account.address }} </v-list-item>
-          <v-divider></v-divider>
-
-          <v-list-item> Relay: {{ $store.state.credentials.twin.relay }} </v-list-item> -->
         </v-list>
         <v-card-actions class="justify-end">
           <v-btn @click="editTwin" color="primary">Edit</v-btn>
