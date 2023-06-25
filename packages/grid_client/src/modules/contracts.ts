@@ -98,7 +98,8 @@ class Contracts {
   @expose
   @validateInput
   async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceModel) {
-    return this.client.contracts.getDedicatedNodeExtraFee(options);
+    // converting fees from milli after getting
+    return (await this.client.contracts.getDedicatedNodeExtraFee(options)) / 1000;
   }
 
   @expose
@@ -225,7 +226,13 @@ class Contracts {
   @validateInput
   @checkBalance
   async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesModel) {
-    return (await this.client.contracts.setDedicatedNodeExtraFee(options)).apply();
+    // converting fees from usd to milli before setting
+    return (
+      await this.client.contracts.setDedicatedNodeExtraFee({
+        nodeId: options.nodeId,
+        extraFee: options.extraFee * 1000,
+      })
+    ).apply();
   }
 
   /**
