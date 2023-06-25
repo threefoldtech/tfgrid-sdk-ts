@@ -1,3 +1,4 @@
+import { Decimal } from "decimal.js";
 import * as PATH from "path";
 
 import { TFClient } from "../clients/tf-grid/client";
@@ -98,7 +99,7 @@ class Contracts {
   @expose
   @validateInput
   async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceModel) {
-    return this.client.contracts.getDedicatedNodeExtraFee(options);
+    return await this.client.contracts.getDedicatedNodeExtraFee(options);
   }
 
   @expose

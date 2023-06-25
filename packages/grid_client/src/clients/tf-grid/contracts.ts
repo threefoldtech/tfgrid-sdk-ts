@@ -1,4 +1,10 @@
-import { ContractLockOptions, Contracts } from "@threefold/tfchain_client";
+import {
+  ContractLockOptions,
+  Contracts,
+  ExtrinsicResult,
+  GetDedicatedNodePriceOptions,
+  SetDedicatedNodeExtraFeesOptions,
+} from "@threefold/tfchain_client";
 import { Decimal } from "decimal.js";
 
 import { ContractStates } from "../../modules";
@@ -184,6 +190,24 @@ class TFContracts extends Contracts {
     }
     await this.client.applyAllExtrinsics(extrinsics);
     return ids;
+  }
+
+  async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceOptions): Promise<number> {
+    // converting fees from milli to usd before getting
+    const fee = new Decimal(await super.getDedicatedNodeExtraFee(options));
+    const feeUSD = fee.div(10 ** 3).toNumber();
+    return feeUSD;
+  }
+
+  async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesOptions) {
+    // converting fees from usd to milli before setting
+    const fee = new Decimal(options.extraFee);
+    const feeUSD = fee.mul(10 ** 3).toNumber();
+
+    return await super.setDedicatedNodeExtraFee({
+      nodeId: options.nodeId,
+      extraFee: feeUSD,
+    });
   }
 }
 
