@@ -418,6 +418,7 @@
 </template>
 <script lang="ts">
 import { QueryClient } from "@threefold/tfchain_client";
+import { Decimal } from "decimal.js";
 import jsPDF from "jspdf";
 import { default as PrivateIp } from "private-ip";
 import { Component, Prop, Vue } from "vue-property-decorator";
@@ -696,15 +697,20 @@ export default class FarmNodesTable extends Vue {
   async openExtraFee(node: nodeInterface) {
     this.nodeToEdit = node;
     // convert fees from USD to mili USD while getting
-    this.extraFee =
-      (await this.queryClient.contracts.getDedicatedNodeExtraFee({ nodeId: this.nodeToEdit.nodeId })) / 1000;
+    const fee = new Decimal(
+      await this.queryClient.contracts.getDedicatedNodeExtraFee({ nodeId: this.nodeToEdit.nodeId }),
+    );
+    const feeUSD = fee.div(10 ** 3).toNumber();
+    this.extraFee = feeUSD;
     this.openExtraFeeDialogue = true;
   }
 
   async saveExtraFee(fee: number) {
     this.loadingExtraFee = true;
     // convert fees from mili USD to USD while setting
-    setDedicatedNodeExtraFee(this.$store.state.credentials.account.address, this.nodeToEdit.nodeId, fee * 1000)
+    const feeDecimal = new Decimal(fee);
+    const feeUSD = feeDecimal.mul(10 ** 3).toNumber();
+    setDedicatedNodeExtraFee(this.$store.state.credentials.account.address, this.nodeToEdit.nodeId, feeUSD)
       .then(() => {
         this.$toasted.show(`Transaction succeeded: Fee is added to node ${this.nodeToEdit.nodeId}`);
         this.loadingExtraFee = false;
