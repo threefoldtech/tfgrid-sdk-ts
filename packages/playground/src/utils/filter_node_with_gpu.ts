@@ -44,7 +44,7 @@ export default class GPUNode {
           publicIPs: machine.publicIpv4,
           availableFor: this.grid.twinId,
           hasGPU: machine.hasGPU,
-          rentedBy: machine.rentedBy,
+          rentedBy: this.grid.twinId,
         };
         return await this.grid.capacity.filterNodes(filters);
       }),

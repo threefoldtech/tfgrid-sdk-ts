@@ -47,7 +47,7 @@ async function createMachine(grid: GridClient, machine: Machine, nodePicker: Nod
     publicIPs: machine.publicIpv4,
     availableFor: grid.twinId,
     hasGPU: machine.hasGPU,
-    rentedBy: machine.rentedBy,
+    rentedBy: grid.twinId,
   };
 
   const vm = new MachineModel();
@@ -145,7 +145,6 @@ export interface Machine {
   country?: string;
   qsfsDisks?: QsfsDisk[];
   hasGPU?: boolean;
-  rentedBy?: number;
   nodeId?: number;
   gpus?: string[];
 }

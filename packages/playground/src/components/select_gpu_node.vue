@@ -161,7 +161,6 @@ async function checkNode() {
               envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
               rootFilesystemSize: 2,
               hasGPU: filters.hasGPU,
-              rentedBy: filters.hasGPU ? profileManager.profile!.twinId : undefined,
             },
           ],
           network: { addAccess: filters.wireguard },

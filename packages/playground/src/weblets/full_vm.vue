@@ -304,7 +304,6 @@ async function deploy() {
           envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
           rootFilesystemSize: 2,
           hasGPU: hasGPU.value,
-          rentedBy: hasGPU.value ? profileManager.profile!.twinId : undefined,
           nodeId: hasGPU.value ? selectedNodewithCards.value.nodeId : undefined,
           gpus: hasGPU.value ? selectedNodewithCards.value.cards.map(card => card.id) : undefined,
         },
