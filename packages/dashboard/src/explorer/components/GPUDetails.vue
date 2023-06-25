@@ -12,7 +12,7 @@
     <v-row>
       <v-col cols="12" class="pt-0">
         <!-- :cols="screen_max_800.matches ? 12 : screen_max_1000.matches ? 6 : 4" -->
-        <v-list v-if="gpuItem">
+        <v-list v-if="gpuItem && nodeGPUitems != null">
           <v-list-item>
             <v-list-item-content>
               <v-tooltip top nudge-bottom="30">
@@ -81,34 +81,73 @@
             {{ gpuItem?.contract }}
           </v-list-item>
           <v-divider />
-        </v-list> </v-col
-    ></v-row>
+        </v-list>
+        <v-sheet v-else class="d-flex justify-center align-center pt-0" height="230">
+          <div class="text-center">
+            <v-alert class="ma-2" dense outlined type="error">
+              Failed to receive node GPUs information
+              <template v-slot:append>
+                <v-icon class="ml-2 mt-1" @click="loadGpuDetails">mdi-reload</v-icon>
+              </template>
+            </v-alert>
+          </div>
+        </v-sheet>
+      </v-col>
+    </v-row>
   </v-card>
 </template>
 <script lang="ts">
+import axios from "axios";
 import { Component, Prop, Vue } from "vue-property-decorator";
 
 import { INodeGPU } from "../graphql/api";
 
 @Component({})
 export default class GPUDetails extends Vue {
-  @Prop({ required: true }) nodeGPU!: INodeGPU[];
-  nodeGPUitems: {
-    text: string;
-    value: INodeGPU;
+  @Prop({ required: true }) nodeGPU!: INodeGPU[] | null;
+  @Prop({ required: true }) nodeId!: number;
+  nodeGPUitems:
+    | {
+        text: string;
+        value: INodeGPU;
+        disabled: false;
+      }[]
+    | null =
+    this.$props.nodeGPU != null
+      ? this.$props.nodeGPU.map((item: INodeGPU) => {
+          return {
+            text: item.id,
+            value: item,
+            disabled: false,
+          };
+        })
+      : null;
 
-    disabled: false;
-  }[] = this.$props.nodeGPU.map((item: INodeGPU) => {
-    return {
-      text: item.id,
-      value: item,
-      disabled: false,
-    };
-  });
-
-  gpuItem = this.$props.nodeGPU[0];
+  gpuItem = this.$props.nodeGPU ? this.$props.nodeGPU[0] : null;
   copy(id: string) {
     navigator.clipboard.writeText(id);
+  }
+  async loadGpuDetails() {
+    console.log("Loading");
+    let nodeGPU = null;
+    try {
+      nodeGPU = await (
+        await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/gpu`, {
+          timeout: 5000,
+        })
+      ).data;
+    } catch (error) {
+      this.nodeGPU = null;
+    }
+    if (nodeGPU == null) return;
+    this.nodeGPUitems = nodeGPU.map((item: INodeGPU) => {
+      return {
+        text: item.id,
+        value: item,
+        disabled: false,
+      };
+    });
+    this.gpuItem = nodeGPU[0];
   }
 }
 </script>

@@ -40,16 +40,13 @@
             <InterfacesDetails :interfaces="interfaces" />
           </v-col>
 
-          <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="node && nodeGPU">
-            <GPUDetails :nodeGPU="nodeGPU" />
+          <v-col
+            :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4"
+            v-if="node && (nodeGPU || gpuError)"
+          >
+            <GPUDetails :nodeGPU="nodeGPU" :nodeId="nodeId" />
           </v-col>
-          <v-snackbar :timeout="2000" :value="gpuError" color="transparent" text>
-            <v-alert class="ma-2" dense outlined type="error"> Failed to receive node GPUs information </v-alert>
-          </v-snackbar>
         </v-row>
-      </div>
-      <div v-if="loading" class="pt-10">
-        <v-progress-circular indeterminate color="primary" :size="100" />
       </div>
     </v-sheet>
   </v-bottom-sheet>
@@ -132,21 +129,7 @@ export default class Details extends Vue {
           this.data.node = await fetch(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}`).then(res =>
             res.json(),
           );
-
-          if (this.data.node.num_gpu) {
-            try {
-              this.nodeGPU = await (
-                await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/gpu`, {
-                  timeout: 5000,
-                })
-              ).data;
-              this.gpuError = false;
-            } catch (error) {
-              this.gpuError = true;
-              this.nodeGPU = undefined;
-            }
-          }
-
+          await this.loadGpuDetails(94);
           try {
             this.data.nodeStatistics = await (
               await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/statistics`, {
@@ -168,7 +151,20 @@ export default class Details extends Vue {
         this.loading = false;
       });
   }
-
+  async loadGpuDetails(nodeId: number) {
+    if (!this.data.node.num_gpu) return;
+    try {
+      this.nodeGPU = await (
+        await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${94}/gpu`, {
+          timeout: 5000,
+        })
+      ).data;
+      this.gpuError = false;
+    } catch (error) {
+      this.gpuError = true;
+      this.nodeGPU = undefined;
+    }
+  }
   destroyed() {
     this.screen_max_1200.destry();
     this.screen_max_700.destry();
