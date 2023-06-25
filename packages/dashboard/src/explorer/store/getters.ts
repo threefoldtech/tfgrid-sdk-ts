@@ -182,6 +182,7 @@ export default {
   getNodesTablePageSize: state => state.nodesTablePageSize,
   getNodesUpFilter: state => state.nodesUpFilter,
   getNodesGatewayFilter: state => state.nodesGatewayFilter,
+  getNodesGPUFilter: state => state.nodesGPUFilter,
 
   getNodesFilter: state => state.nodesFilter,
 } as GetterTree<IState, IState>;

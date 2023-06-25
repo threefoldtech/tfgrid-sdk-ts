@@ -39,6 +39,13 @@
           <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="node && interfaces">
             <InterfacesDetails :interfaces="interfaces" />
           </v-col>
+
+          <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="node && nodeGPU">
+            <GPUDetails :nodeGPU="nodeGPU" />
+          </v-col>
+          <v-snackbar :timeout="2000" :value="gpuError" color="transparent" text>
+            <v-alert class="ma-2" dense outlined type="error"> Failed to receive node GPUs information </v-alert>
+          </v-snackbar>
         </v-row>
       </div>
       <div v-if="loading" class="pt-10">
@@ -53,11 +60,12 @@ import axios from "axios";
 import { DocumentNode } from "graphql";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
-import { ICountry, INode, INodeStatistics } from "../graphql/api";
+import { ICountry, INode, INodeGPU, INodeStatistics } from "../graphql/api";
 import { GrafanaStatistics } from "../utils/getMetricsUrl";
 import mediaMatcher from "../utils/mediaMatcher";
 import CountryDetails from "./CountryDetails.vue";
 import FarmDetails from "./FarmDetails.vue";
+import GPUDetails from "./GPUDetails.vue";
 import InterfacesDetails from "./InterfacesDetails.vue";
 import LocationDetails from "./LocationDetails.vue";
 import NodeDetails from "./NodeDetails.vue";
@@ -74,6 +82,7 @@ import TwinDetails from "./TwinDetails.vue";
     TwinDetails,
     PublicConfigDetails,
     InterfacesDetails,
+    GPUDetails,
     NodeUsedResources,
   },
 })
@@ -86,7 +95,8 @@ export default class Details extends Vue {
   loading = false;
   grafanaUrl = "";
   interfaces = undefined;
-
+  nodeGPU: INodeGPU[] | undefined;
+  gpuError = false;
   data: any = {};
 
   get node(): INode {
@@ -107,7 +117,6 @@ export default class Details extends Vue {
   @Watch("open", { immediate: true })
   onOpenChange() {
     if (!this.open) return;
-
     this.loading = true;
     const { query, variables } = this;
     this.$apollo
@@ -123,6 +132,21 @@ export default class Details extends Vue {
           this.data.node = await fetch(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}`).then(res =>
             res.json(),
           );
+
+          if (this.data.node.num_gpu) {
+            try {
+              this.nodeGPU = await (
+                await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/gpu`, {
+                  timeout: 5000,
+                })
+              ).data;
+              this.gpuError = false;
+            } catch (error) {
+              this.gpuError = true;
+              this.nodeGPU = undefined;
+            }
+          }
+
           try {
             this.data.nodeStatistics = await (
               await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/statistics`, {
