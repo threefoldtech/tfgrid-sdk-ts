@@ -257,7 +257,7 @@
             <v-alert class="ma-2" dense outlined type="error">
               Failed to receive node GPUs information
               <template v-slot:append>
-                <v-icon class="pl-2 pt-1" @click="loadGPUitems">mdi-reload</v-icon>
+                <v-icon class="ml-2 mt-1" @click="loadGPUitems">mdi-reload</v-icon>
               </template>
             </v-alert>
           </div>
