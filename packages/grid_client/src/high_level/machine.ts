@@ -45,7 +45,7 @@ class VMHL extends HighLevelBase {
     corex = false,
     solutionProviderId: number,
     zlogsOutput?: string,
-    gpu: string[] = [],
+    gpus: string[] = [],
   ): Promise<[TwinDeployment[], string]> {
     const deployments: TwinDeployment[] = [];
     const workloads: Workload[] = [];
@@ -133,13 +133,13 @@ class VMHL extends HighLevelBase {
       }
     }
 
-    if (gpu && gpu.length > 0) {
+    if (gpus && gpus.length > 0) {
       const nodeTwinId = await this.nodes.getNodeTwinId(nodeId);
       const gpuList = await this.rmb.request([nodeTwinId], "zos.gpu.list", "");
       if (gpuList.length <= 0) {
         throw Error(`The selected node ${nodeId} doesn't have GPU card`);
       }
-      for (const g of gpu) {
+      for (const g of gpus) {
         const found = gpuList.filter(item => item.id === g);
         if (found.length === 0) {
           throw Error(`Couldn't find the GPU with id: "${g}" in node: ${nodeId}`);
@@ -271,7 +271,7 @@ class VMHL extends HighLevelBase {
         description,
         0,
         corex,
-        gpu,
+        gpus,
       ),
     );
 
