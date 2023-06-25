@@ -271,7 +271,7 @@
             color="primary"
             variant="text"
             @click="updateSSH"
-            :disabled="!ssh || profileManager.profile.ssh === ssh || updatingSSH"
+            :disabled="!ssh || profileManager.profile.ssh === ssh || updatingSSH || !isEnoughBalance(balance)"
             :loading="updatingSSH"
           >
             Update Public SSH Key
