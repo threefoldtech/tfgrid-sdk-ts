@@ -13,16 +13,12 @@
     <template v-slot:table>
       <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center">
         <div>
-          <v-switch
-            label="Gateways (Only)"
-            style="margin-bottom: -30px"
-            v-model="gatewayFilter"
-            @change="requestNodes"
-          />
+          <v-switch label="Gateways (Only)" hide-details v-model="gatewayFilter" @change="requestNodes" />
+          <v-switch label="GPU Node (Only)" hide-details v-model="gpuFilter" @change="requestNodes" />
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
               <div v-bind="attrs" v-on="on">
-                <v-switch label="Online (Only)" v-model="onlineFilter" @change="requestNodes" />
+                <v-switch label="Online (Only)" hide-details v-model="onlineFilter" @change="requestNodes" />
               </div>
             </template>
             <span>Does not include Standby nodes</span>
@@ -152,6 +148,7 @@ export default class Nodes extends Vue {
     { text: "MRU", value: "mru", align: "center", customAlign: "text-center", description: "Total Memory" },
     { text: "SRU", value: "sru", align: "center", customAlign: "text-center", description: "Total SSD" },
     { text: "HRU", value: "hru", align: "center", customAlign: "text-center", description: "Total HDD" },
+    { text: "GPU", value: "num_gpu", align: "center", customAlign: "text-center", description: "GPU card" },
     { text: "Up Time", value: "uptime", align: "center", customAlign: "text-center" },
     { text: "Status", value: "status", align: "center", customAlign: "text-center" },
   ];
@@ -244,6 +241,15 @@ export default class Nodes extends Vue {
 
   set gatewayFilter(value) {
     this.$store.commit("explorer/" + MutationTypes.SET_GATEWAY_FILTER, value);
+  }
+
+  get gpuFilter() {
+    return this.$store.getters["explorer/getNodesGPUFilter"];
+  }
+
+  set gpuFilter(value) {
+    console.log("set gpuFilter");
+    this.$store.commit("explorer/" + MutationTypes.SET_GPU_FILTER, value);
   }
 
   get onlineFilter() {

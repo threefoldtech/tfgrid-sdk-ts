@@ -93,6 +93,7 @@ export interface IState {
   nodesTablePageSize: number;
   nodesGatewayFilter: boolean;
   nodesUpFilter: boolean;
+  nodesGPUFilter: boolean;
 
   /* Refactored Data */
   farms: IPaginationData<IFarm>;
@@ -160,7 +161,7 @@ export default {
   nodesTablePageSize: 10,
   nodesUpFilter: true,
   nodesGatewayFilter: false,
-
+  nodesGPUFilter: false,
   /* Refactored data */
   farms: createPaginationData(),
 } as IState;

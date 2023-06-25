@@ -94,8 +94,16 @@ export interface INode {
   certificationType: "Diy" | "Certified";
   farmingPolicyName: string;
   countryFullName: string;
+  num_gpu: number;
+  extra_fee: number;
 }
 
+export interface INodeGPU {
+  id: string;
+  vendor: string;
+  device: string;
+  contract?: number;
+}
 export interface INodeStatisticsUser {
   deployments: number;
   workloads: number;
