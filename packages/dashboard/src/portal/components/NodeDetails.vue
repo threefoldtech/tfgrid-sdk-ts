@@ -1,5 +1,5 @@
 <template>
-  <v-row>
+  <v-row class="ma-2">
     <v-col :cols="colSize">
       <v-card flat color="transparent" tag="div">
         <!-- Title -->
@@ -103,7 +103,7 @@
         </v-row>
       </v-card>
     </v-col>
-    <v-col :cols="colSize">
+    <v-col :cols="colSize" :class="{ 'mt-n8': colSize === 6 }">
       <v-card flat color="transparent" tag="div">
         <!-- Title -->
         <v-list-item>
@@ -155,7 +155,7 @@
       </v-card>
     </v-col>
 
-    <v-col v-if="node.resources.gpu > 0" :cols="colSize">
+    <v-col v-if="node.resources.gpu > 0" class="mt-n8" style="min-width: 400px">
       <v-card flat color="transparent" tag="div">
         <!-- Title -->
         <v-list-item class="mb-n2">
@@ -171,7 +171,7 @@
         <!-- Details -->
         <v-row v-if="!loading && nodeGPUitems != null && gpuItem">
           <v-col cols="12">
-            <v-list class="pb-0">
+            <v-list>
               <v-list-item>
                 <v-list-item-content>
                   <v-tooltip top nudge-bottom="30">
@@ -182,7 +182,7 @@
                           lose-icon="mdi-delete"
                           :color="gpuItem.contract ? 'warning' : 'success'"
                           x-small
-                          class="mb-1"
+                          class="mb-1 ml-3"
                           >{{ gpuItem.contract ? "Reserved" : "Available" }}</v-chip
                         >
                       </v-list-item-title>
@@ -191,9 +191,9 @@
                   </v-tooltip>
                 </v-list-item-content>
 
-                <v-col class="pa-0 mr-n2" ref="selection">
+                <v-col class="pa-0 d-flex justify-end">
                   <v-select
-                    style="max-width: 185px"
+                    style="max-width: 270px"
                     v-if="nodeGPUitems?.length > 1"
                     append-outer-icon="mdi-content-copy"
                     hide-details
@@ -248,7 +248,7 @@
           </v-col></v-row
         >
         <!-- Errors and loading -->
-        <v-sheet v-else class="d-flex justify-center align-center pt-0" height="180">
+        <v-sheet v-else class="d-flex justify-center align-center pt-0" height="230">
           <div v-if="loading" class="text-center">
             <v-progress-circular indeterminate></v-progress-circular>
             <p class="pt-2">Loading GPU details</p>
@@ -257,7 +257,7 @@
             <v-alert class="ma-2" dense outlined type="error">
               Failed to receive node GPUs information
               <template v-slot:append>
-                <v-icon @click="loadGPUitems">mdi-reload</v-icon>
+                <v-icon class="pl-2 pt-1" @click="loadGPUitems">mdi-reload</v-icon>
               </template>
             </v-alert>
           </div>
@@ -282,7 +282,7 @@ export default class NodeDetails extends Vue {
     farm: { id: string; name: string; farmCertType: string; pubIps: string };
   };
   get colSize() {
-    if (this.node.resources.gpu > 0) return 3;
+    if (this.node.resources.gpu > 0) return 6;
     else return 4;
   }
   loading = false;
