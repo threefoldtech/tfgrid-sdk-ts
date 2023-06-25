@@ -121,8 +121,8 @@
         <input-tooltip
           inline
           tooltip="
-          Selecting a Node with GPU: Important Note
-          When selecting a node with GPU resources, please ensure that you have rented the node. To rent a node and gain access to GPU capabilities, you can utilize our dashboard.
+          Selecting a Node with GPU.
+          When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
           "
         >
           <v-switch color="primary" inset label="GPU" v-model="hasGPU" />

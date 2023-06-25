@@ -2,8 +2,8 @@
   <section>
     <h6 class="text-h5 mb-4">Select a node</h6>
     <v-alert class="mb-2" type="warning" variant="tonal" v-if="!loadingNodes && selectedNode === undefined">
-      Seems to be there are no nodes rented by you that match your selected resources, try to reduce/change you'r
-      resources and try again.
+      There are no nodes rented by you that match your selected resources, try to change your resources or rent a node
+      and try again.
     </v-alert>
 
     <input-validator :rules="[validators.required('Node id is required.')]" :value="selectedNode" #="{ props }">
@@ -33,7 +33,7 @@
       #="{ props }"
     >
       <input-tooltip
-        tooltip="Please select at least one card from the available node cards. Note that if you have a deployment that already uses certain cards, they will not appear in the selection area. You have the option to select one or more cards.."
+        tooltip="Please select at least one card from the available GPU cards. Note that if you have a deployment that already uses certain cards, they will not appear in the selection area. You have the option to select one or more cards.."
       >
         <v-autocomplete
           select
@@ -118,7 +118,7 @@ watch(selectedNode, async () => {
     const gpuNodeHelper = new GPUNode(grid);
     if (selectedNode.value) {
       gpuNodeHelper.getNodeCards(selectedNode.value).then(res => {
-        nodeCards.value = res.filter(card => card.contract == 0);
+        nodeCards.value = res.filter(card => card.contract === 0);
         loadingCards.value = false;
       });
     }

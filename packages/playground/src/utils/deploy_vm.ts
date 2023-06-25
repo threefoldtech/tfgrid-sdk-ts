@@ -64,7 +64,6 @@ async function createMachine(grid: GridClient, machine: Machine, nodePicker: Nod
 
   vm.disks = createDisks(machine.disks);
   vm.gpus = machine.gpus;
-  console.log("vm.node_id: ", vm.node_id);
   vm.public_ip = machine.publicIpv4 || false;
   vm.public_ip6 = machine.publicIpv6 || false;
   vm.planetary = machine.planetary ?? true;
