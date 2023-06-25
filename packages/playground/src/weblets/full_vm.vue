@@ -203,7 +203,6 @@
     </d-tabs>
 
     <template #footer-actions>
-      <!-- (hasGPU && availableNodesWithGPU.length < 1) -->
       <v-btn
         color="primary"
         variant="tonal"
@@ -294,9 +293,6 @@ async function deploy() {
     const grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);
-
-    console.log("nodeId: ", selectedNodewithCards.value.nodeId);
-    console.log("selectedNodewithCards: ", selectedNodewithCards.value.cards);
 
     const vm = await deployVM(grid!, {
       name: name.value,

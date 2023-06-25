@@ -1,7 +1,7 @@
 <template>
   <section>
     <h6 class="text-h5 mb-4">Select a node</h6>
-    <v-alert class="mb-2" type="warning" variant="tonal" v-if="selectedNode == undefined">
+    <v-alert class="mb-2" type="warning" variant="tonal" v-if="selectedNode === undefined">
       Seems to be there are no nodes rented by you that match your selected resources, try to reduce/change you'r
       resources and try again.
     </v-alert>
@@ -32,7 +32,9 @@
       :rules="[validators.required('Please select at least one card.')]"
       :value="availableNodesWithGPU[0]"
     >
-      <input-tooltip tooltip="The rented node id, this node should have GPUs.">
+      <input-tooltip
+        tooltip="Please select at least one card from the available node cards. Note that if you have a deployment that already uses certain cards, they will not appear in the selection area. You have the option to select one or more cards.."
+      >
         <v-autocomplete
           select
           label="Node cards"
@@ -92,8 +94,6 @@ const selectedCards = ref<Array<string>>([]);
 const nodeCards = ref<Array<NodeGPUCardType>>([]);
 
 watch(selectedCards, async () => {
-  console.log(selectedCards.value);
-  console.log(nodeCards.value);
   const cards: NodeGPUCardType[] = [];
   for (const card of nodeCards.value) {
     for (const selectedCard of selectedCards.value) {
