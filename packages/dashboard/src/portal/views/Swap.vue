@@ -40,7 +40,7 @@
                   () =>
                     (amount.toString().split('.').length > 1 ? amount.toString().split('.')[1].length <= 3 : true) ||
                     'Amount must have 3 decimals only',
-                  () => amount >= 2 || 'Amount should at least 2 TFT',
+                  () => amount >= 2 || 'Amount should be at least 2 TFT',
                   () => amount < parseFloat($store.state.credentials.balance.free) || 'Amount cannot exceed balance',
                 ]"
               ></v-text-field>
