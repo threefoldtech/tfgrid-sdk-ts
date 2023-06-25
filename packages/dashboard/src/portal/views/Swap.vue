@@ -1,3 +1,5 @@
+<!-- template - v-card - v-tabs - v-tab-item - template - vacard flat  -->
+
 <template>
   <v-container>
     <DepositDialog
@@ -13,49 +15,117 @@
     <v-container v-if="openWithdrawDialog">
       <v-dialog transition="dialog-bottom-transition" max-width="900" v-model="openWithdrawDialog">
         <v-card>
-          <v-toolbar color="primary" dark>Withdraw TFT</v-toolbar>
-          <v-card-title>
-            Interact with the bridge in order to withdraw your TFT to
-            {{ selectedName.toUpperCase() }} (withdraw fee is: {{ withdrawFee }} TFT)
-          </v-card-title>
-          <v-card-text>
-            <v-form v-model="isValidSwap">
-              <v-text-field
-                v-model="target"
-                :label="selectedName.toUpperCase() + ' Target Wallet Address'"
-                :error-messages="targetError"
-                :disabled="validatingAddress"
-                :loading="validatingAddress"
-                :rules="[() => !!target || 'This field is required', swapAddressCheck]"
-              >
-              </v-text-field>
-              <v-text-field
-                @paste.prevent
-                label="Amount (TFT)"
-                v-model="amount"
-                type="number"
-                onkeydown="javascript: return event.keyCode == 69 || /^\+$/.test(event.key) ? false : true"
-                :rules="[
-                  () => !!amount || 'This field is required',
-                  () =>
-                    (amount.toString().split('.').length > 1 ? amount.toString().split('.')[1].length <= 3 : true) ||
-                    'Amount must have 3 decimals only',
-                  () => amount >= 2 || 'Amount should be at least 2 TFT',
-                  () => amount < parseFloat($store.state.credentials.balance.free) || 'Amount cannot exceed balance',
-                ]"
-              ></v-text-field>
-            </v-form>
-          </v-card-text>
-          <v-card-actions class="justify-end">
-            <v-btn @click="openWithdrawDialog = false" color="grey lighten-2 black--text">Close</v-btn>
-            <v-btn
-              class="primary white--text"
-              @click="withdrawTFT(target, amount)"
-              :disabled="!isValidSwap || validatingAddress"
-              :loading="loadingWithdraw"
-              >Submit</v-btn
-            >
-          </v-card-actions>
+          <v-tabs color="primary">
+            <v-tab value="address">By Address</v-tab>
+            <v-tab value="twinId">By Twin ID</v-tab>
+
+            <v-tab-item>
+              <template>
+                <v-card flat>
+                  <v-toolbar color="primary" dark>Withdraw TFT</v-toolbar>
+                  <v-card-title>
+                    Interact with the bridge in order to withdraw your TFT to
+                    {{ selectedName.toUpperCase() }} (withdraw fee is: {{ withdrawFee }} TFT)
+                  </v-card-title>
+                  <v-card-text>
+                    <v-form v-model="isValidSwap">
+                      <v-text-field
+                        v-model="target"
+                        :label="selectedName.toUpperCase() + ' Target Wallet Address'"
+                        :error-messages="targetError"
+                        :disabled="validatingAddress"
+                        :loading="validatingAddress"
+                        :rules="[() => !!target || 'This field is required', swapAddressCheck]"
+                      >
+                      </v-text-field>
+                      <v-text-field
+                        @paste.prevent
+                        label="Amount (TFT)"
+                        v-model="amount"
+                        type="number"
+                        onkeydown="javascript: return event.keyCode == 69 || /^\+$/.test(event.key) ? false : true"
+                        :rules="[
+                          () => !!amount || 'This field is required',
+                          () =>
+                            (amount.toString().split('.').length > 1
+                              ? amount.toString().split('.')[1].length <= 3
+                              : true) || 'Amount must have 3 decimals only',
+                          () => amount >= 2 || 'Amount should be at least 2 TFT',
+                          () =>
+                            amount < parseFloat($store.state.credentials.balance.free) ||
+                            'Amount cannot exceed balance',
+                        ]"
+                      ></v-text-field>
+                    </v-form>
+                  </v-card-text>
+                  <v-card-actions class="justify-end">
+                    <v-btn @click="openWithdrawDialog = false" color="grey lighten-2 black--text">Close</v-btn>
+                    <v-btn
+                      class="primary white--text"
+                      @click="withdrawTFT(target, amount)"
+                      :disabled="!isValidSwap || validatingAddress"
+                      :loading="loadingWithdraw"
+                      >Submit</v-btn
+                    >
+                  </v-card-actions>
+                </v-card>
+              </template>
+            </v-tab-item>
+
+            <v-tab-item>
+              <template>
+                <v-card flat>
+                  <v-toolbar color="primary" dark>Withdraw TFT</v-toolbar>
+                  <v-card-title>
+                    Interact with the bridge in order to withdraw your TFT to
+                    {{ selectedName.toUpperCase() }} (withdraw fee is: {{ withdrawFee }} TFT)
+                  </v-card-title>
+                  <v-card-text>
+                    <!-- TODO: How to validate TwinID ?? -->
+                    <v-form v-model="isValidSwap">
+                      <v-text-field
+                        v-model="target"
+                        :label="selectedName.toUpperCase() + ' Target Wallet TwinID'"
+                        :error-messages="targetError"
+                        :disabled="validatingTwinID"
+                        :loading="validatingTwinID"
+                        :rules="[() => !!target || 'This field is required', swapAddressCheck]"
+                      >
+                      </v-text-field>
+                      <v-text-field
+                        @paste.prevent
+                        label="Amount (TFT)"
+                        v-model="amount"
+                        type="number"
+                        onkeydown="javascript: return event.keyCode == 69 || /^\+$/.test(event.key) ? false : true"
+                        :rules="[
+                          () => !!amount || 'This field is required',
+                          () =>
+                            (amount.toString().split('.').length > 1
+                              ? amount.toString().split('.')[1].length <= 3
+                              : true) || 'Amount must have 3 decimals only',
+                          () => amount >= 2 || 'Amount should be at least 2 TFT',
+                          () =>
+                            amount < parseFloat($store.state.credentials.balance.free) ||
+                            'Amount cannot exceed balance',
+                        ]"
+                      ></v-text-field>
+                    </v-form>
+                  </v-card-text>
+                  <v-card-actions class="justify-end">
+                    <v-btn @click="openWithdrawDialog = false" color="grey lighten-2 black--text">Close</v-btn>
+                    <v-btn
+                      class="primary white--text"
+                      @click="withdrawTFT(target, amount)"
+                      :disabled="!isValidSwap || validatingTwinID"
+                      :loading="loadingWithdraw"
+                      >Submit</v-btn
+                    >
+                  </v-card-actions>
+                </v-card>
+              </template>
+            </v-tab-item>
+          </v-tabs>
         </v-card>
       </v-dialog>
     </v-container>
@@ -123,6 +193,7 @@ export default class TransferView extends Vue {
   targetError = "";
   server = new StellarSdk.Server(config.horizonUrl);
   validatingAddress = false;
+  validatingTwinID = false;
 
   mounted() {
     if (this.$api && this.$store.state.credentials.initialized) {
@@ -195,6 +266,15 @@ export default class TransferView extends Vue {
     this.validatingAddress = false;
     return;
   }
+
+  // TODO: check if the twin id is valid
+  async validateTwinID() {
+    this.validatingTwinID = true;
+    this.isValidSwap = false;
+    this.validatingTwinID = false;
+    return;
+  }
+
   public async withdrawTFT(target: string, amount: number) {
     this.loadingWithdraw = true;
     withdraw(
