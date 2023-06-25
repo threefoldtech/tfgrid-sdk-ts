@@ -1,3 +1,4 @@
+import { Decimal } from "decimal.js";
 import * as PATH from "path";
 
 import { TFClient } from "../clients/tf-grid/client";
@@ -98,8 +99,7 @@ class Contracts {
   @expose
   @validateInput
   async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceModel) {
-    // converting fees from milli after getting
-    return (await this.client.contracts.getDedicatedNodeExtraFee(options)) / 1000;
+    return await this.client.contracts.getDedicatedNodeExtraFee(options);
   }
 
   @expose
@@ -226,13 +226,7 @@ class Contracts {
   @validateInput
   @checkBalance
   async setDedicatedNodeExtraFee(options: SetDedicatedNodeExtraFeesModel) {
-    // converting fees from usd to milli before setting
-    return (
-      await this.client.contracts.setDedicatedNodeExtraFee({
-        nodeId: options.nodeId,
-        extraFee: options.extraFee * 1000,
-      })
-    ).apply();
+    return (await this.client.contracts.setDedicatedNodeExtraFee(options)).apply();
   }
 
   /**
