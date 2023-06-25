@@ -1,6 +1,6 @@
 <template>
   <v-row>
-    <v-col :cols="3">
+    <v-col :cols="colSize">
       <v-card flat color="transparent" tag="div">
         <!-- Title -->
         <v-list-item>
@@ -52,7 +52,7 @@
       </v-card>
     </v-col>
 
-    <v-col :cols="3">
+    <v-col :cols="colSize">
       <v-card flat color="transparent" tag="div">
         <!-- Title -->
         <v-list-item>
@@ -103,7 +103,7 @@
         </v-row>
       </v-card>
     </v-col>
-    <v-col :cols="3">
+    <v-col :cols="colSize">
       <v-card flat color="transparent" tag="div">
         <!-- Title -->
         <v-list-item>
@@ -155,35 +155,25 @@
       </v-card>
     </v-col>
 
-    <v-col :cols="3">
+    <v-col v-if="node.resources.gpu > 0" :cols="colSize">
       <v-card flat color="transparent" tag="div">
         <!-- Title -->
-        <v-list-item>
+        <v-list-item class="mb-n2">
           <v-list-item-icon>
-            <v-icon size="30" class="mr-2">mdi-harddisk</v-icon>
+            <v-icon size="30" class="mr-2">mdi-expansion-card-variant</v-icon>
           </v-list-item-icon>
           <v-list-item-content>
-            <v-list-item-title style="font-size: 20px"> Node Resources </v-list-item-title>
+            <v-list-item-title style="font-size: 20px">
+              GPU Card{{ node.resources.gpu > 1 ? "s" : "" }} details
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <!-- <v-sheet class="d-flex justify-center align-center pt-0" height="180">
-          <div v-if="loading" class="text-center">
-            <v-progress-circular indeterminate></v-progress-circular>
-            <p class="pt-2">Loading GPU details</p>
-          </div>
-          <div v-else-if="nodeGPUitems === undefined || nodeGPUitems.length == 0" class="text-center">
-            <v-alert class="ma-2" dense outlined type="error">
-              Failed to receive node GPUs information
-              <template v-slot:append>
-                <v-icon @click="loadGPUitems">mdi-reload</v-icon>
-              </template>
-            </v-alert>
-          </div> -->
-        <v-row>
+        <!-- Details -->
+        <v-row v-if="!loading && nodeGPUitems != null && gpuItem">
           <v-col cols="12">
-            <v-list>
+            <v-list class="pb-0">
               <v-list-item>
-                <v-list-item-content style="max-width: fit-content">
+                <v-list-item-content>
                   <v-tooltip top nudge-bottom="30">
                     <template v-slot:activator="{ on, attrs }">
                       <v-list-item-title v-bind="attrs" v-on="on"
@@ -201,9 +191,10 @@
                   </v-tooltip>
                 </v-list-item-content>
 
-                <v-col class="pa-0 ml-2 mr-n2">
+                <v-col class="pa-0 mr-n2" ref="selection">
                   <v-select
-                    v-if="nodeGPUitems.length > 1"
+                    style="max-width: 185px"
+                    v-if="nodeGPUitems?.length > 1"
                     append-outer-icon="mdi-content-copy"
                     hide-details
                     dense
@@ -214,7 +205,7 @@
                   />
                   <v-text-field
                     v-else
-                    :value="gpuItem.id"
+                    :value="gpuItem?.id"
                     readonly
                     hide-details
                     class="mt-n2"
@@ -222,7 +213,7 @@
                     append-outer-icon="mdi-content-copy"
                     @click:append-outer="copy(gpuItem.id)"
                     solo
-                  ></v-text-field>
+                  />
                 </v-col>
               </v-list-item>
 
@@ -242,7 +233,7 @@
                 {{ gpuItem?.device }}
               </v-list-item>
               <v-divider />
-              <v-list-item v-if="gpuItem.contract !== undefined">
+              <v-list-item class="mb-0" v-if="gpuItem?.contract !== undefined">
                 <v-tooltip top nudge-bottom="30">
                   <template v-slot:activator="{ on, attrs }">
                     <v-list-item-content v-bind="attrs" v-on="on">
@@ -253,9 +244,24 @@
                 </v-tooltip>
                 {{ gpuItem?.contract }}
               </v-list-item>
-              <v-divider v-if="gpuItem.contract !== undefined" />
-            </v-list> </v-col
-        ></v-row>
+            </v-list>
+          </v-col></v-row
+        >
+        <!-- Errors and loading -->
+        <v-sheet v-else class="d-flex justify-center align-center pt-0" height="180">
+          <div v-if="loading" class="text-center">
+            <v-progress-circular indeterminate></v-progress-circular>
+            <p class="pt-2">Loading GPU details</p>
+          </div>
+          <div v-else-if="nodeGPUitems === null" class="text-center">
+            <v-alert class="ma-2" dense outlined type="error">
+              Failed to receive node GPUs information
+              <template v-slot:append>
+                <v-icon @click="loadGPUitems">mdi-reload</v-icon>
+              </template>
+            </v-alert>
+          </div>
+        </v-sheet>
       </v-card>
     </v-col>
   </v-row>
@@ -275,18 +281,19 @@ export default class NodeDetails extends Vue {
     location: { country: string; city: string; long: string; lat: string };
     farm: { id: string; name: string; farmCertType: string; pubIps: string };
   };
+  get colSize() {
+    if (this.node.resources.gpu > 0) return 3;
+    else return 4;
+  }
   loading = false;
   nodeGPUitems:
     | {
         text: string;
         value: INodeGPU;
-
         disabled: false;
       }[]
-    | undefined = [];
-  gpuItem: INodeGPU | undefined = undefined;
-  error = false;
-  gpuError = false;
+    | null = null;
+  gpuItem: INodeGPU | null = null;
   async loadGPUitems() {
     this.loading = true;
     const nodeGPU = await getNodeGPUs(this.node.nodeId);
@@ -306,6 +313,7 @@ export default class NodeDetails extends Vue {
   }
   copy(id: string) {
     navigator.clipboard.writeText(id);
+    this.$toasted.show("GPU ID copied to clipboard");
   }
 }
 </script>
