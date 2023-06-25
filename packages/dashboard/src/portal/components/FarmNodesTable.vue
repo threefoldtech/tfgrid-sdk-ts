@@ -689,17 +689,22 @@ export default class FarmNodesTable extends Vue {
 
   async openExtraFee(node: nodeInterface) {
     this.nodeToEdit = node;
-    this.extraFee = await this.queryClient.contracts.getDedicatedNodeExtraFee({ nodeId: this.nodeToEdit.nodeId });
+    // convert fees from USD to mili USD while getting
+    this.extraFee =
+      (await this.queryClient.contracts.getDedicatedNodeExtraFee({ nodeId: this.nodeToEdit.nodeId })) / 1000;
     this.openExtraFeeDialogue = true;
   }
 
   async saveExtraFee(fee: number) {
     this.loadingExtraFee = true;
-    setDedicatedNodeExtraFee(this.$store.state.credentials.account.address, this.nodeToEdit.nodeId, fee).then(() => {
-      this.$toasted.show(`Transaction succeeded: Fee is added to node ${this.nodeToEdit.nodeId}`);
-      this.loadingExtraFee = false;
-      this.openExtraFeeDialogue = false;
-    });
+    // convert fees from mili USD to USD while setting
+    setDedicatedNodeExtraFee(this.$store.state.credentials.account.address, this.nodeToEdit.nodeId, fee * 1000).then(
+      () => {
+        this.$toasted.show(`Transaction succeeded: Fee is added to node ${this.nodeToEdit.nodeId}`);
+        this.loadingExtraFee = false;
+        this.openExtraFeeDialogue = false;
+      },
+    );
   }
 
   openDelete(node: { id: string }) {
