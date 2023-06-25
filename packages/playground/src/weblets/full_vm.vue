@@ -306,7 +306,7 @@ async function deploy() {
           hasGPU: hasGPU.value,
           rentedBy: hasGPU.value ? profileManager.profile!.twinId : undefined,
           nodeId: hasGPU.value ? selectedNodewithCards.value.nodeId : undefined,
-          gpu: hasGPU.value ? selectedNodewithCards.value.cards.map(card => card.id) : undefined,
+          gpus: hasGPU.value ? selectedNodewithCards.value.cards.map(card => card.id) : undefined,
         },
       ],
       network: { addAccess: wireguard.value },

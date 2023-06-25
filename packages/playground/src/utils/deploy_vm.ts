@@ -63,8 +63,8 @@ async function createMachine(grid: GridClient, machine: Machine, nodePicker: Nod
   }
 
   vm.disks = createDisks(machine.disks);
-  vm.gpu = machine.gpu;
-  console.log("vm.node_id: ", vm.node_id, vm.gpu);
+  vm.gpus = machine.gpus;
+  console.log("vm.node_id: ", vm.node_id);
   vm.public_ip = machine.publicIpv4 || false;
   vm.public_ip6 = machine.publicIpv6 || false;
   vm.planetary = machine.planetary ?? true;
@@ -148,7 +148,7 @@ export interface Machine {
   hasGPU?: boolean;
   rentedBy?: number;
   nodeId?: number;
-  gpu?: string[];
+  gpus?: string[];
 }
 
 export interface DeployVMOptions {
