@@ -337,7 +337,7 @@
                 required
                 outlined
                 dense
-                hint="Extra fees are in USD"
+                hint="Extra fees are in USD/month"
                 persistent-hint
                 type="number"
                 :error-messages="extraFeeErrorMessage"
@@ -411,6 +411,7 @@
   </div>
 </template>
 <script lang="ts">
+import { QueryClient } from "@threefold/tfchain_client";
 import jsPDF from "jspdf";
 import { default as PrivateIp } from "private-ip";
 import { Component, Prop, Vue } from "vue-property-decorator";
@@ -420,7 +421,7 @@ import { addNodePublicConfig, deleteNode, nodeInterface } from "@/portal/lib/far
 import { byteToGB, generateNodeSummary, generateReceipt, getNodeUptimePercentage } from "@/portal/lib/nodes";
 import { hex2a } from "@/portal/lib/util";
 
-import { getDedicatedNodeExtraFee, setDedicatedNodeExtraFee } from "../lib/nodes";
+import { setDedicatedNodeExtraFee } from "../lib/nodes";
 import ReceiptsCalendar from "./ReceiptsCalendar.vue";
 
 @Component({
@@ -428,6 +429,7 @@ import ReceiptsCalendar from "./ReceiptsCalendar.vue";
   components: { ReceiptsCalendar },
 })
 export default class FarmNodesTable extends Vue {
+  queryClient = new QueryClient(window.configs.APP_API_URL);
   expanded: any = [];
   receiptsPanel = [];
   resourcesPanel = [];
@@ -687,36 +689,14 @@ export default class FarmNodesTable extends Vue {
 
   async openExtraFee(node: nodeInterface) {
     this.nodeToEdit = node;
-    this.extraFee = await getDedicatedNodeExtraFee(this.$api, this.nodeToEdit.nodeId);
+    this.extraFee = await this.queryClient.contracts.getDedicatedNodeExtraFee({ nodeId: this.nodeToEdit.nodeId });
     this.openExtraFeeDialogue = true;
   }
 
-  saveExtraFee(fee: number) {
+  async saveExtraFee(fee: number) {
     this.loadingExtraFee = true;
-
-    setDedicatedNodeExtraFee(
-      this.$api,
-      this.$store.state.credentials.account.address,
-      this.nodeToEdit.nodeId,
-      fee,
-      async (res: { status: { type: string; asFinalized: string; isFinalized: string } }) => {
-        console.log("res", res);
-        switch (res.status.type) {
-          case "Ready":
-            this.$toasted.show(`Transaction submitted: Setting extra fee to node ${this.nodeToEdit.nodeId}`);
-            break;
-          case "Finalized":
-            this.$toasted.show(`Transaction succeeded: Fee is added to node ${this.nodeToEdit.nodeId}`);
-            this.loadingExtraFee = false;
-            this.openExtraFeeDialogue = false;
-            break;
-        }
-      },
-    ).catch((err: { message: string }) => {
-      console.log(err.message);
-      this.$toasted.show(`Error:  ${err.message}`, {
-        type: "error",
-      });
+    setDedicatedNodeExtraFee(this.$store.state.credentials.account.address, this.nodeToEdit.nodeId, fee).then(() => {
+      this.$toasted.show(`Transaction succeeded: Fee is added to node ${this.nodeToEdit.nodeId}`);
       this.loadingExtraFee = false;
       this.openExtraFeeDialogue = false;
     });
