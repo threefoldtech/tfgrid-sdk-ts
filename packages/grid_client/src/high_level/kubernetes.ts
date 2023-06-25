@@ -32,7 +32,7 @@ class KubernetesHL extends HighLevelBase {
     corex = false,
     solutionProviderId: number,
     zlogsOutput?: string,
-    gpu: string[] = [],
+    gpus: string[] = [],
   ) {
     events.emit("logs", `Creating a master with name: ${name} on node: ${nodeId}, network: ${network.name}`);
     const machine = new VMHL(this.config);
@@ -74,7 +74,7 @@ class KubernetesHL extends HighLevelBase {
       corex,
       solutionProviderId,
       zlogsOutput,
-      gpu,
+      gpus,
     );
   }
 
@@ -102,7 +102,7 @@ class KubernetesHL extends HighLevelBase {
     corex = false,
     solutionProviderId: number,
     zlogsOutput?: string,
-    gpu: string[] = [],
+    gpus: string[] = [],
   ) {
     events.emit("logs", `Creating a worker with name: ${name} on node: ${nodeId}, network: ${network.name}`);
     const machine = new VMHL(this.config);
@@ -144,7 +144,7 @@ class KubernetesHL extends HighLevelBase {
       corex,
       solutionProviderId,
       zlogsOutput,
-      gpu,
+      gpus,
     );
   }
 

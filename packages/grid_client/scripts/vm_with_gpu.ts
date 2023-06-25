@@ -51,7 +51,7 @@ async function main() {
   if (gpuList.length <= 0) {
     throw Error(`Couldn't find GPU card available on node ${nodeId}`);
   }
-  vm.gpu = [gpuList[0].id]; // gpu card's id, you can check the available gpu from the dashboard
+  vm.gpus = [gpuList[0].id]; // gpu card's id, you can check the available gpu from the dashboard
 
   // create VMs Object
   const vms = new MachinesModel();

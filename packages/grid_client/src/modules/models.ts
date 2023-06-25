@@ -100,7 +100,7 @@ class MachineModel {
   @Expose() @IsOptional() @IsBoolean() corex?: boolean;
   @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
   @Expose() @IsString() @IsOptional() zlogsOutput?: string;
-  @Expose() @IsString({ each: true }) @IsOptional() gpu?: string[];
+  @Expose() @IsString({ each: true }) @IsOptional() gpus?: string[];
 }
 
 class MachinesModel {
@@ -139,7 +139,7 @@ class KubernetesNodeModel {
   @Expose() @IsOptional() @IsBoolean() corex?: boolean;
   @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
   @Expose() @IsString() @IsOptional() zlogsOutput?: string;
-  @Expose() @IsString({ each: true }) @IsOptional() gpu?: string[];
+  @Expose() @IsString({ each: true }) @IsOptional() gpus?: string[];
 }
 
 class K8SModel {
