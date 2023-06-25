@@ -1,17 +1,12 @@
 <template>
   <section>
     <h6 class="text-h5 mb-4">Select a node</h6>
-    <v-alert class="mb-2" type="warning" variant="tonal" v-if="selectedNode === undefined">
+    <v-alert class="mb-2" type="warning" variant="tonal" v-if="!loadingNodes && selectedNode === undefined">
       Seems to be there are no nodes rented by you that match your selected resources, try to reduce/change you'r
       resources and try again.
     </v-alert>
 
-    <input-validator
-      :rules="[validators.required('Node id is required.')]"
-      :value="
-        selectedNode && selectedNode < 1 && availableNodesWithGPU.length ? availableNodesWithGPU[0] : selectedNode
-      "
-    >
+    <input-validator :rules="[validators.required('Node id is required.')]" :value="selectedNode" #="{ props }">
       <input-tooltip tooltip="The rented node id, this node should have GPUs.">
         <v-autocomplete
           select
@@ -23,14 +18,19 @@
           :disabled="loadingNodes"
           :loading="loadingNodes"
           @update:model-value="selectedNode = $event"
+          v-bind="props"
         />
       </input-tooltip>
     </input-validator>
 
     <input-validator
       v-if="selectedNode"
-      :rules="[validators.required('Please select at least one card.')]"
-      :value="availableNodesWithGPU[0]"
+      :rules="[
+        validators.required('Please select at least one card.'),
+        validators.min('Please select at least one card.', 1),
+      ]"
+      :value="selectedCards.length"
+      #="{ props }"
     >
       <input-tooltip
         tooltip="Please select at least one card from the available node cards. Note that if you have a deployment that already uses certain cards, they will not appear in the selection area. You have the option to select one or more cards.."
@@ -44,6 +44,7 @@
           :loading="loadingCards"
           multiple
           @update:model-value="selectedCards = $event"
+          v-bind="props"
         />
       </input-tooltip>
     </input-validator>
@@ -54,6 +55,7 @@
 import { onMounted, type PropType, ref, watch } from "vue";
 
 import GPUNode, { type GPUNodeType, type NodeGPUCardType } from "@/utils/filter_node_with_gpu";
+import { normalizeError } from "@/utils/helpers";
 
 import { useProfileManager } from "../stores/profile_manager";
 import { type Flist, ProjectName } from "../types";
@@ -92,6 +94,7 @@ const loadingCards = ref(false);
 const selectedNode = ref<number>();
 const selectedCards = ref<Array<string>>([]);
 const nodeCards = ref<Array<NodeGPUCardType>>([]);
+const errorMessage = ref<string>();
 
 watch(selectedCards, async () => {
   const cards: NodeGPUCardType[] = [];
@@ -132,6 +135,8 @@ watch(
 onMounted(checkNode);
 
 async function checkNode() {
+  errorMessage.value = "";
+  loadingNodes.value = true;
   const filters = props.filters;
   if (filters.hasGPU) {
     const projectName = ProjectName.Fullvm.toLowerCase();
@@ -139,7 +144,6 @@ async function checkNode() {
 
     if (grid) {
       const gpuNodeHelper = new GPUNode(grid);
-      loadingNodes.value = true;
       gpuNodeHelper
         .getNodes({
           name: filters.name,
@@ -174,9 +178,10 @@ async function checkNode() {
               selectedNode.value = undefined; // To display the alert message only if the select area is touched, do not want to display the message on the mount.
               availableNodesWithGPU.value = [];
             }
-            loadingNodes.value = false;
           }),
-        );
+        )
+        .catch(e => (errorMessage.value = normalizeError(e, "Failed to deploy a full virtual machine instance.")))
+        .then(() => (loadingNodes.value = false));
     }
   }
 }
