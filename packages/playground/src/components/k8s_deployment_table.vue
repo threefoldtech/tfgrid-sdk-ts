@@ -26,7 +26,7 @@
     </template>
 
     <template #[`item.ipv4`]="{ item }">
-      {{ item.value.masters[0].publicIP?.ip || "None" }}
+      {{ item.value.masters[0].publicIP?.ip?.split("/")?.[0] || item.value.masters[0].publicIP?.ip || "None" }}
     </template>
 
     <template #[`item.ipv6`]="{ item }">
