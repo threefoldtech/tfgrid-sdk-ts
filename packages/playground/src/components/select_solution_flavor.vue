@@ -40,17 +40,17 @@
       <input-validator
         :value="disk"
         :rules="[
-          validators.required('Disk size is required.'),
-          validators.isInt('Disk size must be a valid integer.'),
-          validators.min('Minimum allowed disk size is 15 GB.', 15),
-          validators.max('Maximum allowed disk size is 10000 GB.', 10000),
+          validators.required('SSD Storage size is required.'),
+          validators.isInt('SSD Storage size must be a valid integer.'),
+          validators.min('Minimum allowed ssd storage size is 15 GB.', 15),
+          validators.max('Maximum allowed ssd storage size is 10000 GB.', 10000),
         ]"
         #="{ props }"
       >
         <input-tooltip
           tooltip="The storage capacity allocated to your instance, indicating the amount of space available to store files, data, and applications."
         >
-          <v-text-field label="Disk Size (GB)" type="number" v-model.number="disk" v-bind="props" />
+          <v-text-field label="SSD Storage (GB)" type="number" v-model.number="disk" v-bind="props" />
         </input-tooltip>
       </input-validator>
     </div>
@@ -66,11 +66,11 @@ import type { solutionFlavor } from "../types";
 type Package = PropType<solutionFlavor>;
 
 const props = defineProps({
-  minimum: { type: Object as Package, default: () => ({ cpu: 1, memory: 1024 * 2, disk: 15 }) },
-  standard: { type: Object as Package, default: () => ({ cpu: 2, memory: 1024 * 2, disk: 100 }) },
+  minimum: { type: Object as Package, default: () => ({ cpu: 1, memory: 1024 * 2, ssd: 15 }) },
+  standard: { type: Object as Package, default: () => ({ cpu: 2, memory: 1024 * 2, ssd: 100 }) },
   recommended: {
     type: Object as Package,
-    default: () => ({ cpu: 4, memory: 1024 * 4, disk: 250 }),
+    default: () => ({ cpu: 4, memory: 1024 * 4, ssd: 250 }),
   },
 });
 const emits = defineEmits<{ (event: "update:model-value", value?: solutionFlavor): void }>();
@@ -79,15 +79,15 @@ const packages = computed(() => {
   const { minimum, standard, recommended } = props;
   return [
     {
-      title: `Minimum(CPU: ${minimum.cpu} vCores, Memory: ${minimum.memory} MB, Disk: ${minimum.disk} GB)`,
+      title: `Minimum(CPU: ${minimum.cpu} vCores, Memory: ${minimum.memory} MB, SSD: ${minimum.disk} GB)`,
       value: minimum,
     },
     {
-      title: `Standard(CPU: ${standard.cpu} vCores, Memory: ${standard.memory} MB, Disk: ${standard.disk} GB)`,
+      title: `Standard(CPU: ${standard.cpu} vCores, Memory: ${standard.memory} MB, SSD: ${standard.disk} GB)`,
       value: standard,
     },
     {
-      title: `Recommended(CPU: ${recommended.cpu} vCores, Memory: ${recommended.memory} MB, Disk: ${recommended.disk} GB)`,
+      title: `Recommended(CPU: ${recommended.cpu} vCores, Memory: ${recommended.memory} MB, SSD: ${recommended.disk} GB)`,
       value: recommended,
     },
     { title: "Custom", value: "custom" },
