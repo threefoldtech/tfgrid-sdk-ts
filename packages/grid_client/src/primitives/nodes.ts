@@ -45,6 +45,9 @@ interface NodeInfo {
   publicConfig: PublicConfig;
   status: string;
   certificationType: string;
+  hasGPU: boolean;
+  extraFee: number;
+  rentedByTwinId: number;
 }
 interface PublicConfig {
   domain: string;
@@ -332,6 +335,8 @@ class Nodes {
       status: "up",
       page: options.page,
       size: options.size,
+      has_gpu: options.hasGPU,
+      rented_by: options.rentedBy,
     };
     if (options.gateway) {
       params["ipv4"] = true;
