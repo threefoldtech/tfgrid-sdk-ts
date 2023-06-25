@@ -136,6 +136,20 @@
           />
         </template>
 
+        <template #Freeflow-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="layout.openDialog(item?.value, deploymentListEnvironments.freeflow)"
+          />
+          <IconActionBtn
+            tooltip="Preview"
+            color="info"
+            icon="mdi-web"
+            :href="'https://' + item.value[0].env.DIGITALTWIN_APPID"
+          />
+        </template>
+
         <template #Casperlabs-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
@@ -336,6 +350,7 @@ const tabs: Tab[] = [
   { title: "Algorand", value: "Algorand", imgPath: "images/icons/algorand.png" },
   { title: "Node Pilot", value: "NodePilot", imgPath: "images/icons/vm.png" },
   { title: "Umbrel", value: "Umbrel", imgPath: "images/icons/umbrel.png" },
+  { title: "Freeflow", value: "Freeflow", imgPath: "images/icons/freeflow.png" },
   { title: "Wordpress", value: "Wordpress", imgPath: "images/icons/wordpress.png" },
 ];
 
