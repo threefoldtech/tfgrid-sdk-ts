@@ -1,5 +1,4 @@
 /* eslint-disable */
-import { Signer } from "@polkadot/api/types";
 import { web3FromAddress } from "@polkadot/extension-dapp";
 import axios from "axios";
 import config from "../config";
@@ -9,7 +8,8 @@ import { nodeInterface } from "./farms";
 import moment from "moment";
 import "jspdf-autotable";
 import { apiInterface } from "./util";
-import { Any } from "@/hub/types/google/protobuf/any";
+import { Client } from "@threefold/tfchain_client";
+
 export interface receiptInterface {
   hash: string;
   mintingStart?: number;
@@ -252,27 +252,18 @@ export async function cancelRentContract(api: apiInterface, address: string, con
     .signAndSend(address, { signer: injector.signer }, callback);
 }
 
-export async function setDedicatedNodeExtraFee(
-  api: apiInterface,
-  address: string,
-  nodeId: number,
-  fee: number,
-  callback: any,
-) {
+export async function setDedicatedNodeExtraFee(address: string, nodeId: number, extraFee: number) {
   const injector = await web3FromAddress(address);
-  return api.tx.smartContractModule
-    .setDedicatedNodeExtraFee(nodeId, fee)
-    .signAndSend(address, { signer: injector.signer }, callback);
+  const client = new Client({
+    url: window.configs.APP_API_URL,
+    extSigner: { address: address, signer: injector.signer },
+  });
+  return await (await client.contracts.setDedicatedNodeExtraFee({ nodeId, extraFee })).apply();
 }
 
 export async function getActiveContracts(api: apiInterface, nodeId: string) {
   console.log("getActiveContracts", api.query.smartContractModule.activeNodeContracts(nodeId));
   return await api.query.smartContractModule.activeNodeContracts(nodeId);
-}
-
-export async function getDedicatedNodeExtraFee(api: apiInterface, nodeId: number) {
-  console.log("getDedicatedNodeExtraFee", api.query.smartContractModule.dedicatedNodesExtraFee(nodeId));
-  return await api.query.smartContractModule.dedicatedNodesExtraFee(nodeId);
 }
 
 export async function getNodeMintingFixupReceipts(nodeId: number) {
@@ -363,7 +354,7 @@ export async function getIpsForFarm(farmID: string) {
               id
             }
           }
-        }      
+        }
         `,
       operation: "getNodes",
     },
