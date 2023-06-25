@@ -74,7 +74,7 @@
                 mdi-code-string
               </v-icon>
             </template>
-            <span>Add extra fees</span>
+            <span>Set Additional Fees</span>
           </v-tooltip>
         </template>
 
@@ -326,23 +326,29 @@
       <!--extra fees dialog-->
       <v-dialog v-model="openExtraFeeDialogue" width="800">
         <v-card>
-          <v-card-title class="text-h5"> Add Extra fees to your node with ID: {{ nodeToEdit.nodeId }} </v-card-title>
-
+          <v-card-title class="text-h5">Set Additional Fees</v-card-title>
+          <v-card-subtitle class="my-0" style="font-size: 1rem">
+            Additional fees will be added to your node {{ nodeToEdit.nodeId }} (for the special hardware you’re
+            providing e.g. GPUs) while renting.
+          </v-card-subtitle>
           <v-card-text class="text">
-            <v-form v-model="isValidExtraFee">
+            <v-form v-model="isValidExtraFee" style="position: relative">
               <v-text-field
                 class="mt-4"
-                label="Extra Fees"
+                label="Additional Fees"
                 v-model="extraFee"
                 required
                 outlined
                 dense
-                hint="Extra fees are in USD/month"
-                persistent-hint
                 type="number"
                 :error-messages="extraFeeErrorMessage"
-                :rules="[() => !!extraFee || 'This field is required']"
-              ></v-text-field>
+                :rules="[
+                  () => !!extraFee || 'This field is required',
+                  () => extraFee > 0 || 'Extra fee cannot be negative or 0',
+                ]"
+              >
+              </v-text-field>
+              <span style="position: absolute; right: 2%; top: 15%; color: grey">USD/Month</span>
             </v-form>
           </v-card-text>
 
@@ -356,7 +362,7 @@
               :loading="loadingExtraFee"
               :disabled="!isValidExtraFee"
             >
-              Add Fees
+              Set
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -698,13 +704,16 @@ export default class FarmNodesTable extends Vue {
   async saveExtraFee(fee: number) {
     this.loadingExtraFee = true;
     // convert fees from mili USD to USD while setting
-    setDedicatedNodeExtraFee(this.$store.state.credentials.account.address, this.nodeToEdit.nodeId, fee * 1000).then(
-      () => {
+    setDedicatedNodeExtraFee(this.$store.state.credentials.account.address, this.nodeToEdit.nodeId, fee * 1000)
+      .then(() => {
         this.$toasted.show(`Transaction succeeded: Fee is added to node ${this.nodeToEdit.nodeId}`);
         this.loadingExtraFee = false;
         this.openExtraFeeDialogue = false;
-      },
-    );
+      })
+      .catch(e => {
+        this.loadingExtraFee = false;
+        this.$toasted.show(`Transaction Failed: ${e}`);
+      });
   }
 
   openDelete(node: { id: string }) {
