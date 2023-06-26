@@ -172,6 +172,12 @@ export interface ITab {
   value: "rentable" | "rented" | "mine";
   index: number;
 }
+export interface INodeGPU {
+  id: string;
+  vendor: string;
+  device: string;
+  contract?: number;
+}
 
 export function generateReceipt(doc: jsPDF, node: nodeInterface) {
   doc.setFontSize(15);
@@ -286,6 +292,20 @@ export async function getNodeMintingFixupReceipts(nodeId: number) {
   );
 
   return nodeReceipts;
+}
+export async function getNodeGPUs(nodeId: number): Promise<INodeGPU[] | undefined> {
+  let nodeGPUs: INodeGPU[] | undefined;
+
+  try {
+    nodeGPUs = await (
+      await axios.get(`${config.gridproxyUrl}/nodes/${nodeId}/gpu`, {
+        timeout: 5000,
+      })
+    ).data;
+  } catch (err) {
+    nodeGPUs = undefined;
+  }
+  return nodeGPUs;
 }
 
 export async function getNodeUsedResources(nodeId: string) {
@@ -467,7 +487,7 @@ export async function getDNodes(
     discount: any;
     applyedDiscount: { first: any; second: any };
     location: { country: any; city: any; long: any; lat: any };
-    resources: { cru: any; mru: any; hru: any; sru: any };
+    resources: { cru: any; mru: any; hru: any; sru: any; gpu: number };
     farm: { id: string; name?: string; farmCertType?: string; pubIps?: string };
     rentContractId: any;
     rentedByTwinId: any;
@@ -499,6 +519,7 @@ export async function getDNodes(
         mru: node.total_resources.mru,
         hru: node.total_resources.hru,
         sru: node.total_resources.sru,
+        gpu: node.num_gpu,
       },
       usedResources: {
         cru: node.used_resources.cru,
