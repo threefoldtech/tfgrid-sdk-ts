@@ -39,8 +39,6 @@ export default class InFilter extends Vue {
         key: this.filterKey,
         value: [value],
       });
-      // reset to the first page
-      this.$store.commit("explorer/" + MutationTypes.SET_NODES_TABLE_PAGE_NUMBER, 1);
       // load nodes with the changes
       this.$store.dispatch(ActionTypes.REQUEST_NODES);
     }
@@ -48,8 +46,6 @@ export default class InFilter extends Vue {
 
   remove(index: number): void {
     this.$store.getters["explorer/getNodesFilter"][this.filterKey].splice(index, 1);
-
-    this.$store.commit("explorer/" + MutationTypes.SET_NODES_TABLE_PAGE_NUMBER, 1);
     this.$store.dispatch(ActionTypes.REQUEST_NODES);
   }
 
@@ -77,6 +73,7 @@ export default class InFilter extends Vue {
       value: true,
     });
   }
+
   destroyed() {
     this.$store.commit("explorer/" + MutationTypes.SET_FILTER_ENABLE, {
       key1: "nodes",
@@ -84,7 +81,6 @@ export default class InFilter extends Vue {
       value: false,
     });
     this.$store.commit("explorer/" + MutationTypes.CLEAR_NODES_FILTER_KEY, this.filterKey);
-    this.$store.commit("explorer/" + MutationTypes.SET_NODES_TABLE_PAGE_NUMBER, 1);
   }
 }
 </script>
