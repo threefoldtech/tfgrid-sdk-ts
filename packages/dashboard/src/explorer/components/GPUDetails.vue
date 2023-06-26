@@ -12,7 +12,7 @@
     <v-row>
       <v-col cols="12" class="pt-0">
         <!-- :cols="screen_max_800.matches ? 12 : screen_max_1000.matches ? 6 : 4" -->
-        <v-list v-if="gpuItem">
+        <v-list v-if="gpuItem != null && nodeGPUitems != null">
           <v-list-item>
             <v-list-item-content>
               <v-tooltip top nudge-bottom="30">
@@ -81,34 +81,63 @@
             {{ gpuItem?.contract }}
           </v-list-item>
           <v-divider />
-        </v-list> </v-col
-    ></v-row>
+        </v-list>
+        <v-sheet v-else class="d-flex justify-center align-center pt-0" height="230">
+          <div v-if="loading" class="text-center">
+            <v-progress-circular indeterminate></v-progress-circular>
+            <p class="pt-2">Loading GPU details</p>
+          </div>
+          <div v-else class="text-center">
+            <v-alert class="ma-2" dense outlined type="error">
+              Failed to get node GPUs' information
+              <template v-slot:append>
+                <v-icon class="ml-2 mt-1" @click="loadGpuDetails">mdi-reload</v-icon>
+              </template>
+            </v-alert>
+          </div>
+        </v-sheet>
+      </v-col>
+    </v-row>
   </v-card>
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 
+import { getNodeGPUs } from "../../portal/lib/nodes";
 import { INodeGPU } from "../graphql/api";
 
 @Component({})
 export default class GPUDetails extends Vue {
-  @Prop({ required: true }) nodeGPU!: INodeGPU[];
-  nodeGPUitems: {
-    text: string;
-    value: INodeGPU;
-
-    disabled: false;
-  }[] = this.$props.nodeGPU.map((item: INodeGPU) => {
-    return {
-      text: item.id,
-      value: item,
-      disabled: false,
-    };
-  });
-
-  gpuItem = this.$props.nodeGPU[0];
+  @Prop({ required: true }) nodeId!: number;
+  nodeGPUitems: { text: string; value: INodeGPU; disabled: false }[] | null = null;
+  gpuItem: INodeGPU | null = null;
+  loading = true;
   copy(id: string) {
     navigator.clipboard.writeText(id);
+  }
+  async loadGpuDetails() {
+    this.loading = true;
+    await getNodeGPUs(this.nodeId)
+      .then(result => {
+        if (!result) return;
+        this.nodeGPUitems = result?.map((item: INodeGPU) => {
+          return {
+            text: item.id,
+            value: item,
+            disabled: false,
+          };
+        });
+        this.gpuItem = result[0];
+      })
+      .catch(err => {
+        console.log(err);
+      })
+      .finally(() => {
+        this.loading = false;
+      });
+  }
+  async mounted() {
+    await this.loadGpuDetails();
   }
 }
 </script>
