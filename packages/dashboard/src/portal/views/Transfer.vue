@@ -3,45 +3,109 @@
     <v-card color="primary" class="white--text pa-5 my-5">
       <h3 class="text-center">Transfer TFTs on the TFChain</h3>
     </v-card>
-    <v-card class="pa-5 my-5">
-      <v-form v-model="isTransferValid">
-        <v-combobox
-          v-model="receipientAddress"
-          :items="accountsAddresses"
-          dense
-          filled
-          @keydown="setValue"
-          label="Recipient:"
-          :rules="[
-            () => !!receipientAddress || 'This field is required',
-            () => transferAddressCheck() || 'invalid address',
-          ]"
-        ></v-combobox>
-        <v-text-field
-          @paste.prevent
-          v-model="amount"
-          label="Amount (TFT)"
-          type="number"
-          onkeydown="javascript: return event.keyCode == 69 || /^\+$/.test(event.key) ? false : true"
-          :rules="[
-            () => !!amount || 'This field is required',
-            () =>
-              (amount.toString().split('.').length > 1 ? amount.toString().split('.')[1].length <= 3 : true) ||
-              'Amount must have 3 decimals only',
-            () => amount > 0 || 'Amount cannot be negative or 0',
-            () => amount < parseFloat($store.state.credentials.balance.free) || 'Amount cannot exceed balance',
-          ]"
-        >
-        </v-text-field>
-        <span class="fee">0.01 transaction fee will be deducted</span>
-      </v-form>
-      <v-card-actions>
-        <v-spacer> </v-spacer>
-        <v-btn @click="clearInput" color="grey lighten-2 black--text">Clear</v-btn>
-        <v-btn class="primary white--text" @click="transferTFT" :loading="loadingTransfer" :disabled="!isTransferValid"
-          >Submit</v-btn
-        >
-      </v-card-actions>
+
+    <v-card>
+      <v-tabs>
+        <v-tab class=""> By Address</v-tab>
+        <v-tab> By Twin ID </v-tab>
+        <v-tab-item>
+          <template>
+            <v-card class="pa-5 my-5" flat>
+              <v-form v-model="isTransferValid">
+                <v-combobox
+                  v-model="receipientAddress"
+                  :items="accountsAddresses"
+                  dense
+                  filled
+                  @keydown="setValue"
+                  label="Recipient:"
+                  :rules="[
+                    () => !!receipientAddress || 'This field is required',
+                    () => transferAddressCheck() || 'invalid address',
+                  ]"
+                ></v-combobox>
+                <v-text-field
+                  @paste.prevent
+                  v-model="amount"
+                  label="Amount (TFT)"
+                  type="number"
+                  onkeydown="javascript: return event.keyCode == 69 || /^\+$/.test(event.key) ? false : true"
+                  :rules="[
+                    () => !!amount || 'This field is required',
+                    () =>
+                      (amount.toString().split('.').length > 1 ? amount.toString().split('.')[1].length <= 3 : true) ||
+                      'Amount must have 3 decimals only',
+                    () => amount > 0 || 'Amount cannot be negative or 0',
+                    () => amount < parseFloat($store.state.credentials.balance.free) || 'Amount cannot exceed balance',
+                  ]"
+                >
+                </v-text-field>
+                <span class="fee">0.01 transaction fee will be deducted</span>
+              </v-form>
+              <v-card-actions>
+                <v-spacer> </v-spacer>
+                <v-btn @click="clearInput" color="grey lighten-2 black--text">Clear</v-btn>
+                <v-btn
+                  class="primary white--text"
+                  @click="transferTFT"
+                  :loading="loadingTransfer"
+                  :disabled="!isTransferValid"
+                  >Submit</v-btn
+                >
+              </v-card-actions>
+            </v-card>
+          </template>
+        </v-tab-item>
+        <v-tab-item>
+          <template>
+            <v-card class="pa-5 my-5" flat>
+              <v-form v-model="isTransferValid">
+                <!-- TODO: Handle with twin id -->
+                <v-combobox
+                  v-model="receipientAddress"
+                  :items="accountsAddresses"
+                  dense
+                  filled
+                  @keydown="setValue"
+                  label="Recipient:"
+                  :rules="[
+                    () => !!receipientAddress || 'This field is required',
+                    () => transferAddressCheck() || 'invalid address',
+                  ]"
+                ></v-combobox>
+                <v-text-field
+                  @paste.prevent
+                  v-model="amount"
+                  label="Amount (TFT)"
+                  type="number"
+                  onkeydown="javascript: return event.keyCode == 69 || /^\+$/.test(event.key) ? false : true"
+                  :rules="[
+                    () => !!amount || 'This field is required',
+                    () =>
+                      (amount.toString().split('.').length > 1 ? amount.toString().split('.')[1].length <= 3 : true) ||
+                      'Amount must have 3 decimals only',
+                    () => amount > 0 || 'Amount cannot be negative or 0',
+                    () => amount < parseFloat($store.state.credentials.balance.free) || 'Amount cannot exceed balance',
+                  ]"
+                >
+                </v-text-field>
+                <span class="fee">0.01 transaction fee will be deducted</span>
+              </v-form>
+              <v-card-actions>
+                <v-spacer> </v-spacer>
+                <v-btn @click="clearInput" color="grey lighten-2 black--text">Clear</v-btn>
+                <v-btn
+                  class="primary white--text"
+                  @click="transferTFT"
+                  :loading="loadingTransfer"
+                  :disabled="!isTransferValid"
+                  >Submit</v-btn
+                >
+              </v-card-actions>
+            </v-card>
+          </template>
+        </v-tab-item>
+      </v-tabs>
     </v-card>
   </v-container>
 </template>
