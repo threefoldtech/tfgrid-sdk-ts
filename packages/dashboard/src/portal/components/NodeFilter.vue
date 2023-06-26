@@ -41,21 +41,25 @@ export default class InFilter extends Vue {
   }
 
   setItem(value: string) {
-    this.$store.commit(`portal/${MutationTypes.SET_DEDICATED_NODES_FILTER}`, {
+    console.log("Set item value: ", value);
+
+    this.$store.commit("portal/" + MutationTypes.SET_DEDICATED_NODES_FILTER, {
       key: this.filterKey,
-      value: value,
+      value: [value],
     });
 
     this.$store.dispatch("portal/" + ActionTypes.REQUEST_DEDICATED_NODES);
 
     if (!this.invalid) {
-      this.$store.dispatch(`portal/${ActionTypes.REQUEST_DEDICATED_NODES}`);
+      // add the current filter key to the query.
+      // load nodes with the changes
+      // this.$store.dispatch(ActionTypes.REQUEST_NODES);
     }
   }
 
   remove(index: number): void {
-    this.$store.dispatch(`portal/removeFilterItem`, { filterKey: this.filterKey, index });
-    this.$store.dispatch(`portal/${ActionTypes.REQUEST_DEDICATED_NODES}`);
+    this.$store.dispatch("explorer/removeFilterItem", { filterKey: this.filterKey, index });
+    // this.$store.dispatch(ActionTypes.REQUEST_NODES);
   }
 
   validated(value: string, key: string): string | null {
@@ -63,6 +67,7 @@ export default class InFilter extends Vue {
     console.log("value: ", value);
 
     if (!value) {
+      // reset filter
       this.setItem("");
       return (this.errorMsg = "");
     }
