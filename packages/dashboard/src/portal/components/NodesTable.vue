@@ -50,10 +50,7 @@
               </li>
               <li>
                 You're receiving {{ item.applyedDiscount.second }}% discount as per the
-                <a
-                  target="_blank"
-                  href="https://library.threefold.me/info/threefold/#/tfgrid/grid/pricing?id=discount-levels"
-                >
+                <a target="_blank" href="https://manual.grid.tf/cloud/cloudunits_pricing.html#discount-levels">
                   <p style="color: blue; display: inline">discount levels</p>
                 </a>
               </li>
