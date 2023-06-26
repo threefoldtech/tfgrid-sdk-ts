@@ -6,8 +6,12 @@ import { IState } from "@/explorer/store/state";
 import { apiInterface } from "../lib/util";
 import { accountInterface, PortalState } from "./state";
 
-
 export enum MutationTypes {
+  SET_DEDICATED_NODES = "setNodes",
+  SET_DEDICATED_NODES_FILTER = "setNodesFilter",
+}
+
+export enum PortalMutationTypes {
   SET_ACCOUNTS = "setAccounts",
   REMOVE_ACCOUNTS = "removeAccounts",
   SET_PROPOSALS = "setProposals",
@@ -77,5 +81,18 @@ export default {
 
   setDedicatedNodesCount(state: PortalState, payload: number) {
     state.dedicatedNodesCount = payload;
+  },
+
+  clearDedicatedNodesFilter(state: PortalState) {
+    state.dedicatedNodesFilter = {};
+  },
+
+  clearDedicatedNodesFilterKey(state: PortalState, key: string) {
+    state.dedicatedNodesFilter[key] = "";
+  },
+
+  setNodesFilter(state: PortalState, payload: { key: string; value: any }) {
+    state.dedicatedNodesFilter[payload.key] = payload.value;
+    console.log(payload.key, state.dedicatedNodesFilter[payload.key]);
   },
 };
