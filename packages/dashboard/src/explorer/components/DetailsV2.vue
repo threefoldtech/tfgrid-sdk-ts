@@ -45,7 +45,7 @@
           </v-col>
         </v-row>
       </div>
-      <div v-if="loading" class="d-flex align-self-center justify-center" style="height: 100%">
+      <div v-if="loading" class="d-flex justify-center" style="height: 100%">
         <div class="align-self-center">
           <v-progress-circular indeterminate color="primary" :size="100" />
           <p class="pt-4">Loading Node {{ nodeId ?? "" }} details</p>
