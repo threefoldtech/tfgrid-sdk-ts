@@ -67,6 +67,15 @@
             </template>
             <span>Add a public config</span>
           </v-tooltip>
+
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon class="configIcon ml-2" medium v-on="on" v-bind="attrs" @click="openExtraFee(item)">
+                mdi-code-string
+              </v-icon>
+            </template>
+            <span>Set Additional Fees</span>
+          </v-tooltip>
         </template>
 
         <!--expanded node view-->
@@ -314,6 +323,51 @@
         </v-card>
       </v-dialog>
 
+      <!--extra fees dialog-->
+      <v-dialog v-model="openExtraFeeDialogue" width="800">
+        <v-card>
+          <v-card-title class="text-h5">Set Additional Fees</v-card-title>
+          <v-card-subtitle class="my-0" style="font-size: 1rem">
+            Additional fees will be added to your node {{ nodeToEdit.nodeId }} (for the special hardware you’re
+            providing e.g. GPUs) while renting.
+          </v-card-subtitle>
+          <v-card-text class="text">
+            <v-form v-model="isValidExtraFee" style="position: relative">
+              <v-text-field
+                class="mt-4"
+                label="Additional Fees"
+                v-model="extraFee"
+                required
+                outlined
+                dense
+                type="number"
+                :error-messages="extraFeeErrorMessage"
+                :rules="[
+                  () => !!extraFee || 'This field is required',
+                  () => extraFee > 0 || 'Extra fee cannot be negative or 0',
+                ]"
+              >
+              </v-text-field>
+              <span style="position: absolute; right: 2%; top: 15%; color: grey">USD/Month</span>
+            </v-form>
+          </v-card-text>
+
+          <v-divider></v-divider>
+
+          <v-card-actions class="justify-end py-4">
+            <v-btn color="grey lighten-2 black--text" @click="openExtraFeeDialogue = false"> Cancel </v-btn>
+            <v-btn
+              color="primary white--text"
+              @click="saveExtraFee(extraFee)"
+              :loading="loadingExtraFee"
+              :disabled="!isValidExtraFee"
+            >
+              Set
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
       <!-- delete item dialog-->
       <v-dialog v-model="openDeleteDialog" max-width="700px">
         <v-card>
@@ -363,6 +417,8 @@
   </div>
 </template>
 <script lang="ts">
+import { QueryClient } from "@threefold/tfchain_client";
+import { Decimal } from "decimal.js";
 import jsPDF from "jspdf";
 import { default as PrivateIp } from "private-ip";
 import { Component, Prop, Vue } from "vue-property-decorator";
@@ -372,6 +428,7 @@ import { addNodePublicConfig, deleteNode, nodeInterface } from "@/portal/lib/far
 import { byteToGB, generateNodeSummary, generateReceipt, getNodeUptimePercentage } from "@/portal/lib/nodes";
 import { hex2a } from "@/portal/lib/util";
 
+import { setDedicatedNodeExtraFee } from "../lib/nodes";
 import ReceiptsCalendar from "./ReceiptsCalendar.vue";
 
 @Component({
@@ -379,6 +436,7 @@ import ReceiptsCalendar from "./ReceiptsCalendar.vue";
   components: { ReceiptsCalendar },
 })
 export default class FarmNodesTable extends Vue {
+  queryClient = new QueryClient(window.configs.APP_API_URL);
   expanded: any = [];
   receiptsPanel = [];
   resourcesPanel = [];
@@ -437,6 +495,7 @@ export default class FarmNodesTable extends Vue {
     status: "",
     certificationType: "",
     dedicated: true,
+    extraFee: 0,
     rentContractId: 0,
     rentedByTwinId: 0,
     receipts: [],
@@ -447,10 +506,12 @@ export default class FarmNodesTable extends Vue {
     id: "",
   };
   openPublicConfigDialog = false;
+  openExtraFeeDialogue = false;
   @Prop({ required: true }) nodes!: nodeInterface[];
   @Prop({ required: true }) loadingNodes!: boolean;
   @Prop({ required: true }) initLoading!: boolean;
   @Prop({ required: true }) count!: string;
+  extraFee = 0;
   searchTerm = "";
   ip4 = "";
   gw4 = "";
@@ -458,9 +519,11 @@ export default class FarmNodesTable extends Vue {
   gw6 = "";
   domain = "";
   loadingPublicConfig = false;
+  loadingExtraFee = false;
   $api: any;
   isValidPublicConfig = false;
   hasPublicConfig = false;
+  isValidExtraFee = false;
   openWarningDialog = false;
   openRemoveConfigWarningDialog = false;
   ip4ErrorMessage = "";
@@ -468,6 +531,7 @@ export default class FarmNodesTable extends Vue {
   ip6ErrorMessage = "";
   gw6ErrorMessage = "";
   domainErrorMessage = "";
+  extraFeeErrorMessage = "";
   receipts = [];
 
   updated() {
@@ -629,6 +693,35 @@ export default class FarmNodesTable extends Vue {
     }
     this.openPublicConfigDialog = true;
   }
+
+  async openExtraFee(node: nodeInterface) {
+    this.nodeToEdit = node;
+    // convert fees from USD to mili USD while getting
+    const fee = new Decimal(
+      await this.queryClient.contracts.getDedicatedNodeExtraFee({ nodeId: this.nodeToEdit.nodeId }),
+    );
+    const feeUSD = fee.div(10 ** 3).toNumber();
+    this.extraFee = feeUSD;
+    this.openExtraFeeDialogue = true;
+  }
+
+  async saveExtraFee(fee: number) {
+    this.loadingExtraFee = true;
+    // convert fees from mili USD to USD while setting
+    const feeDecimal = new Decimal(fee);
+    const feeUSD = feeDecimal.mul(10 ** 3).toNumber();
+    setDedicatedNodeExtraFee(this.$store.state.credentials.account.address, this.nodeToEdit.nodeId, feeUSD)
+      .then(() => {
+        this.$toasted.show(`Transaction succeeded: Fee is added to node ${this.nodeToEdit.nodeId}`);
+        this.loadingExtraFee = false;
+        this.openExtraFeeDialogue = false;
+      })
+      .catch(e => {
+        this.loadingExtraFee = false;
+        this.$toasted.show(`Transaction Failed: ${e}`);
+      });
+  }
+
   openDelete(node: { id: string }) {
     this.nodeToDelete = node;
     this.openDeleteDialog = true;

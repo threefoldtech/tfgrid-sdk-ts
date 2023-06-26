@@ -3,7 +3,9 @@ export interface apiInterface {
   query: {
     system: { account: (arg0: string) => { data: any } };
     tftPriceModule: { tftPrice: () => { words: [0] } };
-    smartContractModule: { activeNodeContracts: (arg0: any) => any };
+    smartContractModule: {
+      activeNodeContracts: (arg0: any) => any;
+    };
     tfgridModule: { pricingPolicies: (arg0: number) => any };
   };
   tx: {
