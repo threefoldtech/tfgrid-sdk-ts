@@ -100,6 +100,7 @@ class MachineModel {
   @Expose() @IsOptional() @IsBoolean() corex?: boolean;
   @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
   @Expose() @IsString() @IsOptional() zlogsOutput?: string;
+  @Expose() @IsString({ each: true }) @IsOptional() gpus?: string[];
 }
 
 class MachinesModel {
@@ -138,6 +139,7 @@ class KubernetesNodeModel {
   @Expose() @IsOptional() @IsBoolean() corex?: boolean;
   @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
   @Expose() @IsString() @IsOptional() zlogsOutput?: string;
+  @Expose() @IsString({ each: true }) @IsOptional() gpus?: string[];
 }
 
 class K8SModel {
@@ -556,9 +558,11 @@ class FilterOptions {
   @Expose() @IsOptional() @IsString() country?: string;
   @Expose() @IsOptional() @IsString() city?: string;
   @Expose() @IsOptional() @IsBoolean() dedicated?: boolean;
-  @Expose() @IsOptional() @IsInt() availableFor?: number;
+  @Expose() @IsOptional() @IsInt() @Min(1) availableFor?: number;
   @Expose() @IsOptional() @IsInt() page?: number;
   @Expose() @IsOptional() @IsInt() size?: number;
+  @Expose() @IsOptional() @IsBoolean() hasGPU?: boolean;
+  @Expose() @IsOptional() @IsInt() @Min(1) rentedBy?: number;
 }
 
 class CalculatorModel {
@@ -603,6 +607,15 @@ class pingFarmModel {
 
 class NetworkGetModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+}
+
+class SetDedicatedNodeExtraFeesModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) extraFee: number;
+}
+
+class GetDedicatedNodePriceModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
 }
 
 export {
@@ -720,4 +733,6 @@ export {
   GetServiceContractModel,
   NetworkGetModel,
   NodeGetModel,
+  SetDedicatedNodeExtraFeesModel,
+  GetDedicatedNodePriceModel,
 };

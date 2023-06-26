@@ -11,7 +11,7 @@ export async function getBalance(
       system: {
         account: (arg0: string) => {
           data: {
-            feeFrozen: { toJSON: () => number };
+            frozen: { toJSON: () => number };
             free: { toJSON: () => number };
             reserved: { toJSON: () => number };
           };
@@ -25,8 +25,8 @@ export async function getBalance(
 
   return {
     free: Math.floor((res.data.free.toJSON() / 1e7) * 1000) / 1000,
-    transferable: Math.floor(((res.data.free.toJSON() - res.data.feeFrozen.toJSON()) / 1e7) * 1000) / 1000,
-    reserved: res.data.feeFrozen.toJSON() / 1e7,
+    transferable: Math.floor(((res.data.free.toJSON() - res.data.frozen.toJSON()) / 1e7) * 1000) / 1000,
+    reserved: res.data.frozen.toJSON() / 1e7,
   };
 }
 

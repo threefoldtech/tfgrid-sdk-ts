@@ -8,8 +8,6 @@ on:
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
-    env:
-      NODE_OPTIONS: "--max-old-space-size=8192"
     strategy:
       matrix:
         node-version: [18.x]
@@ -35,6 +33,8 @@ jobs:
           echo '${{ secrets.TFCHAIN_MNEMONICS }}' > packages/weblets/cypress.env.json
       - name: Cypress run
         uses: cypress-io/github-action@v5.7.1
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192 --openssl-legacy-provider"
         with:
           browser: chrome
           start: yarn workspace @threefold/weblets serve:app

@@ -42,18 +42,28 @@ async function createMachine(grid: GridClient, machine: Machine, nodePicker: Nod
     cru: machine.cpu,
     mru: Math.round(machine.memory / 1024),
     country: machine.country,
-    farmId: machine.farmId,
-    farmName: machine.farmName,
     hru: machine.qsfsDisks?.reduce((total, disk) => total + disk.cache, 0),
     sru: machine.disks?.reduce((total, disk) => total + disk.size, machine.rootFilesystemSize || 0),
     publicIPs: machine.publicIpv4,
     availableFor: grid.twinId,
+    hasGPU: machine.hasGPU,
+    rentedBy: grid.twinId,
   };
 
   const vm = new MachineModel();
   vm.name = machine.name;
-  vm.node_id = await nodePicker.pick(await grid.capacity.filterNodes(filters));
+  if (machine.nodeId && machine.hasGPU) {
+    vm.node_id = machine.nodeId;
+  } else {
+    //TODO: Remove this condition once this issue is resolved https://github.com/threefoldtech/tfgrid-sdk-ts/issues/703
+    filters.farmId = machine.farmId;
+    filters.farmName = machine.farmName;
+
+    vm.node_id = await nodePicker.pick(await grid.capacity.filterNodes(filters));
+  }
+
   vm.disks = createDisks(machine.disks);
+  vm.gpus = machine.gpus;
   vm.public_ip = machine.publicIpv4 || false;
   vm.public_ip6 = machine.publicIpv6 || false;
   vm.planetary = machine.planetary ?? true;
@@ -120,7 +130,7 @@ export interface QsfsDisk {
 
 export interface Machine {
   name: string;
-  farmId: number;
+  farmId?: number;
   farmName?: string;
   publicIpv4?: boolean;
   publicIpv6?: boolean;
@@ -134,6 +144,9 @@ export interface Machine {
   disks?: Disk[];
   country?: string;
   qsfsDisks?: QsfsDisk[];
+  hasGPU?: boolean;
+  nodeId?: number;
+  gpus?: string[];
 }
 
 export interface DeployVMOptions {

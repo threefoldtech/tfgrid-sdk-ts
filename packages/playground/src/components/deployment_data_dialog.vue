@@ -33,7 +33,11 @@
               <CopyReadonlyInput label="Contract ID" :data="contract.contractId" />
 
               <template v-if="contract.publicIP">
-                <CopyReadonlyInput label="Public IPv4" :data="contract.publicIP.ip" v-if="contract.publicIP.ip" />
+                <CopyReadonlyInput
+                  label="Public IPv4"
+                  :data="contract.publicIP.ip.split('/')[0] || contract.publicIP.ip"
+                  v-if="contract.publicIP.ip"
+                />
                 <CopyReadonlyInput label="Public IPv6" :data="contract.publicIP.ip6" v-if="contract.publicIP.ip6" />
               </template>
 

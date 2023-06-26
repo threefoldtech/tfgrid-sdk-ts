@@ -17,8 +17,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      NODE_OPTIONS: "--max-old-space-size=8192"
 
     strategy:
       matrix:
@@ -44,6 +42,8 @@ jobs:
           yarn install
 
       - name: Build
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192 --openssl-legacy-provider"
         run: |
           lerna run build --no-private
           cd packages/weblets

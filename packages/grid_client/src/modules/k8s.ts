@@ -115,6 +115,7 @@ class K8sModule extends BaseModule {
         master.corex,
         master.solutionProviderId!,
         master.zlogsOutput,
+        master.gpus,
       );
 
       deployments = deployments.concat(twinDeployments);
@@ -158,6 +159,7 @@ class K8sModule extends BaseModule {
         worker.corex,
         worker.solutionProviderId!,
         worker.zlogsOutput,
+        worker.gpus,
       );
 
       deployments = deployments.concat(twinDeployments);
@@ -295,6 +297,7 @@ class K8sModule extends BaseModule {
       options.corex,
       options.solutionProviderId!,
       options.zlogsOutput,
+      options.gpus,
     );
 
     return await this._add(options.deployment_name, options.node_id, oldDeployments, twinDeployments, network);

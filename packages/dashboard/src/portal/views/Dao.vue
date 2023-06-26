@@ -86,7 +86,7 @@
                       </v-btn>
                     </div>
                     <v-container class="px-12" v-if="proposal.ayesProgress > 0 || proposal.nayesProgress > 0">
-                      <v-row justify="center" class="pt-4">
+                      <v-row justify="center" v-if="proposal.end > Date.now()" class="pt-4">
                         <v-progress-linear
                           rounded
                           :value="proposal.ayesProgress"
@@ -127,6 +127,55 @@
                                   ? proposal.nayesProgress.toFixed(2)
                                   : proposal.nayesProgress
                               }}%</strong
+                            >
+                          </template>
+                        </v-progress-linear>
+                      </v-row>
+                      <v-row justify="center" v-else class="pt-4">
+                        <v-progress-linear
+                          v-if="proposal.ayesProgress > proposal.nayesProgress"
+                          rounded
+                          :value="100"
+                          height="20"
+                          :style="{
+                            width: '100%',
+                            marginRight: 'auto',
+                            backgroundColor: '#1982b1',
+                            color: '#fff',
+                          }"
+                        >
+                          <template>
+                            <strong>Accepted</strong>
+                            <span class="pl-2"
+                              >{{
+                                !!(proposal.ayesProgress % 1)
+                                  ? proposal.ayesProgress.toFixed(2)
+                                  : proposal.ayesProgress
+                              }}%</span
+                            >
+                          </template>
+                        </v-progress-linear>
+                        <v-progress-linear
+                          v-else-if="proposal.ayesProgress < proposal.nayesProgress"
+                          rounded
+                          :value="100"
+                          color="grey lighten-2"
+                          backgroundColor="#e0e0e0"
+                          height="20"
+                          :style="{
+                            width: '100%',
+                            marginRight: 'auto',
+                            color: '#333',
+                          }"
+                        >
+                          <template>
+                            <strong>Rejected</strong>
+                            <span class="pl-2"
+                              >{{
+                                !!(proposal.nayesProgress % 1)
+                                  ? proposal.nayesProgress.toFixed(2)
+                                  : proposal.nayesProgress
+                              }}%</span
                             >
                           </template>
                         </v-progress-linear>

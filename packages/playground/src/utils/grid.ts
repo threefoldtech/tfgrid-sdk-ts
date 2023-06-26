@@ -54,7 +54,7 @@ export async function loadBalance(grid: GridClient): Promise<Balance> {
   const balance = await grid.balance.getMyBalance();
   return {
     free: +balance.free,
-    locked: +balance.feeFrozen,
+    locked: +balance.frozen,
   };
 }
 

@@ -98,7 +98,17 @@
           v-model:planetary="planetary"
           v-model:wireguard="wireguard"
         />
+        <input-tooltip
+          inline
+          tooltip="
+          Selecting a Node with GPU.
+          When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
+          "
+        >
+          <v-switch color="primary" inset label="GPU" v-model="hasGPU" />
+        </input-tooltip>
         <SelectFarm
+          v-if="!hasGPU"
           :filters="{
             cpu,
             memory,
@@ -106,6 +116,24 @@
             ssd: disks.reduce((total, disk) => total + disk.size, diskSize + 2),
           }"
           v-model="farm"
+        />
+        <SelectGPUNode
+          v-else
+          v-model="selectedNodewithCards"
+          :filters="{
+            cpu,
+            memory,
+            ipv4: ipv4,
+            ssd: disks.reduce((total, disk) => total + disk.size, diskSize + 2),
+            ipv6: ipv4,
+            name: name,
+            flist: flist,
+            disks: disks,
+            disk: diskSize,
+            hasGPU: hasGPU,
+            planetary: planetary,
+            wireguard: wireguard,
+          }"
         />
       </template>
 
@@ -207,6 +235,8 @@ const wireguard = ref(false);
 const farm = ref() as Ref<Farm>;
 const disks = ref<Disk[]>([]);
 const network = ref();
+const hasGPU = ref(false);
+const selectedNodewithCards = ref() as Ref<GPUNodeType>;
 
 function addDisk() {
   const name = generateName(7);
@@ -246,6 +276,9 @@ async function deploy() {
           planetary: planetary.value,
           envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
           rootFilesystemSize: 2,
+          hasGPU: hasGPU.value,
+          nodeId: hasGPU.value ? selectedNodewithCards.value.nodeId : undefined,
+          gpus: hasGPU.value ? selectedNodewithCards.value.cards.map(card => card.id) : undefined,
         },
       ],
       network: { addAccess: wireguard.value },
@@ -261,8 +294,11 @@ async function deploy() {
 </script>
 
 <script lang="ts">
+import type { GPUNodeType } from "@/utils/filter_node_with_gpu";
+
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectFarm from "../components/select_farm.vue";
+import SelectGPUNode from "../components/select_gpu_node.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
 
@@ -272,6 +308,7 @@ export default {
     SelectVmImage,
     SelectFarm,
     ExpandableLayout,
+    SelectGPUNode,
   },
 };
 </script>

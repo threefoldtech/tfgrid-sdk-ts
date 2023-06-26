@@ -207,6 +207,7 @@ class BaseModule {
       description: workload.description,
       rootfs_size: data.size,
       corex: data.corex,
+      gpu: data.gpu,
     };
   }
 

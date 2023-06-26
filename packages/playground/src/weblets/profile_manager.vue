@@ -41,6 +41,20 @@
             </p>
           </template>
         </div>
+        <v-tooltip text="Logout" location="bottom" :disabled="!profileManager.profile">
+          <template #activator="{ props }">
+            <VBtn
+              color="error"
+              variant="tonal"
+              @click.stop="logout"
+              v-if="profileManager.profile"
+              :disabled="updatingSSH || generatingSSH || loadingBalance"
+              class="ml-2"
+              v-bind="props"
+              icon="mdi-logout"
+            />
+          </template>
+        </v-tooltip>
       </VCard>
     </template>
 
@@ -69,6 +83,12 @@
         <VContainer>
           <form @submit.prevent="activeTab === 0 ? login() : storeAndLogin()">
             <FormValidator v-model="isValidForm">
+              <v-alert type="warning" variant="tonal" class="mb-6" v-if="activeTab === 1">
+                <p :style="{ maxWidth: '880px' }">
+                  To connect your wallet, you will need to enter your mnemonic which will be encrypted using the
+                  password. Mnemonic will never be shared outside of this device.
+                </p>
+              </v-alert>
               <VTooltip
                 v-if="activeTab === 1"
                 text="Mnemonic are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonic or click the 'Create Account' button to create an account and generate mnemonic."
@@ -92,7 +112,6 @@
                           class="mb-2"
                           label="Mnemonic"
                           placeholder="Please insert your mnemonic"
-                          autofocus
                           v-model="mnemonic"
                           v-bind="{ ...passwordInputProps, ...validationProps }"
                           :disabled="creatingAccount || activating"
@@ -117,6 +136,11 @@
                 {{ createAccountError }}
               </v-alert>
 
+              <v-alert type="warning" variant="tonal" class="mb-6" v-if="activeTab === 0">
+                <p :style="{ maxWidth: '880px' }">
+                  You will need to provide the password used while connecting your wallet.
+                </p>
+              </v-alert>
               <PasswordInputWrapper #="{ props: passwordInputProps }">
                 <InputValidator
                   :value="password"
@@ -130,13 +154,12 @@
                 >
                   <v-tooltip
                     location="bottom"
-                    text="used to encrypt your mnemonic on your local system, and is used to login from the same device."
+                    text="Used to encrypt your mnemonic on your local system, and is used to login from the same device."
                   >
                     <template #activator="{ props: tooltipProps }">
                       <div v-bind="tooltipProps">
                         <VTextField
                           label="Password"
-                          :autofocus="activeTab === 0"
                           v-model="password"
                           v-bind="{ ...passwordInputProps, ...validationProps }"
                           :disabled="creatingAccount || activating"
@@ -147,6 +170,21 @@
                 </InputValidator>
               </PasswordInputWrapper>
 
+              <PasswordInputWrapper #="{ props: confirmPasswordInputProps }" v-if="activeTab === 1">
+                <InputValidator
+                  :value="confirmPassword"
+                  :rules="[validators.required('A confirmation password is required.'), validateConfirmPassword]"
+                  #="{ props: validationProps }"
+                  ref="confirmPasswordInput"
+                >
+                  <VTextField
+                    label="Confirm Password"
+                    v-model="confirmPassword"
+                    v-bind="{ ...confirmPasswordInputProps, ...validationProps }"
+                    :disabled="creatingAccount || activating"
+                  />
+                </InputValidator>
+              </PasswordInputWrapper>
               <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="loginError">
                 {{ loginError }}
               </v-alert>
@@ -158,7 +196,7 @@
                 color="primary"
                 variant="tonal"
                 :loading="activating"
-                :disabled="!isValidForm || creatingAccount"
+                :disabled="!isValidForm || creatingAccount || (activeTab === 1 && isValidConnectConfirmationPassword)"
                 size="large"
               >
                 {{ activeTab === 0 ? "Login" : "Connect" }}
@@ -247,7 +285,7 @@
             color="primary"
             variant="text"
             @click="updateSSH"
-            :disabled="!ssh || profileManager.profile.ssh === ssh || updatingSSH"
+            :disabled="!ssh || profileManager.profile.ssh === ssh || updatingSSH || !isEnoughBalance(balance)"
             :loading="updatingSSH"
           >
             Update Public SSH Key
@@ -283,11 +321,11 @@
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import md5 from "md5";
-import { onMounted, type Ref, ref, watch } from "vue";
+import { computed, onMounted, type Ref, ref, watch } from "vue";
 import { nextTick } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
-import IconActionBtn from "../components/icon_action_btn.vue";
+import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
 import { type Balance, createAccount, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
 import { isEnoughBalance, normalizeError } from "../utils/helpers";
@@ -387,6 +425,9 @@ const isValidForm = ref(false);
 const SSHKeyHint = ref("");
 const ssh = ref("");
 let sshTimeout: any;
+const isValidConnectConfirmationPassword = computed(() =>
+  !validateConfirmPassword(confirmPassword.value) ? false : true,
+);
 
 watch(SSHKeyHint, hint => {
   if (hint) {
@@ -403,7 +444,9 @@ const balance = ref<Balance>();
 
 const activeTab = ref(0);
 const password = ref("");
+const confirmPassword = ref("");
 const passwordInput = ref() as Ref<{ validate(value: string): Promise<boolean> }>;
+const confirmPasswordInput = useInputRef();
 
 const version = 1;
 const WALLET_KEY = "wallet.v" + version;
@@ -424,6 +467,14 @@ watch(
   { immediate: true, deep: true },
 );
 
+watch(
+  password,
+  () => {
+    confirmPassword.value && confirmPasswordInput.value?.validate();
+  },
+  { immediate: true },
+);
+
 function logout() {
   sessionStorage.removeItem("password");
   profileManager.clear();
@@ -440,6 +491,7 @@ function clearError() {
 
 function clearFields() {
   password.value = "";
+  confirmPassword.value = "";
   mnemonic.value = "";
 }
 
@@ -551,6 +603,12 @@ function validatePassword(value: string) {
     if (getCredentials().passwordHash !== md5(password.value)) {
       return { message: "We couldn't find a matching wallet for this password. Please connect your wallet first." };
     }
+  }
+}
+
+function validateConfirmPassword(value: string) {
+  if (value !== password.value) {
+    return { message: "Passwords should match." };
   }
 }
 
