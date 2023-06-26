@@ -108,20 +108,10 @@ import { INodeGPU } from "../graphql/api";
 
 @Component({})
 export default class GPUDetails extends Vue {
-  @Prop({ required: true }) nodeGPU!: INodeGPU[] | null;
   @Prop({ required: true }) nodeId!: number;
-  nodeGPUitems =
-    this.$props.nodeGPU != null
-      ? this.$props.nodeGPU.map((item: INodeGPU) => {
-          return {
-            text: item.id,
-            value: item,
-            disabled: false,
-          };
-        })
-      : null;
-  gpuItem = this.$props.nodeGPU ? this.$props.nodeGPU[0] : null;
-  loading = false;
+  nodeGPUitems: { text: string; value: INodeGPU; disabled: false }[] | null = null;
+  gpuItem: INodeGPU | null = null;
+  loading = true;
   copy(id: string) {
     navigator.clipboard.writeText(id);
   }
@@ -129,7 +119,7 @@ export default class GPUDetails extends Vue {
     this.loading = true;
     await getNodeGPUs(this.nodeId)
       .then(result => {
-        if (result == null) return;
+        if (!result) return;
         this.nodeGPUitems = result?.map((item: INodeGPU) => {
           return {
             text: item.id,
@@ -145,6 +135,9 @@ export default class GPUDetails extends Vue {
       .finally(() => {
         this.loading = false;
       });
+  }
+  async mounted() {
+    await this.loadGpuDetails();
   }
 }
 </script>

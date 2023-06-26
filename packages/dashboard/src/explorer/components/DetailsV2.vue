@@ -40,11 +40,8 @@
             <InterfacesDetails :interfaces="interfaces" />
           </v-col>
 
-          <v-col
-            :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4"
-            v-if="node && (nodeGPU || gpuError)"
-          >
-            <GPUDetails :nodeGPU="nodeGPU" :nodeId="nodeId" />
+          <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="node && node.num_gpu > 0">
+            <GPUDetails :nodeId="nodeId" />
           </v-col>
         </v-row>
       </div>
@@ -57,7 +54,7 @@ import axios from "axios";
 import { DocumentNode } from "graphql";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
-import { ICountry, INode, INodeGPU, INodeStatistics } from "../graphql/api";
+import { ICountry, INode, INodeStatistics } from "../graphql/api";
 import { GrafanaStatistics } from "../utils/getMetricsUrl";
 import mediaMatcher from "../utils/mediaMatcher";
 import CountryDetails from "./CountryDetails.vue";
@@ -92,8 +89,6 @@ export default class Details extends Vue {
   loading = false;
   grafanaUrl = "";
   interfaces = undefined;
-  nodeGPU: INodeGPU[] | undefined;
-  gpuError = false;
   data: any = {};
 
   get node(): INode {
@@ -129,7 +124,6 @@ export default class Details extends Vue {
           this.data.node = await fetch(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}`).then(res =>
             res.json(),
           );
-          await this.loadGpuDetails(this.nodeId);
           try {
             this.data.nodeStatistics = await (
               await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/statistics`, {
@@ -150,20 +144,6 @@ export default class Details extends Vue {
       .finally(() => {
         this.loading = false;
       });
-  }
-  async loadGpuDetails(nodeId: number) {
-    if (!this.data.node.num_gpu) return;
-    try {
-      this.nodeGPU = await (
-        await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${nodeId}/gpu`, {
-          timeout: 5000,
-        })
-      ).data;
-      this.gpuError = false;
-    } catch (error) {
-      this.gpuError = true;
-      this.nodeGPU = undefined;
-    }
   }
   destroyed() {
     this.screen_max_1200.destry();
