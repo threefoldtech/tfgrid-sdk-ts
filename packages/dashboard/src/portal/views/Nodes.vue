@@ -63,7 +63,7 @@ export default class NodesView extends Vue {
     },
   ];
 
-  activeFiltersList: string[] = ["Total SRU (GB)"];
+  activeFiltersList: string[] = ["Free SRU (GB)"];
 
   get activeFilters() {
     const keySet = new Set(this.activeFiltersList);
@@ -75,21 +75,20 @@ export default class NodesView extends Vue {
       label: "Total SRU (GB)",
       key: "total_sru",
       placeholder: "Filter by total SSD greater than or equal to.",
+    {
+      label: "Free HRU (GB)",
+      key: "free_hru",
+      placeholder: "Filter by Free HDD greater than or equal to.",
     },
     {
-      label: "Total HRU (GB)",
-      key: "total_hru",
-      placeholder: "Filter by total HDD greater than or equal to.",
+      label: "Free MRU (GB)",
+      key: "free_mru",
+      placeholder: "Filter by Free Memory greater than or equal to.",
     },
     {
-      label: "Total MRU (GB)",
-      key: "total_mru",
-      placeholder: "Filter by total Memory greater than or equal to.",
-    },
-    {
-      label: "Total CRU (Cores)",
-      key: "total_cru",
-      placeholder: "Filter by total Cores greater than or equal to.",
+      label: "Free CRU (Cores)",
+      key: "free_cru",
+      placeholder: "Filter by Free Cores greater than or equal to.",
     },
     {
       label: "GPU's vendor",
@@ -97,13 +96,12 @@ export default class NodesView extends Vue {
       placeholder: "Filter by GPU's vendor.",
     },
     {
-      label: "GPU's device name",
-      key: "gpu_device_name",
-      placeholder: "Filter by GPU's device name.",
+      label: "GPU's device",
+      key: "gpu_device",
+      placeholder: "Filter by GPU's device.",
     },
   ];
 
-  $api = "";
   activeTab = this.tabs[0].query;
   trigger = "";
 
