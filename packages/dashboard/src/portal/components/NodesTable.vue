@@ -91,6 +91,8 @@ export default class NodesTable extends Vue {
   @Prop({ required: true }) tab!: ITab;
   @Prop({ required: true }) twinId: any;
   @Prop({ required: true }) trigger!: string;
+  @Prop({ required: true }) filterKeys!: string;
+
   $api: any;
   expanded: any = [];
   loading = true;
@@ -122,6 +124,11 @@ export default class NodesTable extends Vue {
 
   @Watch("trigger", { immediate: true }) onTab() {
     this.getNodes();
+  }
+
+  @Watch("filterKeys") async filterRequest(value: string) {
+    console.log(this.filterKeys);
+    console.log("filterKeys | value: ", value);
   }
 
   async mounted() {

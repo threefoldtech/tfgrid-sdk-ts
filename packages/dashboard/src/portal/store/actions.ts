@@ -1,9 +1,13 @@
 import { web3AccountsSubscribe, web3Enable } from "@polkadot/extension-dapp";
 import type { ActionContext } from "vuex";
 
-import { getProposal, getProposals } from "../lib/dao";
+import { getProposals } from "../lib/dao";
 import { getFarm } from "../lib/farms";
 import { PortalState } from "./state";
+
+export enum ActionTypes {
+  REQUEST_DEDICATED_NODES = "requestDedicatedNodes",
+}
 
 export default {
   async subscribeAccounts({ commit }: ActionContext<PortalState, PortalState>) {
@@ -12,6 +16,25 @@ export default {
       commit("setAccounts", { accounts: injectedAccounts });
     });
   },
+
+  async requestDedicatedNodes({ state, commit }: ActionContext<PortalState, PortalState>) {
+    let url = `${window.configs.APP_GRIDPROXY_URL}/nodes?ret_count=true&rentable=true`;
+
+    for (const key in state.dedicatedNodesFilter) {
+      let value = state.dedicatedNodesFilter[key];
+
+      if (key == "free_hru" || key == "free_mru" || key == "free_sru" || key == "free_cru") {
+        value *= 1024 * 1024 * 1024; // convert from gb to b
+      }
+
+      // don't break the call for the null values
+      if (value == null || value == undefined) value = "";
+
+      url += `&${key}=${value}`;
+    }
+    // console.log('url => ', url);
+  },
+
   async unsubscribeAccounts({ commit }: ActionContext<PortalState, PortalState>) {
     const unsubscribe = await web3AccountsSubscribe(() => {
       console.log(`unsubscribing`);

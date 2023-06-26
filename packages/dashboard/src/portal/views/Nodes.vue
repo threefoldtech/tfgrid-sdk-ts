@@ -1,29 +1,45 @@
 <template>
-  <v-container>
-    <v-card>
-      <v-tabs v-model="activeTab" background-color="deep-blue accent-4" centered dark @change="onTabChange()">
-        <v-tab v-for="tab in tabs" :key="tab.index" :value="tab.query" :href="'#' + tab.query">
-          {{ tab.label }}
-        </v-tab>
-      </v-tabs>
-      <NodesTable
-        :tab="tabs.find(tab => tab.query === activeTab)"
-        :twinId="$store.state.credentials.twin.id"
-        :trigger="trigger"
-      />
-    </v-card>
-  </v-container>
+  <Layout>
+    <template v-slot:filters>
+      <LayoutFilters :items="filters.map(f => f.label)" v-model="activeFiltersList" />
+    </template>
+
+    <template v-slot:active-filters>
+      <div v-for="filter in activeFilters" :key="filter.key">
+        <NodeFilter :filterKey="filter.key" :label="filter.label" :items="[]" :placeholder="filter.placeholder" />
+      </div>
+    </template>
+
+    <template v-slot:node-table>
+      <v-card>
+        <v-tabs v-model="activeTab" background-color="deep-blue accent-4" centered dark @change="onTabChange()">
+          <v-tab v-for="tab in tabs" :key="tab.index" :value="tab.query" :href="'#' + tab.query">
+            {{ tab.label }}
+          </v-tab>
+        </v-tabs>
+        <NodesTable
+          :tab="tabs.find(tab => tab.query === activeTab)"
+          :twinId="$store.state.credentials.twin.id"
+          :trigger="trigger"
+          :filterKeys="activeFilters"
+        />
+      </v-card>
+    </template>
+  </Layout>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 
+import Layout from "../components/Layout.vue";
+import LayoutFilters from "../components/LayoutFilters.vue";
+import NodeFilter from "../components/NodeFilter.vue";
 import NodesTable from "../components/NodesTable.vue";
 import { ITab } from "../lib/nodes";
 
 @Component({
   name: "NodesView",
-  components: { NodesTable },
+  components: { NodesTable, LayoutFilters, Layout, NodeFilter },
 })
 export default class NodesView extends Vue {
   tabs: ITab[] = [
@@ -46,6 +62,47 @@ export default class NodesView extends Vue {
       index: 3,
     },
   ];
+
+  activeFiltersList: string[] = ["Free SRU (GB)"];
+
+  get activeFilters() {
+    const keySet = new Set(this.activeFiltersList);
+    return this.filters.filter(filter => keySet.has(filter.label));
+  }
+
+  filters = [
+    {
+      label: "Free SRU (GB)",
+      key: "free_sru",
+      placeholder: "Filter by Free SSD greater than or equal to.",
+    },
+    {
+      label: "Free HRU (GB)",
+      key: "free_hru",
+      placeholder: "Filter by Free HDD greater than or equal to.",
+    },
+    {
+      label: "Free MRU (GB)",
+      key: "free_mru",
+      placeholder: "Filter by Free Memory greater than or equal to.",
+    },
+    {
+      label: "Free CRU (Cores)",
+      key: "free_cru",
+      placeholder: "Filter by Free Cores greater than or equal to.",
+    },
+    {
+      label: "GPU's vendor",
+      key: "gpu_vendor",
+      placeholder: "Filter by GPU's vendor.",
+    },
+    {
+      label: "GPU's device",
+      key: "gpu_device",
+      placeholder: "Filter by GPU's device.",
+    },
+  ];
+
   $api = "";
   activeTab = this.tabs[0].query;
   trigger = "";

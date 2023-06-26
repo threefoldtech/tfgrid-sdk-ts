@@ -10,9 +10,11 @@ export interface PortalState {
   accounts: accountInterface[];
   proposals: number;
   api: ApiPromise;
+  dedicatedNodesFilter: any;
 }
 export default {
   accounts: [],
   proposals: 0,
   api: undefined,
+  dedicatedNodesFilter: {},
 };
