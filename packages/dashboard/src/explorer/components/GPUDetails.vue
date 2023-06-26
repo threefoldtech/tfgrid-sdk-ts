@@ -89,7 +89,7 @@
           </div>
           <div v-else class="text-center">
             <v-alert class="ma-2" dense outlined type="error">
-              Failed to receive node GPUs information
+              Failed to get node GPUs' information
               <template v-slot:append>
                 <v-icon class="ml-2 mt-1" @click="loadGpuDetails">mdi-reload</v-icon>
               </template>
