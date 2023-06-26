@@ -1,6 +1,6 @@
 <template>
   <v-bottom-sheet v-model="open" persistent no-click-animation @click:outside="$emit('close-sheet')">
-    <v-sheet class="text-center" height="90vh">
+    <v-sheet :class="{ 'text-center': true, loading: loading }" height="90vh">
       <div class="content" v-if="!loading">
         <v-row>
           <v-col v-if="node">
@@ -45,9 +45,11 @@
           </v-col>
         </v-row>
       </div>
-      <div v-if="loading" class="pt-10 mt-auto align-center">
-        <v-progress-circular indeterminate color="primary" :size="100" />
-        <p class="pt-4">Loading Node {{ nodeId ?? "" }} details</p>
+      <div v-if="loading" class="d-flex align-self-center justify-center" style="height: 100%">
+        <div class="align-self-center">
+          <v-progress-circular indeterminate color="primary" :size="100" />
+          <p class="pt-4">Loading Node {{ nodeId ?? "" }} details</p>
+        </div>
       </div>
     </v-sheet>
   </v-bottom-sheet>
@@ -90,7 +92,7 @@ export default class Details extends Vue {
   @Prop({ required: true }) variables!: { [key: string]: any };
   @Prop() nodeId: any;
 
-  loading = true;
+  loading = false;
   grafanaUrl = "";
   interfaces = undefined;
   data: any = {};
@@ -146,7 +148,7 @@ export default class Details extends Vue {
         /* pass */
       })
       .finally(() => {
-        this.loading = true;
+        this.loading = false;
       });
   }
   destroyed() {
@@ -175,5 +177,8 @@ export default class Details extends Vue {
   will-change: transform;
   height: 100%;
   padding: 20px;
+}
+.loading {
+  cursor: wait;
 }
 </style>
