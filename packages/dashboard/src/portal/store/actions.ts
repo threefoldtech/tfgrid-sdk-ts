@@ -21,42 +21,21 @@ export default {
   },
 
   async requestDedicatedNodes({ state, commit }: ActionContext<PortalState, PortalState>) {
-    commit(MutationTypes.SET_TABLE_LOAD, true);
-    let baseUrl = `${window.configs.APP_GRIDPROXY_URL}/nodes?status=up&ret_count=true&page=${state.dedicatedNodesTablePageNumber}&size=${state.dedicatedNodesTablePageSize}`;
-    const query = state.tabQuery; // tab query.
-
-    if (query == "rented_by") {
-      baseUrl += `&${query}=${state.twinID}`;
-    } else {
-      baseUrl += `&${query}=true`;
-    }
+    let url = `${window.configs.APP_GRIDPROXY_URL}/nodes?ret_count=true&rentable=true`;
 
     for (const key in state.dedicatedNodesFilter) {
       let value = state.dedicatedNodesFilter[key];
-      if (key == "total_hru" || key == "total_mru" || key == "total_sru") {
-        value *= 1024 * 1024 * 1024; // convert from gb to b
-        value = parseInt(value);
-      }
-      // don't break the call for the null values
-      if (value == null || value == undefined || value == 0) value = "";
-      baseUrl += `&${key}=${value}`;
-    }
 
-    if (query.length) {
-      try {
-        const res = await fetch(baseUrl);
-        const nodesCount: any = res.headers.get("count");
-        commit(MutationTypes.SET_DEDICATED_NODES_COUNT, +nodesCount);
-        let nodes = await res.json();
-        // Update the nodes with price and discount.
-        nodes = await updateDedicatedNodes(state.api, state.address, state.twinID, nodes);
-        commit(MutationTypes.SET_DEDICATED_NODES, nodes);
-      } catch (error) {
-        console.error("Failed to fetch dedicated nodes:", error);
-        // Handle error and show error message to the user
+      if (key == "free_hru" || key == "free_mru" || key == "free_sru" || key == "free_cru") {
+        value *= 1024 * 1024 * 1024; // convert from gb to b
       }
+
+      // don't break the call for the null values
+      if (value == null || value == undefined) value = "";
+
+      url += `&${key}=${value}`;
     }
-    commit(MutationTypes.SET_TABLE_LOAD, false);
+    // console.log('url => ', url);
   },
 
   async unsubscribeAccounts({ commit }: ActionContext<PortalState, PortalState>) {
