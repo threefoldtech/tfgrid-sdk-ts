@@ -6,20 +6,13 @@ import { IState } from "@/explorer/store/state";
 import { apiInterface } from "../lib/util";
 import { accountInterface, PortalState } from "./state";
 
+
 export enum MutationTypes {
   SET_DEDICATED_NODES = "setNodes",
   SET_DEDICATED_NODES_FILTER = "setNodesFilter",
-  SET_DEDICATED_NODES_TABLE_PAGE_NUMBER = "setDedicatedNodesTablePageNumber",
-  SET_DEDICATED_NODES_TABLE_PAGE_SIZE = "setDedicatedNodesTablePageSize",
-  SET_TWIN_ID = "setTwinID",
-  SET_TAB_QUERY = "setTabQuery",
-  SET_TABLE_LOAD = "setTableLoad",
-  SET_DEDICATED_NODES_COUNT = "setDedicatedNodesCount",
-  SET_API = "setApi",
-  SET_ADDRESS = "setAddress",
 }
 
-export enum MutationTypes {
+export enum PortalMutationTypes {
   SET_ACCOUNTS = "setAccounts",
   REMOVE_ACCOUNTS = "removeAccounts",
   SET_PROPOSALS = "setProposals",
@@ -89,5 +82,18 @@ export default {
 
   setDedicatedNodesCount(state: PortalState, payload: number) {
     state.dedicatedNodesCount = payload;
+  },
+
+  clearDedicatedNodesFilter(state: PortalState) {
+    state.dedicatedNodesFilter = {};
+  },
+
+  clearDedicatedNodesFilterKey(state: PortalState, key: string) {
+    state.dedicatedNodesFilter[key] = "";
+  },
+
+  setNodesFilter(state: PortalState, payload: { key: string; value: any }) {
+    state.dedicatedNodesFilter[payload.key] = payload.value;
+    console.log(payload.key, state.dedicatedNodesFilter[payload.key]);
   },
 };
