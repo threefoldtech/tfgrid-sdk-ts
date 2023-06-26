@@ -20,6 +20,7 @@
     :model-value="$props.modelValue"
     @update:model-value="$emit('update:model-value', $event)"
     :no-data-text="`No Kubernetes deployments found on this account.`"
+    @click:row="$attrs['onClick:row']"
   >
     <template #[`item.name`]="{ item }">
       {{ item.value.deploymentName }}
