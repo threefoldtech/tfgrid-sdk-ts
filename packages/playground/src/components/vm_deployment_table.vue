@@ -107,14 +107,14 @@ async function loadDeployments() {
 
 const filteredHeaders = computed(() => {
   let headers = [
-    { title: "PLACEHOLDER", key: "data-table-select" },
+    { title: "PLACEHOLDER", key: "data-table-select", sortable: false },
     { title: "Name", key: "name" },
     { title: "Public IPv4", key: "ipv4" },
     { title: "Public IPv6", key: "ipv6" },
     { title: "Planetary Network IP", key: "planetary" },
     { title: "Flist", key: "flist" },
     { title: "Cost", key: "billing" },
-    { title: "Actions", key: "actions" },
+    { title: "Actions", key: "actions", sortable: false },
   ];
 
   const IPV6Solutions = [ProjectName.VM, ProjectName.Fullvm] as string[];
