@@ -129,7 +129,7 @@ export default class Details extends Vue {
           this.data.node = await fetch(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}`).then(res =>
             res.json(),
           );
-          await this.loadGpuDetails(94);
+          await this.loadGpuDetails(this.nodeId);
           try {
             this.data.nodeStatistics = await (
               await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/statistics`, {
@@ -155,7 +155,7 @@ export default class Details extends Vue {
     if (!this.data.node.num_gpu) return;
     try {
       this.nodeGPU = await (
-        await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${94}/gpu`, {
+        await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${nodeId}/gpu`, {
           timeout: 5000,
         })
       ).data;
