@@ -33,6 +33,9 @@ export enum PortalMutationTypes {
   SET_DEDICATED_NODES = "setDedicatedNodes",
   SET_DEDICATED_NODES_COUNT = "setDedicatedNodesCount",
   SET_ADDRESS = "setAddress",
+
+  CLEAR_DEDICATED_NODES_FILTER = "clearDedicatedNodesFilter",
+  CLEAR_DEDICATED_NODES_FILTER_KEY = "clearDedicatedNodesFilterKey",
 }
 
 export default {
@@ -53,7 +56,6 @@ export default {
 
   setNodesFilter(state: PortalState, payload: { key: string; value: any }) {
     state.dedicatedNodesFilter[payload.key] = payload.value;
-    console.log(payload.key, state.dedicatedNodesFilter[payload.key]);
   },
 
   setDedicatedNodesTablePageNumber(state: PortalState, payload: number) {
@@ -75,16 +77,10 @@ export default {
     state.address = address;
   },
 
-  setNodes(state: PortalState, payload: any): void {
+  setNodes(state: PortalState, nodes: any[]): void {
     // clear the state each time you reload. to avoid duplicated nodes
     state.dedicatedNodes = [];
-
-    console.log("payload.nodes: , ", payload.nodes);
-
-    state.dedicatedNodes = payload.nodes;
-    // for (let i = 0; i < payload.nodes.length; i++) {
-    //   state.dedicatedNodes.push(fillNodesFields(state as unknown as IState, payload.nodes[i], [payload.farms]));
-    // }
+    state.dedicatedNodes = nodes;
   },
 
   setDedicatedNodesCount(state: PortalState, payload: number) {
