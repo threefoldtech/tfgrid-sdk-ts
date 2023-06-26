@@ -45,6 +45,10 @@
           </v-col>
         </v-row>
       </div>
+      <div v-if="loading" class="pt-10 mt-auto align-center">
+        <v-progress-circular indeterminate color="primary" :size="100" />
+        <p class="pt-4">Loading Node {{ nodeId ?? "" }} details</p>
+      </div>
     </v-sheet>
   </v-bottom-sheet>
 </template>
@@ -86,7 +90,7 @@ export default class Details extends Vue {
   @Prop({ required: true }) variables!: { [key: string]: any };
   @Prop() nodeId: any;
 
-  loading = false;
+  loading = true;
   grafanaUrl = "";
   interfaces = undefined;
   data: any = {};
@@ -142,7 +146,7 @@ export default class Details extends Vue {
         /* pass */
       })
       .finally(() => {
-        this.loading = false;
+        this.loading = true;
       });
   }
   destroyed() {
