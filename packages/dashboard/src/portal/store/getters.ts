@@ -12,7 +12,4 @@ export default {
   proposals: (state: PortalState) => state.proposals,
   getDedicatedNodesTablePageNumber: state => state.dedicatedNodesTablePageNumber,
   getDedicatedNodesTablePageSize: state => state.dedicatedNodesTablePageSize,
-  getTableLoad: state => state.tableLoad,
-  getAPI: state => state.api,
-  getTwinID: state => state.twinID,
 } as GetterTree<PortalState, PortalState>;
