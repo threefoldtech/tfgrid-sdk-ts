@@ -11,12 +11,6 @@ export enum MutationTypes {
   SET_DEDICATED_NODES_FILTER = "setNodesFilter",
   SET_DEDICATED_NODES_TABLE_PAGE_NUMBER = "setDedicatedNodesTablePageNumber",
   SET_DEDICATED_NODES_TABLE_PAGE_SIZE = "setDedicatedNodesTablePageSize",
-  SET_TWIN_ID = "setTwinID",
-  SET_TAB_QUERY = "setTabQuery",
-  SET_TABLE_LOAD = "setTableLoad",
-  SET_DEDICATED_NODES_COUNT = "setDedicatedNodesCount",
-  SET_API = "setApi",
-  SET_ADDRESS = "setAddress",
 }
 
 export enum PortalMutationTypes {
@@ -85,5 +79,12 @@ export default {
 
   setDedicatedNodesCount(state: PortalState, payload: number) {
     state.dedicatedNodesCount = payload;
+  },
+
+  setDedicatedNodesTablePageNumber(state: PortalState, payload: number) {
+    state.dedicatedNodesTablePageNumber = payload;
+  },
+  setDedicatedNodesTablePageSize(state: PortalState, payload: number) {
+    state.dedicatedNodesTablePageSize = payload;
   },
 };
