@@ -19,7 +19,7 @@
             </v-btn>
 
             <v-card color="transparent" outlined v-if="$store.state.portal.accounts.length === 0">
-              <v-btn @click="$store.dispatch('portal/subscribeAccounts')" color="green"> Connect </v-btn>
+              <v-btn @click="subscribe" color="green"> Connect </v-btn>
             </v-card>
 
             <v-btn v-else @click="disconnectWallet" color="red"> Disconnect </v-btn>
@@ -252,9 +252,21 @@ export default class Dashboard extends Vue {
   accounts: accountInterface[] = [];
   loadingAPI = true;
   version = config.version;
-
+  async subscribe() {
+    await this.$store.dispatch("portal/subscribeAccounts").then(extensions => {
+      if (!extensions)
+        this.$toasted.show("Can't open polkadot extension please make sure you have installed it first, and try again");
+    });
+  }
   async mounted() {
-    this.$store.dispatch("portal/subscribeAccounts");
+    await this.subscribe();
+    console.log(this.$store.state.portal.accounts.length);
+    await setTimeout(() => {
+      if (!this.$store.state.portal.accounts.length)
+        this.$toasted.show(
+          "Can't get any account information from polkadot extension please make sure you have registered account on it",
+        );
+    }, 30);
     this.accounts = this.$store.state.portal.accounts;
     if (this.$route.path === "/" && !this.$api) {
       Vue.prototype.$api = await connect();
