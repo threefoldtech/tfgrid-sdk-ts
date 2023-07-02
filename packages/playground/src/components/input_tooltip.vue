@@ -13,7 +13,7 @@
             @focus="propsRef?.onFocus"
             @blur="propsRef?.onBlur"
           >
-            <v-icon>mdi-information</v-icon>
+            <v-icon>mdi-information-outline</v-icon>
           </span>
         </div>
       </template>
