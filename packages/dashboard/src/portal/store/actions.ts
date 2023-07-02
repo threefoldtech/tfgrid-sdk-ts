@@ -22,6 +22,8 @@ export default {
 
   async requestDedicatedNodes({ state, commit }: ActionContext<PortalState, PortalState>) {
     let url = `${window.configs.APP_GRIDPROXY_URL}/nodes?ret_count=true&rentable=true`;
+    url += `&size=${state.dedicatedNodesTablePageSize}`;
+    url += `&page=${state.dedicatedNodesTablePageNumber}`;
 
     for (const key in state.dedicatedNodesFilter) {
       let value = state.dedicatedNodesFilter[key];
