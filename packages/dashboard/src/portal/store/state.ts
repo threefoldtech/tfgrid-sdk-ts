@@ -11,10 +11,14 @@ export interface PortalState {
   proposals: number;
   api: ApiPromise;
   dedicatedNodesFilter: any;
+  dedicatedNodesTablePageSize: number;
+  dedicatedNodesTablePageNumber: number;
 }
 export default {
   accounts: [],
   proposals: 0,
   api: undefined,
   dedicatedNodesFilter: {},
+  nodesTablePageSize: 10,
+  nodesTablePageNumber: 1,
 };
