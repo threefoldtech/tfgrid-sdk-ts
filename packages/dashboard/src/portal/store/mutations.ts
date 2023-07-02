@@ -5,19 +5,10 @@ import { accountInterface, PortalState } from "./state";
 import { apiInterface } from "../lib/util";
 
 export enum MutationTypes {
-  SET_ACCOUNTS = "setAccounts",
-  REMOVE_ACCOUNTS = "removeAccounts",
-  SET_PROPOSALS = "setProposals",
-  SET_API = "setApi",
-  SET_DEDICATED_NODES_FILTER = "setDedicatedNodesFilter",
+  SET_DEDICATED_NODES = "setNodes",
+  SET_DEDICATED_NODES_FILTER = "setNodesFilter",
   SET_DEDICATED_NODES_TABLE_PAGE_NUMBER = "setDedicatedNodesTablePageNumber",
   SET_DEDICATED_NODES_TABLE_PAGE_SIZE = "setDedicatedNodesTablePageSize",
-  SET_TWIN_ID = "setTwinID",
-  SET_TAB_QUERY = "setTabQuery",
-  SET_TABLE_LOAD = "setTableLoad",
-  SET_DEDICATED_NODES = "setDedicatedNodes",
-  SET_DEDICATED_NODES_COUNT = "setDedicatedNodesCount",
-  SET_ADDRESS = "setAddress",
 }
 
 export default {
@@ -77,5 +68,12 @@ export default {
   setNodesFilter(state: PortalState, payload: { key: string; value: any }) {
     state.dedicatedNodesFilter[payload.key] = payload.value;
     console.log(payload.key, state.dedicatedNodesFilter[payload.key]);
+  },
+
+  setDedicatedNodesTablePageNumber(state: PortalState, payload: number) {
+    state.dedicatedNodesTablePageNumber = payload;
+  },
+  setDedicatedNodesTablePageSize(state: PortalState, payload: number) {
+    state.dedicatedNodesTablePageSize = payload;
   },
 };
