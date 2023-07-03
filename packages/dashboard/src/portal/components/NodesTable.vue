@@ -1,6 +1,5 @@
 <template>
   <v-container>
-    key => {{ filterKeys }}
     <v-data-table
       :headers="headers"
       :items="$store.getters['portal/getDedicatedNodes']"
@@ -22,7 +21,6 @@
       @item-expanded="getDNodeDetails"
     >
       <template v-slot:[`item.mru`]="{ item }">
-        item22 => {{ item }}
         {{ convert(item.mru) }}
       </template>
       <template v-slot:[`item.sru`]="{ item }">
@@ -126,6 +124,7 @@ export default class NodesTable extends Vue {
 
   @Watch("trigger", { immediate: true }) onTab() {
     this.requestNodes();
+    this.expanded = this.expanded.length ? [] : this.expanded;
   }
 
   @Watch("filterKeys") async filterRequest(value: string) {
@@ -148,8 +147,6 @@ export default class NodesTable extends Vue {
 
   async getDNodeDetails(event: any) {
     // value is whether or not the row is expanded now.
-    console.log("event: ", event);
-
     if (!event.value) return;
     try {
       this.dNodeError = false;
@@ -175,7 +172,7 @@ export default class NodesTable extends Vue {
   // reload the nodes table
   async requestNodes() {
     if (this.$api) {
-      // this.$store.commit('portal/' + MutationTypes.SET_API, this.$api);
+      this.$store.commit("portal/" + MutationTypes.SET_API, this.$api);
       this.$store.commit("portal/" + MutationTypes.SET_TWIN_ID, this.twinId);
       this.$store.commit("portal/" + MutationTypes.SET_TAB_QUERY, this.tab.query);
       await this.$store.dispatch(ActionTypes.REQUEST_DEDICATED_NODES);
