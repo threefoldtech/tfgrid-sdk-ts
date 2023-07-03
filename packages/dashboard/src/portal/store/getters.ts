@@ -14,5 +14,8 @@ export default {
   getDedicatedNodesTablePageSize: state => state.dedicatedNodesTablePageSize,
   getTableLoad: state => state.tableLoad,
   getAPI: state => state.api,
+<<<<<<< HEAD
   getTwinID: state => state.twinID,
+=======
+>>>>>>> 28377b5f (WIP: update the INode model with the missing fields, make a bind on the inputes and request to get the nodes on change.)
 } as GetterTree<PortalState, PortalState>;
