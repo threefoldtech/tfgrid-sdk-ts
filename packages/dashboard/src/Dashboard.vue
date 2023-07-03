@@ -253,20 +253,23 @@ export default class Dashboard extends Vue {
   loadingAPI = true;
   version = config.version;
   async subscribe() {
-    await this.$store.dispatch("portal/subscribeAccounts").then(extensions => {
-      if (!extensions)
-        this.$toasted.show("Can't open polkadot extension please make sure you have installed it first, and try again");
+    await this.$store.dispatch("portal/subscribeAccounts").then(async extensions => {
+      if (!extensions) {
+        this.$toasted.show(
+          "Can't open polkadot extension please make sure you have installed it first, allow access on this page, and try again",
+        );
+        return;
+      }
+      await setTimeout(() => {
+        if (!this.$store.state.portal.accounts.length)
+          this.$toasted.show(
+            "Can't get any account information from polkadot extension please make sure you have registered account on it",
+          );
+      }, 50);
     });
   }
   async mounted() {
     await this.subscribe();
-    console.log(this.$store.state.portal.accounts.length);
-    await setTimeout(() => {
-      if (!this.$store.state.portal.accounts.length)
-        this.$toasted.show(
-          "Can't get any account information from polkadot extension please make sure you have registered account on it",
-        );
-    }, 30);
     this.accounts = this.$store.state.portal.accounts;
     if (this.$route.path === "/" && !this.$api) {
       Vue.prototype.$api = await connect();
