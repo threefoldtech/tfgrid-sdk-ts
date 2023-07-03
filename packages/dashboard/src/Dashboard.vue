@@ -187,6 +187,7 @@ import TfChainConnector from "./components/TfChainConnector.vue";
 import FundsCard from "./portal/components/FundsCard.vue";
 import TftSwapPrice from "./portal/components/TftSwapPrice.vue";
 import { connect } from "./portal/lib/connect";
+import { MutationTypes } from "./portal/store/mutations";
 import { accountInterface } from "./portal/store/state";
 
 interface SidenavItem {
@@ -226,11 +227,13 @@ export default class Dashboard extends Vue {
   version = config.version;
 
   async mounted() {
-    this.routes = this.routes.filter(route => !route.hidden);
-    Vue.prototype.$api = await connect();
-    this.$store.commit("portal/setApi", { api: this.$api });
-    this.loadingAPI = false;
-
+    this.$store.dispatch("portal/subscribeAccounts");
+    this.accounts = this.$store.state.portal.accounts;
+    if (this.$route.path === "/" && !this.$api) {
+      Vue.prototype.$api = await connect();
+      if (this.$api) this.$store.commit(`portal/${MutationTypes.SET_API}`, this.$api);
+      this.loadingAPI = false;
+    }
     const theme = localStorage.getItem("dark_theme");
     if (theme) {
       if (theme === "true") {
