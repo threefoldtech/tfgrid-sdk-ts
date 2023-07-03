@@ -10,14 +10,13 @@
       type="text"
       :rules="[validated(item, filterKey)]"
     />
-    <!-- <v-alert dense type="error" v-if="errorMsg">
-      {{ errorMsg }}
-    </v-alert> -->
   </v-card>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+
+import { inputValidation } from "@/explorer/utils/validations";
 
 import { ActionTypes } from "../store/actions";
 import { MutationTypes } from "../store/mutations";
@@ -32,46 +31,31 @@ export default class InFilter extends Vue {
   invalid = false;
   errorMsg: string | null = null;
 
-  created() {
-    console.log("Created...");
-  }
-
-  destroyed() {
-    console.log("Destroyed...");
-  }
-
   setItem(value: string) {
-    console.log("Set item value: ", value);
-
     this.$store.commit("portal/" + MutationTypes.SET_DEDICATED_NODES_FILTER, {
       key: this.filterKey,
       value: [value],
     });
 
-    this.$store.dispatch("portal/" + ActionTypes.REQUEST_DEDICATED_NODES);
-
     if (!this.invalid) {
-      // add the current filter key to the query.
       // load nodes with the changes
-      // this.$store.dispatch(ActionTypes.REQUEST_NODES);
+      // add the current filter key to the query.
+      this.$store.dispatch("portal/" + ActionTypes.REQUEST_DEDICATED_NODES);
     }
   }
 
   remove(index: number): void {
     this.$store.dispatch("portal/removeFilterItem", { filterKey: this.filterKey, index });
-    // this.$store.dispatch(ActionTypes.REQUEST_NODES);
+    this.$store.dispatch("portal/" + ActionTypes.REQUEST_DEDICATED_NODES);
   }
 
   validated(value: string, key: string): string | null {
-    console.log("key: ", key);
-    console.log("value: ", value);
-
     if (!value) {
       // reset filter
       this.setItem("");
       return (this.errorMsg = "");
     }
-    // this.errorMsg = inputValidation(value, key);
+    this.errorMsg = inputValidation(value, key);
     if (!this.errorMsg) {
       this.invalid = false;
       this.setItem(value);
