@@ -58,7 +58,7 @@ export default class InFilter extends Vue {
   }
 
   remove(index: number): void {
-    this.$store.dispatch("explorer/removeFilterItem", { filterKey: this.filterKey, index });
+    this.$store.dispatch("portal/removeFilterItem", { filterKey: this.filterKey, index });
     // this.$store.dispatch(ActionTypes.REQUEST_NODES);
   }
 
