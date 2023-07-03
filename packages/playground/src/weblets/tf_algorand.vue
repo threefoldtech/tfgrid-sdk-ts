@@ -25,15 +25,7 @@
           <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
-
-      <input-tooltip
-        #="{ props }"
-        inline
-        tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
-      >
-        <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
-      </input-tooltip>
-
+      <Network v-model:ipv4="ipv4" />
       <AlgorandCapacity
         :network="network"
         :type="type"
@@ -161,6 +153,7 @@
 <script lang="ts" setup>
 import { computed, type Ref, ref, watch } from "vue";
 
+import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type Farm, ProjectName, type Validators } from "../types";

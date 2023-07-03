@@ -48,26 +48,7 @@
             </input-tooltip>
           </password-input-wrapper>
         </input-validator>
-
-        <input-tooltip
-          #="props"
-          tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
-          inline
-        >
-          <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
-        </input-tooltip>
-
-        <input-tooltip
-          #="props"
-          inline
-          tooltip="The Planetary Network is a distributed network infrastructure that spans across multiple regions and countries, providing global connectivity."
-        >
-          <v-switch color="primary" inset label="Planetary Network" v-model="planetary" v-bind="props" />
-        </input-tooltip>
-
-        <v-alert v-show="networkError" class="mb-2" type="warning" variant="tonal">
-          You must enable at least one of network options.
-        </v-alert>
+        <Network required v-model:ipv4="ipv4" v-model:planetary="planetary" ref="network" />
         <SelectFarm
           :filters="{
             cpu,
@@ -96,7 +77,9 @@
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" :disabled="tabs?.invalid || networkError" @click="deploy"> Deploy </v-btn>
+      <v-btn color="primary" variant="tonal" :disabled="tabs?.invalid || network?.error" @click="deploy">
+        Deploy
+      </v-btn>
     </template>
   </weblet-layout>
 </template>
@@ -104,6 +87,7 @@
 <script lang="ts" setup>
 import { type Ref, ref, watch } from "vue";
 
+import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type Farm, ProjectName } from "../types";
@@ -127,12 +111,8 @@ const rootFsSize = rootFs(cpu, memory);
 const farm = ref() as Ref<Farm>;
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
-const networkError = ref(false);
+const network = ref();
 
-watch([planetary, ipv4], ([planetary, ipv4]) => {
-  if (!(ipv4 || planetary)) networkError.value = true;
-  else networkError.value = false;
-});
 async function deploy() {
   layout.value.setStatus("deploy");
 

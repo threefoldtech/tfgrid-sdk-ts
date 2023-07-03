@@ -61,26 +61,11 @@
     </input-tooltip>
   </input-validator>
 
-  <input-tooltip
-    inline
-    tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
-  >
-    <v-switch color="primary" inset label="Public IPv4" v-model="$props.modelValue.ipv4" />
-  </input-tooltip>
-
-  <input-tooltip
-    inline
-    tooltip="Public IPv6 is the next-generation Internet Protocol that offers an expanded address space to connect a vast number of devices."
-  >
-    <v-switch color="primary" inset label="Public IPv6" v-model="$props.modelValue.ipv6" />
-  </input-tooltip>
-
-  <input-tooltip
-    inline
-    tooltip="The Planetary Network is a distributed network infrastructure that spans across multiple regions and countries, providing global connectivity."
-  >
-    <v-switch color="primary" inset label="Planetary Network" v-model="$props.modelValue.planetary" />
-  </input-tooltip>
+  <Network
+    v-model:ipv4="$props.modelValue.ipv4"
+    v-model:ipv6="$props.modelValue.ipv6"
+    v-model:planetary="$props.modelValue.planetary"
+  />
 
   <RootFsSize
     :cpu="$props.modelValue.cpu"
@@ -106,6 +91,7 @@ defineProps<{ modelValue: K8SWorker }>();
 <script lang="ts">
 import type { Farm, K8SWorker } from "../types";
 import { generateName } from "../utils/strings";
+import Network from "./networks.vue";
 import RootFsSize from "./root_fs_size.vue";
 import SelectFarm from "./select_farm.vue";
 
