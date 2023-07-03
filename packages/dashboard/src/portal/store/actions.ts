@@ -21,21 +21,33 @@ export default {
   },
 
   async requestDedicatedNodes({ state, commit }: ActionContext<PortalState, PortalState>) {
-    let url = `${window.configs.APP_GRIDPROXY_URL}/nodes?ret_count=true&rentable=true`;
+    commit(MutationTypes.SET_TABLE_LOAD, true);
+
+    let url = `${window.configs.APP_GRIDPROXY_URL}/nodes?status=up&ret_count=true&rentable=true`;
+    url += `&size=${state.dedicatedNodesTablePageSize}`;
+    url += `&page=${state.dedicatedNodesTablePageNumber}`;
 
     for (const key in state.dedicatedNodesFilter) {
       let value = state.dedicatedNodesFilter[key];
-
       if (key == "free_hru" || key == "free_mru" || key == "free_sru" || key == "free_cru") {
         value *= 1024 * 1024 * 1024; // convert from gb to b
       }
-
       // don't break the call for the null values
-      if (value == null || value == undefined) value = "";
-
+      if (value == null || value == undefined || value == 0) value = "";
       url += `&${key}=${value}`;
     }
-    // console.log('url => ', url);
+
+    const res = await fetch(url);
+
+    const nodesCount: any = res.headers.get("count");
+    commit(MutationTypes.SET_DEDICATED_NODES_COUNT, +nodesCount);
+
+    let nodes = await res.json();
+    // Update the nodes with price and discount.
+    nodes = await updateDedicatedNodes(state.api, state.address, nodes);
+
+    commit(MutationTypes.SET_DEDICATED_NODES, { nodes });
+    commit(MutationTypes.SET_TABLE_LOAD, false);
   },
 
   async unsubscribeAccounts({ commit }: ActionContext<PortalState, PortalState>) {
