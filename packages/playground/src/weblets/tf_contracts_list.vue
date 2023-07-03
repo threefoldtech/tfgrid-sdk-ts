@@ -163,7 +163,7 @@ const loadingContractId = ref<number>();
 const contractLocked = ref<ContractLock>();
 
 async function showDetails(value: any) {
-  if (value.type === "name") {
+  if (value.type === "name" || value.type === "rent") {
     return layout.value.openDialog(value, false, true);
   }
 

@@ -42,12 +42,14 @@ async function createMachine(grid: GridClient, machine: Machine, nodePicker: Nod
     cru: machine.cpu,
     mru: Math.round(machine.memory / 1024),
     country: machine.country,
+    farmId: machine.farmId,
+    farmName: machine.farmName,
     hru: machine.qsfsDisks?.reduce((total, disk) => total + disk.cache, 0),
     sru: machine.disks?.reduce((total, disk) => total + disk.size, machine.rootFilesystemSize || 0),
     publicIPs: machine.publicIpv4,
     availableFor: grid.twinId,
     hasGPU: machine.hasGPU,
-    rentedBy: grid.twinId,
+    rentedBy: machine.hasGPU ? grid.twinId : undefined,
   };
 
   const vm = new MachineModel();
@@ -160,8 +162,6 @@ export interface DeployVMOptions {
 export type AddMachineOptions = Machine & { deploymentName: string };
 
 export async function addMachine(grid: GridClient, options: AddMachineOptions) {
-  console.log(options);
-
   const filters: FilterOptions = {
     cru: options.cpu,
     mru: Math.round(options.memory / 1024),
@@ -172,6 +172,8 @@ export async function addMachine(grid: GridClient, options: AddMachineOptions) {
     sru: options.disks?.reduce((total, disk) => total + disk.size, options.rootFilesystemSize || 0),
     publicIPs: options.publicIpv4,
     availableFor: grid.twinId,
+    hasGPU: options.hasGPU,
+    rentedBy: options.hasGPU ? grid.twinId : undefined,
   };
 
   const machine = new AddMachineModel();
