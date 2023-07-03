@@ -98,13 +98,10 @@ export default class NodesTable extends Vue {
 
   $api: any;
   expanded: any = [];
-  loading = true;
   dNodeLoading = true;
   dNodeError = false;
   address = "";
 
-  nodes: any[] = [];
-  count = 0;
   pageNumber = 1;
   pageSize = 10;
 
@@ -165,7 +162,6 @@ export default class NodesTable extends Vue {
   }
 
   async onStatusUpdate() {
-    this.loading = true;
     this.$toasted.show(`Table may take some time to update the changes.`);
     setTimeout(async () => {
       this.requestNodes();
