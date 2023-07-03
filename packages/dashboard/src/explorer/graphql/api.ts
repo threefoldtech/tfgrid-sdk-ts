@@ -99,6 +99,7 @@ export interface INode {
   countryFullName: string;
   num_gpu: number;
   extra_fee: number;
+  farm?: IFarm;
 }
 
 export interface INodeGPU {

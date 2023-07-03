@@ -21,10 +21,14 @@ export default {
 
   async requestDedicatedNodes({ state, commit }: ActionContext<PortalState, PortalState>) {
     commit(MutationTypes.SET_TABLE_LOAD, true);
+    let baseUrl = `${window.configs.APP_GRIDPROXY_URL}/nodes?status=up&ret_count=true&page=${state.dedicatedNodesTablePageNumber}&size=${state.dedicatedNodesTablePageSize}`;
+    const query = state.tabQuery; // tab query.
 
-    let url = `${window.configs.APP_GRIDPROXY_URL}/nodes?status=up&ret_count=true&rentable=true`;
-    url += `&size=${state.dedicatedNodesTablePageSize}`;
-    url += `&page=${state.dedicatedNodesTablePageNumber}`;
+    if (query == "rented_by") {
+      baseUrl += `&${query}=${state.twinID}`;
+    } else {
+      baseUrl += `&${query}=true`;
+    }
 
     for (const key in state.dedicatedNodesFilter) {
       let value = state.dedicatedNodesFilter[key];
@@ -33,19 +37,18 @@ export default {
       }
       // don't break the call for the null values
       if (value == null || value == undefined || value == 0) value = "";
-      url += `&${key}=${value}`;
+      baseUrl += `&${key}=${value}`;
     }
 
-    const res = await fetch(url);
-
-    const nodesCount: any = res.headers.get("count");
-    commit(MutationTypes.SET_DEDICATED_NODES_COUNT, +nodesCount);
-
-    let nodes = await res.json();
-    // Update the nodes with price and discount.
-    nodes = await updateDedicatedNodes(state.api, state.address, nodes);
-
-    commit(MutationTypes.SET_DEDICATED_NODES, { nodes });
+    if (query.length) {
+      const res = await fetch(baseUrl);
+      const nodesCount: any = res.headers.get("count");
+      commit(MutationTypes.SET_DEDICATED_NODES_COUNT, +nodesCount);
+      let nodes = await res.json();
+      // Update the nodes with price and discount.
+      nodes = await updateDedicatedNodes(state.api, state.address, state.twinID, nodes);
+      commit(MutationTypes.SET_DEDICATED_NODES, nodes);
+    }
     commit(MutationTypes.SET_TABLE_LOAD, false);
   },
 
@@ -58,12 +61,9 @@ export default {
   },
   async getProposal({ commit, state }: ActionContext<PortalState, PortalState>, twin: number) {
     if (state.api) {
-      console.log(state.api, "ahooooooooooooooooooooooooooooooooooo");
-
       const active = (await getProposals(state.api)).active;
       if (!active.length) return;
       const farms = await getFarm(state.api, parseFloat(`${twin}`));
-
       // only users who own a farm should get the notification
       if (!farms.length) {
         commit("setProposals", { proposals: 0 });
