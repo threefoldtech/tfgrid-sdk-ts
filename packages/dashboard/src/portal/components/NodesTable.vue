@@ -1,80 +1,80 @@
 <template>
   <v-container>
-    <v-responsive class="responsive-table">
-      <v-data-table
-        :headers="headers"
-        :items="$store.getters['portal/getDedicatedNodes']"
-        :server-items-length="$store.getters['portal/getDedicatedNodesCount']"
-        :single-expand="true"
-        :expanded.sync="expanded"
-        show-expand
-        :disable-sort="true"
-        item-key="nodeId"
-        class="elevation-1"
-        :loading="$store.getters['portal/getTableLoad']"
-        :page.sync="page"
-        loading-text="loading dedicated nodes ..."
-        :items-per-page="pageSize"
-        :footer-props="{
-          'items-per-page-options': [5, 10, 15, 50],
-        }"
-        @update:options="onUpdateOptions($event.page, $event.itemsPerPage)"
-        @item-expanded="getDNodeDetails"
-      >
-        <template v-slot:[`item.mru`]="{ item }">
-          {{ convert(item.mru) }}
-        </template>
-        <template v-slot:[`item.sru`]="{ item }">
-          {{ convert(item.sru) }}
-        </template>
-        <template v-slot:[`item.hru`]="{ item }">
-          {{ convert(item.hru) }}
-        </template>
-        <template v-slot:[`item.actions`]="{ item }">
-          <NodeActionBtn :nodeId="item.nodeId" :status="item.rentStatus" @node-status-changed="onStatusUpdate()" />
-        </template>
-        <template v-slot:[`item.discount`]="{ item }">
-          <v-tooltip bottom color="primary" close-delay="1000">
-            <template v-slot:activator="{ on, attrs }">
-              <span v-bind="attrs" v-on="on">{{ item.discount + (item.extraFee ? item.extraFee / 1000 : 0) }} *</span>
-            </template>
-            <span
-              >Discounts: <br />
-              <ul>
-                <li>
-                  You receive {{ item.applyedDiscount.first }}% discount if you reserve an entire
-                  <a
-                    target="_blank"
-                    href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html#billing--pricing"
-                    style="color: blue"
-                    >node</a
-                  >
-                </li>
-                <li>
-                  You're receiving {{ item.applyedDiscount.second }}% discount as per the
-                  <a target="_blank" href="https://manual.grid.tf/cloud/cloudunits_pricing.html#discount-levels">
-                    <p style="color: blue; display: inline">discount levels</p>
-                  </a>
-                </li>
-              </ul>
-            </span>
-          </v-tooltip>
-        </template>
-        <template v-slot:expanded-item="{ headers, item }">
-          <td :colspan="headers.length" v-if="dNodeLoading" style="text-align: center">
-            <div class="pa-1">
-              <v-progress-circular indeterminate model-value="20" :width="3"></v-progress-circular>
-            </div>
-          </td>
-          <td :colspan="headers.length" v-else-if="dNodeError" style="text-align: center">
-            <strong style="color: #f44336">Failed to retrieve Node details</strong>
-          </td>
-          <td :colspan="headers.length" v-else>
-            <NodeDetails :node="item" />
-          </td>
-        </template>
-      </v-data-table>
-    </v-responsive>
+    key => {{ filterKeys }}
+    <v-data-table
+      :headers="headers"
+      :items="$store.getters['portal/getDedicatedNodes']"
+      :server-items-length="$store.getters['portal/getDedicatedNodesCount']"
+      :single-expand="true"
+      :expanded.sync="expanded"
+      show-expand
+      :disable-sort="true"
+      item-key="nodeId"
+      class="elevation-1"
+      :loading="$store.getters['portal/getTableLoad']"
+      :page.sync="page"
+      loading-text="loading dedicated nodes ..."
+      :items-per-page="pageSize"
+      :footer-props="{
+        'items-per-page-options': [5, 10, 15, 50],
+      }"
+      @update:options="onUpdateOptions($event.page, $event.itemsPerPage)"
+      @item-expanded="getDNodeDetails"
+    >
+      <template v-slot:[`item.mru`]="{ item }">
+        item22 => {{ item }}
+        {{ convert(item.mru) }}
+      </template>
+      <template v-slot:[`item.sru`]="{ item }">
+        {{ convert(item.sru) }}
+      </template>
+      <template v-slot:[`item.hru`]="{ item }">
+        {{ convert(item.hru) }}
+      </template>
+      <template v-slot:[`item.actions`]="{ item }">
+        <NodeActionBtn :nodeId="item.nodeId" :status="item.rentStatus" @node-status-changed="onStatusUpdate()" />
+      </template>
+      <template v-slot:[`item.discount`]="{ item }">
+        <v-tooltip bottom color="primary" close-delay="1000">
+          <template v-slot:activator="{ on, attrs }">
+            <span v-bind="attrs" v-on="on">{{ item.discount + (item.extraFee ? item.extraFee / 1000 : 0) }} *</span>
+          </template>
+          <span
+            >Discounts: <br />
+            <ul>
+              <li>
+                You receive {{ item.applyedDiscount.first }}% discount if you reserve an entire
+                <a
+                  target="_blank"
+                  href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html#billing--pricing"
+                  style="color: blue"
+                  >node</a
+                >
+              </li>
+              <li>
+                You're receiving {{ item.applyedDiscount.second }}% discount as per the
+                <a target="_blank" href="https://manual.grid.tf/cloud/cloudunits_pricing.html#discount-levels">
+                  <p style="color: blue; display: inline">discount levels</p>
+                </a>
+              </li>
+            </ul>
+          </span>
+        </v-tooltip>
+      </template>
+      <template v-slot:expanded-item="{ headers, item }">
+        <td :colspan="headers.length" v-if="dNodeLoading" style="text-align: center">
+          <div class="pa-1">
+            <v-progress-circular indeterminate model-value="20" :width="3"></v-progress-circular>
+          </div>
+        </td>
+        <td :colspan="headers.length" v-else-if="dNodeError" style="text-align: center">
+          <strong style="color: #f44336">Failed to retrieve Node details</strong>
+        </td>
+        <td :colspan="headers.length" v-else>
+          <NodeDetails :node="item" />
+        </td>
+      </template>
+    </v-data-table>
   </v-container>
 </template>
 
@@ -126,15 +126,10 @@ export default class NodesTable extends Vue {
 
   @Watch("trigger", { immediate: true }) onTab() {
     this.requestNodes();
-    this.expanded = this.expanded.length ? [] : this.expanded;
-  }
-
-  @Watch("filterKeys") async filterRequest() {
-    this.requestNodes();
-    this.expanded = this.expanded.length ? [] : this.expanded;
   }
 
   @Watch("filterKeys") async filterRequest(value: string) {
+    this.requestNodes();
     console.log(this.filterKeys);
     console.log("filterKeys | value: ", value);
   }
@@ -153,6 +148,8 @@ export default class NodesTable extends Vue {
 
   async getDNodeDetails(event: any) {
     // value is whether or not the row is expanded now.
+    console.log("event: ", event);
+
     if (!event.value) return;
     try {
       this.dNodeError = false;
@@ -178,10 +175,10 @@ export default class NodesTable extends Vue {
   // reload the nodes table
   async requestNodes() {
     if (this.$api) {
-      this.$store.commit(`portal/${MutationTypes.SET_API}`, this.$api);
-      this.$store.commit(`portal/${MutationTypes.SET_TWIN_ID}`, this.twinId);
-      this.$store.commit(`portal/${MutationTypes.SET_TAB_QUERY}`, this.tab.query);
-      await this.$store.dispatch(`portal/${ActionTypes.REQUEST_DEDICATED_NODES}`);
+      // this.$store.commit('portal/' + MutationTypes.SET_API, this.$api);
+      this.$store.commit("portal/" + MutationTypes.SET_TWIN_ID, this.twinId);
+      this.$store.commit("portal/" + MutationTypes.SET_TAB_QUERY, this.tab.query);
+      await this.$store.dispatch(ActionTypes.REQUEST_DEDICATED_NODES);
     }
   }
 

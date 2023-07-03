@@ -7,10 +7,8 @@ import { nodeInterface } from "./farms";
 import moment from "moment";
 import "jspdf-autotable";
 import { Client } from "@threefold/tfchain_client";
-import { getKeypair } from "@/utils/signer";
+import { INode } from "@/explorer/graphql/api";
 import { ApiPromise } from "@polkadot/api";
-import profileStore from "@/store";
-import toTeraOrGigaOrPeta from "@/explorer/filters/toTeraOrGigaOrPeta";
 
 export interface receiptInterface {
   type: "MINTING" | "FIXUP";
@@ -540,150 +538,22 @@ export async function getNodeByID(nodeId: any) {
   return node;
 }
 
-export async function getDedicatedNodes(twinId: string, query: string, page: number, size: number) {
-  let baseUrl = `${config.gridproxyUrl}/nodes?status=up&ret_count=true&page=${page}&size=${size}`;
-  if (query != "rented_by") {
-    baseUrl += `&${query}=true`;
-  } else {
-    baseUrl += `&${query}=${twinId}`;
-  }
-
-  const res = await fetch(baseUrl);
-  const count = res.headers.get("count");
-  const nodes = await res.json();
-  return { nodes, count };
-}
-
-export async function getDNodes(
-  api: ApiPromise,
-  address: string,
-  currentTwinID: string,
-  query: string,
-  page: number,
-  size: number,
-) {
-  let { nodes, count } = await getDedicatedNodes(currentTwinID, query, page, size);
-
-  const pricing = (await getPrices(api)) as any;
-
+export async function updateDedicatedNodes(api: apiInterface, address: string, nodes: INode[]) {
+  const pricing = await getPrices(api);
   // discount for Twin Balance
   const TFTprice = await getTFTPrice(api);
   const balance = await getBalance(api, address);
   const TFTbalance = TFTprice * balance.free;
 
-  let dNodes: {
-    nodeId: string;
-    price: string;
-    discount: any;
-    applyedDiscount: { first: any; second: any };
-    location: { country: any; city: any; long: any; lat: any };
-    resources: { cru: any; mru: any; hru: any; sru: any; gpu: number };
-    farm: { id: string; name?: string; farmCertType?: string; pubIps?: string };
-    rentContractId: any;
-    rentedByTwinId: any;
-    usedResources: { cru: any; mru: any; hru: any; sru: any };
-    rentStatus: any;
-  }[] = [];
-
   for (const node of nodes) {
     const price = countPrice(pricing, node);
     const [discount, discountLevel] = await calDiscount(TFTbalance, pricing, price);
-    dNodes.push({
-      farm: {
-        id: node.farmId,
-      },
-      nodeId: node.nodeId,
-      price: price,
-      discount: discount,
-      applyedDiscount: {
-        first: pricing.discountForDedicationNodes,
-        second: discountLevel,
-      },
-      location: {
-        country: node.country,
-        city: node.city,
-        long: node.location.longitude ? node.location.longitude : "Unknown",
-        lat: node.location.latitude ? node.location.latitude : "Unknown",
-      },
-      resources: {
-        cru: toTeraOrGigaOrPeta(node.total_resources.cru.toString()),
-        mru: toTeraOrGigaOrPeta(node.total_resources.mru.toString()),
-        hru: toTeraOrGigaOrPeta(node.total_resources.hru.toString()),
-        sru: toTeraOrGigaOrPeta(node.total_resources.sru.toString()),
-        gpu: node.num_gpu,
-      },
-      usedResources: {
-        cru: node.used_resources.cru,
-        mru: node.used_resources.mru,
-        hru: node.used_resources.hru,
-        sru: node.used_resources.sru,
-      },
-      rentContractId: node.rentContractId,
-      rentedByTwinId: node.rentedByTwinId,
-      rentStatus: node.rentContractId === 0 ? "free" : node.rentedByTwinId == currentTwinID ? "yours" : "taken",
-    });
+    node.price = price;
+    node.discount = discount;
+    node.applyedDiscount = {
+      first: pricing.discountForDedicationNodes,
+      second: discountLevel,
+    };
   }
-  return dNodes;
-}
-
-export async function updateDedicatedNodes(api: ApiPromise, address: string, currentTwinID: number, nodes: any[]) {
-  const pricing = (await getPrices(api)) as any;
-  // discount for Twin Balance
-  const TFTprice = await getTFTPrice(api);
-  const balance = await getBalance(api, address);
-  const TFTbalance = TFTprice * balance.free;
-
-  let dNodes: {
-    nodeId: string;
-    price: string;
-    discount: any;
-    applyedDiscount: { first: any; second: any };
-    location: { country: any; city: any; long: any; lat: any };
-    resources: { cru: any; mru: any; hru: any; sru: any; gpu: number };
-    farm: { id: string; name?: string; farmCertType?: string; pubIps?: string };
-    rentContractId: any;
-    rentedByTwinId: any;
-    usedResources: { cru: any; mru: any; hru: any; sru: any };
-    rentStatus: any;
-  }[] = [];
-
-  for (const node of nodes) {
-    const price = countPrice(pricing, node);
-    const [discount, discountLevel] = await calDiscount(TFTbalance, pricing, price);
-    dNodes.push({
-      farm: {
-        id: node.farmId,
-      },
-      nodeId: node.nodeId,
-      price: price,
-      discount: discount,
-      applyedDiscount: {
-        first: pricing.discountForDedicationNodes,
-        second: discountLevel,
-      },
-      location: {
-        country: node.country,
-        city: node.city,
-        long: node.location.longitude ? node.location.longitude : "Unknown",
-        lat: node.location.latitude ? node.location.latitude : "Unknown",
-      },
-      resources: {
-        cru: toTeraOrGigaOrPeta(node.total_resources.cru.toString()),
-        mru: toTeraOrGigaOrPeta(node.total_resources.mru.toString()),
-        hru: toTeraOrGigaOrPeta(node.total_resources.hru.toString()),
-        sru: toTeraOrGigaOrPeta(node.total_resources.sru.toString()),
-        gpu: node.num_gpu,
-      },
-      usedResources: {
-        cru: node.used_resources.cru,
-        mru: node.used_resources.mru,
-        hru: node.used_resources.hru,
-        sru: node.used_resources.sru,
-      },
-      rentContractId: node.rentContractId,
-      rentedByTwinId: node.rentedByTwinId,
-      rentStatus: node.rentContractId === 0 ? "free" : node.rentedByTwinId == currentTwinID ? "yours" : "taken",
-    });
-  }
-  return dNodes;
+  return nodes;
 }
