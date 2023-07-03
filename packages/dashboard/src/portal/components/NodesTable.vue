@@ -1,17 +1,19 @@
 <template>
   <v-container>
+    key => {{ filterKeys }}
     <v-data-table
       :headers="headers"
-      :items="nodes"
+      :items="$store.getters['portal/getDedicatedNodes']"
+      :server-items-length="$store.getters['portal/getDedicatedNodesCount']"
       :single-expand="true"
       :expanded.sync="expanded"
       show-expand
       :disable-sort="true"
       item-key="nodeId"
       class="elevation-1"
-      :loading="loading"
-      loading-text="loading nodes ..."
-      :server-items-length="count"
+      :loading="$store.getters['portal/getTableLoad']"
+      :page.sync="page"
+      loading-text="loading dedicated nodes ..."
       :items-per-page="pageSize"
       :footer-props="{
         'items-per-page-options': [5, 10, 15, 50],
@@ -19,14 +21,15 @@
       @update:options="onUpdateOptions($event.page, $event.itemsPerPage)"
       @item-expanded="getDNodeDetails"
     >
-      <template v-slot:[`item.resources.mru`]="{ item }">
-        {{ convert(item.resources.mru) }}
+      <template v-slot:[`item.mru`]="{ item }">
+        item22 => {{ item }}
+        {{ convert(item.mru) }}
       </template>
-      <template v-slot:[`item.resources.sru`]="{ item }">
-        {{ convert(item.resources.sru) }}
+      <template v-slot:[`item.sru`]="{ item }">
+        {{ convert(item.sru) }}
       </template>
-      <template v-slot:[`item.resources.hru`]="{ item }">
-        {{ convert(item.resources.hru) }}
+      <template v-slot:[`item.hru`]="{ item }">
+        {{ convert(item.hru) }}
       </template>
       <template v-slot:[`item.actions`]="{ item }">
         <NodeActionBtn :nodeId="item.nodeId" :status="item.rentStatus" @node-status-changed="onStatusUpdate()" />
@@ -81,7 +84,9 @@ import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 import toTeraOrGigaOrPeta from "../../explorer/filters/toTeraOrGigaOrPeta";
 import NodeActionBtn from "../components/NodeActionBtn.vue";
 import NodeDetails from "../components/NodeDetails.vue";
-import { getDNodes, getFarmDetails, ITab } from "../lib/nodes";
+import { getFarmDetails, ITab } from "../lib/nodes";
+import { ActionTypes } from "../store/actions";
+import { MutationTypes } from "../store/mutations";
 
 @Component({
   name: "NodesTable",
@@ -119,32 +124,35 @@ export default class NodesTable extends Vue {
 
   @Watch("$route.params.accountID") async onPropertyChanged(value: string, oldValue: string) {
     console.log(`removing nodes of ${oldValue}, putting in nodes of ${value}`);
-    await this.getNodes();
+    this.requestNodes();
   }
 
   @Watch("trigger", { immediate: true }) onTab() {
-    this.getNodes();
+    this.requestNodes();
   }
 
   @Watch("filterKeys") async filterRequest(value: string) {
+    this.requestNodes();
     console.log(this.filterKeys);
     console.log("filterKeys | value: ", value);
   }
 
   async mounted() {
     this.address = this.$store.state.credentials.account.address;
+    this.$store.commit("portal/" + MutationTypes.SET_ADDRESS, this.address);
   }
 
   async onUpdateOptions(pageNumber: number, pageSize: number) {
     if (this.pageNumber === pageNumber && this.pageSize === pageSize) return;
-
-    this.pageNumber = pageNumber;
-    this.pageSize = pageSize;
-    await this.getNodes();
+    this.$store.commit("portal/" + MutationTypes.SET_DEDICATED_NODES_TABLE_PAGE_NUMBER, pageNumber);
+    this.$store.commit("portal/" + MutationTypes.SET_DEDICATED_NODES_TABLE_PAGE_SIZE, pageSize);
+    this.requestNodes();
   }
 
   async getDNodeDetails(event: any) {
     // value is whether or not the row is expanded now.
+    console.log("event: ", event);
+
     if (!event.value) return;
     try {
       this.dNodeError = false;
@@ -164,25 +172,26 @@ export default class NodesTable extends Vue {
     this.loading = true;
     this.$toasted.show(`Table may take some time to update the changes.`);
     setTimeout(async () => {
-      await this.getNodes();
+      this.requestNodes();
     }, 5000);
   }
 
-  async getNodes() {
-    this.nodes = [];
-    this.loading = true;
+  // reload the nodes table
+  async requestNodes() {
+    if (this.$api) {
+      // this.$store.commit('portal/' + MutationTypes.SET_API, this.$api);
+      this.$store.commit("portal/" + MutationTypes.SET_TWIN_ID, this.twinId);
+      this.$store.commit("portal/" + MutationTypes.SET_TAB_QUERY, this.tab.query);
+      await this.$store.dispatch(ActionTypes.REQUEST_DEDICATED_NODES);
+    }
+  }
 
-    const { dNodes, count } = await getDNodes(
-      this.$api,
-      this.address,
-      this.twinId,
-      this.tab.query,
-      this.pageNumber,
-      this.pageSize,
-    );
-    this.nodes = dNodes;
-    this.count = parseInt(count as string);
-    this.loading = false;
+  get page() {
+    return this.$store.getters["portal/getDedicatedNodesTablePageNumber"];
+  }
+
+  set page(value) {
+    this.$store.commit("portal/" + MutationTypes.SET_DEDICATED_NODES_TABLE_PAGE_NUMBER, value);
   }
 
   convert(capacity: number) {

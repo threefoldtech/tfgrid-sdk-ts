@@ -72,6 +72,7 @@ export interface INode {
   version: number;
   gridVersion: number;
   nodeId: number;
+  applyedDiscount?: { first: string; second: string };
   farmId: number;
   twinId: number;
   cityId?: number;
@@ -81,12 +82,14 @@ export interface INode {
   sru?: string;
   cru?: string;
   mru?: string;
+  price?: string;
+  discount?: any;
   capacity: Capacity;
   publicConfig?: IPublicConfig;
   uptime?: number;
   created: number;
   farmingPolicyId: number;
-  location: Location;
+  location: ILocation;
   country?: string;
   city?: string;
   interfaces: Interfaces[];
