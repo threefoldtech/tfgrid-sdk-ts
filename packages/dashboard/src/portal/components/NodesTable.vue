@@ -127,10 +127,9 @@ export default class NodesTable extends Vue {
     this.expanded = this.expanded.length ? [] : this.expanded;
   }
 
-  @Watch("filterKeys") async filterRequest(value: string) {
+  @Watch("filterKeys") async filterRequest() {
     this.requestNodes();
-    console.log(this.filterKeys);
-    console.log("filterKeys | value: ", value);
+    this.expanded = this.expanded.length ? [] : this.expanded;
   }
 
   async mounted() {
