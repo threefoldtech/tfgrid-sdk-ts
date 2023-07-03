@@ -29,8 +29,8 @@
   </v-container>
   <v-container v-else-if="$store.state.credentials.loading">
     <div class="d-flex justify-center" style="display: block; padding: 10%">
-      <v-progress-circular indeterminate color="blue" :size="335" :width="7">
-        <span style="font-size: large; color: white">Loading Twin Details</span>
+      <v-progress-circular indeterminate :size="335" :width="7">
+        <span style="font-size: large">Loading Twin Details</span>
       </v-progress-circular>
     </div>
   </v-container>
