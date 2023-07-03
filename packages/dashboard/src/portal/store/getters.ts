@@ -14,5 +14,4 @@ export default {
   getDedicatedNodesTablePageSize: state => state.dedicatedNodesTablePageSize,
   getTableLoad: state => state.tableLoad,
   getAPI: state => state.api,
-  getTwinID: state => state.twinID,
 } as GetterTree<PortalState, PortalState>;
