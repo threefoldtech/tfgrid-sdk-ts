@@ -134,11 +134,6 @@ export default class NodesTable extends Vue {
     console.log("filterKeys | value: ", value);
   }
 
-  @Watch("filterKeys") async filterRequest(value: string) {
-    console.log(this.filterKeys);
-    console.log("filterKeys | value: ", value);
-  }
-
   async mounted() {
     this.address = this.$store.state.credentials.account.address;
     this.$store.commit("portal/" + MutationTypes.SET_ADDRESS, this.address);
@@ -180,10 +175,10 @@ export default class NodesTable extends Vue {
   // reload the nodes table
   async requestNodes() {
     if (this.$api) {
-      this.$store.commit(`portal/${MutationTypes.SET_API}`, this.$api);
-      this.$store.commit(`portal/${MutationTypes.SET_TWIN_ID}`, this.twinId);
-      this.$store.commit(`portal/${MutationTypes.SET_TAB_QUERY}`, this.tab.query);
-      await this.$store.dispatch(`portal/${ActionTypes.REQUEST_DEDICATED_NODES}`);
+      // this.$store.commit('portal/' + MutationTypes.SET_API, this.$api);
+      this.$store.commit("portal/" + MutationTypes.SET_TWIN_ID, this.twinId);
+      this.$store.commit("portal/" + MutationTypes.SET_TAB_QUERY, this.tab.query);
+      await this.$store.dispatch(ActionTypes.REQUEST_DEDICATED_NODES);
     }
   }
 
