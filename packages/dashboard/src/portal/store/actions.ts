@@ -42,13 +42,18 @@ export default {
     }
 
     if (query.length) {
-      const res = await fetch(baseUrl);
-      const nodesCount: any = res.headers.get("count");
-      commit(MutationTypes.SET_DEDICATED_NODES_COUNT, +nodesCount);
-      let nodes = await res.json();
-      // Update the nodes with price and discount.
-      nodes = await updateDedicatedNodes(state.api, state.address, state.twinID, nodes);
-      commit(MutationTypes.SET_DEDICATED_NODES, nodes);
+      try {
+        const res = await fetch(baseUrl);
+        const nodesCount: any = res.headers.get("count");
+        commit(MutationTypes.SET_DEDICATED_NODES_COUNT, +nodesCount);
+        let nodes = await res.json();
+        // Update the nodes with price and discount.
+        nodes = await updateDedicatedNodes(state.api, state.address, state.twinID, nodes);
+        commit(MutationTypes.SET_DEDICATED_NODES, nodes);
+      } catch (error) {
+        console.error("Failed to fetch dedicated nodes:", error);
+        // Handle error and show error message to the user
+      }
     }
     commit(MutationTypes.SET_TABLE_LOAD, false);
   },
@@ -63,40 +68,43 @@ export default {
 
   async getProposal({ commit, state }: ActionContext<PortalState, PortalState>, twin: number) {
     if (state.api) {
-      const active = (await getProposals(state.api)).active;
-      if (!active.length) return;
-      const farms = await getFarm(state.api, parseFloat(`${twin}`));
-      // only users who own a farm should get the notification
-      if (!farms.length) {
-        commit("setProposals", { proposals: 0 });
-        return;
-      }
-      const farmIds = farms.map(function (value) {
-        return value.id;
-      });
+      try {
+        const active = (await getProposals(state.api)).active;
+        if (!active.length) return;
+        const farms = await getFarm(state.api, parseFloat(`${twin}`));
+        // only users who own a farm should get the notification
+        if (!farms.length) {
+          commit(MutationTypes.SET_PROPOSALS, { proposals: 0 });
+          return;
+        }
+        const farmIds = farms.map(value => value.id);
 
-      const voted: number[] = [];
-      active.forEach((proposal, index) => {
-        let inYes = false;
-        proposal.ayes.forEach(({ farmId }) => {
-          if (farmIds.includes(farmId)) {
-            inYes = true;
-            voted.push(index);
-            return;
-          }
+        const voted: number[] = [];
+        active.forEach((proposal, index) => {
+          let inYes = false;
+          proposal.ayes.forEach(({ farmId }) => {
+            if (farmIds.includes(farmId)) {
+              inYes = true;
+              voted.push(index);
+              return;
+            }
+          });
+          if (inYes) return;
+          proposal.nayes.forEach(({ farmId }) => {
+            if (farmIds.includes(farmId)) {
+              voted.push(index);
+              return;
+            }
+          });
         });
-        if (inYes) return;
-        proposal.nayes.forEach(({ farmId }) => {
-          if (farmIds.includes(farmId)) {
-            voted.push(index);
-            return;
-          }
+        voted.forEach(index => {
+          active.splice(index, 1);
         });
-      });
-      voted.forEach(index => {
-        active.splice(index, 1);
-      });
-      commit("setProposals", { proposals: active.length });
+        commit(MutationTypes.SET_PROPOSALS, { proposals: active.length });
+      } catch (error) {
+        console.error("Failed to get proposal:", error);
+        // Handle error and show error message to the user
+      }
     }
   },
 };
