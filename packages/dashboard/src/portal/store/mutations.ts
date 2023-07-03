@@ -86,39 +86,4 @@ export default {
   setDedicatedNodesCount(state: PortalState, payload: number) {
     state.dedicatedNodesCount = payload;
   },
-
-  setDedicatedNodesTablePageNumber(state: PortalState, payload: number) {
-    state.dedicatedNodesTablePageNumber = payload;
-  },
-  setDedicatedNodesTablePageSize(state: PortalState, payload: number) {
-    state.dedicatedNodesTablePageSize = payload;
-  },
-  setTwinID(state: PortalState, payload: number) {
-    state.twinID = payload;
-  },
-  setTabQuery(state: PortalState, payload: string) {
-    state.tabQuery = payload;
-  },
-  setTableLoad(state: PortalState, payload: boolean) {
-    state.tableLoad = payload;
-  },
-  setAddress(state: PortalState, address: string) {
-    state.address = address;
-  },
-
-  setNodes(state: PortalState, payload: any): void {
-    // clear the state each time you reload. to avoid duplicated nodes
-    state.dedicatedNodes = [];
-
-    console.log("payload.nodes: , ", payload.nodes);
-
-    state.dedicatedNodes = payload.nodes;
-    // for (let i = 0; i < payload.nodes.length; i++) {
-    //   state.dedicatedNodes.push(fillNodesFields(state as unknown as IState, payload.nodes[i], [payload.farms]));
-    // }
-  },
-
-  setDedicatedNodesCount(state: PortalState, payload: number) {
-    state.dedicatedNodesCount = payload;
-  },
 };
