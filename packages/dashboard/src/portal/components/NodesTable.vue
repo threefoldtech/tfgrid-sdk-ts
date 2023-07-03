@@ -134,11 +134,6 @@ export default class NodesTable extends Vue {
     console.log("filterKeys | value: ", value);
   }
 
-  @Watch("filterKeys") async filterRequest(value: string) {
-    console.log(this.filterKeys);
-    console.log("filterKeys | value: ", value);
-  }
-
   async mounted() {
     this.address = this.$store.state.credentials.account.address;
     this.$store.commit("portal/" + MutationTypes.SET_ADDRESS, this.address);
