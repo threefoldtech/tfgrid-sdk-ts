@@ -39,6 +39,7 @@ export interface DeployGatewayNameOptions {
 export async function deployGatewayName(grid: GridClient, options: DeployGatewayNameOptions) {
   const gateway = new GatewayNameModel();
   gateway.name = options.name;
+  await grid.gateway.getObj(gateway.name); //invalidating the cashed keys
   gateway.node_id = options.nodeId;
   gateway.tls_passthrough = options.tlsPassthrough || false;
   gateway.backends = options.backends.map(({ ip, port }) => `http://${ip}:${port}`);
