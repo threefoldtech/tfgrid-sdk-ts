@@ -5,6 +5,7 @@
     :memory="memory"
     :disk="disks.reduce((total, disk) => total + disk.size, diskSize + 2)"
     :ivp4="ipv4"
+    :gpu="hasGPU"
     title-image="images/icons/vm.png"
   >
     <template #title> Deploy a Full Virtual Machine </template>

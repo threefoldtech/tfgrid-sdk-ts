@@ -47,12 +47,14 @@
         variant="tonal"
         v-if="showPrice"
       >
-        Your deployment costs
-        <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(tft) }}</span> TFTs or
-        <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span> USD/month
-        based on the cloud resources (CPU: {{ cpu }} Cores, RAM: {{ memory }} MB, SSD: {{ disk }} GB{{
+        Based on the cloud resources you have selected (CPU: {{ cpu }} Cores, RAM: {{ memory }} MB, SSD: {{ disk }} GB{{
           ivp4 ? " , Public IP: Enabled" : ""
-        }}) selected
+        }}) your deployment costs
+        <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(tft) }}</span> TFTs or
+        approximately
+        <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span> USD per
+        month. {{ gpu ? "Please note that additional fees may apply if you have selected a machine with GPU." : "" }}
+
         <a href="https://manual.grid.tf/cloud/cloudunits_pricing.html" target="_blank" class="app-link">
           Learn more about the pricing and how to unlock discounts.
         </a>
@@ -107,6 +109,11 @@ const props = defineProps({
     required: false,
   },
   ivp4: {
+    type: Boolean,
+    required: false,
+    default: () => false,
+  },
+  gpu: {
     type: Boolean,
     required: false,
     default: () => false,
