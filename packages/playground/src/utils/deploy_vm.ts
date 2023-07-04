@@ -21,6 +21,7 @@ export async function deployVM(grid: GridClient, options: DeployVMOptions) {
   const nodePicker = new NodePicker();
   const vms = new MachinesModel();
   vms.name = options.name;
+  await grid.machines.getObj(vms.name); //invalidating the cashed keys
   vms.network = createNetwork(options.network);
   vms.machines = await Promise.all(options.machines.map(machine => createMachine(grid, machine, nodePicker)));
   vms.metadata = options.metadata;
