@@ -57,6 +57,8 @@
             publicIp: ipv4,
           }"
           exclusive-for="research"
+          :once-per-farm="!ipv4"
+          :project-name="ProjectName.Presearch"
           v-model="farm"
         />
       </template>
