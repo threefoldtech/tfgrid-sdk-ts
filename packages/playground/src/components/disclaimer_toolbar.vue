@@ -6,6 +6,12 @@
       <a class="app-link" href="https://github.com/threefoldtech/test_feedback/issues" target="_blank">here.</a>
     </v-card-text>
   </v-card>
+  <v-card v-else class="mb-3">
+    <v-card-text>
+      <v-icon>mdi-information</v-icon>
+      This version of the Playground is experimental. Please get in touch with any issues.
+    </v-card-text>
+  </v-card>
 </template>
 
 <script lang="ts" setup>
