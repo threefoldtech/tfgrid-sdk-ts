@@ -1,10 +1,10 @@
-import { FarmIdModel } from "../src";
+import { pingFarmModel } from "../src";
 import { FarmerBotFindNodeModel } from "../src/high_level/farmerbot";
 import { getClient } from "./client_loader";
 
 async function main() {
   const grid3 = await getClient();
-  const farmId: FarmIdModel = {
+  const farmId: pingFarmModel = {
     farmId: 53,
   };
 
@@ -13,10 +13,11 @@ async function main() {
 
   const FarmerBotFindNode: FarmerBotFindNodeModel = {
     farmId: farmId.farmId,
-    // required_cru: 4,
-    // required_mru: 5,
-    // required_sru: 5,
-    // required_hru: 5,
+    required_cru: 4,
+    required_mru: 5,
+    required_sru: 5,
+    required_hru: 5,
+    // has_gpus: 2, // Uncomment it if you want to get only nodes with gpus.
   };
 
   if (pingFarm.twinid) {
