@@ -97,7 +97,7 @@ class FarmerBot {
     const result = node?.result?.params;
 
     if (result.length) {
-      const nodeId = +result.filter(x => x.key === "nodeid")[0]?.value;
+      const nodeId = +result.filter(x => x.key === "nodeid")[0].value;
       if (nodeId) {
         return nodeId;
       } else {
