@@ -248,7 +248,6 @@ export default class Nodes extends Vue {
   }
 
   set gpuFilter(value) {
-    console.log("set gpuFilter");
     this.$store.commit("explorer/" + MutationTypes.SET_GPU_FILTER, value);
   }
 
