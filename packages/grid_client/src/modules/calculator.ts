@@ -74,19 +74,19 @@ class Calculator {
         discount: 0,
       },
       default: {
-        duration: 3,
+        duration: 1.5,
         discount: 20,
       },
       bronze: {
-        duration: 6,
+        duration: 3,
         discount: 30,
       },
       silver: {
-        duration: 12,
+        duration: 6,
         discount: 40,
       },
       gold: {
-        duration: 36,
+        duration: 18,
         discount: 60,
       },
     };
