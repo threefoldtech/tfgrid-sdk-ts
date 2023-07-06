@@ -88,31 +88,27 @@
             </v-col>
           </v-row>
           <v-row no-gutters>
-            <v-col cols="2" class="mx-auto no-gutters">
+            <v-col cols="6" class="d-flex">
               <v-tooltip bottom nudge-right="40">
                 <template v-slot:activator="{ on, attrs }">
-                  <div v-on="on" v-bind="attrs">
+                  <div v-on="on" v-bind="attrs" class="mx-auto">
                     <v-switch hide-details label="Certified Node" @change="certifiedToggle" />
                   </div>
                 </template>
                 <span> A certified node will receive 25% more reward compared to a non-certified node. </span>
               </v-tooltip>
-            </v-col>
-            <v-col cols="2" class="mx-auto">
               <v-tooltip bottom nudge-right="40">
                 <template v-slot:activator="{ on, attrs }">
-                  <div v-on="on" v-bind="attrs">
+                  <div v-on="on" v-bind="attrs" class="mx-auto">
                     <v-switch hide-details label="With a Public IPv4" @change="IPV4Toggle" />
                   </div> </template
                 ><span
                   >An Internet Protocol version 4 address that is globally unique and accessible over the internet</span
                 >
               </v-tooltip>
-            </v-col>
-            <v-col cols="2" class="mx-auto">
               <v-tooltip bottom nudge-left="20">
                 <template v-slot:activator="{ on, attrs }">
-                  <div v-on="on" v-bind="attrs">
+                  <div v-on="on" v-bind="attrs" class="mx-auto">
                     <v-switch
                       hide-details
                       label="Use current balance"
