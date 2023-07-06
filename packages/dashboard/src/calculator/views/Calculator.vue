@@ -87,12 +87,22 @@
               </v-tooltip>
             </v-col>
           </v-row>
-          <v-row>
+          <v-row no-gutters>
+            <v-col cols="2" class="mx-auto no-gutters">
+              <v-tooltip bottom nudge-right="40">
+                <template v-slot:activator="{ on, attrs }">
+                  <div v-on="on" v-bind="attrs">
+                    <v-switch hide-details label="Certified Node" @change="certifiedToggle" />
+                  </div>
+                </template>
+                <span> A certified node will receive 25% more reward compared to a non-certified node. </span>
+              </v-tooltip>
+            </v-col>
             <v-col cols="2" class="mx-auto">
               <v-tooltip bottom nudge-right="40">
                 <template v-slot:activator="{ on, attrs }">
                   <div v-on="on" v-bind="attrs">
-                    <v-switch hide-details label="With a Public IP (V4)" @change="IPV4Toggle" />
+                    <v-switch hide-details label="With a Public IPv4" @change="IPV4Toggle" />
                   </div> </template
                 ><span
                   >An Internet Protocol version 4 address that is globally unique and accessible over the internet</span
@@ -188,6 +198,7 @@ type priceType = {
 })
 export default class Calculator extends Vue {
   IPV4 = false;
+  isCerified = false;
   CRU = "1";
   SRU = "25";
   MRU = "1";
@@ -199,6 +210,7 @@ export default class Calculator extends Vue {
   @Watch("HRU")
   @Watch("balance")
   @Watch("IPV4")
+  @Watch("isCerified")
   @Watch("isValidInputs")
   calcWatcher() {
     this.calculate();
@@ -287,8 +299,10 @@ export default class Calculator extends Vue {
       const CU = calCU(+this.CRU, +this.MRU);
       const SU = calSU(+this.HRU, +this.SRU);
       const IPV4 = this.IPV4 ? 1 : 0;
+      // apply 25% off of certified node if selected
+      const certified = this.isCerified ? 0.75 : 1;
 
-      const musd_month = (CU * price.cu.value + SU * price.su.value + IPV4 * price.ipu.value) * 24 * 30;
+      const musd_month = (CU * price.cu.value + SU * price.su.value + IPV4 * price.ipu.value * certified) * 24 * 30;
       const [dedicatedPrice, dedicatedPackage, sharedPrice, sharedPackage] = await this.calDiscount(musd_month);
 
       this.prices = [
@@ -325,6 +339,10 @@ export default class Calculator extends Vue {
     console.log("current balance: " + this.$store.state.credentials.balance.free);
   }
 
+  certifiedToggle() {
+    this.isCerified = !this.isCerified;
+  }
+
   async calcPrice() {
     const price = await getPrices(this.$api);
     return price;
@@ -348,25 +366,25 @@ export default class Calculator extends Vue {
         color: "#868686",
       },
       default: {
-        duration: 3,
+        duration: 1.5,
         discount: 20,
         backgroundColor: "#3b3b3b",
         color: "black",
       },
       bronze: {
-        duration: 6,
+        duration: 3,
         discount: 30,
         backgroundColor: "#F7B370",
         color: "#C17427",
       },
       silver: {
-        duration: 12,
+        duration: 6,
         discount: 40,
         backgroundColor: "#eeeeee",
         color: "#a9a9a9",
       },
       gold: {
-        duration: 36,
+        duration: 18,
         discount: 60,
         backgroundColor: "#ffed8b",
         color: "rgba(0,0,0,.4)",
