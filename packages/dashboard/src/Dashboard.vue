@@ -28,6 +28,8 @@
               <v-btn class="custom-button" color="white" style="color: black"> Help</v-btn>
             </a>
 
+            <TfChainConnector />
+
             <v-theme-provider root>
               <v-card v-if="filteredAccounts().length" style="width: max-content">
                 <v-card-text
@@ -212,6 +214,7 @@ import { Component, Vue } from "vue-property-decorator";
 
 import config from "@/portal/config";
 
+import TfChainConnector from "./components/TfChainConnector.vue";
 import FundsCard from "./portal/components/FundsCard.vue";
 import TftSwapPrice from "./portal/components/TftSwapPrice.vue";
 import WelcomeWindow from "./portal/components/WelcomeWindow.vue";
@@ -242,7 +245,7 @@ interface SidenavItem {
 
 @Component({
   name: "Dashboard",
-  components: { WelcomeWindow, FundsCard, TftSwapPrice },
+  components: { WelcomeWindow, FundsCard, TftSwapPrice, TfChainConnector },
 })
 export default class Dashboard extends Vue {
   collapseOnScroll = true;
