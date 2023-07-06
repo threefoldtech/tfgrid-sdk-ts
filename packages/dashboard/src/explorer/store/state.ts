@@ -1,4 +1,5 @@
 import { GetDataQueryType, IFarm, INode } from "../graphql/api";
+import { NodeSatusFilter } from "../types/FilterOptions";
 
 interface IInFilter {
   enabled: boolean;
@@ -37,7 +38,6 @@ export interface IState {
   pricingPolicies: Map<number, string>;
   loading: boolean;
   tableLoading: boolean;
-  nodes_status: { [key: number]: boolean };
   nodeContractsNo: number;
   accessNodesNo: number;
   countriesNo: number;
@@ -92,7 +92,7 @@ export interface IState {
   nodesTablePageNumber: number;
   nodesTablePageSize: number;
   nodesGatewayFilter: boolean;
-  nodesUpFilter: boolean;
+  nodeStatusFilter: string;
   nodesGPUFilter: boolean;
 
   /* Refactored Data */
@@ -105,7 +105,6 @@ export default {
   pricingPolicies: new Map(),
   loading: false,
   tableLoading: false,
-  nodes_status: {},
   nodesDistribution: {},
   nodeContractsNo: 0,
   accessNodesNo: 0,
@@ -159,9 +158,9 @@ export default {
   nodesCount: 0,
   nodesTablePageNumber: 1,
   nodesTablePageSize: 10,
-  nodesUpFilter: true,
+  nodeStatusFilter: NodeSatusFilter.up,
   nodesGatewayFilter: false,
   nodesGPUFilter: false,
   /* Refactored data */
   farms: createPaginationData(),
-} as IState;
+} as unknown as IState;
