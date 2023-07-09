@@ -206,7 +206,7 @@ export default class Calculator extends Vue {
   @Watch("HRU")
   @Watch("balance")
   @Watch("IPV4")
-  @Watch("isCerified")
+  @Watch("isCertified")
   @Watch("isValidInputs")
   calcWatcher() {
     this.calculate();
