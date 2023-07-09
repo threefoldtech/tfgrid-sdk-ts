@@ -1,5 +1,5 @@
 import { GetDataQueryType, IFarm, INode } from "../graphql/api";
-import { NodeSatusFilter } from "../types/FilterOptions";
+import { NodeStatusFilter } from "../types/FilterOptions";
 
 interface IInFilter {
   enabled: boolean;
@@ -92,7 +92,7 @@ export interface IState {
   nodesTablePageNumber: number;
   nodesTablePageSize: number;
   nodesGatewayFilter: boolean;
-  nodeStatusFilter: NodeSatusFilter;
+  nodeStatusFilter: NodeStatusFilter;
   nodesGPUFilter: boolean;
 
   /* Refactored Data */
@@ -158,7 +158,7 @@ export default {
   nodesCount: 0,
   nodesTablePageNumber: 1,
   nodesTablePageSize: 10,
-  nodeStatusFilter: NodeSatusFilter.up,
+  nodeStatusFilter: NodeStatusFilter.up,
   nodesGatewayFilter: false,
   nodesGPUFilter: false,
   /* Refactored data */

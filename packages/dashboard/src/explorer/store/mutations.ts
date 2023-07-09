@@ -1,7 +1,7 @@
 import { byInternet } from "country-code-lookup";
 
 import { GetDataQueryType } from "../graphql/api";
-import { NodeSatusFilter } from "../types/FilterOptions";
+import { NodeStatusFilter } from "../types/FilterOptions";
 import { INode } from "./../graphql/api";
 import { IState } from "./state";
 
@@ -126,7 +126,7 @@ export default {
   setGPUFilter(state: IState, payload: boolean) {
     state.nodesGPUFilter = payload;
   },
-  setNodeStatusFilter(state: IState, status: NodeSatusFilter) {
+  setNodeStatusFilter(state: IState, status: NodeStatusFilter) {
     state.nodeStatusFilter = status;
   },
   setNodesFilter(state: IState, payload: { key: string; value: any }) {
