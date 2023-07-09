@@ -59,10 +59,13 @@ class Calculator {
     let balance = 0;
     const pricing = await this.pricing(options);
 
+    // certified node cotsts 25% more than DIY node
+    const certified = options.certified ? 1.25 : 1;
+
     // discount for Dedicated Nodes
     const discount = pricing.dedicatedDiscount;
-    let dedicatedPrice = pricing.musd_month - pricing.musd_month * (+discount / 100);
-    let sharedPrice = pricing.musd_month;
+    let dedicatedPrice = pricing.musd_month - pricing.musd_month * (+discount / 100) * certified;
+    let sharedPrice = pricing.musd_month * certified;
     const TFTPrice = await this.tftPrice();
     if (options.balance) {
       balance = TFTPrice * options.balance * 10000000;
@@ -120,6 +123,7 @@ class Calculator {
       hru: options.hru,
       sru: options.sru,
       ipv4u: options.ipv4u,
+      certified: options.certified,
       balance: balance,
     });
     return calculate;
