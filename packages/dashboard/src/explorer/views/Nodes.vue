@@ -144,7 +144,7 @@ import NodeFilter from "../components/NodeFilter.vue";
 import { INode } from "../graphql/api";
 import { ActionTypes } from "../store/actions";
 import { MutationTypes } from "../store/mutations";
-import { NodeSatusFilter } from "../types/FilterOptions";
+import { NodeStatusFilter } from "../types/FilterOptions";
 
 @Component({
   components: {
@@ -169,7 +169,7 @@ export default class Nodes extends Vue {
     { text: "Status", value: "status", align: "center", customAlign: "text-center" },
   ];
 
-  statusFilter = NodeSatusFilter;
+  statusFilter = NodeStatusFilter;
   filters = [
     {
       label: "Node ID",
@@ -291,12 +291,12 @@ export default class Nodes extends Vue {
   }
 
   getStatus(node: { status: string }) {
-    if (node.status === NodeSatusFilter.up) {
-      return { color: "green", status: NodeSatusFilter.up };
-    } else if (node.status === NodeSatusFilter.standBy) {
-      return { color: "#dc9123", status: NodeSatusFilter.standBy };
+    if (node.status === NodeStatusFilter.up.toLocaleLowerCase()) {
+      return { color: "green", status: NodeStatusFilter.up };
+    } else if (node.status === NodeStatusFilter.standBy.toLocaleLowerCase()) {
+      return { color: "#dc9123", status: NodeStatusFilter.standBy };
     } else {
-      return { color: "red", status: NodeSatusFilter.down };
+      return { color: "red", status: NodeStatusFilter.down };
     }
   }
 

@@ -13,8 +13,8 @@ export default interface IFilterOptions {
   getValue?: (filter: IFilterOptions) => any;
 }
 
-export enum NodeSatusFilter {
-  up = "up",
-  down = "down",
-  standBy = "standby",
+export enum NodeStatusFilter {
+  up = "Up",
+  down = "Down",
+  standBy = "Standby",
 }
