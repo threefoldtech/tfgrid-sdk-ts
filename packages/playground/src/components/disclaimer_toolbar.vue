@@ -1,13 +1,11 @@
 <template>
-  <v-card v-if="network !== 'main' && nw !== 'main'">
+  <v-card>
     <v-card-title class="font-weight-bold">Disclaimer</v-card-title>
-    <v-card-text>
+    <v-card-text v-if="network !== 'main' && nw !== 'main'">
       This is {{ nw }} environment. We're still ironing out the kinks. If there are any issues, please let us know
       <a class="app-link" href="https://github.com/threefoldtech/test_feedback/issues" target="_blank">here.</a>
     </v-card-text>
-  </v-card>
-  <v-card v-else class="mb-3">
-    <v-card-text>
+    <v-card-text v-else>
       <v-icon>mdi-information</v-icon>
       This version of the Playground is experimental. Please get in touch with any issues.
     </v-card-text>
