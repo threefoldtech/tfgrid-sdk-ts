@@ -291,9 +291,9 @@ export default class Nodes extends Vue {
   }
 
   getStatus(node: { status: string }) {
-    if (node.status === NodeStatusFilter.up) {
+    if (node.status === NodeStatusFilter.up.toLocaleLowerCase()) {
       return { color: "green", status: NodeStatusFilter.up };
-    } else if (node.status === NodeStatusFilter.standBy) {
+    } else if (node.status === NodeStatusFilter.standBy.toLocaleLowerCase()) {
       return { color: "#dc9123", status: NodeStatusFilter.standBy };
     } else {
       return { color: "red", status: NodeStatusFilter.down };

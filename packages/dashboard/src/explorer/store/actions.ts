@@ -30,7 +30,7 @@ export default {
     let url = `${window.configs.APP_GRIDPROXY_URL}/nodes?ret_count=true`;
     url += `&size=${state.nodesTablePageSize}`;
     url += `&page=${state.nodesTablePageNumber}`;
-    url += `&status=${state.nodeStatusFilter}`;
+    url += `&status=${state.nodeStatusFilter.toLocaleLowerCase()}`;
 
     if (state.nodesGatewayFilter) url += "&ipv4=true&domain=true";
     if (state.nodesGPUFilter) url += "&has_gpu=true";
