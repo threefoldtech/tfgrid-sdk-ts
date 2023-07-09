@@ -64,7 +64,7 @@ class Calculator {
 
     // discount for Dedicated Nodes
     const discount = pricing.dedicatedDiscount;
-    let dedicatedPrice = pricing.musd_month - pricing.musd_month * (+discount / 100) * certified;
+    let dedicatedPrice = (pricing.musd_month - pricing.musd_month * (+discount / 100)) * certified;
     let sharedPrice = pricing.musd_month * certified;
     const TFTPrice = await this.tftPrice();
     if (options.balance) {
