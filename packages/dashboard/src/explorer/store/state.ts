@@ -92,7 +92,7 @@ export interface IState {
   nodesTablePageNumber: number;
   nodesTablePageSize: number;
   nodesGatewayFilter: boolean;
-  nodeStatusFilter: string;
+  nodeStatusFilter: NodeSatusFilter;
   nodesGPUFilter: boolean;
 
   /* Refactored Data */
