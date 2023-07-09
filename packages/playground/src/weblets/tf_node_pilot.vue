@@ -1,5 +1,5 @@
 <template>
-  <weblet-layout ref="layout" :cpu="cpu" :memory="memory" :disk="32" ivp4 title-image="images/icons/vm.png">
+  <weblet-layout ref="layout" :cpu="cpu" :memory="memory" :disk="32" ipv4 title-image="images/icons/vm.png">
     <template #title>Deploy a Node Pilot</template>
     <form-validator v-model="valid">
       <input-validator
