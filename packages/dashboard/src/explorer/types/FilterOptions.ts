@@ -14,7 +14,7 @@ export default interface IFilterOptions {
 }
 
 export enum NodeStatusFilter {
-  up = "up",
-  down = "down",
-  standBy = "standby",
+  up = "Up",
+  down = "Down",
+  standBy = "Standby",
 }
