@@ -4,12 +4,13 @@ import { getClient } from "./client_loader";
 async function main() {
   const grid3 = await getClient();
   const CalculatorModel: CalculatorModel = {
-    cru: 1,
-    mru: 1, // GB
+    cru: 16,
+    mru: 8, // GB
     sru: 25,
-    hru: 100,
+    hru: 0,
     ipv4u: false,
-    balance: 1,
+    certified: true,
+    balance: 0,
   };
 
   const CUModel: CUModel = {
