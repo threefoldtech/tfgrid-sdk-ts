@@ -295,10 +295,11 @@ export default class Calculator extends Vue {
       const CU = calCU(+this.CRU, +this.MRU);
       const SU = calSU(+this.HRU, +this.SRU);
       const IPV4 = this.IPV4 ? 1 : 0;
-      // apply 25% off of certified node if selected
-      const certified = this.isCerified ? 0.75 : 1;
+      // apply 25% extra on certified node if selected
+      const certified = this.isCerified ? 1.25 : 1;
 
-      const musd_month = (CU * price.cu.value + SU * price.su.value + IPV4 * price.ipu.value * certified) * 24 * 30;
+      const musd_month = (CU * price.cu.value + SU * price.su.value + IPV4 * price.ipu.value) * certified * 24 * 30;
+
       const [dedicatedPrice, dedicatedPackage, sharedPrice, sharedPackage] = await this.calDiscount(musd_month);
 
       this.prices = [
