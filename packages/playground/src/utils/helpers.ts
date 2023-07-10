@@ -33,5 +33,5 @@ export function normalizeBalance(num: number | string | undefined, floor = false
 }
 
 export function isEnoughBalance(balance: any, min = 0.001): boolean {
-  return balance.free > min ? true : false;
+  return balance?.free > min ? true : false;
 }
