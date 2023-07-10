@@ -13,7 +13,6 @@ class TwinDeploymentHandler {
   rmb: RMB;
   deploymentFactory: DeploymentFactory;
   original_deployments = [];
-  addedNameContracts = [];
   nodes: Nodes;
 
   constructor(public config: GridClientConfig) {
@@ -32,9 +31,7 @@ class TwinDeploymentHandler {
       }
     }
     try {
-      const contract = await this.tfclient.contracts.createName({ name });
-      this.addedNameContracts.push(name);
-      return contract;
+      return await this.tfclient.contracts.createName({ name });
     } catch (e) {
       throw Error(`Failed to create name contract ${name} due to ${e}`);
     }
