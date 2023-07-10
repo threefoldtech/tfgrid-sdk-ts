@@ -325,11 +325,6 @@ class TwinDeploymentHandler {
     // cancel all created contracts and leave the updated ones.
     events.emit("logs", "Rolling back deployments");
     const extrinsics: ExtrinsicResult<number | Contract>[] = [];
-    // delete name contracts for the updated deployment
-    for (const name of this.addedNameContracts) {
-      const extrinsic = await this.deleteNameContract(name);
-      if (extrinsic) extrinsics.push(extrinsic);
-    }
 
     for (const c of contracts.created) {
       if (c.state !== "Deleted") {
