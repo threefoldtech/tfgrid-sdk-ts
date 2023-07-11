@@ -153,10 +153,13 @@
           <v-tooltip bottom nudge-bottom="12">
             <template v-slot:activator="{ on, attrs }">
               <span class="price">
-                <p>
+                <p v-if="price.label === 'Dedicated Node'">
+                  Cost of reserving a
+                  <span class="name">{{ price.label + " " }}</span> of same specification
+                </p>
+                <p v-else>
                   Cost of reservation on a
-                  <span class="name">{{ price.label !== undefined ? price.label + " " : " " }}</span> of same
-                  specification
+                  <span class="name">{{ price.label !== undefined ? price.label + " " : " " }}</span>
                 </p>
                 <span class="package"> {{ price.packageName != "none" ? price.packageName + " Package: " : "" }}</span>
                 ${{ price.price }}/month, {{ price.TFTs }} TFT/month
