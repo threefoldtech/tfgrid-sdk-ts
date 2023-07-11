@@ -1,0 +1,67 @@
+name: Publish ARM
+
+on:
+  workflow_run:
+    workflows: ["Full Clients Publish"]
+    types:
+      - completed
+
+jobs:
+  docker-image-grid-http-server:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: 'Get tag'
+        id: tag
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            let run = await github.rest.actions.getWorkflowRun({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: context.payload.workflow_run.id,
+            });
+            return run.data.head_branch;
+
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.tag.outputs.result }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2.1.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          context: git
+          images: ghcr.io/${{ github.repository_owner }}/grid_http_server
+          flavor: |
+            suffix=-arm,onlatest=true
+          tags: |
+            type=semver,pattern={{version}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: packages/grid_http_server/arm
+          push: true
+          platforms: linux/arm64,linux/armhf
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            GRID_VERSION=${{ steps.tag.outputs.result }}
