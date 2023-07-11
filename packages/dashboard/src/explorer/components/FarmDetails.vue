@@ -29,15 +29,17 @@
         <v-list-item-content>
           <v-list-item-title> Stellar Address </v-list-item-title>
         </v-list-item-content>
-        <v-col class="pl-0 mr-n4" v-if="farm.stellarAddress">
-          <v-text-field
-            :value="farm.stellarAddress"
-            readonly
-            hide-details
-            append-outer-icon="mdi-content-copy"
-            @click:append-outer="copy(farm.stellarAddress)"
-            solo
-        /></v-col>
+        <v-text-field
+          class="py-2"
+          v-if="farm.stellarAddress"
+          style="max-width: 70%"
+          :value="farm.stellarAddress"
+          readonly
+          hide-details
+          append-outer-icon="mdi-content-copy"
+          @click:append-outer="copy(farm.stellarAddress)"
+          solo
+        />
         <span v-else>None</span>
       </v-list-item>
     </v-list>
