@@ -155,7 +155,8 @@
               <span class="price">
                 <p>
                   Cost of reservation on a
-                  <span class="name">{{ price.label !== undefined ? price.label + " " : " " }}</span>
+                  <span class="name">{{ price.label !== undefined ? price.label + " " : " " }}</span> of same
+                  specification
                 </p>
                 <span class="package"> {{ price.packageName != "none" ? price.packageName + " Package: " : "" }}</span>
                 ${{ price.price }}/month, {{ price.TFTs }} TFT/month
