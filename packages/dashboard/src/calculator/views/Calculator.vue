@@ -155,7 +155,7 @@
               <span class="price">
                 <p v-if="price.label === 'Dedicated Node'">
                   Cost of reserving a
-                  <span class="name">{{ price.label + " " }}</span> the same specifications
+                  <span class="name">{{ price.label + " " }}</span> of the same specifications
                 </p>
                 <p v-else>
                   Cost of reservation on a
