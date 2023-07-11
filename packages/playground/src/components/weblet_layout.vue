@@ -38,6 +38,14 @@
       </template>
     </v-card-text>
 
+    <template v-if="dedicated">
+      <v-alert class="mb-4 mx-4" type="warning" variant="tonal">
+        When renting a dedicated node, you receive a 50% discount for the entire node. However, it's important to note
+        that you will still be required to pay for the entire node, even with the discount applied. This means that
+        while you enjoy the discount, the cost of the dedicated node is not prorated based on the resources you utilize.
+      </v-alert>
+    </template>
+
     <template v-if="$slots['footer-actions'] && (profileManager.profile || disableAlerts)">
       <v-alert
         v-show="!status"
@@ -215,14 +223,16 @@ const tft = ref<number>();
 const costLoading = ref(false);
 const shouldUpdateCost = ref(false);
 watch(
-  () => [props.cpu, props.memory, props.disk, props.ipv4],
+  () => [props.cpu, props.memory, props.disk, props.ipv4, props.certified, props.dedicated],
   debounce((value, oldValue) => {
     if (
       oldValue &&
       value[0] === oldValue[0] &&
       value[1] === oldValue[1] &&
       value[2] === oldValue[2] &&
-      value[3] === oldValue[3]
+      value[3] === oldValue[3] &&
+      value[4] === oldValue[4] &&
+      value[5] === oldValue[5]
     )
       return;
     shouldUpdateCost.value = true;
@@ -242,7 +252,7 @@ watch(
 async function loadCost(profile: { mnemonic: string }) {
   costLoading.value = true;
   const grid = await getGrid(profile);
-  const { sharedPrice } = await grid!.calculator.calculateWithMyBalance({
+  const { sharedPrice, dedicatedPrice } = await grid!.calculator.calculateWithMyBalance({
     cru: typeof props.cpu === "number" ? props.cpu : 0,
     sru: typeof props.disk === "number" ? props.disk : 0,
     mru: typeof props.disk === "number" ? (props.memory ?? 0) / 1024 : 0,
@@ -251,7 +261,7 @@ async function loadCost(profile: { mnemonic: string }) {
     certified: props.certified,
     dedicated: props.dedicated,
   });
-  usd.value = sharedPrice;
+  usd.value = props.dedicated ? dedicatedPrice : sharedPrice;
   tft.value = parseFloat((usd.value / (await grid!.calculator.tftPrice())).toFixed(2));
   costLoading.value = false;
 }
