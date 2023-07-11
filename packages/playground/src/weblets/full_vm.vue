@@ -114,13 +114,7 @@
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" />
         </input-tooltip>
 
-        <input-tooltip
-          inline
-          tooltip="
-          Selecting a Node with GPU.
-          When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
-          "
-        >
+        <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
           <v-switch color="primary" inset label="Certified" v-model="certified" />
         </input-tooltip>
         <SelectFarm

@@ -38,6 +38,8 @@ export interface Filters {
   memory?: number;
   ssd?: number;
   disk?: number;
+  certified?: boolean;
+  dedicated?: boolean;
 }
 
 const props = defineProps({
