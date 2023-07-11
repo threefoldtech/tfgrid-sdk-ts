@@ -28,7 +28,7 @@
                 <v-list-item-content>
                   <v-list-item-title> Disk (HDD) </v-list-item-title>
                 </v-list-item-content>
-                {{ node.resources.hru | toTeraOrGigaOrPeta }}
+                {{ node.resources.hru }}
               </v-list-item>
               <v-divider />
 
@@ -36,7 +36,7 @@
                 <v-list-item-content>
                   <v-list-item-title> Disk (SSD) </v-list-item-title>
                 </v-list-item-content>
-                {{ node.resources.sru | toTeraOrGigaOrPeta }}
+                {{ node.resources.sru }}
               </v-list-item>
               <v-divider />
 
@@ -44,7 +44,7 @@
                 <v-list-item-content>
                   <v-list-item-title> Memory </v-list-item-title>
                 </v-list-item-content>
-                {{ node.resources.mru | toTeraOrGigaOrPeta }}
+                {{ node.resources.mru }}
               </v-list-item>
             </v-list>
           </v-col>

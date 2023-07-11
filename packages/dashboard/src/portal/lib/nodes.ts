@@ -9,6 +9,9 @@ import moment from "moment";
 import "jspdf-autotable";
 import { apiInterface } from "./util";
 import { Client } from "@threefold/tfchain_client";
+import { INode } from "@/explorer/graphql/api";
+import { ApiPromise } from "@polkadot/api";
+import toTeraOrGigaOrPeta from "@/explorer/filters/toTeraOrGigaOrPeta";
 
 export interface receiptInterface {
   hash: string;
@@ -388,10 +391,7 @@ export async function getPrices(api: apiInterface) {
   return pricing.toJSON();
 }
 
-export function countPrice(
-  prices: { cu: { value: number }; su: { value: number } },
-  node: { total_resources: { sru: number; hru: number; mru: number; cru: any } },
-) {
+export function countPrice(prices: { cu: { value: number }; su: { value: number } }, node: any) {
   const resources = {
     sru: node.total_resources.sru / 1024 / 1024 / 1024,
     hru: node.total_resources.hru / 1024 / 1024 / 1024,
@@ -459,32 +459,8 @@ export async function getNodeByID(nodeId: any) {
   return node;
 }
 
-export async function getDedicatedNodes(twinId: string, query: string, page: number, size: number) {
-  let baseUrl = `${config.gridproxyUrl}/nodes?status=up&ret_count=true&page=${page}&size=${size}`;
-  if (query != "rented_by") {
-    baseUrl += `&${query}=true`;
-  } else {
-    baseUrl += `&${query}=${twinId}`;
-  }
-
-  const res = await fetch(baseUrl);
-  const count = res.headers.get("count");
-  const nodes = await res.json();
-  return { nodes, count };
-}
-
-export async function getDNodes(
-  api: apiInterface,
-  address: string,
-  currentTwinID: string,
-  query: string,
-  page: number,
-  size: number,
-) {
-  let { nodes, count } = await getDedicatedNodes(currentTwinID, query, page, size);
-
+export async function updateDedicatedNodes(api: apiInterface, address: string, currentTwinID: number, nodes: any[]) {
   const pricing = await getPrices(api);
-
   // discount for Twin Balance
   const TFTprice = await getTFTPrice(api);
   const balance = await getBalance(api, address);
@@ -503,6 +479,7 @@ export async function getDNodes(
     usedResources: { cru: any; mru: any; hru: any; sru: any };
     rentStatus: any;
   }[] = [];
+
   for (const node of nodes) {
     const price = countPrice(pricing, node);
     const [discount, discountLevel] = await calDiscount(TFTbalance, pricing, price);
@@ -524,10 +501,10 @@ export async function getDNodes(
         lat: node.location.latitude ? node.location.latitude : "Unknown",
       },
       resources: {
-        cru: node.total_resources.cru,
-        mru: node.total_resources.mru,
-        hru: node.total_resources.hru,
-        sru: node.total_resources.sru,
+        cru: toTeraOrGigaOrPeta(node.total_resources.cru.toString()),
+        mru: toTeraOrGigaOrPeta(node.total_resources.mru.toString()),
+        hru: toTeraOrGigaOrPeta(node.total_resources.hru.toString()),
+        sru: toTeraOrGigaOrPeta(node.total_resources.sru.toString()),
         gpu: node.num_gpu,
       },
       usedResources: {
@@ -541,5 +518,5 @@ export async function getDNodes(
       rentStatus: node.rentContractId === 0 ? "free" : node.rentedByTwinId == currentTwinID ? "yours" : "taken",
     });
   }
-  return { dNodes, count };
+  return dNodes;
 }
