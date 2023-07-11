@@ -572,6 +572,7 @@ class CalculatorModel {
   @Expose() @IsNumber() @IsNotEmpty() @Min(0) hru: number; // GB
   @Expose() @IsBoolean() @IsNotEmpty() ipv4u: boolean;
   @Expose() @IsBoolean() @IsOptional() certified?: boolean;
+  @Expose() @IsBoolean() @IsOptional() dedicated?: boolean;
   @Expose() @IsOptional() @IsNumber() @Min(0) balance?: number;
 }
 

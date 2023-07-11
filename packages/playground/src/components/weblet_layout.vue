@@ -116,6 +116,11 @@ const props = defineProps({
     required: false,
     default: () => false,
   },
+  dedicated: {
+    type: Boolean,
+    required: false,
+    default: () => false,
+  },
 });
 const emits = defineEmits<{ (event: "mount"): void; (event: "back"): void }>();
 const baseUrl = import.meta.env.BASE_URL;
@@ -244,6 +249,7 @@ async function loadCost(profile: { mnemonic: string }) {
     hru: 0,
     ipv4u: props.ipv4,
     certified: props.certified,
+    dedicated: props.dedicated,
   });
   usd.value = sharedPrice;
   tft.value = parseFloat((usd.value / (await grid!.calculator.tftPrice())).toFixed(2));
