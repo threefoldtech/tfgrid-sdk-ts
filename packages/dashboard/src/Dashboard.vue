@@ -474,7 +474,7 @@ export default class Dashboard extends Vue {
       icon: "cash-multiple",
       prefix: "/other/minting",
       children: [],
-      hidden: (window.configs.APP_NETWORK !== "main"),
+      hidden: window.configs.APP_NETWORK !== "main",
     },
     {
       label: "Monitoring",
