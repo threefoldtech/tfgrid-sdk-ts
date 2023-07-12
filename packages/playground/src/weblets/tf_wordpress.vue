@@ -82,7 +82,10 @@
         :standard="{ cpu: 2, memory: 1024 * 2, disk: 50 }"
         :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
       />
-      <SelectGatewayNode v-model="gateway" />
+      <Networks v-model:ipv4="ipv4" v-model:ipv6="ipv6" />
+      <v-switch hide-details color="primary" inset label="Custom Domain Name" v-model="customDomain" />
+      <SelectGatewayNode v-if="!customDomain" v-model="gateway" />
+      <Gateway v-else :hasPublicIP="ipv4 || ipv6" v-model:customDomainName="domainName" v-model:gateway="gateway" />
       <SelectFarm
         :filters="{
           cpu: solution?.cpu,
@@ -102,7 +105,7 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { type Ref, ref } from "vue";
+import { type Ref, ref, watch } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
@@ -124,8 +127,15 @@ const email = ref("");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
+const customDomain = ref(false);
+const domainName = ref("");
 const farm = ref() as Ref<Farm>;
-
+const ipv4 = ref(false);
+const ipv6 = ref(false);
+watch(domainName, domainName => {
+  console.log(domainName);
+  return domainName;
+});
 async function deploy() {
   layout.value.setStatus("deploy");
 
@@ -211,6 +221,8 @@ async function deploy() {
 </script>
 
 <script lang="ts">
+import Gateway from "../components/gateway.vue";
+import Networks from "../components/networks.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
@@ -222,6 +234,8 @@ export default {
     SelectSolutionFlavor,
     SelectGatewayNode,
     SelectFarm,
+    Gateway,
+    Networks,
   },
 };
 </script>
