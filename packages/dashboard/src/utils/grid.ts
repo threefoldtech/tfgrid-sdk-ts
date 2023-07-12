@@ -58,3 +58,7 @@ export function downloadAsFile(name: string, data: string) {
   a.click();
   a.remove();
 }
+
+export function loadBalance(grid: GridClient) {
+  return grid.balance.getMyBalance();
+}
