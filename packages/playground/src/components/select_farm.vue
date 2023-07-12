@@ -45,8 +45,6 @@ const props = defineProps({
   country: String,
   filters: { default: () => ({} as Filters), type: Object as PropType<Filters> },
   exclusiveFor: String,
-  oncePerFarm: Boolean,
-  projectName: String,
 });
 
 const emits = defineEmits<{ (event: "update:modelValue", value?: Farm): void }>();
@@ -83,11 +81,7 @@ async function loadFarms() {
       publicIPs: filters.publicIp,
       availableFor: grid!.twinId,
     },
-    {
-      exclusiveFor: props.exclusiveFor,
-      oncePerFarm: props.oncePerFarm,
-      projectName: props.projectName,
-    },
+    { exclusiveFor: props.exclusiveFor },
   );
 
   if (oldFarm) {
