@@ -5,7 +5,7 @@
     :cpu="cpu"
     :memory="memory"
     :disk="disks.reduce((total, disk) => total + disk.size, rootFsSize)"
-    :ivp4="ipv4"
+    :ipv4="ipv4"
     title-image="images/icons/vm.png"
   >
     <template #title>Deploy a Micro Virtual Machine </template>
@@ -71,6 +71,7 @@
         </input-validator>
 
         <Network
+          required
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
@@ -166,14 +167,15 @@
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" :disabled="tabs?.invalid || networkError" @click="deploy">Deploy</v-btn>
+      <v-btn color="primary" variant="tonal" :disabled="tabs?.invalid || network?.error" @click="deploy">Deploy</v-btn>
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref, watch } from "vue";
+import { type Ref, ref } from "vue";
 
+import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type Farm, type Flist, ProjectName } from "../types";
@@ -220,12 +222,8 @@ const wireguard = ref(false);
 const farm = ref() as Ref<Farm>;
 const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
-const networkError = ref(false);
+const network = ref();
 
-watch([planetary, ipv4, ipv6, wireguard], ([planetary, ipv4, ipv6, wireguard]) => {
-  if (!(ipv6 || ipv4 || planetary || wireguard)) networkError.value = true;
-  else networkError.value = false;
-});
 function layoutMount() {
   if (envs.value.length > 0) {
     envs.value.splice(0, 1);

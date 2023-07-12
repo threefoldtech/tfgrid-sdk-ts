@@ -1,6 +1,7 @@
 import { byInternet } from "country-code-lookup";
 
 import { GetDataQueryType } from "../graphql/api";
+import { NodeStatusFilter } from "../types/FilterOptions";
 import { INode } from "./../graphql/api";
 import { IState } from "./state";
 
@@ -11,17 +12,16 @@ export enum MutationTypes {
   SET_FILTER_ENABLE = "setFilterEnable",
   SET_FILTER_VALUE = "setFilterValue",
   SET_POLICIES = "setPolicies",
-  SET_NODES_STATUS = "setNodesStatus",
   SET_PRICING_POLICIES = "setPricingPolicies",
   SET_NODES_COUNT = "setNodesCount",
   SET_NODES_TABLE_PAGE_NUMBER = "setNodesTablePageNumber",
   SET_NODES_TABLE_PAGE_SIZE = "setNodesTablePageSize",
   SET_GATEWAY_FILTER = "setGatewayFilter",
-  SET_UP_FILTER = "setUpFilter",
+  SET_NODE_STATUS_FILTER = "setNodeStatusFilter",
   SET_GPU_FILTER = "setGPUFilter",
   SET_NODES = "setNodes",
   SET_NODES_FILTER = "setNodesFilter",
-  CLEAR_NODES_FILTER = "clearNodesFilter",
+  CLEAR_NODES_FILTER = "status",
   CLEAR_NODES_FILTER_KEY = "clearNodesFilterKey",
 }
 
@@ -102,9 +102,6 @@ export default {
   setFilterValue(state: IState, { key1, key2, value }: ISetNodeFilter) {
     (state.filters[key1] as any)[key2].value = value;
   },
-  setNodesStatus(state: IState, payload: { [key: number]: boolean }) {
-    state.nodes_status = payload;
-  },
   setNodes(state: IState, payload: any): void {
     // clear the state each time you reload. to avoid duplicated nodes
     state.nodes = [];
@@ -129,8 +126,8 @@ export default {
   setGPUFilter(state: IState, payload: boolean) {
     state.nodesGPUFilter = payload;
   },
-  setUpFilter(state: IState, payload: boolean) {
-    state.nodesUpFilter = payload;
+  setNodeStatusFilter(state: IState, status: NodeStatusFilter) {
+    state.nodeStatusFilter = status;
   },
   setNodesFilter(state: IState, payload: { key: string; value: any }) {
     state.nodesFilter[payload.key] = payload.value;

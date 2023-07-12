@@ -87,22 +87,28 @@
               </v-tooltip>
             </v-col>
           </v-row>
-          <v-row>
-            <v-col cols="2" class="mx-auto">
+          <v-row no-gutters>
+            <v-col cols="6" class="d-flex">
               <v-tooltip bottom nudge-right="40">
                 <template v-slot:activator="{ on, attrs }">
-                  <div v-on="on" v-bind="attrs">
-                    <v-switch hide-details label="With a Public IP (V4)" @change="IPV4Toggle" />
+                  <div v-on="on" v-bind="attrs" class="mx-auto">
+                    <v-switch hide-details label="Certified Node" @change="certifiedToggle" />
+                  </div>
+                </template>
+                <span> A certified node will receive 25% more reward compared to a non-certified node. </span>
+              </v-tooltip>
+              <v-tooltip bottom nudge-right="40">
+                <template v-slot:activator="{ on, attrs }">
+                  <div v-on="on" v-bind="attrs" class="mx-auto">
+                    <v-switch hide-details label="With a Public IPv4" @change="IPV4Toggle" />
                   </div> </template
                 ><span
                   >An Internet Protocol version 4 address that is globally unique and accessible over the internet</span
                 >
               </v-tooltip>
-            </v-col>
-            <v-col cols="2" class="mx-auto">
               <v-tooltip bottom nudge-left="20">
                 <template v-slot:activator="{ on, attrs }">
-                  <div v-on="on" v-bind="attrs">
+                  <div v-on="on" v-bind="attrs" class="mx-auto">
                     <v-switch
                       hide-details
                       label="Use current balance"
@@ -147,7 +153,11 @@
           <v-tooltip bottom nudge-bottom="12">
             <template v-slot:activator="{ on, attrs }">
               <span class="price">
-                <p>
+                <p v-if="price.label === 'Dedicated Node'">
+                  Cost of reserving a
+                  <span class="name">{{ price.label + " " }}</span> of the same specifications
+                </p>
+                <p v-else>
                   Cost of reservation on a
                   <span class="name">{{ price.label !== undefined ? price.label + " " : " " }}</span>
                 </p>
@@ -188,6 +198,7 @@ type priceType = {
 })
 export default class Calculator extends Vue {
   IPV4 = false;
+  isCertified = false;
   CRU = "1";
   SRU = "25";
   MRU = "1";
@@ -199,6 +210,7 @@ export default class Calculator extends Vue {
   @Watch("HRU")
   @Watch("balance")
   @Watch("IPV4")
+  @Watch("isCertified")
   @Watch("isValidInputs")
   calcWatcher() {
     this.calculate();
@@ -287,8 +299,12 @@ export default class Calculator extends Vue {
       const CU = calCU(+this.CRU, +this.MRU);
       const SU = calSU(+this.HRU, +this.SRU);
       const IPV4 = this.IPV4 ? 1 : 0;
+      // apply 25% extra on certified node if selected
+      const certifiedFactor = this.isCertified ? 1.25 : 1;
 
-      const musd_month = (CU * price.cu.value + SU * price.su.value + IPV4 * price.ipu.value) * 24 * 30;
+      const musd_month =
+        (CU * price.cu.value + SU * price.su.value + IPV4 * price.ipu.value) * certifiedFactor * 24 * 30;
+
       const [dedicatedPrice, dedicatedPackage, sharedPrice, sharedPackage] = await this.calDiscount(musd_month);
 
       this.prices = [
@@ -325,6 +341,10 @@ export default class Calculator extends Vue {
     console.log("current balance: " + this.$store.state.credentials.balance.free);
   }
 
+  certifiedToggle() {
+    this.isCertified = !this.isCertified;
+  }
+
   async calcPrice() {
     const price = await getPrices(this.$api);
     return price;
@@ -348,25 +368,25 @@ export default class Calculator extends Vue {
         color: "#868686",
       },
       default: {
-        duration: 3,
+        duration: 1.5,
         discount: 20,
         backgroundColor: "#3b3b3b",
         color: "black",
       },
       bronze: {
-        duration: 6,
+        duration: 3,
         discount: 30,
         backgroundColor: "#F7B370",
         color: "#C17427",
       },
       silver: {
-        duration: 12,
+        duration: 6,
         discount: 40,
         backgroundColor: "#eeeeee",
         color: "#a9a9a9",
       },
       gold: {
-        duration: 36,
+        duration: 18,
         discount: 60,
         backgroundColor: "#ffed8b",
         color: "rgba(0,0,0,.4)",

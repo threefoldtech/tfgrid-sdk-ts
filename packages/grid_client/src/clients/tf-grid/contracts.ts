@@ -120,9 +120,9 @@ class TFContracts extends Contracts {
           for (const contracts of [nodeContracts, nameContracts, rentContracts]) {
             if (contracts.length === 1) {
               createdAt = contracts[0]["createdAt"];
+              duration = (billReports[0]["timestamp"] - createdAt) / 3600;
+              break;
             }
-            duration = (billReports[0]["timestamp"] - createdAt) / 3600;
-            break;
           }
         }
         if (!duration) {

@@ -13,7 +13,6 @@ class TwinDeploymentHandler {
   rmb: RMB;
   deploymentFactory: DeploymentFactory;
   original_deployments = [];
-  addedNameContracts = [];
   nodes: Nodes;
 
   constructor(public config: GridClientConfig) {
@@ -32,9 +31,7 @@ class TwinDeploymentHandler {
       }
     }
     try {
-      const contract = await this.tfclient.contracts.createName({ name });
-      this.addedNameContracts.push(name);
-      return contract;
+      return await this.tfclient.contracts.createName({ name });
     } catch (e) {
       throw Error(`Failed to create name contract ${name} due to ${e}`);
     }
@@ -325,11 +322,6 @@ class TwinDeploymentHandler {
     // cancel all created contracts and leave the updated ones.
     events.emit("logs", "Rolling back deployments");
     const extrinsics: ExtrinsicResult<number | Contract>[] = [];
-    // delete name contracts for the updated deployment
-    for (const name of this.addedNameContracts) {
-      const extrinsic = await this.deleteNameContract(name);
-      if (extrinsic) extrinsics.push(extrinsic);
-    }
 
     for (const c of contracts.created) {
       if (c.state !== "Deleted") {

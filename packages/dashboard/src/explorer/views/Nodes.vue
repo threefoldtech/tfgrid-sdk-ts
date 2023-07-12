@@ -11,26 +11,37 @@
     </template>
 
     <template v-slot:table>
-      <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center">
-        <div>
-          <v-switch label="Gateways (Only)" hide-details v-model="gatewayFilter" @change="requestNodes" />
-          <v-switch label="GPU Node (Only)" hide-details v-model="gpuFilter" @change="requestNodes" />
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
-              <div v-bind="attrs" v-on="on">
-                <v-switch label="Online (Only)" hide-details v-model="onlineFilter" @change="requestNodes" />
-              </div>
-            </template>
-            <span>Does not include Standby nodes</span>
-          </v-tooltip>
-        </div>
-      </div>
-      <div class="d-flex justify-center">
-        <v-alert dense text type="success">
+      <div class="d-flex justify-start mt-11">
+        <v-alert class="mb-0" dense text type="info">
           Node statuses are updated every 2 hours. For a realtime status, please click on the row.
         </v-alert>
       </div>
-
+      <v-row class="py-2" align="center" justify="space-between">
+        <v-col cols="6">
+          <v-row align="center">
+            <v-col cols="4">
+              <v-switch
+                class="mt-0"
+                label="Gateways (Only)"
+                hide-details
+                v-model="gatewayFilter"
+                @change="requestNodes"
+              />
+            </v-col>
+            <v-col cols="4">
+              <v-switch class="mt-0" label="GPU Node (Only)" hide-details v-model="gpuFilter" @change="requestNodes" />
+            </v-col>
+          </v-row>
+        </v-col>
+        <v-col cols="3" align="end">
+          <v-select
+            class="p-0"
+            label="Select Nodes Status"
+            :items="[statusFilter.up, statusFilter.down, statusFilter.standBy]"
+            v-model="nodeStatusFilter"
+          ></v-select>
+        </v-col>
+      </v-row>
       <v-data-table
         ref="table"
         :loading="$store.getters['explorer/tableLoading']"
@@ -91,7 +102,11 @@
 
         <template v-slot:[`item.status`]="{ item }">
           <p class="text-left mt-1 mb-0">
-            <v-chip :color="getStatus(item).color">{{ getStatus(item).status }}</v-chip>
+            <v-chip :color="getStatus(item).color">
+              <span style="color: rgb(255, 255, 255); font-weight: 700">
+                {{ getStatus(item).status }}
+              </span>
+            </v-chip>
           </p>
         </template>
       </v-data-table>
@@ -129,6 +144,7 @@ import NodeFilter from "../components/NodeFilter.vue";
 import { INode } from "../graphql/api";
 import { ActionTypes } from "../store/actions";
 import { MutationTypes } from "../store/mutations";
+import { NodeStatusFilter } from "../types/FilterOptions";
 
 @Component({
   components: {
@@ -153,6 +169,7 @@ export default class Nodes extends Vue {
     { text: "Status", value: "status", align: "center", customAlign: "text-center" },
   ];
 
+  statusFilter = NodeStatusFilter;
   filters = [
     {
       label: "Node ID",
@@ -248,16 +265,15 @@ export default class Nodes extends Vue {
   }
 
   set gpuFilter(value) {
-    console.log("set gpuFilter");
     this.$store.commit("explorer/" + MutationTypes.SET_GPU_FILTER, value);
   }
 
-  get onlineFilter() {
-    return this.$store.getters["explorer/getNodesUpFilter"];
+  get nodeStatusFilter() {
+    return this.$store.getters["explorer/getNodeStatusFilter"];
   }
 
-  set onlineFilter(value) {
-    this.$store.commit("explorer/" + MutationTypes.SET_UP_FILTER, value);
+  set nodeStatusFilter(value) {
+    this.$store.commit("explorer/" + MutationTypes.SET_NODE_STATUS_FILTER, value);
   }
 
   // update the page/size of the request
@@ -275,9 +291,13 @@ export default class Nodes extends Vue {
   }
 
   getStatus(node: { status: string }) {
-    if (node.status === "up") return { color: "green", status: "Up" };
-    else if (node.status === "standby") return { color: "orange", status: "Standby" };
-    else return { color: "red", status: "Down" };
+    if (node.status === NodeStatusFilter.up.toLocaleLowerCase()) {
+      return { color: "green", status: NodeStatusFilter.up };
+    } else if (node.status === NodeStatusFilter.standBy.toLocaleLowerCase()) {
+      return { color: "#dc9123", status: NodeStatusFilter.standBy };
+    } else {
+      return { color: "red", status: NodeStatusFilter.down };
+    }
   }
 
   toggleActive(label: string): void {
@@ -350,3 +370,9 @@ export default class Nodes extends Vue {
   }
 }
 </script>
+
+<style>
+.v-text-field__details {
+  display: none;
+}
+</style>
