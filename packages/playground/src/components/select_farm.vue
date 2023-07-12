@@ -46,7 +46,6 @@ const props = defineProps({
   filters: { default: () => ({} as Filters), type: Object as PropType<Filters> },
   exclusiveFor: String,
 });
-
 const emits = defineEmits<{ (event: "update:modelValue", value?: Farm): void }>();
 
 const farmInput = useInputRef();
