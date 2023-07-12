@@ -4,8 +4,29 @@
       <template #activator="{ on, attrs }">
         <v-card v-on="on" v-bind="attrs">
           <v-card-text class="d-flex align-center">
-            <v-icon size="x-large">mdi-account</v-icon>
-            <p class="font-weight-bold">Connect your TFChain Wallet</p>
+            <v-icon large>mdi-account</v-icon>
+            <template v-if="$store.state.profile && balance">
+              <p class="font-weight-bold ml-2">
+                <span>Balance: {{ balance.free }} TFT</span>
+                <br />
+                <span
+                  >Locked: {{ balance.frozen }} TFT
+                  <v-btn
+                    icon
+                    small
+                    @click.stop
+                    href="https://manual.grid.tf/tfchain/tfchain.html?highlight=locked#contract-locking"
+                    target="_blank"
+                    ><v-icon>mdi-information-outline</v-icon></v-btn
+                  ></span
+                >
+              </p>
+
+              <v-btn @click.stop="logout" icon color="error" class="ml-2">
+                <v-icon>mdi-logout</v-icon>
+              </v-btn>
+            </template>
+            <p class="font-weight-bold" v-else>Connect your TFChain Wallet</p>
           </v-card-text>
         </v-card>
       </template>
@@ -168,10 +189,10 @@
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import md5 from "md5";
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
 import { generateKeyPair } from "web-ssh-keygen";
 
-import { downloadAsFile, getGrid, loadProfile, storeSSH } from "../utils/grid";
+import { downloadAsFile, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
 import QrcodeGenerator from "./QrcodeGenerator.vue";
 
 const version = "v1";
@@ -215,6 +236,15 @@ export default class TfChainConnector extends Vue {
   public isValidForm = false;
 
   public canLogin = typeof localStorage.getItem(key) === "string";
+
+  public balance: any | null = null;
+  @Watch("$store.state.profile")
+  async profileWatcher$(profile: any) {
+    if (profile) {
+      const grid = await getGrid(profile.mnemonic);
+      this.balance = await loadBalance(grid);
+    }
+  }
 
   /* Validation */
   private _confirmPasswordUpdated = false;
