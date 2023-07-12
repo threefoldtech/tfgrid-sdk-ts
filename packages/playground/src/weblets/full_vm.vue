@@ -5,6 +5,8 @@
     :memory="memory"
     :disk="disks.reduce((total, disk) => total + disk.size, diskSize + 2)"
     :ipv4="ipv4"
+    :certified="certified"
+    :dedicated="dedicated"
     title-image="images/icons/vm.png"
   >
     <template #title> Deploy a Full Virtual Machine </template>
@@ -107,6 +109,16 @@
         >
           <v-switch color="primary" inset label="GPU" v-model="hasGPU" />
         </input-tooltip>
+        <input-tooltip
+          inline
+          tooltip="When renting a dedicated node, you receive a 50% discount for the entire node. However, it's important to note that you will still be required to pay for the entire node, even with the discount applied. This means that while you enjoy the discount, the cost of the dedicated node is not prorated based on the resources you utilize."
+        >
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" />
+        </input-tooltip>
+
+        <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+          <v-switch color="primary" inset label="Certified" v-model="certified" />
+        </input-tooltip>
         <SelectFarm
           v-if="!hasGPU"
           :filters="{
@@ -114,6 +126,8 @@
             memory,
             publicIp: ipv4,
             ssd: disks.reduce((total, disk) => total + disk.size, diskSize + 2),
+            dedicated: dedicated,
+            certified: certified,
           }"
           v-model="farm"
         />
@@ -133,6 +147,8 @@
             hasGPU: hasGPU,
             planetary: planetary,
             wireguard: wireguard,
+            dedicated: dedicated,
+            certified: certified,
           }"
         />
       </template>
@@ -232,6 +248,8 @@ const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
 const wireguard = ref(false);
+const dedicated = ref(false);
+const certified = ref(false);
 const farm = ref() as Ref<Farm>;
 const disks = ref<Disk[]>([]);
 const network = ref();

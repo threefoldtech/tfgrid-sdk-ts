@@ -38,6 +38,8 @@ export interface Filters {
   memory?: number;
   ssd?: number;
   disk?: number;
+  certified?: boolean;
+  dedicated?: boolean;
 }
 
 const props = defineProps({
@@ -78,6 +80,8 @@ async function loadFarms() {
       hru: filters.disk,
       sru: filters.ssd,
       publicIPs: filters.publicIp,
+      certified: filters.certified,
+      dedicated: filters.dedicated,
       availableFor: grid!.twinId,
     },
     { exclusiveFor: props.exclusiveFor },
@@ -114,7 +118,9 @@ watch(
       value.ssd === oldValue.ssd &&
       value.disk === oldValue.disk &&
       value.publicIp === oldValue.publicIp &&
-      value.country === oldValue.country
+      value.country === oldValue.country &&
+      value.certified === oldValue.certified &&
+      value.dedicated === oldValue.dedicated
     )
       return;
 

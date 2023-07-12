@@ -78,6 +78,8 @@ export interface GPUMachineFilters {
     size: number;
     mountPoint: string;
   }[];
+  certified?: boolean;
+  dedicated?: boolean;
 }
 
 const emits = defineEmits<{ (event: "update:modelValue", value?: GPUNodeType): void }>();

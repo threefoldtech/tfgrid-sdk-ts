@@ -50,7 +50,12 @@ class Calculator {
     const cu = await this.calCU({ cru: options.cru, mru: options.mru });
     const su = await this.calSU({ hru: options.hru, sru: options.sru });
     const ipv4u = options.ipv4u ? 1 : 0;
-    const musd_month = (cu * +price?.cu.value + su * +price?.su.value + ipv4u * price?.ipu.value) * 24 * 30;
+
+    // certified node cotsts 25% more than DIY node
+    const certifiedFactor = options.certified ? 1.25 : 1;
+
+    const musd_month =
+      (cu * +price?.cu.value + su * +price?.su.value + ipv4u * price?.ipu.value) * certifiedFactor * 24 * 30;
     return { musd_month: musd_month, dedicatedDiscount: price.discountForDedicationNodes };
   }
   @expose
@@ -59,13 +64,10 @@ class Calculator {
     let balance = 0;
     const pricing = await this.pricing(options);
 
-    // certified node cotsts 25% more than DIY node
-    const certifiedFactor = options.certified ? 1.25 : 1;
-
     // discount for Dedicated Nodes
     const discount = pricing.dedicatedDiscount;
-    let dedicatedPrice = (pricing.musd_month - pricing.musd_month * (+discount / 100)) * certifiedFactor;
-    let sharedPrice = pricing.musd_month * certifiedFactor;
+    let dedicatedPrice = pricing.musd_month - pricing.musd_month * (+discount / 100);
+    let sharedPrice = pricing.musd_month;
     const TFTPrice = await this.tftPrice();
     if (options.balance) {
       balance = TFTPrice * options.balance * 10000000;
