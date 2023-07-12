@@ -458,7 +458,7 @@ watch(
     if (profile) {
       __loadBalance(profile);
       if (interval) clearInterval(interval);
-      interval = setInterval(__loadBalance.bind(undefined, profile), 1000 * 60 * 5);
+      interval = setInterval(__loadBalance.bind(undefined, profile), 1000 * 60 * 2);
     } else {
       if (interval) clearInterval(interval);
       balance.value = undefined;
