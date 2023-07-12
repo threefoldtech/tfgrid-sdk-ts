@@ -107,6 +107,14 @@
         >
           <v-switch color="primary" inset label="GPU" v-model="hasGPU" />
         </input-tooltip>
+
+        <input-tooltip
+          inline
+          tooltip="Enabling the cloud console offers you to interact with the machine from the web browser, if enabled, you'll find the console url inside the deployment details."
+        >
+          <v-switch color="primary" inset label="Cloud console" v-model="wireguard" />
+        </input-tooltip>
+
         <SelectFarm
           v-if="!hasGPU"
           :filters="{
@@ -185,7 +193,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref, watch } from "vue";
+import { type Ref, ref } from "vue";
 
 import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";

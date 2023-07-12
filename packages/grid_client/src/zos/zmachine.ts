@@ -88,6 +88,7 @@ class ZmachineResult extends WorkloadDataResult {
   @Expose() id: string;
   @Expose() ip: string;
   @Expose() ygg_ip: string;
+  @Expose() console_url: string;
 }
 
 export { Zmachine, ZmachineNetwork, ZNetworkInterface, Mount, ZmachineResult };

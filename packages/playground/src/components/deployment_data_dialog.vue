@@ -88,6 +88,7 @@
                   <p>Generating metrics url...</p>
                 </v-card-text>
               </v-card>
+              <CopyReadonlyInput label="Console URL" :data="contract.consoleUrl" />
             </v-form>
           </template>
           <template v-else>
