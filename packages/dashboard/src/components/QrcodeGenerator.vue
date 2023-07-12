@@ -4,20 +4,18 @@
 
 <script lang="ts">
 import qrcode from "qrcode";
+import { Component, Prop, Vue } from "vue-property-decorator";
 
-export default {
+@Component({
   name: "QrcodeGenerator",
-  props: {
-    data: {
-      type: String,
-      required: true,
-    },
-  },
-  data() {
-    return { src: "" };
-  },
+})
+export default class QrcodeGenerator extends Vue {
+  @Prop({ required: true }) data!: string;
+
+  public src = "";
+
   async mounted() {
     this.src = await qrcode.toDataURL(this.data, { width: 250 });
-  },
-};
+  }
+}
 </script>
