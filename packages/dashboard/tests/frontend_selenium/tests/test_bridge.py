@@ -132,7 +132,7 @@ def test_check_withdraw_stellar(browser):
     """
     swap_page, _, _ = before_test_setup(browser)
     swap_page.transfer_chain()
-    assert swap_page.check_withdraw(get_stellar_address(), '1.01').is_enabled() == True
+    assert swap_page.check_withdraw(get_stellar_address(), '2.01').is_enabled() == True
 
 
 def test_check_withdraw_invalid_stellar(browser):
@@ -172,7 +172,7 @@ def test_check_withdraw_tft_amount(browser):
     """
     swap_page, _, _ = before_test_setup(browser)
     swap_page.transfer_chain()
-    cases = [1, 0.001, 1.111]
+    cases = [2, 2.001, 2.111]
     balance = swap_page.setup_widthdraw_address(get_stellar_address())
     cases.append(format(float(balance)-1, '.3f'))
     for case in cases:
@@ -195,10 +195,10 @@ def test_check_withdraw_invalid_tft_amount(browser):
     swap_page, _, _ = before_test_setup(browser)
     swap_page.transfer_chain()
     balance = swap_page.setup_widthdraw_address(get_stellar_address())
-    cases = [0, 0.000, 0.0, -0.1, -1, -22.2, -1.111]
+    cases = [0, 0.000, 0.0, -0.1, -1, -22.2, -1.111, 0.123, 1.999]
     for case in cases:
         assert swap_page.check_withdraw_invalid_tft_amount(case) == False
-        assert swap_page.wait_for('Amount cannot be negative or 0')
+        assert swap_page.wait_for('Amount should be at least 2 TFT')
     assert swap_page.check_withdraw_invalid_tft_amount('1.0123') == False
     assert swap_page.wait_for('Amount must have 3 decimals only')
     assert swap_page.check_withdraw_invalid_tft_amount(format(float(balance)+100, '.3f')) == False
@@ -222,9 +222,9 @@ def test_check_withdraw(browser):
     swap_page, polka_page, password = before_test_setup(browser)
     swap_page.transfer_chain()
     balance = swap_page.get_balance()
-    min_balance = float(balance)-1
-    max_balance = float(balance)-1.1
-    swap_page.check_withdraw(get_stellar_address(), '1.01').click()
+    min_balance = float(balance)-2
+    max_balance = float(balance)-2.1
+    swap_page.check_withdraw(get_stellar_address(), '2.01').click()
     polka_page.authenticate_with_pass(password)
     assert swap_page.wait_for('Withdraw submitted!')
     assert format(float(max_balance), '.3f') <= format(float(swap_page.get_balance_withdraw(balance)), '.3f') <= format(float(min_balance), '.3f')
