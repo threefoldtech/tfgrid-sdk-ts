@@ -8,16 +8,22 @@
       ]"
       #="{ props }"
     >
-      <input-tooltip tooltip="Wordpress admin email.">
+      <!-- <input-tooltip tooltip="Domain Name that will points to this instance">
         <v-text-field
           label="Domain Name"
           v-model="customDomainName"
           @update:modelValue="$emit('update:customDomainName', $event)"
           v-bind="{ ...props }"
         />
-      </input-tooltip>
+      </input-tooltip> -->
     </input-validator>
-    <select_gateway_node v-if="!$props.hasPublicIP" v-model="gateway"></select_gateway_node>
+    <SelectGatewayNode
+      v-model="gateway"
+      v-if="!$props.hasPublicIP"
+      customDomain
+      :farmData="farmData"
+      @update:model-value="$emit('update:gateway', $event)"
+    />
   </v-div>
 </template>
 
@@ -27,12 +33,12 @@ import { type Ref, ref, watch } from "vue";
 import type { GatewayNode } from "@/types";
 
 import { useFarmGatewayManager } from "./farm_gateway_mamager.vue";
-import select_gateway_node from "./select_gateway_node.vue";
+import SelectGatewayNode from "./select_gateway_node.vue";
 
 export default {
-  name: "Gateway",
+  name: "CustomDomain",
   components: {
-    select_gateway_node,
+    SelectGatewayNode,
   },
   props: {
     hasPublicIP: {
@@ -41,20 +47,22 @@ export default {
     },
   },
   emits: {
-    "update:customDomainName": (value?: string) => value,
+    "update:gateway": (value?: GatewayNode) => value,
   },
   setup() {
     const customDomain = ref(false);
     const customDomainName = ref("");
     const FarmGatewayManager = useFarmGatewayManager();
     const farmData = ref(FarmGatewayManager?.load());
-    watch(farmData, f => console.log(f), { deep: true });
+    // watch(farmData, f => console.log(f), { deep: true });
+    const gatewayNode = ref() as Ref<GatewayNode>;
     const gateway = ref() as Ref<GatewayNode>;
     return {
       customDomain,
       customDomainName,
-      gateway,
+      gatewayNode,
       farmData,
+      gateway,
     };
   },
 };

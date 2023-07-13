@@ -82,19 +82,21 @@
         :standard="{ cpu: 2, memory: 1024 * 2, disk: 50 }"
         :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
       />
-      <Networks v-model:ipv4="ipv4" v-model:ipv6="ipv6" />
+      <Networks v-model:ipv4="ipv4" />
       <v-switch hide-details color="primary" inset label="Custom Domain Name" v-model="customDomain" />
-      <SelectGatewayNode v-if="!customDomain" v-model="gateway" />
-      <Gateway v-else :hasPublicIP="ipv4 || ipv6" v-model:customDomainName="domainName" v-model:gateway="gateway" />
-      <SelectFarm
-        :filters="{
-          cpu: solution?.cpu,
-          memory: solution?.memory,
-          ssd: solution?.disk,
-          publicIp: false,
-        }"
-        v-model="farm"
-      />
+      <FarmGatewayManager>
+        <SelectGatewayNode v-if="!customDomain" v-model="gateway" />
+        <CustomDomain v-else :hasPublicIP="ipv4" v-model:gateway="gateway" />
+        <SelectFarm
+          :filters="{
+            cpu: solution?.cpu,
+            memory: solution?.memory,
+            ssd: solution?.disk,
+            publicIp: false,
+          }"
+          v-model="farm"
+        />
+      </FarmGatewayManager>
     </form-validator>
 
     <template #footer-actions>
@@ -131,10 +133,9 @@ const customDomain = ref(false);
 const domainName = ref("");
 const farm = ref() as Ref<Farm>;
 const ipv4 = ref(false);
-const ipv6 = ref(false);
-watch(domainName, domainName => {
-  console.log(domainName);
-  return domainName;
+
+watch(gateway, gateway => {
+  console.log(gateway);
 });
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -221,21 +222,22 @@ async function deploy() {
 </script>
 
 <script lang="ts">
-import Gateway from "../components/gateway.vue";
+import CustomDomain from "../components/custom_domain.vue";
+import FarmGatewayManager from "../components/farm_gateway_mamager.vue";
 import Networks from "../components/networks.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
-
 export default {
   name: "TFWordpress",
   components: {
     SelectSolutionFlavor,
     SelectGatewayNode,
     SelectFarm,
-    Gateway,
+    CustomDomain,
     Networks,
+    FarmGatewayManager,
   },
 };
 </script>

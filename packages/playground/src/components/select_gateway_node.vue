@@ -40,14 +40,16 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import type { FilterOptions } from "@threefold/grid_client";
+import { onMounted, type Ref, ref, watch } from "vue";
 
 import { useProfileManager } from "../stores";
 import type { GatewayNode } from "../types";
+import type { Farm } from "../types";
 import { loadGatewayNodes } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 
-const props = defineProps<{ modelValue?: GatewayNode }>();
+const props = defineProps<{ modelValue?: GatewayNode; farmData?: Farm; customDomain?: boolean }>();
 const emits = defineEmits<{ (event: "update:model-value", value: GatewayNode): void }>();
 
 const profileManager = useProfileManager();
@@ -58,10 +60,36 @@ const page = ref(1);
 const size = 50;
 
 onMounted(loadNextPage);
+type gatewayFilters = Omit<FilterOptions, "gateway">;
+
+watch(
+  () => props.farmData,
+  () => {
+    page.value = 1;
+    items.value = [];
+    loadNextPage();
+  },
+);
 async function loadNextPage() {
   loading.value = true;
   const grid = await getGrid(profileManager.profile!);
-  const nodes = await loadGatewayNodes(grid!, { page: page.value++, size });
+  let nodes = [];
+  const options: gatewayFilters = {
+    page: page.value++,
+    size,
+  };
+  nodes = await loadGatewayNodes(grid!, options);
+
+  if (!nodes.length && props.customDomain && props.farmData?.country) {
+    console.log("Nearest in same country");
+    options.country = props.farmData.country;
+    nodes = await await loadGatewayNodes(grid!, options);
+  }
+  if (!nodes.length && props.customDomain) {
+    console.log("Network");
+    options.country = options.farmId = undefined;
+    nodes = await await loadGatewayNodes(grid!, options);
+  }
 
   if (nodes.length === 0 || nodes.length < size) {
     page.value = -1;
