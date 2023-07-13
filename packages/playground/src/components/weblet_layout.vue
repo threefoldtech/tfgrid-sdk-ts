@@ -53,8 +53,7 @@
         <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(tft) }}</span> TFTs or
         approximately
         <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span> USD per
-        month. {{ gpu ? "Please note that additional fees may apply if you have selected a machine with GPU." : "" }}
-
+        month. {{ costLoading ? "Calculating..." : IPV4CostMessage }}
         <a href="https://manual.grid.tf/cloud/cloudunits_pricing.html" target="_blank" class="app-link">
           Learn more about the pricing and how to unlock discounts.
         </a>
@@ -109,6 +108,11 @@ const props = defineProps({
     required: false,
   },
   ipv4: {
+    type: Boolean,
+    required: false,
+    default: () => false,
+  },
+  isRented: {
     type: Boolean,
     required: false,
     default: () => false,
@@ -216,20 +220,39 @@ const usd = ref<number>();
 const tft = ref<number>();
 const costLoading = ref(false);
 const shouldUpdateCost = ref(false);
+const onlyIPV4Price = ref<number>();
+const IPV4CostMessage = ref<string>("There are no fees will be added since the selected node is rented by you.");
+
 watch(
   () => [props.cpu, props.memory, props.disk, props.ipv4],
   debounce((value, oldValue) => {
     if (
       oldValue &&
-      value[0] === oldValue[0] &&
-      value[1] === oldValue[1] &&
-      value[2] === oldValue[2] &&
-      value[3] === oldValue[3]
+      value[0] === oldValue[0] && // CPU
+      value[1] === oldValue[1] && // Memory
+      value[2] === oldValue[2] && // Disk
+      value[3] === oldValue[3] // IPV4
     )
       return;
     shouldUpdateCost.value = true;
   }, 500),
   { immediate: true },
+);
+
+watch(
+  () => [props.ipv4],
+  () => {
+    if (props.ipv4) {
+      costLoading.value = true;
+      getIPv1Price();
+      if (onlyIPV4Price.value) {
+        IPV4CostMessage.value = `Please note that additional fees '${normalizeBalance(
+          onlyIPV4Price.value,
+        )}' may apply if you have enabled the public ip option.`;
+      }
+      costLoading.value = false;
+    }
+  },
 );
 
 watch(
@@ -240,6 +263,22 @@ watch(
     loadCost(profile);
   },
 );
+
+async function getIPv1Price() {
+  const profile = profileManager.profile!;
+  const grid = await getGrid(profile);
+  const { sharedPrice } = await grid!.calculator.calculateWithMyBalance({
+    sru: 0,
+    mru: 0,
+    cru: 0,
+    ipv4u: props.ipv4,
+    hru: 0,
+    certified: false,
+  });
+  console.log("onlyIPV4Price.value: ", onlyIPV4Price.value);
+  onlyIPV4Price.value = sharedPrice;
+  console.log("onlyIPV4Price.value: ", onlyIPV4Price.value);
+}
 
 async function loadCost(profile: { mnemonic: string }) {
   costLoading.value = true;
