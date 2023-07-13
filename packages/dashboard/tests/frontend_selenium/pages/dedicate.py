@@ -20,7 +20,7 @@ class DedicatePage:
     price = (By.XPATH , "//*[contains(text(), 'Price (USD)')]")
     search_bar = (By.XPATH ,'/html/body/div[1]/div[1]/div[3]/div/div/div[1]/div/div[1]/div/input')
     node_table = (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div/div[2]/div[1]/table/tbody/tr')
-    twin_address = (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div/div[1]/div[2]/div[1]/div[1]')
+    twin_address = (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div[1]/div[1]/div[2]/div[1]/div/div[2]/div[1]')
     reservation_button = (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div/div[2]/div[1]/table/tbody/tr/td[9]/div/button')
     ok_btn = (By.XPATH, "//*[@id='app']/div[4]/div/div/div[3]/button[1]")
     table_xpath = '//div/div/div[1]/table/tbody/tr'
@@ -30,8 +30,7 @@ class DedicatePage:
       
     def navigate(self, user):
         self.browser.find_element(By.XPATH, "//*[contains(text(), '"+ user +"')]").click()
-        id = self.browser.find_element(*self.twin_address).text
-        self.twin_id = int(id[id.find(':')+2:])
+        self.twin_id = int(self.browser.find_element(*self.twin_address).text)
         self.browser.find_element(*self.dedicate_node).click()
         WebDriverWait(self.browser, 30).until(EC.visibility_of_any_elements_located((By.XPATH, "//*[contains(text(), 'Rows per page:')]")))
     
