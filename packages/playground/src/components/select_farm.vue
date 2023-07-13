@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, type PropType, ref, watch } from "vue";
+import { onMounted, onUnmounted, type PropType, ref, watch } from "vue";
 
 import { useInputRef } from "@/hooks/input_validator";
 
@@ -31,6 +31,7 @@ import { useProfileManager } from "../stores/profile_manager";
 import type { Farm } from "../types";
 import { getFarms } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
+import { useFarmGatewayManager } from "./farm_gateway_mamager.vue";
 
 export interface Filters {
   publicIp?: boolean;
@@ -39,7 +40,7 @@ export interface Filters {
   ssd?: number;
   disk?: number;
 }
-
+const FarmGatewayManager = useFarmGatewayManager();
 const props = defineProps({
   modelValue: { type: Object as PropType<Farm> },
   country: String,
@@ -49,14 +50,15 @@ const props = defineProps({
 const emits = defineEmits<{ (event: "update:modelValue", value?: Farm): void }>();
 
 const farmInput = useInputRef();
-
 const profileManager = useProfileManager();
 const country = ref<string>();
 
 const farm = ref<Farm>();
-watch([farm, country], ([f, c]) =>
-  emits("update:modelValue", f ? { farmID: f.farmID, name: f.name, country: c ?? undefined } : undefined),
-);
+watch([farm, country], ([f, c]) => {
+  f = f ? { farmID: f.farmID, name: f.name, country: c ?? undefined } : undefined;
+  emits("update:modelValue", f);
+  if (f) FarmGatewayManager?.register(f);
+});
 
 const loading = ref(false);
 const farms = ref<Farm[]>([]);
@@ -103,6 +105,7 @@ async function loadFarms() {
   loading.value = false;
 }
 onMounted(loadFarms);
+onUnmounted(() => FarmGatewayManager?.unregister());
 
 const shouldBeUpdated = ref(false);
 watch(

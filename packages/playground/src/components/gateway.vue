@@ -22,10 +22,11 @@
 </template>
 
 <script lang="ts">
-import { type Ref, ref } from "vue";
+import { type Ref, ref, watch } from "vue";
 
 import type { GatewayNode } from "@/types";
 
+import { useFarmGatewayManager } from "./farm_gateway_mamager.vue";
 import select_gateway_node from "./select_gateway_node.vue";
 
 export default {
@@ -45,11 +46,15 @@ export default {
   setup() {
     const customDomain = ref(false);
     const customDomainName = ref("");
+    const FarmGatewayManager = useFarmGatewayManager();
+    const farmData = ref(FarmGatewayManager?.load());
+    watch(farmData, f => console.log(f), { deep: true });
     const gateway = ref() as Ref<GatewayNode>;
     return {
       customDomain,
       customDomainName,
       gateway,
+      farmData,
     };
   },
 };
