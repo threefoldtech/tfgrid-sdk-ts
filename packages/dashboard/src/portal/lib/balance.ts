@@ -5,22 +5,7 @@ export interface balanceInterface {
   transferable: number;
 }
 
-export async function getBalance(
-  api: {
-    query: {
-      system: {
-        account: (arg0: string) => {
-          data: {
-            frozen: { toJSON: () => number };
-            free: { toJSON: () => number };
-            reserved: { toJSON: () => number };
-          };
-        };
-      };
-    };
-  },
-  address: string,
-) {
+export async function getBalance(api: any, address: string) {
   const res = await api.query.system.account(address);
 
   return {
