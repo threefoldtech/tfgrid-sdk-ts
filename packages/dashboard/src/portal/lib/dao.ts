@@ -1,5 +1,7 @@
-import { web3FromAddress } from "@polkadot/extension-dapp";
+import type { ApiPromise } from "@polkadot/api";
 import moment from "moment";
+
+import { getKeypair } from "@/utils/signer";
 
 import { hex2a } from "./util";
 export interface ayesAndNayesInterface {
@@ -21,25 +23,16 @@ export interface proposalInterface {
 }
 export async function vote(
   address: string,
-  api: {
-    tx: {
-      dao: {
-        vote: (
-          arg0: any,
-          arg1: any,
-          arg2: any,
-        ) => { (): any; new (): any; signAndSend: { (arg0: any, arg1: { signer: any }, arg2: any): any; new (): any } };
-      };
-    };
-  },
+  api: ApiPromise,
   farmId: string,
   hash: any,
   approve: boolean,
   callback: any,
 ) {
   try {
-    const injector = await web3FromAddress(address);
-    return api.tx.dao.vote(farmId, hash, approve).signAndSend(address, { signer: injector.signer }, callback);
+    const keypair = await getKeypair();
+    const nonce = await api.rpc.system.accountNextIndex(address);
+    return api.tx.dao.vote(farmId, hash, approve).signAndSend(keypair, { nonce }, callback);
   } catch (error) {
     console.log(`err while trying to get injector ${error}`);
   }
