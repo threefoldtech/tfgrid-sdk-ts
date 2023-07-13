@@ -130,9 +130,9 @@ def test_check_withdraw_stellar(browser):
           - Click on close button.
       Result: Assert that stellar address is right.
     """
-    bridge_page, _, _ = before_test_setup(browser)
-    bridge_page.transfer_chain()
-    assert bridge_page.check_withdraw(get_stellar_address(), '2.01').is_enabled() == True
+    swap_page, _, _ = before_test_setup(browser)
+    swap_page.transfer_chain()
+    assert swap_page.check_withdraw(get_stellar_address(), '2.01').is_enabled() == True
 
 
 def test_check_withdraw_invalid_stellar(browser):
@@ -170,10 +170,10 @@ def test_check_withdraw_tft_amount(browser):
           - Click on close button.
       Result: Assert that the amount of tft is right.
     """
-    bridge_page, _, _ = before_test_setup(browser)
-    bridge_page.transfer_chain()
+    swap_page, _, _ = before_test_setup(browser)
+    swap_page.transfer_chain()
     cases = [2, 2.001, 2.111]
-    balance = bridge_page.setup_widthdraw_address(get_stellar_address())
+    balance = swap_page.setup_widthdraw_address(get_stellar_address())
     cases.append(format(float(balance)-1, '.3f'))
     for case in cases:
         assert bridge_page.check_withdraw_tft_amount(case) == True
@@ -192,17 +192,17 @@ def test_check_withdraw_invalid_tft_amount(browser):
           - Click on close button.
       Result: Alert with message "Amount cannot be negative or 0" should be displayed.
     """
-    bridge_page, _, _ = before_test_setup(browser)
-    bridge_page.transfer_chain()
-    balance = bridge_page.setup_widthdraw_address(get_stellar_address())
+    swap_page, _, _ = before_test_setup(browser)
+    swap_page.transfer_chain()
+    balance = swap_page.setup_widthdraw_address(get_stellar_address())
     cases = [0, 0.000, 0.0, -0.1, -1, -22.2, -1.111, 0.123, 1.999]
     for case in cases:
-        assert bridge_page.check_withdraw_invalid_tft_amount(case) == False
-        assert bridge_page.wait_for('Amount should be at least 2 TFT')
-    assert bridge_page.check_withdraw_invalid_tft_amount('1.0123') == False
-    assert bridge_page.wait_for('Amount must have 3 decimals only')
-    assert bridge_page.check_withdraw_invalid_tft_amount(format(float(balance)+100, '.3f')) == False
-    assert bridge_page.wait_for('Amount cannot exceed balance')
+        assert swap_page.check_withdraw_invalid_tft_amount(case) == False
+        assert swap_page.wait_for('Amount should be at least 2 TFT')
+    assert swap_page.check_withdraw_invalid_tft_amount('1.0123') == False
+    assert swap_page.wait_for('Amount must have 3 decimals only')
+    assert swap_page.check_withdraw_invalid_tft_amount(format(float(balance)+100, '.3f')) == False
+    assert swap_page.wait_for('Amount cannot exceed balance')
 
 
 def test_check_withdraw(browser):
@@ -219,12 +219,12 @@ def test_check_withdraw(browser):
           - Click on close button.
       Result: Assert that Amount of tft should send to the stellar.
     """
-    bridge_page, polka_page, password = before_test_setup(browser)
-    bridge_page.transfer_chain()
-    balance = bridge_page.get_balance()
+    swap_page, polka_page, password = before_test_setup(browser)
+    swap_page.transfer_chain()
+    balance = swap_page.get_balance()
     min_balance = float(balance)-2
-    max_balance = float(balance)-2.11
-    bridge_page.check_withdraw(get_stellar_address(), '2.1').click()
+    max_balance = float(balance)-2.1
+    swap_page.check_withdraw(get_stellar_address(), '2.01').click()
     polka_page.authenticate_with_pass(password)
     assert bridge_page.wait_for('Withdraw submitted!')
     assert format(float(max_balance), '.3f') <= format(float(bridge_page.get_balance_withdraw(balance)), '.3f') <= format(float(min_balance), '.3f')
