@@ -7,8 +7,9 @@ import { jsPDF } from "jspdf";
 import { nodeInterface } from "./farms";
 import moment from "moment";
 import "jspdf-autotable";
-import { apiInterface } from "./util";
 import { Client } from "@threefold/tfchain_client";
+import { getKeypair } from "@/utils/signer";
+import { ApiPromise } from "@polkadot/api";
 
 export interface receiptInterface {
   hash: string;
@@ -234,22 +235,22 @@ export function byteToGB(capacity: number) {
 }
 
 export async function createRentContract(
-  api: apiInterface,
+  api: ApiPromise,
   address: string,
   nodeId: string,
   solutionProviderID: string | null,
   callback: any,
 ) {
-  const injector = await web3FromAddress(address);
+  const keypair = await getKeypair();
+  const nonce = await api.rpc.system.accountNextIndex(address);
   return api.tx.smartContractModule
     .createRentContract(nodeId, solutionProviderID)
-    .signAndSend(address, { signer: injector.signer }, callback);
+    .signAndSend(keypair, { nonce }, callback);
 }
-export async function cancelRentContract(api: apiInterface, address: string, contractId: string, callback: any) {
-  const injector = await web3FromAddress(address);
-  return api.tx.smartContractModule
-    .cancelContract(contractId)
-    .signAndSend(address, { signer: injector.signer }, callback);
+export async function cancelRentContract(api: ApiPromise, address: string, contractId: string, callback: any) {
+  const keypair = await getKeypair();
+  const nonce = await api.rpc.system.accountNextIndex(address);
+  return api.tx.smartContractModule.cancelContract(contractId).signAndSend(keypair, { nonce }, callback);
 }
 
 export async function setDedicatedNodeExtraFee(address: string, nodeId: number, extraFee: number) {
@@ -261,7 +262,7 @@ export async function setDedicatedNodeExtraFee(address: string, nodeId: number, 
   return await (await client.contracts.setDedicatedNodeExtraFee({ nodeId, extraFee })).apply();
 }
 
-export async function getActiveContracts(api: apiInterface, nodeId: string) {
+export async function getActiveContracts(api: ApiPromise, nodeId: string) {
   console.log("getActiveContracts", api.query.smartContractModule.activeNodeContracts(nodeId));
   return await api.query.smartContractModule.activeNodeContracts(nodeId);
 }
@@ -383,7 +384,7 @@ export function calCU(cru: number, mru: number) {
 
   return cu;
 }
-export async function getPrices(api: apiInterface) {
+export async function getPrices(api: ApiPromise) {
   const pricing = await api.query.tfgridModule.pricingPolicies(1);
   return pricing.toJSON();
 }
@@ -408,8 +409,8 @@ export function countPrice(
   return usdPrice.toFixed(2);
 }
 
-export async function getTFTPrice(api: apiInterface) {
-  const pricing = await api.query.tftPriceModule.tftPrice();
+export async function getTFTPrice(api: ApiPromise) {
+  const pricing = (await api.query.tftPriceModule.tftPrice()) as any;
   return pricing.words[0] / 1000;
 }
 
@@ -474,7 +475,7 @@ export async function getDedicatedNodes(twinId: string, query: string, page: num
 }
 
 export async function getDNodes(
-  api: apiInterface,
+  api: ApiPromise,
   address: string,
   currentTwinID: string,
   query: string,
@@ -483,7 +484,7 @@ export async function getDNodes(
 ) {
   let { nodes, count } = await getDedicatedNodes(currentTwinID, query, page, size);
 
-  const pricing = await getPrices(api);
+  const pricing = (await getPrices(api)) as any;
 
   // discount for Twin Balance
   const TFTprice = await getTFTPrice(api);
