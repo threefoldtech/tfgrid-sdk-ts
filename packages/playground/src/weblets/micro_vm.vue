@@ -78,6 +78,14 @@
           v-model:wireguard="wireguard"
           ref="network"
         />
+
+        <input-tooltip
+          inline
+          tooltip="Enabling the cloud console offers you to interact with the machine from the web browser, if enabled, you'll find the console url inside the deployment details."
+        >
+          <v-switch color="primary" inset label="Cloud console" v-model="wireguard" />
+        </input-tooltip>
+
         <SelectFarm
           :filters="{
             cpu,

@@ -188,6 +188,7 @@ class BaseModule {
       flist: data.flist,
       publicIP: await this._getMachinePubIP(deploymentName, deployments, data.network.public_ip),
       planetary: data.network.planetary ? (workload.result.data as ZmachineResult).ygg_ip : "",
+      consoleUrl: (workload.result.data as ZmachineResult).console_url,
       interfaces: data.network.interfaces.map(n => ({
         network: n.network,
         ip: n.ip,
