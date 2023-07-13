@@ -10,7 +10,7 @@
         leader.solution?.disk ?? 0 + rootFs(leader.solution?.cpu ?? 0, leader.solution?.memory ?? 0),
       )
     "
-    :ivp4="true"
+    :ipv4="true"
     title-image="images/icons/caprover.png"
   >
     <d-tabs

@@ -48,7 +48,7 @@
         v-if="showPrice"
       >
         Based on the cloud resources you have selected (CPU: {{ cpu }} Cores, RAM: {{ memory }} MB, SSD: {{ disk }} GB{{
-          ivp4 ? " , Public IP: Enabled" : ""
+          ipv4 ? " , Public IP: Enabled" : ""
         }}) your deployment costs
         <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(tft) }}</span> TFTs or
         approximately
@@ -108,7 +108,12 @@ const props = defineProps({
     type: String,
     required: false,
   },
-  ivp4: {
+  ipv4: {
+    type: Boolean,
+    required: false,
+    default: () => false,
+  },
+  certified: {
     type: Boolean,
     required: false,
     default: () => false,
@@ -212,7 +217,7 @@ const tft = ref<number>();
 const costLoading = ref(false);
 const shouldUpdateCost = ref(false);
 watch(
-  () => [props.cpu, props.memory, props.disk, props.ivp4],
+  () => [props.cpu, props.memory, props.disk, props.ipv4],
   debounce((value, oldValue) => {
     if (
       oldValue &&
@@ -244,7 +249,8 @@ async function loadCost(profile: { mnemonic: string }) {
     sru: typeof props.disk === "number" ? props.disk : 0,
     mru: typeof props.disk === "number" ? (props.memory ?? 0) / 1024 : 0,
     hru: 0,
-    ipv4u: props.ivp4,
+    ipv4u: props.ipv4,
+    certified: props.certified,
   });
   usd.value = sharedPrice;
   tft.value = parseFloat((usd.value / (await grid!.calculator.tftPrice())).toFixed(2));
