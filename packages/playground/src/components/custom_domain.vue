@@ -8,14 +8,14 @@
       ]"
       #="{ props }"
     >
-      <!-- <input-tooltip tooltip="Domain Name that will points to this instance">
+      <input-tooltip tooltip="Domain Name that will points to this instance">
         <v-text-field
           label="Domain Name"
           v-model="customDomainName"
-          @update:modelValue="$emit('update:customDomainName', $event)"
+          @update:modelValue="$emit('update:domainName', $event)"
           v-bind="{ ...props }"
         />
-      </input-tooltip> -->
+      </input-tooltip>
     </input-validator>
     <SelectGatewayNode
       v-model="gateway"
@@ -48,6 +48,7 @@ export default {
   },
   emits: {
     "update:gateway": (value?: GatewayNode) => value,
+    "update:domainName": (value?: string) => value,
   },
   setup() {
     const customDomain = ref(false);

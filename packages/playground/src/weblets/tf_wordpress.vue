@@ -83,10 +83,8 @@
         :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
       />
       <Networks v-model:ipv4="ipv4" />
-      <v-switch hide-details color="primary" inset label="Custom Domain Name" v-model="customDomain" />
+
       <FarmGatewayManager>
-        <SelectGatewayNode v-if="!customDomain" v-model="gateway" />
-        <CustomDomain v-else :hasPublicIP="ipv4" v-model:gateway="gateway" />
         <SelectFarm
           :filters="{
             cpu: solution?.cpu,
@@ -96,6 +94,7 @@
           }"
           v-model="farm"
         />
+        <DomainName></DomainName>
       </FarmGatewayManager>
     </form-validator>
 
@@ -223,6 +222,7 @@ async function deploy() {
 
 <script lang="ts">
 import CustomDomain from "../components/custom_domain.vue";
+import DomainName from "../components/domain_name.vue";
 import FarmGatewayManager from "../components/farm_gateway_mamager.vue";
 import Networks from "../components/networks.vue";
 import SelectFarm from "../components/select_farm.vue";
@@ -233,10 +233,9 @@ export default {
   name: "TFWordpress",
   components: {
     SelectSolutionFlavor,
-    SelectGatewayNode,
     SelectFarm,
-    CustomDomain,
     Networks,
+    DomainName,
     FarmGatewayManager,
   },
 };

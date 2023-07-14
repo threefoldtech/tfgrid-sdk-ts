@@ -77,11 +77,14 @@ async function loadNextPage() {
   const options: gatewayFilters = {
     page: page.value++,
     size,
+    farmId: props.customDomain ? props.farmData?.farmID : undefined,
   };
+  console.log(options);
   nodes = await loadGatewayNodes(grid!, options);
 
   if (!nodes.length && props.customDomain && props.farmData?.country) {
     console.log("Nearest in same country");
+    options.farmId = undefined;
     options.country = props.farmData.country;
     nodes = await await loadGatewayNodes(grid!, options);
   }
