@@ -115,6 +115,12 @@ export interface GatewayNode {
   domain: string;
 }
 
+export interface Domain {
+  name: string;
+  useFQDN: boolean;
+  gateway?: GatewayNode;
+}
+
 export interface SMTPServer {
   enabled: boolean;
   username: string;
