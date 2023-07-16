@@ -91,7 +91,7 @@ export default class NodeActionBtn extends Vue {
   async unReserveNode() {
     this.loadingUnreserveNode = true;
     this.$toasted.show(`check for contracts on node ${this.nodeIDToUnreserve}`);
-    const contracts = await getActiveContracts(this.$api, this.nodeIDToUnreserve);
+    const contracts = (await getActiveContracts(this.$api, this.nodeIDToUnreserve)) as any;
     if (contracts.length > 0) {
       this.$toasted.show(`node ${this.nodeIDToUnreserve} has ${contracts.length} active contracts`);
       this.loadingUnreserveNode = false;

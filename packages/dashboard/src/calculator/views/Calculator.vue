@@ -295,7 +295,7 @@ export default class Calculator extends Vue {
     else if (this.$api) {
       if (this.isInvalidValues()) return;
       this.TFTPrice = await this.getTFTPrice(this.$api);
-      const price = await this.calcPrice();
+      const price = (await this.calcPrice()) as any;
       const CU = calCU(+this.CRU, +this.MRU);
       const SU = calSU(+this.HRU, +this.SRU);
       const IPV4 = this.IPV4 ? 1 : 0;
