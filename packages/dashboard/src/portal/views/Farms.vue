@@ -128,13 +128,11 @@
                   </v-tooltip>
                 </v-col>
 
-                <template v-if="network !== networkEnv.main && item.nodesCount > 0">
+                <template v-if="network !== networkEnv.main">
                   <v-col align="center">
                     <v-tooltip top>
                       <template v-slot:activator="{ on, attrs }">
-                        <v-btn v-bind="attrs" @click="downloadFarmReceipts(item.id)" v-on="on"
-                          >Download Minting Receipts</v-btn
-                        >
+                        <v-btn v-bind="attrs" @click="downloadAllReceipts" v-on="on">Download Minting Receipts</v-btn>
                       </template>
                       <span> Download Farm Nodes Minting Receipts</span>
                     </v-tooltip>
@@ -307,34 +305,22 @@ export default class FarmsView extends Vue {
     this.farmName;
   }
 
-  async downloadFarmReceipts(farmId: number) {
-    // the farm summary receipt
+  async downloadAllReceipts() {
     const docSum = new jsPDF();
-    const farmNodes = this.nodes.filter((node: nodeInterface) => node.farmId == farmId);
-    generateNodeSummary(docSum, farmNodes);
+    generateNodeSummary(docSum, this.nodes);
     docSum.addPage();
 
-    // each node receipt
-    farmNodes.map((node: nodeInterface, i: number) => {
+    this.nodes.map((node: nodeInterface, i: number) => {
       generateReceipt(docSum, node);
       docSum.text(`${i + 1}`, 185, docSum.internal.pageSize.height - 10);
       docSum.addPage();
     });
-
-    // download the full receipts
-    docSum.save(`farm_${farmId}_receipt.pdf`);
+    docSum.save("nodes_receipts.pdf");
   }
 
   unmounted() {
     this.$store.commit("UNSET_CREDENTIALS");
   }
-
-  // Watchers
-  @Watch("$store.state.credentials.twin.id") async onPropertyChanged(value: number, oldValue: number) {
-    console.log(`switching from account ${oldValue} farms to account ${value} farms`);
-    this.farms = await getFarm(this.$api, value);
-
-    await this.getNodes();
   }
   @Watch("farms.length") async onFarmCreation(value: number, oldValue: number) {
     console.log(`there were ${oldValue} farms, now there is ${value} farms`);
