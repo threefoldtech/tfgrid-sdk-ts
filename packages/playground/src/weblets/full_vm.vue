@@ -6,7 +6,6 @@
     :disk="disks.reduce((total, disk) => total + disk.size, diskSize + 2)"
     :ipv4="ipv4"
     :gpu="hasGPU"
-    :isRented="hasGPU"
     title-image="images/icons/vm.png"
   >
     <template #title> Deploy a Full Virtual Machine </template>
@@ -187,7 +186,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref, watch } from "vue";
+import { type Ref, ref } from "vue";
 
 import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";

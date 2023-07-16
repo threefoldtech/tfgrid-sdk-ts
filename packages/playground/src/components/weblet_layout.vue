@@ -47,13 +47,35 @@
         variant="tonal"
         v-if="showPrice"
       >
-        Based on the cloud resources you have selected (CPU: {{ cpu }} Cores, RAM: {{ memory }} MB, SSD: {{ disk }} GB{{
-          ipv4 ? " , Public IP: Enabled" : ""
-        }}) your deployment costs
-        <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(tft) }}</span> TFTs or
-        approximately
-        <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span> USD per
-        month. {{ costLoading ? "Calculating..." : IPV4CostMessage }}
+        <div v-if="ipv4 && gpu">
+          <span>
+            There are no fees will be added since the selected node is rented by you and the cost already included in
+            the rent contract. <br />Please be aware that an additional fee of
+            <span class="font-weight-black">
+              {{ costLoading ? "Calculating..." : normalizeBalance(onlyIPV4TftPrice) }}
+            </span>
+            TFTs or approximately
+            <span class="font-weight-black">
+              {{ costLoading ? "Calculating..." : normalizeBalance(onlyIPV4UsdPrice) }}
+            </span>
+            USD per month.
+          </span>
+        </div>
+        <div v-else-if="!ipv4 && gpu">
+          <span>
+            There are no fees will be added since the selected node is rented by you and the cost already included in
+            the rent contract.
+          </span>
+        </div>
+        <div v-else>
+          Based on the cloud resources you have selected (CPU: {{ cpu }} Cores, RAM: {{ memory }} MB, SSD:
+          {{ disk }} GB{{ ipv4 ? ", Public IP: Enabled" : "" }}) your deployment costs
+          <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(tft) }}</span> TFTs or
+          approximately
+          <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span> USD per
+          month.
+        </div>
+
         <a href="https://manual.grid.tf/cloud/cloudunits_pricing.html" target="_blank" class="app-link">
           Learn more about the pricing and how to unlock discounts.
         </a>
@@ -108,11 +130,6 @@ const props = defineProps({
     required: false,
   },
   ipv4: {
-    type: Boolean,
-    required: false,
-    default: () => false,
-  },
-  isRented: {
     type: Boolean,
     required: false,
     default: () => false,
@@ -220,8 +237,8 @@ const usd = ref<number>();
 const tft = ref<number>();
 const costLoading = ref(false);
 const shouldUpdateCost = ref(false);
-const onlyIPV4Price = ref<number>();
-const IPV4CostMessage = ref<string>("There are no fees will be added since the selected node is rented by you.");
+const onlyIPV4TftPrice = ref<number>();
+const onlyIPV4UsdPrice = ref<number>();
 
 watch(
   () => [props.cpu, props.memory, props.disk, props.ipv4],
@@ -240,22 +257,6 @@ watch(
 );
 
 watch(
-  () => [props.ipv4],
-  () => {
-    if (props.ipv4) {
-      costLoading.value = true;
-      getIPv1Price();
-      if (onlyIPV4Price.value) {
-        IPV4CostMessage.value = `Please note that additional fees '${normalizeBalance(
-          onlyIPV4Price.value,
-        )}' may apply if you have enabled the public ip option.`;
-      }
-      costLoading.value = false;
-    }
-  },
-);
-
-watch(
   () => [profileManager.profile, costLoading.value, shouldUpdateCost.value] as const,
   ([profile, loading, shouldUpdate]) => {
     if (!profile || loading || !shouldUpdate) return;
@@ -264,9 +265,7 @@ watch(
   },
 );
 
-async function getIPv1Price() {
-  const profile = profileManager.profile!;
-  const grid = await getGrid(profile);
+async function getIPv1Price(grid: GridClient) {
   const { sharedPrice } = await grid!.calculator.calculateWithMyBalance({
     sru: 0,
     mru: 0,
@@ -275,9 +274,8 @@ async function getIPv1Price() {
     hru: 0,
     certified: false,
   });
-  console.log("onlyIPV4Price.value: ", onlyIPV4Price.value);
-  onlyIPV4Price.value = sharedPrice;
-  console.log("onlyIPV4Price.value: ", onlyIPV4Price.value);
+  onlyIPV4UsdPrice.value = sharedPrice;
+  onlyIPV4TftPrice.value = parseFloat((onlyIPV4UsdPrice.value / (await grid!.calculator.tftPrice())).toFixed(2));
 }
 
 async function loadCost(profile: { mnemonic: string }) {
@@ -291,6 +289,7 @@ async function loadCost(profile: { mnemonic: string }) {
     ipv4u: props.ipv4,
     certified: props.certified,
   });
+  await getIPv1Price(grid!);
   usd.value = sharedPrice;
   tft.value = parseFloat((usd.value / (await grid!.calculator.tftPrice())).toFixed(2));
   costLoading.value = false;
