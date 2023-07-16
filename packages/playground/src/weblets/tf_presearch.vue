@@ -17,6 +17,9 @@
       ref="tabs"
     >
       <template #base>
+        <v-alert type="warning" variant="tonal" class="mb-6">
+          You can deploy only one Presearch node per farm without reserving a dedicated public IP.
+        </v-alert>
         <input-validator
           :value="name"
           :rules="[
