@@ -92,7 +92,7 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { type Ref, ref } from "vue";
+import { onMounted, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
@@ -118,16 +118,18 @@ const dedicated = ref(false);
 const certified = ref(false);
 const selectedDedicatedNode = ref() as Ref<Node>;
 
-disks.value.push({
-  name: "disk",
-  size: solution?.value?.disk,
-  mountPoint: "/disk",
-});
+onMounted(() => {
+  disks.value.push({
+    name: "disk",
+    size: solution?.value?.disk,
+    mountPoint: "/disk",
+  });
 
-flist.value = {
-  value: "https://hub.grid.tf/lennertapp2.3bot/threefoldjimber-freeflow-latest.flist",
-  entryPoint: "/sbin/zinit init",
-};
+  flist.value = {
+    value: "https://hub.grid.tf/lennertapp2.3bot/threefoldjimber-freeflow-latest.flist",
+    entryPoint: "/sbin/zinit init",
+  };
+});
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -158,8 +160,8 @@ async function deploy() {
           cpu: solution.value.cpu,
           memory: solution.value.memory,
           disks: disks.value,
-          flist: flist.value?.value,
-          entryPoint: flist.value?.entryPoint,
+          flist: flist?.value!.value,
+          entryPoint: flist.value!.entryPoint,
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,

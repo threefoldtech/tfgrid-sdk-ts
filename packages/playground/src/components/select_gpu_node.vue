@@ -163,7 +163,7 @@ async function checkNode() {
               memory: filters.memory,
               flist: filters.flist!.value,
               entryPoint: filters.flist!.entryPoint,
-              disks: [{ size: filters.disk, mountPoint: "/" }, ...filters.disks],
+              disks: [{ size: filters.disk!, mountPoint: "/" }, ...filters.disks],
               publicIpv4: filters.ipv4,
               publicIpv6: filters.ipv6,
               planetary: filters.planetary,
