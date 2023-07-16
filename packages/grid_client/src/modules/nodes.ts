@@ -23,13 +23,13 @@ class Nodes {
   @validateInput
   @checkBalance
   async reserve(options: RentContractCreateModel) {
-    const rentContract = await this.getRent({ nodeId: options.nodeId });
-    if (rentContract.rentContractId != 0) {
-      throw Error(`Node Already rented by user with twinId ${rentContract.twinId}`);
+    const rentContractId = await this.getRentContractId({ nodeId: options.nodeId });
+    if (rentContractId !== 0) {
+      throw Error(`Node is already rented`);
     }
     try {
       const res = await (await this.client.contracts.createRent(options)).apply();
-      events.emit("logs", `Rent contract with id: ${res["contractId"]} has been created`);
+      events.emit("logs", `Rent contract with id: ${res.contractId} has been created`);
       return res;
     } catch (e) {
       throw Error(`Failed to create rent contract on node ${options.nodeId} due to ${e}`);
@@ -40,13 +40,13 @@ class Nodes {
   @validateInput
   @checkBalance
   async unreserve(options: RentContractDeleteModel) {
-    const rentContract = await this.getRent({ nodeId: options.nodeId });
-    if (rentContract.rentContractId === 0) {
+    const rentContractId = await this.getRentContractId({ nodeId: options.nodeId });
+    if (rentContractId === 0) {
       events.emit("logs", `No rent contract found for node ${options.nodeId}`);
-      return rentContract;
+      return rentContractId;
     }
     try {
-      const res = await (await this.client.contracts.cancel({ id: rentContract.rentContractId })).apply();
+      const res = await (await this.client.contracts.cancel({ id: rentContractId })).apply();
       events.emit("logs", `Rent contract for node ${options.nodeId} has been deleted`);
       return res;
     } catch (e) {
@@ -56,11 +56,11 @@ class Nodes {
 
   @expose
   @validateInput
-  async getRent(options: RentContractGetModel) {
+  async getRentContractId(options: RentContractGetModel) {
     const proxyURL = this.config.proxyURL;
-    return send("get", urlJoin(proxyURL, `/nodes/${options.nodeId}?dedicated=true`), "", {})
+    return send("get", urlJoin(proxyURL, `/nodes/${options.nodeId}`), "", {})
       .then(res => {
-        return res;
+        return res.rentContractId;
       })
       .catch(err => {
         throw Error(`Error getting rent for node ${options.nodeId}: ${err}`);
