@@ -111,7 +111,8 @@
         </input-tooltip>
         <input-tooltip
           inline
-          tooltip="When renting a dedicated node, you receive a 50% discount for the entire node. However, it's important to note that you will still be required to pay for the entire node, even with the discount applied. This means that while you enjoy the discount, the cost of the dedicated node is not prorated based on the resources you utilize."
+          tooltip="Click to know more about dedicated nodes."
+          href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
         >
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" />
         </input-tooltip>

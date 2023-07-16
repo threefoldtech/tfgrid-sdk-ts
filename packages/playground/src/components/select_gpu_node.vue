@@ -20,6 +20,13 @@
           @update:model-value="selectedNode = $event"
           v-bind="props"
         />
+
+        <template #selection="{ item }" v-if="filters.dedicated">
+          <span>
+            {{ item.value }}
+          </span>
+          <v-chip v-bind="props" color="success" class="ml-3">dedicated</v-chip>
+        </template>
       </input-tooltip>
     </input-validator>
 
@@ -163,6 +170,7 @@ async function checkNode() {
               envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
               rootFilesystemSize: 2,
               hasGPU: filters.hasGPU,
+              dedicated: filters.dedicated,
             },
           ],
           network: { addAccess: filters.wireguard },
