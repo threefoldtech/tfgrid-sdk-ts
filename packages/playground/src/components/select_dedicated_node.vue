@@ -38,11 +38,11 @@ import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 
 export interface DedicatedMachineFilters {
-  ipv6: boolean;
-  ipv4: boolean;
-  wireguard: boolean;
-  planetary: boolean;
-  hasGPU: boolean;
+  ipv6?: boolean;
+  ipv4?: boolean;
+  wireguard?: boolean;
+  planetary?: boolean;
+  hasGPU?: boolean;
   cpu: number;
   memory: number;
   ssd: number;
@@ -55,7 +55,7 @@ export interface DedicatedMachineFilters {
     mountPoint: string;
   }[];
   certified?: boolean;
-  dedicated?: boolean;
+  dedicated: boolean;
 }
 
 const emits = defineEmits<{ (event: "update:modelValue", value?: Node): void }>();
@@ -137,4 +137,10 @@ async function checkNode() {
     }
   }
 }
+</script>
+
+<script lang="ts">
+export default {
+  name: "SelectDedicatedNode",
+};
 </script>

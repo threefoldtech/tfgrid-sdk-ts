@@ -6,6 +6,8 @@
     :memory="memory"
     :disk="disks.reduce((total, disk) => total + disk.size, rootFsSize)"
     :ipv4="ipv4"
+    :certified="certified"
+    :dedicated="dedicated"
     title-image="images/icons/vm.png"
   >
     <template #title>Deploy a Micro Virtual Machine </template>
@@ -78,14 +80,45 @@
           v-model:wireguard="wireguard"
           ref="network"
         />
+        <input-tooltip
+          inline
+          tooltip="Click to know more about dedicated nodes."
+          href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+        >
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" />
+        </input-tooltip>
+
+        <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+          <v-switch color="primary" inset label="Certified" v-model="certified" />
+        </input-tooltip>
+
         <SelectFarm
           :filters="{
             cpu,
             memory,
             publicIp: ipv4,
             ssd: disks.reduce((total, disk) => total + disk.size, rootFsSize),
+            dedicated: dedicated,
+            certified: certified,
           }"
           v-model="farm"
+        />
+        <SelectDedicatedNode
+          v-if="dedicated"
+          v-model="selectedDedicatedNode"
+          :filters="{
+            cpu,
+            memory,
+            ipv4: ipv4,
+            ssd: disks.reduce((total, disk) => total + disk.size, rootFsSize),
+            ipv6: ipv4,
+            name: name,
+            flist: flist,
+            disks: disks,
+            disk: 0,
+            dedicated: dedicated,
+            certified: certified,
+          }"
         />
       </template>
 
@@ -180,6 +213,7 @@ import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type Farm, type Flist, ProjectName } from "../types";
 import { deployVM, type Disk, type Env } from "../utils/deploy_vm";
+import type { Node } from "../utils/filter_dedicated_node";
 import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
 
@@ -223,6 +257,9 @@ const farm = ref() as Ref<Farm>;
 const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
 const network = ref();
+const dedicated = ref(false);
+const certified = ref(false);
+const selectedDedicatedNode = ref() as Ref<Node>;
 
 function layoutMount() {
   if (envs.value.length > 0) {
@@ -275,6 +312,9 @@ async function deploy() {
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           rootFilesystemSize: rootFsSize.value,
+          nodeId: dedicated.value ? selectedDedicatedNode.value.nodeId : undefined,
+          dedicated: dedicated.value,
+          certified: certified.value,
         },
       ],
     });
@@ -291,6 +331,7 @@ async function deploy() {
 <script lang="ts">
 import ExpandableLayout from "../components/expandable_layout.vue";
 import RootFsSize from "../components/root_fs_size.vue";
+import SelectDedicatedNode from "../components/select_dedicated_node.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectVmImage from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -302,6 +343,7 @@ export default {
     SelectVmImage,
     RootFsSize,
     SelectFarm,
+    SelectDedicatedNode,
     ExpandableLayout,
   },
 };

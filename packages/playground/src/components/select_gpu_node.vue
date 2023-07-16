@@ -73,13 +73,13 @@ export interface GPUMachineFilters {
   ipv4: boolean;
   wireguard: boolean;
   planetary: boolean;
-  hasGPU: boolean;
+  hasGPU?: boolean;
   cpu: number;
   memory: number;
   ssd: number;
   flist?: Flist;
   name: string;
-  disk: number;
+  disk?: number;
   disks: {
     name?: string | undefined;
     size: number;
@@ -194,4 +194,10 @@ async function checkNode() {
     }
   }
 }
+</script>
+
+<script lang="ts">
+export default {
+  name: "SelectGPUNode",
+};
 </script>
