@@ -150,6 +150,8 @@ export interface Machine {
   hasGPU?: boolean;
   nodeId?: number;
   gpus?: string[];
+  dedicated?: boolean;
+  certified?: boolean;
 }
 
 export interface DeployVMOptions {

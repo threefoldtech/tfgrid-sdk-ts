@@ -38,11 +38,11 @@
       </template>
     </v-card-text>
 
-    <template v-if="dedicated">
-      <v-alert class="mb-4 mx-4" type="warning" variant="tonal">
-        When renting a dedicated node, you receive a 50% discount for the entire node. However, it's important to note
-        that you will still be required to pay for the entire node, even with the discount applied. This means that
-        while you enjoy the discount, the cost of the dedicated node is not prorated based on the resources you utilize.
+    <template v-if="dedicated && !status">
+      <v-alert class="mb-4 mx-4" type="info" variant="tonal">
+        You need to rent a dedicated node from our
+        <a :href="dashboardURL" target="_blank" class="app-link"> Dashboard </a>
+        before deploying on a dedicated node.
       </v-alert>
     </template>
 
@@ -90,7 +90,7 @@ import { computed, ref, watch } from "vue";
 
 import { useProfileManager } from "../stores";
 import { getGrid, loadBalance } from "../utils/grid";
-import { normalizeBalance } from "../utils/helpers";
+import { getDashboardURL, normalizeBalance } from "../utils/helpers";
 
 const props = defineProps({
   disableAlerts: {
@@ -141,6 +141,9 @@ function onLogMessage(msg: string) {
     message.value = msg;
   }
 }
+
+const network = process.env.NETWORK || window.env.NETWORK;
+const dashboardURL = getDashboardURL(network);
 
 watch(status, s => {
   if (s === "deploy") events.addListener("logs", onLogMessage);

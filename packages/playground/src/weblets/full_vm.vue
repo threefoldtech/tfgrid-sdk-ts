@@ -132,8 +132,28 @@
           v-model="farm"
         />
         <SelectGPUNode
-          v-else
+          v-if="hasGPU || (dedicated && hasGPU)"
           v-model="selectedNodewithCards"
+          :filters="{
+            cpu,
+            memory,
+            ipv4: ipv4,
+            ssd: disks.reduce((total, disk) => total + disk.size, diskSize + 2),
+            ipv6: ipv4,
+            name: name,
+            flist: flist,
+            disks: disks,
+            disk: diskSize,
+            hasGPU: hasGPU,
+            planetary: planetary,
+            wireguard: wireguard,
+            dedicated: dedicated,
+            certified: certified,
+          }"
+        />
+        <SelectDedicatedNode
+          v-else-if="dedicated"
+          v-model="selectedDedicatedNode"
           :filters="{
             cpu,
             memory,
@@ -201,13 +221,14 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type Farm, type Flist, ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
+import type { Node } from "../utils/filter_dedicated_node";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
@@ -255,6 +276,7 @@ const disks = ref<Disk[]>([]);
 const network = ref();
 const hasGPU = ref(false);
 const selectedNodewithCards = ref() as Ref<GPUNodeType>;
+const selectedDedicatedNode = ref() as Ref<Node>;
 
 function addDisk() {
   const name = generateName(7);
@@ -264,6 +286,14 @@ function addDisk() {
     mountPoint: "/mnt/" + name,
   });
 }
+
+function getNodeId(hasGPU: boolean, dedicated: boolean) {
+  return hasGPU ? selectedNodewithCards.value.nodeId : dedicated ? selectedDedicatedNode.value.nodeId : undefined;
+}
+
+const nodeId = computed(() => {
+  return getNodeId(hasGPU.value, dedicated.value);
+});
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -295,8 +325,10 @@ async function deploy() {
           envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
           rootFilesystemSize: 2,
           hasGPU: hasGPU.value,
-          nodeId: hasGPU.value ? selectedNodewithCards.value.nodeId : undefined,
+          nodeId: nodeId.value,
           gpus: hasGPU.value ? selectedNodewithCards.value.cards.map(card => card.id) : undefined,
+          dedicated: dedicated.value,
+          certified: certified.value,
         },
       ],
       network: { addAccess: wireguard.value },
@@ -312,13 +344,13 @@ async function deploy() {
 </script>
 
 <script lang="ts">
-import type { GPUNodeType } from "@/utils/filter_node_with_gpu";
-
 import ExpandableLayout from "../components/expandable_layout.vue";
+import SelectDedicatedNode from "../components/select_dedicated_node.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectGPUNode from "../components/select_gpu_node.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { GPUNodeType } from "../utils/filter_node_with_gpu";
 
 export default {
   name: "FullVm",
@@ -327,6 +359,7 @@ export default {
     SelectFarm,
     ExpandableLayout,
     SelectGPUNode,
+    SelectDedicatedNode,
   },
 };
 </script>

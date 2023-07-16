@@ -35,3 +35,10 @@ export function normalizeBalance(num: number | string | undefined, floor = false
 export function isEnoughBalance(balance: any, min = 0.001): boolean {
   return balance?.free > min ? true : false;
 }
+
+export function getDashboardURL(network: string) {
+  if (network === "main") {
+    return "https://dashboard.grid.tf";
+  }
+  return `https://dashboard.${network}.grid.tf`;
+}
