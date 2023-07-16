@@ -29,8 +29,8 @@
   </v-container>
   <v-container v-else-if="$store.state.credentials.loading">
     <div class="d-flex justify-center" style="display: block; padding: 10%">
-      <v-progress-circular indeterminate color="blue" :size="335" :width="7">
-        <span style="font-size: large; color: white">Loading Twin Details</span>
+      <v-progress-circular indeterminate :size="335" :width="7">
+        <span style="font-size: large">Loading Twin Details</span>
       </v-progress-circular>
     </div>
   </v-container>
@@ -131,9 +131,9 @@ export default class AccountView extends Vue {
           this.$api,
           this.$store.state.credentials.account.address,
         ));
-        const document = await axios.get(this.documentLink);
-        this.documentHash = md5(document.data);
       }
+      const document = await axios.get(this.documentLink);
+      this.documentHash = md5(document.data);
       this.selectedName = this.items.filter(item => item.id === this.selectedItem.item_id)[0].name;
     } else {
       this.$toasted.show(`Can't connect to Polkadot API right now, please refresh the page or try again later`);

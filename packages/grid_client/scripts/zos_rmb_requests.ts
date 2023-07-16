@@ -42,6 +42,12 @@ async function main() {
   } catch (e) {
     log(`Couldn't reach node ${nodeId} to get storage pools due to ${e}`);
   }
+  try {
+    log(await grid3.zos.getNodeGPUInfo({ nodeId }));
+  } catch (e) {
+    log(`Couldn't reach node ${nodeId} to get gpu info due to ${e}`);
+  }
+
   await grid3.disconnect();
 }
 

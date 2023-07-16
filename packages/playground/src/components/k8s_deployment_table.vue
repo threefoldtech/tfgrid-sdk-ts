@@ -20,13 +20,14 @@
     :model-value="$props.modelValue"
     @update:model-value="$emit('update:model-value', $event)"
     :no-data-text="`No Kubernetes deployments found on this account.`"
+    @click:row="$attrs['onClick:row']"
   >
     <template #[`item.name`]="{ item }">
       {{ item.value.deploymentName }}
     </template>
 
     <template #[`item.ipv4`]="{ item }">
-      {{ item.value.masters[0].publicIP?.ip || "None" }}
+      {{ item.value.masters[0].publicIP?.ip?.split("/")?.[0] || item.value.masters[0].publicIP?.ip || "None" }}
     </template>
 
     <template #[`item.ipv6`]="{ item }">

@@ -59,10 +59,13 @@ class Calculator {
     let balance = 0;
     const pricing = await this.pricing(options);
 
+    // certified node cotsts 25% more than DIY node
+    const certifiedFactor = options.certified ? 1.25 : 1;
+
     // discount for Dedicated Nodes
     const discount = pricing.dedicatedDiscount;
-    let dedicatedPrice = pricing.musd_month - pricing.musd_month * (+discount / 100);
-    let sharedPrice = pricing.musd_month;
+    let dedicatedPrice = (pricing.musd_month - pricing.musd_month * (+discount / 100)) * certifiedFactor;
+    let sharedPrice = pricing.musd_month * certifiedFactor;
     const TFTPrice = await this.tftPrice();
     if (options.balance) {
       balance = TFTPrice * options.balance * 10000000;
@@ -74,19 +77,19 @@ class Calculator {
         discount: 0,
       },
       default: {
-        duration: 3,
+        duration: 1.5,
         discount: 20,
       },
       bronze: {
-        duration: 6,
+        duration: 3,
         discount: 30,
       },
       silver: {
-        duration: 12,
+        duration: 6,
         discount: 40,
       },
       gold: {
-        duration: 36,
+        duration: 18,
         discount: 60,
       },
     };
@@ -120,6 +123,7 @@ class Calculator {
       hru: options.hru,
       sru: options.sru,
       ipv4u: options.ipv4u,
+      certified: options.certified,
       balance: balance,
     });
     return calculate;

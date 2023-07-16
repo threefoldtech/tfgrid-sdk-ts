@@ -33,7 +33,11 @@
               <CopyReadonlyInput label="Contract ID" :data="contract.contractId" />
 
               <template v-if="contract.publicIP">
-                <CopyReadonlyInput label="Public IPv4" :data="contract.publicIP.ip" v-if="contract.publicIP.ip" />
+                <CopyReadonlyInput
+                  label="Public IPv4"
+                  :data="contract.publicIP.ip.split('/')[0] || contract.publicIP.ip"
+                  v-if="contract.publicIP.ip"
+                />
                 <CopyReadonlyInput label="Public IPv6" :data="contract.publicIP.ip6" v-if="contract.publicIP.ip6" />
               </template>
 
@@ -49,7 +53,12 @@
                 :data="Math.ceil(disk.size / (1024 * 1024 * 1024))"
               />
               <CopyReadonlyInput label="WireGuard IP" :data="contract.interfaces[0].ip" />
-              <CopyReadonlyInput label="WireGuard Config" textarea :data="data.wireguard" v-if="data.wireguard" />
+              <CopyReadonlyInput
+                label="WireGuard Config"
+                textarea
+                :data="data.wireguard || contract.wireguard"
+                v-if="data.wireguard || contract.wireguard"
+              />
               <CopyReadonlyInput label="Flist" :data="contract.flist" v-if="contract.flist" />
               <template v-if="environments !== false">
                 <template v-for="key of Object.keys(contract.env)" :key="key">

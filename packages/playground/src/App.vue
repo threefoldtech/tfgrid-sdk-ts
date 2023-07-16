@@ -159,6 +159,7 @@ const routes: AppRoute[] = [
       { title: "Node Pilot", icon: "vm.png", route: "/nodepilot" },
       { title: "Wordpress", icon: "wordpress.png", route: "/wordpress" },
       { title: "Umbrel", icon: "umbrel.png", route: "/umbrel" },
+      { title: "Freeflow", icon: "freeflow.png", route: "/freeflow" },
     ],
   },
   {
@@ -281,5 +282,9 @@ export default {
   color: white;
   font-weight: 900;
   background-color: rgb(71, 70, 70);
+}
+
+a {
+  color: #5695ff !important;
 }
 </style>

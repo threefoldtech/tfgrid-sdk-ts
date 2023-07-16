@@ -64,9 +64,9 @@
       },
       {
         id: 7,
-        data: data.accessNodes,
-        title: "Access Nodes",
-        icon: "/assets/access.svg",
+        data: data.gpus,
+        title: "GPUs",
+        icon: "/assets/gpu.svg",
       },
       {
         id: 8,

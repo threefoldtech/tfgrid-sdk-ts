@@ -4,7 +4,7 @@
     :cpu="cpu"
     :memory="memory"
     :disk="disks.reduce((total, disk) => total + disk.size, diskSize + 2)"
-    :ivp4="ipv4"
+    :ipv4="ipv4"
     title-image="images/icons/vm.png"
   >
     <template #title> Deploy a Full Virtual Machine </template>
@@ -49,38 +49,25 @@
           v-model="solution"
         />
 
+        <Network
+          required
+          ref="network"
+          v-model:ipv4="ipv4"
+          v-model:ipv6="ipv6"
+          v-model:planetary="planetary"
+          v-model:wireguard="wireguard"
+        />
         <input-tooltip
           inline
-          tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
+          tooltip="
+          Selecting a Node with GPU.
+          When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
+          "
         >
-          <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
+          <v-switch color="primary" inset label="GPU" v-model="hasGPU" />
         </input-tooltip>
-
-        <input-tooltip
-          inline
-          tooltip="Public IPv6 is the next-generation Internet Protocol that offers an expanded address space to connect a vast number of devices."
-        >
-          <v-switch color="primary" inset label="Public IPv6" v-model="ipv6" />
-        </input-tooltip>
-
-        <input-tooltip
-          inline
-          tooltip="The Planetary Network is a distributed network infrastructure that spans across multiple regions and countries, providing global connectivity."
-        >
-          <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
-        </input-tooltip>
-
-        <input-tooltip
-          inline
-          tooltip="Enabling WireGuard Access allows you to establish private, secure, and encrypted connections to your instance."
-        >
-          <v-switch color="primary" inset label="Add Wireguard Access" v-model="wireguard" />
-        </input-tooltip>
-
-        <v-alert v-show="networkError" class="mb-2" type="warning" variant="tonal">
-          You must enable at least one of network options.
-        </v-alert>
         <SelectFarm
+          v-if="!hasGPU"
           :filters="{
             cpu,
             memory,
@@ -88,6 +75,24 @@
             ssd: disks.reduce((total, disk) => total + disk.size, diskSize + 2),
           }"
           v-model="farm"
+        />
+        <SelectGPUNode
+          v-else
+          v-model="selectedNodewithCards"
+          :filters="{
+            cpu,
+            memory,
+            ipv4: ipv4,
+            ssd: disks.reduce((total, disk) => total + disk.size, diskSize + 2),
+            ipv6: ipv4,
+            name: name,
+            flist: flist,
+            disks: disks,
+            disk: diskSize,
+            hasGPU: hasGPU,
+            planetary: planetary,
+            wireguard: wireguard,
+          }"
         />
       </template>
 
@@ -133,7 +138,7 @@
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid || networkError"> Deploy </v-btn>
+      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid || network?.error">Deploy </v-btn>
     </template>
   </weblet-layout>
 </template>
@@ -141,6 +146,7 @@
 <script lang="ts" setup>
 import { type Ref, ref, watch } from "vue";
 
+import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import type { solutionFlavor as SolutionFlavor } from "../types";
@@ -189,7 +195,9 @@ const planetary = ref(true);
 const wireguard = ref(false);
 const farm = ref() as Ref<Farm>;
 const disks = ref<Disk[]>([]);
-const networkError = ref(false);
+const network = ref();
+const hasGPU = ref(false);
+const selectedNodewithCards = ref() as Ref<GPUNodeType>;
 
 function addDisk() {
   const name = generateName(7);
@@ -199,10 +207,7 @@ function addDisk() {
     mountPoint: "/mnt/" + name,
   });
 }
-watch([planetary, ipv4, ipv6, wireguard], ([planetary, ipv4, ipv6, wireguard]) => {
-  if (!(ipv6 || ipv4 || planetary || wireguard)) networkError.value = true;
-  else networkError.value = false;
-});
+
 async function deploy() {
   layout.value.setStatus("deploy");
 
@@ -232,6 +237,9 @@ async function deploy() {
           planetary: planetary.value,
           envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
           rootFilesystemSize: 2,
+          hasGPU: hasGPU.value,
+          nodeId: hasGPU.value ? selectedNodewithCards.value.nodeId : undefined,
+          gpus: hasGPU.value ? selectedNodewithCards.value.cards.map(card => card.id) : undefined,
         },
       ],
       network: { addAccess: wireguard.value },
@@ -247,9 +255,12 @@ async function deploy() {
 </script>
 
 <script lang="ts">
+import type { GPUNodeType } from "@/utils/filter_node_with_gpu";
+
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
+import SelectGPUNode from "../components/select_gpu_node.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
 
@@ -260,6 +271,7 @@ export default {
     SelectSolutionFlavor,
     SelectFarm,
     ExpandableLayout,
+    SelectGPUNode,
   },
 };
 </script>

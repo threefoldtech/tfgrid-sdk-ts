@@ -1,5 +1,5 @@
 # choose the Image which has Node installed already
-FROM node:16 AS build
+FROM node:18 AS build
 
 # add arg for the network
 ARG NETWORK
@@ -14,7 +14,7 @@ WORKDIR /app
 COPY . .
 
 # increase the max memory for node
-ENV NODE_OPTIONS="--max-old-space-size=8192"
+ENV NODE_OPTIONS="--max-old-space-size=8192 --openssl-legacy-provider"
 
 # install project dependencies
 RUN yarn install && yarn workspace @threefold/weblets deps

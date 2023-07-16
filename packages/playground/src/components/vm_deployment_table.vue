@@ -18,21 +18,22 @@
       :model-value="$props.modelValue"
       @update:model-value="$emit('update:model-value', $event)"
       :no-data-text="`No ${projectName} deployments found on this account.`"
+      @click:row="$attrs['onClick:row']"
     >
       <template #[`item.name`]="{ item }">
         {{ item.value[0].name }}
       </template>
 
       <template #[`item.ipv4`]="{ item }">
-        {{ item.value[0].publicIP?.ip || "None" }}
+        {{ item.value[0].publicIP?.ip?.split("/")?.[0] || item.value[0].publicIP?.ip || "-" }}
       </template>
 
       <template #[`item.ipv6`]="{ item }">
-        {{ item.value[0].publicIP?.ip6 || "None" }}
+        {{ item.value[0].publicIP?.ip6 || "-" }}
       </template>
 
       <template #[`item.planetary`]="{ item }">
-        {{ item.value[0].planetary || "None" }}
+        {{ item.value[0].planetary || "-" }}
       </template>
 
       <template #[`item.flist`]="{ item }">

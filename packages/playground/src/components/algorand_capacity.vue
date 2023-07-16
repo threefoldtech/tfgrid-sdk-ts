@@ -84,18 +84,12 @@ watch(memory, memory => emits("update:memory", memory), { immediate: true });
 watch(storage, storage => emits("update:storage", storage), { immediate: true });
 
 watch(
-  () => [custom.value, props.network, props.type] as const,
-  ([custom, network, type]) => {
-    if (!custom) {
-      const min = getMinCapacity(network, type);
-      cpu.value = min.cpu;
-      memory.value = min.memory;
-      storage.value = min.storage;
-    } else {
-      cpuInput.value?.validate(cpu.value?.toString());
-      memoryInput.value?.validate(memory.value?.toString());
-      storageInput.value?.validate(storage.value?.toString());
-    }
+  () => [props.network, props.type] as const,
+  ([network, type]) => {
+    const min = getMinCapacity(network, type);
+    cpu.value = min.cpu;
+    memory.value = min.memory;
+    storage.value = min.storage;
   },
 );
 

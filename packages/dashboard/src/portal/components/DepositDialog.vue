@@ -1,11 +1,6 @@
 <template>
   <v-container>
-    <v-dialog
-      transition="dialog-bottom-transition"
-      max-width="900"
-      v-model="depositDialog"
-      v-click-outside="handleClose"
-    >
+    <v-dialog transition="dialog-bottom-transition" max-width="900" v-model="depositDialog">
       <v-card>
         <v-toolbar color="primary" dark>Deposit TFT</v-toolbar>
         <v-card-text>
@@ -42,7 +37,7 @@
           </v-container>
         </v-card-text>
         <v-card-actions class="justify-end">
-          <v-btn @click="handleClose" class="grey lighten-2 black--text">Close</v-btn>
+          <v-btn @click="depositDialog = false" class="grey lighten-2 black--text">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -51,7 +46,7 @@
 <script lang="ts">
 import { QueryClient } from "@threefold/tfchain_client";
 import QrcodeVue from "qrcode.vue";
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
 import { balanceInterface, getBalance } from "../lib/balance";
 @Component({
@@ -86,13 +81,12 @@ export default class DepositDialog extends Vue {
       this.handleClose();
     }
   }
+  @Watch("depositDialog")
+  handleClose() {
+    if (!this.depositDialog) this.$emit("close");
+  }
   destroyed() {
     this._destroyed = true;
-  }
-
-  handleClose() {
-    this.depositDialog = false;
-    this.$emit("close");
   }
 }
 </script>

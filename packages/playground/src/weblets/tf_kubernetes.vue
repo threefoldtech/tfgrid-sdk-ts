@@ -6,7 +6,7 @@
     :disk="
       workers.reduce((disk, worker) => disk + worker.diskSize + worker.rootFsSize, master.diskSize + master.rootFsSize)
     "
-    :ivp4="master.ipv4"
+    :ipv4="master.ipv4"
     title-image="images/icons/kubernetes.png"
   >
     <template #title>Deploy a Kubernetes cluster</template>
@@ -42,7 +42,6 @@
             validators.required('Token is required.'),
             validators.minLength('Token minimum length is 6 chars.', 6),
             validators.maxLength('Token max length is 15 chars.', 15),
-            validators.isAlphanumeric('Token cannot contain any characters other than alphabets and numbers.'),
           ]"
           #="{ props: validationProps }"
         >

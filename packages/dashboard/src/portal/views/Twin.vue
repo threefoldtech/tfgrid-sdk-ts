@@ -44,10 +44,24 @@
         <h2>Twin Details</h2>
       </v-card>
       <v-card class="my-3 pa-3 text-center">
-        <v-list v-if="$store.state.credentials.initialized">
-          <v-list-item> ID: {{ $store.state.credentials.twin.id }} </v-list-item>
-          <v-list-item> Address: {{ $store.state.credentials.account.address }} </v-list-item>
-          <v-list-item> Relay: {{ $store.state.credentials.twin.relay }} </v-list-item>
+        <v-list v-if="$store.state.credentials.initialized" style="font-size: 18px">
+          <v-row>
+            <v-col cols="1" sm="2">
+              <v-list-item> ID </v-list-item>
+              <v-divider></v-divider>
+              <v-list-item> Address </v-list-item>
+              <v-divider></v-divider>
+              <v-list-item> Relay </v-list-item>
+            </v-col>
+            <v-divider vertical style="color: black"></v-divider>
+            <v-col cols="1" sm="10">
+              <v-list-item> {{ $store.state.credentials.twin.id }} </v-list-item>
+              <v-divider></v-divider>
+              <v-list-item> {{ $store.state.credentials.account.address }} </v-list-item>
+              <v-divider></v-divider>
+              <v-list-item> {{ $store.state.credentials.twin.relay }} </v-list-item>
+            </v-col>
+          </v-row>
         </v-list>
         <v-card-actions class="justify-end">
           <v-btn @click="editTwin" color="primary">Edit</v-btn>
@@ -71,6 +85,7 @@
 </template>
 
 <script lang="ts">
+import { divide } from "lodash";
 import { Component, Vue } from "vue-property-decorator";
 
 import config from "@/portal/config";

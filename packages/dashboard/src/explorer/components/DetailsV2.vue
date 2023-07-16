@@ -1,6 +1,6 @@
 <template>
   <v-bottom-sheet v-model="open" persistent no-click-animation @click:outside="$emit('close-sheet')">
-    <v-sheet class="text-center" height="90vh">
+    <v-sheet :class="{ 'text-center': true, loading: loading }" height="90vh">
       <div class="content" v-if="!loading">
         <v-row>
           <v-col v-if="node">
@@ -39,10 +39,17 @@
           <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="node && interfaces">
             <InterfacesDetails :interfaces="interfaces" />
           </v-col>
+
+          <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="node && node.num_gpu > 0">
+            <GPUDetails :nodeId="nodeId" />
+          </v-col>
         </v-row>
       </div>
-      <div v-if="loading" class="pt-10">
-        <v-progress-circular indeterminate color="primary" :size="100" />
+      <div v-if="loading" class="d-flex justify-center" style="height: 100%">
+        <div class="align-self-center">
+          <v-progress-circular indeterminate color="primary" :size="100" />
+          <p class="pt-4">Loading Node {{ nodeId ?? "" }} details</p>
+        </div>
       </div>
     </v-sheet>
   </v-bottom-sheet>
@@ -58,6 +65,7 @@ import { GrafanaStatistics } from "../utils/getMetricsUrl";
 import mediaMatcher from "../utils/mediaMatcher";
 import CountryDetails from "./CountryDetails.vue";
 import FarmDetails from "./FarmDetails.vue";
+import GPUDetails from "./GPUDetails.vue";
 import InterfacesDetails from "./InterfacesDetails.vue";
 import LocationDetails from "./LocationDetails.vue";
 import NodeDetails from "./NodeDetails.vue";
@@ -74,6 +82,7 @@ import TwinDetails from "./TwinDetails.vue";
     TwinDetails,
     PublicConfigDetails,
     InterfacesDetails,
+    GPUDetails,
     NodeUsedResources,
   },
 })
@@ -86,7 +95,6 @@ export default class Details extends Vue {
   loading = false;
   grafanaUrl = "";
   interfaces = undefined;
-
   data: any = {};
 
   get node(): INode {
@@ -107,7 +115,6 @@ export default class Details extends Vue {
   @Watch("open", { immediate: true })
   onOpenChange() {
     if (!this.open) return;
-
     this.loading = true;
     const { query, variables } = this;
     this.$apollo
@@ -144,7 +151,6 @@ export default class Details extends Vue {
         this.loading = false;
       });
   }
-
   destroyed() {
     this.screen_max_1200.destry();
     this.screen_max_700.destry();
@@ -171,5 +177,8 @@ export default class Details extends Vue {
   will-change: transform;
   height: 100%;
   padding: 20px;
+}
+.loading {
+  cursor: wait;
 }
 </style>

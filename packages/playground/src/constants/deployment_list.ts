@@ -53,6 +53,10 @@ export const deploymentListEnvironments = {
     FLASK_SECRET_KEY: { label: "Flask Secret Key", type: "password" },
   },
 
+  freeflow: {
+    SSH_KEY: _ssh,
+  },
+
   funkwhale: {
     FUNKWHALE_HOSTNAME: "Funkwhale Hostname",
     DJANGO_SUPERUSER_EMAIL: "Superuser Email",

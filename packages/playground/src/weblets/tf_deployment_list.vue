@@ -12,12 +12,18 @@
       destroy
       :hide-tabs="!!$props.projectName"
     >
-      <VmDeploymentTable :projectName="tabs[activeTab].value" v-model="selectedItems" :deleting="deleting" ref="table">
+      <VmDeploymentTable
+        :projectName="tabs[activeTab].value"
+        v-model="selectedItems"
+        :deleting="deleting"
+        ref="table"
+        @click:row="clickOpenDialog"
+      >
         <template #Fullvm-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.vm)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
         </template>
 
@@ -25,7 +31,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.vm)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
         </template>
 
@@ -33,7 +39,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.caprover)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Admin Panel"
@@ -61,7 +67,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.peertube)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Preview"
@@ -75,7 +81,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.funkwhale)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Preview"
@@ -89,7 +95,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.taiga)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Admin Panel"
@@ -109,7 +115,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.presearch)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
         </template>
 
@@ -117,7 +123,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.mattermost)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn tooltip="Preview" color="info" icon="mdi-web" :href="item.value[0].env.SITE_URL" />
         </template>
@@ -126,7 +132,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.discourse)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Preview"
@@ -136,11 +142,25 @@
           />
         </template>
 
+        <template #Freeflow-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+          <IconActionBtn
+            tooltip="Preview"
+            color="info"
+            icon="mdi-web"
+            :href="'https://' + item.value[0].env.DIGITALTWIN_APPID"
+          />
+        </template>
+
         <template #Casperlabs-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.casperlabs)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Preview"
@@ -154,7 +174,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.owncloud)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Preview"
@@ -168,7 +188,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.subsquid)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Preview"
@@ -182,7 +202,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.algorand)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
         </template>
 
@@ -190,7 +210,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.vm)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Visit"
@@ -209,7 +229,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.umbrel)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Admin Panel"
@@ -228,7 +248,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.wordpress)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn tooltip="Preview" color="info" icon="mdi-web" :href="'https://' + item.value[0].env.WP_URL" />
           <IconActionBtn
@@ -246,12 +266,13 @@
           v-model="selectedItems"
           :deleting="deleting"
           ref="table"
+          @click:row="clickOpenDialog"
         >
           <template #actions="{ item }">
             <IconActionBtn
               tooltip="Show Details"
               icon="mdi-eye-outline"
-              @click="layout.openDialog(item?.value, deploymentListEnvironments.k8s)"
+              @click="openDialog(tabs[activeTab].value, item)"
             />
             <IconActionBtn
               icon="mdi-cog"
@@ -336,6 +357,7 @@ const tabs: Tab[] = [
   { title: "Algorand", value: "Algorand", imgPath: "images/icons/algorand.png" },
   { title: "Node Pilot", value: "NodePilot", imgPath: "images/icons/vm.png" },
   { title: "Umbrel", value: "Umbrel", imgPath: "images/icons/umbrel.png" },
+  { title: "Freeflow", value: "Freeflow", imgPath: "images/icons/freeflow.png" },
   { title: "Wordpress", value: "Wordpress", imgPath: "images/icons/wordpress.png" },
 ];
 
@@ -373,6 +395,20 @@ async function onDelete(k8s = false) {
   deleting.value = false;
 }
 
+const VMS: string[] = [ProjectName.Fullvm, ProjectName.VM, ProjectName.NodePilot];
+function openDialog(project: string, item?: { value: any }): void {
+  const key: keyof typeof deploymentListEnvironments = VMS.includes(project)
+    ? "vm"
+    : project === ProjectName.Kubernetes
+    ? "k8s"
+    : (project.toLowerCase() as any);
+  layout.value.openDialog(item?.value, deploymentListEnvironments[key]);
+}
+
+function clickOpenDialog(_: MouseEvent, { item }: any) {
+  return openDialog(tabs[activeTab.value].value, item);
+}
+
 /* List Manager */
 const { uid } = getCurrentInstance() as { uid: number };
 const deploymentListManager = useDeploymentListManager();
@@ -391,7 +427,7 @@ import K8sDeploymentTable from "../components/k8s_deployment_table.vue";
 import ManageCaproverWorkerDialog from "../components/manage_caprover_worker_dialog.vue";
 import ManageK8SWorkerDialog from "../components/manage_k8s_worker_dialog.vue";
 import VmDeploymentTable from "../components/vm_deployment_table.vue";
-import type { ProjectName } from "../types";
+import { ProjectName } from "../types";
 
 export default {
   name: "TfDeploymentList",

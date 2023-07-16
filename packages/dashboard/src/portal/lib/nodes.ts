@@ -1,5 +1,4 @@
 /* eslint-disable */
-import { Signer } from "@polkadot/api/types";
 import { web3FromAddress } from "@polkadot/extension-dapp";
 import axios from "axios";
 import config from "../config";
@@ -9,7 +8,8 @@ import { nodeInterface } from "./farms";
 import moment from "moment";
 import "jspdf-autotable";
 import { apiInterface } from "./util";
-import { Any } from "@/hub/types/google/protobuf/any";
+import { Client } from "@threefold/tfchain_client";
+
 export interface receiptInterface {
   hash: string;
   mintingStart?: number;
@@ -172,6 +172,12 @@ export interface ITab {
   value: "rentable" | "rented" | "mine";
   index: number;
 }
+export interface INodeGPU {
+  id: string;
+  vendor: string;
+  device: string;
+  contract?: number;
+}
 
 export function generateReceipt(doc: jsPDF, node: nodeInterface) {
   doc.setFontSize(15);
@@ -246,6 +252,15 @@ export async function cancelRentContract(api: apiInterface, address: string, con
     .signAndSend(address, { signer: injector.signer }, callback);
 }
 
+export async function setDedicatedNodeExtraFee(address: string, nodeId: number, extraFee: number) {
+  const injector = await web3FromAddress(address);
+  const client = new Client({
+    url: window.configs.APP_API_URL,
+    extSigner: { address: address, signer: injector.signer },
+  });
+  return await (await client.contracts.setDedicatedNodeExtraFee({ nodeId, extraFee })).apply();
+}
+
 export async function getActiveContracts(api: apiInterface, nodeId: string) {
   console.log("getActiveContracts", api.query.smartContractModule.activeNodeContracts(nodeId));
   return await api.query.smartContractModule.activeNodeContracts(nodeId);
@@ -287,6 +302,20 @@ export async function getNodeMintingFixupReceipts(nodeId: number) {
 
   return nodeReceipts;
 }
+export async function getNodeGPUs(nodeId: number): Promise<INodeGPU[] | undefined> {
+  let nodeGPUs: INodeGPU[] | undefined;
+
+  try {
+    nodeGPUs = await (
+      await axios.get(`${config.gridproxyUrl}/nodes/${nodeId}/gpu`, {
+        timeout: 5000,
+      })
+    ).data;
+  } catch (err) {
+    nodeGPUs = undefined;
+  }
+  return nodeGPUs;
+}
 
 export async function getNodeUsedResources(nodeId: string) {
   const res = await axios.get(`${config.gridproxyUrl}/nodes/${nodeId}`, {
@@ -325,7 +354,7 @@ export async function getIpsForFarm(farmID: string) {
               id
             }
           }
-        }      
+        }
         `,
       operation: "getNodes",
     },
@@ -467,7 +496,7 @@ export async function getDNodes(
     discount: any;
     applyedDiscount: { first: any; second: any };
     location: { country: any; city: any; long: any; lat: any };
-    resources: { cru: any; mru: any; hru: any; sru: any };
+    resources: { cru: any; mru: any; hru: any; sru: any; gpu: number };
     farm: { id: string; name?: string; farmCertType?: string; pubIps?: string };
     rentContractId: any;
     rentedByTwinId: any;
@@ -499,6 +528,7 @@ export async function getDNodes(
         mru: node.total_resources.mru,
         hru: node.total_resources.hru,
         sru: node.total_resources.sru,
+        gpu: node.num_gpu,
       },
       usedResources: {
         cru: node.used_resources.cru,

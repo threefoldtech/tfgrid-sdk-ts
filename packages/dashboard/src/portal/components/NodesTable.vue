@@ -34,7 +34,7 @@
       <template v-slot:[`item.discount`]="{ item }">
         <v-tooltip bottom color="primary" close-delay="1000">
           <template v-slot:activator="{ on, attrs }">
-            <span v-bind="attrs" v-on="on">{{ item.discount }} *</span>
+            <span v-bind="attrs" v-on="on">{{ item.discount + (item.extraFee ? item.extraFee / 1000 : 0) }} *</span>
           </template>
           <span
             >Discounts: <br />
@@ -50,10 +50,7 @@
               </li>
               <li>
                 You're receiving {{ item.applyedDiscount.second }}% discount as per the
-                <a
-                  target="_blank"
-                  href="https://library.threefold.me/info/threefold/#/tfgrid/grid/pricing?id=discount-levels"
-                >
+                <a target="_blank" href="https://manual.grid.tf/cloud/cloudunits_pricing.html#discount-levels">
                   <p style="color: blue; display: inline">discount levels</p>
                 </a>
               </li>
@@ -113,6 +110,7 @@ export default class NodesTable extends Vue {
     { text: "MRU", value: "resources.mru", align: "center" },
     { text: "SRU", value: "resources.sru", align: "center" },
     { text: "HRU", value: "resources.hru", align: "center" },
+    { text: "GPU", value: "resources.gpu", align: "center" },
     { text: "Price (USD)", value: "discount", align: "center" },
     { text: "Actions", value: "actions", align: "center", sortable: false },
   ];
@@ -175,7 +173,6 @@ export default class NodesTable extends Vue {
       this.pageNumber,
       this.pageSize,
     );
-
     this.nodes = dNodes;
     this.count = parseInt(count as string);
     this.loading = false;

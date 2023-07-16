@@ -41,6 +41,20 @@
             </p>
           </template>
         </div>
+        <v-tooltip text="Logout" location="bottom" :disabled="!profileManager.profile">
+          <template #activator="{ props }">
+            <VBtn
+              color="error"
+              variant="tonal"
+              @click.stop="logout"
+              v-if="profileManager.profile"
+              :disabled="updatingSSH || generatingSSH || loadingBalance"
+              class="ml-2"
+              v-bind="props"
+              icon="mdi-logout"
+            />
+          </template>
+        </v-tooltip>
       </VCard>
     </template>
 
@@ -271,7 +285,7 @@
             color="primary"
             variant="text"
             @click="updateSSH"
-            :disabled="!ssh || profileManager.profile.ssh === ssh || updatingSSH"
+            :disabled="!ssh || profileManager.profile.ssh === ssh || updatingSSH || !isEnoughBalance(balance)"
             :loading="updatingSSH"
           >
             Update Public SSH Key
@@ -444,7 +458,7 @@ watch(
     if (profile) {
       __loadBalance(profile);
       if (interval) clearInterval(interval);
-      interval = setInterval(__loadBalance.bind(undefined, profile), 1000 * 60 * 5);
+      interval = setInterval(__loadBalance.bind(undefined, profile), 1000 * 60 * 2);
     } else {
       if (interval) clearInterval(interval);
       balance.value = undefined;

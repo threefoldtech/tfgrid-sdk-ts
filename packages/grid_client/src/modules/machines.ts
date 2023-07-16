@@ -71,6 +71,7 @@ class MachinesModule extends BaseModule {
         machine.corex,
         machine.solutionProviderId!,
         machine.zlogsOutput,
+        machine.gpus,
       );
       twinDeployments = twinDeployments.concat(TDeployments);
       if (wgConfig) {
@@ -188,6 +189,7 @@ class MachinesModule extends BaseModule {
       options.corex,
       options.solutionProviderId!,
       options.zlogsOutput,
+      options.gpus,
     );
     return await this._add(options.deployment_name, options.node_id, oldDeployments, twinDeployments, network);
   }

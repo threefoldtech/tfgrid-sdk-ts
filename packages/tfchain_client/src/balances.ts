@@ -4,8 +4,7 @@ import { checkConnection } from "./utils";
 interface Balance {
   free: number;
   reserved: number;
-  miscFrozen: number;
-  feeFrozen: number;
+  frozen: number;
 }
 
 export interface QueryBalancesGetOptions {
@@ -23,8 +22,7 @@ class QueryBalances {
     const balance: Balance = {
       free: res["data"].free.toJSON(),
       reserved: res["data"].reserved.toJSON(),
-      miscFrozen: res["data"].miscFrozen.toJSON(),
-      feeFrozen: res["data"].feeFrozen.toJSON(),
+      frozen: res["data"].frozen.toJSON(),
     };
     return balance;
   }

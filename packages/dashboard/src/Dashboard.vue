@@ -19,7 +19,7 @@
             </v-btn>
 
             <v-card color="transparent" outlined v-if="$store.state.portal.accounts.length === 0">
-              <v-btn @click="$store.dispatch('portal/subscribeAccounts')" color="green"> Connect </v-btn>
+              <v-btn @click="subscribe" color="green"> Connect </v-btn>
             </v-card>
 
             <v-btn v-else @click="disconnectWallet" color="red"> Disconnect </v-btn>
@@ -223,6 +223,7 @@ interface SidenavItem {
   icon: string;
   prefix: string;
   active?: boolean;
+  hidden?: boolean;
   hyperlink?: boolean;
   children: Array<{
     label?: string;
@@ -252,9 +253,27 @@ export default class Dashboard extends Vue {
   accounts: accountInterface[] = [];
   loadingAPI = true;
   version = config.version;
-
+  async subscribe() {
+    await this.$store.dispatch("portal/subscribeAccounts").then(async extensions => {
+      if (!extensions) {
+        this.$toasted.show(
+          "Can't open polkadot extension please make sure you have installed it first, allow access on this page, and try again",
+        );
+        return;
+      }
+      await setTimeout(() => {
+        if (!this.$store.state.portal.accounts.length)
+          this.$toasted.show(
+            "Can't get any account information from polkadot extension please make sure you have registered account on it",
+          );
+      }, 50);
+    });
+  }
   async mounted() {
-    this.$store.dispatch("portal/subscribeAccounts");
+    this.routes = this.routes.filter(route => {
+      if (!route.hidden) return route;
+    });
+    await this.subscribe();
     this.accounts = this.$store.state.portal.accounts;
     if (this.$route.path === "/" && !this.$api) {
       Vue.prototype.$api = await connect();
@@ -445,6 +464,13 @@ export default class Dashboard extends Vue {
       icon: "earth",
       prefix: "/other/bootstrap",
       children: [],
+    },
+    {
+      label: "Minting",
+      icon: "cash-multiple",
+      prefix: "/other/minting",
+      children: [],
+      hidden: window.configs.APP_NETWORK !== "main",
     },
     {
       label: "Monitoring",

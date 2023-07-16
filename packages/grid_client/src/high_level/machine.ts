@@ -45,6 +45,7 @@ class VMHL extends HighLevelBase {
     corex = false,
     solutionProviderId: number,
     zlogsOutput?: string,
+    gpus: string[] = [],
   ): Promise<[TwinDeployment[], string]> {
     const deployments: TwinDeployment[] = [];
     const workloads: Workload[] = [];
@@ -120,6 +121,7 @@ class VMHL extends HighLevelBase {
     }
 
     // ipv4
+    // TODO: make sure that the farm has a free public ip before continuing the deployment
     let ipName = "";
     let publicIps = 0;
     if (publicIp || publicIp6) {
@@ -128,6 +130,28 @@ class VMHL extends HighLevelBase {
       workloads.push(ip.create(ipName, metadata, description, 0, publicIp, publicIp6));
       if (publicIp) {
         publicIps++;
+      }
+    }
+
+    if (gpus && gpus.length > 0) {
+      const nodeTwinId = await this.nodes.getNodeTwinId(nodeId);
+      const gpuList = await this.rmb.request([nodeTwinId], "zos.gpu.list", "");
+      if (gpuList.length <= 0) {
+        throw Error(`The selected node ${nodeId} doesn't have GPU card`);
+      }
+      for (const g of gpus) {
+        const found = gpuList.filter(item => item.id === g);
+        if (found.length === 0) {
+          throw Error(`Couldn't find the GPU with id: "${g}" in node: ${nodeId}`);
+        }
+        if (found[0].contract !== 0) {
+          throw Error(`This GPU: "${g}" is currently in use by another VM with contract id: ${found[0].contract}`);
+        }
+      }
+
+      const node = await this.nodes.getNode(nodeId);
+      if (node.rentedByTwinId !== this.config.twinId) {
+        throw Error(`This node ${nodeId} is not rented by the current user`);
       }
     }
 
@@ -247,6 +271,7 @@ class VMHL extends HighLevelBase {
         description,
         0,
         corex,
+        gpus,
       ),
     );
 
