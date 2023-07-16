@@ -13,13 +13,13 @@ export const portalRouter: RouteConfig[] = [
     name: "accounts",
     component: AccountsView,
   },
+  // {
+  //   path: "/:accountID",
+  //   name: "account",
+  //   component: AccountView,
+  // },
   {
-    path: "/:accountID",
-    name: "account",
-    component: AccountView,
-  },
-  {
-    path: "/:accountID/account-twin",
+    path: "/account-twin",
     name: "account-twin",
     component: TwinView,
   },

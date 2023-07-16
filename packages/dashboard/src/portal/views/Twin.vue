@@ -44,7 +44,7 @@
         <h2>Twin Details</h2>
       </v-card>
       <v-card class="my-3 pa-3 text-center">
-        <v-list v-if="$store.state.credentials.initialized" style="font-size: 18px">
+        <v-list v-if="$store.state.profile" style="font-size: 18px">
           <v-row>
             <v-col cols="1" sm="2">
               <v-list-item> ID </v-list-item>
@@ -55,11 +55,11 @@
             </v-col>
             <v-divider vertical style="color: black"></v-divider>
             <v-col cols="1" sm="10">
-              <v-list-item> {{ $store.state.credentials.twin.id }} </v-list-item>
+              <v-list-item> {{ $store.state.profile.twin }} </v-list-item>
               <v-divider></v-divider>
-              <v-list-item> {{ $store.state.credentials.account.address }} </v-list-item>
+              <v-list-item> {{ $store.state.profile.address }} </v-list-item>
               <v-divider></v-divider>
-              <v-list-item> {{ $store.state.credentials.twin.relay }} </v-list-item>
+              <v-list-item> {{ "dev" }} </v-list-item>
             </v-col>
           </v-row>
         </v-list>
@@ -85,10 +85,10 @@
 </template>
 
 <script lang="ts">
-import { divide } from "lodash";
 import { Component, Vue } from "vue-property-decorator";
 
 import config from "@/portal/config";
+import { getGrid } from "@/utils/grid";
 
 import WelcomeWindow from "../components/WelcomeWindow.vue";
 import { deleteTwin, updateRelay } from "../lib/twin";
@@ -123,9 +123,16 @@ export default class TwinView extends Vue {
     }
   }
 
-  mounted() {
-    if (this.$api && this.$store.state.credentials.initialized) {
-      this.twin = this.$store.state.credentials.twin;
+  async mounted() {
+    if (this.$store.state.profile) {
+      const grid = await getGrid(this.$store.state.profile.mnemonic);
+      this.twin = {
+        id: grid.twinId.toString(),
+        pk: grid.tfclient.address,
+        relay: "relay.dev.grid.tf",
+      };
+      console.log(this.items);
+
       this.selectedName = this.items.filter(item => item.id === this.selectedItem.item_id)[0].name;
     } else {
       this.$router.push({

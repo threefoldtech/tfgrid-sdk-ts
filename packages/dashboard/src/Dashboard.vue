@@ -131,7 +131,7 @@
             </template>
 
             <div v-if="route.prefix === '/'">
-              <template v-if="!$store.state.credentials.initialized">
+              <template v-if="!$store.state.profile">
                 <div class="mt-4">
                   <v-alert color="rgb(25, 130, 177)" dense type="info">
                     You should <strong>select/create</strong> an account to enable the portal functionalities.
@@ -139,23 +139,24 @@
                 </div>
               </template>
               <template v-else>
-                <div v-for="account in filteredAccounts()" :key="account.address">
-                  <v-list-item
-                    :active="account.active"
-                    v-for="subchild in route.children"
-                    :key="subchild.label"
-                    :to="subchild.path"
-                    class="white--text pl-16"
-                  >
-                    <v-list-item-icon>
-                      <v-icon class="white--text" v-text="'mdi-' + subchild.icon" />
-                    </v-list-item-icon>
-                    <v-list-item-content>
-                      <v-list-item-title class="white--text text-capitalize" v-text="subchild.label">
-                      </v-list-item-title>
-                    </v-list-item-content>
-                  </v-list-item>
-                </div>
+                <!-- {{ $store.state.profile }} -->
+                <!-- <div v-for="account in filteredAccounts()" :key="account.address"> -->
+                <!-- :active="account.active" -->
+                <v-list-item
+                  active
+                  v-for="subchild in route.children"
+                  :key="subchild.label"
+                  :to="subchild.path"
+                  class="white--text pl-16"
+                >
+                  <v-list-item-icon>
+                    <v-icon class="white--text" v-text="'mdi-' + subchild.icon" />
+                  </v-list-item-icon>
+                  <v-list-item-content>
+                    <v-list-item-title class="white--text text-capitalize" v-text="subchild.label"> </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+                <!-- </div> -->
               </template>
             </div>
             <div v-else>
