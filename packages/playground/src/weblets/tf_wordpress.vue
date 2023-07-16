@@ -94,7 +94,8 @@
           }"
           v-model="farm"
         />
-        <DomainName></DomainName>
+        <DomainName :has-i-pv4="ipv4" ref="dnc"></DomainName>
+        {{ dnc }}
       </FarmGatewayManager>
     </form-validator>
 
@@ -128,14 +129,18 @@ const email = ref("");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
+const dnc = ref(null);
 const customDomain = ref(false);
 const domainName = ref("");
 const farm = ref() as Ref<Farm>;
 const ipv4 = ref(false);
 
-watch(gateway, gateway => {
-  console.log(gateway);
-});
+watch(
+  () => (dnc.value as any)?.domain,
+  (dnc: any) => {
+    console.log(dnc);
+  },
+);
 async function deploy() {
   layout.value.setStatus("deploy");
 

@@ -79,19 +79,18 @@ async function loadNextPage() {
     size,
     farmId: props.customDomain ? props.farmData?.farmID : undefined,
   };
-  console.log(options);
   nodes = await loadGatewayNodes(grid!, options);
 
   if (!nodes.length && props.customDomain && props.farmData?.country) {
     console.log("Nearest in same country");
     options.farmId = undefined;
     options.country = props.farmData.country;
-    nodes = await await loadGatewayNodes(grid!, options);
+    nodes = await loadGatewayNodes(grid!, options);
   }
   if (!nodes.length && props.customDomain) {
     console.log("Network");
     options.country = options.farmId = undefined;
-    nodes = await await loadGatewayNodes(grid!, options);
+    nodes = await loadGatewayNodes(grid!, options);
   }
 
   if (nodes.length === 0 || nodes.length < size) {
@@ -101,7 +100,7 @@ async function loadNextPage() {
   items.value = items.value.concat(nodes.map(normalizeGatewayNode));
   loading.value = false;
 
-  if (!props.modelValue && items.value.length > 0) {
+  if (items.value.length > 0) {
     emits("update:model-value", items.value[0]);
   }
 }

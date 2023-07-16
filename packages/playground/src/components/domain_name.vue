@@ -1,7 +1,20 @@
 <template>
-  <v-sheet width="100%" class="pl-3 my-4" v-model="domain">
-    <v-row class="d-flex align-center mr-2 mb-2">
+  <v-sheet width="100%" v-model="domain">
+    <v-row class="d-flex align-center mx-2 mb-2">
       <h6 class="text-h5">Domain Name</h6>
+      <v-tooltip location="top" text="Use Custom domain name">
+        <template #activator="{ props }">
+          <v-btn
+            color="grey-lighten-1"
+            v-bind="props"
+            :class="[{ 'ma-2': true, 'bg-primary': customDomain }]"
+            @click="customDomain = !customDomain"
+            >Custom</v-btn
+          >
+        </template>
+      </v-tooltip>
+    </v-row>
+    <!-- <v-row class="d-flex align-center mr-2 mb-2">
       <v-tooltip location="top" text="Use subdomain with a gateway node">
         <template #activator="{ props }">
           <v-btn
@@ -24,9 +37,9 @@
           >
         </template>
       </v-tooltip>
-    </v-row>
+    </v-row> -->
     <v-expand-transition>
-      <v-container v-if="customDomain" class="pa-0">
+      <div class="pb-3" v-if="customDomain">
         <input-validator
           :value="domainName"
           :rules="[
@@ -36,20 +49,24 @@
           #="{ props }"
         >
           <input-tooltip tooltip="Domain Name that will points to this instance">
-            <v-text-field label="Domain Name" v-model="domainName" v-bind="{ ...props }" />
+            <v-text-field :disabled="!customDomain" label="Domain Name" v-model="domainName" v-bind="{ ...props }" />
           </input-tooltip>
         </input-validator>
-        <SelectGatewayNode v-model="gatewayNode" v-if="!$props.hasIPv4" customDomain :farmData="farmData" />
-      </v-container>
+      </div>
     </v-expand-transition>
-    <SelectGatewayNode v-if="!customDomain" v-model="gatewayNode"></SelectGatewayNode>
+    <SelectGatewayNode
+      v-model="gatewayNode"
+      v-if="!$props.hasIPv4 || !customDomain"
+      customDomain
+      :farmData="farmData"
+    />
   </v-sheet>
 </template>
 <script lang="ts">
 import { computed, type Ref, ref } from "vue";
 
 import SelectGatewayNode from "../components/select_gateway_node.vue";
-import type { Domain, GatewayNode } from "../types";
+import type { Domain, GatewayNode, Validators } from "../types";
 import { useFarmGatewayManager } from "./farm_gateway_mamager.vue";
 
 export default {
@@ -58,6 +75,15 @@ export default {
     hasIPv4: {
       type: Boolean,
       required: true,
+    },
+  },
+  methods: {
+    dynamicValidateDomain(validators: Validators) {
+      return (value: string) => {
+        if (this.customDomain) {
+          return validators.isFQDN("test required")(value);
+        }
+      };
     },
   },
   setup(props, { expose }) {
@@ -74,7 +100,7 @@ export default {
         };
       }
     });
-    expose(domain);
+    expose({ domain });
     const gatewayNode = ref() as Ref<GatewayNode>;
     const FarmGatewayManager = useFarmGatewayManager();
     const farmData = ref(FarmGatewayManager?.load());
