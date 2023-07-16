@@ -70,7 +70,7 @@
                   label="Recipient:"
                   :rules="[
                     () => !!receptinTwinId || 'This field is required',
-                    () => validateTwinId() || 'invalid address',
+                    () => transferTwinIdCheck() || 'invalid address',
                   ]"
                 ></v-combobox>
                 <v-text-field
@@ -97,9 +97,9 @@
                 <v-btn @click="clearInput" color="grey lighten-2 black--text">Clear</v-btn>
                 <v-btn
                   class="primary white--text"
-                  @click="transferTFTWithAddress"
-                  :loading="loadingTransfer"
-                  :disabled="!isTransferValid"
+                  @click="transferTFTWithTwinID"
+                  :loading="loadingTransferTwinId"
+                  :disabled="!isTransferValidTwinId"
                   >Submit</v-btn
                 >
               </v-card-actions>
@@ -112,7 +112,7 @@
 </template>
 
 <script lang="ts">
-import { QueryClient } from "@threefold/tfchain_client";
+import { Client, QueryClient } from "@threefold/tfchain_client";
 import QrcodeVue from "qrcode.vue";
 import { Component, Vue } from "vue-property-decorator";
 
@@ -132,19 +132,20 @@ export default class TransferView extends Vue {
   loadingTransfer = false;
   isTransferValid = false;
 
+  loadingTransferTwinId = false;
+  isTransferValidTwinId = false;
+
   queryClient = new QueryClient(window.configs.APP_API_URL);
+  client = new Client({ url: window.configs.APP_API_URL });
 
   receptinTwinId = "";
   accountTwinIds: any = [];
 
-  async validateTwinId() {
-    console.log("Query", this.queryClient);
+  async transferTwinIdCheck() {
     const twinId = this.receptinTwinId;
-    console.log("Twin", twinId);
-    const twinIdExists = await this.queryClient.twins.get({ id: parseInt(twinId) });
-    if (twinIdExists) {
-      const twin = await this.queryClient.twins.get({ id: parseInt(twinId) });
-      this.receptinTwinId = twin.id.toString();
+    const twinDetails = await this.queryClient.twins.get({ id: parseInt(twinId) });
+    console.log("twinDetails", twinDetails);
+    if (twinDetails != null) {
       return true;
     } else {
       return false;
@@ -233,13 +234,59 @@ export default class TransferView extends Vue {
     });
   }
 
-  transferTFTWithTwinID() {
-    // transfer(
-    //   this.$store.state.credentials.account.id
-    // ).catch(err => {
-    //   this.$toasted.show(err.message);
-    //   this.loadingTransfer = false;
-    // });
+  async transferTFTWithTwinID() {
+    const twinDetails = await this.queryClient.twins.get({ id: parseInt(this.receptinTwinId) });
+    if (twinDetails != null) {
+      const twinAddress = twinDetails.accountId;
+      console.log("twinAddress", twinAddress);
+      transfer(
+        this.$store.state.credentials.account.address,
+        this.$api,
+        twinAddress,
+        this.amount,
+        (res: { events?: never[] | undefined; status: { type: string; asFinalized: string; isFinalized: string } }) => {
+          this.loadingTransferTwinId = true;
+          if (res instanceof Error) {
+            console.log(res);
+            return;
+          }
+          const { events = [], status } = res;
+          console.log(`Current status is ${status.type}`);
+          switch (status.type) {
+            case "Ready":
+              this.$toasted.show(`Transaction submitted`);
+          }
+          if (status.isFinalized) {
+            console.log(`Transaction included at blockHash ${status.asFinalized}`);
+            if (!events.length) {
+              this.$toasted.show("Transfer failed!");
+              this.loadingTransferTwinId = false;
+            } else {
+              // Loop through Vec<EventRecord> to display all events
+              events.forEach(({ phase, event: { data, method, section } }) => {
+                console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+                if (section === "balances" && method === "Transfer") {
+                  this.$toasted.show("Transfer succeeded!");
+                  this.loadingTransferTwinId = false;
+                  getBalance(this.$api, this.$store.state.credentials.account.address).then(
+                    (balance: balanceInterface) => {
+                      this.$store.state.credentials.balance.free = balance.free;
+                      this.$store.state.credentials.balance.reserved = balance.reserved;
+                    },
+                  );
+                } else if (section === "system" && method === "ExtrinsicFailed") {
+                  this.$toasted.show("Transfer failed!");
+                  this.loadingTransfer = false;
+                }
+              });
+            }
+          }
+        },
+      ).catch(err => {
+        this.$toasted.show(err.message);
+        this.loadingTransfer = false;
+      });
+    }
   }
 
   setValue($event: { target: { value: string } }) {
