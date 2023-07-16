@@ -87,13 +87,8 @@
                   </template>
                 </template>
               </template>
-              <CopyReadonlyInput label="GPU Cards" :data="gpuInfo" v-if="!isLoading && gpuInfo != ''" />
-              <CopyReadonlyInput label="Monitoring URL" :data="grafanaURL" v-if="!isLoading" />
-              <v-card :loading="isLoading" type="info" variant="tonal" v-else>
-                <v-card-text>
-                  <p>Generating metrics url...</p>
-                </v-card-text>
-              </v-card>
+              <CopyReadonlyInput label="GPU Cards" :data="gpuInfo" :loading="loadingCard" v-if="showGpuCard" />
+              <CopyReadonlyInput label="Monitoring URL" :data="grafanaURL" :loading="isLoading" />
             </v-form>
           </template>
           <template v-else>
@@ -143,6 +138,8 @@ defineEmits<{ (event: "close"): void }>();
 
 const showType = ref(props.onlyJson ? 1 : 0);
 const isLoading = ref(false);
+const loadingCard = ref(false);
+const showGpuCard = ref(false);
 const activeTab = ref(0);
 const grafanaURL = ref("");
 const gpuInfo = ref("");
@@ -199,21 +196,25 @@ async function getGrafanaUrl() {
 getGrafanaUrl();
 
 async function getGPUInfo() {
-  isLoading.value = true;
+  showGpuCard.value = true;
+  loadingCard.value = true;
 
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
     const gpuCards = await grid.zos.getNodeGPUInfo({ nodeId: contract.value.nodeId });
-    const usedCards = gpuCards.filter((card: any) => card.contract == contract.value.contractId);
+    const usedCards = gpuCards?.filter((card: any) => card.contract == contract.value.contractId);
 
     const cardsInfo = [];
-    for (let i = 0; i < usedCards.length; i++) {
+    for (let i = 0; i < usedCards?.length; i++) {
       cardsInfo.push(getCardName(usedCards[i]));
     }
     gpuInfo.value = cardsInfo.join(", ");
   }
 
-  isLoading.value = false;
+  if (gpuInfo.value == "") {
+    showGpuCard.value = false;
+  }
+  loadingCard.value = false;
 }
 getGPUInfo();
 
