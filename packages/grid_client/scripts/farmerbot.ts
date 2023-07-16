@@ -1,13 +1,9 @@
-import { FarmIdModel, pingFarmModel } from "../src";
+import { pingFarmModel } from "../src";
 import { FarmerBotFindNodeModel } from "../src/high_level/farmerbot";
 import { getClient } from "./client_loader";
 
 async function main() {
   const grid3 = await getClient();
-  const farmId: FarmIdModel = {
-    id: 53,
-  };
-
   const farm: pingFarmModel = {
     farmId: 53,
   };
@@ -16,12 +12,11 @@ async function main() {
   console.log("pingFarm", pingFarm);
 
   const FarmerBotFindNode: FarmerBotFindNodeModel = {
-    farmId: farmId.id,
+    farmId: 53,
     // required_cru: 4,
     // required_mru: 5,
     // required_sru: 5,
     // required_hru: 5,
-    dedicated: true,
   };
 
   if (pingFarm.twinid) {
