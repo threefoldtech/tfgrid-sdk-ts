@@ -111,12 +111,13 @@ export interface solutionFlavor {
 }
 
 export interface GatewayNode {
-  id: number;
+  id?: number;
   domain: string;
+  useFQDN?: boolean;
 }
 
 export interface Domain {
-  name: string;
+  domain: string;
   useFQDN: boolean;
   gateway?: GatewayNode;
 }

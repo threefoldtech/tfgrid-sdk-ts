@@ -1,4 +1,4 @@
-import { type FilterOptions, GatewayNameModel, type GridClient } from "@threefold/grid_client";
+import { type FilterOptions, GatewayFQDNModel, GatewayNameModel, type GridClient } from "@threefold/grid_client";
 
 import { SolutionCode } from "@/types";
 
@@ -35,6 +35,7 @@ export interface DeployGatewayNameOptions {
   tlsPassthrough?: boolean;
   backends: GatewayBackend[];
   networkName: string;
+  fqdn?: string;
 }
 export async function deployGatewayName(grid: GridClient, options: DeployGatewayNameOptions) {
   const gateway = new GatewayNameModel();
@@ -45,7 +46,13 @@ export async function deployGatewayName(grid: GridClient, options: DeployGateway
   gateway.backends = options.backends.map(({ ip, port }) => `http://${ip}:${port}`);
   gateway.network = options.networkName;
   gateway.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
+  console.log(options.fqdn, options.name);
+  if (options.fqdn) {
+    const domain = gateway as GatewayFQDNModel;
+    domain.fqdn = options.fqdn;
 
+    return grid.gateway.deploy_fqdn(domain);
+  }
   return grid.gateway.deploy_name(gateway);
 }
 

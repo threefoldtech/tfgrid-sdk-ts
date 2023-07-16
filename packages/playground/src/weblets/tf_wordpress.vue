@@ -94,13 +94,20 @@
           }"
           v-model="farm"
         />
-        <DomainName :has-i-pv4="ipv4" ref="dnc"></DomainName>
-        {{ dnc }}
+        <DomainName :has-i-pv4="ipv4" ref="domainNameCmp"></DomainName>
+        {{ domainNameCmp?.domain }}
       </FarmGatewayManager>
     </form-validator>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="!valid"> Deploy </v-btn>
+      <v-btn
+        color="primary"
+        variant="tonal"
+        @click="deploy(domainNameCmp?.domain, domainNameCmp?.customDomain)"
+        :disabled="!valid"
+      >
+        Deploy
+      </v-btn>
     </template>
   </weblet-layout>
 </template>
@@ -129,33 +136,35 @@ const email = ref("");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
-const dnc = ref(null);
-const customDomain = ref(false);
-const domainName = ref("");
+const domainNameCmp = ref();
 const farm = ref() as Ref<Farm>;
 const ipv4 = ref(false);
 
 watch(
-  () => (dnc.value as any)?.domain,
-  (dnc: any) => {
-    console.log(dnc);
+  () => (domainNameCmp.value as any)?.domain,
+  (domainNameCmp: any) => {
+    console.log(domainNameCmp);
   },
 );
-async function deploy() {
+
+async function deploy(GatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
-
+  console.log(GatewayName);
+  console.log(customDomain);
   const projectName = ProjectName.Wordpress.toLowerCase();
-
   const subdomain = getSubdomain({
     deploymentName: name.value,
     projectName,
     twinId: profileManager.profile!.twinId,
   });
-  const domain = subdomain + "." + gateway.value.domain;
+  const domain = customDomain ? GatewayName.domain : subdomain + "." + GatewayName.domain;
 
   let grid: GridClient | null;
   let vm: any;
-
+  console.log({
+    accessNodeId: GatewayName.id,
+    addAccess: !!GatewayName.id,
+  });
   try {
     layout.value.validateSsh();
     grid = await getGrid(profileManager.profile!, projectName);
@@ -165,8 +174,8 @@ async function deploy() {
     vm = await deployVM(grid!, {
       name: name.value,
       network: {
-        accessNodeId: gateway.value.id,
-        addAccess: true,
+        accessNodeId: GatewayName.id,
+        addAccess: !!GatewayName.id,
       },
       machines: [
         {
@@ -197,13 +206,21 @@ async function deploy() {
   } catch (e) {
     return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Wordpress instance."));
   }
-
+  if (customDomain && ipv4.value) {
+    console.log(
+      "################################################################################################ early ",
+    );
+    layout.value.reloadDeploymentsList();
+    layout.value.setStatus("success", "Successfully deployed a Wordpress instance.");
+    layout.value.openDialog(vm, deploymentListEnvironments.wordpress);
+    return;
+  }
   try {
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
 
     await deployGatewayName(grid!, {
-      name: subdomain,
-      nodeId: gateway.value.id,
+      name: GatewayName?.useFQDN ? name.value : subdomain,
+      nodeId: GatewayName.id!,
       backends: [
         {
           ip: vm[0].interfaces[0].ip,
@@ -211,6 +228,7 @@ async function deploy() {
         },
       ],
       networkName: vm[0].interfaces[0].network,
+      fqdn: GatewayName?.useFQDN ? GatewayName?.domain : undefined,
     });
 
     layout.value.reloadDeploymentsList();
@@ -226,7 +244,6 @@ async function deploy() {
 </script>
 
 <script lang="ts">
-import CustomDomain from "../components/custom_domain.vue";
 import DomainName from "../components/domain_name.vue";
 import FarmGatewayManager from "../components/farm_gateway_mamager.vue";
 import Networks from "../components/networks.vue";
@@ -234,6 +251,7 @@ import SelectFarm from "../components/select_farm.vue";
 import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
+
 export default {
   name: "TFWordpress",
   components: {

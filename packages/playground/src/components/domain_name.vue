@@ -14,30 +14,6 @@
         </template>
       </v-tooltip>
     </v-row>
-    <!-- <v-row class="d-flex align-center mr-2 mb-2">
-      <v-tooltip location="top" text="Use subdomain with a gateway node">
-        <template #activator="{ props }">
-          <v-btn
-            color="grey-lighten-1"
-            v-bind="props"
-            :class="[{ 'ma-2': true, 'bg-primary': !customDomain }]"
-            @click="customDomain = false"
-            >Gateway</v-btn
-          >
-        </template></v-tooltip
-      >
-      <v-tooltip location="top" text="Use Custom domain name">
-        <template #activator="{ props }">
-          <v-btn
-            color="grey-lighten-1"
-            v-bind="props"
-            :class="[{ 'ma-2': true, 'bg-primary': customDomain }]"
-            @click="customDomain = true"
-            >Custom</v-btn
-          >
-        </template>
-      </v-tooltip>
-    </v-row> -->
     <v-expand-transition>
       <div class="pb-3" v-if="customDomain">
         <input-validator
@@ -89,18 +65,18 @@ export default {
   setup(props, { expose }) {
     const customDomain = ref(false);
     const domainName = ref("");
-    const domain: Ref<GatewayNode | Domain> = computed(() => {
+    const domain: Ref<GatewayNode> = computed(() => {
       if (!customDomain.value) {
         return gatewayNode.value;
       } else {
         return {
-          name: domainName.value,
-          useFQDN: props.hasIPv4,
-          gatewayNode: props.hasIPv4 ? undefined : gatewayNode.value,
+          domain: domainName.value,
+          useFQDN: !props.hasIPv4,
+          id: !props.hasIPv4 ? gatewayNode.value.id : undefined,
         };
       }
     });
-    expose({ domain });
+    expose({ domain, customDomain });
     const gatewayNode = ref() as Ref<GatewayNode>;
     const FarmGatewayManager = useFarmGatewayManager();
     const farmData = ref(FarmGatewayManager?.load());
