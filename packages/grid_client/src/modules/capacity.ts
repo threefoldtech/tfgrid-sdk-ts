@@ -51,18 +51,7 @@ class Capacity {
       options.farmId = await this.nodes.getFarmIdFromFarmName(options.farmName);
     }
 
-    if (options?.farmId && options.rentedBy === twinId) {
-      const proxyURL = this.config.proxyURL;
-      return send("get", urlJoin(proxyURL, `/nodes?rented_by=${twinId}`), "", {})
-        .then(res => {
-          return res;
-        })
-        .catch(err => {
-          throw Error(`Error while getting nodes: ${err}`);
-        });
-    }
-
-    if (options?.farmId) {
+    if (options?.farmId && !options.rentedBy) {
       const farmerbot = new FarmerBot(this.config);
       try {
         const pong = await farmerbot.pingFarm({ farmId: options?.farmId });
