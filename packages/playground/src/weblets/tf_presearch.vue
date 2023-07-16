@@ -18,9 +18,9 @@
     >
       <template #base>
         <v-alert type="warning" variant="tonal" class="mb-6">
-          You can deploy only one Presearch node per farm without reserving a dedicated public IP. So a Presearch's node
-          is deployed without public IP and didn't show up in the Presearch's Dashboard that's means there is another
-          node is deployed and you have to add public IP to your deployment.
+          You can deploy only one Presearch node per farm without reserving a dedicated public IP. So if a Presearch
+          node is deployed without public IP and didn't show up in the Presearch's Dashboard that means there is another
+          node deployed and you have to add public IP to your deployment.
         </v-alert>
         <input-validator
           :value="name"
