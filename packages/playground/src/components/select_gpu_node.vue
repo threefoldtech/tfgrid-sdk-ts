@@ -41,10 +41,9 @@
           :model-value="selectedCards"
           :items="nodeCards.map(card => getCardName(card))"
           :disabled="loadingCards"
-          :loading="loadingCards"
           multiple
           @update:model-value="selectedCards = $event"
-          v-bind="props"
+          v-bind="{ ...props, loading: props.loading || loadingCards }"
         />
       </input-tooltip>
     </input-validator>
