@@ -1,4 +1,7 @@
+import urlJoin from "url-join";
+
 import { GridClientConfig } from "../config";
+import { send } from "../helpers";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { FarmerBot, FarmerBotFindNodeModel } from "../high_level/farmerbot";
@@ -43,13 +46,26 @@ class Capacity {
   @expose
   @validateInput
   async filterNodes(options?: FilterOptions): Promise<NodeInfo[]> {
-    if (options.farmName) {
+    const twinId = this.config.twinId;
+    if (options?.farmName) {
       options.farmId = await this.nodes.getFarmIdFromFarmName(options.farmName);
     }
-    if (options.farmId) {
+
+    if (options?.farmId && options.rentedBy === twinId) {
+      const proxyURL = this.config.proxyURL;
+      return send("get", urlJoin(proxyURL, `/nodes?rented_by=${twinId}`), "", {})
+        .then(res => {
+          return res;
+        })
+        .catch(err => {
+          throw Error(`Error while getting nodes: ${err}`);
+        });
+    }
+
+    if (options?.farmId) {
       const farmerbot = new FarmerBot(this.config);
       try {
-        const pong = await farmerbot.pingFarm({ farmId: options.farmId });
+        const pong = await farmerbot.pingFarm({ farmId: options?.farmId });
         if (pong) {
           const nodeOptions: FarmerBotFindNodeModel = {
             farmId: options.farmId,
