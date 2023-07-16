@@ -47,7 +47,7 @@
                 <v-btn @click="clearInput" color="grey lighten-2 black--text">Clear</v-btn>
                 <v-btn
                   class="primary white--text"
-                  @click="transferTFT"
+                  @click="transferTFTWithAddress"
                   :loading="loadingTransfer"
                   :disabled="!isTransferValid"
                   >Submit</v-btn
@@ -62,15 +62,15 @@
               <v-form v-model="isTransferValid">
                 <!-- TODO: Handle with twin id -->
                 <v-combobox
-                  v-model="receipientAddress"
-                  :items="accountsAddresses"
+                  v-model="receptinTwinId"
+                  :items="accountTwinIds"
                   dense
                   filled
                   @keydown="setValue"
                   label="Recipient:"
                   :rules="[
-                    () => !!receipientAddress || 'This field is required',
-                    () => transferAddressCheck() || 'invalid address',
+                    () => !!receptinTwinId || 'This field is required',
+                    () => validateTwinId() || 'invalid address',
                   ]"
                 ></v-combobox>
                 <v-text-field
@@ -91,12 +91,13 @@
                 </v-text-field>
                 <span class="fee">0.01 transaction fee will be deducted</span>
               </v-form>
+
               <v-card-actions>
                 <v-spacer> </v-spacer>
                 <v-btn @click="clearInput" color="grey lighten-2 black--text">Clear</v-btn>
                 <v-btn
                   class="primary white--text"
-                  @click="transferTFT"
+                  @click="transferTFTWithAddress"
                   :loading="loadingTransfer"
                   :disabled="!isTransferValid"
                   >Submit</v-btn
@@ -111,6 +112,7 @@
 </template>
 
 <script lang="ts">
+import { QueryClient } from "@threefold/tfchain_client";
 import QrcodeVue from "qrcode.vue";
 import { Component, Vue } from "vue-property-decorator";
 
@@ -129,6 +131,25 @@ export default class TransferView extends Vue {
   amount = 0;
   loadingTransfer = false;
   isTransferValid = false;
+
+  queryClient = new QueryClient(window.configs.APP_API_URL);
+
+  receptinTwinId = "";
+  accountTwinIds: any = [];
+
+  async validateTwinId() {
+    console.log("Query", this.queryClient);
+    const twinId = this.receptinTwinId;
+    console.log("Twin", twinId);
+    const twinIdExists = await this.queryClient.twins.get({ id: parseInt(twinId) });
+    if (twinIdExists) {
+      const twin = await this.queryClient.twins.get({ id: parseInt(twinId) });
+      this.receptinTwinId = twin.id.toString();
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   mounted() {
     if (this.$api && this.$store.state.credentials.initialized) {
@@ -158,10 +179,11 @@ export default class TransferView extends Vue {
 
   clearInput() {
     this.receipientAddress = "";
+    this.receptinTwinId = "";
     this.amount = 0;
   }
 
-  transferTFT() {
+  transferTFTWithAddress() {
     transfer(
       this.$store.state.credentials.account.address,
       this.$api,
@@ -209,6 +231,15 @@ export default class TransferView extends Vue {
       this.$toasted.show(err.message);
       this.loadingTransfer = false;
     });
+  }
+
+  transferTFTWithTwinID() {
+    // transfer(
+    //   this.$store.state.credentials.account.id
+    // ).catch(err => {
+    //   this.$toasted.show(err.message);
+    //   this.loadingTransfer = false;
+    // });
   }
 
   setValue($event: { target: { value: string } }) {
