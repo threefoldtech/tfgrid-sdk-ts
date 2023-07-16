@@ -153,7 +153,11 @@
           <v-tooltip bottom nudge-bottom="12">
             <template v-slot:activator="{ on, attrs }">
               <span class="price">
-                <p>
+                <p v-if="price.label === 'Dedicated Node'">
+                  Cost of reserving a
+                  <span class="name">{{ price.label + " " }}</span> of the same specifications
+                </p>
+                <p v-else>
                   Cost of reservation on a
                   <span class="name">{{ price.label !== undefined ? price.label + " " : " " }}</span>
                 </p>

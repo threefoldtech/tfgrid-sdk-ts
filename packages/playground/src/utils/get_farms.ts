@@ -41,7 +41,7 @@ export async function getBlockedFarmSet(exclusiveFor: string): Promise<Set<numbe
     { nodeID: true },
     {
       limit: totalCount,
-      where: { deploymentData_contains: exclusiveFor, state_eq: "Created" },
+      where: { deploymentData_contains: exclusiveFor, state_eq: "Created", numberOfPublicIPs_eq: 0 },
     },
   );
 
