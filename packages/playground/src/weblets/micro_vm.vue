@@ -152,8 +152,8 @@
 <script lang="ts" setup>
 import { type Ref, ref } from "vue";
 
-import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import Network from "../components/networks.vue";
+import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type Farm, type Flist, ProjectName } from "../types";
