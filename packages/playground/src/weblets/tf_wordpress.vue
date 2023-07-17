@@ -134,7 +134,6 @@ const username = ref("admin");
 const email = ref("");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
-const gateway = ref() as Ref<GatewayNode>;
 const domainNameCmp = ref();
 const farm = ref() as Ref<Farm>;
 const ipv4 = ref(false);
@@ -145,25 +144,24 @@ watch(
     console.log(domainNameCmp);
   },
 );
-
-async function deploy(GatewayName: GatewayNode, customDomain: boolean) {
+function finalize(deployment: any, showTip?: boolean) {
+  console.log(deployment?.tip);
+  layout.value.reloadDeploymentsList();
+  layout.value.setStatus("success", "Successfully deployed a Wordpress instance.");
+  layout.value.openDialog(deployment, deploymentListEnvironments.wordpress);
+}
+async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
-  console.log(GatewayName);
-  console.log(customDomain);
   const projectName = ProjectName.Wordpress.toLowerCase();
   const subdomain = getSubdomain({
     deploymentName: name.value,
     projectName,
     twinId: profileManager.profile!.twinId,
   });
-  const domain = customDomain ? GatewayName.domain : subdomain + "." + GatewayName.domain;
+  const domain = customDomain ? gatewayName.domain : subdomain + "." + gatewayName.domain;
 
   let grid: GridClient | null;
   let vm: any;
-  console.log({
-    accessNodeId: GatewayName.id,
-    addAccess: !!GatewayName.id,
-  });
   try {
     layout.value.validateSsh();
     grid = await getGrid(profileManager.profile!, projectName);
@@ -173,8 +171,8 @@ async function deploy(GatewayName: GatewayNode, customDomain: boolean) {
     vm = await deployVM(grid!, {
       name: name.value,
       network: {
-        accessNodeId: GatewayName.id,
-        addAccess: !!GatewayName.id,
+        accessNodeId: gatewayName.id,
+        addAccess: !!gatewayName.id,
       },
       machines: [
         {
@@ -191,6 +189,7 @@ async function deploy(GatewayName: GatewayNode, customDomain: boolean) {
           entryPoint: "/sbin/zinit init",
           farmId: farm.value.farmID,
           farmName: farm.value.name,
+          publicIpv4: ipv4.value,
           country: farm.value.country,
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
@@ -206,34 +205,22 @@ async function deploy(GatewayName: GatewayNode, customDomain: boolean) {
     return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Wordpress instance."));
   }
   if (customDomain && ipv4.value) {
-    layout.value.reloadDeploymentsList();
-    layout.value.setStatus(
-      "success",
-      "Successfully deployed a Wordpress instance.",
-      "Make sure to update your dns records on the domain name provider",
-    );
-    layout.value.openDialog(vm, deploymentListEnvironments.wordpress);
+    vm[0].showTip = true;
+    finalize(vm);
     return;
   }
   try {
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
-
     await deployGatewayName(grid!, {
-      name: GatewayName?.useFQDN ? name.value : subdomain,
-      nodeId: GatewayName.id!,
-      backends: [
-        {
-          ip: vm[0].interfaces[0].ip,
-          port: 80,
-        },
-      ],
+      name: subdomain,
+      nodeId: gatewayName.id!,
+      ip: vm[0].interfaces[0].ip,
+      port: 80,
       networkName: vm[0].interfaces[0].network,
-      fqdn: GatewayName?.useFQDN ? GatewayName?.domain : undefined,
+      fqdn: gatewayName?.useFQDN ? gatewayName?.domain : undefined,
     });
 
-    layout.value.reloadDeploymentsList();
-    layout.value.setStatus("success", "Successfully deployed a Wordpress instance.");
-    layout.value.openDialog(vm, deploymentListEnvironments.wordpress);
+    finalize(vm);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
