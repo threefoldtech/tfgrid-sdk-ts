@@ -29,6 +29,10 @@
         <v-card-text>
           <template v-if="showType === 0">
             <v-form readonly v-if="contract">
+              <v-alert class="my-4" variant="tonal" v-if="contract.showTip" type="info">
+                Make sure to update your dns records on the domain name provider to add ip:
+                <span class="font-weight-bold">{{ contract.publicIP?.ip.split("/")[0] || contract.publicIP?.ip }}</span>
+              </v-alert>
               <CopyReadonlyInput label="Name" :data="contract.name" />
               <CopyReadonlyInput label="Contract ID" :data="contract.contractId" />
 
@@ -145,6 +149,7 @@ const grafanaURL = ref("");
 const contracts = computed(() => {
   if (!props.data) return [];
   if ("masters" in props.data) return [...props.data.masters, ...props.data.workers];
+  console.log(props.data);
   return Array.isArray(props.data) ? props.data : [props.data];
 });
 const contract = computed(() => contracts.value?.[activeTab.value] ?? {});
