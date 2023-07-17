@@ -59,7 +59,7 @@
         <v-tab-item>
           <template>
             <v-card class="pa-5 my-5" flat>
-              <v-form v-model="isTransferValid">
+              <v-form v-model="isTransferValidTwinId">
                 <!-- TODO: Handle with twin id -->
                 <v-combobox
                   v-model="receptinTwinId"
