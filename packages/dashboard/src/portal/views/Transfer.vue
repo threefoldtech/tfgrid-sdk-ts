@@ -26,17 +26,20 @@
                 ></v-combobox>
                 <v-text-field
                   @paste.prevent
-                  v-model="amount"
+                  v-model="amountByAddress"
                   label="Amount (TFT)"
                   type="number"
                   onkeydown="javascript: return event.keyCode == 69 || /^\+$/.test(event.key) ? false : true"
                   :rules="[
-                    () => !!amount || 'This field is required',
+                    () => !!amountByAddress || 'This field is required',
                     () =>
-                      (amount.toString().split('.').length > 1 ? amount.toString().split('.')[1].length <= 3 : true) ||
-                      'Amount must have 3 decimals only',
-                    () => amount > 0 || 'Amount cannot be negative or 0',
-                    () => amount < parseFloat($store.state.credentials.balance.free) || 'Amount cannot exceed balance',
+                      (amountByAddress.toString().split('.').length > 1
+                        ? amountByAddress.toString().split('.')[1].length <= 3
+                        : true) || 'Amount must have 3 decimals only',
+                    () => amountByAddress > 0 || 'Amount cannot be negative or 0',
+                    () =>
+                      amountByAddress < parseFloat($store.state.credentials.balance.free) ||
+                      'Amount cannot exceed balance',
                   ]"
                 >
                 </v-text-field>
@@ -69,22 +72,26 @@
                   label="Recipient:"
                   :rules="[
                     () => !!receptinTwinId || 'This field is required',
-                    () => transferTwinIdCheck() || 'invalid address',
+                    () => /^[1-9]\d*$/.test(receptinTwinId) || 'Please enter a positive integer',
+                    () => transferTwinIdCheck() || 'Twin ID does not exist',
                   ]"
                 ></v-combobox>
                 <v-text-field
                   @paste.prevent
-                  v-model="amount"
+                  v-model="amountByTwinId"
                   label="Amount (TFT)"
                   type="number"
                   onkeydown="javascript: return event.keyCode == 69 || /^\+$/.test(event.key) ? false : true"
                   :rules="[
-                    () => !!amount || 'This field is required',
+                    () => !!amountByTwinId || 'This field is required',
                     () =>
-                      (amount.toString().split('.').length > 1 ? amount.toString().split('.')[1].length <= 3 : true) ||
-                      'Amount must have 3 decimals only',
-                    () => amount > 0 || 'Amount cannot be negative or 0',
-                    () => amount < parseFloat($store.state.credentials.balance.free) || 'Amount cannot exceed balance',
+                      (amountByTwinId.toString().split('.').length > 1
+                        ? amountByTwinId.toString().split('.')[1].length <= 3
+                        : true) || 'Amount must have 3 decimals only',
+                    () => amountByTwinId > 0 || 'Amount cannot be negative or 0',
+                    () =>
+                      amountByTwinId < parseFloat($store.state.credentials.balance.free) ||
+                      'Amount cannot exceed balance',
                   ]"
                 >
                 </v-text-field>
@@ -127,7 +134,8 @@ export default class TransferView extends Vue {
   receipientAddress = "";
   accountsAddresses: any = [];
   $api: any;
-  amount = 0;
+  amountByAddress = 0;
+  amountByTwinId = 0;
   loadingTransfer = false;
   isTransferValid = false;
 
@@ -144,8 +152,10 @@ export default class TransferView extends Vue {
     const twinId = this.receptinTwinId;
     const twinDetails = await this.queryClient.twins.get({ id: parseInt(twinId) });
     if (twinDetails != null) {
+      console.log("valid twin id");
       return true;
     } else {
+      console.log("invalid twin id");
       return false;
     }
   }
@@ -179,7 +189,8 @@ export default class TransferView extends Vue {
   clearInput() {
     this.receipientAddress = "";
     this.receptinTwinId = "";
-    this.amount = 0;
+    this.amountByAddress = 0;
+    this.amountByTwinId = 0;
   }
 
   transferTFTWithAddress() {
@@ -187,7 +198,7 @@ export default class TransferView extends Vue {
       this.$store.state.credentials.account.address,
       this.$api,
       this.receipientAddress,
-      this.amount,
+      this.amountByAddress,
       (res: { events?: never[] | undefined; status: { type: string; asFinalized: string; isFinalized: string } }) => {
         this.loadingTransfer = true;
         if (res instanceof Error) {
@@ -240,7 +251,7 @@ export default class TransferView extends Vue {
         this.$store.state.credentials.account.address,
         this.$api,
         twinAddress,
-        this.amount,
+        this.amountByTwinId,
         (res: { events?: never[] | undefined; status: { type: string; asFinalized: string; isFinalized: string } }) => {
           this.loadingTransferTwinId = true;
           if (res instanceof Error) {
@@ -273,7 +284,7 @@ export default class TransferView extends Vue {
                   );
                 } else if (section === "system" && method === "ExtrinsicFailed") {
                   this.$toasted.show("Transfer failed!");
-                  this.loadingTransfer = false;
+                  this.loadingTransferTwinId = false;
                 }
               });
             }
@@ -281,7 +292,7 @@ export default class TransferView extends Vue {
         },
       ).catch(err => {
         this.$toasted.show(err.message);
-        this.loadingTransfer = false;
+        this.loadingTransferTwinId = false;
       });
     }
   }
