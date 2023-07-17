@@ -222,11 +222,12 @@
                 </v-expansion-panel>
               </v-expansion-panels>
             </v-col>
-            <v-col v-if="network == 'main'">
+            <v-col v-if="network == 'dev'">
               <v-expansion-panels v-model="receiptsPanel" :disabled="false" focusable single>
                 <v-expansion-panel>
                   <v-expansion-panel-header> Node Statistics </v-expansion-panel-header>
                   <v-expansion-panel-content>
+                    <!-- <ReceiptsCalendar :node="item" /> -->
                     <NodeMintingDetails :node="item" />
                   </v-expansion-panel-content>
                 </v-expansion-panel>
@@ -437,10 +438,11 @@ import { hex2a } from "@/portal/lib/util";
 
 import { setDedicatedNodeExtraFee } from "../lib/nodes";
 import NodeMintingDetails from "./NodeMintingDetails.vue";
+import ReceiptsCalendar from "./ReceiptsCalendar.vue";
 
 @Component({
   name: "FarmNodesTable",
-  components: { NodeMintingDetails },
+  components: { ReceiptsCalendar, NodeMintingDetails },
 })
 export default class FarmNodesTable extends Vue {
   queryClient = new QueryClient(window.configs.APP_API_URL);
