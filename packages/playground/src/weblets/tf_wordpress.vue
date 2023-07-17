@@ -139,7 +139,7 @@ const farm = ref() as Ref<Farm>;
 const ipv4 = ref(false);
 
 watch(
-  () => (domainNameCmp.value as any)?.domain,
+  () => domainNameCmp.value as any,
   (domainNameCmp: any) => {
     console.log(domainNameCmp);
   },

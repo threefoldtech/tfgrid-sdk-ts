@@ -23,9 +23,14 @@
       </div>
     </v-expand-transition>
     <div v-if="!$props.hasIPv4 || !customDomain">
-      <SelectGatewayNode v-model="gatewayNode" customDomain :farmData="farmData" />
+      <SelectGatewayNode ref="selectGateway" v-model="gatewayNode" customDomain :farmData="farmData" />
       <v-expand-transition>
-        <v-alert v-show="domain?.useFQDN && domain?.ip" class="mb-2" type="warning" variant="tonal">
+        <v-alert
+          v-show="domain?.useFQDN && domain?.ip && !selectGateway?.loading"
+          class="mb-2"
+          type="warning"
+          variant="tonal"
+        >
           Please make sure to create a record with ip: <span class="font-weight-bold">{{ domain?.ip }}</span> on the
           name provider
         </v-alert>
@@ -50,6 +55,7 @@ export default {
   },
   setup(props, { expose }) {
     const customDomain = ref(false);
+    const selectGateway = ref();
     const domainName = ref("");
     const domain: Ref<GatewayNode> = computed(() => {
       if (!customDomain.value) {
@@ -73,6 +79,7 @@ export default {
       domainName,
       farmData,
       domain,
+      selectGateway,
     };
   },
   components: { SelectGatewayNode },

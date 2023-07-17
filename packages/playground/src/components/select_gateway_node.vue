@@ -3,6 +3,7 @@
     :value="$props.modelValue?.id"
     :rules="[validators.required('Gateway node is required.')]"
     #="{ props }"
+    ref="test"
   >
     <input-tooltip
       tooltip="Creates a subdomain for your instance on the selected domain to be able to access your instance from the browser."
@@ -47,6 +48,8 @@
 import type { FilterOptions } from "@threefold/grid_client";
 import { onMounted, type Ref, ref, watch } from "vue";
 
+import { ValidatorStatus } from "@/hooks/form_validator";
+
 import { useProfileManager } from "../stores";
 import type { GatewayNode } from "../types";
 import type { Farm } from "../types";
@@ -62,7 +65,7 @@ const loading = ref(false);
 const items = ref<any[]>([]);
 const page = ref(1);
 const size = 50;
-const test = 0;
+const validator = ref();
 
 onMounted(loadNextPage);
 type gatewayFilters = Omit<FilterOptions, "gateway">;
@@ -77,6 +80,7 @@ watch(
 );
 async function loadNextPage() {
   loading.value = true;
+  validator.value?.setStatus(ValidatorStatus.Init);
   const grid = await getGrid(profileManager.profile!);
   let nodes = [];
   const options: gatewayFilters = {
@@ -87,15 +91,13 @@ async function loadNextPage() {
   nodes = await loadGatewayNodes(grid!, options);
 
   if (!nodes.length && props.customDomain && props.farmData?.country) {
-    console.log("Nearest in same country");
     options.farmId = undefined;
     options.country = props.farmData.country;
-    nodes = await loadGatewayNodes(grid!, options);
+    nodes = await loadGatewayNodes(grid!, options); // search in the same country
   }
   if (!nodes.length && props.customDomain) {
-    console.log("Network");
     options.country = options.farmId = undefined;
-    nodes = await loadGatewayNodes(grid!, options);
+    nodes = await loadGatewayNodes(grid!, options); // search in the whole network
   }
 
   if (nodes.length === 0 || nodes.length < size) {
@@ -103,13 +105,14 @@ async function loadNextPage() {
   }
 
   items.value = items.value.concat(nodes.map(normalizeGatewayNode));
+  const nodeExists = !!nodes.find(({ nodeId }) => nodeId == props.modelValue?.id);
   loading.value = false;
 
-  if (!items.value.length) {
+  if (props.modelValue && !nodeExists) {
     emits("update:model-value", undefined);
   }
 }
-
+defineExpose({ loading });
 function normalizeGatewayNode(item: any): GatewayNode {
   return {
     id: +item.nodeId,
