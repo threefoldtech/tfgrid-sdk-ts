@@ -37,7 +37,7 @@
 import { computed, type Ref, ref } from "vue";
 
 import SelectGatewayNode from "../components/select_gateway_node.vue";
-import type { GatewayNode, Validators } from "../types";
+import type { GatewayNode } from "../types";
 import { useFarmGatewayManager } from "./farm_gateway_mamager.vue";
 
 export default {
@@ -46,15 +46,6 @@ export default {
     hasIPv4: {
       type: Boolean,
       required: true,
-    },
-  },
-  methods: {
-    dynamicValidateDomain(validators: Validators) {
-      return (value: string) => {
-        if (this.customDomain) {
-          return validators.isFQDN("test required")(value);
-        }
-      };
     },
   },
   setup(props, { expose }) {
