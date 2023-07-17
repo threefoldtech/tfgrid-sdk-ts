@@ -13,7 +13,7 @@
     <template v-slot:table>
       <div class="d-flex justify-start mt-11">
         <v-alert class="mb-0" dense text type="info">
-          Node statuses are updated every 2 hours. For a realtime status, please click on the row.
+          Node statuses are updated every 90 minutes. For a realtime status, please click on the row.
         </v-alert>
       </div>
       <v-row class="py-2" align="center" justify="space-between">
