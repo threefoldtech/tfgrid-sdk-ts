@@ -60,7 +60,6 @@
           <template>
             <v-card class="pa-5 my-5" flat>
               <v-form v-model="isTransferValidTwinId">
-                <!-- TODO: Handle with twin id -->
                 <v-combobox
                   v-model="receptinTwinId"
                   :items="accountTwinIds"
@@ -144,7 +143,6 @@ export default class TransferView extends Vue {
   async transferTwinIdCheck() {
     const twinId = this.receptinTwinId;
     const twinDetails = await this.queryClient.twins.get({ id: parseInt(twinId) });
-    console.log("twinDetails", twinDetails);
     if (twinDetails != null) {
       return true;
     } else {
@@ -238,7 +236,6 @@ export default class TransferView extends Vue {
     const twinDetails = await this.queryClient.twins.get({ id: parseInt(this.receptinTwinId) });
     if (twinDetails != null) {
       const twinAddress = twinDetails.accountId;
-      console.log("twinAddress", twinAddress);
       transfer(
         this.$store.state.credentials.account.address,
         this.$api,
