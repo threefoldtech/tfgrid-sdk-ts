@@ -128,11 +128,13 @@
                   </v-tooltip>
                 </v-col>
 
-                <template v-if="network !== networkEnv.main">
+                <template v-if="network !== networkEnv.main && item.nodesCount > 0">
                   <v-col align="center">
                     <v-tooltip top>
                       <template v-slot:activator="{ on, attrs }">
-                        <v-btn v-bind="attrs" @click="downloadAllReceipts" v-on="on">Download Minting Receipts</v-btn>
+                        <v-btn v-bind="attrs" @click="downloadFarmReceipts(item.id)" v-on="on"
+                          >Download Minting Receipts</v-btn
+                        >
                       </template>
                       <span> Download Farm Nodes Minting Receipts</span>
                     </v-tooltip>
@@ -305,17 +307,22 @@ export default class FarmsView extends Vue {
     this.farmName;
   }
 
-  async downloadAllReceipts() {
+  async downloadFarmReceipts(farmId: number) {
+    // the farm summary receipt
     const docSum = new jsPDF();
-    generateNodeSummary(docSum, this.nodes);
+    const farmNodes = this.nodes.filter((node: nodeInterface) => node.farmId == farmId);
+    generateNodeSummary(docSum, farmNodes);
     docSum.addPage();
 
-    this.nodes.map((node: nodeInterface, i: number) => {
+    // each node receipt
+    farmNodes.map((node: nodeInterface, i: number) => {
       generateReceipt(docSum, node);
       docSum.text(`${i + 1}`, 185, docSum.internal.pageSize.height - 10);
       docSum.addPage();
     });
-    docSum.save("nodes_receipts.pdf");
+
+    // download the full receipts
+    docSum.save(`farm_${farmId}_receipt.pdf`);
   }
 
   unmounted() {
