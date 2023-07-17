@@ -259,8 +259,8 @@ import type { GPUNodeType } from "@/utils/filter_node_with_gpu";
 
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectFarm from "../components/select_farm.vue";
-import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SelectGPUNode from "../components/select_gpu_node.vue";
+import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
 
