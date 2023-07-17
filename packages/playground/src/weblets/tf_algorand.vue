@@ -133,17 +133,47 @@
         </template>
       </AlgorandCapacity>
 
+      <input-tooltip
+        inline
+        tooltip="Click to know more about dedicated nodes."
+        href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+      >
+        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" />
+      </input-tooltip>
+
+      <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+        <v-switch color="primary" inset label="Certified" v-model="certified" />
+      </input-tooltip>
+
       <SelectFarm
         :filters="{
           cpu: cpu,
           memory: memory,
           ssd: storage + (type === 'indexer' ? 50 : 0),
           publicIp: ipv4,
+          dedicated: dedicated,
+          certified: certified,
         }"
         v-model="farm"
       />
+      <SelectDedicatedNode
+        v-if="dedicated"
+        v-model="selectedDedicatedNode"
+        :filters="{
+          cpu,
+          memory,
+          ipv4: ipv4,
+          ssd: storage + (type === 'indexer' ? 50 : 0),
+          ipv6: ipv4,
+          name: name,
+          disks: disks,
+          disk: 0,
+          flist: flist,
+          rentedBy: profileManager.profile?.twinId,
+          certified: certified,
+        }"
+      />
     </form-validator>
-
     <template #footer-actions>
       <v-btn color="primary" variant="tonal" @click="deploy" :disabled="!valid"> Deploy </v-btn>
     </template>
@@ -156,8 +186,9 @@ import { computed, type Ref, ref, watch } from "vue";
 import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import { type Farm, ProjectName, type Validators } from "../types";
-import { deployVM } from "../utils/deploy_vm";
+import { type Farm, type Flist, ProjectName, type Validators } from "../types";
+import { deployVM, type Disk } from "../utils/deploy_vm";
+import type { Node } from "../utils/filter_dedicated_node";
 import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
 
@@ -165,7 +196,10 @@ const layout = useLayout();
 const valid = ref(false);
 const lastRoundInput = ref();
 const profileManager = useProfileManager();
-
+const flist: Flist = {
+  value: "https://hub.grid.tf/tf-official-apps/algorand-latest.flist",
+  entryPoint: "/sbin/zinit init",
+};
 const name = ref(generateName(9, { prefix: "al" }));
 const ipv4 = ref(false);
 const cpu = ref() as Ref<number>;
@@ -178,9 +212,22 @@ const wordsLength = computed(() => (account.value ? account.value.split(" ").len
 const firstRound = ref(24000000);
 const lastRound = ref(26000000);
 const farm = ref() as Ref<Farm>;
+const disks = ref() as Ref<Disk[]>;
+const dedicated = ref(false);
+const certified = ref(false);
+const selectedDedicatedNode = ref() as Ref<Node>;
 
 watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()));
 
+disks.value =
+  type.value === "indexer"
+    ? [
+        {
+          size: 50,
+          mountPoint: "/var/lib/docker",
+        },
+      ]
+    : [];
 async function deploy() {
   layout.value.setStatus("deploy");
 
@@ -202,20 +249,16 @@ async function deploy() {
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
-          flist: "https://hub.grid.tf/tf-official-apps/algorand-latest.flist",
-          entryPoint: "/sbin/zinit init",
+          flist: flist.value,
+          entryPoint: flist.entryPoint,
+          disks: disks.value,
           rootFilesystemSize: storage.value,
           publicIpv4: ipv4.value,
           planetary: true,
-          disks:
-            type.value === "indexer"
-              ? [
-                  {
-                    size: 50,
-                    mountPoint: "/var/lib/docker",
-                  },
-                ]
-              : [],
+          nodeId: dedicated.value ? selectedDedicatedNode.value.nodeId : undefined,
+          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          certified: certified.value,
+
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "NETWORK", value: network.value },
@@ -256,6 +299,7 @@ function customLastRoundValidation(validators: Validators) {
 
 <script lang="ts">
 import AlgorandCapacity from "../components/algorand_capacity.vue";
+import SelectDedicatedNode from "../components/select_dedicated_node.vue";
 import SelectFarm from "../components/select_farm.vue";
 import { deploymentListEnvironments } from "../constants";
 import { normalizeError } from "../utils/helpers";
@@ -264,6 +308,7 @@ export default {
   name: "TfAlgorand",
   components: {
     SelectFarm,
+    SelectDedicatedNode,
     AlgorandCapacity,
   },
 };

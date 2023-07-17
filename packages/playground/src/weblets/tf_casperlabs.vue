@@ -33,14 +33,44 @@
         :recommended="{ cpu: 4, memory: 1024 * 32, disk: 1000 }"
       />
       <SelectGatewayNode v-model="gateway" />
+
+      <input-tooltip
+        inline
+        tooltip="Click to know more about dedicated nodes."
+        href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+      >
+        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" />
+      </input-tooltip>
+
+      <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+        <v-switch color="primary" inset label="Certified" v-model="certified" />
+      </input-tooltip>
+
       <SelectFarm
         :filters="{
           cpu: solution?.cpu,
           memory: solution?.memory,
           ssd: solution?.disk,
           publicIp: false,
+          dedicated: dedicated,
+          certified: certified,
         }"
         v-model="farm"
+      />
+      <SelectDedicatedNode
+        v-if="dedicated"
+        v-model="selectedDedicatedNode"
+        :filters="{
+          cpu: solution?.cpu,
+          memory: solution?.memory,
+          ssd: solution?.disk,
+          disks: disks,
+          disk: 0,
+          name: name,
+          flist: flist,
+          rentedBy: profileManager.profile?.twinId,
+          certified: certified,
+        }"
       />
     </form-validator>
 
@@ -56,9 +86,10 @@ import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
+import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
-import { deployVM } from "../utils/deploy_vm";
+import { deployVM, type Disk } from "../utils/deploy_vm";
+import type { Node } from "../utils/filter_dedicated_node";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
@@ -72,6 +103,20 @@ const name = ref(generateName(9, { prefix: "cl" }));
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;
+const disks = ref() as Ref<Disk[]>;
+const flist: Flist = {
+  value: "https://hub.grid.tf/tf-official-apps/casperlabs-latest.flist",
+  entryPoint: "/sbin/zinit init",
+};
+const dedicated = ref(false);
+const certified = ref(false);
+const selectedDedicatedNode = ref() as Ref<Node>;
+disks.value = [
+  {
+    size: solution.value?.disk,
+    mountPoint: "/data",
+  },
+];
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -105,14 +150,9 @@ async function deploy() {
           name: name.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
-          disks: [
-            {
-              size: solution.value.disk,
-              mountPoint: "/data",
-            },
-          ],
-          flist: "https://hub.grid.tf/tf-official-apps/casperlabs-latest.flist",
-          entryPoint: "/sbin/zinit init",
+          disks: disks.value,
+          flist: flist.value,
+          entryPoint: flist.entryPoint,
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
@@ -120,6 +160,9 @@ async function deploy() {
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "CASPERLABS_HOSTNAME", value: domain },
           ],
+          nodeId: dedicated.value ? selectedDedicatedNode.value.nodeId : undefined,
+          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          certified: certified.value,
         },
       ],
     });
@@ -155,6 +198,7 @@ async function deploy() {
 </script>
 
 <script lang="ts">
+import SelectDedicatedNode from "../components/select_dedicated_node.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
@@ -166,6 +210,7 @@ export default {
     SelectSolutionFlavor,
     SelectGatewayNode,
     SelectFarm,
+    SelectDedicatedNode,
   },
 };
 </script>
