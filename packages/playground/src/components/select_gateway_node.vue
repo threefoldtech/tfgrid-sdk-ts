@@ -3,7 +3,6 @@
     :value="$props.modelValue?.id"
     :rules="[validators.required('Gateway node is required.')]"
     #="{ props }"
-    ref="test"
   >
     <input-tooltip
       tooltip="Creates a subdomain for your instance on the selected domain to be able to access your instance from the browser."

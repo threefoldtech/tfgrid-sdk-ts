@@ -138,12 +138,6 @@ const domainNameCmp = ref();
 const farm = ref() as Ref<Farm>;
 const ipv4 = ref(false);
 
-watch(
-  () => domainNameCmp.value as any,
-  (domainNameCmp: any) => {
-    console.log(domainNameCmp);
-  },
-);
 function finalize(deployment: any, showTip?: boolean) {
   console.log(deployment?.tip);
   layout.value.reloadDeploymentsList();
@@ -232,10 +226,9 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
 
 <script lang="ts">
 import DomainName from "../components/domain_name.vue";
-import FarmGatewayManager from "../components/farm_gateway_mamager.vue";
+import FarmGatewayManager from "../components/farm_gateway_manager.vue";
 import Networks from "../components/networks.vue";
 import SelectFarm from "../components/select_farm.vue";
-import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
 
