@@ -114,12 +114,7 @@ export interface GatewayNode {
   id?: number;
   domain: string;
   useFQDN?: boolean;
-}
-
-export interface Domain {
-  domain: string;
-  useFQDN: boolean;
-  gateway?: GatewayNode;
+  ip?: string;
 }
 
 export interface SMTPServer {

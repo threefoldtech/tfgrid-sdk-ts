@@ -95,7 +95,6 @@
           v-model="farm"
         />
         <DomainName :has-i-pv4="ipv4" ref="domainNameCmp"></DomainName>
-        {{ domainNameCmp?.domain }}
       </FarmGatewayManager>
     </form-validator>
 
@@ -207,11 +206,12 @@ async function deploy(GatewayName: GatewayNode, customDomain: boolean) {
     return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Wordpress instance."));
   }
   if (customDomain && ipv4.value) {
-    console.log(
-      "################################################################################################ early ",
-    );
     layout.value.reloadDeploymentsList();
-    layout.value.setStatus("success", "Successfully deployed a Wordpress instance.");
+    layout.value.setStatus(
+      "success",
+      "Successfully deployed a Wordpress instance.",
+      "Make sure to update your dns records on the domain name provider",
+    );
     layout.value.openDialog(vm, deploymentListEnvironments.wordpress);
     return;
   }

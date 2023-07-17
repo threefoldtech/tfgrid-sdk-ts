@@ -13,7 +13,11 @@
         :items="items"
         item-title="domain"
         return-object
-        v-bind="props"
+        v-bind="{
+          ...props,
+          error: items.length == 0 ? false : props.error,
+          errorMessages: items.length == 0 ? undefined : props.errorMessages,
+        }"
         @update:model-value="$emit('update:model-value', $event)"
         :loading="items.length === 0 && loading"
         :disabled="items.length === 0 && loading"
@@ -50,7 +54,7 @@ import { loadGatewayNodes } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 
 const props = defineProps<{ modelValue?: GatewayNode; farmData?: Farm; customDomain?: boolean }>();
-const emits = defineEmits<{ (event: "update:model-value", value: GatewayNode): void }>();
+const emits = defineEmits<{ (event: "update:model-value", value: GatewayNode | undefined): void }>();
 
 const profileManager = useProfileManager();
 
@@ -58,6 +62,7 @@ const loading = ref(false);
 const items = ref<any[]>([]);
 const page = ref(1);
 const size = 50;
+const test = 0;
 
 onMounted(loadNextPage);
 type gatewayFilters = Omit<FilterOptions, "gateway">;
@@ -100,8 +105,8 @@ async function loadNextPage() {
   items.value = items.value.concat(nodes.map(normalizeGatewayNode));
   loading.value = false;
 
-  if (items.value.length > 0) {
-    emits("update:model-value", items.value[0]);
+  if (!items.value.length) {
+    emits("update:model-value", undefined);
   }
 }
 
@@ -109,6 +114,7 @@ function normalizeGatewayNode(item: any): GatewayNode {
   return {
     id: +item.nodeId,
     domain: item.publicConfig.domain,
+    ip: item.publicConfig.ipv4,
   };
 }
 </script>

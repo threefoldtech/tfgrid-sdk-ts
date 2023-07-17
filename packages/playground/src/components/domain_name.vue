@@ -1,21 +1,13 @@
 <template>
   <v-sheet width="100%" v-model="domain">
-    <v-row class="d-flex align-center mx-2 mb-2">
-      <h6 class="text-h5">Domain Name</h6>
-      <v-tooltip location="top" text="Use Custom domain name">
-        <template #activator="{ props }">
-          <v-btn
-            color="grey-lighten-1"
-            v-bind="props"
-            :class="[{ 'ma-2': true, 'bg-primary': customDomain }]"
-            @click="customDomain = !customDomain"
-            >Custom</v-btn
-          >
-        </template>
-      </v-tooltip>
-    </v-row>
+    <h6 class="text-h5">Domain Name</h6>
+    <v-tooltip location="top" text="Use Custom domain name">
+      <template #activator="{ props }">
+        <v-switch v-bind="props" v-model="customDomain" hide-details color="primary" inset label="custom domain" />
+      </template>
+    </v-tooltip>
     <v-expand-transition>
-      <div class="pb-3" v-if="customDomain">
+      <div v-if="customDomain">
         <input-validator
           :value="domainName"
           :rules="[
@@ -30,19 +22,22 @@
         </input-validator>
       </div>
     </v-expand-transition>
-    <SelectGatewayNode
-      v-model="gatewayNode"
-      v-if="!$props.hasIPv4 || !customDomain"
-      customDomain
-      :farmData="farmData"
-    />
+    <div v-if="!$props.hasIPv4 || !customDomain">
+      <SelectGatewayNode v-model="gatewayNode" customDomain :farmData="farmData" />
+      <v-expand-transition>
+        <v-alert v-show="domain?.useFQDN && domain?.ip" class="mb-2" type="warning" variant="tonal">
+          Please make sure to create a record with ip: <span class="font-weight-bold">{{ domain?.ip }}</span> on the
+          name provider
+        </v-alert>
+      </v-expand-transition>
+    </div>
   </v-sheet>
 </template>
 <script lang="ts">
 import { computed, type Ref, ref } from "vue";
 
 import SelectGatewayNode from "../components/select_gateway_node.vue";
-import type { Domain, GatewayNode, Validators } from "../types";
+import type { GatewayNode, Validators } from "../types";
 import { useFarmGatewayManager } from "./farm_gateway_mamager.vue";
 
 export default {
@@ -72,7 +67,8 @@ export default {
         return {
           domain: domainName.value,
           useFQDN: !props.hasIPv4,
-          id: !props.hasIPv4 ? gatewayNode.value.id : undefined,
+          id: !props.hasIPv4 ? gatewayNode.value?.id : undefined,
+          ip: !props.hasIPv4 ? gatewayNode.value?.ip : undefined,
         };
       }
     });
