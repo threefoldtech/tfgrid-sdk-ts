@@ -134,7 +134,7 @@ export default class FundsCard extends Vue {
       ).catch((err: { message: string }) => {
         console.log(err.message);
         this.loadingAddTFT = false;
-        this.$toasted.show("Get more TFT failed!");
+        this.$toasted.show("Get more TFT failed! <br>Please contact support");
       });
     }
   }
