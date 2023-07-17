@@ -114,7 +114,7 @@ function normalizeGatewayNode(item: any): GatewayNode {
   return {
     id: +item.nodeId,
     domain: item.publicConfig.domain,
-    ip: item.publicConfig.ipv4,
+    ip: item.publicConfig.ipv4.split("/")[0],
   };
 }
 </script>
