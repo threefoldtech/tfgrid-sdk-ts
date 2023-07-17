@@ -43,7 +43,7 @@ import { computed, type Ref, ref } from "vue";
 
 import SelectGatewayNode from "../components/select_gateway_node.vue";
 import type { GatewayNode } from "../types";
-import { useFarmGatewayManager } from "./farm_gateway_mamager.vue";
+import { useFarmGatewayManager } from "./farm_gateway_manager.vue";
 
 export default {
   name: "DomainName",
