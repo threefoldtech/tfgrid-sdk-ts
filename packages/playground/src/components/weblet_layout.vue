@@ -42,7 +42,7 @@
       <v-alert class="mb-4 mx-4" type="info" variant="tonal">
         You need to rent a dedicated node from our
         <a :href="dashboardURL" target="_blank" class="app-link"> Dashboard </a>
-        before deploying on a dedicated node.
+        before deploying on it.
       </v-alert>
     </template>
 

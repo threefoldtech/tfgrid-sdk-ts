@@ -147,11 +147,11 @@ export interface Machine {
   disks?: Disk[];
   country?: string;
   qsfsDisks?: QsfsDisk[];
-  hasGPU?: boolean;
-  nodeId?: number;
   gpus?: string[];
-  dedicated?: boolean;
+  hasGPU?: boolean;
   certified?: boolean;
+  rentedBy?: number;
+  nodeId?: number;
 }
 
 export interface DeployVMOptions {

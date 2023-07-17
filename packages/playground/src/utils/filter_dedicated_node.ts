@@ -25,7 +25,6 @@ export default class DedicatedNode {
           publicIPs: machine.publicIpv4,
           availableFor: this.grid.twinId,
           hasGPU: machine.hasGPU,
-          dedicated: machine.dedicated,
           rentedBy: this.grid.twinId,
         };
         return await this.grid.capacity.filterNodes(filters);

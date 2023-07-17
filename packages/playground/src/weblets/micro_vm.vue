@@ -116,7 +116,7 @@
             flist: flist,
             disks: disks,
             disk: 0,
-            dedicated: dedicated,
+            rentedBy: profileManager.profile?.twinId,
             certified: certified,
           }"
         />
@@ -313,7 +313,7 @@ async function deploy() {
           publicIpv6: ipv6.value,
           rootFilesystemSize: rootFsSize.value,
           nodeId: dedicated.value ? selectedDedicatedNode.value.nodeId : undefined,
-          dedicated: dedicated.value,
+          rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },
       ],

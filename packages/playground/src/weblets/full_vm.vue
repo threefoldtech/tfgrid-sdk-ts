@@ -127,7 +127,6 @@
             memory,
             publicIp: ipv4,
             ssd: disks.reduce((total, disk) => total + disk.size, diskSize + 2),
-            dedicated: dedicated,
             certified: certified,
           }"
           v-model="farm"
@@ -168,7 +167,7 @@
             hasGPU: hasGPU,
             planetary: planetary,
             wireguard: wireguard,
-            dedicated: dedicated,
+            rentedBy: profileManager.profile?.twinId,
             certified: certified,
           }"
         />
@@ -328,7 +327,7 @@ async function deploy() {
           hasGPU: hasGPU.value,
           nodeId: nodeId.value,
           gpus: hasGPU.value ? selectedNodewithCards.value.cards.map(card => card.id) : undefined,
-          dedicated: dedicated.value,
+          rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },
       ],

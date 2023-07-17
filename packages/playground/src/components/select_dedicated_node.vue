@@ -32,7 +32,7 @@
 import { onMounted, type PropType, ref, watch } from "vue";
 
 import { useProfileManager } from "../stores/profile_manager";
-import { type Flist, ProjectName } from "../types";
+import type { Flist } from "../types";
 import DedicatedNode, { type Node } from "../utils/filter_dedicated_node";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
@@ -55,7 +55,7 @@ export interface DedicatedMachineFilters {
     mountPoint: string;
   }[];
   certified?: boolean;
-  dedicated: boolean;
+  rentedBy?: number;
 }
 
 const emits = defineEmits<{ (event: "update:modelValue", value?: Node): void }>();
@@ -90,51 +90,47 @@ async function checkNode() {
   errorMessage.value = "";
   loadingNodes.value = true;
   const filters = props.filters;
-  if (filters.dedicated) {
-    const projectName = ProjectName.Fullvm.toLowerCase();
-    const grid = await getGrid(profileManager.profile!, projectName);
-
-    if (grid) {
-      const filteredDNodes = new DedicatedNode(grid);
-      filteredDNodes
-        .getDedicatedNodes({
-          name: filters.name,
-          machines: [
-            {
-              name: filters.name,
-              cpu: filters.cpu,
-              memory: filters.memory,
-              flist: filters.flist!.value,
-              entryPoint: filters.flist!.entryPoint,
-              disks: [{ size: filters.disk, mountPoint: "/" }, ...filters.disks],
-              publicIpv4: filters.ipv4,
-              publicIpv6: filters.ipv6,
-              planetary: filters.planetary,
-              envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
-              rootFilesystemSize: 2,
-              hasGPU: filters.hasGPU,
-              dedicated: filters.dedicated,
-            },
-          ],
-          network: { addAccess: filters.wireguard },
-        })
-        .then(res =>
-          res.forEach(nodes => {
-            if (nodes.length) {
-              const node = nodes[0].nodeId;
-              if (!availableNodes.value.includes(node)) {
-                availableNodes.value.push(node);
-                selectedNode.value = node;
-              }
-            } else {
-              selectedNode.value = undefined;
-              availableNodes.value = [];
+  const grid = await getGrid(profileManager.profile!);
+  if (grid && filters.rentedBy === grid!.twinId) {
+    const filteredDNodes = new DedicatedNode(grid);
+    filteredDNodes
+      .getDedicatedNodes({
+        name: filters.name,
+        machines: [
+          {
+            name: filters.name,
+            cpu: filters.cpu,
+            memory: filters.memory,
+            flist: filters.flist!.value,
+            entryPoint: filters.flist!.entryPoint,
+            disks: [{ size: filters.disk, mountPoint: "/" }, ...filters.disks],
+            publicIpv4: filters.ipv4,
+            publicIpv6: filters.ipv6,
+            planetary: filters.planetary,
+            envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
+            rootFilesystemSize: 2,
+            hasGPU: filters.hasGPU,
+            rentedBy: grid!.twinId,
+          },
+        ],
+        network: { addAccess: filters.wireguard },
+      })
+      .then(res =>
+        res.forEach(nodes => {
+          if (nodes.length) {
+            const node = nodes[0].nodeId;
+            if (!availableNodes.value.includes(node)) {
+              availableNodes.value.push(node);
+              selectedNode.value = node;
             }
-          }),
-        )
-        .catch(e => (errorMessage.value = normalizeError(e, "Failed to deploy a full virtual machine instance.")))
-        .then(() => (loadingNodes.value = false));
-    }
+          } else {
+            selectedNode.value = undefined;
+            availableNodes.value = [];
+          }
+        }),
+      )
+      .catch(e => (errorMessage.value = normalizeError(e, "Failed to deploy a full virtual machine instance.")))
+      .then(() => (loadingNodes.value = false));
   }
 }
 </script>

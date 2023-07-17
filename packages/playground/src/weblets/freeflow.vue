@@ -78,7 +78,7 @@
           ssd: solution?.disk,
           disks: disks,
           disk: 0,
-          dedicated: dedicated,
+          rentedBy: profileManager.profile?.twinId,
           certified: certified,
         }"
       />
@@ -172,7 +172,7 @@ async function deploy() {
             { key: "NODE_ENV", value: "staging" },
           ],
           nodeId: dedicated.value ? selectedDedicatedNode.value.nodeId : undefined,
-          dedicated: dedicated.value,
+          rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },
       ],
