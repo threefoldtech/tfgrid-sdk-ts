@@ -331,7 +331,8 @@ export default class Dashboard extends Vue {
   }
 
   public filteredAccounts() {
-    return this.accounts.filter(account => account.active);
+    return [this.$store.state.credentials.account];
+    // return this.accounts.filter(account => account.active);
   }
 
   public isAccountSelected() {
@@ -354,8 +355,8 @@ export default class Dashboard extends Vue {
 
   public redirectToHomePage() {
     this.accounts.map(account => (account.active = false));
-    this.$store.commit("UNSET_CREDENTIALS");
-    this.routes[0].active = false;
+    // this.$store.commit("UNSET_CREDENTIALS");
+    // this.routes[0].active = false;
     if (this.$route.path !== "/") {
       this.$router.push({
         name: "accounts",

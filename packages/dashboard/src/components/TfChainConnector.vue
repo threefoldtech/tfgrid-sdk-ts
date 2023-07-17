@@ -186,6 +186,7 @@
 </template>
 
 <script lang="ts">
+import type { ApiPromise } from "@polkadot/api";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import md5 from "md5";
@@ -194,6 +195,7 @@ import { generateKeyPair } from "web-ssh-keygen";
 
 import { downloadAsFile, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
 import QrcodeGenerator from "./QrcodeGenerator.vue";
+// import { getTwin } from "@/portal/lib/twin";
 
 const version = "v1";
 const key = `wallet.${version}`;
@@ -234,6 +236,7 @@ export default class TfChainConnector extends Vue {
   public password = "";
   public password2 = "";
   public isValidForm = false;
+  public $api!: ApiPromise;
 
   public canLogin = typeof localStorage.getItem(key) === "string";
 
@@ -324,6 +327,30 @@ export default class TfChainConnector extends Vue {
       const grid = await getGrid(mnemonic);
       this.$store.state.profile = await loadProfile(grid);
       sessionStorage.setItem(key, this.loginPassword);
+
+      // const account = await getTwin(this.$api as any, this.$store.state.profile.twin);
+      // console.log(account);
+
+      console.log(this.$store.state.profile.address);
+
+      this.$store.commit("SET_CREDENTIALS", {
+        api: this.$api,
+        account: {
+          address: this.$store.state.profile.address,
+          meta: {
+            genesisHash: "",
+            name: "User",
+          },
+          type: "sr25519",
+          active: true,
+        },
+      });
+      this.$root.$emit("selectAccount");
+      this.$router.push({
+        name: "account",
+        path: "account",
+        params: { accountID: `${this.$store.state.profile.address}` },
+      });
     } catch (e) {
       console.log("error", e);
     } finally {
