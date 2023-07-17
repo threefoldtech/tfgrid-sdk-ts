@@ -88,9 +88,8 @@ export async function getFarmPayoutV2Address(
 }
 
 export async function getNodesCount(api: { query: any }, farmID: number) {
-  const nodes = await axios.get(`${config.gridproxyUrl}/nodes?farm_ids=${farmID}&ret_count=true`);
-  const count = nodes.headers["count"];
-  return count;
+  const nodes = await axios.get(`${config.gridproxyUrl}/nodes?farm_ids=${farmID}`);
+  return nodes.data.length;
 }
 
 export async function setFarmPayoutV2Address(
@@ -170,7 +169,7 @@ export async function getNodesByFarmID(farmIDs: any[], page: number, size: numbe
     try {
       const network = config.network;
       node.receipts = [];
-      if (network == "main") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
+      if (network == "dev") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
       node.availability = await getNodeAvailability(node.nodeId);
     } catch (error) {
       node.receipts = [];
