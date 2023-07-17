@@ -55,11 +55,11 @@
             </v-col>
             <v-divider vertical style="color: black"></v-divider>
             <v-col cols="1" sm="10">
-              <v-list-item> {{ $store.state.profile.twin }} </v-list-item>
+              <v-list-item> {{ twin.id }} </v-list-item>
               <v-divider></v-divider>
-              <v-list-item> {{ $store.state.profile.address }} </v-list-item>
+              <v-list-item> {{ twin.pk }} </v-list-item>
               <v-divider></v-divider>
-              <v-list-item> {{ "dev" }} </v-list-item>
+              <v-list-item> {{ twin.relay }} </v-list-item>
             </v-col>
           </v-row>
         </v-list>
@@ -91,7 +91,7 @@ import config from "@/portal/config";
 import { getGrid } from "@/utils/grid";
 
 import WelcomeWindow from "../components/WelcomeWindow.vue";
-import { deleteTwin, updateRelay } from "../lib/twin";
+import { deleteTwin, getTwin, updateRelay } from "../lib/twin";
 import { TwinType } from "../store/types";
 
 @Component({
@@ -125,13 +125,8 @@ export default class TwinView extends Vue {
 
   async mounted() {
     if (this.$store.state.profile) {
-      const grid = await getGrid(this.$store.state.profile.mnemonic);
-      this.twin = {
-        id: grid.twinId.toString(),
-        pk: grid.tfclient.address,
-        relay: "relay.dev.grid.tf",
-      };
-      console.log(this.items);
+      this.twin = await getTwin(this.$api, this.$store.state.profile.twin);
+      console.log(this.twin);
 
       this.selectedName = this.items.filter(item => item.id === this.selectedItem.item_id)[0].name;
     } else {
@@ -153,7 +148,8 @@ export default class TwinView extends Vue {
 
   public updateTwin() {
     this.loadingEditTwin = true;
-    if (this.$store.state.credentials.twin.relay && this.selectedName === this.$store.state.credentials.twin.relay) {
+
+    if (this.selectedName === this.twin.relay) {
       this.$toasted.show(`Chosen relay is the current relay!`);
       this.loadingEditTwin = false;
       return;
