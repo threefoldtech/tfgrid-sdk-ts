@@ -113,7 +113,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
     vm = await deployVM(grid!, {
       name: name.value,
       network: {
-        addAccess: !!gatewayName.ip,
+        addAccess: !!gatewayName.id,
         accessNodeId: gatewayName.id,
       },
       machines: [
