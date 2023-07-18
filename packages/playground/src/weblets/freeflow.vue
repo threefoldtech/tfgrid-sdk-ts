@@ -67,9 +67,8 @@
         v-model="farm"
       />
 
-      <SelectDedicatedNode
-        v-if="dedicated"
-        v-model="selectedDedicatedNode"
+      <SelectNode
+        v-model="selectedNode"
         :filters="{
           name: threebotName,
           flist: flist,
@@ -78,7 +77,7 @@
           ssd: solution?.disk,
           disks: disks,
           disk: 0,
-          rentedBy: profileManager.profile?.twinId,
+          rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
           certified: certified,
         }"
       />
@@ -99,7 +98,7 @@ import { useProfileManager } from "../stores";
 import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
-import type { Node } from "../utils/filter_dedicated_node";
+import type { Node } from "../utils/filter_nodes";
 import { deployGatewayName, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
@@ -116,7 +115,7 @@ const flist = ref<Flist>();
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedDedicatedNode = ref() as Ref<Node>;
+const selectedNode = ref() as Ref<Node>;
 
 onMounted(() => {
   disks.value.push({
@@ -171,7 +170,7 @@ async function deploy() {
             { key: "DIGITALTWIN_APPID", value: domain },
             { key: "NODE_ENV", value: "staging" },
           ],
-          nodeId: dedicated.value ? selectedDedicatedNode.value.nodeId : undefined,
+          nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },
@@ -209,9 +208,9 @@ async function deploy() {
 </script>
 
 <script lang="ts">
-import SelectDedicatedNode from "../components/select_dedicated_node.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectGatewayNode from "../components/select_gateway_node.vue";
+import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
 
@@ -221,7 +220,7 @@ export default {
     SelectSolutionFlavor,
     SelectGatewayNode,
     SelectFarm,
-    SelectDedicatedNode,
+    SelectNode,
   },
 };
 </script>

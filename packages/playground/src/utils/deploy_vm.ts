@@ -2,7 +2,6 @@ import {
   AddMachineModel,
   DeleteMachineModel,
   DiskModel,
-  events,
   type FilterOptions,
   type GridClient,
   MachineModel,
@@ -14,16 +13,13 @@ import {
 import { generateName } from "../utils/strings";
 import { createNetwork, type Network } from "./deploy_helpers";
 import { getWireguardConfig } from "./load_deployment";
-import { NodePicker } from "./node_picker";
 
 export async function deployVM(grid: GridClient, options: DeployVMOptions) {
-  events.emit("logs", "Finding a suitable node to deploy on.");
-  const nodePicker = new NodePicker();
   const vms = new MachinesModel();
   vms.name = options.name;
   await grid.machines.getObj(vms.name); //invalidating the cashed keys
   vms.network = createNetwork(options.network);
-  vms.machines = await Promise.all(options.machines.map(machine => createMachine(grid, machine, nodePicker)));
+  vms.machines = await Promise.all(options.machines.map(machine => createMachine(grid, machine, machine.nodeId!)));
   vms.metadata = options.metadata;
   vms.description = options.description;
   await grid.machines.deploy(vms);
@@ -38,7 +34,7 @@ export async function loadVM(grid: GridClient, name: string) {
   return vm;
 }
 
-async function createMachine(grid: GridClient, machine: Machine, nodePicker: NodePicker): Promise<MachineModel> {
+async function createMachine(grid: GridClient, machine: Machine, nodeId: number): Promise<MachineModel> {
   const filters: FilterOptions = {
     cru: machine.cpu,
     mru: Math.round(machine.memory / 1024),
@@ -62,7 +58,7 @@ async function createMachine(grid: GridClient, machine: Machine, nodePicker: Nod
     filters.farmId = machine.farmId;
     filters.farmName = machine.farmName;
 
-    vm.node_id = await nodePicker.pick(await grid.capacity.filterNodes(filters));
+    vm.node_id = nodeId;
   }
 
   vm.disks = createDisks(machine.disks);

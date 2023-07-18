@@ -1,17 +1,17 @@
 <template>
   <section>
     <h6 class="text-h5 mb-4">Select a Node</h6>
-    <v-alert class="mb-2" type="warning" variant="tonal" v-if="!loadingNodes && selectedNodeId === undefined">
+    <v-alert class="mb-2" type="warning" variant="tonal" v-if="!loadingNodes && selectedNode === undefined">
       There are no nodes rented by you that match your selected resources, try to change your resources or rent a node
       and try again.
     </v-alert>
-    <input-validator :rules="[validators.required('Node id is required.')]" :value="selectedNodeId" #="{ props }">
+    <input-validator :rules="[validators.required('Node id is required.')]" :value="selectedNode?.id" #="{ props }">
       <v-autocomplete
         select
         label="Node"
         :items="availableNodes"
         item-title="id"
-        v-model="selectedNodeId"
+        v-model="selectedNode"
         :disabled="loadingNodes"
         :loading="loadingNodes"
         v-bind="props"
@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, type PropType, ref, watch } from "vue";
+import { onMounted, type PropType, type Ref, ref, watch } from "vue";
 
 import { useProfileManager } from "../stores/profile_manager";
 import type { Flist } from "../types";
@@ -78,13 +78,17 @@ const profileManager = useProfileManager();
 const availableNodes = ref<Array<AvailableNode>>([]);
 const loadingNodes = ref(false);
 const errorMessage = ref<string>();
-const selectedNodeId = ref();
+const selectedNode = ref() as Ref<AvailableNode | undefined>;
 
-watch(selectedNodeId, node => {
-  if (node) {
-    emits("update:modelValue", { nodeId: node.id });
-  }
-});
+watch(
+  () => selectedNode.value,
+  node => {
+    if (node) {
+      emits("update:modelValue", { nodeId: node.id as unknown as number });
+    }
+  },
+  { immediate: true },
+);
 
 const shouldBeUpdated = ref(false);
 watch(
@@ -155,9 +159,9 @@ async function loadNodes() {
             availableNodes.value.push({ id: node.nodeId, state: node.rentedByTwinId ? "Dedicated" : "Shared" });
           }
         }
-        selectedNodeId.value = availableNodes.value ? availableNodes.value[0] : undefined;
+        selectedNode.value = availableNodes.value ? availableNodes.value[0] : undefined;
       } else {
-        selectedNodeId.value = undefined;
+        selectedNode.value = undefined;
         availableNodes.value = [];
       }
     } catch (e) {

@@ -154,7 +154,7 @@
         />
         <SelectNode
           v-else
-          v-model="selectedDedicatedNode"
+          v-model="selectedNode"
           :filters="{
             cpu,
             memory,
@@ -222,7 +222,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, type Ref, ref } from "vue";
+import { type Ref, ref } from "vue";
 
 import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
@@ -277,7 +277,7 @@ const disks = ref<Disk[]>([]);
 const network = ref();
 const hasGPU = ref(false);
 const selectedNodewithCards = ref() as Ref<GPUNodeType>;
-const selectedDedicatedNode = ref() as Ref<Node>;
+const selectedNode = ref() as Ref<Node>;
 
 function addDisk() {
   const name = generateName(7);
@@ -287,14 +287,6 @@ function addDisk() {
     mountPoint: "/mnt/" + name,
   });
 }
-
-function getNodeId(hasGPU: boolean, dedicated: boolean) {
-  return hasGPU ? selectedNodewithCards.value.nodeId : dedicated ? selectedDedicatedNode.value.nodeId : undefined;
-}
-
-const nodeId = computed(() => {
-  return getNodeId(hasGPU.value, dedicated.value);
-});
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -326,7 +318,7 @@ async function deploy() {
           envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
           rootFilesystemSize: 2,
           hasGPU: hasGPU.value,
-          nodeId: nodeId.value,
+          nodeId: hasGPU.value ? selectedNodewithCards.value.nodeId : selectedNode.value.nodeId,
           gpus: hasGPU.value ? selectedNodewithCards.value.cards.map(card => card.id) : undefined,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,

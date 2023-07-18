@@ -156,9 +156,8 @@
         }"
         v-model="farm"
       />
-      <SelectDedicatedNode
-        v-if="dedicated"
-        v-model="selectedDedicatedNode"
+      <SelectNode
+        v-model="selectedNode"
         :filters="{
           cpu,
           memory,
@@ -169,7 +168,7 @@
           disks: disks,
           disk: 0,
           flist: flist,
-          rentedBy: profileManager.profile?.twinId,
+          rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
           certified: certified,
         }"
       />
@@ -188,7 +187,7 @@ import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type Farm, type Flist, ProjectName, type Validators } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
-import type { Node } from "../utils/filter_dedicated_node";
+import type { Node } from "../utils/filter_nodes";
 import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
 
@@ -215,7 +214,7 @@ const farm = ref() as Ref<Farm>;
 const disks = ref() as Ref<Disk[]>;
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedDedicatedNode = ref() as Ref<Node>;
+const selectedNode = ref() as Ref<Node>;
 
 watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()));
 
@@ -255,7 +254,7 @@ async function deploy() {
           rootFilesystemSize: storage.value,
           publicIpv4: ipv4.value,
           planetary: true,
-          nodeId: dedicated.value ? selectedDedicatedNode.value.nodeId : undefined,
+          nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
 
@@ -299,8 +298,8 @@ function customLastRoundValidation(validators: Validators) {
 
 <script lang="ts">
 import AlgorandCapacity from "../components/algorand_capacity.vue";
-import SelectDedicatedNode from "../components/select_dedicated_node.vue";
 import SelectFarm from "../components/select_farm.vue";
+import SelectNode from "../components/select_node.vue";
 import { deploymentListEnvironments } from "../constants";
 import { normalizeError } from "../utils/helpers";
 
@@ -308,7 +307,7 @@ export default {
   name: "TfAlgorand",
   components: {
     SelectFarm,
-    SelectDedicatedNode,
+    SelectNode,
     AlgorandCapacity,
   },
 };

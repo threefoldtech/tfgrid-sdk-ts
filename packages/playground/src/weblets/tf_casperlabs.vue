@@ -57,18 +57,17 @@
         }"
         v-model="farm"
       />
-      <SelectDedicatedNode
-        v-if="dedicated"
-        v-model="selectedDedicatedNode"
+      <SelectNode
+        v-model="selectedNode"
         :filters="{
           cpu: solution?.cpu,
           memory: solution?.memory,
           ssd: solution?.disk,
-          disks: disks,
+          disks: [{ size: solution?.disk, mountPoint: '/data' }],
           disk: 0,
           name: name,
           flist: flist,
-          rentedBy: profileManager.profile?.twinId,
+          rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
           certified: certified,
         }"
       />
@@ -88,8 +87,8 @@ import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
-import { deployVM, type Disk } from "../utils/deploy_vm";
-import type { Node } from "../utils/filter_dedicated_node";
+import { deployVM } from "../utils/deploy_vm";
+import type { Node } from "../utils/filter_nodes";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
@@ -103,20 +102,13 @@ const name = ref(generateName(9, { prefix: "cl" }));
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;
-const disks = ref() as Ref<Disk[]>;
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/casperlabs-latest.flist",
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedDedicatedNode = ref() as Ref<Node>;
-disks.value = [
-  {
-    size: solution.value?.disk,
-    mountPoint: "/data",
-  },
-];
+const selectedNode = ref() as Ref<Node>;
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -150,7 +142,7 @@ async function deploy() {
           name: name.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
-          disks: disks.value,
+          disks: [{ size: solution?.value.disk, mountPoint: "/data" }],
           flist: flist.value,
           entryPoint: flist.entryPoint,
           farmId: farm.value.farmID,
@@ -160,7 +152,7 @@ async function deploy() {
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "CASPERLABS_HOSTNAME", value: domain },
           ],
-          nodeId: dedicated.value ? selectedDedicatedNode.value.nodeId : undefined,
+          nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },
@@ -198,9 +190,9 @@ async function deploy() {
 </script>
 
 <script lang="ts">
-import SelectDedicatedNode from "../components/select_dedicated_node.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectGatewayNode from "../components/select_gateway_node.vue";
+import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
 
@@ -210,7 +202,7 @@ export default {
     SelectSolutionFlavor,
     SelectGatewayNode,
     SelectFarm,
-    SelectDedicatedNode,
+    SelectNode,
   },
 };
 </script>

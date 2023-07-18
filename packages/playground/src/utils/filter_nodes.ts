@@ -27,6 +27,7 @@ export default class FilteredNodes {
           availableFor: this.grid.twinId,
           hasGPU: machine.hasGPU,
           rentedBy: machine.rentedBy ? this.grid.twinId : undefined,
+          certified: machine.certified,
         };
         return await this.grid.capacity.filterNodes(filters);
       }),
