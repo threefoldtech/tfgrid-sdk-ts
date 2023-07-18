@@ -30,4 +30,4 @@ def browser():
     # Quit the WebDriver instance for the cleanup
     driver.quit()
     # Ending virtual display for the browser
-    #display.stop()
+    display.stop()
