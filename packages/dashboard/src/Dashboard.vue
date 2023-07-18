@@ -226,6 +226,7 @@ interface SidenavItem {
   icon: string;
   prefix: string;
   active?: boolean;
+  hidden?: boolean;
   hyperlink?: boolean;
   children: Array<{
     label?: string;
@@ -272,6 +273,9 @@ export default class Dashboard extends Vue {
     });
   }
   async mounted() {
+    this.routes = this.routes.filter(route => {
+      if (!route.hidden) return route;
+    });
     await this.subscribe();
     this.accounts = this.$store.state.portal.accounts;
     if (this.$route.path === "/" && !this.$api) {
@@ -464,6 +468,13 @@ export default class Dashboard extends Vue {
       icon: "earth",
       prefix: "/other/bootstrap",
       children: [],
+    },
+    {
+      label: "Minting",
+      icon: "cash-multiple",
+      prefix: "/other/minting",
+      children: [],
+      hidden: window.configs.APP_NETWORK !== "main",
     },
     {
       label: "Monitoring",

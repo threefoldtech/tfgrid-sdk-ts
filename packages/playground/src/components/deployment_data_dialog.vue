@@ -53,7 +53,12 @@
                 :data="Math.ceil(disk.size / (1024 * 1024 * 1024))"
               />
               <CopyReadonlyInput label="WireGuard IP" :data="contract.interfaces[0].ip" />
-              <CopyReadonlyInput label="WireGuard Config" textarea :data="data.wireguard" v-if="data.wireguard" />
+              <CopyReadonlyInput
+                label="WireGuard Config"
+                textarea
+                :data="data.wireguard || contract.wireguard"
+                v-if="data.wireguard || contract.wireguard"
+              />
               <CopyReadonlyInput label="Flist" :data="contract.flist" v-if="contract.flist" />
               <template v-if="environments !== false">
                 <template v-for="key of Object.keys(contract.env)" :key="key">
@@ -82,12 +87,8 @@
                   </template>
                 </template>
               </template>
-              <CopyReadonlyInput label="Monitoring URL" :data="grafanaURL" v-if="!isLoading" />
-              <v-card :loading="isLoading" type="info" variant="tonal" v-else>
-                <v-card-text>
-                  <p>Generating metrics url...</p>
-                </v-card-text>
-              </v-card>
+              <CopyReadonlyInput label="GPU Cards" :data="gpuInfo" :loading="loadingCard" v-if="showGpuCard" />
+              <CopyReadonlyInput label="Monitoring URL" :data="grafanaURL" :loading="isLoading" />
             </v-form>
           </template>
           <template v-else>
@@ -112,6 +113,8 @@
 import hljs from "highlight.js";
 import { computed, type PropType, ref } from "vue";
 
+import { getCardName } from "@/utils/helpers";
+
 const props = defineProps({
   data: {
     type: Object as PropType<any>,
@@ -135,8 +138,11 @@ defineEmits<{ (event: "close"): void }>();
 
 const showType = ref(props.onlyJson ? 1 : 0);
 const isLoading = ref(false);
+const loadingCard = ref(false);
+const showGpuCard = ref(false);
 const activeTab = ref(0);
 const grafanaURL = ref("");
+const gpuInfo = ref("");
 const contracts = computed(() => {
   if (!props.data) return [];
   if ("masters" in props.data) return [...props.data.masters, ...props.data.workers];
@@ -188,6 +194,29 @@ async function getGrafanaUrl() {
   return grafanaURL.value;
 }
 getGrafanaUrl();
+
+async function getGPUInfo() {
+  showGpuCard.value = true;
+  loadingCard.value = true;
+
+  const grid = await getGrid(profileManager.profile!);
+  if (grid) {
+    const gpuCards = await grid.zos.getNodeGPUInfo({ nodeId: contract.value.nodeId });
+    const usedCards = gpuCards?.filter((card: any) => card.contract == contract.value.contractId);
+
+    const cardsInfo = [];
+    for (let i = 0; i < usedCards?.length; i++) {
+      cardsInfo.push(getCardName(usedCards[i]));
+    }
+    gpuInfo.value = cardsInfo.join(", ");
+  }
+
+  if (gpuInfo.value == "") {
+    showGpuCard.value = false;
+  }
+  loadingCard.value = false;
+}
+getGPUInfo();
 
 function _transform(value: string): any {
   const v = value.toLowerCase();

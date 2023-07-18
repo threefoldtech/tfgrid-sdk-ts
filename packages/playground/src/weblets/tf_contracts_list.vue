@@ -53,7 +53,6 @@
         <v-tooltip text="Show Details">
           <template #activator="{ props }">
             <v-btn
-              color="secondary"
               variant="tonal"
               @click="showDetails(item.value)"
               :disabled="(loading && loadingContractId !== item.value.contractId) || deleting"
