@@ -42,7 +42,8 @@ import FilteredNodes, { type Node } from "../utils/filter_nodes";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 
-export interface MachineFilters {
+export interface NodeFilters {
+  farmId: number;
   ipv6?: boolean;
   ipv4?: boolean;
   wireguard?: boolean;
@@ -67,7 +68,7 @@ const emits = defineEmits<{ (event: "update:modelValue", value?: Node): void }>(
 
 const props = defineProps({
   modelValue: { type: Object as PropType<Node> },
-  filters: { default: () => ({} as MachineFilters), type: Object as PropType<MachineFilters> },
+  filters: { default: () => ({} as NodeFilters), type: Object as PropType<NodeFilters> },
 });
 
 interface AvailableNode {
@@ -95,6 +96,7 @@ watch(
   () => ({ ...props.filters }),
   (value, oldValue) => {
     if (
+      value.farmId === oldValue.farmId &&
       value.cpu === oldValue.cpu &&
       value.memory === oldValue.memory &&
       value.ssd === oldValue.ssd &&
@@ -126,6 +128,7 @@ async function loadNodes() {
   errorMessage.value = "";
   loadingNodes.value = true;
   const filters = props.filters;
+
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
     const filteredDNodes = new FilteredNodes(grid);
@@ -134,6 +137,7 @@ async function loadNodes() {
         name: filters.name,
         machines: [
           {
+            farmId: filters.farmId,
             name: filters.name,
             cpu: filters.cpu,
             memory: filters.memory,

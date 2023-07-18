@@ -18,6 +18,7 @@ export default class FilteredNodes {
     const nodes = await Promise.all(
       options.machines.map(async machine => {
         const filters: FilterOptions = {
+          farmId: machine.farmId,
           cru: machine.cpu,
           mru: Math.round(machine.memory / 1024),
           country: machine.country,
