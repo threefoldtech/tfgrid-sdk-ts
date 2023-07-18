@@ -44,6 +44,7 @@ class PolkaPage:
         self.browser.find_element(*self.polka_understand).click()
         self.browser.find_element(*self.polka_allow).click()
         self.browser.switch_to.window(self.browser.window_handles[0])
+        WebDriverWait(self.browser, 30).until(EC.invisibility_of_element(self.dashboard_load))
     
     def add_account(self, name, password):
         self.browser.execute_script("window.open('');")

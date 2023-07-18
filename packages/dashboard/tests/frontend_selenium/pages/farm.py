@@ -13,7 +13,7 @@ class FarmPage:
     twin_details = (By.XPATH, "//*[contains(text(), 'Twin Details')]")
     create_button=(By.XPATH, "//*[contains(text(), 'Create farm')]")
     farm_name_text_field=(By.XPATH,'/html/body/div[1]/div[4]/div/div/div[1]/form/div/div/div[1]/div/input')
-    submit_farm_button=(By.XPATH, "//*[contains(text(), 'Submit')]") 
+    create_farm_button=(By.XPATH, "/html/body/div[1]/div[4]/div/div/div[2]/button[1]") 
     search_bar=(By.XPATH ,'/html/body/div[1]/div[1]/div[3]/div/div/div[3]/div/div[1]/div/input')
     details_arrow=(By.XPATH,'//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/tbody/tr[1]/td[1]/button')
     farm_Id_arrow=(By.XPATH ,'//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/thead/tr/th[2]')
@@ -65,7 +65,7 @@ class FarmPage:
     def create_farm(self, farm_name):
         self.browser.find_element(*self.create_button).click()
         self.browser.find_element(*self.farm_name_text_field).send_keys(farm_name)
-        self.browser.find_element(*self.submit_farm_button).click()
+        self.browser.find_element(*self.create_farm_button).click()
 
     def create_farm_invalid_name(self, data):
         self.browser.find_element(*self.farm_name_text_field).send_keys(Keys.CONTROL + "a")

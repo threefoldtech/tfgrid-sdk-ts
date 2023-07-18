@@ -223,8 +223,8 @@ def test_check_withdraw(browser):
     swap_page.transfer_chain()
     balance = swap_page.get_balance()
     min_balance = float(balance)-2
-    max_balance = float(balance)-2.1
-    swap_page.check_withdraw(get_stellar_address(), '2.01').click()
+    max_balance = float(balance)-2.11
+    swap_page.check_withdraw(get_stellar_address(), '2.1').click()
     polka_page.authenticate_with_pass(password)
     assert swap_page.wait_for('Withdraw submitted!')
     assert format(float(max_balance), '.3f') <= format(float(swap_page.get_balance_withdraw(balance)), '.3f') <= format(float(min_balance), '.3f')
