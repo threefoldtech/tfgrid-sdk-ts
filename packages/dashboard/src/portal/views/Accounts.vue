@@ -1,5 +1,6 @@
 <template>
-  <v-container v-if="!$store.state.portal.accounts.length">
+  <div>Please connect your wallet</div>
+  <!-- <v-container v-if="!$store.state.portal.accounts.length">
     <WelcomeWindow />
   </v-container>
   <v-container v-else style="">
@@ -34,7 +35,7 @@
         </v-card>
       </div>
     </v-container>
-  </v-container>
+  </v-container> -->
 </template>
 
 <script lang="ts">
