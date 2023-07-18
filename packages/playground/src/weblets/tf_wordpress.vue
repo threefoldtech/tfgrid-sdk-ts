@@ -113,7 +113,7 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { type Ref, ref, watch } from "vue";
+import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
@@ -138,7 +138,7 @@ const domainNameCmp = ref();
 const farm = ref() as Ref<Farm>;
 const ipv4 = ref(false);
 
-function finalize(deployment: any, showTip?: boolean) {
+function finalize(deployment: any) {
   console.log(deployment?.tip);
   layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed a Wordpress instance.");
