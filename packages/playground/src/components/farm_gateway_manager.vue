@@ -13,7 +13,6 @@ provide("farm:gateway:manager", {
     FarmGateway.value = farmData;
   },
   setLoading(loading: boolean) {
-    console.log(loading);
     Loading.value = loading;
   },
   getLoading() {

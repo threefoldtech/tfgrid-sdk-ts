@@ -59,10 +59,8 @@ watch([farm, country], ([f, c]) => {
 });
 const loading = ref(false);
 watch([farm, loading], ([farm, loading]) => {
-  if (loading) {
-    FarmGatewayManager?.setLoading(true);
-    console.log("setLoading");
-  }
+  if (loading) FarmGatewayManager?.setLoading(true);
+
   if (farm && !loading) {
     farm.country = country.value;
     FarmGatewayManager?.register(farm);
