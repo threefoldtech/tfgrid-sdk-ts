@@ -31,9 +31,7 @@
         <v-alert variant="tonal" v-show="profileManager.profile && status" :type="alertType">
           {{ message }}
         </v-alert>
-        <v-alert class="mt-2" variant="tonal" v-show="profileManager.profile && status && todo?.length" type="info">
-          {{ todo }}
-        </v-alert>
+
         <div v-show="profileManager.profile && !status">
           <slot v-if="profileManager.profile" />
         </div>
@@ -125,7 +123,6 @@ const profileManager = useProfileManager();
 
 const status = ref<WebletStatus>();
 const message = ref<string>();
-const todo = ref<string>();
 function onLogMessage(msg: string) {
   if (typeof msg === "string") {
     message.value = msg;
@@ -159,11 +156,11 @@ defineExpose({
     return balance;
   },
 
-  setStatus(s: WebletStatus, m?: string, tip?: string) {
+  setStatus(s: WebletStatus, m?: string) {
     if (s !== "deploy" && !m) {
       throw new Error("Message need to be passed while settingStatus.");
     }
-    todo.value = tip ? tip : "";
+
     message.value = m ? m : "Preparing to deploy...";
     status.value = s;
   },
@@ -265,7 +262,7 @@ export type WebletStatus = "deploy" | "success" | "failed";
 
 export interface WebletLayout {
   validateBalance(grid: GridClient, min?: number): Promise<Balance>;
-  setStatus(status: WebletStatus, message?: string, tip?: string): void;
+  setStatus(status: WebletStatus, message?: string): void;
   openDialog(
     data: any,
     envs?: { [key: string]: string | boolean | { label: string; type?: string } } | false,
