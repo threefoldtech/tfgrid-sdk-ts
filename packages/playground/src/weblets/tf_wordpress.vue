@@ -4,6 +4,7 @@
     :cpu="solution?.cpu"
     :memory="solution?.memory"
     :disk="solution?.disk"
+    :ipv4="ipv4"
     title-image="images/icons/wordpress.png"
   >
     <template #title>Deploy a Wordpress Instance </template>
@@ -90,11 +91,11 @@
             cpu: solution?.cpu,
             memory: solution?.memory,
             ssd: solution?.disk,
-            publicIp: false,
+            publicIp: ipv4,
           }"
           v-model="farm"
         />
-        <DomainName :has-i-pv4="ipv4" ref="domainNameCmp"></DomainName>
+        <DomainName :hasIPv4="ipv4" ref="domainNameCmp"></DomainName>
       </FarmGatewayManager>
     </form-validator>
 
@@ -139,7 +140,6 @@ const farm = ref() as Ref<Farm>;
 const ipv4 = ref(false);
 
 function finalize(deployment: any) {
-  console.log(deployment?.tip);
   layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed a Wordpress instance.");
   layout.value.openDialog(deployment, deploymentListEnvironments.wordpress);
