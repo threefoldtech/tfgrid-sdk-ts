@@ -6,7 +6,7 @@
           <v-card-text class="d-flex align-center">
             <v-icon large>mdi-account</v-icon>
             <template v-if="$store.state.profile && balance">
-              <p class="font-weight-bold ml-2">
+              <p class="font-weight-bold ml-2" :style="{ whiteSpace: 'nowrap' }">
                 <span>Balance: {{ balance.free }} TFT</span>
                 <br />
                 <span

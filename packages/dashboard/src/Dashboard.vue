@@ -11,7 +11,7 @@
         <v-spacer>
           <TftSwapPrice v-if="!loadingAPI" />
         </v-spacer>
-        <div class="d-flex">
+        <div class="d-flex align-center">
           <FundsCard v-if="$store.state.credentials.initialized && $store.state.credentials.balance" />
           <div class="d-flex" style="align-items: center">
             <v-btn icon @click="toggle_dark_mode">
@@ -22,31 +22,13 @@
               <v-btn @click="subscribe" color="green"> Connect </v-btn>
             </v-card>
 
-            <v-btn v-else @click="disconnectWallet" color="red"> Disconnect </v-btn>
+            <!-- <v-btn v-else @click="disconnectWallet" color="red"> Disconnect </v-btn> -->
 
             <a href="https://manual.grid.tf/dashboard/dashboard.html" target="_blank">
               <v-btn class="custom-button" color="white" style="color: black"> Help</v-btn>
             </a>
 
             <TfChainConnector />
-
-            <v-theme-provider root>
-              <v-card v-if="filteredAccounts().length" style="width: max-content">
-                <v-card-text
-                  style="padding: 10px 0px 10px 30px"
-                  v-for="account in filteredAccounts()"
-                  :key="account.address"
-                >
-                  <v-row class="d-flex align-center mx-0">
-                    <p class="font-weight-black" style="font-size: 15px">{{ account.meta.name }}</p>
-                    <!-- Logout button -->
-                    <v-btn icon class="mr-2" @click="redirectToHomePage">
-                      <v-icon>mdi-logout theme-light-dark</v-icon>
-                    </v-btn>
-                  </v-row>
-                </v-card-text>
-              </v-card>
-            </v-theme-provider>
           </div>
         </div>
       </v-app-bar>
@@ -187,13 +169,13 @@
         <span>{{ version ? version : "no version provided" }}</span>
       </div>
     </v-navigation-drawer>
-    <v-dialog v-model="loadingAPI" persistent class="loadingDialog">
+    <!-- <v-dialog v-model="loadingAPI" persistent class="loadingDialog">
       <div class="d-flex justify-center" style="display: block; padding: 10%">
         <v-progress-circular indeterminate color="green" :size="335" :width="7">
           <span style="font-size: large; color: black">Connecting to Polkadot</span>
         </v-progress-circular>
       </div>
-    </v-dialog>
+    </v-dialog> -->
 
     <div :style="'padding-left:' + (mini ? '56px' : '300px')">
       <router-view />
