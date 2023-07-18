@@ -1,12 +1,6 @@
 <!-- eslint-disable no-dupe-class-members -->
 <template>
-  <v-container v-if="$store.state.portal.accounts.length === 0">
-    <v-card>
-      <WelcomeWindow />
-    </v-card>
-  </v-container>
-
-  <div style="padding-top: 100px" v-else>
+  <div style="padding-top: 100px">
     <v-container v-if="editingTwin">
       <v-dialog transition="dialog-bottom-transition" max-width="600" v-model="editingTwin">
         <v-card>
@@ -85,18 +79,15 @@
 </template>
 
 <script lang="ts">
-import { divide } from "lodash";
 import { Component, Vue } from "vue-property-decorator";
 
 import config from "@/portal/config";
 
-import WelcomeWindow from "../components/WelcomeWindow.vue";
 import { deleteTwin, updateRelay } from "../lib/twin";
 import { TwinType } from "../store/types";
 
 @Component({
   name: "Twin",
-  components: { WelcomeWindow },
 })
 export default class TwinView extends Vue {
   $api: any;
