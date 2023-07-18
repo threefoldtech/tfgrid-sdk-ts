@@ -224,7 +224,7 @@ def test_check_withdraw(browser):
     balance = bridge_page.get_balance()
     min_balance = float(balance)-2
     max_balance = float(balance)-2.11
-    bridge_page.check_withdraw(get_stellar_address(), '2.1').click()
+    swap_page.check_withdraw(get_stellar_address(), '2.1').click()
     polka_page.authenticate_with_pass(password)
     assert bridge_page.wait_for('Withdraw submitted!')
     assert format(float(max_balance), '.3f') <= format(float(bridge_page.get_balance_withdraw(balance)), '.3f') <= format(float(min_balance), '.3f')
