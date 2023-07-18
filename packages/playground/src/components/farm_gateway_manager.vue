@@ -7,9 +7,17 @@ import { provide, type Ref, ref } from "vue";
 import type { Farm } from "@/types";
 
 const FarmGateway = ref() as Ref<Farm | undefined>;
+const Loading = ref(false);
 provide("farm:gateway:manager", {
   register(farmData: Farm) {
     FarmGateway.value = farmData;
+  },
+  setLoading(loading: boolean) {
+    console.log(loading);
+    Loading.value = loading;
+  },
+  getLoading() {
+    return Loading;
   },
   unregister() {
     FarmGateway.value = undefined;
@@ -22,8 +30,10 @@ provide("farm:gateway:manager", {
 <script lang="ts">
 import { inject } from "vue";
 export interface FarmGatewayManager {
-  register(farmData: Farm): void;
+  register(farmData: Farm | undefined): void;
   unregister(): void;
+  setLoading(loading: boolean): void;
+  getLoading(): boolean;
   load(): Farm;
 }
 

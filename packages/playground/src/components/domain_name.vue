@@ -27,8 +27,10 @@
         </input-validator>
       </div>
     </v-expand-transition>
-    <div v-if="!$props.hasIPv4 || !customDomain">
-      <SelectGatewayNode ref="selectGateway" v-model="gatewayNode" customDomain :farmData="farmData" />
+    <div v-if="(!$props.hasIPv4 || !customDomain) && !loading">
+      <v-expand-transition>
+        <SelectGatewayNode ref="selectGateway" v-model="gatewayNode" customDomain :farmData="farmData" />
+      </v-expand-transition>
       <v-expand-transition>
         <v-alert
           v-show="domain?.useFQDN && domain?.ip && domainName && !selectGateway?.loading"
@@ -79,11 +81,13 @@ export default {
     const gatewayNode = ref() as Ref<GatewayNode>;
     const FarmGatewayManager = useFarmGatewayManager();
     const farmData = ref(FarmGatewayManager?.load());
+    const loading = ref(FarmGatewayManager?.getLoading());
     return {
       customDomain,
       gatewayNode,
       domainName,
       farmData,
+      loading,
       domain,
       selectGateway,
     };
