@@ -42,14 +42,11 @@ export async function deployGatewayName(grid: GridClient, options: DeployGateway
   gateway.backends = [`http://${options.ip}:${options.port}`];
   gateway.network = options.networkName;
   gateway.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
-  console.log(options.fqdn, options.name);
   if (options.fqdn) {
     const domain = gateway as GatewayFQDNModel;
     domain.fqdn = options.fqdn;
-    console.log("deploy fqdn");
     return grid.gateway.deploy_fqdn(domain);
   }
-  console.log("deploy gateway");
   return grid.gateway.deploy_name(gateway);
 }
 
