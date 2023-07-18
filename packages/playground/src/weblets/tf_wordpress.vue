@@ -199,7 +199,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
     return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Wordpress instance."));
   }
   if (customDomain && ipv4.value) {
-    vm[0].showTip = true;
+    vm[0].customDomain = gatewayName.domain;
     finalize(vm);
     return;
   }
