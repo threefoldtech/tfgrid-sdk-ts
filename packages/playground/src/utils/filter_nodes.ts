@@ -4,16 +4,17 @@ import type { DeployVMOptions } from "./deploy_vm";
 
 export interface Node {
   nodeId: number;
+  state?: string;
 }
 
-export default class DedicatedNode {
+export default class FilteredNodes {
   private grid;
 
   constructor(grid: GridClient) {
     this.grid = grid;
   }
 
-  async getDedicatedNodes(options: DeployVMOptions): Promise<NodeInfo[][]> {
+  async getFilteredNodes(options: DeployVMOptions): Promise<NodeInfo[][]> {
     const nodes = await Promise.all(
       options.machines.map(async machine => {
         const filters: FilterOptions = {
@@ -25,7 +26,7 @@ export default class DedicatedNode {
           publicIPs: machine.publicIpv4,
           availableFor: this.grid.twinId,
           hasGPU: machine.hasGPU,
-          rentedBy: this.grid.twinId,
+          rentedBy: machine.rentedBy ? this.grid.twinId : undefined,
         };
         return await this.grid.capacity.filterNodes(filters);
       }),

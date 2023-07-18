@@ -61,12 +61,11 @@
 <script lang="ts" setup>
 import { onMounted, type PropType, ref, watch } from "vue";
 
-import GPUNode, { type GPUNodeType, type NodeGPUCardType } from "@/utils/filter_node_with_gpu";
-import { normalizeError } from "@/utils/helpers";
-
 import { useProfileManager } from "../stores/profile_manager";
 import { type Flist, ProjectName } from "../types";
+import GPUNode, { type GPUNodeType, type NodeGPUCardType } from "../utils/filter_node_with_gpu";
 import { getGrid } from "../utils/grid";
+import { normalizeError } from "../utils/helpers";
 
 export interface GPUMachineFilters {
   ipv6: boolean;
@@ -87,6 +86,7 @@ export interface GPUMachineFilters {
   }[];
   certified?: boolean;
   dedicated?: boolean;
+  rentedBy?: number;
 }
 
 const emits = defineEmits<{ (event: "update:modelValue", value?: GPUNodeType): void }>();
@@ -170,7 +170,7 @@ async function checkNode() {
               envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
               rootFilesystemSize: 2,
               hasGPU: filters.hasGPU,
-              rentedBy: filters.dedicated ? profileManager.profile!.twinId : undefined,
+              rentedBy: filters.rentedBy,
             },
           ],
           network: { addAccess: filters.wireguard },

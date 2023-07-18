@@ -103,8 +103,7 @@
           }"
           v-model="farm"
         />
-        <SelectDedicatedNode
-          v-if="dedicated"
+        <SelectNode
           v-model="selectedDedicatedNode"
           :filters="{
             cpu,
@@ -116,7 +115,7 @@
             flist: flist,
             disks: disks,
             disk: 0,
-            rentedBy: profileManager.profile?.twinId,
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"
         />
@@ -213,7 +212,7 @@ import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type Farm, type Flist, ProjectName } from "../types";
 import { deployVM, type Disk, type Env } from "../utils/deploy_vm";
-import type { Node } from "../utils/filter_dedicated_node";
+import type { Node } from "../utils/filter_nodes";
 import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
 
@@ -331,8 +330,8 @@ async function deploy() {
 <script lang="ts">
 import ExpandableLayout from "../components/expandable_layout.vue";
 import RootFsSize from "../components/root_fs_size.vue";
-import SelectDedicatedNode from "../components/select_dedicated_node.vue";
 import SelectFarm from "../components/select_farm.vue";
+import SelectNode from "../components/select_node.vue";
 import SelectVmImage from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
 import { normalizeError } from "../utils/helpers";
@@ -343,7 +342,7 @@ export default {
     SelectVmImage,
     RootFsSize,
     SelectFarm,
-    SelectDedicatedNode,
+    SelectNode,
     ExpandableLayout,
   },
 };

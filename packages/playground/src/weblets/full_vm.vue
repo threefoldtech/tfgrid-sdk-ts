@@ -133,7 +133,7 @@
           v-model="farm"
         />
         <SelectGPUNode
-          v-if="hasGPU || (dedicated && hasGPU)"
+          v-if="hasGPU"
           v-model="selectedNodewithCards"
           :filters="{
             cpu,
@@ -148,12 +148,12 @@
             hasGPU: hasGPU,
             planetary: planetary,
             wireguard: wireguard,
-            dedicated: dedicated,
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"
         />
-        <SelectDedicatedNode
-          v-else-if="dedicated"
+        <SelectNode
+          v-else
           v-model="selectedDedicatedNode"
           :filters="{
             cpu,
@@ -168,7 +168,7 @@
             hasGPU: hasGPU,
             planetary: planetary,
             wireguard: wireguard,
-            rentedBy: profileManager.profile?.twinId,
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"
         />
@@ -229,7 +229,7 @@ import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type Farm, type Flist, ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
-import type { Node } from "../utils/filter_dedicated_node";
+import type { Node } from "../utils/filter_nodes";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
@@ -346,9 +346,9 @@ async function deploy() {
 
 <script lang="ts">
 import ExpandableLayout from "../components/expandable_layout.vue";
-import SelectDedicatedNode from "../components/select_dedicated_node.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectGPUNode from "../components/select_gpu_node.vue";
+import SelectNode from "../components/select_node.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { GPUNodeType } from "../utils/filter_node_with_gpu";
@@ -360,7 +360,7 @@ export default {
     SelectFarm,
     ExpandableLayout,
     SelectGPUNode,
-    SelectDedicatedNode,
+    SelectNode,
   },
 };
 </script>
