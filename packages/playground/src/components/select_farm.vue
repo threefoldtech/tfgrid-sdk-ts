@@ -57,14 +57,14 @@ const farm = ref<Farm>();
 watch([farm, country], ([f, c]) => {
   emits("update:modelValue", f ? { farmID: f.farmID, name: f.name, country: c ?? undefined } : undefined);
 });
-watch(farm, f => {
-  if (f) {
-    f.country = country.value;
-    FarmGatewayManager?.register(f);
+const loading = ref(false);
+watch([farm, loading], ([farm, loading]) => {
+  if (farm && !loading) {
+    farm.country = country.value;
+    FarmGatewayManager?.register(farm);
   }
 });
 
-const loading = ref(false);
 const farms = ref<Farm[]>([]);
 let initialized = false;
 async function loadFarms() {
