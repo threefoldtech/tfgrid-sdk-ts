@@ -156,6 +156,7 @@
           v-else
           v-model="selectedNode"
           :filters="{
+            farmId: farm?.farmID,
             cpu,
             memory,
             ipv4: ipv4,
@@ -164,7 +165,7 @@
             name: name,
             flist: flist,
             disks: disks,
-            disk: diskSize,
+            disk: disks.reduce((total, disk) => total + disk.size, diskSize + 2),
             hasGPU: hasGPU,
             planetary: planetary,
             wireguard: wireguard,

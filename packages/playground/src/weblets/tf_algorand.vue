@@ -159,6 +159,7 @@
       <SelectNode
         v-model="selectedNode"
         :filters="{
+          farmId: farm?.farmID,
           cpu,
           memory,
           ipv4: ipv4,
@@ -166,7 +167,7 @@
           ipv6: ipv4,
           name: name,
           disks: disks,
-          disk: 0,
+          disk: storage + (type === 'indexer' ? 50 : 0),
           flist: flist,
           rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
           certified: certified,

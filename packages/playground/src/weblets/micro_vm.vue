@@ -106,6 +106,7 @@
         <SelectNode
           v-model="selectedNode"
           :filters="{
+            farmId: farm?.farmID,
             cpu,
             memory,
             ipv4: ipv4,
@@ -114,7 +115,7 @@
             name: name,
             flist: flist,
             disks: disks,
-            disk: 0,
+            disk: disks.reduce((total, disk) => total + disk.size, rootFsSize),
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"

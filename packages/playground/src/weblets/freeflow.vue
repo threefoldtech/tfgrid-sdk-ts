@@ -70,13 +70,14 @@
       <SelectNode
         v-model="selectedNode"
         :filters="{
+          farmId: farm?.farmID,
           name: threebotName,
           flist: flist,
           cpu: solution?.cpu,
           memory: solution?.memory,
           ssd: solution?.disk,
           disks: disks,
-          disk: 0,
+          disk: solution?.disk,
           rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
           certified: certified,
         }"

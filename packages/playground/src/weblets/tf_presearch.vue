@@ -54,15 +54,46 @@
           </password-input-wrapper>
         </input-validator>
         <Network required v-model:ipv4="ipv4" v-model:planetary="planetary" ref="network" />
+
+        <input-tooltip
+          inline
+          tooltip="Click to know more about dedicated nodes."
+          href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+        >
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" />
+        </input-tooltip>
+        <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+          <v-switch color="primary" inset label="Certified" v-model="certified" />
+        </input-tooltip>
+
         <SelectFarm
           :filters="{
             cpu,
             memory,
             ssd: rootFsSize,
             publicIp: ipv4,
+            dedicated: dedicated,
+            certified: certified,
           }"
           exclusive-for="research"
           v-model="farm"
+        />
+
+        <SelectNode
+          v-model="selectedNode"
+          :filters="{
+            farmId: farm?.farmID,
+            cpu,
+            memory,
+            ssd: rootFsSize,
+            ipv4: ipv4,
+            disks: [{ size: rootFsSize, mountPoint: '/' }],
+            disk: rootFsSize,
+            name: name,
+            flist: flist,
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+            certified: certified,
+          }"
         />
       </template>
 
@@ -95,8 +126,9 @@ import { type Ref, ref } from "vue";
 import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import { type Farm, ProjectName } from "../types";
+import { type Farm, type Flist, ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
+import type { Node } from "../utils/filter_nodes";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
@@ -117,6 +149,13 @@ const farm = ref() as Ref<Farm>;
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
 const network = ref();
+const flist: Flist = {
+  value: "https://hub.grid.tf/tf-official-apps/presearch-v2.2.flist",
+  entryPoint: "/sbin/zinit init",
+};
+const dedicated = ref(false);
+const certified = ref(false);
+const selectedNode = ref() as Ref<Node>;
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -136,8 +175,8 @@ async function deploy() {
           name: name.value,
           cpu: cpu,
           memory: memory,
-          flist: "https://hub.grid.tf/tf-official-apps/presearch-v2.2.flist",
-          entryPoint: "/sbin/zinit init",
+          flist: flist.value,
+          entryPoint: flist.entryPoint,
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           planetary: planetary.value,
@@ -162,6 +201,9 @@ async function deploy() {
             },
           ],
           rootFilesystemSize: rootFsSize,
+          nodeId: selectedNode.value.nodeId,
+          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          certified: certified.value,
         },
       ],
     });
@@ -177,12 +219,14 @@ async function deploy() {
 
 <script lang="ts">
 import SelectFarm from "../components/select_farm.vue";
+import SelectNode from "../components/select_node.vue";
 import { deploymentListEnvironments } from "../constants";
 
 export default {
   name: "TFPresearch",
   components: {
     SelectFarm,
+    SelectNode,
   },
 };
 </script>

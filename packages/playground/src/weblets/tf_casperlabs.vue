@@ -60,6 +60,7 @@
       <SelectNode
         v-model="selectedNode"
         :filters="{
+          farmId: farm?.farmID,
           cpu: solution?.cpu,
           memory: solution?.memory,
           ssd: solution?.disk,

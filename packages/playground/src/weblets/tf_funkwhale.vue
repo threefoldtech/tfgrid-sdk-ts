@@ -83,13 +83,43 @@
         :standard="{ cpu: 2, memory: 1024 * 2, disk: 100 }"
       />
       <SelectGatewayNode v-model="gateway" />
+
+      <input-tooltip
+        inline
+        tooltip="Click to know more about dedicated nodes."
+        href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+      >
+        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" />
+      </input-tooltip>
+      <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+        <v-switch color="primary" inset label="Certified" v-model="certified" />
+      </input-tooltip>
+
       <SelectFarm
         :filters="{
           cpu: solution?.cpu,
           memory: solution?.memory,
           ssd: solution?.disk,
+          dedicated: dedicated,
+          certified: certified,
         }"
         v-model="farm"
+      />
+
+      <SelectNode
+        v-model="selectedNode"
+        :filters="{
+          farmId: farm?.farmID,
+          cpu: solution?.cpu,
+          memory: solution?.memory,
+          ssd: solution?.disk,
+          disks: [{ size: solution?.disk, mountPoint: '/data' }],
+          disk: solution?.disk,
+          name: name,
+          flist: flist,
+          rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+          certified: certified,
+        }"
       />
     </form-validator>
 
@@ -105,9 +135,10 @@ import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
+import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
+import type { Node } from "../utils/filter_nodes";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
@@ -124,6 +155,13 @@ const password = ref(generatePassword(12));
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;
+const flist: Flist = {
+  value: "https://hub.grid.tf/tf-official-apps/funkwhale-dec21.flist",
+  entryPoint: "/init.sh",
+};
+const dedicated = ref(false);
+const certified = ref(false);
+const selectedNode = ref() as Ref<Node>;
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -163,8 +201,8 @@ async function deploy() {
               mountPoint: "/data",
             },
           ],
-          flist: "https://hub.grid.tf/tf-official-apps/funkwhale-dec21.flist",
-          entryPoint: "/init.sh",
+          flist: flist.value,
+          entryPoint: flist.entryPoint,
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
@@ -174,6 +212,9 @@ async function deploy() {
             { key: "DJANGO_SUPERUSER_USERNAME", value: username.value },
             { key: "DJANGO_SUPERUSER_PASSWORD", value: password.value },
           ],
+          nodeId: selectedNode.value.nodeId,
+          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          certified: certified.value,
         },
       ],
     });
@@ -211,6 +252,7 @@ async function deploy() {
 <script lang="ts">
 import SelectFarm from "../components/select_farm.vue";
 import SelectGatewayNode from "../components/select_gateway_node.vue";
+import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
 
@@ -220,6 +262,7 @@ export default {
     SelectSolutionFlavor,
     SelectGatewayNode,
     SelectFarm,
+    SelectNode,
   },
 };
 </script>

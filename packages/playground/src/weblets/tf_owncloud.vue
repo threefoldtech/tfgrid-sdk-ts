@@ -73,14 +73,43 @@
           :recommended="{ cpu: 4, memory: 1024 * 16, disk: 1000 }"
         />
         <SelectGatewayNode v-model="gateway" />
+
+        <input-tooltip
+          inline
+          tooltip="Click to know more about dedicated nodes."
+          href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+        >
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" />
+        </input-tooltip>
+        <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+          <v-switch color="primary" inset label="Certified" v-model="certified" />
+        </input-tooltip>
+
         <SelectFarm
           :filters="{
             cpu: solution?.cpu,
             memory: solution?.memory,
             ssd: solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
             publicIp: false,
+            dedicated: dedicated,
+            certified: certified,
           }"
           v-model="farm"
+        />
+        <SelectNode
+          v-model="selectedNode"
+          :filters="{
+            farmId: farm?.farmID,
+            cpu: solution?.cpu,
+            memory: solution?.memory,
+            ssd: solution?.disk,
+            disks: [{ size: solution?.disk, mountPoint: '/var/lib/docker' }],
+            disk: solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
+            name: name,
+            flist: flist,
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+            certified: certified,
+          }"
         />
       </template>
 
@@ -103,9 +132,10 @@ import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
+import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
+import type { Node } from "../utils/filter_nodes";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { generateName, generatePassword } from "../utils/strings";
@@ -120,7 +150,13 @@ const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;
-
+const flist: Flist = {
+  value: "https://hub.grid.tf/tf-official-apps/owncloud-10.9.1.flist",
+  entryPoint: "/sbin/zinit init",
+};
+const dedicated = ref(false);
+const certified = ref(false);
+const selectedNode = ref() as Ref<Node>;
 const smtp = ref(createSMTPServer());
 
 async function deploy() {
@@ -161,8 +197,8 @@ async function deploy() {
               mountPoint: "/var/lib/docker",
             },
           ],
-          flist: "https://hub.grid.tf/tf-official-apps/owncloud-10.9.1.flist",
-          entryPoint: "/sbin/zinit init",
+          flist: flist.value,
+          entryPoint: flist.entryPoint,
           rootFilesystemSize: rootFs(solution.value.cpu, solution.value.memory),
           farmId: farm.value.farmID,
           farmName: farm.value.name,
@@ -188,6 +224,9 @@ async function deploy() {
                 ]
               : []),
           ],
+          nodeId: selectedNode.value.nodeId,
+          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          certified: certified.value,
         },
       ],
     });
@@ -223,6 +262,7 @@ async function deploy() {
 <script lang="ts">
 import SelectFarm from "../components/select_farm.vue";
 import SelectGatewayNode from "../components/select_gateway_node.vue";
+import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -236,6 +276,7 @@ export default {
     SelectSolutionFlavor,
     SelectGatewayNode,
     SelectFarm,
+    SelectNode,
   },
 };
 </script>
