@@ -1,29 +1,29 @@
 <template>
   <section>
     <h6 class="text-h5 mb-4">Select a Node</h6>
-    <v-alert class="mb-2" type="warning" variant="tonal" v-if="!loadingNodes && selectedNode === undefined">
+    <v-alert class="mb-2" type="warning" variant="tonal" v-if="!loadingNodes && selectedNodeId === undefined">
       There are no nodes rented by you that match your selected resources, try to change your resources or rent a node
       and try again.
     </v-alert>
-    <input-validator :rules="[validators.required('Node id is required.')]" :value="selectedNode?.id" #="{ props }">
+    <input-validator :rules="[validators.required('Node id is required.')]" :value="selectedNodeId" #="{ props }">
       <v-autocomplete
         select
         label="Node"
         :items="availableNodes"
-        :model-value="selectedNode?.id"
+        item-title="id"
+        v-model="selectedNodeId"
         :disabled="loadingNodes"
         :loading="loadingNodes"
-        @update:model-value="selectedNode = $event"
         v-bind="props"
       >
         <template v-slot:item="{ item, props }">
           <v-list-item @click="props.onClick" :class="{ 'v-list-item--active': props.isActive }">
             <v-list-item-content class="d-flex justify-space-between">
               <v-list-item-title>
-                {{ item.value.id }}
+                {{ item.raw.id }}
               </v-list-item-title>
-              <v-chip v-bind="props" :color="getChipColor(item.value.state)" class="ml-3">
-                {{ item.value.state }}
+              <v-chip v-bind="props" :color="getChipColor(item.raw.state)" class="ml-3">
+                {{ item.raw.state }}
               </v-chip>
             </v-list-item-content>
           </v-list-item>
@@ -77,28 +77,48 @@ interface AvailableNode {
 const profileManager = useProfileManager();
 const availableNodes = ref<Array<AvailableNode>>([]);
 const loadingNodes = ref(false);
-const selectedNode = ref<{ id: number }>();
 const errorMessage = ref<string>();
+const selectedNodeId = ref();
 
-watch(selectedNode, async () => {
-  if (selectedNode.value) {
-    emits("update:modelValue", { nodeId: selectedNode.value.id });
+watch(selectedNodeId, node => {
+  if (node) {
+    emits("update:modelValue", { nodeId: node.id });
   }
 });
 
+const shouldBeUpdated = ref(false);
 watch(
-  () => props.filters.ipv4,
-  async () => {
-    checkNode();
+  () => ({ ...props.filters }),
+  (value, oldValue) => {
+    if (
+      value.cpu === oldValue.cpu &&
+      value.memory === oldValue.memory &&
+      value.ssd === oldValue.ssd &&
+      value.disk === oldValue.disk &&
+      value.ipv4 === oldValue.ipv4 &&
+      value.ipv6 === oldValue.ipv6 &&
+      value.certified === oldValue.certified &&
+      value.rentedBy === oldValue.rentedBy
+    )
+      return;
+    loadNodes();
+    shouldBeUpdated.value = true;
   },
 );
+
+watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
+  if (l || !s) return;
+  shouldBeUpdated.value = false;
+  await loadNodes();
+});
 
 function getChipColor(item: any) {
   return item === "Dedicated" ? "success" : "secondary";
 }
-onMounted(checkNode);
+onMounted(loadNodes);
 
-async function checkNode() {
+async function loadNodes() {
+  availableNodes.value = [];
   errorMessage.value = "";
   loadingNodes.value = true;
   const filters = props.filters;
@@ -122,27 +142,26 @@ async function checkNode() {
             envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
             rootFilesystemSize: 2,
             hasGPU: filters.hasGPU,
+            certified: filters.certified,
             rentedBy: filters.rentedBy,
           },
         ],
         network: { addAccess: filters.wireguard },
       });
-
-      for (const nodes of res) {
-        if (nodes.length) {
-          for (const node of nodes) {
-            selectedNode.value = { id: availableNodes.value[0].id };
-            if (!availableNodes.value.some(n => n.id === node.nodeId)) {
-              availableNodes.value.push({ id: node.nodeId, state: node.rentedByTwinId ? "Dedicated" : "Shared" });
-            }
+      const nodes = res[0];
+      if (nodes) {
+        for (const node of nodes) {
+          if (!availableNodes.value.some(n => n.id === node.nodeId)) {
+            availableNodes.value.push({ id: node.nodeId, state: node.rentedByTwinId ? "Dedicated" : "Shared" });
           }
-        } else {
-          selectedNode.value = undefined;
-          availableNodes.value = [];
         }
+        selectedNodeId.value = availableNodes.value ? availableNodes.value[0] : undefined;
+      } else {
+        selectedNodeId.value = undefined;
+        availableNodes.value = [];
       }
     } catch (e) {
-      errorMessage.value = normalizeError(e, "Failed to deploy a full virtual machine instance.");
+      errorMessage.value = normalizeError(e, "Failed to deploy.");
     } finally {
       loadingNodes.value = false;
     }
