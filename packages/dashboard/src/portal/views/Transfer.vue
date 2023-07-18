@@ -24,25 +24,12 @@
                     () => transferAddressCheck() || 'invalid address',
                   ]"
                 ></v-combobox>
-                <v-text-field
-                  @paste.prevent
+                <TransferTextField
                   v-model="amountByAddress"
                   label="Amount (TFT)"
-                  type="number"
-                  onkeydown="javascript: return event.keyCode == 69 || /^\+$/.test(event.key) ? false : true"
-                  :rules="[
-                    () => !!amountByAddress || 'This field is required',
-                    () =>
-                      (amountByAddress.toString().split('.').length > 1
-                        ? amountByAddress.toString().split('.')[1].length <= 3
-                        : true) || 'Amount must have 3 decimals only',
-                    () => amountByAddress > 0 || 'Amount cannot be negative or 0',
-                    () =>
-                      amountByAddress < parseFloat($store.state.credentials.balance.free) ||
-                      'Amount cannot exceed balance',
-                  ]"
+                  :rules="getAmountRules(amountByAddress)"
                 >
-                </v-text-field>
+                </TransferTextField>
                 <span class="fee">0.01 transaction fee will be deducted</span>
               </v-form>
               <v-card-actions>
@@ -73,29 +60,15 @@
                   :rules="[
                     () => !!receptinTwinId || 'This field is required',
                     () => /^[1-9]\d*$/.test(receptinTwinId) || 'Please enter a positive integer',
-                    //TODO: this line not working correctly
-                    () => transferTwinIdCheck() || 'Twin ID does not exist',
+                    //TODO:
                   ]"
                 ></v-combobox>
-                <v-text-field
-                  @paste.prevent
+                <TransferTextField
                   v-model="amountByTwinId"
                   label="Amount (TFT)"
-                  type="number"
-                  onkeydown="javascript: return event.keyCode == 69 || /^\+$/.test(event.key) ? false : true"
-                  :rules="[
-                    () => !!amountByTwinId || 'This field is required',
-                    () =>
-                      (amountByTwinId.toString().split('.').length > 1
-                        ? amountByTwinId.toString().split('.')[1].length <= 3
-                        : true) || 'Amount must have 3 decimals only',
-                    () => amountByTwinId > 0 || 'Amount cannot be negative or 0',
-                    () =>
-                      amountByTwinId < parseFloat($store.state.credentials.balance.free) ||
-                      'Amount cannot exceed balance',
-                  ]"
+                  :rules="getAmountRules(amountByTwinId)"
                 >
-                </v-text-field>
+                </TransferTextField>
                 <span class="fee">0.01 transaction fee will be deducted</span>
               </v-form>
 
@@ -123,13 +96,14 @@ import { Client, QueryClient } from "@threefold/tfchain_client";
 import QrcodeVue from "qrcode.vue";
 import { Component, Vue } from "vue-property-decorator";
 
+import TransferTextField from "../components/TransferTextField.vue";
 import { balanceInterface, getBalance } from "../lib/balance";
 import { checkAddress, transfer } from "../lib/transfer";
 import { accountInterface } from "../store/state";
 
 @Component({
   name: "TransferView",
-  components: { QrcodeVue },
+  components: { QrcodeVue, TransferTextField },
 })
 export default class TransferView extends Vue {
   receipientAddress = "";
@@ -153,9 +127,11 @@ export default class TransferView extends Vue {
     const twinId = this.receptinTwinId;
     const twinDetails = await this.queryClient.twins.get({ id: parseInt(twinId) });
     if (twinDetails != null) {
+      this.isTransferValidTwinId = true;
       // console.log("valid twin id");
       return true;
     } else {
+      this.isTransferValidTwinId = false;
       // console.log("invalid twin id");
       return false;
     }
@@ -302,6 +278,17 @@ export default class TransferView extends Vue {
     requestAnimationFrame(() => {
       this.receipientAddress = $event.target.value;
     });
+  }
+
+  getAmountRules(value: any) {
+    return [
+      (v: any) => !!v || "This field is required",
+      () =>
+        (value.toString().split(".").length > 1 ? value.toString().split(".")[1].length <= 3 : true) ||
+        "Amount must have 3 decimals only",
+      () => value > 0 || "Amount cannot be negative or 0",
+      () => value < parseFloat(this.$store.state.credentials.balance.free) || "Amount cannot exceed balance",
+    ];
   }
 }
 </script>
