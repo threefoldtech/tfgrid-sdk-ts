@@ -4,6 +4,7 @@
     :cpu="solution?.cpu"
     :memory="solution?.memory"
     :disk="solution?.disk"
+    :ipv4="ipv4"
     title-image="images/icons/freeflow.png"
   >
     <template #title>Deploy a Freeflow Instance </template>
@@ -40,20 +41,30 @@
         :standard="{ cpu: 2, memory: 1024 * 16, disk: 500 }"
         :recommended="{ cpu: 4, memory: 1024 * 32, disk: 1000 }"
       />
-      <SelectGatewayNode v-model="gateway" />
-      <SelectFarm
-        :filters="{
-          cpu: solution?.cpu,
-          memory: solution?.memory,
-          ssd: solution?.disk,
-          publicIp: false,
-        }"
-        v-model="farm"
-      />
+      <Networks v-model:ipv4="ipv4"></Networks>
+      <FarmGatewayManager>
+        <SelectFarm
+          :filters="{
+            cpu: solution?.cpu,
+            memory: solution?.memory,
+            ssd: solution?.disk,
+            publicIp: ipv4,
+          }"
+          v-model="farm"
+        />
+        <DomainName :hasIPv4="ipv4" ref="domainNameCmp"></DomainName>
+      </FarmGatewayManager>
     </form-validator>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="!valid"> Deploy </v-btn>
+      <v-btn
+        color="primary"
+        variant="tonal"
+        @click="deploy(domainNameCmp?.domain, domainNameCmp?.customDomain)"
+        :disabled="!valid"
+      >
+        Deploy
+      </v-btn>
     </template>
   </weblet-layout>
 </template>
@@ -77,15 +88,20 @@ const profileManager = useProfileManager();
 
 const threebotName = ref<string>("");
 const solution = ref() as Ref<SolutionFlavor>;
-const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;
-
-async function deploy() {
+const ipv4 = ref(false);
+const domainNameCmp = ref();
+function finalize(deployment: any) {
+  layout.value.reloadDeploymentsList();
+  layout.value.setStatus("success", "Successfully deployed a Freeflow instance.");
+  layout.value.openDialog(deployment, deploymentListEnvironments.freeflow);
+}
+async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.FreeFlow.toLowerCase();
 
-  const domain = threebotName.value + "." + gateway.value.domain;
+  const domain = customDomain ? gatewayName.domain : threebotName.value + "." + gatewayName.domain;
 
   let grid: GridClient | null;
   let vm: any;
@@ -99,12 +115,11 @@ async function deploy() {
     vm = await deployVM(grid!, {
       name: threebotName.value,
       network: {
-        addAccess: true,
-        accessNodeId: gateway.value.id,
+        addAccess: !!gatewayName.id,
+        accessNodeId: gatewayName.id,
       },
       machines: [
         {
-          // publicIpv4: true,
           name: threebotName.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
@@ -119,6 +134,7 @@ async function deploy() {
           entryPoint: "/sbin/zinit init",
           farmId: farm.value.farmID,
           farmName: farm.value.name,
+          publicIpv4: ipv4.value,
           country: farm.value.country,
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
@@ -130,7 +146,12 @@ async function deploy() {
       ],
     });
   } catch (e) {
-    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Casperlabs instance."));
+    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Freeflow instance."));
+  }
+  if (customDomain && ipv4.value) {
+    vm[0].customDomain = gatewayName.domain;
+    finalize(vm);
+    return;
   }
 
   try {
@@ -138,31 +159,28 @@ async function deploy() {
 
     await deployGatewayName(grid!, {
       name: threebotName.value,
-      nodeId: gateway.value.id,
-      backends: [
-        {
-          ip: vm[0].interfaces[0].ip,
-          port: 80,
-        },
-      ],
+      nodeId: gatewayName.id!,
+      ip: vm[0].interfaces[0].ip,
+      port: 80,
       networkName: vm[0].interfaces[0].network,
+      fqdn: gatewayName?.useFQDN ? gatewayName?.domain : undefined,
     });
 
-    layout.value.reloadDeploymentsList();
-    layout.value.setStatus("success", "Successfully deployed a Casperlabs instance.");
-    layout.value.openDialog(vm, deploymentListEnvironments.casperlabs);
+    finalize(vm);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
     await rollbackDeployment(grid!, threebotName.value);
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Casperlabs instance."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Freeflow instance."));
   }
 }
 </script>
 
 <script lang="ts">
+import DomainName from "../components/domain_name.vue";
+import FarmGatewayManager from "../components/farm_gateway_manager.vue";
+import Networks from "../components/networks.vue";
 import SelectFarm from "../components/select_farm.vue";
-import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
 
@@ -170,8 +188,10 @@ export default {
   name: "TFFreeflow",
   components: {
     SelectSolutionFlavor,
-    SelectGatewayNode,
     SelectFarm,
+    DomainName,
+    FarmGatewayManager,
+    Networks,
   },
 };
 </script>
