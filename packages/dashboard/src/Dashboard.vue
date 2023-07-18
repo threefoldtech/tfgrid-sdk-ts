@@ -18,12 +18,6 @@
               <v-icon>mdi-theme-light-dark</v-icon>
             </v-btn>
 
-            <!-- <v-card color="transparent" outlined v-if="$store.state.portal.accounts.length === 0">
-              <v-btn @click="subscribe" color="green"> Connect </v-btn>
-            </v-card> -->
-
-            <!-- <v-btn v-else @click="disconnectWallet" color="red"> Disconnect </v-btn> -->
-
             <a href="https://manual.grid.tf/dashboard/dashboard.html" target="_blank">
               <v-btn class="custom-button" color="white" style="color: black"> Help</v-btn>
             </a>
@@ -169,13 +163,6 @@
         <span>{{ version ? version : "no version provided" }}</span>
       </div>
     </v-navigation-drawer>
-    <!-- <v-dialog v-model="loadingAPI" persistent class="loadingDialog">
-      <div class="d-flex justify-center" style="display: block; padding: 10%">
-        <v-progress-circular indeterminate color="green" :size="335" :width="7">
-          <span style="font-size: large; color: black">Connecting to Polkadot</span>
-        </v-progress-circular>
-      </div>
-    </v-dialog> -->
 
     <div :style="'padding-left:' + (mini ? '56px' : '300px')">
       <router-view />
@@ -237,34 +224,13 @@ export default class Dashboard extends Vue {
   accounts: accountInterface[] = [];
   loadingAPI = true;
   version = config.version;
-  // async subscribe() {
-  //   await this.$store.dispatch("portal/subscribeAccounts").then(async extensions => {
-  //     if (!extensions) {
-  //       this.$toasted.show(
-  //         "Can't open polkadot extension please make sure you have installed it first, allow access on this page, and try again",
-  //       );
-  //       return;
-  //     }
-  //     await setTimeout(() => {
-  //       if (!this.$store.state.portal.accounts.length)
-  //         this.$toasted.show(
-  //           "Can't get any account information from polkadot extension please make sure you have registered account on it",
-  //         );
-  //     }, 50);
-  //   });
-  // }
+
   async mounted() {
     this.routes = this.routes.filter(route => !route.hidden);
     Vue.prototype.$api = await connect();
     this.$store.commit("portal/setApi", { api: this.$api });
     this.loadingAPI = false;
-    // await this.subscribe();
-    // this.accounts = this.$store.state.portal.accounts;
-    // if (this.$route.path === "/" && !this.$api) {
-    //   Vue.prototype.$api = await connect();
-    //   if (this.$api) this.$store.commit("portal/setApi", { api: this.$api });
-    //   this.loadingAPI = false;
-    // }
+
     const theme = localStorage.getItem("dark_theme");
     if (theme) {
       if (theme === "true") {
@@ -318,7 +284,6 @@ export default class Dashboard extends Vue {
 
   public filteredAccounts() {
     return [this.$store.state.credentials.account];
-    // return this.accounts.filter(account => account.active);
   }
 
   public isAccountSelected() {
@@ -341,8 +306,6 @@ export default class Dashboard extends Vue {
 
   public redirectToHomePage() {
     this.accounts.map(account => (account.active = false));
-    // this.$store.commit("UNSET_CREDENTIALS");
-    // this.routes[0].active = false;
     if (this.$route.path !== "/") {
       this.$router.push({
         name: "accounts",
