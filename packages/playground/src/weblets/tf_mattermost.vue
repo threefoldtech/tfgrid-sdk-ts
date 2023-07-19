@@ -41,15 +41,11 @@
         />
         <!-- <Networks v-model:ipv4="ipv4" /> -->
         <FarmGatewayManager>
-          <input-tooltip
-            inline
-            tooltip="Click to know more about dedicated nodes."
-            href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
           <SelectFarm
             :filters="{
               cpu: solution?.cpu,
               memory: solution?.memory,
-              ssd: solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),)
+              ssd: solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
               publicIp: ipv4,
             }"
             v-model="farm"
