@@ -80,8 +80,9 @@ async function loadFarms() {
       hru: filters.disk,
       sru: filters.ssd,
       publicIPs: filters.publicIp,
-      certified: filters.certified,
       availableFor: grid!.twinId,
+      certified: filters.certified,
+      dedicated: filters.dedicated,
     },
     { exclusiveFor: props.exclusiveFor },
   );

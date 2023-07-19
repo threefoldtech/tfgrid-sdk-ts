@@ -5,30 +5,38 @@
       There are no nodes rented by you that match your selected resources, try to change your resources or rent a node
       and try again.
     </v-alert>
-    <input-validator :rules="[validators.required('Node id is required.')]" :value="selectedNode?.id" #="{ props }">
-      <v-autocomplete
-        select
-        label="Node"
-        :items="availableNodes"
-        item-title="id"
-        v-model="selectedNode"
-        :disabled="loadingNodes"
-        :loading="loadingNodes"
-        v-bind="props"
-      >
-        <template v-slot:item="{ item, props }">
-          <v-list-item @click="props.onClick" :class="{ 'v-list-item--active': props.isActive }">
-            <v-list-item-content class="d-flex justify-space-between">
-              <v-list-item-title>
-                {{ item.raw.id }}
-              </v-list-item-title>
-              <v-chip v-bind="props" :color="getChipColor(item.raw.state)" class="ml-3">
-                {{ item.raw.state }}
-              </v-chip>
-            </v-list-item-content>
-          </v-list-item>
-        </template>
-      </v-autocomplete>
+    <input-validator :rules="[validators.required('Node id is required.')]" :value="selectedNode" #="{ props }">
+      <input-tooltip tooltip="Select Node ID to deploy on.">
+        <v-autocomplete
+          select
+          label="Node"
+          :items="availableNodes"
+          item-title="nodeId"
+          v-model="selectedNode"
+          @update:model-value="selectedNode = $event"
+          :disabled="loadingNodes"
+          :loading="loadingNodes"
+          v-bind="{
+            ...props,
+            loading: props.loading || loadingNodes,
+            error: false,
+            errorMessages: undefined,
+          }"
+        >
+          <template v-slot:item="{ item, props }">
+            <v-list-item @click="props.onClick" :class="{ 'v-list-item--active': props.isActive }">
+              <v-list-item-content class="d-flex justify-space-between">
+                <v-list-item-title>
+                  {{ item.raw.nodeId }}
+                </v-list-item-title>
+                <v-chip v-bind="props" :color="getChipColor(item.raw.state)" class="ml-3">
+                  {{ item.raw.state }}
+                </v-chip>
+              </v-list-item-content>
+            </v-list-item>
+          </template>
+        </v-autocomplete>
+      </input-tooltip>
     </input-validator>
   </section>
 </template>
@@ -71,21 +79,17 @@ const props = defineProps({
   filters: { default: () => ({} as NodeFilters), type: Object as PropType<NodeFilters> },
 });
 
-interface AvailableNode {
-  id: number;
-  state: string;
-}
 const profileManager = useProfileManager();
-const availableNodes = ref<Array<AvailableNode>>([]);
+const availableNodes = ref<Array<Node>>([]);
 const loadingNodes = ref(false);
 const errorMessage = ref<string>();
-const selectedNode = ref() as Ref<AvailableNode | undefined>;
+const selectedNode = ref() as Ref<number | undefined>;
 
 watch(
   () => selectedNode.value,
   node => {
     if (node) {
-      emits("update:modelValue", { nodeId: node.id as unknown as number });
+      emits("update:modelValue", { nodeId: node as number });
     }
   },
   { immediate: true },
@@ -134,6 +138,7 @@ async function loadNodes() {
     const filteredDNodes = new FilteredNodes(grid);
     try {
       if (!filters.farmId) {
+        selectedNode.value = undefined;
         return;
       }
       const res = await filteredDNodes.getFilteredNodes({
@@ -162,11 +167,11 @@ async function loadNodes() {
       const nodes = res[0];
       if (nodes) {
         for (const node of nodes) {
-          if (!availableNodes.value.some(n => n.id === node.nodeId)) {
-            availableNodes.value.push({ id: node.nodeId, state: node.rentedByTwinId ? "Dedicated" : "Shared" });
+          if (!availableNodes.value.some(n => n.nodeId === node.nodeId)) {
+            availableNodes.value.push({ nodeId: node.nodeId, state: node.rentedByTwinId ? "Dedicated" : "Shared" });
           }
         }
-        selectedNode.value = availableNodes.value ? availableNodes.value[0] : undefined;
+        selectedNode.value = availableNodes.value ? availableNodes.value[0].nodeId : undefined;
       } else {
         selectedNode.value = undefined;
         availableNodes.value = [];
