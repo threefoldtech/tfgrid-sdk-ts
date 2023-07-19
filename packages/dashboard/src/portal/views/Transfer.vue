@@ -60,7 +60,7 @@
                   :rules="[
                     () => !!receptinTwinId || 'This field is required',
                     () => /^[1-9]\d*$/.test(receptinTwinId) || 'Please enter a positive integer',
-                    //TODO:
+                    () => transferTwinIdCheck() || 'invalid twin id',
                   ]"
                 ></v-combobox>
                 <TransferTextField
@@ -92,6 +92,7 @@
 </template>
 
 <script lang="ts">
+import { web3FromAddress } from "@polkadot/extension-dapp";
 import { Client, QueryClient } from "@threefold/tfchain_client";
 import QrcodeVue from "qrcode.vue";
 import { Component, Vue } from "vue-property-decorator";
@@ -128,11 +129,9 @@ export default class TransferView extends Vue {
     const twinDetails = await this.queryClient.twins.get({ id: parseInt(twinId) });
     if (twinDetails != null) {
       this.isTransferValidTwinId = true;
-      // console.log("valid twin id");
       return true;
     } else {
       this.isTransferValidTwinId = false;
-      // console.log("invalid twin id");
       return false;
     }
   }
@@ -222,55 +221,28 @@ export default class TransferView extends Vue {
 
   async transferTFTWithTwinID() {
     const twinDetails = await this.queryClient.twins.get({ id: parseInt(this.receptinTwinId) });
+    const injector = await web3FromAddress(this.$store.state.credentials.account.address);
     if (twinDetails != null) {
       const twinAddress = twinDetails.accountId;
-      transfer(
-        this.$store.state.credentials.account.address,
-        this.$api,
-        twinAddress,
-        this.amountByTwinId,
-        (res: { events?: never[] | undefined; status: { type: string; asFinalized: string; isFinalized: string } }) => {
-          this.loadingTransferTwinId = true;
-          if (res instanceof Error) {
-            console.log(res);
-            return;
-          }
-          const { events = [], status } = res;
-          console.log(`Current status is ${status.type}`);
-          switch (status.type) {
-            case "Ready":
-              this.$toasted.show(`Transaction submitted`);
-          }
-          if (status.isFinalized) {
-            console.log(`Transaction included at blockHash ${status.asFinalized}`);
-            if (!events.length) {
-              this.$toasted.show("Transfer failed!");
-              this.loadingTransferTwinId = false;
-            } else {
-              // Loop through Vec<EventRecord> to display all events
-              events.forEach(({ phase, event: { data, method, section } }) => {
-                console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-                if (section === "balances" && method === "Transfer") {
-                  this.$toasted.show("Transfer succeeded!");
-                  this.loadingTransferTwinId = false;
-                  getBalance(this.$api, this.$store.state.credentials.account.address).then(
-                    (balance: balanceInterface) => {
-                      this.$store.state.credentials.balance.free = balance.free;
-                      this.$store.state.credentials.balance.reserved = balance.reserved;
-                    },
-                  );
-                } else if (section === "system" && method === "ExtrinsicFailed") {
-                  this.$toasted.show("Transfer failed!");
-                  this.loadingTransferTwinId = false;
-                }
-              });
-            }
-          }
+      const client = new Client({
+        url: window.configs.APP_API_URL,
+        extSigner: {
+          address: this.$store.state.credentials.account.address,
+          signer: injector.signer,
         },
-      ).catch(err => {
-        this.$toasted.show(err.message);
-        this.loadingTransferTwinId = false;
       });
+
+      return await (
+        await client.balances.transfer({
+          address: twinAddress,
+          amount: this.amountByTwinId,
+        })
+      )
+        .apply()
+        .catch(err => {
+          this.$toasted.show(err.message);
+          this.loadingTransferTwinId = false;
+        });
     }
   }
 
