@@ -169,8 +169,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
     return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a mattermost instance."));
   }
   if (customDomain && ipv4.value) {
-    vm[0].customDomain = gatewayName.domain;
-    vm[0].customPort = port;
+    vm[0].customDomain = `{${gatewayName.domain}:${port}`;
     finalize(vm);
     return;
   }

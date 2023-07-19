@@ -32,10 +32,7 @@
               <v-alert class="my-4" variant="tonal" v-if="contract.customDomain" type="info">
                 Make sure to create an A record on your name provider with
                 <span class="font-weight-bold">{{ contract.customDomain }}</span> pointing to
-                <span class="font-weight-bold"
-                  >{{ contract.publicIP?.ip.split("/")[0] || contract.publicIP?.ip
-                  }}{{ contract.customPort ? ":" + contract.customPort : "" }}</span
-                >
+                <span class="font-weight-bold">{{ contract.publicIP?.ip.split("/")[0] || contract.publicIP?.ip }}</span>
               </v-alert>
               <CopyReadonlyInput label="Name" :data="contract.name" />
               <CopyReadonlyInput label="Contract ID" :data="contract.contractId" />
