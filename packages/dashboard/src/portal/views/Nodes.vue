@@ -91,14 +91,24 @@ export default class NodesView extends Vue {
       placeholder: "Filter by Free Cores greater than or equal to.",
     },
     {
-      label: "GPU's vendor",
-      key: "gpu_vendor",
-      placeholder: "Filter by GPU's vendor.",
+      label: "GPU's vendor name",
+      key: "gpu_vendor_name",
+      placeholder: "Filter by GPU's vendor name.",
     },
     {
-      label: "GPU's device",
-      key: "gpu_device",
-      placeholder: "Filter by GPU's device.",
+      label: "GPU's vendor id",
+      key: "gpu_vendor_id",
+      placeholder: "Filter by GPU's vendor id.",
+    },
+    {
+      label: "GPU's device name",
+      key: "gpu_device_name",
+      placeholder: "Filter by GPU's device name.",
+    },
+    {
+      label: "GPU's device id",
+      key: "gpu_device_id",
+      placeholder: "Filter by GPU's device id.",
     },
   ];
 
