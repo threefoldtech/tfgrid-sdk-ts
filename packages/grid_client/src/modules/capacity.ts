@@ -1,7 +1,4 @@
-import urlJoin from "url-join";
-
 import { GridClientConfig } from "../config";
-import { send } from "../helpers";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { FarmerBot, FarmerBotFindNodeModel } from "../high_level/farmerbot";
@@ -46,7 +43,6 @@ class Capacity {
   @expose
   @validateInput
   async filterNodes(options?: FilterOptions): Promise<NodeInfo[]> {
-    const twinId = this.config.twinId;
     if (options?.farmName) {
       options.farmId = await this.nodes.getFarmIdFromFarmName(options.farmName);
     }
