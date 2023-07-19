@@ -42,14 +42,25 @@
         <!-- <Networks v-model:ipv4="ipv4" /> -->
         <FarmGatewayManager>
 <<<<<<< HEAD
+<<<<<<< HEAD
           <input-tooltip
             inline
             tooltip="Click to know more about dedicated nodes."
             href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+=======
+          <SelectFarm
+            :filters="{
+              cpu: solution?.cpu,
+              memory: solution?.memory,
+              ssd: solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
+>>>>>>> a0391d7 (playground: custom Domain Name (#820))
               publicIp: ipv4,
             }"
             v-model="farm"
           />
+<<<<<<< HEAD
+>>>>>>> a0391d7 (playground: custom Domain Name (#820))
+=======
 >>>>>>> a0391d7 (playground: custom Domain Name (#820))
           <DomainName :hasIPv4="ipv4" ref="domainNameCmp" />
         </FarmGatewayManager>
