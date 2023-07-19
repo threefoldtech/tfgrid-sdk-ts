@@ -167,7 +167,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
 
   let grid: GridClient | null;
   let vm: any;
-
+  const port = 9000;
   try {
     layout.value.validateSsh();
     grid = await getGrid(profileManager.profile!, projectName);
@@ -223,7 +223,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
     return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a taiga instance."));
   }
   if (customDomain && ipv4.value) {
-    vm[0].customDomain = gatewayName.domain;
+    vm[0].customDomain = `${gatewayName.domain}:${port}`;
     finalize(vm);
     return;
   }
@@ -234,7 +234,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
       name: subdomain,
       nodeId: gatewayName.id!,
       ip: vm[0].interfaces[0].ip,
-      port: 9000,
+      port,
       networkName: vm[0].interfaces[0].network,
       fqdn: gatewayName?.useFQDN ? gatewayName.domain : undefined,
     });
