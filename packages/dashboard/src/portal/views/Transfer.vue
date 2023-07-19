@@ -60,7 +60,7 @@
                   :rules="[
                     () => !!receptinTwinId || 'This field is required',
                     () => /^[1-9]\d*$/.test(receptinTwinId) || 'Please enter a positive integer',
-                    () => transferTwinIdCheck() || 'invalid twin id',
+                    () => ValidateTwinId() || 'Twin ID does not exist',
                   ]"
                 ></v-combobox>
                 <TransferTextField
@@ -126,13 +126,27 @@ export default class TransferView extends Vue {
 
   async transferTwinIdCheck() {
     const twinId = this.receptinTwinId;
-    const twinDetails = await this.queryClient.twins.get({ id: parseInt(twinId) });
-    if (twinDetails != null) {
-      this.isTransferValidTwinId = true;
-      return true;
-    } else {
+    try {
+      const twinDetails = await this.queryClient.twins.get({ id: parseInt(twinId) });
+      if (twinDetails != null) {
+        this.isTransferValidTwinId = true;
+        return true;
+      } else {
+        this.isTransferValidTwinId = false;
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
       this.isTransferValidTwinId = false;
       return false;
+    }
+  }
+
+  ValidateTwinId() {
+    if (this.receptinTwinId === "") {
+      return false;
+    } else {
+      return this.transferTwinIdCheck();
     }
   }
 
