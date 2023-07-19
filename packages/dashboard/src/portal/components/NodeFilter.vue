@@ -42,11 +42,6 @@ export default class InFilter extends Vue {
     }
   }
 
-  remove(index: number): void {
-    this.$store.dispatch(`portal/removeFilterItem`, { filterKey: this.filterKey, index });
-    this.$store.dispatch(`portal/${ActionTypes.REQUEST_DEDICATED_NODES}`);
-  }
-
   validated(value: string, key: string): string | null {
     if (!value) {
       this.setItem("");
@@ -60,6 +55,10 @@ export default class InFilter extends Vue {
       this.invalid = true;
     }
     return this.errorMsg;
+  }
+
+  destroyed() {
+    this.$store.commit("portal/" + MutationTypes.CLEAR_DEDICATED_NODES_FILTER_KEY, this.filterKey);
   }
 }
 </script>

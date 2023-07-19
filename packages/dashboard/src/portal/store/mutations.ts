@@ -15,6 +15,9 @@ export enum MutationTypes {
   SET_DEDICATED_NODES = "setDedicatedNodes",
   SET_DEDICATED_NODES_COUNT = "setDedicatedNodesCount",
   SET_ADDRESS = "setAddress",
+
+  CLEAR_DEDICATED_NODES_FILTER = "clearDedicatedNodesFilter",
+  CLEAR_DEDICATED_NODES_FILTER_KEY = "clearDedicatedNodesFilterKey",
 }
 
 export default {
@@ -68,5 +71,13 @@ export default {
 
   setDedicatedNodesCount(state: PortalState, payload: number) {
     state.dedicatedNodesCount = payload;
+  },
+
+  clearDedicatedNodesFilter(state: PortalState) {
+    state.dedicatedNodesFilter = {};
+  },
+
+  clearDedicatedNodesFilterKey(state: PortalState, key: string) {
+    state.dedicatedNodesFilter[key] = "";
   },
 };
