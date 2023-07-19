@@ -4,6 +4,7 @@
     :cpu="solution?.cpu"
     :memory="solution?.memory"
     :disk="(solution?.disk ?? 0) + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
+    :ipv4="ipv4"
     title-image="images/icons/discourse.png"
   >
     <template #title> Deploy a Discourse Instance </template>
@@ -54,16 +55,19 @@
           :standard="{ cpu: 2, memory: 1024 * 2, disk: 50 }"
           :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
         />
-        <SelectGatewayNode v-model="gateway" />
-        <SelectFarm
-          :filters="{
-            cpu: solution?.cpu,
-            memory: solution?.memory,
-            ssd: (solution?.disk ?? 0) + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
-            publicIp: false,
-          }"
-          v-model="farm"
-        />
+        <!-- <Networks v-model:ipv4="ipv4" /> -->
+        <FarmGatewayManager>
+          <SelectFarm
+            :filters="{
+              cpu: solution?.cpu,
+              memory: solution?.memory,
+              ssd: (solution?.disk ?? 0) + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
+              publicIp: ipv4,
+            }"
+            v-model="farm"
+          />
+          <DomainName :hasIPv4="ipv4" ref="domainNameCmp" />
+        </FarmGatewayManager>
       </template>
 
       <template #mail>
@@ -73,7 +77,14 @@
       </template>
     </d-tabs>
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid"> Deploy </v-btn>
+      <v-btn
+        color="primary"
+        variant="tonal"
+        @click="deploy(domainNameCmp?.domain, domainNameCmp?.customDomain)"
+        :disabled="tabs?.invalid"
+      >
+        Deploy
+      </v-btn>
     </template>
   </weblet-layout>
 </template>
@@ -102,11 +113,18 @@ const profileManager = useProfileManager();
 const name = ref(generateName(9, { prefix: "dc" }));
 const email = ref("");
 const solution = ref() as Ref<SolutionFlavor>;
-const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;
+const ipv4 = ref(false);
+const domainNameCmp = ref();
 const smtp = ref(createSMTPServer());
 
-async function deploy() {
+function finalize(deployment: any) {
+  layout.value.reloadDeploymentsList();
+  layout.value.setStatus("success", "Successfully deployed a discourse instance.");
+  layout.value.openDialog(deployment, deploymentListEnvironments.discourse);
+}
+
+async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.Discourse.toLowerCase();
@@ -117,7 +135,7 @@ async function deploy() {
     twinId: profileManager.profile!.twinId,
   });
 
-  const domain = subdomain + "." + gateway.value.domain;
+  const domain = customDomain ? gatewayName.domain : subdomain + "." + gatewayName.domain;
   let grid: GridClient | null;
   let vm: any;
 
@@ -129,8 +147,8 @@ async function deploy() {
     vm = await deployVM(grid!, {
       name: name.value,
       network: {
-        addAccess: true,
-        accessNodeId: gateway.value.id,
+        addAccess: !!gatewayName.id,
+        accessNodeId: gatewayName.id,
       },
       machines: [
         {
@@ -148,6 +166,7 @@ async function deploy() {
           rootFilesystemSize: rootFs(solution.value.cpu, solution.value.memory),
           farmId: farm.value.farmID,
           farmName: farm.value.name,
+          publicIpv4: ipv4.value,
           country: farm.value.country,
           planetary: true,
           envs: [
@@ -168,25 +187,24 @@ async function deploy() {
   } catch (e) {
     return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a discourse instance."));
   }
+  if (customDomain && ipv4) {
+    vm[0].customDomain = gatewayName.domain;
+    finalize(vm);
+    return;
+  }
 
   try {
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
 
     await deployGatewayName(grid!, {
       name: subdomain,
-      nodeId: gateway.value.id,
-      backends: [
-        {
-          ip: vm[0].interfaces[0].ip,
-          port: 88,
-        },
-      ],
+      nodeId: gatewayName.id!,
+      ip: vm[0].interfaces[0].ip,
+      port: 88,
       networkName: vm[0].interfaces[0].network,
+      fqdn: gatewayName?.useFQDN ? gatewayName?.domain : undefined,
     });
-
-    layout.value.reloadDeploymentsList();
-    layout.value.setStatus("success", "Successfully deployed a discourse instance.");
-    layout.value.openDialog(vm, deploymentListEnvironments.discourse);
+    finalize(vm);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
     await rollbackDeployment(grid!, name.value);
@@ -201,8 +219,10 @@ function generatePubKey(): string {
 </script>
 
 <script lang="ts">
+import DomainName from "../components/domain_name.vue";
+import FarmGatewayManager from "../components/farm_gateway_manager.vue";
+// import Networks from "../components/networks.vue";
 import SelectFarm from "../components/select_farm.vue";
-import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -212,7 +232,9 @@ export default {
   components: {
     SmtpServer,
     SelectSolutionFlavor,
-    SelectGatewayNode,
+    DomainName,
+    FarmGatewayManager,
+    // Networks,
     SelectFarm,
   },
 };

@@ -111,8 +111,10 @@ export interface solutionFlavor {
 }
 
 export interface GatewayNode {
-  id: number;
+  id?: number;
   domain: string;
+  useFQDN?: boolean;
+  ip?: string;
 }
 
 export interface SMTPServer {
