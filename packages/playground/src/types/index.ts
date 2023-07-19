@@ -12,12 +12,19 @@ export interface K8SWorker {
   planetary: boolean;
   rootFsSize: number;
   farm?: Farm;
+  selectedNode: any;
+  rentedBy?: number;
+  dedicated: boolean;
+  certified: boolean;
 }
 
 export interface CaproverWorker {
+  selectedNode?: any;
   name: string;
   farm?: Farm;
   solution?: solutionFlavor;
+  dedicated?: boolean;
+  certified?: boolean;
 }
 
 export interface Farm {

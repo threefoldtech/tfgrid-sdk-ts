@@ -43,7 +43,7 @@ import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 
 export interface NodeFilters {
-  farmId: number;
+  farmId?: number;
   ipv6?: boolean;
   ipv4?: boolean;
   wireguard?: boolean;
@@ -51,7 +51,7 @@ export interface NodeFilters {
   hasGPU?: boolean;
   cpu: number;
   memory: number;
-  ssd: number;
+  ssd?: number;
   flist?: Flist;
   name: string;
   disk: number;
@@ -133,6 +133,9 @@ async function loadNodes() {
   if (grid) {
     const filteredDNodes = new FilteredNodes(grid);
     try {
+      if (!filters.farmId) {
+        return;
+      }
       const res = await filteredDNodes.getFilteredNodes({
         name: filters.name,
         machines: [
