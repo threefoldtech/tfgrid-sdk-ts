@@ -138,7 +138,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   const domain = customDomain ? gatewayName.domain : subdomain + "." + gatewayName.domain;
   let grid: GridClient | null;
   let vm: any;
-  const port = 88;
+
   try {
     layout.value.validateSsh();
     grid = await getGrid(profileManager.profile!, projectName);
@@ -188,7 +188,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
     return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a discourse instance."));
   }
   if (customDomain && ipv4) {
-    vm[0].customDomain = `{${gatewayName.domain}:${port}`;
+    vm[0].customDomain = gatewayName.domain;
     finalize(vm);
     return;
   }
@@ -200,7 +200,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
       name: subdomain,
       nodeId: gatewayName.id!,
       ip: vm[0].interfaces[0].ip,
-      port,
+      port: 88,
       networkName: vm[0].interfaces[0].network,
       fqdn: gatewayName?.useFQDN ? gatewayName?.domain : undefined,
     });
