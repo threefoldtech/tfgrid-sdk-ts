@@ -4,7 +4,7 @@
     :cpu="solution?.cpu"
     :memory="solution?.memory"
     :disk="(solution?.disk ?? 0) + 10 + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
-    :ivp4="ipv4"
+    :ipv4="ipv4"
     title-image="images/icons/umbrel.png"
   >
     <template #title>Deploy an Umbrel Instance </template>
@@ -60,13 +60,7 @@
         </input-validator>
       </password-input-wrapper>
 
-      <input-tooltip
-        #="props"
-        inline
-        tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
-      >
-        <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
-      </input-tooltip>
+      <Network v-model:ipv4="ipv4" />
 
       <SelectSolutionFlavor
         v-model="solution"
@@ -171,6 +165,7 @@ async function deploy() {
 </script>
 
 <script lang="ts">
+import Network from "../components/networks.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";

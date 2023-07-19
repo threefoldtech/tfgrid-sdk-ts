@@ -1,3 +1,5 @@
+import type { NodeGPUCardType } from "@/utils/filter_node_with_gpu";
+
 export function downloadAsFile(name: string, data: string) {
   const a = document.createElement("a");
   a.download = name;
@@ -33,5 +35,9 @@ export function normalizeBalance(num: number | string | undefined, floor = false
 }
 
 export function isEnoughBalance(balance: any, min = 0.001): boolean {
-  return balance.free > min ? true : false;
+  return balance?.free > min ? true : false;
+}
+
+export function getCardName(card: NodeGPUCardType): string {
+  return card.vendor + " - " + card.device;
 }

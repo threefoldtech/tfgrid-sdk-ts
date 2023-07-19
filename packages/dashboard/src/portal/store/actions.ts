@@ -13,10 +13,11 @@ export enum ActionTypes {
 
 export default {
   async subscribeAccounts({ commit }: ActionContext<PortalState, PortalState>) {
-    await web3Enable("TF Chain UI");
+    const extensions = await web3Enable("TF Chain UI");
     await web3AccountsSubscribe(injectedAccounts => {
       commit(MutationTypes.SET_ACCOUNTS, { accounts: injectedAccounts });
     });
+    return extensions.length;
   },
 
   async requestDedicatedNodes({ state, commit }: ActionContext<PortalState, PortalState>) {

@@ -3,13 +3,16 @@
     <template #activator="{ props }">
       <v-btn
         @click.stop="$emit('click', $event)"
-        :icon="icon"
         :color="color"
         v-bind="props"
         :href="href"
         :target="href ? '_blank' : undefined"
+        variant="tonal"
         :height="height"
-      />
+        class="my-1"
+      >
+        <v-icon> {{ icon }}</v-icon>
+      </v-btn>
     </template>
   </v-tooltip>
 </template>

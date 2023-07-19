@@ -39,12 +39,11 @@
           select
           label="Node cards"
           :model-value="selectedCards"
-          :items="nodeCards.map(card => card.vendor)"
+          :items="nodeCards.map(card => getCardName(card))"
           :disabled="loadingCards"
-          :loading="loadingCards"
           multiple
           @update:model-value="selectedCards = $event"
-          v-bind="props"
+          v-bind="{ ...props, loading: props.loading || loadingCards }"
         />
       </input-tooltip>
     </input-validator>
@@ -55,7 +54,7 @@
 import { onMounted, type PropType, ref, watch } from "vue";
 
 import GPUNode, { type GPUNodeType, type NodeGPUCardType } from "@/utils/filter_node_with_gpu";
-import { normalizeError } from "@/utils/helpers";
+import { getCardName, normalizeError } from "@/utils/helpers";
 
 import { useProfileManager } from "../stores/profile_manager";
 import { type Flist, ProjectName } from "../types";
@@ -100,7 +99,7 @@ watch(selectedCards, async () => {
   const cards: NodeGPUCardType[] = [];
   for (const card of nodeCards.value) {
     for (const selectedCard of selectedCards.value) {
-      if (card.vendor === selectedCard && !cards.includes(card)) {
+      if (getCardName(card) === selectedCard && !cards.includes(card)) {
         cards.push(card);
       }
     }
