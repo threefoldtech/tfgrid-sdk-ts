@@ -1,3 +1,5 @@
+import type { NodeGPUCardType } from "@/utils/filter_node_with_gpu";
+
 export function downloadAsFile(name: string, data: string) {
   const a = document.createElement("a");
   a.download = name;
@@ -41,4 +43,8 @@ export function getDashboardURL(network: string) {
     return "https://dashboard.grid.tf";
   }
   return `https://dashboard.${network}.grid.tf`;
+}
+
+export function getCardName(card: NodeGPUCardType): string {
+  return card.vendor + " - " + card.device;
 }
