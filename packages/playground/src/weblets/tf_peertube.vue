@@ -56,7 +56,7 @@
       </password-input-wrapper>
 
       <SelectSolutionFlavor v-model="solution" />
-      <Networks v-model:ipv4="ipv4" />
+      <!-- <Networks v-model:ipv4="ipv4" /> -->
       <FarmGatewayManager>
         <SelectFarm
           :filters="{
@@ -200,7 +200,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
 <script lang="ts">
 import DomainName from "../components/domain_name.vue";
 import FarmGatewayManager from "../components/farm_gateway_manager.vue";
-import Networks from "../components/networks.vue";
+// import Networks from "../components/networks.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -212,7 +212,7 @@ export default {
   components: {
     SelectSolutionFlavor,
     SelectFarm,
-    Networks,
+    // Networks,
     DomainName,
     FarmGatewayManager,
   },
