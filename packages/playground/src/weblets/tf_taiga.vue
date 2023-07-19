@@ -5,8 +5,6 @@
     :memory="solution?.memory"
     :disk="solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
     :ipv4="ipv4"
-    :certified="certified"
-    :dedicated="dedicated"
     title-image="images/icons/taiga.png"
   >
     <template #title>Deploy a Taiga Instance</template>
@@ -88,42 +86,15 @@
         />
         <!-- <Networks v-model:ipv4="ipv4" /> -->
         <FarmGatewayManager>
-          <input-tooltip
-            inline
-            tooltip="Click to know more about dedicated nodes."
-            href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
-          >
-            <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
-          </input-tooltip>
-          <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-            <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
-          </input-tooltip>
-
-          <SelectFarmManager>
-            <SelectFarm
-              :filters="{
-                cpu: solution?.cpu,
-                memory: solution?.memory,
-                ssd: solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
-                publicIp: ipv4,
-                rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-                certified: certified,
-              }"
-              v-model="farm"
-            />
-
-            <SelectNode
-              v-model="selectedNode"
-              :filters="{
-                farmId: farm?.farmID,
-                cpu: solution?.cpu,
-                memory: solution?.memory,
-                disks: [{ size: solution?.disk, mountPoint: '/var/lib/docker' }],
-                rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-                certified: certified,
-              }"
-            />
-          </SelectFarmManager>
+          <SelectFarm
+            :filters="{
+              cpu: solution?.cpu,
+              memory: solution?.memory,
+              ssd: solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
+              publicIp: ipv4,
+            }"
+            v-model="farm"
+          />
           <DomainName :hasIPv4="ipv4" ref="domainNameCmp" />
         </FarmGatewayManager>
       </template>
@@ -171,13 +142,6 @@ const password = ref(generatePassword());
 const email = ref("");
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
-const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/grid3_taiga_docker-latest.flist",
-  entryPoint: "/sbin/zinit init",
-};
-const dedicated = ref(false);
-const certified = ref(false);
-const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
 const domainNameCmp = ref();
 
@@ -292,8 +256,6 @@ import DomainName from "../components/domain_name.vue";
 import FarmGatewayManager from "../components/farm_gateway_manager.vue";
 // import Networks from "../components/networks.vue";
 import SelectFarm from "../components/select_farm.vue";
-import SelectFarmManager from "../components/select_farm_manager.vue";
-import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import { deploymentListEnvironments } from "../constants";
