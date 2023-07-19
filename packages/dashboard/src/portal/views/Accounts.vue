@@ -1,5 +1,7 @@
 <template>
-  <div>Please connect your wallet</div>
+  <div>
+    <v-alert type="info">Please connect to your tfchain wallet.</v-alert>
+  </div>
 </template>
 
 <script lang="ts">
