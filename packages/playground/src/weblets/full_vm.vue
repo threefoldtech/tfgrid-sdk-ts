@@ -223,7 +223,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref } from "vue";
+import { type Ref, ref, watch } from "vue";
 
 import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
@@ -288,6 +288,26 @@ function addDisk() {
     mountPoint: "/mnt/" + name,
   });
 }
+
+watch(
+  dedicated,
+  dedicated => {
+    if (dedicated === false) {
+      hasGPU.value = dedicated;
+    }
+  },
+  { immediate: true },
+);
+
+watch(
+  hasGPU,
+  hasGPU => {
+    if (hasGPU) {
+      dedicated.value = true;
+    }
+  },
+  { immediate: true },
+);
 
 async function deploy() {
   layout.value.setStatus("deploy");
