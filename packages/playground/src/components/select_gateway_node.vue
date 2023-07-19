@@ -1,5 +1,6 @@
 <template>
   <input-validator
+    ref="validator"
     :value="$props.modelValue?.id"
     :rules="[validators.required('Gateway node is required.')]"
     #="{ props }"
@@ -45,7 +46,7 @@
 
 <script lang="ts" setup>
 import type { FilterOptions } from "@threefold/grid_client";
-import { onMounted, type Ref, ref, watch } from "vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
 
@@ -67,6 +68,7 @@ const size = 50;
 const validator = ref();
 
 onMounted(loadNextPage);
+onUnmounted(() => emits("update:model-value", undefined));
 type gatewayFilters = Omit<FilterOptions, "gateway">;
 
 watch(
@@ -107,9 +109,8 @@ async function loadNextPage() {
   const nodeExists = !!nodes.find(({ nodeId }) => nodeId == props.modelValue?.id);
   loading.value = false;
 
-  if (props.modelValue && !nodeExists) {
-    emits("update:model-value", undefined);
-  }
+  if (props.modelValue && !nodeExists) emits("update:model-value", undefined);
+  if (nodeExists) validator.value?.validate();
 }
 defineExpose({ loading });
 function normalizeGatewayNode(item: any): GatewayNode {
