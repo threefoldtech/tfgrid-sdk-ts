@@ -231,18 +231,26 @@ export default class TransferView extends Vue {
           signer: injector.signer,
         },
       });
-
-      return await (
-        await client.balances.transfer({
+      this.loadingTransferTwinId = true;
+      try {
+        const transferResult = await client.balances.transfer({
           address: twinAddress,
-          amount: this.amountByTwinId,
-        })
-      )
-        .apply()
-        .catch(err => {
-          this.$toasted.show(err.message);
-          this.loadingTransferTwinId = false;
+          amount: this.amountByTwinId * 1e7,
         });
+        this.$toasted.show(`Transaction submitted`);
+        await transferResult.apply();
+
+        this.$toasted.show("Transfer succeeded!");
+        this.loadingTransferTwinId = false;
+
+        getBalance(this.$api, this.$store.state.credentials.account.address).then((balance: balanceInterface) => {
+          this.$store.state.credentials.balance.free = balance.free;
+          this.$store.state.credentials.balance.reserved = balance.reserved;
+        });
+      } catch (error) {
+        this.$toasted.show("Transfer failed!");
+        this.loadingTransferTwinId = false;
+      }
     }
   }
 
