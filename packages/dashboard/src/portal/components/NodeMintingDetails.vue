@@ -119,11 +119,6 @@ export default class NodeMintingDetails extends Vue {
   mounted() {
     this.getDates();
     this.getMonthReceipt();
-    for (let i = 0; i < this.node.receipts.length; i++) {
-      if (this.node.receipts[i].cloud_units.cu > 0) {
-        console.log(this.node.receipts[i]);
-      }
-    }
   }
 
   getChipColor(type: string) {
