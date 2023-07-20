@@ -97,19 +97,9 @@ export default class NodesView extends Vue {
       placeholder: "Filter by GPU's vendor name.",
     },
     {
-      label: "GPU's vendor id",
-      key: "gpu_vendor_id",
-      placeholder: "Filter by GPU's vendor id.",
-    },
-    {
       label: "GPU's device name",
       key: "gpu_device_name",
       placeholder: "Filter by GPU's device name.",
-    },
-    {
-      label: "GPU's device id",
-      key: "gpu_device_id",
-      placeholder: "Filter by GPU's device id.",
     },
   ];
 
