@@ -122,7 +122,7 @@
                           variant="tonal"
                           :disabled="isValidForm"
                           :loading="creatingAccount"
-                          @click="createNewAccount"
+                          @click="openAcceptTerms = termsLoading = true"
                         >
                           generate account
                         </VBtn>
@@ -131,7 +131,25 @@
                   </PasswordInputWrapper>
                 </template>
               </VTooltip>
-
+              <v-dialog v-model="openAcceptTerms" fullscreen>
+                <iframe
+                  v-show="!termsLoading"
+                  src="https://library.threefold.me/info/legal/#/"
+                  frameborder="0"
+                  style="background-color: white"
+                  allow="fullscreen"
+                  height="95%"
+                  width="100%"
+                  sandbox="allow-forms allow-modals allow-scripts allow-popups allow-same-origin "
+                  @load="termsLoading = false"
+                ></iframe>
+                <v-btn @click="createNewAccount" v-show="!termsLoading"> accept terms and conditions </v-btn>
+                <v-card v-show="termsLoading" :style="{ height: '100%' }">
+                  <v-card-text class="d-flex justify-center align-center" :style="{ height: '100%' }">
+                    <v-progress-circular indeterminate color="primary" />
+                  </v-card-text>
+                </v-card>
+              </v-dialog>
               <v-alert type="error" variant="tonal" class="mb-4" v-if="createAccountError && activeTab === 1">
                 {{ createAccountError }}
               </v-alert>
@@ -417,9 +435,9 @@ function getTabs() {
   }
   return tabs;
 }
-
+const termsLoading = ref(false);
 const profileManager = useProfileManager();
-
+const openAcceptTerms = ref(false);
 const mnemonic = ref("");
 const isValidForm = ref(false);
 const SSHKeyHint = ref("");
@@ -525,6 +543,8 @@ onMounted(async () => {
 
 const creatingAccount = ref(false);
 async function createNewAccount() {
+  openAcceptTerms.value = false;
+  termsLoading.value = false;
   clearError();
   creatingAccount.value = true;
   try {
