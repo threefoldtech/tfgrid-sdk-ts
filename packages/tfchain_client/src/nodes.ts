@@ -65,7 +65,7 @@ class QueryNodes {
   @checkConnection
   async get(options: QueryNodesGetOptions): Promise<Node> {
     if (isNaN(options.id) || options.id <= 0) {
-      throw Error("Invalid node id. Node id must be postive integer");
+      throw Error("Invalid node id. Node id must be positive integer");
     }
     const res = await this.client.api.query.tfgridModule.nodes(options.id);
     return res.toPrimitive() as unknown as Node;

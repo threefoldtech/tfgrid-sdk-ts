@@ -29,7 +29,18 @@
         <v-list-item-content>
           <v-list-item-title> Stellar Address </v-list-item-title>
         </v-list-item-content>
-        <span style="width: 60%">{{ farm.stellarAddress || "None" }}</span>
+        <v-text-field
+          class="py-2"
+          v-if="farm.stellarAddress"
+          style="max-width: 70%"
+          :value="farm.stellarAddress"
+          readonly
+          hide-details
+          append-outer-icon="mdi-content-copy"
+          @click:append-outer="copy(farm.stellarAddress)"
+          solo
+        />
+        <span v-else>None</span>
       </v-list-item>
     </v-list>
   </v-container>
@@ -42,5 +53,9 @@ import { IFarm } from "../graphql/api";
 @Component({})
 export default class FarmDetails extends Vue {
   @Prop({ required: true }) farm!: IFarm;
+  copy(address: string) {
+    navigator.clipboard.writeText(address);
+    this.$toasted.show("Copied!");
+  }
 }
 </script>

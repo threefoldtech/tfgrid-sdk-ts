@@ -216,6 +216,7 @@ import FundsCard from "./portal/components/FundsCard.vue";
 import TftSwapPrice from "./portal/components/TftSwapPrice.vue";
 import WelcomeWindow from "./portal/components/WelcomeWindow.vue";
 import { connect } from "./portal/lib/connect";
+import { MutationTypes } from "./portal/store/mutations";
 import { accountInterface } from "./portal/store/state";
 
 interface SidenavItem {
@@ -223,6 +224,7 @@ interface SidenavItem {
   icon: string;
   prefix: string;
   active?: boolean;
+  hidden?: boolean;
   hyperlink?: boolean;
   children: Array<{
     label?: string;
@@ -269,11 +271,14 @@ export default class Dashboard extends Vue {
     });
   }
   async mounted() {
+    this.routes = this.routes.filter(route => {
+      if (!route.hidden) return route;
+    });
     await this.subscribe();
     this.accounts = this.$store.state.portal.accounts;
     if (this.$route.path === "/" && !this.$api) {
       Vue.prototype.$api = await connect();
-      if (this.$api) this.$store.commit("portal/setApi", { api: this.$api });
+      if (this.$api) this.$store.commit(`portal/${MutationTypes.SET_API}`, this.$api);
       this.loadingAPI = false;
     }
     const theme = localStorage.getItem("dark_theme");
@@ -460,6 +465,13 @@ export default class Dashboard extends Vue {
       icon: "earth",
       prefix: "/other/bootstrap",
       children: [],
+    },
+    {
+      label: "Minting",
+      icon: "cash-multiple",
+      prefix: "/other/minting",
+      children: [],
+      hidden: window.configs.APP_NETWORK !== "main",
     },
     {
       label: "Monitoring",
