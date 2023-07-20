@@ -137,14 +137,20 @@ export default class NodeMintingDetails extends Vue {
   }
 
   getMonthReceipt() {
-    this.receipts = [];
     const selectedDate = new Date(this.selectedData);
-    for (let i = 0; i < this.node.receipts.length; i++) {
-      const receiptDate = this.getDateFromTimestamp(this.node.receipts[i].startPeriodTimestamp);
-      if (this.formatDate(selectedDate) === this.formatDate(receiptDate)) {
-        this.receipts.push(this.node.receipts[i]);
-      }
-    }
+    this.receipts = this.filterReceiptsByMonth(this.node.receipts, selectedDate.getFullYear(), selectedDate.getMonth());
+  }
+
+  filterReceiptsByMonth(receipts: receiptInterface[], year: number, month: number): receiptInterface[] {
+    const startDate = new Date(year, month - 1, 20);
+    const endDate = new Date(year, month, 20);
+
+    const filteredReceipts = receipts.filter(receipt => {
+      const receiptDate = this.getDateFromTimestamp(receipt.startPeriodTimestamp);
+      return receiptDate >= startDate && receiptDate < endDate;
+    });
+
+    return filteredReceipts;
   }
 }
 </script>
