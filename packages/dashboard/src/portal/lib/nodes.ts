@@ -1,5 +1,4 @@
 /* eslint-disable */
-import { web3FromAddress } from "@polkadot/extension-dapp";
 import axios from "axios";
 import config from "../config";
 import { getBalance } from "./balance";
@@ -10,6 +9,7 @@ import "jspdf-autotable";
 import { Client } from "@threefold/tfchain_client";
 import { getKeypair } from "@/utils/signer";
 import { ApiPromise } from "@polkadot/api";
+import profileStore from "@/store";
 
 export interface receiptInterface {
   hash: string;
@@ -254,10 +254,10 @@ export async function cancelRentContract(api: ApiPromise, address: string, contr
 }
 
 export async function setDedicatedNodeExtraFee(address: string, nodeId: number, extraFee: number) {
-  const injector = await web3FromAddress(address);
+  const keypair = await getKeypair();
   const client = new Client({
     url: window.configs.APP_API_URL,
-    extSigner: { address: address, signer: injector.signer },
+    mnemonicOrSecret: profileStore.state.profile!.mnemonic,
   });
   return await (await client.contracts.setDedicatedNodeExtraFee({ nodeId, extraFee })).apply();
 }
