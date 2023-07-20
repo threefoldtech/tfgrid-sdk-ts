@@ -11,7 +11,7 @@ import { apiInterface } from "./util";
 import { Client } from "@threefold/tfchain_client";
 
 export interface receiptInterface {
-  type: "minting" | "fixup";
+  type: "MINTING" | "FIXUP";
   hash: string;
   mintingStart?: number;
   mintingEnd?: number;
@@ -19,12 +19,14 @@ export interface receiptInterface {
   fixupStart?: number;
   fixupEnd?: number;
   tft?: number;
-  clould_units: {
+  cloud_units: {
     cu: number;
     su: number;
     nu: number;
   };
-  payoutDate: number;
+  startPeriodTimestamp: number;
+  endPeriodTimestamp: number;
+  fixupReward?: number;
 }
 interface UptimeEvent {
   uptime: number;
@@ -311,35 +313,42 @@ export async function getNodeMintingFixupReceipts(nodeId: number) {
           Fixup: {
             period: { start: number; end: number };
             fixup_cloud_units: { cu: number; su: number; nu: number };
+            minted_reward: { musd: number; tft: number };
+            fixup_reward: { musd: number; tft: number };
           };
         };
       }) => {
         if (rec.receipt.Minting) {
           nodeReceipts.push({
-            type: "minting",
+            type: "MINTING",
             hash: rec.hash,
-            clould_units: rec.receipt.Minting.cloud_units,
+            cloud_units: rec.receipt.Minting.cloud_units,
             mintingStart: rec.receipt.Minting.period.start * 1000,
             mintingEnd: rec.receipt.Minting.period.end * 1000,
             measuredUptime: rec.receipt.Minting.measured_uptime || 0,
             tft: rec.receipt.Minting.reward.tft / 1e7,
-            payoutDate: rec.receipt.Minting.period.end,
+            startPeriodTimestamp: rec.receipt.Minting.period.start,
+            endPeriodTimestamp: rec.receipt.Minting.period.end,
           });
         } else {
           nodeReceipts.push({
-            type: "fixup",
+            type: "FIXUP",
             hash: rec.hash,
-            clould_units: rec.receipt.Fixup.fixup_cloud_units,
+            cloud_units: rec.receipt.Fixup.fixup_cloud_units,
             fixupStart: rec.receipt.Fixup.period.start * 1000 || 0,
             fixupEnd: rec.receipt.Fixup.period.end * 1000 || 0,
-            payoutDate: rec.receipt.Fixup.period.end,
+            startPeriodTimestamp: rec.receipt.Fixup.period.start,
+            endPeriodTimestamp: rec.receipt.Fixup.period.end,
+            tft: rec.receipt.Fixup.minted_reward.tft / 1e7,
+            fixupReward: rec.receipt.Fixup.fixup_reward.tft / 1e7,
           });
         }
       },
     ),
   );
 
-  nodeReceipts = nodeReceipts.sort((a, b) => b.payoutDate - a.payoutDate);
+  // sort based on the start date
+  nodeReceipts = nodeReceipts.sort((a, b) => b.startPeriodTimestamp - a.startPeriodTimestamp);
   return nodeReceipts;
 }
 export async function getNodeGPUs(nodeId: number): Promise<INodeGPU[] | undefined> {
