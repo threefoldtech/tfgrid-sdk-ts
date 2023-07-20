@@ -24,6 +24,16 @@ export interface receiptInterface {
     su: number;
     nu: number;
   };
+  fixup_cloud_units?: {
+    cu: number;
+    su: number;
+    nu: number;
+  };
+  correct_cloud_units?: {
+    cu: number;
+    su: number;
+    nu: number;
+  };
   startPeriodTimestamp: number;
   endPeriodTimestamp: number;
   fixupReward?: number;
@@ -123,7 +133,7 @@ export function generateNodeSummary(doc: jsPDF, nodes: nodeInterface[]) {
   const cellX = 15;
   const cellY = topY + lineOffset;
 
-  doc.text("Total Nodes Summary", topX, topY);
+  doc.text(`Farm ${nodes[0].farmId} Nodes Minting Summary`, topX, topY);
   doc.setFontSize(10);
 
   doc.text(`Nodes: ${nodes.length}`, cellX, cellY);
@@ -166,10 +176,7 @@ export function generateNodeSummary(doc: jsPDF, nodes: nodeInterface[]) {
           0,
         )) *
       100
-    ).toFixed(2)}% - ${nodes.reduce(
-      (total, node) => (total += Math.floor(moment.duration(node.uptime, "seconds").asDays())),
-      0,
-    )} days`,
+    ).toFixed(2)}%`,
     cellX,
     cellY + lineOffset * 5,
   );
@@ -191,7 +198,7 @@ export interface INodeGPU {
 export function generatePage(doc: jsPDF, receiptsBatch: receiptInterface[], page: number) {
   const lineOffset = 5;
   const topY = 20 + lineOffset * 6;
-  const cellOffset = 30;
+  const cellOffset = lineOffset * 12;
   const cellX = 15;
   const cellY = topY + lineOffset * 2;
 
@@ -199,18 +206,50 @@ export function generatePage(doc: jsPDF, receiptsBatch: receiptInterface[], page
     doc.addPage();
   }
   for (let i = 0; i < receiptsBatch.length; i++) {
-    if (receiptsBatch[i].measuredUptime) {
+    if (receiptsBatch[i].type === "MINTING") {
       doc.text(`Minting: ${receiptsBatch[i].hash}`, cellX, cellY + cellOffset * i);
       doc.text(`start: ${getTime(receiptsBatch[i].mintingStart)}`, cellX, cellY + cellOffset * i + lineOffset);
       doc.text(`end: ${getTime(receiptsBatch[i].mintingEnd)}`, cellX, cellY + cellOffset * i + lineOffset * 2);
       doc.text(`TFT: ${receiptsBatch[i].tft?.toFixed(2)}`, cellX, cellY + cellOffset * i + lineOffset * 3);
+      doc.text(
+        `Cloud Units: ${receiptsBatch[i].cloud_units.cu} CU, ${receiptsBatch[i].cloud_units.nu} NU, ${receiptsBatch[i].cloud_units.su} SU`,
+        cellX,
+        cellY + cellOffset * i + lineOffset * 4,
+      );
     } else {
       doc.text(`Fixup: ${receiptsBatch[i].hash}`, cellX, cellY + cellOffset * i);
       doc.text(`start: ${getTime(receiptsBatch[i].fixupStart)}`, cellX, cellY + cellOffset * i + lineOffset);
       doc.text(`end: ${getTime(receiptsBatch[i].fixupEnd)}`, cellX, cellY + cellOffset * i + lineOffset * 2);
+      doc.text(`TFT: ${receiptsBatch[i].tft?.toFixed(2)}`, cellX, cellY + cellOffset * i + lineOffset * 3);
+      doc.text(
+        `Fixup TFT: ${receiptsBatch[i].fixupReward?.toFixed(2) || 0}`,
+        cellX,
+        cellY + cellOffset * i + lineOffset * 4,
+      );
+      doc.text(
+        `CU (Minted|Actual|FixedUp):   (${receiptsBatch[i].cloud_units.cu} | ${
+          receiptsBatch[i].correct_cloud_units?.cu || 0
+        } | ${receiptsBatch[i].fixup_cloud_units?.cu || 0})`,
+        cellX,
+        cellY + cellOffset * i + lineOffset * 5,
+      );
+      doc.text(
+        `NU (Minted|Actual|FixedUp):   (${receiptsBatch[i].cloud_units.nu} | ${
+          receiptsBatch[i].correct_cloud_units?.nu || 0
+        } | ${receiptsBatch[i].fixup_cloud_units?.nu || 0})`,
+        cellX,
+        cellY + cellOffset * i + lineOffset * 6,
+      );
+      doc.text(
+        `SU (Minted|Actual|FixedUp):   (${receiptsBatch[i].cloud_units.su} | ${
+          receiptsBatch[i].correct_cloud_units?.su || 0
+        } | ${receiptsBatch[i].fixup_cloud_units?.su || 0})`,
+        cellX,
+        cellY + cellOffset * i + lineOffset * 7,
+      );
     }
     if (i !== receiptsBatch.length - 1) {
-      doc.line(cellX, cellY + cellOffset * i + lineOffset * 4, cellX + 175, cellY + cellOffset * i + lineOffset * 4);
+      doc.line(cellX, cellY + cellOffset * i + lineOffset * 8, cellX + 175, cellY + cellOffset * i + lineOffset * 8);
     }
   }
 
@@ -251,7 +290,7 @@ export function generateReceipt(doc: jsPDF, node: nodeInterface) {
   // Draw a line after the header information
   doc.line(cellX, topY + lineOffset * 6, cellX + 175, topY + lineOffset * 6);
 
-  const size = 7;
+  const size = 4;
   let page = 0;
   for (let i = 0; i < node.receipts.length - 1; i += size) {
     page++;
@@ -312,7 +351,9 @@ export async function getNodeMintingFixupReceipts(nodeId: number) {
           };
           Fixup: {
             period: { start: number; end: number };
+            minted_cloud_units: { cu: number; su: number; nu: number };
             fixup_cloud_units: { cu: number; su: number; nu: number };
+            correct_cloud_units: { cu: number; su: number; nu: number };
             minted_reward: { musd: number; tft: number };
             fixup_reward: { musd: number; tft: number };
           };
@@ -334,7 +375,9 @@ export async function getNodeMintingFixupReceipts(nodeId: number) {
           nodeReceipts.push({
             type: "FIXUP",
             hash: rec.hash,
-            cloud_units: rec.receipt.Fixup.fixup_cloud_units,
+            cloud_units: rec.receipt.Fixup.minted_cloud_units,
+            fixup_cloud_units: rec.receipt.Fixup.fixup_cloud_units,
+            correct_cloud_units: rec.receipt.Fixup.correct_cloud_units,
             fixupStart: rec.receipt.Fixup.period.start * 1000 || 0,
             fixupEnd: rec.receipt.Fixup.period.end * 1000 || 0,
             startPeriodTimestamp: rec.receipt.Fixup.period.start,
