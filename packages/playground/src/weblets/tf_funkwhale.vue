@@ -4,6 +4,7 @@
     :cpu="solution?.cpu"
     :memory="solution?.memory"
     :disk="solution?.disk"
+    :ipv4="ipv4"
     title-image="images/icons/funkwhale.png"
   >
     <template #title>Deploy a Funkwhale Instance </template>
@@ -82,49 +83,59 @@
         :minimum="{ cpu: 2, memory: 1024, disk: 50 }"
         :standard="{ cpu: 2, memory: 1024 * 2, disk: 100 }"
       />
-      <SelectGatewayNode v-model="gateway" />
+      <Networks v-model:ipv4="ipv4" />
+      <FarmGatewayManager>
+        <input-tooltip
+          inline
+          tooltip="Click to know more about dedicated nodes."
+          href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+        >
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" />
+        </input-tooltip>
+        <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+          <v-switch color="primary" inset label="Certified" v-model="certified" />
+        </input-tooltip>
 
-      <input-tooltip
-        inline
-        tooltip="Click to know more about dedicated nodes."
-        href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
-      >
-        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" />
-      </input-tooltip>
-      <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-        <v-switch color="primary" inset label="Certified" v-model="certified" />
-      </input-tooltip>
+        <SelectFarm
+          :filters="{
+            cpu: solution?.cpu,
+            memory: solution?.memory,
+            ssd: solution?.disk,
+            dedicated: dedicated,
+            certified: certified,
+            publicIp: ipv4,
+          }"
+          v-model="farm"
+        />
 
-      <SelectFarm
-        :filters="{
-          cpu: solution?.cpu,
-          memory: solution?.memory,
-          ssd: solution?.disk,
-          dedicated: dedicated,
-          certified: certified,
-        }"
-        v-model="farm"
-      />
-
-      <SelectNode
-        v-model="selectedNode"
-        :filters="{
-          farmId: farm?.farmID,
-          cpu: solution?.cpu,
-          memory: solution?.memory,
-          ssd: solution?.disk,
-          disks: [{ size: solution?.disk, mountPoint: '/data' }],
-          disk: solution?.disk,
-          name: name,
-          flist: flist,
-          rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-          certified: certified,
-        }"
-      />
+        <SelectNode
+          v-model="selectedNode"
+          :filters="{
+            farmId: farm?.farmID,
+            cpu: solution?.cpu,
+            memory: solution?.memory,
+            ssd: solution?.disk,
+            disks: [{ size: solution?.disk, mountPoint: '/data' }],
+            disk: solution?.disk,
+            name: name,
+            flist: flist,
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+            certified: certified,
+          }"
+        />
+        <DomainName :hasIPv4="ipv4" ref="domainNameCmp" />
+      </FarmGatewayManager>
     </form-validator>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="!valid"> Deploy </v-btn>
+      <v-btn
+        color="primary"
+        variant="tonal"
+        @click="deploy(domainNameCmp?.domain, domainNameCmp?.customDomain)"
+        :disabled="!valid"
+      >
+        Deploy
+      </v-btn>
     </template>
   </weblet-layout>
 </template>
@@ -153,7 +164,6 @@ const username = ref("admin");
 const email = ref("");
 const password = ref(generatePassword(12));
 const solution = ref() as Ref<SolutionFlavor>;
-const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/funkwhale-dec21.flist",
@@ -162,8 +172,16 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<Node>;
+const ipv4 = ref(false);
+const domainNameCmp = ref();
 
-async function deploy() {
+function finalize(deployment: any) {
+  layout.value.reloadDeploymentsList();
+  layout.value.setStatus("success", "Successfully deployed a funkwhale instance.");
+  layout.value.openDialog(deployment, deploymentListEnvironments.funkwhale);
+}
+
+async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.Funkwhale.toLowerCase();
@@ -173,7 +191,7 @@ async function deploy() {
     projectName,
     twinId: profileManager.profile!.twinId,
   });
-  const domain = subdomain + "." + gateway.value.domain;
+  const domain = customDomain ? gatewayName.domain : subdomain + "." + gatewayName.domain;
 
   let grid: GridClient | null;
   let vm: any;
@@ -187,8 +205,8 @@ async function deploy() {
     vm = await deployVM(grid!, {
       name: name.value,
       network: {
-        accessNodeId: gateway.value.id,
-        addAccess: true,
+        accessNodeId: gatewayName.id,
+        addAccess: !!gatewayName.id,
       },
       machines: [
         {
@@ -205,6 +223,7 @@ async function deploy() {
           entryPoint: flist.entryPoint,
           farmId: farm.value.farmID,
           farmName: farm.value.name,
+          publicIpv4: ipv4.value,
           country: farm.value.country,
           envs: [
             { key: "FUNKWHALE_HOSTNAME", value: domain },
@@ -221,25 +240,24 @@ async function deploy() {
   } catch (e) {
     return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a funkwhale instance."));
   }
-
+  if (customDomain && ipv4.value) {
+    vm[0].customDomain = gatewayName.domain;
+    finalize(vm);
+    return;
+  }
   try {
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
 
     await deployGatewayName(grid!, {
       name: subdomain,
-      nodeId: gateway.value.id,
-      backends: [
-        {
-          ip: vm[0].interfaces[0].ip,
-          port: 80,
-        },
-      ],
+      nodeId: gatewayName.id!,
+      ip: vm[0].interfaces[0].ip,
+      port: 80,
       networkName: vm[0].interfaces[0].network,
+      fqdn: gatewayName?.useFQDN ? gatewayName?.domain : undefined,
     });
 
-    layout.value.reloadDeploymentsList();
-    layout.value.setStatus("success", "Successfully deployed a funkwhale instance.");
-    layout.value.openDialog(vm, deploymentListEnvironments.funkwhale);
+    finalize(vm);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
@@ -250,8 +268,10 @@ async function deploy() {
 </script>
 
 <script lang="ts">
+import DomainName from "../components/domain_name.vue";
+import FarmGatewayManager from "../components/farm_gateway_manager.vue";
+import Networks from "../components/networks.vue";
 import SelectFarm from "../components/select_farm.vue";
-import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -260,7 +280,9 @@ export default {
   name: "TfFunkwhale",
   components: {
     SelectSolutionFlavor,
-    SelectGatewayNode,
+    Networks,
+    DomainName,
+    FarmGatewayManager,
     SelectFarm,
     SelectNode,
   },
