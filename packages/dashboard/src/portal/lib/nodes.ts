@@ -11,6 +11,7 @@ import { apiInterface } from "./util";
 import { Client } from "@threefold/tfchain_client";
 
 export interface receiptInterface {
+  type: "minting" | "fixup";
   hash: string;
   mintingStart?: number;
   mintingEnd?: number;
@@ -185,15 +186,45 @@ export interface INodeGPU {
   contract?: number;
 }
 
-export function generateReceipt(doc: jsPDF, node: nodeInterface) {
-  doc.setFontSize(15);
+export function generatePage(doc: jsPDF, receiptsBatch: receiptInterface[], page: number) {
+  const lineOffset = 5;
+  const topY = 20 + lineOffset * 6;
+  const cellOffset = 30;
+  const cellX = 15;
+  const cellY = topY + lineOffset * 2;
 
+  if (page > 1) {
+    doc.addPage();
+  }
+  for (let i = 0; i < receiptsBatch.length; i++) {
+    if (receiptsBatch[i].measuredUptime) {
+      doc.text(`Minting: ${receiptsBatch[i].hash}`, cellX, cellY + cellOffset * i);
+      doc.text(`start: ${getTime(receiptsBatch[i].mintingStart)}`, cellX, cellY + cellOffset * i + lineOffset);
+      doc.text(`end: ${getTime(receiptsBatch[i].mintingEnd)}`, cellX, cellY + cellOffset * i + lineOffset * 2);
+      doc.text(`TFT: ${receiptsBatch[i].tft?.toFixed(2)}`, cellX, cellY + cellOffset * i + lineOffset * 3);
+    } else {
+      doc.text(`Fixup: ${receiptsBatch[i].hash}`, cellX, cellY + cellOffset * i);
+      doc.text(`start: ${getTime(receiptsBatch[i].fixupStart)}`, cellX, cellY + cellOffset * i + lineOffset);
+      doc.text(`end: ${getTime(receiptsBatch[i].fixupEnd)}`, cellX, cellY + cellOffset * i + lineOffset * 2);
+    }
+    if (i !== receiptsBatch.length - 1) {
+      doc.line(cellX, cellY + cellOffset * i + lineOffset * 4, cellX + 175, cellY + cellOffset * i + lineOffset * 4);
+    }
+  }
+
+  return doc;
+}
+
+export function generateReceipt(doc: jsPDF, node: nodeInterface) {
+  // Set font size and initial positioning
+  doc.setFontSize(15);
   const topY = 20;
   const lineOffset = 5;
   const cellOffset = 30;
   const cellX = 15;
   const cellY = topY + lineOffset * 8;
 
+  // Add header information on the first page
   doc.text(`Node ${node.nodeId} Summary`, 80, topY);
   doc.setFontSize(10);
   doc.text(`Receipts total: ${node.receipts.length}`, cellX, topY + lineOffset);
@@ -215,24 +246,15 @@ export function generateReceipt(doc: jsPDF, node: nodeInterface) {
     topY + lineOffset * 5,
   );
 
+  // Draw a line after the header information
   doc.line(cellX, topY + lineOffset * 6, cellX + 175, topY + lineOffset * 6);
 
-  node.receipts.map((receipt, i) => {
-    // check this??
-    if (receipt.measuredUptime) {
-      doc.text(`Minting: ${receipt.hash}`, cellX, cellY + cellOffset * i);
-      doc.text(`start: ${getTime(receipt.mintingStart)}`, cellX, cellY + cellOffset * i + lineOffset);
-      doc.text(`end: ${getTime(receipt.mintingEnd)}`, cellX, cellY + cellOffset * i + lineOffset * 2);
-      doc.text(`TFT: ${receipt.tft?.toFixed(2)}`, cellX, cellY + cellOffset * i + lineOffset * 3);
-    } else {
-      doc.text(`Fixup: ${receipt.hash}`, cellX, cellY + cellOffset * i);
-      doc.text(`start: ${getTime(receipt.fixupStart)}`, cellX, cellY + cellOffset * i + lineOffset);
-      doc.text(`end: ${getTime(receipt.fixupEnd)}`, cellX, cellY + cellOffset * i + lineOffset * 2);
-    }
-    if (i !== node.receipts.length - 1) {
-      doc.line(cellX, cellY + cellOffset * i + lineOffset * 4, cellX + 175, cellY + cellOffset * i + lineOffset * 4);
-    }
-  });
+  const size = 7;
+  let page = 0;
+  for (let i = 0; i < node.receipts.length - 1; i += size) {
+    page++;
+    doc = generatePage(doc, node.receipts.slice(i, i + size), page);
+  }
 
   return doc;
 }
@@ -294,6 +316,7 @@ export async function getNodeMintingFixupReceipts(nodeId: number) {
       }) => {
         if (rec.receipt.Minting) {
           nodeReceipts.push({
+            type: "minting",
             hash: rec.hash,
             clould_units: rec.receipt.Minting.cloud_units,
             mintingStart: rec.receipt.Minting.period.start * 1000,
@@ -304,6 +327,7 @@ export async function getNodeMintingFixupReceipts(nodeId: number) {
           });
         } else {
           nodeReceipts.push({
+            type: "fixup",
             hash: rec.hash,
             clould_units: rec.receipt.Fixup.fixup_cloud_units,
             fixupStart: rec.receipt.Fixup.period.start * 1000 || 0,
