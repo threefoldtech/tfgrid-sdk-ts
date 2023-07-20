@@ -134,8 +134,16 @@ watch(selectedNode, async () => {
 });
 
 watch(
-  () => props.filters.ipv4,
-  async () => {
+  () => ({ ...props.filters }),
+  (value, oldValue) => {
+    if (
+      value.cpu === oldValue.cpu &&
+      value.memory === oldValue.memory &&
+      value.ipv4 === oldValue.ipv4 &&
+      value.certified === oldValue.certified &&
+      value.rentedBy === oldValue.rentedBy
+    )
+      return;
     checkNode();
   },
 );
@@ -143,6 +151,7 @@ watch(
 onMounted(checkNode);
 
 async function checkNode() {
+  selectedNode.value = undefined;
   errorMessage.value = "";
   loadingNodes.value = true;
   const filters = props.filters;
@@ -170,6 +179,7 @@ async function checkNode() {
               rootFilesystemSize: 2,
               hasGPU: filters.hasGPU,
               rentedBy: filters.rentedBy,
+              certified: filters.certified,
             },
           ],
           network: { addAccess: filters.wireguard },

@@ -144,6 +144,7 @@ async function loadNodes() {
 
       if (!filters?.farmId || res?.length === 0) {
         selectedNode.value = undefined;
+        loadingNodes.value = false;
         return;
       }
 
