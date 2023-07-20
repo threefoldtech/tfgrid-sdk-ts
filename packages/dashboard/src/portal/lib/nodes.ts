@@ -19,7 +19,7 @@ export interface receiptInterface {
   fixupStart?: number;
   fixupEnd?: number;
   tft?: number;
-  cloud_units: {
+  clould_units: {
     cu: number;
     su: number;
     nu: number;
@@ -27,20 +27,7 @@ export interface receiptInterface {
   fixup_cloud_units?: {
     cu: number;
     su: number;
-    nu: number;
-  };
-  correct_cloud_units?: {
-    cu: number;
-    su: number;
-    nu: number;
-  };
-  startPeriodTimestamp: number;
-  endPeriodTimestamp: number;
-  fixupReward?: number;
-}
-interface UptimeEvent {
   uptime: number;
-  timestamp: number;
 }
 
 export interface NodeAvailability {
@@ -283,12 +270,22 @@ export function generateReceipt(doc: jsPDF, node: nodeInterface) {
   // Draw a line after the header information
   doc.line(cellX, topY + lineOffset * 6, cellX + 175, topY + lineOffset * 6);
 
-  const size = 4;
-  let page = 0;
-  for (let i = 0; i < node.receipts.length - 1; i += size) {
-    page++;
-    doc = generatePage(doc, node.receipts.slice(i, i + size), page);
-  }
+  node.receipts.map((receipt, i) => {
+    // check this??
+    if (receipt.measuredUptime) {
+      doc.text(`Minting: ${receipt.hash}`, cellX, cellY + cellOffset * i);
+      doc.text(`start: ${getTime(receipt.mintingStart)}`, cellX, cellY + cellOffset * i + lineOffset);
+      doc.text(`end: ${getTime(receipt.mintingEnd)}`, cellX, cellY + cellOffset * i + lineOffset * 2);
+      doc.text(`TFT: ${receipt.tft?.toFixed(2)}`, cellX, cellY + cellOffset * i + lineOffset * 3);
+    } else {
+      doc.text(`Fixup: ${receipt.hash}`, cellX, cellY + cellOffset * i);
+      doc.text(`start: ${getTime(receipt.fixupStart)}`, cellX, cellY + cellOffset * i + lineOffset);
+      doc.text(`end: ${getTime(receipt.fixupEnd)}`, cellX, cellY + cellOffset * i + lineOffset * 2);
+    }
+    if (i !== node.receipts.length - 1) {
+      doc.line(cellX, cellY + cellOffset * i + lineOffset * 4, cellX + 175, cellY + cellOffset * i + lineOffset * 4);
+    }
+  });
 
   return doc;
 }
@@ -343,11 +340,7 @@ export async function getNodeMintingFixupReceipts(nodeId: number) {
           };
           Fixup: {
             period: { start: number; end: number };
-            minted_cloud_units: { cu: number; su: number; nu: number };
             fixup_cloud_units: { cu: number; su: number; nu: number };
-            correct_cloud_units: { cu: number; su: number; nu: number };
-            minted_reward: { musd: number; tft: number };
-            fixup_reward: { musd: number; tft: number };
           };
         };
       }) => {
@@ -355,34 +348,27 @@ export async function getNodeMintingFixupReceipts(nodeId: number) {
           nodeReceipts.push({
             type: "MINTING",
             hash: rec.hash,
-            cloud_units: rec.receipt.Minting.cloud_units,
+            clould_units: rec.receipt.Minting.cloud_units,
             mintingStart: rec.receipt.Minting.period.start * 1000,
             mintingEnd: rec.receipt.Minting.period.end * 1000,
             tft: rec.receipt.Minting.reward.tft / 1e7,
-            startPeriodTimestamp: rec.receipt.Minting.period.start,
-            endPeriodTimestamp: rec.receipt.Minting.period.end,
+            payoutDate: rec.receipt.Minting.period.end,
           });
         } else {
           nodeReceipts.push({
             type: "FIXUP",
             hash: rec.hash,
-            cloud_units: rec.receipt.Fixup.minted_cloud_units,
-            fixup_cloud_units: rec.receipt.Fixup.fixup_cloud_units,
-            correct_cloud_units: rec.receipt.Fixup.correct_cloud_units,
+            clould_units: rec.receipt.Fixup.fixup_cloud_units,
             fixupStart: rec.receipt.Fixup.period.start * 1000 || 0,
             fixupEnd: rec.receipt.Fixup.period.end * 1000 || 0,
-            startPeriodTimestamp: rec.receipt.Fixup.period.start,
-            endPeriodTimestamp: rec.receipt.Fixup.period.end,
-            tft: rec.receipt.Fixup.minted_reward.tft / 1e7,
-            fixupReward: rec.receipt.Fixup.fixup_reward.tft / 1e7,
+            payoutDate: rec.receipt.Fixup.period.end,
           });
         }
       },
     ),
   );
 
-  // sort based on the start date
-  nodeReceipts = nodeReceipts.sort((a, b) => b.startPeriodTimestamp - a.startPeriodTimestamp);
+  nodeReceipts = nodeReceipts.sort((a, b) => b.payoutDate - a.payoutDate);
   return nodeReceipts;
 }
 export async function getNodeGPUs(nodeId: number): Promise<INodeGPU[] | undefined> {
