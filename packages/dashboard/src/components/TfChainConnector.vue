@@ -142,7 +142,7 @@
                       :loading="generatingAccount"
                       class="mt-2 ml-4"
                       text
-                      @click="generateAccount"
+                      @click="openAcceptTerms = true"
                     >
                       Generate Account
                     </v-btn>
@@ -192,6 +192,19 @@
           <v-btn color="error" text @click="show = false">Close</v-btn>
         </v-card-actions>
       </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="openAcceptTerms" fullscreen>
+      <iframe
+        src="https://library.threefold.me/info/legal/#/"
+        frameborder="0"
+        style="background-color: white"
+        allow="fullscreen"
+        height="95%"
+        width="100px"
+        sandbox="allow-forms allow-modals allow-scripts allow-popups allow-same-origin "
+      ></iframe>
+      <v-btn @click="generateAccount"> accept terms and conditions </v-btn>
     </v-dialog>
   </section>
 </template>
@@ -417,8 +430,10 @@ export default class TfChainConnector extends Vue {
     this.sshState = SSHState.None;
   }
 
+  public openAcceptTerms = false;
   public generatingAccount = false;
   public async generateAccount() {
+    this.openAcceptTerms = false;
     this.generatingAccount = true;
     const account = await createAccount();
     this.mnemonic = account.mnemonic;
