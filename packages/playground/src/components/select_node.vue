@@ -81,6 +81,7 @@ const props = defineProps({
 
 const profileManager = useProfileManager();
 const availableNodes = ref<Array<Node>>([]);
+const nodesArr = ref<Array<Node>>([]);
 const loadingNodes = ref(false);
 const errorMessage = ref<string>();
 const selectedNode = ref() as Ref<number | undefined>;
@@ -165,12 +166,14 @@ async function loadNodes() {
         network: { addAccess: filters.wireguard },
       });
       const nodes = res[0];
+
       if (nodes) {
         for (const node of nodes) {
-          if (!availableNodes.value.some(n => n.nodeId === node.nodeId)) {
-            availableNodes.value.push({ nodeId: node.nodeId, state: node.rentedByTwinId ? "Dedicated" : "Shared" });
+          if (!nodesArr.value.some(n => n.nodeId === node.nodeId)) {
+            nodesArr.value.push({ nodeId: node.nodeId, state: node.rentedByTwinId ? "Dedicated" : "Shared" });
           }
         }
+        availableNodes.value = nodesArr.value;
         selectedNode.value = availableNodes.value ? availableNodes.value[0].nodeId : undefined;
       } else {
         selectedNode.value = undefined;
