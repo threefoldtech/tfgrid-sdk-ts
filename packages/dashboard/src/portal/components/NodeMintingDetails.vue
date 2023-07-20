@@ -30,19 +30,36 @@
           <v-card-title>
             <span class="headline">Minting Details</span>
           </v-card-title>
-          <v-card-text>
-            <span class="font-weight-bold">Date of Payout :</span>
-            {{ getDateFromTimestamp(receipt.payoutDate) }}
-            <br />
-            <span class="font-weight-bold">Node TFT Amount :</span> {{ receipt.tft || 0 }} TFT
-            <br />
-            <span class="font-weight-bold">Cloud Units :</span>
-            <ul>
-              <li inset v-for="(val, key) in receipt.clould_units" :key="key">
-                <b style="text-transform: uppercase">{{ key }}:</b> {{ val }}
-              </li>
-            </ul>
-          </v-card-text>
+          <div class="receipt-body" v-if="receipts.length">
+            <v-card outlined v-for="receipt in receipts" :key="receipt.hash">
+              <v-container>
+                <v-row>
+                  <v-col cols="10">
+                    <v-card-text>
+                      <span class="font-weight-bold">Date of Payout :</span>
+                      {{ getDateFromTimestamp(receipt.endPeriodTimestamp) }}
+                      <br />
+                      <span class="font-weight-bold">Node TFT Amount :</span> {{ receipt.tft || 0 }} TFT
+                      <span v-if="receipt.fixupReward != undefined">+ {{ receipt.fixupReward || 0 }} TFT FixedUp</span>
+                      <br />
+                      <span class="font-weight-bold">Cloud Units :</span>
+                      <ul>
+                        <li inset v-for="(val, key) in receipt.cloud_units" :key="key">
+                          <b style="text-transform: uppercase">{{ key }}:</b> {{ val }}
+                        </li>
+                      </ul>
+                    </v-card-text>
+                  </v-col>
+                  <v-col cols="2">
+                    <v-chip class="ma-4 me-auto" small :color="getChipColor(receipt.type)">{{ receipt.type }} </v-chip>
+                  </v-col>
+                </v-row>
+              </v-container>
+            </v-card>
+          </div>
+          <div v-else>
+            <v-card-text class="font-weight-bold">No receipts found for this month</v-card-text>
+          </div>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="blue" @click="downloadNodeReceipt">Download Node Receipt</v-btn>
@@ -69,16 +86,7 @@ export default class NodeMintingDetails extends Vue {
   selectedData = "";
   minDate = "";
   maxDate = "";
-  receipt: receiptInterface = {
-    type: "minting",
-    hash: "",
-    clould_units: {
-      cu: 0,
-      su: 0,
-      nu: 0,
-    },
-    payoutDate: 0,
-  };
+  receipts: receiptInterface[] = [];
 
   @Watch("selectedData")
   onDateChange() {
@@ -99,8 +107,8 @@ export default class NodeMintingDetails extends Vue {
   }
 
   getDates() {
-    const firstReceiptData = this.node.receipts[this.node.receipts.length - 1].payoutDate;
-    const lastReceiptData = this.node.receipts[0].payoutDate;
+    const firstReceiptData = this.node.receipts[this.node.receipts.length - 1].startPeriodTimestamp;
+    const lastReceiptData = this.node.receipts[0].startPeriodTimestamp;
 
     this.minDate = this.formatDate(this.getDateFromTimestamp(firstReceiptData));
     this.maxDate = this.formatDate(this.getDateFromTimestamp(lastReceiptData));
@@ -112,9 +120,20 @@ export default class NodeMintingDetails extends Vue {
     this.getDates();
     this.getMonthReceipt();
     for (let i = 0; i < this.node.receipts.length; i++) {
-      if (this.node.receipts[i].clould_units.cu > 0) {
+      if (this.node.receipts[i].cloud_units.cu > 0) {
         console.log(this.node.receipts[i]);
       }
+    }
+  }
+
+  getChipColor(type: string) {
+    switch (type) {
+      case "MINTING":
+        return "green";
+      case "FIXUP":
+        return "red";
+      default:
+        return "grey";
     }
   }
 
@@ -123,12 +142,12 @@ export default class NodeMintingDetails extends Vue {
   }
 
   getMonthReceipt() {
+    this.receipts = [];
     const selectedDate = new Date(this.selectedData);
     for (let i = 0; i < this.node.receipts.length; i++) {
-      const receiptDate = this.getDateFromTimestamp(this.node.receipts[i].payoutDate);
-      if (selectedDate.getMonth() === receiptDate.getMonth()) {
-        this.receipt = this.node.receipts[i];
-        break;
+      const receiptDate = this.getDateFromTimestamp(this.node.receipts[i].startPeriodTimestamp);
+      if (this.formatDate(selectedDate) === this.formatDate(receiptDate)) {
+        this.receipts.push(this.node.receipts[i]);
       }
     }
   }
