@@ -80,96 +80,104 @@
         <!--expanded node view-->
         <template v-slot:expanded-item="{ headers, item }">
           <td :colspan="headers.length" key="item.id">
-            <v-container fluid>
-              <v-row :justify="'space-around'">
-                <v-col cols="8">
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">Node ID</v-flex>
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ item.nodeId }}</span>
-                    </v-flex>
-                  </v-row>
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">Farm ID</v-flex>
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ item.farmId }}</span>
-                    </v-flex>
-                  </v-row>
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">Twin ID</v-flex>
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ item.twinId }}</span>
-                    </v-flex>
-                  </v-row>
+            <v-container>
+              <v-card outlined>
+                <v-card-title>
+                  <span class="headline">Node Details</span>
+                </v-card-title>
+                <v-card-text>
+                  <v-row :justify="'space-around'">
+                    <v-col cols="8">
+                      <v-container class="mx-10 mt-5">
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">Node ID</v-flex>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ item.nodeId }}</span>
+                          </v-flex>
+                        </v-row>
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">Farm ID</v-flex>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ item.farmId }}</span>
+                          </v-flex>
+                        </v-row>
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">Twin ID</v-flex>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ item.twinId }}</span>
+                          </v-flex>
+                        </v-row>
 
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">Certification </v-flex>
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">Certification </v-flex>
 
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ item.certificationType }}</span>
-                    </v-flex>
-                  </v-row>
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">First boot at</v-flex>
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ new Date(parseInt(item.created) * 1000) }}</span>
-                    </v-flex>
-                  </v-row>
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">Updated at</v-flex>
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ new Date(parseInt(item.updatedAt) * 1000) }}</span>
-                    </v-flex>
-                  </v-row>
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">Country</v-flex>
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ item.country }}</span>
-                    </v-flex>
-                  </v-row>
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">City</v-flex>
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ item.city }}</span>
-                    </v-flex>
-                  </v-row>
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">Serial Number</v-flex>
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ item.serialNumber }}</span>
-                    </v-flex>
-                  </v-row>
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">Farming Policy ID</v-flex>
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ item.farmingPolicyId }}</span>
-                    </v-flex>
-                  </v-row>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ item.certificationType }}</span>
+                          </v-flex>
+                        </v-row>
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">First boot at</v-flex>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ new Date(parseInt(item.created) * 1000) }}</span>
+                          </v-flex>
+                        </v-row>
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">Updated at</v-flex>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ new Date(parseInt(item.updatedAt) * 1000) }}</span>
+                          </v-flex>
+                        </v-row>
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">Country</v-flex>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ item.country }}</span>
+                          </v-flex>
+                        </v-row>
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">City</v-flex>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ item.city }}</span>
+                          </v-flex>
+                        </v-row>
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">Serial Number</v-flex>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ item.serialNumber }}</span>
+                          </v-flex>
+                        </v-row>
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">Farming Policy ID</v-flex>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ item.farmingPolicyId }}</span>
+                          </v-flex>
+                        </v-row>
+                        <v-row>
+                          <span>For more information visit the Capacity Explorer</span>
+                        </v-row>
+                      </v-container>
+                    </v-col>
+                    <v-col cols="4" class="text-center" :align-self="'center'">
+                      <v-flex class="text-truncate font-weight-bold">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on }">
+                            <v-progress-circular
+                              v-on="on"
+                              :rotate="-90"
+                              :size="150"
+                              :width="20"
+                              :value="getNodeUptimePercentage(item)"
+                              color="light-green darken-2"
+                            />
 
-                  <v-row>
-                    <span>For more information visit the Capacity Explorer</span>
+                            <span> Uptime: {{ getNodeUptimePercentage(item) }} % </span>
+                          </template>
+                          <span>Current Node Uptime Percentage (since start of the current minting period)</span>
+                        </v-tooltip>
+                      </v-flex>
+                    </v-col>
                   </v-row>
-                </v-col>
-                <v-col cols="4" class="text-center" :align-self="'center'">
-                  <v-flex class="text-truncate font-weight-bold">
-                    <v-tooltip bottom>
-                      <template v-slot:activator="{ on }">
-                        <v-progress-circular
-                          v-on="on"
-                          :rotate="-90"
-                          :size="100"
-                          :width="15"
-                          :value="getNodeUptimePercentage(item)"
-                          color="light-green darken-2"
-                        />
-
-                        <span> Uptime: {{ getNodeUptimePercentage(item) }} % </span>
-                      </template>
-                      <span>Current Node Uptime Percentage (since start of the current minting period)</span>
-                    </v-tooltip>
-                  </v-flex>
-                </v-col>
-              </v-row>
+                </v-card-text>
+              </v-card>
             </v-container>
 
             <v-col>
@@ -177,7 +185,7 @@
                 <v-expansion-panel>
                   <v-expansion-panel-header> Resource units reserved </v-expansion-panel-header>
                   <v-expansion-panel-content>
-                    <v-row>
+                    <v-row class="mt-5 mb-5">
                       <v-col v-for="(value, key) in item.total_resources" :key="key" align="center">
                         <v-flex class="text-center pr-2">
                           <span class="text-uppercase">{{ key }}</span>
@@ -188,8 +196,8 @@
                               <v-progress-circular
                                 v-on="on"
                                 :rotate="-90"
-                                :size="100"
-                                :width="15"
+                                :size="150"
+                                :width="20"
                                 :value="isNaN(getPercentage(key)) ? 0 : getPercentage(key)"
                                 color="light-green darken-2"
                               />
