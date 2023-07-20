@@ -106,13 +106,15 @@
               />
 
               <div class="d-flex justify-center">
-                <v-btn color="primary" :disabled="!isValidForm" type="submit" :loading="connecting">Login</v-btn>
+                <v-btn color="primary" :disabled="!isValidForm || generatingAccount" type="submit" :loading="connecting"
+                  >Login</v-btn
+                >
               </div>
             </v-form>
           </v-container>
 
           <v-container class="pt-5" v-else>
-            <v-form v-model="isValidForm" :disabled="connecting" @submit.prevent="connect">
+            <v-form v-model="isValidForm" :disabled="connecting || generatingAccount" @submit.prevent="connect">
               <v-alert type="warning" text>
                 To connect your wallet, you will need to enter your mnemonic which will be encrypted using the password.
                 Mnemonic will never be shared outside of this device.
@@ -134,7 +136,16 @@
                         mnemonicError = null;
                       "
                     />
-                    <v-btn color="primary" :disabled="connecting" class="mt-2 ml-4" text>Generate Account</v-btn>
+                    <v-btn
+                      color="primary"
+                      :disabled="connecting"
+                      :loading="generatingAccount"
+                      class="mt-2 ml-4"
+                      text
+                      @click="generateAccount"
+                    >
+                      Generate Account
+                    </v-btn>
                   </div>
                 </template>
 
@@ -193,9 +204,8 @@ import md5 from "md5";
 import { Component, Vue, Watch } from "vue-property-decorator";
 import { generateKeyPair } from "web-ssh-keygen";
 
-import { downloadAsFile, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
+import { createAccount, downloadAsFile, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
 import QrcodeGenerator from "./QrcodeGenerator.vue";
-// import { getTwin } from "@/portal/lib/twin";
 
 const version = "v1";
 const key = `wallet.${version}`;
@@ -210,6 +220,9 @@ enum SSHState {
   name: "TfChainConnector",
   components: {
     QrcodeGenerator,
+  },
+  methods: {
+    createAccount,
   },
 })
 export default class TfChainConnector extends Vue {
@@ -402,6 +415,14 @@ export default class TfChainConnector extends Vue {
     const grid = await getGrid(this.$store.state.profile.mnemonic);
     await storeSSH(grid!, this.$store.state.profile.ssh);
     this.sshState = SSHState.None;
+  }
+
+  public generatingAccount = false;
+  public async generateAccount() {
+    this.generatingAccount = true;
+    const account = await createAccount();
+    this.mnemonic = account.mnemonic;
+    this.generatingAccount = false;
   }
 }
 </script>
