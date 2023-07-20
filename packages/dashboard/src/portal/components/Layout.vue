@@ -8,7 +8,7 @@
       <br />
     </div>
     <v-row>
-      <v-col :cols="screen_max_1400 ? 12 : 3" :order="screen_max_1400 ? 1 : undefined" v-if="!noFilter">
+      <v-col :cols="screen_max_1400 ? 12 : 2" :order="screen_max_1400 ? 1 : undefined" v-if="!noFilter">
         <h3>Filters</h3>
         <br />
         <v-row>
@@ -23,7 +23,7 @@
           <slot name="active-filters"></slot>
         </section>
       </v-col>
-      <v-col :cols="screen_max_1400 ? 12 : 9" class="table-container">
+      <v-col :cols="screen_max_1400 ? 12 : 10" class="table-container">
         <slot name="node-table"></slot>
       </v-col>
     </v-row>
