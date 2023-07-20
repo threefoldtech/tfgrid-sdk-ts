@@ -70,6 +70,7 @@ export default class NodeMintingDetails extends Vue {
   minDate = "";
   maxDate = "";
   receipt: receiptInterface = {
+    type: "minting",
     hash: "",
     clould_units: {
       cu: 0,
@@ -87,7 +88,7 @@ export default class NodeMintingDetails extends Vue {
   downloadNodeReceipt() {
     let doc = new jsPDF();
     doc = generateReceipt(doc, this.node);
-    // doc.save(`node_${this.node.nodeId}_receipts.pdf`);
+    doc.save(`node_${this.node.nodeId}_receipts.pdf`);
   }
 
   formatDate(date: Date) {
