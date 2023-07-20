@@ -62,3 +62,15 @@ export function downloadAsFile(name: string, data: string) {
 export function loadBalance(grid: GridClient) {
   return grid.balance.getMyBalance();
 }
+
+export function createAccount() {
+  const network = NetworkEnv.dev;
+  const grid = new GridClient({
+    network,
+    mnemonic: "",
+    storeSecret: "test",
+  });
+  grid._connect();
+  const relay = grid.getDefaultUrls(network).relay.slice(6);
+  return grid.tfchain.createAccount(relay);
+}
