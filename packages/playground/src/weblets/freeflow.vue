@@ -73,8 +73,6 @@
           v-model="selectedNode"
           :filters="{
             farmId: farm?.farmID,
-            name: threebotName,
-            flist: flist,
             cpu: solution?.cpu,
             memory: solution?.memory,
             disks: disks,
@@ -124,7 +122,7 @@ const flist = ref<Flist>();
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<Node>;
+const selectedNode = ref() as Ref<number>;
 const ipv4 = ref(false);
 
 onMounted(() => {
@@ -185,7 +183,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
             { key: "DIGITALTWIN_APPID", value: domain },
             { key: "NODE_ENV", value: "staging" },
           ],
-          nodeId: selectedNode.value.nodeId,
+          nodeId: selectedNode.value,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },

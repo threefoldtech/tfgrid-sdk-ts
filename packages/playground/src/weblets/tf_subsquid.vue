@@ -77,8 +77,6 @@
             cpu: solution?.cpu,
             memory: solution?.memory,
             disks: [{ size: solution?.disk, mountPoint: '/var/lib/docker' }],
-            name: name,
-            flist: flist,
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"
@@ -130,7 +128,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<Node>;
+const selectedNode = ref() as Ref<number>;
 const domainNameCmp = ref();
 
 function finalize(deployment: any) {
@@ -187,7 +185,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
             { key: "CHAIN_ENDPOINT", value: endpoint.value },
             { key: "SUBSQUID_WEBSERVER_HOSTNAME", value: domain },
           ],
-          nodeId: selectedNode.value.nodeId,
+          nodeId: selectedNode.value,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },

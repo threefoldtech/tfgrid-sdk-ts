@@ -173,7 +173,7 @@ function normalizeCaproverWorker(worker: CW, envs: Env[]): Machine {
       },
     ],
     envs,
-    nodeId: worker.selectedNode.nodeId,
+    nodeId: worker.selectedNode,
     rentedBy: worker.dedicated ? profileManager.profile?.twinId : undefined,
     certified: worker.certified,
   };

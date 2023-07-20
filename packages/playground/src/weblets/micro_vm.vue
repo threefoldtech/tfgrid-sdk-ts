@@ -111,8 +111,6 @@
             memory,
             ipv4: ipv4,
             ipv6: ipv4,
-            name: name,
-            flist: flist,
             disks: disks,
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
@@ -257,7 +255,7 @@ const disks = ref<Disk[]>([]);
 const network = ref();
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<Node>;
+const selectedNode = ref() as Ref<number>;
 
 function layoutMount() {
   if (envs.value.length > 0) {
@@ -310,7 +308,7 @@ async function deploy() {
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           rootFilesystemSize: rootFsSize.value,
-          nodeId: selectedNode.value.nodeId,
+          nodeId: selectedNode.value,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },

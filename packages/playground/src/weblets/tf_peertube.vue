@@ -88,8 +88,6 @@
             cpu: solution?.cpu,
             memory: solution?.memory,
             disks: [{ size: solution?.disk, mountPoint: '/data' }],
-            name: name,
-            flist: flist,
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"
@@ -139,7 +137,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<Node>;
+const selectedNode = ref() as Ref<number>;
 const ipv4 = ref(false);
 const domainNameCmp = ref();
 
@@ -199,7 +197,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
             { key: "PT_INITIAL_ROOT_PASSWORD", value: password.value },
             { key: "PEERTUBE_WEBSERVER_HOSTNAME", value: domain },
           ],
-          nodeId: selectedNode.value.nodeId,
+          nodeId: selectedNode.value,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },

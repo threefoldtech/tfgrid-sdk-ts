@@ -161,12 +161,8 @@
             memory,
             ipv4: ipv4,
             ipv6: ipv4,
-            name: name,
-            flist: flist,
             disks: [{ size: diskSize, mountPoint: '/' }, ...disks],
             hasGPU: hasGPU,
-            planetary: planetary,
-            wireguard: wireguard,
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"
@@ -228,7 +224,6 @@ import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type Farm, type Flist, ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
-import type { Node } from "../utils/filter_nodes";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
@@ -276,7 +271,7 @@ const disks = ref<Disk[]>([]);
 const network = ref();
 const hasGPU = ref(false);
 const selectedNodewithCards = ref() as Ref<GPUNodeType>;
-const selectedNode = ref() as Ref<Node>;
+const selectedNode = ref() as Ref<number>;
 
 function addDisk() {
   const name = generateName(7);
@@ -337,7 +332,7 @@ async function deploy() {
           envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
           rootFilesystemSize: 2,
           hasGPU: hasGPU.value,
-          nodeId: hasGPU.value ? selectedNodewithCards.value.nodeId : selectedNode.value.nodeId,
+          nodeId: hasGPU.value ? selectedNodewithCards.value.nodeId : selectedNode.value,
           gpus: hasGPU.value ? selectedNodewithCards.value.cards.map(card => card.id) : undefined,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,

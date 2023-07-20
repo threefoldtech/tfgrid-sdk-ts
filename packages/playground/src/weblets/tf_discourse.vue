@@ -89,8 +89,6 @@
               farmId: farm?.farmID,
               cpu: solution?.cpu,
               memory: solution?.memory,
-              name: name,
-              flist: flist,
               disks: [{ size: solution?.disk, mountPoint: '/var/lib/docker' }],
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
@@ -150,7 +148,7 @@ const domainNameCmp = ref();
 const smtp = ref(createSMTPServer());
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<Node>;
+const selectedNode = ref() as Ref<number>;
 
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.2.flist",
@@ -215,7 +213,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
             { key: "THREEBOT_PRIVATE_KEY", value: generatePubKey() },
             { key: "FLASK_SECRET_KEY", value: generatePassword(8) },
           ],
-          nodeId: selectedNode.value.nodeId,
+          nodeId: selectedNode.value,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },

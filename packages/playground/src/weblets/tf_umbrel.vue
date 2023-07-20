@@ -102,8 +102,6 @@
             { size: 10, mountPoint: '/var/lib/docker' },
             { size: solution?.disk, mountPoint: '/umbrelDisk' },
           ],
-          name: name,
-          flist: flist,
           rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
           certified: certified,
         }"
@@ -146,7 +144,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<Node>;
+const selectedNode = ref() as Ref<number>;
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -190,7 +188,7 @@ async function deploy() {
             { key: "UMBREL_DISK", value: "/umbrelDisk" },
           ],
           rootFilesystemSize: rootFs(solution.value.cpu, solution.value.memory),
-          nodeId: selectedNode.value.nodeId,
+          nodeId: selectedNode.value,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },

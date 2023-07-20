@@ -71,7 +71,7 @@ export interface GPUMachineFilters {
   ipv4: boolean;
   wireguard: boolean;
   planetary: boolean;
-  hasGPU?: boolean;
+  hasGPU: boolean;
   cpu: number;
   memory: number;
   ssd: number;

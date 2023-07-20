@@ -55,8 +55,6 @@
         cpu: $props.modelValue.solution?.cpu ?? 0,
         memory: $props.modelValue.solution?.memory ?? 0,
         disks: [{ name: 'data0', size: $props.modelValue.solution?.disk ?? 0, mountPoint: '/var/lib/docker' }],
-        name: $props.modelValue.name,
-        flist: flist,
         rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
         certified: $props.modelValue.certified,
       }"
@@ -69,16 +67,12 @@ import { useProfileManager } from "../stores";
 import rootFs from "../utils/root_fs";
 
 defineProps<{ modelValue: CaproverWorker }>();
-const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/tf-caprover-latest.flist",
-  entryPoint: "/sbin/zinit init",
-};
 const profileManager = useProfileManager();
 </script>
 
 <script lang="ts">
 import SelectNode from "../components/select_node.vue";
-import type { CaproverWorker, Flist } from "../types";
+import type { CaproverWorker } from "../types";
 import { generateName } from "../utils/strings";
 import SelectFarm from "./select_farm.vue";
 import SelectSolutionFlavor from "./select_solution_flavor.vue";

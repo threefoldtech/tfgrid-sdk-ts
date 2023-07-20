@@ -83,8 +83,6 @@
             { size: 15, mountPoint: '/mnt/' + generateName(10) },
             { size: 15, mountPoint: '/mnt/' + generateName(10) },
           ],
-          name: name,
-          flist: flist,
           rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
           certified: certified,
         }"
@@ -122,7 +120,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<Node>;
+const selectedNode = ref() as Ref<number>;
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -162,7 +160,7 @@ async function deploy() {
               mountPoint: "/mnt/" + generateName(10),
             },
           ],
-          nodeId: selectedNode.value.nodeId,
+          nodeId: selectedNode.value,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },

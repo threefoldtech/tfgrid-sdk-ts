@@ -164,7 +164,6 @@
           memory,
           ipv4: ipv4,
           ipv6: ipv4,
-          name: name,
           type: type,
           disks:
             type === 'indexer'
@@ -175,7 +174,6 @@
                   },
                 ]
               : [],
-          flist: flist,
           rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
           certified: certified,
         }"
@@ -221,7 +219,7 @@ const lastRound = ref(26000000);
 const farm = ref() as Ref<Farm>;
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<Node>;
+const selectedNode = ref() as Ref<number>;
 
 watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()));
 
@@ -260,7 +258,7 @@ async function deploy() {
           rootFilesystemSize: storage.value,
           publicIpv4: ipv4.value,
           planetary: true,
-          nodeId: selectedNode.value.nodeId,
+          nodeId: selectedNode.value,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
 

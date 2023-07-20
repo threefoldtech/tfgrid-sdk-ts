@@ -19,7 +19,7 @@ export async function deployVM(grid: GridClient, options: DeployVMOptions) {
   vms.name = options.name;
   await grid.machines.getObj(vms.name); //invalidating the cashed keys
   vms.network = createNetwork(options.network);
-  vms.machines = await Promise.all(options.machines.map(machine => createMachine(grid, machine, machine.nodeId!)));
+  vms.machines = await Promise.all(options.machines.map(machine => createMachine(grid, machine)));
   vms.metadata = options.metadata;
   vms.description = options.description;
   await grid.machines.deploy(vms);
@@ -34,32 +34,10 @@ export async function loadVM(grid: GridClient, name: string) {
   return vm;
 }
 
-async function createMachine(grid: GridClient, machine: Machine, nodeId: number): Promise<MachineModel> {
-  const filters: FilterOptions = {
-    cru: machine.cpu,
-    mru: Math.round(machine.memory / 1024),
-    country: machine.country,
-    farmId: machine.farmId,
-    farmName: machine.farmName,
-    hru: machine.qsfsDisks?.reduce((total, disk) => total + disk.cache, 0),
-    sru: machine.disks?.reduce((total, disk) => total + disk.size, machine.rootFilesystemSize || 0),
-    publicIPs: machine.publicIpv4,
-    availableFor: grid.twinId,
-    hasGPU: machine.hasGPU,
-    rentedBy: machine.hasGPU ? grid.twinId : undefined,
-  };
-
+async function createMachine(grid: GridClient, machine: Machine): Promise<MachineModel> {
   const vm = new MachineModel();
   vm.name = machine.name;
-  if (machine.nodeId && machine.hasGPU) {
-    vm.node_id = machine.nodeId;
-  } else {
-    //TODO: Remove this condition once this issue is resolved https://github.com/threefoldtech/tfgrid-sdk-ts/issues/703
-    filters.farmId = machine.farmId;
-    filters.farmName = machine.farmName;
-
-    vm.node_id = nodeId;
-  }
+  vm.node_id = machine.nodeId!;
 
   vm.disks = createDisks(machine.disks);
   vm.gpus = machine.gpus;

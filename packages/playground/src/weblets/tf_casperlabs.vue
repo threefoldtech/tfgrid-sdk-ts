@@ -66,8 +66,6 @@
             cpu: solution?.cpu,
             memory: solution?.memory,
             disks: [{ size: solution?.disk, mountPoint: '/data' }],
-            name: name,
-            flist: flist,
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"
@@ -117,7 +115,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<Node>;
+const selectedNode = ref() as Ref<number>;
 const ipv4 = ref(false);
 const domainNameCmp = ref();
 function finalize(deployment: any) {
@@ -168,7 +166,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "CASPERLABS_HOSTNAME", value: domain },
           ],
-          nodeId: selectedNode.value.nodeId,
+          nodeId: selectedNode.value,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },

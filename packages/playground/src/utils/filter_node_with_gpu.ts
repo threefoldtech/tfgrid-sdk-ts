@@ -31,10 +31,10 @@ export default class GPUNode {
     return cards;
   }
 
-  async getNodes(options: DeployVMOptions): Promise<NodeInfo[][]> {
+  async getNodes(options: Partial<DeployVMOptions>): Promise<NodeInfo[][]> {
     // Return a list of nodes that has gpus and rented for the activated user account.
     const nodes = await Promise.all(
-      options.machines.map(async machine => {
+      options.machines!.map(async machine => {
         const filters: FilterOptions = {
           cru: machine.cpu,
           mru: Math.round(machine.memory / 1024),

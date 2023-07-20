@@ -45,8 +45,7 @@
 import { onMounted, type PropType, type Ref, ref, watch } from "vue";
 
 import { useProfileManager } from "../stores/profile_manager";
-import type { Flist } from "../types";
-import FilteredNodes, { type Node } from "../utils/filter_nodes";
+import { getFilteredNodes, type Node } from "../utils/filter_nodes";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 
@@ -54,13 +53,9 @@ export interface NodeFilters {
   farmId?: number;
   ipv6?: boolean;
   ipv4?: boolean;
-  wireguard?: boolean;
-  planetary?: boolean;
   hasGPU?: boolean;
   cpu: number;
   memory: number;
-  flist?: Flist;
-  name: string;
   disks: {
     name?: string | undefined;
     size: number;
@@ -71,10 +66,10 @@ export interface NodeFilters {
   type?: string;
 }
 
-const emits = defineEmits<{ (event: "update:modelValue", value?: Node): void }>();
+const emits = defineEmits<{ (event: "update:modelValue", value?: number): void }>();
 
 const props = defineProps({
-  modelValue: { type: Object as PropType<Node> },
+  modelValue: { type: Number },
   filters: { default: () => ({} as NodeFilters), type: Object as PropType<NodeFilters> },
 });
 
@@ -91,7 +86,7 @@ watch(
   () => selectedNode.value,
   node => {
     if (node) {
-      emits("update:modelValue", { nodeId: node as number });
+      emits("update:modelValue", node as number);
     }
   },
   { immediate: true },
@@ -135,40 +130,25 @@ async function loadNodes() {
 
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
-    const filteredDNodes = new FilteredNodes(grid);
     try {
-      const res = await filteredDNodes.getFilteredNodes({
-        name: filters.name,
-        machines: [
-          {
-            farmId: filters.farmId,
-            name: filters.name,
-            cpu: filters.cpu,
-            memory: filters.memory,
-            flist: filters.flist!.value,
-            entryPoint: filters.flist!.entryPoint,
-            disks: [...filters.disks],
-            publicIpv4: filters.ipv4,
-            publicIpv6: filters.ipv6,
-            planetary: filters.planetary,
-            envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
-            rootFilesystemSize: 2,
-            hasGPU: filters.hasGPU,
-            certified: filters.certified,
-            rentedBy: filters.rentedBy,
-          },
-        ],
-        network: { addAccess: filters.wireguard },
+      const res = await getFilteredNodes(grid, {
+        farmId: filters.farmId,
+        cpu: filters.cpu,
+        memory: filters.memory,
+        disks: [...filters.disks],
+        ipv4: filters.ipv4,
+        hasGPU: filters.hasGPU,
+        certified: filters.certified,
+        rentedBy: filters.rentedBy,
       });
-      const nodes = res[0];
 
-      if (!filters?.farmId || nodes?.length === 0) {
+      if (!filters?.farmId || res?.length === 0) {
         selectedNode.value = undefined;
         return;
       }
 
-      if (nodes) {
-        for (const node of nodes) {
+      if (res) {
+        for (const node of res) {
           if (!nodesArr.value.some(n => n.nodeId === node.nodeId)) {
             nodesArr.value.push({ nodeId: node.nodeId, state: node.rentedByTwinId ? "Dedicated" : "Shared" });
           }
@@ -180,7 +160,7 @@ async function loadNodes() {
         availableNodes.value = [];
       }
     } catch (e) {
-      errorMessage.value = normalizeError(e, "Failed to deploy.");
+      errorMessage.value = normalizeError(e, "Something went wrong while deploying.");
     } finally {
       loadingNodes.value = false;
     }
