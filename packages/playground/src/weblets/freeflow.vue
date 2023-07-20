@@ -106,7 +106,6 @@ import { useProfileManager } from "../stores";
 import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
-import type { Node } from "../utils/filter_nodes";
 import { deployGatewayName, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";

@@ -122,7 +122,6 @@ import { useProfileManager } from "../stores";
 import type { Farm, Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
-import type { Node } from "../utils/filter_nodes";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";

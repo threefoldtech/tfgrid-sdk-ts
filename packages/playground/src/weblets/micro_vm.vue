@@ -209,7 +209,6 @@ import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type Farm, type Flist, ProjectName } from "../types";
 import { deployVM, type Disk, type Env } from "../utils/deploy_vm";
-import type { Node } from "../utils/filter_nodes";
 import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
 

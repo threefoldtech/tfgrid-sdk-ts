@@ -146,7 +146,6 @@ import { useProfileManager } from "../stores";
 import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
-import type { Node } from "../utils/filter_nodes";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { generateName, generatePassword } from "../utils/strings";

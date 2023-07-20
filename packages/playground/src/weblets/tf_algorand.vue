@@ -192,8 +192,7 @@ import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type Farm, type Flist, ProjectName, type Validators } from "../types";
-import { deployVM, type Disk } from "../utils/deploy_vm";
-import type { Node } from "../utils/filter_nodes";
+import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
 
