@@ -43,6 +43,7 @@ class FarmerBotFindNodeModel {
   @Expose() @IsOptional() @IsBoolean() public_config?: boolean;
   @Expose() @IsOptional() @Min(0) public_ips?: number;
   @Expose() @IsOptional() @IsBoolean() certified?: boolean;
+  @Expose() @IsOptional() @Min(0) has_gpus?: number;
 }
 
 class FarmerBot {
@@ -73,6 +74,7 @@ class FarmerBot {
           { key: "public_config", value: options.public_config?.toLocaleString() },
           { key: "public_ips", value: options.public_ips?.toLocaleString() },
           { key: "certified", value: options.certified?.toLocaleString() },
+          { key: "has_gpus", value: options.has_gpus?.toLocaleString() },
         ],
         args: [],
       },
@@ -94,7 +96,7 @@ class FarmerBot {
 
     const result = node?.result?.params;
 
-    if (result) {
+    if (result.length) {
       const nodeId = +result.filter(x => x.key === "nodeid")[0]?.value;
       if (nodeId) {
         return nodeId;

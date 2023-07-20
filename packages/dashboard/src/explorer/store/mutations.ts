@@ -31,7 +31,7 @@ interface ISetNodeFilter {
   value: any;
 }
 
-function fillNodesFields(state: IState, node: any, farms: any): INode {
+export function fillNodesFields(state: IState, node: any, farms: any): INode {
   return {
     id: node.id,
     createdAt: node.createdAt,
@@ -75,7 +75,7 @@ function fillNodesFields(state: IState, node: any, farms: any): INode {
     ],
     status: node.status,
     certificationType: node.certificationType,
-    farmingPolicyName: state.policies[node.farmingPolicyId],
+    farmingPolicyName: state.policies ? state.policies[node.farmingPolicyId] : "",
     countryFullName: node.country && node.country?.length == 2 ? byInternet(node.country)?.country : node.country,
   };
 }

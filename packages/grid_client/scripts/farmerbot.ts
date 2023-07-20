@@ -12,11 +12,12 @@ async function main() {
   console.log("pingFarm", pingFarm);
 
   const FarmerBotFindNode: FarmerBotFindNodeModel = {
-    farmId: 53,
-    // required_cru: 4,
-    // required_mru: 5,
-    // required_sru: 5,
-    // required_hru: 5,
+    farmId: farm.farmId,
+    required_cru: 4,
+    required_mru: 5,
+    required_sru: 5,
+    required_hru: 5,
+    // has_gpus: 2, // Uncomment it if you want to get only nodes with gpus.
   };
 
   if (pingFarm.twinid) {
