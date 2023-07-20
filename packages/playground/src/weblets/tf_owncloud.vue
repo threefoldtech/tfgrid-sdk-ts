@@ -103,9 +103,12 @@
               farmId: farm?.farmID,
               cpu: solution?.cpu,
               memory: solution?.memory,
-              ssd: solution?.disk,
-              disks: [{ size: solution?.disk, mountPoint: '/var/lib/docker' }],
-              disk: solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
+              disks: [
+                {
+                  size: solution?.disk,
+                  mountPoint: '/var/lib/docker',
+                },
+              ],
               name: name,
               flist: flist,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,

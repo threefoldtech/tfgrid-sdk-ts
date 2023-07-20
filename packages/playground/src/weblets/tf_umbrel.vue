@@ -98,12 +98,10 @@
           farmId: farm?.farmID,
           cpu: solution?.cpu,
           memory: solution?.memory,
-          ssd: solution?.disk,
           disks: [
             { size: 10, mountPoint: '/var/lib/docker' },
             { size: solution?.disk, mountPoint: '/umbrelDisk' },
           ],
-          disk: solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
           name: name,
           flist: flist,
           rentedBy: dedicated ? profileManager.profile?.twinId : undefined,

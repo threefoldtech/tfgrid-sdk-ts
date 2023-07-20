@@ -78,13 +78,11 @@
           farmId: farm?.farmID,
           cpu,
           memory,
-          ssd: 32,
           ipv4: true,
           disks: [
             { size: 15, mountPoint: '/mnt/' + generateName(10) },
             { size: 15, mountPoint: '/mnt/' + generateName(10) },
           ],
-          disk: 32,
           name: name,
           flist: flist,
           rentedBy: dedicated ? profileManager.profile?.twinId : undefined,

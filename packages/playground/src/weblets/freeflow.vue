@@ -77,9 +77,7 @@
             flist: flist,
             cpu: solution?.cpu,
             memory: solution?.memory,
-            ssd: solution?.disk,
             disks: disks,
-            disk: solution?.disk,
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"

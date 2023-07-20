@@ -89,11 +89,9 @@
               farmId: farm?.farmID,
               cpu: solution?.cpu,
               memory: solution?.memory,
-              ssd: (solution?.disk ?? 0) + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
               name: name,
               flist: flist,
               disks: [{ size: solution?.disk, mountPoint: '/var/lib/docker' }],
-              disk: 0,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"

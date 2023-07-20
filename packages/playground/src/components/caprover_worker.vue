@@ -54,11 +54,7 @@
         farmId: $props.modelValue.farm?.farmID,
         cpu: $props.modelValue.solution?.cpu ?? 0,
         memory: $props.modelValue.solution?.memory ?? 0,
-        ssd: $props.modelValue.solution?.disk,
         disks: [{ name: 'data0', size: $props.modelValue.solution?.disk ?? 0, mountPoint: '/var/lib/docker' }],
-        disk:
-          ($props.modelValue.solution?.disk ?? 0) +
-          rootFs($props.modelValue.solution?.cpu ?? 0, $props.modelValue.solution?.memory ?? 0),
         name: $props.modelValue.name,
         flist: flist,
         rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,

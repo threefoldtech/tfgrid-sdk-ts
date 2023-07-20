@@ -163,11 +163,18 @@
           cpu,
           memory,
           ipv4: ipv4,
-          ssd: storage + (type === 'indexer' ? 50 : 0),
           ipv6: ipv4,
           name: name,
-          disks: disks,
-          disk: storage + (type === 'indexer' ? 50 : 0),
+          type: type,
+          disks:
+            type === 'indexer'
+              ? [
+                  {
+                    size: 50,
+                    mountPoint: '/var/lib/docker',
+                  },
+                ]
+              : [],
           flist: flist,
           rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
           certified: certified,
@@ -212,22 +219,12 @@ const wordsLength = computed(() => (account.value ? account.value.split(" ").len
 const firstRound = ref(24000000);
 const lastRound = ref(26000000);
 const farm = ref() as Ref<Farm>;
-const disks = ref() as Ref<Disk[]>;
 const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<Node>;
 
 watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()));
 
-disks.value =
-  type.value === "indexer"
-    ? [
-        {
-          size: 50,
-          mountPoint: "/var/lib/docker",
-        },
-      ]
-    : [];
 async function deploy() {
   layout.value.setStatus("deploy");
 
@@ -251,7 +248,15 @@ async function deploy() {
           country: farm.value.country,
           flist: flist.value,
           entryPoint: flist.entryPoint,
-          disks: disks.value,
+          disks:
+            type.value === "indexer"
+              ? [
+                  {
+                    size: 50,
+                    mountPoint: "/var/lib/docker",
+                  },
+                ]
+              : [],
           rootFilesystemSize: storage.value,
           publicIpv4: ipv4.value,
           planetary: true,

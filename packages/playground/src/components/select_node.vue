@@ -59,10 +59,8 @@ export interface NodeFilters {
   hasGPU?: boolean;
   cpu: number;
   memory: number;
-  ssd?: number;
   flist?: Flist;
   name: string;
-  disk: number;
   disks: {
     name?: string | undefined;
     size: number;
@@ -70,6 +68,7 @@ export interface NodeFilters {
   }[];
   certified?: boolean;
   rentedBy?: number;
+  type?: string;
 }
 
 const emits = defineEmits<{ (event: "update:modelValue", value?: Node): void }>();
@@ -85,6 +84,8 @@ const nodesArr = ref<Array<Node>>([]);
 const loadingNodes = ref(false);
 const errorMessage = ref<string>();
 const selectedNode = ref() as Ref<number | undefined>;
+
+onMounted(loadNodes);
 
 watch(
   () => selectedNode.value,
@@ -104,12 +105,11 @@ watch(
       value.farmId === oldValue.farmId &&
       value.cpu === oldValue.cpu &&
       value.memory === oldValue.memory &&
-      value.ssd === oldValue.ssd &&
-      value.disk === oldValue.disk &&
       value.ipv4 === oldValue.ipv4 &&
       value.ipv6 === oldValue.ipv6 &&
       value.certified === oldValue.certified &&
-      value.rentedBy === oldValue.rentedBy
+      value.rentedBy === oldValue.rentedBy &&
+      value.type === oldValue.type
     )
       return;
     loadNodes();
@@ -126,10 +126,9 @@ watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
 function getChipColor(item: any) {
   return item === "Dedicated" ? "success" : "secondary";
 }
-onMounted(loadNodes);
 
 async function loadNodes() {
-  availableNodes.value = [];
+  nodesArr.value = [];
   errorMessage.value = "";
   loadingNodes.value = true;
   const filters = props.filters;
@@ -138,10 +137,6 @@ async function loadNodes() {
   if (grid) {
     const filteredDNodes = new FilteredNodes(grid);
     try {
-      if (!filters.farmId) {
-        selectedNode.value = undefined;
-        return;
-      }
       const res = await filteredDNodes.getFilteredNodes({
         name: filters.name,
         machines: [
@@ -152,7 +147,7 @@ async function loadNodes() {
             memory: filters.memory,
             flist: filters.flist!.value,
             entryPoint: filters.flist!.entryPoint,
-            disks: [{ size: filters.disk, mountPoint: "/" }, ...filters.disks],
+            disks: [...filters.disks],
             publicIpv4: filters.ipv4,
             publicIpv6: filters.ipv6,
             planetary: filters.planetary,
@@ -166,6 +161,11 @@ async function loadNodes() {
         network: { addAccess: filters.wireguard },
       });
       const nodes = res[0];
+
+      if (!filters?.farmId || nodes?.length === 0) {
+        selectedNode.value = undefined;
+        return;
+      }
 
       if (nodes) {
         for (const node of nodes) {

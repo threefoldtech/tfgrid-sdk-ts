@@ -110,12 +110,10 @@
             cpu,
             memory,
             ipv4: ipv4,
-            ssd: disks.reduce((total, disk) => total + disk.size, rootFsSize),
             ipv6: ipv4,
             name: name,
             flist: flist,
             disks: disks,
-            disk: disks.reduce((total, disk) => total + disk.size, rootFsSize),
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"
