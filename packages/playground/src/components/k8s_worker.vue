@@ -104,8 +104,6 @@
         cpu: $props.modelValue.cpu,
         memory: $props.modelValue.memory,
         disks: [{ name: 'data0', size: $props.modelValue?.diskSize ?? 0, mountPoint: '/var/lib/docker' }],
-        name: $props.modelValue.name,
-        flist: flist,
         rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
         certified: $props.modelValue.certified,
       }"
@@ -120,15 +118,11 @@ defineProps<{ modelValue: K8SWorker }>();
 <script lang="ts">
 import SelectNode from "../components/select_node.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, Flist, K8SWorker } from "../types";
+import type { Farm, K8SWorker } from "../types";
 import { generateName } from "../utils/strings";
 import RootFsSize from "./root_fs_size.vue";
 import SelectFarm from "./select_farm.vue";
 
-const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/tf-caprover-latest.flist",
-  entryPoint: "/sbin/zinit init",
-};
 const profileManager = useProfileManager();
 
 export function createWorker(name: string = generateName(9, { prefix: "wr" })): K8SWorker {
