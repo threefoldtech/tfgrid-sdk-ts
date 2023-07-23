@@ -1,9 +1,9 @@
 <template>
   <weblet-layout
     ref="layout"
-    :cpu="cpu"
-    :memory="memory"
-    :disk="disks.reduce((total, disk) => total + disk.size, diskSize + 2)"
+    :cpu="solution?.cpu"
+    :memory="solution?.memory"
+    :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk + 2)"
     :ipv4="ipv4"
     title-image="images/icons/vm.png"
   >
@@ -69,10 +69,10 @@
         <SelectFarm
           v-if="!hasGPU"
           :filters="{
-            cpu,
-            memory,
+            cpu: solution?.cpu,
+            memory: solution?.memory,
             publicIp: ipv4,
-            ssd: disks.reduce((total, disk) => total + disk.size, diskSize + 2),
+            ssd: disks.reduce((total, disk) => total + disk.size, solution?.disk + 2),
           }"
           v-model="farm"
         />
@@ -80,15 +80,15 @@
           v-else
           v-model="selectedNodewithCards"
           :filters="{
-            cpu,
-            memory,
+            cpu: solution?.cpu,
+            memory: solution?.memory,
             ipv4: ipv4,
-            ssd: disks.reduce((total, disk) => total + disk.size, diskSize + 2),
+            ssd: disks.reduce((total, disk) => total + disk.size, solution?.disk + 2),
             ipv6: ipv4,
             name: name,
             flist: flist,
             disks: disks,
-            disk: diskSize,
+            disk: solution?.disk,
             hasGPU: hasGPU,
             planetary: planetary,
             wireguard: wireguard,
@@ -186,9 +186,6 @@ const images: VmImage[] = [
 
 const name = ref(generateName(8, { prefix: "vm" }));
 const flist = ref<Flist>();
-const cpu = ref(4);
-const memory = ref(8192);
-const diskSize = ref(50);
 const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
@@ -224,14 +221,14 @@ async function deploy() {
       machines: [
         {
           name: name.value,
-          cpu: cpu.value,
-          memory: memory.value,
+          cpu: solution.value.cpu,
+          memory: solution.value.memory,
           flist: flist.value!.value,
           entryPoint: flist.value!.entryPoint,
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
-          disks: [{ size: diskSize.value, mountPoint: "/" }, ...disks.value],
+          disks: [{ size: solution.value.disk, mountPoint: "/" }, ...disks.value],
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           planetary: planetary.value,

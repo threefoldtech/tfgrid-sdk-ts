@@ -2,8 +2,8 @@
   <weblet-layout
     ref="layout"
     @mount="layoutMount"
-    :cpu="cpu"
-    :memory="memory"
+    :cpu="solution?.cpu"
+    :memory="solution?.memory"
     :disk="disks.reduce((total, disk) => total + disk.size, rootFsSize)"
     :ipv4="ipv4"
     title-image="images/icons/vm.png"
@@ -38,7 +38,7 @@
 
         <SelectVmImage :images="images" v-model="flist" />
 
-        <RootFsSize :cpu="cpu" :memory="memory" v-model.number="rootFsSize" />
+        <RootFsSize :cpu="solution?.cpu" :memory="solution?.memory" v-model.number="rootFsSize" />
 
         <SelectSolutionFlavor
           :minimum="{ cpu: 1, memory: 1024 * 1, disk: 25 }"
@@ -57,8 +57,8 @@
         />
         <SelectFarm
           :filters="{
-            cpu,
-            memory,
+            cpu: solution?.cpu,
+            memory: solution?.memory,
             publicIp: ipv4,
             ssd: disks.reduce((total, disk) => total + disk.size, rootFsSize),
           }"
@@ -191,8 +191,6 @@ const images = [
 const name = ref(generateName(8, { prefix: "vm" }));
 const flist = ref<Flist>();
 const rootFsSize = ref(2) as Ref<number>;
-const cpu = ref(4);
-const memory = ref(8192);
 const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
@@ -240,8 +238,8 @@ async function deploy() {
       machines: [
         {
           name: name.value,
-          cpu: cpu.value,
-          memory: memory.value,
+          cpu: solution.value.cpu,
+          memory: solution.value.memory,
           flist: flist.value!.value,
           entryPoint: flist.value!.entryPoint,
           farmId: farm.value.farmID,
