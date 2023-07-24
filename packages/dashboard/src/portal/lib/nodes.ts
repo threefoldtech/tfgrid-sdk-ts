@@ -172,22 +172,7 @@ export function generateNodeSummary(doc: jsPDF, nodes: nodeInterface[]) {
     cellX,
     cellY + lineOffset * 4,
   );
-  doc.text(
-    `Uptime: ${(
-      (nodes.reduce(
-        (totalM, node) =>
-          (totalM += node.receipts.reduce((total, receipt) => (total += receipt.measuredUptime || 0), 0)),
-        0,
-      ) /
-        nodes.reduce(
-          (totalU, node) => (totalU += Math.floor(moment.duration(node.uptime, "seconds").asSeconds())),
-          0,
-        )) *
-      100
-    ).toFixed(2)}%`,
-    cellX,
-    cellY + lineOffset * 5,
-  );
+  doc.text(`Uptime: ${getFarmUptimePercentage(nodes)}%`, cellX, cellY + lineOffset * 5);
 }
 
 export interface ITab {
