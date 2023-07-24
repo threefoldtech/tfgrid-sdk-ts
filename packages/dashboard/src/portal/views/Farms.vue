@@ -64,94 +64,100 @@
         </v-toolbar>
       </template>
 
-      <!-- details panel -->
       <template v-slot:expanded-item="{ item }">
-        <td :colspan="headers.length">
-          <v-container fluid class="text-left">
-            <v-row>
-              <v-col>
-                <v-flex class="text-left pr-2">Farm ID</v-flex>
+        <td class="spacer" :colspan="headers.length + 1">
+          <v-card variant="tonal" class="farm-details-card mt-3 mb-3">
+            <v-row class="farm-details-card-row">
+              <!-- First col for the title, second for the value -->
+              <v-col align="start" class="farm-details-card-text">Farm ID</v-col>
+              <v-col align="end" class="farm-details-card-text">{{ item.id }}</v-col>
+
+              <v-col align="start" class="farm-details-card-text">Farm Name</v-col>
+              <v-col align="end" class="farm-details-card-text">{{ item.name }}</v-col>
+            </v-row>
+            <v-row class="farm-details-card-row">
+              <v-col align="start" class="farm-details-card-text">Linked Twin ID</v-col>
+              <v-col align="end" class="farm-details-card-text">{{ item.twinId }}</v-col>
+
+              <v-col align="start" class="farm-details-card-text">Certification Type</v-col>
+              <v-col align="end" class="farm-details-card-text">{{ item.certification }}</v-col>
+            </v-row>
+            <v-row class="farm-details-card-row">
+              <v-col class="farm-details-card-text justify-start align-center d-flex">Linked Pricing Policy ID</v-col>
+              <v-col class="farm-details-card-text justify-end align-center d-flex">{{ item.pricingPolicyId }}</v-col>
+
+              <v-col class="farm-details-card-text align-center d-flex">Stellar Address</v-col>
+              <v-col class="farm-details-card-text align-center d-flex" v-if="item.v2address">
+                <v-text-field
+                  outlined
+                  class="text-caption"
+                  dense
+                  hide-details
+                  :value="item.v2address"
+                  :readonly="!!item.v2address"
+                  :append-icon="'mdi-pencil'"
+                  @click:append="openV2AddressDialog = true"
+                >
+                </v-text-field>
               </v-col>
-              <v-col>
-                <v-flex class="text-truncate font-weight-bold">
-                  <span>{{ item.id }}</span>
-                </v-flex>
+              <v-col align="end" class="farm-details-card-text" v-else>---</v-col>
+            </v-row>
+            <v-row class="farm-details-card-row">
+              <v-col align="center" class="farm-details-card-text">
+                <PublicIPTable
+                  :ips="item.publicIps"
+                  :deleteIP="deletePublicIP"
+                  :loadingDelete="loadingDeleteIP"
+                  :createIP="createPublicIPs"
+                  :loadingCreate="loadingCreateIP"
+                />
               </v-col>
             </v-row>
-            <v-row>
-              <v-col>
-                <v-flex class="text-left pr-2">Farm Name</v-flex>
-              </v-col>
-              <v-col>
-                <v-flex class="text-truncate font-weight-bold">
-                  <span>{{ item.name }}</span>
-                </v-flex>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <v-flex class="text-left pr-2">Linked Twin ID</v-flex>
-              </v-col>
-              <v-col>
-                <v-flex class="text-truncate font-weight-bold">
-                  <span>{{ item.twinId }}</span>
-                </v-flex>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <v-flex class="text-left pr-2">Certification Type</v-flex>
-              </v-col>
-              <v-col>
-                <v-flex class="text-truncate font-weight-bold">
-                  <span>{{ item.certification }}</span>
-                </v-flex>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <v-flex class="text-left">Linked Pricing Policy ID</v-flex>
-              </v-col>
-              <v-col>
-                <v-flex class="text-truncate font-weight-bold">
-                  <span>{{ item.pricingPolicyId }}</span>
-                </v-flex>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <v-flex class="text-left">Stellar Payout Address</v-flex>
-              </v-col>
-              <v-col v-if="item.v2address">
-                <v-row class="d-flex align-baseline justify-between pl-3">
-                  <v-text-field
-                    outlined
-                    class="pt-1 text-caption"
-                    dense
-                    hide-details
-                    :value="item.v2address"
-                    :readonly="!!item.v2address"
-                    :append-icon="'mdi-pencil'"
-                    @click:append="openV2AddressDialog = true"
-                  >
-                  </v-text-field>
-                </v-row>
-              </v-col>
-              <v-col v-else>
-                <v-flex>
-                  <v-tooltip right>
+
+            <!-- Actions -->
+            <v-card-actions>
+              <v-row>
+                <v-col align="center">
+                  <v-tooltip top>
                     <template v-slot:activator="{ on, attrs }">
-                      <v-btn x-small @click="openV2AddressDialog = true" v-bind="attrs" v-on="on"
-                        >Stellar Address</v-btn
+                      <v-btn v-bind="attrs" v-on="on" v-bind:href="'https://v3.bootstrap.grid.tf/'" target="blank"
+                        >Bootstrap Node Image</v-btn
                       >
                     </template>
-                    <span> Where minting payouts get sent to </span>
+                    <span> Download a ZOS image for your farm nodes </span>
                   </v-tooltip>
-                </v-flex>
-              </v-col>
+                </v-col>
+
+                <template v-if="network == networkEnv.main && item.nodesCount > 0">
+                  <v-col align="center">
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn v-bind="attrs" @click="downloadFarmReceipts(item.id)" v-on="on"
+                          >Download Minting Receipts</v-btn
+                        >
+                      </template>
+                      <span> Download Farm Nodes Minting Receipts</span>
+                    </v-tooltip>
+                  </v-col>
+                </template>
+                <template v-if="!item.v2address">
+                  <v-col align="center">
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn @click="openV2AddressDialog = true" v-bind="attrs" v-on="on"
+                          >Add Stellar Payout Address</v-btn
+                        >
+                      </template>
+                      <span> Where minting payouts get sent to </span>
+                    </v-tooltip>
+                  </v-col>
+                </template>
+              </v-row>
               <v-dialog transition="dialog-bottom-transition" v-model="openV2AddressDialog" max-width="500">
                 <v-card>
-                  <v-toolbar color="primary">Add/Edit V2 Stellar Address</v-toolbar>
+                  <v-toolbar flat class="primary white--text">
+                    <v-toolbar-title>Add/Edit V2 Stellar Address</v-toolbar-title>
+                  </v-toolbar>
                   <v-card-text>
                     <v-form v-model="isValidStellarV2Address">
                       <v-text-field
@@ -177,32 +183,8 @@
                   </v-card-actions>
                 </v-card>
               </v-dialog>
-            </v-row>
-            <v-row>
-              <v-col>
-                <v-flex class="text-left">Bootstrap Node Image</v-flex>
-              </v-col>
-              <v-col>
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-flex v-bind="attrs" v-on="on">
-                      <v-btn small v-bind:href="'https://v3.bootstrap.grid.tf/'" target="blank">ZOS Live Image</v-btn>
-                    </v-flex>
-                  </template>
-                  <span> Download a ZOS image for your farm nodes </span>
-                </v-tooltip>
-              </v-col>
-            </v-row>
-
-            <PublicIPTable
-              class="pt-4"
-              :ips="item.publicIps"
-              :deleteIP="deletePublicIP"
-              :loadingDelete="loadingDeleteIP"
-              :createIP="createPublicIPs"
-              :loadingCreate="loadingCreateIP"
-            />
-          </v-container>
+            </v-card-actions>
+          </v-card>
         </td>
       </template>
     </v-data-table>
@@ -236,8 +218,12 @@
 </template>
 
 <script lang="ts">
+import jsPDF from "jspdf";
 import { StrKey } from "stellar-sdk";
 import { Component, Vue, Watch } from "vue-property-decorator";
+
+import config from "@/portal/config";
+import { generateNodeSummary, generateReceipt } from "@/portal/lib/nodes";
 
 import FarmNodesTable from "../components/FarmNodesTable.vue";
 import PublicIPTable from "../components/PublicIPTable.vue";
@@ -248,8 +234,10 @@ import {
   deleteIP,
   getFarm,
   getNodesByFarmID,
+  nodeInterface,
   setFarmPayoutV2Address,
 } from "../lib/farms";
+import { NetworkEnv } from "../lib/util";
 
 @Component({
   name: "FarmsView",
@@ -287,6 +275,8 @@ export default class FarmsView extends Vue {
   isValidStellarV2Address = false;
   loadingAddStellar = false;
   loadingFarms = true;
+  network = config.network;
+  networkEnv = NetworkEnv;
 
   page = 1;
   size = 10;
@@ -315,6 +305,24 @@ export default class FarmsView extends Vue {
   async updated() {
     this.v2_address;
     this.farmName;
+  }
+
+  async downloadFarmReceipts(farmId: number) {
+    // the farm summary receipt
+    const docSum = new jsPDF();
+    const farmNodes = this.nodes.filter((node: nodeInterface) => node.farmId == farmId);
+    generateNodeSummary(docSum, farmNodes);
+    docSum.addPage();
+
+    // each node receipt
+    farmNodes.map((node: nodeInterface, i: number) => {
+      generateReceipt(docSum, node);
+      docSum.text(`${i + 1}`, 185, docSum.internal.pageSize.height - 10);
+      docSum.addPage();
+    });
+
+    // download the full receipts
+    docSum.save(`farm_${farmId}_receipt.pdf`);
   }
 
   unmounted() {
@@ -674,10 +682,30 @@ export default class FarmsView extends Vue {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .theme--dark.v-btn.v-btn--has-bg {
   background-color: #064663;
 }
+
 .farm {
   font-weight: 500 !important;
+}
+
+.farm-details-card {
+  padding: 20px;
+  border-radius: 0px;
+  margin: 0;
+}
+
+.farm-details-card-text {
+  font-size: 15px;
+  font-weight: 500;
+  font-family: system-ui;
+}
+
+.farm-details-card-row {
+  border-radius: 0px !important;
+  margin-bottom: 6px;
+  margin-top: 0px;
 }
 </style>
