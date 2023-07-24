@@ -57,12 +57,14 @@
                   filled
                   @keydown="setValue"
                   label="Recipient:"
+                  @blur="transferTwinIdCheck"
                   :rules="[
                     () => !!receptinTwinId || 'This field is required',
                     () => /^[1-9]\d*$/.test(receptinTwinId) || 'Please enter a positive integer',
+                    () => isComboBoxInvalid || 'Twin ID does not exist',
                   ]"
-                  :async-rules="[() => transferTwinIdCheck() || 'invalid twin id']"
-                ></v-combobox>
+                >
+                </v-combobox>
                 <TransferTextField
                   v-model="amountByTwinId"
                   label="Amount (TFT)"
@@ -71,6 +73,7 @@
                 </TransferTextField>
                 <span class="fee">0.01 transaction fee will be deducted</span>
               </v-form>
+
               <v-card-actions>
                 <v-spacer> </v-spacer>
                 <v-btn @click="clearInput" color="grey lighten-2 black--text">Clear</v-btn>
@@ -116,6 +119,7 @@ export default class TransferView extends Vue {
 
   loadingTransferTwinId = false;
   isTransferValidTwinId = false;
+  isComboBoxInvalid = false;
 
   queryClient = new QueryClient(window.configs.APP_API_URL);
   client = new Client({ url: window.configs.APP_API_URL });
@@ -125,15 +129,28 @@ export default class TransferView extends Vue {
 
   async transferTwinIdCheck() {
     const twinId = this.receptinTwinId;
-    const twinDetails = await this.queryClient.twins.get({ id: parseInt(twinId) });
-    if (twinDetails != null) {
-      this.isTransferValidTwinId = true;
-      console.log("true");
-      return true;
-    } else {
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => {
+        reject(new Error("Request timed out."));
+      }, 5000);
+    });
+    try {
+      const twinDetailsPromise = this.queryClient.twins.get({ id: parseInt(twinId) });
+      const twinDetails = await Promise.race([twinDetailsPromise, timeoutPromise]);
+      if (twinDetails != null) {
+        this.isTransferValidTwinId = true;
+        this.isComboBoxInvalid = false;
+        return true;
+      } else {
+        this.isTransferValidTwinId = false;
+        this.isComboBoxInvalid = true;
+        return false;
+      }
+    } catch (error) {
       this.isTransferValidTwinId = false;
-      console.log("false");
-      return false;
+      this.isComboBoxInvalid = true;
+      console.log("Error: ", error);
+      throw error;
     }
   }
 
