@@ -4,7 +4,7 @@
     @mount="layoutMount"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
-    :disk="disks.reduce((total, disk) => total + disk.size, rootFsSize)"
+    :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk + rootFsSize)"
     :ipv4="ipv4"
     title-image="images/icons/vm.png"
   >
@@ -60,7 +60,7 @@
             cpu: solution?.cpu,
             memory: solution?.memory,
             publicIp: ipv4,
-            ssd: disks.reduce((total, disk) => total + disk.size, rootFsSize),
+            ssd: disks.reduce((total, disk) => total + disk.size, solution?.disk + rootFsSize),
           }"
           v-model="farm"
         />
@@ -250,7 +250,7 @@ async function deploy() {
           planetary: planetary.value,
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
-          rootFilesystemSize: rootFsSize.value,
+          rootFilesystemSize: rootFsSize.value + solution.value.disk,
         },
       ],
     });
