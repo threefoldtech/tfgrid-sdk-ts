@@ -187,7 +187,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   } catch (e) {
     return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a discourse instance."));
   }
-  if (customDomain && ipv4) {
+  if (customDomain && ipv4.value) {
     vm[0].customDomain = gatewayName.domain;
     finalize(vm);
     return;
