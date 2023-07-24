@@ -15,7 +15,6 @@ export interface receiptInterface {
   hash: string;
   mintingStart?: number;
   mintingEnd?: number;
-  measuredUptime?: number;
   fixupStart?: number;
   fixupEnd?: number;
   tft?: number;
@@ -111,6 +110,14 @@ export async function getNodeAvailability(nodeId: number) {
   return { downtime: downtime, currentPeriod: secondsSinceCurrentPeriodStart };
 }
 
+export function getFarmUptimePercentage(farm: nodeInterface[]) {
+  let uptime = 0;
+  for (let i = 0; i < farm.length; i++) {
+    uptime += +getNodeUptimePercentage(farm[i]);
+  }
+  return (uptime / farm.length).toFixed(2);
+}
+
 export function getNodeUptimePercentage(node: nodeInterface) {
   return (
     ((node.availability.currentPeriod - node.availability.downtime) / node.availability.currentPeriod) *
@@ -127,7 +134,7 @@ export function getTime(num: number | undefined) {
 export function generateNodeSummary(doc: jsPDF, nodes: nodeInterface[]) {
   doc.setFontSize(15);
   const topY = 20;
-  const topX = 80;
+  const topX = 60;
   const lineOffset = 10;
   const cellOffset = 40;
   const cellX = 15;
@@ -140,7 +147,7 @@ export function generateNodeSummary(doc: jsPDF, nodes: nodeInterface[]) {
   doc.text(`Receipts: ${nodes.reduce((total, node) => (total += node.receipts.length), 0)}`, cellX, cellY + lineOffset);
   doc.text(
     `Minting Receipts: ${nodes.reduce(
-      (total, node) => (total += node.receipts.filter(receipt => receipt.measuredUptime).length),
+      (total, node) => (total += node.receipts.filter(receipt => receipt.type == "MINTING").length),
       0,
     )}`,
     cellX,
@@ -164,22 +171,7 @@ export function generateNodeSummary(doc: jsPDF, nodes: nodeInterface[]) {
     cellX,
     cellY + lineOffset * 4,
   );
-  doc.text(
-    `Uptime: ${(
-      (nodes.reduce(
-        (totalM, node) =>
-          (totalM += node.receipts.reduce((total, receipt) => (total += receipt.measuredUptime || 0), 0)),
-        0,
-      ) /
-        nodes.reduce(
-          (totalU, node) => (totalU += Math.floor(moment.duration(node.uptime, "seconds").asSeconds())),
-          0,
-        )) *
-      100
-    ).toFixed(2)}%`,
-    cellX,
-    cellY + lineOffset * 5,
-  );
+  doc.text(`Uptime: ${getFarmUptimePercentage(nodes)}%`, cellX, cellY + lineOffset * 5);
 }
 
 export interface ITab {
@@ -270,7 +262,7 @@ export function generateReceipt(doc: jsPDF, node: nodeInterface) {
   doc.setFontSize(10);
   doc.text(`Receipts total: ${node.receipts.length}`, cellX, topY + lineOffset);
   doc.text(
-    `Minting total: ${node.receipts.filter(receipt => receipt.measuredUptime).length}`,
+    `Minting total: ${node.receipts.filter(receipt => receipt.type == "MINTING").length}`,
     cellX,
     topY + lineOffset * 2,
   );
@@ -345,7 +337,6 @@ export async function getNodeMintingFixupReceipts(nodeId: number) {
         receipt: {
           Minting: {
             period: { start: number; end: number };
-            measured_uptime: number;
             reward: { musd: number; tft: number };
             cloud_units: { cu: number; su: number; nu: number };
           };
@@ -366,7 +357,6 @@ export async function getNodeMintingFixupReceipts(nodeId: number) {
             cloud_units: rec.receipt.Minting.cloud_units,
             mintingStart: rec.receipt.Minting.period.start * 1000,
             mintingEnd: rec.receipt.Minting.period.end * 1000,
-            measuredUptime: rec.receipt.Minting.measured_uptime || 0,
             tft: rec.receipt.Minting.reward.tft / 1e7,
             startPeriodTimestamp: rec.receipt.Minting.period.start,
             endPeriodTimestamp: rec.receipt.Minting.period.end,
