@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-
+  
   import CardList from "./components/CardList.svelte";
   import { fetchData, IStatsRes } from "./utils/fetchData";
   import { status } from "./utils/fetchData";
@@ -32,7 +32,7 @@
     const networks = Object.entries($status)
       .filter(x => x[1])
       .map(x => x[0]);
-    return `Please note that the current node distribution is for ${networks.join(", ")}.`;
+    return `Please note that the current node distribution is for ${networks.join(", ")} net.`;
   }
 </script>
 
@@ -56,13 +56,13 @@
     <div class:lds-dual-ring={loading} />
   {:else if data}
     <h2 class="node-title map-container">Node Distribution</h2>
+    <div class="networks">
+      <p>{networks()}</p>
+    </div>
     <div class="map-container">
       <div class="map">
         <tf-map r="76" g="187" b="217" nodes={JSON.stringify(data.nodesDistribution)} />
       </div>
-    </div>
-    <div class="networks">
-      <p>{networks()}</p>
     </div>
     <div class="map-container">
       <div class="state-title">
@@ -77,8 +77,8 @@
 
 <style>
   p {
-    margin: 0px;
-    padding: 25px;
+    margin: 8px;
+    padding: 15px;
   }
   .refresh {
     border: none;
@@ -108,9 +108,12 @@
   }
 
   .networks {
-    position: fixed;
-    top: 5%;
+    position: relative;
+    /* top: 5%; */
     font-size: 1.1rem;
+    text-align: center;
+    color: #fff;
+    background-color: #1982b1;
   }
   .state-title,
   .node-title {
