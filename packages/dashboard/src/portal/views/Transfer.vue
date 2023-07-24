@@ -60,8 +60,8 @@
                   :rules="[
                     () => !!receptinTwinId || 'This field is required',
                     () => /^[1-9]\d*$/.test(receptinTwinId) || 'Please enter a positive integer',
-                    () => ValidateTwinId() || 'Twin ID does not exist',
                   ]"
+                  :async-rules="[() => transferTwinIdCheck() || 'invalid twin id']"
                 ></v-combobox>
                 <TransferTextField
                   v-model="amountByTwinId"
@@ -71,7 +71,6 @@
                 </TransferTextField>
                 <span class="fee">0.01 transaction fee will be deducted</span>
               </v-form>
-
               <v-card-actions>
                 <v-spacer> </v-spacer>
                 <v-btn @click="clearInput" color="grey lighten-2 black--text">Clear</v-btn>
@@ -126,27 +125,15 @@ export default class TransferView extends Vue {
 
   async transferTwinIdCheck() {
     const twinId = this.receptinTwinId;
-    try {
-      const twinDetails = await this.queryClient.twins.get({ id: parseInt(twinId) });
-      if (twinDetails != null) {
-        this.isTransferValidTwinId = true;
-        return true;
-      } else {
-        this.isTransferValidTwinId = false;
-        return false;
-      }
-    } catch (error) {
-      console.error(error);
-      this.isTransferValidTwinId = false;
-      return false;
-    }
-  }
-
-  ValidateTwinId() {
-    if (this.receptinTwinId === "") {
-      return false;
+    const twinDetails = await this.queryClient.twins.get({ id: parseInt(twinId) });
+    if (twinDetails != null) {
+      this.isTransferValidTwinId = true;
+      console.log("true");
+      return true;
     } else {
-      return this.transferTwinIdCheck();
+      this.isTransferValidTwinId = false;
+      console.log("false");
+      return false;
     }
   }
 
