@@ -128,7 +128,7 @@
                   </v-tooltip>
                 </v-col>
 
-                <template v-if="network !== networkEnv.main && item.nodesCount > 0">
+                <template v-if="network == networkEnv.main && item.nodesCount > 0">
                   <v-col align="center">
                     <v-tooltip top>
                       <template v-slot:activator="{ on, attrs }">
