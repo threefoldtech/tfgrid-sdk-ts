@@ -87,8 +87,9 @@ export async function getFarmPayoutV2Address(
 }
 
 export async function getNodesCount(api: { query: any }, farmID: number) {
-  const nodes = await axios.get(`${config.gridproxyUrl}/nodes?farm_ids=${farmID}`);
-  return nodes.data.length;
+  const nodes = await axios.get(`${config.gridproxyUrl}/nodes?farm_ids=${farmID}&ret_count=true`);
+  const count = nodes.headers["count"];
+  return count;
 }
 
 export async function setFarmPayoutV2Address(
