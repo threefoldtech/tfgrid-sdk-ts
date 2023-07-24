@@ -278,7 +278,7 @@ export async function getNodesByFarmID(farmIDs: any[], page: number, size: numbe
     try {
       const network = config.network;
       node.receipts = [];
-      if (network == "dev") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
+      if (network == "main") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
       node.availability = await getNodeAvailability(node.nodeId);
     } catch (error) {
       node.receipts = [];
