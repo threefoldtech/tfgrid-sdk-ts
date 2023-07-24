@@ -222,12 +222,11 @@
                 </v-expansion-panel>
               </v-expansion-panels>
             </v-col>
-            <v-col v-if="network == 'dev'">
+            <v-col v-if="network == 'main'">
               <v-expansion-panels v-model="receiptsPanel" :disabled="false" focusable single>
                 <v-expansion-panel>
                   <v-expansion-panel-header> Node Statistics </v-expansion-panel-header>
                   <v-expansion-panel-content>
-                    <!-- <ReceiptsCalendar :node="item" /> -->
                     <NodeMintingDetails :node="item" />
                   </v-expansion-panel-content>
                 </v-expansion-panel>

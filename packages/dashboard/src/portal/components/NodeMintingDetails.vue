@@ -40,7 +40,7 @@
                       {{ getDateFromTimestamp(receipt.endPeriodTimestamp) }}
                       <br />
                       <span class="font-weight-bold">Node TFT Amount :</span> {{ receipt.tft || 0 }} TFT
-                      <span v-if="receipt.fixupReward != undefined">+ {{ receipt.fixupReward || 0 }} TFT FixedUp</span>
+                      <span v-if="receipt.fixupReward">+ {{ receipt.fixupReward || 0 }} TFT FixedUp</span>
                       <br />
                       <span class="font-weight-bold">Cloud Units :</span>
                       <ul>
