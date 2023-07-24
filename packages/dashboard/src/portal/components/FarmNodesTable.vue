@@ -438,11 +438,10 @@ import { hex2a } from "@/portal/lib/util";
 
 import { setDedicatedNodeExtraFee } from "../lib/nodes";
 import NodeMintingDetails from "./NodeMintingDetails.vue";
-import ReceiptsCalendar from "./ReceiptsCalendar.vue";
 
 @Component({
   name: "FarmNodesTable",
-  components: { ReceiptsCalendar, NodeMintingDetails },
+  components: { NodeMintingDetails },
 })
 export default class FarmNodesTable extends Vue {
   queryClient = new QueryClient(window.configs.APP_API_URL);
