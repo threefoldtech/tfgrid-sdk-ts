@@ -165,7 +165,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<number>;
+const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
 const domainNameCmp = ref();
 
@@ -243,7 +243,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
                 ]
               : []),
           ],
-          nodeId: selectedNode.value,
+          nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },
@@ -286,6 +286,7 @@ import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { INode } from "../utils/filter_nodes";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 

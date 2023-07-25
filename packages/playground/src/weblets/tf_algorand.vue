@@ -218,7 +218,7 @@ const lastRound = ref(26000000);
 const farm = ref() as Ref<Farm>;
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<number>;
+const selectedNode = ref() as Ref<INode>;
 
 watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()));
 
@@ -257,7 +257,7 @@ async function deploy() {
           rootFilesystemSize: storage.value,
           publicIpv4: ipv4.value,
           planetary: true,
-          nodeId: selectedNode.value,
+          nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
 
@@ -304,6 +304,7 @@ import AlgorandCapacity from "../components/algorand_capacity.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectNode from "../components/select_node.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { INode } from "../utils/filter_nodes";
 import { normalizeError } from "../utils/helpers";
 
 export default {

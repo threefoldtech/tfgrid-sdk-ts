@@ -40,7 +40,7 @@ export function loadK8S(grid: GridClient, name: string) {
 async function createWorker(data: K8SWorker) {
   const worker = new KubernetesNodeModel();
   worker.name = data.name;
-  worker.node_id = data.selectedNode!;
+  worker.node_id = data.selectedNode!.nodeId;
   worker.cpu = data.cpu;
   worker.disk_size = data.diskSize;
   worker.memory = data.memory;
@@ -73,7 +73,7 @@ export async function deployWorker(grid: GridClient, options: K8SWorker & { depl
   worker.public_ip6 = options.ipv6;
   worker.planetary = options.planetary;
   worker.rootfs_size = options.rootFsSize;
-  worker.node_id = options.selectedNode!;
+  worker.node_id = options.selectedNode!.nodeId;
   worker.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
 
   await grid.k8s.add_worker(worker);

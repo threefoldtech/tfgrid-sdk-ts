@@ -121,7 +121,6 @@
           <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
         </input-tooltip>
         <SelectFarm
-          v-if="!hasGPU"
           :filters="{
             cpu,
             memory,
@@ -132,28 +131,7 @@
           }"
           v-model="farm"
         />
-        <SelectGPUNode
-          v-if="hasGPU"
-          v-model="selectedNodewithCards"
-          :filters="{
-            cpu,
-            memory,
-            ipv4: ipv4,
-            ssd: disks.reduce((total, disk) => total + disk.size, diskSize + 2),
-            ipv6: ipv4,
-            name: name,
-            flist: flist,
-            disks: disks,
-            disk: diskSize,
-            hasGPU: hasGPU,
-            planetary: planetary,
-            wireguard: wireguard,
-            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-            certified: certified,
-          }"
-        />
         <SelectNode
-          v-else
           v-model="selectedNode"
           :filters="{
             farmId: farm?.farmID,
@@ -269,9 +247,8 @@ const certified = ref(false);
 const farm = ref() as Ref<Farm>;
 const disks = ref<Disk[]>([]);
 const network = ref();
-const hasGPU = ref(false);
-const selectedNodewithCards = ref() as Ref<GPUNodeType>;
-const selectedNode = ref() as Ref<number>;
+const hasGPU = ref();
+const selectedNode = ref() as Ref<INode>;
 
 function addDisk() {
   const name = generateName(7);
@@ -332,8 +309,8 @@ async function deploy() {
           envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
           rootFilesystemSize: 2,
           hasGPU: hasGPU.value,
-          nodeId: hasGPU.value ? selectedNodewithCards.value.nodeId : selectedNode.value,
-          gpus: hasGPU.value ? selectedNodewithCards.value.cards.map(card => card.id) : undefined,
+          nodeId: selectedNode.value.nodeId,
+          gpus: hasGPU.value ? selectedNode.value.cards?.map(card => card.id) : undefined,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },
@@ -353,11 +330,10 @@ async function deploy() {
 <script lang="ts">
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectFarm from "../components/select_farm.vue";
-import SelectGPUNode from "../components/select_gpu_node.vue";
 import SelectNode from "../components/select_node.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
-import type { GPUNodeType } from "../utils/filter_node_with_gpu";
+import type { INode } from "../utils/filter_nodes";
 
 export default {
   name: "FullVm",
@@ -365,7 +341,6 @@ export default {
     SelectVmImage,
     SelectFarm,
     ExpandableLayout,
-    SelectGPUNode,
     SelectNode,
   },
 };

@@ -254,7 +254,7 @@ const disks = ref<Disk[]>([]);
 const network = ref();
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<number>;
+const selectedNode = ref() as Ref<INode>;
 
 function layoutMount() {
   if (envs.value.length > 0) {
@@ -307,7 +307,7 @@ async function deploy() {
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           rootFilesystemSize: rootFsSize.value,
-          nodeId: selectedNode.value,
+          nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },
@@ -330,6 +330,7 @@ import SelectFarm from "../components/select_farm.vue";
 import SelectNode from "../components/select_node.vue";
 import SelectVmImage from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { INode } from "../utils/filter_nodes";
 import { normalizeError } from "../utils/helpers";
 
 export default {

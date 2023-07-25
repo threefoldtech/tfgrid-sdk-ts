@@ -91,7 +91,6 @@ async function loadFarms() {
       publicIPs: filters.publicIp,
       availableFor: grid!.twinId,
       certified: filters.certified,
-      dedicated: filters.dedicated,
     },
     { exclusiveFor: props.exclusiveFor },
   );

@@ -1,5 +1,7 @@
 import type { VDataTable } from "vuetify/lib/labs/components";
 
+import type { INode } from "@/utils/filter_nodes";
+
 import type * as validators from "../utils/validators";
 
 export interface K8SWorker {
@@ -12,14 +14,14 @@ export interface K8SWorker {
   planetary: boolean;
   rootFsSize: number;
   farm?: Farm;
-  selectedNode?: number;
+  selectedNode?: INode;
   rentedBy?: number;
   dedicated: boolean;
   certified: boolean;
 }
 
 export interface CaproverWorker {
-  selectedNode?: number;
+  selectedNode?: INode;
   name: string;
   farm?: Farm;
   solution?: solutionFlavor;

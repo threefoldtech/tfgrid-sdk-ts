@@ -150,7 +150,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<number>;
+const selectedNode = ref() as Ref<INode>;
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -196,7 +196,7 @@ async function deploy() {
             },
           ],
           rootFilesystemSize: rootFsSize,
-          nodeId: selectedNode.value,
+          nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },
@@ -216,6 +216,7 @@ async function deploy() {
 import SelectFarm from "../components/select_farm.vue";
 import SelectNode from "../components/select_node.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { INode } from "../utils/filter_nodes";
 
 export default {
   name: "TFPresearch",

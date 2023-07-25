@@ -168,7 +168,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<number>;
+const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
 
 function finalize(deployment: any) {
@@ -224,7 +224,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
             { key: "ADMIN_EMAIL", value: email.value },
             { key: "WP_URL", value: domain },
           ],
-          nodeId: selectedNode.value,
+          nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },
@@ -267,6 +267,7 @@ import SelectFarm from "../components/select_farm.vue";
 import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { INode } from "../utils/filter_nodes";
 
 export default {
   name: "TFWordpress",

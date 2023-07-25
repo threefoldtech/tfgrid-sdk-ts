@@ -147,7 +147,7 @@ const domainNameCmp = ref();
 const smtp = ref(createSMTPServer());
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<number>;
+const selectedNode = ref() as Ref<INode>;
 
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.2.flist",
@@ -212,7 +212,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
             { key: "THREEBOT_PRIVATE_KEY", value: generatePubKey() },
             { key: "FLASK_SECRET_KEY", value: generatePassword(8) },
           ],
-          nodeId: selectedNode.value,
+          nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },
@@ -261,6 +261,7 @@ import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { INode } from "../utils/filter_nodes";
 
 export default {
   name: "TfDiscourse",

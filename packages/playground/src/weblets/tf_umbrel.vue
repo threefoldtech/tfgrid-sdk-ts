@@ -143,7 +143,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<number>;
+const selectedNode = ref() as Ref<INode>;
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -187,7 +187,7 @@ async function deploy() {
             { key: "UMBREL_DISK", value: "/umbrelDisk" },
           ],
           rootFilesystemSize: rootFs(solution.value.cpu, solution.value.memory),
-          nodeId: selectedNode.value,
+          nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },
@@ -208,6 +208,7 @@ import SelectFarm from "../components/select_farm.vue";
 import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { INode } from "../utils/filter_nodes";
 
 export default {
   name: "TfUmbrel",

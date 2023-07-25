@@ -1,17 +1,23 @@
 <template>
   <section>
     <h6 class="text-h5 mb-4">Select a Node</h6>
-    <v-alert class="mb-2" type="warning" variant="tonal" v-if="!loadingNodes && selectedNode === undefined">
+    <v-alert
+      class="mb-2"
+      type="warning"
+      variant="tonal"
+      v-if="!loadingNodes && selectedNode === undefined && emptyResult"
+    >
       There are no nodes rented by you that match your selected resources, try to change your resources or rent a node
       and try again.
     </v-alert>
     <input-validator :rules="[validators.required('Node id is required.')]" :value="selectedNode" #="{ props }">
-      <input-tooltip tooltip="Select Node ID to deploy on.">
+      <input-tooltip tooltip="Select a node ID to deploy on.">
         <v-autocomplete
           select
           label="Node"
           :items="availableNodes"
           item-title="nodeId"
+          return-object
           v-model="selectedNode"
           @update:model-value="selectedNode = $event"
           :disabled="loadingNodes"
@@ -37,23 +43,47 @@
           </template>
         </v-autocomplete>
       </input-tooltip>
+      <input-validator
+        v-if="selectedNode && filters.hasGPU"
+        :rules="[
+          validators.required('Please select at least one card.'),
+          validators.min('Please select at least one card.', 1),
+        ]"
+        :value="selectedCards.length"
+        #="{ props }"
+      >
+        <input-tooltip
+          tooltip="Please select at least one card from the available GPU cards. Note that if you have a deployment that already uses certain cards, they will not appear in the selection area. You have the option to select one or more cards.."
+        >
+          <v-autocomplete
+            select
+            label="Node cards"
+            :model-value="selectedCards"
+            :items="nodeCards?.map(card => getCardName(card))"
+            :disabled="loadingCards"
+            multiple
+            @update:model-value="selectedCards = $event"
+            v-bind="{ ...props, loading: props.loading || loadingCards }"
+          />
+        </input-tooltip>
+      </input-validator>
     </input-validator>
   </section>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, type PropType, type Ref, ref, watch } from "vue";
+import { type PropType, type Ref, ref, watch } from "vue";
 
 import { useProfileManager } from "../stores/profile_manager";
-import { getFilteredNodes, type Node } from "../utils/filter_nodes";
+import { getFilteredNodes, getNodeCards, type INode, type NodeGPUCardType } from "../utils/filter_nodes";
 import { getGrid } from "../utils/grid";
-import { normalizeError } from "../utils/helpers";
+import { getCardName, normalizeError } from "../utils/helpers";
 
 export interface NodeFilters {
   farmId?: number;
   ipv6?: boolean;
   ipv4?: boolean;
-  hasGPU?: boolean;
+  hasGPU?: boolean | undefined;
   cpu: number;
   memory: number;
   disks: {
@@ -66,33 +96,59 @@ export interface NodeFilters {
   type?: string;
 }
 
-const emits = defineEmits<{ (event: "update:modelValue", value?: number): void }>();
+const emits = defineEmits<{ (event: "update:modelValue", value?: INode): void }>();
 
 const props = defineProps({
-  modelValue: { type: Number },
+  modelValue: { type: Object as PropType<INode> },
   filters: { default: () => ({} as NodeFilters), type: Object as PropType<NodeFilters> },
 });
 
 const profileManager = useProfileManager();
-const availableNodes = ref<Array<Node>>([]);
-const nodesArr = ref<Array<Node>>([]);
+const availableNodes = ref<Array<INode>>([]);
+const nodesArr = ref<Array<INode>>([]);
 const loadingNodes = ref(false);
+const loadingCards = ref(false);
+const shouldBeUpdated = ref(false);
 const errorMessage = ref<string>();
-const selectedNode = ref() as Ref<number | undefined>;
+const selectedNode = ref() as Ref<INode | undefined>;
+const selectedCards = ref<Array<string>>([]);
+const nodeCards = ref<Array<NodeGPUCardType>>([]);
+const cards: NodeGPUCardType[] = [];
+const emptyResult = ref(false);
 
-onMounted(loadNodes);
+watch(selectedCards, async () => {
+  for (const card of nodeCards.value) {
+    for (const selectedCard of selectedCards.value) {
+      if (getCardName(card) === selectedCard && !cards.includes(card)) {
+        cards.push(card);
+      }
+    }
+  }
+  if (selectedNode.value && selectedCards.value) {
+    emits("update:modelValue", { nodeId: selectedNode.value.nodeId, cards: cards });
+  }
+});
 
 watch(
   () => selectedNode.value,
-  node => {
+  async node => {
     if (node) {
-      emits("update:modelValue", node as number);
+      emits("update:modelValue", { nodeId: node.nodeId, cards: cards });
+    }
+
+    if (node && props.filters.hasGPU) {
+      loadingCards.value = true;
+      const grid = await getGrid(profileManager.profile!);
+      if (grid) {
+        const cards = await getNodeCards(grid, node.nodeId);
+        nodeCards.value = cards?.filter(card => card.contract === 0);
+        loadingCards.value = false;
+      }
     }
   },
   { immediate: true },
 );
 
-const shouldBeUpdated = ref(false);
 watch(
   () => ({ ...props.filters }),
   (value, oldValue) => {
@@ -104,10 +160,10 @@ watch(
       value.ipv6 === oldValue.ipv6 &&
       value.certified === oldValue.certified &&
       value.rentedBy === oldValue.rentedBy &&
+      value.hasGPU === oldValue.hasGPU &&
       value.type === oldValue.type
     )
       return;
-    loadNodes();
     shouldBeUpdated.value = true;
   },
 );
@@ -123,11 +179,18 @@ function getChipColor(item: any) {
 }
 
 async function loadNodes() {
+  availableNodes.value = [];
   nodesArr.value = [];
-  errorMessage.value = "";
+  selectedNode.value = undefined;
   loadingNodes.value = true;
+  errorMessage.value = "";
   const filters = props.filters;
 
+  if (!filters.farmId) {
+    emptyResult.value = true;
+    loadingNodes.value = false;
+    return;
+  }
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
     try {
@@ -137,13 +200,13 @@ async function loadNodes() {
         memory: filters.memory,
         disks: [...filters.disks],
         ipv4: filters.ipv4,
-        hasGPU: filters.hasGPU,
+        hasGPU: filters.hasGPU ? filters.hasGPU : undefined,
         certified: filters.certified,
         rentedBy: filters.rentedBy,
       });
 
-      if (!filters?.farmId || res?.length === 0) {
-        selectedNode.value = undefined;
+      if (res?.length === 0) {
+        emptyResult.value = true;
         loadingNodes.value = false;
         return;
       }
@@ -155,7 +218,7 @@ async function loadNodes() {
           }
         }
         availableNodes.value = nodesArr.value;
-        selectedNode.value = availableNodes.value ? availableNodes.value[0].nodeId : undefined;
+        selectedNode.value = availableNodes.value ? availableNodes.value[0] : undefined;
       } else {
         selectedNode.value = undefined;
         availableNodes.value = [];

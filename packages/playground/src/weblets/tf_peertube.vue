@@ -136,7 +136,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<number>;
+const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
 const domainNameCmp = ref();
 
@@ -196,7 +196,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
             { key: "PT_INITIAL_ROOT_PASSWORD", value: password.value },
             { key: "PEERTUBE_WEBSERVER_HOSTNAME", value: domain },
           ],
-          nodeId: selectedNode.value,
+          nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },
@@ -240,6 +240,7 @@ import SelectFarm from "../components/select_farm.vue";
 import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { INode } from "../utils/filter_nodes";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 

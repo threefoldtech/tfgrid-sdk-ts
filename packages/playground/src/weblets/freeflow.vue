@@ -121,7 +121,7 @@ const flist = ref<Flist>();
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<number>;
+const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
 
 onMounted(() => {
@@ -182,7 +182,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
             { key: "DIGITALTWIN_APPID", value: domain },
             { key: "NODE_ENV", value: "staging" },
           ],
-          nodeId: selectedNode.value,
+          nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },
@@ -227,6 +227,7 @@ import SelectFarm from "../components/select_farm.vue";
 import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { INode } from "../utils/filter_nodes";
 
 export default {
   name: "TFFreeflow",

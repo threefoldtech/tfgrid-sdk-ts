@@ -119,6 +119,7 @@ defineProps<{ modelValue: K8SWorker }>();
 import SelectNode from "../components/select_node.vue";
 import { useProfileManager } from "../stores";
 import type { Farm, K8SWorker } from "../types";
+import type { INode } from "../utils/filter_nodes";
 import { generateName } from "../utils/strings";
 import RootFsSize from "./root_fs_size.vue";
 import SelectFarm from "./select_farm.vue";
@@ -136,7 +137,7 @@ export function createWorker(name: string = generateName(9, { prefix: "wr" })): 
     planetary: true,
     rootFsSize: 2,
     farm: undefined as Farm | undefined,
-    selectedNode: undefined as number | undefined,
+    selectedNode: undefined as INode | undefined,
     dedicated: false,
     certified: false,
     rentedBy: undefined,
