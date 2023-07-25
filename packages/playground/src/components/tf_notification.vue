@@ -8,11 +8,13 @@ import "mosha-vue-toastify/dist/style.css";
 import { ContractStates } from "@threefold/grid_client";
 import { createToast } from "mosha-vue-toastify";
 import { onMounted } from "vue";
+import { ref } from "vue";
 
 import { useProfileManager } from "../stores";
 import { getGrid } from "../utils/grid";
 
 const profileManager = useProfileManager();
+const contractsCount = ref(0);
 
 onMounted(async () => {
   while (profileManager.profile) {
@@ -24,7 +26,9 @@ onMounted(async () => {
       contracts.nodeContracts.length != 0 ||
       contracts.rentContracts.length != 0
     ) {
-      createToast("Contracts are in grace period", {
+      contractsCount.value =
+        contracts.nameContracts.length + contracts.nodeContracts.length + contracts.rentContracts.length;
+      createToast("You have " + contractsCount.value + " contracts in grace period", {
         position: "top-right",
         hideProgressBar: true,
         toastBackgroundColor: "red",
