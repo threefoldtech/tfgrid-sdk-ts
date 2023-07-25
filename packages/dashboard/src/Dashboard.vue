@@ -187,6 +187,7 @@ import TfChainConnector from "./components/TfChainConnector.vue";
 import FundsCard from "./portal/components/FundsCard.vue";
 import TftSwapPrice from "./portal/components/TftSwapPrice.vue";
 import { connect } from "./portal/lib/connect";
+import { MutationTypes } from "./portal/store/mutations";
 import { accountInterface } from "./portal/store/state";
 
 interface SidenavItem {
