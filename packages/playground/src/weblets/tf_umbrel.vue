@@ -86,7 +86,7 @@
           memory: solution?.memory,
           ssd: (solution?.disk ?? 0) + 10 + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
           publicIp: ipv4,
-          dedicated: dedicated,
+          rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
           certified: certified,
         }"
         v-model="farm"

@@ -66,7 +66,7 @@
           memory,
           ssd: 32,
           publicIp: true,
-          dedicated: dedicated,
+          rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
           certified: certified,
         }"
         v-model="farm"

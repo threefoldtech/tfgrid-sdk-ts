@@ -40,7 +40,7 @@ export interface Filters {
   ssd?: number;
   disk?: number;
   certified?: boolean;
-  dedicated?: boolean;
+  rentedBy?: number;
 }
 const FarmGatewayManager = useFarmGatewayManager();
 const props = defineProps({
@@ -91,6 +91,7 @@ async function loadFarms() {
       publicIPs: filters.publicIp,
       availableFor: grid!.twinId,
       certified: filters.certified,
+      rentedBy: filters.rentedBy,
     },
     { exclusiveFor: props.exclusiveFor },
   );
@@ -129,7 +130,7 @@ watch(
       value.publicIp === oldValue.publicIp &&
       value.country === oldValue.country &&
       value.certified === oldValue.certified &&
-      value.dedicated === oldValue.dedicated
+      value.rentedBy === oldValue.rentedBy
     )
       return;
 

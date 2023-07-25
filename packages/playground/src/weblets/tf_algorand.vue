@@ -151,7 +151,7 @@
           memory: memory,
           ssd: storage + (type === 'indexer' ? 50 : 0),
           publicIp: ipv4,
-          dedicated: dedicated,
+          rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
           certified: certified,
         }"
         v-model="farm"

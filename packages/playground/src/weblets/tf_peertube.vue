@@ -75,7 +75,7 @@
             memory: solution?.memory,
             ssd: solution?.disk,
             publicIp: ipv4,
-            dedicated: dedicated,
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"
           v-model="farm"

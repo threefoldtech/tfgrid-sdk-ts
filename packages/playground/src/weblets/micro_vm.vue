@@ -98,7 +98,7 @@
             memory,
             publicIp: ipv4,
             ssd: disks.reduce((total, disk) => total + disk.size, rootFsSize),
-            dedicated: dedicated,
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"
           v-model="farm"

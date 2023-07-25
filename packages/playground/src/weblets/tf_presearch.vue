@@ -72,7 +72,7 @@
             memory,
             ssd: rootFsSize,
             publicIp: ipv4,
-            dedicated: dedicated,
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"
           exclusive-for="research"
