@@ -64,14 +64,15 @@ export async function getFarm(api: { query: any }, twinID: number) {
   const parsedFarms = twinFarms.map(async (farm: { toJSON: () => any }[]) => {
     const parsedFarm = farm[1].toJSON();
     const v2address = await getFarmPayoutV2Address(api, parsedFarm.id);
+    const nodesCount = await getNodesCount(api, parsedFarm.id);
 
     return {
       ...parsedFarm,
+      nodesCount,
       name: hex2a(parsedFarm.name),
       v2address: hex2a(v2address),
     };
   });
-
   return await Promise.all(parsedFarms);
 }
 export async function getFarmPayoutV2Address(
@@ -85,6 +86,13 @@ export async function getFarmPayoutV2Address(
   const address = await api.query.tfgridModule.farmPayoutV2AddressByFarmID(id);
   return address.toJSON();
 }
+
+export async function getNodesCount(api: { query: any }, farmID: number) {
+  const nodes = await axios.get(`${config.gridproxyUrl}/nodes?farm_ids=${farmID}&ret_count=true`);
+  const count = nodes.headers["count"];
+  return count;
+}
+
 export async function setFarmPayoutV2Address(
   address: string,
   api: ApiPromise,

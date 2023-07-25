@@ -37,12 +37,10 @@ export async function deleteDeploymentGateway(grid: GridClient, options: DeleteD
     twinId: grid.twinId,
   });
   for (const projectName of [options.projectName, ProjectName.Gateway, ""]) {
-    if (await deleteGateway(updateGrid(grid, { projectName }), subdomain)) {
-      updateGrid(grid, { projectName: options.projectName });
-      return;
-    }
+    await deleteGateway(updateGrid(grid, { projectName }), subdomain);
+    updateGrid(grid, { projectName: options.projectName });
+    return;
   }
-  throw new Error(`Can't delete gateway contracts with name ${subdomain}`);
 }
 
 export async function deleteGateway(grid: GridClient, name: string) {

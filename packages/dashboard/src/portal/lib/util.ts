@@ -7,3 +7,11 @@ export function hex2a(hex: string) {
   }
   return str;
 }
+
+export enum NetworkEnv {
+  dev = "dev",
+  test = "test",
+  main = "main",
+  qa = "qa",
+  custom = "custom",
+}
