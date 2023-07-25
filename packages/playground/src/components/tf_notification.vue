@@ -19,10 +19,9 @@ const contracts = ref<NormalizedContract[]>([]);
 
 onMounted(async () => {
   contracts.value = [];
-  const grid = await getGrid(profileManager.profile!);
 
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
+  while (profileManager.profile) {
+    const grid = await getGrid(profileManager.profile!);
     contracts.value = await getUserContracts(grid!);
 
     for (const contract of contracts.value) {
