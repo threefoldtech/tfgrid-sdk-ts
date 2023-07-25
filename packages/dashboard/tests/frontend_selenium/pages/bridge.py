@@ -4,12 +4,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 """
-This module contains Swap page elements.
+This module contains Bridge page elements.
 """
 
-class SwapPage:
+class BridgePage:
 
-    swap=(By.XPATH, '//*[@id="app"]/div[1]/nav/div[1]/div[1]/div[2]/div[2]/div/div/a[2]/div[2]/div')
+    bridge=(By.XPATH, '//*[@id="app"]/div[1]/nav/div[1]/div[1]/div[2]/div[2]/div/div/a[2]/div[2]/div')
     twin_details = (By.XPATH, "//*[contains(text(), 'Twin Details')]")
     stellar_choose=(By.XPATH, "//*[contains(text(), 'stellar')]") 
     stellar=(By.XPATH,'//*[@role="option"]')
@@ -30,11 +30,11 @@ class SwapPage:
     def __init__(self, browser):
         self.browser = browser
 
-    def navigate_to_swap(self, user):
+    def navigate_to_bridge(self, user):
         self.browser.find_element(By.XPATH, "//*[contains(text(), '"+ user +"')]").click()
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.twin_details))
-        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.swap))
-        self.browser.find_element(*self.swap).click()
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.bridge))
+        self.browser.find_element(*self.bridge).click()
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.transfer_tft_title))
     
     def twin_address(self):

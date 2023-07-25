@@ -1,5 +1,5 @@
-pytest==7.1.2
-selenium==4.4.3
-webdriver_manager==3.8.3
-requests==2.25.1
+pytest==7.4.0
+selenium==4.10.0
+webdriver_manager==3.9.1
+requests==2.31.0
 pyvirtualdisplay==3.0
