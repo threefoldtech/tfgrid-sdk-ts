@@ -32,7 +32,7 @@
     const networks = Object.entries($status)
       .filter(x => x[1])
       .map(x => x[0]);
-    return `Please note that the current node distribution is for ${networks.join(", ")} net.`;
+    return `Please note that the current node distribution is for ${networks.join(", ")} net(s).`;
   }
 </script>
 
