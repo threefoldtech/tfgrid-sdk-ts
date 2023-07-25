@@ -3,7 +3,7 @@
     <v-dialog v-model="show" scrollable width="80%">
       <template #activator="{ on, attrs }">
         <v-card v-on="on" v-bind="attrs">
-          <v-card-text class="d-flex align-center">
+          <v-card-text class="d-flex align-center py-1 px-2">
             <v-icon large>mdi-account</v-icon>
             <template v-if="$store.state.profile && balance">
               <p class="font-weight-bold ml-2" :style="{ whiteSpace: 'nowrap' }">
@@ -43,44 +43,14 @@
         <v-card-text v-if="$store.state.profile" class="pt-2">
           <v-container>
             <v-form>
-              <v-text-field readonly label="Mnemonic" :value="$store.state.profile.mnemonic" />
-              <p class="text-center font-weight-bold">
-                Scan the QRcode using
-                <a href="https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html" target="_blank">
-                  ThreeFold Connect
-                </a>
-                to fund your account
-              </p>
-              <div class="d-flex justify-center mt-2">
-                <QrcodeGenerator
-                  :data="'TFT:' + bridge + '?message=twin_' + $store.state.profile.twinId + '&sender=me&amount=100'"
-                />
-              </div>
-              <div class="d-flex justify-center my-4">
-                <a
-                  v-for="(app, index) in apps"
-                  :key="app.alt"
-                  :style="{ cursor: 'pointer', width: '150px' }"
-                  :class="{ 'mr-2': index === 0 }"
-                  :title="app.alt"
-                  v-html="app.src"
-                  :href="app.url"
-                  target="_blank"
-                />
-              </div>
-
-              <v-textarea label="Public SSH Key" spellcheck="false" :value="$store.state.profile.ssh" />
-              <div class="d-flex justify-end">
-                <v-btn color="primary" text @click="generateSSH" :disabled="sshState !== 0" :loading="sshState === 1"
-                  >Generate SSH Keys</v-btn
-                >
-                <v-btn text @click="updateSSH" :disabled="sshState !== 0" :loading="sshState === 2"
-                  >Update Public SSH Key</v-btn
-                >
-              </div>
-
-              <v-text-field readonly label="Twin ID" :value="$store.state.profile.twin" />
-              <v-text-field readonly label="Address" :value="$store.state.profile.address" />
+              <v-text-field
+                readonly
+                label="Mnemonic"
+                :value="$store.state.profile.mnemonic"
+                :type="showMnemonic ? 'text' : 'password'"
+                :append-icon="showMnemonic ? 'mdi-eye-outline' : 'mdi-eye-off-outline'"
+                @click:append="showMnemonic = !showMnemonic"
+              />
             </v-form>
           </v-container>
         </v-card-text>
@@ -101,7 +71,9 @@
                 label="Password"
                 autofocus
                 :rules="[validateLoginPassword]"
-                type="password"
+                :type="showPass1 ? 'text' : 'password'"
+                :append-icon="showPass1 ? 'mdi-eye-outline' : 'mdi-eye-off-outline'"
+                @click:append="showPass1 = !showPass1"
                 v-model="loginPassword"
               />
 
@@ -127,7 +99,6 @@
                       label="Mnemonic"
                       :rules="mnemonicRules"
                       placeholder="Please insert your mnemonic"
-                      type="password"
                       autofocus
                       :error-messages="mnemonicError"
                       :value="mnemonic"
@@ -135,6 +106,9 @@
                         mnemonic = $event;
                         mnemonicError = null;
                       "
+                      :type="showMnemonic ? 'text' : 'password'"
+                      :append-icon="showMnemonic ? 'mdi-eye-outline' : 'mdi-eye-off-outline'"
+                      @click:append="showMnemonic = !showMnemonic"
                     />
                     <v-btn
                       color="primary"
@@ -163,7 +137,9 @@
                     v-on="on"
                     v-bind="attrs"
                     label="Password"
-                    type="password"
+                    :type="showPass1 ? 'text' : 'password'"
+                    :append-icon="showPass1 ? 'mdi-eye-outline' : 'mdi-eye-off-outline'"
+                    @click:append="showPass1 = !showPass1"
                   />
                 </template>
 
@@ -177,7 +153,9 @@
                 ref="confirmPassword"
                 :rules="[validateConfirmPassword]"
                 v-model="password2"
-                type="password"
+                :type="showPass2 ? 'text' : 'password'"
+                :append-icon="showPass2 ? 'mdi-eye-outline' : 'mdi-eye-off-outline'"
+                @click:append="showPass2 = !showPass2"
               />
 
               <div class="d-flex justify-center">
@@ -265,11 +243,14 @@ export default class TfChainConnector extends Vue {
   public show = true;
   public tab = 0;
   public mnemonic = "";
+  public showMnemonic = false;
   public loginPassword = "";
   public password = "";
   public password2 = "";
   public isValidForm = false;
   public $api!: ApiPromise;
+  public showPass1 = false;
+  public showPass2 = false;
 
   public canLogin = typeof localStorage.getItem(key) === "string";
 
