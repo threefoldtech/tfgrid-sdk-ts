@@ -11,40 +11,18 @@
         <v-spacer>
           <TftSwapPrice v-if="!loadingAPI" />
         </v-spacer>
-        <div class="d-flex">
+        <div class="d-flex align-center">
           <FundsCard v-if="$store.state.credentials.initialized && $store.state.credentials.balance" />
           <div class="d-flex" style="align-items: center">
             <v-btn icon @click="toggle_dark_mode">
               <v-icon>mdi-theme-light-dark</v-icon>
             </v-btn>
 
-            <v-card color="transparent" outlined v-if="$store.state.portal.accounts.length === 0">
-              <v-btn @click="subscribe" color="green"> Connect </v-btn>
-            </v-card>
-
-            <v-btn v-else @click="disconnectWallet" color="red"> Disconnect </v-btn>
-
             <a href="https://manual.grid.tf/dashboard/dashboard.html" target="_blank">
               <v-btn class="custom-button" color="white" style="color: black"> Help</v-btn>
             </a>
 
-            <v-theme-provider root>
-              <v-card v-if="filteredAccounts().length" style="width: max-content">
-                <v-card-text
-                  style="padding: 10px 0px 10px 30px"
-                  v-for="account in filteredAccounts()"
-                  :key="account.address"
-                >
-                  <v-row class="d-flex align-center mx-0">
-                    <p class="font-weight-black" style="font-size: 15px">{{ account.meta.name }}</p>
-                    <!-- Logout button -->
-                    <v-btn icon class="mr-2" @click="redirectToHomePage">
-                      <v-icon>mdi-logout theme-light-dark</v-icon>
-                    </v-btn>
-                  </v-row>
-                </v-card-text>
-              </v-card>
-            </v-theme-provider>
+            <TfChainConnector />
           </div>
         </div>
       </v-app-bar>
@@ -185,13 +163,6 @@
         <span>{{ version ? version : "no version provided" }}</span>
       </div>
     </v-navigation-drawer>
-    <v-dialog v-model="loadingAPI" persistent class="loadingDialog">
-      <div class="d-flex justify-center" style="display: block; padding: 10%">
-        <v-progress-circular indeterminate color="green" :size="335" :width="7">
-          <span style="font-size: large; color: black">Connecting to Polkadot</span>
-        </v-progress-circular>
-      </div>
-    </v-dialog>
 
     <div :style="'padding-left:' + (mini ? '56px' : '300px')">
       <router-view />
@@ -212,9 +183,9 @@ import { Component, Vue } from "vue-property-decorator";
 
 import config from "@/portal/config";
 
+import TfChainConnector from "./components/TfChainConnector.vue";
 import FundsCard from "./portal/components/FundsCard.vue";
 import TftSwapPrice from "./portal/components/TftSwapPrice.vue";
-import WelcomeWindow from "./portal/components/WelcomeWindow.vue";
 import { connect } from "./portal/lib/connect";
 import { MutationTypes } from "./portal/store/mutations";
 import { accountInterface } from "./portal/store/state";
@@ -244,7 +215,7 @@ interface SidenavItem {
 
 @Component({
   name: "Dashboard",
-  components: { WelcomeWindow, FundsCard, TftSwapPrice },
+  components: { FundsCard, TftSwapPrice, TfChainConnector },
 })
 export default class Dashboard extends Vue {
   collapseOnScroll = true;
@@ -254,33 +225,13 @@ export default class Dashboard extends Vue {
   accounts: accountInterface[] = [];
   loadingAPI = true;
   version = config.version;
-  async subscribe() {
-    await this.$store.dispatch("portal/subscribeAccounts").then(async extensions => {
-      if (!extensions) {
-        this.$toasted.show(
-          "Can't open polkadot extension please make sure you have installed it first, allow access on this page, and try again",
-        );
-        return;
-      }
-      await setTimeout(() => {
-        if (!this.$store.state.portal.accounts.length)
-          this.$toasted.show(
-            "Can't get any account information from polkadot extension please make sure you have registered account on it",
-          );
-      }, 50);
-    });
-  }
+
   async mounted() {
-    this.routes = this.routes.filter(route => {
-      if (!route.hidden) return route;
-    });
-    await this.subscribe();
-    this.accounts = this.$store.state.portal.accounts;
-    if (this.$route.path === "/" && !this.$api) {
-      Vue.prototype.$api = await connect();
-      if (this.$api) this.$store.commit(`portal/${MutationTypes.SET_API}`, this.$api);
-      this.loadingAPI = false;
-    }
+    this.routes = this.routes.filter(route => !route.hidden);
+    Vue.prototype.$api = await connect();
+    this.$store.commit("portal/setApi", { api: this.$api });
+    this.loadingAPI = false;
+
     const theme = localStorage.getItem("dark_theme");
     if (theme) {
       if (theme === "true") {
@@ -333,7 +284,7 @@ export default class Dashboard extends Vue {
   }
 
   public filteredAccounts() {
-    return this.accounts.filter(account => account.active);
+    return [this.$store.state.credentials.account];
   }
 
   public isAccountSelected() {
@@ -356,8 +307,6 @@ export default class Dashboard extends Vue {
 
   public redirectToHomePage() {
     this.accounts.map(account => (account.active = false));
-    this.$store.commit("UNSET_CREDENTIALS");
-    this.routes[0].active = false;
     if (this.$route.path !== "/") {
       this.$router.push({
         name: "accounts",

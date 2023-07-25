@@ -1,4 +1,5 @@
-import { apiInterface } from "../lib/util";
+import { ApiPromise } from "@polkadot/api";
+
 import { accountInterface, PortalState } from "./state";
 
 export enum MutationTypes {
@@ -33,7 +34,7 @@ export default {
     state.proposals = payload.proposals;
   },
 
-  setApi(state: PortalState, api: apiInterface) {
+  setApi(state: PortalState, api: ApiPromise) {
     state.api = api;
   },
 

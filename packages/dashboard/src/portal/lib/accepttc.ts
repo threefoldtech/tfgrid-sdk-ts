@@ -1,30 +1,18 @@
-import { Signer } from "@polkadot/api/types";
-import { web3FromAddress } from "@polkadot/extension-dapp";
+import type { ApiPromise } from "@polkadot/api";
+
+import { getKeypair } from "@/utils/signer";
 
 export async function acceptTermsAndCondition(
-  api: {
-    tx: {
-      tfgridModule: {
-        userAcceptTc: (
-          arg0: string,
-          arg1: string,
-        ) => {
-          (): any;
-          new (): any;
-          signAndSend: { (arg0: string, arg1: { signer: Signer }, arg2: any): any; new (): any };
-        };
-      };
-    };
-  },
+  api: ApiPromise,
   address: string,
   documentLink: string,
   documentHash: string,
   callback: any,
 ) {
-  const injector = await web3FromAddress(address);
-  return api.tx.tfgridModule
-    .userAcceptTc(documentLink, documentHash)
-    .signAndSend(address, { signer: injector.signer }, callback);
+  const keypair = await getKeypair();
+  const nonce = await api.rpc.system.accountNextIndex(address);
+  const extrinsic = api.tx.tfgridModule.userAcceptTc(documentLink, documentHash);
+  return extrinsic.signAndSend(keypair, { nonce }, callback);
 }
 
 export async function userAcceptedTermsAndConditions(

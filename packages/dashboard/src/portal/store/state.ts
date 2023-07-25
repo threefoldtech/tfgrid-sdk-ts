@@ -1,6 +1,6 @@
-import { INode } from "@/explorer/graphql/api";
+import { ApiPromise } from "@polkadot/api";
 
-import { apiInterface } from "../lib/util";
+import { INode } from "@/explorer/graphql/api";
 
 export interface accountInterface {
   address: string;
@@ -13,7 +13,7 @@ export interface PortalState {
   accounts: accountInterface[];
   dedicatedNodes: INode[];
   proposals: number;
-  api: apiInterface;
+  api: ApiPromise;
   address: string;
   tabQuery: string;
   tableLoad: boolean;
