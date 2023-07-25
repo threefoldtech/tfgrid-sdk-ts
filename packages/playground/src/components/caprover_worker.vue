@@ -34,31 +34,33 @@
       <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" />
     </input-tooltip>
 
-    <SelectFarm
-      :filters="{
-        cpu: $props.modelValue.solution?.cpu,
-        memory: $props.modelValue.solution?.memory,
-        publicIp: true,
-        ssd:
-          ($props.modelValue.solution?.disk ?? 0) +
-          rootFs($props.modelValue.solution?.cpu ?? 0, $props.modelValue.solution?.memory ?? 0),
-        dedicated: $props.modelValue.dedicated,
-        certified: $props.modelValue.certified,
-      }"
-      v-model="$props.modelValue.farm"
-    />
+    <SelectFarmManager>
+      <SelectFarm
+        :filters="{
+          cpu: $props.modelValue.solution?.cpu,
+          memory: $props.modelValue.solution?.memory,
+          publicIp: true,
+          ssd:
+            ($props.modelValue.solution?.disk ?? 0) +
+            rootFs($props.modelValue.solution?.cpu ?? 0, $props.modelValue.solution?.memory ?? 0),
+          rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
+          certified: $props.modelValue.certified,
+        }"
+        v-model="$props.modelValue.farm"
+      />
 
-    <SelectNode
-      v-model="$props.modelValue.selectedNode"
-      :filters="{
-        farmId: $props.modelValue.farm?.farmID,
-        cpu: $props.modelValue.solution?.cpu ?? 0,
-        memory: $props.modelValue.solution?.memory ?? 0,
-        disks: [{ name: 'data0', size: $props.modelValue.solution?.disk ?? 0, mountPoint: '/var/lib/docker' }],
-        rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
-        certified: $props.modelValue.certified,
-      }"
-    />
+      <SelectNode
+        v-model="$props.modelValue.selectedNode"
+        :filters="{
+          farmId: $props.modelValue.farm?.farmID,
+          cpu: $props.modelValue.solution?.cpu ?? 0,
+          memory: $props.modelValue.solution?.memory ?? 0,
+          disks: [{ name: 'data0', size: $props.modelValue.solution?.disk ?? 0, mountPoint: '/var/lib/docker' }],
+          rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
+          certified: $props.modelValue.certified,
+        }"
+      />
+    </SelectFarmManager>
   </div>
 </template>
 
@@ -71,6 +73,7 @@ const profileManager = useProfileManager();
 </script>
 
 <script lang="ts">
+import SelectFarmManager from "../components/select_farm_manager.vue";
 import SelectNode from "../components/select_node.vue";
 import type { CaproverWorker } from "../types";
 import { generateName } from "../utils/strings";
@@ -87,6 +90,7 @@ export default {
     SelectSolutionFlavor,
     SelectFarm,
     SelectNode,
+    SelectFarmManager,
   },
 };
 </script>

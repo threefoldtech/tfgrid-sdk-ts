@@ -32,6 +32,7 @@ import type { Farm } from "../types";
 import { getFarms } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
 import { useFarmGatewayManager } from "./farm_gateway_manager.vue";
+import { useFarm } from "./select_farm_manager.vue";
 
 export interface Filters {
   publicIp?: boolean;
@@ -56,7 +57,9 @@ const profileManager = useProfileManager();
 const country = ref<string>();
 
 const farm = ref<Farm>();
+const farmManager = useFarm();
 watch([farm, country], ([f, c]) => {
+  farmManager?.setFarmId(f?.farmID);
   emits("update:modelValue", f ? { farmID: f.farmID, name: f.name, country: c ?? undefined } : undefined);
 });
 const loading = ref(false);

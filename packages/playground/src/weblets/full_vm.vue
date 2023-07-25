@@ -120,31 +120,34 @@
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
           <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
         </input-tooltip>
-        <SelectFarm
-          :filters="{
-            cpu,
-            memory,
-            publicIp: ipv4,
-            ssd: disks.reduce((total, disk) => total + disk.size, diskSize + 2),
-            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-            certified: certified,
-          }"
-          v-model="farm"
-        />
-        <SelectNode
-          v-model="selectedNode"
-          :filters="{
-            farmId: farm?.farmID,
-            cpu,
-            memory,
-            ipv4: ipv4,
-            ipv6: ipv4,
-            disks: [{ size: diskSize, mountPoint: '/' }, ...disks],
-            hasGPU: hasGPU,
-            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-            certified: certified,
-          }"
-        />
+
+        <SelectFarmManager>
+          <SelectFarm
+            :filters="{
+              cpu,
+              memory,
+              publicIp: ipv4,
+              ssd: disks.reduce((total, disk) => total + disk.size, diskSize + 2),
+              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+              certified: certified,
+            }"
+            v-model="farm"
+          />
+          <SelectNode
+            v-model="selectedNode"
+            :filters="{
+              farmId: farm?.farmID,
+              cpu,
+              memory,
+              ipv4: ipv4,
+              ipv6: ipv4,
+              disks: [{ size: diskSize, mountPoint: '/' }, ...disks],
+              hasGPU: hasGPU,
+              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+              certified: certified,
+            }"
+          />
+        </SelectFarmManager>
       </template>
 
       <template #disks>
@@ -198,6 +201,7 @@
 import { type Ref, ref, watch } from "vue";
 
 import Network from "../components/networks.vue";
+import SelectFarmManager from "../components/select_farm_manager.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type Farm, type Flist, ProjectName } from "../types";

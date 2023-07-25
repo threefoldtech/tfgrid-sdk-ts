@@ -145,39 +145,41 @@
         <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
       </input-tooltip>
 
-      <SelectFarm
-        :filters="{
-          cpu: cpu,
-          memory: memory,
-          ssd: storage + (type === 'indexer' ? 50 : 0),
-          publicIp: ipv4,
-          rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-          certified: certified,
-        }"
-        v-model="farm"
-      />
-      <SelectNode
-        v-model="selectedNode"
-        :filters="{
-          farmId: farm?.farmID,
-          cpu,
-          memory,
-          ipv4: ipv4,
-          ipv6: ipv4,
-          type: type,
-          disks:
-            type === 'indexer'
-              ? [
-                  {
-                    size: 50,
-                    mountPoint: '/var/lib/docker',
-                  },
-                ]
-              : [],
-          rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-          certified: certified,
-        }"
-      />
+      <SelectFarmManager>
+        <SelectFarm
+          :filters="{
+            cpu: cpu,
+            memory: memory,
+            ssd: storage + (type === 'indexer' ? 50 : 0),
+            publicIp: ipv4,
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+            certified: certified,
+          }"
+          v-model="farm"
+        />
+        <SelectNode
+          v-model="selectedNode"
+          :filters="{
+            farmId: farm?.farmID,
+            cpu,
+            memory,
+            ipv4: ipv4,
+            ipv6: ipv4,
+            type: type,
+            disks:
+              type === 'indexer'
+                ? [
+                    {
+                      size: 50,
+                      mountPoint: '/var/lib/docker',
+                    },
+                  ]
+                : [],
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+            certified: certified,
+          }"
+        />
+      </SelectFarmManager>
     </form-validator>
     <template #footer-actions>
       <v-btn color="primary" variant="tonal" @click="deploy" :disabled="!valid"> Deploy </v-btn>
@@ -302,6 +304,7 @@ function customLastRoundValidation(validators: Validators) {
 <script lang="ts">
 import AlgorandCapacity from "../components/algorand_capacity.vue";
 import SelectFarm from "../components/select_farm.vue";
+import SelectFarmManager from "../components/select_farm_manager.vue";
 import SelectNode from "../components/select_node.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { INode } from "../utils/filter_nodes";
@@ -313,6 +316,7 @@ export default {
     SelectFarm,
     SelectNode,
     AlgorandCapacity,
+    SelectFarmManager,
   },
 };
 </script>

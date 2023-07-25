@@ -60,33 +60,35 @@
         <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
       </input-tooltip>
 
-      <SelectFarmId
-        :filters="{
-          cpu,
-          memory,
-          ssd: 32,
-          publicIp: true,
-          rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-          certified: certified,
-        }"
-        v-model="farm"
-      />
+      <SelectFarmManager>
+        <SelectFarmId
+          :filters="{
+            cpu,
+            memory,
+            ssd: 32,
+            publicIp: true,
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+            certified: certified,
+          }"
+          v-model="farm"
+        />
 
-      <SelectNode
-        v-model="selectedNode"
-        :filters="{
-          farmId: farm?.farmID,
-          cpu,
-          memory,
-          ipv4: true,
-          disks: [
-            { size: 15, mountPoint: '/mnt/' + generateName(10) },
-            { size: 15, mountPoint: '/mnt/' + generateName(10) },
-          ],
-          rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-          certified: certified,
-        }"
-      />
+        <SelectNode
+          v-model="selectedNode"
+          :filters="{
+            farmId: farm?.farmID,
+            cpu,
+            memory,
+            ipv4: true,
+            disks: [
+              { size: 15, mountPoint: '/mnt/' + generateName(10) },
+              { size: 15, mountPoint: '/mnt/' + generateName(10) },
+            ],
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+            certified: certified,
+          }"
+        />
+      </SelectFarmManager>
     </form-validator>
 
     <template #footer-actions>
@@ -177,6 +179,7 @@ async function deploy() {
 
 <script lang="ts">
 import SelectFarmId from "../components/select_farm.vue";
+import SelectFarmManager from "../components/select_farm_manager.vue";
 import SelectNode from "../components/select_node.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { INode } from "../utils/filter_nodes";
@@ -187,6 +190,7 @@ export default {
   components: {
     SelectFarmId,
     SelectNode,
+    SelectFarmManager,
   },
 };
 </script>

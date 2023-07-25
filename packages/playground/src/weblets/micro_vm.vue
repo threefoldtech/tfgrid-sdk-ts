@@ -92,30 +92,32 @@
           <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
         </input-tooltip>
 
-        <SelectFarm
-          :filters="{
-            cpu,
-            memory,
-            publicIp: ipv4,
-            ssd: disks.reduce((total, disk) => total + disk.size, rootFsSize),
-            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-            certified: certified,
-          }"
-          v-model="farm"
-        />
-        <SelectNode
-          v-model="selectedNode"
-          :filters="{
-            farmId: farm?.farmID,
-            cpu,
-            memory,
-            ipv4: ipv4,
-            ipv6: ipv4,
-            disks: disks,
-            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-            certified: certified,
-          }"
-        />
+        <SelectFarmManager>
+          <SelectFarm
+            :filters="{
+              cpu,
+              memory,
+              publicIp: ipv4,
+              ssd: disks.reduce((total, disk) => total + disk.size, rootFsSize),
+              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+              certified: certified,
+            }"
+            v-model="farm"
+          />
+          <SelectNode
+            v-model="selectedNode"
+            :filters="{
+              farmId: farm?.farmID,
+              cpu,
+              memory,
+              ipv4: ipv4,
+              ipv6: ipv4,
+              disks: disks,
+              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+              certified: certified,
+            }"
+          />
+        </SelectFarmManager>
       </template>
 
       <template #env>
@@ -327,6 +329,7 @@ async function deploy() {
 import ExpandableLayout from "../components/expandable_layout.vue";
 import RootFsSize from "../components/root_fs_size.vue";
 import SelectFarm from "../components/select_farm.vue";
+import SelectFarmManager from "../components/select_farm_manager.vue";
 import SelectNode from "../components/select_node.vue";
 import SelectVmImage from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -341,6 +344,7 @@ export default {
     SelectFarm,
     SelectNode,
     ExpandableLayout,
+    SelectFarmManager,
   },
 };
 </script>

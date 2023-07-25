@@ -78,22 +78,24 @@ import { useProfileManager } from "../stores/profile_manager";
 import { getFilteredNodes, getNodeCards, type INode, type NodeGPUCardType } from "../utils/filter_nodes";
 import { getGrid } from "../utils/grid";
 import { getCardName, normalizeError } from "../utils/helpers";
+import { useFarm } from "./select_farm_manager.vue";
 
 export interface NodeFilters {
   farmId?: number;
   ipv6?: boolean;
   ipv4?: boolean;
-  hasGPU?: boolean | undefined;
+  hasGPU?: boolean;
   cpu: number;
   memory: number;
   disks: {
-    name?: string | undefined;
+    name?: string;
     size: number;
     mountPoint: string;
   }[];
   certified?: boolean;
   rentedBy?: number;
   type?: string;
+  availableFor?: number;
 }
 
 const emits = defineEmits<{ (event: "update:modelValue", value?: INode): void }>();
@@ -102,7 +104,7 @@ const props = defineProps({
   modelValue: { type: Object as PropType<INode> },
   filters: { default: () => ({} as NodeFilters), type: Object as PropType<NodeFilters> },
 });
-
+const farmManager = useFarm();
 const profileManager = useProfileManager();
 const availableNodes = ref<Array<INode>>([]);
 const nodesArr = ref<Array<INode>>([]);
@@ -152,33 +154,38 @@ watch(
 watch(
   () => ({ ...props.filters }),
   (value, oldValue) => {
-    if (
-      value.farmId === oldValue.farmId &&
-      value.cpu === oldValue.cpu &&
-      value.memory === oldValue.memory &&
-      value.ipv4 === oldValue.ipv4 &&
-      value.ipv6 === oldValue.ipv6 &&
-      value.certified === oldValue.certified &&
-      value.rentedBy === oldValue.rentedBy &&
-      value.hasGPU === oldValue.hasGPU &&
-      value.type === oldValue.type
-    )
-      return;
+    if (value.hasGPU === oldValue.hasGPU && value.type === oldValue.type) return;
     shouldBeUpdated.value = true;
   },
 );
 
+farmManager?.subscribe(farmId => {
+  if (!farmId) {
+    selectedNode.value = undefined;
+    availableNodes.value = [];
+    return;
+  }
+  loadNodes(farmId);
+});
+
 watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
   if (l || !s) return;
   shouldBeUpdated.value = false;
-  await loadNodes();
+  farmManager?.subscribe(farmId => {
+    if (!farmId) {
+      selectedNode.value = undefined;
+      availableNodes.value = [];
+      return;
+    }
+    loadNodes(farmId);
+  });
 });
 
 function getChipColor(item: any) {
   return item === "Dedicated" ? "success" : "secondary";
 }
 
-async function loadNodes() {
+async function loadNodes(farmId: number) {
   availableNodes.value = [];
   nodesArr.value = [];
   selectedNode.value = undefined;
@@ -186,16 +193,11 @@ async function loadNodes() {
   errorMessage.value = "";
   const filters = props.filters;
 
-  if (!filters.farmId) {
-    emptyResult.value = true;
-    loadingNodes.value = false;
-    return;
-  }
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
     try {
       const res = await getFilteredNodes(grid, {
-        farmId: filters.farmId,
+        farmId: farmId,
         cpu: filters.cpu,
         memory: filters.memory,
         disks: [...filters.disks],
@@ -203,6 +205,7 @@ async function loadNodes() {
         hasGPU: filters.hasGPU ? filters.hasGPU : undefined,
         certified: filters.certified,
         rentedBy: filters.rentedBy,
+        availableFor: filters.rentedBy,
       });
 
       if (res?.length === 0) {

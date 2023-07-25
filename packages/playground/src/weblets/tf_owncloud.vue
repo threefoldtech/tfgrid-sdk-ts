@@ -86,33 +86,35 @@
             <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
           </input-tooltip>
 
-          <SelectFarm
-            :filters="{
-              cpu: solution?.cpu,
-              memory: solution?.memory,
-              ssd: solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
-              publicIp: ipv4,
-              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-              certified: certified,
-            }"
-            v-model="farm"
-          />
-          <SelectNode
-            v-model="selectedNode"
-            :filters="{
-              farmId: farm?.farmID,
-              cpu: solution?.cpu,
-              memory: solution?.memory,
-              disks: [
-                {
-                  size: solution?.disk,
-                  mountPoint: '/var/lib/docker',
-                },
-              ],
-              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-              certified: certified,
-            }"
-          />
+          <SelectFarmManager>
+            <SelectFarm
+              :filters="{
+                cpu: solution?.cpu,
+                memory: solution?.memory,
+                ssd: solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
+                publicIp: ipv4,
+                rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+                certified: certified,
+              }"
+              v-model="farm"
+            />
+            <SelectNode
+              v-model="selectedNode"
+              :filters="{
+                farmId: farm?.farmID,
+                cpu: solution?.cpu,
+                memory: solution?.memory,
+                disks: [
+                  {
+                    size: solution?.disk,
+                    mountPoint: '/var/lib/docker',
+                  },
+                ],
+                rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+                certified: certified,
+              }"
+            />
+          </SelectFarmManager>
           <DomainName :hasIPv4="ipv4" ref="domainNameCmp" />
         </FarmGatewayManager>
       </template>
@@ -282,6 +284,7 @@ import DomainName from "../components/domain_name.vue";
 import FarmGatewayManager from "../components/farm_gateway_manager.vue";
 import Networks from "../components/networks.vue";
 import SelectFarm from "../components/select_farm.vue";
+import SelectFarmManager from "../components/select_farm_manager.vue";
 import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
@@ -300,6 +303,7 @@ export default {
     FarmGatewayManager,
     SelectFarm,
     SelectNode,
+    SelectFarmManager,
   },
 };
 </script>

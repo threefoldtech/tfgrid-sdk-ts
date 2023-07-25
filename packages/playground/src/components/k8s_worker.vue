@@ -85,29 +85,31 @@
       <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" />
     </input-tooltip>
 
-    <SelectFarm
-      :filters="{
-        cpu: $props.modelValue.cpu,
-        memory: $props.modelValue.memory,
-        publicIp: $props.modelValue.ipv4,
-        ssd: $props.modelValue.diskSize + $props.modelValue.rootFsSize,
-        dedicated: $props.modelValue.dedicated,
-        certified: $props.modelValue.certified,
-      }"
-      v-model="$props.modelValue.farm"
-    />
+    <SelectFarmManager>
+      <SelectFarm
+        :filters="{
+          cpu: $props.modelValue.cpu,
+          memory: $props.modelValue.memory,
+          publicIp: $props.modelValue.ipv4,
+          ssd: $props.modelValue.diskSize + $props.modelValue.rootFsSize,
+          rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
+          certified: $props.modelValue.certified,
+        }"
+        v-model="$props.modelValue.farm"
+      />
 
-    <SelectNode
-      v-model="$props.modelValue.selectedNode"
-      :filters="{
-        farmId: $props.modelValue.farm?.farmID,
-        cpu: $props.modelValue.cpu,
-        memory: $props.modelValue.memory,
-        disks: [{ name: 'data0', size: $props.modelValue?.diskSize ?? 0, mountPoint: '/var/lib/docker' }],
-        rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
-        certified: $props.modelValue.certified,
-      }"
-    />
+      <SelectNode
+        v-model="$props.modelValue.selectedNode"
+        :filters="{
+          farmId: $props.modelValue.farm?.farmID,
+          cpu: $props.modelValue.cpu,
+          memory: $props.modelValue.memory,
+          disks: [{ name: 'data0', size: $props.modelValue?.diskSize ?? 0, mountPoint: '/var/lib/docker' }],
+          rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
+          certified: $props.modelValue.certified,
+        }"
+      />
+    </SelectFarmManager>
   </div>
 </template>
 
@@ -116,6 +118,7 @@ defineProps<{ modelValue: K8SWorker }>();
 </script>
 
 <script lang="ts">
+import SelectFarmManager from "../components/select_farm_manager.vue";
 import SelectNode from "../components/select_node.vue";
 import { useProfileManager } from "../stores";
 import type { Farm, K8SWorker } from "../types";
@@ -150,6 +153,7 @@ export default {
     SelectFarm,
     RootFsSize,
     SelectNode,
+    SelectFarmManager,
   },
 };
 </script>
