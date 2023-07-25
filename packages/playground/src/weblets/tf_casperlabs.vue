@@ -5,6 +5,8 @@
     :memory="solution?.memory"
     :disk="solution?.disk"
     :ipv4="ipv4"
+    :certified="certified"
+    :dedicated="dedicated"
     title-image="images/icons/casperlabs.png"
   >
     <template #title>Deploy a Casperlabs Instance </template>

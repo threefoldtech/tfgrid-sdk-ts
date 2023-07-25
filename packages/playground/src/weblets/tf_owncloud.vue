@@ -5,6 +5,8 @@
     :memory="solution?.memory"
     :disk="solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
     :ipv4="ipv4"
+    :certified="certified"
+    :dedicated="dedicated"
     title-image="images/icons/owncloud.png"
   >
     <template #title>Deploy an OwnCloud Instance </template>

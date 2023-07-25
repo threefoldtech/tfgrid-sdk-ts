@@ -11,6 +11,8 @@
       )
     "
     :ipv4="true"
+    :certified="leader.certified"
+    :dedicated="leader.dedicated"
     title-image="images/icons/caprover.png"
   >
     <d-tabs

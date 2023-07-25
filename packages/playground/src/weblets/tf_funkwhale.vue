@@ -5,6 +5,8 @@
     :memory="solution?.memory"
     :disk="solution?.disk"
     :ipv4="ipv4"
+    :certified="certified"
+    :dedicated="dedicated"
     title-image="images/icons/funkwhale.png"
   >
     <template #title>Deploy a Funkwhale Instance </template>

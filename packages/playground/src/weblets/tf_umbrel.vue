@@ -5,6 +5,8 @@
     :memory="solution?.memory"
     :disk="(solution?.disk ?? 0) + 10 + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
     :ipv4="ipv4"
+    :certified="certified"
+    :dedicated="dedicated"
     title-image="images/icons/umbrel.png"
   >
     <template #title>Deploy an Umbrel Instance </template>
