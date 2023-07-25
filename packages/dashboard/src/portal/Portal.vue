@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <router-view style="padding: 6% 5% 5% 10%; margin: 4% 0" />
+    <router-view style="padding: 3%; margin: 4% 0" />
     <VotePopup v-if="$store.state.credentials.twin.id" />
   </v-container>
 </template>

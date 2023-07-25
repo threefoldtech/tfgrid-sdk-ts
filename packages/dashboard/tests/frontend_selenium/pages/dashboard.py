@@ -89,5 +89,5 @@ class DashboardPage:
         self.browser.find_element(*self.tft_info).click()
         WebDriverWait(self.browser, 30).until(EC.number_of_windows_to_be(2))
         self.browser.switch_to.window(self.browser.window_handles[1])
-        return self.browser.find_element(*self.stellar_tft_price).text
+        return self.browser.find_element(*self.stellar_tft_price).text[:-4]
         

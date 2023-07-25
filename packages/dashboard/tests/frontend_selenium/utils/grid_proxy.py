@@ -32,6 +32,11 @@ class GridProxy:
         farm_node = r.json()
         return (farm_node['publicConfig']['ipv4'])
 
+    def get_node_fee(self, node_id):
+        r = requests.post(Base.gridproxy_url + 'nodes/'+ str(node_id))
+        farm_node = r.json()
+        return (farm_node['extraFee'])/1000
+    
     def get_twin_address(self, twin_id):
         r = requests.post(Base.gridproxy_url + 'twins?twin_id='+ twin_id)
         details = r.json()

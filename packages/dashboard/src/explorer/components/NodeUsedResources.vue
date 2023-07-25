@@ -66,7 +66,7 @@ export default class NodeUsedResources extends Vue {
 
   getNodeUsedResources() {
     this.loader = true;
-    return ["cru", "sru", "hru", "mru"].map((i, idx) => {
+    return ["cru", "mru", "sru", "hru"].map((i, idx) => {
       const value =
         this.nodeStatistics.total[i] != 0
           ? ((this.nodeStatistics.used[i] + this.nodeStatistics.system[i]) / this.nodeStatistics.total[i]) * 100
@@ -90,7 +90,7 @@ export default class NodeUsedResources extends Vue {
         this.resources = resources;
       }
     } else {
-      this.resources = ["cru", "sru", "hru", "mru"].map((i, idx) => {
+      this.resources = ["cru", "mru", "sru", "hru"].map((i, idx) => {
         return { id: idx + 1, value: 0, name: this.renamedResources[idx] };
       });
     }

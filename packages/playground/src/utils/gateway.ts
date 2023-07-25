@@ -1,4 +1,4 @@
-import { type FilterOptions, GatewayNameModel, type GridClient } from "@threefold/grid_client";
+import { type FilterOptions, GatewayFQDNModel, GatewayNameModel, type GridClient } from "@threefold/grid_client";
 
 import { SolutionCode } from "@/types";
 
@@ -24,17 +24,14 @@ export function getSubdomain(options: GetHostnameOptions) {
   );
 }
 
-export interface GatewayBackend {
-  ip: string;
-  port: number;
-}
-
 export interface DeployGatewayNameOptions {
   name: string;
   nodeId: number;
   tlsPassthrough?: boolean;
-  backends: GatewayBackend[];
+  ip: string;
+  port: number;
   networkName: string;
+  fqdn?: string;
 }
 export async function deployGatewayName(grid: GridClient, options: DeployGatewayNameOptions) {
   const gateway = new GatewayNameModel();
@@ -42,10 +39,14 @@ export async function deployGatewayName(grid: GridClient, options: DeployGateway
   await grid.gateway.getObj(gateway.name); //invalidating the cashed keys
   gateway.node_id = options.nodeId;
   gateway.tls_passthrough = options.tlsPassthrough || false;
-  gateway.backends = options.backends.map(({ ip, port }) => `http://${ip}:${port}`);
+  gateway.backends = [`http://${options.ip}:${options.port}`];
   gateway.network = options.networkName;
   gateway.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
-
+  if (options.fqdn) {
+    const domain = gateway as GatewayFQDNModel;
+    domain.fqdn = options.fqdn;
+    return grid.gateway.deploy_fqdn(domain);
+  }
   return grid.gateway.deploy_name(gateway);
 }
 

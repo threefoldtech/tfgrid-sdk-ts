@@ -19,7 +19,7 @@
       <v-row class="py-2" align="center" justify="space-between">
         <v-col cols="6">
           <v-row align="center">
-            <v-col cols="4">
+            <v-col xl="4" class="ml-2">
               <v-switch
                 class="mt-0"
                 label="Gateways (Only)"
@@ -28,8 +28,14 @@
                 @change="requestNodes"
               />
             </v-col>
-            <v-col cols="4">
-              <v-switch class="mt-0" label="GPU Node (Only)" hide-details v-model="gpuFilter" @change="requestNodes" />
+            <v-col>
+              <v-switch
+                class="mt-0 ml-2"
+                label="GPU Node (Only)"
+                hide-details
+                v-model="gpuFilter"
+                @change="requestNodes"
+              />
             </v-col>
           </v-row>
         </v-col>

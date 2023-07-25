@@ -31,7 +31,7 @@ class PolkaPage:
     polka_submit_forget = (By.XPATH ,'//*[@id="root"]/main/div[2]/div/div[3]/button')
     polka_auth_pass = (By.XPATH ,'//*[@id="root"]/main/div[3]/div[1]/div/input')
     polka_auth_submit = (By.XPATH ,'//*[@id="root"]/main/div[3]/button/div[1]')
-    dashboard_load = (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div/div/div[1]/div/div/div/div/div/div[1]/div[3]')
+    dashboard_load = (By.XPATH, "//*[contains(text(), 'Connecting to Polkadot')]")
 
     def __init__(self, browser):
         self.browser = browser
@@ -44,6 +44,7 @@ class PolkaPage:
         self.browser.find_element(*self.polka_understand).click()
         self.browser.find_element(*self.polka_allow).click()
         self.browser.switch_to.window(self.browser.window_handles[0])
+        WebDriverWait(self.browser, 30).until(EC.invisibility_of_element(self.dashboard_load))
     
     def add_account(self, name, password):
         self.browser.execute_script("window.open('');")

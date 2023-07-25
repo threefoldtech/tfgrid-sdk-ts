@@ -43,31 +43,34 @@ class Capacity {
   @expose
   @validateInput
   async filterNodes(options?: FilterOptions): Promise<NodeInfo[]> {
-    if (options.farmName) {
-      options.farmId = await this.nodes.getFarmIdFromFarmName(options.farmName);
-    }
-    if (options.farmId) {
-      const farmerbot = new FarmerBot(this.config);
-      try {
-        const pong = await farmerbot.pingFarm({ farmId: options.farmId });
-        if (pong) {
-          const nodeOptions: FarmerBotFindNodeModel = {
-            farmId: options.farmId,
-            required_cru: options.cru,
-            required_mru: Math.ceil(this.nodes._g2b(options.mru)) || 0,
-            required_sru: Math.ceil(this.nodes._g2b(options.sru)) || 0,
-            required_hru: Math.ceil(this.nodes._g2b(options.hru)) || 0,
-            certified: options.certified,
-            dedicated: options.dedicated,
-            public_ips: options.publicIPs ? 1 : 0,
-            public_config: options.accessNodeV4 || options.accessNodeV6 || options.gateway,
-            node_exclude: options.nodeExclude,
-          };
-          const nodeId = await farmerbot.findNode(nodeOptions);
-          return [await this.nodes.getNode(nodeId)];
+    if (options) {
+      if (options.farmName) {
+        options.farmId = await this.nodes.getFarmIdFromFarmName(options.farmName);
+      }
+      if (options.farmId) {
+        const farmerbot = new FarmerBot(this.config);
+        try {
+          const pong = await farmerbot.pingFarm({ farmId: options.farmId });
+          if (pong && options.mru && options.sru && options.hru && options.hasGPU) {
+            const nodeOptions: FarmerBotFindNodeModel = {
+              farmId: options.farmId,
+              required_cru: options.cru,
+              required_mru: Math.ceil(this.nodes._g2b(options.mru)) || 0,
+              required_sru: Math.ceil(this.nodes._g2b(options.sru)) || 0,
+              required_hru: Math.ceil(this.nodes._g2b(options.hru)) || 0,
+              certified: options.certified,
+              dedicated: options.dedicated,
+              public_ips: options.publicIPs ? 1 : 0,
+              public_config: options.accessNodeV4 || options.accessNodeV6 || options.gateway,
+              node_exclude: options.nodeExclude,
+              has_gpus: options.hasGPU ? 0 : 1,
+            };
+            const nodeId = await farmerbot.findNode(nodeOptions);
+            return [await this.nodes.getNode(nodeId)];
+          }
+        } catch {
+          console.log(`farmer bot is not responding for farm ${options.farmId}`);
         }
-      } catch {
-        console.log(`farmer bot is not responding for farm ${options.farmId}`);
       }
     }
     return await this.nodes.filterNodes(options);
