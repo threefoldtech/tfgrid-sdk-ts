@@ -5,7 +5,7 @@
       class="mb-2"
       type="warning"
       variant="tonal"
-      v-if="!loadingNodes && selectedNode === undefined && emptyResult"
+      v-if="!loadingNodes && selectedNode === undefined && emptyResult && props.filters.rentedBy"
     >
       There are no nodes rented by you that match your selected resources, try to change your resources or rent a node
       and try again.
@@ -20,8 +20,8 @@
           return-object
           v-model="selectedNode"
           @update:model-value="selectedNode = $event"
-          :disabled="loadingNodes"
-          :loading="loadingNodes"
+          :disabled="getLoading"
+          :loading="getLoading"
           v-bind="{
             ...props,
             loading: props.loading || loadingNodes,
@@ -117,6 +117,7 @@ const selectedCards = ref<Array<string>>([]);
 const nodeCards = ref<Array<NodeGPUCardType>>([]);
 const cards: NodeGPUCardType[] = [];
 const emptyResult = ref(false);
+const getLoading = ref(farmManager?.getLoading());
 
 watch(selectedCards, async () => {
   for (const card of nodeCards.value) {
@@ -180,7 +181,7 @@ watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
       availableNodes.value = [];
       return;
     }
-    loadNodes(farmId);
+    loadNodes(farmId!);
   });
 });
 
@@ -190,15 +191,22 @@ function getChipColor(item: any) {
 
 onMounted(() => {
   farmManager?.subscribe(farmId => {
-    loadNodes(farmId);
+    if (!farmId) {
+      selectedNode.value = undefined;
+      availableNodes.value = [];
+      return;
+    }
+    loadNodes(farmId!);
   });
 });
 
-async function loadNodes(farmId: number | undefined) {
+async function loadNodes(farmId: number) {
+  farmManager?.setLoading(true);
   availableNodes.value = [];
   nodesArr.value = [];
   selectedNode.value = undefined;
   loadingNodes.value = true;
+  emptyResult.value = false;
   errorMessage.value = "";
   const filters = props.filters;
 
@@ -243,6 +251,7 @@ async function loadNodes(farmId: number | undefined) {
       errorMessage.value = normalizeError(e, "Something went wrong while deploying.");
     } finally {
       loadingNodes.value = false;
+      farmManager?.setLoading(false);
     }
   }
 }

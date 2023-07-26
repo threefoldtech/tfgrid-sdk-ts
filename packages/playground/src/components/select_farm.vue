@@ -6,11 +6,11 @@
     <input-validator :rules="[validators.required('Farm is required.')]" :value="farm?.farmID" ref="farmInput">
       <input-tooltip tooltip="The name of the farm that you want to deploy inside it.">
         <v-autocomplete
-          :disabled="loading"
+          :disabled="getLoading"
           label="Farm Name"
           v-bind="props"
           :items="farms"
-          :loading="loading"
+          :loading="getLoading"
           item-title="name"
           return-object
           :model-value="shouldBeUpdated ? undefined : farm"
@@ -64,6 +64,8 @@ watch([farm, country], ([f, c]) => {
   emits("update:modelValue", f ? { farmID: f.farmID, name: f.name, country: c ?? undefined } : undefined);
 });
 const loading = ref(false);
+const getLoading = ref(farmManager?.getLoading());
+
 watch([farm, loading], ([farm, loading]) => {
   if (loading) FarmGatewayManager?.setLoading(true);
 

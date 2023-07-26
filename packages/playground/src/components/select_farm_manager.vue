@@ -6,6 +6,7 @@ import { provide, type Ref, ref, watch } from "vue";
 
 const subscribtion: any[] = [];
 const farm = ref() as Ref<number | undefined>;
+const Loading = ref(false);
 provide("farm:manager", {
   setFarmId(_farm) {
     farm.value = _farm;
@@ -15,6 +16,12 @@ provide("farm:manager", {
     return () => {
       subscribtion.splice(subscribtion.indexOf(fn), 1);
     };
+  },
+  setLoading(loading: boolean) {
+    Loading.value = loading;
+  },
+  getLoading() {
+    return Loading.value;
   },
 } as IFarm);
 
@@ -27,6 +34,8 @@ import { inject } from "vue";
 export interface IFarm {
   setFarmId(farmId?: number): void;
   subscribe(fn: (farm?: number) => void): () => void;
+  setLoading(loading: boolean): void;
+  getLoading(): boolean;
 }
 
 export function useFarm(): IFarm | null {
