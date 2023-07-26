@@ -7,6 +7,8 @@
       workers.reduce((disk, worker) => disk + worker.diskSize + worker.rootFsSize, master.diskSize + master.rootFsSize)
     "
     :ipv4="master.ipv4"
+    :certified="master.certified"
+    :dedicated="master.dedicated"
     title-image="images/icons/kubernetes.png"
   >
     <template #title>Deploy a Kubernetes cluster</template>

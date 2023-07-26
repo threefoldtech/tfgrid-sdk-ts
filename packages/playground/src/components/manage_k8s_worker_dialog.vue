@@ -45,7 +45,6 @@
 import { ref } from "vue";
 
 import { useProfileManager } from "../stores";
-import { ProjectName } from "../types";
 import { deleteWorker, deployWorker, loadK8S } from "../utils/deploy_k8s";
 import { getGrid } from "../utils/grid";
 

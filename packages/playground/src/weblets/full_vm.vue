@@ -5,6 +5,8 @@
     :memory="solution?.memory"
     :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk + 2)"
     :ipv4="ipv4"
+    :certified="certified"
+    :dedicated="dedicated"
     title-image="images/icons/vm.png"
   >
     <template #title> Deploy a Full Virtual Machine </template>
@@ -64,36 +66,48 @@
           When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
           "
         >
-          <v-switch color="primary" inset label="GPU" v-model="hasGPU" />
+          <v-switch color="primary" inset label="GPU" v-model="hasGPU" hide-details />
         </input-tooltip>
-        <SelectFarm
-          v-if="!hasGPU"
-          :filters="{
-            cpu: solution?.cpu,
-            memory: solution?.memory,
-            publicIp: ipv4,
-            ssd: disks.reduce((total, disk) => total + disk.size, solution?.disk + 2),
-          }"
-          v-model="farm"
-        />
-        <SelectGPUNode
-          v-else
-          v-model="selectedNodewithCards"
-          :filters="{
-            cpu: solution?.cpu,
-            memory: solution?.memory,
-            ipv4: ipv4,
-            ssd: disks.reduce((total, disk) => total + disk.size, solution?.disk + 2),
-            ipv6: ipv4,
-            name: name,
-            flist: flist,
-            disks: disks,
-            disk: solution?.disk,
-            hasGPU: hasGPU,
-            planetary: planetary,
-            wireguard: wireguard,
-          }"
-        />
+        <input-tooltip
+          inline
+          tooltip="Click to know more about dedicated nodes."
+          href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+        >
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+        </input-tooltip>
+
+        <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+        </input-tooltip>
+
+        <SelectFarmManager>
+          <SelectFarm
+            :filters="{
+              cpu: solution?.cpu,
+              memory: solution?.memory,
+              publicIp: ipv4,
+              ssd: disks.reduce((total, disk) => total + disk.size, solution?.disk + 2),
+              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+              certified: certified,
+              hasGPU: hasGPU,
+            }"
+            v-model="farm"
+          />
+          <SelectNode
+            v-model="selectedNode"
+            :filters="{
+              farmId: farm?.farmID,
+              cpu: solution?.cpu,
+              memory: solution?.memory,
+              ipv4: ipv4,
+              ipv6: ipv4,
+              disks: [{ size: solution?.value.disk, mountPoint: '/' }, ...disks],
+              hasGPU: hasGPU,
+              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+              certified: certified,
+            }"
+          />
+        </SelectFarmManager>
       </template>
 
       <template #disks>
@@ -147,6 +161,7 @@
 import { type Ref, ref, watch } from "vue";
 
 import Network from "../components/networks.vue";
+import SelectFarmManager from "../components/select_farm_manager.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import type { solutionFlavor as SolutionFlavor } from "../types";
@@ -190,11 +205,13 @@ const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
 const wireguard = ref(false);
+const dedicated = ref(false);
+const certified = ref(false);
 const farm = ref() as Ref<Farm>;
 const disks = ref<Disk[]>([]);
 const network = ref();
-const hasGPU = ref(false);
-const selectedNodewithCards = ref() as Ref<GPUNodeType>;
+const hasGPU = ref();
+const selectedNode = ref() as Ref<INode>;
 
 function addDisk() {
   const name = generateName(7);
@@ -204,6 +221,26 @@ function addDisk() {
     mountPoint: "/mnt/" + name,
   });
 }
+
+watch(
+  dedicated,
+  dedicated => {
+    if (dedicated === false) {
+      hasGPU.value = dedicated;
+    }
+  },
+  { immediate: true },
+);
+
+watch(
+  hasGPU,
+  hasGPU => {
+    if (hasGPU) {
+      dedicated.value = true;
+    }
+  },
+  { immediate: true },
+);
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -235,8 +272,10 @@ async function deploy() {
           envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
           rootFilesystemSize: 2,
           hasGPU: hasGPU.value,
-          nodeId: hasGPU.value ? selectedNodewithCards.value.nodeId : undefined,
-          gpus: hasGPU.value ? selectedNodewithCards.value.cards.map(card => card.id) : undefined,
+          nodeId: selectedNode.value.nodeId,
+          gpus: hasGPU.value ? selectedNode.value.cards?.map(card => card.id) : undefined,
+          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          certified: certified.value,
         },
       ],
       network: { addAccess: wireguard.value },
@@ -252,14 +291,14 @@ async function deploy() {
 </script>
 
 <script lang="ts">
-import type { GPUNodeType } from "@/utils/filter_node_with_gpu";
-
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectGPUNode from "../components/select_gpu_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
+import SelectNode from "../components/select_node.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { INode } from "../utils/filter_nodes";
 
 export default {
   name: "FullVm",
@@ -268,7 +307,7 @@ export default {
     SelectSolutionFlavor,
     SelectFarm,
     ExpandableLayout,
-    SelectGPUNode,
+    SelectNode,
   },
 };
 </script>

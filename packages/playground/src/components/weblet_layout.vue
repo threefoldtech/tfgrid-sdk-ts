@@ -38,6 +38,14 @@
       </template>
     </v-card-text>
 
+    <template v-if="dedicated && !status">
+      <v-alert class="mb-4 mx-4" type="info" variant="tonal">
+        You need to rent a dedicated node from our
+        <a :href="dashboardURL" target="_blank" class="app-link"> Dashboard </a>
+        before deploying on it.
+      </v-alert>
+    </template>
+
     <template v-if="$slots['footer-actions'] && (profileManager.profile || disableAlerts)">
       <v-alert
         v-show="!status"
@@ -47,12 +55,35 @@
         variant="tonal"
         v-if="showPrice"
       >
-        Your deployment costs
-        <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(tft) }}</span> TFTs or
-        <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span> USD/month
-        based on the cloud resources (CPU: {{ cpu }} Cores, RAM: {{ memory }} MB, SSD: {{ disk }} GB{{
-          ipv4 ? " , Public IP: Enabled" : ""
-        }}) selected
+        <div v-if="ipv4 && dedicated">
+          <span>
+            There are no fees will be added since the selected node is rented by you and the cost already included in
+            the rent contract. <br />Please be aware that an additional fee of
+            <span class="font-weight-black">
+              {{ costLoading ? "Calculating..." : normalizeBalance(onlyIPV4TftPrice) }}
+            </span>
+            TFTs or approximately
+            <span class="font-weight-black">
+              {{ costLoading ? "Calculating..." : normalizeBalance(onlyIPV4UsdPrice) }}
+            </span>
+            USD per month.
+          </span>
+        </div>
+        <div v-else-if="!ipv4 && dedicated">
+          <span>
+            There are no fees will be added since the selected node is rented by you and the cost already included in
+            the rent contract.
+          </span>
+        </div>
+        <div v-else>
+          Based on the cloud resources you have selected (CPU: {{ cpu }} Cores, RAM: {{ memory }} MB, SSD:
+          {{ disk }} GB{{ ipv4 ? ", Public IP: Enabled" : "" }}) your deployment costs
+          <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(tft) }}</span> TFTs or
+          approximately
+          <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span> USD per
+          month.
+        </div>
+
         <a href="https://manual.grid.tf/cloud/cloudunits_pricing.html" target="_blank" class="app-link">
           Learn more about the pricing and how to unlock discounts.
         </a>
@@ -82,7 +113,7 @@ import { computed, ref, watch } from "vue";
 
 import { useProfileManager } from "../stores";
 import { getGrid, loadBalance } from "../utils/grid";
-import { normalizeBalance } from "../utils/helpers";
+import { getDashboardURL, normalizeBalance } from "../utils/helpers";
 
 const props = defineProps({
   disableAlerts: {
@@ -116,6 +147,11 @@ const props = defineProps({
     required: false,
     default: () => false,
   },
+  dedicated: {
+    type: Boolean,
+    required: false,
+    default: () => false,
+  },
 });
 const emits = defineEmits<{ (event: "mount"): void; (event: "back"): void }>();
 const baseUrl = import.meta.env.BASE_URL;
@@ -128,6 +164,9 @@ function onLogMessage(msg: string) {
     message.value = msg;
   }
 }
+
+const network = process.env.NETWORK || window.env.NETWORK;
+const dashboardURL = getDashboardURL(network);
 
 watch(status, s => {
   if (s === "deploy") events.addListener("logs", onLogMessage);
@@ -209,15 +248,20 @@ const usd = ref<number>();
 const tft = ref<number>();
 const costLoading = ref(false);
 const shouldUpdateCost = ref(false);
+const onlyIPV4TftPrice = ref<number>();
+const onlyIPV4UsdPrice = ref<number>();
+
 watch(
-  () => [props.cpu, props.memory, props.disk, props.ipv4],
+  () => [props.cpu, props.memory, props.disk, props.ipv4, props.certified, props.dedicated],
   debounce((value, oldValue) => {
     if (
       oldValue &&
       value[0] === oldValue[0] &&
       value[1] === oldValue[1] &&
       value[2] === oldValue[2] &&
-      value[3] === oldValue[3]
+      value[3] === oldValue[3] &&
+      value[4] === oldValue[4] &&
+      value[5] === oldValue[5]
     )
       return;
     shouldUpdateCost.value = true;
@@ -234,10 +278,23 @@ watch(
   },
 );
 
+async function getIPv1Price(grid: GridClient) {
+  const { sharedPrice } = await grid!.calculator.calculateWithMyBalance({
+    sru: 0,
+    mru: 0,
+    cru: 0,
+    ipv4u: props.ipv4,
+    hru: 0,
+    certified: false,
+  });
+  onlyIPV4UsdPrice.value = sharedPrice;
+  onlyIPV4TftPrice.value = parseFloat((onlyIPV4UsdPrice.value / (await grid!.calculator.tftPrice())).toFixed(2));
+}
+
 async function loadCost(profile: { mnemonic: string }) {
   costLoading.value = true;
   const grid = await getGrid(profile);
-  const { sharedPrice } = await grid!.calculator.calculateWithMyBalance({
+  const { sharedPrice, dedicatedPrice } = await grid!.calculator.calculateWithMyBalance({
     cru: typeof props.cpu === "number" ? props.cpu : 0,
     sru: typeof props.disk === "number" ? props.disk : 0,
     mru: typeof props.disk === "number" ? (props.memory ?? 0) / 1024 : 0,
@@ -245,7 +302,8 @@ async function loadCost(profile: { mnemonic: string }) {
     ipv4u: props.ipv4,
     certified: props.certified,
   });
-  usd.value = sharedPrice;
+  await getIPv1Price(grid!);
+  usd.value = props.dedicated ? dedicatedPrice : sharedPrice;
   tft.value = parseFloat((usd.value / (await grid!.calculator.tftPrice())).toFixed(2));
   costLoading.value = false;
 }
