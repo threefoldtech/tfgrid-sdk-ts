@@ -250,7 +250,7 @@ async function deploy() {
           planetary: planetary.value,
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
-          rootFilesystemSize: rootFsSize.value + solution.value.disk,
+          rootFilesystemSize: solution.value.disk,
         },
       ],
     });
