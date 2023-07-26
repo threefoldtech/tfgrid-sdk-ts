@@ -1,6 +1,6 @@
 {
   "name": "@threefold/dashboard",
-  "version": "2.1.0-rc2",
+  "version": "2.1.0-rc3",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -19,7 +19,8 @@
     "@polkadot/extension-dapp": "0.45.1",
     "@polkadot/ui-keyring": "^2.2.1",
     "@popperjs/core": "^2.11.5",
-    "@threefold/tfchain_client": "^2.1.0-rc2",
+    "@threefold/grid_client": "^2.1.0-rc3",
+    "@threefold/tfchain_client": "^2.1.0-rc3",
     "@types/ip": "^1.1.0",
     "@types/md5": "^2.3.2",
     "apollo-cache-inmemory": "^1.6.6",
@@ -33,6 +34,7 @@
     "core-js": "^3.29.0",
     "country-code-lookup": "^0.0.20",
     "crypto-browserify": "^3.12.0",
+    "cryptr": "^6.2.0",
     "cypress": "^12.7.0",
     "debounce": "^1.2.1",
     "ethers": "^5.6.8",
@@ -61,8 +63,6 @@
     "vue-toasted": "^1.1.28",
     "vuetify": "^2.6.0",
     "vuex": "^3.6.2",
-    "@threefold/grid_client": "^2.1.0-rc1",
-    "cryptr": "^6.2.0",
     "web-ssh-keygen": "^0.1.2"
   },
   "devDependencies": {
@@ -79,6 +79,7 @@
     "@vue/cli-plugin-vuex": "~5.0.0",
     "@vue/cli-service": "^5.0.8",
     "@vue/test-utils": "^1.1.3",
+    "browserify-fs": "^1.0.0",
     "husky": "^8.0.2",
     "jest": "^29.5.0",
     "lint-staged": "^13.0.3",
@@ -90,7 +91,6 @@
     "typescript": "~4.5.5",
     "vue-cli-plugin-vuetify": "~2.4.8",
     "vue-template-compiler": "^2.6.14",
-    "vuetify-loader": "1.7.3",
-    "browserify-fs": "^1.0.0"
+    "vuetify-loader": "1.7.3"
   }
 }
