@@ -4,7 +4,7 @@
     @mount="layoutMount"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
-    :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk + rootFsSize)"
+    :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk)"
     :ipv4="ipv4"
     title-image="images/icons/vm.png"
   >
@@ -37,9 +37,6 @@
         </input-validator>
 
         <SelectVmImage :images="images" v-model="flist" />
-
-        <RootFsSize :cpu="solution?.cpu" :memory="solution?.memory" v-model.number="rootFsSize" />
-
         <SelectSolutionFlavor
           :minimum="{ cpu: 1, memory: 1024 * 1, disk: 25 }"
           :standard="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
@@ -60,7 +57,7 @@
             cpu: solution?.cpu,
             memory: solution?.memory,
             publicIp: ipv4,
-            ssd: disks.reduce((total, disk) => total + disk.size, solution?.disk + rootFsSize),
+            ssd: disks.reduce((total, disk) => total + disk.size, solution?.disk),
           }"
           v-model="farm"
         />
@@ -190,7 +187,6 @@ const images = [
 
 const name = ref(generateName(8, { prefix: "vm" }));
 const flist = ref<Flist>();
-const rootFsSize = ref(2) as Ref<number>;
 const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
@@ -266,7 +262,6 @@ async function deploy() {
 
 <script lang="ts">
 import ExpandableLayout from "../components/expandable_layout.vue";
-import RootFsSize from "../components/root_fs_size.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectVmImage from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -279,7 +274,6 @@ export default {
   name: "MicroVm",
   components: {
     SelectVmImage,
-    RootFsSize,
     SelectSolutionFlavor,
     SelectFarm,
     ExpandableLayout,
