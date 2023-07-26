@@ -11,6 +11,8 @@
       )
     "
     :ipv4="true"
+    :certified="leader.certified"
+    :dedicated="leader.dedicated"
     title-image="images/icons/caprover.png"
   >
     <d-tabs
@@ -173,6 +175,9 @@ function normalizeCaproverWorker(worker: CW, envs: Env[]): Machine {
       },
     ],
     envs,
+    nodeId: worker.selectedNode?.nodeId,
+    rentedBy: worker.dedicated ? profileManager.profile?.twinId : undefined,
+    certified: worker.certified,
   };
 }
 </script>

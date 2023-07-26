@@ -1,6 +1,6 @@
 <template>
   <section>
-    <h6 class="text-h5 mb-4">Choose a Location</h6>
+    <h6 class="text-h5 mb-4 mt-2">Choose a Location</h6>
     <SelectCountry v-model="country" />
 
     <input-validator :rules="[validators.required('Farm is required.')]" :value="farm?.farmID" ref="farmInput">
@@ -32,6 +32,7 @@ import type { Farm } from "../types";
 import { getFarms } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
 import { useFarmGatewayManager } from "./farm_gateway_manager.vue";
+import { useFarm } from "./select_farm_manager.vue";
 
 export interface Filters {
   publicIp?: boolean;
@@ -39,6 +40,9 @@ export interface Filters {
   memory?: number;
   ssd?: number;
   disk?: number;
+  certified?: boolean;
+  hasGPU?: boolean;
+  rentedBy?: number;
 }
 const FarmGatewayManager = useFarmGatewayManager();
 const props = defineProps({
@@ -54,7 +58,9 @@ const profileManager = useProfileManager();
 const country = ref<string>();
 
 const farm = ref<Farm>();
+const farmManager = useFarm();
 watch([farm, country], ([f, c]) => {
+  farmManager?.setFarmId(f?.farmID);
   emits("update:modelValue", f ? { farmID: f.farmID, name: f.name, country: c ?? undefined } : undefined);
 });
 const loading = ref(false);
@@ -88,6 +94,9 @@ async function loadFarms() {
       sru: filters.ssd,
       publicIPs: filters.publicIp,
       availableFor: grid!.twinId,
+      certified: filters.certified,
+      rentedBy: filters.rentedBy ? filters.rentedBy : undefined,
+      hasGPU: filters.hasGPU ? filters.hasGPU : undefined,
     },
     { exclusiveFor: props.exclusiveFor },
   );
@@ -124,7 +133,10 @@ watch(
       value.ssd === oldValue.ssd &&
       value.disk === oldValue.disk &&
       value.publicIp === oldValue.publicIp &&
-      value.country === oldValue.country
+      value.country === oldValue.country &&
+      value.certified === oldValue.certified &&
+      value.rentedBy === oldValue.rentedBy &&
+      value.hasGPU === oldValue.hasGPU
     )
       return;
 

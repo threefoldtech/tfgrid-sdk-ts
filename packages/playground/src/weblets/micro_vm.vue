@@ -6,6 +6,8 @@
     :memory="memory"
     :disk="disks.reduce((total, disk) => total + disk.size, rootFsSize)"
     :ipv4="ipv4"
+    :certified="certified"
+    :dedicated="dedicated"
     title-image="images/icons/vm.png"
   >
     <template #title>Deploy a Micro Virtual Machine </template>
@@ -78,15 +80,44 @@
           v-model:wireguard="wireguard"
           ref="network"
         />
-        <SelectFarm
-          :filters="{
-            cpu,
-            memory,
-            publicIp: ipv4,
-            ssd: disks.reduce((total, disk) => total + disk.size, rootFsSize),
-          }"
-          v-model="farm"
-        />
+        <input-tooltip
+          inline
+          tooltip="Click to know more about dedicated nodes."
+          href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+        >
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+        </input-tooltip>
+
+        <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+        </input-tooltip>
+
+        <SelectFarmManager>
+          <SelectFarm
+            :filters="{
+              cpu,
+              memory,
+              publicIp: ipv4,
+              ssd: disks.reduce((total, disk) => total + disk.size, rootFsSize),
+              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+              certified: certified,
+            }"
+            v-model="farm"
+          />
+          <SelectNode
+            v-model="selectedNode"
+            :filters="{
+              farmId: farm?.farmID,
+              cpu,
+              memory,
+              ipv4: ipv4,
+              ipv6: ipv4,
+              disks: disks,
+              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+              certified: certified,
+            }"
+          />
+        </SelectFarmManager>
       </template>
 
       <template #env>
@@ -223,6 +254,9 @@ const farm = ref() as Ref<Farm>;
 const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
 const network = ref();
+const dedicated = ref(false);
+const certified = ref(false);
+const selectedNode = ref() as Ref<INode>;
 
 function layoutMount() {
   if (envs.value.length > 0) {
@@ -275,6 +309,9 @@ async function deploy() {
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           rootFilesystemSize: rootFsSize.value,
+          nodeId: selectedNode.value.nodeId,
+          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          certified: certified.value,
         },
       ],
     });
@@ -292,8 +329,11 @@ async function deploy() {
 import ExpandableLayout from "../components/expandable_layout.vue";
 import RootFsSize from "../components/root_fs_size.vue";
 import SelectFarm from "../components/select_farm.vue";
+import SelectFarmManager from "../components/select_farm_manager.vue";
+import SelectNode from "../components/select_node.vue";
 import SelectVmImage from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { INode } from "../utils/filter_nodes";
 import { normalizeError } from "../utils/helpers";
 
 export default {
@@ -302,7 +342,9 @@ export default {
     SelectVmImage,
     RootFsSize,
     SelectFarm,
+    SelectNode,
     ExpandableLayout,
+    SelectFarmManager,
   },
 };
 </script>

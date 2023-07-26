@@ -13,7 +13,13 @@
             @focus="propsRef?.onFocus"
             @blur="propsRef?.onBlur"
           >
-            <v-icon>mdi-information</v-icon>
+            <a v-if="href" :href="href" target="_blank">
+              <v-icon>mdi-information</v-icon>
+            </a>
+
+            <template v-else>
+              <v-icon>mdi-information</v-icon>
+            </template>
           </span>
         </div>
       </template>
@@ -35,6 +41,10 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    href: {
+      type: String,
+      required: false,
+    },
   },
   setup() {
     const appendIcon = "mdi-information";
@@ -53,3 +63,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+a {
+  text-decoration: none;
+  color: inherit !important;
+}
+</style>
