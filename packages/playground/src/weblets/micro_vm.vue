@@ -245,7 +245,7 @@ async function deploy() {
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
-          disks: [{ size: solution.value.disk, mountPoint: "/" }, ...disks.value],
+          disks: disks.value,
           envs: envs.value,
           planetary: planetary.value,
           publicIpv4: ipv4.value,
