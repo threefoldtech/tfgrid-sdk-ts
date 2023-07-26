@@ -150,6 +150,7 @@ watch(
     if (node) {
       validator.value?.setStatus(ValidatorStatus.Pending);
       pingingNode.value = true;
+      farmManager?.setLoading(true);
       try {
         await grid!.zos.pingNode({ nodeId: node.nodeId });
         emits("update:modelValue", {
@@ -163,6 +164,7 @@ watch(
         validator.value?.setStatus(ValidatorStatus.Invalid);
       } finally {
         pingingNode.value = false;
+        farmManager?.setLoading(false);
       }
     }
 
@@ -221,7 +223,6 @@ onMounted(() => {
 
 async function loadNodes(farmId: number) {
   availableNodes.value = [];
-  nodesArr.value = [];
   selectedNode.value = undefined;
   loadingNodes.value = true;
   errorMessage.value = "";
@@ -251,6 +252,7 @@ async function loadNodes(farmId: number) {
       }
 
       if (res) {
+        nodesArr.value = [];
         for (const node of res) {
           if (!nodesArr.value.some(n => n.nodeId === node.nodeId)) {
             nodesArr.value.push({
