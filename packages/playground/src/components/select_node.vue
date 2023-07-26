@@ -150,7 +150,6 @@ watch(
     if (node) {
       validator.value?.setStatus(ValidatorStatus.Pending);
       pingingNode.value = true;
-      farmManager?.setLoading(true);
       try {
         await grid!.zos.pingNode({ nodeId: node.nodeId });
         emits("update:modelValue", {
@@ -271,7 +270,6 @@ async function loadNodes(farmId: number) {
       errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
     } finally {
       loadingNodes.value = false;
-      farmManager?.setLoading(false);
     }
   }
 }
