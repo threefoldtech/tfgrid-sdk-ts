@@ -82,8 +82,8 @@
             v-model="selectedNode"
             :filters="{
               farmId: farm?.farmID,
-              cpu,
-              memory,
+              cpu: solution?.cpu,
+              memory: solution?.memory,
               ipv4: ipv4,
               ipv6: ipv4,
               disks: disks,

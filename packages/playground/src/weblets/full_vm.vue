@@ -101,7 +101,7 @@
               memory: solution?.memory,
               ipv4: ipv4,
               ipv6: ipv4,
-              disks: [{ size: solution?.value.disk, mountPoint: '/' }, ...disks],
+              disks: [{ size: solution?.disk, mountPoint: '/' }, ...disks],
               hasGPU: hasGPU,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
@@ -293,9 +293,8 @@ async function deploy() {
 <script lang="ts">
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectFarm from "../components/select_farm.vue";
-import SelectGPUNode from "../components/select_gpu_node.vue";
-import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SelectNode from "../components/select_node.vue";
+import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { INode } from "../utils/filter_nodes";
