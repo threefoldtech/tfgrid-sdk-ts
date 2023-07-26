@@ -31,7 +31,7 @@
             ...props,
             loading: props.loading || loadingNodes,
             hint: pingingNode ? 'Check if node is alive ... ' : props.hint,
-            error: !!errorMessage || false,
+            error: !!errorMessage,
             errorMessages: !!errorMessage ? errorMessage : undefined,
           }"
         >
