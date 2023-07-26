@@ -89,7 +89,7 @@ const profileManager = useProfileManager();
 const threebotName = ref<string>("");
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
-const ipv4 = ref(false);
+const ipv4 = ref(true);
 const domainNameCmp = ref();
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
@@ -130,7 +130,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
               mountPoint: "/disk",
             },
           ],
-          flist: "https://hub.grid.tf/lennertapp2.3bot/threefoldjimber-freeflow-latest.flist",
+          flist: "https://hub.grid.tf/omda.3bot/mahmoudemmad-freeflow-zinit-latest.flist",
           entryPoint: "/sbin/zinit init",
           farmId: farm.value.farmID,
           farmName: farm.value.name,
@@ -140,7 +140,8 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "USER_ID", value: threebotName.value },
             { key: "DIGITALTWIN_APPID", value: domain },
-            { key: "NODE_ENV", value: "staging" },
+            { key: "NODE_ENV", value: "production" },
+            { key: "ENVIRONMENT", value: "production" },
           ],
         },
       ],
