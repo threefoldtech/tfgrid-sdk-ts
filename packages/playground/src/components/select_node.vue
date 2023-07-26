@@ -10,7 +10,12 @@
       There are no nodes rented by you that match your selected resources, try to change your resources or rent a node
       and try again.
     </v-alert>
-    <input-validator :rules="[validators.required('Node id is required.')]" :value="selectedNode" #="{ props }">
+    <input-validator
+      ref="validator"
+      :rules="[validators.required('Node id is required.')]"
+      :value="selectedNode"
+      #="{ props }"
+    >
       <input-tooltip tooltip="Select a node ID to deploy on.">
         <v-autocomplete
           select
@@ -25,8 +30,9 @@
           v-bind="{
             ...props,
             loading: props.loading || loadingNodes,
-            error: false,
-            errorMessages: undefined,
+            hint: pingingNode ? 'Check if node is alive ... ' : props.hint,
+            error: !!errorMessage,
+            errorMessages: !!errorMessage ? errorMessage : undefined,
           }"
         >
           <template v-slot:item="{ item, props }">
@@ -74,6 +80,8 @@
 <script lang="ts" setup>
 import { onMounted, type PropType, type Ref, ref, watch } from "vue";
 
+import { ValidatorStatus } from "@/hooks/form_validator";
+
 import { useProfileManager } from "../stores/profile_manager";
 import { getFilteredNodes, getNodeCards, type INode, type NodeGPUCardType } from "../utils/filter_nodes";
 import { getGrid } from "../utils/grid";
@@ -117,7 +125,8 @@ const selectedCards = ref<Array<string>>([]);
 const nodeCards = ref<Array<NodeGPUCardType>>([]);
 const cards: NodeGPUCardType[] = [];
 const emptyResult = ref(false);
-
+const validator = ref();
+const pingingNode = ref(false);
 watch(selectedCards, async () => {
   for (const card of nodeCards.value) {
     for (const selectedCard of selectedCards.value) {
@@ -134,11 +143,27 @@ watch(selectedCards, async () => {
 watch(
   () => selectedNode.value,
   async node => {
+    errorMessage.value = ``;
+
+    const grid = await getGrid(profileManager.profile!);
+
     if (node) {
-      emits("update:modelValue", {
-        nodeId: node.nodeId,
-        cards: cards,
-      });
+      validator.value?.setStatus(ValidatorStatus.Pending);
+      pingingNode.value = true;
+      try {
+        await grid!.zos.pingNode({ nodeId: node.nodeId });
+        emits("update:modelValue", {
+          nodeId: node.nodeId,
+          cards: cards,
+        });
+        validator.value?.validate();
+      } catch (e) {
+        errorMessage.value = `Node ${node.nodeId} is not responding please select another node`;
+        availableNodes.value = availableNodes.value.filter(({ nodeId }) => nodeId !== node.nodeId);
+        validator.value?.setStatus(ValidatorStatus.Invalid);
+      } finally {
+        pingingNode.value = false;
+      }
     }
 
     if (node && props.filters.hasGPU) {
