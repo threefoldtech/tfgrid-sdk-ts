@@ -1,7 +1,7 @@
 <template>
   <input-tooltip tooltip="Select a country to deploy your instance inside it.">
     <v-autocomplete
-      :disabled="loading"
+      :disabled="loading || loadingNodes"
       label="Country"
       :items="countries"
       clearable
@@ -16,14 +16,16 @@ import { NodeStatus } from "tf_gridproxy_client";
 import { onMounted, ref, watch } from "vue";
 
 import { gridProxyClient } from "../clients";
+import { useFarm } from "./select_farm_manager.vue";
 
 defineProps<{ modelValue?: string }>();
 const emits = defineEmits<{ (events: "update:modelValue", value?: string): void }>();
 
 const country = ref<string>();
 watch(country, c => emits("update:modelValue", c));
-
+const farmManager = useFarm();
 const loading = ref(false);
+const loadingNodes = ref(farmManager?.getLoading());
 const countries = ref<string[]>();
 async function getCountries() {
   try {
