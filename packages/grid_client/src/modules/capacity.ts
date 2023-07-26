@@ -44,13 +44,14 @@ class Capacity {
   @validateInput
   async filterNodes(options?: FilterOptions): Promise<NodeInfo[]> {
     if (options) {
-      if (options.farmName) {
+      if (options?.farmName) {
         options.farmId = await this.nodes.getFarmIdFromFarmName(options.farmName);
       }
-      if (options.farmId) {
+
+      if (options?.farmId && !options.rentedBy) {
         const farmerbot = new FarmerBot(this.config);
         try {
-          const pong = await farmerbot.pingFarm({ farmId: options.farmId });
+          const pong = await farmerbot.pingFarm({ farmId: options?.farmId });
           if (pong && options.mru && options.sru && options.hru && options.hasGPU) {
             const nodeOptions: FarmerBotFindNodeModel = {
               farmId: options.farmId,

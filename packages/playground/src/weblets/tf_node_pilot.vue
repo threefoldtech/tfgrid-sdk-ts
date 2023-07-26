@@ -1,5 +1,14 @@
 <template>
-  <weblet-layout ref="layout" :cpu="cpu" :memory="memory" :disk="32" ipv4 title-image="images/icons/vm.png">
+  <weblet-layout
+    ref="layout"
+    :cpu="cpu"
+    :memory="memory"
+    :disk="32"
+    :certified="certified"
+    :dedicated="dedicated"
+    ipv4
+    title-image="images/icons/vm.png"
+  >
     <template #title>Deploy a Node Pilot</template>
     <form-validator v-model="valid">
       <input-validator
@@ -49,15 +58,46 @@
         </input-tooltip>
       </input-validator>
 
-      <SelectFarmId
-        :filters="{
-          cpu,
-          memory,
-          ssd: 32,
-          publicIp: true,
-        }"
-        v-model="farm"
-      />
+      <input-tooltip
+        inline
+        tooltip="Click to know more about dedicated nodes."
+        href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+      >
+        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+      </input-tooltip>
+      <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+        <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+      </input-tooltip>
+
+      <SelectFarmManager>
+        <SelectFarmId
+          :filters="{
+            cpu,
+            memory,
+            ssd: 32,
+            publicIp: true,
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+            certified: certified,
+          }"
+          v-model="farm"
+        />
+
+        <SelectNode
+          v-model="selectedNode"
+          :filters="{
+            farmId: farm?.farmID,
+            cpu,
+            memory,
+            ipv4: true,
+            disks: [
+              { size: 15, mountPoint: '/mnt/' + generateName(10) },
+              { size: 15, mountPoint: '/mnt/' + generateName(10) },
+            ],
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+            certified: certified,
+          }"
+        />
+      </SelectFarmManager>
     </form-validator>
 
     <template #footer-actions>
@@ -71,7 +111,7 @@ import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import { type Farm, ProjectName } from "../types";
+import { type Farm, type Flist, ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
@@ -84,6 +124,13 @@ const name = ref(generateName(8, { prefix: "np" }));
 const cpu = ref(8);
 const memory = ref(8192);
 const farm = ref() as Ref<Farm>;
+const flist: Flist = {
+  value: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
+  entryPoint: "/",
+};
+const dedicated = ref(false);
+const certified = ref(false);
+const selectedNode = ref() as Ref<INode>;
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -103,8 +150,8 @@ async function deploy() {
           name: name.value,
           cpu: cpu.value,
           memory: memory.value,
-          flist: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
-          entryPoint: "/",
+          flist: flist.value,
+          entryPoint: flist.entryPoint,
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
@@ -123,6 +170,9 @@ async function deploy() {
               mountPoint: "/mnt/" + generateName(10),
             },
           ],
+          nodeId: selectedNode.value.nodeId,
+          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          certified: certified.value,
         },
       ],
     });
@@ -138,13 +188,18 @@ async function deploy() {
 
 <script lang="ts">
 import SelectFarmId from "../components/select_farm.vue";
+import SelectFarmManager from "../components/select_farm_manager.vue";
+import SelectNode from "../components/select_node.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { INode } from "../utils/filter_nodes";
 import { normalizeError } from "../utils/helpers";
 
 export default {
   name: "NodePilot",
   components: {
     SelectFarmId,
+    SelectNode,
+    SelectFarmManager,
   },
 };
 </script>

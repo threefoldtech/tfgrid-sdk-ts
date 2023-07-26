@@ -4,15 +4,15 @@ import { getClient } from "./client_loader";
 
 async function main() {
   const grid3 = await getClient();
-  const farmId: pingFarmModel = {
+  const farm: pingFarmModel = {
     farmId: 53,
   };
 
-  const pingFarm = await grid3.farmerbot.pingFarm(farmId);
+  const pingFarm = await grid3.farmerbot.pingFarm(farm);
   console.log("pingFarm", pingFarm);
 
   const FarmerBotFindNode: FarmerBotFindNodeModel = {
-    farmId: farmId.farmId,
+    farmId: farm.farmId,
     required_cru: 4,
     required_mru: 5,
     required_sru: 5,
