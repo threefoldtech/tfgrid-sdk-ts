@@ -135,7 +135,10 @@ watch(
   () => selectedNode.value,
   async node => {
     if (node) {
-      emits("update:modelValue", { nodeId: node.nodeId, cards: cards });
+      emits("update:modelValue", {
+        nodeId: node.nodeId,
+        cards: cards,
+      });
     }
 
     if (node && props.filters.hasGPU) {
@@ -214,7 +217,8 @@ async function loadNodes(farmId: number | undefined) {
         availableFor: grid.twinId,
       });
 
-      if (res?.length === 0) {
+      if (res?.length === 0 || farmId === undefined) {
+        selectedNode.value = undefined;
         emptyResult.value = true;
         loadingNodes.value = false;
         return;
@@ -223,7 +227,10 @@ async function loadNodes(farmId: number | undefined) {
       if (res) {
         for (const node of res) {
           if (!nodesArr.value.some(n => n.nodeId === node.nodeId)) {
-            nodesArr.value.push({ nodeId: node.nodeId, state: node.rentedByTwinId ? "Dedicated" : "Shared" });
+            nodesArr.value.push({
+              nodeId: node.nodeId,
+              state: node.rentedByTwinId ? "Dedicated" : "Shared",
+            });
           }
         }
         availableNodes.value = nodesArr.value;
