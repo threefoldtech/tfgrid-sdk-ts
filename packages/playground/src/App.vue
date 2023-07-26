@@ -113,6 +113,7 @@
           </div>
         </v-container>
       </DeploymentListManager>
+      <TFNotification v-if="hasActiveProfile" />
     </v-main>
   </v-app>
 </template>
@@ -202,6 +203,7 @@ import AppTheme from "./components/app_theme.vue";
 import ConnectWalletLanding from "./components/connect_wallet_landing.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
 import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
+import TFNotification from "./components/tf_notification.vue";
 import ProfileManager from "./weblets/profile_manager.vue";
 
 interface AppRoute {
@@ -225,6 +227,7 @@ interface NavbarLink {
 export default {
   name: "App",
   components: {
+    TFNotification,
     DisclaimerToolbar,
     ProfileManager,
     DeploymentListManager,

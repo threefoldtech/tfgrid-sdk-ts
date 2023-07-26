@@ -40,7 +40,6 @@ async function main() {
     // These env. vars needed to be changed based on the leader node.
     PUBLIC_KEY: config.ssh_key,
     SWM_NODE_MODE: "worker",
-    SWMTKN: "SWMTKN-1-1eikxeyat4br9t4la1dnln11l1tvlnrngzwh5iq68m2vn7edi1-6lc6xtw3pzd99lrowyuayr5yv",
     LEADER_PUBLIC_IP: "185.206.122.157",
     CAPTAIN_IMAGE_VERSION: "latest",
   };

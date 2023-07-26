@@ -4,6 +4,7 @@
     :cpu="solution?.cpu"
     :memory="solution?.memory"
     :disk="solution?.disk"
+    :ipv4="ipv4"
     title-image="images/icons/peertube.png"
   >
     <template #title>Deploy a Peertube Instance</template>
@@ -55,20 +56,30 @@
       </password-input-wrapper>
 
       <SelectSolutionFlavor v-model="solution" />
-      <SelectGatewayNode v-model="gateway" />
-      <SelectFarm
-        :filters="{
-          cpu: solution?.cpu,
-          memory: solution?.memory,
-          ssd: solution?.disk,
-          publicIp: false,
-        }"
-        v-model="farm"
-      />
+      <!-- <Networks v-model:ipv4="ipv4" /> -->
+      <FarmGatewayManager>
+        <SelectFarm
+          :filters="{
+            cpu: solution?.cpu,
+            memory: solution?.memory,
+            ssd: solution?.disk,
+            publicIp: ipv4,
+          }"
+          v-model="farm"
+        />
+        <DomainName :hasIPv4="ipv4" ref="domainNameCmp" />
+      </FarmGatewayManager>
     </form-validator>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="!valid"> Deploy </v-btn>
+      <v-btn
+        color="primary"
+        variant="tonal"
+        @click="deploy(domainNameCmp?.domain, domainNameCmp?.customDomain)"
+        :disabled="!valid"
+      >
+        Deploy
+      </v-btn>
     </template>
   </weblet-layout>
 </template>
@@ -93,10 +104,16 @@ const name = ref(generateName(9, { prefix: "pt" }));
 const email = ref("");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
-const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;
+const ipv4 = ref(false);
+const domainNameCmp = ref();
 
-async function deploy() {
+function finalize(deployment: any) {
+  layout.value.reloadDeploymentsList();
+  layout.value.setStatus("success", "Successfully deployed a peertube instance.");
+  layout.value.openDialog(deployment, deploymentListEnvironments.peertube);
+}
+async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.Peertube.toLowerCase();
@@ -106,7 +123,7 @@ async function deploy() {
     projectName,
     twinId: profileManager.profile!.twinId,
   });
-  const domain = subdomain + "." + gateway.value.domain;
+  const domain = customDomain ? gatewayName.domain : subdomain + "." + gatewayName.domain;
 
   let grid: GridClient | null;
   let vm: any;
@@ -120,8 +137,8 @@ async function deploy() {
     vm = await deployVM(grid!, {
       name: name.value,
       network: {
-        addAccess: true,
-        accessNodeId: gateway.value.id,
+        addAccess: !!gatewayName.id,
+        accessNodeId: gatewayName.id,
       },
       machines: [
         {
@@ -138,6 +155,7 @@ async function deploy() {
           entryPoint: "/sbin/zinit init",
           farmId: farm.value.farmID,
           farmName: farm.value.name,
+          publicIpv4: ipv4.value,
           country: farm.value.country,
           planetary: true,
           envs: [
@@ -152,25 +170,24 @@ async function deploy() {
   } catch (e) {
     return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a peertube instance."));
   }
-
+  if (customDomain && ipv4.value) {
+    vm[0].customDomain = gatewayName.domain;
+    finalize(vm);
+    return;
+  }
   try {
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
 
     await deployGatewayName(grid!, {
       name: subdomain,
-      nodeId: gateway.value.id,
-      backends: [
-        {
-          ip: vm[0].interfaces[0].ip,
-          port: 9000,
-        },
-      ],
+      nodeId: gatewayName.id!,
+      ip: vm[0].interfaces[0].ip,
+      port: 9000,
       networkName: vm[0].interfaces[0].network,
+      fqdn: gatewayName?.useFQDN ? gatewayName.domain : undefined,
     });
 
-    layout.value.reloadDeploymentsList();
-    layout.value.setStatus("success", "Successfully deployed a peertube instance.");
-    layout.value.openDialog(vm, deploymentListEnvironments.peertube);
+    finalize(vm);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
@@ -181,8 +198,10 @@ async function deploy() {
 </script>
 
 <script lang="ts">
+import DomainName from "../components/domain_name.vue";
+import FarmGatewayManager from "../components/farm_gateway_manager.vue";
+// import Networks from "../components/networks.vue";
 import SelectFarm from "../components/select_farm.vue";
-import SelectGatewayNode from "../components/select_gateway_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
 import { getGrid } from "../utils/grid";
@@ -192,8 +211,10 @@ export default {
   name: "TfPeertube",
   components: {
     SelectSolutionFlavor,
-    SelectGatewayNode,
     SelectFarm,
+    // Networks,
+    DomainName,
+    FarmGatewayManager,
   },
 };
 </script>
