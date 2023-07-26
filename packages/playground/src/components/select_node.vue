@@ -154,19 +154,19 @@ watch(
 watch(
   () => ({ ...props.filters }),
   (value, oldValue) => {
-    if (value.hasGPU === oldValue.hasGPU && value.type === oldValue.type) return;
+    if (
+      value.farmId === oldValue.farmId &&
+      value.disks === oldValue.disks &&
+      value.cpu === oldValue.cpu &&
+      value.memory === oldValue.memory &&
+      value.certified === oldValue.certified &&
+      value.rentedBy === oldValue.rentedBy &&
+      value.hasGPU === oldValue.hasGPU
+    )
+      return;
     shouldBeUpdated.value = true;
   },
 );
-
-farmManager?.subscribe(farmId => {
-  if (!farmId) {
-    selectedNode.value = undefined;
-    availableNodes.value = [];
-    return;
-  }
-  loadNodes(farmId);
-});
 
 watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
   if (l || !s) return;
@@ -205,7 +205,7 @@ async function loadNodes(farmId: number) {
         hasGPU: filters.hasGPU ? filters.hasGPU : undefined,
         certified: filters.certified,
         rentedBy: filters.rentedBy,
-        availableFor: filters.rentedBy,
+        availableFor: grid.twinId,
       });
 
       if (res?.length === 0) {

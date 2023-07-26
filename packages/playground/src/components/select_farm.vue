@@ -41,6 +41,7 @@ export interface Filters {
   ssd?: number;
   disk?: number;
   certified?: boolean;
+  hasGPU?: boolean;
   rentedBy?: number;
 }
 const FarmGatewayManager = useFarmGatewayManager();
@@ -94,7 +95,8 @@ async function loadFarms() {
       publicIPs: filters.publicIp,
       availableFor: grid!.twinId,
       certified: filters.certified,
-      rentedBy: filters.rentedBy,
+      rentedBy: filters.rentedBy ? filters.rentedBy : undefined,
+      hasGPU: filters.hasGPU ? filters.hasGPU : undefined,
     },
     { exclusiveFor: props.exclusiveFor },
   );
@@ -133,7 +135,8 @@ watch(
       value.publicIp === oldValue.publicIp &&
       value.country === oldValue.country &&
       value.certified === oldValue.certified &&
-      value.rentedBy === oldValue.rentedBy
+      value.rentedBy === oldValue.rentedBy &&
+      value.hasGPU === oldValue.hasGPU
     )
       return;
 

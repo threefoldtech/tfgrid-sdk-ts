@@ -130,6 +130,7 @@
               ssd: disks.reduce((total, disk) => total + disk.size, diskSize + 2),
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
+              hasGPU: hasGPU,
             }"
             v-model="farm"
           />

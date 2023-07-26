@@ -28,6 +28,7 @@ export async function getFilteredNodes(grid: GridClient, options: NodeFilters): 
     hasGPU: options.hasGPU,
     rentedBy: options.rentedBy ? grid.twinId : undefined,
     certified: options.certified,
+    availableFor: grid.twinId,
   };
   const nodes = await grid.capacity.filterNodes(filters);
   return nodes;
