@@ -4,6 +4,8 @@
     :cpu="solution?.cpu"
     :memory="solution?.memory"
     :disk="solution?.disk"
+    :certified="certified"
+    :dedicated="dedicated"
     :ipv4="ipv4"
     title-image="images/icons/freeflow.png"
   >
@@ -43,15 +45,43 @@
       />
       <Networks v-model:ipv4="ipv4"></Networks>
       <FarmGatewayManager>
-        <SelectFarm
-          :filters="{
-            cpu: solution?.cpu,
-            memory: solution?.memory,
-            ssd: solution?.disk,
-            publicIp: ipv4,
-          }"
-          v-model="farm"
-        />
+        <input-tooltip
+          inline
+          tooltip="Click to know more about dedicated nodes."
+          href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+        >
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+        </input-tooltip>
+
+        <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+        </input-tooltip>
+
+        <SelectFarmManager>
+          <SelectFarm
+            :filters="{
+              cpu: solution?.cpu,
+              memory: solution?.memory,
+              ssd: solution?.disk,
+              publicIp: ipv4,
+              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+              certified: certified,
+            }"
+            v-model="farm"
+          />
+
+          <SelectNode
+            v-model="selectedNode"
+            :filters="{
+              farmId: farm?.farmID,
+              cpu: solution?.cpu,
+              memory: solution?.memory,
+              disks: disks,
+              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+              certified: certified,
+            }"
+          />
+        </SelectFarmManager>
         <DomainName :hasIPv4="ipv4" ref="domainNameCmp"></DomainName>
       </FarmGatewayManager>
     </form-validator>
@@ -71,13 +101,13 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { type Ref, ref } from "vue";
+import { onMounted, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
+import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
-import { deployVM } from "../utils/deploy_vm";
+import { deployVM, type Disk } from "../utils/deploy_vm";
 import { deployGatewayName, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
@@ -89,7 +119,25 @@ const profileManager = useProfileManager();
 const threebotName = ref<string>("");
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
+const flist = ref<Flist>();
+const disks = ref<Disk[]>([]);
+const dedicated = ref(false);
+const certified = ref(false);
+const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
+
+onMounted(() => {
+  disks.value.push({
+    name: "disk",
+    size: solution?.value?.disk,
+    mountPoint: "/disk",
+  });
+
+  flist.value = {
+    value: "https://hub.grid.tf/lennertapp2.3bot/threefoldjimber-freeflow-latest.flist",
+    entryPoint: "/sbin/zinit init",
+  };
+});
 const domainNameCmp = ref();
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
@@ -123,15 +171,9 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
           name: threebotName.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
-          disks: [
-            {
-              name: "disk",
-              size: solution.value.disk,
-              mountPoint: "/disk",
-            },
-          ],
-          flist: "https://hub.grid.tf/lennertapp2.3bot/threefoldjimber-freeflow-latest.flist",
-          entryPoint: "/sbin/zinit init",
+          disks: disks.value,
+          flist: flist?.value!.value,
+          entryPoint: flist.value!.entryPoint,
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           publicIpv4: ipv4.value,
@@ -142,6 +184,9 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
             { key: "DIGITALTWIN_APPID", value: domain },
             { key: "NODE_ENV", value: "staging" },
           ],
+          nodeId: selectedNode.value.nodeId,
+          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          certified: certified.value,
         },
       ],
     });
@@ -181,8 +226,11 @@ import DomainName from "../components/domain_name.vue";
 import FarmGatewayManager from "../components/farm_gateway_manager.vue";
 import Networks from "../components/networks.vue";
 import SelectFarm from "../components/select_farm.vue";
+import SelectFarmManager from "../components/select_farm_manager.vue";
+import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { INode } from "../utils/filter_nodes";
 
 export default {
   name: "TFFreeflow",
@@ -192,6 +240,8 @@ export default {
     DomainName,
     FarmGatewayManager,
     Networks,
+    SelectNode,
+    SelectFarmManager,
   },
 };
 </script>

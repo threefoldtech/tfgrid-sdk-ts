@@ -1,27 +1,23 @@
 import {
   AddWorkerModel,
   DeleteWorkerModel,
-  type FilterOptions,
   type GridClient,
   K8SModel,
   KubernetesNodeModel,
-  randomChoice,
 } from "@threefold/grid_client";
 
 import type { K8SWorker } from "../types";
 import { createNetwork } from "./deploy_helpers";
 import { getWireguardConfig } from "./load_deployment";
-import { NodePicker } from "./node_picker";
 
 export async function deployK8s(grid: GridClient, options: DeployK8SOptions) {
-  const nodePicker = new NodePicker();
   const k8s = new K8SModel();
   k8s.name = options.name;
   k8s.secret = options.clusterToken;
 
   const workers = await Promise.all([
-    createWorker(grid, options.master, nodePicker),
-    Promise.all(options.workers.map(worker => createWorker(grid, worker, nodePicker))),
+    createWorker(options.master),
+    Promise.all(options.workers.map(worker => createWorker(worker))),
   ]);
 
   k8s.network = createNetwork({ addAccess: true });
@@ -41,21 +37,10 @@ export function loadK8S(grid: GridClient, name: string) {
   return grid.k8s.getObj(name);
 }
 
-async function createWorker(grid: GridClient, data: K8SWorker, nodePicker: NodePicker) {
-  const filters: FilterOptions = {
-    cru: data.cpu,
-    mru: Math.round(data.memory / 1024),
-    farmId: data.farm!.farmID,
-    farmName: data.farm!.name,
-    sru: data.diskSize + data.rootFsSize,
-    publicIPs: data.ipv4,
-    availableFor: grid.twinId,
-    country: data.farm!.country,
-  };
-
+async function createWorker(data: K8SWorker) {
   const worker = new KubernetesNodeModel();
   worker.name = data.name;
-  worker.node_id = await nodePicker.pick(await grid.capacity.filterNodes(filters));
+  worker.node_id = data.selectedNode!.nodeId;
   worker.cpu = data.cpu;
   worker.disk_size = data.diskSize;
   worker.memory = data.memory;
@@ -78,17 +63,6 @@ export interface DeployK8SOptions {
 }
 
 export async function deployWorker(grid: GridClient, options: K8SWorker & { deploymentName: string }) {
-  const filters: FilterOptions = {
-    cru: options.cpu,
-    mru: Math.round(options.memory / 1024),
-    farmId: options.farm!.farmID,
-    farmName: options.farm!.name,
-    sru: options.diskSize + options.rootFsSize,
-    publicIPs: options.ipv4,
-    availableFor: grid.twinId,
-    country: options.farm!.country,
-  };
-
   const worker = new AddWorkerModel();
   worker.deployment_name = options.deploymentName;
   worker.name = options.name;
@@ -99,7 +73,7 @@ export async function deployWorker(grid: GridClient, options: K8SWorker & { depl
   worker.public_ip6 = options.ipv6;
   worker.planetary = options.planetary;
   worker.rootfs_size = options.rootFsSize;
-  worker.node_id = worker.node_id = +randomChoice(await grid.capacity.filterNodes(filters)).nodeId;
+  worker.node_id = options.selectedNode!.nodeId;
   worker.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
 
   await grid.k8s.add_worker(worker);
