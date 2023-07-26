@@ -72,7 +72,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type PropType, type Ref, ref, watch } from "vue";
+import { onMounted, type PropType, type Ref, ref, watch } from "vue";
 
 import { useProfileManager } from "../stores/profile_manager";
 import { getFilteredNodes, getNodeCards, type INode, type NodeGPUCardType } from "../utils/filter_nodes";
@@ -185,7 +185,13 @@ function getChipColor(item: any) {
   return item === "Dedicated" ? "success" : "secondary";
 }
 
-async function loadNodes(farmId: number) {
+onMounted(() => {
+  farmManager?.subscribe(farmId => {
+    loadNodes(farmId);
+  });
+});
+
+async function loadNodes(farmId: number | undefined) {
   availableNodes.value = [];
   nodesArr.value = [];
   selectedNode.value = undefined;
