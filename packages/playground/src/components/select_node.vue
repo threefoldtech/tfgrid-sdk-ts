@@ -266,7 +266,7 @@ async function loadNodes(farmId: number) {
         availableNodes.value = [];
       }
     } catch (e) {
-      errorMessage.value = normalizeError(e, "Something went wrong while deploying.");
+      errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
     } finally {
       loadingNodes.value = false;
       farmManager?.setLoading(false);
