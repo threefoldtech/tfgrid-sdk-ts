@@ -8,7 +8,17 @@ import { credentialsStore } from "@/portal/store/credentials";
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+export interface Profile {
+  mnemonic: string;
+  ssh: string;
+  twin: number;
+  address: string;
+}
+
+export default new Vuex.Store<{ profile: Profile | null }>({
+  state: {
+    profile: null,
+  },
   modules: {
     explorer: explorerStore,
     portal: portalStore,

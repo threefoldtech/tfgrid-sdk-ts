@@ -11,4 +11,4 @@ export const portalStore = {
   mutations,
   actions,
   getters,
-} as ModuleTree<PortalState>;
+} as unknown as ModuleTree<PortalState>;

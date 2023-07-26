@@ -24,6 +24,7 @@ class TwinPage:
     tf_iframe_page = (By.XPATH, '/html/body/main/aside/div[2]/ul[3]/li/a')
     iframe_dialog_icon = (By.XPATH, '//*[@id="cc_dialog"]/div/div[2]/button[1]')
     accept_alert = (By.XPATH, "//*[contains(text(), 'Accepted!')]")
+    locked_info = (By.XPATH, '//*[@id="app"]/div[4]/div/div/div[1]/div/div[3]/div[1]/strong/a/i')
 
     def __init__(self, browser):
         self.browser = browser
@@ -71,6 +72,12 @@ class TwinPage:
     
     def press_create_btn(self):
         self.browser.find_element(*self.CreateButton).click()
+    
+    def press_locked_info(self):
+        self.browser.find_element(*self.locked_info).click()
+        WebDriverWait(self.browser, 30).until(EC.number_of_windows_to_be(2))
+        self.browser.switch_to.window(self.browser.window_handles[1])
+        return self.browser.current_url
 
     def wait_for(self, keyword):
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), '"+ keyword +"')]")))
