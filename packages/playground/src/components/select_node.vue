@@ -5,7 +5,7 @@
       class="mb-2"
       type="warning"
       variant="tonal"
-      v-if="!loadingNodes && selectedNode === undefined && emptyResult"
+      v-if="!loadingNodes && selectedNode === undefined && emptyResult && props.filters.rentedBy"
     >
       There are no nodes rented by you that match your selected resources, try to change your resources or rent a node
       and try again.
@@ -163,6 +163,7 @@ watch(
         validator.value?.setStatus(ValidatorStatus.Invalid);
       } finally {
         pingingNode.value = false;
+        farmManager?.setLoading(false);
       }
     }
 
@@ -215,18 +216,18 @@ function getChipColor(item: any) {
 
 onMounted(() => {
   farmManager?.subscribe(farmId => {
-    loadNodes(farmId);
+    if (farmId) loadNodes(farmId);
   });
 });
 
-async function loadNodes(farmId: number | undefined) {
+async function loadNodes(farmId: number) {
   availableNodes.value = [];
-  nodesArr.value = [];
   selectedNode.value = undefined;
   loadingNodes.value = true;
   errorMessage.value = "";
   const filters = props.filters;
-
+  farmManager?.setLoading(true);
+  emptyResult.value = false;
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
     try {
@@ -250,6 +251,7 @@ async function loadNodes(farmId: number | undefined) {
       }
 
       if (res) {
+        nodesArr.value = [];
         for (const node of res) {
           if (!nodesArr.value.some(n => n.nodeId === node.nodeId)) {
             nodesArr.value.push({
@@ -265,7 +267,7 @@ async function loadNodes(farmId: number | undefined) {
         availableNodes.value = [];
       }
     } catch (e) {
-      errorMessage.value = normalizeError(e, "Something went wrong while deploying.");
+      errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
     } finally {
       loadingNodes.value = false;
     }
