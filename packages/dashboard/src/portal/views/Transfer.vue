@@ -55,13 +55,18 @@
                   :items="accountTwinIds"
                   dense
                   filled
-                  @keydown="setValue"
+                  @input="onInputValueChanged"
                   label="Recipient:"
-                  @blur="transferTwinIdCheck"
+                  :error-messages="targetError"
                   :rules="[
                     () => !!receptinTwinId || 'This field is required',
-                    () => /^[1-9]\d*$/.test(receptinTwinId) || 'Please enter a positive integer',
-                    () => isComboBoxInvalid || 'Twin ID does not exist',
+                    () => {
+                      /^[1-9]\d*$/.test(receptinTwinId) || 'Please enter a positive integer';
+                    },
+                    () => {
+                      (parseInt(receptinTwinId) >= -(2 ** 31) && parseInt(receptinTwinId) <= 2 ** 31 - 1) ||
+                        'Invalid Twin ID';
+                    },
                   ]"
                 >
                 </v-combobox>
@@ -111,6 +116,7 @@ import { accountInterface } from "../store/state";
 export default class TransferView extends Vue {
   receipientAddress = "";
   accountsAddresses: any = [];
+  twinIdRules: any = [];
   $api: any;
   amountByAddress = 0;
   amountByTwinId = 0;
@@ -119,38 +125,42 @@ export default class TransferView extends Vue {
 
   loadingTransferTwinId = false;
   isTransferValidTwinId = false;
-  isComboBoxInvalid = false;
 
   queryClient = new QueryClient(window.configs.APP_API_URL);
   client = new Client({ url: window.configs.APP_API_URL });
 
   receptinTwinId = "";
   accountTwinIds: any = [];
+  targetError = "";
+
+  async onInputValueChanged() {
+    await this.$nextTick();
+    this.transferTwinIdCheck();
+  }
 
   async transferTwinIdCheck() {
-    const twinId = this.receptinTwinId;
+    await this.$nextTick();
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => {
         reject(new Error("Request timed out."));
-      }, 5000);
+      }, 6000);
     });
     try {
-      const twinDetailsPromise = this.queryClient.twins.get({ id: parseInt(twinId) });
+      console.log("twinId: ", this.receptinTwinId);
+      console.log(typeof this.receptinTwinId);
+      const twinDetailsPromise = this.queryClient.twins.get({ id: parseInt(this.receptinTwinId) });
       const twinDetails = await Promise.race([twinDetailsPromise, timeoutPromise]);
-      if (twinDetails != null) {
+      if (twinDetails) {
         this.isTransferValidTwinId = true;
-        this.isComboBoxInvalid = false;
-        return true;
+        this.accountTwinIds.push(this.receptinTwinId);
+        this.targetError = "";
       } else {
         this.isTransferValidTwinId = false;
-        this.isComboBoxInvalid = true;
-        return false;
+        this.targetError = "Twin ID doesn't exist";
       }
     } catch (error) {
       this.isTransferValidTwinId = false;
-      this.isComboBoxInvalid = true;
-      console.log("Error: ", error);
-      throw error;
+      this.targetError = "Twin ID doesn't exist";
     }
   }
 
@@ -269,6 +279,9 @@ export default class TransferView extends Vue {
         this.$toasted.show("Transfer failed!");
         this.loadingTransferTwinId = false;
       }
+    } else {
+      this.$toasted.show("Twin ID doesn't exist");
+      this.loadingTransferTwinId = false;
     }
   }
 
