@@ -86,7 +86,7 @@
               memory: solution?.memory,
               ipv4: ipv4,
               ipv6: ipv4,
-              disks: disks,
+              disks: [{ size: solution.disk, mountPoint: '/JustForFilters' }, ...disks],
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
