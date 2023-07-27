@@ -32,7 +32,7 @@ export default class FullVM extends VM {
 export class DiskFullVm {
   // prettier-ignore
   public diskFields: IFormField[] = [
-    { label: "Name", symbol: "name", placeholder: "Disk Name", type: "text", validator: validateDiskName, invalid:false },
+    { label: "Name", symbol: "name", placeholder: "Disk Name", type: "text", validator: validateDiskName, invalid: false },
     { label: "Size (GB)", symbol: "size", placeholder: "Disk size in GB", type: "number", validator: validateDisk, invalid: false },
   ]
 
