@@ -2,9 +2,9 @@
   <weblet-layout
     ref="layout"
     @mount="layoutMount"
-    :cpu="cpu"
-    :memory="memory"
-    :disk="disks.reduce((total, disk) => total + disk.size, rootFsSize)"
+    :cpu="solution?.cpu"
+    :memory="solution?.memory"
+    :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk)"
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
@@ -39,38 +39,12 @@
         </input-validator>
 
         <SelectVmImage :images="images" v-model="flist" />
-
-        <RootFsSize :cpu="cpu" :memory="memory" v-model.number="rootFsSize" />
-
-        <input-validator
-          :value="cpu"
-          :rules="[
-            validators.required('CPU is required.'),
-            validators.isInt('CPU must be a valid integer.'),
-            validators.min('CPU min is 1 cores.', 1),
-            validators.max('CPU max is 32 cores.', 32),
-          ]"
-          #="{ props }"
-        >
-          <input-tooltip tooltip="The number of virtual cores allocated to your instance.">
-            <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
-          </input-tooltip>
-        </input-validator>
-
-        <input-validator
-          :value="memory"
-          :rules="[
-            validators.required('Memory is required.'),
-            validators.isInt('Memory must be a valid integer.'),
-            validators.min('Minimum allowed memory is 256 MB.', 256),
-            validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
-          ]"
-          #="{ props }"
-        >
-          <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
-            <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
-          </input-tooltip>
-        </input-validator>
+        <SelectSolutionFlavor
+          :minimum="{ cpu: 1, memory: 1024 * 1, disk: 25 }"
+          :standard="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
+          :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+          v-model="solution"
+        />
 
         <Network
           required
@@ -95,10 +69,10 @@
         <SelectFarmManager>
           <SelectFarm
             :filters="{
-              cpu,
-              memory,
+              cpu: solution?.cpu,
+              memory: solution?.memory,
               publicIp: ipv4,
-              ssd: disks.reduce((total, disk) => total + disk.size, rootFsSize),
+              ssd: disks.reduce((total, disk) => total + disk.size, solution?.disk),
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
@@ -108,8 +82,8 @@
             v-model="selectedNode"
             :filters="{
               farmId: farm?.farmID,
-              cpu,
-              memory,
+              cpu: solution?.cpu,
+              memory: solution?.memory,
               ipv4: ipv4,
               ipv6: ipv4,
               disks: disks,
@@ -207,6 +181,7 @@
 import { type Ref, ref } from "vue";
 
 import Network from "../components/networks.vue";
+import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type Farm, type Flist, ProjectName } from "../types";
@@ -243,9 +218,6 @@ const images = [
 
 const name = ref(generateName(8, { prefix: "vm" }));
 const flist = ref<Flist>();
-const rootFsSize = ref(2) as Ref<number>;
-const cpu = ref(4);
-const memory = ref(8192);
 const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
@@ -296,8 +268,8 @@ async function deploy() {
       machines: [
         {
           name: name.value,
-          cpu: cpu.value,
-          memory: memory.value,
+          cpu: solution.value.cpu,
+          memory: solution.value.memory,
           flist: flist.value!.value,
           entryPoint: flist.value!.entryPoint,
           farmId: farm.value.farmID,
@@ -308,7 +280,7 @@ async function deploy() {
           planetary: planetary.value,
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
-          rootFilesystemSize: rootFsSize.value,
+          rootFilesystemSize: solution.value.disk,
           nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
@@ -327,20 +299,22 @@ async function deploy() {
 
 <script lang="ts">
 import ExpandableLayout from "../components/expandable_layout.vue";
-import RootFsSize from "../components/root_fs_size.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectFarmManager from "../components/select_farm_manager.vue";
 import SelectNode from "../components/select_node.vue";
 import SelectVmImage from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { solutionFlavor as SolutionFlavor } from "../types";
 import type { INode } from "../utils/filter_nodes";
 import { normalizeError } from "../utils/helpers";
+
+const solution = ref() as Ref<SolutionFlavor>;
 
 export default {
   name: "MicroVm",
   components: {
     SelectVmImage,
-    RootFsSize,
+    SelectSolutionFlavor,
     SelectFarm,
     SelectNode,
     ExpandableLayout,

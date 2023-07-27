@@ -1,9 +1,9 @@
 <template>
   <weblet-layout
     ref="layout"
-    :cpu="cpu"
-    :memory="memory"
-    :disk="disks.reduce((total, disk) => total + disk.size, diskSize + 2)"
+    :cpu="solution?.cpu"
+    :memory="solution?.memory"
+    :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk + 2)"
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
@@ -44,53 +44,12 @@
         </input-validator>
 
         <SelectVmImage :images="images" v-model="flist" />
-
-        <input-validator
-          :value="cpu"
-          :rules="[
-            validators.required('CPU is required.'),
-            validators.isInt('CPU must be a valid integer.'),
-            validators.min('CPU min is 1 cores.', 1),
-            validators.max('CPU max is 32 cores.', 32),
-          ]"
-          #="{ props }"
-        >
-          <input-tooltip tooltip="The number of virtual cores allocated to your instance.">
-            <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
-          </input-tooltip>
-        </input-validator>
-
-        <input-validator
-          :value="memory"
-          :rules="[
-            validators.required('Memory is required.'),
-            validators.isInt('Memory must be a valid integer.'),
-            validators.min('Minimum allowed memory is 256 MB.', 256),
-            validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
-          ]"
-          #="{ props }"
-        >
-          <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
-            <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
-          </input-tooltip>
-        </input-validator>
-
-        <input-validator
-          :value="diskSize"
-          :rules="[
-            validators.required('Disk size is required.'),
-            validators.isInt('Disk size must be a valid integer.'),
-            validators.min('Minimum allowed disk size is 15 GB.', 15),
-            validators.max('Maximum allowed disk size is 10000 GB.', 10000),
-          ]"
-          #="{ props }"
-        >
-          <input-tooltip
-            tooltip="The storage capacity allocated to your instance, indicating the amount of space available to store files, data, and applications."
-          >
-            <v-text-field label="Disk Size (GB)" type="number" v-model.number="diskSize" v-bind="props" />
-          </input-tooltip>
-        </input-validator>
+        <SelectSolutionFlavor
+          :minimum="{ cpu: 1, memory: 1024 * 1, disk: 25 }"
+          :standard="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
+          :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+          v-model="solution"
+        />
 
         <Network
           required
@@ -124,10 +83,10 @@
         <SelectFarmManager>
           <SelectFarm
             :filters="{
-              cpu,
-              memory,
+              cpu: solution?.cpu,
+              memory: solution?.memory,
               publicIp: ipv4,
-              ssd: disks.reduce((total, disk) => total + disk.size, diskSize + 2),
+              ssd: disks.reduce((total, disk) => total + disk.size, solution?.disk + 2),
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
               hasGPU: hasGPU,
@@ -138,11 +97,11 @@
             v-model="selectedNode"
             :filters="{
               farmId: farm?.farmID,
-              cpu,
-              memory,
+              cpu: solution?.cpu,
+              memory: solution?.memory,
               ipv4: ipv4,
               ipv6: ipv4,
-              disks: [{ size: diskSize, mountPoint: '/' }, ...disks],
+              disks: [{ size: solution?.disk, mountPoint: '/' }, ...disks],
               hasGPU: hasGPU,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
@@ -205,6 +164,7 @@ import Network from "../components/networks.vue";
 import SelectFarmManager from "../components/select_farm_manager.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
+import type { solutionFlavor as SolutionFlavor } from "../types";
 import { type Farm, type Flist, ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
@@ -214,6 +174,7 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
+const solution = ref() as Ref<SolutionFlavor>;
 
 const images: VmImage[] = [
   {
@@ -240,9 +201,6 @@ const images: VmImage[] = [
 
 const name = ref(generateName(8, { prefix: "vm" }));
 const flist = ref<Flist>();
-const cpu = ref(4);
-const memory = ref(8192);
-const diskSize = ref(50);
 const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
@@ -300,14 +258,14 @@ async function deploy() {
       machines: [
         {
           name: name.value,
-          cpu: cpu.value,
-          memory: memory.value,
+          cpu: solution.value.cpu,
+          memory: solution.value.memory,
           flist: flist.value!.value,
           entryPoint: flist.value!.entryPoint,
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
-          disks: [{ size: diskSize.value, mountPoint: "/" }, ...disks.value],
+          disks: [{ size: solution?.value.disk, mountPoint: "/" }, ...disks.value],
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           planetary: planetary.value,
@@ -336,6 +294,7 @@ async function deploy() {
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectNode from "../components/select_node.vue";
+import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { INode } from "../utils/filter_nodes";
@@ -344,6 +303,7 @@ export default {
   name: "FullVm",
   components: {
     SelectVmImage,
+    SelectSolutionFlavor,
     SelectFarm,
     ExpandableLayout,
     SelectNode,
