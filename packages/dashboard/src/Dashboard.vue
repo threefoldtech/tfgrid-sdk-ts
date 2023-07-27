@@ -9,10 +9,16 @@
         >
 
         <v-spacer>
-          <TftSwapPrice v-if="!loadingAPI" />
+          <v-row class="d-flex align-center justify-start">
+            <div>
+              <TftSwapPrice v-if="!loadingAPI" />
+            </div>
+            <div>
+              <FundsCard v-if="$store.state.credentials.initialized && $store.state.credentials.balance" />
+            </div>
+          </v-row>
         </v-spacer>
         <div class="d-flex align-center">
-          <FundsCard v-if="$store.state.credentials.initialized && $store.state.credentials.balance" />
           <div class="d-flex" style="align-items: center">
             <v-btn icon @click="toggle_dark_mode">
               <v-icon>mdi-theme-light-dark</v-icon>

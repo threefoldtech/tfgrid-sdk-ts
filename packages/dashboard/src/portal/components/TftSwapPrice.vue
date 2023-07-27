@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="pr-0">
     <div class="d-flex ml-5">
       <div v-if="!loading" class="d-flex" style="align-items: center">
         <p>{{ prices[0].amount }} {{ prices[0].currency }}</p>
