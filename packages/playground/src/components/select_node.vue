@@ -78,6 +78,7 @@
 </template>
 
 <script lang="ts" setup>
+import { GridClient } from "@threefold/grid_client";
 import { onMounted, type PropType, type Ref, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
@@ -104,6 +105,11 @@ export interface NodeFilters {
   rentedBy?: number;
   type?: string;
   availableFor?: number;
+}
+export interface StoragePool {
+  type: string;
+  size: number;
+  used: number;
 }
 
 const emits = defineEmits<{ (event: "update:modelValue", value?: INode): void }>();
@@ -147,11 +153,17 @@ watch(
 
     const grid = await getGrid(profileManager.profile!);
 
-    if (node) {
+    if (node && grid) {
       validator.value?.setStatus(ValidatorStatus.Pending);
       pingingNode.value = true;
       try {
-        await grid!.zos.pingNode({ nodeId: node.nodeId });
+        console.log();
+        await checkStoragepools(
+          props.filters.disks.map(disk => disk.size),
+          node.nodeId,
+          grid,
+        );
+
         emits("update:modelValue", {
           nodeId: node.nodeId,
           cards: cards,
@@ -219,7 +231,13 @@ onMounted(() => {
     if (farmId) loadNodes(farmId);
   });
 });
-
+async function checkStoragepools(disks: number[], nodeId: number, grid: GridClient) {
+  const pool: number[] = (await grid.zos.getStoragePools({ nodeId })).flatMap((disk: StoragePool) => {
+    return disk.type === "ssd" ? [(disk.size - disk.used) / 1024 ** 3] : [];
+  });
+  console.log(pool);
+  return;
+}
 async function loadNodes(farmId: number) {
   availableNodes.value = [];
   selectedNode.value = undefined;
