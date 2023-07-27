@@ -25,12 +25,17 @@ export function inputValidation(value: string, key: string): string {
   const textNumbersFields: string[] = ["farm_name"];
 
   const countryFields: string[] = ["countryFullName", "country"];
-  const specialChars = /[ `!@#$%^&*()+\-=[\]{};':"\\|,.<>/?~]/;
+  const specialChars = /[ `!@#$%^&*()+\-=[\]{};':"\\|,<>/?~]/;
   const countryRegex = /^[A-Za-z][A-Za-z\s]*$/;
   let errorMsg = "";
 
   if (numericFields.includes(key)) {
-    if (isNaN(+value) || specialChars.test(value) || +value <= 0 || value.includes("e")) {
+    if (isNaN(+value) || specialChars.test(value)) {
+      errorMsg = "This Field accepts only a valid number.";
+      return errorMsg;
+    }
+
+    if (+value <= 0) {
       errorMsg = "This field must be a number larger than 0.";
       return errorMsg;
     }
