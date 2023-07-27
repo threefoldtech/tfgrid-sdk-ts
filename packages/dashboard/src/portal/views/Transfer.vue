@@ -5,13 +5,13 @@
     </v-card>
 
     <v-card>
-      <v-tabs>
+      <v-tabs v-model="activeTab">
         <v-tab class=""> By Address</v-tab>
         <v-tab> By Twin ID </v-tab>
         <v-tab-item>
           <template>
             <v-card class="pa-5 my-5" flat>
-              <v-form v-model="isTransferValid">
+              <v-form v-model="isTransferValidAddress">
                 <v-combobox
                   v-model="receipientAddress"
                   :items="accountsAddresses"
@@ -32,17 +32,12 @@
                 </TransferTextField>
                 <span class="fee">0.01 transaction fee will be deducted</span>
               </v-form>
-              <v-card-actions>
-                <v-spacer> </v-spacer>
-                <v-btn @click="clearInput" color="grey lighten-2 black--text">Clear</v-btn>
-                <v-btn
-                  class="primary white--text"
-                  @click="transferTFTWithAddress"
-                  :loading="loadingTransfer"
-                  :disabled="!isTransferValid"
-                  >Submit</v-btn
-                >
-              </v-card-actions>
+              <Buttons
+                :isTransferValid="isTransferValidAddress"
+                :loadingTransfer="loadingTransferAddress"
+                @submit="transferTFTWithAddress"
+                @clear="clearInputAddress"
+              />
             </v-card>
           </template>
         </v-tab-item>
@@ -78,18 +73,12 @@
                 </TransferTextField>
                 <span class="fee">0.01 transaction fee will be deducted</span>
               </v-form>
-
-              <v-card-actions>
-                <v-spacer> </v-spacer>
-                <v-btn @click="clearInput" color="grey lighten-2 black--text">Clear</v-btn>
-                <v-btn
-                  class="primary white--text"
-                  @click="transferTFTWithTwinID"
-                  :loading="loadingTransferTwinId"
-                  :disabled="!isTransferValidTwinId"
-                  >Submit</v-btn
-                >
-              </v-card-actions>
+              <Buttons
+                :isTransferValid="isTransferValidTwinId"
+                :loadingTransfer="loadingTransferTwinId"
+                @submit="transferTFTWithTwinID"
+                @clear="clearInputTwinId"
+              />
             </v-card>
           </template>
         </v-tab-item>
@@ -104,6 +93,7 @@ import { Client, QueryClient } from "@threefold/tfchain_client";
 import QrcodeVue from "qrcode.vue";
 import { Component, Vue } from "vue-property-decorator";
 
+import Buttons from "../components/TransferFormButtons.vue";
 import TransferTextField from "../components/TransferTextField.vue";
 import { balanceInterface, getBalance } from "../lib/balance";
 import { checkAddress, transfer } from "../lib/transfer";
@@ -111,27 +101,27 @@ import { accountInterface } from "../store/state";
 
 @Component({
   name: "TransferView",
-  components: { QrcodeVue, TransferTextField },
+  components: { QrcodeVue, TransferTextField, Buttons },
 })
 export default class TransferView extends Vue {
+  activeTab = 0;
+  $api: any;
+
   receipientAddress = "";
   accountsAddresses: any = [];
-  twinIdRules: any = [];
-  $api: any;
   amountByAddress = 0;
-  amountByTwinId = 0;
-  loadingTransfer = false;
-  isTransferValid = false;
+  loadingTransferAddress = false;
+  isTransferValidAddress = false;
 
+  amountByTwinId = 0;
   loadingTransferTwinId = false;
   isTransferValidTwinId = false;
-
-  queryClient = new QueryClient(window.configs.APP_API_URL);
-  client = new Client({ url: window.configs.APP_API_URL });
-
   receptinTwinId = "";
   accountTwinIds: any = [];
   targetError = "";
+
+  queryClient = new QueryClient(window.configs.APP_API_URL);
+  client = new Client({ url: window.configs.APP_API_URL });
 
   async onInputValueChanged() {
     await this.$nextTick();
@@ -190,10 +180,13 @@ export default class TransferView extends Vue {
     }
   }
 
-  clearInput() {
+  clearInputAddress() {
     this.receipientAddress = "";
-    this.receptinTwinId = "";
     this.amountByAddress = 0;
+  }
+
+  clearInputTwinId() {
+    this.receptinTwinId = "";
     this.amountByTwinId = 0;
   }
 
@@ -204,7 +197,7 @@ export default class TransferView extends Vue {
       this.receipientAddress,
       this.amountByAddress,
       (res: { events?: never[] | undefined; status: { type: string; asFinalized: string; isFinalized: string } }) => {
-        this.loadingTransfer = true;
+        this.loadingTransferAddress = true;
         if (res instanceof Error) {
           console.log(res);
           return;
@@ -219,14 +212,14 @@ export default class TransferView extends Vue {
           console.log(`Transaction included at blockHash ${status.asFinalized}`);
           if (!events.length) {
             this.$toasted.show("Transfer failed!");
-            this.loadingTransfer = false;
+            this.loadingTransferAddress = false;
           } else {
             // Loop through Vec<EventRecord> to display all events
             events.forEach(({ phase, event: { data, method, section } }) => {
               console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
               if (section === "balances" && method === "Transfer") {
                 this.$toasted.show("Transfer succeeded!");
-                this.loadingTransfer = false;
+                this.loadingTransferAddress = false;
                 getBalance(this.$api, this.$store.state.credentials.account.address).then(
                   (balance: balanceInterface) => {
                     this.$store.state.credentials.balance.free = balance.free;
@@ -235,7 +228,7 @@ export default class TransferView extends Vue {
                 );
               } else if (section === "system" && method === "ExtrinsicFailed") {
                 this.$toasted.show("Transfer failed!");
-                this.loadingTransfer = false;
+                this.loadingTransferAddress = false;
               }
             });
           }
@@ -243,7 +236,7 @@ export default class TransferView extends Vue {
       },
     ).catch(err => {
       this.$toasted.show(err.message);
-      this.loadingTransfer = false;
+      this.loadingTransferAddress = false;
     });
   }
 
