@@ -17,6 +17,6 @@ export async function transfer(address: string, api: ApiPromise, target: any, am
   const keypair = await getKeypair();
   const nonce = await api.rpc.system.accountNextIndex(address);
   const decimalAmount = new Decimal(amount);
-  const miliAmount = decimalAmount.mul(10 ** 7).toNumber();
-  return api.tx.balances.transfer(target, miliAmount).signAndSend(keypair, { nonce }, callback);
+  const milliAmount = decimalAmount.mul(10 ** 7).toNumber();
+  return api.tx.balances.transfer(target, milliAmount).signAndSend(keypair, { nonce }, callback);
 }
