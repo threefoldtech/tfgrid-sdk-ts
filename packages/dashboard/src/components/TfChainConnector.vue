@@ -69,7 +69,6 @@
 
               <v-text-field
                 label="Password"
-                autofocus
                 :rules="[validateLoginPassword]"
                 :type="showPass1 ? 'text' : 'password'"
                 :append-icon="showPass1 ? 'mdi-eye-outline' : 'mdi-eye-off-outline'"
@@ -99,7 +98,6 @@
                       label="Mnemonic"
                       :rules="mnemonicRules"
                       placeholder="Please insert your mnemonic"
-                      autofocus
                       :error-messages="mnemonicError"
                       :value="mnemonic"
                       @input="
@@ -382,6 +380,7 @@ export default class TfChainConnector extends Vue {
       console.log("error", e);
     } finally {
       this.connecting = false;
+      this.show = false;
     }
   }
 
