@@ -1,5 +1,6 @@
 import { ApiPromise } from "@polkadot/api";
 import { Keyring } from "@polkadot/keyring";
+import { Decimal } from "decimal.js";
 
 import { getKeypair } from "@/utils/signer";
 
@@ -15,5 +16,7 @@ export function checkAddress(address: string) {
 export async function transfer(address: string, api: ApiPromise, target: any, amount: number, callback: any) {
   const keypair = await getKeypair();
   const nonce = await api.rpc.system.accountNextIndex(address);
-  return api.tx.balances.transfer(target, amount * 1e7).signAndSend(keypair, { nonce }, callback);
+  const decimalAmount = new Decimal(amount);
+  const miliAmount = decimalAmount.mul(10 ** 7).toNumber();
+  return api.tx.balances.transfer(target, miliAmount).signAndSend(keypair, { nonce }, callback);
 }
