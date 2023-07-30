@@ -127,7 +127,7 @@ const cards: NodeGPUCardType[] = [];
 const emptyResult = ref(false);
 const validator = ref();
 const pingingNode = ref(false);
-const timeoutId = ref();
+const delay = ref();
 
 watch(selectedCards, async () => {
   for (const card of nodeCards.value) {
@@ -209,8 +209,8 @@ watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
       availableNodes.value = [];
       return;
     }
-    clearTimeout(timeoutId.value);
-    timeoutId.value = setTimeout(() => {
+    clearTimeout(delay.value);
+    delay.value = setTimeout(() => {
       loadNodes(farmId);
     }, 1000);
   });
