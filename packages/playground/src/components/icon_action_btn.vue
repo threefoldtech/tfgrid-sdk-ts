@@ -9,7 +9,7 @@
         :target="href ? '_blank' : undefined"
         variant="tonal"
         :height="height"
-        class="my-1"
+        class="my-1 mr-1"
       >
         <v-icon> {{ icon }}</v-icon>
       </v-btn>
