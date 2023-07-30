@@ -43,14 +43,14 @@
           />
           <IconActionBtn
             tooltip="Admin Panel"
-            color="info"
+            color="white"
             icon="mdi-view-dashboard"
             :href="'http://captain.' + item.value[0].env.CAPROVER_ROOT_DOMAIN"
           />
           <IconActionBtn
             icon="mdi-cog"
             tooltip="Manage Workers"
-            color="secondary"
+            color="white"
             @click="dialog = item.value.deploymentName"
           />
 
@@ -71,7 +71,7 @@
           />
           <IconActionBtn
             tooltip="Preview"
-            color="info"
+            color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.PEERTUBE_WEBSERVER_HOSTNAME"
           />
@@ -85,7 +85,7 @@
           />
           <IconActionBtn
             tooltip="Preview"
-            color="info"
+            color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.FUNKWHALE_HOSTNAME"
           />
@@ -99,13 +99,13 @@
           />
           <IconActionBtn
             tooltip="Admin Panel"
-            color="info"
+            color="white"
             icon="mdi-view-dashboard"
             :href="'http://' + item.value[0].env.DOMAIN_NAME + '/admin/'"
           />
           <IconActionBtn
             tooltip="Preview"
-            color="secondary"
+            color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.DOMAIN_NAME"
           />
@@ -125,7 +125,7 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Preview" color="info" icon="mdi-web" :href="item.value[0].env.SITE_URL" />
+          <IconActionBtn tooltip="Preview" color="white" icon="mdi-web" :href="item.value[0].env.SITE_URL" />
         </template>
 
         <template #Discourse-actions="{ item }">
@@ -136,7 +136,7 @@
           />
           <IconActionBtn
             tooltip="Preview"
-            color="info"
+            color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.DISCOURSE_HOSTNAME"
           />
@@ -150,7 +150,7 @@
           />
           <IconActionBtn
             tooltip="Preview"
-            color="info"
+            color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.DIGITALTWIN_APPID"
           />
@@ -164,7 +164,7 @@
           />
           <IconActionBtn
             tooltip="Preview"
-            color="info"
+            color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.CASPERLABS_HOSTNAME"
           />
@@ -178,7 +178,7 @@
           />
           <IconActionBtn
             tooltip="Preview"
-            color="info"
+            color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.OWNCLOUD_DOMAIN"
           />
@@ -192,7 +192,7 @@
           />
           <IconActionBtn
             tooltip="Preview"
-            color="info"
+            color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.SUBSQUID_WEBSERVER_HOSTNAME + '/graphql'"
           />
@@ -214,7 +214,7 @@
           />
           <IconActionBtn
             tooltip="Visit"
-            color="info"
+            color="white"
             icon="mdi-web"
             :href="
               'http://' +
@@ -233,7 +233,7 @@
           />
           <IconActionBtn
             tooltip="Admin Panel"
-            color="info"
+            color="white"
             icon="mdi-view-dashboard"
             :href="
               'http://' +
@@ -250,10 +250,10 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Preview" color="info" icon="mdi-web" :href="'https://' + item.value[0].env.WP_URL" />
+          <IconActionBtn tooltip="Preview" color="white" icon="mdi-web" :href="'https://' + item.value[0].env.WP_URL" />
           <IconActionBtn
             tooltip="Admin Panel"
-            color="secondary"
+            color="white"
             icon="mdi-view-dashboard"
             :href="'https://' + item.value[0].env.WP_URL + '/wp-admin'"
           />
@@ -277,7 +277,7 @@
             <IconActionBtn
               icon="mdi-cog"
               tooltip="Manage Workers"
-              color="secondary"
+              color="white"
               @click="dialog = item.value.deploymentName"
             />
 
