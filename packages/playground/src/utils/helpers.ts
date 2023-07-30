@@ -1,3 +1,5 @@
+import type { NodeGPUCardType } from "../utils/filter_nodes";
+
 export function downloadAsFile(name: string, data: string) {
   const a = document.createElement("a");
   a.download = name;
@@ -33,5 +35,16 @@ export function normalizeBalance(num: number | string | undefined, floor = false
 }
 
 export function isEnoughBalance(balance: any, min = 0.001): boolean {
-  return balance.free > min ? true : false;
+  return balance?.free > min ? true : false;
+}
+
+export function getDashboardURL(network: string) {
+  if (network === "main") {
+    return "https://dashboard.grid.tf";
+  }
+  return `https://dashboard.${network}.grid.tf`;
+}
+
+export function getCardName(card: NodeGPUCardType): string {
+  return card.vendor + " - " + card.device;
 }

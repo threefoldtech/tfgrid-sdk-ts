@@ -40,19 +40,14 @@ class Capacity {
     return await this.nodes.getAllNodes();
   }
 
-  @expose
-  @validateInput
-  async filterNodes(options?: FilterOptions): Promise<NodeInfo[]> {
-    if (options.farmName) {
-      options.farmId = await this.nodes.getFarmIdFromFarmName(options.farmName);
-    }
-    if (options.farmId) {
+  private async useFarmerBot(options?: FilterOptions): Promise<NodeInfo[]> {
+    if (options) {
       const farmerbot = new FarmerBot(this.config);
       try {
-        const pong = await farmerbot.pingFarm({ farmId: options.farmId });
-        if (pong) {
+        const pong = await farmerbot.pingFarm({ farmId: options.farmId! });
+        if (pong && options.mru && options.sru && options.hru && options.hasGPU) {
           const nodeOptions: FarmerBotFindNodeModel = {
-            farmId: options.farmId,
+            farmId: options.farmId!,
             required_cru: options.cru,
             required_mru: Math.ceil(this.nodes._g2b(options.mru)) || 0,
             required_sru: Math.ceil(this.nodes._g2b(options.sru)) || 0,
@@ -62,6 +57,7 @@ class Capacity {
             public_ips: options.publicIPs ? 1 : 0,
             public_config: options.accessNodeV4 || options.accessNodeV6 || options.gateway,
             node_exclude: options.nodeExclude,
+            has_gpus: options.hasGPU ? 0 : 1,
           };
           const nodeId = await farmerbot.findNode(nodeOptions);
           return [await this.nodes.getNode(nodeId)];
@@ -70,7 +66,23 @@ class Capacity {
         console.log(`farmer bot is not responding for farm ${options.farmId}`);
       }
     }
-    return await this.nodes.filterNodes(options);
+    return [];
+  }
+
+  @expose
+  @validateInput
+  async filterNodes(options?: FilterOptions): Promise<NodeInfo[]> {
+    // Disabling farmer bot as some filters are not supported yet there.
+
+    let nodes: NodeInfo[] = [];
+    // if (options?.farmName) {
+    //   options.farmId = await this.nodes.getFarmIdFromFarmName(options.farmName);
+    // }
+    // if (options?.farmId && !options.rentedBy) {
+    //   nodes = await this.useFarmerBot(options)
+    // }
+    if (nodes.length <= 0) nodes = await this.nodes.filterNodes(options);
+    return nodes;
   }
 
   @expose

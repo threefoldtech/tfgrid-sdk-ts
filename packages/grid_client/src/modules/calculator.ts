@@ -50,7 +50,12 @@ class Calculator {
     const cu = await this.calCU({ cru: options.cru, mru: options.mru });
     const su = await this.calSU({ hru: options.hru, sru: options.sru });
     const ipv4u = options.ipv4u ? 1 : 0;
-    const musd_month = (cu * +price?.cu.value + su * +price?.su.value + ipv4u * price?.ipu.value) * 24 * 30;
+
+    // certified node cotsts 25% more than DIY node
+    const certifiedFactor = options.certified ? 1.25 : 1;
+
+    const musd_month =
+      (cu * +price?.cu.value + su * +price?.su.value + ipv4u * price?.ipu.value) * certifiedFactor * 24 * 30;
     return { musd_month: musd_month, dedicatedDiscount: price.discountForDedicationNodes };
   }
   @expose
@@ -74,19 +79,19 @@ class Calculator {
         discount: 0,
       },
       default: {
-        duration: 3,
+        duration: 1.5,
         discount: 20,
       },
       bronze: {
-        duration: 6,
+        duration: 3,
         discount: 30,
       },
       silver: {
-        duration: 12,
+        duration: 6,
         discount: 40,
       },
       gold: {
-        duration: 36,
+        duration: 18,
         discount: 60,
       },
     };
@@ -120,6 +125,7 @@ class Calculator {
       hru: options.hru,
       sru: options.sru,
       ipv4u: options.ipv4u,
+      certified: options.certified,
       balance: balance,
     });
     return calculate;

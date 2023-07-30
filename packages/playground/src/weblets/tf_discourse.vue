@@ -4,6 +4,9 @@
     :cpu="solution?.cpu"
     :memory="solution?.memory"
     :disk="(solution?.disk ?? 0) + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
+    :certified="certified"
+    :dedicated="dedicated"
+    :ipv4="ipv4"
     title-image="images/icons/discourse.png"
   >
     <template #title> Deploy a Discourse Instance </template>
@@ -54,16 +57,47 @@
           :standard="{ cpu: 2, memory: 1024 * 2, disk: 50 }"
           :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
         />
-        <SelectGatewayNode v-model="gateway" />
-        <SelectFarm
-          :filters="{
-            cpu: solution?.cpu,
-            memory: solution?.memory,
-            ssd: (solution?.disk ?? 0) + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
-            publicIp: false,
-          }"
-          v-model="farm"
-        />
+        <!-- <Networks v-model:ipv4="ipv4" /> -->
+        <FarmGatewayManager>
+          <input-tooltip
+            inline
+            tooltip="Click to know more about dedicated nodes."
+            href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+          >
+            <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+          </input-tooltip>
+
+          <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+            <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+          </input-tooltip>
+
+          <SelectFarmManager>
+            <SelectFarm
+              :filters="{
+                cpu: solution?.cpu,
+                memory: solution?.memory,
+                ssd: (solution?.disk ?? 0) + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
+                publicIp: ipv4,
+                rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+                certified: certified,
+              }"
+              v-model="farm"
+            />
+
+            <SelectNode
+              v-model="selectedNode"
+              :filters="{
+                farmId: farm?.farmID,
+                cpu: solution?.cpu,
+                memory: solution?.memory,
+                disks: [{ size: solution?.disk, mountPoint: '/var/lib/docker' }],
+                rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+                certified: certified,
+              }"
+            />
+          </SelectFarmManager>
+          <DomainName :hasIPv4="ipv4" ref="domainNameCmp" />
+        </FarmGatewayManager>
       </template>
 
       <template #mail>
@@ -73,7 +107,14 @@
       </template>
     </d-tabs>
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid"> Deploy </v-btn>
+      <v-btn
+        color="primary"
+        variant="tonal"
+        @click="deploy(domainNameCmp?.domain, domainNameCmp?.customDomain)"
+        :disabled="tabs?.invalid"
+      >
+        Deploy
+      </v-btn>
     </template>
   </weblet-layout>
 </template>
@@ -86,7 +127,7 @@ import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
+import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
@@ -102,11 +143,26 @@ const profileManager = useProfileManager();
 const name = ref(generateName(9, { prefix: "dc" }));
 const email = ref("");
 const solution = ref() as Ref<SolutionFlavor>;
-const gateway = ref() as Ref<GatewayNode>;
 const farm = ref() as Ref<Farm>;
+const ipv4 = ref(false);
+const domainNameCmp = ref();
 const smtp = ref(createSMTPServer());
+const dedicated = ref(false);
+const certified = ref(false);
+const selectedNode = ref() as Ref<INode>;
 
-async function deploy() {
+const flist: Flist = {
+  value: "https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.2.flist",
+  entryPoint: "/sbin/zinit init",
+};
+
+function finalize(deployment: any) {
+  layout.value.reloadDeploymentsList();
+  layout.value.setStatus("success", "Successfully deployed a discourse instance.");
+  layout.value.openDialog(deployment, deploymentListEnvironments.discourse);
+}
+
+async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.Discourse.toLowerCase();
@@ -117,7 +173,7 @@ async function deploy() {
     twinId: profileManager.profile!.twinId,
   });
 
-  const domain = subdomain + "." + gateway.value.domain;
+  const domain = customDomain ? gatewayName.domain : subdomain + "." + gatewayName.domain;
   let grid: GridClient | null;
   let vm: any;
 
@@ -129,25 +185,21 @@ async function deploy() {
     vm = await deployVM(grid!, {
       name: name.value,
       network: {
-        addAccess: true,
-        accessNodeId: gateway.value.id,
+        addAccess: !!gatewayName.id,
+        accessNodeId: gatewayName.id,
       },
       machines: [
         {
           name: name.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
-          disks: [
-            {
-              size: solution.value.disk,
-              mountPoint: "/var/lib/docker",
-            },
-          ],
-          flist: "https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.2.flist",
-          entryPoint: "/sbin/zinit init",
+          disks: [{ size: solution.value?.disk, mountPoint: "/var/lib/docker" }],
+          flist: flist.value,
+          entryPoint: flist.entryPoint,
           rootFilesystemSize: rootFs(solution.value.cpu, solution.value.memory),
           farmId: farm.value.farmID,
           farmName: farm.value.name,
+          publicIpv4: ipv4.value,
           country: farm.value.country,
           planetary: true,
           envs: [
@@ -162,11 +214,19 @@ async function deploy() {
             { key: "THREEBOT_PRIVATE_KEY", value: generatePubKey() },
             { key: "FLASK_SECRET_KEY", value: generatePassword(8) },
           ],
+          nodeId: selectedNode.value.nodeId,
+          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          certified: certified.value,
         },
       ],
     });
   } catch (e) {
     return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a discourse instance."));
+  }
+  if (customDomain && ipv4.value) {
+    vm[0].customDomain = gatewayName.domain;
+    finalize(vm);
+    return;
   }
 
   try {
@@ -174,19 +234,13 @@ async function deploy() {
 
     await deployGatewayName(grid!, {
       name: subdomain,
-      nodeId: gateway.value.id,
-      backends: [
-        {
-          ip: vm[0].interfaces[0].ip,
-          port: 88,
-        },
-      ],
+      nodeId: gatewayName.id!,
+      ip: vm[0].interfaces[0].ip,
+      port: 88,
       networkName: vm[0].interfaces[0].network,
+      fqdn: gatewayName?.useFQDN ? gatewayName?.domain : undefined,
     });
-
-    layout.value.reloadDeploymentsList();
-    layout.value.setStatus("success", "Successfully deployed a discourse instance.");
-    layout.value.openDialog(vm, deploymentListEnvironments.discourse);
+    finalize(vm);
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
     await rollbackDeployment(grid!, name.value);
@@ -201,19 +255,28 @@ function generatePubKey(): string {
 </script>
 
 <script lang="ts">
+import DomainName from "../components/domain_name.vue";
+import FarmGatewayManager from "../components/farm_gateway_manager.vue";
+// import Networks from "../components/networks.vue";
 import SelectFarm from "../components/select_farm.vue";
-import SelectGatewayNode from "../components/select_gateway_node.vue";
+import SelectFarmManager from "../components/select_farm_manager.vue";
+import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { INode } from "../utils/filter_nodes";
 
 export default {
   name: "TfDiscourse",
   components: {
     SmtpServer,
     SelectSolutionFlavor,
-    SelectGatewayNode,
+    DomainName,
+    FarmGatewayManager,
+    // Networks,
     SelectFarm,
+    SelectNode,
+    SelectFarmManager,
   },
 };
 </script>

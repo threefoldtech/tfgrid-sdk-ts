@@ -1,11 +1,11 @@
 <template>
   <v-card color="transparent" flat tile>
-    <v-window v-model="onboarding">
-      <v-window-item v-for="(card, index) in cards" :key="`card-${index}`">
-        <v-card color="transparent">
-          <v-row class="fill-height" align="center" justify="center">
+    <v-carousel light show-arrows-on-hover cycle hide-delimiters height="fit-content" v-model="onboarding">
+      <v-carousel-item v-for="(card, index) in cards" :key="`card-${index}`">
+        <v-card flat color="transparent">
+          <v-row align="center" justify="center">
             <v-card-text class="text-center" style="font-size: 2rem">
-              <v-img width="450" style="margin: auto; margin-bottom: 20px" :src="card.img"> </v-img>
+              <v-img width="750" style="margin: auto; margin-bottom: 20px" :src="card.img"> </v-img>
               <v-card-subtitle style="font-size: 1.5rem; padding: 5px">
                 {{ card.text }}
               </v-card-subtitle>
@@ -32,24 +32,8 @@
             </v-card-text>
           </v-row>
         </v-card>
-      </v-window-item>
-    </v-window>
-
-    <v-card-actions class="justify-space-between">
-      <v-btn text @click="prev">
-        <v-icon>mdi-chevron-left</v-icon>
-      </v-btn>
-      <v-item-group v-model="onboarding" class="text-center" mandatory>
-        <v-item v-for="n in cards.length" :key="`btn-${n}`" v-slot="{ active, toggle }">
-          <v-btn :input-value="active" icon @click="toggle">
-            <v-icon>mdi-record</v-icon>
-          </v-btn>
-        </v-item>
-      </v-item-group>
-      <v-btn text @click="next">
-        <v-icon>mdi-chevron-right</v-icon>
-      </v-btn>
-    </v-card-actions>
+      </v-carousel-item>
+    </v-carousel>
   </v-card>
 </template>
 <script lang="ts">
@@ -69,12 +53,6 @@ export default class WelcomeWindow extends Vue {
   onboarding = 0;
   blank = "blank";
   cards: WelcomeCard[] = [
-    {
-      text: "The Decentralized Cloud Awaits!",
-      button: "Download polkadot{.js} extension to access the Portal",
-      link: "https://polkadot.js.org/extension/",
-      img: require("../../assets/decentralized.png"),
-    },
     {
       text: "Discover the ThreeFold Grid",
       button: "View ThreeFold Capacity ",
@@ -102,3 +80,9 @@ export default class WelcomeWindow extends Vue {
   }
 }
 </script>
+<style>
+.v-window__prev,
+.v-window__next {
+  background: transparent !important;
+}
+</style>

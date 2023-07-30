@@ -50,8 +50,8 @@ To get a local copy up and running follow these simple example steps:
 
   ```bash
   export VERSION="v1.3.0-rc4"
-  cd packages/dashboard/public
-  source ../scripts/build-env.sh
+  cd packages/dashboard
+  source ./scripts/build-env.sh
   # these commands will generate a config file for you against `devnet`
   ```
 
@@ -62,8 +62,8 @@ To get a local copy up and running follow these simple example steps:
   ```bash
   export VERSION="v1.3.0-rc4"
   export TFCHAIN_NETWORK="custom"
-  cd packages/dashboard/public
-  source ../scripts/build-env.sh
+  cd packages/dashboard
+  source ./scripts/build-env.sh
 
   # The terminal will ask you about the required env vars, see below.
   ```

@@ -1,7 +1,7 @@
 import { RouteConfig } from "vue-router";
 
+import WelcomeWindow from "@/other/views/WelcomeWindow.vue";
 import AccountView from "@/portal/views/Account.vue";
-import AccountsView from "@/portal/views/Accounts.vue";
 import DaoView from "@/portal/views/Dao.vue";
 import NodesView from "@/portal/views/Nodes.vue";
 import SwapView from "@/portal/views/Swap.vue";
@@ -11,7 +11,7 @@ export const portalRouter: RouteConfig[] = [
   {
     path: "/",
     name: "accounts",
-    component: AccountsView,
+    component: WelcomeWindow,
   },
   {
     path: "/:accountID",

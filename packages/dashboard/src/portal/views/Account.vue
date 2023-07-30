@@ -22,15 +22,10 @@
     </v-dialog>
   </v-container>
 
-  <v-container v-else-if="$store.state.portal.accounts.length === 0">
-    <v-card transparent outlined>
-      <WelcomeWindow />
-    </v-card>
-  </v-container>
   <v-container v-else-if="$store.state.credentials.loading">
     <div class="d-flex justify-center" style="display: block; padding: 10%">
-      <v-progress-circular indeterminate color="blue" :size="335" :width="7">
-        <span style="font-size: large; color: white">Loading Twin Details</span>
+      <v-progress-circular indeterminate :size="335" :width="7">
+        <span style="font-size: large">Loading Twin Details</span>
       </v-progress-circular>
     </div>
   </v-container>
@@ -63,19 +58,6 @@
           create
         </v-btn>
       </v-card>
-
-      <!-- <v-row>
-        <v-col>
-          <v-card class="pa-5 text-center d-flex align-center justify-center">
-            <v-btn
-              class="primary"
-              :target="'blank'"
-              :href="'https://library.threefold.me/info/manual/#/manual__yggdrasil_client'"
-              >Why do I even need a twin?</v-btn
-            >
-          </v-card>
-        </v-col>
-      </v-row> -->
     </v-container>
   </v-container>
 </template>
@@ -87,7 +69,6 @@ import { Component, Vue } from "vue-property-decorator";
 
 import config from "@/portal/config";
 
-import WelcomeWindow from "../components/WelcomeWindow.vue";
 import { acceptTermsAndCondition, userAcceptedTermsAndConditions } from "../lib/accepttc";
 import { activateThroughActivationService } from "../lib/activation";
 import { createTwin } from "../lib/twin";
@@ -96,7 +77,7 @@ import Twin from "./Twin.vue";
 
 @Component({
   name: "AccountView",
-  components: { WelcomeWindow, Twin },
+  components: { Twin },
 })
 export default class AccountView extends Vue {
   documentLink = "https://library.threefold.me/info/legal/#/";

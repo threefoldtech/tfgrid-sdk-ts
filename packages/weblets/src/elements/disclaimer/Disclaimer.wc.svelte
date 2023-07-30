@@ -2,14 +2,42 @@
 
 <script lang="ts">
   const envs = {
-    dev: { env: "development", url: "https://github.com/threefoldtech/test_feedback/issues" },
-    test: { env: "testing", url: "https://github.com/threefoldtech/test_feedback/issues" },
-    qa: { env: "QA", url: "https://github.com/threefoldtech/test_feedback/issues" },
-    custom: { env: "customized", url: "https://github.com/threefoldtech/test_feedback/issues" },
+    dev: {
+      env: "development",
+      url: "https://github.com/threefoldtech/test_feedback/issues",
+      playground: "https://playground.dev.grid.tf/#/",
+    },
+    test: {
+      env: "testing",
+      url: "https://github.com/threefoldtech/test_feedback/issues",
+      playground: "https://playground.test.grid.tf/#/",
+    },
+    qa: {
+      env: "QA",
+      url: "https://github.com/threefoldtech/test_feedback/issues",
+      playground: "https://playground.qa.grid.tf/#/",
+    },
+    custom: {
+      env: "customized",
+      url: "https://github.com/threefoldtech/test_feedback/issues",
+      playground: "https://playground.grid.tf/#/",
+    },
   };
 
   $: env = envs[window.env?.NETWORK];
 </script>
+
+<div style="padding: 15px; margin-top: 20px; ">
+  <form class="box" style="background-color: #edd986;">
+    <p class="is-size-4 has-text-weight-bold">Warning</p>
+    <p>
+      This website is deprecated, please use the new <a
+        href={env.playground || "https://playground.grid.tf/#/"}
+        class="has-text-weight-bold">Playground</a
+      >
+    </p>
+  </form>
+</div>
 
 {#if env}
   <div style="padding: 15px;">

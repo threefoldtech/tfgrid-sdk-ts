@@ -11,7 +11,7 @@ class NodePage:
 
     farm_page = (By.XPATH , "//*[contains(text(), 'farms')]")
     node_page = (By.XPATH , "//*[contains(text(), 'Your Farm Nodes')]")
-    twin_id_label = (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div/div[1]/div[2]/div[1]/div[1]')
+    twin_id_label = (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div[1]/div[1]/div[2]/div[1]/div/div[2]/div[1]')
     search_node_input = (By.XPATH, '/html/body/div[1]/div[1]/div[3]/div/div/div[5]/div/div[1]/div/div[1]/div/input')
     node_table = (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div/div[5]/div[2]/div[1]/div[1]/table/tbody/tr')
     node_id = (By.XPATH , "//*[contains(text(), 'Node ID')]")
@@ -30,6 +30,9 @@ class NodePage:
     cancel = (By.XPATH , '//*[@id="app"]/div[4]/div/div/div[3]/button[2]')
     save = (By.XPATH , '//*[@id="app"]/div[4]/div/div/div[3]/button[3]')
     submit = (By.XPATH , '//*[@id="app"]/div[6]/div/div/div[3]/button[1]')
+    fee_input = (By.XPATH , '/html/body/div[1]/div[5]/div/div/div[3]/form/div/div/div[1]/div/input')
+    set_btn = (By.XPATH , '//*[@id="app"]/div[5]/div/div/div[4]/button[2]')
+    fee_id = (By.XPATH , "//*[contains(text(), 'Additional fees will be added to your node')]")
     table_xpath = '//*[@id="app"]/div[1]/div[3]/div/div/div[5]/div[2]/div[1]/div[1]/table/tbody/tr'
 
     def __init__(self, browser):
@@ -37,8 +40,7 @@ class NodePage:
       
     def navigate(self, user):
         self.browser.find_element(By.XPATH, "//*[contains(text(), '"+ user +"')]").click()
-        id = self.browser.find_element(*self.twin_id_label).text
-        self.twin_id = int(id[id.find(':')+2:])
+        self.twin_id = int(self.browser.find_element(*self.twin_id_label).text)
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.farm_page))
         self.browser.find_element(*self.farm_page).click()
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.node_page))
@@ -196,6 +198,18 @@ class NodePage:
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.update_msg))
         WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.submit))
         self.browser.find_element(*self.submit).click()
+    
+    def setup_fee(self, node_id):
+        for i in range(1, len(self.browser.find_elements(*self.node_table))+1):
+            if (self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[2]/p").text==str(node_id)):
+                self.browser.find_element(By.XPATH, self.table_xpath+ '['+ str(i) +']/td[7]/button[2]').click()
+                WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.fee_id))
+
+    def set_fee(self, fee):
+        self.browser.find_element(*self.fee_input).send_keys(Keys.CONTROL + "a")
+        self.browser.find_element(*self.fee_input).send_keys(Keys.DELETE)
+        self.browser.find_element(*self.fee_input).send_keys(fee)
+        return self.browser.find_element(*self.set_btn)
 
     def wait_for(self, keyword):
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), '"+ keyword +"')]")))

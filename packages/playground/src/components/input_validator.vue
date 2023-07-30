@@ -19,6 +19,8 @@ import { computed, getCurrentInstance, onMounted, onUnmounted, type PropType, re
 import { useForm, ValidatorStatus } from "@/hooks/form_validator";
 import type { InputValidatorService } from "@/hooks/input_validator";
 
+import type { INode } from "../utils/filter_nodes";
+
 export default {
   name: "InputValidator",
   props: {
@@ -34,7 +36,7 @@ export default {
       default: () => [] as AsyncRule[],
     },
     value: {
-      type: String as PropType<string | number | undefined>,
+      type: String as PropType<string | number | INode | undefined>,
       required: true,
     },
     validMessage: String,

@@ -4,7 +4,9 @@
     :cpu="solution?.cpu"
     :memory="solution?.memory"
     :disk="(solution?.disk ?? 0) + 10 + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
-    :ivp4="ipv4"
+    :ipv4="ipv4"
+    :certified="certified"
+    :dedicated="dedicated"
     title-image="images/icons/umbrel.png"
   >
     <template #title>Deploy an Umbrel Instance </template>
@@ -60,13 +62,7 @@
         </input-validator>
       </password-input-wrapper>
 
-      <input-tooltip
-        #="props"
-        inline
-        tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
-      >
-        <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" v-bind="props" />
-      </input-tooltip>
+      <Network v-model:ipv4="ipv4" />
 
       <SelectSolutionFlavor
         v-model="solution"
@@ -74,15 +70,46 @@
         :standard="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
         :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
       />
-      <SelectFarm
-        :filters="{
-          cpu: solution?.cpu,
-          memory: solution?.memory,
-          ssd: (solution?.disk ?? 0) + 10 + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
-          publicIp: ipv4,
-        }"
-        v-model="farm"
-      />
+
+      <input-tooltip
+        inline
+        tooltip="Click to know more about dedicated nodes."
+        href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+      >
+        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+      </input-tooltip>
+      <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+        <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+      </input-tooltip>
+
+      <SelectFarmManager>
+        <SelectFarm
+          :filters="{
+            cpu: solution?.cpu,
+            memory: solution?.memory,
+            ssd: (solution?.disk ?? 0) + 10 + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
+            publicIp: ipv4,
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+            certified: certified,
+          }"
+          v-model="farm"
+        />
+
+        <SelectNode
+          v-model="selectedNode"
+          :filters="{
+            farmId: farm?.farmID,
+            cpu: solution?.cpu,
+            memory: solution?.memory,
+            disks: [
+              { size: 10, mountPoint: '/var/lib/docker' },
+              { size: solution?.disk, mountPoint: '/umbrelDisk' },
+            ],
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+            certified: certified,
+          }"
+        />
+      </SelectFarmManager>
     </form-validator>
 
     <template #footer-actions>
@@ -96,7 +123,7 @@ import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, solutionFlavor as SolutionFlavor } from "../types";
+import type { Farm, Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
@@ -114,6 +141,13 @@ const password = ref(generatePassword());
 const ipv4 = ref(false);
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
+const flist: Flist = {
+  value: "https://hub.grid.tf/tf-official-apps/umbrel-latest.flist",
+  entryPoint: "/sbin/zinit init",
+};
+const dedicated = ref(false);
+const certified = ref(false);
+const selectedNode = ref() as Ref<INode>;
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -143,8 +177,8 @@ async function deploy() {
               mountPoint: "/umbrelDisk",
             },
           ],
-          flist: "https://hub.grid.tf/tf-official-apps/umbrel-latest.flist",
-          entryPoint: "/sbin/zinit init",
+          flist: flist.value,
+          entryPoint: flist.entryPoint,
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
@@ -157,6 +191,9 @@ async function deploy() {
             { key: "UMBREL_DISK", value: "/umbrelDisk" },
           ],
           rootFilesystemSize: rootFs(solution.value.cpu, solution.value.memory),
+          nodeId: selectedNode.value.nodeId,
+          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          certified: certified.value,
         },
       ],
     });
@@ -172,14 +209,19 @@ async function deploy() {
 
 <script lang="ts">
 import SelectFarm from "../components/select_farm.vue";
+import SelectFarmManager from "../components/select_farm_manager.vue";
+import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { INode } from "../utils/filter_nodes";
 
 export default {
   name: "TfUmbrel",
   components: {
     SelectSolutionFlavor,
     SelectFarm,
+    SelectNode,
+    SelectFarmManager,
   },
 };
 </script>

@@ -1,12 +1,12 @@
 <template>
   <section>
-    <h6 class="text-h5 mb-4">Choose a Location</h6>
+    <h6 class="text-h5 mb-4 mt-2">Choose a Location</h6>
     <SelectCountry v-model="country" />
 
     <input-validator :rules="[validators.required('Farm is required.')]" :value="farm?.farmID" ref="farmInput">
       <input-tooltip tooltip="The name of the farm that you want to deploy inside it.">
         <v-autocomplete
-          :disabled="loading"
+          :disabled="loading || loadingNodes"
           label="Farm Name"
           v-bind="props"
           :items="farms"
@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, type PropType, ref, watch } from "vue";
+import { onMounted, onUnmounted, type PropType, ref, watch } from "vue";
 
 import { useInputRef } from "@/hooks/input_validator";
 
@@ -31,6 +31,8 @@ import { useProfileManager } from "../stores/profile_manager";
 import type { Farm } from "../types";
 import { getFarms } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
+import { useFarmGatewayManager } from "./farm_gateway_manager.vue";
+import { useFarm } from "./select_farm_manager.vue";
 
 export interface Filters {
   publicIp?: boolean;
@@ -38,8 +40,11 @@ export interface Filters {
   memory?: number;
   ssd?: number;
   disk?: number;
+  certified?: boolean;
+  hasGPU?: boolean;
+  rentedBy?: number;
 }
-
+const FarmGatewayManager = useFarmGatewayManager();
 const props = defineProps({
   modelValue: { type: Object as PropType<Farm> },
   country: String,
@@ -49,16 +54,27 @@ const props = defineProps({
 const emits = defineEmits<{ (event: "update:modelValue", value?: Farm): void }>();
 
 const farmInput = useInputRef();
-
 const profileManager = useProfileManager();
 const country = ref<string>();
 
 const farm = ref<Farm>();
-watch([farm, country], ([f, c]) =>
-  emits("update:modelValue", f ? { farmID: f.farmID, name: f.name, country: c ?? undefined } : undefined),
-);
-
+const farmManager = useFarm();
+watch([farm, country], ([f, c]) => {
+  farmManager?.setFarmId(f?.farmID);
+  emits("update:modelValue", f ? { farmID: f.farmID, name: f.name, country: c ?? undefined } : undefined);
+});
 const loading = ref(false);
+const loadingNodes = ref(farmManager?.getLoading());
+watch([farm, loading], ([farm, loading]) => {
+  if (loading) FarmGatewayManager?.setLoading(true);
+
+  if (farm && !loading) {
+    farm.country = country.value;
+    FarmGatewayManager?.register(farm);
+    FarmGatewayManager?.setLoading(false);
+  }
+});
+
 const farms = ref<Farm[]>([]);
 let initialized = false;
 async function loadFarms() {
@@ -79,6 +95,9 @@ async function loadFarms() {
       sru: filters.ssd,
       publicIPs: filters.publicIp,
       availableFor: grid!.twinId,
+      certified: filters.certified,
+      rentedBy: filters.rentedBy ? filters.rentedBy : undefined,
+      hasGPU: filters.hasGPU ? filters.hasGPU : undefined,
     },
     { exclusiveFor: props.exclusiveFor },
   );
@@ -103,6 +122,7 @@ async function loadFarms() {
   loading.value = false;
 }
 onMounted(loadFarms);
+onUnmounted(() => FarmGatewayManager?.unregister());
 
 const shouldBeUpdated = ref(false);
 watch(
@@ -114,7 +134,10 @@ watch(
       value.ssd === oldValue.ssd &&
       value.disk === oldValue.disk &&
       value.publicIp === oldValue.publicIp &&
-      value.country === oldValue.country
+      value.country === oldValue.country &&
+      value.certified === oldValue.certified &&
+      value.rentedBy === oldValue.rentedBy &&
+      value.hasGPU === oldValue.hasGPU
     )
       return;
 
