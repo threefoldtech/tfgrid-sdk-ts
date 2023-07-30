@@ -4,9 +4,7 @@
       class="mb-6"
       :style="{ opacity: $vuetify.theme.name === 'dark' ? 'var(--v-medium-emphasis-opacity)' : '' }"
       v-if="$slots.description"
-    >
-      <slot name="description"></slot>
-    </div>
+    ></div>
     <div
       class="position-absolute pa-1 rounded-circle border"
       :style="{

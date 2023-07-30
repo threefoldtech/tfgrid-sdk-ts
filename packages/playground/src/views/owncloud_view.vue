@@ -1,13 +1,5 @@
 <template>
   <view-layout>
-    <template #description
-      >Owncloud develops and provides open-source software for content collaboration, allowing teams to easily share and
-      work on files seamlessly regardless of device or location.
-      <a target="_blank" class="app-link" href="https://manual.grid.tf/weblets/weblets_owncloud.html">
-        read more about OwnCloud
-      </a></template
-    >
-
     <TfOwncloud />
 
     <template #list>

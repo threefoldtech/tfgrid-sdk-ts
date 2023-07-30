@@ -1,13 +1,5 @@
 <template>
   <view-layout>
-    <template #description
-      >Discourse is the 100% open source discussion platform built for the next decade of the Internet. Use it as a
-      mailing list, discussion forum, long-form chat room, and more!
-      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_discourse.html" class="app-link">
-        read more about Discourse
-      </a></template
-    >
-
     <TfDiscourse />
 
     <template #list>
