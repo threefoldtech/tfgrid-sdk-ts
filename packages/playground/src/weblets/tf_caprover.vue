@@ -15,6 +15,7 @@
     :dedicated="leader.dedicated"
     title-image="images/icons/caprover.png"
   >
+    <template #title>Deploy a Caprover Instance</template>
     <d-tabs
       :tabs="[
         { title: 'Config', value: 'config' },

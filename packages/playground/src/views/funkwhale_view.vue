@@ -1,13 +1,5 @@
 <template>
   <view-layout>
-    <template #description
-      >Funkwhale is social platform to enjoy and share music. Funkwhale is a community-driven project that lets you
-      listen and share music and audio within a decentralized, open network.
-      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_funkwhale.html" class="app-link">
-        read more about Funkwhale
-      </a></template
-    >
-
     <TfFunkwhale />
 
     <template #list>

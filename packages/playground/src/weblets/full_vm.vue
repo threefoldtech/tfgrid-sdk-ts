@@ -10,13 +10,6 @@
     title-image="images/icons/vm.png"
   >
     <template #title> Deploy a Full Virtual Machine </template>
-    <template #subtitle
-      >Deploy a new full virtual machine on the Threefold Grid
-      <a class="app-link" href="https://manual.grid.tf/weblets/weblets_fullVm.html" target="_blank">
-        Quick start documentation
-      </a>
-      .
-    </template>
 
     <d-tabs
       :tabs="[
