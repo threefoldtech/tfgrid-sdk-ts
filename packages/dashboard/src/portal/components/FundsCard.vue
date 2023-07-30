@@ -1,8 +1,13 @@
 <template>
   <v-container class="px-0">
     <v-card flat class="d-flex align-center font-weight-bold mx-0 transparent">
-      <v-card-actions class="px-0">
-        <v-btn @click="addTFT()" color="white" style="color: black; max-width: 90px" :loading="loadingAddTFT"
+      <v-card-actions>
+        <v-btn
+          @click="addTFT()"
+          color="primary"
+          class="px-6"
+          style="color: white; border: 1px solid white !important; max-width: 140px"
+          :loading="loadingAddTFT"
           >GET TFT</v-btn
         >
       </v-card-actions>

@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <div>
-      <v-app-bar :class="{ 'sidebar-opened': !mini }" color="#064663" dense dark fixed height="65">
+      <v-app-bar :class="{ 'sidebar-opened': !mini, 'ml-4 ': !mini }" color="#064663" dense dark fixed height="65">
         <v-app-bar-nav-icon></v-app-bar-nav-icon>
 
         <v-toolbar-title class="font-weight-bold" @click="redirectToHomePage" style="cursor: pointer"
@@ -23,10 +23,6 @@
             <v-btn icon @click="toggle_dark_mode">
               <v-icon>mdi-theme-light-dark</v-icon>
             </v-btn>
-
-            <a href="https://manual.grid.tf/dashboard/dashboard.html" target="_blank">
-              <v-btn class="custom-button" color="white" style="color: black"> Help</v-btn>
-            </a>
 
             <TfChainConnector />
           </div>
