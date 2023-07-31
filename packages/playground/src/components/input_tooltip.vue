@@ -18,7 +18,7 @@
             </a>
 
             <template v-else>
-              <v-icon>mdi-information</v-icon>
+              <v-icon>mdi-information-outline</v-icon>
             </template>
           </span>
         </div>

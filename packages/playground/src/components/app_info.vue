@@ -1,7 +1,7 @@
 <template>
   <v-tooltip location="left" :text="tooltip">
     <template #activator="{ props }">
-      <v-btn v-bind="props" icon="mdi-information" @click="setOpenInfo(true)" />
+      <v-btn v-bind="props" icon="mdi-information-outline" @click="setOpenInfo(true)" />
     </template>
   </v-tooltip>
 
