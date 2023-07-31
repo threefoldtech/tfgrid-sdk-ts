@@ -121,7 +121,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
@@ -143,7 +143,8 @@ const ipv4 = ref(false);
 const planetary = ref(true);
 const cpu = 1;
 const memory = 512;
-const rootFsSize = rootFs(cpu, memory);
+const rootFsSize = computed(() => rootFs(cpu, memory));
+rootFs(cpu, memory);
 const farm = ref() as Ref<Farm>;
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
