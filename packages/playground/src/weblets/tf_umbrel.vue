@@ -3,7 +3,7 @@
     ref="layout"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
-    :disk="(solution?.disk ?? 0) + 10 + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
+    :disk="(solution?.disk ?? 0) + 10 + rootFilesystemSize"
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
@@ -87,7 +87,7 @@
           :filters="{
             cpu: solution?.cpu,
             memory: solution?.memory,
-            ssd: (solution?.disk ?? 0) + 10 + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
+            ssd: (solution?.disk ?? 0) + 10 + rootFilesystemSize,
             publicIp: ipv4,
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
@@ -119,7 +119,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
@@ -148,7 +148,7 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
-
+const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 async function deploy() {
   layout.value.setStatus("deploy");
 
@@ -190,7 +190,7 @@ async function deploy() {
             { key: "PASSWORD", value: password.value },
             { key: "UMBREL_DISK", value: "/umbrelDisk" },
           ],
-          rootFilesystemSize: rootFs(solution.value.cpu, solution.value.memory),
+          rootFilesystemSize: rootFilesystemSize.value,
           nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
