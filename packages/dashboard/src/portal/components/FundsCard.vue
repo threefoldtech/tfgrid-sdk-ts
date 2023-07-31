@@ -1,18 +1,14 @@
 <template>
-  <v-container class="px-0">
-    <v-card flat class="d-flex align-center font-weight-bold mx-0 transparent">
-      <v-card-actions>
-        <v-btn
-          @click="addTFT()"
-          color="primary"
-          class="px-6"
-          style="color: white; border: 1px solid white !important; max-width: 140px"
-          :loading="loadingAddTFT"
-          >GET TFT</v-btn
-        >
-      </v-card-actions>
-    </v-card>
-  </v-container>
+  <v-btn
+    id="tftBtn"
+    width="2000"
+    @click="addTFT()"
+    color="primary"
+    class="px-lg-6 px-md-2 px-sm-0 mx-sm-0"
+    style="color: white; border: 1px solid white !important; max-width: 140px; width: auto"
+    :loading="loadingAddTFT"
+    >GET TFT</v-btn
+  >
 </template>
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
@@ -80,3 +76,9 @@ export default class FundsCard extends Vue {
   }
 }
 </script>
+<style scoped>
+#tftBtn {
+  display: inline-block;
+  min-width: 10px !important;
+}
+</style>

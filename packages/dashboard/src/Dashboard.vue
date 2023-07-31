@@ -9,14 +9,10 @@
         >
 
         <v-spacer>
-          <v-row class="d-flex align-center justify-start">
-            <div>
-              <TftSwapPrice v-if="!loadingAPI" />
-            </div>
-            <div>
-              <FundsCard v-if="$store.state.credentials.initialized && $store.state.credentials.balance" />
-            </div>
-          </v-row>
+          <div class="d-flex align-center justify-start">
+            <TftSwapPrice v-if="!loadingAPI" />
+            <FundsCard v-if="$store.state.credentials.initialized && $store.state.credentials.balance" />
+          </div>
         </v-spacer>
         <div class="d-flex align-center">
           <div class="d-flex" style="align-items: center">

@@ -1,28 +1,26 @@
 <template>
-  <v-container class="pr-0">
-    <div class="d-flex ml-5">
-      <div v-if="!loading" class="d-flex" style="align-items: center">
-        <p>{{ prices[0].amount }} {{ prices[0].currency }}</p>
-        <v-tooltip>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn @click="priceSwap" icon v-bind="attrs" v-on="on" class="d-flex align-center">
-              <v-icon>mdi-swap-horizontal</v-icon>
-            </v-btn>
-          </template>
-          <span>TFT Exchange Rate</span>
-        </v-tooltip>
-        <p>{{ prices[1].amount }} {{ prices[1].currency }}</p>
-        <v-tooltip>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn @click="openInfoLink" icon v-bind="attrs" v-on="on" class="d-flex align-center">
-              <v-icon>mdi-information</v-icon>
-            </v-btn>
-          </template>
-          <span>More information</span>
-        </v-tooltip>
-      </div>
+  <div class="d-flex ml-5 w-auto">
+    <div v-if="!loading" class="d-flex" style="align-items: center">
+      <p>{{ prices[0].amount }} {{ prices[0].currency }}</p>
+      <v-tooltip>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn @click="priceSwap" icon v-bind="attrs" v-on="on" class="d-flex align-center">
+            <v-icon>mdi-swap-horizontal</v-icon>
+          </v-btn>
+        </template>
+        <span>TFT Exchange Rate</span>
+      </v-tooltip>
+      <p>{{ prices[1].amount }} {{ prices[1].currency }}</p>
+      <v-tooltip>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn @click="openInfoLink" icon v-bind="attrs" v-on="on" class="d-flex align-center">
+            <v-icon>mdi-information</v-icon>
+          </v-btn>
+        </template>
+        <span>More information</span>
+      </v-tooltip>
     </div>
-  </v-container>
+  </div>
 </template>
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
