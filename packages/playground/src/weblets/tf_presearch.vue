@@ -3,7 +3,7 @@
     ref="layout"
     :cpu="cpu"
     :memory="memory"
-    :disk="rootFsSize"
+    :disk="rootFilesystemSize"
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
@@ -73,7 +73,7 @@
             :filters="{
               cpu,
               memory,
-              ssd: rootFsSize,
+              ssd: rootFilesystemSize,
               publicIp: ipv4,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
@@ -89,7 +89,7 @@
               cpu,
               memory,
               ipv4: ipv4,
-              disks: [{ size: rootFsSize, mountPoint: '/' }],
+              disks: [{ size: rootFilesystemSize, mountPoint: '/' }],
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
@@ -143,8 +143,8 @@ const ipv4 = ref(false);
 const planetary = ref(true);
 const cpu = 1;
 const memory = 512;
-const rootFsSize = computed(() => rootFs(cpu, memory));
-rootFs(cpu, memory);
+const rootFilesystemSize = computed(() => rootFs(cpu, memory));
+
 const farm = ref() as Ref<Farm>;
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
@@ -200,7 +200,7 @@ async function deploy() {
               value: publicRestoreKey.value,
             },
           ],
-          rootFilesystemSize: rootFsSize,
+          rootFilesystemSize: rootFilesystemSize.value,
           nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
