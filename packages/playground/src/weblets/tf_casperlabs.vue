@@ -93,7 +93,7 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { type Ref, ref } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
@@ -121,6 +121,7 @@ const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
 const domainNameCmp = ref();
+const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu || 0, solution.value?.memory || 0));
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed a Casperlabs instance.");
@@ -172,6 +173,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
           nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
+          rootFilesystemSize: rootFilesystemSize.value,
         },
       ],
     });
@@ -215,6 +217,7 @@ import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { INode } from "../utils/filter_nodes";
+import rootFs from "../utils/root_fs";
 
 export default {
   name: "TFCasperlabs",
