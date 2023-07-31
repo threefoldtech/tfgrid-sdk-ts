@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <div>
-      <v-app-bar :class="{ 'sidebar-opened': !mini }" color="#064663" dense dark fixed height="65">
+      <v-app-bar :class="{ 'sidebar-opened': !mini, 'ml-4 ': !mini }" color="#064663" dense dark fixed height="65">
         <v-app-bar-nav-icon></v-app-bar-nav-icon>
 
         <v-toolbar-title class="font-weight-bold" @click="redirectToHomePage" style="cursor: pointer"
@@ -9,18 +9,16 @@
         >
 
         <v-spacer>
-          <TftSwapPrice v-if="!loadingAPI" />
+          <div class="d-flex align-center justify-start">
+            <TftSwapPrice v-if="!loadingAPI" />
+            <FundsCard v-if="$store.state.credentials.initialized && $store.state.credentials.balance" />
+          </div>
         </v-spacer>
         <div class="d-flex align-center">
-          <FundsCard v-if="$store.state.credentials.initialized && $store.state.credentials.balance" />
           <div class="d-flex" style="align-items: center">
             <v-btn icon @click="toggle_dark_mode">
               <v-icon>mdi-theme-light-dark</v-icon>
             </v-btn>
-
-            <a href="https://manual.grid.tf/dashboard/dashboard.html" target="_blank">
-              <v-btn class="custom-button" color="white" style="color: black"> Help</v-btn>
-            </a>
 
             <TfChainConnector />
           </div>

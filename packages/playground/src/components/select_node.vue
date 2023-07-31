@@ -133,6 +133,8 @@ const cards: NodeGPUCardType[] = [];
 const emptyResult = ref(false);
 const validator = ref();
 const pingingNode = ref(false);
+const delay = ref();
+
 watch(selectedCards, async () => {
   for (const card of nodeCards.value) {
     for (const selectedCard of selectedCards.value) {
@@ -209,6 +211,7 @@ watch(
       return;
     shouldBeUpdated.value = true;
   },
+  { deep: false },
 );
 
 watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
@@ -220,7 +223,10 @@ watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
       availableNodes.value = [];
       return;
     }
-    loadNodes(farmId);
+    clearTimeout(delay.value);
+    delay.value = setTimeout(() => {
+      loadNodes(farmId);
+    }, 1000);
   });
 });
 

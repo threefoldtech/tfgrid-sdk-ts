@@ -1,7 +1,5 @@
 <template>
   <view-layout>
-    <template #description>Deploy your own cloud-init based virtual machine</template>
-
     <FullVm />
 
     <template #list>
