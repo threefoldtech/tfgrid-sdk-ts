@@ -10,9 +10,12 @@
         leader.solution?.disk ?? 0 + rootFs(leader.solution?.cpu ?? 0, leader.solution?.memory ?? 0),
       )
     "
-    :ivp4="true"
+    :ipv4="true"
+    :certified="leader.certified"
+    :dedicated="leader.dedicated"
     title-image="images/icons/caprover.png"
   >
+    <template #title>Deploy a Caprover Instance</template>
     <d-tabs
       :tabs="[
         { title: 'Config', value: 'config' },
@@ -173,6 +176,9 @@ function normalizeCaproverWorker(worker: CW, envs: Env[]): Machine {
       },
     ],
     envs,
+    nodeId: worker.selectedNode?.nodeId,
+    rentedBy: worker.dedicated ? profileManager.profile?.twinId : undefined,
+    certified: worker.certified,
   };
 }
 </script>

@@ -12,12 +12,18 @@
       destroy
       :hide-tabs="!!$props.projectName"
     >
-      <VmDeploymentTable :projectName="tabs[activeTab].value" v-model="selectedItems" :deleting="deleting" ref="table">
+      <VmDeploymentTable
+        :projectName="tabs[activeTab].value"
+        v-model="selectedItems"
+        :deleting="deleting"
+        ref="table"
+        @click:row="clickOpenDialog"
+      >
         <template #Fullvm-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.vm)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
         </template>
 
@@ -25,7 +31,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.vm)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
         </template>
 
@@ -33,18 +39,18 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.caprover)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Admin Panel"
-            color="info"
+            color="white"
             icon="mdi-view-dashboard"
             :href="'http://captain.' + item.value[0].env.CAPROVER_ROOT_DOMAIN"
           />
           <IconActionBtn
             icon="mdi-cog"
             tooltip="Manage Workers"
-            color="secondary"
+            color="white"
             @click="dialog = item.value.deploymentName"
           />
 
@@ -61,11 +67,11 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.peertube)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Preview"
-            color="info"
+            color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.PEERTUBE_WEBSERVER_HOSTNAME"
           />
@@ -75,11 +81,11 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.funkwhale)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Preview"
-            color="info"
+            color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.FUNKWHALE_HOSTNAME"
           />
@@ -89,17 +95,17 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.taiga)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Admin Panel"
-            color="info"
+            color="white"
             icon="mdi-view-dashboard"
             :href="'http://' + item.value[0].env.DOMAIN_NAME + '/admin/'"
           />
           <IconActionBtn
             tooltip="Preview"
-            color="secondary"
+            color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.DOMAIN_NAME"
           />
@@ -109,7 +115,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.presearch)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
         </template>
 
@@ -117,20 +123,20 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.mattermost)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Preview" color="info" icon="mdi-web" :href="item.value[0].env.SITE_URL" />
+          <IconActionBtn tooltip="Preview" color="white" icon="mdi-web" :href="item.value[0].env.SITE_URL" />
         </template>
 
         <template #Discourse-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.discourse)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Preview"
-            color="info"
+            color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.DISCOURSE_HOSTNAME"
           />
@@ -140,11 +146,11 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.freeflow)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Preview"
-            color="info"
+            color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.DIGITALTWIN_APPID"
           />
@@ -154,11 +160,11 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.casperlabs)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Preview"
-            color="info"
+            color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.CASPERLABS_HOSTNAME"
           />
@@ -168,11 +174,11 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.owncloud)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Preview"
-            color="info"
+            color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.OWNCLOUD_DOMAIN"
           />
@@ -182,11 +188,11 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.subsquid)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Preview"
-            color="info"
+            color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.SUBSQUID_WEBSERVER_HOSTNAME + '/graphql'"
           />
@@ -196,7 +202,7 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.algorand)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
         </template>
 
@@ -204,11 +210,11 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.vm)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Visit"
-            color="info"
+            color="white"
             icon="mdi-web"
             :href="
               'http://' +
@@ -223,11 +229,11 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.umbrel)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
             tooltip="Admin Panel"
-            color="info"
+            color="white"
             icon="mdi-view-dashboard"
             :href="
               'http://' +
@@ -242,12 +248,12 @@
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
-            @click="layout.openDialog(item?.value, deploymentListEnvironments.wordpress)"
+            @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Preview" color="info" icon="mdi-web" :href="'https://' + item.value[0].env.WP_URL" />
+          <IconActionBtn tooltip="Preview" color="white" icon="mdi-web" :href="'https://' + item.value[0].env.WP_URL" />
           <IconActionBtn
             tooltip="Admin Panel"
-            color="secondary"
+            color="white"
             icon="mdi-view-dashboard"
             :href="'https://' + item.value[0].env.WP_URL + '/wp-admin'"
           />
@@ -260,17 +266,18 @@
           v-model="selectedItems"
           :deleting="deleting"
           ref="table"
+          @click:row="clickOpenDialog"
         >
           <template #actions="{ item }">
             <IconActionBtn
               tooltip="Show Details"
               icon="mdi-eye-outline"
-              @click="layout.openDialog(item?.value, deploymentListEnvironments.k8s)"
+              @click="openDialog(tabs[activeTab].value, item)"
             />
             <IconActionBtn
               icon="mdi-cog"
               tooltip="Manage Workers"
-              color="secondary"
+              color="white"
               @click="dialog = item.value.deploymentName"
             />
 
@@ -388,6 +395,20 @@ async function onDelete(k8s = false) {
   deleting.value = false;
 }
 
+const VMS: string[] = [ProjectName.Fullvm, ProjectName.VM, ProjectName.NodePilot];
+function openDialog(project: string, item?: { value: any }): void {
+  const key: keyof typeof deploymentListEnvironments = VMS.includes(project)
+    ? "vm"
+    : project === ProjectName.Kubernetes
+    ? "k8s"
+    : (project.toLowerCase() as any);
+  layout.value.openDialog(item?.value, deploymentListEnvironments[key]);
+}
+
+function clickOpenDialog(_: MouseEvent, { item }: any) {
+  return openDialog(tabs[activeTab.value].value, item);
+}
+
 /* List Manager */
 const { uid } = getCurrentInstance() as { uid: number };
 const deploymentListManager = useDeploymentListManager();
@@ -406,7 +427,7 @@ import K8sDeploymentTable from "../components/k8s_deployment_table.vue";
 import ManageCaproverWorkerDialog from "../components/manage_caprover_worker_dialog.vue";
 import ManageK8SWorkerDialog from "../components/manage_k8s_worker_dialog.vue";
 import VmDeploymentTable from "../components/vm_deployment_table.vue";
-import type { ProjectName } from "../types";
+import { ProjectName } from "../types";
 
 export default {
   name: "TfDeploymentList",

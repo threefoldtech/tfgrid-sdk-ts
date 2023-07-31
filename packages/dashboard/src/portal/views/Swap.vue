@@ -83,7 +83,7 @@
         color="primary"
         :target="'blank'"
         class="text-decoration-none"
-        :href="'https://manual.grid.tf/TF_Farmer_Guide/TF_Complete_Farmer_Guide/farmer_guide.html?highlight=bridge#how-to-use-the-tfchain-stellar-bridge'"
+        :href="'https://manual.grid.tf/threefold_token/tft_bridges/tfchain_stellar_bridge.html#how-to-use-the-tfchain-stellar-bridge'"
         >How is it done?</a
       >
     </v-container>

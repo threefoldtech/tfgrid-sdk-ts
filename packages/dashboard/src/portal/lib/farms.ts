@@ -1,6 +1,7 @@
-import { Signer } from "@polkadot/api/types";
-import { web3FromAddress } from "@polkadot/extension-dapp";
+import { ApiPromise } from "@polkadot/api";
 import axios from "axios";
+
+import { getKeypair } from "@/utils/signer";
 
 import config from "../config";
 import { getNodeAvailability, NodeAvailability } from "./nodes";
@@ -44,6 +45,7 @@ export interface nodeInterface {
   status: string;
   certificationType: string;
   dedicated: boolean;
+  extraFee: number;
   rentContractId: number;
   rentedByTwinId: number;
   receipts: receiptInterface[];
@@ -62,14 +64,15 @@ export async function getFarm(api: { query: any }, twinID: number) {
   const parsedFarms = twinFarms.map(async (farm: { toJSON: () => any }[]) => {
     const parsedFarm = farm[1].toJSON();
     const v2address = await getFarmPayoutV2Address(api, parsedFarm.id);
+    const nodesCount = await getNodesCount(api, parsedFarm.id);
 
     return {
       ...parsedFarm,
+      nodesCount,
       name: hex2a(parsedFarm.name),
       v2address: hex2a(v2address),
     };
   });
-
   return await Promise.all(parsedFarms);
 }
 export async function getFarmPayoutV2Address(
@@ -83,179 +86,76 @@ export async function getFarmPayoutV2Address(
   const address = await api.query.tfgridModule.farmPayoutV2AddressByFarmID(id);
   return address.toJSON();
 }
+
+export async function getNodesCount(api: { query: any }, farmID: number) {
+  const nodes = await axios.get(`${config.gridproxyUrl}/nodes?farm_ids=${farmID}&ret_count=true`);
+  const count = nodes.headers["count"];
+  return count;
+}
+
 export async function setFarmPayoutV2Address(
   address: string,
-  api: {
-    tx: {
-      tfgridModule: {
-        addStellarPayoutV2address: (
-          arg0: number,
-          arg1: string,
-        ) => {
-          (): any;
-          new (): any;
-          signAndSend: {
-            (arg0: string, arg1: { signer: Signer }, arg2: any): any;
-            new (): any;
-          };
-        };
-      };
-    };
-  },
+  api: ApiPromise,
   id: number,
   v2address: string,
   callback: any,
 ) {
-  const injector = await web3FromAddress(address);
-
-  return api.tx.tfgridModule
-    .addStellarPayoutV2address(id, v2address)
-    .signAndSend(address, { signer: injector.signer }, callback);
+  const keypair = await getKeypair();
+  const nonce = await api.rpc.system.accountNextIndex(address);
+  return api.tx.tfgridModule.addStellarPayoutV2address(id, v2address).signAndSend(keypair, { nonce }, callback);
 }
-export async function createFarm(
-  address: string,
-  api: {
-    tx: {
-      tfgridModule: {
-        createFarm: (
-          arg0: string,
-          arg1: never[],
-        ) => {
-          (): any;
-          new (): any;
-          signAndSend: {
-            (arg0: string, arg1: { signer: Signer }, arg2: any): any;
-            new (): any;
-          };
-        };
-      };
-    };
-  },
-  name: string,
-  callback: any,
-) {
-  const injector = await web3FromAddress(address);
-
-  return api.tx.tfgridModule.createFarm(name, []).signAndSend(address, { signer: injector.signer }, callback);
+export async function createFarm(address: string, api: ApiPromise, name: string, callback: any) {
+  const keypair = await getKeypair();
+  const nonce = await api.rpc.system.accountNextIndex(address);
+  return api.tx.tfgridModule.createFarm(name, []).signAndSend(keypair, { nonce }, callback);
 }
 export async function createIP(
   address: string,
-  api: {
-    tx: {
-      tfgridModule: {
-        addFarmIp: (
-          arg0: number,
-          arg1: string,
-          arg2: string,
-        ) => {
-          (): any;
-          new (): any;
-          signAndSend: {
-            (arg0: string, arg1: { signer: Signer }, arg2: any): any;
-            new (): any;
-          };
-        };
-      };
-    };
-  },
+  api: ApiPromise,
   farmID: number,
   ip: string,
   gateway: string,
   callback: any,
 ) {
-  const injector = await web3FromAddress(address);
-
-  return api.tx.tfgridModule.addFarmIp(farmID, ip, gateway).signAndSend(address, { signer: injector.signer }, callback);
+  const keypair = await getKeypair();
+  const nonce = await api.rpc.system.accountNextIndex(address);
+  return api.tx.tfgridModule.addFarmIp(farmID, ip, gateway).signAndSend(keypair, { nonce }, callback);
 }
 
 export async function batchCreateIP(
   address: string,
-  api: any,
+  api: ApiPromise,
   farmID: number,
   ips: string[],
   gateway: string,
   callback: any,
 ) {
-  const injector = await web3FromAddress(address);
+  const keypair = await getKeypair();
+  const nonce = await api.rpc.system.accountNextIndex(address);
 
   const calls: any[] = [];
   ips.map(ip => calls.push(api.tx.tfgridModule.addFarmIp(farmID, ip, gateway)));
 
-  return api.tx.utility.batch(calls).signAndSend(address, { signer: injector.signer }, callback);
+  return api.tx.utility.batch(calls).signAndSend(keypair, { nonce }, callback);
 }
 
-export async function deleteIP(
-  address: string,
-  api: {
-    tx: {
-      tfgridModule: {
-        removeFarmIp: (
-          arg0: number,
-          arg1: any,
-        ) => {
-          (): any;
-          new (): any;
-          signAndSend: {
-            (arg0: string, arg1: { signer: Signer }, arg2: any): any;
-            new (): any;
-          };
-        };
-      };
-    };
-  },
-  farmID: number,
-  ip: { ip: string },
-  callback: any,
-) {
-  const injector = await web3FromAddress(address);
+export async function deleteIP(address: string, api: ApiPromise, farmID: number, ip: { ip: string }, callback: any) {
+  const keypair = await getKeypair();
+  const nonce = await api.rpc.system.accountNextIndex(address);
 
-  return api.tx.tfgridModule.removeFarmIp(farmID, ip.ip).signAndSend(address, { signer: injector.signer }, callback);
+  return api.tx.tfgridModule.removeFarmIp(farmID, ip.ip).signAndSend(keypair, { nonce }, callback);
 }
-export async function deleteNode(
-  address: string,
-  api: {
-    tx: {
-      tfgridModule: {
-        deleteNodeFarm: (arg0: any) => {
-          (): any;
-          new (): any;
-          signAndSend: {
-            (arg0: string, arg1: { signer: Signer }, arg2: any): any;
-            new (): any;
-          };
-        };
-      };
-    };
-  },
-  nodeId: number,
-  callback: any,
-) {
-  const injector = await web3FromAddress(address);
+export async function deleteNode(address: string, api: ApiPromise, nodeId: number, callback: any) {
+  const keypair = await getKeypair();
+  const nonce = await api.rpc.system.accountNextIndex(address);
 
-  return api.tx.tfgridModule.deleteNodeFarm(nodeId).signAndSend(address, { signer: injector.signer }, callback);
+  return api.tx.tfgridModule.deleteNodeFarm(nodeId).signAndSend(keypair, { nonce }, callback);
 }
-export async function deleteFarm(
-  address: string,
-  api: {
-    tx: {
-      tfgridModule: {
-        deleteFarm: (arg0: string) => {
-          (): any;
-          new (): any;
-          signAndSend: {
-            (arg0: string, arg1: { signer: Signer }, arg2: any): any;
-            new (): any;
-          };
-        };
-      };
-    };
-  },
-  farmId: string,
-  callback: any,
-) {
-  const injector = await web3FromAddress(address);
+export async function deleteFarm(address: string, api: ApiPromise, farmId: string, callback: any) {
+  const keypair = await getKeypair();
+  const nonce = await api.rpc.system.accountNextIndex(address);
 
-  return api.tx.tfgridModule.deleteFarm(farmId).signAndSend(address, { signer: injector.signer }, callback);
+  return api.tx.tfgridModule.deleteFarm(farmId).signAndSend(keypair, { nonce }, callback);
 }
 
 export async function getNodesByFarmID(farmIDs: any[], page: number, size: number): Promise<any> {
@@ -335,24 +235,7 @@ export async function getNodesByFarm(farmID: string) {
 }
 export async function addNodePublicConfig(
   address: string,
-  api: {
-    tx: {
-      tfgridModule: {
-        addNodePublicConfig: (
-          arg0: any,
-          arg1: any,
-          arg2: any,
-        ) => {
-          (): any;
-          new (): any;
-          signAndSend: {
-            (arg0: any, arg1: { signer: Signer }, arg2: any): any;
-            new (): any;
-          };
-        };
-      };
-    };
-  },
+  api: ApiPromise,
   farmID: number,
   nodeID: number,
   config: {
@@ -362,9 +245,8 @@ export async function addNodePublicConfig(
   } | null,
   callback: any,
 ) {
-  const injector = await web3FromAddress(address);
+  const keypair = await getKeypair();
+  const nonce = await api.rpc.system.accountNextIndex(address);
 
-  return api.tx.tfgridModule
-    .addNodePublicConfig(farmID, nodeID, config)
-    .signAndSend(address, { signer: injector.signer }, callback);
+  return api.tx.tfgridModule.addNodePublicConfig(farmID, nodeID, config).signAndSend(keypair, { nonce }, callback);
 }

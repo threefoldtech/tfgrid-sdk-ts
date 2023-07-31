@@ -1,7 +1,7 @@
 import math
 import datetime
 import random
-from utils.utils import generate_inavalid_gateway, generate_inavalid_ip, generate_ip, generate_leters, generate_string, get_node_seed, randomize_public_ipv4
+from utils.utils import generate_inavalid_gateway, generate_inavalid_ip, generate_ip, generate_leters, generate_string, get_node_seed, randomize_public_ipv4, valid_amount
 from pages.polka import PolkaPage
 from utils.grid_proxy import GridProxy
 from pages.node import NodePage
@@ -239,3 +239,37 @@ def test_remove_config(browser):
         if(counter==10):
             break
     assert grid_proxy.get_node_ipv4(node_id) == ''
+
+
+def test_additional_fee(browser):
+    """
+      Test Case: TC1750 - Additional Fee
+      Steps:
+          - Navigate to the dashboard.
+          - Select twin (with node).
+          - Click on farms from side menu.
+          - Click on 'Set Additional Fee' button.
+          - Enter Fee and press 'Set' button.
+      Result: Additional fee should have been set on dashboard and grid proxy.
+    """
+    node_page, polka_page, grid_proxy, password = before_test_setup(browser)
+    nodes = grid_proxy.get_twin_node(str(node_page.twin_id))
+    rand_node = random.randint(0,len(nodes)-1)
+    node_id = nodes[rand_node]['nodeId']
+    node_page.setup_fee(node_id)
+    cases = ['-10', '0', '-5', '-0', '-8.84']
+    for case in cases:
+        assert node_page.set_fee(case).is_enabled()==False
+        assert node_page.wait_for('Extra fee cannot be negative or 0')
+    fee = grid_proxy.get_node_fee(node_id)
+    new_fee = valid_amount()
+    node_page.set_fee(new_fee).click()
+    polka_page.authenticate_with_pass(password)
+    node_page.wait_for('Transaction succeeded: Fee is added to node ' + str(node_id))
+    counter = 0
+    while(fee != new_fee):
+        fee = grid_proxy.get_node_fee(node_id)
+        counter += 1
+        if(counter==40):
+            break
+    assert grid_proxy.get_node_fee(node_id) == new_fee

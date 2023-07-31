@@ -1,6 +1,4 @@
 /* eslint-disable */
-import { Signer } from "@polkadot/api/types";
-import { web3FromAddress } from "@polkadot/extension-dapp";
 import axios from "axios";
 import config from "../config";
 import { getBalance } from "./balance";
@@ -8,16 +6,38 @@ import { jsPDF } from "jspdf";
 import { nodeInterface } from "./farms";
 import moment from "moment";
 import "jspdf-autotable";
-import { apiInterface } from "./util";
-import { Any } from "@/hub/types/google/protobuf/any";
+import { Client } from "@threefold/tfchain_client";
+import { getKeypair } from "@/utils/signer";
+import { ApiPromise } from "@polkadot/api";
+import profileStore from "@/store";
+import toTeraOrGigaOrPeta from "@/explorer/filters/toTeraOrGigaOrPeta";
+
 export interface receiptInterface {
+  type: "MINTING" | "FIXUP";
   hash: string;
   mintingStart?: number;
   mintingEnd?: number;
-  measuredUptime?: number;
   fixupStart?: number;
   fixupEnd?: number;
   tft?: number;
+  cloud_units: {
+    cu: number;
+    su: number;
+    nu: number;
+  };
+  fixup_cloud_units?: {
+    cu: number;
+    su: number;
+    nu: number;
+  };
+  correct_cloud_units?: {
+    cu: number;
+    su: number;
+    nu: number;
+  };
+  startPeriodTimestamp: number;
+  endPeriodTimestamp: number;
+  fixupReward?: number;
 }
 interface UptimeEvent {
   uptime: number;
@@ -92,6 +112,14 @@ export async function getNodeAvailability(nodeId: number) {
   return { downtime: downtime, currentPeriod: secondsSinceCurrentPeriodStart };
 }
 
+export function getFarmUptimePercentage(farm: nodeInterface[]) {
+  let uptime = 0;
+  for (let i = 0; i < farm.length; i++) {
+    uptime += +getNodeUptimePercentage(farm[i]);
+  }
+  return (uptime / farm.length).toFixed(2);
+}
+
 export function getNodeUptimePercentage(node: nodeInterface) {
   return (
     ((node.availability.currentPeriod - node.availability.downtime) / node.availability.currentPeriod) *
@@ -108,20 +136,20 @@ export function getTime(num: number | undefined) {
 export function generateNodeSummary(doc: jsPDF, nodes: nodeInterface[]) {
   doc.setFontSize(15);
   const topY = 20;
-  const topX = 80;
+  const topX = 60;
   const lineOffset = 10;
   const cellOffset = 40;
   const cellX = 15;
   const cellY = topY + lineOffset;
 
-  doc.text("Total Nodes Summary", topX, topY);
+  doc.text(`Farm ${nodes[0].farmId} Nodes Minting Summary`, topX, topY);
   doc.setFontSize(10);
 
   doc.text(`Nodes: ${nodes.length}`, cellX, cellY);
   doc.text(`Receipts: ${nodes.reduce((total, node) => (total += node.receipts.length), 0)}`, cellX, cellY + lineOffset);
   doc.text(
     `Minting Receipts: ${nodes.reduce(
-      (total, node) => (total += node.receipts.filter(receipt => receipt.measuredUptime).length),
+      (total, node) => (total += node.receipts.filter(receipt => receipt.type == "MINTING").length),
       0,
     )}`,
     cellX,
@@ -145,25 +173,7 @@ export function generateNodeSummary(doc: jsPDF, nodes: nodeInterface[]) {
     cellX,
     cellY + lineOffset * 4,
   );
-  doc.text(
-    `Uptime: ${(
-      (nodes.reduce(
-        (totalM, node) =>
-          (totalM += node.receipts.reduce((total, receipt) => (total += receipt.measuredUptime || 0), 0)),
-        0,
-      ) /
-        nodes.reduce(
-          (totalU, node) => (totalU += Math.floor(moment.duration(node.uptime, "seconds").asSeconds())),
-          0,
-        )) *
-      100
-    ).toFixed(2)}% - ${nodes.reduce(
-      (total, node) => (total += Math.floor(moment.duration(node.uptime, "seconds").asDays())),
-      0,
-    )} days`,
-    cellX,
-    cellY + lineOffset * 5,
-  );
+  doc.text(`Uptime: ${getFarmUptimePercentage(nodes)}%`, cellX, cellY + lineOffset * 5);
 }
 
 export interface ITab {
@@ -172,21 +182,89 @@ export interface ITab {
   value: "rentable" | "rented" | "mine";
   index: number;
 }
+export interface INodeGPU {
+  id: string;
+  vendor: string;
+  device: string;
+  contract?: number;
+}
+
+export function generatePage(doc: jsPDF, receiptsBatch: receiptInterface[], page: number) {
+  const lineOffset = 5;
+  const topY = 20 + lineOffset * 6;
+  const cellOffset = lineOffset * 12;
+  const cellX = 15;
+  const cellY = topY + lineOffset * 2;
+
+  if (page > 1) {
+    doc.addPage();
+  }
+  for (let i = 0; i < receiptsBatch.length; i++) {
+    if (receiptsBatch[i].type === "MINTING") {
+      doc.text(`Minting: ${receiptsBatch[i].hash}`, cellX, cellY + cellOffset * i);
+      doc.text(`start: ${getTime(receiptsBatch[i].mintingStart)}`, cellX, cellY + cellOffset * i + lineOffset);
+      doc.text(`end: ${getTime(receiptsBatch[i].mintingEnd)}`, cellX, cellY + cellOffset * i + lineOffset * 2);
+      doc.text(`TFT: ${receiptsBatch[i].tft?.toFixed(2)}`, cellX, cellY + cellOffset * i + lineOffset * 3);
+      doc.text(
+        `Cloud Units: ${receiptsBatch[i].cloud_units.cu} CU, ${receiptsBatch[i].cloud_units.nu} NU, ${receiptsBatch[i].cloud_units.su} SU`,
+        cellX,
+        cellY + cellOffset * i + lineOffset * 4,
+      );
+    } else {
+      doc.text(`Fixup: ${receiptsBatch[i].hash}`, cellX, cellY + cellOffset * i);
+      doc.text(`start: ${getTime(receiptsBatch[i].fixupStart)}`, cellX, cellY + cellOffset * i + lineOffset);
+      doc.text(`end: ${getTime(receiptsBatch[i].fixupEnd)}`, cellX, cellY + cellOffset * i + lineOffset * 2);
+      doc.text(`TFT: ${receiptsBatch[i].tft?.toFixed(2)}`, cellX, cellY + cellOffset * i + lineOffset * 3);
+      doc.text(
+        `Fixup TFT: ${receiptsBatch[i].fixupReward?.toFixed(2) || 0}`,
+        cellX,
+        cellY + cellOffset * i + lineOffset * 4,
+      );
+      doc.text(
+        `CU (Minted|Actual|FixedUp):   (${receiptsBatch[i].cloud_units.cu} | ${
+          receiptsBatch[i].correct_cloud_units?.cu || 0
+        } | ${receiptsBatch[i].fixup_cloud_units?.cu || 0})`,
+        cellX,
+        cellY + cellOffset * i + lineOffset * 5,
+      );
+      doc.text(
+        `NU (Minted|Actual|FixedUp):   (${receiptsBatch[i].cloud_units.nu} | ${
+          receiptsBatch[i].correct_cloud_units?.nu || 0
+        } | ${receiptsBatch[i].fixup_cloud_units?.nu || 0})`,
+        cellX,
+        cellY + cellOffset * i + lineOffset * 6,
+      );
+      doc.text(
+        `SU (Minted|Actual|FixedUp):   (${receiptsBatch[i].cloud_units.su} | ${
+          receiptsBatch[i].correct_cloud_units?.su || 0
+        } | ${receiptsBatch[i].fixup_cloud_units?.su || 0})`,
+        cellX,
+        cellY + cellOffset * i + lineOffset * 7,
+      );
+    }
+    if (i !== receiptsBatch.length - 1) {
+      doc.line(cellX, cellY + cellOffset * i + lineOffset * 8, cellX + 175, cellY + cellOffset * i + lineOffset * 8);
+    }
+  }
+
+  return doc;
+}
 
 export function generateReceipt(doc: jsPDF, node: nodeInterface) {
+  // Set font size and initial positioning
   doc.setFontSize(15);
-
   const topY = 20;
   const lineOffset = 5;
   const cellOffset = 30;
   const cellX = 15;
   const cellY = topY + lineOffset * 8;
 
+  // Add header information on the first page
   doc.text(`Node ${node.nodeId} Summary`, 80, topY);
   doc.setFontSize(10);
   doc.text(`Receipts total: ${node.receipts.length}`, cellX, topY + lineOffset);
   doc.text(
-    `Minting total: ${node.receipts.filter(receipt => receipt.measuredUptime).length}`,
+    `Minting total: ${node.receipts.filter(receipt => receipt.type == "MINTING").length}`,
     cellX,
     topY + lineOffset * 2,
   );
@@ -203,23 +281,15 @@ export function generateReceipt(doc: jsPDF, node: nodeInterface) {
     topY + lineOffset * 5,
   );
 
+  // Draw a line after the header information
   doc.line(cellX, topY + lineOffset * 6, cellX + 175, topY + lineOffset * 6);
 
-  node.receipts.map((receipt, i) => {
-    if (receipt.measuredUptime) {
-      doc.text(`Minting: ${receipt.hash}`, cellX, cellY + cellOffset * i);
-      doc.text(`start: ${getTime(receipt.mintingStart)}`, cellX, cellY + cellOffset * i + lineOffset);
-      doc.text(`end: ${getTime(receipt.mintingEnd)}`, cellX, cellY + cellOffset * i + lineOffset * 2);
-      doc.text(`TFT: ${receipt.tft?.toFixed(2)}`, cellX, cellY + cellOffset * i + lineOffset * 3);
-    } else {
-      doc.text(`Fixup: ${receipt.hash}`, cellX, cellY + cellOffset * i);
-      doc.text(`start: ${getTime(receipt.fixupStart)}`, cellX, cellY + cellOffset * i + lineOffset);
-      doc.text(`end: ${getTime(receipt.fixupEnd)}`, cellX, cellY + cellOffset * i + lineOffset * 2);
-    }
-    if (i !== node.receipts.length - 1) {
-      doc.line(cellX, cellY + cellOffset * i + lineOffset * 4, cellX + 175, cellY + cellOffset * i + lineOffset * 4);
-    }
-  });
+  const size = 4;
+  let page = 0;
+  for (let i = 0; i < node.receipts.length - 1; i += size) {
+    page++;
+    doc = generatePage(doc, node.receipts.slice(i, i + size), page);
+  }
 
   return doc;
 }
@@ -228,25 +298,34 @@ export function byteToGB(capacity: number) {
 }
 
 export async function createRentContract(
-  api: apiInterface,
+  api: ApiPromise,
   address: string,
   nodeId: string,
   solutionProviderID: string | null,
   callback: any,
 ) {
-  const injector = await web3FromAddress(address);
+  const keypair = await getKeypair();
+  const nonce = await api.rpc.system.accountNextIndex(address);
   return api.tx.smartContractModule
     .createRentContract(nodeId, solutionProviderID)
-    .signAndSend(address, { signer: injector.signer }, callback);
+    .signAndSend(keypair, { nonce }, callback);
 }
-export async function cancelRentContract(api: apiInterface, address: string, contractId: string, callback: any) {
-  const injector = await web3FromAddress(address);
-  return api.tx.smartContractModule
-    .cancelContract(contractId)
-    .signAndSend(address, { signer: injector.signer }, callback);
+export async function cancelRentContract(api: ApiPromise, address: string, contractId: string, callback: any) {
+  const keypair = await getKeypair();
+  const nonce = await api.rpc.system.accountNextIndex(address);
+  return api.tx.smartContractModule.cancelContract(contractId).signAndSend(keypair, { nonce }, callback);
 }
 
-export async function getActiveContracts(api: apiInterface, nodeId: string) {
+export async function setDedicatedNodeExtraFee(address: string, nodeId: number, extraFee: number) {
+  const keypair = await getKeypair();
+  const client = new Client({
+    url: window.configs.APP_API_URL,
+    mnemonicOrSecret: profileStore.state.profile!.mnemonic,
+  });
+  return await (await client.contracts.setDedicatedNodeExtraFee({ nodeId, extraFee })).apply();
+}
+
+export async function getActiveContracts(api: ApiPromise, nodeId: string) {
   console.log("getActiveContracts", api.query.smartContractModule.activeNodeContracts(nodeId));
   return await api.query.smartContractModule.activeNodeContracts(nodeId);
 }
@@ -260,32 +339,66 @@ export async function getNodeMintingFixupReceipts(nodeId: number) {
         receipt: {
           Minting: {
             period: { start: number; end: number };
-            measured_uptime: number;
             reward: { musd: number; tft: number };
+            cloud_units: { cu: number; su: number; nu: number };
           };
-          Fixup: { period: { start: number; end: number } };
+          Fixup: {
+            period: { start: number; end: number };
+            minted_cloud_units: { cu: number; su: number; nu: number };
+            fixup_cloud_units: { cu: number; su: number; nu: number };
+            correct_cloud_units: { cu: number; su: number; nu: number };
+            minted_reward: { musd: number; tft: number };
+            fixup_reward: { musd: number; tft: number };
+          };
         };
       }) => {
         if (rec.receipt.Minting) {
           nodeReceipts.push({
+            type: "MINTING",
             hash: rec.hash,
+            cloud_units: rec.receipt.Minting.cloud_units,
             mintingStart: rec.receipt.Minting.period.start * 1000,
             mintingEnd: rec.receipt.Minting.period.end * 1000,
-            measuredUptime: rec.receipt.Minting.measured_uptime || 0,
             tft: rec.receipt.Minting.reward.tft / 1e7,
+            startPeriodTimestamp: rec.receipt.Minting.period.start,
+            endPeriodTimestamp: rec.receipt.Minting.period.end,
           });
         } else {
           nodeReceipts.push({
+            type: "FIXUP",
             hash: rec.hash,
+            cloud_units: rec.receipt.Fixup.minted_cloud_units,
+            fixup_cloud_units: rec.receipt.Fixup.fixup_cloud_units,
+            correct_cloud_units: rec.receipt.Fixup.correct_cloud_units,
             fixupStart: rec.receipt.Fixup.period.start * 1000 || 0,
             fixupEnd: rec.receipt.Fixup.period.end * 1000 || 0,
+            startPeriodTimestamp: rec.receipt.Fixup.period.start,
+            endPeriodTimestamp: rec.receipt.Fixup.period.end,
+            tft: rec.receipt.Fixup.minted_reward.tft / 1e7,
+            fixupReward: rec.receipt.Fixup.fixup_reward.tft / 1e7,
           });
         }
       },
     ),
   );
 
+  // sort based on the start date
+  nodeReceipts = nodeReceipts.sort((a, b) => b.startPeriodTimestamp - a.startPeriodTimestamp);
   return nodeReceipts;
+}
+export async function getNodeGPUs(nodeId: number): Promise<INodeGPU[] | undefined> {
+  let nodeGPUs: INodeGPU[] | undefined;
+
+  try {
+    nodeGPUs = await (
+      await axios.get(`${config.gridproxyUrl}/nodes/${nodeId}/gpu`, {
+        timeout: 5000,
+      })
+    ).data;
+  } catch (err) {
+    nodeGPUs = undefined;
+  }
+  return nodeGPUs;
 }
 
 export async function getNodeUsedResources(nodeId: string) {
@@ -325,7 +438,7 @@ export async function getIpsForFarm(farmID: string) {
               id
             }
           }
-        }      
+        }
         `,
       operation: "getNodes",
     },
@@ -354,15 +467,12 @@ export function calCU(cru: number, mru: number) {
 
   return cu;
 }
-export async function getPrices(api: apiInterface) {
+export async function getPrices(api: ApiPromise) {
   const pricing = await api.query.tfgridModule.pricingPolicies(1);
   return pricing.toJSON();
 }
 
-export function countPrice(
-  prices: { cu: { value: number }; su: { value: number } },
-  node: { total_resources: { sru: number; hru: number; mru: number; cru: any } },
-) {
+export function countPrice(prices: { cu: { value: number }; su: { value: number } }, node: any) {
   const resources = {
     sru: node.total_resources.sru / 1024 / 1024 / 1024,
     hru: node.total_resources.hru / 1024 / 1024 / 1024,
@@ -379,8 +489,8 @@ export function countPrice(
   return usdPrice.toFixed(2);
 }
 
-export async function getTFTPrice(api: apiInterface) {
-  const pricing = await api.query.tftPriceModule.tftPrice();
+export async function getTFTPrice(api: ApiPromise) {
+  const pricing = (await api.query.tftPriceModule.tftPrice()) as any;
   return pricing.words[0] / 1000;
 }
 
@@ -445,7 +555,7 @@ export async function getDedicatedNodes(twinId: string, query: string, page: num
 }
 
 export async function getDNodes(
-  api: apiInterface,
+  api: ApiPromise,
   address: string,
   currentTwinID: string,
   query: string,
@@ -454,7 +564,7 @@ export async function getDNodes(
 ) {
   let { nodes, count } = await getDedicatedNodes(currentTwinID, query, page, size);
 
-  const pricing = await getPrices(api);
+  const pricing = (await getPrices(api)) as any;
 
   // discount for Twin Balance
   const TFTprice = await getTFTPrice(api);
@@ -467,13 +577,14 @@ export async function getDNodes(
     discount: any;
     applyedDiscount: { first: any; second: any };
     location: { country: any; city: any; long: any; lat: any };
-    resources: { cru: any; mru: any; hru: any; sru: any };
+    resources: { cru: any; mru: any; hru: any; sru: any; gpu: number };
     farm: { id: string; name?: string; farmCertType?: string; pubIps?: string };
     rentContractId: any;
     rentedByTwinId: any;
     usedResources: { cru: any; mru: any; hru: any; sru: any };
     rentStatus: any;
   }[] = [];
+
   for (const node of nodes) {
     const price = countPrice(pricing, node);
     const [discount, discountLevel] = await calDiscount(TFTbalance, pricing, price);
@@ -495,10 +606,11 @@ export async function getDNodes(
         lat: node.location.latitude ? node.location.latitude : "Unknown",
       },
       resources: {
-        cru: node.total_resources.cru,
-        mru: node.total_resources.mru,
-        hru: node.total_resources.hru,
-        sru: node.total_resources.sru,
+        cru: toTeraOrGigaOrPeta(node.total_resources.cru.toString()),
+        mru: toTeraOrGigaOrPeta(node.total_resources.mru.toString()),
+        hru: toTeraOrGigaOrPeta(node.total_resources.hru.toString()),
+        sru: toTeraOrGigaOrPeta(node.total_resources.sru.toString()),
+        gpu: node.num_gpu,
       },
       usedResources: {
         cru: node.used_resources.cru,
@@ -511,5 +623,67 @@ export async function getDNodes(
       rentStatus: node.rentContractId === 0 ? "free" : node.rentedByTwinId == currentTwinID ? "yours" : "taken",
     });
   }
-  return { dNodes, count };
+  return dNodes;
+}
+
+export async function updateDedicatedNodes(api: ApiPromise, address: string, currentTwinID: number, nodes: any[]) {
+  const pricing = (await getPrices(api)) as any;
+  // discount for Twin Balance
+  const TFTprice = await getTFTPrice(api);
+  const balance = await getBalance(api, address);
+  const TFTbalance = TFTprice * balance.free;
+
+  let dNodes: {
+    nodeId: string;
+    price: string;
+    discount: any;
+    applyedDiscount: { first: any; second: any };
+    location: { country: any; city: any; long: any; lat: any };
+    resources: { cru: any; mru: any; hru: any; sru: any; gpu: number };
+    farm: { id: string; name?: string; farmCertType?: string; pubIps?: string };
+    rentContractId: any;
+    rentedByTwinId: any;
+    usedResources: { cru: any; mru: any; hru: any; sru: any };
+    rentStatus: any;
+  }[] = [];
+
+  for (const node of nodes) {
+    const price = countPrice(pricing, node);
+    const [discount, discountLevel] = await calDiscount(TFTbalance, pricing, price);
+    dNodes.push({
+      farm: {
+        id: node.farmId,
+      },
+      nodeId: node.nodeId,
+      price: price,
+      discount: discount,
+      applyedDiscount: {
+        first: pricing.discountForDedicationNodes,
+        second: discountLevel,
+      },
+      location: {
+        country: node.country,
+        city: node.city,
+        long: node.location.longitude ? node.location.longitude : "Unknown",
+        lat: node.location.latitude ? node.location.latitude : "Unknown",
+      },
+      resources: {
+        cru: toTeraOrGigaOrPeta(node.total_resources.cru.toString()),
+        mru: toTeraOrGigaOrPeta(node.total_resources.mru.toString()),
+        hru: toTeraOrGigaOrPeta(node.total_resources.hru.toString()),
+        sru: toTeraOrGigaOrPeta(node.total_resources.sru.toString()),
+        gpu: node.num_gpu,
+      },
+      usedResources: {
+        cru: node.used_resources.cru,
+        mru: node.used_resources.mru,
+        hru: node.used_resources.hru,
+        sru: node.used_resources.sru,
+      },
+      rentContractId: node.rentContractId,
+      rentedByTwinId: node.rentedByTwinId,
+      rentStatus: node.rentContractId === 0 ? "free" : node.rentedByTwinId == currentTwinID ? "yours" : "taken",
+    });
+  }
+  return dNodes;
 }

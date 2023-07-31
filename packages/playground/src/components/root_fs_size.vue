@@ -3,17 +3,11 @@
     <div :style="{ width: '100%' }" class="mr-4">
       <input-validator
         :value="value"
-        :rules="[validators.required('Root File System is required.'), dynamicValidateRootFs(validators)]"
+        :rules="[validators.required('SSD Storage is required.'), dynamicValidateRootFs(validators)]"
         ref="input"
         #="{ props }"
       >
-        <v-text-field
-          label="Root File System (GB)"
-          type="number"
-          :disabled="!edit"
-          v-model.number="value"
-          v-bind="props"
-        />
+        <v-text-field label="SSD Storage (GB)" type="number" :disabled="!edit" v-model.number="value" v-bind="props" />
       </input-validator>
     </div>
 
@@ -57,7 +51,7 @@ watch(
 function dynamicValidateRootFs(validators: Validators) {
   return (value: string) => {
     const min = rootFs(props.cpu ?? 0, props.memory ?? 0);
-    return validators.min(`Root File System min value is ${min}GB.`, min)(value);
+    return validators.min(`SSD Storage min value is ${min}GB.`, min)(value);
   };
 }
 </script>

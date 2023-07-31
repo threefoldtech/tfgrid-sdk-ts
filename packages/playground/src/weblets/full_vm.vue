@@ -1,20 +1,15 @@
 <template>
   <weblet-layout
     ref="layout"
-    :cpu="cpu"
-    :memory="memory"
-    :disk="disks.reduce((total, disk) => total + disk.size, diskSize + 2)"
-    :ivp4="ipv4"
+    :cpu="solution?.cpu"
+    :memory="solution?.memory"
+    :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk + 2)"
+    :ipv4="ipv4"
+    :certified="certified"
+    :dedicated="dedicated"
     title-image="images/icons/vm.png"
   >
     <template #title> Deploy a Full Virtual Machine </template>
-    <template #subtitle
-      >Deploy a new full virtual machine on the Threefold Grid
-      <a class="app-link" href="https://manual.grid.tf/weblets/weblets_fullVm.html" target="_blank">
-        Quick start documentation
-      </a>
-      .
-    </template>
 
     <d-tabs
       :tabs="[
@@ -42,82 +37,21 @@
         </input-validator>
 
         <SelectVmImage :images="images" v-model="flist" />
+        <SelectSolutionFlavor
+          :minimum="{ cpu: 1, memory: 1024 * 1, disk: 25 }"
+          :standard="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
+          :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+          v-model="solution"
+        />
 
-        <input-validator
-          :value="cpu"
-          :rules="[
-            validators.required('CPU is required.'),
-            validators.isInt('CPU must be a valid integer.'),
-            validators.min('CPU min is 1 cores.', 1),
-            validators.max('CPU max is 32 cores.', 32),
-          ]"
-          #="{ props }"
-        >
-          <input-tooltip tooltip="The number of virtual cores allocated to your instance.">
-            <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
-          </input-tooltip>
-        </input-validator>
-
-        <input-validator
-          :value="memory"
-          :rules="[
-            validators.required('Memory is required.'),
-            validators.isInt('Memory must be a valid integer.'),
-            validators.min('Minimum allowed memory is 256 MB.', 256),
-            validators.max('Maximum allowed memory is 256 GB.', 256 * 1024),
-          ]"
-          #="{ props }"
-        >
-          <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
-            <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
-          </input-tooltip>
-        </input-validator>
-
-        <input-validator
-          :value="diskSize"
-          :rules="[
-            validators.required('Disk size is required.'),
-            validators.isInt('Disk size must be a valid integer.'),
-            validators.min('Minimum allowed disk size is 15 GB.', 15),
-            validators.max('Maximum allowed disk size is 10000 GB.', 10000),
-          ]"
-          #="{ props }"
-        >
-          <input-tooltip
-            tooltip="The storage capacity allocated to your instance, indicating the amount of space available to store files, data, and applications."
-          >
-            <v-text-field label="Disk Size (GB)" type="number" v-model.number="diskSize" v-bind="props" />
-          </input-tooltip>
-        </input-validator>
-
-        <input-tooltip
-          inline
-          tooltip="An Internet Protocol version 4 address that is globally unique and accessible over the internet."
-        >
-          <v-switch color="primary" inset label="Public IPv4" v-model="ipv4" />
-        </input-tooltip>
-
-        <input-tooltip
-          inline
-          tooltip="Public IPv6 is the next-generation Internet Protocol that offers an expanded address space to connect a vast number of devices."
-        >
-          <v-switch color="primary" inset label="Public IPv6" v-model="ipv6" />
-        </input-tooltip>
-
-        <input-tooltip
-          inline
-          tooltip="The Planetary Network is a distributed network infrastructure that spans across multiple regions and countries, providing global connectivity."
-        >
-          <v-switch color="primary" inset label="Planetary Network" v-model="planetary" />
-        </input-tooltip>
-
-        <input-tooltip
-          inline
-          tooltip="Enabling WireGuard Access allows you to establish private, secure, and encrypted connections to your instance."
-        >
-          <v-switch color="primary" inset label="Add Wireguard Access" v-model="wireguard" />
-        </input-tooltip>
-
+        <Network
+          required
+          ref="network"
+          v-model:ipv4="ipv4"
+          v-model:ipv6="ipv6"
+          v-model:planetary="planetary"
+          v-model:wireguard="wireguard"
+        />
         <input-tooltip
           inline
           tooltip="
@@ -125,40 +59,48 @@
           When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
           "
         >
-          <v-switch color="primary" inset label="GPU" v-model="hasGPU" />
+          <v-switch color="primary" inset label="GPU" v-model="hasGPU" hide-details />
+        </input-tooltip>
+        <input-tooltip
+          inline
+          tooltip="Click to know more about dedicated nodes."
+          href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+        >
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>
 
-        <v-alert v-show="networkError" class="mb-2" type="warning" variant="tonal">
-          You must enable at least one of network options.
-        </v-alert>
-        <SelectFarm
-          v-if="!hasGPU"
-          :filters="{
-            cpu,
-            memory,
-            publicIp: ipv4,
-            ssd: disks.reduce((total, disk) => total + disk.size, diskSize + 2),
-          }"
-          v-model="farm"
-        />
-        <SelectGPUNode
-          v-else
-          v-model="selectedNodewithCards"
-          :filters="{
-            cpu,
-            memory,
-            ipv4: ipv4,
-            ssd: disks.reduce((total, disk) => total + disk.size, diskSize + 2),
-            ipv6: ipv4,
-            name: name,
-            flist: flist,
-            disks: disks,
-            disk: diskSize,
-            hasGPU: hasGPU,
-            planetary: planetary,
-            wireguard: wireguard,
-          }"
-        />
+        <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+        </input-tooltip>
+
+        <SelectFarmManager>
+          <SelectFarm
+            :filters="{
+              cpu: solution?.cpu,
+              memory: solution?.memory,
+              publicIp: ipv4,
+              ssd: disks.reduce((total, disk) => total + disk.size, solution?.disk + 2),
+              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+              certified: certified,
+              hasGPU: hasGPU,
+            }"
+            v-model="farm"
+          />
+          <SelectNode
+            v-model="selectedNode"
+            :filters="{
+              farmId: farm?.farmID,
+              cpu: solution?.cpu,
+              memory: solution?.memory,
+              ipv4: ipv4,
+              ipv6: ipv4,
+              disks: [{ size: solution?.disk, mountPoint: '/' }, ...disks],
+              hasGPU: hasGPU,
+              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+              certified: certified,
+            }"
+          />
+        </SelectFarmManager>
       </template>
 
       <template #disks>
@@ -203,7 +145,7 @@
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid || networkError"> Deploy </v-btn>
+      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid || network?.error">Deploy </v-btn>
     </template>
   </weblet-layout>
 </template>
@@ -211,8 +153,11 @@
 <script lang="ts" setup>
 import { type Ref, ref, watch } from "vue";
 
+import Network from "../components/networks.vue";
+import SelectFarmManager from "../components/select_farm_manager.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
+import type { solutionFlavor as SolutionFlavor } from "../types";
 import { type Farm, type Flist, ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
@@ -222,6 +167,7 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
+const solution = ref() as Ref<SolutionFlavor>;
 
 const images: VmImage[] = [
   {
@@ -248,18 +194,17 @@ const images: VmImage[] = [
 
 const name = ref(generateName(8, { prefix: "vm" }));
 const flist = ref<Flist>();
-const cpu = ref(4);
-const memory = ref(8192);
-const diskSize = ref(50);
 const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
 const wireguard = ref(false);
+const dedicated = ref(false);
+const certified = ref(false);
 const farm = ref() as Ref<Farm>;
 const disks = ref<Disk[]>([]);
-const networkError = ref(false);
-const hasGPU = ref(false);
-const selectedNodewithCards = ref() as Ref<GPUNodeType>;
+const network = ref();
+const hasGPU = ref();
+const selectedNode = ref() as Ref<INode>;
 
 function addDisk() {
   const name = generateName(7);
@@ -269,10 +214,26 @@ function addDisk() {
     mountPoint: "/mnt/" + name,
   });
 }
-watch([planetary, ipv4, ipv6, wireguard], ([planetary, ipv4, ipv6, wireguard]) => {
-  if (!(ipv6 || ipv4 || planetary || wireguard)) networkError.value = true;
-  else networkError.value = false;
-});
+
+watch(
+  dedicated,
+  dedicated => {
+    if (dedicated === false) {
+      hasGPU.value = dedicated;
+    }
+  },
+  { immediate: true },
+);
+
+watch(
+  hasGPU,
+  hasGPU => {
+    if (hasGPU) {
+      dedicated.value = true;
+    }
+  },
+  { immediate: true },
+);
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -290,22 +251,24 @@ async function deploy() {
       machines: [
         {
           name: name.value,
-          cpu: cpu.value,
-          memory: memory.value,
+          cpu: solution.value.cpu,
+          memory: solution.value.memory,
           flist: flist.value!.value,
           entryPoint: flist.value!.entryPoint,
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
-          disks: [{ size: diskSize.value, mountPoint: "/" }, ...disks.value],
+          disks: [{ size: solution?.value.disk, mountPoint: "/" }, ...disks.value],
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           planetary: planetary.value,
           envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
           rootFilesystemSize: 2,
           hasGPU: hasGPU.value,
-          nodeId: hasGPU.value ? selectedNodewithCards.value.nodeId : undefined,
-          gpus: hasGPU.value ? selectedNodewithCards.value.cards.map(card => card.id) : undefined,
+          nodeId: selectedNode.value.nodeId,
+          gpus: hasGPU.value ? selectedNode.value.cards?.map(card => card.id) : undefined,
+          rentedBy: dedicated.value ? grid!.twinId : undefined,
+          certified: certified.value,
         },
       ],
       network: { addAccess: wireguard.value },
@@ -321,21 +284,22 @@ async function deploy() {
 </script>
 
 <script lang="ts">
-import type { GPUNodeType } from "@/utils/filter_node_with_gpu";
-
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectFarm from "../components/select_farm.vue";
-import SelectGPUNode from "../components/select_gpu_node.vue";
+import SelectNode from "../components/select_node.vue";
+import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { INode } from "../utils/filter_nodes";
 
 export default {
   name: "FullVm",
   components: {
     SelectVmImage,
+    SelectSolutionFlavor,
     SelectFarm,
     ExpandableLayout,
-    SelectGPUNode,
+    SelectNode,
   },
 };
 </script>

@@ -180,7 +180,7 @@ export default {
   getNodesCount: state => state.nodesCount,
   getNodesTablePageNumber: state => state.nodesTablePageNumber,
   getNodesTablePageSize: state => state.nodesTablePageSize,
-  getNodesUpFilter: state => state.nodesUpFilter,
+  getNodeStatusFilter: state => state.nodeStatusFilter,
   getNodesGatewayFilter: state => state.nodesGatewayFilter,
   getNodesGPUFilter: state => state.nodesGPUFilter,
 

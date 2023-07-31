@@ -1,5 +1,8 @@
-import { web3FromAddress } from "@polkadot/extension-dapp";
+import { ApiPromise } from "@polkadot/api";
 import { Keyring } from "@polkadot/keyring";
+import { Decimal } from "decimal.js";
+
+import { getKeypair } from "@/utils/signer";
 
 export function checkAddress(address: string) {
   const keyring = new Keyring({ type: "sr25519" });
@@ -10,22 +13,10 @@ export function checkAddress(address: string) {
     return false;
   }
 }
-export async function transfer(
-  address: string,
-  api: {
-    tx: {
-      balances: {
-        transfer: (
-          arg0: any,
-          arg1: number,
-        ) => { (): any; new (): any; signAndSend: { (arg0: any, arg1: { signer: any }, arg2: any): any; new (): any } };
-      };
-    };
-  },
-  target: any,
-  amount: number,
-  callback: any,
-) {
-  const injector = await web3FromAddress(address);
-  return api.tx.balances.transfer(target, amount * 1e7).signAndSend(address, { signer: injector.signer }, callback);
+export async function transfer(address: string, api: ApiPromise, target: any, amount: number, callback: any) {
+  const keypair = await getKeypair();
+  const nonce = await api.rpc.system.accountNextIndex(address);
+  const decimalAmount = new Decimal(amount);
+  const milliAmount = decimalAmount.mul(10 ** 7).toNumber();
+  return api.tx.balances.transfer(target, milliAmount).signAndSend(keypair, { nonce }, callback);
 }

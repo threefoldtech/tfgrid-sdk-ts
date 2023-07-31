@@ -28,7 +28,6 @@
         <template v-slot:top>
           <v-toolbar flat class="primary white--text">
             <v-toolbar-title>Your Farm Nodes</v-toolbar-title>
-            <v-btn v-if="network == 'main'" class="ml-auto" @click="downloadAllReceipts()">Download Receipts</v-btn>
           </v-toolbar>
         </template>
 
@@ -67,101 +66,118 @@
             </template>
             <span>Add a public config</span>
           </v-tooltip>
+
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon class="configIcon ml-2" medium v-on="on" v-bind="attrs" @click="openExtraFee(item)">
+                mdi-code-string
+              </v-icon>
+            </template>
+            <span>Set Additional Fees</span>
+          </v-tooltip>
         </template>
 
         <!--expanded node view-->
         <template v-slot:expanded-item="{ headers, item }">
           <td :colspan="headers.length" key="item.id">
-            <v-container fluid>
-              <v-row :justify="'space-around'">
-                <v-col cols="8">
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">Node ID</v-flex>
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ item.nodeId }}</span>
-                    </v-flex>
-                  </v-row>
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">Farm ID</v-flex>
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ item.farmId }}</span>
-                    </v-flex>
-                  </v-row>
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">Twin ID</v-flex>
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ item.twinId }}</span>
-                    </v-flex>
-                  </v-row>
+            <v-container>
+              <v-card outlined>
+                <v-card-title>
+                  <span class="headline">Node Details</span>
+                </v-card-title>
+                <v-card-text>
+                  <v-row :justify="'space-around'">
+                    <v-col cols="8">
+                      <v-container class="mx-10 mt-5">
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">Node ID</v-flex>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ item.nodeId }}</span>
+                          </v-flex>
+                        </v-row>
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">Farm ID</v-flex>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ item.farmId }}</span>
+                          </v-flex>
+                        </v-row>
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">Twin ID</v-flex>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ item.twinId }}</span>
+                          </v-flex>
+                        </v-row>
 
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">Certification </v-flex>
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">Certification </v-flex>
 
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ item.certificationType }}</span>
-                    </v-flex>
-                  </v-row>
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">First boot at</v-flex>
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ new Date(parseInt(item.created) * 1000) }}</span>
-                    </v-flex>
-                  </v-row>
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">Updated at</v-flex>
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ new Date(parseInt(item.updatedAt) * 1000) }}</span>
-                    </v-flex>
-                  </v-row>
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">Country</v-flex>
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ item.country }}</span>
-                    </v-flex>
-                  </v-row>
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">City</v-flex>
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ item.city }}</span>
-                    </v-flex>
-                  </v-row>
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">Serial Number</v-flex>
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ item.serialNumber }}</span>
-                    </v-flex>
-                  </v-row>
-                  <v-row>
-                    <v-flex xs3 class="text-left pr-2">Farming Policy ID</v-flex>
-                    <v-flex class="text-truncate font-weight-bold">
-                      <span>{{ item.farmingPolicyId }}</span>
-                    </v-flex>
-                  </v-row>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ item.certificationType }}</span>
+                          </v-flex>
+                        </v-row>
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">First boot at</v-flex>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ new Date(parseInt(item.created) * 1000) }}</span>
+                          </v-flex>
+                        </v-row>
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">Updated at</v-flex>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ new Date(parseInt(item.updatedAt) * 1000) }}</span>
+                          </v-flex>
+                        </v-row>
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">Country</v-flex>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ item.country }}</span>
+                          </v-flex>
+                        </v-row>
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">City</v-flex>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ item.city }}</span>
+                          </v-flex>
+                        </v-row>
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">Serial Number</v-flex>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ item.serialNumber }}</span>
+                          </v-flex>
+                        </v-row>
+                        <v-row>
+                          <v-flex xs3 class="text-left pr-2">Farming Policy ID</v-flex>
+                          <v-flex class="text-truncate font-weight-bold">
+                            <span>{{ item.farmingPolicyId }}</span>
+                          </v-flex>
+                        </v-row>
+                        <v-row>
+                          <span>For more information visit the Capacity Explorer</span>
+                        </v-row>
+                      </v-container>
+                    </v-col>
+                    <v-col cols="4" class="text-center" :align-self="'center'">
+                      <v-flex class="text-truncate font-weight-bold">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on }">
+                            <v-progress-circular
+                              v-on="on"
+                              :rotate="-90"
+                              :size="150"
+                              :width="20"
+                              :value="getNodeUptimePercentage(item)"
+                              color="light-green darken-2"
+                            />
 
-                  <v-row>
-                    <span>For more information visit the Capacity Explorer</span>
+                            <span> Uptime: {{ getNodeUptimePercentage(item) }} % </span>
+                          </template>
+                          <span>Current Node Uptime Percentage (since start of the current minting period)</span>
+                        </v-tooltip>
+                      </v-flex>
+                    </v-col>
                   </v-row>
-                </v-col>
-                <v-col cols="4" class="text-center" :align-self="'center'">
-                  <v-flex class="text-truncate font-weight-bold">
-                    <v-tooltip bottom>
-                      <template v-slot:activator="{ on }">
-                        <v-progress-circular
-                          v-on="on"
-                          :rotate="-90"
-                          :size="100"
-                          :width="15"
-                          :value="getNodeUptimePercentage(item)"
-                          color="light-green darken-2"
-                        />
-
-                        <span> Uptime: {{ getNodeUptimePercentage(item) }} % </span>
-                      </template>
-                      <span>Current Node Uptime Percentage (since start of the current minting period)</span>
-                    </v-tooltip>
-                  </v-flex>
-                </v-col>
-              </v-row>
+                </v-card-text>
+              </v-card>
             </v-container>
 
             <v-col>
@@ -169,7 +185,7 @@
                 <v-expansion-panel>
                   <v-expansion-panel-header> Resource units reserved </v-expansion-panel-header>
                   <v-expansion-panel-content>
-                    <v-row>
+                    <v-row class="mt-5 mb-5">
                       <v-col v-for="(value, key) in item.total_resources" :key="key" align="center">
                         <v-flex class="text-center pr-2">
                           <span class="text-uppercase">{{ key }}</span>
@@ -180,8 +196,8 @@
                               <v-progress-circular
                                 v-on="on"
                                 :rotate="-90"
-                                :size="100"
-                                :width="15"
+                                :size="150"
+                                :width="20"
                                 :value="isNaN(getPercentage(key)) ? 0 : getPercentage(key)"
                                 color="light-green darken-2"
                               />
@@ -211,7 +227,7 @@
                 <v-expansion-panel>
                   <v-expansion-panel-header> Node Statistics </v-expansion-panel-header>
                   <v-expansion-panel-content>
-                    <ReceiptsCalendar :node="item" />
+                    <NodeMintingDetails :node="item" />
                   </v-expansion-panel-content>
                 </v-expansion-panel>
               </v-expansion-panels>
@@ -314,6 +330,51 @@
         </v-card>
       </v-dialog>
 
+      <!--extra fees dialog-->
+      <v-dialog v-model="openExtraFeeDialogue" width="800">
+        <v-card>
+          <v-card-title class="text-h5">Set Additional Fees</v-card-title>
+          <v-card-subtitle class="my-0" style="font-size: 1rem">
+            Additional fees will be added to your node {{ nodeToEdit.nodeId }} (for the special hardware you’re
+            providing e.g. GPUs) while renting.
+          </v-card-subtitle>
+          <v-card-text class="text">
+            <v-form v-model="isValidExtraFee" style="position: relative">
+              <v-text-field
+                class="mt-4"
+                label="Additional Fees"
+                v-model="extraFee"
+                required
+                outlined
+                dense
+                type="number"
+                :error-messages="extraFeeErrorMessage"
+                :rules="[
+                  () => !!extraFee || 'This field is required',
+                  () => extraFee > 0 || 'Extra fee cannot be negative or 0',
+                ]"
+              >
+              </v-text-field>
+              <span style="position: absolute; right: 2%; top: 15%; color: grey">USD/Month</span>
+            </v-form>
+          </v-card-text>
+
+          <v-divider></v-divider>
+
+          <v-card-actions class="justify-end py-4">
+            <v-btn color="grey lighten-2 black--text" @click="openExtraFeeDialogue = false"> Cancel </v-btn>
+            <v-btn
+              color="primary white--text"
+              @click="saveExtraFee(extraFee)"
+              :loading="loadingExtraFee"
+              :disabled="!isValidExtraFee"
+            >
+              Set
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
       <!-- delete item dialog-->
       <v-dialog v-model="openDeleteDialog" max-width="700px">
         <v-card>
@@ -363,6 +424,8 @@
   </div>
 </template>
 <script lang="ts">
+import { QueryClient } from "@threefold/tfchain_client";
+import { Decimal } from "decimal.js";
 import jsPDF from "jspdf";
 import { default as PrivateIp } from "private-ip";
 import { Component, Prop, Vue } from "vue-property-decorator";
@@ -372,13 +435,15 @@ import { addNodePublicConfig, deleteNode, nodeInterface } from "@/portal/lib/far
 import { byteToGB, generateNodeSummary, generateReceipt, getNodeUptimePercentage } from "@/portal/lib/nodes";
 import { hex2a } from "@/portal/lib/util";
 
-import ReceiptsCalendar from "./ReceiptsCalendar.vue";
+import { setDedicatedNodeExtraFee } from "../lib/nodes";
+import NodeMintingDetails from "./NodeMintingDetails.vue";
 
 @Component({
   name: "FarmNodesTable",
-  components: { ReceiptsCalendar },
+  components: { NodeMintingDetails },
 })
 export default class FarmNodesTable extends Vue {
+  queryClient = new QueryClient(window.configs.APP_API_URL);
   expanded: any = [];
   receiptsPanel = [];
   resourcesPanel = [];
@@ -437,6 +502,7 @@ export default class FarmNodesTable extends Vue {
     status: "",
     certificationType: "",
     dedicated: true,
+    extraFee: 0,
     rentContractId: 0,
     rentedByTwinId: 0,
     receipts: [],
@@ -447,10 +513,12 @@ export default class FarmNodesTable extends Vue {
     id: "",
   };
   openPublicConfigDialog = false;
+  openExtraFeeDialogue = false;
   @Prop({ required: true }) nodes!: nodeInterface[];
   @Prop({ required: true }) loadingNodes!: boolean;
   @Prop({ required: true }) initLoading!: boolean;
   @Prop({ required: true }) count!: string;
+  extraFee = 0;
   searchTerm = "";
   ip4 = "";
   gw4 = "";
@@ -458,9 +526,11 @@ export default class FarmNodesTable extends Vue {
   gw6 = "";
   domain = "";
   loadingPublicConfig = false;
+  loadingExtraFee = false;
   $api: any;
   isValidPublicConfig = false;
   hasPublicConfig = false;
+  isValidExtraFee = false;
   openWarningDialog = false;
   openRemoveConfigWarningDialog = false;
   ip4ErrorMessage = "";
@@ -468,6 +538,7 @@ export default class FarmNodesTable extends Vue {
   ip6ErrorMessage = "";
   gw6ErrorMessage = "";
   domainErrorMessage = "";
+  extraFeeErrorMessage = "";
   receipts = [];
 
   updated() {
@@ -629,6 +700,35 @@ export default class FarmNodesTable extends Vue {
     }
     this.openPublicConfigDialog = true;
   }
+
+  async openExtraFee(node: nodeInterface) {
+    this.nodeToEdit = node;
+    // convert fees from USD to mili USD while getting
+    const fee = new Decimal(
+      await this.queryClient.contracts.getDedicatedNodeExtraFee({ nodeId: this.nodeToEdit.nodeId }),
+    );
+    const feeUSD = fee.div(10 ** 3).toNumber();
+    this.extraFee = feeUSD;
+    this.openExtraFeeDialogue = true;
+  }
+
+  async saveExtraFee(fee: number) {
+    this.loadingExtraFee = true;
+    // convert fees from mili USD to USD while setting
+    const feeDecimal = new Decimal(fee);
+    const feeUSD = feeDecimal.mul(10 ** 3).toNumber();
+    setDedicatedNodeExtraFee(this.$store.state.credentials.account.address, this.nodeToEdit.nodeId, feeUSD)
+      .then(() => {
+        this.$toasted.show(`Transaction succeeded: Fee is added to node ${this.nodeToEdit.nodeId}`);
+        this.loadingExtraFee = false;
+        this.openExtraFeeDialogue = false;
+      })
+      .catch(e => {
+        this.loadingExtraFee = false;
+        this.$toasted.show(`Transaction Failed: ${e}`);
+      });
+  }
+
   openDelete(node: { id: string }) {
     this.nodeToDelete = node;
     this.openDeleteDialog = true;

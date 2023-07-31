@@ -1,6 +1,6 @@
 <template>
   <v-bottom-sheet v-model="open" persistent no-click-animation @click:outside="$emit('close-sheet')">
-    <v-sheet class="text-center" height="90vh">
+    <v-sheet :class="{ 'text-center': true, loading: loading }" height="90vh">
       <div class="content" v-if="!loading">
         <v-row>
           <v-col v-if="node">
@@ -40,16 +40,16 @@
             <InterfacesDetails :interfaces="interfaces" />
           </v-col>
 
-          <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="node && nodeGPU">
-            <GPUDetails :nodeGPU="nodeGPU" />
+          <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="node && node.num_gpu > 0">
+            <GPUDetails :nodeId="nodeId" />
           </v-col>
-          <v-snackbar :timeout="2000" :value="gpuError" color="transparent" text>
-            <v-alert class="ma-2" dense outlined type="error"> Failed to receive node GPUs information </v-alert>
-          </v-snackbar>
         </v-row>
       </div>
-      <div v-if="loading" class="pt-10">
-        <v-progress-circular indeterminate color="primary" :size="100" />
+      <div v-if="loading" class="d-flex justify-center" style="height: 100%">
+        <div class="align-self-center">
+          <v-progress-circular indeterminate color="primary" :size="100" />
+          <p class="pt-4">Loading Node {{ nodeId ?? "" }} details</p>
+        </div>
       </div>
     </v-sheet>
   </v-bottom-sheet>
@@ -60,7 +60,7 @@ import axios from "axios";
 import { DocumentNode } from "graphql";
 import { Component, Prop, Vue, Watch } from "vue-property-decorator";
 
-import { ICountry, INode, INodeGPU, INodeStatistics } from "../graphql/api";
+import { ICountry, INode, INodeStatistics } from "../graphql/api";
 import { GrafanaStatistics } from "../utils/getMetricsUrl";
 import mediaMatcher from "../utils/mediaMatcher";
 import CountryDetails from "./CountryDetails.vue";
@@ -95,8 +95,6 @@ export default class Details extends Vue {
   loading = false;
   grafanaUrl = "";
   interfaces = undefined;
-  nodeGPU: INodeGPU[] | undefined;
-  gpuError = false;
   data: any = {};
 
   get node(): INode {
@@ -132,21 +130,6 @@ export default class Details extends Vue {
           this.data.node = await fetch(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}`).then(res =>
             res.json(),
           );
-
-          if (this.data.node.num_gpu) {
-            try {
-              this.nodeGPU = await (
-                await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/gpu`, {
-                  timeout: 5000,
-                })
-              ).data;
-              this.gpuError = false;
-            } catch (error) {
-              this.gpuError = true;
-              this.nodeGPU = undefined;
-            }
-          }
-
           try {
             this.data.nodeStatistics = await (
               await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/statistics`, {
@@ -168,7 +151,6 @@ export default class Details extends Vue {
         this.loading = false;
       });
   }
-
   destroyed() {
     this.screen_max_1200.destry();
     this.screen_max_700.destry();
@@ -195,5 +177,8 @@ export default class Details extends Vue {
   will-change: transform;
   height: 100%;
   padding: 20px;
+}
+.loading {
+  cursor: wait;
 }
 </style>

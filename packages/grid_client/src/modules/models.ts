@@ -208,8 +208,11 @@ class QSFSZDBGetModel extends BaseGetDeleteModel {}
 
 class QSFSZDBDeleteModel extends BaseGetDeleteModel {}
 
-class GatewayFQDNModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+class BaseGatewayNameModel {
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength + 10) name: string;
+}
+
+class GatewayFQDNModel extends BaseGatewayNameModel {
   @Expose() @IsInt() @Min(1) node_id: number;
   @Expose() @IsString() @IsNotEmpty() fqdn: string;
   @Expose() @IsBoolean() tls_passthrough: boolean;
@@ -223,10 +226,6 @@ class GatewayFQDNModel {
 class GatewayFQDNGetModel extends BaseGetDeleteModel {}
 
 class GatewayFQDNDeleteModel extends BaseGetDeleteModel {}
-
-class BaseGatewayNameModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength + 10) name: string;
-}
 
 class GatewayNameModel extends BaseGatewayNameModel {
   @Expose() @IsInt() @Min(1) node_id: number;
@@ -571,6 +570,7 @@ class CalculatorModel {
   @Expose() @IsNumber() @IsNotEmpty() @Min(0) sru: number; // GB
   @Expose() @IsNumber() @IsNotEmpty() @Min(0) hru: number; // GB
   @Expose() @IsBoolean() @IsNotEmpty() ipv4u: boolean;
+  @Expose() @IsBoolean() @IsOptional() certified?: boolean;
   @Expose() @IsOptional() @IsNumber() @Min(0) balance?: number;
 }
 

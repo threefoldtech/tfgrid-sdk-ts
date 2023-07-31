@@ -1,5 +1,7 @@
 import type { VDataTable } from "vuetify/lib/labs/components";
 
+import type { INode } from "@/utils/filter_nodes";
+
 import type * as validators from "../utils/validators";
 
 export interface K8SWorker {
@@ -12,12 +14,19 @@ export interface K8SWorker {
   planetary: boolean;
   rootFsSize: number;
   farm?: Farm;
+  selectedNode?: INode;
+  rentedBy?: number;
+  dedicated: boolean;
+  certified: boolean;
 }
 
 export interface CaproverWorker {
+  selectedNode?: INode;
   name: string;
   farm?: Farm;
   solution?: solutionFlavor;
+  dedicated?: boolean;
+  certified?: boolean;
 }
 
 export interface Farm {
@@ -83,6 +92,27 @@ export enum SolutionCode {
   wordpress = "wp",
 }
 
+export const solutionType: { [key: string]: string } = {
+  algorand: "Algorand",
+  caprover: "CapRover",
+  casperlabs: "Casperlabs",
+  discourse: "Discourse",
+  fullvm: "Full Virtual Machine",
+  funkwhale: "Funkwhale",
+  gatewayname: "Gateway Name",
+  kubernetes: "Kubernetes",
+  mattermost: "Mattermost",
+  nodepilot: "Node Pilot",
+  owncloud: "Owncloud",
+  peertube: "Peertube",
+  presearch: "Presearch",
+  subsquid: "Subsquid",
+  taiga: "Taiga",
+  umbrel: "Umbrel",
+  vm: "Micro Virtual Machine",
+  wordpress: "Wordpress",
+};
+
 export interface solutionFlavor {
   cpu: number;
   memory: number;
@@ -90,8 +120,10 @@ export interface solutionFlavor {
 }
 
 export interface GatewayNode {
-  id: number;
+  id?: number;
   domain: string;
+  useFQDN?: boolean;
+  ip?: string;
 }
 
 export interface SMTPServer {

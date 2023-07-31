@@ -1,6 +1,6 @@
 {
   "name": "@threefold/tfchain_client",
-  "version": "2.1.0-rc1",
+  "version": "2.1.0-rc5",
   "description": "A client for TF chain",
   "private": false,
   "publishConfig": {
