@@ -131,7 +131,7 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
-
+const rootFilesystemSize = 2;
 async function deploy() {
   layout.value.setStatus("deploy");
 
@@ -159,7 +159,7 @@ async function deploy() {
           publicIpv6: true,
           planetary: false,
           envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
-          rootFilesystemSize: 2,
+          rootFilesystemSize,
           disks: [
             {
               size: 15,
