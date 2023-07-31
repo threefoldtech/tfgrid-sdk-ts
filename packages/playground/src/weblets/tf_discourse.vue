@@ -3,7 +3,7 @@
     ref="layout"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
-    :disk="(solution?.disk ?? 0) + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
+    :disk="(solution?.disk ?? 0) + rootFilesystemSize"
     :certified="certified"
     :dedicated="dedicated"
     :ipv4="ipv4"
@@ -76,7 +76,7 @@
               :filters="{
                 cpu: solution?.cpu,
                 memory: solution?.memory,
-                ssd: (solution?.disk ?? 0) + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
+                ssd: (solution?.disk ?? 0) + rootFilesystemSize,
                 publicIp: ipv4,
                 rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
                 certified: certified,
@@ -123,7 +123,7 @@
 import type { GridClient } from "@threefold/grid_client";
 import { Buffer } from "buffer";
 import TweetNACL from "tweetnacl";
-import { type Ref, ref } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
@@ -150,7 +150,7 @@ const smtp = ref(createSMTPServer());
 const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
-
+const rootFilesystemSize = computed(() => rootFs(solution.value.cpu, solution.value.memory));
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.2.flist",
   entryPoint: "/sbin/zinit init",
@@ -196,7 +196,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
           disks: [{ size: solution.value?.disk, mountPoint: "/var/lib/docker" }],
           flist: flist.value,
           entryPoint: flist.entryPoint,
-          rootFilesystemSize: rootFs(solution.value.cpu, solution.value.memory),
+          rootFilesystemSize: rootFilesystemSize.value,
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           publicIpv4: ipv4.value,
