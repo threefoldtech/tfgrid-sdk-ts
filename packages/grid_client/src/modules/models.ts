@@ -564,6 +564,31 @@ class FilterOptions {
   @Expose() @IsOptional() @IsInt() @Min(1) rentedBy?: number;
 }
 
+enum CertificationType {
+  Diy = "Diy",
+  Certified = "Certified",
+}
+
+class FarmFilterOptions {
+  @Expose() @IsOptional() @Min(0) nodeMRU?: number; // GB
+  @Expose() @IsOptional() @Min(0) nodeSRU?: number; // GB
+  @Expose() @IsOptional() @Min(0) nodeHRU?: number; // GB
+  @Expose() @IsOptional() @IsBoolean() publicIp?: boolean;
+  @Expose() @IsOptional() @IsBoolean() accessNodeV4?: boolean;
+  @Expose() @IsOptional() @IsBoolean() accessNodeV6?: boolean;
+  @Expose() @IsOptional() @IsBoolean() gateway?: boolean;
+  @Expose() @IsOptional() @IsBoolean() certificationType?: CertificationType;
+  @Expose() @IsOptional() @IsString() farmName?: string;
+  @Expose() @IsOptional() @IsString() country?: string;
+  @Expose() @IsOptional() @IsBoolean() dedicated?: boolean;
+  @Expose() @IsOptional() @IsBoolean() nodeCertified?: boolean;
+  @Expose() @IsOptional() @IsInt() @Min(1) availableFor?: number;
+  @Expose() @IsOptional() @IsBoolean() nodeHasGPU?: boolean;
+  @Expose() @IsOptional() @IsInt() @Min(1) nodeRentedBy?: number;
+  @Expose() @IsOptional() @IsInt() page?: number;
+  @Expose() @IsOptional() @IsInt() size?: number;
+}
+
 class CalculatorModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(0) cru: number; // vCores
   @Expose() @IsNumber() @IsNotEmpty() @Min(0) mru: number; // GB
@@ -693,6 +718,7 @@ export {
   NodeFreeResourcesModel,
   FarmIdFromFarmNameModel,
   FilterOptions,
+  FarmFilterOptions,
   ContractStates,
   ContractState,
   TfchainWalletInitModel,

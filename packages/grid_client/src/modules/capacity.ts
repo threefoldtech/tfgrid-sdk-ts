@@ -4,6 +4,7 @@ import { validateInput } from "../helpers/validator";
 import { FarmerBot, FarmerBotFindNodeModel } from "../high_level/farmerbot";
 import { FarmInfo, NodeInfo, NodeResources, Nodes } from "../primitives/nodes";
 import {
+  FarmFilterOptions,
   FarmHasFreePublicIPsModel,
   FarmIdFromFarmNameModel,
   FarmsGetModel,
@@ -83,6 +84,12 @@ class Capacity {
     // }
     if (nodes.length <= 0) nodes = await this.nodes.filterNodes(options);
     return nodes;
+  }
+
+  @expose
+  @validateInput
+  async filterFarms(options?: FarmFilterOptions): Promise<FarmInfo[]> {
+    return await this.nodes.filterFarms(options);
   }
 
   @expose
