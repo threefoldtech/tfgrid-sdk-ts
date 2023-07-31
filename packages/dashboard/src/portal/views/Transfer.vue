@@ -88,7 +88,6 @@
 </template>
 
 <script lang="ts">
-import { web3FromAddress } from "@polkadot/extension-dapp";
 import { Client, QueryClient } from "@threefold/tfchain_client";
 import QrcodeVue from "qrcode.vue";
 import { Component, Vue } from "vue-property-decorator";
@@ -136,8 +135,6 @@ export default class TransferView extends Vue {
       }, 6000);
     });
     try {
-      console.log("twinId: ", this.receptinTwinId);
-      console.log(typeof this.receptinTwinId);
       const twinDetailsPromise = this.queryClient.twins.get({ id: parseInt(this.receptinTwinId) });
       const twinDetails = await Promise.race([twinDetailsPromise, timeoutPromise]);
       if (twinDetails) {
@@ -242,15 +239,11 @@ export default class TransferView extends Vue {
 
   async transferTFTWithTwinID() {
     const twinDetails = await this.queryClient.twins.get({ id: parseInt(this.receptinTwinId) });
-    const injector = await web3FromAddress(this.$store.state.credentials.account.address);
     if (twinDetails != null) {
       const twinAddress = twinDetails.accountId;
       const client = new Client({
         url: window.configs.APP_API_URL,
-        extSigner: {
-          address: this.$store.state.credentials.account.address,
-          signer: injector.signer,
-        },
+        mnemonicOrSecret: this.$store.state.profile.mnemonic,
       });
       this.loadingTransferTwinId = true;
       try {
