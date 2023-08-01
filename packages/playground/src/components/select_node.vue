@@ -106,17 +106,13 @@ export interface NodeFilters {
   type?: string;
   availableFor?: number;
 }
-export interface StoragePool {
-  type: string;
-  size: number;
-  used: number;
-}
 
 const emits = defineEmits<{ (event: "update:modelValue", value?: INode): void }>();
 
 const props = defineProps({
   modelValue: { type: Object as PropType<INode> },
   filters: { default: () => ({} as NodeFilters), type: Object as PropType<NodeFilters> },
+  rootFileSystemSize: { type: Number, required: true },
 });
 const farmManager = useFarm();
 const profileManager = useProfileManager();
@@ -159,15 +155,6 @@ watch(
       validator.value?.setStatus(ValidatorStatus.Pending);
       pingingNode.value = true;
       try {
-        console.log(
-          await checkStoragepools(
-            props.filters.disks.map(disk => disk.size * 1024 ** 3),
-            5,
-            node.nodeId,
-            grid,
-          ),
-        );
-
         emits("update:modelValue", {
           nodeId: node.nodeId,
           cards: cards,
@@ -240,46 +227,6 @@ onMounted(() => {
     if (farmId) loadNodes(farmId);
   });
 });
-
-function diskSearch(DisksPool: number[], disk: number) {
-  for (const index in DisksPool) {
-    if (DisksPool[index] >= disk) return +index;
-  }
-  return -1;
-}
-
-async function checkStoragepools(disks: number[], rootFileSystemSize: number, nodeId: number, grid: GridClient) {
-  let pool: number[];
-  try {
-    pool = (await grid.zos.getStoragePools({ nodeId })).flatMap((disk: StoragePool) => {
-      return disk.type === "ssd" ? [disk.size - disk.used] : [];
-    });
-  } catch {
-    throw new Error(`Node ${nodeId} is not responding please select another node`);
-  }
-  pool.sort((a, b) => b - a);
-  disks.sort((a, b) => b - a);
-
-  disks.forEach(disk => {
-    const index: number = diskSearch(pool, disk);
-    console.log(index);
-    if (index === -1) {
-      throw new Error(
-        `can't fit required disk with size ${
-          disk / 1024 ** 3
-        } to the disks pool of node ${nodeId}, please select another node`,
-      );
-    }
-    pool[index] -= disk;
-    pool.sort((a, b) => b - a);
-  });
-  if (diskSearch(pool, rootFileSystemSize * 10 ** 3) === -1) {
-    throw new Error(
-      `can't fit required root file system disk with size ${rootFileSystemSize} to the disks pool of node ${nodeId}, please select another node`,
-    );
-  }
-  return true;
-}
 
 async function loadNodes(farmId: number) {
   availableNodes.value = [];
