@@ -267,23 +267,31 @@
         >
           <template #activator="{ props }">
             <CopyInputWrapper :data="profileManager.profile.ssh" #="{ props: copyInputProps }">
-              <VTextarea
-                label="Public SSH Key"
-                no-resize
-                :spellcheck="false"
-                v-model.trim="ssh"
-                v-bind="{ ...props, ...copyInputProps }"
-                :disabled="updatingSSH || generatingSSH"
-                :hint="
-                  updatingSSH
-                    ? 'Updating your public ssh key.'
-                    : generatingSSH
-                    ? 'Generating a new public ssh key.'
-                    : SSHKeyHint
-                "
-                :persistent-hint="updatingSSH || generatingSSH || !!SSHKeyHint"
-                :rules="[value => !!value || 'SSH key is required']"
-              />
+              <InputValidator
+                :value="ssh"
+                :rules="[
+                  validators.required('SSH key is required'),
+                  v => (isValidSSHKey(v) ? undefined : { message: `SSH key must be in RSA format.` }),
+                ]"
+                #="{ props: validationProps }"
+              >
+                <VTextarea
+                  label="Public SSH Key"
+                  no-resize
+                  :spellcheck="false"
+                  v-model.trim="ssh"
+                  v-bind="{ ...props, ...copyInputProps, ...validationProps }"
+                  :disabled="updatingSSH || generatingSSH"
+                  :hint="
+                    updatingSSH
+                      ? 'Updating your public ssh key.'
+                      : generatingSSH
+                      ? 'Generating a new public ssh key.'
+                      : SSHKeyHint
+                  "
+                  :persistent-hint="updatingSSH || generatingSSH || !!SSHKeyHint"
+                />
+              </InputValidator>
             </CopyInputWrapper>
           </template>
         </VTooltip>
@@ -303,7 +311,13 @@
             color="primary"
             variant="text"
             @click="updateSSH"
-            :disabled="!ssh || profileManager.profile.ssh === ssh || updatingSSH || !isEnoughBalance(balance)"
+            :disabled="
+              !ssh ||
+              !isValidSSHKey(ssh) ||
+              profileManager.profile.ssh === ssh ||
+              updatingSSH ||
+              !isEnoughBalance(balance)
+            "
             :loading="updatingSSH"
           >
             Update Public SSH Key
@@ -535,6 +549,11 @@ function validateMnInput(mnemonic: string) {
     .catch(e => {
       return { message: normalizeError(e, "Something went wrong. please try again.") };
     });
+}
+
+function isValidSSHKey(value: string) {
+  const rsaPublicKeyRegex = /^ssh-rsa\s+[A-Za-z0-9+/]+[=]{0,3}(\s+[^\s]+)?$/;
+  return rsaPublicKeyRegex.test(value);
 }
 
 onMounted(async () => {
