@@ -2,7 +2,9 @@
   <v-card-actions>
     <v-spacer></v-spacer>
     <v-btn @click="clearInput" color="grey lighten-2 black--text">Clear</v-btn>
-    <v-btn @click="submitForm" :loading="loadingTransfer" :disabled="!isTransferValid">Submit</v-btn>
+    <v-btn class="primary white--text" @click="submitForm" :loading="loadingTransfer" :disabled="!isTransferValid"
+      >Submit</v-btn
+    >
   </v-card-actions>
 </template>
 
