@@ -40,9 +40,7 @@
           cpu: $props.modelValue.solution?.cpu,
           memory: $props.modelValue.solution?.memory,
           publicIp: true,
-          ssd:
-            ($props.modelValue.solution?.disk ?? 0) +
-            rootFs($props.modelValue.solution?.cpu ?? 0, $props.modelValue.solution?.memory ?? 0),
+          ssd: ($props.modelValue.solution?.disk ?? 0) + rootFilesystemSize,
           rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
           certified: $props.modelValue.certified,
         }"
@@ -68,11 +66,16 @@
 import { useProfileManager } from "../stores";
 import rootFs from "../utils/root_fs";
 
-defineProps<{ modelValue: CaproverWorker }>();
+const props = defineProps<{ modelValue: CaproverWorker }>();
+const rootFilesystemSize = computed(() =>
+  rootFs(props.modelValue.solution?.cpu ?? 0, props.modelValue.solution?.memory ?? 0),
+);
 const profileManager = useProfileManager();
 </script>
 
 <script lang="ts">
+import { computed } from "vue";
+
 import SelectFarmManager from "../components/select_farm_manager.vue";
 import SelectNode from "../components/select_node.vue";
 import type { CaproverWorker } from "../types";
