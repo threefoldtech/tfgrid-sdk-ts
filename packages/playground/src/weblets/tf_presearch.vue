@@ -143,7 +143,7 @@ const ipv4 = ref(false);
 const planetary = ref(true);
 const cpu = 1;
 const memory = 512;
-const rootFilesystemSize = computed(() => rootFs(cpu, memory));
+const rootFilesystemSize = rootFs(cpu, memory);
 
 const farm = ref() as Ref<Farm>;
 const privateRestoreKey = ref("");
