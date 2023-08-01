@@ -240,6 +240,14 @@ onMounted(() => {
     if (farmId) loadNodes(farmId);
   });
 });
+
+function diskSearch(DisksPool: number[], disk: number) {
+  for (const index in DisksPool) {
+    if (DisksPool[index] >= disk) return +index;
+  }
+  return -1;
+}
+
 async function checkStoragepools(disks: number[], rootFileSystemSize: number, nodeId: number, grid: GridClient) {
   let pool: number[];
   try {
@@ -270,16 +278,9 @@ async function checkStoragepools(disks: number[], rootFileSystemSize: number, no
       `can't fit required root file system disk with size ${rootFileSystemSize} to the disks pool of node ${nodeId}, please select another node`,
     );
   }
-
   return true;
 }
-//Binary Search
-function diskSearch(DisksPool: number[], disk: number) {
-  for (const index in DisksPool) {
-    if (DisksPool[index] >= disk) return +index;
-  }
-  return -1;
-}
+
 async function loadNodes(farmId: number) {
   availableNodes.value = [];
   selectedNode.value = undefined;
