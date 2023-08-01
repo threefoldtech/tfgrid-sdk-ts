@@ -162,6 +162,7 @@ watch(
         console.log(
           await checkStoragepools(
             props.filters.disks.map(disk => disk.size * 1024 ** 3),
+            5,
             node.nodeId,
             grid,
           ),
@@ -239,7 +240,7 @@ onMounted(() => {
     if (farmId) loadNodes(farmId);
   });
 });
-async function checkStoragepools(disks: number[], nodeId: number, grid: GridClient) {
+async function checkStoragepools(disks: number[], rootFileSystemSize: number, nodeId: number, grid: GridClient) {
   let pool: number[];
   try {
     pool = (await grid.zos.getStoragePools({ nodeId })).flatMap((disk: StoragePool) => {
@@ -248,36 +249,36 @@ async function checkStoragepools(disks: number[], nodeId: number, grid: GridClie
   } catch {
     throw new Error(`Node ${nodeId} is not responding please select another node`);
   }
-
-  pool.sort((a, b) => a - b);
-  disks.sort((a, b) => a - b);
+  pool.sort((a, b) => b - a);
+  disks.sort((a, b) => b - a);
 
   disks.forEach(disk => {
-    const index = diskSearch(pool, disk);
-    if (index === -1)
+    const index: number = diskSearch(pool, disk);
+    console.log(index);
+    if (index === -1) {
       throw new Error(
         `can't fit required disk with size ${
           disk / 1024 ** 3
         } to the disks pool of node ${nodeId}, please select another node`,
       );
+    }
     pool[index] -= disk;
-    pool.sort((a, b) => a - b);
+    pool.sort((a, b) => b - a);
   });
+  if (diskSearch(pool, rootFileSystemSize * 10 ** 3) === -1) {
+    throw new Error(
+      `can't fit required root file system disk with size ${rootFileSystemSize} to the disks pool of node ${nodeId}, please select another node`,
+    );
+  }
 
   return true;
 }
 //Binary Search
 function diskSearch(DisksPool: number[], disk: number) {
-  let start = 0,
-    end = DisksPool.length - 1;
-  while (start <= end) {
-    const mid = Math.floor((start + end) / 2);
-    if (DisksPool[mid] === disk) return mid;
-    else if (DisksPool[mid] < disk) start = mid + 1;
-    else end = mid - 1;
+  for (const index in DisksPool) {
+    if (DisksPool[index] >= disk) return +index;
   }
-  ++end;
-  return DisksPool[end] ? end : -1;
+  return -1;
 }
 async function loadNodes(farmId: number) {
   availableNodes.value = [];
