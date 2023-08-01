@@ -52,6 +52,30 @@
                 @click:append="showMnemonic = !showMnemonic"
               />
             </v-form>
+            <section class="d-flex flex-column align-center">
+              <p class="font-weight-bold mb-4">
+                Scan the QRcode using
+                <a class="app-link" href="https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html" target="_blank">
+                  ThreeFold Connect
+                </a>
+                to fund your account
+              </p>
+              <QrcodeGenerator
+                :data="'TFT:' + bridge + '?message=twin_' + $store.state.profile.twin + '&sender=me&amount=100'"
+              />
+              <div class="d-flex justify-center my-4">
+                <a
+                  v-for="(app, index) in apps"
+                  :key="app.alt"
+                  :style="{ cursor: 'pointer', width: '150px' }"
+                  :class="{ 'mr-2': index === 0 }"
+                  :title="app.alt"
+                  v-html="app.src"
+                  :href="app.url"
+                  target="_blank"
+                />
+              </div>
+            </section>
           </v-container>
         </v-card-text>
 
@@ -380,7 +404,6 @@ export default class TfChainConnector extends Vue {
       console.log("error", e);
     } finally {
       this.connecting = false;
-      this.show = false;
     }
   }
 
