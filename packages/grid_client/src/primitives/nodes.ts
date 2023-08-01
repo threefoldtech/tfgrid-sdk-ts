@@ -366,9 +366,6 @@ class Nodes {
       node_free_sru: Math.ceil(this._g2b(options.nodeSRU)) || "",
       node_free_hru: Math.ceil(this._g2b(options.nodeHRU)) || "",
       free_ips: options.publicIp ? 1 : "",
-      ipv4: options.accessNodeV4,
-      ipv6: options.accessNodeV6,
-      gateway: options.gateway,
       certification_type: options.nodeCertified ? "Certified" : "",
       farm_name: options.farmName,
       country: options.country,
@@ -380,11 +377,6 @@ class Nodes {
       node_has_gpu: options.nodeHasGPU,
       node_rented_by: options.nodeRentedBy,
     };
-    if (options.gateway) {
-      params["ipv4"] = true;
-      params["ipv6"] = true;
-      params["domain"] = true;
-    }
     return Object.entries(params)
       .map(param => param.join("="))
       .join("&");
