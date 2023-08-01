@@ -61,7 +61,7 @@
                 to fund your account
               </p>
               <QrcodeGenerator
-                :data="'TFT:' + bridge + '?message=twin_' + $store.state.profile.twin + '&sender=me&amount=100'"
+                :data="'TFT:' + bridge + '?message=twin_' + $store.state.profile?.twin + '&sender=me&amount=100'"
               />
               <div class="d-flex justify-center my-4">
                 <a
@@ -246,8 +246,7 @@ enum SSHState {
   },
 })
 export default class TfChainConnector extends Vue {
-  /* devnet bridge for now */
-  public bridge = "GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG";
+  public bridge = (window as any).configs.APP_BRIDGE_TFT_ADDRESS;
 
   readonly apps = [
     {
