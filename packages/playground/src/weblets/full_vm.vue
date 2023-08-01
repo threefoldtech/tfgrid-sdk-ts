@@ -79,7 +79,7 @@
               cpu: solution?.cpu,
               memory: solution?.memory,
               publicIp: ipv4,
-              ssd: disks.reduce((total, disk) => total + disk.size, solution?.disk + 2),
+              ssd: disks.reduce((total, disk) => total + disk.size, solution?.disk + rootFilesystemSize),
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
               hasGPU: hasGPU,
@@ -205,7 +205,7 @@ const disks = ref<Disk[]>([]);
 const network = ref();
 const hasGPU = ref();
 const selectedNode = ref() as Ref<INode>;
-
+const rootFilesystemSize = 2;
 function addDisk() {
   const name = generateName(7);
   disks.value.push({
@@ -263,7 +263,7 @@ async function deploy() {
           publicIpv6: ipv6.value,
           planetary: planetary.value,
           envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
-          rootFilesystemSize: 2,
+          rootFilesystemSize,
           hasGPU: hasGPU.value,
           nodeId: selectedNode.value.nodeId,
           gpus: hasGPU.value ? selectedNode.value.cards?.map(card => card.id) : undefined,

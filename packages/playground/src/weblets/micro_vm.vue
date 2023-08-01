@@ -4,7 +4,7 @@
     @mount="layoutMount"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
-    :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk)"
+    :disk="disks.reduce((total, disk) => total + disk.size, rootFilesystemSize)"
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
@@ -72,7 +72,7 @@
               cpu: solution?.cpu,
               memory: solution?.memory,
               publicIp: ipv4,
-              ssd: disks.reduce((total, disk) => total + disk.size, solution?.disk),
+              ssd: disks.reduce((total, disk) => total + disk.size, rootFilesystemSize),
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
@@ -178,7 +178,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import Network from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
@@ -229,7 +229,7 @@ const network = ref();
 const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
-
+const rootFilesystemSize = computed(() => solution.value?.disk);
 function layoutMount() {
   if (envs.value.length > 0) {
     envs.value.splice(0, 1);
@@ -280,7 +280,7 @@ async function deploy() {
           planetary: planetary.value,
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
-          rootFilesystemSize: solution.value.disk,
+          rootFilesystemSize: rootFilesystemSize.value,
           nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,

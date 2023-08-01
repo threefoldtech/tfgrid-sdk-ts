@@ -142,7 +142,7 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { type Ref, ref } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
@@ -164,6 +164,7 @@ const email = ref("");
 const password = ref(generatePassword(12));
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
+const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/funkwhale-dec21.flist",
   entryPoint: "/init.sh",
@@ -233,6 +234,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
           nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
+          rootFilesystemSize: rootFilesystemSize.value,
         },
       ],
     });
@@ -276,6 +278,7 @@ import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { INode } from "../utils/filter_nodes";
+import rootFs from "../utils/root_fs";
 
 export default {
   name: "TfFunkwhale",
