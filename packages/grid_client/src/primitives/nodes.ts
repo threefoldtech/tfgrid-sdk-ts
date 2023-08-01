@@ -74,7 +74,11 @@ interface RMBNodeCapacity {
   total: NodeResources;
   used: NodeResources;
 }
-
+export interface StoragePool {
+  type: string;
+  size: number;
+  used: number;
+}
 class Nodes {
   gqlClient: Graphql;
   rmb: RMB;
@@ -371,6 +375,58 @@ class Nodes {
       .catch(err => {
         throw Error(`Error checking if node ${nodeId} is available for twin ${twinId}: ${err}`);
       });
+  }
+
+  /**
+   * Searches for a disk in the given DisksPool and returns the index of the first occurrence
+   * where the disk size is greater than or equal to the specified disk size.
+   *
+   * @param {number[]} DisksPool - An array containing the sizes of disks in the pool.
+   * @param {number} disk - The size of the disk to search for.
+   * @returns {number} - The index of the first disk in the DisksPool that has a size greater than or equal to the specified disk size.
+   *                    If no disk is found, it returns -1.
+   */
+  findDiskIndex(DisksPool: number[], disk: number) {
+    for (const index in DisksPool) {
+      if (DisksPool[index] >= disk) return +index;
+    }
+    return -1;
+  }
+
+  async verifyNodeStoragePoolCapacity(disks: number[], rootFileSystemSize: number, nodeId: number) {
+    let pool: number[];
+    try {
+      const node_twin_id = await this.getNodeTwinId(nodeId);
+      pool = ((await this.rmb.request([node_twin_id], "zos.storage.pools", "")) as StoragePool[]).flatMap(
+        (disk: StoragePool) => {
+          return disk.type === "ssd" ? [disk.size - disk.used] : [];
+        },
+      );
+      console.log(pool);
+    } catch (err) {
+      throw Error(`Error getting node ${nodeId}: ${err}`);
+    }
+    pool.sort((a, b) => b - a);
+    disks.sort((a, b) => b - a);
+    disks.forEach(disk => {
+      const index: number = this.findDiskIndex(pool, disk);
+      console.log(index);
+      if (index === -1) {
+        throw new Error(
+          `can't fit required disk with size ${
+            disk / 1024 ** 3
+          } to the disks pool of node ${nodeId}, please select another node`,
+        );
+      }
+      pool[index] -= disk;
+      pool.sort((a, b) => b - a);
+    });
+    if (this.findDiskIndex(pool, rootFileSystemSize) === -1) {
+      throw new Error(
+        `can't fit required root file system disk with size ${rootFileSystemSize} to the disks pool of node ${nodeId}, please select another node`,
+      );
+    }
+    return true;
   }
 
   // TODO : add get node by its node ID like the one in modules

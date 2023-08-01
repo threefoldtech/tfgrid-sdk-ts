@@ -537,6 +537,11 @@ class NodeFreeResourcesModel {
 class FarmIdFromFarmNameModel {
   @Expose() @IsString() @IsNotEmpty() farmName: string;
 }
+class CapacityPoolCheckModel {
+  @Expose() @IsInt() @Min(1) nodeId: number;
+  @Expose() @IsInt({ each: true }) @Min(1, { each: true }) disks: number[]; //Byte
+  @Expose() @IsInt() @Min(1) rootfs_size: number; //Byte
+}
 
 class PingNodeOptionsModel {
   @Expose() @IsInt() @Min(1) nodeId: number;
@@ -692,6 +697,7 @@ export {
   NodesByFarmIdModel,
   NodeFreeResourcesModel,
   FarmIdFromFarmNameModel,
+  CapacityPoolCheckModel,
   FilterOptions,
   ContractStates,
   ContractState,

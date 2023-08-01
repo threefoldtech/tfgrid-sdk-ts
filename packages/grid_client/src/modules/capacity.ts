@@ -4,6 +4,7 @@ import { validateInput } from "../helpers/validator";
 import { FarmerBot, FarmerBotFindNodeModel } from "../high_level/farmerbot";
 import { FarmInfo, NodeInfo, NodeResources, Nodes } from "../primitives/nodes";
 import {
+  CapacityPoolCheckModel,
   FarmHasFreePublicIPsModel,
   FarmIdFromFarmNameModel,
   FarmsGetModel,
@@ -107,6 +108,11 @@ class Capacity {
   @validateInput
   async getFarmIdFromFarmName(options?: FarmIdFromFarmNameModel): Promise<number> {
     return await this.nodes.getFarmIdFromFarmName(options.farmName);
+  }
+  @expose
+  @validateInput
+  async checkNodeCapacityPool(options: CapacityPoolCheckModel): Promise<boolean> {
+    return await this.nodes.verifyNodeStoragePoolCapacity(options.disks, options.rootfs_size, options.nodeId);
   }
 }
 
