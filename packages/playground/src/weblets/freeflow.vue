@@ -80,6 +80,7 @@
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
+            :root-file-system-size="rootFileSystemSize"
           />
         </SelectFarmManager>
         <DomainName :hasIPv4="ipv4" ref="domainNameCmp"></DomainName>

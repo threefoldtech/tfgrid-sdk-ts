@@ -72,6 +72,7 @@
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
+            :root-file-system-size="rootFilesystemSize"
           />
           <DomainName :hasIPv4="ipv4" ref="domainNameCmp" />
         </FarmGateWayManager>
