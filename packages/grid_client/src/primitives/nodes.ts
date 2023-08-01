@@ -393,27 +393,38 @@ class Nodes {
     return -1;
   }
 
-  async verifyNodeStoragePoolCapacity(disks: number[], rootFileSystemSize: number, nodeId: number) {
+  /**
+   * Verifies the node's storage pool capacity to accommodate required disks and the root file system.
+   *
+   * @param {number[]} disks - An array containing the sizes of required disks in bytes.
+   * @param {number} rootFileSystemSize - The size of the required root file system disk in bytes.
+   * @param {number} nodeId - The ID of the node to check storage pools on.
+   * @throws {Error} - If there is an error getting the node, or if required disks cannot fit in the storage pools.
+   * @returns {boolean} - Returns true if all required disks and root file system disk can fit in the storage pools.
+   */
+  async verifyNodeStoragePoolCapacity(disks: number[], rootFileSystemSize: number, nodeId: number): Promise<boolean> {
     let pool: number[];
+
     try {
-      const node_twin_id = await this.getNodeTwinId(nodeId);
-      pool = ((await this.rmb.request([node_twin_id], "zos.storage.pools", "")) as StoragePool[]).flatMap(
+      const nodeTwinId = await this.getNodeTwinId(nodeId);
+      pool = ((await this.rmb.request([nodeTwinId], "zos.storage.pools", "")) as StoragePool[]).flatMap(
         (disk: StoragePool) => {
+          // Filter the SSD type disks and calculate the available space for each
           return disk.type === "ssd" ? [disk.size - disk.used] : [];
         },
       );
-      console.log(pool);
     } catch (err) {
-      throw Error(`Error getting node ${nodeId}: ${err}`);
+      throw new Error(`Error getting node ${nodeId}: ${err}`);
     }
+
     pool.sort((a, b) => b - a);
     disks.sort((a, b) => b - a);
+
     disks.forEach(disk => {
       const index: number = this.findDiskIndex(pool, disk);
-      console.log(index);
       if (index === -1) {
         throw new Error(
-          `can't fit required disk with size ${
+          `Cannot fit the required disk with size ${
             disk / 1024 ** 3
           } to the disks pool of node ${nodeId}, please select another node`,
         );
@@ -421,9 +432,12 @@ class Nodes {
       pool[index] -= disk;
       pool.sort((a, b) => b - a);
     });
+
     if (this.findDiskIndex(pool, rootFileSystemSize) === -1) {
       throw new Error(
-        `can't fit required root file system disk with size ${rootFileSystemSize} to the disks pool of node ${nodeId}, please select another node`,
+        `Cannot fit the required root file system disk with size ${
+          rootFileSystemSize / 1024 ** 3
+        } to the disks pool of node ${nodeId}, please select another node`,
       );
     }
     return true;
