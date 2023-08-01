@@ -132,7 +132,7 @@ const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
 const domainNameCmp = ref();
 const smtp = ref(createSMTPServer());
-const rootFilesystemSize = computed(() => rootFs(solution.value.cpu, solution.value.memory));
+const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed a mattermost instance.");

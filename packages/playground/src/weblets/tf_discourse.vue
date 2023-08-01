@@ -150,7 +150,7 @@ const smtp = ref(createSMTPServer());
 const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
-const rootFilesystemSize = computed(() => rootFs(solution.value.cpu, solution.value.memory));
+const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.2.flist",
   entryPoint: "/sbin/zinit init",
