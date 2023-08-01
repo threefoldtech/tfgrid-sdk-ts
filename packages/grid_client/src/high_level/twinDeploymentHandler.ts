@@ -293,7 +293,16 @@ class TwinDeploymentHandler {
           mru += workload.data["compute_capacity"].memory;
         }
       }
-
+      let rootfs_size;
+      const disks: number[] = [];
+      for (const workload of workloads) {
+        if (workload.type == WorkloadTypes.zmachine) {
+          rootfs_size = workload.data["size"];
+        }
+        if (workload.type == WorkloadTypes.zmount) {
+          disks.push(workload.data["size"]);
+        }
+      }
       if (
         workloads.length !== 0 &&
         !(await this.nodes.nodeHasResources(+twinDeployment.nodeId, {
@@ -303,6 +312,9 @@ class TwinDeploymentHandler {
         }))
       ) {
         throw Error(`Node ${twinDeployment.nodeId} doesn't have enough resources: sru=${sru}, mru=${mru}`);
+      }
+      if (workloads.length !== 0 && rootfs_size !== undefined) {
+        await this.nodes.verifyNodeStoragePoolCapacity(disks, rootfs_size, +twinDeployment.nodeId);
       }
     }
   }
