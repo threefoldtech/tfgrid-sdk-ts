@@ -70,7 +70,7 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
-            tooltip="Preview"
+            tooltip="Visit"
             color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.PEERTUBE_WEBSERVER_HOSTNAME"
@@ -84,7 +84,7 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
-            tooltip="Preview"
+            tooltip="Visit"
             color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.FUNKWHALE_HOSTNAME"
@@ -104,7 +104,7 @@
             :href="'http://' + item.value[0].env.DOMAIN_NAME + '/admin/'"
           />
           <IconActionBtn
-            tooltip="Preview"
+            tooltip="Visit"
             color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.DOMAIN_NAME"
@@ -125,7 +125,7 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Preview" color="white" icon="mdi-web" :href="item.value[0].env.SITE_URL" />
+          <IconActionBtn tooltip="Visit" color="white" icon="mdi-web" :href="item.value[0].env.SITE_URL" />
         </template>
 
         <template #Discourse-actions="{ item }">
@@ -135,7 +135,7 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
-            tooltip="Preview"
+            tooltip="Visit"
             color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.DISCOURSE_HOSTNAME"
@@ -149,7 +149,7 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
-            tooltip="Preview"
+            tooltip="Visit"
             color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.DIGITALTWIN_APPID"
@@ -163,7 +163,7 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
-            tooltip="Preview"
+            tooltip="Visit"
             color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.CASPERLABS_HOSTNAME"
@@ -177,7 +177,7 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
-            tooltip="Preview"
+            tooltip="Visit"
             color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.OWNCLOUD_DOMAIN"
@@ -191,7 +191,7 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
-            tooltip="Preview"
+            tooltip="Visit"
             color="white"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.SUBSQUID_WEBSERVER_HOSTNAME + '/graphql'"
@@ -250,7 +250,7 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Preview" color="white" icon="mdi-web" :href="'https://' + item.value[0].env.WP_URL" />
+          <IconActionBtn tooltip="Visit" color="white" icon="mdi-web" :href="'https://' + item.value[0].env.WP_URL" />
           <IconActionBtn
             tooltip="Admin Panel"
             color="white"
