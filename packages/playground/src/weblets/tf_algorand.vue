@@ -223,7 +223,7 @@ const farm = ref() as Ref<Farm>;
 const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
-
+const rootFilesystemSize = computed(() => storage.value);
 watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()));
 
 async function deploy() {
@@ -258,7 +258,7 @@ async function deploy() {
                   },
                 ]
               : [],
-          rootFilesystemSize: storage.value,
+          rootFilesystemSize: rootFilesystemSize.value,
           publicIpv4: ipv4.value,
           planetary: true,
           nodeId: selectedNode.value.nodeId,

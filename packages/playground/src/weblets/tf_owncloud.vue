@@ -3,7 +3,7 @@
     ref="layout"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
-    :disk="solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
+    :disk="solution?.disk + rootFilesystemSize"
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
@@ -93,7 +93,7 @@
               :filters="{
                 cpu: solution?.cpu,
                 memory: solution?.memory,
-                ssd: solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
+                ssd: solution?.disk + rootFilesystemSize,
                 publicIp: ipv4,
                 rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
                 certified: certified,
@@ -143,7 +143,7 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { type Ref, ref } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
@@ -174,7 +174,7 @@ const ipv4 = ref(false);
 const domainNameCmp = ref();
 
 const smtp = ref(createSMTPServer());
-
+const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed a owncloud instance.");
@@ -221,7 +221,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
           ],
           flist: flist.value,
           entryPoint: flist.entryPoint,
-          rootFilesystemSize: rootFs(solution.value.cpu, solution.value.memory),
+          rootFilesystemSize: rootFilesystemSize.value,
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           publicIpv4: ipv4.value,
