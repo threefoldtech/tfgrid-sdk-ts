@@ -35,8 +35,7 @@
         <v-card-title>Connect your TFChain Wallet</v-card-title>
         <v-card-subtitle>
           Please visit
-          <a href="https://manual.grid.tf/playground/weblets_profile_manager.html" target="_blank">the manual</a> get
-          started.
+          <a href="https://manual.grid.tf/playground/wallet_connector.html" target="_blank">the manual</a> get started.
         </v-card-subtitle>
         <v-divider />
 
