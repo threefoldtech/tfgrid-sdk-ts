@@ -539,8 +539,9 @@ class FarmIdFromFarmNameModel {
 }
 class CapacityPoolCheckModel {
   @Expose() @IsInt() @Min(1) nodeId: number;
-  @Expose() @IsInt({ each: true }) @Min(1, { each: true }) disks: number[]; //Byte
-  @Expose() @IsInt() @Min(1) rootfs_size: number; //Byte
+  @Expose() @IsInt({ each: true }) @ArrayNotEmpty() rootfsDisks: number[]; //Byte
+  @Expose() @IsInt({ each: true }) @Min(1, { each: true }) ssdDisks: number[]; //Byte
+  @Expose() @IsInt({ each: true }) hddDisks: number[]; //Byte
 }
 
 class PingNodeOptionsModel {

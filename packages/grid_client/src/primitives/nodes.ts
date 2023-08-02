@@ -378,69 +378,98 @@ class Nodes {
   }
 
   /**
-   * Searches for a disk in the given DisksPool and returns the index of the first occurrence
-   * where the disk size is greater than or equal to the specified disk size.
+   * Finds the index of a disk with a size greater than or equal to the specified disk size in the DisksPool.
    *
-   * @param {number[]} DisksPool - An array containing the sizes of disks in the pool.
-   * @param {number} disk - The size of the disk to search for.
-   * @returns {number} - The index of the first disk in the DisksPool that has a size greater than or equal to the specified disk size.
-   *                    If no disk is found, it returns -1.
+   * @param diskPools - An array of disk sizes available in the pool.
+   * @param disk - The required disk size to fit into the pool.
+   * @returns {boolean} - True if the disk can be fitted into the pool, otherwise false.
    */
-  findDiskIndex(DisksPool: number[], disk: number) {
-    for (const index in DisksPool) {
-      if (DisksPool[index] >= disk) return +index;
+  findDiskIndex(diskPools: number[], disk: number): boolean {
+    for (const index in diskPools) {
+      if (diskPools[index] >= disk) {
+        diskPools[index] -= disk;
+        return true;
+      }
     }
-    return -1;
+    return false;
   }
 
   /**
-   * Verifies the node's storage pool capacity to accommodate required disks and the root file system.
+   * Sorts an array of numbers in descending order.
    *
-   * @param {number[]} disks - An array containing the sizes of required disks in bytes.
-   * @param {number} rootFileSystemSize - The size of the required root file system disk in bytes.
-   * @param {number} nodeId - The ID of the node to check storage pools on.
-   * @throws {Error} - If there is an error getting the node, or if required disks cannot fit in the storage pools.
-   * @returns {boolean} - Returns true if all required disks and root file system disk can fit in the storage pools.
+   * @param array - The array of numbers to be sorted in descending order.
    */
-  async verifyNodeStoragePoolCapacity(disks: number[], rootFileSystemSize: number, nodeId: number): Promise<boolean> {
-    let pool: number[];
+  sortArrayDesc(array: number[]): void {
+    array.sort((a, b) => b - a);
+  }
+
+  /**
+   * Fits disks into a disks pool based on their sizes.
+   *
+   * @param disks - An array of disk sizes required to be fitted into the pool.
+   * @param pool - An array representing the available disk space in the pool.
+   * @param type - The type of disks being fitted (SSD, HDD, or RootFileSystem).
+   * @throws {Error} - If the required disk cannot be fitted into the pool.
+   */
+  fitDisksInDisksPool(disks: number[], pool: number[], type: "SSD" | "HDD" | "RootFileSystem"): void {
+    disks.forEach(disk => {
+      if (!this.findDiskIndex(pool, disk)) {
+        throw new Error(`Cannot fit the required ${type} disk with size ${(disk / 1024 ** 3).toFixed(2)} GB`);
+      }
+      this.sortArrayDesc(pool);
+    });
+  }
+
+  /**
+   * Verifies the storage pool capacity of a node for different disk types.
+   *
+   * @param ssdDisks - An array of SSD disk sizes required for the deployment.
+   * @param hddDisks - An array of HDD disk sizes required for the deployment.
+   * @param rootFileSystemDisks - An array of disk sizes required for the deployment's root file system.
+   * @param nodeId - The ID of the node to be verified.
+   * @returns {Promise<boolean>} - True if the node has enough capacity, otherwise false.
+   * @throws {Error} - If there is an error in getting the node's information or if the required deployment can't be fitted.
+   */
+  async verifyNodeStoragePoolCapacity(
+    ssdDisks: number[],
+    hddDisks: number[],
+    rootFileSystemDisks: number[],
+    nodeId: number,
+  ): Promise<boolean> {
+    const ssdPools: number[] = [];
+    const hddPools: number[] = [];
 
     try {
       const nodeTwinId = await this.getNodeTwinId(nodeId);
-      pool = ((await this.rmb.request([nodeTwinId], "zos.storage.pools", "")) as StoragePool[]).flatMap(
+      ((await this.rmb.request([nodeTwinId], "zos.storage.pools", "")) as StoragePool[]).forEach(
         (disk: StoragePool) => {
-          // Filter the SSD type disks and calculate the available space for each
-          return disk.type === "ssd" ? [disk.size - disk.used] : [];
+          disk.type === "ssd" ? ssdPools.push(disk.size - disk.used) : hddPools.push(disk.size - disk.used);
         },
       );
     } catch (err) {
       throw new Error(`Error getting node ${nodeId}: ${err}`);
     }
 
-    pool.sort((a, b) => b - a);
-    disks.sort((a, b) => b - a);
+    this.sortArrayDesc(hddPools);
+    this.sortArrayDesc(ssdPools);
 
-    disks.forEach(disk => {
-      const index: number = this.findDiskIndex(pool, disk);
-      if (index === -1) {
-        throw new Error(
-          `Cannot fit the required disk with size ${
-            disk / 1024 ** 3
-          } to the disks pool of node ${nodeId}, please select another node`,
-        );
-      }
-      pool[index] -= disk;
-      pool.sort((a, b) => b - a);
-    });
+    this.sortArrayDesc(rootFileSystemDisks);
+    this.sortArrayDesc(ssdDisks);
+    this.sortArrayDesc(hddDisks);
 
-    if (this.findDiskIndex(pool, rootFileSystemSize) === -1) {
+    try {
+      this.fitDisksInDisksPool(ssdDisks, ssdPools, "SSD");
+      this.fitDisksInDisksPool(hddDisks, hddPools, "HDD");
+      this.fitDisksInDisksPool(rootFileSystemDisks, ssdDisks, "RootFileSystem");
+      return true;
+    } catch (error) {
       throw new Error(
-        `Cannot fit the required root file system disk with size ${
-          rootFileSystemSize / 1024 ** 3
-        } to the disks pool of node ${nodeId}, please select another node`,
+        `${(error as Error).message}, on Node ${nodeId} with disk pools:
+         SSD:  ${ssdPools.map(disk => (disk / 1024 ** 3).toFixed(2).toString() + "GB ")} 
+         HDD:  ${hddPools.map(disk => (disk / 1024 ** 3).toFixed(2).toString() + "GB ")}
+    Please select another Node\n`,
       );
     }
-    return true;
   }
 
   // TODO : add get node by its node ID like the one in modules

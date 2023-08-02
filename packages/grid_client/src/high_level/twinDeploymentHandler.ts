@@ -281,18 +281,20 @@ class TwinDeploymentHandler {
       let hru = 0;
       let sru = 0;
       let mru = 0;
-      let rootfs_size;
-      const disks: number[] = [];
+      const rootfsDisks: number[] = [];
+      const ssdDisks: number[] = [];
+      const hddDisks: number[] = [];
       for (const workload of workloads) {
         if (workload.type == WorkloadTypes.zmachine) {
-          rootfs_size = workload.data["size"];
+          rootfsDisks.push(workload.data["size"]);
           sru += workload.data["size"];
         }
         if (workload.type == WorkloadTypes.zmount) {
-          disks.push(workload.data["size"]);
+          ssdDisks.push(workload.data["size"]);
           sru += workload.data["size"];
         }
         if (workload.type == WorkloadTypes.zdb) {
+          hddDisks.push(workload.data["size"]);
           hru += workload.data["size"];
         }
         if (workload.type == WorkloadTypes.zmachine) {
@@ -310,8 +312,8 @@ class TwinDeploymentHandler {
       ) {
         throw Error(`Node ${twinDeployment.nodeId} doesn't have enough resources: sru=${sru}, mru=${mru}`);
       }
-      if (workloads.length !== 0 && rootfs_size !== undefined) {
-        await this.nodes.verifyNodeStoragePoolCapacity(disks, rootfs_size, +twinDeployment.nodeId);
+      if (workloads.length && rootfsDisks.length) {
+        await this.nodes.verifyNodeStoragePoolCapacity(ssdDisks, hddDisks, rootfsDisks, +twinDeployment.nodeId);
       }
     }
   }

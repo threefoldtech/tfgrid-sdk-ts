@@ -112,7 +112,12 @@ class Capacity {
   @expose
   @validateInput
   async checkNodeCapacityPool(options: CapacityPoolCheckModel): Promise<boolean> {
-    return await this.nodes.verifyNodeStoragePoolCapacity(options.disks, options.rootfs_size, options.nodeId);
+    return await this.nodes.verifyNodeStoragePoolCapacity(
+      options.ssdDisks,
+      options.hddDisks,
+      options.rootfsDisks,
+      options.nodeId,
+    );
   }
 }
 
