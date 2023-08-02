@@ -89,6 +89,7 @@
 
 <script lang="ts">
 import { Client, QueryClient } from "@threefold/tfchain_client";
+import { Decimal } from "decimal.js";
 import QrcodeVue from "qrcode.vue";
 import { Component, Vue } from "vue-property-decorator";
 
@@ -246,10 +247,12 @@ export default class TransferView extends Vue {
         mnemonicOrSecret: this.$store.state.profile.mnemonic,
       });
       this.loadingTransferTwinId = true;
+      const decimalAmount = new Decimal(this.amountByTwinId);
+      const milliAmount = decimalAmount.mul(10 ** 7).toNumber();
       try {
         const transferResult = await client.balances.transfer({
           address: twinAddress,
-          amount: this.amountByTwinId * 1e7,
+          amount: milliAmount,
         });
         this.$toasted.show(`Transaction submitted`);
         await transferResult.apply();
