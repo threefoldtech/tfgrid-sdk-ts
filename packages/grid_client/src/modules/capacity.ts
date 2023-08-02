@@ -114,9 +114,9 @@ class Capacity {
    * Checks the storage pool capacity of a node for different disk types.
    *
    * @param options - An object containing the required disk sizes and node ID for capacity pool check.
-   * @param options.ssdDisks - An array of SSD disk sizes required for the node.
-   * @param options.hddDisks - An array of HDD disk sizes required for the node.
-   * @param options.rootfsDisks - An array of disk sizes required for the node's root file system.
+   * @param options.ssdDisks - An array of SSD disk sizes (in bytes) required for the node.
+   * @param options.hddDisks - An array of HDD disk sizes (in bytes) required for the node.
+   * @param options.rootfsDisks - An array of disk sizes (in bytes) required for the node's root file system.
    * @param options.nodeId - The ID of the node to be verified.
    * @returns {Promise<boolean>} - True if the node has enough capacity, otherwise false.
    * @throws {Error} - If there is an error in getting the node's information or if the required deployment can't be fitted.
