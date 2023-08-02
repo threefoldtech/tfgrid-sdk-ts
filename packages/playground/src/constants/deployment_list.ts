@@ -98,6 +98,13 @@ export const deploymentListEnvironments = {
     OWNCLOUD_MAIL_SMTP_PASSWORD: { label: "Owncloud Mail SMTP Password", type: "password" },
   },
 
+  nextcloud: {
+    SSH_KEY: _ssh,
+    NEXTCLOUD_DOMAIN: "Nextcloud Domain",
+    NEXTCLOUD_DATABASE_USERNAME: "Nextcloud Admin Username",
+    NEXTCLOUD_DATABASE_PASSWORD: { label: "Nextcloud Admin Password", type: "password" },
+  },
+
   peertube: {
     SSH_KEY: _ssh,
     PEERTUBE_ADMIN_EMAIL: "Peertube Admin Email",
