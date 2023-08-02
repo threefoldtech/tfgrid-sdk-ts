@@ -32,7 +32,7 @@
                 </TransferTextField>
                 <span class="fee">0.01 transaction fee will be deducted</span>
               </v-form>
-              <Buttons
+              <TransferFormButtons
                 :isTransferValid="isTransferValidAddress"
                 :loadingTransfer="loadingTransferAddress"
                 @submit="transferTFTWithAddress"
@@ -73,7 +73,7 @@
                 </TransferTextField>
                 <span class="fee">0.01 transaction fee will be deducted</span>
               </v-form>
-              <Buttons
+              <TransferFormButtons
                 :isTransferValid="isTransferValidTwinId"
                 :loadingTransfer="loadingTransferTwinId"
                 @submit="transferTFTWithTwinID"
@@ -93,7 +93,7 @@ import { Decimal } from "decimal.js";
 import QrcodeVue from "qrcode.vue";
 import { Component, Vue } from "vue-property-decorator";
 
-import Buttons from "../components/TransferFormButtons.vue";
+import TransferFormButtons from "../components/TransferFormButtons.vue";
 import TransferTextField from "../components/TransferTextField.vue";
 import { balanceInterface, getBalance } from "../lib/balance";
 import { checkAddress, transfer } from "../lib/transfer";
@@ -101,7 +101,7 @@ import { accountInterface } from "../store/state";
 
 @Component({
   name: "TransferView",
-  components: { QrcodeVue, TransferTextField, Buttons },
+  components: { QrcodeVue, TransferTextField, TransferFormButtons },
 })
 export default class TransferView extends Vue {
   activeTab = 0;
