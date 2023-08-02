@@ -1,11 +1,12 @@
 import { BackendStorageType, GridClient, NetworkEnv } from "@threefold/grid_client";
 
+import config from "@/portal/config";
 import { Profile } from "@/store";
 
 export async function getGrid(mnemonic: string) {
   const grid = new GridClient({
     mnemonic,
-    network: NetworkEnv.dev,
+    network: config.network as NetworkEnv,
     backendStorageType: BackendStorageType.tfkvstore,
   });
 
