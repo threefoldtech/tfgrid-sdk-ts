@@ -36,56 +36,6 @@ def test_accept_terms_conditions(browser):
     assert twin_page.wait_for('Choose a Relay Address')
 
 
-def test_create_twin_relay(browser):
-    """
-      Test Case: TC932- check Balance
-      Test Case: TC1461 - Choose a Relay Address
-      Steps:
-          - Navigate to dashboard
-          - Create an account from the polkadot extension.
-          - Accept terms and conditions.
-          - Choose relay from list options and press create button.
-          - Click on create button.
-          - Use polka password authentication.
-          - Click on the balance button.
-      Result: Assert that Error message willnot appear and Assert that a twin should be created.
-              Assert Balance must be in the first of creating your account [Free: 0.0979706 TFT -Reserved (Locked): 0 TFT]
-    """
-    twin_page, polka_page, password = before_test_setup(browser, True)
-    twin_page.accept_terms_conditions()
-    polka_page.authenticate_with_pass(password)
-    assert twin_page.wait_for('Accepted!')
-    relay = twin_page.create_twin_valid_relay()
-    twin_page.press_create_btn()
-    polka_page.authenticate_with_pass(password)
-    assert twin_page.wait_for('Twin created!')
-    assert relay in browser.page_source
-    twin_page.Check_Balance()
-    assert twin_page.wait_for('Total:')
-    assert twin_page.wait_for('0.097')
-    assert twin_page.press_locked_info() == 'https://manual.grid.tf/tfchain/tfchain.html?highlight=locked#contract-locking'
-
-
-def test_edit_twin_relay(browser):
-    """
-      Test Cases: TC925- edit twin relay
-      Steps:
-          - Navigate to dashboard
-          - Click on the desired account from the dashboard homepage.
-          - Click on edit button.
-          - Choose relay from list option.
-          - Click on submit button.
-          - Use polka password authentication.
-      Result: Assert that twin relay edited.
-    """
-    twin_page, polka_page, password = before_test_setup(browser, False)
-    twin_page.press_edit_btn()
-    relay = twin_page.edit_twin_relay()
-    twin_page.press_submit_btn()
-    assert twin_page.wait_for('Chosen relay is the current relay!')
-    assert twin_page.wait_for(relay)
-
-
 def test_sum_sign(browser):
     """
       Test Cases: TC933- sum sign

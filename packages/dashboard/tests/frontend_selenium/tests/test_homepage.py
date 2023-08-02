@@ -1,6 +1,4 @@
 import pytest
-from random import randint
-from pages.polka import PolkaPage
 from pages.dashboard import DashboardPage
 from utils.utils import generate_string, get_seed
 from utils.base import Base
@@ -10,23 +8,8 @@ from utils.base import Base
 
 def before_test_setup(browser):
     dashboard_page = DashboardPage(browser)
-    polka_page = PolkaPage(browser)
-    polka_page.load_and_authenticate()
-    return dashboard_page, polka_page
-
-
-def test_polka_page(browser):
-    """
-      Test Case: TC974 - Download polkadot{.js} extension
-      Steps:
-          - Navigate to dashboard.
-          - Authenticate polkadot.
-          - Disconnect polka.
-          - Click "Download polkadot{.js} extension" button.
-      Result: User should be navigated to the download polkadot extesion page.
-    """
-    dashboard_page, _ = before_test_setup(browser)
-    assert dashboard_page.navigate_to_polka() == 'https://polkadot.js.org/extension/'
+    dashboard_page.open_and_load()
+    return dashboard_page
 
 
 def test_discover_page(browser):
@@ -34,13 +17,11 @@ def test_discover_page(browser):
       Test Case: TC975 - Discover the ThreeFold Grid
       Steps:
           - Navigate to dashboard.
-          - Authenticate polkadot.
-          - Disconnect polka.
-          - Swape to next option. 
+          - Close profile manager.
           - Click "Discover the ThreeFold Grid" button
       Result: User should be navigated to the explorer stats page.
     """
-    dashboard_page, _ = before_test_setup(browser)
+    dashboard_page = before_test_setup(browser)
     assert dashboard_page.navigate_to_explorer() == (Base.base_url+'explorer/statistics')
 
 
@@ -49,35 +30,13 @@ def test_manual_page(browser):
       Test Case: TC976 - Your Guide to The ThreeFold Grid
       Steps:
           - Navigate to dashboard.
-          - Authenticate polkadot.
-          - Disconnect polka.
-          - Swipe back to previous option.
+          - Close profile manager.
+          - Swipe to the next option.
           - Click "Learn More" button.
       Result: User should be navigated to the manual page.
     """
-    dashboard_page, _ = before_test_setup(browser)
+    dashboard_page = before_test_setup(browser)
     assert dashboard_page.navigate_to_manual() == 'https://manual.grid.tf/getstarted/tfgrid3_getstarted.html'
-
-
-def test_polka_connection(browser):
-    """
-      Test Case: TC977 - Polkadot connection
-      Steps:
-          - Navigate to dashboard.
-          - Authenticate polkadot.
-          - Disconnect from polka.
-          - Reconnect to it.
-      Result: Polka should be load and authenticated, Assert button works and polka connect and disconnect.
-    """
-    dashboard_page, polka_page = before_test_setup(browser)
-    user = generate_string()
-    password = generate_string()
-    polka_page.add_account(user, password)
-    dashboard_page.polka_disconnection()
-    connected = dashboard_page.polka_connected_status()
-    dashboard_page.polka_connection()
-    disconnected = dashboard_page.polka_disconnected_status()
-    assert ('green' in connected) and ('red' in disconnected)
 
 
 def test_create_account(browser):
@@ -85,17 +44,18 @@ def test_create_account(browser):
       Test Cases: TC978 - Create account
       Steps:
           - Navigate to dashboard.
-          - Authenticate and Navigate to polkadot.
-          - Click on "Menu" then "Create new account".
-          - Click on checkbox then "Next step".
-          - Enter username, password (twice) and submit.
-      Result: Account should be listed on the connected account.
+          - Click on Generate account.
+          - Enter password (twice).
+          - Click on Connect.
+      Result: Login successfully and account saved.
     """
-    dashboard_page, polka_page = before_test_setup(browser)
-    user = generate_string()
+    dashboard_page = before_test_setup(browser)
     password = generate_string()
-    polka_page.add_account(user, password)
-    assert user in dashboard_page.accounts_list()
+    dashboard_page.create_account()
+    dashboard_page.accept_terms_conditions()
+    dashboard_page.connect_your_wallet(password).click()
+    dashboard_page.logout_account()
+    assert dashboard_page.login_account(password).is_enabled() == True
 
 
 def test_import_account(browser):
@@ -103,109 +63,52 @@ def test_import_account(browser):
       Test Cases: TC979 - Import account
       Steps:
           - Navigate to dashboard.
-          - Authenticate and Navigate to polkadot.
-          - Click on "Menu" then "import account".
-          - Enter seed then "Next".
-          - Enter username, password (twice) and submit.
-      Result: Account should be listed on the connected account.
+          - Enter Mnemonics, password (twice).
+          - Click on Connect.
+      Result: Login successfully and account saved.
     """
-    dashboard_page, polka_page = before_test_setup(browser)
-    user = generate_string()
+    dashboard_page = before_test_setup(browser)
     password = generate_string()
-    polka_page.import_account(get_seed(), user, password)
-    assert user in dashboard_page.accounts_list()
+    dashboard_page.import_account(get_seed())
+    dashboard_page.connect_your_wallet(password).click()
+    dashboard_page.logout_account()
+    assert dashboard_page.login_account(password).is_enabled() == True
 
 
-"""
-  Test Cases: TC980 - Search by valid account name or address
-  Steps:
-      - Navigate to dashboard.
-      - Authenticate polkadot.
-      - Add or Import some accounts.
-      - Type account name or address in SearchBar.
-  Test Data: [ Name - Address - (First char,  Last char, Random char from middle,
-                  Random char sequence, case sensitive chars) From Account Name or Address ]
-  Result: List of all the accounts that matches search input.
-"""
-
-
-def test_search_by_name_address(browser):
-    dashboard_page, polka_page = before_test_setup(browser)
-    user = generate_string()
-    password = generate_string()
-    polka_page.add_account(user, password)
-    address = dashboard_page.get_address((dashboard_page.accounts_list()))
-    dashboard_page.search_accounts(user)
-    account_list = dashboard_page.accounts_list()
-    dashboard_page.search_accounts(address)
-    address_list = dashboard_page.accounts_list()
-    dashboard_page.search_accounts(user.lower())
-    assert user in account_list and user in dashboard_page.accounts_list()
-    dashboard_page.search_accounts(address.lower())
-    assert address in address_list and address in dashboard_page.accounts_list()
-
-
-@pytest.mark.parametrize('cases', [0, 9, randint(1, 8)])
-def test_search_by_valid_name_address(browser, cases):
-    dashboard_page, polka_page = before_test_setup(browser)
-    user = generate_string()
-    password = generate_string()
-    polka_page.add_account(user, password)
-    address = dashboard_page.get_address((dashboard_page.accounts_list()))
-    dashboard_page.search_accounts(user[cases])
-    account_list = dashboard_page.accounts_list()
-    dashboard_page.search_accounts(address[cases])
-    address_list = dashboard_page.accounts_list()
-    dashboard_page.search_accounts(user[cases].lower())
-    assert user in account_list and user in dashboard_page.accounts_list()
-    dashboard_page.search_accounts(address[cases].lower())
-    assert address in address_list and address in dashboard_page.accounts_list()
-
-
-@pytest.mark.parametrize('begin, end', [(0, 1), (8, 9), (randint(1, 4), randint(5, 8))])
-def test_search_by_valid_name_address(browser, begin, end):
-    dashboard_page, polka_page = before_test_setup(browser)
-    user = generate_string()
-    password = generate_string()
-    polka_page.add_account(user, password)
-    address = dashboard_page.get_address((dashboard_page.accounts_list()))
-    dashboard_page.search_accounts(user[begin: end])
-    account_list = dashboard_page.accounts_list()
-    dashboard_page.search_accounts(address[begin: end])
-    address_list = dashboard_page.accounts_list()
-    dashboard_page.search_accounts(user[begin: end].lower())
-    assert user in account_list and user in dashboard_page.accounts_list()
-    dashboard_page.search_accounts(address[begin: end].lower())
-    assert address in address_list and address in dashboard_page.accounts_list()
-
-
-@pytest.mark.parametrize('cases', [' ', generate_string()])
-def test_search_by_invalid_name_address(browser, cases):
+def test_account_validation(browser):
     """
-      Test Cases: TC981 - Search by invalid account name or address
+      Test Cases: TC1777 - Connect your wallet Validation
       Steps:
           - Navigate to dashboard.
-          - Authenticate polkadot.
-          - Add or Import some accounts.
-          - Type account name or address in SearchBar.
-      Test Data: [Empty - Random char or sequence not in both]
-      Result: Empty list.
+          - verify Mnemonics.
+          - Verify password (bith).
+          - Click on Connect and Logout.
+          - verify Lgoin password.
+      Result: Every input should have the correct validation.
     """
-    dashboard_page, polka_page = before_test_setup(browser)
-    user = generate_string()
-    password = generate_string()
-    polka_page.add_account(user, password)
-    address = dashboard_page.get_address((dashboard_page.accounts_list()))
-    dashboard_page.search_accounts(cases)
-    account_list = dashboard_page.accounts_list()
-    dashboard_page.search_accounts(cases)
-    address_list = dashboard_page.accounts_list()
-    dashboard_page.search_accounts(cases.lower())
-    assert user not in account_list and user not in dashboard_page.accounts_list()
-    assert len(account_list) == 0 and len(dashboard_page.accounts_list()) == 0
-    dashboard_page.search_accounts(cases.lower())
-    assert address not in address_list and address not in dashboard_page.accounts_list()
-    assert len(account_list) == 0 and len(dashboard_page.accounts_list()) == 0
+    dashboard_page = before_test_setup(browser)
+    cases = [generate_string(), '123456', '!)$%&@#(+?', 'wrong hat egg gospel crowd foster lonely control cat recipe mean spoon']
+    for case in cases:
+        dashboard_page.import_account(case)
+        assert dashboard_page.wait_for('seem to be valid')
+    dashboard_page.import_account('')
+    assert dashboard_page.wait_for('Mnemonic is required')
+    dashboard_page.import_account(get_seed())
+    assert dashboard_page.connect_your_wallet('12345').get_attribute("disabled") == 'true'
+    assert dashboard_page.wait_for('Password must be at least 6 characters')
+    assert dashboard_page.connect_your_wallet('123456').get_attribute("disabled") == None
+    dashboard_page.confirm_password('12345')
+    assert dashboard_page.wait_for('Passwords should match')
+    dashboard_page.connect_your_wallet('123456').click()
+    assert dashboard_page.get_mnemonic() == get_seed()
+    dashboard_page.logout_account()
+    assert dashboard_page.login_account('12345').get_attribute("disabled") == 'true'
+    assert dashboard_page.wait_for('Password must be at least 6 characters')
+    assert dashboard_page.login_account('1234567').get_attribute("disabled") == 'true'
+    assert dashboard_page.wait_for('Please provide a valid password')
+    assert dashboard_page.login_account('').get_attribute("disabled") == 'true'
+    assert dashboard_page.wait_for('Password is required')
+    assert dashboard_page.login_account('123456').get_attribute("disabled") == None
 
 
 def test_tft_price(browser):
@@ -213,14 +116,35 @@ def test_tft_price(browser):
       Test Case: TC1674 - TFT price
       Steps:
           - Navigate to dashboard.
-          - Authenticate polkadot.
+          - Close profile manager.
           - Click on TFT swap icon.
           - Get TFT price from stellar site.
       Result: Assert TFT in USD and vice versa.
     """
-    dashboard_page, _ = before_test_setup(browser)
+    dashboard_page = before_test_setup(browser)
+    browser.find_element(*dashboard_page.close_login_button).click()
     tft_in_usd = float(dashboard_page.tft_price_result()[:-4])
     dashboard_page.tft_price_swap()
     usd_in_tft = float(dashboard_page.tft_price_result()[:-4])
     assert str(tft_in_usd) in dashboard_page.get_tft_price()
     assert 0.99 < tft_in_usd * usd_in_tft < 1.1
+
+
+def test_login_links(browser):
+    """
+      Test Case: TC1801 - Verify login profile manager links
+      Steps:
+          - Navigate to dashboard.
+          - Enter Mnemonics, password (twice).
+          - Click on Connect.
+          - Verify Manual and Connect links
+      Result: User should be navigated to the Manuak and Connect pages.
+    """
+    dashboard_page = before_test_setup(browser)
+    password = generate_string()
+    dashboard_page.import_account(get_seed())
+    dashboard_page.connect_your_wallet(password).click()
+    assert dashboard_page.manual_link() == 'https://manual.grid.tf/weblets/weblets_profile_manager.html'
+    assert dashboard_page.connect_manual_link() == 'https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html'
+    assert dashboard_page.get_connect_google_link() == 'https://play.google.com/store/apps/details?id=org.jimber.threebotlogin&hl=en&gl=US'
+    assert dashboard_page.get_connect_apple_link() == 'https://apps.apple.com/us/app/threefold-connect/id1459845885'

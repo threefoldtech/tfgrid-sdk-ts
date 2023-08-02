@@ -17,8 +17,7 @@ def browser():
 
     # Initialize the ChromeDriver instance with options
     options = webdriver.ChromeOptions()
-    options.add_extension('polka_extension_0_44_1_0.crx')  # PolkaDot Extension
-    driver = webdriver.Chrome(options=options, service=Service(ChromeDriverManager().install()))
+    driver = webdriver.Chrome(options=options)
     driver.set_window_size(1200, 1100)
 
     # Make its calls wait up to 60 seconds for elements to appear
