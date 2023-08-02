@@ -159,7 +159,7 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref(generateName(9, { prefix: "oc" }));
+const name = ref(generateName(9, { prefix: "nc" }));
 const username = ref("admin");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
@@ -177,8 +177,8 @@ const domainNameCmp = ref();
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed a owncloud instance.");
-  layout.value.openDialog(deployment, deploymentListEnvironments.owncloud);
+  layout.value.setStatus("success", "Successfully deployed a Nextcloud instance.");
+  layout.value.openDialog(deployment, deploymentListEnvironments.nextcloud);
 }
 
 async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
@@ -262,7 +262,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   } catch (e) {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
     await rollbackDeployment(grid!, name.value);
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a owncloud instance."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Nextcloud instance."));
   }
 }
 </script>

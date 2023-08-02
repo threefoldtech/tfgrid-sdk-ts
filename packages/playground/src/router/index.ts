@@ -68,6 +68,11 @@ const router = createRouter({
       meta: { title: "Owncloud", info: { page: "info/owncloud.md" } },
     },
     {
+      path: "/nextcloud",
+      component: () => import("../views/nextcloud_view.vue"),
+      meta: { title: "Owncloud", info: { page: "info/nextcloud.md" } },
+    },
+    {
       path: "/presearch",
       component: () => import("../views/presearch_view.vue"),
       meta: { title: "Presearch", info: { page: "info/presearch.md" } },
