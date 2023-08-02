@@ -70,7 +70,7 @@ const router = createRouter({
     {
       path: "/nextcloud",
       component: () => import("../views/nextcloud_view.vue"),
-      meta: { title: "Owncloud", info: { page: "info/nextcloud.md" } },
+      meta: { title: "Nextcloud", info: { page: "info/nextcloud.md" } },
     },
     {
       path: "/presearch",
