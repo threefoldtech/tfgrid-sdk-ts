@@ -13,7 +13,7 @@
 <script>
 export default {
   props: {
-    value: {
+    amount: {
       type: [String, Number],
       required: true,
     },
