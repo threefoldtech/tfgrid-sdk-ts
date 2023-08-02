@@ -281,9 +281,15 @@ class TwinDeploymentHandler {
       let hru = 0;
       let sru = 0;
       let mru = 0;
-
+      let rootfs_size;
+      const disks: number[] = [];
       for (const workload of workloads) {
-        if (workload.type == WorkloadTypes.zmachine || workload.type == WorkloadTypes.zmount) {
+        if (workload.type == WorkloadTypes.zmachine) {
+          rootfs_size = workload.data["size"];
+          sru += workload.data["size"];
+        }
+        if (workload.type == WorkloadTypes.zmount) {
+          disks.push(workload.data["size"]);
           sru += workload.data["size"];
         }
         if (workload.type == WorkloadTypes.zdb) {
@@ -293,16 +299,7 @@ class TwinDeploymentHandler {
           mru += workload.data["compute_capacity"].memory;
         }
       }
-      let rootfs_size;
-      const disks: number[] = [];
-      for (const workload of workloads) {
-        if (workload.type == WorkloadTypes.zmachine) {
-          rootfs_size = workload.data["size"];
-        }
-        if (workload.type == WorkloadTypes.zmount) {
-          disks.push(workload.data["size"]);
-        }
-      }
+
       if (
         workloads.length !== 0 &&
         !(await this.nodes.nodeHasResources(+twinDeployment.nodeId, {
