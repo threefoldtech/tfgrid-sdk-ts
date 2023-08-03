@@ -62,13 +62,14 @@
         </input-validator>
       </password-input-wrapper>
 
-      <Network v-model:ipv4="ipv4" />
+      <Network v-model:ipv4="ipv4" :disabled="loadingFarm" />
 
       <SelectSolutionFlavor
         v-model="solution"
         :minimum="{ cpu: 2, memory: 1024 * 2, disk: 10 }"
         :standard="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
         :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+        :disabled="loadingFarm"
       />
 
       <input-tooltip
@@ -76,10 +77,10 @@
         tooltip="Click to know more about dedicated nodes."
         href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
       >
-        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
       </input-tooltip>
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-        <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+        <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
       </input-tooltip>
 
       <SelectFarmManager>
@@ -93,6 +94,7 @@
             certified: certified,
           }"
           v-model="farm"
+          v-model:loading="loadingFarm"
         />
 
         <SelectNode
@@ -142,6 +144,7 @@ const password = ref(generatePassword());
 const ipv4 = ref(false);
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
+const loadingFarm = ref(false);
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/umbrel-latest.flist",
   entryPoint: "/sbin/zinit init",

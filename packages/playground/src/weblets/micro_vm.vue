@@ -44,6 +44,7 @@
           :standard="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
           :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
           v-model="solution"
+          :disabled="loadingFarm"
         />
 
         <Network
@@ -52,6 +53,7 @@
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
           v-model:wireguard="wireguard"
+          :disabled="loadingFarm"
           ref="network"
         />
         <input-tooltip
@@ -59,11 +61,11 @@
           tooltip="Click to know more about dedicated nodes."
           href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
         >
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
         </input-tooltip>
 
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+          <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
 
         <SelectFarmManager>
@@ -77,6 +79,7 @@
               certified: certified,
             }"
             v-model="farm"
+            v-model:loading="loadingFarm"
           />
           <SelectNode
             v-model="selectedNode"
@@ -135,6 +138,7 @@
           @add="addDisk"
           title="Add additional disk space to your micro virtual machine"
           #="{ index }"
+          :disabled="loadingFarm"
         >
           <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
           <input-validator
@@ -230,6 +234,7 @@ const network = ref();
 const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
+const loadingFarm = ref(false);
 const rootFilesystemSize = computed(() => solution.value?.disk);
 function layoutMount() {
   if (envs.value.length > 0) {

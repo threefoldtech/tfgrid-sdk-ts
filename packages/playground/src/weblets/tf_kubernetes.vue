@@ -58,12 +58,12 @@
       </template>
 
       <template #master>
-        <K8SWorker v-model="master" />
+        <K8SWorker v-model="master" loadingFarm />
       </template>
 
       <template #workers>
-        <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }">
-          <K8SWorker v-model="workers[index]" />
+        <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }" :disabled="loadingFarm">
+          <K8SWorker v-model="workers[index]" v-model:loading="loadingFarm" />
         </ExpandableLayout>
       </template>
     </d-tabs>
@@ -88,12 +88,11 @@ import { generateName, generatePassword } from "../utils/strings";
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
-
 const name = ref(generateName(8, { prefix: "k8s" }));
 const clusterToken = ref(generatePassword(10));
 const master = ref(createWorker(generateName(9, { prefix: "mr" })));
 const workers = ref<K8sWorker[]>([]);
-
+const loadingFarm = ref(false);
 function addWorker() {
   workers.value.push(createWorker());
 }

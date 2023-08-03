@@ -27,13 +27,14 @@
           <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
-      <Network v-model:ipv4="ipv4" />
+      <v-switch color="primary" inset label="IPv4" v-model="ipv4" :disabled="loadingFarm" hide-details />
       <AlgorandCapacity
         :network="network"
         :type="type"
         v-model:cpu.number="cpu"
         v-model:memory.number="memory"
         v-model:storage.number="storage"
+        v-model:disabled="loadingFarm"
       >
         <input-tooltip tooltip="Select a network to work against.">
           <v-select
@@ -45,6 +46,7 @@
               { title: 'Devnet', value: 'devnet' },
             ]"
             v-model="network"
+            :disabled="loadingFarm"
           />
         </input-tooltip>
 
@@ -58,6 +60,7 @@
               { title: 'Indexer', value: 'indexer' },
             ]"
             v-model="type"
+            :disabled="loadingFarm"
           />
         </input-tooltip>
 
@@ -108,6 +111,7 @@
                 v-model.number="firstRound"
                 v-bind="props"
                 type="number"
+                :disabled="loadingFarm"
               />
             </input-tooltip>
           </input-validator>
@@ -129,6 +133,7 @@
                 v-model.number="lastRound"
                 v-bind="props"
                 type="number"
+                :disabled="loadingFarm"
               />
             </input-tooltip>
           </input-validator>
@@ -140,11 +145,11 @@
         tooltip="Click to know more about dedicated nodes."
         href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
       >
-        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
       </input-tooltip>
 
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-        <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+        <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
       </input-tooltip>
 
       <SelectFarmManager>
@@ -158,6 +163,7 @@
             certified: certified,
           }"
           v-model="farm"
+          v-model:loading="loadingFarm"
         />
         <SelectNode
           v-model="selectedNode"
@@ -223,6 +229,7 @@ const lastRound = ref(26000000);
 const farm = ref() as Ref<Farm>;
 const dedicated = ref(false);
 const certified = ref(false);
+const loadingFarm = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const rootFilesystemSize = computed(() => storage.value);
 watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()));

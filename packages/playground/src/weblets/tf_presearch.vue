@@ -55,17 +55,17 @@
             </input-tooltip>
           </password-input-wrapper>
         </input-validator>
-        <Network required v-model:ipv4="ipv4" v-model:planetary="planetary" ref="network" />
+        <Network required v-model:ipv4="ipv4" v-model:planetary="planetary" ref="network" :disabled="loadingFarm" />
 
         <input-tooltip
           inline
           tooltip="Click to know more about dedicated nodes."
           href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
         >
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
         </input-tooltip>
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+          <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
 
         <SelectFarmManager>
@@ -80,6 +80,7 @@
             }"
             exclusive-for="research"
             v-model="farm"
+            v-model:loading="loadingFarm"
           />
 
           <SelectNode
@@ -122,7 +123,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, type Ref, ref } from "vue";
+import { type Ref, ref } from "vue";
 
 import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
@@ -145,7 +146,7 @@ const planetary = ref(true);
 const cpu = 1;
 const memory = 512;
 const rootFilesystemSize = rootFs(cpu, memory);
-
+const loadingFarm = ref(false);
 const farm = ref() as Ref<Farm>;
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");

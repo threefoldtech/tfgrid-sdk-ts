@@ -85,6 +85,7 @@
           v-model="solution"
           :minimum="{ cpu: 2, memory: 1024 * 2, disk: 100 }"
           :standard="{ cpu: 2, memory: 1024 * 4, disk: 150 }"
+          :disabled="loadingFarm"
         />
         <!-- <Networks v-model:ipv4="ipv4" /> -->
         <FarmGatewayManager>
@@ -93,10 +94,24 @@
             tooltip="Click to know more about dedicated nodes."
             href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
           >
-            <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+            <v-switch
+              color="primary"
+              inset
+              label="Dedicated"
+              v-model="dedicated"
+              :disabled="loadingFarm"
+              hide-details
+            />
           </input-tooltip>
           <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-            <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+            <v-switch
+              color="primary"
+              inset
+              label="Certified"
+              v-model="certified"
+              :disabled="loadingFarm"
+              hide-details
+            />
           </input-tooltip>
 
           <SelectFarmManager>
@@ -110,6 +125,7 @@
                 certified: certified,
               }"
               v-model="farm"
+              v-model:loading="loadingFarm"
             />
 
             <SelectNode
@@ -172,6 +188,7 @@ const password = ref(generatePassword());
 const email = ref("");
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
+const loadingFarm = ref(false);
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/grid3_taiga_docker-latest.flist",
   entryPoint: "/sbin/zinit init",

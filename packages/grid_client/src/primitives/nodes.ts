@@ -467,7 +467,7 @@ class Nodes {
     try {
       this.fitDisksInDisksPool(ssdDisks, ssdPools, DiskTypes.SSD);
       this.fitDisksInDisksPool(hddDisks, hddPools, DiskTypes.HDD);
-      this.fitDisksInDisksPool(rootFileSystemDisks, ssdDisks, DiskTypes.SSD);
+      this.fitDisksInDisksPool(rootFileSystemDisks, ssdPools, DiskTypes.SSD);
       return true;
     } catch (error) {
       throw new Error(
