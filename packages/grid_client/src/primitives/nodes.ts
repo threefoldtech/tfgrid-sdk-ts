@@ -420,7 +420,7 @@ class Nodes {
     disks.forEach(disk => {
       if (!this.allocateDiskToPools(pools, disk)) {
         throw new Error(
-          `Cannot fit the required ${DiskTypes[type]} disk with size ${(disk / 1024 ** 3).toFixed(2)} GB`,
+          `Cannot fit the required ${type.toUpperCase()} disk with size ${(disk / 1024 ** 3).toFixed(2)} GB`,
         );
       }
       this.sortArrayDesc(pools);
