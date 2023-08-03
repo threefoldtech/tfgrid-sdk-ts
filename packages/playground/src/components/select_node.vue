@@ -258,7 +258,7 @@ async function loadNodes(farmId: number) {
           }
         }
         availableNodes.value = nodesArr.value;
-        selectedNode.value = availableNodes.value ? availableNodes.value[0] : undefined;
+        selectedNode.value = undefined;
       } else {
         selectedNode.value = undefined;
         availableNodes.value = [];
