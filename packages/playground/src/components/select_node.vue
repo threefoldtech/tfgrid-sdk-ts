@@ -30,7 +30,7 @@
           v-bind="{
             ...props,
             loading: props.loading || loadingNodes,
-            hint: pingingNode ? 'Checking node storage pool... ' : props.hint,
+            hint: pingingNode ? `Checking the node's storage pool... ` : props.hint,
             error: !!errorMessage,
             errorMessages: !!errorMessage ? errorMessage : undefined,
           }"
