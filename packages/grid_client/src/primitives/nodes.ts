@@ -411,7 +411,7 @@ class Nodes {
    * @param type - The type of disks being fitted (SSD, HDD, or RootFileSystem).
    * @throws {Error} - If the required disk cannot be fitted into the pool.
    */
-  fitDisksInDisksPool(disks: number[], pool: number[], type: "SSD" | "HDD" | "RootFileSystem"): void {
+  fitDisksInDisksPool(disks: number[], pools: number[], type: "SSD" | "HDD" | "RootFileSystem"): void {
     disks.forEach(disk => {
       if (!this.findDiskIndex(pool, disk)) {
         throw new Error(`Cannot fit the required ${type} disk with size ${(disk / 1024 ** 3).toFixed(2)} GB`);
