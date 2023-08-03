@@ -7,8 +7,8 @@
       variant="tonal"
       v-if="!loadingNodes && selectedNode === undefined && emptyResult && props.filters.rentedBy"
     >
-      You have no nodes rented that match your selected resources, try changing your selected resources or renting a
-      node matching your requirements.
+      You have no rented nodes that match your selected resources. Please try changing your selected resources or rent a
+      node that matches your requirements.
     </v-alert>
     <input-validator
       ref="validator"
@@ -230,13 +230,6 @@ watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
     }, 1000);
   });
 });
-
-watch(
-  () => selectedCards.value,
-  () => {
-    emptyResult.value = isSelectionEmpty(selectedNode.value, selectedCards.value);
-  },
-);
 
 function getChipColor(item: any) {
   return item === "Dedicated" ? "success" : "secondary";
