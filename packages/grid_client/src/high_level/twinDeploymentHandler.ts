@@ -312,7 +312,7 @@ class TwinDeploymentHandler {
       ) {
         throw Error(`Node ${twinDeployment.nodeId} doesn't have enough resources: sru=${sru}, mru=${mru}`);
       }
-      if (workloads.length && rootfsDisks.length) {
+      if (workloads.length && (rootfsDisks.length || ssdDisks.length || hddDisks.length)) {
         await this.nodes.verifyNodeStoragePoolCapacity(ssdDisks, hddDisks, rootfsDisks, +twinDeployment.nodeId);
       }
     }

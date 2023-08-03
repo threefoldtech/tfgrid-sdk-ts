@@ -74,8 +74,13 @@ interface RMBNodeCapacity {
   total: NodeResources;
   used: NodeResources;
 }
+enum DiskTypes {
+  SSD,
+  HDD,
+  rootFS,
+}
 export interface StoragePool {
-  type: string;
+  type: DiskTypes;
   size: number;
   used: number;
 }
@@ -378,13 +383,14 @@ class Nodes {
   }
 
   /**
-   * Finds the index of a disk with a size greater than or equal to the specified disk size in the DiskPools.
+   * Allocates a disk of a given size to a list of disk pools.
    *
-   * @param diskPools - An array of disk sizes available in the pool.
-   * @param disk - The required disk size to fit into the pool.
-   * @returns {boolean} - True if the disk can be fitted into the pool, otherwise false.
+   * @param diskPools - An array of numbers representing the available disk space in each pool.
+   * @param disk - The size of the disk to be allocated.
+   * @returns A boolean value indicating whether the disk was successfully allocated or not.
+   *          Returns true if the disk was allocated to a pool, false otherwise.
    */
-  findDiskIndex(diskPools: number[], disk: number): boolean {
+  allocateDiskToPools(diskPools: number[], disk: number): boolean {
     for (const index in diskPools) {
       if (diskPools[index] >= disk) {
         diskPools[index] -= disk;
@@ -408,15 +414,15 @@ class Nodes {
    *
    * @param disks - An array of disk sizes required to be fitted into the pool.
    * @param pool - An array representing the available disk space in the pool.
-   * @param type - The type of disks being fitted (SSD, HDD, or RootFileSystem).
+   * @param type - A DiskTypes enum value representing the type of disk being allocated.
    * @throws {Error} - If the required disk cannot be fitted into the pool.
    */
-  fitDisksInDisksPool(disks: number[], pools: number[], type: "SSD" | "HDD" | "RootFileSystem"): void {
+  fitDisksInDisksPool(disks: number[], pools: number[], type: DiskTypes): void {
     disks.forEach(disk => {
-      if (!this.findDiskIndex(pool, disk)) {
+      if (!this.allocateDiskToPools(pools, disk)) {
         throw new Error(`Cannot fit the required ${type} disk with size ${(disk / 1024 ** 3).toFixed(2)} GB`);
       }
-      this.sortArrayDesc(pool);
+      this.sortArrayDesc(pools);
     });
   }
 
@@ -443,7 +449,7 @@ class Nodes {
       const nodeTwinId = await this.getNodeTwinId(nodeId);
       ((await this.rmb.request([nodeTwinId], "zos.storage.pools", "")) as StoragePool[]).forEach(
         (disk: StoragePool) => {
-          disk.type === "ssd" ? ssdPools.push(disk.size - disk.used) : hddPools.push(disk.size - disk.used);
+          disk.type === DiskTypes.SSD ? ssdPools.push(disk.size - disk.used) : hddPools.push(disk.size - disk.used);
         },
       );
     } catch (err) {
@@ -458,9 +464,9 @@ class Nodes {
     this.sortArrayDesc(hddDisks);
 
     try {
-      this.fitDisksInDisksPool(ssdDisks, ssdPools, "SSD");
-      this.fitDisksInDisksPool(hddDisks, hddPools, "HDD");
-      this.fitDisksInDisksPool(rootFileSystemDisks, ssdDisks, "RootFileSystem");
+      this.fitDisksInDisksPool(ssdDisks, ssdPools, DiskTypes.SSD);
+      this.fitDisksInDisksPool(hddDisks, hddPools, DiskTypes.HDD);
+      this.fitDisksInDisksPool(rootFileSystemDisks, ssdDisks, DiskTypes.rootFS);
       return true;
     } catch (error) {
       throw new Error(
