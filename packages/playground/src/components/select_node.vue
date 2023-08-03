@@ -25,12 +25,12 @@
           return-object
           v-model="selectedNode"
           @update:model-value="selectedNode = $event"
-          :disabled="loadingNodes"
+          :disabled="loadingNodes || pingingNode"
           :loading="loadingNodes"
           v-bind="{
             ...props,
             loading: props.loading || loadingNodes,
-            hint: pingingNode ? 'Check if node is alive ... ' : props.hint,
+            hint: pingingNode ? 'Checking node storage pool... ' : props.hint,
             error: !!errorMessage,
             errorMessages: !!errorMessage ? errorMessage : undefined,
           }"
@@ -154,6 +154,12 @@ watch(
     if (node && grid) {
       validator.value?.setStatus(ValidatorStatus.Pending);
       pingingNode.value = true;
+      await validateNodeStoragePool(
+        grid,
+        node.nodeId,
+        props.filters.disks.map(disk => disk.size * 1024 ** 3),
+        props.rootFileSystemSize * 1024 ** 3,
+      );
       try {
         emits("update:modelValue", {
           nodeId: node.nodeId,
@@ -279,6 +285,18 @@ async function loadNodes(farmId: number) {
     } finally {
       loadingNodes.value = false;
     }
+  }
+}
+async function validateNodeStoragePool(grid: GridClient, nodeId: number, disks: number[], rootFileSystemSize: number) {
+  try {
+    await grid.capacity.checkNodeCapacityPool({
+      nodeId,
+      ssdDisks: disks,
+      rootfsDisks: [rootFileSystemSize],
+      hddDisks: [],
+    });
+  } catch {
+    errorMessage.value = `Node ${nodeId} does not have storage pools that fit the required disks, please select another node`;
   }
 }
 </script>
