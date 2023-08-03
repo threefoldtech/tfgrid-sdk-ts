@@ -281,12 +281,20 @@ class TwinDeploymentHandler {
       let hru = 0;
       let sru = 0;
       let mru = 0;
-
+      const rootfsDisks: number[] = [];
+      const ssdDisks: number[] = [];
+      const hddDisks: number[] = [];
       for (const workload of workloads) {
-        if (workload.type == WorkloadTypes.zmachine || workload.type == WorkloadTypes.zmount) {
+        if (workload.type == WorkloadTypes.zmachine) {
+          rootfsDisks.push(workload.data["size"]);
+          sru += workload.data["size"];
+        }
+        if (workload.type == WorkloadTypes.zmount) {
+          ssdDisks.push(workload.data["size"]);
           sru += workload.data["size"];
         }
         if (workload.type == WorkloadTypes.zdb) {
+          hddDisks.push(workload.data["size"]);
           hru += workload.data["size"];
         }
         if (workload.type == WorkloadTypes.zmachine) {
@@ -303,6 +311,9 @@ class TwinDeploymentHandler {
         }))
       ) {
         throw Error(`Node ${twinDeployment.nodeId} doesn't have enough resources: sru=${sru}, mru=${mru}`);
+      }
+      if (workloads.length && (rootfsDisks.length || ssdDisks.length || hddDisks.length)) {
+        await this.nodes.verifyNodeStoragePoolCapacity(ssdDisks, hddDisks, rootfsDisks, +twinDeployment.nodeId);
       }
     }
   }
