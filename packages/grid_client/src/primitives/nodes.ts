@@ -404,7 +404,7 @@ class Nodes {
   }
 
   /**
-   * Fits disks into a disks pool based on their sizes.
+   * Fits disks into disk pools based on their sizes.
    *
    * @param disks - An array of disk sizes required to be fitted into the pool.
    * @param pool - An array representing the available disk space in the pool.
