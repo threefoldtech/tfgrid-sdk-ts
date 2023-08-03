@@ -78,7 +78,7 @@
 </template>
 
 <script lang="ts" setup>
-import { GridClient } from "@threefold/grid_client";
+import type { GridClient } from "@threefold/grid_client";
 import { onMounted, type PropType, type Ref, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
@@ -267,10 +267,12 @@ async function loadNodes(farmId: number) {
       errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
     } finally {
       loadingNodes.value = false;
+      farmManager?.setLoading(false);
     }
   }
 }
 async function validateNodeStoragePool(grid: GridClient, nodeId: number, disks: number[], rootFileSystemSize: number) {
+  farmManager?.setLoading(true);
   validator.value?.setStatus(ValidatorStatus.Pending);
   pingingNode.value = true;
   try {
