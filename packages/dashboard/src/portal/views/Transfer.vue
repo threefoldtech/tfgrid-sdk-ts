@@ -15,6 +15,7 @@
                 <v-combobox
                   v-model="receipientAddress"
                   :items="accountsAddresses"
+                  :error-messages="targetErrorAddress"
                   dense
                   filled
                   @keydown="setValue"
@@ -25,6 +26,7 @@
                   ]"
                 ></v-combobox>
                 <TransferTextField
+                  :amount="amountByTwinId"
                   v-model="amountByAddress"
                   label="Amount (TFT)"
                   :rules="getAmountRules(amountByAddress)"
@@ -52,7 +54,7 @@
                   filled
                   @input="onInputValueChanged"
                   label="Recipient:"
-                  :error-messages="targetError"
+                  :error-messages="targetErrorTwin"
                   :rules="[
                     () => !!receptinTwinId || 'This field is required',
                     () => {
@@ -66,6 +68,7 @@
                 >
                 </v-combobox>
                 <TransferTextField
+                  :amount="amountByTwinId"
                   v-model="amountByTwinId"
                   label="Amount (TFT)"
                   :rules="getAmountRules(amountByTwinId)"
@@ -118,7 +121,8 @@ export default class TransferView extends Vue {
   isTransferValidTwinId = false;
   receptinTwinId = "";
   accountTwinIds: any = [];
-  targetError = "";
+  targetErrorTwin = "";
+  targetErrorAddress = "";
 
   queryClient = new QueryClient(window.configs.APP_API_URL);
   client = new Client({ url: window.configs.APP_API_URL });
@@ -130,25 +134,30 @@ export default class TransferView extends Vue {
 
   async transferTwinIdCheck() {
     await this.$nextTick();
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => {
-        reject(new Error("Request timed out."));
-      }, 6000);
-    });
-    try {
-      const twinDetailsPromise = this.queryClient.twins.get({ id: parseInt(this.receptinTwinId) });
-      const twinDetails = await Promise.race([twinDetailsPromise, timeoutPromise]);
-      if (twinDetails) {
-        this.isTransferValidTwinId = true;
-        this.accountTwinIds.push(this.receptinTwinId);
-        this.targetError = "";
-      } else {
-        this.isTransferValidTwinId = false;
-        this.targetError = "Twin ID doesn't exist";
-      }
-    } catch (error) {
+    if (parseInt(this.receptinTwinId) === this.$store.state.credentials.twin.id) {
       this.isTransferValidTwinId = false;
-      this.targetError = "Twin ID doesn't exist";
+      this.targetErrorTwin = "You can't transfer to yourself";
+    } else {
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(new Error("Request timed out."));
+        }, 6000);
+      });
+      try {
+        const twinDetailsPromise = this.queryClient.twins.get({ id: parseInt(this.receptinTwinId) });
+        const twinDetails = await Promise.race([twinDetailsPromise, timeoutPromise]);
+        if (twinDetails) {
+          this.isTransferValidTwinId = true;
+          this.accountTwinIds.push(this.receptinTwinId);
+          this.targetErrorTwin = "";
+        } else {
+          this.isTransferValidTwinId = false;
+          this.targetErrorTwin = "Twin ID doesn't exist";
+        }
+      } catch (error) {
+        this.isTransferValidTwinId = false;
+        this.targetErrorTwin = "Twin ID doesn't exist";
+      }
     }
   }
 
@@ -170,11 +179,16 @@ export default class TransferView extends Vue {
   }
 
   transferAddressCheck() {
-    const isValid = checkAddress(this.receipientAddress);
-    if (isValid && this.receipientAddress.length && !this.receipientAddress.match(/\W/)) {
-      return true;
+    if (this.receipientAddress === this.$store.state.credentials.account.address) {
+      this.isTransferValidAddress = false;
+      this.targetErrorAddress = "You can't transfer to yourself";
     } else {
-      return false;
+      const isValid = checkAddress(this.receipientAddress);
+      if (isValid && this.receipientAddress.length && !this.receipientAddress.match(/\W/)) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 
