@@ -152,29 +152,12 @@ watch(
     const grid = await getGrid(profileManager.profile!);
 
     if (node && grid) {
-      validator.value?.setStatus(ValidatorStatus.Pending);
-      pingingNode.value = true;
       await validateNodeStoragePool(
         grid,
         node.nodeId,
         props.filters.disks.map(disk => disk.size * 1024 ** 3),
         props.rootFileSystemSize * 1024 ** 3,
       );
-      try {
-        emits("update:modelValue", {
-          nodeId: node.nodeId,
-          cards: cards,
-        });
-        validator.value?.validate();
-      } catch (e) {
-        console.log((e as Error).message);
-        errorMessage.value = (e as Error).message;
-        availableNodes.value = availableNodes.value.filter(({ nodeId }) => nodeId !== node.nodeId);
-        validator.value?.setStatus(ValidatorStatus.Invalid);
-      } finally {
-        pingingNode.value = false;
-        farmManager?.setLoading(false);
-      }
     }
 
     if (node && props.filters.hasGPU) {
@@ -288,6 +271,8 @@ async function loadNodes(farmId: number) {
   }
 }
 async function validateNodeStoragePool(grid: GridClient, nodeId: number, disks: number[], rootFileSystemSize: number) {
+  validator.value?.setStatus(ValidatorStatus.Pending);
+  pingingNode.value = true;
   try {
     await grid.capacity.checkNodeCapacityPool({
       nodeId,
@@ -295,8 +280,18 @@ async function validateNodeStoragePool(grid: GridClient, nodeId: number, disks: 
       rootfsDisks: [rootFileSystemSize],
       hddDisks: [],
     });
-  } catch {
+    emits("update:modelValue", {
+      nodeId: nodeId,
+      cards: cards,
+    });
+    validator.value?.validate();
+  } catch (e) {
     errorMessage.value = `Node ${nodeId} does not have storage pools that fit the required disks, please select another node`;
+    availableNodes.value = availableNodes.value.filter(node => node.nodeId !== nodeId);
+    validator.value?.setStatus(ValidatorStatus.Invalid);
+  } finally {
+    pingingNode.value = false;
+    farmManager?.setLoading(false);
   }
 }
 </script>
