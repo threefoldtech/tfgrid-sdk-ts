@@ -7,8 +7,8 @@
       variant="tonal"
       v-if="!loadingNodes && selectedNode === undefined && emptyResult && props.filters.rentedBy"
     >
-      There are no nodes rented by you that match your selected resources, try to change your resources or rent a node
-      and try again.
+      You have no nodes rented that match your selected resources, try changing your selected resources or renting a
+      node matching your requirements.
     </v-alert>
     <v-alert
       class="mb-2"
@@ -16,8 +16,8 @@
       variant="tonal"
       v-else-if="(selectedNode && props.filters.rentedBy) || (!selectedNode && props.filters.rentedBy)"
     >
-      There are no nodes rented by you that match your selected resources, try to change your resources or rent a node
-      and try again.
+      You have no nodes rented that match your selected resources, try changing your selected resources or renting a
+      node matching your requirements.
     </v-alert>
     <input-validator
       ref="validator"
