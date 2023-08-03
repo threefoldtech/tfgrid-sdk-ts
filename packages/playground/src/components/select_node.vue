@@ -10,7 +10,12 @@
       There are no nodes rented by you that match your selected resources, try to change your resources or rent a node
       and try again.
     </v-alert>
-    <v-alert class="mb-2" type="warning" variant="tonal" v-if="selectedNode && props.filters.rentedBy">
+    <v-alert
+      class="mb-2"
+      type="warning"
+      variant="tonal"
+      v-else-if="(selectedNode && props.filters.rentedBy) || (!selectedNode && props.filters.rentedBy)"
+    >
       There are no nodes rented by you that match your selected resources, try to change your resources or rent a node
       and try again.
     </v-alert>
