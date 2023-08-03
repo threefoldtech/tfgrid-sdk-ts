@@ -85,7 +85,9 @@
               hasGPU: hasGPU,
             }"
             v-model="farm"
+            :loading="loadingFarm"
           />
+          loadingFarm: {{ loadingFarm }}
           <SelectNode
             v-model="selectedNode"
             :filters="{
@@ -201,6 +203,7 @@ const wireguard = ref(false);
 const dedicated = ref(false);
 const certified = ref(false);
 const farm = ref() as Ref<Farm>;
+const loadingFarm = ref(false);
 const disks = ref<Disk[]>([]);
 const network = ref();
 const hasGPU = ref();
