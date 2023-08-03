@@ -5,11 +5,7 @@
       class="mb-2"
       type="warning"
       variant="tonal"
-      v-if="
-        (!loadingNodes && selectedNode === undefined && emptyResult && props.filters.rentedBy) ||
-        (selectedNode && props.filters.rentedBy) ||
-        (!selectedNode && props.filters.rentedBy)
-      "
+      v-if="!loadingNodes && selectedNode === undefined && emptyResult && props.filters.rentedBy"
     >
       You have no nodes rented that match your selected resources, try changing your selected resources or renting a
       node matching your requirements.
@@ -133,6 +129,20 @@ const validator = ref();
 const pingingNode = ref(false);
 const delay = ref();
 
+function isSelectionEmpty(node: INode | undefined, selectedCards: string[]): boolean {
+  if (!node || availableNodes.value.length === 0) {
+    return true;
+  }
+
+  const selectedNodeMatches = availableNodes.value.some(n => n.nodeId === node.nodeId);
+
+  if (selectedNodeMatches && selectedCards.length > 0) {
+    return !selectedCards.some(selectedCard => cards.some(card => getCardName(card) === selectedCard));
+  }
+
+  return !selectedNodeMatches;
+}
+
 watch(selectedCards, async () => {
   for (const card of nodeCards.value) {
     for (const selectedCard of selectedCards.value) {
@@ -182,6 +192,7 @@ watch(
         loadingCards.value = false;
       }
     }
+    emptyResult.value = isSelectionEmpty(node, selectedCards.value);
   },
   { immediate: true },
 );
@@ -219,6 +230,13 @@ watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
     }, 1000);
   });
 });
+
+watch(
+  () => selectedCards.value,
+  () => {
+    emptyResult.value = isSelectionEmpty(selectedNode.value, selectedCards.value);
+  },
+);
 
 function getChipColor(item: any) {
   return item === "Dedicated" ? "success" : "secondary";
