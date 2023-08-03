@@ -5,16 +5,10 @@
       class="mb-2"
       type="warning"
       variant="tonal"
-      v-if="!loadingNodes && selectedNode === undefined && emptyResult && props.filters.rentedBy"
-    >
-      You have no nodes rented that match your selected resources, try changing your selected resources or renting a
-      node matching your requirements.
-    </v-alert>
-    <v-alert
-      class="mb-2"
-      type="warning"
-      variant="tonal"
-      v-else-if="(selectedNode && props.filters.rentedBy) || (!selectedNode && props.filters.rentedBy)"
+      v-if="
+        (!loadingNodes && selectedNode === undefined && emptyResult && props.filters.rentedBy) ||
+        ((selectedNode || !selectedNode) && props.filters.rentedBy)
+      "
     >
       You have no nodes rented that match your selected resources, try changing your selected resources or renting a
       node matching your requirements.
