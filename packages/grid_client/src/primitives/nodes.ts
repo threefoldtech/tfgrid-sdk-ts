@@ -378,7 +378,7 @@ class Nodes {
   }
 
   /**
-   * Finds the index of a disk with a size greater than or equal to the specified disk size in the DisksPool.
+   * Finds the index of a disk with a size greater than or equal to the specified disk size in the DiskPools.
    *
    * @param diskPools - An array of disk sizes available in the pool.
    * @param disk - The required disk size to fit into the pool.
