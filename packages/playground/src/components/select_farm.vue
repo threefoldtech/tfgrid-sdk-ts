@@ -73,7 +73,7 @@ const delay = ref();
 watch(
   [farm, loading],
   ([farm, loading]) => {
-    emits("update:loading", true);
+    emits("update:loading", loading);
     if (loading) {
       FarmGatewayManager?.setLoading(true);
     }

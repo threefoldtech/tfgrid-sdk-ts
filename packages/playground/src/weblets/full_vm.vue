@@ -41,6 +41,7 @@
           :minimum="{ cpu: 1, memory: 1024 * 1, disk: 25 }"
           :standard="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
           :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+          :disabled="loadingFarm"
           v-model="solution"
         />
 
@@ -51,6 +52,7 @@
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
           v-model:wireguard="wireguard"
+          :disabled="loadingFarm"
         />
         <input-tooltip
           inline
@@ -59,18 +61,18 @@
           When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
           "
         >
-          <v-switch color="primary" inset label="GPU" v-model="hasGPU" hide-details />
+          <v-switch color="primary" inset label="GPU" v-model="hasGPU" :disabled="loadingFarm" hide-details />
         </input-tooltip>
         <input-tooltip
           inline
           tooltip="Click to know more about dedicated nodes."
           href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
         >
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
         </input-tooltip>
 
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+          <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
 
         <SelectFarmManager>
@@ -85,9 +87,8 @@
               hasGPU: hasGPU,
             }"
             v-model="farm"
-            :loading="loadingFarm"
+            v-model:loading="loadingFarm"
           />
-          loadingFarm: {{ loadingFarm }}
           <SelectNode
             v-model="selectedNode"
             :filters="{
@@ -111,6 +112,7 @@
           @add="addDisk"
           title="Add additional disk space to your full virtual machine"
           #="{ index }"
+          :disabled="loadingFarm"
         >
           <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
           <input-validator

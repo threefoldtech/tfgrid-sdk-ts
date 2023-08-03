@@ -84,18 +84,19 @@
         v-model="solution"
         :minimum="{ cpu: 2, memory: 1024, disk: 50 }"
         :standard="{ cpu: 2, memory: 1024 * 2, disk: 100 }"
+        :disabled="loadingFarm"
       />
-      <Networks v-model:ipv4="ipv4" />
+      <Networks v-model:ipv4="ipv4" :disabled="loadingFarm" />
       <FarmGatewayManager>
         <input-tooltip
           inline
           tooltip="Click to know more about dedicated nodes."
           href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
         >
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
         </input-tooltip>
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+          <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
 
         <SelectFarmManager>
@@ -109,6 +110,7 @@
               publicIp: ipv4,
             }"
             v-model="farm"
+            v-model:loading="loadingFarm"
           />
 
           <SelectNode
@@ -157,7 +159,7 @@ import { generateName, generatePassword } from "../utils/strings";
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
-
+const loadingFarm = ref(false);
 const name = ref(generateName(9, { prefix: "fw" }));
 const username = ref("admin");
 const email = ref("");
