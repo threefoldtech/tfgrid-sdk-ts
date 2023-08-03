@@ -74,18 +74,33 @@
           :minimum="{ cpu: 2, memory: 1024 * 16, disk: 250 }"
           :standard="{ cpu: 2, memory: 1024 * 16, disk: 500 }"
           :recommended="{ cpu: 4, memory: 1024 * 16, disk: 1000 }"
+          :disabled="loadingFarm"
         />
-        <Networks v-model:ipv4="ipv4" />
+        <Networks v-model:ipv4="ipv4" :disabled="loadingFarm" />
         <FarmGatewayManager>
           <input-tooltip
             inline
             tooltip="Click to know more about dedicated nodes."
             href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
           >
-            <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+            <v-switch
+              color="primary"
+              inset
+              label="Dedicated"
+              v-model="dedicated"
+              :disabled="loadingFarm"
+              hide-details
+            />
           </input-tooltip>
           <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-            <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+            <v-switch
+              color="primary"
+              inset
+              label="Certified"
+              v-model="certified"
+              :disabled="loadingFarm"
+              hide-details
+            />
           </input-tooltip>
 
           <SelectFarmManager>
@@ -99,6 +114,7 @@
                 certified: certified,
               }"
               v-model="farm"
+              v-model:loading="loadingFarm"
             />
             <SelectNode
               v-model="selectedNode"
@@ -163,6 +179,7 @@ const username = ref("admin");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
+const loadingFarm = ref(false);
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/owncloud-10.9.1.flist",
   entryPoint: "/sbin/zinit init",

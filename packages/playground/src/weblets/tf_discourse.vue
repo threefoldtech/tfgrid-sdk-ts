@@ -56,6 +56,7 @@
           v-model="solution"
           :standard="{ cpu: 2, memory: 1024 * 2, disk: 50 }"
           :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+          :disabled="loadingFarm"
         />
         <!-- <Networks v-model:ipv4="ipv4" /> -->
         <FarmGatewayManager>
@@ -64,11 +65,25 @@
             tooltip="Click to know more about dedicated nodes."
             href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
           >
-            <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+            <v-switch
+              color="primary"
+              inset
+              label="Dedicated"
+              v-model="dedicated"
+              :disabled="loadingFarm"
+              hide-details
+            />
           </input-tooltip>
 
           <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-            <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+            <v-switch
+              color="primary"
+              inset
+              label="Certified"
+              v-model="certified"
+              :disabled="loadingFarm"
+              hide-details
+            />
           </input-tooltip>
 
           <SelectFarmManager>
@@ -82,6 +97,7 @@
                 certified: certified,
               }"
               v-model="farm"
+              v-model:loading="loadingFarm"
             />
 
             <SelectNode
@@ -149,6 +165,7 @@ const domainNameCmp = ref();
 const smtp = ref(createSMTPServer());
 const dedicated = ref(false);
 const certified = ref(false);
+const loadingFarm = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const flist: Flist = {

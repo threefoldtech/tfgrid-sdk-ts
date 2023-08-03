@@ -3,7 +3,13 @@
     <input-tooltip
       tooltip="Choosing the appropriate computing resources and performance capabilities for a virtual instance or server. When provisioning a virtual machine or cloud instance, the 'Select instance capacity' step allows users to specify the desired CPU, memory, storage, and network resources for their virtual environment."
     >
-      <v-select label="Select instance capacity" v-bind="props" :items="packages" v-model="solution" />
+      <v-select
+        label="Select instance capacity"
+        v-bind="props"
+        :items="packages"
+        v-model="solution"
+        :disabled="props.disabled"
+      />
     </input-tooltip>
 
     <div v-if="solution === 'custom'">
@@ -72,6 +78,7 @@ const props = defineProps({
     type: Object as Package,
     default: () => ({ cpu: 4, memory: 1024 * 4, disk: 250 }),
   },
+  disabled: { type: Boolean },
 });
 const emits = defineEmits<{ (event: "update:model-value", value?: solutionFlavor): void }>();
 
