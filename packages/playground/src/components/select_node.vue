@@ -25,7 +25,7 @@
           return-object
           v-model="selectedNode"
           @update:model-value="selectedNode = $event"
-          :disabled="loadingNodes || pingingNode"
+          :disabled="loadingNodes"
           :loading="loadingNodes"
           v-bind="{
             ...props,
@@ -266,6 +266,7 @@ async function loadNodes(farmId: number) {
     } catch (e) {
       errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
     } finally {
+      validator.value?.setStatus(ValidatorStatus.Invalid);
       loadingNodes.value = false;
       farmManager?.setLoading(false);
     }
