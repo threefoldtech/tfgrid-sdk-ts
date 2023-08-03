@@ -7,7 +7,8 @@
       variant="tonal"
       v-if="
         (!loadingNodes && selectedNode === undefined && emptyResult && props.filters.rentedBy) ||
-        ((selectedNode || !selectedNode) && props.filters.rentedBy)
+        (selectedNode && props.filters.rentedBy) ||
+        (!selectedNode && props.filters.rentedBy)
       "
     >
       You have no nodes rented that match your selected resources, try changing your selected resources or renting a
