@@ -1529,15 +1529,15 @@
   resolved "https://registry.yarnpkg.com/@substrate/ss58-registry/-/ss58-registry-1.41.0.tgz#dd18e132f44b73c3cd31cf0db489c10af70bef36"
   integrity sha512-TLz5VkEaJRNFzf1Oiix9gqknKer3aKbLfjK9XHBFCIhdxlQpI+S6lZGu3wT4DHAGXPakYfXb8+9ZIOtWLcQ/2Q==
 
-"@threefold/grid_client@2.1.0-rc5":
-  version "2.1.0-rc5"
-  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.1.0-rc5.tgz#480318caa51d03b8186c015dc97640ba2c21ddbd"
-  integrity sha512-Y2XSxAEO+/4S9mT41Q1Sg4Yefyz+1fJz3vp1YIVuu9U/4iYBR1nsNr4Wwa7WP8WpGjbTLBfVSTR7JUWm37Ghhw==
+"@threefold/grid_client@^2.1.0-rc6":
+  version "2.1.0-rc6"
+  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.1.0-rc6.tgz#9d82cf6cd40f0960990999a3506ae792c974da9e"
+  integrity sha512-iSBQMug7OsPqlnT1ygYJlFL9yzhyiM3cFtYvSS+n5vFp1DJYLBt4I6dXpnGDvG1nyXlyHAWWiBcwwsCAGe6EVw==
   dependencies:
     "@jimber/pkid" "1.0.4"
     "@noble/secp256k1" "^1.7.1"
-    "@threefold/rmb_direct_client" "^2.1.0-rc5"
-    "@threefold/tfchain_client" "^2.1.0-rc5"
+    "@threefold/rmb_direct_client" "^2.1.0-rc6"
+    "@threefold/tfchain_client" "^2.1.0-rc6"
     algosdk "^1.19.0"
     appdata-path "^1.0.0"
     axios "^0.27.2"
@@ -1559,14 +1559,14 @@
     url-parse "^1.5.10"
     uuid4 "^2.0.2"
 
-"@threefold/rmb_direct_client@^2.1.0-rc5":
-  version "2.1.0-rc5"
-  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-2.1.0-rc5.tgz#f19a3a901504ba8c1301a6817509d101104e8468"
-  integrity sha512-Afkx4OFA0b8SVVfrkVeiwMczGhkbac+88Ptzfr1gj65DJUCOoOr/N2mu7vI8sy1d3zYPmUxArTpibp21vDCbSg==
+"@threefold/rmb_direct_client@^2.1.0-rc6":
+  version "2.1.0-rc6"
+  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-2.1.0-rc6.tgz#b222568b850f7f2449fccdfa346cbab1aa5ca618"
+  integrity sha512-K716bKxSRRGWAtjm/qvR+Y1RkEV8Rzrm4uHPyO++1ZoPn/oqvNREiyqANwiY060tuZIyabAMeQEPmSH9nRH82w==
   dependencies:
     "@noble/secp256k1" "^1.7.1"
     "@polkadot/api" "^8.9.1"
-    "@threefold/tfchain_client" "^2.1.0-rc5"
+    "@threefold/tfchain_client" "^2.1.0-rc6"
     base64url "^3.0.1"
     bip39 "^3.1.0"
     buffer "^6.0.3"
@@ -1576,10 +1576,10 @@
     uuid "^8.3.2"
     ws "^8.12.0"
 
-"@threefold/tfchain_client@^2.1.0-rc5":
-  version "2.1.0-rc5"
-  resolved "https://registry.yarnpkg.com/@threefold/tfchain_client/-/tfchain_client-2.1.0-rc5.tgz#5683dfaa1c0584c4a3ff6fec2730153b94e2cbc2"
-  integrity sha512-4ze+k/4Yf9vxW2rWavf9/vGaY+3bl6AJRJ8Hx8HbXGinZHXc/px4BFQKfC0LSzWijncvCb2QUYBImh5rlRJDTA==
+"@threefold/tfchain_client@^2.1.0-rc6":
+  version "2.1.0-rc6"
+  resolved "https://registry.yarnpkg.com/@threefold/tfchain_client/-/tfchain_client-2.1.0-rc6.tgz#c7ef338e799c20c29c3751498b4dae25e177aea4"
+  integrity sha512-K+nFTJfoslBbu4NXb1pYqZmDg023eDfkFBYr0Bm2v+e2ROA01LKTYH+kUFgGK8NR56zDNYCjuPPRWYhpL3+KGA==
   dependencies:
     "@polkadot/api" "^8.9.1"
     await-lock "^2.2.2"
@@ -1758,9 +1758,9 @@
   integrity sha512-Exw4yUWMBXM3X+8oqzJNRqZSwUAaS4+7NdvHqQuFi/d+synz++xmX3QIf+BFqneW8N31R8Ky+sikfZUXq07ggQ==
 
 "@types/node@>= 8":
-  version "20.4.5"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.4.5.tgz#9dc0a5cb1ccce4f7a731660935ab70b9c00a5d69"
-  integrity sha512-rt40Nk13II9JwQBdeYqmbn2Q6IVTA5uPhvSO+JVqdXw/6/4glI6oR9ezty/A9Hg5u7JH4OmYmuQ+XvjKm0Datg==
+  version "20.4.6"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.4.6.tgz#b66b66c9bb5d49b199f03399e341c9d6036e9e88"
+  integrity sha512-q0RkvNgMweWWIvSMDiXhflGUKMdIxBo2M2tYM/0kEGDueQByFzK4KZAgu5YHGFNxziTlppNpTIBcqHQAxlfHdA==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -1840,9 +1840,9 @@
   integrity sha512-FDJNkyhmKLw7uEvTxx5tSXfPeQpO0iy73Ry+PmYZJvQy0QIWX8a7kJ4kLWRf+EbTPJEPDSgPXHaM7pzr5lmvCg==
 
 "@types/validator@^13.7.10":
-  version "13.7.17"
-  resolved "https://registry.yarnpkg.com/@types/validator/-/validator-13.7.17.tgz#0a6d1510395065171e3378a4afc587a3aefa7cc1"
-  integrity sha512-aqayTNmeWrZcvnG2MG9eGYI6b7S5fl+yKgPs6bAjOTwPS316R5SxBGKvtSExfyoJU7pIeHJfsHI0Ji41RVMkvQ==
+  version "13.9.0"
+  resolved "https://registry.yarnpkg.com/@types/validator/-/validator-13.9.0.tgz#e7a96da3ea6a936222c6e76bb54abdd3dc4c9e4a"
+  integrity sha512-NclP0IbzHj/4tJZKFqKh8E7kZdgss+MCUYV9G+TLltFfDA4lFgE4PKPpDIyS2FlcdANIfSx273emkupvChigbw==
 
 "@types/webpack-dev-server@^3.11.0":
   version "3.11.6"
@@ -7246,9 +7246,9 @@ levn@~0.3.0:
     type-check "~0.3.2"
 
 libphonenumber-js@^1.10.14:
-  version "1.10.38"
-  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.10.38.tgz#edb9c1f13796ab17a8484180ef937184784628e9"
-  integrity sha512-4NjVXVUmpZ9Zsqq6FXa2+MKI+KAI3tOqA0pxXgXGluhpj4ge5didmbWJpMBqGB3AVGv1SnEtKdGTbxjSEG1kCQ==
+  version "1.10.39"
+  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.10.39.tgz#12dd512621c9ebb13402a694ac81dc78511cd982"
+  integrity sha512-iPMM/NbSNIrdwbr94rAOos6krB7snhfzEptmk/DJUtTPs+P9gOhZ1YXVPcRgjpp3jJByclfm/Igvz45spfJK7g==
 
 libsodium-wrappers@^0.7.10, libsodium-wrappers@^0.7.6:
   version "0.7.11"
