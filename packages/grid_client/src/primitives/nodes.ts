@@ -75,9 +75,8 @@ interface RMBNodeCapacity {
   used: NodeResources;
 }
 enum DiskTypes {
-  SSD,
-  HDD,
-  rootFS,
+  SSD = "ssd",
+  HDD = "hdd",
 }
 export interface StoragePool {
   type: DiskTypes;
@@ -468,7 +467,7 @@ class Nodes {
     try {
       this.fitDisksInDisksPool(ssdDisks, ssdPools, DiskTypes.SSD);
       this.fitDisksInDisksPool(hddDisks, hddPools, DiskTypes.HDD);
-      this.fitDisksInDisksPool(rootFileSystemDisks, ssdDisks, DiskTypes.rootFS);
+      this.fitDisksInDisksPool(rootFileSystemDisks, ssdDisks, DiskTypes.SSD);
       return true;
     } catch (error) {
       throw new Error(
