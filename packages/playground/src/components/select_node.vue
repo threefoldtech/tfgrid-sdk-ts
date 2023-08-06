@@ -7,8 +7,8 @@
       variant="tonal"
       v-if="!loadingNodes && selectedNode === undefined && emptyResult && props.filters.rentedBy"
     >
-      There are no nodes rented by you that match your selected resources, try to change your resources or rent a node
-      and try again.
+      You have no rented nodes that match your selected resources. Please try changing your selected resources or rent a
+      node that matches your requirements.
     </v-alert>
     <input-validator
       ref="validator"
@@ -129,6 +129,20 @@ const validator = ref();
 const pingingNode = ref(false);
 const delay = ref();
 
+function isSelectionEmpty(node: INode | undefined, selectedCards: string[]): boolean {
+  if (!node || availableNodes.value.length === 0) {
+    return true;
+  }
+
+  const selectedNodeMatches = availableNodes.value.some(n => n.nodeId === node.nodeId);
+
+  if (selectedNodeMatches && selectedCards.length > 0) {
+    return !selectedCards.some(selectedCard => cards.some(card => getCardName(card) === selectedCard));
+  }
+
+  return !selectedNodeMatches;
+}
+
 watch(selectedCards, async () => {
   for (const card of nodeCards.value) {
     for (const selectedCard of selectedCards.value) {
@@ -178,6 +192,7 @@ watch(
         loadingCards.value = false;
       }
     }
+    emptyResult.value = isSelectionEmpty(node, selectedCards.value);
   },
   { immediate: true },
 );
