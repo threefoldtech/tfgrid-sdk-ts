@@ -206,7 +206,12 @@ async function getGPUInfo() {
 
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
-    const gpuCards = await grid.zos.getNodeGPUInfo({ nodeId: contract.value.nodeId });
+    const nodeId = await grid.zos.capacity.getNodeIdFromContractId(
+      contract.value.contract_id,
+      profileManager.profile!.mnemonic,
+    );
+
+    const gpuCards = await grid.zos.getNodeGPUInfo({ nodeId });
     const usedCards = gpuCards?.filter((card: any) => card.contract == contract.value.contractId);
 
     const cardsInfo = [];
@@ -221,7 +226,7 @@ async function getGPUInfo() {
   }
   loadingCard.value = false;
 }
-getGPUInfo();
+contract.value.metadata?.includes("fullvm") ? getGPUInfo() : undefined;
 
 function _transform(value: string): any {
   const v = value.toLowerCase();
