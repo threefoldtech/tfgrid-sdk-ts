@@ -1,6 +1,6 @@
 <template>
   <Layout pageName="Calculator" :noFilter="true">
-    <div class="d-flex justify-left">
+    <div class="d-flex margin-left">
       <h1>
         Resources Pricing Calculator
         <i class="fa fa-calculator" aria-hidden="true"></i>
@@ -431,6 +431,10 @@ export default class Calculator extends Vue {
 }
 </script>
 <style>
+.margin-left {
+  margin-left: 20px;
+}
+
 .right {
   text-align: right;
   margin-right: 0;

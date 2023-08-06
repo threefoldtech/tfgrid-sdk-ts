@@ -1,5 +1,5 @@
 <template>
-  <Layout pageName="Nodes">
+  <Layout pageName="Nodes" class="custom-layout">
     <template v-slot:filters>
       <LayoutFilters :items="filters.map(f => f.label)" v-model="activeFiltersList" />
     </template>
@@ -380,5 +380,9 @@ export default class Nodes extends Vue {
 <style>
 .v-text-field__details {
   display: none;
+}
+
+.custom-layout {
+  margin-left: 20px;
 }
 </style>
