@@ -165,7 +165,7 @@ const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
 const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/nextcloud-27.0.1.flist",
+  value: "https://hub.grid.tf/idrnd.3bot/logismosis-nextcloud-aio2-latest.flist",
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
