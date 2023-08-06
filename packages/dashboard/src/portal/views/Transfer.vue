@@ -15,7 +15,6 @@
                 <v-combobox
                   v-model="receipientAddress"
                   :items="accountsAddresses"
-                  :error-messages="targetErrorAddress"
                   dense
                   filled
                   @keydown="setValue"
@@ -123,7 +122,6 @@ export default class TransferView extends Vue {
   receptinTwinId = "";
   accountTwinIds: any = [];
   targetErrorTwin = "";
-  targetErrorAddress = "";
 
   queryClient = new QueryClient(window.configs.APP_API_URL);
   client = new Client({ url: window.configs.APP_API_URL });
@@ -186,7 +184,6 @@ export default class TransferView extends Vue {
   }
 
   transferAddressCheck() {
-    this.targetErrorAddress = "";
     const isValid = checkAddress(this.receipientAddress);
     if (isValid && this.receipientAddress.length && !this.receipientAddress.match(/\W/)) {
       return true;
