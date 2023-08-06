@@ -36,7 +36,7 @@
                 <span class="fee">0.01 transaction fee will be deducted</span>
               </v-form>
               <TransferFormButtons
-                :isTransferValid="isTransferValidAddress"
+                :isTransferValid="isTransferValidAddress && amountByAddress > 0"
                 :loadingTransfer="loadingTransferAddress"
                 @submit="transferTFTWithAddress"
                 @clear="clearInputAddress"
@@ -78,7 +78,7 @@
                 <span class="fee">0.01 transaction fee will be deducted</span>
               </v-form>
               <TransferFormButtons
-                :isTransferValid="isTransferValidTwinId"
+                :isTransferValid="isTransferValidTwinId && amountByTwinId > 0"
                 :loadingTransfer="loadingTransferTwinId"
                 @submit="transferTFTWithTwinID"
                 @clear="clearInputTwinId"
