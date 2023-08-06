@@ -55,16 +55,7 @@
                   @input="onInputValueChanged"
                   label="Recipient:"
                   :error-messages="targetErrorTwin"
-                  :rules="[
-                    () => !!receptinTwinId || 'This field is required',
-                    () => {
-                      /^[1-9]\d*$/.test(receptinTwinId) || 'Please enter a positive integer';
-                    },
-                    () => {
-                      (parseInt(receptinTwinId) >= -(2 ** 31) && parseInt(receptinTwinId) <= 2 ** 31 - 1) ||
-                        'Invalid Twin ID';
-                    },
-                  ]"
+                  :rules="[() => !!receptinTwinId || 'This field is required']"
                 >
                 </v-combobox>
                 <TransferTextField
@@ -136,11 +127,25 @@ export default class TransferView extends Vue {
     await this.$nextTick();
     if (this.receptinTwinId.length === 0) {
       this.targetErrorTwin = "This field is required";
+      this.isTransferValidTwinId = false;
       return;
     }
 
     if (parseInt(this.receptinTwinId) === this.$store.state.credentials.twin.id) {
       this.targetErrorTwin = "You can't transfer to yourself";
+      this.isTransferValidTwinId = false;
+      return;
+    }
+
+    if (!/^[1-9]\d*$/.test(this.receptinTwinId)) {
+      this.targetErrorTwin = "Please enter a positive integer";
+      this.isTransferValidTwinId = false;
+      return;
+    }
+
+    if (!(parseInt(this.receptinTwinId) >= -(2 ** 31) && parseInt(this.receptinTwinId) <= 2 ** 31 - 1)) {
+      this.targetErrorTwin = "Please enter a valid twin id";
+      this.isTransferValidTwinId = false;
       return;
     }
 
