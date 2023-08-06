@@ -194,7 +194,7 @@
             tooltip="Visit"
             color="white"
             icon="mdi-web"
-            :href="'https://' + item.value[0].publicIP + ':8080' "
+            :href="'https://' + item.value[0].NEXTCLOUD_DOMAIN + ':8080' "
           />
         </template>
 

@@ -231,7 +231,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "NEXTCLOUD_DATABASE_USERNAME", value: username.value },
             { key: "NEXTCLOUD_DATABASE_PASSWORD", value: password.value },
-            { key: "NEXTCLOUD_DOMAIN", value: domain },
+            { key: "NEXTCLOUD_DOMAIN", value: ipv4.value },
           ],
           nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
@@ -243,7 +243,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
     return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Nextcloud instance."));
   }
   if (customDomain && ipv4.value) {
-    vm[0].customDomain = gatewayName.domain;
+    vm[0].customDomain = ipv4.value;
     finalize(vm);
     return;
   }
