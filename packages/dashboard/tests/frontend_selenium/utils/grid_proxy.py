@@ -41,6 +41,11 @@ class GridProxy:
         r = requests.post(Base.gridproxy_url + 'twins?twin_id='+ twin_id)
         details = r.json()
         return details[0]['accountId']
+    
+    def get_twin_relay(self, twin_id):
+        r = requests.post(Base.gridproxy_url + 'twins?twin_id='+ twin_id)
+        details = r.json()
+        return details[0]['relay']
 
     def get_farm_ips(self, farm_id):
         r = requests.post(Base.gridproxy_url + 'farms?farm_id='+ farm_id)

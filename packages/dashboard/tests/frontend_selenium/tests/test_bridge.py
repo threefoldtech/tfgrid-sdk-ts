@@ -1,20 +1,20 @@
 from utils.utils import generate_leters, generate_string, get_seed, get_stellar_address
-from pages.bridge import BridgePage
-from pages.polka import PolkaPage
+from pages.dashboard import DashboardPage
 from utils.grid_proxy import GridProxy
+from pages.bridge import BridgePage
 
 #  Time required for the run (11 cases) is approximately 3 minutes.
 
 
 def before_test_setup(browser):
     bridge_page = BridgePage(browser)
-    polka_page = PolkaPage(browser)
-    user = generate_string()
+    dashboard_page = DashboardPage(browser)
     password = generate_string()
-    polka_page.load_and_authenticate()
-    polka_page.import_account(get_seed(), user, password)
-    bridge_page.navigate_to_bridge(user)
-    return bridge_page, polka_page, password
+    dashboard_page.open_and_load()
+    dashboard_page.import_account(get_seed())
+    dashboard_page.connect_your_wallet(password).click()
+    bridge_page.navigate_to_bridge()
+    return bridge_page
 
 
 def test_navigate_bridge(browser):
@@ -40,7 +40,7 @@ def test_transfer_chain(browser):
           - Click on chain list.
       Result: Steller should be selected.
     """
-    bridge_page, _, _ = before_test_setup(browser)
+    bridge_page = before_test_setup(browser)
     bridge_page.transfer_chain()
 
 
@@ -56,7 +56,7 @@ def test_choose_deposit(browser):
           - Click on close button.
       Result: Deposit tft will be shown.
     """
-    bridge_page, _, _ = before_test_setup(browser)
+    bridge_page = before_test_setup(browser)
     bridge_page.transfer_chain()
     bridge_page.choose_deposit()
     assert 'Deposit TFT' in browser.page_source
@@ -74,7 +74,7 @@ def test_choose_withdraw(browser):
           - Click on close button.
       Result: withdraw tft will be shown.
     """
-    bridge_page, _, _ = before_test_setup(browser)
+    bridge_page = before_test_setup(browser)
     bridge_page.transfer_chain()
     bridge_page.choose_withdraw()
     assert 'Withdraw TFT' in browser.page_source
@@ -90,9 +90,9 @@ def test_how_it_done(browser):
           - Click on how it's done text.
       Result: it will go to link
     """
-    bridge_page, _, _ = before_test_setup(browser)
+    bridge_page = before_test_setup(browser)
     bridge_page.transfer_chain()
-    assert bridge_page.how_it_done() in 'https://manual.grid.tf/TF_Farmer_Guide/TF_Complete_Farmer_Guide/farmer_guide.html?highlight=bridge#how-to-use-the-tfchain-stellar-bridge'
+    assert bridge_page.how_it_done() in 'https://manual.grid.tf/threefold_token/tft_bridges/tfchain_stellar_bridge.html#how-to-use-the-tfchain-stellar-bridge'
 
 
 def test_check_deposit(browser):
@@ -107,7 +107,7 @@ def test_check_deposit(browser):
           - Click on close button.
       Result: Assert that Destination and memo text will come from drid proxy.
     """
-    bridge_page, _, _ = before_test_setup(browser)
+    bridge_page = before_test_setup(browser)
     grid_proxy = GridProxy(browser)
     bridge_page.transfer_chain()
     twin_id, amount_text, bridge_address = bridge_page.check_deposit()
@@ -130,7 +130,7 @@ def test_check_withdraw_stellar(browser):
           - Click on close button.
       Result: Assert that stellar address is right.
     """
-    bridge_page, _, _ = before_test_setup(browser)
+    bridge_page = before_test_setup(browser)
     bridge_page.transfer_chain()
     assert bridge_page.check_withdraw(get_stellar_address(), '2.01').is_enabled() == True
 
@@ -148,7 +148,7 @@ def test_check_withdraw_invalid_stellar(browser):
           - Click on close button.
       Result: Alert with message "invalid address" should be displayed.
     """
-    bridge_page, _, _ = before_test_setup(browser)
+    bridge_page = before_test_setup(browser)
     bridge_page.transfer_chain()
     bridge_page.setup_withdraw_tft(0.001)
     cases = [' ', generate_string(), generate_leters(), '!@##$%$E^/>|ز%^(;:^*)']
@@ -170,7 +170,7 @@ def test_check_withdraw_tft_amount(browser):
           - Click on close button.
       Result: Assert that the amount of tft is right.
     """
-    bridge_page, _, _ = before_test_setup(browser)
+    bridge_page = before_test_setup(browser)
     bridge_page.transfer_chain()
     cases = [2, 2.001, 2.111]
     balance = bridge_page.setup_widthdraw_address(get_stellar_address())
@@ -192,7 +192,7 @@ def test_check_withdraw_invalid_tft_amount(browser):
           - Click on close button.
       Result: Alert with message "Amount cannot be negative or 0" should be displayed.
     """
-    bridge_page, _, _ = before_test_setup(browser)
+    bridge_page = before_test_setup(browser)
     bridge_page.transfer_chain()
     balance = bridge_page.setup_widthdraw_address(get_stellar_address())
     cases = [0, 0.000, 0.0, -0.1, -1, -22.2, -1.111, 0.123, 1.999]
@@ -219,12 +219,11 @@ def test_check_withdraw(browser):
           - Click on close button.
       Result: Assert that Amount of tft should send to the stellar.
     """
-    bridge_page, polka_page, password = before_test_setup(browser)
+    bridge_page = before_test_setup(browser)
     bridge_page.transfer_chain()
     balance = bridge_page.get_balance()
     min_balance = float(balance)-2
     max_balance = float(balance)-2.11
     bridge_page.check_withdraw(get_stellar_address(), '2.1').click()
-    polka_page.authenticate_with_pass(password)
     assert bridge_page.wait_for('Withdraw submitted!')
     assert format(float(max_balance), '.3f') <= format(float(bridge_page.get_balance_withdraw(balance)), '.3f') <= format(float(min_balance), '.3f')

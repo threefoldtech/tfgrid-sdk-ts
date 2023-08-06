@@ -11,15 +11,15 @@ class NodePage:
 
     farm_page = (By.XPATH , "//*[contains(text(), 'farms')]")
     node_page = (By.XPATH , "//*[contains(text(), 'Your Farm Nodes')]")
-    twin_id_label = (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div[1]/div[1]/div[2]/div[1]/div/div[2]/div[1]')
+    twin_id_label = (By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[1]/div[2]/div[1]/div/div[2]/div[1]')
     search_node_input = (By.XPATH, '/html/body/div[1]/div[1]/div[3]/div/div/div[5]/div/div[1]/div/div[1]/div/input')
-    node_table = (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div/div[5]/div[2]/div[1]/div[1]/table/tbody/tr')
+    node_table = (By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[5]/div[2]/div[1]/div[1]/table/tbody/tr')
     node_id = (By.XPATH , "//*[contains(text(), 'Node ID')]")
-    farm_id = (By.XPATH , '//*[@id="app"]/div[1]/div[3]/div/div/div[5]/div[2]/div[1]/div[1]/table/thead/tr/th[3]')
+    farm_id = (By.XPATH , '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[5]/div[2]/div[1]/div[1]/table/thead/tr/th[3]')
     country = (By.XPATH , "//*[contains(text(), 'Country')]")
     serial_number = (By.XPATH , "//*[contains(text(), 'Serial Number')]")
     status = (By.XPATH , "//*[contains(text(), 'Status')]")
-    id = (By.XPATH , "//*[contains(text(), 'Add a public config to your node with ID:')]")
+    id_label = (By.XPATH , "//*[contains(text(), 'Add a public config to your node with ID:')]")
     update_msg = (By.XPATH , "//*[contains(text(), 'This action is irreversible')]")
     ipv4 = (By.XPATH , '/html/body/div[1]/div[4]/div/div/div[2]/form/div[1]/div/div[1]/div/input')
     ipv4_gateway = (By.XPATH , '/html/body/div[1]/div[4]/div/div/div[2]/form/div[2]/div/div[1]/div/input')
@@ -33,13 +33,17 @@ class NodePage:
     fee_input = (By.XPATH , '/html/body/div[1]/div[5]/div/div/div[3]/form/div/div/div[1]/div/input')
     set_btn = (By.XPATH , '//*[@id="app"]/div[5]/div/div/div[4]/button[2]')
     fee_id = (By.XPATH , "//*[contains(text(), 'Additional fees will be added to your node')]")
-    table_xpath = '//*[@id="app"]/div[1]/div[3]/div/div/div[5]/div[2]/div[1]/div[1]/table/tbody/tr'
+    table_xpath = '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[5]/div[2]/div[1]/div[1]/table/tbody/tr'
+    close_login_button = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div[4]/button')
+    twin_details = (By.XPATH, "//*[contains(text(), 'Twin Details')]")
+
 
     def __init__(self, browser):
         self.browser = browser
       
-    def navigate(self, user):
-        self.browser.find_element(By.XPATH, "//*[contains(text(), '"+ user +"')]").click()
+    def navigate(self):
+        self.browser.find_element(*self.close_login_button).click()
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.twin_details))
         self.twin_id = int(self.browser.find_element(*self.twin_id_label).text)
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.farm_page))
         self.browser.find_element(*self.farm_page).click()
@@ -129,8 +133,8 @@ class NodePage:
             WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, self.table_xpath+ '['+ str(i) +']/td[7]/button')))
             WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable((By.XPATH, self.table_xpath+ '['+ str(i) +']/td[7]/button')))
             self.browser.find_element(By.XPATH, self.table_xpath+ '['+ str(i) +']/td[7]/button').click()
-            WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.id))
-            details.append(self.browser.find_element(*self.id).text[42:]) # ID
+            WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.id_label))
+            details.append(self.browser.find_element(*self.id_label).text[42:]) # ID
             details.append(self.browser.find_element(*self.ipv4).text) # IPV4
             details.append(self.browser.find_element(*self.ipv4_gateway).text) # IPV4 Gateway
             details.append(self.browser.find_element(*self.ipv6).text) # IPV6
@@ -139,21 +143,21 @@ class NodePage:
             self.browser.find_element(*self.cancel).click()
             self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[2]/div/div").click()
             self.browser.execute_script("window.scrollTo(0,document.body.scrollHeight)")
-            details.append(int(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div/div[1]/div[2]/span").text)) # Node ID
-            details.append(int(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div/div[2]/div[2]/span").text)) # Farm ID
-            details.append(int(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div/div[3]/div[2]/span").text)) # Twin ID
-            details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div/div[7]/div[2]/span").text) # Country
-            details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div/div[8]/div[2]/span").text) # City
-            details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div/div[5]/div[2]/span").text) # Created Time
-            details.append(int(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div/div[10]/div[2]/span").text)) # Farming Policy ID
-            details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div/div[6]/div[2]/span").text) # Updated Time
+            details.append(int(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div[2]/div/div[1]/div/div[1]/div[2]/span").text)) # Node ID
+            details.append(int(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div[2]/div/div[1]/div/div[2]/div[2]/span").text)) # Farm ID
+            details.append(int(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div[2]/div/div[1]/div/div[3]/div[2]/span").text)) # Twin ID
+            details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div[2]/div/div[1]/div/div[7]/div[2]/span").text) # Country
+            details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div[2]/div/div[1]/div/div[8]/div[2]/span").text) # City
+            details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div[2]/div/div[1]/div/div[5]/div[2]/span").text) # Created Time
+            details.append(int(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div[2]/div/div[1]/div/div[10]/div[2]/span").text)) # Farming Policy ID
+            details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div[2]/div/div[1]/div/div[6]/div[2]/span").text) # Updated Time
             details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[2]/div/div/div/div/div/div[1]/div[2]/span[2]").text) # CRU
             details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[2]/div/div/div/div/div/div[4]/div[2]/span[2]").text) # SRU
             details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[2]/div/div/div/div/div/div[2]/div[2]/span[2]").text) # HRU
             details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[2]/div/div/div/div/div/div[3]/div[2]/span[2]").text) # MRU
             details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[6]/p/span/span").text) # Status
-            details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div/div[4]/div[2]/span").text) # Certification
-            details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div/div[9]/div[2]/span").text) # Serial Number
+            details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div[2]/div/div[1]/div/div[4]/div[2]/span").text) # Certification
+            details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div[1]/div/div[2]/div/div[1]/div/div[9]/div[2]/span").text) # Serial Number
             nodes.append(details)
         return nodes
     
@@ -161,7 +165,7 @@ class NodePage:
         for i in range(1, len(self.browser.find_elements(*self.node_table))+1):
             if (self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[2]/p").text==str(node_id)):
                 self.browser.find_element(By.XPATH, self.table_xpath+ '['+ str(i) +']/td[7]/button').click()
-                WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.id))
+                WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.id_label))
 
     def add_config_input(self, ipv4, gw4, ipv6, gw6, domain):
         if(ipv4):
