@@ -1,5 +1,5 @@
 <template>
-  <Layout pageName="Farms">
+  <Layout pageName="Farms" class="custom-layout">
     <template v-slot:filters>
       <LayoutFilters :items="filters.map(f => f.chip_label)" v-model="activeFiltersKeys" />
     </template>
@@ -336,3 +336,9 @@ export default class Farms extends Vue {
   }
 }
 </script>
+
+<style>
+.custom-layout {
+  margin-left: 20px;
+}
+</style>
