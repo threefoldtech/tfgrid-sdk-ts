@@ -23,6 +23,7 @@
                   :rules="[
                     () => !!receipientAddress || 'This field is required',
                     () => transferAddressCheck() || 'invalid address',
+                    () => receipientAddress === $store.state.credentials.address || 'You can not transfer to yourself',
                   ]"
                 ></v-combobox>
                 <TransferTextField
@@ -130,34 +131,40 @@ export default class TransferView extends Vue {
   async onInputValueChanged() {
     await this.$nextTick();
     this.transferTwinIdCheck();
+    this.targetErrorTwin = "";
   }
 
   async transferTwinIdCheck() {
     await this.$nextTick();
+    if (this.receptinTwinId.length === 0) {
+      this.targetErrorTwin = "This field is required";
+      return;
+    }
+
     if (parseInt(this.receptinTwinId) === this.$store.state.credentials.twin.id) {
-      this.isTransferValidTwinId = false;
       this.targetErrorTwin = "You can't transfer to yourself";
-    } else {
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => {
-          reject(new Error("Request timed out."));
-        }, 6000);
-      });
-      try {
-        const twinDetailsPromise = this.queryClient.twins.get({ id: parseInt(this.receptinTwinId) });
-        const twinDetails = await Promise.race([twinDetailsPromise, timeoutPromise]);
-        if (twinDetails) {
-          this.isTransferValidTwinId = true;
-          this.accountTwinIds.push(this.receptinTwinId);
-          this.targetErrorTwin = "";
-        } else {
-          this.isTransferValidTwinId = false;
-          this.targetErrorTwin = "Twin ID doesn't exist";
-        }
-      } catch (error) {
+      return;
+    }
+
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => {
+        reject(new Error("Request timed out."));
+      }, 6000);
+    });
+    try {
+      const twinDetailsPromise = this.queryClient.twins.get({ id: parseInt(this.receptinTwinId) });
+      const twinDetails = await Promise.race([twinDetailsPromise, timeoutPromise]);
+      if (twinDetails) {
+        this.isTransferValidTwinId = true;
+        this.accountTwinIds.push(this.receptinTwinId);
+        this.targetErrorTwin = "";
+      } else {
         this.isTransferValidTwinId = false;
         this.targetErrorTwin = "Twin ID doesn't exist";
       }
+    } catch (error) {
+      this.isTransferValidTwinId = false;
+      this.targetErrorTwin = "Twin ID doesn't exist";
     }
   }
 
@@ -179,16 +186,12 @@ export default class TransferView extends Vue {
   }
 
   transferAddressCheck() {
-    if (this.receipientAddress === this.$store.state.credentials.account.address) {
-      this.isTransferValidAddress = false;
-      this.targetErrorAddress = "You can't transfer to yourself";
+    this.targetErrorAddress = "";
+    const isValid = checkAddress(this.receipientAddress);
+    if (isValid && this.receipientAddress.length && !this.receipientAddress.match(/\W/)) {
+      return true;
     } else {
-      const isValid = checkAddress(this.receipientAddress);
-      if (isValid && this.receipientAddress.length && !this.receipientAddress.match(/\W/)) {
-        return true;
-      } else {
-        return false;
-      }
+      return false;
     }
   }
 
