@@ -22,9 +22,11 @@
                   :rules="[
                     () => !!receipientAddress || 'This field is required',
                     () => transferAddressCheck() || 'invalid address',
+                    () => receipientAddress === $store.state.credentials.address || 'You can not transfer to yourself',
                   ]"
                 ></v-combobox>
                 <TransferTextField
+                  :amount="amountByTwinId"
                   v-model="amountByAddress"
                   label="Amount (TFT)"
                   :rules="getAmountRules(amountByAddress)"
@@ -33,7 +35,7 @@
                 <span class="fee">0.01 transaction fee will be deducted</span>
               </v-form>
               <TransferFormButtons
-                :isTransferValid="isTransferValidAddress"
+                :isTransferValid="isTransferValidAddress && amountByAddress > 0"
                 :loadingTransfer="loadingTransferAddress"
                 @submit="transferTFTWithAddress"
                 @clear="clearInputAddress"
@@ -52,20 +54,12 @@
                   filled
                   @input="onInputValueChanged"
                   label="Recipient:"
-                  :error-messages="targetError"
-                  :rules="[
-                    () => !!receptinTwinId || 'This field is required',
-                    () => {
-                      /^[1-9]\d*$/.test(receptinTwinId) || 'Please enter a positive integer';
-                    },
-                    () => {
-                      (parseInt(receptinTwinId) >= -(2 ** 31) && parseInt(receptinTwinId) <= 2 ** 31 - 1) ||
-                        'Invalid Twin ID';
-                    },
-                  ]"
+                  :error-messages="targetErrorTwin"
+                  :rules="[() => !!receptinTwinId || 'This field is required']"
                 >
                 </v-combobox>
                 <TransferTextField
+                  :amount="amountByTwinId"
                   v-model="amountByTwinId"
                   label="Amount (TFT)"
                   :rules="getAmountRules(amountByTwinId)"
@@ -74,7 +68,7 @@
                 <span class="fee">0.01 transaction fee will be deducted</span>
               </v-form>
               <TransferFormButtons
-                :isTransferValid="isTransferValidTwinId"
+                :isTransferValid="isTransferValidTwinId && amountByTwinId > 0"
                 :loadingTransfer="loadingTransferTwinId"
                 @submit="transferTFTWithTwinID"
                 @clear="clearInputTwinId"
@@ -118,7 +112,7 @@ export default class TransferView extends Vue {
   isTransferValidTwinId = false;
   receptinTwinId = "";
   accountTwinIds: any = [];
-  targetError = "";
+  targetErrorTwin = "";
 
   queryClient = new QueryClient(window.configs.APP_API_URL);
   client = new Client({ url: window.configs.APP_API_URL });
@@ -126,10 +120,35 @@ export default class TransferView extends Vue {
   async onInputValueChanged() {
     await this.$nextTick();
     this.transferTwinIdCheck();
+    this.targetErrorTwin = "";
   }
 
   async transferTwinIdCheck() {
     await this.$nextTick();
+    if (this.receptinTwinId.length === 0) {
+      this.targetErrorTwin = "This field is required";
+      this.isTransferValidTwinId = false;
+      return;
+    }
+
+    if (parseInt(this.receptinTwinId) === this.$store.state.credentials.twin.id) {
+      this.targetErrorTwin = "You can't transfer to yourself";
+      this.isTransferValidTwinId = false;
+      return;
+    }
+
+    if (!/^[1-9]\d*$/.test(this.receptinTwinId)) {
+      this.targetErrorTwin = "Please enter a positive integer";
+      this.isTransferValidTwinId = false;
+      return;
+    }
+
+    if (!(parseInt(this.receptinTwinId) >= -(2 ** 31) && parseInt(this.receptinTwinId) <= 2 ** 31 - 1)) {
+      this.targetErrorTwin = "Please enter a valid twin id";
+      this.isTransferValidTwinId = false;
+      return;
+    }
+
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => {
         reject(new Error("Request timed out."));
@@ -141,14 +160,14 @@ export default class TransferView extends Vue {
       if (twinDetails) {
         this.isTransferValidTwinId = true;
         this.accountTwinIds.push(this.receptinTwinId);
-        this.targetError = "";
+        this.targetErrorTwin = "";
       } else {
         this.isTransferValidTwinId = false;
-        this.targetError = "Twin ID doesn't exist";
+        this.targetErrorTwin = "Twin ID doesn't exist";
       }
     } catch (error) {
       this.isTransferValidTwinId = false;
-      this.targetError = "Twin ID doesn't exist";
+      this.targetErrorTwin = "Twin ID doesn't exist";
     }
   }
 
