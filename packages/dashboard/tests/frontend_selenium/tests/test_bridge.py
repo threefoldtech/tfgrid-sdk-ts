@@ -22,7 +22,7 @@ def test_navigate_bridge(browser):
       Test Case: TC1112 Navigate bridge
       Steps:
           - Navigate to the dashboard.
-          - Select an account.
+          - Login.
           - Click on bridge from side menu.
       Result: bridge page open.
     """
@@ -35,7 +35,7 @@ def test_transfer_chain(browser):
       Test Case: TC1113 transfer chain
       Steps:
           - Navigate to the dashboard.
-          - Select an account.
+          - Login.
           - Click on bridge from side menu.
           - Click on chain list.
       Result: Steller should be selected.
@@ -49,7 +49,7 @@ def test_choose_deposit(browser):
       Test Case: TC1114 choose deposit
       Steps:
           - Navigate to the dashboard.
-          - Select an account.
+          - Login.
           - Click on bridge from side menu.
           - Click on chain list.
           - Click on deposit button.
@@ -67,7 +67,7 @@ def test_choose_withdraw(browser):
       Test Case: TC1115 choose withdraw
       Steps:
           - Navigate to the dashboard.
-          - Select an account.
+          - Login.
           - Click on bridge from side menu.
           - Click on chain list.
           - Click on withdraw button.
@@ -85,7 +85,7 @@ def test_how_it_done(browser):
       Test Case: TC1116 how it done
       Steps:
           - Navigate to the dashboard.
-          - Select an account.
+          - Login.
           - Click on bridge from side menu.
           - Click on how it's done text.
       Result: it will go to link
@@ -100,7 +100,7 @@ def test_check_deposit(browser):
       Test Case: TC1117 check deposit
       Steps:
           - Navigate to the dashboard.
-          - Select an account.
+          - Login.
           - Click on bridge from side menu.
           - Click on chain list.
           - Click on deposit button.
@@ -122,7 +122,7 @@ def test_check_withdraw_stellar(browser):
       Test Case: TC1118 check withdraw stellar
       Steps:
           - Navigate to the dashboard.
-          - Select an account.
+          - Login.
           - Click on bridge from side menu.
           - Click on chain list.
           - Click on withdraw button.
@@ -140,7 +140,7 @@ def test_check_withdraw_invalid_stellar(browser):
       Test Case: TC1143 - Check withdraw invalid Stellar address
       Steps:
           - Navigate to the dashboard.
-          - Select an account.
+          - Login.
           - Click on bridge from side menu.
           - Click on chain list.
           - Click on withdraw button.
@@ -162,7 +162,7 @@ def test_check_withdraw_tft_amount(browser):
       Test Case: TC1131 check withdraw tft amount
       Steps:
           - Navigate to the dashboard.
-          - Select an account.
+          - Login.
           - Click on bridge from side menu.
           - Click on chain list.
           - Click on withdraw button.
@@ -184,7 +184,7 @@ def test_check_withdraw_invalid_tft_amount(browser):
       Test Case: TC1144 - Check withdraw invalid TFT amount
       Steps:
           - Navigate to the dashboard.
-          - Select an account.
+          - Login.
           - Click on bridge from side menu.
           - Click on chain list.
           - Click on withdraw button.
@@ -210,7 +210,7 @@ def test_check_withdraw(browser):
       Test Case: TC1132 check withdraw 
       Steps:
           - Navigate to the dashboard.
-          - Select an account.
+          - Login.
           - Click on bridge from side menu.
           - Click on chain list.
           - Click on withdraw button.

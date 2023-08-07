@@ -24,7 +24,7 @@ def test_dedicate_page(browser):
       Test Case: TC1138 - Navigate to dedicate node
       Steps:
           - Navigate to the dashboard.
-          - Select an account.
+          - Login.
           - Click on Dedicate Node from side menu.
       Result: User should be navigated to Dedicate Node page.
     """
@@ -174,6 +174,8 @@ def test_node_details(browser):
     """
       Test Case: TC1139 - Node details
       Steps:
+          - Navigate to the dashboard.
+          - Login.
           - From the Twin Details Page Click on Dedicated nodes
           - Click on expand button on a node
       Result: You should see the node details.
@@ -195,9 +197,10 @@ def test_reserve_node(browser):
     """
       Test Case: TC1137 - Reserve a node
       Steps:
+          - Navigate to the dashboard.
+          - Login.
           - From the Twin Details Page Click on Dedicated nodes
           - Click reserve button on a node not taken
-          - Authenticate polka with password
           - Click unreserve button on same node
       Result: You should see the node details.
     """

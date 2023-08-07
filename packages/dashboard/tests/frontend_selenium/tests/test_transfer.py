@@ -11,15 +11,15 @@ def before_test_setup(browser):
     dashboard_page.open_and_load()
     dashboard_page.import_account(get_seed())
     dashboard_page.connect_your_wallet(password).click()
-    twin_address = transfer_page.navigate()
-    return transfer_page, twin_address
+    transfer_page.navigate()
+    return transfer_page
 
 def test_transfer_page(browser):
     """
       Test Case: TC982 - Navigate to transfer
       Steps:
           - Navigate to the dashboard.
-          - Select an account.
+          - Login.
           - Click on Transfer from side menu.
       Result: User should be navigated to Transfer page.
     """
@@ -46,13 +46,13 @@ def test_valid_receipient(browser):
     """
     Test Case: TC984 - Valid Receipient
       Steps:
-          -Navigate to the dashboard.
-          -Select an account.
-          -Click on Transfer from side menu. -Type valid address in recipient input.
+          - Navigate to the dashboard.
+          - Login.
+          - Click on Transfer from side menu. -Type valid address in recipient input.
       Results: Accepting address with no alerts
     """
-    transfer_page, twin_address = before_test_setup(browser)
-    transfer_page.recipient_input(twin_address)
+    transfer_page = before_test_setup(browser)
+    transfer_page.recipient_input('5FWW1F7XHaiRgPEqJdkv9nVgz94AVKXkTKNyfbLcY4rqpaNM')
     transfer_page.amount_tft_input(valid_amount())
     assert transfer_page.get_submit().is_enabled() == True
 
@@ -61,13 +61,13 @@ def test_invalid_address(browser):
     """
     Test Case: TC985 -Invalid Address
     Steps:
-      - Navigate to the dashboard.
-      - Select an account.
-      - Click on Transfer from side menu.
-      - Type invalid address in recipient input.
+        - Navigate to the dashboard.
+        - Login.
+        - Click on Transfer from side menu.
+        - Type invalid address in recipient input.
     Results: Alert message "invalid address"
     """
-    transfer_page, _ = before_test_setup(browser)
+    transfer_page = before_test_setup(browser)
     cases = [' ', generate_string(), invalid_address(), generate_leters()]
     transfer_page.amount_tft_input(valid_amount())
     for case in cases:
@@ -81,13 +81,13 @@ def test_valid_amount(browser):
     Test Case: TC986 - Valid amount
     Steps:
         - Navigate to the dashboard.
-        - Select an account.
+        - Login.
         - Click on Transfer from side menu.
         - Type valid amount in TFT input.
     Result: User gets no alerts
     """
-    transfer_page, twin_address = before_test_setup(browser)
-    transfer_page.recipient_input(twin_address)
+    transfer_page = before_test_setup(browser)
+    transfer_page.recipient_input('5FWW1F7XHaiRgPEqJdkv9nVgz94AVKXkTKNyfbLcY4rqpaNM')
     transfer_page.amount_tft_input(valid_amount())
     assert transfer_page.get_submit().is_enabled() == True
 
@@ -97,13 +97,13 @@ def test_invalid_amount(browser):
     Test Case: TC987 - InValid amount
     Steps:
         - Navigate to the dashboard.
-        - Select an account.
+        - Login.
         - Click on Transfer from side menu.
         - Type Invalid amount in TFT input.
     Result: Alert with message "Amount cannot be negative or 0"
     """
-    transfer_page, twin_address = before_test_setup(browser)
-    transfer_page.recipient_input(twin_address)
+    transfer_page = before_test_setup(browser)
+    transfer_page.recipient_input('5FWW1F7XHaiRgPEqJdkv9nVgz94AVKXkTKNyfbLcY4rqpaNM')
     balance = transfer_page.get_balance()
     cases = [0, -900.009, invalid_amount_negtive()]
     for case in cases:
@@ -123,18 +123,18 @@ def test_transfer_TFTs_on_TFChain (browser):
     Test Case: TC988 -Transfer TFTs on the TFChain
     Steps:
         - Navigate to the dashboard.
-        - Select an account.
+        - Login.
         - Click on Transfer from side menu.
         - Type valid address in recipient input.
         - Type valid amount in TFT input.
         - Click submit button.
     Result: Amount should dedicate from this account twin and transferred to the typed address.
     """
-    transfer_page, _ = before_test_setup(browser)
+    transfer_page = before_test_setup(browser)
     balance = transfer_page.get_balance()
     min_balance = float(balance)-1
     max_balance = float(balance)-1.1
-    transfer_page.recipient_input('5HdjwbFYNgujpqBNeWC4Dpu7xAzEeCsq74nZhLnyTKjSuNJe')
+    transfer_page.recipient_input('5FWW1F7XHaiRgPEqJdkv9nVgz94AVKXkTKNyfbLcY4rqpaNM')
     transfer_page.amount_tft_input(1.01)
     transfer_page.get_submit().click()
     assert transfer_page.wait_for('Transfer succeeded!')

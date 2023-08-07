@@ -19,7 +19,6 @@ class TransferPage:
     transfer_tft_title = (By.XPATH, "//*[contains(text(), 'Transfer TFTs on the TFChain')]")
     balance_text = (By.XPATH,'//*[@id="app"]/div[1]/div[1]/header/div/div[3]/div/section/div[1]/div/p/span[1]')
     balance_transfer = (By.XPATH,'//*[@id="app"]/div[2]/div[1]/header/div/div[3]/div/section/div[1]/div/p/span[1]')
-    twin_address_text = (By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[1]/div[2]/div[1]/div/div[2]/div[2]')
     close_login_button = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div[4]/button')
 
 
@@ -29,11 +28,9 @@ class TransferPage:
     def navigate(self):
         self.browser.find_element(*self.close_login_button).click()
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.twin_details))
-        twin_addess = self.browser.find_element(*self.twin_address_text).text
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.transfer_page))
         self.browser.find_element(*self.transfer_page).click()
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.transfer_tft_title))
-        return twin_addess
 
     def recipient_list(self):
         self.browser.find_element(*self.receipient_textfield).click()

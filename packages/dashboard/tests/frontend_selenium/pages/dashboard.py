@@ -24,7 +24,7 @@ class DashboardPage:
     connect_button = (By.XPATH, '//*[@id="app"]/div[3]/div/div/div[3]/div[2]/form/div[5]/button')
     login_password_input = (By.XPATH, "/html/body/div[1]/div[3]/div/div/div[3]/div[2]/form/div[2]/div/div[1]/div[1]/input")
     login_button = (By.XPATH, '//*[@id="app"]/div[3]/div/div/div[3]/div[2]/form/div[3]/button')
-    terms_iframe = (By.XPATH, '//*[@id="app"]/div[4]/div/iframe')
+    terms_iframe = (By.TAG_NAME, 'iframe')
     iframe_load_image = (By.XPATH, '//*[@id="main"]/p[1]/img')
     tf_iframe_button = (By.XPATH, '/html/body/main/aside/div[2]/ul[3]/li/a')
     iframe_dialog_button = (By.XPATH, '//*[@id="cc_dialog"]/div/div[2]/button[1]')

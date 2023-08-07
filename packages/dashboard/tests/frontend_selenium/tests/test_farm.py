@@ -22,13 +22,13 @@ def test_create_farm(browser):
     Test Case: TC911-Create farm with existing name
     Test Case: TC908-Verify the search functionality
     Steps:
+        - Navigate to the dashboard.
+        - Login.
         - From the Twin Details Page Click on Farms.
         - In the Farms page Click on "Create Farm" button.
         - Enter the Farm Name.
         - Click on Submit.
-        - Authenticate polkadot transaction.
         - Try to recreate a Farm with same name on the third step
-        - Authenticate polkadot transactions.
         - In the Farms search bar enter the name or the id of the farm you just created
     Test Data: [ use the whole name of the farm, only the first part, the second part ]
     Result: The user can create a farm.
@@ -55,11 +55,12 @@ def test_create_farm_invalid_name(browser):
     """
     Test Case: TC912 - create a farm with invalid name
     Steps:
+        - Navigate to the dashboard.
+        - Login.
         - From the Twin Details Page Click on Farms.
         - In the Farms page Click on " Create Farm ".
         - Enter the Farm Name.
         - Click on Submit.
-        - Authenticate polkadot transactions.
     Test Data: [Empty Field, More than 40 char, Spaces, Special chr(@,#%^&*(_+-))]
     Result: You should display a warning message 'Name is not formatted correctly (All letters + numbers and (-,_) are allowed).
     """
@@ -81,6 +82,8 @@ def test_farm_table_sorting(browser):
     """
     Test Case: TC910 - Farm Node table sorting
     Steps:
+        - Navigate to the dashboard.
+        - Login.
         - From the Twin Details Page Click on Farms
         - Make sure to have at least 2 Farms , If you don't create them
         - Click on the arrow behind farm Id 'once up and once down and once to remove the sorting'
@@ -131,6 +134,8 @@ def test_farmpayout_address(browser):
     Test Case: TC1140 - Add invalid farm payout address
     Test Case: TC916 - Edit farm payout address
     Steps:
+        - Navigate to the dashboard.
+        - Login.
         - From the Twin Details Page Click on Farms
         - Make sure you have at least one farm.
         - Click on the arrow behind any farm id
@@ -177,6 +182,8 @@ def test_ip(browser):
     Test Case: TC917 - Add IP to Farm
     Test Case: TC918 - Delete IP address from farm
     Steps:
+        - Navigate to the dashboard.
+        - Login.
         - From the Twin Details Page Click on Farms.
         - Make sure you have at least one farm.
         - Click on the arrow behind any farm id.
@@ -224,6 +231,8 @@ def test_gateway(browser):
     """
     Test Case: TC1142 - Enter valid Gateway
     Steps:
+        - Navigate to the dashboard.
+        - Login.
         - From the Twin Details Page Click on Farms
         - Make sure you have at least one farm.
         - Click on the arrow behind any farm id
@@ -263,6 +272,8 @@ def test_range_ips(browser):
     Test Case: TC1212 - Enter invalid to IP in add range of IPs
     Test Case: TC1211 - Add range of IPs to Farm
     Steps:
+        - Navigate to the dashboard.
+        - Login.
         - Open the twin
         - From sidebar Click on Farms.
         - Create a farm.
@@ -272,7 +283,6 @@ def test_range_ips(browser):
         - Choose Range
         - Add From IP, To IP and Gateway.
         - Click on the save button.
-        - Authenticate polkadot transaction.
     Test Data for Gateway: [Empty Field,All letters, (-,_),54.54,....1270001,127.0.0..1]
     Test Data for From IP: [ should be numbers separated by '.' and end with '/' port ex: 127.0.0.01/16]
     Test Data for To IP: [Invalid IP formats, IPs with smaller or bigger values]
@@ -329,6 +339,8 @@ def test_farm_details(browser):
     Test Case: TC914 - Farm Details
     Test Case: TC921 - Verify the availability of zero os bootstrap
     Steps:
+        - Navigate to the dashboard.
+        - Login.
         - From the Twin Details Page Click on Farms
         - Make sure you have at least one farm.
         - Click on the arrow behind any farm id

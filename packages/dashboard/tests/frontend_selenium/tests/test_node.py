@@ -25,7 +25,7 @@ def test_node_page(browser):
       Test Case: TC1216 - Navigate to farm node
       Steps:
           - Navigate to the dashboard.
-          - Select an account (with node).
+          - Login into an account (with node).
           - Click on Farm from side menu.
       Result: User should be navigated to Farm Nodes page and see all his node.
     """
@@ -97,7 +97,7 @@ def test_node_details(browser):
       Test Case: TC1216 - Navigate to farm node
       Steps:
           - Navigate to the dashboard.
-          - Select an account (with node).
+          - Login into an account (with node).
           - Click on Farm from side menu.
       Result: User should be navigated to Farm Nodes page and see all his node.
     """
@@ -135,7 +135,7 @@ def test_config_validation(browser):
       Test Case: TC1220 - Add a public config validation
       Steps:
           - Navigate to the dashboard.
-          - Select an account (with node).
+          - Login into an account (with node).
           - Click on Farm from side menu.
           - Click on 'Add a public config' button.
           - Enter values.
@@ -185,7 +185,7 @@ def test_add_config(browser):
       Test Case: TC1221 - Add a public config
       Steps:
           - Navigate to the dashboard.
-          - Select an account (with node).
+          - Login into an account (with node).
           - Click on Farm from side menu.
           - Click on 'Add a public config' button.
           - Enter values and click on save button.
@@ -216,7 +216,7 @@ def test_remove_config(browser):
       Test Case: TC1222 - Remove a public config
       Steps:
           - Navigate to the dashboard.
-          - Select an account (with node).
+          - Login into an account (with node).
           - Click on Farm from side menu.
           - Click on 'Add a public config' button.
           - Click on Remove config button.
@@ -244,7 +244,7 @@ def test_additional_fee(browser):
       Test Case: TC1750 - Additional Fee
       Steps:
           - Navigate to the dashboard.
-          - Select twin (with node).
+          - Login into an account (with node).
           - Click on farms from side menu.
           - Click on 'Set Additional Fee' button.
           - Enter Fee and press 'Set' button.
