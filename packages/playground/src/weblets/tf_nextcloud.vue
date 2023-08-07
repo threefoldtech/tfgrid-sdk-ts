@@ -37,49 +37,6 @@
           :recommended="{ cpu: 4, memory: 1024 * 16, disk: 1000 }"
         />
         <Networks v-model:ipv4="ipv4" />
-        <FarmGatewayManager>
-          <input-tooltip
-            inline
-            tooltip="Click to know more about dedicated nodes."
-            href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
-          >
-            <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
-          </input-tooltip>
-          <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-            <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
-          </input-tooltip>
-
-          <SelectFarmManager>
-            <SelectFarm
-              :filters="{
-                cpu: solution?.cpu,
-                memory: solution?.memory,
-                ssd: solution?.disk + rootFilesystemSize,
-                publicIp: ipv4,
-                rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-                certified: certified,
-              }"
-              v-model="farm"
-            />
-            <SelectNode
-              v-model="selectedNode"
-              :filters="{
-                farmId: farm?.farmID,
-                cpu: solution?.cpu,
-                memory: solution?.memory,
-                disks: [
-                  {
-                    size: solution?.disk,
-                    mountPoint: '/var/lib/docker',
-                  },
-                ],
-                rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-                certified: certified,
-              }"
-            />
-          </SelectFarmManager>
-          <DomainName :hasIPv4="ipv4" ref="domainNameCmp" />
-        </FarmGatewayManager>
       </template>
     </d-tabs>
 
@@ -102,7 +59,7 @@ import { computed, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
+import type { Farm, Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
@@ -138,7 +95,6 @@ function finalize(deployment: any) {
 
 <script lang="ts">
 import DomainName from "../components/domain_name.vue";
-import FarmGatewayManager from "../components/farm_gateway_manager.vue";
 import Networks from "../components/networks.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectFarmManager from "../components/select_farm_manager.vue";
