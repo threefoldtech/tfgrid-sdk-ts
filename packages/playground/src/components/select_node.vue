@@ -30,7 +30,7 @@
           v-bind="{
             ...props,
             loading: props.loading || loadingNodes,
-            hint: pingingNode ? 'Check if node is alive ... ' : props.hint,
+            hint: pingingNode ? `Checking if the disks will fit in the node's storage pools... ` : props.hint,
             error: !!errorMessage,
             errorMessages: !!errorMessage ? errorMessage : undefined,
           }"
@@ -78,6 +78,7 @@
 </template>
 
 <script lang="ts" setup>
+import type { GridClient } from "@threefold/grid_client";
 import { onMounted, type PropType, type Ref, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
@@ -111,6 +112,7 @@ const emits = defineEmits<{ (event: "update:modelValue", value?: INode): void }>
 const props = defineProps({
   modelValue: { type: Object as PropType<INode> },
   filters: { default: () => ({} as NodeFilters), type: Object as PropType<NodeFilters> },
+  rootFileSystemSize: { type: Number, required: true },
 });
 const farmManager = useFarm();
 const profileManager = useProfileManager();
@@ -163,24 +165,13 @@ watch(
 
     const grid = await getGrid(profileManager.profile!);
 
-    if (node) {
-      validator.value?.setStatus(ValidatorStatus.Pending);
-      pingingNode.value = true;
-      try {
-        await grid!.zos.pingNode({ nodeId: node.nodeId });
-        emits("update:modelValue", {
-          nodeId: node.nodeId,
-          cards: cards,
-        });
-        validator.value?.validate();
-      } catch (e) {
-        errorMessage.value = `Node ${node.nodeId} is not responding please select another node`;
-        availableNodes.value = availableNodes.value.filter(({ nodeId }) => nodeId !== node.nodeId);
-        validator.value?.setStatus(ValidatorStatus.Invalid);
-      } finally {
-        pingingNode.value = false;
-        farmManager?.setLoading(false);
-      }
+    if (node && grid) {
+      await validateNodeStoragePool(
+        grid,
+        node.nodeId,
+        props.filters.disks.map(disk => disk.size * 1024 ** 3),
+        props.rootFileSystemSize * 1024 ** 3,
+      );
     }
 
     if (node && props.filters.hasGPU) {
@@ -282,7 +273,7 @@ async function loadNodes(farmId: number) {
           }
         }
         availableNodes.value = nodesArr.value;
-        selectedNode.value = availableNodes.value ? availableNodes.value[0] : undefined;
+        selectedNode.value = undefined;
       } else {
         selectedNode.value = undefined;
         availableNodes.value = [];
@@ -290,8 +281,35 @@ async function loadNodes(farmId: number) {
     } catch (e) {
       errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
     } finally {
+      validator.value?.setStatus(ValidatorStatus.Invalid);
       loadingNodes.value = false;
+      farmManager?.setLoading(false);
     }
+  }
+}
+async function validateNodeStoragePool(grid: GridClient, nodeId: number, disks: number[], rootFileSystemSize: number) {
+  farmManager?.setLoading(true);
+  validator.value?.setStatus(ValidatorStatus.Pending);
+  pingingNode.value = true;
+  try {
+    await grid.capacity.checkNodeCapacityPool({
+      nodeId,
+      ssdDisks: disks,
+      rootfsDisks: [rootFileSystemSize],
+      hddDisks: [],
+    });
+    emits("update:modelValue", {
+      nodeId: nodeId,
+      cards: cards,
+    });
+    validator.value?.validate();
+  } catch (e) {
+    errorMessage.value = `Couldn't fit the required disks in Node ${nodeId} storage pools, please select another node`;
+    availableNodes.value = availableNodes.value.filter(node => node.nodeId !== nodeId);
+    validator.value?.setStatus(ValidatorStatus.Invalid);
+  } finally {
+    pingingNode.value = false;
+    farmManager?.setLoading(false);
   }
 }
 </script>

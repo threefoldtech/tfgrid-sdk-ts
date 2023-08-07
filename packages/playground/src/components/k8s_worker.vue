@@ -129,6 +129,7 @@
           rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
           certified: $props.modelValue.certified,
         }"
+        :root-file-system-size="$props.modelValue.rootFsSize"
       />
     </SelectFarmManager>
   </div>

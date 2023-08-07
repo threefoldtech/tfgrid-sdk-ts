@@ -82,6 +82,7 @@
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
+            :root-file-system-size="rootFileSystemSize"
           />
         </SelectFarmManager>
         <DomainName :hasIPv4="ipv4" ref="domainNameCmp"></DomainName>
@@ -103,7 +104,7 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { onMounted, type Ref, ref } from "vue";
+import { computed, onMounted, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
@@ -127,6 +128,7 @@ const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
+const rootFileSystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const loadingFarm = ref(false);
 onMounted(() => {
   disks.value.push({
@@ -189,6 +191,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
           nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
+          rootFilesystemSize: rootFileSystemSize.value,
         },
       ],
     });
@@ -233,6 +236,7 @@ import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { INode } from "../utils/filter_nodes";
+import rootFs from "../utils/root_fs";
 
 export default {
   name: "TFFreeflow",
