@@ -289,7 +289,7 @@ async function validateNodeStoragePool(grid: GridClient, nodeId: number, disks: 
     });
     validator.value?.validate();
   } catch (e) {
-    errorMessage.value = `Node ${nodeId} does not have storage pools that fit the required disks, please select another node`;
+    errorMessage.value = `Couldn't fit the required disks in Node ${nodeId} storage pools, please select another node`;
     availableNodes.value = availableNodes.value.filter(node => node.nodeId !== nodeId);
     validator.value?.setStatus(ValidatorStatus.Invalid);
   } finally {
