@@ -80,7 +80,7 @@
           :filters="{
             cpu,
             memory,
-            ssd: 32,
+            ssd: 30 + rootFilesystemSize,
             publicIp: true,
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
