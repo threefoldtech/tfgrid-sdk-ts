@@ -119,7 +119,7 @@
               farmId: farm?.farmID,
               cpu: solution?.cpu,
               memory: solution?.memory,
-              disks: [{ size: solution?.disk, mountPoint: '/data' }],
+              disks: [solution?.disk],
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"

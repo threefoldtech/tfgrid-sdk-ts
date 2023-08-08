@@ -96,10 +96,7 @@
             cpu,
             memory,
             ipv4: true,
-            disks: [
-              { size: 15, mountPoint: '/mnt/' + generateName(10) },
-              { size: 15, mountPoint: '/mnt/' + generateName(10) },
-            ],
+            disks: [15, 15],
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"

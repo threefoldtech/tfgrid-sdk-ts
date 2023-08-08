@@ -103,10 +103,7 @@
             farmId: farm?.farmID,
             cpu: solution?.cpu,
             memory: solution?.memory,
-            disks: [
-              { size: 10, mountPoint: '/var/lib/docker' },
-              { size: solution?.disk, mountPoint: '/umbrelDisk' },
-            ],
+            disks: [10, solution?.disk],
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"
