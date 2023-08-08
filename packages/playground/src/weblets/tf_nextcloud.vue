@@ -185,13 +185,12 @@ import { normalizeError } from "../utils/helpers";
 const solution = ref() as Ref<SolutionFlavor>;
 
 export default {
-  name: "MicroVm",
+  name: "TfNextcloud",
   components: {
     SelectVmImage,
     SelectSolutionFlavor,
     SelectFarm,
     SelectNode,
-    ExpandableLayout,
     SelectFarmManager,
   },
 };
