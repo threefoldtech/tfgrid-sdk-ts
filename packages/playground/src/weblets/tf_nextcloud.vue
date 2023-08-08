@@ -79,43 +79,7 @@
             }"
           />
         </SelectFarmManager>
-      </template>
-
-      <template #env>
-        <ExpandableLayout
-          v-model="envs"
-          @add="envs.push({ key: '', value: '' })"
-          #="{ index, isRequired }"
-          :required="[0]"
-        >
-          <input-validator
-            :value="envs[index].key"
-            :rules="[
-              validators.required('Key name is required.'),
-              key => validators.isAlpha('Key must start with alphabet char.')(key[0]),
-              validators.pattern('Invalid key format.', { pattern: /^[^0-9_\s][a-zA-Z0-9_]+$/ }),
-              validators.maxLength('Key max length is 128 chars.', 128),
-            ]"
-            #="{ props }"
-          >
-            <input-tooltip tooltip="Environment key.">
-              <v-text-field label="Name" v-model="envs[index].key" :disabled="isRequired" v-bind="props" />
-            </input-tooltip>
-          </input-validator>
-
-          <input-validator
-            :value="envs[index].value"
-            :rules="[validators.required('Value is required.')]"
-            #="{ props }"
-          >
-            <input-tooltip tooltip="Environment Value.">
-              <v-textarea label="Value" v-model="envs[index].value" no-resize :spellcheck="false" />
-            </input-tooltip>
-          </input-validator>
-        </ExpandableLayout>
-      </template>
-    </d-tabs>
-
+      
     <template #footer-actions>
       <v-btn color="primary" variant="tonal" :disabled="tabs?.invalid || network?.error" @click="deploy">Deploy</v-btn>
     </template>
