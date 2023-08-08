@@ -111,7 +111,7 @@
           cpu: $props.modelValue.cpu,
           memory: $props.modelValue.memory,
           publicIp: $props.modelValue.ipv4,
-          ssd: $props.modelValue.diskSize + $props.modelValue.rootFsSize,
+          ssd: ($props.modelValue.diskSize ?? 0) + $props.modelValue.rootFsSize,
           rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
           certified: $props.modelValue.certified,
         }"

@@ -81,7 +81,7 @@
               cpu: solution?.cpu,
               memory: solution?.memory,
               publicIp: ipv4,
-              ssd: disks.reduce((total, disk) => total + disk.size, solution?.disk + rootFilesystemSize),
+              ssd: disks.reduce((total, disk) => total + disk.size, (solution?.disk ?? 0) + rootFilesystemSize),
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
               hasGPU: hasGPU,

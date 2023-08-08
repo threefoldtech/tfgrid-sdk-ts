@@ -104,7 +104,7 @@
             :filters="{
               cpu: solution?.cpu,
               memory: solution?.memory,
-              ssd: solution?.disk,
+              ssd: (solution?.disk ?? 0) + rootFilesystemSize,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
               publicIp: ipv4,

@@ -66,7 +66,7 @@
             :filters="{
               cpu: solution?.cpu,
               memory: solution?.memory,
-              ssd: solution?.disk,
+              ssd: (solution?.disk ?? 0) + rootFilesystemSize,
               publicIp: ipv4,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
