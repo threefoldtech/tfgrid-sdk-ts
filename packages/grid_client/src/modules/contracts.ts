@@ -1,7 +1,7 @@
-import { Decimal } from "decimal.js";
 import * as PATH from "path";
 
 import { TFClient } from "../clients/tf-grid/client";
+import { GetContractOptions } from "../clients/tf-grid/contracts";
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
 import { expose } from "../helpers/expose";
@@ -139,6 +139,24 @@ class Contracts {
   @validateInput
   async listContractsByTwinId(options: ContractsByTwinId) {
     return this.client.contracts.listContractsByTwinId({ graphqlURL: this.config.graphqlURL, twinId: options.twinId });
+  }
+
+  @expose
+  @validateInput
+  async getNameContractByContractId(options: GetContractOptions) {
+    return this.client.contracts.getNameContractByContractId({
+      graphqlURL: this.config.graphqlURL,
+      contractId: options.contractId,
+    });
+  }
+
+  @expose
+  @validateInput
+  async getRentContractByContractId(options: GetContractOptions) {
+    return this.client.contracts.getRentContractByContractId({
+      graphqlURL: this.config.graphqlURL,
+      contractId: options.contractId,
+    });
   }
 
   @expose
