@@ -116,28 +116,11 @@ const ipv4 = ref(true);
 const planetary = ref(true);
 const wireguard = ref(true);
 const farm = ref() as Ref<Farm>;
-const envs = ref<Env[]>([]);
-const disks = ref<Disk[]>([]);
 const network = ref();
 const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const rootFilesystemSize = 8;
-function layoutMount() {
-  if (envs.value.length > 0) {
-    envs.value.splice(0, 1);
-  }
-
-  envs.value.unshift({
-    key: "SSH_KEY",
-    value: profileManager.profile!.ssh,
-  });
-
-  envs.value.unshift({
-    key: "NEXTCLOUD_DOMAIN",
-    value: ipv4.value,
-  });
-}
 
 async function deploy() {
   layout.value.setStatus("deploy");
