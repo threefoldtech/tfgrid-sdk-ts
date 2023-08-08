@@ -105,7 +105,7 @@ const profileManager = useProfileManager();
 const images = [
   {
     name: "Nextcloud All-in-One",
-    flist: "https://hub.grid.tf/idrnd.3bot/logismosis-nextcloud-aio2-latest.flist",
+    flist: "https://hub.grid.tf/idrnd.3bot/logismosis-nextcloudaio-latest.flist",
     entryPoint: "/sbin/zinit init",
   },
 ];
