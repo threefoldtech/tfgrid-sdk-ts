@@ -97,7 +97,7 @@
               memory: solution?.memory,
               ipv4: ipv4,
               ipv6: ipv4,
-              disks: [solution?.disk, ...disks.map(disk => disk.size)],
+              diskSizes: [solution?.disk, ...disks.map(disk => disk.size)],
               hasGPU: hasGPU,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,

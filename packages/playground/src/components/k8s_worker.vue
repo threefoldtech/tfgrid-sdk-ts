@@ -125,7 +125,7 @@
           farmId: $props.modelValue.farm?.farmID,
           cpu: $props.modelValue.cpu,
           memory: $props.modelValue.memory,
-          disks: [$props.modelValue?.diskSize ?? 0],
+          diskSizes: [$props.modelValue?.diskSize ?? 0],
           rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
           certified: $props.modelValue.certified,
         }"

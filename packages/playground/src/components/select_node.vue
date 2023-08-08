@@ -96,7 +96,7 @@ export interface NodeFilters {
   hasGPU?: boolean;
   cpu: number;
   memory: number;
-  disks: number[];
+  diskSizes: number[];
   certified?: boolean;
   rentedBy?: number;
   type?: string;
@@ -165,7 +165,7 @@ watch(
       await validateNodeStoragePool(
         grid,
         node.nodeId,
-        props.filters.disks.map(disk => disk * 1024 ** 3),
+        props.filters.diskSizes.map(disk => disk * 1024 ** 3),
         props.rootFileSystemSize * 1024 ** 3,
       );
     }
@@ -189,7 +189,7 @@ watch(
   (value, oldValue) => {
     if (
       value.farmId === oldValue.farmId &&
-      value.disks === oldValue.disks &&
+      value.diskSizes === oldValue.diskSizes &&
       value.cpu === oldValue.cpu &&
       value.memory === oldValue.memory &&
       value.certified === oldValue.certified &&
@@ -243,7 +243,7 @@ async function loadNodes(farmId: number) {
         farmId: farmId,
         cpu: filters.cpu,
         memory: filters.memory,
-        disks: [...filters.disks, props.rootFileSystemSize],
+        diskSizes: [...filters.diskSizes, props.rootFileSystemSize],
         ipv4: filters.ipv4,
         hasGPU: filters.hasGPU ? filters.hasGPU : undefined,
         certified: filters.certified,

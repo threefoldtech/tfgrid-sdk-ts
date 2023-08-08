@@ -96,7 +96,7 @@
             cpu,
             memory,
             ipv4: true,
-            disks: [15, 15],
+            diskSizes: [15, 15],
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"

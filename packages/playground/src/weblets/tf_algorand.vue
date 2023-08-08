@@ -174,7 +174,7 @@
             ipv4: ipv4,
             ipv6: ipv4,
             type: type,
-            disks: type === 'indexer' ? [50] : [],
+            diskSizes: type === 'indexer' ? [50] : [],
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"

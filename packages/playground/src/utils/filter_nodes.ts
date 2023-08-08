@@ -23,7 +23,7 @@ export async function getFilteredNodes(grid: GridClient, options: NodeFilters): 
     farmId: options.farmId ? options.farmId : undefined,
     cru: options.cpu,
     mru: Math.round(options.memory / 1024),
-    sru: options.disks.reduce((total, disk) => total + disk),
+    sru: options.diskSizes.reduce((total, disk) => total + disk),
     publicIPs: options.ipv4,
     hasGPU: options.hasGPU,
     rentedBy: options.rentedBy ? grid.twinId : undefined,

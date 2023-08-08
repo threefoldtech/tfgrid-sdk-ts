@@ -55,7 +55,7 @@
           farmId: $props.modelValue.farm?.farmID,
           cpu: $props.modelValue.solution?.cpu ?? 0,
           memory: $props.modelValue.solution?.memory ?? 0,
-          disks: [$props.modelValue.solution?.disk ?? 0],
+          diskSizes: [$props.modelValue.solution?.disk ?? 0],
           rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
           certified: $props.modelValue.certified,
         }"

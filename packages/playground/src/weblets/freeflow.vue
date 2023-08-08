@@ -78,7 +78,7 @@
               farmId: farm?.farmID,
               cpu: solution?.cpu,
               memory: solution?.memory,
-              disks: disks.map(disk => disk.size),
+              diskSizes: disks.map(disk => disk.size),
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"

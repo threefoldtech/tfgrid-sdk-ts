@@ -103,7 +103,7 @@
             farmId: farm?.farmID,
             cpu: solution?.cpu,
             memory: solution?.memory,
-            disks: [10, solution?.disk],
+            diskSizes: [10, solution?.disk],
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"
