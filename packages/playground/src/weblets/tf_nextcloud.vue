@@ -12,13 +12,7 @@
   >
     <template #title>Deploy Nextcloud All-in-One Instance </template>
 
-    <d-tabs
-      :tabs="[
-        { title: 'Config', value: 'config' },
-        { title: 'Environment Variables', value: 'env' },
-      ]"
-      ref="tabs"
-    >
+    <d-tabs :tabs="[{ title: 'Config', value: 'config' }]" ref="tabs">
       <template #config>
         <input-validator
           :value="name"
