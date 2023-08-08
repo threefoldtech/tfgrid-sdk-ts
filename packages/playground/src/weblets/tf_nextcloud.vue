@@ -147,11 +147,14 @@ async function deploy() {
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
-          disks: disks.value,
-          envs: envs.value,
+          disks: [{ size: solution.value.disk, mountPoint: "/mnt/next_cloud" }], // make sure to update mountPoint as needed
+          envs: [
+            { key: "SSH_KEY", value: profileManager.profile!.ssh },
+            { key: "NEXTCLOUD_DOMAIN", value: String(ipv4.value) },
+          ],
           planetary: planetary.value,
           publicIpv4: ipv4.value,
-          rootFilesystemSize: rootFilesystemSize.value,
+          rootFilesystemSize: rootFilesystemSize, // remove `.value`
           nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
