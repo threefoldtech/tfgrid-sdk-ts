@@ -73,7 +73,7 @@
               cpu: solution?.cpu,
               memory: solution?.memory,
               ipv4: ipv4,
-              disks: disks,
+              disks: [{ size: rootFilesystemSize + (solution?.disk ?? 0), mountPoint: '' }],
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
