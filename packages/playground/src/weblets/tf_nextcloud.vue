@@ -60,7 +60,7 @@
               cpu: solution?.cpu,
               memory: solution?.memory,
               publicIp: ipv4,
-              ssd: disks.reduce((total, disk) => total + disk.size, rootFilesystemSize),
+              ssd: rootFilesystemSize + (solution?.disk ?? 0),
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
