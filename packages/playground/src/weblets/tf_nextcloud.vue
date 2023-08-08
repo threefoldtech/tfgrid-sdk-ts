@@ -181,7 +181,7 @@ function layoutMount() {
   });
 
   envs.value.unshift({
-    key: "DOMAIN_IPV4",
+    key: "NEXTCLOUD_DOMAIN",
     value: ipv4.value,
   });
 }
