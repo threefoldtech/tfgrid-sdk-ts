@@ -277,11 +277,19 @@ export default class TfChainConnector extends Vue {
   public canLogin = typeof localStorage.getItem(key) === "string";
 
   public balance: any | null = null;
+  public twinID: any;
+  public grid: any;
+  @Watch("mnemonic")
+  async updateGrid() {
+    console.log(this.mnemonic);
+    this.grid = await getGrid(this.mnemonic);
+  }
   @Watch("$store.state.profile")
   async profileWatcher$(profile: any) {
     if (profile) {
-      const grid = await getGrid(profile.mnemonic);
-      this.balance = await loadBalance(grid);
+      this.grid = await getGrid(profile.mnemonic);
+
+      this.balance = await loadBalance(this.grid);
     }
   }
 
@@ -290,7 +298,18 @@ export default class TfChainConnector extends Vue {
   public readonly mnemonicRules = [
     (value: string) => (value ? true : "Mnemonic is required."),
     (value: string) => (validateMnemonic(value) ? true : "Mnemonic doesn't seem to be valid."),
+    () =>
+      this.validateMnemonicChain() ? true : `Couldn't find a user for provided mnemonic on ${config.network} network.`,
   ];
+  public validateMnemonicChain() {
+    try {
+      this.grid.twinId;
+    } catch (err) {
+      return false;
+    }
+    return true;
+    // return (await getGrid(value)).twinId ? true : false;
+  }
   public validatePassword(value: string) {
     if (this._confirmPasswordUpdated) {
       (this.$refs.confirmPassword as any).validate();
