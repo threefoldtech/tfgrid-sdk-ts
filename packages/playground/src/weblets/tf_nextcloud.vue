@@ -77,7 +77,6 @@
               cpu: solution?.cpu,
               memory: solution?.memory,
               ipv4: ipv4,
-              ipv6: ipv4,
               disks: disks,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
@@ -153,9 +152,9 @@ const images = [
 
 const name = ref(generateName(8, { prefix: "nc" }));
 const flist = ref<Flist>();
-const ipv4 = true;
-const planetary = true;
-const wireguard = true;
+const ipv4 = ref(true);
+const planetary = ref(true);
+const wireguard = ref(true);
 const farm = ref() as Ref<Farm>;
 const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
