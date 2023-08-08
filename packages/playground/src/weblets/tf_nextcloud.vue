@@ -179,6 +179,11 @@ function layoutMount() {
     key: "SSH_KEY",
     value: profileManager.profile!.ssh,
   });
+
+  envs.value.unshift({
+    key: "DOMAIN_IPV4",
+    value: ipv4.value,
+  });
 }
 
 function addDisk() {
