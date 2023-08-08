@@ -36,7 +36,7 @@ yarn install
 ## Build
 
 ```bash
-lerna run build
+npx lerna run build
 ```
 
 ## Related Documentations
