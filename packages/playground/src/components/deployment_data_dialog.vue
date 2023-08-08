@@ -201,13 +201,12 @@ async function getGrafanaUrl() {
 getGrafanaUrl();
 
 async function getGPUInfo() {
-  showGpuCard.value = true;
   loadingCard.value = true;
 
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
     const nodeId = await grid.zos.capacity.getNodeIdFromContractId(
-      contract.value.contract_id,
+      contract.value.contractId,
       profileManager.profile!.mnemonic,
     );
 
@@ -218,7 +217,10 @@ async function getGPUInfo() {
     for (let i = 0; i < usedCards?.length; i++) {
       cardsInfo.push(getCardName(usedCards[i]));
     }
-    gpuInfo.value = cardsInfo.join(", ");
+    if (cardsInfo) {
+      gpuInfo.value = cardsInfo.join(", ");
+      showGpuCard.value = true;
+    }
   }
 
   if (gpuInfo.value == "") {
