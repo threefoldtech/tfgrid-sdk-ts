@@ -308,7 +308,6 @@ export default class TfChainConnector extends Vue {
       return false;
     }
     return true;
-    // return (await getGrid(value)).twinId ? true : false;
   }
   public validatePassword(value: string) {
     if (this._confirmPasswordUpdated) {
@@ -340,8 +339,7 @@ export default class TfChainConnector extends Vue {
   public async connect() {
     this.connecting = true;
     try {
-      const grid = await getGrid(this.mnemonic);
-      this.$store.state.profile = await loadProfile(grid);
+      this.$store.state.profile = await loadProfile(this.grid);
       const passwordHash = md5(this.password);
       const cryptr = new Cryptr(passwordHash, { pbkdf2Iterations: 10, saltLength: 10 });
       localStorage.setItem(
