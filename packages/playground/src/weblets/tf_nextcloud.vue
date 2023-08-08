@@ -10,7 +10,7 @@
     :dedicated="dedicated"
     title-image="images/icons/nextcloud.png"
   >
-    <template #title>Deploy a Nextcloud All-in-One Instance </template>
+    <template #title>Deploy Nextcloud All-in-One Instance </template>
 
     <d-tabs
       :tabs="[
