@@ -10,10 +10,7 @@
     title-image="images/icons/nextcloud.png"
   >
     <template #title>Deploy Nextcloud All-in-One Instance </template>
-
-    <d-tabs :tabs="[{ title: 'Config', value: 'config' }]" ref="tabs">
-      <template #config>
-        <input-validator
+<input-validator
           :value="name"
           :rules="[
             validators.required('Name is required.'),
