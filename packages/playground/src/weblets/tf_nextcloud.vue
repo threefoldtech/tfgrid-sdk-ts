@@ -186,15 +186,6 @@ function layoutMount() {
   });
 }
 
-function addDisk() {
-  const name = generateName(5);
-  disks.value.push({
-    name: "disk" + name,
-    size: 50,
-    mountPoint: "/mnt/" + name,
-  });
-}
-
 async function deploy() {
   layout.value.setStatus("deploy");
 
