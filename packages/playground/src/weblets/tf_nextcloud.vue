@@ -1,10 +1,9 @@
 <template>
   <weblet-layout
     ref="layout"
-    @mount="layoutMount"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
-    :disk="disks.reduce((total, disk) => total + disk.size, rootFilesystemSize)"
+    :disk="rootFilesystemSize + (solution?.disk ?? 0)"
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
