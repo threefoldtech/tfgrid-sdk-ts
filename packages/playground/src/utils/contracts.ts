@@ -42,15 +42,19 @@ async function normalizeContract(
   }
 
   return {
+    id: c.id,
     contractId: id,
+    twinID: c.twinID,
     type,
     state: c.state,
     createdAt: new Date(+c.createdAt * 1000).toLocaleString(),
     nodeId: c.nodeID || "-",
+    solutionProviderID: c.solutionProviderID,
     solutionName: data.name || "-",
     solutionType: data.projectName || data.type || "-",
     expiration,
     consumption,
+    gridVersion: c.gridVersion,
   };
 }
 
@@ -61,6 +65,7 @@ export function formatConsumption(value: number): string {
 }
 
 export interface NormalizedContract {
+  id: number;
   contractId: number;
   type: "name" | "node" | "rent";
   state: ContractStates;
@@ -70,4 +75,7 @@ export interface NormalizedContract {
   solutionType?: string;
   expiration?: string;
   consumption: string;
+  gridVersion: string;
+  solutionProviderID: number;
+  twinID: number;
 }

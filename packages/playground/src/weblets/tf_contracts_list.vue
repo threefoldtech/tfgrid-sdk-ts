@@ -162,30 +162,15 @@ const loadingContractId = ref<number>();
 const contractLocked = ref<ContractLock>();
 
 async function showDetails(value: any) {
+  if (value.type === "name" || value.type === "rent") {
+    return layout.value.openDialog(value, false, true);
+  }
   loading.value = true;
   const contractId: number = value.contractId;
   loadingContractId.value = contractId;
-  let deployment;
   try {
     const grid = await getGrid(profileManager.profile!);
-    if (value.type === "node") {
-      deployment = await grid!.zos.getDeployment({ contractId });
-    }
-
-    if (value.type === "name") {
-      deployment = await grid!.contracts.getNameContractByContractId({
-        contractId,
-        graphqlURL: grid!.clientOptions!.graphqlURL!,
-      });
-    }
-
-    if (value.type === "rent") {
-      deployment = await grid!.contracts.getRentContractByContractId({
-        contractId,
-        graphqlURL: grid!.clientOptions!.graphqlURL!,
-      });
-    }
-
+    const deployment = await grid!.zos.getDeployment({ contractId });
     return layout.value.openDialog(deployment, false, true);
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, `Failed to load details of contract(${contractId})`));

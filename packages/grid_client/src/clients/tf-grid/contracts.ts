@@ -35,11 +35,6 @@ export interface CancelMyContractOptions {
   graphqlURL: string;
 }
 
-export interface GetContractOptions {
-  graphqlURL: string;
-  contractId: number;
-}
-
 class TFContracts extends Contracts {
   async listContractsByTwinId(options: ListContractByTwinIdOptions) {
     options.stateList = options.stateList || [ContractStates.Created, ContractStates.GracePeriod];
@@ -52,10 +47,14 @@ class TFContracts extends Contracts {
       const rentContractsCount = await gqlClient.getItemTotalCount("rentContracts", opts);
       const body = `query getContracts($nameContractsCount: Int!, $nodeContractsCount: Int!, $rentContractsCount: Int!){
                 nameContracts(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, limit: $nameContractsCount) {
+                  id
                   contractID
-                  state
-                  name
                   createdAt
+                  gridVersion
+                  name
+                  solutionProviderID
+                  state
+                  twinID
                 }
                 nodeContracts(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, limit: $nodeContractsCount) {
                   contractID
@@ -66,8 +65,13 @@ class TFContracts extends Contracts {
                 }
                 rentContracts(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, limit: $rentContractsCount) {
                   contractID
-                  state
                   createdAt
+                  gridVersion
+                  id
+                  nodeID
+                  solutionProviderID
+                  state
+                  twinID
                 }
               }`;
       const response = await gqlClient.query(body, {
@@ -82,53 +86,6 @@ class TFContracts extends Contracts {
     }
   }
 
-  async getNameContractByContractId(options: GetContractOptions) {
-    const gqlClient = new Graphql(options.graphqlURL);
-    try {
-      const body = `query getNameContract($contractId: BigInt!) {
-        nameContracts(where: {contractID_eq: $contractId}) {
-          id
-          contractID
-          createdAt
-          gridVersion
-          name
-          solutionProviderID
-          state
-          twinID
-        }
-      }`;
-
-      const response = await gqlClient.query(body, { contractId: options.contractId });
-      const contract = response["data"]["nameContracts"][0];
-      return contract;
-    } catch (e) {
-      throw new Error(`Error happened while getting contract ${options.contractId}`);
-    }
-  }
-
-  async getRentContractByContractId(options: GetContractOptions) {
-    const gqlClient = new Graphql(options.graphqlURL);
-    try {
-      const body = `query getRentContract($contractId: BigInt!) {
-        rentContracts(where: {contractID_eq: $contractId}) {
-          contractID
-          createdAt
-          gridVersion
-          id
-          nodeID
-          solutionProviderID
-          state
-          twinID
-        }
-      }`;
-
-      const response = await gqlClient.query(body, { contractId: options.contractId });
-      const contract = response["data"]["rentContracts"][0];
-      return contract;
-    } catch (e) {
-      throw new Error(`Error happened while getting contract ${options.contractId}`);
-    }
-  }
   /**
    * Get contract consumption per hour in TFT.
    *

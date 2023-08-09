@@ -228,7 +228,7 @@ async function getGPUInfo() {
   }
   loadingCard.value = false;
 }
-contract.value.metadata?.includes("fullvm") ? getGPUInfo() : undefined;
+if (contract.value.metadata?.includes("fullvm")) getGPUInfo();
 
 function _transform(value: string): any {
   const v = value.toLowerCase();
