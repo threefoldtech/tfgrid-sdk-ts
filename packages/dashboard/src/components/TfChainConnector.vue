@@ -225,7 +225,6 @@ import { Component, Vue, Watch } from "vue-property-decorator";
 import { generateKeyPair } from "web-ssh-keygen";
 
 import config from "@/portal/config";
-import { getBalance } from "@/portal/lib/balance";
 
 import { createAccount, downloadAsFile, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
 import QrcodeGenerator from "./QrcodeGenerator.vue";
