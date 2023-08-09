@@ -4,6 +4,11 @@ import { log } from "./utils";
 async function main() {
   const client = await getClient();
 
+  async function unreserve() {
+    const unreserved = await client.nodes.unreserve({ nodeId: 12 });
+    log(unreserved);
+  }
+
   const nodesDedicated = await client.capacity.filterNodes({ dedicated: true });
   log(nodesDedicated);
 
@@ -16,9 +21,8 @@ async function main() {
   const rentContractId = await client.nodes.getRentContractId({ nodeId: 12 });
   log(rentContractId);
 
-  const unreserved = await client.nodes.unreserve({ nodeId: 12 });
-  log(unreserved);
-
+  // Uncomment the line below if you intend to perform unreserve.
+  // unreserve();
   await client.disconnect();
 }
 
