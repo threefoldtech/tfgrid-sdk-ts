@@ -13,7 +13,7 @@ async function main() {
   // const res = await client.nodes.reserve({ nodeId: 22 });
   // log(res);
 
-  // const res = await client.nodes.getRent({ nodeId: 12 });
+  // const res = await client.nodes.getRentContractId({ nodeId: 12 });
   // log(res);
 
   // const res = await client.nodes.unreserve({ nodeId: 12 });
