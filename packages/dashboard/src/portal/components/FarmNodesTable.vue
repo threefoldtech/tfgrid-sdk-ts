@@ -850,7 +850,7 @@ export default class FarmNodesTable extends Vue {
     }
   }
   domainCheck() {
-    if (this.domain !== "" && !this.validator.isURL(this.domain)) return "Invalid url format";
+    if (this.domain && !this.validator.isURL(this.domain)) return "Invalid url format";
     return true;
   }
 
