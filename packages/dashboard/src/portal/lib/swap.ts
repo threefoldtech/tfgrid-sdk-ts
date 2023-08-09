@@ -5,14 +5,14 @@ import { getKeypair } from "@/utils/signer";
 
 export async function getDepositFee(api: any) {
   const fee = await api.query.tftBridgeModule.depositFee();
-  const decimalFee = new Decimal(fee);
+  const decimalFee = new Decimal(fee.toString());
   const convertedFee = decimalFee.div(10 ** 7).toNumber();
   return convertedFee;
 }
 
 export async function getWithdrawFee(api: any) {
   const fee = await api.query.tftBridgeModule.withdrawFee();
-  const decimalFee = new Decimal(fee);
+  const decimalFee = new Decimal(fee.toString());
   const convertedFee = decimalFee.div(10 ** 7).toNumber();
   return convertedFee;
 }
