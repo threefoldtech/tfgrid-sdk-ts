@@ -34,7 +34,7 @@ async function main() {
       await getRentContract(client, rentableNodes[0].nodeId);
 
       // Uncomment the line below if you intend to perform unreserve.
-      // unreserve(client, rentableNodes[0].nodeId);
+      // await unreserve(client, rentableNodes[0].nodeId);
     }
 
     // Disconnect the client
