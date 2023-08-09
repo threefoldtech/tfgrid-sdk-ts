@@ -147,7 +147,12 @@ async function deploy() {
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
-          disks: [{ size: solution.value.disk, mountPoint: "/mnt/next_cloud" }],
+          disks: [
+            { 
+              size: solution.value.disk, 
+              mountPoint: "/mnt/next_cloud", 
+            },
+          ],
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "NEXTCLOUD_DOMAIN", value: String(ipv4.value) },
