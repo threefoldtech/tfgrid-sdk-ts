@@ -4,20 +4,20 @@ import { log } from "./utils";
 async function main() {
   const client = await getClient();
 
-  // const res = await client.capacity.filterNodes({ dedicated: true });
-  // log(res);
+  const nodesDedicated = await client.capacity.filterNodes({ dedicated: true });
+  log(nodesDedicated);
 
-  const res = await client.capacity.filterNodes({ availableFor: client.twinId });
-  log(res);
+  const nodesAvailableFor = await client.capacity.filterNodes({ availableFor: client.twinId });
+  log(nodesAvailableFor);
 
-  // const res = await client.nodes.reserve({ nodeId: 22 });
-  // log(res);
+  const reserved = await client.nodes.reserve({ nodeId: 22 });
+  log(reserved);
 
-  // const res = await client.nodes.getRentContractId({ nodeId: 12 });
-  // log(res);
+  const rentContractId = await client.nodes.getRentContractId({ nodeId: 12 });
+  log(rentContractId);
 
-  // const res = await client.nodes.unreserve({ nodeId: 12 });
-  // log(res);
+  const unreserved = await client.nodes.unreserve({ nodeId: 12 });
+  log(unreserved);
 
   await client.disconnect();
 }
