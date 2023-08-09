@@ -154,7 +154,7 @@ async function deploy() {
           ],
           planetary: planetary.value,
           publicIpv4: ipv4.value,
-          rootFilesystemSize: rootFilesystemSize,
+          rootFilesystemSize: rootFilesystemSize.value,
           nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
