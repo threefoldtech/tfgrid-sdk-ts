@@ -301,7 +301,7 @@ export default class TfChainConnector extends Vue {
   }
   public validateConfirmPassword(value: string) {
     this._confirmPasswordUpdated = true;
-    if (!value) return "A confirmation password is required.";
+    if (!value && this.password) return "A confirmation password is required.";
     if (value !== this.password) return "Passwords should match.";
     return true;
   }
