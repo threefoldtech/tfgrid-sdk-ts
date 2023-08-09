@@ -225,6 +225,7 @@ import { Component, Vue, Watch } from "vue-property-decorator";
 import { generateKeyPair } from "web-ssh-keygen";
 
 import config from "@/portal/config";
+import { getBalance } from "@/portal/lib/balance";
 
 import { createAccount, downloadAsFile, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
 import QrcodeGenerator from "./QrcodeGenerator.vue";
@@ -282,6 +283,13 @@ export default class TfChainConnector extends Vue {
     if (profile) {
       const grid = await getGrid(profile.mnemonic);
       this.balance = await loadBalance(grid);
+    }
+  }
+
+  @Watch("$store.state.credentials.balance", { deep: true })
+  async balanceWatcher$(profile: any) {
+    if (profile) {
+      this.balance = this.$store.state.credentials.balance;
     }
   }
 
