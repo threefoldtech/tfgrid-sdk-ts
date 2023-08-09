@@ -3,7 +3,7 @@
     ref="layout"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
-    :disk="rootFilesystemSize + (solution?.disk ?? 0)"
+    :disk="solution?.disk + rootFilesystemSize"
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
@@ -60,7 +60,7 @@
               cpu: solution?.cpu,
               memory: solution?.memory,
               publicIp: ipv4,
-              ssd: rootFilesystemSize + (solution?.disk ?? 0),
+              ssd: solution?.disk + rootFilesystemSize,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
@@ -73,7 +73,7 @@
               cpu: solution?.cpu,
               memory: solution?.memory,
               ipv4: ipv4,
-              disks: [{ size: rootFilesystemSize + (solution?.disk ?? 0), mountPoint: '/mnt/next_cloud' }],
+              disks: [{ size: solution?.disk + rootFilesystemSize, mountPoint: '/mnt/next_cloud' }],
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
