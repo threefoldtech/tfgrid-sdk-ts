@@ -128,7 +128,7 @@ class DashboardPage:
         self.browser.find_element(*self.tft_info_button).click()
         WebDriverWait(self.browser, 30).until(EC.number_of_windows_to_be(2))
         self.browser.switch_to.window(self.browser.window_handles[1])
-        return self.browser.find_element(*self.stellar_tft_price_label).text[:-4]
+        return round(float(self.browser.find_element(*self.stellar_tft_price_label).text[:6]), 3)
     
     def get_link(self):
         WebDriverWait(self.browser, 30).until(EC.number_of_windows_to_be(2))

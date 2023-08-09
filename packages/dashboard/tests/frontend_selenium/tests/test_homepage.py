@@ -45,7 +45,7 @@ def test_create_account(browser):
       Steps:
           - Navigate to dashboard.
           - Click on Generate account.
-          - Enter password (twice).
+          - Enter Password and Confirmation password.
           - Click on Connect.
       Result: Login successfully and account saved.
     """
@@ -63,7 +63,7 @@ def test_import_account(browser):
       Test Cases: TC979 - Import account
       Steps:
           - Navigate to dashboard.
-          - Enter Mnemonics, password (twice).
+          - Enter Mnemonics, Password and Confirmation password.
           - Click on Connect.
       Result: Login successfully and account saved.
     """
@@ -80,8 +80,9 @@ def test_account_validation(browser):
       Test Cases: TC1777 - Connect your wallet Validation
       Steps:
           - Navigate to dashboard.
-          - verify Mnemonics.
-          - Verify password (bith).
+          - verify Mnemonics field.
+          - Verify Password field.
+          - Verify Confirm Password field.
           - Click on Connect and Logout.
           - verify Lgoin password.
       Result: Every input should have the correct validation.
@@ -126,7 +127,7 @@ def test_tft_price(browser):
     tft_in_usd = float(dashboard_page.tft_price_result()[:-4])
     dashboard_page.tft_price_swap()
     usd_in_tft = float(dashboard_page.tft_price_result()[:-4])
-    assert str(tft_in_usd) in dashboard_page.get_tft_price()
+    assert tft_in_usd == dashboard_page.get_tft_price()
     assert 0.99 < tft_in_usd * usd_in_tft < 1.1
 
 
@@ -135,7 +136,7 @@ def test_login_links(browser):
       Test Case: TC1801 - Verify login profile manager links
       Steps:
           - Navigate to dashboard.
-          - Enter Mnemonics, password (twice).
+          - Enter Mnemonics, Password and Confirmation password.
           - Click on Connect.
           - Verify Manual and Connect links
       Result: User should be navigated to the Manuak and Connect pages.
@@ -144,7 +145,7 @@ def test_login_links(browser):
     password = generate_string()
     dashboard_page.import_account(get_seed())
     dashboard_page.connect_your_wallet(password).click()
-    assert dashboard_page.manual_link() == 'https://manual.grid.tf/weblets/weblets_profile_manager.html'
+    assert dashboard_page.manual_link() == 'https://manual.grid.tf/dashboard/dashboard.html#tfchain-wallet'
     assert dashboard_page.connect_manual_link() == 'https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html'
     assert dashboard_page.get_connect_google_link() == 'https://play.google.com/store/apps/details?id=org.jimber.threebotlogin&hl=en&gl=US'
     assert dashboard_page.get_connect_apple_link() == 'https://apps.apple.com/us/app/threefold-connect/id1459845885'

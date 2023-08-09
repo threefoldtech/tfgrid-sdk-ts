@@ -12,13 +12,14 @@ This module contains shared browser fixtures.
 def browser():
 
     # Virtual display for the browser, allowing it to run in headless mode
-    display = Display(visible=0, size=(1500, 1200))
+    display = Display(visible=0, size=(1920, 1080))
     display.start()
 
     # Initialize the ChromeDriver instance with options
     options = webdriver.ChromeOptions()
+    #options.add_extension('extension.crx')  # For Adding Extension
     driver = webdriver.Chrome(options=options)
-    driver.set_window_size(1900, 1500)
+    driver.set_window_size(1920, 1080)
 
     # Make its calls wait up to 60 seconds for elements to appear
     driver.implicitly_wait(60)
