@@ -89,7 +89,7 @@
               memory: solution?.memory,
               ipv4: ipv4,
               ipv6: ipv4,
-              disks: disks,
+              diskSizes: disks.map(disk => disk.size),
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"

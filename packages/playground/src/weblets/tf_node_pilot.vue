@@ -80,7 +80,7 @@
           :filters="{
             cpu,
             memory,
-            ssd: 32,
+            ssd: 30 + rootFilesystemSize,
             publicIp: true,
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
@@ -96,10 +96,7 @@
             cpu,
             memory,
             ipv4: true,
-            disks: [
-              { size: 15, mountPoint: '/mnt/' + generateName(10) },
-              { size: 15, mountPoint: '/mnt/' + generateName(10) },
-            ],
+            diskSizes: [15, 15],
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"
