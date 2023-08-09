@@ -73,7 +73,7 @@
               cpu: solution?.cpu,
               memory: solution?.memory,
               ipv4: ipv4,
-              disks: [{ size: rootFilesystemSize + (solution?.disk ?? 0), mountPoint: '' }],
+              disks: [{ size: rootFilesystemSize + (solution?.disk ?? 0), mountPoint: '/mnt/next_cloud' }],
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
@@ -147,7 +147,7 @@ async function deploy() {
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
-          disks: [{ size: solution.value.disk, mountPoint: "/mnt/next_cloud" }], // make sure to update mountPoint as needed
+          disks: [{ size: solution.value.disk, mountPoint: "/mnt/next_cloud" }],
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "NEXTCLOUD_DOMAIN", value: String(ipv4.value) },
