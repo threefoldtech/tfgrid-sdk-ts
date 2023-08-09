@@ -73,7 +73,7 @@
               cpu: solution?.cpu,
               memory: solution?.memory,
               ipv4: ipv4,
-              disks: [{ size: solution?.disk + rootFilesystemSize, mountPoint: '/mnt/next_cloud' }],
+              disks: [{ size: solution?.disk, mountPoint: '/mnt/next_cloud' }],
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
