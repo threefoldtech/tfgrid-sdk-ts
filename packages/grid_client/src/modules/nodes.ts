@@ -24,7 +24,7 @@ class Nodes {
   @checkBalance
   async reserve(options: RentContractCreateModel) {
     const rentContractId = await this.getRentContractId({ nodeId: options.nodeId });
-    if (rentContractId !== 0) {
+    if (rentContractId) {
       throw Error(`Node is already rented`);
     }
     try {
@@ -41,7 +41,7 @@ class Nodes {
   @checkBalance
   async unreserve(options: RentContractDeleteModel) {
     const rentContractId = await this.getRentContractId({ nodeId: options.nodeId });
-    if (rentContractId === 0) {
+    if (!rentContractId) {
       events.emit("logs", `No rent contract found for node ${options.nodeId}`);
       return rentContractId;
     }
@@ -57,10 +57,10 @@ class Nodes {
   @expose
   @validateInput
   async getRentContractId(options: RentContractGetModel) {
-    const proxyURL = this.config.proxyURL;
-    return send("get", urlJoin(proxyURL, `/nodes/${options.nodeId}`), "", {})
+    return this.client.contracts
+      .getContractIdByActiveRentForNode(options)
       .then(res => {
-        return res.rentContractId;
+        return res;
       })
       .catch(err => {
         throw Error(`Error getting rent for node ${options.nodeId}: ${err}`);
