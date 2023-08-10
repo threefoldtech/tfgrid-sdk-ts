@@ -22,7 +22,9 @@
                   :rules="[
                     () => !!receipientAddress || 'This field is required',
                     () => transferAddressCheck() || 'invalid address',
-                    () => receipientAddress === $store.state.credentials.address || 'You can not transfer to yourself',
+                    () =>
+                      receipientAddress !== $store.state.credentials.account.address ||
+                      'You can\'t transfer to yourself',
                   ]"
                 ></v-combobox>
                 <TransferTextField
