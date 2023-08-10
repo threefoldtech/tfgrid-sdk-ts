@@ -290,6 +290,13 @@ export default class TfChainConnector extends Vue {
     }
   }
 
+  @Watch("$store.state.credentials.balance", { deep: true })
+  async balanceWatcher$(profile: any) {
+    if (profile) {
+      this.balance = this.$store.state.credentials.balance;
+    }
+  }
+
   /* Validation */
   private _confirmPasswordUpdated = false;
   public readonly mnemonicRules = [
