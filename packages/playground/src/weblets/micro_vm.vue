@@ -205,7 +205,7 @@ const images = [
   },
   {
     name: "Debian-12",
-    flist: "https://hub.grid.tf/ahmedthabet.3bot/threefolddev-debian-12.flist",
+    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-debian-12.flist",
     entryPoint: "/sbin/zinit init",
   },
   {
