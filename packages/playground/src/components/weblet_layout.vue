@@ -211,7 +211,7 @@ defineExpose({
   },
   validateSsh() {
     if (!profileManager.profile!.ssh) {
-      throw new Error("You must provide a SSH key to deploy");
+      throw new Error("You must provide an SSH key to deploy");
     }
   },
 
