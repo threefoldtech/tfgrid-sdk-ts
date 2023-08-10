@@ -27,7 +27,6 @@
           </input-tooltip>
         </input-validator>
 
-        <SelectVmImage :images="images" v-model="flist" />
         <SelectSolutionFlavor
           :minimum="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
           :standard="{ cpu: 4, memory: 1024 * 8, disk: 500 }"
@@ -37,7 +36,6 @@
 
         <Network
           required
-          v-model:ipv4="ipv4"
           v-model:planetary="planetary"
           v-model:wireguard="wireguard"
           ref="network"
@@ -182,7 +180,6 @@ import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectFarmManager from "../components/select_farm_manager.vue";
 import SelectNode from "../components/select_node.vue";
-import SelectVmImage from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { solutionFlavor as SolutionFlavor } from "../types";
 import type { INode } from "../utils/filter_nodes";
@@ -193,7 +190,6 @@ const solution = ref() as Ref<SolutionFlavor>;
 export default {
   name: "TfNextcloud",
   components: {
-    SelectVmImage,
     SelectSolutionFlavor,
     SelectFarm,
     SelectNode,
