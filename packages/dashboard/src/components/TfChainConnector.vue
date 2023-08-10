@@ -281,8 +281,11 @@ export default class TfChainConnector extends Vue {
   public grid: any;
   @Watch("mnemonic")
   async updateGrid() {
-    console.log(this.mnemonic);
-    this.grid = await getGrid(this.mnemonic);
+    try {
+      this.grid = await getGrid(this.mnemonic);
+    } catch (e) {
+      this.grid = null;
+    }
   }
   @Watch("$store.state.profile")
   async profileWatcher$(profile: any) {
