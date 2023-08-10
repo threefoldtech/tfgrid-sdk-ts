@@ -14,6 +14,17 @@ export async function getGrid(mnemonic: string) {
   return grid;
 }
 
+export function activeAccountTwin(mnemonic: string) {
+  const grid = new GridClient({
+    network: config.network as NetworkEnv,
+    mnemonic,
+    storeSecret: mnemonic,
+  });
+  grid._connect();
+  const relay = grid.getDefaultUrls(config.network as NetworkEnv).relay.slice(6);
+  return grid.tfchain.createAccountTwin(mnemonic, relay, true);
+}
+
 export async function loadProfile(grid: GridClient): Promise<Profile> {
   return {
     mnemonic: grid.clientOptions!.mnemonic,

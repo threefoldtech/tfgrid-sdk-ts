@@ -127,11 +127,12 @@
                       label="Mnemonic"
                       :rules="mnemonicRules"
                       placeholder="Please insert your mnemonic"
-                      :error-messages="mnemonicError"
+                      :error-messages="mnemonicError || activateAccountError"
                       :value="mnemonic"
                       @input="
                         mnemonic = $event;
                         mnemonicError = null;
+                        activateAccountError = '';
                       "
                       :type="showMnemonic ? 'text' : 'password'"
                       :append-icon="showMnemonic ? 'mdi-eye-outline' : 'mdi-eye-off-outline'"
@@ -186,7 +187,7 @@
               />
 
               <div class="d-flex justify-center">
-                <v-btn color="primary" :disabled="!isValidForm" type="submit" :loading="connecting">Connect</v-btn>
+                <v-btn color="primary" :disabled="!isValidForm" type="submit" :loading="connecting"> Connect </v-btn>
               </div>
             </v-form>
           </v-container>
@@ -211,11 +212,24 @@
         sandbox="allow-forms allow-modals allow-scripts allow-popups allow-same-origin "
         @load="termsLoading = false"
       ></iframe>
-      <v-btn @click="generateAccount" v-show="!termsLoading"> accept terms and conditions </v-btn>
+      <v-btn @click="activateAccountModal ? activateAccount() : generateAccount()" v-show="!termsLoading">
+        accept terms and conditions
+      </v-btn>
       <v-card v-show="termsLoading" :style="{ height: '100%' }">
         <v-card-text class="d-flex justify-center align-center" :style="{ height: '100%' }">
           <v-progress-circular indeterminate color="primary" />
         </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="activateAccountModal" width="500">
+      <v-card>
+        <v-card-title>Activate Your Account</v-card-title>
+        <v-card-text> Do you want to activate your account? </v-card-text>
+        <v-card-actions class="d-flex justify-end">
+          <v-btn color="error" text @click="activateAccountModal = false">No</v-btn>
+          <v-btn color="success" text @click="openAcceptTerms = true">Yes</v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
   </section>
@@ -231,7 +245,15 @@ import { generateKeyPair } from "web-ssh-keygen";
 
 import config from "@/portal/config";
 
-import { createAccount, downloadAsFile, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
+import {
+  activeAccountTwin,
+  createAccount,
+  downloadAsFile,
+  getGrid,
+  loadBalance,
+  loadProfile,
+  storeSSH,
+} from "../utils/grid";
 import QrcodeGenerator from "./QrcodeGenerator.vue";
 
 const version = "v1";
@@ -364,7 +386,12 @@ export default class TfChainConnector extends Vue {
         params: { accountID: `${this.$store.state.profile.address}` },
       });
     } catch (error) {
-      this.mnemonicError = (error as any).message || "Failed to Mnemonic on grid.";
+      const msg: string = (error as any).message || "";
+      if (msg.toLowerCase().includes("couldn't find a user for the provided mnemonic")) {
+        this.activateAccountModal = true;
+      } else {
+        this.mnemonicError = msg || "Failed to connect mnemonic on grid.";
+      }
     } finally {
       this.connecting = false;
     }
@@ -377,6 +404,24 @@ export default class TfChainConnector extends Vue {
     if (password && wallet) {
       this.loginPassword = password;
       this.login();
+    }
+  }
+
+  /* Activating */
+  public activateAccountModal = false;
+  public activateAccountError = "";
+  public async activateAccount() {
+    this.openAcceptTerms = false;
+    this.activateAccountModal = false;
+    this.connecting = true;
+    this.activateAccountError = "";
+    try {
+      await activeAccountTwin(this.mnemonic);
+      this.connecting = false;
+      this.connect();
+    } catch (e) {
+      this.activateAccountError = (e as any).message;
+      this.connecting = false;
     }
   }
 
