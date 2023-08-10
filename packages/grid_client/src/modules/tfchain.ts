@@ -253,8 +253,12 @@ class TFChain implements blockchainInterface {
   }
 
   async createAccount(relay: string, disconnect = false) {
-    const mnemonics = generateMnemonic();
-    const client = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
+    const mnemonic = generateMnemonic();
+    return this.createAccountTwin(mnemonic, relay, disconnect);
+  }
+
+  async createAccountTwin(mnemonic: string, relay: string, disconnect = false) {
+    const client = new TFClient(this.substrateURL, mnemonic, this.storeSecret, this.keypairType);
     await client.connect();
     await axios.post(this.activationURL, {
       substrateAccountID: client.address,
@@ -276,7 +280,7 @@ class TFChain implements blockchainInterface {
     if (disconnect) await client.disconnect();
     return {
       public_key: client.address,
-      mnemonic: mnemonics,
+      mnemonic,
       twinId: ret.id,
     };
   }
