@@ -5,75 +5,65 @@
     </v-card>
 
     <v-card>
-      <v-tabs v-model="activeTab">
+      <v-tabs centered v-model="activeTab">
         <v-tab class=""> By Address</v-tab>
         <v-tab> By Twin ID </v-tab>
+
+        <!-- Address Transfer -->
         <v-tab-item>
           <template>
             <v-card class="pa-5 my-5" flat>
-              <v-form v-model="isTransferValidAddress">
-                <v-combobox
+              <v-form v-model="isValidAddressTransfer">
+                <TransferInputField
                   v-model="receipientAddress"
-                  :items="accountsAddresses"
-                  dense
-                  filled
-                  @keydown="setValue"
-                  label="Recipient:"
-                  :rules="[
-                    () => !!receipientAddress || 'This field is required',
-                    () => transferAddressCheck() || 'invalid address',
-                    () =>
-                      receipientAddress !== $store.state.credentials.account.address ||
-                      'You can\'t transfer to yourself',
-                  ]"
-                ></v-combobox>
-                <TransferTextField
-                  :amount="amountByTwinId"
-                  v-model="amountByAddress"
+                  label="Recipient Address:"
+                  :type="'text'"
+                  :rules="[() => validateAddressTransfer() || addressErrorMessage]"
+                />
+
+                <TransferInputField
+                  v-model="transferAmount"
                   label="Amount (TFT)"
-                  :rules="getAmountRules(amountByAddress)"
-                >
-                </TransferTextField>
+                  :type="'number'"
+                  :rules="getAmountRules(transferAmount)"
+                />
                 <span class="fee">0.01 transaction fee will be deducted</span>
               </v-form>
+
               <TransferFormButtons
-                :isTransferValid="isTransferValidAddress && amountByAddress > 0"
-                :loadingTransfer="loadingTransferAddress"
+                :isTransferValid="isValidAddressTransfer"
+                :loadingTransfer="loadingTransfer"
                 @submit="transferTFTWithAddress"
-                @clear="clearInputAddress"
+                @clear="clearInputValues"
               />
             </v-card>
           </template>
         </v-tab-item>
+
+        <!-- TwinID Transfer -->
         <v-tab-item>
           <template>
             <v-card class="pa-5 my-5" flat>
-              <v-form v-model="isTransferValidTwinId">
-                <v-combobox
+              <v-form v-model="isValidTwinIDTransfer">
+                <TransferInputField
                   v-model="receptinTwinId"
-                  :items="accountTwinIds"
-                  dense
-                  filled
-                  @input="onInputValueChanged"
-                  label="Recipient:"
-                  :error-messages="targetErrorTwin"
-                  :rules="[() => !!receptinTwinId || 'This field is required']"
-                >
-                </v-combobox>
-                <TransferTextField
-                  :amount="amountByTwinId"
-                  v-model="amountByTwinId"
+                  label="Recipient TwinID:"
+                  :type="'number'"
+                  :rules="[() => transferTwinIdCheck() || twinIDErrorMessage]"
+                />
+                <TransferInputField
+                  v-model="transferAmount"
                   label="Amount (TFT)"
-                  :rules="getAmountRules(amountByTwinId)"
-                >
-                </TransferTextField>
+                  :type="'number'"
+                  :rules="getAmountRules(transferAmount)"
+                />
                 <span class="fee">0.01 transaction fee will be deducted</span>
               </v-form>
               <TransferFormButtons
-                :isTransferValid="isTransferValidTwinId && amountByTwinId > 0"
-                :loadingTransfer="loadingTransferTwinId"
+                :isTransferValid="isValidTwinIDTransfer"
+                :loadingTransfer="loadingTransfer"
                 @submit="transferTFTWithTwinID"
-                @clear="clearInputTwinId"
+                @clear="clearInputValues"
               />
             </v-card>
           </template>
@@ -90,95 +80,36 @@ import QrcodeVue from "qrcode.vue";
 import { Component, Vue } from "vue-property-decorator";
 
 import TransferFormButtons from "../components/TransferFormButtons.vue";
-import TransferTextField from "../components/TransferTextField.vue";
+import TransferInputField from "../components/TransferInputField.vue";
 import { balanceInterface, getBalance } from "../lib/balance";
 import { checkAddress, transfer } from "../lib/transfer";
-import { accountInterface } from "../store/state";
 
 @Component({
   name: "TransferView",
-  components: { QrcodeVue, TransferTextField, TransferFormButtons },
+  components: { QrcodeVue, TransferInputField, TransferFormButtons },
 })
 export default class TransferView extends Vue {
-  activeTab = 0;
   $api: any;
 
   receipientAddress = "";
-  accountsAddresses: any = [];
-  amountByAddress = 0;
-  loadingTransferAddress = false;
-  isTransferValidAddress = false;
-
-  amountByTwinId = 0;
-  loadingTransferTwinId = false;
-  isTransferValidTwinId = false;
   receptinTwinId = "";
-  accountTwinIds: any = [];
-  targetErrorTwin = "";
+
+  isValidAddressTransfer = false;
+  isValidTwinIDTransfer = false;
+
+  addressErrorMessage = "";
+  twinIDErrorMessage = "";
+
+  transferAmount = 0;
+  activeTab = 0;
+
+  loadingTransfer = false;
 
   queryClient = new QueryClient(window.configs.APP_API_URL);
   client = new Client({ url: window.configs.APP_API_URL });
 
-  async onInputValueChanged() {
-    await this.$nextTick();
-    this.transferTwinIdCheck();
-    this.targetErrorTwin = "";
-  }
-
-  async transferTwinIdCheck() {
-    await this.$nextTick();
-    if (this.receptinTwinId.length === 0) {
-      this.targetErrorTwin = "This field is required";
-      this.isTransferValidTwinId = false;
-      return;
-    }
-
-    if (parseInt(this.receptinTwinId) === this.$store.state.credentials.twin.id) {
-      this.targetErrorTwin = "You can't transfer to yourself";
-      this.isTransferValidTwinId = false;
-      return;
-    }
-
-    if (!/^[1-9]\d*$/.test(this.receptinTwinId)) {
-      this.targetErrorTwin = "Please enter a positive integer";
-      this.isTransferValidTwinId = false;
-      return;
-    }
-
-    if (!(parseInt(this.receptinTwinId) >= -(2 ** 31) && parseInt(this.receptinTwinId) <= 2 ** 31 - 1)) {
-      this.targetErrorTwin = "Please enter a valid twin id";
-      this.isTransferValidTwinId = false;
-      return;
-    }
-
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => {
-        reject(new Error("Request timed out."));
-      }, 6000);
-    });
-    try {
-      const twinDetailsPromise = this.queryClient.twins.get({ id: parseInt(this.receptinTwinId) });
-      const twinDetails = await Promise.race([twinDetailsPromise, timeoutPromise]);
-      if (twinDetails) {
-        this.isTransferValidTwinId = true;
-        this.accountTwinIds.push(this.receptinTwinId);
-        this.targetErrorTwin = "";
-      } else {
-        this.isTransferValidTwinId = false;
-        this.targetErrorTwin = "Twin ID doesn't exist";
-      }
-    } catch (error) {
-      this.isTransferValidTwinId = false;
-      this.targetErrorTwin = "Twin ID doesn't exist";
-    }
-  }
-
   mounted() {
-    if (this.$api && this.$store.state.credentials.initialized) {
-      this.accountsAddresses = this.$store.state.portal.accounts
-        .filter((account: accountInterface) => account.address !== this.$store.state.credentials.account.address)
-        .map((account: accountInterface) => `${account.address}`);
-    } else {
+    if (!this.$api && !this.$store.state.credentials.initialized) {
       this.$router.push({
         name: "accounts",
         path: "/",
@@ -186,27 +117,129 @@ export default class TransferView extends Vue {
     }
   }
 
+  clearInputValues() {
+    this.receipientAddress = "";
+    this.receptinTwinId = "";
+    this.transferAmount = 0;
+    this.twinIDErrorMessage = "";
+    this.addressErrorMessage = "";
+  }
+
+  transferTwinIdCheck() {
+    if (this.receptinTwinId.length === 0) {
+      this.twinIDErrorMessage = "This field is required and should be a number.";
+      this.isValidTwinIDTransfer = false;
+      return this.isValidTwinIDTransfer;
+    }
+
+    if (parseInt(this.receptinTwinId) === this.$store.state.credentials.twin.id) {
+      this.twinIDErrorMessage = "You can't transfer to yourself";
+      this.isValidTwinIDTransfer = false;
+      return this.isValidTwinIDTransfer;
+    }
+
+    if (!/^[1-9]\d*$/.test(this.receptinTwinId)) {
+      this.twinIDErrorMessage = "Please enter a positive integer";
+      this.isValidTwinIDTransfer = false;
+      return this.isValidTwinIDTransfer;
+    }
+
+    if (!(parseInt(this.receptinTwinId) >= -(2 ** 31) && parseInt(this.receptinTwinId) <= 2 ** 31 - 1)) {
+      this.twinIDErrorMessage = "Please enter a valid twin id";
+      this.isValidTwinIDTransfer = false;
+      return this.isValidTwinIDTransfer;
+    }
+
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => {
+        reject(new Error("Request timed out."));
+      }, 6000);
+    });
+
+    try {
+      const twinDetailsPromise = this.queryClient.twins.get({ id: parseInt(this.receptinTwinId) });
+      Promise.race([twinDetailsPromise, timeoutPromise]).then(twinDetails => {
+        if (twinDetails) {
+          this.isValidTwinIDTransfer = true;
+          this.twinIDErrorMessage = "";
+          return this.isValidTwinIDTransfer;
+        } else {
+          this.isValidTwinIDTransfer = false;
+          this.twinIDErrorMessage = "Twin ID doesn't exist";
+          return this.isValidTwinIDTransfer;
+        }
+      });
+    } catch (error) {
+      this.isValidTwinIDTransfer = false;
+      this.twinIDErrorMessage = "Twin ID doesn't exist";
+      return this.isValidTwinIDTransfer;
+    }
+    return this.isValidTwinIDTransfer;
+  }
+
+  validateAddressTransfer() {
+    // Validate the address
+    const isValid = checkAddress(this.receipientAddress);
+    if (!isValid) {
+      this.addressErrorMessage = "Invalid address.";
+      this.isValidAddressTransfer = false;
+    } else if (this.receipientAddress === this.$store.state.credentials.account.address) {
+      this.addressErrorMessage = "You can't transfer to yourself.";
+      this.isValidAddressTransfer = false;
+    } else {
+      this.addressErrorMessage = "";
+      this.isValidAddressTransfer = true;
+    }
+
+    return this.isValidAddressTransfer;
+  }
+
+  getAmountRules(value: any) {
+    return [
+      (v: any) => !!v || "Amount should be a number.",
+      () => value > 0 || "Amount cannot be negative or 0.",
+      () => value < parseFloat(this.$store.state.credentials.balance.free) || "Amount cannot exceed balance.",
+    ];
+  }
+
   unmounted() {
     this.$store.commit("UNSET_CREDENTIALS");
   }
 
-  transferAddressCheck() {
-    const isValid = checkAddress(this.receipientAddress);
-    if (isValid && this.receipientAddress.length && !this.receipientAddress.match(/\W/)) {
-      return true;
+  async transferTFTWithTwinID() {
+    const twinDetails = await this.queryClient.twins.get({ id: parseInt(this.receptinTwinId) });
+    if (twinDetails != null) {
+      const twinAddress = twinDetails.accountId;
+      const client = new Client({
+        url: window.configs.APP_API_URL,
+        mnemonicOrSecret: this.$store.state.profile.mnemonic,
+      });
+      this.loadingTransfer = true;
+      const decimalAmount = new Decimal(this.transferAmount);
+      const milliAmount = decimalAmount.mul(10 ** 7).toNumber();
+      try {
+        const transferResult = await client.balances.transfer({
+          address: twinAddress,
+          amount: milliAmount,
+        });
+        this.$toasted.show(`Transaction submitted`);
+        await transferResult.apply();
+
+        this.$toasted.show("Transfer succeeded!");
+        this.loadingTransfer = false;
+
+        getBalance(this.$api, this.$store.state.credentials.account.address).then((balance: balanceInterface) => {
+          this.$store.state.credentials.balance.free = balance.free;
+          this.$store.state.credentials.balance.reserved = balance.reserved;
+        });
+      } catch (error) {
+        this.$toasted.show("Transfer failed!");
+        this.loadingTransfer = false;
+      }
     } else {
-      return false;
+      this.$toasted.show("Twin ID doesn't exist");
+      this.loadingTransfer = false;
     }
-  }
-
-  clearInputAddress() {
-    this.receipientAddress = "";
-    this.amountByAddress = 0;
-  }
-
-  clearInputTwinId() {
-    this.receptinTwinId = "";
-    this.amountByTwinId = 0;
   }
 
   transferTFTWithAddress() {
@@ -214,9 +247,9 @@ export default class TransferView extends Vue {
       this.$store.state.credentials.account.address,
       this.$api,
       this.receipientAddress,
-      this.amountByAddress,
+      this.transferAmount,
       (res: { events?: never[] | undefined; status: { type: string; asFinalized: string; isFinalized: string } }) => {
-        this.loadingTransferAddress = true;
+        this.loadingTransfer = true;
         if (res instanceof Error) {
           console.log(res);
           return;
@@ -231,14 +264,14 @@ export default class TransferView extends Vue {
           console.log(`Transaction included at blockHash ${status.asFinalized}`);
           if (!events.length) {
             this.$toasted.show("Transfer failed!");
-            this.loadingTransferAddress = false;
+            this.loadingTransfer = false;
           } else {
             // Loop through Vec<EventRecord> to display all events
             events.forEach(({ phase, event: { data, method, section } }) => {
               console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
               if (section === "balances" && method === "Transfer") {
                 this.$toasted.show("Transfer succeeded!");
-                this.loadingTransferAddress = false;
+                this.loadingTransfer = false;
                 getBalance(this.$api, this.$store.state.credentials.account.address).then(
                   (balance: balanceInterface) => {
                     this.$store.state.credentials.balance.free = balance.free;
@@ -247,7 +280,7 @@ export default class TransferView extends Vue {
                 );
               } else if (section === "system" && method === "ExtrinsicFailed") {
                 this.$toasted.show("Transfer failed!");
-                this.loadingTransferAddress = false;
+                this.loadingTransfer = false;
               }
             });
           }
@@ -255,61 +288,8 @@ export default class TransferView extends Vue {
       },
     ).catch(err => {
       this.$toasted.show(err.message);
-      this.loadingTransferAddress = false;
+      this.loadingTransfer = false;
     });
-  }
-
-  async transferTFTWithTwinID() {
-    const twinDetails = await this.queryClient.twins.get({ id: parseInt(this.receptinTwinId) });
-    if (twinDetails != null) {
-      const twinAddress = twinDetails.accountId;
-      const client = new Client({
-        url: window.configs.APP_API_URL,
-        mnemonicOrSecret: this.$store.state.profile.mnemonic,
-      });
-      this.loadingTransferTwinId = true;
-      const decimalAmount = new Decimal(this.amountByTwinId);
-      const milliAmount = decimalAmount.mul(10 ** 7).toNumber();
-      try {
-        const transferResult = await client.balances.transfer({
-          address: twinAddress,
-          amount: milliAmount,
-        });
-        this.$toasted.show(`Transaction submitted`);
-        await transferResult.apply();
-
-        this.$toasted.show("Transfer succeeded!");
-        this.loadingTransferTwinId = false;
-
-        getBalance(this.$api, this.$store.state.credentials.account.address).then((balance: balanceInterface) => {
-          this.$store.state.credentials.balance.free = balance.free;
-          this.$store.state.credentials.balance.reserved = balance.reserved;
-        });
-      } catch (error) {
-        this.$toasted.show("Transfer failed!");
-        this.loadingTransferTwinId = false;
-      }
-    } else {
-      this.$toasted.show("Twin ID doesn't exist");
-      this.loadingTransferTwinId = false;
-    }
-  }
-
-  setValue($event: { target: { value: string } }) {
-    requestAnimationFrame(() => {
-      this.receipientAddress = $event.target.value;
-    });
-  }
-
-  getAmountRules(value: any) {
-    return [
-      (v: any) => !!v || "This field is required",
-      () =>
-        (value.toString().split(".").length > 1 ? value.toString().split(".")[1].length <= 3 : true) ||
-        "Amount must have 3 decimals only",
-      () => value > 0 || "Amount cannot be negative or 0",
-      () => value < parseFloat(this.$store.state.credentials.balance.free) || "Amount cannot exceed balance",
-    ];
   }
 }
 </script>

@@ -3,10 +3,9 @@
     v-model="internalValue"
     :label="label"
     :rules="rules"
-    @paste.prevent
-    type="number"
-    @keydown="handleInput"
+    :type="type"
     @input="emitInput"
+    @keydown="handleInput"
   ></v-text-field>
 </template>
 
@@ -15,6 +14,10 @@ export default {
   props: {
     amount: {
       type: [String, Number],
+      required: false,
+    },
+    type: {
+      type: String,
       required: true,
     },
     label: {
