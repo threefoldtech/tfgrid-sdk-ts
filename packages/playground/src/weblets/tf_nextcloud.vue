@@ -3,7 +3,7 @@
     ref="layout"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
-    :disk="solution?.disk + rootFilesystemSize"
+    :disk="(solution?.disk ?? 0) + rootFilesystemSize"
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
@@ -60,7 +60,7 @@
               cpu: solution?.cpu,
               memory: solution?.memory,
               publicIp: ipv4,
-              ssd: solution?.disk + rootFilesystemSize,
+              ssd: (solution?.disk ?? 0) + rootFilesystemSize,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
