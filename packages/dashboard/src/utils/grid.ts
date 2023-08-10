@@ -22,7 +22,7 @@ export function activeAccountTwin(mnemonic: string) {
   });
   grid._connect();
   const relay = grid.getDefaultUrls(config.network as NetworkEnv).relay.slice(6);
-  return grid.tfchain.createAccountTwin(mnemonic, relay, true);
+  return grid.tfchain.activateAccountAndCreateTwin(mnemonic, relay, true);
 }
 
 export async function loadProfile(grid: GridClient): Promise<Profile> {

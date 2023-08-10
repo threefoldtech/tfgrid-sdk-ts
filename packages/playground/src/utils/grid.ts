@@ -54,7 +54,7 @@ export function activeAccountTwin(mnemonic: string) {
   });
   grid._connect();
   const relay = grid.getDefaultUrls(network).relay.slice(6);
-  return grid.tfchain.createAccountTwin(mnemonic, relay, true);
+  return grid.tfchain.activateAccountAndCreateTwin(mnemonic, relay, true);
 }
 
 export interface Balance {

@@ -254,10 +254,10 @@ class TFChain implements blockchainInterface {
 
   async createAccount(relay: string, disconnect = false) {
     const mnemonic = generateMnemonic();
-    return this.createAccountTwin(mnemonic, relay, disconnect);
+    return this.activateAccountAndCreateTwin(mnemonic, relay, disconnect);
   }
 
-  async createAccountTwin(mnemonic: string, relay: string, disconnect = false) {
+  async activateAccountAndCreateTwin(mnemonic: string, relay: string, disconnect = false) {
     const client = new TFClient(this.substrateURL, mnemonic, this.storeSecret, this.keypairType);
     await client.connect();
     await axios.post(this.activationURL, {
