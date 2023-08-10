@@ -31,14 +31,22 @@ export class IP4 {
   }
 
   /**
-   * Masks the given IPv4 segments using the stored mask bits.
+   * Applies the stored mask bits to the provided IPv4 segments.
+   *
+   * This method performs a bitwise AND operation between each segment of the IPv4 address
+   * and the corresponding mask bits. The mask bits are shifted to the right by a certain
+   * amount to align with the current segment, ensuring that only the relevant bits are retained.
+   *
+   * The bitwise AND operation with shifted mask bits effectively masks out the unwanted bits
+   * in each segment, following the CIDR notation. This process is essential for isolating
+   * the network portion of the address and applying the subnet mask effectively.
+   *
    * @param ipBits - The IPv4 segments to be masked.
-   * @returns The masked IPv4 segments.
+   * @returns The masked IPv4 segments after applying the bitwise AND operation.
    */
   private masked(ipBits: number[]): number[] {
     return ipBits.map((bit, index) => bit & (this.maskBits >>> (24 - index * 8)));
   }
-
   /**
    * Checks if the provided IPv4 address falls within the CIDR range of this instance.
    * @param ipToCheck - The IPv6 address to check.
@@ -77,7 +85,14 @@ export class IP6 {
   }
 
   /**
-   * Calculates the bitmask based on the stored mask.
+   * Calculates the bitmask based on the stored mask value.
+   *
+   * The bitmask is a binary value that represents the network portion of an IPv6 address
+   * according to the CIDR mask value. If the CIDR mask is 0, the entire address space is
+   * treated as the network. Otherwise, the bitmask is calculated by creating a value where
+   * the first `(128 - mask)` bits are 1 and the remaining `mask` bits are 0, effectively
+   * isolating the network portion.
+   *
    * @returns The bitmask as a BigInt.
    */
   private asBitmask(): bigint {
@@ -95,6 +110,7 @@ export class IP6 {
    */
   expandIPv6(ip: string): string {
     const parts = ip.split(":");
+    // to handle edge case starting with `::`
     let last_seen_empty = false;
     let empty_index: number | null = null;
     const expandedParts = [];
