@@ -120,7 +120,7 @@
                           class="mt-2 ml-3"
                           color="secondary"
                           variant="tonal"
-                          :disabled="isValidForm"
+                          :disabled="isValidForm || !!mnemonic"
                           :loading="creatingAccount"
                           @click="openAcceptTerms = termsLoading = true"
                         >
