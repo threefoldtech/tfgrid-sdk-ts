@@ -47,10 +47,8 @@ class TFContracts extends Contracts {
       const rentContractsCount = await gqlClient.getItemTotalCount("rentContracts", opts);
       const body = `query getContracts($nameContractsCount: Int!, $nodeContractsCount: Int!, $rentContractsCount: Int!){
                 nameContracts(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, limit: $nameContractsCount) {
-                  id
                   contractID
                   createdAt
-                  gridVersion
                   name
                   solutionProviderID
                   state
@@ -66,8 +64,6 @@ class TFContracts extends Contracts {
                 rentContracts(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, limit: $rentContractsCount) {
                   contractID
                   createdAt
-                  gridVersion
-                  id
                   nodeID
                   solutionProviderID
                   state
