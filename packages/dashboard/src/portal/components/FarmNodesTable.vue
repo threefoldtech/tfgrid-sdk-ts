@@ -435,6 +435,7 @@ import { addNodePublicConfig, deleteNode, nodeInterface } from "@/portal/lib/far
 import { byteToGB, generateNodeSummary, generateReceipt, getNodeUptimePercentage } from "@/portal/lib/nodes";
 import { hex2a } from "@/portal/lib/util";
 
+import { IP4, IP6 } from "../lib/ips";
 import { setDedicatedNodeExtraFee } from "../lib/nodes";
 import NodeMintingDetails from "./NodeMintingDetails.vue";
 
@@ -801,6 +802,11 @@ export default class FarmNodesTable extends Vue {
     const IPv4AddressFormat = `(${IPv4SegmentFormat}[.]){3}${IPv4SegmentFormat}`;
     const gatewayRegex = new RegExp(`^${IPv4AddressFormat}$`);
     if (gatewayRegex.test(this.gw4)) {
+      const ip4 = new IP4(this.ip4);
+      if (!ip4.contains(this.gw4)) {
+        this.gw6ErrorMessage = "Gateway is not a part of the given IPV4.";
+        return false;
+      }
       this.gw4ErrorMessage = "";
       return true;
     } else {
@@ -842,6 +848,11 @@ export default class FarmNodesTable extends Vue {
         ")([0-9a-fA-F]{1})?$",
     );
     if (gatewayRegex.test(this.gw6)) {
+      const ip6 = new IP6(this.ip6);
+      if (!ip6.contains(this.gw6)) {
+        this.gw6ErrorMessage = "Gateway is not a part of the given IPV6.";
+        return false;
+      }
       this.gw6ErrorMessage = "";
       return true;
     } else {
