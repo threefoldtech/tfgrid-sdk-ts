@@ -280,12 +280,14 @@ export default class TfChainConnector extends Vue {
   public twinID: any;
   public grid: any;
   @Watch("mnemonic")
-  async updateGrid() {
+  async checkMnemonic() {
     try {
       this.grid = await getGrid(this.mnemonic);
-    } catch (e) {
-      this.grid = null;
+      this.grid.twinId;
+    } catch (err) {
+      this.mnemonicError = `Couldn't find a user for provided mnemonic on ${config.network} network.`;
     }
+    return true;
   }
   @Watch("$store.state.profile")
   async profileWatcher$(profile: any) {
@@ -301,11 +303,10 @@ export default class TfChainConnector extends Vue {
   public readonly mnemonicRules = [
     (value: string) => (value ? true : "Mnemonic is required."),
     (value: string) => (validateMnemonic(value) ? true : "Mnemonic doesn't seem to be valid."),
-    () =>
-      this.validateMnemonicChain() ? true : `Couldn't find a user for provided mnemonic on ${config.network} network.`,
   ];
-  public validateMnemonicChain() {
+  public async validateMnemonicChain(mnemonic: string) {
     try {
+      this.grid = await getGrid(mnemonic);
       this.grid.twinId;
     } catch (err) {
       return false;
