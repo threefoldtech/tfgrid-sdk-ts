@@ -62,7 +62,7 @@
       <template #title> Connect your TFChain Wallet </template>
       <template #subtitle>
         Please visit
-        <a class="app-link" href="https://www2.manual.grid.tf/playground/wallet_connector.html" target="_blank">
+        <a class="app-link" href="https://manual.grid.tf/playground/wallet_connector.html" target="_blank">
           the manual
         </a>
         get started.
