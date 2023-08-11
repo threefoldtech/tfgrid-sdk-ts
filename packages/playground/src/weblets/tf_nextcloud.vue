@@ -9,7 +9,7 @@
     :dedicated="dedicated"
     title-image="images/icons/nextcloud.png"
   >
-    <template #title>Deploy Nextcloud All-in-One Instance </template>
+    <template #title>Deploy a Nextcloud All-in-One Instance </template>
     <input-validator
       :value="name"
       :rules="[
@@ -35,7 +35,7 @@
       v-model="solution"
     />
 
-    <Network required v-model:planetary="planetary" v-model:wireguard="wireguard" ref="network" />
+    <Network v-model:planetary="planetary" v-model:wireguard="wireguard" ref="network" />
     <input-tooltip
       inline
       tooltip="Click to know more about dedicated nodes."
