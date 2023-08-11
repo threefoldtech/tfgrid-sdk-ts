@@ -27,7 +27,6 @@
       </input-tooltip>
     </input-validator>
 
-    <SelectVmImage :images="images" v-model="flist" />
     <SelectSolutionFlavor
       :minimum="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
       :standard="{ cpu: 4, memory: 1024 * 8, disk: 500 }"
@@ -97,16 +96,12 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const images = [
-  {
-    name: "Nextcloud All-in-One",
-    flist: "https://hub.grid.tf/idrnd.3bot/logismosis-nextcloudaio-latest.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-];
+const flist: Flist = {
+  value: "https://hub.grid.tf/idrnd.3bot/logismosis-nextcloudaio-latest.flist",
+  entryPoint: "/sbin/zinit init",
+};
 
 const name = ref(generateName(8, { prefix: "nc" }));
-const flist = ref<Flist>();
 const ipv4 = ref(true);
 const planetary = ref(true);
 const wireguard = ref(true);
@@ -137,8 +132,8 @@ async function deploy() {
           name: name.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
-          flist: flist.value!.value,
-          entryPoint: flist.value!.entryPoint,
+          flist: flist.value,
+          entryPoint: flist.entryPoint,
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
@@ -148,9 +143,7 @@ async function deploy() {
               mountPoint: "/mnt/next_cloud",
             },
           ],
-          envs: [
-            { key: "SSH_KEY", value: profileManager.profile!.ssh },
-          ],
+          envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
           planetary: planetary.value,
           publicIpv4: ipv4.value,
           rootFilesystemSize: rootFilesystemSize,
@@ -162,7 +155,10 @@ async function deploy() {
     });
 
     layout.value.reloadDeploymentsList();
-    layout.value.setStatus("success", "Successfully deployed a Nextcloud AIO instance.");
+    layout.value.setStatus(
+      "success",
+      "Successfully deployed a Nextcloud AIO instance. Under Actions, click Open Nextcloud. Note: You may need to wait a minute and refresh the page.",
+    );
     layout.value.openDialog(vm, deploymentListEnvironments.vm);
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy Nextcloud."));
@@ -175,7 +171,6 @@ import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectFarmManager from "../components/select_farm_manager.vue";
 import SelectNode from "../components/select_node.vue";
-import SelectVmImage from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { solutionFlavor as SolutionFlavor } from "../types";
 import type { INode } from "../utils/filter_nodes";
@@ -186,7 +181,6 @@ const solution = ref() as Ref<SolutionFlavor>;
 export default {
   name: "TfNextcloud",
   components: {
-    SelectVmImage,
     SelectSolutionFlavor,
     SelectFarm,
     SelectNode,
