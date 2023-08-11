@@ -150,7 +150,6 @@ async function deploy() {
           ],
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
-            { key: "NEXTCLOUD_DOMAIN", value: String(ipv4.value) },
           ],
           planetary: planetary.value,
           publicIpv4: ipv4.value,
