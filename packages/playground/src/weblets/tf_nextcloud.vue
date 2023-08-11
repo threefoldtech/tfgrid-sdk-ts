@@ -97,7 +97,7 @@ const tabs = ref();
 const profileManager = useProfileManager();
 
 const flist: Flist = {
-  value: "https://hub.grid.tf/idrnd.3bot/logismosis-nextcloudaio-latest.flist",
+  value: "https://hub.grid.tf/tf-official-apps/threefoldtech-nextcloudaio-latest.flist",
   entryPoint: "/sbin/zinit init",
 };
 
