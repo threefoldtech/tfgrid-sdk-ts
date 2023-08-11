@@ -35,7 +35,7 @@
       v-model="solution"
     />
 
-    <Network required v-model:ipv4="ipv4" v-model:planetary="planetary" v-model:wireguard="wireguard" ref="network" />
+    <Network required v-model:planetary="planetary" v-model:wireguard="wireguard" ref="network" />
     <input-tooltip
       inline
       tooltip="Click to know more about dedicated nodes."
