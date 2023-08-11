@@ -110,7 +110,7 @@ const network = ref();
 const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
-const rootFilesystemSize = 8;
+const rootFilesystemSize = 40;
 
 async function deploy() {
   layout.value.setStatus("deploy");
