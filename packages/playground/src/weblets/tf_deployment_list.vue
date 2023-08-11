@@ -191,10 +191,10 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
-            tooltip="Visit"
+            tooltip="Open Nextcloud"
             color="white"
             icon="mdi-web"
-            :href="'https://' + item.value[0].env.NEXTCLOUD_DOMAIN + ':8080'"
+            :href="'https://' + item.value[0].publicIP?.ip.slice(0, -3) + ':8080'"
           />
         </template>
 
