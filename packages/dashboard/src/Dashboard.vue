@@ -118,7 +118,7 @@
                     :active="account.active"
                     v-for="subchild in route.children"
                     :key="subchild.label"
-                    :to="subchild.path"
+                    :to="route.prefix + subchild.path"
                     class="white--text pl-16"
                   >
                     <v-list-item-icon>
@@ -238,7 +238,9 @@ export default class Dashboard extends Vue {
       this.$vuetify.theme.dark = true;
       localStorage.setItem("dark_theme", this.$vuetify.theme.dark.toString());
     }
+
     this.$root.$on("selectAccount", async () => {
+      // On selecting an account, should we view the twin details view.
       this.routes[0].active = true;
       this.mini = false;
     });
