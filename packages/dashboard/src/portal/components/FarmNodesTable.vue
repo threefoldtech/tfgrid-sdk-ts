@@ -743,7 +743,7 @@ export default class FarmNodesTable extends Vue {
     const IPv4SegmentFormat = "(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])";
     const IPv4AddressFormat = `(${IPv4SegmentFormat}[.]){3}${IPv4SegmentFormat}`;
     const ipRegex = new RegExp(`^${IPv4AddressFormat}/(1[6-9]|2[0-9]|3[0-2])$`);
-    if (ipRegex.test(this.ip4)) {
+    if (ipRegex.test(this.ip4) && ipaddr.isValid(this.ip4.split("/")[0])) {
       this.ip4ErrorMessage = "";
       if (this.gw4) this.gw4Check();
       return true;
@@ -785,7 +785,7 @@ export default class FarmNodesTable extends Vue {
       this.ip6ErrorMessage = "IP is not public";
       return false;
     }
-    if (ipRegex.test(this.ip6)) {
+    if (ipRegex.test(this.ip6) && ipaddr.isValid(this.ip6.split("/")[0])) {
       this.ip6ErrorMessage = "";
       if (this.gw6) this.gw6Check();
       return true;
@@ -803,7 +803,7 @@ export default class FarmNodesTable extends Vue {
     const IPv4SegmentFormat = "(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])";
     const IPv4AddressFormat = `(${IPv4SegmentFormat}[.]){3}${IPv4SegmentFormat}`;
     const gatewayRegex = new RegExp(`^${IPv4AddressFormat}$`);
-    if (gatewayRegex.test(this.gw4)) {
+    if (gatewayRegex.test(this.gw4) && ipaddr.isValid(this.gw4)) {
       const addr = ipaddr.parse(this.gw4);
       if (!addr.match(ipaddr.parseCIDR(this.ip4))) {
         this.gw4ErrorMessage = "Gateway is not a part of the given IP.";
@@ -821,6 +821,7 @@ export default class FarmNodesTable extends Vue {
     gw6Ref?.validate();
   }
   gw6Check() {
+    if (!ipaddr.isValid(this.ip6.split("/")[0])) return true;
     if (!this.gw6) {
       if (this.ip6) {
         this.gw6ErrorMessage = "This field is required";
@@ -849,7 +850,7 @@ export default class FarmNodesTable extends Vue {
         `(?::((?::${IPv6SegmentFormat}){0,5}:${IPv4AddressFormat}|(?::${IPv6SegmentFormat}){1,7}|:))` +
         ")([0-9a-fA-F]{1})?$",
     );
-    if (gatewayRegex.test(this.gw6)) {
+    if (gatewayRegex.test(this.gw6) && ipaddr.isValid(this.gw6)) {
       const addr = ipaddr.parse(this.gw6);
       if (!addr.match(ipaddr.parseCIDR(this.ip6))) {
         this.gw6ErrorMessage = "Gateway is not a part of the given IP.";
