@@ -431,6 +431,10 @@ export default class TfChainConnector extends Vue {
       name: "accounts",
       path: `/`,
     });
+    this.loginPassword = "";
+    this.password = "";
+    this.password2 = "";
+    this.mnemonic = "";
   }
 
   public close() {
