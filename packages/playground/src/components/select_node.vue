@@ -235,7 +235,7 @@ async function loadNodes(farmId: number) {
   errorMessage.value = "";
   const filters = props.filters;
   farmManager?.setLoading(true);
-  emptyResult.value = false;
+  emptyResult.value = true;
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
     try {
@@ -303,6 +303,7 @@ async function validateNodeStoragePool(grid: GridClient, nodeId: number, disks: 
     errorMessage.value = `Couldn't fit the required disks in Node ${nodeId} storage pools, please select another node`;
     availableNodes.value = availableNodes.value.filter(node => node.nodeId !== nodeId);
     validator.value?.setStatus(ValidatorStatus.Invalid);
+    emptyResult.value = true;
   } finally {
     pingingNode.value = false;
     farmManager?.setLoading(false);
