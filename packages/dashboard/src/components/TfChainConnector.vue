@@ -143,7 +143,7 @@
                       :loading="generatingAccount"
                       class="mt-2 ml-4"
                       text
-                      @click="openAcceptTerms = termsLoading = true"
+                      @click="openTerms"
                     >
                       Generate Account
                     </v-btn>
@@ -209,7 +209,6 @@
         height="95%"
         width="100px"
         sandbox="allow-forms allow-modals allow-scripts allow-popups allow-same-origin "
-        @load="termsLoading = false"
       ></iframe>
       <v-btn @click="generateAccount" v-show="!termsLoading"> accept terms and conditions </v-btn>
       <v-card v-show="termsLoading" :style="{ height: '100%' }">
@@ -465,6 +464,13 @@ export default class TfChainConnector extends Vue {
   public openAcceptTerms = false;
   public generatingAccount = false;
   public termsLoading = false;
+
+  public openTerms() {
+    this.openAcceptTerms = this.termsLoading = true;
+    setTimeout(() => {
+      this.termsLoading = false;
+    }, 2000);
+  }
   public async generateAccount() {
     this.termsLoading = false;
     this.openAcceptTerms = false;
