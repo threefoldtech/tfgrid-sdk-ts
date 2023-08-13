@@ -122,7 +122,7 @@
 
               <v-tooltip bottom>
                 <template #activator="{ on, attrs }">
-                  <div class="d-flex" v-on="on" v-bind="attrs">
+                  <div v-on="on" v-bind="attrs">
                     <v-text-field
                       label="Mnemonic"
                       placeholder="Please insert your mnemonic"
@@ -138,16 +138,6 @@
                       @click:append="showMnemonic = !showMnemonic"
                       :hint="validatingMnemonic ? 'validating...' : null"
                     />
-                    <v-btn
-                      color="primary"
-                      :disabled="connecting || !!mnemonic"
-                      :loading="generatingAccount"
-                      class="mt-2 ml-4"
-                      text
-                      @click="openTerms"
-                    >
-                      Generate Account
-                    </v-btn>
                   </div>
                 </template>
 
@@ -156,6 +146,28 @@
                   existing mnemonic or click the 'Create Account' button to create an account and generate mnemonic.
                 </p>
               </v-tooltip>
+
+              <div class="d-flex justify-end">
+                <v-btn
+                  color="primary"
+                  :disabled="!canActivateMnemonic"
+                  :loading="connecting && canActivateMnemonic"
+                  class="mt-2 ml-4"
+                  text
+                  @click="openTerms"
+                >
+                  Activate Account
+                </v-btn>
+                <v-btn
+                  :disabled="(!mnemonicError && !!mnemonic) || canActivateMnemonic"
+                  :loading="generatingAccount"
+                  class="mt-2 ml-4"
+                  text
+                  @click="openTerms"
+                >
+                  Generate Account
+                </v-btn>
+              </div>
 
               <v-tooltip bottom>
                 <template #activator="{ on, attrs }">
@@ -191,7 +203,7 @@
                   color="primary"
                   :disabled="!isValidForm || isInvalidMnemonic"
                   type="submit"
-                  :loading="connecting"
+                  :loading="connecting && !canActivateMnemonic"
                 >
                   Connect
                 </v-btn>
@@ -218,24 +230,13 @@
         width="100px"
         sandbox="allow-forms allow-modals allow-scripts allow-popups allow-same-origin "
       ></iframe>
-      <v-btn @click="activateAccountModal ? activateAccount() : generateAccount()" v-show="!termsLoading">
+      <v-btn @click="canActivateMnemonic ? activateAccount() : generateAccount()" v-show="!termsLoading">
         accept terms and conditions
       </v-btn>
       <v-card v-show="termsLoading" :style="{ height: '100%' }">
         <v-card-text class="d-flex justify-center align-center" :style="{ height: '100%' }">
           <v-progress-circular indeterminate color="primary" />
         </v-card-text>
-      </v-card>
-    </v-dialog>
-
-    <v-dialog v-model="activateAccountModal" width="500">
-      <v-card>
-        <v-card-title>Activate Your Account</v-card-title>
-        <v-card-text> Do you want to activate your account? </v-card-text>
-        <v-card-actions class="d-flex justify-end">
-          <v-btn color="error" text @click="activateAccountModal = false">No</v-btn>
-          <v-btn color="success" text @click="openAcceptTerms = true">Yes</v-btn>
-        </v-card-actions>
       </v-card>
     </v-dialog>
   </section>
@@ -319,8 +320,12 @@ export default class TfChainConnector extends Vue {
     return !this.mnemonic || this.validatingMnemonic || this.mnemonicError !== null;
   }
 
+  get canActivateMnemonic(): boolean {
+    return this.mnemonicError?.toLowerCase().includes("couldn't find a user for the provided mnemonic") ?? false;
+  }
+
   @Watch("mnemonic")
-  async checkMnemonic(mnemonic: string) {
+  async checkMnemonic(mnemonic: string = this.mnemonic) {
     this.validatingMnemonic = true;
     this.mnemonicError = null;
 
@@ -447,8 +452,8 @@ export default class TfChainConnector extends Vue {
     this.activateAccountError = "";
     try {
       await activeAccountTwin(this.mnemonic);
+      await this.checkMnemonic();
       this.connecting = false;
-      this.connect();
     } catch (e) {
       this.activateAccountError = (e as any).message;
       this.connecting = false;
