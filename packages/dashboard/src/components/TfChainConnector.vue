@@ -35,7 +35,7 @@
         <v-card-title>Connect your TFChain Wallet</v-card-title>
         <v-card-subtitle>
           Please visit
-          <a href="https://manual.grid.tf/weblets/weblets_profile_manager.html" target="_blank">the manual</a> get
+          <a href="https://manual.grid.tf/dashboard/dashboard.html#tfchain-wallet" target="_blank">the manual</a> get
           started.
         </v-card-subtitle>
         <v-divider />
@@ -86,7 +86,7 @@
           </v-tabs>
 
           <v-container class="pt-5" v-if="tab === 0 && canLogin">
-            <v-form v-model="isValidForm" @submit.prevent="login">
+            <v-form ref="login" v-model="isValidForm" @submit.prevent="login">
               <v-alert type="warning" text>
                 You will need to provide the password used while connecting your wallet.
               </v-alert>
@@ -109,7 +109,12 @@
           </v-container>
 
           <v-container class="pt-5" v-else>
-            <v-form v-model="isValidForm" :disabled="connecting || generatingAccount" @submit.prevent="connect">
+            <v-form
+              ref="connect"
+              v-model="isValidForm"
+              :disabled="connecting || generatingAccount"
+              @submit.prevent="connect"
+            >
               <v-alert type="warning" text>
                 To connect your wallet, you will need to enter your mnemonic which will be encrypted using the password.
                 Mnemonic will never be shared outside of this device.
@@ -134,7 +139,7 @@
                     />
                     <v-btn
                       color="primary"
-                      :disabled="connecting"
+                      :disabled="connecting || !!mnemonic"
                       :loading="generatingAccount"
                       class="mt-2 ml-4"
                       text
@@ -189,7 +194,7 @@
         <v-divider />
         <v-card-actions class="d-flex justify-end">
           <v-btn color="error" outlined v-if="$store.state.profile" @click="logout">Logout</v-btn>
-          <v-btn color="error" text @click="show = false">Close</v-btn>
+          <v-btn color="error" text @click="close">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -298,6 +303,13 @@ export default class TfChainConnector extends Vue {
     }
   }
 
+  @Watch("$store.state.credentials.balance", { deep: true })
+  async balanceWatcher$(profile: any) {
+    if (profile) {
+      this.balance = this.$store.state.credentials.balance;
+    }
+  }
+
   /* Validation */
   private _confirmPasswordUpdated = false;
   public readonly mnemonicRules = [
@@ -323,7 +335,7 @@ export default class TfChainConnector extends Vue {
   }
   public validateConfirmPassword(value: string) {
     this._confirmPasswordUpdated = true;
-    if (!value) return "A confirmation password is required.";
+    if (!value && this.password) return "A confirmation password is required.";
     if (value !== this.password) return "Passwords should match.";
     return true;
   }
@@ -436,6 +448,16 @@ export default class TfChainConnector extends Vue {
       name: "accounts",
       path: `/`,
     });
+  }
+
+  public close() {
+    this.show = false;
+    this.clearFields();
+  }
+
+  public clearFields() {
+    (this.$refs.login as any)?.reset();
+    (this.$refs.connect as any)?.reset();
   }
 
   /* SSH */

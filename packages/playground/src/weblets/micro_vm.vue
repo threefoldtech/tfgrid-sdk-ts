@@ -89,7 +89,7 @@
               memory: solution?.memory,
               ipv4: ipv4,
               ipv6: ipv4,
-              disks: disks,
+              diskSizes: disks.map(disk => disk.size),
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
@@ -202,6 +202,11 @@ const images = [
   {
     name: "Ubuntu-22.04",
     flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
+    entryPoint: "/sbin/zinit init",
+  },
+  {
+    name: "Debian-12",
+    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-debian-12.flist",
     entryPoint: "/sbin/zinit init",
   },
   {

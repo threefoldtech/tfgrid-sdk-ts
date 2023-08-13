@@ -90,7 +90,7 @@
               cpu,
               memory,
               ipv4: ipv4,
-              disks: [{ size: rootFilesystemSize, mountPoint: '/' }],
+              diskSizes: [],
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"

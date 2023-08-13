@@ -62,7 +62,7 @@
       <template #title> Connect your TFChain Wallet </template>
       <template #subtitle>
         Please visit
-        <a class="app-link" href="https://manual.grid.tf/weblets/weblets_profile_manager.html" target="_blank">
+        <a class="app-link" href="https://manual.grid.tf/playground/wallet_connector.html" target="_blank">
           the manual
         </a>
         get started.
@@ -120,7 +120,7 @@
                           class="mt-2 ml-3"
                           color="secondary"
                           variant="tonal"
-                          :disabled="isValidForm"
+                          :disabled="isValidForm || !!mnemonic"
                           :loading="creatingAccount"
                           @click="openAcceptTerms = termsLoading = true"
                         >

@@ -74,7 +74,7 @@
               :filters="{
                 cpu: solution?.cpu,
                 memory: solution?.memory,
-                ssd: solution?.disk + rootFilesystemSize,
+                ssd: (solution?.disk ?? 0) + rootFilesystemSize,
                 publicIp: ipv4,
                 rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
                 certified: certified,
@@ -89,7 +89,7 @@
                 farmId: farm?.farmID,
                 cpu: solution?.cpu,
                 memory: solution?.memory,
-                disks: [{ size: solution?.disk, mountPoint: '/data' }],
+                diskSizes: [solution?.disk],
                 rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
                 certified: certified,
               }"
