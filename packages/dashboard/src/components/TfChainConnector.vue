@@ -291,7 +291,7 @@ export default class TfChainConnector extends Vue {
   public mnemonicError: null | string = null;
 
   get isInvalidMnemonic(): boolean {
-    return this.validatingMnemonic || this.mnemonicError !== null;
+    return !this.mnemonic || this.validatingMnemonic || this.mnemonicError !== null;
   }
 
   @Watch("mnemonic")
