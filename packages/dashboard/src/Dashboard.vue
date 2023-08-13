@@ -304,7 +304,6 @@ export default class Dashboard extends Vue {
   }
 
   public redirectToHomePage() {
-    this.accounts.map(account => (account.active = false));
     if (this.$route.path !== "/") {
       this.$router.push({
         name: "accounts",
@@ -323,7 +322,7 @@ export default class Dashboard extends Vue {
       //label and path will be retrieved from accounts fetched from store (polkadot)
       label: "Portal",
       icon: "account-convert-outline",
-      prefix: "/",
+      prefix: "/portal/",
       active: this.mini ? false : true,
       children: [
         {
