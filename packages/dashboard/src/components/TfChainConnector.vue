@@ -409,7 +409,6 @@ export default class TfChainConnector extends Vue {
       this.$router.push({
         name: "account",
         path: "account",
-        params: { accountID: `${this.$store.state.profile.address}` },
       });
     } catch (e) {
       console.log("error", e);

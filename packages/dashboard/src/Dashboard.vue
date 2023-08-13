@@ -104,8 +104,7 @@
                 </v-list-item-title>
               </v-list-item-content>
             </template>
-
-            <div v-if="route.prefix === '/'">
+            <div v-if="route.prefix === '/portal/'">
               <template v-if="!$store.state.credentials.initialized">
                 <div class="mt-4">
                   <v-alert color="rgb(25, 130, 177)" dense type="info">
