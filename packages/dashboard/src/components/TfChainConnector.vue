@@ -85,7 +85,7 @@
             <v-tab>Connect Your Wallet</v-tab>
           </v-tabs>
 
-          <v-container class="pt-5" v-if="tab === 0 && canLogin">
+          <v-container class="pt-5" v-show="tab === 0 && canLogin">
             <v-form ref="login" v-model="isValidForm" @submit.prevent="login">
               <v-alert type="warning" text>
                 You will need to provide the password used while connecting your wallet.
@@ -108,7 +108,7 @@
             </v-form>
           </v-container>
 
-          <v-container class="pt-5" v-else>
+          <v-container class="pt-5" v-show="!(tab === 0 && canLogin)">
             <v-form
               ref="connect"
               v-model="isValidForm"
