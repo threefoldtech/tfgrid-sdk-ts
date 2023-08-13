@@ -426,6 +426,7 @@
 <script lang="ts">
 import { QueryClient } from "@threefold/tfchain_client";
 import { Decimal } from "decimal.js";
+import ipaddr from "ipaddr.js";
 import jsPDF from "jspdf";
 import { default as PrivateIp } from "private-ip";
 import { Component, Prop, Vue } from "vue-property-decorator";
@@ -801,6 +802,11 @@ export default class FarmNodesTable extends Vue {
     const IPv4AddressFormat = `(${IPv4SegmentFormat}[.]){3}${IPv4SegmentFormat}`;
     const gatewayRegex = new RegExp(`^${IPv4AddressFormat}$`);
     if (gatewayRegex.test(this.gw4)) {
+      const addr = ipaddr.parse(this.gw4);
+      if (!addr.match(ipaddr.parseCIDR(this.ip4))) {
+        this.gw4ErrorMessage = "Gateway is not a part of the given IP.";
+        return false;
+      }
       this.gw4ErrorMessage = "";
       return true;
     } else {
@@ -841,7 +847,13 @@ export default class FarmNodesTable extends Vue {
         `(?::((?::${IPv6SegmentFormat}){0,5}:${IPv4AddressFormat}|(?::${IPv6SegmentFormat}){1,7}|:))` +
         ")([0-9a-fA-F]{1})?$",
     );
+    console.log(ipaddr.isValid(this.ip6));
     if (gatewayRegex.test(this.gw6)) {
+      const addr = ipaddr.parse(this.gw6);
+      if (!addr.match(ipaddr.parseCIDR(this.ip6))) {
+        this.gw6ErrorMessage = "Gateway is not a part of the given IP.";
+        return false;
+      }
       this.gw6ErrorMessage = "";
       return true;
     } else {
