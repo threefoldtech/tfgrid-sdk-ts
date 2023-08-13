@@ -745,6 +745,7 @@ export default class FarmNodesTable extends Vue {
     const ipRegex = new RegExp(`^${IPv4AddressFormat}/(1[6-9]|2[0-9]|3[0-2])$`);
     if (ipRegex.test(this.ip4)) {
       this.ip4ErrorMessage = "";
+      if (this.gw4) this.gw4Check();
       return true;
     } else {
       this.ip4ErrorMessage = "IP address is not formatted correctly";
@@ -786,6 +787,7 @@ export default class FarmNodesTable extends Vue {
     }
     if (ipRegex.test(this.ip6)) {
       this.ip6ErrorMessage = "";
+      if (this.gw6) this.gw6Check();
       return true;
     } else {
       this.ip6ErrorMessage = "IPV6 address is not formatted correctly";
@@ -847,7 +849,6 @@ export default class FarmNodesTable extends Vue {
         `(?::((?::${IPv6SegmentFormat}){0,5}:${IPv4AddressFormat}|(?::${IPv6SegmentFormat}){1,7}|:))` +
         ")([0-9a-fA-F]{1})?$",
     );
-    console.log(ipaddr.isValid(this.ip6));
     if (gatewayRegex.test(this.gw6)) {
       const addr = ipaddr.parse(this.gw6);
       if (!addr.match(ipaddr.parseCIDR(this.ip6))) {
