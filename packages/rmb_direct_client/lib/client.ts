@@ -103,6 +103,15 @@ class Client {
       await this.createSigner();
       const twinId = await this.tfclient.twins.getTwinIdByAccountId({ accountId: this.signer.address });
       this.twin = await this.tfclient.twins.get({ id: twinId });
+      if (!twinId) {
+        throw new Error({ message: `Couldn't find a user for the provided mnemonic on this network.` });
+      }
+    } catch (e) {
+      console.log(e);
+      throw new Error({ message: `Couldn't find a user for the provided mnemonic on this network.` });
+    }
+
+    try {
       if (!this.twin) {
         throw new Error({ message: "twin does not exist, please create a twin first" });
       }
