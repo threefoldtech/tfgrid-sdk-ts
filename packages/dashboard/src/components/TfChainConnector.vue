@@ -282,6 +282,10 @@ export default class TfChainConnector extends Vue {
   public canLogin = typeof localStorage.getItem(key) === "string";
 
   public balance: any | null = null;
+  @Watch("show")
+  showWatcher$(show: boolean) {
+    if (!show) this.clearFields();
+  }
   @Watch("$store.state.profile")
   async profileWatcher$(profile: any) {
     if (profile) {
@@ -431,7 +435,6 @@ export default class TfChainConnector extends Vue {
 
   public close() {
     this.show = false;
-    this.clearFields();
   }
 
   public clearFields() {
