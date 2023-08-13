@@ -125,7 +125,6 @@
                   <div class="d-flex" v-on="on" v-bind="attrs">
                     <v-text-field
                       label="Mnemonic"
-                      :rules="mnemonicRules"
                       placeholder="Please insert your mnemonic"
                       :error-messages="mnemonicError || activateAccountError"
                       :value="mnemonic"
@@ -137,6 +136,7 @@
                       :type="showMnemonic ? 'text' : 'password'"
                       :append-icon="showMnemonic ? 'mdi-eye-outline' : 'mdi-eye-off-outline'"
                       @click:append="showMnemonic = !showMnemonic"
+                      :hint="validatingMnemonic ? 'validating...' : null"
                     />
                     <v-btn
                       color="primary"
@@ -144,7 +144,7 @@
                       :loading="generatingAccount"
                       class="mt-2 ml-4"
                       text
-                      @click="openAcceptTerms = termsLoading = true"
+                      @click="openTerms"
                     >
                       Generate Account
                     </v-btn>
@@ -187,7 +187,14 @@
               />
 
               <div class="d-flex justify-center">
-                <v-btn color="primary" :disabled="!isValidForm" type="submit" :loading="connecting"> Connect </v-btn>
+                <v-btn
+                  color="primary"
+                  :disabled="!isValidForm || isInvalidMnemonic"
+                  type="submit"
+                  :loading="connecting"
+                >
+                  Connect
+                </v-btn>
               </div>
             </v-form>
           </v-container>
@@ -210,7 +217,6 @@
         height="95%"
         width="100px"
         sandbox="allow-forms allow-modals allow-scripts allow-popups allow-same-origin "
-        @load="termsLoading = false"
       ></iframe>
       <v-btn @click="activateAccountModal ? activateAccount() : generateAccount()" v-show="!termsLoading">
         accept terms and conditions
@@ -304,10 +310,38 @@ export default class TfChainConnector extends Vue {
   public canLogin = typeof localStorage.getItem(key) === "string";
 
   public balance: any | null = null;
+  public twinID: any;
+
+  public validatingMnemonic = false;
+  public mnemonicError: null | string = null;
+
+  get isInvalidMnemonic(): boolean {
+    return !this.mnemonic || this.validatingMnemonic || this.mnemonicError !== null;
+  }
+
+  @Watch("mnemonic")
+  async checkMnemonic(mnemonic: string) {
+    this.validatingMnemonic = true;
+    this.mnemonicError = null;
+
+    if (!mnemonic) this.mnemonicError = "Mnemonic is required.";
+    else if (!validateMnemonic(mnemonic)) this.mnemonicError = "Mnemonic doesn't seem to be valid.";
+    else {
+      try {
+        await getGrid(mnemonic);
+      } catch (err) {
+        this.mnemonicError = (err as any).message || "Couldn't connect to chain using the provided mnemonic.";
+      }
+    }
+
+    this.validatingMnemonic = false;
+  }
+
   @Watch("$store.state.profile")
   async profileWatcher$(profile: any) {
     if (profile) {
       const grid = await getGrid(profile.mnemonic);
+
       this.balance = await loadBalance(grid);
     }
   }
@@ -321,10 +355,7 @@ export default class TfChainConnector extends Vue {
 
   /* Validation */
   private _confirmPasswordUpdated = false;
-  public readonly mnemonicRules = [
-    (value: string) => (value ? true : "Mnemonic is required."),
-    (value: string) => (validateMnemonic(value) ? true : "Mnemonic doesn't seem to be valid."),
-  ];
+
   public validatePassword(value: string) {
     if (this._confirmPasswordUpdated) {
       (this.$refs.confirmPassword as any).validate();
@@ -351,7 +382,6 @@ export default class TfChainConnector extends Vue {
 
   /* Connection */
   public connecting = false;
-  public mnemonicError: null | string = null;
   public async connect() {
     this.connecting = true;
     try {
@@ -510,6 +540,13 @@ export default class TfChainConnector extends Vue {
   public openAcceptTerms = false;
   public generatingAccount = false;
   public termsLoading = false;
+
+  public openTerms() {
+    this.openAcceptTerms = this.termsLoading = true;
+    setTimeout(() => {
+      this.termsLoading = false;
+    }, 2000);
+  }
   public async generateAccount() {
     this.termsLoading = false;
     this.openAcceptTerms = false;

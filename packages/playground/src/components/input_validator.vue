@@ -41,6 +41,7 @@ export default {
     },
     validMessage: String,
     hint: String,
+    disableValidation: Boolean,
   },
   emits: {
     "update:modelValue": (valid: boolean) => valid,
@@ -104,6 +105,22 @@ export default {
         debouncedValidate(value);
       },
       { immediate: true },
+    );
+
+    watch(
+      () => props.disableValidation,
+      (disabled, wasDisabled) => {
+        const isEnabled = !disabled;
+        const wasEnabled = !wasDisabled;
+
+        if (disabled && wasEnabled) {
+          form?.unregister(uid);
+          error.value = null;
+          setStatus(ValidatorStatus.Valid);
+        }
+
+        if (wasDisabled && isEnabled) validate();
+      },
     );
 
     const blured = ref(false);
