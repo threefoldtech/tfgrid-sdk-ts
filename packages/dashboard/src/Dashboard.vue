@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-v-text-v-html-on-component -->
 <template>
   <v-app>
     <div>
@@ -185,8 +186,6 @@ import TfChainConnector from "./components/TfChainConnector.vue";
 import FundsCard from "./portal/components/FundsCard.vue";
 import TftSwapPrice from "./portal/components/TftSwapPrice.vue";
 import { connect } from "./portal/lib/connect";
-import { MutationTypes } from "./portal/store/mutations";
-import { accountInterface } from "./portal/store/state";
 
 interface SidenavItem {
   label: string;
@@ -220,7 +219,6 @@ export default class Dashboard extends Vue {
   mini = true;
   drawer = true;
   $api: any;
-  accounts: accountInterface[] = [];
   loadingAPI = true;
   version = config.version;
 
@@ -265,10 +263,6 @@ export default class Dashboard extends Vue {
     if (this.$route.name !== "accounts" && !this.filteredAccounts().length && route.label === "Portal") {
       return this.redirectToHomePage();
     }
-  }
-
-  async updated() {
-    this.accounts = this.$store.state.portal.accounts;
   }
 
   async unmounted() {
