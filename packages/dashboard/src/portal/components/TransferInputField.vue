@@ -11,7 +11,9 @@
 </template>
 
 <script lang="ts">
-export default {
+import { defineComponent } from "vue";
+
+export default defineComponent({
   props: {
     amount: {
       type: [String, Number],
@@ -48,5 +50,5 @@ export default {
       this.$emit("input", value);
     },
   },
-};
+});
 </script>
