@@ -5,7 +5,9 @@
       class="mb-2"
       type="warning"
       variant="tonal"
-      v-if="!loadingNodes && selectedNode === undefined && emptyResult && props.filters.rentedBy"
+      v-if="
+        !loadingNodes && selectedNode === undefined && emptyResult && props.filters.rentedBy && !props.filters.farmId
+      "
     >
       You have no rented nodes that match your selected resources. Please try changing your selected resources or rent a
       node that matches your requirements.
@@ -258,7 +260,17 @@ async function loadNodes(farmId: number) {
       }
 
       if (res?.length > 0 && props.filters.rentedBy) {
-        selectedNode.value = res[0];
+        nodesArr.value = [];
+        for (const node of res) {
+          if (!nodesArr.value.some(n => n.nodeId === node.nodeId)) {
+            nodesArr.value.push({
+              nodeId: node.nodeId,
+              state: node.rentedByTwinId ? "Dedicated" : "Shared",
+            });
+          }
+        }
+        availableNodes.value = nodesArr.value;
+        selectedNode.value = undefined;
         emptyResult.value = false;
         loadingNodes.value = false;
         return;
