@@ -257,6 +257,13 @@ async function loadNodes(farmId: number) {
         return;
       }
 
+      if (res?.length > 0 && props.filters.rentedBy) {
+        selectedNode.value = res[0];
+        emptyResult.value = false;
+        loadingNodes.value = false;
+        return;
+      }
+
       if (res) {
         nodesArr.value = [];
         for (const node of res) {
