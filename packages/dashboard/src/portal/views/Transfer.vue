@@ -30,7 +30,7 @@
                 <span class="fee">0.01 transaction fee will be deducted</span>
               </v-form>
               <TransferFormButtons
-                :isTransferValid="isValidTwinIDTransfer"
+                :isTransferValid="isValidTwinIDTransfer && !twinIDErrorMessage && !!receptinTwinId"
                 :loadingTransfer="loadingTransfer"
                 @submit="transferTFTWithTwinID"
                 @clear="clearInputValues"
@@ -141,21 +141,12 @@ export default class TransferView extends Vue {
       });
       try {
         const twinDetailsPromise = this.queryClient.twins.get({ id: parseInt(this.receptinTwinId) });
-        Promise.race([twinDetailsPromise, timeoutPromise]).then(twinDetails => {
-          if (twinDetails) {
-            this.isValidTwinIDTransfer = true;
-            this.twinIDErrorMessage = "";
-            return this.isValidTwinIDTransfer;
-          } else {
-            this.isValidTwinIDTransfer = false;
-            this.twinIDErrorMessage = "Twin ID doesn't exist";
-            return this.isValidTwinIDTransfer;
-          }
-        });
+        const twinDetails = await Promise.race([twinDetailsPromise, timeoutPromise]);
+        if (!twinDetails) {
+          this.twinIDErrorMessage = "Twin ID doesn't exist";
+        }
       } catch (error) {
-        this.isValidTwinIDTransfer = false;
         this.twinIDErrorMessage = "Twin ID doesn't exist";
-        return this.isValidTwinIDTransfer;
       }
     }
     this.validatingTwinId = false;
