@@ -572,8 +572,9 @@ class FilterOptions {
 }
 
 enum CertificationType {
-  Diy = "Diy",
-  Certified = "Certified",
+  NotCertified = "NotCertified",
+  Silver = "Silver",
+  Gold = "Gold",
 }
 
 class FarmFilterOptions {

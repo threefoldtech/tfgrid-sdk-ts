@@ -375,16 +375,17 @@ class Nodes {
       node_free_sru: Math.ceil(this._g2b(options.nodeSRU)) || "",
       node_free_hru: Math.ceil(this._g2b(options.nodeHRU)) || "",
       free_ips: options.publicIp ? 1 : "",
-      certification_type: options.nodeCertified ? "Certified" : "",
+      certification_type: options.certificationType,
       farm_name: options.farmName,
       country: options.country,
       dedicated: options.dedicated,
-      available_for: options.availableFor,
+      node_available_for: options.availableFor,
       node_status: "up",
       page: options.page,
       size: options.size,
       node_has_gpu: options.nodeHasGPU,
       node_rented_by: options.nodeRentedBy,
+      node_certified: options.nodeCertified,
     };
     return Object.entries(params)
       .map(param => param.join("="))
