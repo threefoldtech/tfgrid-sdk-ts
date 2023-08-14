@@ -259,23 +259,6 @@ async function loadNodes(farmId: number) {
         return;
       }
 
-      if (res?.length > 0 && props.filters.rentedBy) {
-        nodesArr.value = [];
-        for (const node of res) {
-          if (!nodesArr.value.some(n => n.nodeId === node.nodeId)) {
-            nodesArr.value.push({
-              nodeId: node.nodeId,
-              state: node.rentedByTwinId ? "Dedicated" : "Shared",
-            });
-          }
-        }
-        availableNodes.value = nodesArr.value;
-        selectedNode.value = undefined;
-        emptyResult.value = false;
-        loadingNodes.value = false;
-        return;
-      }
-
       if (res) {
         nodesArr.value = [];
         for (const node of res) {
