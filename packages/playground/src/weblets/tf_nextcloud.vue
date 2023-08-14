@@ -49,13 +49,13 @@
       </p>
 
       <p class="font-weight-bold mt-4">
-        For more information, make sure to visit the
+        For more information, read the
         <a
           target="_blank"
           href="https://www.manual.grid.tf/terraform/advanced/terraform_nextcloud_aio.html"
           :style="{ color: 'inherit' }"
         >
-          Quick start documentation</a
+          documentation</a
         >.
       </p>
     </v-alert>
