@@ -264,6 +264,7 @@
                 required
                 outlined
                 dense
+                ref="gw4Ref"
                 hint="Gateway for the IP in ipv4 format"
                 persistent-hint
                 type="string"
@@ -745,7 +746,7 @@ export default class FarmNodesTable extends Vue {
     const ipRegex = new RegExp(`^${IPv4AddressFormat}/(1[6-9]|2[0-9]|3[0-2])$`);
     if (ipRegex.test(this.ip4) && ipaddr.isValid(this.ip4.split("/")[0])) {
       this.ip4ErrorMessage = "";
-      if (this.gw4) this.gw4Check();
+      if (this.gw4) (this.$refs.gw4Ref as unknown as { validate(): void }).validate();
       return true;
     } else {
       this.ip4ErrorMessage = "IP address is not formatted correctly";
@@ -795,7 +796,7 @@ export default class FarmNodesTable extends Vue {
     }
   }
   gw4Check() {
-    if (!this.gw4) return true;
+    if (!this.gw4 || !ipaddr.isValid(this.ip4.split("/")[0])) return true;
     if (PrivateIp(this.gw4.split("/")[0])) {
       this.gw4ErrorMessage = "Gateway is not public";
       return false;
