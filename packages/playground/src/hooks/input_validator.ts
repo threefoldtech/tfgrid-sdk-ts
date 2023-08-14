@@ -6,6 +6,8 @@ export interface InputValidatorService {
   validate(): Promise<boolean>;
   setStatus(newStatus: ValidatorStatus): void;
   reset(): void;
+  status: ValidatorStatus;
+  error: string | null;
 }
 
 export function useInputRef(isArray: true): Ref<InputValidatorService[]>;

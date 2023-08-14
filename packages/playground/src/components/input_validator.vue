@@ -138,6 +138,8 @@ export default {
         setStatus(ValidatorStatus.Init);
         error.value = null;
       },
+      status: status as unknown as ValidatorStatus,
+      error: error as unknown as string | null,
     };
     onMounted(() => form?.register(uid, obj));
     onUnmounted(() => form?.unregister(uid));
