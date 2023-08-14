@@ -44,7 +44,7 @@
 
     <v-alert type="warning" variant="tonal" class="mb-6">
       <p :style="{ maxWidth: '880px' }">
-        You will need to add an A record (Host: "@", Value: &lt;VM_IP_Address &gt;) for this domain after deployment.
+        You will need to add an A record (Host: "@", Value: &lt;VM_IP_Address&gt;) for this domain after deployment.
         Otherwise, you won't be able to access the Nextcloud AIO instance using this domain.
       </p>
 
