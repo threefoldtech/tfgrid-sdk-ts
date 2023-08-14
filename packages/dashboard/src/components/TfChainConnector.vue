@@ -371,6 +371,7 @@ export default class TfChainConnector extends Vue {
         }),
       );
       sessionStorage.setItem(key, this.password);
+
       this.$store.commit("SET_CREDENTIALS", {
         api: this.$api,
         account: {
@@ -383,11 +384,11 @@ export default class TfChainConnector extends Vue {
           active: true,
         },
       });
+
       this.$root.$emit("selectAccount");
       this.$router.push({
         name: "account",
-        path: "account",
-        params: { accountID: `${this.$store.state.profile.address}` },
+        path: "/portal/account-twin",
       });
     } catch (error) {
       this.mnemonicError = (error as any).message || "Failed to Mnemonic on grid.";
@@ -432,11 +433,11 @@ export default class TfChainConnector extends Vue {
           active: true,
         },
       });
+
       this.$root.$emit("selectAccount");
       this.$router.push({
         name: "account",
-        path: "account",
-        params: { accountID: `${this.$store.state.profile.address}` },
+        path: "/portal/account-twin",
       });
     } catch (e) {
       console.log("error", e);

@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-v-text-v-html-on-component -->
 <template>
   <v-app>
     <div>
@@ -103,8 +104,7 @@
                 </v-list-item-title>
               </v-list-item-content>
             </template>
-
-            <div v-if="route.prefix === '/'">
+            <div v-if="route.prefix === '/portal/'">
               <template v-if="!$store.state.credentials.initialized">
                 <div class="mt-4">
                   <v-alert color="rgb(25, 130, 177)" dense type="info">
@@ -118,7 +118,7 @@
                     :active="account.active"
                     v-for="subchild in route.children"
                     :key="subchild.label"
-                    :to="subchild.path"
+                    :to="route.prefix + subchild.path"
                     class="white--text pl-16"
                   >
                     <v-list-item-icon>
@@ -185,8 +185,6 @@ import TfChainConnector from "./components/TfChainConnector.vue";
 import FundsCard from "./portal/components/FundsCard.vue";
 import TftSwapPrice from "./portal/components/TftSwapPrice.vue";
 import { connect } from "./portal/lib/connect";
-import { MutationTypes } from "./portal/store/mutations";
-import { accountInterface } from "./portal/store/state";
 
 interface SidenavItem {
   label: string;
@@ -220,7 +218,6 @@ export default class Dashboard extends Vue {
   mini = true;
   drawer = true;
   $api: any;
-  accounts: accountInterface[] = [];
   loadingAPI = true;
   version = config.version;
 
@@ -241,7 +238,9 @@ export default class Dashboard extends Vue {
       this.$vuetify.theme.dark = true;
       localStorage.setItem("dark_theme", this.$vuetify.theme.dark.toString());
     }
+
     this.$root.$on("selectAccount", async () => {
+      // On selecting an account, should we view the twin details view.
       this.routes[0].active = true;
       this.mini = false;
     });
@@ -265,10 +264,6 @@ export default class Dashboard extends Vue {
     if (this.$route.name !== "accounts" && !this.filteredAccounts().length && route.label === "Portal") {
       return this.redirectToHomePage();
     }
-  }
-
-  async updated() {
-    this.accounts = this.$store.state.portal.accounts;
   }
 
   async unmounted() {
@@ -304,7 +299,6 @@ export default class Dashboard extends Vue {
   }
 
   public redirectToHomePage() {
-    this.accounts.map(account => (account.active = false));
     if (this.$route.path !== "/") {
       this.$router.push({
         name: "accounts",
@@ -323,7 +317,7 @@ export default class Dashboard extends Vue {
       //label and path will be retrieved from accounts fetched from store (polkadot)
       label: "Portal",
       icon: "account-convert-outline",
-      prefix: "/",
+      prefix: "/portal/",
       active: this.mini ? false : true,
       children: [
         {
