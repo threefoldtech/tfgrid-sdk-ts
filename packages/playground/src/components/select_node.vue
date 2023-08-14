@@ -5,7 +5,9 @@
       class="mb-2"
       type="warning"
       variant="tonal"
-      v-if="!loadingNodes && selectedNode === undefined && emptyResult && props.filters.rentedBy"
+      v-if="
+        !loadingNodes && selectedNode === undefined && emptyResult && props.filters.rentedBy && !props.filters.farmId
+      "
     >
       You have no rented nodes that match your selected resources. Please try changing your selected resources or rent a
       node that matches your requirements.
@@ -235,7 +237,6 @@ async function loadNodes(farmId: number) {
   errorMessage.value = "";
   const filters = props.filters;
   farmManager?.setLoading(true);
-  emptyResult.value = false;
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
     try {
@@ -303,6 +304,7 @@ async function validateNodeStoragePool(grid: GridClient, nodeId: number, disks: 
     errorMessage.value = `Couldn't fit the required disks in Node ${nodeId} storage pools, please select another node`;
     availableNodes.value = availableNodes.value.filter(node => node.nodeId !== nodeId);
     validator.value?.setStatus(ValidatorStatus.Invalid);
+    emptyResult.value = true;
   } finally {
     pingingNode.value = false;
     farmManager?.setLoading(false);
