@@ -146,7 +146,7 @@ const profileManager = useProfileManager();
 const contracts = ref<NormalizedContract[]>([]);
 const loading = ref(false);
 const isExporting = ref(false);
-const grid = ref<GridClient>();
+const grid = ref<GridClient | null>();
 const selectedContracts = ref<NormalizedContract[]>([]);
 const headers: VDataTableHeader = [
   { title: "PLACEHOLDER", key: "data-table-select" },
