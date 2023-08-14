@@ -194,7 +194,7 @@
             tooltip="Open Nextcloud"
             color="white"
             icon="mdi-web"
-            :href="'https://' + item.value[0].publicIP?.ip.split('/')[0] + ':8080'"
+            :href="'https://' + item.value[0].env.NEXTCLOUD_DOMAIN + ':8443'"
           />
         </template>
 

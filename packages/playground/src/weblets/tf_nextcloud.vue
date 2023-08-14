@@ -27,6 +27,39 @@
       </input-tooltip>
     </input-validator>
 
+    <input-validator
+      :value="domain"
+      :rules="[
+        validators.required('Domain is required.'),
+        validators.pattern('Please provide a valid domain.', {
+          pattern: /^\b((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\b$/,
+        }),
+      ]"
+      #="{ props }"
+    >
+      <input-tooltip tooltip="Domain name.">
+        <v-text-field label="Domain" v-model="domain" v-bind="props" />
+      </input-tooltip>
+    </input-validator>
+
+    <v-alert type="warning" variant="tonal" class="mb-6">
+      <p :style="{ maxWidth: '880px' }">
+        You will need to add an A record (Host: "@", Value: &lt;VM_IP_Address &gt;) for this domain after deployment.
+        Otherwise, you won't be able to access the Nextcloud AIO instance using this domain.
+      </p>
+
+      <p class="font-weight-bold mt-4">
+        For more information, make sure to visit the
+        <a
+          target="_blank"
+          href="https://www.manual.grid.tf/terraform/advanced/terraform_nextcloud_aio.html"
+          :style="{ color: 'inherit' }"
+        >
+          Quick start documentation</a
+        >.
+      </p>
+    </v-alert>
+
     <SelectSolutionFlavor
       :minimum="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
       :standard="{ cpu: 4, memory: 1024 * 8, disk: 500 }"
@@ -94,6 +127,7 @@ import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
+const domain = ref("");
 const profileManager = useProfileManager();
 
 const flist: Flist = {
@@ -143,7 +177,10 @@ async function deploy() {
               mountPoint: "/mnt/next_cloud",
             },
           ],
-          envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
+          envs: [
+            { key: "SSH_KEY", value: profileManager.profile!.ssh },
+            { key: "NEXTCLOUD_DOMAIN", value: domain.value },
+          ],
           planetary: planetary.value,
           publicIpv4: ipv4.value,
           rootFilesystemSize: rootFilesystemSize,
