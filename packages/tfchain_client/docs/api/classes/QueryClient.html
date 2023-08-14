@@ -22,7 +22,7 @@
 <ul class="tsd-hierarchy">
 <li><a href="Client.html" class="tsd-signature-type" data-tsd-kind="Class">Client</a></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/5def582/packages/tfchain_client/src/client.ts#L31">client.ts:31</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L41">client.ts:41</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -39,7 +39,9 @@
 <a href="QueryClient.html#connectingLock" class="tsd-index-link tsd-kind-property tsd-parent-kind-class tsd-is-private"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>connecting<wbr/>Lock</span></a>
 <a href="QueryClient.html#contracts" class="tsd-index-link tsd-kind-property tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>contracts</span></a>
 <a href="QueryClient.html#farms" class="tsd-index-link tsd-kind-property tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>farms</span></a>
+<a href="QueryClient.html#nodes" class="tsd-index-link tsd-kind-property tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>nodes</span></a>
 <a href="QueryClient.html#pricingPolicies" class="tsd-index-link tsd-kind-property tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>pricing<wbr/>Policies</span></a>
+<a href="QueryClient.html#tftBridge" class="tsd-index-link tsd-kind-property tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>tft<wbr/>Bridge</span></a>
 <a href="QueryClient.html#tftPrice" class="tsd-index-link tsd-kind-property tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>tft<wbr/>Price</span></a>
 <a href="QueryClient.html#twins" class="tsd-index-link tsd-kind-property tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>twins</span></a>
 <a href="QueryClient.html#url" class="tsd-index-link tsd-kind-property tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg><span>url</span></a>
@@ -47,10 +49,13 @@
 </div></section>
 <section class="tsd-index-section">
 <h3 class="tsd-index-heading">Methods</h3>
-<div class="tsd-index-list"><a href="QueryClient.html#checkConnectionAndApply" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-2048-path"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)" id="icon-2048-text"></path></svg><span>check<wbr/>Connection<wbr/>And<wbr/>Apply</span></a>
+<div class="tsd-index-list"><a href="QueryClient.html#checkInputs" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><rect fill="var(--color-icon-background)" stroke="#FF4DB8" stroke-width="1.5" x="1" y="1" width="22" height="22" rx="12" id="icon-2048-path"></rect><path d="M9.162 16V7.24H10.578L11.514 10.072C11.602 10.328 11.674 10.584 11.73 10.84C11.794 11.088 11.842 11.28 11.874 11.416C11.906 11.28 11.954 11.088 12.018 10.84C12.082 10.584 12.154 10.324 12.234 10.06L13.122 7.24H14.538V16H13.482V12.82C13.482 12.468 13.49 12.068 13.506 11.62C13.53 11.172 13.558 10.716 13.59 10.252C13.622 9.78 13.654 9.332 13.686 8.908C13.726 8.476 13.762 8.1 13.794 7.78L12.366 12.16H11.334L9.894 7.78C9.934 8.092 9.97 8.456 10.002 8.872C10.042 9.28 10.078 9.716 10.11 10.18C10.142 10.636 10.166 11.092 10.182 11.548C10.206 12.004 10.218 12.428 10.218 12.82V16H9.162Z" fill="var(--color-text)" id="icon-2048-text"></path></svg><span>check<wbr/>Inputs</span></a>
+<a href="QueryClient.html#checkMethod" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-private"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>check<wbr/>Method</span></a>
+<a href="QueryClient.html#checkSection" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-private"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>check<wbr/>Section</span></a>
 <a href="QueryClient.html#connect" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>connect</span></a>
 <a href="QueryClient.html#disconnect" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>disconnect</span></a>
 <a href="QueryClient.html#disconnectAndExit" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>disconnect<wbr/>And<wbr/>Exit</span></a>
+<a href="QueryClient.html#listenForEvent" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>listen<wbr/>For<wbr/>Event</span></a>
 <a href="QueryClient.html#loadKeyPairOrSigner" class="tsd-index-link tsd-kind-method tsd-parent-kind-class"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>load<wbr/>Key<wbr/>Pair<wbr/>Or<wbr/>Signer</span></a>
 <a href="QueryClient.html#wait" class="tsd-index-link tsd-kind-method tsd-parent-kind-class tsd-is-private"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg><span>wait</span></a>
 </div></section></div></details></section></section>
@@ -68,87 +73,125 @@
 <h5>url: <span class="tsd-signature-type">string</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="QueryClient.html" class="tsd-signature-type" data-tsd-kind="Class">QueryClient</a></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/5def582/packages/tfchain_client/src/client.ts#L41">client.ts:41</a></li></ul></aside></li></ul></section></section>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L53">client.ts:53</a></li></ul></aside></li></ul></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Properties</h2>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class"><a id="api" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>api</span><a href="#api" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">api<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ApiPromise</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/5def582/packages/tfchain_client/src/client.ts#L34">client.ts:34</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L44">client.ts:44</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class"><a id="balances" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>balances</span><a href="#balances" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">balances<span class="tsd-signature-symbol">:</span> <a href="QueryBalances.html" class="tsd-signature-type" data-tsd-kind="Class">QueryBalances</a><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/5def582/packages/tfchain_client/src/client.ts#L36">client.ts:36</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L46">client.ts:46</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private"><a id="connectingLock" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>connecting<wbr/>Lock</span><a href="#connectingLock" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">connecting<wbr/>Lock<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">default</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/5def582/packages/tfchain_client/src/client.ts#L33">client.ts:33</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L43">client.ts:43</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class"><a id="contracts" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>contracts</span><a href="#contracts" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">contracts<span class="tsd-signature-symbol">:</span> <a href="QueryContracts.html" class="tsd-signature-type" data-tsd-kind="Class">QueryContracts</a><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/5def582/packages/tfchain_client/src/client.ts#L35">client.ts:35</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L45">client.ts:45</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class"><a id="farms" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>farms</span><a href="#farms" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">farms<span class="tsd-signature-symbol">:</span> <a href="QueryFarms.html" class="tsd-signature-type" data-tsd-kind="Class">QueryFarms</a><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/5def582/packages/tfchain_client/src/client.ts#L37">client.ts:37</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L47">client.ts:47</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class"><a id="nodes" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>nodes</span><a href="#nodes" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<div class="tsd-signature">nodes<span class="tsd-signature-symbol">:</span> <a href="QueryNodes.html" class="tsd-signature-type" data-tsd-kind="Class">QueryNodes</a><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L52">client.ts:52</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class"><a id="pricingPolicies" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>pricing<wbr/>Policies</span><a href="#pricingPolicies" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">pricing<wbr/>Policies<span class="tsd-signature-symbol">:</span> <a href="QueryPricingPolicies.html" class="tsd-signature-type" data-tsd-kind="Class">QueryPricingPolicies</a><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/5def582/packages/tfchain_client/src/client.ts#L39">client.ts:39</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L50">client.ts:50</a></li></ul></aside></section>
+<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class"><a id="tftBridge" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>tft<wbr/>Bridge</span><a href="#tftBridge" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<div class="tsd-signature">tft<wbr/>Bridge<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">QueryTFTBridge</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L48">client.ts:48</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class"><a id="tftPrice" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>tft<wbr/>Price</span><a href="#tftPrice" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">tft<wbr/>Price<span class="tsd-signature-symbol">:</span> <a href="QueryTFTPrice.html" class="tsd-signature-type" data-tsd-kind="Class">QueryTFTPrice</a><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/5def582/packages/tfchain_client/src/client.ts#L38">client.ts:38</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L49">client.ts:49</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class"><a id="twins" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>twins</span><a href="#twins" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">twins<span class="tsd-signature-symbol">:</span> <a href="QueryTwins.html" class="tsd-signature-type" data-tsd-kind="Class">QueryTwins</a><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/5def582/packages/tfchain_client/src/client.ts#L40">client.ts:40</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L51">client.ts:51</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class"><a id="url" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>url</span><a href="#url" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">url<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/5def582/packages/tfchain_client/src/client.ts#L41">client.ts:41</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L53">client.ts:53</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class"><a id="connections" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>connections</span><a href="#connections" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <div class="tsd-signature">connections<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">ApiPromise</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = ...</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/5def582/packages/tfchain_client/src/client.ts#L32">client.ts:32</a></li></ul></aside></section></section>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L42">client.ts:42</a></li></ul></aside></section></section>
 <section class="tsd-panel-group tsd-member-group">
 <h2>Methods</h2>
-<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="checkConnectionAndApply" class="tsd-anchor"></a>
-<h3 class="tsd-anchor-link"><span>check<wbr/>Connection<wbr/>And<wbr/>Apply</span><a href="#checkConnectionAndApply" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="checkInputs" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>check<wbr/>Inputs</span><a href="#checkInputs" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-<li class="tsd-signature tsd-anchor-link" id="checkConnectionAndApply.checkConnectionAndApply-1">check<wbr/>Connection<wbr/>And<wbr/>Apply<span class="tsd-signature-symbol">(</span>func<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span>, args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><a href="#checkConnectionAndApply.checkConnectionAndApply-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="checkInputs.checkInputs-1">check<wbr/>Inputs<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><a href="#checkInputs.checkInputs-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
 <li class="tsd-description">
-<div class="tsd-parameters">
-<h4 class="tsd-parameters-title">Parameters</h4>
-<ul class="tsd-parameter-list">
-<li>
-<h5>func: <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span></h5>
-<ul class="tsd-parameters">
-<li class="tsd-parameter-signature">
-<ul class="tsd-signatures tsd-kind-type-literal">
-<li class="tsd-signature"><span class="tsd-signature-symbol">(</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span></li>
-<li class="tsd-description">
-<div class="tsd-parameters">
-<h4 class="tsd-parameters-title">Parameters</h4>
-<ul class="tsd-parameter-list">
-<li>
-<h5>args: <span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">[]</span></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">unknown</span></h4></li></ul></li></ul></li>
-<li>
-<h5>args: <span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">[]</span></h5></li></ul></div>
-<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/5def582/packages/tfchain_client/src/client.ts#L109">client.ts:109</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L56">client.ts:56</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private"><a id="checkMethod" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>check<wbr/>Method</span><a href="#checkMethod" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+<li class="tsd-signature tsd-anchor-link" id="checkMethod.checkMethod-1">check<wbr/>Method<span class="tsd-signature-symbol">(</span>section<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><a href="#checkMethod.checkMethod-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Checks if the given method exists within the specified section of the API events.</p>
+
+<h3>Returns</h3><ul>
+<li>True if the method exists within the section, false otherwise.</li>
+</ul>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>section: <span class="tsd-signature-type">any</span></h5>
+<div class="tsd-comment tsd-typography"><p>The section of the API events to check.</p>
+</div></li>
+<li>
+<h5>method: <span class="tsd-signature-type">any</span></h5>
+<div class="tsd-comment tsd-typography"><p>The method to check within the section.</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L144">client.ts:144</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private"><a id="checkSection" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>check<wbr/>Section</span><a href="#checkSection" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+<li class="tsd-signature tsd-anchor-link" id="checkSection.checkSection-1">check<wbr/>Section<span class="tsd-signature-symbol">(</span>section<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><a href="#checkSection.checkSection-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Checks if the given section exists within the API events.</p>
+
+<h3>Returns</h3><ul>
+<li>True if the section exists within the API events, false otherwise.</li>
+</ul>
+</div>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>section: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>The section to check within the API events.</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L128">client.ts:128</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="connect" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>connect</span><a href="#connect" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -156,7 +199,7 @@
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/5def582/packages/tfchain_client/src/client.ts#L59">client.ts:59</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L71">client.ts:71</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="disconnect" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>disconnect</span><a href="#disconnect" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -164,7 +207,7 @@
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/5def582/packages/tfchain_client/src/client.ts#L94">client.ts:94</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L107">client.ts:107</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="disconnectAndExit" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>disconnect<wbr/>And<wbr/>Exit</span><a href="#disconnectAndExit" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -172,7 +215,51 @@
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/5def582/packages/tfchain_client/src/client.ts#L103">client.ts:103</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L116">client.ts:116</a></li></ul></aside></li></ul></section>
+<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="listenForEvent" class="tsd-anchor"></a>
+<h3 class="tsd-anchor-link"><span>listen<wbr/>For<wbr/>Event</span><a href="#listenForEvent" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
+<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+<li class="tsd-signature tsd-anchor-link" id="listenForEvent.listenForEvent-1">listen<wbr/>For<wbr/>Event<span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">(</span>section<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, validator<span class="tsd-signature-symbol">: </span><a href="../types/validatorFunctionType.html" class="tsd-signature-type" data-tsd-kind="Type alias">validatorFunctionType</a>, timeoutInMinutes<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">&gt;</span><a href="#listenForEvent.listenForEvent-1" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></li>
+<li class="tsd-description">
+<div class="tsd-comment tsd-typography"><p>Listens for a specific event on the chain and resolves when the event matches the specified conditions.</p>
+
+<h3>Returns</h3><ul>
+<li>A promise that resolves with the event data when the event matches the conditions.</li>
+</ul>
+
+<h3>Throws</h3><ul>
+<li>If the section or method is not defined on the chain.</li>
+</ul>
+
+<h3>Rejects</h3><p>If no response is received within the given time or if an error occurs during validation.</p>
+</div>
+<section class="tsd-panel tsd-type-parameters">
+<h4>Type Parameters</h4>
+<ul class="tsd-type-parameters">
+<li>
+<h4>T</h4></li></ul></section>
+<div class="tsd-parameters">
+<h4 class="tsd-parameters-title">Parameters</h4>
+<ul class="tsd-parameter-list">
+<li>
+<h5>section: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>The section of the event to listen for.</p>
+</div></li>
+<li>
+<h5>method: <span class="tsd-signature-type">string</span></h5>
+<div class="tsd-comment tsd-typography"><p>The method of the event to listen for.</p>
+</div></li>
+<li>
+<h5>validator: <a href="../types/validatorFunctionType.html" class="tsd-signature-type" data-tsd-kind="Type alias">validatorFunctionType</a></h5>
+<div class="tsd-comment tsd-typography"><p>The validator function to validate the event data.</p>
+</div></li>
+<li>
+<h5>timeoutInMinutes: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 2</span></h5>
+<div class="tsd-comment tsd-typography"><p>The timeout value in minutes. Default is 2 minutes.</p>
+</div></li></ul></div>
+<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type" data-tsd-kind="Type parameter">T</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
+<ul>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L162">client.ts:162</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class"><a id="loadKeyPairOrSigner" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>load<wbr/>Key<wbr/>Pair<wbr/>Or<wbr/>Signer</span><a href="#loadKeyPairOrSigner" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
@@ -180,7 +267,7 @@
 <li class="tsd-description">
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/5def582/packages/tfchain_client/src/client.ts#L47">client.ts:47</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L55">client.ts:55</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private"><a id="wait" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagPrivate">Private</code> <span>wait</span><a href="#wait" aria-label="Permalink" class="tsd-anchor-icon"><svg class="icon icon-tabler icon-tabler-link" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-anchor-a"></use><use href="#icon-anchor-b"></use><use href="#icon-anchor-c"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
@@ -193,7 +280,7 @@
 <h5>connection: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = true</span></h5></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/5def582/packages/tfchain_client/src/client.ts#L49">client.ts:49</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/threefoldtech/tfgrid-sdk-ts/blob/01decc17/packages/tfchain_client/src/client.ts#L61">client.ts:61</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">
 <details class="tsd-index-accordion"><summary class="tsd-accordion-summary">
@@ -225,15 +312,20 @@
 <li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="QueryClient.html#connectingLock" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>connecting<wbr/>Lock</a></li>
 <li class="tsd-kind-property tsd-parent-kind-class"><a href="QueryClient.html#contracts" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>contracts</a></li>
 <li class="tsd-kind-property tsd-parent-kind-class"><a href="QueryClient.html#farms" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>farms</a></li>
+<li class="tsd-kind-property tsd-parent-kind-class"><a href="QueryClient.html#nodes" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>nodes</a></li>
 <li class="tsd-kind-property tsd-parent-kind-class"><a href="QueryClient.html#pricingPolicies" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>pricing<wbr/>Policies</a></li>
+<li class="tsd-kind-property tsd-parent-kind-class"><a href="QueryClient.html#tftBridge" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>tft<wbr/>Bridge</a></li>
 <li class="tsd-kind-property tsd-parent-kind-class"><a href="QueryClient.html#tftPrice" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>tft<wbr/>Price</a></li>
 <li class="tsd-kind-property tsd-parent-kind-class"><a href="QueryClient.html#twins" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>twins</a></li>
 <li class="tsd-kind-property tsd-parent-kind-class"><a href="QueryClient.html#url" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>url</a></li>
 <li class="tsd-kind-property tsd-parent-kind-class"><a href="QueryClient.html#connections" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-1024-path"></use><use href="#icon-1024-text"></use></svg>connections</a></li>
-<li class="tsd-kind-method tsd-parent-kind-class"><a href="QueryClient.html#checkConnectionAndApply" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>check<wbr/>Connection<wbr/>And<wbr/>Apply</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="QueryClient.html#checkInputs" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>check<wbr/>Inputs</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="QueryClient.html#checkMethod" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>check<wbr/>Method</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="QueryClient.html#checkSection" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>check<wbr/>Section</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="QueryClient.html#connect" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>connect</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="QueryClient.html#disconnect" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>disconnect</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="QueryClient.html#disconnectAndExit" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>disconnect<wbr/>And<wbr/>Exit</a></li>
+<li class="tsd-kind-method tsd-parent-kind-class"><a href="QueryClient.html#listenForEvent" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>listen<wbr/>For<wbr/>Event</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class"><a href="QueryClient.html#loadKeyPairOrSigner" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>load<wbr/>Key<wbr/>Pair<wbr/>Or<wbr/>Signer</a></li>
 <li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="QueryClient.html#wait" class="tsd-index-link"><svg class="tsd-kind-icon" width="24" height="24" viewBox="0 0 24 24"><use href="#icon-2048-path"></use><use href="#icon-2048-text"></use></svg>wait</a></li></ul></li></ul></nav></div></div>
 <div class="container tsd-generator">

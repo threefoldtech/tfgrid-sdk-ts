@@ -80,8 +80,8 @@
       </template>
 
       <template #workers>
-        <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }">
-          <CaproverWorker v-model="workers[index]" />
+        <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }" :disabled="loadingFarm">
+          <CaproverWorker v-model="workers[index]" v-model:loading="loadingFarm" />
         </ExpandableLayout>
       </template>
     </d-tabs>
@@ -106,7 +106,7 @@ import { generateName, generatePassword } from "../utils/strings";
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
-
+const loadingFarm = ref(false);
 const domain = ref("");
 const password = ref(generatePassword(10));
 const leader = ref(createWorker(generateName(9, { prefix: "cr" })));

@@ -77,9 +77,7 @@ export default class PublicIPTable extends Vue {
   }
   deletePublicIP(ip: any, i: number) {
     this.loading = i;
-    this.deleteIP(ip).finally(() => {
-      this.loading = null;
-    });
+    this.deleteIP(ip);
   }
 }
 </script>

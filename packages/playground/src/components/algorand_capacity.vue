@@ -1,7 +1,14 @@
 <template>
   <div>
     <input-tooltip inline #="{ props }" tooltip="Enable this option to set custom resources.">
-      <v-switch color="primary" inset label="Set Custom Capacity" v-model="custom" v-bind="props" />
+      <v-switch
+        color="primary"
+        inset
+        label="Set Custom Capacity"
+        v-model="custom"
+        v-bind="props"
+        :disabled="disabled"
+      />
     </input-tooltip>
 
     <slot></slot>
@@ -18,7 +25,7 @@
         ref="cpuInput"
       >
         <input-tooltip tooltip="The number of virtual cores allocated to your instance.">
-          <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" />
+          <v-text-field label="CPU (vCores)" type="number" v-model.number="cpu" v-bind="props" :disabled="disabled" />
         </input-tooltip>
       </input-validator>
 
@@ -33,7 +40,7 @@
         ref="memoryInput"
       >
         <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
-          <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
+          <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" :disabled="disabled" />
         </input-tooltip>
       </input-validator>
 
@@ -50,7 +57,13 @@
         <input-tooltip
           tooltip="The storage capacity allocated to your instance, indicating the amount of space available to store files, data, and applications."
         >
-          <v-text-field label="Storage Size (GB)" type="number" v-model.number="storage" v-bind="props" />
+          <v-text-field
+            label="Storage Size (GB)"
+            type="number"
+            v-model.number="storage"
+            v-bind="props"
+            :disabled="disabled"
+          />
         </input-tooltip>
       </input-validator>
     </template>
@@ -62,7 +75,7 @@ import { ref, watch } from "vue";
 
 import type { Validators } from "../types";
 
-const props = defineProps<{ network: string; type: string }>();
+const props = defineProps<{ network: string; type: string; disabled: boolean }>();
 const emits = defineEmits<{
   (event: "update:cpu", value?: number): void;
   (event: "update:memory", value?: number): void;

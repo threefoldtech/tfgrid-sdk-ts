@@ -4,7 +4,7 @@
     @mount="layoutMount"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
-    :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk)"
+    :disk="disks.reduce((total, disk) => total + disk.size, rootFilesystemSize)"
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
@@ -44,6 +44,7 @@
           :standard="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
           :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
           v-model="solution"
+          :disabled="loadingFarm"
         />
 
         <Network
@@ -52,6 +53,7 @@
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
           v-model:wireguard="wireguard"
+          :disabled="loadingFarm"
           ref="network"
         />
         <input-tooltip
@@ -59,11 +61,11 @@
           tooltip="Click to know more about dedicated nodes."
           href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
         >
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
         </input-tooltip>
 
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+          <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
 
         <SelectFarmManager>
@@ -72,11 +74,12 @@
               cpu: solution?.cpu,
               memory: solution?.memory,
               publicIp: ipv4,
-              ssd: disks.reduce((total, disk) => total + disk.size, solution?.disk),
+              ssd: disks.reduce((total, disk) => total + disk.size, rootFilesystemSize),
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
             v-model="farm"
+            v-model:loading="loadingFarm"
           />
           <SelectNode
             v-model="selectedNode"
@@ -86,10 +89,11 @@
               memory: solution?.memory,
               ipv4: ipv4,
               ipv6: ipv4,
-              disks: disks,
+              diskSizes: disks.map(disk => disk.size),
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
+            :root-file-system-size="rootFilesystemSize"
           />
         </SelectFarmManager>
       </template>
@@ -134,6 +138,7 @@
           @add="addDisk"
           title="Add additional disk space to your micro virtual machine"
           #="{ index }"
+          :disabled="loadingFarm"
         >
           <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
           <input-validator
@@ -178,7 +183,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import Network from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
@@ -197,6 +202,11 @@ const images = [
   {
     name: "Ubuntu-22.04",
     flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
+    entryPoint: "/sbin/zinit init",
+  },
+  {
+    name: "Debian-12",
+    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-debian-12.flist",
     entryPoint: "/sbin/zinit init",
   },
   {
@@ -229,7 +239,8 @@ const network = ref();
 const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
-
+const loadingFarm = ref(false);
+const rootFilesystemSize = computed(() => solution.value?.disk);
 function layoutMount() {
   if (envs.value.length > 0) {
     envs.value.splice(0, 1);
@@ -280,7 +291,7 @@ async function deploy() {
           planetary: planetary.value,
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
-          rootFilesystemSize: solution.value.disk,
+          rootFilesystemSize: rootFilesystemSize.value,
           nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,

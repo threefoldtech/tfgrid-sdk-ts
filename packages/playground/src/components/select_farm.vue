@@ -50,8 +50,12 @@ const props = defineProps({
   country: String,
   filters: { default: () => ({} as Filters), type: Object as PropType<Filters> },
   exclusiveFor: String,
+  loading: Boolean,
 });
-const emits = defineEmits<{ (event: "update:modelValue", value?: Farm): void }>();
+const emits = defineEmits<{
+  (event: "update:modelValue", value?: Farm): void;
+  (event: "update:loading", value: boolean): void;
+}>();
 
 const farmInput = useInputRef();
 const profileManager = useProfileManager();
@@ -65,15 +69,23 @@ watch([farm, country], ([f, c]) => {
 });
 const loading = ref(false);
 const loadingNodes = ref(farmManager?.getLoading());
-watch([farm, loading], ([farm, loading]) => {
-  if (loading) FarmGatewayManager?.setLoading(true);
+const delay = ref();
+watch(
+  [farm, loading],
+  ([farm, loading]) => {
+    emits("update:loading", loading);
+    if (loading) {
+      FarmGatewayManager?.setLoading(true);
+    }
 
-  if (farm && !loading) {
-    farm.country = country.value;
-    FarmGatewayManager?.register(farm);
-    FarmGatewayManager?.setLoading(false);
-  }
-});
+    if (farm && !loading) {
+      farm.country = country.value;
+      FarmGatewayManager?.register(farm);
+      FarmGatewayManager?.setLoading(false);
+    }
+  },
+  { immediate: true },
+);
 
 const farms = ref<Farm[]>([]);
 let initialized = false;
@@ -148,7 +160,10 @@ watch(
 watch([loading, shouldBeUpdated], async ([l, s]) => {
   if (l || !s) return;
   shouldBeUpdated.value = false;
-  await loadFarms();
+  clearTimeout(delay.value);
+  delay.value = setTimeout(async () => {
+    await loadFarms();
+  }, 2000);
 });
 </script>
 

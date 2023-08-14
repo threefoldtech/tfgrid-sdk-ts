@@ -54,7 +54,13 @@
         #="{ props }"
       >
         <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
-          <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
+          <v-text-field
+            label="Memory (MB)"
+            type="number"
+            v-model.number="memory"
+            v-bind="props"
+            :disabled="loadingFarm"
+          />
         </input-tooltip>
       </input-validator>
 
@@ -63,10 +69,10 @@
         tooltip="Click to know more about dedicated nodes."
         href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
       >
-        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
       </input-tooltip>
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-        <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+        <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
       </input-tooltip>
 
       <SelectFarmManager>
@@ -74,12 +80,13 @@
           :filters="{
             cpu,
             memory,
-            ssd: 32,
+            ssd: 30 + rootFilesystemSize,
             publicIp: true,
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"
           v-model="farm"
+          v-model:loading="loadingFarm"
         />
 
         <SelectNode
@@ -89,13 +96,11 @@
             cpu,
             memory,
             ipv4: true,
-            disks: [
-              { size: 15, mountPoint: '/mnt/' + generateName(10) },
-              { size: 15, mountPoint: '/mnt/' + generateName(10) },
-            ],
+            diskSizes: [15, 15],
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"
+          :root-file-system-size="rootFilesystemSize"
         />
       </SelectFarmManager>
     </form-validator>
@@ -119,7 +124,7 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
-
+const loadingFarm = ref(false);
 const name = ref(generateName(8, { prefix: "np" }));
 const cpu = ref(8);
 const memory = ref(8192);
@@ -131,7 +136,7 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
-
+const rootFilesystemSize = 2;
 async function deploy() {
   layout.value.setStatus("deploy");
 
@@ -159,7 +164,7 @@ async function deploy() {
           publicIpv6: true,
           planetary: false,
           envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
-          rootFilesystemSize: 2,
+          rootFilesystemSize,
           disks: [
             {
               size: 15,

@@ -165,14 +165,13 @@ async function showDetails(value: any) {
   if (value.type === "name" || value.type === "rent") {
     return layout.value.openDialog(value, false, true);
   }
-
   loading.value = true;
   const contractId: number = value.contractId;
   loadingContractId.value = contractId;
   try {
     const grid = await getGrid(profileManager.profile!);
     const deployment = await grid!.zos.getDeployment({ contractId });
-    layout.value.openDialog(deployment, false, true);
+    return layout.value.openDialog(deployment, false, true);
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, `Failed to load details of contract(${contractId})`));
   } finally {

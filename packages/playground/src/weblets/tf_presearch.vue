@@ -3,7 +3,7 @@
     ref="layout"
     :cpu="cpu"
     :memory="memory"
-    :disk="rootFsSize"
+    :disk="rootFilesystemSize"
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
@@ -55,17 +55,17 @@
             </input-tooltip>
           </password-input-wrapper>
         </input-validator>
-        <Network required v-model:ipv4="ipv4" v-model:planetary="planetary" ref="network" />
+        <Network required v-model:ipv4="ipv4" v-model:planetary="planetary" ref="network" :disabled="loadingFarm" />
 
         <input-tooltip
           inline
           tooltip="Click to know more about dedicated nodes."
           href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
         >
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
         </input-tooltip>
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+          <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
 
         <SelectFarmManager>
@@ -73,13 +73,14 @@
             :filters="{
               cpu,
               memory,
-              ssd: rootFsSize,
+              ssd: rootFilesystemSize,
               publicIp: ipv4,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
             exclusive-for="research"
             v-model="farm"
+            v-model:loading="loadingFarm"
           />
 
           <SelectNode
@@ -89,10 +90,11 @@
               cpu,
               memory,
               ipv4: ipv4,
-              disks: [{ size: rootFsSize, mountPoint: '/' }],
+              diskSizes: [],
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
+            :root-file-system-size="rootFilesystemSize"
           />
         </SelectFarmManager>
       </template>
@@ -143,7 +145,8 @@ const ipv4 = ref(false);
 const planetary = ref(true);
 const cpu = 1;
 const memory = 512;
-const rootFsSize = rootFs(cpu, memory);
+const rootFilesystemSize = rootFs(cpu, memory);
+const loadingFarm = ref(false);
 const farm = ref() as Ref<Farm>;
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
@@ -199,7 +202,7 @@ async function deploy() {
               value: publicRestoreKey.value,
             },
           ],
-          rootFilesystemSize: rootFsSize,
+          rootFilesystemSize: rootFilesystemSize,
           nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,

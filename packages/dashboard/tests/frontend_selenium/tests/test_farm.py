@@ -1,20 +1,20 @@
 from utils.utils import generate_gateway, generate_inavalid_gateway, generate_inavalid_ip, generate_ip, generate_string, get_seed, randomize_public_ipv4
 from pages.farm import FarmPage
-from pages.polka import PolkaPage
 from utils.grid_proxy import GridProxy
+from pages.dashboard import DashboardPage
 
 #  Time required for the run (17 cases) is approximately 13 minutes.
 
 def before_test_setup(browser):
-    polka_page = PolkaPage(browser)
     farm_page=FarmPage(browser)
-    user = generate_string()
-    password = generate_string()
+    dashboard_page = DashboardPage(browser)
     farm_name=generate_string()
-    polka_page.load_and_authenticate()
-    polka_page.import_account(get_seed(), user, password)
-    farm_page.navigetor(user)
-    return farm_page, polka_page, farm_name, password
+    password = generate_string()
+    dashboard_page.open_and_load()
+    dashboard_page.import_account(get_seed())
+    dashboard_page.connect_your_wallet(password).click()
+    farm_page.navigetor()
+    return farm_page, farm_name
 
 def test_create_farm(browser):
     """
@@ -22,13 +22,13 @@ def test_create_farm(browser):
     Test Case: TC911-Create farm with existing name
     Test Case: TC908-Verify the search functionality
     Steps:
+        - Navigate to the dashboard.
+        - Login.
         - From the Twin Details Page Click on Farms.
         - In the Farms page Click on "Create Farm" button.
         - Enter the Farm Name.
         - Click on Submit.
-        - Authenticate polkadot transaction.
         - Try to recreate a Farm with same name on the third step
-        - Authenticate polkadot transactions.
         - In the Farms search bar enter the name or the id of the farm you just created
     Test Data: [ use the whole name of the farm, only the first part, the second part ]
     Result: The user can create a farm.
@@ -36,9 +36,8 @@ def test_create_farm(browser):
             The search results should be displayed correctly according to the keywords used.
             You should see "No data available " on the table of farms.
     """
-    farm_page, polka_page, farm_name, password = before_test_setup(browser)
+    farm_page, farm_name = before_test_setup(browser)
     farm_page.create_farm(farm_name)
-    polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('Farm created!')
     farm_page.search_functionality(farm_name)
     assert farm_page.wait_for(farm_name)
@@ -47,7 +46,6 @@ def test_create_farm(browser):
     assert farm_name in farm_page.search_functionality(farm_name[:len(farm_name)//2]) 
     assert farm_name in farm_page.search_functionality(farm_name[len(farm_name)//2:])
     farm_page.create_farm(farm_name)
-    polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('Farm creation failed!')
     table=farm_page.search_functionality(generate_string())
     assert 'No data available' in table
@@ -57,15 +55,16 @@ def test_create_farm_invalid_name(browser):
     """
     Test Case: TC912 - create a farm with invalid name
     Steps:
+        - Navigate to the dashboard.
+        - Login.
         - From the Twin Details Page Click on Farms.
         - In the Farms page Click on " Create Farm ".
         - Enter the Farm Name.
         - Click on Submit.
-        - Authenticate polkadot transactions.
     Test Data: [Empty Field, More than 40 char, Spaces, Special chr(@,#%^&*(_+-))]
     Result: You should display a warning message 'Name is not formatted correctly (All letters + numbers and (-,_) are allowed).
     """
-    farm_page, _, _, _ = before_test_setup(browser)
+    farm_page, _ = before_test_setup(browser)
     farm_page.close_create()
     cases = ['f', 'DD', '4', '88', '-', '_-']
     for case in cases:
@@ -83,6 +82,8 @@ def test_farm_table_sorting(browser):
     """
     Test Case: TC910 - Farm Node table sorting
     Steps:
+        - Navigate to the dashboard.
+        - Login.
         - From the Twin Details Page Click on Farms
         - Make sure to have at least 2 Farms , If you don't create them
         - Click on the arrow behind farm Id 'once up and once down and once to remove the sorting'
@@ -92,10 +93,9 @@ def test_farm_table_sorting(browser):
         - Click on the arrow behind the pricing policy id 'once up and once down and once to remove the sorting'
     Result: You should see the sorting of the table change according to each case
     """
-    farm_page, polka_page, farm_name, password = before_test_setup(browser)
+    farm_page, farm_name = before_test_setup(browser)
     while (farm_page.check_farm_counts() < 2):
         farm_page.create_farm(farm_name + generate_string())
-        polka_page.authenticate_with_pass(password)
         assert farm_page.wait_for('Farm created!')
         farm_page.search_functionality(farm_name)
         assert farm_page.wait_for(farm_name)
@@ -134,6 +134,8 @@ def test_farmpayout_address(browser):
     Test Case: TC1140 - Add invalid farm payout address
     Test Case: TC916 - Edit farm payout address
     Steps:
+        - Navigate to the dashboard.
+        - Login.
         - From the Twin Details Page Click on Farms
         - Make sure you have at least one farm.
         - Click on the arrow behind any farm id
@@ -144,9 +146,8 @@ def test_farmpayout_address(browser):
             You should see alert with the message "invalid address"
             You should see the bottom right alert with the message "address added"
     """
-    farm_page, polka_page, farm_name, password = before_test_setup(browser)
+    farm_page, farm_name = before_test_setup(browser)
     farm_page.create_farm(farm_name)
-    polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('Farm created!')
     farm_page.search_functionality(farm_name)
     assert farm_page.wait_for(farm_name)
@@ -159,7 +160,6 @@ def test_farmpayout_address(browser):
         assert farm_page.wait_for('Edit')
     case = "GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG"
     farm_page.add_farmpayout_address(case).click()
-    polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('Transaction submitted')
     assert farm_page.wait_for('Address added!')
     assert farm_page.farmpayout_address_value() == 'GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG'
@@ -168,7 +168,6 @@ def test_farmpayout_address(browser):
     farm_page.setup_farmpayout_address(farm_name)
     browser.find_element(*farm_page.edit_stellar_address).click()
     farm_page.add_farmpayout_address(case).click()
-    polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('Transaction submitted')
     if(farm_page.wait_for('Address added!')):
         while (farm_page.farmpayout_address_value() != 'GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4'):
@@ -183,6 +182,8 @@ def test_ip(browser):
     Test Case: TC917 - Add IP to Farm
     Test Case: TC918 - Delete IP address from farm
     Steps:
+        - Navigate to the dashboard.
+        - Login.
         - From the Twin Details Page Click on Farms.
         - Make sure you have at least one farm.
         - Click on the arrow behind any farm id.
@@ -194,9 +195,8 @@ def test_ip(browser):
             You should see the bottom right alert with the message "IP Created!"
             You should see the bottom right alert with the message "IP deleted!"
     """
-    farm_page, polka_page, farm_name, password = before_test_setup(browser)
+    farm_page, farm_name = before_test_setup(browser)
     farm_page.create_farm(farm_name)
-    polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('Farm created!')
     farm_page.search_functionality(farm_name)
     assert farm_page.wait_for(farm_name)
@@ -219,13 +219,11 @@ def test_ip(browser):
         farm_page.close_detail()
     farm_page.setup_gateway(gateway, farm_name)
     farm_page.add_ip(ip).click()
-    polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('IP created!')
     assert farm_page.wait_for(ip)
     assert farm_page.wait_for(gateway)
     farm_page.close_detail() 
     farm_page.delete_ip(farm_name, ip, gateway)
-    polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('IP deleted!')
 
 
@@ -233,6 +231,8 @@ def test_gateway(browser):
     """
     Test Case: TC1142 - Enter valid Gateway
     Steps:
+        - Navigate to the dashboard.
+        - Login.
         - From the Twin Details Page Click on Farms
         - Make sure you have at least one farm.
         - Click on the arrow behind any farm id
@@ -244,9 +244,8 @@ def test_gateway(browser):
     Result: You should see the bottom right alert with the message "Gateway is not formatted correctly".
             No alert displayed and button is enabled.
     """
-    farm_page, polka_page, farm_name, password = before_test_setup(browser)
+    farm_page, farm_name = before_test_setup(browser)
     farm_page.create_farm(farm_name)
-    polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('Farm created!')
     farm_page.search_functionality(farm_name)
     assert farm_page.wait_for(farm_name)
@@ -273,6 +272,8 @@ def test_range_ips(browser):
     Test Case: TC1212 - Enter invalid to IP in add range of IPs
     Test Case: TC1211 - Add range of IPs to Farm
     Steps:
+        - Navigate to the dashboard.
+        - Login.
         - Open the twin
         - From sidebar Click on Farms.
         - Create a farm.
@@ -282,16 +283,14 @@ def test_range_ips(browser):
         - Choose Range
         - Add From IP, To IP and Gateway.
         - Click on the save button.
-        - Authenticate polkadot transaction.
     Test Data for Gateway: [Empty Field,All letters, (-,_),54.54,....1270001,127.0.0..1]
     Test Data for From IP: [ should be numbers separated by '.' and end with '/' port ex: 127.0.0.01/16]
     Test Data for To IP: [Invalid IP formats, IPs with smaller or bigger values]
     Result: You should see the alert with the correct message responding to invalid input entered and the save button will be disabled.
             You should see the bottom right alert with the message "IP Created!" and the IPs added to your farm.
     """
-    farm_page, polka_page, farm_name, password = before_test_setup(browser)
+    farm_page, farm_name = before_test_setup(browser)
     farm_page.create_farm(farm_name)
-    polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('Farm created!')
     farm_page.search_functionality(farm_name)
     assert farm_page.wait_for(farm_name)
@@ -329,7 +328,6 @@ def test_range_ips(browser):
         assert farm_page.add_range_ips(0, 0, case).is_enabled()==False
         assert farm_page.wait_for('Gateway IP not in the provided IP range')
     farm_page.add_range_ips('1.2.3.4/16', '1.2.3.6/16', '1.2.3.4').click()
-    polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('IP created!')
     assert farm_page.wait_for('1.2.3.4/16')
     assert farm_page.wait_for('1.2.3.5/16')
@@ -341,6 +339,8 @@ def test_farm_details(browser):
     Test Case: TC914 - Farm Details
     Test Case: TC921 - Verify the availability of zero os bootstrap
     Steps:
+        - Navigate to the dashboard.
+        - Login.
         - From the Twin Details Page Click on Farms
         - Make sure you have at least one farm.
         - Click on the arrow behind any farm id
@@ -348,10 +348,9 @@ def test_farm_details(browser):
                 Linked Pricing policy Id, stellar payout address, Bootstrap Image, Public IPs.
             You should see Zero-OS bootstrap page is opened   
     """
-    farm_page, polka_page, farm_name, password = before_test_setup(browser)
+    farm_page, farm_name = before_test_setup(browser)
     grid_proxy = GridProxy(browser)
     farm_page.create_farm(farm_name)
-    polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('Farm created!')
     farm_page.search_functionality(farm_name)
     assert farm_page.wait_for(farm_name)
@@ -360,13 +359,11 @@ def test_farm_details(browser):
     farm_page.setup_farmpayout_address(farm_name)
     browser.find_element(*farm_page.add_v2_button).click()
     farm_page.add_farmpayout_address(case).click()
-    polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('Address added!')
     farm_page.close_detail()
     ip, gateway = randomize_public_ipv4()
     farm_page.setup_ip(ip, farm_name)
     farm_page.add_gateway(gateway).click()
-    polka_page.authenticate_with_pass(password)
     assert farm_page.wait_for('IP created!')
     farm_page.close_detail()
     farm_details = farm_page.farm_detials(farm_name)

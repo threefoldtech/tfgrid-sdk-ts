@@ -84,6 +84,7 @@
         v-model="solution"
         :standard="{ cpu: 2, memory: 1024 * 2, disk: 50 }"
         :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+        :disabled="loadingFarm"
       />
       <Networks v-model:ipv4="ipv4" />
 
@@ -93,10 +94,10 @@
           tooltip="Click to know more about dedicated nodes."
           href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
         >
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
         </input-tooltip>
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+          <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
 
         <SelectFarmManager>
@@ -104,12 +105,13 @@
             :filters="{
               cpu: solution?.cpu,
               memory: solution?.memory,
-              ssd: solution?.disk,
+              ssd: (solution?.disk ?? 0) + rootFilesystemSize,
               publicIp: ipv4,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
             v-model="farm"
+            v-model:loading="loadingFarm"
           />
 
           <SelectNode
@@ -118,10 +120,11 @@
               farmId: farm?.farmID,
               cpu: solution?.cpu,
               memory: solution?.memory,
-              disks: [{ size: solution?.disk, mountPoint: '/var/www/html' }],
+              diskSizes: [solution?.disk],
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
+            :root-file-system-size="rootFilesystemSize"
           />
         </SelectFarmManager>
         <DomainName :hasIPv4="ipv4" ref="domainNameCmp"></DomainName>
@@ -143,7 +146,7 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { type Ref, ref } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
@@ -158,7 +161,7 @@ import { generateName, generatePassword } from "../utils/strings";
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
-
+const loadingFarm = ref(false);
 const name = ref(generateName(9, { prefix: "wp" }));
 const username = ref("admin");
 const email = ref("");
@@ -174,7 +177,7 @@ const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
-
+const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed a Wordpress instance.");
@@ -231,6 +234,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
           nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
+          rootFilesystemSize: rootFilesystemSize.value,
         },
       ],
     });
@@ -273,6 +277,7 @@ import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { INode } from "../utils/filter_nodes";
+import rootFs from "../utils/root_fs";
 
 export default {
   name: "TFWordpress",

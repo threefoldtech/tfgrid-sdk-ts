@@ -1,7 +1,7 @@
 from utils.utils import generate_string, get_seed
-from pages.polka import PolkaPage
 from utils.grid_proxy import GridProxy
 from pages.dedicate import DedicatePage
+from pages.dashboard import DashboardPage
 import pytest
 
 #  Time required for the run (12 cases) is approximately 3 minutes.
@@ -9,14 +9,14 @@ import pytest
 
 def before_test_setup(browser):
     dedicate_page = DedicatePage(browser)
-    polka_page = PolkaPage(browser)
     grid_proxy = GridProxy(browser)
-    user = generate_string()
+    dashboard_page = DashboardPage(browser)
     password = generate_string()
-    polka_page.load_and_authenticate()
-    polka_page.import_account(get_seed(), user, password)
-    dedicate_page.navigate(user)
-    return dedicate_page, polka_page, grid_proxy, password
+    dashboard_page.open_and_load()
+    dashboard_page.import_account(get_seed())
+    dashboard_page.connect_your_wallet(password).click()
+    dedicate_page.navigate()
+    return dedicate_page, grid_proxy
 
 
 def test_dedicate_page(browser):
@@ -24,7 +24,7 @@ def test_dedicate_page(browser):
       Test Case: TC1138 - Navigate to dedicate node
       Steps:
           - Navigate to the dashboard.
-          - Select an account.
+          - Login.
           - Click on Dedicate Node from side menu.
       Result: User should be navigated to Dedicate Node page.
     """
@@ -174,11 +174,13 @@ def test_node_details(browser):
     """
       Test Case: TC1139 - Node details
       Steps:
+          - Navigate to the dashboard.
+          - Login.
           - From the Twin Details Page Click on Dedicated nodes
           - Click on expand button on a node
       Result: You should see the node details.
     """
-    dedicate_page, _, grid_proxy, _ = before_test_setup(browser)
+    dedicate_page, grid_proxy = before_test_setup(browser)
     node_list = grid_proxy.get_rentable_node()
     nodes = dedicate_page.node_details()
     for i in range(len(nodes)):
@@ -195,28 +197,27 @@ def test_reserve_node(browser):
     """
       Test Case: TC1137 - Reserve a node
       Steps:
+          - Navigate to the dashboard.
+          - Login.
           - From the Twin Details Page Click on Dedicated nodes
           - Click reserve button on a node not taken
-          - Authenticate polka with password
           - Click unreserve button on same node
       Result: You should see the node details.
     """
-    dedicate_page, polka_page, grid_proxy, password = before_test_setup(browser)
+    dedicate_page, grid_proxy = before_test_setup(browser)
     node_list = grid_proxy.get_rentable_node()
     node_id = dedicate_page.check_free_node(node_list)
     if (node_id):
         dedicate_page.reserve_node(node_id)
-        polka_page.authenticate_with_pass(password)
         assert dedicate_page.wait_for('Transaction succeeded: Node ' + str(node_id) + ' reserved')
         status = counter = 0
         while (status == 0):
             status = grid_proxy.get_dedicate_status(node_id)
             counter += 1
-            if (counter == 10):
+            if (counter == 40):
                 break
         assert grid_proxy.get_dedicate_status(node_id) == dedicate_page.twin_id
         dedicate_page.unreserve_node(node_id)
-        polka_page.authenticate_with_pass(password)
         assert dedicate_page.wait_for(
             'Transaction succeeded: Node ' + str(node_id) + ' Unreserved')
         while (status != 0):

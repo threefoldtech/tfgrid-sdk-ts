@@ -3,7 +3,7 @@
     ref="layout"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
-    :disk="(solution?.disk ?? 0) + 10 + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
+    :disk="(solution?.disk ?? 0) + 10 + rootFilesystemSize"
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
@@ -62,13 +62,14 @@
         </input-validator>
       </password-input-wrapper>
 
-      <Network v-model:ipv4="ipv4" />
+      <Network v-model:ipv4="ipv4" :disabled="loadingFarm" />
 
       <SelectSolutionFlavor
         v-model="solution"
         :minimum="{ cpu: 2, memory: 1024 * 2, disk: 10 }"
         :standard="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
         :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+        :disabled="loadingFarm"
       />
 
       <input-tooltip
@@ -76,10 +77,10 @@
         tooltip="Click to know more about dedicated nodes."
         href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
       >
-        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
       </input-tooltip>
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-        <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+        <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
       </input-tooltip>
 
       <SelectFarmManager>
@@ -87,12 +88,13 @@
           :filters="{
             cpu: solution?.cpu,
             memory: solution?.memory,
-            ssd: (solution?.disk ?? 0) + 10 + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
+            ssd: (solution?.disk ?? 0) + 10 + rootFilesystemSize,
             publicIp: ipv4,
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"
           v-model="farm"
+          v-model:loading="loadingFarm"
         />
 
         <SelectNode
@@ -101,13 +103,11 @@
             farmId: farm?.farmID,
             cpu: solution?.cpu,
             memory: solution?.memory,
-            disks: [
-              { size: 10, mountPoint: '/var/lib/docker' },
-              { size: solution?.disk, mountPoint: '/umbrelDisk' },
-            ],
+            diskSizes: [10, solution?.disk],
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
           }"
+          :root-file-system-size="rootFilesystemSize"
         />
       </SelectFarmManager>
     </form-validator>
@@ -119,7 +119,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
@@ -141,6 +141,7 @@ const password = ref(generatePassword());
 const ipv4 = ref(false);
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
+const loadingFarm = ref(false);
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/umbrel-latest.flist",
   entryPoint: "/sbin/zinit init",
@@ -148,7 +149,7 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
-
+const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 async function deploy() {
   layout.value.setStatus("deploy");
 
@@ -190,7 +191,7 @@ async function deploy() {
             { key: "PASSWORD", value: password.value },
             { key: "UMBREL_DISK", value: "/umbrelDisk" },
           ],
-          rootFilesystemSize: rootFs(solution.value.cpu, solution.value.memory),
+          rootFilesystemSize: rootFilesystemSize.value,
           nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,

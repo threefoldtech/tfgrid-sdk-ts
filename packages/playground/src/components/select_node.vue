@@ -7,8 +7,8 @@
       variant="tonal"
       v-if="!loadingNodes && selectedNode === undefined && emptyResult && props.filters.rentedBy"
     >
-      There are no nodes rented by you that match your selected resources, try to change your resources or rent a node
-      and try again.
+      You have no rented nodes that match your selected resources. Please try changing your selected resources or rent a
+      node that matches your requirements.
     </v-alert>
     <input-validator
       ref="validator"
@@ -30,7 +30,7 @@
           v-bind="{
             ...props,
             loading: props.loading || loadingNodes,
-            hint: pingingNode ? 'Check if node is alive ... ' : props.hint,
+            hint: pingingNode ? `Checking if the disks will fit in the node's storage pools... ` : props.hint,
             error: !!errorMessage,
             errorMessages: !!errorMessage ? errorMessage : undefined,
           }"
@@ -78,6 +78,7 @@
 </template>
 
 <script lang="ts" setup>
+import type { GridClient } from "@threefold/grid_client";
 import { onMounted, type PropType, type Ref, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
@@ -95,11 +96,7 @@ export interface NodeFilters {
   hasGPU?: boolean;
   cpu: number;
   memory: number;
-  disks: {
-    name?: string;
-    size: number;
-    mountPoint: string;
-  }[];
+  diskSizes: number[];
   certified?: boolean;
   rentedBy?: number;
   type?: string;
@@ -111,6 +108,7 @@ const emits = defineEmits<{ (event: "update:modelValue", value?: INode): void }>
 const props = defineProps({
   modelValue: { type: Object as PropType<INode> },
   filters: { default: () => ({} as NodeFilters), type: Object as PropType<NodeFilters> },
+  rootFileSystemSize: { type: Number, required: true },
 });
 const farmManager = useFarm();
 const profileManager = useProfileManager();
@@ -128,6 +126,20 @@ const emptyResult = ref(false);
 const validator = ref();
 const pingingNode = ref(false);
 const delay = ref();
+
+function isSelectionEmpty(node: INode | undefined, selectedCards: string[]): boolean {
+  if (!node || availableNodes.value.length === 0) {
+    return true;
+  }
+
+  const selectedNodeMatches = availableNodes.value.some(n => n.nodeId === node.nodeId);
+
+  if (selectedNodeMatches && selectedCards.length > 0) {
+    return !selectedCards.some(selectedCard => cards.some(card => getCardName(card) === selectedCard));
+  }
+
+  return !selectedNodeMatches;
+}
 
 watch(selectedCards, async () => {
   for (const card of nodeCards.value) {
@@ -149,24 +161,13 @@ watch(
 
     const grid = await getGrid(profileManager.profile!);
 
-    if (node) {
-      validator.value?.setStatus(ValidatorStatus.Pending);
-      pingingNode.value = true;
-      try {
-        await grid!.zos.pingNode({ nodeId: node.nodeId });
-        emits("update:modelValue", {
-          nodeId: node.nodeId,
-          cards: cards,
-        });
-        validator.value?.validate();
-      } catch (e) {
-        errorMessage.value = `Node ${node.nodeId} is not responding please select another node`;
-        availableNodes.value = availableNodes.value.filter(({ nodeId }) => nodeId !== node.nodeId);
-        validator.value?.setStatus(ValidatorStatus.Invalid);
-      } finally {
-        pingingNode.value = false;
-        farmManager?.setLoading(false);
-      }
+    if (node && grid) {
+      await validateNodeStoragePool(
+        grid,
+        node.nodeId,
+        props.filters.diskSizes.map(disk => disk * 1024 ** 3),
+        props.rootFileSystemSize * 1024 ** 3,
+      );
     }
 
     if (node && props.filters.hasGPU) {
@@ -178,6 +179,7 @@ watch(
         loadingCards.value = false;
       }
     }
+    emptyResult.value = isSelectionEmpty(node, selectedCards.value);
   },
   { immediate: true },
 );
@@ -187,7 +189,7 @@ watch(
   (value, oldValue) => {
     if (
       value.farmId === oldValue.farmId &&
-      value.disks === oldValue.disks &&
+      value.diskSizes === oldValue.diskSizes &&
       value.cpu === oldValue.cpu &&
       value.memory === oldValue.memory &&
       value.certified === oldValue.certified &&
@@ -241,7 +243,7 @@ async function loadNodes(farmId: number) {
         farmId: farmId,
         cpu: filters.cpu,
         memory: filters.memory,
-        disks: [...filters.disks],
+        diskSizes: [...filters.diskSizes, props.rootFileSystemSize],
         ipv4: filters.ipv4,
         hasGPU: filters.hasGPU ? filters.hasGPU : undefined,
         certified: filters.certified,
@@ -267,7 +269,7 @@ async function loadNodes(farmId: number) {
           }
         }
         availableNodes.value = nodesArr.value;
-        selectedNode.value = availableNodes.value ? availableNodes.value[0] : undefined;
+        selectedNode.value = undefined;
       } else {
         selectedNode.value = undefined;
         availableNodes.value = [];
@@ -275,8 +277,35 @@ async function loadNodes(farmId: number) {
     } catch (e) {
       errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
     } finally {
+      validator.value?.setStatus(ValidatorStatus.Invalid);
       loadingNodes.value = false;
+      farmManager?.setLoading(false);
     }
+  }
+}
+async function validateNodeStoragePool(grid: GridClient, nodeId: number, disks: number[], rootFileSystemSize: number) {
+  farmManager?.setLoading(true);
+  validator.value?.setStatus(ValidatorStatus.Pending);
+  pingingNode.value = true;
+  try {
+    await grid.capacity.checkNodeCapacityPool({
+      nodeId,
+      ssdDisks: disks,
+      rootfsDisks: [rootFileSystemSize],
+      hddDisks: [],
+    });
+    emits("update:modelValue", {
+      nodeId: nodeId,
+      cards: cards,
+    });
+    validator.value?.validate();
+  } catch (e) {
+    errorMessage.value = `Couldn't fit the required disks in Node ${nodeId} storage pools, please select another node`;
+    availableNodes.value = availableNodes.value.filter(node => node.nodeId !== nodeId);
+    validator.value?.setStatus(ValidatorStatus.Invalid);
+  } finally {
+    pingingNode.value = false;
+    farmManager?.setLoading(false);
   }
 }
 </script>

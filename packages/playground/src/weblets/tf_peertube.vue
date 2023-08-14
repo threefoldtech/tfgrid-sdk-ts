@@ -57,7 +57,7 @@
         </input-validator>
       </password-input-wrapper>
 
-      <SelectSolutionFlavor v-model="solution" />
+      <SelectSolutionFlavor v-model="solution" :disabled="loadingFarm" />
       <!-- <Networks v-model:ipv4="ipv4" /> -->
       <FarmGatewayManager>
         <input-tooltip
@@ -65,10 +65,10 @@
           tooltip="Click to know more about dedicated nodes."
           href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
         >
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
         </input-tooltip>
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+          <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
 
         <SelectFarmManager>
@@ -76,12 +76,13 @@
             :filters="{
               cpu: solution?.cpu,
               memory: solution?.memory,
-              ssd: solution?.disk,
+              ssd: (solution?.disk ?? 0) + rootFilesystemSize,
               publicIp: ipv4,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
             v-model="farm"
+            v-model:loading="loadingFarm"
           />
 
           <SelectNode
@@ -90,10 +91,11 @@
               farmId: farm?.farmID,
               cpu: solution?.cpu,
               memory: solution?.memory,
-              disks: [{ size: solution?.disk, mountPoint: '/data' }],
+              diskSizes: [solution?.disk],
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
+            :root-file-system-size="rootFilesystemSize"
           />
         </SelectFarmManager>
         <DomainName :hasIPv4="ipv4" ref="domainNameCmp" />
@@ -115,7 +117,7 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { type Ref, ref } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
@@ -134,6 +136,7 @@ const email = ref("");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
+const loadingFarm = ref(false);
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/peertube-v3.1.1.flist",
   entryPoint: "/sbin/zinit init",
@@ -143,7 +146,7 @@ const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
 const domainNameCmp = ref();
-
+const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed a peertube instance.");
@@ -203,6 +206,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
           nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
+          rootFilesystemSize: rootFilesystemSize.value,
         },
       ],
     });
@@ -248,6 +252,7 @@ import { deploymentListEnvironments } from "../constants";
 import type { INode } from "../utils/filter_nodes";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
+import rootFs from "../utils/root_fs";
 
 export default {
   name: "TfPeertube",
