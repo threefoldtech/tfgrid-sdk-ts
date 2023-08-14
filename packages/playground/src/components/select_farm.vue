@@ -101,7 +101,6 @@ async function loadFarms() {
     grid!,
     {
       country: country.value,
-      // cru: filters.cpu,
       nodeMRU: filters.memory ? Math.round(filters.memory / 1024) : undefined,
       nodeHRU: filters.disk,
       nodeSRU: filters.ssd,
