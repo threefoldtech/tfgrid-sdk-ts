@@ -427,7 +427,7 @@
 <script lang="ts">
 import { QueryClient } from "@threefold/tfchain_client";
 import { Decimal } from "decimal.js";
-import ipaddr from "ipaddr.js";
+import ipaddr, { IPv4, IPv6 } from "ipaddr.js";
 import jsPDF from "jspdf";
 import { default as PrivateIp } from "private-ip";
 import { Component, Prop, Vue } from "vue-property-decorator";
@@ -796,7 +796,7 @@ export default class FarmNodesTable extends Vue {
     }
   }
   gw4Check() {
-    if (!this.gw4 || !ipaddr.isValid(this.ip4.split("/")[0])) return true;
+    if (!this.gw4) return true;
     if (PrivateIp(this.gw4.split("/")[0])) {
       this.gw4ErrorMessage = "Gateway is not public";
       return false;
@@ -804,9 +804,16 @@ export default class FarmNodesTable extends Vue {
     const IPv4SegmentFormat = "(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])";
     const IPv4AddressFormat = `(${IPv4SegmentFormat}[.]){3}${IPv4SegmentFormat}`;
     const gatewayRegex = new RegExp(`^${IPv4AddressFormat}$`);
+    let cidr: [IPv4 | IPv6, number];
     if (gatewayRegex.test(this.gw4) && ipaddr.isValid(this.gw4)) {
       const addr = ipaddr.parse(this.gw4);
-      if (!addr.match(ipaddr.parseCIDR(this.ip4))) {
+      try {
+        cidr = ipaddr.parseCIDR(this.ip4);
+      } catch {
+        this.gw4ErrorMessage = "Make sure you have provided the correct IPv4";
+        return false;
+      }
+      if (!addr.match(cidr)) {
         this.gw4ErrorMessage = "Gateway is not a part of the given IP.";
         return false;
       }
@@ -822,7 +829,6 @@ export default class FarmNodesTable extends Vue {
     gw6Ref?.validate();
   }
   gw6Check() {
-    if (!ipaddr.isValid(this.ip6.split("/")[0])) return true;
     if (!this.gw6) {
       if (this.ip6) {
         this.gw6ErrorMessage = "This field is required";
@@ -852,8 +858,15 @@ export default class FarmNodesTable extends Vue {
         ")([0-9a-fA-F]{1})?$",
     );
     if (gatewayRegex.test(this.gw6) && ipaddr.isValid(this.gw6)) {
+      let cidr: [IPv4 | IPv6, number];
+      try {
+        cidr = ipaddr.parseCIDR(this.ip6);
+      } catch {
+        this.gw6ErrorMessage = "Make sure you have provided the correct IPv6";
+        return false;
+      }
       const addr = ipaddr.parse(this.gw6);
-      if (!addr.match(ipaddr.parseCIDR(this.ip6))) {
+      if (!addr.match(cidr)) {
         this.gw6ErrorMessage = "Gateway is not a part of the given IP.";
         return false;
       }
