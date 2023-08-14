@@ -20,17 +20,21 @@ class DedicatePage:
     price = (By.XPATH , "//*[contains(text(), 'Price (USD)')]")
     search_bar = (By.XPATH ,'/html/body/div[1]/div[1]/div[3]/div/div/div[1]/div/div[1]/div/input')
     node_table = (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div/div[2]/div[1]/table/tbody/tr')
-    twin_address = (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div[1]/div[1]/div[2]/div[1]/div/div[2]/div[1]')
+    twin_id_label = (By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[1]/div[2]/div[1]/div/div[2]/div[1]')
     reservation_button = (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div/div[2]/div[1]/table/tbody/tr/td[9]/div/button')
     ok_btn = (By.XPATH, "//*[@id='app']/div[4]/div/div/div[3]/button[1]")
+    close_login_button = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div[4]/button')
+    twin_details = (By.XPATH, "//*[contains(text(), 'Twin Details')]")
     table_xpath = '//div/div/div[1]/table/tbody/tr'
+
 
     def __init__(self, browser):
         self.browser = browser
       
-    def navigate(self, user):
-        self.browser.find_element(By.XPATH, "//*[contains(text(), '"+ user +"')]").click()
-        self.twin_id = int(self.browser.find_element(*self.twin_address).text)
+    def navigate(self):
+        self.browser.find_element(*self.close_login_button).click()
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.twin_details))
+        self.twin_id = int(self.browser.find_element(*self.twin_id_label).text)
         self.browser.find_element(*self.dedicate_node).click()
         WebDriverWait(self.browser, 30).until(EC.visibility_of_any_elements_located((By.XPATH, "//*[contains(text(), 'Rows per page:')]")))
     
@@ -178,7 +182,7 @@ class DedicatePage:
         tables = ["rentable", "rented"]
         for table in tables:
             self.browser.find_element(By.XPATH, "//*[contains(text(), '"+table.capitalize()+"')]").click()
-            if(self.browser.find_element(By.XPATH, f"//*[@id='app']/div[1]/div[3]/div/div/div/div[2]/div/div[1]/table/tbody/tr").text == 'No data available'):
+            if(self.browser.find_element(By.XPATH, f'//*[@id="app"]/div[1]/div[2]/div/div[1]/div/div[2]/div/div[2]/div/div/div/div[1]/table/tbody/tr').text == 'No data available'):
                 continue 
             for i in range(1, len(self.browser.find_elements(By.XPATH, f"//*[@id='{table}']{self.table_xpath}"))+1):
                 details = []
