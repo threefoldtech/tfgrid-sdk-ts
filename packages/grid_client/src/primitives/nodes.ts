@@ -345,6 +345,7 @@ class Nodes {
       size: options.size,
       has_gpu: options.hasGPU,
       rented_by: options.rentedBy,
+      rentable: options.rentable,
     };
     if (options.gateway) {
       params["ipv4"] = true;

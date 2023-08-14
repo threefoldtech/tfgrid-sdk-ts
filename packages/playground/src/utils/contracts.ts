@@ -43,10 +43,12 @@ async function normalizeContract(
 
   return {
     contractId: id,
+    twinID: c.twinID,
     type,
     state: c.state,
     createdAt: new Date(+c.createdAt * 1000).toLocaleString(),
     nodeId: c.nodeID || "-",
+    solutionProviderID: c.solutionProviderID,
     solutionName: data.name || "-",
     solutionType: data.projectName || data.type || "-",
     expiration,
@@ -70,4 +72,6 @@ export interface NormalizedContract {
   solutionType?: string;
   expiration?: string;
   consumption: string;
+  solutionProviderID: number;
+  twinID: number;
 }

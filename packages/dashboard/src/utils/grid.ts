@@ -65,7 +65,7 @@ export function loadBalance(grid: GridClient) {
 }
 
 export function createAccount() {
-  const network = NetworkEnv.dev;
+  const network = config.network as NetworkEnv;
   const grid = new GridClient({
     network,
     mnemonic: "",
