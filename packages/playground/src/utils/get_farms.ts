@@ -12,16 +12,7 @@ export async function getFarms(
   filters: FarmFilterOptions,
   options: GetFarmsOptions = {},
 ): Promise<Farm[]> {
-  const farmsChunks: FarmInfo[][] = [];
-
-  let page = 1;
-  while (page) {
-    const farmsChunk = await grid.capacity.filterFarms({ ...filters, page }).catch(() => []);
-    farmsChunks.push(farmsChunk);
-    page = 0;
-  }
-
-  let farms = farmsChunks.flat(1);
+  let farms = await grid.capacity.filterFarms({ ...filters }).catch(() => []);
 
   if (options.exclusiveFor && !filters.publicIp) {
     const blockedFarms = await getBlockedFarmSet(options.exclusiveFor);

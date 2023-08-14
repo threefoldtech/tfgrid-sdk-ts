@@ -16,7 +16,25 @@
           :model-value="shouldBeUpdated ? undefined : farm"
           @update:model-value="farm = $event"
           :error-messages="!loading && !farms.length ? 'No farms where found with the specified resources.' : undefined"
-        />
+        >
+          <template v-slot:append-item v-if="page !== -1">
+            <div class="px-4 mt-4">
+              <v-btn
+                block
+                color="secondary"
+                variant="tonal"
+                rounded="large"
+                size="large"
+                @click="loadFarms"
+                :loading="loading"
+              >
+                <!-- @click="loadNextPage" -->
+                <!-- :loading="loading" -->
+                Load More Farms
+              </v-btn>
+            </div>
+          </template>
+        </v-autocomplete>
       </input-tooltip>
     </input-validator>
   </section>
@@ -56,6 +74,9 @@ const emits = defineEmits<{
   (event: "update:modelValue", value?: Farm): void;
   (event: "update:loading", value: boolean): void;
 }>();
+
+const SIZE = 20;
+const page = ref(1);
 
 const farmInput = useInputRef();
 const profileManager = useProfileManager();
@@ -97,9 +118,11 @@ async function loadFarms() {
 
   const grid = await getGrid(profileManager.profile!);
   const filters = props.filters;
-  farms.value = await getFarms(
+  const _farms = await getFarms(
     grid!,
     {
+      size: SIZE,
+      page: page.value,
       country: country.value,
       nodeMRU: filters.memory ? Math.round(filters.memory / 1024) : undefined,
       nodeHRU: filters.disk,
@@ -112,6 +135,12 @@ async function loadFarms() {
     },
     { exclusiveFor: props.exclusiveFor },
   );
+
+  if (page.value === 1) {
+    farms.value = _farms;
+  } else {
+    farms.value = farms.value.concat(_farms);
+  }
 
   if (oldFarm) {
     farm.value = undefined;
@@ -130,6 +159,7 @@ async function loadFarms() {
     }
   }
 
+  page.value = _farms.length < SIZE ? -1 : page.value + 1;
   loading.value = false;
 }
 onMounted(loadFarms);
@@ -161,6 +191,7 @@ watch([loading, shouldBeUpdated], async ([l, s]) => {
   shouldBeUpdated.value = false;
   clearTimeout(delay.value);
   delay.value = setTimeout(async () => {
+    page.value = 1;
     await loadFarms();
   }, 2000);
 });
