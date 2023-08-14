@@ -235,7 +235,6 @@ async function loadNodes(farmId: number) {
   errorMessage.value = "";
   const filters = props.filters;
   farmManager?.setLoading(true);
-  emptyResult.value = true;
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
     try {
