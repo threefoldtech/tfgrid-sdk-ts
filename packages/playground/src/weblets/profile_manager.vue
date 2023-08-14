@@ -72,7 +72,7 @@
         v-if="!profileManager.profile"
         :tabs="getTabs()"
         v-model="activeTab"
-        :disabled="creatingAccount || activating"
+        :disabled="creatingAccount || activatingAccount || activating"
         @tab:change="
           () => {
             clearError();
@@ -106,21 +106,34 @@
                       :async-rules="[validateMnInput]"
                       valid-message="Mnemonic is valid."
                       #="{ props: validationProps }"
+                      ref="mnemonicInput"
+                      :disable-validation="creatingAccount || activatingAccount || activating"
                     >
-                      <div v-bind="tooltipProps" v-show="!profileManager.profile" class="d-flex">
+                      <div v-bind="tooltipProps">
                         <VTextField
-                          class="mb-2"
                           label="Mnemonic"
                           placeholder="Please insert your mnemonic"
                           v-model="mnemonic"
                           v-bind="{ ...passwordInputProps, ...validationProps }"
-                          :disabled="creatingAccount || activating"
+                          :disabled="creatingAccount || activatingAccount || activating"
                         />
+                      </div>
+                      <div class="d-flex justify-end mb-10">
+                        <VBtn
+                          class="mt-2 ml-3"
+                          color="primary"
+                          variant="tonal"
+                          :disabled="!shouldActivateAccount"
+                          :loading="activatingAccount"
+                          @click="openAcceptTerms = termsLoading = true"
+                        >
+                          Activate account
+                        </VBtn>
                         <VBtn
                           class="mt-2 ml-3"
                           color="secondary"
                           variant="tonal"
-                          :disabled="isValidForm || !!mnemonic"
+                          :disabled="isValidForm || !!mnemonic || shouldActivateAccount"
                           :loading="creatingAccount"
                           @click="openAcceptTerms = termsLoading = true"
                         >
@@ -143,15 +156,22 @@
                   sandbox="allow-forms allow-modals allow-scripts allow-popups allow-same-origin "
                   @load="termsLoading = false"
                 ></iframe>
-                <v-btn @click="createNewAccount" v-show="!termsLoading"> accept terms and conditions </v-btn>
+                <v-btn @click="shouldActivateAccount ? activateAccount() : createNewAccount()" v-show="!termsLoading">
+                  accept terms and conditions
+                </v-btn>
                 <v-card v-show="termsLoading" :style="{ height: '100%' }">
                   <v-card-text class="d-flex justify-center align-center" :style="{ height: '100%' }">
                     <v-progress-circular indeterminate color="primary" />
                   </v-card-text>
                 </v-card>
               </v-dialog>
-              <v-alert type="error" variant="tonal" class="mb-4" v-if="createAccountError && activeTab === 1">
-                {{ createAccountError }}
+              <v-alert
+                type="error"
+                variant="tonal"
+                class="mb-4"
+                v-if="(createAccountError || activatingAccountError) && activeTab === 1"
+              >
+                {{ createAccountError || activatingAccountError }}
               </v-alert>
 
               <v-alert type="warning" variant="tonal" class="mb-6" v-if="activeTab === 0">
@@ -180,7 +200,7 @@
                           label="Password"
                           v-model="password"
                           v-bind="{ ...passwordInputProps, ...validationProps }"
-                          :disabled="creatingAccount || activating"
+                          :disabled="creatingAccount || activatingAccount || activating"
                         />
                       </div>
                     </template>
@@ -199,7 +219,7 @@
                     label="Confirm Password"
                     v-model="confirmPassword"
                     v-bind="{ ...confirmPasswordInputProps, ...validationProps }"
-                    :disabled="creatingAccount || activating"
+                    :disabled="creatingAccount || activatingAccount || activating"
                   />
                 </InputValidator>
               </PasswordInputWrapper>
@@ -214,7 +234,12 @@
                 color="primary"
                 variant="tonal"
                 :loading="activating"
-                :disabled="!isValidForm || creatingAccount || (activeTab === 1 && isValidConnectConfirmationPassword)"
+                :disabled="
+                  !isValidForm ||
+                  creatingAccount ||
+                  activatingAccount ||
+                  (activeTab === 1 && isValidConnectConfirmationPassword)
+                "
                 size="large"
               >
                 {{ activeTab === 0 ? "Login" : "Connect" }}
@@ -231,7 +256,7 @@
             readonly
             v-model="profileManager.profile.mnemonic"
             v-bind="props"
-            :disabled="activating || creatingAccount"
+            :disabled="activating || creatingAccount || activatingAccount"
           />
         </PasswordInputWrapper>
 
@@ -345,7 +370,15 @@ import { generateKeyPair } from "web-ssh-keygen";
 
 import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
-import { type Balance, createAccount, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
+import {
+  activateAccountAndCreateTwin,
+  type Balance,
+  createAccount,
+  getGrid,
+  loadBalance,
+  loadProfile,
+  storeSSH,
+} from "../utils/grid";
 import { isEnoughBalance, normalizeError } from "../utils/helpers";
 import { downloadAsFile, normalizeBalance } from "../utils/helpers";
 
@@ -442,6 +475,10 @@ const mnemonic = ref("");
 const isValidForm = ref(false);
 const SSHKeyHint = ref("");
 const ssh = ref("");
+const mnemonicInput = useInputRef();
+const shouldActivateAccount = computed(
+  () => mnemonicInput.value?.error?.toLowerCase()?.includes("couldn't find a user for the provided mnemonic") || false,
+);
 let sshTimeout: any;
 const isValidConnectConfirmationPassword = computed(() =>
   !validateConfirmPassword(confirmPassword.value) ? false : true,
@@ -501,10 +538,11 @@ function logout() {
 const activating = ref(false);
 const loginError = ref<string | null>(null);
 const createAccountError = ref<string | null>(null);
-
+const activatingAccountError = ref<string | null>(null);
 function clearError() {
   loginError.value = null;
   createAccountError.value = null;
+  activatingAccountError.value = null;
 }
 
 function clearFields() {
@@ -554,6 +592,22 @@ async function createNewAccount() {
     createAccountError.value = normalizeError(e, "Something went wrong while creating new account.");
   } finally {
     creatingAccount.value = false;
+  }
+}
+
+const activatingAccount = ref(false);
+async function activateAccount() {
+  openAcceptTerms.value = false;
+  termsLoading.value = false;
+  clearError();
+  activatingAccount.value = true;
+  try {
+    await activateAccountAndCreateTwin(mnemonic.value);
+    await mnemonicInput.value?.validate();
+  } catch (e) {
+    activatingAccountError.value = normalizeError(e, "Something went wrong while activating your account.");
+  } finally {
+    activatingAccount.value = false;
   }
 }
 
