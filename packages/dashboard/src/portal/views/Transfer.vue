@@ -6,8 +6,38 @@
 
     <v-card>
       <v-tabs centered v-model="activeTab">
-        <v-tab class=""> By Address</v-tab>
         <v-tab> By Twin ID </v-tab>
+        <v-tab class=""> By Address</v-tab>
+
+        <!-- TwinID Transfer -->
+        <v-tab-item>
+          <template>
+            <v-card class="pa-5 my-5" flat>
+              <v-form v-model="isValidTwinIDTransfer">
+                <TransferInputField
+                  v-model="receptinTwinId"
+                  label="Recipient TwinID:"
+                  :type="'number'"
+                  :hint="validatingTwinId ? 'validating...' : null"
+                  :errorMessages="twinIDErrorMessage"
+                />
+                <TransferInputField
+                  v-model="transferAmount"
+                  label="Amount (TFT)"
+                  :type="'number'"
+                  :rules="getAmountRules(transferAmount)"
+                />
+                <span class="fee">0.01 transaction fee will be deducted</span>
+              </v-form>
+              <TransferFormButtons
+                :isTransferValid="isValidTwinIDTransfer"
+                :loadingTransfer="loadingTransfer"
+                @submit="transferTFTWithTwinID"
+                @clear="clearInputValues"
+              />
+            </v-card>
+          </template>
+        </v-tab-item>
 
         <!-- Address Transfer -->
         <v-tab-item>
@@ -39,35 +69,6 @@
             </v-card>
           </template>
         </v-tab-item>
-
-        <!-- TwinID Transfer -->
-        <v-tab-item>
-          <template>
-            <v-card class="pa-5 my-5" flat>
-              <v-form v-model="isValidTwinIDTransfer">
-                <TransferInputField
-                  v-model="receptinTwinId"
-                  label="Recipient TwinID:"
-                  :type="'number'"
-                  :rules="[() => transferTwinIdCheck() || twinIDErrorMessage]"
-                />
-                <TransferInputField
-                  v-model="transferAmount"
-                  label="Amount (TFT)"
-                  :type="'number'"
-                  :rules="getAmountRules(transferAmount)"
-                />
-                <span class="fee">0.01 transaction fee will be deducted</span>
-              </v-form>
-              <TransferFormButtons
-                :isTransferValid="isValidTwinIDTransfer"
-                :loadingTransfer="loadingTransfer"
-                @submit="transferTFTWithTwinID"
-                @clear="clearInputValues"
-              />
-            </v-card>
-          </template>
-        </v-tab-item>
       </v-tabs>
     </v-card>
   </v-container>
@@ -77,7 +78,9 @@
 import { Client, QueryClient } from "@threefold/tfchain_client";
 import { Decimal } from "decimal.js";
 import QrcodeVue from "qrcode.vue";
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue, Watch } from "vue-property-decorator";
+
+import { validateNumberField } from "@/explorer/utils/validations";
 
 import TransferFormButtons from "../components/TransferFormButtons.vue";
 import TransferInputField from "../components/TransferInputField.vue";
@@ -96,11 +99,12 @@ export default class TransferView extends Vue {
 
   isValidAddressTransfer = false;
   isValidTwinIDTransfer = false;
+  validatingTwinId = false;
 
   addressErrorMessage = "";
   twinIDErrorMessage = "";
 
-  transferAmount = 0;
+  transferAmount = 1;
   activeTab = 0;
 
   loadingTransfer = false;
@@ -117,64 +121,52 @@ export default class TransferView extends Vue {
     }
   }
 
+  @Watch("receptinTwinId")
+  async checkTwinId(twinId: string) {
+    this.validatingTwinId = true;
+    this.twinIDErrorMessage = "";
+    const isNotANumber = validateNumberField(twinId, "twinId");
+
+    if (!twinId) this.twinIDErrorMessage = "Twin ID is required.";
+    else if (!isNotANumber.isValid) this.twinIDErrorMessage = isNotANumber.errorMessage;
+    else if (!(parseInt(twinId) >= -(2 ** 31) && parseInt(twinId) <= 2 ** 31 - 1))
+      this.twinIDErrorMessage = "Please enter a valid twin id";
+    else if (parseInt(twinId) === this.$store.state.credentials.twin.id)
+      this.twinIDErrorMessage = "You can't transfer to yourself";
+    else {
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(new Error("Request timed out."));
+        }, 6000);
+      });
+      try {
+        const twinDetailsPromise = this.queryClient.twins.get({ id: parseInt(this.receptinTwinId) });
+        Promise.race([twinDetailsPromise, timeoutPromise]).then(twinDetails => {
+          if (twinDetails) {
+            this.isValidTwinIDTransfer = true;
+            this.twinIDErrorMessage = "";
+            return this.isValidTwinIDTransfer;
+          } else {
+            this.isValidTwinIDTransfer = false;
+            this.twinIDErrorMessage = "Twin ID doesn't exist";
+            return this.isValidTwinIDTransfer;
+          }
+        });
+      } catch (error) {
+        this.isValidTwinIDTransfer = false;
+        this.twinIDErrorMessage = "Twin ID doesn't exist";
+        return this.isValidTwinIDTransfer;
+      }
+    }
+    this.validatingTwinId = false;
+  }
+
   clearInputValues() {
     this.receipientAddress = "";
     this.receptinTwinId = "";
-    this.transferAmount = 0;
+    this.transferAmount = 1;
     this.twinIDErrorMessage = "";
     this.addressErrorMessage = "";
-  }
-
-  transferTwinIdCheck() {
-    if (this.receptinTwinId.length === 0) {
-      this.twinIDErrorMessage = "This field is required and should be a number.";
-      this.isValidTwinIDTransfer = false;
-      return this.isValidTwinIDTransfer;
-    }
-
-    if (parseInt(this.receptinTwinId) === this.$store.state.credentials.twin.id) {
-      this.twinIDErrorMessage = "You can't transfer to yourself";
-      this.isValidTwinIDTransfer = false;
-      return this.isValidTwinIDTransfer;
-    }
-
-    if (!/^[1-9]\d*$/.test(this.receptinTwinId)) {
-      this.twinIDErrorMessage = "Please enter a positive integer";
-      this.isValidTwinIDTransfer = false;
-      return this.isValidTwinIDTransfer;
-    }
-
-    if (!(parseInt(this.receptinTwinId) >= -(2 ** 31) && parseInt(this.receptinTwinId) <= 2 ** 31 - 1)) {
-      this.twinIDErrorMessage = "Please enter a valid twin id";
-      this.isValidTwinIDTransfer = false;
-      return this.isValidTwinIDTransfer;
-    }
-
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => {
-        reject(new Error("Request timed out."));
-      }, 6000);
-    });
-
-    try {
-      const twinDetailsPromise = this.queryClient.twins.get({ id: parseInt(this.receptinTwinId) });
-      Promise.race([twinDetailsPromise, timeoutPromise]).then(twinDetails => {
-        if (twinDetails) {
-          this.isValidTwinIDTransfer = true;
-          this.twinIDErrorMessage = "";
-          return this.isValidTwinIDTransfer;
-        } else {
-          this.isValidTwinIDTransfer = false;
-          this.twinIDErrorMessage = "Twin ID doesn't exist";
-          return this.isValidTwinIDTransfer;
-        }
-      });
-    } catch (error) {
-      this.isValidTwinIDTransfer = false;
-      this.twinIDErrorMessage = "Twin ID doesn't exist";
-      return this.isValidTwinIDTransfer;
-    }
-    return this.isValidTwinIDTransfer;
   }
 
   validateAddressTransfer() {

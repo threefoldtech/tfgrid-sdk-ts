@@ -1,8 +1,16 @@
 <template>
-  <v-text-field :value="value" :label="label" :rules="rules" :type="type" @input="emitInput"></v-text-field>
+  <v-text-field
+    :hint="hint"
+    :value="value"
+    :label="label"
+    :rules="rules"
+    :type="type"
+    @input="emitInput"
+    :error-messages="errorMessages"
+  ></v-text-field>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   props: {
     amount: {
@@ -11,6 +19,14 @@ export default {
     },
     value: {
       type: [String, Number],
+      required: false,
+    },
+    errorMessages: {
+      type: String,
+      required: false,
+    },
+    hint: {
+      type: String,
       required: false,
     },
     type: {
@@ -26,8 +42,9 @@ export default {
       default: () => [],
     },
   },
+
   methods: {
-    emitInput(value) {
+    emitInput(value: string) {
       this.$emit("input", value);
     },
   },
