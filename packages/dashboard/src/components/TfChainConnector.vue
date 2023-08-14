@@ -253,7 +253,7 @@ import { generateKeyPair } from "web-ssh-keygen";
 import config from "@/portal/config";
 
 import {
-  activeAccountTwin,
+  activateAccountAndCreateTwin,
   createAccount,
   downloadAsFile,
   getGrid,
@@ -451,7 +451,7 @@ export default class TfChainConnector extends Vue {
     this.connecting = true;
     this.activateAccountError = "";
     try {
-      await activeAccountTwin(this.mnemonic);
+      await activateAccountAndCreateTwin(this.mnemonic);
       await this.checkMnemonic();
       this.connecting = false;
     } catch (e) {

@@ -46,7 +46,7 @@ export function createAccount() {
   return grid.tfchain.createAccount(relay);
 }
 
-export function activeAccountTwin(mnemonic: string) {
+export function activateAccountAndCreateTwin(mnemonic: string) {
   const grid = new GridClient({
     network,
     mnemonic,

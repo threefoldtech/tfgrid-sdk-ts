@@ -14,7 +14,7 @@ export async function getGrid(mnemonic: string) {
   return grid;
 }
 
-export function activeAccountTwin(mnemonic: string) {
+export function activateAccountAndCreateTwin(mnemonic: string) {
   const grid = new GridClient({
     network: config.network as NetworkEnv,
     mnemonic,

@@ -371,7 +371,7 @@ import { generateKeyPair } from "web-ssh-keygen";
 import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
 import {
-  activeAccountTwin,
+  activateAccountAndCreateTwin,
   type Balance,
   createAccount,
   getGrid,
@@ -602,7 +602,7 @@ async function activateAccount() {
   clearError();
   activatingAccount.value = true;
   try {
-    await activeAccountTwin(mnemonic.value);
+    await activateAccountAndCreateTwin(mnemonic.value);
     await mnemonicInput.value?.validate();
   } catch (e) {
     activatingAccountError.value = normalizeError(e, "Something went wrong while activating your account.");
