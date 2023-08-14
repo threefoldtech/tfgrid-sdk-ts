@@ -1,18 +1,15 @@
 <template>
-  <v-text-field
-    v-model="internalValue"
-    :label="label"
-    :rules="rules"
-    :type="type"
-    @input="emitInput"
-    @keydown="handleInput"
-  ></v-text-field>
+  <v-text-field :value="value" :label="label" :rules="rules" :type="type" @input="emitInput"></v-text-field>
 </template>
 
 <script>
 export default {
   props: {
     amount: {
+      type: [String, Number],
+      required: false,
+    },
+    value: {
       type: [String, Number],
       required: false,
     },
@@ -29,22 +26,9 @@ export default {
       default: () => [],
     },
   },
-  data() {
-    return {
-      internalValue: this.value,
-    };
-  },
   methods: {
-    handleInput(event) {
-      this.internalValue = event.target.value;
-    },
-    emitInput() {
-      this.$emit("input", this.internalValue);
-    },
-  },
-  watch: {
-    value(newValue) {
-      this.internalValue = newValue;
+    emitInput(value) {
+      this.$emit("input", value);
     },
   },
 };
