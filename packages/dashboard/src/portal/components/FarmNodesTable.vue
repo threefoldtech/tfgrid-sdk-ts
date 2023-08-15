@@ -324,7 +324,11 @@
             </v-btn>
             <v-spacer></v-spacer>
             <v-btn color="grey lighten-2 black--text" @click="openPublicConfigDialog = false"> Cancel </v-btn>
-            <v-btn color="primary white--text" @click="openWarningDialog = true" :disabled="!isValidPublicConfig">
+            <v-btn
+              color="primary white--text"
+              @click="openWarningDialog = true"
+              :disabled="!isValidPublicConfig || !changed"
+            >
               Save
             </v-btn>
           </v-card-actions>
@@ -439,7 +443,6 @@ import { hex2a } from "@/portal/lib/util";
 
 import { setDedicatedNodeExtraFee } from "../lib/nodes";
 import NodeMintingDetails from "./NodeMintingDetails.vue";
-
 @Component({
   name: "FarmNodesTable",
   components: { NodeMintingDetails },
@@ -531,6 +534,7 @@ export default class FarmNodesTable extends Vue {
   loadingExtraFee = false;
   $api: any;
   isValidPublicConfig = false;
+  changed = false;
   hasPublicConfig = false;
   isValidExtraFee = false;
   openWarningDialog = false;
@@ -542,9 +546,34 @@ export default class FarmNodesTable extends Vue {
   domainErrorMessage = "";
   extraFeeErrorMessage = "";
   receipts = [];
+  form = {
+    domain: "",
+    gw6: "",
+    ip6: "",
+    gw4: "",
+    ip4: "",
+  };
 
   updated() {
     this.receiptsPanel = [];
+    this.form = {
+      domain: this.domain,
+      gw6: this.gw6,
+      ip6: this.ip6,
+      gw4: this.gw4,
+      ip4: this.ip4,
+    };
+    if (
+      this.form.domain != this.nodeToEdit.publicConfig.domain ||
+      this.form.gw4 != this.nodeToEdit.publicConfig.gw4 ||
+      this.form.gw6 != this.nodeToEdit.publicConfig.gw6 ||
+      this.form.ip4 != this.nodeToEdit.publicConfig.ipv4 ||
+      this.form.ip6 != this.nodeToEdit.publicConfig.ipv6
+    ) {
+      this.changed = true;
+    } else {
+      this.changed = false;
+    }
   }
   onOptionChange(pageNumber: number, pageSize: number) {
     this.$emit("options-changed", { pageNumber, pageSize });
