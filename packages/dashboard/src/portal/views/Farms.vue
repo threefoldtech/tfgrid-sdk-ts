@@ -238,6 +238,7 @@ import {
   setFarmPayoutV2Address,
 } from "../lib/farms";
 import { NetworkEnv } from "../lib/util";
+import { MutationTypes } from "../store/mutations";
 
 @Component({
   name: "FarmsView",
@@ -372,6 +373,7 @@ export default class FarmsView extends Vue {
     this.loadingNodes = true;
     const { nodes, count } = await getNodesByFarmID(this.farmsIds, this.page, this.size);
     this.nodes = nodes;
+    this.$store.commit("portal/" + MutationTypes.SET_FARM_NODES, this.nodes);
     this.count = count;
     this.loadingNodes = false;
   }

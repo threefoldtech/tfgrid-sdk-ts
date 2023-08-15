@@ -28,14 +28,14 @@ export default class VotePopup extends Vue {
   proposals = 0;
   voteMsg = "You have a pending proposal to vote!";
 
-  private __destroied = false;
+  private __destroyed = false;
 
   async mounted() {
     await this.$store.dispatch("portal/getProposal", this.$store.state.credentials.twin.id);
 
     this.proposals = this.$store.state.portal.proposals;
 
-    if (!this.proposals || this.__destroied) return;
+    if (!this.proposals || this.__destroyed) return;
 
     this.voteMsg =
       this.proposals > 1
@@ -52,7 +52,7 @@ export default class VotePopup extends Vue {
   }
 
   destroyed() {
-    this.__destroied = true;
+    this.__destroyed = true;
   }
 }
 </script>
