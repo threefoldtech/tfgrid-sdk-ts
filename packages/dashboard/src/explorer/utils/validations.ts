@@ -98,7 +98,7 @@ function validateCountryFields(value: string, key: string) {
   return validated;
 }
 
-function validateNumberField(value: string, key: string): ErrorValidation {
+export function validateNumberField(value: string, key: string): ErrorValidation {
   // Validate number field and return true if valid false if not, also return string as error message.
   const validated = {
     errorMessage: "",
