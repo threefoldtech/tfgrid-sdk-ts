@@ -295,9 +295,13 @@ class Client extends QueryClient {
           events.forEach(({ phase, event: { data, method, section } }) => {
             console.log(`phase: ${phase}, section: ${section}, method: ${method}, data: ${data}`);
             if (section === SYSTEM && method === ExtrinsicState.ExtrinsicFailed) {
-              const [dispatchError, _] = data;
-              const errorIndex = dispatchError.asModule.error[0];
-              reject(errorIndex);
+              try {
+                const [dispatchError, _] = data;
+                const errorIndex = dispatchError.asModule.error[0];
+                reject(errorIndex);
+              } catch (e) {
+                reject(e);
+              }
             } else if (
               resultSections.includes(section) &&
               (resultEvents.length === 0 || (resultEvents.length > 0 && resultEvents.includes(method)))
