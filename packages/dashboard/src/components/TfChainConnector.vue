@@ -358,7 +358,8 @@ export default class TfChainConnector extends Vue {
   @Watch("$store.state.credentials.balance", { deep: true })
   async balanceWatcher$(profile: any) {
     if (profile) {
-      this.balance = this.$store.state.credentials.balance;
+      this.balance.free = this.$store.state.credentials.balance.free;
+      this.balance.frozen = this.$store.state.credentials.balance.reserved;
     }
   }
 
