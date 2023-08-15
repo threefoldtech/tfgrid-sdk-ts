@@ -224,12 +224,6 @@ function getChipColor(item: any) {
   return item === "Dedicated" ? "success" : "secondary";
 }
 
-onMounted(() => {
-  farmManager?.subscribe(farmId => {
-    if (farmId) loadNodes(farmId);
-  });
-});
-
 async function loadNodes(farmId: number) {
   availableNodes.value = [];
   selectedNode.value = undefined;
