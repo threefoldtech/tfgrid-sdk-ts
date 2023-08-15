@@ -1,3 +1,4 @@
+import { test } from "@threefold/common";
 import { createPinia } from "pinia";
 import { createApp } from "vue";
 
@@ -15,3 +16,5 @@ app.use(vuetify);
 defineGlobals(app);
 
 app.mount("#app");
+
+test();
