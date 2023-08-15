@@ -163,7 +163,7 @@ async function deploy() {
   const projectName = ProjectName.Presearch.toLowerCase();
 
   try {
-    layout.value.validateSsh();
+    layout.value?.validateSSH();
     const grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);

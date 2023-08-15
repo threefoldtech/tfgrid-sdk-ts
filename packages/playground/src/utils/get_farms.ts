@@ -1,31 +1,25 @@
-import type { FilterOptions, GridClient, NodeInfo } from "@threefold/grid_client";
+import type { FarmFilterOptions, FarmInfo, GridClient } from "@threefold/grid_client";
+
+import type { Farm } from "@/types";
 
 import { gqlClient, gridProxyClient } from "../clients";
 
 export interface GetFarmsOptions {
   exclusiveFor?: string;
 }
-export async function getFarms(grid: GridClient, filters: FilterOptions, options: GetFarmsOptions = {}) {
-  const nodes: NodeInfo[][] = [];
+export async function getFarms(
+  grid: GridClient,
+  filters: FarmFilterOptions,
+  options: GetFarmsOptions = {},
+): Promise<Farm[]> {
+  let farms = await grid.capacity.filterFarms({ ...filters }).catch(() => []);
 
-  let page = 1;
-  while (page) {
-    const _nodes = await grid.capacity.filterNodes({ ...filters, page }).catch(() => []);
-    nodes.push(_nodes);
-    page = nodes[page - 1].length ? ++page : 0;
-  }
-
-  let farmIds = Array.from(new Set(nodes.flat(1).map(node => node.farmId)));
-
-  if (options.exclusiveFor && !filters.publicIPs) {
+  if (options.exclusiveFor && !filters.publicIp) {
     const blockedFarms = await getBlockedFarmSet(options.exclusiveFor);
-    farmIds = farmIds.filter(id => !blockedFarms.has(id));
+    farms = farms.filter(farm => !blockedFarms.has(farm.farmId));
   }
 
-  return gqlClient.farms(
-    { farmID: true, name: true },
-    { orderBy: ["farmID_ASC"], where: { farmID_in: farmIds }, limit: farmIds.length },
-  );
+  return farms.map(farm => ({ name: farm.name, farmID: farm.farmId, country: filters.country }));
 }
 
 export async function getBlockedFarmSet(exclusiveFor: string): Promise<Set<number>> {

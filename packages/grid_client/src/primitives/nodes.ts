@@ -7,15 +7,16 @@ import { RMB } from "../clients";
 import { Graphql } from "../clients/graphql/client";
 import { TFClient } from "../clients/tf-grid/client";
 import { send } from "../helpers/requests";
-import { FilterOptions } from "../modules/models";
+import { FarmFilterOptions, FilterOptions } from "../modules/models";
 
 interface FarmInfo {
   name: string;
   farmId: number;
   twinId: number;
-  version: number;
   pricingPolicyId: number;
+  certificationType: string;
   stellarAddress: string;
+  dedicated: boolean;
   publicIps: PublicIps[];
 }
 interface PublicIps {
@@ -295,7 +296,7 @@ class Nodes {
   async filterNodes(options: FilterOptions = {}, url = ""): Promise<NodeInfo[]> {
     let nodes: NodeInfo[] = [];
     url = url || this.proxyURL;
-    const query = this.getUrlQuery(options);
+    const query = this.getNodeUrlQuery(options);
     try {
       nodes = await send("get", urlJoin(url, `/nodes?${query}`), "", {});
     } catch {
@@ -305,6 +306,17 @@ class Nodes {
       nodes = nodes.filter(n => !(options.nodeExclude && options.nodeExclude?.includes(n.nodeId)));
     }
     return nodes;
+  }
+  async filterFarms(options: FilterOptions = {}, url = ""): Promise<FarmInfo[]> {
+    let farms: FarmInfo[] = [];
+    url = url || this.proxyURL;
+    const query = this.getFarmUrlQuery(options);
+    try {
+      farms = await send("get", urlJoin(url, `/farms?${query}`), "", {});
+    } catch {
+      throw Error(`Invalid query: ${query}`);
+    }
+    return farms;
   }
 
   /**
@@ -324,7 +336,7 @@ class Nodes {
     return filteredFarms[0].farmId;
   }
 
-  getUrlQuery(options: FilterOptions = {}) {
+  getNodeUrlQuery(options: FilterOptions = {}) {
     const params = {
       free_mru: Math.ceil(this._g2b(options.mru)) || "",
       free_sru: Math.ceil(this._g2b(options.sru)) || "",
@@ -352,6 +364,29 @@ class Nodes {
       params["ipv6"] = true;
       params["domain"] = true;
     }
+    return Object.entries(params)
+      .map(param => param.join("="))
+      .join("&");
+  }
+
+  getFarmUrlQuery(options: FarmFilterOptions = {}) {
+    const params = {
+      node_free_mru: Math.ceil(this._g2b(options.nodeMRU)) || "",
+      node_free_sru: Math.ceil(this._g2b(options.nodeSRU)) || "",
+      node_free_hru: Math.ceil(this._g2b(options.nodeHRU)) || "",
+      free_ips: options.publicIp ? 1 : "",
+      certification_type: options.certificationType,
+      farm_name: options.farmName,
+      country: options.country,
+      dedicated: options.dedicated,
+      node_available_for: options.availableFor,
+      node_status: "up",
+      page: options.page,
+      size: options.size,
+      node_has_gpu: options.nodeHasGPU,
+      node_rented_by: options.nodeRentedBy,
+      node_certified: options.nodeCertified,
+    };
     return Object.entries(params)
       .map(param => param.join("="))
       .join("&");

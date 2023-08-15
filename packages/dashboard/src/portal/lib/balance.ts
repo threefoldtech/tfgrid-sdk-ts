@@ -7,9 +7,8 @@ export interface balanceInterface {
 
 export async function getBalance(api: any, address: string) {
   const res = await api.query.system.account(address);
-
   return {
-    free: Math.floor((res.data.free.toJSON() / 1e7) * 1000) / 1000,
+    free: Math.floor((res.data.free.toJSON() / 1e7) * 1e7) / 1e7,
     transferable: Math.floor(((res.data.free.toJSON() - res.data.frozen.toJSON()) / 1e7) * 1000) / 1000,
     reserved: res.data.frozen.toJSON() / 1e7,
   };

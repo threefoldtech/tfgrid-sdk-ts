@@ -198,7 +198,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   let vm: any;
 
   try {
-    layout.value.validateSsh();
+    layout.value?.validateSSH();
     grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);
