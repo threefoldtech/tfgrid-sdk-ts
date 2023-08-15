@@ -316,6 +316,8 @@ export default class TfChainConnector extends Vue {
   public validatingMnemonic = false;
   public mnemonicError: null | string = null;
 
+  private interval: ReturnType<typeof setInterval> | null = null;
+
   get isInvalidMnemonic(): boolean {
     return !this.mnemonic || this.validatingMnemonic || this.mnemonicError !== null;
   }
@@ -350,7 +352,6 @@ export default class TfChainConnector extends Vue {
   async profileWatcher$(profile: any) {
     if (profile) {
       const grid = await getGrid(profile.mnemonic);
-
       this.balance = await loadBalance(grid);
     }
   }
@@ -358,8 +359,37 @@ export default class TfChainConnector extends Vue {
   @Watch("$store.state.credentials.balance", { deep: true })
   async balanceWatcher$(profile: any) {
     if (profile) {
-      this.balance = this.$store.state.credentials.balance;
+      this.balance.free = this.$store.state.credentials.balance.free;
+      this.balance.frozen = this.$store.state.credentials.balance.reserved;
     }
+  }
+
+  /* Load Balance every 2 min */
+
+  startBalanceInterval() {
+    this.interval = setInterval(this.loadBalanceData, 2 * 60 * 1000);
+  }
+
+  stopBalanceInterval() {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
+  }
+
+  async loadBalanceData() {
+    const profile = this.$store.state.profile;
+    if (profile) {
+      const grid = await getGrid(profile.mnemonic);
+      this.balance = await loadBalance(grid);
+    }
+  }
+
+  mounted() {
+    this.startBalanceInterval();
+  }
+
+  beforeDestroy() {
+    this.stopBalanceInterval();
   }
 
   /* Validation */
