@@ -5,8 +5,8 @@
 <script lang="ts">
 import { computed, ref, watch } from "vue";
 
-import { type FormValidatorService, provideForm, ValidatorStatus } from "@/hooks/form_validator";
-import type { InputValidatorService } from "@/hooks/input_validator";
+import { type FormValidatorService, provideForm, ValidatorStatus } from "../hooks/form_validator";
+import type { InputValidatorService } from "../hooks/input_validator";
 
 export default {
   name: "FormValidator",

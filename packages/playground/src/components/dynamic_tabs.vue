@@ -37,9 +37,8 @@
 </template>
 
 <script lang="ts" setup>
+import { useFormRef } from "@threefold/common";
 import { computed, ref, watch } from "vue";
-
-import { useFormRef } from "@/hooks/form_validator";
 
 export interface Tab {
   title: string;

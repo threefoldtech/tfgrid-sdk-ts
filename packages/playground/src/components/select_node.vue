@@ -80,10 +80,9 @@
 </template>
 
 <script lang="ts" setup>
+import { ValidatorStatus } from "@threefold/common";
 import type { GridClient } from "@threefold/grid_client";
 import { onMounted, type PropType, type Ref, ref, watch } from "vue";
-
-import { ValidatorStatus } from "@/hooks/form_validator";
 
 import { useProfileManager } from "../stores/profile_manager";
 import { getFilteredNodes, getNodeCards, type INode, type NodeGPUCardType } from "../utils/filter_nodes";

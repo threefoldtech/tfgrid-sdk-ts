@@ -23,9 +23,8 @@
 </template>
 
 <script lang="ts" setup>
+import { useInputRef } from "@threefold/common";
 import { onMounted, onUnmounted, type PropType, ref, watch } from "vue";
-
-import { useInputRef } from "@/hooks/input_validator";
 
 import { useProfileManager } from "../stores/profile_manager";
 import type { Farm } from "../types";
@@ -168,9 +167,8 @@ watch([loading, shouldBeUpdated], async ([l, s]) => {
 </script>
 
 <script lang="ts">
+import { ValidatorStatus } from "@threefold/common";
 import { nextTick } from "vue";
-
-import { ValidatorStatus } from "@/hooks/form_validator";
 
 import SelectCountry from "./select_country.vue";
 

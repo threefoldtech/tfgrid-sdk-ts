@@ -361,6 +361,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useInputRef } from "@threefold/common";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import md5 from "md5";
@@ -368,7 +369,6 @@ import { computed, onMounted, type Ref, ref, watch } from "vue";
 import { nextTick } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
-import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
 import {
   activateAccountAndCreateTwin,

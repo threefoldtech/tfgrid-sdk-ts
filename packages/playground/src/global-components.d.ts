@@ -2,7 +2,6 @@ import type { NetworkEnv } from "@threefold/grid_client";
 
 import CopyInputWrapper from "./components/copy_input_wrapper.vue";
 import DTabs from "./components/dynamic_tabs.vue";
-import FormValidator from "./components/form_validator.vue";
 import InputTooltip from "./components/input_tooltip.vue";
 import PasswordInputWrapper from "./components/password_input_wrapper.vue";
 import ViewLayout from "./components/view_layout.vue";
@@ -14,7 +13,6 @@ declare module "@vue/runtime-core" {
     WebletLayout: typeof WebletLayout;
     CopyInputWrapper: typeof CopyInputWrapper;
     DTabs: typeof DTabs;
-    FormValidator: typeof FormValidator;
     ViewLayout: typeof ViewLayout;
     InputTooltip: typeof InputTooltip;
   }

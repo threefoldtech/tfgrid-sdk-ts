@@ -45,10 +45,9 @@
 </template>
 
 <script lang="ts" setup>
+import { ValidatorStatus } from "@threefold/common";
 import type { FilterOptions } from "@threefold/grid_client";
 import { onMounted, onUnmounted, ref, watch } from "vue";
-
-import { ValidatorStatus } from "@/hooks/form_validator";
 
 import { useProfileManager } from "../stores";
 import type { GatewayNode } from "../types";
