@@ -16,10 +16,8 @@
 import debounce from "lodash/debounce.js";
 import { computed, getCurrentInstance, onMounted, onUnmounted, type PropType, ref, watch } from "vue";
 
-import { useForm, ValidatorStatus } from "@/hooks/form_validator";
-import type { InputValidatorService } from "@/hooks/input_validator";
-
-import type { INode } from "../utils/filter_nodes";
+import { useForm, ValidatorStatus } from "../hooks/form_validator";
+import type { InputValidatorService } from "../hooks/input_validator";
 
 export default {
   name: "InputValidator",
@@ -35,10 +33,7 @@ export default {
       required: false,
       default: () => [] as AsyncRule[],
     },
-    value: {
-      type: String as PropType<string | number | INode | undefined>,
-      required: true,
-    },
+    value: String as PropType<any>,
     validMessage: String,
     hint: String,
     disableValidation: Boolean,
