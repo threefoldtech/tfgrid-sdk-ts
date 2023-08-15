@@ -1,20 +1,12 @@
 import { marked } from "marked";
 import type { App, Component } from "vue";
 
-import CopyInputWrapper from "./components/copy_input_wrapper.vue";
-import DTabs from "./components/dynamic_tabs.vue";
-import InputTooltip from "./components/input_tooltip.vue";
-import PasswordInputWrapper from "./components/password_input_wrapper.vue";
 import ViewLayout from "./components/view_layout.vue";
 import WebletLayout from "./components/weblet_layout.vue";
 
 const GLOBAL_COMPONENTS: { [key: string]: Component } = {
-  PasswordInputWrapper,
   WebletLayout,
-  CopyInputWrapper,
-  DTabs,
   ViewLayout,
-  InputTooltip,
 };
 
 export function defineGlobals(app: App<Element>): void {

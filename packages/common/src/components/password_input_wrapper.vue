@@ -1,4 +1,4 @@
-<template :x="5">
+<template>
   <slot :props="props"></slot>
 </template>
 
