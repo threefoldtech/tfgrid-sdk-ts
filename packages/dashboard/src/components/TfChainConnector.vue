@@ -373,7 +373,6 @@ export default class TfChainConnector extends Vue {
   stopBalanceInterval() {
     if (this.interval) {
       clearInterval(this.interval);
-      this.interval = null;
     }
   }
 
