@@ -124,10 +124,11 @@ async function deploy() {
 </script>
 
 <script lang="ts">
+import { normalizeError } from "@threefold/common";
+
 import ExpandableLayout from "../components/expandable_layout.vue";
 import K8SWorker from "../components/k8s_worker.vue";
 import { deploymentListEnvironments } from "../constants";
-import { normalizeError } from "../utils/helpers";
 
 export default {
   name: "TfKubernetes",

@@ -304,13 +304,14 @@ function customLastRoundValidation(validators: Validators) {
 </script>
 
 <script lang="ts">
+import { normalizeError } from "@threefold/common";
+
 import AlgorandCapacity from "../components/algorand_capacity.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectFarmManager from "../components/select_farm_manager.vue";
 import SelectNode from "../components/select_node.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { INode } from "../utils/filter_nodes";
-import { normalizeError } from "../utils/helpers";
 
 export default {
   name: "TfAlgorand",

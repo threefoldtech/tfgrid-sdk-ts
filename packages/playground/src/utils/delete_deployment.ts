@@ -1,10 +1,10 @@
+import { updateGrid } from "@threefold/common";
 import type { GridClient } from "@threefold/grid_client";
 
 import { ProjectName } from "@/types";
 
 import { loadVM } from "./deploy_vm";
 import { getSubdomain } from "./gateway";
-import { updateGrid } from "./grid";
 
 export interface DeleteDeploymentOptions {
   name: string;

@@ -78,12 +78,11 @@
 </template>
 
 <script lang="ts" setup>
+import { getGrid, useProfileManager } from "@threefold/common";
 import { ref } from "vue";
 
-import { useProfileManager } from "../stores";
 import { ProjectName } from "../types";
 import { addMachine, deleteMachine, loadVM } from "../utils/deploy_vm";
-import { getGrid } from "../utils/grid";
 import rootFs from "../utils/root_fs";
 
 const props = defineProps<{ master: any; data: any[] }>();
@@ -175,9 +174,10 @@ async function onDelete(cb: (workers: any[]) => void) {
 </script>
 
 <script lang="ts">
+import { normalizeError } from "@threefold/common";
+
 import CaproverWorker, { createWorker } from "../components/caprover_worker.vue";
 import ListTable from "../components/list_table.vue";
-import { normalizeError } from "../utils/helpers";
 import ManageWorkerDialog from "./manage_worker_dialog.vue";
 
 export default {

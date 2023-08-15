@@ -107,13 +107,17 @@
 </template>
 
 <script lang="ts" setup>
+import {
+  type Balance,
+  getDashboardURL,
+  getGrid,
+  loadBalance,
+  normalizeBalance,
+  useProfileManager,
+} from "@threefold/common";
 import { events, type GridClient } from "@threefold/grid_client";
 import debounce from "lodash/debounce.js";
 import { computed, ref, watch } from "vue";
-
-import { useProfileManager } from "../stores";
-import { getGrid, loadBalance } from "../utils/grid";
-import { getDashboardURL, normalizeBalance } from "../utils/helpers";
 
 const props = defineProps({
   disableAlerts: {
@@ -312,7 +316,6 @@ async function loadCost(profile: { mnemonic: string }) {
 <script lang="ts">
 import type { ComputedRef, Ref } from "vue";
 
-import type { Balance } from "../utils/grid";
 import DeploymentDataDialog from "./deployment_data_dialog.vue";
 import { useDeploymentListManager } from "./deployment_list_manager.vue";
 

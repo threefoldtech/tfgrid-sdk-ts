@@ -23,13 +23,11 @@
 </template>
 
 <script lang="ts" setup>
-import { useInputRef } from "@threefold/common";
+import { getGrid, useInputRef, useProfileManager } from "@threefold/common";
 import { onMounted, onUnmounted, type PropType, ref, watch } from "vue";
 
-import { useProfileManager } from "../stores/profile_manager";
 import type { Farm } from "../types";
 import { getFarms } from "../utils/get_farms";
-import { getGrid } from "../utils/grid";
 import { useFarmGatewayManager } from "./farm_gateway_manager.vue";
 import { useFarm } from "./select_farm_manager.vue";
 

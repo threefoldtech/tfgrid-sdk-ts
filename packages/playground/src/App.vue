@@ -81,7 +81,7 @@
         <v-divider vertical class="mx-2" />
         <AppTheme />
         <v-divider vertical class="mx-2" />
-        <ProfileManager v-model="openProfile" />
+        <TfChainWalletConnector v-model="openProfile" />
       </v-toolbar>
 
       <DeploymentListManager>
@@ -119,10 +119,9 @@
 </template>
 
 <script lang="ts" setup>
+import { useProfileManager } from "@threefold/common";
 import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-
-import { useProfileManager } from "./stores/profile_manager";
 
 const $route = useRoute();
 const $router = useRouter();
@@ -198,13 +197,14 @@ function clickHandler({ route, url }: AppRouteItem): void {
 </script>
 
 <script lang="ts">
+import { TfChainWalletConnector } from "@threefold/common";
+
 import AppInfo from "./components/app_info.vue";
 import AppTheme from "./components/app_theme.vue";
 import ConnectWalletLanding from "./components/connect_wallet_landing.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
 import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
 import TFNotification from "./components/tf_notification.vue";
-import ProfileManager from "./weblets/profile_manager.vue";
 
 interface AppRoute {
   title: string;
@@ -229,7 +229,7 @@ export default {
   components: {
     TFNotification,
     DisclaimerToolbar,
-    ProfileManager,
+    TfChainWalletConnector,
     DeploymentListManager,
     AppTheme,
     ConnectWalletLanding,

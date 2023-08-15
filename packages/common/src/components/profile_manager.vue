@@ -379,8 +379,7 @@ import {
   loadProfile,
   storeSSH,
 } from "../utils/grid";
-import { isEnoughBalance, normalizeError } from "../utils/helpers";
-import { downloadAsFile, normalizeBalance } from "../utils/helpers";
+import { downloadAsFile, isEnoughBalance, normalizeBalance, normalizeError } from "../utils/helpers";
 
 interface Credentials {
   passwordHash?: string;

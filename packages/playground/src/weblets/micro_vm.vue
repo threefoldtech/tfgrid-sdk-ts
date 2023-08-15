@@ -309,6 +309,8 @@ async function deploy() {
 </script>
 
 <script lang="ts">
+import { normalizeError } from "@threefold/common";
+
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectFarmManager from "../components/select_farm_manager.vue";
@@ -317,7 +319,6 @@ import SelectVmImage from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { solutionFlavor as SolutionFlavor } from "../types";
 import type { INode } from "../utils/filter_nodes";
-import { normalizeError } from "../utils/helpers";
 
 const solution = ref() as Ref<SolutionFlavor>;
 

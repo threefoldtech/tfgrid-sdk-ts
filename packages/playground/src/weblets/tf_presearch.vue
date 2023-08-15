@@ -123,15 +123,13 @@
 </template>
 
 <script lang="ts" setup>
+import { getGrid, normalizeError, useProfileManager } from "@threefold/common";
 import { type Ref, ref } from "vue";
 
 import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
 import { type Farm, type Flist, ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
-import { getGrid } from "../utils/grid";
-import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 import { generateName } from "../utils/strings";
 

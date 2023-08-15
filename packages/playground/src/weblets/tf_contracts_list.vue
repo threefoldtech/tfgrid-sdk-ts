@@ -245,11 +245,11 @@ async function onDelete() {
 </script>
 
 <script lang="ts">
+import { normalizeError } from "@threefold/common";
 import type { ContractLock } from "@threefold/tfchain_client";
 
 import ListTable from "../components/list_table.vue";
 import { solutionType } from "../types/index";
-import { normalizeError } from "../utils/helpers";
 
 export default {
   name: "TfContractsList",

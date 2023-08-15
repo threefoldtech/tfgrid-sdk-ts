@@ -62,10 +62,9 @@
 </template>
 
 <script lang="ts" setup>
+import { getGrid, updateGrid, useProfileManager } from "@threefold/common";
 import { computed, onMounted, ref } from "vue";
 
-import { useProfileManager } from "../stores";
-import { getGrid, updateGrid } from "../utils/grid";
 import { loadVms, mergeLoadedDeployments } from "../utils/load_deployment";
 
 const profileManager = useProfileManager();

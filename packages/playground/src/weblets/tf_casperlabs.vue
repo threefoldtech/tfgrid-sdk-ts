@@ -95,17 +95,15 @@
 </template>
 
 <script lang="ts" setup>
+import { getGrid, normalizeError, useProfileManager } from "@threefold/common";
 import type { GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
 import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
-import { getGrid } from "../utils/grid";
-import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();

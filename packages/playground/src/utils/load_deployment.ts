@@ -1,8 +1,7 @@
+import { normalizeError, updateGrid } from "@threefold/common";
 import type { GridClient } from "@threefold/grid_client";
 
 import { formatConsumption } from "./contracts";
-import { updateGrid } from "./grid";
-import { normalizeError } from "./helpers";
 
 export interface LoadedDeployments<T> {
   count: number;

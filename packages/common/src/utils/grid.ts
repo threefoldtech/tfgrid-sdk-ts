@@ -1,6 +1,6 @@
 import { BackendStorageType, GridClient, type NetworkEnv } from "@threefold/grid_client";
 
-import type { Profile } from "../stores/profile_manager";
+import type { Profile } from "../stores";
 
 const network = (process.env.NETWORK as NetworkEnv) || window.env.NETWORK;
 

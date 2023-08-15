@@ -1,6 +1,5 @@
+import { normalizeBalance } from "@threefold/common";
 import { ContractStates, type GridClient } from "@threefold/grid_client";
-
-import { normalizeBalance } from "./helpers";
 
 export async function getUserContracts(grid: GridClient) {
   const res: any = await grid!.contracts.listMyContracts();

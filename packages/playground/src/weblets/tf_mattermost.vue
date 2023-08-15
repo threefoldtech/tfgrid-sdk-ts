@@ -252,6 +252,8 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
 </script>
 
 <script lang="ts">
+import { normalizeError } from "@threefold/common";
+
 import DomainName from "../components/domain_name.vue";
 import FarmGatewayManager from "../components/farm_gateway_manager.vue";
 // import Networks from "../components/networks.vue";
@@ -262,7 +264,6 @@ import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { INode } from "../utils/filter_nodes";
-import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 
 export default {

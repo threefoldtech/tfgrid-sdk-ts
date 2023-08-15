@@ -327,14 +327,13 @@
 </template>
 
 <script lang="ts" setup>
+import { getGrid, Tab, updateGrid, useProfileManager } from "@threefold/common";
 import { getCurrentInstance, onUnmounted, type Ref, ref, watch } from "vue";
 
-import type { Tab } from "../components/dynamic_tabs.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { deploymentListEnvironments } from "../constants/deployment_list";
-import { useProfileManager } from "../stores";
 import { deleteDeployment } from "../utils/delete_deployment";
-import { getGrid, updateGrid } from "../utils/grid";
+
 const props = defineProps<{
   projectName?: ProjectName;
   title?: string;

@@ -93,14 +93,12 @@
 </template>
 
 <script lang="ts" setup>
+import { getGrid, normalizeError, useProfileManager } from "@threefold/common";
 import { ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
 import { type CaproverWorker as CW, ProjectName } from "../types";
 import { deployVM, type Env, type Machine } from "../utils/deploy_vm";
-import { getGrid } from "../utils/grid";
-import { normalizeError } from "../utils/helpers";
 import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();

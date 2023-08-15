@@ -147,11 +147,11 @@ watch(loadingFarm, (loadingFarm): void => {
 </script>
 
 <script lang="ts">
+import { useProfileManager } from "@threefold/common";
 import { ref, watch } from "vue";
 
 import SelectFarmManager, { useFarm } from "../components/select_farm_manager.vue";
 import SelectNode from "../components/select_node.vue";
-import { useProfileManager } from "../stores";
 import type { Farm, K8SWorker } from "../types";
 import type { INode } from "../utils/filter_nodes";
 import { generateName } from "../utils/strings";

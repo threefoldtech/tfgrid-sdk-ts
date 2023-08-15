@@ -1,4 +1,4 @@
-import type { NodeGPUCardType } from "../utils/filter_nodes";
+import type { NodeGPUCardType } from "../types";
 
 export function downloadAsFile(name: string, data: string) {
   const a = document.createElement("a");

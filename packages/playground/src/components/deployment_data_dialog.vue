@@ -115,10 +115,9 @@
 </template>
 
 <script lang="ts" setup>
+import { getCardName } from "@threefold/common";
 import hljs from "highlight.js";
 import { computed, type PropType, ref } from "vue";
-
-import { getCardName } from "@/utils/helpers";
 
 const props = defineProps({
   data: {
@@ -292,9 +291,9 @@ function getTooltipText(contract: any, index: number) {
 </script>
 
 <script lang="ts">
-import { useProfileManager } from "@/stores/profile_manager";
+import { getGrid, useProfileManager } from "@threefold/common";
+
 import { GrafanaStatistics } from "@/utils/getMetricsUrl";
-import { getGrid } from "@/utils/grid";
 
 import type { Disk } from "../utils/deploy_vm";
 import CopyReadonlyInput from "./copy_readonly_input.vue";

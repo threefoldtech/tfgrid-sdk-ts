@@ -66,7 +66,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useProfileManager } from "../stores";
+import { useProfileManager } from "@threefold/common";
+
 import rootFs from "../utils/root_fs";
 
 const emits = defineEmits<{ (event: "update:loading", value: boolean): void }>();

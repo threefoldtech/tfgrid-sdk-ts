@@ -156,17 +156,15 @@
 </template>
 
 <script lang="ts" setup>
+import { getGrid, normalizeError, useProfileManager } from "@threefold/common";
 import { type Ref, ref, watch } from "vue";
 
 import Network from "../components/networks.vue";
 import SelectFarmManager from "../components/select_farm_manager.vue";
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
 import type { solutionFlavor as SolutionFlavor } from "../types";
 import { type Farm, type Flist, ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
-import { getGrid } from "../utils/grid";
-import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();

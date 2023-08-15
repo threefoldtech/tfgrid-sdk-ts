@@ -42,11 +42,10 @@
 </template>
 
 <script lang="ts" setup>
+import { getGrid, useProfileManager } from "@threefold/common";
 import { ref } from "vue";
 
-import { useProfileManager } from "../stores";
 import { deleteWorker, deployWorker, loadK8S } from "../utils/deploy_k8s";
-import { getGrid } from "../utils/grid";
 
 const props = defineProps<{ data: K8S }>();
 const emits = defineEmits<{ (event: "close"): void; (event: "update:k8s", data: any): void }>();

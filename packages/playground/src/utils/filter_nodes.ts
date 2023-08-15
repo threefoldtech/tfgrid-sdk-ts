@@ -1,13 +1,8 @@
+import type { NodeGPUCardType } from "@threefold/common";
 import type { FilterOptions, GridClient, NodeInfo } from "@threefold/grid_client";
 
 import type { NodeFilters } from "@/components/select_node.vue";
 
-export interface NodeGPUCardType {
-  id: string;
-  vendor: string;
-  device: string;
-  contract: number;
-}
 export interface INode {
   nodeId: number;
   state?: string;

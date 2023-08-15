@@ -5,13 +5,11 @@
 <script lang="ts" setup>
 import "mosha-vue-toastify/dist/style.css";
 
+import { getGrid, useProfileManager } from "@threefold/common";
 import { ContractStates } from "@threefold/grid_client";
 import { createToast } from "mosha-vue-toastify";
 import { onMounted } from "vue";
 import { ref } from "vue";
-
-import { useProfileManager } from "../stores";
-import { getGrid } from "../utils/grid";
 
 const profileManager = useProfileManager();
 const contractsCount = ref(0);

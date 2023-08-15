@@ -28,10 +28,9 @@
 </template>
 
 <script lang="ts">
+import { useProfileManager } from "@threefold/common";
 import { computed } from "vue";
 import { useRoute } from "vue-router";
-
-import { useProfileManager } from "@/stores";
 
 import AppInfo from "./app_info.vue";
 

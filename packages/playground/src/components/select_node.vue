@@ -80,14 +80,12 @@
 </template>
 
 <script lang="ts" setup>
-import { ValidatorStatus } from "@threefold/common";
+import { getGrid, type NodeGPUCardType, useProfileManager, ValidatorStatus } from "@threefold/common";
+import { getCardName, normalizeError } from "@threefold/common";
 import type { GridClient } from "@threefold/grid_client";
 import { onMounted, type PropType, type Ref, ref, watch } from "vue";
 
-import { useProfileManager } from "../stores/profile_manager";
-import { getFilteredNodes, getNodeCards, type INode, type NodeGPUCardType } from "../utils/filter_nodes";
-import { getGrid } from "../utils/grid";
-import { getCardName, normalizeError } from "../utils/helpers";
+import { getFilteredNodes, getNodeCards, type INode } from "../utils/filter_nodes";
 import { useFarm } from "./select_farm_manager.vue";
 
 export interface NodeFilters {
