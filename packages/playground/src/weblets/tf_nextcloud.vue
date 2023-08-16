@@ -44,15 +44,15 @@
 
     <v-alert type="warning" variant="tonal" class="mb-6">
       <p :style="{ maxWidth: '880px' }">
-        You will need to add an A record (Host: "@", Value: &lt;VM_IP_Address&gt;) for this domain after deployment.
-        Otherwise, you won't be able to access the Nextcloud AIO instance using this domain.
+        Write a valid domain (e.g. "example.com"). After deployment, you will need to add a DNS A record (Host: "@",
+        Value: &lt;VM_IPv4_Address&gt;) to your domain to access Nextcloud.
       </p>
 
       <p class="font-weight-bold mt-4">
         For more information, read the
         <a
           target="_blank"
-          href="https://www.manual.grid.tf/terraform/advanced/terraform_nextcloud_aio.html"
+          href="https://www.manual.grid.tf/playground/nextcloud.html#set-the-dns-record"
           :style="{ color: 'inherit' }"
         >
           documentation</a
