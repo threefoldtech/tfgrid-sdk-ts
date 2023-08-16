@@ -3,7 +3,7 @@
     ref="layout"
     :cpu="cpu"
     :memory="memory"
-    :disk="rootFilesystemSize"
+    :disk="rootFilesystemSize + dockerDiskSize"
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
@@ -73,7 +73,7 @@
             :filters="{
               cpu,
               memory,
-              ssd: rootFilesystemSize,
+              ssd: rootFilesystemSize + dockerDiskSize,
               publicIp: ipv4,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
@@ -90,7 +90,7 @@
               cpu,
               memory,
               ipv4: ipv4,
-              diskSizes: [],
+              diskSizes: [dockerDiskSize],
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
@@ -147,12 +147,13 @@ const cpu = 1;
 const memory = 512;
 const rootFilesystemSize = rootFs(cpu, memory);
 const loadingFarm = ref(false);
+const dockerDiskSize = 10;
 const farm = ref() as Ref<Farm>;
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
 const network = ref();
 const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/presearch-v2.2.flist",
+  value: "https://hub.grid.tf/tf-official-apps/presearch-v2.3.flist",
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
@@ -179,6 +180,13 @@ async function deploy() {
           memory: memory,
           flist: flist.value,
           entryPoint: flist.entryPoint,
+          disks: [
+            {
+              name: "docker",
+              mountPoint: "/var/lib/docker",
+              size: dockerDiskSize,
+            },
+          ],
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           planetary: planetary.value,
