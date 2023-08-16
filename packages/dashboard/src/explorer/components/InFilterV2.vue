@@ -1,6 +1,6 @@
 <template>
   <v-card flat color="transparent">
-    <v-subheader>{{ options.label.toLocaleUpperCase() }}</v-subheader>
+    <v-subheader>{{ options.label }}</v-subheader>
     <v-combobox
       :items="searchItems"
       chips
