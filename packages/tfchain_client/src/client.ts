@@ -79,7 +79,7 @@ class QueryClient {
   async onDisconnet() {
     this.api.on("disconnected", async () => {
       console.log("WebSocket connection closed unexpectedly.");
-      console.log("Reconnecting..");
+      console.log("Reconnecting...");
       await this.createNewApiProvider();
       console.log("Connected!");
     });
@@ -93,7 +93,6 @@ class QueryClient {
       this.api = QueryClient.connections[this.url];
       if (this.api && this.api.isConnected) return;
       await this.connectingLock.acquireAsync();
-      await this.api.connect();
       await this.wait();
       await this.onDisconnet();
       this.connectingLock.release();
