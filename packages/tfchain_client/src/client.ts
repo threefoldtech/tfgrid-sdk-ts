@@ -68,6 +68,23 @@ class QueryClient {
     if (connection) throw Error(`Client couldn't connect to ${this.url} after 10 seconds`);
   }
 
+  async createNewApiProvider() {
+    await this.connectingLock.acquireAsync();
+    const provider = new WsProvider(this.url);
+    this.api = await ApiPromise.create({ provider });
+    await this.wait();
+    QueryClient.connections[this.url] = this.api;
+  }
+
+  async onDisconnet() {
+    this.api.on("disconnected", async () => {
+      console.log("WebSocket connection closed unexpectedly.");
+      console.log("Reconnecting..");
+      await this.createNewApiProvider();
+      console.log("Connected!");
+    });
+  }
+
   async connect() {
     this.checkInputs();
     await this.loadKeyPairOrSigner();
@@ -78,17 +95,13 @@ class QueryClient {
       await this.connectingLock.acquireAsync();
       await this.api.connect();
       await this.wait();
-      this.api.on("disconnected", this.api.connect);
+      await this.onDisconnet();
       this.connectingLock.release();
       return;
     }
-    await this.connectingLock.acquireAsync();
-    const provider = new WsProvider(this.url);
-    this.api = await ApiPromise.create({ provider });
-    await this.wait();
-    QueryClient.connections[this.url] = this.api;
 
-    this.api.on("disconnected", this.api.connect);
+    await this.createNewApiProvider();
+    await this.onDisconnet();
     this.connectingLock.release();
 
     if (isEnvNode()) {
@@ -107,7 +120,7 @@ class QueryClient {
   async disconnect(): Promise<void> {
     if (this.api && this.api.isConnected) {
       console.log("disconnecting");
-      this.api.off("disconnected", this.api.connect);
+      this.api.off("disconnected", this.createNewApiProvider);
       await this.api.disconnect();
       await this.wait(false);
     }
