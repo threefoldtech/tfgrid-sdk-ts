@@ -73,7 +73,7 @@
             :filters="{
               cpu,
               memory,
-              ssd: rootFilesystemSize,
+              ssd: rootFilesystemSize + dockerDiskSize,
               publicIp: ipv4,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
@@ -90,7 +90,7 @@
               cpu,
               memory,
               ipv4: ipv4,
-              diskSizes: [],
+              diskSizes: [dockerDiskSize],
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
