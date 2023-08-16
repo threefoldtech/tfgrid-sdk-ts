@@ -1525,19 +1525,19 @@
     websocket "^1.0.32"
 
 "@substrate/ss58-registry@^1.38.0":
-  version "1.42.0"
-  resolved "https://registry.yarnpkg.com/@substrate/ss58-registry/-/ss58-registry-1.42.0.tgz#ab7c71b67a2db67c9c082f75ad5b1b672c192dc5"
-  integrity sha512-SwcM9d9q4tjcAx9O3wpLoDE+d82rBDCPW1ngRMFyQb/LNEXNVR7vmCy0cP8evBDyxP8reL0YwNV+DtkC45vkaw==
+  version "1.43.0"
+  resolved "https://registry.yarnpkg.com/@substrate/ss58-registry/-/ss58-registry-1.43.0.tgz#93108e45cb7ef6d82560c153e3692c2aa1c711b3"
+  integrity sha512-USEkXA46P9sqClL7PZv0QFsit4S8Im97wchKG0/H/9q3AT/S76r40UHfCr4Un7eBJPE23f7fU9BZ0ITpP9MCsA==
 
-"@threefold/grid_client@2.1.0-rc9":
-  version "2.1.0-rc9"
-  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.1.0-rc9.tgz#026d1fc5d02ba2e82e16ff695fbd89795f803f4f"
-  integrity sha512-gbKZgf7S9QG6egF1+9VtlTJ1vR0TJMxvf7QUuGhysIACWsX2zOlZGYYKhyDaJ9oNa8u3xdavFzr3MOZpBAOkcg==
+"@threefold/grid_client@2.1.0-rc10":
+  version "2.1.0-rc10"
+  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.1.0-rc10.tgz#65bf02e00b6bfac4ccc5d51446061a36b792d929"
+  integrity sha512-5cWVpK297Tml5SXwQygoPHdLEN5wTlkkpPahDYzMeDQSi2B02OOozYG5a5g6JtO9Iw2hOL90HpoA+Zc1jq4beQ==
   dependencies:
     "@jimber/pkid" "1.0.4"
     "@noble/secp256k1" "^1.7.1"
-    "@threefold/rmb_direct_client" "^2.1.0-rc9"
-    "@threefold/tfchain_client" "^2.1.0-rc9"
+    "@threefold/rmb_direct_client" "^2.1.0-rc10"
+    "@threefold/tfchain_client" "^2.1.0-rc10"
     algosdk "^1.19.0"
     appdata-path "^1.0.0"
     axios "^0.27.2"
@@ -1559,14 +1559,14 @@
     url-parse "^1.5.10"
     uuid4 "^2.0.2"
 
-"@threefold/rmb_direct_client@^2.1.0-rc9":
-  version "2.1.0-rc9"
-  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-2.1.0-rc9.tgz#76a279a0ceab6563bfcae3e09a5feed3961a6fa7"
-  integrity sha512-HB6RA+Li/a7Kocd7ACvW0PMYStuep2QYUgjTogKcm3Oaa8nT9o8f9dyNY4LboLFWBYnc4PLxeDL9h/UdKTlaqg==
+"@threefold/rmb_direct_client@^2.1.0-rc10":
+  version "2.1.0-rc10"
+  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-2.1.0-rc10.tgz#0ae0b303328d77c2cd4d99bc861280e6b64e86f0"
+  integrity sha512-DDljJfW3XtaMHtLtzuBClOmaqE8FZgM7TStRQxEPE2gdXGTZl27IpzAJFp4HZSePowMlL3UgfcJtwVy7iog6Ew==
   dependencies:
     "@noble/secp256k1" "^1.7.1"
     "@polkadot/api" "^8.9.1"
-    "@threefold/tfchain_client" "^2.1.0-rc9"
+    "@threefold/tfchain_client" "^2.1.0-rc10"
     base64url "^3.0.1"
     bip39 "^3.1.0"
     buffer "^6.0.3"
@@ -1576,10 +1576,10 @@
     uuid "^8.3.2"
     ws "^8.12.0"
 
-"@threefold/tfchain_client@^2.1.0-rc9":
-  version "2.1.0-rc9"
-  resolved "https://registry.yarnpkg.com/@threefold/tfchain_client/-/tfchain_client-2.1.0-rc9.tgz#62a25fb4170cca81eaf21c77d1582fe41dc17cc2"
-  integrity sha512-tVal3gUJEPv9zcAe9Zs4OQ0V0VM0xmbPvQ342Dz0aUxphh5CflV33qbTHJkjDB7EukrmwpJmKJDADxa6GEeogA==
+"@threefold/tfchain_client@^2.1.0-rc10":
+  version "2.1.0-rc10"
+  resolved "https://registry.yarnpkg.com/@threefold/tfchain_client/-/tfchain_client-2.1.0-rc10.tgz#f77ae4c39ddb96f64f6ec83720d32457b014d568"
+  integrity sha512-e6yqdbgeWGhj0pgkEzzGEIb9yaPo8+N8OB+KlbR7qtBSaUc59fuGKCdZflpUYDxjoB0HeBUq1XWzRqQz1TY9Jg==
   dependencies:
     "@polkadot/api" "^8.9.1"
     await-lock "^2.2.2"
