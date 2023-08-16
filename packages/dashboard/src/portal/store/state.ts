@@ -18,7 +18,6 @@ export interface PortalState {
   tabQuery: string;
   tableLoad: boolean;
   twinID: number;
-  farmNodes: INode[];
   dedicatedNodesFilter: any;
   dedicatedNodesTablePageSize: number;
   dedicatedNodesTablePageNumber: number;
@@ -33,7 +32,6 @@ export default {
   tabQuery: "",
   tableLoad: false,
   twinID: 0,
-  farmNodes: [],
   dedicatedNodesFilter: {},
   dedicatedNodesTablePageSize: 10,
   dedicatedNodesTablePageNumber: 1,

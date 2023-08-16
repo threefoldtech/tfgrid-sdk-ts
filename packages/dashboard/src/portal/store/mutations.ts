@@ -14,7 +14,6 @@ export enum MutationTypes {
   SET_TAB_QUERY = "setTabQuery",
   SET_TABLE_LOAD = "setTableLoad",
   SET_DEDICATED_NODES = "setDedicatedNodes",
-  SET_FARM_NODES = "setFarmNodes",
   SET_DEDICATED_NODES_COUNT = "setDedicatedNodesCount",
   SET_ADDRESS = "setAddress",
 
@@ -65,10 +64,6 @@ export default {
 
   setAddress(state: PortalState, address: string) {
     state.address = address;
-  },
-
-  setFarmNodes(state: PortalState, nodes: any[]): void {
-    state.farmNodes = nodes;
   },
 
   setDedicatedNodes(state: PortalState, nodes: any[]): void {
