@@ -13,12 +13,16 @@ export function generateName(length = 12, options?: GenerateNameOptions): string
   const consonants = "bcdfghjklmnpqrstvwxyz";
   const nums = "0123456789";
 
+  const prefix = options?.prefix ?? "";
+  const suffix = options?.suffix ?? "";
+  const remainingLength = length - prefix.length - suffix.length;
+
   return (
     (options?.prefix ?? "") +
     randomChoice(consonants) +
-    generateString(vowels + consonants, Math.ceil((length - 2) / 2)) +
-    generateString(consonants, Math.floor(length / 3)) +
-    generateString(nums, Math.floor(length / 6)) +
+    generateString(vowels + consonants, Math.ceil((remainingLength - 2) / 2)) +
+    generateString(consonants, Math.floor(remainingLength / 3)) +
+    generateString(nums, Math.floor(remainingLength / 6)) +
     (options?.suffix ?? "")
   );
 }
