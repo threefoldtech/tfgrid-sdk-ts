@@ -9,11 +9,17 @@ export interface GenerateNameOptions {
   suffix?: string;
 }
 export function generateName(length = 12, options?: GenerateNameOptions): string {
-  const chars = "abcdefghijklmnopqrstuvwxyz";
+  const vowels = "aeiou";
+  const consonants = "bcdfghjklmnpqrstvwxyz";
   const nums = "0123456789";
 
   return (
-    (options?.prefix ?? "") + randomChoice(chars) + generateString(chars + nums, length - 1) + (options?.suffix ?? "")
+    (options?.prefix ?? "") +
+    randomChoice(consonants) +
+    generateString(vowels + consonants, Math.ceil((length - 2) / 2)) +
+    generateString(consonants, Math.floor(length / 3)) +
+    generateString(nums, Math.floor(length / 6)) +
+    (options?.suffix ?? "")
   );
 }
 
