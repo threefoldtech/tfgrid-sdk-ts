@@ -109,7 +109,7 @@ const profileManager = useProfileManager();
 const loadingFarm = ref(false);
 const domain = ref("");
 const password = ref(generatePassword(10));
-const leader = ref(createWorker(generateName(9, { prefix: "cr" })));
+const leader = ref(createWorker(generateName(5, { prefix: "cr" })));
 const workers = ref<CW[]>([]);
 
 async function deploy() {
