@@ -124,13 +124,12 @@
 </template>
 
 <script lang="ts" setup>
+import { getGrid, useProfileManager } from "@threefold/common";
 import { ContractStates } from "@threefold/grid_client";
 import { ref } from "vue";
 
-import { useProfileManager } from "../stores";
 import type { VDataTableHeader } from "../types";
 import { getUserContracts, type NormalizedContract } from "../utils/contracts";
-import { getGrid } from "../utils/grid";
 
 const layout = ref();
 const profileManager = useProfileManager();

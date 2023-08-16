@@ -189,14 +189,12 @@
 </template>
 
 <script lang="ts" setup>
+import { getGrid, useProfileManager } from "@threefold/common";
 import { computed, type Ref, ref, watch } from "vue";
 
-import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
 import { type Farm, type Flist, ProjectName, type Validators } from "../types";
 import { deployVM } from "../utils/deploy_vm";
-import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();

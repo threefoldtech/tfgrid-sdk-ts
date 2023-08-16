@@ -183,15 +183,14 @@
 </template>
 
 <script lang="ts" setup>
+import { getGrid, useProfileManager } from "@threefold/common";
 import { computed, type Ref, ref } from "vue";
 
 import Network from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
 import { type Farm, type Flist, ProjectName } from "../types";
 import { deployVM, type Disk, type Env } from "../utils/deploy_vm";
-import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();

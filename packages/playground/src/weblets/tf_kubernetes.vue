@@ -75,14 +75,13 @@
 </template>
 
 <script lang="ts" setup>
+import { getGrid, normalizeError, useProfileManager } from "@threefold/common";
 import { ref } from "vue";
 
 import { createWorker } from "../components/k8s_worker.vue";
 import { useLayout } from "../components/weblet_layout.vue";
-import { useProfileManager } from "../stores";
 import type { K8SWorker as K8sWorker } from "../types";
 import { deployK8s } from "../utils/deploy_k8s";
-import { getGrid } from "../utils/grid";
 import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
@@ -124,8 +123,6 @@ async function deploy() {
 </script>
 
 <script lang="ts">
-import { normalizeError } from "@threefold/common";
-
 import ExpandableLayout from "../components/expandable_layout.vue";
 import K8SWorker from "../components/k8s_worker.vue";
 import { deploymentListEnvironments } from "../constants";

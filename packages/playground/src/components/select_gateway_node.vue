@@ -45,15 +45,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ValidatorStatus } from "@threefold/common";
+import { getGrid, useProfileManager, ValidatorStatus } from "@threefold/common";
 import type { FilterOptions } from "@threefold/grid_client";
 import { onMounted, onUnmounted, ref, watch } from "vue";
 
-import { useProfileManager } from "../stores";
 import type { GatewayNode } from "../types";
 import type { Farm } from "../types";
 import { loadGatewayNodes } from "../utils/gateway";
-import { getGrid } from "../utils/grid";
 
 const props = defineProps<{ modelValue?: GatewayNode; farmData?: Farm; customDomain?: boolean }>();
 const emits = defineEmits<{ (event: "update:model-value", value: GatewayNode | undefined): void }>();

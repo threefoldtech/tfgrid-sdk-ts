@@ -13,6 +13,7 @@
     "format": "prettier --write src/"
   },
   "main": "./src/main.ts",
+  "module": "./src/main.ts",
   "dependencies": {
     "pinia": "^2.1.4",
     "vue": "^3.3.4"

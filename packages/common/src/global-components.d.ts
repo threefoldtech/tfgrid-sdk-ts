@@ -1,41 +1,21 @@
-import type { NetworkEnv } from "@threefold/grid_client";
+/* eslint-disable @typescript-eslint/no-empty-interface */
+import type { GlobalTypes } from "./types";
 
-import CopyInputWrapper from "../components/copy_input_wrapper.vue";
-import DTabs from "../components/dynamic_tabs.vue";
-import FormValidator from "../components/form_validator.vue";
-import InputTooltip from "../components/input_tooltip.vue";
-import InputValidator from "../components/input_validator.vue";
-import PasswordInputWrapper from "../components/password_input_wrapper.vue";
-import type { ValidatorsType } from "./utils";
-
-export declare module "@vue/runtime-core" {
-  export interface GlobalComponents {
-    InputValidator: typeof InputValidator;
-    FormValidator: typeof FormValidator;
-    CopyInputWrapper: typeof CopyInputWrapper;
-    DTabs: typeof DTabs;
-    InputTooltip: typeof InputTooltip;
-    PasswordInputWrapper: typeof PasswordInputWrapper;
+declare module "@vue/runtime-core" {
+  export interface GlobalComponents extends GlobalTypes.Components {}
+  export interface ComponentCustomProperties extends GlobalTypes.Properties {
+    $vuetify: any;
   }
+}
 
-  export interface ComponentCustomProperties {
-    validators: ValidatorsType;
+declare module "vue" {
+  export interface ComponentCustomProperties extends GlobalTypes.Properties {
+    $vuetify: any;
   }
 }
 
 declare global {
-  interface Window {
-    env: {
-      NETWORK: NetworkEnv;
-      GRAPHQL_URL: string;
-      GRIDPROXY_URL: string;
-      SUBSTRATE_URL: string;
-      ACTIVATION_SERVICE_URL: string;
-      RELAY_DOMAIN: string;
-      BRIDGE_TFT_ADDRESS: string;
-      STELLAR_NETWORK: string;
-      STELLAR_HORIZON_URL: string;
-      TFT_ASSET_ISSUER: string;
-    };
+  export interface Window {
+    env: GlobalTypes.Environment;
   }
 }
