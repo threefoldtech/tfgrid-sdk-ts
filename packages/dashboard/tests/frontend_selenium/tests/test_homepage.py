@@ -70,7 +70,7 @@ def test_import_account(browser):
     dashboard_page = before_test_setup(browser)
     password = generate_string()
     dashboard_page.import_account(get_seed())
-    dashboard_page.connect_your_wallet(password).click()
+    dashboard_page.click_button(dashboard_page.connect_your_wallet(password))
     dashboard_page.logout_account()
     assert dashboard_page.login_account(password).is_enabled() == True
 
@@ -97,7 +97,7 @@ def test_account_validation(browser):
     dashboard_page.import_account(get_seed())
     assert dashboard_page.connect_your_wallet('12345').get_attribute("disabled") == 'true'
     assert dashboard_page.wait_for('Password must be at least 6 characters')
-    assert dashboard_page.connect_your_wallet('123456').get_attribute("disabled") == None
+    dashboard_page.connect_your_wallet('123456')
     dashboard_page.confirm_password('12345')
     assert dashboard_page.wait_for('Passwords should match')
     dashboard_page.connect_your_wallet('123456').click()
@@ -144,7 +144,7 @@ def test_login_links(browser):
     dashboard_page = before_test_setup(browser)
     password = generate_string()
     dashboard_page.import_account(get_seed())
-    dashboard_page.connect_your_wallet(password).click()
+    dashboard_page.click_button(dashboard_page.connect_your_wallet(password))
     assert dashboard_page.manual_link() == 'https://manual.grid.tf/dashboard/dashboard.html#tfchain-wallet'
     assert dashboard_page.connect_manual_link() == 'https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html'
     assert dashboard_page.get_connect_google_link() == 'https://play.google.com/store/apps/details?id=org.jimber.threebotlogin&hl=en&gl=US'

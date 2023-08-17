@@ -18,10 +18,10 @@ class DashboardPage:
     threefold_guide_label = (By.XPATH, "//*[contains(text(), 'Your Guide to The ThreeFold Grid')]")
     learn_more_button = (By.XPATH, "//*[contains(text(), 'Learn More')]")
     generate_account_button = (By.XPATH, "//*[contains(text(), 'Generate Account')]")
-    mnemonic_input = (By.XPATH, "/html/body/div[1]/div[3]/div/div/div[3]/div[2]/form/div[2]/div/div/div[1]/div[1]/input")
-    password_input = (By.XPATH, "/html/body/div[1]/div[3]/div/div/div[3]/div[2]/form/div[3]/div/div[1]/div[1]/input")
-    confirm_password_input = (By.XPATH, "/html/body/div[1]/div[3]/div/div/div[3]/div[2]/form/div[4]/div/div[1]/div[1]/input")
-    connect_button = (By.XPATH, '//*[@id="app"]/div[3]/div/div/div[3]/div[2]/form/div[5]/button')
+    mnemonic_input = (By.XPATH, "/html/body/div[1]/div[3]/div/div/div[3]/div[3]/form/div[2]/div/div/div[1]/div[1]/input")
+    password_input = (By.XPATH, "/html/body/div[1]/div[3]/div/div/div[3]/div[3]/form/div[4]/div/div[1]/div[1]/input")
+    confirm_password_input = (By.XPATH, "/html/body/div[1]/div[3]/div/div/div[3]/div[3]/form/div[5]/div/div[1]/div[1]/input")
+    connect_button = (By.XPATH, '//*[@id="app"]/div[3]/div/div/div[3]/div[3]/form/div[6]/button')
     login_password_input = (By.XPATH, "/html/body/div[1]/div[3]/div/div/div[3]/div[2]/form/div[2]/div/div[1]/div[1]/input")
     login_button = (By.XPATH, '//*[@id="app"]/div[3]/div/div/div[3]/div[2]/form/div[3]/button')
     terms_iframe = (By.TAG_NAME, 'iframe')
@@ -81,6 +81,7 @@ class DashboardPage:
         self.browser.find_element(*self.mnemonic_input).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.mnemonic_input).send_keys(Keys.DELETE)
         self.browser.find_element(*self.mnemonic_input).send_keys(seed)
+
     
     def connect_your_wallet(self, password):
         self.browser.find_element(*self.password_input).send_keys(Keys.CONTROL + "a")
@@ -90,6 +91,10 @@ class DashboardPage:
         self.browser.find_element(*self.confirm_password_input).send_keys(Keys.DELETE)
         self.browser.find_element(*self.confirm_password_input).send_keys(password)
         return self.browser.find_element(*self.connect_button)
+    
+    def click_button(self, button):
+        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(button))
+        button.click()
     
     def confirm_password(self, password): 
         self.browser.find_element(*self.confirm_password_input).send_keys(Keys.CONTROL + "a")
