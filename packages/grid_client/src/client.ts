@@ -111,6 +111,7 @@ class GridClient {
         process.on("SIGINT", this.disconnectAndExit);
         process.on("SIGUSR1", this.disconnectAndExit);
         process.on("SIGUSR2", this.disconnectAndExit);
+        process.removeAllListeners();
       } else {
         window.onbeforeunload = () => {
           return "";
