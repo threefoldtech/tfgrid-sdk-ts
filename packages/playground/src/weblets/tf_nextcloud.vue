@@ -43,9 +43,10 @@
     </input-validator>
 
     <v-alert type="warning" variant="tonal" class="mb-6">
+      <p :style="{ maxWidth: '880px' }">Write a valid domain (e.g. "example.com").</p>
       <p :style="{ maxWidth: '880px' }">
-        Write a valid domain (e.g. "example.com"). After deployment, you will need to add a DNS A record (Host: "@",
-        Value: &lt;VM_IPv4_Address&gt;) to your domain to access Nextcloud.
+        After deployment, add a DNS A record (Host: "@", Value: &lt;Public IPv4 Address&gt;) to your domain to access
+        Nextcloud.
       </p>
 
       <p class="font-weight-bold mt-4">
@@ -194,7 +195,7 @@ async function deploy() {
     layout.value.reloadDeploymentsList();
     layout.value.setStatus(
       "success",
-      "Successfully deployed a Nextcloud AIO instance. Under Actions, click Open Nextcloud. Note: You may need to wait a minute and refresh the page.",
+      'Successfully deployed a Nextcloud AIO instance. Make sure to add a DNS A record (Host: "@", Value: <Public IPv4 Address>) to your domain. After DNS propagation, under Actions, click Open Nextcloud.',
     );
     layout.value.openDialog(vm, deploymentListEnvironments.vm);
   } catch (e) {
