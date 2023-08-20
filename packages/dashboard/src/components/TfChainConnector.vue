@@ -81,8 +81,8 @@
 
         <v-card-text v-else>
           <v-tabs centered v-model="tab" class="mt-2">
-            <v-tab v-if="canLogin">Login</v-tab>
-            <v-tab>Connect Your Wallet</v-tab>
+            <v-tab v-if="canLogin" class="title">Login</v-tab>
+            <v-tab class="title">Connect Your Wallet</v-tab>
           </v-tabs>
 
           <v-container class="pt-5" v-show="tab === 0 && canLogin">
@@ -600,3 +600,9 @@ export default class TfChainConnector extends Vue {
   }
 }
 </script>
+<style scoped>
+.title {
+  text-transform: capitalize !important;
+  font-size: 1rem !important;
+}
+</style>
