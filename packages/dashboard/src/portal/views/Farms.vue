@@ -189,6 +189,15 @@
       </template>
     </v-data-table>
 
+    <template v-if="errorMessage.length">
+      <v-alert type="error" text class="mt-2">
+        {{ errorMessage }}
+        <v-btn @click="getFarms" icon color="error" style="float: right" :disabled="loadingFarms">
+          <v-icon>mdi-refresh</v-icon>
+        </v-btn>
+      </v-alert>
+    </template>
+
     <!-- Nodes table -->
     <FarmNodesTable
       v-if="nodes.length"
@@ -283,13 +292,26 @@ export default class FarmsView extends Vue {
   count = 0;
   farmsIds: any;
   initLoading = false;
+  errorMessage = "";
 
-  // Life hooks
-  async mounted() {
+  async getFarms() {
     // not logged in? login: get farms, nodes
     if (this.$api && this.$store.state.credentials) {
-      this.farms = await getFarm(this.$api, this.$store.state.credentials.twin.id);
-      this.loadingFarms = false;
+      this.loadingFarms = true;
+      this.errorMessage = "";
+      try {
+        this.farms = await getFarm(this.$api, this.$store.state.credentials.twin.id);
+      } catch (error: any) {
+        if (error instanceof Error) {
+          this.errorMessage = `An error occurred during the attempt to fetch farms due to a ${error.message.toLocaleLowerCase()}`;
+          console.log(
+            "An error occurred during the attempt to fetch farms due to a ",
+            error.message.toLocaleLowerCase(),
+          );
+        }
+      } finally {
+        this.loadingFarms = false;
+      }
 
       this.initLoading = true;
       await this.getNodes();
@@ -300,6 +322,11 @@ export default class FarmsView extends Vue {
         path: "/",
       });
     }
+  }
+
+  // Life hooks
+  async mounted() {
+    await this.getFarms();
   }
 
   async updated() {
