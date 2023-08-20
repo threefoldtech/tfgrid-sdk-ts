@@ -88,9 +88,9 @@ import { generateName, generatePassword } from "../utils/strings";
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
-const name = ref(generateName(8, { prefix: "k8s" }));
+const name = ref(generateName({ prefix: "k8s" }));
 const clusterToken = ref(generatePassword(10));
-const master = ref(createWorker(generateName(9, { prefix: "mr" })));
+const master = ref(createWorker(generateName({ prefix: "mr" })));
 const workers = ref<K8sWorker[]>([]);
 const loadingFarm = ref(false);
 function addWorker() {

@@ -125,7 +125,7 @@ const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 const loadingFarm = ref(false);
-const name = ref(generateName(8, { prefix: "np" }));
+const name = ref(generateName({ prefix: "np" }));
 const cpu = ref(8);
 const memory = ref(8192);
 const farm = ref() as Ref<Farm>;
@@ -168,11 +168,11 @@ async function deploy() {
           disks: [
             {
               size: 15,
-              mountPoint: "/mnt/" + generateName(10),
+              mountPoint: "/mnt/" + generateName(),
             },
             {
               size: 15,
-              mountPoint: "/mnt/" + generateName(10),
+              mountPoint: "/mnt/" + generateName(),
             },
           ],
           nodeId: selectedNode.value.nodeId,

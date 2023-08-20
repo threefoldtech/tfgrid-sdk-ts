@@ -135,7 +135,7 @@ const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref(generateName(9, { prefix: "um" }));
+const name = ref(generateName({ prefix: "um" }));
 const username = ref("admin");
 const password = ref(generatePassword());
 const ipv4 = ref(false);

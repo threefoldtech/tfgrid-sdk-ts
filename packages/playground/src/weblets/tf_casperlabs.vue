@@ -112,7 +112,7 @@ const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref(generateName(9, { prefix: "cl" }));
+const name = ref(generateName({ prefix: "cl" }));
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
 const flist: Flist = {
