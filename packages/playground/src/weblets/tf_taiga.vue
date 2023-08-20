@@ -182,7 +182,7 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref(generateName(5, { prefix: "tg" }));
+const name = ref(generateName({ prefix: "tg" }));
 const username = ref("admin");
 const password = ref(generatePassword());
 const email = ref("");

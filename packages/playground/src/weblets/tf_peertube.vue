@@ -131,7 +131,7 @@ const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref(generateName(5, { prefix: "pt" }));
+const name = ref(generateName({ prefix: "pt" }));
 const email = ref("");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;

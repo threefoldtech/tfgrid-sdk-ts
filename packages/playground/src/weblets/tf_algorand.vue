@@ -207,7 +207,7 @@ const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/algorand-latest.flist",
   entryPoint: "/sbin/zinit init",
 };
-const name = ref(generateName(5, { prefix: "al" }));
+const name = ref(generateName({ prefix: "al" }));
 const ipv4 = ref(false);
 const cpu = ref() as Ref<number>;
 const memory = ref() as Ref<number>;

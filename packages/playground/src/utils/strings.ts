@@ -6,22 +6,15 @@ export function generatePassword(length = 12): string {
 
 export interface GenerateNameOptions {
   prefix?: string;
-  suffix?: string;
 }
-export function generateName(length = 12, options?: GenerateNameOptions): string {
+export function generateName(options?: GenerateNameOptions, length = 7): string {
   const chars = "abcdefghijklmnopqrstuvwxyz";
   const nums = "0123456789";
 
   const prefix = options?.prefix ?? "";
-  const suffix = options?.suffix ?? "";
-  const remainingLength = length - prefix.length - suffix.length;
+  const remainingLength = length - prefix.length;
 
-  return (
-    (options?.prefix ?? "") +
-    randomChoice(chars) +
-    generateString(chars + nums, remainingLength - 1) +
-    (options?.suffix ?? "")
-  );
+  return (options?.prefix ?? "") + randomChoice(chars) + generateString(chars + nums, remainingLength - 1);
 }
 
 function generateString(from: string, length: number): string {
