@@ -335,8 +335,11 @@ export default class TfChainConnector extends Vue {
     else if (!validateMnemonic(mnemonic)) this.mnemonicError = "Mnemonic doesn't seem to be valid.";
     else {
       try {
-        await getGrid(mnemonic);
+        const grid = await getGrid(mnemonic);
+        console.log(grid);
       } catch (err) {
+        console.log("err: ", err);
+
         this.mnemonicError = (err as any).message || "Couldn't connect to chain using the provided mnemonic.";
       }
     }
@@ -488,8 +491,15 @@ export default class TfChainConnector extends Vue {
     try {
       await activateAccountAndCreateTwin(this.mnemonic);
       await this.checkMnemonic();
+      console.log("no error: ");
       this.connecting = false;
     } catch (e) {
+      const mno = await this.checkMnemonic();
+      console.log("mno: ", mno);
+
+      console.log("Error: ", e);
+      console.log("this.mnemonic: ", this.mnemonic);
+
       this.activateAccountError = (e as any).message;
       this.connecting = false;
     }
