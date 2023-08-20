@@ -122,7 +122,7 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
-const name = ref(generateName(9, { prefix: "ss" }));
+const name = ref(generateName(5, { prefix: "ss" }));
 const endpoint = ref("");
 const ipv4 = ref(false);
 const solution = ref() as Ref<SolutionFlavor>;

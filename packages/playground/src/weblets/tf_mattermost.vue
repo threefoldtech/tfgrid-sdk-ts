@@ -136,7 +136,7 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref(generateName(9, { prefix: "mm" }));
+const name = ref(generateName(5, { prefix: "mm" }));
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
 const loadingFarm = ref(false);

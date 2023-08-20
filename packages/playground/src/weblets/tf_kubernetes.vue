@@ -90,7 +90,7 @@ const tabs = ref();
 const profileManager = useProfileManager();
 const name = ref(generateName(8, { prefix: "k8s" }));
 const clusterToken = ref(generatePassword(10));
-const master = ref(createWorker(generateName(9, { prefix: "mr" })));
+const master = ref(createWorker(generateName(5, { prefix: "mr" })));
 const workers = ref<K8sWorker[]>([]);
 const loadingFarm = ref(false);
 function addWorker() {
