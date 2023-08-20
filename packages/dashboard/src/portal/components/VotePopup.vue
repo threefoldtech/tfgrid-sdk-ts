@@ -20,6 +20,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 
+import { IFarm, INode } from "../../explorer/graphql/api";
 import config from "../config";
 import { getFarm } from "../lib/farms";
 
@@ -31,9 +32,9 @@ export default class VotePopup extends Vue {
   proposals = 0;
   voteMsg = "You have a pending proposal to vote!";
   $api: any;
-  farms: any = [];
-  farmsIds: any = [];
-  nodes: any = [];
+  farms: IFarm[] = [];
+  farmsIds: number[] = [];
+  nodes: INode[] = [];
   private __destroyed = false;
 
   async mounted() {
