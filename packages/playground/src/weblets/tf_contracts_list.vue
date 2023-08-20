@@ -70,6 +70,15 @@
       <v-btn
         variant="outlined"
         color="error"
+        prepend-icon="mdi-export-variant"
+        :disabled="isExporting || contracts.length === 0"
+        @click="exportData"
+      >
+        Export My Data
+      </v-btn>
+      <v-btn
+        variant="outlined"
+        color="error"
         :disabled="!selectedContracts.length || loading || deleting"
         prepend-icon="mdi-trash-can-outline"
         @click="deletingDialog = true"
@@ -124,7 +133,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ContractStates } from "@threefold/grid_client";
+import { ContractStates, type GridClient } from "@threefold/grid_client";
 import { ref } from "vue";
 
 import { useProfileManager } from "../stores";
@@ -136,6 +145,8 @@ const layout = ref();
 const profileManager = useProfileManager();
 const contracts = ref<NormalizedContract[]>([]);
 const loading = ref(false);
+const isExporting = ref(false);
+const grid = ref<GridClient | null>();
 const selectedContracts = ref<NormalizedContract[]>([]);
 const headers: VDataTableHeader = [
   { title: "PLACEHOLDER", key: "data-table-select" },
@@ -153,8 +164,8 @@ const headers: VDataTableHeader = [
 async function onMount() {
   loading.value = true;
   contracts.value = [];
-  const grid = await getGrid(profileManager.profile!);
-  contracts.value = await getUserContracts(grid!);
+  grid.value = await getGrid(profileManager.profile!);
+  contracts.value = await getUserContracts(grid.value!);
   loading.value = false;
 }
 
@@ -169,8 +180,7 @@ async function showDetails(value: any) {
   const contractId: number = value.contractId;
   loadingContractId.value = contractId;
   try {
-    const grid = await getGrid(profileManager.profile!);
-    const deployment = await grid!.zos.getDeployment({ contractId });
+    const deployment = await grid.value?.zos.getDeployment({ contractId });
     return layout.value.openDialog(deployment, false, true);
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, `Failed to load details of contract(${contractId})`));
@@ -198,11 +208,16 @@ function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+function exportData() {
+  isExporting.value = true;
+  downloadAsJson(contracts?.value);
+  isExporting.value = false;
+}
+
 async function contractLockDetails(contractId: number) {
   contractStateDialog.value = true;
   loading.value = true;
-  const grid = await getGrid(profileManager.profile!);
-  await grid?.contracts
+  await grid.value?.contracts
     .contractLock({ id: contractId })
     .then((data: ContractLock) => {
       contractLocked.value = data;
@@ -221,11 +236,10 @@ async function onDelete() {
   deletingDialog.value = false;
   deleting.value = true;
   try {
-    const grid = await getGrid(profileManager.profile!);
     if (selectedContracts.value.length === contracts.value.length) {
-      await grid!.contracts.cancelMyContracts();
+      await grid.value?.contracts.cancelMyContracts();
     } else {
-      await grid!.contracts.batchCancelContracts({
+      await grid.value?.contracts.batchCancelContracts({
         ids: selectedContracts.value.map(c => c.contractId),
       });
     }
@@ -249,7 +263,7 @@ import type { ContractLock } from "@threefold/tfchain_client";
 
 import ListTable from "../components/list_table.vue";
 import { solutionType } from "../types/index";
-import { normalizeError } from "../utils/helpers";
+import { downloadAsJson, normalizeError } from "../utils/helpers";
 
 export default {
   name: "TfContractsList",
