@@ -3,6 +3,8 @@ from utils.grid_proxy import GridProxy
 from pages.dedicate import DedicatePage
 from pages.dashboard import DashboardPage
 import pytest
+import random
+import time
 
 #  Time required for the run (12 cases) is approximately 3 minutes.
 
@@ -14,7 +16,7 @@ def before_test_setup(browser):
     password = generate_string()
     dashboard_page.open_and_load()
     dashboard_page.import_account(get_seed())
-    dashboard_page.connect_your_wallet(password).click()
+    dashboard_page.click_button(dashboard_page.connect_your_wallet(password))
     dedicate_page.navigate()
     return dedicate_page, grid_proxy
 
@@ -168,6 +170,55 @@ def test_dedicate_page(browser):
 #     price = dedicate_page.get_node_price()
 #     assert dedicate_page.sort_node_price() == sorted(price, reverse=True)
 #     assert dedicate_page.sort_node_price() == sorted(price, reverse=False)
+
+
+def test_filter_resource(browser):
+    """
+      Test Case: 
+      Steps:
+          - Navigate to the dashboard.
+          - Login.
+          - Click on Dedicate Node from side menu.
+      Result: .
+    """
+    dedicate_page, _ = before_test_setup(browser)
+    dedicate_page.select_filters()
+    full_nodes = dedicate_page.table_nodes()
+    dedicate_page.filter_input('1000', 0, False)
+    for i in range(4):
+        min = int(dedicate_page.get_min(full_nodes, i))
+        max = int(dedicate_page.get_max(full_nodes, i))
+        test_data = random.randint(min-10,max+10)
+        dedicate_page.filter_input(test_data, i, False)
+        nodes = dedicate_page.table_nodes()
+        assert dedicate_page.filter_result(full_nodes, test_data, i) == len(nodes)
+        if len(nodes) != 0 :
+            for node in nodes :
+                assert test_data <= node[i]
+                assert dedicate_page.filter_result(full_nodes, test_data, i)
+
+
+def test_filter_validation(browser):
+    """
+      Test Case: 
+      Steps:
+          - Navigate to the dashboard.
+          - Login.
+          - Click on Dedicate Node from side menu.
+      Result: .
+    """
+    dedicate_page, _ = before_test_setup(browser)
+    dedicate_page.select_filters()
+    cases = ['f', generate_string(), '1a', '!@#(/)+', '.', '-', '+', '1.23.4']
+    for i in range(4):
+        for case in cases:
+            dedicate_page.filter_input(case, i, True)
+            assert dedicate_page.wait_for('This Field accepts only a valid number.')
+        dedicate_page.filter_input('0', i, True)
+        assert dedicate_page.wait_for('This field must be a number larger than 0.')
+    for i in range(2):
+        dedicate_page.filter_input('!@#(/)+', i+4, True)
+        assert dedicate_page.wait_for('This field does not accept special characters.')
 
 
 def test_node_details(browser):

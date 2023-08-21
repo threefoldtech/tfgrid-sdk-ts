@@ -21,7 +21,7 @@ class TransferPage:
     transfer_tft_title = (By.XPATH, "//*[contains(text(), 'Transfer TFTs on the TFChain')]")
     balance_text = (By.XPATH,'//*[@id="app"]/div[1]/div[1]/header/div/div[3]/div/section/div[1]/div/p/span[1]')
     balance_transfer = (By.XPATH,'//*[@id="app"]/div[2]/div[1]/header/div/div[3]/div/section/div[1]/div/p/span[1]')
-    close_login_button = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div[4]/button')
+    close_login_button = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div[4]/button[2]')
     twin_address_text = (By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[1]/div[2]/div[1]/div/div[2]/div[2]')
     twin_id_input = (By.XPATH, '/html/body/div[1]/div[1]/div[2]/div/div[1]/div[2]/div/div[2]/div/div[2]/div/form/div[1]/div/div[1]/div[1]/input[1]')
     twin_id_amount_input = (By.XPATH, '/html/body/div[1]/div[1]/div[2]/div/div[1]/div[2]/div/div[2]/div/div[2]/div/form/div[2]/div/div[1]/div/input')
