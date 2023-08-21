@@ -41,8 +41,8 @@ export default class VotePopup extends Vue {
   async mounted() {
     this.farms = await getFarm(this.$api, this.$store.state.credentials.twin.id);
     if (this.farms.length === 0) return;
-    this.farmsIds = this.farms?.map((farm: any) => farm.id);
-    this.nodes = await this.getUserNodes(this.farmsIds);
+    this.farmsIds = this.farms?.map((farm: IFarm) => +farm.id);
+    this.nodes = await this.getFarmsNodes(this.farmsIds);
 
     await this.$store.dispatch("portal/getProposal", this.$store.state.credentials.twin.id);
 
@@ -57,8 +57,8 @@ export default class VotePopup extends Vue {
     this.openProposalDialog = true;
   }
 
-  async getUserNodes(farmIDs: any[]): Promise<any> {
-    const url = `${config.gridproxyUrl}/nodes?ret_count=true&page=1&size=10&farm_ids=${farmIDs}`;
+  async getFarmsNodes(farmIDs: number[]): Promise<INode[]> {
+    const url = `${config.gridproxyUrl}/nodes?status=up&ret_count=true&page=1&size=10&farm_ids=${farmIDs}`;
     const res = await fetch(url);
     const nodes = await res.json();
     return nodes;
