@@ -20,7 +20,7 @@ const NETWORK = NetworkEnv.dev;
 
 // Function to log the current minute along with the client's name
 function logCurrentMinute(clientName: string, time: number) {
-  console.log(`${clientName} running count ${time}`);
+  console.log(`${clientName} is in its ${time} execution cycle.`);
 }
 
 // Client 1 logic
