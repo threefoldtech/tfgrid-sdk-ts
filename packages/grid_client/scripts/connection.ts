@@ -19,7 +19,7 @@ const clientMnemonic2 = "your_mnemonic_here";
 const NETWORK = NetworkEnv.dev;
 
 // Function to log the current minute along with the client's name
-function logCurrentMinute(clientName: string, time = 1) {
+function logCurrentMinute(clientName: string, time: number) {
   console.log(`${clientName} running count ${time}`);
 }
 
@@ -30,7 +30,7 @@ async function newClient(mnemonic: string, clientNumber: number) {
     mnemonic: mnemonic,
   };
 
-  let time = 1;
+  let time = 0;
 
   try {
     const gridClient = new GridClient(options);
@@ -55,7 +55,6 @@ async function newClient(mnemonic: string, clientNumber: number) {
 
 // Main function
 async function main() {
-  logCurrentMinute("Script start");
   await newClient(clientMnemonic1, 1);
   await newClient(clientMnemonic2, 2);
 }
