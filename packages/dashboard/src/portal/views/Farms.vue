@@ -304,10 +304,6 @@ export default class FarmsView extends Vue {
       } catch (error: any) {
         if (error instanceof Error) {
           this.errorMessage = `An error occurred during the attempt to fetch farms due to a ${error.message.toLocaleLowerCase()}`;
-          console.log(
-            "An error occurred during the attempt to fetch farms due to a ",
-            error.message.toLocaleLowerCase(),
-          );
         }
       } finally {
         this.loadingFarms = false;
