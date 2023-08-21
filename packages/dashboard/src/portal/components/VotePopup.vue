@@ -18,6 +18,7 @@
 </template>
 
 <script lang="ts">
+import { ApiPromise } from "@polkadot/api";
 import { Component, Vue } from "vue-property-decorator";
 
 import { IFarm, INode } from "../../explorer/graphql/api";
@@ -31,14 +32,15 @@ export default class VotePopup extends Vue {
   openProposalDialog = false;
   proposals = 0;
   voteMsg = "You have a pending proposal to vote!";
-  $api: any;
+  $api!: ApiPromise;
   farms: IFarm[] = [];
   farmsIds: number[] = [];
-  nodes: INode[] = [];
+  nodes: INode[] | undefined;
   private __destroyed = false;
 
   async mounted() {
     this.farms = await getFarm(this.$api, this.$store.state.credentials.twin.id);
+    if (this.farms.length === 0) return;
     this.farmsIds = this.farms?.map((farm: any) => farm.id);
     this.nodes = await this.getUserNodes(this.farmsIds);
 
