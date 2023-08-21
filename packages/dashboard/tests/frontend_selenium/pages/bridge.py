@@ -27,7 +27,7 @@ class BridgePage:
     twin_id_text = (By.XPATH,"//*[@id='app']/div[5]/div/div/div[1]/div/div[1]/div[1]/ul/li[2]/b")
     balance_text = (By.XPATH,'//*[@id="app"]/div[1]/div[1]/header/div/div[3]/div/section/div[1]/div/p/span[1]')
     balance_withdraw = (By.XPATH,'//*[@id="app"]/div[2]/div[1]/header/div/div[3]/div/section/div[1]/div/p/span[1]')
-    close_login_button = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div[4]/button')
+    close_login_button = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div[4]/button[2]')
     
     
     def __init__(self, browser):

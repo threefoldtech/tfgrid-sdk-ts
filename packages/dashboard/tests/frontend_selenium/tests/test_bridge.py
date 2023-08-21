@@ -12,7 +12,7 @@ def before_test_setup(browser):
     password = generate_string()
     dashboard_page.open_and_load()
     dashboard_page.import_account(get_seed())
-    dashboard_page.connect_your_wallet(password).click()
+    dashboard_page.click_button(dashboard_page.connect_your_wallet(password))
     bridge_page.navigate_to_bridge()
     return bridge_page
 

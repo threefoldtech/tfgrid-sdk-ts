@@ -34,7 +34,7 @@ class NodePage:
     set_btn = (By.XPATH , '//*[@id="app"]/div[5]/div/div/div[4]/button[2]')
     fee_id = (By.XPATH , "//*[contains(text(), 'Additional fees will be added to your node')]")
     table_xpath = '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[5]/div[2]/div[1]/div[1]/table/tbody/tr'
-    close_login_button = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div[4]/button')
+    close_login_button = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div[4]/button[2]')
     twin_details = (By.XPATH, "//*[contains(text(), 'Twin Details')]")
 
 
