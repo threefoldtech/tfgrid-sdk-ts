@@ -14,65 +14,39 @@ import { GridClient, NetworkEnv } from "../src";
 // Replace with actual mnemonics
 const clientMnemonic1 = "your_mnemonic_here";
 const clientMnemonic2 = "your_mnemonic_here";
-const storeSecret = "store_secret";
 
 // Choose the desired network (main, test, qa, dev)
 const NETWORK = NetworkEnv.dev;
 
 // Function to log the current minute along with the client's name
-function logCurrentMinute(clientName) {
-  const now = new Date();
-  console.log(`${clientName} running in minute ${now.getMinutes()}`);
+function logCurrentMinute(clientName: string, time = 1) {
+  console.log(`${clientName} running count ${time}`);
 }
 
 // Client 1 logic
-async function client1() {
+async function newClient(mnemonic: string, clientNumber: number) {
   const options = {
     network: NETWORK,
-    mnemonic: clientMnemonic1,
-    storeSecret: storeSecret,
+    mnemonic: mnemonic,
   };
+
+  let time = 1;
+
   try {
     const gridClient = new GridClient(options);
     await gridClient.connect();
 
     // Log the current minute every minute
     setInterval(() => {
-      logCurrentMinute("Client 1");
+      time += 1; // script starts at the first minute, then after one minute will log the second..etc
+      logCurrentMinute(`Client: ${clientNumber}`, time);
     }, 60000); // Log every minute (60000 milliseconds)
 
     // Run the task every 10 minutes
     setInterval(async () => {
-      console.log("Running task for Client 1...");
+      console.log(`Running task for Client ${clientNumber}...`);
       const twinID = await gridClient.twins.get_my_twin_id();
-      console.log("Client 1 twin id: ", twinID);
-    }, 10 * 60 * 1000); // Run every 10 minutes (10 * 60 * 1000 milliseconds)
-  } catch (error) {
-    console.error("Error connecting to Grid:", error);
-  }
-}
-
-// Client 2 logic
-async function client2() {
-  const options = {
-    network: NETWORK,
-    mnemonic: clientMnemonic2,
-    storeSecret: storeSecret,
-  };
-  try {
-    const gridClient = new GridClient(options);
-    await gridClient.connect();
-
-    // Log the current minute every minute
-    setInterval(() => {
-      logCurrentMinute("Client 2");
-    }, 60000); // Log every minute (60000 milliseconds)
-
-    // Run the task every 10 minutes
-    setInterval(async () => {
-      console.log("Running task for Client 2...");
-      const twinID = await gridClient.twins.get_my_twin_id();
-      console.log("Client 2 twin id: ", twinID);
+      console.log(`Client ${clientNumber} twin id: ${twinID}`);
     }, 10 * 60 * 1000); // Run every 10 minutes (10 * 60 * 1000 milliseconds)
   } catch (error) {
     console.error("Error connecting to Grid:", error);
@@ -82,8 +56,8 @@ async function client2() {
 // Main function
 async function main() {
   logCurrentMinute("Script start");
-  await client1();
-  await client2();
+  await newClient(clientMnemonic1, 1);
+  await newClient(clientMnemonic2, 2);
 }
 
 // Start the script execution
