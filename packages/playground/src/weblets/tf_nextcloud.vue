@@ -10,106 +10,107 @@
     title-image="images/icons/nextcloud.png"
   >
     <template #title>Deploy a Nextcloud All-in-One Instance </template>
-    <input-validator
-      :value="name"
-      :rules="[
-        validators.required('Name is required.'),
-        validators.isLowercase('Name should consist of lowercase letters only.'),
-        validators.isAlphanumeric('Name should consist of alphabets & numbers only.'),
-        name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
-        validators.minLength('Name must be at least 2 characters.', 2),
-        validators.maxLength('Name cannot exceed 15 characters.', 15),
-      ]"
-      #="{ props }"
-    >
-      <input-tooltip tooltip="Instance name.">
-        <v-text-field label="Name" v-model="name" v-bind="props" />
-      </input-tooltip>
-    </input-validator>
+    <form-validator v-model="valid">
+      <input-validator
+        :value="name"
+        :rules="[
+          validators.required('Name is required.'),
+          validators.isLowercase('Name should consist of lowercase letters only.'),
+          validators.isAlphanumeric('Name should consist of alphabets & numbers only.'),
+          name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+          validators.minLength('Name must be at least 2 characters.', 2),
+          validators.maxLength('Name cannot exceed 15 characters.', 15),
+        ]"
+        #="{ props }"
+      >
+        <input-tooltip tooltip="Instance name.">
+          <v-text-field label="Name" v-model="name" v-bind="props" />
+        </input-tooltip>
+      </input-validator>
 
-    <input-validator
-      :value="domain"
-      :rules="[
-        validators.required('Domain is required.'),
-        validators.pattern('Please provide a valid domain.', {
-          pattern: /^\b((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\b$/,
-        }),
-      ]"
-      #="{ props }"
-    >
-      <input-tooltip tooltip="Domain name.">
-        <v-text-field label="Domain" v-model="domain" v-bind="props" />
-      </input-tooltip>
-    </input-validator>
+      <input-validator
+        :value="domain"
+        :rules="[
+          validators.required('Domain is required.'),
+          validators.pattern('Please provide a valid domain.', {
+            pattern: /^\b((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\b$/,
+          }),
+        ]"
+        #="{ props }"
+      >
+        <input-tooltip tooltip="Domain name.">
+          <v-text-field label="Domain" v-model="domain" v-bind="props" />
+        </input-tooltip>
+      </input-validator>
 
-    <v-alert type="warning" variant="tonal" class="mb-6">
-      <p :style="{ maxWidth: '880px' }">Write a valid domain (e.g. "example.com").</p>
-      <p :style="{ maxWidth: '880px' }">
-        After deployment, add a DNS A record (Host: "@", Value: &lt;Public IPv4 Address&gt;) to your domain to access
-        Nextcloud.
-      </p>
+      <v-alert type="warning" variant="tonal" class="mb-6">
+        <p :style="{ maxWidth: '880px' }">Write a valid domain (e.g. "example.com").</p>
+        <p :style="{ maxWidth: '880px' }">
+          After deployment, add a DNS A record (Host: "@", Value: &lt;Public IPv4 Address&gt;) to your domain to access
+          Nextcloud.
+        </p>
 
-      <p class="font-weight-bold mt-4">
-        For more information, read the
-        <a
-          target="_blank"
-          href="https://www.manual.grid.tf/playground/nextcloud.html#set-the-dns-record"
-          :style="{ color: 'inherit' }"
-        >
-          documentation</a
-        >.
-      </p>
-    </v-alert>
+        <p class="font-weight-bold mt-4">
+          For more information, read the
+          <a
+            target="_blank"
+            href="https://www.manual.grid.tf/playground/nextcloud.html#set-the-dns-record"
+            :style="{ color: 'inherit' }"
+          >
+            documentation</a
+          >.
+        </p>
+      </v-alert>
 
-    <SelectSolutionFlavor
-      :minimum="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
-      :standard="{ cpu: 4, memory: 1024 * 8, disk: 500 }"
-      :recommended="{ cpu: 4, memory: 1024 * 16, disk: 1000 }"
-      v-model="solution"
-    />
-
-    <Network v-model:planetary="planetary" v-model:wireguard="wireguard" ref="network" />
-    <input-tooltip
-      inline
-      tooltip="Click to know more about dedicated nodes."
-      href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
-    >
-      <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
-    </input-tooltip>
-
-    <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-      <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
-    </input-tooltip>
-
-    <SelectFarmManager>
-      <SelectFarm
-        :filters="{
-          cpu: solution?.cpu,
-          memory: solution?.memory,
-          publicIp: ipv4,
-          ssd: (solution?.disk ?? 0) + rootFilesystemSize,
-          rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-          certified: certified,
-        }"
-        v-model="farm"
+      <SelectSolutionFlavor
+        :minimum="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
+        :standard="{ cpu: 4, memory: 1024 * 8, disk: 500 }"
+        :recommended="{ cpu: 4, memory: 1024 * 16, disk: 1000 }"
+        v-model="solution"
       />
-      <SelectNode
-        v-model="selectedNode"
-        :filters="{
-          farmId: farm?.farmID,
-          cpu: solution?.cpu,
-          memory: solution?.memory,
-          diskSizes: [solution?.disk],
-          ipv4: ipv4,
-          rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-          certified: certified,
-        }"
-        :root-file-system-size="rootFilesystemSize"
-      />
-    </SelectFarmManager>
 
+      <Network v-model:planetary="planetary" v-model:wireguard="wireguard" ref="network" />
+      <input-tooltip
+        inline
+        tooltip="Click to know more about dedicated nodes."
+        href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+      >
+        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+      </input-tooltip>
+
+      <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+        <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+      </input-tooltip>
+
+      <SelectFarmManager>
+        <SelectFarm
+          :filters="{
+            cpu: solution?.cpu,
+            memory: solution?.memory,
+            publicIp: ipv4,
+            ssd: (solution?.disk ?? 0) + rootFilesystemSize,
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+            certified: certified,
+          }"
+          v-model="farm"
+        />
+        <SelectNode
+          v-model="selectedNode"
+          :filters="{
+            farmId: farm?.farmID,
+            cpu: solution?.cpu,
+            memory: solution?.memory,
+            diskSizes: [solution?.disk],
+            ipv4: ipv4,
+            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
+            certified: certified,
+          }"
+          :root-file-system-size="rootFilesystemSize"
+        />
+      </SelectFarmManager>
+    </form-validator>
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" :disabled="tabs?.invalid || network?.error" @click="deploy">Deploy</v-btn>
+      <v-btn color="primary" variant="tonal" :disabled="!valid" @click="deploy">Deploy</v-btn>
     </template>
   </weblet-layout>
 </template>
@@ -127,7 +128,7 @@ import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
-const tabs = ref();
+const valid = ref(false);
 const domain = ref("");
 const profileManager = useProfileManager();
 
