@@ -69,7 +69,11 @@ class QueryClient {
   }
 
   async newProvider() {
-    console.log("this.connectingLock: ", this.connectingLock);
+    await this.disconnect.bind(this);
+    if (this.api) {
+      delete this.api;
+    }
+
     const provider = new WsProvider(this.url);
     this.api = await ApiPromise.create({ provider });
     await this.wait();
@@ -77,10 +81,6 @@ class QueryClient {
   }
 
   async connect() {
-    if (!this.connectingLock) {
-      this.connectingLock = new AwaitLock();
-    }
-
     this.checkInputs();
     await this.loadKeyPairOrSigner();
     if (this.api && this.api.isConnected) return;
@@ -89,14 +89,14 @@ class QueryClient {
       if (this.api && this.api.isConnected) return;
       await this.connectingLock.acquireAsync();
       await this.newProvider();
-      this.api.on("disconnected", this.newProvider);
+      this.api.on("disconnected", this.newProvider.bind(this));
       this.connectingLock.release();
       return;
     }
 
     await this.connectingLock.acquireAsync();
     await this.newProvider();
-    this.api.on("disconnected", this.newProvider);
+    this.api.on("disconnected", this.newProvider.bind(this));
     this.connectingLock.release();
 
     if (isEnvNode()) {
@@ -115,7 +115,7 @@ class QueryClient {
   async disconnect(): Promise<void> {
     if (this.api && this.api.isConnected) {
       console.log("disconnecting");
-      this.api.off("disconnected", this.newProvider);
+      this.api.off("disconnected", this.newProvider.bind(this));
       await this.api.disconnect();
       await this.wait(false);
     }
