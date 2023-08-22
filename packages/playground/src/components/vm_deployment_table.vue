@@ -126,6 +126,7 @@ const filteredHeaders = computed(() => {
     ProjectName.Algorand,
     ProjectName.Subsquid,
     ProjectName.Umbrel,
+    ProjectName.Nextcloud,
   ] as string[];
 
   const flistSolutions = [ProjectName.VM, ProjectName.Fullvm] as string[];

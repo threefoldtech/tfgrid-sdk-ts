@@ -546,6 +546,7 @@ export default class TfChainConnector extends Vue {
     this.password = "";
     this.password2 = "";
     this.mnemonic = "";
+    this._confirmPasswordUpdated = false;
   }
 
   public close() {
