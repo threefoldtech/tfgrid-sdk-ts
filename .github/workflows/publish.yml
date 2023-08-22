@@ -15,7 +15,8 @@ jobs:
       matrix:
         node-version: [18.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
+    env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
@@ -24,15 +25,20 @@ jobs:
           node-version: ${{ matrix.node-version }}
           registry-url: "https://registry.npmjs.org"
           cache: "yarn"
-
+    
       - name: Install
         run: yarn --pure-lockfile
       - name: Build
         run: lerna run build --no-private
-      - name: Publish
+
+      - name: Publish Pre-release
+        if: contains(github.ref, 'rc')
+        run: lerna publish from-package --no-private --yes --dist-tag edge
+
+      - name: Publish Release
+        if: "!contains(github.ref, 'rc')"
         run: lerna publish from-package --no-private --yes
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        
 
   docker-image-grid-client:
     needs: build
