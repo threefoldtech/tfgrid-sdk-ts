@@ -242,6 +242,7 @@ def test_node_details(browser):
         assert dedicate_page.get_node_location(node_list)[i] in nodes[i][5]
         assert dedicate_page.get_node_city(node_list)[i] in nodes[i][6]
         assert str(grid_proxy.get_farm_ips((dedicate_page.get_farm_id(nodes[i][0], node_list)))) in nodes[i][7]
+        assert str(dedicate_page.get_node_gpu(node_list)[i]) == nodes[i][8]
 
 
 def test_reserve_node(browser):
