@@ -68,6 +68,12 @@ class DedicatePage:
             city.append(node_list[i]['city'])
         return city
     
+    def get_node_gpu(self, node_list):
+        gpu = []
+        for i in range(len(node_list)):
+            gpu.append(node_list[i]['num_gpu'])
+        return gpu
+    
     def get_node_cru(self, node_list):
         cru = []
         for i in range(len(node_list)):
@@ -284,6 +290,7 @@ class DedicatePage:
                 details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div/div[2]/div/div[2]/div/div/div[1]").text) # Country
                 details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div/div[2]/div/div[2]/div/div/div[2]").text) # City
                 details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div/div[3]/div/div[2]/div/div/div[4]").text) # Farm Public Ips
+                details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[8]").text) # GPU
                 self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[1]/button").click()
                 nodes.append(details)
         return nodes
