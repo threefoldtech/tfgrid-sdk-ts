@@ -33,7 +33,7 @@
                     :src="baseUrl + 'images/icons/' + item.icon"
                     :alt="item.title"
                   />
-                  <v-icon v-else>{{ item.icon }}</v-icon>
+                  <v-icon v-else class="mr-4" width="26">{{ item.icon }}</v-icon>
                 </template>
 
                 <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -140,28 +140,78 @@ watch(
 const version = process.env.VERSION as any;
 
 const routes: AppRoute[] = [
+  // {
+  //   title: "Deployments",
+  //   items: [
+  //     { title: "Full Virtual Machine", icon: "vm.png", route: "/" },
+  //     { title: "Micro Virtual Machine", icon: "vm.png", route: "/vm" },
+  //     { title: "Kubernetes", icon: "kubernetes.png", route: "/kubernetes" },
+  //     { title: "CapRover", icon: "caprover.png", route: "/caprover" },
+  //     { title: "Peertube", icon: "peertube.png", route: "/peertube" },
+  //     { title: "Funkwhale", icon: "funkwhale.png", route: "/funkwhale" },
+  //     { title: "Mattermost", icon: "mattermost.png", route: "/mattermost" },
+  //     { title: "Discourse", icon: "discourse.png", route: "/discourse" },
+  //     { title: "Taiga", icon: "taiga.png", route: "/taiga" },
+  //     { title: "Owncloud", icon: "owncloud.png", route: "/owncloud" },
+  //     { title: "Nextcloud", icon: "nextcloud.png", route: "/nextcloud" },
+  //     { title: "Presearch", icon: "presearch.png", route: "/presearch" },
+  //     { title: "Subsquid", icon: "subsquid.png", route: "/subsquid" },
+  //     { title: "Casperlabs", icon: "casperlabs.png", route: "/casperlabs" },
+  //     { title: "Algorand", icon: "algorand.png", route: "/algorand" },
+  //     { title: "Node Pilot", icon: "vm.png", route: "/nodepilot" },
+  //     { title: "Wordpress", icon: "wordpress.png", route: "/wordpress" },
+  //     { title: "Umbrel", icon: "umbrel.png", route: "/umbrel" },
+  //     // { title: "Freeflow", icon: "freeflow.png", route: "/freeflow" },
+  //   ],
+  // },
   {
-    title: "Deployments",
+    title: "Playground",
+    items: [{ title: "Deployments", icon: "vm.png", route: "/" }],
+  },
+  {
+    title: "Portal",
     items: [
-      { title: "Full Virtual Machine", icon: "vm.png", route: "/" },
-      { title: "Micro Virtual Machine", icon: "vm.png", route: "/vm" },
-      { title: "Kubernetes", icon: "kubernetes.png", route: "/kubernetes" },
-      { title: "CapRover", icon: "caprover.png", route: "/caprover" },
-      { title: "Peertube", icon: "peertube.png", route: "/peertube" },
-      { title: "Funkwhale", icon: "funkwhale.png", route: "/funkwhale" },
-      { title: "Mattermost", icon: "mattermost.png", route: "/mattermost" },
-      { title: "Discourse", icon: "discourse.png", route: "/discourse" },
-      { title: "Taiga", icon: "taiga.png", route: "/taiga" },
-      { title: "Owncloud", icon: "owncloud.png", route: "/owncloud" },
-      { title: "Nextcloud", icon: "nextcloud.png", route: "/nextcloud" },
-      { title: "Presearch", icon: "presearch.png", route: "/presearch" },
-      { title: "Subsquid", icon: "subsquid.png", route: "/subsquid" },
-      { title: "Casperlabs", icon: "casperlabs.png", route: "/casperlabs" },
-      { title: "Algorand", icon: "algorand.png", route: "/algorand" },
-      { title: "Node Pilot", icon: "vm.png", route: "/nodepilot" },
-      { title: "Wordpress", icon: "wordpress.png", route: "/wordpress" },
-      { title: "Umbrel", icon: "umbrel.png", route: "/umbrel" },
-      // { title: "Freeflow", icon: "freeflow.png", route: "/freeflow" },
+      { title: "Twin", icon: "account-supervisor-outline.svg", route: "/twin" },
+      { title: "Bridge", icon: "swap-horizontal.png", route: "/bridge" },
+      { title: "Transfer", icon: "account-transfer.svg", route: "/transfer" },
+      { title: "Farms", icon: "silo.svg", route: "/farms" },
+      { title: "Dedicated Nodes", icon: "resistor-nodes.svg", route: "/dedicated-nodes" },
+      { title: "DAO", icon: "note-check-outline.svg", route: "/dao" },
+    ],
+  },
+  {
+    title: "Explorer",
+    items: [
+      { title: "Statistics", icon: "chart-scatter-plot.svg", route: "/stats" },
+      { title: "Nodes", icon: "access-point.svg", route: "/nodes" },
+      { title: "Farms", icon: "lan-connect.svg", route: "/farms" },
+    ],
+  },
+  {
+    title: "Calculators",
+    items: [
+      { title: "Resource Pricing", icon: "calculator.svg", route: "pricing" },
+      { title: "Simulator", icon: "chart-line.svg", route: "/simulator" },
+    ],
+  },
+  {
+    title: "Other Services",
+    items: [
+      {
+        title: "Graphana",
+        icon: "mdi-open-in-new",
+        url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
+      },
+      {
+        title: "Zero-Os Bootstrap",
+        icon: "mdi-open-in-new",
+        url: "https://bootstrap.grid.tf/",
+      },
+      {
+        title: "0-Hub",
+        icon: "mdi-open-in-new",
+        url: "https://hub.grid.tf/",
+      },
     ],
   },
   {
@@ -178,6 +228,10 @@ const navbarLinks: NavbarLink[] = [
   {
     label: "Help",
     url: "https://manual.grid.tf/",
+  },
+  {
+    label: "Monitoring",
+    url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
   },
 ];
 

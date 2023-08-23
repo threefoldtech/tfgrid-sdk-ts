@@ -19,6 +19,11 @@ const router = createRouter({
   routes: [
     {
       path: "/",
+      component: () => import("../views/solutions_view.vue"),
+      meta: { title: "Deployments" },
+    },
+    {
+      path: "/fullvm",
       component: () => import("../views/full_virtual_machine.vue"),
       meta: { title: "Full Virtual Machine", info: { page: "info/full_vm.md" } },
     },
