@@ -16,8 +16,34 @@
         >
           <v-list>
             <template v-for="route in routes" :key="route.title">
-              <v-list-subheader>{{ route.title }}</v-list-subheader>
+              <v-list-group v-if="route.items.length > 1" :value="route.title">
+                <template v-slot:activator="{ props }">
+                  <v-list-item v-bind="props" :prepend-icon="route.icon" :title="route.title"></v-list-item>
+                </template>
+                <v-list-item
+                  v-for="item in route.items"
+                  :key="item.route"
+                  :value="item.route"
+                  @click="clickHandler(item)"
+                  active-color="primary"
+                  :active="$route.path === item.route"
+                >
+                  <template v-slot:prepend v-if="item.icon">
+                    <v-img
+                      v-if="item.icon.includes('.')"
+                      class="mr-7"
+                      width="26"
+                      :src="baseUrl + 'images/icons/' + item.icon"
+                      :alt="item.title"
+                    />
+                    <v-icon v-else width="26">{{ item.icon }}</v-icon>
+                  </template>
+
+                  <v-list-item-title>{{ item.title }}</v-list-item-title>
+                </v-list-item>
+              </v-list-group>
               <v-list-item
+                v-else
                 v-for="item in route.items"
                 :key="item.route"
                 :value="item.route"
@@ -28,12 +54,12 @@
                 <template v-slot:prepend v-if="item.icon">
                   <v-img
                     v-if="item.icon.includes('.')"
-                    class="mr-4"
+                    class="mr-7"
                     width="26"
                     :src="baseUrl + 'images/icons/' + item.icon"
                     :alt="item.title"
                   />
-                  <v-icon v-else class="mr-4" width="26">{{ item.icon }}</v-icon>
+                  <v-icon v-else width="26">{{ item.icon }}</v-icon>
                 </template>
 
                 <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -65,18 +91,6 @@
 
         <v-spacer></v-spacer>
 
-        <v-btn
-          v-for="(link, index) in navbarLinks"
-          :key="index"
-          color="var(--link-color)"
-          variant="text"
-          target="_blank"
-          :href="link.url"
-          :prepend-icon="link.icon && link.label ? link.icon : undefined"
-          :icon="link.icon && !link.label ? link.icon : undefined"
-          :text="link.label"
-        />
-        <v-divider vertical v-if="navbarLinks.length" />
         <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
         <v-divider vertical class="mx-2" />
         <AppTheme />
@@ -140,58 +154,41 @@ watch(
 const version = process.env.VERSION as any;
 
 const routes: AppRoute[] = [
-  // {
-  //   title: "Deployments",
-  //   items: [
-  //     { title: "Full Virtual Machine", icon: "vm.png", route: "/" },
-  //     { title: "Micro Virtual Machine", icon: "vm.png", route: "/vm" },
-  //     { title: "Kubernetes", icon: "kubernetes.png", route: "/kubernetes" },
-  //     { title: "CapRover", icon: "caprover.png", route: "/caprover" },
-  //     { title: "Peertube", icon: "peertube.png", route: "/peertube" },
-  //     { title: "Funkwhale", icon: "funkwhale.png", route: "/funkwhale" },
-  //     { title: "Mattermost", icon: "mattermost.png", route: "/mattermost" },
-  //     { title: "Discourse", icon: "discourse.png", route: "/discourse" },
-  //     { title: "Taiga", icon: "taiga.png", route: "/taiga" },
-  //     { title: "Owncloud", icon: "owncloud.png", route: "/owncloud" },
-  //     { title: "Nextcloud", icon: "nextcloud.png", route: "/nextcloud" },
-  //     { title: "Presearch", icon: "presearch.png", route: "/presearch" },
-  //     { title: "Subsquid", icon: "subsquid.png", route: "/subsquid" },
-  //     { title: "Casperlabs", icon: "casperlabs.png", route: "/casperlabs" },
-  //     { title: "Algorand", icon: "algorand.png", route: "/algorand" },
-  //     { title: "Node Pilot", icon: "vm.png", route: "/nodepilot" },
-  //     { title: "Wordpress", icon: "wordpress.png", route: "/wordpress" },
-  //     { title: "Umbrel", icon: "umbrel.png", route: "/umbrel" },
-  //     // { title: "Freeflow", icon: "freeflow.png", route: "/freeflow" },
-  //   ],
-  // },
   {
     title: "Playground",
     items: [{ title: "Deployments", icon: "vm.png", route: "/" }],
   },
   {
+    title: "My Account",
+    items: [{ title: "Contracts", icon: "mdi-file-document-edit", route: "/contractslist" }],
+  },
+  {
     title: "Portal",
+    icon: "mdi-account-convert-outline",
     items: [
-      { title: "Twin", icon: "account-supervisor-outline.svg", route: "/twin" },
-      { title: "Bridge", icon: "swap-horizontal.png", route: "/bridge" },
-      { title: "Transfer", icon: "account-transfer.svg", route: "/transfer" },
-      { title: "Farms", icon: "silo.svg", route: "/farms" },
-      { title: "Dedicated Nodes", icon: "resistor-nodes.svg", route: "/dedicated-nodes" },
-      { title: "DAO", icon: "note-check-outline.svg", route: "/dao" },
+      { title: "Twin", icon: "mdi-account-supervisor-outline", route: "/twin" },
+      { title: "Bridge", icon: "mdi-swap-horizontal", route: "/bridge" },
+      { title: "Transfer", icon: "mdi-account-arrow-right-outline", route: "/transfer" },
+      { title: "Farms", icon: "mdi-silo", route: "/my-farms" },
+      { title: "Dedicated Nodes", icon: "mdi-resistor-nodes", route: "/dedicated-nodes" },
+      { title: "DAO", icon: "mdi-note-check-outline", route: "/dao" },
     ],
   },
   {
     title: "Explorer",
+    icon: "mdi-database-search-outline",
     items: [
-      { title: "Statistics", icon: "chart-scatter-plot.svg", route: "/stats" },
-      { title: "Nodes", icon: "access-point.svg", route: "/nodes" },
-      { title: "Farms", icon: "lan-connect.svg", route: "/farms" },
+      { title: "Statistics", icon: "mdi-chart-scatter-plot", route: "/stats" },
+      { title: "Nodes", icon: "mdi-access-point", route: "/nodes" },
+      { title: "Farms", icon: "mdi-lan-connect", route: "/farms" },
     ],
   },
   {
     title: "Calculators",
+    icon: "mdi-calculator",
     items: [
-      { title: "Resource Pricing", icon: "calculator.svg", route: "pricing" },
-      { title: "Simulator", icon: "chart-line.svg", route: "/simulator" },
+      { title: "Resource Pricing", icon: "mdi-currency-usd", route: "pricing" },
+      { title: "Simulator", icon: "mdi-chart-line", route: "/simulator" },
     ],
   },
   {
@@ -215,23 +212,8 @@ const routes: AppRoute[] = [
     ],
   },
   {
-    title: "My Account",
-    items: [{ title: "Contracts", route: "/contractslist" }],
-  },
-  {
     title: "Help",
     items: [{ title: "Manual", icon: "mdi-open-in-new", url: "https://manual.grid.tf/" }],
-  },
-];
-
-const navbarLinks: NavbarLink[] = [
-  {
-    label: "Help",
-    url: "https://manual.grid.tf/",
-  },
-  {
-    label: "Monitoring",
-    url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
   },
 ];
 
@@ -264,6 +246,7 @@ import ProfileManager from "./weblets/profile_manager.vue";
 interface AppRoute {
   title: string;
   items: AppRouteItem[];
+  icon?: string;
 }
 
 interface AppRouteItem {
