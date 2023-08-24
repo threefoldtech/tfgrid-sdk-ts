@@ -32,7 +32,7 @@
                     <v-img
                       v-if="item.icon.includes('.')"
                       class="mr-7"
-                      width="26"
+                      width="24"
                       :src="baseUrl + 'images/icons/' + item.icon"
                       :alt="item.title"
                     />
@@ -55,7 +55,7 @@
                   <v-img
                     v-if="item.icon.includes('.')"
                     class="mr-7"
-                    width="26"
+                    width="24"
                     :src="baseUrl + 'images/icons/' + item.icon"
                     :alt="item.title"
                   />
@@ -193,15 +193,16 @@ const routes: AppRoute[] = [
   },
   {
     title: "Other Services",
+    icon: "mdi-toolbox",
     items: [
       {
         title: "Graphana",
-        icon: "mdi-open-in-new",
+        icon: "mdi-equalizer",
         url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
       },
       {
         title: "Zero-Os Bootstrap",
-        icon: "mdi-open-in-new",
+        icon: "mdi-earth",
         url: "https://bootstrap.grid.tf/",
       },
       {
@@ -213,7 +214,7 @@ const routes: AppRoute[] = [
   },
   {
     title: "Help",
-    items: [{ title: "Manual", icon: "mdi-open-in-new", url: "https://manual.grid.tf/" }],
+    items: [{ title: "Manual", icon: "mdi-book-open-page-variant-outline", url: "https://manual.grid.tf/" }],
   },
 ];
 
@@ -327,5 +328,13 @@ export default {
 
 a {
   color: #5695ff !important;
+}
+
+.v-list-item__prepend {
+  width: 35px !important;
+}
+
+.v-list-item--density-default.v-list-item--one-line {
+  min-height: 40px;
 }
 </style>

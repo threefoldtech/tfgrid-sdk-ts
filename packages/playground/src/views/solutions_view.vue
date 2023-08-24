@@ -71,7 +71,7 @@ export default {
       {
         title: "Mattermost",
         excerpt:
-          "Mattermost is an open-source, self-hostable online chat service with file sharing, search, and integrations. It is designed as an internal chat for organisations and companies, and mostly markets itself as an open-source alternative to Slack and Microsoft Teams.",
+          "Mattermost is an open-source, self-hostable online chat service with file sharing, search, and integrations. It is designed as an internal chat for organisations and companies.",
         icon: "mattermost.png",
         route: "/mattermost",
       },
@@ -85,7 +85,7 @@ export default {
       {
         title: "Taiga",
         excerpt:
-          "Taiga is a project management application that can handle both simple and complex projects for startups, software developers, and other target teams. It tracks the progress of a project. With Taiga, you can use either Kanban or Scrum template, or both.",
+          "Taiga is a project management application that can handle both simple and complex projects for startups, software developers, and other target teams. It tracks the progress of a project.",
         icon: "taiga.png",
         route: "/taiga",
       },
