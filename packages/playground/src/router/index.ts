@@ -123,6 +123,11 @@ const router = createRouter({
       meta: { title: "Contracts List", info: { page: "info/contracts_list.md" } },
     },
     {
+      path: "/twin",
+      component: () => import("../portal/twin_view.vue"),
+      meta: { title: "Twin" },
+    },
+    {
       path: "/:pathMatch(.*)*",
       component: () => import("../views/page_not_found.vue"),
       meta: { title: "Page Not Found" },
