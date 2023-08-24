@@ -5,6 +5,7 @@ export interface Profile {
   ssh: string;
   twinId: number;
   address: string;
+  relay: string;
 }
 
 interface State {
