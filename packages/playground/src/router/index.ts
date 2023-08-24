@@ -125,7 +125,7 @@ const router = createRouter({
     {
       path: "/twin",
       component: () => import("../portal/twin_view.vue"),
-      meta: { title: "Twin", info: { page: "info/twin.md" } },
+      meta: { title: "Twin" },
     },
     {
       path: "/:pathMatch(.*)*",
