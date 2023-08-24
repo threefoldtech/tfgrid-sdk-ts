@@ -44,6 +44,7 @@ const profileManager = useProfileManager();
 .custom-list {
   overflow: hidden;
   font-size: 20px;
+  padding: 10px;
 }
 
 .column-style {
