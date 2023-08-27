@@ -1,9 +1,11 @@
 import math
+from utils.utils import byte_converter
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+
 """
 This module contains Dedicate Node page elements.
 """
@@ -192,60 +194,21 @@ class DedicatePage:
     def table_nodes(self):
         nodes = []
         checking_table = self.browser.find_element(By.XPATH, f'//*[@id="app"]/div[1]/div[2]/div/div[1]/div/div[2]/div/div[2]/div/div/div/div[1]/table/tbody/tr').text
-        if(checking_table == 'No data available'):
+        if(checking_table == 'No matching records found' or checking_table == 'No data available'):
             return nodes
         for i in range(1, len(self.browser.find_elements(By.XPATH, self.table_xpath))+1):
             if i <= len(self.browser.find_elements(By.XPATH, self.table_xpath))+1:
                 details = []
-                self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[1]/button").click()
-                WebDriverWait(self.browser, 30).until(EC.visibility_of_any_elements_located((By.XPATH, "//*[contains(text(), 'Node Resources')]")))
-                text = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div/div[1]/div/div[2]/div/div/div[3]").text
-                text = text.replace('Disk (SSD)\n', '')
-                details.append(self.byte_converter(text)) # SRU
-                text = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div/div[1]/div/div[2]/div/div/div[2]").text
-                text = text.replace('Disk (HDD)\n', '')
-                details.append(self.byte_converter(text)) # HRU
-                text = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div/div[1]/div/div[2]/div/div/div[4]").text
-                text = text.replace('Memory\n', '')
-                details.append(self.byte_converter(text)) # MRU
-                text = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div/div[1]/div/div[2]/div/div/div[1]").text
-                text = text.replace('CPU\n', '')
-                details.append(int(text[:-4])) # CRU
-                self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[1]/button").click()
+                text = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[6]").text
+                details.append(byte_converter(text)) # SRU
+                text = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[7]").text
+                details.append(byte_converter(text)) # HRU
+                text = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[5]").text
+                details.append(byte_converter(text)) # MRU
+                text = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[4]").text
+                details.append(int(text)) # CRU
                 nodes.append(details)
         return nodes
-    
-    def byte_converter(self, value):
-        if value!='0':
-            if value[-2]=='P':
-                return float(value[:-3])*(1024*2)
-            elif value[-2]=='T':
-                return float(value[:-3])*1024
-            else:
-                return float(value[:-3])
-        else:
-            return float(value)
-
-    def get_min(self, nodes, resource):
-        min = nodes[0][resource]
-        for node in nodes:
-            if min > node[resource]:
-                min = node[resource]
-        return min
-
-    def get_max(self, nodes, resource):
-        max = nodes[0][resource]
-        for node in nodes:
-            if max < node[resource]:
-                max = node[resource]
-        return max
-    
-    def filter_result(self, nodes, data, resource):
-        result = 0
-        for node in nodes:
-            if node[resource] >= data :
-                result += 1
-        return result
 
     def select_filters(self):
         self.browser.find_element(By.XPATH, "//*[contains(text(), 'Rented')]").click()
@@ -261,11 +224,11 @@ class DedicatePage:
     def filter_input(self, data, resource, validation):
         for i in range(6):
             resource_input = (By.XPATH, self.filter_resource_input + str(i+1) + ']/div/div[2]/div/div[1]/div[1]/input')
-            time.sleep(0.5)
             self.browser.find_element(*resource_input).send_keys(Keys.CONTROL + "a")
             self.browser.find_element(*resource_input).send_keys(Keys.DELETE)
             if (i == resource):
                 self.browser.find_element(*resource_input).send_keys(str(data) + Keys.ENTER)
+                time.sleep(5)
         if not validation :
             self.browser.find_element(*resource_input).send_keys(Keys.PAGE_UP + Keys.PAGE_UP)
 
