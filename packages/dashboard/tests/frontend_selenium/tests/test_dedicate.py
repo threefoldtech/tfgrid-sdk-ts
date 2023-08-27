@@ -1,10 +1,9 @@
-from utils.utils import generate_string, get_seed
+from utils.utils import generate_string, get_seed, get_min, get_max, filter_result
 from utils.grid_proxy import GridProxy
 from pages.dedicate import DedicatePage
 from pages.dashboard import DashboardPage
 import pytest
 import random
-import time
 
 #  Time required for the run (12 cases) is approximately 3 minutes.
 
@@ -171,41 +170,44 @@ def test_dedicate_page(browser):
 #     assert dedicate_page.sort_node_price() == sorted(price, reverse=True)
 #     assert dedicate_page.sort_node_price() == sorted(price, reverse=False)
 
-
-def test_filter_resource(browser):
+@pytest.mark.parametrize("resource",[0, 1, 2, 3])
+def test_filter_resource(browser, resource):
     """
-      Test Case: 
+      Test Case: TC2034 - Filter Resource
       Steps:
           - Navigate to the dashboard.
           - Login.
           - Click on Dedicate Node from side menu.
-      Result: .
+          - Select filter.
+          - Enter the resource value. 
+      Result: The nodes with enough resources that matches the filters.
     """
     dedicate_page, _ = before_test_setup(browser)
     dedicate_page.select_filters()
     full_nodes = dedicate_page.table_nodes()
-    dedicate_page.filter_input('1000', 0, False)
-    for i in range(4):
-        min = int(dedicate_page.get_min(full_nodes, i))
-        max = int(dedicate_page.get_max(full_nodes, i))
-        test_data = random.randint(min-10,max+10)
-        dedicate_page.filter_input(test_data, i, False)
-        nodes = dedicate_page.table_nodes()
-        assert dedicate_page.filter_result(full_nodes, test_data, i) == len(nodes)
-        if len(nodes) != 0 :
-            for node in nodes :
-                assert test_data <= node[i]
-                assert dedicate_page.filter_result(full_nodes, test_data, i)
+    dedicate_page.filter_input('10000', resource, False)
+    min = int(get_min(full_nodes, resource))
+    max = int(get_max(full_nodes, resource))
+    test_data = random.randint(min-10,max+10)
+    dedicate_page.filter_input(test_data, resource, False)
+    nodes = dedicate_page.table_nodes()
+    assert filter_result(full_nodes, test_data, resource) == len(nodes)
+    if len(nodes) != 0 :
+        for node in nodes :
+            assert test_data <= node[resource]
+            assert filter_result(full_nodes, test_data, resource)
 
 
 def test_filter_validation(browser):
     """
-      Test Case: 
+      Test Case: TC2035 - Filter Resource Validation
       Steps:
           - Navigate to the dashboard.
           - Login.
           - Click on Dedicate Node from side menu.
-      Result: .
+          - Select filter.
+          - Enter the resource value.
+      Result: Input should only accept correct format or give an alert in invalide case.
     """
     dedicate_page, _ = before_test_setup(browser)
     dedicate_page.select_filters()
