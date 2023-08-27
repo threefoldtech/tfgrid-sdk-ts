@@ -83,13 +83,17 @@ function editTwin() {
 }
 
 async function UpdateRelay() {
-  const grid = await getGrid(profileManager.profile!);
-  const twins = new Twins(grid!.tfclient);
-  const newPk = await generatePublicKey(profileManager.profile!.mnemonic);
-  await twins.update({ pk: newPk, relay: relay.value });
-  profileManager.updateRelay(window.env.RELAY_DOMAIN);
-  profileManager.updatePk(newPk);
-  updateRelay.value = false;
+  try {
+    const grid = await getGrid(profileManager.profile!);
+    const twins = new Twins(grid!.tfclient);
+    const newPk = await generatePublicKey(profileManager.profile!.mnemonic);
+    await twins.update({ pk: newPk, relay: relay.value });
+    profileManager.updateRelay(window.env.RELAY_DOMAIN);
+    profileManager.updatePk(newPk);
+    updateRelay.value = false;
+  } catch (e) {
+    console.log("could not update relay, Error: ", e);
+  }
 }
 </script>
 
