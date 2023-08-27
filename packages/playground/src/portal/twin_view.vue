@@ -69,8 +69,12 @@ async function validateEdit() {
   try {
     await client._connect();
     const pk = await generatePublicKey(profileManager.profile!.mnemonic);
-    if (pk !== profileManager.profile?.pk || profileManager.profile?.relay !== window.env.RELAY_DOMAIN) {
+    if (profileManager.profile?.relay !== window.env.RELAY_DOMAIN) {
       updateRelay.value = true;
+    }
+
+    if (profileManager.profile?.pk !== pk) {
+      UpdateRelay();
     }
   } catch (e) {
     console.log(e);
@@ -92,7 +96,7 @@ async function UpdateRelay() {
     profileManager.updatePk(newPk);
     updateRelay.value = false;
   } catch (e) {
-    console.log("could not update relay, Error: ", e);
+    console.log("could not update relay or pk, Error: ", e);
   }
 }
 </script>
