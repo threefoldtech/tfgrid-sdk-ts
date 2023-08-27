@@ -5,11 +5,11 @@
         <v-card>
           <v-toolbar color="primary" dark class="custom-toolbar">Edit Twin</v-toolbar>
           <div class="text-h2 pa-10">
-            <v-text-field v-model="relay" outlined></v-text-field>
+            <v-text-field v-model="relay" outlined label="Relay"></v-text-field>
           </div>
           <v-card-actions class="justify-end pa-5">
             <v-btn @click="editingTwin = false" class="grey lighten-2 black--text">Close</v-btn>
-            <v-btn @click="UpdateRelay" class="primary white--text">Submit</v-btn>
+            <v-btn @click="UpdateRelay" class="primary white--text">Save</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
