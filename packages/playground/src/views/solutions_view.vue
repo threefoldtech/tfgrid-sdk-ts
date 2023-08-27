@@ -2,14 +2,19 @@
   <view-layout>
     <v-row>
       <v-col cols="4" v-for="card in cards" :key="card.title">
-        <router-link :to="card.route">
+        <router-link :to="'/solutions' + card.route">
           <v-card class="pa-3 pt-6" height="250">
-            <v-img class="ml-3" width="75" :src="baseURL + 'images/icons/' + card.icon" :alt="card.title" />
+            <v-img
+              class="ml-3"
+              width="75"
+              :src="baseURL + 'images/icons/' + card.icon"
+              :alt="card.title"
+              :style="{ filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})` }"
+            />
             <v-card-title> {{ card.title }} </v-card-title>
             <v-card-text> {{ card.excerpt }} </v-card-text>
           </v-card>
         </router-link>
-        <router-view></router-view>
       </v-col>
     </v-row>
   </view-layout>
