@@ -29,9 +29,11 @@ const router = createRouter({
     },
     {
       path: "/solutions",
-      component: () => import("../views/solutions_view.vue"),
-      strict: true,
       children: [
+        {
+          path: "",
+          component: () => import("../views/solutions_view.vue"),
+        },
         {
           path: "fullvm",
           component: () => import("../views/full_virtual_machine.vue"),

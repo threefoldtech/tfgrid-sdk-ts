@@ -101,13 +101,13 @@ export default {
         icon: "owncloud.png",
         route: "/owncloud",
       },
-      {
-        title: "Nextcloud",
-        excerpt:
-          "Nextcloud is a suite of client-server software for creating and using file hosting services. Nextcloud provides functionality similar to Dropbox, Office 365 or Google Drive.",
-        icon: "nextcloud.png",
-        route: "/nextcloud",
-      },
+      // {
+      //   title: "Nextcloud",
+      //   excerpt:
+      //     "Nextcloud is a suite of client-server software for creating and using file hosting services. Nextcloud provides functionality similar to Dropbox, Office 365 or Google Drive.",
+      //   icon: "nextcloud.png",
+      //   route: "/nextcloud",
+      // },
       {
         title: "Presearch",
         excerpt:

@@ -25,7 +25,7 @@
                   :key="item.route"
                   :value="item.route"
                   @click="clickHandler(item)"
-                  active-color="primary"
+                  color="primary"
                   :active="$route.path === item.route"
                 >
                   <template v-slot:prepend v-if="item.icon">
@@ -48,7 +48,7 @@
                 :key="item.route"
                 :value="item.route"
                 @click="clickHandler(item)"
-                active-color="primary"
+                color="primary"
                 :active="$route.path === item.route"
               >
                 <template v-slot:prepend v-if="item.icon">
@@ -158,9 +158,9 @@ const routes: AppRoute[] = [
     title: "Portal",
     icon: "mdi-account-convert-outline",
     items: [
-      { title: "Twin", icon: "mdi-account-supervisor-outline", route: `/portal/twin` },
+      { title: "Twin", icon: "mdi-account-supervisor-outline", route: "/portal/twin" },
       { title: "Bridge", icon: "mdi-swap-horizontal", route: "/portal/bridge" },
-      { title: "Transfer", icon: "mdi-account-arrow-right-outline", route: "/transfer" },
+      { title: "Transfer", icon: "mdi-account-arrow-right-outline", route: "/portal/transfer" },
       { title: "Farms", icon: "mdi-silo", route: "/portal/farms" },
       { title: "Dedicated Nodes", icon: "mdi-resistor-nodes", route: "/portal/dedicated-nodes" },
       { title: "DAO", icon: "mdi-note-check-outline", route: "/portal/dao" },
