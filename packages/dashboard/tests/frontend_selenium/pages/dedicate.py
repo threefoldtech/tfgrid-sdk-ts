@@ -227,7 +227,10 @@ class DedicatePage:
             self.browser.find_element(*resource_input).send_keys(Keys.CONTROL + "a")
             self.browser.find_element(*resource_input).send_keys(Keys.DELETE)
             if (i == resource):
-                self.browser.find_element(*resource_input).send_keys(str(data) + Keys.ENTER)
+                self.browser.find_element(*resource_input).send_keys(data)
+                self.browser.find_element(*resource_input).send_keys(Keys.CONTROL + "a")
+                self.browser.find_element(*resource_input).send_keys(Keys.CONTROL + "x")
+                self.browser.find_element(*resource_input).send_keys(Keys.CONTROL + "v")
                 time.sleep(5)
         if not validation :
             self.browser.find_element(*resource_input).send_keys(Keys.PAGE_UP + Keys.PAGE_UP)
