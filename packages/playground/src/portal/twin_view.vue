@@ -5,7 +5,7 @@
         <v-card>
           <v-toolbar color="primary" dark class="custom-toolbar">Edit Twin</v-toolbar>
           <div class="text-h2 pa-10">
-            <v-text-field v-model="relay" outlined label="Relay"></v-text-field>
+            <v-text-field v-model="relay" outlined label="Relay" :error-messages="errorMsg"></v-text-field>
           </div>
           <v-card-actions class="justify-end pa-5">
             <v-btn @click="editingTwin = false" class="grey lighten-2 black--text">Close</v-btn>
@@ -62,6 +62,7 @@ const profileManager = useProfileManager();
 const editingTwin = ref(false);
 const relay = ref(profileManager.profile?.relay || "");
 const updateRelay = ref(false);
+const errorMsg = ref("");
 
 onMounted(validateEdit);
 async function validateEdit() {
@@ -69,7 +70,7 @@ async function validateEdit() {
   try {
     await client._connect();
     const pk = await generatePublicKey(profileManager.profile!.mnemonic);
-    if (profileManager.profile?.relay !== window.env.RELAY_DOMAIN) {
+    if (profileManager.profile?.relay !== "window.env.RELAY_DOMAIN") {
       updateRelay.value = true;
     }
 
@@ -89,13 +90,13 @@ function editTwin() {
 async function UpdateRelay() {
   try {
     const grid = await getGrid(profileManager.profile!);
-    const twins = new Twins(grid!.tfclient);
     const newPk = await generatePublicKey(profileManager.profile!.mnemonic);
-    await twins.update({ pk: newPk, relay: relay.value });
+    await grid?.twins.update({ relay: relay.value });
     profileManager.updateRelay(window.env.RELAY_DOMAIN);
     profileManager.updatePk(newPk);
     updateRelay.value = false;
   } catch (e) {
+    errorMsg.value = (e as any).message;
     console.log("could not update relay or pk, Error: ", e);
   }
 }
