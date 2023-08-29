@@ -3,7 +3,7 @@ export type ValidationResult = {
   errorMessage: string;
 };
 
-export function validateUrl(value: string): ValidationResult {
+export function validatePdfUrl(value: string): ValidationResult {
   if (!value || value.trim() === "") {
     return {
       isValid: false,
@@ -11,10 +11,10 @@ export function validateUrl(value: string): ValidationResult {
     };
   }
 
-  if (!value.startsWith("http://") || !value.startsWith("https://") || !value.includes(".")) {
+  if (!value.includes(".") || !value.endsWith("pdf")) {
     return {
       isValid: false,
-      errorMessage: "Invalid urk format",
+      errorMessage: "Invalid pdf url format",
     };
   }
 

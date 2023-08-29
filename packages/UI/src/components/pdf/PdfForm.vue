@@ -1,5 +1,11 @@
 <template>
-  <v-container>
+  <v-container v-if="isSubmitted">
+    <object :data="pdfLink" type="application/pdf" width="100%" height="910">
+      <p>PDF cannot be displayed.</p>
+    </object>
+  </v-container>
+
+  <v-container v-else>
     <div class="d-flex align-center">
       <img class="threefold-logo" src="../../assets/threefold-logo.png" alt="" />
       <span class="logo-text">Viewer</span>
@@ -27,23 +33,24 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 
-import { validateUrl, type ValidationResult } from "../../utils/validations";
+import { validatePdfUrl, type ValidationResult } from "../../utils/validations";
 
 export default defineComponent({
   data() {
     return {
       pdfLink: "",
       isClicked: false,
+      isSubmitted: false,
       linkValidationResult: {} as ValidationResult,
     };
   },
   computed: {
     errorLink(): boolean {
-      return !validateUrl(this.pdfLink).isValid;
+      return !validatePdfUrl(this.pdfLink).isValid;
     },
     validateLinkRule() {
       return (value: string) => {
-        this.linkValidationResult = validateUrl(value);
+        this.linkValidationResult = validatePdfUrl(value);
         return this.linkValidationResult.isValid || this.linkValidationResult.errorMessage;
       };
     },
@@ -52,6 +59,7 @@ export default defineComponent({
   methods: {
     submitForm() {
       if (!this.errorLink) {
+        this.isSubmitted = true;
         console.log("Link:", this.pdfLink);
       } else {
         console.log("Form is not valid");
