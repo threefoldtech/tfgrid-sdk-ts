@@ -1,31 +1,29 @@
 <!-- eslint-disable vue/no-v-text-v-html-on-component -->
 <template>
   <v-app>
-    <div>
-      <v-app-bar :class="{ 'sidebar-opened': !mini, 'ml-4 ': !mini }" color="#064663" dense dark fixed height="65">
-        <v-app-bar-nav-icon></v-app-bar-nav-icon>
+    <v-app-bar :class="{ 'sidebar-opened': !mini, 'ml-4 ': !mini }" color="#064663" dense dark fixed height="65">
+      <v-app-bar-nav-icon></v-app-bar-nav-icon>
 
-        <v-toolbar-title class="font-weight-bold" @click="redirectToHomePage" style="cursor: pointer"
-          >Threefold Chain</v-toolbar-title
-        >
+      <v-toolbar-title class="font-weight-bold" @click="redirectToHomePage" style="cursor: pointer"
+        >Threefold Chain</v-toolbar-title
+      >
 
-        <v-spacer>
-          <div class="d-flex align-center justify-start">
-            <TftSwapPrice v-if="!loadingAPI" />
-            <FundsCard v-if="$store.state.credentials.initialized && $store.state.credentials.balance" />
-          </div>
-        </v-spacer>
-        <div class="d-flex align-center">
-          <div class="d-flex" style="align-items: center">
-            <v-btn icon @click="toggle_dark_mode">
-              <v-icon>mdi-theme-light-dark</v-icon>
-            </v-btn>
-
-            <TfChainConnector />
-          </div>
+      <v-spacer>
+        <div class="d-flex align-center justify-start">
+          <TftSwapPrice v-if="!loadingAPI" />
+          <FundsCard v-if="$store.state.credentials.initialized && $store.state.credentials.balance" />
         </div>
-      </v-app-bar>
-    </div>
+      </v-spacer>
+      <div class="d-flex align-center">
+        <div class="d-flex" style="align-items: center">
+          <v-btn icon @click="toggle_dark_mode">
+            <v-icon>mdi-theme-light-dark</v-icon>
+          </v-btn>
+
+          <TfChainConnector />
+        </div>
+      </div>
+    </v-app-bar>
 
     <v-navigation-drawer
       app
@@ -162,9 +160,21 @@
       </div>
     </v-navigation-drawer>
 
-    <div :style="'padding-left:' + (mini ? '56px' : '300px')">
+    <!-- <div :style="'padding-left:' + (mini ? '56px' : '300px')">
       <router-view />
-    </div>
+    </div> -->
+
+    <v-content class="mt-15">
+      <v-container fluid>
+        <v-row class="fill-height">
+          <v-col>
+            <transition name="fade">
+              <router-view></router-view>
+            </transition>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-content>
 
     <v-footer padless fixed>
       <v-card class="flex" flat tile>
@@ -338,14 +348,24 @@ export default class Dashboard extends Vue {
           icon: "account-arrow-right-outline",
           showBeforeLogIn: false,
         },
-        { label: "farms", path: "account-farms", icon: "silo", showBeforeLogIn: false },
+        {
+          label: "farms",
+          path: "account-farms",
+          icon: "silo",
+          showBeforeLogIn: false,
+        },
         {
           label: "dedicated nodes",
           path: "account-nodes",
           icon: "resistor-nodes",
           showBeforeLogIn: false,
         },
-        { label: "dao", path: "account-dao", icon: "note-check-outline", showBeforeLogIn: false },
+        {
+          label: "dao",
+          path: "account-dao",
+          icon: "note-check-outline",
+          showBeforeLogIn: false,
+        },
       ],
     },
     {
