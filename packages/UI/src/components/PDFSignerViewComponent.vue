@@ -9,6 +9,10 @@
     </div>
     <div v-else class="pdf-container">
       <VuePdf v-for="page in numOfPages" :key="page" :src="pdfSrc" :page="page" class="pdf-page" />
+      <div class="buttons-footer">
+        <Button class="btn btn-accept">Accept</Button>
+        <Button class="btn btn-decline">Decline</Button>
+      </div>
     </div>
   </div>
 </template>
@@ -46,6 +50,10 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.pdf-container {
+  overflow-x: hidden;
+}
+
 .loading {
   display: flex;
   flex-direction: column;
@@ -65,6 +73,36 @@ onMounted(async () => {
   width: 40px;
   height: 40px;
   animation: spin 1s linear infinite;
+}
+
+.buttons-footer {
+  display: flex;
+  width: 100%;
+  /* height: 58px; */
+  padding: 50px;
+  background: #ededed;
+  border-radius: 9px;
+  justify-content: center;
+}
+
+.btn {
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 15px;
+  margin-right: 15px;
+  width: 15%;
+  border-radius: 20px;
+  outline: none;
+  border: none;
+  color: white;
+}
+
+.btn-accept {
+  background: #80c968;
+}
+.btn-decline {
+  background: #c7664e;
 }
 
 @keyframes spin {
