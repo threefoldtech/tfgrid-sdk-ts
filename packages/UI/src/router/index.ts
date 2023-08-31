@@ -5,11 +5,6 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      name: "home",
-      component: () => import("../views/PDFSignerFormView.vue"),
-    },
-    {
-      path: "/pdf",
       name: "pdf",
       component: () => import("../views/PDFSignerView.vue"),
     },
