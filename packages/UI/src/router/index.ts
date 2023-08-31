@@ -6,7 +6,7 @@ const router = createRouter({
     {
       path: "/",
       name: "pdf",
-      component: () => import("../views/PDFSignerView.vue"),
+      component: () => import("../views/PDFSignerView.ce.vue"),
     },
     {
       path: "/editor",

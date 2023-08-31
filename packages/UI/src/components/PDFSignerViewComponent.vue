@@ -90,7 +90,8 @@ const loadingAcceptBtn = ref(false);
 
 const pdfSrc = ref<VuePdfPropsType["src"]>(props.pdfUrl);
 
-const onScroll = ({ target }) => {
+const onScroll = (e: UIEvent) => {
+  const target = e.target as HTMLElement;
   if (target.scrollTop + target.clientHeight >= target.scrollHeight) {
     if (!loadingAcceptBtn.value) {
       isAcceptDisabled.value = false;
@@ -107,10 +108,10 @@ const accept = () => {
 onMounted(async () => {
   loadingPdf.value = true;
   try {
-    const loadingTask = createLoadingTask(pdfSrc.value);
+    const loadingTask = createLoadingTask(props.pdfUrl);
     const pdf: PDFDocumentProxy = await loadingTask.promise;
     numOfPages.value = pdf.numPages;
-  } catch (error) {
+  } catch (error: any) {
     errorMessage.value =
       `An error occurred while loading the PDF: ${error.message}` || "An error occurred while loading the PDF.";
     console.error(error);
