@@ -1,8 +1,10 @@
 <template>
-  <ScriptEditor />
+  <ScriptEditor dest />
 </template>
 
 <script lang="ts">
+import { ref } from "vue";
+
 import ScriptEditor from "../components/ScriptEditor.vue";
 export default {
   name: "TFScriptEditor",
@@ -10,8 +12,10 @@ export default {
     ScriptEditor,
   },
   setup() {
+    const dest = ref();
     return {
       ScriptEditor,
+      dest,
     };
   },
 };
