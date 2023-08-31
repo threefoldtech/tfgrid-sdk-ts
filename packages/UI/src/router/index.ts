@@ -13,6 +13,11 @@ const router = createRouter({
       name: "pdf",
       component: () => import("../views/PDFSignerView.vue"),
     },
+    {
+      path: "/editor",
+      name: "editor",
+      component: () => import("../views/ScriptEditorView.vue"),
+    },
   ],
 });
 

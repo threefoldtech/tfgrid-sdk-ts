@@ -7,6 +7,8 @@
 </template>
 
 <script lang="ts">
+import "./index.css";
+
 import { defineComponent } from "vue";
 
 export default defineComponent({
