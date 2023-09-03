@@ -1,15 +1,15 @@
 <template>
-  <form dest>
+  <form dest class="container mx-auto">
     <div class="w-full mb-4 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
       <div class="px-4 py-2 bg-white rounded-b-lg dark:bg-gray-800">
-        <label for="editor" class="sr-only">Submit Script</label>
         <textarea
           id="editor"
           rows="8"
           class="block w-full px-0 text-sm text-gray-800 bg-white border-0 dark:bg-gray-800 focus:ring-0 dark:text-white dark:placeholder-gray-400"
           placeholder="Edit your script..."
           required
-        ></textarea>
+        >
+        </textarea>
       </div>
     </div>
     <button
@@ -23,6 +23,8 @@
 </template>
 
 <script lang="ts">
+import { defineCustomElement } from "vue";
+
 export default {
   name: "ScriptEditor",
   props: ["dest"],
@@ -36,4 +38,19 @@ export default {
     };
   },
 };
+
+const TFScriptEditor = defineCustomElement({
+  props: ["dest"],
+  // defineCustomElement only: CSS to be injected into shadow root
+  styles: [`/* inlined css */`],
+});
+
+console.log("TFScriptEditor", TFScriptEditor);
+
+customElements.define("tf-script-editor", TFScriptEditor);
+document.body.appendChild(
+  new TFScriptEditor({
+    dest: String,
+  }),
+);
 </script>
