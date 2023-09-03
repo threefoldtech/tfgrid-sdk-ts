@@ -88,7 +88,7 @@ async function UpdateRelay() {
     const grid = await getGrid(profileManager.profile!);
     const newPk = await generatePublicKey(profileManager.profile!.mnemonic);
     await grid?.twins.update({ relay: relay.value });
-    profileManager.updateRelay(window.env.RELAY_DOMAIN);
+    profileManager.updateRelay(relay.value);
     profileManager.updatePk(newPk);
     updateRelay.value = false;
   } catch (e) {
