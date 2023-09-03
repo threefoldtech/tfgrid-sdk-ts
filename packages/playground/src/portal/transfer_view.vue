@@ -9,35 +9,38 @@
         <v-tab :value="1">By Address</v-tab>
       </v-tabs>
       <v-window v-model="activeTab">
+        <!-- TwinID Transfer -->
         <v-window-item :value="0">
           <v-card class="pa-5 my-5" flat>
-            <form-validator v-model="isValidTwinIDTransfer"></form-validator>
+            <form-validator v-model="isValidTwinIDTransfer">
+              <input-validator
+                :value="receptinTwinId"
+                :rules="[
+                  validators.required('Recepient Twin ID is required'),
+                  validators.isNotEmpty('Invalid Twin ID'),
+                ]"
+                #="{ props }"
+              >
+                <input-tooltip tooltip="Enter Twin ID of Receipient Account">
+                  <v-text-field label="Recipient TwinID:" v-bind="props" v-model="receptinTwinId"></v-text-field>
+                </input-tooltip>
+              </input-validator>
 
-            <input-validator
-              :value="receptinTwinId"
-              :rules="[validators.required('Recepient Twin ID is required'), validators.isNotEmpty('Invalid Twin ID')]"
-              #="{ props }"
-            >
-              <input-tooltip tooltip="Enter Twin ID of Receipient Account">
-                <v-text-field label="Recipient TwinID:" v-bind="props" v-model="receptinTwinId"></v-text-field>
-              </input-tooltip>
-            </input-validator>
-
-            <input-validator
-              :value="transferAmount"
-              :rules="[
-                validators.required('Transfer amount is required '),
-                validators.isNumeric('Amount should be a number.'),
-                validators.min('Amount must be greater than 0', 0.00000000001),
-                validators.max('Insuffient funds', freeBalance),
-              ]"
-              #="{ props }"
-            >
-              <input-tooltip tooltip="0.01 transaction fee will be deducted">
-                <v-text-field label="Transfer Amount:" v-bind="props" v-model.number="transferAmount"></v-text-field>
-              </input-tooltip>
-            </input-validator>
-
+              <input-validator
+                :value="transferAmount"
+                :rules="[
+                  validators.required('Transfer amount is required '),
+                  validators.isNumeric('Amount should be a number.'),
+                  validators.min('Amount must be greater than 0', 0.00000000001),
+                  validators.max('Insuffient funds', freeBalance),
+                ]"
+                #="{ props }"
+              >
+                <input-tooltip tooltip="0.01 transaction fee will be deducted">
+                  <v-text-field label="Transfer Amount:" v-bind="props" v-model.number="transferAmount"></v-text-field>
+                </input-tooltip>
+              </input-validator>
+            </form-validator>
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn @click="clearInput" color="grey lighten-2 black--text">Clear</v-btn>
@@ -52,8 +55,10 @@
             </v-card-actions>
           </v-card>
         </v-window-item>
+        <!-- Address Transfer -->
+
         <v-window-item :value="1">
-          <v-card>puss</v-card>
+          <v-card class="pa-5 my-5" flat> </v-card>
         </v-window-item>
       </v-window>
     </v-card>
