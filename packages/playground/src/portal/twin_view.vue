@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts" setup>
-import { GridClient } from "@threefold/grid_client";
+import { generatePublicKey } from "@threefold/rmb_direct_client";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
@@ -65,10 +65,7 @@ const errorMsg = ref("");
 onMounted(validateEdit);
 async function validateEdit() {
   try {
-    const client = new GridClient({ mnemonic: profileManager.profile!.mnemonic, network: window.env.NETWORK });
-    client._connect();
-
-    const pk = (await client.twins.get({ id: profileManager.profile?.twinId ?? 0 })).pk;
+    const pk = await generatePublicKey(profileManager.profile!.mnemonic);
     if (profileManager.profile?.relay !== window.env.RELAY_DOMAIN) {
       updateRelay.value = true;
     }
@@ -88,10 +85,7 @@ function editTwin() {
 
 async function UpdateRelay() {
   try {
-    const client = new GridClient({ mnemonic: profileManager.profile!.mnemonic, network: window.env.NETWORK });
-    client._connect();
-
-    const pk = (await client.twins.get({ id: profileManager.profile?.twinId ?? 0 })).pk;
+    const pk = await generatePublicKey(profileManager.profile!.mnemonic);
     const grid = await getGrid(profileManager.profile!);
     await grid?.twins.update({ relay: relay.value });
     profileManager.updateRelay(relay.value);
