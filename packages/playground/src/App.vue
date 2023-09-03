@@ -233,6 +233,14 @@ function clickHandler({ route, url }: AppRouteItem): void {
     window.open(url, "_blank");
   }
 }
+
+$router.beforeEach((to, from, next) => {
+  if (to.path === "/" && hasActiveProfile) {
+    next({ path: "portal/twin" });
+  } else {
+    next();
+  }
+});
 </script>
 
 <script lang="ts">
