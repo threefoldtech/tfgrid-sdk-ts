@@ -7,6 +7,7 @@
             <StatisticsCard :item="item" />
           </div>
         </section>
+        <v-col cols="10" class="mx-auto"> <tf-map :nodes="nodesDistribution"></tf-map></v-col>
       </v-row>
       <section class="loader" v-if="Istats.length === 0">
         <v-progress-circular size="150" indeterminate />
@@ -38,10 +39,12 @@ interface Stats {
   gateways: number;
   twins: number;
   contracts: number;
+  nodesDistribution: { [key: string]: number };
 }
 
 const loading = ref(true);
 const Istats = ref<IStatistics[]>([]);
+const nodesDistribution = ref<string>("");
 
 let stats: Stats | null = null;
 
@@ -54,8 +57,8 @@ const fetchData = async () => {
     .get("/stats?status=up")
     .then(({ data }) => {
       stats = data;
-
       if (!loading.value || stats != null) {
+        nodesDistribution.value = JSON.stringify(stats!.nodesDistribution);
         Istats.value = [
           { data: stats!.nodes, title: "Nodes Online", icon: "mdi-laptop" },
           { data: stats!.farms, title: "Farms", icon: "mdi-tractor" },
