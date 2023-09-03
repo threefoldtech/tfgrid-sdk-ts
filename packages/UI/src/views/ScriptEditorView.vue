@@ -5,7 +5,7 @@
 <script lang="ts">
 import { ref } from "vue";
 
-import ScriptEditor from "../components/ScriptEditor.vue";
+import ScriptEditor from "../components/ScriptEditor.ce.vue";
 export default {
   name: "TFScriptEditor",
   components: {
