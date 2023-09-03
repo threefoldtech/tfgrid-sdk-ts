@@ -1,7 +1,4 @@
-import { defineCustomElement } from "vue";
-
+import { defineCustomElement } from "./apiCustomElement";
 import PDFSignerView from "./views/PDFSignerView.ce.vue";
 
-const PDFSignerComponent = defineCustomElement(PDFSignerView);
-
-customElements.define("pdf-signer", PDFSignerComponent);
+customElements.define("pdf-signer", defineCustomElement(PDFSignerView, { shadowRoot: false }));
