@@ -18,7 +18,7 @@
               :rules="[validators.required('Recepient Twin ID is required'), validators.isNotEmpty('Invalid Twin ID')]"
               #="{ props }"
             >
-              <input-tooltip tooltip="Receipient Twin ID">
+              <input-tooltip tooltip="Enter Twin ID of Receipient Account">
                 <v-text-field label="Recipient TwinID:" v-bind="props" v-model="receptinTwinId"></v-text-field>
               </input-tooltip>
             </input-validator>
@@ -33,15 +33,15 @@
               ]"
               #="{ props }"
             >
-              <input-tooltip tooltip="Transfer amount">
+              <input-tooltip tooltip="0.01 transaction fee will be deducted">
                 <v-text-field label="Transfer Amount:" v-bind="props" v-model.number="transferAmount"></v-text-field>
               </input-tooltip>
             </input-validator>
-            <span class="fee">0.01 transaction fee will be deducted</span>
 
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn @click="clearInput" color="grey lighten-2 black--text">Clear</v-btn>
+
               <v-btn
                 class="primary white--text"
                 :loading="loadingTransfer"
