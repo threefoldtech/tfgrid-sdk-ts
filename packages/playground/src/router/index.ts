@@ -129,7 +129,7 @@ const router = createRouter({
     },
     {
       path: "/bridge",
-      component: () => import("../portal/bridge.vue"),
+      component: () => import("../portal/bridge_view.vue"),
       meta: { title: "Bridge" },
     },
     {

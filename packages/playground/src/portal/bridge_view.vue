@@ -1,6 +1,6 @@
 <template>
   <div class="mt-8">
-    <v-container>
+    <v-container class="custom-container">
       <v-card color="primary" class="my-3 pa-3 text-center">
         <v-icon width="26">mdi-swap-horizontal</v-icon>
         <h2>Transfer TFT Across Chains</h2>
@@ -42,4 +42,8 @@ function navigation() {
 }
 </script>
 
-<style></style>
+<style>
+.custom-container {
+  width: 80%;
+}
+</style>
