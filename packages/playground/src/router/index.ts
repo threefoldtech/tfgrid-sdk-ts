@@ -118,6 +118,11 @@ const router = createRouter({
       meta: { title: "Contracts List", info: { page: "info/contracts_list.md" } },
     },
     {
+      path: "/explorer/nodes",
+      component: () => import("@/explorer/views/nodes.vue"),
+      meta: { title: "Explorer Nodes" },
+    },
+    {
       path: "/:pathMatch(.*)*",
       component: () => import("../views/page_not_found.vue"),
       meta: { title: "Page Not Found" },

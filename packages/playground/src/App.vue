@@ -165,6 +165,16 @@ const routes: AppRoute[] = [
     ],
   },
   {
+    title: "Explorer",
+    items: [
+      {
+        title: "Nodes",
+        route: "/explorer/nodes",
+        icon: "mdi-database-search-outline",
+      },
+    ],
+  },
+  {
     title: "My Account",
     items: [{ title: "Contracts", route: "/contractslist" }],
   },
@@ -281,6 +291,7 @@ export default {
   bottom: 15px;
   right: 25px;
 }
+
 .v-tooltip > .v-overlay__content {
   opacity: 10;
   color: white;
