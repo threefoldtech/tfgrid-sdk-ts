@@ -74,14 +74,12 @@
 </template>
 
 <script lang="ts" setup>
-import { Keyring } from "@polkadot/keyring";
-import { waitReady } from "@polkadot/wasm-crypto";
-import { Buffer } from "buffer";
-import MD5 from "crypto-js/md5";
 import { PDFDocumentProxy } from "pdfjs-dist/types/src/display/api";
 import { onMounted, ref } from "vue";
 import { createLoadingTask, VuePdf } from "vue3-pdfjs";
 import { type VuePdfPropsType } from "vue3-pdfjs/components/vue-pdf/vue-pdf-props"; // Prop type definitions can also be imported
+
+import { KeypairType, sign } from "@/utils/sign";
 
 const props = defineProps<{ pdfUrl: string }>();
 
@@ -89,7 +87,7 @@ const numOfPages = ref(0);
 const loadingPdf = ref(false);
 const isError = ref(false);
 const errorMessage = ref("");
-const pdfData = ref<Uint8Array>();
+const pdfData = ref<string>("");
 const isAcceptDisabled = ref(true);
 const loadingAcceptBtn = ref(false);
 
@@ -108,7 +106,8 @@ const onScroll = (e: UIEvent) => {
 const accept = async () => {
   isAcceptDisabled.value = loadingAcceptBtn.value = true;
   if (pdfData.value) {
-    const data = await sign(pdfData.value);
+    const mnemonic = "actual reveal dish guilt inner film scheme between lonely myself material replace";
+    const data = await sign(pdfData.value, mnemonic, KeypairType.ed25519);
     console.log("Accepted", data);
   } else {
     isError.value = true;
@@ -124,7 +123,7 @@ onMounted(async () => {
     const loadingTask = createLoadingTask(props.pdfUrl);
     const pdf: PDFDocumentProxy = await loadingTask.promise;
     const data = await pdf.getData();
-    pdfData.value = data;
+    pdfData.value = data.toString();
     numOfPages.value = pdf.numPages;
   } catch (error: any) {
     errorMessage.value =
@@ -134,17 +133,6 @@ onMounted(async () => {
     loadingPdf.value = false; // Set loading to false when PDF is loaded or errored
   }
 });
-
-const sign = async (content: Uint8Array): Promise<string> => {
-  const mnemonics = "actual reveal dish guilt inner film scheme between lonely myself material replace";
-  const hash = MD5(content.toString());
-  const message_bytes = Uint8Array.from(Buffer.from(hash.toString(), "hex"));
-  const keyr = new Keyring({ type: "ed25519" });
-  const key = keyr.addFromMnemonic(mnemonics);
-  await waitReady();
-  const signed = key.sign(message_bytes);
-  return Buffer.from(signed).toString("hex");
-};
 </script>
 
 <script lang="ts">
