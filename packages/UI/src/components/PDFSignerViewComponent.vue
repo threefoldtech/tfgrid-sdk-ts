@@ -114,7 +114,8 @@ const accept = async () => {
     isError.value = true;
     errorMessage.value = "Cannot read the data from the provided PDF.";
   }
-  isAcceptDisabled.value = loadingAcceptBtn.value = false;
+  // isAcceptDisabled.value = true;
+  loadingAcceptBtn.value = false;
 };
 
 onMounted(async () => {
