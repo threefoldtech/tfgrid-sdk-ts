@@ -40,8 +40,8 @@
             </v-col>
           </v-row>
         </v-list>
-        <v-card-actions v-if="updateRelay" class="justify-end">
-          <v-btn color="primary" class="custom-button" @click="editTwin">Edit</v-btn>
+        <v-card-actions v-if="updateRelay" class="justify-end mx-4 mb-4">
+          <v-btn class="custom-button bg-primary" @click="editTwin">Edit</v-btn>
         </v-card-actions>
       </v-card>
     </v-container>
@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts" setup>
-import { generatePublicKey } from "@threefold/rmb_direct_client";
+import { GridClient } from "@threefold/grid_client";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
@@ -65,7 +65,10 @@ const errorMsg = ref("");
 onMounted(validateEdit);
 async function validateEdit() {
   try {
-    const pk = await generatePublicKey(profileManager.profile!.mnemonic);
+    const client = new GridClient({ mnemonic: profileManager.profile!.mnemonic, network: window.env.NETWORK });
+    client._connect();
+
+    const pk = (await client.twins.get({ id: profileManager.profile?.twinId ?? 0 })).pk;
     if (profileManager.profile?.relay !== window.env.RELAY_DOMAIN) {
       updateRelay.value = true;
     }
@@ -85,11 +88,14 @@ function editTwin() {
 
 async function UpdateRelay() {
   try {
+    const client = new GridClient({ mnemonic: profileManager.profile!.mnemonic, network: window.env.NETWORK });
+    client._connect();
+
+    const pk = (await client.twins.get({ id: profileManager.profile?.twinId ?? 0 })).pk;
     const grid = await getGrid(profileManager.profile!);
-    const newPk = await generatePublicKey(profileManager.profile!.mnemonic);
     await grid?.twins.update({ relay: relay.value });
     profileManager.updateRelay(relay.value);
-    profileManager.updatePk(newPk);
+    profileManager.updatePk(pk);
     updateRelay.value = false;
   } catch (e) {
     errorMsg.value = (e as any).message;
