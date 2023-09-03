@@ -22,7 +22,11 @@ export default defineConfig({
       fileName: "pdf-signer",
     },
     rollupOptions: {
-      external: ["pdfjs-dist/types/src/display/api", "vue3-pdfjs/components/vue-pdf/vue-pdf-props"], // Add the module you want to ignore here
+      external: [
+        "pdfjs-dist/types/src/display/api",
+        "vue3-pdfjs/components/vue-pdf/vue-pdf-props",
+        "./src/apiCustomElement.ts",
+      ], // Add the module you want to ignore here
     },
   },
   define: {
