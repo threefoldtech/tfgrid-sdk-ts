@@ -79,12 +79,15 @@ import { onMounted, ref } from "vue";
 import { createLoadingTask, VuePdf } from "vue3-pdfjs";
 import { type VuePdfPropsType } from "vue3-pdfjs/components/vue-pdf/vue-pdf-props"; // Prop type definitions can also be imported
 
+import { KeypairType, sign } from "@/utils/sign";
+
 const props = defineProps<{ pdfUrl: string }>();
 
 const numOfPages = ref(0);
 const loadingPdf = ref(false);
 const isError = ref(false);
 const errorMessage = ref("");
+const pdfData = ref<string>("");
 const isAcceptDisabled = ref(true);
 const loadingAcceptBtn = ref(false);
 
@@ -100,9 +103,18 @@ const onScroll = (e: UIEvent) => {
   }
 };
 
-const accept = () => {
+const accept = async () => {
   isAcceptDisabled.value = loadingAcceptBtn.value = true;
-  console.log("Accepted");
+  if (pdfData.value) {
+    const mnemonic = "actual reveal dish guilt inner film scheme between lonely myself material replace";
+    const data = await sign(pdfData.value, mnemonic, KeypairType.ed25519);
+    console.log("Accepted", data);
+  } else {
+    isError.value = true;
+    errorMessage.value = "Cannot read the data from the provided PDF.";
+  }
+  // isAcceptDisabled.value = true;
+  loadingAcceptBtn.value = false;
 };
 
 onMounted(async () => {
@@ -110,6 +122,8 @@ onMounted(async () => {
   try {
     const loadingTask = createLoadingTask(props.pdfUrl);
     const pdf: PDFDocumentProxy = await loadingTask.promise;
+    const data = await pdf.getData();
+    pdfData.value = data.toString();
     numOfPages.value = pdf.numPages;
   } catch (error: any) {
     errorMessage.value =
