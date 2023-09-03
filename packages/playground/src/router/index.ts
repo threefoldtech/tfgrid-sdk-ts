@@ -128,6 +128,11 @@ const router = createRouter({
       meta: { title: "Twin" },
     },
     {
+      path: "/transfer",
+      component: () => import("../portal/transfer_view.vue"),
+      meta: { title: "Transfer" },
+    },
+    {
       path: "/:pathMatch(.*)*",
       component: () => import("../views/page_not_found.vue"),
       meta: { title: "Page Not Found" },
