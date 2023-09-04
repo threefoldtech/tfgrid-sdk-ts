@@ -1,5 +1,9 @@
+import { Keyring } from "@polkadot/keyring";
+import { Decimal } from "decimal.js";
+
 import { QueryClient } from "./client";
 import { checkConnection } from "./utils";
+
 class QueryTFTBridge {
   constructor(public client: QueryClient) {
     this.client = client;
@@ -28,6 +32,34 @@ class QueryTFTBridge {
       timeoutInMinutes,
     );
     return eventData[0].amount.toPrimitive();
+  }
+
+  @checkConnection
+  async GetWithdrawFee() {
+    try {
+      const fee = await this.client.api.query.tftBridgeModule.withdrawFee();
+      const decimalFee = new Decimal(fee.toString());
+      const convertedFee = decimalFee.div(10 ** 7).toNumber();
+      return convertedFee;
+    } catch (e) {
+      return e;
+    }
+  }
+
+  @checkConnection
+  async withdraw(mnemonic: string, address: string, target: string, amount: number, callback: any) {
+    try {
+      const keyring = new Keyring({ type: "sr25519" });
+      const keypair = keyring.addFromUri(mnemonic);
+      const nonce = await this.client.api.rpc.system.accountNextIndex(address);
+      const decimalAmount = new Decimal(amount);
+      const milliAmount = decimalAmount.mul(10 ** 7).toNumber();
+      return await this.client.api.tx.tftBridgeModule
+        .swapToStellar(target, milliAmount)
+        .signAndSend(keypair, { nonce }, callback);
+    } catch (e) {
+      return e;
+    }
   }
 }
 export { QueryTFTBridge };

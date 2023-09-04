@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-dialog transition="dialog-bottom-transition" max-width="900" v-model="depositDialog">
+    <v-dialog transition="dialog-bottom-transition" max-width="900">
       <v-card>
         <v-toolbar color="primary" dark> Deposit TFT </v-toolbar>
         <v-card-text>
@@ -22,17 +22,11 @@
   </v-container>
 </template>
 
-<script lang="ts" setup>
-import { ref } from "vue";
-
-const depositDialog = ref(false);
-
-const props = defineProps({
-  openDepositDialog: Boolean,
-});
-
-// async function created() {
-//   if (!props.openDepositDialog) return;
-//   depositDialog.value = true;
-// }
+<script lang="ts" setup></script>
+<script lang="ts">
+export default {
+  name: "DepositDialog",
+};
 </script>
+
+<style></style>
