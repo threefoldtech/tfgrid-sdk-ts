@@ -23,13 +23,15 @@
         </svg>
       </button>
     </div>
-    <button
-      type="submit"
-      class="font-sans hover:font-sans inline-flex items-center px-5 py-2.5 text-center text-white bg-sky-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
-      @click="editScript"
-    >
-      Submit Script
-    </button>
+    <div style="display: flex; justify-content: flex-end">
+      <button
+        type="submit"
+        class="font-sans hover:font-sans inline-flex px-5 py-2.5 text-center text-white bg-sky-700 rounded focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800"
+        @click="submitScript"
+      >
+        Submit Script
+      </button>
+    </div>
   </form>
 </template>
 
@@ -52,11 +54,16 @@ export default {
       lines.value = newLines;
     };
 
+    function submitScript() {
+      console.log(props.dest);
+    }
+
     return {
       text,
       lines,
       copyToClipboard,
       updateLines,
+      submitScript,
     };
   },
 };

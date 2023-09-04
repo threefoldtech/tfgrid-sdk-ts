@@ -3,13 +3,16 @@ import { fileURLToPath, URL } from "node:url";
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 
+// List of custom element tags
+const customElements = ["pdf-signer", "script-editor"];
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue({
       template: {
         compilerOptions: {
-          isCustomElement: tag => tag.includes("pdf-signer"),
+          isCustomElement: tag => customElements.some(el => tag.includes(el)),
         },
       },
     }),
@@ -17,9 +20,9 @@ export default defineConfig({
   build: {
     lib: {
       entry: "./src/main.ce.ts",
-      name: "pdf-signer",
+      name: "threefold-ui",
       // the proper extensions will be added
-      fileName: "pdf-signer",
+      fileName: "threefold-ui",
     },
     rollupOptions: {
       external: [
