@@ -36,7 +36,10 @@
 </template>
 
 <script lang="ts">
+import axios from "axios";
 import { ref } from "vue";
+
+import { KeypairType, sign } from "../utils/sign";
 
 export default {
   name: "ScriptEditor",
@@ -54,9 +57,21 @@ export default {
       lines.value = newLines;
     };
 
-    function submitScript() {
-      console.log(props.dest);
-    }
+    const submitScript = async (e: Event) => {
+      e.preventDefault();
+      try {
+        const data = await sign(
+          text.value,
+          "together assist lottery side vocal double edit cave impact alien birth monitor",
+          KeypairType.sr25519,
+        );
+
+        const response = axios.post(props.dest, data);
+        console.log(response);
+      } catch (error) {
+        throw new Error("Something went wrong while submitting the script.");
+      }
+    };
 
     return {
       text,

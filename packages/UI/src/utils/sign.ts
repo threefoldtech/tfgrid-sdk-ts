@@ -8,12 +8,21 @@ export enum KeypairType {
   ed25519 = "ed25519",
 }
 
-export const sign = async (content: string, mnemonic: string, type: KeypairType): Promise<string> => {
+interface SignReturn {
+  publicKey: string;
+  signature: string;
+}
+
+export const sign = async (content: string, mnemonic: string, KeypairType: KeypairType): Promise<SignReturn> => {
   const hash = MD5(content.toString());
   const message_bytes = Uint8Array.from(Buffer.from(hash.toString(), "hex"));
-  const keyr = new Keyring({ type: type });
+  const keyr = new Keyring({ type: KeypairType });
   const key = keyr.addFromMnemonic(mnemonic);
+  const publicKey = key.address;
+
   await waitReady();
+
   const signed = key.sign(message_bytes);
-  return Buffer.from(signed).toString("hex");
+  const signature = Buffer.from(signed).toString("hex");
+  return { publicKey, signature };
 };
