@@ -19004,6 +19004,7 @@ uglify-js@^3.1.4:
   dependencies:
     "@polkadot/keyring" "^12.4.2"
     html-parsed-element "^0.4.1"
+    md5 "^2.3.0"
     pinia "^2.1.6"
     vue "^3.3.4"
     vue-router "^4.2.4"

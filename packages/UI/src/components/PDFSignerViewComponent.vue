@@ -99,16 +99,14 @@ const onScroll = (e: UIEvent) => {
     if (!loadingAcceptBtn.value) {
       isAcceptDisabled.value = false;
     }
-    console.log(isAcceptDisabled);
   }
 };
 
 const accept = async () => {
   isAcceptDisabled.value = loadingAcceptBtn.value = true;
   if (pdfData.value) {
-    const mnemonic = "actual reveal dish guilt inner film scheme between lonely myself material replace";
+    const mnemonic = "";
     const data = await sign(pdfData.value, mnemonic, KeypairType.ed25519);
-    console.log("Accepted", data);
   } else {
     isError.value = true;
     errorMessage.value = "Cannot read the data from the provided PDF.";
