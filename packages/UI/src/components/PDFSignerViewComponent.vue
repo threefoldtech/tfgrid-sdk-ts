@@ -1,6 +1,6 @@
 <template>
   <div class="pdf-viewer">
-    <div class="flex justify-center items-center h-screen" role="status" v-if="loadingPdf">
+    <div v-if="loadingPdf" class="flex justify-center items-center h-screen" role="status">
       <svg
         aria-hidden="true"
         class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
@@ -76,74 +76,90 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-import { PDFDocumentProxy } from "pdfjs-dist/types/src/display/api";
+<script lang="ts">
 import { onMounted, ref } from "vue";
 import { createLoadingTask, VuePdf } from "vue3-pdfjs";
 import { type VuePdfPropsType } from "vue3-pdfjs/components/vue-pdf/vue-pdf-props"; // Prop type definitions can also be imported
 
 import { KeypairType, sign } from "@/utils/sign";
 
-const props = defineProps<{ pdfUrl: string }>();
-
-const numOfPages = ref(0);
-const loadingPdf = ref(false);
-const isError = ref(false);
-const errorMessage = ref("");
-const pdfData = ref<string>("");
-const isAcceptDisabled = ref(true);
-const loadingAcceptBtn = ref(false);
-
-const pdfSrc = ref<VuePdfPropsType["src"]>(props.pdfUrl);
-
-const onScroll = (e: UIEvent) => {
-  const target = e.target as HTMLElement;
-  if (target.scrollTop + target.clientHeight >= target.scrollHeight) {
-    if (!loadingAcceptBtn.value) {
-      isAcceptDisabled.value = false;
-    }
-  }
-};
-
-const accept = async () => {
-  isAcceptDisabled.value = loadingAcceptBtn.value = true;
-  if (pdfData.value) {
-    const mnemonic = "";
-    const data = await sign(pdfData.value, mnemonic, KeypairType.ed25519);
-  } else {
-    isError.value = true;
-    errorMessage.value = "Cannot read the data from the provided PDF.";
-  }
-  // isAcceptDisabled.value = true;
-  loadingAcceptBtn.value = false;
-};
-
-onMounted(async () => {
-  loadingPdf.value = true;
-  try {
-    if (!props.pdfUrl) {
-      isError.value = true;
-      errorMessage.value = "An error occurred while loading the PDF: The property `pdfUrl` should be provided.";
-      return;
-    }
-    const loadingTask = createLoadingTask(props.pdfUrl);
-    const pdf: PDFDocumentProxy = await loadingTask.promise;
-    const data = await pdf.getData();
-    pdfData.value = data.toString();
-    numOfPages.value = pdf.numPages;
-  } catch (error: any) {
-    isError.value = true;
-    errorMessage.value =
-      `An error occurred while loading the PDF: ${error.message}` || "An error occurred while loading the PDF.";
-    console.error(error);
-  } finally {
-    loadingPdf.value = false; // Set loading to false when PDF is loaded or errored
-  }
-});
-</script>
-
-<script lang="ts">
 export default {
   name: "PDFSignerViewComponent",
+  props: ["pdfurl"],
+  components: {
+    VuePdf,
+  },
+  setup(props) {
+    const numOfPages = ref(0);
+    const loadingPdf = ref(false);
+    const isError = ref(false);
+    const errorMessage = ref("");
+    const pdfData = ref<string>("");
+    const isAcceptDisabled = ref(true);
+    const loadingAcceptBtn = ref(false);
+    console.log("From setUp: ", props.pdfurl);
+
+    const pdfSrc = ref<VuePdfPropsType["src"]>(props.pdfurl);
+    console.log("pdfSrc: ", pdfSrc);
+
+    onMounted(async () => {
+      console.log("props.pdfurl: ", props.pdfurl);
+      loadingPdf.value = true;
+      try {
+        if (!props.pdfurl) {
+          isError.value = true;
+          errorMessage.value = "An error occurred while loading the PDF: The property `pdfurl` should be provided.";
+          return;
+        }
+        const loadingTask = createLoadingTask(props.pdfurl);
+        const pdf = await loadingTask.promise;
+        const data = await pdf.getData();
+        pdfData.value = data.toString();
+        numOfPages.value = pdf.numPages;
+      } catch (error: any) {
+        isError.value = true;
+        errorMessage.value =
+          `An error occurred while loading the PDF: ${error.message}` || "An error occurred while loading the PDF.";
+        console.error(error);
+      } finally {
+        loadingPdf.value = false; // Set loading to false when PDF is loaded or errored
+      }
+    });
+
+    const accept = async () => {
+      isAcceptDisabled.value = loadingAcceptBtn.value = true;
+      if (pdfData.value) {
+        const mnemonic = "";
+        const data = await sign(pdfData.value, mnemonic, KeypairType.ed25519);
+      } else {
+        isError.value = true;
+        errorMessage.value = "Cannot read the data from the provided PDF.";
+      }
+      // isAcceptDisabled.value = true;
+      loadingAcceptBtn.value = false;
+    };
+
+    const onScroll = (e: UIEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.scrollTop + target.clientHeight >= target.scrollHeight) {
+        if (!loadingAcceptBtn.value) {
+          isAcceptDisabled.value = false;
+        }
+      }
+    };
+
+    return {
+      isError,
+      errorMessage,
+      loadingPdf,
+      numOfPages,
+      pdfSrc,
+      isAcceptDisabled,
+      pdfData,
+      loadingAcceptBtn,
+      onScroll,
+      accept,
+    };
+  },
 };
 </script>

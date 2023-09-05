@@ -1,22 +1,22 @@
 <template>
-  <div class="form">
-    <PDFSignerViewComponent :pdf-url="props.pdfUrl" />
-  </div>
+  <PDFSignerViewComponent pdfurl />
 </template>
 
-<script lang="ts" setup>
-import { onMounted } from "vue";
+<script lang="ts">
+import { ref } from "vue";
 
 import PDFSignerViewComponent from "../components/PDFSignerViewComponent.vue";
-const props = defineProps<{ pdfUrl: string }>();
-
-onMounted(() => {
-  console.log("props.pdfUrl: ", props.pdfUrl);
-});
-</script>
-
-<script lang="ts">
 export default {
-  name: "PDFSignerView",
+  name: "TFPDFSignerView",
+  components: {
+    PDFSignerViewComponent,
+  },
+  setup() {
+    const pdfurl = ref();
+    return {
+      PDFSignerViewComponent,
+      pdfurl,
+    };
+  },
 };
 </script>

@@ -7,9 +7,6 @@ const router = createRouter({
       path: "/",
       name: "pdf",
       component: () => import("../views/PDFSignerView.ce.vue"),
-      props: {
-        pdfUrl: import.meta.env.VITE_APP_PDF_URL as string,
-      },
     },
     {
       path: "/editor",
