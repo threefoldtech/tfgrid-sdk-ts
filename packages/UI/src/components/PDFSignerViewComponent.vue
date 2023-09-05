@@ -77,6 +77,7 @@
 </template>
 
 <script lang="ts">
+import axios from "axios";
 import { ThreefoldWalletConnectorApi } from "tf-wallet-connector-api";
 import { onMounted, ref } from "vue";
 import { createLoadingTask, VuePdf } from "vue3-pdfjs";
@@ -86,7 +87,7 @@ import { KeypairType, sign } from "@/utils/sign";
 
 export default {
   name: "PDFSignerViewComponent",
-  props: ["pdfurl"],
+  props: ["pdfurl", "dest"],
   components: {
     VuePdf,
   },
@@ -137,8 +138,13 @@ export default {
     const accept = async () => {
       isAcceptDisabled.value = loadingAcceptBtn.value = true;
       if (pdfData.value) {
-        const mnemonic = "";
-        const data = await sign(pdfData.value, mnemonic, KeypairType.ed25519);
+        if (!hasAccess.value) {
+          hasAccess.value = await ThreefoldWalletConnectorApi.requestAccess();
+        }
+        const account = await ThreefoldWalletConnectorApi.selectDecryptedAccount();
+        const data = await sign(pdfData.value, account?.mnemonic ?? "", KeypairType.ed25519);
+        const response = axios.post(props.dest, data);
+        console.log(response);
       } else {
         isError.value = true;
         errorMessage.value = "Cannot read the data from the provided PDF.";

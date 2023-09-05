@@ -1,5 +1,5 @@
 <template>
-  <PDFSignerViewComponent pdfurl />
+  <PDFSignerViewComponent pdfurl dest />
 </template>
 
 <script lang="ts">
@@ -13,9 +13,11 @@ export default {
   },
   setup() {
     const pdfurl = ref();
+    const dest = ref();
     return {
       PDFSignerViewComponent,
       pdfurl,
+      dest,
     };
   },
 };
