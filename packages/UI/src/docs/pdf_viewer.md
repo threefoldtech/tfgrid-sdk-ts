@@ -3,8 +3,8 @@
 ## Table of Contents
 
 1. [Introduction](#introduction)
-2. [Installation](#installation)
-3. [Usage](#usage)
+<!-- 2. [Installation](#installation) -->
+2. [Usage](#usage)
    - [Importing the PDF Signer](#importing-the-pdf-signer)
    - [Initializing the PDF Signer](#initializing-the-pdf-signer)
 
@@ -16,17 +16,17 @@ The PDF Signer Web Component is a straightforward PDF viewer that loads the PDF 
 
 - Supports loading and viewing PDF files by providing the PDF URL.
 
-## 2. Installation
+<!-- ## 2. Installation -->
 
-You can install the PDF Signer Web Component using npm or include it via a script tag.
+<!-- You can install the PDF Signer Web Component using npm or include it via a script tag. -->
 
-### npm
+<!-- ### npm
 
 To install via npm, use the following command:
 
 ```bash
 npm install @threefold/UI
-```
+``` -->
 
 ## 3. Usage
 
@@ -67,8 +67,8 @@ Example:
 
 Script Tag:
 
-1. Clone the `@threefold/UI` repository.
-2. Navigate to the repository and run `yarn build-only`.
+1. Clone the `tfgrid-sdk-ts` repository.
+2. Navigate to the `repository/packages/UI` and run `yarn build-only`.
 3. A `dist` folder will be created. Copy the `threefold-ui.umd.js` file and include it in your scripts.
 4. Copy the `tailwind.css` to your side project.
 
