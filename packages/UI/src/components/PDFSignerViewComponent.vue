@@ -20,7 +20,10 @@
       <span class="text-black text-center">Loading PDF File...</span>
     </div>
     <div v-else-if="isError">
-      <div class="loading text-red-600">Error: {{ errorMessage }}</div>
+      <div class="flex flex-col justify-center items-center h-screen bold">
+        <p class="text-xl bold">Response Error</p>
+        <p class="text-red-600">{{ errorMessage }}</p>
+      </div>
     </div>
     <div v-else class="view-pdf">
       <div @scroll="onScroll" class="overflow-x-hidden w-95% mx-auto p-5" style="height: 85vh">
@@ -118,12 +121,18 @@ const accept = async () => {
 onMounted(async () => {
   loadingPdf.value = true;
   try {
+    if (!props.pdfUrl) {
+      isError.value = true;
+      errorMessage.value = "An error occurred while loading the PDF: The property `pdfUrl` should be provided.";
+      return;
+    }
     const loadingTask = createLoadingTask(props.pdfUrl);
     const pdf: PDFDocumentProxy = await loadingTask.promise;
     const data = await pdf.getData();
     pdfData.value = data.toString();
     numOfPages.value = pdf.numPages;
   } catch (error: any) {
+    isError.value = true;
     errorMessage.value =
       `An error occurred while loading the PDF: ${error.message}` || "An error occurred while loading the PDF.";
     console.error(error);

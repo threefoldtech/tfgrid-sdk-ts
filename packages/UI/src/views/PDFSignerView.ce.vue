@@ -1,24 +1,22 @@
 <template>
   <div class="form">
-    <PDFSignerViewComponent :pdf-url="pdfUrl" />
+    <PDFSignerViewComponent :pdf-url="props.pdfUrl" />
   </div>
 </template>
 
-<script lang="ts">
-import PDFSignerViewComponent from "../components/PDFSignerViewComponent.vue";
+<script lang="ts" setup>
+import { onMounted } from "vue";
 
-export default {
-  name: "PDFSignerView",
-  components: {
-    PDFSignerViewComponent,
-  },
-  setup() {
-    return {
-      pdfUrl: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf",
-      // pdfUrl: "https://www.family-action.org.uk/content/uploads/2019/07/meals-more-recipes.pdf", // with error
-    };
-  },
-};
+import PDFSignerViewComponent from "../components/PDFSignerViewComponent.vue";
+const props = defineProps<{ pdfUrl: string }>();
+
+onMounted(() => {
+  console.log("props.pdfUrl: ", props.pdfUrl);
+});
 </script>
 
-<style scoped></style>
+<script lang="ts">
+export default {
+  name: "PDFSignerView",
+};
+</script>
