@@ -77,6 +77,7 @@
 </template>
 
 <script lang="ts">
+import { ThreefoldWalletConnectorApi } from "tf-wallet-connector-api";
 import { onMounted, ref } from "vue";
 import { createLoadingTask, VuePdf } from "vue3-pdfjs";
 import { type VuePdfPropsType } from "vue3-pdfjs/components/vue-pdf/vue-pdf-props"; // Prop type definitions can also be imported
@@ -97,6 +98,9 @@ export default {
     const pdfData = ref<string>("");
     const isAcceptDisabled = ref(true);
     const loadingAcceptBtn = ref(false);
+    const isInstalled = ref();
+    const hasAccess = ref();
+
     console.log("From setUp: ", props.pdfurl);
 
     const pdfSrc = ref<VuePdfPropsType["src"]>(props.pdfurl);
@@ -111,6 +115,10 @@ export default {
           errorMessage.value = "An error occurred while loading the PDF: The property `pdfurl` should be provided.";
           return;
         }
+
+        isInstalled.value = await ThreefoldWalletConnectorApi.isInstalled();
+        hasAccess.value = await ThreefoldWalletConnectorApi.hasAccess();
+
         const loadingTask = createLoadingTask(props.pdfurl);
         const pdf = await loadingTask.promise;
         const data = await pdf.getData();
