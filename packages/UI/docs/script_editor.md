@@ -9,7 +9,7 @@
    - [Initializing the Script Editor](#initializing-the-script-editor)
    - [Accessing and Managing Scripts](#accessing-and-managing-scripts)
 
-## 1. Introduction
+## Introduction
 
 The Script Editor Web Component is a versatile tool that allows developers to integrate a code editor into their web applications. It offers features like code copying, and script management, making it ideal for building code-related applications or platforms.
 
@@ -18,7 +18,7 @@ The Script Editor Web Component is a versatile tool that allows developers to in
 - Support managing scripts.
 - Code copying
 
-## 2. Installation
+## Installation
 
 You can install the Script Editor Web Component using npm or include it via a script tag.
 
@@ -30,7 +30,7 @@ To install via npm, use the following command:
 npm install @threefold/UI
 ```
 
-## 3. Usage
+## Usage
 
 ### Importing the Script Editor
 
@@ -55,22 +55,22 @@ To create an instance of the Script Editor, use the following HTML tag:
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Working Demo</title>
-    <script src='./dist/threefold-ui.umd.js'></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Script Editor</title>
+    <link rel="stylesheet" href="./tailwind.css">
   </head>
   <body>
-    <div id="app"></div>
     <script-editor dest="<file-path>" />
+    <script src='./dist/threefold-ui.umd.js'></script>
   </body>
 </html>
 ```
 
 Script Tag
 
-1. Clone @threefold/UI repo
-2. cd to the repo and yarn build
-3. A dist folder will be created. Copy threefold-ui.umd.js file and include it in your scripts
+1. Clone the `tfgrid-sdk-ts` repository.
+2. Navigate to the `tfgrid-sdk-ts/packages/UI` and run `yarn build-only`.
+3. A `dist` folder will be created. Copy the `threefold-ui.umd.js` file and include it in your scripts.
+4. Copy the `tailwind.css` to your project and include it in your styles.
 
 ```html
 <script src="./threefold-ui.umd.js"></script>
