@@ -49,7 +49,7 @@
                 class="primary white--text"
                 :loading="loadingTwinIDTransfer"
                 :disabled="!isValidTwinIDTransfer"
-                @submit="submitFormTwinID"
+                @click="submitFormTwinID"
                 >Submit</v-btn
               >
             </v-card-actions>
@@ -60,18 +60,18 @@
         <v-window-item :value="1">
           <v-card class="pa-5 my-5" flat>
             <form-validator v-model="isValidAddressTransfer">
-              <input-validator
-                :value="receipientAddress"
-                :rules="[
-                  validators.required('Recepient Account Address is required'),
-                  validators.isNotEmpty('Invalid Account Address'),
-                ]"
-                #="{ props }"
-              >
-                <input-tooltip tooltip="Enter Address of Receipient Account">
-                  <v-text-field label="Recipient Address:" v-bind="props" v-model="receipientAddress"> </v-text-field>
-                </input-tooltip>
-              </input-validator>
+              <input-tooltip tooltip="Enter Address of Receipient Account">
+                <v-text-field
+                  label="Recipient Address:"
+                  :rules="[
+                    () => !!receipientAddress || 'address is required',
+                    () => isValidAddress() || 'invalid address',
+                    () => isSameAddress() || 'Cannot transfer to yourself',
+                  ]"
+                  v-model="receipientAddress"
+                >
+                </v-text-field>
+              </input-tooltip>
 
               <input-validator
                 :value="transferAmount"
@@ -96,7 +96,7 @@
                 class="primary white--text"
                 :loading="loadingAddressTransfer"
                 :disabled="!isValidAddressTransfer"
-                @submit="submitFormAddress"
+                @click="submitFormAddress"
                 >Submit</v-btn
               >
             </v-card-actions>
@@ -136,6 +136,12 @@ const client = new Client({
   url: window.env.SUBSTRATE_URL,
   mnemonicOrSecret: useProfileManager().profile!.mnemonic,
 });
+function isSameAddress() {
+  if (receipientAddress.value == profile?.address) {
+    return false;
+  }
+  return true;
+}
 function isValidAddress() {
   const keyring = new Keyring({ type: "sr25519" });
   try {
@@ -143,13 +149,14 @@ function isValidAddress() {
 
     return true;
   } catch (error) {
-    return "invalid";
+    return false;
   }
 }
 
 function clearInput() {
   transferAmount.value = 1;
   receipientTwinId.value = "";
+  receipientAddress.value = "";
 }
 async function getFreeBalance() {
   const grid = await getGrid(profile!);
