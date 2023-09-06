@@ -43,6 +43,8 @@ Now you're ready to write your tag:
 
 ### Example of Usage
 
+just create an `index.html` somewhere to test it and point the dist files in it.
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
