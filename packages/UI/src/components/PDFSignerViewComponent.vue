@@ -84,6 +84,7 @@ import { createLoadingTask, VuePdf } from "vue3-pdfjs";
 import { type VuePdfPropsType } from "vue3-pdfjs/components/vue-pdf/vue-pdf-props"; // Prop type definitions can also be imported
 
 import { KeypairType, sign } from "@/utils/sign";
+import type { PDFPostData } from "@/utils/types";
 
 export default {
   name: "PDFSignerViewComponent",
@@ -102,13 +103,10 @@ export default {
     const isInstalled = ref();
     const hasAccess = ref();
 
-    console.log("From setUp: ", props.pdfurl);
-
     const pdfSrc = ref<VuePdfPropsType["src"]>(props.pdfurl);
     console.log("pdfSrc: ", pdfSrc);
 
     onMounted(async () => {
-      console.log("props.pdfurl: ", props.pdfurl);
       loadingPdf.value = true;
       try {
         if (!props.pdfurl) {
@@ -143,7 +141,13 @@ export default {
         }
         const account = await ThreefoldWalletConnectorApi.selectDecryptedAccount();
         const data = await sign(pdfData.value, account?.mnemonic ?? "", KeypairType.ed25519);
-        const response = axios.post(props.dest, data);
+        const requestBody: PDFPostData = {
+          pdfUrl: props.pdfurl,
+          pubkey: account?.address || "",
+          signature: data,
+        };
+
+        const response = axios.post(props.dest, requestBody);
         console.log(response);
       } else {
         isError.value = true;
