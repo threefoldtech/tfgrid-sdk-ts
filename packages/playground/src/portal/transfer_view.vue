@@ -47,7 +47,7 @@
 
               <v-btn
                 class="primary white--text"
-                :loading="loadingTransfer"
+                :loading="loadingTwinIDTransfer"
                 :disabled="!isValidTwinIDTransfer"
                 @submit="submitFormTwinID"
                 >Submit</v-btn
@@ -94,7 +94,7 @@
 
               <v-btn
                 class="primary white--text"
-                :loading="loadingTransfer"
+                :loading="loadingAddressTransfer"
                 :disabled="!isValidAddressTransfer"
                 @submit="submitFormAddress"
                 >Submit</v-btn
@@ -125,7 +125,8 @@ const activeTab = ref(0);
 const receipientTwinId = ref("");
 const isValidTwinIDTransfer = ref(false);
 const transferAmount = ref(1);
-const loadingTransfer = ref(false);
+const loadingTwinIDTransfer = ref(false);
+const loadingAddressTransfer = ref(false);
 const isValidAddressTransfer = ref(false);
 const receipientAddress = ref("");
 const profile = useProfileManager().profile;
@@ -158,7 +159,6 @@ async function getFreeBalance() {
 async function transfer(receipientTwin: Twin) {
   const twinAddress = receipientTwin.accountId;
 
-  loadingTransfer.value = true;
   const decimalAmount = new Decimal(transferAmount.value);
   const milliAmount = decimalAmount.mul(10 ** 7).toNumber();
   try {
@@ -174,7 +174,6 @@ async function transfer(receipientTwin: Twin) {
       timeout: 5000,
     });
 
-    loadingTransfer.value = false;
     await getFreeBalance();
   } catch (err) {
     createInvalidTransferToast("transfer failed!");
@@ -182,11 +181,14 @@ async function transfer(receipientTwin: Twin) {
 }
 async function submitFormAddress() {
   const twinId = await queryClient.twins.getTwinIdByAccountId({ accountId: receipientAddress.value });
-  const twinDetails = await queryClient.twins.get({ id: parseInt(twinId.value) });
+  const twinDetails = await queryClient.twins.get({ id: twinId });
   if (twinDetails != null) {
+    loadingAddressTransfer.value = true;
     transfer(twinDetails);
+    loadingAddressTransfer.value = false;
   } else {
     createInvalidTransferToast("twin ID doesn't exist");
+    loadingAddressTransfer.value = true;
   }
 }
 
@@ -197,15 +199,16 @@ function createInvalidTransferToast(message: string) {
     toastBackgroundColor: "red",
     timeout: 5000,
   });
-
-  loadingTransfer.value = false;
 }
 async function submitFormTwinID() {
   const twinDetails = await queryClient.twins.get({ id: parseInt(receipientTwinId.value) });
   if (twinDetails != null) {
+    loadingTwinIDTransfer.value = true;
     transfer(twinDetails);
+    loadingTwinIDTransfer.value = false;
   } else {
     createInvalidTransferToast("twin ID doesn't exist");
+    loadingTwinIDTransfer.value = false;
   }
 }
 </script>
