@@ -195,7 +195,7 @@ async function submitFormAddress() {
     loadingAddressTransfer.value = false;
   } else {
     createInvalidTransferToast("twin ID doesn't exist");
-    loadingAddressTransfer.value = true;
+    loadingAddressTransfer.value = false;
   }
 }
 
