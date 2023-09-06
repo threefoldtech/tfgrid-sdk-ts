@@ -26,16 +26,26 @@
     </v-container>
   </div>
 
-  <v-container>
-    <DepositDialog v-if="openDepositDialog"></DepositDialog>
-  </v-container>
+  <!-- Deposit Dialog -->
+  <deposit-dialog
+    v-if="openDepositDialog"
+    :selectedName="selectedName"
+    :depositWallet="depositWallet"
+    :qrCodeText="qrCodeText"
+    :depositFee="depositFee"
+    :openDepositDialog="openDepositDialog"
+    :twinId="profileManager.profile?.twinId"
+    @close="openDepositDialog = false"
+  ></deposit-dialog>
+
+  <!-- Withdraw Dialog -->
   <v-container v-if="openWithdrawDialog">
     <v-dialog transition="dialog-bottom-transition" max-width="1000" v-model="openWithdrawDialog">
       <v-card>
-        <v-toolbar color="primary" dark class="pl-3"> Withdraw TFT </v-toolbar>
+        <v-toolbar color="primary" dark class="bold-text"> Withdraw TFT </v-toolbar>
         <v-card-title>
           Interact with the bridge in order to withdraw your TFT to
-          {{ selectedName.toUpperCase() }} (withdraw fee is: {{ withdrawFee }} TFT)
+          {{ selectedName.charAt(0).toUpperCase() + selectedName.slice(1) }} (withdraw fee is: {{ withdrawFee }} TFT)
         </v-card-title>
         <v-card-text>
           <v-form v-model="isValidSwap">
@@ -92,7 +102,7 @@ import { getGrid, loadBalance } from "../utils/grid";
 const profileManager = useProfileManager();
 const items = ref([{ id: 1, name: "stellar" }]);
 const selectedItem = ref(items.value[0]);
-const openDepositDialog = ref(true);
+const openDepositDialog = ref(false);
 const openWithdrawDialog = ref(false);
 const selectedName = ref("");
 const withdrawFee = ref(0);
@@ -104,14 +114,22 @@ const server = new StellarSdk.Server(window.env.STELLAR_HORIZON_URL);
 const amount = ref(0);
 const freeBalance = ref(0);
 const loadingWithdraw = ref(false);
+const depositWallet = ref("");
+const qrCodeText = ref("");
+const depositFee = ref(0);
 
 onMounted(async () => {
   selectedName.value = items.value.filter(item => item.id === selectedItem.value.id)[0].name;
+  depositWallet.value = window.env.BRIDGE_TFT_ADDRESS;
+  qrCodeText.value = `TFT:${depositWallet.value}?message=twin_${profileManager.profile?.twinId}&sender=me`;
   try {
     const client = new GridClient({ mnemonic: profileManager.profile!.mnemonic, network: window.env.NETWORK });
     client._connect();
-    const fee = await client.tfchain.tfClient.tftBridge.GetWithdrawFee();
-    withdrawFee.value = fee;
+    const WithdrawFee = await client.tfchain.tfClient.tftBridge.GetWithdrawFee();
+    withdrawFee.value = WithdrawFee;
+
+    const DepositFee = await client.tfchain.tfClient.tftBridge.GetDepositFee();
+    depositFee.value = DepositFee;
 
     const grid = await getGrid(profileManager.profile!);
     if (grid) {
@@ -182,7 +200,7 @@ async function withdrawTFT(target: string, amount: number) {
   try {
     const client = new GridClient({ mnemonic: profileManager.profile!.mnemonic, network: window.env.NETWORK });
     client._connect();
-    await client.tfchain.tfClient.tftBridge.withdraw(
+    await client.tfchain.tfClient.tftBridge.Withdraw(
       profileManager.profile?.mnemonic as string,
       profileManager.profile?.address as string,
       target,
@@ -244,5 +262,10 @@ export default {
 <style>
 .custom-container {
   width: 80%;
+}
+
+.bold-text {
+  font-weight: bold;
+  padding-left: 1rem;
 }
 </style>

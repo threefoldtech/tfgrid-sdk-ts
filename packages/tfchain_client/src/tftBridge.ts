@@ -47,7 +47,7 @@ class QueryTFTBridge {
   }
 
   @checkConnection
-  async withdraw(mnemonic: string, address: string, target: string, amount: number, callback: any) {
+  async Withdraw(mnemonic: string, address: string, target: string, amount: number, callback: any) {
     try {
       const keyring = new Keyring({ type: "sr25519" });
       const keypair = keyring.addFromUri(mnemonic);
@@ -57,6 +57,18 @@ class QueryTFTBridge {
       return await this.client.api.tx.tftBridgeModule
         .swapToStellar(target, milliAmount)
         .signAndSend(keypair, { nonce }, callback);
+    } catch (e) {
+      return e;
+    }
+  }
+
+  @checkConnection
+  async GetDepositFee() {
+    try {
+      const fee = await this.client.api.query.tftBridgeModule.depositFee();
+      const decimalFee = new Decimal(fee.toString());
+      const convertedFee = decimalFee.div(10 ** 7).toNumber();
+      return convertedFee;
     } catch (e) {
       return e;
     }
