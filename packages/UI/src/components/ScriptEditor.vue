@@ -1,14 +1,11 @@
 <template>
   <div>
-    <div
-      v-if="!(isInstalled && hasAccess)"
-      class="container bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4 mx-auto"
-      role="alert"
-    >
-      <p class="font-bold">Be Warned</p>
-      <p>
-        Please make sure to install the TF Wallet extention and give access to the website before submitting the script.
-      </p>
+    <div v-if="!(isInstalled && hasAccess)">
+      <CustomAlertComponent
+        message="Please make sure to install the TF Wallet extention and give access to the website before submitting the script."
+        title="Be Warned"
+        :_type="alertType.warning"
+      />
     </div>
     <form class="container mx-auto" @submit.prevent="submitScript">
       <div class="font-sans hover:font-sans flex my-4 text-lg relative">
@@ -51,12 +48,19 @@ import axios from "axios";
 import { ThreefoldWalletConnectorApi } from "tf-wallet-connector-api";
 import { onMounted, ref } from "vue";
 
+import { AlertType } from "@/utils/types";
+
 import { KeypairType, sign } from "../utils/sign";
+import CustomAlertComponent from "./CustomAlertComponent.vue";
 
 export default {
   name: "ScriptEditor",
   props: ["dest"],
+  components: {
+    CustomAlertComponent,
+  },
   setup(props) {
+    const alertType = AlertType;
     const text = ref(""); // Store the textarea content
     const lines = ref(["1"]); // Store lines for line numbers
     const isInstalled = ref();
@@ -92,6 +96,7 @@ export default {
       isInstalled,
       hasAccess,
       text,
+      alertType,
       lines,
       copyToClipboard,
       updateLines,

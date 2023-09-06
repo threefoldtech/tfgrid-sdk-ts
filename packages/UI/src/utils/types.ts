@@ -5,3 +5,8 @@ export type PDFPostData = {
   pubkey: string;
   signature: SignReturn;
 };
+
+export enum AlertType {
+  error = "error",
+  warning = "warning",
+}
