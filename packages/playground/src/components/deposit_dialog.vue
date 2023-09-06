@@ -6,14 +6,7 @@
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col>
-                Send a transaction with your TFT's to deposit to:
-                <ul>
-                  <li>Destination</li>
-                  <li>Memo Text</li>
-                </ul>
-              </v-col>
-              <v-divider class="mx-4" vertical></v-divider>
+              <v-col> Send a name </v-col>
             </v-row>
           </v-container>
         </v-card-text>
@@ -22,11 +15,8 @@
   </v-container>
 </template>
 
-<script lang="ts" setup></script>
 <script lang="ts">
 export default {
   name: "DepositDialog",
 };
 </script>
-
-<style></style>

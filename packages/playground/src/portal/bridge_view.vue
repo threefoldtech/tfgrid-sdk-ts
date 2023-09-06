@@ -1,9 +1,36 @@
 <template>
+  <div class="mt-8">
+    <v-container class="custom-container">
+      <v-card color="primary" class="my-3 pa-3 text-center">
+        <v-icon width="26">mdi-swap-horizontal</v-icon>
+        <h2>Transfer TFT Across Chains</h2>
+      </v-card>
+      <v-card class="pa-5 my-5 white--text">
+        <v-row class="pa-5 text-center">
+          <v-col cols="12">
+            <v-select
+              :items="items"
+              label="Please select a chain:"
+              item-title="name"
+              item-value="id"
+              v-model="selectedItem"
+            ></v-select>
+          </v-col>
+        </v-row>
+        <v-row class="pa-4 px-8">
+          <v-btn color="primary" class="mr-2 bold-text" @click="openDepositDialog = true">Deposit</v-btn>
+          <v-btn color="black" class="mr-2 bold-text" @click="openWithdrawDialog = true">Withdraw</v-btn>
+          <v-btn color="blue" class="ml-auto bold-text" @click="navigation">Learn How?</v-btn>
+        </v-row>
+      </v-card>
+    </v-container>
+  </div>
+
   <v-container>
     <DepositDialog v-if="openDepositDialog"></DepositDialog>
   </v-container>
   <v-container v-if="openWithdrawDialog">
-    <v-dialog transition="dialog-bottom-transition" max-width="900" v-model="openWithdrawDialog">
+    <v-dialog transition="dialog-bottom-transition" max-width="1000" v-model="openWithdrawDialog">
       <v-card>
         <v-toolbar color="primary" dark class="pl-3"> Withdraw TFT </v-toolbar>
         <v-card-title>
@@ -52,33 +79,6 @@
       </v-card>
     </v-dialog>
   </v-container>
-
-  <div class="mt-8">
-    <v-container class="custom-container">
-      <v-card color="primary" class="my-3 pa-3 text-center">
-        <v-icon width="26">mdi-swap-horizontal</v-icon>
-        <h2>Transfer TFT Across Chains</h2>
-      </v-card>
-      <v-card class="pa-5 my-5 white--text">
-        <v-row class="pa-5 text-center">
-          <v-col cols="12">
-            <v-select
-              :items="items"
-              label="Please select a chain:"
-              item-title="name"
-              item-value="id"
-              v-model="selectedItem"
-            ></v-select>
-          </v-col>
-        </v-row>
-        <v-row class="pa-4 px-8">
-          <v-btn color="primary" class="mr-2 bold-text" @click="openDepositDialog = true">Deposit</v-btn>
-          <v-btn color="black" class="mr-2 bold-text" @click="openWithdrawDialog = true">Withdraw</v-btn>
-          <v-btn color="blue" class="ml-auto bold-text" @click="navigation">Learn How?</v-btn>
-        </v-row>
-      </v-card>
-    </v-container>
-  </div>
 </template>
 
 <script lang="ts" setup>
@@ -92,7 +92,7 @@ import { getGrid, loadBalance } from "../utils/grid";
 const profileManager = useProfileManager();
 const items = ref([{ id: 1, name: "stellar" }]);
 const selectedItem = ref(items.value[0]);
-const openDepositDialog = ref(false);
+const openDepositDialog = ref(true);
 const openWithdrawDialog = ref(false);
 const selectedName = ref("");
 const withdrawFee = ref(0);
@@ -182,7 +182,7 @@ async function withdrawTFT(target: string, amount: number) {
   try {
     const client = new GridClient({ mnemonic: profileManager.profile!.mnemonic, network: window.env.NETWORK });
     client._connect();
-    const result = await client.tfchain.tfClient.tftBridge.withdraw(
+    await client.tfchain.tfClient.tftBridge.withdraw(
       profileManager.profile?.mnemonic as string,
       profileManager.profile?.address as string,
       target,
