@@ -76,6 +76,7 @@ export async function loadProfile(grid: GridClient): Promise<Profile> {
     twinId: grid!.twinId,
     address: grid.tfclient.address,
     relay: grid.getDefaultUrls(network).relay.slice(6),
+    pk: (await grid.twins.get({ id: grid!.twinId })).pk,
   };
 }
 

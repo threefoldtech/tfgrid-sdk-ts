@@ -2,14 +2,19 @@
   <view-layout>
     <v-row>
       <v-col cols="4" v-for="card in cards" :key="card.title">
-        <router-link :to="card.route">
+        <router-link :to="'/solutions' + card.route">
           <v-card class="pa-3 pt-6" height="250">
-            <v-img class="ml-3" width="75" :src="baseURL + 'images/icons/' + card.icon" :alt="card.title" />
+            <v-img
+              class="ml-3"
+              width="75"
+              :src="baseURL + 'images/icons/' + card.icon"
+              :alt="card.title"
+              :style="{ filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})` }"
+            />
             <v-card-title> {{ card.title }} </v-card-title>
             <v-card-text> {{ card.excerpt }} </v-card-text>
           </v-card>
         </router-link>
-        <router-view></router-view>
       </v-col>
     </v-row>
   </view-layout>
@@ -96,13 +101,13 @@ export default {
         icon: "owncloud.png",
         route: "/owncloud",
       },
-      {
-        title: "Nextcloud",
-        excerpt:
-          "Nextcloud is a suite of client-server software for creating and using file hosting services. Nextcloud provides functionality similar to Dropbox, Office 365 or Google Drive.",
-        icon: "nextcloud.png",
-        route: "/nextcloud",
-      },
+      // {
+      //   title: "Nextcloud",
+      //   excerpt:
+      //     "Nextcloud is a suite of client-server software for creating and using file hosting services. Nextcloud provides functionality similar to Dropbox, Office 365 or Google Drive.",
+      //   icon: "nextcloud.png",
+      //   route: "/nextcloud",
+      // },
       {
         title: "Presearch",
         excerpt:
@@ -145,13 +150,13 @@ export default {
         icon: "umbrel.png",
         route: "/umbrel",
       },
-      {
-        title: "Freeflow",
-        excerpt: `Freeflow is a convenient ecosystem on top of a resilient internet grid. We bring you a new internet with a set of
-productivity tools so you can enhance collaboration within your country, your company, your community.`,
-        icon: "freeflow.png",
-        route: "/freeflow",
-      },
+      //       {
+      //         title: "Freeflow",
+      //         excerpt: `Freeflow is a convenient ecosystem on top of a resilient internet grid. We bring you a new internet with a set of
+      // productivity tools so you can enhance collaboration within your country, your company, your community.`,
+      //         icon: "freeflow.png",
+      //         route: "/freeflow",
+      //       },
       {
         title: "Wordpress",
         excerpt:

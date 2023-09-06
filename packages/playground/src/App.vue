@@ -25,7 +25,7 @@
                   :key="item.route"
                   :value="item.route"
                   @click="clickHandler(item)"
-                  active-color="primary"
+                  color="primary"
                   :active="$route.path === item.route"
                 >
                   <template v-slot:prepend v-if="item.icon">
@@ -48,7 +48,7 @@
                 :key="item.route"
                 :value="item.route"
                 @click="clickHandler(item)"
-                active-color="primary"
+                color="primary"
                 :active="$route.path === item.route"
               >
                 <template v-slot:prepend v-if="item.icon">
@@ -155,41 +155,41 @@ const version = process.env.VERSION as any;
 
 const routes: AppRoute[] = [
   {
-    title: "Playground",
-    items: [{ title: "Deployments", icon: "vm.png", route: "/" }],
-  },
-  {
-    title: "My Account",
-    items: [{ title: "Contracts", icon: "mdi-file-document-edit", route: "/contractslist" }],
-  },
-  {
     title: "Portal",
     icon: "mdi-account-convert-outline",
     items: [
-      { title: "Twin", icon: "mdi-account-supervisor-outline", route: "/twin" },
-      { title: "Bridge", icon: "mdi-swap-horizontal", route: "/bridge" },
-      { title: "Transfer", icon: "mdi-account-arrow-right-outline", route: "/transfer" },
-      { title: "Farms", icon: "mdi-silo", route: "/my-farms" },
-      { title: "Dedicated Nodes", icon: "mdi-resistor-nodes", route: "/dedicated-nodes" },
-      { title: "DAO", icon: "mdi-note-check-outline", route: "/dao" },
+      { title: "Twin", icon: "mdi-account-supervisor-outline", route: "/portal/twin" },
+      { title: "Bridge", icon: "mdi-swap-horizontal", route: "/portal/bridge" },
+      { title: "Transfer", icon: "mdi-account-arrow-right-outline", route: "/portal/transfer" },
+      { title: "Farms", icon: "mdi-silo", route: "/portal/farms" },
+      { title: "Dedicated Nodes", icon: "mdi-resistor-nodes", route: "/portal/dedicated-nodes" },
+      { title: "DAO", icon: "mdi-note-check-outline", route: "/portal/dao" },
     ],
   },
   {
     title: "Explorer",
     icon: "mdi-database-search-outline",
     items: [
-      { title: "Statistics", icon: "mdi-chart-scatter-plot", route: "/stats" },
-      { title: "Nodes", icon: "mdi-access-point", route: "/nodes" },
-      { title: "Farms", icon: "mdi-lan-connect", route: "/farms" },
+      { title: "Statistics", icon: "mdi-chart-scatter-plot", route: "/explorer/stats" },
+      { title: "Nodes", icon: "mdi-access-point", route: "/explorer/nodes" },
+      { title: "Farms", icon: "mdi-lan-connect", route: "/explorer/farms" },
     ],
   },
   {
     title: "Calculators",
     icon: "mdi-calculator",
     items: [
-      { title: "Resource Pricing", icon: "mdi-currency-usd", route: "pricing" },
-      { title: "Simulator", icon: "mdi-chart-line", route: "/simulator" },
+      { title: "Resource Pricing", icon: "mdi-currency-usd", route: "/explorer/pricing" },
+      { title: "Simulator", icon: "mdi-chart-line", route: "/explorer/simulator" },
     ],
+  },
+  {
+    title: "Playground",
+    items: [{ title: "Deployments", icon: "vm.png", route: "/solutions" }],
+  },
+  {
+    title: "My Account",
+    items: [{ title: "Contracts", icon: "mdi-file-document-edit", route: "/contractslist" }],
   },
   {
     title: "Other Services",
@@ -233,6 +233,14 @@ function clickHandler({ route, url }: AppRouteItem): void {
     window.open(url, "_blank");
   }
 }
+
+$router.beforeEach((to, from, next) => {
+  if (to.path === "/" && hasActiveProfile) {
+    next({ path: "portal/twin" });
+  } else {
+    next();
+  }
+});
 </script>
 
 <script lang="ts">
@@ -254,12 +262,6 @@ interface AppRouteItem {
   title: string;
   route?: string;
   url?: string;
-  icon?: string;
-}
-
-interface NavbarLink {
-  label?: string;
-  url: string;
   icon?: string;
 }
 
