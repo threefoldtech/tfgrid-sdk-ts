@@ -25,6 +25,11 @@ const router = createRouter({
           component: () => import("../portal/twin_view.vue"),
           meta: { title: "Twin" },
         },
+        {
+          path: "dao",
+          component: () => import("../portal/dao_view.vue"),
+          meta: { title: "Dao" },
+        },
       ],
     },
     {
