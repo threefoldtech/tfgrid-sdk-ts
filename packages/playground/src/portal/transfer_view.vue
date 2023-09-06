@@ -191,7 +191,7 @@ async function submitFormAddress() {
   const twinDetails = await queryClient.twins.get({ id: twinId });
   if (twinDetails != null) {
     loadingAddressTransfer.value = true;
-    transfer(twinDetails);
+    await transfer(twinDetails);
     loadingAddressTransfer.value = false;
   } else {
     createInvalidTransferToast("twin ID doesn't exist");
@@ -211,7 +211,7 @@ async function submitFormTwinID() {
   const twinDetails = await queryClient.twins.get({ id: parseInt(receipientTwinId.value) });
   if (twinDetails != null) {
     loadingTwinIDTransfer.value = true;
-    transfer(twinDetails);
+    await transfer(twinDetails);
     loadingTwinIDTransfer.value = false;
   } else {
     createInvalidTransferToast("twin ID doesn't exist");
