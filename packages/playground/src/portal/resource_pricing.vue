@@ -1,12 +1,12 @@
 <template>
   <div class="mt-8">
     <v-container class="custom-container">
-      <v-card color="calcprimary" class="mt-3 pa-3 text-center">
-        <v-icon size="40" color="white">mdi-calculator</v-icon>
-        <h2 color="white">Resource Pricing Calculator</h2>
+      <v-card color="calcprimary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+        <v-icon size="30" class="pr-3" color="white">mdi-calculator</v-icon>
+        <v-card-title class="pa-0" lor="white">Resource Pricing Calculator</v-card-title>
       </v-card>
-      <v-card>
-        <v-row class="mt-3 pa-3">
+      <v-card class="pa-3">
+        <v-row class="mt-3 px-3">
           <v-col cols="6">
             <input-validator
               :value="CRU"
@@ -54,7 +54,7 @@
           </v-col>
         </v-row>
 
-        <v-row class="mt-3 pa-3">
+        <v-row class="px-3">
           <v-col cols="6">
             <input-validator
               :value="SRU"
@@ -101,8 +101,8 @@
           </v-col>
         </v-row>
 
-        <v-row class="mt-3 pa-3">
-          <v-col cols="6">
+        <v-row class="px-3">
+          <v-col cols="12">
             <input-validator
               :rules="[
                 validators.required('Balance is required.'),
@@ -126,7 +126,7 @@
             </input-validator>
           </v-col>
         </v-row>
-        <v-row class="my-0 py-0 px-6">
+        <v-row class="my-0 my-3 px-6">
           <input-tooltip
             inline
             class="px-2"
@@ -147,10 +147,10 @@
         </v-row>
         <v-divider />
 
-        <v-row class="mb-3 pa-3" style="text-color: black">
+        <v-row class="pa-3" style="text-color: black">
           <v-col cols="6" v-for="price in prices" :key="price.price">
             <v-card
-              class="mt-3 pa-3 text-center price-box"
+              class="pa-3 text-center price-box"
               height="100%"
               :style="{ color: price.color, background: price.backgroundColor }"
             >
@@ -250,19 +250,19 @@ async function calDiscount(price: number) {
     bronze: {
       duration: 3,
       discount: 30,
-      backgroundColor: "#F7B370",
+      backgroundColor: "linear-gradient(270deg, #AF6114 0%, #ffc58b 25%, #DC8E41 49.83%, #f9d1a9 77.32%, #AF6114 100%)",
       color: "black",
     },
     silver: {
       duration: 6,
       discount: 40,
-      backgroundColor: "#eeeeee",
+      backgroundColor: "linear-gradient(270deg, #7d7d7d 0%, #f9f9f9 25%, #adadad 49.83%, #ffffff 77.32%, #a0a0a0 100%)",
       color: "black",
     },
     gold: {
       duration: 18,
       discount: 60,
-      backgroundColor: "linear-gradient(270deg, #bf953f 0%, #fcf6ba 25%, #d7ae56 49.83%, #fbf5b7 77.32%, #aa771c 100%)",
+      backgroundColor: "linear-gradient(270deg, #bf953f 0%, #fffce0 25%, #d7ae56 49.83%, #fffce0 77.32%, #aa771c 100%)",
       color: "black",
     },
   };
@@ -327,5 +327,8 @@ onMounted(async () => {
 <style>
 .custom-container {
   width: 80%;
+}
+.v-label {
+  font-size: 0.875rem;
 }
 </style>
