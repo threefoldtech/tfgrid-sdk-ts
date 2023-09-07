@@ -193,7 +193,7 @@ const routes: AppRoute[] = [
   },
   {
     title: "Minting",
-    items: [{ title: "Minting", icon: "mdi-file-document-edit", route: "/minting" }],
+    items: [{ title: "Minting", icon: "coin.png", route: "/minting" }],
   },
   {
     title: "Other Services",
