@@ -6,7 +6,7 @@
 2. [Installation](#installation)
 3. [Usage](#usage)
    <!-- - [Importing the Script Editor](#importing-the-script-editor) -->
-   - [Initializing the Script Editor](#initializing-the-script-editor)
+   - [Build the Script Editor](#build-the-script-editor)
    - [Example of Usage](#example-of-usage)
    - [Accessing and Managing Scripts](#accessing-and-managing-scripts)
 
@@ -41,7 +41,7 @@ npm install @threefold/UI
 import script-editor from "@threefold/UI";
 ``` -->
 
-### Initializing the Script Editor
+### Build the Script Editor
 
 To create an instance of the Script Editor, you need to build the package first and then copy the created `dist` folder inside your project:
 
