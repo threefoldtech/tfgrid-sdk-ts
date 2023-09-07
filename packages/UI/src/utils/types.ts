@@ -1,9 +1,8 @@
-import type { SignReturn } from "./sign";
-
 export type PDFPostData = {
+  twinid?: number;
   pdfUrl: string;
   pubkey: string;
-  signature: SignReturn;
+  signature: string;
 };
 
 export enum AlertType {
