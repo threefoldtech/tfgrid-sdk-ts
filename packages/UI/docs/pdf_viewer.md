@@ -5,10 +5,10 @@
 1. [Introduction](#introduction)
 2. [Usage](#usage)
    <!-- - [Importing the PDF Signer](#importing-the-pdf-signer) -->
-   - [Initializing the PDF Signer](#initializing-the-pdf-signer)
+   - [Build the PDF Signer](#build-the-pdf-signer)
    - [Example of Usage](#example-of-usage)
 
-## 1. Introduction
+## Introduction
 
 The PDF Signer Web Component is a straightforward PDF viewer that loads the PDF file into a single-page browser interface, allowing users to sign the data within the PDF and send it to an endpoint specified by the user.
 
@@ -16,7 +16,7 @@ The PDF Signer Web Component is a straightforward PDF viewer that loads the PDF 
 
 - Supports loading and viewing PDF files by providing the PDF URL.
 
-## 2. Usage
+## Usage
 
 <!-- ### Importing the PDF Signer
 
@@ -26,7 +26,7 @@ Import the PDF Signer Web Component into your JavaScript file.
 import pdfSigner from "@threefold/UI";
 ``` -->
 
-### Initializing the PDF Signer
+### Build the PDF Signer
 
 To create an instance of the pdf signer component, you need to build the package first and then copy the created `dist` folder inside your project:
 
