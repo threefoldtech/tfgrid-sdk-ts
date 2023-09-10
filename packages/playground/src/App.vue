@@ -144,7 +144,6 @@ const profileManager = useProfileManager();
 
 const openProfile = ref(true);
 const hasActiveProfile = computed(() => !!profileManager.profile);
-
 watch(
   () => $route.meta,
   meta => (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
@@ -153,16 +152,28 @@ watch(
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
 
-const routes: AppRoute[] = [
+let routes: AppRoute[] = [
   {
     title: "Portal",
     icon: "mdi-account-convert-outline",
     items: [
-      { title: "Twin", icon: "mdi-account-supervisor-outline", route: "/portal/twin" },
+      {
+        title: "Twin",
+        icon: "mdi-account-supervisor-outline",
+        route: "/portal/twin",
+      },
       { title: "Bridge", icon: "mdi-swap-horizontal", route: "/portal/bridge" },
-      { title: "Transfer", icon: "mdi-account-arrow-right-outline", route: "/portal/transfer" },
+      {
+        title: "Transfer",
+        icon: "mdi-account-arrow-right-outline",
+        route: "/portal/transfer",
+      },
       { title: "Farms", icon: "mdi-silo", route: "/portal/farms" },
-      { title: "Dedicated Nodes", icon: "mdi-resistor-nodes", route: "/portal/dedicated-nodes" },
+      {
+        title: "Dedicated Nodes",
+        icon: "mdi-resistor-nodes",
+        route: "/portal/dedicated-nodes",
+      },
       { title: "DAO", icon: "mdi-note-check-outline", route: "/portal/dao" },
     ],
   },
@@ -170,7 +181,11 @@ const routes: AppRoute[] = [
     title: "Explorer",
     icon: "mdi-database-search-outline",
     items: [
-      { title: "Statistics", icon: "mdi-chart-scatter-plot", route: "/explorer/stats" },
+      {
+        title: "Statistics",
+        icon: "mdi-chart-scatter-plot",
+        route: "/explorer/stats",
+      },
       { title: "Nodes", icon: "mdi-access-point", route: "/explorer/nodes" },
       { title: "Farms", icon: "mdi-lan-connect", route: "/explorer/farms" },
     ],
@@ -179,8 +194,16 @@ const routes: AppRoute[] = [
     title: "Calculators",
     icon: "mdi-calculator",
     items: [
-      { title: "Resource Pricing", icon: "mdi-currency-usd", route: "/explorer/pricing" },
-      { title: "Simulator", icon: "mdi-chart-line", route: "/explorer/simulator" },
+      {
+        title: "Resource Pricing",
+        icon: "mdi-currency-usd",
+        route: "/explorer/pricing",
+      },
+      {
+        title: "Simulator",
+        icon: "mdi-chart-line",
+        route: "/explorer/simulator",
+      },
     ],
   },
   {
@@ -189,11 +212,17 @@ const routes: AppRoute[] = [
   },
   {
     title: "My Account",
-    items: [{ title: "Contracts", icon: "mdi-file-document-edit", route: "/contractslist" }],
+    items: [
+      {
+        title: "Contracts",
+        icon: "mdi-file-document-edit",
+        route: "/contractslist",
+      },
+    ],
   },
   {
     title: "Minting",
-    items: [{ title: "Minting", icon: "coin.png", route: "/minting" }],
+    items: [{ title: "Minting", icon: "mdi-file-document-edit", route: "/minting" }],
   },
   {
     title: "Other Services",
@@ -218,7 +247,13 @@ const routes: AppRoute[] = [
   },
   {
     title: "Help",
-    items: [{ title: "Manual", icon: "mdi-book-open-page-variant-outline", url: "https://manual.grid.tf/" }],
+    items: [
+      {
+        title: "Manual",
+        icon: "mdi-book-open-page-variant-outline",
+        url: "https://manual.grid.tf/",
+      },
+    ],
   },
 ];
 
@@ -239,6 +274,13 @@ function clickHandler({ route, url }: AppRouteItem): void {
 }
 
 $router.beforeEach((to, from, next) => {
+  if (network !== "main") {
+    routes = routes.filter(route => route.title !== "Minting");
+    if (to.path === "/minting") {
+      return;
+    }
+    next();
+  }
   if (to.path === "/" && hasActiveProfile) {
     next({ path: "portal/twin" });
   } else {

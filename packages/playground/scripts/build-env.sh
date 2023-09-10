@@ -29,7 +29,6 @@ case $MODE in
     RELAY_DOMAIN='relay.dev.grid.tf'
     BRIDGE_TFT_ADDRESS=GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG
     STELLAR_NETWORK=test
-    MINTING_URL="https://alpha.minting.tfchain.grid.tf"
   ;;
 
   "qa")
