@@ -7,7 +7,7 @@
             <StatisticsCard :item="item" />
           </div>
         </section>
-        <v-col cols="10" class="mx-auto"> <tf-map :nodes="nodesDistribution"></tf-map></v-col>
+        <v-col cols="10" class="mx-auto"> <tf-map color="primary" :nodes="nodesDistribution"></tf-map></v-col>
       </v-row>
       <section class="loader" v-if="Istats.length === 0">
         <v-progress-circular size="150" indeterminate />
