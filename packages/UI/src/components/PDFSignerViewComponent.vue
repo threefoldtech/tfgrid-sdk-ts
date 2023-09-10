@@ -36,7 +36,7 @@
 
         <!-- Accept Button -->
         <button
-          @click="accept"
+          @click="acceptPDF"
           type="button"
           :class="`${
             isAcceptDisabled ? 'opacity-50 cursor-not-allowed' : ''
@@ -55,13 +55,15 @@
 
 <script lang="ts">
 import axios from "axios";
-import { type Account, ThreefoldWalletConnectorApi } from "tf-wallet-connector-api";
 import { onMounted, ref } from "vue";
 import { createLoadingTask, VuePdf } from "vue3-pdfjs";
 import { type VuePdfPropsType } from "vue3-pdfjs/components/vue-pdf/vue-pdf-props";
 
-import { KeypairType, sign } from "../utils/sign";
-import { AlertType, type PDFPostData } from "../utils/types";
+import { KeypairType, sign, type SignReturn } from "@/utils/sign";
+import ThreefoldPDFSigner from "@/utils/ThreefoldPDFSignerScript";
+import { AlertType, type ErrorType, type IThreefoldProvider, type PDFPostData } from "@/utils/types";
+
+import ThreefoldConnector from "../utils/threefoldConnectorScript";
 import CustomAlertComponent from "./CustomAlertComponent.vue";
 import LoadingSpinnerComponent from "./LoadingSpinnerComponent.vue";
 
@@ -84,108 +86,40 @@ export default {
     const responseData = ref<string>("");
     const isAcceptDisabled = ref<boolean>(true);
     const loadingAcceptBtn = ref<boolean>(false);
-    const hasAccess = ref<boolean>(true);
-    const isInstalled = ref<boolean>(true);
+
+    let provider: IThreefoldProvider = new ThreefoldPDFSigner();
 
     const pdfSrc = ref<VuePdfPropsType["src"]>(props.pdfurl);
 
     onMounted(async () => {
       loadingPdf.value = true;
+      const IS_ENV_MNEMONIC = import.meta.env.VITE_MNEMONIC;
 
-      try {
-        if (!props.pdfurl) {
-          showError("The 'pdfurl' property is missing and is required.");
-          return;
-        } else if (!props.dest) {
-          showError("The 'dest' property is missing and is required.");
-          return;
-        }
-
-        await checkExtensionInstalled();
-        await checkExtensionAccess();
-
-        if (!hasAccess.value || !isInstalled.value) {
-          showError("Please make sure you have installed/linked the Threefold Connector extension.");
-          return;
-        }
-
-        const loadingTask = createLoadingTask(props.pdfurl);
-        const pdf = await loadingTask.promise;
-        const data = await pdf.getData();
-        pdfData.value = data.toString();
-        numOfPages.value = pdf.numPages;
-      } catch (error: any) {
-        showError(
-          `An error occurred while loading the PDF: ${error.message}` || "An error occurred while loading the PDF.",
-        );
-      } finally {
-        loadingPdf.value = false;
+      if (!IS_ENV_MNEMONIC.length) {
+        provider = new ThreefoldConnector();
       }
+
+      const useProvider = await provider.use(props);
+      if (useProvider.isError) {
+        loadingPdf.value = false;
+        return showError(useProvider);
+      }
+
+      const loadingTask = createLoadingTask(props.pdfurl);
+      const pdf = await loadingTask.promise;
+      const data = await pdf.getData();
+
+      pdfData.value = data.toString();
+      numOfPages.value = pdf.numPages;
+      loadingPdf.value = false;
     });
 
-    const checkExtensionAccess = async () => {
-      try {
-        await ThreefoldWalletConnectorApi.hasAccess();
-      } catch (error) {
-        console.error(error);
-        hasAccess.value = false;
-      }
-    };
-
-    const checkExtensionInstalled = async () => {
-      try {
-        await ThreefoldWalletConnectorApi.isInstalled();
-      } catch (error) {
-        console.error(error);
-        isInstalled.value = false;
-      }
-    };
-
-    const request = async (account: Account | null, data: string) => {
-      if (account) {
-        const requestBody: PDFPostData = {
-          twinid: account?.twinId,
-          pdfUrl: props.pdfurl,
-          pubkey: account.ssh,
-          signature: data.signature,
-        };
-
-        try {
-          const response = await axios.post(props.dest, ...requestBody);
-          responseData.value = String(response.status);
-          console.log(response);
-        } catch (error: any) {
-          console.log(error);
-          showError(error.message);
-        }
-      } else {
-        showError(
-          "Failed to load account. Make sure you have installed the ThreeFold Connector extension and activated an account.",
-        );
-      }
-    };
-
-    const accept = async () => {
+    const acceptPDF = async () => {
       isAcceptDisabled.value = loadingAcceptBtn.value = true;
-
-      if (pdfData.value) {
-        if (!hasAccess.value) {
-          hasAccess.value = await ThreefoldWalletConnectorApi.requestAccess();
-        }
-
-        const account = await ThreefoldWalletConnectorApi.selectDecryptedAccount();
-        const data = await sign(pdfData.value, account?.mnemonic ?? "", KeypairType.ed25519);
-
-        if (!data.signature) {
-          showError("Unexpected signing signature.");
-          return;
-        }
-
-        await request(account, data);
-      } else {
-        showError("Cannot read the data from the provided PDF.");
+      const accepted = await provider.acceptAndSign(pdfData.value, KeypairType.ed25519);
+      if (accepted.isError) {
+        return showError(accepted);
       }
-
       loadingAcceptBtn.value = false;
     };
 
@@ -198,9 +132,10 @@ export default {
       }
     };
 
-    const showError = (message: string) => {
-      isError.value = true;
-      errorMessage.value = message;
+    const showError = (error: ErrorType): ErrorType => {
+      isError.value = error.isError;
+      errorMessage.value = error.errorMessage;
+      return error;
     };
 
     return {
@@ -215,7 +150,7 @@ export default {
       loadingAcceptBtn,
       responseData,
       onScroll,
-      accept,
+      acceptPDF,
     };
   },
 };
