@@ -108,7 +108,6 @@
                 validators.required('Balance is required.'),
                 validators.required('Balance is required.'),
                 validators.min('Balance should be a positive integer.', 1),
-                validators.isInt('Balance must be a valid integer.'),
               ]"
               :value="balance"
               #="{ props }"
@@ -187,8 +186,10 @@ import { watch } from "vue";
 import { onMounted } from "vue";
 import { ref } from "vue";
 
-import { calcPrice, calCU, calSU, getTFTPrice } from "../utils/calculator";
-import { connect } from "../utils/connect";
+import { useProfileManager } from "@/stores/profile_manager";
+import { getGrid } from "@/utils/grid";
+
+import { color } from "../utils/background_color";
 
 const CRU = ref<number>(1);
 const MRU = ref<number>(1);
@@ -202,7 +203,6 @@ const ipv4 = ref<boolean>(false);
 const currentbalance = ref<boolean>(false);
 
 const valid = ref();
-const api = ref<any>(null);
 interface PriceType {
   label?: string;
   color: string;
@@ -212,115 +212,78 @@ interface PriceType {
   TFTs: any;
   info: string;
 }
-
-let pricing: any;
-const discountPackages = ref<any>({});
 const prices = ref<PriceType[]>([]);
 
-watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance], () => {
+const grid = ref();
+const profileManager = useProfileManager();
+
+watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance], async () => {
+  let pkgs: any;
   if (!valid.value.error) {
-    calculate(); // Call the calculate function when any of the watched variables change
+    if (currentbalance.value) {
+      const accountBalance = await grid.value.balance.getMyBalance();
+      balance.value = accountBalance.free;
+      pkgs = await grid.value.calculator.calculateWithMyBalance({
+        cru: CRU.value,
+        mru: MRU.value,
+        hru: HRU.value,
+        sru: SRU.value,
+        ipv4u: ipv4.value,
+        certified: isCertified.value,
+      });
+    } else {
+      pkgs = await grid.value.calculator.calculate({
+        cru: CRU.value,
+        mru: MRU.value,
+        hru: HRU.value,
+        sru: SRU.value,
+        ipv4u: ipv4.value,
+        certified: isCertified.value,
+        balance: balance.value,
+      });
+    }
+
+    setPriceList(pkgs);
   }
 });
 
-async function calDiscount(price: number) {
-  pricing = await calcPrice(api.value);
-
-  // discount for Dedicated Nodes
-  const discount = pricing.discountForDedicationNodes;
-  let dedicatedPrice = price - price * (discount / 100);
-  let sharedPrice = price;
-
-  // discount for Twin Balance in TFT
-  const balance2 = (TFTPrice.value ? TFTPrice.value : 1) * +balance.value * 10000000;
-
-  discountPackages.value = {
-    none: {
-      duration: 0,
-      discount: 0,
-      backgroundColor: "#CCCCCC",
-      color: "black",
-    },
-    default: {
-      duration: 1.5,
-      discount: 20,
-      backgroundColor: "#3b3b3b",
-      color: "black",
-    },
-    bronze: {
-      duration: 3,
-      discount: 30,
-      backgroundColor: "linear-gradient(270deg, #AF6114 0%, #ffc58b 25%, #DC8E41 49.83%, #f9d1a9 77.32%, #AF6114 100%)",
-      color: "black",
-    },
-    silver: {
-      duration: 6,
-      discount: 40,
-      backgroundColor: "linear-gradient(270deg, #7d7d7d 0%, #f9f9f9 25%, #adadad 49.83%, #ffffff 77.32%, #a0a0a0 100%)",
-      color: "black",
-    },
-    gold: {
-      duration: 18,
-      discount: 60,
-      backgroundColor: "linear-gradient(270deg, #bf953f 0%, #fffce0 25%, #d7ae56 49.83%, #fffce0 77.32%, #aa771c 100%)",
-      color: "black",
-    },
-  };
-
-  let dedicatedPackage = "none";
-  let sharedPackage = "none";
-  for (const pkg in discountPackages.value) {
-    if (balance2 > dedicatedPrice * discountPackages.value[pkg].duration) {
-      dedicatedPackage = pkg;
-    }
-    if (balance2 > sharedPrice * discountPackages.value[pkg].duration) {
-      sharedPackage = pkg;
-    }
-  }
-  dedicatedPrice =
-    (dedicatedPrice - dedicatedPrice * (discountPackages.value[dedicatedPackage].discount / 100)) / 10000000;
-  sharedPrice = (sharedPrice - sharedPrice * (discountPackages.value[sharedPackage].discount / 100)) / 10000000;
-
-  return [dedicatedPrice.toFixed(2), dedicatedPackage, sharedPrice.toFixed(2), sharedPackage];
-}
-
-async function calculate() {
-  TFTPrice.value = await getTFTPrice(api.value);
-  const price = (await calcPrice(api.value)) as any;
-  const CU = calCU(+CRU.value, +MRU.value);
-
-  const SU = calSU(+HRU.value, +SRU.value);
-  const IPV4 = ipv4.value ? 1 : 0;
-  // apply 25% extra on certified node if selected
-  const certifiedFactor = isCertified.value ? 1.25 : 1;
-  const musd_month = (CU * price.cu.value + SU * price.su.value + IPV4 * price.ipu.value) * certifiedFactor * 24 * 30;
-
-  const [dedicatedPrice, dedicatedPackage, sharedPrice, sharedPackage] = await calDiscount(musd_month);
+async function setPriceList(pkgs: any): Promise<PriceType[]> {
+  TFTPrice.value = await grid.value.calculator.tftPrice();
   prices.value = [
     {
       label: "Dedicated Node",
-      price: `${dedicatedPrice}`,
-      color: discountPackages.value[dedicatedPackage].color,
-      packageName: dedicatedPackage,
-      backgroundColor: discountPackages.value[dedicatedPackage].backgroundColor,
-      TFTs: (+dedicatedPrice / TFTPrice.value).toFixed(2),
+      price: `${pkgs.dedicatedPrice}`,
+      color: "black",
+      packageName: pkgs.dedicatedPackage,
+      backgroundColor: color(pkgs.dedicatedPackage),
+      TFTs: (+pkgs.dedicatedPrice / TFTPrice.value).toFixed(2),
       info: "A user can reserve an entire node then use it exclusively to deploy solutions",
     },
     {
       label: "Shared Node",
-      price: `${sharedPrice}`,
+      price: `${pkgs.sharedPrice}`,
       color: "black",
-      packageName: sharedPackage,
-      backgroundColor: discountPackages.value[sharedPackage].backgroundColor,
-      TFTs: (+sharedPrice / TFTPrice.value).toFixed(2),
+      packageName: pkgs.sharedPackage,
+      backgroundColor: color(pkgs.dedicatedPackage),
+      TFTs: (+pkgs.sharedPrice / TFTPrice.value).toFixed(2),
       info: "Shared Nodes allow several users to host various workloads on a single node",
     },
   ];
+  return prices.value;
 }
 
 onMounted(async () => {
-  api.value = await connect();
-  calculate();
+  grid.value = await getGrid(profileManager.profile!);
+  const pkgs = await grid.value.calculator.calculate({
+    cru: CRU.value,
+    mru: MRU.value,
+    hru: HRU.value,
+    sru: SRU.value,
+    ipv4u: ipv4.value,
+    certified: isCertified.value,
+    balance: balance.value,
+  });
+  setPriceList(pkgs);
 });
 </script>
 
