@@ -10,3 +10,4 @@ export * from "./tft_price";
 export * from "./twins";
 export * from "./types";
 export * from "./utility";
+export * from "./tftBridge";

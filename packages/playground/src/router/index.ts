@@ -25,6 +25,11 @@ const router = createRouter({
           component: () => import("../portal/twin_view.vue"),
           meta: { title: "Twin" },
         },
+        {
+          path: "bridge",
+          component: () => import("../portal/bridge_view.vue"),
+          meta: { title: "Bridge" },
+        },
       ],
     },
     {
@@ -135,16 +140,6 @@ const router = createRouter({
       path: "/contractslist",
       component: () => import("../views/contracts_list.vue"),
       meta: { title: "Contracts List", info: { page: "info/contracts_list.md" } },
-    },
-    {
-      path: "/twin",
-      component: () => import("../portal/twin_view.vue"),
-      meta: { title: "Twin" },
-    },
-    {
-      path: "/bridge",
-      component: () => import("../portal/bridge_view.vue"),
-      meta: { title: "Bridge" },
     },
     {
       path: "/:pathMatch(.*)*",

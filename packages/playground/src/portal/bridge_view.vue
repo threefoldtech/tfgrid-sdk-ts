@@ -83,7 +83,7 @@
             @click="withdrawTFT(target, amount)"
             :disabled="!isValidSwap || validatingAddress"
             :loading="loadingWithdraw"
-            >Submit</v-btn
+            >Send</v-btn
           >
         </v-card-actions>
       </v-card>
@@ -93,11 +93,12 @@
 
 <script lang="ts" setup>
 import { GridClient } from "@threefold/grid_client";
+import { createToast } from "mosha-vue-toastify";
 import { default as StellarSdk, StrKey } from "stellar-sdk";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
-import { getGrid, loadBalance } from "../utils/grid";
+import { getGrid, loadBalance, loadProfile } from "../utils/grid";
 
 const profileManager = useProfileManager();
 const items = ref([{ id: 1, name: "stellar" }]);
@@ -105,7 +106,7 @@ const selectedItem = ref(items.value[0]);
 const openDepositDialog = ref(false);
 const openWithdrawDialog = ref(false);
 const selectedName = ref("");
-const withdrawFee = ref(0);
+const withdrawFee = ref("");
 const isValidSwap = ref(false);
 const target = ref("");
 const targetError = ref("");
@@ -116,23 +117,22 @@ const freeBalance = ref(0);
 const loadingWithdraw = ref(false);
 const depositWallet = ref("");
 const qrCodeText = ref("");
-const depositFee = ref(0);
+const depositFee = ref("");
 
 onMounted(async () => {
   selectedName.value = items.value.filter(item => item.id === selectedItem.value.id)[0].name;
   depositWallet.value = window.env.BRIDGE_TFT_ADDRESS;
   qrCodeText.value = `TFT:${depositWallet.value}?message=twin_${profileManager.profile?.twinId}&sender=me`;
   try {
-    const client = new GridClient({ mnemonic: profileManager.profile!.mnemonic, network: window.env.NETWORK });
-    client._connect();
-    const WithdrawFee = await client.tfchain.tfClient.tftBridge.GetWithdrawFee();
-    withdrawFee.value = WithdrawFee;
-
-    const DepositFee = await client.tfchain.tfClient.tftBridge.GetDepositFee();
-    depositFee.value = DepositFee;
-
     const grid = await getGrid(profileManager.profile!);
     if (grid) {
+      grid.connect();
+      const WithdrawFee = await grid.tfclient.tftBridge.GetWithdrawFee();
+      withdrawFee.value = WithdrawFee as string;
+
+      const DepositFee = await grid.tfclient.tftBridge.GetDepositFee();
+      depositFee.value = DepositFee as string;
+
       const balance = await loadBalance(grid);
       freeBalance.value = balance.free;
     }
@@ -195,55 +195,37 @@ async function validateAddress() {
   return;
 }
 
-async function withdrawTFT(target: string, amount: number) {
+async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
   loadingWithdraw.value = true;
   try {
     const client = new GridClient({ mnemonic: profileManager.profile!.mnemonic, network: window.env.NETWORK });
-    client._connect();
-    await client.tfchain.tfClient.tftBridge.Withdraw(
-      profileManager.profile?.mnemonic as string,
-      profileManager.profile?.address as string,
-      target,
-      amount,
-      (res: { events?: never[] | undefined; status: any }) => {
-        console.log(res);
-        if (res instanceof Error) {
-          console.log(res);
-          loadingWithdraw.value = false;
-          return;
-        }
-        const { events = [], status } = res;
-        console.log(`Current status is ${status.type}`);
-        if (status.isFinalized) {
-          console.log(`Transaction included at blockHash ${status.asFinalized}`);
-          if (!events.length) {
-            openWithdrawDialog.value = false;
-          } else {
-            // Loop through Vec<EventRecord> to display all events
-            events.forEach(({ phase, event: { data, method, section } }) => {
-              console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-              if (section === "tftBridgeModule" && method === "BurnTransactionCreated") {
-                openWithdrawDialog.value = false;
-                target = "";
-                amount = 0;
-                loadingWithdraw.value = false;
-              } else if (section === "system" && method === "ExtrinsicFailed") {
-                openWithdrawDialog.value = false;
-                target = "";
-                amount = 0;
-                loadingWithdraw.value = false;
-              }
-            });
-          }
-        }
-      },
-    );
+    client.connect();
+    const result = await client.tfclient.tftBridge.withdraw({ amount: withdrawAmount, target: targetAddress });
+    await result.apply();
+    openWithdrawDialog.value = false;
+    target.value = "";
+    amount.value = 0;
+    loadingWithdraw.value = false;
+    const profile = await loadProfile(client);
+    profileManager.set(profile);
+    createToast("Transaction Succeeded", {
+      position: "bottom-right",
+      hideProgressBar: true,
+      toastBackgroundColor: "black",
+      timeout: 5000,
+    });
   } catch (e) {
     console.log("Error withdrawing, Error: ", e);
     openWithdrawDialog.value = false;
-    target = "";
-    amount = 0;
+    target.value = "";
+    amount.value = 0;
     loadingWithdraw.value = false;
+    createToast("Withdraw Failed!", {
+      position: "bottom-right",
+      hideProgressBar: true,
+      toastBackgroundColor: "red",
+      timeout: 5000,
+    });
   }
 }
 </script>

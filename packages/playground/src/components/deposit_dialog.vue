@@ -6,7 +6,7 @@
         <v-card-text>
           <v-container>
             <v-row class="py-2">
-              <v-col cols="7">
+              <v-col cols="7" class="mx-4">
                 Send a
                 {{ selectedName ? selectedName.charAt(0).toUpperCase() + selectedName.slice(1) : "" }} transaction with
                 your TFT's to deposit to:
@@ -21,7 +21,7 @@
               </v-col>
               <v-divider class="mx-4" vertical></v-divider>
               <v-col>
-                Or use Threefold connect to scan this qr code:
+                Or use ThreeFold Connect to scan this QRcode:
                 <div class="d-flex justify-center py-2">
                   <qrcode-vue
                     :value="qrCodeText"
@@ -48,30 +48,68 @@
 </template>
 
 <script setup lang="ts">
+import { GridClient } from "@threefold/grid_client";
+import { createToast } from "mosha-vue-toastify";
 import QrcodeVue from "qrcode.vue";
-import { onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
+
+import { useProfileManager } from "../stores";
+import { loadProfile } from "../utils/grid";
 
 const depositDialog = ref(false);
 const emits = defineEmits(["close"]);
+const profileManager = useProfileManager();
+let destroyed = false;
 
 const props = defineProps({
   selectedName: String,
   depositWallet: String,
   qrCodeText: String,
-  depositFee: Number,
+  depositFee: String,
   openDepositDialog: Boolean,
   twinId: Number,
 });
 
-onMounted(() => {
+onMounted(async () => {
   if (!props.openDepositDialog) return;
   depositDialog.value = true;
+  try {
+    const client = new GridClient({ mnemonic: profileManager.profile!.mnemonic, network: window.env.NETWORK });
+    client.connect();
+    const receivedDeposit = await client.tfclient.tftBridge.listenToMintCompleted(
+      profileManager.profile?.address as string,
+    );
+
+    if (destroyed) return;
+    createToast(`You have received ${receivedDeposit / 10000000} TFT`, {
+      position: "bottom-right",
+      hideProgressBar: true,
+      toastBackgroundColor: "black",
+      timeout: 5000,
+    });
+    const profile = await loadProfile(client);
+    profileManager.set(profile);
+  } catch (e) {
+    if (destroyed) return;
+    console.log(e);
+    createToast(e as string, {
+      position: "bottom-right",
+      hideProgressBar: true,
+      toastBackgroundColor: "red",
+      timeout: 5000,
+    });
+    closeDialog();
+  }
 });
 
 const closeDialog = () => {
   depositDialog.value = false;
   emits("close");
 };
+
+onBeforeUnmount(() => {
+  destroyed = true;
+});
 </script>
 
 <style>
