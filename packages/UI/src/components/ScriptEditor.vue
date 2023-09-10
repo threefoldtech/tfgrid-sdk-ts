@@ -48,9 +48,8 @@ import axios from "axios";
 import { ThreefoldWalletConnectorApi } from "tf-wallet-connector-api";
 import { onMounted, ref } from "vue";
 
-import { AlertType } from "@/utils/types";
-
 import { KeypairType, sign } from "../utils/sign";
+import { AlertType } from "../utils/types";
 import CustomAlertComponent from "./CustomAlertComponent.vue";
 
 export default {
@@ -83,8 +82,13 @@ export default {
     const submitScript = async () => {
       try {
         const account = await ThreefoldWalletConnectorApi.selectDecryptedAccount();
-        const data = await sign(text.value, account?.mnemonic ?? "", KeypairType.sr25519);
-        const response = axios.post(props.dest, data);
+        const signature = await sign(text.value, account?.mnemonic ?? "", KeypairType.sr25519);
+        const response = axios.post(props.dest, {
+          content: text.value,
+          signature,
+          pubkey: account?.ssh,
+          twinid: account?.twinId,
+        });
         console.log(response);
       } catch (error) {
         console.log(error);

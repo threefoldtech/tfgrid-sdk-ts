@@ -60,9 +60,8 @@ import { onMounted, ref } from "vue";
 import { createLoadingTask, VuePdf } from "vue3-pdfjs";
 import { type VuePdfPropsType } from "vue3-pdfjs/components/vue-pdf/vue-pdf-props";
 
-import { KeypairType, sign, type SignReturn } from "@/utils/sign";
-import { AlertType, type PDFPostData } from "@/utils/types";
-
+import { KeypairType, sign } from "../utils/sign";
+import { AlertType, type PDFPostData } from "../utils/types";
 import CustomAlertComponent from "./CustomAlertComponent.vue";
 import LoadingSpinnerComponent from "./LoadingSpinnerComponent.vue";
 
@@ -142,17 +141,17 @@ export default {
       }
     };
 
-    const request = async (account: Account | null, data: SignReturn) => {
+    const request = async (account: Account | null, data: string) => {
       if (account) {
         const requestBody: PDFPostData = {
           twinid: account?.twinId,
           pdfUrl: props.pdfurl,
-          pubkey: data.publicKey,
+          pubkey: account.ssh,
           signature: data.signature,
         };
 
         try {
-          const response = await axios.post(props.dest, requestBody);
+          const response = await axios.post(props.dest, ...requestBody);
           responseData.value = String(response.status);
           console.log(response);
         } catch (error: any) {
@@ -177,7 +176,7 @@ export default {
         const account = await ThreefoldWalletConnectorApi.selectDecryptedAccount();
         const data = await sign(pdfData.value, account?.mnemonic ?? "", KeypairType.ed25519);
 
-        if (!data.publicKey || !data.signature) {
+        if (!data.signature) {
           showError("Unexpected signing signature.");
           return;
         }
