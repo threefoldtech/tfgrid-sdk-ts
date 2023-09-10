@@ -1,9 +1,11 @@
 <template>
   <div class="mt-2 text-center">
     <v-card color="primary" class="pa-3 pt-4">
-      <div class="d-flex justify-center items-center pa-2">
-        <v-icon class="mr-3">{{ item.icon }} </v-icon>
-        {{ item.title }}
+      <div class="d-flex align-center justify-center items-center py-2 font-weight-bold fs-17">
+        <v-icon class="mr-3" size="large">{{ item.icon }} </v-icon>
+        <span>
+          {{ item.title }}
+        </span>
       </div>
 
       <v-divider class="mt-1" />
@@ -25,3 +27,8 @@ export default {
   name: "StatisticsCard",
 };
 </script>
+<style scoped>
+.fs-17 {
+  font-size: 1.1rem;
+}
+</style>

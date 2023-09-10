@@ -75,8 +75,8 @@ const fetchData = async () => {
         ];
       }
     })
-    .catch(() => {
-      /* Pass */
+    .catch(error => {
+      console.log(error);
     })
     .finally(() => (loading.value = false));
 };
@@ -89,7 +89,6 @@ onMounted(fetchData);
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  padding: 15px 16px 0;
 
   > div {
     padding: 5px;
