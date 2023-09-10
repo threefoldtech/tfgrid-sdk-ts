@@ -35,7 +35,7 @@ export default class ThreefoldPDFSigner implements IThreefoldProvider {
     }
   }
 
-  async __request(data: SignReturn, account?: boolean): Promise<ErrorType> {
+  private async __request(data: SignReturn, account?: boolean): Promise<ErrorType> {
     console.log("Requested form the signer", data, account);
     const requestBody: PDFPostData = {
       pdfUrl: this.props.pdfurl,

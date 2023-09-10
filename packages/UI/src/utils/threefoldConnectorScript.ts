@@ -55,7 +55,7 @@ export default class ThreefoldConnector implements IThreefoldProvider {
     return error;
   }
 
-  async __request(data: SignReturn, account?: Account): Promise<ErrorType> {
+  private async __request(data: SignReturn, account?: Account): Promise<ErrorType> {
     console.log("Requested form the connector", data, account);
     return this.syncErrors(false, "");
   }
