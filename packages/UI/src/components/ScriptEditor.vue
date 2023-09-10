@@ -54,7 +54,7 @@ import CustomAlertComponent from "./CustomAlertComponent.vue";
 
 export default {
   name: "ScriptEditor",
-  props: ["dest"],
+  props: ["dest", "network"],
   components: {
     CustomAlertComponent,
   },
@@ -81,13 +81,13 @@ export default {
 
     const submitScript = async () => {
       try {
-        const account = await ThreefoldWalletConnectorApi.selectDecryptedAccount();
+        const account = await ThreefoldWalletConnectorApi.selectDecryptedAccount(props.network || "main");
         const signature = await sign(text.value, account?.mnemonic ?? "", KeypairType.sr25519);
         const response = axios.post(props.dest, {
           content: text.value,
           signature,
-          pubkey: account?.ssh,
-          twinid: account?.twinId,
+          pubkey: account?.metadata.ssh,
+          twinid: account?.metadata.twinId,
         });
         console.log(response);
       } catch (error) {

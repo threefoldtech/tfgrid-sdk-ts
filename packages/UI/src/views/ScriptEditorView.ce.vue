@@ -1,5 +1,5 @@
 <template>
-  <ScriptEditor dest />
+  <ScriptEditor dest network />
 </template>
 
 <script lang="ts">
@@ -12,10 +12,12 @@ export default {
     ScriptEditor,
   },
   setup() {
-    const dest = ref();
+    const dest = ref<string>();
+    const network = ref<string>();
     return {
       ScriptEditor,
       dest,
+      network,
     };
   },
 };
