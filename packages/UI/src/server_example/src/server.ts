@@ -1,0 +1,81 @@
+import { Keyring } from "@polkadot/keyring";
+import { waitReady } from "@polkadot/wasm-crypto";
+import axios from "axios";
+import { Buffer } from "buffer";
+import cors from "cors";
+import MD5 from "crypto-js/md5";
+import express, { Express, Request, Response } from "express";
+
+const app: Express = express();
+
+app.use(cors({ origin: "*" }));
+app.use(express.json());
+
+interface Payload {
+  twinid?: number;
+  pdfUrl: string;
+  pubkey: string;
+  signature: string;
+}
+
+let payLoad: Payload = {
+  pdfUrl: "",
+  pubkey: "",
+  signature: "",
+};
+
+export enum KeypairType {
+  sr25519 = "sr25519",
+  ed25519 = "ed25519",
+}
+
+const verify = async (address: string, signature: string, pdfUrl: string, keypairType: KeypairType) => {
+  try {
+    const response = await axios.get(pdfUrl, { responseType: "arraybuffer" });
+    const pdfBytes = Uint8Array.from(Buffer.from(response.data, "base64"));
+    const hash = MD5(pdfBytes.toString()).toString();
+
+    const messageBytes = Uint8Array.from(Buffer.from(hash.toString(), "hex"));
+    const keyring = new Keyring({ type: keypairType });
+
+    await waitReady();
+
+    const key = keyring.addFromAddress(address);
+    const sig = Uint8Array.from(Buffer.from(signature, "hex"));
+
+    // Verify the signature
+    const isValid = key.verify(messageBytes, sig, key.publicKey);
+    return { isValid };
+  } catch (error) {
+    console.error(error);
+    // Handle any errors that occur during the verification process
+    throw new Error("An error occurred while verifying the signature or fetching/processing the PDF content.");
+  }
+};
+
+app.post("/api/verify", async (req: Request, res: Response) => {
+  payLoad = req.body;
+
+  try {
+    const verified = await verify(payLoad.pubkey, payLoad.signature, payLoad.pdfUrl, KeypairType.ed25519);
+    if (verified) {
+      res.status(200).json({
+        message: "The signature was verified successfully.",
+        data: verified,
+      });
+    } else {
+      res.status(400).json({
+        message: "Failed to verify the signature.",
+        data: verified,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "error", data: "An error occurred while verifying the signature." });
+  }
+});
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
