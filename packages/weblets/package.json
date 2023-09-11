@@ -1,6 +1,6 @@
 {
   "name": "@threefold/weblets",
-  "version": "2.1.0-rc12",
+  "version": "2.1.0",
   "private": true,
   "scripts": {
     "rollup-build": "rollup -c",
@@ -71,7 +71,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",
-    "@threefold/grid_client": "^2.1.0-rc12",
+    "@threefold/grid_client": "^2.1.0",
     "add": "^2.0.6",
     "bip39": "^3.0.4",
     "buffer": "^6.0.3",

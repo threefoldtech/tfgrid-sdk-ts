@@ -1,6 +1,6 @@
 {
   "name": "@threefold/stats",
-  "version": "2.1.0-rc12",
+  "version": "2.1.0",
   "private": true,
   "scripts": {
     "build": "rollup -c",
