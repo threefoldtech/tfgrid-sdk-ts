@@ -60,19 +60,27 @@
         <v-window-item :value="1">
           <v-card class="pa-5 my-5" flat>
             <form-validator v-model="isValidAddressTransfer">
-              <input-tooltip tooltip="Enter Address of Receipient Account">
-                <v-text-field
-                  label="Recipient Address:"
-                  :rules="[
-                    () => !!receipientAddress || 'address is required',
-                    () => isValidAddress() || 'invalid address',
-                    () => isSameAddress() || 'Cannot transfer to yourself',
-                  ]"
-                  v-model="receipientAddress"
-                >
-                </v-text-field>
-              </input-tooltip>
-
+              <input-validator
+                :value="receipientAddress"
+                :rules="[
+                  validators.required('Receipient address is required '),
+                  validators.isAlphanumeric('Invalid Address'),
+                ]"
+                #="{ props }"
+              >
+                <input-tooltip tooltip="Enter Address of Receipient Account">
+                  <v-text-field
+                    label="Recipient Address:"
+                    :rules="[
+                      () => isValidAddress() || 'Invalid address',
+                      () => isSameAddress() || 'Cannot transfer to yourself',
+                    ]"
+                    v-model="receipientAddress"
+                    v-bind="props"
+                  >
+                  </v-text-field>
+                </input-tooltip>
+              </input-validator>
               <input-validator
                 :value="transferAmount"
                 :rules="[
@@ -115,7 +123,6 @@ import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
 
-const freeBalance = ref(0);
 const activeTab = ref(0);
 const receipientTwinId = ref("");
 const isValidTwinIDTransfer = ref(false);
@@ -130,7 +137,7 @@ const gridClient = new GridClient({
   mnemonic: useProfileManager().profile!.mnemonic,
   network: window.env.NETWORK,
 });
-
+const freeBalance = ref(0);
 onMounted(async () => {
   await gridClient.connect();
   await getFreeBalance();
