@@ -22,7 +22,12 @@
                 #="{ props }"
               >
                 <input-tooltip tooltip="Enter Twin ID of Receipient Account">
-                  <v-text-field label="Recipient TwinID:" v-bind="props" v-model="receipientTwinId"></v-text-field>
+                  <v-text-field
+                    :rules="[() => parseInt(receipientTwinId) != senderTwinID || 'Cannot transfer to yourself']"
+                    label="Recipient TwinID:"
+                    v-bind="props"
+                    v-model="receipientTwinId"
+                  ></v-text-field>
                 </input-tooltip>
               </input-validator>
 
@@ -131,7 +136,8 @@ const loadingAddressTransfer = ref(false);
 const isValidAddressTransfer = ref(false);
 const receipientAddress = ref("");
 const profile = useProfileManager().profile;
-
+const senderTwinID = profile!.twinId;
+console.log(senderTwinID);
 const gridClient = new GridClient({
   mnemonic: useProfileManager().profile!.mnemonic,
   network: window.env.NETWORK,
