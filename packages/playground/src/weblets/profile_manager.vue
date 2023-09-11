@@ -185,7 +185,9 @@
                   :rules="[
                     validators.required('Password is required.'),
                     validators.minLength('Password must be at least 6 characters.', 6),
-                    validators.isAlphanumeric('Password should consist of letters and numbers only.'),
+                    validators.pattern('Password should not contain whitespaces.', {
+                      pattern: /^[^\s]+$/,
+                    }),
                     validatePassword,
                   ]"
                   #="{ props: validationProps }"
