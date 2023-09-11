@@ -5,8 +5,8 @@
     </v-card>
     <v-card>
       <v-tabs v-model="activeTab" align-tabs="center">
-        <v-tab :value="0">By Twin ID</v-tab>
-        <v-tab :value="1">By Address</v-tab>
+        <v-tab :value="0" color="primary">By Twin ID</v-tab>
+        <v-tab :value="1" color="primary">By Address</v-tab>
       </v-tabs>
       <v-window v-model="activeTab">
         <!-- TwinID Transfer -->
