@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   repository: ghcr.io/threefoldtech/dashboard
   pullPolicy: Always
-  tag: "2.1.0-rc12"
+  tag: "2.1.0"
 
   env:
     - name: "STELLAR_NETWORK"
