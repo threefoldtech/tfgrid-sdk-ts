@@ -79,7 +79,7 @@
                   validators.required('Transfer amount is required '),
                   validators.isNumeric('Amount should be a number.'),
                   validators.min('Amount must be greater than 0', 0.00000000001),
-                  validators.max('Insuffient funds', freeBalance),
+                  validators.max('Insufficient funds', freeBalance),
                 ]"
                 #="{ props }"
               >
