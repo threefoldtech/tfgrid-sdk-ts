@@ -109,7 +109,7 @@
 <script lang="ts" setup>
 import { Keyring } from "@polkadot/keyring";
 import { GridClient } from "@threefold/grid_client";
-import { QueryClient, type Twin } from "@threefold/tfchain_client";
+import type { Twin } from "@threefold/tfchain_client";
 import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
@@ -125,8 +125,6 @@ const loadingAddressTransfer = ref(false);
 const isValidAddressTransfer = ref(false);
 const receipientAddress = ref("");
 const profile = useProfileManager().profile;
-
-const queryClient = new QueryClient(window.env.SUBSTRATE_URL);
 
 const gridClient = new GridClient({
   mnemonic: useProfileManager().profile!.mnemonic,
@@ -180,8 +178,8 @@ async function transfer(receipientTwin: Twin) {
   }
 }
 async function submitFormAddress() {
-  const twinId = await queryClient.twins.getTwinIdByAccountId({ accountId: receipientAddress.value });
-  const twinDetails = await queryClient.twins.get({ id: twinId });
+  const twinId = await gridClient.twins.get_twin_id_by_account_id({ public_key: receipientAddress.value });
+  const twinDetails = await gridClient.twins.get({ id: twinId });
   if (twinDetails != null) {
     loadingAddressTransfer.value = true;
     await transfer(twinDetails);
@@ -201,7 +199,8 @@ function createInvalidTransferToast(message: string) {
   });
 }
 async function submitFormTwinID() {
-  const twinDetails = await queryClient.twins.get({ id: parseInt(receipientTwinId.value) });
+  const twinDetails = await gridClient.twins.get({ id: parseInt(receipientTwinId.value) });
+
   if (twinDetails != null) {
     loadingTwinIDTransfer.value = true;
     await transfer(twinDetails);
