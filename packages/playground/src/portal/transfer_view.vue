@@ -167,7 +167,7 @@ async function transfer(receipientTwin: Twin) {
   try {
     gridClient.balance.transfer({ address: receipientTwin.accountId, amount: transferAmount.value });
 
-    createToast("Transaction submitted!", {
+    createToast("Transaction Complete!", {
       position: "top-right",
       hideProgressBar: true,
       toastBackgroundColor: "green",
