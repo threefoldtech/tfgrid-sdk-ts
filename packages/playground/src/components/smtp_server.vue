@@ -40,6 +40,7 @@
             validators.required('Password is required.'),
             validators.minLength('Password must be at least 6 characters.', 6),
             validators.maxLength('Password cannot exceed 15 characters.', 15),
+            validators.isAlphanumeric('Password should consist of letters and numbers only.'),
           ]"
           #="{ props: validatorProps }"
         >

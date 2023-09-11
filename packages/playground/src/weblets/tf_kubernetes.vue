@@ -44,6 +44,7 @@
             validators.required('Token is required.'),
             validators.minLength('Token minimum length is 6 chars.', 6),
             validators.maxLength('Token max length is 15 chars.', 15),
+            validators.isAlphanumeric('Token should consist of letters and numbers only.'),
           ]"
           #="{ props: validationProps }"
         >
