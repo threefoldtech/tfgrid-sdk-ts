@@ -41,13 +41,20 @@ Here's an example of how to use the PDF Signer Web Component in your HTML file:
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./style.css" />
-    <!-- Include the PDF Signer component -->
-    <title>Your PDF Signing Application</title>
+    <title>Threefold UI</title>
+
+    <!-- Include the style and logo files -->
+    <link rel="stylesheet" href="./dist/threefold-ui-style.css" />
+    <link rel="icon" href="./dist/favicon.ico" />
   </head>
+
   <body>
     <!-- Use the pdf-signer custom element with required attributes -->
-    <pdf-signer pdfurl="<pdf-url>" dest="<endpoint-url>" network="dev"></pdf-signer>
+    <pdf-signer
+      dest="http://localhost:3000/"
+      pdfUrl="https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf"
+      network="dev"
+    />
     <!-- Include the PDF Signer component script -->
     <script src="./dist/threefold-ui.umd.js"></script>
   </body>
