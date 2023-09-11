@@ -108,17 +108,12 @@
 </template>
 <script lang="ts" setup>
 import { Keyring } from "@polkadot/keyring";
-import { Client, QueryClient, type Twin } from "@threefold/tfchain_client";
-import Decimal from "decimal.js";
+import { GridClient } from "@threefold/grid_client";
+import { QueryClient, type Twin } from "@threefold/tfchain_client";
 import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
-import { getGrid, loadBalance } from "../utils/grid";
-
-onMounted(async () => {
-  await getFreeBalance();
-});
 
 const freeBalance = ref(0);
 const activeTab = ref(0);
@@ -132,9 +127,15 @@ const receipientAddress = ref("");
 const profile = useProfileManager().profile;
 
 const queryClient = new QueryClient(window.env.SUBSTRATE_URL);
-const client = new Client({
-  url: window.env.SUBSTRATE_URL,
-  mnemonicOrSecret: useProfileManager().profile!.mnemonic,
+
+const gridClient = new GridClient({
+  mnemonic: useProfileManager().profile!.mnemonic,
+  network: window.env.NETWORK,
+});
+
+onMounted(async () => {
+  await gridClient.connect();
+  await getFreeBalance();
 });
 function isSameAddress() {
   if (receipientAddress.value == profile?.address) {
@@ -159,21 +160,13 @@ function clearInput() {
   receipientAddress.value = "";
 }
 async function getFreeBalance() {
-  const grid = await getGrid(profile!);
-  const balance = await loadBalance(grid!);
+  const balance = await gridClient.balance.getMyBalance();
   freeBalance.value = balance.free;
 }
 async function transfer(receipientTwin: Twin) {
-  const twinAddress = receipientTwin.accountId;
-
-  const decimalAmount = new Decimal(transferAmount.value);
-  const milliAmount = decimalAmount.mul(10 ** 7).toNumber();
   try {
-    const transferResult = await client.balances.transfer({
-      address: twinAddress,
-      amount: milliAmount,
-    });
-    await transferResult.apply();
+    gridClient.balance.transfer({ address: receipientTwin.accountId, amount: transferAmount.value });
+
     createToast("Transaction submitted!", {
       position: "top-right",
       hideProgressBar: true,
