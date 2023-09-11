@@ -54,7 +54,7 @@ export default {
                     createToast(` Transaction Submitted`, {
                       position: "bottom-right",
                       hideProgressBar: true,
-                      toastBackgroundColor: "var(--primary)",
+                      toastBackgroundColor: "black",
                       timeout: 5000,
                     });
                 }
