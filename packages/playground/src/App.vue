@@ -152,7 +152,7 @@ watch(
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
 
-let routes: AppRoute[] = [
+const routes: AppRoute[] = [
   {
     title: "Portal",
     icon: "mdi-account-convert-outline",
@@ -274,13 +274,13 @@ function clickHandler({ route, url }: AppRouteItem): void {
 }
 
 $router.beforeEach((to, from, next) => {
-  if (network !== "main") {
-    routes = routes.filter(route => route.title !== "Minting");
-    if (to.path === "/minting") {
-      return;
-    }
-    next();
-  }
+  // if (network !== "main") {
+  //   routes = routes.filter(route => route.title !== "Minting");
+  //   if (to.path === "/minting") {
+  //     return;
+  //   }
+  //   next();
+  // }
   if (to.path === "/" && hasActiveProfile) {
     next({ path: "portal/twin" });
   } else {

@@ -5,38 +5,18 @@ export interface receiptInterface {
   farm_name?: string;
   farm_id?: number;
   measured_uptime?: number;
-  period?: {
-    start: number;
-    end: number;
-  };
-  cloud_units?: {
-    cu: number;
-    su: number;
-    nu: number;
-  };
-  resource_units?: {
-    cru: number;
-    mru: number;
-    hru: number;
-    sru: number;
-  };
+  period?: object;
+  cru?: number;
+  mru?: number;
+  hru?: number;
+  sru?: number;
+  cu: number;
+  su: number;
+  nu: number;
   stellar_payout_address?: string;
   tft_connection_price?: number;
-  minted_cloud_units?: {
-    cu: number;
-    su: number;
-    nu: number;
-  };
-  correct_cloud_units?: {
-    cu: number;
-    su: number;
-    nu: number;
-  };
-  fixup_cloud_units?: {
-    cu: number;
-    su: number;
-    nu: number;
-  };
+  correct_cloud_units?: object;
+  fixup_cloud_units?: object;
   correct_tft?: number;
   minted_tft?: number;
   fixup_tft?: number;
@@ -58,8 +38,13 @@ export async function getMintingData(hash: number) {
         farm_id: receipt.Minting.farm_id,
         measured_uptime: receipt.Minting.measured_uptime,
         period: receipt.Minting.period,
-        cloud_units: receipt.Minting.cloud_units,
-        resource_units: receipt.Minting.resource_units,
+        cu: receipt.Minting.cloud_units.cu,
+        su: receipt.Minting.cloud_units.su,
+        nu: receipt.Minting.cloud_units.nu,
+        cru: receipt.Minting.resource_units.cru,
+        mru: receipt.Minting.resource_units.mru,
+        hru: receipt.Minting.resource_units.hru,
+        sru: receipt.Minting.resource_units.sru,
         reward: receipt.Minting.reward,
         tft_connection_price: receipt.Minting.tft_connection_price / 1e3,
         stellar_payout_address: receipt.Minting.stellar_payout_address,
@@ -72,7 +57,9 @@ export async function getMintingData(hash: number) {
         type: "FIXUP",
         node_id: receipt.Fixup.node_id,
         farm_id: receipt.Fixup.farm_id,
-        cloud_units: receipt.Fixup.minted_cloud_units,
+        cu: receipt.Fixup.minted_cloud_units.cu,
+        su: receipt.Fixup.minted_cloud_units.su,
+        nu: receipt.Fixup.minted_cloud_units.nu,
         correct_cloud_units: receipt.Fixup.correct_cloud_units,
         fixup_cloud_units: receipt.Fixup.fixup_cloud_units,
         minted_tft: receipt.Fixup.minted_reward.tft / 1e7,
@@ -83,5 +70,6 @@ export async function getMintingData(hash: number) {
       hashReceipts = Object.assign({}, data);
     }
   });
+
   return hashReceipts;
 }

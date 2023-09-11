@@ -12,7 +12,7 @@
           ]"
           valid-message="Receipt hash is valid."
           #="{ props: validationProps }"
-          ref="textInput"
+          ref="hashInput"
         >
           <VTextField
             class="mr-5"
@@ -26,12 +26,12 @@
           type="submit"
           color="primary"
           variant="elevated"
+          :disabled="!isValidForm || !receiptHash"
           :loading="loading"
-          :disabled="!isValidForm"
           size="x-large"
           rounded="lg"
         >
-          Mint
+          View
         </VBtn>
       </FormValidator>
     </v-form>
@@ -41,7 +41,7 @@
         <v-list class="custom-list">
           <v-row>
             <v-col cols="2" class="column-style">
-              <v-list-item v-for="header in infoHeader" :key="header">
+              <v-list-item v-for="header in mintNodeInfoHeaders" :key="header">
                 {{ header }}
               </v-list-item>
             </v-col>
@@ -63,24 +63,24 @@
         <v-list class="custom-list">
           <v-row>
             <v-col cols="2" class="column-style">
-              <v-list-item v-for="header in resourcesHeader" :key="header">
+              <v-list-item v-for="header in mintResourcesHeaders" :key="header">
                 {{ header }}
               </v-list-item>
             </v-col>
             <v-col cols="10">
-              <v-list-item> {{ item.cloud_units.cu.toFixed(2) }}</v-list-item>
-              <v-list-item> {{ item.cloud_units.su.toFixed(2) }}</v-list-item>
+              <v-list-item> {{ item.cu.toFixed(2) }}</v-list-item>
+              <v-list-item> {{ item.su.toFixed(2) }}</v-list-item>
               <v-list-item>
-                {{ item.cloud_units.nu.toFixed(2) }}
+                {{ item.nu.toFixed(2) }}
               </v-list-item>
-              <v-list-item v-if="item.resource_units.cru && item.resource_units.cru < 0.1">
-                {{ (item.resource_units.cru * 1024 ** 3).toFixed(0) }} VCpu
+              <v-list-item v-if="item.cru && item.cru < 0.1">
+                {{ (item.cru * 1024 ** 3).toFixed(0) }} VCPU
               </v-list-item>
-              <v-list-item v-else> {{ item.resource_units.cru }} VCpu </v-list-item>
+              <v-list-item v-else> {{ item.cru }} VCpu </v-list-item>
 
-              <v-list-item> {{ item.resource_units.mru.toFixed(3) }}GB </v-list-item>
-              <v-list-item> {{ item.resource_units.sru.toFixed(3) }}GB </v-list-item>
-              <v-list-item> {{ item.resource_units.hru.toFixed(3) }}GB </v-list-item>
+              <v-list-item> {{ item.mru.toFixed(3) }} GB </v-list-item>
+              <v-list-item> {{ item.sru.toFixed(3) }} GB </v-list-item>
+              <v-list-item> {{ item.hru.toFixed(3) }} GB </v-list-item>
             </v-col>
           </v-row>
         </v-list>
@@ -91,7 +91,7 @@
         <v-list class="custom-list">
           <v-row>
             <v-col cols="2" class="column-style">
-              <v-list-item v-for="header in payoutHeader" :key="header">
+              <v-list-item v-for="header in mintPayoutHeaders" :key="header">
                 {{ header }}
               </v-list-item>
             </v-col>
@@ -113,7 +113,7 @@
         <v-list class="custom-list">
           <v-row>
             <v-col cols="2" class="column-style">
-              <v-list-item v-for="header in fixedHeader" :key="header">
+              <v-list-item v-for="header in fixupNodeInfoHeaders" :key="header">
                 {{ header }}
               </v-list-item>
             </v-col>
@@ -130,21 +130,21 @@
         <v-list class="custom-list">
           <v-row>
             <v-col cols="2" class="column-style">
-              <v-list-item v-for="header in resourcesFHeader" :key="header">
+              <v-list-item v-for="header in fixupResourcesHeaders" :key="header">
                 {{ header }}
               </v-list-item>
             </v-col>
             <v-col cols="10">
               <v-list-item>
-                {{ item.cloud_units.cu.toFixed(2) }} | {{ item.correct_cloud_units.cu.toFixed(2) }} |
+                {{ item.cu.toFixed(2) }} | {{ item.correct_cloud_units.cu.toFixed(2) }} |
                 {{ item.fixup_cloud_units.cu.toFixed(2) }}</v-list-item
               >
               <v-list-item>
-                {{ item.cloud_units.su.toFixed(2) }} | {{ item.correct_cloud_units.su.toFixed(2) }} |
+                {{ item.su.toFixed(2) }} | {{ item.correct_cloud_units.su.toFixed(2) }} |
                 {{ item.fixup_cloud_units.su.toFixed(2) }}</v-list-item
               >
               <v-list-item>
-                {{ item.cloud_units.nu.toFixed(2) }} | {{ item.correct_cloud_units.nu.toFixed(2) }} |
+                {{ item.nu.toFixed(2) }} | {{ item.correct_cloud_units.nu.toFixed(2) }} |
                 {{ item.fixup_cloud_units.nu.toFixed(2) }}</v-list-item
               >
             </v-col>
@@ -156,7 +156,7 @@
         <v-list class="custom-list">
           <v-row>
             <v-col cols="2" class="column-style">
-              <v-list-item v-for="header in payoutFHeader" :key="header">
+              <v-list-item v-for="header in fixupPayoutHeaders" :key="header">
                 {{ header }}
               </v-list-item>
             </v-col>
@@ -170,6 +170,10 @@
         </v-list>
       </v-card>
     </v-container>
+
+    <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="noData">
+      {{ noData }}
+    </v-alert>
   </view-layout>
 </template>
 
@@ -178,24 +182,36 @@ import { ref } from "vue";
 
 import { useInputRef } from "@/hooks/input_validator";
 
+import { normalizeError } from "../utils/helpers";
 import { getMintingData } from "../utils/mintings";
+
 const receiptHash = ref();
 const isValidForm = ref(false);
-const textInput = useInputRef();
+const hashInput = useInputRef();
 const loading = ref(false);
+const noData = ref<string | null>(null);
 const item = ref();
-const infoHeader = ref(["ID", "Farm", "Measured Uptime"]);
-const fixedHeader = ref(["ID", "Farm"]);
-const resourcesHeader = ref(["CU", "SU", "NU", "Cru", "Mru", "Sru", "Hru"]);
-const resourcesFHeader = ref(["CU", "SU", "NU"]);
-const payoutHeader = ref(["TFT Farmed", "Payout Address"]);
-const payoutFHeader = ref(["TFT Received", "TFT Owed", "Additional TFT minted", "Payout Address"]);
+const mintNodeInfoHeaders = ref(["ID", "Farm", "Measured Uptime"]);
+const fixupNodeInfoHeaders = ref(["ID", "Farm"]);
+const mintResourcesHeaders = ref(["CU", "SU", "NU", "CRU", "MRU", "SRU", "HRU"]);
+const fixupResourcesHeaders = ref(["CU", "SU", "NU"]);
+const mintPayoutHeaders = ref(["TFT Farmed", "Payout Address"]);
+const fixupPayoutHeaders = ref(["TFT Received", "TFT Owed", "Additional TFT Minted", "Payout Address"]);
 
+function reset() {
+  item.value = null;
+  noData.value = null;
+}
 async function mintingHash() {
   loading.value = true;
-  item.value = await getMintingData(receiptHash.value);
-  isValidForm.value = false;
-  loading.value = false;
+  reset();
+  try {
+    item.value = await getMintingData(receiptHash.value);
+  } catch (e) {
+    noData.value = normalizeError(e, "Something went wrong while fetching data.");
+  } finally {
+    loading.value = false;
+  }
 }
 </script>
 
