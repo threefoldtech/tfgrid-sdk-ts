@@ -95,7 +95,7 @@ export default {
       loadingPdf.value = true;
       const IS_ENV_MNEMONIC = import.meta.env.VITE_MNEMONIC;
 
-      if (!IS_ENV_MNEMONIC.length) {
+      if (!IS_ENV_MNEMONIC) {
         provider = new ThreefoldConnector();
       }
 

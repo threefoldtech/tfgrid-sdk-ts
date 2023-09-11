@@ -35,8 +35,8 @@ export default class ThreefoldPDFSigner implements IThreefoldProvider {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async __request(data: SignReturn, account?: boolean): Promise<ErrorType> {
-    console.log("Requested form the signer", data, account);
     const requestBody: PDFPostData = {
       pdfUrl: this.props.pdfurl,
       pubkey: data.publicKey,
@@ -45,11 +45,9 @@ export default class ThreefoldPDFSigner implements IThreefoldProvider {
 
     try {
       const response = await axios.post(this.props.dest, requestBody);
-      console.log("From try");
       console.log(response);
       return this.syncErrors(false, "");
     } catch (error: any) {
-      console.log("From catch");
       console.log(error);
       return this.syncErrors(true, error.message);
     }

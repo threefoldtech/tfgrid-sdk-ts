@@ -1,14 +1,18 @@
+import axios from "axios";
 import { type Account, ThreefoldWalletConnectorApi } from "tf-wallet-connector-api";
 
 import { KeypairType, sign, type SignReturn } from "./sign";
-import type { ErrorType, IThreefoldProvider, PDFSignerProps } from "./types";
+import type { ErrorType, IThreefoldProvider, PDFPostData, PDFSignerProps } from "./types";
 
 export default class ThreefoldConnector implements IThreefoldProvider {
   private props: PDFSignerProps = { pdfurl: "", dest: "" };
 
   async use(props: PDFSignerProps): Promise<ErrorType> {
+    console.warn(
+      "Using the connector provider, Please make sure that you installed the Threefold Connector extension.",
+    );
+
     this.props = props;
-    console.log("Used from Connector");
     const isInstalled = async () => {
       return await ThreefoldWalletConnectorApi.isInstalled();
     };
@@ -21,8 +25,6 @@ export default class ThreefoldConnector implements IThreefoldProvider {
   }
 
   async acceptAndSign(pdfData: string, keypairType: KeypairType): Promise<ErrorType> {
-    console.log("Accepted from ThreefoldPDFSigner");
-
     const hasAccess = async () => {
       return await ThreefoldWalletConnectorApi.hasAccess();
     };
@@ -43,8 +45,7 @@ export default class ThreefoldConnector implements IThreefoldProvider {
         return this.syncErrors(true, "Unexpected signing signature.");
       }
 
-      await this.__request(data);
-      return this.syncErrors(false, "");
+      return await this.__request(data, account);
     } else {
       return this.syncErrors(true, "Cannot read the data from the provided PDF.");
     }
@@ -55,8 +56,28 @@ export default class ThreefoldConnector implements IThreefoldProvider {
     return error;
   }
 
-  private async __request(data: SignReturn, account?: Account): Promise<ErrorType> {
-    console.log("Requested form the connector", data, account);
-    return this.syncErrors(false, "");
+  private async __request(data: SignReturn, account?: Account | null): Promise<ErrorType> {
+    if (account) {
+      const requestBody: PDFPostData = {
+        twinid: account?.twinId,
+        pdfUrl: this.props.pdfurl,
+        pubkey: data.publicKey,
+        signature: data.signature,
+      };
+
+      try {
+        const response = await axios.post(this.props.dest, requestBody);
+        console.log(response);
+        return this.syncErrors(false, "");
+      } catch (error: any) {
+        console.log(error);
+        return this.syncErrors(true, error.message);
+      }
+    }
+
+    return this.syncErrors(
+      true,
+      "Failed to load account. Make sure you have installed the ThreeFold Connector extension and activated an account.",
+    );
   }
 }
