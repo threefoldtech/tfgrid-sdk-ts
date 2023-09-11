@@ -54,14 +54,13 @@
 </template>
 
 <script lang="ts">
-import axios from "axios";
 import { onMounted, ref } from "vue";
 import { createLoadingTask, VuePdf } from "vue3-pdfjs";
 import { type VuePdfPropsType } from "vue3-pdfjs/components/vue-pdf/vue-pdf-props";
 
-import { KeypairType, sign, type SignReturn } from "@/utils/sign";
+import { KeypairType } from "@/utils/sign";
 import ThreefoldPDFSigner from "@/utils/ThreefoldPDFSignerScript";
-import { AlertType, type ErrorType, type IThreefoldProvider, type PDFPostData } from "@/utils/types";
+import { AlertType, type ErrorType, type IThreefoldProvider } from "@/utils/types";
 
 import ThreefoldConnector from "../utils/threefoldConnectorScript";
 import CustomAlertComponent from "./CustomAlertComponent.vue";
