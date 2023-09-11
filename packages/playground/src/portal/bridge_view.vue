@@ -1,9 +1,9 @@
 <template>
   <div class="mt-8">
     <v-container class="custom-container">
-      <v-card color="primary" class="my-3 pa-3 text-center">
-        <v-icon width="26">mdi-swap-horizontal</v-icon>
-        <h2>Transfer TFT Across Chains</h2>
+      <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+        <v-icon size="30" class="pr-3">mdi-swap-horizontal</v-icon>
+        <v-card-title class="pa-0" lor="white">Transfer TFT Across Chains</v-card-title>
       </v-card>
       <v-card class="pa-5 my-5 white--text">
         <v-row class="pa-5 text-center">
@@ -42,11 +42,11 @@
   <v-container v-if="openWithdrawDialog">
     <v-dialog transition="dialog-bottom-transition" max-width="1000" v-model="openWithdrawDialog">
       <v-card>
-        <v-toolbar color="primary" dark class="bold-text"> Withdraw TFT </v-toolbar>
-        <v-card-title>
+        <v-toolbar color="primary" dark class="bold-text justify-center"> Withdraw TFT </v-toolbar>
+        <v-card-text>
           Interact with the bridge in order to withdraw your TFT to
           {{ selectedName.charAt(0).toUpperCase() + selectedName.slice(1) }} (withdraw fee is: {{ withdrawFee }} TFT)
-        </v-card-title>
+        </v-card-text>
         <v-card-text>
           <v-form v-model="isValidSwap">
             <v-text-field
