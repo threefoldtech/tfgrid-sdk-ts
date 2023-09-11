@@ -59,7 +59,7 @@ import { createLoadingTask, VuePdf } from "vue3-pdfjs";
 import { type VuePdfPropsType } from "vue3-pdfjs/components/vue-pdf/vue-pdf-props";
 
 import { KeypairType } from "@/utils/sign";
-import ThreefoldPDFSigner from "@/utils/ThreefoldPDFSignerScript";
+import ThreefoldPDFSigner from "@/utils/threefoldPDFSignerScript";
 import { AlertType, type ErrorType, type IThreefoldProvider } from "@/utils/types";
 
 import ThreefoldConnector from "../utils/threefoldConnectorScript";

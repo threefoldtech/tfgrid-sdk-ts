@@ -1,8 +1,7 @@
 import axios from "axios";
-import { validateMnemonic } from "bip39";
 
 import { KeypairType, sign, type SignReturn } from "./sign";
-import type { ErrorType, IThreefoldProvider, PDFPostData, PDFSignerProps } from "./types";
+import { type ErrorType, type IThreefoldProvider, type PDFPostData, type PDFSignerProps } from "./types";
 
 export default class ThreefoldPDFSigner implements IThreefoldProvider {
   private MNEMONIC = import.meta.env.VITE_MNEMONIC;
@@ -15,21 +14,18 @@ export default class ThreefoldPDFSigner implements IThreefoldProvider {
     if (!this.MNEMONIC) {
       return this.syncErrors(true, "Couldn't find a user for the provided mnemonic.");
     }
-
-    const isValidSeeds = validateMnemonic(this.MNEMONIC);
-    console.log("isValidSeeds: ", isValidSeeds);
-    console.info("Provided mnemonic: ", this.MNEMONIC);
-    return this.syncErrors(!isValidSeeds, isValidSeeds ? "" : "Mnemonic doesn't seem to be valid.");
+    return this.syncErrors(false, "");
   }
 
   async acceptAndSign(pdfData: string, keypairType: KeypairType): Promise<ErrorType> {
     console.log("Accepted from ThreefoldPDFSigner");
     if (pdfData) {
-      const data = await sign(pdfData, this.MNEMONIC, keypairType);
-      if (!data.publicKey || !data.signature) {
-        return this.syncErrors(true, "Unexpected signing signature.");
+      try {
+        const data = await sign(pdfData, this.MNEMONIC, keypairType);
+        return await this.__request(data);
+      } catch (error: any) {
+        return this.syncErrors(true, error.message);
       }
-      return await this.__request(data);
     } else {
       return this.syncErrors(true, "Cannot read the data from the provided PDF.");
     }

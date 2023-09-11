@@ -26,5 +26,4 @@ export interface IThreefoldProvider {
   use(props: PDFSignerProps): Promise<ErrorType>;
   acceptAndSign(pdfData: string, keypairType: KeypairType): Promise<ErrorType>;
   syncErrors(isError: boolean, errorMessage: string): ErrorType;
-  // __request(data: SignReturn, account?: any): Promise<ErrorType>;
 }
