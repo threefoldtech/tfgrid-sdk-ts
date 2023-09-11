@@ -82,11 +82,11 @@ export default {
     const submitScript = async () => {
       try {
         const account = await ThreefoldWalletConnectorApi.selectDecryptedAccount(props.network || "main");
-        const signature = await sign(text.value, account?.mnemonic ?? "", KeypairType.sr25519);
+        const { signature, publicKey } = await sign(text.value, account?.mnemonic ?? "", KeypairType.sr25519);
         const response = axios.post(props.dest, {
           content: text.value,
           signature,
-          pubkey: account?.metadata.ssh,
+          pubkey: publicKey,
           twinid: account?.metadata.twinId,
         });
         console.log(response);
