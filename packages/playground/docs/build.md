@@ -5,8 +5,8 @@
 - you can run the script anywhere but make sure the generated config file are placed in [config.js](../config.js)
 
 ```bash
-cd packages/playground
-bash ./scripts/build-env.sh
+cd packages/playground/public
+bash ../scripts/build-env.sh
 ```
 
 ### Required env vars
