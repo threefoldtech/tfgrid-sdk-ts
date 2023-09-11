@@ -54,6 +54,8 @@
                 :loading="loadingTwinIDTransfer"
                 :disabled="!isValidTwinIDTransfer"
                 @click="submitFormTwinID"
+                color="secondary"
+                variant="tonal"
                 >Send</v-btn
               >
             </v-card-actions>
@@ -109,6 +111,8 @@
                 :loading="loadingAddressTransfer"
                 :disabled="!isValidAddressTransfer"
                 @click="submitFormAddress"
+                color="secondary"
+                variant="tonal"
                 >Send</v-btn
               >
             </v-card-actions>
