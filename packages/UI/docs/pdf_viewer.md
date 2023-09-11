@@ -47,14 +47,14 @@ Here's an example of how to use the PDF Signer Web Component in your HTML file:
   </head>
   <body>
     <!-- Use the pdf-signer custom element with required attributes -->
-    <pdf-signer pdfurl="<pdf-url>" dest="<endpoint-url>"></pdf-signer>
+    <pdf-signer pdfurl="<pdf-url>" dest="<endpoint-url>" network="dev"></pdf-signer>
     <!-- Include the PDF Signer component script -->
     <script src="./dist/threefold-ui.umd.js"></script>
   </body>
 </html>
 ```
 
-In the example above, replace `<pdf-url>` and `<endpoint-url>` with the actual URLs for your PDF document and the destination where signed documents should be sent.
+In the example above, replace `<pdf-url>` and `<endpoint-url>` with the actual URLs for your PDF document and the destination where signed documents should be sent, also for the `<network>` should match one of the following networks `[main, test, qa, dev]`.
 
 Feel free to customize the HTML structure and styles to match your application's design and requirements.
 

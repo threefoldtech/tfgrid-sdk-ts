@@ -68,7 +68,7 @@ import LoadingSpinnerComponent from "./LoadingSpinnerComponent.vue";
 
 export default {
   name: "PDFSignerViewComponent",
-  props: ["pdfurl", "dest"],
+  props: ["pdfurl", "dest", "network"],
   components: {
     VuePdf,
     CustomAlertComponent,
@@ -83,7 +83,7 @@ export default {
     const errorMessage = ref<string>("");
     const pdfData = ref<string>("");
     const responseData = ref<string>("");
-    const isAcceptDisabled = ref<boolean>(true);
+    const isAcceptDisabled = ref<boolean>(!import.meta.env.DEV);
     const loadingAcceptBtn = ref<boolean>(false);
 
     let provider: IThreefoldProvider = new ThreefoldPDFSigner();

@@ -1,7 +1,7 @@
 import { KeypairType } from "./sign";
 
 export type PDFPostData = {
-  twinid?: number;
+  twinid?: string | null;
   pdfUrl: string;
   pubkey: string;
   signature: string;
@@ -15,7 +15,15 @@ export enum AlertType {
 export type PDFSignerProps = {
   pdfurl: string;
   dest: string;
+  network: NetworkEnv;
 };
+
+export enum NetworkEnv {
+  main = "main",
+  test = "test",
+  qa = "qa",
+  dev = "dev",
+}
 
 export type ErrorType = {
   isError: boolean;
