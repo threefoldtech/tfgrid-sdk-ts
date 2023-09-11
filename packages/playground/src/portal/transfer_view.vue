@@ -32,6 +32,7 @@
               </input-validator>
 
               <input-validator
+                v-if="!loadingBalance"
                 :value="transferAmount"
                 :rules="[
                   validators.required('Transfer amount is required '),
@@ -45,6 +46,7 @@
                   <v-text-field label="Transfer Amount:" v-bind="props" v-model.number="transferAmount"></v-text-field>
                 </input-tooltip>
               </input-validator>
+              <strong v-else>Loading...</strong>
             </form-validator>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -88,12 +90,13 @@
                 </input-tooltip>
               </input-validator>
               <input-validator
+                v-if="!loadingBalance"
                 :value="transferAmount"
                 :rules="[
                   validators.required('Transfer amount is required '),
                   validators.isNumeric('Amount should be a number.'),
                   validators.min('Amount must be greater than 0', 0.00000000001),
-                  validators.max('Insufficient funds', freeBalance),
+                  validators.max('Insuffient funds', freeBalance),
                 ]"
                 #="{ props }"
               >
@@ -101,6 +104,7 @@
                   <v-text-field label="Transfer Amount:" v-bind="props" v-model.number="transferAmount"></v-text-field>
                 </input-tooltip>
               </input-validator>
+              <strong v-else>Loading...</strong>
             </form-validator>
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -141,7 +145,8 @@ const isValidAddressTransfer = ref(false);
 const receipientAddress = ref("");
 const profile = useProfileManager().profile;
 const senderTwinID = profile!.twinId;
-console.log(senderTwinID);
+const loadingBalance = ref(true);
+
 const gridClient = new GridClient({
   mnemonic: useProfileManager().profile!.mnemonic,
   network: window.env.NETWORK,
@@ -174,8 +179,10 @@ function clearInput() {
   receipientAddress.value = "";
 }
 async function getFreeBalance() {
+  loadingBalance.value = true;
   const balance = await gridClient.balance.getMyBalance();
   freeBalance.value = balance.free;
+  loadingBalance.value = false;
 }
 async function transfer(receipientTwin: Twin) {
   try {
