@@ -142,7 +142,7 @@ onMounted(async () => {
   await getFreeBalance();
 });
 function isSameAddress() {
-  if (receipientAddress.value == profile?.address) {
+  if (receipientAddress.value.trim() == profile?.address) {
     return false;
   }
   return true;
@@ -150,7 +150,7 @@ function isSameAddress() {
 function isValidAddress() {
   const keyring = new Keyring({ type: "sr25519" });
   try {
-    keyring.addFromAddress(receipientAddress.value);
+    keyring.addFromAddress(receipientAddress.value.trim());
 
     return true;
   } catch (error) {
@@ -184,7 +184,7 @@ async function transfer(receipientTwin: Twin) {
   }
 }
 async function submitFormAddress() {
-  const twinId = await gridClient.twins.get_twin_id_by_account_id({ public_key: receipientAddress.value });
+  const twinId = await gridClient.twins.get_twin_id_by_account_id({ public_key: receipientAddress.value.trim() });
   const twinDetails = await gridClient.twins.get({ id: twinId });
   if (twinDetails != null) {
     loadingAddressTransfer.value = true;
