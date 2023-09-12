@@ -50,11 +50,13 @@ export default {
                 console.log(`Current status is ${status.type}`);
                 switch (status.type) {
                   case "Ready":
-                    createToast(` Transaction Submitted`, {
+                    createToast(`Transaction Submitted`, {
                       position: "bottom-right",
                       hideProgressBar: true,
                       toastBackgroundColor: "black",
                       timeout: 5000,
+                      type: "success",
+                      showIcon: true,
                     });
                 }
                 if (status.isFinalized) {
@@ -65,6 +67,8 @@ export default {
                       hideProgressBar: true,
                       toastBackgroundColor: "black",
                       timeout: 5000,
+                      type: "danger",
+                      showIcon: true,
                     });
                     loadingAddTFT.value = false;
                   } else {
@@ -73,11 +77,13 @@ export default {
                       console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
                       if (section === "balances" && method === "Transfer") {
                         loadingAddTFT.value = false;
-                        createToast(` Success!`, {
+                        createToast(`Success!`, {
                           position: "bottom-right",
                           hideProgressBar: true,
-                          toastBackgroundColor: "black",
+                          toastBackgroundColor: "#1aa18f",
                           timeout: 5000,
+                          type: "success",
+                          showIcon: true,
                         });
                         const profile = await loadProfile(client);
                         profileManager.set(profile);
@@ -87,6 +93,8 @@ export default {
                           hideProgressBar: true,
                           toastBackgroundColor: "black",
                           timeout: 5000,
+                          type: "danger",
+                          showIcon: true,
                         });
                         loadingAddTFT.value = false;
                       }
@@ -105,6 +113,8 @@ export default {
                   hideProgressBar: true,
                   toastBackgroundColor: "black",
                   timeout: 5000,
+                  type: "danger",
+                  showIcon: true,
                 },
               );
             });
