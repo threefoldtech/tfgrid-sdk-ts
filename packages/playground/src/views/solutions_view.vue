@@ -190,7 +190,6 @@ a {
 }
 
 .card-opacity {
-  background-color: #7de3c8;
-  opacity: 0.7;
+  background-color: rgba(125, 227, 200, 0.12);
 }
 </style>
