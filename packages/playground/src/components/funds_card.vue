@@ -34,7 +34,6 @@ export default {
         try {
           const client = new GridClient({ mnemonic: profileManager.profile!.mnemonic, network: window.env.NETWORK });
           client.connect();
-          console.log(profileManager.profile?.address as string);
           await client.tfclient.balances
             .getMoreFunds(
               profileManager.profile?.address as string,
@@ -110,7 +109,7 @@ export default {
               );
             });
         } catch (e) {
-          console.log(e);
+          console.log("Error: ", e);
         }
       }
     };
