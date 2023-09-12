@@ -14,7 +14,7 @@
       <v-tooltip>
         <template v-slot:activator="{ isActive, props }">
           <v-btn @click="openInfoLink" icon v-bind="props" v-on="isActive" class="d-flex align-center">
-            <v-icon>mdi-information</v-icon>
+            <v-icon>mdi-information</v-icon>0
           </v-btn>
         </template>
         <span>More information</span>
@@ -24,17 +24,14 @@
 </template>
 
 <script setup lang="ts">
+import { QueryClient } from "@threefold/tfchain_client";
 import { onMounted, ref } from "vue";
-
-import { useProfileManager } from "../stores";
-import { getGrid } from "../utils/grid";
 
 type SwapPrice = {
   currency: string;
   amount: number;
 };
 
-const profileManager = useProfileManager();
 const loading = ref<boolean>(false);
 const swapped = ref(false);
 const prices = ref<SwapPrice[]>([
@@ -55,18 +52,12 @@ onMounted(async () => {
 });
 
 async function getTFTPrice(): Promise<number> {
-  //TODO:
-  const grid = await getGrid(profileManager.profile!);
-  if (grid) {
-    const res = await grid.tfclient.api.query.tftPriceModule.tftPrice();
-    const primitiveValue = Number(res?.toPrimitive());
-    if (!isNaN(primitiveValue)) {
-      return primitiveValue / 1000;
-    } else {
-      return 0;
-    }
-  } else {
-    console.log("Problem");
+  try {
+    const client = new QueryClient(window.env.SUBSTRATE_URL);
+    const res = await client.tftPrice.get();
+    return res;
+  } catch (e) {
+    console.log(e);
     return 0;
   }
 }
