@@ -25,3 +25,4 @@ class Dao {
     });
   }
 }
+export { Dao as dao };
