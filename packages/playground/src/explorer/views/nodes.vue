@@ -91,6 +91,7 @@
                       :disable-sort="true"
                       hide-default-header
                       :hover="true"
+                      @click:row="openSheet"
                       @update:options="onUpdateOptions({ page: $event.page, size: $event.itemsPerPage })"
                     >
                       <template v-slot:headers="{ columns }: any">
@@ -146,6 +147,7 @@
         </v-row>
       </div>
     </div>
+    <NodeDetails :openDetails="openDetails" :node="currentNode" @close-details="() => toggleNodeDetails(false)" />
   </view-layout>
 </template>
 
@@ -160,11 +162,13 @@ import toFixedCsSize from "@/utils/to_fixed_cs_size";
 
 import MultipleFilter from "../components/Common/Filters/MultipleFilter.vue";
 import NodeFilter from "../components/Common/Filters/NodeFilter.vue";
+import NodeDetails from "../components/Nodes/NodeDetails.vue";
 
 export default {
   components: {
     MultipleFilter,
     NodeFilter,
+    NodeDetails,
   },
   setup() {
     // multiple values filter
@@ -215,21 +219,6 @@ export default {
     const activeFilters = computed(() => {
       const keySet = new Set(activeFiltersList.value);
       return drawFiltersFields.filter(filter => keySet.has(filter.label));
-    });
-
-    const createFilter = () => ({ enabled: false, value: [] });
-
-    const fieldsFilter = ref({
-      nodeId: { enabled: true, value: [] },
-      twinId: createFilter(),
-      farmIds: createFilter(),
-      country: createFilter(),
-      farmName: createFilter(),
-      countryFullName: createFilter(),
-      freeHru: createFilter(),
-      freeMru: createFilter(),
-      freeSru: createFilter(),
-      freeIps: createFilter(),
     });
     // ______________
 
@@ -328,6 +317,11 @@ export default {
 
     const requestNodes = async (options: Partial<NodesQuery>) => {
       tableLoading.value = true;
+      for (const option in options) {
+        if (options[option] === 0 || options[option] === "") {
+          delete options[option];
+        }
+      }
       await getNodes(options);
       tableLoading.value = false;
     };
@@ -345,12 +339,28 @@ export default {
     };
     // ______________
 
+    // Node Details
+    const openDetails = ref(false);
+    const currentNode = ref({});
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const openSheet = (_e: any, { item }: any) => {
+      console.log(item);
+
+      currentNode.value = item.raw;
+      toggleNodeDetails(true);
+    };
+
+    const toggleNodeDetails = (val: boolean) => {
+      openDetails.value = val;
+    };
+    // ______________
+
     return {
       // multiple values filter
       drawFiltersFields,
       activeFiltersList,
       activeFilters,
-      fieldsFilter,
       // ______________
       // Switches Filter
       gpuFilter,
@@ -383,6 +393,13 @@ export default {
       // utils
       secondToRedable,
       toFixedCsSize,
+      // ______________
+
+      // Node Details
+      openDetails,
+      currentNode,
+      toggleNodeDetails,
+      openSheet,
       // ______________
     };
   },
