@@ -1,4 +1,5 @@
 export * from "./balances";
+export * from "./dao";
 export * from "./client";
 export * from "./contracts";
 export * from "./farms";
