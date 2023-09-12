@@ -11,37 +11,38 @@ const app: Express = express();
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-interface Payload {
-  twinid?: number;
-  pdfUrl: string;
-  pubkey: string;
-  signature: string;
-}
-
-let payLoad: Payload = {
-  pdfUrl: "",
-  pubkey: "",
-  signature: "",
-};
-
 export enum KeypairType {
   sr25519 = "sr25519",
   ed25519 = "ed25519",
 }
 
-const verify = async (address: string, signature: string, pdfUrl: string, keypairType: KeypairType) => {
+interface Payload {
+  twinid?: number;
+  pdfUrl?: string;
+  pubkey: string;
+  content?: string;
+  signature: string;
+  keypairType: KeypairType;
+}
+
+let payload: Payload = {
+  pubkey: "",
+  signature: "",
+  keypairType: KeypairType.ed25519,
+};
+
+const verify = async (payload: Payload) => {
   try {
-    const response = await axios.get(pdfUrl, { responseType: "arraybuffer" });
-    const pdfBytes = Uint8Array.from(Buffer.from(response.data, "base64"));
-    const hash = MD5(pdfBytes.toString()).toString();
+    const content = Uint8Array.from(Buffer.from(payload.content || "", "base64"));
+    const hash = MD5(content.toString()).toString();
 
     const messageBytes = Uint8Array.from(Buffer.from(hash.toString(), "hex"));
-    const keyring = new Keyring({ type: keypairType });
+    const keyring = new Keyring({ type: payload.keypairType });
 
     await waitReady();
 
-    const key = keyring.addFromAddress(address);
-    const sig = Uint8Array.from(Buffer.from(signature, "hex"));
+    const key = keyring.addFromAddress(payload.pubkey);
+    const sig = Uint8Array.from(Buffer.from(payload.signature, "hex"));
 
     // Verify the signature
     const isValid = key.verify(messageBytes, sig, key.publicKey);
@@ -54,10 +55,19 @@ const verify = async (address: string, signature: string, pdfUrl: string, keypai
 };
 
 app.post("/api/verify", async (req: Request, res: Response) => {
-  payLoad = req.body;
-
+  payload = req.body;
+  let content: Uint8Array = new Uint8Array();
   try {
-    const verified = await verify(payLoad.pubkey, payLoad.signature, payLoad.pdfUrl, KeypairType.ed25519);
+    if (payload.pdfUrl) {
+      const response = await axios.get(payload.pdfUrl, { responseType: "arraybuffer" });
+      content = Uint8Array.from(Buffer.from(response.data, "base64"));
+    } else {
+      content = Uint8Array.from(Buffer.from(payload.content || "", "base64"));
+    }
+
+    payload.content = content.toString();
+    const verified = await verify(payload);
+
     if (verified) {
       res.status(200).json({
         message: "The signature was verified successfully.",
