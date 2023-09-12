@@ -89,8 +89,11 @@
           <v-img :src="baseUrl + 'images/logoTF.png'" width="160px" />
         </v-toolbar-title>
 
-        <v-spacer></v-spacer>
-
+        <v-spacer>
+          <div class="d-flex align-center justify-start">
+            <TftSwapPrice></TftSwapPrice>
+          </div>
+        </v-spacer>
         <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
         <v-divider vertical class="mx-2" />
         <AppTheme />
@@ -249,6 +252,7 @@ import AppTheme from "./components/app_theme.vue";
 import ConnectWalletLanding from "./components/connect_wallet_landing.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
 import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
+import TftSwapPrice from "./components/swap_price.vue";
 import TFNotification from "./components/tf_notification.vue";
 import ProfileManager from "./weblets/profile_manager.vue";
 
@@ -275,6 +279,7 @@ export default {
     AppTheme,
     ConnectWalletLanding,
     AppInfo,
+    TftSwapPrice,
   },
 };
 </script>
