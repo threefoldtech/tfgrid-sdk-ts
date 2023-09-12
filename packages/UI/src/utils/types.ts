@@ -1,8 +1,9 @@
 import { KeypairType } from "./sign";
 
-export type PDFPostData = {
+export type RequestData = {
   twinid?: string | null;
-  pdfUrl: string;
+  pdfUrl?: string;
+  content?: string;
   pubkey: string;
   signature: string;
 };
@@ -12,8 +13,14 @@ export enum AlertType {
   warning = "warning",
 }
 
-export type PDFSignerProps = {
-  pdfurl: string;
+export type AcceptConfig = {
+  scriptContent?: string;
+  pdfData?: string;
+  keypairType: KeypairType;
+};
+
+export type SignProps = {
+  pdfurl?: string;
   dest: string;
   network: NetworkEnv;
 };
@@ -30,8 +37,28 @@ export type ErrorType = {
   errorMessage: string;
 };
 
-export interface IThreefoldProvider {
-  use(props: PDFSignerProps): Promise<ErrorType>;
-  acceptAndSign(pdfData: string, keypairType: KeypairType): Promise<ErrorType>;
-  syncErrors(isError: boolean, errorMessage: string): ErrorType;
+export abstract class ThreefoldProvider {
+  protected props: SignProps = { pdfurl: "", dest: "", network: NetworkEnv.dev };
+  abstract use(props: SignProps): Promise<ErrorType>;
+  abstract acceptAndSign(config: AcceptConfig): Promise<ErrorType>;
+
+  syncErrors(isError: boolean, errorMessage: string): ErrorType {
+    const error: ErrorType = { isError: isError, errorMessage: errorMessage };
+    return error;
+  }
+
+  protected selectNetwork(network: string): NetworkEnv {
+    switch (network) {
+      case "main":
+        return NetworkEnv.main;
+      case "test":
+        return NetworkEnv.test;
+      case "qa":
+        return NetworkEnv.qa;
+      case "dev":
+        return NetworkEnv.dev;
+      default:
+        return NetworkEnv.dev;
+    }
+  }
 }

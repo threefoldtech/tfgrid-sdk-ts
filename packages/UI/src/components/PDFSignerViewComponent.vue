@@ -59,10 +59,10 @@ import { createLoadingTask, VuePdf } from "vue3-pdfjs";
 import { type VuePdfPropsType } from "vue3-pdfjs/components/vue-pdf/vue-pdf-props";
 
 import { KeypairType } from "@/utils/sign";
-import ThreefoldPDFSigner from "@/utils/threefoldPDFSignerScript";
-import { AlertType, type ErrorType, type IThreefoldProvider } from "@/utils/types";
+import threefoldSignerProvider from "@/utils/threefoldSignerProvider";
+import { AlertType, type ErrorType, type ThreefoldProvider } from "@/utils/types";
 
-import ThreefoldConnector from "../utils/threefoldConnectorScript";
+import ThreefoldConnector from "../utils/threefoldConnectorProvider";
 import CustomAlertComponent from "./CustomAlertComponent.vue";
 import LoadingSpinnerComponent from "./LoadingSpinnerComponent.vue";
 
@@ -86,7 +86,7 @@ export default {
     const isAcceptDisabled = ref<boolean>(!import.meta.env.DEV);
     const loadingAcceptBtn = ref<boolean>(false);
 
-    let provider: IThreefoldProvider = new ThreefoldPDFSigner();
+    let provider: ThreefoldProvider = new threefoldSignerProvider();
 
     const pdfSrc = ref<VuePdfPropsType["src"]>(props.pdfurl);
 
@@ -104,18 +104,26 @@ export default {
         return showError(useProvider);
       }
 
-      const loadingTask = createLoadingTask(props.pdfurl);
-      const pdf = await loadingTask.promise;
-      const data = await pdf.getData();
+      try {
+        const loadingTask = createLoadingTask(props.pdfurl);
+        const pdf = await loadingTask.promise;
+        const data = await pdf.getData();
 
-      pdfData.value = data.toString();
-      numOfPages.value = pdf.numPages;
-      loadingPdf.value = false;
+        pdfData.value = data.toString();
+        numOfPages.value = pdf.numPages;
+      } catch (error: any) {
+        showError({ isError: true, errorMessage: error.message });
+      } finally {
+        loadingPdf.value = false;
+      }
     });
 
     const acceptPDF = async () => {
       isAcceptDisabled.value = loadingAcceptBtn.value = true;
-      const accepted = await provider.acceptAndSign(pdfData.value, KeypairType.ed25519);
+      const accepted = await provider.acceptAndSign({
+        pdfData: pdfData.value,
+        keypairType: KeypairType.ed25519,
+      });
       if (accepted.isError) {
         return showError(accepted);
       }

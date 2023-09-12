@@ -2,27 +2,20 @@ import axios from "axios";
 import { type PublicAccount, ThreefoldWalletConnectorApi } from "tf-wallet-connector-api";
 
 import { KeypairType, sign, type SignReturn } from "./sign";
-import { type ErrorType, type IThreefoldProvider, NetworkEnv, type PDFPostData, type PDFSignerProps } from "./types";
+import {
+  type AcceptConfig,
+  type ErrorType,
+  NetworkEnv,
+  type RequestData,
+  type SignProps,
+  ThreefoldProvider,
+} from "./types";
 
-export default class ThreefoldConnector implements IThreefoldProvider {
-  private props: PDFSignerProps = { pdfurl: "", dest: "", network: NetworkEnv.dev };
+export default class ThreefoldConnector extends ThreefoldProvider {
+  private config: AcceptConfig = { keypairType: KeypairType.ed25519 };
+  private network: NetworkEnv = NetworkEnv.main;
 
-  private selectNetwork(network: string): NetworkEnv {
-    switch (network) {
-      case "main":
-        return NetworkEnv.main;
-      case "test":
-        return NetworkEnv.test;
-      case "qa":
-        return NetworkEnv.qa;
-      case "dev":
-        return NetworkEnv.dev;
-      default:
-        return NetworkEnv.dev;
-    }
-  }
-
-  async use(props: PDFSignerProps): Promise<ErrorType> {
+  async use(props: SignProps): Promise<ErrorType> {
     console.warn(
       "Using the connector provider, Please make sure that you installed the Threefold Connector extension.",
     );
@@ -34,15 +27,21 @@ export default class ThreefoldConnector implements IThreefoldProvider {
     }
 
     this.props = props;
-    this.props.network = this.selectNetwork(props.network);
+    this.network = this.selectNetwork(props.network);
 
     return this.syncErrors(false, "");
   }
 
-  async acceptAndSign(pdfData: string, keypairType: KeypairType): Promise<ErrorType> {
-    if (!pdfData) {
-      return this.syncErrors(true, "Cannot read the data from the provided PDF.");
+  async acceptAndSign(config: AcceptConfig): Promise<ErrorType> {
+    if (!config.pdfData && !config.scriptContent) {
+      if (!config.pdfData) {
+        return this.syncErrors(true, "Cannot read the data from the provided PDF.");
+      } else if (!config.scriptContent) {
+        return this.syncErrors(true, "Cannot read the content from the provided script.");
+      }
     }
+
+    this.config = config;
 
     const requestAccess = await ThreefoldWalletConnectorApi.requestAccess();
     if (!requestAccess) {
@@ -50,21 +49,22 @@ export default class ThreefoldConnector implements IThreefoldProvider {
     }
 
     const account: PublicAccount | null = await ThreefoldWalletConnectorApi.selectDecryptedAccount(
-      this.props.network || NetworkEnv.main,
+      this.network || NetworkEnv.main,
     );
 
-    const data = await sign(pdfData, account?.mnemonic ?? "", keypairType);
+    let data: SignReturn;
+
+    if (config.pdfData) {
+      data = await sign(config.pdfData, account?.mnemonic ?? "", config.keypairType);
+    } else {
+      data = await sign(config.scriptContent!, account?.mnemonic ?? "", config.keypairType);
+    }
 
     if (!data.publicKey || !data.signature) {
       return this.syncErrors(true, "Unexpected signing signature.");
     }
 
     return await this.__request(data, account);
-  }
-
-  syncErrors(isError: boolean, errorMessage: string): ErrorType {
-    const error: ErrorType = { isError: isError, errorMessage: errorMessage };
-    return error;
   }
 
   private async __request(data: SignReturn, account?: PublicAccount | null): Promise<ErrorType> {
@@ -75,11 +75,12 @@ export default class ThreefoldConnector implements IThreefoldProvider {
       );
     }
 
-    const requestBody: PDFPostData = {
+    const requestBody: RequestData = {
       pdfUrl: this.props.pdfurl,
       pubkey: data.publicKey,
+      content: this.config.scriptContent,
       signature: data.signature,
-      twinid: account?.metadata[this.props.network].twinId,
+      twinid: account?.metadata[this.network].twinId,
     };
 
     try {
