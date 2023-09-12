@@ -1,5 +1,5 @@
+import { type PublicAccount, ThreefoldWalletConnectorApi } from "@threefold/extension_api";
 import axios from "axios";
-import { type PublicAccount, ThreefoldWalletConnectorApi } from "tf-wallet-connector-api";
 
 import { KeypairType, sign, type SignReturn } from "./sign";
 import {

@@ -22,7 +22,7 @@ $ tfgrid-sdk-ts/packages/UI: yarn build-only
 
 ```sh
 $ tfgrid-sdk-ts/packages/UI: cd ...
-$ tfgrid-sdk-ts: cp packages/UI/dist packages/UI/src/examples/html-tag-example/dist
+$ tfgrid-sdk-ts: cp packages/UI/dist packages/UI/src/examples/html-tag-example/
 ```
 
 4. Run the `index.html` file in a local server and navigate to it. This will allow you to test and interact with the `<pdf-signer />` and `<script-editor />` tags within your web application.

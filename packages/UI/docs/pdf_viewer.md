@@ -44,8 +44,7 @@ Here's an example of how to use the PDF Signer Web Component in your HTML file:
     <title>Threefold UI</title>
 
     <!-- Include the style and logo files -->
-    <link rel="stylesheet" href="./dist/threefold-ui-style.css" />
-    <link rel="icon" href="./dist/favicon.ico" />
+    <link rel="stylesheet" href="./style.css" />
   </head>
 
   <body>
@@ -56,7 +55,7 @@ Here's an example of how to use the PDF Signer Web Component in your HTML file:
       network="dev"
     />
     <!-- Include the PDF Signer component script -->
-    <script src="./dist/threefold-ui.umd.js"></script>
+    <script src="./pdf.js"></script>
   </body>
 </html>
 ```
