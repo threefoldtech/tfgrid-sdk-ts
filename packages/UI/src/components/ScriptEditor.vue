@@ -1,11 +1,8 @@
 <template>
   <div>
-    <div v-if="!(isInstalled && hasAccess)">
-      <CustomAlertComponent
-        message="Please make sure to install the TF Wallet extention and give access to the website before submitting the script."
-        title="Be Warned"
-        :_type="alertType.warning"
-      />
+    <!-- Error Alert Component -->
+    <div v-if="isError" class="mt-4">
+      <CustomAlertComponent :message="errorMessage" title="Response Error" :_type="alertType.error" />
     </div>
     <form class="container mx-auto" @submit.prevent="submitScript">
       <div class="font-sans hover:font-sans flex my-4 text-lg relative">
@@ -44,12 +41,12 @@
 </template>
 
 <script lang="ts">
-import axios from "axios";
-import { ThreefoldWalletConnectorApi } from "tf-wallet-connector-api";
 import { onMounted, ref } from "vue";
 
-import { KeypairType, sign } from "../utils/sign";
-import { AlertType } from "../utils/types";
+import { KeypairType } from "../utils/sign";
+import ThreefoldConnector from "../utils/threefoldConnectorProvider";
+import ThreefoldPDFSigner from "../utils/threefoldSignerProvider";
+import { AlertType, type ErrorType, type ThreefoldProvider } from "../utils/types";
 import CustomAlertComponent from "./CustomAlertComponent.vue";
 
 export default {
@@ -62,12 +59,27 @@ export default {
     const alertType = AlertType;
     const text = ref(""); // Store the textarea content
     const lines = ref(["1"]); // Store lines for line numbers
-    const isInstalled = ref();
-    const hasAccess = ref();
+    const isError = ref<boolean>(false);
+    const errorMessage = ref();
+    let provider: ThreefoldProvider = new ThreefoldPDFSigner();
+
     onMounted(async () => {
-      isInstalled.value = await ThreefoldWalletConnectorApi.isInstalled();
-      hasAccess.value = await ThreefoldWalletConnectorApi.hasAccess();
+      const IS_ENV_MNEMONIC = import.meta.env.VITE_MNEMONIC;
+
+      if (!IS_ENV_MNEMONIC) {
+        provider = new ThreefoldConnector();
+      }
+
+      const useProvider = await provider.use(props);
+      if (useProvider.isError) {
+        return showError(useProvider);
+      }
     });
+
+    const showError = (error: ErrorType): ErrorType => {
+      errorMessage.value = error.errorMessage;
+      return error;
+    };
 
     const copyToClipboard = () => {
       navigator.clipboard.writeText(text.value || "");
@@ -81,27 +93,21 @@ export default {
 
     const submitScript = async () => {
       try {
-        const account = await ThreefoldWalletConnectorApi.selectDecryptedAccount(props.network || "main");
-        const { signature, publicKey } = await sign(text.value, account?.mnemonic ?? "", KeypairType.sr25519);
-        const response = axios.post(props.dest, {
-          content: text.value,
-          signature,
-          pubkey: publicKey,
-          twinid: account?.metadata.twinId,
+        await provider.acceptAndSign({
+          scriptContent: text.value,
+          keypairType: KeypairType.ed25519,
         });
-        console.log(response);
-      } catch (error) {
-        console.log(error);
-        throw new Error("Something went wrong while submitting the script.");
+      } catch (error: any) {
+        showError({ isError: true, errorMessage: error.message });
       }
     };
 
     return {
-      isInstalled,
-      hasAccess,
       text,
       alertType,
       lines,
+      errorMessage,
+      isError,
       copyToClipboard,
       updateLines,
       submitScript,
