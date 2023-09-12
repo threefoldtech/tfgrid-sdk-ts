@@ -3,6 +3,7 @@ import { Client } from "@threefold/tfchain_client";
 import { KeypairType } from "../../zos/deployment";
 import { TFBalances } from "./balances";
 import { TFContracts } from "./contracts";
+import { TFDao } from "./dao";
 import { TFKVStore } from "./kvstore";
 import { TFTermsAndConditions } from "./terms_and_conditions";
 import { TFTPrice } from "./tftPrice";
@@ -14,6 +15,7 @@ class TFClient extends Client {
   tftPrice: TFTPrice = new TFTPrice(this);
   twins: TFTwins = new TFTwins(this);
   kvStore: TFKVStore = new TFKVStore(this);
+  dao: TFDao = new TFDao(this);
   termsAndConditions: TFTermsAndConditions = new TFTermsAndConditions(this);
 
   constructor(
