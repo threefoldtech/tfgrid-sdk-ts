@@ -35,7 +35,7 @@
         </VBtn>
       </FormValidator>
     </v-form>
-    <v-container class="mt-8" v-if="item && item.type == 'MINTING'">
+    <v-container class="mt-8" v-if="item && item.Minting">
       <v-card>
         <v-card-title class="font-weight-bold bg-primary">Node Info</v-card-title>
         <v-list class="custom-list">
@@ -46,11 +46,15 @@
               </v-list-item>
             </v-col>
             <v-col cols="10">
-              <v-list-item> {{ item.node_id }} ({{ item.node_type }})</v-list-item>
-              <v-list-item> {{ item.farm_name }} ({{ item.farm_id }})</v-list-item>
+              <v-list-item> {{ item.Minting.node_id }} ({{ item.Minting.node_type }})</v-list-item>
+              <v-list-item> {{ item.Minting.farm_name }} ({{ item.Minting.farm_id }})</v-list-item>
               <v-list-item>
-                {{ (item.measured_uptime / (3600 * 24)).toFixed(2) }} days ({{
-                  ((100 * item.measured_uptime) / (item.period.end - item.period.start)).toFixed(2)
+                {{ (item.Minting.measured_uptime / (3600 * 24)).toFixed(2) }}
+                days ({{
+                  (
+                    (100 * item.Minting.measured_uptime) /
+                    (item.Minting.period.end - item.Minting.period.start)
+                  ).toFixed(2)
                 }}%)
               </v-list-item>
             </v-col>
@@ -68,19 +72,20 @@
               </v-list-item>
             </v-col>
             <v-col cols="10">
-              <v-list-item> {{ item.cu.toFixed(2) }}</v-list-item>
-              <v-list-item> {{ item.su.toFixed(2) }}</v-list-item>
+              <v-list-item> {{ item.Minting.cloud_units.cu.toFixed(2) }}</v-list-item>
+              <v-list-item> {{ item.Minting.cloud_units.su.toFixed(2) }}</v-list-item>
               <v-list-item>
-                {{ item.nu.toFixed(2) }}
+                {{ item.Minting.cloud_units.nu.toFixed(2) }}
               </v-list-item>
-              <v-list-item v-if="item.cru && item.cru < 0.1">
-                {{ (item.cru * 1024 ** 3).toFixed(0) }} VCPU
+              <v-list-item v-if="item.Minting.resource_units.cru && item.Minting.resource_units.cru < 0.1">
+                {{ (item.Minting.resource_units.cru * 1024 ** 3).toFixed(0) }}
+                VCPU
               </v-list-item>
-              <v-list-item v-else> {{ item.cru }} VCpu </v-list-item>
+              <v-list-item v-else> {{ item.Minting.resource_units.cru }} VCpu </v-list-item>
 
-              <v-list-item> {{ item.mru.toFixed(3) }} GB </v-list-item>
-              <v-list-item> {{ item.sru.toFixed(3) }} GB </v-list-item>
-              <v-list-item> {{ item.hru.toFixed(3) }} GB </v-list-item>
+              <v-list-item> {{ item.Minting.resource_units.mru.toFixed(3) }} GB </v-list-item>
+              <v-list-item> {{ item.Minting.resource_units.sru.toFixed(3) }} GB </v-list-item>
+              <v-list-item> {{ item.Minting.resource_units.hru.toFixed(3) }} GB </v-list-item>
             </v-col>
           </v-row>
         </v-list>
@@ -97,10 +102,10 @@
             </v-col>
             <v-col cols="10">
               <v-list-item>
-                {{ item.tft.toFixed(7) }} TFT ({{ item.musd.toFixed(3) }}$ at
-                {{ item.tft_connection_price.toFixed(3) }}$/TFT)</v-list-item
+                {{ item.Minting.reward.tft.toFixed(7) }} TFT ({{ item.Minting.reward.musd.toFixed(3) }}$ at
+                {{ item.Minting.tft_connection_price.toFixed(3) }}$/TFT)</v-list-item
               >
-              <v-list-item> {{ item.stellar_payout_address }}</v-list-item>
+              <v-list-item> {{ item.Minting.stellar_payout_address }}</v-list-item>
             </v-col>
           </v-row>
         </v-list>
@@ -136,16 +141,16 @@
             </v-col>
             <v-col cols="10">
               <v-list-item>
-                {{ item.cu.toFixed(2) }} | {{ item.correct_cloud_units.cu.toFixed(2) }} |
-                {{ item.fixup_cloud_units.cu.toFixed(2) }}</v-list-item
+                {{ item.Fixup.minted_cloud_units.cu.toFixed(2) }} | {{ item.Fixup.correct_cloud_units.cu.toFixed(2) }} |
+                {{ item.Fixup.fixup_cloud_units.cu.toFixed(2) }}</v-list-item
               >
               <v-list-item>
-                {{ item.su.toFixed(2) }} | {{ item.correct_cloud_units.su.toFixed(2) }} |
-                {{ item.fixup_cloud_units.su.toFixed(2) }}</v-list-item
+                {{ item.Fixup.minted_cloud_units.su.toFixed(2) }} | {{ item.Fixup.correct_cloud_units.su.toFixed(2) }} |
+                {{ item.Fixup.fixup_cloud_units.cu.toFixed(2) }}</v-list-item
               >
               <v-list-item>
-                {{ item.nu.toFixed(2) }} | {{ item.correct_cloud_units.nu.toFixed(2) }} |
-                {{ item.fixup_cloud_units.nu.toFixed(2) }}</v-list-item
+                {{ item.Fixup.minted_cloud_units.nu.toFixed(2) }} | {{ item.Fixup.correct_cloud_units.nu.toFixed(2) }} |
+                {{ item.Fixup.fixup_cloud_units.cu.toFixed(2) }}</v-list-item
               >
             </v-col>
           </v-row>
@@ -161,10 +166,10 @@
               </v-list-item>
             </v-col>
             <v-col cols="10">
-              <v-list-item> {{ item.minted_tft.toFixed(7) }} TFT</v-list-item>
-              <v-list-item> {{ item.correct_tft.toFixed(7) }} TFT</v-list-item>
-              <v-list-item> {{ item.fixup_tft.toFixed(7) }} TFT</v-list-item>
-              <v-list-item> {{ item.stellar_payout_address }}</v-list-item>
+              <v-list-item> {{ item.Fixup.minted_tft.toFixed(7) }} TFT</v-list-item>
+              <v-list-item> {{ item.Fixup.correct_tft.toFixed(7) }} TFT</v-list-item>
+              <v-list-item> {{ item.Fixup.tft.toFixed(7) }} TFT</v-list-item>
+              <v-list-item> {{ item.Fixup.stellar_payout_address }}</v-list-item>
             </v-col>
           </v-row>
         </v-list>
