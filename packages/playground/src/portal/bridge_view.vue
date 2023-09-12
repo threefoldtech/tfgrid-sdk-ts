@@ -106,7 +106,7 @@ const selectedItem = ref(items.value[0]);
 const openDepositDialog = ref(false);
 const openWithdrawDialog = ref(false);
 const selectedName = ref("");
-const withdrawFee = ref("");
+const withdrawFee = ref(0);
 const isValidSwap = ref(false);
 const target = ref("");
 const targetError = ref("");
@@ -117,7 +117,7 @@ const freeBalance = ref(0);
 const loadingWithdraw = ref(false);
 const depositWallet = ref("");
 const qrCodeText = ref("");
-const depositFee = ref("");
+const depositFee = ref(0);
 
 onMounted(async () => {
   selectedName.value = items.value.filter(item => item.id === selectedItem.value.id)[0].name;
@@ -126,12 +126,11 @@ onMounted(async () => {
   try {
     const grid = await getGrid(profileManager.profile!);
     if (grid) {
-      grid.connect();
-      const WithdrawFee = await grid.tfclient.tftBridge.GetWithdrawFee();
-      withdrawFee.value = WithdrawFee as string;
+      const WithdrawFee = await grid.tfclient.tftBridge.getWithdrawFee();
+      withdrawFee.value = WithdrawFee;
 
-      const DepositFee = await grid.tfclient.tftBridge.GetDepositFee();
-      depositFee.value = DepositFee as string;
+      const DepositFee = await grid.tfclient.tftBridge.getDepositFee();
+      depositFee.value = DepositFee;
 
       const balance = await loadBalance(grid);
       freeBalance.value = balance.free;

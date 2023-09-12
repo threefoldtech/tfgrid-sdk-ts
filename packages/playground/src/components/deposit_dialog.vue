@@ -49,6 +49,7 @@
 
 <script setup lang="ts">
 import { GridClient } from "@threefold/grid_client";
+import { Decimal } from "decimal.js";
 import { createToast } from "mosha-vue-toastify";
 import QrcodeVue from "qrcode.vue";
 import { onBeforeUnmount, onMounted, ref } from "vue";
@@ -65,7 +66,7 @@ const props = defineProps({
   selectedName: String,
   depositWallet: String,
   qrCodeText: String,
-  depositFee: String,
+  depositFee: Number,
   openDepositDialog: Boolean,
   twinId: Number,
 });
@@ -81,7 +82,9 @@ onMounted(async () => {
     );
 
     if (destroyed) return;
-    createToast(`You have received ${receivedDeposit / 10000000} TFT`, {
+    const DecimalDeposit = new Decimal(receivedDeposit);
+    const divisor = new Decimal(10000000);
+    createToast(`You have received ${DecimalDeposit.dividedBy(divisor)} TFT`, {
       position: "bottom-right",
       hideProgressBar: true,
       toastBackgroundColor: "black",

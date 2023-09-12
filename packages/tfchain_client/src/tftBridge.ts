@@ -39,15 +39,15 @@ class QueryTFTBridge {
   }
 
   @checkConnection
-  async GetWithdrawFee(): Promise<string> {
+  async getWithdrawFee(): Promise<any> {
     const fee = await this.client.api.query.tftBridgeModule.withdrawFee();
-    return fee.toString();
+    return fee.toPrimitive();
   }
 
   @checkConnection
-  async GetDepositFee(): Promise<string> {
+  async getDepositFee(): Promise<any> {
     const fee = await this.client.api.query.tftBridgeModule.depositFee();
-    return fee.toString();
+    return fee.toPrimitive();
   }
 }
 

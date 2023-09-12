@@ -8,18 +8,18 @@ class Bridge extends TFTBridge {
     return await super.withdraw({ amount: decimalAmountInTFT, target: options.target });
   }
 
-  async GetWithdrawFee(): Promise<string> {
-    const fee = await super.GetWithdrawFee();
+  async getWithdrawFee(): Promise<number> {
+    const fee = await super.getWithdrawFee();
     const decimalAmount = new Decimal(fee.toString());
     const convertedFee = decimalAmount.div(10 ** 7).toNumber();
-    return convertedFee.toString();
+    return convertedFee;
   }
 
-  async GetDepositFee(): Promise<string> {
-    const fee = await super.GetDepositFee();
+  async getDepositFee(): Promise<number> {
+    const fee = await super.getDepositFee();
     const decimalAmount = new Decimal(fee.toString());
     const convertedFee = decimalAmount.div(10 ** 7).toNumber();
-    return convertedFee.toString();
+    return convertedFee;
   }
 }
 
