@@ -28,7 +28,6 @@ export interface DaoVoteOptions {
   farmId: string;
   hash: any;
   approve: boolean;
-  callback: any;
 }
 class QueryDao {
   constructor(public client: QueryClient) {
@@ -129,7 +128,7 @@ class Dao extends QueryDao {
     const nonce = await this.client.api.rpc.system.accountNextIndex(options.address);
     return this.client.api.tx.dao
       .vote(options.farmId, options.hash, options.approve)
-      .signAndSend(this.client.keypair, { nonce }, options.callback);
+      .signAndSend(this.client.keypair, { nonce });
   }
 }
 export { Dao, QueryDao };

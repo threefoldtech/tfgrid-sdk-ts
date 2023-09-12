@@ -378,7 +378,12 @@ class KVStoreRemoveModel {
 class KVStoreBatchRemoveModel {
   @Expose() @ArrayNotEmpty() @IsString({ each: true }) keys: string[];
 }
-
+class DaoVoteModel {
+  @Expose() @IsString() @IsNotEmpty() address: string;
+  @Expose() @IsString() @IsNotEmpty() farmId: string;
+  @Expose() @IsBoolean() approve: boolean;
+  @Expose() @IsNotEmpty() hash: any;
+}
 class BalanceGetModel {
   @Expose() @IsString() @IsNotEmpty() address: string;
 }
@@ -656,6 +661,7 @@ export {
   AlgorandCreateTransactionModel,
   AlgorandTransferModel,
   DiskModel,
+  DaoVoteModel,
   NetworkModel,
   MachineModel,
   MachinesModel,
