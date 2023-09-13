@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "module": "ES2015",
+    "moduleResolution": "node",
+    "baseUrl": "./src",
+    "outDir": "./dist",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "lib": ["es2019", "DOM"]
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "tests"]
+}
