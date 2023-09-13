@@ -89,6 +89,8 @@ onMounted(async () => {
       hideProgressBar: true,
       toastBackgroundColor: "black",
       timeout: 5000,
+      showIcon: true,
+      type: "success",
     });
     const profile = await loadProfile(client);
     profileManager.set(profile);
@@ -100,6 +102,8 @@ onMounted(async () => {
       hideProgressBar: true,
       toastBackgroundColor: "red",
       timeout: 5000,
+      showIcon: true,
+      type: "danger",
     });
     closeDialog();
   }

@@ -212,6 +212,8 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
       hideProgressBar: true,
       toastBackgroundColor: "black",
       timeout: 5000,
+      showIcon: true,
+      type: "success",
     });
   } catch (e) {
     console.log("Error withdrawing, Error: ", e);
@@ -224,6 +226,8 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
       hideProgressBar: true,
       toastBackgroundColor: "red",
       timeout: 5000,
+      showIcon: true,
+      type: "danger",
     });
   }
 }
