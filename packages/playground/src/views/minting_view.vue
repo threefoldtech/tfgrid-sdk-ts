@@ -123,8 +123,8 @@
               </v-list-item>
             </v-col>
             <v-col cols="10">
-              <v-list-item> {{ item.node_id }}</v-list-item>
-              <v-list-item> {{ item.farm_id }}</v-list-item>
+              <v-list-item> {{ item.Fixup.node_id }}</v-list-item>
+              <v-list-item> {{ item.Fixup.farm_id }}</v-list-item>
             </v-col>
           </v-row>
         </v-list>
@@ -166,9 +166,9 @@
               </v-list-item>
             </v-col>
             <v-col cols="10">
-              <v-list-item> {{ item.Fixup.minted_tft.toFixed(7) }} TFT</v-list-item>
-              <v-list-item> {{ item.Fixup.correct_tft.toFixed(7) }} TFT</v-list-item>
-              <v-list-item> {{ item.Fixup.tft.toFixed(7) }} TFT</v-list-item>
+              <v-list-item> {{ item.Fixup.minted_reward.tft.toFixed(7) }} TFT</v-list-item>
+              <v-list-item> {{ item.Fixup.correct_reward.tft.toFixed(7) }} TFT</v-list-item>
+              <v-list-item> {{ item.Fixup.fixup_reward.tft.toFixed(7) }} TFT</v-list-item>
               <v-list-item> {{ item.Fixup.stellar_payout_address }}</v-list-item>
             </v-col>
           </v-row>

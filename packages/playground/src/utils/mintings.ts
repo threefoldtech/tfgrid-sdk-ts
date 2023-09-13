@@ -1,26 +1,49 @@
+interface periodInterface {
+  start: number;
+  end: number;
+}
+
+interface cloudUnitsInterface {
+  cu: number;
+  su: number;
+  nu: number;
+}
+
+interface rewardInterface {
+  tft: number;
+  musd: number;
+}
+
+interface recourcesUnitesInterface {
+  cru: number;
+  mru: number;
+  hru: number;
+  sru: number;
+}
 export interface receiptInterface {
   farm_id: number;
   node_id: number;
-  period: object;
+  period: periodInterface;
   stellar_payout_address: string;
 }
+
 interface Minting extends receiptInterface {
-  cloud_units: object;
+  cloud_units: cloudUnitsInterface;
   farm_name: string;
   measured_uptime: number;
   node_type: string;
-  resource_units: object;
-  reward: object;
+  resource_units: recourcesUnitesInterface;
+  reward: rewardInterface;
   tft_connection_price: number;
 }
 
 interface Fixup extends receiptInterface {
-  correct_cloud_units: object;
-  correct_reward: object;
-  fixup_cloud_units: object;
-  fixup_reward: object;
-  minted_cloud_units: object;
-  minted_reward: object;
+  correct_cloud_units: cloudUnitsInterface;
+  correct_reward: rewardInterface;
+  fixup_cloud_units: cloudUnitsInterface;
+  fixup_reward: rewardInterface;
+  minted_cloud_units: cloudUnitsInterface;
+  minted_reward: rewardInterface;
 }
 
 export async function getMintingData(hash: number) {
