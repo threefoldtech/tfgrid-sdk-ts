@@ -173,8 +173,8 @@ class Client {
   }
   waitForOpenConnection() {
     return new Promise((resolve, reject) => {
-      const maxNumberOfAttempts = 10;
-      const intervalTime = 1000; //ms
+      const maxNumberOfAttempts = 20;
+      const intervalTime = 500; //ms
 
       let currentAttempt = 0;
       const interval = setInterval(() => {
