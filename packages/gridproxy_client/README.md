@@ -1,21 +1,15 @@
-## Introduction
+# gridproxy_client
 
-gridproxy_client help to interact with gridproxy based on network.
+This a Typescript client to communicate with GridProxy based on the network.
 
 ## Installation
 
-- **Prerequisite**
+```bash
+yarn install
+```
 
-  - Nodejs 16^
-  - yarn
+## Building
 
-  > For troubleshooting please checkout this file [troubleshooting](./docs/config.md)
-
-- **Clone the repository & Install Dependencies**
-
-  ```bash
-  git clone https://github.com/threefoldtech/tfgrid-sdk-ts.git
-  cd tfgrid-sdk-ts
-  yarn install
-  make build
-  ```
+```bash
+yarn build
+```
