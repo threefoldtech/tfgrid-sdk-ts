@@ -55,7 +55,6 @@
     "packages/weblets/playground/public/build/elements/*",
     "packages/stats/public/build/*",
     "*.config.*",
-    "*global.css",
-    // "packages/gridproxy_client"
+    "*global.css"
   ]
 }
