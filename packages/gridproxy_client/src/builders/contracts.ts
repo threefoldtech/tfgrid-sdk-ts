@@ -73,5 +73,4 @@ export class ContractsBuilder extends AbstractBuilder<ContractsQuery> {
     });
   }
 }
-
 export interface ContractsBuilder extends BuilderMethods<ContractsQuery, ContractsBuilder> {}

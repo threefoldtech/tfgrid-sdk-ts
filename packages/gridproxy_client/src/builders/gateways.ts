@@ -89,5 +89,4 @@ export class GatewayBuilder extends AbstractBuilder<GatewaysQuery> {
     });
   }
 }
-
 export interface GatewayBuilder extends BuilderMethods<GatewaysQuery, GatewayBuilder> {}

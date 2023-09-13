@@ -69,5 +69,4 @@ export class FarmsBuilder extends AbstractBuilder<FarmsQuery> {
     });
   }
 }
-
 export interface FarmsBuilder extends BuilderMethods<FarmsQuery, FarmsBuilder> {}
