@@ -56,6 +56,6 @@
     "packages/stats/public/build/*",
     "*.config.*",
     "*global.css",
-    "packages/gridproxy_client"
+    // "packages/gridproxy_client"
   ]
 }
