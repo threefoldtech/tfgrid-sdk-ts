@@ -43,6 +43,7 @@
           />
           <IconActionBtn
             tooltip="Admin Panel"
+            color="anchor"
             icon="mdi-view-dashboard"
             :href="'http://captain.' + item.value[0].env.CAPROVER_ROOT_DOMAIN"
           />
@@ -66,6 +67,7 @@
           <IconActionBtn
             tooltip="Visit"
             icon="mdi-web"
+            color="anchor"
             :href="'https://' + item.value[0].env.PEERTUBE_WEBSERVER_HOSTNAME"
           />
         </template>
@@ -76,7 +78,12 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Visit" icon="mdi-web" :href="'https://' + item.value[0].env.FUNKWHALE_HOSTNAME" />
+          <IconActionBtn
+            tooltip="Visit"
+            icon="mdi-web"
+            color="anchor"
+            :href="'https://' + item.value[0].env.FUNKWHALE_HOSTNAME"
+          />
         </template>
 
         <template #Taiga-actions="{ item }">
@@ -87,10 +94,16 @@
           />
           <IconActionBtn
             tooltip="Admin Panel"
+            color="anchor"
             icon="mdi-view-dashboard"
             :href="'http://' + item.value[0].env.DOMAIN_NAME + '/admin/'"
           />
-          <IconActionBtn tooltip="Visit" icon="mdi-web" :href="'https://' + item.value[0].env.DOMAIN_NAME" />
+          <IconActionBtn
+            tooltip="Visit"
+            icon="mdi-web"
+            color="anchor"
+            :href="'https://' + item.value[0].env.DOMAIN_NAME"
+          />
         </template>
 
         <template #Presearch-actions="{ item }">
@@ -107,7 +120,7 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Visit" color="white" icon="mdi-web" :href="item.value[0].env.SITE_URL" />
+          <IconActionBtn tooltip="Visit" color="anchor" icon="mdi-web" :href="item.value[0].env.SITE_URL" />
         </template>
 
         <template #Discourse-actions="{ item }">
@@ -116,7 +129,12 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Visit" icon="mdi-web" :href="'https://' + item.value[0].env.DISCOURSE_HOSTNAME" />
+          <IconActionBtn
+            tooltip="Visit"
+            icon="mdi-web"
+            color="anchor"
+            :href="'https://' + item.value[0].env.DISCOURSE_HOSTNAME"
+          />
         </template>
 
         <template #Freeflow-actions="{ item }">
@@ -125,7 +143,12 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Visit" icon="mdi-web" :href="'https://' + item.value[0].env.DIGITALTWIN_APPID" />
+          <IconActionBtn
+            tooltip="Visit"
+            icon="mdi-web"
+            color="anchor"
+            :href="'https://' + item.value[0].env.DIGITALTWIN_APPID"
+          />
         </template>
 
         <template #Casperlabs-actions="{ item }">
@@ -134,7 +157,12 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Visit" icon="mdi-web" :href="'https://' + item.value[0].env.CASPERLABS_HOSTNAME" />
+          <IconActionBtn
+            tooltip="Visit"
+            icon="mdi-web"
+            color="anchor"
+            :href="'https://' + item.value[0].env.CASPERLABS_HOSTNAME"
+          />
         </template>
 
         <template #Owncloud-actions="{ item }">
@@ -143,7 +171,12 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Visit" icon="mdi-web" :href="'https://' + item.value[0].env.OWNCLOUD_DOMAIN" />
+          <IconActionBtn
+            tooltip="Visit"
+            icon="mdi-web"
+            color="anchor"
+            :href="'https://' + item.value[0].env.OWNCLOUD_DOMAIN"
+          />
         </template>
 
         <template #Nextcloud-actions="{ item }">
@@ -155,6 +188,7 @@
           <IconActionBtn
             tooltip="Open Nextcloud"
             icon="mdi-web"
+            color="anchor"
             :href="'https://' + item.value[0].env.NEXTCLOUD_DOMAIN + ':8443'"
           />
         </template>
@@ -168,6 +202,7 @@
           <IconActionBtn
             tooltip="Visit"
             icon="mdi-web"
+            color="anchor"
             :href="'https://' + item.value[0].env.SUBSQUID_WEBSERVER_HOSTNAME + '/graphql'"
           />
         </template>
@@ -189,6 +224,7 @@
           <IconActionBtn
             tooltip="Visit"
             icon="mdi-web"
+            color="anchor"
             :href="
               'http://' +
               (item.value[0].publicIP?.ip
@@ -206,6 +242,7 @@
           />
           <IconActionBtn
             tooltip="Admin Panel"
+            color="anchor"
             icon="mdi-view-dashboard"
             :href="
               'http://' +
@@ -222,9 +259,10 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Visit" color="white" icon="mdi-web" :href="'https://' + item.value[0].env.WP_URL" />
+          <IconActionBtn tooltip="Visit" color="anchor" icon="mdi-web" :href="'https://' + item.value[0].env.WP_URL" />
           <IconActionBtn
             tooltip="Admin Panel"
+            color="anchor"
             icon="mdi-view-dashboard"
             :href="'https://' + item.value[0].env.WP_URL + '/wp-admin'"
           />
