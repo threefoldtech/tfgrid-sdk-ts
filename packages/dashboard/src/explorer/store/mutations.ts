@@ -51,7 +51,7 @@ export function fillNodesFields(state: IState, node: any, farms: any): INode {
     totalPublicIPs: farms.find((farm: any) => farm.farmId === node.farmId)?.publicIps.length,
     freePublicIPs: farms
       .find((farm: any) => farm.farmId === node.farmId)
-      ?.publicIps.filter((ip: any) => ip.contractId === 0).length,
+      ?.publicIps.filter((ip: any) => ip.contract_id === 0).length,
     hru: node.total_resources.hru,
     sru: node.total_resources.sru,
     cru: node.total_resources.cru,
