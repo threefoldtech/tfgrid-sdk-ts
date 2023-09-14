@@ -1,4 +1,35 @@
 <template>
+  <div class="hint mb-2">
+    <v-alert type="info" variant="tonal">
+      Node statuses are updated every 90 minutes. For a realtime status, please click on the row.
+    </v-alert>
+  </div>
+  <v-expansion-panels>
+    <v-expansion-panel>
+      <v-expansion-panel-title>
+        <template v-slot:default="{ expanded }">
+          <v-row no-gutters>
+            <v-col cols="4" class="d-flex justify-start"> Filters </v-col>
+            <v-col cols="8" class="text-grey">
+              <v-fade-transition leave-absolute>
+                <span v-if="expanded" key="0"> Enter a name for the trip </span>
+                <span v-else key="1"> Test </span>
+              </v-fade-transition>
+            </v-col>
+            <v-col cols="12">
+              <v-text-field>This is an input</v-text-field>
+            </v-col>
+          </v-row>
+        </template>
+      </v-expansion-panel-title>
+    </v-expansion-panel>
+    <!-- <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn variant="text" color="secondary"> Cancel </v-btn>
+        <v-btn variant="text" color="primary"> Save </v-btn>
+      </v-card-actions> -->
+  </v-expansion-panels>
+
   <view-layout>
     <div class="nodes">
       <div class="nodes-inner">
@@ -26,12 +57,6 @@
           </v-col>
           <v-col cols="9">
             <div class="table">
-              <div class="hint mt-11 mb-2">
-                <v-alert type="info" variant="tonal">
-                  Node statuses are updated every 90 minutes. For a realtime status, please click on the row.
-                </v-alert>
-              </div>
-
               <div class="table-filters">
                 <v-row>
                   <v-col>

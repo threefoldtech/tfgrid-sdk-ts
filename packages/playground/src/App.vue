@@ -96,9 +96,9 @@
               :disabled="!hasActiveProfile"
               v-if="!permanent"
             />
-            <div :style="{ width: '100%' }" class="mb-4">
+            <!-- <div :style="{ width: '100%' }" class="mb-4">
               <DisclaimerToolbar />
-            </div>
+            </div> -->
           </div>
 
           <div :style="{ position: 'relative' }">
