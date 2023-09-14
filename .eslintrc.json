@@ -55,6 +55,7 @@
     "packages/weblets/playground/public/build/elements/*",
     "packages/stats/public/build/*",
     "*.config.*",
-    "*global.css"
+    "*global.css",
+    "packages/graphql_client/"
   ]
 }

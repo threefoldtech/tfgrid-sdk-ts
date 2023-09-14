@@ -39,6 +39,8 @@ else ifeq ($(project), weblets)
 	cd packages/weblets/playground && yarn build
 else ifeq ($(project), playground)
 	cd packages/playground && yarn build
+else ifeq ($(project), graphql_client)
+	cd packages/graphql_client && yarn build
 else
 	yarn lerna run build --no-private
 endif
