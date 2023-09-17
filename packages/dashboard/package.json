@@ -12,7 +12,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "1x": "^0.0.0",
+    "@achrinza/node-ipc": "^9.2.7",
     "@cosmjs/proto-signing": "^0.28.4",
     "@cosmjs/stargate": "^0.28.6",
     "@polkadot/api": "^8.4.2",
@@ -23,6 +23,7 @@
     "@threefold/tfchain_client": "^2.1.1",
     "@types/ip": "^1.1.0",
     "@types/md5": "^2.3.2",
+    "1x": "^0.0.0",
     "apollo-cache-inmemory": "^1.6.6",
     "apollo-client": "^2.6.10",
     "apollo-link-http": "^1.5.17",
