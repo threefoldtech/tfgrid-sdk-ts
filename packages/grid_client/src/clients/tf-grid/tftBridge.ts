@@ -2,10 +2,10 @@ import { SwapToStellarOptions, TFTBridge } from "@threefold/tfchain_client";
 import Decimal from "decimal.js";
 
 class Bridge extends TFTBridge {
-  async withdraw(options: SwapToStellarOptions) {
+  async swapToStellar(options: SwapToStellarOptions) {
     const decimalAmount = new Decimal(options.amount);
     const decimalAmountInTFT = decimalAmount.mul(10 ** 7).toNumber();
-    return await super.withdraw({ amount: decimalAmountInTFT, target: options.target });
+    return await super.swapToStellar({ amount: decimalAmountInTFT, target: options.target });
   }
 
   async getWithdrawFee(): Promise<number> {

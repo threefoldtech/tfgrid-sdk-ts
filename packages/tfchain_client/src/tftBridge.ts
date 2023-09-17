@@ -39,15 +39,15 @@ class QueryTFTBridge {
   }
 
   @checkConnection
-  async getWithdrawFee(): Promise<any> {
+  async getWithdrawFee(): Promise<number> {
     const fee = await this.client.api.query.tftBridgeModule.withdrawFee();
-    return fee.toPrimitive();
+    return fee.toPrimitive() as number;
   }
 
   @checkConnection
-  async getDepositFee(): Promise<any> {
+  async getDepositFee(): Promise<number> {
     const fee = await this.client.api.query.tftBridgeModule.depositFee();
-    return fee.toPrimitive();
+    return fee.toPrimitive() as number;
   }
 }
 
@@ -58,7 +58,7 @@ class TFTBridge extends QueryTFTBridge {
   }
 
   @checkConnection
-  async withdraw(options: SwapToStellarOptions) {
+  async swapToStellar(options: SwapToStellarOptions) {
     const extrinsic = await this.client.api.tx.tftBridgeModule.swapToStellar(options.target, options.amount);
     return this.client.patchExtrinsic<void>(extrinsic);
   }

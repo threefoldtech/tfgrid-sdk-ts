@@ -51,7 +51,7 @@
           <v-form v-model="isValidSwap">
             <v-text-field
               v-model="target"
-              :label="selectedName.toUpperCase() + ' Target Wallet Address'"
+              :label="selectedName.charAt(0).toUpperCase() + selectedName.slice(1) + ' Target Wallet Address'"
               :error-messages="targetError"
               :disabled="validatingAddress"
               :loading="validatingAddress"
@@ -199,7 +199,7 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
   try {
     const client = new GridClient({ mnemonic: profileManager.profile!.mnemonic, network: window.env.NETWORK });
     client.connect();
-    const result = await client.tfclient.tftBridge.withdraw({ amount: withdrawAmount, target: targetAddress });
+    const result = await client.tfclient.tftBridge.swapToStellar({ amount: withdrawAmount, target: targetAddress });
     await result.apply();
     openWithdrawDialog.value = false;
     target.value = "";
