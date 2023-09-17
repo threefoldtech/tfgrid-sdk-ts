@@ -25,6 +25,7 @@ async function main() {
 
   const qsfsQueryOptions: FilterOptions = {
     hru: 6,
+    availableFor: grid3.twinId,
     farmId: 1,
   };
 
