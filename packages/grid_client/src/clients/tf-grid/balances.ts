@@ -1,5 +1,5 @@
 import { Keyring } from "@polkadot/keyring";
-import { Balance, Balances, BalanceTransferOptions, QueryBalancesGetOptions } from "@threefold/tfchain_client";
+import { Balance, Balances, BalanceTransferOptions, Client, QueryBalancesGetOptions } from "@threefold/tfchain_client";
 import { Decimal } from "decimal.js";
 
 class TFBalances extends Balances {
@@ -18,11 +18,9 @@ class TFBalances extends Balances {
     return await super.transfer({ address: options.address, amount: decimalAmountInTFT });
   }
 
-  async getMoreFunds(address: string, callback: any) {
-    const keyring = new Keyring({ type: "sr25519" });
-    const alice = keyring.addFromUri("//Alice");
-    const transaction = await super.transfer({ address: address, amount: 100 * 1e7 });
-    transaction.signAndSend(alice, callback);
+  async getMoreFunds() {
+    const client = new Client({ url: this.client.url, mnemonicOrSecret: "//Alice" });
+    return (await client.balances.transfer({ address: this.client.address, amount: 100 * 1e7 })).apply();
   }
 }
 

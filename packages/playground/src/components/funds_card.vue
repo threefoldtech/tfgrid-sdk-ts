@@ -34,92 +34,28 @@ export default {
         try {
           const client = new GridClient({ mnemonic: profileManager.profile!.mnemonic, network: window.env.NETWORK });
           client.connect();
-          await client.tfclient.balances
-            .getMoreFunds(
-              profileManager.profile?.address as string,
-              (res: {
-                events?: never[] | undefined;
-                status: { type: string; asFinalized: string; isFinalized: string };
-              }) => {
-                console.log(res);
-                if (res instanceof Error) {
-                  console.log(res);
-                  return;
-                }
-                const { events = [], status } = res;
-                console.log(`Current status is ${status.type}`);
-                switch (status.type) {
-                  case "Ready":
-                    createToast(`Transaction Submitted`, {
-                      position: "bottom-right",
-                      hideProgressBar: true,
-                      toastBackgroundColor: "black",
-                      timeout: 5000,
-                      type: "success",
-                      showIcon: true,
-                    });
-                }
-                if (status.isFinalized) {
-                  console.log(`Transaction included at blockHash ${status.asFinalized}`);
-                  if (!events.length) {
-                    createToast(` Get more TFT failed!`, {
-                      position: "bottom-right",
-                      hideProgressBar: true,
-                      toastBackgroundColor: "black",
-                      timeout: 5000,
-                      type: "danger",
-                      showIcon: true,
-                    });
-                    loadingAddTFT.value = false;
-                  } else {
-                    // Loop through Vec<EventRecord> to display all events
-                    events.forEach(async ({ phase, event: { data, method, section } }) => {
-                      console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-                      if (section === "balances" && method === "Transfer") {
-                        loadingAddTFT.value = false;
-                        createToast(`Success!`, {
-                          position: "bottom-right",
-                          hideProgressBar: true,
-                          toastBackgroundColor: "#1aa18f",
-                          timeout: 5000,
-                          type: "success",
-                          showIcon: true,
-                        });
-                        const profile = await loadProfile(client);
-                        profileManager.set(profile);
-                      } else if (section === "system" && method === "ExtrinsicFailed") {
-                        createToast(` Get more TFT failed!`, {
-                          position: "bottom-right",
-                          hideProgressBar: true,
-                          toastBackgroundColor: "black",
-                          timeout: 5000,
-                          type: "danger",
-                          showIcon: true,
-                        });
-                        loadingAddTFT.value = false;
-                      }
-                    });
-                  }
-                }
-              },
-            )
-            .catch((err: { message: string }) => {
-              console.log(err.message);
-              loadingAddTFT.value = false;
-              createToast(
-                ` Get more TFT failed! <br>Maybe the funding wallet has run out of TFTs. Please contact support`,
-                {
-                  position: "bottom-right",
-                  hideProgressBar: true,
-                  toastBackgroundColor: "black",
-                  timeout: 5000,
-                  type: "danger",
-                  showIcon: true,
-                },
-              );
-            });
+          await client.tfclient.balances.getMoreFunds();
+          loadingAddTFT.value = false;
+          const profile = await loadProfile(client);
+          profileManager.set(profile);
+          createToast(`Success!`, {
+            position: "bottom-right",
+            hideProgressBar: true,
+            toastBackgroundColor: "#1aa18f",
+            timeout: 5000,
+            type: "success",
+            showIcon: true,
+          });
         } catch (e) {
           console.log("Error: ", e);
+          createToast(`Get more TFT failed!`, {
+            position: "bottom-right",
+            hideProgressBar: true,
+            toastBackgroundColor: "black",
+            timeout: 5000,
+            type: "danger",
+            showIcon: true,
+          });
         }
       }
     };
