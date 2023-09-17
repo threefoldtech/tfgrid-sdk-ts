@@ -137,7 +137,7 @@
                           :loading="creatingAccount"
                           @click="openAcceptTerms = termsLoading = true"
                         >
-                          generate account
+                          create account
                         </VBtn>
                       </div>
                     </InputValidator>
