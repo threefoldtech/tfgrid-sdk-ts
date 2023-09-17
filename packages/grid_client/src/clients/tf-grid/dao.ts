@@ -1,4 +1,4 @@
-import { Dao, DaoVoteOptions, Proposals } from "@threefold/tfchain_client/src/dao";
+import { Dao, DaoVoteOptions, Proposals } from "@threefold/tfchain_client";
 
 class TFDao extends Dao {
   async get(): Promise<Proposals> {

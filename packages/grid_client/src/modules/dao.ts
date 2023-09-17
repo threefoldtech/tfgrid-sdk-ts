@@ -15,7 +15,6 @@ class Dao {
   }
   @expose
   @validateInput
-  @checkBalance
   async transfer(options: DaoVoteModel) {
     return await await this.client.dao.vote({
       address: options.address,
