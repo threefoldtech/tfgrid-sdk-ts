@@ -85,7 +85,7 @@
                   validators.required('Transfer amount is required '),
                   validators.isNumeric('Amount should be a number.'),
                   validators.min('Amount must be greater than 0', 0.00000000001),
-                  validators.max('Insuffient funds', freeBalance),
+                  validators.max('Insufficient funds', freeBalance),
                 ]"
                 #="{ props }"
               >
@@ -122,7 +122,7 @@ import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
-
+import { getGrid } from "../utils/grid";
 const activeTab = ref(0);
 const receipientTwinId = ref("");
 const isValidTwinIDTransfer = ref(false);
@@ -135,13 +135,9 @@ const profile = useProfileManager().profile;
 const loadingBalance = ref(true);
 const recepTwinFromAddress = ref<Twin>();
 const receptTwinFromTwinID = ref<Twin>();
-const gridClient = new GridClient({
-  mnemonic: useProfileManager().profile!.mnemonic,
-  network: window.env.NETWORK,
-});
+
 const freeBalance = ref(0);
 onMounted(async () => {
-  await gridClient.connect();
   await getFreeBalance();
 });
 function isSameTwinID(value: string) {
@@ -150,10 +146,13 @@ function isSameTwinID(value: string) {
   }
 }
 async function isValidTwinID(value: string) {
+  const grid = await getGrid(useProfileManager().profile!);
   try {
-    receptTwinFromTwinID.value = await gridClient.twins.get({ id: parseInt(value.trim()) });
-    if (receptTwinFromTwinID.value == null) {
-      return { message: "Invalid Twin ID. This ID has no Twin." };
+    if (grid) {
+      receptTwinFromTwinID.value = await grid.twins.get({ id: parseInt(value.trim()) });
+      if (receptTwinFromTwinID.value == null) {
+        return { message: "Invalid Twin ID. This ID has no Twin." };
+      }
     }
   } catch (err) {
     return { message: "Invalid Twin ID. This ID has no Twin." };
@@ -166,6 +165,7 @@ function isSameAddress(value: string) {
   }
 }
 async function isValidAddress() {
+  const grid = await getGrid(useProfileManager().profile!);
   const keyring = new Keyring({ type: "sr25519" });
   try {
     keyring.addFromAddress(receipientAddress.value.trim());
@@ -173,10 +173,14 @@ async function isValidAddress() {
     return { message: "Invalid address." };
   }
   try {
-    const twinId = await gridClient.twins.get_twin_id_by_account_id({ public_key: receipientAddress.value.trim() });
-    recepTwinFromAddress.value = await gridClient.twins.get({ id: twinId });
-    if (recepTwinFromAddress.value == null) {
-      return { message: "Twin ID doesn't exist" };
+    if (grid) {
+      const twinId = await grid.twins.get_twin_id_by_account_id({
+        public_key: receipientAddress.value.trim(),
+      });
+      recepTwinFromAddress.value = await grid.twins.get({ id: twinId });
+      if (recepTwinFromAddress.value == null) {
+        return { message: "Twin ID doesn't exist" };
+      }
     }
   } catch (err) {
     return { message: "Invalid address. Twin ID doesn't exist" };
@@ -189,23 +193,29 @@ function clearInput() {
   receipientAddress.value = "";
 }
 async function getFreeBalance() {
-  loadingBalance.value = true;
-  const balance = await gridClient.balance.getMyBalance();
-  freeBalance.value = balance.free;
-  loadingBalance.value = false;
+  const grid = await getGrid(useProfileManager().profile!);
+  if (grid) {
+    loadingBalance.value = true;
+    const balance = await grid.balance.getMyBalance();
+    freeBalance.value = balance.free;
+    loadingBalance.value = false;
+  }
 }
 async function transfer(receipientTwin: Twin) {
+  const grid = await getGrid(useProfileManager().profile!);
   try {
-    gridClient.balance.transfer({ address: receipientTwin.accountId, amount: transferAmount.value });
+    if (grid) {
+      grid.balance.transfer({ address: receipientTwin.accountId, amount: transferAmount.value });
 
-    createToast("Transaction Complete!", {
-      position: "top-right",
-      hideProgressBar: true,
-      toastBackgroundColor: "green",
-      timeout: 5000,
-    });
+      createToast("Transaction Complete!", {
+        position: "top-right",
+        hideProgressBar: true,
+        toastBackgroundColor: "green",
+        timeout: 5000,
+      });
 
-    await getFreeBalance();
+      await getFreeBalance();
+    }
   } catch (err) {
     createInvalidTransferToast("transfer failed!");
   }
@@ -225,15 +235,18 @@ function createInvalidTransferToast(message: string) {
   });
 }
 async function submitFormTwinID() {
-  const twinDetails = await gridClient.twins.get({ id: parseInt(receipientTwinId.value.trim()) });
+  const grid = await getGrid(useProfileManager().profile!);
+  if (grid) {
+    const twinDetails = await grid.twins.get({ id: parseInt(receipientTwinId.value.trim()) });
 
-  if (twinDetails != null) {
-    loadingTwinIDTransfer.value = true;
-    await transfer(twinDetails);
-    loadingTwinIDTransfer.value = false;
-  } else {
-    createInvalidTransferToast("twin ID doesn't exist");
-    loadingTwinIDTransfer.value = false;
+    if (twinDetails != null) {
+      loadingTwinIDTransfer.value = true;
+      await transfer(twinDetails);
+      loadingTwinIDTransfer.value = false;
+    } else {
+      createInvalidTransferToast("twin ID doesn't exist");
+      loadingTwinIDTransfer.value = false;
+    }
   }
 }
 </script>
