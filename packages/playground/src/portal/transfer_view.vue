@@ -18,16 +18,13 @@
                 :rules="[
                   validators.required('Recepient Twin ID is required'),
                   validators.isNotEmpty('Invalid Twin ID'),
+                  customTwinIDValidation,
                 ]"
+                :async-rules="[customTwinFromTwinIDValidation]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Enter Twin ID of Receipient Account">
-                  <v-text-field
-                    :rules="[() => parseInt(receipientTwinId) != senderTwinID || 'Cannot transfer to yourself']"
-                    label="Recipient TwinID:"
-                    v-bind="props"
-                    v-model="receipientTwinId"
-                  ></v-text-field>
+                  <v-text-field label="Recipient TwinID:" v-bind="props" v-model="receipientTwinId"></v-text-field>
                 </input-tooltip>
               </input-validator>
 
@@ -134,6 +131,7 @@ import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
+import type { Validators } from "../types";
 
 const activeTab = ref(0);
 const receipientTwinId = ref("");
@@ -146,7 +144,8 @@ const receipientAddress = ref("");
 const profile = useProfileManager().profile;
 const senderTwinID = profile!.twinId;
 const loadingBalance = ref(true);
-
+const recepTwinFromAddress = ref<Twin>();
+const receptTwinFromTwinID = ref<Twin>();
 const gridClient = new GridClient({
   mnemonic: useProfileManager().profile!.mnemonic,
   network: window.env.NETWORK,
@@ -156,20 +155,47 @@ onMounted(async () => {
   await gridClient.connect();
   await getFreeBalance();
 });
+function customTwinIDValidation(value: string) {
+  if (parseInt(value.trim()) == senderTwinID) {
+    return { message: "Cannot transfer to yourself" };
+  }
+}
+async function customTwinFromTwinIDValidation(value: string) {
+  try {
+    receptTwinFromTwinID.value = await gridClient.twins.get({ id: parseInt(value.trim()) });
+    if (receptTwinFromTwinID.value == null) {
+      return { message: "Invalid Twin ID. This ID has no Twin." };
+    }
+  } catch (err) {
+    return { message: "Invalid Twin ID. This ID has no Twin." };
+  }
+}
+
 function isSameAddress() {
   if (receipientAddress.value.trim() == profile?.address) {
     return false;
   }
   return true;
 }
-function isValidAddress() {
+async function isValidAddress() {
   const keyring = new Keyring({ type: "sr25519" });
   try {
     keyring.addFromAddress(receipientAddress.value.trim());
-
-    return true;
   } catch (error) {
-    return false;
+    isValidAddressTransfer.value = false;
+    return "Invalid address.";
+  }
+  try {
+    const twinId = await gridClient.twins.get_twin_id_by_account_id({ public_key: receipientAddress.value.trim() });
+    recepTwinFromAddress.value = await gridClient.twins.get({ id: twinId });
+    if (recepTwinFromAddress.value != null) {
+      return true;
+    }
+    isValidAddressTransfer.value = false;
+    return "Twin ID doesn't exist";
+  } catch (err) {
+    isValidAddressTransfer.value = false;
+    return "Invalid address. Twin ID doesn't exist";
   }
 }
 
@@ -201,16 +227,9 @@ async function transfer(receipientTwin: Twin) {
   }
 }
 async function submitFormAddress() {
-  const twinId = await gridClient.twins.get_twin_id_by_account_id({ public_key: receipientAddress.value.trim() });
-  const twinDetails = await gridClient.twins.get({ id: twinId });
-  if (twinDetails != null) {
-    loadingAddressTransfer.value = true;
-    await transfer(twinDetails);
-    loadingAddressTransfer.value = false;
-  } else {
-    createInvalidTransferToast("twin ID doesn't exist");
-    loadingAddressTransfer.value = false;
-  }
+  loadingAddressTransfer.value = true;
+  await transfer(recepTwinFromAddress.value!);
+  loadingAddressTransfer.value = false;
 }
 
 function createInvalidTransferToast(message: string) {
@@ -222,7 +241,7 @@ function createInvalidTransferToast(message: string) {
   });
 }
 async function submitFormTwinID() {
-  const twinDetails = await gridClient.twins.get({ id: parseInt(receipientTwinId.value) });
+  const twinDetails = await gridClient.twins.get({ id: parseInt(receipientTwinId.value.trim()) });
 
   if (twinDetails != null) {
     loadingTwinIDTransfer.value = true;
