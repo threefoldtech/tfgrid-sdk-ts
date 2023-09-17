@@ -23,6 +23,7 @@ const vuetify = createVuetify({
           info: "#7de3c8",
           warning: "#FFCC00",
           link: "#5695ff",
+          anchor: "#ffffff",
         },
       },
       light: {
@@ -31,6 +32,7 @@ const vuetify = createVuetify({
           primary: "#1AA18F",
           info: "#1AA18F",
           secondary: "#14A1B8",
+          anchor: "#000000",
         },
       },
     },

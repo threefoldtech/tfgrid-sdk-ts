@@ -50,7 +50,7 @@ For an automated generation of the config file you can use the script `build-env
 
 ```bash
 cd packages/playground/public
-bash ../../scripts/build-env.sh
+bash ../scripts/build-env.sh
 ```
 
 More illustration on the build-env script [here](docs/build.md)
