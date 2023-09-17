@@ -1,7 +1,7 @@
 <template>
   <view-layout>
     <h2 class="mb-5 text-capitalize">Alpha software - all data subject to change</h2>
-    <v-form @change.prevent="mintingHash()" class="d-inline-flex w-100">
+    <v-form @submit.prevent="mintingHash()" class="d-inline-flex w-100">
       <FormValidator v-model="isValidForm">
         <InputValidator
           :value="receiptHash"
@@ -26,7 +26,7 @@
           type="submit"
           color="primary"
           variant="elevated"
-          :disabled="!isValidForm || !receiptHash"
+          :disabled="!isValidForm"
           :loading="loading"
           size="x-large"
           rounded="lg"
@@ -79,9 +79,9 @@
               </v-list-item>
               <v-list-item v-if="item.Minting.resource_units.cru && item.Minting.resource_units.cru < 0.1">
                 {{ (item.Minting.resource_units.cru * 1024 ** 3).toFixed(0) }}
-                VCPU
+                vCPU
               </v-list-item>
-              <v-list-item v-else> {{ item.Minting.resource_units.cru }} VCpu </v-list-item>
+              <v-list-item v-else> {{ item.Minting.resource_units.cru }} vCPU </v-list-item>
 
               <v-list-item> {{ item.Minting.resource_units.mru.toFixed(3) }} GB </v-list-item>
               <v-list-item> {{ item.Minting.resource_units.sru.toFixed(3) }} GB </v-list-item>
@@ -196,12 +196,12 @@ const hashInput = useInputRef();
 const loading = ref(false);
 const noData = ref<string | null>(null);
 const item = ref();
-const mintNodeInfoHeaders = ref(["ID", "Farm", "Measured Uptime"]);
+const mintNodeInfoHeaders = ["ID", "Farm", "Measured Uptime"];
 const fixupNodeInfoHeaders = ref(["ID", "Farm"]);
-const mintResourcesHeaders = ref(["CU", "SU", "NU", "CRU", "MRU", "SRU", "HRU"]);
-const fixupResourcesHeaders = ref(["CU", "SU", "NU"]);
-const mintPayoutHeaders = ref(["TFT Farmed", "Payout Address"]);
-const fixupPayoutHeaders = ref(["TFT Received", "TFT Owed", "Additional TFT Minted", "Payout Address"]);
+const mintResourcesHeaders = ["CU", "SU", "NU", "CRU", "MRU", "SRU", "HRU"];
+const fixupResourcesHeaders = ["CU", "SU", "NU"];
+const mintPayoutHeaders = ["TFT Farmed", "Payout Address"];
+const fixupPayoutHeaders = ["TFT Received", "TFT Owed", "Additional TFT Minted", "Payout Address"];
 
 function reset() {
   item.value = null;

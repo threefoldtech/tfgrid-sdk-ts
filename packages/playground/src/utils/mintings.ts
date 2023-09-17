@@ -1,59 +1,61 @@
-interface periodInterface {
+interface Period {
   start: number;
   end: number;
 }
 
-interface cloudUnitsInterface {
+interface CloudUnits {
   cu: number;
   su: number;
   nu: number;
 }
 
-interface rewardInterface {
+interface Reward {
   tft: number;
   musd: number;
 }
 
-interface recourcesUnitesInterface {
+interface ResourcesUnits {
   cru: number;
   mru: number;
   hru: number;
   sru: number;
 }
-export interface receiptInterface {
+export interface Receipt {
   farm_id: number;
   node_id: number;
-  period: periodInterface;
+  period: Period;
   stellar_payout_address: string;
 }
 
-interface Minting extends receiptInterface {
-  cloud_units: cloudUnitsInterface;
+interface Minting extends Receipt {
+  cloud_units: CloudUnits;
   farm_name: string;
   measured_uptime: number;
   node_type: string;
-  resource_units: recourcesUnitesInterface;
-  reward: rewardInterface;
+  resource_units: ResourcesUnits;
+  reward: Reward;
   tft_connection_price: number;
 }
 
-interface Fixup extends receiptInterface {
-  correct_cloud_units: cloudUnitsInterface;
-  correct_reward: rewardInterface;
-  fixup_cloud_units: cloudUnitsInterface;
-  fixup_reward: rewardInterface;
-  minted_cloud_units: cloudUnitsInterface;
-  minted_reward: rewardInterface;
+interface Fixup extends Receipt {
+  correct_cloud_units: CloudUnits;
+  correct_reward: Reward;
+  fixup_cloud_units: CloudUnits;
+  fixup_reward: Reward;
+  minted_cloud_units: CloudUnits;
+  minted_reward: Reward;
 }
 
 export async function getMintingData(hash: number) {
   const hashReceipts = await fetch(`${window.env.MINTING_URL}/api/v1/receipt/${hash}`).then(async res => {
-    const receipt = await res.json();
-    if (receipt.Minting) {
-      return receipt as object as Minting;
-    } else {
-      return receipt as object as Fixup;
-    }
+    if (res.ok) {
+      const receipt = await res.json();
+      if (receipt.Minting) {
+        return receipt as unknown as Minting;
+      } else {
+        return receipt as unknown as Fixup;
+      }
+    } else throw new Error(`Receipt with hash ${hash} not found`);
   });
 
   return hashReceipts;

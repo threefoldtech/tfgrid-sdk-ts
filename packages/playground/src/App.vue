@@ -141,6 +141,7 @@ import { useProfileManager } from "./stores/profile_manager";
 const $route = useRoute();
 const $router = useRouter();
 const profileManager = useProfileManager();
+const network = process.env.NETWORK || (window as any).env.NETWORK;
 
 const openProfile = ref(true);
 const hasActiveProfile = computed(() => !!profileManager.profile);
@@ -152,7 +153,7 @@ watch(
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
 
-let routes: AppRoute[] = [
+const routes: AppRoute[] = [
   {
     title: "Portal",
     icon: "mdi-account-convert-outline",
@@ -220,10 +221,18 @@ let routes: AppRoute[] = [
       },
     ],
   },
-  {
-    title: "Minting",
-    items: [{ title: "Minting", icon: "mdi-file-document-edit", route: "/minting" }],
-  },
+  ...(network !== "main"
+    ? {}
+    : ({
+        title: "Minting",
+        items: [
+          {
+            title: "Minting",
+            icon: "mdi-file-document-edit",
+            route: "/minting",
+          },
+        ],
+      } as any)),
   {
     title: "Other Services",
     icon: "mdi-toolbox",
@@ -258,8 +267,6 @@ let routes: AppRoute[] = [
 ];
 
 // eslint-disable-next-line no-undef
-const network = process.env.NETWORK || (window as any).env.NETWORK;
-
 const permanent = window.innerWidth > 980;
 const openSidebar = ref(permanent);
 
@@ -274,13 +281,6 @@ function clickHandler({ route, url }: AppRouteItem): void {
 }
 
 $router.beforeEach((to, from, next) => {
-  if (network !== "main") {
-    routes = routes.filter(route => route.title !== "Minting");
-    if (to.path === "/minting") {
-      return;
-    }
-    next();
-  }
   if (to.path === "/" && hasActiveProfile) {
     next({ path: "portal/twin" });
   } else {
