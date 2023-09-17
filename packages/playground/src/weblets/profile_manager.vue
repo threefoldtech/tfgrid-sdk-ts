@@ -174,7 +174,7 @@
                 {{ createAccountError || activatingAccountError }}
               </v-alert>
 
-              <v-alert type="warning" variant="tonal" class="mb-6" v-if="activeTab === 0">
+              <v-alert type="info" variant="tonal" class="mb-6" v-if="activeTab === 0">
                 <p :style="{ maxWidth: '880px' }">
                   You will need to provide the password used while connecting your wallet.
                 </p>
