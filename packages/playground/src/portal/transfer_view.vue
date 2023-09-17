@@ -1,7 +1,8 @@
 <template>
   <v-container>
-    <v-card color="primary" class="white--text pa-5 my-5">
-      <h3 class="text-center">Transfer TFTs on the TFChain</h3>
+    <v-card color="primary" class="my-3 pa-3 text-center">
+      <v-icon width="26">mdi-account-arrow-right-outline</v-icon>
+      <h2>Transfer TFTs on the TFChain</h2>
     </v-card>
     <v-card>
       <v-tabs v-model="activeTab" align-tabs="center">
