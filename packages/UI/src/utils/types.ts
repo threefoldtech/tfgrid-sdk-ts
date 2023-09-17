@@ -58,7 +58,7 @@ export abstract class ThreefoldProvider {
       case "dev":
         return NetworkEnv.dev;
       default:
-        return NetworkEnv.dev;
+        return NetworkEnv.main;
     }
   }
 }
