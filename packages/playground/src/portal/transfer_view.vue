@@ -49,12 +49,11 @@
               <v-spacer></v-spacer>
               <v-btn @click="clearInput" class="primary white--text">Clear</v-btn>
               <v-btn
-                class="primary white--text"
+                color="primary"
+                variant="tonal"
                 :loading="loadingTwinIDTransfer"
                 :disabled="!isValidTwinIDTransfer"
                 @click="submitFormTwinID"
-                color="secondary"
-                variant="tonal"
                 >Send</v-btn
               >
             </v-card-actions>
@@ -101,12 +100,11 @@
               <v-btn @click="clearInput" class="primary white--text">Clear</v-btn>
 
               <v-btn
-                class="primary white--text"
+                color="primary"
+                variant="tonal"
                 :loading="loadingAddressTransfer"
                 :disabled="!isValidAddressTransfer"
                 @click="submitFormAddress"
-                color="secondary"
-                variant="tonal"
                 >Send</v-btn
               >
             </v-card-actions>
