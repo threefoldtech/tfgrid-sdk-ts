@@ -20,6 +20,7 @@ class TFBalances extends Balances {
 
   async getMoreFunds() {
     const client = new Client({ url: this.client.url, mnemonicOrSecret: "//Alice" });
+    client.connect();
     return (await client.balances.transfer({ address: this.client.address, amount: 100 * 1e7 })).apply();
   }
 }
