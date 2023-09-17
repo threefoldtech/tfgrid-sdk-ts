@@ -6,7 +6,7 @@
 2. [Usage](#usage)
    - [Build the PDF Signer](#build-the-pdf-signer)
    - [Example of Usage](#example-of-usage)
-   - [Using Providers/Extensions](#using-providers-extensions)
+   - [Using Providers and Extensions](#using-providers-and-extensions)
 
 ## Introduction
 
@@ -64,21 +64,21 @@ In the example above, replace `<pdf-url>` and `<endpoint-url>` with the actual U
 
 Feel free to customize the HTML structure and styles to match your application's design and requirements.
 
-### Using Providers/Extensions
+### Using Providers and Extensions
 
 The PDF Signer Web Component now supports providers/extensions for enhanced functionality. You can choose between two providers:
 
-- **ThreefoldPDFSigner**: A basic provider that requires a mnemonic provided in the [.env](../.env).
+- **threefoldSignerProvider**: A basic provider that requires a mnemonic provided in the [.env](../.env).
 
-- **ThreefoldConnector**: An extension that connects to the Threefold Connector extension for enhanced capabilities.
+- **threefoldConnectorProvider**: An extension that connects to the Threefold Connector extension for enhanced capabilities.
 
-To specify the provider/extension to use, you can set an environment variable in your project. For example, to use the `ThreefoldPDFSigner`, set the following environment variable:
+To specify the provider/extension to use, you can set an environment variable in your project. For example, to use the `threefoldSignerProvider`, set the following environment variable:
 
 ```bash
 VITE_MNEMONIC="<your_mnemonic_here>"
 ```
 
-and to use the `ThreefoldConnector` extension please make sure that you installed and enabled access the extension. `PS: The extension is still under development`
+and to use the `threefoldConnectorProvider` extension please make sure that you installed and enabled access the extension. `PS: The extension is still under development`
 comment the above line to be:
 
 ```bash
@@ -89,6 +89,6 @@ The component will automatically detect the environment variable and use the sel
 
 By adding this flexibility, you can choose the provider/extension that best fits your project's requirements.
 
-**Note**: If you choose to use the `ThreefoldConnector` extension, make sure it is installed and configured properly in your environment.
+**Note**: If you choose to use the `threefoldConnectorProvider` extension, make sure it is installed and configured properly in your environment.
 
 Now, you can seamlessly integrate PDF signing into your web application using the PDF Signer Web Component with your preferred provider/extension.

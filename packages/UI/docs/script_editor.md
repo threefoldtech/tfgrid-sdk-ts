@@ -3,62 +3,36 @@
 ## Table of Contents
 
 1. [Introduction](#introduction)
-2. [Installation](#installation)
-3. [Usage](#usage)
-   <!-- - [Importing the Script Editor](#importing-the-script-editor) -->
-   - [Build the Script Editor](#build-the-script-editor)
+2. [Usage](#usage)
+   - [Building the Script Editor](#building-the-script-editor)
    - [Example of Usage](#example-of-usage)
-   - [Accessing and Managing Scripts](#accessing-and-managing-scripts)
+   - [Using Providers and Extensions](#using-providers-and-extensions)
 
 ## Introduction
 
-The Script Editor Web Component is a versatile tool that allows developers to integrate a code editor into their web applications. It offers features like code copying, and script management, making it ideal for building code-related applications or platforms.
+The Script Editor Web Component is a versatile tool that allows developers to seamlessly integrate a code editor into their web applications. It offers features like script management and code copying, making it ideal for building code-related applications or platforms.
 
 **Key features:**
 
-- Support managing scripts.
-- Code copying
-
-## Installation
-
-You can install the Script Editor Web Component using npm or include it via a script tag.
-
-<!-- ### npm
-
-To install via npm, use the following command:
-
-```bash
-npm install @threefold/UI
-``` -->
+- Support for managing scripts.
+- Code copying.
 
 ## Usage
 
-### Importing the Script Editor
+### Building the Script Editor
 
-<!-- Import the Script Editor Web Component into your JavaScript file.
-
-```js
-import script-editor from "@threefold/UI";
-``` -->
-
-### Build the Script Editor
-
-To create an instance of the Script Editor, you need to build the package first and then copy the created `dist` folder inside your project:
+To create an instance of the Script Editor, you need to build the package first and then copy the generated `dist` folder into your project:
 
 1. Clone the `tfgrid-sdk-ts` repository.
-2. Navigate to the `repository/packages/UI` directory and run `yarn build-only`.
-3. A `dist` folder will be created. Copy the `threefold-ui.umd.js` file and include it in your scripts.
-4. Copy the `dist/tailwind.css` to your side project.
-
-Now you're ready to write your tag:
-
-```html
-<script-editor dest="<file-path>" />
-```
+2. Navigate to the `repository/packages/UI` directory.
+3. Run `yarn build-only` to generate the required distribution files.
+4. Locate the `dist` folder created in the previous step.
+5. Copy the `threefold-ui.umd.js` file and include it in your project's HTML files.
+6. Copy the `dist/tailwind.css` file and use it for styling.
 
 ### Example of Usage
 
-just create an `index.html` somewhere to test it and point the dist files in it.
+Here's an example of how to use the Script Editor Web Component in your HTML file:
 
 ```html
 <!DOCTYPE html>
@@ -66,23 +40,50 @@ just create an `index.html` somewhere to test it and point the dist files in it.
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./style.css" />
-    <!-- From build -->
     <title>Threefold UI</title>
+
+    <!-- Include the style and logo files -->
+    <link rel="stylesheet" href="./style.css" />
   </head>
+
   <body>
-    <pdf-signer
-      dest="http://localhost:5173/"
-      pdfUrl="https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf"
-    />
-    <script src="./dist/threefold-ui.umd.js"></script>
-    <!-- From build -->
+    <!-- Use the script-editor custom element with required attributes -->
+    <script-editor dest="http://localhost:3000/" network="main" />
+
+    <!-- Include the Script Editor component script -->
+    <script src="./script-editor.js"></script>
   </body>
 </html>
 ```
 
-### Accessing and Managing Scripts
+In the example above, replace `<dest>` and `<network>` with the actual destination where the signed script should be sent. Also, for the `<network>`, use one of the following network options: `[main, test, qa, dev]`.
 
-Upon script submission, you will be asked to choose a Threefold account. From this account, a mnemonic will be extracted to generate a signature, which will then overwrite the file content within the dest property.
+Feel free to customize the HTML structure and styles to match your application's design and requirements.
 
-The sent data will consist of the public key and the signature created from the content.
+### Using Providers and Extensions
+
+The Script Editor Web Component now supports providers and extensions for enhanced functionality. You can choose between two providers:
+
+- **threefoldSignerProvider**: A basic provider that requires a mnemonic provided in the [.env](../.env) file.
+
+- **threefoldConnectorProvider**: An extension that connects to the Threefold Connector extension for enhanced capabilities.
+
+To specify the provider or extension to use, you can set an environment variable in your project. For example, to use the `threefoldSignerProvider`, set the following environment variable:
+
+```bash
+VITE_MNEMONIC="<your_mnemonic_here>"
+```
+
+To use the `threefoldConnectorProvider` extension, please ensure that you have it installed and enabled. (Note: The extension is still under development.) You can comment out the mnemonic line as follows:
+
+```bash
+# VITE_MNEMONIC="<your_mnemonic_here>"
+```
+
+The component will automatically detect the environment variable and use the selected provider or extension.
+
+By adding this flexibility, you can choose the provider or extension that best fits your project's requirements.
+
+**Note**: If you choose to use the `threefoldConnectorProvider` extension, make sure it is properly installed and configured in your environment.
+
+Now, you can seamlessly integrate the Script Editor Signing into your web application using the Script Editor Web Component with your preferred provider or extension.
