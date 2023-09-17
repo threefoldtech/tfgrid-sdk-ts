@@ -14,7 +14,7 @@
       <v-tooltip>
         <template v-slot:activator="{ isActive, props }">
           <v-btn @click="openInfoLink" icon v-bind="props" v-on="isActive" class="d-flex align-center">
-            <v-icon>mdi-information</v-icon>0
+            <v-icon>mdi-information</v-icon>
           </v-btn>
         </template>
         <span>More information</span>

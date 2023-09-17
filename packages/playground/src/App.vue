@@ -89,7 +89,7 @@
           <v-img :src="baseUrl + 'images/logoTF.png'" width="160px" />
         </v-toolbar-title>
 
-        <v-spacer>
+        <v-spacer class="pr-16">
           <div class="d-flex align-center justify-start">
             <TftSwapPrice></TftSwapPrice>
           </div>
