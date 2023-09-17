@@ -1,61 +1,18 @@
 <template>
-  <div class="hint mb-2">
+  <NodeFilter v-model="filters" />
+  {{ filters }}
+
+  <div class="hint mb-2 mt-3">
     <v-alert type="info" variant="tonal">
       Node statuses are updated every 90 minutes. For a realtime status, please click on the row.
     </v-alert>
   </div>
-  <v-expansion-panels>
-    <v-expansion-panel>
-      <v-expansion-panel-title>
-        <template v-slot:default="{ expanded }">
-          <v-row no-gutters>
-            <v-col cols="4" class="d-flex justify-start"> Filters </v-col>
-            <v-col cols="8" class="text-grey">
-              <v-fade-transition leave-absolute>
-                <span v-if="expanded" key="0"> Enter a name for the trip </span>
-                <span v-else key="1"> Test </span>
-              </v-fade-transition>
-            </v-col>
-            <v-col cols="12">
-              <v-text-field>This is an input</v-text-field>
-            </v-col>
-          </v-row>
-        </template>
-      </v-expansion-panel-title>
-    </v-expansion-panel>
-    <!-- <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn variant="text" color="secondary"> Cancel </v-btn>
-        <v-btn variant="text" color="primary"> Save </v-btn>
-      </v-card-actions> -->
-  </v-expansion-panels>
 
   <view-layout>
     <div class="nodes">
       <div class="nodes-inner">
         <v-row>
-          <v-col cols="3">
-            <div class="filters">
-              <h1 class="text-h6 font-medium mb-3">Filters</h1>
-              <div class="filters-actions">
-                <div class="select-filter">
-                  <MultipleFilter :items="drawFiltersFields.map(f => f.label)" v-model="activeFiltersList" />
-                </div>
-                <v-divider />
-                <div class="text-filter mt-3">
-                  <div v-for="filter in activeFilters" :key="filter.key">
-                    <NodeFilter
-                      :filterKey="filter.key"
-                      :label="filter.label"
-                      :placeholder="filter.placeholder"
-                      @changeValue="setValue"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </v-col>
-          <v-col cols="9">
+          <v-col cols="12">
             <div class="table">
               <div class="table-filters">
                 <v-row>
@@ -179,73 +136,23 @@
 <script lang="ts">
 import type { NodesQuery } from "tf_gridproxy_client";
 import type { Ref } from "vue";
-import { computed, ref } from "vue";
+import { ref, watch } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import secondToRedable from "@/utils/second_to_redable";
 import toFixedCsSize from "@/utils/to_fixed_cs_size";
 
-import MultipleFilter from "../components/Common/Filters/MultipleFilter.vue";
 import NodeFilter from "../components/Common/Filters/NodeFilter.vue";
 import NodeDetails from "../components/Nodes/NodeDetails.vue";
+import { filterInitializer, type NodeFiltersType } from "../utils/types.js";
 
 export default {
   components: {
-    MultipleFilter,
     NodeFilter,
     NodeDetails,
   },
   setup() {
-    // multiple values filter
-    const drawFiltersFields = [
-      {
-        label: "Node ID",
-        key: "nodeId",
-        placeholder: "Filter by node id.",
-      },
-      {
-        label: "Twin ID",
-        key: "twinId",
-        placeholder: "Filter by twin id.",
-      },
-      {
-        label: "Farm IDs",
-        key: "farmIds",
-        placeholder: "Find nodes in Farms with ids.",
-      },
-      {
-        label: "Farm Name",
-        key: "farmName",
-        placeholder: "Filter by farm name.",
-      },
-      {
-        label: "Country Full Name",
-        key: "country",
-        placeholder: "Filter by country.",
-      },
-      {
-        label: "Free SRU (GB)",
-        key: "freeSru",
-        placeholder: "Filter by Free SSD greater than or equal to.",
-      },
-      {
-        label: "Free HRU (GB)",
-        key: "freeHru",
-        placeholder: "Filter by Free HDD greater than or equal to.",
-      },
-      {
-        label: "Free MRU (GB)",
-        key: "freeMru",
-        placeholder: "Filter by Free Memory greater than or equal to.",
-      },
-    ];
-
-    const activeFiltersList = ref(["Node ID"]);
-    const activeFilters = computed(() => {
-      const keySet = new Set(activeFiltersList.value);
-      return drawFiltersFields.filter(filter => keySet.has(filter.label));
-    });
-    // ______________
+    const filters = ref<NodeFiltersType>(filterInitializer);
 
     // Switches Filter
     const gpuFilter = ref(false);
@@ -263,24 +170,46 @@ export default {
     // ______________
 
     // Nodes Filters
-    const setValue = (key: string, value: string) => {
-      const strKeys = ["farmIds", "country", "farmName"];
-      const convertedKeys = ["freeHru", "freeMru", "freeSru"];
-      const excludedKeys = ["twinId"];
-      if (!excludedKeys.includes(key)) {
-        if (strKeys.includes(key)) {
-          defaultFilterValues.value = { ...defaultFilterValues.value, [key]: value };
-        } else {
-          if (!convertedKeys.includes(key)) {
-            defaultFilterValues.value = { ...defaultFilterValues.value, [key]: +value };
-          } else {
-            let newVal = +value * 1024 * 1024 * 1024;
-            newVal = Math.ceil(newVal);
-            defaultFilterValues.value = { ...defaultFilterValues.value, [key]: newVal };
-          }
-        }
+    watch(filters, () => {
+      console.log("Changed....");
+    });
+
+    const setValue = async () => {
+      try {
+        const { count, data } = await gridProxyClient.nodes.list({
+          retCount: true,
+          nodeId: filters.value.nodeId.value ? +filters.value.nodeId.value : undefined,
+          farmIds: filters.value.farmIds.value,
+          farmName: filters.value.farmName.value,
+          freeMru: filters.value.freeMru.value ? +filters.value.freeMru.value * 1024 * 1024 * 1024 : undefined,
+          freeHru: filters.value.freeHru.value ? +filters.value.freeHru.value * 1024 * 1024 * 1024 : undefined,
+          freeSru: filters.value.freeSru.value ? +filters.value.freeSru.value * 1024 * 1024 * 1024 : undefined,
+        });
+        nodes.value = data;
+        nodesCount.value = count;
+      } catch (err) {
+        console.log(err);
       }
-      requestNodes(defaultFilterValues.value);
+
+      // console.log("inputs", inputs);
+
+      // const strKeys = ["farmIds", "country", "farmName"];
+      // const convertedKeys = ["freeHru", "freeMru", "freeSru"];
+      // const excludedKeys = ["twinId"];
+      // if (!excludedKeys.includes(key)) {
+      //   if (strKeys.includes(key)) {
+      //     defaultFilterValues.value = { ...defaultFilterValues.value, [key]: value };
+      //   } else {
+      //     if (!convertedKeys.includes(key)) {
+      //       defaultFilterValues.value = { ...defaultFilterValues.value, [key]: +value };
+      //     } else {
+      //       let newVal = +value * 1024 * 1024 * 1024;
+      //       newVal = Math.ceil(newVal);
+      //       defaultFilterValues.value = { ...defaultFilterValues.value, [key]: newVal };
+      //     }
+      //   }
+      // }
+      // requestNodes(defaultFilterValues.value);
     };
     // ______________
     // Status Filter
@@ -342,12 +271,12 @@ export default {
 
     const requestNodes = async (options: Partial<NodesQuery>) => {
       tableLoading.value = true;
-      for (const option in options) {
-        if (options[option] === 0 || options[option] === "") {
-          delete options[option];
-        }
-      }
-      await getNodes(options);
+      // for (const option in options) {
+      //   if (options[option] === 0 || options[option] === "") {
+      //     delete options[option];
+      //   }
+      // }
+      await getNodes({});
       tableLoading.value = false;
     };
 
@@ -382,12 +311,6 @@ export default {
     // ______________
 
     return {
-      // multiple values filter
-      drawFiltersFields,
-      activeFiltersList,
-      activeFilters,
-      // ______________
-      // Switches Filter
       gpuFilter,
       gatewayFilter,
       gatewayValueChange,
@@ -425,7 +348,7 @@ export default {
       currentNode,
       toggleNodeDetails,
       openSheet,
-      // ______________
+      filters,
     };
   },
   created() {
