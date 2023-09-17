@@ -1,6 +1,6 @@
 {
   "name": "@threefold/gridproxy_client",
-  "version": "2.1.0-rc11",
+  "version": "2.1.1",
   "description": "gridproxy_client help to interact with gridproxy based on network",
   "main": "dist/public_api.js",
   "types": "dist/public_api.d.ts",
