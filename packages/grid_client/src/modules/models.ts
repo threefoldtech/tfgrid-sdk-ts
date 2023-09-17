@@ -428,7 +428,13 @@ class TfchainWalletInitModel {
 class TfchainWalletBalanceByAddressModel {
   @Expose() @IsString() @IsNotEmpty() address: string;
 }
-
+class TfchainDaoVoteModel {
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() address: string;
+  @Expose() @IsString() @IsNotEmpty() farmId: string;
+  @Expose() @IsBoolean() approve: boolean;
+  @Expose() @IsNotEmpty() hash: any;
+}
 class TfchainWalletTransferModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() address_dest: string;
@@ -737,6 +743,7 @@ export {
   TfchainWalletBalanceByAddressModel,
   TfchainWalletTransferModel,
   TfchainCreateModel,
+  TfchainDaoVoteModel,
   WalletMessageSignModel,
   BlockchainCreateModel,
   BlockchainCreateResultModel,
