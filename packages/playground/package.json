@@ -25,7 +25,7 @@
     "pinia": "^2.0.32",
     "qrcode": "^1.5.1",
     "tf_gridproxy_client": "^1.0.2",
-    "tfgrid-gql": "^1.0.1",
+    "@threefold/graphql_client":"^2.1.1",
     "validator": "^13.9.0",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6",
