@@ -18,9 +18,9 @@
                 :rules="[
                   validators.required('Recepient Twin ID is required'),
                   validators.isNotEmpty('Invalid Twin ID'),
-                  customTwinIDValidation,
+                  isSameTwinID,
                 ]"
-                :async-rules="[customTwinFromTwinIDValidation]"
+                :async-rules="[isValidTwinID]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Enter Twin ID of Receipient Account">
@@ -70,20 +70,13 @@
                 :rules="[
                   validators.required('Receipient address is required '),
                   validators.isAlphanumeric('Invalid Address'),
+                  isSameAddress,
                 ]"
+                :async-rules="[isValidAddress]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Enter Address of Receipient Account">
-                  <v-text-field
-                    label="Recipient Address:"
-                    :rules="[
-                      () => isValidAddress() || 'Invalid address',
-                      () => isSameAddress() || 'Cannot transfer to yourself',
-                    ]"
-                    v-model="receipientAddress"
-                    v-bind="props"
-                  >
-                  </v-text-field>
+                  <v-text-field label="Recipient Address:" v-model="receipientAddress" v-bind="props"> </v-text-field>
                 </input-tooltip>
               </input-validator>
               <input-validator
@@ -131,7 +124,6 @@ import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
-import type { Validators } from "../types";
 
 const activeTab = ref(0);
 const receipientTwinId = ref("");
@@ -142,7 +134,6 @@ const loadingAddressTransfer = ref(false);
 const isValidAddressTransfer = ref(false);
 const receipientAddress = ref("");
 const profile = useProfileManager().profile;
-const senderTwinID = profile!.twinId;
 const loadingBalance = ref(true);
 const recepTwinFromAddress = ref<Twin>();
 const receptTwinFromTwinID = ref<Twin>();
@@ -155,12 +146,12 @@ onMounted(async () => {
   await gridClient.connect();
   await getFreeBalance();
 });
-function customTwinIDValidation(value: string) {
-  if (parseInt(value.trim()) == senderTwinID) {
+function isSameTwinID(value: string) {
+  if (parseInt(value.trim()) == profile?.twinId) {
     return { message: "Cannot transfer to yourself" };
   }
 }
-async function customTwinFromTwinIDValidation(value: string) {
+async function isValidTwinID(value: string) {
   try {
     receptTwinFromTwinID.value = await gridClient.twins.get({ id: parseInt(value.trim()) });
     if (receptTwinFromTwinID.value == null) {
@@ -171,31 +162,26 @@ async function customTwinFromTwinIDValidation(value: string) {
   }
 }
 
-function isSameAddress() {
-  if (receipientAddress.value.trim() == profile?.address) {
-    return false;
+function isSameAddress(value: string) {
+  if (value.trim() == profile?.address) {
+    return { message: "Cannot transfer to yourself" };
   }
-  return true;
 }
 async function isValidAddress() {
   const keyring = new Keyring({ type: "sr25519" });
   try {
     keyring.addFromAddress(receipientAddress.value.trim());
   } catch (error) {
-    isValidAddressTransfer.value = false;
-    return "Invalid address.";
+    return { message: "Invalid address." };
   }
   try {
     const twinId = await gridClient.twins.get_twin_id_by_account_id({ public_key: receipientAddress.value.trim() });
     recepTwinFromAddress.value = await gridClient.twins.get({ id: twinId });
-    if (recepTwinFromAddress.value != null) {
-      return true;
+    if (recepTwinFromAddress.value == null) {
+      return { message: "Twin ID doesn't exist" };
     }
-    isValidAddressTransfer.value = false;
-    return "Twin ID doesn't exist";
   } catch (err) {
-    isValidAddressTransfer.value = false;
-    return "Invalid address. Twin ID doesn't exist";
+    return { message: "Invalid address. Twin ID doesn't exist" };
   }
 }
 
