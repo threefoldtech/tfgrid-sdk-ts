@@ -90,7 +90,11 @@
   <v-dialog width="70%" v-model="deletingDialog">
     <v-card>
       <v-card-title class="text-h5 mt-2"> Are you sure you want to delete the following contracts? </v-card-title>
-      <v-alert class="ma-4" type="warning" variant="tonal">Deleting contracts may take a while to complete.</v-alert>
+      <v-alert class="ma-4" type="warning" variant="tonal"
+        >It is advisable to remove the contract from its solution page, especially
+        when multiple contracts may be linked to the same instance.</v-alert
+      >
+      <v-alert class="mx-4" type="warning" variant="tonal">Deleting contracts may take a while to complete.</v-alert>
       <v-card-text>
         <v-chip class="ma-1" color="primary" label v-for="c in selectedContracts" :key="c.contractId">
           {{ c.contractId }}

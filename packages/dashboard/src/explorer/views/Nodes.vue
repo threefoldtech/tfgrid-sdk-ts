@@ -1,5 +1,5 @@
 <template>
-  <Layout pageName="Nodes" class="custom-layout">
+  <Layout pageName="Nodes">
     <template v-slot:filters>
       <LayoutFilters :items="filters.map(f => f.label)" v-model="activeFiltersList" />
     </template>
