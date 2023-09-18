@@ -368,6 +368,7 @@ import { computed, onMounted, type Ref, ref, watch } from "vue";
 import { nextTick } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
+import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
 import {
@@ -640,7 +641,10 @@ async function generateSSH() {
 }
 
 const loadingBalance = ref(false);
-async function __loadBalance(profile: Profile) {
+async function __loadBalance(profile?: Profile) {
+  profile = profile || profileManager.profile!;
+  if (!profile) return;
+
   try {
     loadingBalance.value = true;
     const grid = await getGrid(profile);
@@ -650,6 +654,9 @@ async function __loadBalance(profile: Profile) {
     __loadBalance(profile);
   }
 }
+
+const profileManagerController = useProfileManagerController();
+profileManagerController.set({ loadBalance: __loadBalance });
 
 function login() {
   const credentials: Credentials = getCredentials();
