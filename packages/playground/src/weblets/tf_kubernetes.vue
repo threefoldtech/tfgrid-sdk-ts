@@ -44,6 +44,9 @@
             validators.required('Token is required.'),
             validators.minLength('Token minimum length is 6 chars.', 6),
             validators.maxLength('Token max length is 15 chars.', 15),
+            validators.pattern('Token should not contain whitespaces.', {
+              pattern: /^[^\s]+$/,
+            }),
           ]"
           #="{ props: validationProps }"
         >

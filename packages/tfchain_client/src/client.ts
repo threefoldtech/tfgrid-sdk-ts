@@ -50,6 +50,8 @@ class QueryClient {
   pricingPolicies: QueryPricingPolicies = new QueryPricingPolicies(this);
   twins: QueryTwins = new QueryTwins(this);
   nodes: QueryNodes = new QueryNodes(this);
+  __disconnectHandler = this.newProvider.bind(this);
+
   constructor(public url: string) {}
 
   async loadKeyPairOrSigner(): Promise<void> {} // to be overridden in the full client
@@ -78,6 +80,7 @@ class QueryClient {
     this.api = await ApiPromise.create({ provider });
     await this.wait();
     QueryClient.connections[this.url] = this.api;
+    this.api.on("disconnected", this.__disconnectHandler);
   }
 
   async connect() {
@@ -89,14 +92,12 @@ class QueryClient {
       if (this.api && this.api.isConnected) return;
       await this.connectingLock.acquireAsync();
       await this.newProvider();
-      this.api.on("disconnected", this.newProvider.bind(this));
       this.connectingLock.release();
       return;
     }
 
     await this.connectingLock.acquireAsync();
     await this.newProvider();
-    this.api.on("disconnected", this.newProvider.bind(this));
     this.connectingLock.release();
 
     if (isEnvNode()) {
@@ -115,7 +116,7 @@ class QueryClient {
   async disconnect(): Promise<void> {
     if (this.api && this.api.isConnected) {
       console.log("disconnecting");
-      this.api.off("disconnected", this.newProvider.bind(this));
+      this.api.off("disconnected", this.__disconnectHandler);
       await this.api.disconnect();
       await this.wait(false);
     }

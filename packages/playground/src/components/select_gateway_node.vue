@@ -139,7 +139,7 @@ async function loadNextPage() {
   loading.value = false;
 
   if (props.modelValue && !nodeExists) emits("update:model-value", undefined);
-  if (nodeExists) validator.value?.validate();
+  if (nodeExists) await validator.value?.validate();
 }
 defineExpose({ loading });
 function normalizeGatewayNode(item: any): GatewayNode {
