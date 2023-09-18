@@ -117,13 +117,12 @@
 </template>
 <script lang="ts" setup>
 import { Keyring } from "@polkadot/keyring";
-import { GridClient } from "@threefold/grid_client";
 import type { Twin } from "@threefold/tfchain_client";
 import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
-import { getGrid } from "../utils/grid";
+import { getGrid, loadProfile } from "../utils/grid";
 const activeTab = ref(0);
 const receipientTwinId = ref("");
 const isValidTwinIDTransfer = ref(false);
@@ -132,7 +131,8 @@ const loadingTwinIDTransfer = ref(false);
 const loadingAddressTransfer = ref(false);
 const isValidAddressTransfer = ref(false);
 const receipientAddress = ref("");
-const profile = useProfileManager().profile;
+const profileManager = useProfileManager();
+const profile = ref(profileManager.profile!);
 const loadingBalance = ref(true);
 const recepTwinFromAddress = ref<Twin>();
 const receptTwinFromTwinID = ref<Twin>();
@@ -142,12 +142,12 @@ onMounted(async () => {
   await getFreeBalance();
 });
 function isSameTwinID(value: string) {
-  if (parseInt(value.trim()) == profile?.twinId) {
+  if (parseInt(value.trim()) == profile.value?.twinId) {
     return { message: "Cannot transfer to yourself" };
   }
 }
 async function isValidTwinID(value: string) {
-  const grid = await getGrid(useProfileManager().profile!);
+  const grid = await getGrid(profile.value);
   try {
     if (grid) {
       receptTwinFromTwinID.value = await grid.twins.get({ id: parseInt(value.trim()) });
@@ -161,12 +161,12 @@ async function isValidTwinID(value: string) {
 }
 
 function isSameAddress(value: string) {
-  if (value.trim() == profile?.address) {
+  if (value.trim() == profile.value?.address) {
     return { message: "Cannot transfer to yourself" };
   }
 }
 async function isValidAddress() {
-  const grid = await getGrid(useProfileManager().profile!);
+  const grid = await getGrid(profile.value);
   const keyring = new Keyring({ type: "sr25519" });
   try {
     keyring.addFromAddress(receipientAddress.value.trim());
@@ -194,7 +194,7 @@ function clearInput() {
   receipientAddress.value = "";
 }
 async function getFreeBalance() {
-  const grid = await getGrid(useProfileManager().profile!);
+  const grid = await getGrid(profile.value);
   if (grid) {
     loadingBalance.value = true;
     const balance = await grid.balance.getMyBalance();
@@ -203,7 +203,7 @@ async function getFreeBalance() {
   }
 }
 async function transfer(receipientTwin: Twin) {
-  const grid = await getGrid(useProfileManager().profile!);
+  const grid = await getGrid(profile.value);
   try {
     if (grid) {
       grid.balance.transfer({ address: receipientTwin.accountId, amount: transferAmount.value });
@@ -215,6 +215,8 @@ async function transfer(receipientTwin: Twin) {
         timeout: 5000,
       });
 
+      profile.value = await loadProfile(grid);
+      profileManager.set(profile.value);
       await getFreeBalance();
     }
   } catch (err) {
@@ -236,7 +238,7 @@ function createInvalidTransferToast(message: string) {
   });
 }
 async function submitFormTwinID() {
-  const grid = await getGrid(useProfileManager().profile!);
+  const grid = await getGrid(profile.value);
   if (grid) {
     const twinDetails = await grid.twins.get({ id: parseInt(receipientTwinId.value.trim()) });
 
