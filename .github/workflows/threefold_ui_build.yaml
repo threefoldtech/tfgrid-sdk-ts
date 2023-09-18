@@ -42,4 +42,4 @@ jobs:
       - name: Build
         run: |
           lerna run build --no-private
-          yarn workspace @threefold/UI build-only
+          yarn workspace @threefold/ui build-only
