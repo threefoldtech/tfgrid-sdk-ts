@@ -17,7 +17,7 @@ yarn build
 
 ### Supported URLs
 
-- [devnet](wss://graphql.dev.grid.tf)
-- [qanet](wss://graphql.qa.grid.tf)
-- [testnet](wss://graphql.test.grid.tf)
-- [mainnet](wss://graphql.grid.tf)
+- [devnet](https://graphql.dev.grid.tf/graphql)
+- [qanet](https://graphql.qa.grid.tf/graphql)
+- [testnet](https://graphql.test.grid.tf/graphql)
+- [mainnet](https://graphql.grid.tf/graphql)
