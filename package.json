@@ -31,5 +31,8 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx,css,scss,svelte,vue}": "eslint -c .eslintrc.json --fix",
     "*.{js,ts,css,scss,md,svelte,vue,yaml}": "prettier .prettierrc --write"
+  },
+  "dependencies": {
+    "@achrinza/node-ipc": "^10.1.9"
   }
 }
