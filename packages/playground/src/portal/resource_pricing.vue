@@ -1,7 +1,7 @@
 <template>
   <div class="mt-8">
     <v-container class="custom-container">
-      <v-card color="calcprimary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+      <v-card color="title" class="d-flex justify-center items-center mt-3 pa-3 text-center">
         <v-icon size="30" class="pr-3" color="white">mdi-calculator</v-icon>
         <v-card-title class="pa-0" lor="white">Resource Pricing Calculator</v-card-title>
       </v-card>
@@ -264,7 +264,7 @@ async function setPriceList(pkgs: any): Promise<PriceType[]> {
       price: `${pkgs.sharedPrice}`,
       color: "black",
       packageName: pkgs.sharedPackage,
-      backgroundColor: color(pkgs.dedicatedPackage),
+      backgroundColor: color(pkgs.sharedPackage),
       TFTs: (+pkgs.sharedPrice / TFTPrice.value).toFixed(2),
       info: "Shared Nodes allow several users to host various workloads on a single node",
     },
@@ -273,17 +273,23 @@ async function setPriceList(pkgs: any): Promise<PriceType[]> {
 }
 
 onMounted(async () => {
-  grid.value = await getGrid(profileManager.profile!);
-  const pkgs = await grid.value.calculator.calculate({
-    cru: CRU.value,
-    mru: MRU.value,
-    hru: HRU.value,
-    sru: SRU.value,
-    ipv4u: ipv4.value,
-    certified: isCertified.value,
-    balance: balance.value,
-  });
-  setPriceList(pkgs);
+  getGrid(profileManager.profile!)
+    .then(async result => {
+      grid.value = result;
+      const pkgs = await grid.value.calculator.calculate({
+        cru: CRU.value,
+        mru: MRU.value,
+        hru: HRU.value,
+        sru: SRU.value,
+        ipv4u: ipv4.value,
+        certified: isCertified.value,
+        balance: balance.value,
+      });
+      setPriceList(pkgs);
+    })
+    .catch(error => {
+      console.error("Error fetching the grid:", error);
+    });
 });
 </script>
 
