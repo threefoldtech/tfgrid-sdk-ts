@@ -1,22 +1,22 @@
 <template>
-  <PDFSignerViewComponent pdfurl dest network />
+  <PDFSignerComponent pdfurl dest network />
 </template>
 
 <script lang="ts">
 import { ref } from "vue";
 
-import PDFSignerViewComponent from "../components/PDFSignerViewComponent.vue";
+import PDFSignerComponent from "../components/PDFSignerViewComponent.vue";
 export default {
   name: "TFPDFSignerView",
   components: {
-    PDFSignerViewComponent,
+    PDFSignerComponent,
   },
   setup() {
-    const pdfurl = ref();
-    const dest = ref();
-    const network = ref();
+    const pdfurl = ref<string>();
+    const dest = ref<string>();
+    const network = ref<string>();
     return {
-      PDFSignerViewComponent,
+      PDFSignerComponent,
       pdfurl,
       dest,
       network,

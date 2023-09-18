@@ -12,7 +12,7 @@ import {
 } from "./types";
 
 export default class ThreefoldConnector extends ThreefoldProvider {
-  private config: AcceptConfig = { keypairType: KeypairType.ed25519 };
+  private config: AcceptConfig = { keypairType: KeypairType.sr25519 };
   private network: NetworkEnv = NetworkEnv.main;
 
   async use(props: SignProps): Promise<ErrorType> {

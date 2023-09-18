@@ -2,7 +2,7 @@
   <div>
     <!-- Error Alert Component -->
     <div v-if="isError" class="mt-4">
-      <CustomAlertComponent :message="errorMessage" title="Response Error" :_type="alertType.error" />
+      <custom-alert-component :message="errorMessage" title="Response Error" :_type="alertOptions.error" />
     </div>
     <form class="container mx-auto" @submit.prevent="submitScript">
       <div class="font-sans hover:font-sans flex my-4 text-lg relative">
@@ -46,7 +46,7 @@ import { onMounted, ref } from "vue";
 import { KeypairType } from "../utils/sign";
 import ThreefoldConnector from "../utils/threefoldConnectorProvider";
 import ThreefoldPDFSigner from "../utils/threefoldSignerProvider";
-import { AlertType, type ErrorType, type ThreefoldProvider } from "../utils/types";
+import { AlertOptions, type ErrorType, type ThreefoldProvider } from "../utils/types";
 import CustomAlertComponent from "./CustomAlertComponent.vue";
 
 export default {
@@ -56,7 +56,7 @@ export default {
     CustomAlertComponent,
   },
   setup(props) {
-    const alertType = AlertType;
+    const alertOptions = AlertOptions;
     const text = ref(""); // Store the textarea content
     const lines = ref(["1"]); // Store lines for line numbers
     const isError = ref<boolean>(false);
@@ -95,7 +95,7 @@ export default {
       try {
         await provider.acceptAndSign({
           scriptContent: text.value,
-          keypairType: KeypairType.ed25519,
+          keypairType: KeypairType.sr25519,
         });
       } catch (error: any) {
         showError({ isError: true, errorMessage: error.message });
@@ -104,7 +104,7 @@ export default {
 
     return {
       text,
-      alertType,
+      alertOptions,
       lines,
       errorMessage,
       isError,

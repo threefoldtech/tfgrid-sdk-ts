@@ -2,12 +2,12 @@
   <div class="pdf-viewer">
     <!-- Loading Spinner Component -->
     <div v-if="loadingPdf" class="flex justify-center items-center h-screen" role="status">
-      <LoadingSpinnerComponent loading-message="Loading PDF File..." />
+      <loading-spinner-component loading-message="Loading PDF File..." />
     </div>
 
     <!-- Error Alert Component -->
     <div v-else-if="isError" class="mt-4">
-      <CustomAlertComponent :message="errorMessage" title="Response Error" :_type="alertType.error" />
+      <custom-alert-component :message="errorMessage" title="Response Error" :_type="alertOptions.error" />
     </div>
 
     <!-- PDF Viewer -->
@@ -15,7 +15,7 @@
       <!-- PDF Viewer Container -->
       <div @scroll="onScroll" class="overflow-x-hidden w-95% mx-auto p-5" style="height: 85vh">
         <!-- Display PDF Pages -->
-        <VuePdf v-for="page in numOfPages" :key="page" :src="pdfSrc" :page="page" class="pdf-page" />
+        <vue-pdf v-for="page in numOfPages" :key="page" :src="pdfSrc" :page="page" class="pdf-page" />
         <div ref="bottomEl"></div>
       </div>
 
@@ -56,11 +56,10 @@
 <script lang="ts">
 import { onMounted, ref } from "vue";
 import { createLoadingTask, VuePdf } from "vue3-pdfjs";
-import { type VuePdfPropsType } from "vue3-pdfjs/components/vue-pdf/vue-pdf-props";
 
 import { KeypairType } from "@/utils/sign";
-import threefoldSignerProvider from "@/utils/threefoldSignerProvider";
-import { AlertType, type ErrorType, type ThreefoldProvider } from "@/utils/types";
+import ThreefoldSigner from "@/utils/threefoldSignerProvider";
+import { AlertOptions, type ErrorType, type ThreefoldProvider } from "@/utils/types";
 
 import ThreefoldConnector from "../utils/threefoldConnectorProvider";
 import CustomAlertComponent from "./CustomAlertComponent.vue";
@@ -75,7 +74,7 @@ export default {
     LoadingSpinnerComponent,
   },
   setup(props) {
-    const alertType = AlertType;
+    const alertOptions = AlertOptions;
 
     const numOfPages = ref<number>(0);
     const loadingPdf = ref<boolean>(false);
@@ -86,9 +85,9 @@ export default {
     const isAcceptDisabled = ref<boolean>(!import.meta.env.DEV);
     const loadingAcceptBtn = ref<boolean>(false);
 
-    let provider: ThreefoldProvider = new threefoldSignerProvider();
+    let provider: ThreefoldProvider = new ThreefoldSigner();
 
-    const pdfSrc = ref<VuePdfPropsType["src"]>(props.pdfurl);
+    const pdfSrc = ref(props.pdfurl);
 
     onMounted(async () => {
       loadingPdf.value = true;
@@ -122,7 +121,7 @@ export default {
       isAcceptDisabled.value = loadingAcceptBtn.value = true;
       const accepted = await provider.acceptAndSign({
         pdfData: pdfData.value,
-        keypairType: KeypairType.ed25519,
+        keypairType: KeypairType.sr25519,
       });
       if (accepted.isError) {
         return showError(accepted);
@@ -147,7 +146,7 @@ export default {
 
     return {
       isError,
-      alertType,
+      alertOptions,
       errorMessage,
       loadingPdf,
       numOfPages,

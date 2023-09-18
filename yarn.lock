@@ -3907,10 +3907,10 @@
   resolved "https://registry.yarnpkg.com/@substrate/ss58-registry/-/ss58-registry-1.43.0.tgz#93108e45cb7ef6d82560c153e3692c2aa1c711b3"
   integrity sha512-USEkXA46P9sqClL7PZv0QFsit4S8Im97wchKG0/H/9q3AT/S76r40UHfCr4Un7eBJPE23f7fU9BZ0ITpP9MCsA==
 
-"@threefold/extension_api@^0.0.1-rc3":
-  version "0.0.1-rc4"
-  resolved "https://registry.yarnpkg.com/@threefold/extension_api/-/extension_api-0.0.1-rc4.tgz#acd99b15093174da59cc277f3c0306bf903fc835"
-  integrity sha512-z6AbD8U7vuEqJdpNHekEtguZM9Q4RKHiejkFWFoHNhlJi4g0Tk2K6oF9m4xAcKsSMIyTZLgds2XkUfTzsvyGFA==
+"@threefold/extension_api@^0.0.1-rc6":
+  version "0.0.1-rc6"
+  resolved "https://registry.yarnpkg.com/@threefold/extension_api/-/extension_api-0.0.1-rc6.tgz#9271ac014f8cfc5b0351f75bc7bee6f9e5e744a2"
+  integrity sha512-rICTgNT7NuAlJCi9PcQ4l5q4jh0aQ/9nilXu9SHHo4toSYd9NxeI4HxF+Vmk1vR8O7iA101SoRhJrJCAqjtROw==
 
 "@tootallnate/once@2":
   version "2.0.0"

@@ -8,7 +8,7 @@ export type RequestData = {
   signature: string;
 };
 
-export enum AlertType {
+export enum AlertOptions {
   error = "error",
   warning = "warning",
 }

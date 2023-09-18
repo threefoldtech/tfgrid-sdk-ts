@@ -52,7 +52,7 @@ Here's an example of how to use the PDF Signer Web Component in your HTML file:
     <pdf-signer
       dest="http://localhost:3000/"
       pdfUrl="https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf"
-      network="dev"
+      network="main"
     />
     <!-- Include the PDF Signer component script -->
     <script src="./pdf.js"></script>

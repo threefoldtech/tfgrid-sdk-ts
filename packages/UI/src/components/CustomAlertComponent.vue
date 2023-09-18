@@ -10,7 +10,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
 
-import { AlertType } from "../utils/types";
+import { AlertOptions } from "../utils/types";
 
 const props = defineProps({
   title: String,
@@ -22,9 +22,9 @@ const classes = ref("");
 
 const getAlertColor = (): string => {
   switch (props._type) {
-    case AlertType.error:
+    case AlertOptions.error:
       return "bg-red-100 border-l-4 border-red-500 text-red-700 container p-4 mx-auto";
-    case AlertType.warning:
+    case AlertOptions.warning:
       return "bg-orange-100 border-l-4 border-orange-500 text-orange-700 container p-4 mx-auto";
   }
   return "orange";

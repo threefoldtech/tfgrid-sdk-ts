@@ -50,11 +50,11 @@ If the signature is verified successfully, the server will respond with an HTTP 
 
 #### Unverified Signature
 
-If the signature cannot be verified, the server will respond with an HTTP status code of 200 and a JSON response like this:
+If the signature cannot be verified, the server will respond with an HTTP status code of 400 and a JSON response like this:
 
 ```json
 {
-  "status": 200,
+  "status": 400,
   "message": "Failed to verify the signature.",
   "data": {
     "isValid": false

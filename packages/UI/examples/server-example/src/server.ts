@@ -16,19 +16,13 @@ export enum KeypairType {
   ed25519 = "ed25519",
 }
 
-interface Payload {
+type Payload = {
   twinid?: number;
   pdfUrl?: string;
   pubkey: string;
   content?: string;
   signature: string;
   keypairType: KeypairType;
-}
-
-let payload: Payload = {
-  pubkey: "",
-  signature: "",
-  keypairType: KeypairType.ed25519,
 };
 
 const verify = async (payload: Payload) => {
@@ -55,7 +49,7 @@ const verify = async (payload: Payload) => {
 };
 
 app.post("/api/verify", async (req: Request, res: Response) => {
-  payload = req.body;
+  const payload: Payload = req.body;
   let content: Uint8Array = new Uint8Array();
   try {
     if (payload.pdfUrl) {
