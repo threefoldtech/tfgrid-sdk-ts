@@ -13,12 +13,11 @@
 </template>
 
 <script lang="ts">
-import { GridClient } from "@threefold/grid_client";
 import { createToast } from "mosha-vue-toastify";
 import { ref } from "vue";
 
 import { useProfileManager } from "../stores";
-import { loadProfile } from "../utils/grid";
+import { getGrid, loadProfile } from "../utils/grid";
 
 export default {
   name: "FundsCard",
@@ -32,11 +31,11 @@ export default {
       } else {
         loadingAddTFT.value = true;
         try {
-          const client = new GridClient({ mnemonic: profileManager.profile!.mnemonic, network: window.env.NETWORK });
-          client.connect();
-          await client.tfclient.balances.getMoreFunds();
+          const grid = await getGrid(profileManager.profile!);
+          await grid?.connect();
+          await grid?.tfclient.balances.getMoreFunds();
           loadingAddTFT.value = false;
-          const profile = await loadProfile(client);
+          const profile = await loadProfile(grid!);
           profileManager.set(profile);
           createToast(`Success!`, {
             position: "bottom-right",
