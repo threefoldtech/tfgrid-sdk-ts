@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-dialog transition="dialog-bottom-transition" max-width="1000" v-model="depositDialog">
+    <v-dialog transition="dialog-bottom-transition" max-width="1000" v-model="depositDialog" persistent>
       <v-card>
         <v-toolbar color="primary" dark class="bold-text"> Deposit TFT </v-toolbar>
         <v-card-text>
@@ -17,20 +17,16 @@
                   <li>
                     Memo Text: <b>twin_{{ twinId }}</b>
                   </li>
+                  <div v-if="loading" class="loading">
+                    <div class="spinner"></div>
+                  </div>
                 </ul>
               </v-col>
               <v-divider class="mx-4" vertical></v-divider>
               <v-col>
                 Or use ThreeFold Connect to scan this QRcode:
                 <div class="d-flex justify-center py-2">
-                  <qrcode-vue
-                    :value="qrCodeText"
-                    :size="250"
-                    level="M"
-                    render-as="svg"
-                    style="background: white; padding: 6%"
-                  >
-                  </qrcode-vue>
+                  <QrcodeGenerator :data="qrCodeText" />
                 </div>
               </v-col>
             </v-row>
@@ -48,19 +44,19 @@
 </template>
 
 <script setup lang="ts">
-import { GridClient } from "@threefold/grid_client";
 import { Decimal } from "decimal.js";
 import { createToast } from "mosha-vue-toastify";
-import QrcodeVue from "qrcode.vue";
 import { onBeforeUnmount, onMounted, ref } from "vue";
 
+import QrcodeGenerator from "../components/qrcode_generator.vue";
 import { useProfileManager } from "../stores";
-import { loadProfile } from "../utils/grid";
+import { getGrid, loadProfile } from "../utils/grid";
 
 const depositDialog = ref(false);
 const emits = defineEmits(["close"]);
 const profileManager = useProfileManager();
 let destroyed = false;
+const loading = ref(false);
 
 const props = defineProps({
   selectedName: String,
@@ -75,12 +71,13 @@ onMounted(async () => {
   if (!props.openDepositDialog) return;
   depositDialog.value = true;
   try {
-    const client = new GridClient({ mnemonic: profileManager.profile!.mnemonic, network: window.env.NETWORK });
-    client.connect();
-    const receivedDeposit = await client.tfclient.tftBridge.listenToMintCompleted(
+    loading.value = true;
+    const grid = await getGrid(profileManager.profile!);
+    const receivedDeposit = await grid!.tfclient.tftBridge.listenToMintCompleted(
       profileManager.profile?.address as string,
     );
-
+    console.log("recieved", receivedDeposit);
+    loading.value = false;
     if (destroyed) return;
     const DecimalDeposit = new Decimal(receivedDeposit);
     const divisor = new Decimal(10000000);
@@ -92,7 +89,7 @@ onMounted(async () => {
       showIcon: true,
       type: "success",
     });
-    const profile = await loadProfile(client);
+    const profile = await loadProfile(grid!);
     profileManager.set(profile);
   } catch (e) {
     if (destroyed) return;
@@ -123,5 +120,30 @@ onBeforeUnmount(() => {
 .bold-text {
   font-weight: bold;
   padding-left: 1rem;
+}
+.loading {
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.3);
+  border-top: 4px solid #1aa18f;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
