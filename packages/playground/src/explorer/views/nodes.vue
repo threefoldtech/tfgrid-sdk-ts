@@ -1,6 +1,5 @@
 <template>
-  <NodeFilter v-model="filters" />
-  {{ filters }}
+  <node-filter v-model="filters" />
 
   <div class="hint mb-2 mt-3">
     <v-alert type="info" variant="tonal">
@@ -170,8 +169,22 @@ export default {
     // ______________
 
     // Nodes Filters
-    watch(filters, () => {
-      console.log("Changed....");
+    watch(filters.value, async () => {
+      try {
+        const { count, data } = await gridProxyClient.nodes.list({
+          retCount: true,
+          nodeId: filters.value.nodeId.value ? +filters.value.nodeId.value : undefined,
+          farmIds: filters.value.farmIds.value,
+          farmName: filters.value.farmName.value,
+          freeMru: filters.value.freeMru.value ? +filters.value.freeMru.value * 1024 * 1024 * 1024 : undefined,
+          freeHru: filters.value.freeHru.value ? +filters.value.freeHru.value * 1024 * 1024 * 1024 : undefined,
+          freeSru: filters.value.freeSru.value ? +filters.value.freeSru.value * 1024 * 1024 * 1024 : undefined,
+        });
+        nodes.value = data;
+        nodesCount.value = count;
+      } catch (err) {
+        console.log(err);
+      }
     });
 
     const setValue = async () => {
