@@ -10,18 +10,29 @@
       </v-expansion-panel-title>
       <v-expansion-panel-text>
         <v-row no-gutters>
-          <v-col cols="2" class="ml-2 mr-2 mb-2" v-for="key in Object.keys($props.modelValue)" :key="key">
-            <v-text-field
-              :rules="$props.modelValue[key].rules"
-              :error-messages="'This is an error'"
-              v-model="$props.modelValue[key].value"
-              :label="$props.modelValue[key].label"
-              hide-details
-              :placeholder="$props.modelValue[key].placeholder"
-              type="text"
-            ></v-text-field>
+          <v-col
+            cols="2"
+            class="d-flex justify-end align-center ml-2 mr-2 mb-2"
+            v-for="key in Object.keys($props.modelValue)"
+            :key="key"
+          >
+            <input-validator
+              v-model:error="$props.modelValue[key].error"
+              #="{ props }"
+              :rules="$props.modelValue[key].rules[0]"
+              :async-rules="$props.modelValue[key].rules[1]"
+              :value="$props.modelValue[key].value"
+            >
+              <v-text-field
+                v-bind="props"
+                v-model="$props.modelValue[key].value"
+                :label="$props.modelValue[key].label"
+                :placeholder="$props.modelValue[key].placeholder"
+                :type="$props.modelValue[key].type"
+              ></v-text-field>
+            </input-validator>
           </v-col>
-          <v-col cols="2" class="d-flex justify-center align-center">
+          <v-col cols="2" class="d-flex justify-start align-center mb-6 ml-4">
             <v-btn @click="resetFilters" variant="outlined" color="primary">Reset filter</v-btn>
           </v-col>
         </v-row>
@@ -32,11 +43,9 @@
 
 <script lang="ts">
 import type { PropType } from "vue";
-import { defineComponent, ref } from "vue";
+import { defineComponent } from "vue";
 
 import type { NodeInputFilterType } from "@/explorer/utils/types";
-
-// import type { ExplorerFilterNodesType } from "../../../utils/types";
 
 export default defineComponent({
   props: {
@@ -46,8 +55,6 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    const invalid = ref(false);
-
     const resetFilters = () => {
       emit(
         "update:model-value",
@@ -59,7 +66,6 @@ export default defineComponent({
     };
 
     return {
-      invalid,
       resetFilters,
     };
   },

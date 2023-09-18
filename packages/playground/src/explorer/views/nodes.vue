@@ -38,10 +38,10 @@
                         <v-select
                           class="p-0"
                           v-model="nodeStatusFilter"
-                          :items="[statusFilter.up, statusFilter.down]"
+                          :items="[statusFilters.Up, statusFilters.Down]"
                           label="Select Nodes Status"
                           variant="underlined"
-                          @update:model-value="(val:string) => onUpdateOptions({status: val.toLowerCase() as any})"
+                          @update:model-value="(val: any) => onUpdateOptions({status: val.toLowerCase() as any})"
                         ></v-select>
                       </v-col>
                     </v-row>
@@ -133,16 +133,17 @@
 </template>
 
 <script lang="ts">
-import type { NodesQuery } from "tf_gridproxy_client";
+import { type NodesQuery, NodeStatus } from "tf_gridproxy_client";
 import type { Ref } from "vue";
 import { ref, watch } from "vue";
+import { onMounted } from "vue";
 
-import { gridProxyClient } from "@/clients";
 import secondToRedable from "@/utils/second_to_redable";
 import toFixedCsSize from "@/utils/to_fixed_cs_size";
 
 import NodeFilter from "../components/Common/Filters/NodeFilter.vue";
 import NodeDetails from "../components/Nodes/NodeDetails.vue";
+import { requestNodes } from "../utils/helpers";
 import { filterInitializer, type NodeFiltersType } from "../utils/types.js";
 
 export default {
@@ -157,94 +158,83 @@ export default {
     const gpuFilter = ref(false);
     const gatewayFilter = ref(false);
 
-    const gatewayValueChange = async () => {
-      tableLoading.value = true;
-      if (gatewayFilter.value) {
-        await getNodes({ ...defaultFilterValues.value, domain: gatewayFilter.value, ipv4: gatewayFilter.value });
-      } else {
-        await getNodes({ ...defaultFilterValues.value });
-      }
-      tableLoading.value = false;
-    };
-    // ______________
+    const nodes: any = ref([]);
+    const nodesCount: Ref<number | null> = ref(0);
+    const nodeStatusFilter = ref<NodeStatus>(NodeStatus.Up);
+    const statusFilters = NodeStatus;
 
-    watch(filters.value, async () => {
-      if (filters.value.nodeId.rules) {
-        filters.value.nodeId.rules[0]("This is an message");
-        console.log(filters.value.nodeId.rules[0]("This is an message").error);
-      }
-      try {
-        const { count, data } = await gridProxyClient.nodes.list({
-          retCount: true,
-          nodeId: filters.value.nodeId.value ? +filters.value.nodeId.value : undefined,
-          farmIds: filters.value.farmIds.value,
-          farmName: filters.value.farmName.value,
-          freeMru: filters.value.freeMru.value ? +filters.value.freeMru.value * 1024 * 1024 * 1024 : undefined,
-          freeHru: filters.value.freeHru.value ? +filters.value.freeHru.value * 1024 * 1024 * 1024 : undefined,
-          freeSru: filters.value.freeSru.value ? +filters.value.freeSru.value * 1024 * 1024 * 1024 : undefined,
-        });
-        nodes.value = data;
-        nodesCount.value = count;
-      } catch (err) {
-        console.log(err);
-      }
-    });
-
-    const setValue = async () => {
-      try {
-        const { count, data } = await gridProxyClient.nodes.list({
-          retCount: true,
-          nodeId: filters.value.nodeId.value ? +filters.value.nodeId.value : undefined,
-          farmIds: filters.value.farmIds.value,
-          farmName: filters.value.farmName.value,
-          freeMru: filters.value.freeMru.value ? +filters.value.freeMru.value * 1024 * 1024 * 1024 : undefined,
-          freeHru: filters.value.freeHru.value ? +filters.value.freeHru.value * 1024 * 1024 * 1024 : undefined,
-          freeSru: filters.value.freeSru.value ? +filters.value.freeSru.value * 1024 * 1024 * 1024 : undefined,
-        });
-        nodes.value = data;
-        nodesCount.value = count;
-      } catch (err) {
-        console.log(err);
-      }
-
-      // console.log("inputs", inputs);
-
-      // const strKeys = ["farmIds", "country", "farmName"];
-      // const convertedKeys = ["freeHru", "freeMru", "freeSru"];
-      // const excludedKeys = ["twinId"];
-      // if (!excludedKeys.includes(key)) {
-      //   if (strKeys.includes(key)) {
-      //     defaultFilterValues.value = { ...defaultFilterValues.value, [key]: value };
-      //   } else {
-      //     if (!convertedKeys.includes(key)) {
-      //       defaultFilterValues.value = { ...defaultFilterValues.value, [key]: +value };
-      //     } else {
-      //       let newVal = +value * 1024 * 1024 * 1024;
-      //       newVal = Math.ceil(newVal);
-      //       defaultFilterValues.value = { ...defaultFilterValues.value, [key]: newVal };
-      //     }
-      //   }
-      // }
-      // requestNodes(defaultFilterValues.value);
-    };
-    // ______________
-    // Status Filter
-    const statusFilter = { up: "Up", down: "Down" };
-    const nodeStatusFilter = ref<string>(statusFilter.up);
-
-    const getStatus = (node: any) => {
-      if (node.props.title.status === statusFilter.up.toLocaleLowerCase()) {
-        return { color: "green", status: statusFilter.up };
-      } else {
-        return { color: "red", status: statusFilter.down };
-      }
-    };
-    // ______________
-
-    // Table Options
     const tableLoading = ref(false);
     const nodesTablePageNumber = ref(1);
     const nodesTablePageSize = ref(10);
+
+    const defaultFilterValues = ref({
+      retCount: true,
+      page: nodesTablePageNumber.value,
+      size: nodesTablePageSize.value,
+      status: nodeStatusFilter.value.toLowerCase() as any,
+    });
+
+    onMounted(async () => {
+      _requestNodes(defaultFilterValues.value);
+    });
+
+    const _requestNodes = async (options?: Partial<NodesQuery>) => {
+      try {
+        tableLoading.value = true;
+        const { count, data } = await requestNodes(options);
+        nodes.value = data;
+        nodesCount.value = count;
+      } catch (err) {
+        console.log(err);
+      } finally {
+        tableLoading.value = false;
+      }
+    };
+
+    const gatewayValueChange = async () => {
+      tableLoading.value = true;
+      // if (gatewayFilter.value) {
+      //   await getNodes({ ...defaultFilterValues.value, domain: gatewayFilter.value, ipv4: gatewayFilter.value });
+      // } else {
+      //   await getNodes({ ...defaultFilterValues.value });
+      // }
+      tableLoading.value = false;
+    };
+
+    // Watch on filter reset.
+    watch(filters, async () => {
+      console.log("filters 2 changed...");
+      await _requestNodes();
+    });
+
+    watch(nodeStatusFilter, () => {
+      filters.value.status = nodeStatusFilter.value;
+      console.log("Status changed...");
+    });
+
+    // Watch on values, filters.
+    watch(filters.value, async () => {
+      console.log("filters changed...");
+      await _requestNodes({
+        nodeId: filters.value.nodeId.value ? +filters.value.nodeId.value : undefined,
+        farmIds: filters.value.farmIds.value,
+        farmName: filters.value.farmName.value,
+        freeMru: filters.value.freeMru.value ? +filters.value.freeMru.value * 1024 * 1024 * 1024 : undefined,
+        freeHru: filters.value.freeHru.value ? +filters.value.freeHru.value * 1024 * 1024 * 1024 : undefined,
+        freeSru: filters.value.freeSru.value ? +filters.value.freeSru.value * 1024 * 1024 * 1024 : undefined,
+        status: filters.value.status,
+      });
+    });
+
+    const getStatus = (node: any) => {
+      if (node.props.title.status === statusFilters.Up.toLocaleLowerCase()) {
+        return { color: "green", status: statusFilters.Up };
+      } else {
+        return { color: "red", status: statusFilters.Down };
+      }
+    };
+    // ______________
+
     const headers: any = [
       { title: "ID", key: "nodeId" },
       { title: "Farm ID", key: "farmId", align: "center" },
@@ -266,35 +256,6 @@ export default {
     // ______________
 
     // Nodes Handling
-    const nodes: any = ref([]);
-    const nodesCount: Ref<number | null> = ref(0);
-    const defaultFilterValues = ref({
-      retCount: true,
-      page: nodesTablePageNumber.value,
-      size: nodesTablePageSize.value,
-      status: nodeStatusFilter.value.toLowerCase() as any,
-    });
-
-    const getNodes = async (options: Partial<NodesQuery>) => {
-      try {
-        const { count, data } = await gridProxyClient.nodes.list(options);
-        nodes.value = data;
-        nodesCount.value = count;
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    const requestNodes = async (options: Partial<NodesQuery>) => {
-      tableLoading.value = true;
-      // for (const option in options) {
-      //   if (options[option] === 0 || options[option] === "") {
-      //     delete options[option];
-      //   }
-      // }
-      await getNodes({});
-      tableLoading.value = false;
-    };
 
     const onUpdateOptions = (options: Partial<NodesQuery>) => {
       defaultFilterValues.value = {
@@ -330,45 +291,30 @@ export default {
       gpuFilter,
       gatewayFilter,
       gatewayValueChange,
-      // ______________
-      // Status Filter
-      statusFilter,
+
       nodeStatusFilter,
       getStatus,
-      // ______________
-      // Nodes Filters
-      setValue,
-      // ______________
-      // Table Options
       nodesTablePageNumber,
       nodesTablePageSize,
       tableLoading,
       headers,
-      // ______________
-      // Nodes Handling
+
       nodes,
       nodesCount,
       defaultFilterValues,
-      getNodes,
       requestNodes,
       onUpdateOptions,
-      // ______________
 
-      // utils
       secondToRedable,
       toFixedCsSize,
-      // ______________
 
-      // Node Details
       openDetails,
       currentNode,
       toggleNodeDetails,
       openSheet,
       filters,
+      statusFilters,
     };
-  },
-  created() {
-    this.requestNodes(this.defaultFilterValues);
   },
 };
 </script>
