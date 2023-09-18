@@ -12,6 +12,8 @@
         <v-row no-gutters>
           <v-col cols="2" class="ml-2 mr-2 mb-2" v-for="key in Object.keys($props.modelValue)" :key="key">
             <v-text-field
+              :rules="$props.modelValue[key].rules"
+              :error-messages="'This is an error'"
               v-model="$props.modelValue[key].value"
               :label="$props.modelValue[key].label"
               hide-details
@@ -32,12 +34,14 @@
 import type { PropType } from "vue";
 import { defineComponent, ref } from "vue";
 
+import type { NodeInputFilterType } from "@/explorer/utils/types";
+
 // import type { ExplorerFilterNodesType } from "../../../utils/types";
 
 export default defineComponent({
   props: {
     modelValue: {
-      type: Object as PropType<{ [key: string]: { label: string; placeholder: string; value: any } }>,
+      type: Object as PropType<{ [key: string]: NodeInputFilterType }>,
       required: true,
     },
   },

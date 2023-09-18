@@ -55,6 +55,7 @@ export function isIn(msg: string, list: string[]) {
 export function isInt(msg: string, options?: validator.IsIntOptions) {
   return (value: string) => {
     if (!validator.isInt(value, options)) {
+      console.log({ message: msg, isInt: options || true });
       return { message: msg, isInt: options || true };
     }
   };

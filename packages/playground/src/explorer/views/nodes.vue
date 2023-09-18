@@ -168,8 +168,11 @@ export default {
     };
     // ______________
 
-    // Nodes Filters
     watch(filters.value, async () => {
+      if (filters.value.nodeId.rules) {
+        filters.value.nodeId.rules[0]("This is an message");
+        console.log(filters.value.nodeId.rules[0]("This is an message").error);
+      }
       try {
         const { count, data } = await gridProxyClient.nodes.list({
           retCount: true,

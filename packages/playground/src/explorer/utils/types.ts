@@ -1,7 +1,10 @@
+import { isInt, required } from "@/utils/validators";
+
 export type NodeInputFilterType = {
   label: string;
   placeholder: string;
   value: string | undefined;
+  rules?: any;
 };
 
 export type NodeFiltersType = {
@@ -20,6 +23,7 @@ export const filterInitializer: NodeFiltersType = {
     label: "Node ID",
     placeholder: "Filter by node id.",
     value: undefined,
+    rules: [isInt("This field accepts numbers only."), required("This field is required.")],
   },
   twinId: {
     label: "Twin ID",
