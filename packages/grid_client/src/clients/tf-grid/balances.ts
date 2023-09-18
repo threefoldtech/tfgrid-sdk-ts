@@ -1,4 +1,3 @@
-import { Keyring } from "@polkadot/keyring";
 import { Balance, Balances, BalanceTransferOptions, Client, QueryBalancesGetOptions } from "@threefold/tfchain_client";
 import { Decimal } from "decimal.js";
 
@@ -19,10 +18,14 @@ class TFBalances extends Balances {
   }
 
   async getMoreFunds() {
-    const client = new Client({ url: this.client.url, mnemonicOrSecret: "//Alice" });
-    await client.connect();
-    const transaction = await client.balances.transfer({ address: this.client.address, amount: 100 * 1e7 });
-    return transaction.apply();
+    if (this.client.url === "wss://tfchain.dev.grid.tf/ws" || this.client.url === "wss://tfchain.qa.grid.tf/ws") {
+      const client = new Client({ url: this.client.url, mnemonicOrSecret: "//Alice" });
+      await client.connect();
+      const transaction = await client.balances.transfer({ address: this.client.address, amount: 100 * 1e7 });
+      return transaction.apply();
+    } else {
+      return 0;
+    }
   }
 }
 

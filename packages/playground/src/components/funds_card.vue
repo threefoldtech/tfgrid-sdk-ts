@@ -32,8 +32,7 @@ export default {
         loadingAddTFT.value = true;
         try {
           const grid = await getGrid(profileManager.profile!);
-          await grid?.connect();
-          await grid?.tfclient.balances.getMoreFunds();
+          await grid?.balance.getMoreFunds();
           loadingAddTFT.value = false;
           const profile = await loadProfile(grid!);
           profileManager.set(profile);
