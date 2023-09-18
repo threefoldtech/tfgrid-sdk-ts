@@ -45,6 +45,7 @@ export default {
             showIcon: true,
           });
         } catch (e) {
+          loadingAddTFT.value = false;
           console.log("Error: ", e);
           createToast(`Get more TFT failed!`, {
             position: "bottom-right",

@@ -18,14 +18,13 @@ class TFBalances extends Balances {
   }
 
   async getMoreFunds() {
-    if (this.client.url === "wss://tfchain.dev.grid.tf/ws" || this.client.url === "wss://tfchain.qa.grid.tf/ws") {
-      const client = new Client({ url: this.client.url, mnemonicOrSecret: "//Alice" });
-      await client.connect();
-      const transaction = await client.balances.transfer({ address: this.client.address, amount: 100 * 1e7 });
-      return transaction.apply();
-    } else {
-      return 0;
+    if (this.client.url !== "wss://tfchain.dev.grid.tf/ws" && this.client.url !== "wss://tfchain.qa.grid.tf/ws") {
+      throw "Unable to get more TFTs";
     }
+    const client = new Client({ url: this.client.url, mnemonicOrSecret: "//Alice" });
+    await client.connect();
+    const transaction = await client.balances.transfer({ address: this.client.address, amount: 100 * 1e7 });
+    return transaction.apply();
   }
 }
 
