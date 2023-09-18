@@ -122,7 +122,7 @@ import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
-import { getGrid, loadProfile } from "../utils/grid";
+import { getGrid, loadBalance, loadProfile } from "../utils/grid";
 const activeTab = ref(0);
 const receipientTwinId = ref("");
 const isValidTwinIDTransfer = ref(false);
@@ -197,7 +197,7 @@ async function getFreeBalance() {
   const grid = await getGrid(profile.value);
   if (grid) {
     loadingBalance.value = true;
-    const balance = await grid.balance.getMyBalance();
+    const balance = await loadBalance(grid);
     freeBalance.value = balance.free;
     loadingBalance.value = false;
   }
