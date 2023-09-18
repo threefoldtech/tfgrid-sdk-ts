@@ -1,13 +1,16 @@
 <template>
   <div>
-    <v-container class="custom-container">
+    <v-container>
       <v-row>
-        <section class="items" v-if="Istats.length != 0">
-          <div v-for="item of Istats" :key="item.title">
+        <v-col v-if="Istats.length !== 0" class="d-flex flex-wrap justify-center">
+          <v-col v-for="item of Istats" :key="item.title" cols="6" md="2" sm="4" xs="12" class="px-2">
             <StatisticsCard :item="item" />
-          </div>
-        </section>
-        <v-col cols="10" class="mx-auto"> <tf-map color="primary" :nodes="nodesDistribution"></tf-map></v-col>
+          </v-col>
+        </v-col>
+
+        <v-col v-else cols="12" class="mx-auto">
+          <tf-map color="primary" :nodes="nodesDistribution" />
+        </v-col>
       </v-row>
       <section class="loader" v-if="Istats.length === 0">
         <v-progress-circular size="150" indeterminate />
@@ -19,9 +22,10 @@
 </template>
 
 <script lang="ts" setup>
-import axios from "axios";
+import { NodeStatus } from "tf_gridproxy_client";
 import { onMounted, ref } from "vue";
 
+import { gridProxyClient } from "../clients";
 import StatisticsCard from "../components/statistics_card.vue";
 import type { IStatistics as IStatistics } from "../types";
 import toTeraOrGigaOrPeta from "../utils/toTeraOrGegaOrPeta";
@@ -48,15 +52,11 @@ const nodesDistribution = ref<string>("");
 
 let stats: Stats | null = null;
 
-const req = axios.create({
-  baseURL: `${window.env.GRIDPROXY_URL}`,
-});
-
 const fetchData = async () => {
-  req
-    .get("/stats?status=up")
-    .then(({ data }) => {
-      stats = data;
+  gridProxyClient.stats
+    .get({ status: NodeStatus.Up })
+    .then(async (result: any) => {
+      stats = result;
       if (!loading.value || stats != null) {
         nodesDistribution.value = JSON.stringify(stats!.nodesDistribution);
         Istats.value = [
@@ -75,36 +75,13 @@ const fetchData = async () => {
         ];
       }
     })
-    .catch(error => {
-      console.log(error);
+    .catch((error: any) => {
+      console.error("Error fetching stats:", error);
     })
-    .finally(() => (loading.value = false));
+    .finally(() => {
+      loading.value = false;
+    });
 };
 
 onMounted(fetchData);
 </script>
-
-<style lang="scss" scoped>
-.items {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-
-  > div {
-    padding: 5px;
-    width: 16.5%;
-
-    @media (max-width: 1910px) {
-      width: calc(100% / 6);
-    }
-
-    @media (max-width: 1270px) {
-      width: 50%;
-    }
-
-    @media (max-width: 800px) {
-      width: 100%;
-    }
-  }
-}
-</style>
