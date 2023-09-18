@@ -16,7 +16,7 @@ yarn build
 
 ### Supported URLs
 
-- [devnet](wss://gridproxy.dev.grid.tf)
-- [qanet](wss://gridproxy.qa.grid.tf)
-- [testnet](wss://gridproxy.test.grid.tf)
-- [mainnet](wss://gridproxy.grid.tf)
+- [devnet](https://gridproxy.dev.grid.tf)
+- [qanet](https://gridproxy.qa.grid.tf)
+- [testnet](https://gridproxy.test.grid.tf)
+- [mainnet](https://gridproxy.grid.tf)
