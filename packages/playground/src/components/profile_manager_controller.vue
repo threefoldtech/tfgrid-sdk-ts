@@ -27,7 +27,7 @@ export default {
   setup() {
     let m: ManagerService;
 
-    provide("profile:manager:controller", {
+    provide(key, {
       set(manager: ManagerService) {
         m = manager;
       },
