@@ -299,8 +299,8 @@ class Nodes {
     const query = this.getNodeUrlQuery(options);
     try {
       nodes = await send("get", urlJoin(url, `/nodes?${query}`), "", {});
-    } catch {
-      throw Error(`Invalid query: ${query}`);
+    } catch (err) {
+      throw Error(`Error while requesting the grid proxy due ${err}`);
     }
     if (nodes.length) {
       nodes = nodes.filter(n => !(options.nodeExclude && options.nodeExclude?.includes(n.nodeId)));
@@ -313,8 +313,8 @@ class Nodes {
     const query = this.getFarmUrlQuery(options);
     try {
       farms = await send("get", urlJoin(url, `/farms?${query}`), "", {});
-    } catch {
-      throw Error(`Invalid query: ${query}`);
+    } catch (err) {
+      throw Error(`Error while requesting the grid proxy due ${err}`);
     }
     return farms;
   }

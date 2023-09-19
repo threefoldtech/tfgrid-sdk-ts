@@ -30,7 +30,7 @@ async function newClient(mnemonic: string) {
     await gridClient.connect();
 
     setTimeout(async () => {
-      console.log(`Requist the grid to get the twin id.`);
+      console.log(`Request the grid to get the twin id.`);
       const twinID = await gridClient.twins.get_my_twin_id();
       console.log(`Twin id: ${twinID}`);
     }, 10 * 60 * 1000);
