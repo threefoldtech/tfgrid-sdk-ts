@@ -115,14 +115,18 @@
     </v-card>
   </v-container>
 </template>
+
 <script lang="ts" setup>
 import { Keyring } from "@polkadot/keyring";
 import type { Twin } from "@threefold/tfchain_client";
 import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
+import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useProfileManager } from "../stores";
-import { getGrid, loadBalance, loadProfile } from "../utils/grid";
+import { getGrid, loadBalance } from "../utils/grid";
+
+const profileManagerController = useProfileManagerController();
 const activeTab = ref(0);
 const receipientTwinId = ref("");
 const isValidTwinIDTransfer = ref(false);
@@ -136,7 +140,6 @@ const profile = ref(profileManager.profile!);
 const loadingBalance = ref(true);
 const recepTwinFromAddress = ref<Twin>();
 const receptTwinFromTwinID = ref<Twin>();
-
 const freeBalance = ref(0);
 onMounted(async () => {
   await getFreeBalance();
@@ -159,7 +162,6 @@ async function isValidTwinID(value: string) {
     return { message: "Invalid Twin ID. This ID has no Twin." };
   }
 }
-
 function isSameAddress(value: string) {
   if (value.trim() == profile.value?.address) {
     return { message: "Cannot transfer to yourself" };
@@ -187,7 +189,6 @@ async function isValidAddress() {
     return { message: "Invalid address. Twin ID doesn't exist" };
   }
 }
-
 function clearInput() {
   transferAmount.value = 1;
   receipientTwinId.value = "";
@@ -206,17 +207,14 @@ async function transfer(receipientTwin: Twin) {
   const grid = await getGrid(profile.value);
   try {
     if (grid) {
-      grid.balance.transfer({ address: receipientTwin.accountId, amount: transferAmount.value });
-
+      await grid.balance.transfer({ address: receipientTwin.accountId, amount: transferAmount.value });
       createToast("Transaction Complete!", {
         position: "top-right",
         hideProgressBar: true,
         toastBackgroundColor: "green",
         timeout: 5000,
       });
-
-      profile.value = await loadProfile(grid);
-      profileManager.set(profile.value);
+      profileManagerController.reloadBalance();
       await getFreeBalance();
     }
   } catch (err) {
@@ -228,7 +226,6 @@ async function submitFormAddress() {
   await transfer(recepTwinFromAddress.value!);
   loadingAddressTransfer.value = false;
 }
-
 function createInvalidTransferToast(message: string) {
   createToast(message, {
     position: "top-right",
@@ -241,7 +238,6 @@ async function submitFormTwinID() {
   const grid = await getGrid(profile.value);
   if (grid) {
     const twinDetails = await grid.twins.get({ id: parseInt(receipientTwinId.value.trim()) });
-
     if (twinDetails != null) {
       loadingTwinIDTransfer.value = true;
       await transfer(twinDetails);
