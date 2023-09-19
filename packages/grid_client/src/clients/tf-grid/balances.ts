@@ -21,6 +21,7 @@ class TFBalances extends Balances {
     if (this.client.url !== "wss://tfchain.dev.grid.tf/ws" && this.client.url !== "wss://tfchain.qa.grid.tf/ws") {
       throw "Unable to get more TFTs";
     }
+    await this.client.connect();
     const client = new Client({ url: this.client.url, mnemonicOrSecret: "//Alice" });
     await client.connect();
     const transaction = await client.balances.transfer({ address: this.client.address, amount: 100 * 1e7 });
