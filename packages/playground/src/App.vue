@@ -15,8 +15,8 @@
           }"
         >
           <v-list>
-            <template v-for="route in checkedRoutes" :key="route.title">
-              <v-list-group v-if="route.items.length > 1" :value="route.title">
+            <template v-for="route in routes" :key="route.title">
+              <v-list-group v-if="route.items?.length > 1" :value="route.title">
                 <template v-slot:activator="{ props }">
                   <v-list-item v-bind="props" :prepend-icon="route.icon" :title="route.title"></v-list-item>
                 </template>
@@ -153,7 +153,7 @@ watch(
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
 
-let routes: AppRoute[] = [
+const routes: AppRoute[] = [
   {
     title: "Portal",
     icon: "mdi-account-convert-outline",
@@ -221,10 +221,18 @@ let routes: AppRoute[] = [
       },
     ],
   },
-  {
-    title: "Minting",
-    items: [{ title: "Minting", icon: "mdi-file-document-edit", route: "/minting" }],
-  },
+  network !== "main"
+    ? {}
+    : ({
+        title: "Minting",
+        items: [
+          {
+            title: "Minting",
+            icon: "mdi-file-document-edit",
+            route: "/minting",
+          },
+        ],
+      } as any),
   {
     title: "Other Services",
     icon: "mdi-toolbox",
@@ -262,13 +270,6 @@ let routes: AppRoute[] = [
 const permanent = window.innerWidth > 980;
 const openSidebar = ref(permanent);
 
-const checkedRoutes = computed(() => {
-  if (network !== "main") {
-    routes = routes.filter(route => route.title !== "Minting");
-  }
-  return routes;
-});
-
 const baseUrl = import.meta.env.BASE_URL;
 
 function clickHandler({ route, url }: AppRouteItem): void {
@@ -280,10 +281,6 @@ function clickHandler({ route, url }: AppRouteItem): void {
 }
 
 $router.beforeEach((to, from, next) => {
-  if (to.path === "/minting") {
-    return;
-  }
-  next();
   if (to.path === "/" && hasActiveProfile) {
     next({ path: "portal/twin" });
   } else {
