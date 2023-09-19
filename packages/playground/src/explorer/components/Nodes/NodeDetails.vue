@@ -477,7 +477,6 @@ export default {
             value: ((props.node?.used_resources[resource] / props.node?.total_resources[resource]) * 100).toFixed(2),
           });
         }
-        console.log(resources);
       }
     };
 
@@ -552,7 +551,6 @@ export default {
       () => props.openDetails,
       newValue => {
         dialog.value = newValue as boolean;
-        console.log(props.node);
         if (newValue) {
           loadData();
         }

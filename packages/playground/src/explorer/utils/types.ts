@@ -14,7 +14,23 @@ export type NodeInputFilterType = {
   type: string;
 };
 
-export type NodeInputsFiltersType = {
+// The input filters<nodeId, farmIds..etc> and the option filters<status, gpu...etc>
+export type MixedFilter = {
+  inputs: FilterInputs;
+  options: FilterOptions;
+};
+
+// Status, GPU, Gateway, and any other option should be add here.
+export type FilterOptions = {
+  status: NodeStatus;
+  gpu: boolean;
+  gateway: boolean;
+  page: number;
+  size: number;
+};
+
+// Input fields
+export type FilterInputs = {
   nodeId: NodeInputFilterType;
   farmIds: NodeInputFilterType;
   farmName: NodeInputFilterType;
@@ -24,7 +40,15 @@ export type NodeInputsFiltersType = {
   freeMru: NodeInputFilterType;
 };
 
-export const filterInitializer: NodeInputsFiltersType = {
+export const optionsInitializer: FilterOptions = {
+  gateway: false,
+  gpu: false,
+  page: 1,
+  size: 10,
+  status: NodeStatus.Up,
+};
+
+export const inputsInitializer: FilterInputs = {
   nodeId: {
     label: "Node ID",
     placeholder: "Filter by node id.",
@@ -33,7 +57,7 @@ export const filterInitializer: NodeInputsFiltersType = {
     type: "number",
   },
   farmIds: {
-    label: "Farm IDs",
+    label: "Farm ID",
     placeholder: "Find nodes in Farms with ids.",
     value: undefined,
     rules: [[isInt("This field accepts numbers only.")]],
