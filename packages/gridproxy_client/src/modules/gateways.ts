@@ -1,6 +1,6 @@
-import { AbstractClient } from "./abstract_client";
 import { CertificationType, GatewayBuilder, GatewaysQuery, NodeStatus } from "../builders/public_api";
 import { assertId, resolvePaginator } from "../utils";
+import { AbstractClient } from "./abstract_client";
 import { Farm } from "./farms";
 
 export interface Resources {
@@ -19,6 +19,12 @@ export interface PublicConfig {
   gw6: string;
   ipv4: string;
   ipv6: string;
+}
+
+export interface PublicIps {
+  total: number;
+  used: number;
+  free: number;
 }
 
 export interface GridNode {
@@ -43,6 +49,7 @@ export interface GridNode {
   rentContractId: number;
   rentedByTwinId: number;
   farm: Farm;
+  publicIps: PublicIps;
 }
 
 export class GatewaysClient extends AbstractClient<GatewayBuilder, GatewaysQuery> {
