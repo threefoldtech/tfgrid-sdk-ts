@@ -25,6 +25,11 @@ const router = createRouter({
           component: () => import("../portal/twin_view.vue"),
           meta: { title: "Twin" },
         },
+        {
+          path: "transfer",
+          component: () => import("../portal/transfer_view.vue"),
+          meta: { title: "Transfer" },
+        },
       ],
     },
     {
