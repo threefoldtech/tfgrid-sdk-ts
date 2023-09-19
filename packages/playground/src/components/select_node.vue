@@ -264,15 +264,13 @@ async function loadNodes(farmId: number) {
           }
         }
         availableNodes.value = nodesArr.value;
-        selectedNode.value = undefined;
       } else {
-        selectedNode.value = undefined;
         availableNodes.value = [];
       }
     } catch (e) {
       errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
     } finally {
-      validator.value?.setStatus(ValidatorStatus.Invalid);
+      validator.value?.setStatus(ValidatorStatus.Init);
       loadingNodes.value = false;
       farmManager?.setLoading(false);
     }
@@ -293,7 +291,7 @@ async function validateNodeStoragePool(grid: GridClient, nodeId: number, disks: 
       nodeId: nodeId,
       cards: cards,
     });
-    validator.value?.validate();
+    await validator.value?.validate();
   } catch (e) {
     errorMessage.value = `Couldn't fit the required disks in Node ${nodeId} storage pools, please select another node`;
     availableNodes.value = availableNodes.value.filter(node => node.nodeId !== nodeId);

@@ -27,6 +27,31 @@
         <template v-slot:append-item v-if="page !== -1">
           <div class="px-4 mt-4">
             <v-btn
+              v-if="gatewayOption == 'farm'"
+              block
+              color="secondary"
+              variant="tonal"
+              rounded="large"
+              size="large"
+              @click="loadNextPage"
+              :loading="loading"
+            >
+              Load More Gateway Nodes in {{ farmData?.name }}
+            </v-btn>
+            <v-btn
+              v-else-if="gatewayOption == 'country'"
+              block
+              color="secondary"
+              variant="tonal"
+              rounded="large"
+              size="large"
+              @click="loadNextPage"
+              :loading="loading"
+            >
+              Load More Gateway Nodes in {{ farmData?.country }}
+            </v-btn>
+            <v-btn
+              v-else
               block
               color="secondary"
               variant="tonal"
@@ -66,6 +91,7 @@ const items = ref<any[]>([]);
 const page = ref(1);
 const size = 50;
 const validator = ref();
+const gatewayOption = ref("");
 
 onMounted(loadNextPage);
 onUnmounted(() => emits("update:model-value", undefined));
@@ -84,6 +110,7 @@ async function loadNextPage() {
   validator.value?.setStatus(ValidatorStatus.Init);
   const grid = await getGrid(profileManager.profile!);
   let nodes = [];
+  gatewayOption.value = "farm";
   const options: gatewayFilters = {
     page: page.value++,
     size,
@@ -92,13 +119,15 @@ async function loadNextPage() {
   nodes = await loadGatewayNodes(grid!, options);
 
   if (!nodes.length && props.customDomain && props.farmData?.country) {
+    gatewayOption.value = "country";
     options.farmId = undefined;
     options.country = props.farmData.country;
     nodes = await loadGatewayNodes(grid!, options); // search in the same country
-  }
-  if (!nodes.length && props.customDomain) {
-    options.country = options.farmId = undefined;
-    nodes = await loadGatewayNodes(grid!, options); // search in the whole network
+    if (!nodes.length && props.customDomain) {
+      gatewayOption.value = "Network";
+      options.country = options.farmId = undefined;
+      nodes = await loadGatewayNodes(grid!, options); // search in the whole network
+    }
   }
 
   if (nodes.length === 0 || nodes.length < size) {
@@ -110,7 +139,7 @@ async function loadNextPage() {
   loading.value = false;
 
   if (props.modelValue && !nodeExists) emits("update:model-value", undefined);
-  if (nodeExists) validator.value?.validate();
+  if (nodeExists) await validator.value?.validate();
 }
 defineExpose({ loading });
 function normalizeGatewayNode(item: any): GatewayNode {

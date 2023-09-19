@@ -9,6 +9,15 @@ export function downloadAsFile(name: string, data: string) {
   a.remove();
 }
 
+export function downloadAsJson(data: object) {
+  const a = document.createElement("a");
+  a.download = "contracts.json";
+  a.href = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data))}`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
 export function normalizeError(error: any, fallbackError: string): string {
   return typeof error === "string"
     ? error

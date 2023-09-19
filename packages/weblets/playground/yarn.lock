@@ -880,9 +880,9 @@
     regenerator-runtime "^0.13.4"
 
 "@babel/runtime@^7.18.9", "@babel/runtime@^7.20.13", "@babel/runtime@^7.20.6":
-  version "7.22.11"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.22.11.tgz#7a9ba3bbe406ad6f9e8dd4da2ece453eb23a77a4"
-  integrity sha512-ee7jVNlWN09+KftVOu9n7S8gQzD/Z6hN/I8VBRXW4P1+Xe7kJGXMwu8vds4aGIMHZnNbdpSWCfZZtinytpcAvA==
+  version "7.22.15"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.22.15.tgz#38f46494ccf6cf020bd4eed7124b425e83e523b8"
+  integrity sha512-T0O+aa+4w0u06iNmapipJXMV4HoUir03hpx3/YqXXhu9xim3w+dVphjFWl1OH8NbZHw5Lbm9k45drDkgq2VNNA==
   dependencies:
     regenerator-runtime "^0.14.0"
 
@@ -1529,15 +1529,15 @@
   resolved "https://registry.yarnpkg.com/@substrate/ss58-registry/-/ss58-registry-1.43.0.tgz#93108e45cb7ef6d82560c153e3692c2aa1c711b3"
   integrity sha512-USEkXA46P9sqClL7PZv0QFsit4S8Im97wchKG0/H/9q3AT/S76r40UHfCr4Un7eBJPE23f7fU9BZ0ITpP9MCsA==
 
-"@threefold/grid_client@2.1.0-rc12":
-  version "2.1.0-rc12"
-  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.1.0-rc12.tgz#8d7adb3bc904a80cade520b5d30c6926bca5b779"
-  integrity sha512-3834w66lfbguSDEc70PsGfJltdn1vICQpqFn1+bwW6IYbxDJkFJlkbYY8nGbsDUkbLgx01FSP6mOM8lcggbu+g==
+"@threefold/grid_client@2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.1.1.tgz#32a6135634d23ff66ab3a86aacd16e76eff75c1b"
+  integrity sha512-czcACdSfNgCHmL4xymIhDhqjIFOapdq4WIZTcZXrdqRozxe1ezW/afDSOf3z0uIAtC9k9dYj3Rt3pwv9xjw7ZA==
   dependencies:
     "@jimber/pkid" "1.0.4"
     "@noble/secp256k1" "^1.7.1"
-    "@threefold/rmb_direct_client" "^2.1.0-rc12"
-    "@threefold/tfchain_client" "^2.1.0-rc12"
+    "@threefold/rmb_direct_client" "^2.1.1"
+    "@threefold/tfchain_client" "^2.1.1"
     algosdk "^1.19.0"
     appdata-path "^1.0.0"
     axios "^0.27.2"
@@ -1559,14 +1559,14 @@
     url-parse "^1.5.10"
     uuid4 "^2.0.2"
 
-"@threefold/rmb_direct_client@^2.1.0-rc12":
-  version "2.1.0-rc12"
-  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-2.1.0-rc12.tgz#fe05378fd8fa75fbfc76e7d73ffa9fd2f07b1209"
-  integrity sha512-PkoyhpkRt5lRXYK+MsJudAYiMMl8tm7JF2zv0HB+F6VxfXKaUXMbfQWpW3tK3fnTmiisob27bfrgh49kdNfO3w==
+"@threefold/rmb_direct_client@^2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-2.1.1.tgz#c2f9b29af22761f558efe815760403fcbd4accd7"
+  integrity sha512-V5HFzPQt5q1vXas4Q3G+AJjrXaSM9/MbH0s3XTYJT4tVtMBn97Lf7rSWnIlK6/Rdox12j+wJKiUZAY0C+ndTog==
   dependencies:
     "@noble/secp256k1" "^1.7.1"
     "@polkadot/api" "^8.9.1"
-    "@threefold/tfchain_client" "^2.1.0-rc12"
+    "@threefold/tfchain_client" "^2.1.1"
     base64url "^3.0.1"
     bip39 "^3.1.0"
     buffer "^6.0.3"
@@ -1576,10 +1576,10 @@
     uuid "^8.3.2"
     ws "^8.12.0"
 
-"@threefold/tfchain_client@^2.1.0-rc12":
-  version "2.1.0-rc12"
-  resolved "https://registry.yarnpkg.com/@threefold/tfchain_client/-/tfchain_client-2.1.0-rc12.tgz#fa1ae9fa8b3468e50a9815fe8b0b1af0a21ff8ce"
-  integrity sha512-k8PlzffxRdmS+eTuaopPIehlDSqpYygrwOlZmxJY4w2RNIOBK+q94PHcC6z1/wA5UJU1Rd20oJlzbE9oXqiBpA==
+"@threefold/tfchain_client@^2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@threefold/tfchain_client/-/tfchain_client-2.1.1.tgz#26f25a6d0cca8050742400d889ccb3af3192aa16"
+  integrity sha512-Xwp5R6lSiqaAPpSrawAZ5vju1CNCKpas/0Sz/h2IKscTjbMMeNEcyP1bxM7QR9L/VmLsjeSNLk6jtBLFbQMSsw==
   dependencies:
     "@polkadot/api" "^8.9.1"
     await-lock "^2.2.2"
@@ -1758,9 +1758,9 @@
   integrity sha512-Exw4yUWMBXM3X+8oqzJNRqZSwUAaS4+7NdvHqQuFi/d+synz++xmX3QIf+BFqneW8N31R8Ky+sikfZUXq07ggQ==
 
 "@types/node@>= 8":
-  version "20.5.6"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.5.6.tgz#5e9aaa86be03a09decafd61b128d6cec64a5fe40"
-  integrity sha512-Gi5wRGPbbyOTX+4Y2iULQ27oUPrefaB0PxGQJnfyWN3kvEDGM3mIB5M/gQLmitZf7A9FmLeaqxD3L1CXpm3VKQ==
+  version "20.6.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.6.0.tgz#9d7daa855d33d4efec8aea88cd66db1c2f0ebe16"
+  integrity sha512-najjVq5KN2vsH2U/xyh2opaSEz6cZMR2SetLIlxlj08nOcmPOemJmUK2o4kUzfLqfrWE0PIrNeE16XhYDd3nqg==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -1835,9 +1835,9 @@
     source-map "^0.6.1"
 
 "@types/urijs@^1.19.6":
-  version "1.19.19"
-  resolved "https://registry.yarnpkg.com/@types/urijs/-/urijs-1.19.19.tgz#2789369799907fc11e2bc6e3a00f6478c2281b95"
-  integrity sha512-FDJNkyhmKLw7uEvTxx5tSXfPeQpO0iy73Ry+PmYZJvQy0QIWX8a7kJ4kLWRf+EbTPJEPDSgPXHaM7pzr5lmvCg==
+  version "1.19.20"
+  resolved "https://registry.yarnpkg.com/@types/urijs/-/urijs-1.19.20.tgz#7ea4254f4c2cdbd7d34e47d483e76fa1b81e19a4"
+  integrity sha512-77Mq/2BeHU894J364dUv9tSwxxyCLtcX228Pc8TwZpP5bvOoMns+gZoftp3LYl3FBH8vChpWbuagKGiMki2c1A==
 
 "@types/validator@^13.7.10":
   version "13.11.1"
@@ -3004,9 +3004,9 @@ bignumber.js@^4.0.0:
   integrity sha512-eJzYkFYy9L4JzXsbymsFn3p54D+llV27oTQ+ziJG7WFRheJcNZilgVXMG0LoZtlQSKBsJdWtLFqOD0u+U0jZKA==
 
 bignumber.js@^9.0.0:
-  version "9.1.1"
-  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.1.1.tgz#c4df7dc496bd849d4c9464344c1aa74228b4dac6"
-  integrity sha512-pHm4LsMJ6lzgNGVfZHjMoO8sdoRhOzOH4MLmY65Jg70bpxCKu5iOHNJyfF6OyvYw7t8Fpf35RuzUyqnQsj8Vig==
+  version "9.1.2"
+  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.1.2.tgz#b7c4242259c008903b13707983b5f4bbd31eda0c"
+  integrity sha512-2/mKyZH9K85bzOEfhXDBFZTGd1CTs+5IHpeFQo9luiBG7hghdC851Pj2WAhb6E3R6b9tZj/XKhbg4fum+Kepug==
 
 binary-extensions@^1.0.0:
   version "1.13.1"
@@ -6953,9 +6953,9 @@ js-beautify@^1.6.12, js-beautify@^1.6.14:
     nopt "^5.0.0"
 
 js-crypto-aes@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/js-crypto-aes/-/js-crypto-aes-1.0.4.tgz#db3fed7b2d7ceec4610eb246be515f12d9674594"
-  integrity sha512-L2fh7Q55+8eS/ALbhgAZYZpTkuo+n12+3GpuUE+U6SGlObmwibG5rVtDTVSTNgV9VuzD2BaY4unTkRWTcfLYxg==
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/js-crypto-aes/-/js-crypto-aes-1.0.5.tgz#a6faa64ecc5ccda0caa84dd7e95eefd61d5e9117"
+  integrity sha512-tP+SbHbhHx6ck0VE9dDPDC0QUN5WzngXomERrvI8gXovIrN1V8mI6mL4EI4mfORkSh3f4fXSIxb079rRTSHqtw==
   dependencies:
     js-crypto-env "^1.0.4"
 
@@ -7246,9 +7246,9 @@ levn@~0.3.0:
     type-check "~0.3.2"
 
 libphonenumber-js@^1.10.14:
-  version "1.10.42"
-  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.10.42.tgz#38112294b2ee3f2ac3813c79390b7a77fc7e833d"
-  integrity sha512-/as6xI3D4Utfd28CCUPvMqX4oVXGMzk4ytzR52ju+sI/sN68LZpr9ED3Kh2kRfBbOALsLeeOSWdtyUPIbNWPrw==
+  version "1.10.44"
+  resolved "https://registry.yarnpkg.com/libphonenumber-js/-/libphonenumber-js-1.10.44.tgz#6709722461173e744190494aaaec9c1c690d8ca8"
+  integrity sha512-svlRdNBI5WgBjRC20GrCfbFiclbF0Cx+sCcQob/C1r57nsoq0xg8r65QbTyVyweQIlB33P+Uahyho6EMYgcOyQ==
 
 libsodium-wrappers@^0.7.10, libsodium-wrappers@^0.7.6:
   version "0.7.11"
@@ -7682,9 +7682,9 @@ mkdirp@0.x, mkdirp@^0.5.1, mkdirp@^0.5.3, mkdirp@^0.5.5, mkdirp@~0.5.1:
     minimist "^1.2.5"
 
 mock-socket@^9.1.5:
-  version "9.2.1"
-  resolved "https://registry.yarnpkg.com/mock-socket/-/mock-socket-9.2.1.tgz#cc9c0810aa4d0afe02d721dcb2b7e657c00e2282"
-  integrity sha512-aw9F9T9G2zpGipLLhSNh6ZpgUyUl4frcVmRN08uE1NWPWg43Wx6+sGPDbQ7E5iFZZDJW5b5bypMeAEHqTbIFag==
+  version "9.3.1"
+  resolved "https://registry.yarnpkg.com/mock-socket/-/mock-socket-9.3.1.tgz#24fb00c2f573c84812aa4a24181bb025de80cc8e"
+  integrity sha512-qxBgB7Qa2sEQgHFjj0dSigq7fX4k6Saisd5Nelwp2q8mlbAFh5dHV9JTTlF8viYJLSSWgMCZFUom8PJcMNBoJw==
 
 move-concurrently@^1.0.1:
   version "1.0.1"
@@ -11429,9 +11429,9 @@ ws@^7.0.0:
   integrity sha512-BAkMFcAzl8as1G/hArkxOxq3G7pjUqQ3gzYbLL0/5zNkph70e+lCoxBGnm6AW1+/aiNeV4fnKqZ8m4GZewmH2w==
 
 ws@^8.12.0:
-  version "8.13.0"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-8.13.0.tgz#9a9fb92f93cf41512a0735c8f4dd09b8a1211cd0"
-  integrity sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==
+  version "8.14.1"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.14.1.tgz#4b9586b4f70f9e6534c7bb1d3dc0baa8b8cf01e0"
+  integrity sha512-4OOseMUq8AzRBI/7SLMUwO+FEDnguetSk7KMb1sHwvF2w2Wv5Hoj0nlifx8vtGsftE/jWHojPy8sMMzYLJ2G/A==
 
 xml-name-validator@^3.0.0:
   version "3.0.0"
