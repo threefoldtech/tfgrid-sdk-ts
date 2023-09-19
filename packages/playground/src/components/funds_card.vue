@@ -16,15 +16,16 @@
 import { createToast } from "mosha-vue-toastify";
 import { ref } from "vue";
 
+import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useProfileManager } from "../stores";
-import { getGrid, loadProfile } from "../utils/grid";
+import { getGrid } from "../utils/grid";
 
 export default {
   name: "FundsCard",
   setup() {
     const loadingAddTFT = ref(false);
     const profileManager = useProfileManager();
-
+    const ProfileManagerController = useProfileManagerController();
     const addTFT = async () => {
       if (window.env.NETWORK !== "dev" && window.env.NETWORK !== "qa") {
         window.open("https://gettft.com/gettft/", "_blank");
@@ -33,9 +34,8 @@ export default {
         try {
           const grid = await getGrid(profileManager.profile!);
           await grid?.balance.getMoreFunds();
+          await ProfileManagerController.reloadBalance();
           loadingAddTFT.value = false;
-          const profile = await loadProfile(grid!);
-          profileManager.set(profile);
           createToast(`Success!`, {
             position: "bottom-right",
             hideProgressBar: true,
