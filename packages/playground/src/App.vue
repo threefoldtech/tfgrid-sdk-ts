@@ -70,44 +70,6 @@
           </div>
         </div>
 
-    <v-main :style="{ paddingTop: '70px' }">
-      <v-toolbar
-        color="rgb(49, 49, 49)"
-        class="position-fixed pr-2"
-        theme="dark"
-        :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }"
-      >
-        <v-toolbar-title>
-          <v-img :src="baseUrl + 'images/logoTF.png'" width="160px" />
-        </v-toolbar-title>
-
-        <v-spacer>
-          <div class="d-flex align-center justify-start">
-            <FundsCard v-if="hasActiveProfile"></FundsCard>
-          </div>
-        </v-spacer>
-        <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
-        <v-divider vertical class="mx-2" />
-        <AppTheme />
-        <v-divider vertical class="mx-2" />
-        <ProfileManager v-model="openProfile" />
-      </v-toolbar>
-
-      <DeploymentListManager>
-        <v-container fluid :style="{ paddingBottom: '100px' }">
-          <div class="d-flex align-center">
-            <v-btn
-              color="primary"
-              @click="openSidebar = true"
-              icon="mdi-menu"
-              variant="tonal"
-              class="mr-2"
-              :disabled="!hasActiveProfile"
-              v-if="!permanent"
-            />
-            <div :style="{ width: '100%' }" class="mb-4">
-              <DisclaimerToolbar />
-            </div>
         <template v-if="version">
           <div class="version">
             <v-chip color="primary">
@@ -128,8 +90,11 @@
             <v-img :src="baseUrl + 'images/logoTF.png'" width="160px" />
           </v-toolbar-title>
 
-          <v-spacer></v-spacer>
-
+          <v-spacer>
+            <div class="d-flex align-center justify-start">
+              <FundsCard v-if="hasActiveProfile"></FundsCard>
+            </div>
+          </v-spacer>
           <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
           <v-divider vertical class="mx-2" />
           <AppTheme />
