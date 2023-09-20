@@ -5,6 +5,8 @@ export interface Profile {
   ssh: string;
   twinId: number;
   address: string;
+  relay: string;
+  pk: string;
 }
 
 interface State {
@@ -23,6 +25,16 @@ const useProfileManager = defineStore("profile-manager", {
     updateSSH(ssh: string) {
       if (this.profile) {
         this.profile.ssh = ssh;
+      }
+    },
+    updateRelay(relay: string) {
+      if (this.profile) {
+        this.profile.relay = relay;
+      }
+    },
+    updatePk(pk: string) {
+      if (this.profile) {
+        this.profile.pk = pk;
       }
     },
     clear() {
