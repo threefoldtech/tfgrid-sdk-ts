@@ -1,26 +1,50 @@
 <template>
   <v-app>
-    <v-navigation-drawer
-      width="280"
-      :permanent="permanent"
-      :model-value="hasActiveProfile && openSidebar"
-      @update:model-value="openSidebar = $event"
-      theme="dark"
-    >
-      <div :style="{ paddingTop: '64px' }">
-        <div
-          :style="{
-            maxHeight: 'calc(100vh - 64px)',
-            overflowY: 'auto',
-          }"
-        >
-          <v-list>
-            <template v-for="route in routes" :key="route.title">
-              <v-list-group v-if="route.items.length > 1" :value="route.title">
-                <template v-slot:activator="{ props }">
-                  <v-list-item v-bind="props" :prepend-icon="route.icon" :title="route.title"></v-list-item>
-                </template>
+    <profile-manager-controller>
+      <v-navigation-drawer
+        width="280"
+        :permanent="permanent"
+        :model-value="hasActiveProfile && openSidebar"
+        @update:model-value="openSidebar = $event"
+        theme="dark"
+      >
+        <div :style="{ paddingTop: '64px' }">
+          <div
+            :style="{
+              maxHeight: 'calc(100vh - 64px)',
+              overflowY: 'auto',
+            }"
+          >
+            <v-list>
+              <template v-for="route in routes" :key="route.title">
+                <v-list-group v-if="route.items.length > 1" :value="route.title">
+                  <template v-slot:activator="{ props }">
+                    <v-list-item v-bind="props" :prepend-icon="route.icon" :title="route.title"></v-list-item>
+                  </template>
+                  <v-list-item
+                    v-for="item in route.items"
+                    :key="item.route"
+                    :value="item.route"
+                    @click="clickHandler(item)"
+                    color="primary"
+                    :active="$route.path === item.route"
+                  >
+                    <template v-slot:prepend v-if="item.icon">
+                      <v-img
+                        v-if="item.icon.includes('.')"
+                        class="mr-7"
+                        width="24"
+                        :src="baseUrl + 'images/icons/' + item.icon"
+                        :alt="item.title"
+                      />
+                      <v-icon v-else width="26">{{ item.icon }}</v-icon>
+                    </template>
+
+                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                  </v-list-item>
+                </v-list-group>
                 <v-list-item
+                  v-else
                   v-for="item in route.items"
                   :key="item.route"
                   :value="item.route"
@@ -41,94 +65,72 @@
 
                   <v-list-item-title>{{ item.title }}</v-list-item-title>
                 </v-list-item>
-              </v-list-group>
-              <v-list-item
-                v-else
-                v-for="item in route.items"
-                :key="item.route"
-                :value="item.route"
-                @click="clickHandler(item)"
+              </template>
+            </v-list>
+          </div>
+        </div>
+
+        <template v-if="version">
+          <div class="version">
+            <v-chip color="primary">
+              {{ version }}
+            </v-chip>
+          </div>
+        </template>
+      </v-navigation-drawer>
+
+      <v-main :style="{ paddingTop: '70px' }">
+        <v-toolbar
+          color="rgb(49, 49, 49)"
+          class="position-fixed pr-2"
+          theme="dark"
+          :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }"
+        >
+          <v-toolbar-title>
+            <v-img :src="baseUrl + 'images/logoTF.png'" width="160px" />
+          </v-toolbar-title>
+
+          <v-spacer></v-spacer>
+
+          <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
+          <v-divider vertical class="mx-2" />
+          <AppTheme />
+          <v-divider vertical class="mx-2" />
+          <ProfileManager v-model="openProfile" />
+        </v-toolbar>
+
+        <DeploymentListManager>
+          <v-container fluid :style="{ paddingBottom: '100px' }">
+            <div class="d-flex align-center">
+              <v-btn
                 color="primary"
-                :active="$route.path === item.route"
-              >
-                <template v-slot:prepend v-if="item.icon">
-                  <v-img
-                    v-if="item.icon.includes('.')"
-                    class="mr-7"
-                    width="24"
-                    :src="baseUrl + 'images/icons/' + item.icon"
-                    :alt="item.title"
-                  />
-                  <v-icon v-else width="26">{{ item.icon }}</v-icon>
-                </template>
-
-                <v-list-item-title>{{ item.title }}</v-list-item-title>
-              </v-list-item>
-            </template>
-          </v-list>
-        </div>
-      </div>
-
-      <template v-if="version">
-        <div class="version">
-          <v-chip color="primary">
-            {{ version }}
-          </v-chip>
-        </div>
-      </template>
-    </v-navigation-drawer>
-
-    <v-main :style="{ paddingTop: '70px' }">
-      <v-toolbar
-        color="rgb(49, 49, 49)"
-        class="position-fixed pr-2"
-        theme="dark"
-        :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }"
-      >
-        <v-toolbar-title>
-          <v-img :src="baseUrl + 'images/logoTF.png'" width="160px" />
-        </v-toolbar-title>
-
-        <v-spacer></v-spacer>
-
-        <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
-        <v-divider vertical class="mx-2" />
-        <AppTheme />
-        <v-divider vertical class="mx-2" />
-        <ProfileManager v-model="openProfile" />
-      </v-toolbar>
-
-      <DeploymentListManager>
-        <v-container fluid :style="{ paddingBottom: '100px' }">
-          <div class="d-flex align-center">
-            <v-btn
-              color="primary"
-              @click="openSidebar = true"
-              icon="mdi-menu"
-              variant="tonal"
-              class="mr-2"
-              :disabled="!hasActiveProfile"
-              v-if="!permanent"
-            />
-            <div :style="{ width: '100%' }" class="mb-4">
-              <DisclaimerToolbar />
+                @click="openSidebar = true"
+                icon="mdi-menu"
+                variant="tonal"
+                class="mr-2"
+                :disabled="!hasActiveProfile"
+                v-if="!permanent"
+              />
+              <div :style="{ width: '100%' }" class="mb-4">
+                <DisclaimerToolbar />
+              </div>
             </div>
-          </div>
 
-          <div :style="{ position: 'relative' }">
-            <router-view v-slot="{ Component }">
-              <transition name="fade">
-                <div :key="$route.path">
-                  <component :is="Component" v-if="hasActiveProfile"></component>
-                  <ConnectWalletLanding @openProfile="openProfile = true" v-else />
-                </div>
-              </transition>
-            </router-view>
-          </div>
-        </v-container>
-      </DeploymentListManager>
-      <TFNotification v-if="hasActiveProfile" />
-    </v-main>
+            <div :style="{ position: 'relative' }">
+              <router-view v-slot="{ Component }">
+                <transition name="fade">
+                  <div :key="$route.path">
+                    <component :is="Component" v-if="hasActiveProfile"></component>
+                    <ConnectWalletLanding @openProfile="openProfile = true" v-else />
+                  </div>
+                </transition>
+              </router-view>
+            </div>
+          </v-container>
+        </DeploymentListManager>
+        <TFNotification v-if="hasActiveProfile" />
+      </v-main>
+    </profile-manager-controller>
   </v-app>
 </template>
 
@@ -249,6 +251,7 @@ import AppTheme from "./components/app_theme.vue";
 import ConnectWalletLanding from "./components/connect_wallet_landing.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
 import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
+import ProfileManagerController from "./components/profile_manager_controller.vue";
 import TFNotification from "./components/tf_notification.vue";
 import ProfileManager from "./weblets/profile_manager.vue";
 
@@ -275,6 +278,7 @@ export default {
     AppTheme,
     ConnectWalletLanding,
     AppInfo,
+    ProfileManagerController,
   },
 };
 </script>
