@@ -1,4 +1,4 @@
-import type { NodesQuery } from "tf_gridproxy_client";
+import type { NodesQuery } from "@threefold/gridproxy_client";
 
 import { gridProxyClient } from "@/clients";
 
@@ -26,6 +26,11 @@ export const getFilterValues = (mixedFilters: MixedFilter): Partial<NodesQuery> 
     freeHru: multiplyResource1024(+mixedFilters.inputs.freeHru.value!),
     freeMru: multiplyResource1024(+mixedFilters.inputs.freeMru.value!),
     freeSru: multiplyResource1024(+mixedFilters.inputs.freeSru.value!),
+    hasGpu: mixedFilters.options.gpu,
   };
+  if (mixedFilters.options.gateway) {
+    options.domain = mixedFilters.options.gateway;
+    options.ipv4 = mixedFilters.options.gateway;
+  }
   return options;
 };

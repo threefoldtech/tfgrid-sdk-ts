@@ -84,7 +84,7 @@
 </template>
 
 <script lang="ts">
-import { type GridNode, NodeStatus } from "tf_gridproxy_client";
+import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
 import type { PropType } from "vue";
 
 import secondToRedable from "@/utils/second_to_redable";

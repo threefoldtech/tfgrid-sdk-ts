@@ -74,7 +74,7 @@
 </template>
 
 <script lang="ts">
-import { type GridNode, type NodesQuery, NodeStatus } from "tf_gridproxy_client";
+import { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
 import { ref, watch } from "vue";
 import { onMounted } from "vue";
 
@@ -140,8 +140,8 @@ export default {
     const InputFiltersReset = (nFltrNptsVal: FilterInputs) => {
       mixedFilters.value.inputs = nFltrNptsVal;
       mixedFilters.value.options.status = NodeStatus.Up;
-      mixedFilters.value.options.gpu = false;
-      mixedFilters.value.options.gateway = false;
+      mixedFilters.value.options.gpu = undefined;
+      mixedFilters.value.options.gateway = undefined;
       mixedFilters.value.options.page = 1;
       mixedFilters.value.options.size = 10;
     };

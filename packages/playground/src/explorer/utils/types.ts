@@ -1,4 +1,4 @@
-import { NodeStatus } from "tf_gridproxy_client";
+import { NodeStatus } from "@threefold/gridproxy_client";
 
 import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
 import { isInt, isString } from "@/utils/validators";
@@ -23,8 +23,8 @@ export type MixedFilter = {
 // Status, GPU, Gateway, and any other option should be add here.
 export type FilterOptions = {
   status: NodeStatus;
-  gpu: boolean;
-  gateway: boolean;
+  gpu: boolean | undefined;
+  gateway: boolean | undefined;
   page: number;
   size: number;
 };
@@ -41,8 +41,8 @@ export type FilterInputs = {
 };
 
 export const optionsInitializer: FilterOptions = {
-  gateway: false,
-  gpu: false,
+  gateway: undefined,
+  gpu: undefined,
   page: 1,
   size: 10,
   status: NodeStatus.Up,
