@@ -40,7 +40,7 @@
 
   <!-- Withdraw Dialog -->
   <v-container v-if="openWithdrawDialog">
-    <v-dialog transition="dialog-bottom-transition" max-width="1000" v-model="openWithdrawDialog">
+    <v-dialog transition="dialog-bottom-transition" max-width="1000" v-model="openWithdrawDialog" persistent>
       <v-card>
         <v-toolbar color="primary" dark class="bold-text justify-center"> Withdraw TFT </v-toolbar>
         <v-card-text>
@@ -97,6 +97,7 @@ import { createToast } from "mosha-vue-toastify";
 import { default as StellarSdk, StrKey } from "stellar-sdk";
 import { onMounted, ref } from "vue";
 
+import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useProfileManager } from "../stores";
 import { getGrid, loadBalance, loadProfile } from "../utils/grid";
 
@@ -118,6 +119,7 @@ const loadingWithdraw = ref(false);
 const depositWallet = ref("");
 const qrCodeText = ref("");
 const depositFee = ref(0);
+const ProfileManagerController = useProfileManagerController();
 
 onMounted(async () => {
   selectedName.value = items.value.filter(item => item.id === selectedItem.value.id)[0].name;
@@ -205,8 +207,7 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
     target.value = "";
     amount.value = 0;
     loadingWithdraw.value = false;
-    const profile = await loadProfile(client);
-    profileManager.set(profile);
+    await ProfileManagerController.reloadBalance();
     createToast("Transaction Succeeded", {
       position: "bottom-right",
       hideProgressBar: true,
