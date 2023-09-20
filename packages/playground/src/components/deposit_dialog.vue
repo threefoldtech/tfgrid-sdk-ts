@@ -5,34 +5,45 @@
         <v-toolbar color="primary" dark class="bold-text"> Deposit TFT </v-toolbar>
         <v-card-text>
           <v-container>
-            <v-row class="py-2">
-              <v-col cols="7" class="mx-4">
-                Send a
-                {{ selectedName ? selectedName.charAt(0).toUpperCase() + selectedName.slice(1) : "" }} transaction with
-                your TFT's to deposit to:
+            <v-row class="py-2 pb-5">
+              <v-col cols="6" class="mx-4">
+                <div class="mb-2">
+                  <b
+                    >Send a
+                    {{ selectedName ? selectedName.charAt(0).toUpperCase() + selectedName.slice(1) : "" }} transaction
+                    with your TFT's to deposit to:</b
+                  >
+                </div>
                 <ul>
-                  <li>
+                  <li class="mb-2">
                     Destination: <b>{{ depositWallet }}</b>
                   </li>
                   <li>
                     Memo Text: <b>twin_{{ twinId }}</b>
                   </li>
-                  <div v-if="loading" class="loading">
-                    <div class="spinner"></div>
+                  <div style="position: absolute; bottom: 10rem">
+                    <p :style="{ padding: '2rem', color: '#7de3c8', fontWeight: 'bold' }">
+                      Waiting for receiving TFTs{{ dots }}
+                    </p>
                   </div>
                 </ul>
               </v-col>
               <v-divider class="mx-4" vertical></v-divider>
               <v-col>
-                Or use ThreeFold Connect to scan this QRcode:
-                <div class="d-flex justify-center py-2">
-                  <QrcodeGenerator :data="qrCodeText" />
+                <div class="d-flex flex-column text-center align-center">
+                  <b> OR </b>
+                  <b>use ThreeFold Connect to scan this QRcode:</b>
+                  <div class="d-flex justify-center py-2">
+                    <QrcodeGenerator :data="qrCodeText" />
+                  </div>
                 </div>
               </v-col>
             </v-row>
-            <v-row class="d-flex row justify-center"
-              >Amount: should be larger than {{ depositFee }}TFT (deposit fee is: {{ depositFee }}TFT)</v-row
-            >
+            <v-alert type="warning" variant="tonal" class="d-flex row justify-start mb-6">
+              <p :style="{ maxWidth: '880px' }">
+                Amount: should be larger than {{ depositFee }}TFT (deposit fee is: {{ depositFee }}TFT)
+              </p>
+            </v-alert>
           </v-container>
           <v-card-actions class="justify-end">
             <v-btn color="primary" class="bold-text" @click="closeDialog"> Close </v-btn>
@@ -57,6 +68,8 @@ const emits = defineEmits(["close"]);
 const profileManager = useProfileManager();
 let destroyed = false;
 const loading = ref(false);
+const dots = ref(".");
+const interval = ref<number | null>(null);
 
 const props = defineProps({
   selectedName: String,
@@ -67,16 +80,27 @@ const props = defineProps({
   twinId: Number,
 });
 
+function loadingDots() {
+  if (dots.value === "...") {
+    dots.value = ".";
+  } else {
+    dots.value += ".";
+  }
+}
+
 onMounted(async () => {
   if (!props.openDepositDialog) return;
+  if (interval.value !== null) {
+    window.clearInterval(interval.value);
+  }
   depositDialog.value = true;
+  interval.value = window.setInterval(loadingDots, 500);
   try {
     loading.value = true;
     const grid = await getGrid(profileManager.profile!);
     const receivedDeposit = await grid!.tfclient.tftBridge.listenToMintCompleted(
       profileManager.profile?.address as string,
     );
-    console.log("recieved", receivedDeposit);
     loading.value = false;
     if (destroyed) return;
     const DecimalDeposit = new Decimal(receivedDeposit);
@@ -120,30 +144,5 @@ onBeforeUnmount(() => {
 .bold-text {
   font-weight: bold;
   padding-left: 1rem;
-}
-.loading {
-  padding-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
-
-.spinner {
-  border: 4px solid rgba(0, 0, 0, 0.3);
-  border-top: 4px solid #1aa18f;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-}
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
 }
 </style>
