@@ -11,6 +11,6 @@ export function isNumber(value: unknown): value is number {
   return typeof value === "number";
 }
 
-export function isBoolean(value: unknown): value is Boolean {
+export function isBoolean(value: unknown): value is boolean {
   return typeof value === "boolean";
 }

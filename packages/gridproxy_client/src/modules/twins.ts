@@ -1,5 +1,5 @@
-import { resolvePaginator } from "../utils";
 import { TwinsBuilder, TwinsQuery } from "../builders/twins";
+import { resolvePaginator } from "../utils";
 import { AbstractClient } from "./abstract_client";
 
 export interface Twin {

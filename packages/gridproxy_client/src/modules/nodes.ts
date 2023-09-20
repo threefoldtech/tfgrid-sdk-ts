@@ -1,9 +1,9 @@
-import { resolvePaginator } from "../utils";
-import { NodesBuilder, type NodesQuery } from "../builders/nodes";
-import { AbstractClient } from "./abstract_client";
-import type { GridNode } from "./gateways";
-import type { Farm, FarmsClient } from "./farms";
 import type { Pagination } from "../builders/abstract_builder";
+import { NodesBuilder, type NodesQuery } from "../builders/nodes";
+import { resolvePaginator } from "../utils";
+import { AbstractClient } from "./abstract_client";
+import type { Farm, FarmsClient } from "./farms";
+import type { GridNode } from "./gateways";
 
 export interface NodesExtractOptions {
   loadFarm?: boolean;

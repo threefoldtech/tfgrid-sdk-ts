@@ -1,5 +1,5 @@
-import { AbstractBuilder, BuilderMapper, BuilderMethods, BuilderValidator } from "./abstract_builder";
 import { assertBoolean, assertId, assertIn, assertNatural, assertString } from "../utils";
+import { AbstractBuilder, BuilderMapper, BuilderMethods, BuilderValidator } from "./abstract_builder";
 
 export enum ContractType {
   Node = "node",
@@ -73,4 +73,5 @@ export class ContractsBuilder extends AbstractBuilder<ContractsQuery> {
     });
   }
 }
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ContractsBuilder extends BuilderMethods<ContractsQuery, ContractsBuilder> {}

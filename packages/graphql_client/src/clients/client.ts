@@ -1,7 +1,7 @@
 import { AbstractClient, RequestOptions } from "./abstract_client";
-import { LIST_QUERIES, ListQueries } from "./list_queries";
 import { BY_ID_QUERIES, ByIdQueries } from "./by_id_queries";
-import { ConnectionQueries, CONNECTION_QUERIES } from "./connection_queries";
+import { CONNECTION_QUERIES, ConnectionQueries } from "./connection_queries";
+import { LIST_QUERIES, ListQueries } from "./list_queries";
 
 export enum Networks {
   Dev = "dev",

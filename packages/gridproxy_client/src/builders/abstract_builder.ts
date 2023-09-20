@@ -30,12 +30,11 @@ export abstract class AbstractBuilder<T> {
     this.__validator = options.validator;
     this.__queries = options.queries;
 
-    const self = this;
-    for (const key of Object.keys(self.__mapper)) {
-      Object.defineProperty(self, key, {
+    for (const key of Object.keys(this.__mapper)) {
+      Object.defineProperty(this, key, {
         value(value: any) {
-          self.__queries[key as any] = value;
-          return self;
+          this.__queries[key as any] = value;
+          return this;
         },
       });
     }

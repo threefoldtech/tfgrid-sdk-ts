@@ -1,5 +1,5 @@
-import { capitalize, min } from "./utils";
 import { isBoolean, isInt, isNumber, isString } from "./guards";
+import { capitalize, min } from "./utils";
 
 export function panic(value: any, expect: string): never {
   const found = capitalize(typeof value);

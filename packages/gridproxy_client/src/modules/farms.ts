@@ -1,7 +1,7 @@
-import { resolvePaginator } from "../utils";
-import { CertificationType, FarmsBuilder, FarmsQuery } from "../builders/public_api";
-import { AbstractClient } from "./abstract_client";
 import type { Pagination } from "../builders/abstract_builder";
+import { CertificationType, FarmsBuilder, FarmsQuery } from "../builders/public_api";
+import { resolvePaginator } from "../utils";
+import { AbstractClient } from "./abstract_client";
 
 export interface PublicIp {
   id: string;

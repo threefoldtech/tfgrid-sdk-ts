@@ -91,4 +91,5 @@ export class NodesBuilder extends AbstractBuilder<NodesQuery> {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface NodesBuilder extends BuilderMethods<NodesQuery, NodesBuilder> {}

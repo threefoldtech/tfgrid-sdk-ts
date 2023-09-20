@@ -1,21 +1,34 @@
 import {
+  AbstractWhere,
   Account,
+  ArrayWhere,
+  BaseWhere,
+  BigInt,
+  BoolWhere,
   BurnTransaction,
   City,
   ContractBillReport,
   ContractResources,
+  ContractState,
   Country,
+  DiscountLevel,
   EntityProof,
+  EnumWhere,
   Farm,
+  FarmCertification,
   FarmingPolicy,
+  FitType,
   HistoricalBalance,
+  Int,
   Interfaces,
   MintTransaction,
   NameContract,
   Node,
+  NodeCertification,
   NodeContract,
   NodeResourcesTotal,
   NruConsumption,
+  NullWhere,
   PartialBoolean,
   PricingPolicy,
   PublicConfig,
@@ -23,23 +36,10 @@ import {
   RefundTransaction,
   RentContract,
   SolutionProvider,
+  StringWhere,
   Transfer,
   Twin,
   UptimeEvent,
-  BaseWhere,
-  StringWhere,
-  ArrayWhere,
-  Int,
-  NullWhere,
-  BigInt,
-  EnumWhere,
-  NodeCertification,
-  BoolWhere,
-  AbstractWhere,
-  DiscountLevel,
-  FarmCertification,
-  ContractState,
-  FitType,
 } from "../types";
 import { ByArray } from "./abstract_client";
 
@@ -109,7 +109,7 @@ interface OrderBy {
 interface _W {
     Node: 
         BaseWhere<"gridVersion" |"nodeID" |"farmID" |"twinID" |"created" |"farmingPolicyId" | "connectionPrice", Int> &
-        BaseWhere<"uptime" | "createdAt" | "updatedAt", BigInt> &
+        BaseWhere<"uptime" | "createdAt" | "updatedAt", bigint> &
         StringWhere<"id" | "country" | "city" | "serialNumber"> &
         NullWhere<"country" | "city" | "uptime" | "certification" | "secure" | "virtualized" | "serialNumber" | "connectionPrice"> &
         ArrayWhere<"interfaces", Where["Interfaces"]> &
@@ -119,13 +119,13 @@ interface _W {
 
     Account:
         StringWhere<"id" | "wallet"> &
-        BaseWhere<"balance", BigInt> &
+        BaseWhere<"balance", bigint> &
         ArrayWhere<"historicalBalances", Where["HistoricalBalance"]>;
 
     BurnTransaction:
         StringWhere<"id" | "target"> &
         BaseWhere<"block", Int> &
-        BaseWhere<"amount", BigInt>;
+        BaseWhere<"amount", bigint>;
 
     City:
         StringWhere<"id" | "name"> &
@@ -133,12 +133,12 @@ interface _W {
 
     ContractBillReport:
         StringWhere<"id"> &
-        BaseWhere<"contractID" | "amountBilled" | "timestamp", BigInt> &
+        BaseWhere<"contractID" | "amountBilled" | "timestamp", bigint> &
         EnumWhere<"discountReceived", DiscountLevel>;
 
     ContractResources:
         StringWhere<"id"> &
-        BaseWhere<"hru" | "src" | "cru" | "mru", BigInt> &
+        BaseWhere<"hru" | "src" | "cru" | "mru", bigint> &
         { contract?: Where["NodeContract"]; };
 
     Country:
@@ -169,7 +169,7 @@ interface _W {
 
     HistoricalBalance:
         StringWhere<"id"> &
-        BaseWhere<"balance" | "timestamp", BigInt> &
+        BaseWhere<"balance" | "timestamp", bigint> &
         { account?: Where["Account"] };
 
     Interfaces:
@@ -180,31 +180,31 @@ interface _W {
 
     MintTransaction:
         StringWhere<"id" | "target"> &
-        BaseWhere<"amount", BigInt> &
+        BaseWhere<"amount", bigint> &
         BaseWhere<"block", Int>;
 
     NameContract:
         StringWhere<"id" | "name"> &
         BaseWhere<"gridVersion" | "twinID", Int> &
-        BaseWhere<"contractID", BigInt> &
+        BaseWhere<"contractID", bigint> &
         EnumWhere<"state", ContractState>;
 
     NodeContract:
         StringWhere<"id" | "deploymentData" | "deploymentHash"> &
         BaseWhere<"gridVersion" | "twinID" | "nodeID" | "numberOfPublicIPs" | "solutionProviderID", Int> &
-        BaseWhere<"contractID" | "createdAt", BigInt> &
+        BaseWhere<"contractID" | "createdAt", bigint> &
         EnumWhere<"state", ContractState> &
         NullWhere<"resourcesUsed" | "solutionProviderID"> &
         { resourcesUsed?: Where["ContractResources"] };
 
     NodeResourcesTotal:
         StringWhere<"id"> &
-        BaseWhere<"hru" | "sru" | "cru" | "mru", BigInt> &
+        BaseWhere<"hru" | "sru" | "cru" | "mru", bigint> &
         { node?: Where["Node"] };
 
     NruConsumption:
         StringWhere<"id"> &
-        BaseWhere<"contractID" | "timestamp" | "window" | "nru", BigInt> &
+        BaseWhere<"contractID" | "timestamp" | "window" | "nru", bigint> &
         NullWhere<"window" | "nru">;
 
     PricingPolicy:
@@ -219,30 +219,30 @@ interface _W {
 
     PublicIp:
         StringWhere<"id" | "gateway" | "ip"> &
-        BaseWhere<"contractId", BigInt> &
+        BaseWhere<"contractId", bigint> &
         { farm?: Where["Farm"] };
     
     RefundTransaction:
         StringWhere<"id" | "target" | "txHash"> &
         BaseWhere<"block", Int> &
-        BaseWhere<"amount", BigInt>;
+        BaseWhere<"amount", bigint>;
 
     RentContract:
         StringWhere<"id"> &
         BaseWhere<"gridVersion" | "twinID" | "nodeID" | "solutionProviderID", Int> &
-        BaseWhere<"contractID" | "createdAt", BigInt> &
+        BaseWhere<"contractID" | "createdAt", bigint> &
         EnumWhere<"state", ContractState> &
         NullWhere<"solutionProviderID">;
 
     SolutionProvider:
         StringWhere<"id" | "description" | "link"> &
-        BaseWhere<"solutionProviderID", BigInt> &
+        BaseWhere<"solutionProviderID", bigint> &
         BoolWhere<"approved"> &
         NullWhere<"providers">;
 
     Transfer:
         StringWhere<"id" | "from" | "to"> &
-        BaseWhere<"amount" | "timestamp", BigInt>;
+        BaseWhere<"amount" | "timestamp", bigint>;
 
     Twin:
         StringWhere<"id" | "accountID" | "ip"> &
@@ -251,7 +251,7 @@ interface _W {
     UptimeEvent:
         StringWhere<"id"> &
         BaseWhere<"nodeID", Int> &
-        BaseWhere<"uptime" | "timestamp", BigInt>;
+        BaseWhere<"uptime" | "timestamp", bigint>;
 }
 
 interface Where {

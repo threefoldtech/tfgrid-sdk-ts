@@ -1,4 +1,4 @@
-import { assertId, assertIn, assertNatural, assertString, assertBoolean } from "../utils";
+import { assertBoolean, assertId, assertIn, assertNatural, assertString } from "../utils";
 import { AbstractBuilder, BuilderMapper, BuilderMethods, BuilderValidator } from "./abstract_builder";
 
 export enum CertificationType {
@@ -69,4 +69,5 @@ export class FarmsBuilder extends AbstractBuilder<FarmsQuery> {
     });
   }
 }
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface FarmsBuilder extends BuilderMethods<FarmsQuery, FarmsBuilder> {}

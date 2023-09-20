@@ -1,5 +1,5 @@
-import { AbstractClient } from "./abstract_client";
 import { StatsBuilder, StatsQuery } from "../builders/public_api";
+import { AbstractClient } from "./abstract_client";
 
 export interface Stats {
   nodes: number;

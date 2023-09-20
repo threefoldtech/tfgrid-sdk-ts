@@ -1,6 +1,6 @@
-import { AbstractClient } from "./abstract_client";
 import { CertificationType, GatewayBuilder, GatewaysQuery, NodeStatus } from "../builders/public_api";
 import { assertId, resolvePaginator } from "../utils";
+import { AbstractClient } from "./abstract_client";
 import { Farm } from "./farms";
 
 export interface Resources {

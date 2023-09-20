@@ -57,21 +57,21 @@ export type FitType<T, R> = {
 export interface Account {
   id: ID;
   wallet: string;
-  balance: BigInt;
+  balance: bigint;
   historicalBalances: HistoricalBalance[];
 }
 
 export interface HistoricalBalance {
   id: ID;
   account: Account;
-  balance: BigInt;
-  timestamp: BigInt;
+  balance: bigint;
+  timestamp: bigint;
 }
 
 export interface BurnTransaction {
   id: ID;
   block: Int;
-  amount: BigInt;
+  amount: bigint;
   target: string;
 }
 
@@ -84,25 +84,25 @@ export interface City {
 
 export interface ContractBillReport {
   id: ID;
-  contractID: BigInt;
+  contractID: bigint;
   discountReceived: DiscountLevel;
-  amountBilled: BigInt;
-  timestamp: BigInt;
+  amountBilled: bigint;
+  timestamp: bigint;
 }
 
 export interface ContractResources {
   id: ID;
   contract: NodeContract;
-  hru: BigInt;
-  sru: BigInt;
-  cru: BigInt;
-  mru: BigInt;
+  hru: bigint;
+  sru: bigint;
+  cru: bigint;
+  mru: bigint;
 }
 
 export interface NodeContract {
   id: ID;
   gridVersion: Int;
-  contractID: BigInt;
+  contractID: bigint;
   twinID: Int;
   nodeID: Int;
   deploymentData: string;
@@ -110,7 +110,7 @@ export interface NodeContract {
   numberOfPublicIPs: Int;
   state: ContractState;
   resourcesUsed?: ContractResources;
-  createdAt: BigInt;
+  createdAt: bigint;
   solutionProviderID?: Int;
 }
 
@@ -168,7 +168,7 @@ export interface PublicIp {
   farm: Farm;
   gateway: string;
   ip: string;
-  contractId: BigInt;
+  contractId: bigint;
 }
 
 export interface FarmingPolicy {
@@ -208,7 +208,7 @@ export interface Node {
   city?: string;
   publicConfig?: PublicConfig;
   resourcesTotal?: NodeResourcesTotal;
-  uptime?: BigInt;
+  uptime?: bigint;
   created: Int;
   farmingPolicyId: Int;
   interfaces: Interfaces[];
@@ -216,8 +216,8 @@ export interface Node {
   secure?: boolean;
   virtualized?: boolean;
   serialNumber?: string;
-  createdAt: BigInt;
-  updatedAt: BigInt;
+  createdAt: bigint;
+  updatedAt: bigint;
   connectionPrice?: Int;
 }
 
@@ -240,15 +240,15 @@ export interface PublicConfig {
 export interface NodeResourcesTotal {
   id: ID;
   node: Node;
-  hru: BigInt;
-  sru: BigInt;
-  cru: BigInt;
-  mru: BigInt;
+  hru: bigint;
+  sru: bigint;
+  cru: bigint;
+  mru: bigint;
 }
 
 export interface MintTransaction {
   id: ID;
-  amount: BigInt;
+  amount: bigint;
   target: string;
   block: Int;
 }
@@ -256,20 +256,20 @@ export interface MintTransaction {
 export interface NameContract {
   id: ID;
   gridVersion: Int;
-  contractID: BigInt;
+  contractID: bigint;
   twinID: Int;
   name: string;
   state: ContractState;
-  createdAt: BigInt;
+  createdAt: bigint;
   solutionProviderID?: Int;
 }
 
 export interface NruConsumption {
   id: ID;
-  contractID: BigInt;
-  timestamp: BigInt;
-  window?: BigInt;
-  nru?: BigInt;
+  contractID: bigint;
+  timestamp: bigint;
+  window?: bigint;
+  nru?: bigint;
 }
 
 export interface PricingPolicy {
@@ -294,7 +294,7 @@ export interface Policy {
 export interface RefundTransaction {
   id: ID;
   block: Int;
-  amount: BigInt;
+  amount: bigint;
   target: string;
   txHash: string;
 }
@@ -302,17 +302,17 @@ export interface RefundTransaction {
 export interface RentContract {
   id: ID;
   gridVersion: Int;
-  contractID: BigInt;
+  contractID: bigint;
   twinID: Int;
   nodeID: Int;
   state: ContractState;
-  createdAt: BigInt;
+  createdAt: bigint;
   solutionProviderID?: Int;
 }
 
 export interface SolutionProvider {
   id: ID;
-  solutionProviderID: BigInt;
+  solutionProviderID: bigint;
   description: string;
   link: string;
   approved: boolean;
@@ -328,13 +328,13 @@ export interface Transfer {
   id: ID;
   from: string;
   to: string;
-  amount: BigInt;
-  timestamp: BigInt;
+  amount: bigint;
+  timestamp: bigint;
 }
 
 export interface UptimeEvent {
   id: ID;
   nodeID: Int;
-  uptime: BigInt;
-  timestamp: BigInt;
+  uptime: bigint;
+  timestamp: bigint;
 }
