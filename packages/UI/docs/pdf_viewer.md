@@ -26,7 +26,7 @@ To use the PDF Signer Web Component, follow these steps:
 
 1. Clone the `tfgrid-sdk-ts` repository.
 2. Navigate to the `repository/packages/UI` directory.
-3. Run `yarn build-only` to generate the required distribution files.
+3. Run `yarn build` to generate the required distribution files.
 4. Locate the `dist` folder created in the previous step.
 5. Copy the `threefold-ui.umd.js` file and include it in your project's HTML files.
 6. Copy the `dist/tailwind.css` file and use it for styling.
@@ -63,6 +63,8 @@ Here's an example of how to use the PDF Signer Web Component in your HTML file:
 In the example above, replace `<pdf-url>` and `<endpoint-url>` with the actual URLs for your PDF document and the destination where signed documents should be sent, also for the `<network>` should match one of the following networks `[main, test, qa, dev]`.
 
 Feel free to customize the HTML structure and styles to match your application's design and requirements.
+
+**now you can serve your HTML file on any live-server plugin.**
 
 ### Using Providers and Extensions
 

@@ -42,7 +42,7 @@ else ifeq ($(project), weblets)
 else ifeq ($(project), playground)
 	cd packages/playground && yarn build
 else ifeq ($(project), UI)
-	cd packages/UI && yarn build-only
+	cd packages/UI && yarn build
 else
 	yarn lerna run build --no-private
 endif

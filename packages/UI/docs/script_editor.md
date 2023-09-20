@@ -25,7 +25,7 @@ To create an instance of the Script Editor, you need to build the package first 
 
 1. Clone the `tfgrid-sdk-ts` repository.
 2. Navigate to the `repository/packages/UI` directory.
-3. Run `yarn build-only` to generate the required distribution files.
+3. Run `yarn build` to generate the required distribution files.
 4. Locate the `dist` folder created in the previous step.
 5. Copy the `threefold-ui.umd.js` file and include it in your project's HTML files.
 6. Copy the `dist/tailwind.css` file and use it for styling.
@@ -59,6 +59,8 @@ Here's an example of how to use the Script Editor Web Component in your HTML fil
 In the example above, replace `<dest>` and `<network>` with the actual destination where the signed script should be sent. Also, for the `<network>`, use one of the following network options: `[main, test, qa, dev]`.
 
 Feel free to customize the HTML structure and styles to match your application's design and requirements.
+
+**now you can serve your HTML file on any live-server plugin.**
 
 ### Using Providers and Extensions
 
