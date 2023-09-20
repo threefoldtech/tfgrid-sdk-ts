@@ -65,6 +65,9 @@
               validators.required('Password is required.'),
               validators.minLength('Password must be at least 6 characters.', 6),
               validators.maxLength('Password cannot exceed 15 characters.', 15),
+              validators.pattern('Password should not contain whitespaces.', {
+                pattern: /^[^\s]+$/,
+              }),
             ]"
             #="{ props: validationProps }"
           >
@@ -109,7 +112,7 @@ const profileManager = useProfileManager();
 const loadingFarm = ref(false);
 const domain = ref("");
 const password = ref(generatePassword(10));
-const leader = ref(createWorker(generateName(9, { prefix: "cr" })));
+const leader = ref(createWorker(generateName({ prefix: "cr" })));
 const workers = ref<CW[]>([]);
 
 async function deploy() {

@@ -226,7 +226,7 @@ const images = [
   },
 ];
 
-const name = ref(generateName(8, { prefix: "vm" }));
+const name = ref(generateName({ prefix: "vm" }));
 const flist = ref<Flist>();
 const ipv4 = ref(false);
 const ipv6 = ref(false);
@@ -253,7 +253,7 @@ function layoutMount() {
 }
 
 function addDisk() {
-  const name = generateName(5);
+  const name = generateName();
   disks.value.push({
     name: "disk" + name,
     size: 50,

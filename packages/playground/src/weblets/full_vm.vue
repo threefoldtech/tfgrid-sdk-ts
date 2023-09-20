@@ -197,7 +197,7 @@ const images: VmImage[] = [
   },
 ];
 
-const name = ref(generateName(8, { prefix: "vm" }));
+const name = ref(generateName({ prefix: "vm" }));
 const flist = ref<Flist>();
 const ipv4 = ref(false);
 const ipv6 = ref(false);
@@ -213,7 +213,7 @@ const hasGPU = ref();
 const selectedNode = ref() as Ref<INode>;
 const rootFilesystemSize = 2;
 function addDisk() {
-  const name = generateName(7);
+  const name = generateName();
   disks.value.push({
     name: "disk" + name,
     size: 50,

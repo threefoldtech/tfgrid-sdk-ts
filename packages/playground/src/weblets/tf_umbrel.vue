@@ -53,6 +53,9 @@
             validators.required('Password is required.'),
             validators.minLength('Password must be at least 6 characters.', 6),
             validators.maxLength('Password cannot exceed 15 characters.', 15),
+            validators.pattern('Password should not contain whitespaces.', {
+              pattern: /^[^\s]+$/,
+            }),
           ]"
           #="{ props: validatorProps }"
         >
@@ -135,7 +138,7 @@ const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref(generateName(9, { prefix: "um" }));
+const name = ref(generateName({ prefix: "um" }));
 const username = ref("admin");
 const password = ref(generatePassword());
 const ipv4 = ref(false);

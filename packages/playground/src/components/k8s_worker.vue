@@ -160,7 +160,7 @@ import SelectFarm from "./select_farm.vue";
 
 const profileManager = useProfileManager();
 
-export function createWorker(name: string = generateName(9, { prefix: "wr" })): K8SWorker {
+export function createWorker(name: string = generateName({ prefix: "wr" })): K8SWorker {
   return {
     name,
     cpu: 1,

@@ -137,7 +137,7 @@ const flist: Flist = {
   entryPoint: "/sbin/zinit init",
 };
 
-const name = ref(generateName(8, { prefix: "nc" }));
+const name = ref(generateName({ prefix: "nc" }));
 const ipv4 = ref(true);
 const planetary = ref(true);
 const wireguard = ref(true);
