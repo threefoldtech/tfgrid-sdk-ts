@@ -21,6 +21,12 @@ export interface PublicConfig {
   ipv6: string;
 }
 
+export interface PublicIps {
+  total: number;
+  used: number;
+  free: number;
+}
+
 export interface GridNode {
   id: string;
   nodeId: number;
@@ -43,6 +49,7 @@ export interface GridNode {
   rentContractId: number;
   rentedByTwinId: number;
   farm: Farm;
+  publicIps: PublicIps;
 }
 
 export class GatewaysClient extends AbstractClient<GatewayBuilder, GatewaysQuery> {

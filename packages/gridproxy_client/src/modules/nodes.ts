@@ -3,7 +3,7 @@ import { NodesBuilder, type NodesQuery } from "../builders/nodes";
 import { resolvePaginator } from "../utils";
 import { AbstractClient } from "./abstract_client";
 import type { Farm, FarmsClient } from "./farms";
-import type { GridNode } from "./gateways";
+import type { GridNode, PublicIps } from "./gateways";
 
 export interface NodesExtractOptions {
   loadFarm?: boolean;
@@ -70,7 +70,21 @@ export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
   }
 
   private setFarm(node: GridNode): GridNode {
-    node.farm = this.farms.get(node.farmId)!;
+    const farm = this.farms.get(node.farmId);
+    if (farm) {
+      node.farm = farm;
+      node.publicIps = this.getFarmPublicIps(farm);
+    }
     return node;
+  }
+
+  private getFarmPublicIps(farm: Farm): PublicIps {
+    const total = farm.publicIps.length;
+    const free = farm.publicIps.filter(({ contractId }) => contractId === 0).length;
+    return {
+      total,
+      used: total - free,
+      free,
+    };
   }
 }

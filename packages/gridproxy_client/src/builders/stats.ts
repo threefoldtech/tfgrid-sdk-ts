@@ -26,4 +26,5 @@ export class StatsBuilder extends AbstractBuilder<StatsQuery> {
   }
 }
 
-export type StatuBuilder = BuilderMethods<StatsQuery, StatuBuilder>;
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface StatuBuilder extends BuilderMethods<StatsQuery, StatuBuilder> {}
