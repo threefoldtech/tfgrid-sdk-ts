@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts" setup>
-import { NodeStatus } from "tf_gridproxy_client";
+import { NodeStatus } from "@threefold/gridproxy_client";
 import { onMounted, ref, watch } from "vue";
 
 import { gridProxyClient } from "../clients";

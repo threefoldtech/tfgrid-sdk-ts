@@ -42,7 +42,16 @@
     "@typescript-eslint/no-empty-function": "off",
     "vue/no-v-for-template-key": "off",
     "vue/no-multiple-template-root": "off",
-    "vue/no-v-model-argument": "off"
+    "vue/no-v-model-argument": "off",
+    "@typescript-eslint/ban-types": [
+      "error",
+      {
+        "extendDefaults": true,
+        "types": {
+          "{}": false
+        }
+      }
+    ]
   },
   "settings": {
     "svelte3/typescript": true // load TypeScript as peer dependency
@@ -54,6 +63,8 @@
     "/packages/rmb_direct_client/lib/types/lib/**",
     "packages/weblets/playground/public/build/elements/*",
     "packages/stats/public/build/*",
+    "packages/UI/*.config.js",
+    "packages/UI/src/index.css",
     "*.config.*",
     "*global.css"
   ]

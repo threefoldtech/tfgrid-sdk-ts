@@ -104,3 +104,9 @@ On **Pull Request**, and **Push** to development branch that has changes in the 
 ### [Docker](/.github/workflows/stats_docker.yaml)
 
 On **Release** published: It will build and push a new docker image based on project release tag.
+
+## Threefold UI
+
+### [Build](/.github/workflows/threefold_ui_build.yaml)
+
+On **Pull Request**, and **Push** to development branch: It will do a clean install of node dependencies, cache/restore them to make the process faster, and build the source code using `lerna run build --no-private`.
