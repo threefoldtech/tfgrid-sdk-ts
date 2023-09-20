@@ -112,10 +112,10 @@ export default {
 
     const nodeStatusOptions = [NodeStatus.Up, NodeStatus.Down];
 
-    const _requestNodes = async (options?: Partial<NodesQuery>) => {
+    const _requestNodes = async (options: Partial<NodesQuery> = {}, loadFarm = false) => {
       try {
         tableLoading.value = true;
-        const { count, data } = await requestNodes(options ? options : {});
+        const { count, data } = await requestNodes(options, loadFarm);
         nodes.value = data;
         if (count) {
           nodesCount.value = count;
@@ -129,7 +129,7 @@ export default {
 
     watch(mixedFilters.value, async () => {
       const options = getFilterValues(mixedFilters.value);
-      await _requestNodes(options);
+      await _requestNodes(options, true);
     });
 
     watch(selectedNode, async () => {
@@ -148,7 +148,7 @@ export default {
 
     onMounted(async () => {
       const options = getFilterValues(mixedFilters.value);
-      await _requestNodes(options);
+      await _requestNodes(options, true);
     });
 
     return {

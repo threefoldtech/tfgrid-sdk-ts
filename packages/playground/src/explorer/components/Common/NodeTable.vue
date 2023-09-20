@@ -25,49 +25,6 @@
           :hover="true"
           @click:row="openSheet"
         >
-          <template v-slot:headers="{ columns }: any">
-            <tr>
-              <template v-for="column in columns" :key="column.key">
-                <th>
-                  <v-tooltip location="bottom">
-                    <template v-slot:activator="{ props }">
-                      <span v-bind="props">{{ column.title }}</span>
-                    </template>
-                    <span>{{ column.description || column.title }}</span>
-                  </v-tooltip>
-                </th>
-              </template>
-            </tr>
-          </template>
-
-          <template v-slot:[`item.totalPublicIPs`]="{ item }">
-            {{ toFixedCsSize(item?.columns?.totalPublicIPs) }}
-          </template>
-
-          <template v-slot:[`item.freePublicIPs`]="{ item }">
-            {{ toFixedCsSize(item?.columns?.freePublicIPs) }}
-          </template>
-
-          <template v-slot:[`item.total_resources.cru`]="{ item }">
-            {{ toFixedCsSize(item?.columns?.total_resources?.cru) }}
-          </template>
-
-          <template v-slot:[`item.total_resources.mru`]="{ item }">
-            {{ toFixedCsSize(item?.columns?.total_resources?.mru) }}
-          </template>
-
-          <template v-slot:[`item.total_resources.sru`]="{ item }">
-            {{ toFixedCsSize(item?.columns?.total_resources?.sru) }}
-          </template>
-
-          <template v-slot:[`item.total_resources.hru`]="{ item }">
-            {{ toFixedCsSize(item?.columns?.total_resources?.hru) }}
-          </template>
-
-          <template v-slot:[`item.uptime`]="{ item }">
-            {{ secondToRedable(item?.columns?.uptime) }}
-          </template>
-
           <template v-slot:[`item.status`]="{ item }">
             <p class="text-left mt-1 mb-0">
               <v-chip :color="getStatus(item).color">
@@ -86,6 +43,7 @@
 <script lang="ts">
 import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
 import type { PropType } from "vue";
+import type { VDataTable } from "vuetify/labs/VDataTable";
 
 import secondToRedable from "@/utils/second_to_redable";
 import toFixedCsSize from "@/utils/to_fixed_cs_size";
@@ -121,22 +79,42 @@ export default {
   setup(props, { emit }) {
     const nodeStatusOptions = [NodeStatus.Up, NodeStatus.Down];
 
-    const headers: any = [
+    const headers: VDataTable["headers"] = [
       { title: "ID", key: "nodeId" },
-      { title: "Farm ID", key: "farmId", align: "center" },
+      { title: "Farm ID", key: "farmId", align: "start" },
       {
         title: "Total Public IPs",
-        key: "totalPublicIPs",
-        align: "center",
+        key: "publicIps.total",
+        align: "start",
       },
-      { title: "Free Public IPs", key: "freePublicIPs", align: "center" },
-      { title: "CRU", key: "total_resources.cru", align: "center", description: "Total Cores" },
-      { title: "MRU", key: "total_resources.mru", align: "center", description: "Total Memory" },
-      { title: "SRU", key: "total_resources.sru", align: "center", description: "Total SSD" },
-      { title: "HRU", key: "total_resources.hru", align: "center", description: "Total HDD" },
-      { title: "GPU", key: "num_gpu", align: "center", description: "GPU card" },
-      { title: "Up Time", key: "uptime", align: "left" },
-      { title: "Status", key: "status", align: "center" },
+      { title: "Free Public IPs", key: "publicIps.free", align: "start" },
+      {
+        title: "CRU",
+        key: "total_resources.cru",
+        align: "start",
+        value: item => toFixedCsSize(item.total_resources.cru),
+      },
+      {
+        title: "MRU",
+        key: "total_resources.mru",
+        align: "start",
+        value: item => toFixedCsSize(item.total_resources.mru),
+      },
+      {
+        title: "SRU",
+        key: "total_resources.sru",
+        align: "start",
+        value: item => toFixedCsSize(item.total_resources.sru),
+      },
+      {
+        title: "HRU",
+        key: "total_resources.hru",
+        align: "start",
+        value: item => toFixedCsSize(item.total_resources.hru),
+      },
+      { title: "GPU", key: "num_gpu", align: "start" },
+      { title: "Up Time", key: "uptime", align: "start", value: item => secondToRedable(item.uptime) },
+      { title: "Status", key: "status", align: "start" },
     ];
 
     const getStatus = (node: any) => {
@@ -169,7 +147,7 @@ export default {
   white-space: nowrap;
 }
 .v-data-table__tr {
-  line-height: 45px;
+  line-height: 55px;
 }
 .v-data-table__thead {
   line-height: 60px;

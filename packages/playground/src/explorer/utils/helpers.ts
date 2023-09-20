@@ -4,9 +4,8 @@ import { gridProxyClient } from "@/clients";
 
 import type { MixedFilter } from "./types";
 
-export async function requestNodes(options: Partial<NodesQuery>) {
-  const { count, data } = await gridProxyClient.nodes.list(options);
-  return { count, data };
+export function requestNodes(options: Partial<NodesQuery>, loadFarm?: boolean) {
+  return gridProxyClient.nodes.list(options, { loadFarm: loadFarm });
 }
 
 export const multiplyResource1024 = (resource: number | undefined): number => {
