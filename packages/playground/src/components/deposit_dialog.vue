@@ -2,29 +2,29 @@
   <v-container>
     <v-dialog transition="dialog-bottom-transition" max-width="1000" v-model="depositDialog" persistent>
       <v-card>
-        <v-toolbar color="primary" dark class="bold-text"> Deposit TFT </v-toolbar>
+        <v-toolbar color="primary" dark class="d-flex justify-center bold-text"> Deposit TFT </v-toolbar>
         <v-card-text>
           <v-container>
             <v-row class="py-2 pb-5">
               <v-col cols="6" class="mx-4">
                 <div class="mb-2">
-                  <b
-                    >Send a
+                  <p class="mb-3">
+                    Send a
                     {{ selectedName ? selectedName.charAt(0).toUpperCase() + selectedName.slice(1) : "" }} transaction
-                    with your TFT's to deposit to:</b
-                  >
+                    with your TFT's to deposit to:
+                  </p>
                 </div>
                 <ul>
                   <li class="mb-2">
-                    Destination: <b>{{ depositWallet }}</b>
+                    Destination:
+                    <p class="text-subtitle-2">{{ depositWallet }}</p>
                   </li>
                   <li>
-                    Memo Text: <b>twin_{{ twinId }}</b>
+                    Memo Text:
+                    <p class="text-subtitle-2">twin_{{ twinId }}</p>
                   </li>
                   <div style="position: absolute; bottom: 10rem">
-                    <p :style="{ padding: '2rem', color: '#7de3c8', fontWeight: 'bold' }">
-                      Waiting for receiving TFTs{{ dots }}
-                    </p>
+                    <p :style="{ paddingBottom: '3rem', color: '#7de3c8' }">Waiting for receiving TFTs{{ dots }}</p>
                   </div>
                 </ul>
               </v-col>
@@ -32,12 +32,13 @@
               <v-col>
                 <div class="d-flex flex-column text-center align-center">
                   <b> OR </b>
-                  <b>use ThreeFold Connect to scan this QRcode:</b>
+                  <p class="mb-3">Use ThreeFold Connect to scan this QRcode:</p>
                   <div class="d-flex justify-center py-2">
                     <QrcodeGenerator :data="qrCodeText" />
                   </div>
                 </div>
               </v-col>
+              <v-divider class="my-4" horizontal></v-divider>
             </v-row>
             <v-alert type="warning" variant="tonal" class="d-flex row justify-start mb-6">
               <p :style="{ maxWidth: '880px' }">
@@ -144,5 +145,8 @@ onBeforeUnmount(() => {
 .bold-text {
   font-weight: bold;
   padding-left: 1rem;
+}
+.v-toolbar {
+  height: 48px;
 }
 </style>
