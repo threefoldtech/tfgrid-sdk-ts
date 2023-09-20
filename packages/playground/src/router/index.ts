@@ -18,6 +18,16 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes: [
     {
+      path: "/explorer",
+      children: [
+        {
+          path: "simulator",
+          component: () => import("../portal/simulator_view.vue"),
+          meta: { title: "Twin" },
+        },
+      ],
+    },
+    {
       path: "/portal",
       children: [
         {
