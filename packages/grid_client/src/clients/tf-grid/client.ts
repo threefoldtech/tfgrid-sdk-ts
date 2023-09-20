@@ -5,7 +5,7 @@ import { TFBalances } from "./balances";
 import { TFContracts } from "./contracts";
 import { TFKVStore } from "./kvstore";
 import { TFTermsAndConditions } from "./terms_and_conditions";
-import { Bridge } from "./tftBridge";
+import { TFTBridge } from "./tftBridge";
 import { TFTPrice } from "./tftPrice";
 import { TFTwins } from "./twins";
 
@@ -16,7 +16,7 @@ class TFClient extends Client {
   twins: TFTwins = new TFTwins(this);
   kvStore: TFKVStore = new TFKVStore(this);
   termsAndConditions: TFTermsAndConditions = new TFTermsAndConditions(this);
-  tftBridge: Bridge = new Bridge(this);
+  tftBridge: TFTBridge = new TFTBridge(this);
 
   constructor(
     public url: string,

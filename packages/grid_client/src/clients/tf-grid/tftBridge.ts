@@ -1,7 +1,7 @@
-import { SwapToStellarOptions, TFTBridge } from "@threefold/tfchain_client";
+import { Bridge, SwapToStellarOptions } from "@threefold/tfchain_client";
 import Decimal from "decimal.js";
 
-class Bridge extends TFTBridge {
+class TFTBridge extends Bridge {
   async swapToStellar(options: SwapToStellarOptions) {
     const decimalAmount = new Decimal(options.amount);
     const decimalAmountInTFT = decimalAmount.mul(10 ** 7).toNumber();
@@ -23,4 +23,4 @@ class Bridge extends TFTBridge {
   }
 }
 
-export { Bridge };
+export { TFTBridge };

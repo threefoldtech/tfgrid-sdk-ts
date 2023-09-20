@@ -51,7 +51,7 @@ class QueryTFTBridge {
   }
 }
 
-class TFTBridge extends QueryTFTBridge {
+class Bridge extends QueryTFTBridge {
   constructor(public client: Client) {
     super(client);
     this.client = client;
@@ -63,4 +63,4 @@ class TFTBridge extends QueryTFTBridge {
     return this.client.patchExtrinsic<void>(extrinsic);
   }
 }
-export { QueryTFTBridge, TFTBridge };
+export { QueryTFTBridge, Bridge };

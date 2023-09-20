@@ -16,8 +16,8 @@ import { KVStore } from "./kvstore";
 import { Nodes, QueryNodes } from "./nodes";
 import { QueryPricingPolicies } from "./pricing_policies";
 import { TermsAndConditions } from "./terms_and_conditions";
+import { Bridge, QueryTFTBridge } from "./tft_bridge";
 import { QueryTFTPrice } from "./tft_price";
-import { QueryTFTBridge, TFTBridge } from "./tftBridge";
 import { QueryTwins, Twins } from "./twins";
 import type { Extrinsic, ExtrinsicResult, PatchExtrinsicOptions, validatorFunctionType } from "./types";
 import { Utility } from "./utility";
@@ -228,7 +228,7 @@ class Client extends QueryClient {
   termsAndConditions: TermsAndConditions = new TermsAndConditions(this);
   kvStore: KVStore = new KVStore(this);
   twins: Twins = new Twins(this);
-  tftBridge: TFTBridge = new TFTBridge(this);
+  tftBridge: Bridge = new Bridge(this);
 
   declare url: string;
   mnemonicOrSecret?: string;
