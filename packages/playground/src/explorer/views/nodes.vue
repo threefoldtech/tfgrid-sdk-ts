@@ -81,9 +81,9 @@ import { onMounted } from "vue";
 import secondToRedable from "@/utils/second_to_redable";
 import toFixedCsSize from "@/utils/to_fixed_cs_size";
 
-import NodeFilter from "../components/Common/Filters/NodeFilter.vue";
-import NodeTable from "../components/Common/NodeTable.vue";
-import NodeDetails from "../components/Nodes/NodeDetails.vue";
+import NodeFilter from "../components/common/filters/node_filter.vue";
+import NodeDetails from "../components/nodes/node_details.vue";
+import NodeTable from "../components/nodes/nodes_table.vue";
 import { getFilterValues, requestNodes } from "../utils/helpers";
 import {
   type FilterInputs,
