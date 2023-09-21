@@ -25,7 +25,7 @@
         <VBtn
           type="submit"
           color="primary"
-          variant="elevated"
+          variant="tonal"
           :disabled="!isValidForm"
           :loading="loading"
           size="x-large"

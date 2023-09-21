@@ -223,18 +223,20 @@ const routes: AppRoute[] = [
       },
     ],
   },
-  network !== "main"
-    ? {}
-    : ({
-        title: "Minting",
-        items: [
-          {
-            title: "Minting",
-            icon: "mdi-file-document-edit",
-            route: "/minting",
-          },
-        ],
-      } as any),
+  ...(network !== "main"
+    ? []
+    : [
+        {
+          title: "Minting",
+          items: [
+            {
+              title: "Minting",
+              icon: "mdi-file-document-edit",
+              route: "/minting",
+            },
+          ],
+        } as any,
+      ]),
   {
     title: "Other Services",
     icon: "mdi-toolbox",
