@@ -2,10 +2,10 @@ import moment from "moment";
 
 import { Client, QueryClient } from "./client";
 import { checkConnection } from "./utils";
-interface proposal {
+interface Proposal {
   threshold: number;
-  ayes: ayesAndNayes[];
-  nayes: ayesAndNayes[];
+  ayes: AyesAndNayes[];
+  nayes: AyesAndNayes[];
   vetos: number;
   end: moment.Moment;
   hash: string;
@@ -15,13 +15,13 @@ interface proposal {
   ayesProgress: number;
   nayesProgress: number;
 }
-interface ayesAndNayes {
+interface AyesAndNayes {
   farmId: number;
   weight: number;
 }
 export interface Proposals {
-  active: proposal[];
-  inactive: proposal[];
+  active: Proposal[];
+  inactive: Proposal[];
 }
 export interface DaoVoteOptions {
   address: string;
@@ -39,17 +39,17 @@ class QueryDao {
   async get(): Promise<Proposals> {
     const hashesJson = (await this.client.api.query.dao.proposalList()).toPrimitive();
     const hashes = JSON.parse(JSON.stringify(hashesJson));
-    const activeProposals: proposal[] = [];
-    const inactiveProposals: proposal[] = [];
+    const activeProposals: Proposal[] = [];
+    const inactiveProposals: Proposal[] = [];
     for await (const hash of hashes) {
       const daoProposal = await this.getDaoProposal(hash);
       const proposal = await this.getProposal(hash);
       const proposalVotes = await this.getProposalVotes(hash);
 
-      const nowBlock: any = await this.client.api.query.system.number();
-      const timeUntilEnd = (proposalVotes.end - nowBlock.toJSON()) * 6;
+      const nowBlock: number = +(await this.client.api.query.system.number());
+      const timeUntilEnd = (proposalVotes.end - nowBlock) * 6;
       if (proposal && daoProposal) {
-        if (proposalVotes.end < nowBlock.toJSON()) {
+        if (proposalVotes.end < nowBlock) {
           inactiveProposals.push({
             threshold: proposalVotes.threshold,
             ayes: proposalVotes.ayes, //[{farmId: number, weight: number}]
@@ -82,12 +82,12 @@ class QueryDao {
     }
     return { active: activeProposals, inactive: inactiveProposals };
   }
-  private getVotesWithWeights(votes: ayesAndNayes[]) {
-    return votes.reduce((total: number, vote: ayesAndNayes) => {
+  private getVotesWithWeights(votes: AyesAndNayes[]) {
+    return votes.reduce((total: number, vote: AyesAndNayes) => {
       return total + vote.weight;
     }, 0);
   }
-  private getProgress(ayes: ayesAndNayes[], nayes: ayesAndNayes[], typeAye: boolean) {
+  private getProgress(ayes: AyesAndNayes[], nayes: AyesAndNayes[], typeAye: boolean) {
     const totalAyeWeight = ayes ? this.getVotesWithWeights(ayes) : 0;
     const totalNayeWeight = nayes ? this.getVotesWithWeights(nayes) : 0;
     const total = totalAyeWeight + totalNayeWeight;
