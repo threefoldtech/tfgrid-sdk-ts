@@ -100,7 +100,7 @@ class QueryDao {
     return 0;
   }
   @checkConnection
-  private async getDaoProposal(hash: { toJSON: () => any }) {
+  private async getDaoProposal(hash: string) {
     const proposalJson = (await this.client.api.query.dao.proposals(hash)).toPrimitive();
 
     const proposal = JSON.parse(JSON.stringify(proposalJson));
@@ -108,7 +108,7 @@ class QueryDao {
     return proposal;
   }
   @checkConnection
-  private async getProposal(hash: { toJSON: () => any }) {
+  private async getProposal(hash: string) {
     try {
       const proposalJson = (await this.client.api.query.dao.proposalOf(hash)).toPrimitive();
 
