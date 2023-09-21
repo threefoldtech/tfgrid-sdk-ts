@@ -199,7 +199,7 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
   loadingWithdraw.value = true;
   try {
     const grid = await getGrid(profileManager.profile!);
-    await grid?.bridge.swapToStellar({ amount: Number(withdrawAmount), target: targetAddress });
+    await grid?.bridge.swapToStellar({ amount: +withdrawAmount, target: targetAddress });
 
     openWithdrawDialog.value = false;
     target.value = "";
