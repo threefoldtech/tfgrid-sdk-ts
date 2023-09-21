@@ -4,6 +4,7 @@ import { AbstractBuilder, BuilderMapper, BuilderMethods, BuilderValidator } from
 export enum NodeStatus {
   Up = "up",
   Down = "down",
+  Standby = "standby"
 }
 
 export interface GatewaysQuery {
@@ -89,4 +90,5 @@ export class GatewayBuilder extends AbstractBuilder<GatewaysQuery> {
     });
   }
 }
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface GatewayBuilder extends BuilderMethods<GatewaysQuery, GatewayBuilder> {}

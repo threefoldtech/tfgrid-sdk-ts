@@ -659,6 +659,15 @@ class GetDedicatedNodePriceModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
 }
 
+class SwapToStellarModel {
+  @Expose() @IsNotEmpty() @IsString() target: string;
+  @Expose() @IsNotEmpty() @Min(1) amount: number;
+}
+
+class ListenToMintCompletedModel {
+  @Expose() @IsNotEmpty() @IsString() address: string;
+}
+
 export {
   AlgorandAccountCreateModel,
   AlgorandAccountInitModel,
@@ -780,4 +789,6 @@ export {
   NodeGetModel,
   SetDedicatedNodeExtraFeesModel,
   GetDedicatedNodePriceModel,
+  SwapToStellarModel,
+  ListenToMintCompletedModel,
 };

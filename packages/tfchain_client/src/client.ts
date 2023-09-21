@@ -17,8 +17,8 @@ import { KVStore } from "./kvstore";
 import { Nodes, QueryNodes } from "./nodes";
 import { QueryPricingPolicies } from "./pricing_policies";
 import { TermsAndConditions } from "./terms_and_conditions";
+import { Bridge, QueryBridge } from "./tft_bridge";
 import { QueryTFTPrice } from "./tft_price";
-import { QueryTFTBridge } from "./tftBridge";
 import { QueryTwins, Twins } from "./twins";
 import type { Extrinsic, ExtrinsicResult, PatchExtrinsicOptions, validatorFunctionType } from "./types";
 import { Utility } from "./utility";
@@ -47,7 +47,7 @@ class QueryClient {
   balances: QueryBalances = new QueryBalances(this);
   dao: QueryDao = new QueryDao(this);
   farms: QueryFarms = new QueryFarms(this);
-  tftBridge: QueryTFTBridge = new QueryTFTBridge(this);
+  tftBridge: QueryBridge = new QueryBridge(this);
   tftPrice: QueryTFTPrice = new QueryTFTPrice(this);
   pricingPolicies: QueryPricingPolicies = new QueryPricingPolicies(this);
   twins: QueryTwins = new QueryTwins(this);
@@ -231,6 +231,8 @@ class Client extends QueryClient {
   kvStore: KVStore = new KVStore(this);
   twins: Twins = new Twins(this);
   dao: Dao = new Dao(this);
+  tftBridge: Bridge = new Bridge(this);
+
 
   declare url: string;
   mnemonicOrSecret?: string;
@@ -256,7 +258,9 @@ class Client extends QueryClient {
       throw Error("mnemonicOrSecret or extension signer should be provided");
     }
     if (this.mnemonicOrSecret) {
-      if (!validateMnemonic(this.mnemonicOrSecret)) {
+      if (this.mnemonicOrSecret === "//Alice") {
+        return;
+      } else if (!validateMnemonic(this.mnemonicOrSecret)) {
         if (this.mnemonicOrSecret.includes(" "))
           // seed shouldn't have spaces
           throw Error("Invalid mnemonic! Must be bip39 compliant");

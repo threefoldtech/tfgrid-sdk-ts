@@ -1,4 +1,4 @@
-import { assertBoolean, assertId, assertIn, assertNatural, assertPattern, assertString } from "../utils";
+import { assertBoolean, assertId, assertIn, assertInt, assertNatural, assertPattern, assertString } from "../utils";
 import { AbstractBuilder, BuilderMapper, BuilderMethods, BuilderValidator } from "./abstract_builder";
 import { ID_PATTERN, NodeStatus } from "./gateways";
 
@@ -9,14 +9,18 @@ export interface NodesQuery {
   freeMru: number;
   freeHru: number;
   freeSru: number;
+  totalMru: number;
+  totalCru: number;
+  totalSru: number;
+  totalHru: number;
   freeIps: number;
   status: NodeStatus;
   city: string;
   country: string;
   farmName: string;
-  domain: boolean;
   ipv4: boolean;
   ipv6: boolean;
+  domain: boolean;
   dedicated: boolean;
   rentable: boolean;
   rented: boolean;
@@ -24,6 +28,13 @@ export interface NodesQuery {
   availableFor: number;
   farmIds: string;
   nodeId: number;
+  certificationType: "NotCertified" | "Silver" | "Gold";
+  hasGpu: boolean;
+  gpuDeviceId: string;
+  gpuDeviceName: string;
+  gpuVendorId: string;
+  gpuVendorName: string;
+  gpuAvailable: boolean;
 }
 
 const NODES_MAPPER: BuilderMapper<NodesQuery> = {
@@ -48,6 +59,17 @@ const NODES_MAPPER: BuilderMapper<NodesQuery> = {
   availableFor: "available_for",
   farmIds: "farm_ids",
   nodeId: "node_id",
+  certificationType: "certification_type",
+  gpuAvailable: "gpu_available",
+  gpuDeviceId: "gpu_device_id",
+  gpuDeviceName: "gpu_device_name",
+  gpuVendorId: "gpu_vendor_id",
+  gpuVendorName: "gpu_vendor_name",
+  hasGpu: "has_gpu",
+  totalCru: "total_cru",
+  totalHru: "total_hru",
+  totalMru: "total_mru",
+  totalSru: "total_sru",
 };
 
 const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
@@ -59,7 +81,7 @@ const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
   freeSru: assertNatural,
   freeIps: assertNatural,
   status(value) {
-    assertIn(value, [NodeStatus.Up, NodeStatus.Down]);
+    assertIn(value, [NodeStatus.Up, NodeStatus.Down, NodeStatus.Standby]);
   },
   city: assertString,
   country: assertString,
@@ -79,6 +101,19 @@ const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
     });
   },
   nodeId: assertId,
+  certificationType(value) {
+    assertIn(value, ["NotCertified", "Silver", "Gold"]);
+  },
+  gpuAvailable: assertBoolean,
+  gpuDeviceId: assertString,
+  gpuDeviceName: assertString,
+  gpuVendorId: assertString,
+  gpuVendorName: assertString,
+  hasGpu: assertBoolean,
+  totalCru: assertInt,
+  totalHru: assertInt,
+  totalMru: assertInt,
+  totalSru: assertInt,
 };
 
 export class NodesBuilder extends AbstractBuilder<NodesQuery> {
@@ -91,4 +126,5 @@ export class NodesBuilder extends AbstractBuilder<NodesQuery> {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface NodesBuilder extends BuilderMethods<NodesQuery, NodesBuilder> {}

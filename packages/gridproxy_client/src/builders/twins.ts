@@ -35,4 +35,5 @@ export class TwinsBuilder extends AbstractBuilder<TwinsQuery> {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface TwinsBuilder extends BuilderMethods<TwinsQuery, TwinsBuilder> {}

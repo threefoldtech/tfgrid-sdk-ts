@@ -1,5 +1,5 @@
-import { resolvePaginator } from "../utils";
 import { ContractsBuilder, ContractsQuery, ContractState, ContractType } from "../builders/public_api";
+import { resolvePaginator } from "../utils";
 import { AbstractClient } from "./abstract_client";
 
 export enum Discount {

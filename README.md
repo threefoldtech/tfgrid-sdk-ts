@@ -26,7 +26,7 @@ This repo contains the typescript clients and projects for Threefold grid.
 
 The main requirements are:
 
-- [Node.js](https://nodejs.org/en) 18^
+- [Node.js](https://nodejs.org/en) ^18
 - [Lerna](https://lerna.js.org/) 7.1.1
 
 ## Install
