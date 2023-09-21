@@ -52,7 +52,7 @@ class QueryDao {
   @checkConnection
   async get(): Promise<Proposals> {
     const hashesJson = (await this.client.api.query.dao.proposalList()).toPrimitive();
-    const hashes = JSON.parse(JSON.stringify(hashesJson));
+    const hashes = JSON.stringify(hashesJson);
     const activeProposals: Proposal[] = [];
     const inactiveProposals: Proposal[] = [];
     for await (const hash of hashes) {
