@@ -17208,13 +17208,6 @@ tf-svelte-rx-forms@^1.0.3:
     "@types/validator" "^13.7.7"
     validator "^13.7.0"
 
-tfgrid-gql@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/tfgrid-gql/-/tfgrid-gql-1.0.1.tgz#9c93c2d409badac2cec417e3719b78665617fea7"
-  integrity sha512-y3kouojhe+ky3/8ET+iCPPQcfSZgBDkzfFaY61wYM2IzmAPWV/3c1fAEhL6zbWT/7uTKZFuhyOsnmCXpxGCS4Q==
-  dependencies:
-    ts-mixer "^6.0.2"
-
 thenify-all@^1.0.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/thenify-all/-/thenify-all-1.6.0.tgz#1a1918d402d8fc3f98fbf234db0bcc8cc10e9726"
@@ -17699,8 +17692,7 @@ typescript@*, typescript@^5.0.2:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.4.tgz#b217fd20119bd61a94d4011274e0ab369058da3b"
   integrity sha512-cW9T5W9xY37cc+jfEnaUvX91foxtHkza3Nw3wkoF4sSlKn0MONdkdEndig/qPBWXNkmplh3NzayQzCiHM4/hqw==
 
-
-"typescript@^3 || ^4", typescript@^4.0.0, typescript@^4.4.4, typescript@^4.7.4, typescript@^4.8.4:
+"typescript@^3 || ^4", typescript@^4.0.0, typescript@^4.4.4, typescript@^4.7.4, typescript@^4.8.4, typescript@^4.9.3:
   version "4.9.5"
   resolved "https://registry.npmjs.org/typescript/-/typescript-4.9.5.tgz"
   integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==

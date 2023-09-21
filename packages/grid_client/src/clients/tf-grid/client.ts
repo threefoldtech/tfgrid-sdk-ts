@@ -3,7 +3,6 @@ import { Client } from "@threefold/tfchain_client";
 import { KeypairType } from "../../zos/deployment";
 import { TFBalances } from "./balances";
 import { TFContracts } from "./contracts";
-import { TFDao } from "./dao";
 import { TFKVStore } from "./kvstore";
 import { TFTermsAndConditions } from "./terms_and_conditions";
 import { TFTPrice } from "./tftPrice";
