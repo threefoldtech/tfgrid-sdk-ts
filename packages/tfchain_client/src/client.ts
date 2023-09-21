@@ -254,7 +254,9 @@ class Client extends QueryClient {
       throw Error("mnemonicOrSecret or extension signer should be provided");
     }
     if (this.mnemonicOrSecret) {
-      if (!validateMnemonic(this.mnemonicOrSecret)) {
+      if (this.mnemonicOrSecret === "//Alice") {
+        return;
+      } else if (!validateMnemonic(this.mnemonicOrSecret)) {
         if (this.mnemonicOrSecret.includes(" "))
           // seed shouldn't have spaces
           throw Error("Invalid mnemonic! Must be bip39 compliant");
