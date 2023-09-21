@@ -2,12 +2,12 @@ import { getClient } from "../client_loader";
 
 async function main() {
   const grid3 = await getClient();
-
+  await grid3.tfchain.init({ name: "harby", secret: grid3.clientOptions.mnemonic });
   await grid3.tfchain.vote({
-    name: "mariobassem",
-    address: "5F7ctVSmDXMM3yTQszZy47QgvNxaeUPPRz5p3oBaK9jTeNgf",
-    farmId: 3876,
-    hash: "0xd24a8e1b3c02966d9333f96ba31248aad7e35f52bb3e5f0b24b10748ce03161f",
+    name: "harby",
+    address: "5FWW1F7XHaiRgPEqJdkv9nVgz94AVKXkTKNyfbLcY4rqpaNM",
+    farmId: 246,
+    hash: "0xa539b59dcf7ba10764a49c9effb88aea400d3c20f0071c3b85494423079757fe",
     approve: true,
   });
 
