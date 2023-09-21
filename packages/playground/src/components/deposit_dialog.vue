@@ -60,9 +60,10 @@ import { Decimal } from "decimal.js";
 import { createToast } from "mosha-vue-toastify";
 import { onBeforeUnmount, onMounted, ref } from "vue";
 
+import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import QrcodeGenerator from "../components/qrcode_generator.vue";
 import { useProfileManager } from "../stores";
-import { getGrid, loadProfile } from "../utils/grid";
+import { getGrid } from "../utils/grid";
 
 const depositDialog = ref(false);
 const emits = defineEmits(["close"]);
@@ -71,6 +72,7 @@ let destroyed = false;
 const loading = ref(false);
 const dots = ref(".");
 const interval = ref<number | null>(null);
+const ProfileManagerController = useProfileManagerController();
 
 const props = defineProps({
   selectedName: String,
@@ -99,9 +101,8 @@ onMounted(async () => {
   try {
     loading.value = true;
     const grid = await getGrid(profileManager.profile!);
-    const receivedDeposit = await grid!.tfclient.tftBridge.listenToMintCompleted(
-      profileManager.profile?.address as string,
-    );
+    const address = profileManager.profile?.address as string;
+    const receivedDeposit = await grid!.bridge.listenToMintCompleted({ address: address });
     loading.value = false;
     if (destroyed) return;
     const DecimalDeposit = new Decimal(receivedDeposit);
@@ -114,8 +115,8 @@ onMounted(async () => {
       showIcon: true,
       type: "success",
     });
-    const profile = await loadProfile(grid!);
-    profileManager.set(profile);
+    await ProfileManagerController.reloadBalance();
+    closeDialog();
   } catch (e) {
     if (destroyed) return;
     console.log(e);

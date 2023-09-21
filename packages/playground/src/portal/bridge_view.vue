@@ -92,14 +92,13 @@
 </template>
 
 <script lang="ts" setup>
-import { GridClient } from "@threefold/grid_client";
 import { createToast } from "mosha-vue-toastify";
 import { default as StellarSdk, StrKey } from "stellar-sdk";
 import { onMounted, ref } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useProfileManager } from "../stores";
-import { getGrid, loadBalance, loadProfile } from "../utils/grid";
+import { getGrid, loadBalance } from "../utils/grid";
 
 const profileManager = useProfileManager();
 const items = ref([{ id: 1, name: "stellar" }]);
@@ -128,10 +127,10 @@ onMounted(async () => {
   try {
     const grid = await getGrid(profileManager.profile!);
     if (grid) {
-      const WithdrawFee = await grid.tfclient.tftBridge.getWithdrawFee();
+      const WithdrawFee = await grid.bridge.getWithdrawFee();
       withdrawFee.value = WithdrawFee;
 
-      const DepositFee = await grid.tfclient.tftBridge.getDepositFee();
+      const DepositFee = await grid.bridge.getDepositFee();
       depositFee.value = DepositFee;
 
       const balance = await loadBalance(grid);
@@ -199,10 +198,9 @@ async function validateAddress() {
 async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
   loadingWithdraw.value = true;
   try {
-    const client = new GridClient({ mnemonic: profileManager.profile!.mnemonic, network: window.env.NETWORK });
-    client.connect();
-    const result = await client.tfclient.tftBridge.swapToStellar({ amount: withdrawAmount, target: targetAddress });
-    await result.apply();
+    const grid = await getGrid(profileManager.profile!);
+    await grid?.bridge.swapToStellar({ amount: Number(withdrawAmount), target: targetAddress });
+
     openWithdrawDialog.value = false;
     target.value = "";
     amount.value = 0;

@@ -1,5 +1,3 @@
-import { Decimal } from "decimal.js";
-
 import { Client, QueryClient } from "./client";
 import { checkConnection } from "./utils";
 
@@ -8,7 +6,7 @@ export interface SwapToStellarOptions {
   amount: number;
 }
 
-class QueryTFTBridge {
+class QueryBridge {
   constructor(public client: QueryClient) {
     this.client = client;
   }
@@ -51,7 +49,7 @@ class QueryTFTBridge {
   }
 }
 
-class Bridge extends QueryTFTBridge {
+class Bridge extends QueryBridge {
   constructor(public client: Client) {
     super(client);
     this.client = client;
@@ -63,4 +61,4 @@ class Bridge extends QueryTFTBridge {
     return this.client.patchExtrinsic<void>(extrinsic);
   }
 }
-export { QueryTFTBridge, Bridge };
+export { QueryBridge, Bridge };

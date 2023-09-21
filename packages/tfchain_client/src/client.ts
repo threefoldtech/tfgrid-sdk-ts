@@ -16,7 +16,7 @@ import { KVStore } from "./kvstore";
 import { Nodes, QueryNodes } from "./nodes";
 import { QueryPricingPolicies } from "./pricing_policies";
 import { TermsAndConditions } from "./terms_and_conditions";
-import { Bridge, QueryTFTBridge } from "./tft_bridge";
+import { Bridge, QueryBridge } from "./tft_bridge";
 import { QueryTFTPrice } from "./tft_price";
 import { QueryTwins, Twins } from "./twins";
 import type { Extrinsic, ExtrinsicResult, PatchExtrinsicOptions, validatorFunctionType } from "./types";
@@ -45,7 +45,7 @@ class QueryClient {
   contracts: QueryContracts = new QueryContracts(this);
   balances: QueryBalances = new QueryBalances(this);
   farms: QueryFarms = new QueryFarms(this);
-  tftBridge: QueryTFTBridge = new QueryTFTBridge(this);
+  tftBridge: QueryBridge = new QueryBridge(this);
   tftPrice: QueryTFTPrice = new QueryTFTPrice(this);
   pricingPolicies: QueryPricingPolicies = new QueryPricingPolicies(this);
   twins: QueryTwins = new QueryTwins(this);
