@@ -90,12 +90,13 @@
             <v-img :src="baseUrl + 'images/logoTF.png'" width="160px" />
           </v-toolbar-title>
 
-          <v-spacer class="pr-16">
+          <v-spacer>
             <div class="d-flex align-center justify-start">
-              <TftSwapPrice></TftSwapPrice>
+              <FundsCard v-if="hasActiveProfile"></FundsCard>
+                            <TftSwapPrice></TftSwapPrice>
+
             </div>
           </v-spacer>
-
           <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
           <v-divider vertical class="mx-2" />
           <AppTheme />
@@ -147,10 +148,10 @@ import { useProfileManager } from "./stores/profile_manager";
 const $route = useRoute();
 const $router = useRouter();
 const profileManager = useProfileManager();
+const network = process.env.NETWORK || (window as any).env.NETWORK;
 
 const openProfile = ref(true);
 const hasActiveProfile = computed(() => !!profileManager.profile);
-
 watch(
   () => $route.meta,
   meta => (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
@@ -164,11 +165,23 @@ const routes: AppRoute[] = [
     title: "Portal",
     icon: "mdi-account-convert-outline",
     items: [
-      { title: "Twin", icon: "mdi-account-supervisor-outline", route: "/portal/twin" },
+      {
+        title: "Twin",
+        icon: "mdi-account-supervisor-outline",
+        route: "/portal/twin",
+      },
       { title: "Bridge", icon: "mdi-swap-horizontal", route: "/portal/bridge" },
-      { title: "Transfer", icon: "mdi-account-arrow-right-outline", route: "/portal/transfer" },
+      {
+        title: "Transfer",
+        icon: "mdi-account-arrow-right-outline",
+        route: "/portal/transfer",
+      },
       { title: "Farms", icon: "mdi-silo", route: "/portal/farms" },
-      { title: "Dedicated Nodes", icon: "mdi-resistor-nodes", route: "/portal/dedicated-nodes" },
+      {
+        title: "Dedicated Nodes",
+        icon: "mdi-resistor-nodes",
+        route: "/portal/dedicated-nodes",
+      },
       { title: "DAO", icon: "mdi-note-check-outline", route: "/portal/dao" },
     ],
   },
@@ -176,7 +189,11 @@ const routes: AppRoute[] = [
     title: "Explorer",
     icon: "mdi-database-search-outline",
     items: [
-      { title: "Statistics", icon: "mdi-chart-scatter-plot", route: "/explorer/stats" },
+      {
+        title: "Statistics",
+        icon: "mdi-chart-scatter-plot",
+        route: "/explorer/stats",
+      },
       { title: "Nodes", icon: "mdi-access-point", route: "/explorer/nodes" },
       { title: "Farms", icon: "mdi-lan-connect", route: "/explorer/farms" },
     ],
@@ -185,8 +202,16 @@ const routes: AppRoute[] = [
     title: "Calculators",
     icon: "mdi-calculator",
     items: [
-      { title: "Resource Pricing", icon: "mdi-currency-usd", route: "/explorer/pricing" },
-      { title: "Simulator", icon: "mdi-chart-line", route: "/explorer/simulator" },
+      {
+        title: "Resource Pricing",
+        icon: "mdi-currency-usd",
+        route: "/explorer/pricing",
+      },
+      {
+        title: "Simulator",
+        icon: "mdi-chart-line",
+        route: "/explorer/simulator",
+      },
     ],
   },
   {
@@ -195,8 +220,28 @@ const routes: AppRoute[] = [
   },
   {
     title: "My Account",
-    items: [{ title: "Contracts", icon: "mdi-file-document-edit", route: "/contractslist" }],
+    items: [
+      {
+        title: "Contracts",
+        icon: "mdi-file-document-edit",
+        route: "/contractslist",
+      },
+    ],
   },
+  ...(network !== "main"
+    ? []
+    : [
+        {
+          title: "Minting",
+          items: [
+            {
+              title: "Minting",
+              icon: "mdi-file-document-edit",
+              route: "/minting",
+            },
+          ],
+        } as any,
+      ]),
   {
     title: "Other Services",
     icon: "mdi-toolbox",
@@ -220,13 +265,17 @@ const routes: AppRoute[] = [
   },
   {
     title: "Help",
-    items: [{ title: "Manual", icon: "mdi-book-open-page-variant-outline", url: "https://manual.grid.tf/" }],
+    items: [
+      {
+        title: "Manual",
+        icon: "mdi-book-open-page-variant-outline",
+        url: "https://manual.grid.tf/",
+      },
+    ],
   },
 ];
 
 // eslint-disable-next-line no-undef
-const network = process.env.NETWORK || (window as any).env.NETWORK;
-
 const permanent = window.innerWidth > 980;
 const openSidebar = ref(permanent);
 
@@ -255,6 +304,7 @@ import AppTheme from "./components/app_theme.vue";
 import ConnectWalletLanding from "./components/connect_wallet_landing.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
 import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
+import FundsCard from "./components/funds_card.vue";
 import ProfileManagerController from "./components/profile_manager_controller.vue";
 import TftSwapPrice from "./components/swap_price.vue";
 import TFNotification from "./components/tf_notification.vue";
@@ -284,6 +334,7 @@ export default {
     ConnectWalletLanding,
     AppInfo,
     TftSwapPrice,
+    FundsCard,
     ProfileManagerController,
   },
 };

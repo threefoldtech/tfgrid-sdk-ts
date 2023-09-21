@@ -81,7 +81,7 @@ const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
   freeSru: assertNatural,
   freeIps: assertNatural,
   status(value) {
-    assertIn(value, [NodeStatus.Up, NodeStatus.Down]);
+    assertIn(value, [NodeStatus.Up, NodeStatus.Down, NodeStatus.Standby]);
   },
   city: assertString,
   country: assertString,

@@ -1,6 +1,12 @@
-import { QueryClient } from "./client";
+import { Client, QueryClient } from "./client";
 import { checkConnection } from "./utils";
-class QueryTFTBridge {
+
+export interface SwapToStellarOptions {
+  target: string;
+  amount: number;
+}
+
+class QueryBridge {
   constructor(public client: QueryClient) {
     this.client = client;
   }
@@ -29,5 +35,30 @@ class QueryTFTBridge {
     );
     return eventData[0].amount.toPrimitive();
   }
+
+  @checkConnection
+  async getWithdrawFee(): Promise<number> {
+    const fee = await this.client.api.query.tftBridgeModule.withdrawFee();
+    return fee.toPrimitive() as number;
+  }
+
+  @checkConnection
+  async getDepositFee(): Promise<number> {
+    const fee = await this.client.api.query.tftBridgeModule.depositFee();
+    return fee.toPrimitive() as number;
+  }
 }
-export { QueryTFTBridge };
+
+class Bridge extends QueryBridge {
+  constructor(public client: Client) {
+    super(client);
+    this.client = client;
+  }
+
+  @checkConnection
+  async swapToStellar(options: SwapToStellarOptions) {
+    const extrinsic = await this.client.api.tx.tftBridgeModule.swapToStellar(options.target, options.amount);
+    return this.client.patchExtrinsic<void>(extrinsic);
+  }
+}
+export { QueryBridge, Bridge };
