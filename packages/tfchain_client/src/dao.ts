@@ -130,10 +130,7 @@ class Dao extends QueryDao {
   }
   @checkConnection
   async vote(options: DaoVoteOptions) {
-    const nonce = await this.client.api.rpc.system.accountNextIndex(options.address);
-    return this.client.api.tx.dao
-      .vote(options.farmId, options.hash, options.approve)
-      .signAndSend(this.client.keypair, { nonce });
+    return this.client.api.tx.dao.vote(options.farmId, options.hash, options.approve);
   }
 }
 export { Dao, QueryDao };
