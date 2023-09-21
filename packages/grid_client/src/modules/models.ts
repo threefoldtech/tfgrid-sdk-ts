@@ -380,9 +380,9 @@ class KVStoreBatchRemoveModel {
 }
 class DaoVoteModel {
   @Expose() @IsString() @IsNotEmpty() address: string;
-  @Expose() @IsInt() @IsNotEmpty() farmId: number;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
   @Expose() @IsBoolean() approve: boolean;
-  @Expose() @IsNotEmpty() hash: any;
+  @Expose() @IsString() @IsNotEmpty() hash: string;
 }
 class BalanceGetModel {
   @Expose() @IsString() @IsNotEmpty() address: string;
@@ -431,9 +431,9 @@ class TfchainWalletBalanceByAddressModel {
 class TfchainDaoVoteModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() address: string;
-  @Expose() @IsInt() @IsNotEmpty() farmId: number;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
   @Expose() @IsBoolean() approve: boolean;
-  @Expose() @IsNotEmpty() hash: any;
+  @Expose() @IsString() @IsNotEmpty() hash: string;
 }
 class TfchainWalletTransferModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
