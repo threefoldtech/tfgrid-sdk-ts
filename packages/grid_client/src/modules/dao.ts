@@ -16,7 +16,7 @@ class Dao {
   @expose
   @validateInput
   async vote(options: DaoVoteModel) {
-    return await this.client.dao.vote(options);
+    return (await this.client.dao.vote(options)).apply();
   }
 }
 export { Dao as dao };

@@ -51,8 +51,8 @@ class QueryDao {
 
   @checkConnection
   async get(): Promise<Proposals> {
-    const hashesJson = (await this.client.api.query.dao.proposalList()).toPrimitive();
-    const hashes = JSON.stringify(hashesJson);
+    const hashesJson = await this.client.api.query.dao.proposalList();
+    const hashes = hashesJson.toPrimitive() as string[];
     const activeProposals: Proposal[] = [];
     const inactiveProposals: Proposal[] = [];
     for await (const hash of hashes) {
@@ -96,12 +96,12 @@ class QueryDao {
     }
     return { active: activeProposals, inactive: inactiveProposals };
   }
-  private getVotesWithWeights(votes: AyesAndNayes[]) {
+  private getVotesWithWeights(votes: AyesAndNayes[]): number {
     return votes.reduce((total: number, vote: AyesAndNayes) => {
       return total + vote.weight;
     }, 0);
   }
-  private getProgress(ayes: AyesAndNayes[], nayes: AyesAndNayes[], typeAye: boolean) {
+  private getProgress(ayes: AyesAndNayes[], nayes: AyesAndNayes[], typeAye: boolean): number {
     const totalAyeWeight = ayes ? this.getVotesWithWeights(ayes) : 0;
     const totalNayeWeight = nayes ? this.getVotesWithWeights(nayes) : 0;
     const total = totalAyeWeight + totalNayeWeight;
@@ -115,16 +115,16 @@ class QueryDao {
   }
   @checkConnection
   private async getDaoProposal(hash: string): Promise<DaoProposal> {
-    const proposalJson = (await this.client.api.query.dao.proposals(hash)).toPrimitive();
-    const proposal: DaoProposal = JSON.parse(JSON.stringify(proposalJson));
+    const proposalJson = await this.client.api.query.dao.proposals(hash);
+    const proposal: DaoProposal = proposalJson.toPrimitive() as unknown as DaoProposal;
     return proposal;
   }
 
   @checkConnection
   private async getProposal(hash: string): Promise<ProposalRemark | undefined> {
     try {
-      const proposalJson = (await this.client.api.query.dao.proposalOf(hash)).toPrimitive();
-      const proposalRemark: ProposalRemark = JSON.parse(JSON.stringify(proposalJson));
+      const proposalJson = await this.client.api.query.dao.proposalOf(hash);
+      const proposalRemark: ProposalRemark = proposalJson.toPrimitive() as unknown as ProposalRemark;
       return proposalRemark;
     } catch (error) {
       console.warn("Couldn't decode a proposal");
@@ -132,8 +132,8 @@ class QueryDao {
   }
   @checkConnection
   private async getProposalVotes(hash: string): Promise<ProposalVotes> {
-    const votesJson = (await this.client.api.query.dao.voting(hash)).toPrimitive();
-    const proposalVotes: ProposalVotes = JSON.parse(JSON.stringify(votesJson));
+    const votesJson = await this.client.api.query.dao.voting(hash);
+    const proposalVotes: ProposalVotes = votesJson.toPrimitive() as unknown as ProposalVotes;
     return proposalVotes;
   }
 }

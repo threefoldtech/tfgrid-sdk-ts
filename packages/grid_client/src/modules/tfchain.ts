@@ -229,12 +229,14 @@ class TFChain implements blockchainInterface {
     const sourceClient = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
     await sourceClient.connect();
     try {
-      await await sourceClient.dao.vote({
-        address: options.address,
-        farmId: options.farmId,
-        hash: options.hash,
-        approve: options.approve,
-      });
+      await (
+        await sourceClient.dao.vote({
+          address: options.address,
+          farmId: options.farmId,
+          hash: options.hash,
+          approve: options.approve,
+        })
+      ).apply();
     } catch (e) {
       throw Error(`Could not complete transfer transaction: ${e}`);
     }
