@@ -653,7 +653,7 @@ class SwapToStellarModel {
   @Expose() @IsNotEmpty() @Min(1) amount: number;
 }
 
-class listenToMintCompletedModel {
+class ListenToMintCompletedModel {
   @Expose() @IsNotEmpty() @IsString() address: string;
 }
 
