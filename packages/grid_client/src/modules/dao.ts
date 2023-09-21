@@ -15,13 +15,8 @@ class Dao {
   }
   @expose
   @validateInput
-  async transfer(options: DaoVoteModel) {
-    return await await this.client.dao.vote({
-      address: options.address,
-      farmId: options.farmId,
-      approve: options.approve,
-      hash: options.hash,
-    });
+  async vote(options: DaoVoteModel) {
+    return await this.client.dao.vote(options);
   }
 }
 export { Dao as dao };

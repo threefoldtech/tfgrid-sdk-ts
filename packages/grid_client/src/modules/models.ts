@@ -380,7 +380,7 @@ class KVStoreBatchRemoveModel {
 }
 class DaoVoteModel {
   @Expose() @IsString() @IsNotEmpty() address: string;
-  @Expose() @IsString() @IsNotEmpty() farmId: string;
+  @Expose() @IsInteger() @IsNotEmpty() farmId: integer;
   @Expose() @IsBoolean() approve: boolean;
   @Expose() @IsNotEmpty() hash: any;
 }
