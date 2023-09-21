@@ -90,13 +90,13 @@
             <v-img :src="baseUrl + 'images/logoTF.png'" width="160px" />
           </v-toolbar-title>
 
-          <v-spacer>
+          <v-spacer class="pr-16">
             <div class="d-flex align-center justify-start">
+              <TftSwapPrice class="pr-4"></TftSwapPrice>
               <FundsCard v-if="hasActiveProfile"></FundsCard>
-                            <TftSwapPrice></TftSwapPrice>
-
             </div>
           </v-spacer>
+          <v-spacer></v-spacer>
           <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
           <v-divider vertical class="mx-2" />
           <AppTheme />
