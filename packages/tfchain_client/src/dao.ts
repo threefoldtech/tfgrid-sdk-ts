@@ -7,7 +7,7 @@ interface proposal {
   ayes: ayesAndNayes[];
   nayes: ayesAndNayes[];
   vetos: number;
-  end: any;
+  end: moment.Moment;
   hash: string;
   action: string;
   description: string;
@@ -29,23 +29,49 @@ export interface DaoVoteOptions {
   hash: string;
   approve: boolean;
 }
-// interface daoProposal {
-//   index: number;
-//   description: string;
-//   link: string;
-// }
+class proposalPart {
+  args: { remark: string };
+  constructor(data: Partial<proposalPart>) {
+    Object.assign(this, data);
+  }
+
+  public static fromJSON = (json: string): proposalPart => {
+    const jsonObject = JSON.parse(json);
+    return new proposalPart(jsonObject);
+  };
+}
+
 class daoProposal {
   index: number;
   description: string;
   link: string;
+
   constructor(data: Partial<daoProposal>) {
     Object.assign(this, data);
   }
-  // public static fromJSON = (json: string): daoProposal => {
-  //   const jsonObject = JSON.parse(json);
-  //   return new daoProposal(jsonObject);
-  // };
+
+  public static fromJSON = (json: string): daoProposal => {
+    const jsonObject = JSON.parse(json);
+    return new daoProposal(jsonObject);
+  };
 }
+class proposalVotes {
+  end: number;
+  ayes: ayesAndNayes[];
+  nays: ayesAndNayes[];
+  vetos: number;
+  threshold: number;
+
+  constructor(data: Partial<proposalVotes>) {
+    Object.assign(this, data);
+  }
+
+  public static fromJSON = (json: string): proposalVotes => {
+    const jsonObject = JSON.parse(json);
+    return new proposalVotes(jsonObject);
+  };
+}
+
 class QueryDao {
   constructor(public client: QueryClient) {
     this.client = client;
@@ -58,12 +84,12 @@ class QueryDao {
     const inactiveProposals: proposal[] = [];
     for await (const hash of hashes) {
       const daoProposal = await this.getDaoProposal(hash);
-      const proposal: any = await this.getProposal(hash);
-      const proposalVotes: any = await this.getProposalVotes(hash);
-      console.log(daoProposal);
+      const proposal = await this.getProposal(hash);
+      const proposalVotes = await this.getProposalVotes(hash);
+
       const nowBlock: any = await this.client.api.query.system.number();
       const timeUntilEnd = (proposalVotes.end - nowBlock.toJSON()) * 6;
-      if (proposal) {
+      if (proposal && daoProposal) {
         if (proposalVotes.end < nowBlock.toJSON()) {
           inactiveProposals.push({
             threshold: proposalVotes.threshold,
@@ -116,24 +142,26 @@ class QueryDao {
   }
   @checkConnection
   private async getDaoProposal(hash: { toJSON: () => any }) {
-    const proposal = (await this.client.api.query.dao.proposals(hash)).toPrimitive();
+    const proposalJson = (await this.client.api.query.dao.proposals(hash)).toPrimitive();
 
-    return Object.assign(daoProposal, proposal.toString);
+    const proposal = daoProposal.fromJSON(JSON.stringify(proposalJson));
+
+    return proposal;
   }
   @checkConnection
   private async getProposal(hash: { toJSON: () => any }) {
     try {
-      const proposal = await this.client.api.query.dao.proposalOf(hash);
-      const res = proposal.toJSON();
-      return res;
+      const proposalJson = (await this.client.api.query.dao.proposalOf(hash)).toPrimitive();
+
+      return proposalPart.fromJSON(JSON.stringify(proposalJson));
     } catch (error) {
       console.warn("Couldn't decode a proposal");
     }
   }
   @checkConnection
   private async getProposalVotes(hash: string) {
-    const voting = await this.client.api.query.dao.voting(hash);
-    return voting.toJSON();
+    const voting = (await this.client.api.query.dao.voting(hash)).toPrimitive();
+    return proposalVotes.fromJSON(JSON.stringify(voting));
   }
 }
 class Dao extends QueryDao {
