@@ -26,6 +26,11 @@ const router = createRouter({
           meta: { title: "Twin" },
         },
         {
+          path: "bridge",
+          component: () => import("../portal/bridge_view.vue"),
+          meta: { title: "Bridge" },
+        },
+        {
           path: "transfer",
           component: () => import("../portal/transfer_view.vue"),
           meta: { title: "Transfer" },
