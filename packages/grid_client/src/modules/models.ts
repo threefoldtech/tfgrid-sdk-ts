@@ -777,5 +777,5 @@ export {
   SetDedicatedNodeExtraFeesModel,
   GetDedicatedNodePriceModel,
   SwapToStellarModel,
-  listenToMintCompletedModel,
+  ListenToMintCompletedModel,
 };

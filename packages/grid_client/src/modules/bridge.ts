@@ -1,7 +1,7 @@
 import { TFClient } from "../clients";
 import { GridClientConfig } from "../config";
 import { expose, validateInput } from "../helpers";
-import { listenToMintCompletedModel, SwapToStellarModel } from "./models";
+import { ListenToMintCompletedModel, SwapToStellarModel } from "./models";
 
 class Bridge {
   client: TFClient;
@@ -11,7 +11,7 @@ class Bridge {
 
   @expose
   @validateInput
-  async listenToMintCompleted(options: listenToMintCompletedModel) {
+  async listenToMintCompleted(options: ListenToMintCompletedModel) {
     return await this.client.tftBridge.listenToMintCompleted(options.address);
   }
 
