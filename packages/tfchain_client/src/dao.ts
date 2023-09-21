@@ -1,7 +1,7 @@
 import moment from "moment";
 
 import { Client, QueryClient } from "./client";
-import { checkConnection, hex2a } from "./utils";
+import { checkConnection } from "./utils";
 interface proposal {
   threshold: number;
   ayes: ayesAndNayes[];
@@ -57,9 +57,9 @@ class QueryDao {
             vetos: proposalVotes.vetos,
             end: moment().add(timeUntilEnd, "second"),
             hash: hash,
-            action: hex2a(proposal.args.remark),
-            description: hex2a(daoProposal.description),
-            link: hex2a(daoProposal.link),
+            action: proposal.args.remark,
+            description: daoProposal.description,
+            link: daoProposal.link,
             ayesProgress: this.getProgress(proposalVotes.ayes, proposalVotes.nays, true),
             nayesProgress: this.getProgress(proposalVotes.ayes, proposalVotes.nays, false),
           });
@@ -71,9 +71,9 @@ class QueryDao {
             vetos: proposalVotes.vetos,
             end: moment().add(timeUntilEnd, "second"),
             hash: hash,
-            action: hex2a(proposal.args.remark),
-            description: hex2a(daoProposal.description),
-            link: hex2a(daoProposal.link),
+            action: proposal.args.remark,
+            description: daoProposal.description,
+            link: daoProposal.link,
             ayesProgress: this.getProgress(proposalVotes.ayes, proposalVotes.nays, true),
             nayesProgress: this.getProgress(proposalVotes.ayes, proposalVotes.nays, false),
           });
