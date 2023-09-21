@@ -15,7 +15,6 @@ class TFClient extends Client {
   tftPrice: TFTPrice = new TFTPrice(this);
   twins: TFTwins = new TFTwins(this);
   kvStore: TFKVStore = new TFKVStore(this);
-  dao: TFDao = new TFDao(this);
   termsAndConditions: TFTermsAndConditions = new TFTermsAndConditions(this);
 
   constructor(
