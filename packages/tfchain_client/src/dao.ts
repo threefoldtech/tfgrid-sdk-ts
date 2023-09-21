@@ -144,7 +144,8 @@ class Dao extends QueryDao {
   }
   @checkConnection
   async vote(options: DaoVoteOptions) {
-    return this.client.api.tx.dao.vote(options.farmId, options.hash, options.approve);
+    const extrinsic = this.client.api.tx.dao.vote(options.farmId, options.hash, options.approve);
+    return this.client.patchExtrinsic(extrinsic);
   }
 }
 export { Dao, QueryDao };
