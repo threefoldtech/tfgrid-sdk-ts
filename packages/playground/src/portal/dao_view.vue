@@ -76,10 +76,125 @@
                     >No <v-divider class="mx-3" vertical />{{ proposal.nayes.length }}
                   </v-btn>
                 </div>
+                <v-container class="px-12" v-if="proposal.ayesProgress > 0 || proposal.nayesProgress > 0">
+                  <v-row justify="center" v-if="expired(proposal.end)" class="pt-4">
+                    <v-progress-linear
+                      rounded
+                      :value="proposal.ayesProgress"
+                      height="20"
+                      :style="{
+                        width: proposal.ayesProgress + '%',
+                        marginRight: 'auto',
+                        backgroundColor: '#1AA18F',
+                        color: '#fff',
+                      }"
+                    >
+                      <strong v-if="proposal.ayesProgress >= 20"
+                        >{{
+                          !!(proposal.ayesProgress % 1) ? proposal.ayesProgress.toFixed(2) : proposal.ayesProgress
+                        }}%</strong
+                      >
+                    </v-progress-linear>
+                    <v-progress-linear
+                      rounded
+                      :value="proposal.nayesProgress"
+                      color="grey lighten-2"
+                      backgroundColor="#e0e0e0"
+                      height="20"
+                      :style="{
+                        width: proposal.nayesProgress + '%',
+                        marginRight: 'auto',
+                        color: '#333',
+                      }"
+                    >
+                      <template>
+                        <strong v-if="proposal.nayesProgress >= 20"
+                          >{{
+                            !!(proposal.nayesProgress % 1) ? proposal.nayesProgress.toFixed(2) : proposal.nayesProgress
+                          }}%</strong
+                        >
+                      </template>
+                    </v-progress-linear>
+                  </v-row>
+                  <v-row justify="center" v-else class="pt-4">
+                    <v-progress-linear
+                      v-if="proposal.ayesProgress > proposal.nayesProgress"
+                      rounded
+                      :value="100"
+                      height="20"
+                      :style="{
+                        width: '100%',
+                        marginRight: 'auto',
+                        backgroundColor: '#1982b1',
+                        color: '#fff',
+                      }"
+                    >
+                      <template>
+                        <strong>Accepted</strong>
+                        <span class="pl-2"
+                          >{{
+                            !!(proposal.ayesProgress % 1) ? proposal.ayesProgress.toFixed(2) : proposal.ayesProgress
+                          }}%</span
+                        >
+                      </template>
+                    </v-progress-linear>
+                    <v-progress-linear
+                      v-else-if="proposal.ayesProgress < proposal.nayesProgress"
+                      rounded
+                      :value="100"
+                      color="grey lighten-2"
+                      backgroundColor="#e0e0e0"
+                      height="20"
+                      :style="{
+                        width: '100%',
+                        marginRight: 'auto',
+                        color: '#333',
+                      }"
+                    >
+                      <template>
+                        <strong>Rejected</strong>
+                        <span class="pl-2"
+                          >{{
+                            !!(proposal.nayesProgress % 1) ? proposal.nayesProgress.toFixed(2) : proposal.nayesProgress
+                          }}%</span
+                        >
+                      </template>
+                    </v-progress-linear>
+                  </v-row>
+                </v-container>
               </v-container>
             </v-card>
           </v-window-item>
         </v-window>
+        <v-dialog v-model="openVDialog" max-width="600">
+          <v-card>
+            <v-card-title>Cast Vote</v-card-title>
+            <v-card-text>
+              <form-validator v-model="isValidFarm">
+                <input-validator :value="selectedFarm" :rules="[validators.required('Required field')]" #="{ props }">
+                  <input-tooltip tooltip="Select farm you wish to vote with">
+                    <v-select
+                      :items="farms"
+                      label="Select a farm"
+                      outlined
+                      item-text="name"
+                      item-value="id"
+                      v-model="selectedFarm"
+                      v-bind="props"
+                    >
+                    </v-select>
+                  </input-tooltip>
+                </input-validator>
+              </form-validator>
+            </v-card-text>
+            <!-- <v-card-actions class="justify-end">
+              <v-btn @click="castVote" :loading="loadingVote" color="primary white--text" :disabled="!isValidFarm"
+                >Submit</v-btn
+              >
+              <v-btn @click="openVDialog = false" color="grey lighten-2 black--text">Close</v-btn>
+            </v-card-actions> -->
+          </v-card>
+        </v-dialog>
         <v-dialog v-model="openInfoModal" width="50vw">
           <v-card class="card">
             <v-card-title class="text-h5"> Proposals information </v-card-title>
@@ -122,7 +237,7 @@
   </v-container>
 </template>
 <script lang="ts" setup>
-import type { Proposal, Proposals } from "@threefold/tfchain_client";
+import type { Farm, Proposal, Proposals } from "@threefold/tfchain_client";
 import type moment from "moment";
 import { onMounted, ref } from "vue";
 
@@ -139,8 +254,10 @@ const openInfoModal = ref(false);
 const openVDialog = ref(false);
 const castedVote = ref(false);
 const loadingVote = ref(false);
-
+const isValidFarm = ref(false);
 const selectedProposal = ref("");
+const selectedFarm = ref("");
+const farms = ref<Farm[]>();
 const profileManager = useProfileManager();
 const profile = ref(profileManager.profile!);
 const tabs = [
