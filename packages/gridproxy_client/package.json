@@ -1,0 +1,17 @@
+{
+  "name": "@threefold/gridproxy_client",
+  "version": "2.1.1",
+  "description": "gridproxy_client help to interact with gridproxy based on network",
+  "main": "dist/public_api.js",
+  "types": "dist/public_api.d.ts",
+  "repository": "git@github.com:MohamedElmdary/gridproxy_client.git",
+  "author": "MohamedElmdary <engm5081@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^4.8.4"
+  }
+}

@@ -5,3 +5,4 @@ export * from "./kvstore";
 export * from "./balances";
 export * from "./tftPrice";
 export * from "./terms_and_conditions";
+export * from "./tftBridge";

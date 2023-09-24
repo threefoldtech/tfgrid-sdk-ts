@@ -33,13 +33,15 @@ export default {
 
     for (const key in state.dedicatedNodesFilter) {
       let value = state.dedicatedNodesFilter[key];
+
       if (key == "total_hru" || key == "total_mru" || key == "total_sru") {
-        value *= 1024 * 1024 * 1024; // convert from gb to b
-        value = Math.ceil(value);
-        value = parseInt(value);
+        value = BigInt(value) * BigInt(1024) * BigInt(1024) * BigInt(1024); // convert from gb to b
+        value = BigInt(Math.ceil(Number(value))); // Convert back to a BigInt if needed
       }
+
       // don't break the call for the null values
       if (value == null || value == undefined || value == 0) value = "";
+
       baseUrl += `&${key}=${value}`;
     }
 

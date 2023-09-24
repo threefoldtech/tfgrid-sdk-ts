@@ -11,13 +11,14 @@ import { validateMnemonic } from "bip39";
 
 import { Balances, QueryBalances } from "./balances";
 import { Contracts, QueryContracts } from "./contracts";
+import { Dao, QueryDao } from "./dao";
 import { QueryFarms } from "./farms";
 import { KVStore } from "./kvstore";
 import { Nodes, QueryNodes } from "./nodes";
 import { QueryPricingPolicies } from "./pricing_policies";
 import { TermsAndConditions } from "./terms_and_conditions";
+import { Bridge, QueryBridge } from "./tft_bridge";
 import { QueryTFTPrice } from "./tft_price";
-import { QueryTFTBridge } from "./tftBridge";
 import { QueryTwins, Twins } from "./twins";
 import type { Extrinsic, ExtrinsicResult, PatchExtrinsicOptions, validatorFunctionType } from "./types";
 import { Utility } from "./utility";
@@ -44,12 +45,15 @@ class QueryClient {
   api: ApiPromise;
   contracts: QueryContracts = new QueryContracts(this);
   balances: QueryBalances = new QueryBalances(this);
+  dao: QueryDao = new QueryDao(this);
   farms: QueryFarms = new QueryFarms(this);
-  tftBridge: QueryTFTBridge = new QueryTFTBridge(this);
+  tftBridge: QueryBridge = new QueryBridge(this);
   tftPrice: QueryTFTPrice = new QueryTFTPrice(this);
   pricingPolicies: QueryPricingPolicies = new QueryPricingPolicies(this);
   twins: QueryTwins = new QueryTwins(this);
   nodes: QueryNodes = new QueryNodes(this);
+  __disconnectHandler = this.newProvider.bind(this);
+
   constructor(public url: string) {}
 
   async loadKeyPairOrSigner(): Promise<void> {} // to be overridden in the full client
@@ -78,6 +82,7 @@ class QueryClient {
     this.api = await ApiPromise.create({ provider });
     await this.wait();
     QueryClient.connections[this.url] = this.api;
+    this.api.on("disconnected", this.__disconnectHandler);
   }
 
   async connect() {
@@ -89,14 +94,12 @@ class QueryClient {
       if (this.api && this.api.isConnected) return;
       await this.connectingLock.acquireAsync();
       await this.newProvider();
-      this.api.on("disconnected", this.newProvider.bind(this));
       this.connectingLock.release();
       return;
     }
 
     await this.connectingLock.acquireAsync();
     await this.newProvider();
-    this.api.on("disconnected", this.newProvider.bind(this));
     this.connectingLock.release();
 
     if (isEnvNode()) {
@@ -115,7 +118,7 @@ class QueryClient {
   async disconnect(): Promise<void> {
     if (this.api && this.api.isConnected) {
       console.log("disconnecting");
-      this.api.off("disconnected", this.newProvider.bind(this));
+      this.api.off("disconnected", this.__disconnectHandler);
       await this.api.disconnect();
       await this.wait(false);
     }
@@ -227,6 +230,8 @@ class Client extends QueryClient {
   termsAndConditions: TermsAndConditions = new TermsAndConditions(this);
   kvStore: KVStore = new KVStore(this);
   twins: Twins = new Twins(this);
+  dao: Dao = new Dao(this);
+  tftBridge: Bridge = new Bridge(this);
 
   declare url: string;
   mnemonicOrSecret?: string;
@@ -252,7 +257,9 @@ class Client extends QueryClient {
       throw Error("mnemonicOrSecret or extension signer should be provided");
     }
     if (this.mnemonicOrSecret) {
-      if (!validateMnemonic(this.mnemonicOrSecret)) {
+      if (this.mnemonicOrSecret === "//Alice") {
+        return;
+      } else if (!validateMnemonic(this.mnemonicOrSecret)) {
         if (this.mnemonicOrSecret.includes(" "))
           // seed shouldn't have spaces
           throw Error("Invalid mnemonic! Must be bip39 compliant");

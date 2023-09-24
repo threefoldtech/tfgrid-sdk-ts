@@ -3,17 +3,26 @@
     <v-row>
       <v-col cols="4" v-for="card in cards" :key="card.title">
         <router-link :to="'/solutions' + card.route">
-          <v-card class="pa-3 pt-6" height="250">
-            <v-img
-              class="ml-3"
-              width="75"
-              :src="baseURL + 'images/icons/' + card.icon"
-              :alt="card.title"
-              :style="{ filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})` }"
-            />
-            <v-card-title> {{ card.title }} </v-card-title>
-            <v-card-text> {{ card.excerpt }} </v-card-text>
-          </v-card>
+          <v-hover>
+            <template v-slot:default="{ isHovering, props }">
+              <v-card class="pa-3 pt-6" height="200" v-bind="props" :class="isHovering ? 'card-opacity' : undefined">
+                <v-img
+                  class="d-inline-block ml-3 mb-2"
+                  width="35"
+                  :src="baseURL + 'images/icons/' + card.icon"
+                  :alt="card.title"
+                  :style="{
+                    filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})`,
+                    lineHeight: 1,
+                  }"
+                />
+                <v-card-title class="d-inline-block">
+                  {{ card.title }}
+                </v-card-title>
+                <v-card-text class="mt-2"> {{ card.excerpt }} </v-card-text>
+              </v-card>
+            </template></v-hover
+          >
         </router-link>
       </v-col>
     </v-row>
@@ -178,5 +187,9 @@ export default {
 <style scoped>
 a {
   text-decoration: none !important;
+}
+
+.card-opacity {
+  background-color: rgba(125, 227, 200, 0.12);
 }
 </style>

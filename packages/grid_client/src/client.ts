@@ -41,6 +41,8 @@ class GridClient {
   farmerbot: modules.farmerbot;
   farms: modules.farms;
   networks: modules.networks;
+  dao: modules.dao;
+  bridge: modules.bridge;
   modules: string[] = [];
 
   constructor(public clientOptions?: ClientOptions) {

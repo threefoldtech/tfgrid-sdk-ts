@@ -27,6 +27,12 @@ class Balance {
   async getMyBalance() {
     return await this.client.balances.getMyBalance();
   }
+
+  @expose
+  @validateInput
+  async getMoreFunds() {
+    return await this.client.balances.getMoreFunds();
+  }
 }
 
 export { Balance as balance };

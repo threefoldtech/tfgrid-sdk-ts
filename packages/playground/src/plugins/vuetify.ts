@@ -20,9 +20,11 @@ const vuetify = createVuetify({
         colors: {
           primary: "#7de3c8",
           secondary: "#14A1B8",
+          title: "#1AA18F",
           info: "#7de3c8",
           warning: "#FFCC00",
           link: "#5695ff",
+          anchor: "#ffffff",
         },
       },
       light: {
@@ -31,6 +33,7 @@ const vuetify = createVuetify({
           primary: "#1AA18F",
           info: "#1AA18F",
           secondary: "#14A1B8",
+          anchor: "#000000",
         },
       },
     },
