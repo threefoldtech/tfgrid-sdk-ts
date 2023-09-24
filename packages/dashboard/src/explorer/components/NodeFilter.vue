@@ -1,6 +1,6 @@
 <template>
   <v-card flat color="transparent">
-    <v-subheader>{{ label.toLocaleUpperCase() }}</v-subheader>
+    <v-subheader>{{ label }}</v-subheader>
     <v-text-field
       v-model="item"
       chips

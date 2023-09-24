@@ -4,7 +4,7 @@ title: Full Virtual Machine
 
 Deploy a full virtual machine on Threefold Grid, the full VM allows you to have a complete image with a custom kernel optimized for your own usecase.
 
-We provide a few images managed by Threefold like Ubuntu 22.04, and NixOS, but you can still use a custom one. For more details, check [Full Virtual Machine documentation](https://manual.grid.tf/weblets/weblets_fullVm.html).
+We provide a few images managed by Threefold like Ubuntu 22.04, and NixOS, but you can still use a custom one. For more details, check [Full Virtual Machine documentation](https://manual.grid.tf/playground/fullVm.html).
 
 <br />
 

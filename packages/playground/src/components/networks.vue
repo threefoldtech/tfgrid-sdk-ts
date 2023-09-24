@@ -1,7 +1,7 @@
 <template>
   <input-tooltip tooltip="Enable the network options to be able access your deployment">
     <v-expansion-panels variant="inset" class="mb-4">
-      <v-expansion-panel expand-icon="mdi-menu-down" collapse-icon="mdi-menu-up">
+      <v-expansion-panel expand-icon="mdi-menu-down" collapse-icon="mdi-menu-up" :disabled="$props.disabled">
         <template v-slot:title>
           <span class="text-h6">Network</span>
           <v-chip v-if="error" variant="text">
@@ -103,6 +103,7 @@ export default {
       type: Boolean,
       default: () => null,
     },
+    disabled: { type: Boolean },
   },
   emits: {
     "update:ipv4": (value?: boolean) => value,

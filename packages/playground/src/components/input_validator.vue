@@ -41,6 +41,7 @@ export default {
     },
     validMessage: String,
     hint: String,
+    disableValidation: Boolean,
   },
   emits: {
     "update:modelValue": (valid: boolean) => valid,
@@ -106,6 +107,22 @@ export default {
       { immediate: true },
     );
 
+    watch(
+      () => props.disableValidation,
+      (disabled, wasDisabled) => {
+        const isEnabled = !disabled;
+        const wasEnabled = !wasDisabled;
+
+        if (disabled && wasEnabled) {
+          form?.unregister(uid);
+          error.value = null;
+          setStatus(ValidatorStatus.Valid);
+        }
+
+        if (wasDisabled && isEnabled) validate();
+      },
+    );
+
     const blured = ref(false);
     function onBlur() {
       blured.value = true;
@@ -121,6 +138,8 @@ export default {
         setStatus(ValidatorStatus.Init);
         error.value = null;
       },
+      status: status as unknown as ValidatorStatus,
+      error: error as unknown as string | null,
     };
     onMounted(() => form?.register(uid, obj));
     onUnmounted(() => form?.unregister(uid));

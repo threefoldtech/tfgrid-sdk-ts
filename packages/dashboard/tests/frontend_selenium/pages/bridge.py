@@ -1,5 +1,6 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -24,14 +25,16 @@ class BridgePage:
     tft_amount_text = (By.XPATH,"//*[contains(text(), 'Amount: should be larger than 1TFT (deposit fee is: 1TFT)')]")
     deposite_bridge_address = (By.XPATH, "//*[@id='app']/div[5]/div/div/div[1]/div/div[1]/div[1]/ul/li[1]/b")
     twin_id_text = (By.XPATH,"//*[@id='app']/div[5]/div/div/div[1]/div/div[1]/div[1]/ul/li[2]/b")
-    balance_text = (By.XPATH,'//*[@id="app"]/div[1]/div[1]/header/div/div[3]/div[1]/div[1]/div[1]/button/span/p[1]')
-    balance_withdraw = (By.XPATH,'//*[@id="app"]/div[2]/div[1]/header/div/div[3]/div[1]/div[1]/div[1]/button/span/p[1]')
+    balance_text = (By.XPATH,'//*[@id="app"]/div[1]/div[1]/header/div/div[3]/div/section/div[1]/div/p/span[1]')
+    balance_withdraw = (By.XPATH,'//*[@id="app"]/div[2]/div[1]/header/div/div[3]/div/section/div[1]/div/p/span[1]')
+    close_login_button = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div[4]/button')
+    
     
     def __init__(self, browser):
         self.browser = browser
 
-    def navigate_to_bridge(self, user):
-        self.browser.find_element(By.XPATH, "//*[contains(text(), '"+ user +"')]").click()
+    def navigate_to_bridge(self):
+        self.browser.find_element(*self.close_login_button).click()
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.twin_details))
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.bridge))
         self.browser.find_element(*self.bridge).click()
@@ -69,7 +72,7 @@ class BridgePage:
         self.browser.find_element(*self.amount_tft).send_keys(data)
     
     def setup_widthdraw_address(self, data):
-        balance = self.browser.find_element(*self.balance_text).text
+        balance = self.browser.find_element(*self.balance_text).text[9:-4]
         self.browser.find_element(*self.withdraw).click()
         self.browser.find_element(*self.stellar_address).send_keys(data)
         return balance
@@ -99,12 +102,15 @@ class BridgePage:
         return self.browser.find_element(*self.submit_button)
     
     def get_balance(self):
-        return self.browser.find_element(*self.balance_text).text
+        return self.browser.find_element(*self.balance_text).text[9:-4]
     
     def get_balance_withdraw(self, balance):
-        new_balance = self.browser.find_element(*self.balance_withdraw).text
+        new_balance = self.browser.find_element(*self.balance_withdraw).text[9:-4]
+        self.browser.refresh()
+        alert = Alert(self.browser)
+        alert.accept()
         while(new_balance==balance):
-            new_balance = self.browser.find_element(*self.balance_withdraw).text
+            new_balance = self.browser.find_element(*self.balance_withdraw).text[9:-4]
         return new_balance
 
     def wait_for(self, keyword):

@@ -1,32 +1,29 @@
+<!-- eslint-disable vue/no-v-text-v-html-on-component -->
 <template>
   <v-app>
-    <div>
-      <v-app-bar :class="{ 'sidebar-opened': !mini }" color="#064663" dense dark fixed height="65">
-        <v-app-bar-nav-icon></v-app-bar-nav-icon>
+    <v-app-bar :class="{ 'sidebar-opened': !mini, 'ml-4 ': !mini }" color="#064663" dense dark fixed height="65">
+      <v-app-bar-nav-icon></v-app-bar-nav-icon>
 
-        <v-toolbar-title class="font-weight-bold" @click="redirectToHomePage" style="cursor: pointer"
-          >Threefold Chain</v-toolbar-title
-        >
+      <v-toolbar-title class="font-weight-bold" @click="redirectToHomePage" style="cursor: pointer"
+        >Threefold Chain</v-toolbar-title
+      >
 
-        <v-spacer>
+      <v-spacer>
+        <div class="d-flex align-center justify-start">
           <TftSwapPrice v-if="!loadingAPI" />
-        </v-spacer>
-        <div class="d-flex align-center">
           <FundsCard v-if="$store.state.credentials.initialized && $store.state.credentials.balance" />
-          <div class="d-flex" style="align-items: center">
-            <v-btn icon @click="toggle_dark_mode">
-              <v-icon>mdi-theme-light-dark</v-icon>
-            </v-btn>
-
-            <a href="https://manual.grid.tf/dashboard/dashboard.html" target="_blank">
-              <v-btn class="custom-button" color="white" style="color: black"> Help</v-btn>
-            </a>
-
-            <TfChainConnector />
-          </div>
         </div>
-      </v-app-bar>
-    </div>
+      </v-spacer>
+      <div class="d-flex align-center">
+        <div class="d-flex" style="align-items: center">
+          <v-btn icon @click="toggle_dark_mode">
+            <v-icon>mdi-theme-light-dark</v-icon>
+          </v-btn>
+
+          <TfChainConnector />
+        </div>
+      </div>
+    </v-app-bar>
 
     <v-navigation-drawer
       app
@@ -105,8 +102,7 @@
                 </v-list-item-title>
               </v-list-item-content>
             </template>
-
-            <div v-if="route.prefix === '/'">
+            <div v-if="route.prefix === '/portal/'">
               <template v-if="!$store.state.credentials.initialized">
                 <div class="mt-4">
                   <v-alert color="rgb(25, 130, 177)" dense type="info">
@@ -120,7 +116,7 @@
                     :active="account.active"
                     v-for="subchild in route.children"
                     :key="subchild.label"
-                    :to="subchild.path"
+                    :to="route.prefix + subchild.path"
                     class="white--text pl-16"
                   >
                     <v-list-item-icon>
@@ -164,9 +160,21 @@
       </div>
     </v-navigation-drawer>
 
-    <div :style="'padding-left:' + (mini ? '56px' : '300px')">
+    <!-- <div :style="'padding-left:' + (mini ? '56px' : '300px')">
       <router-view />
-    </div>
+    </div> -->
+
+    <v-content class="mt-15">
+      <v-container fluid>
+        <v-row class="fill-height">
+          <v-col>
+            <transition name="fade">
+              <router-view></router-view>
+            </transition>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-content>
 
     <v-footer padless fixed>
       <v-card class="flex" flat tile>
@@ -187,8 +195,6 @@ import TfChainConnector from "./components/TfChainConnector.vue";
 import FundsCard from "./portal/components/FundsCard.vue";
 import TftSwapPrice from "./portal/components/TftSwapPrice.vue";
 import { connect } from "./portal/lib/connect";
-import { MutationTypes } from "./portal/store/mutations";
-import { accountInterface } from "./portal/store/state";
 
 interface SidenavItem {
   label: string;
@@ -222,7 +228,6 @@ export default class Dashboard extends Vue {
   mini = true;
   drawer = true;
   $api: any;
-  accounts: accountInterface[] = [];
   loadingAPI = true;
   version = config.version;
 
@@ -243,7 +248,9 @@ export default class Dashboard extends Vue {
       this.$vuetify.theme.dark = true;
       localStorage.setItem("dark_theme", this.$vuetify.theme.dark.toString());
     }
+
     this.$root.$on("selectAccount", async () => {
+      // On selecting an account, should we view the twin details view.
       this.routes[0].active = true;
       this.mini = false;
     });
@@ -267,10 +274,6 @@ export default class Dashboard extends Vue {
     if (this.$route.name !== "accounts" && !this.filteredAccounts().length && route.label === "Portal") {
       return this.redirectToHomePage();
     }
-  }
-
-  async updated() {
-    this.accounts = this.$store.state.portal.accounts;
   }
 
   async unmounted() {
@@ -306,7 +309,6 @@ export default class Dashboard extends Vue {
   }
 
   public redirectToHomePage() {
-    this.accounts.map(account => (account.active = false));
     if (this.$route.path !== "/") {
       this.$router.push({
         name: "accounts",
@@ -325,7 +327,7 @@ export default class Dashboard extends Vue {
       //label and path will be retrieved from accounts fetched from store (polkadot)
       label: "Portal",
       icon: "account-convert-outline",
-      prefix: "/",
+      prefix: "/portal/",
       active: this.mini ? false : true,
       children: [
         {
@@ -346,14 +348,24 @@ export default class Dashboard extends Vue {
           icon: "account-arrow-right-outline",
           showBeforeLogIn: false,
         },
-        { label: "farms", path: "account-farms", icon: "silo", showBeforeLogIn: false },
+        {
+          label: "farms",
+          path: "account-farms",
+          icon: "silo",
+          showBeforeLogIn: false,
+        },
         {
           label: "dedicated nodes",
           path: "account-nodes",
           icon: "resistor-nodes",
           showBeforeLogIn: false,
         },
-        { label: "dao", path: "account-dao", icon: "note-check-outline", showBeforeLogIn: false },
+        {
+          label: "dao",
+          path: "account-dao",
+          icon: "note-check-outline",
+          showBeforeLogIn: false,
+        },
       ],
     },
     {

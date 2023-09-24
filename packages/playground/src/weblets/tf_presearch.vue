@@ -3,7 +3,7 @@
     ref="layout"
     :cpu="cpu"
     :memory="memory"
-    :disk="rootFsSize"
+    :disk="rootFilesystemSize + dockerDiskSize"
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
@@ -55,17 +55,17 @@
             </input-tooltip>
           </password-input-wrapper>
         </input-validator>
-        <Network required v-model:ipv4="ipv4" v-model:planetary="planetary" ref="network" />
+        <Network required v-model:ipv4="ipv4" v-model:planetary="planetary" ref="network" :disabled="loadingFarm" />
 
         <input-tooltip
           inline
           tooltip="Click to know more about dedicated nodes."
           href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
         >
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
         </input-tooltip>
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+          <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
 
         <SelectFarmManager>
@@ -73,13 +73,14 @@
             :filters="{
               cpu,
               memory,
-              ssd: rootFsSize,
+              ssd: rootFilesystemSize + dockerDiskSize,
               publicIp: ipv4,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
             exclusive-for="research"
             v-model="farm"
+            v-model:loading="loadingFarm"
           />
 
           <SelectNode
@@ -89,10 +90,11 @@
               cpu,
               memory,
               ipv4: ipv4,
-              disks: [{ size: rootFsSize, mountPoint: '/' }],
+              diskSizes: [dockerDiskSize],
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
+            :root-file-system-size="rootFilesystemSize"
           />
         </SelectFarmManager>
       </template>
@@ -137,19 +139,21 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref(generateName(8, { prefix: "ps" }));
+const name = ref(generateName({ prefix: "ps" }));
 const code = ref("");
 const ipv4 = ref(false);
 const planetary = ref(true);
 const cpu = 1;
 const memory = 512;
-const rootFsSize = rootFs(cpu, memory);
+const rootFilesystemSize = rootFs(cpu, memory);
+const loadingFarm = ref(false);
+const dockerDiskSize = 10;
 const farm = ref() as Ref<Farm>;
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
 const network = ref();
 const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/presearch-v2.2.flist",
+  value: "https://hub.grid.tf/tf-official-apps/presearch-v2.3.flist",
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
@@ -162,7 +166,7 @@ async function deploy() {
   const projectName = ProjectName.Presearch.toLowerCase();
 
   try {
-    layout.value.validateSsh();
+    layout.value?.validateSSH();
     const grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);
@@ -176,6 +180,13 @@ async function deploy() {
           memory: memory,
           flist: flist.value,
           entryPoint: flist.entryPoint,
+          disks: [
+            {
+              name: "docker",
+              mountPoint: "/var/lib/docker",
+              size: dockerDiskSize,
+            },
+          ],
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           planetary: planetary.value,
@@ -199,7 +210,7 @@ async function deploy() {
               value: publicRestoreKey.value,
             },
           ],
-          rootFilesystemSize: rootFsSize,
+          rootFilesystemSize: rootFilesystemSize,
           nodeId: selectedNode.value.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,

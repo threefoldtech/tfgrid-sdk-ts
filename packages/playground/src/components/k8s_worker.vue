@@ -28,7 +28,13 @@
       #="{ props }"
     >
       <input-tooltip tooltip="The number of virtual cores allocated to your instance.">
-        <v-text-field label="CPU (vCores)" type="number" v-model.number="$props.modelValue.cpu" v-bind="props" />
+        <v-text-field
+          label="CPU (vCores)"
+          type="number"
+          v-model.number="$props.modelValue.cpu"
+          v-bind="props"
+          :disabled="loadingFarm"
+        />
       </input-tooltip>
     </input-validator>
 
@@ -43,7 +49,13 @@
       #="{ props }"
     >
       <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
-        <v-text-field label="Memory (MB)" type="number" v-model.number="$props.modelValue.memory" v-bind="props" />
+        <v-text-field
+          label="Memory (MB)"
+          type="number"
+          v-model.number="$props.modelValue.memory"
+          v-bind="props"
+          :disabled="loadingFarm"
+        />
       </input-tooltip>
     </input-validator>
 
@@ -58,7 +70,13 @@
       #="{ props }"
     >
       <input-tooltip tooltip="Disk Size.">
-        <v-text-field label="Size (GB)" type="number" v-model.number="$props.modelValue.diskSize" v-bind="props" />
+        <v-text-field
+          label="Size (GB)"
+          type="number"
+          v-model.number="$props.modelValue.diskSize"
+          v-bind="props"
+          :disabled="loadingFarm"
+        />
       </input-tooltip>
     </input-validator>
 
@@ -66,12 +84,14 @@
       v-model:ipv4="$props.modelValue.ipv4"
       v-model:ipv6="$props.modelValue.ipv6"
       v-model:planetary="$props.modelValue.planetary"
+      :disabled="loadingFarm"
     />
 
     <RootFsSize
       :cpu="$props.modelValue.cpu"
       :memory="$props.modelValue.memory"
       v-model.number="$props.modelValue.rootFsSize"
+      :disabled="loadingFarm"
     />
 
     <input-tooltip
@@ -79,10 +99,10 @@
       tooltip="Click to know more about dedicated nodes."
       href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
     >
-      <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" />
+      <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" :disabled="loadingFarm" />
     </input-tooltip>
     <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-      <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" />
+      <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" :disabled="loadingFarm" />
     </input-tooltip>
 
     <SelectFarmManager>
@@ -91,11 +111,12 @@
           cpu: $props.modelValue.cpu,
           memory: $props.modelValue.memory,
           publicIp: $props.modelValue.ipv4,
-          ssd: $props.modelValue.diskSize + $props.modelValue.rootFsSize,
+          ssd: ($props.modelValue.diskSize ?? 0) + $props.modelValue.rootFsSize,
           rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
           certified: $props.modelValue.certified,
         }"
         v-model="$props.modelValue.farm"
+        v-model:loading="loadingFarm"
       />
 
       <SelectNode
@@ -104,10 +125,11 @@
           farmId: $props.modelValue.farm?.farmID,
           cpu: $props.modelValue.cpu,
           memory: $props.modelValue.memory,
-          disks: [{ name: 'data0', size: $props.modelValue?.diskSize ?? 0, mountPoint: '/var/lib/docker' }],
+          diskSizes: [$props.modelValue?.diskSize ?? 0],
           rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
           certified: $props.modelValue.certified,
         }"
+        :root-file-system-size="$props.modelValue.rootFsSize"
       />
     </SelectFarmManager>
   </div>
@@ -115,10 +137,19 @@
 
 <script lang="ts" setup>
 defineProps<{ modelValue: K8SWorker }>();
+const emits = defineEmits<{ (event: "update:loading", value: boolean): void }>();
+const farmManager = useFarm();
+const loadingFarm = ref(farmManager?.getLoading());
+
+watch(loadingFarm, (loadingFarm): void => {
+  emits("update:loading", loadingFarm!);
+});
 </script>
 
 <script lang="ts">
-import SelectFarmManager from "../components/select_farm_manager.vue";
+import { ref, watch } from "vue";
+
+import SelectFarmManager, { useFarm } from "../components/select_farm_manager.vue";
 import SelectNode from "../components/select_node.vue";
 import { useProfileManager } from "../stores";
 import type { Farm, K8SWorker } from "../types";
@@ -129,7 +160,7 @@ import SelectFarm from "./select_farm.vue";
 
 const profileManager = useProfileManager();
 
-export function createWorker(name: string = generateName(9, { prefix: "wr" })): K8SWorker {
+export function createWorker(name: string = generateName({ prefix: "wr" })): K8SWorker {
   return {
     name,
     cpu: 1,

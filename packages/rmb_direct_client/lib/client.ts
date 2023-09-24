@@ -1,5 +1,4 @@
 import { Keyring } from "@polkadot/api";
-import { ApiPromise, WsProvider } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { waitReady } from "@polkadot/wasm-crypto";
@@ -103,6 +102,15 @@ class Client {
       await this.createSigner();
       const twinId = await this.tfclient.twins.getTwinIdByAccountId({ accountId: this.signer.address });
       this.twin = await this.tfclient.twins.get({ id: twinId });
+      if (!twinId) {
+        throw new Error({ message: `Couldn't find a user for the provided mnemonic on this network.` });
+      }
+    } catch (e) {
+      console.log(e);
+      throw new Error({ message: `Couldn't find a user for the provided mnemonic on this network.` });
+    }
+
+    try {
       if (!this.twin) {
         throw new Error({ message: "twin does not exist, please create a twin first" });
       }
@@ -164,15 +172,15 @@ class Client {
   }
   waitForOpenConnection() {
     return new Promise((resolve, reject) => {
-      const maxNumberOfAttempts = 10;
-      const intervalTime = 300; //ms
+      const maxNumberOfAttempts = 20;
+      const intervalTime = 500; //ms
 
       let currentAttempt = 0;
       const interval = setInterval(() => {
         if (currentAttempt > maxNumberOfAttempts - 1) {
           clearInterval(interval);
           reject(new Error({ message: "Maximum number of attempts exceeded" }));
-        } else if (this.con.readyState === this.con.OPEN) {
+        } else if (this.con && this.con.readyState === this.con.OPEN) {
           clearInterval(interval);
           resolve("connected");
         }

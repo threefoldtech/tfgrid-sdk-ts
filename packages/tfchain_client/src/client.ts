@@ -50,6 +50,8 @@ class QueryClient {
   pricingPolicies: QueryPricingPolicies = new QueryPricingPolicies(this);
   twins: QueryTwins = new QueryTwins(this);
   nodes: QueryNodes = new QueryNodes(this);
+  __disconnectHandler = this.newProvider.bind(this);
+
   constructor(public url: string) {}
 
   async loadKeyPairOrSigner(): Promise<void> {} // to be overridden in the full client
@@ -68,6 +70,19 @@ class QueryClient {
     if (connection) throw Error(`Client couldn't connect to ${this.url} after 10 seconds`);
   }
 
+  async newProvider() {
+    await this.disconnect.bind(this);
+    if (this.api) {
+      delete this.api;
+    }
+
+    const provider = new WsProvider(this.url);
+    this.api = await ApiPromise.create({ provider });
+    await this.wait();
+    QueryClient.connections[this.url] = this.api;
+    this.api.on("disconnected", this.__disconnectHandler);
+  }
+
   async connect() {
     this.checkInputs();
     await this.loadKeyPairOrSigner();
@@ -76,19 +91,13 @@ class QueryClient {
       this.api = QueryClient.connections[this.url];
       if (this.api && this.api.isConnected) return;
       await this.connectingLock.acquireAsync();
-      await this.api.connect();
-      await this.wait();
-      this.api.on("disconnected", this.api.connect);
+      await this.newProvider();
       this.connectingLock.release();
       return;
     }
-    await this.connectingLock.acquireAsync();
-    const provider = new WsProvider(this.url);
-    this.api = await ApiPromise.create({ provider });
-    await this.wait();
-    QueryClient.connections[this.url] = this.api;
 
-    this.api.on("disconnected", this.api.connect);
+    await this.connectingLock.acquireAsync();
+    await this.newProvider();
     this.connectingLock.release();
 
     if (isEnvNode()) {
@@ -107,7 +116,7 @@ class QueryClient {
   async disconnect(): Promise<void> {
     if (this.api && this.api.isConnected) {
       console.log("disconnecting");
-      this.api.off("disconnected", this.api.connect);
+      this.api.off("disconnected", this.__disconnectHandler);
       await this.api.disconnect();
       await this.wait(false);
     }
@@ -295,9 +304,13 @@ class Client extends QueryClient {
           events.forEach(({ phase, event: { data, method, section } }) => {
             console.log(`phase: ${phase}, section: ${section}, method: ${method}, data: ${data}`);
             if (section === SYSTEM && method === ExtrinsicState.ExtrinsicFailed) {
-              const [dispatchError, _] = data;
-              const errorIndex = dispatchError.asModule.error[0];
-              reject(errorIndex);
+              try {
+                const [dispatchError, _] = data;
+                const errorIndex = dispatchError.asModule.error[0];
+                reject(errorIndex);
+              } catch (e) {
+                reject(e);
+              }
             } else if (
               resultSections.includes(section) &&
               (resultEvents.length === 0 || (resultEvents.length > 0 && resultEvents.includes(method)))

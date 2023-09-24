@@ -44,6 +44,9 @@
             validators.required('Token is required.'),
             validators.minLength('Token minimum length is 6 chars.', 6),
             validators.maxLength('Token max length is 15 chars.', 15),
+            validators.pattern('Token should not contain whitespaces.', {
+              pattern: /^[^\s]+$/,
+            }),
           ]"
           #="{ props: validationProps }"
         >
@@ -58,12 +61,12 @@
       </template>
 
       <template #master>
-        <K8SWorker v-model="master" />
+        <K8SWorker v-model="master" loadingFarm />
       </template>
 
       <template #workers>
-        <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }">
-          <K8SWorker v-model="workers[index]" />
+        <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }" :disabled="loadingFarm">
+          <K8SWorker v-model="workers[index]" v-model:loading="loadingFarm" />
         </ExpandableLayout>
       </template>
     </d-tabs>
@@ -88,12 +91,11 @@ import { generateName, generatePassword } from "../utils/strings";
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
-
-const name = ref(generateName(8, { prefix: "k8s" }));
+const name = ref(generateName({ prefix: "k8s" }));
 const clusterToken = ref(generatePassword(10));
-const master = ref(createWorker(generateName(9, { prefix: "mr" })));
+const master = ref(createWorker(generateName({ prefix: "mr" })));
 const workers = ref<K8sWorker[]>([]);
-
+const loadingFarm = ref(false);
 function addWorker() {
   workers.value.push(createWorker());
 }
@@ -102,7 +104,7 @@ async function deploy() {
   layout.value.setStatus("deploy");
 
   try {
-    layout.value.validateSsh();
+    layout.value?.validateSSH();
     const grid = await getGrid(profileManager.profile!);
 
     await layout.value.validateBalance(grid!);

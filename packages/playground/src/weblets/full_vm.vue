@@ -41,6 +41,7 @@
           :minimum="{ cpu: 1, memory: 1024 * 1, disk: 25 }"
           :standard="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
           :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+          :disabled="loadingFarm"
           v-model="solution"
         />
 
@@ -51,6 +52,7 @@
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
           v-model:wireguard="wireguard"
+          :disabled="loadingFarm"
         />
         <input-tooltip
           inline
@@ -59,18 +61,18 @@
           When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
           "
         >
-          <v-switch color="primary" inset label="GPU" v-model="hasGPU" hide-details />
+          <v-switch color="primary" inset label="GPU" v-model="hasGPU" :disabled="loadingFarm" hide-details />
         </input-tooltip>
         <input-tooltip
           inline
           tooltip="Click to know more about dedicated nodes."
           href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
         >
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
         </input-tooltip>
 
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+          <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
 
         <SelectFarmManager>
@@ -79,12 +81,13 @@
               cpu: solution?.cpu,
               memory: solution?.memory,
               publicIp: ipv4,
-              ssd: disks.reduce((total, disk) => total + disk.size, solution?.disk + 2),
+              ssd: disks.reduce((total, disk) => total + disk.size, (solution?.disk ?? 0) + rootFilesystemSize),
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
               hasGPU: hasGPU,
             }"
             v-model="farm"
+            v-model:loading="loadingFarm"
           />
           <SelectNode
             v-model="selectedNode"
@@ -94,11 +97,12 @@
               memory: solution?.memory,
               ipv4: ipv4,
               ipv6: ipv4,
-              disks: [{ size: solution?.disk, mountPoint: '/' }, ...disks],
+              diskSizes: [solution?.disk, ...disks.map(disk => disk.size)],
               hasGPU: hasGPU,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
             }"
+            :root-file-system-size="rootFilesystemSize"
           />
         </SelectFarmManager>
       </template>
@@ -109,6 +113,7 @@
           @add="addDisk"
           title="Add additional disk space to your full virtual machine"
           #="{ index }"
+          :disabled="loadingFarm"
         >
           <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
           <input-validator
@@ -192,7 +197,7 @@ const images: VmImage[] = [
   },
 ];
 
-const name = ref(generateName(8, { prefix: "vm" }));
+const name = ref(generateName({ prefix: "vm" }));
 const flist = ref<Flist>();
 const ipv4 = ref(false);
 const ipv6 = ref(false);
@@ -201,13 +206,14 @@ const wireguard = ref(false);
 const dedicated = ref(false);
 const certified = ref(false);
 const farm = ref() as Ref<Farm>;
+const loadingFarm = ref(false);
 const disks = ref<Disk[]>([]);
 const network = ref();
 const hasGPU = ref();
 const selectedNode = ref() as Ref<INode>;
-
+const rootFilesystemSize = 2;
 function addDisk() {
-  const name = generateName(7);
+  const name = generateName();
   disks.value.push({
     name: "disk" + name,
     size: 50,
@@ -241,7 +247,7 @@ async function deploy() {
   const projectName = ProjectName.Fullvm.toLowerCase();
 
   try {
-    layout.value.validateSsh();
+    layout.value?.validateSSH();
     const grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);
@@ -263,7 +269,7 @@ async function deploy() {
           publicIpv6: ipv6.value,
           planetary: planetary.value,
           envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
-          rootFilesystemSize: 2,
+          rootFilesystemSize,
           hasGPU: hasGPU.value,
           nodeId: selectedNode.value.nodeId,
           gpus: hasGPU.value ? selectedNode.value.cards?.map(card => card.id) : undefined,

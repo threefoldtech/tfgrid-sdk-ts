@@ -16,7 +16,25 @@
           :model-value="shouldBeUpdated ? undefined : farm"
           @update:model-value="farm = $event"
           :error-messages="!loading && !farms.length ? 'No farms where found with the specified resources.' : undefined"
-        />
+        >
+          <template v-slot:append-item v-if="page !== -1">
+            <div class="px-4 mt-4">
+              <v-btn
+                block
+                color="secondary"
+                variant="tonal"
+                rounded="large"
+                size="large"
+                @click="loadFarms"
+                :loading="loading"
+              >
+                <!-- @click="loadNextPage" -->
+                <!-- :loading="loading" -->
+                Load More Farms
+              </v-btn>
+            </div>
+          </template>
+        </v-autocomplete>
       </input-tooltip>
     </input-validator>
   </section>
@@ -50,8 +68,15 @@ const props = defineProps({
   country: String,
   filters: { default: () => ({} as Filters), type: Object as PropType<Filters> },
   exclusiveFor: String,
+  loading: Boolean,
 });
-const emits = defineEmits<{ (event: "update:modelValue", value?: Farm): void }>();
+const emits = defineEmits<{
+  (event: "update:modelValue", value?: Farm): void;
+  (event: "update:loading", value: boolean): void;
+}>();
+
+const SIZE = 20;
+const page = ref(1);
 
 const farmInput = useInputRef();
 const profileManager = useProfileManager();
@@ -65,15 +90,23 @@ watch([farm, country], ([f, c]) => {
 });
 const loading = ref(false);
 const loadingNodes = ref(farmManager?.getLoading());
-watch([farm, loading], ([farm, loading]) => {
-  if (loading) FarmGatewayManager?.setLoading(true);
+const delay = ref();
+watch(
+  [farm, loading],
+  ([farm, loading]) => {
+    emits("update:loading", loading);
+    if (loading) {
+      FarmGatewayManager?.setLoading(true);
+    }
 
-  if (farm && !loading) {
-    farm.country = country.value;
-    FarmGatewayManager?.register(farm);
-    FarmGatewayManager?.setLoading(false);
-  }
-});
+    if (farm && !loading) {
+      farm.country = country.value;
+      FarmGatewayManager?.register(farm);
+      FarmGatewayManager?.setLoading(false);
+    }
+  },
+  { immediate: true },
+);
 
 const farms = ref<Farm[]>([]);
 let initialized = false;
@@ -85,22 +118,29 @@ async function loadFarms() {
 
   const grid = await getGrid(profileManager.profile!);
   const filters = props.filters;
-  farms.value = await getFarms(
+  const _farms = await getFarms(
     grid!,
     {
+      size: SIZE,
+      page: page.value,
       country: country.value,
-      cru: filters.cpu,
-      mru: filters.memory ? Math.round(filters.memory / 1024) : undefined,
-      hru: filters.disk,
-      sru: filters.ssd,
-      publicIPs: filters.publicIp,
+      nodeMRU: filters.memory ? Math.round(filters.memory / 1024) : undefined,
+      nodeHRU: filters.disk,
+      nodeSRU: filters.ssd,
+      publicIp: filters.publicIp,
       availableFor: grid!.twinId,
-      certified: filters.certified,
-      rentedBy: filters.rentedBy ? filters.rentedBy : undefined,
-      hasGPU: filters.hasGPU ? filters.hasGPU : undefined,
+      nodeCertified: filters.certified,
+      nodeRentedBy: filters.rentedBy ? filters.rentedBy : undefined,
+      nodeHasGPU: filters.hasGPU ? filters.hasGPU : undefined,
     },
     { exclusiveFor: props.exclusiveFor },
   );
+
+  if (page.value === 1) {
+    farms.value = _farms;
+  } else {
+    farms.value = farms.value.concat(_farms);
+  }
 
   if (oldFarm) {
     farm.value = undefined;
@@ -119,6 +159,7 @@ async function loadFarms() {
     }
   }
 
+  page.value = _farms.length < SIZE ? -1 : page.value + 1;
   loading.value = false;
 }
 onMounted(loadFarms);
@@ -148,7 +189,11 @@ watch(
 watch([loading, shouldBeUpdated], async ([l, s]) => {
   if (l || !s) return;
   shouldBeUpdated.value = false;
-  await loadFarms();
+  clearTimeout(delay.value);
+  delay.value = setTimeout(async () => {
+    page.value = 1;
+    await loadFarms();
+  }, 2000);
 });
 </script>
 

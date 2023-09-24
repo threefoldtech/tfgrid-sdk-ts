@@ -13,46 +13,48 @@ class FarmPage:
     twin_details = (By.XPATH, "//*[contains(text(), 'Twin Details')]")
     create_button=(By.XPATH, "//*[contains(text(), 'Create farm')]")
     farm_name_text_field=(By.XPATH,'/html/body/div[1]/div[4]/div/div/div[1]/form/div/div/div[1]/div/input')
-    create_farm_button=(By.XPATH, "/html/body/div[1]/div[4]/div/div/div[2]/button[1]") 
-    search_bar=(By.XPATH ,'/html/body/div[1]/div[1]/div[3]/div/div/div[3]/div/div[1]/div/input')
-    details_arrow=(By.XPATH,'//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/tbody/tr[1]/td[1]/button')
-    farm_Id_arrow=(By.XPATH ,'//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/thead/tr/th[2]')
-    farm_name_arrow=(By.XPATH ,'//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/thead/tr/th[3]/i')
-    farm_twin_linked_arrow=(By.XPATH ,'//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/thead/tr/th[4]/i')
-    certification_type_arrow=(By.XPATH ,'//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/thead/tr/th[5]/i')
-    pricing_policy_arrow=(By.XPATH ,'//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/thead/tr/th[6]/i')
-    add_v2_button=(By.XPATH ,'//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/tbody/tr[2]/td/div/div[6]/div[2]/div/button')
+    create_farm_button=(By.XPATH, "/html/body/div[1]/div[4]/div/div/div[2]/button[1]")
+    search_bar=(By.XPATH ,'/html/body/div[1]/div[1]/div[2]/div/div[1]/div[3]/div/div[1]/div/input')
+    details_arrow=(By.XPATH,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[1]/td[1]/button')
+    farm_Id_arrow=(By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/thead/tr/th[2]')
+    farm_name_arrow=(By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/thead/tr/th[3]/i')
+    farm_twin_linked_arrow=(By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/thead/tr/th[4]/i')
+    certification_type_arrow=(By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/thead/tr/th[5]/i')
+    pricing_policy_arrow=(By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/thead/tr/th[6]/i')
+    add_v2_button=(By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div[5]/div[1]/div[2]/button')
     submit_button=(By.XPATH,'//*[@id="app"]/div[5]/div/div/div[2]/button[2]')
-    view_bootstrap_button=(By.XPATH ,'//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/tbody/tr[2]/td/div/div[7]/div[2]/div/a')
-    public_ip_list=(By.XPATH ,'//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/tbody/tr[2]/td/div/div[8]/div/button/div')
-    add_ip_button=(By.XPATH ,'//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/tbody/tr[2]/td/div/div[8]/div/div/div/div/header/div/div/button/span')
+    view_bootstrap_button=(By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div[5]/div[1]/div[1]/a')
+    public_ip_list=(By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div[4]/div/div/div/button/div/i')
+    add_ip_button=(By.XPATH ,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div[4]/div/div/div/div/div/div/header/div/div/button')
     ip_text_field=(By.XPATH ,'/html/body/div[1]/div[5]/div/div/div[2]/form/div/div/div[1]/div/input')
     add_stellar_address=(By.XPATH,'/html/body/div[1]/div[5]/div/div/div[1]/form/div/div/div[1]/div/input')
-    edit_stellar_address=(By.XPATH,'//*[@id="app"]/div[1]/div[3]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div[6]/div[2]/div/div/div/div/div[2]/div/button')
+    edit_stellar_address=(By.XPATH,'//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div[3]/div[4]/div/div/div/div[2]/div/button')
     gateway_text_field=(By.XPATH ,'/html/body/div[1]/div[5]/div/div/div[2]/div[2]/div/div[1]/div/input')
     save_button=(By.XPATH ,'//*[@id="app"]/div[5]/div/div/div[3]/button[3]')
     close_button=(By.XPATH ,'//*[@id="app"]/div[5]/div/div/div[3]/button[1]')
     delete_button=(By.XPATH, "//div[contains(@class, 'v-card__actions')]//button[contains(@class, 'red--text')]")
     zero=(By.XPATH,'//html/body/main/div[1]/div/h1')
-    table_farm_name=(By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/tbody/tr[1]/td[3]')
+    table_farm_name=(By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[1]/td[3]')
     table = (By.XPATH,'//table/tbody/tr')
-    stellar_payout_address = (By.XPATH,'/html/body/div[1]/div[1]/div[3]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div[6]/div[2]/div/div/div/div/div[1]/input')
+    stellar_payout_address = (By.XPATH,'/html/body/div[1]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div[3]/div[4]/div/div/div/div[1]/input')
     ip_dropdown = (By.XPATH,'//*[@id="app"]/div[5]/div/div/div[2]/div[1]/div/div[1]/div[1]/div')
     range_selection=(By.XPATH, "//*[contains(text(), 'Range')]")
     from_ip_input = (By.XPATH, "/html/body/div[1]/div[5]/div/div/div[2]/form/div/div/div[1]/div/input") 
     to_ip_input = (By.XPATH, "/html/body/div[1]/div[5]/div/div/div[2]/div[2]/div/div[1]/div/input") 
     gateway_range_input = (By.XPATH, "/html/body/div[1]/div[5]/div/div/div[2]/div[3]/div/div[1]/div/input") 
-    table_row = '//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/tbody/tr['
-    farm_public_ips = '//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/tbody/tr[2]/td/div/div[8]/div/div/div/div/div/table/tbody/tr'
-    node_expand_details = '//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[1]/table/tbody/tr[2]/td/div/div['
-    rows_per_page = (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div/div[4]/div[2]/div[1]/div/div/div')
-    all_rows_per_page = (By.XPATH, '/html/body/div[1]/div[3]/div/div[4]/div/div')
-  
+    table_row = '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr['
+    farm_public_ips = '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div[4]/div/div/div/div/div/div/div/table/tbody/tr'
+    node_expand_details = '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div['
+    rows_per_page = (By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[2]/div[1]/div/div/div/div[1]/div[2]/div/i')
+    all_rows_per_page = (By.XPATH, '/html/body/div[1]/div[3]/div/div[4]/div/div')   
+    close_login_button = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div[4]/button')
+
+
     def __init__(self, browser):
         self.browser = browser
 
-    def navigetor(self,user):
-        self.browser.find_element(By.XPATH, "//*[contains(text(), '"+ user +"')]").click()
+    def navigetor(self):
+        self.browser.find_element(*self.close_login_button).click()
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.twin_details))
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.farm))
         self.browser.find_element(*self.farm).click()
@@ -299,9 +301,12 @@ class FarmPage:
         self.browser.find_element(*self.details_arrow).click()
         self.browser.find_element(*self.public_ip_list).click()
         details = []
-        for i in range(5): 
-            details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}{str(i+1)}]/div[2]/div/span").text) #[Farm ID, Farm Name, Linked Twin ID, Certification Type, Linked Pricing Policy ID]
-        details.append(self.browser.find_element(*self.stellar_payout_address).get_attribute("value"))
+        details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}1]/div[2]").text) # Farm ID
+        details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}1]/div[4]").text) # Farm Name
+        details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}2]/div[2]").text) # Linked Twin ID
+        details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}2]/div[4]").text) # Certification Type
+        details.append(self.browser.find_element(By.XPATH,  f"{self.node_expand_details}3]/div[2]").text) # Linked Pricing Policy ID
+        details.append(self.browser.find_element(*self.stellar_payout_address).get_attribute("value")) # Stellar Address
         for i in range(len(self.browser.find_elements(By.XPATH, self.farm_public_ips))):
             details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[1]").text) # IP
             details.append(self.browser.find_element(By.XPATH,  f"{self.farm_public_ips}[{str(i+1)}]/td[3]").text) # Deployed Contract ID

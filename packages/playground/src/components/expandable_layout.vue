@@ -5,7 +5,14 @@
       <v-spacer />
       <v-tooltip text="Add">
         <template #activator="{ props }">
-          <v-btn icon="mdi-plus" variant="tonal" color="primary" @click="$emit('add')" v-bind="props" />
+          <v-btn
+            icon="mdi-plus"
+            variant="tonal"
+            color="primary"
+            @click="$emit('add')"
+            v-bind="props"
+            :disabled="disabled"
+          />
         </template>
       </v-tooltip>
     </div>
@@ -47,6 +54,7 @@ const props = defineProps({
     type: Array as PropType<number[]>,
     default: () => [],
   },
+  disabled: Boolean,
   title: String,
 });
 const emits = defineEmits<{

@@ -1,11 +1,14 @@
 <template>
-  <v-container>
-    <v-card class="d-flex align-center font-weight-bold mr-4 primary">
-      <v-card-actions class="pr-0">
-        <v-btn @click="addTFT()" style="max-width: 90px" :loading="loadingAddTFT">GET TFT</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-container>
+  <v-btn
+    id="tftBtn"
+    width="2000"
+    @click="addTFT()"
+    color="primary"
+    class="px-lg-6 px-md-2 px-sm-0 mx-sm-0"
+    style="color: white; border: 1px solid white !important; max-width: 140px; width: auto"
+    :loading="loadingAddTFT"
+    >GET TFT</v-btn
+  >
 </template>
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
@@ -67,9 +70,17 @@ export default class FundsCard extends Vue {
       ).catch((err: { message: string }) => {
         console.log(err.message);
         this.loadingAddTFT = false;
-        this.$toasted.show("Get more TFT failed!");
+        this.$toasted.show(
+          "Get more TFT failed! <br>Maybe the funding wallet has run out of TFTs. Please contact support",
+        );
       });
     }
   }
 }
 </script>
+<style scoped>
+#tftBtn {
+  display: inline-block;
+  min-width: 10px !important;
+}
+</style>

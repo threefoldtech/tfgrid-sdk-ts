@@ -1,7 +1,6 @@
 import {
   ContractLockOptions,
   Contracts,
-  ExtrinsicResult,
   GetDedicatedNodePriceOptions,
   SetDedicatedNodeExtraFeesOptions,
 } from "@threefold/tfchain_client";
@@ -49,9 +48,11 @@ class TFContracts extends Contracts {
       const body = `query getContracts($nameContractsCount: Int!, $nodeContractsCount: Int!, $rentContractsCount: Int!){
                 nameContracts(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, limit: $nameContractsCount) {
                   contractID
-                  state
-                  name
                   createdAt
+                  name
+                  solutionProviderID
+                  state
+                  twinID
                 }
                 nodeContracts(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, limit: $nodeContractsCount) {
                   contractID
@@ -62,9 +63,11 @@ class TFContracts extends Contracts {
                 }
                 rentContracts(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, limit: $rentContractsCount) {
                   contractID
-                  state
                   createdAt
                   nodeID
+                  solutionProviderID
+                  state
+                  twinID
                 }
               }`;
       const response = await gqlClient.query(body, {

@@ -46,6 +46,17 @@ export function createAccount() {
   return grid.tfchain.createAccount(relay);
 }
 
+export function activateAccountAndCreateTwin(mnemonic: string) {
+  const grid = new GridClient({
+    network,
+    mnemonic,
+    storeSecret: mnemonic,
+  });
+  grid._connect();
+  const relay = grid.getDefaultUrls(network).relay.slice(6);
+  return grid.tfchain.activateAccountAndCreateTwin(mnemonic, relay, true);
+}
+
 export interface Balance {
   free: number;
   locked: number;

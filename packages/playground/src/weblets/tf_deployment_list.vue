@@ -43,16 +43,11 @@
           />
           <IconActionBtn
             tooltip="Admin Panel"
-            color="white"
+            color="anchor"
             icon="mdi-view-dashboard"
             :href="'http://captain.' + item.value[0].env.CAPROVER_ROOT_DOMAIN"
           />
-          <IconActionBtn
-            icon="mdi-cog"
-            tooltip="Manage Workers"
-            color="white"
-            @click="dialog = item.value.deploymentName"
-          />
+          <IconActionBtn icon="mdi-cog" tooltip="Manage Workers" @click="dialog = item.value.deploymentName" />
 
           <ManageCaproverWorkerDialog
             v-if="dialog === item.value.deploymentName"
@@ -70,9 +65,9 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
-            tooltip="Preview"
-            color="white"
+            tooltip="Visit"
             icon="mdi-web"
+            color="anchor"
             :href="'https://' + item.value[0].env.PEERTUBE_WEBSERVER_HOSTNAME"
           />
         </template>
@@ -84,9 +79,9 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
-            tooltip="Preview"
-            color="white"
+            tooltip="Visit"
             icon="mdi-web"
+            color="anchor"
             :href="'https://' + item.value[0].env.FUNKWHALE_HOSTNAME"
           />
         </template>
@@ -99,14 +94,14 @@
           />
           <IconActionBtn
             tooltip="Admin Panel"
-            color="white"
+            color="anchor"
             icon="mdi-view-dashboard"
             :href="'http://' + item.value[0].env.DOMAIN_NAME + '/admin/'"
           />
           <IconActionBtn
-            tooltip="Preview"
-            color="white"
+            tooltip="Visit"
             icon="mdi-web"
+            color="anchor"
             :href="'https://' + item.value[0].env.DOMAIN_NAME"
           />
         </template>
@@ -125,7 +120,7 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Preview" color="white" icon="mdi-web" :href="item.value[0].env.SITE_URL" />
+          <IconActionBtn tooltip="Visit" color="anchor" icon="mdi-web" :href="item.value[0].env.SITE_URL" />
         </template>
 
         <template #Discourse-actions="{ item }">
@@ -135,9 +130,9 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
-            tooltip="Preview"
-            color="white"
+            tooltip="Visit"
             icon="mdi-web"
+            color="anchor"
             :href="'https://' + item.value[0].env.DISCOURSE_HOSTNAME"
           />
         </template>
@@ -149,9 +144,9 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
-            tooltip="Preview"
-            color="white"
+            tooltip="Visit"
             icon="mdi-web"
+            color="anchor"
             :href="'https://' + item.value[0].env.DIGITALTWIN_APPID"
           />
         </template>
@@ -163,9 +158,9 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
-            tooltip="Preview"
-            color="white"
+            tooltip="Visit"
             icon="mdi-web"
+            color="anchor"
             :href="'https://' + item.value[0].env.CASPERLABS_HOSTNAME"
           />
         </template>
@@ -177,10 +172,24 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
-            tooltip="Preview"
-            color="white"
+            tooltip="Visit"
             icon="mdi-web"
+            color="anchor"
             :href="'https://' + item.value[0].env.OWNCLOUD_DOMAIN"
+          />
+        </template>
+
+        <template #Nextcloud-actions="{ item }">
+          <IconActionBtn
+            tooltip="Show Details"
+            icon="mdi-eye-outline"
+            @click="openDialog(tabs[activeTab].value, item)"
+          />
+          <IconActionBtn
+            tooltip="Open Nextcloud"
+            icon="mdi-web"
+            color="anchor"
+            :href="'https://' + item.value[0].env.NEXTCLOUD_DOMAIN + ':8443'"
           />
         </template>
 
@@ -191,9 +200,9 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
           <IconActionBtn
-            tooltip="Preview"
-            color="white"
+            tooltip="Visit"
             icon="mdi-web"
+            color="anchor"
             :href="'https://' + item.value[0].env.SUBSQUID_WEBSERVER_HOSTNAME + '/graphql'"
           />
         </template>
@@ -214,8 +223,8 @@
           />
           <IconActionBtn
             tooltip="Visit"
-            color="white"
             icon="mdi-web"
+            color="anchor"
             :href="
               'http://' +
               (item.value[0].publicIP?.ip
@@ -233,7 +242,7 @@
           />
           <IconActionBtn
             tooltip="Admin Panel"
-            color="white"
+            color="anchor"
             icon="mdi-view-dashboard"
             :href="
               'http://' +
@@ -250,10 +259,10 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Preview" color="white" icon="mdi-web" :href="'https://' + item.value[0].env.WP_URL" />
+          <IconActionBtn tooltip="Visit" color="anchor" icon="mdi-web" :href="'https://' + item.value[0].env.WP_URL" />
           <IconActionBtn
             tooltip="Admin Panel"
-            color="white"
+            color="anchor"
             icon="mdi-view-dashboard"
             :href="'https://' + item.value[0].env.WP_URL + '/wp-admin'"
           />
@@ -274,12 +283,7 @@
               icon="mdi-eye-outline"
               @click="openDialog(tabs[activeTab].value, item)"
             />
-            <IconActionBtn
-              icon="mdi-cog"
-              tooltip="Manage Workers"
-              color="white"
-              @click="dialog = item.value.deploymentName"
-            />
+            <IconActionBtn icon="mdi-cog" tooltip="Manage Workers" @click="dialog = item.value.deploymentName" />
 
             <ManageK8SWorkerDialog
               v-if="dialog === item.value.deploymentName"
@@ -351,6 +355,7 @@ const tabs: Tab[] = [
   { title: "Discourse", value: "Discourse", imgPath: "images/icons/discourse.png" },
   { title: "Taiga", value: "Taiga", imgPath: "images/icons/taiga.png" },
   { title: "Owncloud", value: "Owncloud", imgPath: "images/icons/owncloud.png" },
+  { title: "Nextcloud", value: "Nextcloud", imgPath: "images/icons/nextcloud.png" },
   { title: "Presearch", value: "Presearch", imgPath: "images/icons/presearch.png" },
   { title: "Subsquid", value: "Subsquid", imgPath: "images/icons/subsquid.png" },
   { title: "Casperlabs", value: "Casperlabs", imgPath: "images/icons/casperlabs.png" },

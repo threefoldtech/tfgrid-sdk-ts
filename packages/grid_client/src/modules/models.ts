@@ -537,6 +537,12 @@ class NodeFreeResourcesModel {
 class FarmIdFromFarmNameModel {
   @Expose() @IsString() @IsNotEmpty() farmName: string;
 }
+class CapacityPoolCheckModel {
+  @Expose() @IsInt() @Min(1) nodeId: number;
+  @Expose() @IsInt({ each: true }) @Min(250 * 1024 ** 2, { each: true }) rootfsDisks: number[]; //Byte
+  @Expose() @IsInt({ each: true }) @Min(250 * 1024 ** 2, { each: true }) ssdDisks: number[]; //Byte
+  @Expose() @IsInt({ each: true }) @Min(250 * 1024 ** 2, { each: true }) hddDisks: number[]; //Byte
+}
 
 class PingNodeOptionsModel {
   @Expose() @IsInt() @Min(1) nodeId: number;
@@ -561,7 +567,31 @@ class FilterOptions {
   @Expose() @IsOptional() @IsInt() page?: number;
   @Expose() @IsOptional() @IsInt() size?: number;
   @Expose() @IsOptional() @IsBoolean() hasGPU?: boolean;
+  @Expose() @IsOptional() @IsBoolean() rentable?: boolean;
   @Expose() @IsOptional() @IsInt() @Min(1) rentedBy?: number;
+}
+
+enum CertificationType {
+  NotCertified = "NotCertified",
+  Silver = "Silver",
+  Gold = "Gold",
+}
+
+class FarmFilterOptions {
+  @Expose() @IsOptional() @Min(0) nodeMRU?: number; // GB
+  @Expose() @IsOptional() @Min(0) nodeSRU?: number; // GB
+  @Expose() @IsOptional() @Min(0) nodeHRU?: number; // GB
+  @Expose() @IsOptional() @IsBoolean() publicIp?: boolean;
+  @Expose() @IsOptional() @IsBoolean() certificationType?: CertificationType;
+  @Expose() @IsOptional() @IsString() farmName?: string;
+  @Expose() @IsOptional() @IsString() country?: string;
+  @Expose() @IsOptional() @IsBoolean() dedicated?: boolean;
+  @Expose() @IsOptional() @IsBoolean() nodeCertified?: boolean;
+  @Expose() @IsOptional() @IsInt() @Min(1) availableFor?: number;
+  @Expose() @IsOptional() @IsBoolean() nodeHasGPU?: boolean;
+  @Expose() @IsOptional() @IsInt() @Min(1) nodeRentedBy?: number;
+  @Expose() @IsOptional() @IsInt() page?: number;
+  @Expose() @IsOptional() @IsInt() size?: number;
 }
 
 class CalculatorModel {
@@ -692,7 +722,9 @@ export {
   NodesByFarmIdModel,
   NodeFreeResourcesModel,
   FarmIdFromFarmNameModel,
+  CapacityPoolCheckModel,
   FilterOptions,
+  FarmFilterOptions,
   ContractStates,
   ContractState,
   TfchainWalletInitModel,

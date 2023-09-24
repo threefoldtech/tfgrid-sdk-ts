@@ -14,6 +14,8 @@ ifeq ($(project), playground)
 	cd packages/playground && yarn dev
 else ifeq ($(project), dashboard)
 	cd packages/dashboard && yarn serve
+else ifeq ($(project), UI)
+	cd packages/UI && yarn dev
 endif
 
 build:
@@ -39,6 +41,8 @@ else ifeq ($(project), weblets)
 	cd packages/weblets/playground && yarn build
 else ifeq ($(project), playground)
 	cd packages/playground && yarn build
+else ifeq ($(project), UI)
+	cd packages/UI && yarn build
 else
 	yarn lerna run build --no-private
 endif

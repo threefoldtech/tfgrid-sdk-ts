@@ -381,4 +381,8 @@ export default class Nodes extends Vue {
 .v-text-field__details {
   display: none;
 }
+
+.custom-layout {
+  margin-left: 20px;
+}
 </style>

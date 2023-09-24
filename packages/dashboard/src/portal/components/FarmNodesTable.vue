@@ -264,6 +264,7 @@
                 required
                 outlined
                 dense
+                ref="gw4Ref"
                 hint="Gateway for the IP in ipv4 format"
                 persistent-hint
                 type="string"
@@ -323,7 +324,11 @@
             </v-btn>
             <v-spacer></v-spacer>
             <v-btn color="grey lighten-2 black--text" @click="openPublicConfigDialog = false"> Cancel </v-btn>
-            <v-btn color="primary white--text" @click="openWarningDialog = true" :disabled="!isValidPublicConfig">
+            <v-btn
+              color="primary white--text"
+              @click="openWarningDialog = true"
+              :disabled="!isValidPublicConfig || !changed"
+            >
               Save
             </v-btn>
           </v-card-actions>
@@ -426,6 +431,7 @@
 <script lang="ts">
 import { QueryClient } from "@threefold/tfchain_client";
 import { Decimal } from "decimal.js";
+import ipaddr, { IPv4, IPv6 } from "ipaddr.js";
 import jsPDF from "jspdf";
 import { default as PrivateIp } from "private-ip";
 import { Component, Prop, Vue } from "vue-property-decorator";
@@ -437,7 +443,6 @@ import { hex2a } from "@/portal/lib/util";
 
 import { setDedicatedNodeExtraFee } from "../lib/nodes";
 import NodeMintingDetails from "./NodeMintingDetails.vue";
-
 @Component({
   name: "FarmNodesTable",
   components: { NodeMintingDetails },
@@ -529,6 +534,7 @@ export default class FarmNodesTable extends Vue {
   loadingExtraFee = false;
   $api: any;
   isValidPublicConfig = false;
+  changed = false;
   hasPublicConfig = false;
   isValidExtraFee = false;
   openWarningDialog = false;
@@ -540,9 +546,34 @@ export default class FarmNodesTable extends Vue {
   domainErrorMessage = "";
   extraFeeErrorMessage = "";
   receipts = [];
+  form = {
+    domain: "",
+    gw6: "",
+    ip6: "",
+    gw4: "",
+    ip4: "",
+  };
 
   updated() {
     this.receiptsPanel = [];
+    this.form = {
+      domain: this.domain,
+      gw6: this.gw6,
+      ip6: this.ip6,
+      gw4: this.gw4,
+      ip4: this.ip4,
+    };
+    if (
+      this.form.domain != this.nodeToEdit.publicConfig.domain ||
+      this.form.gw4 != this.nodeToEdit.publicConfig.gw4 ||
+      this.form.gw6 != this.nodeToEdit.publicConfig.gw6 ||
+      this.form.ip4 != this.nodeToEdit.publicConfig.ipv4 ||
+      this.form.ip6 != this.nodeToEdit.publicConfig.ipv6
+    ) {
+      this.changed = true;
+    } else {
+      this.changed = false;
+    }
   }
   onOptionChange(pageNumber: number, pageSize: number) {
     this.$emit("options-changed", { pageNumber, pageSize });
@@ -742,8 +773,9 @@ export default class FarmNodesTable extends Vue {
     const IPv4SegmentFormat = "(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])";
     const IPv4AddressFormat = `(${IPv4SegmentFormat}[.]){3}${IPv4SegmentFormat}`;
     const ipRegex = new RegExp(`^${IPv4AddressFormat}/(1[6-9]|2[0-9]|3[0-2])$`);
-    if (ipRegex.test(this.ip4)) {
+    if (ipRegex.test(this.ip4) && ipaddr.isValid(this.ip4.split("/")[0])) {
       this.ip4ErrorMessage = "";
+      if (this.gw4) (this.$refs.gw4Ref as unknown as { validate(): void }).validate();
       return true;
     } else {
       this.ip4ErrorMessage = "IP address is not formatted correctly";
@@ -783,8 +815,9 @@ export default class FarmNodesTable extends Vue {
       this.ip6ErrorMessage = "IP is not public";
       return false;
     }
-    if (ipRegex.test(this.ip6)) {
+    if (ipRegex.test(this.ip6) && ipaddr.isValid(this.ip6.split("/")[0])) {
       this.ip6ErrorMessage = "";
+      if (this.gw6) this.gw6Check();
       return true;
     } else {
       this.ip6ErrorMessage = "IPV6 address is not formatted correctly";
@@ -800,7 +833,19 @@ export default class FarmNodesTable extends Vue {
     const IPv4SegmentFormat = "(?:[0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])";
     const IPv4AddressFormat = `(${IPv4SegmentFormat}[.]){3}${IPv4SegmentFormat}`;
     const gatewayRegex = new RegExp(`^${IPv4AddressFormat}$`);
-    if (gatewayRegex.test(this.gw4)) {
+    let cidr: [IPv4 | IPv6, number];
+    if (gatewayRegex.test(this.gw4) && ipaddr.isValid(this.gw4)) {
+      const addr = ipaddr.parse(this.gw4);
+      try {
+        cidr = ipaddr.parseCIDR(this.ip4);
+      } catch {
+        this.gw4ErrorMessage = "Make sure you have provided the correct IPv4";
+        return false;
+      }
+      if (!addr.match(cidr)) {
+        this.gw4ErrorMessage = "Gateway is not a part of the given IP.";
+        return false;
+      }
       this.gw4ErrorMessage = "";
       return true;
     } else {
@@ -841,7 +886,19 @@ export default class FarmNodesTable extends Vue {
         `(?::((?::${IPv6SegmentFormat}){0,5}:${IPv4AddressFormat}|(?::${IPv6SegmentFormat}){1,7}|:))` +
         ")([0-9a-fA-F]{1})?$",
     );
-    if (gatewayRegex.test(this.gw6)) {
+    if (gatewayRegex.test(this.gw6) && ipaddr.isValid(this.gw6)) {
+      let cidr: [IPv4 | IPv6, number];
+      try {
+        cidr = ipaddr.parseCIDR(this.ip6);
+      } catch {
+        this.gw6ErrorMessage = "Make sure you have provided the correct IPv6";
+        return false;
+      }
+      const addr = ipaddr.parse(this.gw6);
+      if (!addr.match(cidr)) {
+        this.gw6ErrorMessage = "Gateway is not a part of the given IP.";
+        return false;
+      }
       this.gw6ErrorMessage = "";
       return true;
     } else {
@@ -850,8 +907,7 @@ export default class FarmNodesTable extends Vue {
     }
   }
   domainCheck() {
-    if (this.domain == "") return false;
-    if (!this.validator.isURL(this.domain)) return "Invalid url format";
+    if (this.domain && !this.validator.isURL(this.domain)) return "Invalid url format";
     return true;
   }
 

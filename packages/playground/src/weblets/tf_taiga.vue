@@ -3,7 +3,7 @@
     ref="layout"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
-    :disk="solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0)"
+    :disk="solution?.disk + rootFilesystemSize"
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
@@ -59,6 +59,9 @@
               validators.required('Password is required.'),
               validators.minLength('Password must be at least 6 characters.', 6),
               validators.maxLength('Password cannot exceed 15 characters.', 15),
+              validators.pattern('Password should not contain whitespaces.', {
+                pattern: /^[^\s]+$/,
+              }),
             ]"
             #="{ props: validatorProps }"
           >
@@ -85,6 +88,7 @@
           v-model="solution"
           :minimum="{ cpu: 2, memory: 1024 * 2, disk: 100 }"
           :standard="{ cpu: 2, memory: 1024 * 4, disk: 150 }"
+          :disabled="loadingFarm"
         />
         <!-- <Networks v-model:ipv4="ipv4" /> -->
         <FarmGatewayManager>
@@ -93,10 +97,24 @@
             tooltip="Click to know more about dedicated nodes."
             href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
           >
-            <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+            <v-switch
+              color="primary"
+              inset
+              label="Dedicated"
+              v-model="dedicated"
+              :disabled="loadingFarm"
+              hide-details
+            />
           </input-tooltip>
           <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-            <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+            <v-switch
+              color="primary"
+              inset
+              label="Certified"
+              v-model="certified"
+              :disabled="loadingFarm"
+              hide-details
+            />
           </input-tooltip>
 
           <SelectFarmManager>
@@ -104,12 +122,13 @@
               :filters="{
                 cpu: solution?.cpu,
                 memory: solution?.memory,
-                ssd: solution?.disk + rootFs(solution?.cpu ?? 0, solution?.memory ?? 0),
+                ssd: (solution?.disk ?? 0) + rootFilesystemSize,
                 publicIp: ipv4,
                 rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
                 certified: certified,
               }"
               v-model="farm"
+              v-model:loading="loadingFarm"
             />
 
             <SelectNode
@@ -118,10 +137,11 @@
                 farmId: farm?.farmID,
                 cpu: solution?.cpu,
                 memory: solution?.memory,
-                disks: [{ size: solution?.disk, mountPoint: '/var/lib/docker' }],
+                diskSizes: [solution?.disk],
                 rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
                 certified: certified,
               }"
+              :root-file-system-size="rootFilesystemSize"
             />
           </SelectFarmManager>
           <DomainName :hasIPv4="ipv4" ref="domainNameCmp" />
@@ -150,7 +170,7 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { type Ref, ref } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
@@ -165,12 +185,13 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref(generateName(9, { prefix: "tg" }));
+const name = ref(generateName({ prefix: "tg" }));
 const username = ref("admin");
 const password = ref(generatePassword());
 const email = ref("");
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
+const loadingFarm = ref(false);
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/grid3_taiga_docker-latest.flist",
   entryPoint: "/sbin/zinit init",
@@ -182,7 +203,7 @@ const ipv4 = ref(false);
 const domainNameCmp = ref();
 
 const smtp = ref(createSMTPServer());
-
+const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed a taiga instance.");
@@ -205,7 +226,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   let vm: any;
 
   try {
-    layout.value.validateSsh();
+    layout.value?.validateSSH();
     grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);
@@ -229,7 +250,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
           ],
           flist: flist.value,
           entryPoint: flist.entryPoint,
-          rootFilesystemSize: rootFs(solution.value.cpu, solution.value.memory),
+          rootFilesystemSize: rootFilesystemSize.value,
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           publicIpv4: ipv4.value,
