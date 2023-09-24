@@ -147,7 +147,4 @@ onBeforeUnmount(() => {
   font-weight: bold;
   padding-left: 1rem;
 }
-.v-toolbar {
-  height: 48px;
-}
 </style>
