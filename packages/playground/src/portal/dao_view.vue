@@ -33,7 +33,7 @@
               ></v-text-field> </v-card
           ></v-window-item>
         </v-window>
-        <!-- <v-dialog v-model="openInfoModal" width="50vw">
+        <v-dialog v-model="openInfoModal" width="50vw">
           <v-card class="card">
             <v-card-title class="text-h5"> Proposals information </v-card-title>
 
@@ -69,7 +69,7 @@
               <v-btn @click="openInfoModal = false"> Close </v-btn>
             </v-card-actions>
           </v-card>
-        </v-dialog> -->
+        </v-dialog>
       </v-container>
     </v-skeleton-loader>
   </v-container>
@@ -99,6 +99,5 @@ const tabs = [
 onMounted(async () => {
   const grid = await getGrid(profile.value);
   proposals.value = await grid?.dao.get();
-  console.log(proposals.value?.active?.length);
 });
 </script>
