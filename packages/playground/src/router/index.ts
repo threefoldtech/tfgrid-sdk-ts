@@ -22,6 +22,7 @@ const router = createRouter({
       path: "/portal",
       children: [
         {
+          name: "Twin",
           path: "twin",
           component: () => import("../portal/twin_view.vue"),
           meta: { title: "Twin" },

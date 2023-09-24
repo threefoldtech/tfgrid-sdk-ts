@@ -1,9 +1,11 @@
 <template>
   <img class="centered-img" :src="baseUrl + 'images/404.png'" />
-  <p class="text1">Oops. The page you were looking for doesn't exist.</p>
-  <p class="text2">You may have mistyped address or the page may have been moved</p>
+  <p class="text1">Oops! The page you were looking for doesn't exist.</p>
+  <p class="text2">You may have mistyped address or the page may have been moved.</p>
   <div style="text-align: center">
-    <v-btn color="primary" variant="text" @click="$router.push('/')"> Take me back to the home page</v-btn>
+    <v-btn color="primary" variant="text" @click="$router.push({ name: 'Twin' })">
+      Take me back to the Home page.</v-btn
+    >
   </div>
 </template>
 
