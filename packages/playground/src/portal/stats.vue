@@ -48,12 +48,12 @@ const failed = ref(false);
 const Istats = ref<IStatistics[]>([]);
 const nodesDistribution = ref<string>("");
 
-let stats: Stats | null = null;
+let stats: Stats | null | undefined = null;
 
 const fetchStats = async () => {
   let retryCount = 0;
 
-  const fetchDataWithRetry = async (): Promise<Stats> => {
+  const fetchDataWithRetry = async (): Promise<Stats | undefined> => {
     try {
       loading.value = true;
       failed.value = false;
