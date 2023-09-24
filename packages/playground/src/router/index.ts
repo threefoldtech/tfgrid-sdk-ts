@@ -50,6 +50,16 @@ const router = createRouter({
       ],
     },
     {
+      path: "/explorer",
+      children: [
+        {
+          path: "stats",
+          component: () => import("../portal/stats.vue"),
+          meta: { title: "Statistics" },
+        },
+      ],
+    },
+    {
       path: "/solutions",
       children: [
         {
