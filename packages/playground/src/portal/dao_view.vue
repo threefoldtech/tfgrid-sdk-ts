@@ -18,20 +18,67 @@
             <v-icon @click="openInfoModal = true"> mdi-information-outline </v-icon>
           </h4>
           <v-tabs v-model="activeTab" align-tabs="center">
-            <v-tab :value="0" color="primary">Active</v-tab>
-            <v-tab :value="1" color="primary">Executable</v-tab>
+            <v-tab color="primary" v-for="(tab, index) in tabs" :key="index" :value="`${index}`">{{ tab.title }}</v-tab>
           </v-tabs>
         </v-card>
         <v-window v-model="activeTab">
           <!--Active-->
-          <v-window-item :value="0">
+          <v-window-item v-for="(tab, index) in tabs" :key="index" :value="`${index}`">
             <v-card>
               <v-text-field
                 v-model="searchTerm"
                 color="primary darken-2"
                 label="Search by proposal action or description"
-              ></v-text-field> </v-card
-          ></v-window-item>
+                class="pa-3"
+              ></v-text-field>
+            </v-card>
+            <v-card class="my-3 pa-3" v-for="(proposal, i) in tab.content.value" :key="i">
+              <v-card-title class="pa-3 mb-2">
+                {{ proposal.action.toUpperCase() }}
+              </v-card-title>
+              <v-card-subtitle class="pb-0">
+                <p class="font-weight-bold">
+                  Proposal hash: <span class="text--secondary">{{ proposal.hash }}</span>
+                </p>
+              </v-card-subtitle>
+              <v-card-text class="pb-0">
+                <p class="font-weight-bold">
+                  Description:
+                  <span class="text--secondary">
+                    {{ proposal.description }}
+                    <a v-bind:href="proposal.link" v-bind:target="'blank'">More details</a>
+                  </span>
+                </p>
+                <p class="font-weight-bold" v-if="expired(proposal.end)">
+                  You can vote until:
+                  <span class="text--secondary">{{ proposal.end }}</span>
+                </p>
+                <p class="font-weight-bold" v-else>
+                  Voting ended on: <span class="text--secondary">{{ proposal.end }}</span>
+                </p>
+              </v-card-text>
+              <v-container class="votes">
+                <div v-if="expired(proposal.end)" class="d-flex justify-space-between my-3 mx-8">
+                  <v-btn color="primary" @click="openVoteDialog(proposal.hash, true)" :disabled="loadingVote"
+                    >Yes <v-divider class="mx-3" vertical />{{ proposal.ayes.length }}
+                  </v-btn>
+                  <div class="d-flex align-center text-center pr-2">
+                    <v-divider vertical />
+                    <span class="px-1"
+                      >Threshold: <br />{{ proposal.nayes.length + proposal.ayes.length }}/{{ proposal.threshold }}
+                    </span>
+                    <v-divider vertical />
+                  </div>
+                  <v-btn
+                    color="grey lighten-2 black--text"
+                    @click="openVoteDialog(proposal.hash, false)"
+                    :disabled="loadingVote"
+                    >No <v-divider class="mx-3" vertical />{{ proposal.nayes.length }}
+                  </v-btn>
+                </div>
+              </v-container>
+            </v-card>
+          </v-window-item>
         </v-window>
         <v-dialog v-model="openInfoModal" width="50vw">
           <v-card class="card">
@@ -76,6 +123,7 @@
 </template>
 <script lang="ts" setup>
 import type { Proposal, Proposals } from "@threefold/tfchain_client";
+import type moment from "moment";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
@@ -83,12 +131,16 @@ import { getGrid } from "../utils/grid";
 
 const loadingProposals = ref(true);
 const activeTab = ref(0);
-const activeProposals: Proposal[] = [];
-const inactiveProposals: Proposal[] = [];
+const activeProposals = ref<Proposal[]>();
+const inactiveProposals = ref<Proposal[]>();
 const proposals = ref<Proposals>();
 const searchTerm = ref("");
 const openInfoModal = ref(false);
+const openVDialog = ref(false);
+const castedVote = ref(false);
+const loadingVote = ref(false);
 
+const selectedProposal = ref("");
 const profileManager = useProfileManager();
 const profile = ref(profileManager.profile!);
 const tabs = [
@@ -99,5 +151,14 @@ const tabs = [
 onMounted(async () => {
   const grid = await getGrid(profile.value);
   proposals.value = await grid?.dao.get();
+  activeProposals.value = proposals?.value?.active;
 });
+function expired(proposalEnd: moment.Moment) {
+  return proposalEnd.isAfter(Date.now());
+}
+function openVoteDialog(hash: any, vote: boolean) {
+  openVDialog.value = true;
+  castedVote.value = vote;
+  selectedProposal.value = hash;
+}
 </script>
