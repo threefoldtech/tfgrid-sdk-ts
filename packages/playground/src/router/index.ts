@@ -38,6 +38,17 @@ const router = createRouter({
         },
       ],
     },
+
+    {
+      path: "/explorer",
+      children: [
+        {
+          path: "pricing",
+          component: () => import("../portal/resource_pricing.vue"),
+          meta: { title: "Resource Pricing" },
+        },
+      ],
+    },
     {
       path: "/solutions",
       children: [
