@@ -143,7 +143,7 @@
                           <v-list-item-content>
                             <v-list-item-title class="text-lg font-weight-bold"> Created </v-list-item-title>
                           </v-list-item-content>
-                          <template v-slot:append> {{ dateFiler(node?.created) }} </template>
+                          <template v-slot:append> {{ toHumanDate(node?.created) }} </template>
                         </v-list-item>
                         <v-divider></v-divider>
                         <v-list-item class="text-lg font-weight-bold">
@@ -450,7 +450,7 @@ import type { PropType } from "vue";
 import { ref, watch } from "vue";
 
 import { gqlClient, gridProxyClient } from "@/clients";
-import dateFiler from "@/utils/date";
+import toHumanDate from "@/utils/date";
 import toFixedCsSize from "@/utils/to_fixed_cs_size";
 export default {
   props: {
@@ -566,7 +566,7 @@ export default {
       resources,
       toFixedCsSize,
       copy,
-      dateFiler,
+      toHumanDate,
       countryFlagSrc,
       getCountryCode,
     };

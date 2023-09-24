@@ -78,20 +78,13 @@ import { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy
 import { ref, watch } from "vue";
 import { onMounted } from "vue";
 
-import secondToRedable from "@/utils/second_to_redable";
-import toFixedCsSize from "@/utils/to_fixed_cs_size";
-
+import toFixedCsSize from "../../utils/to_fixed_cs_size";
+import toReadableDate from "../../utils/to_readable_data";
 import NodeFilter from "../components/common/filters/node_filter.vue";
 import NodeDetails from "../components/nodes/node_details.vue";
 import NodeTable from "../components/nodes/nodes_table.vue";
-import { getFilterValues, requestNodes } from "../utils/helpers";
-import {
-  type FilterInputs,
-  type FilterOptions,
-  inputsInitializer,
-  type MixedFilter,
-  optionsInitializer,
-} from "../utils/types.js";
+import { getFilterValues, inputsInitializer, requestNodes } from "../utils/helpers";
+import { type FilterInputs, type FilterOptions, type MixedFilter, optionsInitializer } from "../utils/types.js";
 
 export default {
   components: {
@@ -164,7 +157,7 @@ export default {
       openeDetails,
 
       requestNodes,
-      secondToRedable,
+      toReadableDate,
       toFixedCsSize,
       InputFiltersReset,
     };

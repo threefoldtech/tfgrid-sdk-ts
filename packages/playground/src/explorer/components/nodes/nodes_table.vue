@@ -45,8 +45,8 @@ import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
 import type { PropType } from "vue";
 import type { VDataTable } from "vuetify/labs/VDataTable";
 
-import secondToRedable from "@/utils/second_to_redable";
-import toFixedCsSize from "@/utils/to_fixed_cs_size";
+import toFixedCsSize from "../../../utils/to_fixed_cs_size";
+import toReadableDate from "../../../utils/to_readable_data";
 
 export default {
   emits: ["update:page", "update:size", "update:selectedNode"],
@@ -113,7 +113,7 @@ export default {
         value: item => toFixedCsSize(item.total_resources.hru),
       },
       { title: "GPU", key: "num_gpu", align: "start" },
-      { title: "Up Time", key: "uptime", align: "start", value: item => secondToRedable(item.uptime) },
+      { title: "Up Time", key: "uptime", align: "start", value: item => toReadableDate(item.uptime) },
       { title: "Status", key: "status", align: "start" },
     ];
 
@@ -132,7 +132,7 @@ export default {
     return {
       headers,
       nodeStatusOptions,
-      secondToRedable,
+      toReadableDate,
       getStatus,
       toFixedCsSize,
       openSheet,
