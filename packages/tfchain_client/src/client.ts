@@ -11,6 +11,7 @@ import { validateMnemonic } from "bip39";
 
 import { Balances, QueryBalances } from "./balances";
 import { Contracts, QueryContracts } from "./contracts";
+import { Dao, QueryDao } from "./dao";
 import { QueryFarms } from "./farms";
 import { KVStore } from "./kvstore";
 import { Nodes, QueryNodes } from "./nodes";
@@ -44,6 +45,7 @@ class QueryClient {
   api: ApiPromise;
   contracts: QueryContracts = new QueryContracts(this);
   balances: QueryBalances = new QueryBalances(this);
+  dao: QueryDao = new QueryDao(this);
   farms: QueryFarms = new QueryFarms(this);
   tftBridge: QueryBridge = new QueryBridge(this);
   tftPrice: QueryTFTPrice = new QueryTFTPrice(this);
@@ -228,7 +230,9 @@ class Client extends QueryClient {
   termsAndConditions: TermsAndConditions = new TermsAndConditions(this);
   kvStore: KVStore = new KVStore(this);
   twins: Twins = new Twins(this);
+  dao: Dao = new Dao(this);
   tftBridge: Bridge = new Bridge(this);
+
 
   declare url: string;
   mnemonicOrSecret?: string;

@@ -378,7 +378,12 @@ class KVStoreRemoveModel {
 class KVStoreBatchRemoveModel {
   @Expose() @ArrayNotEmpty() @IsString({ each: true }) keys: string[];
 }
-
+class DaoVoteModel {
+  @Expose() @IsString() @IsNotEmpty() address: string;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsBoolean() approve: boolean;
+  @Expose() @IsString() @IsNotEmpty() hash: string;
+}
 class BalanceGetModel {
   @Expose() @IsString() @IsNotEmpty() address: string;
 }
@@ -423,7 +428,13 @@ class TfchainWalletInitModel {
 class TfchainWalletBalanceByAddressModel {
   @Expose() @IsString() @IsNotEmpty() address: string;
 }
-
+class TfchainDaoVoteModel {
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() address: string;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsBoolean() approve: boolean;
+  @Expose() @IsString() @IsNotEmpty() hash: string;
+}
 class TfchainWalletTransferModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() address_dest: string;
@@ -665,6 +676,7 @@ export {
   AlgorandCreateTransactionModel,
   AlgorandTransferModel,
   DiskModel,
+  DaoVoteModel,
   NetworkModel,
   MachineModel,
   MachinesModel,
@@ -740,6 +752,7 @@ export {
   TfchainWalletBalanceByAddressModel,
   TfchainWalletTransferModel,
   TfchainCreateModel,
+  TfchainDaoVoteModel,
   WalletMessageSignModel,
   BlockchainCreateModel,
   BlockchainCreateResultModel,
