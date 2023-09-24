@@ -1,3 +1,4 @@
+import { NetworkEnv } from "@threefold/grid_client";
 import { createRouter, createWebHashHistory } from "vue-router";
 
 export interface InfoMeta {
@@ -31,14 +32,41 @@ const router = createRouter({
       path: "/portal",
       children: [
         {
+          name: "Twin",
           path: "twin",
           component: () => import("../portal/twin_view.vue"),
           meta: { title: "Twin" },
         },
         {
+          path: "bridge",
+          component: () => import("../portal/bridge_view.vue"),
+          meta: { title: "Bridge" },
+        },
+        {
           path: "transfer",
           component: () => import("../portal/transfer_view.vue"),
           meta: { title: "Transfer" },
+        },
+      ],
+    },
+
+    {
+      path: "/explorer",
+      children: [
+        {
+          path: "pricing",
+          component: () => import("../portal/resource_pricing.vue"),
+          meta: { title: "Resource Pricing" },
+        },
+      ],
+    },
+    {
+      path: "/explorer",
+      children: [
+        {
+          path: "stats",
+          component: () => import("../portal/stats.vue"),
+          meta: { title: "Statistics" },
         },
       ],
     },
@@ -52,12 +80,18 @@ const router = createRouter({
         {
           path: "fullvm",
           component: () => import("../views/full_virtual_machine.vue"),
-          meta: { title: "Full Virtual Machine", info: { page: "info/full_vm.md" } },
+          meta: {
+            title: "Full Virtual Machine",
+            info: { page: "info/full_vm.md" },
+          },
         },
         {
           path: "vm",
           component: () => import("../views/micro_virtual_machine.vue"),
-          meta: { title: "Micro Virtual Machine", info: { page: "info/vm.md" } },
+          meta: {
+            title: "Micro Virtual Machine",
+            info: { page: "info/vm.md" },
+          },
         },
         {
           path: "kubernetes",
@@ -149,7 +183,22 @@ const router = createRouter({
     {
       path: "/contractslist",
       component: () => import("../views/contracts_list.vue"),
-      meta: { title: "Contracts List", info: { page: "info/contracts_list.md" } },
+      meta: {
+        title: "Contracts List",
+        info: { page: "info/contracts_list.md" },
+      },
+    },
+    {
+      path: "/minting",
+      component: () => import("../views/minting_view.vue"),
+      meta: { title: "Minting" },
+      beforeEnter(_, __, next) {
+        const network = process.env.NETWORK || window.env.NETWORK;
+        if (network !== NetworkEnv.main) {
+          return next({ path: "/page-not-found" });
+        }
+        next();
+      },
     },
     {
       path: "/:pathMatch(.*)*",
