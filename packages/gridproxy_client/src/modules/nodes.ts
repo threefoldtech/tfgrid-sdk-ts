@@ -2,12 +2,13 @@ import { NodesBuilder, type NodesQuery } from "../builders/nodes";
 import { resolvePaginator } from "../utils";
 import { AbstractClient } from "./abstract_client";
 import type { Farm, FarmsClient } from "./farms";
-import type { GridNode, PublicIps } from "./gateways";
+import type { GridNode, NodeStats, PublicIps } from "./gateways";
 import type { Twin, TwinsClient } from "./twins";
 
 export interface NodesExtractOptions {
   loadFarm?: boolean;
   loadTwin?: boolean;
+  loadStats?: boolean;
 }
 
 export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
@@ -30,14 +31,25 @@ export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
   public async list(queries: Partial<NodesQuery> = {}, extraOptions: NodesExtractOptions = {}) {
     const res = await this.builder(queries).build("/nodes");
     const nodes = await resolvePaginator<GridNode[]>(res);
+
     if (extraOptions.loadFarm) {
       await this.loadFarms(nodes.data.map(n => n.farmId));
       nodes.data = nodes.data.map(this.setFarm);
     }
+
     if (extraOptions.loadTwin) {
       await this.loadTwins(nodes.data.map(n => n.twinId));
       nodes.data = nodes.data.map(this.setTwin);
     }
+
+    if (extraOptions.loadStats) {
+      const nodesStats = await Promise.all(nodes.data.map(n => this.statsById(n.nodeId)));
+      nodes.data = nodes.data.map((n, index) => {
+        n.stats = nodesStats[index];
+        return n;
+      });
+    }
+
     return nodes;
   }
 
@@ -61,7 +73,16 @@ export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
       node = this.setTwin(node);
     }
 
+    if (extraOptions.loadStats) {
+      node.stats = await this.statsById(node.nodeId);
+    }
+
     return node;
+  }
+
+  public async statsById(nodeId: number): Promise<NodeStats> {
+    const res = await this.builder({}).build(`/nodes/${nodeId}/statistics`);
+    return res.json();
   }
 
   private async loadFarms(farmIds: number[]): Promise<void> {
@@ -94,7 +115,7 @@ export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
     };
   }
 
-  public async loadTwins(twinIds: number[]): Promise<void> {
+  private async loadTwins(twinIds: number[]): Promise<void> {
     twinIds = twinIds.filter(id => !this.twins.has(id));
     const ids = Array.from(new Set(twinIds));
     if (!ids.length) return;

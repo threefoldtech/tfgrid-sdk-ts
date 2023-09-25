@@ -28,6 +28,16 @@ export interface PublicIps {
   free: number;
 }
 
+export interface NodeStats {
+  system: Resources & { ipv4u: number };
+  total: Resources & { ipv4u: number };
+  used: Resources & { ipv4u: number };
+  users: {
+    deployments: number;
+    workloads: number;
+  };
+}
+
 export interface GridNode {
   id: string;
   nodeId: number;
@@ -52,6 +62,7 @@ export interface GridNode {
   farm: Farm;
   publicIps: PublicIps;
   twin: Twin;
+  stats: NodeStats;
 }
 
 export class GatewaysClient extends AbstractClient<GatewayBuilder, GatewaysQuery> {
