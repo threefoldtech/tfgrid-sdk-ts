@@ -17,14 +17,17 @@ export function buildPieChart(canvas: HTMLCanvasElement) {
 
   return new Chart(ctx, {
     type: "doughnut",
+
     options: {
       responsive: true,
       plugins: {
         legend: {
-          position: "top",
+          position: "bottom",
         },
         title: {
+          position: "bottom",
           display: true,
+          padding: 10,
           text: "Reward for CU, SU & NU",
         },
       },

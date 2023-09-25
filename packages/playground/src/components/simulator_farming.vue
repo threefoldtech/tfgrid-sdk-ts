@@ -142,12 +142,12 @@
             <label class="label ml-2">Return On Investment</label>
           </div>
         </v-row>
-        <v-row v-if="!isAdvanced">
+        <v-row v-show="!isAdvanced">
           <v-col>
             <canvas ref="lineCanvas" />
           </v-col>
         </v-row>
-        <v-row v-if="isAdvanced">
+        <v-row v-show="isAdvanced">
           <v-col cols="6">
             <canvas ref="pieCanvas" />
           </v-col>
@@ -279,6 +279,11 @@ const certified = ref();
 const isAdvanced = ref(false);
 const isProfit = ref(false);
 
+const pieCanvas = ref<HTMLCanvasElement | null>(null);
+const lineCanvas = ref<HTMLCanvasElement | null>(null);
+let pieChart: Chart<"doughnut", number[], string> | null = null;
+let lineChart: Chart<"line", number[], string> | null = null;
+
 const activeProfile = ref(
   new FarmingProfile({
     type: ProfileTypes.DIY,
@@ -298,14 +303,10 @@ watch([activeProfile.value, isProfit, isAdvanced, certified], () => {
   } else {
     activeProfile.value.certified = Certification.NONE;
   }
+
   updatePieChart();
   updateLineChart();
 });
-
-const pieCanvas = ref<HTMLCanvasElement | null>(null);
-const lineCanvas = ref<HTMLCanvasElement | null>(null);
-let pieChart: Chart<"doughnut", number[], string> | null = null;
-let lineChart: Chart<"line", number[], string> | null = null;
 
 onMounted(() => {
   Chart.register(...registerables);
