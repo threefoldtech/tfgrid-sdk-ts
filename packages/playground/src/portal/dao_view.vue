@@ -57,7 +57,7 @@
                   Voting ended on: <span class="text--secondary">{{ proposal.end }}</span>
                 </p>
               </v-card-text>
-              <v-container class="votes">
+              <v-container fluid class="votes">
                 <div v-if="expired(proposal.end)" class="d-flex justify-space-between my-3 mx-8">
                   <v-btn color="primary" @click="openVoteDialog(proposal.hash, true)" :disabled="loadingVote"
                     >Yes <v-divider class="mx-3" vertical />{{ proposal.ayes.length }}
@@ -77,8 +77,37 @@
                   </v-btn>
                 </div>
 
-                <v-container class="justify-center" v-if="proposal.ayesProgress > 0 || proposal.nayesProgress > 0">
-                  <row justify="center" class="">
+                <v-container fluid v-if="proposal.ayesProgress > 0 || proposal.nayesProgress > 0">
+                  <v-row justify="stretch" align-content="start" v-if="expired(proposal.end)">
+                    <v-progress-linear
+                      :height="20"
+                      color="#1AA18F"
+                      v-model="proposal.ayesProgress"
+                      :style="{
+                        backgroundColor: '#1AA18F',
+                        width: `${proposal.ayesProgress}%`,
+                      }"
+                    >
+                      <template v-slot:default="{ value }">
+                        <span class="">{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
+                      </template>
+                    </v-progress-linear>
+
+                    <v-progress-linear
+                      :height="20"
+                      color="#9e9e9e"
+                      v-model="proposal.nayesProgress"
+                      :style="{
+                        backgroundColor: '#9e9e9e',
+                        width: `${proposal.nayesProgress}%`,
+                      }"
+                    >
+                      <template v-slot:default="{ value }">
+                        <span class="">{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
+                      </template>
+                    </v-progress-linear>
+                  </v-row>
+                  <row v-else justify="center" class="">
                     <v-progress-linear
                       v-if="proposal.ayesProgress > proposal.nayesProgress"
                       rounded
@@ -283,6 +312,5 @@ async function castVote() {
 </script>
 <style scoped>
 .votes {
-  width: 75%;
 }
 </style>
