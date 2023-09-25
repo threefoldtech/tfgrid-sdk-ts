@@ -1,17 +1,17 @@
 <template>
   <v-container fluid>
-    <v-card color="primary" class="my-3 pa-3 text-center">
+    <v-card color="#1AA18F" class="my-3 pa-3 text-center">
       <v-icon width="26">mdi-note-check-outline</v-icon>
       <h2>DAO</h2>
     </v-card>
 
     <v-skeleton-loader :loading="loadingProposals">
-      <v-container v-if="proposals?.active?.length == 0 && proposals?.inactive?.length == 0">
+      <div v-if="proposals?.active?.length == 0 && proposals?.inactive?.length == 0">
         <v-card class="my-3 pa-3 d-flex justify-center">
           <h3>No proposals at this time</h3>
         </v-card>
-      </v-container>
-      <v-container v-else>
+      </div>
+      <div v-else>
         <v-card>
           <h4 class="d-flex justify-center pa-4">
             User, you can now vote on proposals!
@@ -76,92 +76,45 @@
                     >No <v-divider class="mx-3" vertical />{{ proposal.nayes.length }}
                   </v-btn>
                 </div>
-                <v-container v-if="proposal.ayesProgress > 0 || proposal.nayesProgress > 0">
-                  <v-row v-if="expired(proposal.end)">
-                    <v-progress-linear
-                      rounded
-                      :value="proposal.ayesProgress"
-                      height="20"
-                      :style="{
-                        width: proposal.ayesProgress + '%',
-                        marginRight: 'auto',
-                        backgroundColor: '#1AA18F',
-                        color: '#fff',
-                      }"
-                    >
-                      <strong v-if="proposal.ayesProgress >= 20"
-                        >{{
-                          !!(proposal.ayesProgress % 1) ? proposal.ayesProgress.toFixed(2) : proposal.ayesProgress
-                        }}%</strong
-                      >
-                    </v-progress-linear>
-                    <v-progress-linear
-                      rounded
-                      :value="proposal.nayesProgress"
-                      color="grey lighten-2"
-                      backgroundColor="#e0e0e0"
-                      height="20"
-                      :style="{
-                        width: proposal.nayesProgress + '%',
-                        marginRight: 'auto',
-                        color: '#333',
-                      }"
-                    >
-                      <template>
-                        <strong v-if="proposal.nayesProgress >= 20"
-                          >{{
-                            !!(proposal.nayesProgress % 1) ? proposal.nayesProgress.toFixed(2) : proposal.nayesProgress
-                          }}%</strong
-                        >
-                      </template>
-                    </v-progress-linear>
-                  </v-row>
-                  <v-row v-else>
+
+                <v-container class="justify-center" v-if="proposal.ayesProgress > 0 || proposal.nayesProgress > 0">
+                  <row justify="center" class="">
                     <v-progress-linear
                       v-if="proposal.ayesProgress > proposal.nayesProgress"
                       rounded
-                      :value="100"
+                      v-model="proposal.ayesProgress"
+                      color="#1AA18F"
                       height="20"
                       :style="{
                         width: '100%',
-                        marginRight: 'auto',
-                        backgroundColor: '#1982b1',
                         color: '#fff',
                       }"
                     >
-                      <template>
+                      <template v-slot:default="{ value }">
                         <strong>Accepted</strong>
-                        <span
-                          >{{
-                            !!(proposal.ayesProgress % 1) ? proposal.ayesProgress.toFixed(2) : proposal.ayesProgress
-                          }}%</span
-                        >
+                        <span>{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
                       </template>
                     </v-progress-linear>
                     <v-progress-linear
-                      v-else-if="proposal.ayesProgress < proposal.nayesProgress"
+                      v-else
                       rounded
-                      :value="100"
+                      v-model="proposal.nayesProgress"
                       color="grey lighten-2"
                       backgroundColor="#e0e0e0"
                       height="20"
                       :style="{
                         width: '100%',
-                        marginRight: 'auto',
                         color: '#333',
                       }"
                     >
-                      <template>
+                      <template v-slot:default="{ value }">
                         <strong>Rejected</strong>
-                        <span
-                          >{{
-                            !!(proposal.nayesProgress % 1) ? proposal.nayesProgress.toFixed(2) : proposal.nayesProgress
-                          }}%</span
-                        >
+                        <span>{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
                       </template>
                     </v-progress-linear>
-                  </v-row>
+                  </row>
                 </v-container>
+
                 <v-dialog v-model="openVDialog" max-width="600">
                   <v-card>
                     <v-card-title>Cast Vote</v-card-title>
@@ -240,7 +193,7 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-      </v-container>
+      </div>
     </v-skeleton-loader>
   </v-container>
 </template>
@@ -248,6 +201,7 @@
 import type { Proposal, Proposals } from "@threefold/tfchain_client";
 import type moment from "moment";
 import { createToast } from "mosha-vue-toastify";
+import type { start } from "repl";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
@@ -327,3 +281,8 @@ async function castVote() {
   loadingVote.value = false;
 }
 </script>
+<style scoped>
+.votes {
+  width: 75%;
+}
+</style>
