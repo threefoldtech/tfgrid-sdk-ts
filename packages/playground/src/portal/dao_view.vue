@@ -174,11 +174,10 @@
                         >
                           <input-tooltip tooltip="Select farm you wish to vote with">
                             <v-select
-                              :items="farmsOption"
+                              :items="userFarms"
+                              :item-title="item => `${item.name}`"
+                              :item-value="item => item.farmID"
                               label="Select a farm"
-                              outlined
-                              item-text="name"
-                              item-value="id"
                               v-model="selectedFarm"
                               v-bind="props"
                             >
@@ -248,9 +247,11 @@
 <script lang="ts" setup>
 import type { Proposal, Proposals } from "@threefold/tfchain_client";
 import type moment from "moment";
+import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
+import type { Farm } from "../types";
 import { getFarms } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
 
@@ -266,9 +267,9 @@ const castedVote = ref(false);
 const loadingVote = ref(false);
 const isValidFarm = ref(false);
 const selectedProposal = ref("");
-const selectedFarm = ref("");
+const selectedFarm = ref();
+const userFarms = ref<Farm[]>();
 
-const farmsOption = ref<string[]>();
 const profileManager = useProfileManager();
 const profile = ref(profileManager.profile!);
 const tabs = [
@@ -282,10 +283,7 @@ onMounted(async () => {
   if (grid) {
     proposals.value = await grid?.dao.get();
     activeProposals.value = proposals?.value?.active;
-    const userFarms = await getFarms(grid, { twinId: profile.value.twinId }, {});
-    const farms: string[] = [];
-    userFarms.map(farm => farms.push(farm.name));
-    farmsOption.value = farms;
+    userFarms.value = await getFarms(grid, { twinId: profile.value.twinId }, {});
     loadingProposals.value = false;
   }
 });
@@ -297,5 +295,33 @@ function openVoteDialog(hash: any, vote: boolean) {
   castedVote.value = vote;
   selectedProposal.value = hash;
 }
-function castVote() {}
+async function castVote() {
+  loadingVote.value = true;
+  const grid = await getGrid(profile.value);
+  console.log(selectedFarm.value);
+  if (grid) {
+    try {
+      await grid.dao.vote({
+        address: profile.value.address,
+        farmId: selectedFarm.value,
+        approve: castedVote.value,
+        hash: selectedProposal.value,
+      });
+      createToast("Transaction Complete!", {
+        position: "top-right",
+        hideProgressBar: true,
+        toastBackgroundColor: "green",
+        timeout: 5000,
+      });
+    } catch (err) {
+      createToast(`Transaction Failed!`, {
+        position: "top-right",
+        hideProgressBar: true,
+        toastBackgroundColor: "red",
+        timeout: 5000,
+      });
+    }
+  }
+  loadingVote.value = false;
+}
 </script>
