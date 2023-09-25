@@ -5,7 +5,7 @@
       <h2>DAO</h2>
     </v-card>
 
-    <v-skeleton-loader :loading="loadingProposals" max-width="100%" type="image">
+    <v-skeleton-loader :loading="loadingProposals">
       <v-container v-if="proposals?.active?.length == 0 && proposals?.inactive?.length == 0">
         <v-card class="my-3 pa-3 d-flex justify-center">
           <h3>No proposals at this time</h3>
@@ -162,39 +162,48 @@
                     </v-progress-linear>
                   </v-row>
                 </v-container>
+                <v-dialog v-model="openVDialog" max-width="600">
+                  <v-card>
+                    <v-card-title>Cast Vote</v-card-title>
+                    <v-card-text>
+                      <form-validator v-model="isValidFarm">
+                        <input-validator
+                          :value="selectedFarm"
+                          :rules="[validators.required('Required field')]"
+                          #="{ props }"
+                        >
+                          <input-tooltip tooltip="Select farm you wish to vote with">
+                            <v-select
+                              :items="farmsOption"
+                              label="Select a farm"
+                              outlined
+                              item-text="name"
+                              item-value="id"
+                              v-model="selectedFarm"
+                              v-bind="props"
+                            >
+                            </v-select>
+                          </input-tooltip>
+                        </input-validator>
+                      </form-validator>
+                    </v-card-text>
+                    <v-card-actions class="justify-end">
+                      <v-btn
+                        @click="castVote"
+                        :loading="loadingVote"
+                        color="primary white--text"
+                        :disabled="!isValidFarm"
+                        >Submit</v-btn
+                      >
+                      <v-btn @click="openVDialog = false" color="grey lighten-2 black--text">Close</v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
               </v-container>
             </v-card>
           </v-window-item>
         </v-window>
-        <v-dialog v-model="openVDialog" max-width="600">
-          <v-card>
-            <v-card-title>Cast Vote</v-card-title>
-            <v-card-text>
-              <form-validator v-model="isValidFarm">
-                <input-validator :value="selectedFarm" :rules="[validators.required('Required field')]" #="{ props }">
-                  <input-tooltip tooltip="Select farm you wish to vote with">
-                    <v-select
-                      :items="farms"
-                      label="Select a farm"
-                      outlined
-                      item-text="name"
-                      item-value="id"
-                      v-model="selectedFarm"
-                      v-bind="props"
-                    >
-                    </v-select>
-                  </input-tooltip>
-                </input-validator>
-              </form-validator>
-            </v-card-text>
-            <!-- <v-card-actions class="justify-end">
-              <v-btn @click="castVote" :loading="loadingVote" color="primary white--text" :disabled="!isValidFarm"
-                >Submit</v-btn
-              >
-              <v-btn @click="openVDialog = false" color="grey lighten-2 black--text">Close</v-btn>
-            </v-card-actions> -->
-          </v-card>
-        </v-dialog>
+
         <v-dialog v-model="openInfoModal" width="50vw">
           <v-card class="card">
             <v-card-title class="text-h5"> Proposals information </v-card-title>
@@ -237,11 +246,12 @@
   </v-container>
 </template>
 <script lang="ts" setup>
-import type { Farm, Proposal, Proposals } from "@threefold/tfchain_client";
+import type { Proposal, Proposals } from "@threefold/tfchain_client";
 import type moment from "moment";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
+import { getFarms } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
 
 const loadingProposals = ref(true);
@@ -257,7 +267,8 @@ const loadingVote = ref(false);
 const isValidFarm = ref(false);
 const selectedProposal = ref("");
 const selectedFarm = ref("");
-const farms = ref<Farm[]>();
+
+const farmsOption = ref<string[]>();
 const profileManager = useProfileManager();
 const profile = ref(profileManager.profile!);
 const tabs = [
@@ -267,8 +278,16 @@ const tabs = [
 
 onMounted(async () => {
   const grid = await getGrid(profile.value);
-  proposals.value = await grid?.dao.get();
-  activeProposals.value = proposals?.value?.active;
+
+  if (grid) {
+    proposals.value = await grid?.dao.get();
+    activeProposals.value = proposals?.value?.active;
+    const userFarms = await getFarms(grid, { twinId: profile.value.twinId }, {});
+    const farms: string[] = [];
+    userFarms.map(farm => farms.push(farm.name));
+    farmsOption.value = farms;
+    loadingProposals.value = false;
+  }
 });
 function expired(proposalEnd: moment.Moment) {
   return proposalEnd.isAfter(Date.now());
@@ -278,4 +297,5 @@ function openVoteDialog(hash: any, vote: boolean) {
   castedVote.value = vote;
   selectedProposal.value = hash;
 }
+function castVote() {}
 </script>
