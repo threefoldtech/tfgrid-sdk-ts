@@ -203,12 +203,12 @@ const routes: AppRoute[] = [
       {
         title: "Pricing Calculator",
         icon: "mdi-currency-usd",
-        route: "/explorer/pricing",
+        route: "/calculator/pricing",
       },
       {
         title: "Simulator",
         icon: "mdi-chart-line",
-        route: "/explorer/simulator",
+        route: "/calculator/simulator",
       },
     ],
   },
