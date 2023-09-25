@@ -41,7 +41,7 @@ const router = createRouter({
     },
 
     {
-      path: "/explorer",
+      path: "/calculator",
       children: [
         {
           path: "pricing",
