@@ -28,9 +28,9 @@ export default class GridProxyClient {
     this.contracts = new ContractsClient(this.__uri);
     this.farms = new FarmsClient(this.__uri);
     this.gateways = new GatewaysClient(this.__uri);
-    this.nodes = new NodesClient(this.__uri, this.farms);
-    this.stats = new StatsClient(this.__uri);
     this.twins = new TwinsClient(this.__uri);
+    this.nodes = new NodesClient(this.__uri, this.farms, this.twins);
+    this.stats = new StatsClient(this.__uri);
   }
 
   public contracts: ContractsClient;

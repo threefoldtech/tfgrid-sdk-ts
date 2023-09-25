@@ -1,7 +1,8 @@
 import { CertificationType, GatewayBuilder, GatewaysQuery, NodeStatus } from "../builders/public_api";
 import { assertId, resolvePaginator } from "../utils";
 import { AbstractClient } from "./abstract_client";
-import { Farm } from "./farms";
+import type { Farm } from "./farms";
+import type { Twin } from "./twins";
 
 export interface Resources {
   cru: number;
@@ -27,6 +28,16 @@ export interface PublicIps {
   free: number;
 }
 
+export interface NodeStats {
+  system: Resources & { ipv4u: number };
+  total: Resources & { ipv4u: number };
+  used: Resources & { ipv4u: number };
+  users: {
+    deployments: number;
+    workloads: number;
+  };
+}
+
 export interface GridNode {
   id: string;
   nodeId: number;
@@ -50,6 +61,8 @@ export interface GridNode {
   rentedByTwinId: number;
   farm: Farm;
   publicIps: PublicIps;
+  twin: Twin;
+  stats: NodeStats;
 }
 
 export class GatewaysClient extends AbstractClient<GatewayBuilder, GatewaysQuery> {

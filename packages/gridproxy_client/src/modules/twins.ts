@@ -5,7 +5,8 @@ import { AbstractClient } from "./abstract_client";
 export interface Twin {
   twinId: number;
   accountId: string;
-  ip: string;
+  relay: string;
+  publicKey: string;
 }
 
 export class TwinsClient extends AbstractClient<TwinsBuilder, TwinsQuery> {
