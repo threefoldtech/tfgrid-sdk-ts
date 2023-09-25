@@ -15,7 +15,7 @@ $ cd packages/UI
 2. Build the package:
 
 ```sh
-$ tfgrid-sdk-ts/packages/UI: yarn build-only
+$ tfgrid-sdk-ts/packages/UI: yarn build
 ```
 
 3. Copy the `dist` folder into the `html-tag-example/dist` directory:
