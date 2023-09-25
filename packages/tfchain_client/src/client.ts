@@ -232,6 +232,7 @@ class Client extends QueryClient {
   twins: Twins = new Twins(this);
   dao: Dao = new Dao(this);
   tftBridge: Bridge = new Bridge(this);
+
   declare url: string;
   mnemonicOrSecret?: string;
   keypairType: KeypairType;
