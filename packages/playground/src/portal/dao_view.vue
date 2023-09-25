@@ -33,7 +33,7 @@
               ></v-text-field>
             </v-card>
             <v-card class="my-3 pa-3" v-for="(proposal, i) in tab.content.value" :key="i">
-              <v-card-title class="pa-3 mb-2">
+              <v-card-title class="pa-3 mb-2" v-if="proposal.action">
                 {{ proposal.action.toUpperCase() }}
               </v-card-title>
               <v-card-subtitle class="pb-0">
@@ -76,8 +76,8 @@
                     >No <v-divider class="mx-3" vertical />{{ proposal.nayes.length }}
                   </v-btn>
                 </div>
-                <v-container class="px-12" v-if="proposal.ayesProgress > 0 || proposal.nayesProgress > 0">
-                  <v-row justify="center" v-if="expired(proposal.end)" class="pt-4">
+                <v-container v-if="proposal.ayesProgress > 0 || proposal.nayesProgress > 0">
+                  <v-row v-if="expired(proposal.end)">
                     <v-progress-linear
                       rounded
                       :value="proposal.ayesProgress"
@@ -116,7 +116,7 @@
                       </template>
                     </v-progress-linear>
                   </v-row>
-                  <v-row justify="center" v-else class="pt-4">
+                  <v-row v-else>
                     <v-progress-linear
                       v-if="proposal.ayesProgress > proposal.nayesProgress"
                       rounded
@@ -131,7 +131,7 @@
                     >
                       <template>
                         <strong>Accepted</strong>
-                        <span class="pl-2"
+                        <span
                           >{{
                             !!(proposal.ayesProgress % 1) ? proposal.ayesProgress.toFixed(2) : proposal.ayesProgress
                           }}%</span
@@ -153,7 +153,7 @@
                     >
                       <template>
                         <strong>Rejected</strong>
-                        <span class="pl-2"
+                        <span
                           >{{
                             !!(proposal.nayesProgress % 1) ? proposal.nayesProgress.toFixed(2) : proposal.nayesProgress
                           }}%</span
@@ -282,7 +282,9 @@ onMounted(async () => {
 
   if (grid) {
     proposals.value = await grid?.dao.get();
-    activeProposals.value = proposals?.value?.active;
+    activeProposals.value = proposals.value.active.filter(proposal => proposal.hash);
+    inactiveProposals.value = proposals.value.inactive.filter(proposal => proposal.hash);
+
     userFarms.value = await getFarms(grid, { twinId: profile.value.twinId }, {});
     loadingProposals.value = false;
   }
