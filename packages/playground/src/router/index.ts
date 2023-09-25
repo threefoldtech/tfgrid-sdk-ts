@@ -45,7 +45,7 @@ const router = createRouter({
       children: [
         {
           path: "pricing",
-          component: () => import("../portal/resource_pricing.vue"),
+          component: () => import("../calculator/resource_pricing.vue"),
           meta: { title: "Resource Pricing" },
         },
       ],
@@ -55,7 +55,7 @@ const router = createRouter({
       children: [
         {
           path: "stats",
-          component: () => import("../portal/stats.vue"),
+          component: () => import("../explorer/stats.vue"),
           meta: { title: "Statistics" },
         },
       ],
