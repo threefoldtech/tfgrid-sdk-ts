@@ -10,7 +10,6 @@
     </v-row>
   </v-card>
 
-  //TODO: where to put placeholder
   <v-card class="pa-4 my-4 white--text" v-if="isExpanded">
     <v-row class="pa-5 text-center" justify="end">
       <v-column v-for="(filter, index) in props.filters" :key="index" class="pr-8">
@@ -34,6 +33,8 @@
 import { ref } from "vue";
 
 import type { Validators } from "../types";
+
+// TODO: placeholder
 
 interface Filter {
   label: string;
