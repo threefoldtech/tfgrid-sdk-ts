@@ -37,6 +37,11 @@ const router = createRouter({
           component: () => import("../portal/transfer_view.vue"),
           meta: { title: "Transfer" },
         },
+        {
+          path: "farms",
+          component: () => import("../portal/farms_view.vue"),
+          meta: { title: "Farms" },
+        },
       ],
     },
 
