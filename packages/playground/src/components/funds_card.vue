@@ -37,7 +37,7 @@ export default {
           await ProfileManagerController.reloadBalance();
           loadingAddTFT.value = false;
           createToast(`Success!`, {
-            position: "bottom-right",
+            position: "top-right",
             hideProgressBar: true,
             toastBackgroundColor: "#1aa18f",
             timeout: 5000,
@@ -48,7 +48,7 @@ export default {
           loadingAddTFT.value = false;
           console.log("Error: ", e);
           createToast(`Get more TFT failed!`, {
-            position: "bottom-right",
+            position: "top-right",
             hideProgressBar: true,
             toastBackgroundColor: "black",
             timeout: 5000,

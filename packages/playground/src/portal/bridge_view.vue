@@ -207,7 +207,7 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
     loadingWithdraw.value = false;
     await ProfileManagerController.reloadBalance();
     createToast("Transaction Succeeded", {
-      position: "bottom-right",
+      position: "top-right",
       hideProgressBar: true,
       toastBackgroundColor: "black",
       timeout: 5000,
@@ -221,7 +221,7 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
     amount.value = 0;
     loadingWithdraw.value = false;
     createToast("Withdraw Failed!", {
-      position: "bottom-right",
+      position: "top-right",
       hideProgressBar: true,
       toastBackgroundColor: "red",
       timeout: 5000,

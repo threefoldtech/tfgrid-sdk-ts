@@ -108,7 +108,7 @@ onMounted(async () => {
     const DecimalDeposit = new Decimal(receivedDeposit);
     const divisor = new Decimal(10000000);
     createToast(`You have received ${DecimalDeposit.dividedBy(divisor)} TFT`, {
-      position: "bottom-right",
+      position: "top-right",
       hideProgressBar: true,
       toastBackgroundColor: "black",
       timeout: 5000,
@@ -121,7 +121,7 @@ onMounted(async () => {
     if (destroyed) return;
     console.log(e);
     createToast(e as string, {
-      position: "bottom-right",
+      position: "top-right",
       hideProgressBar: true,
       toastBackgroundColor: "red",
       timeout: 5000,

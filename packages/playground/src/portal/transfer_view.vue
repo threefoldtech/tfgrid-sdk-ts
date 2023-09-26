@@ -211,8 +211,10 @@ async function transfer(receipientTwin: Twin) {
       createToast("Transaction Complete!", {
         position: "top-right",
         hideProgressBar: true,
-        toastBackgroundColor: "green",
+        toastBackgroundColor: "#1aa18f",
         timeout: 5000,
+        showIcon: true,
+        type: "success",
       });
       profileManagerController.reloadBalance();
       await getFreeBalance();
@@ -232,6 +234,8 @@ function createInvalidTransferToast(message: string) {
     hideProgressBar: true,
     toastBackgroundColor: "red",
     timeout: 5000,
+    showIcon: true,
+    type: "danger",
   });
 }
 async function submitFormTwinID() {

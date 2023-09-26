@@ -33,6 +33,8 @@ onMounted(async () => {
         hideProgressBar: true,
         toastBackgroundColor: "red",
         timeout: 5000,
+        showIcon: true,
+        type: "info",
       });
     }
     await new Promise(resolve => setTimeout(resolve, 15 * 60 * 1000));
