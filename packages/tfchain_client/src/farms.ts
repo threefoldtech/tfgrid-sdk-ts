@@ -1,4 +1,4 @@
-import { QueryClient } from "./client";
+import { Client, QueryClient } from "./client";
 import { PublicIp } from "./types";
 import { checkConnection } from "./utils";
 
@@ -32,6 +32,14 @@ interface QueryFarmsGetOptions {
   id: number;
 }
 
+interface CreateFarmOptions {
+  name: string;
+  publicIps?: {
+    ip?: number;
+    gw?: number;
+  };
+}
+
 class QueryFarms {
   constructor(public client: QueryClient) {
     this.client = client;
@@ -44,4 +52,17 @@ class QueryFarms {
   }
 }
 
-export { QueryFarms, Farm, Certification, FarmingPolicyLimits };
+class Farms extends QueryFarms {
+  constructor(public client: Client) {
+    super(client);
+    this.client = client;
+  }
+
+  @checkConnection
+  async create(options: CreateFarmOptions) {
+    const extrinsic = this.client.api.tx.tfgridModule.createFarm(options.name, options.publicIps);
+    return this.client.patchExtrinsic(extrinsic);
+  }
+}
+
+export { QueryFarms, Farms, Farm, Certification, FarmingPolicyLimits };

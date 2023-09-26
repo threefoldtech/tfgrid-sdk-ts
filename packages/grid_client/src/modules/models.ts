@@ -642,6 +642,16 @@ class FarmIdModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) id: number;
 }
 
+class FarmPublicIPsModel {
+  @Expose() @IsOptional() @IsIP() ip?: number;
+  @Expose() @IsOptional() gw?: number;
+}
+
+class CreateFarmModel {
+  @Expose() @IsString() @IsNotEmpty() @MaxLength(NameLength) name: string;
+  @Expose() @IsOptional() publicIps?: FarmPublicIPsModel;
+}
+
 class pingFarmModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
 }
@@ -777,6 +787,7 @@ export {
   ZOSNodeModel,
   NodePowerModel,
   FarmIdModel,
+  CreateFarmModel,
   pingFarmModel,
   CreateServiceContractModel,
   ServiceContractApproveModel,
