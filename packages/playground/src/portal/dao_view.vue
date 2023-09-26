@@ -244,7 +244,6 @@
 import type { Proposal, Proposals } from "@threefold/tfchain_client";
 import type moment from "moment";
 import { createToast } from "mosha-vue-toastify";
-import type { Ref } from "vue";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
@@ -305,7 +304,7 @@ function filteredProposals(proposals: Proposal[] | undefined) {
 async function castVote() {
   loadingVote.value = true;
   const grid = await getGrid(profile.value);
-  console.log(selectedFarm.value);
+
   if (grid) {
     try {
       await grid.dao.vote({
