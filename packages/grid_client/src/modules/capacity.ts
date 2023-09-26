@@ -13,6 +13,7 @@ import {
   NodeFreeResourcesModel,
   NodesByFarmIdModel,
   NodesGetModel,
+  UserFarmsGetModel,
 } from "./models";
 
 class Capacity {
@@ -35,6 +36,11 @@ class Capacity {
   @expose
   async getAllFarms(): Promise<FarmInfo[]> {
     return await this.nodes.getAllFarms();
+  }
+
+  @expose
+  async getUserFarms(options: UserFarmsGetModel): Promise<FarmInfo[]> {
+    return await this.nodes.getUserFarms(options.twinId);
   }
 
   @expose

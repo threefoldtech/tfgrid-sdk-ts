@@ -166,6 +166,20 @@ class Nodes {
       });
   }
 
+  async getUserFarms(twinId: number, page = 1, pageSize = 50, url = ""): Promise<FarmInfo[]> {
+    let r: string;
+    if (url) r = url;
+    else r = this.proxyURL;
+
+    return send("get", urlJoin(r, `/farms?twin_id=${twinId}&page=${page}&size=${pageSize}`), "", {})
+      .then(res => {
+        return res;
+      })
+      .catch(err => {
+        throw Error(`Error listing farms for twin id ${twinId}: ${err}`);
+      });
+  }
+
   async getAllFarms(url = ""): Promise<FarmInfo[]> {
     try {
       const farmsCount = await this.gqlClient.getItemTotalCount("farms", "(orderBy: farmID_ASC)");
