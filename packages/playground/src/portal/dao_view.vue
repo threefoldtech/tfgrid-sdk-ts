@@ -138,7 +138,7 @@
                       }"
                     >
                       <template v-slot:default="{ value }">
-                        <strong>Accepted</strong>
+                        <strong class="mx-3">Accepted </strong>
                         <span>{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
                       </template>
                     </v-progress-linear>
@@ -155,7 +155,7 @@
                       }"
                     >
                       <template v-slot:default="{ value }">
-                        <strong>Rejected</strong>
+                        <strong class="mx-3">Rejected </strong>
                         <span>{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
                       </template>
                     </v-progress-linear>
