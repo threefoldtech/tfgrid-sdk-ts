@@ -44,3 +44,8 @@ export const optionsInitializer: FilterOptions = {
   size: 10,
   status: NodeStatus.Up,
 };
+
+export type ResourceWrapper = {
+  name: string;
+  value: string;
+};

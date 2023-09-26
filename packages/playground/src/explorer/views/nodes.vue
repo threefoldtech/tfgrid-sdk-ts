@@ -17,7 +17,7 @@
                 <v-row>
                   <v-col>
                     <v-row>
-                      <v-col cols="4">
+                      <v-col cols="12" sm="6" md="6" lg="4">
                         <input-tooltip inline tooltip="Enable filtering the nodes that have Gateway supported only.">
                           <v-switch
                             color="primary"
@@ -28,7 +28,7 @@
                           />
                         </input-tooltip>
                       </v-col>
-                      <v-col cols="4">
+                      <v-col cols="12" sm="6" md="6" lg="4">
                         <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
                           <v-switch
                             color="primary"
@@ -41,8 +41,15 @@
                       </v-col>
                     </v-row>
                   </v-col>
-                  <v-col>
-                    <v-row justify="end">
+                  <v-col cols="12" sm="12" md="12" lg="4">
+                    <v-row
+                      justify="start"
+                      justify-md="start"
+                      justify-sm="start"
+                      justify-lg="end"
+                      justify-xl="end"
+                      justify-xxl="end"
+                    >
                       <v-col cols="7">
                         <v-select
                           class="p-4"
@@ -56,6 +63,11 @@
                   </v-col>
                 </v-row>
               </div>
+              <div class="hint mb-2 mt-3">
+                <v-alert type="info" variant="tonal">
+                  The nodes will be filtered and displayed after 1 second once you remove your finger from the filters.
+                </v-alert>
+              </div>
               <node-table
                 v-model="nodes"
                 v-model:size="filterOptions.size"
@@ -63,27 +75,32 @@
                 :count="nodesCount"
                 :loading="tableLoading"
                 v-model:selectedNode="selectedNode"
+                @open-dialog="openDialog"
               />
             </div>
           </v-col>
         </v-row>
       </div>
     </div>
-    <node-details :openDetails="openeDetails" :node="selectedNode" @close-details="openeDetails = false" />
+    <node-details :node="selectedNode" :openDialog="isDialogOpened" @close-dialog="closeDialog" />
   </view-layout>
 </template>
 
 <script lang="ts">
 import { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
+import debounce from "lodash/debounce.js";
 import { ref, watch } from "vue";
 import { onMounted } from "vue";
+import { useRoute } from "vue-router";
+
+import router from "@/router";
 
 import toFixedCsSize from "../../utils/to_fixed_cs_size";
 import toReadableDate from "../../utils/to_readable_data";
 import NodeFilter from "../components/common/filters/node_filter.vue";
 import NodeDetails from "../components/nodes/node_details.vue";
 import NodeTable from "../components/nodes/nodes_table.vue";
-import { getFilterValues, inputsInitializer, requestNodes } from "../utils/helpers";
+import { getFilterValues, getNode, inputsInitializer, nodeInitializer, requestNodes } from "../utils/helpers";
 import { type FilterInputs, type FilterOptions, type MixedFilter, optionsInitializer } from "../utils/types.js";
 
 export default {
@@ -100,10 +117,11 @@ export default {
     const tableLoading = ref(false);
     const nodes = ref<GridNode[]>([]);
     const nodesCount = ref<number>(0);
-    const selectedNode = ref<GridNode>();
-    const openeDetails = ref<boolean>(false);
+    const selectedNode = ref<GridNode>(nodeInitializer);
+    const isDialogOpened = ref<boolean>(false);
 
     const nodeStatusOptions = [NodeStatus.Up, NodeStatus.Down];
+    const route = useRoute();
 
     const _requestNodes = async (options: Partial<NodesQuery> = {}, loadFarm = false) => {
       try {
@@ -122,11 +140,8 @@ export default {
 
     watch(mixedFilters.value, async () => {
       const options = getFilterValues(mixedFilters.value);
-      await _requestNodes(options, true);
-    });
-
-    watch(selectedNode, async () => {
-      openeDetails.value = true;
+      const request = debounce(_requestNodes, 1000);
+      await request(options, true);
     });
 
     // The mixed filters should reset to the default value again..
@@ -139,7 +154,30 @@ export default {
       mixedFilters.value.options.size = 10;
     };
 
+    const checkSelectedNode = async () => {
+      if (route.query.nodeId) {
+        const node: any = await getNode(+route.query.nodeId);
+        node.total_resources = node.capacity.total_resources;
+        node.used_resources = node.capacity.used_resources;
+        selectedNode.value = node;
+        isDialogOpened.value = true;
+      }
+    };
+
+    const closeDialog = () => {
+      if (route.query.nodeId) {
+        router.replace(route.path);
+      }
+      isDialogOpened.value = false;
+      selectedNode.value = nodeInitializer;
+    };
+
+    const openDialog = () => {
+      isDialogOpened.value = true;
+    };
+
     onMounted(async () => {
+      await checkSelectedNode();
       const options = getFilterValues(mixedFilters.value);
       await _requestNodes(options, true);
     });
@@ -154,7 +192,9 @@ export default {
 
       filterInputs,
       filterOptions,
-      openeDetails,
+      isDialogOpened,
+      openDialog,
+      closeDialog,
 
       requestNodes,
       toReadableDate,

@@ -1,4 +1,9 @@
-import GridProxyClient, { type NodesQuery } from "@threefold/gridproxy_client";
+import GridProxyClient, {
+  CertificationType,
+  type GridNode,
+  type NodesQuery,
+  NodeStatus,
+} from "@threefold/gridproxy_client";
 
 import { isNumeric } from "../../utils/validators";
 import type { FilterInputs, MixedFilter } from "./types";
@@ -7,6 +12,12 @@ export function requestNodes(options: Partial<NodesQuery>, loadFarm?: boolean) {
   const network = process.env.NETWORK || (window as any).env.NETWORK;
   const client = new GridProxyClient(network);
   return client.nodes.list(options, { loadFarm: loadFarm });
+}
+
+export function getNode(nodeId: number) {
+  const network = process.env.NETWORK || (window as any).env.NETWORK;
+  const client = new GridProxyClient(network);
+  return client.nodes.byId(nodeId);
 }
 
 export const toBytes = (resource: number | undefined): number => {
@@ -43,9 +54,23 @@ export const inputsInitializer: FilterInputs = {
     type: "text",
   },
   farmIds: {
-    label: "Farm ID",
-    placeholder: "Find nodes in Farms with ids.",
-    rules: [[isNumeric("This field accepts numbers only.", { no_symbols: true })]],
+    label: "Farm IDs",
+    placeholder: "e.g. 1, 2, 3",
+    rules: [
+      [
+        isNumeric("This field accepts numbers only.", { no_symbols: true }),
+        (value: string) => {
+          const ids = value.split(",").map((id: string) => {
+            if (isNaN(+id)) {
+              return isNumeric("This field accepts numbers only.", { no_symbols: true });
+            } else {
+              return isNumeric("This field accepts numbers only.", { no_symbols: true });
+            }
+          });
+          console.log(ids);
+        },
+      ],
+    ],
     type: "text",
   },
   farmName: {
@@ -77,4 +102,38 @@ export const inputsInitializer: FilterInputs = {
     rules: [[isNumeric("This field accepts numbers only.", { no_symbols: true })]],
     type: "text",
   },
+};
+
+export const nodeInitializer: GridNode = {
+  id: "",
+  nodeId: 0,
+  farmId: 0,
+  twinId: 0,
+  country: "",
+  gridVersion: 0,
+  city: "",
+  uptime: 0,
+  created: 0,
+  farmingPolicyId: 0,
+  updatedAt: 0,
+  total_resources: { mru: 0, sru: 0, hru: 0, cru: 0 },
+  used_resources: { mru: 0, sru: 0, hru: 0, cru: 0 },
+  location: { city: "", country: "" },
+  publicConfig: { domain: "", gw4: "", ipv6: "", gw6: "", ipv4: "" },
+  status: NodeStatus.Up,
+  certificationType: CertificationType.Diy,
+  dedicated: false,
+  rentContractId: 0,
+  rentedByTwinId: 0,
+  farm: {
+    certificationType: CertificationType.Diy,
+    dedicated: false,
+    farmId: 0,
+    name: "",
+    pricingPolicyId: 0,
+    publicIps: [],
+    twinId: 0,
+    stellarAddress: "",
+  },
+  publicIps: { free: 0, total: 0, used: 0 },
 };

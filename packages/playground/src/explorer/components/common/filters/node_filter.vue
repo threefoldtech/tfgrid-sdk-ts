@@ -20,8 +20,8 @@
               v-if="$props.modelValue[key].label"
               v-model:error="$props.modelValue[key].error"
               #="{ props }"
-              :rules="$props.modelValue[key].rules[0]"
-              :async-rules="$props.modelValue[key].rules[1]"
+              :rules="$props.modelValue[key].rules?.[0] ?? []"
+              :async-rules="$props.modelValue[key].rules?.[1] ?? []"
               :value="$props.modelValue[key].value"
             >
               <v-text-field
