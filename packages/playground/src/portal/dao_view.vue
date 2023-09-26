@@ -30,11 +30,12 @@
             <v-text-field
               v-model="searchTerm"
               color="primary darken-2"
-              label="Search by proposal action or description"
+              label="Search by proposal description"
               class="pa-3"
             ></v-text-field>
           </v-card>
-          <v-card class="my-3 pa-3" v-for="(proposal, i) in tab.content.value" :key="i">
+
+          <v-card class="my-3 pa-3" v-for="(proposal, i) in filteredProposals(tab.content.value)" :key="i">
             <v-card-title class="pa-3 mb-2" v-if="proposal.action">
               {{ proposal.action.toUpperCase() }}
             </v-card-title>
@@ -243,6 +244,7 @@
 import type { Proposal, Proposals } from "@threefold/tfchain_client";
 import type moment from "moment";
 import { createToast } from "mosha-vue-toastify";
+import type { Ref } from "vue";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
@@ -291,6 +293,14 @@ function openVoteDialog(hash: any, vote: boolean) {
   openVDialog.value = true;
   castedVote.value = vote;
   selectedProposal.value = hash;
+}
+function filteredProposals(proposals: Proposal[] | undefined) {
+  if (searchTerm.value.length) {
+    if (proposals) {
+      return proposals.filter(proposal => proposal.description.includes(searchTerm.value));
+    }
+  }
+  return proposals;
 }
 async function castVote() {
   loadingVote.value = true;
