@@ -2,7 +2,7 @@ import moment from "moment";
 
 import { Client, QueryClient } from "./client";
 import { checkConnection } from "./utils";
-interface Proposal {
+export interface Proposal {
   threshold: number;
   ayes: AyesAndNayes[];
   nayes: AyesAndNayes[];
