@@ -36,7 +36,7 @@ export default {
           await grid?.balance.getMoreFunds();
           await ProfileManagerController.reloadBalance();
           loadingAddTFT.value = false;
-          createToast(` Success! You have received TFTs.!`, {
+          createToast(` Success! You have received TFTs.`, {
             position: "top-right",
             hideProgressBar: true,
             toastBackgroundColor: "#1aa18f",
