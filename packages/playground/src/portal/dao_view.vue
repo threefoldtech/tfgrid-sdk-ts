@@ -98,32 +98,49 @@
                       </v-btn>
                     </v-row>
                   </v-container>
-                  <v-container :style="{ width: '100%' }" class="">
+                  <v-container
+                    :style="{ width: '100%' }"
+                    v-if="proposal.ayesProgress > 0 || proposal.nayesProgress > 0"
+                  >
                     <v-row v-if="expired(proposal.end)" class="">
-                      <v-progress-linear
-                        :height="20"
-                        color="#1AA18F"
-                        :value="proposal.ayesProgress"
-                        :style="{
-                          backgroundColor: '#9e9e9e',
-                          marginRight: 'auto',
-                        }"
-                      >
-                        <v-row class="d-flex justify-space-around">
+                      <div :style="{ width: `${proposal.ayesProgress}%` }">
+                        <v-progress-linear
+                          :height="20"
+                          color="#1AA18F"
+                          v-model="proposal.ayesProgress"
+                          :style="{
+                            backgroundColor: '#1AA18F',
+                            marginRight: 'auto',
+                          }"
+                        >
                           <span class=""
                             >{{
                               !!(proposal.ayesProgress % 1) ? proposal.ayesProgress.toFixed(2) : proposal.ayesProgress
                             }}%</span
                           >
-                          <span class="text-black"
-                            >{{
-                              !!(proposal.nayesProgress % 1)
-                                ? proposal.nayesProgress.toFixed(2)
-                                : proposal.nayesProgress
-                            }}%</span
-                          >
-                        </v-row>
-                      </v-progress-linear>
+                        </v-progress-linear>
+                      </div>
+                      <div :style="{ width: `${proposal.nayesProgress}%` }">
+                        <v-progress-linear
+                          :height="20"
+                          color="#9e9e9e"
+                          v-model="proposal.nayesProgress"
+                          :style="{
+                            backgroundColor: '#9e9e9e',
+                            marginRight: 'auto',
+                          }"
+                        >
+                          <v-row class="d-flex justify-center">
+                            <span class="text-black"
+                              >{{
+                                !!(proposal.nayesProgress % 1)
+                                  ? proposal.nayesProgress.toFixed(2)
+                                  : proposal.nayesProgress
+                              }}%</span
+                            >
+                          </v-row>
+                        </v-progress-linear>
+                      </div>
                     </v-row>
                     <v-row v-else justify="center" class="">
                       <v-progress-linear
