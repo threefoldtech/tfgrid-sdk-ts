@@ -23,47 +23,7 @@
       </div>
 
       <template v-else>
-        <div class="node-resources mt-10">
-          <v-row justify="center">
-            <v-col cols="8">
-              <h2 class="node-resources-title text-center text-h4 flex justify-center items-center">
-                <v-icon size="40" class="mr-2">mdi-chart-pie</v-icon>
-                Node Resources
-                <span :style="'color:' + (node.status === nodeStatus.Up ? '#4caf50' : '#f44336')">{{
-                  node.status === nodeStatus.Up ? "[Online]" : "Offline"
-                }}</span>
-              </h2>
-            </v-col>
-          </v-row>
-          <!-- Details -->
-          <v-row>
-            <v-col cols="12">
-              <div class="d-flex justify-center">
-                <div v-for="item in resources" :key="item.name" class="mx-6 d-flex flex-column align-center">
-                  <div>{{ item.name }}</div>
-                  <div class="text-center">
-                    <v-progress-circular
-                      :model-value="isNaN(+item.value) ? 0 : item.value"
-                      :size="150"
-                      :width="15"
-                      color="primary"
-                      v-if="isNaN(+item.value)"
-                      >NA
-                    </v-progress-circular>
-                    <v-progress-circular
-                      :model-value="isNaN(+item.value) ? 0 : item.value"
-                      :size="150"
-                      :width="15"
-                      color="primary"
-                      v-else
-                      >{{ item.value }}%
-                    </v-progress-circular>
-                  </div>
-                </div>
-              </div>
-            </v-col>
-          </v-row>
-        </div>
+        <node-resources-charts :node="node" />
       </template>
     </v-card>
   </v-dialog>
@@ -73,16 +33,17 @@
 // import the styling for the toast
 import "mosha-vue-toastify/dist/style.css";
 
-import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
+import type { GridNode } from "@threefold/gridproxy_client";
 import { byCountry } from "country-code-lookup";
 import { createToast } from "mosha-vue-toastify";
 import type { PropType } from "vue";
 import { ref, watch } from "vue";
 
 import { gqlClient, gridProxyClient } from "@/clients";
-import type { ResourceWrapper } from "@/explorer/utils/types";
 import toHumanDate from "@/utils/date";
 import toFixedCsSize from "@/utils/to_fixed_cs_size";
+
+import NodeResourcesCharts from "./node_resources_charts.vue";
 
 export default {
   props: {
@@ -95,6 +56,9 @@ export default {
       required: true,
     },
   },
+  components: {
+    NodeResourcesCharts,
+  },
 
   setup(props) {
     const dialog = ref(false);
@@ -103,20 +67,6 @@ export default {
     const twinDetails = ref(null);
     const nodesMap = ref(null);
     const interfacesDetails = ref(null);
-    const resources = ref<ResourceWrapper[]>([]);
-    const nodeStatus = NodeStatus;
-
-    const getNodeResources = () => {
-      for (const resource in props.node.used_resources) {
-        resources.value.push({
-          name: resource.toLocaleUpperCase(),
-          value: (
-            (Reflect.get(props.node.used_resources, resource) / Reflect.get(props.node.total_resources, resource)) *
-            100
-          ).toFixed(2),
-        });
-      }
-    };
 
     // const getFarmDetails = async () => {
     //   if (props.node) {
@@ -155,12 +105,12 @@ export default {
     const loadData = async () => {
       loading.value = true;
       if (props.node) {
-        console.log("resources", resources.value);
+        // console.log("resources", resources.value);
         // await getFarmDetails();
         // await getTwinDetails();
         // await getStats();
         // await getInterfaces();
-        getNodeResources();
+        // getNodeResources();
       }
       loading.value = false;
     };
@@ -190,7 +140,7 @@ export default {
       () => props.openDialog,
       newValue => {
         if (!newValue) {
-          resources.value = [];
+          // resources.value = [];
         }
         dialog.value = newValue as boolean;
         if (newValue) {
@@ -205,8 +155,6 @@ export default {
       twinDetails,
       nodesMap,
       interfacesDetails,
-      resources,
-      nodeStatus,
       toFixedCsSize,
       // copy,
       toHumanDate,

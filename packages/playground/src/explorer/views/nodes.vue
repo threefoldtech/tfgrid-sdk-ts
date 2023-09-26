@@ -172,7 +172,10 @@ export default {
       selectedNode.value = nodeInitializer;
     };
 
-    const openDialog = () => {
+    const openDialog = (item: { props: { title: GridNode } }) => {
+      const node: GridNode = item.props.title;
+      selectedNode.value = node;
+      router.push({ path: route.path, query: { nodeId: selectedNode.value.nodeId } });
       isDialogOpened.value = true;
     };
 

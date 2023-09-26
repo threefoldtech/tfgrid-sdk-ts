@@ -43,16 +43,13 @@
 <script lang="ts">
 import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
 import type { PropType } from "vue";
-import { useRoute } from "vue-router";
 import type { VDataTable } from "vuetify/labs/VDataTable";
-
-import router from "@/router";
 
 import toFixedCsSize from "../../../utils/to_fixed_cs_size";
 import toReadableDate from "../../../utils/to_readable_data";
 
 export default {
-  emits: ["update:page", "update:size", "update:selectedNode", "open-dialog"],
+  emits: ["update:page", "update:size", "open-dialog"],
   props: {
     size: {
       required: true,
@@ -81,7 +78,6 @@ export default {
   },
   setup(props, { emit }) {
     const nodeStatusOptions = [NodeStatus.Up, NodeStatus.Down];
-    const route = useRoute();
 
     const headers: VDataTable["headers"] = [
       { title: "ID", key: "nodeId" },
@@ -130,10 +126,6 @@ export default {
     };
 
     const openSheet = (_e: any, { item }: any) => {
-      const node: GridNode = item.props.title;
-      const nodeId = node.nodeId;
-      router.push({ path: route.path, query: { nodeId: nodeId } });
-      emit("update:selectedNode", node);
       emit("open-dialog", item);
     };
 
