@@ -1,32 +1,32 @@
 <template>
-  <v-card class="pa-4 my-4 white--text">
-    <v-row class="pa-5 text-center">
-      <button @click="toggleList">
-        <div>
-          <span>Filters</span>
-          <span :class="{ 'rotate-arrow': isExpanded }">&#9660;</span>
-        </div>
-      </button>
-    </v-row>
-  </v-card>
-
-  <v-card class="pa-4 my-4 white--text" v-if="isExpanded">
-    <v-row class="pa-5 text-center" justify="end">
-      <v-column v-for="(filter, index) in props.filters" :key="index" class="pr-8">
-        <v-list-subheader>{{ filter.label }}</v-list-subheader>
-        <input-validator
-          :value="filterValues[filter.key].value"
-          :rules="validated(filter.key, validators)"
-          #="{ props }"
-        >
-          <v-text-field type="text" v-model="filterValues[filter.key].value" v-bind="props" />
-        </input-validator>
-      </v-column>
-      <v-column class="pr-7 pt-12">
-        <v-btn color="blue" class="ml-auto bold-text" @click="resetFilters">Reset Filters</v-btn>
-      </v-column>
-    </v-row>
-  </v-card>
+  <v-expansion-panels class="pt-5">
+    <v-expansion-panel>
+      <v-expansion-panel-title>
+        <template v-slot:default="{}">
+          <v-row no-gutters>
+            <v-col cols="4" class="d-flex justify-start text-h6"> Filters</v-col>
+          </v-row>
+        </template>
+      </v-expansion-panel-title>
+      <v-expansion-panel-text>
+        <v-row no-gutters>
+          <v-column v-for="(filter, index) in props.filters" :key="index" class="pr-8">
+            <v-list-subheader>{{ filter.label }}</v-list-subheader>
+            <input-validator
+              :value="filterValues[filter.key].value"
+              :rules="validated(filter.key, validators)"
+              #="{ props }"
+            >
+              <v-text-field type="text" v-model="filterValues[filter.key].value" v-bind="props" />
+            </input-validator>
+          </v-column>
+          <v-column class="pr-7 pt-12">
+            <v-btn color="blue" class="ml-auto bold-text" @click="resetFilters">Reset Filters</v-btn>
+          </v-column>
+        </v-row>
+      </v-expansion-panel-text>
+    </v-expansion-panel>
+  </v-expansion-panels>
 </template>
 
 <script setup lang="ts">
@@ -65,7 +65,7 @@ function validated(key: string, validators: Validators) {
   }
 
   if (key === "gpu_vendor_name" || key === "gpu_device_name") {
-    const allowedPattern = /^[A-Za-z0-9[\]/,.]+$/; // Remove the unnecessary escape for the dot
+    const allowedPattern = /^[A-Za-z0-9[\]/,.]+$/;
     if (!allowedPattern.test(filterValues[key].value)) {
       rules.push(validators.isAlphanumeric("This Field accepts only letters and numbers."));
     }
@@ -82,11 +82,3 @@ function resetFilters() {
   }
 }
 </script>
-
-<style>
-/* TODO: Not rotating */
-.rotate-arrow {
-  transform: rotate(180deg);
-  transition: transform 0.2s;
-}
-</style>
