@@ -129,6 +129,12 @@ export interface GatewayNode {
   ip?: string;
 }
 
+export interface IStatistics {
+  data: number | string;
+  title: string;
+  icon: string;
+}
+
 export interface SMTPServer {
   enabled: boolean;
   username: string;
