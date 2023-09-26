@@ -12,6 +12,23 @@
         </v-card>
       </div>
       <div v-else>
+        <!-- <div class="d-flex">
+          <v-progress-linear
+            class="d-flex flex-row"
+            :height="20"
+            color="#1AA18F"
+            v-model="dummy"
+            :style="{
+              backgroundColor: '#1AA18F',
+              width: `${20}%`,
+              marginLeft: 'auto',
+            }"
+          >
+            <template v-slot:default="{ value }">
+              <span class="">{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
+            </template>
+          </v-progress-linear>
+        </div> -->
         <v-card>
           <h4 class="d-flex justify-center pa-4">
             User, you can now vote on proposals!
@@ -57,92 +74,94 @@
                   Voting ended on: <span class="text--secondary">{{ proposal.end }}</span>
                 </p>
               </v-card-text>
-              <v-container fluid class="votes">
-                <div v-if="expired(proposal.end)" class="d-flex justify-space-between my-3 mx-8">
-                  <v-btn color="primary" @click="openVoteDialog(proposal.hash, true)" :disabled="loadingVote"
-                    >Yes <v-divider class="mx-3" vertical />{{ proposal.ayes.length }}
-                  </v-btn>
-                  <div class="d-flex align-center text-center pr-2">
-                    <v-divider vertical />
-                    <span class="px-1"
-                      >Threshold: <br />{{ proposal.nayes.length + proposal.ayes.length }}/{{ proposal.threshold }}
-                    </span>
-                    <v-divider vertical />
-                  </div>
-                  <v-btn
-                    color="grey lighten-2 black--text"
-                    @click="openVoteDialog(proposal.hash, false)"
-                    :disabled="loadingVote"
-                    >No <v-divider class="mx-3" vertical />{{ proposal.nayes.length }}
-                  </v-btn>
-                </div>
-
-                <v-container fluid v-if="proposal.ayesProgress > 0 || proposal.nayesProgress > 0">
-                  <v-row justify="stretch" align-content="start" v-if="expired(proposal.end)">
-                    <v-progress-linear
-                      :height="20"
-                      color="#1AA18F"
-                      v-model="proposal.ayesProgress"
-                      :style="{
-                        backgroundColor: '#1AA18F',
-                        width: `${proposal.ayesProgress}%`,
-                      }"
-                    >
-                      <template v-slot:default="{ value }">
-                        <span class="">{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
-                      </template>
-                    </v-progress-linear>
-
-                    <v-progress-linear
-                      :height="20"
-                      color="#9e9e9e"
-                      v-model="proposal.nayesProgress"
-                      :style="{
-                        backgroundColor: '#9e9e9e',
-                        width: `${proposal.nayesProgress}%`,
-                      }"
-                    >
-                      <template v-slot:default="{ value }">
-                        <span class="">{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
-                      </template>
-                    </v-progress-linear>
-                  </v-row>
-                  <row v-else justify="center" class="">
-                    <v-progress-linear
-                      v-if="proposal.ayesProgress > proposal.nayesProgress"
-                      rounded
-                      v-model="proposal.ayesProgress"
-                      color="#1AA18F"
-                      height="20"
-                      :style="{
-                        width: '100%',
-                        color: '#fff',
-                      }"
-                    >
-                      <template v-slot:default="{ value }">
-                        <strong>Accepted</strong>
-                        <span>{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
-                      </template>
-                    </v-progress-linear>
-                    <v-progress-linear
-                      v-else
-                      rounded
-                      v-model="proposal.nayesProgress"
-                      color="grey lighten-2"
-                      backgroundColor="#e0e0e0"
-                      height="20"
-                      :style="{
-                        width: '100%',
-                        color: '#333',
-                      }"
-                    >
-                      <template v-slot:default="{ value }">
-                        <strong>Rejected</strong>
-                        <span>{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
-                      </template>
-                    </v-progress-linear>
-                  </row>
-                </v-container>
+              <v-container fluid>
+                <v-col class="votes">
+                  <v-container class="" :style="{}">
+                    <v-row v-if="expired(proposal.end)" class="d-flex justify-space-between">
+                      <v-btn
+                        :style="{ backgroundColor: '#1AA18F' }"
+                        @click="openVoteDialog(proposal.hash, true)"
+                        :disabled="loadingVote"
+                        class="text-white"
+                        >Yes <v-divider class="mx-3" vertical />{{ proposal.ayes.length }}
+                      </v-btn>
+                      <div class="d-flex align-center text-center pr-2">
+                        <span class="px-1"
+                          >Threshold: {{ proposal.nayes.length + proposal.ayes.length }}/{{ proposal.threshold }}
+                        </span>
+                      </div>
+                      <v-btn
+                        color="grey lighten-2 text-black"
+                        @click="openVoteDialog(proposal.hash, false)"
+                        :disabled="loadingVote"
+                        >No <v-divider class="mx-3" vertical />{{ proposal.nayes.length }}
+                      </v-btn>
+                    </v-row>
+                  </v-container>
+                  <v-container :style="{ width: '100%' }" class="">
+                    <v-row v-if="expired(proposal.end)" class="">
+                      <v-progress-linear
+                        :height="20"
+                        color="#1AA18F"
+                        :value="proposal.ayesProgress"
+                        :style="{
+                          backgroundColor: '#9e9e9e',
+                          marginRight: 'auto',
+                        }"
+                      >
+                        <v-row class="d-flex justify-space-around">
+                          <span class=""
+                            >{{
+                              !!(proposal.ayesProgress % 1) ? proposal.ayesProgress.toFixed(2) : proposal.ayesProgress
+                            }}%</span
+                          >
+                          <span class="text-black"
+                            >{{
+                              !!(proposal.nayesProgress % 1)
+                                ? proposal.nayesProgress.toFixed(2)
+                                : proposal.nayesProgress
+                            }}%</span
+                          >
+                        </v-row>
+                      </v-progress-linear>
+                    </v-row>
+                    <v-row v-else justify="center" class="">
+                      <v-progress-linear
+                        v-if="proposal.ayesProgress > proposal.nayesProgress"
+                        rounded
+                        v-model="proposal.ayesProgress"
+                        color="#1AA18F"
+                        height="20"
+                        :style="{
+                          width: '100%',
+                          color: '#fff',
+                        }"
+                      >
+                        <template v-slot:default="{ value }">
+                          <strong>Accepted</strong>
+                          <span>{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
+                        </template>
+                      </v-progress-linear>
+                      <v-progress-linear
+                        v-else
+                        rounded
+                        v-model="proposal.nayesProgress"
+                        color="grey lighten-2"
+                        backgroundColor="#e0e0e0"
+                        height="20"
+                        :style="{
+                          width: '100%',
+                          color: '#333',
+                        }"
+                      >
+                        <template v-slot:default="{ value }">
+                          <strong>Rejected</strong>
+                          <span>{{ !!(value % 1) ? value.toFixed(2) : value }}%</span>
+                        </template>
+                      </v-progress-linear>
+                    </v-row>
+                  </v-container>
+                </v-col>
 
                 <v-dialog v-model="openVDialog" max-width="600">
                   <v-card>
@@ -230,7 +249,6 @@
 import type { Proposal, Proposals } from "@threefold/tfchain_client";
 import type moment from "moment";
 import { createToast } from "mosha-vue-toastify";
-import type { start } from "repl";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
@@ -312,5 +330,9 @@ async function castVote() {
 </script>
 <style scoped>
 .votes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 </style>
