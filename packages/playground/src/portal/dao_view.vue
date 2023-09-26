@@ -29,7 +29,7 @@
           <v-card>
             <v-text-field
               v-model="searchTerm"
-              color="primary darken-2"
+              variant="underlined"
               label="Search by proposal description"
               class="pa-3"
             ></v-text-field>
