@@ -1,10 +1,9 @@
-import urlJoin from "url-join";
-
 import { TFClient } from "../clients";
 import { GridClientConfig } from "../config";
-import { events, send, validateInput } from "../helpers";
+import { events, validateInput } from "../helpers";
 import { expose } from "../helpers/expose";
 import {
+  AddPublicConfig,
   NodeGetModel,
   NodePowerModel,
   RentContractCreateModel,
@@ -78,6 +77,13 @@ class Nodes {
   @checkBalance
   async setNodePower(options: NodePowerModel) {
     return (await this.client.nodes.setPower(options)).apply();
+  }
+
+  @expose
+  @validateInput
+  @checkBalance
+  async addNodePublicConfig(options: AddPublicConfig) {
+    return (await this.client.nodes.addNodePublicConfig(options)).apply();
   }
 }
 

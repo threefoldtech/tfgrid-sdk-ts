@@ -651,6 +651,34 @@ class FarmPublicIPsModel {
   @Expose() @IsOptional() gw?: number;
 }
 
+class AddFarmIPModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsInt() @IsNotEmpty() @IsIP() ip: number;
+  @Expose() @IsInt() @IsNotEmpty() gw: number;
+}
+
+class PublicConfigModel {
+  @Expose() @IsInt() @IsNotEmpty() @IsIP() ip?: number;
+  @Expose() @IsInt() @IsNotEmpty() gw?: number;
+  @Expose() @IsInt() @IsNotEmpty() @IsIP() ip6?: number;
+  @Expose() @IsString() @IsNotEmpty() domain?: string;
+}
+class AddPublicConfig {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+  @Expose() @IsNotEmpty() publicConfig: PublicConfigModel;
+}
+
+class RemoveFarmIPModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsInt() @IsNotEmpty() @IsIP() ip: number;
+}
+
+class AddStellarModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsString() @IsNotEmpty() stellarAddress: string;
+}
+
 class CreateFarmModel {
   @Expose() @IsString() @IsNotEmpty() @MaxLength(NameLength) name: string;
   @Expose() @IsOptional() publicIps?: FarmPublicIPsModel;
@@ -807,4 +835,8 @@ export {
   SwapToStellarModel,
   ListenToMintCompletedModel,
   UserFarmsGetModel,
+  AddFarmIPModel,
+  RemoveFarmIPModel,
+  AddStellarModel,
+  AddPublicConfig,
 };
