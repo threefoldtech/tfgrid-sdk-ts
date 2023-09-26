@@ -144,12 +144,12 @@
         </v-row>
         <v-row v-show="!isAdvanced">
           <v-col>
-            <canvas ref="lineCanvas" />
+            <LineChart :fp="activeProfile" :xs="xs" :isProfit="isProfit" />
           </v-col>
         </v-row>
         <v-row v-show="isAdvanced">
           <v-col cols="6">
-            <canvas ref="pieCanvas" />
+            <PieChart :chartdata="chartdata" />
           </v-col>
           <v-col cols="6" v-if="isAdvanced">
             <input-validator
@@ -262,12 +262,12 @@
 </template>
 
 <script lang="ts" setup>
-import { Chart, registerables } from "chart.js";
 import { onMounted, ref, watch } from "vue";
 
 import FarmingProfile, { Certification, ProfileTypes } from "@/utils/simulator";
 
-import { buildLineChart, buildPieChart } from "../utils/charts";
+import LineChart from "./line_chart.vue";
+import PieChart from "./pie_chart.vue";
 
 const props = defineProps<{
   chosenConfig: string;
@@ -278,12 +278,9 @@ const certified = ref();
 
 const isAdvanced = ref(false);
 const isProfit = ref(false);
+const xs = ref<number[]>([]);
 
-const pieCanvas = ref<HTMLCanvasElement | null>(null);
-const lineCanvas = ref<HTMLCanvasElement | null>(null);
-let pieChart: Chart<"doughnut", number[], string> | null = null;
-let lineChart: Chart<"line", number[], string> | null = null;
-
+const chartdata = ref();
 const activeProfile = ref(
   new FarmingProfile({
     type: ProfileTypes.DIY,
@@ -309,8 +306,7 @@ watch([activeProfile.value, isProfit, isAdvanced, certified], () => {
 });
 
 onMounted(() => {
-  Chart.register(...registerables);
-  initCharts();
+  updateLineChart();
   if (props.chosenConfig == "Titan v2.1") {
     activeProfile.value = new FarmingProfile({
       type: ProfileTypes.TITAN,
@@ -326,19 +322,6 @@ onMounted(() => {
   }
 });
 
-function initCharts() {
-  requestAnimationFrame(() => {
-    if (pieCanvas.value) {
-      pieChart = buildPieChart(pieCanvas.value);
-    }
-    if (lineCanvas.value && activeProfile.value) {
-      lineChart = buildLineChart(lineCanvas.value, activeProfile.value);
-    }
-    updatePieChart();
-    updateLineChart();
-  });
-}
-
 const updateLineChart = () => {
   const price = activeProfile.value
     ? isProfit.value
@@ -346,35 +329,14 @@ const updateLineChart = () => {
       : activeProfile.value.maximumTokenPrice
     : 0; // Provide a default value if activeProfile is not available
 
-  if (lineChart && activeProfile.value) {
+  if (activeProfile.value) {
     const X = (price - 0.15) / 19;
-    const xs = [...Array.from({ length: 20 }).map((_, i) => 0.15 + X * i)];
-
-    // Update chart data based on the selected chart type
-    lineChart.data.labels = xs.map(i => i.toFixed(2));
-    if (isProfit.value) {
-      lineChart.data.datasets[0].label = "ROI";
-      if (lineChart?.options?.plugins?.title) {
-        lineChart.options.plugins.title.text = "Return (USD) / TFT price (USD)";
-      }
-      lineChart.data.datasets[0].data = xs.map(x => activeProfile.value.getRoi(x) / 100);
-    } else {
-      lineChart.data.datasets[0].label = "Margin";
-      if (lineChart?.options?.plugins?.title) {
-        lineChart.options.plugins.title.text = "Return (USD) / TFT price (USD)";
-      }
-      lineChart.data.datasets[0].data = xs.map(x => activeProfile.value.getTotalReward(x));
-    }
-
-    lineChart.update();
+    xs.value = [...Array.from({ length: 20 }).map((_, i) => 0.15 + X * i)];
   }
 };
 function updatePieChart() {
-  if (pieChart) {
-    const { nuFarmingRewardInTft, cuFarmingRewardInTft, suFarmingRewardInTft } = activeProfile.value;
-    pieChart.data.datasets[0].data = [nuFarmingRewardInTft, cuFarmingRewardInTft, suFarmingRewardInTft];
-    pieChart.update();
-  }
+  const { nuFarmingRewardInTft, cuFarmingRewardInTft, suFarmingRewardInTft } = activeProfile.value;
+  chartdata.value = [nuFarmingRewardInTft, cuFarmingRewardInTft, suFarmingRewardInTft];
 }
 </script>
 
