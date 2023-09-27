@@ -100,8 +100,15 @@ import toReadableDate from "../../utils/to_readable_data";
 import NodeFilter from "../components/common/filters/node_filter.vue";
 import NodeDetails from "../components/nodes/node_details.vue";
 import NodeTable from "../components/nodes/nodes_table.vue";
-import { getFilterValues, getNode, inputsInitializer, nodeInitializer, requestNodes } from "../utils/helpers";
-import { type FilterInputs, type FilterOptions, type MixedFilter, optionsInitializer } from "../utils/types.js";
+import { getFilterValues, getNode, requestNodes } from "../utils/helpers";
+import {
+  type FilterInputs,
+  type FilterOptions,
+  inputsInitializer,
+  type MixedFilter,
+  nodeInitializer,
+  optionsInitializer,
+} from "../utils/types.js";
 
 export default {
   components: {

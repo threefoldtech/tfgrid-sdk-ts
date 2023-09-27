@@ -16,33 +16,25 @@
       <div v-for="item in resources" :key="item.name" class="mx-6 d-flex flex-column pt-2 mt-2 align-center">
         <div class="mb-2">{{ item.name }}</div>
         <div class="text-center">
-          <v-progress-circular
-            :model-value="isNaN(+item.value) ? 0 : item.value"
-            :size="150"
-            :width="15"
-            color="primary"
-            v-if="isNaN(+item.value)"
-            >NA
-          </v-progress-circular>
-          <v-progress-circular
-            :model-value="isNaN(+item.value) ? 0 : item.value"
-            :size="150"
-            :width="15"
-            color="primary"
-            v-else
-            >{{ item.value }}%
+          <v-progress-circular :model-value="item.value" :size="150" :width="15" color="primary"
+            >{{ item.value !== "NaN" ? item.value + "%" : "NaN" }}
           </v-progress-circular>
         </div>
       </div>
+    </v-row>
+    <v-row justify="center">
+      <v-progress-circular v-if="loading" indeterminate color="primary" :size="50" class="mt-10 mb-10" />
+      <v-btn v-if="!loading" class="mt-5 primary" @click="getNodeHealthUrl">Check Node Health</v-btn>
     </v-row>
   </div>
 </template>
 
 <script lang="ts">
-import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
+import { type GridNode, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
 import { type PropType, ref } from "vue";
 
-import type { ResourceWrapper } from "@/explorer/utils/types";
+import { getNodeStates } from "@/explorer/utils/helpers";
+import { nodeStatsInitializer, type ResourceWrapper } from "@/explorer/utils/types";
 
 export default {
   props: {
@@ -51,22 +43,33 @@ export default {
       required: true,
     },
   },
-  mounted() {
-    this.getNodeResources();
+  async mounted() {
+    this.resources = await this.getNodeResources();
+    console.log(this.resources);
   },
   setup(props) {
     const resources = ref<ResourceWrapper[]>([]);
     const renamedResources = ["CPU", "RAM", "SSD", "HDD"];
     const loading = ref<boolean>(false);
-    const nodeStatistics = {};
+    const nodeStats = ref<NodeStats>(nodeStatsInitializer);
 
-    const getNodeResources = () => {
+    const getNodeHealthUrl = () => {
+      const nodeHealthUrl = "";
+      window.open(nodeHealthUrl, "_blank");
+    };
+
+    const getNodeResources = async () => {
       loading.value = true;
+      nodeStats.value = await getNodeStates(props.node.nodeId);
+      console.log(nodeStats.value);
+
       return ["cru", "mru", "sru", "hru"].map((i, idx) => {
         const value =
-          nodeStatistics.value.total[i] != 0
-            ? ((nodeStatistics.value.used[i] + nodeStatistics.value.system[i]) / nodeStatistics.value.total[i]) * 100
-            : NaN; // prettier-ignore, validate if the total is zero so the usage is set to NaN else do the division
+          Reflect.get(nodeStats.value.total, i) != 0
+            ? ((Reflect.get(nodeStats.value.used, i) + Reflect.get(nodeStats.value.system, i)) /
+                Reflect.get(nodeStats.value.total, i)) *
+              100
+            : NaN;
         loading.value = false;
         return {
           id: idx + 1,
@@ -79,7 +82,9 @@ export default {
     return {
       NodeStatus,
       resources,
+      loading,
       getNodeResources,
+      getNodeHealthUrl,
     };
   },
 };
