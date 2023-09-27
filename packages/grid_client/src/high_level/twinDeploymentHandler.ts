@@ -16,7 +16,7 @@ class TwinDeploymentHandler {
   nodes: Nodes;
 
   constructor(public config: GridClientConfig) {
-    this.tfclient = new TFClient(config.substrateURL, config.mnemonic, config.storeSecret, config.keypairType);
+    this.tfclient = config.tfclient;
     this.deploymentFactory = new DeploymentFactory(this.config);
     this.rmb = new RMB(config.rmbClient);
     this.nodes = new Nodes(this.config.graphqlURL, this.config.proxyURL, this.config.rmbClient);

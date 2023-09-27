@@ -44,12 +44,7 @@ class BaseModule {
       config.backendStorage,
       config.seed,
     );
-    this.tfClient = new TFClient(
-      this.config.substrateURL,
-      this.config.mnemonic,
-      this.config.storeSecret,
-      this.config.keypairType,
-    );
+    this.tfClient = config.tfclient;
   }
 
   getDeploymentPath(name: string): string {
