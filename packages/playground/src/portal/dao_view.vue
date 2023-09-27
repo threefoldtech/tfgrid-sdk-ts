@@ -163,44 +163,38 @@
                   </v-row>
                 </v-container>
               </v-col>
-
-              <v-dialog v-model="openVDialog" max-width="600">
-                <v-card>
-                  <v-card-title>Cast Vote</v-card-title>
-                  <v-card-text>
-                    <form-validator v-model="isValidFarm">
-                      <input-validator
-                        :value="selectedFarm"
-                        :rules="[validators.required('Required field')]"
-                        #="{ props }"
-                      >
-                        <input-tooltip tooltip="Select farm you wish to vote with">
-                          <v-select
-                            :items="userFarms"
-                            :item-title="item => `${item.name}`"
-                            :item-value="item => item.farmID"
-                            label="Select a farm"
-                            v-model="selectedFarm"
-                            v-bind="props"
-                          >
-                          </v-select>
-                        </input-tooltip>
-                      </input-validator>
-                    </form-validator>
-                  </v-card-text>
-                  <v-card-actions class="justify-end">
-                    <v-btn @click="castVote" :loading="loadingVote" color="primary white--text" :disabled="!isValidFarm"
-                      >Submit</v-btn
-                    >
-                    <v-btn @click="openVDialog = false" color="grey lighten-2 black--text">Close</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
             </v-container>
           </v-card>
         </v-window-item>
       </v-window>
-
+      <v-dialog v-model="openVDialog" max-width="600" scrollable="true">
+        <v-card>
+          <v-card-title>Cast Vote</v-card-title>
+          <v-card-text>
+            <form-validator v-model="isValidFarm">
+              <input-validator :value="selectedFarm" :rules="[validators.required('Required field')]" #="{ props }">
+                <input-tooltip tooltip="Select farm you wish to vote with">
+                  <v-select
+                    :items="userFarms"
+                    :item-title="item => `${item.name}`"
+                    :item-value="item => item.farmID"
+                    label="Select a farm"
+                    v-model="selectedFarm"
+                    v-bind="props"
+                  >
+                  </v-select>
+                </input-tooltip>
+              </input-validator>
+            </form-validator>
+          </v-card-text>
+          <v-card-actions class="justify-end">
+            <v-btn @click="castVote" :loading="loadingVote" color="primary white--text" :disabled="!isValidFarm"
+              >Submit</v-btn
+            >
+            <v-btn @click="openVDialog = false" color="grey lighten-2 black--text">Close</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
       <v-dialog v-model="openInfoModal" width="50vw">
         <v-card>
           <v-card-title class="text-h5"> Proposals information </v-card-title>
