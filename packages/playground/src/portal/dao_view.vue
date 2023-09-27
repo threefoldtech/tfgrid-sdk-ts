@@ -39,20 +39,24 @@
             <v-card-title class="pa-3 mb-2" v-if="proposal.action">
               {{ proposal.action.toUpperCase() }}
             </v-card-title>
-
-            <v-card-text class="pb-0">
+            <!-- <v-card-subtitle class="pb-0">
               <p class="font-weight-bold">
+                Proposal hash: <span class="text--secondary">{{ proposal.hash }}</span>
+              </p>
+            </v-card-subtitle> -->
+            <v-card-text class="pb-0">
+              <p>
                 Description:
                 <span class="text--secondary">
                   {{ proposal.description }}
                   <a v-bind:href="proposal.link" v-bind:target="'blank'">More details</a>
                 </span>
               </p>
-              <p class="font-weight-bold" v-if="expired(proposal.end)">
+              <p v-if="expired(proposal.end)">
                 You can vote until:
                 <span class="text--secondary">{{ proposal.end }}</span>
               </p>
-              <p class="font-weight-bold" v-else>
+              <p v-else>
                 Voting ended on: <span class="text--secondary">{{ proposal.end }}</span>
               </p>
             </v-card-text>
