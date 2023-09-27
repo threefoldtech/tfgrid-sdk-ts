@@ -73,16 +73,15 @@ export const inputsInitializer: FilterInputs = {
     placeholder: "e.g. 1, 2, 3",
     rules: [
       [
-        isNumeric("This field accepts numbers only.", { no_symbols: true }),
         (value: string) => {
           const ids = value.split(",").map((id: string) => {
-            if (isNaN(+id)) {
-              return isNumeric("This field accepts numbers only.", { no_symbols: true });
-            } else {
-              return isNumeric("This field accepts numbers only.", { no_symbols: true });
+            const numericId = parseInt(id);
+            if (!isNaN(numericId)) {
+              return numericId;
             }
           });
-          console.log(ids);
+          const validate = isNumeric("This field accepts numbers only.", { no_symbols: false });
+          return validate(String(ids));
         },
       ],
     ],

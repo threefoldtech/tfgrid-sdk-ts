@@ -1,52 +1,65 @@
 <template>
-  <v-expansion-panels>
-    <v-expansion-panel>
-      <v-expansion-panel-title>
-        <template v-slot:default="{}">
+  <form-validator valid-on-init ref="formRef" @update:model-value="$emit('update:valid', $event)">
+    <v-expansion-panels
+      @update:model-value="
+        e => {
+          if (typeof e === 'number') {
+            formRef.validate();
+          }
+        }
+      "
+    >
+      <v-expansion-panel>
+        <v-expansion-panel-title>
+          <template v-slot:default="{}">
+            <v-row no-gutters>
+              <v-col cols="4" class="d-flex justify-start text-h6"> Filters</v-col>
+            </v-row>
+          </template>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
           <v-row no-gutters>
-            <v-col cols="4" class="d-flex justify-start text-h6"> Filters</v-col>
-          </v-row>
-        </template>
-      </v-expansion-panel-title>
-      <v-expansion-panel-text>
-        <v-row no-gutters>
-          <v-col
-            cols="2"
-            class="d-flex justify-end align-center ml-2 mr-2 mb-2"
-            v-for="key in Object.keys($props.modelValue)"
-            :key="key"
-          >
-            <input-validator
-              v-if="$props.modelValue[key].label"
-              v-model:error="$props.modelValue[key].error"
-              #="{ props }"
-              :rules="$props.modelValue[key].rules?.[0] ?? []"
-              :async-rules="$props.modelValue[key].rules?.[1] ?? []"
-              :value="$props.modelValue[key].value"
+            <v-col
+              cols="12"
+              sm="6"
+              md="6"
+              xl="6"
+              xxl="12"
+              class="d-flex justify-end align-center ml-2 mr-2 mb-2"
+              v-for="key in Object.keys($props.modelValue)"
+              :key="key"
             >
-              <v-text-field
-                v-bind="props"
-                v-model="$props.modelValue[key].value"
-                :label="$props.modelValue[key].label"
-                :placeholder="$props.modelValue[key].placeholder"
-                :type="$props.modelValue[key].type"
-              ></v-text-field>
-            </input-validator>
-          </v-col>
-          <v-col cols="2" class="d-flex justify-start align-center mb-6 ml-4">
-            <v-btn @click="resetFilters" variant="outlined" color="primary">Reset filter</v-btn>
-          </v-col>
-        </v-row>
-      </v-expansion-panel-text>
-    </v-expansion-panel>
-  </v-expansion-panels>
+              <input-validator
+                v-if="$props.modelValue[key].label"
+                #="{ props }"
+                :rules="$props.modelValue[key].rules?.[0] ?? []"
+                :async-rules="$props.modelValue[key].rules?.[1] ?? []"
+                :value="$props.modelValue[key].value"
+              >
+                <v-text-field
+                  v-bind="props"
+                  v-model="$props.modelValue[key].value"
+                  :label="$props.modelValue[key].label"
+                  :placeholder="$props.modelValue[key].placeholder"
+                  :type="$props.modelValue[key].type"
+                ></v-text-field>
+              </input-validator>
+            </v-col>
+            <v-col cols="2" class="d-flex justify-start align-center mb-6 ml-4">
+              <v-btn @click="resetFilters" variant="outlined" color="primary">Reset filter</v-btn>
+            </v-col>
+          </v-row>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+    </v-expansion-panels>
+  </form-validator>
 </template>
 
 <script lang="ts">
-import type { PropType } from "vue";
-import { defineComponent } from "vue";
+import { defineComponent, type PropType } from "vue";
 
-import type { NodeInputFilterType } from "@/utils/filter_nodes";
+import type { NodeInputFilterType } from "@/explorer/utils/types";
+import { useFormRef } from "@/hooks/form_validator";
 
 export default defineComponent({
   props: {
@@ -54,9 +67,12 @@ export default defineComponent({
       type: Object as PropType<{ [key: string]: NodeInputFilterType }>,
       required: true,
     },
+    valid: Boolean,
   },
 
   setup(props, { emit }) {
+    const formRef = useFormRef();
+
     const resetFilters = () => {
       emit(
         "update:model-value",
@@ -69,6 +85,7 @@ export default defineComponent({
 
     return {
       resetFilters,
+      formRef,
     };
   },
 });
