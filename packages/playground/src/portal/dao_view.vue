@@ -45,20 +45,21 @@
               </p>
             </v-card-subtitle> -->
             <v-card-text class="pb-0">
-              <p>
-                Description:
+              <v-row>
+                <p class="font-weight-bold mr-3">Description:</p>
                 <span class="text--secondary">
                   {{ proposal.description }}
                   <a v-bind:href="proposal.link" v-bind:target="'blank'">More details</a>
                 </span>
-              </p>
-              <p v-if="expired(proposal.end)">
-                You can vote until:
+              </v-row>
+              <v-row v-if="expired(proposal.end)">
+                <p class="font-weight-bold mr-3">You can vote until:</p>
                 <span class="text--secondary">{{ proposal.end }}</span>
-              </p>
-              <p v-else>
-                Voting ended on: <span class="text--secondary">{{ proposal.end }}</span>
-              </p>
+              </v-row>
+              <v-row v-else>
+                <p class="font-weight-bold mr-3">Voting ended on:</p>
+                <span class="text--secondary">{{ proposal.end }}</span>
+              </v-row>
             </v-card-text>
             <v-container fluid>
               <v-col class="votes">
