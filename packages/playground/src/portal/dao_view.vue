@@ -167,7 +167,7 @@
           </v-card>
         </v-window-item>
       </v-window>
-      <v-dialog v-model="openVDialog" max-width="600" scrollable="true">
+      <v-dialog v-model="openVDialog" max-width="600" scrollable>
         <v-card>
           <v-card-title>Cast Vote</v-card-title>
           <v-card-text>
