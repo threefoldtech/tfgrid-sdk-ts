@@ -39,11 +39,7 @@
             <v-card-title class="pa-3 mb-2" v-if="proposal.action">
               {{ proposal.action.toUpperCase() }}
             </v-card-title>
-            <v-card-subtitle class="pb-0">
-              <p class="font-weight-bold">
-                Proposal hash: <span class="text--secondary">{{ proposal.hash }}</span>
-              </p>
-            </v-card-subtitle>
+
             <v-card-text class="pb-0">
               <p class="font-weight-bold">
                 Description:
