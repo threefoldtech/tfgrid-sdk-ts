@@ -17,7 +17,7 @@
       <v-card>
         <h4 class="d-flex justify-center pa-4">
           User, you can now vote on proposals!
-          <v-icon @click="openInfoModal = true"> mdi-information-outline </v-icon>
+          <v-icon @click="openInfoModal = true" class="mx-3"> mdi-information-outline </v-icon>
         </h4>
         <v-tabs v-model="activeTab" align-tabs="center">
           <v-tab color="primary" v-for="(tab, index) in tabs" :key="index" :value="`${index}`">{{ tab.title }}</v-tab>
@@ -201,7 +201,7 @@
       </v-window>
 
       <v-dialog v-model="openInfoModal" width="50vw">
-        <v-card class="card">
+        <v-card>
           <v-card-title class="text-h5"> Proposals information </v-card-title>
 
           <v-card-text>
@@ -318,6 +318,7 @@ async function castVote() {
         hideProgressBar: true,
         toastBackgroundColor: "green",
         timeout: 5000,
+        showIcon: true,
       });
     } catch (err) {
       createToast(`Vote Failed!`, {
@@ -325,6 +326,7 @@ async function castVote() {
         hideProgressBar: true,
         toastBackgroundColor: "red",
         timeout: 5000,
+        showIcon: true,
       });
     }
   }
