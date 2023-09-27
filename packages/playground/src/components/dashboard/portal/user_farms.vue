@@ -1,12 +1,30 @@
 <template>
-  <v-container> user farms </v-container>
+  <v-container>
+    <v-btn @click="createFarm">Click</v-btn>
+  </v-container>
 </template>
 
-<script>
+<script lang="ts">
+import { ref } from "vue";
+
+import { useGrid } from "../../../stores";
+
 export default {
   name: "UserFarms",
   setup() {
-    return {};
+    const gridStore = useGrid();
+    const farmName = ref();
+
+    function createFarm() {
+      farmName.value = "new-farm";
+      console.log("grid", gridStore.grid);
+      gridStore.grid.farms.create(farmName.value);
+    }
+    return {
+      gridStore,
+      farmName,
+      createFarm,
+    };
   },
 };
 </script>

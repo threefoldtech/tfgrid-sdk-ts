@@ -1,5 +1,7 @@
 import { defineStore } from "pinia";
 
+import { useGrid } from "./grid";
+
 export interface Profile {
   mnemonic: string;
   ssh: string;
@@ -21,6 +23,7 @@ const useProfileManager = defineStore("profile-manager", {
   actions: {
     set(profile: Profile | null) {
       this.profile = profile;
+      useGrid().set(profile);
     },
     updateSSH(ssh: string) {
       if (this.profile) {

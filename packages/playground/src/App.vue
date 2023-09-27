@@ -123,7 +123,7 @@
               <router-view v-slot="{ Component }">
                 <transition name="fade">
                   <div :key="$route.path">
-                    <component :is="Component" v-if="hasActiveProfile"></component>
+                    <component :is="Component" v-if="hasActiveProfile && gridStore.grid"></component>
                     <ConnectWalletLanding @openProfile="openProfile = true" v-else />
                   </div>
                 </transition>
@@ -141,11 +141,13 @@
 import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
+import { useGrid } from "./stores/grid";
 import { useProfileManager } from "./stores/profile_manager";
 
 const $route = useRoute();
 const $router = useRouter();
 const profileManager = useProfileManager();
+const gridStore = useGrid();
 const network = process.env.NETWORK || (window as any).env.NETWORK;
 
 const openProfile = ref(true);
