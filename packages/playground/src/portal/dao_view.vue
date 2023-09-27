@@ -281,7 +281,7 @@ onMounted(async () => {
     activeProposals.value = proposals.value.active.filter(proposal => proposal.hash);
     inactiveProposals.value = proposals.value.inactive.filter(proposal => proposal.hash);
 
-    userFarms.value = await getFarms(grid, { twinId: profile.value.twinId }, {});
+    userFarms.value = await getFarms(grid, { ownedBy: profile.value.twinId }, {});
     loadingProposals.value = false;
   }
 });
@@ -313,14 +313,14 @@ async function castVote() {
         approve: castedVote.value,
         hash: selectedProposal.value,
       });
-      createToast("Transaction Complete!", {
+      createToast("Voted for proposal!", {
         position: "top-right",
         hideProgressBar: true,
         toastBackgroundColor: "green",
         timeout: 5000,
       });
     } catch (err) {
-      createToast(`Transaction Failed!`, {
+      createToast(`Vote Failed!`, {
         position: "top-right",
         hideProgressBar: true,
         toastBackgroundColor: "red",
