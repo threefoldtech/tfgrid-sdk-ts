@@ -1,5 +1,5 @@
 <template>
-  <node-filter v-model="filterInputs" @update:model-value="InputFiltersReset" />
+  <node-filters v-model="filterInputs" v-model:valid="isValidForm" @update:model-value="InputFiltersReset" />
 
   <div class="hint mb-2 mt-3">
     <v-alert type="info" variant="tonal">
@@ -94,28 +94,18 @@ import { onMounted } from "vue";
 import { useRoute } from "vue-router";
 
 import router from "@/router";
+import { inputsInitializer } from "@/utils/filter_nodes";
 
-import toFixedCsSize from "../../utils/to_fixed_cs_size";
-import toReadableDate from "../../utils/to_readable_data";
-import NodeFilter from "../components/common/filters/node_filter.vue";
-import NodeDetails from "../components/nodes/node_details.vue";
-import NodeTable from "../components/nodes/nodes_table.vue";
 import { getFilterValues, getNode, requestNodes } from "../utils/helpers";
 import {
   type FilterInputs,
   type FilterOptions,
-  inputsInitializer,
   type MixedFilter,
   nodeInitializer,
   optionsInitializer,
 } from "../utils/types.js";
 
 export default {
-  components: {
-    NodeFilter,
-    NodeTable,
-    NodeDetails,
-  },
   setup() {
     const filterInputs = ref<FilterInputs>(inputsInitializer);
     const filterOptions = ref<FilterOptions>(optionsInitializer);
@@ -126,6 +116,7 @@ export default {
     const nodesCount = ref<number>(0);
     const selectedNode = ref<GridNode>(nodeInitializer);
     const isDialogOpened = ref<boolean>(false);
+    const isValidForm = ref<boolean>(false);
 
     const nodeStatusOptions = [NodeStatus.Up, NodeStatus.Down];
     const route = useRoute();
@@ -145,11 +136,17 @@ export default {
       }
     };
 
-    watch(mixedFilters.value, async () => {
-      const options = getFilterValues(mixedFilters.value);
-      const request = debounce(_requestNodes, 1000);
-      await request(options, true);
-    });
+    const request = debounce(_requestNodes, 1000);
+    watch(
+      mixedFilters,
+      async () => {
+        if (isValidForm.value) {
+          const options = getFilterValues(mixedFilters.value);
+          await request(options, false);
+        }
+      },
+      { deep: true },
+    );
 
     // The mixed filters should reset to the default value again..
     const InputFiltersReset = (nFltrNptsVal: FilterInputs) => {
@@ -203,12 +200,11 @@ export default {
       filterInputs,
       filterOptions,
       isDialogOpened,
+      isValidForm,
+
       openDialog,
       closeDialog,
-
       requestNodes,
-      toReadableDate,
-      toFixedCsSize,
       InputFiltersReset,
     };
   },

@@ -45,8 +45,8 @@ import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
 import type { PropType } from "vue";
 import type { VDataTable } from "vuetify/labs/VDataTable";
 
-import toFixedCsSize from "../../../utils/to_fixed_cs_size";
-import toReadableDate from "../../../utils/to_readable_data";
+import formatResourceSize from "@/utils/format_resource_size";
+import toReadableDate from "@/utils/to_readable_data";
 
 export default {
   emits: ["update:page", "update:size", "open-dialog"],
@@ -92,25 +92,25 @@ export default {
         title: "CRU",
         key: "total_resources.cru",
         align: "start",
-        value: item => toFixedCsSize(item.total_resources.cru),
+        value: item => formatResourceSize(item.total_resources.cru),
       },
       {
         title: "MRU",
         key: "total_resources.mru",
         align: "start",
-        value: item => toFixedCsSize(item.total_resources.mru),
+        value: item => formatResourceSize(item.total_resources.mru),
       },
       {
         title: "SRU",
         key: "total_resources.sru",
         align: "start",
-        value: item => toFixedCsSize(item.total_resources.sru),
+        value: item => formatResourceSize(item.total_resources.sru),
       },
       {
         title: "HRU",
         key: "total_resources.hru",
         align: "start",
-        value: item => toFixedCsSize(item.total_resources.hru),
+        value: item => formatResourceSize(item.total_resources.hru),
       },
       { title: "GPU", key: "num_gpu", align: "start" },
       { title: "Up Time", key: "uptime", align: "start", value: item => toReadableDate(item.uptime) },
@@ -134,7 +134,7 @@ export default {
       nodeStatusOptions,
       toReadableDate,
       getStatus,
-      toFixedCsSize,
+      formatResourceSize,
       openSheet,
     };
   },

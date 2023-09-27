@@ -62,6 +62,7 @@ import type { NodeInputFilterType } from "@/explorer/utils/types";
 import { useFormRef } from "@/hooks/form_validator";
 
 export default defineComponent({
+  name: "NodeFilters",
   props: {
     modelValue: {
       type: Object as PropType<{ [key: string]: NodeInputFilterType }>,

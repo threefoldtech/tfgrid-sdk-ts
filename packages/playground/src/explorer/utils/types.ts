@@ -52,64 +52,6 @@ export type ResourceWrapper = {
   value: string;
 };
 
-export const inputsInitializer: FilterInputs = {
-  nodeId: {
-    label: "Node ID",
-    placeholder: "Filter by node id.",
-    rules: [[isNumeric("This field accepts numbers only.", { no_symbols: true })]],
-    type: "text",
-  },
-  farmIds: {
-    label: "Farm IDs",
-    placeholder: "e.g. 1, 2, 3",
-    rules: [
-      [
-        isNumeric("This field accepts numbers only.", { no_symbols: true }),
-        (value: string) => {
-          const ids = value.split(",").map((id: string) => {
-            if (isNaN(+id)) {
-              return isNumeric("This field accepts numbers only.", { no_symbols: true });
-            } else {
-              return isNumeric("This field accepts numbers only.", { no_symbols: true });
-            }
-          });
-          console.log(ids);
-        },
-      ],
-    ],
-    type: "text",
-  },
-  farmName: {
-    label: "Farm Name",
-    placeholder: "Filter by farm name.",
-    type: "text",
-  },
-  country: {
-    label: "Country Full Name",
-    placeholder: "Filter by country.",
-    type: "text",
-  },
-  freeSru: {
-    label: "Free SRU (GB)",
-    placeholder: "Filter by Free SSD greater than or equal to.",
-    rules: [[isNumeric("This field accepts numbers only.", { no_symbols: true })]],
-    type: "text",
-  },
-  freeHru: {
-    label: "Free HRU (GB)",
-    placeholder: "Filter by Free HDD greater than or equal to.",
-    rules: [[isNumeric("This field accepts numbers only.", { no_symbols: true })]],
-    type: "text",
-  },
-  freeMru: {
-    label: "Free MRU (GB)",
-    placeholder: "Filter by Free Memory greater than or equal to.",
-    value: undefined,
-    rules: [[isNumeric("This field accepts numbers only.", { no_symbols: true })]],
-    type: "text",
-  },
-};
-
 export const nodeStatsInitializer: NodeStats = {
   system: { cru: 0, hru: 0, ipv4u: 0, mru: 0, sru: 0 },
   total: { cru: 0, hru: 0, ipv4u: 0, mru: 0, sru: 0 },

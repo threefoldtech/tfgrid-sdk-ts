@@ -34,15 +34,14 @@
 import "mosha-vue-toastify/dist/style.css";
 
 import type { GridNode } from "@threefold/gridproxy_client";
-import { byCountry } from "country-code-lookup";
-import { createToast } from "mosha-vue-toastify";
+// import { byCountry } from "country-code-lookup";
+// import { createToast } from "mosha-vue-toastify";
 import type { PropType } from "vue";
 import { ref, watch } from "vue";
 
-import { gqlClient, gridProxyClient } from "@/clients";
-import toHumanDate from "@/utils/date";
-import toFixedCsSize from "@/utils/to_fixed_cs_size";
-
+// import { gqlClient, gridProxyClient } from "@/clients";
+// import toHumanDate from "@/utils/date";
+// import formatResourceSize from "@/utils/format_resource_size";
 import NodeResourcesCharts from "./node_resources_charts.vue";
 
 export default {
@@ -155,9 +154,9 @@ export default {
       twinDetails,
       nodesMap,
       interfacesDetails,
-      toFixedCsSize,
+      // toFixedCsSize,
       // copy,
-      toHumanDate,
+      // toHumanDate,
       // countryFlagSrc,
       // getCountryCode,
     };
@@ -171,3 +170,4 @@ export default {
   opacity: 1 !important;
 }
 </style>
+@/utils/format_resource_size
