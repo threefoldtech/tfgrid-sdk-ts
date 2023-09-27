@@ -2,27 +2,30 @@
  * Formats the size of a resource in a human-readable format.
  * @param sizeInBytes - The size of the resource in bytes.
  * @returns A formatted string representing the size of the resource.
- * @throws Error if the sizeInBytes is undefined or negative.
  */
 export default function formatResourceSize(sizeInBytes?: number): string {
-  if (sizeInBytes === undefined || sizeInBytes < 0) {
-    throw new Error("Invalid sizeInBytes value: " + sizeInBytes);
+  if (sizeInBytes === undefined || sizeInBytes === null || isNaN(sizeInBytes) || sizeInBytes === 0) {
+    return "0 Bytes";
   }
 
-  const units = [
-    { value: 1 << 30, label: "GB" },
-    { value: 1 << 40, label: "TB" },
-    { value: 1 << 50, label: "PB" },
-  ];
+  const giga = 1024 ** 3; // One gigabyte in bytes
+  const tera = 1024 ** 4; // One terabyte in bytes
+  const peta = 1024 ** 5; // One petabyte in bytes
 
-  for (const unit of units) {
-    if (sizeInBytes < unit.value) {
-      const sizeInUnit = sizeInBytes / (unit.value / 1024);
-      return `${sizeInUnit.toFixed(2)} ${unit.label}`;
-    }
+  if (sizeInBytes < giga) {
+    return sizeInBytes.toString() + " Bytes";
   }
 
-  const largestUnit = units[units.length - 1];
-  const sizeInLargestUnit = sizeInBytes / (largestUnit.value / 1024);
-  return `${sizeInLargestUnit.toFixed(2)} ${largestUnit.label}`;
+  if (sizeInBytes < tera) {
+    const sizeInGB = sizeInBytes / giga;
+    return sizeInGB.toFixed(2) + " GB";
+  }
+
+  if (sizeInBytes < peta) {
+    const sizeInTB = sizeInBytes / tera;
+    return sizeInTB.toFixed(2) + " TB";
+  }
+
+  const sizeInPB = sizeInBytes / peta;
+  return sizeInPB.toFixed(2) + " PB";
 }

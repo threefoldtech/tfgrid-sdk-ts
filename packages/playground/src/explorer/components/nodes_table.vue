@@ -29,7 +29,7 @@
             <p class="text-left mt-1 mb-0">
               <v-chip :color="getStatus(item).color">
                 <span>
-                  {{ getStatus(item).status }}
+                  {{ getStatus(item).status.toLocaleUpperCase() }}
                 </span>
               </v-chip>
             </p>
@@ -80,46 +80,47 @@ export default {
     const nodeStatusOptions = [NodeStatus.Up, NodeStatus.Down];
 
     const headers: VDataTable["headers"] = [
-      { title: "ID", key: "nodeId" },
-      { title: "Farm ID", key: "farmId", align: "start" },
-      {
-        title: "Total Public IPs",
-        key: "publicIps.total",
-        align: "start",
-      },
-      { title: "Free Public IPs", key: "publicIps.free", align: "start" },
+      { title: "ID", key: "nodeId", sortable: false },
+      { title: "Farm ID", key: "farmId", align: "start", sortable: false },
+      { title: "Total Public IPs", key: "publicIps.total", align: "start", sortable: false },
+      { title: "Free Public IPs", key: "publicIps.free", align: "start", sortable: false },
       {
         title: "CRU",
         key: "total_resources.cru",
         align: "start",
-        value: item => formatResourceSize(item.total_resources.cru),
+        sortable: false,
       },
       {
         title: "MRU",
         key: "total_resources.mru",
         align: "start",
         value: item => formatResourceSize(item.total_resources.mru),
+        sortable: false,
       },
       {
         title: "SRU",
         key: "total_resources.sru",
         align: "start",
         value: item => formatResourceSize(item.total_resources.sru),
+        sortable: false,
       },
       {
         title: "HRU",
         key: "total_resources.hru",
         align: "start",
         value: item => formatResourceSize(item.total_resources.hru),
+        sortable: false,
       },
-      { title: "GPU", key: "num_gpu", align: "start" },
-      { title: "Up Time", key: "uptime", align: "start", value: item => toReadableDate(item.uptime) },
-      { title: "Status", key: "status", align: "start" },
+      { title: "GPU", key: "num_gpu", align: "start", sortable: false },
+      { title: "Up Time", key: "uptime", align: "start", sortable: false, value: item => toReadableDate(item.uptime) },
+      { title: "Status", key: "status", align: "start", sortable: false },
     ];
 
     const getStatus = (node: any) => {
-      if (node.props.title.status === NodeStatus.Up.toLocaleLowerCase()) {
+      if (node.props.title.status === NodeStatus.Up) {
         return { color: "green", status: NodeStatus.Up };
+      } else if (node.props.title.status === NodeStatus.Standby) {
+        return { color: "orange", status: NodeStatus.Standby };
       } else {
         return { color: "red", status: NodeStatus.Down };
       }
@@ -132,9 +133,7 @@ export default {
     return {
       headers,
       nodeStatusOptions,
-      toReadableDate,
       getStatus,
-      formatResourceSize,
       openSheet,
     };
   },

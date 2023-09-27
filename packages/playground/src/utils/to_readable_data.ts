@@ -1,11 +1,26 @@
 import moment from "moment";
 
+const formatTimeUnit = (unit: string, value: number) => (value > 0 ? `${value} ${unit}${value === 1 ? "" : "s"}` : "");
+
 export default function toReadableDate(timeInSeconds: number): string {
+  if (timeInSeconds === 0) {
+    return "No time";
+  }
+
   const duration = moment.duration(timeInSeconds * 1000);
   const years = duration.years();
   const months = duration.months();
-  const weeks = duration.weeks();
   const days = duration.days();
-  const _ = (k: string, n: number) => (n > 0 ? `${n} ${k}${n === 1 ? "" : "s"}` : "");
-  return [_("year", years), _("month", months), _("week", weeks), _("day", days)].join(", ");
+
+  const dateParts = [
+    formatTimeUnit("year", years),
+    formatTimeUnit("month", months),
+    formatTimeUnit("day", days),
+  ].filter(Boolean);
+
+  if (dateParts.length === 0) {
+    return "Less than a day";
+  }
+
+  return dateParts.join(" and ");
 }

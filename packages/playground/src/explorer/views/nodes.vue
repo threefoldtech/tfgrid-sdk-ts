@@ -68,7 +68,7 @@
                   The nodes will be filtered and displayed after 1 second once you remove your finger from the filters.
                 </v-alert>
               </div>
-              <node-table
+              <nodes-table
                 v-model="nodes"
                 v-model:size="filterOptions.size"
                 v-model:page="filterOptions.page"
@@ -93,6 +93,7 @@ import { ref, watch } from "vue";
 import { onMounted } from "vue";
 import { useRoute } from "vue-router";
 
+import NodesTable from "@/explorer/components/nodes_table.vue";
 import router from "@/router";
 import { inputsInitializer } from "@/utils/filter_nodes";
 
@@ -106,6 +107,9 @@ import {
 } from "../utils/types.js";
 
 export default {
+  components: {
+    NodesTable,
+  },
   setup() {
     const filterInputs = ref<FilterInputs>(inputsInitializer);
     const filterOptions = ref<FilterOptions>(optionsInitializer);
@@ -118,7 +122,7 @@ export default {
     const isDialogOpened = ref<boolean>(false);
     const isValidForm = ref<boolean>(false);
 
-    const nodeStatusOptions = [NodeStatus.Up, NodeStatus.Down];
+    const nodeStatusOptions = [NodeStatus.Up, NodeStatus.Standby, NodeStatus.Down];
     const route = useRoute();
 
     const _requestNodes = async (options: Partial<NodesQuery> = {}, loadFarm = false) => {
@@ -142,7 +146,7 @@ export default {
       async () => {
         if (isValidForm.value) {
           const options = getFilterValues(mixedFilters.value);
-          await request(options, false);
+          await request(options, true);
         }
       },
       { deep: true },
