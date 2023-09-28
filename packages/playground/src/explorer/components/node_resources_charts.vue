@@ -24,7 +24,7 @@
     </v-row>
     <v-row justify="center">
       <v-progress-circular v-if="loading" indeterminate color="primary" :size="50" class="mt-10 mb-10" />
-      <v-btn rounded="lg" variant="flat" color="primary" v-if="!loading" class="mt-7" @click="getNodeHealthUrl">
+      <v-btn rounded="lg" variant="flat" color="primary" v-if="!loading" class="mt-15" @click="getNodeHealthUrl">
         Check Node Health
       </v-btn>
     </v-row>
@@ -48,16 +48,14 @@ export default {
   },
   async mounted() {
     this.resources = await this.getNodeResources();
-    console.log(this.resources);
   },
-  setup(props) {
+  setup(props, { emit }) {
     const resources = ref<ResourceWrapper[]>([]);
     const renamedResources = ["CPU", "RAM", "SSD", "HDD"];
     const loading = ref<boolean>(false);
     const nodeStats = ref<NodeStats>(nodeStatsInitializer);
 
     const getNodeHealthUrl = async () => {
-      console.log(props.node);
       const grafana = new GrafanaStatistics(props.node);
       const nodeHealthUrl = await grafana.getUrl();
       window.open(nodeHealthUrl, "_blank");
@@ -66,7 +64,7 @@ export default {
     const getNodeResources = async () => {
       loading.value = true;
       nodeStats.value = await getNodeStates(props.node.nodeId);
-      console.log(nodeStats.value);
+      emit("update:stats", nodeStats.value);
 
       return ["cru", "mru", "sru", "hru"].map((i, idx) => {
         const value =

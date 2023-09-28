@@ -23,15 +23,12 @@
       </div>
 
       <template v-else>
-        <node-resources-charts :node="node" />
-        <v-row>
+        <node-resources-charts :node="node" @update:stats="(stats: NodeStats) => $emit('update:stats', stats)" />
+
+        <v-row class="pa-8 mt-5">
           <v-col cols="4">
-            <v-card>
-              <v-card-header> </v-card-header>
-            </v-card>
+            <node-details-card :node="node" />
           </v-col>
-          <v-col cols="4"></v-col>
-          <v-col cols="4"></v-col>
         </v-row>
       </template>
     </v-card>
@@ -40,14 +37,15 @@
 
 <script lang="ts">
 // import the styling for the toast
-import "mosha-vue-toastify/dist/style.css";
+// import "mosha-vue-toastify/dist/style.css";
 
-import type { GridNode } from "@threefold/gridproxy_client";
+import type { GridNode, NodeStats } from "@threefold/gridproxy_client";
 // import { byCountry } from "country-code-lookup";
 // import { createToast } from "mosha-vue-toastify";
-import type { PropType } from "vue";
-import { ref, watch } from "vue";
+import { type PropType, ref, watch } from "vue";
 
+import { nodeStatsInitializer } from "../utils/types";
+import NodeDetailsCard from "./node_details_cards/node_details_card.vue";
 // import { gqlClient, gridProxyClient } from "@/clients";
 // import toHumanDate from "@/utils/date";
 // import formatResourceSize from "@/utils/format_resource_size";
@@ -66,6 +64,7 @@ export default {
   },
   components: {
     NodeResourcesCharts,
+    NodeDetailsCard,
   },
 
   setup(props) {

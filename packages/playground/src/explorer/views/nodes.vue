@@ -82,12 +82,17 @@
         </v-row>
       </div>
     </div>
-    <node-details :node="selectedNode" :openDialog="isDialogOpened" @close-dialog="closeDialog" />
+    <node-details
+      @update:stats="(stats: NodeStats) => selectedNode.stats = stats"
+      :node="selectedNode"
+      :openDialog="isDialogOpened"
+      @close-dialog="closeDialog"
+    />
   </view-layout>
 </template>
 
 <script lang="ts">
-import { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
+import { type GridNode, type NodesQuery, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
 import debounce from "lodash/debounce.js";
 import { ref, watch } from "vue";
 import { onMounted } from "vue";
@@ -104,6 +109,8 @@ import {
   type FilterOptions,
   type MixedFilter,
   nodeInitializer,
+  type NodeRequestConfig,
+  nodeStatsInitializer,
   optionsInitializer,
 } from "../utils/types.js";
 
@@ -127,10 +134,10 @@ export default {
     const nodeStatusOptions = [NodeStatus.Up, NodeStatus.Standby, NodeStatus.Down];
     const route = useRoute();
 
-    const _requestNodes = async (options: Partial<NodesQuery> = {}, loadFarm = false) => {
+    const _requestNodes = async (options: Partial<NodesQuery> = {}, config: NodeRequestConfig) => {
       try {
         tableLoading.value = true;
-        const { count, data } = await requestNodes(options, loadFarm);
+        const { count, data } = await requestNodes(options, config);
         nodes.value = data;
         if (count) {
           nodesCount.value = count;
@@ -148,7 +155,7 @@ export default {
       async () => {
         if (isValidForm.value) {
           const options = getFilterValues(mixedFilters.value);
-          await request(options, true);
+          await request(options, { loadFarm: true });
         }
       },
       { deep: true },
@@ -170,6 +177,7 @@ export default {
         node.total_resources = node.capacity.total_resources;
         node.used_resources = node.capacity.used_resources;
         selectedNode.value = node;
+        selectedNode.value.stats = nodeStatsInitializer;
         isDialogOpened.value = true;
       }
     };
@@ -192,7 +200,7 @@ export default {
     onMounted(async () => {
       await checkSelectedNode();
       const options = getFilterValues(mixedFilters.value);
-      await _requestNodes(options, true);
+      await request(options, { loadFarm: true });
     });
 
     return {

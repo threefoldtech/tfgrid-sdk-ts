@@ -5,13 +5,16 @@ import GridProxyClient, {
   type Pagination,
 } from "@threefold/gridproxy_client";
 
-import type { MixedFilter } from "./types";
+import type { MixedFilter, NodeRequestConfig } from "./types";
 
 const network = process.env.NETWORK || (window as any).env.NETWORK;
 const client = new GridProxyClient(network);
 
-export async function requestNodes(options: Partial<NodesQuery>, loadFarm?: boolean): Promise<Pagination<GridNode[]>> {
-  const nodes: Pagination<GridNode[]> = await client.nodes.list(options, { loadFarm: loadFarm });
+export async function requestNodes(
+  options: Partial<NodesQuery>,
+  config: NodeRequestConfig,
+): Promise<Pagination<GridNode[]>> {
+  const nodes: Pagination<GridNode[]> = await client.nodes.list(options, config);
   return nodes;
 }
 

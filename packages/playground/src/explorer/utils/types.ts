@@ -1,7 +1,5 @@
 import { CertificationType, type GridNode, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
 
-import { isNumeric } from "@/utils/validators";
-
 import type { AsyncRule, SyncRule } from "../../components/input_validator.vue";
 
 export type NodeInputFilterType = {
@@ -50,6 +48,14 @@ export const optionsInitializer: FilterOptions = {
 export type ResourceWrapper = {
   name: string;
   value: string;
+};
+
+export type NodeDetailsCard = ResourceWrapper;
+
+export type NodeRequestConfig = {
+  loadFarm?: boolean;
+  loadStats?: boolean;
+  loadTwin?: boolean;
 };
 
 export const nodeStatsInitializer: NodeStats = {
