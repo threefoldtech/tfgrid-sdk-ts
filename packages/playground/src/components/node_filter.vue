@@ -18,13 +18,11 @@
           </template>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
-          <v-row no-gutters>
+          <v-row justify="center" justify-md="start" no-gutters>
             <v-col
               cols="12"
-              sm="6"
-              md="6"
-              xl="6"
-              xxl="12"
+              sm="4"
+              md="2"
               class="d-flex justify-end align-center ml-2 mr-2 mb-2"
               v-for="key in Object.keys($props.modelValue)"
               :key="key"
@@ -45,7 +43,7 @@
                 ></v-text-field>
               </input-validator>
             </v-col>
-            <v-col cols="2" class="d-flex justify-start align-center mb-6 ml-4">
+            <v-col cols="12" sm="4" md="2" class="d-flex justify-start align-center mb-6 ml-4">
               <v-btn @click="resetFilters" variant="outlined" color="primary">Reset filter</v-btn>
             </v-col>
           </v-row>
