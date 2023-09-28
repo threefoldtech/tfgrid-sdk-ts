@@ -61,7 +61,7 @@ class BaseModule {
   }
 
   async getDeploymentContracts(name: string) {
-    const path = PATH.join(this.getDeploymentPath(name), "contracts.json");
+    const path = this.newGetDeploymentPath(name, name, "contracts.json");
     const contracts = await this.backendStorage.load(path);
     if (!contracts) {
       return [];
@@ -70,7 +70,7 @@ class BaseModule {
   }
 
   async save(name: string, contracts: Record<string, unknown[]>) {
-    const contractsPath = PATH.join(this.getDeploymentPath(name), "contracts.json");
+    const contractsPath = PATH.join(this.newGetDeploymentPath(name, name), "contracts.json");
     const wireguardPath = PATH.join(this.getDeploymentPath(name), `${name}.conf`);
     const oldContracts = await this.getDeploymentContracts(name);
     let StoreContracts = oldContracts;
@@ -111,28 +111,32 @@ class BaseModule {
 
   async _migrateListKeys(): Promise<void> {
     const oldPath = this.getDeploymentPath("");
+
     const oldKeys = await this.backendStorage.list(oldPath);
-    const oldValues = await Promise.all(
-      oldKeys.map(key => {
-        return this.backendStorage.load(PATH.join(oldPath, key, "contracts.json"));
-      }),
+    if (oldKeys.length === 0) {
+      return;
+    }
+
+    const values = await Promise.all(
+      oldKeys.map(k => this.backendStorage.load(PATH.join(oldPath, k, "contracts.json"))),
     );
 
-    for (let i = 0; i < oldKeys.length; i++) {
-      const key = oldKeys[i];
-      const path = this.newGetDeploymentPath(key, key, "contracts.json");
-      const value = oldValues[i];
+    const ext1 = await Promise.all(
+      oldKeys.map((k, i) => this.backendStorage.dump(this.newGetDeploymentPath(k, k, "contracts.json"), values[i])),
+    );
 
-      await this.backendStorage.dump(path, value);
-      await this.backendStorage.remove(PATH.join(oldPath, key, "contracts.json"));
-    }
+    const ext2 = await Promise.all(
+      oldKeys.map(k => this.backendStorage.remove(PATH.join(oldPath, k, "contracts.json"))),
+    );
+
+    const setExtrinsics = ext1.flat(1);
+    const removeExtrinsics = ext2.flat(1);
+
+    await this.tfClient.applyAllExtrinsics(setExtrinsics);
+    await this.tfClient.applyAllExtrinsics(removeExtrinsics);
   }
 
   async _list(): Promise<string[]> {
-    const list = await this.backendStorage.list(this.newGetDeploymentPath(""));
-
-    if (list.length > 0) return list;
-
     await this._migrateListKeys();
     return this.backendStorage.list(this.newGetDeploymentPath(""));
   }
