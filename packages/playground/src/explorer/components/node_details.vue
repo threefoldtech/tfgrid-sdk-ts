@@ -23,11 +23,22 @@
       </div>
 
       <template v-else>
-        <node-resources-charts :node="node" @update:stats="(stats: NodeStats) => $emit('update:stats', stats)" />
+        <node-resources-charts :node="node" />
 
         <v-row class="pa-8 mt-5">
           <v-col cols="4">
             <node-details-card :node="node" />
+          </v-col>
+          <v-col cols="4">
+            <farm-details-card :node="node" />
+            <country-details-card class="mt-5" :node="node" />
+          </v-col>
+          <v-col cols="4">
+            <interfaces-details-card :node="node" />
+            <location-details-card class="mt-5" :node="node" />
+          </v-col>
+          <v-col cols="4">
+            <twin-details-card :node="node" />
           </v-col>
         </v-row>
       </template>
@@ -39,13 +50,18 @@
 // import the styling for the toast
 // import "mosha-vue-toastify/dist/style.css";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { GridNode, NodeStats } from "@threefold/gridproxy_client";
 // import { byCountry } from "country-code-lookup";
 // import { createToast } from "mosha-vue-toastify";
 import { type PropType, ref, watch } from "vue";
 
-import { nodeStatsInitializer } from "../utils/types";
+import CountryDetailsCard from "./node_details_cards/country_details_card.vue";
+import FarmDetailsCard from "./node_details_cards/farm_details_card.vue";
+import InterfacesDetailsCard from "./node_details_cards/interfaces_details_card.vue";
+import LocationDetailsCard from "./node_details_cards/location_details_card.vue";
 import NodeDetailsCard from "./node_details_cards/node_details_card.vue";
+import TwinDetailsCard from "./node_details_cards/twin_details_card.vue";
 // import { gqlClient, gridProxyClient } from "@/clients";
 // import toHumanDate from "@/utils/date";
 // import formatResourceSize from "@/utils/format_resource_size";
@@ -65,6 +81,11 @@ export default {
   components: {
     NodeResourcesCharts,
     NodeDetailsCard,
+    FarmDetailsCard,
+    CountryDetailsCard,
+    LocationDetailsCard,
+    InterfacesDetailsCard,
+    TwinDetailsCard,
   },
 
   setup(props) {

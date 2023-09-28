@@ -50,7 +50,14 @@ export type ResourceWrapper = {
   value: string;
 };
 
-export type NodeDetailsCard = ResourceWrapper;
+export type NodeDetailsCard = {
+  name: string;
+  value?: string;
+  imgSrc?: string;
+  hint?: string;
+  icon?: string;
+  callback?: (value: string) => void;
+};
 
 export type NodeRequestConfig = {
   loadFarm?: boolean;
@@ -82,7 +89,7 @@ export const nodeInitializer: GridNode = {
   updatedAt: 0,
   total_resources: { mru: 0, sru: 0, hru: 0, cru: 0 },
   used_resources: { mru: 0, sru: 0, hru: 0, cru: 0 },
-  location: { city: "", country: "" },
+  location: { city: "", country: "", latitude: 0, longitude: 0 },
   publicConfig: { domain: "", gw4: "", ipv6: "", gw6: "", ipv4: "" },
   status: NodeStatus.Up,
   certificationType: CertificationType.Diy,

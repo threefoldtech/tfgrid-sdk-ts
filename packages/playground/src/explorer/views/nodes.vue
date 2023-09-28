@@ -82,16 +82,12 @@
         </v-row>
       </div>
     </div>
-    <node-details
-      @update:stats="(stats: NodeStats) => selectedNode.stats = stats"
-      :node="selectedNode"
-      :openDialog="isDialogOpened"
-      @close-dialog="closeDialog"
-    />
+    <node-details :node="selectedNode" :openDialog="isDialogOpened" @close-dialog="closeDialog" />
   </view-layout>
 </template>
 
 <script lang="ts">
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { type GridNode, type NodesQuery, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
 import debounce from "lodash/debounce.js";
 import { ref, watch } from "vue";
@@ -110,7 +106,6 @@ import {
   type MixedFilter,
   nodeInitializer,
   type NodeRequestConfig,
-  nodeStatsInitializer,
   optionsInitializer,
 } from "../utils/types.js";
 
@@ -173,11 +168,14 @@ export default {
 
     const checkSelectedNode = async () => {
       if (route.query.nodeId) {
-        const node: any = await getNode(+route.query.nodeId);
+        const node: GridNode | any = await getNode(+route.query.nodeId, {
+          loadFarm: true,
+          loadStats: true,
+          loadTwin: true,
+        });
         node.total_resources = node.capacity.total_resources;
         node.used_resources = node.capacity.used_resources;
         selectedNode.value = node;
-        selectedNode.value.stats = nodeStatsInitializer;
         isDialogOpened.value = true;
       }
     };
@@ -190,8 +188,12 @@ export default {
       selectedNode.value = nodeInitializer;
     };
 
-    const openDialog = (item: { props: { title: GridNode } }) => {
-      const node: GridNode = item.props.title;
+    const openDialog = async (item: { props: { title: GridNode } }) => {
+      const node: GridNode = await getNode(item.props.title.nodeId, {
+        loadFarm: true,
+        loadStats: true,
+        loadTwin: true,
+      });
       selectedNode.value = node;
       router.push({ path: route.path, query: { nodeId: selectedNode.value.nodeId } });
       isDialogOpened.value = true;

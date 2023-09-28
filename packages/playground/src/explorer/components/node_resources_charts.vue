@@ -49,7 +49,7 @@ export default {
   async mounted() {
     this.resources = await this.getNodeResources();
   },
-  setup(props, { emit }) {
+  setup(props) {
     const resources = ref<ResourceWrapper[]>([]);
     const renamedResources = ["CPU", "RAM", "SSD", "HDD"];
     const loading = ref<boolean>(false);
@@ -64,7 +64,6 @@ export default {
     const getNodeResources = async () => {
       loading.value = true;
       nodeStats.value = await getNodeStates(props.node.nodeId);
-      emit("update:stats", nodeStats.value);
 
       return ["cru", "mru", "sru", "hru"].map((i, idx) => {
         const value =

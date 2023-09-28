@@ -23,8 +23,8 @@ export async function getNodeStates(nodeId: number): Promise<NodeStats> {
   return nodeStats;
 }
 
-export async function getNode(nodeId: number): Promise<GridNode> {
-  const node: GridNode = await client.nodes.byId(nodeId);
+export async function getNode(nodeId: number, config: NodeRequestConfig): Promise<GridNode> {
+  const node: GridNode = await client.nodes.byId(nodeId, config);
   return node;
 }
 

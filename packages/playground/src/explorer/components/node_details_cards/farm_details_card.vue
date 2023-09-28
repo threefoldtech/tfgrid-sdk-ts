@@ -1,0 +1,68 @@
+<template>
+  <card-details :loading="loading" title="Farm Detials" :items="farmItems" icon="mdi-webpack" />
+</template>
+
+<script lang="ts">
+import type { GridNode } from "@threefold/gridproxy_client";
+import { createToast } from "mosha-vue-toastify";
+import { onMounted, type PropType, ref } from "vue";
+
+import type { NodeDetailsCard } from "@/explorer/utils/types";
+
+import CardDetails from "./card_details.vue";
+
+export default {
+  name: "FarmDetailsCard",
+  components: { CardDetails },
+  props: {
+    node: {
+      type: Object as PropType<GridNode>,
+      required: true,
+    },
+  },
+
+  setup(props) {
+    const loading = ref<boolean>(false);
+    const farmItems = ref<NodeDetailsCard[]>();
+
+    const mount = () => {
+      loading.value = true;
+      farmItems.value = getNodeDetailsCard();
+      loading.value = false;
+    };
+
+    onMounted(async () => {
+      mount();
+    });
+
+    const copy = (address: string) => {
+      navigator.clipboard.writeText(address);
+      createToast("Copied!", {
+        position: "top-right",
+        hideProgressBar: true,
+        toastBackgroundColor: "#1aa18f",
+        timeout: 5000,
+      });
+    };
+
+    const getNodeDetailsCard = (): NodeDetailsCard[] => {
+      return [
+        { name: "ID", value: props.node.farmId.toString() },
+        { name: "Name", value: props.node.farm.name },
+        {
+          name: "Stellar Address",
+          value: props.node.farm.stellarAddress,
+          icon: "mdi-content-copy",
+          callback: copy,
+          hint: "Copy the stellar address to the clipboard.",
+        },
+      ];
+    };
+
+    return {
+      farmItems,
+      loading,
+    };
+  },
+};
+</script>

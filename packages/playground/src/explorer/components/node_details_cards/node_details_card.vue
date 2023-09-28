@@ -1,31 +1,20 @@
 <template>
-  <v-card :loading="loading" color="#1b1a1a">
-    <v-alert class="pa-5" style="height: 20px" color="info">
-      <h4 class="text-center">
-        <v-icon color="black" icon="mdi-resistor-nodes" />
-        Node Detials
-      </h4>
-    </v-alert>
-    <v-card-item v-if="!loading" class="mt-2 mb-2">
-      <v-row class="bb-gray" v-for="item in nodeDetailFields" :key="item.name">
-        <v-col class="d-flex justify-start">{{ item.name }}</v-col>
-        <v-col class="d-flex justify-end">{{ item.value }}</v-col>
-      </v-row>
-    </v-card-item>
-  </v-card>
+  <card-details :loading="loading" title="Node Detials" :items="nodeItems" icon="mdi-resistor-nodes" />
 </template>
 
 <script lang="ts">
 import type { GridNode } from "@threefold/gridproxy_client";
-import type { PropType } from "vue";
-import { onMounted, ref, watch } from "vue";
+import { onMounted, type PropType, ref } from "vue";
 
 import type { NodeDetailsCard } from "@/explorer/utils/types";
 import toHumanDate from "@/utils/date";
 import formatResourceSize from "@/utils/format_resource_size";
 
+import CardDetails from "./card_details.vue";
+
 export default {
   name: "NodeDetailsCard",
+  components: { CardDetails },
   props: {
     node: {
       type: Object as PropType<GridNode>,
@@ -35,19 +24,15 @@ export default {
 
   setup(props) {
     const loading = ref<boolean>(false);
-    const nodeDetailFields = ref<NodeDetailsCard[]>();
+    const nodeItems = ref<NodeDetailsCard[]>();
 
     const mount = () => {
       loading.value = true;
-      nodeDetailFields.value = getNodeDetailsCard();
+      nodeItems.value = getNodeDetailsCard();
       loading.value = false;
     };
 
     onMounted(async () => {
-      mount();
-    });
-
-    watch(props.node, () => {
       mount();
     });
 
@@ -68,15 +53,9 @@ export default {
     };
 
     return {
-      nodeDetailFields,
+      nodeItems,
       loading,
     };
   },
 };
 </script>
-
-<style scoped>
-.bb-gray {
-  border-bottom: 1px solid gray;
-}
-</style>
