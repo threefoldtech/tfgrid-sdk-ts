@@ -8,6 +8,7 @@
 
       <!-- Filters -->
       <dedicated-node-filters :filters="filters" />
+
       <!-- Table -->
       <nodes-table />
     </v-container>
@@ -15,6 +16,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
+
 const filters = [
   {
     label: "Total SRU (GB)",
