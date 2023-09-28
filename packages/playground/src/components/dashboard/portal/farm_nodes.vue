@@ -3,10 +3,25 @@
 </template>
 
 <script lang="ts">
+import { useGrid, useProfileManager } from "../../../stores";
+
 export default {
   name: "FarmNodes",
   setup() {
-    return {};
+    const gridStore = useGrid();
+    const profileManager = useProfileManager();
+
+    async function getUserNodes() {
+      try {
+        const twinId = profileManager.profile!.twinId;
+        return await gridStore.grid.capacity.getUserNodes({ twinId });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    return {
+      getUserNodes,
+    };
   },
 };
 </script>

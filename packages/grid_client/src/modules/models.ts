@@ -533,6 +533,8 @@ class UserFarmsGetModel {
   @Expose() @IsInt() @Min(1) @IsNotEmpty() twinId: number;
 }
 
+class UserNodesGetModel extends UserFarmsGetModel {}
+
 class NodesGetModel extends FarmsGetModel {}
 
 class FarmHasFreePublicIPsModel {
@@ -839,4 +841,5 @@ export {
   RemoveFarmIPModel,
   AddStellarModel,
   AddPublicConfig,
+  UserNodesGetModel,
 };
