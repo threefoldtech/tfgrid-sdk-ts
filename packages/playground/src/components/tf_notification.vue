@@ -31,7 +31,7 @@ onMounted(async () => {
       createToast("You have " + contractsCount.value + " contracts in grace period", {
         position: "top-right",
         hideProgressBar: true,
-        toastBackgroundColor: "red",
+        toastBackgroundColor: "#FF5252",
         timeout: 5000,
         showIcon: true,
         type: "info",
