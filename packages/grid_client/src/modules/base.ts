@@ -52,6 +52,10 @@ class BaseModule {
     );
   }
 
+  newGetDeploymentPath(...paths: string[]): string {
+    return PATH.join(this.config.storePath, this.moduleName, this.projectName, ...paths);
+  }
+
   getDeploymentPath(name: string): string {
     return PATH.join(this.config.storePath, this.projectName, this.moduleName, name);
   }
@@ -105,8 +109,32 @@ class BaseModule {
     }
   }
 
+  async _migrateListKeys(): Promise<void> {
+    const oldPath = this.getDeploymentPath("");
+    const oldKeys = await this.backendStorage.list(oldPath);
+    const oldValues = await Promise.all(
+      oldKeys.map(key => {
+        return this.backendStorage.load(PATH.join(oldPath, key, "contracts.json"));
+      }),
+    );
+
+    for (let i = 0; i < oldKeys.length; i++) {
+      const key = oldKeys[i];
+      const path = this.newGetDeploymentPath(key, key, "contracts.json");
+      const value = oldValues[i];
+
+      await this.backendStorage.dump(path, value);
+      await this.backendStorage.remove(PATH.join(oldPath, key, "contracts.json"));
+    }
+  }
+
   async _list(): Promise<string[]> {
-    return await this.backendStorage.list(this.getDeploymentPath(""));
+    const list = await this.backendStorage.list(this.newGetDeploymentPath(""));
+
+    if (list.length > 0) return list;
+
+    await this._migrateListKeys();
+    return this.backendStorage.list(this.newGetDeploymentPath(""));
   }
 
   async exists(name: string): Promise<boolean> {
