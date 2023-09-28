@@ -24,7 +24,9 @@
     </v-row>
     <v-row justify="center">
       <v-progress-circular v-if="loading" indeterminate color="primary" :size="50" class="mt-10 mb-10" />
-      <v-btn v-if="!loading" class="mt-5 primary" @click="getNodeHealthUrl">Check Node Health</v-btn>
+      <v-btn rounded="lg" variant="flat" color="primary" v-if="!loading" class="mt-7" @click="getNodeHealthUrl">
+        Check Node Health
+      </v-btn>
     </v-row>
   </div>
 </template>
@@ -35,6 +37,7 @@ import { type PropType, ref } from "vue";
 
 import { getNodeStates } from "@/explorer/utils/helpers";
 import { nodeStatsInitializer, type ResourceWrapper } from "@/explorer/utils/types";
+import { GrafanaStatistics } from "@/utils/getMetricsUrl";
 
 export default {
   props: {
@@ -53,8 +56,10 @@ export default {
     const loading = ref<boolean>(false);
     const nodeStats = ref<NodeStats>(nodeStatsInitializer);
 
-    const getNodeHealthUrl = () => {
-      const nodeHealthUrl = "";
+    const getNodeHealthUrl = async () => {
+      console.log(props.node);
+      const grafana = new GrafanaStatistics(props.node);
+      const nodeHealthUrl = await grafana.getUrl();
       window.open(nodeHealthUrl, "_blank");
     };
 

@@ -1,70 +1,76 @@
-import type { GridClient } from "@threefold/grid_client";
+import GridProxyClient, { type GridNode, type TwinsQuery } from "@threefold/gridproxy_client";
 
 export interface IGrafanaArgs {
-  orgID: number;
   farmID: number;
-  network: string;
+  twinID: number;
   accountID: string;
 }
 
-export class GrafanaStatistics implements IGrafanaArgs {
-  public orgID = 2;
-  public network = "";
-  public accountID = "";
-  public grid: GridClient;
-  public deployment: any;
+export class GrafanaStatistics {
+  private client: GridProxyClient;
+  private network: string;
   public farmID: number;
+  public twinID: number;
+  public accountID: string;
+  private orgID: number;
+  private node: GridNode;
 
-  constructor(grid: GridClient, deployment: any) {
-    this.grid = grid;
-    this.deployment = deployment;
-    this.network = grid.clientOptions?.network || "dev";
-    this.farmID = 0;
-  }
-
-  async setNodeAccountID() {
-    if (this.deployment.length && this.deployment[0]["nodeId"]) {
-      const node = await this.grid.nodes.get({ id: this.deployment[0].nodeId });
-      if (node) {
-        await this.grid.twins.get({ id: node.twinId }).then(res => {
-          this.accountID = res.accountId;
-          this.farmID = node.farmId;
-        });
-      }
-    }
-  }
-
-  async getUrl() {
-    await this.setNodeAccountID();
+  constructor(node: GridNode, orgID = 2) {
+    this.node = node;
+    const network = process.env.NETWORK || (window as any).env.NETWORK;
+    const client = new GridProxyClient(network);
+    this.client = client;
+    this.twinID = node.twinId;
+    this.farmID = node.farmId;
+    this.network = process.env.NETWORK || (window as any).env.NETWORK;
     this.updateNetwork();
-    const orgId = `orgId=${this.orgID}`;
-    const network = `var-network=${this.network}`;
-    const farmID = `var-farm=${this.farmID}`;
-    const nodeID = `var-node=${this.accountID}`;
-
-    const urlArgs = `${orgId}&refresh=30s&${network}&${farmID}&${nodeID}`;
-    const url = `https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?${urlArgs}`;
-    return url;
+    this.orgID = orgID;
+    this.accountID = "";
   }
 
-  public updateNetwork() {
-    if (this.network.length) {
-      switch (this.network) {
-        case "dev":
-          this.network = "development";
-          break;
-        case "qa":
-          this.network = "qa";
-          break;
-        case "test":
-          this.network = "testing";
-          break;
-        case "main":
-          this.network = "production";
-          break;
-      }
-    } else {
-      throw Error("Can not get the network from the GridClient Options");
+  private async getAccountID() {
+    const twinsListParams: Partial<TwinsQuery> = {
+      twinId: this.node.twinId,
+    };
+
+    const twins = await this.client.twins.list(twinsListParams);
+    if (twins.data.length > 0) {
+      this.accountID = twins.data[0].accountId;
     }
+  }
+
+  private updateNetwork() {
+    switch (this.network) {
+      case "dev":
+        this.network = "development";
+        break;
+      case "qa":
+        this.network = "qa";
+        break;
+      case "test":
+        this.network = "testing";
+        break;
+      case "main":
+        this.network = "production";
+        break;
+      // Add a default case to handle other network values
+      default:
+        break;
+    }
+  }
+
+  public async getUrl(): Promise<string> {
+    await this.getAccountID();
+    const url = new URL("https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics");
+    const params = new URLSearchParams();
+    params.set("orgId", this.orgID.toString());
+    params.set("refresh", "30s");
+    params.set("var-network", this.network);
+    params.set("var-farm", this.farmID.toString());
+    params.set("var-node", this.accountID);
+    params.set("var-diskdevices", "[a-z]+|nvme[0-9]+n[0-9]+|mmcblk[0-9]+");
+
+    url.search = params.toString();
+    return url.toString();
   }
 }

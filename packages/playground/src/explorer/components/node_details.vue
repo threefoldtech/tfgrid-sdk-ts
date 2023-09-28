@@ -24,6 +24,15 @@
 
       <template v-else>
         <node-resources-charts :node="node" />
+        <v-row>
+          <v-col cols="4">
+            <v-card>
+              <v-card-header> </v-card-header>
+            </v-card>
+          </v-col>
+          <v-col cols="4"></v-col>
+          <v-col cols="4"></v-col>
+        </v-row>
       </template>
     </v-card>
   </v-dialog>

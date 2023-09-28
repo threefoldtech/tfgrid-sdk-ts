@@ -93,6 +93,7 @@ import { ref, watch } from "vue";
 import { onMounted } from "vue";
 import { useRoute } from "vue-router";
 
+import NodeDetails from "@/explorer/components/node_details.vue";
 import NodesTable from "@/explorer/components/nodes_table.vue";
 import router from "@/router";
 import { inputsInitializer } from "@/utils/filter_nodes";
@@ -109,6 +110,7 @@ import {
 export default {
   components: {
     NodesTable,
+    NodeDetails,
   },
   setup() {
     const filterInputs = ref<FilterInputs>(inputsInitializer);
