@@ -209,7 +209,7 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
     createToast("Transaction Succeeded", {
       position: "top-right",
       hideProgressBar: true,
-      toastBackgroundColor: "black",
+      toastBackgroundColor: "#1aa18f",
       timeout: 5000,
       showIcon: true,
       type: "success",

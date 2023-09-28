@@ -110,7 +110,7 @@ onMounted(async () => {
     createToast(`You have received ${DecimalDeposit.dividedBy(divisor)} TFT`, {
       position: "top-right",
       hideProgressBar: true,
-      toastBackgroundColor: "black",
+      toastBackgroundColor: "#1aa18f",
       timeout: 5000,
       showIcon: true,
       type: "success",

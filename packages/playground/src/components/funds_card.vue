@@ -50,7 +50,7 @@ export default {
           createToast(`Get more TFT failed!`, {
             position: "top-right",
             hideProgressBar: true,
-            toastBackgroundColor: "black",
+            toastBackgroundColor: "red",
             timeout: 5000,
             type: "danger",
             showIcon: true,
