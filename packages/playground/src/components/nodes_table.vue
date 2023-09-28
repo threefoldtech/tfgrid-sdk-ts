@@ -29,7 +29,15 @@
         :footer-props="{
           'items-per-page-options': [5, 10, 15, 50],
         }"
+        @item-expanded="exposed.getNodeDetails"
       >
+        <template v-slot:[`item.actions`]="{ item }">
+          <reserve-btn
+            :node-id="item.raw.nodeId"
+            :rented-by-twin-id="item.raw.rentedByTwinId"
+            :twin-id="(profileManager.profile?.twinId as number)"
+          ></reserve-btn>
+        </template>
       </v-data-table>
     </v-card>
   </div>
@@ -57,7 +65,11 @@ const headers: VDataTableHeader = [
     title: "Price (USD)",
     key: "price",
   },
-  { title: "Actions", key: "actions", sortable: false },
+  {
+    title: "Actions",
+    key: "actions",
+    sortable: false,
+  },
 ];
 const profileManager = useProfileManager();
 const pageSize = ref(10);
@@ -67,6 +79,8 @@ const activeTab = ref(0);
 const loading = ref(false);
 const nodes = ref();
 const nodesCount = ref(0);
+const dNodeError = ref(false);
+const dNodeLoading = ref(false);
 
 onMounted(async () => {
   loadData();
@@ -93,6 +107,7 @@ async function loadData() {
         item.publicConfig.ipv4,
       );
     }
+    console.log("Nodes ", data.data);
     nodesCount.value = data.count ?? 0;
     loading.value = false;
   }
@@ -146,14 +161,40 @@ async function calculatePrice(cru: string, mru: string, sru: string, hru: string
   }
 }
 
+async function getNodeDetails(event: any) {
+  if (!event.value) return;
+  try {
+    dNodeError.value = false;
+    dNodeLoading.value = true;
+    const res = await gridProxyClient.farms.list({ farmId: event.item.farm.id });
+    console.log("Farms ", res);
+    if (Array.isArray(res) && !res.length) throw new Error("Can't resolve farm data");
+    event.item.farm.name = res.data[0].name;
+    event.item.farm.farmCertType = res.data[0].certificationType;
+    event.item.farm.pubIps = res.data[0].publicIps.length;
+  } catch (e) {
+    dNodeError.value = true;
+    console.log("Error farms ", e);
+  }
+  dNodeLoading.value = false;
+}
+
+const exposed = {
+  nodes,
+  getNodeDetails,
+};
+
 watch(activeTab, () => {
   loadData();
 });
 </script>
 
 <script lang="ts">
+import ReserveBtn from "../components/reserve_action_btn.vue";
 export default {
   name: "Dedicated Node",
-  components: {},
+  components: {
+    ReserveBtn,
+  },
 };
 </script>
