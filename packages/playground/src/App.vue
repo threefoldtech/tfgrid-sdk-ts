@@ -123,7 +123,7 @@
               <router-view v-slot="{ Component }">
                 <transition name="fade">
                   <div :key="$route.path">
-                    <component :is="Component" v-if="hasActiveProfile"></component>
+                    <component :is="Component" v-if="hasActiveProfile && hasGrid"></component>
                     <ConnectWalletLanding @openProfile="openProfile = true" v-else />
                   </div>
                 </transition>
@@ -146,10 +146,12 @@ import { useProfileManager } from "./stores/profile_manager";
 const $route = useRoute();
 const $router = useRouter();
 const profileManager = useProfileManager();
+const gridStore = useGrid();
 const network = process.env.NETWORK || (window as any).env.NETWORK;
 
 const openProfile = ref(true);
 const hasActiveProfile = computed(() => !!profileManager.profile);
+const hasGrid = computed(() => !!gridStore.grid);
 watch(
   () => $route.meta,
   meta => (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
@@ -305,6 +307,7 @@ import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
 import FundsCard from "./components/funds_card.vue";
 import ProfileManagerController from "./components/profile_manager_controller.vue";
 import TFNotification from "./components/tf_notification.vue";
+import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
 
 interface AppRoute {

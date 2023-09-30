@@ -5,19 +5,19 @@
       <v-card-title class="pa-0 font-weight-bold">Farms</v-card-title>
     </v-card>
 
-    <FarmNodes />
     <UserFarms />
+    <UserNodes />
   </v-container>
 </template>
 
-<script>
-import FarmNodes from "../components/dashboard/portal/farm_nodes.vue";
+<script lang="ts">
 import UserFarms from "../components/dashboard/portal/user_farms.vue";
+import UserNodes from "../components/dashboard/portal/user_nodes.vue";
 
 export default {
   name: "PortalFarms",
   components: {
-    FarmNodes,
+    UserNodes,
     UserFarms,
   },
   setup() {
