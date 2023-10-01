@@ -37,7 +37,7 @@
 
           <v-card class="my-3 pa-3" v-for="(proposal, i) in filteredProposals(tab.content.value)" :key="i">
             <v-card-title class="pa-3 mb-2" v-if="proposal.action">
-              {{ proposal.action.toUpperCase() }}
+              {{ proposal.action }}
             </v-card-title>
             <!-- <v-card-subtitle class="pb-0">
               <p class="font-weight-bold">
