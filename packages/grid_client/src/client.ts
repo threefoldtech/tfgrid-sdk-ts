@@ -43,6 +43,7 @@ class GridClient {
   networks: modules.networks;
   dao: modules.dao;
   bridge: modules.bridge;
+  councilMembership: modules.councilMembership;
   modules: string[] = [];
 
   constructor(public clientOptions?: ClientOptions) {

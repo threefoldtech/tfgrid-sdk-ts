@@ -12,3 +12,4 @@ export * from "./twins";
 export * from "./types";
 export * from "./utility";
 export * from "./tft_bridge";
+export * from "./councilMembership";
