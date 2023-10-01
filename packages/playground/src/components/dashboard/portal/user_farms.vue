@@ -1,22 +1,22 @@
-<template>
+<template v-if="farms">
   <div class="my-6">
-    <v-card color="primary rounded-b-0">
-      <v-card-title class="py-1 text-subtitle-1 font-weight-bold">Your Farms</v-card-title>
-    </v-card>
     <v-data-table
-      v-if="farms"
       :headers="headers"
       :items="farms"
       single-expand="true"
-      show-expand
       :expanded.sync="expanded"
+      show-expand
       item-value="name"
     >
-      <template v-slot:expanded-item="{ item }">
+      <template v-slot:top>
+        <v-toolbar flat color="primary">
+          <v-toolbar-title class="mb-6 text-subtitle-1">Your Farms</v-toolbar-title>
+        </v-toolbar>
+      </template>
+      <template v-slot:expanded-row="{ columns, item }">
         <tr>
-          <td>
-            {{ item.name }}
-            nenenenenenene
+          <td :colspan="columns.length">
+            <PublicIPsTable :farmId="item.columns.farmId" />
           </td>
         </tr>
       </template>
@@ -29,9 +29,19 @@ import type { FarmInfo } from "@threefold/grid_client";
 import { onMounted, ref } from "vue";
 
 import { useGrid, useProfileManager } from "../../../stores";
+import PublicIPsTable from "./public_ips_table.vue";
 
 export default {
   name: "UserFarms",
+  props: {
+    farmId: {
+      type: Number,
+      required: true,
+    },
+  },
+  components: {
+    PublicIPsTable,
+  },
   setup() {
     const gridStore = useGrid();
     const profileManager = useProfileManager();
@@ -135,3 +145,8 @@ export default {
   },
 };
 </script>
+<style scoped>
+.v-toolbar {
+  height: 2.5rem !important;
+}
+</style>
