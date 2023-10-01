@@ -138,31 +138,22 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import { useProfileManager } from "./stores/profile_manager";
-import { getGrid } from "./utils/grid";
 
 const $route = useRoute();
 const $router = useRouter();
 const profileManager = useProfileManager();
 const network = process.env.NETWORK || (window as any).env.NETWORK;
-const openVotDialog = ref(false);
+
 const openProfile = ref(true);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 watch(
   () => $route.meta,
   meta => (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
 );
-// onMounted(async () => {
-//   const profile = profileManager.profile!;
-//   const grid = await getGrid(profile);
-//   const councilMembers = grid?
-//   // setTimeout(() => {
-//   //   openVotDialog.value = true;
-//   // }, 2000);
-// });
 
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;

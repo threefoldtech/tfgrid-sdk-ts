@@ -44,6 +44,17 @@
           <v-btn class="custom-button bg-primary" @click="editTwin">Edit</v-btn>
         </v-card-actions>
       </v-card>
+
+      <v-dialog v-model="openVotePopup" max-width="600">
+        <v-card>
+          <v-toolbar color="primary" dark class="custom-toolbar">Vote Reminder</v-toolbar>
+          <v-card-text>There are {{}} proposals you haven't voted on yet</v-card-text>
+          <v-card-actions class="justify-end pa-5">
+            <v-btn @click="openVotePopup = false" class="grey lighten-2 black--text">Close</v-btn>
+            <v-btn @click="redirectToDao" class="primary white--text">Vote</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-container>
   </div>
 </template>
@@ -52,6 +63,7 @@
 import { generatePublicKey } from "@threefold/rmb_direct_client";
 import { onMounted, ref } from "vue";
 
+import router from "../router";
 import { useProfileManager } from "../stores";
 import { getGrid } from "../utils/grid";
 
@@ -61,7 +73,24 @@ const editingTwin = ref(false);
 const relay = ref(profileManager.profile?.relay || "");
 const updateRelay = ref(false);
 const errorMsg = ref("");
+const openVotePopup = ref(false);
+onMounted(async () => {
+  const profile = profileManager.profile!;
+  const grid = await getGrid(profile);
+  const councilMembers = await grid?.councilMembership.members();
 
+  if (councilMembers) {
+    if (councilMembers.includes(profile.address)) {
+      setTimeout(() => {
+        openVotePopup.value = true;
+        console.log("howdy");
+      }, 500);
+    }
+  }
+});
+function redirectToDao() {
+  router.push({ path: "/portal/dao" });
+}
 onMounted(validateEdit);
 async function validateEdit() {
   try {
