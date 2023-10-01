@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
-    <v-card color="#1AA18F" class="my-3 pa-3 text-center">
-      <v-icon width="26">mdi-note-check-outline</v-icon>
+    <v-card color="#1AA18F" class="my-3 pa-3 d-flex justify-center align-baseline">
+      <v-icon width="26" class="mx-2">mdi-note-check-outline</v-icon>
       <h2>DAO</h2>
     </v-card>
     <div class="d-flex my-12 align-center justify-center" v-if="loadingProposals">
