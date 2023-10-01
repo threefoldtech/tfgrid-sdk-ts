@@ -83,7 +83,6 @@ onMounted(async () => {
     if (councilMembers.includes(profile.address)) {
       setTimeout(() => {
         openVotePopup.value = true;
-        console.log("howdy");
       }, 500);
     }
   }
