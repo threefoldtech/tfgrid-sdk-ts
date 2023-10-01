@@ -311,17 +311,19 @@ async function castVote() {
       createToast("Voted for proposal!", {
         position: "top-right",
         hideProgressBar: true,
-        toastBackgroundColor: "green",
+        toastBackgroundColor: "#1aa18f",
         timeout: 5000,
         showIcon: true,
+        type: "success",
       });
     } catch (err) {
       createToast(`Vote Failed!`, {
         position: "top-right",
         hideProgressBar: true,
-        toastBackgroundColor: "red",
+        toastBackgroundColor: "#FF5252",
         timeout: 5000,
         showIcon: true,
+        type: "danger",
       });
     }
   }
