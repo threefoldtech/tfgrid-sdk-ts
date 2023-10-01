@@ -48,7 +48,7 @@
       <v-dialog v-model="openVotePopup" max-width="600">
         <v-card>
           <v-toolbar color="primary" dark class="custom-toolbar">Vote Reminder</v-toolbar>
-          <v-card-text>There are {{}} proposals you haven't voted on yet</v-card-text>
+          <v-card-text>There are {{ numberOfActiveProposals }} active proposals you can vote on now</v-card-text>
           <v-card-actions class="justify-end pa-5">
             <v-btn @click="openVotePopup = false" class="grey lighten-2 black--text">Close</v-btn>
             <v-btn @click="redirectToDao" class="primary white--text">Vote</v-btn>
@@ -74,6 +74,7 @@ const relay = ref(profileManager.profile?.relay || "");
 const updateRelay = ref(false);
 const errorMsg = ref("");
 const openVotePopup = ref(false);
+const numberOfActiveProposals = ref(0);
 onMounted(async () => {
   const profile = profileManager.profile!;
   const grid = await getGrid(profile);
@@ -81,9 +82,12 @@ onMounted(async () => {
 
   if (councilMembers) {
     if (councilMembers.includes(profile.address)) {
-      setTimeout(() => {
-        openVotePopup.value = true;
-      }, 500);
+      const proposals = grid?.dao.get();
+
+      const activeProposals = (await proposals)?.active;
+      numberOfActiveProposals.value = activeProposals ? activeProposals.length : 0;
+
+      openVotePopup.value = true;
     }
   }
 });
