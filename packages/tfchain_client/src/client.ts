@@ -233,7 +233,6 @@ class Client extends QueryClient {
   dao: Dao = new Dao(this);
   tftBridge: Bridge = new Bridge(this);
 
-
   declare url: string;
   mnemonicOrSecret?: string;
   keypairType: KeypairType;
