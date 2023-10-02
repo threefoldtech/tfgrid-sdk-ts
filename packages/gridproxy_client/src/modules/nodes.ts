@@ -2,13 +2,14 @@ import { NodesBuilder, type NodesQuery } from "../builders/nodes";
 import { resolvePaginator } from "../utils";
 import { AbstractClient } from "./abstract_client";
 import type { Farm, FarmsClient } from "./farms";
-import type { GridNode, NodeStats, PublicIps } from "./gateways";
+import type { GPUCard, GridNode, NodeStats, PublicIps } from "./gateways";
 import type { Twin, TwinsClient } from "./twins";
 
 export interface NodesExtractOptions {
   loadFarm?: boolean;
   loadTwin?: boolean;
   loadStats?: boolean;
+  loadGpu?: boolean;
 }
 
 export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
@@ -50,6 +51,22 @@ export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
       });
     }
 
+    if (!extraOptions.loadGpu) {
+      nodes.data = nodes.data.map(n => {
+        n.cards = [];
+        return n;
+      });
+    }
+
+    if (extraOptions.loadGpu) {
+      const nodesGpu = await Promise.all(nodes.data.map(n => this.gpuById(n.nodeId)));
+      nodes.data = nodes.data.map((n, index) => {
+        const cards = nodesGpu[index];
+        n.cards = Array.isArray(cards) ? cards : [];
+        return n;
+      });
+    }
+
     return nodes;
   }
 
@@ -77,11 +94,25 @@ export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
       node.stats = await this.statsById(node.nodeId);
     }
 
+    node.cards = [];
+
+    if (extraOptions.loadGpu) {
+      const cards = await this.gpuById(node.nodeId);
+      if (Array.isArray(cards)) {
+        node.cards = cards;
+      }
+    }
+
     return node;
   }
 
   public async statsById(nodeId: number): Promise<NodeStats> {
     const res = await this.builder({}).build(`/nodes/${nodeId}/statistics`);
+    return res.json();
+  }
+
+  public async gpuById(nodeId: number): Promise<GPUCard[] | null | { error: string }> {
+    const res = await this.builder({}).build(`/nodes/${nodeId}/gpu`);
     return res.json();
   }
 
