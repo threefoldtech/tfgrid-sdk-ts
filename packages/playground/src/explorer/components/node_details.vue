@@ -4,16 +4,14 @@
     @update:modelValue="(val:boolean) => $emit('close-dialog', val)"
     :scrim="false"
     transition="dialog-bottom-transition"
-    fullscreen
     hide-overlay
   >
     <v-card>
-      <v-toolbar dark color="primary">
+      <v-card-title>
         <v-btn icon dark @click="() => $emit('close-dialog', false)">
           <v-icon>mdi-close</v-icon>
         </v-btn>
-        <v-toolbar-title>Node {{ node.nodeId }}</v-toolbar-title>
-      </v-toolbar>
+      </v-card-title>
 
       <div v-if="loading" class="d-flex justify-center" style="height: 100%">
         <div class="align-self-center d-flex flex-column align-center">
@@ -23,7 +21,7 @@
       </div>
 
       <template v-else>
-        <node-resources-charts :node="node" />
+        <node-resources-charts :node="node" :grid-proxy-client="gridProxyClient" />
 
         <v-row class="pa-8 mt-5">
           <v-col cols="4">
@@ -52,6 +50,7 @@
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { GridNode, NodeStats } from "@threefold/gridproxy_client";
+import type GridProxyClient from "@threefold/gridproxy_client";
 // import { byCountry } from "country-code-lookup";
 // import { createToast } from "mosha-vue-toastify";
 import { type PropType, ref, watch } from "vue";
@@ -75,6 +74,10 @@ export default {
     },
     node: {
       type: Object as PropType<GridNode>,
+      required: true,
+    },
+    gridProxyClient: {
+      type: Object as PropType<GridProxyClient>,
       required: true,
     },
   },
@@ -199,4 +202,3 @@ export default {
   opacity: 1 !important;
 }
 </style>
-@/utils/format_resource_size

@@ -98,19 +98,19 @@ export const inputsInitializer: FilterInputs = {
     type: "text",
   },
   freeSru: {
-    label: "Free SRU (GB)",
+    label: "Free SSD (GB)",
     placeholder: "Filter by Free SSD greater than or equal to.",
     rules: [[isNumeric("This field accepts numbers only.", { no_symbols: true })]],
     type: "text",
   },
   freeHru: {
-    label: "Free HRU (GB)",
+    label: "Free HDD (GB)",
     placeholder: "Filter by Free HDD greater than or equal to.",
     rules: [[isNumeric("This field accepts numbers only.", { no_symbols: true })]],
     type: "text",
   },
   freeMru: {
-    label: "Free MRU (GB)",
+    label: "Free RAM (GB)",
     placeholder: "Filter by Free Memory greater than or equal to.",
     value: undefined,
     rules: [[isNumeric("This field accepts numbers only.", { no_symbols: true })]],

@@ -82,13 +82,18 @@
         </v-row>
       </div>
     </div>
-    <node-details :node="selectedNode" :openDialog="isDialogOpened" @close-dialog="closeDialog" />
+    <node-details
+      :grid-proxy-client="client"
+      :node="selectedNode"
+      :openDialog="isDialogOpened"
+      @close-dialog="closeDialog"
+    />
   </view-layout>
 </template>
 
 <script lang="ts">
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { type GridNode, type NodesQuery, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
+import GridProxyClient, { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
 import debounce from "lodash/debounce.js";
 import { ref, watch } from "vue";
 import { onMounted } from "vue";
@@ -129,10 +134,13 @@ export default {
     const nodeStatusOptions = [NodeStatus.Up, NodeStatus.Standby, NodeStatus.Down];
     const route = useRoute();
 
+    const network = process.env.NETWORK || (window as any).env.NETWORK;
+    const client = new GridProxyClient(network);
+
     const _requestNodes = async (options: Partial<NodesQuery> = {}, config: NodeRequestConfig) => {
       try {
         tableLoading.value = true;
-        const { count, data } = await requestNodes(options, config);
+        const { count, data } = await requestNodes(options, config, client);
         nodes.value = data;
         if (count) {
           nodesCount.value = count;
@@ -168,11 +176,15 @@ export default {
 
     const checkSelectedNode = async () => {
       if (route.query.nodeId) {
-        const node: GridNode | any = await getNode(+route.query.nodeId, {
-          loadFarm: true,
-          loadStats: true,
-          loadTwin: true,
-        });
+        const node: GridNode | any = await getNode(
+          +route.query.nodeId,
+          {
+            loadFarm: true,
+            loadStats: mixedFilters.value.options.status === NodeStatus.Down ? false : true,
+            loadTwin: true,
+          },
+          client,
+        );
         node.total_resources = node.capacity.total_resources;
         node.used_resources = node.capacity.used_resources;
         selectedNode.value = node;
@@ -189,11 +201,15 @@ export default {
     };
 
     const openDialog = async (item: { props: { title: GridNode } }) => {
-      const node: GridNode = await getNode(item.props.title.nodeId, {
-        loadFarm: true,
-        loadStats: true,
-        loadTwin: true,
-      });
+      const node: GridNode = await getNode(
+        item.props.title.nodeId,
+        {
+          loadFarm: true,
+          loadStats: mixedFilters.value.options.status === NodeStatus.Down ? false : true,
+          loadTwin: true,
+        },
+        client,
+      );
       selectedNode.value = node;
       router.push({ path: route.path, query: { nodeId: selectedNode.value.nodeId } });
       isDialogOpened.value = true;
@@ -217,6 +233,7 @@ export default {
       filterOptions,
       isDialogOpened,
       isValidForm,
+      client,
 
       openDialog,
       closeDialog,

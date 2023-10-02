@@ -27,7 +27,7 @@ export default {
 
     const mount = () => {
       loading.value = true;
-      farmItems.value = getNodeDetailsCard();
+      farmItems.value = getFarmDetails();
       loading.value = false;
     };
 
@@ -45,7 +45,7 @@ export default {
       });
     };
 
-    const getNodeDetailsCard = (): NodeDetailsCard[] => {
+    const getFarmDetails = (): NodeDetailsCard[] => {
       return [
         { name: "ID", value: props.node.farmId.toString() },
         { name: "Name", value: props.node.farm.name },

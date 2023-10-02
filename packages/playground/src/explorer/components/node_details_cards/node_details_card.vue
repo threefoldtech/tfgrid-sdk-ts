@@ -47,8 +47,14 @@ export default {
         { name: "RAM", value: formatResourceSize(props.node.total_resources.mru) },
         { name: "Created", value: toHumanDate(props.node.created) },
         { name: "Certification Type", value: props.node.certificationType },
-        { name: "Number of Workloads", value: props.node.stats.users.workloads.toString() },
-        { name: "Number of Deployments", value: props.node.stats.users.deployments.toString() },
+        {
+          name: "Number of Workloads",
+          value: props.node.stats && props.node.stats.system ? props.node.stats.users.workloads.toString() : "N/A",
+        },
+        {
+          name: "Number of Deployments",
+          value: props.node.stats && props.node.stats.system ? props.node.stats.users.deployments.toString() : "N/A",
+        },
       ];
     };
 
