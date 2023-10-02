@@ -7,7 +7,7 @@ import { checkBalance } from "./utils";
 
 class KVStore {
   client: TFClient;
-  constructor(config: GridClientConfig) {
+  constructor(public config: GridClientConfig) {
     this.client = config.tfclient;
   }
   @expose
