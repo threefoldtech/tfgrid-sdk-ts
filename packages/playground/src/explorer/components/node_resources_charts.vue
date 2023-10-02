@@ -1,5 +1,5 @@
 <template>
-  <div class="node-resources">
+  <div class="node-resources mt-10">
     <v-row justify="center">
       <v-col cols="8">
         <h2 class="node-resources-title text-center text-h4 flex justify-center items-center">

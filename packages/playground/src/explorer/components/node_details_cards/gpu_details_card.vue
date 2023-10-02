@@ -1,5 +1,5 @@
 <template>
-  <card-details :loading="loading" title="Node Twin Details" :items="twinItems" icon="mdi-account" />
+  <card-details :loading="loading" title="GPU Details" :items="twinItems" icon="mdi-credit-card-settings-outline" />
 </template>
 
 <script lang="ts">
@@ -47,7 +47,7 @@ export default {
 
     const getNodeTwinDetailsCard = (): NodeDetailsCard[] => {
       return [
-        { name: "ID", value: props.node.twin.twinId.toString() },
+        { name: "Card ID", value: props.node.twin.twinId.toString() },
         {
           name: "Account ID",
           value: props.node.twin.accountId,

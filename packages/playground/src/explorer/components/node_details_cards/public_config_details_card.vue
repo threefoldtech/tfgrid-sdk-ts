@@ -1,5 +1,5 @@
 <template>
-  <card-details :loading="loading" title="Node Twin Details" :items="twinItems" icon="mdi-account" />
+  <card-details :loading="loading" title="Public Configs Details" :items="twinItems" icon="mdi-cog" />
 </template>
 
 <script lang="ts">
@@ -12,7 +12,7 @@ import type { NodeDetailsCard } from "@/explorer/utils/types";
 import CardDetails from "./card_details.vue";
 
 export default {
-  name: "TwinDetailsCard",
+  name: "PublicConfigDetailsCard",
   components: { CardDetails },
   props: {
     node: {
@@ -47,15 +47,17 @@ export default {
 
     const getNodeTwinDetailsCard = (): NodeDetailsCard[] => {
       return [
-        { name: "ID", value: props.node.twin.twinId.toString() },
+        { name: "IPv4", value: props.node.publicConfig.ipv4 },
         {
-          name: "Account ID",
-          value: props.node.twin.accountId,
+          name: "IPv6",
+          value: props.node.publicConfig.ipv6,
           icon: "mdi-content-copy",
           callback: copy,
-          hint: "Copy the account id to the clipboard.",
+          hint: "Copy the IPv6 to the clipboard.",
         },
-        { name: "Relay", value: props.node.twin.relay },
+        { name: "GW4", value: props.node.publicConfig.gw4 },
+        { name: "GW6", value: props.node.publicConfig.gw6 },
+        { name: "Domain", value: props.node.publicConfig.domain },
       ];
     };
 

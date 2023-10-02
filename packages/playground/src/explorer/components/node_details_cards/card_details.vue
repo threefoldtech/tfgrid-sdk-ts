@@ -22,23 +22,27 @@
           <v-col class="d-flex justify-start">{{ item.name }}</v-col>
           <v-col class="d-flex justify-end">
             <p v-if="!item.icon && !item.hint && !item.imgSrc">
-              {{ item.value && item.value.length > 30 ? item.value.slice(0, 30) + "..." : item.value }}
+              {{ item.value && item.value.length > maxLenChar ? item.value.slice(0, maxLenChar) + "..." : item.value }}
             </p>
 
             <v-tooltip v-if="item.hint && !item.icon" location="top" :text="item.hint">
               <template #activator="{ props }">
                 <p v-bind="props">
-                  {{ item.value && item.value.length > 30 ? item.value.slice(0, 30) + "..." : item.value }}
+                  {{
+                    item.value && item.value.length > maxLenChar ? item.value.slice(0, maxLenChar) + "..." : item.value
+                  }}
                 </p>
               </template>
             </v-tooltip>
 
             <v-tooltip v-if="item.hint && item.icon" location="top" :text="item.hint">
               <template #activator="{ props }">
+                <v-icon class="mr-1" v-bind="props" :icon="item.icon" @click="item.callback!(item.value!)" />
                 <p v-bind="props">
-                  {{ item.value && item.value.length > 30 ? item.value.slice(0, 30) + "..." : item.value }}
+                  {{
+                    item.value && item.value.length > maxLenChar ? item.value.slice(0, maxLenChar) + "..." : item.value
+                  }}
                 </p>
-                <v-icon v-bind="props" :icon="item.icon" @click="item.callback!(item.value!)" />
               </template>
             </v-tooltip>
 
@@ -92,6 +96,10 @@ export default {
       type: Boolean,
       required: false,
     },
+  },
+  setup() {
+    const maxLenChar = 30;
+    return { maxLenChar };
   },
 };
 </script>

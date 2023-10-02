@@ -41,8 +41,8 @@ export default {
         { name: "Name", value: props.node.country },
         { name: "Code ISO 2", value: getCountryCode() },
         { name: "City", value: props.node.city },
-        { name: "Latitude", value: props.node.location.latitude.toString() },
-        { name: "Longitude", value: props.node.location.longitude.toString() },
+        { name: "Latitude", value: props.node.location.latitude?.toString() },
+        { name: "Longitude", value: props.node.location.longitude?.toString() },
       ];
     };
 
