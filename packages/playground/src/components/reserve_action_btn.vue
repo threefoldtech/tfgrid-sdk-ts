@@ -5,7 +5,7 @@
         <v-card-title> Are you sure you want to unreserve this dedicated node? </v-card-title>
         <v-card-text>This will free up the node for others on the chain</v-card-text>
         <v-card-actions class="justify-end">
-          <v-btn :loading="loadingUnreserveNode">Yes</v-btn>
+          <v-btn @click="unReserveNode" :loading="loadingUnreserveNode">Yes</v-btn>
           <v-btn @click="openUnreserveDialog = false">No</v-btn>
         </v-card-actions>
       </v-card>
@@ -20,13 +20,29 @@
     >
       Reserve
     </v-btn>
-    <v-btn small outlined color="red" style="background: #1aa18f" v-if="rentedByTwinId === twinId"> Unreserve </v-btn>
+    <v-btn
+      small
+      outlined
+      color="red"
+      style="background: #1aa18f"
+      v-if="rentedByTwinId === twinId"
+      @click="removeReserve()"
+    >
+      Unreserve
+    </v-btn>
     <v-btn small outlined disabled color="gray" v-if="rentedByTwinId !== 0 && rentedByTwinId !== twinId"> Taken </v-btn>
   </container>
 </template>
 
 <script lang="ts">
+import { createToast } from "mosha-vue-toastify";
 import { ref } from "vue";
+
+import { gridProxyClient } from "../clients";
+import { useProfileManager } from "../stores";
+import { getGrid } from "../utils/grid";
+
+const profileManager = useProfileManager();
 
 export default {
   name: "ReserveBtn",
@@ -44,29 +60,89 @@ export default {
       required: true,
     },
   },
-  setup() {
+  setup(props) {
     const openUnreserveDialog = ref(false);
     const loadingUnreserveNode = ref(false);
     const loadingReserveNode = ref(false);
 
-    // async function unReserveNode() {
-    //   try {
-    //     loadingUnreserveNode.value = true;
-    //     //show toast
-    //   } catch (e) {
-    //     console.log("Error ", e);
-    //   }
-    // }
-    // function removeReserve(nodeId: string) {}
+    function removeReserve() {
+      console.log("Remove Reserve");
+      openUnreserveDialog.value = true;
+    }
+
+    async function unReserveNode() {
+      loadingUnreserveNode.value = true;
+
+      try {
+        const grid = await getGrid(profileManager.profile!);
+        createToast(`check for contracts on node ${props.nodeId}`, {
+          position: "top-right",
+          hideProgressBar: true,
+          toastBackgroundColor: "#1aa18f",
+          timeout: 5000,
+          showIcon: true,
+          type: "info",
+        });
+
+        const result = (await grid?.contracts.getActiveContracts({ nodeId: +props.nodeId })) as any;
+        console.log("Result Length", result.length);
+        if (result.length > 0) {
+          createToast(`node ${props.nodeId} has active contracts`, {
+            position: "top-right",
+            hideProgressBar: true,
+            toastBackgroundColor: "#1aa18f",
+            timeout: 5000,
+            showIcon: true,
+            type: "info",
+          });
+          loadingUnreserveNode.value = false;
+          openUnreserveDialog.value = false;
+        } else {
+          createToast(`unreserving node ${props.nodeId}`, {
+            position: "top-right",
+            hideProgressBar: true,
+            toastBackgroundColor: "#1aa18f",
+            timeout: 5000,
+            showIcon: true,
+            type: "info",
+          });
+
+          const node = await gridProxyClient.nodes.byId(+props.nodeId);
+          await grid?.contracts.cancel({ id: node.rentContractId });
+          createToast(`Transaction succeeded node ${props.nodeId} Unreserved`, {
+            position: "top-right",
+            hideProgressBar: true,
+            toastBackgroundColor: "#1aa18f",
+            timeout: 5000,
+            showIcon: true,
+            type: "success",
+          });
+
+          loadingUnreserveNode.value = false;
+          openUnreserveDialog.value = false;
+        }
+      } catch (e) {
+        createToast(e as string, {
+          position: "top-right",
+          hideProgressBar: true,
+          toastBackgroundColor: "#FF5252",
+          timeout: 5000,
+          showIcon: true,
+          type: "danger",
+        });
+        loadingUnreserveNode.value = false;
+        openUnreserveDialog.value = false;
+      }
+    }
 
     // function reserveNode(nodeId: string) {}
     return {
       openUnreserveDialog,
       loadingUnreserveNode,
-      //   unReserveNode,
+      unReserveNode,
       loadingReserveNode,
-      //   reserveNode,
-      //   removeReserve,
+      // reserveNode,
+      removeReserve,
     };
   },
 };

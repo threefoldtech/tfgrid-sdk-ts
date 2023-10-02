@@ -18,8 +18,8 @@
         :headers="headers"
         :items="nodes"
         :server-items-length="nodesCount"
+        :single-expand="true"
         :loading="loading"
-        loading-text="loading dedicated nodes ..."
         show-expand
         class="elevation-1"
         :disable-sort="true"
@@ -29,7 +29,6 @@
         :footer-props="{
           'items-per-page-options': [5, 10, 15, 50],
         }"
-        @item-expanded="exposed.getNodeDetails"
       >
         <template v-slot:[`item.actions`]="{ item }">
           <reserve-btn
@@ -38,6 +37,42 @@
             :twin-id="(profileManager.profile?.twinId as number)"
           ></reserve-btn>
         </template>
+
+        <template v-slot:[`item.price`]="{ item }">
+          <v-tooltip bottom color="primary" close-delay="1000">
+            <template v-slot:activator="{ isActive, props }">
+              <span v-bind="props" v-on="isActive">{{ item.raw.price }} *</span>
+            </template>
+            <span
+              >Discounts: <br />
+              <ul class="pl-2">
+                <li>
+                  You receive 50% discount if you reserve an entire
+                  <a
+                    target="_blank"
+                    href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html#billing--pricing"
+                    style="color: primary"
+                    >node</a
+                  >
+                </li>
+                <li>
+                  You're receiving {{ item.raw.discount }}% discount as per the
+                  <a target="_blank" href="https://manual.grid.tf/cloud/cloudunits_pricing.html#discount-levels">
+                    <p style="color: primary; display: inline">discount levels</p>
+                  </a>
+                </li>
+              </ul>
+            </span>
+          </v-tooltip>
+        </template>
+
+        <!-- 
+        <template v-slot:expanded-item="{ headers, item }">
+          <td :colspan="headers.length" v-if="dNodeLoading" style="text-align: center">
+            <strong style="color: #f44336">Failed to retrieve Node details</strong>
+          </td>
+          <td :colspan="headers.length" v-else></td>
+        </template> -->
       </v-data-table>
     </v-card>
   </div>
@@ -50,7 +85,7 @@ import { onMounted, ref, watch } from "vue";
 import { gridProxyClient } from "../clients";
 import { useProfileManager } from "../stores";
 import type { VDataTableHeader } from "../types";
-import { getGrid } from "../utils/grid";
+import { getGrid, loadBalance } from "../utils/grid";
 import toTeraOrGigaOrPeta from "../utils/toTeraOrGegaOrPeta";
 
 const headers: VDataTableHeader = [
@@ -79,110 +114,125 @@ const activeTab = ref(0);
 const loading = ref(false);
 const nodes = ref();
 const nodesCount = ref(0);
-const dNodeError = ref(false);
-const dNodeLoading = ref(false);
+const tabParams = {
+  0: {
+    rentable: true,
+    status: NodeStatus.Up,
+    retCount: true,
+  },
+  1: {
+    rented: true,
+    status: NodeStatus.Up,
+    retCount: true,
+  },
+  2: {
+    rented: true,
+    rentedBy: profileManager.profile?.twinId,
+    retCount: true,
+  },
+};
+// const dNodeError = ref(false);
+// const dNodeLoading = ref(false);
 
 onMounted(async () => {
   loadData();
 });
+//TODO: How to handle page
 
 async function loadData() {
-  //TODO: add try w catch
-  //TODO: add discount
-  if (activeTab.value === 0) {
-    loading.value = true;
-    const data = await gridProxyClient.nodes.list({
-      rentable: true,
-      status: NodeStatus.Up,
-      retCount: true,
-      size: pageSize.value,
-    });
-    nodes.value = data.data;
-    for (const item of nodes.value) {
-      item.price = await calculatePrice(
-        item.total_resources.cru,
-        item.total_resources.mru,
-        item.total_resources.sru,
-        item.total_resources.hru,
-        item.publicConfig.ipv4,
-      );
-    }
-    console.log("Nodes ", data.data);
-    nodesCount.value = data.count ?? 0;
-    loading.value = false;
+  const params = tabParams[activeTab.value as keyof typeof tabParams];
+
+  if (!params) {
+    return;
   }
 
-  if (activeTab.value === 1) {
-    loading.value = true;
-    const data = await gridProxyClient.nodes.list({
-      rented: true,
-      status: NodeStatus.Up,
-      retCount: true,
-      size: pageSize.value,
-    });
-    nodes.value = data.data;
-    nodesCount.value = data.count ?? 0;
-    loading.value = false;
+  loading.value = true;
+  const data = await gridProxyClient.nodes.list({
+    ...params,
+    size: pageSize.value,
+  });
+
+  nodes.value = data.data;
+
+  for (const item of nodes.value) {
+    const price = await calculatePrice(
+      item.total_resources.cru,
+      item.total_resources.mru,
+      item.total_resources.sru,
+      item.total_resources.hru,
+      item.publicConfig.ipv4,
+      item.certificationType,
+    );
+    item.price =
+      (price as { dedicatedPrice: number } | undefined)?.dedicatedPrice ||
+      0 + (parseFloat(item.extraFee) ? parseFloat(item.extraFee) / 1000 : 0);
+    item.discount = (price as { sharedPackage: { discount: number } } | undefined)?.sharedPackage.discount || 0;
   }
 
-  if (activeTab.value === 2) {
-    loading.value = true;
-    const data = await gridProxyClient.nodes.list({
-      rented: true,
-      rentedBy: profileManager.profile?.twinId,
-      retCount: true,
-      size: pageSize.value,
-    });
-    nodes.value = data.data;
-    nodesCount.value = data.count ?? 0;
-    loading.value = false;
-  }
+  nodesCount.value = data.count ?? 0;
+  loading.value = false;
 }
 
-//TODO: handling TB && discounts
-async function calculatePrice(cru: string, mru: string, sru: string, hru: string, ipv4: string) {
-  const grid = await getGrid(profileManager.profile!);
-  const mruGB = toTeraOrGigaOrPeta(mru);
-  const hruGB = toTeraOrGigaOrPeta(hru);
-  const sruGB = toTeraOrGigaOrPeta(sru);
-
+async function calculatePrice(
+  cru: string,
+  mru: string,
+  sru: string,
+  hru: string,
+  ipv4: string,
+  certificationType: string,
+) {
   try {
-    const price = await grid?.calculator.calculate({
+    const grid = await getGrid(profileManager.profile!);
+    const balance = await loadBalance(grid!);
+    const ipv4u = ipv4 !== "";
+    const certified = certificationType !== "";
+
+    const price = await grid?.calculator.calculateWithMyBalance({
       cru: +cru,
-      hru: +hruGB.replace(/\s*(GB|TB)$/, ""),
-      ipv4u: ipv4 !== "",
-      mru: +mruGB.replace(/\s*(GB|TB)$/, ""),
-      sru: +sruGB.replace(/\s*(GB|TB)$/, ""),
+      hru: toGigaBytes(hru),
+      ipv4u,
+      mru: toGigaBytes(mru),
+      sru: toGigaBytes(sru),
+      balance: balance.free,
+      certified: certified,
     });
 
-    return price?.dedicatedPrice;
+    return price;
   } catch (e) {
     console.log("Error calculating price: ", e);
+    return 0;
   }
 }
 
-async function getNodeDetails(event: any) {
-  if (!event.value) return;
-  try {
-    dNodeError.value = false;
-    dNodeLoading.value = true;
-    const res = await gridProxyClient.farms.list({ farmId: event.item.farm.id });
-    console.log("Farms ", res);
-    if (Array.isArray(res) && !res.length) throw new Error("Can't resolve farm data");
-    event.item.farm.name = res.data[0].name;
-    event.item.farm.farmCertType = res.data[0].certificationType;
-    event.item.farm.pubIps = res.data[0].publicIps.length;
-  } catch (e) {
-    dNodeError.value = true;
-    console.log("Error farms ", e);
-  }
-  dNodeLoading.value = false;
-}
+// async function getNodeDetails(event: any) {
+//   if (!event.value) return;
+//   try {
+//     dNodeError.value = false;
+//     dNodeLoading.value = true;
+//     const res = await gridProxyClient.farms.list({ farmId: event.item.farmId });
+//     console.log("Farms ", res);
+//     if (Array.isArray(res) && !res.length) throw new Error("Can't resolve farm data");
+//     // event.item.farm.name = res.data[0].name;
+//     // event.item.farm.farmCertType = res.data[0].certificationType;
+//     // event.item.farm.pubIps = res.data[0].publicIps.length;
+//   } catch (e) {
+//     dNodeError.value = true;
+//     console.log("Error farms ", e);
+//   }
+//   dNodeLoading.value = false;
+// }
 
-const exposed = {
-  nodes,
-  getNodeDetails,
-};
+function toGigaBytes(value?: string) {
+  const giga = 1024 ** 3;
+
+  if (!value) return 0;
+
+  const val = +value;
+  if (val === 0 || isNaN(val)) return 0;
+
+  const gb = val / giga;
+  return parseFloat(gb.toFixed(2));
+}
 
 watch(activeTab, () => {
   loadData();
@@ -191,10 +241,12 @@ watch(activeTab, () => {
 
 <script lang="ts">
 import ReserveBtn from "../components/reserve_action_btn.vue";
+// import NodeDetails from "../components/node_details.vue";
 export default {
   name: "Dedicated Node",
   components: {
     ReserveBtn,
+    // NodeDetails,
   },
 };
 </script>

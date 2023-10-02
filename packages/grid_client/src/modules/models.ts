@@ -668,6 +668,10 @@ class ListenToMintCompletedModel {
   @Expose() @IsNotEmpty() @IsString() address: string;
 }
 
+class GetActiveContractsModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+}
+
 export {
   AlgorandAccountCreateModel,
   AlgorandAccountInitModel,
@@ -791,4 +795,5 @@ export {
   GetDedicatedNodePriceModel,
   SwapToStellarModel,
   ListenToMintCompletedModel,
+  GetActiveContractsModel,
 };

@@ -18,6 +18,7 @@ import {
   ContractsByTwinId,
   ContractState,
   CreateServiceContractModel,
+  GetActiveContractsModel,
   GetDedicatedNodePriceModel,
   GetServiceContractModel,
   NameContractCreateModel,
@@ -99,6 +100,12 @@ class Contracts {
   @validateInput
   async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceModel) {
     return await this.client.contracts.getDedicatedNodeExtraFee(options);
+  }
+
+  @expose
+  @validateInput
+  async getActiveContracts(options: GetActiveContractsModel) {
+    return await this.client.contracts.getActiveContracts(options);
   }
 
   @expose

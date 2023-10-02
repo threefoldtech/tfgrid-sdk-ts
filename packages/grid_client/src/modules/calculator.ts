@@ -110,9 +110,15 @@ class Calculator {
     sharedPrice = (sharedPrice - sharedPrice * (discountPackages[sharedPackage].discount / 100)) / 10000000;
     return {
       dedicatedPrice: dedicatedPrice,
-      dedicatedPackage: dedicatedPackage,
+      dedicatedPackage: {
+        package: dedicatedPackage,
+        discount: discountPackages[dedicatedPackage].discount,
+      },
       sharedPrice: sharedPrice,
-      sharedPackage: sharedPackage,
+      sharedPackage: {
+        package: sharedPackage,
+        discount: discountPackages[sharedPackage].discount,
+      },
     };
   }
 
