@@ -13,8 +13,8 @@ export interface Resources {
 export interface Location {
   country: string;
   city: string;
-  latitude: number;
   longitude: number;
+  latitude: number;
 }
 export interface PublicConfig {
   domain: string;
@@ -38,6 +38,13 @@ export interface NodeStats {
     deployments: number;
     workloads: number;
   };
+}
+
+export interface GPUCard {
+  id: string;
+  vendor: string;
+  device: string;
+  contract: number;
 }
 
 export interface GridNode {
@@ -65,6 +72,7 @@ export interface GridNode {
   publicIps: PublicIps;
   twin: Twin;
   stats: NodeStats;
+  cards: GPUCard[];
 }
 
 export class GatewaysClient extends AbstractClient<GatewayBuilder, GatewaysQuery> {
