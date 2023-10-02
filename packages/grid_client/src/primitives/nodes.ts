@@ -383,6 +383,7 @@ class Nodes {
       node_status: "up",
       page: options.page,
       size: options.size,
+      twin_id: options.ownedBy,
       node_has_gpu: options.nodeHasGPU,
       node_rented_by: options.nodeRentedBy,
       node_certified: options.nodeCertified,
