@@ -102,7 +102,7 @@ export const getQueries = (mixedFilters: MixedFilter): Partial<NodesQuery> => {
     farmIds: mixedFilters.inputs.farmIds.value,
     farmName: mixedFilters.inputs.farmName.value,
     country: mixedFilters.inputs.country.value,
-    status: mixedFilters.options.status,
+    status: mixedFilters.options.status.toLocaleLowerCase() as NodeStatus,
     page: mixedFilters.options.page,
     size: mixedFilters.options.size,
     freeHru: toBytes(+mixedFilters.inputs.freeHru.value!),

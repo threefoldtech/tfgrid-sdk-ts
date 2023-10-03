@@ -7,9 +7,11 @@
     hide-overlay
   >
     <v-toolbar dark color="info">
-      <v-btn icon dark @click="() => $emit('close-dialog', false)">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
+      <div class="d-flex justify-center">
+        <v-btn icon dark @click="() => $emit('close-dialog', false)">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </div>
     </v-toolbar>
 
     <v-card>
@@ -98,9 +100,12 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .v-list-item__prepend > .v-icon,
 .v-list-item__append > .v-icon {
   opacity: 1 !important;
+}
+.v-toolbar__content {
+  justify-content: end !important;
 }
 </style>

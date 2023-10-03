@@ -65,7 +65,7 @@
               </div>
               <div class="hint mb-2">
                 <v-alert type="info" variant="tonal">
-                  The nodes will be filtered and displayed after 1 second once you remove your finger from the filters.
+                  The nodes will be filtered and displayed after you enter the value by 1 second.
                 </v-alert>
               </div>
               <nodes-table
@@ -90,7 +90,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
 import debounce from "lodash/debounce.js";
-import { onMounted, ref, watch } from "vue";
+import { capitalize, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import NodeDetails from "@/explorer/components/node_details.vue";
@@ -125,7 +125,7 @@ export default {
     const isDialogOpened = ref<boolean>(false);
     const isValidForm = ref<boolean>(false);
 
-    const nodeStatusOptions = [NodeStatus.Up, NodeStatus.Standby, NodeStatus.Down];
+    const nodeStatusOptions = [capitalize(NodeStatus.Up), capitalize(NodeStatus.Standby), capitalize(NodeStatus.Down)];
     const route = useRoute();
 
     const _requestNodes = async (queries: Partial<NodesQuery> = {}, config: GridProxyRequestConfig) => {
@@ -190,7 +190,6 @@ export default {
     };
 
     const openDialog = async (item: { props: { title: GridNode } }) => {
-      loading.value = true;
       const node: GridNode = await getNode(item.props.title.nodeId, {
         loadFarm: true,
         loadStats: mixedFilters.value.options.status === NodeStatus.Down ? false : true,
@@ -200,7 +199,6 @@ export default {
       selectedNode.value = node;
       router.push({ path: route.path, query: { nodeId: selectedNode.value.nodeId } });
       isDialogOpened.value = true;
-      loading.value = false;
     };
 
     onMounted(async () => {

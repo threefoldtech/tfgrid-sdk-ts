@@ -1,5 +1,5 @@
 <template>
-  <card-details :loading="loading" title="Country Detials" :items="countryFields" icon="mdi-map-outline" />
+  <card-details :loading="loading" title="Country Details" :items="countryFields" icon="mdi-map-outline" />
 </template>
 
 <script lang="ts">

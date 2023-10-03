@@ -44,7 +44,7 @@
               </input-validator>
             </v-col>
             <v-col cols="12" sm="4" md="2" class="d-flex justify-start align-center mb-6 ml-4">
-              <v-btn @click="resetFilters" variant="outlined" color="primary">Reset filter</v-btn>
+              <v-btn @click="resetFilters" variant="outlined" color="primary">Reset Filters</v-btn>
             </v-col>
           </v-row>
         </v-expansion-panel-text>

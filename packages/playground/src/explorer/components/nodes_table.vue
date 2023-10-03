@@ -31,7 +31,7 @@
             <p class="text-left mt-1 mb-0">
               <v-chip :color="getNodeStatusColor(item.columns.status as string).color">
                 <span>
-                  {{ getNodeStatusColor(item.columns.status as string).status.toLocaleUpperCase() }}
+                  {{ capitalize(getNodeStatusColor(item.columns.status as string).status) }}
                 </span>
               </v-chip>
             </p>
@@ -45,6 +45,7 @@
 <script lang="ts">
 import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
 import type { PropType } from "vue";
+import { capitalize } from "vue";
 import type { VDataTable } from "vuetify/labs/VDataTable";
 
 import { getNodeStatusColor } from "@/explorer/utils/helpers";
@@ -88,34 +89,34 @@ export default {
       { title: "Total Public IPs", key: "publicIps.total", align: "start", sortable: false },
       { title: "Free Public IPs", key: "publicIps.free", align: "start", sortable: false },
       {
-        title: "CRU",
+        title: "CPU",
         key: "total_resources.cru",
         align: "start",
         sortable: false,
       },
       {
-        title: "MRU",
+        title: "RAM",
         key: "total_resources.mru",
         align: "start",
         value: item => formatResourceSize(item.total_resources.mru),
         sortable: false,
       },
       {
-        title: "SRU",
+        title: "SSD",
         key: "total_resources.sru",
         align: "start",
         value: item => formatResourceSize(item.total_resources.sru),
         sortable: false,
       },
       {
-        title: "HRU",
+        title: "  ",
         key: "total_resources.hru",
         align: "start",
         value: item => formatResourceSize(item.total_resources.hru),
         sortable: false,
       },
       { title: "GPU", key: "num_gpu", align: "start", sortable: false },
-      { title: "Up Time", key: "uptime", align: "start", sortable: false, value: item => toReadableDate(item.uptime) },
+      { title: "Uptime", key: "uptime", align: "start", sortable: false, value: item => toReadableDate(item.uptime) },
       { title: "Status", key: "status", align: "start", sortable: false },
     ];
 
@@ -128,6 +129,7 @@ export default {
       nodeStatusOptions,
       getNodeStatusColor,
       openSheet,
+      capitalize,
     };
   },
 };

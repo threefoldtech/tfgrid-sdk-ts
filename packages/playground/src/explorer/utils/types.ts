@@ -1,4 +1,5 @@
 import { CertificationType, type GridNode, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
+import { capitalize } from "vue";
 
 import type { AsyncRule, SyncRule } from "../../components/input_validator.vue";
 
@@ -42,7 +43,7 @@ export const optionsInitializer: FilterOptions = {
   gpu: undefined,
   page: 1,
   size: 10,
-  status: NodeStatus.Up,
+  status: capitalize(NodeStatus.Up) as NodeStatus,
 };
 
 export type ResourceWrapper = {

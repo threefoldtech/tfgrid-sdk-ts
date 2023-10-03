@@ -1,5 +1,5 @@
 <template>
-  <card-details :loading="loading" title="Node Detials" :items="nodeFields" icon="mdi-resistor-nodes" />
+  <card-details :loading="loading" title="Node Details" :items="nodeFields" icon="mdi-resistor-nodes" />
 </template>
 
 <script lang="ts">

@@ -1,5 +1,5 @@
 <template>
-  <card-details :loading="loading" title="Farm Detials" :items="farmFields" icon="mdi-webpack" />
+  <card-details :loading="loading" title="Farm Details" :items="farmFields" icon="mdi-webpack" />
 </template>
 
 <script lang="ts">

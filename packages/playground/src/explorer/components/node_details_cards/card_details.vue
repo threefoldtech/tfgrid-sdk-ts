@@ -40,7 +40,13 @@
 
             <v-tooltip v-if="item.hint && item.icon" location="top" :text="item.hint">
               <template #activator="{ props }">
-                <v-icon class="mr-1" v-bind="props" :icon="item.icon" @click="item.callback!(item.value!)" />
+                <v-icon
+                  v-if="item.value && item.value.length"
+                  class="mr-1"
+                  v-bind="props"
+                  :icon="item.icon"
+                  @click="item.callback!(item.value!)"
+                />
                 <p v-bind="props">
                   {{
                     item.value && item.value.length > maxLenChar ? item.value.slice(0, maxLenChar) + "..." : item.value
