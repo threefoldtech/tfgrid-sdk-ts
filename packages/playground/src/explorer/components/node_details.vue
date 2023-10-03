@@ -14,7 +14,7 @@
 
     <v-card>
       <template v-if="node">
-        <node-resources-charts :node="node" :grid-proxy-client="gridProxyClient" />
+        <node-resources-charts :node="node" />
 
         <v-row class="pa-8 mt-5" justify-md="start" justify-sm="center">
           <v-col cols="12" md="6" sm="8">
@@ -47,7 +47,6 @@
 
 <script lang="ts">
 import type { GridNode } from "@threefold/gridproxy_client";
-import type GridProxyClient from "@threefold/gridproxy_client";
 import { type PropType, ref, watch } from "vue";
 
 import CountryDetailsCard from "./node_details_cards/country_details_card.vue";
@@ -68,10 +67,6 @@ export default {
     },
     node: {
       type: Object as PropType<GridNode>,
-      required: true,
-    },
-    gridProxyClient: {
-      type: Object as PropType<GridProxyClient>,
       required: true,
     },
   },

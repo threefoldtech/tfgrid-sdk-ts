@@ -25,6 +25,8 @@
           :hover="true"
           @click:row="openSheet"
         >
+          <template #loading />
+
           <template v-slot:[`item.status`]="{ item }">
             <p class="text-left mt-1 mb-0">
               <v-chip :color="getNodeStatusColor(item.columns.status as string).color">

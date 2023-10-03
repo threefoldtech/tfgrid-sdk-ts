@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import GridProxyClient, { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
+import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
 import { type PropType, ref } from "vue";
 
 import { getNodeStatusColor } from "@/explorer/utils/helpers";
@@ -52,10 +52,6 @@ export default {
   props: {
     node: {
       type: Object as PropType<GridNode>,
-      required: true,
-    },
-    gridProxyClient: {
-      type: Object as PropType<GridProxyClient>,
       required: true,
     },
   },
@@ -106,6 +102,7 @@ export default {
       NodeStatus,
       resources,
       loading,
+
       getNodeResources,
       getNodeHealthUrl,
       isNodeReadyToVisit,

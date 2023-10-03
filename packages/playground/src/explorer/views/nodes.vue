@@ -82,18 +82,13 @@
         </v-row>
       </div>
     </div>
-    <node-details
-      :grid-proxy-client="gridProxyClient"
-      :node="selectedNode"
-      :openDialog="isDialogOpened"
-      @close-dialog="closeDialog"
-    />
+    <node-details :node="selectedNode" :openDialog="isDialogOpened" @close-dialog="closeDialog" />
   </view-layout>
 </template>
 
 <script lang="ts">
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import GridProxyClient, { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
+import { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
 import debounce from "lodash/debounce.js";
 import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
@@ -103,7 +98,7 @@ import NodesTable from "@/explorer/components/nodes_table.vue";
 import router from "@/router";
 import { inputsInitializer } from "@/utils/filter_nodes";
 
-import { getNode, getProxyClient, getQueries, requestNodes } from "../utils/helpers";
+import { getNode, getQueries, requestNodes } from "../utils/helpers";
 import {
   type FilterInputs,
   type FilterOptions,
@@ -123,7 +118,7 @@ export default {
     const filterOptions = ref<FilterOptions>(optionsInitializer);
     const mixedFilters = ref<MixedFilter>({ inputs: filterInputs.value, options: filterOptions.value });
 
-    const loading = ref<boolean>(false);
+    const loading = ref<boolean>(true);
     const nodes = ref<GridNode[]>([]);
     const nodesCount = ref<number>(0);
     const selectedNode = ref<GridNode>(nodeInitializer);
@@ -133,17 +128,10 @@ export default {
     const nodeStatusOptions = [NodeStatus.Up, NodeStatus.Standby, NodeStatus.Down];
     const route = useRoute();
 
-    const network = process.env.NETWORK || (window as any).env.NETWORK;
-    const gridProxyClient = getProxyClient(network);
-
-    const _requestNodes = async (
-      queries: Partial<NodesQuery> = {},
-      config: GridProxyRequestConfig,
-      client: GridProxyClient,
-    ) => {
+    const _requestNodes = async (queries: Partial<NodesQuery> = {}, config: GridProxyRequestConfig) => {
       loading.value = true;
       try {
-        const { count, data } = await requestNodes(queries, client, config);
+        const { count, data } = await requestNodes(queries, config);
         nodes.value = data;
         if (count) {
           nodesCount.value = count;
@@ -162,7 +150,7 @@ export default {
       async () => {
         if (isValidForm.value) {
           const queries = getQueries(mixedFilters.value);
-          await request(queries, { loadFarm: true }, gridProxyClient);
+          await request(queries, { loadFarm: true });
         }
       },
       { deep: true },
@@ -180,16 +168,12 @@ export default {
 
     const checkSelectedNode = async () => {
       if (route.query.nodeId) {
-        const node: GridNode | any = await getNode(
-          +route.query.nodeId,
-          {
-            loadFarm: true,
-            loadStats: mixedFilters.value.options.status === NodeStatus.Down ? false : true,
-            loadTwin: true,
-            loadGpu: mixedFilters.value.options.gpu,
-          },
-          gridProxyClient,
-        );
+        const node: GridNode | any = await getNode(+route.query.nodeId, {
+          loadFarm: true,
+          loadStats: mixedFilters.value.options.status === NodeStatus.Down ? false : true,
+          loadTwin: true,
+          loadGpu: mixedFilters.value.options.gpu,
+        });
         node.total_resources = node.capacity.total_resources;
         node.used_resources = node.capacity.used_resources;
         selectedNode.value = node;
@@ -207,16 +191,12 @@ export default {
 
     const openDialog = async (item: { props: { title: GridNode } }) => {
       loading.value = true;
-      const node: GridNode = await getNode(
-        item.props.title.nodeId,
-        {
-          loadFarm: true,
-          loadStats: mixedFilters.value.options.status === NodeStatus.Down ? false : true,
-          loadTwin: true,
-          loadGpu: mixedFilters.value.options.gpu,
-        },
-        gridProxyClient,
-      );
+      const node: GridNode = await getNode(item.props.title.nodeId, {
+        loadFarm: true,
+        loadStats: mixedFilters.value.options.status === NodeStatus.Down ? false : true,
+        loadTwin: true,
+        loadGpu: mixedFilters.value.options.gpu,
+      });
       selectedNode.value = node;
       router.push({ path: route.path, query: { nodeId: selectedNode.value.nodeId } });
       isDialogOpened.value = true;
@@ -226,7 +206,7 @@ export default {
     onMounted(async () => {
       await checkSelectedNode();
       const queries = getQueries(mixedFilters.value);
-      await request(queries, { loadFarm: true }, gridProxyClient);
+      await request(queries, { loadFarm: true });
     });
 
     return {
@@ -241,7 +221,6 @@ export default {
       filterOptions,
       isDialogOpened,
       isValidForm,
-      gridProxyClient,
 
       openDialog,
       closeDialog,

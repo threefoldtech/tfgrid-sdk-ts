@@ -1,21 +1,22 @@
-import type {
-  GridNode,
-  Network,
-  NodesExtractOptions,
-  NodesQuery,
-  NodeStats,
-  Pagination,
+import {
+  type GridNode,
+  type NodesExtractOptions,
+  type NodesQuery,
+  type NodeStats,
+  NodeStatus,
+  type Pagination,
 } from "@threefold/gridproxy_client";
-import GridProxyClient, { NodeStatus } from "@threefold/gridproxy_client";
 
-import type { MixedFilter } from "./types";
+import { gridProxyClient } from "@/clients";
 
-export const getProxyClient = (network: Network): GridProxyClient => {
-  const client = new GridProxyClient(network);
-  return client;
-};
+import type { MixedFilter, NodeStatusColor } from "./types";
 
-export const getNodeStatusColor = (status: string) => {
+/**
+ * Get the node status then return the color based on the status type.
+ * @param {string} status - the ststus of the node, it should be match one of these statuses [up, standby, down].
+ * @returns {NodeStatusColor} - return type of the node status color and status
+ */
+export const getNodeStatusColor = (status: string): NodeStatusColor => {
   if (status === NodeStatus.Up) {
     return { color: "info", status: NodeStatus.Up };
   } else if (status === NodeStatus.Standby) {
@@ -30,16 +31,14 @@ export const getNodeStatusColor = (status: string) => {
  *
  * @param {Partial<NodesQuery>} options - The options for querying the nodes.
  * @param {NodeRequestConfig} config - The configuration for the node request.
- * @param {GridProxyClient} client - The GridProxyClient instance.
  * @returns {Promise<Pagination<GridNode[]>>} - A promise that resolves to a pagination object containing the list of nodes.
  */
 export async function requestNodes(
   options: Partial<NodesQuery>,
-  client: GridProxyClient,
   config: NodesExtractOptions,
 ): Promise<Pagination<GridNode[]>> {
   try {
-    const nodes: Pagination<GridNode[]> = await client.nodes.list(options, config);
+    const nodes: Pagination<GridNode[]> = await gridProxyClient.nodes.list(options, config);
     return JSON.parse(JSON.stringify(nodes));
   } catch (error) {
     console.error("An error occurred while requesting nodes:", error);
@@ -50,14 +49,13 @@ export async function requestNodes(
 /**
  * Requests a node from GridProxyClient to get its stats.
  * @param {number} nodeId - The node id.
- * @param {GridProxyClient} client - The GridProxyClient instance.
  * @returns {Promise<NodeStats>} - A promise that resolves to an object containing the node stats details.
  */
-export async function getNodeStates(nodeId: number, client: GridProxyClient): Promise<NodeStats> {
+export async function getNodeStates(nodeId: number): Promise<NodeStats> {
   if (typeof nodeId !== "number" || isNaN(nodeId)) {
     throw new Error("Invalid nodeId");
   }
-  const nodeStats: NodeStats = await client.nodes.statsById(nodeId);
+  const nodeStats: NodeStats = await gridProxyClient.nodes.statsById(nodeId);
   if (nodeStats.system) {
     return nodeStats;
   } else {
@@ -69,10 +67,9 @@ export async function getNodeStates(nodeId: number, client: GridProxyClient): Pr
  * Requests a node from GridProxyClient.
  * @param {number} nodeId - The node id.
  * @param {NodesExtractOptions} config - The configuration for the node request.
- * @param {GridProxyClient} client - The GridProxyClient instance.
  * @returns {Promise<GridNode>} - A promise that resolves to an object containing the node details.
  */
-export async function getNode(nodeId: number, config: NodesExtractOptions, client: GridProxyClient): Promise<GridNode> {
+export async function getNode(nodeId: number, config: NodesExtractOptions): Promise<GridNode> {
   if (typeof nodeId !== "number" || nodeId <= 0) {
     throw new Error("Invalid nodeId. Expected a positive integer.");
   }
@@ -82,7 +79,7 @@ export async function getNode(nodeId: number, config: NodesExtractOptions, clien
   }
 
   try {
-    const node: GridNode = await client.nodes.byId(nodeId, config);
+    const node: GridNode = await gridProxyClient.nodes.byId(nodeId, config);
     return node;
   } catch (error: any) {
     throw new Error(`Failed to get node: ${error.message}`);

@@ -70,18 +70,20 @@ export const inputsInitializer: FilterInputs = {
   },
   farmIds: {
     label: "Farm IDs",
-    placeholder: "e.g. 1, 2, 3",
+    placeholder: "e.g. 1,2,3",
     rules: [
       [
         (value: string) => {
-          const ids = value.split(",").map((id: string) => {
-            const numericId = parseInt(id);
-            if (!isNaN(numericId)) {
-              return numericId;
-            }
-          });
-          const validate = isNumeric("This field accepts numbers only.", { no_symbols: false });
-          return validate(String(ids));
+          if (value.endsWith(",")) {
+            return { message: "Invalid farm ids format." };
+          }
+          const ids = value.split(",").map(parseFloat);
+          const validate = isNumeric("This field accepts numbers only.", { no_symbols: true });
+
+          for (const id of ids) {
+            const err = validate(String(id));
+            if (err) return err;
+          }
         },
       ],
     ],

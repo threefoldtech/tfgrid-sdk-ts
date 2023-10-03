@@ -32,9 +32,7 @@ export default {
       loading.value = false;
     };
 
-    onMounted(async () => {
-      mount();
-    });
+    onMounted(mount);
 
     const getNodeDetailsCard = (): NodeDetailsCard[] => {
       return [

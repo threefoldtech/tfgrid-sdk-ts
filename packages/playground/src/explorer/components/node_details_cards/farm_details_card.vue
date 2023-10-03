@@ -1,5 +1,5 @@
 <template>
-  <card-details :loading="loading" title="Farm Detials" :items="farmItems" icon="mdi-webpack" />
+  <card-details :loading="loading" title="Farm Detials" :items="farmFields" icon="mdi-webpack" />
 </template>
 
 <script lang="ts">
@@ -23,17 +23,15 @@ export default {
 
   setup(props) {
     const loading = ref<boolean>(false);
-    const farmItems = ref<NodeDetailsCard[]>();
+    const farmFields = ref<NodeDetailsCard[]>();
 
     const mount = () => {
       loading.value = true;
-      farmItems.value = getFarmDetails();
+      farmFields.value = getFarmDetails();
       loading.value = false;
     };
 
-    onMounted(async () => {
-      mount();
-    });
+    onMounted(mount);
 
     const copy = (address: string) => {
       navigator.clipboard.writeText(address);
@@ -60,7 +58,7 @@ export default {
     };
 
     return {
-      farmItems,
+      farmFields,
       loading,
     };
   },

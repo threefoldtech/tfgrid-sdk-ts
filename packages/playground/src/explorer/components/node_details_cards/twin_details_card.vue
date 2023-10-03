@@ -31,9 +31,7 @@ export default {
       loading.value = false;
     };
 
-    onMounted(async () => {
-      mount();
-    });
+    onMounted(mount);
 
     const copy = (address: string) => {
       navigator.clipboard.writeText(address);
