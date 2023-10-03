@@ -18,18 +18,17 @@
         :headers="headers"
         :items="nodes"
         :server-items-length="nodesCount"
-        :single-expand="true"
         :loading="loading"
         show-expand
         class="elevation-1"
         :disable-sort="true"
-        :expanded.sync="expanded"
         hover
         :items-per-page="pageSize"
         :footer-props="{
           'items-per-page-options': [5, 10, 15, 50],
         }"
-        @item-expanded="getNodeDetails"
+        v-model:expanded="expanded"
+        return-object
       >
         <template v-slot:[`item.actions`]="{ item }">
           <reserve-btn
@@ -67,12 +66,8 @@
           </v-tooltip>
         </template>
 
-        <template v-slot:expanded-item="{ headers }">
-          <td :colspan="headers.length" v-if="dNodeLoading" style="text-align: center">
-            <div class="pa-1">
-              <v-progress-circular indeterminate model-value="20" :width="3"></v-progress-circular>
-            </div>
-          </td>
+        <template v-slot:expanded-row="{ columns, item }">
+          <node-details :item="item" :columns-len="columns.length"></node-details>
         </template>
       </v-data-table>
     </v-card>
@@ -109,11 +104,11 @@ const headers: VDataTableHeader = [
 ];
 const profileManager = useProfileManager();
 const pageSize = ref(10);
-const expanded = ref();
+const expanded = ref([]);
 const tabs = [{ label: "Rentable" }, { label: "Rented" }, { label: "Mine" }];
 const activeTab = ref(0);
 const loading = ref(false);
-const nodes = ref();
+const nodes = ref<any[]>();
 const nodesCount = ref(0);
 const tabParams = {
   0: {
@@ -132,8 +127,6 @@ const tabParams = {
     retCount: true,
   },
 };
-// const dNodeError = ref(false);
-const dNodeLoading = ref(true);
 
 onMounted(async () => {
   loadData();
@@ -206,25 +199,6 @@ async function calculatePrice(
   }
 }
 
-async function getNodeDetails(event: any) {
-  console.log("Hello");
-  // if (!event.value) return;
-  // try {
-  //   dNodeError.value = false;
-  //   dNodeLoading.value = true;
-  //   const res = await gridProxyClient.farms.list({ farmId: event.item.farmId });
-  //   console.log("Farms ", res);
-  //   if (Array.isArray(res) && !res.length) throw new Error("Can't resolve farm data");
-  //   // event.item.farm.name = res.data[0].name;
-  //   // event.item.farm.farmCertType = res.data[0].certificationType;
-  //   // event.item.farm.pubIps = res.data[0].publicIps.length;
-  // } catch (e) {
-  //   dNodeError.value = true;
-  //   console.log("Error farms ", e);
-  // }
-  // dNodeLoading.value = false;
-}
-
 function toGigaBytes(value?: string) {
   const giga = 1024 ** 3;
 
@@ -243,13 +217,13 @@ watch(activeTab, () => {
 </script>
 
 <script lang="ts">
+import NodeDetails from "../components/node_details.vue";
 import ReserveBtn from "../components/reserve_action_btn.vue";
-// import NodeDetails from "../components/node_details.vue";
 export default {
   name: "Dedicated Node",
   components: {
     ReserveBtn,
-    // NodeDetails,
+    NodeDetails,
   },
 };
 </script>
