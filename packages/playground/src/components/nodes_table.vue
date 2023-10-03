@@ -29,6 +29,7 @@
         :footer-props="{
           'items-per-page-options': [5, 10, 15, 50],
         }"
+        @item-expanded="getNodeDetails"
       >
         <template v-slot:[`item.actions`]="{ item }">
           <reserve-btn
@@ -66,13 +67,13 @@
           </v-tooltip>
         </template>
 
-        <!-- 
-        <template v-slot:expanded-item="{ headers, item }">
+        <template v-slot:expanded-item="{ headers }">
           <td :colspan="headers.length" v-if="dNodeLoading" style="text-align: center">
-            <strong style="color: #f44336">Failed to retrieve Node details</strong>
+            <div class="pa-1">
+              <v-progress-circular indeterminate model-value="20" :width="3"></v-progress-circular>
+            </div>
           </td>
-          <td :colspan="headers.length" v-else></td>
-        </template> -->
+        </template>
       </v-data-table>
     </v-card>
   </div>
@@ -132,12 +133,13 @@ const tabParams = {
   },
 };
 // const dNodeError = ref(false);
-// const dNodeLoading = ref(false);
+const dNodeLoading = ref(true);
 
 onMounted(async () => {
   loadData();
 });
 //TODO: How to handle page
+//TODO: refresh after any transaction
 
 async function loadData() {
   const params = tabParams[activeTab.value as keyof typeof tabParams];
@@ -204,23 +206,24 @@ async function calculatePrice(
   }
 }
 
-// async function getNodeDetails(event: any) {
-//   if (!event.value) return;
-//   try {
-//     dNodeError.value = false;
-//     dNodeLoading.value = true;
-//     const res = await gridProxyClient.farms.list({ farmId: event.item.farmId });
-//     console.log("Farms ", res);
-//     if (Array.isArray(res) && !res.length) throw new Error("Can't resolve farm data");
-//     // event.item.farm.name = res.data[0].name;
-//     // event.item.farm.farmCertType = res.data[0].certificationType;
-//     // event.item.farm.pubIps = res.data[0].publicIps.length;
-//   } catch (e) {
-//     dNodeError.value = true;
-//     console.log("Error farms ", e);
-//   }
-//   dNodeLoading.value = false;
-// }
+async function getNodeDetails(event: any) {
+  console.log("Hello");
+  // if (!event.value) return;
+  // try {
+  //   dNodeError.value = false;
+  //   dNodeLoading.value = true;
+  //   const res = await gridProxyClient.farms.list({ farmId: event.item.farmId });
+  //   console.log("Farms ", res);
+  //   if (Array.isArray(res) && !res.length) throw new Error("Can't resolve farm data");
+  //   // event.item.farm.name = res.data[0].name;
+  //   // event.item.farm.farmCertType = res.data[0].certificationType;
+  //   // event.item.farm.pubIps = res.data[0].publicIps.length;
+  // } catch (e) {
+  //   dNodeError.value = true;
+  //   console.log("Error farms ", e);
+  // }
+  // dNodeLoading.value = false;
+}
 
 function toGigaBytes(value?: string) {
   const giga = 1024 ** 3;
