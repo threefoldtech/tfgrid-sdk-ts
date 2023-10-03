@@ -16,9 +16,9 @@
     </v-container>
 
     <v-container class="custom-container">
-      <v-card color="primary" class="my-3 pa-3 text-center">
-        <v-icon width="26">mdi-account-supervisor-outline</v-icon>
-        <h2>Twin Details</h2>
+      <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+        <v-icon size="30" class="pr-3">mdi-account-supervisor-outline</v-icon>
+        <v-card-title class="pa-0" lor="white">Twin Details</v-card-title>
       </v-card>
 
       <v-card>
@@ -105,7 +105,7 @@ async function UpdateRelay() {
 
 .custom-list {
   overflow: hidden;
-  font-size: 20px;
+  font-size: 1rem;
   padding: 10px;
 }
 

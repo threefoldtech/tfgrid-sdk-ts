@@ -23,7 +23,7 @@
       <div
         :style="{
           backgroundImage: 'url(' + baseUrl + 'images/live-and-operational-background.png)',
-          padding: '100px 0',
+          padding: '50px 0',
           backgroundSize: 'cover',
           backgroundPosition: 'center center',
           minHeight: '850px',
@@ -31,36 +31,34 @@
       >
         <!-- class="d-flex justify-center align-center" -->
         <div class="d-flex justify-center mb-10">
-          <v-card flat class="py-1 px-2 d-inline-block m-auto">
-            <h4 class="text-center text-h3">Live and Operational</h4>
-          </v-card>
+          <h4 class="text-center text-h4">Live and Operational</h4>
         </div>
 
         <div class="d-flex flex-wrap justify-space-around">
-          <div v-for="s in stats" :key="s.value" class="stats">
-            <v-card>
+          <div v-for="s in stats" :key="s.value" class="stats px-5 py-10">
+            <v-card class="my-10">
               <v-img
                 cover
-                width="200"
+                width="150"
                 class="mx-auto"
                 :src="baseUrl + 'images/icons/live-and-operational/' + s.image"
               />
               <v-card-text>
-                <p class="text-center font-weight-bold text-h4">{{ s.value }}</p>
-                <p class="text-center text-h6">{{ s.label }}</p>
+                <p class="text-center font-weight-medium text-h5">{{ s.value }}</p>
+                <p class="text-center font-weight-regular text-h6">{{ s.label }}</p>
               </v-card-text>
             </v-card>
           </div>
         </div>
 
-        <div class="d-flex justify-center mt-16">
+        <div class="d-flex justify-center mt-5">
           <v-btn color="primary" target="_blank" :href="capacityURL"> Explore ThreeFold Grid Capacity </v-btn>
         </div>
       </div>
     </v-container>
 
     <v-container>
-      <h4 class="text-center text-h3 mb-8">The <strong>Layer Zero</strong> for a Decentralized World</h4>
+      <h4 class="text-center text-h4 mb-8">The <strong>Layer Zero</strong> for a Decentralized World</h4>
       <p class="text-center">
         Anything that runs on Linux can run on ThreeFold – with more security, more sustainably, and in true
         decentralization. The ThreeFold Grid can support workloads from Blockchain to Web2 to Web3 to IoT and Metaverse
@@ -68,12 +66,10 @@
       </p>
 
       <div class="d-flex justify-center align-center flex-wrap mt-8">
-        <v-btn class="mr-2" variant="tonal" color="primary" target="_blank" href="https://www.threefold.io/grid/">
+        <v-btn class="mr-2" color="primary" target="_blank" href="https://www.threefold.io/grid/">
           Learn about the grid
         </v-btn>
-        <v-btn variant="tonal" color="primary" target="_blank" href="https://www.threefold.io/build/">
-          Use The Grid
-        </v-btn>
+        <v-btn color="primary" target="_blank" href="https://www.threefold.io/build/"> Use The Grid </v-btn>
       </div>
     </v-container>
   </div>
@@ -125,9 +121,7 @@ export default {
 
 <style>
 .stats {
-  flex-grow: 1;
   min-width: 280px;
   max-width: 300px;
-  padding: 15px 15px 0;
 }
 </style>

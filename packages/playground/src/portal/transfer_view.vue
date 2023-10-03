@@ -1,13 +1,13 @@
 <template>
-  <v-container>
-    <v-card color="primary" class="my-3 pa-3 text-center">
-      <v-icon width="26">mdi-account-arrow-right-outline</v-icon>
-      <h2>Transfer TFTs on the TFChain</h2>
+  <v-container class="custom-container">
+    <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-account-arrow-right-outline</v-icon>
+      <v-card-title class="pa-0" lor="white">Transfer TFTs on the TFChain</v-card-title>
     </v-card>
     <v-card>
       <v-tabs v-model="activeTab" align-tabs="center">
-        <v-tab :value="0" color="primary">By Twin ID</v-tab>
-        <v-tab :value="1" color="primary">By Address</v-tab>
+        <v-tab :value="0" color="secondary">By Twin ID</v-tab>
+        <v-tab :value="1" color="secondary">By Address</v-tab>
       </v-tabs>
       <v-window v-model="activeTab">
         <!-- TwinID Transfer -->

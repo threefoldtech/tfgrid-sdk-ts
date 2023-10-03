@@ -5,7 +5,7 @@
         <v-icon size="30" class="pr-3">mdi-swap-horizontal</v-icon>
         <v-card-title class="pa-0" lor="white">Transfer TFT Across Chains</v-card-title>
       </v-card>
-      <v-card class="pa-5 my-5 white--text">
+      <v-card class="pa-5 white--text">
         <v-row class="pa-5 text-center">
           <v-col cols="12">
             <v-select

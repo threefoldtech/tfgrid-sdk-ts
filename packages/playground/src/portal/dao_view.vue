@@ -1,8 +1,8 @@
 <template>
-  <v-container fluid>
-    <v-card color="#1AA18F" class="my-3 pa-3 d-flex justify-center align-baseline">
-      <v-icon width="26" class="mx-2">mdi-note-check-outline</v-icon>
-      <h2>DAO</h2>
+  <v-container class="custom-container">
+    <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-note-check-outline</v-icon>
+      <v-card-title class="pa-0" lor="white">DAO</v-card-title>
     </v-card>
     <div class="d-flex my-12 align-center justify-center" v-if="loadingProposals">
       <v-progress-circular :size="70" :width="7" indeterminate color="primary"></v-progress-circular>
@@ -20,7 +20,7 @@
           <v-icon @click="openInfoModal = true" class="mx-3"> mdi-information-outline </v-icon>
         </h4>
         <v-tabs v-model="activeTab" align-tabs="center">
-          <v-tab color="primary" v-for="(tab, index) in tabs" :key="index" :value="`${index}`">{{ tab.title }}</v-tab>
+          <v-tab color="secondary" v-for="(tab, index) in tabs" :key="index" :value="`${index}`">{{ tab.title }}</v-tab>
         </v-tabs>
       </v-card>
       <v-window v-model="activeTab">
@@ -31,12 +31,12 @@
               v-model="searchTerm"
               variant="underlined"
               label="Search by proposal description"
-              class="pa-3"
+              class="pa-5"
             ></v-text-field>
           </v-card>
 
-          <v-card class="my-3 pa-3" v-for="(proposal, i) in filteredProposals(tab.content.value)" :key="i">
-            <v-card-title class="pa-3 mb-2" v-if="proposal.action">
+          <v-card class="my-3 pa-5" v-for="(proposal, i) in filteredProposals(tab.content.value)" :key="i">
+            <v-card-title class="pa-0 mb-5" v-if="proposal.action">
               {{ proposal.action }}
             </v-card-title>
             <!-- <v-card-subtitle class="pb-0">
@@ -46,22 +46,22 @@
             </v-card-subtitle> -->
             <v-card-text class="pb-0">
               <v-row>
-                <p class="font-weight-bold mr-3">Description:</p>
+                <p class="font-weight-medium mr-3">Description:</p>
                 <span class="text--secondary">
                   {{ proposal.description }}
                   <a v-bind:href="proposal.link" v-bind:target="'blank'">More details</a>
                 </span>
               </v-row>
               <v-row v-if="expired(proposal.end)">
-                <p class="font-weight-bold mr-3">You can vote until:</p>
+                <p class="font-weight-medium mr-3">You can vote until:</p>
                 <span class="text--secondary">{{ proposal.end }}</span>
               </v-row>
               <v-row v-else>
-                <p class="font-weight-bold mr-3">Voting ended on:</p>
+                <p class="font-weight-medium mr-3">Voting ended on:</p>
                 <span class="text--secondary">{{ proposal.end }}</span>
               </v-row>
             </v-card-text>
-            <v-container fluid>
+            <v-row class="my-3">
               <v-col class="votes">
                 <v-container class="" :style="{}">
                   <v-row v-if="expired(proposal.end)" class="d-flex justify-space-between">
@@ -89,7 +89,7 @@
                   <v-row v-if="expired(proposal.end)" class="">
                     <div :style="{ width: `${proposal.ayesProgress}%` }">
                       <v-progress-linear
-                        :height="20"
+                        :height="24"
                         color="#1AA18F"
                         v-model="proposal.ayesProgress"
                         :style="{
@@ -106,7 +106,7 @@
                     </div>
                     <div :style="{ width: `${proposal.nayesProgress}%` }">
                       <v-progress-linear
-                        :height="20"
+                        :height="24"
                         color="#9e9e9e"
                         v-model="proposal.nayesProgress"
                         :style="{
@@ -132,7 +132,7 @@
                       rounded
                       v-model="proposal.ayesProgress"
                       color="#1AA18F"
-                      height="20"
+                      height="24"
                       :style="{
                         width: '100%',
                         color: '#fff',
@@ -149,7 +149,7 @@
                       v-model="proposal.nayesProgress"
                       color="grey lighten-2"
                       backgroundColor="#e0e0e0"
-                      height="20"
+                      height="24"
                       :style="{
                         width: '100%',
                         color: '#333',
@@ -163,7 +163,7 @@
                   </v-row>
                 </v-container>
               </v-col>
-            </v-container>
+            </v-row>
           </v-card>
         </v-window-item>
       </v-window>
@@ -331,6 +331,9 @@ async function castVote() {
 }
 </script>
 <style scoped>
+.custom-container {
+  width: 80%;
+}
 .votes {
   display: flex;
   flex-direction: column;
