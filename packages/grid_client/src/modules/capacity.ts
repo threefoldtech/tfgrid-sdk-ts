@@ -45,11 +45,6 @@ class Capacity {
   }
 
   @expose
-  async getUserNodes(options: UserNodesGetModel): Promise<NodeInfo[]> {
-    return await this.nodes.getUserNodes(options.twinId);
-  }
-
-  @expose
   async getAllNodes(): Promise<NodeInfo[]> {
     return await this.nodes.getAllNodes();
   }
