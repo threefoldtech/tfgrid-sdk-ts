@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-8">
+  <div>
     <v-container v-if="editingTwin">
       <v-dialog v-model="editingTwin" max-width="600">
         <v-card>

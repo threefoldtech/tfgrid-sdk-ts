@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-8">
+  <div>
     <v-container class="custom-container">
       <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
         <v-icon size="30" class="pr-3">mdi-swap-horizontal</v-icon>
