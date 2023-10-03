@@ -17,6 +17,7 @@ import {
   ContractsByAddress,
   ContractsByTwinId,
   ContractState,
+  CreateRentModel,
   CreateServiceContractModel,
   GetActiveContractsModel,
   GetDedicatedNodePriceModel,
@@ -79,6 +80,14 @@ class Contracts {
   async create_name(options: NameContractCreateModel) {
     return (await this.client.contracts.createName(options)).apply();
   }
+
+  @expose
+  @validateInput
+  @checkBalance
+  async createRent(options: CreateRentModel) {
+    return (await this.client.contracts.createRent(options)).apply();
+  }
+
   @expose
   @validateInput
   async get(options: ContractGetModel) {

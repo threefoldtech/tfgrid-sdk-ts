@@ -279,6 +279,11 @@ class ContractGetModel {
   @Expose() @IsInt() @Min(1) id: number;
 }
 
+class CreateRentModel {
+  @Expose() @IsInt() @Min(1) nodeId: number;
+  @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
+}
+
 class ContractGetByNodeIdAndHashModel {
   @Expose() @IsInt() @Min(1) node_id: number;
   @Expose() @IsString() @IsNotEmpty() hash: string;
@@ -796,4 +801,5 @@ export {
   SwapToStellarModel,
   ListenToMintCompletedModel,
   GetActiveContractsModel,
+  CreateRentModel,
 };

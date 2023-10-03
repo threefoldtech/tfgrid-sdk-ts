@@ -17,6 +17,7 @@
       color="#064663"
       style="background: #1aa18f"
       v-if="rentedByTwinId === 0"
+      @click="reserveNode"
     >
       Reserve
     </v-btn>
@@ -72,7 +73,6 @@ export default {
 
     async function unReserveNode() {
       loadingUnreserveNode.value = true;
-
       try {
         const grid = await getGrid(profileManager.profile!);
         createToast(`check for contracts on node ${props.nodeId}`, {
@@ -122,6 +122,7 @@ export default {
           openUnreserveDialog.value = false;
         }
       } catch (e) {
+        console.log("Error: ", e);
         createToast(e as string, {
           position: "top-right",
           hideProgressBar: true,
@@ -135,13 +136,47 @@ export default {
       }
     }
 
-    // function reserveNode(nodeId: string) {}
+    async function reserveNode() {
+      loadingReserveNode.value = true;
+      try {
+        const grid = await getGrid(profileManager.profile!);
+        createToast(`Transaction Submitted`, {
+          position: "top-right",
+          hideProgressBar: true,
+          toastBackgroundColor: "#1aa18f",
+          timeout: 5000,
+          showIcon: true,
+          type: "info",
+        });
+        await grid?.contracts.createRent({ nodeId: +props.nodeId });
+        loadingReserveNode.value = false;
+        createToast(`Transaction succeeded node ${props.nodeId} Reserved`, {
+          position: "top-right",
+          hideProgressBar: true,
+          toastBackgroundColor: "#1aa18f",
+          timeout: 5000,
+          showIcon: true,
+          type: "success",
+        });
+      } catch (e) {
+        console.log("Error: ", e);
+        createToast(e as string, {
+          position: "top-right",
+          hideProgressBar: true,
+          toastBackgroundColor: "#FF5252",
+          timeout: 5000,
+          showIcon: true,
+          type: "danger",
+        });
+        loadingReserveNode.value = false;
+      }
+    }
     return {
       openUnreserveDialog,
       loadingUnreserveNode,
       unReserveNode,
       loadingReserveNode,
-      // reserveNode,
+      reserveNode,
       removeReserve,
     };
   },
