@@ -33,11 +33,10 @@
           <v-col cols="12" md="6" sm="8">
             <interfaces-details-card :node="node" />
           </v-col>
-          <!-- v-if="node.gpu" TODO: Replace with the node gpu -->
-          <v-col cols="12" md="6" sm="8">
+          <v-col v-if="node.cards.length" cols="12" md="6" sm="8">
             <gpu-details-card :node="node" />
           </v-col>
-          <v-col v-if="node.publicConfig" cols="12" md="6" sm="8">
+          <v-col v-if="node.publicConfig && node.publicConfig.domain" cols="12" md="6" sm="8">
             <public-config-details-card :node="node" />
           </v-col>
         </v-row>

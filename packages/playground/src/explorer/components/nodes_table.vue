@@ -27,9 +27,9 @@
         >
           <template v-slot:[`item.status`]="{ item }">
             <p class="text-left mt-1 mb-0">
-              <v-chip :color="getStatus(item).color">
+              <v-chip :color="getNodeStatusColor(item.columns.status as string).color">
                 <span>
-                  {{ getStatus(item).status.toLocaleUpperCase() }}
+                  {{ getNodeStatusColor(item.columns.status as string).status.toLocaleUpperCase() }}
                 </span>
               </v-chip>
             </p>
@@ -45,6 +45,7 @@ import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
 import type { PropType } from "vue";
 import type { VDataTable } from "vuetify/labs/VDataTable";
 
+import { getNodeStatusColor } from "@/explorer/utils/helpers";
 import formatResourceSize from "@/utils/format_resource_size";
 import toReadableDate from "@/utils/to_readable_data";
 
@@ -76,7 +77,7 @@ export default {
       type: Boolean,
     },
   },
-  setup(props, { emit }) {
+  setup(_, { emit }) {
     const nodeStatusOptions = [NodeStatus.Up, NodeStatus.Down];
 
     const headers: VDataTable["headers"] = [
@@ -116,16 +117,6 @@ export default {
       { title: "Status", key: "status", align: "start", sortable: false },
     ];
 
-    const getStatus = (node: any) => {
-      if (node.props.title.status === NodeStatus.Up) {
-        return { color: "green", status: NodeStatus.Up };
-      } else if (node.props.title.status === NodeStatus.Standby) {
-        return { color: "orange", status: NodeStatus.Standby };
-      } else {
-        return { color: "red", status: NodeStatus.Down };
-      }
-    };
-
     const openSheet = (_e: any, { item }: any) => {
       emit("open-dialog", item);
     };
@@ -133,7 +124,7 @@ export default {
     return {
       headers,
       nodeStatusOptions,
-      getStatus,
+      getNodeStatusColor,
       openSheet,
     };
   },

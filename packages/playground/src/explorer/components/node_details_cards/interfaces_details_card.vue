@@ -1,5 +1,10 @@
 <template>
-  <card-details :loading="loading" title="Interfaces Details" :items="farmItems" icon="mdi-expansion-card-variant" />
+  <card-details
+    :loading="loading"
+    title="Interfaces Details"
+    :items="interfaceFields"
+    icon="mdi-expansion-card-variant"
+  />
 </template>
 
 <script lang="ts">
@@ -13,7 +18,7 @@ import type { NodeDetailsCard } from "@/explorer/utils/types";
 import CardDetails from "./card_details.vue";
 
 export default {
-  name: "FarmDetailsCard",
+  name: "InterfacesDetailsCard",
   components: { CardDetails },
   props: {
     node: {
@@ -24,12 +29,12 @@ export default {
 
   setup(props) {
     const loading = ref<boolean>(false);
-    const farmItems = ref<NodeDetailsCard[]>();
+    const interfaceFields = ref<NodeDetailsCard[]>();
     const interfacesDetails = ref<Interfaces>();
 
     const mount = () => {
       loading.value = true;
-      farmItems.value = getNodeDetailsCard();
+      interfaceFields.value = getNodeDetailsCard();
       loading.value = false;
     };
 
@@ -76,7 +81,7 @@ export default {
     };
 
     return {
-      farmItems,
+      interfaceFields,
       loading,
     };
   },

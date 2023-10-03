@@ -1,5 +1,5 @@
 <template>
-  <card-details :loading="loading" title="Node Twin Details" :items="twinItems" icon="mdi-account" />
+  <card-details :loading="loading" title="Node Twin Details" :items="twinFields" icon="mdi-account" />
 </template>
 
 <script lang="ts">
@@ -23,11 +23,11 @@ export default {
 
   setup(props) {
     const loading = ref<boolean>(false);
-    const twinItems = ref<NodeDetailsCard[]>();
+    const twinFields = ref<NodeDetailsCard[]>();
 
     const mount = () => {
       loading.value = true;
-      twinItems.value = getNodeTwinDetailsCard();
+      twinFields.value = getNodeTwinDetailsCard();
       loading.value = false;
     };
 
@@ -60,7 +60,7 @@ export default {
     };
 
     return {
-      twinItems,
+      twinFields,
       loading,
     };
   },

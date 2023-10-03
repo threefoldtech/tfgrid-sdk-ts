@@ -1,5 +1,5 @@
 <template>
-  <card-details :loading="loading" title="Public Configs Details" :items="twinItems" icon="mdi-cog" />
+  <card-details :loading="loading" title="Public Configs Details" :items="publicConfigFields" icon="mdi-cog" />
 </template>
 
 <script lang="ts">
@@ -23,11 +23,11 @@ export default {
 
   setup(props) {
     const loading = ref<boolean>(false);
-    const twinItems = ref<NodeDetailsCard[]>();
+    const publicConfigFields = ref<NodeDetailsCard[]>();
 
     const mount = () => {
       loading.value = true;
-      twinItems.value = getNodeTwinDetailsCard();
+      publicConfigFields.value = getNodeTwinDetailsCard();
       loading.value = false;
     };
 
@@ -62,7 +62,7 @@ export default {
     };
 
     return {
-      twinItems,
+      publicConfigFields,
       loading,
     };
   },

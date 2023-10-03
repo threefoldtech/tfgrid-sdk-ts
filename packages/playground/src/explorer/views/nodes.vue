@@ -63,7 +63,7 @@
                   </v-col>
                 </v-row>
               </div>
-              <div class="hint mb-2 mt-3">
+              <div class="hint mb-2">
                 <v-alert type="info" variant="tonal">
                   The nodes will be filtered and displayed after 1 second once you remove your finger from the filters.
                 </v-alert>
@@ -73,7 +73,7 @@
                 v-model:size="filterOptions.size"
                 v-model:page="filterOptions.page"
                 :count="nodesCount"
-                :loading="tableLoading"
+                :loading="loading"
                 v-model:selectedNode="selectedNode"
                 @open-dialog="openDialog"
               />
@@ -83,7 +83,7 @@
       </div>
     </div>
     <node-details
-      :grid-proxy-client="client"
+      :grid-proxy-client="gridProxyClient"
       :node="selectedNode"
       :openDialog="isDialogOpened"
       @close-dialog="closeDialog"
@@ -95,8 +95,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import GridProxyClient, { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
 import debounce from "lodash/debounce.js";
-import { ref, watch } from "vue";
-import { onMounted } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import NodeDetails from "@/explorer/components/node_details.vue";
@@ -104,15 +103,15 @@ import NodesTable from "@/explorer/components/nodes_table.vue";
 import router from "@/router";
 import { inputsInitializer } from "@/utils/filter_nodes";
 
-import { getFilterValues, getNode, requestNodes } from "../utils/helpers";
+import { getNode, getProxyClient, getQueries, requestNodes } from "../utils/helpers";
 import {
   type FilterInputs,
   type FilterOptions,
+  type GridProxyRequestConfig,
   type MixedFilter,
   nodeInitializer,
-  type NodeRequestConfig,
   optionsInitializer,
-} from "../utils/types.js";
+} from "../utils/types";
 
 export default {
   components: {
@@ -124,7 +123,7 @@ export default {
     const filterOptions = ref<FilterOptions>(optionsInitializer);
     const mixedFilters = ref<MixedFilter>({ inputs: filterInputs.value, options: filterOptions.value });
 
-    const tableLoading = ref(false);
+    const loading = ref<boolean>(false);
     const nodes = ref<GridNode[]>([]);
     const nodesCount = ref<number>(0);
     const selectedNode = ref<GridNode>(nodeInitializer);
@@ -135,12 +134,16 @@ export default {
     const route = useRoute();
 
     const network = process.env.NETWORK || (window as any).env.NETWORK;
-    const client = new GridProxyClient(network);
+    const gridProxyClient = getProxyClient(network);
 
-    const _requestNodes = async (options: Partial<NodesQuery> = {}, config: NodeRequestConfig) => {
+    const _requestNodes = async (
+      queries: Partial<NodesQuery> = {},
+      config: GridProxyRequestConfig,
+      client: GridProxyClient,
+    ) => {
+      loading.value = true;
       try {
-        tableLoading.value = true;
-        const { count, data } = await requestNodes(options, config, client);
+        const { count, data } = await requestNodes(queries, client, config);
         nodes.value = data;
         if (count) {
           nodesCount.value = count;
@@ -148,17 +151,18 @@ export default {
       } catch (err) {
         console.log(err);
       } finally {
-        tableLoading.value = false;
+        loading.value = false;
       }
     };
 
     const request = debounce(_requestNodes, 1000);
+
     watch(
       mixedFilters,
       async () => {
         if (isValidForm.value) {
-          const options = getFilterValues(mixedFilters.value);
-          await request(options, { loadFarm: true });
+          const queries = getQueries(mixedFilters.value);
+          await request(queries, { loadFarm: true }, gridProxyClient);
         }
       },
       { deep: true },
@@ -182,8 +186,9 @@ export default {
             loadFarm: true,
             loadStats: mixedFilters.value.options.status === NodeStatus.Down ? false : true,
             loadTwin: true,
+            loadGpu: mixedFilters.value.options.gpu,
           },
-          client,
+          gridProxyClient,
         );
         node.total_resources = node.capacity.total_resources;
         node.used_resources = node.capacity.used_resources;
@@ -201,28 +206,31 @@ export default {
     };
 
     const openDialog = async (item: { props: { title: GridNode } }) => {
+      loading.value = true;
       const node: GridNode = await getNode(
         item.props.title.nodeId,
         {
           loadFarm: true,
           loadStats: mixedFilters.value.options.status === NodeStatus.Down ? false : true,
           loadTwin: true,
+          loadGpu: mixedFilters.value.options.gpu,
         },
-        client,
+        gridProxyClient,
       );
       selectedNode.value = node;
       router.push({ path: route.path, query: { nodeId: selectedNode.value.nodeId } });
       isDialogOpened.value = true;
+      loading.value = false;
     };
 
     onMounted(async () => {
       await checkSelectedNode();
-      const options = getFilterValues(mixedFilters.value);
-      await request(options, { loadFarm: true });
+      const queries = getQueries(mixedFilters.value);
+      await request(queries, { loadFarm: true }, gridProxyClient);
     });
 
     return {
-      tableLoading,
+      loading,
 
       nodes,
       nodesCount,
@@ -233,7 +241,7 @@ export default {
       filterOptions,
       isDialogOpened,
       isValidForm,
-      client,
+      gridProxyClient,
 
       openDialog,
       closeDialog,

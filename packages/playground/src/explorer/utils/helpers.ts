@@ -1,7 +1,29 @@
-import type GridProxyClient from "@threefold/gridproxy_client";
-import type { GridNode, NodesQuery, NodeStats, Pagination } from "@threefold/gridproxy_client";
+import type {
+  GridNode,
+  Network,
+  NodesExtractOptions,
+  NodesQuery,
+  NodeStats,
+  Pagination,
+} from "@threefold/gridproxy_client";
+import GridProxyClient, { NodeStatus } from "@threefold/gridproxy_client";
 
-import type { MixedFilter, NodeRequestConfig } from "./types";
+import type { MixedFilter } from "./types";
+
+export const getProxyClient = (network: Network): GridProxyClient => {
+  const client = new GridProxyClient(network);
+  return client;
+};
+
+export const getNodeStatusColor = (status: string) => {
+  if (status === NodeStatus.Up) {
+    return { color: "info", status: NodeStatus.Up };
+  } else if (status === NodeStatus.Standby) {
+    return { color: "warning", status: NodeStatus.Standby };
+  } else {
+    return { color: "error", status: NodeStatus.Down };
+  }
+};
 
 /**
  * Requests a list of nodes from the GridProxyClient.
@@ -13,8 +35,8 @@ import type { MixedFilter, NodeRequestConfig } from "./types";
  */
 export async function requestNodes(
   options: Partial<NodesQuery>,
-  config: NodeRequestConfig,
   client: GridProxyClient,
+  config: NodesExtractOptions,
 ): Promise<Pagination<GridNode[]>> {
   try {
     const nodes: Pagination<GridNode[]> = await client.nodes.list(options, config);
@@ -46,10 +68,11 @@ export async function getNodeStates(nodeId: number, client: GridProxyClient): Pr
 /**
  * Requests a node from GridProxyClient.
  * @param {number} nodeId - The node id.
+ * @param {NodesExtractOptions} config - The configuration for the node request.
  * @param {GridProxyClient} client - The GridProxyClient instance.
  * @returns {Promise<GridNode>} - A promise that resolves to an object containing the node details.
  */
-export async function getNode(nodeId: number, config: NodeRequestConfig, client: GridProxyClient): Promise<GridNode> {
+export async function getNode(nodeId: number, config: NodesExtractOptions, client: GridProxyClient): Promise<GridNode> {
   if (typeof nodeId !== "number" || nodeId <= 0) {
     throw new Error("Invalid nodeId. Expected a positive integer.");
   }
@@ -75,7 +98,7 @@ export const toBytes = (resource: number | undefined): number => {
   return resource ? resource * 1024 * 1024 * 1024 : 0;
 };
 
-export const getFilterValues = (mixedFilters: MixedFilter): Partial<NodesQuery> => {
+export const getQueries = (mixedFilters: MixedFilter): Partial<NodesQuery> => {
   const options: Partial<NodesQuery> = {
     retCount: true,
     nodeId: +mixedFilters.inputs.nodeId.value! || undefined,

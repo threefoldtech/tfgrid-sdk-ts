@@ -57,12 +57,15 @@ export type NodeDetailsCard = {
   hint?: string;
   icon?: string;
   callback?: (value: string) => void;
+  nameHint?: string; // v-chip hint beside the item name.
+  nameHintColor?: string; // The v-chip color
 };
 
-export type NodeRequestConfig = {
+export type GridProxyRequestConfig = {
   loadFarm?: boolean;
-  loadStats?: boolean;
   loadTwin?: boolean;
+  loadStats?: boolean;
+  loadGpu?: boolean;
 };
 
 export const nodeStatsInitializer: NodeStats = {
@@ -109,4 +112,5 @@ export const nodeInitializer: GridNode = {
   publicIps: { free: 0, total: 0, used: 0 },
   twin: { twinId: 0, accountId: "", publicKey: "", relay: "" },
   stats: nodeStatsInitializer,
+  cards: [],
 };

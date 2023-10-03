@@ -19,8 +19,11 @@
 
       <div class="items" v-else>
         <v-row class="bb-gray" v-for="item in items" :key="item.name">
-          <v-col class="d-flex justify-start">{{ item.name }}</v-col>
-          <v-col class="d-flex justify-end">
+          <v-col class="d-flex justify-start align-center">
+            {{ item.name }}
+            <v-chip class="ml-4" v-if="item.nameHint" :color="item.nameHintColor">{{ item.nameHint }}</v-chip>
+          </v-col>
+          <v-col class="d-flex justify-end align-center">
             <p v-if="!item.icon && !item.hint && !item.imgSrc">
               {{ item.value && item.value.length > maxLenChar ? item.value.slice(0, maxLenChar) + "..." : item.value }}
             </p>

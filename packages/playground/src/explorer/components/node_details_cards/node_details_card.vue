@@ -1,5 +1,5 @@
 <template>
-  <card-details :loading="loading" title="Node Detials" :items="nodeItems" icon="mdi-resistor-nodes" />
+  <card-details :loading="loading" title="Node Detials" :items="nodeFields" icon="mdi-resistor-nodes" />
 </template>
 
 <script lang="ts">
@@ -24,11 +24,11 @@ export default {
 
   setup(props) {
     const loading = ref<boolean>(false);
-    const nodeItems = ref<NodeDetailsCard[]>();
+    const nodeFields = ref<NodeDetailsCard[]>();
 
     const mount = () => {
       loading.value = true;
-      nodeItems.value = getNodeDetailsCard();
+      nodeFields.value = getNodeDetailsCard();
       loading.value = false;
     };
 
@@ -59,7 +59,7 @@ export default {
     };
 
     return {
-      nodeItems,
+      nodeFields,
       loading,
     };
   },

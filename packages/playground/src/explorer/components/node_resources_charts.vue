@@ -5,9 +5,9 @@
         <h2 class="node-resources-title text-center text-h4 flex justify-center items-center">
           <v-icon size="40" class="mr-2">mdi-chart-pie</v-icon>
           Node {{ node.nodeId }} Resources
-          <span :style="'color:' + (node.status === NodeStatus.Up ? '#4caf50' : '#f44336')">{{
-            node.status === NodeStatus.Up ? "[Online]" : "Offline"
-          }}</span>
+          <v-chip :color="getNodeStatusColor(node.status).color">
+            {{ node.status === NodeStatus.Up ? "Online" : node.status === NodeStatus.Standby ? "Standby" : "Offline" }}
+          </v-chip>
         </h2>
       </v-col>
     </v-row>
@@ -25,7 +25,15 @@
 
     <v-row justify="center">
       <v-progress-circular v-if="loading" indeterminate color="primary" :size="50" class="mt-10 mb-10" />
-      <v-btn rounded="lg" variant="flat" color="primary" v-if="!loading" class="mt-15" @click="getNodeHealthUrl">
+
+      <v-btn
+        rounded="lg"
+        variant="flat"
+        color="primary"
+        v-if="isNodeReadyToVisit()"
+        class="mt-15"
+        @click="getNodeHealthUrl"
+      >
         Check Node Health
       </v-btn>
     </v-row>
@@ -36,6 +44,7 @@
 import GridProxyClient, { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
 import { type PropType, ref } from "vue";
 
+import { getNodeStatusColor } from "@/explorer/utils/helpers";
 import type { ResourceWrapper } from "@/explorer/utils/types";
 import { GrafanaStatistics } from "@/utils/getMetricsUrl";
 
@@ -85,12 +94,22 @@ export default {
       });
     };
 
+    // Return true if the node is up or standby
+    const isNodeReadyToVisit = () => {
+      return (
+        (!loading.value && props.node.status === NodeStatus.Up) ||
+        (!loading.value && props.node.status === NodeStatus.Standby)
+      );
+    };
+
     return {
       NodeStatus,
       resources,
       loading,
       getNodeResources,
       getNodeHealthUrl,
+      isNodeReadyToVisit,
+      getNodeStatusColor,
     };
   },
 };

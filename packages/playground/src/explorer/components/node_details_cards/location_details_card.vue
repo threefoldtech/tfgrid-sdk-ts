@@ -3,12 +3,13 @@
     :isMap="true"
     :loading="loading"
     title="Location Details"
-    :items="locationItems"
+    :items="locationFields"
     icon="mdi-google-maps"
   />
 </template>
 
 <script lang="ts">
+// TODO: Update the map location...
 import type { GridNode } from "@threefold/gridproxy_client";
 import { type PropType, ref } from "vue";
 
@@ -28,10 +29,10 @@ export default {
 
   setup() {
     const loading = ref<boolean>(false);
-    const locationItems = ref<NodeDetailsCard[]>();
+    const locationFields = ref<NodeDetailsCard[]>();
 
     return {
-      locationItems,
+      locationFields,
       loading,
     };
   },

@@ -1,5 +1,5 @@
 <template>
-  <card-details :loading="loading" title="Country Detials" :items="countryItems" icon="mdi-map-outline" />
+  <card-details :loading="loading" title="Country Detials" :items="countryFields" icon="mdi-map-outline" />
 </template>
 
 <script lang="ts">
@@ -23,11 +23,11 @@ export default {
 
   setup(props) {
     const loading = ref<boolean>(false);
-    const countryItems = ref<NodeDetailsCard[]>();
+    const countryFields = ref<NodeDetailsCard[]>();
 
     const mount = () => {
       loading.value = true;
-      countryItems.value = getNodeDetailsCard();
+      countryFields.value = getNodeDetailsCard();
       loading.value = false;
     };
 
@@ -62,7 +62,7 @@ export default {
     };
 
     return {
-      countryItems,
+      countryFields,
       loading,
     };
   },
