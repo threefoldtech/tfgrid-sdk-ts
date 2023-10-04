@@ -56,8 +56,8 @@
 <script lang="ts">
 import { defineComponent, type PropType } from "vue";
 
-import type { NodeInputFilterType } from "@/explorer/utils/types";
 import { useFormRef } from "@/hooks/form_validator";
+import type { NodeInputFilterType } from "@/utils/filter_nodes";
 
 export default defineComponent({
   props: {
