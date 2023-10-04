@@ -13,12 +13,10 @@
       <v-col :cols="getColSize">
         <v-card flat color="transparent" tag="div">
           <!-- Title -->
-          <v-list-item>
-            <div class="d-inline">
-              <v-icon size="30" class="mr-2">mdi-harddisk</v-icon>
-              <v-list-item-title style="font-size: 20px; display: inline">Node Resources</v-list-item-title>
-            </div>
-          </v-list-item>
+          <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+            <v-icon size="30" class="pr-3">mdi-harddisk</v-icon>
+            <v-card-title class="pa-0" color="white">Node Resources</v-card-title>
+          </v-card>
 
           <!-- Details -->
           <v-list>
@@ -56,12 +54,10 @@
       <v-col :cols="getColSize">
         <v-card flat color="transparent" tag="div">
           <!-- Title -->
-          <v-list-item>
-            <div class="d-inline">
-              <v-icon size="30" class="mr-2">mdi-map-marker</v-icon>
-              <v-list-item-title style="font-size: 20px; display: inline">Location</v-list-item-title>
-            </div>
-          </v-list-item>
+          <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+            <v-icon size="30" class="pr-3">mdi-map-marker</v-icon>
+            <v-card-title class="pa-0" color="white">Location</v-card-title>
+          </v-card>
 
           <!-- Details -->
           <v-list>
@@ -99,12 +95,10 @@
       <v-col :cols="getColSize" :class="{ 'mt-n8': getColSize() === 6 }">
         <v-card flat color="transparent" tag="div">
           <!-- Title -->
-          <v-list-item>
-            <div class="d-inline">
-              <v-icon size="30" class="mr-2">mdi-silo</v-icon>
-              <v-list-item-title style="font-size: 20px; display: inline">Farm details</v-list-item-title>
-            </div>
-          </v-list-item>
+          <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+            <v-icon size="30" class="pr-3">mdi-silo</v-icon>
+            <v-card-title class="pa-0" color="white">Farm details</v-card-title>
+          </v-card>
 
           <!-- Details -->
           <v-list>
@@ -139,50 +133,100 @@
         </v-card>
       </v-col>
 
-      <!-- TODO: Add GPU Items -->
-
-      <v-col v-if="item.value.num_gpu > 0" class="mt-n8" style="min-width: 400px">
+      <v-col v-if="item.value.num_gpu > 0" cols="getColSize" style="min-width: 600px">
         <v-card flat color="transparent" tag="div">
           <!-- Title -->
-          <v-list-item>
-            <div class="d-inline">
-              <v-icon size="30" class="mr-2">mdi-expansion-card-variant</v-icon>
-              <v-list-item-title style="font-size: 20px; display: inline"
-                >GPU Card{{ item.value.num_gpu > 1 ? "s" : "" }} details</v-list-item-title
-              >
-            </div>
-          </v-list-item>
+          <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+            <v-icon size="30" class="pr-3">mdi-expansion-card-variant</v-icon>
+            <v-card-title class="pa-0" color="white"
+              >GPU Card{{ item.value.num_gpu > 1 ? "s" : "" }} details</v-card-title
+            >
+          </v-card>
 
           <!-- Details -->
-          <v-list>
-            <v-list-item>
-              <v-list-item-content style="display: flex; justify-content: space-between; align-items: center">
-                <v-list-item-title>ID</v-list-item-title>
-                {{ item.value.farmId }}
-              </v-list-item-content>
-            </v-list-item>
-            <v-divider></v-divider>
-            <v-list-item>
-              <v-list-item-content style="display: flex; justify-content: space-between; align-items: center">
-                <v-list-item-title>Name</v-list-item-title>
-                {{ farmName }}
-              </v-list-item-content>
-            </v-list-item>
-            <v-divider></v-divider>
-            <v-list-item>
-              <v-list-item-content style="display: flex; justify-content: space-between; align-items: center">
-                <v-list-item-title>Certification type</v-list-item-title>
-                {{ item.value.certificationType }}
-              </v-list-item-content>
-            </v-list-item>
-            <v-divider></v-divider>
-            <v-list-item>
-              <v-list-item-content style="display: flex; justify-content: space-between; align-items: center">
-                <v-list-item-title>Public Ips</v-list-item-title>
-                {{ publicIps }}
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
+          <v-row v-if="!loading && gpuItem && gpuItem.length !== 0">
+            <v-col cols="12">
+              <v-list>
+                <v-list-item>
+                  <v-list-item-content style="display: flex; justify-content: space-between; align-items: center">
+                    <v-tooltip top nudge-bottom="30">
+                      <template v-slot:activator="{ isActive, props }">
+                        <v-list-item-title v-bind="props" v-on="isActive"
+                          >Card ID
+                          <v-chip
+                            lose-icon="mdi-delete"
+                            :color="gpuItem[0].contract ? 'warning' : 'success'"
+                            x-small
+                            class="mb-1 ml-3"
+                            >{{ gpuItem[0].contract ? "Reserved" : "Available" }}</v-chip
+                          >
+                        </v-list-item-title>
+                      </template>
+                      <span>Card id that's used in a deployment</span>
+                    </v-tooltip>
+                    <v-col class="pa-0 d-flex justify-end align-center pl-2">
+                      <v-select
+                        style="max-width: 250px"
+                        v-if="gpuItem.length > 1"
+                        append-outer-icon="mdi-content-copy"
+                        hide-details
+                        dense
+                        v-model="gpuItem[0].id"
+                        :items="gpuItem"
+                        @input.native="gpuItem = $event.srcElement.value.value"
+                        @click:append-outer="copy(gpuItem[0].id)"
+                      />
+                      <v-text-field
+                        v-else
+                        :value="gpuItem[0].id"
+                        readonly
+                        hide-details
+                        class="mt-n2"
+                        dense
+                        solo
+                        style="max-width: 250px"
+                      />
+                      <v-icon @click="copy(gpuItem[0].id)">mdi-content-copy</v-icon>
+                    </v-col>
+                  </v-list-item-content>
+                </v-list-item>
+                <v-divider></v-divider>
+
+                <v-list-item>
+                  <v-list-item-content style="display: flex; justify-content: space-between; align-items: center">
+                    <v-list-item-title>Vendor</v-list-item-title>
+                    {{ gpuItem[0].vendor }}
+                  </v-list-item-content>
+                </v-list-item>
+                <v-divider></v-divider>
+
+                <v-list-item>
+                  <v-list-item-content style="display: flex; justify-content: space-between; align-items: center">
+                    <v-list-item-title>Device</v-list-item-title>
+                    {{ gpuItem[0].device }}
+                  </v-list-item-content>
+                </v-list-item>
+                <v-divider></v-divider>
+
+                <v-list-item class="mb-0" v-if="gpuItem[0].contract !== undefined">
+                  <v-tooltip top nudge-bottom="30">
+                    <template v-slot:activator="{ isActive, props }">
+                      <v-list-item-content
+                        v-bind="props"
+                        v-on="isActive"
+                        style="display: flex; justify-content: space-between; align-items: center"
+                      >
+                        <v-list-item-title> Contract ID</v-list-item-title>
+                        {{ gpuItem[0].contract }}
+                      </v-list-item-content>
+                    </template>
+                    <span>The contract id that reserves this GPU card</span>
+                  </v-tooltip>
+                </v-list-item>
+                <v-divider></v-divider>
+              </v-list>
+            </v-col>
+          </v-row>
         </v-card>
       </v-col>
     </v-row>
@@ -190,15 +234,21 @@
 </template>
 
 <script setup lang="ts">
+import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
 import { gridProxyClient } from "../clients";
+import { useProfileManager } from "../stores";
+import { getGrid } from "../utils/grid";
 import toTeraOrGigaOrPeta from "../utils/toTeraOrGegaOrPeta";
 
+const profileManager = useProfileManager();
 const dNodeError = ref(false);
 const dNodeLoading = ref(true);
 const farmName = ref("");
 const publicIps = ref(0);
+const loading = ref(false);
+const gpuItem = ref<any[]>();
 
 const props = defineProps({
   item: {
@@ -217,6 +267,7 @@ onMounted(async () => {
     farmName.value = res.data[0].name;
     publicIps.value = res.data[0].publicIps.length;
     if (Array.isArray(res) && !res.length) throw new Error("Can't resolve farm data");
+    if (props.item.value.num_gpu > 0) loadGPUitems();
   } catch (e) {
     dNodeError.value = true;
   }
@@ -229,6 +280,42 @@ function getColSize() {
   } else {
     return 4;
   }
+}
+
+async function loadGPUitems() {
+  loading.value = true;
+  try {
+    const grid = await getGrid(profileManager.profile!);
+    gpuItem.value = await grid?.zos.getNodeGPUInfo({ nodeId: props.item.value.nodeId });
+    if (gpuItem.value && gpuItem.value.length > 0) {
+      console.log("Length ", gpuItem.value?.length);
+      console.log("GPU INFO: ", gpuItem.value);
+      console.log("Contract ", gpuItem.value[0].contract);
+    }
+    loading.value = false;
+  } catch (e) {
+    console.log("Error: ", e);
+    createToast("Failed to load GPU details", {
+      position: "top-right",
+      hideProgressBar: true,
+      toastBackgroundColor: "#FF5252",
+      timeout: 5000,
+      showIcon: true,
+      type: "danger",
+    });
+  }
+}
+
+function copy(id: string) {
+  navigator.clipboard.writeText(id);
+  createToast(`GPU ID copied to clipboard`, {
+    position: "top-right",
+    hideProgressBar: true,
+    toastBackgroundColor: "#1aa18f",
+    timeout: 5000,
+    showIcon: true,
+    type: "success",
+  });
 }
 </script>
 

@@ -17,16 +17,16 @@
       <v-data-table
         :headers="headers"
         :items="nodes"
-        :server-items-length="nodesCount"
+        :items-length="nodesCount"
         :loading="loading"
+        :page="currentPage"
+        :pageCount="100"
+        :items-per-page="pageSize"
+        loading-text="loading nodes..."
         show-expand
         class="elevation-1"
         :disable-sort="true"
         hover
-        :items-per-page="pageSize"
-        :footer-props="{
-          'items-per-page-options': [5, 10, 15, 50],
-        }"
         v-model:expanded="expanded"
         return-object
       >
@@ -111,6 +111,7 @@ const activeTab = ref(0);
 const loading = ref(false);
 const nodes = ref<any[]>();
 const nodesCount = ref(0);
+const currentPage = ref(1);
 const tabParams = {
   0: {
     rentable: true,
@@ -130,8 +131,14 @@ const tabParams = {
 };
 
 onMounted(async () => {
-  loadData();
+  await loadData();
 });
+
+const onPageChange = (newPage: number) => {
+  console.log("Page changed to", newPage);
+  currentPage.value = newPage;
+  loadData();
+};
 //TODO: How to handle page
 
 async function loadData() {
@@ -145,6 +152,7 @@ async function loadData() {
   const data = await gridProxyClient.nodes.list({
     ...params,
     size: pageSize.value,
+    page: currentPage.value,
   });
 
   nodes.value = data.data;
@@ -214,6 +222,15 @@ function toGigaBytes(value?: string) {
 watch(activeTab, () => {
   loadData();
 });
+
+watch(
+  () => currentPage,
+  (newPage, oldPage) => {
+    if (newPage !== oldPage) {
+      loadData();
+    }
+  },
+);
 
 async function reloadTable() {
   await new Promise(resolve => {
