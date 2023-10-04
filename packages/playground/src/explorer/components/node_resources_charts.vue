@@ -46,7 +46,7 @@ import { type PropType, ref } from "vue";
 
 import { getNodeStatusColor } from "@/explorer/utils/helpers";
 import type { ResourceWrapper } from "@/explorer/utils/types";
-import { GrafanaStatistics } from "@/utils/getMetricsUrl";
+import { GrafanaStatistics } from "@/utils/get_metrics_url";
 
 export default {
   props: {
@@ -111,3 +111,4 @@ export default {
   },
 };
 </script>
+@/utils/get_metrics_url
