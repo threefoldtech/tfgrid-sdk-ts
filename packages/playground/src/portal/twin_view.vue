@@ -65,8 +65,9 @@ import { onMounted, ref } from "vue";
 
 import router from "../router";
 import { useProfileManager } from "../stores";
+import type { Farm } from "../types";
+import { getFarms } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
-
 const profileManager = useProfileManager();
 
 const editingTwin = ref(false);
@@ -75,13 +76,13 @@ const updateRelay = ref(false);
 const errorMsg = ref("");
 const openVotePopup = ref(false);
 const numberOfActiveProposals = ref(0);
+const userFarms = ref<Farm[]>();
 onMounted(async () => {
   const profile = profileManager.profile!;
   const grid = await getGrid(profile);
-  const councilMembers = await grid?.councilMembership.members();
-
-  if (councilMembers) {
-    if (councilMembers.includes(profile.address)) {
+  if (grid) {
+    userFarms.value = await getFarms(grid, { ownedBy: profile.twinId }, {});
+    if (userFarms.value.length > 0) {
       const proposals = grid?.dao.get();
 
       const activeProposals = (await proposals)?.active;
