@@ -8,11 +8,12 @@
 </template>
 
 <script lang="ts">
-import gqlClient, { type Interfaces } from "@threefold/graphql_client";
+import type { Interfaces } from "@threefold/graphql_client";
 import type { GridNode } from "@threefold/gridproxy_client";
 import { createToast } from "mosha-vue-toastify";
 import { onMounted, type PropType, ref } from "vue";
 
+import { gqlClient } from "@/clients";
 import type { NodeDetailsCard } from "@/explorer/utils/types";
 
 import CardDetails from "./card_details.vue";
@@ -45,14 +46,11 @@ export default {
 
     const getInterfaces = async () => {
       if (props.node) {
-        const network = process.env.NETWORK || (window as any).env.NETWORK;
-        const client = new gqlClient(network);
-        const interfaces = await client.interfaces(
+        const interfaces = await gqlClient.interfaces(
           { name: true, ips: true, mac: true },
           { where: { node: { nodeID_eq: props.node?.nodeId } } },
         );
-
-        interfacesDetails.value = interfaces[0] as any;
+        interfacesDetails.value = interfaces[0] as Interfaces;
       }
     };
 
