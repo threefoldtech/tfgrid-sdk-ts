@@ -1,8 +1,10 @@
 <template v-if="farms">
   <div class="my-6">
+    <v-text-field class="mb-6" v-model="search" label="Search Farm" single-line hide-details></v-text-field>
     <v-data-table
       :headers="headers"
       :items="farms"
+      :search="search"
       single-expand="true"
       :expanded.sync="expanded"
       show-expand
@@ -16,6 +18,16 @@
       <template v-slot:expanded-row="{ columns, item }">
         <tr>
           <td :colspan="columns.length">
+            <v-row no-gutters>
+              <v-col class="d-flex">
+                <v-sheet class="pa-2 ma-2"> Stellar Address: </v-sheet>
+                <v-sheet class="pa-2 ma-2"> {{ item.raw.stellarAddress || "-" }} </v-sheet>
+              </v-col>
+              <v-col class="d-flex">
+                <v-sheet class="pa-2 ma-2"> Pricing Policy: </v-sheet>
+                <v-sheet class="pa-2 ma-2"> {{ item.raw.pricingPolicyId || "-" }} </v-sheet>
+              </v-col>
+            </v-row>
             <PublicIPsTable :farmId="item.columns.farmId" />
           </td>
         </tr>
@@ -33,19 +45,14 @@ import PublicIPsTable from "./public_ips_table.vue";
 
 export default {
   name: "UserFarms",
-  props: {
-    farmId: {
-      type: Number,
-      required: true,
-    },
-  },
   components: {
     PublicIPsTable,
   },
   setup() {
     const gridStore = useGrid();
-    const profileManager = useProfileManager();
-    const twinId = profileManager.profile!.twinId;
+    const profile = useProfileManager().profile;
+    const twinId = profile!.twinId;
+    const search = ref<string>();
     const headers = [
       {
         title: "Farm ID",
@@ -83,16 +90,21 @@ export default {
 
     onMounted(async () => {
       await getUserFarms();
-      console.log("expanded", expanded.value);
     });
 
-    async function createFarm(name: string) {
-      console.log("grid", gridStore.grid);
-      try {
-        return await gridStore.grid.farms.create({ name });
-      } catch (error) {
-        console.log(error);
+    function customSearch(search: string, item: any) {
+      // Define the columns you want to filter by
+      const columnsToFilter = ["farmId", "name"];
+
+      // Loop through the columns and check if the search term matches any of them
+      for (const column of columnsToFilter) {
+        const cellValue = item[column].toString().toLowerCase();
+        if (cellValue.includes(search.toLowerCase())) {
+          return true; // Include the item in the filtered results
+        }
       }
+
+      return false; // Exclude the item from the filtered results
     }
 
     async function getUserFarms() {
@@ -102,22 +114,6 @@ export default {
 
         farms.value = userFarms;
         return userFarms;
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    async function addFarmIp(farmId: number, ip: number, gw: number) {
-      try {
-        return await gridStore.grid.farms.addFarmIp({ farmId, ip, gw });
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    async function removeFarmIp(farmId: number, ip: number) {
-      try {
-        return await gridStore.grid.farms.removeFarmIp({ farmId, ip });
       } catch (error) {
         console.log(error);
       }
@@ -136,10 +132,9 @@ export default {
       headers,
       farms,
       expanded,
-      createFarm,
+      search,
+      customSearch,
       getUserFarms,
-      addFarmIp,
-      removeFarmIp,
       setStellarAddress,
     };
   },
