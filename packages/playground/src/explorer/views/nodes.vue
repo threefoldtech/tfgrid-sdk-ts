@@ -141,17 +141,19 @@ export default {
     const route = useRoute();
 
     const _requestNodes = async (queries: Partial<NodesQuery> = {}, config: GridProxyRequestConfig) => {
-      loading.value = true;
-      try {
-        const { count, data } = await requestNodes(queries, config);
-        nodes.value = data;
-        if (count) {
-          nodesCount.value = count;
+      if (isValidForm.value) {
+        loading.value = true;
+        try {
+          const { count, data } = await requestNodes(queries, config);
+          nodes.value = data;
+          if (count) {
+            nodesCount.value = count;
+          }
+        } catch (err) {
+          console.log(err);
+        } finally {
+          loading.value = false;
         }
-      } catch (err) {
-        console.log(err);
-      } finally {
-        loading.value = false;
       }
     };
 
@@ -160,10 +162,8 @@ export default {
     watch(
       mixedFilters,
       async () => {
-        if (isValidForm.value) {
-          const queries = getQueries(mixedFilters.value);
-          await request(queries, { loadFarm: true });
-        }
+        const queries = getQueries(mixedFilters.value);
+        await request(queries, { loadFarm: true });
       },
       { deep: true },
     );
