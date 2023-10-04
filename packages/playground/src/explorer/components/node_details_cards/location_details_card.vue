@@ -5,6 +5,7 @@
     title="Location Details"
     :items="locationFields"
     icon="mdi-google-maps"
+    :node="$props.node"
   />
 </template>
 

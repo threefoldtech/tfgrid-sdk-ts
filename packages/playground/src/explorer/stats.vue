@@ -80,6 +80,7 @@ const fetchData = async () => {
   try {
     stats = await fetchStats();
     if (!loading.value || stats != null) {
+      console.log(stats!.nodesDistribution);
       nodesDistribution.value = JSON.stringify(stats!.nodesDistribution);
       Istats.value = [
         { data: stats!.nodes, title: "Nodes Online", icon: "mdi-laptop" },

@@ -6,10 +6,31 @@ import {
   NodeStatus,
   type Pagination,
 } from "@threefold/gridproxy_client";
+import { byCountry } from "country-code-lookup";
 
 import { gridProxyClient } from "@/clients";
 
 import type { MixedFilter, NodeStatusColor } from "./types";
+
+export const getCountryCode = (node: GridNode): string => {
+  if (!node) {
+    return "";
+  }
+  if (!node.country) {
+    return "";
+  }
+  if (node.country.length && node.country.length > 2) {
+    const country = byCountry(node.country);
+    if (!country) {
+      return node.country;
+    }
+    const countryCode = country.internet;
+    if (countryCode !== null && countryCode !== undefined) {
+      return countryCode;
+    }
+  }
+  return node.country;
+};
 
 /**
  * Get the node status then return the color based on the status type.

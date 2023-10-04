@@ -4,9 +4,9 @@
 
 <script lang="ts">
 import type { GridNode } from "@threefold/gridproxy_client";
-import { byCountry } from "country-code-lookup";
 import { onMounted, type PropType, ref } from "vue";
 
+import { getCountryCode } from "@/explorer/utils/helpers";
 import type { NodeDetailsCard } from "@/explorer/utils/types";
 
 import CardDetails from "./card_details.vue";
@@ -37,22 +37,15 @@ export default {
       return [
         { name: "Flag", imgSrc: getCountryFlagSrc(), hint: props.node.location.country },
         { name: "Name", value: props.node.country },
-        { name: "Code ISO 2", value: getCountryCode() },
+        { name: "Code ISO 2", value: getCountryCode(props.node) },
         { name: "City", value: props.node.city },
         { name: "Latitude", value: props.node.location.latitude?.toString() },
         { name: "Longitude", value: props.node.location.longitude?.toString() },
       ];
     };
 
-    const getCountryCode = (): string => {
-      if (props.node.country && props.node.country.length > 2) {
-        return byCountry(props.node.country)?.internet || props.node.country;
-      }
-      return props.node.country;
-    };
-
     const getCountryFlagSrc = () => {
-      const conuntryCode = getCountryCode();
+      const conuntryCode = getCountryCode(props.node);
 
       return conuntryCode.toLocaleLowerCase() != "ch"
         ? `https://www.worldatlas.com/r/w425/img/flag/${conuntryCode?.toLocaleLowerCase()}-flag.jpg`

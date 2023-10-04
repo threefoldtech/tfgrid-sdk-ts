@@ -14,10 +14,16 @@
       </div>
     </v-toolbar>
 
-    <v-card>
-      <template v-if="node">
-        <node-resources-charts :node="node" />
+    <template v-if="loading">
+      <v-card class="d-flex justify-center align-center h-screen">
+        <v-progress-circular color="primary" indeterminate :size="128" :width="5" />
+        <p class="mt-2">Loading node details..</p>
+      </v-card>
+    </template>
 
+    <template v-else>
+      <v-card>
+        <node-resources-charts :node="node" />
         <v-row class="pa-8 mt-5" justify-md="start" justify-sm="center">
           <v-col cols="12" md="6" sm="8">
             <node-details-card :node="node" />
@@ -42,15 +48,20 @@
             <public-config-details-card :node="node" />
           </v-col>
         </v-row>
-      </template>
-    </v-card>
+      </v-card>
+    </template>
   </v-dialog>
 </template>
 
 <script lang="ts">
 import type { GridNode } from "@threefold/gridproxy_client";
 import { type PropType, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 
+import router from "@/router";
+
+import { getNode } from "../utils/helpers";
+import { type GridProxyRequestConfig, nodeInitializer } from "../utils/types";
 import CountryDetailsCard from "./node_details_cards/country_details_card.vue";
 import FarmDetailsCard from "./node_details_cards/farm_details_card.vue";
 import GpuDetailsCard from "./node_details_cards/gpu_details_card.vue";
@@ -67,8 +78,12 @@ export default {
       type: Boolean,
       required: true,
     },
-    node: {
-      type: Object as PropType<GridNode>,
+    nodeId: {
+      type: Number,
+      required: true,
+    },
+    options: {
+      type: Object as PropType<GridProxyRequestConfig>,
       required: true,
     },
   },
@@ -85,7 +100,23 @@ export default {
   },
 
   setup(props) {
+    const loading = ref(false);
     const dialog = ref(false);
+    const route = useRoute();
+    const node = ref<GridNode>(nodeInitializer);
+
+    watch(
+      () => props.nodeId,
+      async (nodeId: number) => {
+        if (nodeId > 0) {
+          loading.value = true;
+          const _node: GridNode = await getNode(nodeId, props.options);
+          node.value = _node;
+          router.push({ path: route.path, query: { nodeId: node.value.nodeId } });
+          loading.value = false;
+        }
+      },
+    );
 
     watch(
       () => props.openDialog,
@@ -95,6 +126,8 @@ export default {
     );
     return {
       dialog,
+      node,
+      loading,
     };
   },
 };

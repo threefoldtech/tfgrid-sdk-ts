@@ -74,7 +74,7 @@
                 v-model:page="filterOptions.page"
                 :count="nodesCount"
                 :loading="loading"
-                v-model:selectedNode="selectedNode"
+                v-model:selectedNode="selectedNodeId"
                 @open-dialog="openDialog"
               />
             </div>
@@ -82,7 +82,12 @@
         </v-row>
       </div>
     </div>
-    <node-details :node="selectedNode" :openDialog="isDialogOpened" @close-dialog="closeDialog" />
+    <node-details
+      :options="selectedNodeoptions"
+      :nodeId="selectedNodeId"
+      :openDialog="isDialogOpened"
+      @close-dialog="closeDialog"
+    />
   </view-layout>
 </template>
 
@@ -98,13 +103,12 @@ import NodesTable from "@/explorer/components/nodes_table.vue";
 import router from "@/router";
 import { inputsInitializer } from "@/utils/filter_nodes";
 
-import { getNode, getQueries, requestNodes } from "../utils/helpers";
+import { getQueries, requestNodes } from "../utils/helpers";
 import {
   type FilterInputs,
   type FilterOptions,
   type GridProxyRequestConfig,
   type MixedFilter,
-  nodeInitializer,
   optionsInitializer,
 } from "../utils/types";
 
@@ -121,7 +125,15 @@ export default {
     const loading = ref<boolean>(true);
     const nodes = ref<GridNode[]>([]);
     const nodesCount = ref<number>(0);
-    const selectedNode = ref<GridNode>(nodeInitializer);
+
+    const selectedNodeId = ref<number>(0);
+    const selectedNodeoptions = ref<GridProxyRequestConfig>({
+      loadFarm: true,
+      loadStats: mixedFilters.value.options.status === NodeStatus.Down ? false : true,
+      loadTwin: true,
+      loadGpu: mixedFilters.value.options.gpu,
+    });
+
     const isDialogOpened = ref<boolean>(false);
     const isValidForm = ref<boolean>(false);
 
@@ -168,15 +180,7 @@ export default {
 
     const checkSelectedNode = async () => {
       if (route.query.nodeId) {
-        const node: GridNode | any = await getNode(+route.query.nodeId, {
-          loadFarm: true,
-          loadStats: mixedFilters.value.options.status === NodeStatus.Down ? false : true,
-          loadTwin: true,
-          loadGpu: mixedFilters.value.options.gpu,
-        });
-        node.total_resources = node.capacity.total_resources;
-        node.used_resources = node.capacity.used_resources;
-        selectedNode.value = node;
+        selectedNodeId.value = +route.query.nodeId;
         isDialogOpened.value = true;
       }
     };
@@ -186,18 +190,11 @@ export default {
         router.replace(route.path);
       }
       isDialogOpened.value = false;
-      selectedNode.value = nodeInitializer;
+      selectedNodeId.value = 0;
     };
 
     const openDialog = async (item: { props: { title: GridNode } }) => {
-      const node: GridNode = await getNode(item.props.title.nodeId, {
-        loadFarm: true,
-        loadStats: mixedFilters.value.options.status === NodeStatus.Down ? false : true,
-        loadTwin: true,
-        loadGpu: mixedFilters.value.options.gpu,
-      });
-      selectedNode.value = node;
-      router.push({ path: route.path, query: { nodeId: selectedNode.value.nodeId } });
+      selectedNodeId.value = item.props.title.nodeId;
       isDialogOpened.value = true;
     };
 
@@ -212,7 +209,9 @@ export default {
 
       nodes,
       nodesCount,
-      selectedNode,
+
+      selectedNodeId,
+      selectedNodeoptions,
       nodeStatusOptions,
 
       filterInputs,

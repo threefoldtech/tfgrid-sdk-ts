@@ -67,10 +67,6 @@ export default {
       required: true,
       type: [] as PropType<GridNode[]>,
     },
-    selectedNode: {
-      required: false,
-      type: Object as PropType<GridNode>,
-    },
     count: {
       required: true,
       type: Number,

@@ -8,13 +8,7 @@
     </v-alert>
     <v-card-item :class="`mt-2 mb-2 ${$props.isMap ? 'map' : ''}`">
       <div v-if="$props.isMap">
-        <tf-map
-          r="76"
-          g="187"
-          b="217"
-          :nodes="$props.node ? $props.node.stats : []"
-          :aria-selected="node?.country"
-        ></tf-map>
+        <tf-map :nodes="transformedObject" r="76" g="187" b="217"></tf-map>
       </div>
 
       <div class="items" v-else>
@@ -69,7 +63,7 @@
 
 <script lang="ts">
 import type { GridNode } from "@threefold/gridproxy_client";
-import type { PropType } from "vue";
+import { capitalize, onMounted, type PropType, ref } from "vue";
 
 import type { NodeDetailsCard } from "@/explorer/utils/types";
 
@@ -85,7 +79,6 @@ export default {
       type: String,
       required: true,
     },
-
     node: {
       type: Object as PropType<GridNode>,
       required: false,
@@ -106,9 +99,20 @@ export default {
       required: false,
     },
   },
-  setup() {
+  setup(props) {
     const maxLenChar = 30;
-    return { maxLenChar };
+    const transformedObject = ref<string>("");
+
+    onMounted(() => {
+      if (props.node) {
+        const country = capitalize(props.node.country);
+        transformedObject.value = JSON.stringify({
+          [country]: 1,
+        });
+      }
+    });
+
+    return { maxLenChar, transformedObject };
   },
 };
 </script>
