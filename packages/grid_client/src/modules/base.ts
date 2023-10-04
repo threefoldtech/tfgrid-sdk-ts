@@ -116,19 +116,29 @@ class BaseModule {
       oldKeys.map(k => this.backendStorage.load(PATH.join(oldPath, k, "contracts.json"))),
     );
 
-    const ext1 = await Promise.all(
-      oldKeys.map((k, i) => this.backendStorage.dump(this.newGetDeploymentPath(k, k, "contracts.json"), values[i])),
-    );
+    let ext1: any[] = [];
+    let ext2: any[] = [];
 
-    const ext2 = await Promise.all(
-      oldKeys.map(k => this.backendStorage.remove(PATH.join(oldPath, k, "contracts.json"))),
-    );
+    for (let i = 0; i < oldKeys.length; i++) {
+      const key = oldKeys[i];
+      const value = values[i];
+      const from = PATH.join(oldPath, key, "contracts.json");
+      const to = this.newGetDeploymentPath(key, key, "contracts.json");
 
-    const setExtrinsics = ext1.flat(1);
-    const removeExtrinsics = ext2.flat(1);
+      if (value) {
+        ext1.push(this.backendStorage.dump(to, value));
+        ext2.push(this.backendStorage.remove(from));
+      }
+    }
 
-    await this.tfClient.applyAllExtrinsics(setExtrinsics);
-    await this.tfClient.applyAllExtrinsics(removeExtrinsics);
+    ext1 = await Promise.all(ext1.flat(1));
+    ext2 = await Promise.all(ext2.flat(1));
+
+    ext1 = ext1.filter(x => !!x);
+    ext2 = ext2.filter(x => !!x);
+
+    await this.tfClient.applyAllExtrinsics(ext1);
+    await this.tfClient.applyAllExtrinsics(ext2);
   }
 
   async _list(): Promise<string[]> {
