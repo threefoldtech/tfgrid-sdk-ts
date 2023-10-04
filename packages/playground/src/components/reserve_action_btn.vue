@@ -27,7 +27,7 @@
       color="red"
       style="background: #1aa18f"
       v-if="rentedByTwinId === twinId"
-      @click="removeReserve()"
+      @click="removeReserve"
     >
       Unreserve
     </v-btn>
@@ -61,13 +61,12 @@ export default {
       required: true,
     },
   },
-  setup(props) {
+  setup(props, { emit }) {
     const openUnreserveDialog = ref(false);
     const loadingUnreserveNode = ref(false);
     const loadingReserveNode = ref(false);
 
     function removeReserve() {
-      console.log("Remove Reserve");
       openUnreserveDialog.value = true;
     }
 
@@ -85,7 +84,6 @@ export default {
         });
 
         const result = (await grid?.contracts.getActiveContracts({ nodeId: +props.nodeId })) as any;
-        console.log("Result Length", result.length);
         if (result.length > 0) {
           createToast(`node ${props.nodeId} has active contracts`, {
             position: "top-right",
@@ -120,6 +118,15 @@ export default {
 
           loadingUnreserveNode.value = false;
           openUnreserveDialog.value = false;
+          createToast(`Table may take sometime to update the changes`, {
+            position: "top-right",
+            hideProgressBar: true,
+            toastBackgroundColor: "#1aa18f",
+            timeout: 5000,
+            showIcon: true,
+            type: "info",
+          });
+          emit("updateTable");
         }
       } catch (e) {
         console.log("Error: ", e);
@@ -158,6 +165,15 @@ export default {
           showIcon: true,
           type: "success",
         });
+        createToast(`Table may take sometime to update the changes`, {
+          position: "top-right",
+          hideProgressBar: true,
+          toastBackgroundColor: "#1aa18f",
+          timeout: 5000,
+          showIcon: true,
+          type: "info",
+        });
+        emit("updateTable");
       } catch (e) {
         console.log("Error: ", e);
         createToast(e as string, {

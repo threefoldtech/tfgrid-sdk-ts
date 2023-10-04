@@ -35,6 +35,7 @@
             :node-id="item.raw.nodeId"
             :rented-by-twin-id="item.raw.rentedByTwinId"
             :twin-id="(profileManager.profile?.twinId as number)"
+            @updateTable="reloadTable"
           ></reserve-btn>
         </template>
 
@@ -132,7 +133,6 @@ onMounted(async () => {
   loadData();
 });
 //TODO: How to handle page
-//TODO: refresh after any transaction
 
 async function loadData() {
   const params = tabParams[activeTab.value as keyof typeof tabParams];
@@ -214,6 +214,13 @@ function toGigaBytes(value?: string) {
 watch(activeTab, () => {
   loadData();
 });
+
+async function reloadTable() {
+  await new Promise(resolve => {
+    setTimeout(resolve, 20000);
+  });
+  await loadData();
+}
 </script>
 
 <script lang="ts">
