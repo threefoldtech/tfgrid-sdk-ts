@@ -1,6 +1,10 @@
 <template>
   <div>
-    <v-container>
+    <v-container class="custom-container">
+      <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+        <v-icon size="30" class="pr-3" color="white">mdi-chart-scatter-plot</v-icon>
+        <v-card-title class="pa-0" lor="white">statistics</v-card-title>
+      </v-card>
       <div class="text-center">
         <v-row align="center" justify="center">
           <v-col cols="12" sm="6" md="4">
@@ -10,25 +14,28 @@
           </v-col>
         </v-row>
       </div>
-      <v-row>
-        <v-col color="red" v-if="failed">
-          <v-alert type="error" variant="tonal">
-            Failed to get stats data after 3 attempts, Feel free to contact the support team or try again later.
-            <v-btn @click="fetchData" color="transparent">
-              <v-icon> mdi-refresh</v-icon>
-            </v-btn>
-          </v-alert>
-        </v-col>
-        <v-col v-if="Istats.length !== 0" class="d-flex flex-wrap justify-center">
-          <v-col v-for="item of Istats" :key="item.title" xl="2" lg="3" md="4" sm="6" cols="12" class="px-2">
-            <StatisticsCard :item="item" />
+      <v-card class="pa-5">
+        <v-row>
+          <v-col color="red" v-if="failed">
+            <v-alert type="error" variant="tonal">
+              Failed to get stats data after 3 attempts, Feel free to contact the support team or try again later.
+              <v-btn @click="fetchData" color="transparent">
+                <v-icon> mdi-refresh</v-icon>
+              </v-btn>
+            </v-alert>
           </v-col>
-        </v-col>
-        <v-col cols="12" class="mx-auto">
-          <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
-        </v-col>
-      </v-row>
-      <v-divider class="mt-2 mb-2" />
+          <v-col cols="12" sm="12" md="12" lg="8" class="mx-auto mt-3">
+            <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
+          </v-col>
+          <v-divider class="v-divider--vertical mx-2 my-4" />
+          <v-col v-if="Istats.length !== 0" class="d-flex flex-wrap justify-center">
+            <v-col v-for="item of Istats" :key="item.title" xl="6" lg="6" md="4" sm="12" cols="12" class="px-2 py-0">
+              <StatisticsCard :item="item" />
+            </v-col>
+          </v-col>
+        </v-row>
+      </v-card>
+      <!-- <v-divider class="mt-4 mb-2" /> -->
     </v-container>
   </div>
 </template>

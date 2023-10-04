@@ -18,9 +18,9 @@
           </v-col>
         </v-row>
         <v-row class="pa-4 px-8">
-          <v-btn color="primary" class="mr-2 bold-text" @click="openDepositDialog = true">Deposit</v-btn>
-          <v-btn color="black" class="mr-2 bold-text" @click="openWithdrawDialog = true">Withdraw</v-btn>
-          <v-btn color="blue" class="ml-auto bold-text" @click="navigation">Learn How?</v-btn>
+          <v-btn color="primary" class="mr-2" @click="openDepositDialog = true">Deposit</v-btn>
+          <v-btn variant="outlined" color="secondary" class="mr-2" @click="openWithdrawDialog = true">Withdraw</v-btn>
+          <v-btn color="blue" class="ml-auto" @click="navigation">Learn How?</v-btn>
         </v-row>
       </v-card>
     </v-container>
