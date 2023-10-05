@@ -14,17 +14,24 @@
   </div>
   <div class="pt-5">
     <v-card class="pa-5">
-      <v-data-table
+      <v-data-table-server
+        :loading="loading"
+        :items-length="nodesCount"
+        loading-text="Loading nodes..."
         :headers="headers"
         :items="nodes"
-        loading="loading"
         v-model:items-per-page="pageSize"
-        loading-text="loading nodes..."
+        v-model:expanded="expanded"
         show-expand
         class="elevation-1"
-        :disable-sort="true"
-        hover
-        v-model:expanded="expanded"
+        :hover="true"
+        :items-per-page-options="[
+          { value: 5, title: '5' },
+          { value: 10, title: '10' },
+          { value: 15, title: '15' },
+          { value: 50, title: '50' },
+        ]"
+        v-model:page="page"
         return-object
       >
         <template v-slot:[`item.actions`]="{ item }">
@@ -67,7 +74,7 @@
         <template v-slot:expanded-row="{ columns, item }">
           <node-details :item="item" :columns-len="columns.length"></node-details>
         </template>
-      </v-data-table>
+      </v-data-table-server>
     </v-card>
   </div>
 </template>
@@ -75,14 +82,15 @@
 <script setup lang="ts">
 import { NodeStatus } from "@threefold/gridproxy_client";
 import { onMounted, ref, watch } from "vue";
+import type { VDataTable } from "vuetify/labs/VDataTable";
+import { VDataTableServer } from "vuetify/labs/VDataTable";
 
 import { gridProxyClient } from "../clients";
 import { useProfileManager } from "../stores";
-import type { VDataTableHeader } from "../types";
 import { getGrid, loadBalance } from "../utils/grid";
 import toTeraOrGigaOrPeta from "../utils/toTeraOrGegaOrPeta";
 
-const headers: VDataTableHeader = [
+const headers: VDataTable["headers"] = [
   { title: "Node ID", key: "nodeId" },
   { title: "Location", key: "location.country", sortable: false },
   { title: "CRU", key: "total_resources.cru" },
@@ -102,6 +110,7 @@ const headers: VDataTableHeader = [
 ];
 const profileManager = useProfileManager();
 const pageSize = ref(10);
+const page = ref(1);
 const expanded = ref([]);
 const tabs = [{ label: "Rentable" }, { label: "Rented" }, { label: "Mine" }];
 const activeTab = ref(0);
@@ -138,36 +147,48 @@ async function loadData() {
   }
 
   loading.value = true;
-  const data = await gridProxyClient.nodes.listAll({
-    ...params,
-  });
+  try {
+    const data = await gridProxyClient.nodes.list({
+      ...params,
+      size: pageSize.value,
+      page: page.value,
+    });
+    const grid = await getGrid(profileManager.profile!);
 
-  nodes.value = data;
+    const pricePromises = data.data.map(async item => {
+      const fee = await grid?.contracts.getDedicatedNodeExtraFee({ nodeId: item.nodeId });
 
-  for (const item of nodes.value) {
-    const price = await calculatePrice(
-      item.total_resources.cru,
-      item.total_resources.mru,
-      item.total_resources.sru,
-      item.total_resources.hru,
-      item.publicConfig.ipv4,
-      item.certificationType,
-    );
-    item.price =
-      (price as { dedicatedPrice: number } | undefined)?.dedicatedPrice ||
-      0 + (parseFloat(item.extraFee) ? parseFloat(item.extraFee) / 1000 : 0);
-    item.discount = (price as { sharedPackage: { discount: number } } | undefined)?.sharedPackage.discount || 0;
+      const price = await calculatePrice(
+        item.total_resources.cru,
+        item.total_resources.mru,
+        item.total_resources.sru,
+        item.total_resources.hru,
+        item.publicConfig.ipv4,
+        item.certificationType,
+      );
+
+      return {
+        ...item,
+        price: (price as { dedicatedPrice?: number } | undefined)?.dedicatedPrice ?? 0 + (fee || 0),
+        discount: (price as { sharedPackage: { discount: number } } | undefined)?.sharedPackage.discount || 0,
+      };
+    });
+
+    const pricedNodes = await Promise.all(pricePromises);
+    nodes.value = pricedNodes;
+
+    nodesCount.value = data.count ?? 0;
+    loading.value = false;
+  } catch (e) {
+    console.log("Error: ", e);
   }
-
-  nodesCount.value = data.length ?? 0;
-  loading.value = false;
 }
 
 async function calculatePrice(
-  cru: string,
-  mru: string,
-  sru: string,
-  hru: string,
+  cru: number,
+  mru: number,
+  sru: number,
+  hru: number,
   ipv4: string,
   certificationType: string,
 ) {
@@ -178,11 +199,11 @@ async function calculatePrice(
     const certified = certificationType !== "";
 
     const price = await grid?.calculator.calculateWithMyBalance({
-      cru: +cru,
-      hru: toGigaBytes(hru),
+      cru: cru,
+      hru: toGigaBytes(hru.toString()),
       ipv4u,
-      mru: toGigaBytes(mru),
-      sru: toGigaBytes(sru),
+      mru: toGigaBytes(mru.toString()),
+      sru: toGigaBytes(sru.toString()),
       balance: balance.free,
       certified: certified,
     });
@@ -209,6 +230,16 @@ function toGigaBytes(value?: string) {
 watch(activeTab, () => {
   loadData();
 });
+
+watch(
+  [page, pageSize],
+  ([newPage, newPageSize]) => {
+    page.value = newPage;
+    pageSize.value = newPageSize;
+    loadData();
+  },
+  { immediate: true },
+);
 
 async function reloadTable() {
   await new Promise(resolve => {

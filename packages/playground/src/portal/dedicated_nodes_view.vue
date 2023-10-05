@@ -52,7 +52,7 @@ const filters = [
 
 <script lang="ts">
 import DedicatedNodeFilters from "../components/dedicated_node_filter.vue";
-import NodesTable from "../components/nodes_table.vue";
+import NodesTable from "../components/dedicated_nodes_table.vue";
 
 export default {
   name: "Dedicated Node",
