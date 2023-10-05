@@ -51,16 +51,17 @@ const nodesDistribution = ref<string>("");
 let stats: Stats | null = null;
 let networks: Network[] = [];
 const getStats = async () => {
-  networks = [Network.Dev];
+  networks = [Network.Dev, Network.Main, Network.Test];
   try {
     loading.value = true;
     failed.value = false;
     const data = await fetchStats(networks);
     return formatData(networks, data);
   } catch (error) {
-    loading.value = false;
     failed.value = true;
     return null;
+  } finally {
+    loading.value = false;
   }
 };
 
