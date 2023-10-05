@@ -47,7 +47,7 @@ class BaseModule {
     this.tfClient = config.tfclient;
   }
 
-  newGetDeploymentPath(...paths: string[]): string {
+  getNewDeploymentPath(...paths: string[]): string {
     return PATH.join(this.config.storePath, this.moduleName, this.projectName, ...paths);
   }
 
@@ -56,7 +56,7 @@ class BaseModule {
   }
 
   async getDeploymentContracts(name: string) {
-    const path = this.newGetDeploymentPath(name, name, "contracts.json");
+    const path = this.getNewDeploymentPath(name, name, "contracts.json");
     const contracts = await this.backendStorage.load(path);
     if (!contracts) {
       return [];
@@ -65,7 +65,7 @@ class BaseModule {
   }
 
   async save(name: string, contracts: Record<string, unknown[]>) {
-    const contractsPath = PATH.join(this.newGetDeploymentPath(name, name), "contracts.json");
+    const contractsPath = PATH.join(this.getNewDeploymentPath(name, name), "contracts.json");
     const wireguardPath = PATH.join(this.getDeploymentPath(name), `${name}.conf`);
     const oldContracts = await this.getDeploymentContracts(name);
     let StoreContracts = oldContracts;
@@ -123,7 +123,7 @@ class BaseModule {
       const key = oldKeys[i];
       const value = values[i];
       const from = PATH.join(oldPath, key, "contracts.json");
-      const to = this.newGetDeploymentPath(key, key, "contracts.json");
+      const to = this.getNewDeploymentPath(key, key, "contracts.json");
 
       if (value) {
         ext1.push(this.backendStorage.dump(to, value));
@@ -134,16 +134,18 @@ class BaseModule {
     ext1 = await Promise.all(ext1.flat(1));
     ext2 = await Promise.all(ext2.flat(1));
 
-    ext1 = ext1.filter(x => !!x);
-    ext2 = ext2.filter(x => !!x);
+    if (this.backendStorage.type === BackendStorageType.tfkvstore) {
+      ext1 = ext1.filter(x => !!x);
+      ext2 = ext2.filter(x => !!x);
 
-    await this.tfClient.applyAllExtrinsics(ext1);
-    await this.tfClient.applyAllExtrinsics(ext2);
+      await this.tfClient.applyAllExtrinsics(ext1);
+      await this.tfClient.applyAllExtrinsics(ext2);
+    }
   }
 
   async _list(): Promise<string[]> {
     await this._migrateListKeys();
-    return this.backendStorage.list(this.newGetDeploymentPath(""));
+    return this.backendStorage.list(this.getNewDeploymentPath(""));
   }
 
   async exists(name: string): Promise<boolean> {
