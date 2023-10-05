@@ -4,7 +4,7 @@ import { AbstractBuilder, BuilderMapper, BuilderMethods, BuilderValidator } from
 export enum NodeStatus {
   Up = "up",
   Down = "down",
-  Standby = "standby"
+  Standby = "standby",
 }
 
 export interface GatewaysQuery {

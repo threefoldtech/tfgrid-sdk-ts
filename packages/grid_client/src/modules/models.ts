@@ -553,6 +553,10 @@ class NodeFreeResourcesModel {
 class FarmIdFromFarmNameModel {
   @Expose() @IsString() @IsNotEmpty() farmName: string;
 }
+
+class NodeIdFromContractIdModel {
+  @Expose() @IsInt() @Min(1) contractId: number;
+}
 class CapacityPoolCheckModel {
   @Expose() @IsInt() @Min(1) nodeId: number;
   @Expose() @IsInt({ each: true }) @Min(250 * 1024 ** 2, { each: true }) rootfsDisks: number[]; //Byte
@@ -608,6 +612,7 @@ class FarmFilterOptions {
   @Expose() @IsOptional() @IsInt() @Min(1) nodeRentedBy?: number;
   @Expose() @IsOptional() @IsInt() page?: number;
   @Expose() @IsOptional() @IsInt() size?: number;
+  @Expose() @IsOptional() @IsInt() ownedBy?: number;
 }
 
 class CalculatorModel {
@@ -752,6 +757,7 @@ export {
   NodesByFarmIdModel,
   NodeFreeResourcesModel,
   FarmIdFromFarmNameModel,
+  NodeIdFromContractIdModel,
   CapacityPoolCheckModel,
   FilterOptions,
   FarmFilterOptions,

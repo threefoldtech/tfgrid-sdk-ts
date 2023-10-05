@@ -182,7 +182,7 @@ class HighLevelBase {
       throw Error("Network workload can't be deleted");
     }
     let twinDeployments: TwinDeployment[] = [];
-    const node_id = await this.nodes.getNodeIdFromContractId(deployment.contract_id, this.config.mnemonic);
+    const node_id = await this.nodes.getNodeIdFromContractId(deployment.contract_id, this.config.substrateURL);
     const deploymentFactory = new DeploymentFactory(this.config);
 
     const numberOfWorkloads = deployment.workloads.length;

@@ -16,7 +16,7 @@ class TwinDeploymentHandler {
   nodes: Nodes;
 
   constructor(public config: GridClientConfig) {
-    this.tfclient = new TFClient(config.substrateURL, config.mnemonic, config.storeSecret, config.keypairType);
+    this.tfclient = config.tfclient;
     this.deploymentFactory = new DeploymentFactory(this.config);
     this.rmb = new RMB(config.rmbClient);
     this.nodes = new Nodes(this.config.graphqlURL, this.config.proxyURL, this.config.rmbClient);
@@ -59,7 +59,7 @@ class TwinDeploymentHandler {
   }
 
   async getDeployment(contract_id: number) {
-    const node_id = await this.nodes.getNodeIdFromContractId(contract_id, this.config.mnemonic);
+    const node_id = await this.nodes.getNodeIdFromContractId(contract_id, this.config.substrateURL);
     const node_twin_id = await this.nodes.getNodeTwinId(node_id);
 
     const payload = JSON.stringify({ contract_id: contract_id });
@@ -83,7 +83,7 @@ class TwinDeploymentHandler {
 
   async waitForDeployment(twinDeployment: TwinDeployment, timeout = this.config.deploymentTimeoutMinutes) {
     const contract_id = twinDeployment.deployment.contract_id;
-    const node_id = await this.nodes.getNodeIdFromContractId(contract_id, this.config.mnemonic);
+    const node_id = await this.nodes.getNodeIdFromContractId(contract_id, this.config.substrateURL);
 
     const now = new Date().getTime();
     while (new Date().getTime() < now + timeout * 1000 * 60) {

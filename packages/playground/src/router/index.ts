@@ -22,9 +22,15 @@ const router = createRouter({
       path: "/portal",
       children: [
         {
+          name: "Twin",
           path: "twin",
           component: () => import("../portal/twin_view.vue"),
           meta: { title: "Twin" },
+        },
+        {
+          path: "dao",
+          component: () => import("../portal/dao_view.vue"),
+          meta: { title: "Dao" },
         },
         {
           path: "bridge",
@@ -45,11 +51,11 @@ const router = createRouter({
     },
 
     {
-      path: "/explorer",
+      path: "/calculator",
       children: [
         {
           path: "pricing",
-          component: () => import("../portal/resource_pricing.vue"),
+          component: () => import("../calculator/resource_pricing.vue"),
           meta: { title: "Resource Pricing" },
         },
       ],
@@ -59,7 +65,7 @@ const router = createRouter({
       children: [
         {
           path: "stats",
-          component: () => import("../portal/stats.vue"),
+          component: () => import("../explorer/stats.vue"),
           meta: { title: "Statistics" },
         },
       ],

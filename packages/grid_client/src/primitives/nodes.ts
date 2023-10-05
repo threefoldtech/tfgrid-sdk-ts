@@ -1,4 +1,5 @@
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
+import { QueryClient } from "@threefold/tfchain_client";
 import { default as PrivateIp } from "private-ip";
 import urlJoin from "url-join";
 
@@ -129,13 +130,8 @@ class Nodes {
     return accessNodes;
   }
 
-  async getNodeIdFromContractId(contractId: number, mnemonic: string): Promise<number> {
-    const tfclient = new TFClient(
-      GridClient.config.substrateURL,
-      mnemonic,
-      GridClient.config.storeSecret,
-      GridClient.config.keypairType,
-    );
+  async getNodeIdFromContractId(contractId: number, substrateURL: string): Promise<number> {
+    const tfclient = new QueryClient(substrateURL);
     return tfclient.contracts
       .get({ id: contractId })
       .then(contract => {
@@ -383,6 +379,7 @@ class Nodes {
       node_status: "up",
       page: options.page,
       size: options.size,
+      twin_id: options.ownedBy,
       node_has_gpu: options.nodeHasGPU,
       node_rented_by: options.nodeRentedBy,
       node_certified: options.nodeCertified,

@@ -44,12 +44,7 @@ class Stellar implements blockchainInterface {
       config.backendStorage,
       config.seed,
     );
-    this.tfClient = new TFClient(
-      this.config.substrateURL,
-      this.config.mnemonic,
-      this.config.storeSecret,
-      this.config.keypairType,
-    );
+    this.tfClient = config.tfclient;
   }
 
   private async saveIfKVStoreBackend(extrinsics) {
