@@ -119,8 +119,9 @@
 <script lang="ts" setup>
 import { Keyring } from "@polkadot/keyring";
 import type { Twin } from "@threefold/tfchain_client";
-import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
+
+import { createCustomToast } from "@/components/custom_toast.vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useProfileManager } from "../stores";
@@ -208,14 +209,7 @@ async function transfer(receipientTwin: Twin) {
   try {
     if (grid) {
       await grid.balance.transfer({ address: receipientTwin.accountId, amount: transferAmount.value });
-      createToast("Transaction Complete!", {
-        position: "top-right",
-        hideProgressBar: true,
-        toastBackgroundColor: "#1aa18f",
-        timeout: 5000,
-        showIcon: true,
-        type: "success",
-      });
+      createCustomToast("Transaction Complete!", "success");
       profileManagerController.reloadBalance();
       await getFreeBalance();
     }
@@ -229,14 +223,7 @@ async function submitFormAddress() {
   loadingAddressTransfer.value = false;
 }
 function createInvalidTransferToast(message: string) {
-  createToast(message, {
-    position: "top-right",
-    hideProgressBar: true,
-    toastBackgroundColor: "#FF5252",
-    timeout: 5000,
-    showIcon: true,
-    type: "danger",
-  });
+  createCustomToast(message, "danger");
 }
 async function submitFormTwinID() {
   const grid = await getGrid(profile.value);
