@@ -1,4 +1,8 @@
 <template>
+  <!-- Filters -->
+  <div class="pt-5">
+    <node-filter v-model="filterInputs" v-model:valid="isValidForm" />
+  </div>
   <div class="pt-5">
     <v-card>
       <v-tabs v-model="activeTab" align-tabs="center">
@@ -117,6 +121,9 @@ const activeTab = ref(0);
 const loading = ref(false);
 const nodes = ref<any[]>();
 const nodesCount = ref(0);
+const filterInputs = ref<DedicatedNodeFilters>(DedicatedNodeInitializer);
+const isValidForm = ref<boolean>(false);
+
 const tabParams = {
   0: {
     rentable: true,
@@ -152,6 +159,12 @@ async function loadData() {
       ...params,
       size: pageSize.value,
       page: page.value,
+      freeSru: filterInputs.value.total_sru.value ? +filterInputs.value.total_sru.value : 0,
+      freeHru: filterInputs.value.total_hru.value ? +filterInputs.value.total_hru.value : 0,
+      freeMru: filterInputs.value.total_mru.value ? +filterInputs.value.total_mru.value : 0,
+      totalCru: filterInputs.value.total_cru.value ? +filterInputs.value.total_cru.value : 0,
+      gpuVendorName: filterInputs.value.gpu_vendor_name.value ? filterInputs.value.gpu_vendor_name.value : "",
+      gpuDeviceName: filterInputs.value.gpu_device_name.value ? filterInputs.value.gpu_device_name.value : "",
     });
     const grid = await getGrid(profileManager.profile!);
 
@@ -232,11 +245,13 @@ watch(activeTab, () => {
 });
 
 watch(
-  [page, pageSize],
-  ([newPage, newPageSize]) => {
+  [page, pageSize, isValidForm, filterInputs],
+  ([newPage, newPageSize, newIsValidForm, newFilterInputs]) => {
     page.value = newPage;
     pageSize.value = newPageSize;
-    loadData();
+    if (newIsValidForm) {
+      loadData();
+    }
   },
   { immediate: true },
 );
@@ -250,13 +265,18 @@ async function reloadTable() {
 </script>
 
 <script lang="ts">
+import { type DedicatedNodeFilters, DedicatedNodeInitializer, type NodeInputFilterType } from "@/utils/filter_nodes";
+
 import NodeDetails from "../components/node_details.vue";
+import NodeFilter from "../components/node_filter.vue";
 import ReserveBtn from "../components/reserve_action_btn.vue";
+
 export default {
   name: "Dedicated Node",
   components: {
     ReserveBtn,
     NodeDetails,
+    NodeFilter,
   },
 };
 </script>
