@@ -39,7 +39,11 @@ export async function deployGatewayName(grid: GridClient, options: DeployGateway
   await grid.gateway.getObj(gateway.name); //invalidating the cashed keys
   gateway.node_id = options.nodeId;
   gateway.tls_passthrough = options.tlsPassthrough || false;
-  gateway.backends = [`http://${options.ip}:${options.port}`];
+  if (gateway.tls_passthrough) {
+    gateway.backends = [`${options.ip}:${options.port}`];
+  } else {
+    gateway.backends = [`http://${options.ip}:${options.port}`];
+  }
   gateway.network = options.networkName;
   gateway.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
   if (options.fqdn) {

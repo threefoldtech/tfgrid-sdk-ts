@@ -8,7 +8,7 @@ import { checkBalance } from "./utils";
 class Balance {
   client: TFClient;
   constructor(config: GridClientConfig) {
-    this.client = new TFClient(config.substrateURL, config.mnemonic, config.storeSecret, config.keypairType);
+    this.client = config.tfclient;
   }
   @expose
   @validateInput

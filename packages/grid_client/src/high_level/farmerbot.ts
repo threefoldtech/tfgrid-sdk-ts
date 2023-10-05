@@ -51,7 +51,7 @@ class FarmerBot {
   client: TFClient;
 
   constructor(public config: GridClientConfig) {
-    this.client = new TFClient(config.substrateURL, config.mnemonic, config.storeSecret, config.keypairType);
+    this.client = config.tfclient;
     this.rmb = new RMB(config.rmbClient);
   }
 

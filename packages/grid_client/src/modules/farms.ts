@@ -8,7 +8,7 @@ class Farms {
   client: TFClient;
 
   constructor(public config: GridClientConfig) {
-    this.client = new TFClient(config.substrateURL, config.mnemonic, config.storeSecret, config.keypairType);
+    this.client = config.tfclient;
   }
 
   @expose
