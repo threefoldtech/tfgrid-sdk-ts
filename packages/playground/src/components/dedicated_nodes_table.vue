@@ -92,8 +92,8 @@ import { VDataTableServer } from "vuetify/labs/VDataTable";
 
 import { gridProxyClient } from "../clients";
 import { useProfileManager } from "../stores";
-import { getGrid, loadBalance } from "../utils/grid";
-import { toGigaBytes } from "../utils/helpers";
+import { getGrid } from "../utils/grid";
+import { gigabytesToBytes, toGigaBytes } from "../utils/helpers";
 import toTeraOrGigaOrPeta from "../utils/toTeraOrGegaOrPeta";
 
 const headers: VDataTable["headers"] = [
@@ -161,9 +161,15 @@ async function loadData() {
       ...params,
       size: pageSize.value,
       page: page.value,
-      freeSru: filterInputs.value.total_sru.value ? +filterInputs.value.total_sru.value : undefined,
-      freeHru: filterInputs.value.total_hru.value ? +filterInputs.value.total_hru.value : undefined,
-      freeMru: filterInputs.value.total_mru.value ? +filterInputs.value.total_mru.value : undefined,
+      freeSru: gigabytesToBytes(filterInputs.value.total_sru.value)
+        ? gigabytesToBytes(filterInputs.value.total_sru.value)
+        : undefined,
+      freeHru: gigabytesToBytes(filterInputs.value.total_hru.value)
+        ? gigabytesToBytes(filterInputs.value.total_hru.value)
+        : undefined,
+      freeMru: gigabytesToBytes(filterInputs.value.total_mru.value)
+        ? gigabytesToBytes(filterInputs.value.total_mru.value)
+        : undefined,
       totalCru: filterInputs.value.total_cru.value ? +filterInputs.value.total_cru.value : undefined,
       gpuVendorName: filterInputs.value.gpu_vendor_name.value ? filterInputs.value.gpu_vendor_name.value : "",
       gpuDeviceName: filterInputs.value.gpu_device_name.value ? filterInputs.value.gpu_device_name.value : "",
