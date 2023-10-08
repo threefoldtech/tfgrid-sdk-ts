@@ -6,7 +6,7 @@
   <div class="pt-5">
     <v-card>
       <v-tabs v-model="activeTab" align-tabs="center">
-        <v-tab v-for="(tab, index) in tabs" :key="index" :value="index" color="primary" class="pr-8">
+        <v-tab v-for="(tab, index) in tabs" :key="index" :value="index" color="primary">
           {{ tab.label }}
         </v-tab>
       </v-tabs>
@@ -16,7 +16,7 @@
       </v-window>
     </v-card>
   </div>
-  <div class="pt-5">
+  <div>
     <v-card class="pa-5">
       <v-data-table-server
         :loading="loading"
@@ -27,6 +27,7 @@
         v-model:items-per-page="pageSize"
         v-model:expanded="expanded"
         show-expand
+        :hide-no-data="false"
         class="elevation-1"
         :hover="true"
         :items-per-page-options="[
@@ -92,15 +93,16 @@ import { VDataTableServer } from "vuetify/labs/VDataTable";
 import { gridProxyClient } from "../clients";
 import { useProfileManager } from "../stores";
 import { getGrid, loadBalance } from "../utils/grid";
+import { toGigaBytes } from "../utils/helpers";
 import toTeraOrGigaOrPeta from "../utils/toTeraOrGegaOrPeta";
 
 const headers: VDataTable["headers"] = [
   { title: "Node ID", key: "nodeId" },
   { title: "Location", key: "location.country", sortable: false },
-  { title: "CRU", key: "total_resources.cru" },
-  { title: "MRU", key: "total_resources.mru", value: item => toTeraOrGigaOrPeta(item.total_resources.mru) },
-  { title: "SRU", key: "total_resources.sru", value: item => toTeraOrGigaOrPeta(item.total_resources.sru) },
-  { title: "HRU", key: "total_resources.hru", value: item => toTeraOrGigaOrPeta(item.total_resources.hru) },
+  { title: "CPU", key: "total_resources.cru" },
+  { title: "RAM", key: "total_resources.mru", value: item => toTeraOrGigaOrPeta(item.total_resources.mru) },
+  { title: "SSD", key: "total_resources.sru", value: item => toTeraOrGigaOrPeta(item.total_resources.sru) },
+  { title: "HDD", key: "total_resources.hru", value: item => toTeraOrGigaOrPeta(item.total_resources.hru) },
   { title: "GPU", key: "num_gpu" },
   {
     title: "Price (USD)",
@@ -159,30 +161,37 @@ async function loadData() {
       ...params,
       size: pageSize.value,
       page: page.value,
-      freeSru: filterInputs.value.total_sru.value ? +filterInputs.value.total_sru.value : 0,
-      freeHru: filterInputs.value.total_hru.value ? +filterInputs.value.total_hru.value : 0,
-      freeMru: filterInputs.value.total_mru.value ? +filterInputs.value.total_mru.value : 0,
-      totalCru: filterInputs.value.total_cru.value ? +filterInputs.value.total_cru.value : 0,
+      freeSru: filterInputs.value.total_sru.value ? +filterInputs.value.total_sru.value : undefined,
+      freeHru: filterInputs.value.total_hru.value ? +filterInputs.value.total_hru.value : undefined,
+      freeMru: filterInputs.value.total_mru.value ? +filterInputs.value.total_mru.value : undefined,
+      totalCru: filterInputs.value.total_cru.value ? +filterInputs.value.total_cru.value : undefined,
       gpuVendorName: filterInputs.value.gpu_vendor_name.value ? filterInputs.value.gpu_vendor_name.value : "",
       gpuDeviceName: filterInputs.value.gpu_device_name.value ? filterInputs.value.gpu_device_name.value : "",
     });
+
+    if (data.count === 0) {
+      nodes.value = [];
+      loading.value = false;
+      return;
+    }
+
     const grid = await getGrid(profileManager.profile!);
 
     const pricePromises = data.data.map(async item => {
       const fee = await grid?.contracts.getDedicatedNodeExtraFee({ nodeId: item.nodeId });
 
-      const price = await calculatePrice(
-        item.total_resources.cru,
-        item.total_resources.mru,
-        item.total_resources.sru,
-        item.total_resources.hru,
-        item.publicConfig.ipv4,
-        item.certificationType,
-      );
+      const price = await grid?.calculator.calculateWithMyBalance({
+        cru: item.total_resources.cru,
+        hru: toGigaBytes(item.total_resources.hru.toString()),
+        mru: toGigaBytes(item.total_resources.mru.toString()),
+        sru: toGigaBytes(item.total_resources.sru.toString()),
+        ipv4u: false,
+        certified: !!item.certificationType,
+      });
 
       return {
         ...item,
-        price: (price as { dedicatedPrice?: number } | undefined)?.dedicatedPrice ?? 0 + (fee || 0),
+        price: ((price as { dedicatedPrice?: number } | undefined)?.dedicatedPrice ?? 0 + (fee || 0)).toFixed(3),
         discount: (price as { sharedPackage: { discount: number } } | undefined)?.sharedPackage.discount || 0,
       };
     });
@@ -194,50 +203,8 @@ async function loadData() {
     loading.value = false;
   } catch (e) {
     console.log("Error: ", e);
+    loading.value = false;
   }
-}
-
-async function calculatePrice(
-  cru: number,
-  mru: number,
-  sru: number,
-  hru: number,
-  ipv4: string,
-  certificationType: string,
-) {
-  try {
-    const grid = await getGrid(profileManager.profile!);
-    const balance = await loadBalance(grid!);
-    const ipv4u = ipv4 !== "";
-    const certified = certificationType !== "";
-
-    const price = await grid?.calculator.calculateWithMyBalance({
-      cru: cru,
-      hru: toGigaBytes(hru.toString()),
-      ipv4u,
-      mru: toGigaBytes(mru.toString()),
-      sru: toGigaBytes(sru.toString()),
-      balance: balance.free,
-      certified: certified,
-    });
-
-    return price;
-  } catch (e) {
-    console.log("Error calculating price: ", e);
-    return 0;
-  }
-}
-
-function toGigaBytes(value?: string) {
-  const giga = 1024 ** 3;
-
-  if (!value) return 0;
-
-  const val = +value;
-  if (val === 0 || isNaN(val)) return 0;
-
-  const gb = val / giga;
-  return parseFloat(gb.toFixed(2));
 }
 
 watch(activeTab, () => {

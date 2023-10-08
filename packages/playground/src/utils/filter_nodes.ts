@@ -130,7 +130,7 @@ export const inputsInitializer: FilterInputs = {
 
 export const DedicatedNodeInitializer: DedicatedNodeFilters = {
   total_sru: {
-    label: "Total SRU (GB)",
+    label: "Total SSD (GB)",
     placeholder: "Filter by total SSD greater than or equal to.",
     type: "text",
     rules: [
@@ -138,7 +138,7 @@ export const DedicatedNodeInitializer: DedicatedNodeFilters = {
     ],
   },
   total_hru: {
-    label: "Total HRU (GB)",
+    label: "Total HDD (GB)",
     placeholder: "Filter by total HDD greater than or equal to.",
     type: "text",
     rules: [
@@ -146,7 +146,7 @@ export const DedicatedNodeInitializer: DedicatedNodeFilters = {
     ],
   },
   total_mru: {
-    label: "Total MRU (GB)",
+    label: "Total RAM (GB)",
     placeholder: "Filter by total Memory greater than or equal to.",
     type: "text",
     rules: [
@@ -154,7 +154,7 @@ export const DedicatedNodeInitializer: DedicatedNodeFilters = {
     ],
   },
   total_cru: {
-    label: "Total CRU (Cores)",
+    label: "Total CPU (Cores)",
     placeholder: "Filter by total Cores greater than or equal to.",
     type: "text",
     rules: [

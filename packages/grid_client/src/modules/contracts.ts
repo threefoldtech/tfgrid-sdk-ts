@@ -17,7 +17,6 @@ import {
   ContractsByAddress,
   ContractsByTwinId,
   ContractState,
-  CreateRentModel,
   CreateServiceContractModel,
   GetActiveContractsModel,
   GetDedicatedNodePriceModel,
@@ -26,6 +25,7 @@ import {
   NameContractGetModel,
   NodeContractCreateModel,
   NodeContractUpdateModel,
+  RentContractCreateModel,
   RentContractGetModel,
   ServiceContractApproveModel,
   ServiceContractBillModel,
@@ -84,7 +84,7 @@ class Contracts {
   @expose
   @validateInput
   @checkBalance
-  async createRent(options: CreateRentModel) {
+  async createRent(options: RentContractCreateModel) {
     return (await this.client.contracts.createRent(options)).apply();
   }
 

@@ -105,8 +105,7 @@ export default {
             type: "info",
           });
 
-          const node = await gridProxyClient.nodes.byId(+props.nodeId);
-          await grid?.contracts.cancel({ id: node.rentContractId });
+          await grid?.nodes.unreserve({ nodeId: +props.nodeId });
           createToast(`Transaction succeeded node ${props.nodeId} Unreserved`, {
             position: "top-right",
             hideProgressBar: true,
@@ -155,7 +154,7 @@ export default {
           showIcon: true,
           type: "info",
         });
-        await grid?.contracts.createRent({ nodeId: +props.nodeId });
+        await grid?.nodes.reserve({ nodeId: +props.nodeId });
         loadingReserveNode.value = false;
         createToast(`Transaction succeeded node ${props.nodeId} Reserved`, {
           position: "top-right",

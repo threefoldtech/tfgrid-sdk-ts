@@ -109,8 +109,9 @@ class QueryContracts {
   }
 
   @checkConnection
-  async getActiveContracts(options: ActiveContractsOptions) {
-    return await this.client.api.query.smartContractModule.activeNodeContracts(options.nodeId);
+  async getActiveContracts(options: ActiveContractsOptions): Promise<number[]> {
+    const res = await this.client.api.query.smartContractModule.activeNodeContracts(options.nodeId);
+    return res.toPrimitive() as number[];
   }
 
   @checkConnection

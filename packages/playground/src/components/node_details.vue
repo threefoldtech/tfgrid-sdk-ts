@@ -287,11 +287,6 @@ async function loadGPUitems() {
   try {
     const grid = await getGrid(profileManager.profile!);
     gpuItem.value = await grid?.zos.getNodeGPUInfo({ nodeId: props.item.value.nodeId });
-    if (gpuItem.value && gpuItem.value.length > 0) {
-      console.log("Length ", gpuItem.value?.length);
-      console.log("GPU INFO: ", gpuItem.value);
-      console.log("Contract ", gpuItem.value[0].contract);
-    }
     loading.value = false;
   } catch (e) {
     console.log("Error: ", e);

@@ -4,6 +4,19 @@ import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { CalculatorModel, CUModel, SUModel } from "./models";
 
+interface PricingInfo {
+  dedicatedPrice: number;
+  dedicatedPackage: {
+    package: string;
+    discount: number;
+  };
+  sharedPrice: number;
+  sharedPackage: {
+    package: string;
+    discount: number;
+  };
+}
+
 class Calculator {
   client: TFClient;
 
@@ -60,7 +73,7 @@ class Calculator {
   }
   @expose
   @validateInput
-  async calculate(options: CalculatorModel) {
+  async calculate(options: CalculatorModel): Promise<PricingInfo> {
     let balance = 0;
     const pricing = await this.pricing(options);
 
