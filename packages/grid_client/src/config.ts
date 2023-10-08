@@ -1,5 +1,6 @@
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
 
+import { TFClient } from "./clients/tf-grid/client";
 import { BackendStorageType } from "./storage/backend";
 import BackendStorageInterface from "./storage/BackendStorageInterface";
 import { KeypairType } from "./zos/deployment";
@@ -17,6 +18,7 @@ class GridClientConfig {
   mnemonic: string;
   storeSecret: string | Uint8Array;
   rmbClient: RMBClient;
+  tfclient: TFClient;
   projectName: string;
   backendStorageType: BackendStorageType;
   backendStorage: BackendStorageInterface;

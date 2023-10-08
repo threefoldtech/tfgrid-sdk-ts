@@ -208,10 +208,9 @@ async function getGPUInfo() {
 
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
-    const nodeId = await grid.zos.capacity.getNodeIdFromContractId(
-      contract.value.contractId,
-      profileManager.profile!.mnemonic,
-    );
+    const nodeId = await grid.capacity.getNodeIdFromContractId({
+      contractId: contract.value.contractId,
+    });
 
     const gpuCards = await grid.zos.getNodeGPUInfo({ nodeId });
     const usedCards = gpuCards?.filter((card: any) => card.contract == contract.value.contractId);
