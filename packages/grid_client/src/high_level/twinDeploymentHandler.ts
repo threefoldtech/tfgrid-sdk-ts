@@ -5,7 +5,7 @@ import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
 import { validateObject } from "../helpers/validator";
-import { DeploymentFactory, Nodes } from "../primitives/index";
+import { DeploymentFactory, NodeInfo, Nodes } from "../primitives/index";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { Operations, TwinDeployment } from "./models";
 class TwinDeploymentHandler {
@@ -265,6 +265,30 @@ class TwinDeploymentHandler {
     return deployments;
   }
 
+  async checkFarmIps(twinDeployments: TwinDeployment[]) {
+    const farms: { [key: string]: { ips: number } } = {};
+    for (const twinDeployment of twinDeployments) {
+      const node = await this.nodes.getNode(twinDeployment.nodeId);
+      if (node) {
+        if (!(node.farmId in farms)) {
+          farms[node.farmId] = { ips: twinDeployment.publicIps };
+        } else {
+          farms[node.farmId] = { ips: farms[node.farmId].ips + twinDeployment.publicIps };
+        }
+      }
+    }
+
+    for (const farm of Object.keys(farms)) {
+      const _farm = await this.nodes.filterFarms({
+        farmId: +farm,
+      });
+      const freeIps = _farm[0].publicIps.filter(res => res.contract_id === 0).length;
+      if (freeIps < farms[farm].ips) {
+        throw Error(`Farm ${farm} doesn't have enough ips: requested Ips=${farms[farm].ips}, free Ips=${freeIps}`);
+      }
+    }
+  }
+
   async checkNodesCapacity(twinDeployments: TwinDeployment[]) {
     for (const twinDeployment of twinDeployments) {
       let workloads: Workload[] = [];
@@ -439,6 +463,8 @@ class TwinDeploymentHandler {
     twinDeployments = await this.merge(twinDeployments);
     await this.validate(twinDeployments);
     await this.checkNodesCapacity(twinDeployments);
+    await this.checkFarmIps(twinDeployments);
+
     const contracts = { created: [], updated: [], deleted: [] };
     const resultContracts = { created: [], updated: [], deleted: [] };
     let nodeExtrinsics: ExtrinsicResult<Contract>[] = [];

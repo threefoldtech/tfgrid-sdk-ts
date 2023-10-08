@@ -596,6 +596,7 @@ class FarmFilterOptions {
   @Expose() @IsOptional() @IsInt() @Min(1) nodeRentedBy?: number;
   @Expose() @IsOptional() @IsInt() page?: number;
   @Expose() @IsOptional() @IsInt() size?: number;
+  @Expose() @IsOptional() @IsInt() farmId?: number;
 }
 
 class CalculatorModel {
