@@ -1,15 +1,12 @@
 <template>
   <div>
-    <v-container>
-      <div class="text-center">
-        <v-row align="center" justify="center">
-          <v-col cols="12" sm="6" md="4">
-            <section class="loader" v-if="loading">
-              <v-progress-circular size="150" indeterminate />
-            </section>
-          </v-col>
-        </v-row>
-      </div>
+    <v-sheet height="100vh" v-if="loading" class="d-flex align-center justify-center">
+      <v-container class="text-center d-block">
+        <v-progress-circular size="40" indeterminate />
+        <p class="pt-4 font-weight-bold">Loading stats data</p>
+      </v-container>
+    </v-sheet>
+    <v-container v-else>
       <v-row>
         <v-col color="red" v-if="failed">
           <v-alert type="error" variant="tonal">
