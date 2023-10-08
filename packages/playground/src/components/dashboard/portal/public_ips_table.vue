@@ -5,6 +5,7 @@
         <div class="d-flex ma-4 align-center">
           <p class="text-subtitle-1 font-weight-bold p-3 w-50">Public IPs</p>
           <AddIP
+            v-model:farmId="$props.farmId"
             v-model:type="type"
             v-model:publicIP="publicIP"
             v-model:toPublicIP="toPublicIP"

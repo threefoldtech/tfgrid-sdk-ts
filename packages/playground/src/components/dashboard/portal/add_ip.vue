@@ -59,7 +59,13 @@
             </form-validator>
           </div>
           <v-card-actions class="justify-end pa-5">
-            <v-btn variant="tonal" color="primary" @click="addFarmIp" :disabled="!valid">Add</v-btn>
+            <v-btn
+              variant="tonal"
+              color="primary"
+              @click="addFarmIp($props.farmId, $props.publicIP, $props.gateway)"
+              :disabled="!valid"
+              >Add</v-btn
+            >
             <v-btn variant="tonal" @click="addIPs" :disabled="!valid">Show IPs Range</v-btn>
             <v-btn @click="isAddIP = false" class="grey lighten-2 black--text">Close</v-btn>
           </v-card-actions>
@@ -78,7 +84,7 @@ import { useGrid } from "../../../stores";
 
 export default {
   name: "AddIP",
-  props: ["type", "publicIP", "toPublicIP", "gateway"],
+  props: ["farmId", "type", "publicIP", "toPublicIP", "gateway"],
   setup(props) {
     const isAddIP = ref(false);
     const gridStore = useGrid();

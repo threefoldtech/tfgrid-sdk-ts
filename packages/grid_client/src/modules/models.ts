@@ -656,15 +656,15 @@ class FarmPublicIPsModel {
 
 class AddFarmIPModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
-  @Expose() @IsInt() @IsNotEmpty() @IsIP() ip: number;
-  @Expose() @IsInt() @IsNotEmpty() gw: number;
+  @Expose() @IsNotEmpty() @IsIP() ip: number;
+  @Expose() @IsNotEmpty() gw: number;
 }
 
 class PublicConfigModel {
-  @Expose() @IsInt() @IsNotEmpty() @IsIP() ip?: number;
-  @Expose() @IsInt() @IsNotEmpty() gw?: number;
-  @Expose() @IsInt() @IsNotEmpty() @IsIP() ip6?: number;
-  @Expose() @IsString() @IsNotEmpty() domain?: string;
+  @Expose() @IsOptional() @IsIP() ip?: number;
+  @Expose() @IsOptional() gw?: number;
+  @Expose() @IsOptional() @IsIP() ip6?: number;
+  @Expose() @IsString() @IsOptional() domain?: string;
 }
 class AddPublicConfig {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
