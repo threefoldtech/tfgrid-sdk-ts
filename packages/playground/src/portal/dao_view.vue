@@ -90,7 +90,7 @@
                     <div :style="{ width: `${proposal.ayesProgress}%` }">
                       <v-progress-linear
                         :height="24"
-                        color="#1AA18F"
+                        color="primary"
                         v-model="proposal.ayesProgress"
                         :style="{
                           backgroundColor: '#1AA18F',
@@ -131,7 +131,7 @@
                       v-if="proposal.ayesProgress > proposal.nayesProgress"
                       rounded
                       v-model="proposal.ayesProgress"
-                      color="#1AA18F"
+                      color="primary"
                       height="24"
                       :style="{
                         width: '100%',

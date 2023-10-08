@@ -18,20 +18,20 @@
     <v-container class="custom-container">
       <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
         <v-icon size="30" class="pr-3">mdi-account-supervisor-outline</v-icon>
-        <v-card-title class="pa-0" lor="white">Twin Details</v-card-title>
+        <v-card-title class="pa-0">Twin Details</v-card-title>
       </v-card>
 
       <v-card>
         <v-list class="custom-list">
           <v-row>
-            <v-col cols="1" sm="2" class="column-style">
+            <v-col cols="1" sm="2" class="column-style my-4">
               <v-list-item> ID </v-list-item>
               <v-divider></v-divider>
               <v-list-item> Address </v-list-item>
               <v-divider></v-divider>
               <v-list-item> Relay </v-list-item>
             </v-col>
-            <v-col cols="1" sm="10">
+            <v-col cols="1" sm="10" class="my-4">
               <v-list-item> {{ profileManager.profile?.twinId.toString() }} </v-list-item>
               <v-divider></v-divider>
               <v-list-item> {{ profileManager.profile?.address }} </v-list-item>
