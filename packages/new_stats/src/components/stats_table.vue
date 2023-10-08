@@ -1,31 +1,44 @@
 <template>
-  <div>
+  <div class="d-flex justify-center">
     <v-sheet height="100vh" v-if="loading" class="d-flex align-center justify-center">
       <v-container class="text-center d-block">
         <v-progress-circular size="40" indeterminate />
         <p class="pt-4 font-weight-bold">Loading stats data</p>
       </v-container>
     </v-sheet>
-    <v-container v-else>
-      <v-row>
-        <v-col color="red" v-if="failed">
+    <v-container fluid class="py-0 d-flex justify-center" v-else>
+      <v-row class="w-100">
+        <!-- <v-col color="red" v-if="failed">
           <v-alert type="error" variant="tonal">
             Failed to get stats data after 3 attempts, Feel free to contact the support team or try again later.
             <v-btn @click="fetchData" color="transparent">
               <v-icon> mdi-refresh</v-icon>
             </v-btn>
           </v-alert>
+        </v-col> -->
+        <v-col xl="8" lg="8" md="12" cols="12" class="mt-4 px-0">
+          <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
         </v-col>
-        <v-col v-if="Istats.length !== 0" class="d-flex flex-wrap justify-center">
-          <v-col v-for="item of Istats" :key="item.title" xl="2" lg="3" md="4" sm="6" cols="12" class="px-2">
+        <div style="height: 80vhd" class="my-auto">
+          <v-divider :thickness="2" class="border-opacity-50" color="gray" vertical></v-divider>
+        </div>
+
+        <v-col v-if="Istats.length !== 0" class="d-flex flex-wrap justify-center px-0">
+          <v-col
+            v-for="item of Istats"
+            :key="item.title"
+            xl="5"
+            lg="5"
+            md="3"
+            sm="4"
+            xs="4"
+            cols="12"
+            class="text-center"
+          >
             <StatisticsCard :item="item" />
           </v-col>
         </v-col>
-        <v-col cols="12" class="mx-auto">
-          <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
-        </v-col>
       </v-row>
-      <v-divider class="mt-2 mb-2" />
     </v-container>
   </div>
 </template>
