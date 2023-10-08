@@ -35,6 +35,7 @@
                 :value="$props.modelValue[key].value"
               >
                 <v-text-field
+                  :disabled="isFormLoading"
                   v-bind="props"
                   v-model="$props.modelValue[key].value"
                   :label="$props.modelValue[key].label"
@@ -44,7 +45,11 @@
               </input-validator>
             </v-col>
             <v-col cols="12" sm="4" md="2" class="d-flex justify-start align-center mb-6 ml-4">
-              <v-btn :disabled="!isFiltersTouched" @click="resetFilters" variant="outlined" color="primary"
+              <v-btn
+                :disabled="!isFiltersTouched || isFormLoading"
+                @click="resetFilters"
+                variant="outlined"
+                color="primary"
                 >Reset Filters</v-btn
               >
             </v-col>
@@ -68,6 +73,7 @@ export default defineComponent({
       type: Object as PropType<{ [key: string]: NodeInputFilterType }>,
       required: true,
     },
+    isFormLoading: Boolean,
     valid: Boolean,
   },
 

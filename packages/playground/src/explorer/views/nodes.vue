@@ -1,5 +1,10 @@
 <template>
-  <node-filters v-model="filterInputs" v-model:valid="isValidForm" @update:model-value="InputFiltersReset" />
+  <node-filters
+    :is-form-loading="isFormLoading"
+    v-model="filterInputs"
+    v-model:valid="isValidForm"
+    @update:model-value="InputFiltersReset"
+  />
 
   <div class="hint mb-2 mt-3">
     <v-alert type="info" variant="tonal">
@@ -123,15 +128,15 @@ export default {
     const mixedFilters = ref<MixedFilter>({ inputs: filterInputs.value, options: filterOptions.value });
 
     const loading = ref<boolean>(true);
+    const isFormLoading = ref<boolean>(true);
     const nodes = ref<GridNode[]>([]);
     const nodesCount = ref<number>(0);
 
     const selectedNodeId = ref<number>(0);
     const selectedNodeoptions = ref<GridProxyRequestConfig>({
       loadFarm: true,
-      loadStats: mixedFilters.value.options.status === NodeStatus.Down ? false : true,
       loadTwin: true,
-      loadGpu: mixedFilters.value.options.gpu,
+      loadStats: true,
     });
 
     const isDialogOpened = ref<boolean>(false);
@@ -143,6 +148,7 @@ export default {
     const _requestNodes = async (queries: Partial<NodesQuery> = {}, config: GridProxyRequestConfig) => {
       if (isValidForm.value) {
         loading.value = true;
+        isFormLoading.value = true;
         try {
           const { count, data } = await requestNodes(queries, config);
           nodes.value = data;
@@ -153,6 +159,7 @@ export default {
           console.log(err);
         } finally {
           loading.value = false;
+          isFormLoading.value = false;
         }
       }
     };
@@ -163,6 +170,12 @@ export default {
       mixedFilters,
       async () => {
         const queries = getQueries(mixedFilters.value);
+        selectedNodeoptions.value = {
+          loadFarm: true,
+          loadTwin: true,
+          loadStats: mixedFilters.value.options.status === NodeStatus.Down ? false : true,
+          loadGpu: mixedFilters.value.options.gpu,
+        };
         await request(queries, { loadFarm: true });
       },
       { deep: true },
@@ -206,6 +219,7 @@ export default {
 
     return {
       loading,
+      isFormLoading,
 
       nodes,
       nodesCount,

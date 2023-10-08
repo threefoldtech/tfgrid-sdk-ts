@@ -17,7 +17,7 @@
     <template v-if="loading">
       <v-card class="d-flex justify-center align-center h-screen">
         <v-progress-circular color="primary" indeterminate :size="128" :width="5" />
-        <p class="mt-2">Loading node details..</p>
+        <p class="mt-2">Loading node details...</p>
       </v-card>
     </template>
 

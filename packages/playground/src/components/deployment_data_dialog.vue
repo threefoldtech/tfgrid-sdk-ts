@@ -191,10 +191,10 @@ async function getGrafanaUrl() {
   isLoading.value = true;
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
-    const nodeId = await grid.zos.capacity.getNodeIdFromContractId(
-      contract.value.contractId,
-      profileManager.profile!.mnemonic,
-    );
+    const nodeId = await grid.capacity.getNodeIdFromContractId({
+      contractId: contract.value.contractId,
+    });
+
     const node = await gridProxyClient.nodes.byId(nodeId);
     const grafana = new GrafanaStatistics(node, 2);
     grafanaURL.value = await grafana.getUrl();

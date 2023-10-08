@@ -105,7 +105,7 @@ export default {
         sortable: false,
       },
       {
-        title: "  ",
+        title: "HDD",
         key: "total_resources.hru",
         align: "start",
         value: item => formatResourceSize(item.total_resources.hru),

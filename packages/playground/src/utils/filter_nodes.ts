@@ -76,7 +76,7 @@ export const inputsInitializer: FilterInputs = {
   },
   farmIds: {
     label: "Farm IDs",
-    placeholder: "e.g. 1,2,3",
+    placeholder: "e.g. 1,2,3.",
     rules: [
       [
         (value: string) => {
@@ -111,7 +111,7 @@ export const inputsInitializer: FilterInputs = {
   },
   freeSru: {
     label: "Free SSD (GB)",
-    placeholder: "Filter by Free SSD greater than or equal to.",
+    placeholder: "Filter by free SSD.",
     rules: [
       [
         isNumeric("This field accepts numbers only.", { no_symbols: true }),
@@ -123,7 +123,7 @@ export const inputsInitializer: FilterInputs = {
   },
   freeHru: {
     label: "Free HDD (GB)",
-    placeholder: "Filter by Free HDD greater than or equal to.",
+    placeholder: "Filter by free HDD.",
     rules: [
       [
         isNumeric("This field accepts numbers only.", { no_symbols: true }),
@@ -135,7 +135,7 @@ export const inputsInitializer: FilterInputs = {
   },
   freeMru: {
     label: "Free RAM (GB)",
-    placeholder: "Filter by Free Memory greater than or equal to.",
+    placeholder: "Filter by free RAM.",
     value: undefined,
     rules: [
       [

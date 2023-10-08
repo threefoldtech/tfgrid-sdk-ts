@@ -13,11 +13,11 @@
 
       <div class="items" v-else>
         <v-row class="bb-gray" v-for="item in items" :key="item.name">
-          <v-col class="d-flex justify-start align-center">
+          <v-col class="d-flex justify-start align-center ml-3">
             {{ item.name }}
             <v-chip class="ml-4" v-if="item.nameHint" :color="item.nameHintColor">{{ item.nameHint }}</v-chip>
           </v-col>
-          <v-col class="d-flex justify-end align-center">
+          <v-col class="d-flex justify-end align-center mr-3">
             <p v-if="!item.icon && !item.hint && !item.imgSrc">
               {{ item.value && item.value.length > maxLenChar ? item.value.slice(0, maxLenChar) + "..." : item.value }}
             </p>
@@ -34,18 +34,18 @@
 
             <v-tooltip v-if="item.hint && item.icon" location="top" :text="item.hint">
               <template #activator="{ props }">
-                <v-icon
-                  v-if="item.value && item.value.length"
-                  class="mr-1"
-                  v-bind="props"
-                  :icon="item.icon"
-                  @click="item.callback!(item.value!)"
-                />
                 <p v-bind="props">
                   {{
                     item.value && item.value.length > maxLenChar ? item.value.slice(0, maxLenChar) + "..." : item.value
                   }}
                 </p>
+                <v-icon
+                  v-if="item.value && item.value.length"
+                  class="ml-1"
+                  v-bind="props"
+                  :icon="item.icon"
+                  @click="item.callback!(item.value!)"
+                />
               </template>
             </v-tooltip>
 
