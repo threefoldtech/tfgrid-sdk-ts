@@ -1,30 +1,28 @@
 <template>
-  <div>
-    <v-container class="custom-container">
-      <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-        <v-icon size="30" class="pr-3">mdi-swap-horizontal</v-icon>
-        <v-card-title class="pa-0" lor="white">Transfer TFT Across Chains</v-card-title>
-      </v-card>
-      <v-card class="pa-5 white--text">
-        <v-row class="pa-5 text-center">
-          <v-col cols="12">
-            <v-select
-              :items="items"
-              label="Please select a chain:"
-              item-title="name"
-              item-value="id"
-              v-model="selectedItem"
-            ></v-select>
-          </v-col>
-        </v-row>
-        <v-row class="pa-4 px-8">
-          <v-btn color="primary" class="mr-2" @click="openDepositDialog = true">Deposit</v-btn>
-          <v-btn variant="outlined" color="secondary" class="mr-2" @click="openWithdrawDialog = true">Withdraw</v-btn>
-          <v-btn color="blue" class="ml-auto" @click="navigation">Learn How?</v-btn>
-        </v-row>
-      </v-card>
-    </v-container>
-  </div>
+  <v-container class="custom-container">
+    <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-swap-horizontal</v-icon>
+      <v-card-title class="pa-0" lor="white">Transfer TFT Across Chains</v-card-title>
+    </v-card>
+    <v-card class="pa-5 white--text">
+      <v-row class="pa-5 text-center">
+        <v-col cols="12">
+          <v-select
+            :items="items"
+            label="Please select a chain:"
+            item-title="name"
+            item-value="id"
+            v-model="selectedItem"
+          ></v-select>
+        </v-col>
+      </v-row>
+      <v-row class="pa-4 px-8">
+        <v-btn color="primary" class="mr-2" @click="openDepositDialog = true">Deposit</v-btn>
+        <v-btn variant="outlined" color="secondary" class="mr-2" @click="openWithdrawDialog = true">Withdraw</v-btn>
+        <v-btn color="blue" class="ml-auto" @click="navigation">Learn How?</v-btn>
+      </v-row>
+    </v-card>
+  </v-container>
 
   <!-- Deposit Dialog -->
   <deposit-dialog
