@@ -176,8 +176,8 @@ async function loadData() {
     });
 
     if (data.count === 0) {
-      nodes.value = [];
       loading.value = false;
+      nodes.value = [];
       return;
     }
 
@@ -206,7 +206,9 @@ async function loadData() {
     nodes.value = pricedNodes;
 
     nodesCount.value = data.count ?? 0;
-    loading.value = false;
+    setTimeout(() => {
+      loading.value = false;
+    }, 3000);
   } catch (e) {
     console.log("Error: ", e);
     loading.value = false;
@@ -220,6 +222,8 @@ watch(activeTab, () => {
 watch(
   [page, pageSize, isValidForm, filterInputs],
   ([newPage, newPageSize, newIsValidForm, newFilterInputs]) => {
+    console.log("Filter watcher");
+    console.log(filterInputs.value);
     page.value = newPage;
     pageSize.value = newPageSize;
     if (newIsValidForm) {

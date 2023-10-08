@@ -144,7 +144,12 @@
           </v-card>
 
           <!-- Details -->
-          <v-row v-if="!loading && gpuItem && gpuItem.length !== 0">
+          <v-row v-if="loading">
+            <v-col cols="12" class="text-center pt-12">
+              <v-progress-circular indeterminate size="64" color="primary"></v-progress-circular>
+            </v-col>
+          </v-row>
+          <v-row v-else-if="gpuItem && gpuItem.length !== 0">
             <v-col cols="12">
               <v-list>
                 <v-list-item>
