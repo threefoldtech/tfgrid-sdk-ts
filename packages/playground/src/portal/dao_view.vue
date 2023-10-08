@@ -2,7 +2,7 @@
   <v-container class="custom-container">
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
       <v-icon size="30" class="pr-3">mdi-note-check-outline</v-icon>
-      <v-card-title class="pa-0" lor="white">DAO</v-card-title>
+      <v-card-title class="pa-0">DAO</v-card-title>
     </v-card>
     <div class="d-flex my-12 align-center justify-center" v-if="loadingProposals">
       <v-progress-circular :size="70" :width="7" indeterminate color="primary"></v-progress-circular>
