@@ -245,7 +245,7 @@ const routes: AppRoute[] = [
     icon: "mdi-toolbox",
     items: [
       {
-        title: "Grafana",
+        title: "Monitoring",
         icon: "mdi-equalizer",
         url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
       },
