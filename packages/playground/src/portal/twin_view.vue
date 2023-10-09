@@ -36,7 +36,9 @@
               <v-divider></v-divider>
               <v-list-item>
                 {{ profileManager.profile?.address }}
-                <v-icon style="padding-left: 3rem" @click="copy(profileManager.profile?.address as string)"
+                <v-icon
+                  style="padding-left: 3rem; font-size: 1.5rem"
+                  @click="copy(profileManager.profile?.address as string)"
                   >mdi-content-copy</v-icon
                 >
               </v-list-item>
