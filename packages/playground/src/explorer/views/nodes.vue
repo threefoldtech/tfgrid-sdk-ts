@@ -30,6 +30,7 @@
                             label="Gateways (Only)"
                             v-model="filterOptions.gateway"
                             hide-details
+                            :disabled="isFormLoading"
                           />
                         </input-tooltip>
                       </v-col>
@@ -41,6 +42,7 @@
                             label="GPU Node (Only)"
                             v-model="filterOptions.gpu"
                             hide-details
+                            :disabled="isFormLoading"
                           />
                         </input-tooltip>
                       </v-col>
@@ -62,6 +64,7 @@
                           :items="nodeStatusOptions"
                           label="Select Nodes Status"
                           variant="underlined"
+                          :disabled="isFormLoading"
                         ></v-select>
                       </v-col>
                     </v-row>
