@@ -28,7 +28,7 @@ To use the PDF Signer Web Component, follow these steps:
 
 2. Navigate to the `repository/packages/UI` directory.
 
-3. Chose wich provider you gonna use [see providers section](#using-providers-and-extensions)
+3. Choose which provider you are going to use [see providers section](#using-providers-and-extensions)
 
 4. Run `yarn build` to generate the required distribution files.
 
