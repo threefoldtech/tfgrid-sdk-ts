@@ -27,11 +27,13 @@ To create an instance of the Script Editor, follow these steps:
 
 2. Navigate to the `repository/packages/UI` directory.
 
-3. Run `yarn build` to generate the required distribution files.
+3. Choose which provider you are going to use [see providers section](#using-providers-and-extensions)
 
-4. Locate the `dist` folder created in the previous step.
+4. Run `yarn build` to generate the required distribution files.
 
-5. Copy the `dist/threefold-ui.umd.js` file and include it in your project's HTML files.
+5. Locate the `dist` folder created in the previous step.
+
+6. Copy the `dist/threefold-ui.umd.js` file and include it in your project's HTML files.
 
 ```html
 <body>

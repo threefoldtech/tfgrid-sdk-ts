@@ -111,7 +111,10 @@ export default {
         pdfData.value = data.toString();
         numOfPages.value = pdf.numPages;
       } catch (error: any) {
-        showError({ isError: true, errorMessage: error.message });
+        showError({
+          isError: true,
+          errorMessage: "Please make sure that you have provided a PDF URL with CORS enabled.",
+        });
       } finally {
         loadingPdf.value = false;
       }
