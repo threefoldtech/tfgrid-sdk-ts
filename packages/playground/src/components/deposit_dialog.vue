@@ -40,7 +40,7 @@
               </v-col>
               <v-divider class="my-4" horizontal></v-divider>
             </v-row>
-            <v-alert type="warning" variant="tonal" class="d-flex row justify-start mb-6">
+            <v-alert type="warning" variant="tonal" class="d-flex row justify-start mb-6" color="primary">
               <p :style="{ maxWidth: '880px' }">
                 Amount: should be larger than {{ depositFee }}TFT (deposit fee is: {{ depositFee }}TFT)
               </p>

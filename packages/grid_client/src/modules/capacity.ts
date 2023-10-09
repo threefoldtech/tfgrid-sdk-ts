@@ -11,6 +11,7 @@ import {
   FarmsGetModel,
   FilterOptions,
   NodeFreeResourcesModel,
+  NodeIdFromContractIdModel,
   NodesByFarmIdModel,
   NodesGetModel,
   UserFarmsGetModel,
@@ -144,6 +145,12 @@ class Capacity {
       options.rootfsDisks,
       options.nodeId,
     );
+  }
+
+  @expose
+  @validateInput
+  async getNodeIdFromContractId(options: NodeIdFromContractIdModel) {
+    return await this.nodes.getNodeIdFromContractId(options.contractId, this.config.substrateURL);
   }
 }
 

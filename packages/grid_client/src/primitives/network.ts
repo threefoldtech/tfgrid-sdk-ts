@@ -65,12 +65,7 @@ class Network {
     );
     this.rmb = new RMB(config.rmbClient);
     this.capacity = new Nodes(this.config.graphqlURL, this.config.proxyURL, this.config.rmbClient);
-    this.tfClient = new TFClient(
-      this.config.substrateURL,
-      this.config.mnemonic,
-      this.config.storeSecret,
-      this.config.keypairType,
-    );
+    this.tfClient = config.tfclient;
   }
 
   private async saveIfKVStoreBackend(extrinsics) {
