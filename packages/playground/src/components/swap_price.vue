@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex ml-5 w-auto">
+  <div class="d-flex w-auto">
     <div v-if="!loading" class="d-flex" style="align-items: center">
       <p>{{ prices[0].amount }} {{ prices[0].currency }}</p>
       <v-tooltip>
