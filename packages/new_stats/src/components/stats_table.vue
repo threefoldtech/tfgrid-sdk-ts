@@ -1,5 +1,8 @@
 <template>
-  <div class="d-flex justify-center">
+  <div>
+    <v-sheet color="primary" class="w-100 d-flex align-center justify-center">
+      <p class="my-1 font-weight-bold text-h6">Stats</p>
+    </v-sheet>
     <v-sheet height="100vh" v-if="loading" class="d-flex align-center justify-center">
       <v-container class="text-center d-block">
         <v-progress-circular size="40" indeterminate />
