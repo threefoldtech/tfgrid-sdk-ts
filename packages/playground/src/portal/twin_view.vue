@@ -34,7 +34,13 @@
             <v-col cols="1" sm="10">
               <v-list-item> {{ profileManager.profile?.twinId.toString() }} </v-list-item>
               <v-divider></v-divider>
-              <v-list-item> {{ profileManager.profile?.address }} </v-list-item>
+              <v-list-item>
+                {{ profileManager.profile?.address }}
+                <v-icon style="padding-left: 3rem" @click="copy(profileManager.profile?.address as string)"
+                  >mdi-content-copy</v-icon
+                >
+              </v-list-item>
+
               <v-divider></v-divider>
               <v-list-item> {{ profileManager.profile?.relay }} </v-list-item>
             </v-col>
@@ -50,6 +56,7 @@
 
 <script lang="ts" setup>
 import { generatePublicKey } from "@threefold/rmb_direct_client";
+import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
@@ -95,6 +102,18 @@ async function UpdateRelay() {
     errorMsg.value = (e as any).message;
     console.log("could not update relay or pk, Error: ", e);
   }
+}
+
+function copy(id: string) {
+  navigator.clipboard.writeText(id);
+  createToast(`Address copied to clipboard`, {
+    position: "top-right",
+    hideProgressBar: true,
+    toastBackgroundColor: "#1aa18f",
+    timeout: 5000,
+    showIcon: true,
+    type: "success",
+  });
 }
 </script>
 
