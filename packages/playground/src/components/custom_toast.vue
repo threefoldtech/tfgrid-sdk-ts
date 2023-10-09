@@ -37,6 +37,7 @@ export function createCustomToast(content: string, type: ToastType) {
 }
 .mosha__icon {
   margin-right: 6px !important;
+  margin-top: 2px;
 }
 
 .mosha__toast__content__text {
