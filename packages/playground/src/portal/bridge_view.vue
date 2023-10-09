@@ -182,7 +182,7 @@ async function validateAddress() {
     );
     if (!includes) throw new Error("invalid trustline");
   } catch (e) {
-    target.value =
+    targetError.value =
       (e as Error).message === "invalid trustline"
         ? "Address does not have a valid trustline to TFT"
         : "Address not found";
