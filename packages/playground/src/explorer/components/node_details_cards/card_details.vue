@@ -11,7 +11,14 @@
         <tf-map :nodes="transformedObject" r="76" g="187" b="217"></tf-map>
       </div>
 
-      <div class="items" v-else>
+      <div :class="`items ${isListItems ? 'scrollable-item' : ''}`" v-else>
+        <v-tooltip location="top" :text="'Scroll down to see all node GPUs card details.'">
+          <template #activator="{ props }">
+            <v-chip v-bind="props" class="d-flex justify-center ma-4 mt-1" color="info" v-if="isListItems">
+              List Items, scroll down
+            </v-chip>
+          </template>
+        </v-tooltip>
         <v-row class="bb-gray" v-for="item in items" :key="item.name">
           <v-col class="d-flex justify-start align-center ml-3">
             {{ item.name }}
@@ -98,6 +105,11 @@ export default {
       type: Boolean,
       required: false,
     },
+
+    isListItems: {
+      type: Boolean,
+      required: false,
+    },
   },
   setup(props) {
     const maxLenChar = 30;
@@ -126,5 +138,11 @@ export default {
   overflow: hidden;
   display: flex;
   justify-content: center;
+}
+
+.scrollable-item {
+  height: 280px;
+  overflow-y: scroll !important;
+  overflow-x: hidden !important;
 }
 </style>

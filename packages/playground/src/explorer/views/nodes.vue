@@ -140,6 +140,7 @@ export default {
       loadFarm: true,
       loadTwin: true,
       loadStats: true,
+      loadGpu: true,
     });
 
     const isDialogOpened = ref<boolean>(false);
@@ -173,12 +174,6 @@ export default {
       mixedFilters,
       async () => {
         const queries = getQueries(mixedFilters.value);
-        selectedNodeoptions.value = {
-          loadFarm: true,
-          loadTwin: true,
-          loadStats: mixedFilters.value.options.status === NodeStatus.Down ? false : true,
-          loadGpu: mixedFilters.value.options.gpu,
-        };
         await request(queries, { loadFarm: true });
       },
       { deep: true },
