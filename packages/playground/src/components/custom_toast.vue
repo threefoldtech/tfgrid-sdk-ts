@@ -21,7 +21,7 @@ export function createCustomToast(content: string, type: ToastType) {
   const toastOptions: ToastOptions = {
     hideProgressBar: true,
     position: "top-right",
-    timeout: 500000,
+    timeout: 5000,
     showIcon: true,
     type,
     toastBackgroundColor: typeToColor[type],
