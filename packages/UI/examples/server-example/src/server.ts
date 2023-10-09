@@ -48,12 +48,10 @@ const verify = async (payload: Payload) => {
 
 app.post("/api/verify", async (req: Request, res: Response) => {
   const payload: Payload = req.body;
-  let content: Uint8Array = new Uint8Array();
   try {
     if (payload.pdfUrl) {
       const response = await axios.get(payload.pdfUrl, { responseType: "arraybuffer" });
-      content = Uint8Array.from(Buffer.from(response.data, "base64"));
-      payload.content = content.toString();
+      payload.content = Uint8Array.from(Buffer.from(response.data, "base64")).toString();
     }
 
     const verified = await verify(payload);
