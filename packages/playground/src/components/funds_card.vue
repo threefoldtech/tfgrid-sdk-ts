@@ -13,9 +13,9 @@
 </template>
 
 <script lang="ts">
-import { createToast } from "mosha-vue-toastify";
 import { ref } from "vue";
 
+import { createCustomToast, ToastType } from "../components/custom_toast.vue";
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useProfileManager } from "../stores";
 import { getGrid } from "../utils/grid";
@@ -36,25 +36,11 @@ export default {
           await grid?.balance.getMoreFunds();
           await ProfileManagerController.reloadBalance();
           loadingAddTFT.value = false;
-          createToast(`Success!`, {
-            position: "bottom-right",
-            hideProgressBar: true,
-            toastBackgroundColor: "#1aa18f",
-            timeout: 5000,
-            type: "success",
-            showIcon: true,
-          });
+          createCustomToast("Success! You have received TFTs.", ToastType.success);
         } catch (e) {
           loadingAddTFT.value = false;
           console.log("Error: ", e);
-          createToast(`Get more TFT failed!`, {
-            position: "bottom-right",
-            hideProgressBar: true,
-            toastBackgroundColor: "black",
-            timeout: 5000,
-            type: "danger",
-            showIcon: true,
-          });
+          createCustomToast("Get more TFT failed!", ToastType.danger);
         }
       }
     };

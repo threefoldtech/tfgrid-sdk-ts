@@ -57,13 +57,13 @@
 
 <script setup lang="ts">
 import { Decimal } from "decimal.js";
-import { createToast } from "mosha-vue-toastify";
 import { onBeforeUnmount, onMounted, ref } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import QrcodeGenerator from "../components/qrcode_generator.vue";
 import { useProfileManager } from "../stores";
 import { getGrid } from "../utils/grid";
+import { createCustomToast, ToastType } from "./custom_toast.vue";
 
 const depositDialog = ref(false);
 const emits = defineEmits(["close"]);
@@ -107,27 +107,13 @@ onMounted(async () => {
     if (destroyed) return;
     const DecimalDeposit = new Decimal(receivedDeposit);
     const divisor = new Decimal(10000000);
-    createToast(`You have received ${DecimalDeposit.dividedBy(divisor)} TFT`, {
-      position: "bottom-right",
-      hideProgressBar: true,
-      toastBackgroundColor: "black",
-      timeout: 5000,
-      showIcon: true,
-      type: "success",
-    });
+    createCustomToast(`You have received ${DecimalDeposit.dividedBy(divisor)} TFT`, ToastType.success);
     await ProfileManagerController.reloadBalance();
     closeDialog();
   } catch (e) {
     if (destroyed) return;
     console.log(e);
-    createToast(e as string, {
-      position: "bottom-right",
-      hideProgressBar: true,
-      toastBackgroundColor: "red",
-      timeout: 5000,
-      showIcon: true,
-      type: "danger",
-    });
+    createCustomToast(e as string, ToastType.danger);
     closeDialog();
   }
 });

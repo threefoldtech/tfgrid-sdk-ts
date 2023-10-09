@@ -6,12 +6,12 @@
 import "mosha-vue-toastify/dist/style.css";
 
 import { ContractStates } from "@threefold/grid_client";
-import { createToast } from "mosha-vue-toastify";
 import { onMounted } from "vue";
 import { ref } from "vue";
 
 import { useProfileManager } from "../stores";
 import { getGrid } from "../utils/grid";
+import { createCustomToast, ToastType } from "./custom_toast.vue";
 
 const profileManager = useProfileManager();
 const contractsCount = ref(0);
@@ -28,12 +28,7 @@ onMounted(async () => {
     ) {
       contractsCount.value =
         contracts.nameContracts.length + contracts.nodeContracts.length + contracts.rentContracts.length;
-      createToast("You have " + contractsCount.value + " contracts in grace period", {
-        position: "top-right",
-        hideProgressBar: true,
-        toastBackgroundColor: "red",
-        timeout: 5000,
-      });
+      createCustomToast("You have " + contractsCount.value + " contracts in grace period", ToastType.warning);
     }
     await new Promise(resolve => setTimeout(resolve, 15 * 60 * 1000));
   }
