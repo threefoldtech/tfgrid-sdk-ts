@@ -53,22 +53,22 @@
             <template v-slot:activator="{ isActive, props }">
               <span v-bind="props" v-on="isActive">{{ item.raw.price }} *</span>
             </template>
-            <span
-              >Discounts: <br />
+            <span>
+              Discounts: <br />
               <ul class="pl-2">
                 <li>
                   You receive 50% discount if you reserve an entire
                   <a
                     target="_blank"
                     href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html#billing--pricing"
-                    style="color: primary"
-                    >node</a
                   >
+                    node
+                  </a>
                 </li>
                 <li>
                   You're receiving {{ item.raw.discount }}% discount as per the
                   <a target="_blank" href="https://manual.grid.tf/cloud/cloudunits_pricing.html#discount-levels">
-                    <p style="color: primary; display: inline">discount levels</p>
+                    <p style="display: inline">discount levels</p>
                   </a>
                 </li>
               </ul>
@@ -147,7 +147,7 @@ const tabParams = {
 onMounted(async () => {
   await loadData();
 });
-
+//TODO: add max limit for searching
 async function loadData() {
   const params = tabParams[activeTab.value as keyof typeof tabParams];
 
@@ -221,9 +221,7 @@ watch(activeTab, () => {
 
 watch(
   [page, pageSize, isValidForm, filterInputs],
-  ([newPage, newPageSize, newIsValidForm, newFilterInputs]) => {
-    console.log("Filter watcher");
-    console.log(filterInputs.value);
+  ([newPage, newPageSize, newIsValidForm]) => {
     page.value = newPage;
     pageSize.value = newPageSize;
     if (newIsValidForm) {
@@ -242,7 +240,7 @@ async function reloadTable() {
 </script>
 
 <script lang="ts">
-import { type DedicatedNodeFilters, DedicatedNodeInitializer, type NodeInputFilterType } from "@/utils/filter_nodes";
+import { type DedicatedNodeFilters, DedicatedNodeInitializer } from "@/utils/filter_nodes";
 
 import NodeDetails from "../components/node_details.vue";
 import NodeFilter from "../components/node_filter.vue";
@@ -257,3 +255,13 @@ export default {
   },
 };
 </script>
+
+<style>
+.v-table__wrapper {
+  min-height: 100px;
+}
+
+.v-tooltip > .v-overlay__content {
+  pointer-events: initial !important;
+}
+</style>
