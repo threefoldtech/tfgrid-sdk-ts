@@ -121,10 +121,9 @@ import { Keyring } from "@polkadot/keyring";
 import type { Twin } from "@threefold/tfchain_client";
 import { onMounted, ref } from "vue";
 
-import { createCustomToast, ToastType } from "@/components/custom_toast.vue";
-
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useProfileManager } from "../stores";
+import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid, loadBalance } from "../utils/grid";
 
 const profileManagerController = useProfileManagerController();

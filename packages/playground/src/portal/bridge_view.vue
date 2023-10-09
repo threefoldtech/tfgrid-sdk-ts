@@ -95,9 +95,9 @@
 import { default as StellarSdk, StrKey } from "stellar-sdk";
 import { onMounted, ref } from "vue";
 
-import { createCustomToast, ToastType } from "../components/custom_toast.vue";
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useProfileManager } from "../stores";
+import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid, loadBalance } from "../utils/grid";
 
 const profileManager = useProfileManager();

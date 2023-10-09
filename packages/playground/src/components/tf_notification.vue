@@ -10,8 +10,8 @@ import { onMounted } from "vue";
 import { ref } from "vue";
 
 import { useProfileManager } from "../stores";
+import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid } from "../utils/grid";
-import { createCustomToast, ToastType } from "./custom_toast.vue";
 
 const profileManager = useProfileManager();
 const contractsCount = ref(0);

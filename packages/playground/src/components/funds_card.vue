@@ -15,9 +15,9 @@
 <script lang="ts">
 import { ref } from "vue";
 
-import { createCustomToast, ToastType } from "../components/custom_toast.vue";
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useProfileManager } from "../stores";
+import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid } from "../utils/grid";
 
 export default {
