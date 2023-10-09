@@ -267,27 +267,29 @@ class TwinDeploymentHandler {
 
   async checkFarmIps(twinDeployments: TwinDeployment[]) {
     const farmIPs: Map<number, number> = new Map();
+
     for (const twinDeployment of twinDeployments) {
       if (twinDeployment.operation === Operations.deploy) {
         const node = await this.nodes.getNode(twinDeployment.nodeId);
         if (node) {
-          if (!(node.farmId in farmIPs)) {
+          if (!farmIPs.has(node.farmId)) {
             farmIPs.set(node.farmId, twinDeployment.publicIps);
           } else {
-            farmIPs.set(node.farmId, farmIPs[node.farmId] + twinDeployment.publicIps);
+            farmIPs.set(node.farmId, farmIPs.get(node.farmId)! + twinDeployment.publicIps);
           }
         }
       }
     }
 
-    for (const farm of Object.keys(farmIPs)) {
-      const _farm = await this.nodes.filterFarms({
-        farmId: +farm,
-      });
-      const freeIps = _farm[0].publicIps.filter(res => res.contract_id === 0).length;
-      if (freeIps < farmIPs[farm]) {
+    for (const farmId of farmIPs.keys()) {
+      const _farm = await this.tfclient.farms.get({ id: farmId });
+      const freeIps = _farm.publicIps.filter(res => res.contractId === 0).length;
+
+      if (freeIps < farmIPs.get(farmId)!) {
         throw Error(
-          `Farm ${farm} doesn't have enough public IPs: requested IPs=${farmIPs[farm]}, avaiable IPs=${freeIps}`,
+          `Farm ${farmId} doesn't have enough public IPs: requested IPs=${farmIPs.get(
+            farmId,
+          )}, available IPs=${freeIps}`,
         );
       }
     }
