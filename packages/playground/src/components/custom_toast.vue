@@ -9,22 +9,22 @@ export enum ToastType {
   warning = "warning",
 }
 
-const typeToColor: { [key in ToastType]: string } = {
-  [ToastType.danger]: "#FF5252",
-  [ToastType.default]: "#313131",
-  [ToastType.info]: "#2196F3",
-  [ToastType.success]: "#1AA18F",
-  [ToastType.warning]: "#FFCC00",
-};
-
 export function createCustomToast(content: string, type: ToastType) {
+  const colors = {
+    danger: "#FF5252",
+    default: "#313131",
+    info: "#2196F3",
+    success: "#1AA18F",
+    warning: "#FFCC00",
+  };
+
   const toastOptions: ToastOptions = {
     hideProgressBar: true,
     position: "top-right",
     timeout: 5000,
     showIcon: true,
     type,
-    toastBackgroundColor: typeToColor[type],
+    toastBackgroundColor: colors[type],
   };
 
   createToast(content, toastOptions);
