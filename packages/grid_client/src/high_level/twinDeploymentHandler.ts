@@ -5,7 +5,7 @@ import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
 import { validateObject } from "../helpers/validator";
-import { DeploymentFactory, NodeInfo, Nodes } from "../primitives/index";
+import { DeploymentFactory, Nodes } from "../primitives/index";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { Operations, TwinDeployment } from "./models";
 class TwinDeploymentHandler {
@@ -269,15 +269,22 @@ class TwinDeploymentHandler {
     const farmIPs: Map<number, number> = new Map();
 
     for (const twinDeployment of twinDeployments) {
-      if (twinDeployment.operation === Operations.deploy) {
-        const node = await this.nodes.getNode(twinDeployment.nodeId);
-        if (node) {
-          if (!farmIPs.has(node.farmId)) {
-            farmIPs.set(node.farmId, twinDeployment.publicIps);
-          } else {
-            farmIPs.set(node.farmId, farmIPs.get(node.farmId)! + twinDeployment.publicIps);
-          }
-        }
+      if (twinDeployment.operation !== Operations.deploy) {
+        continue;
+      }
+
+      if (twinDeployment.publicIps === 0) {
+        continue;
+      }
+
+      const node = await this.nodes.getNode(twinDeployment.nodeId);
+      if (!node) {
+        continue;
+      }
+      if (!farmIPs.has(node.farmId)) {
+        farmIPs.set(node.farmId, twinDeployment.publicIps);
+      } else {
+        farmIPs.set(node.farmId, farmIPs.get(node.farmId)! + twinDeployment.publicIps);
       }
     }
 
