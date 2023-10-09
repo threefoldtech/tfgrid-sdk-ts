@@ -62,8 +62,8 @@ import { onBeforeUnmount, onMounted, ref } from "vue";
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import QrcodeGenerator from "../components/qrcode_generator.vue";
 import { useProfileManager } from "../stores";
+import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid } from "../utils/grid";
-import { createCustomToast, ToastType } from "./custom_toast.vue";
 
 const depositDialog = ref(false);
 const emits = defineEmits(["close"]);

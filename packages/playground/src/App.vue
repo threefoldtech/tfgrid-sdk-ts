@@ -396,4 +396,16 @@ a {
 .v-list-item--density-default.v-list-item--one-line {
   min-height: 40px;
 }
+
+.mosha__toast__content-wrapper {
+  margin-bottom: -2px;
+}
+.mosha__icon {
+  margin-right: 6px !important;
+  margin-top: 2px;
+}
+
+.mosha__toast__content__text {
+  font-size: 14px !important;
+}
 </style>

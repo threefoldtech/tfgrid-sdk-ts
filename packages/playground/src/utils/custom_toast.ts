@@ -1,4 +1,3 @@
-<script lang="ts">
 import { createToast, type ToastOptions } from "mosha-vue-toastify";
 
 export enum ToastType {
@@ -29,18 +28,3 @@ export function createCustomToast(content: string, type: ToastType) {
 
   createToast(content, toastOptions);
 }
-</script>
-
-<style>
-.mosha__toast__content-wrapper {
-  margin-bottom: -2px;
-}
-.mosha__icon {
-  margin-right: 6px !important;
-  margin-top: 2px;
-}
-
-.mosha__toast__content__text {
-  font-size: 14px !important;
-}
-</style>
