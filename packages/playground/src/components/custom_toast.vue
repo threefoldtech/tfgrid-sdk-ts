@@ -9,15 +9,15 @@ export enum ToastType {
   warning = "warning",
 }
 
-export function createCustomToast(content: string, type: ToastType) {
-  const colors = {
-    danger: "#FF5252",
-    default: "#313131",
-    info: "#2196F3",
-    success: "#1AA18F",
-    warning: "#FFCC00",
-  };
+const colors = {
+  danger: "#FF5252",
+  default: "#313131",
+  info: "#2196F3",
+  success: "#1AA18F",
+  warning: "#FFCC00",
+};
 
+export function createCustomToast(content: string, type: ToastType) {
   const toastOptions: ToastOptions = {
     hideProgressBar: true,
     position: "top-right",
