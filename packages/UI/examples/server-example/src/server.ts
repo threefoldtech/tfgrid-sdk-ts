@@ -53,11 +53,9 @@ app.post("/api/verify", async (req: Request, res: Response) => {
     if (payload.pdfUrl) {
       const response = await axios.get(payload.pdfUrl, { responseType: "arraybuffer" });
       content = Uint8Array.from(Buffer.from(response.data, "base64"));
-    } else {
-      content = Uint8Array.from(Buffer.from(payload.content || "", "base64"));
+      payload.content = content.toString();
     }
 
-    payload.content = content.toString();
     const verified = await verify(payload);
 
     if (verified) {
