@@ -15,7 +15,7 @@
 <script lang="ts">
 import { ref } from "vue";
 
-import { createCustomToast } from "../components/custom_toast.vue";
+import { createCustomToast, ToastType } from "../components/custom_toast.vue";
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useProfileManager } from "../stores";
 import { getGrid } from "../utils/grid";
@@ -36,11 +36,11 @@ export default {
           await grid?.balance.getMoreFunds();
           await ProfileManagerController.reloadBalance();
           loadingAddTFT.value = false;
-          createCustomToast("Success! You have received TFTs.", "success");
+          createCustomToast("Success! You have received TFTs.", ToastType.success);
         } catch (e) {
           loadingAddTFT.value = false;
           console.log("Error: ", e);
-          createCustomToast("Get more TFT failed!", "danger");
+          createCustomToast("Get more TFT failed!", ToastType.danger);
         }
       }
     };
@@ -60,9 +60,5 @@ export default {
 
 :root {
   --primary: #1aa18f;
-}
-
-.mosha__toast__content-wrapper {
-  margin-bottom: -2px;
 }
 </style>

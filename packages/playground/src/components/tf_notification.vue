@@ -11,7 +11,7 @@ import { ref } from "vue";
 
 import { useProfileManager } from "../stores";
 import { getGrid } from "../utils/grid";
-import { createCustomToast } from "./custom_toast.vue";
+import { createCustomToast, ToastType } from "./custom_toast.vue";
 
 const profileManager = useProfileManager();
 const contractsCount = ref(0);
@@ -28,7 +28,7 @@ onMounted(async () => {
     ) {
       contractsCount.value =
         contracts.nameContracts.length + contracts.nodeContracts.length + contracts.rentContracts.length;
-      createCustomToast("You have " + contractsCount.value + " contracts in grace period", "info");
+      createCustomToast("You have " + contractsCount.value + " contracts in grace period", ToastType.warning);
     }
     await new Promise(resolve => setTimeout(resolve, 15 * 60 * 1000));
   }

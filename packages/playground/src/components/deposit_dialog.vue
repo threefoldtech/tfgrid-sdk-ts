@@ -63,7 +63,7 @@ import { useProfileManagerController } from "../components/profile_manager_contr
 import QrcodeGenerator from "../components/qrcode_generator.vue";
 import { useProfileManager } from "../stores";
 import { getGrid } from "../utils/grid";
-import { createCustomToast } from "./custom_toast.vue";
+import { createCustomToast, ToastType } from "./custom_toast.vue";
 
 const depositDialog = ref(false);
 const emits = defineEmits(["close"]);
@@ -107,13 +107,13 @@ onMounted(async () => {
     if (destroyed) return;
     const DecimalDeposit = new Decimal(receivedDeposit);
     const divisor = new Decimal(10000000);
-    createCustomToast(`You have received ${DecimalDeposit.dividedBy(divisor)} TFT`, "success");
+    createCustomToast(`You have received ${DecimalDeposit.dividedBy(divisor)} TFT`, ToastType.success);
     await ProfileManagerController.reloadBalance();
     closeDialog();
   } catch (e) {
     if (destroyed) return;
     console.log(e);
-    createCustomToast(e as string, "danger");
+    createCustomToast(e as string, ToastType.danger);
     closeDialog();
   }
 });

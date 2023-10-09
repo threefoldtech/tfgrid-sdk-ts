@@ -95,7 +95,7 @@
 import { default as StellarSdk, StrKey } from "stellar-sdk";
 import { onMounted, ref } from "vue";
 
-import { createCustomToast } from "../components/custom_toast.vue";
+import { createCustomToast, ToastType } from "../components/custom_toast.vue";
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useProfileManager } from "../stores";
 import { getGrid, loadBalance } from "../utils/grid";
@@ -206,14 +206,14 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
     amount.value = 0;
     loadingWithdraw.value = false;
     await ProfileManagerController.reloadBalance();
-    createCustomToast("Transaction Succeeded", "success");
+    createCustomToast("Transaction Succeeded", ToastType.success);
   } catch (e) {
     console.log("Error withdrawing, Error: ", e);
     openWithdrawDialog.value = false;
     target.value = "";
     amount.value = 0;
     loadingWithdraw.value = false;
-    createCustomToast("Withdraw Failed!", "danger");
+    createCustomToast("Withdraw Failed!", ToastType.danger);
   }
 }
 </script>
