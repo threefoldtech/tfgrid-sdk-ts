@@ -1,7 +1,7 @@
 <template>
   <!-- Filters -->
   <div class="pt-5">
-    <node-filter v-model="filterInputs" v-model:valid="isValidForm" />
+    <node-filter v-model="filterInputs" v-model:valid="isValidForm" :is-form-loading="isFormLoading" />
   </div>
   <div class="pt-5">
     <v-card>
@@ -127,6 +127,7 @@ const nodes = ref<any[]>();
 const nodesCount = ref(0);
 const filterInputs = ref<DedicatedNodeFilters>(DedicatedNodeInitializer);
 const isValidForm = ref<boolean>(false);
+const isFormLoading = ref<boolean>(true);
 
 const tabParams = {
   0: {
@@ -149,7 +150,8 @@ const tabParams = {
 onMounted(async () => {
   await loadData();
 });
-async function loadData() {
+
+const _loadData = async () => {
   const params = tabParams[activeTab.value as keyof typeof tabParams];
 
   if (!params) {
@@ -157,6 +159,7 @@ async function loadData() {
   }
 
   loading.value = true;
+  isFormLoading.value = true;
   try {
     const data = await gridProxyClient.nodes.list({
       ...params,
@@ -174,6 +177,7 @@ async function loadData() {
       loading.value = false;
       nodes.value = [];
       nodesCount.value = 0;
+      isFormLoading.value = false;
       return;
     }
 
@@ -202,23 +206,27 @@ async function loadData() {
 
     nodesCount.value = data.count ?? 0;
     loading.value = false;
+    isFormLoading.value = false;
   } catch (e) {
     console.log("Error: ", e);
     loading.value = false;
+    isFormLoading.value = false;
   }
-}
+};
 
-watch(activeTab, () => {
-  loadData();
+const loadData = debounce(_loadData, 1000);
+
+watch(activeTab, async () => {
+  await loadData();
 });
 
 watch(
   [page, pageSize, isValidForm, filterInputs],
-  ([newPage, newPageSize, newIsValidForm]) => {
+  async ([newPage, newPageSize, newIsValidForm]) => {
     page.value = newPage;
     pageSize.value = newPageSize;
     if (newIsValidForm) {
-      loadData();
+      await loadData();
     }
   },
   { immediate: true },
@@ -233,6 +241,8 @@ async function reloadTable() {
 </script>
 
 <script lang="ts">
+import { debounce } from "lodash";
+
 import NodeDetails from "../components/node_details.vue";
 import NodeFilter from "../components/node_filter.vue";
 import ReserveBtn from "../components/reserve_action_btn.vue";

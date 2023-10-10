@@ -161,7 +161,7 @@ export const inputsInitializer: FilterInputs = {
 export const DedicatedNodeInitializer: DedicatedNodeFilters = {
   total_cru: {
     label: "Total CPU (Cores)",
-    placeholder: "Filter by total Cores greater than or equal to.",
+    placeholder: "Filter by total Cores.",
     type: "text",
     rules: [
       [isDecimal("This Field accepts only a valid number."), min("This Field must be a number larger than 0.", 1)],
@@ -169,7 +169,7 @@ export const DedicatedNodeInitializer: DedicatedNodeFilters = {
   },
   total_mru: {
     label: "Total RAM (GB)",
-    placeholder: "Filter by total Memory greater than or equal to.",
+    placeholder: "Filter by total Memory.",
     type: "text",
     rules: [
       [
@@ -181,7 +181,7 @@ export const DedicatedNodeInitializer: DedicatedNodeFilters = {
   },
   total_sru: {
     label: "Total SSD (GB)",
-    placeholder: "Filter by total SSD greater than or equal to.",
+    placeholder: "Filter by total SSD.",
     type: "text",
     rules: [
       [
@@ -193,7 +193,7 @@ export const DedicatedNodeInitializer: DedicatedNodeFilters = {
   },
   total_hru: {
     label: "Total HDD (GB)",
-    placeholder: "Filter by total HDD greater than or equal to.",
+    placeholder: "Filter by total HDD.",
     type: "text",
     rules: [
       [
