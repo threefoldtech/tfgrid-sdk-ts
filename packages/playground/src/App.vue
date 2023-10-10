@@ -86,7 +86,7 @@
           theme="dark"
           :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }"
         >
-          <v-toolbar-title>
+          <v-toolbar-title class="custom-toolbar-title">
             <v-img :src="baseUrl + 'images/logoTF.png'" width="160px" />
           </v-toolbar-title>
 
@@ -400,7 +400,7 @@ a {
   min-height: 40px;
 }
 
-.v-toolbar-title {
-  max-width: 17rem;
+.custom-toolbar-title {
+  max-width: 17rem !important;
 }
 </style>
