@@ -48,10 +48,10 @@
 </template>
 
 <script lang="ts">
-import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
 import { useGrid } from "../../../stores";
+import { createCustomToast, ToastType } from "../../../utils/custom_toast";
 
 export default {
   name: "CreateFarm",
@@ -65,24 +65,10 @@ export default {
     async function createFarm() {
       try {
         await gridStore.grid.farms.create({ name: props.name });
-        createToast(`Farm created successfully!`, {
-          position: "bottom-right",
-          hideProgressBar: true,
-          toastBackgroundColor: "#1aa18f",
-          timeout: 5000,
-          type: "success",
-          showIcon: true,
-        });
+        createCustomToast("Farm created successfully.", ToastType.success);
       } catch (error) {
         console.log(error);
-        createToast(`Failed to create farm with name ${props.name}.`, {
-          position: "bottom-right",
-          hideProgressBar: true,
-          toastBackgroundColor: "#FF5252",
-          timeout: 5000,
-          type: "danger",
-          showIcon: true,
-        });
+        createCustomToast("Failed to create farm.", ToastType.danger);
       }
     }
     return {

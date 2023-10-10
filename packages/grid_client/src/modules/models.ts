@@ -661,8 +661,8 @@ class FarmPublicIPsModel {
 
 class AddFarmIPModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
-  @Expose() @IsNotEmpty() @IsIP() ip: number;
-  @Expose() @IsNotEmpty() gw: number;
+  @Expose() @IsNotEmpty() ip: number;
+  @Expose() @IsNotEmpty() @IsIP() gw: number;
 }
 
 class PublicConfigModel {
@@ -679,7 +679,7 @@ class AddPublicConfig {
 
 class RemoveFarmIPModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
-  @Expose() @IsInt() @IsNotEmpty() @IsIP() ip: number;
+  @Expose() @IsNotEmpty() ip: number;
 }
 
 class AddStellarModel {

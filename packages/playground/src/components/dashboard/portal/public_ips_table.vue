@@ -1,4 +1,4 @@
-<template v-if="publicIps.length">
+<template v-if="publicIps.length || isRemoved">
   <div class="my-6">
     <v-data-table :headers="headers" :items="publicIps" item-value="name" class="elevation-1">
       <template v-slot:top>
@@ -13,32 +13,30 @@
           />
         </div>
       </template>
-      <template v-slot:item="{ item }">
-        <tr class="text-center">
-          <td>
-            {{ item.value.ip || "-" }}
-          </td>
-          <td>
-            {{ item.value.gateway || "-" }}
-          </td>
-          <td>
-            {{ item.value.contract_id || "-" }}
-          </td>
-          <td>
-            <v-btn color="red-darken-1" @click="showDialogue = true" :disabled="loading" :loading="loading">
-              Delete IP
-            </v-btn>
-          </td>
-        </tr>
+      <template #[`item.ip`]="{ item }">
+        {{ item.value.ip || "-" }}
+      </template>
+
+      <template #[`item.gateway`]="{ item }">
+        {{ item.value.gateway || "-" }}
+      </template>
+
+      <template #[`item.contract_id`]="{ item }">
+        {{ item.value.ip || "-" }}
       </template>
       <template #[`item.actions`]="{ item }">
+        <v-btn color="red-darken-1" @click="showDialogue = true" :disabled="loading" :loading="loading">
+          Delete IP
+        </v-btn>
         <v-container v-if="showDialogue">
-          <v-dialog v-model="showDialogue" max-width="600">
+          <v-dialog v-model="showDialogue" max-width="600" transition="dialog-bottom-transition" persistent>
             <v-card>
               <v-toolbar color="primary" dark class="custom-toolbar">Delete IP</v-toolbar>
               Are you sure you want to delete IP {{ item.value.ip }}?
               <v-card-actions class="justify-end px-5 pb-5 pt-0">
-                <v-btn @click="removeFarmIp({ farmId: $props.farmId, ip: item.value.ip })"> Delete </v-btn>
+                <v-btn @click="removeFarmIp({ farmId: $props.farmId, ip: item.value.ip })" :loading="loading">
+                  Delete
+                </v-btn>
                 <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Cancel</v-btn>
               </v-card-actions>
             </v-card>
@@ -51,11 +49,11 @@
 </template>
 <script lang="ts">
 import type { RemoveFarmIPModel } from "@threefold/grid_client";
-import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
 import { useGrid } from "@/stores";
 
+import { createCustomToast, ToastType } from "../../../utils/custom_toast";
 import AddIP from "./add_ip.vue";
 
 export default {
@@ -85,7 +83,7 @@ export default {
       { title: "Actions", align: "center", sortable: false, key: "actions" },
     ] as any;
     const publicIps = ref();
-    const loading = ref();
+    const loading = ref(false);
     const showDialogue = ref(false);
     enum IPType {
       single = "Single",
@@ -95,6 +93,8 @@ export default {
     const publicIP = ref();
     const toPublicIP = ref();
     const gateway = ref();
+    const isRemoved = ref(false);
+
     onMounted(async () => {
       await getFarmByID(props.farmId);
     });
@@ -109,24 +109,11 @@ export default {
     async function removeFarmIp(options: RemoveFarmIPModel) {
       try {
         await gridStore.grid.farms.removeFarmIp({ ip: options.ip, farmId: options.farmId });
-        createToast(`IP is deleted successfully!`, {
-          position: "bottom-right",
-          hideProgressBar: true,
-          toastBackgroundColor: "#1aa18f",
-          timeout: 5000,
-          type: "success",
-          showIcon: true,
-        });
+        createCustomToast("IP is deleted successfully!", ToastType.success);
+        isRemoved.value = true;
       } catch (error) {
         console.log(error);
-        createToast(`Failed to delete IP!`, {
-          position: "bottom-right",
-          hideProgressBar: true,
-          toastBackgroundColor: "#FF5252",
-          timeout: 5000,
-          type: "danger",
-          showIcon: true,
-        });
+        createCustomToast("Failed to delete IP!", ToastType.danger);
       }
     }
     return {
@@ -139,6 +126,7 @@ export default {
       gateway,
       loading,
       showDialogue,
+      isRemoved,
       removeFarmIp,
     };
   },

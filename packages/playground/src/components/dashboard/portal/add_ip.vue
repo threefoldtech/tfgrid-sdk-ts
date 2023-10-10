@@ -1,26 +1,24 @@
 <template>
   <v-container>
     <v-row>
-      <v-btn color="blue" class="ml-auto bold-text" @click="isAddIP = true">Add IP</v-btn>
+      <v-btn color="blue" class="ml-auto bold-text" @click="showDialogue = true" :loading="loading">Add IP</v-btn>
     </v-row>
 
-    <v-container v-if="isAddIP">
-      <v-dialog v-model="isAddIP" max-width="600">
+    <v-container v-if="showDialogue">
+      <v-dialog v-model="showDialogue" max-width="600">
         <v-card>
           <v-toolbar color="primary" dark class="custom-toolbar">Add Public IP to Farm</v-toolbar>
           <div class="pa-6">
             <form-validator v-model="valid">
-              <v-combobox
-                :v-model="$props.type"
-                @update:model-value="$emit('update:type', $event)"
+              <v-select
+                :items="items"
                 label="Choose how to enter IP"
-                :items="['Single', 'Range']"
-              ></v-combobox>
-              <input-validator
-                :value="$props.publicIP"
-                :rules="[validators.required('IP is required.'), validators.isIP('IP is not valid.')]"
-                #="{ props }"
-              >
+                item-title="name"
+                item-value="id"
+                v-model="selectedItem"
+                @update:model-value="$emit('update:type', $event)"
+              ></v-select>
+              <input-validator :value="$props.publicIP" :rules="[validators.required('IP is required.')]" #="{ props }">
                 <v-text-field
                   :model-value="$props.publicIP"
                   v-bind:="props"
@@ -32,7 +30,7 @@
               <input-validator
                 v-if="type === 'Range'"
                 :value="$props.toPublicIP"
-                :rules="[validators.required('IP is required.'), validators.isIP('IP is not valid.')]"
+                :rules="[validators.required('IP is required.')]"
                 #="{ props }"
               >
                 <v-text-field
@@ -63,11 +61,12 @@
               variant="tonal"
               color="primary"
               @click="addFarmIp($props.farmId, $props.publicIP, $props.gateway)"
+              @update:modelValue="$emit('update:isAdded', $event)"
               :disabled="!valid"
               >Add</v-btn
             >
             <v-btn variant="tonal" @click="addIPs" :disabled="!valid">Show IPs Range</v-btn>
-            <v-btn @click="isAddIP = false" class="grey lighten-2 black--text">Close</v-btn>
+            <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -77,19 +76,23 @@
 
 <script lang="ts">
 import { getIPRange } from "get-ip-range";
-import { createToast } from "mosha-vue-toastify";
 import { ref } from "vue";
 
 import { useGrid } from "../../../stores";
+import { createCustomToast, ToastType } from "../../../utils/custom_toast";
 
 export default {
   name: "AddIP",
   props: ["farmId", "type", "publicIP", "toPublicIP", "gateway"],
   setup(props) {
-    const isAddIP = ref(false);
+    const showDialogue = ref(false);
     const gridStore = useGrid();
     const valid = ref(false);
     const IPs = ref<string[]>();
+    const items = ref<string[]>(["Single", "Range"]);
+    const selectedItem = ref(items.value[0]);
+    const loading = ref(false);
+    const isAdded = ref(false);
 
     function addIPs() {
       const sub = props.publicIP.split("/")[1];
@@ -106,30 +109,23 @@ export default {
 
     async function addFarmIp(farmId: number, ip: number, gw: number) {
       try {
+        loading.value = true;
         await gridStore.grid.farms.addFarmIp({ farmId, ip, gw });
-        createToast("IP is added successfully.", {
-          position: "bottom-right",
-          hideProgressBar: true,
-          toastBackgroundColor: "#1aa18f",
-          timeout: 5000,
-          type: "success",
-          showIcon: true,
-        });
+        createCustomToast("IP is added successfully.", ToastType.success);
       } catch (error) {
         console.log(error);
-        createToast(`Failed to add IP.`, {
-          position: "bottom-right",
-          hideProgressBar: true,
-          toastBackgroundColor: "#FF5252",
-          timeout: 5000,
-          type: "danger",
-          showIcon: true,
-        });
+        createCustomToast("Failed to add IP.", ToastType.danger);
+      } finally {
+        loading.value = false;
       }
     }
     return {
-      isAddIP,
+      showDialogue,
       valid,
+      items,
+      selectedItem,
+      loading,
+      isAdded,
       addIPs,
       addFarmIp,
     };

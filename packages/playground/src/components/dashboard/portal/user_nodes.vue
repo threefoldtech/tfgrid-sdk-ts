@@ -1,10 +1,9 @@
-<template>
+<template v-if="nodes">
   <div class="my-6">
     <v-card color="primary rounded-b-0">
       <v-card-title class="py-1 text-subtitle-1 font-weight-bold">Your Nodes</v-card-title>
     </v-card>
     <v-data-table
-      v-if="nodes"
       :headers="headers"
       :items="nodes"
       single-expand="true"
@@ -16,7 +15,6 @@
         <tr>
           <td>
             {{ item.name }}
-            nenenenenenene
           </td>
         </tr>
       </template>
@@ -70,11 +68,11 @@ export default {
     async function getUserNodes() {
       try {
         const twinId = profileManager.profile!.twinId;
-        const userNodes = await gridStore.grid.capacity.getUserNodes({ twinId });
-        nodes.value = userNodes;
-        console.log("nodes.value", nodes.value);
+        // const userNodes = await gridStore.grid.capacity.getUserNodes({ twinId });
+        // nodes.value = userNodes;
+        // console.log("nodes.value", nodes.value);
 
-        return userNodes;
+        // return userNodes;
       } catch (error) {
         console.log(error);
       }
