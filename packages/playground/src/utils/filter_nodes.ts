@@ -3,7 +3,7 @@ import type { FilterOptions, GridClient, NodeInfo } from "@threefold/grid_client
 import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
 import type { NodeFilters } from "@/components/select_node.vue";
 
-import { isAlphanumeric, isDecimal, isNumeric, min } from "./validators";
+import { isNumeric, min, startsWith, validateResourceMaxNumber, isAlphanumeric, isDecimal } from "./validators";
 
 export interface NodeGPUCardType {
   id: string;
@@ -75,23 +75,35 @@ export const inputsInitializer: FilterInputs = {
   nodeId: {
     label: "Node ID",
     placeholder: "Filter by node id.",
-    rules: [[isNumeric("This field accepts numbers only.", { no_symbols: true })]],
+    rules: [
+      [
+        isNumeric("This field accepts numbers only.", { no_symbols: true }),
+        min("The node id should be larger then zero.", 1),
+        startsWith("The node id start with zero.", "0"),
+      ],
+    ],
     type: "text",
   },
   farmIds: {
     label: "Farm IDs",
-    placeholder: "e.g. 1, 2, 3",
+    placeholder: "e.g. 1,2,3.",
     rules: [
       [
         (value: string) => {
-          const ids = value.split(",").map((id: string) => {
-            const numericId = parseInt(id);
-            if (!isNaN(numericId)) {
-              return numericId;
-            }
-          });
-          const validate = isNumeric("This field accepts numbers only.", { no_symbols: false });
-          return validate(String(ids));
+          if (value.endsWith(",") || value.includes(" ")) {
+            return { message: "Invalid farm ids format." };
+          }
+
+          const ids = value.split(",").map(parseFloat);
+          const visNumeric = isNumeric("This field accepts numbers only.", { no_symbols: true });
+          const vMin = min("The farm ids should be larger then zero.", 1);
+
+          for (const id of ids) {
+            const err1 = visNumeric(String(id));
+            const err2 = vMin(String(id));
+            if (err1) return err1;
+            if (err2) return err2;
+          }
         },
       ],
     ],
@@ -108,22 +120,40 @@ export const inputsInitializer: FilterInputs = {
     type: "text",
   },
   freeSru: {
-    label: "Free SRU (GB)",
-    placeholder: "Filter by Free SSD greater than or equal to.",
-    rules: [[isNumeric("This field accepts numbers only.", { no_symbols: true })]],
+    label: "Free SSD (GB)",
+    placeholder: "Filter by free SSD.",
+    rules: [
+      [
+        isNumeric("This field accepts numbers only.", { no_symbols: true }),
+        min("The free ssd should be larger then zero.", 1),
+        validateResourceMaxNumber("This value is out of range."),
+      ],
+    ],
     type: "text",
   },
   freeHru: {
-    label: "Free HRU (GB)",
-    placeholder: "Filter by Free HDD greater than or equal to.",
-    rules: [[isNumeric("This field accepts numbers only.", { no_symbols: true })]],
+    label: "Free HDD (GB)",
+    placeholder: "Filter by free HDD.",
+    rules: [
+      [
+        isNumeric("This field accepts numbers only.", { no_symbols: true }),
+        min("The free hdd should be larger then zero.", 1),
+        validateResourceMaxNumber("This value is out of range."),
+      ],
+    ],
     type: "text",
   },
   freeMru: {
-    label: "Free MRU (GB)",
-    placeholder: "Filter by Free Memory greater than or equal to.",
+    label: "Free RAM (GB)",
+    placeholder: "Filter by free RAM.",
     value: undefined,
-    rules: [[isNumeric("This field accepts numbers only.", { no_symbols: true })]],
+    rules: [
+      [
+        isNumeric("This field accepts numbers only.", { no_symbols: true }),
+        min("The free ram should be larger then zero.", 1),
+        validateResourceMaxNumber("This value is out of range."),
+      ],
+    ],
     type: "text",
   },
 };

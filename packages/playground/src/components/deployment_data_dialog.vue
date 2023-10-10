@@ -118,6 +118,7 @@
 import hljs from "highlight.js";
 import { computed, type PropType, ref } from "vue";
 
+import { gridProxyClient } from "@/clients";
 import { getCardName } from "@/utils/helpers";
 
 const props = defineProps({
@@ -190,13 +191,15 @@ async function getGrafanaUrl() {
   isLoading.value = true;
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
-    const grafana = new GrafanaStatistics(grid, props.data);
-    await grafana.getUrl().then(res => {
-      grafanaURL.value = res;
+    const nodeId = await grid.capacity.getNodeIdFromContractId({
+      contractId: contract.value.contractId,
     });
+
+    const node = await gridProxyClient.nodes.byId(nodeId);
+    const grafana = new GrafanaStatistics(node, 2);
+    grafanaURL.value = await grafana.getUrl();
   }
   isLoading.value = false;
-  return grafanaURL.value;
 }
 getGrafanaUrl();
 
@@ -292,9 +295,10 @@ function getTooltipText(contract: any, index: number) {
 
 <script lang="ts">
 import { useProfileManager } from "@/stores/profile_manager";
-import { GrafanaStatistics } from "@/utils/getMetricsUrl";
+import { GrafanaStatistics } from "@/utils/get_metrics_url";
 import { getGrid } from "@/utils/grid";
 
+import type { NodeInfo } from "../../../grid_client/dist/es6";
 import type { Disk } from "../utils/deploy_vm";
 import CopyReadonlyInput from "./copy_readonly_input.vue";
 import { HighlightDark, HighlightLight } from "./highlight_themes";
@@ -308,3 +312,4 @@ export default {
   },
 };
 </script>
+@/utils/get_metrics_url
