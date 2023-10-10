@@ -69,12 +69,3 @@ export function toGigaBytes(value?: string) {
   const gb = val / giga;
   return parseFloat(gb.toFixed(2));
 }
-
-export function gigabytesToBytes(value?: string) {
-  const bytesInAGigabyte = 1024 ** 3;
-
-  if (!value) return 0;
-
-  const bytes = +value * bytesInAGigabyte;
-  return bytes;
-}

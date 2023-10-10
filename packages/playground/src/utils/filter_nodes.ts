@@ -3,7 +3,7 @@ import type { FilterOptions, GridClient, NodeInfo } from "@threefold/grid_client
 import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
 import type { NodeFilters } from "@/components/select_node.vue";
 
-import { isNumeric, min, startsWith, validateResourceMaxNumber, isAlphanumeric, isDecimal } from "./validators";
+import { isAlphanumeric, isDecimal, isNumeric, min, startsWith, validateResourceMaxNumber } from "./validators";
 
 export interface NodeGPUCardType {
   id: string;
@@ -164,7 +164,11 @@ export const DedicatedNodeInitializer: DedicatedNodeFilters = {
     placeholder: "Filter by total SSD greater than or equal to.",
     type: "text",
     rules: [
-      [isDecimal("This Field accepts only a valid number."), min("This Field must be a number larger than 0.", 1)],
+      [
+        isDecimal("This Field accepts only a valid number."),
+        min("This Field must be a number larger than 0.", 1),
+        validateResourceMaxNumber("This value is out of range."),
+      ],
     ],
   },
   total_hru: {
@@ -172,7 +176,11 @@ export const DedicatedNodeInitializer: DedicatedNodeFilters = {
     placeholder: "Filter by total HDD greater than or equal to.",
     type: "text",
     rules: [
-      [isDecimal("This Field accepts only a valid number."), min("This Field must be a number larger than 0.", 1)],
+      [
+        isDecimal("This Field accepts only a valid number."),
+        min("This Field must be a number larger than 0.", 1),
+        validateResourceMaxNumber("This value is out of range."),
+      ],
     ],
   },
   total_mru: {
@@ -180,7 +188,11 @@ export const DedicatedNodeInitializer: DedicatedNodeFilters = {
     placeholder: "Filter by total Memory greater than or equal to.",
     type: "text",
     rules: [
-      [isDecimal("This Field accepts only a valid number."), min("This Field must be a number larger than 0.", 1)],
+      [
+        isDecimal("This Field accepts only a valid number."),
+        min("This Field must be a number larger than 0.", 1),
+        validateResourceMaxNumber("This value is out of range."),
+      ],
     ],
   },
   total_cru: {

@@ -90,10 +90,12 @@ import { onMounted, ref, watch } from "vue";
 import type { VDataTable } from "vuetify/labs/VDataTable";
 import { VDataTableServer } from "vuetify/labs/VDataTable";
 
+import { toBytes } from "@/explorer/utils/helpers";
+
 import { gridProxyClient } from "../clients";
 import { useProfileManager } from "../stores";
 import { getGrid } from "../utils/grid";
-import { gigabytesToBytes, toGigaBytes } from "../utils/helpers";
+import { toGigaBytes } from "../utils/helpers";
 import toTeraOrGigaOrPeta from "../utils/toTeraOrGegaOrPeta";
 
 const headers: VDataTable["headers"] = [
@@ -147,7 +149,6 @@ const tabParams = {
 onMounted(async () => {
   await loadData();
 });
-//TODO: add max limit for searching
 async function loadData() {
   const params = tabParams[activeTab.value as keyof typeof tabParams];
 
@@ -161,15 +162,9 @@ async function loadData() {
       ...params,
       size: pageSize.value,
       page: page.value,
-      freeSru: gigabytesToBytes(filterInputs.value.total_sru.value)
-        ? gigabytesToBytes(filterInputs.value.total_sru.value)
-        : undefined,
-      freeHru: gigabytesToBytes(filterInputs.value.total_hru.value)
-        ? gigabytesToBytes(filterInputs.value.total_hru.value)
-        : undefined,
-      freeMru: gigabytesToBytes(filterInputs.value.total_mru.value)
-        ? gigabytesToBytes(filterInputs.value.total_mru.value)
-        : undefined,
+      freeSru: filterInputs.value.total_sru.value ? toBytes(+filterInputs.value.total_sru.value) : undefined,
+      freeHru: filterInputs.value.total_hru.value ? toBytes(+filterInputs.value.total_hru.value) : undefined,
+      freeMru: filterInputs.value.total_mru.value ? toBytes(+filterInputs.value.total_mru.value) : undefined,
       totalCru: filterInputs.value.total_cru.value ? +filterInputs.value.total_cru.value : undefined,
       gpuVendorName: filterInputs.value.gpu_vendor_name.value ? filterInputs.value.gpu_vendor_name.value : "",
       gpuDeviceName: filterInputs.value.gpu_device_name.value ? filterInputs.value.gpu_device_name.value : "",
@@ -206,9 +201,7 @@ async function loadData() {
     nodes.value = pricedNodes;
 
     nodesCount.value = data.count ?? 0;
-    setTimeout(() => {
-      loading.value = false;
-    }, 3000);
+    loading.value = false;
   } catch (e) {
     console.log("Error: ", e);
     loading.value = false;
