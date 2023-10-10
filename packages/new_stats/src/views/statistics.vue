@@ -1,0 +1,30 @@
+<template>
+  <v-container fluid class="pa-0">
+    <v-sheet color="title" class="w-100 d-flex align-center justify-center">
+      <v-icon class="mr-1" size="large" icon="mdi-chart-scatter-plot"> </v-icon>
+      <p class="my-2 font-weight-bold text-h6">Statistics</p>
+    </v-sheet>
+    <v-col cols="11" class="mx-auto">
+      <networkFilter v-model="networks"></networkFilter>
+      <statsTable></statsTable>
+    </v-col>
+    <v-sheet class="w-100 d-flex align-center justify-center">
+      <p class="my-2 font-weight-bold text-h6">Statistics</p>
+    </v-sheet>
+  </v-container>
+</template>
+
+<script lang="ts" setup>
+import { Network } from "@threefold/gridproxy_client";
+import { Ref, ref } from "vue";
+
+import networkFilter from "../components/network_filter.vue";
+import statsTable from "../components/stats_table.vue";
+const networks = ref() as Ref<Network[]>;
+</script>
+<script lang="ts">
+export default {
+  components: { networkFilter, statsTable },
+  name: "StatisticsView",
+};
+</script>

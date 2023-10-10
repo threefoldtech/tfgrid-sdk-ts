@@ -1,6 +1,6 @@
 <template>
-  <div class="mt-2 text-center py-0 w-100">
-    <v-card color="primary">
+  <div class="mt-1 text-center py-0 w-100">
+    <v-card color="title">
       <div class="d-flex align-center justify-center items-center py-2 font-weight-bold text-h6">
         <v-icon class="mr-1" size="large">{{ item.icon }} </v-icon>
         <span>
@@ -10,13 +10,13 @@
 
       <v-divider class="mt-1" />
 
-      <v-card-text style="background-color: #1aa18f; color: white" class="card-body"> {{ item.data }} </v-card-text>
+      <v-card-text class="card-body light"> {{ item.data }} </v-card-text>
     </v-card>
   </div>
 </template>
 
 <script lang="ts" setup>
-import type { IStatistics } from "@/types/index";
+import type { IStatistics } from "../types/index";
 defineProps<{
   item: IStatistics;
 }>();

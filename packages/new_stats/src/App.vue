@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import StatsTable from "./components/stats_table.vue";
+import StatisticsView from "./views/statistics.vue";
 </script>
 
 <template>
@@ -8,7 +8,7 @@ import StatsTable from "./components/stats_table.vue";
   </header>
 
   <main>
-    <StatsTable />
+    <StatisticsView />
   </main>
 </template>
 

@@ -1,15 +1,12 @@
 <template>
   <div>
-    <v-sheet color="primary" class="w-100 d-flex align-center justify-center">
-      <p class="my-1 font-weight-bold text-h6">Stats</p>
-    </v-sheet>
-    <v-sheet height="100vh" v-if="loading" class="d-flex align-center justify-center">
+    <v-sheet color="transparent" height="100vh" v-if="loading" class="d-flex align-center justify-center">
       <v-container class="text-center d-block">
         <v-progress-circular size="40" indeterminate />
         <p class="pt-4 font-weight-bold">Loading stats data</p>
       </v-container>
     </v-sheet>
-    <v-container fluid class="py-0 d-flex justify-center" v-else>
+    <v-container fluid class="py-0 ml-2 d-flex justify-center" v-else>
       <v-row class="w-100">
         <!-- <v-col color="red" v-if="failed">
           <v-alert type="error" variant="tonal">
