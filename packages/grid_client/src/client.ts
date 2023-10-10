@@ -14,9 +14,9 @@ import { BackendStorage, BackendStorageType } from "./storage/backend";
 import { KeypairType } from "./zos/deployment";
 
 class GridClient {
-  static config: GridClientConfig;
-  static rmbClients: Record<string, RMBClient> = {};
+  static rmbClients: Map<string, RMBClient> = new Map();
   static connecting = new Set<string>();
+  config: GridClientConfig;
   rmbClient: RMBClient;
   tfclient: TFClient;
   machines: modules.machines;
@@ -41,10 +41,11 @@ class GridClient {
   farmerbot: modules.farmerbot;
   farms: modules.farms;
   networks: modules.networks;
+  dao: modules.dao;
   bridge: modules.bridge;
   modules: string[] = [];
 
-  constructor(public clientOptions?: ClientOptions) {
+  constructor(public clientOptions: ClientOptions) {
     this.clientOptions = {
       mnemonic: clientOptions.mnemonic,
       network: clientOptions.network,
@@ -136,11 +137,12 @@ class GridClient {
   _connect(): void {
     const urls = this.getDefaultUrls(this.clientOptions.network);
     const storePath = PATH.join(appPath, this.clientOptions.network, String(this.twinId));
-    GridClient.config = {
+    this.config = {
       network: this.clientOptions.network,
       mnemonic: this.clientOptions.mnemonic,
       storeSecret: this.clientOptions.storeSecret,
       rmbClient: this.rmbClient,
+      tfclient: this.tfclient,
       projectName: this.clientOptions.projectName,
       backendStorageType: this.clientOptions.backendStorageType,
       backendStorage: this.clientOptions.backendStorage,
@@ -158,7 +160,7 @@ class GridClient {
       if (module.includes("Model")) {
         continue;
       }
-      this[module] = new modules[module](GridClient.config);
+      this[module] = new modules[module](this.config);
       this.modules.push(module);
     }
   }

@@ -10,13 +10,23 @@ import type { InputValidatorService } from "@/hooks/input_validator";
 
 export default {
   name: "FormValidator",
-  props: ["modelValue"],
+  props: {
+    modelValue: Boolean,
+    validOnInit: Boolean,
+  },
   emits: { "update:modelValue": (value: boolean) => value },
-  setup(_, { emit, expose }) {
+  setup(props, { emit, expose }) {
     const statusMap = ref(new Map<number, ValidatorStatus>());
     const serviceMap = new Map<number, InputValidatorService>();
 
-    const valid = computed(() => [...statusMap.value.values()].every(status => status === ValidatorStatus.Valid));
+    const valid = computed(() =>
+      [...statusMap.value.values()].every(status => {
+        if (props.validOnInit) {
+          return status === ValidatorStatus.Valid || status === ValidatorStatus.Init;
+        }
+        return status === ValidatorStatus.Valid;
+      }),
+    );
     watch(valid, valid => emit("update:modelValue", valid), { immediate: true });
 
     const form: FormValidatorService = {

@@ -202,20 +202,20 @@ const routes: AppRoute[] = [
     icon: "mdi-calculator",
     items: [
       {
-        title: "Resource Pricing",
+        title: "Pricing Calculator",
         icon: "mdi-currency-usd",
-        route: "/explorer/pricing",
+        route: "/calculator/pricing",
       },
       {
         title: "Simulator",
         icon: "mdi-chart-line",
-        route: "/explorer/simulator",
+        route: "/calculator/simulator",
       },
     ],
   },
   {
     title: "Playground",
-    items: [{ title: "Deployments", icon: "vm.png", route: "/solutions" }],
+    items: [{ title: "Solutions", icon: "vm.png", route: "/solutions" }],
   },
   {
     title: "My Account",
@@ -246,7 +246,7 @@ const routes: AppRoute[] = [
     icon: "mdi-toolbox",
     items: [
       {
-        title: "Graphana",
+        title: "Monitoring",
         icon: "mdi-equalizer",
         url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
       },
@@ -402,5 +402,16 @@ a {
 
 .custom-toolbar-title {
   max-width: 17rem !important;
+
+.mosha__toast__content-wrapper {
+  margin-bottom: -2px;
+}
+.mosha__icon {
+  margin-right: 6px !important;
+  margin-top: 2px;
+}
+
+.mosha__toast__content__text {
+  font-size: 14px !important;
 }
 </style>

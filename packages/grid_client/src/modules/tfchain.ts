@@ -22,6 +22,7 @@ import {
   BlockchainListResultModel,
   BlockchainSignModel,
   TfchainCreateModel,
+  TfchainDaoVoteModel,
   TfchainWalletBalanceByAddressModel,
   TfchainWalletInitModel,
   TfchainWalletTransferModel,
@@ -54,12 +55,7 @@ class TFChain implements blockchainInterface {
     this.storeSecret = config.storeSecret as string;
     this.keypairType = config.keypairType;
     this.network = config.network;
-    this.tfClient = new TFClient(
-      this.config.substrateURL,
-      this.config.mnemonic,
-      this.config.storeSecret,
-      this.config.keypairType,
-    );
+    this.tfClient = config.tfclient;
   }
 
   getPath() {
@@ -217,6 +213,25 @@ class TFChain implements blockchainInterface {
     await sourceClient.connect();
     try {
       await (await sourceClient.balances.transfer({ address: options.address_dest, amount: options.amount })).apply();
+    } catch (e) {
+      throw Error(`Could not complete transfer transaction: ${e}`);
+    }
+  }
+  @expose
+  @validateInput
+  async vote(options: TfchainDaoVoteModel) {
+    const mnemonics = await this.getMnemonics(options.name);
+    const sourceClient = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
+    await sourceClient.connect();
+    try {
+      await (
+        await sourceClient.dao.vote({
+          address: options.address,
+          farmId: options.farmId,
+          hash: options.hash,
+          approve: options.approve,
+        })
+      ).apply();
     } catch (e) {
       throw Error(`Could not complete transfer transaction: ${e}`);
     }

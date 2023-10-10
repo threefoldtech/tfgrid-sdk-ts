@@ -1,4 +1,5 @@
 export * from "./k8s";
+export * from "./dao";
 export * from "./machines";
 export * from "./models";
 export * from "./zdb";

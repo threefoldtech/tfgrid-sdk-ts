@@ -1,7 +1,8 @@
 import { CertificationType, GatewayBuilder, GatewaysQuery, NodeStatus } from "../builders/public_api";
 import { assertId, resolvePaginator } from "../utils";
 import { AbstractClient } from "./abstract_client";
-import { Farm } from "./farms";
+import type { Farm } from "./farms";
+import type { Twin } from "./twins";
 
 export interface Resources {
   cru: number;
@@ -12,6 +13,8 @@ export interface Resources {
 export interface Location {
   country: string;
   city: string;
+  longitude: number;
+  latitude: number;
 }
 export interface PublicConfig {
   domain: string;
@@ -25,6 +28,23 @@ export interface PublicIps {
   total: number;
   used: number;
   free: number;
+}
+
+export interface NodeStats {
+  system: Resources & { ipv4u: number };
+  total: Resources & { ipv4u: number };
+  used: Resources & { ipv4u: number };
+  users: {
+    deployments: number;
+    workloads: number;
+  };
+}
+
+export interface GPUCard {
+  id: string;
+  vendor: string;
+  device: string;
+  contract: number;
 }
 
 export interface GridNode {
@@ -50,6 +70,9 @@ export interface GridNode {
   rentedByTwinId: number;
   farm: Farm;
   publicIps: PublicIps;
+  twin: Twin;
+  stats: NodeStats;
+  cards: GPUCard[];
 }
 
 export class GatewaysClient extends AbstractClient<GatewayBuilder, GatewaysQuery> {

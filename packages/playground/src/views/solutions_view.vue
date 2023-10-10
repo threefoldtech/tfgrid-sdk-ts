@@ -7,7 +7,7 @@
             <template v-slot:default="{ isHovering, props }">
               <v-card class="pa-3 pt-6" height="200" v-bind="props" :class="isHovering ? 'card-opacity' : undefined">
                 <v-img
-                  class="d-inline-block ml-3"
+                  class="d-inline-block ml-3 mb-2"
                   width="35"
                   :src="baseURL + 'images/icons/' + card.icon"
                   :alt="card.title"

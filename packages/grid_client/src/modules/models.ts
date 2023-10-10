@@ -378,7 +378,12 @@ class KVStoreRemoveModel {
 class KVStoreBatchRemoveModel {
   @Expose() @ArrayNotEmpty() @IsString({ each: true }) keys: string[];
 }
-
+class DaoVoteModel {
+  @Expose() @IsString() @IsNotEmpty() address: string;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsBoolean() approve: boolean;
+  @Expose() @IsString() @IsNotEmpty() hash: string;
+}
 class BalanceGetModel {
   @Expose() @IsString() @IsNotEmpty() address: string;
 }
@@ -423,7 +428,13 @@ class TfchainWalletInitModel {
 class TfchainWalletBalanceByAddressModel {
   @Expose() @IsString() @IsNotEmpty() address: string;
 }
-
+class TfchainDaoVoteModel {
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() address: string;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsBoolean() approve: boolean;
+  @Expose() @IsString() @IsNotEmpty() hash: string;
+}
 class TfchainWalletTransferModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() address_dest: string;
@@ -537,6 +548,10 @@ class NodeFreeResourcesModel {
 class FarmIdFromFarmNameModel {
   @Expose() @IsString() @IsNotEmpty() farmName: string;
 }
+
+class NodeIdFromContractIdModel {
+  @Expose() @IsInt() @Min(1) contractId: number;
+}
 class CapacityPoolCheckModel {
   @Expose() @IsInt() @Min(1) nodeId: number;
   @Expose() @IsInt({ each: true }) @Min(250 * 1024 ** 2, { each: true }) rootfsDisks: number[]; //Byte
@@ -592,6 +607,8 @@ class FarmFilterOptions {
   @Expose() @IsOptional() @IsInt() @Min(1) nodeRentedBy?: number;
   @Expose() @IsOptional() @IsInt() page?: number;
   @Expose() @IsOptional() @IsInt() size?: number;
+  @Expose() @IsOptional() @IsInt() ownedBy?: number;
+  @Expose() @IsOptional() @IsInt() farmId?: number;
 }
 
 class CalculatorModel {
@@ -665,6 +682,7 @@ export {
   AlgorandCreateTransactionModel,
   AlgorandTransferModel,
   DiskModel,
+  DaoVoteModel,
   NetworkModel,
   MachineModel,
   MachinesModel,
@@ -731,6 +749,7 @@ export {
   NodesByFarmIdModel,
   NodeFreeResourcesModel,
   FarmIdFromFarmNameModel,
+  NodeIdFromContractIdModel,
   CapacityPoolCheckModel,
   FilterOptions,
   FarmFilterOptions,
@@ -740,6 +759,7 @@ export {
   TfchainWalletBalanceByAddressModel,
   TfchainWalletTransferModel,
   TfchainCreateModel,
+  TfchainDaoVoteModel,
   WalletMessageSignModel,
   BlockchainCreateModel,
   BlockchainCreateResultModel,
