@@ -6,7 +6,7 @@
         <p class="pt-4 font-weight-bold">Loading stats data</p>
       </v-container>
     </v-sheet>
-    <v-container fluid class="py-0 ml-2 d-flex justify-center" v-else>
+    <v-container fluid class="py-0 pt-4 ml-2 d-flex justify-center" v-else>
       <v-row class="w-100">
         <!-- <v-col color="red" v-if="failed">
           <v-alert type="error" variant="tonal">
@@ -16,14 +16,14 @@
             </v-btn>
           </v-alert>
         </v-col> -->
-        <v-col xl="8" lg="8" md="12" cols="12" class="mt-4 px-0">
+        <v-col xl="8" lg="8" md="12" cols="12" class="mt-4 pb-0 px-0">
           <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
         </v-col>
         <div style="height: 80vhd" class="my-auto">
           <v-divider :thickness="2" class="border-opacity-50" color="gray" vertical></v-divider>
         </div>
 
-        <v-col v-if="Istats.length !== 0" class="d-flex flex-wrap justify-center px-0">
+        <v-col v-if="Istats.length !== 0" class="d-flex flex-wrap justify-center pt-6 pb-0 px-0">
           <v-col
             v-for="item of Istats"
             :key="item.title"
@@ -33,7 +33,7 @@
             sm="4"
             xs="4"
             cols="12"
-            class="text-center"
+            class="text-center pt-1 pb-0"
           >
             <StatisticsCard :item="item" />
           </v-col>

@@ -4,12 +4,12 @@
       <v-icon class="mr-1" size="large" icon="mdi-chart-scatter-plot"> </v-icon>
       <p class="my-2 font-weight-bold text-h6">Statistics</p>
     </v-sheet>
-    <v-col cols="11" class="mx-auto">
+    <v-col cols="11" class="mx-auto pb-0">
       <networkFilter v-model="networks"></networkFilter>
       <statsTable></statsTable>
     </v-col>
-    <v-sheet class="w-100 d-flex align-center justify-center">
-      <p class="my-2 font-weight-bold text-h6">Statistics</p>
+    <v-sheet style="position: fixed; bottom: 0%" class="w-100 d-flex align-center justify-center">
+      <p class="my-1 font-weight-bold">{{ new Date().getFullYear() }} - ThreeFoldTech</p>
     </v-sheet>
   </v-container>
 </template>

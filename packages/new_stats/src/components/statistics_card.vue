@@ -8,9 +8,9 @@
         </span>
       </div>
 
-      <v-divider class="mt-1" />
+      <v-divider class="mt-1 light border-opacity-75" :thickness="2" />
 
-      <v-card-text class="card-body light"> {{ item.data }} </v-card-text>
+      <v-card-text class="card-body light py-2"> {{ item.data }} </v-card-text>
     </v-card>
   </div>
 </template>
