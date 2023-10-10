@@ -2,44 +2,26 @@
   <div class="table-content">
     <v-row>
       <v-col>
-        <v-data-table-server
+        <v-data-table
           :loading="loading"
-          loading-text="Loading farms..."
+          :items-per-page="itemPerPage"
           :headers="headers"
-          :items="modelValue"
-          :items-length="count"
-          :items-per-page-options="[
-            { value: 5, title: '5' },
-            { value: 10, title: '10' },
-            { value: 15, title: '15' },
-            { value: 50, title: '50' },
-          ]"
-          class="elevation-1 v-data-table-header"
-          density="compact"
-          :disable-sort="true"
-          hide-default-header
-          :hover="true"
+          :items="items"
+          class="elevation-1"
         >
           <template #loading />
-        </v-data-table-server>
+        </v-data-table>
       </v-col>
     </v-row>
   </div>
 </template>
 
 <script lang="ts" setup>
-import type { Farm } from "@threefold/gridproxy_client";
-import type { PropType } from "vue";
-import type { VDataTable } from "vuetify/labs/VDataTable";
-
+import type { VDataTableHeader } from "@/types";
 const props = defineProps({
-  modelValue: {
+  items: {
     required: true,
-    type: [] as PropType<Farm[]>,
-  },
-  count: {
-    required: true,
-    type: Number,
+    type: Array,
   },
   loading: {
     required: true,
@@ -50,8 +32,8 @@ const props = defineProps({
 const emit = defineEmits<{
   (e: "update", value: string): void;
 }>();
-
-const headers: VDataTable["headers"] = [
+const itemPerPage = 10;
+const headers: VDataTableHeader = [
   { title: "ID", key: "farmId" },
   { title: "Name", key: "name" },
   {

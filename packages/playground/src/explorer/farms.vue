@@ -4,12 +4,7 @@
     <v-row>
       <v-col>
         <!-- table -->
-        <div class="hint mb-2">
-          <v-alert type="info" variant="tonal">
-            The farms will be filtered and displayed after you enter the value by 1 second.
-          </v-alert>
-        </div>
-        <FarmsTable v-model="farms" :count="farmsCount" :loading="loading" />
+        <FarmsTable :items="farms" :loading="loading" />
       </v-col>
     </v-row>
     <!-- details -->
@@ -17,21 +12,42 @@
 </template>
 
 <script lang="ts" setup>
-import type { Farm } from "@threefold/gridproxy_client";
+import type { CertificationType, PublicIp } from "@threefold/gridproxy_client";
 import { onMounted, ref } from "vue";
 
 import { getFarms } from "./utils/helpers";
 
-const loading = ref<boolean>(true);
-// const isFormLoading = ref<boolean>(true);
-const farms = ref<Farm[]>([]);
-const farmsCount = ref<number>(0);
+interface IFarm {
+  farmId: number;
+  name: string;
+  twinId: number;
+  pricingPolicyId: number;
+  certificationType: CertificationType;
+  publicIps: PublicIp[];
+  stellarAddress?: string;
+  totalPublicIp: number;
+  usedPublicIp: number;
+  freePublicIp: number;
+}
+
+const loading = ref<boolean>(false);
+const farms = ref<IFarm[]>([]);
 
 const getAllFarms = async () => {
   loading.value = true;
   try {
-    const { data } = await getFarms();
-    farms.value = data;
+    const data = await getFarms();
+    farms.value = data.map(farm => {
+      const ips = farm.publicIps;
+      const total = ips.length;
+      const used = ips.filter(x => x.contractId === 0).length;
+      return {
+        ...farm,
+        totalPublicIp: total,
+        usedPublicIp: used,
+        freePublicIp: total - used,
+      };
+    });
   } catch (error) {
     console.log(error);
   } finally {
