@@ -63,6 +63,11 @@ const router = createRouter({
           component: () => import("../explorer/stats.vue"),
           meta: { title: "Statistics" },
         },
+        {
+          path: "farms",
+          component: () => import("../explorer/farms.vue"),
+          meta: { title: "Farms" },
+        },
       ],
     },
     {
