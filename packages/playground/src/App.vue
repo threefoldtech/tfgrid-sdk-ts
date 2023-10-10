@@ -399,4 +399,8 @@ a {
 .v-list-item--density-default.v-list-item--one-line {
   min-height: 40px;
 }
+
+.v-toolbar-title {
+  max-width: 17rem;
+}
 </style>
