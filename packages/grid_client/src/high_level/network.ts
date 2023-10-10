@@ -1,7 +1,7 @@
 import { Addr } from "netaddr";
 
 import { DeploymentFactory, Network } from "../primitives";
-import { WorkloadTypes } from "../zos";
+import { WorkloadTypes, Znet } from "../zos";
 import { HighLevelBase } from "./base";
 import { Operations, TwinDeployment } from "./models";
 
@@ -33,14 +33,12 @@ class NetworkHL extends HighLevelBase {
     // update network if it's already exist
     for (const deployment of network.deployments) {
       const d = await deploymentFactory.fromObj(deployment);
-      for (const workload of d["workloads"]) {
-        if (
-          workload["type"] !== WorkloadTypes.network ||
-          !Addr(network.ipRange).contains(Addr(workload["data"]["subnet"]))
-        ) {
+      for (const workload of d.workloads) {
+        const data = workload.data as Znet;
+        if (workload.type !== WorkloadTypes.network || !Addr(network.ipRange).contains(Addr(data.subnet))) {
           continue;
         }
-        workload.data = network.updateNetwork(workload["data"]);
+        workload.data = network.updateNetwork(data);
         workload.version += 1;
         break;
       }
