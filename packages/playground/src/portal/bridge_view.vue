@@ -92,12 +92,12 @@
 </template>
 
 <script lang="ts" setup>
-import { createToast } from "mosha-vue-toastify";
 import { default as StellarSdk, StrKey } from "stellar-sdk";
 import { onMounted, ref } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useProfileManager } from "../stores";
+import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid, loadBalance } from "../utils/grid";
 
 const profileManager = useProfileManager();
@@ -206,28 +206,14 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
     amount.value = 0;
     loadingWithdraw.value = false;
     await ProfileManagerController.reloadBalance();
-    createToast("Transaction Succeeded", {
-      position: "bottom-right",
-      hideProgressBar: true,
-      toastBackgroundColor: "black",
-      timeout: 5000,
-      showIcon: true,
-      type: "success",
-    });
+    createCustomToast("Transaction Succeeded", ToastType.success);
   } catch (e) {
     console.log("Error withdrawing, Error: ", e);
     openWithdrawDialog.value = false;
     target.value = "";
     amount.value = 0;
     loadingWithdraw.value = false;
-    createToast("Withdraw Failed!", {
-      position: "bottom-right",
-      hideProgressBar: true,
-      toastBackgroundColor: "red",
-      timeout: 5000,
-      showIcon: true,
-      type: "danger",
-    });
+    createCustomToast("Withdraw Failed!", ToastType.danger);
   }
 }
 </script>
