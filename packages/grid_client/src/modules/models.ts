@@ -607,6 +607,7 @@ class FarmFilterOptions {
   @Expose() @IsOptional() @IsInt() page?: number;
   @Expose() @IsOptional() @IsInt() size?: number;
   @Expose() @IsOptional() @IsInt() ownedBy?: number;
+  @Expose() @IsOptional() @IsInt() farmId?: number;
 }
 
 class CalculatorModel {
