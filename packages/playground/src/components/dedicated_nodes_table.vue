@@ -86,13 +86,13 @@
 
 <script setup lang="ts">
 import { NodeStatus } from "@threefold/gridproxy_client";
+import { CertificationType } from "@threefold/gridproxy_client";
 import { onMounted, ref, watch } from "vue";
 import type { VDataTable } from "vuetify/labs/VDataTable";
 import { VDataTableServer } from "vuetify/labs/VDataTable";
 
-import { toBytes } from "@/explorer/utils/helpers";
-
 import { gridProxyClient } from "../clients";
+import { toBytes } from "../explorer/utils/helpers";
 import { useProfileManager } from "../stores";
 import { getGrid } from "../utils/grid";
 import { toGigaBytes } from "../utils/helpers";
@@ -173,6 +173,7 @@ async function loadData() {
     if (data.count === 0) {
       loading.value = false;
       nodes.value = [];
+      nodesCount.value = 0;
       return;
     }
 
@@ -187,12 +188,12 @@ async function loadData() {
         mru: toGigaBytes(item.total_resources.mru.toString()),
         sru: toGigaBytes(item.total_resources.sru.toString()),
         ipv4u: false,
-        certified: !!item.certificationType,
+        certified: item.certificationType === CertificationType.Certified,
       });
       return {
         ...item,
         price: (price?.dedicatedPrice ?? 0 + (fee || 0)).toFixed(3),
-        discount: (price as { sharedPackage: { discount: number } } | undefined)?.sharedPackage.discount || 0,
+        discount: price?.sharedPackage ?? 0,
       };
     });
 
@@ -232,11 +233,10 @@ async function reloadTable() {
 </script>
 
 <script lang="ts">
-import { type DedicatedNodeFilters, DedicatedNodeInitializer } from "@/utils/filter_nodes";
-
 import NodeDetails from "../components/node_details.vue";
 import NodeFilter from "../components/node_filter.vue";
 import ReserveBtn from "../components/reserve_action_btn.vue";
+import { type DedicatedNodeFilters, DedicatedNodeInitializer } from "../utils/filter_nodes";
 
 export default {
   name: "Dedicated Node",
