@@ -51,7 +51,7 @@ class Zos {
   @expose
   @validateInput
   async getDeployment(options: ZOSGetDeploymentModel) {
-    const nodeId = await this.capacity.getNodeIdFromContractId(options.contractId, this.config.mnemonic);
+    const nodeId = await this.capacity.getNodeIdFromContractId(options.contractId, this.config.substrateURL);
     const nodeTwinId = await this.capacity.getNodeTwinId(nodeId);
     const payload = JSON.stringify({ contract_id: options.contractId });
     return await this.rmb.request([nodeTwinId], "zos.deployment.get", payload);

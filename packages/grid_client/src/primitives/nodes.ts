@@ -1,4 +1,5 @@
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
+import { QueryClient } from "@threefold/tfchain_client";
 import { default as PrivateIp } from "private-ip";
 import urlJoin from "url-join";
 
@@ -22,7 +23,7 @@ interface FarmInfo {
 interface PublicIps {
   id: string;
   ip: string;
-  contractId: number;
+  contract_id: number; // Added to match the one in the farm interface || TODO: Should we replace the whole http requests to be done with the gridProxy.
   gateway: string;
 }
 
@@ -129,13 +130,8 @@ class Nodes {
     return accessNodes;
   }
 
-  async getNodeIdFromContractId(contractId: number, mnemonic: string): Promise<number> {
-    const tfclient = new TFClient(
-      GridClient.config.substrateURL,
-      mnemonic,
-      GridClient.config.storeSecret,
-      GridClient.config.keypairType,
-    );
+  async getNodeIdFromContractId(contractId: number, substrateURL: string): Promise<number> {
+    const tfclient = new QueryClient(substrateURL);
     return tfclient.contracts
       .get({ id: contractId })
       .then(contract => {
@@ -180,7 +176,7 @@ class Nodes {
       farms = await this.getAllFarms(url);
     }
     return farms
-      .filter(farm => farm.publicIps.filter(ip => ip.contractId === 0).length > 0)
+      .filter(farm => farm.publicIps.filter(ip => ip.contract_id === 0).length > 0)
       .map(farm => farm.farmId)
       .includes(farmId);
   }
@@ -387,6 +383,7 @@ class Nodes {
       node_has_gpu: options.nodeHasGPU,
       node_rented_by: options.nodeRentedBy,
       node_certified: options.nodeCertified,
+      farm_id: options.farmId,
     };
     return Object.entries(params)
       .map(param => param.join("="))
