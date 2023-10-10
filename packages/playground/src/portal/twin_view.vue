@@ -84,14 +84,23 @@ onMounted(async () => {
     userFarms.value = await getFarms(grid, { ownedBy: profile.twinId }, {});
     if (userFarms.value.length > 0) {
       const proposals = grid?.dao.get();
-
+      const userFarmId = userFarms.value.map(farm => farm.farmID);
       const activeProposals = (await proposals)?.active;
       numberOfActiveProposals.value = activeProposals ? activeProposals.length : 0;
-
-      openVotePopup.value = true;
+      if (numberOfActiveProposals.value > 0) {
+        const activeProposalsUserHasVotedOn = activeProposals.filter(
+          proposal =>
+            proposal.ayes.filter(aye => userFarmId.includes(aye.farmId)) ||
+            proposal.nayes.filter(naye => userFarmId.includes(naye.farmId)),
+        );
+        if (activeProposalsUserHasVotedOn.length != numberOfActiveProposals.value) {
+          openVotePopup.value = true;
+        }
+      }
     }
   }
 });
+
 function redirectToDao() {
   router.push({ path: "/portal/dao" });
 }
