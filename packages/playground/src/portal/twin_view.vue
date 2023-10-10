@@ -56,10 +56,10 @@
 
 <script lang="ts" setup>
 import { generatePublicKey } from "@threefold/rmb_direct_client";
-import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
+import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid } from "../utils/grid";
 
 const profileManager = useProfileManager();
@@ -106,14 +106,7 @@ async function UpdateRelay() {
 
 function copy(id: string) {
   navigator.clipboard.writeText(id);
-  createToast(`Address copied to clipboard`, {
-    position: "top-right",
-    hideProgressBar: true,
-    toastBackgroundColor: "#1aa18f",
-    timeout: 5000,
-    showIcon: true,
-    type: "success",
-  });
+  createCustomToast("Address copied to clipboard", ToastType.success);
 }
 </script>
 
