@@ -112,7 +112,7 @@ const target = ref("");
 const targetError = ref("");
 const validatingAddress = ref(false);
 const server = new StellarSdk.Server(window.env.STELLAR_HORIZON_URL);
-const amount = ref(0);
+const amount = ref(2);
 const freeBalance = ref(0);
 const loadingWithdraw = ref(false);
 const depositWallet = ref("");
@@ -203,7 +203,7 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
 
     openWithdrawDialog.value = false;
     target.value = "";
-    amount.value = 0;
+    amount.value = 2;
     loadingWithdraw.value = false;
     await ProfileManagerController.reloadBalance();
     createCustomToast("Transaction Succeeded", ToastType.success);
@@ -211,7 +211,7 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
     console.log("Error withdrawing, Error: ", e);
     openWithdrawDialog.value = false;
     target.value = "";
-    amount.value = 0;
+    amount.value = 2;
     loadingWithdraw.value = false;
     createCustomToast("Withdraw Failed!", ToastType.danger);
   }
