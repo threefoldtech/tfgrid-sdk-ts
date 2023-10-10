@@ -35,12 +35,10 @@
               <v-list-item> {{ profileManager.profile?.twinId.toString() }} </v-list-item>
               <v-divider></v-divider>
               <v-list-item>
-                {{ profileManager.profile?.address }}
-                <v-icon
-                  style="padding-left: 3rem; font-size: 1.5rem"
-                  @click="copy(profileManager.profile?.address as string)"
-                  >mdi-content-copy</v-icon
-                >
+                <div style="display: flex; justify-content: space-between; align-items: center">
+                  <span>{{ profileManager.profile?.address }}</span>
+                  <v-icon @click="copy(profileManager.profile?.address as string)"> mdi-content-copy </v-icon>
+                </div>
               </v-list-item>
 
               <v-divider></v-divider>
