@@ -189,10 +189,9 @@ async function loadData() {
         ipv4u: false,
         certified: !!item.certificationType,
       });
-
       return {
         ...item,
-        price: ((price as { dedicatedPrice?: number } | undefined)?.dedicatedPrice ?? 0 + (fee || 0)).toFixed(3),
+        price: (price?.dedicatedPrice ?? 0 + (fee || 0)).toFixed(3),
         discount: (price as { sharedPackage: { discount: number } } | undefined)?.sharedPackage.discount || 0,
       };
     });
