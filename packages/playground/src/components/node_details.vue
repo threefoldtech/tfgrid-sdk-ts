@@ -239,11 +239,11 @@
 </template>
 
 <script setup lang="ts">
-import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
 import { gridProxyClient } from "../clients";
 import { useProfileManager } from "../stores";
+import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid } from "../utils/grid";
 import toTeraOrGigaOrPeta from "../utils/toTeraOrGegaOrPeta";
 
@@ -295,27 +295,13 @@ async function loadGPUitems() {
     loading.value = false;
   } catch (e) {
     console.log("Error: ", e);
-    createToast("Failed to load GPU details", {
-      position: "top-right",
-      hideProgressBar: true,
-      toastBackgroundColor: "#FF5252",
-      timeout: 5000,
-      showIcon: true,
-      type: "danger",
-    });
+    createCustomToast("Failed to load GPU details", ToastType.danger);
   }
 }
 
 function copy(id: string) {
   navigator.clipboard.writeText(id);
-  createToast(`GPU ID copied to clipboard`, {
-    position: "top-right",
-    hideProgressBar: true,
-    toastBackgroundColor: "#1aa18f",
-    timeout: 5000,
-    showIcon: true,
-    type: "success",
-  });
+  createCustomToast("GPU ID copied to clipboard", ToastType.success);
 }
 </script>
 

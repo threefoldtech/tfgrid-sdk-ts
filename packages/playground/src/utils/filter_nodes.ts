@@ -159,6 +159,26 @@ export const inputsInitializer: FilterInputs = {
 };
 
 export const DedicatedNodeInitializer: DedicatedNodeFilters = {
+  total_cru: {
+    label: "Total CPU (Cores)",
+    placeholder: "Filter by total Cores greater than or equal to.",
+    type: "text",
+    rules: [
+      [isDecimal("This Field accepts only a valid number."), min("This Field must be a number larger than 0.", 1)],
+    ],
+  },
+  total_mru: {
+    label: "Total RAM (GB)",
+    placeholder: "Filter by total Memory greater than or equal to.",
+    type: "text",
+    rules: [
+      [
+        isDecimal("This Field accepts only a valid number."),
+        min("This Field must be a number larger than 0.", 1),
+        validateResourceMaxNumber("This value is out of range."),
+      ],
+    ],
+  },
   total_sru: {
     label: "Total SSD (GB)",
     placeholder: "Filter by total SSD greater than or equal to.",
@@ -183,26 +203,7 @@ export const DedicatedNodeInitializer: DedicatedNodeFilters = {
       ],
     ],
   },
-  total_mru: {
-    label: "Total RAM (GB)",
-    placeholder: "Filter by total Memory greater than or equal to.",
-    type: "text",
-    rules: [
-      [
-        isDecimal("This Field accepts only a valid number."),
-        min("This Field must be a number larger than 0.", 1),
-        validateResourceMaxNumber("This value is out of range."),
-      ],
-    ],
-  },
-  total_cru: {
-    label: "Total CPU (Cores)",
-    placeholder: "Filter by total Cores greater than or equal to.",
-    type: "text",
-    rules: [
-      [isDecimal("This Field accepts only a valid number."), min("This Field must be a number larger than 0.", 1)],
-    ],
-  },
+
   gpu_device_name: {
     label: "GPU's device name",
     placeholder: "Filter by GPU's device name.",

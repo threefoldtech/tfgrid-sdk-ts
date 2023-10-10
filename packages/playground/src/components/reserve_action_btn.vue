@@ -36,11 +36,11 @@
 </template>
 
 <script lang="ts">
-import { createToast } from "mosha-vue-toastify";
 import { ref } from "vue";
 
 import { gridProxyClient } from "../clients";
 import { useProfileManager } from "../stores";
+import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid } from "../utils/grid";
 
 const profileManager = useProfileManager();
@@ -74,69 +74,25 @@ export default {
       loadingUnreserveNode.value = true;
       try {
         const grid = await getGrid(profileManager.profile!);
-        createToast(`check for contracts on node ${props.nodeId}`, {
-          position: "top-right",
-          hideProgressBar: true,
-          toastBackgroundColor: "#1aa18f",
-          timeout: 5000,
-          showIcon: true,
-          type: "info",
-        });
+        createCustomToast("check for contracts on node ${props.nodeId}", ToastType.info);
 
         const result = (await grid?.contracts.getActiveContracts({ nodeId: +props.nodeId })) as any;
         if (result.length > 0) {
-          createToast(`node ${props.nodeId} has active contracts`, {
-            position: "top-right",
-            hideProgressBar: true,
-            toastBackgroundColor: "#1aa18f",
-            timeout: 5000,
-            showIcon: true,
-            type: "info",
-          });
+          createCustomToast("node ${props.nodeId} has active contracts", ToastType.info);
           loadingUnreserveNode.value = false;
           openUnreserveDialog.value = false;
         } else {
-          createToast(`unreserving node ${props.nodeId}`, {
-            position: "top-right",
-            hideProgressBar: true,
-            toastBackgroundColor: "#1aa18f",
-            timeout: 5000,
-            showIcon: true,
-            type: "info",
-          });
-
+          createCustomToast("unreserving node ${props.nodeId}", ToastType.info);
           await grid?.nodes.unreserve({ nodeId: +props.nodeId });
-          createToast(`Transaction succeeded node ${props.nodeId} Unreserved`, {
-            position: "top-right",
-            hideProgressBar: true,
-            toastBackgroundColor: "#1aa18f",
-            timeout: 5000,
-            showIcon: true,
-            type: "success",
-          });
-
+          createCustomToast("Transaction succeeded node ${props.nodeId} Unreserved", ToastType.success);
           loadingUnreserveNode.value = false;
           openUnreserveDialog.value = false;
-          createToast(`Table may take sometime to update the changes`, {
-            position: "top-right",
-            hideProgressBar: true,
-            toastBackgroundColor: "#1aa18f",
-            timeout: 5000,
-            showIcon: true,
-            type: "info",
-          });
+          createCustomToast("Table may take sometime to update the changes", ToastType.info);
           emit("updateTable");
         }
       } catch (e) {
         console.log("Error: ", e);
-        createToast(e as string, {
-          position: "top-right",
-          hideProgressBar: true,
-          toastBackgroundColor: "#FF5252",
-          timeout: 5000,
-          showIcon: true,
-          type: "danger",
-        });
+        createCustomToast(e as string, ToastType.danger);
         loadingUnreserveNode.value = false;
         openUnreserveDialog.value = false;
       }
@@ -146,43 +102,16 @@ export default {
       loadingReserveNode.value = true;
       try {
         const grid = await getGrid(profileManager.profile!);
-        createToast(`Transaction Submitted`, {
-          position: "top-right",
-          hideProgressBar: true,
-          toastBackgroundColor: "#1aa18f",
-          timeout: 5000,
-          showIcon: true,
-          type: "info",
-        });
+        createCustomToast("Transaction Submitted", ToastType.info);
         await grid?.nodes.reserve({ nodeId: +props.nodeId });
         loadingReserveNode.value = false;
-        createToast(`Transaction succeeded node ${props.nodeId} Reserved`, {
-          position: "top-right",
-          hideProgressBar: true,
-          toastBackgroundColor: "#1aa18f",
-          timeout: 5000,
-          showIcon: true,
-          type: "success",
-        });
-        createToast(`Table may take sometime to update the changes`, {
-          position: "top-right",
-          hideProgressBar: true,
-          toastBackgroundColor: "#1aa18f",
-          timeout: 5000,
-          showIcon: true,
-          type: "info",
-        });
+        createCustomToast("Transaction succeeded node ${props.nodeId} Reserved", ToastType.success);
+        createCustomToast("Table may take sometime to update the changes", ToastType.info);
+
         emit("updateTable");
       } catch (e) {
         console.log("Error: ", e);
-        createToast(e as string, {
-          position: "top-right",
-          hideProgressBar: true,
-          toastBackgroundColor: "#FF5252",
-          timeout: 5000,
-          showIcon: true,
-          type: "danger",
-        });
+        createCustomToast(e as string, ToastType.danger);
         loadingReserveNode.value = false;
       }
     }
