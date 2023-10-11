@@ -33,10 +33,12 @@
           <v-col cols="1" sm="10" class="my-4">
             <v-list-item> {{ profileManager.profile?.twinId.toString() }} </v-list-item>
             <v-divider></v-divider>
-            <v-list-item>            <div style="display: flex; justify-content: space-between; align-items: center">
-                  <span>{{ profileManager.profile?.address }}</span>
-                  <v-icon @click="copy(profileManager.profile?.address as string)"> mdi-content-copy </v-icon>
-                </div> </v-list-item>
+            <v-list-item>
+              <div style="display: flex; justify-content: space-between; align-items: center">
+                <span>{{ profileManager.profile?.address }}</span>
+                <v-icon @click="copy(profileManager.profile?.address as string)"> mdi-content-copy </v-icon>
+              </div>
+            </v-list-item>
             <v-divider></v-divider>
             <v-list-item> {{ profileManager.profile?.relay }} </v-list-item>
           </v-col>
