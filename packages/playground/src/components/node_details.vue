@@ -211,11 +211,11 @@
                         dense
                         v-model="selectedGpuId"
                         :items="gpuItem.map(item => item.id)"
-                        @click:append-outer="copy(selectedGpuId)"
+                        @click:append-outer="copy(selectedGpuId || '')"
                       />
                       <v-text-field
                         v-else
-                        :value="selectedGpuItem.id"
+                        :value="selectedGpuItem?.id ?? null"
                         readonly
                         hide-details
                         class="mt-n2"
@@ -223,7 +223,7 @@
                         solo
                         style="max-width: 250px"
                       />
-                      <v-icon @click="copy(selectedGpuItem.id)">mdi-content-copy</v-icon>
+                      <v-icon @click="copy(selectedGpuItem.id || null)">mdi-content-copy</v-icon>
                     </v-col>
                   </v-list-item-content>
                 </v-list-item>
@@ -232,7 +232,7 @@
                 <v-list-item>
                   <v-list-item-content style="display: flex; justify-content: space-between; align-items: center">
                     <v-list-item-title>Vendor</v-list-item-title>
-                    {{ selectedGpuItem.vendor }}
+                    {{ selectedGpuItem.vendor || null }}
                   </v-list-item-content>
                 </v-list-item>
                 <v-divider></v-divider>
@@ -240,7 +240,7 @@
                 <v-list-item>
                   <v-list-item-content style="display: flex; justify-content: space-between; align-items: center">
                     <v-list-item-title>Device</v-list-item-title>
-                    {{ selectedGpuItem.device }}
+                    {{ selectedGpuItem.device || null }}
                   </v-list-item-content>
                 </v-list-item>
                 <v-divider></v-divider>
@@ -254,7 +254,7 @@
                         style="display: flex; justify-content: space-between; align-items: center"
                       >
                         <v-list-item-title> Contract ID</v-list-item-title>
-                        {{ selectedGpuItem.contract }}
+                        {{ selectedGpuItem.contract || null }}
                       </v-list-item-content>
                     </template>
                     <span>The contract id that reserves this GPU card</span>
@@ -287,8 +287,8 @@ const publicIps = ref(0);
 const loading = ref(false);
 const gpuItem = ref<any[]>([]);
 const Items = ref<any[]>();
-const selectedGpuItem = ref(null);
-const selectedGpuId = ref(null);
+const selectedGpuItem = ref<any>();
+const selectedGpuId = ref("");
 const gpuLoadingError = ref(false);
 
 const props = defineProps({
