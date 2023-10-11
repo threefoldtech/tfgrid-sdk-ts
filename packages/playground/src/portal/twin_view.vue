@@ -1,51 +1,49 @@
 <template>
-  <div class="mt-8">
-    <v-container v-if="editingTwin">
-      <v-dialog v-model="editingTwin" max-width="600">
-        <v-card>
-          <v-toolbar color="primary" dark class="custom-toolbar">Edit Twin</v-toolbar>
-          <div class="text-h2 pa-10">
-            <v-text-field v-model="relay" outlined label="Relay" :error-messages="errorMsg"></v-text-field>
-          </div>
-          <v-card-actions class="justify-end pa-5">
-            <v-btn @click="editingTwin = false" class="grey lighten-2 black--text">Close</v-btn>
-            <v-btn @click="UpdateRelay" class="primary white--text">Save</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-container>
-
-    <v-container class="custom-container">
-      <v-card color="primary" class="my-3 pa-3 text-center">
-        <v-icon width="26">mdi-account-supervisor-outline</v-icon>
-        <h2>Twin Details</h2>
-      </v-card>
-
+  <v-container v-if="editingTwin">
+    <v-dialog v-model="editingTwin" max-width="600">
       <v-card>
-        <v-list class="custom-list">
-          <v-row>
-            <v-col cols="1" sm="2" class="column-style">
-              <v-list-item> ID </v-list-item>
-              <v-divider></v-divider>
-              <v-list-item> Address </v-list-item>
-              <v-divider></v-divider>
-              <v-list-item> Relay </v-list-item>
-            </v-col>
-            <v-col cols="1" sm="10">
-              <v-list-item> {{ profileManager.profile?.twinId.toString() }} </v-list-item>
-              <v-divider></v-divider>
-              <v-list-item> {{ profileManager.profile?.address }} </v-list-item>
-              <v-divider></v-divider>
-              <v-list-item> {{ profileManager.profile?.relay }} </v-list-item>
-            </v-col>
-          </v-row>
-        </v-list>
-        <v-card-actions v-if="updateRelay" class="justify-end mx-4 mb-4">
-          <v-btn class="custom-button bg-primary" @click="editTwin">Edit</v-btn>
+        <v-toolbar color="primary" dark class="custom-toolbar">Edit Twin</v-toolbar>
+        <div class="text-h2 pa-10">
+          <v-text-field v-model="relay" outlined label="Relay" :error-messages="errorMsg"></v-text-field>
+        </div>
+        <v-card-actions class="justify-end pa-5">
+          <v-btn @click="editingTwin = false" class="grey lighten-2 black--text">Close</v-btn>
+          <v-btn @click="UpdateRelay" class="primary white--text">Save</v-btn>
         </v-card-actions>
       </v-card>
-    </v-container>
-  </div>
+    </v-dialog>
+  </v-container>
+
+  <v-container class="custom-container">
+    <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-account-supervisor-outline</v-icon>
+      <v-card-title class="pa-0">Twin Details</v-card-title>
+    </v-card>
+
+    <v-card>
+      <v-list class="custom-list">
+        <v-row>
+          <v-col cols="1" sm="2" class="column-style my-4">
+            <v-list-item> ID </v-list-item>
+            <v-divider></v-divider>
+            <v-list-item> Address </v-list-item>
+            <v-divider></v-divider>
+            <v-list-item> Relay </v-list-item>
+          </v-col>
+          <v-col cols="1" sm="10" class="my-4">
+            <v-list-item> {{ profileManager.profile?.twinId.toString() }} </v-list-item>
+            <v-divider></v-divider>
+            <v-list-item> {{ profileManager.profile?.address }} </v-list-item>
+            <v-divider></v-divider>
+            <v-list-item> {{ profileManager.profile?.relay }} </v-list-item>
+          </v-col>
+        </v-row>
+      </v-list>
+      <v-card-actions v-if="updateRelay" class="justify-end mx-4 mb-4">
+        <v-btn class="custom-button bg-primary" @click="editTwin">Edit</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-container>
 </template>
 
 <script lang="ts" setup>
@@ -105,7 +103,7 @@ async function UpdateRelay() {
 
 .custom-list {
   overflow: hidden;
-  font-size: 20px;
+  font-size: 1rem;
   padding: 10px;
 }
 
