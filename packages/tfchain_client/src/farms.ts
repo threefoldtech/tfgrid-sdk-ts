@@ -92,7 +92,7 @@ class Farms extends QueryFarms {
 
   @checkConnection
   async addStellarAddress(options: AddStellarOptions) {
-    const extrinsic = this.client.api.tx.tfgridModule.addStellaPayoutV2address(options.farmId, options.stellarAddress);
+    const extrinsic = this.client.api.tx.tfgridModule.addStellarPayoutV2address(options.farmId, options.stellarAddress);
     return this.client.patchExtrinsic(extrinsic);
   }
 }

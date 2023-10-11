@@ -29,8 +29,52 @@
               </v-col>
             </v-row>
             <PublicIPsTable :farmId="item.columns.farmId" />
+            <v-row class="d-flex justify-center pb-5">
+              <v-card-actions>
+                <v-btn class="bg-primary" v-bind:href="'https://v3.bootstrap.grid.tf/'" target="blank"
+                  >Bootstrap Node Image</v-btn
+                >
+                <v-btn class="bg-primary" @click="showDialogue = true">Add Stellar Payout Address</v-btn>
+              </v-card-actions>
+            </v-row>
           </td>
         </tr>
+
+        <v-container v-if="showDialogue">
+          <v-dialog v-model="showDialogue" max-width="600">
+            <v-card>
+              <v-toolbar color="primary" dark>
+                <v-toolbar-title class="custom-toolbar_title mb-6"> Add/Edit Stellar V2 Address </v-toolbar-title>
+              </v-toolbar>
+              <div class="pt-6 px-6">
+                <form-validator v-model="valid">
+                  <input-validator
+                    :value="address"
+                    :rules="[validators.required('Address is required.'), customStellarValidation]"
+                    #="{ props }"
+                  >
+                    <v-text-field
+                      v-model="address"
+                      v-bind="props"
+                      outlined
+                      label="Stellar Wallet Address"
+                    ></v-text-field>
+                  </input-validator>
+                </form-validator>
+              </div>
+              <v-card-actions class="justify-end px-5 pb-5 pt-0">
+                <v-btn
+                  color="primary"
+                  variant="tonal"
+                  @click="setStellarAddress(item.raw.farmId, address)"
+                  :disabled="!valid"
+                  >Submit</v-btn
+                >
+                <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </v-container>
       </template>
     </v-data-table>
   </div>
@@ -38,9 +82,11 @@
 
 <script lang="ts">
 import type { FarmInfo } from "@threefold/grid_client";
+import { StrKey } from "stellar-sdk";
 import { onMounted, ref } from "vue";
 
 import { useGrid, useProfileManager } from "../../../stores";
+import { createCustomToast, ToastType } from "../../../utils/custom_toast";
 import PublicIPsTable from "./public_ips_table.vue";
 
 export default {
@@ -87,31 +133,18 @@ export default {
     ] as any[];
     const expanded = ref<any[]>();
     const farms = ref<FarmInfo[]>();
+    const showDialogue = ref(false);
+    const valid = ref(false);
+    const address = ref();
+    const isValidAddress = ref(false);
 
     onMounted(async () => {
       await getUserFarms();
     });
 
-    function customSearch(search: string, item: any) {
-      // Define the columns you want to filter by
-      const columnsToFilter = ["farmId", "name"];
-
-      // Loop through the columns and check if the search term matches any of them
-      for (const column of columnsToFilter) {
-        const cellValue = item[column].toString().toLowerCase();
-        if (cellValue.includes(search.toLowerCase())) {
-          return true; // Include the item in the filtered results
-        }
-      }
-
-      return false; // Exclude the item from the filtered results
-    }
-
     async function getUserFarms() {
       try {
         const userFarms = await gridStore.grid.capacity.getUserFarms({ twinId });
-        console.log("userFarms", userFarms);
-
         farms.value = userFarms;
         return userFarms;
       } catch (error) {
@@ -121,10 +154,23 @@ export default {
 
     async function setStellarAddress(farmId: number, stellarAddress: string) {
       try {
-        return await gridStore.grid.farms.addStellarAddress({ farmId, stellarAddress });
+        await gridStore.grid.farms.addStellarAddress({ farmId, stellarAddress });
+        createCustomToast("Address Added successfully!", ToastType.success);
+        showDialogue.value = false;
       } catch (error) {
         console.log(error);
+        createCustomToast("Failed to add address!", ToastType.danger);
       }
+    }
+
+    function customStellarValidation() {
+      isValidAddress.value = StrKey.isValidEd25519PublicKey(address.value);
+      if (!isValidAddress.value) {
+        return {
+          message: "Address is not valid.",
+        };
+      }
+      return undefined;
     }
 
     return {
@@ -133,9 +179,13 @@ export default {
       farms,
       expanded,
       search,
-      customSearch,
+      showDialogue,
+      address,
+      valid,
+      isValidAddress,
       getUserFarms,
       setStellarAddress,
+      customStellarValidation,
     };
   },
 };
@@ -143,5 +193,9 @@ export default {
 <style scoped>
 .v-toolbar {
   height: 2.5rem !important;
+}
+
+.custom-toolbar_title {
+  font-size: 1rem !important;
 }
 </style>
