@@ -1,12 +1,18 @@
 <template>
   <container>
-    <v-dialog v-model="openUnreserveDialog" max-width="600">
+    <v-dialog v-model="openUnreserveDialog" max-width="600" class="custom-dialog">
       <v-card>
-        <v-card-title> Are you sure you want to unreserve this dedicated node? </v-card-title>
+        <v-card-title class="pt-4">
+          <span style="display: flex; align-items: center">
+            <v-icon color="warning" style="margin-right: 8px">mdi-alert</v-icon>
+            Are you sure you want to unreserve this dedicated node?
+          </span>
+        </v-card-title>
+        <v-divider style="color: #1aa18f" />
         <v-card-text>This will free up the node for others on the chain</v-card-text>
         <v-card-actions class="justify-end">
-          <v-btn @click="unReserveNode" :loading="loadingUnreserveNode">Yes</v-btn>
-          <v-btn @click="openUnreserveDialog = false">No</v-btn>
+          <v-btn variant="outlined" color="primary" @click="unReserveNode" :loading="loadingUnreserveNode">Yes</v-btn>
+          <v-btn variant="outlined" color="primary" @click="openUnreserveDialog = false">No</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

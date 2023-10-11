@@ -67,7 +67,7 @@
                 </li>
                 <li>
                   You're receiving {{ item.raw.discount }}% discount as per the
-                  <a target="_blank" href="https://manual.grid.tf/cloud/cloudunits_pricing.html#discount-levels">
+                  <a target="_blank" href="https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount">
                     <p style="display: inline">discount levels</p>
                   </a>
                 </li>
@@ -185,7 +185,6 @@ const _loadData = async () => {
 
     const pricePromises = data.data.map(async item => {
       const fee = await grid?.contracts.getDedicatedNodeExtraFee({ nodeId: item.nodeId });
-
       const price = await grid?.calculator.calculateWithMyBalance({
         cru: item.total_resources.cru,
         hru: toGigaBytes(item.total_resources.hru.toString()),
@@ -197,7 +196,7 @@ const _loadData = async () => {
       return {
         ...item,
         price: (price?.dedicatedPrice ?? 0 + (fee || 0)).toFixed(3),
-        discount: price?.sharedPackage ?? 0,
+        discount: price?.sharedPackage.discount ?? 0,
       };
     });
 

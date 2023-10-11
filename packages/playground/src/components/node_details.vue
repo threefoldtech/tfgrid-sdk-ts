@@ -5,7 +5,22 @@
     </div>
   </td>
   <td :colspan="columnsLen" v-else-if="dNodeError" style="text-align: center">
-    <strong style="color: #f44336">Failed to retrieve Node details</strong>
+    <div class="pt-4">
+      <v-alert
+        variant="tonal"
+        class="d-flex justify-between"
+        color="#f44336"
+        dense
+        outlined
+        type="error"
+        style="text-align: center"
+      >
+        <div style="display: flex; align-items: center">Failed to retrieve Node details.</div>
+        <template v-slot:append>
+          <v-icon @click="getNodeDetails" style="cursor: pointer">mdi-reload</v-icon>
+        </template>
+      </v-alert>
+    </div>
   </td>
 
   <td :colspan="columnsLen" v-else>
@@ -29,8 +44,8 @@
             <v-divider></v-divider>
             <v-list-item>
               <v-list-item-content style="display: flex; justify-content: space-between; align-items: center">
-                <v-list-item-title>Disk (HDD)</v-list-item-title>
-                {{ toTeraOrGigaOrPeta(item.value.total_resources.hru) }}
+                <v-list-item-title>Memory</v-list-item-title>
+                {{ toTeraOrGigaOrPeta(item.value.total_resources.mru) }}
               </v-list-item-content>
             </v-list-item>
             <v-divider></v-divider>
@@ -43,8 +58,8 @@
             <v-divider></v-divider>
             <v-list-item>
               <v-list-item-content style="display: flex; justify-content: space-between; align-items: center">
-                <v-list-item-title>Memory</v-list-item-title>
-                {{ toTeraOrGigaOrPeta(item.value.total_resources.mru) }}
+                <v-list-item-title>Disk (HDD)</v-list-item-title>
+                {{ toTeraOrGigaOrPeta(item.value.total_resources.hru) }}
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -77,15 +92,15 @@
             <v-divider></v-divider>
             <v-list-item>
               <v-list-item-content style="display: flex; justify-content: space-between; align-items: center">
-                <v-list-item-title>Longitude</v-list-item-title>
-                {{ item.value.location.longitude }}
+                <v-list-item-title>Latitude</v-list-item-title>
+                {{ item.value.location.latitude }}
               </v-list-item-content>
             </v-list-item>
             <v-divider></v-divider>
             <v-list-item>
               <v-list-item-content style="display: flex; justify-content: space-between; align-items: center">
-                <v-list-item-title>Latitude</v-list-item-title>
-                {{ item.value.location.latitude }}
+                <v-list-item-title>Longitude</v-list-item-title>
+                {{ item.value.location.longitude }}
               </v-list-item-content>
             </v-list-item>
           </v-list>
@@ -144,10 +159,28 @@
           </v-card>
 
           <!-- Details -->
-          <v-row v-if="loading">
+          <v-row v-if="loading && !gpuLoadingError">
             <v-col cols="12" class="text-center pt-12">
               <v-progress-circular indeterminate size="64" color="primary"></v-progress-circular>
             </v-col>
+          </v-row>
+          <v-row v-else-if="gpuLoadingError" style="display: flex; justify-content: center; align-items: center">
+            <div class="pt-10">
+              <v-alert
+                variant="tonal"
+                class="d-flex justify-between"
+                color="#f44336"
+                dense
+                outlined
+                type="error"
+                style="text-align: center"
+              >
+                <div style="display: flex; align-items: center">Failed to receive node GPUs information</div>
+                <template v-slot:append>
+                  <v-icon @click="loadGPUitems" style="cursor: pointer">mdi-reload</v-icon>
+                </template>
+              </v-alert>
+            </div>
           </v-row>
           <v-row v-else-if="gpuItem && gpuItem.length !== 0">
             <v-col cols="12">
@@ -176,14 +209,13 @@
                         append-outer-icon="mdi-content-copy"
                         hide-details
                         dense
-                        v-model="gpuItem[0].id"
-                        :items="gpuItem"
-                        @input.native="gpuItem = $event.srcElement.value.value"
-                        @click:append-outer="copy(gpuItem[0].id)"
+                        v-model="selectedGpuId"
+                        :items="gpuItem.map(item => item.id)"
+                        @click:append-outer="copy(selectedGpuId)"
                       />
                       <v-text-field
                         v-else
-                        :value="gpuItem[0].id"
+                        :value="selectedGpuItem.id"
                         readonly
                         hide-details
                         class="mt-n2"
@@ -191,7 +223,7 @@
                         solo
                         style="max-width: 250px"
                       />
-                      <v-icon @click="copy(gpuItem[0].id)">mdi-content-copy</v-icon>
+                      <v-icon @click="copy(selectedGpuItem.id)">mdi-content-copy</v-icon>
                     </v-col>
                   </v-list-item-content>
                 </v-list-item>
@@ -200,7 +232,7 @@
                 <v-list-item>
                   <v-list-item-content style="display: flex; justify-content: space-between; align-items: center">
                     <v-list-item-title>Vendor</v-list-item-title>
-                    {{ gpuItem[0].vendor }}
+                    {{ selectedGpuItem.vendor }}
                   </v-list-item-content>
                 </v-list-item>
                 <v-divider></v-divider>
@@ -208,7 +240,7 @@
                 <v-list-item>
                   <v-list-item-content style="display: flex; justify-content: space-between; align-items: center">
                     <v-list-item-title>Device</v-list-item-title>
-                    {{ gpuItem[0].device }}
+                    {{ selectedGpuItem.device }}
                   </v-list-item-content>
                 </v-list-item>
                 <v-divider></v-divider>
@@ -222,7 +254,7 @@
                         style="display: flex; justify-content: space-between; align-items: center"
                       >
                         <v-list-item-title> Contract ID</v-list-item-title>
-                        {{ gpuItem[0].contract }}
+                        {{ selectedGpuItem.contract }}
                       </v-list-item-content>
                     </template>
                     <span>The contract id that reserves this GPU card</span>
@@ -239,7 +271,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 
 import { gridProxyClient } from "../clients";
 import { useProfileManager } from "../stores";
@@ -253,7 +285,11 @@ const dNodeLoading = ref(true);
 const farmName = ref("");
 const publicIps = ref(0);
 const loading = ref(false);
-const gpuItem = ref<any[]>();
+const gpuItem = ref<any[]>([]);
+const Items = ref<any[]>();
+const selectedGpuItem = ref(null);
+const selectedGpuId = ref(null);
+const gpuLoadingError = ref(false);
 
 const props = defineProps({
   item: {
@@ -267,6 +303,10 @@ const props = defineProps({
 });
 
 onMounted(async () => {
+  getNodeDetails();
+});
+
+async function getNodeDetails() {
   try {
     const res = await gridProxyClient.farms.list({ farmId: props.item.value.farmId });
     farmName.value = res.data[0].name;
@@ -277,7 +317,7 @@ onMounted(async () => {
     dNodeError.value = true;
   }
   dNodeLoading.value = false;
-});
+}
 
 function getColSize() {
   if (props.item.num_gpu > 0) {
@@ -292,9 +332,12 @@ async function loadGPUitems() {
   try {
     const grid = await getGrid(profileManager.profile!);
     gpuItem.value = await grid?.zos.getNodeGPUInfo({ nodeId: props.item.value.nodeId });
+    selectedGpuItem.value = gpuItem.value[0];
+    selectedGpuId.value = gpuItem.value[0].id;
     loading.value = false;
   } catch (e) {
     console.log("Error: ", e);
+    gpuLoadingError.value = true;
     createCustomToast("Failed to load GPU details", ToastType.danger);
   }
 }
@@ -303,6 +346,10 @@ function copy(id: string) {
   navigator.clipboard.writeText(id);
   createCustomToast("GPU ID copied to clipboard", ToastType.success);
 }
+
+watch(selectedGpuId, (newGpuId, oldGpuId) => {
+  selectedGpuItem.value = gpuItem.value.find(item => item.id === newGpuId);
+});
 </script>
 
 <style></style>
