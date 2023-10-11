@@ -34,7 +34,7 @@
                 <v-btn class="bg-primary" v-bind:href="'https://v3.bootstrap.grid.tf/'" target="blank"
                   >Bootstrap Node Image</v-btn
                 >
-                <v-btn class="bg-primary" @click="showDialogue = true">Add Stellar Payout Address</v-btn>
+                <v-btn class="bg-primary" @click="showDialogue = true">Add/Edit Stellar Payout Address</v-btn>
               </v-card-actions>
             </v-row>
           </td>

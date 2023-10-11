@@ -1,4 +1,4 @@
-<template v-if="publicIps.length || isRemoved">
+<template v-if="isRemoved">
   <div class="my-6">
     <v-data-table :headers="headers" :items="publicIps" item-value="name" class="elevation-1">
       <template v-slot:top>

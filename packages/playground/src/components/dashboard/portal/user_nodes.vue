@@ -7,33 +7,221 @@
       :headers="headers"
       :items="nodes"
       single-expand="true"
-      show-expand
       :expanded.sync="expanded"
+      show-expand
       item-value="name"
     >
-      <template v-slot:expanded-item="{ item }">
+      <template v-slot:expanded-row="{ columns, item }">
         <tr>
-          <td>
-            {{ item.name }}
+          <td :colspan="columns.length" key="item.id">
+            <v-container>
+              <v-card outlined>
+                <v-card-title>
+                  <span class="headline">Node Details</span>
+                </v-card-title>
+                <v-card-text>
+                  <v-row :justify="'space-around'">
+                    <v-col cols="8">
+                      <v-row no-gutters>
+                        <v-col col="2">
+                          <span>Node ID</span>
+                        </v-col>
+                        <v-col cols="9">
+                          <span>{{ item.raw.nodeId }}</span>
+                        </v-col>
+                      </v-row>
+
+                      <v-row no-gutters>
+                        <v-col col="2">
+                          <span>Farm ID</span>
+                        </v-col>
+                        <v-col cols="9">
+                          <span>{{ item.raw.farmId }}</span>
+                        </v-col>
+                      </v-row>
+
+                      <v-row no-gutters>
+                        <v-col col="2">
+                          <span>Twin ID</span>
+                        </v-col>
+                        <v-col cols="9">
+                          <span>{{ item.raw.twinId }}</span>
+                        </v-col>
+                      </v-row>
+
+                      <v-row no-gutters>
+                        <v-col col="2">
+                          <span>Certification</span>
+                        </v-col>
+                        <v-col cols="9">
+                          <span>{{ item.raw.certificationType }}</span>
+                        </v-col>
+                      </v-row>
+
+                      <v-row no-gutters>
+                        <v-col col="2">
+                          <span>First boot at</span>
+                        </v-col>
+                        <v-col cols="9">
+                          <span>{{ new Date(parseInt(item.raw.created) * 1000) }}</span>
+                        </v-col>
+                      </v-row>
+
+                      <v-row no-gutters>
+                        <v-col col="2">
+                          <span>Updated at</span>
+                        </v-col>
+                        <v-col cols="9">
+                          <span>{{ new Date(parseInt(item.raw.updatedAt) * 1000) }}</span>
+                        </v-col>
+                      </v-row>
+
+                      <v-row no-gutters>
+                        <v-col col="2">
+                          <span>Country</span>
+                        </v-col>
+                        <v-col cols="9">
+                          <span>{{ item.raw.country }}</span>
+                        </v-col>
+                      </v-row>
+
+                      <v-row no-gutters>
+                        <v-col col="2">
+                          <span>City</span>
+                        </v-col>
+                        <v-col cols="9">
+                          <span>{{ item.raw.city }}</span>
+                        </v-col>
+                      </v-row>
+
+                      <v-row no-gutters>
+                        <v-col col="2">
+                          <span>Serial Number</span>
+                        </v-col>
+                        <v-col cols="9">
+                          <span>{{ item.raw.serialNumber }}</span>
+                        </v-col>
+                      </v-row>
+
+                      <v-row no-gutters>
+                        <v-col col="2">
+                          <span>Farming Policy ID</span>
+                        </v-col>
+                        <v-col cols="9">
+                          <span>{{ item.raw.farmingPolicyId }}</span>
+                        </v-col>
+                      </v-row>
+                    </v-col>
+                    <v-col cols="4" class="text-center" :align-self="'center'">
+                      <v-flex class="text-truncate font-weight-bold">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ props }">
+                            <v-progress-circular
+                              v-bind="props"
+                              :rotate="-90"
+                              :size="150"
+                              :width="12"
+                              :model-value="getNodeUptimePercentage(item.raw.uptime)"
+                              class="my-3"
+                              color="primary"
+                            />
+                            <p>Uptime: {{ getNodeUptimePercentage(item.raw.uptime) }}%</p>
+                          </template>
+                          <span>Current Node Uptime Percentage (since start of the current minting period)</span>
+                        </v-tooltip>
+                      </v-flex>
+                    </v-col>
+                  </v-row>
+                </v-card-text>
+              </v-card>
+            </v-container>
+
+            <v-expansion-panels v-model="resourcesPanel" :disabled="false" focusable>
+              <v-expansion-panel>
+                <v-expansion-panel-title> Resource Units Reserved </v-expansion-panel-title>
+                <v-expansion-panel-text>
+                  <v-row class="mt-5 mb-5">
+                    <v-col v-for="(value, key) in item.raw.total_resources" :key="key" align="center">
+                      <p class="text-center text-uppercase">{{ key }}</p>
+                      <v-flex class="text-truncate">
+                        <v-tooltip bottom class="d-none">
+                          <template v-slot:activator="{ props }">
+                            <v-progress-circular
+                              v-bind="props"
+                              :rotate="-90"
+                              :size="150"
+                              :width="12"
+                              :model-value="isNaN(getPercentage(item.raw, key)) ? 0 : getPercentage(item.raw, key)"
+                              class="my-3"
+                              color="primary"
+                            />
+                            <template v-if="item.value.used_resources">
+                              <p v-if="item.value.total_resources[key] > 1000">
+                                {{ byteToGB(item.value.used_resources[key]) }} /
+                                {{ byteToGB(item.value.total_resources[key]) }} GB
+                              </p>
+
+                              <p v-else-if="item.value.total_resources[key] == 0">NA</p>
+                              <p v-else>
+                                {{ item.value.used_resources[key] }} /
+                                {{ item.value.total_resources[key] }}
+                              </p>
+                            </template>
+                          </template>
+                        </v-tooltip>
+                      </v-flex>
+                    </v-col>
+                  </v-row>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+            </v-expansion-panels>
+            <v-expansion-panels v-if="network == 'dev'" v-model="receiptsPanel" :disabled="false" focusable single>
+              <v-expansion-panel>
+                <v-expansion-panel-title> Node Statistics </v-expansion-panel-title>
+                <v-expansion-panel-text>
+                  <NodeMintingDetails :node="item.raw" />
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+            </v-expansion-panels>
           </td>
         </tr>
+      </template>
+
+      <template #[`item.status`]="{ item }">
+        <v-chip :color="getColor(item.raw.status)">
+          {{ item.raw.status }}
+        </v-chip>
+      </template>
+
+      <template #[`item.actions`]="{ item }">
+        <v-icon size="small" class="me-2"> mdi-earth </v-icon>
+        <v-icon size="small"> mdi-code-string </v-icon>
+
+        {{ item }}
       </template>
     </v-data-table>
   </div>
 </template>
 
 <script lang="ts">
-import type { NodeInfo } from "@threefold/grid_client";
 import { onMounted, ref } from "vue";
 
+import type { NodeInterface } from "@/utils/node";
+
+import { gridProxyClient } from "../../../clients";
 import { useGrid, useProfileManager } from "../../../stores";
+import { createCustomToast, ToastType } from "../../../utils/custom_toast";
+import NodeMintingDetails from "./NodeMintingDetails.vue";
 
 export default {
   name: "UserNodes",
+  components: {
+    NodeMintingDetails,
+  },
   setup() {
     const gridStore = useGrid();
     const profileManager = useProfileManager();
-    const nodes = ref<NodeInfo[]>();
+    const nodes = ref<NodeInterface[]>();
     const headers = [
       {
         title: "Node ID",
@@ -60,29 +248,77 @@ export default {
         align: "center",
         key: "status",
       },
+      {
+        title: "Actions",
+        align: "center",
+        key: "actions",
+      },
     ] as any[];
+
     const expanded = ref<any[]>();
+    const network = process.env.NETWORK || window.env.NETWORK;
     onMounted(async () => {
       await getUserNodes();
     });
+    const resourcesPanel = ref([]);
+    const receiptsPanel = ref([]);
+
     async function getUserNodes() {
       try {
         const twinId = profileManager.profile!.twinId;
-        // const userNodes = await gridStore.grid.capacity.getUserNodes({ twinId });
-        // nodes.value = userNodes;
-        // console.log("nodes.value", nodes.value);
-
-        // return userNodes;
+        const userFarms = await gridStore.grid.capacity.getUserFarms({ twinId });
+        const farmIds = userFarms.map(farm => farm.farmId).join(",");
+        const { data } = await gridProxyClient.nodes.list({ farmIds }, { loadStats: true });
+        nodes.value = data as unknown as NodeInterface[];
+        console.log("nodes.value", nodes.value);
       } catch (error) {
         console.log(error);
+        createCustomToast("Failed to get user nodes!", ToastType.danger);
       }
     }
+
+    function getColor(status: string) {
+      return status === "down" ? "red" : "primary";
+    }
+
+    function getNodeUptimePercentage(node: NodeInterface) {
+      return (
+        ((node.availability?.currentPeriod - node.availability?.downtime) / node.availability?.currentPeriod) *
+        100
+      ).toFixed(2);
+    }
+
+    function getPercentage(item: any, type: any) {
+      if (!item.used_resources) return 0;
+      const reservedResources = item.used_resources[type];
+      const totalResources = item.total_resources[type];
+      if (reservedResources === 0 && totalResources === 0) return 0;
+      return (reservedResources / totalResources) * 100;
+    }
+
+    function byteToGB(capacity: number) {
+      return (capacity / 1024 / 1024 / 1024).toFixed(2);
+    }
+
     return {
-      getUserNodes,
       nodes,
       headers,
       expanded,
+      network,
+      resourcesPanel,
+      receiptsPanel,
+      getUserNodes,
+      getColor,
+      getNodeUptimePercentage,
+      getPercentage,
+      byteToGB,
     };
   },
 };
 </script>
+
+<style scoped>
+.v-table .v-table__wrapper > table > tbody > tr:not(:last-child) > td {
+  border-bottom: none;
+}
+</style>
