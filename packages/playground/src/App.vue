@@ -406,7 +406,7 @@ a {
 
 .custom-toolbar-title {
   max-width: 17rem !important;
-
+}
 .mosha__toast__content-wrapper {
   margin-bottom: -2px;
 }
