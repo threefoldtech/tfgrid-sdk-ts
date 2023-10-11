@@ -46,7 +46,7 @@ else ifeq ($(project), graphql_client)
 else ifeq ($(project), gridproxy_client)
 	cd packages/gridproxy_client && yarn build
 else ifeq ($(project), UI)
-	cd packages/UI && yarn build-only
+	cd packages/UI && yarn build
 else
 	yarn lerna run build --no-private
 endif

@@ -27,8 +27,7 @@ type Payload = {
 
 const verify = async (payload: Payload) => {
   try {
-    const content = Uint8Array.from(Buffer.from(payload.content || "", "base64"));
-    const hash = MD5(content.toString()).toString();
+    const hash = MD5(payload.content!).toString();
 
     const messageBytes = Uint8Array.from(Buffer.from(hash.toString(), "hex"));
     const keyring = new Keyring({ type: payload.keypairType });
@@ -38,9 +37,8 @@ const verify = async (payload: Payload) => {
     const key = keyring.addFromAddress(payload.pubkey);
     const sig = Uint8Array.from(Buffer.from(payload.signature, "hex"));
 
-    // Verify the signature
-    const isValid = key.verify(messageBytes, sig, key.publicKey);
-    return { isValid };
+    // Verify and return the signature
+    return key.verify(messageBytes, sig, key.publicKey);
   } catch (error) {
     console.error(error);
     // Handle any errors that occur during the verification process
@@ -50,16 +48,12 @@ const verify = async (payload: Payload) => {
 
 app.post("/api/verify", async (req: Request, res: Response) => {
   const payload: Payload = req.body;
-  let content: Uint8Array = new Uint8Array();
   try {
     if (payload.pdfUrl) {
       const response = await axios.get(payload.pdfUrl, { responseType: "arraybuffer" });
-      content = Uint8Array.from(Buffer.from(response.data, "base64"));
-    } else {
-      content = Uint8Array.from(Buffer.from(payload.content || "", "base64"));
+      payload.content = Uint8Array.from(Buffer.from(response.data, "base64")).toString();
     }
 
-    payload.content = content.toString();
     const verified = await verify(payload);
 
     if (verified) {

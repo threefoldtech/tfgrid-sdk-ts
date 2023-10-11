@@ -16,7 +16,7 @@ class TwinDeploymentHandler {
   nodes: Nodes;
 
   constructor(public config: GridClientConfig) {
-    this.tfclient = new TFClient(config.substrateURL, config.mnemonic, config.storeSecret, config.keypairType);
+    this.tfclient = config.tfclient;
     this.deploymentFactory = new DeploymentFactory(this.config);
     this.rmb = new RMB(config.rmbClient);
     this.nodes = new Nodes(this.config.graphqlURL, this.config.proxyURL, this.config.rmbClient);
@@ -59,7 +59,7 @@ class TwinDeploymentHandler {
   }
 
   async getDeployment(contract_id: number) {
-    const node_id = await this.nodes.getNodeIdFromContractId(contract_id, this.config.mnemonic);
+    const node_id = await this.nodes.getNodeIdFromContractId(contract_id, this.config.substrateURL);
     const node_twin_id = await this.nodes.getNodeTwinId(node_id);
 
     const payload = JSON.stringify({ contract_id: contract_id });
@@ -83,7 +83,7 @@ class TwinDeploymentHandler {
 
   async waitForDeployment(twinDeployment: TwinDeployment, timeout = this.config.deploymentTimeoutMinutes) {
     const contract_id = twinDeployment.deployment.contract_id;
-    const node_id = await this.nodes.getNodeIdFromContractId(contract_id, this.config.mnemonic);
+    const node_id = await this.nodes.getNodeIdFromContractId(contract_id, this.config.substrateURL);
 
     const now = new Date().getTime();
     while (new Date().getTime() < now + timeout * 1000 * 60) {
@@ -265,6 +265,43 @@ class TwinDeploymentHandler {
     return deployments;
   }
 
+  async checkFarmIps(twinDeployments: TwinDeployment[]) {
+    const farmIPs: Map<number, number> = new Map();
+
+    for (const twinDeployment of twinDeployments) {
+      if (twinDeployment.operation !== Operations.deploy) {
+        continue;
+      }
+
+      if (twinDeployment.publicIps === 0) {
+        continue;
+      }
+
+      const node = await this.nodes.getNode(twinDeployment.nodeId);
+      if (!node) {
+        continue;
+      }
+      if (!farmIPs.has(node.farmId)) {
+        farmIPs.set(node.farmId, twinDeployment.publicIps);
+      } else {
+        farmIPs.set(node.farmId, farmIPs.get(node.farmId)! + twinDeployment.publicIps);
+      }
+    }
+
+    for (const farmId of farmIPs.keys()) {
+      const _farm = await this.tfclient.farms.get({ id: farmId });
+      const freeIps = _farm.publicIps.filter(res => res.contractId === 0).length;
+
+      if (freeIps < farmIPs.get(farmId)!) {
+        throw Error(
+          `Farm ${farmId} doesn't have enough public IPs: requested IPs=${farmIPs.get(
+            farmId,
+          )}, available IPs=${freeIps}`,
+        );
+      }
+    }
+  }
+
   async checkNodesCapacity(twinDeployments: TwinDeployment[]) {
     for (const twinDeployment of twinDeployments) {
       let workloads: Workload[] = [];
@@ -439,6 +476,8 @@ class TwinDeploymentHandler {
     twinDeployments = await this.merge(twinDeployments);
     await this.validate(twinDeployments);
     await this.checkNodesCapacity(twinDeployments);
+    await this.checkFarmIps(twinDeployments);
+
     const contracts = { created: [], updated: [], deleted: [] };
     const resultContracts = { created: [], updated: [], deleted: [] };
     let nodeExtrinsics: ExtrinsicResult<Contract>[] = [];

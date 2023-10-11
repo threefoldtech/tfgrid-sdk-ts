@@ -1,13 +1,13 @@
 <template>
-  <v-container>
-    <v-card color="primary" class="my-3 pa-3 text-center">
-      <v-icon width="26">mdi-account-arrow-right-outline</v-icon>
-      <h2>Transfer TFTs on the TFChain</h2>
+  <v-container class="custom-container">
+    <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-account-arrow-right-outline</v-icon>
+      <v-card-title class="pa-0">Transfer TFTs on the TFChain</v-card-title>
     </v-card>
     <v-card>
       <v-tabs v-model="activeTab" align-tabs="center">
-        <v-tab :value="0" color="primary">By Twin ID</v-tab>
-        <v-tab :value="1" color="primary">By Address</v-tab>
+        <v-tab :value="0" color="secondary">By Twin ID</v-tab>
+        <v-tab :value="1" color="secondary">By Address</v-tab>
       </v-tabs>
       <v-window v-model="activeTab">
         <!-- TwinID Transfer -->
@@ -119,11 +119,11 @@
 <script lang="ts" setup>
 import { Keyring } from "@polkadot/keyring";
 import type { Twin } from "@threefold/tfchain_client";
-import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useProfileManager } from "../stores";
+import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid, loadBalance } from "../utils/grid";
 
 const profileManagerController = useProfileManagerController();
@@ -208,12 +208,7 @@ async function transfer(receipientTwin: Twin) {
   try {
     if (grid) {
       await grid.balance.transfer({ address: receipientTwin.accountId, amount: transferAmount.value });
-      createToast("Transaction Complete!", {
-        position: "top-right",
-        hideProgressBar: true,
-        toastBackgroundColor: "green",
-        timeout: 5000,
-      });
+      createCustomToast("Transaction Complete!", ToastType.success);
       profileManagerController.reloadBalance();
       await getFreeBalance();
     }
@@ -227,12 +222,7 @@ async function submitFormAddress() {
   loadingAddressTransfer.value = false;
 }
 function createInvalidTransferToast(message: string) {
-  createToast(message, {
-    position: "top-right",
-    hideProgressBar: true,
-    toastBackgroundColor: "red",
-    timeout: 5000,
-  });
+  createCustomToast(message, ToastType.danger);
 }
 async function submitFormTwinID() {
   const grid = await getGrid(profile.value);

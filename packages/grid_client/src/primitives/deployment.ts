@@ -78,7 +78,7 @@ class DeploymentFactory {
         // Don't change the machine ip
         if (w.type === WorkloadTypes.zmachine) {
           const nodes = new Nodes(this.config.graphqlURL, this.config.proxyURL, this.config.rmbClient);
-          const node_id = await nodes.getNodeIdFromContractId(oldDeployment.contract_id, this.config.mnemonic);
+          const node_id = await nodes.getNodeIdFromContractId(oldDeployment.contract_id, this.config.substrateURL);
           const oldIp = workload.data["network"]["interfaces"][0]["ip"];
           const newIp = w.data["network"]["interfaces"][0]["ip"];
           if (newIp !== oldIp) {

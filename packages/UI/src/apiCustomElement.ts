@@ -178,8 +178,8 @@ export class VueElement extends BaseClass {
     );
 
     if (this._config.shadowRoot) {
-      if (this.shadowRoot && hydrate) {
-        hydrate(this._createVNode(), this._root!);
+      if (this._root && this.shadowRoot && hydrate) {
+        hydrate(this._createVNode(), this._root);
       } else {
         const __DEV__ = true;
         if (__DEV__ && this.shadowRoot) {
@@ -195,8 +195,8 @@ export class VueElement extends BaseClass {
         }
       }
     } else {
-      if (hydrate) {
-        hydrate(this._createVNode(), this._root!);
+      if (hydrate && this._root) {
+        hydrate(this._createVNode(), this._root);
       }
     }
   }
@@ -242,7 +242,9 @@ export class VueElement extends BaseClass {
     }
     nextTick(() => {
       if (!this._connected) {
-        render(null, this._root!);
+        if (this._root) {
+          render(null, this._root);
+        }
         this._instance = null;
       }
     });
@@ -262,7 +264,9 @@ export class VueElement extends BaseClass {
     // watch future attr changes
     this._ob = new MutationObserver(mutations => {
       for (const m of mutations) {
-        this._setAttr(m.attributeName!);
+        if (m.attributeName) {
+          this._setAttr(m.attributeName);
+        }
       }
     });
 
@@ -376,7 +380,9 @@ export class VueElement extends BaseClass {
   }
 
   private _update() {
-    render(this._createVNode(), this._root!);
+    if (this._root) {
+      render(this._createVNode(), this._root);
+    }
   }
 
   private _createVNode(): VNode<any, any> {
@@ -394,7 +400,7 @@ export class VueElement extends BaseClass {
           }
           return res;
         };
-        return this._slots!.map(ele => {
+        return this._slots?.map(ele => {
           const attrs = ele.attributes ? toObj(ele.attributes) : {};
           attrs.innerHTML = ele.innerHTML;
           return createVNode(ele.tagName, attrs, null);
@@ -402,56 +408,6 @@ export class VueElement extends BaseClass {
       };
     }
     const vnode = createVNode(this._def, extend({}, this._props), childs);
-    if (!this._instance) {
-      vnode.ce = (instance: ComponentInternalInstance | null) => {
-        this._instance = instance;
-        if (this._config.shadowRoot) {
-          instance.isCE = true;
-        }
-        // HMR
-        const __DEV__ = true;
-        if (__DEV__) {
-          instance.ceReload = (newStyles: string[] | undefined) => {
-            // always reset styles
-            if (this._styles) {
-              this._styles.forEach(s => this._root!.removeChild(s));
-              this._styles.length = 0;
-            }
-            this._applyStyles(newStyles);
-            this._instance = null;
-            this._update();
-          };
-        }
-
-        const dispatch = (event: string, args: any[]) => {
-          this.dispatchEvent(
-            new CustomEvent(event, {
-              detail: args,
-            }),
-          );
-        };
-
-        // intercept emit
-        instance.emit = (event: string, ...args: any[]) => {
-          // dispatch both the raw and hyphenated versions of an event
-          // to match Vue behavior
-          dispatch(event, args);
-          if (hyphenate(event) !== event) {
-            dispatch(hyphenate(event), args);
-          }
-        };
-
-        // locate nearest Vue custom element parent for provide/inject
-        let parent: Node | null = this;
-        while ((parent = parent && (parent.parentNode || (parent as ShadowRoot).host))) {
-          if (parent instanceof VueElement) {
-            instance.parent = parent._instance;
-            instance.provides = parent._instance!.provides;
-            break;
-          }
-        }
-      };
-    }
     return vnode;
   }
 
@@ -460,7 +416,7 @@ export class VueElement extends BaseClass {
       styles.forEach(css => {
         const s = document.createElement("style");
         s.textContent = css;
-        this._root!.appendChild(s);
+        this._root?.appendChild(s);
         // record for HMR
         const __DEV__ = true;
         if (__DEV__) {

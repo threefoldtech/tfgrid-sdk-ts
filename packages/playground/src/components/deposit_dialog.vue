@@ -40,7 +40,7 @@
               </v-col>
               <v-divider class="my-4" horizontal></v-divider>
             </v-row>
-            <v-alert type="warning" variant="tonal" class="d-flex row justify-start mb-6">
+            <v-alert type="warning" variant="tonal" class="d-flex row justify-start mb-6" color="primary">
               <p :style="{ maxWidth: '880px' }">
                 Amount: should be larger than {{ depositFee }}TFT (deposit fee is: {{ depositFee }}TFT)
               </p>
@@ -57,12 +57,12 @@
 
 <script setup lang="ts">
 import { Decimal } from "decimal.js";
-import { createToast } from "mosha-vue-toastify";
 import { onBeforeUnmount, onMounted, ref } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import QrcodeGenerator from "../components/qrcode_generator.vue";
 import { useProfileManager } from "../stores";
+import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid } from "../utils/grid";
 
 const depositDialog = ref(false);
@@ -107,27 +107,13 @@ onMounted(async () => {
     if (destroyed) return;
     const DecimalDeposit = new Decimal(receivedDeposit);
     const divisor = new Decimal(10000000);
-    createToast(`You have received ${DecimalDeposit.dividedBy(divisor)} TFT`, {
-      position: "bottom-right",
-      hideProgressBar: true,
-      toastBackgroundColor: "black",
-      timeout: 5000,
-      showIcon: true,
-      type: "success",
-    });
+    createCustomToast(`You have received ${DecimalDeposit.dividedBy(divisor)} TFT`, ToastType.success);
     await ProfileManagerController.reloadBalance();
     closeDialog();
   } catch (e) {
     if (destroyed) return;
     console.log(e);
-    createToast(e as string, {
-      position: "bottom-right",
-      hideProgressBar: true,
-      toastBackgroundColor: "red",
-      timeout: 5000,
-      showIcon: true,
-      type: "danger",
-    });
+    createCustomToast(e as string, ToastType.danger);
     closeDialog();
   }
 });
@@ -144,7 +130,7 @@ onBeforeUnmount(() => {
 
 <style>
 .bold-text {
-  font-weight: bold;
+  font-weight: 500;
   padding-left: 1rem;
 }
 </style>

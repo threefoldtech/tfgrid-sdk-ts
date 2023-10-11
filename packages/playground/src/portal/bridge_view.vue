@@ -1,30 +1,28 @@
 <template>
-  <div class="mt-8">
-    <v-container class="custom-container">
-      <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-        <v-icon size="30" class="pr-3">mdi-swap-horizontal</v-icon>
-        <v-card-title class="pa-0" lor="white">Transfer TFT Across Chains</v-card-title>
-      </v-card>
-      <v-card class="pa-5 my-5 white--text">
-        <v-row class="pa-5 text-center">
-          <v-col cols="12">
-            <v-select
-              :items="items"
-              label="Please select a chain:"
-              item-title="name"
-              item-value="id"
-              v-model="selectedItem"
-            ></v-select>
-          </v-col>
-        </v-row>
-        <v-row class="pa-4 px-8">
-          <v-btn color="primary" class="mr-2 bold-text" @click="openDepositDialog = true">Deposit</v-btn>
-          <v-btn color="black" class="mr-2 bold-text" @click="openWithdrawDialog = true">Withdraw</v-btn>
-          <v-btn color="blue" class="ml-auto bold-text" @click="navigation">Learn How?</v-btn>
-        </v-row>
-      </v-card>
-    </v-container>
-  </div>
+  <v-container class="custom-container">
+    <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-swap-horizontal</v-icon>
+      <v-card-title class="pa-0">Transfer TFT Across Chains</v-card-title>
+    </v-card>
+    <v-card class="pa-5 white--text">
+      <v-row class="pa-5 text-center">
+        <v-col cols="12">
+          <v-select
+            :items="items"
+            label="Please select a chain:"
+            item-title="name"
+            item-value="id"
+            v-model="selectedItem"
+          ></v-select>
+        </v-col>
+      </v-row>
+      <v-row class="pa-4 px-8">
+        <v-btn color="primary" class="mr-2" @click="openDepositDialog = true">Deposit</v-btn>
+        <v-btn variant="outlined" color="secondary" class="mr-2" @click="openWithdrawDialog = true">Withdraw</v-btn>
+        <v-btn color="blue" class="ml-auto" @click="navigation">Learn How?</v-btn>
+      </v-row>
+    </v-card>
+  </v-container>
 
   <!-- Deposit Dialog -->
   <deposit-dialog
@@ -92,12 +90,12 @@
 </template>
 
 <script lang="ts" setup>
-import { createToast } from "mosha-vue-toastify";
 import { default as StellarSdk, StrKey } from "stellar-sdk";
 import { onMounted, ref } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useProfileManager } from "../stores";
+import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid, loadBalance } from "../utils/grid";
 
 const profileManager = useProfileManager();
@@ -112,7 +110,7 @@ const target = ref("");
 const targetError = ref("");
 const validatingAddress = ref(false);
 const server = new StellarSdk.Server(window.env.STELLAR_HORIZON_URL);
-const amount = ref(0);
+const amount = ref(2);
 const freeBalance = ref(0);
 const loadingWithdraw = ref(false);
 const depositWallet = ref("");
@@ -182,7 +180,7 @@ async function validateAddress() {
     );
     if (!includes) throw new Error("invalid trustline");
   } catch (e) {
-    target.value =
+    targetError.value =
       (e as Error).message === "invalid trustline"
         ? "Address does not have a valid trustline to TFT"
         : "Address not found";
@@ -203,31 +201,17 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
 
     openWithdrawDialog.value = false;
     target.value = "";
-    amount.value = 0;
+    amount.value = 2;
     loadingWithdraw.value = false;
     await ProfileManagerController.reloadBalance();
-    createToast("Transaction Succeeded", {
-      position: "bottom-right",
-      hideProgressBar: true,
-      toastBackgroundColor: "black",
-      timeout: 5000,
-      showIcon: true,
-      type: "success",
-    });
+    createCustomToast("Transaction Succeeded", ToastType.success);
   } catch (e) {
     console.log("Error withdrawing, Error: ", e);
     openWithdrawDialog.value = false;
     target.value = "";
-    amount.value = 0;
+    amount.value = 2;
     loadingWithdraw.value = false;
-    createToast("Withdraw Failed!", {
-      position: "bottom-right",
-      hideProgressBar: true,
-      toastBackgroundColor: "red",
-      timeout: 5000,
-      showIcon: true,
-      type: "danger",
-    });
+    createCustomToast("Withdraw Failed!", ToastType.danger);
   }
 }
 </script>

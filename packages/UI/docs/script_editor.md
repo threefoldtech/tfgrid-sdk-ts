@@ -10,25 +10,60 @@
 
 ## Introduction
 
-The Script Editor Web Component is a versatile tool that allows developers to seamlessly integrate a code editor into their web applications. It offers features like script management and code copying, making it ideal for building code-related applications or platforms.
+The Script Editor Web Component is a powerful tool that enables developers to seamlessly integrate a code editor into their web applications. It offers essential features such as script management and code copying, making it an ideal choice for building code-related applications or platforms.
 
 **Key features:**
 
-- Support for managing scripts.
-- Code copying.
+- Script management support.
+- Code copying functionality.
 
 ## Usage
 
 ### Building the Script Editor
 
-To create an instance of the Script Editor, you need to build the package first and then copy the generated `dist` folder into your project:
+To create an instance of the Script Editor, follow these steps:
 
 1. Clone the `tfgrid-sdk-ts` repository.
+
 2. Navigate to the `repository/packages/UI` directory.
-3. Run `yarn build-only` to generate the required distribution files.
-4. Locate the `dist` folder created in the previous step.
-5. Copy the `threefold-ui.umd.js` file and include it in your project's HTML files.
+
+3. Choose which provider you are going to use [see providers section](#using-providers-and-extensions)
+
+4. Run `yarn build` to generate the required distribution files.
+
+5. Locate the `dist` folder created in the previous step.
+
+6. Copy the `dist/threefold-ui.umd.js` file and include it in your project's HTML files.
+
+```html
+<body>
+  <!-- Include the Script Editor component script -->
+  <script src="./threefold-ui.umd.js"></script>
+</body>
+```
+
 6. Copy the `dist/tailwind.css` file and use it for styling.
+
+```html
+<head>
+  <!-- Include the style and logo files -->
+  <link rel="stylesheet" href="./tailwind.css" />
+</head>
+```
+
+7. Include the `script-editor` custom element tag in your HTML file as follows:
+
+```html
+<body>
+  <script-editor dest="http://localhost:3000/" network="main" />
+</body>
+```
+
+8. The `script-editor` HTML tag accepts two parameters:
+
+   - `dest`: The destination where the signed script should be sent. Refer to [this document](./server_verification.md) for more information, and you can find a [server example here](../examples/server-example/).
+
+   - `network`: This is required only if you decide to use the `threefoldConnectorProvider`. It points to the network of your account in the extension.
 
 ### Example of Usage
 
@@ -59,6 +94,8 @@ Here's an example of how to use the Script Editor Web Component in your HTML fil
 In the example above, replace `<dest>` and `<network>` with the actual destination where the signed script should be sent. Also, for the `<network>`, use one of the following network options: `[main, test, qa, dev]`.
 
 Feel free to customize the HTML structure and styles to match your application's design and requirements.
+
+**Now you can serve your HTML file on any live-server plugin.**
 
 ### Using Providers and Extensions
 

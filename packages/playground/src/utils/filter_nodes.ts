@@ -1,6 +1,9 @@
 import type { FilterOptions, GridClient, NodeInfo } from "@threefold/grid_client";
 
+import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
 import type { NodeFilters } from "@/components/select_node.vue";
+
+import { isNumeric } from "./validators";
 
 export interface NodeGPUCardType {
   id: string;
@@ -33,3 +36,84 @@ export async function getFilteredNodes(grid: GridClient, options: NodeFilters): 
   const nodes = await grid.capacity.filterNodes(filters);
   return nodes;
 }
+
+// Node filters used in #Explorer, #Dedicated Nodes...
+
+// Input attrs
+export type NodeInputFilterType = {
+  label: string;
+  placeholder: string;
+  value?: string | undefined;
+  rules?: [syncRules: SyncRule[], asyncRules?: AsyncRule[]];
+  error?: string;
+  type: string;
+};
+
+// Input fields
+export type FilterInputs = {
+  nodeId: NodeInputFilterType;
+  farmIds: NodeInputFilterType;
+  farmName: NodeInputFilterType;
+  country: NodeInputFilterType;
+  freeSru: NodeInputFilterType;
+  freeHru: NodeInputFilterType;
+  freeMru: NodeInputFilterType;
+};
+
+// Default input Initialization
+export const inputsInitializer: FilterInputs = {
+  nodeId: {
+    label: "Node ID",
+    placeholder: "Filter by node id.",
+    rules: [[isNumeric("This field accepts numbers only.", { no_symbols: true })]],
+    type: "text",
+  },
+  farmIds: {
+    label: "Farm IDs",
+    placeholder: "e.g. 1, 2, 3",
+    rules: [
+      [
+        (value: string) => {
+          const ids = value.split(",").map((id: string) => {
+            const numericId = parseInt(id);
+            if (!isNaN(numericId)) {
+              return numericId;
+            }
+          });
+          const validate = isNumeric("This field accepts numbers only.", { no_symbols: false });
+          return validate(String(ids));
+        },
+      ],
+    ],
+    type: "text",
+  },
+  farmName: {
+    label: "Farm Name",
+    placeholder: "Filter by farm name.",
+    type: "text",
+  },
+  country: {
+    label: "Country Full Name",
+    placeholder: "Filter by country.",
+    type: "text",
+  },
+  freeSru: {
+    label: "Free SRU (GB)",
+    placeholder: "Filter by Free SSD greater than or equal to.",
+    rules: [[isNumeric("This field accepts numbers only.", { no_symbols: true })]],
+    type: "text",
+  },
+  freeHru: {
+    label: "Free HRU (GB)",
+    placeholder: "Filter by Free HDD greater than or equal to.",
+    rules: [[isNumeric("This field accepts numbers only.", { no_symbols: true })]],
+    type: "text",
+  },
+  freeMru: {
+    label: "Free MRU (GB)",
+    placeholder: "Filter by Free Memory greater than or equal to.",
+    value: undefined,
+    rules: [[isNumeric("This field accepts numbers only.", { no_symbols: true })]],
+    type: "text",
+  },
+};

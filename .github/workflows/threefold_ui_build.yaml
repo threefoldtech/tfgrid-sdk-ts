@@ -1,4 +1,4 @@
-# This workflow will do a clean install of node dependencies, cache/restore them, build the source code using yarn build-only
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code using yarn build
 
 name: Threefold UI Build
 
@@ -42,4 +42,4 @@ jobs:
       - name: Build
         run: |
           lerna run build --no-private
-          yarn workspace @threefold/ui build-only
+          yarn workspace @threefold/ui build

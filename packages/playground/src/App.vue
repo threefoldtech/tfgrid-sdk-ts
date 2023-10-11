@@ -26,7 +26,7 @@
                     :key="item.route"
                     :value="item.route"
                     @click="clickHandler(item)"
-                    color="primary"
+                    color="secondary"
                     :active="$route.path === item.route"
                   >
                     <template v-slot:prepend v-if="item.icon">
@@ -49,7 +49,7 @@
                   :key="item.route"
                   :value="item.route"
                   @click="clickHandler(item)"
-                  color="primary"
+                  color="secondary"
                   :active="$route.path === item.route"
                 >
                   <template v-slot:prepend v-if="item.icon">
@@ -72,7 +72,7 @@
 
         <template v-if="version">
           <div class="version">
-            <v-chip color="primary">
+            <v-chip color="secondary">
               {{ version }}
             </v-chip>
           </div>
@@ -106,7 +106,7 @@
           <v-container fluid :style="{ paddingBottom: '100px' }">
             <div class="d-flex align-center">
               <v-btn
-                color="primary"
+                color="secondary"
                 @click="openSidebar = true"
                 icon="mdi-menu"
                 variant="tonal"
@@ -203,12 +203,12 @@ const routes: AppRoute[] = [
       {
         title: "Pricing Calculator",
         icon: "mdi-currency-usd",
-        route: "/explorer/pricing",
+        route: "/calculator/pricing",
       },
       {
         title: "Simulator",
         icon: "mdi-chart-line",
-        route: "/explorer/simulator",
+        route: "/calculator/simulator",
       },
     ],
   },
@@ -245,7 +245,7 @@ const routes: AppRoute[] = [
     icon: "mdi-toolbox",
     items: [
       {
-        title: "Grafana",
+        title: "Monitoring",
         icon: "mdi-equalizer",
         url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
       },
@@ -393,7 +393,23 @@ a {
   width: 35px !important;
 }
 
+.v-list-item-title {
+  font-size: 0.875rem;
+}
+
 .v-list-item--density-default.v-list-item--one-line {
   min-height: 40px;
+}
+
+.mosha__toast__content-wrapper {
+  margin-bottom: -2px;
+}
+.mosha__icon {
+  margin-right: 6px !important;
+  margin-top: 2px;
+}
+
+.mosha__toast__content__text {
+  font-size: 14px !important;
 }
 </style>
