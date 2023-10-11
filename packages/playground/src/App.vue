@@ -86,12 +86,13 @@
           theme="dark"
           :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }"
         >
-          <v-toolbar-title>
+          <v-toolbar-title class="custom-toolbar-title">
             <v-img :src="baseUrl + 'images/logoTF.png'" width="160px" />
           </v-toolbar-title>
 
           <v-spacer>
             <div class="d-flex align-center justify-start">
+              <TftSwapPrice class="pr-4"></TftSwapPrice>
               <FundsCard v-if="hasActiveProfile"></FundsCard>
             </div>
           </v-spacer>
@@ -304,6 +305,7 @@ import DeploymentListManager from "./components/deployment_list_manager.vue";
 import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
 import FundsCard from "./components/funds_card.vue";
 import ProfileManagerController from "./components/profile_manager_controller.vue";
+import TftSwapPrice from "./components/swap_price.vue";
 import TFNotification from "./components/tf_notification.vue";
 import ProfileManager from "./weblets/profile_manager.vue";
 
@@ -330,6 +332,7 @@ export default {
     AppTheme,
     ConnectWalletLanding,
     AppInfo,
+    TftSwapPrice,
     FundsCard,
     ProfileManagerController,
   },
@@ -400,6 +403,9 @@ a {
 .v-list-item--density-default.v-list-item--one-line {
   min-height: 40px;
 }
+
+.custom-toolbar-title {
+  max-width: 17rem !important;
 
 .mosha__toast__content-wrapper {
   margin-bottom: -2px;
