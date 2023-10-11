@@ -596,6 +596,7 @@ class FarmFilterOptions {
   @Expose() @IsOptional() @IsInt() @Min(1) nodeRentedBy?: number;
   @Expose() @IsOptional() @IsInt() page?: number;
   @Expose() @IsOptional() @IsInt() size?: number;
+  @Expose() @IsOptional() @IsInt() farmId?: number;
 }
 
 class CalculatorModel {
@@ -637,6 +638,14 @@ class FarmIdModel {
 
 class pingFarmModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+}
+
+class NetworkAddNodeModel {
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() ipRange: string;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+  @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
+  @Expose() @IsString() @IsOptional() description?: string;
 }
 
 class NetworkGetModel {
@@ -768,6 +777,7 @@ export {
   SetServiceContractFeesModel,
   SetServiceContractMetadataModel,
   GetServiceContractModel,
+  NetworkAddNodeModel,
   NetworkGetModel,
   NodeGetModel,
   SetDedicatedNodeExtraFeesModel,
