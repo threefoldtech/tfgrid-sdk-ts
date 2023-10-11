@@ -1,30 +1,28 @@
 <template>
-  <div class="mt-8">
-    <v-container class="custom-container">
-      <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-        <v-icon size="30" class="pr-3">mdi-swap-horizontal</v-icon>
-        <v-card-title class="pa-0" lor="white">Transfer TFT Across Chains</v-card-title>
-      </v-card>
-      <v-card class="pa-5 my-5 white--text">
-        <v-row class="pa-5 text-center">
-          <v-col cols="12">
-            <v-select
-              :items="items"
-              label="Please select a chain:"
-              item-title="name"
-              item-value="id"
-              v-model="selectedItem"
-            ></v-select>
-          </v-col>
-        </v-row>
-        <v-row class="pa-4 px-8">
-          <v-btn color="primary" class="mr-2 bold-text" @click="openDepositDialog = true">Deposit</v-btn>
-          <v-btn color="black" class="mr-2 bold-text" @click="openWithdrawDialog = true">Withdraw</v-btn>
-          <v-btn color="blue" class="ml-auto bold-text" @click="navigation">Learn How?</v-btn>
-        </v-row>
-      </v-card>
-    </v-container>
-  </div>
+  <v-container class="custom-container">
+    <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-swap-horizontal</v-icon>
+      <v-card-title class="pa-0">Transfer TFT Across Chains</v-card-title>
+    </v-card>
+    <v-card class="pa-5 white--text">
+      <v-row class="pa-5 text-center">
+        <v-col cols="12">
+          <v-select
+            :items="items"
+            label="Please select a chain:"
+            item-title="name"
+            item-value="id"
+            v-model="selectedItem"
+          ></v-select>
+        </v-col>
+      </v-row>
+      <v-row class="pa-4 px-8">
+        <v-btn color="primary" class="mr-2" @click="openDepositDialog = true">Deposit</v-btn>
+        <v-btn variant="outlined" color="secondary" class="mr-2" @click="openWithdrawDialog = true">Withdraw</v-btn>
+        <v-btn color="blue" class="ml-auto" @click="navigation">Learn How?</v-btn>
+      </v-row>
+    </v-card>
+  </v-container>
 
   <!-- Deposit Dialog -->
   <deposit-dialog
@@ -112,7 +110,7 @@ const target = ref("");
 const targetError = ref("");
 const validatingAddress = ref(false);
 const server = new StellarSdk.Server(window.env.STELLAR_HORIZON_URL);
-const amount = ref(0);
+const amount = ref(2);
 const freeBalance = ref(0);
 const loadingWithdraw = ref(false);
 const depositWallet = ref("");
@@ -203,7 +201,7 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
 
     openWithdrawDialog.value = false;
     target.value = "";
-    amount.value = 0;
+    amount.value = 2;
     loadingWithdraw.value = false;
     await ProfileManagerController.reloadBalance();
     createCustomToast("Transaction Succeeded", ToastType.success);
@@ -211,7 +209,7 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
     console.log("Error withdrawing, Error: ", e);
     openWithdrawDialog.value = false;
     target.value = "";
-    amount.value = 0;
+    amount.value = 2;
     loadingWithdraw.value = false;
     createCustomToast("Withdraw Failed!", ToastType.danger);
   }

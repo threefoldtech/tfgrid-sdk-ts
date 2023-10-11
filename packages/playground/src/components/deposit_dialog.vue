@@ -130,7 +130,7 @@ onBeforeUnmount(() => {
 
 <style>
 .bold-text {
-  font-weight: bold;
+  font-weight: 500;
   padding-left: 1rem;
 }
 </style>

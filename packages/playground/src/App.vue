@@ -26,7 +26,7 @@
                     :key="item.route"
                     :value="item.route"
                     @click="clickHandler(item)"
-                    color="primary"
+                    color="secondary"
                     :active="$route.path === item.route"
                   >
                     <template v-slot:prepend v-if="item.icon">
@@ -49,7 +49,7 @@
                   :key="item.route"
                   :value="item.route"
                   @click="clickHandler(item)"
-                  color="primary"
+                  color="secondary"
                   :active="$route.path === item.route"
                 >
                   <template v-slot:prepend v-if="item.icon">
@@ -72,7 +72,7 @@
 
         <template v-if="version">
           <div class="version">
-            <v-chip color="primary">
+            <v-chip color="secondary">
               {{ version }}
             </v-chip>
           </div>
@@ -86,12 +86,13 @@
           theme="dark"
           :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }"
         >
-          <v-toolbar-title>
+          <v-toolbar-title class="custom-toolbar-title">
             <v-img :src="baseUrl + 'images/logoTF.png'" width="160px" />
           </v-toolbar-title>
 
           <v-spacer>
             <div class="d-flex align-center justify-start">
+              <TftSwapPrice class="pr-4"></TftSwapPrice>
               <FundsCard v-if="hasActiveProfile"></FundsCard>
             </div>
           </v-spacer>
@@ -106,7 +107,7 @@
           <v-container fluid :style="{ paddingBottom: '100px' }">
             <div class="d-flex align-center">
               <v-btn
-                color="primary"
+                color="secondary"
                 @click="openSidebar = true"
                 icon="mdi-menu"
                 variant="tonal"
@@ -304,6 +305,7 @@ import DeploymentListManager from "./components/deployment_list_manager.vue";
 import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
 import FundsCard from "./components/funds_card.vue";
 import ProfileManagerController from "./components/profile_manager_controller.vue";
+import TftSwapPrice from "./components/swap_price.vue";
 import TFNotification from "./components/tf_notification.vue";
 import ProfileManager from "./weblets/profile_manager.vue";
 
@@ -330,6 +332,7 @@ export default {
     AppTheme,
     ConnectWalletLanding,
     AppInfo,
+    TftSwapPrice,
     FundsCard,
     ProfileManagerController,
   },
@@ -393,10 +396,17 @@ a {
   width: 35px !important;
 }
 
+.v-list-item-title {
+  font-size: 0.875rem;
+}
+
 .v-list-item--density-default.v-list-item--one-line {
   min-height: 40px;
 }
 
+.custom-toolbar-title {
+  max-width: 17rem !important;
+}
 .mosha__toast__content-wrapper {
   margin-bottom: -2px;
 }
