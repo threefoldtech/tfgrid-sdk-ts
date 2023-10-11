@@ -144,7 +144,7 @@
         </v-row>
         <v-row v-show="!isAdvanced">
           <v-col>
-            <LineChart :fp="activeProfile" :xs="xs" :isProfit="isProfit" />
+            <!-- <LineChart :fp="activeProfile" :xs="xs" :isProfit="isProfit" /> -->
           </v-col>
         </v-row>
         <v-row v-show="isAdvanced">
@@ -165,10 +165,10 @@
               />
             </input-validator>
 
-            <v-text-field disabled label="Return On Investment" type="number" v-model.number="activeProfile.ROI" />
-            <v-text-field disabled label="Net Profit" type="number" v-model.number="activeProfile.netProfit" />
-            <v-text-field disabled label="Gross Profit" type="number" v-model.number="activeProfile.grossProfit" />
-            <v-text-field disabled label="Total Costs" type="number" v-model.number="activeProfile.totalCosts" />
+            <v-text-field disabled label="Return On Investment" type="number" v-model.number="ROI" />
+            <v-text-field disabled label="Net Profit" type="number" v-model.number="netProfit" />
+            <v-text-field disabled label="Gross Profit" type="number" v-model.number="grossProfit" />
+            <v-text-field disabled label="Total Costs" type="number" v-model.number="totalCosts" />
           </v-col>
         </v-row>
         <v-row class="mt-3 px-3" v-if="isAdvanced">
@@ -176,57 +176,42 @@
             disabled
             label="Total Monthly Farming Reward In TFT"
             type="number"
-            v-model.number="activeProfile.totalFarmingRewardInTft"
+            v-model.number="totalFarmingRewardInTft"
           />
         </v-row>
         <v-row class="mt-3 px-0">
           <v-col cols="4">
-            <v-text-field disabled label="CU" type="number" v-model.number="activeProfile.cu" />
+            <v-text-field disabled label="CU" type="number" v-model.number="cu" />
           </v-col>
           <v-col cols="4">
-            <v-text-field disabled label="SU" type="number" v-model.number="activeProfile.su" />
+            <v-text-field disabled label="SU" type="number" v-model.number="su" />
           </v-col>
           <v-col cols="4">
-            <v-text-field disabled label="NU" type="number" v-model.number="activeProfile.nu" />
+            <v-text-field disabled label="NU" type="number" v-model.number="nu" />
           </v-col>
         </v-row>
 
         <v-row class="mt-3 px-0">
           <v-col cols="4">
-            <v-text-field disabled label="USD reward per CU" type="number" v-model.number="activeProfile.rewardPerCu" />
+            <v-text-field disabled label="USD reward per CU" type="number" v-model.number="rewardPerCu" />
           </v-col>
           <v-col cols="4">
-            <v-text-field disabled label="USD reward per SU" type="number" v-model.number="activeProfile.rewardPerSu" />
+            <v-text-field disabled label="USD reward per SU" type="number" v-model.number="rewardPerSu" />
           </v-col>
           <v-col cols="4">
-            <v-text-field disabled label="USD reward per NU" type="number" v-model.number="activeProfile.rewardPerNu" />
+            <v-text-field disabled label="USD reward per NU" type="number" v-model.number="rewardPerNu" />
           </v-col>
         </v-row>
 
         <v-row class="mt-3 px-0" v-if="isAdvanced">
           <v-col cols="4">
-            <v-text-field
-              disabled
-              label="TFT Reward Per CU"
-              type="number"
-              v-model.number="activeProfile.tftRewardPerCu"
-            />
+            <v-text-field disabled label="TFT Reward Per CU" type="number" v-model.number="tftRewardPerCu" />
           </v-col>
           <v-col cols="4">
-            <v-text-field
-              disabled
-              label="TFT Reward Per SU"
-              type="number"
-              v-model.number="activeProfile.tftRewardPerSu"
-            />
+            <v-text-field disabled label="TFT Reward Per SU" type="number" v-model.number="tftRewardPerSu" />
           </v-col>
           <v-col cols="4">
-            <v-text-field
-              disabled
-              label="TFT Reward Per NU"
-              type="number"
-              v-model.number="activeProfile.tftRewardPerNu"
-            />
+            <v-text-field disabled label="TFT Reward Per NU" type="number" v-model.number="tftRewardPerNu" />
           </v-col>
         </v-row>
 
@@ -236,7 +221,7 @@
               disabled
               label="CU Farming Reward In TFT"
               type="number"
-              v-model.number="activeProfile.cuFarmingRewardInTft"
+              v-model.number="cuFarmingRewardInTft"
             />
           </v-col>
           <v-col cols="4">
@@ -244,7 +229,7 @@
               disabled
               label="SU Farming Reward In TFT"
               type="number"
-              v-model.number="activeProfile.suFarmingRewardInTft"
+              v-model.number="suFarmingRewardInTft"
             />
           </v-col>
           <v-col cols="4">
@@ -252,7 +237,7 @@
               disabled
               label="NU Farming Reward In TFT"
               type="number"
-              v-model.number="activeProfile.nuFarmingRewardInTft"
+              v-model.number="nuFarmingRewardInTft"
             />
           </v-col>
         </v-row>
@@ -262,16 +247,97 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 
-import FarmingProfile, { Certification, ProfileTypes } from "@/utils/simulator";
+import { Certification, type FarmingProfileOptions, ProfileTypes } from "@/types/index";
 
 import LineChart from "./line_chart.vue";
 import PieChart from "./pie_chart.vue";
 
 const props = defineProps<{
   chosenConfig: string;
+  profile: FarmingProfileOptions;
 }>();
+
+const _max = (val: number, max = 0): number => {
+  val = val ?? 0;
+  return Math.max(val, max);
+};
+
+const cu = computed(() => {
+  const x = (activeProfile.value.memory - 1) / 4;
+  const y = activeProfile.value.cpu * 2;
+  const z = activeProfile.value.ssd / 50;
+  return _max(Math.min(x, y, z));
+});
+
+const nu = computed(() => _max(cu.value * activeProfile.value.nuRequiredPerCu));
+
+const su = computed(() => {
+  const x = activeProfile.value.hdd / 1200;
+  const y = activeProfile.value.ssd * 0.8;
+  return x + y / 200;
+});
+
+const averageTokenPrice = computed(() => (activeProfile.value.price + activeProfile.value.priceAfter5Years) / 2);
+
+const rewardPerCu = 2.4;
+const rewardPerSu = 1;
+const rewardPerNu = 0.03;
+
+const tftRewardPer = computed(() => (activeProfile.value.certified ? 1 : 0) * 0.25 + 1);
+
+const tftRewardPerCu = computed(() => {
+  if (activeProfile.value.price < 0.08) return NaN;
+  return (rewardPerCu / activeProfile.value.price) * tftRewardPer.value;
+});
+
+const tftRewardPerSu = computed(() => {
+  if (activeProfile.value.price < 0.08) return NaN;
+  return (rewardPerSu / activeProfile.value.price) * tftRewardPer.value;
+});
+
+const tftRewardPerNu = computed(() => rewardPerNu / averageTokenPrice.value);
+
+const cuFarmingRewardInTft = computed(() => tftRewardPerCu.value * cu.value);
+const suFarmingRewardInTft = computed(() => tftRewardPerSu.value * su.value);
+
+const nuFarmingRewardInTft = computed(() => (activeProfile.value.publicIp ? tftRewardPerNu.value * nu.value : 0));
+
+const totalFarmingRewardInTft = computed(
+  () => cuFarmingRewardInTft.value + suFarmingRewardInTft.value + nuFarmingRewardInTft.value,
+);
+
+const getTotalReward = (currentPrice: number): number => {
+  const tft = totalFarmingRewardInTft.value * 60;
+  const grossProfit = tft * currentPrice;
+  return grossProfit - totalCosts.value;
+};
+
+const getRoi = (price: number = activeProfile.value.priceAfter5Years): number => {
+  const tft = totalFarmingRewardInTft.value * 60;
+  const usd = tft * price;
+  const powerCostOver5Years = activeProfile.value.powerUtilization * 24 * 0.365 * 5 * activeProfile.value.powerCost;
+  const roiX = usd - (activeProfile.value.investmentCostHW + powerCostOver5Years);
+  const roiY = activeProfile.value.investmentCostHW + powerCostOver5Years;
+  const roi = roiX / roiY;
+  return roi * 100;
+};
+
+const ROI = computed(() => getRoi().toFixed(0) + "%");
+
+const grossProfit = computed(() => {
+  const tft = totalFarmingRewardInTft.value * 60;
+  return tft * activeProfile.value.priceAfter5Years;
+});
+
+const totalCosts = computed(() => {
+  if (activeProfile.value.price < 0.08) return NaN;
+  const powerCostOver5Years = activeProfile.value.powerUtilization * 24 * 0.365 * 5 * activeProfile.value.powerCost;
+  return powerCostOver5Years + activeProfile.value.investmentCostHW;
+});
+
+const netProfit = computed(() => grossProfit.value - totalCosts.value);
 
 const certifications = ["No Certification", "Certified Node"];
 const certified = ref();
@@ -279,20 +345,9 @@ const certified = ref();
 const isAdvanced = ref(false);
 const isProfit = ref(false);
 const xs = ref<number[]>([]);
+const activeProfile = ref(props.profile);
 
 const chartdata = ref();
-const activeProfile = ref(
-  new FarmingProfile({
-    type: ProfileTypes.DIY,
-    name: "DIY",
-    memory: 32,
-    cpu: 8,
-    hdd: 10000,
-    ssd: 1000,
-    price: 0.08,
-    priceAfter5Years: 1,
-  }),
-);
 
 watch([activeProfile.value, isProfit, isAdvanced, certified], () => {
   if (certified.value == "Certified Node") {
@@ -307,19 +362,6 @@ watch([activeProfile.value, isProfit, isAdvanced, certified], () => {
 
 onMounted(() => {
   updateLineChart();
-  if (props.chosenConfig == "Titan v2.1") {
-    activeProfile.value = new FarmingProfile({
-      type: ProfileTypes.TITAN,
-      name: "Titan v2.1",
-      memory: 32,
-      cpu: 8,
-      hdd: 0,
-      ssd: 1000,
-      price: 0.08,
-      priceAfter5Years: 1,
-      investmentCostHW: 800,
-    });
-  }
 });
 
 const updateLineChart = () => {
@@ -335,12 +377,32 @@ const updateLineChart = () => {
   }
 };
 function updatePieChart() {
-  const { nuFarmingRewardInTft, cuFarmingRewardInTft, suFarmingRewardInTft } = activeProfile.value;
-  chartdata.value = [nuFarmingRewardInTft, cuFarmingRewardInTft, suFarmingRewardInTft];
+  //   const { nuFarmingRewardInTft, cuFarmingRewardInTft, suFarmingRewardInTft } = activeProfile.value;
+
+  chartdata.value = [nuFarmingRewardInTft.value, cuFarmingRewardInTft.value, suFarmingRewardInTft.value];
 }
 </script>
 
 <script lang="ts">
+export function createFarmingProfile(options: Partial<FarmingProfileOptions> = {}): FarmingProfileOptions {
+  return {
+    type: options.type || ProfileTypes.DIY,
+    name: options.name || "DIY",
+    memory: options.memory || 0,
+    cpu: options.cpu || 0,
+    hdd: options.hdd || 0,
+    ssd: options.ssd || 0,
+    price: options.price || 0.09,
+    priceAfter5Years: options.priceAfter5Years || 2,
+    maximumTokenPrice: options.maximumTokenPrice || 2,
+    powerUtilization: options.powerUtilization || 40,
+    powerCost: options.powerCost || 0.15,
+    certified: options.certified || Certification.NONE,
+    publicIp: options.publicIp || false,
+    investmentCostHW: options.investmentCostHW || 2200,
+    nuRequiredPerCu: options.nuRequiredPerCu || 30,
+  };
+}
 export default {
   name: "SimulatorFarming",
 };

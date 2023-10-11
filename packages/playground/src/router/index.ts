@@ -19,16 +19,6 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes: [
     {
-      path: "/explorer",
-      children: [
-        {
-          path: "simulator",
-          component: () => import("../portal/simulator_view.vue"),
-          meta: { title: "Twin" },
-        },
-      ],
-    },
-    {
       path: "/portal",
       children: [
         {
@@ -62,6 +52,12 @@ const router = createRouter({
           path: "pricing",
           component: () => import("../calculator/resource_pricing.vue"),
           meta: { title: "Resource Pricing" },
+        },
+
+        {
+          path: "simulator",
+          component: () => import("../portal/simulator_view.vue"),
+          meta: { title: "Twin" },
         },
       ],
     },
