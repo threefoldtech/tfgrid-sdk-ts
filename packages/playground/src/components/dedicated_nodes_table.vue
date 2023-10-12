@@ -99,16 +99,32 @@ import { toGigaBytes } from "../utils/helpers";
 import toTeraOrGigaOrPeta from "../utils/toTeraOrGegaOrPeta";
 
 const headers: VDataTable["headers"] = [
-  { title: "Node ID", key: "nodeId" },
+  { title: "Node ID", key: "nodeId", sortable: false },
   { title: "Location", key: "location.country", sortable: false },
-  { title: "CPU", key: "total_resources.cru" },
-  { title: "RAM", key: "total_resources.mru", value: item => toTeraOrGigaOrPeta(item.total_resources.mru) },
-  { title: "SSD", key: "total_resources.sru", value: item => toTeraOrGigaOrPeta(item.total_resources.sru) },
-  { title: "HDD", key: "total_resources.hru", value: item => toTeraOrGigaOrPeta(item.total_resources.hru) },
-  { title: "GPU", key: "num_gpu" },
+  { title: "CPU", key: "total_resources.cru", sortable: false },
+  {
+    title: "RAM",
+    key: "total_resources.mru",
+    value: item => toTeraOrGigaOrPeta(item.total_resources.mru),
+    sortable: false,
+  },
+  {
+    title: "SSD",
+    key: "total_resources.sru",
+    value: item => toTeraOrGigaOrPeta(item.total_resources.sru),
+    sortable: false,
+  },
+  {
+    title: "HDD",
+    key: "total_resources.hru",
+    value: item => toTeraOrGigaOrPeta(item.total_resources.hru),
+    sortable: false,
+  },
+  { title: "GPU", key: "num_gpu", sortable: false },
   {
     title: "Price (USD)",
     key: "price",
+    sortable: false,
   },
   {
     title: "Actions",
