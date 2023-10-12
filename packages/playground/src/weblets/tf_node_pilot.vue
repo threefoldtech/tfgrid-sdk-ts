@@ -140,7 +140,7 @@ const rootFilesystemSize = 2;
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.NodePilot.toLowerCase();
+  const projectName = ProjectName.NodePilot.toLowerCase() + name.value;
 
   try {
     layout.value?.validateSSH();

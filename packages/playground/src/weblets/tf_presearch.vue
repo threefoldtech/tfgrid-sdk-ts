@@ -163,7 +163,7 @@ const selectedNode = ref() as Ref<INode>;
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Presearch.toLowerCase();
+  const projectName = ProjectName.Presearch.toLowerCase() + name.value;
 
   try {
     layout.value?.validateSSH();

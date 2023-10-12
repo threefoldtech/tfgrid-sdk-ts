@@ -213,7 +213,7 @@ function finalize(deployment: any) {
 async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Taiga.toLowerCase();
+  const projectName = ProjectName.Taiga.toLowerCase() + name.value;
 
   const subdomain = getSubdomain({
     deploymentName: name.value,

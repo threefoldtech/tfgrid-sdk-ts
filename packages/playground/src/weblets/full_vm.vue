@@ -244,11 +244,11 @@ watch(
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Fullvm.toLowerCase();
+  const projectName = ProjectName.Fullvm.toLowerCase() + name.value;
 
   try {
     layout.value?.validateSSH();
-    const grid = await getGrid(profileManager.profile!, `${projectName}/${name.value}`);
+    const grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);
 
