@@ -41,6 +41,14 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
+
+          <IconActionBtn icon="mdi-cog" tooltip="Deploy FQDN Gateway" @click="dialog = item.value.deploymentName" />
+
+          <ManageGatewayDialog
+            v-if="dialog === item.value.deploymentName"
+            :vm="item.value"
+            @close="dialog = undefined"
+          />
         </template>
 
         <template #CapRover-actions="{ item }">
