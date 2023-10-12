@@ -148,8 +148,8 @@
         </v-card>
       </v-col>
 
-      <v-col v-if="item.value.num_gpu > 0" cols="getColSize" style="min-width: 600px">
-        <v-card flat color="transparent" tag="div">
+      <v-col v-if="item.value.num_gpu > 0" cols="getColSize" style="min-width: 600px; min-height: 200px">
+        <v-card flat color="transparent" tag="div" class="h-100">
           <!-- Title -->
           <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
             <v-icon size="30" class="pr-3">mdi-expansion-card-variant</v-icon>
@@ -165,14 +165,14 @@
             </v-col>
           </v-row>
           <!-- TODO: -->
-          <v-row v-else-if="gpuLoadingError" class="d-flex justify-center align-center text-center h-100">
-            <div class="pt-10">
-              <v-alert variant="tonal" color="#f44336" dense outlined type="error" style="width: 100%; height: 100%">
+          <v-row v-else-if="gpuLoadingError" class="d-flex justify-center align-center text-center h-75 pt-5">
+            <div>
+              <v-alert variant="tonal" color="#f44336" dense outlined type="error" style="width: 100%" class="my-4">
                 <div class="d-flex align-center">
-                  <div style="display: flex; align-items: center; margin-bottom: 10px; padding-right: 5px">
+                  <div style="display: flex; align-items: center; padding-right: 5px">
                     Failed to receive node GPUs information
                   </div>
-                  <v-icon @click="loadGPUitems" style="cursor: pointer; margin-bottom: 10px">mdi-reload</v-icon>
+                  <v-icon @click="loadGPUitems" style="cursor: pointer">mdi-reload</v-icon>
                 </div>
               </v-alert>
             </div>
