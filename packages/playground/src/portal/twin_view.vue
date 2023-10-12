@@ -1,85 +1,79 @@
 <template>
-  <v-container v-if="editingTwin">
-    <v-dialog v-model="editingTwin" max-width="600">
-      <v-card>
-        <v-toolbar color="primary" dark class="custom-toolbar">Edit Twin</v-toolbar>
-        <div class="text-h2 pa-10">
-          <v-text-field v-model="relay" outlined label="Relay" :error-messages="errorMsg"></v-text-field>
-        </div>
-        <v-card-actions class="justify-end pa-5">
-          <v-btn @click="editingTwin = false" class="grey lighten-2 black--text">Close</v-btn>
-          <v-btn @click="UpdateRelay" class="primary white--text">Save</v-btn>
-        </v-card-actions>
-      </v-card>
-       </v-dialog>
-  </v-container>
-
-
-      <v-dialog v-model="openVotePopup" max-width="600">
+  <div>
+    <v-container v-if="editingTwin">
+      <v-dialog v-model="editingTwin" max-width="600">
         <v-card>
-          <v-toolbar color="primary" dark class="custom-toolbar">Vote Reminder</v-toolbar>
-          <v-card-text>There are {{ numberOfActiveProposals }} active proposals you can vote on now</v-card-text>
+          <v-toolbar color="primary" dark class="custom-toolbar">Edit Twin</v-toolbar>
+          <div class="text-h2 pa-10">
+            <v-text-field v-model="relay" outlined label="Relay" :error-messages="errorMsg"></v-text-field>
+          </div>
           <v-card-actions class="justify-end pa-5">
-            <v-btn @click="openVotePopup = false" class="grey lighten-2 black--text">Close</v-btn>
-            <v-btn @click="redirectToDao" class="primary white--text">Vote</v-btn>
+            <v-btn @click="editingTwin = false" class="grey lighten-2 black--text">Close</v-btn>
+            <v-btn @click="UpdateRelay" class="primary white--text">Save</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
     </v-container>
 
+    <v-dialog v-model="openVotePopup" max-width="600">
+      <v-card>
+        <v-toolbar color="primary" dark class="custom-toolbar">Vote Reminder</v-toolbar>
+        <v-card-text>There are {{ numberOfProposalsToVoteOn }} active proposals you can vote on now</v-card-text>
+        <v-card-actions class="justify-end pa-5">
+          <v-btn @click="openVotePopup = false" class="grey lighten-2 black--text">Close</v-btn>
+          <v-btn @click="redirectToDao" class="primary white--text">Vote</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
-   
+    <v-container class="custom-container">
+      <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+        <v-icon size="30" class="pr-3">mdi-account-supervisor-outline</v-icon>
+        <v-card-title class="pa-0">Twin Details</v-card-title>
+      </v-card>
 
-  <v-container class="custom-container">
-    <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-      <v-icon size="30" class="pr-3">mdi-account-supervisor-outline</v-icon>
-      <v-card-title class="pa-0">Twin Details</v-card-title>
-    </v-card>
-
-    <v-card>
-      <v-list class="custom-list">
-        <v-row>
-          <v-col cols="1" sm="2" class="column-style my-4">
-            <v-list-item> ID </v-list-item>
-            <v-divider></v-divider>
-            <v-list-item> Address </v-list-item>
-            <v-divider></v-divider>
-            <v-list-item> Relay </v-list-item>
-          </v-col>
-          <v-col cols="1" sm="10" class="my-4">
-            <v-list-item> {{ profileManager.profile?.twinId.toString() }} </v-list-item>
-            <v-divider></v-divider>
-            <v-list-item>
-              <div style="display: flex; justify-content: space-between; align-items: center">
-                <span>{{ profileManager.profile?.address }}</span>
-                <v-icon @click="copy(profileManager.profile?.address as string)"> mdi-content-copy </v-icon>
-              </div>
-            </v-list-item>
-            <v-divider></v-divider>
-            <v-list-item> {{ profileManager.profile?.relay }} </v-list-item>
-          </v-col>
-        </v-row>
-      </v-list>
-      <v-card-actions v-if="updateRelay" class="justify-end mx-4 mb-4">
-        <v-btn class="custom-button bg-primary" @click="editTwin">Edit</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-container>
-
+      <v-card>
+        <v-list class="custom-list">
+          <v-row>
+            <v-col cols="1" sm="2" class="column-style my-4">
+              <v-list-item> ID </v-list-item>
+              <v-divider></v-divider>
+              <v-list-item> Address </v-list-item>
+              <v-divider></v-divider>
+              <v-list-item> Relay </v-list-item>
+            </v-col>
+            <v-col cols="1" sm="10" class="my-4">
+              <v-list-item> {{ profileManager.profile?.twinId.toString() }} </v-list-item>
+              <v-divider></v-divider>
+              <v-list-item>
+                <div style="display: flex; justify-content: space-between; align-items: center">
+                  <span>{{ profileManager.profile?.address }}</span>
+                  <v-icon @click="copy(profileManager.profile?.address as string)"> mdi-content-copy </v-icon>
+                </div>
+              </v-list-item>
+              <v-divider></v-divider>
+              <v-list-item> {{ profileManager.profile?.relay }} </v-list-item>
+            </v-col>
+          </v-row>
+        </v-list>
+        <v-card-actions v-if="updateRelay" class="justify-end mx-4 mb-4">
+          <v-btn class="custom-button bg-primary" @click="editTwin">Edit</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-container>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import { generatePublicKey } from "@threefold/rmb_direct_client";
+import type { Proposal } from "@threefold/tfchain_client";
 import { onMounted, ref } from "vue";
 
 import router from "../router";
 import { useProfileManager } from "../stores";
-
 import type { Farm } from "../types";
-import { getFarms } from "../utils/get_farms";
-
 import { createCustomToast, ToastType } from "../utils/custom_toast";
-
+import { getFarms } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
 const profileManager = useProfileManager();
 
@@ -88,25 +82,26 @@ const relay = ref(profileManager.profile?.relay || "");
 const updateRelay = ref(false);
 const errorMsg = ref("");
 const openVotePopup = ref(false);
-const numberOfActiveProposals = ref(0);
+const numberOfProposalsToVoteOn = ref(0);
 const userFarms = ref<Farm[]>();
 onMounted(async () => {
   const profile = profileManager.profile!;
   const grid = await getGrid(profile);
   if (grid) {
     userFarms.value = await getFarms(grid, { ownedBy: profile.twinId }, {});
-    if (userFarms.value.length > 0) {
+    if (userFarms.value.length) {
       const proposals = grid?.dao.get();
       const userFarmId = userFarms.value.map(farm => farm.farmID);
       const activeProposals = (await proposals)?.active;
-      numberOfActiveProposals.value = activeProposals ? activeProposals.length : 0;
-      if (numberOfActiveProposals.value > 0) {
+      const numberOfActiveProposals = activeProposals ? activeProposals.length : 0;
+      if (numberOfActiveProposals) {
         const activeProposalsUserHasVotedOn = activeProposals.filter(
-          proposal =>
-            proposal.ayes.filter(aye => userFarmId.includes(aye.farmId)) ||
-            proposal.nayes.filter(naye => userFarmId.includes(naye.farmId)),
+          (proposal: Proposal) =>
+            proposal.ayes.filter((aye: { farmId: number }) => userFarmId.includes(aye.farmId)) ||
+            proposal.nayes.filter((naye: { farmId: number }) => userFarmId.includes(naye.farmId)),
         );
-        if (activeProposalsUserHasVotedOn.length != numberOfActiveProposals.value) {
+        if (activeProposalsUserHasVotedOn.length != numberOfActiveProposals) {
+          numberOfProposalsToVoteOn.value = numberOfActiveProposals - activeProposalsUserHasVotedOn.length;
           openVotePopup.value = true;
         }
       }
