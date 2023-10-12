@@ -128,6 +128,7 @@ const emptyResult = ref(false);
 const validator = ref();
 const pingingNode = ref(false);
 const delay = ref();
+const isManual = ref(false);
 
 function isSelectionEmpty(node: INode | undefined, selectedCards: string[]): boolean {
   if (!node || availableNodes.value.length === 0) {
@@ -233,46 +234,52 @@ async function loadNodes(farmId: number) {
   farmManager?.setLoading(true);
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
-    try {
-      const res = await getFilteredNodes(grid, {
-        farmId: farmId,
-        cpu: filters.cpu,
-        memory: filters.memory,
-        diskSizes: [...filters.diskSizes, props.rootFileSystemSize],
-        ipv4: filters.ipv4,
-        hasGPU: filters.hasGPU ? filters.hasGPU : undefined,
-        certified: filters.certified,
-        rentedBy: filters.rentedBy,
-        availableFor: grid.twinId,
-      });
+    // if isManual don't pass farmId: farmId as a parameter
+    // remove farmId === undefined from condition
+    // remove farmManager?.setLoading(false) from finally
 
-      if (res?.length === 0 || farmId === undefined) {
-        selectedNode.value = undefined;
-        emptyResult.value = true;
-        loadingNodes.value = false;
-        return;
-      }
+    if (!isManual.value) {
+      try {
+        const res = await getFilteredNodes(grid, {
+          farmId: farmId,
+          cpu: filters.cpu,
+          memory: filters.memory,
+          diskSizes: [...filters.diskSizes, props.rootFileSystemSize],
+          ipv4: filters.ipv4,
+          hasGPU: filters.hasGPU ? filters.hasGPU : undefined,
+          certified: filters.certified,
+          rentedBy: filters.rentedBy,
+          availableFor: grid.twinId,
+        });
 
-      if (res) {
-        nodesArr.value = [];
-        for (const node of res) {
-          if (!nodesArr.value.some(n => n.nodeId === node.nodeId)) {
-            nodesArr.value.push({
-              nodeId: node.nodeId,
-              state: node.rentedByTwinId ? "Dedicated" : "Shared",
-            });
-          }
+        if (res?.length === 0 || farmId === undefined) {
+          selectedNode.value = undefined;
+          emptyResult.value = true;
+          loadingNodes.value = false;
+          return;
         }
-        availableNodes.value = nodesArr.value;
-      } else {
-        availableNodes.value = [];
+
+        if (res) {
+          nodesArr.value = [];
+          for (const node of res) {
+            if (!nodesArr.value.some(n => n.nodeId === node.nodeId)) {
+              nodesArr.value.push({
+                nodeId: node.nodeId,
+                state: node.rentedByTwinId ? "Dedicated" : "Shared",
+              });
+            }
+          }
+          availableNodes.value = nodesArr.value;
+        } else {
+          availableNodes.value = [];
+        }
+      } catch (e) {
+        errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
+      } finally {
+        validator.value?.setStatus(ValidatorStatus.Init);
+        loadingNodes.value = false;
+        farmManager?.setLoading(false);
       }
-    } catch (e) {
-      errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
-    } finally {
-      validator.value?.setStatus(ValidatorStatus.Init);
-      loadingNodes.value = false;
-      farmManager?.setLoading(false);
     }
   }
 }
