@@ -46,6 +46,12 @@ class NetworkHL extends HighLevelBase {
     }
     return twinDeployments;
   }
+
+  async hasNode(networkName: string, ipRange: string, nodeId: number): Promise<boolean> {
+    const network = new Network(networkName, ipRange, this.config);
+    await network.load();
+    return network.nodeExists(nodeId);
+  }
 }
 
 export { NetworkHL };

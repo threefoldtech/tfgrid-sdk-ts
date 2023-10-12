@@ -5,7 +5,7 @@ import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { NetworkHL } from "../high_level/network";
 import { BaseModule } from "./base";
-import { NetworkAddNodeModel, NetworkGetModel } from "./models";
+import { NetworkAddNodeModel, NetworkGetModel, NetworkHasNodeModel } from "./models";
 import { checkBalance } from "./utils";
 
 class NetworkModule extends BaseModule {
@@ -34,6 +34,12 @@ class NetworkModule extends BaseModule {
   @expose
   async list(): Promise<string[]> {
     return await this._list();
+  }
+
+  @expose
+  @validateInput
+  async hasNode(options: NetworkHasNodeModel): Promise<boolean> {
+    return await this.network.hasNode(options.name, options.ipRange, options.nodeId);
   }
 
   @expose
