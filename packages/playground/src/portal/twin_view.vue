@@ -96,7 +96,9 @@ onMounted(async () => {
       const userFarmId = userFarms.value.map(farm => farm.farmID);
       const activeProposals = (await proposals)?.active;
       const numberOfActiveProposals = activeProposals ? activeProposals.length : 0;
-      if (numberOfActiveProposals) {
+      if (!numberOfActiveProposals) {
+        return;
+      } else {
         const activeProposalsUserHasVotedOn = activeProposals.filter(
           (proposal: Proposal) =>
             proposal.ayes.filter((aye: { farmId: number }) => userFarmId.includes(aye.farmId)) ||
