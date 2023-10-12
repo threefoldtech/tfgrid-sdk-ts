@@ -142,6 +142,7 @@ const name = ref(generateName({ prefix: "um" }));
 const username = ref("admin");
 const password = ref(generatePassword());
 const ipv4 = ref(false);
+const wireguard = ref(true);
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
 const loadingFarm = ref(false);
@@ -166,6 +167,9 @@ async function deploy() {
 
     const vm = await deployVM(grid!, {
       name: name.value,
+      network: {
+        addAccess: wireguard.value,
+      },
       machines: [
         {
           name: name.value,
