@@ -87,30 +87,30 @@ const userFarms = ref<Farm[]>();
 onMounted(async () => {
   const profile = profileManager.profile!;
   const grid = await getGrid(profile);
-  if (grid) {
-    userFarms.value = await getFarms(grid, { ownedBy: profile.twinId }, {});
-    if (!userFarms.value.length) {
-      return;
-    } else {
-      const proposals = grid?.dao.get();
-      const userFarmId = userFarms.value.map(farm => farm.farmID);
-      const activeProposals = (await proposals)?.active;
-      const numberOfActiveProposals = activeProposals ? activeProposals.length : 0;
-      if (!numberOfActiveProposals) {
-        return;
-      } else {
-        const activeProposalsUserHasVotedOn = activeProposals.filter(
-          (proposal: Proposal) =>
-            proposal.ayes.filter((aye: { farmId: number }) => userFarmId.includes(aye.farmId)) ||
-            proposal.nayes.filter((naye: { farmId: number }) => userFarmId.includes(naye.farmId)),
-        );
-        if (activeProposalsUserHasVotedOn.length != numberOfActiveProposals) {
-          numberOfProposalsToVoteOn.value = numberOfActiveProposals - activeProposalsUserHasVotedOn.length;
-          openVotePopup.value = true;
-        }
-      }
-    }
+  if (!grid) {
+    return;
   }
+  userFarms.value = await getFarms(grid, { ownedBy: profile.twinId }, {});
+  if (!userFarms.value.length) {
+    return;
+  }
+  const proposals = grid?.dao.get();
+  const userFarmId = userFarms.value.map(farm => farm.farmID);
+  const activeProposals = (await proposals)?.active;
+  const numberOfActiveProposals = activeProposals ? activeProposals.length : 0;
+  if (!numberOfActiveProposals) {
+    return;
+  }
+  const activeProposalsUserHasVotedOn = activeProposals.filter(
+    (proposal: Proposal) =>
+      proposal.ayes.filter((aye: { farmId: number }) => userFarmId.includes(aye.farmId)) ||
+      proposal.nayes.filter((naye: { farmId: number }) => userFarmId.includes(naye.farmId)),
+  );
+  if (activeProposalsUserHasVotedOn.length == numberOfActiveProposals) {
+    return;
+  }
+  numberOfProposalsToVoteOn.value = numberOfActiveProposals - activeProposalsUserHasVotedOn.length;
+  openVotePopup.value = true;
 });
 
 function redirectToDao() {
