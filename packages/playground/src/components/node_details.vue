@@ -313,6 +313,7 @@ async function getNodeDetails() {
     publicIps.value = res.data[0].publicIps.length;
     if (Array.isArray(res) && !res.length) throw new Error("Can't resolve farm data");
     if (props.item.value.num_gpu > 0) loadGPUitems();
+    dNodeError.value = false;
   } catch (e) {
     dNodeError.value = true;
   }
@@ -335,6 +336,7 @@ async function loadGPUitems() {
     selectedGpuItem.value = gpuItem.value[0];
     selectedGpuId.value = gpuItem.value[0].id;
     loading.value = false;
+    gpuLoadingError.value = false;
   } catch (e) {
     console.log("Error: ", e);
     gpuLoadingError.value = true;
