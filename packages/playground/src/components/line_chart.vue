@@ -1,11 +1,9 @@
 <template>
-  <div :xs="xs" :isProfit="isProfit" :getTotalReward="getTotalReward" :getRoi="getRoi">
-    <Line :data="data" :options="options" />
-  </div>
+  <ChLine :data="data" :options="options" />
 </template>
 <script setup lang="ts">
 import { Line } from "vue-chartjs";
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(...registerables);
 const props = defineProps<{
   getTotalReward: (currentPrice: number) => number;
   getRoi: (price: number) => number;
@@ -70,19 +68,11 @@ const options = computed(() => {
 </script>
 
 <script lang="ts">
-import {
-  CategoryScale,
-  Chart as ChartJS,
-  Legend,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-} from "chart.js";
+import { Chart as ChartJS, registerables } from "chart.js";
 import { computed } from "vue";
 
 export default {
   name: "LineChart",
+  components: { ChLine: Line },
 };
 </script>

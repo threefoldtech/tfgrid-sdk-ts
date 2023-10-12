@@ -1,11 +1,8 @@
 <template>
-  <div :chartdata="props.chartdata">
-    <Doughnut :data="data" :options="options" />
-  </div>
+  <ChDoughnut :data="data" :options="options" />
 </template>
 <script setup lang="ts">
-import { Doughnut } from "vue-chartjs";
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(...registerables);
 
 const props = defineProps<{
   chartdata: any[];
@@ -26,6 +23,7 @@ const options = ref({
   },
 });
 const data = computed(() => {
+  console.log("props.chartdata", props.chartdata);
   return {
     labels: ["NU", "CU", "SU"],
     datasets: [
@@ -40,10 +38,12 @@ const data = computed(() => {
 </script>
 
 <script lang="ts">
-import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js";
+import { Chart as ChartJS, registerables } from "chart.js";
 import { computed, ref } from "vue";
+import { Doughnut } from "vue-chartjs";
 
 export default {
   name: "PieChart",
+  components: { ChDoughnut: Doughnut },
 };
 </script>
