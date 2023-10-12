@@ -159,29 +159,25 @@
           </v-card>
 
           <!-- Details -->
-          <v-row v-if="loading && !gpuLoadingError">
+          <v-row v-if="loading && !gpuLoadingError" class="d-flex align-center justify-center">
             <v-col cols="12" class="text-center pt-12">
               <v-progress-circular indeterminate size="64" color="primary"></v-progress-circular>
             </v-col>
           </v-row>
-          <v-row v-else-if="gpuLoadingError" style="display: flex; justify-content: center; align-items: center">
+          <!-- TODO: -->
+          <v-row v-else-if="gpuLoadingError" class="d-flex justify-center align-center text-center h-100">
             <div class="pt-10">
-              <v-alert
-                variant="tonal"
-                class="d-flex justify-between"
-                color="#f44336"
-                dense
-                outlined
-                type="error"
-                style="text-align: center"
-              >
-                <div style="display: flex; align-items: center">Failed to receive node GPUs information</div>
-                <template v-slot:append>
-                  <v-icon @click="loadGPUitems" style="cursor: pointer">mdi-reload</v-icon>
-                </template>
+              <v-alert variant="tonal" color="#f44336" dense outlined type="error" style="width: 100%; height: 100%">
+                <div class="d-flex align-center">
+                  <div style="display: flex; align-items: center; margin-bottom: 10px; padding-right: 5px">
+                    Failed to receive node GPUs information
+                  </div>
+                  <v-icon @click="loadGPUitems" style="cursor: pointer; margin-bottom: 10px">mdi-reload</v-icon>
+                </div>
               </v-alert>
             </div>
           </v-row>
+
           <v-row v-else-if="gpuItem && gpuItem.length !== 0">
             <v-col cols="12">
               <v-list>
@@ -308,6 +304,7 @@ onMounted(async () => {
 
 async function getNodeDetails() {
   try {
+    dNodeLoading.value = true;
     const res = await gridProxyClient.farms.list({ farmId: props.item.value.farmId });
     farmName.value = res.data[0].name;
     publicIps.value = res.data[0].publicIps.length;
@@ -316,6 +313,7 @@ async function getNodeDetails() {
     dNodeError.value = false;
   } catch (e) {
     dNodeError.value = true;
+    dNodeLoading.value = false;
   }
   dNodeLoading.value = false;
 }
@@ -340,6 +338,7 @@ async function loadGPUitems() {
   } catch (e) {
     console.log("Error: ", e);
     gpuLoadingError.value = true;
+    loading.value = false;
     createCustomToast("Failed to load GPU details", ToastType.danger);
   }
 }
@@ -353,5 +352,3 @@ watch(selectedGpuId, (newGpuId, oldGpuId) => {
   selectedGpuItem.value = gpuItem.value.find(item => item.id === newGpuId);
 });
 </script>
-
-<style></style>
