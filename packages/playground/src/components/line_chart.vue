@@ -1,5 +1,5 @@
 <template>
-  <div :fp="fp" :xs="xs" :isProfit="isProfit">
+  <div :xs="xs" :isProfit="isProfit" :getTotalReward="getTotalReward" :getRoi="getRoi">
     <Line :data="data" :options="options" />
   </div>
 </template>
@@ -7,7 +7,8 @@
 import { Line } from "vue-chartjs";
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 const props = defineProps<{
-  fp: FarmingProfile;
+  getTotalReward: (currentPrice: number) => number;
+  getRoi: (price: number) => number;
   xs: number[];
   isProfit: boolean;
 }>();
@@ -20,7 +21,7 @@ const data = computed(() => {
       datasets: [
         {
           label: "ROI",
-          data: props.xs.map(x => props.fp.getRoi(x) / 100),
+          data: props.xs.map(x => props.getRoi(x) / 100),
           backgroundColor: "rgb(26, 161, 143)",
           borderColor: "rgba(26, 161, 143, 0.5)",
           pointRadius: 3,
@@ -33,7 +34,7 @@ const data = computed(() => {
     datasets: [
       {
         label: "Margin",
-        data: props.xs.map(x => props.fp.getTotalReward(x)) || xs.map(x => props.fp.getTotalReward(x)),
+        data: props.xs.map(x => props.getTotalReward(x)) || xs.map(x => props.getTotalReward(x)),
         backgroundColor: "rgb(26, 161, 143)",
         borderColor: "rgba(26, 161, 143, 0.5)",
         pointRadius: 3,
@@ -66,19 +67,6 @@ const options = computed(() => {
     },
   };
 });
-
-const options2 = {
-  responsive: true,
-  plugins: {
-    legend: {
-      position: "top",
-    },
-    title: {
-      display: true,
-      text: "Return (USD) / TFT price (USD)",
-    },
-  },
-};
 </script>
 
 <script lang="ts">
@@ -94,7 +82,6 @@ import {
 } from "chart.js";
 import { computed } from "vue";
 
-import type FarmingProfile from "@/utils/simulator";
 export default {
   name: "LineChart",
 };

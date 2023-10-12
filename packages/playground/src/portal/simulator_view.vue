@@ -45,9 +45,9 @@ const chosenConfig = ref("");
 
 watch([chosenConfig], () => {
   if (chosenConfig.value == "Titan v2.1") {
+    // activeProfile.value = { type:ProfileTypes.TITAN, name: "Titan v2.1", memory: 32,cpu:8, hdd: 0, ssd: 1000, price: 0.08, priceAfter5Years: 1, investmentCostHW: 800};
     activeProfile.value.type = ProfileTypes.TITAN;
     activeProfile.value.name = "Titan v2.1";
-
     activeProfile.value.memory = 32;
     activeProfile.value.cpu = 8;
     activeProfile.value.hdd = 0;
@@ -58,7 +58,6 @@ watch([chosenConfig], () => {
   } else {
     activeProfile.value.type = ProfileTypes.DIY;
     activeProfile.value.name = "DIY";
-
     activeProfile.value.memory = 32;
     activeProfile.value.cpu = 8;
     activeProfile.value.hdd = 10000;

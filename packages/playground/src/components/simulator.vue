@@ -144,7 +144,7 @@
         </v-row>
         <v-row v-show="!isAdvanced">
           <v-col>
-            <!-- <LineChart :fp="activeProfile" :xs="xs" :isProfit="isProfit" /> -->
+            <LineChart :xs="xs" :isProfit="isProfit" :getTotalReward="getTotalReward" :getRoi="getRoi" />
           </v-col>
         </v-row>
         <v-row v-show="isAdvanced">
@@ -259,6 +259,19 @@ const props = defineProps<{
   profile: FarmingProfileOptions;
 }>();
 
+const certifications = ["No Certification", "Certified Node"];
+const certified = ref();
+
+const isAdvanced = ref(false);
+const isProfit = ref(false);
+const xs = ref<number[]>([]);
+const activeProfile = ref(props.profile);
+
+const chartdata = ref();
+const rewardPerCu = 2.4;
+const rewardPerSu = 1;
+const rewardPerNu = 0.03;
+
 const _max = (val: number, max = 0): number => {
   val = val ?? 0;
   return Math.max(val, max);
@@ -280,10 +293,6 @@ const su = computed(() => {
 });
 
 const averageTokenPrice = computed(() => (activeProfile.value.price + activeProfile.value.priceAfter5Years) / 2);
-
-const rewardPerCu = 2.4;
-const rewardPerSu = 1;
-const rewardPerNu = 0.03;
 
 const tftRewardPer = computed(() => (activeProfile.value.certified ? 1 : 0) * 0.25 + 1);
 
@@ -307,7 +316,6 @@ const nuFarmingRewardInTft = computed(() => (activeProfile.value.publicIp ? tftR
 const totalFarmingRewardInTft = computed(
   () => cuFarmingRewardInTft.value + suFarmingRewardInTft.value + nuFarmingRewardInTft.value,
 );
-
 const getTotalReward = (currentPrice: number): number => {
   const tft = totalFarmingRewardInTft.value * 60;
   const grossProfit = tft * currentPrice;
@@ -339,16 +347,6 @@ const totalCosts = computed(() => {
 
 const netProfit = computed(() => grossProfit.value - totalCosts.value);
 
-const certifications = ["No Certification", "Certified Node"];
-const certified = ref();
-
-const isAdvanced = ref(false);
-const isProfit = ref(false);
-const xs = ref<number[]>([]);
-const activeProfile = ref(props.profile);
-
-const chartdata = ref();
-
 watch([activeProfile.value, isProfit, isAdvanced, certified], () => {
   if (certified.value == "Certified Node") {
     activeProfile.value.certified = Certification.CERTIFIED;
@@ -362,6 +360,7 @@ watch([activeProfile.value, isProfit, isAdvanced, certified], () => {
 
 onMounted(() => {
   updateLineChart();
+  updatePieChart();
 });
 
 const updateLineChart = () => {
@@ -369,7 +368,7 @@ const updateLineChart = () => {
     ? isProfit.value
       ? activeProfile.value.priceAfter5Years
       : activeProfile.value.maximumTokenPrice
-    : 0; // Provide a default value if activeProfile is not available
+    : 0;
 
   if (activeProfile.value) {
     const X = (price - 0.15) / 19;
@@ -377,8 +376,6 @@ const updateLineChart = () => {
   }
 };
 function updatePieChart() {
-  //   const { nuFarmingRewardInTft, cuFarmingRewardInTft, suFarmingRewardInTft } = activeProfile.value;
-
   chartdata.value = [nuFarmingRewardInTft.value, cuFarmingRewardInTft.value, suFarmingRewardInTft.value];
 }
 </script>
