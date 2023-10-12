@@ -648,6 +648,12 @@ class NetworkAddNodeModel {
   @Expose() @IsString() @IsOptional() description?: string;
 }
 
+class NetworkHasNodeModel {
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() ipRange: string;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+}
+
 class NetworkGetModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
 }
@@ -778,6 +784,7 @@ export {
   SetServiceContractMetadataModel,
   GetServiceContractModel,
   NetworkAddNodeModel,
+  NetworkHasNodeModel,
   NetworkGetModel,
   NodeGetModel,
   SetDedicatedNodeExtraFeesModel,
