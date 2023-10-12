@@ -44,7 +44,6 @@
 <script lang="ts">
 import { ref } from "vue";
 
-import { gridProxyClient } from "../clients";
 import { useProfileManager } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid } from "../utils/grid";
@@ -80,17 +79,17 @@ export default {
       loadingUnreserveNode.value = true;
       try {
         const grid = await getGrid(profileManager.profile!);
-        createCustomToast("check for contracts on node ${props.nodeId}", ToastType.info);
+        createCustomToast(`check for contracts on node ${props.nodeId}`, ToastType.info);
 
         const result = (await grid?.contracts.getActiveContracts({ nodeId: +props.nodeId })) as any;
         if (result.length > 0) {
-          createCustomToast("node ${props.nodeId} has active contracts", ToastType.info);
+          createCustomToast(`node ${props.nodeId} has active contracts`, ToastType.info);
           loadingUnreserveNode.value = false;
           openUnreserveDialog.value = false;
         } else {
-          createCustomToast("unreserving node ${props.nodeId}", ToastType.info);
+          createCustomToast(`unreserving node ${props.nodeId}`, ToastType.info);
           await grid?.nodes.unreserve({ nodeId: +props.nodeId });
-          createCustomToast("Transaction succeeded node ${props.nodeId} Unreserved", ToastType.success);
+          createCustomToast(`Transaction succeeded node ${props.nodeId} Unreserved`, ToastType.success);
           loadingUnreserveNode.value = false;
           openUnreserveDialog.value = false;
           createCustomToast("Table may take sometime to update the changes", ToastType.info);
@@ -111,7 +110,7 @@ export default {
         createCustomToast("Transaction Submitted", ToastType.info);
         await grid?.nodes.reserve({ nodeId: +props.nodeId });
         loadingReserveNode.value = false;
-        createCustomToast("Transaction succeeded node ${props.nodeId} Reserved", ToastType.success);
+        createCustomToast(`Transaction succeeded node ${props.nodeId} Reserved`, ToastType.success);
         createCustomToast("Table may take sometime to update the changes", ToastType.info);
 
         emit("updateTable");
