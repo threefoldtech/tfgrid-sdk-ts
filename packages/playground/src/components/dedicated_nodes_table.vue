@@ -28,6 +28,7 @@
         v-model:expanded="expanded"
         show-expand
         :hide-no-data="false"
+        :disable-sort="true"
         class="elevation-1"
         :hover="true"
         :items-per-page-options="[
