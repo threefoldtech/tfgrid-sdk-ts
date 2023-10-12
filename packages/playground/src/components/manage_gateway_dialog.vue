@@ -65,6 +65,7 @@ import type { GatewayNode } from "../types";
 import { deployGatewayName, getSubdomain } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
+import { generateName } from "../utils/strings";
 import SelectGatewayNode from "./select_gateway_node.vue";
 import { useLayout } from "./weblet_layout.vue";
 
@@ -83,7 +84,7 @@ export default {
     const profileManager = useProfileManager();
     const layout = useLayout();
 
-    const subdomain = ref<string>();
+    const subdomain = ref<string>(generateName({}, 12));
     const gatewayNode = ref<GatewayNode>();
     const port = ref(80);
     const useCustomDomain = ref(false);
@@ -95,20 +96,23 @@ export default {
 
     const initializing = ref(true);
     onMounted(async () => {
-      const grid = await getGrid(profileManager.profile!);
-      subdomain.value = getSubdomain({
-        deploymentName: props.vm.deploymentName,
-        projectName: props.vm.projectName,
-        twinId: grid.twinId,
-      });
-      initializing.value = false;
+      const grid = await getGrid(profileManager.profile!, props.vm.projectName);
+      // const gateways = await grid.gateway.getObj("gw22");
+      // console.log({ gateways });
+      const list = await grid.gateway.list();
+      console.log(await Promise.all(list.map(x => grid.gateway.getObj(x))));
     });
 
     async function deployGateway() {
       layout.value.setStatus("deploy");
 
       try {
-        const grid = await getGrid(profileManager.profile!);
+        const [x, y] = ip.split(".");
+        const grid = await getGrid(profileManager.profile!, props.vm.projectName);
+        await grid.networks
+          .addNode({ name: networkName, ipRange: `${x}.${y}.0.0/16`, nodeId: gatewayNode.value.id })
+          .catch(() => null);
+
         await deployGatewayName(grid!, {
           name: subdomain.value,
           nodeId: gatewayNode.value.id,

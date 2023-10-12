@@ -248,7 +248,7 @@ async function deploy() {
 
   try {
     layout.value?.validateSSH();
-    const grid = await getGrid(profileManager.profile!, projectName);
+    const grid = await getGrid(profileManager.profile!, `${projectName}/${name.value}`);
 
     await layout.value.validateBalance(grid!);
 

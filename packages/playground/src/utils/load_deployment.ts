@@ -1,7 +1,7 @@
 import type { GridClient } from "@threefold/grid_client";
 
 import { formatConsumption } from "./contracts";
-import { updateGrid } from "./grid";
+import { getGrid, updateGrid } from "./grid";
 import { normalizeError } from "./helpers";
 
 export interface LoadedDeployments<T> {
@@ -16,8 +16,15 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   const machines = await grid.machines.list();
   let count = machines.length;
 
-  const promises = machines.map(name => {
-    return grid.machines.getObj(name).catch(e => {
+  const projectName = grid.clientOptions.projectName;
+  const grids = await Promise.all(machines.map(n => getGrid(grid.clientOptions, `${projectName}/${n}`)));
+
+  // const items: any[] = [];
+  // for (const name of machines) {
+  //   items.push(await updateGrid(grid, { projectName: `${projectName}/${name}` }).machines.getObj(name));
+  // }
+  const promises = machines.map((name, index) => {
+    return grids[index]!.machines.getObj(name).catch(e => {
       console.log(
         `%c[Error] failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`,
         "color: rgb(207, 102, 121)",
