@@ -89,7 +89,9 @@ onMounted(async () => {
   const grid = await getGrid(profile);
   if (grid) {
     userFarms.value = await getFarms(grid, { ownedBy: profile.twinId }, {});
-    if (userFarms.value.length) {
+    if (!userFarms.value.length) {
+      return;
+    } else {
       const proposals = grid?.dao.get();
       const userFarmId = userFarms.value.map(farm => farm.farmID);
       const activeProposals = (await proposals)?.active;
