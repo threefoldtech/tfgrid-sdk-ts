@@ -159,7 +159,7 @@
           </v-card>
 
           <!-- Details -->
-          <v-row v-if="loading && !gpuLoadingError" class="d-flex align-center justify-center">
+          <v-row v-if="loading" class="d-flex align-center justify-center">
             <v-col cols="12" class="text-center pt-12">
               <v-progress-circular indeterminate size="64" color="primary"></v-progress-circular>
             </v-col>
