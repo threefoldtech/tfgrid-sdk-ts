@@ -63,3 +63,10 @@ export async function rollbackDeployment(grid: GridClient, name: string) {
 
   return result;
 }
+
+export type GridGateway = Awaited<ReturnType<typeof loadDeploymentGateways>>[0];
+export async function loadDeploymentGateways(grid: GridClient) {
+  const gws = await grid.gateway.list();
+  const items = await Promise.all(gws.map(gw => grid.gateway.getObj(gw)));
+  return items.flat();
+}

@@ -17,14 +17,12 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   let count = machines.length;
 
   const projectName = grid.clientOptions.projectName;
-  const grids = await Promise.all(machines.map(n => getGrid(grid.clientOptions, `${projectName}/${n}`)));
+  const grids = (await Promise.all(
+    machines.map(n => getGrid(grid.clientOptions, `${projectName}/${n}`)),
+  )) as GridClient[];
 
-  // const items: any[] = [];
-  // for (const name of machines) {
-  //   items.push(await updateGrid(grid, { projectName: `${projectName}/${name}` }).machines.getObj(name));
-  // }
   const promises = machines.map((name, index) => {
-    return grids[index]!.machines.getObj(name).catch(e => {
+    return grids[index].machines.getObj(name).catch(e => {
       console.log(
         `%c[Error] failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`,
         "color: rgb(207, 102, 121)",
@@ -37,10 +35,10 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     .map((item: any, index) => {
       if (item) {
         item.deploymentName = machines[index];
-        item.projectName = grid.clientOptions!.projectName;
+        item.projectName = grids[index].clientOptions!.projectName;
         item.forEach((i: any) => {
           i.deploymentName = machines[index];
-          i.projectName = grid.clientOptions!.projectName;
+          i.projectName = grids[index].clientOptions!.projectName;
         });
       }
       return item;
@@ -54,12 +52,12 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
       return true;
     }) as any[][];
   const consumptions = await Promise.all(
-    vms.map(vm => {
-      return grid.contracts.getConsumption({ id: vm[0].contractId }).catch(() => undefined);
+    vms.map((vm, index) => {
+      return grids[index].contracts.getConsumption({ id: vm[0].contractId }).catch(() => undefined);
     }),
   );
   const wireguards = await Promise.all(
-    vms.map(vm => getWireguardConfig(grid, vm[0].interfaces[0].network).catch(() => [])),
+    vms.map((vm, index) => getWireguardConfig(grids[index], vm[0].interfaces[0].network).catch(() => [])),
   );
 
   const data = vms.map((vm, index) => {

@@ -3,54 +3,91 @@
     <weblet-layout ref="layout">
       <template #title>Manage Gateways </template>
 
-      <form-validator v-model="valid">
-        <input-validator
-          :value="subdomain"
-          :rules="[
-            validators.required('Subdomain is required.'),
-            validators.isLowercase('Subdomain should consist of lowercase letters only.'),
-            validators.isAlphanumeric('Subdomain should consist of letters and numbers only.'),
-            subdomain => validators.isAlpha('Subdomain must start with alphabet char.')(subdomain[0]),
-            validators.minLength('Subdomain must be at least 4 characters.', 4),
-            validators.maxLength('Subdomain cannot exceed 15 characters.', 15),
+      <v-tabs align-tabs="center" color="primary" class="mb-6" v-model="gatewayTab">
+        <v-tab>Gateway List</v-tab>
+        <v-tab>Add new gateway</v-tab>
+      </v-tabs>
+
+      <div v-show="gatewayTab === 0" class="pb-6">
+        <list-table
+          :headers="[
+            { title: 'Name', key: 'name' },
+            { title: 'Contract ID', key: 'contractId' },
+            { title: 'Domain', key: 'domain' },
+            { title: 'TLS Passthrough', key: 'tls_passthrough' },
+            { title: 'Backends', key: 'backends' },
+            { title: 'Status', key: 'status' },
           ]"
-          #="{ props }"
+          :items="gateways"
+          return-object
+          :loading="loadingGateways"
+          v-model="m"
         >
-          <v-text-field label="Subdomain" v-model.trim="subdomain" v-bind="props" />
-        </input-validator>
+          <template #[`item.tls_passthrough`]="{ item }">
+            {{ item.value.tls_passthrough ? "Yes" : "No" }}
+          </template>
 
-        <select-gateway-node v-model.number="gatewayNode" />
+          <template #[`item.status`]="{ item }">
+            {{ item.value.status.toUpperCase() }}
+          </template>
+        </list-table>
+        {{ m }}
+      </div>
 
-        <input-validator
-          :value="port"
-          :rules="[validators.required('Port is required.'), validators.isPort('Please provide a valid port.')]"
-          #="{ props }"
-        >
-          <v-text-field label="Port" v-model.number="port" type="number" v-bind="props" />
-        </input-validator>
+      <!-- <template #footer-actions v-if="gatewayTab === 0">
+        <v-btn color="error" variant="outlined"> Delete </v-btn>
+      </template> -->
 
-        <v-checkbox label="Custom Domain" v-model="useCustomDomain" hide-details />
-
-        <template v-if="useCustomDomain">
+      <div v-show="gatewayTab === 1">
+        <form-validator v-model="valid">
           <input-validator
-            :value="domain"
-            :rules="[validators.required('Domain is required.'), validators.isFQDN('Please provide a valid domain.')]"
+            :value="subdomain"
+            :rules="[
+              validators.required('Subdomain is required.'),
+              validators.isLowercase('Subdomain should consist of lowercase letters only.'),
+              validators.isAlphanumeric('Subdomain should consist of letters and numbers only.'),
+              subdomain => validators.isAlpha('Subdomain must start with alphabet char.')(subdomain[0]),
+              validators.minLength('Subdomain must be at least 4 characters.', 4),
+              validators.maxLength('Subdomain cannot exceed 15 characters.', 15),
+            ]"
             #="{ props }"
           >
-            <v-text-field label="Domain" autofocus v-model.trim="domain" v-bind="props" />
+            <v-text-field label="Subdomain" v-model.trim="subdomain" v-bind="props" />
           </input-validator>
-        </template>
 
-        <copy-input-wrapper #="{ props }" :data="networkName">
-          <v-text-field label="Network Name" v-model="networkName" v-bind="props" />
-        </copy-input-wrapper>
+          <select-gateway-node v-model.number="gatewayNode" />
 
-        <copy-input-wrapper #="{ props }" :data="ip">
-          <v-text-field label="IP Address" v-model="ip" v-bind="props" />
-        </copy-input-wrapper>
-      </form-validator>
+          <input-validator
+            :value="port"
+            :rules="[validators.required('Port is required.'), validators.isPort('Please provide a valid port.')]"
+            #="{ props }"
+          >
+            <v-text-field label="Port" v-model.number="port" type="number" v-bind="props" />
+          </input-validator>
 
-      <template #footer-actions>
+          <v-checkbox label="Custom Domain" v-model="useCustomDomain" hide-details />
+
+          <template v-if="useCustomDomain">
+            <input-validator
+              :value="domain"
+              :rules="[validators.required('Domain is required.'), validators.isFQDN('Please provide a valid domain.')]"
+              #="{ props }"
+            >
+              <v-text-field label="Domain" autofocus v-model.trim="domain" v-bind="props" />
+            </input-validator>
+          </template>
+
+          <copy-input-wrapper #="{ props }" :data="networkName">
+            <v-text-field label="Network Name" v-model="networkName" v-bind="props" />
+          </copy-input-wrapper>
+
+          <copy-input-wrapper #="{ props }" :data="ip">
+            <v-text-field label="IP Address" v-model="ip" v-bind="props" />
+          </copy-input-wrapper>
+        </form-validator>
+      </div>
+
+      <template #footer-actions v-if="gatewayTab === 1">
         <v-btn color="primary" variant="tonal" @click="deployGateway" :disabled="!valid"> Deploy </v-btn>
       </template>
     </weblet-layout>
@@ -62,10 +99,11 @@ import { onMounted, PropType, ref } from "vue";
 
 import { useProfileManager } from "../stores";
 import type { GatewayNode } from "../types";
-import { deployGatewayName, getSubdomain } from "../utils/gateway";
+import { deployGatewayName, type GridGateway, loadDeploymentGateways } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
+import ListTable from "./list_table.vue";
 import SelectGatewayNode from "./select_gateway_node.vue";
 import { useLayout } from "./weblet_layout.vue";
 
@@ -76,13 +114,14 @@ export interface VM {
 
 export default {
   name: "ManageGatewayDialog",
-  components: { SelectGatewayNode },
+  components: { SelectGatewayNode, ListTable },
   props: {
     vm: Object as PropType<VM>,
   },
   setup(props) {
     const profileManager = useProfileManager();
     const layout = useLayout();
+    const gatewayTab = ref(0);
 
     const subdomain = ref<string>(generateName({}, 12));
     const gatewayNode = ref<GatewayNode>();
@@ -94,14 +133,16 @@ export default {
     const ip = props.vm[0].interfaces[0].ip as string;
     const networkName = props.vm[0].interfaces[0].network as string;
 
-    const initializing = ref(true);
-    onMounted(async () => {
+    onMounted(loadGateways);
+
+    const loadingGateways = ref(false);
+    const gateways = ref<GridGateway[]>([]);
+    async function loadGateways() {
+      loadingGateways.value = true;
       const grid = await getGrid(profileManager.profile!, props.vm.projectName);
-      // const gateways = await grid.gateway.getObj("gw22");
-      // console.log({ gateways });
-      const list = await grid.gateway.list();
-      console.log(await Promise.all(list.map(x => grid.gateway.getObj(x))));
-    });
+      gateways.value = await loadDeploymentGateways(grid);
+      loadingGateways.value = false;
+    }
 
     async function deployGateway() {
       layout.value.setStatus("deploy");
@@ -129,7 +170,10 @@ export default {
 
     return {
       layout,
-      initializing,
+      gatewayTab,
+
+      loadingGateways,
+      gateways,
 
       subdomain,
       gatewayNode,
@@ -142,6 +186,7 @@ export default {
       networkName,
 
       deployGateway,
+      m: ref([]),
     };
   },
 };
