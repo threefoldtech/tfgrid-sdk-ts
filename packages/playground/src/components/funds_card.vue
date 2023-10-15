@@ -17,7 +17,15 @@
     <div>
       Get TFT on Stellar using BTC or Credit card, then you can bridge it to your tfchain account using the Bridge in
       the portal section.
-      <a href="https://manual.grid.tf/threefold_token/buy_sell_tft/gettft.html" target="_blank">More Information.</a>
+      <v-btn
+        icon
+        small
+        @click.stop
+        href="https://manual.grid.tf/threefold_token/buy_sell_tft/gettft.html"
+        target="_blank"
+        ><v-icon>mdi-information-outline</v-icon></v-btn
+      >
+      <!-- <a href="https://manual.grid.tf/threefold_token/buy_sell_tft/gettft.html" target="_blank">More Information.</a> -->
     </div>
   </v-tooltip>
 </template>
