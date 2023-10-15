@@ -231,7 +231,7 @@
             <div class="d-flex justify-center">
               <VBtn
                 type="submit"
-                color="primary"
+                color="secondary"
                 variant="tonal"
                 :loading="activating"
                 :disabled="

@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title class="font-weight-bold">Disclaimer</v-card-title>
-    <v-card-text v-if="network !== 'main' && nw !== 'main'">
+    <v-card-text class="px-4" v-if="network !== 'main' && nw !== 'main'">
       This is {{ nw }} environment. We're still ironing out the kinks. If there are any issues, please let us know
       <a class="app-link" href="https://github.com/threefoldtech/test_feedback/issues" target="_blank">here.</a>
     </v-card-text>
