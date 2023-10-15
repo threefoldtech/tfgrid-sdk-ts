@@ -20,6 +20,7 @@
       small
       outlined
       :loading="loadingReserveNode"
+      :disabled="disableButton"
       color="#064663"
       style="background: #1aa18f"
       v-if="rentedByTwinId === 0"
@@ -31,6 +32,8 @@
       small
       outlined
       color="red"
+      :loading="loadingUnreserveBtn"
+      :disabled="disableButton"
       style="background: #1aa18f"
       v-if="rentedByTwinId === twinId"
       @click="removeReserve"
@@ -69,7 +72,9 @@ export default {
   setup(props, { emit }) {
     const openUnreserveDialog = ref(false);
     const loadingUnreserveNode = ref(false);
+    const loadingUnreserveBtn = ref(false);
     const loadingReserveNode = ref(false);
+    const disableButton = ref(false);
 
     function removeReserve() {
       openUnreserveDialog.value = true;
@@ -92,8 +97,14 @@ export default {
           createCustomToast(`Transaction succeeded node ${props.nodeId} Unreserved`, ToastType.success);
           loadingUnreserveNode.value = false;
           openUnreserveDialog.value = false;
+          loadingUnreserveBtn.value = true;
           createCustomToast("Table may take sometime to update the changes", ToastType.info);
           emit("updateTable");
+          disableButton.value = true;
+          setTimeout(() => {
+            disableButton.value = false;
+            loadingUnreserveBtn.value = false;
+          }, 20000);
         }
       } catch (e) {
         console.log("Error: ", e);
@@ -109,11 +120,14 @@ export default {
         const grid = await getGrid(profileManager.profile!);
         createCustomToast("Transaction Submitted", ToastType.info);
         await grid?.nodes.reserve({ nodeId: +props.nodeId });
-        loadingReserveNode.value = false;
         createCustomToast(`Transaction succeeded node ${props.nodeId} Reserved`, ToastType.success);
         createCustomToast("Table may take sometime to update the changes", ToastType.info);
-
         emit("updateTable");
+        disableButton.value = true;
+        setTimeout(() => {
+          disableButton.value = false;
+          loadingReserveNode.value = false;
+        }, 20000);
       } catch (e) {
         console.log("Error: ", e);
         createCustomToast(e as string, ToastType.danger);
@@ -127,6 +141,8 @@ export default {
       loadingReserveNode,
       reserveNode,
       removeReserve,
+      disableButton,
+      loadingUnreserveBtn,
     };
   },
 };
