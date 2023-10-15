@@ -1,15 +1,24 @@
 <template>
-  <v-btn
-    id="tftBtn"
-    width="2000"
-    color="white"
-    @click="addTFT"
-    class="px-lg-6 px-md-2 px-sm-0 mx-sm-0"
-    style="color: white; max-width: 140px; width: auto; background-color: var(--primary)"
-    :loading="loadingAddTFT"
-  >
-    GET TFT
-  </v-btn>
+  <v-tooltip location="bottom" v-if="showTooltip()" close-delay="1000" color="primary">
+    <template #activator="{ props }">
+      <v-btn
+        id="tftBtn"
+        width="2000"
+        color="white"
+        @click="addTFT"
+        class="px-lg-6 px-md-2 px-sm-0 mx-sm-0"
+        style="color: white; max-width: 140px; width: auto; background-color: var(--primary)"
+        :loading="loadingAddTFT"
+        v-bind="props"
+      >
+        GET TFT
+      </v-btn>
+    </template>
+    <div>
+      Get TFT using BTC or Credit card to Stellar bridge, then use bridge to get your TFT from Stellar.
+      <a href="https://manual.grid.tf/threefold_token/buy_sell_tft/gettft.html" target="_blank">More Information.</a>
+    </div>
+  </v-tooltip>
 </template>
 
 <script lang="ts">
@@ -44,9 +53,14 @@ export default {
         }
       }
     };
+    function showTooltip() {
+      return window.env.NETWORK !== "dev" && window.env.NETWORK !== "qa";
+    }
+
     return {
       loadingAddTFT,
       addTFT,
+      showTooltip,
     };
   },
 };
@@ -60,5 +74,9 @@ export default {
 
 :root {
   --primary: #1aa18f;
+}
+
+.v-tooltip > .v-overlay__content {
+  pointer-events: initial !important;
 }
 </style>
