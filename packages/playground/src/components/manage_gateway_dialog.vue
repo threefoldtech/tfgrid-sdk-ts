@@ -16,7 +16,7 @@
           }
         "
       >
-        <template #title>Manage Gateways </template>
+        <template #title>Manage Gateways ({{ $props.vm?.[0]?.name }})</template>
 
         <v-tabs align-tabs="center" color="primary" class="mb-6" v-model="gatewayTab" :disabled="deleting">
           <v-tab>Gateway List</v-tab>
@@ -43,6 +43,7 @@
             :loading="loadingGateways"
             v-model="gatewaysToDelete"
             :deleting="deleting"
+            no-data-text="No gateways found for this deployment."
           >
             <template #[`item.tls_passthrough`]="{ item }">
               {{ item.value.tls_passthrough ? "Yes" : "No" }}
@@ -211,9 +212,12 @@ export default {
       try {
         const [x, y] = ip.split(".");
         const grid = await getGrid(profileManager.profile!, props.vm.projectName);
-        await grid.networks
-          .addNode({ name: networkName, ipRange: `${x}.${y}.0.0/16`, nodeId: gatewayNode.value.id })
-          .catch(() => null);
+
+        const data = { name: networkName, ipRange: `${x}.${y}.0.0/16`, nodeId: gatewayNode.value.id };
+        const hasNode = await grid.networks.hasNode(data);
+        if (!hasNode) {
+          await grid.networks.addNode(data);
+        }
 
         await deployGatewayName(grid!, {
           name: subdomain.value,
