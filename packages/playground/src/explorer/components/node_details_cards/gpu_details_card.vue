@@ -35,11 +35,11 @@
 
 <script lang="ts">
 import type { GPUCard, GridNode } from "@threefold/gridproxy_client";
-import { createToast } from "mosha-vue-toastify";
 import { onMounted, type PropType, ref } from "vue";
 import { watch } from "vue";
 
 import type { NodeDetailsCard } from "@/explorer/utils/types";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import CardDetails from "./card_details.vue";
 
@@ -81,12 +81,7 @@ export default {
 
     const copy = (value: string) => {
       navigator.clipboard.writeText(value);
-      createToast("Copied!", {
-        position: "top-right",
-        hideProgressBar: true,
-        toastBackgroundColor: "#1aa18f",
-        timeout: 5000,
-      });
+      createCustomToast("Copied!", ToastType.success);
     };
 
     const getNodeTwinDetailsCard = (): NodeDetailsCard[] => {

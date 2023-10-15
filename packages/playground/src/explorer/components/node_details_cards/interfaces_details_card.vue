@@ -10,11 +10,11 @@
 <script lang="ts">
 import type { Interfaces } from "@threefold/graphql_client";
 import type { GridNode } from "@threefold/gridproxy_client";
-import { createToast } from "mosha-vue-toastify";
 import { onMounted, type PropType, ref } from "vue";
 
 import { gqlClient } from "@/clients";
 import type { NodeDetailsCard } from "@/explorer/utils/types";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import CardDetails from "./card_details.vue";
 
@@ -56,12 +56,7 @@ export default {
 
     const copy = (address: string) => {
       navigator.clipboard.writeText(address);
-      createToast("Copied!", {
-        position: "top-right",
-        hideProgressBar: true,
-        toastBackgroundColor: "#1aa18f",
-        timeout: 5000,
-      });
+      createCustomToast("Copied!", ToastType.success);
     };
 
     const getNodeDetailsCard = (): NodeDetailsCard[] => {
