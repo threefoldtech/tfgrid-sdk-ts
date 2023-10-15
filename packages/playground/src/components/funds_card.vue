@@ -25,7 +25,6 @@
         target="_blank"
         ><v-icon>mdi-information-outline</v-icon></v-btn
       >
-      <!-- <a href="https://manual.grid.tf/threefold_token/buy_sell_tft/gettft.html" target="_blank">More Information.</a> -->
     </div>
   </v-tooltip>
 </template>
