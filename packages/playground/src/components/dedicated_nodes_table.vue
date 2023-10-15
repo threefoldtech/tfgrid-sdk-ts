@@ -1,7 +1,7 @@
 <template>
   <!-- Filters -->
   <div class="pt-5">
-    <node-filter v-model="filterInputs" v-model:valid="isValidForm" :is-form-loading="isFormLoading" />
+    <node-filter v-model="filterInputs" v-model:valid="isValidForm" :form-disabled="isFormLoading" />
   </div>
   <div class="pt-5">
     <v-card>
