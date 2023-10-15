@@ -116,6 +116,45 @@ class BaseModule {
       oldKeys.map(k => this.backendStorage.load(PATH.join(oldPath, k, "contracts.json"))),
     );
 
+    const contracts = await Promise.all(
+      values.flat(1).map(value => this.tfClient.contracts.get({ id: value.contract_id })),
+    );
+
+    const updateContractsExts: Promise<any>[] = [];
+    for (const contract of contracts) {
+      const { nodeContract } = contract.contractType || {};
+      if (!nodeContract) {
+        continue;
+      }
+
+      const requiredContract = contract.contractId === 41781;
+
+      const { deploymentData, deploymentHash: hash } = nodeContract;
+      const oldData = JSON.parse(deploymentData || "{}") as unknown as {
+        type: string;
+        name: string;
+        projectName: string;
+      };
+      const { name, projectName } = oldData;
+      if (projectName?.endsWith(`/${name}`) && !requiredContract) {
+        continue;
+      }
+
+      oldData.projectName = `${projectName}/${name}`;
+
+      updateContractsExts.push(
+        this.tfClient.contracts.updateNode({
+          id: contract.contractId,
+          data: JSON.stringify(oldData),
+          hash,
+        }),
+      );
+    }
+
+    const _updateContractsExts = await Promise.all(updateContractsExts.flat(1));
+    const __updateContractsExts = _updateContractsExts.flat(1).filter(Boolean);
+    await this.tfClient.applyAllExtrinsics(__updateContractsExts);
+
     let ext1: any[] = [];
     let ext2: any[] = [];
 
