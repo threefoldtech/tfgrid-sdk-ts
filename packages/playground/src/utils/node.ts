@@ -118,8 +118,6 @@ export async function getNodeAvailability(nodeId: number) {
   );
 
   const uptimeEvents: Array<UptimeEvent> = res.map((item: any) => {
-    console.log("uptimeEvents", uptimeEvents);
-
     return { timestamp: +item.timestamp, uptime: +item.uptime };
   });
   // if there are no uptimeEvents (i.e node was never up in the current period), return the time elapsed since the period start as downtime
@@ -157,7 +155,7 @@ export async function getNodeAvailability(nodeId: number) {
 export function getFarmUptimePercentage(farm: NodeInterface[]) {
   let uptime = 0;
   for (let i = 0; i < farm.length; i++) {
-    uptime += +getNodeUptimePercentage(farm[i]);
+    uptime += +getNodeUptimePercentage(farm[i].nodeId);
   }
   return (uptime / farm.length).toFixed(2);
 }
@@ -302,7 +300,9 @@ export function generateReceipt(doc: jsPDF, node: NodeInterface) {
     topY + lineOffset * 4,
   );
   doc.text(
-    `Uptime: ${getNodeUptimePercentage(node)}% - ${Math.floor(moment.duration(node.uptime, "seconds").asDays())} days`,
+    `Uptime: ${getNodeUptimePercentage(node.nodeId)}% - ${Math.floor(
+      moment.duration(node.uptime, "seconds").asDays(),
+    )} days`,
     cellX,
     topY + lineOffset * 5,
   );
