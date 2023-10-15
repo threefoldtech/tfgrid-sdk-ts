@@ -120,11 +120,11 @@
                             :rotate="-90"
                             :size="150"
                             :width="12"
-                            :model-value="getNodeUptimePercentage(item.value)"
+                            :model-value="item.value.uptime"
                             class="my-3"
                             color="primary"
                           />
-                          <p>Uptime: {{ getNodeUptimePercentage(item.value) }}%</p>
+                          <p>Uptime: {{ item.value.uptime }}%</p>
                         </template>
                         <span>Current Node Uptime Percentage (since start of the current minting period)</span>
                       </v-tooltip>
@@ -213,7 +213,7 @@
 <script lang="ts">
 import { onMounted, ref } from "vue";
 
-import type { NodeInterface } from "@/utils/node";
+import { getNodeUptimePercentage, type NodeInterface } from "@/utils/node";
 
 import { gridProxyClient } from "../../../clients";
 import { useGrid, useProfileManager } from "../../../stores";
@@ -278,9 +278,16 @@ export default {
     const publicConfig = ref<IPublicConfig>();
     const resourcesPanel = ref([]);
     const receiptsPanel = ref([]);
+    const uptime = ref();
 
     onMounted(async () => {
-      await getUserNodes();
+      const nodes = await getUserNodes();
+      await Promise.all(
+        nodes!.map(async (n, i) => {
+          n.uptime = +(await getNodeUptimePercentage(n.nodeId));
+          return n.uptime;
+        }),
+      );
     });
 
     async function getUserNodes() {
@@ -290,7 +297,7 @@ export default {
         const farmIds = userFarms.map(farm => farm.farmId).join(",");
         const { data } = await gridProxyClient.nodes.list({ farmIds }, { loadStats: true });
         nodes.value = data as unknown as NodeInterface[];
-        console.log("nodes.value", nodes.value);
+        return nodes.value;
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to get user nodes!", ToastType.danger);
@@ -299,13 +306,6 @@ export default {
 
     function getColor(status: string) {
       return status === "down" ? "red" : "primary";
-    }
-
-    function getNodeUptimePercentage(node: NodeInterface) {
-      return (
-        ((node.availability?.currentPeriod - node.availability?.downtime) / node.availability?.currentPeriod) *
-        100
-      ).toFixed(2);
     }
 
     function getPercentage(item: any, type: any) {
@@ -328,9 +328,9 @@ export default {
       resourcesPanel,
       receiptsPanel,
       publicConfig,
+      uptime,
       getUserNodes,
       getColor,
-      getNodeUptimePercentage,
       getPercentage,
       byteToGB,
     };

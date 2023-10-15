@@ -1,3 +1,5 @@
+import "jspdf-autotable";
+
 import axios from "axios";
 import type { jsPDF } from "jspdf";
 import moment from "moment";
@@ -77,59 +79,14 @@ export interface receiptInterface {
   endPeriodTimestamp: number;
   fixupReward?: number;
 }
-
-export interface NodeAvailability {
-  downtime: number;
-  currentPeriod: number;
-}
-
 interface UptimeEvent {
   uptime: number;
   timestamp: number;
 }
 
-export function generateReceipt(doc: jsPDF, node: NodeInterface) {
-  // Set font size and initial positioning
-  doc.setFontSize(15);
-  const topY = 20;
-  const lineOffset = 5;
-  const cellOffset = 30;
-  const cellX = 15;
-  const cellY = topY + lineOffset * 8;
-
-  // Add header information on the first page
-  doc.text(`Node ${node.nodeId} Summary`, 80, topY);
-  doc.setFontSize(10);
-  doc.text(`Receipts total: ${node.receipts.length}`, cellX, topY + lineOffset);
-  doc.text(
-    `Minting total: ${node.receipts.filter(receipt => receipt.type == "MINTING").length}`,
-    cellX,
-    topY + lineOffset * 2,
-  );
-  doc.text(`Fixup total: ${node.receipts.filter(receipt => receipt.fixupStart).length}`, cellX, topY + lineOffset * 3);
-
-  doc.text(
-    `TFT total: ${node.receipts.reduce((total, receipt) => (total += receipt.tft || 0), 0).toFixed(2)}`,
-    cellX,
-    topY + lineOffset * 4,
-  );
-  doc.text(
-    `Uptime: ${getNodeUptimePercentage(node)}% - ${Math.floor(moment.duration(node.uptime, "seconds").asDays())} days`,
-    cellX,
-    topY + lineOffset * 5,
-  );
-
-  // Draw a line after the header information
-  doc.line(cellX, topY + lineOffset * 6, cellX + 175, topY + lineOffset * 6);
-
-  const size = 4;
-  let page = 0;
-  for (let i = 0; i < node.receipts.length - 1; i += size) {
-    page++;
-    doc = generatePage(doc, node.receipts.slice(i, i + size), page);
-  }
-
-  return doc;
+export interface NodeAvailability {
+  downtime: number;
+  currentPeriod: number;
 }
 
 export async function getNodeAvailability(nodeId: number) {
@@ -152,15 +109,17 @@ export async function getNodeAvailability(nodeId: number) {
   const secondsSinceCurrentPeriodStart = (secondsSinceEpoch - FIRST_PERIOD_START_TIMESTAMP) % STANDARD_PERIOD_DURATION;
   const currentPeriodStartTimestamp = secondsSinceEpoch - secondsSinceCurrentPeriodStart;
 
-  const res = await axios.post(gqlClient, {
-    query: `{
-			uptimeEvents(where: {nodeID_eq: ${nodeId}, timestamp_gt: ${currentPeriodStartTimestamp}}, orderBy: timestamp_ASC) {
-			  timestamp
-			  uptime
-			}
-		  }`,
-  });
-  const uptimeEvents: Array<UptimeEvent> = res.data.data.uptimeEvents.map((item: UptimeEvent) => {
+  const res = await gqlClient.uptimeEvents(
+    { timestamp: true, uptime: true },
+    {
+      orderBy: ["timestamp_ASC"],
+      where: { nodeID_eq: nodeId, timestamp_gt: currentPeriodStartTimestamp as unknown as bigint },
+    },
+  );
+
+  const uptimeEvents: Array<UptimeEvent> = res.map((item: any) => {
+    console.log("uptimeEvents", uptimeEvents);
+
     return { timestamp: +item.timestamp, uptime: +item.uptime };
   });
   // if there are no uptimeEvents (i.e node was never up in the current period), return the time elapsed since the period start as downtime
@@ -203,13 +162,57 @@ export function getFarmUptimePercentage(farm: NodeInterface[]) {
   return (uptime / farm.length).toFixed(2);
 }
 
-export function getNodeUptimePercentage(node: NodeInterface) {
-  console.log("Availability", node.availability);
+export async function getNodeUptimePercentage(nodeId: number) {
+  const availability = await getNodeAvailability(nodeId);
+  return (((availability?.currentPeriod - availability?.downtime) / availability?.currentPeriod) * 100).toFixed(2);
+}
+export function getTime(num: number | undefined) {
+  if (num) {
+    return new Date(num);
+  }
+  return new Date();
+}
+export function generateNodeSummary(doc: jsPDF, nodes: NodeInterface[]) {
+  doc.setFontSize(15);
+  const topY = 20;
+  const topX = 60;
+  const lineOffset = 10;
+  const cellOffset = 40;
+  const cellX = 15;
+  const cellY = topY + lineOffset;
 
-  return (
-    ((node.availability.currentPeriod - node.availability.downtime) / node.availability.currentPeriod) *
-    100
-  ).toFixed(2);
+  doc.text(`Farm ${nodes[0].farmId} Nodes Minting Summary`, topX, topY);
+  doc.setFontSize(10);
+
+  doc.text(`Nodes: ${nodes.length}`, cellX, cellY);
+  doc.text(`Receipts: ${nodes.reduce((total, node) => (total += node.receipts.length), 0)}`, cellX, cellY + lineOffset);
+  doc.text(
+    `Minting Receipts: ${nodes.reduce(
+      (total, node) => (total += node.receipts.filter(receipt => receipt.type == "MINTING").length),
+      0,
+    )}`,
+    cellX,
+    cellY + lineOffset * 2,
+  );
+  doc.text(
+    `Fixup Receipts: ${nodes.reduce(
+      (total, node) => (total += node.receipts.filter(receipt => receipt.fixupStart).length),
+      0,
+    )}`,
+    cellX,
+    cellY + lineOffset * 3,
+  );
+  doc.text(
+    `TFT: ${nodes
+      .reduce(
+        (total, node) => (total += node.receipts.reduce((totalTFT, receipt) => (totalTFT += receipt.tft || 0), 0)),
+        0,
+      )
+      .toFixed(2)}`,
+    cellX,
+    cellY + lineOffset * 4,
+  );
+  doc.text(`Uptime: ${getFarmUptimePercentage(nodes)}%`, cellX, cellY + lineOffset * 5);
 }
 
 export function generatePage(doc: jsPDF, receiptsBatch: receiptInterface[], page: number) {
@@ -273,9 +276,103 @@ export function generatePage(doc: jsPDF, receiptsBatch: receiptInterface[], page
   return doc;
 }
 
-export function getTime(num: number | undefined) {
-  if (num) {
-    return new Date(num);
+export function generateReceipt(doc: jsPDF, node: NodeInterface) {
+  // Set font size and initial positioning
+  doc.setFontSize(15);
+  const topY = 20;
+  const lineOffset = 5;
+  const cellOffset = 30;
+  const cellX = 15;
+  const cellY = topY + lineOffset * 8;
+
+  // Add header information on the first page
+  doc.text(`Node ${node.nodeId} Summary`, 80, topY);
+  doc.setFontSize(10);
+  doc.text(`Receipts total: ${node.receipts.length}`, cellX, topY + lineOffset);
+  doc.text(
+    `Minting total: ${node.receipts.filter(receipt => receipt.type == "MINTING").length}`,
+    cellX,
+    topY + lineOffset * 2,
+  );
+  doc.text(`Fixup total: ${node.receipts.filter(receipt => receipt.fixupStart).length}`, cellX, topY + lineOffset * 3);
+
+  doc.text(
+    `TFT total: ${node.receipts.reduce((total, receipt) => (total += receipt.tft || 0), 0).toFixed(2)}`,
+    cellX,
+    topY + lineOffset * 4,
+  );
+  doc.text(
+    `Uptime: ${getNodeUptimePercentage(node)}% - ${Math.floor(moment.duration(node.uptime, "seconds").asDays())} days`,
+    cellX,
+    topY + lineOffset * 5,
+  );
+
+  // Draw a line after the header information
+  doc.line(cellX, topY + lineOffset * 6, cellX + 175, topY + lineOffset * 6);
+
+  const size = 4;
+  let page = 0;
+  for (let i = 0; i < node.receipts.length - 1; i += size) {
+    page++;
+    doc = generatePage(doc, node.receipts.slice(i, i + size), page);
   }
-  return new Date();
+
+  return doc;
+}
+
+export async function getNodeMintingFixupReceipts(nodeId: number) {
+  let nodeReceipts: receiptInterface[] = [];
+  const res = await axios.get(`https://alpha.minting.tfchain.grid.tf/api/v1/node/${nodeId}`).then(res =>
+    res.data.map(
+      (rec: {
+        hash: any;
+        receipt: {
+          Minting: {
+            period: { start: number; end: number };
+            reward: { musd: number; tft: number };
+            cloud_units: { cu: number; su: number; nu: number };
+          };
+          Fixup: {
+            period: { start: number; end: number };
+            minted_cloud_units: { cu: number; su: number; nu: number };
+            fixup_cloud_units: { cu: number; su: number; nu: number };
+            correct_cloud_units: { cu: number; su: number; nu: number };
+            minted_reward: { musd: number; tft: number };
+            fixup_reward: { musd: number; tft: number };
+          };
+        };
+      }) => {
+        if (rec.receipt.Minting) {
+          nodeReceipts.push({
+            type: "MINTING",
+            hash: rec.hash,
+            cloud_units: rec.receipt.Minting.cloud_units,
+            mintingStart: rec.receipt.Minting.period.start * 1000,
+            mintingEnd: rec.receipt.Minting.period.end * 1000,
+            tft: rec.receipt.Minting.reward.tft / 1e7,
+            startPeriodTimestamp: rec.receipt.Minting.period.start,
+            endPeriodTimestamp: rec.receipt.Minting.period.end,
+          });
+        } else {
+          nodeReceipts.push({
+            type: "FIXUP",
+            hash: rec.hash,
+            cloud_units: rec.receipt.Fixup.minted_cloud_units,
+            fixup_cloud_units: rec.receipt.Fixup.fixup_cloud_units,
+            correct_cloud_units: rec.receipt.Fixup.correct_cloud_units,
+            fixupStart: rec.receipt.Fixup.period.start * 1000 || 0,
+            fixupEnd: rec.receipt.Fixup.period.end * 1000 || 0,
+            startPeriodTimestamp: rec.receipt.Fixup.period.start,
+            endPeriodTimestamp: rec.receipt.Fixup.period.end,
+            tft: rec.receipt.Fixup.minted_reward.tft / 1e7,
+            fixupReward: rec.receipt.Fixup.fixup_reward.tft / 1e7,
+          });
+        }
+      },
+    ),
+  );
+
+  // sort based on the start date
+  nodeReceipts = nodeReceipts.sort((a, b) => b.startPeriodTimestamp - a.startPeriodTimestamp);
+  return nodeReceipts;
 }
