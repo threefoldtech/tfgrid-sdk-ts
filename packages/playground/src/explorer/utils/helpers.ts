@@ -126,9 +126,9 @@ export const getQueries = (mixedFilters: MixedFilter): Partial<NodesQuery> => {
     status: mixedFilters.options.status ? (mixedFilters.options.status.toLocaleLowerCase() as NodeStatus) : undefined,
     page: mixedFilters.options.page,
     size: mixedFilters.options.size,
-    freeHru: toBytes(+mixedFilters.inputs.freeHru.value!),
-    freeMru: toBytes(+mixedFilters.inputs.freeMru.value!),
-    freeSru: toBytes(+mixedFilters.inputs.freeSru.value!),
+    freeHru: mixedFilters.inputs.freeHru.value ? toBytes(+mixedFilters.inputs.freeHru.value!) : undefined,
+    freeMru: mixedFilters.inputs.freeMru.value ? toBytes(+mixedFilters.inputs.freeMru.value!) : undefined,
+    freeSru: mixedFilters.inputs.freeSru.value ? toBytes(+mixedFilters.inputs.freeSru.value!) : undefined,
     hasGpu: mixedFilters.options.gpu,
   };
   if (mixedFilters.options.gateway) {
