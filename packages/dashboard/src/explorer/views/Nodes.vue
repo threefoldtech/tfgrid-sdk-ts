@@ -103,7 +103,7 @@
         </template>
 
         <template v-slot:[`item.uptime`]="{ item }">
-          {{ item.uptime | secondToRedable }}
+          {{ item.uptime | toReadableDate }}
         </template>
 
         <template v-slot:[`item.status`]="{ item }">

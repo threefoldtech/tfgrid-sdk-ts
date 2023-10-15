@@ -1,17 +1,17 @@
 import Vue from "vue";
 import VueApollo from "vue-apollo";
 
-import dateFiler from "./filters/date";
+import toHumanDate from "./filters/date";
 import optionTitleFiler from "./filters/optionTitle";
-import secondToRedable from "./filters/secondToRedable";
+import toReadableDate from "./filters/toReadableDate";
 import toTeraOrGigaOrPeta from "./filters/toTeraOrGigaOrPeta";
 import apolloProvider from "./plugins/apollo";
 
 Vue.use(VueApollo);
-Vue.filter("date", dateFiler);
+Vue.filter("date", toHumanDate);
 Vue.filter("optionTitle", optionTitleFiler);
 Vue.filter("toTeraOrGigaOrPeta", toTeraOrGigaOrPeta);
-Vue.filter("secondToRedable", secondToRedable);
+Vue.filter("toReadableDate", toReadableDate);
 
 export const explorerConfigs: any = {
   apolloProvider,

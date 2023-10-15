@@ -4,6 +4,8 @@ import type { IsEmailOptions } from "validator/lib/isEmail";
 import type { IsFQDNOptions } from "validator/lib/isFQDN";
 import type { IsURLOptions } from "validator/lib/isURL";
 
+import { toBytes } from "@/explorer/utils/helpers";
+
 export function required(msg: string) {
   return (value: string) => {
     if (value === "" || value === undefined || value === null) {
@@ -64,6 +66,23 @@ export function min(msg: string, min: number) {
   return (value: string) => {
     if (+value < min) {
       return { message: msg, min };
+    }
+  };
+}
+
+export function startsWith(msg: string, char: string) {
+  return (value: string) => {
+    if (value.startsWith(char)) {
+      return { message: msg };
+    }
+  };
+}
+
+export function validateResourceMaxNumber(msg: string) {
+  return (value: string) => {
+    const valueInBytes = toBytes(+value);
+    if (+valueInBytes > BigInt(2 ** 64 - 1)) {
+      return { message: msg };
     }
   };
 }
