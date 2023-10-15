@@ -5,13 +5,39 @@
     title="GPUs Details"
     :items="gpuFields"
     icon="mdi-credit-card-settings-outline"
-  />
+  >
+    <template #gpu-hint-message>
+      <v-chip class="d-flex justify-center ma-4 mt-1" color="info">
+        Select a GPU card ID from the below selection to load its data.
+      </v-chip>
+      <v-row class="bb-gray">
+        <v-col class="ml-3 d-flex justify-start align-center">
+          Card ID
+          <v-chip class="ml-4" :color="selectedCard.contract ? 'warning' : 'primary'">
+            {{ selectedCard.contract ? "Reserved" : "Available" }}
+          </v-chip>
+        </v-col>
+        <v-col class="mr-3 d-flex justify-end align-center">
+          <v-select
+            chips
+            clearable
+            hide-details="auto"
+            v-model="selectedCard.id"
+            :items="cardsIds"
+            variant="outlined"
+          />
+          <v-icon class="ml-1" :icon="'mdi-content-copy'" @click="copy(selectedCard.id)" />
+        </v-col>
+      </v-row>
+    </template>
+  </card-details>
 </template>
 
 <script lang="ts">
 import type { GPUCard, GridNode } from "@threefold/gridproxy_client";
 import { createToast } from "mosha-vue-toastify";
 import { onMounted, type PropType, ref } from "vue";
+import { watch } from "vue";
 
 import type { NodeDetailsCard } from "@/explorer/utils/types";
 
@@ -30,21 +56,31 @@ export default {
   setup(props) {
     const loading = ref<boolean>(false);
     const gpuFields = ref<NodeDetailsCard[]>([]); // Initialize as an empty array
+    const cardsIds = ref<string[]>([]);
+    const selectedCard = ref<GPUCard>(props.node.cards[0]);
+
+    watch(
+      selectedCard,
+      (newValue: GPUCard) => {
+        selectedCard.value = newValue;
+      },
+      { deep: true },
+    );
 
     const mount = () => {
       loading.value = true;
-      props.node.cards.map((card: GPUCard, index: number) => {
-        index += 1;
-        const cardField = getNodeTwinDetailsCard(card, index);
-        gpuFields.value.push(...cardField);
+      selectedCard.value = props.node.cards[0];
+      props.node.cards.map((card: GPUCard) => {
+        cardsIds.value.push(card.id);
       });
+      gpuFields.value = getNodeTwinDetailsCard();
       loading.value = false;
     };
 
     onMounted(mount);
 
-    const copy = (address: string) => {
-      navigator.clipboard.writeText(address);
+    const copy = (value: string) => {
+      navigator.clipboard.writeText(value);
       createToast("Copied!", {
         position: "top-right",
         hideProgressBar: true,
@@ -53,47 +89,38 @@ export default {
       });
     };
 
-    const getNodeTwinDetailsCard = (card: GPUCard, index: number): NodeDetailsCard[] => {
-      console.log("This is working...");
+    const getNodeTwinDetailsCard = (): NodeDetailsCard[] => {
       return [
         {
-          name: "Card Level / Number",
-          value: `(${index})`,
-          icon: "mdi-information-outline",
-          callback: () => {},
-          hint: "The card level corresponds to the physical card number within the node. For instance, if the node has 2 cards, the first card's level is 1, and the next one, if present, will be 2, and so on.",
-        },
-        {
-          name: `Card ID`,
-          icon: "mdi-content-copy",
-          callback: copy,
-          hint: "Copy the Card ID to the clipboard.",
-          value: card.id,
-          nameHint: card.contract ? "Reserved" : "Available",
-          nameHintColor: card.contract ? "warning" : "primary",
-        },
-        {
           name: "Vendor",
-          value: card.vendor,
-          hint: card.vendor,
+          value: selectedCard.value.vendor,
+          hint: selectedCard.value.vendor,
         },
         {
           name: "Device",
-          value: card.device,
-          hint: card.device,
+          value: selectedCard.value.device,
+          hint: selectedCard.value.device,
         },
         {
           name: "Contract ID",
-          value: card.contract === 0 ? "N/A" : card.contract.toString(),
+          value: selectedCard.value.contract === 0 ? "N/A" : selectedCard.value.contract.toString(),
         },
-        { name: "" },
       ];
     };
 
     return {
       gpuFields,
       loading,
+      cardsIds,
+      selectedCard,
+      copy,
     };
   },
 };
 </script>
+
+<style scoped>
+.bb-gray {
+  border-bottom: 1px solid gray;
+}
+</style>
