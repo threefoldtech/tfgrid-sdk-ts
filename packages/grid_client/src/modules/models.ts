@@ -669,6 +669,7 @@ class PublicConfigModel {
   @Expose() @IsOptional() @IsIP() ip?: number;
   @Expose() @IsOptional() gw?: number;
   @Expose() @IsOptional() @IsIP() ip6?: number;
+  @Expose() @IsOptional() gw6?: number;
   @Expose() @IsString() @IsOptional() domain?: string;
 }
 class AddPublicConfig {

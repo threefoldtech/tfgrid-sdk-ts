@@ -113,23 +113,21 @@
                       </v-row>
                     </v-col>
                     <v-col cols="4" class="text-center" :align-self="'center'">
-                      <v-flex class="text-truncate font-weight-bold">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ props }">
-                            <v-progress-circular
-                              v-bind="props"
-                              :rotate="-90"
-                              :size="150"
-                              :width="12"
-                              :model-value="getNodeUptimePercentage(item.raw.uptime)"
-                              class="my-3"
-                              color="primary"
-                            />
-                            <p>Uptime: {{ getNodeUptimePercentage(item.raw.uptime) }}%</p>
-                          </template>
-                          <span>Current Node Uptime Percentage (since start of the current minting period)</span>
-                        </v-tooltip>
-                      </v-flex>
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ props }">
+                          <v-progress-circular
+                            v-bind="props"
+                            :rotate="-90"
+                            :size="150"
+                            :width="12"
+                            :model-value="getNodeUptimePercentage(item.value)"
+                            class="my-3"
+                            color="primary"
+                          />
+                          <p>Uptime: {{ getNodeUptimePercentage(item.value) }}%</p>
+                        </template>
+                        <span>Current Node Uptime Percentage (since start of the current minting period)</span>
+                      </v-tooltip>
                     </v-col>
                   </v-row>
                 </v-card-text>
@@ -175,7 +173,13 @@
                 </v-expansion-panel-text>
               </v-expansion-panel>
             </v-expansion-panels>
-            <v-expansion-panels v-if="network == 'dev'" v-model="receiptsPanel" :disabled="false" focusable single>
+            <v-expansion-panels
+              v-if="network == 'main' && item.raw.status === 'up'"
+              v-model="receiptsPanel"
+              :disabled="false"
+              focusable
+              single
+            >
               <v-expansion-panel>
                 <v-expansion-panel-title> Node Statistics </v-expansion-panel-title>
                 <v-expansion-panel-text>
@@ -194,10 +198,13 @@
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <v-icon size="small" class="me-2"> mdi-earth </v-icon>
-        <v-icon size="small"> mdi-code-string </v-icon>
-
-        {{ item }}
+        <AddPublicConfig
+          class="me-2"
+          :nodeId="item.raw.nodeId"
+          :farmId="item.raw.farmId"
+          :publicConfig="item.raw.publicConfig"
+        />
+        <SetExtraFee class="me-2" :nodeId="item.raw.nodeId" />
       </template>
     </v-data-table>
   </div>
@@ -211,12 +218,16 @@ import type { NodeInterface } from "@/utils/node";
 import { gridProxyClient } from "../../../clients";
 import { useGrid, useProfileManager } from "../../../stores";
 import { createCustomToast, ToastType } from "../../../utils/custom_toast";
+import AddPublicConfig from "./add_public_config.vue";
 import NodeMintingDetails from "./NodeMintingDetails.vue";
+import SetExtraFee from "./set_extra_fee.vue";
 
 export default {
   name: "UserNodes",
   components: {
     NodeMintingDetails,
+    AddPublicConfig,
+    SetExtraFee,
   },
   setup() {
     const gridStore = useGrid();
@@ -257,11 +268,20 @@ export default {
 
     const expanded = ref<any[]>();
     const network = process.env.NETWORK || window.env.NETWORK;
+    interface IPublicConfig {
+      ipv4?: number;
+      gwv4?: number;
+      ipv6?: number;
+      gwv6?: number;
+      domain?: string;
+    }
+    const publicConfig = ref<IPublicConfig>();
+    const resourcesPanel = ref([]);
+    const receiptsPanel = ref([]);
+
     onMounted(async () => {
       await getUserNodes();
     });
-    const resourcesPanel = ref([]);
-    const receiptsPanel = ref([]);
 
     async function getUserNodes() {
       try {
@@ -307,6 +327,7 @@ export default {
       network,
       resourcesPanel,
       receiptsPanel,
+      publicConfig,
       getUserNodes,
       getColor,
       getNodeUptimePercentage,

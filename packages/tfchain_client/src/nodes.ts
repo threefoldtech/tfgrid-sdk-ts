@@ -60,6 +60,7 @@ interface AddNodePublicConfigOptions {
     ip?: number;
     gw?: number;
     ip6?: number;
+    gw6?: number;
     domain?: string;
   };
 }
