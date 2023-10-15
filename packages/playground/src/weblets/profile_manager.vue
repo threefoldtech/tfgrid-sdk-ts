@@ -83,7 +83,7 @@
         <VContainer>
           <form @submit.prevent="activeTab === 0 ? login() : storeAndLogin()">
             <FormValidator v-model="isValidForm">
-              <v-alert type="warning" variant="tonal" class="mb-6" v-if="activeTab === 1">
+              <v-alert type="warning" variant="tonal" class="mb-6" v-if="activeTab === 1" color="primary">
                 <p :style="{ maxWidth: '880px' }">
                   To connect your wallet, you will need to enter your mnemonic which will be encrypted using the
                   password. Mnemonic will never be shared outside of this device.
