@@ -8,6 +8,7 @@
           :headers="headers"
           :items="items"
           class="elevation-1"
+          @click:row="openSheet"
         >
           <template #loading />
         </v-data-table>
@@ -17,11 +18,22 @@
 </template>
 
 <script lang="ts" setup>
+import type { PropType } from "vue";
+import { defineEmits } from "vue";
+
 import type { VDataTableHeader } from "@/types";
-const props = defineProps({
+
+import type { IFarm } from "../farms.vue";
+
+const emit = defineEmits(["open-dialog"]);
+const openSheet = (_e: any, { item }: any) => {
+  emit("open-dialog", item.value);
+};
+
+defineProps({
   items: {
     required: true,
-    type: Array,
+    type: Object as PropType<IFarm[]>,
   },
   loading: {
     required: true,
@@ -29,9 +41,6 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits<{
-  (e: "update", value: string): void;
-}>();
 const itemPerPage = 10;
 const headers: VDataTableHeader = [
   { title: "ID", key: "farmId" },
@@ -67,12 +76,6 @@ const headers: VDataTableHeader = [
     sortable: false,
   },
 ];
-</script>
-
-<script lang="ts">
-export default {
-  name: "Farms table",
-};
 </script>
 
 <style>
