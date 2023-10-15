@@ -156,7 +156,7 @@ const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solut
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Umbrel.toLowerCase() + name.value;
+  const projectName = ProjectName.Umbrel.toLowerCase() + "/" + name.value;
 
   try {
     layout.value?.validateSSH();

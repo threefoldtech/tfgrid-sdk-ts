@@ -151,7 +151,7 @@ const rootFilesystemSize = 40;
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Nextcloud.toLowerCase() + name.value;
+  const projectName = ProjectName.Nextcloud.toLowerCase() + "/" + name.value;
 
   try {
     const grid = await getGrid(profileManager.profile!, projectName);
