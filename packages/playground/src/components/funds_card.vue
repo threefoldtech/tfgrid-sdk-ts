@@ -1,5 +1,5 @@
 <template>
-  <v-tooltip location="bottom" v-if="showTooltip()" close-delay="1000" color="primary">
+  <v-tooltip location="bottom" close-delay="1000" color="primary">
     <template #activator="{ props }">
       <v-btn
         id="tftBtn"
@@ -54,14 +54,9 @@ export default {
         }
       }
     };
-    function showTooltip() {
-      return window.env.NETWORK !== "dev" && window.env.NETWORK !== "qa";
-    }
-
     return {
       loadingAddTFT,
       addTFT,
-      showTooltip,
     };
   },
 };
