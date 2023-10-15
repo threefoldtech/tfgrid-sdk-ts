@@ -1,9 +1,9 @@
 <template>
   <node-filters
-    :is-form-loading="isFormLoading"
+    :form-disabled="isFormLoading"
     v-model="filterInputs"
     v-model:valid="isValidForm"
-    @update:model-value="InputFiltersReset"
+    @update:model-value="inputFiltersReset"
   />
 
   <div class="hint mb-2 mt-3">
@@ -180,7 +180,7 @@ export default {
     );
 
     // The mixed filters should reset to the default value again..
-    const InputFiltersReset = (nFltrNptsVal: FilterInputs) => {
+    const inputFiltersReset = (nFltrNptsVal: FilterInputs) => {
       mixedFilters.value.inputs = nFltrNptsVal;
       mixedFilters.value.options.status = NodeStatus.Up;
       mixedFilters.value.options.gpu = undefined;
@@ -234,7 +234,7 @@ export default {
       openDialog,
       closeDialog,
       requestNodes,
-      InputFiltersReset,
+      inputFiltersReset,
     };
   },
 };
