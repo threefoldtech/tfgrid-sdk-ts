@@ -32,14 +32,14 @@ export default {
 }
 
 .text1 {
-  font-size: 30px;
+  font-size: 20px;
   text-align: center;
-  font-weight: 500;
-  margin-top: 50px;
+  font-weight: 400;
+  margin-top: 10px;
 }
 
 .text2 {
-  font-size: 20px;
+  font-size: 16px;
   text-align: center;
   font-weight: 400;
 }
