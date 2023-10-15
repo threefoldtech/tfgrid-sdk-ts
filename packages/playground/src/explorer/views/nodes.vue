@@ -65,6 +65,8 @@
                           label="Select Nodes Status"
                           variant="underlined"
                           :disabled="isFormLoading"
+                          open-on-clear
+                          clearable
                         ></v-select>
                       </v-col>
                     </v-row>

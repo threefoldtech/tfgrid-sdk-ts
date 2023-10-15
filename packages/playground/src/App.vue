@@ -185,8 +185,8 @@ const routes: AppRoute[] = [
     ],
   },
   {
-    icon: "mdi-database-search-outline",
     title: "Explorer",
+    icon: "mdi-database-search-outline",
     items: [
       {
         title: "Statistics",
@@ -381,7 +381,6 @@ export default {
   bottom: 15px;
   right: 25px;
 }
-
 .v-tooltip > .v-overlay__content {
   opacity: 10;
   color: white;
