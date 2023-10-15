@@ -18,15 +18,8 @@
           </v-chip>
         </v-col>
         <v-col class="mr-3 d-flex justify-end align-center">
-          <v-select
-            chips
-            clearable
-            hide-details="auto"
-            v-model="selectedCard.id"
-            :items="cardsIds"
-            variant="outlined"
-          />
-          <v-icon class="ml-1" :icon="'mdi-content-copy'" @click="copy(selectedCard.id)" />
+          <v-select chips clearable hide-details="auto" v-model="cardId" :items="cardsIds" variant="outlined" />
+          <v-icon class="ml-1" :icon="'mdi-content-copy'" @click="copy(cardId)" />
         </v-col>
       </v-row>
     </template>
@@ -55,17 +48,16 @@ export default {
 
   setup(props) {
     const loading = ref<boolean>(false);
-    const gpuFields = ref<NodeDetailsCard[]>([]); // Initialize as an empty array
+    const gpuFields = ref<NodeDetailsCard[]>([]);
     const cardsIds = ref<string[]>([]);
+    const cardId = ref<string>("");
     const selectedCard = ref<GPUCard>(props.node.cards[0]);
 
-    watch(
-      selectedCard,
-      (newValue: GPUCard) => {
-        selectedCard.value = newValue;
-      },
-      { deep: true },
-    );
+    watch(cardId, newCardId => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      selectedCard.value = props.node.cards.find(card => card.id === newCardId)!;
+      gpuFields.value = getNodeTwinDetailsCard();
+    });
 
     const mount = () => {
       loading.value = true;
@@ -73,6 +65,7 @@ export default {
       props.node.cards.map((card: GPUCard) => {
         cardsIds.value.push(card.id);
       });
+      cardId.value = cardsIds.value[0];
       gpuFields.value = getNodeTwinDetailsCard();
       loading.value = false;
     };
@@ -107,6 +100,7 @@ export default {
       gpuFields,
       loading,
       cardsIds,
+      cardId,
       selectedCard,
       copy,
     };
