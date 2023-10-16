@@ -19,7 +19,6 @@
 
 <script lang="ts" setup>
 import type { PropType } from "vue";
-import { defineEmits } from "vue";
 
 import type { VDataTableHeader } from "@/types";
 
