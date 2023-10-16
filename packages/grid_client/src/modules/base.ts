@@ -184,8 +184,7 @@ class BaseModule {
       ext1 = ext1.flat(1).filter(x => !!x);
       ext2 = ext2.flat(1).filter(x => !!x);
 
-      await this.tfClient.applyAllExtrinsics(ext1);
-      await this.tfClient.applyAllExtrinsics(ext2);
+      await this.tfClient.applyAllExtrinsics(ext1.concat(ext2));
     }
   }
 
