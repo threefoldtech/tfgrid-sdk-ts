@@ -134,8 +134,6 @@ class BaseModule {
         continue;
       }
 
-      const requiredContract = contract.contractId === 41781;
-
       const { deploymentData, deploymentHash: hash } = nodeContract;
       const oldData = JSON.parse(deploymentData || "{}") as unknown as {
         type: string;
@@ -143,7 +141,7 @@ class BaseModule {
         projectName: string;
       };
       const { name, projectName } = oldData;
-      if (projectName?.endsWith(`/${name}`) && !requiredContract) {
+      if (projectName?.endsWith(`/${name}`)) {
         continue;
       }
 
