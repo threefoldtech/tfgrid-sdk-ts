@@ -113,15 +113,22 @@ class BaseModule {
     }
 
     const values = await Promise.all(
-      oldKeys.map(k => this.backendStorage.load(PATH.join(oldPath, k, "contracts.json"))),
+      oldKeys.map(k => this.backendStorage.load(PATH.join(oldPath, k, "contracts.json")).catch(() => null)),
     );
 
     const contracts = await Promise.all(
-      values.flat(1).map(value => this.tfClient.contracts.get({ id: value.contract_id })),
+      values.flat(1).map(value => {
+        if (value) return this.tfClient.contracts.get({ id: value.contract_id });
+        return Promise.resolve(null);
+      }),
     );
 
     const updateContractsExts: Promise<any>[] = [];
     for (const contract of contracts) {
+      if (!contract) {
+        continue;
+      }
+
       const { nodeContract } = contract.contractType || {};
       if (!nodeContract) {
         continue;
