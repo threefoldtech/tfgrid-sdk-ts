@@ -35,6 +35,7 @@
                 :value="$props.modelValue[key].value"
               >
                 <v-text-field
+                  :disabled="formDisabled"
                   v-bind="props"
                   v-model="$props.modelValue[key].value"
                   :label="$props.modelValue[key].label"
@@ -44,7 +45,13 @@
               </input-validator>
             </v-col>
             <v-col cols="12" sm="4" md="2" class="d-flex justify-start align-center mb-6 ml-4">
-              <v-btn @click="resetFilters" variant="outlined" color="primary">Reset filter</v-btn>
+              <v-btn
+                :disabled="!isFiltersTouched || formDisabled"
+                @click="resetFilters"
+                variant="outlined"
+                color="primary"
+                >Reset Filters</v-btn
+              >
             </v-col>
           </v-row>
         </v-expansion-panel-text>
@@ -54,22 +61,37 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, type PropType } from "vue";
+import { defineComponent, type PropType, ref, watch } from "vue";
 
 import { useFormRef } from "@/hooks/form_validator";
 import type { NodeInputFilterType } from "@/utils/filter_nodes";
 
 export default defineComponent({
+  name: "NodeFilters",
   props: {
     modelValue: {
       type: Object as PropType<{ [key: string]: NodeInputFilterType }>,
       required: true,
     },
+    formDisabled: Boolean,
     valid: Boolean,
   },
 
   setup(props, { emit }) {
     const formRef = useFormRef();
+    const isFiltersTouched = ref<boolean>(false);
+
+    watch(
+      () => props.modelValue,
+      (newValue: PropType<{ [key: string]: NodeInputFilterType }>) => {
+        const hasNonEmptyValue = Object.keys(newValue).some(obj => {
+          return Reflect.get(newValue, obj).value && Reflect.get(newValue, obj).value.length >= 1;
+        });
+
+        isFiltersTouched.value = hasNonEmptyValue;
+      },
+      { deep: true },
+    );
 
     const resetFilters = () => {
       emit(
@@ -83,6 +105,7 @@ export default defineComponent({
 
     return {
       resetFilters,
+      isFiltersTouched,
       formRef,
     };
   },
