@@ -6,8 +6,8 @@ import { AbstractClient } from "./abstract_client";
 export interface PublicIp {
   id: string;
   ip: string;
-  farmId: string;
-  contractId: number;
+  farm_id: string;
+  contract_id: number;
   gateway: string;
 }
 
