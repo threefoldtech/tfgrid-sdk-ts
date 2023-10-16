@@ -116,7 +116,7 @@ const filteredHeaders = computed(() => {
     { title: "Public IPv4", key: "ipv4" },
     { title: "Public IPv6", key: "ipv6" },
     { title: "Planetary Network IP", key: "planetary" },
-    { title: "Wireguard", key: "wireguard" },
+    { title: "WireGuard", key: "wireguard" },
     { title: "Flist", key: "flist" },
     { title: "Cost", key: "billing" },
     { title: "Actions", key: "actions" },
@@ -134,7 +134,7 @@ const filteredHeaders = computed(() => {
     ProjectName.Nextcloud,
   ] as string[];
 
-  const WireguardSolutions = [ProjectName.VM, ProjectName.Fullvm] as string[];
+  const WireguardSolutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.Umbrel] as string[];
 
   const flistSolutions = [ProjectName.VM, ProjectName.Fullvm] as string[];
 
