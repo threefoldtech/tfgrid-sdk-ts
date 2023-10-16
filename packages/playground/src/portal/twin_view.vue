@@ -103,8 +103,8 @@ onMounted(async () => {
   }
   const activeProposalsUserHasVotedOn = activeProposals.filter(
     (proposal: Proposal) =>
-      proposal.ayes.filter((aye: { farmId: number }) => userFarmId.includes(aye.farmId)) ||
-      proposal.nayes.filter((naye: { farmId: number }) => userFarmId.includes(naye.farmId)),
+      (proposal?.ayes.length && proposal.ayes.filter((aye: { farmId: number }) => userFarmId.includes(aye.farmId))) ||
+      (proposal?.nayes.length && proposal.nayes.filter((naye: { farmId: number }) => userFarmId.includes(naye.farmId))),
   );
   if (activeProposalsUserHasVotedOn.length == numberOfActiveProposals) {
     return;
