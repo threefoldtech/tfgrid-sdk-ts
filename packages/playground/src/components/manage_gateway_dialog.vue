@@ -98,7 +98,7 @@
             </template>
 
             <input-tooltip
-              tooltip="Disabling TLS Pass Through will let the gateway terminate the traffic, while Enabling it will replace it with your backend service to do the TLS termination."
+              tooltip="Disabling TLS Pass Through will let the gateway terminate the traffic, while Enabling it will let your backend service to do the TLS termination."
               inline
             >
               <v-switch
