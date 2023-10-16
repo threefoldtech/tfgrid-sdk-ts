@@ -97,6 +97,20 @@
               </input-validator>
             </template>
 
+            <input-tooltip
+              tooltip="Disabling TLS Pass Through will let the gateway terminate the traffic, while Enabling it will replace it with your backend service to do the TLS termination."
+              inline
+            >
+              <v-switch
+                label="TLS Pass Through"
+                hide-details
+                inset
+                variant="tonal"
+                color="primary"
+                v-model="passThrough"
+              />
+            </input-tooltip>
+
             <copy-input-wrapper #="{ props }" :data="networkName">
               <v-text-field label="Network Name" v-model="networkName" v-bind="props" />
             </copy-input-wrapper>
@@ -188,6 +202,7 @@ export default {
     const port = ref(80);
     const useCustomDomain = ref(false);
     const domain = ref<string>();
+    const passThrough = ref(false);
     const valid = ref(false);
 
     const ip = props.vm[0].interfaces[0].ip as string;
@@ -221,11 +236,12 @@ export default {
 
         await deployGatewayName(grid!, {
           name: subdomain.value,
-          nodeId: gatewayNode.value.id,
+          nodeId: gatewayNode.value!.id,
           ip,
           networkName,
           port: port.value,
           fqdn: useCustomDomain.value ? domain.value : undefined,
+          tlsPassthrough: passThrough.value,
         });
         layout.value.setStatus("success", "Successfully deployed gateway.");
       } catch (error) {
@@ -266,6 +282,7 @@ export default {
       port,
       useCustomDomain,
       domain,
+      passThrough,
       valid,
 
       ip,
