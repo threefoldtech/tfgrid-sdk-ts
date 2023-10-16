@@ -138,7 +138,7 @@ export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
 
   private getFarmPublicIps(farm: Farm): PublicIps {
     const total = farm.publicIps.length;
-    const free = farm.publicIps.filter(({ contractId }) => contractId === 0).length;
+    const free = farm.publicIps.filter(({ contract_id }) => contract_id === 0).length;
     return {
       total,
       used: total - free,
