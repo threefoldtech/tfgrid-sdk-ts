@@ -10,10 +10,6 @@
           {{ tab.label }}
         </v-tab>
       </v-tabs>
-
-      <v-window v-model="activeTab">
-        <nodes-table :tab="activeTab" />
-      </v-window>
     </v-card>
   </div>
   <div>
