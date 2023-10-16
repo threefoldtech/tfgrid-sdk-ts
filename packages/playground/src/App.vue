@@ -251,7 +251,7 @@ const routes: AppRoute[] = [
         url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
       },
       {
-        title: "Zero-Os Bootstrap",
+        title: "0-bootstrap",
         icon: "mdi-earth",
         url: "https://bootstrap.grid.tf/",
       },
