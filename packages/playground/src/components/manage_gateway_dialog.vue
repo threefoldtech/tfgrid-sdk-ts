@@ -35,7 +35,7 @@
               { title: 'Contract ID', key: 'contractId' },
               { title: 'Domain', key: 'domain' },
               { title: 'TLS Passthrough', key: 'tls_passthrough' },
-              { title: 'Backends', key: 'backends' },
+              { title: 'Backend', key: 'backends' },
               { title: 'Status', key: 'status' },
             ]"
             :items="gateways"
