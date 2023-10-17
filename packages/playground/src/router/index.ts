@@ -53,6 +53,12 @@ const router = createRouter({
           component: () => import("../calculator/resource_pricing.vue"),
           meta: { title: "Resource Pricing" },
         },
+
+        {
+          path: "simulator",
+          component: () => import("../portal/simulator_view.vue"),
+          meta: { title: "Twin" },
+        },
       ],
     },
     {
@@ -194,6 +200,11 @@ const router = createRouter({
         }
         next();
       },
+    },
+    {
+      path: "/explorer/nodes",
+      component: () => import("@/explorer/views/nodes.vue"),
+      meta: { title: "Explorer Nodes" },
     },
     {
       path: "/:pathMatch(.*)*",

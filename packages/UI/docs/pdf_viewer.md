@@ -28,11 +28,13 @@ To use the PDF Signer Web Component, follow these steps:
 
 2. Navigate to the `repository/packages/UI` directory.
 
-3. Run `yarn build` to generate the required distribution files.
+3. Choose which provider you are going to use [see providers section](#using-providers-and-extensions)
 
-4. Locate the `dist` folder created in the previous step.
+4. Run `yarn build` to generate the required distribution files.
 
-5. Copy the `dist/threefold-ui.umd.js` file and include it in your project's HTML files.
+5. Locate the `dist` folder created in the previous step.
+
+6. Copy the `dist/threefold-ui.umd.js` file and include it in your project's HTML files.
 
 ```html
 <body>
@@ -100,6 +102,8 @@ Here's an example of how to use the PDF Signer Web Component in your HTML file:
 ```
 
 In the example above, replace `<pdf-url>` and `<endpoint-url>` with the actual URLs for your PDF document and the destination where signed documents should be sent. Also, for the `<network>`, use one of the following network options: `[main, test, qa, dev]`.
+
+PS: Please make sure that you have a `PDF URL` with `CORS-ORIGIN` enabled.
 
 Feel free to customize the HTML structure and styles to match your application's design and requirements.
 
