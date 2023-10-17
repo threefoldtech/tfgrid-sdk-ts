@@ -108,6 +108,7 @@ export interface NodeFilters {
 const emits = defineEmits<{ (event: "update:modelValue", value?: INode): void }>();
 
 const props = defineProps({
+  selection: String,
   modelValue: { type: Object as PropType<INode> },
   filters: { default: () => ({} as NodeFilters), type: Object as PropType<NodeFilters> },
   rootFileSystemSize: { type: Number, required: true },
@@ -128,7 +129,6 @@ const emptyResult = ref(false);
 const validator = ref();
 const pingingNode = ref(false);
 const delay = ref();
-const isManual = ref(false);
 
 function isSelectionEmpty(node: INode | undefined, selectedCards: string[]): boolean {
   if (!node || availableNodes.value.length === 0) {
@@ -143,7 +143,7 @@ function isSelectionEmpty(node: INode | undefined, selectedCards: string[]): boo
 
   return !selectedNodeMatches;
 }
-
+// GPU CArds
 watch(selectedCards, async () => {
   for (const card of nodeCards.value) {
     for (const selectedCard of selectedCards.value) {
@@ -238,48 +238,46 @@ async function loadNodes(farmId: number) {
     // remove farmId === undefined from condition
     // remove farmManager?.setLoading(false) from finally
 
-    if (!isManual.value) {
-      try {
-        const res = await getFilteredNodes(grid, {
-          farmId: farmId,
-          cpu: filters.cpu,
-          memory: filters.memory,
-          diskSizes: [...filters.diskSizes, props.rootFileSystemSize],
-          ipv4: filters.ipv4,
-          hasGPU: filters.hasGPU ? filters.hasGPU : undefined,
-          certified: filters.certified,
-          rentedBy: filters.rentedBy,
-          availableFor: grid.twinId,
-        });
+    try {
+      const res = await getFilteredNodes(grid, {
+        farmId: farmId,
+        cpu: filters.cpu,
+        memory: filters.memory,
+        diskSizes: [...filters.diskSizes, props.rootFileSystemSize],
+        ipv4: filters.ipv4,
+        hasGPU: filters.hasGPU ? filters.hasGPU : undefined,
+        certified: filters.certified,
+        rentedBy: filters.rentedBy,
+        availableFor: grid.twinId,
+      });
 
-        if (res?.length === 0 || farmId === undefined) {
-          selectedNode.value = undefined;
-          emptyResult.value = true;
-          loadingNodes.value = false;
-          return;
-        }
-
-        if (res) {
-          nodesArr.value = [];
-          for (const node of res) {
-            if (!nodesArr.value.some(n => n.nodeId === node.nodeId)) {
-              nodesArr.value.push({
-                nodeId: node.nodeId,
-                state: node.rentedByTwinId ? "Dedicated" : "Shared",
-              });
-            }
-          }
-          availableNodes.value = nodesArr.value;
-        } else {
-          availableNodes.value = [];
-        }
-      } catch (e) {
-        errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
-      } finally {
-        validator.value?.setStatus(ValidatorStatus.Init);
+      if (res?.length === 0 || farmId === undefined) {
+        selectedNode.value = undefined;
+        emptyResult.value = true;
         loadingNodes.value = false;
-        farmManager?.setLoading(false);
+        return;
       }
+
+      if (res) {
+        nodesArr.value = [];
+        for (const node of res) {
+          if (!nodesArr.value.some(n => n.nodeId === node.nodeId)) {
+            nodesArr.value.push({
+              nodeId: node.nodeId,
+              state: node.rentedByTwinId ? "Dedicated" : "Shared",
+            });
+          }
+        }
+        availableNodes.value = nodesArr.value;
+      } else {
+        availableNodes.value = [];
+      }
+    } catch (e) {
+      errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
+    } finally {
+      validator.value?.setStatus(ValidatorStatus.Init);
+      loadingNodes.value = false;
+      farmManager?.setLoading(false);
     }
   }
 }

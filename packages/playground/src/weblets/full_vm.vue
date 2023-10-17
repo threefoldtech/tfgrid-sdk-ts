@@ -75,9 +75,9 @@
           <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
         <NodeSelector v-model="selection" />
-        {{ selection }}
         <SelectFarmManager>
           <SelectFarm
+            v-if="selection == 'automated'"
             :filters="{
               cpu: solution?.cpu,
               memory: solution?.memory,
@@ -92,6 +92,7 @@
           />
           <SelectNode
             v-model="selectedNode"
+            :selection="selection"
             :filters="{
               farmId: farm?.farmID,
               cpu: solution?.cpu,
