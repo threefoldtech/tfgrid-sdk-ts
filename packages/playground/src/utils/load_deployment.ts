@@ -43,7 +43,13 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
       }
       return item;
     })
-    .filter(item => item && item.length > 0)
+    .filter(item => {
+      if (item?.length === 0) {
+        count--;
+        return false;
+      }
+      return item && item.length > 0;
+    })
     .filter(item => {
       if (options.filter && !options.filter(item)) {
         count--;
