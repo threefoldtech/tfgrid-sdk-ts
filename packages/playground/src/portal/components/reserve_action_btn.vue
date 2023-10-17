@@ -4,7 +4,7 @@
       <v-card>
         <v-card-title class="pt-4">
           <span style="display: flex; align-items: center">
-            <v-icon color="warning" style="margin-right: 8px">mdi-alert</v-icon>
+            <v-icon color="warning" style="mr-1: 15">mdi-alert</v-icon>
             Are you sure you want to unreserve this dedicated node?
           </span>
         </v-card-title>
@@ -21,7 +21,6 @@
       outlined
       :loading="loadingReserveNode"
       :disabled="disableButton"
-      color="#064663"
       style="background: #1aa18f"
       v-if="rentedByTwinId === 0"
       @click="reserveNode"
@@ -34,13 +33,11 @@
       color="red"
       :loading="loadingUnreserveBtn"
       :disabled="disableButton"
-      style="background: #1aa18f"
-      v-if="rentedByTwinId === twinId"
+      v-if="rentedByTwinId === profileManager.profile?.twinId"
       @click="removeReserve"
     >
       Unreserve
     </v-btn>
-    <v-btn small outlined disabled color="gray" v-if="rentedByTwinId !== 0 && rentedByTwinId !== twinId"> Taken </v-btn>
   </container>
 </template>
 
@@ -64,10 +61,6 @@ export default {
       type: String,
       required: true,
     },
-    twinId: {
-      type: Number,
-      required: true,
-    },
   },
   setup(props, { emit }) {
     const openUnreserveDialog = ref(false);
@@ -84,7 +77,7 @@ export default {
       loadingUnreserveNode.value = true;
       try {
         const grid = await getGrid(profileManager.profile!);
-        createCustomToast(`check for contracts on node ${props.nodeId}`, ToastType.info);
+        createCustomToast(`Verify contracts for node ${props.nodeId}`, ToastType.info);
 
         const result = (await grid?.contracts.getActiveContracts({ nodeId: +props.nodeId })) as any;
         if (result.length > 0) {
@@ -143,6 +136,7 @@ export default {
       removeReserve,
       disableButton,
       loadingUnreserveBtn,
+      profileManager,
     };
   },
 };

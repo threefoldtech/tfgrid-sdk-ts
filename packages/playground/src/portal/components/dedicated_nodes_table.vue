@@ -40,7 +40,6 @@
           <reserve-btn
             :node-id="item.raw.nodeId"
             :rented-by-twin-id="item.raw.rentedByTwinId"
-            :twin-id="(profileManager.profile?.twinId as number)"
             @updateTable="reloadTable"
           ></reserve-btn>
         </template>
@@ -88,7 +87,6 @@ import { onMounted, ref, watch } from "vue";
 import type { VDataTable } from "vuetify/labs/VDataTable";
 import { VDataTableServer } from "vuetify/labs/VDataTable";
 
-// import { requestNodes } from "@/explorer/utils/helpers";
 import { gridProxyClient } from "@/clients";
 import { toBytes } from "@/explorer/utils/helpers";
 import { useProfileManager } from "@/stores";

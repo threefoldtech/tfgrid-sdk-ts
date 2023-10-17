@@ -164,7 +164,7 @@ export const DedicatedNodeInitializer: DedicatedNodeFilters = {
     placeholder: "Filter by total Cores.",
     type: "text",
     rules: [
-      [isDecimal("This Field accepts only a valid number."), min("This Field must be a number larger than 0.", 1)],
+      [isNumeric("This Field accepts only a valid number."), min("This Field must be a number larger than 0.", 1)],
     ],
   },
   total_mru: {
@@ -173,7 +173,7 @@ export const DedicatedNodeInitializer: DedicatedNodeFilters = {
     type: "text",
     rules: [
       [
-        isDecimal("This Field accepts only a valid number."),
+        isNumeric("This Field accepts only a valid number."),
         min("This Field must be a number larger than 0.", 1),
         validateResourceMaxNumber("This value is out of range."),
       ],
@@ -185,7 +185,7 @@ export const DedicatedNodeInitializer: DedicatedNodeFilters = {
     type: "text",
     rules: [
       [
-        isDecimal("This Field accepts only a valid number."),
+        isNumeric("This Field accepts only a valid number."),
         min("This Field must be a number larger than 0.", 1),
         validateResourceMaxNumber("This value is out of range."),
       ],
@@ -197,7 +197,7 @@ export const DedicatedNodeInitializer: DedicatedNodeFilters = {
     type: "text",
     rules: [
       [
-        isDecimal("This Field accepts only a valid number."),
+        isNumeric("This Field accepts only a valid number."),
         min("This Field must be a number larger than 0.", 1),
         validateResourceMaxNumber("This value is out of range."),
       ],
