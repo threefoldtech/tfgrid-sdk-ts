@@ -165,7 +165,7 @@
               />
             </input-validator>
 
-            <v-text-field disabled label="Return On Investment" type="number" v-model.number="ROI" />
+            <v-text-field disabled label="Return On Investment" v-model.number="ROI" />
             <v-text-field disabled label="Net Profit" type="number" v-model.number="netProfit" />
             <v-text-field disabled label="Gross Profit" type="number" v-model.number="grossProfit" />
             <v-text-field disabled label="Total Costs" type="number" v-model.number="totalCosts" />
@@ -268,9 +268,9 @@ const xs = ref<number[]>([]);
 const activeProfile = ref(props.profile);
 
 const chartdata = ref();
-const rewardPerCu = 2.4;
-const rewardPerSu = 1;
-const rewardPerNu = 0.03;
+const rewardPerCu = ref(2.4);
+const rewardPerSu = ref(1);
+const rewardPerNu = ref(0.03);
 
 const _max = (val: number, max = 0): number => {
   val = val ?? 0;
@@ -298,15 +298,15 @@ const tftRewardPer = computed(() => (activeProfile.value.certified ? 1 : 0) * 0.
 
 const tftRewardPerCu = computed(() => {
   if (activeProfile.value.price < 0.08) return NaN;
-  return (rewardPerCu / activeProfile.value.price) * tftRewardPer.value;
+  return (rewardPerCu.value / activeProfile.value.price) * tftRewardPer.value;
 });
 
 const tftRewardPerSu = computed(() => {
   if (activeProfile.value.price < 0.08) return NaN;
-  return (rewardPerSu / activeProfile.value.price) * tftRewardPer.value;
+  return (rewardPerSu.value / activeProfile.value.price) * tftRewardPer.value;
 });
 
-const tftRewardPerNu = computed(() => rewardPerNu / averageTokenPrice.value);
+const tftRewardPerNu = computed(() => rewardPerNu.value / averageTokenPrice.value);
 
 const cuFarmingRewardInTft = computed(() => tftRewardPerCu.value * cu.value);
 const suFarmingRewardInTft = computed(() => tftRewardPerSu.value * su.value);
@@ -348,6 +348,7 @@ const totalCosts = computed(() => {
 const netProfit = computed(() => grossProfit.value - totalCosts.value);
 
 watch([activeProfile.value, isProfit, isAdvanced, certified], () => {
+  console.log("ROI", ROI.value);
   if (certified.value == "Certified Node") {
     activeProfile.value.certified = Certification.CERTIFIED;
   } else {
@@ -371,8 +372,8 @@ const updateLineChart = () => {
     : 0;
 
   if (activeProfile.value) {
-    const X = (price - 0.15) / 19;
-    xs.value = [...Array.from({ length: 20 }).map((_, i) => 0.15 + X * i)];
+    const X = (price - 0.01) / 19;
+    xs.value = [...Array.from({ length: 10 }).map((_, i) => 0.01 + X * i)];
   }
 };
 function updatePieChart() {
@@ -390,7 +391,7 @@ export function createFarmingProfile(options: Partial<FarmingProfileOptions> = {
     hdd: options.hdd || 0,
     ssd: options.ssd || 0,
     price: options.price || 0.09,
-    priceAfter5Years: options.priceAfter5Years || 2,
+    priceAfter5Years: options.priceAfter5Years || 1,
     maximumTokenPrice: options.maximumTokenPrice || 2,
     powerUtilization: options.powerUtilization || 40,
     powerCost: options.powerCost || 0.15,

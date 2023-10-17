@@ -52,7 +52,7 @@ const options = computed(() => {
           text: "Return (USD) / TFT price (USD)",
         },
       },
-    };
+    } as (typeof Line)["props"]["chartOptions"];
   }
   return {
     responsive: true,
@@ -63,7 +63,7 @@ const options = computed(() => {
         text: "Return (USD) / TFT price (USD)",
       },
     },
-  };
+  } as (typeof Line)["props"]["chartOptions"];
 });
 </script>
 
