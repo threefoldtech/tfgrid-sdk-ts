@@ -113,7 +113,12 @@ class BaseModule {
     }
 
     const values = await Promise.all(
-      oldKeys.map(k => this.backendStorage.load(PATH.join(oldPath, k, "contracts.json")).catch(() => null)),
+      oldKeys.map(k =>
+        this.backendStorage.load(PATH.join(oldPath, k, "contracts.json")).catch(error => {
+          console.log(`Error while fetching contarct data PATH[${PATH.join(oldPath, k, "contracts.json")}]`, error);
+          return null;
+        }),
+      ),
     );
 
     const contracts = await Promise.all(

@@ -1,6 +1,6 @@
 <template>
   <v-sheet width="100%" v-model="domain">
-    <h6 class="text-h5">Domain Name</h6>
+    <h6 class="text-h5" v-if="!$props.hideTitle">Domain Name</h6>
     <v-tooltip location="top" text="Use Custom domain name">
       <template #activator="{ props }">
         <v-switch v-bind="props" v-model="customDomain" hide-details color="primary" inset label="Custom domain" />
@@ -34,7 +34,7 @@
       <v-expand-transition>
         <v-alert
           v-show="domain?.useFQDN && domain?.ip && domainName && !selectGateway?.loading"
-          class="mb-2"
+          class="mb-4"
           type="warning"
           variant="tonal"
         >
@@ -47,21 +47,39 @@
   </v-sheet>
 </template>
 <script lang="ts">
-import { computed, type Ref, ref } from "vue";
+import { computed, type PropType, type Ref, ref } from "vue";
+import { watch } from "vue";
 
 import SelectGatewayNode from "../components/select_gateway_node.vue";
 import type { GatewayNode } from "../types";
 import { useFarmGatewayManager } from "./farm_gateway_manager.vue";
 
+export interface DomainModel {
+  gateway: GatewayNode;
+  hasCustomDomain: boolean;
+  customDomain?: string;
+}
+
 export default {
   name: "DomainName",
   props: {
+    modelValue: {
+      type: Object as PropType<DomainModel>,
+      required: false,
+    },
     hasIPv4: {
       type: Boolean,
       required: true,
     },
+    hideTitle: {
+      type: Boolean,
+      default: () => false,
+    },
   },
-  setup(props, { expose }) {
+  emits: {
+    "update:model-value": (value: DomainModel) => true || value,
+  },
+  setup(props, { expose, emit }) {
     const customDomain = ref(false);
     const selectGateway = ref();
     const domainName = ref("");
@@ -82,6 +100,19 @@ export default {
     const FarmGatewayManager = useFarmGatewayManager();
     const farmData = ref(FarmGatewayManager?.load());
     const loading = ref(FarmGatewayManager?.getLoading());
+
+    watch(
+      [gatewayNode, customDomain, domain],
+      ([gateway, hasCustomDomain, customDomain]) => {
+        emit("update:model-value", {
+          gateway,
+          hasCustomDomain,
+          customDomain: customDomain?.domain,
+        });
+      },
+      { immediate: true },
+    );
+
     return {
       customDomain,
       gatewayNode,
