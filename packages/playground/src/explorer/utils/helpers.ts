@@ -60,7 +60,7 @@ export async function requestNodes(
 ): Promise<Pagination<GridNode[]>> {
   try {
     const nodes: Pagination<GridNode[]> = await gridProxyClient.nodes.list(options, config);
-    return JSON.parse(JSON.stringify(nodes));
+    return nodes;
   } catch (error) {
     console.error("An error occurred while requesting nodes:", error);
     throw error;
