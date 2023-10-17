@@ -194,9 +194,9 @@ const _loadData = async () => {
       const fee = await grid?.contracts.getDedicatedNodeExtraFee({ nodeId: item.nodeId });
       const price = await grid?.calculator.calculateWithMyBalance({
         cru: item.total_resources.cru,
-        hru: toGigaBytes(item.total_resources.hru.toString()),
-        mru: toGigaBytes(item.total_resources.mru.toString()),
-        sru: toGigaBytes(item.total_resources.sru.toString()),
+        hru: toGigaBytes(item.total_resources.hru),
+        mru: toGigaBytes(item.total_resources.mru),
+        sru: toGigaBytes(item.total_resources.sru),
         ipv4u: false,
         certified: item.certificationType === CertificationType.Certified,
       });
