@@ -286,7 +286,7 @@ export function generateReceipt(doc: jsPDF, node: NodeInterface) {
   // Add header information on the first page
   doc.text(`Node ${node.nodeId} Summary`, 80, topY);
   doc.setFontSize(10);
-  doc.text(`Receipts total: ${node.receipts.length}`, cellX, topY + lineOffset);
+  doc.text(`Receipts total: ${node.receipts?.length}`, cellX, topY + lineOffset);
   doc.text(
     `Minting total: ${node.receipts.filter(receipt => receipt.type == "MINTING").length}`,
     cellX,

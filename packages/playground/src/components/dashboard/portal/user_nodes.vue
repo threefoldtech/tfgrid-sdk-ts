@@ -6,10 +6,19 @@
     <v-data-table
       :headers="headers"
       :items="nodes"
-      single-expand="true"
-      :expanded.sync="expanded"
       show-expand
-      item-value="name"
+      :expanded="expanded"
+      @update:expanded="
+        $event => {
+          if ($event.length > 0) {
+            expanded = [$event.pop()];
+          } else {
+            expanded = [];
+          }
+        }
+      "
+      expand-on-click
+      return-object
     >
       <template v-slot:expanded-row="{ columns, item }">
         <tr>
@@ -134,12 +143,12 @@
               </v-card>
             </v-container>
 
-            <v-expansion-panels v-model="resourcesPanel" :disabled="false" focusable>
+            <v-expansion-panels model-value :disabled="false" focusable>
               <v-expansion-panel>
                 <v-expansion-panel-title> Resource Units Reserved </v-expansion-panel-title>
                 <v-expansion-panel-text>
                   <v-row class="mt-5 mb-5">
-                    <v-col v-for="(value, key) in item.raw.total_resources" :key="key" align="center">
+                    <v-col v-for="(value, key) in item.value.total_resources" :key="key" align="center">
                       <p class="text-center text-uppercase">{{ key }}</p>
                       <v-flex class="text-truncate">
                         <v-tooltip bottom class="d-none">
@@ -149,7 +158,7 @@
                               :rotate="-90"
                               :size="150"
                               :width="12"
-                              :model-value="isNaN(getPercentage(item.raw, key)) ? 0 : getPercentage(item.raw, key)"
+                              :model-value="isNaN(getPercentage(item.raw, key)) ? 0 : getPercentage(item, key)"
                               class="my-3"
                               color="primary"
                             />
@@ -175,15 +184,15 @@
             </v-expansion-panels>
             <v-expansion-panels
               v-if="network == 'main' && item.raw.status === 'up'"
-              v-model="receiptsPanel"
               :disabled="false"
               focusable
               single
+              model-value
             >
               <v-expansion-panel>
                 <v-expansion-panel-title> Node Statistics </v-expansion-panel-title>
                 <v-expansion-panel-text>
-                  <NodeMintingDetails :node="item.raw" />
+                  <NodeMintingDetails :node="item" />
                 </v-expansion-panel-text>
               </v-expansion-panel>
             </v-expansion-panels>
@@ -213,7 +222,12 @@
 <script lang="ts">
 import { onMounted, ref } from "vue";
 
-import { getNodeUptimePercentage, type NodeInterface } from "@/utils/node";
+import {
+  getNodeAvailability,
+  getNodeMintingFixupReceipts,
+  getNodeUptimePercentage,
+  type NodeInterface,
+} from "@/utils/node";
 
 import { gridProxyClient } from "../../../clients";
 import { useGrid, useProfileManager } from "../../../stores";
@@ -266,7 +280,7 @@ export default {
       },
     ] as any[];
 
-    const expanded = ref<any[]>();
+    const expanded = ref<string[]>();
     const network = process.env.NETWORK || window.env.NETWORK;
     interface IPublicConfig {
       ipv4?: number;
@@ -295,8 +309,30 @@ export default {
         const twinId = profileManager.profile!.twinId;
         const userFarms = await gridStore.grid.capacity.getUserFarms({ twinId });
         const farmIds = userFarms.map(farm => farm.farmId).join(",");
-        const { data } = await gridProxyClient.nodes.list({ farmIds }, { loadStats: true });
-        nodes.value = data as unknown as NodeInterface[];
+        const { data } = await gridProxyClient.nodes.list({ farmIds });
+        const _nodes = data as unknown as NodeInterface[];
+
+        const nodesWithResources = _nodes.map(async (node: NodeInterface) => {
+          try {
+            const network = process.env.NETWORK || (window as any).env.NETWORK;
+            node.receipts = [];
+            if (network == "dev") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
+            node.availability = await getNodeAvailability(node.nodeId);
+          } catch (error) {
+            node.receipts = [];
+            node.used_resources = {
+              sru: 0,
+              hru: 0,
+              mru: 0,
+              cru: 0,
+            };
+            node.availability = { downtime: 0, currentPeriod: 0 };
+          }
+
+          return node;
+        });
+
+        nodes.value = await Promise.all(nodesWithResources);
         return nodes.value;
       } catch (error) {
         console.log(error);

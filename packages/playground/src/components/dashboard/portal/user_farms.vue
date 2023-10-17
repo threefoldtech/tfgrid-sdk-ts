@@ -8,7 +8,6 @@
       single-expand="true"
       :expanded.sync="expanded"
       show-expand
-      item-value="name"
     >
       <template v-slot:top>
         <v-toolbar flat color="primary">

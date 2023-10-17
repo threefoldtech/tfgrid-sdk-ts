@@ -2,21 +2,18 @@
   <v-container>
     <v-row>
       <v-col cols="3">
-        <v-menu ref="menu" v-model="showMenu" :close-on-content-click="true" transition="scale-transition">
+        <v-menu ref="menu" v-model="showMenu" :close-on-content-click="false" transition="scale-transition">
           <template v-slot:activator="{ props }">
-            <v-text-field v-model="selectedData" label="Filter by month" readonly v-bind="props"></v-text-field>
+            <v-text-field v-bind="props" label="Select Month and Year" readonly :model-value="selectedData" />
           </template>
 
-          <v-date-picker
-            v-model="selectedData"
-            type="month"
-            class="mt-4"
-            color="blue lighten-1"
-            :min="minDate"
-            :max="maxDate"
-            no-title
-            scrollable
-          ></v-date-picker>
+          <v-card>
+            <v-card-text class="d-flex">
+              <v-select v-model="selectedMonth" :items="months" label="Month"></v-select>
+
+              <v-select v-model="selectedYear" :items="years" label="Year"></v-select>
+            </v-card-text>
+          </v-card>
         </v-menu>
       </v-col>
       <v-col cols="9">
@@ -56,7 +53,7 @@
           </div>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue" @click="downloadNodeReceipt">Download Node Receipt</v-btn>
+            <v-btn color="blue" @click="downloadNodeReceipt" :disabled="!node.receipts">Download Node Receipt</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -66,7 +63,8 @@
 
 <script lang="ts">
 import { jsPDF } from "jspdf";
-import { ref } from "vue";
+import moment from "moment";
+import { computed, onMounted, ref } from "vue";
 
 import { generateReceipt, type receiptInterface } from "@/utils/node";
 
@@ -75,10 +73,21 @@ export default {
   props: ["node"],
   setup(props) {
     const showMenu = ref(false);
-    const selectedData = ref();
+    const menu = ref(false);
     const minDate = ref();
     const maxDate = ref();
-    const receipts = ref<receiptInterface[]>();
+    const selectedMonth = ref(moment().format("MMMM"));
+    const selectedYear = ref(+moment().format("YYYY"));
+    const receipts = computed(() => {
+      return filterReceiptsByMonth(
+        props.node.receipts,
+        selectedYear.value,
+        moment.months().indexOf(selectedMonth.value),
+      );
+    });
+    const years = Array.from({ length: 10 }, (_, index) => new Date().getFullYear() - 5 + index);
+    const months = ref(moment.months());
+    const selectedData = computed(() => [selectedMonth.value, selectedYear.value].filter(Boolean).join(", "));
 
     function downloadNodeReceipt() {
       let doc = new jsPDF();
@@ -86,26 +95,10 @@ export default {
       doc.save(`node_${props.node.nodeId}_receipts.pdf`);
     }
 
-    function formatDate(date: Date) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-
-      return `${year}-${month}`;
-    }
-    function getDates() {
-      const firstReceiptData = props.node.receipts.value[props.node.receipts.length - 1].startPeriodTimestamp;
-      const lastReceiptData = props.node.receipts.value[0].startPeriodTimestamp;
-
-      minDate.value = formatDate(getDateFromTimestamp(firstReceiptData));
-      maxDate.value = formatDate(getDateFromTimestamp(lastReceiptData));
-
-      selectedData.value = maxDate;
-    }
-
     function getChipColor(type: string) {
       switch (type) {
         case "MINTING":
-          return "green";
+          return "primary";
         case "FIXUP":
           return "red";
         default:
@@ -117,33 +110,30 @@ export default {
       return new Date(timestamp * 1000);
     }
 
-    function getMonthReceipt() {
-      const selectedDate = new Date(selectedData.value);
-      receipts.value = filterReceiptsByMonth(props.node.receipts, selectedDate.getFullYear(), selectedDate.getMonth());
-    }
-
     function filterReceiptsByMonth(receipts: receiptInterface[], year: number, month: number): receiptInterface[] {
-      const startDate = new Date(year, month - 1, 20);
-      const endDate = new Date(year, month, 20);
-
       const filteredReceipts = receipts.filter(receipt => {
-        const receiptDate = getDateFromTimestamp(receipt.startPeriodTimestamp);
-        return receiptDate >= startDate && receiptDate < endDate;
+        const date = moment(receipt.endPeriodTimestamp * 1000);
+        console.log(date, date.month(), date.year(), month, year);
+
+        return date.month() === month && date.year() === year;
       });
 
       return filteredReceipts;
     }
     return {
       showMenu,
-      selectedData,
       minDate,
       maxDate,
       receipts,
+      years,
+      months,
+      selectedMonth,
+      selectedYear,
+      menu,
+      selectedData,
       getDateFromTimestamp,
       downloadNodeReceipt,
-      getDates,
       getChipColor,
-      getMonthReceipt,
     };
   },
 };
