@@ -1,15 +1,32 @@
 <template>
-  <v-btn
-    id="tftBtn"
-    width="2000"
-    color="white"
-    @click="addTFT"
-    class="px-lg-6 px-md-2 px-sm-0 mx-sm-0"
-    style="color: white; max-width: 140px; width: auto; background-color: var(--primary)"
-    :loading="loadingAddTFT"
-  >
-    GET TFT
-  </v-btn>
+  <v-tooltip location="bottom" close-delay="1000" color="primary">
+    <template #activator="{ props }">
+      <v-btn
+        id="tftBtn"
+        width="2000"
+        color="white"
+        @click="addTFT"
+        class="px-lg-6 px-md-2 px-sm-0 mx-sm-0"
+        style="color: white; max-width: 140px; width: auto; background-color: var(--primary)"
+        :loading="loadingAddTFT"
+        v-bind="props"
+      >
+        GET TFT
+      </v-btn>
+    </template>
+    <div>
+      Get TFT on Stellar using BTC or Credit card, then you can bridge it to your tfchain account using the Bridge in
+      the portal section.
+      <v-btn
+        icon
+        small
+        @click.stop
+        href="https://manual.grid.tf/threefold_token/buy_sell_tft/gettft.html"
+        target="_blank"
+        ><v-icon>mdi-information-outline</v-icon></v-btn
+      >
+    </div>
+  </v-tooltip>
 </template>
 
 <script lang="ts">
@@ -60,5 +77,9 @@ export default {
 
 :root {
   --primary: #1aa18f;
+}
+
+.v-tooltip > .v-overlay__content {
+  pointer-events: initial !important;
 }
 </style>

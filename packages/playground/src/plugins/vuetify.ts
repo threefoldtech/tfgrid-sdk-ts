@@ -4,12 +4,12 @@ import "vuetify/styles";
 import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
-import { VDataTable } from "vuetify/labs/VDataTable";
-
+import { VDataTable, VDataTableServer } from "vuetify/labs/VDataTable";
 const vuetify = createVuetify({
   components: {
     ...components,
     VDataTable,
+    VDataTableServer,
   },
   directives,
   theme: {
@@ -21,6 +21,7 @@ const vuetify = createVuetify({
           primary: "#1aa18f",
           secondary: "#74DDC3",
           title: "#1AA18F",
+          disclaimer: "#4D776D",
           info: "#7de3c8",
           warning: "#FFCC00",
           link: "#5695ff",

@@ -44,7 +44,7 @@
             <v-list-item-content>
               <v-list-item-title> Uptime </v-list-item-title>
             </v-list-item-content>
-            {{ node.uptime | secondToRedable }}
+            {{ node.uptime | toReadableDate }}
           </v-list-item>
           <v-divider />
 
