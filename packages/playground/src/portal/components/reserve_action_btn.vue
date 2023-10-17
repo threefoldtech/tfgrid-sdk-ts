@@ -47,9 +47,9 @@
 <script lang="ts">
 import { ref } from "vue";
 
-import { useProfileManager } from "../stores";
-import { createCustomToast, ToastType } from "../utils/custom_toast";
-import { getGrid } from "../utils/grid";
+import { useProfileManager } from "@/stores";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import { getGrid } from "@/utils/grid";
 
 const profileManager = useProfileManager();
 

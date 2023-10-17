@@ -51,7 +51,7 @@
               <span v-bind="props" v-on="isActive">{{ item.raw.price }} *</span>
             </template>
             <span>
-              Discounts: <br />
+              Discounts: <v-spacer />
               <ul class="pl-2">
                 <li>
                   You receive 50% discount if you reserve an entire
@@ -88,12 +88,13 @@ import { onMounted, ref, watch } from "vue";
 import type { VDataTable } from "vuetify/labs/VDataTable";
 import { VDataTableServer } from "vuetify/labs/VDataTable";
 
-import { gridProxyClient } from "../clients";
-import { toBytes } from "../explorer/utils/helpers";
-import { useProfileManager } from "../stores";
-import { getGrid } from "../utils/grid";
-import { toGigaBytes } from "../utils/helpers";
-import toTeraOrGigaOrPeta from "../utils/toTeraOrGegaOrPeta";
+// import { requestNodes } from "@/explorer/utils/helpers";
+import { gridProxyClient } from "@/clients";
+import { toBytes } from "@/explorer/utils/helpers";
+import { useProfileManager } from "@/stores";
+import { getGrid } from "@/utils/grid";
+import { toGigaBytes } from "@/utils/helpers";
+import toTeraOrGigaOrPeta from "@/utils/toTeraOrGegaOrPeta";
 
 const headers: VDataTable["headers"] = [
   { title: "Node ID", key: "nodeId", sortable: false },
@@ -250,10 +251,11 @@ async function reloadTable() {
 <script lang="ts">
 import { debounce } from "lodash";
 
-import NodeDetails from "../components/node_details.vue";
-import NodeFilter from "../components/node_filter.vue";
-import ReserveBtn from "../components/reserve_action_btn.vue";
-import { type DedicatedNodeFilters, DedicatedNodeInitializer } from "../utils/filter_nodes";
+import NodeFilter from "@/components/node_filter.vue";
+import { type DedicatedNodeFilters, DedicatedNodeInitializer } from "@/utils/filter_nodes";
+
+import NodeDetails from "./node_details.vue";
+import ReserveBtn from "./reserve_action_btn.vue";
 
 export default {
   name: "Dedicated Node",

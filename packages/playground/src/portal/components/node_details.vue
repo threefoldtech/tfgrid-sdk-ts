@@ -6,15 +6,7 @@
   </td>
   <td :colspan="columnsLen" v-else-if="dNodeError" style="text-align: center">
     <div class="pt-4">
-      <v-alert
-        variant="tonal"
-        class="d-flex justify-between"
-        color="#f44336"
-        dense
-        outlined
-        type="error"
-        style="text-align: center"
-      >
+      <v-alert variant="tonal" class="d-flex justify-between" dense outlined type="error" style="text-align: center">
         <div style="display: flex; align-items: center">Failed to retrieve Node details.</div>
         <template v-slot:append>
           <v-icon @click="getNodeDetails" style="cursor: pointer">mdi-reload</v-icon>
@@ -31,7 +23,7 @@
             :loading="false"
             title="Node Resources"
             icon="mdi-harddisk"
-            :items="NodeResourceFields"
+            :items="getNodeResourceCard()"
           ></card-details>
         </div>
       </v-col>
@@ -42,7 +34,7 @@
             :loading="false"
             title="Location"
             icon="mdi-map-marker"
-            :items="CountryResourceFields"
+            :items="getCountryResourceCard()"
           ></card-details>
         </div>
       </v-col>
@@ -53,7 +45,7 @@
             :loading="false"
             title="Farm details"
             icon="mdi-silo"
-            :items="FarmResourceFields"
+            :items="getFarmResourceCard()"
           ></card-details>
         </div>
       </v-col>
@@ -71,20 +63,16 @@
 import type { GridNode } from "@threefold/gridproxy_client";
 import { onMounted, ref, watch } from "vue";
 
+import { gridProxyClient } from "@/clients";
 import { getNode } from "@/explorer/utils/helpers";
 import type { NodeDetailsCard } from "@/explorer/utils/types";
-
-import { gridProxyClient } from "../clients";
-import { nodeInitializer } from "../explorer/utils/types";
-import toTeraOrGigaOrPeta from "../utils/toTeraOrGegaOrPeta";
+import { nodeInitializer } from "@/explorer/utils/types";
+import toTeraOrGigaOrPeta from "@/utils/toTeraOrGegaOrPeta";
 
 const dNodeError = ref(false);
 const dNodeLoading = ref(true);
 const farmName = ref("");
 const publicIps = ref(0);
-const NodeResourceFields = ref<NodeDetailsCard[]>();
-const CountryResourceFields = ref<NodeDetailsCard[]>();
-const FarmResourceFields = ref<NodeDetailsCard[]>();
 const node = ref<GridNode>(nodeInitializer);
 
 const props = defineProps({
@@ -109,9 +97,6 @@ async function getNodeDetails() {
     farmName.value = res.data[0].name;
     publicIps.value = res.data[0].publicIps.length;
     if (Array.isArray(res) && !res.length) throw new Error("Can't resolve farm data");
-    NodeResourceFields.value = getNodeResourceCard();
-    CountryResourceFields.value = getCountryResourceCard();
-    FarmResourceFields.value = getFarmResourceCard();
     if (props.item.value.num_gpu > 0) {
       const _node: GridNode = await getNode(props.item.value.nodeId, {
         loadGpu: true,
