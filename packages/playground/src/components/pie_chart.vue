@@ -8,7 +8,7 @@ const props = defineProps<{
   chartdata: any[];
 }>();
 
-const options = ref({
+const options = ref<(typeof Doughnut)["props"]["chartOptions"]>({
   responsive: true,
   plugins: {
     legend: {

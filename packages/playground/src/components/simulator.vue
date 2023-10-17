@@ -268,9 +268,9 @@ const xs = ref<number[]>([]);
 const activeProfile = ref(props.profile);
 
 const chartdata = ref();
-const rewardPerCu = 2.4;
-const rewardPerSu = 1;
-const rewardPerNu = 0.03;
+const rewardPerCu = ref(2.4);
+const rewardPerSu = ref(1);
+const rewardPerNu = ref(0.03);
 
 const _max = (val: number, max = 0): number => {
   val = val ?? 0;
@@ -298,15 +298,15 @@ const tftRewardPer = computed(() => (activeProfile.value.certified ? 1 : 0) * 0.
 
 const tftRewardPerCu = computed(() => {
   if (activeProfile.value.price < 0.08) return NaN;
-  return (rewardPerCu / activeProfile.value.price) * tftRewardPer.value;
+  return (rewardPerCu.value / activeProfile.value.price) * tftRewardPer.value;
 });
 
 const tftRewardPerSu = computed(() => {
   if (activeProfile.value.price < 0.08) return NaN;
-  return (rewardPerSu / activeProfile.value.price) * tftRewardPer.value;
+  return (rewardPerSu.value / activeProfile.value.price) * tftRewardPer.value;
 });
 
-const tftRewardPerNu = computed(() => rewardPerNu / averageTokenPrice.value);
+const tftRewardPerNu = computed(() => rewardPerNu.value / averageTokenPrice.value);
 
 const cuFarmingRewardInTft = computed(() => tftRewardPerCu.value * cu.value);
 const suFarmingRewardInTft = computed(() => tftRewardPerSu.value * su.value);
