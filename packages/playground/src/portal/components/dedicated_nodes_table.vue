@@ -37,11 +37,7 @@
         return-object
       >
         <template v-slot:[`item.actions`]="{ item }">
-          <reserve-btn
-            :node-id="item.raw.nodeId"
-            :rented-by-twin-id="item.raw.rentedByTwinId"
-            @updateTable="reloadTable"
-          ></reserve-btn>
+          <reserve-btn :node="(item.raw as unknown as GridNode)" @updateTable="reloadTable" />
         </template>
 
         <template v-slot:[`item.price`]="{ item }">
@@ -73,7 +69,7 @@
         </template>
 
         <template v-slot:expanded-row="{ columns, item }">
-          <node-details :item="item" :columns-len="columns.length"></node-details>
+          <node-details :node="(item.raw as unknown as GridNode)" :columns-len="columns.length" />
         </template>
       </v-data-table-server>
     </v-card>
@@ -81,6 +77,7 @@
 </template>
 
 <script setup lang="ts">
+import type { GridNode } from "@threefold/gridproxy_client";
 import { NodeStatus } from "@threefold/gridproxy_client";
 import { CertificationType } from "@threefold/gridproxy_client";
 import { onMounted, ref, watch } from "vue";

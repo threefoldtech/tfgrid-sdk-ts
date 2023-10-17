@@ -51,7 +51,7 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col v-if="item.value.num_gpu > 0" cols="getColSize" style="min-width: 600px; min-height: 400px">
+      <v-col v-if="node.num_gpu > 0" cols="getColSize" style="min-width: 600px; min-height: 400px">
         <div class="mt-3">
           <GPUDetailsCard :node="node" />
         </div> </v-col
@@ -61,7 +61,7 @@
 
 <script setup lang="ts">
 import type { GridNode } from "@threefold/gridproxy_client";
-import { onMounted, ref, watch } from "vue";
+import { onMounted, type PropType, ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import { getNode } from "@/explorer/utils/helpers";
@@ -76,9 +76,9 @@ const publicIps = ref(0);
 const node = ref<GridNode>(nodeInitializer);
 
 const props = defineProps({
-  item: {
+  node: {
     required: true,
-    type: null,
+    type: Object as PropType<GridNode>,
   },
   columnsLen: {
     required: true,
@@ -93,12 +93,12 @@ onMounted(async () => {
 async function getNodeDetails() {
   try {
     dNodeLoading.value = true;
-    const res = await gridProxyClient.farms.list({ farmId: props.item.value.farmId });
+    const res = await gridProxyClient.farms.list({ farmId: props.node.farmId });
     farmName.value = res.data[0].name;
     publicIps.value = res.data[0].publicIps.length;
     if (Array.isArray(res) && !res.length) throw new Error("Can't resolve farm data");
-    if (props.item.value.num_gpu > 0) {
-      const _node: GridNode = await getNode(props.item.value.nodeId, {
+    if (props.node.num_gpu > 0) {
+      const _node: GridNode = await getNode(props.node.nodeId, {
         loadGpu: true,
       });
       node.value = _node;
@@ -113,33 +113,33 @@ async function getNodeDetails() {
 
 const getFarmResourceCard = (): NodeDetailsCard[] => {
   return [
-    { name: "ID", value: props.item.value.farmId },
+    { name: "ID", value: props.node.farmId.toString() },
     { name: "Name", value: farmName.value },
-    { name: "Certification type", value: props.item.value.certificationType },
-    { name: "Public ips", value: publicIps.value },
+    { name: "Certification type", value: props.node.certificationType },
+    { name: "Public ips", value: publicIps.value.toString() },
   ];
 };
 
 const getCountryResourceCard = (): NodeDetailsCard[] => {
   return [
-    { name: "Country", value: props.item.value.location.country },
-    { name: "City", value: props.item.value.location.city },
-    { name: "Latitude", value: props.item.value.location.latitude },
-    { name: "Longitude", value: props.item.value.location.longitude },
+    { name: "Country", value: props.node.location.country },
+    { name: "City", value: props.node.location.city },
+    { name: "Latitude", value: props.node.location.latitude.toString() },
+    { name: "Longitude", value: props.node.location.longitude.toString() },
   ];
 };
 
 const getNodeResourceCard = (): NodeDetailsCard[] => {
   return [
-    { name: "CPU", value: props.item.value.total_resources.cru + " CPU" },
-    { name: "Memory", value: toTeraOrGigaOrPeta(props.item.value.total_resources.mru) },
-    { name: "Disk(SSD)", value: toTeraOrGigaOrPeta(props.item.value.total_resources.sru) },
-    { name: "Disk(HDD)", value: toTeraOrGigaOrPeta(props.item.value.total_resources.hru) },
+    { name: "CPU", value: props.node.total_resources.cru.toString() + " CPU" },
+    { name: "Memory", value: toTeraOrGigaOrPeta(props.node.total_resources.mru.toString()) },
+    { name: "Disk(SSD)", value: toTeraOrGigaOrPeta(props.node.total_resources.sru.toString()) },
+    { name: "Disk(HDD)", value: toTeraOrGigaOrPeta(props.node.total_resources.hru.toString()) },
   ];
 };
 
 function getColSize() {
-  if (props.item.num_gpu > 0) {
+  if (props.node.num_gpu > 0) {
     return 6;
   } else {
     return 4;

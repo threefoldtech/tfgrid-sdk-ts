@@ -21,19 +21,20 @@
       outlined
       :loading="loadingReserveNode"
       :disabled="disableButton"
+      v-if="node.rentedByTwinId === 0"
       style="background: #1aa18f"
-      v-if="rentedByTwinId === 0"
       @click="reserveNode"
     >
       Reserve
     </v-btn>
+
     <v-btn
       small
       outlined
       color="red"
       :loading="loadingUnreserveBtn"
       :disabled="disableButton"
-      v-if="rentedByTwinId === profileManager.profile?.twinId"
+      v-if="node.rentedByTwinId === profileManager.profile?.twinId"
       @click="removeReserve"
     >
       Unreserve
@@ -42,7 +43,8 @@
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import type { GridNode } from "@threefold/gridproxy_client";
+import { type PropType, ref } from "vue";
 
 import { useProfileManager } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
@@ -53,13 +55,9 @@ const profileManager = useProfileManager();
 export default {
   name: "ReserveBtn",
   props: {
-    rentedByTwinId: {
-      type: Number,
+    node: {
       required: true,
-    },
-    nodeId: {
-      type: String,
-      required: true,
+      type: Object as PropType<GridNode>,
     },
   },
   setup(props, { emit }) {
@@ -77,17 +75,17 @@ export default {
       loadingUnreserveNode.value = true;
       try {
         const grid = await getGrid(profileManager.profile!);
-        createCustomToast(`Verify contracts for node ${props.nodeId}`, ToastType.info);
+        createCustomToast(`Verify contracts for node ${props.node.nodeId}`, ToastType.info);
 
-        const result = (await grid?.contracts.getActiveContracts({ nodeId: +props.nodeId })) as any;
+        const result = (await grid?.contracts.getActiveContracts({ nodeId: +props.node.nodeId })) as any;
         if (result.length > 0) {
-          createCustomToast(`node ${props.nodeId} has active contracts`, ToastType.info);
+          createCustomToast(`node ${props.node.nodeId} has active contracts`, ToastType.info);
           loadingUnreserveNode.value = false;
           openUnreserveDialog.value = false;
         } else {
-          createCustomToast(`unreserving node ${props.nodeId}`, ToastType.info);
-          await grid?.nodes.unreserve({ nodeId: +props.nodeId });
-          createCustomToast(`Transaction succeeded node ${props.nodeId} Unreserved`, ToastType.success);
+          createCustomToast(`unreserving node ${props.node.nodeId}`, ToastType.info);
+          await grid?.nodes.unreserve({ nodeId: +props.node.nodeId });
+          createCustomToast(`Transaction succeeded node ${props.node.nodeId} Unreserved`, ToastType.success);
           loadingUnreserveNode.value = false;
           openUnreserveDialog.value = false;
           loadingUnreserveBtn.value = true;
@@ -112,8 +110,8 @@ export default {
       try {
         const grid = await getGrid(profileManager.profile!);
         createCustomToast("Transaction Submitted", ToastType.info);
-        await grid?.nodes.reserve({ nodeId: +props.nodeId });
-        createCustomToast(`Transaction succeeded node ${props.nodeId} Reserved`, ToastType.success);
+        await grid?.nodes.reserve({ nodeId: +props.node.nodeId });
+        createCustomToast(`Transaction succeeded node ${props.node.nodeId} Reserved`, ToastType.success);
         createCustomToast("Table may take sometime to update the changes", ToastType.info);
         emit("updateTable");
         disableButton.value = true;
