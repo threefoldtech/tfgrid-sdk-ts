@@ -133,7 +133,7 @@ const profileManager = useProfileManager();
 const pageSize = ref(10);
 const page = ref(1);
 const expanded = ref([]);
-const tabs = [{ label: "Rentable" }, { label: "Rented" }, { label: "Mine" }];
+const tabs = [{ label: "Rentable" }, { label: "Mine" }];
 const activeTab = ref(0);
 const loading = ref(false);
 const nodes = ref<any[]>();
@@ -149,11 +149,6 @@ const tabParams = {
     retCount: true,
   },
   1: {
-    rented: true,
-    status: NodeStatus.Up,
-    retCount: true,
-  },
-  2: {
     rented: true,
     rentedBy: profileManager.profile?.twinId,
     retCount: true,
