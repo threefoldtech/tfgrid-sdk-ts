@@ -260,6 +260,11 @@ const routes: AppRoute[] = [
         icon: "mdi-open-in-new",
         url: "https://hub.grid.tf/",
       },
+      {
+        title: "Grid Services",
+        icon: "mdi-open-in-new",
+        url: "https://status.grid.tf/status/threefold",
+      },
     ],
   },
   {
