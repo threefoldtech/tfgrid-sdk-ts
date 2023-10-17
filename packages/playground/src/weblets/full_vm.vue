@@ -74,7 +74,8 @@
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
           <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
-
+        <NodeSelector v-model="selection" />
+        {{ selection }}
         <SelectFarmManager>
           <SelectFarm
             :filters="{
@@ -156,7 +157,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref, watch } from "vue";
+import { onMounted, type Ref, ref, watch } from "vue";
 
 import Network from "../components/networks.vue";
 import SelectFarmManager from "../components/select_farm_manager.vue";
@@ -171,6 +172,8 @@ import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
+const selection = ref();
+
 const profileManager = useProfileManager();
 const solution = ref() as Ref<SolutionFlavor>;
 
@@ -291,6 +294,7 @@ async function deploy() {
 
 <script lang="ts">
 import ExpandableLayout from "../components/expandable_layout.vue";
+import NodeSelector from "../components/node_selection.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
