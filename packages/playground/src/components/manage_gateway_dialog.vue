@@ -37,6 +37,7 @@
               { title: 'TLS Passthrough', key: 'tls_passthrough' },
               { title: 'Backend', key: 'backends' },
               { title: 'Status', key: 'status' },
+              { title: 'Actions', key: 'actions' },
             ]"
             :items="gateways"
             return-object
@@ -51,6 +52,10 @@
 
             <template #[`item.status`]="{ item }">
               {{ item.value.status.toUpperCase() }}
+            </template>
+
+            <template #[`item.actions`]="{ item }">
+              <IconActionBtn tooltip="Visit" icon="mdi-web" color="anchor" :href="'https://' + item.value.domain" />
             </template>
           </list-table>
         </div>
@@ -168,6 +173,7 @@ import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
 import DomainName, { type DomainModel } from "./domain_name.vue";
+import IconActionBtn from "./icon_action_btn.vue";
 import ListTable from "./list_table.vue";
 import { useLayout } from "./weblet_layout.vue";
 
@@ -178,7 +184,7 @@ export interface VM {
 
 export default {
   name: "ManageGatewayDialog",
-  components: { ListTable, DomainName },
+  components: { ListTable, DomainName, IconActionBtn },
   props: {
     vm: { type: Object as PropType<VM>, required: true },
   },
