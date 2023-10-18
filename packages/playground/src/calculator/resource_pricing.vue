@@ -6,6 +6,11 @@
     </v-card>
     <v-card class="pa-3">
       <v-row class="mt-3 px-3">
+        <v-alert type="info" variant="tonal">
+          For more information about Threefold Pricing check <a class="app-link" @click="openManual()">here</a>
+        </v-alert>
+      </v-row>
+      <v-row class="mt-3 px-3">
         <v-col cols="6">
           <input-validator
             :value="CRU"
@@ -288,6 +293,10 @@ onMounted(async () => {
       console.error("Error fetching the grid:", error);
     });
 });
+
+function openManual() {
+  window.open("https://manual.grid.tf/cloud/cloudunits_pricing.html", "_blank");
+}
 </script>
 
 <style>
