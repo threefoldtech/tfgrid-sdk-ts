@@ -108,17 +108,14 @@
       <v-row class="px-3">
         <v-col cols="12">
           <input-validator
-            :rules="[
-              validators.required('Balance is required.'),
-              validators.required('Balance is required.'),
-              validators.min('Balance should be a positive integer.', 1),
-            ]"
+            :rules="[validators.min('Balance should be a positive integer.', 1)]"
             :value="balance"
             #="{ props }"
           >
             <input-tooltip tooltip="The amount of TFT to calculate discount.">
               <v-text-field
                 label="Balance"
+                :disabled="currentbalance"
                 suffix="TFT"
                 type="number"
                 v-bind="props"
@@ -235,6 +232,11 @@ watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance], async ()
         certified: isCertified.value,
       });
     } else {
+      const accountBalance = await grid.value.balance.getMyBalance();
+      if (balance.value === accountBalance.free) {
+        balance.value = 0;
+      }
+      if (!balance.value) balance.value = 0;
       pkgs = await grid.value.calculator.calculate({
         cru: CRU.value,
         mru: MRU.value,
@@ -242,6 +244,7 @@ watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance], async ()
         sru: SRU.value,
         ipv4u: ipv4.value,
         certified: isCertified.value,
+        balance: balance.value,
       });
     }
 
