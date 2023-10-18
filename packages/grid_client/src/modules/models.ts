@@ -31,6 +31,12 @@ enum ContractStates {
   GracePeriod = "GracePeriod",
 }
 
+export enum NodeStatusFilter {
+  up = "up",
+  down = "down",
+  standBy = "standby",
+}
+
 //TODO: find a way to validate all fields are passed while casting data to any of these classes.
 class AlgorandAccountCreateModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
@@ -584,6 +590,7 @@ class FilterOptions {
   @Expose() @IsOptional() @IsBoolean() hasGPU?: boolean;
   @Expose() @IsOptional() @IsBoolean() rentable?: boolean;
   @Expose() @IsOptional() @IsInt() @Min(1) rentedBy?: number;
+  @Expose() @IsOptional() @IsString() status?: NodeStatusFilter;
 }
 
 enum CertificationType {
