@@ -237,7 +237,6 @@ watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance], async ()
         sru: SRU.value,
         ipv4u: ipv4.value,
         certified: isCertified.value,
-        balance: balance.value,
       });
     }
 
