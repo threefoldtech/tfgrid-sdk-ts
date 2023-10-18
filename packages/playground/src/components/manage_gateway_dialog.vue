@@ -71,11 +71,15 @@
                   validators.isAlphanumeric('Subdomain should consist of letters and numbers only.'),
                   subdomain => validators.isAlpha('Subdomain must start with alphabet char.')(subdomain[0]),
                   validators.minLength('Subdomain must be at least 4 characters.', 4),
-                  validators.maxLength('Subdomain cannot exceed 15 characters.', 15),
+                  subdomain =>
+                    validators.maxLength(
+                      `Subdomain cannot exceed ${15 - prefix.length} characters.`,
+                      15 - prefix.length,
+                    )(subdomain),
                 ]"
                 #="{ props }"
               >
-                <v-text-field label="Subdomain" v-model.trim="subdomain" v-bind="props" />
+                <v-text-field label="Subdomain" :prefix="prefix" v-model.trim="subdomain" v-bind="props" />
               </input-validator>
             </input-tooltip>
 
@@ -168,6 +172,7 @@
 import { onMounted, type PropType, ref } from "vue";
 
 import { useProfileManager } from "../stores";
+import { ProjectName } from "../types";
 import { deployGatewayName, type GridGateway, loadDeploymentGateways } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
@@ -193,7 +198,8 @@ export default {
     const layout = useLayout();
     const gatewayTab = ref(0);
 
-    const subdomain = ref<string>(generateName({}, 12));
+    const prefix = ref("");
+    const subdomain = ref("");
     const domainName = ref<DomainModel>();
     const port = ref(80);
     const passThrough = ref(false);
@@ -202,7 +208,15 @@ export default {
     const ip = props.vm[0].interfaces[0].ip as string;
     const networkName = props.vm[0].interfaces[0].network as string;
 
-    onMounted(loadGateways);
+    onMounted(async () => {
+      const grid = await getGrid(profileManager.profile!);
+      prefix.value =
+        (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
+        grid!.config.twinId;
+      subdomain.value = generateName({}, 15 - prefix.value.length);
+      await grid!.disconnect();
+      await loadGateways();
+    });
 
     const loadingGateways = ref(false);
     const gateways = ref<GridGateway[]>([]);
@@ -229,7 +243,7 @@ export default {
         }
 
         await deployGatewayName(grid!, {
-          name: subdomain.value,
+          name: prefix.value + subdomain.value,
           nodeId: domainName.value!.gateway.id!,
           ip,
           networkName,
@@ -265,6 +279,7 @@ export default {
     }
 
     return {
+      prefix,
       layout,
       gatewayTab,
 
