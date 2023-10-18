@@ -5,7 +5,7 @@
       <v-card-title class="pa-0" lor="white">Pricing Calculator</v-card-title>
     </v-card>
     <v-card class="pa-3">
-      <v-row class="mt-3 px-3">
+      <v-row class="mt-3 px-3 pl-6" style="max-width: 74.7rem">
         <v-alert type="info" variant="tonal">
           For more information about Threefold Pricing check <a class="app-link" @click="openManual()">here</a>
         </v-alert>
