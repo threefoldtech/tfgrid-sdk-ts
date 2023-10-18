@@ -39,7 +39,7 @@
         </div>
       </v-col>
 
-      <v-col :cols="getColSize" :class="{ 'mt-n8': getColSize() === 6 }">
+      <v-col :cols="getColSize" class="{ 'mt-n8': getColSize() === 6 }">
         <div class="mt-3">
           <card-details
             :loading="false"
@@ -50,8 +50,37 @@
         </div>
       </v-col>
     </v-row>
-    <v-row>
-      <v-col v-if="node.num_gpu > 0" cols="getColSize" style="min-width: 600px; min-height: 400px">
+    <v-row class="d-flex" style="justify-content: center">
+      <div class="pa-1 pb-4" v-if="gpuLoading">
+        <div style="bottom: 10rem; top: 10rem">
+          <p :style="{ paddingBottom: '3rem', color: '#7de3c8', fontSize: '1.25rem' }">
+            Loading Node gpu details{{ dots }}
+          </p>
+        </div>
+      </div>
+      <v-row v-if="gpuError" style="justify-content: center; align-items: center; margin-bottom: 2rem">
+        <div>
+          <v-alert
+            variant="tonal"
+            class="d-flex justify-between"
+            color="#f44336"
+            dense
+            outlined
+            type="error"
+            style="text-align: center"
+          >
+            <div style="display: flex; align-items: center">Failed to receive node GPUs information</div>
+            <template v-slot:append>
+              <v-icon @click="getGpuDetails" style="cursor: pointer">mdi-reload</v-icon>
+            </template>
+          </v-alert>
+        </div>
+      </v-row>
+      <v-col
+        v-if="node.num_gpu > 0"
+        cols="getColSize"
+        style="max-width: 93rem; min-height: 400px; justify-content: center"
+      >
         <div class="mt-3">
           <GPUDetailsCard :node="node" />
         </div> </v-col
@@ -71,9 +100,13 @@ import toTeraOrGigaOrPeta from "@/utils/toTeraOrGegaOrPeta";
 
 const dNodeError = ref(false);
 const dNodeLoading = ref(true);
+const gpuLoading = ref(false);
+const gpuError = ref(false);
 const farmName = ref("");
 const publicIps = ref(0);
 const node = ref<GridNode>(nodeInitializer);
+const dots = ref(".");
+const interval = ref<number | null>(null);
 
 const props = defineProps({
   node: {
@@ -88,6 +121,7 @@ const props = defineProps({
 
 onMounted(async () => {
   getNodeDetails();
+  getGpuDetails();
 });
 
 async function getNodeDetails() {
@@ -97,18 +131,38 @@ async function getNodeDetails() {
     farmName.value = res.data[0].name;
     publicIps.value = res.data[0].publicIps.length;
     if (Array.isArray(res) && !res.length) throw new Error("Can't resolve farm data");
-    if (props.node.num_gpu > 0) {
-      const _node: GridNode = await getNode(props.node.nodeId, {
-        loadGpu: true,
-      });
-      node.value = _node;
-    }
+    dNodeLoading.value = true;
     dNodeError.value = false;
   } catch (e) {
+    console.log("Error retrieving node details: ", e);
     dNodeError.value = true;
     dNodeLoading.value = false;
   }
   dNodeLoading.value = false;
+}
+
+async function getGpuDetails() {
+  try {
+    if (props.node.num_gpu > 0) {
+      gpuLoading.value = true;
+      if (interval.value !== null) {
+        window.clearInterval(interval.value);
+      }
+      interval.value = window.setInterval(loadingDots, 500);
+
+      gpuError.value = false;
+      const _node: GridNode = await getNode(props.node.nodeId, {
+        loadGpu: true,
+      });
+      console.log(_node);
+      node.value = _node;
+    }
+    gpuLoading.value = false;
+  } catch (e) {
+    console.log("Error retrieving gpu node details: ", e);
+    gpuLoading.value = false;
+    gpuError.value = true;
+  }
 }
 
 const getFarmResourceCard = (): NodeDetailsCard[] => {
@@ -143,6 +197,14 @@ function getColSize() {
     return 6;
   } else {
     return 4;
+  }
+}
+
+function loadingDots() {
+  if (dots.value === "...") {
+    dots.value = ".";
+  } else {
+    dots.value += ".";
   }
 }
 </script>
