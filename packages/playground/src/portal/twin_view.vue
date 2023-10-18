@@ -94,7 +94,7 @@ onMounted(async () => {
   if (!userFarms.value.length) {
     return;
   }
-  const proposals = grid?.dao.get();
+  const proposals = grid.dao.get();
   const userFarmId = userFarms.value.map(farm => farm.farmID);
   const activeProposals = (await proposals)?.active;
   const numberOfActiveProposals = activeProposals ? activeProposals.length : 0;
