@@ -6,7 +6,7 @@
     </v-sheet>
     <v-col cols="11" class="mx-auto pb-0">
       <networkFilter v-model="networks"></networkFilter>
-      <statsTable></statsTable>
+      <statsTable :networks="networks"></statsTable>
     </v-col>
     <v-sheet style="position: fixed; bottom: 0%" class="w-100 d-flex align-center justify-center">
       <p class="my-1 font-weight-bold">{{ new Date().getFullYear() }} - ThreeFoldTech</p>
@@ -16,7 +16,7 @@
 
 <script lang="ts" setup>
 import { Network } from "@threefold/gridproxy_client";
-import { Ref, ref } from "vue";
+import { type Ref, ref } from "vue";
 
 import networkFilter from "../components/network_filter.vue";
 import statsTable from "../components/stats_table.vue";

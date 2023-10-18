@@ -45,63 +45,119 @@
 
 <script lang="ts" setup>
 import { Network, type Stats } from "@threefold/gridproxy_client";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
+import { useStore } from "vuex";
 
-import type { IStatistics } from "../types/index";
-import { fetchStats } from "../utils/fetchData";
+import type { IStatistics, NetworkStats } from "../types/index";
+// import { fetchStats } from "../utils/fetchData";
 import { formatData } from "../utils/formatData";
 import toTeraOrGigaOrPeta from "../utils/toTeraOrGegaOrPeta";
 import StatisticsCard from "./statistics_card.vue";
+const $store = useStore();
+const networkStats = computed((): NetworkStats => {
+  return {
+    dev: $store.getters.getNetworkStats(Network.Dev),
+    main: $store.getters.getNetworkStats(Network.Main),
+    test: $store.getters.getNetworkStats(Network.Test),
+  };
+});
+
+const props = defineProps({
+  networks: {
+    type: Object,
+    require: true,
+  },
+});
+watch(
+  () => props.networks,
+  () => {
+    if (props.networks) {
+      props.networks.forEach(async (network: Network) => {
+        if (!networkStats.value[network])
+          try {
+            loading.value = true;
+            await $store.dispatch("getStats", network.toLowerCase());
+          } catch (error) {
+            console.log(error);
+          } finally {
+            loading.value = false;
+          }
+      });
+    }
+  },
+  { deep: true },
+);
 const loading = ref(true);
 const failed = ref(false);
 
-const Istats = ref<IStatistics[]>([]);
-const nodesDistribution = ref<string>("");
-
-let stats: Stats | null = null;
-let networks: Network[] = [];
-const getStats = async () => {
-  networks = [Network.Dev, Network.Main, Network.Test];
-  try {
-    loading.value = true;
-    failed.value = false;
-    const data = await fetchStats(networks);
-    return formatData(networks, data);
-  } catch (error) {
-    failed.value = true;
-    return null;
-  } finally {
-    loading.value = false;
+const Istats = computed((): IStatistics[] => {
+  {
+    return [
+      { data: stats.value.nodes, title: "Nodes Online", icon: "mdi-laptop" },
+      { data: stats.value.farms, title: "Farms", icon: "mdi-tractor" },
+      { data: stats.value.countries, title: "Countries", icon: "mdi-earth" },
+      { data: stats.value.totalCru, title: "CPUs", icon: "mdi-cpu-64-bit" },
+      { data: toTeraOrGigaOrPeta(stats.value.totalSru.toString()), title: "SSD Storage", icon: "mdi-nas" },
+      { data: toTeraOrGigaOrPeta(stats.value.totalHru.toString()), title: "HDD Storage", icon: "mdi-harddisk" },
+      { data: toTeraOrGigaOrPeta(stats.value.totalMru.toString()), title: "RAM", icon: "mdi-memory" },
+      { data: stats.value.accessNodes, title: "Access Nodes", icon: "mdi-gate" },
+      { data: stats.value.gateways, title: "Gateways", icon: "mdi-boom-gate-outline" },
+      { data: stats.value.twins, title: "Twins", icon: "mdi-brain" },
+      { data: stats.value.publicIps, title: "Public IPs", icon: "mdi-access-point" },
+      { data: stats.value.contracts, title: "Contracts", icon: "mdi-file-document-edit-outline" },
+    ];
   }
-};
+});
 
-const fetchData = async () => {
-  try {
-    stats = await getStats();
-    if (!loading.value && stats != null) {
-      nodesDistribution.value = JSON.stringify(stats.nodesDistribution);
-      Istats.value = [
-        { data: stats.nodes, title: "Nodes Online", icon: "mdi-laptop" },
-        { data: stats.farms, title: "Farms", icon: "mdi-tractor" },
-        { data: stats.countries, title: "Countries", icon: "mdi-earth" },
-        { data: stats.totalCru, title: "CPUs", icon: "mdi-cpu-64-bit" },
-        { data: toTeraOrGigaOrPeta(stats.totalSru.toString()), title: "SSD Storage", icon: "mdi-nas" },
-        { data: toTeraOrGigaOrPeta(stats.totalHru.toString()), title: "HDD Storage", icon: "mdi-harddisk" },
-        { data: toTeraOrGigaOrPeta(stats.totalMru.toString()), title: "RAM", icon: "mdi-memory" },
-        { data: stats.accessNodes, title: "Access Nodes", icon: "mdi-gate" },
-        { data: stats.gateways, title: "Gateways", icon: "mdi-boom-gate-outline" },
-        { data: stats.twins, title: "Twins", icon: "mdi-brain" },
-        { data: stats.publicIps, title: "Public IPs", icon: "mdi-access-point" },
-        { data: stats.contracts, title: "Contracts", icon: "mdi-file-document-edit-outline" },
-      ];
-      loading.value = false;
-    }
-  } catch (error) {
-    console.error("Error in fetchData:", error);
-  }
-};
+//nodesDistribution.value = JSON.stringify(stats.value.nodesDistribution)
+const nodesDistribution = computed(() => JSON.stringify(stats.value.nodesDistribution));
 
-onMounted(fetchData);
+const stats = computed(() => {
+  return formatData(props.networks as Network[], networkStats.value);
+});
+// let networks: Network[] = [];
+// const getStats = async () => {
+//   networks = [Network.Dev, Network.Main, Network.Test];
+//   try {
+//     loading.value = true;
+//     failed.value = false;
+//     const data = await fetchStats(networks);
+//     return formatData(networks, data);
+//   } catch (error) {
+//     failed.value = true;
+//     return null;
+//   } finally {
+//     loading.value = false;
+//   }
+// };
+
+// const fetchData = async () => {
+//   try {
+//     stats = await getStats();
+//     if (!loading.value && stats != null) {
+//       nodesDistribution.value = JSON.stringify(stats.nodesDistribution);
+//       Istats.value = [
+//         { data: stats.nodes, title: "Nodes Online", icon: "mdi-laptop" },
+//         { data: stats.farms, title: "Farms", icon: "mdi-tractor" },
+//         { data: stats.countries, title: "Countries", icon: "mdi-earth" },
+//         { data: stats.totalCru, title: "CPUs", icon: "mdi-cpu-64-bit" },
+//         { data: toTeraOrGigaOrPeta(stats.totalSru.toString()), title: "SSD Storage", icon: "mdi-nas" },
+//         { data: toTeraOrGigaOrPeta(stats.totalHru.toString()), title: "HDD Storage", icon: "mdi-harddisk" },
+//         { data: toTeraOrGigaOrPeta(stats.totalMru.toString()), title: "RAM", icon: "mdi-memory" },
+//         { data: stats.accessNodes, title: "Access Nodes", icon: "mdi-gate" },
+//         { data: stats.gateways, title: "Gateways", icon: "mdi-boom-gate-outline" },
+//         { data: stats.twins, title: "Twins", icon: "mdi-brain" },
+//         { data: stats.publicIps, title: "Public IPs", icon: "mdi-access-point" },
+//         { data: stats.contracts, title: "Contracts", icon: "mdi-file-document-edit-outline" },
+//       ];
+//       loading.value = false;
+//     }
+//   } catch (error) {
+//     console.error("Error in fetchData:", error);
+//   }
+// };
+
+// onMounted(fetchData);
 </script>
 <script lang="ts">
 export default {
