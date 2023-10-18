@@ -146,11 +146,21 @@ class BaseModule {
         projectName: string;
       };
       const { name, projectName } = oldData;
-      if (projectName?.endsWith(`/${name}`)) {
+
+      let instanceName = name;
+
+      if (this.moduleName === "gateways") {
+        const [, instance] = name.split(this.config.twinId.toString());
+        if (instance) {
+          instanceName = instance;
+        }
+      }
+
+      if (projectName?.endsWith(`/${instanceName}`)) {
         continue;
       }
 
-      oldData.projectName = `${projectName}/${name}`;
+      oldData.projectName = `${projectName}/${instanceName}`;
 
       updateContractsExts.push(
         this.tfClient.contracts.updateNode({
@@ -169,10 +179,22 @@ class BaseModule {
     let ext2: any[] = [];
 
     for (let i = 0; i < oldKeys.length; i++) {
-      const key = oldKeys[i];
+      const oldKey = oldKeys[i];
+
+      let newKey = oldKey;
+      if (this.moduleName === "gateways") {
+        const [, key] = oldKey.split(this.config.twinId.toString());
+        if (key) {
+          newKey = key;
+        }
+      }
+
       const value = values[i];
-      const from = PATH.join(oldPath, key, "contracts.json");
-      const to = this.getNewDeploymentPath(...(this.projectName.includes(key) ? [key] : [key, key]), "contracts.json");
+      const from = PATH.join(oldPath, oldKey, "contracts.json");
+      const to = this.getNewDeploymentPath(
+        ...(this.projectName.includes(newKey) ? [oldKey] : [newKey, oldKey]),
+        "contracts.json",
+      );
 
       if (value) {
         ext1.push(this.backendStorage.dump(to, value));

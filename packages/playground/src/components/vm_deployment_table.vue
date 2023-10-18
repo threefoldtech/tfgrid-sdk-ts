@@ -87,7 +87,11 @@ async function loadDeployments() {
   loading.value = true;
   const grid = await getGrid(profileManager.profile!, props.projectName);
   const chunk1 = await loadVms(grid!);
+  if (chunk1.count > 0) await grid!.gateway.list();
+
   const chunk2 = await loadVms(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }));
+  if (chunk2.count > 0) await grid!.gateway.list();
+
   const filter =
     props.projectName === ProjectName.VM
       ? undefined
@@ -97,6 +101,8 @@ async function loadDeployments() {
     props.projectName === ProjectName.Fullvm
       ? { count: 0, items: [] }
       : await loadVms(updateGrid(grid!, { projectName: "" }), { filter });
+  if (chunk3.count > 0) await grid!.gateway.list();
+
   const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
 
   count.value = vms.count;

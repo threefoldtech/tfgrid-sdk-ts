@@ -17,11 +17,8 @@ export interface GetHostnameOptions {
   twinId: number;
 }
 export function getSubdomain(options: GetHostnameOptions) {
-  return (
-    SolutionCode[options.projectName as keyof typeof SolutionCode] +
-    options.twinId +
-    options.deploymentName.toLowerCase()
-  );
+  const [projectName] = options.projectName.split("/");
+  return SolutionCode[projectName as keyof typeof SolutionCode] + options.twinId + options.deploymentName.toLowerCase();
 }
 
 export interface DeployGatewayNameOptions {
