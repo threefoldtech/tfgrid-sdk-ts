@@ -415,6 +415,30 @@ a {
   margin-top: 2px;
 }
 
+.mosha__icon__dark__warning {
+  fill: #ffcc00 !important;
+}
+
+.mosha__icon__light__warning {
+  fill: #fb8c00 !important;
+}
+
+.mosha__toast__content.dark__warning {
+  color: #ffcc00;
+}
+
+.mosha__toast__content.light__warning {
+  color: #fb8c00;
+}
+
+.mosha__toast__close-icon.dark__warning::before {
+  color: #ffcc00 !important;
+}
+
+.mosha__toast__close-icon.light__warning::before {
+  color: #fb8c00 !important;
+}
+
 .mosha__toast__content__text {
   font-size: 14px !important;
 }
