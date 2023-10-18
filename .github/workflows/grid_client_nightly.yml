@@ -87,18 +87,20 @@ jobs:
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/zdb.ts
       - name: Cleanup - Delete all contracts
+        id: deleteall
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/delete_all_contracts.ts
 
       - name: Test Results
         run: |
-          echo $steps.dynamicsinglevm.outcome
-          echo ${{ steps.multiplevm.outcome }}
-          echo steps.kubernetes.outcome
-          echo steps.vmqsfs.outcome
-          echo steps.kubernetesqsfs.outcome
-          echo steps.kvstore.outcome
-          echo steps.zdb.outcome
+          echo Dynamic Single Vm: ${{ steps.dynamicsinglevm.outcome }}
+          echo Multiple Vm: ${{ steps.multiplevm.outcome }}
+          echo Kubernetes: ${{ steps.kubernetes.outcome }}
+          echo Vmq Qsfs: ${{ steps.vmqsfs.outcome }}
+          echo Kubernetes Qsfs: ${{ steps.kubernetesqsfs.outcome }}
+          echo Kvstore: ${{ steps.kvstore.outcome }}
+          echo Zdb: ${{ steps.zdb.outcome }}
+          echo Delete all contracts: ${{ steps.deleteall.outcome }}
 
       - name: Check test script status
         if: |
