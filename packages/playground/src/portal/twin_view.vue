@@ -67,7 +67,6 @@
 <script lang="ts" setup>
 import { generatePublicKey } from "@threefold/rmb_direct_client";
 import type { Proposal } from "@threefold/tfchain_client";
-import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
 import router from "../router";
@@ -89,14 +88,8 @@ onMounted(async () => {
   const profile = profileManager.profile!;
   const grid = await getGrid(profile);
   if (!grid) {
-    createToast(`Fetch Grid Failed`, {
-      position: "top-right",
-      hideProgressBar: true,
-      toastBackgroundColor: "#FF5252",
-      timeout: 5000,
-      showIcon: true,
-      type: "danger",
-    });
+    createCustomToast("Fetch Grid Failed", ToastType.danger);
+
     return;
   }
   userFarms.value = await getFarms(grid, { ownedBy: profile.twinId }, {});
