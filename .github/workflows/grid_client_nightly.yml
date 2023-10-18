@@ -92,8 +92,8 @@ jobs:
 
       - name: Test Results
         run: |
-          echo steps.dynamicsinglevm.outcome
-          echo steps.multiplevm.outcome
+          echo $steps.dynamicsinglevm.outcome
+          echo ${{ steps.multiplevm.outcome }}
           echo steps.kubernetes.outcome
           echo steps.vmqsfs.outcome
           echo steps.kubernetesqsfs.outcome
