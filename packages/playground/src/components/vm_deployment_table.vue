@@ -98,6 +98,19 @@ async function loadDeployments() {
       ? { count: 0, items: [] }
       : await loadVms(updateGrid(grid!, { projectName: "" }), { filter });
   const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
+  // const chunks = [...chunk1.items, ...chunk2.items, ...chunk3.items];
+  // chunks.forEach(chunk => {
+  //   if (!vms.items.includes(chunk)) {
+  //     console.log("Item not incl")
+  //   }
+  // } )
+
+  // console.log("All chunks: ", chunks);
+  console.log("Chunk 1: ", chunk1);
+  console.log("Chunk 2: ", chunk2);
+  console.log("Chunk 3: ", chunk3);
+
+  console.log("Deployment Items: ", vms.items);
 
   count.value = vms.count;
   items.value = vms.items;
@@ -150,6 +163,8 @@ defineExpose({ loadDeployments });
 </script>
 
 <script lang="ts">
+import { it } from "node:test";
+
 import { ProjectName } from "../types";
 import ListTable from "./list_table.vue";
 

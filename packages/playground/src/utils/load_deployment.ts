@@ -22,7 +22,9 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
         `%c[Error] failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`,
         "color: rgb(207, 102, 121)",
       );
-      return null;
+      return {
+        name: name,
+      };
     });
   });
   const items = await Promise.all(promises);
