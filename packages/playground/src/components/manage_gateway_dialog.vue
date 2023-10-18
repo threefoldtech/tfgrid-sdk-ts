@@ -46,6 +46,10 @@
             :deleting="deleting"
             no-data-text="No gateways found for this deployment."
           >
+            <template #[`item.name`]="{ item }">
+              {{ item.value.name.slice(item.value.name.startsWith(prefix) ? prefix.length : 0) }}
+            </template>
+
             <template #[`item.tls_passthrough`]="{ item }">
               {{ item.value.tls_passthrough ? "Yes" : "No" }}
             </template>
