@@ -1,5 +1,4 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+# This workflow will install needed dependencies and run main grid tests.
 
 name: Grid Client Nightly
 
@@ -9,7 +8,7 @@ on:
   workflow_dispatch:
 jobs:
   deployment-scripts:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -22,22 +21,23 @@ jobs:
       SSH_KEY: ${{ secrets.SSH_KEY }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: ${{ env.NETWORK == 'dev' }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: ${{ env.NETWORK == 'qa' }}
         with:
           ref: refs/tags/v2.1.1
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: ${{ env.NETWORK == 'test' }}
         with:
           ref: refs/tags/v2.1.1
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         if: ${{ env.NETWORK == 'main' }}
         with:
           ref: refs/tags/v2.1.1
+
       - name: Set up node 18
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: "yarn"
@@ -50,6 +50,7 @@ jobs:
         run: |
           yarn
           lerna run build --no-private
+
       - name: Run test dynamic single vm
         id: dynamicsinglevm
         continue-on-error: true
@@ -88,6 +89,17 @@ jobs:
       - name: Cleanup - Delete all contracts
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/delete_all_contracts.ts
+
+      - name: Test Results
+        run: |
+          echo steps.dynamicsinglevm.outcome
+          echo steps.multiplevm.outcome
+          echo steps.kubernetes.outcome
+          echo steps.vmqsfs.outcome
+          echo steps.kubernetesqsfs.outcome
+          echo steps.kvstore.outcome
+          echo steps.zdb.outcome
+
       - name: Check test script status
         if: |
           steps.dynamicsinglevm.outcome != 'success' ||
@@ -97,4 +109,4 @@ jobs:
           steps.kubernetesqsfs.outcome != 'success' ||
           steps.kvstore.outcome != 'success' ||
           steps.zdb.outcome != 'success'
-        run: exit "Test scripts failed, Please check the failed step/s."
+        run: exit 1
