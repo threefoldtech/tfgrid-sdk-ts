@@ -1,4 +1,4 @@
-import { FilterOptions, GridClient, type NodeInfo, NodeStatusFilter } from "@threefold/grid_client";
+import { type FilterOptions, type GridClient, type NodeInfo, NodeStatus } from "@threefold/grid_client";
 import { ref } from "vue";
 
 const requestPageNumber = ref<number>(1);
@@ -19,7 +19,7 @@ export async function getOfflineNodes(grid: GridClient | null, options?: FilterO
   } else {
     const offNodes: NodeInfo[] = await grid!.nodes.filter({
       ...options,
-      status: NodeStatusFilter.down,
+      status: NodeStatus.down,
       page: requestPageNumber.value,
     });
 

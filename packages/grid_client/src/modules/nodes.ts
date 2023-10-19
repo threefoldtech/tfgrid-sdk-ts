@@ -83,15 +83,12 @@ class Nodes {
   }
 
   @expose
-  @validateInput
-  @checkBalance
   async all() {
     return await this.capacity.getAllNodes();
   }
 
   @expose
   @validateInput
-  @checkBalance
   async filter(options?: FilterOptions) {
     return await this.capacity.filterNodes(options);
   }

@@ -31,7 +31,7 @@ enum ContractStates {
   GracePeriod = "GracePeriod",
 }
 
-export enum NodeStatusFilter {
+export enum NodeStatus {
   up = "up",
   down = "down",
   standBy = "standby",
@@ -284,7 +284,6 @@ class RentContractDeleteModel {
 class ContractGetModel {
   @Expose() @IsInt() @Min(1) id: number;
 }
-
 class ContractGetByNodeIdAndHashModel {
   @Expose() @IsInt() @Min(1) node_id: number;
   @Expose() @IsString() @IsNotEmpty() hash: string;
@@ -590,7 +589,7 @@ class FilterOptions {
   @Expose() @IsOptional() @IsBoolean() hasGPU?: boolean;
   @Expose() @IsOptional() @IsBoolean() rentable?: boolean;
   @Expose() @IsOptional() @IsInt() @Min(1) rentedBy?: number;
-  @Expose() @IsOptional() @IsString() status?: NodeStatusFilter;
+  @Expose() @IsOptional() @Transform(({ value }) => NodeStatus[value]) @IsEnum(NodeStatus) status?: NodeStatus;
 }
 
 enum CertificationType {
@@ -679,6 +678,10 @@ class SwapToStellarModel {
 
 class ListenToMintCompletedModel {
   @Expose() @IsNotEmpty() @IsString() address: string;
+}
+
+class GetActiveContractsModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
 }
 
 export {
@@ -805,4 +808,5 @@ export {
   GetDedicatedNodePriceModel,
   SwapToStellarModel,
   ListenToMintCompletedModel,
+  GetActiveContractsModel,
 };
