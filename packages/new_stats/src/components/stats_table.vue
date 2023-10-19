@@ -17,7 +17,9 @@
           </v-alert>
         </v-col> -->
         <v-col xl="8" lg="8" md="12" cols="12" class="mt-4 pb-0 px-0">
-          <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
+          <v-sheet color="transparent" class="w-75">
+            <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
+          </v-sheet>
         </v-col>
         <div style="height: 80vhd" class="my-auto">
           <v-divider :thickness="2" class="border-opacity-50" color="gray" vertical></v-divider>
@@ -49,7 +51,6 @@ import { computed, ref, watch } from "vue";
 import { useStore } from "vuex";
 
 import type { IStatistics, NetworkStats } from "../types/index";
-// import { fetchStats } from "../utils/fetchData";
 import { formatData } from "../utils/formatData";
 import toTeraOrGigaOrPeta from "../utils/toTeraOrGegaOrPeta";
 import StatisticsCard from "./statistics_card.vue";

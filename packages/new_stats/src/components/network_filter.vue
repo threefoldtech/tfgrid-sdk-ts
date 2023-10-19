@@ -21,10 +21,10 @@
         prepend-icon="mdi-reload"
         @click="emits('refresh')"
       >
-        <p>Refresh</p>
+        <p class="font-weight-bold text-capitalize">Refresh</p>
       </v-btn>
     </v-col>
-    <v-divider :thickness="2" class="border-opacity-50 pb-4" color="gray"></v-divider>
+    <v-divider :thickness="1" class="border-opacity-50 pb-4" color="gray"></v-divider>
   </v-row>
 </template>
 
