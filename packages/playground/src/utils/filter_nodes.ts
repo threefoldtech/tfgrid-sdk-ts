@@ -3,7 +3,7 @@ import type { FilterOptions, GridClient, NodeInfo } from "@threefold/grid_client
 import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
 import type { NodeFilters } from "@/components/select_node.vue";
 
-import { isNumeric, min, startsWith, validateResourceMaxNumber } from "./validators";
+import { isAlphanumeric, isDecimal, isNumeric, min, startsWith, validateResourceMaxNumber } from "./validators";
 
 export interface NodeGPUCardType {
   id: string;
@@ -58,6 +58,16 @@ export type FilterInputs = {
   freeSru: NodeInputFilterType;
   freeHru: NodeInputFilterType;
   freeMru: NodeInputFilterType;
+};
+
+// Input fields for dedicated nodes
+export type DedicatedNodeFilters = {
+  total_sru: NodeInputFilterType;
+  total_hru: NodeInputFilterType;
+  total_mru: NodeInputFilterType;
+  total_cru: NodeInputFilterType;
+  gpu_vendor_name: NodeInputFilterType;
+  gpu_device_name: NodeInputFilterType;
 };
 
 // Default input Initialization
@@ -145,5 +155,83 @@ export const inputsInitializer: FilterInputs = {
       ],
     ],
     type: "text",
+  },
+};
+
+export const DedicatedNodeInitializer: DedicatedNodeFilters = {
+  total_cru: {
+    label: "Total CPU (Cores)",
+    placeholder: "Filter by total Cores.",
+    type: "text",
+    rules: [
+      [isNumeric("This Field accepts only a valid number."), min("This Field must be a number larger than 0.", 1)],
+    ],
+  },
+  total_mru: {
+    label: "Total RAM (GB)",
+    placeholder: "Filter by total Memory.",
+    type: "text",
+    rules: [
+      [
+        isNumeric("This Field accepts only a valid number."),
+        min("This Field must be a number larger than 0.", 1),
+        validateResourceMaxNumber("This value is out of range."),
+      ],
+    ],
+  },
+  total_sru: {
+    label: "Total SSD (GB)",
+    placeholder: "Filter by total SSD.",
+    type: "text",
+    rules: [
+      [
+        isNumeric("This Field accepts only a valid number."),
+        min("This Field must be a number larger than 0.", 1),
+        validateResourceMaxNumber("This value is out of range."),
+      ],
+    ],
+  },
+  total_hru: {
+    label: "Total HDD (GB)",
+    placeholder: "Filter by total HDD.",
+    type: "text",
+    rules: [
+      [
+        isNumeric("This Field accepts only a valid number."),
+        min("This Field must be a number larger than 0.", 1),
+        validateResourceMaxNumber("This value is out of range."),
+      ],
+    ],
+  },
+
+  gpu_device_name: {
+    label: "GPU's device name",
+    placeholder: "Filter by GPU's device name.",
+    rules: [
+      [
+        (value: string) => {
+          const allowedPattern = /^[A-Za-z0-9[\]/,.]+$/;
+          if (!allowedPattern.test(value)) {
+            isAlphanumeric("This Field accepts only letters and numbers.");
+          }
+        },
+      ],
+    ],
+    type: "text",
+  },
+  gpu_vendor_name: {
+    label: "GPU's vendor name",
+    placeholder: "Filter by GPU's vendor name.",
+    type: "text",
+    rules: [
+      [
+        (value: string) => {
+          const allowedPattern = /^[A-Za-z0-9[\]/,.]+$/;
+          if (!allowedPattern.test(value)) {
+            isAlphanumeric("This Field accepts only letters and numbers.");
+          }
+        },
+      ],
+    ],
   },
 };
