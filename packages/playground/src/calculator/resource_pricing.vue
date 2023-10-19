@@ -232,7 +232,6 @@ watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance], async ()
         certified: isCertified.value,
       });
     } else {
-      const accountBalance = await grid.value.balance.getMyBalance();
       if (!balance.value) balance.value = 0;
       pkgs = await grid.value.calculator.calculate({
         cru: CRU.value,
