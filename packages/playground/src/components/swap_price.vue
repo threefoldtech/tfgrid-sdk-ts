@@ -55,7 +55,7 @@ async function getTFTPrice(): Promise<number> {
   try {
     const client = new QueryClient(window.env.SUBSTRATE_URL);
     const res = await client.tftPrice.get();
-    return res;
+    return res / 1000;
   } catch (e) {
     console.log(e);
     return 0;
