@@ -31,7 +31,7 @@ enum ContractStates {
   GracePeriod = "GracePeriod",
 }
 
-export enum NodeStatusFilter {
+export enum NodeStatus {
   up = "up",
   down = "down",
   standBy = "standby",
