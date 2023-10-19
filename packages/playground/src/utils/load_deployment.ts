@@ -15,6 +15,7 @@ export interface LoadVMsOptions {
 export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   const machines = await grid.machines.list();
   let count = machines.length;
+  const failedDeployments: string[] = [];
 
   const promises = machines.map(name => {
     return grid.machines.getObj(name).catch(e => {
@@ -22,6 +23,7 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
         `%c[Error] failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`,
         "color: rgb(207, 102, 121)",
       );
+      failedDeployments.push(name);
     });
   });
   const items = await Promise.all(promises);
@@ -66,6 +68,7 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   return <LoadedDeployments<any[]>>{
     count,
     items: data,
+    failedDeployments,
   };
 }
 export function getWireguardConfig(grid: GridClient, name: string) {
