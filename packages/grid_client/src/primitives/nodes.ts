@@ -3,12 +3,10 @@ import { QueryClient } from "@threefold/tfchain_client";
 import { default as PrivateIp } from "private-ip";
 import urlJoin from "url-join";
 
-import { GridClient } from "../client";
 import { RMB } from "../clients";
 import { Graphql } from "../clients/graphql/client";
-import { TFClient } from "../clients/tf-grid/client";
 import { send } from "../helpers/requests";
-import { FarmFilterOptions, FilterOptions } from "../modules/models";
+import { FarmFilterOptions, FilterOptions, NodeStatus } from "../modules/models";
 
 interface FarmInfo {
   name: string;
@@ -362,7 +360,7 @@ class Nodes {
       city: options.city,
       dedicated: options.dedicated,
       available_for: options.availableFor,
-      status: "up",
+      status: options.status ? options.status : NodeStatus.up,
       page: options.page,
       size: options.size,
       has_gpu: options.hasGPU,

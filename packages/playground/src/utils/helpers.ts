@@ -57,3 +57,14 @@ export function getDashboardURL(network: string) {
 export function getCardName(card: NodeGPUCardType): string {
   return card.vendor + " - " + card.device;
 }
+
+export function toGigaBytes(value?: number) {
+  const giga = 1024 ** 3;
+
+  if (value === undefined || value === null || isNaN(value) || value === 0) {
+    return 0;
+  }
+
+  const gb = value / giga;
+  return parseFloat(gb.toFixed(2));
+}

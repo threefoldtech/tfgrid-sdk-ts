@@ -233,7 +233,6 @@ class Client extends QueryClient {
   farms: Farms = new Farms(this);
   dao: Dao = new Dao(this);
   tftBridge: Bridge = new Bridge(this);
-
   declare url: string;
   mnemonicOrSecret?: string;
   keypairType: KeypairType;

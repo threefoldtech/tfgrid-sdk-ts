@@ -47,6 +47,11 @@ const router = createRouter({
           component: () => import("../portal/farms_view.vue"),
           meta: { title: "Farms" },
         },
+        {
+          path: "dedicated-nodes",
+          component: () => import("../portal/dedicated_nodes_view.vue"),
+          meta: { title: "Dedicated Nodes" },
+        },
       ],
     },
 
