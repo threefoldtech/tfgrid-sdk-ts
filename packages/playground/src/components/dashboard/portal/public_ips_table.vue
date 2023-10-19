@@ -28,18 +28,22 @@
         <v-btn color="red-darken-1" @click="showDialogue = true" :disabled="loading" :loading="loading">
           Delete IP
         </v-btn>
-        <v-container v-if="showDialogue">
-          <v-dialog v-model="showDialogue" max-width="600" transition="dialog-bottom-transition" persistent>
-            <v-card>
-              <v-toolbar color="primary" dark class="custom-toolbar">Delete IP</v-toolbar>
-              Are you sure you want to delete IP {{ item.ip }}?
-              <v-card-actions class="justify-end px-5 pb-5 pt-0">
-                <v-btn @click="removeFarmIp({ farmId: $props.farmId, ip: item.ip })" :loading="loading"> Delete </v-btn>
-                <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Cancel</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-        </v-container>
+        <v-dialog v-model="showDialogue" max-width="600">
+          <v-card>
+            <v-toolbar color="primary" dark class="font-weight-bold px-3">Delete IP</v-toolbar>
+            <v-card-text> Are you sure you want to delete IP {{ item.ip }}? </v-card-text>
+            <v-card-actions class="justify-end px-5 pb-5 pt-0">
+              <v-btn
+                color="red-darken-1"
+                @click="removeFarmIp({ farmId: $props.farmId, ip: item.ip })"
+                :loading="loading"
+                :disabled="isRemoving"
+                >Delete</v-btn
+              >
+              <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </template>
       <template #bottom></template>
     </v-data-table>
@@ -92,6 +96,7 @@ export default {
     const toPublicIP = ref();
     const gateway = ref();
     const isRemoved = ref(false);
+    const isRemoving = ref(false);
 
     onMounted(async () => {
       await getFarmByID(props.farmId);
@@ -106,12 +111,16 @@ export default {
     }
     async function removeFarmIp(options: RemoveFarmIPModel) {
       try {
+        isRemoving.value = true;
         await gridStore.grid.farms.removeFarmIp({ ip: options.ip, farmId: options.farmId });
         createCustomToast("IP is deleted successfully!", ToastType.success);
         isRemoved.value = true;
+        showDialogue.value = false;
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to delete IP!", ToastType.danger);
+      } finally {
+        isRemoving.value = false;
       }
     }
     return {
@@ -125,6 +134,7 @@ export default {
       loading,
       showDialogue,
       isRemoved,
+      isRemoving,
       removeFarmIp,
     };
   },
