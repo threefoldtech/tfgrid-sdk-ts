@@ -1,6 +1,6 @@
 <template v-if="isRemoved">
   <div class="my-6">
-    <v-data-table :headers="headers" :items="publicIps" item-value="name" class="elevation-1">
+    <v-data-table :headers="headers" :items="publicIps" class="elevation-1">
       <template v-slot:top>
         <div class="d-flex ma-4 align-center">
           <p class="text-subtitle-1 font-weight-bold p-3 w-50">Public IPs</p>
@@ -14,15 +14,15 @@
         </div>
       </template>
       <template #[`item.ip`]="{ item }">
-        {{ item.value.ip || "-" }}
+        {{ item.ip || "-" }}
       </template>
 
       <template #[`item.gateway`]="{ item }">
-        {{ item.value.gateway || "-" }}
+        {{ item.gateway || "-" }}
       </template>
 
       <template #[`item.contract_id`]="{ item }">
-        {{ item.value.ip || "-" }}
+        {{ item.ip || "-" }}
       </template>
       <template #[`item.actions`]="{ item }">
         <v-btn color="red-darken-1" @click="showDialogue = true" :disabled="loading" :loading="loading">
@@ -32,11 +32,9 @@
           <v-dialog v-model="showDialogue" max-width="600" transition="dialog-bottom-transition" persistent>
             <v-card>
               <v-toolbar color="primary" dark class="custom-toolbar">Delete IP</v-toolbar>
-              Are you sure you want to delete IP {{ item.value.ip }}?
+              Are you sure you want to delete IP {{ item.ip }}?
               <v-card-actions class="justify-end px-5 pb-5 pt-0">
-                <v-btn @click="removeFarmIp({ farmId: $props.farmId, ip: item.value.ip })" :loading="loading">
-                  Delete
-                </v-btn>
+                <v-btn @click="removeFarmIp({ farmId: $props.farmId, ip: item.ip })" :loading="loading"> Delete </v-btn>
                 <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Cancel</v-btn>
               </v-card-actions>
             </v-card>

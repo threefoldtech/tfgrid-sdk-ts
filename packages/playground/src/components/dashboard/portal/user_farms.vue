@@ -5,9 +5,19 @@
       :headers="headers"
       :items="farms"
       :search="search"
-      single-expand="true"
-      :expanded.sync="expanded"
       show-expand
+      :expanded="expanded"
+      @update:expanded="
+        $event => {
+          if ($event.length > 0) {
+            expanded = [$event.pop()];
+          } else {
+            expanded = [];
+          }
+        }
+      "
+      expand-on-click
+      return-object
     >
       <template v-slot:top>
         <v-toolbar flat color="primary">
@@ -20,14 +30,14 @@
             <v-row no-gutters>
               <v-col class="d-flex">
                 <v-sheet class="pa-2 ma-2"> Stellar Address: </v-sheet>
-                <v-sheet class="pa-2 ma-2"> {{ item.raw.stellarAddress || "-" }} </v-sheet>
+                <v-sheet class="pa-2 ma-2"> {{ item.stellarAddress || "-" }} </v-sheet>
               </v-col>
               <v-col class="d-flex">
                 <v-sheet class="pa-2 ma-2"> Pricing Policy: </v-sheet>
-                <v-sheet class="pa-2 ma-2"> {{ item.raw.pricingPolicyId || "-" }} </v-sheet>
+                <v-sheet class="pa-2 ma-2"> {{ item.pricingPolicyId || "-" }} </v-sheet>
               </v-col>
             </v-row>
-            <PublicIPsTable :farmId="item.columns.farmId" />
+            <PublicIPsTable :farmId="item.farmId" />
             <v-row class="d-flex justify-center pb-5">
               <v-card-actions>
                 <v-btn class="bg-primary" v-bind:href="'https://v3.bootstrap.grid.tf/'" target="blank"
@@ -65,7 +75,7 @@
                 <v-btn
                   color="primary"
                   variant="tonal"
-                  @click="setStellarAddress(item.raw.farmId, address)"
+                  @click="setStellarAddress(item.farmId, address)"
                   :disabled="!valid"
                   >Submit</v-btn
                 >
