@@ -440,4 +440,7 @@ a {
 .mosha__toast__content__text {
   font-size: 14px !important;
 }
+.font-14 {
+  font-size: 14px !important;
+}
 </style>
