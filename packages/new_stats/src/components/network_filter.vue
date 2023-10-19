@@ -1,7 +1,7 @@
 <template>
   <v-row class="d-flex pt-4">
     <v-col class="d-flex justify-start py-0 align-center">
-      <div v-for="(network, index) in networks" :key="index" class="px-2">
+      <div v-for="(network, index) in networks" :key="index" style="min-width: fit-content" class="px-2">
         <v-switch
           hide-details
           color="primary"

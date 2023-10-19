@@ -17,7 +17,9 @@
           </v-alert>
         </v-col> -->
         <v-col xl="8" lg="8" md="12" cols="12" class="mt-4 pb-0 px-0">
-          <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
+          <v-col xl="12" lg="12" cols="9" class="mx-auto">
+            <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
+          </v-col>
         </v-col>
         <div style="height: 80vhd" class="my-auto">
           <v-divider :thickness="2" class="border-opacity-50" color="gray" vertical></v-divider>
