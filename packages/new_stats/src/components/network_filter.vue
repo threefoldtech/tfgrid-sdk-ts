@@ -13,7 +13,16 @@
       </div>
     </v-col>
     <v-col class="d-flex justify-end pb-0">
-      <v-btn flat color="blue" prepend-icon="mdi-reload" text="Refresh"></v-btn>
+      <v-btn
+        flat
+        variant="outlined"
+        :loading="loading"
+        color="#74DDC3"
+        prepend-icon="mdi-reload"
+        @click="emits('refresh')"
+      >
+        <p>Refresh</p>
+      </v-btn>
     </v-col>
     <v-divider :thickness="2" class="border-opacity-50 pb-4" color="gray"></v-divider>
   </v-row>
@@ -21,15 +30,19 @@
 
 <script lang="ts" setup>
 import { Network } from "@threefold/gridproxy_client";
-import { onMounted, type Ref, ref } from "vue";
+import { onMounted, ref } from "vue";
 
 const networks = ref([
   { label: "Dev", value: true },
   { label: "Main", value: true },
   { label: "Test", value: true },
 ]);
+defineProps({
+  loading: Boolean,
+});
 const emits = defineEmits<{
   (events: "update:modelValue", value?: string[]): void;
+  (events: "refresh"): void;
 }>();
 const selectedNetworks = ref([Network.Dev, Network.Main, Network.Test]);
 function updateNetworks(event: Event | undefined, index: number) {

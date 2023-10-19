@@ -44,8 +44,8 @@
 </template>
 
 <script lang="ts" setup>
-import { Network, type Stats } from "@threefold/gridproxy_client";
-import { computed, onMounted, ref, watch } from "vue";
+import { Network } from "@threefold/gridproxy_client";
+import { computed, ref, watch } from "vue";
 import { useStore } from "vuex";
 
 import type { IStatistics, NetworkStats } from "../types/index";
@@ -68,26 +68,28 @@ const props = defineProps({
     require: true,
   },
 });
+async function getStatsData(refresh = false) {
+  if (props.networks) {
+    props.networks.forEach(async (network: Network) => {
+      if (!networkStats.value[network] || refresh)
+        try {
+          loading.value = true;
+          await $store.dispatch("getStats", network.toLowerCase());
+        } catch (error) {
+          console.log(error);
+        } finally {
+          loading.value = false;
+        }
+    });
+  }
+}
 watch(
   () => props.networks,
-  () => {
-    if (props.networks) {
-      props.networks.forEach(async (network: Network) => {
-        if (!networkStats.value[network])
-          try {
-            loading.value = true;
-            await $store.dispatch("getStats", network.toLowerCase());
-          } catch (error) {
-            console.log(error);
-          } finally {
-            loading.value = false;
-          }
-      });
-    }
-  },
+  async () => await getStatsData(),
   { deep: true },
 );
 const loading = ref(true);
+defineExpose({ loading, getStatsData });
 const failed = ref(false);
 
 const Istats = computed((): IStatistics[] => {
@@ -109,55 +111,11 @@ const Istats = computed((): IStatistics[] => {
   }
 });
 
-//nodesDistribution.value = JSON.stringify(stats.value.nodesDistribution)
 const nodesDistribution = computed(() => JSON.stringify(stats.value.nodesDistribution));
 
 const stats = computed(() => {
   return formatData(props.networks as Network[], networkStats.value);
 });
-// let networks: Network[] = [];
-// const getStats = async () => {
-//   networks = [Network.Dev, Network.Main, Network.Test];
-//   try {
-//     loading.value = true;
-//     failed.value = false;
-//     const data = await fetchStats(networks);
-//     return formatData(networks, data);
-//   } catch (error) {
-//     failed.value = true;
-//     return null;
-//   } finally {
-//     loading.value = false;
-//   }
-// };
-
-// const fetchData = async () => {
-//   try {
-//     stats = await getStats();
-//     if (!loading.value && stats != null) {
-//       nodesDistribution.value = JSON.stringify(stats.nodesDistribution);
-//       Istats.value = [
-//         { data: stats.nodes, title: "Nodes Online", icon: "mdi-laptop" },
-//         { data: stats.farms, title: "Farms", icon: "mdi-tractor" },
-//         { data: stats.countries, title: "Countries", icon: "mdi-earth" },
-//         { data: stats.totalCru, title: "CPUs", icon: "mdi-cpu-64-bit" },
-//         { data: toTeraOrGigaOrPeta(stats.totalSru.toString()), title: "SSD Storage", icon: "mdi-nas" },
-//         { data: toTeraOrGigaOrPeta(stats.totalHru.toString()), title: "HDD Storage", icon: "mdi-harddisk" },
-//         { data: toTeraOrGigaOrPeta(stats.totalMru.toString()), title: "RAM", icon: "mdi-memory" },
-//         { data: stats.accessNodes, title: "Access Nodes", icon: "mdi-gate" },
-//         { data: stats.gateways, title: "Gateways", icon: "mdi-boom-gate-outline" },
-//         { data: stats.twins, title: "Twins", icon: "mdi-brain" },
-//         { data: stats.publicIps, title: "Public IPs", icon: "mdi-access-point" },
-//         { data: stats.contracts, title: "Contracts", icon: "mdi-file-document-edit-outline" },
-//       ];
-//       loading.value = false;
-//     }
-//   } catch (error) {
-//     console.error("Error in fetchData:", error);
-//   }
-// };
-
-// onMounted(fetchData);
 </script>
 <script lang="ts">
 export default {
