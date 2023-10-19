@@ -274,6 +274,16 @@ const routes: AppRoute[] = [
     ],
   },
   {
+    title: "Grid Services",
+    items: [
+      {
+        title: "Grid Services",
+        icon: "mdi-grid-large",
+        url: "https://status.grid.tf/status/threefold",
+      },
+    ],
+  },
+  {
     title: "Help",
     items: [
       {
