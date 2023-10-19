@@ -187,13 +187,13 @@
           />
           <IconActionBtn
             tooltip="Open Nextcloud"
-            color="white"
+            color="anchor"
             icon="mdi-web"
             :href="'https://' + item.value[0].env.NEXTCLOUD_DOMAIN"
           />
           <IconActionBtn
             tooltip="Nextcloud Setup"
-            color="white"
+            color="anchor"
             icon="mdi-view-dashboard"
             :href="'https://' + item.value[0].env.NEXTCLOUD_AIO_LINK"
           />
