@@ -156,8 +156,6 @@ defineExpose({ loadDeployments });
 </script>
 
 <script lang="ts">
-import { it } from "node:test";
-
 import { ProjectName } from "../types";
 import ListTable from "./list_table.vue";
 
