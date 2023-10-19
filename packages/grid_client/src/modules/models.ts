@@ -590,7 +590,7 @@ class FilterOptions {
   @Expose() @IsOptional() @IsBoolean() hasGPU?: boolean;
   @Expose() @IsOptional() @IsBoolean() rentable?: boolean;
   @Expose() @IsOptional() @IsInt() @Min(1) rentedBy?: number;
-  @Expose() @IsOptional() @Transform(({ value }) => NodeStatusFilter[value]) @IsEnum() status?: NodeStatusFilter;
+  @Expose() @IsOptional() @Transform(({ value }) => NodeStatus[value]) @IsEnum(NodeStatus) status?: NodeStatus;
 }
 
 enum CertificationType {
