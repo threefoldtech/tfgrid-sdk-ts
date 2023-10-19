@@ -120,7 +120,7 @@ const props = defineProps({
 });
 
 onMounted(async () => {
-  reloadNodeDetails;
+  reloadNodeDetails();
 });
 
 async function reloadNodeDetails() {
