@@ -4,7 +4,7 @@
       Failed to load deployment{{ count - items.length > 1 ? "s" : "" }} with name{{
         count - items.length > 1 ? "s" : ""
       }}
-      <strong>{{ namesOfFailedDeployments }}</strong>
+      <strong>{{ namesOfFailedDeployments }}.</strong>
       <span>
         This might happen because the node is down or it's not reachable or the deployment{{
           count - items.length > 1 ? "s are" : " is"
