@@ -21,6 +21,17 @@
       </v-card>
     </template>
 
+    <template v-else-if="isError">
+      <v-card class="d-flex justify-center align-center h-screen">
+        <div class="text-center w-100 pa-3">
+          <v-alert color="error" variant="tonal" class="mt-2 mb-4">
+            {{ errorMessage }}
+            <v-btn @click="requestNode" color="error" variant="tonal" icon="mdi-refresh" />
+          </v-alert>
+        </div>
+      </v-card>
+    </template>
+
     <template v-else>
       <v-card>
         <node-resources-charts :node="node" />
@@ -41,7 +52,7 @@
           <v-col cols="12" md="6" sm="8">
             <interfaces-details-card :node="node" />
           </v-col>
-          <v-col v-if="node.cards.length" cols="12" md="6" sm="8">
+          <v-col v-if="node.cards && node.cards.length" cols="12" md="6" sm="8">
             <gpu-details-card :node="node" />
           </v-col>
           <v-col v-if="node.publicConfig && node.publicConfig.domain" cols="12" md="6" sm="8">
@@ -87,6 +98,7 @@ export default {
       required: true,
     },
   },
+
   components: {
     NodeResourcesCharts,
     NodeDetailsCard,
@@ -102,21 +114,28 @@ export default {
   setup(props) {
     const loading = ref(false);
     const dialog = ref(false);
+    const isError = ref(false);
+    const errorMessage = ref("");
     const route = useRoute();
     const node = ref<GridNode>(nodeInitializer);
 
-    watch(
-      () => props.nodeId,
-      async (nodeId: number) => {
-        if (nodeId > 0) {
+    async function requestNode() {
+      if (props.nodeId > 0) {
+        try {
           loading.value = true;
-          const _node: GridNode = await getNode(nodeId, props.options);
+          const _node: GridNode = await getNode(props.nodeId, props.options);
           node.value = _node;
           router.push({ path: route.path, query: { nodeId: node.value.nodeId } });
+        } catch {
+          isError.value = true;
+          errorMessage.value = `Failed to load node with ID ${props.nodeId}. The node might be offline or unresponsive. Please try requesting it again.`;
+        } finally {
           loading.value = false;
         }
-      },
-    );
+      }
+    }
+
+    watch(() => props.nodeId, requestNode);
 
     watch(
       () => props.openDialog,
@@ -124,10 +143,14 @@ export default {
         dialog.value = newValue as boolean;
       },
     );
+
     return {
       dialog,
       node,
       loading,
+      isError,
+      errorMessage,
+      requestNode,
     };
   },
 };

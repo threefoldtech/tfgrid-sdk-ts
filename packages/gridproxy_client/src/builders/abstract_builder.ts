@@ -40,23 +40,37 @@ export abstract class AbstractBuilder<T> {
     }
   }
 
-  public async build(path: string): Promise<Response> {
+  public async build(path: string, timeout = 5000): Promise<Response> {
     assertString(path);
     assertPattern(path, /^\//);
 
-    const out: string[] = [];
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-    for (const key in this.__queries) {
-      if (this.__queries[key] === undefined || this.__queries[key] === null || this.__queries[key] === "") {
-        continue;
+    try {
+      const out: string[] = [];
+
+      for (const key in this.__queries) {
+        if (this.__queries[key] === undefined || this.__queries[key] === null || this.__queries[key] === "") {
+          continue;
+        }
+
+        this.__validator[key](this.__queries[key]!);
+        out.push(`${this.__mapper[key]}=${this.__queries[key]}`);
       }
 
-      this.__validator[key](this.__queries[key]!);
-      out.push(`${this.__mapper[key]}=${this.__queries[key]}`);
-    }
+      const query = out.length > 0 ? `?${out.join("&")}` : "";
+      const response = await fetch(`${this.uri}${path}${query}`, {
+        signal: controller.signal,
+      });
 
-    const query = out.length > 0 ? `?${out.join("&")}` : "";
-    return fetch(`${this.uri}${path}${query}`);
+      clearTimeout(timeoutId);
+      return response;
+    } catch (error) {
+      // Handle fetch or abort errors here
+      clearTimeout(timeoutId);
+      throw error;
+    }
   }
 }
 
