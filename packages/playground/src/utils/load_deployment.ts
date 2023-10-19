@@ -90,8 +90,14 @@ export function getWireguardConfig(grid: GridClient, name: string) {
 export type K8S = { masters: any[]; workers: any[]; deploymentName: string; wireguard?: any };
 export async function loadK8s(grid: GridClient) {
   const clusters = await grid.k8s.list();
-  const promises = clusters.map(name => {
-    return grid.k8s.getObj(name).catch(e => {
+
+  const projectName = grid.clientOptions.projectName;
+  const grids = (await Promise.all(
+    clusters.map(n => getGrid(grid.clientOptions, `${projectName}/${n}`)),
+  )) as GridClient[];
+
+  const promises = clusters.map((name, index) => {
+    return grids[index].k8s.getObj(name).catch(e => {
       console.log(
         `%c[Error] failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`,
         "color: rgb(207, 102, 121)",
@@ -104,19 +110,21 @@ export async function loadK8s(grid: GridClient) {
     .map((item, index) => {
       if (item) {
         item.deploymentName = clusters[index];
-        item.projectName = grid.clientOptions!.projectName;
+        item.projectName = grids[index].clientOptions!.projectName;
       }
       return item;
     })
     .filter(item => item && item.masters.length > 0) as K8S[];
   const consumptions = await Promise.all(
-    k8s.map(cluster => {
-      return grid.contracts.getConsumption({ id: cluster.masters[0].contractId }).catch(() => undefined);
+    k8s.map((cluster, index) => {
+      return grids[index].contracts.getConsumption({ id: cluster.masters[0].contractId }).catch(() => undefined);
     }),
   );
 
   const wireguards = await Promise.all(
-    k8s.map(cluster => getWireguardConfig(grid, cluster.masters[0].interfaces[0].network).catch(() => [])),
+    k8s.map((cluster, index) =>
+      getWireguardConfig(grids[index], cluster.masters[0].interfaces[0].network).catch(() => []),
+    ),
   );
   const data = k8s.map((cluster, index) => {
     cluster.masters[0].billing = formatConsumption(consumptions[index] as number);
