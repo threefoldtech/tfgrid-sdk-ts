@@ -99,18 +99,20 @@ async function loadDeployments() {
       : await loadVms(updateGrid(grid!, { projectName: "" }), { filter });
 
   const allItems = [...chunk1.items, ...chunk2.items, ...chunk3.items];
+  console.log("All Items: ", allItems);
   const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
-  const itemsNotIncludedInVms: string[] = [];
-  allItems.forEach(item => {
-    if (!vms.items.includes(item)) {
-      itemsNotIncludedInVms.push(item.toString());
-    }
-  });
+  // const itemsNotIncludedInVms: string[] = [];
 
-  console.log("Items not included in vms:");
-  itemsNotIncludedInVms.forEach(item => {
-    console.log(item);
-  });
+  for (const item of allItems) {
+    if (!vms.items.includes(item)) {
+      console.log("Not Included: ", item);
+    }
+  }
+
+  // console.log("Items not included in vms:");
+  // itemsNotIncludedInVms.forEach(item => {
+  //   console.log(item);
+  // });
 
   console.log("Deployment Items: ", vms.items);
 
