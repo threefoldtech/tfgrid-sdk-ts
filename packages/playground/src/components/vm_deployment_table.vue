@@ -1,7 +1,10 @@
 <template>
   <div>
     <v-alert v-if="!loading && count && items.length < count" type="warning" variant="tonal">
-      Failed to load <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }};
+      Failed to load deployment{{ count - items.length > 1 ? "s" : "" }} with name{{
+        count - items.length > 1 ? "s" : ""
+      }}
+      <strong>{{ namesOfFailedDeployments }}</strong>
       <span>
         This might happen because the node is down or it's not reachable or the deployment{{
           count - items.length > 1 ? "s are" : " is"
@@ -80,6 +83,7 @@ defineEmits<{ (event: "update:model-value", value: any[]): void }>();
 const loading = ref(false);
 const count = ref<number>();
 const items = ref<any[]>([]);
+const namesOfFailedDeployments = ref("");
 
 onMounted(loadDeployments);
 async function loadDeployments() {
@@ -98,9 +102,8 @@ async function loadDeployments() {
       ? { count: 0, items: [] }
       : await loadVms(updateGrid(grid!, { projectName: "" }), { filter });
   const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
-
-  console.log("Chunk 1", chunk1);
-  console.log("Chunk 2", chunk2);
+  const failedDeployments = [...(chunk1 as any).failedDeployments, ...(chunk2 as any).failedDeployments];
+  namesOfFailedDeployments.value = failedDeployments.join(", ");
 
   count.value = vms.count;
   items.value = vms.items;
