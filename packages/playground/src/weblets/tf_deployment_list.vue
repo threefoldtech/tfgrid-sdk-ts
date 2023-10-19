@@ -248,7 +248,9 @@
               'http://' +
               (item.value[0].publicIP?.ip
                 ? item.value[0].publicIP.ip.slice(0, -3)
-                : '[' + item.value[0].planetary + ']')
+                : item.value[0].planetary
+                ? '[' + item.value[0].planetary + ']'
+                : item.value[0].interfaces[0].ip)
             "
           />
         </template>
