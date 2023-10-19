@@ -120,8 +120,7 @@ const props = defineProps({
 });
 
 onMounted(async () => {
-  getNodeDetails();
-  getGpuDetails();
+  reloadNodeDetails;
 });
 
 async function reloadNodeDetails() {
