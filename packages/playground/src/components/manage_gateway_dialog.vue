@@ -186,16 +186,11 @@ import IconActionBtn from "./icon_action_btn.vue";
 import ListTable from "./list_table.vue";
 import { useLayout } from "./weblet_layout.vue";
 
-export interface VM {
-  deploymentName: string;
-  projectName: string;
-}
-
 export default {
   name: "ManageGatewayDialog",
   components: { ListTable, DomainName, IconActionBtn },
   props: {
-    vm: { type: Object as PropType<VM>, required: true },
+    vm: { type: Array as PropType<any>, required: true },
   },
   setup(props) {
     const profileManager = useProfileManager();
@@ -269,7 +264,7 @@ export default {
       const grid = await getGrid(profileManager.profile!, props.vm.projectName);
       const deletedGateways = new Set<GridGateway>();
       for (const gw of gatewaysToDelete.value) {
-        await grid.gateway
+        await grid!.gateway
           .delete_name(gw)
           .then(() => deletedGateways.add(gw))
           .catch(() => []);

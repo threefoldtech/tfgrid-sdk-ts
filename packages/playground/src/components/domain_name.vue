@@ -69,7 +69,7 @@ export default {
     },
     hasIPv4: {
       type: Boolean,
-      required: true,
+      default: () => false,
     },
     hideTitle: {
       type: Boolean,
