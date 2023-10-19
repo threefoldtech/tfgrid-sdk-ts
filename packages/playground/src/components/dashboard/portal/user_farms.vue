@@ -27,14 +27,14 @@
       <template v-slot:expanded-row="{ columns, item }">
         <tr>
           <td :colspan="columns.length">
-            <v-row no-gutters>
-              <v-col class="d-flex">
-                <v-sheet class="pa-2 ma-2"> Stellar Address: </v-sheet>
-                <v-sheet class="pa-2 ma-2"> {{ item.stellarAddress || "-" }} </v-sheet>
+            <v-row class="d-flex justify-space-between">
+              <v-col cols="8" class="my-4">
+                <span> Stellar Address: </span>
+                <span> {{ item.stellarAddress || "-" }} </span>
               </v-col>
-              <v-col class="d-flex">
-                <v-sheet class="pa-2 ma-2"> Pricing Policy: </v-sheet>
-                <v-sheet class="pa-2 ma-2"> {{ item.pricingPolicyId || "-" }} </v-sheet>
+              <v-col cols="4" class="my-4">
+                <span> Pricing Policy: </span>
+                <span> {{ item.pricingPolicyId || "-" }} </span>
               </v-col>
             </v-row>
             <PublicIPsTable :farmId="item.farmId" />

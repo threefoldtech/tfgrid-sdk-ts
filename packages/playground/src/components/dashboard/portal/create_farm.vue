@@ -21,7 +21,7 @@
                 :value="$props.name"
                 :rules="[
                   validators.required('Farm name is required.'),
-                  name => validators.isAlpha('Name must start with alphabet char.')(name[0]),
+                  name => validators.isAlpha('Farm name must start with an alphabet char.')(name[0]),
                   validators.minLength('Farm minimum length is 2 chars.', 2),
                   validators.maxLength('Farm maximum length is 15 chars.', 15),
                 ]"
