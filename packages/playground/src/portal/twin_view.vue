@@ -84,6 +84,7 @@ const errorMsg = ref("");
 const openVotePopup = ref(false);
 const numberOfProposalsToVoteOn = ref(0);
 const userFarms = ref<Farm[]>();
+const activeProposalsUserHasVotedOn = ref(0);
 onMounted(async () => {
   const profile = profileManager.profile!;
   const grid = await getGrid(profile);
@@ -98,20 +99,25 @@ onMounted(async () => {
   }
   const proposals = grid.dao.get();
   const userFarmId = userFarms.value.map(farm => farm.farmID);
+
   const activeProposals = (await proposals)?.active;
   const numberOfActiveProposals = activeProposals ? activeProposals.length : 0;
+
   if (!numberOfActiveProposals) {
     return;
   }
-  const activeProposalsUserHasVotedOn = activeProposals.filter(
-    (proposal: Proposal) =>
-      (proposal?.ayes.length && proposal.ayes.filter((aye: { farmId: number }) => userFarmId.includes(aye.farmId))) ||
-      (proposal?.nayes.length && proposal.nayes.filter((naye: { farmId: number }) => userFarmId.includes(naye.farmId))),
-  );
-  if (activeProposalsUserHasVotedOn.length == numberOfActiveProposals) {
+  activeProposals.forEach(proposal => {
+    if (proposal.nayes.filter(naye => userFarmId.includes(naye.farmId)).length) {
+      activeProposalsUserHasVotedOn.value++;
+    } else if (proposal.ayes.filter(aye => userFarmId.includes(aye.farmId)).length) {
+      activeProposalsUserHasVotedOn.value++;
+    }
+  });
+
+  if (activeProposalsUserHasVotedOn.value == numberOfActiveProposals) {
     return;
   }
-  numberOfProposalsToVoteOn.value = numberOfActiveProposals - activeProposalsUserHasVotedOn.length;
+  numberOfProposalsToVoteOn.value = numberOfActiveProposals - activeProposalsUserHasVotedOn.value;
   openVotePopup.value = true;
 });
 
