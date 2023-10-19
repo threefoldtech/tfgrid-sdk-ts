@@ -10,6 +10,7 @@
             v-model:publicIP="publicIP"
             v-model:toPublicIP="toPublicIP"
             v-model:gateway="gateway"
+            @add-publicIPs="publicIps.push(...$event)"
           />
         </div>
       </template>
@@ -24,7 +25,7 @@
       <template #[`item.contract_id`]="{ item }">
         {{ item.ip || "-" }}
       </template>
-      <template #[`item.actions`]="{ item }">
+      <template #[`item.actions`]="{ item, index }">
         <v-btn color="red-darken-1" @click="showDialogue = true" :disabled="loading" :loading="loading">
           Delete IP
         </v-btn>
@@ -35,7 +36,7 @@
             <v-card-actions class="justify-end px-5 pb-5 pt-0">
               <v-btn
                 color="red-darken-1"
-                @click="removeFarmIp({ farmId: $props.farmId, ip: item.ip })"
+                @click="removeFarmIp({ farmId: $props.farmId, ip: item.ip }, index)"
                 :loading="loading"
                 :disabled="isRemoving"
                 >Delete</v-btn
@@ -109,13 +110,14 @@ export default {
         console.log(error);
       }
     }
-    async function removeFarmIp(options: RemoveFarmIPModel) {
+    async function removeFarmIp(options: RemoveFarmIPModel, index: number) {
       try {
         isRemoving.value = true;
         await gridStore.grid.farms.removeFarmIp({ ip: options.ip, farmId: options.farmId });
         createCustomToast("IP is deleted successfully!", ToastType.success);
         isRemoved.value = true;
         showDialogue.value = false;
+        publicIps.value.splice(index, 1);
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to delete IP!", ToastType.danger);
