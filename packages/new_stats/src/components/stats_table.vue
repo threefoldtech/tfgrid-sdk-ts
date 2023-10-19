@@ -17,9 +17,7 @@
           </v-alert>
         </v-col> -->
         <v-col xl="8" lg="8" md="12" cols="12" class="mt-4 pb-0 px-0">
-          <v-sheet color="transparent" class="w-75">
-            <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
-          </v-sheet>
+          <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
         </v-col>
         <div style="height: 80vhd" class="my-auto">
           <v-divider :thickness="2" class="border-opacity-50" color="gray" vertical></v-divider>
@@ -47,19 +45,21 @@
 
 <script lang="ts" setup>
 import { Network } from "@threefold/gridproxy_client";
+import { storeToRefs } from "pinia";
 import { computed, ref, watch } from "vue";
-import { useStore } from "vuex";
 
+import { useStatsStore } from "../store/stats/index";
 import type { IStatistics, NetworkStats } from "../types/index";
 import { formatData } from "../utils/formatData";
 import toTeraOrGigaOrPeta from "../utils/toTeraOrGegaOrPeta";
 import StatisticsCard from "./statistics_card.vue";
-const $store = useStore();
+const $store = useStatsStore();
+const { getNetworkStats } = storeToRefs($store);
 const networkStats = computed((): NetworkStats => {
   return {
-    dev: $store.getters.getNetworkStats(Network.Dev),
-    main: $store.getters.getNetworkStats(Network.Main),
-    test: $store.getters.getNetworkStats(Network.Test),
+    dev: getNetworkStats.value(Network.Dev),
+    main: getNetworkStats.value(Network.Main),
+    test: getNetworkStats.value(Network.Test),
   };
 });
 
@@ -75,7 +75,7 @@ async function getStatsData(refresh = false) {
       if (!networkStats.value[network] || refresh)
         try {
           loading.value = true;
-          await $store.dispatch("getStats", network.toLowerCase());
+          await $store.getStats(network.toLowerCase() as Network);
         } catch (error) {
           console.log(error);
         } finally {

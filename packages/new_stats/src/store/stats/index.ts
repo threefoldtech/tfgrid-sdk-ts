@@ -1,32 +1,27 @@
 import type { Network, Stats } from "@threefold/gridproxy_client";
 import GridProxyClient, { NodeStatus } from "@threefold/gridproxy_client";
+import { defineStore } from "pinia";
 
 import { type NetworkStats } from "@/types/index";
 
-export default {
+export const useStatsStore = defineStore("stats", {
   state(): NetworkStats {
     return {};
   },
-  mutations: {
-    setNetworkStats(state: NetworkStats, payload: { stats: Stats; network: Network }) {
-      state[payload.network] = payload.stats;
-    },
-  },
   actions: {
-    getStats: async ({ commit }: any, network: Network) => {
+    async getStats(network: Network) {
       try {
         const client = new GridProxyClient(network);
         const stats = await client.stats.get({ status: NodeStatus.Up });
-        commit("setNetworkStats", { stats, network });
+        this[network] = stats;
       } catch (error) {
         throw new Error(`Failed to retrieve ${network} network statistics`);
       }
     },
   },
   getters: {
-    getNetworkStats:
-      (stats: NetworkStats) =>
-      (network: Network): Stats | undefined =>
-        stats[network],
+    getNetworkStats: (stats: NetworkStats) => {
+      return (network: Network): Stats | undefined => stats[network];
+    },
   },
-};
+});
