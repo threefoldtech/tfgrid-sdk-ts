@@ -9,7 +9,7 @@
       <v-alert variant="tonal" class="d-flex justify-between" dense outlined type="error" style="text-align: center">
         <div style="display: flex; align-items: center">Failed to retrieve Node details.</div>
         <template v-slot:append>
-          <v-icon @click="getNodeDetails" style="cursor: pointer">mdi-reload</v-icon>
+          <v-icon @click="reloadNodeDetails" style="cursor: pointer">mdi-reload</v-icon>
         </template>
       </v-alert>
     </div>
@@ -123,6 +123,11 @@ onMounted(async () => {
   getNodeDetails();
   getGpuDetails();
 });
+
+async function reloadNodeDetails() {
+  await getNodeDetails();
+  await getGpuDetails();
+}
 
 async function getNodeDetails() {
   try {
