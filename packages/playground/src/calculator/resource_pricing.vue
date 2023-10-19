@@ -233,9 +233,6 @@ watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance], async ()
       });
     } else {
       const accountBalance = await grid.value.balance.getMyBalance();
-      if (balance.value === accountBalance.free) {
-        balance.value = 0;
-      }
       if (!balance.value) balance.value = 0;
       pkgs = await grid.value.calculator.calculate({
         cru: CRU.value,
@@ -249,6 +246,12 @@ watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance], async ()
     }
 
     setPriceList(pkgs);
+  }
+});
+
+watch(currentbalance, (newCurrentBalance, oldCurrentBalance) => {
+  if (oldCurrentBalance && !newCurrentBalance) {
+    balance.value = 0;
   }
 });
 
