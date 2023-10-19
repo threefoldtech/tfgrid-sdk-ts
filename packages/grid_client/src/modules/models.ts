@@ -284,7 +284,6 @@ class RentContractDeleteModel {
 class ContractGetModel {
   @Expose() @IsInt() @Min(1) id: number;
 }
-
 class ContractGetByNodeIdAndHashModel {
   @Expose() @IsInt() @Min(1) node_id: number;
   @Expose() @IsString() @IsNotEmpty() hash: string;
@@ -681,6 +680,10 @@ class ListenToMintCompletedModel {
   @Expose() @IsNotEmpty() @IsString() address: string;
 }
 
+class GetActiveContractsModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+}
+
 export {
   AlgorandAccountCreateModel,
   AlgorandAccountInitModel,
@@ -805,4 +808,5 @@ export {
   GetDedicatedNodePriceModel,
   SwapToStellarModel,
   ListenToMintCompletedModel,
+  GetActiveContractsModel,
 };
