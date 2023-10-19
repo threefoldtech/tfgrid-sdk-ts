@@ -274,7 +274,7 @@ export function generatePage(doc: jsPDF, receiptsBatch: receiptInterface[], page
   return doc;
 }
 
-export function generateReceipt(doc: jsPDF, node: NodeInterface) {
+export async function generateReceipt(doc: jsPDF, node: NodeInterface) {
   // Set font size and initial positioning
   doc.setFontSize(15);
   const topY = 20;
@@ -300,7 +300,7 @@ export function generateReceipt(doc: jsPDF, node: NodeInterface) {
     topY + lineOffset * 4,
   );
   doc.text(
-    `Uptime: ${getNodeUptimePercentage(node.nodeId)}% - ${Math.floor(
+    `Uptime: ${+(await getNodeUptimePercentage(node.nodeId))}% - ${Math.floor(
       moment.duration(node.uptime, "seconds").asDays(),
     )} days`,
     cellX,
@@ -322,7 +322,7 @@ export function generateReceipt(doc: jsPDF, node: NodeInterface) {
 
 export async function getNodeMintingFixupReceipts(nodeId: number) {
   let nodeReceipts: receiptInterface[] = [];
-  const res = await axios.get(`https://alpha.minting.tfchain.grid.tf/api/v1/node/${nodeId}`).then(res =>
+  await axios.get(`https://alpha.minting.tfchain.grid.tf/api/v1/node/${nodeId}`).then(res =>
     res.data.map(
       (rec: {
         hash: any;

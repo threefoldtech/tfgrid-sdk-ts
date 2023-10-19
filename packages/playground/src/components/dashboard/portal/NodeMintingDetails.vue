@@ -64,7 +64,7 @@
 <script lang="ts">
 import { jsPDF } from "jspdf";
 import moment from "moment";
-import { computed, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 
 import { generateReceipt, type receiptInterface } from "@/utils/node";
 
@@ -89,9 +89,9 @@ export default {
     const months = ref(moment.months());
     const selectedData = computed(() => [selectedMonth.value, selectedYear.value].filter(Boolean).join(", "));
 
-    function downloadNodeReceipt() {
+    async function downloadNodeReceipt() {
       let doc = new jsPDF();
-      doc = generateReceipt(doc, props.node);
+      doc = await generateReceipt(doc, props.node);
       doc.save(`node_${props.node.nodeId}_receipts.pdf`);
     }
 
@@ -113,8 +113,6 @@ export default {
     function filterReceiptsByMonth(receipts: receiptInterface[], year: number, month: number): receiptInterface[] {
       const filteredReceipts = receipts.filter(receipt => {
         const date = moment(receipt.endPeriodTimestamp * 1000);
-        console.log(date, date.month(), date.year(), month, year);
-
         return date.month() === month && date.year() === year;
       });
 
