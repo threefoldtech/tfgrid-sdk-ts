@@ -39,7 +39,7 @@ export const getCountryCode = (node: GridNode): string => {
  */
 export const getNodeStatusColor = (status: string): NodeStatusColor => {
   if (status === NodeStatus.Up) {
-    return { color: "info", status: NodeStatus.Up };
+    return { color: "primary", status: NodeStatus.Up };
   } else if (status === NodeStatus.Standby) {
     return { color: "warning", status: NodeStatus.Standby };
   } else {
