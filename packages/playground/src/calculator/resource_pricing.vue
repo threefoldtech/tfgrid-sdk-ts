@@ -1,6 +1,6 @@
 <template>
   <v-container class="custom-container">
-    <v-card color="title" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+    <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
       <v-icon size="30" class="pr-3">mdi-calculator</v-icon>
       <v-card-title class="pa-0">Pricing Calculator</v-card-title>
     </v-card>
