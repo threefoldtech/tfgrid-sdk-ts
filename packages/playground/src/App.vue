@@ -271,6 +271,11 @@ const routes: AppRoute[] = [
         icon: "mdi-open-in-new",
         url: "https://hub.grid.tf/",
       },
+    ],
+  },
+  {
+    title: "Grid Services",
+    items: [
       {
         title: "Grid Services",
         icon: "mdi-grid-large",
@@ -314,6 +319,8 @@ $router.beforeEach((to, from, next) => {
 </script>
 
 <script lang="ts">
+import { title } from "process";
+
 import AppInfo from "./components/app_info.vue";
 import AppTheme from "./components/app_theme.vue";
 import ConnectWalletLanding from "./components/connect_wallet_landing.vue";
