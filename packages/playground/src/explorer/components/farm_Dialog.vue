@@ -67,9 +67,15 @@
 <script lang="ts" setup>
 import type { Twin } from "@threefold/gridproxy_client";
 import type { PropType } from "vue";
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
+import { useRoute } from "vue-router";
+
+import router from "@/router";
 
 import type { IFarm } from "../farms.vue";
+import { getTwins } from "../utils/helpers";
+
+const route = useRoute();
 
 const props = defineProps({
   openDialog: {
@@ -80,14 +86,44 @@ const props = defineProps({
     type: Object as PropType<IFarm>,
     required: true,
   },
-  twin: {
-    type: Object as PropType<Twin>,
+  twinId: {
+    type: Number,
     required: true,
   },
 });
 
 const dialog = ref<boolean>(false);
 const loading = ref<boolean>(false);
+const twins = ref<Twin[]>();
+const twin = ref<Twin>();
+
+const _getTwins = async () => {
+  loading.value = true;
+  try {
+    const { data } = await getTwins();
+    twins.value = data;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const getTwin = (twinId: number) => twins.value?.find(twin => twin.twinId === twinId);
+
+watch(
+  () => props.twinId,
+  async (twinId: number) => {
+    if (twinId > 0) {
+      loading.value = true;
+      const _twin = getTwin(twinId);
+      twin.value = _twin;
+      router.push({ path: route.path, query: { twinId: twinId } });
+      loading.value = false;
+    }
+  },
+  { deep: true },
+);
 
 watch(
   () => props.openDialog,
@@ -95,6 +131,10 @@ watch(
     dialog.value = newValue as boolean;
   },
 );
+
+onMounted(async () => {
+  await _getTwins();
+});
 </script>
 
 <script lang="ts">

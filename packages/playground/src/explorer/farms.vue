@@ -1,25 +1,37 @@
 <template>
-  <!-- filter -->
+  <node-filters v-model="filterInputs" v-model:valid="isValidForm" @update:model-value="inputFiltersReset" />
   <view-layout>
     <v-row>
       <v-col>
         <!-- table -->
-        <FarmsTable :items="farms" :loading="loading" v-model:selectedFarm="selectedFarmId" @open-dialog="openDialog" />
+        <FarmsTable :items="farms" :loading="loading" v-model:selectedFarm="selectedFarm" @open-dialog="openDialog" />
       </v-col>
     </v-row>
-    <farmDialog :farm="selectedFarm!" :twin="selectedTwin!" :openDialog="isDialogOpened" @close-dialog="closeDialog" />
+    <farmDialog
+      :farm="selectedFarm!"
+      :twinId="selectedTwinId"
+      :openDialog="isDialogOpened"
+      @close-dialog="closeDialog"
+    />
   </view-layout>
 </template>
 
 <script lang="ts" setup>
-import type { CertificationType, PublicIp } from "@threefold/gridproxy_client";
-import type { Twin } from "@threefold/gridproxy_client";
-import { onMounted, ref } from "vue";
+import type { CertificationType, FarmsQuery, PublicIp } from "@threefold/gridproxy_client";
+import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import router from "@/router";
+import { inputsInitializer } from "@/utils/filter_farms";
 
-import { getFarms, getTwins } from "./utils/helpers";
+import { getFarmQueries, getFarms } from "./utils/helpers";
+import {
+  type FarmFilterInputs,
+  type FarmFilterOptions,
+  type FarmMixedFilter,
+  farmOptionsInitializer,
+} from "./utils/types";
+
 export interface IFarm {
   farmId: number;
   name: string;
@@ -36,17 +48,26 @@ const route = useRoute();
 
 const loading = ref<boolean>(false);
 const farms = ref<IFarm[]>([]);
-const twins = ref<Twin[]>([]);
 const isDialogOpened = ref<boolean>(false);
-const selectedFarmId = ref<number>(0);
 const selectedFarm = ref<IFarm>();
-const selectedTwin = ref<Twin>();
+const selectedTwinId = ref<number>(0);
+const filterInputs = ref<FarmFilterInputs>(inputsInitializer);
+const filterOptions = ref<FarmFilterOptions>(farmOptionsInitializer);
+const isValidForm = ref<boolean>(false);
+const farmsCount = ref<number>(0);
+const mixedFilters = ref<FarmMixedFilter>({
+  inputs: filterInputs.value,
+  options: filterOptions.value,
+});
 
-const getAllFarms = async () => {
+const _getFarms = async (queries: Partial<FarmsQuery>) => {
   loading.value = true;
   try {
-    const farmsInfo = await getFarms();
-    farms.value = farmsInfo.map(farm => {
+    const { count, data } = await getFarms(queries);
+    if (count) {
+      farmsCount.value = count;
+    }
+    farms.value = data.map(farm => {
       const ips = farm.publicIps;
       const total = ips.length;
       const used = ips.filter(x => x.contract_id === 0).length;
@@ -64,42 +85,39 @@ const getAllFarms = async () => {
   }
 };
 
-const getAllTwins = async () => {
-  loading.value = true;
-  try {
-    const { data } = await getTwins();
-    twins.value = data;
-  } catch (error) {
-    console.log(error);
-  } finally {
-    loading.value = false;
-  }
-};
-
-const openDialog = async (item: IFarm) => {
-  selectedFarmId.value = item.farmId;
+const openDialog = (item: any) => {
+  selectedFarm.value = item;
+  selectedTwinId.value = item.twinId;
   isDialogOpened.value = true;
-  getDetails(selectedFarmId.value, item.twinId);
 };
 
 const closeDialog = () => {
-  if (route.query.nodeId) {
+  if (route.query.twinId) {
     router.replace(route.path);
   }
   isDialogOpened.value = false;
-  selectedFarmId.value = 0;
+  selectedTwinId.value = 0;
 };
 
-const getDetails = (farmId: number, twinId: number) => {
-  const farm = farms.value.find(farm => farm.farmId === farmId);
-  const twin = twins.value.find(twin => twin.twinId === twinId);
-  selectedFarm.value = farm;
-  selectedTwin.value = twin;
+watch(
+  mixedFilters,
+  async () => {
+    const queries = getFarmQueries(mixedFilters.value);
+    await _getFarms(queries);
+  },
+  { deep: true },
+);
+
+const inputFiltersReset = (nFltrNptsVal: FarmFilterInputs) => {
+  mixedFilters.value.inputs = nFltrNptsVal;
+  mixedFilters.value.options.page = 1;
+  mixedFilters.value.options.size = 10;
+  mixedFilters.value.options.retCount = true;
 };
 
 onMounted(async () => {
-  await getAllFarms();
-  await getAllTwins();
+  const queries = getFarmQueries(mixedFilters.value);
+  await _getFarms(queries);
 });
 </script>
 

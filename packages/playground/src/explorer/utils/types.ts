@@ -18,6 +18,11 @@ export type MixedFilter = {
   options: FilterOptions;
 };
 
+export type FarmMixedFilter = {
+  inputs: FarmFilterInputs;
+  options: FarmFilterOptions;
+};
+
 // Status, GPU, Gateway, and any other option should be add here.
 export type FilterOptions = {
   status: NodeStatus;
@@ -119,4 +124,24 @@ export const nodeInitializer: GridNode = {
   twin: { twinId: 0, accountId: "", publicKey: "", relay: "" },
   stats: nodeStatsInitializer,
   cards: [],
+};
+
+export type FarmFilterInputs = {
+  farmId: NodeInputFilterType;
+  name: NodeInputFilterType;
+  twinId: NodeInputFilterType;
+  certificationType: NodeInputFilterType;
+  pricingPolicyId: NodeInputFilterType;
+};
+
+export type FarmFilterOptions = {
+  page: number;
+  size: number;
+  retCount: boolean;
+};
+
+export const farmOptionsInitializer: FarmFilterOptions = {
+  page: 1,
+  size: 10,
+  retCount: true,
 };
