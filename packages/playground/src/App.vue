@@ -241,20 +241,31 @@ const routes: AppRoute[] = [
           ],
         } as any,
       ]),
+
   {
-    title: "Other Services",
-    icon: "mdi-toolbox",
+    title: "Metrics",
     items: [
       {
         title: "Monitoring",
         icon: "mdi-equalizer",
         url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
       },
+    ],
+  },
+  {
+    title: "Bootstrap",
+    items: [
       {
-        title: "0-bootstrap",
+        title: "0-Bootstrap",
         icon: "mdi-earth",
         url: "https://bootstrap.grid.tf/",
       },
+    ],
+  },
+  {
+    title: "0Hub",
+    icon: "mdi-toolbox",
+    items: [
       {
         title: "0-Hub",
         icon: "mdi-open-in-new",
