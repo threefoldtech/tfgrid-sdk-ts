@@ -8,7 +8,7 @@ import {
   randomChoice,
 } from "../../src";
 import { config, getClient } from "../client_loader";
-import { bytesToGB, generateInt, k8sWait, log, RemoteRun, splitIP } from "../utils";
+import { bytesToGB, checkNodeAvail, generateInt, k8sWait, log, RemoteRun, splitIP } from "../utils";
 
 jest.setTimeout(500000);
 
@@ -123,10 +123,16 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
   }
-  const masterNodeId = +randomChoice(masterNode).nodeId;
-  let workerNodeId = +randomChoice(workerNode).nodeId;
-  while (masterNodeId == workerNodeId) {
-    workerNodeId = +randomChoice(workerNode).nodeId;
+  const masterNodeId = await checkNodeAvail(masterNode);
+  if (masterNodeId == -1) return;
+  let workerNodeId = await checkNodeAvail(workerNode);
+  if (workerNodeId == -1) return;
+
+  let maxCount = 3;
+  while (masterNodeId == workerNodeId && maxCount > 0) {
+    workerNodeId = await checkNodeAvail(workerNode);
+    if (workerNodeId == -1) return;
+    maxCount--;
   }
 
   //K8s Model
@@ -383,10 +389,16 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
   }
-  const masterNodeId = +randomChoice(masterNode).nodeId;
-  let workerNodeId = +randomChoice(workerNode).nodeId;
-  while (masterNodeId == workerNodeId) {
-    workerNodeId = +randomChoice(workerNode).nodeId;
+  const masterNodeId = await checkNodeAvail(masterNode);
+  if (masterNodeId == -1) return;
+  let workerNodeId = await checkNodeAvail(workerNode);
+  if (workerNodeId == -1) return;
+
+  let maxCount = 3;
+  while (masterNodeId == workerNodeId && maxCount > 0) {
+    workerNodeId = await checkNodeAvail(workerNode);
+    if (workerNodeId == -1) return;
+    maxCount--;
   }
 
   //K8s Model
@@ -630,10 +642,16 @@ test("TC1233 - Kubernetes: Delete Worker", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
   }
-  const masterNodeId = +randomChoice(masterNode).nodeId;
-  let workerNodeId = +randomChoice(workerNode).nodeId;
-  while (masterNodeId == workerNodeId) {
-    workerNodeId = +randomChoice(workerNode).nodeId;
+  const masterNodeId = await checkNodeAvail(masterNode);
+  if (masterNodeId == -1) return;
+  let workerNodeId = await checkNodeAvail(workerNode);
+  if (workerNodeId == -1) return;
+
+  let maxCount = 3;
+  while (masterNodeId == workerNodeId && maxCount > 0) {
+    workerNodeId = await checkNodeAvail(workerNode);
+    if (workerNodeId == -1) return;
+    maxCount--;
   }
 
   //K8s Model

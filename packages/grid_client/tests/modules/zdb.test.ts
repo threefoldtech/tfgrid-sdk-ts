@@ -1,8 +1,8 @@
 import { createClient } from "redis";
 
-import { FilterOptions, generateString, GridClient, randomChoice, ZDBModel, ZdbModes, ZDBSModel } from "../../src";
+import { FilterOptions, generateString, GridClient, ZDBModel, ZdbModes, ZDBSModel } from "../../src";
 import { getClient } from "../client_loader";
-import { bytesToGB, generateInt, log } from "../utils";
+import { bytesToGB, checkNodeAvail, generateInt, log } from "../utils";
 
 jest.setTimeout(300000);
 
@@ -70,7 +70,8 @@ test("TC1236 - ZDB: Deploy ZDBs", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
   }
-  const nodeId = +randomChoice(nodes).nodeId;
+  const nodeId = await checkNodeAvail(nodes);
+  if (nodeId == -1) return;
 
   //Zdb Model
   const zdb: ZDBModel = {

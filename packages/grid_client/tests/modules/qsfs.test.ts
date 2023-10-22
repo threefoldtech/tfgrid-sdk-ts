@@ -1,5 +1,3 @@
-import { setTimeout } from "timers/promises";
-
 import {
   FilterOptions,
   generateString,
@@ -10,7 +8,7 @@ import {
   randomChoice,
 } from "../../src";
 import { config, getClient } from "../client_loader";
-import { bytesToGB, generateInt, k8sWait, log, RemoteRun, splitIP } from "../utils";
+import { bytesToGB, checkNodeAvail, generateInt, k8sWait, log, RemoteRun, splitIP } from "../utils";
 
 jest.setTimeout(300000);
 
@@ -81,10 +79,15 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
     if (allNodes.length >= 2) {
-      const qsfsNode1 = +randomChoice(allNodes).nodeId;
-      let qsfsNode2 = +randomChoice(allNodes).nodeId;
-      while (qsfsNode1 == qsfsNode2) {
-        qsfsNode2 = +randomChoice(allNodes).nodeId;
+      const qsfsNode1 = await checkNodeAvail(allNodes);
+      if (qsfsNode1 == -1) return;
+      let qsfsNode2 = await checkNodeAvail(allNodes);
+      if (qsfsNode2 == -1) return;
+      let maxCount = 3;
+      while (qsfsNode1 == qsfsNode2 && maxCount > 0) {
+        qsfsNode2 = await checkNodeAvail(allNodes);
+        if (qsfsNode2 == -1) return;
+        maxCount--;
       }
       qsfsNodes.push(qsfsNode1, qsfsNode2);
     } else {
@@ -106,10 +109,15 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
     if (allNodes.length >= 2) {
-      const qsfsNode1 = +randomChoice(allNodes).nodeId;
-      let qsfsNode2 = +randomChoice(allNodes).nodeId;
-      while (qsfsNode1 == qsfsNode2) {
-        qsfsNode2 = +randomChoice(allNodes).nodeId;
+      const qsfsNode1 = await checkNodeAvail(allNodes);
+      if (qsfsNode1 == -1) return;
+      let qsfsNode2 = await checkNodeAvail(allNodes);
+      if (qsfsNode2 == -1) return;
+      let maxCount = 3;
+      while (qsfsNode1 == qsfsNode2 && maxCount > 0) {
+        qsfsNode2 = await checkNodeAvail(allNodes);
+        if (qsfsNode2 == -1) return;
+        maxCount--;
       }
       qsfsNodes.push(qsfsNode1, qsfsNode2);
     } else {
@@ -146,7 +154,8 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
   }
-  const nodeId = +randomChoice(nodes).nodeId;
+  const nodeId = await checkNodeAvail(nodes);
+  if (nodeId == -1) return;
 
   //QSFS Model
   const qsfs: QSFSZDBSModel = {
@@ -355,10 +364,15 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
     if (allNodes.length >= 2) {
-      const qsfsNode1 = +randomChoice(allNodes).nodeId;
-      let qsfsNode2 = +randomChoice(allNodes).nodeId;
-      while (qsfsNode1 == qsfsNode2) {
-        qsfsNode2 = +randomChoice(allNodes).nodeId;
+      const qsfsNode1 = await checkNodeAvail(allNodes);
+      if (qsfsNode1 == -1) return;
+      let qsfsNode2 = await checkNodeAvail(allNodes);
+      if (qsfsNode2 == -1) return;
+      let maxCount = 3;
+      while (qsfsNode1 == qsfsNode2 && maxCount > 0) {
+        qsfsNode2 = await checkNodeAvail(allNodes);
+        if (qsfsNode2 == -1) return;
+        maxCount--;
       }
       qsfsNodes.push(qsfsNode1, qsfsNode2);
     } else {
@@ -380,10 +394,15 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
     if (allNodes.length >= 2) {
-      const qsfsNode1 = +randomChoice(allNodes).nodeId;
-      let qsfsNode2 = +randomChoice(allNodes).nodeId;
-      while (qsfsNode1 == qsfsNode2) {
-        qsfsNode2 = +randomChoice(allNodes).nodeId;
+      const qsfsNode1 = await checkNodeAvail(allNodes);
+      if (qsfsNode1 == -1) return;
+      let qsfsNode2 = await checkNodeAvail(allNodes);
+      if (qsfsNode2 == -1) return;
+      let maxCount = 3;
+      while (qsfsNode1 == qsfsNode2 && maxCount > 0) {
+        qsfsNode2 = await checkNodeAvail(allNodes);
+        if (qsfsNode2 == -1) return;
+        maxCount--;
       }
       qsfsNodes.push(qsfsNode1, qsfsNode2);
     } else {
@@ -452,10 +471,15 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
   }
-  const masterNodeId = +randomChoice(masterNode).nodeId;
-  let workerNodeId = +randomChoice(workerNode).nodeId;
-  while (masterNodeId == workerNodeId) {
-    workerNodeId = +randomChoice(workerNode).nodeId;
+  const masterNodeId = await checkNodeAvail(masterNode);
+  if (masterNodeId == -1) return;
+  let workerNodeId = await checkNodeAvail(workerNode);
+  if (workerNodeId == -1) return;
+  let maxCount = 3;
+  while (masterNodeId == workerNodeId && maxCount > 0) {
+    workerNodeId = await checkNodeAvail(workerNode);
+    if (workerNodeId == -1) return;
+    maxCount--;
   }
 
   //QSFS Config

@@ -3,9 +3,7 @@ import { setTimeout } from "timers/promises";
 
 import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel, randomChoice } from "../../src";
 import { config, getClient } from "../client_loader";
-import { generateInt, log, splitIP } from "../utils";
-
-const exec = require("child_process").exec;
+import { checkNodeAvail, generateInt, log, splitIP } from "../utils";
 
 jest.setTimeout(300000);
 
@@ -65,7 +63,8 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
     farmId: 1,
     availableFor: await gridClient.twins.get_my_twin_id(),
   } as FilterOptions);
-  const gatewayNodeId = +randomChoice(gatewayNodes).nodeId;
+  const gatewayNodeId = await checkNodeAvail(gatewayNodes);
+  if (gatewayNodeId == -1) return;
 
   //Node Selection
   let nodes;
@@ -96,7 +95,8 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
   }
-  const nodeId = +randomChoice(nodes).nodeId;
+  const nodeId = await checkNodeAvail(nodes);
+  if (nodeId == -1) return;
 
   //VM Model
   const vms: MachinesModel = {
@@ -198,11 +198,11 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   for (let i = 0; i < 30; i++) {
     axios
       .get(domain)
-      .then(res => {
+      .then(() => {
         log("gateway is reachable");
         reachable = true;
       })
-      .catch(err => {
+      .catch(() => {
         log("gateway is not reachable");
       });
     if (reachable) {

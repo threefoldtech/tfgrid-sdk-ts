@@ -3,6 +3,7 @@ import { setTimeout } from "timers/promises";
 import { default as urlParser } from "url-parse";
 import { inspect } from "util";
 
+import { randomChoice } from "../src";
 import { getClient } from "./client_loader";
 
 const os = require("os");
@@ -80,4 +81,24 @@ async function k8sWait(masterSSHClient, k8sMasterName, k8sWorkerName, waitTime, 
   }
 }
 
-export { log, generateHash, generateInt, splitIP, bytesToGB, RemoteRun, returnRelay, k8sWait };
+async function checkNodeAvail(Nodes) {
+  const gridClient = await getClient();
+  let node;
+  while (Nodes.length > 0) {
+    node = randomChoice(Nodes);
+    try {
+      log(await gridClient.zos.pingNode({ nodeId: node.nodeId }));
+      break;
+    } catch (error) {
+      log("node " + node.nodeId + " is not responding, trying different node.");
+      Nodes.splice(+[Nodes.indexOf(node)], 1);
+    }
+  }
+  if (Nodes.length == 0) {
+    log("No nodes available with the needed resources for this test");
+    return -1;
+  }
+  return node.nodeId;
+}
+
+export { log, generateHash, generateInt, splitIP, bytesToGB, RemoteRun, returnRelay, k8sWait, checkNodeAvail };

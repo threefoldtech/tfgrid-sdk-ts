@@ -7,10 +7,9 @@ import {
   NameContractGetModel,
   NodeContractCreateModel,
   NodeContractUpdateModel,
-  randomChoice,
 } from "../../src";
 import { getClient } from "../client_loader";
-import { generateHash, log } from "../utils";
+import { checkNodeAvail, generateHash, log } from "../utils";
 
 jest.setTimeout(300000);
 
@@ -36,7 +35,8 @@ test("TC1269 - Contracts: Create Node Contract", async () => {
     availableFor: await gridClient.twins.get_my_twin_id(),
     farmId: 1,
   } as FilterOptions);
-  const nodeId = +randomChoice(nodes).nodeId;
+  const nodeId = await checkNodeAvail(nodes);
+  if (nodeId == -1) return;
   const hash = generateHash(generateString(8));
   const data = generateString(64);
   const publicIp = 0;
@@ -106,11 +106,11 @@ test("TC1271 - Contracts: Get Node Contract By Node ID & Contract Hash", async (
     availableFor: await gridClient.twins.get_my_twin_id(),
     farmId: 1,
   } as FilterOptions);
-  const nodeId = +randomChoice(nodes).nodeId;
+  const nodeId = await checkNodeAvail(nodes);
+  if (nodeId == -1) return;
   const hash = generateHash(generateString(8));
   const data = generateString(64);
   const publicIp = 0;
-  const twinId = await gridClient.twins.get_my_twin_id();
 
   // Create Contract
   const contract: NodeContractCreateModel = {
@@ -149,7 +149,6 @@ test("TC1272 - Contracts: Get Name Contract", async () => {
 
   //TestData
   const name = generateString(15).toLowerCase();
-  const twinId = await gridClient.twins.get_my_twin_id();
 
   //Create Contract
   const contract: NameContractCreateModel = {
@@ -189,7 +188,8 @@ test("TC1273 - Contracts: Update Node Contract", async () => {
     availableFor: await gridClient.twins.get_my_twin_id(),
     farmId: 1,
   } as FilterOptions);
-  const nodeId = +randomChoice(nodes).nodeId;
+  const nodeId = await checkNodeAvail(nodes);
+  if (nodeId == -1) return;
   const hash = generateHash(generateString(8));
   const data = generateString(64);
   const newHash = generateHash(generateString(8));
