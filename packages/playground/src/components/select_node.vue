@@ -81,7 +81,7 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { onMounted, type PropType, type Ref, ref, watch } from "vue";
+import { type PropType, type Ref, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
 
@@ -205,6 +205,14 @@ watch(
   { deep: false },
 );
 
+watch(
+  () => props.selection,
+  async (value, oldValue) => {
+    value === "manual" ? await loadNodes(undefined) : false;
+  },
+  { deep: false },
+);
+
 watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
   if (l || !s) return;
   shouldBeUpdated.value = false;
@@ -225,7 +233,7 @@ function getChipColor(item: any) {
   return item === "Dedicated" ? "success" : "secondary";
 }
 
-async function loadNodes(farmId: number) {
+async function loadNodes(farmId: number | undefined) {
   availableNodes.value = [];
   selectedNode.value = undefined;
   loadingNodes.value = true;
@@ -234,10 +242,6 @@ async function loadNodes(farmId: number) {
   farmManager?.setLoading(true);
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
-    // if isManual don't pass farmId: farmId as a parameter
-    // remove farmId === undefined from condition
-    // remove farmManager?.setLoading(false) from finally
-
     try {
       const res = await getFilteredNodes(grid, {
         farmId: farmId,
@@ -251,7 +255,7 @@ async function loadNodes(farmId: number) {
         availableFor: grid.twinId,
       });
 
-      if (res?.length === 0 || farmId === undefined) {
+      if (res?.length === 0) {
         selectedNode.value = undefined;
         emptyResult.value = true;
         loadingNodes.value = false;

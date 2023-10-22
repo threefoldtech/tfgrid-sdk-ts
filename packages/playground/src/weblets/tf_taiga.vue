@@ -116,9 +116,10 @@
               hide-details
             />
           </input-tooltip>
-
+          <NodeSelector v-model="selection" />
           <SelectFarmManager>
             <SelectFarm
+              v-if="selection == 'automated'"
               :filters="{
                 cpu: solution?.cpu,
                 memory: solution?.memory,
@@ -133,6 +134,7 @@
 
             <SelectNode
               v-model="selectedNode"
+              :selection="selection"
               :filters="{
                 farmId: farm?.farmID,
                 cpu: solution?.cpu,
@@ -172,6 +174,7 @@
 import type { GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
+import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
@@ -182,6 +185,7 @@ import { getGrid } from "../utils/grid";
 import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
+const selection = ref();
 const tabs = ref();
 const profileManager = useProfileManager();
 

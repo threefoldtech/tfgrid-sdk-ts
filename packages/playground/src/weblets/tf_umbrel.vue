@@ -92,9 +92,10 @@
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
         <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
       </input-tooltip>
-
+      <NodeSelector v-model="selection" />
       <SelectFarmManager>
         <SelectFarm
+          v-if="selection == 'automated'"
           :filters="{
             cpu: solution?.cpu,
             memory: solution?.memory,
@@ -109,6 +110,7 @@
 
         <SelectNode
           v-model="selectedNode"
+          :selection="selection"
           :filters="{
             farmId: farm?.farmID,
             cpu: solution?.cpu,
@@ -132,6 +134,7 @@
 import { computed, type Ref, ref } from "vue";
 
 import Network from "../components/networks.vue";
+import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import type { Farm, Flist, solutionFlavor as SolutionFlavor } from "../types";
@@ -141,11 +144,10 @@ import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 import { generateName, generatePassword } from "../utils/strings";
-
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
-
+const selection = ref();
 const name = ref(generateName({ prefix: "um" }));
 const username = ref("admin");
 const password = ref(generatePassword());

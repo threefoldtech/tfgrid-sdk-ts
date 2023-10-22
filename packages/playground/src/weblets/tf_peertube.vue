@@ -73,9 +73,10 @@
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
           <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
-
+        <NodeSelector v-model="selection" />
         <SelectFarmManager>
           <SelectFarm
+            v-if="selection == 'automated'"
             :filters="{
               cpu: solution?.cpu,
               memory: solution?.memory,
@@ -90,6 +91,7 @@
 
           <SelectNode
             v-model="selectedNode"
+            :selection="selection"
             :filters="{
               farmId: farm?.farmID,
               cpu: solution?.cpu,
@@ -122,6 +124,7 @@
 import type { GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
 
+import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
@@ -133,7 +136,7 @@ import { generateName, generatePassword } from "../utils/strings";
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
-
+const selection = ref();
 const name = ref(generateName({ prefix: "pt" }));
 const email = ref("");
 const password = ref(generatePassword());

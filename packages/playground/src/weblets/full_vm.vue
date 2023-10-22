@@ -158,7 +158,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, type Ref, ref, watch } from "vue";
+import { type Ref, ref, watch } from "vue";
 
 import Network from "../components/networks.vue";
 import SelectFarmManager from "../components/select_farm_manager.vue";
@@ -174,7 +174,6 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const tabs = ref();
 const selection = ref();
-
 const profileManager = useProfileManager();
 const solution = ref() as Ref<SolutionFlavor>;
 
