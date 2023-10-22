@@ -326,7 +326,7 @@ export interface WebletLayout {
     envs?: { [key: string]: string | boolean | { label: string; type?: string } } | false,
     json?: boolean,
   ): void;
-  status: ComputedRef<WebletStatus>;
+  status: ComputedRef<WebletStatus> | string;
   reloadDeploymentsList(): void;
   validateSSH(): void;
 }

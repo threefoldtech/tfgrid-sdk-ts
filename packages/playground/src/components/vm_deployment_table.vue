@@ -39,6 +39,10 @@
         {{ item.value[0].planetary || "-" }}
       </template>
 
+      <template #[`item.wireguard`]="{ item }">
+        {{ item.value[0].interfaces[0].ip || "-" }}
+      </template>
+
       <template #[`item.flist`]="{ item }">
         <v-tooltip :text="item.value[0].flist" location="bottom right">
           <template #activator="{ props }">
@@ -91,7 +95,11 @@ async function loadDeployments() {
   loading.value = true;
   const grid = await getGrid(profileManager.profile!, props.projectName);
   const chunk1 = await loadVms(grid!);
+  if (chunk1.count > 0) await grid!.gateway.list();
+
   const chunk2 = await loadVms(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }));
+  if (chunk2.count > 0) await grid!.gateway.list();
+
   const filter =
     props.projectName === ProjectName.VM
       ? undefined
@@ -101,6 +109,8 @@ async function loadDeployments() {
     props.projectName === ProjectName.Fullvm
       ? { count: 0, items: [] }
       : await loadVms(updateGrid(grid!, { projectName: "" }), { filter });
+  if (chunk3.count > 0) await grid!.gateway.list();
+
   const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
   const failedDeployments = [...(chunk1 as any).failedDeployments, ...(chunk2 as any).failedDeployments];
   namesOfFailedDeployments.value = failedDeployments.join(", ");
@@ -118,6 +128,7 @@ const filteredHeaders = computed(() => {
     { title: "Public IPv4", key: "ipv4" },
     { title: "Public IPv6", key: "ipv6" },
     { title: "Planetary Network IP", key: "planetary" },
+    { title: "WireGuard", key: "wireguard" },
     { title: "Flist", key: "flist" },
     { title: "Cost", key: "billing" },
     { title: "Actions", key: "actions" },
@@ -135,6 +146,8 @@ const filteredHeaders = computed(() => {
     ProjectName.Nextcloud,
   ] as string[];
 
+  const WireguardSolutions = [ProjectName.VM, ProjectName.Fullvm, ProjectName.Umbrel] as string[];
+
   const flistSolutions = [ProjectName.VM, ProjectName.Fullvm] as string[];
 
   if (!IPV6Solutions.includes(props.projectName)) {
@@ -143,6 +156,10 @@ const filteredHeaders = computed(() => {
 
   if (!IPV4Solutions.includes(props.projectName)) {
     headers = headers.filter(h => h.key !== "ipv4");
+  }
+
+  if (!WireguardSolutions.includes(props.projectName)) {
+    headers = headers.filter(h => h.key !== "wireguard");
   }
 
   if (!flistSolutions.includes(props.projectName)) {
