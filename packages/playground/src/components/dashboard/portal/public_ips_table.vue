@@ -15,15 +15,15 @@
         </div>
       </template>
       <template #[`item.ip`]="{ item }">
-        {{ item.ip || "-" }}
+        {{ item.raw.ip || "-" }}
       </template>
 
       <template #[`item.gateway`]="{ item }">
-        {{ item.gateway || "-" }}
+        {{ item.raw.gateway || "-" }}
       </template>
 
       <template #[`item.contract_id`]="{ item }">
-        {{ item.ip || "-" }}
+        {{ item.raw.ip || "-" }}
       </template>
       <template #[`item.actions`]="{ item, index }">
         <v-btn color="red-darken-1" @click="showDialogue = true" :disabled="loading" :loading="loading">
@@ -32,11 +32,11 @@
         <v-dialog v-model="showDialogue" max-width="600">
           <v-card>
             <v-toolbar color="primary" dark class="font-weight-bold px-3">Delete IP</v-toolbar>
-            <v-card-text> Are you sure you want to delete IP {{ item.ip }}? </v-card-text>
+            <v-card-text> Are you sure you want to delete IP {{ item.raw.ip }}? </v-card-text>
             <v-card-actions class="justify-end px-5 pb-5 pt-0">
               <v-btn
                 color="red-darken-1"
-                @click="removeFarmIp({ farmId: $props.farmId, ip: item.ip }, index)"
+                @click="removeFarmIp({ farmId: $props.farmId, ip: item.raw.ip }, index)"
                 :loading="loading"
                 :disabled="isRemoving"
                 >Delete</v-btn

@@ -30,14 +30,14 @@
             <v-row class="d-flex justify-space-between">
               <v-col cols="8" class="my-4">
                 <span> Stellar Address: </span>
-                <span> {{ item.stellarAddress || "-" }} </span>
+                <span> {{ item.raw.stellarAddress || "-" }} </span>
               </v-col>
               <v-col cols="4" class="my-4">
                 <span> Pricing Policy: </span>
-                <span> {{ item.pricingPolicyId || "-" }} </span>
+                <span> {{ item.raw.pricingPolicyId || "-" }} </span>
               </v-col>
             </v-row>
-            <PublicIPsTable :farmId="item.farmId" />
+            <PublicIPsTable :farmId="item.raw.farmId" />
             <v-row class="d-flex justify-center pb-5">
               <v-card-actions>
                 <v-btn class="bg-primary" v-bind:href="'https://v3.bootstrap.grid.tf/'" target="blank"
@@ -75,7 +75,7 @@
                 <v-btn
                   color="primary"
                   variant="tonal"
-                  @click="setStellarAddress(item.farmId, address)"
+                  @click="setStellarAddress(item.raw.farmId, address)"
                   :disabled="!valid"
                   >Submit</v-btn
                 >
@@ -158,6 +158,7 @@ export default {
         return userFarms;
       } catch (error) {
         console.log(error);
+        createCustomToast("Failed to get user farms!", ToastType.danger);
       }
     }
 

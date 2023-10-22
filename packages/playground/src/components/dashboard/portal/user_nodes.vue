@@ -36,7 +36,7 @@
                           <span>Node ID</span>
                         </v-col>
                         <v-col cols="9">
-                          <span>{{ item.nodeId }}</span>
+                          <span>{{ item.raw.nodeId }}</span>
                         </v-col>
                       </v-row>
 
@@ -45,7 +45,7 @@
                           <span>Farm ID</span>
                         </v-col>
                         <v-col cols="9">
-                          <span>{{ item.farmId }}</span>
+                          <span>{{ item.raw.farmId }}</span>
                         </v-col>
                       </v-row>
 
@@ -54,7 +54,7 @@
                           <span>Twin ID</span>
                         </v-col>
                         <v-col cols="9">
-                          <span>{{ item.twinId }}</span>
+                          <span>{{ item.raw.twinId }}</span>
                         </v-col>
                       </v-row>
 
@@ -63,7 +63,7 @@
                           <span>Certification</span>
                         </v-col>
                         <v-col cols="9">
-                          <span>{{ item.certificationType }}</span>
+                          <span>{{ item.raw.certificationType }}</span>
                         </v-col>
                       </v-row>
 
@@ -72,7 +72,7 @@
                           <span>First boot at</span>
                         </v-col>
                         <v-col cols="9">
-                          <span>{{ new Date(parseInt(item.created) * 1000) }}</span>
+                          <span>{{ new Date(parseInt(item.raw.created) * 1000) }}</span>
                         </v-col>
                       </v-row>
 
@@ -81,7 +81,7 @@
                           <span>Updated at</span>
                         </v-col>
                         <v-col cols="9">
-                          <span>{{ new Date(parseInt(item.updatedAt) * 1000) }}</span>
+                          <span>{{ new Date(parseInt(item.raw.updatedAt) * 1000) }}</span>
                         </v-col>
                       </v-row>
 
@@ -90,7 +90,7 @@
                           <span>Country</span>
                         </v-col>
                         <v-col cols="9">
-                          <span>{{ item.country }}</span>
+                          <span>{{ item.raw.country }}</span>
                         </v-col>
                       </v-row>
 
@@ -99,7 +99,7 @@
                           <span>City</span>
                         </v-col>
                         <v-col cols="9">
-                          <span>{{ item.city }}</span>
+                          <span>{{ item.raw.city }}</span>
                         </v-col>
                       </v-row>
 
@@ -108,7 +108,7 @@
                           <span>Serial Number</span>
                         </v-col>
                         <v-col cols="9">
-                          <span>{{ item.serialNumber }}</span>
+                          <span>{{ item.raw.serialNumber }}</span>
                         </v-col>
                       </v-row>
 
@@ -117,7 +117,7 @@
                           <span>Farming Policy ID</span>
                         </v-col>
                         <v-col cols="9">
-                          <span>{{ item.farmingPolicyId }}</span>
+                          <span>{{ item.raw.farmingPolicyId }}</span>
                         </v-col>
                       </v-row>
                     </v-col>
@@ -129,11 +129,11 @@
                             :rotate="-90"
                             :size="150"
                             :width="12"
-                            :model-value="item.uptime"
+                            :model-value="item.raw.uptime"
                             class="my-3"
                             color="primary"
                           />
-                          <p>Uptime: {{ item.uptime }}%</p>
+                          <p>Uptime: {{ item.raw.uptime }}%</p>
                         </template>
                         <span>Current Node Uptime Percentage (since start of the current minting period)</span>
                       </v-tooltip>
@@ -148,7 +148,7 @@
                 <v-expansion-panel-title> Resource Units Reserved </v-expansion-panel-title>
                 <v-expansion-panel-text>
                   <v-row class="mt-5 mb-5">
-                    <v-col v-for="(value, key) in item.total_resources" :key="key" align="center">
+                    <v-col v-for="(value, key) in item.raw.total_resources" :key="key" align="center">
                       <p class="text-center text-uppercase">{{ key }}</p>
                       <v-flex class="text-truncate">
                         <v-tooltip bottom class="d-none">
@@ -158,19 +158,20 @@
                               :rotate="-90"
                               :size="150"
                               :width="12"
-                              :model-value="getPercentage(item, key)"
+                              :model-value="getPercentage(item.raw, key)"
                               class="my-3"
                               color="primary"
                             />
-                            <template v-if="item.used_resources">
-                              <p v-if="item.total_resources[key] > 1000">
-                                {{ byteToGB(item.used_resources[key]) }} / {{ byteToGB(item.total_resources[key]) }} GB
+                            <template v-if="item.raw.used_resources">
+                              <p v-if="item.raw.total_resources[key] > 1000">
+                                {{ byteToGB(item.raw.used_resources[key]) }} /
+                                {{ byteToGB(item.raw.total_resources[key]) }} GB
                               </p>
 
-                              <p v-else-if="item.total_resources[key] == 0">NA</p>
+                              <p v-else-if="item.raw.total_resources[key] == 0">NA</p>
                               <p v-else>
-                                {{ item.used_resources[key] }} /
-                                {{ item.total_resources[key] }}
+                                {{ item.raw.used_resources[key] }} /
+                                {{ item.raw.total_resources[key] }}
                               </p>
                             </template>
                           </template>
@@ -200,14 +201,19 @@
       </template>
 
       <template #[`item.status`]="{ item }">
-        <v-chip :color="getColor(item.status)">
-          {{ item.status }}
+        <v-chip :color="getColor(item.raw.status)">
+          {{ item.raw.status }}
         </v-chip>
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <AddPublicConfig class="me-2" :nodeId="item.nodeId" :farmId="item.farmId" :publicConfig="item.publicConfig" />
-        <SetExtraFee class="me-2" :nodeId="item.nodeId" />
+        <AddPublicConfig
+          class="me-2"
+          :nodeId="item.raw.nodeId"
+          :farmId="item.raw.farmId"
+          :publicConfig="item.raw.publicConfig"
+        />
+        <SetExtraFee class="me-2" :nodeId="item.raw.nodeId" />
       </template>
     </v-data-table>
   </div>
