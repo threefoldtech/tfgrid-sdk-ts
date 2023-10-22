@@ -248,7 +248,7 @@ watch(
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Fullvm.toLowerCase();
+  const projectName = ProjectName.Fullvm.toLowerCase() + "/" + name.value;
 
   try {
     layout.value?.validateSSH();

@@ -105,7 +105,7 @@ async function deploy() {
 
   try {
     layout.value?.validateSSH();
-    const grid = await getGrid(profileManager.profile!);
+    const grid = await getGrid(profileManager.profile!, name.value);
 
     await layout.value.validateBalance(grid!);
 

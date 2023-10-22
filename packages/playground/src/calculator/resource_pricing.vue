@@ -1,10 +1,15 @@
 <template>
   <v-container class="custom-container">
-    <v-card color="title" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-      <v-icon size="30" class="pr-3" color="white">mdi-calculator</v-icon>
-      <v-card-title class="pa-0" lor="white">Resource Pricing Calculator</v-card-title>
+    <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+      <v-icon size="30" class="pr-3">mdi-calculator</v-icon>
+      <v-card-title class="pa-0">Pricing Calculator</v-card-title>
     </v-card>
     <v-card class="pa-3">
+      <v-row class="mt-3 px-3 pl-6" style="max-width: 74.7rem">
+        <v-alert type="info" variant="tonal">
+          For more information about Threefold Pricing check <a class="app-link" @click="openManual()">here</a>
+        </v-alert>
+      </v-row>
       <v-row class="mt-3 px-3">
         <v-col cols="6">
           <input-validator
@@ -103,17 +108,14 @@
       <v-row class="px-3">
         <v-col cols="12">
           <input-validator
-            :rules="[
-              validators.required('Balance is required.'),
-              validators.required('Balance is required.'),
-              validators.min('Balance should be a positive integer.', 1),
-            ]"
+            :rules="[validators.min('Balance should be a positive integer.', 1)]"
             :value="balance"
             #="{ props }"
           >
             <input-tooltip tooltip="The amount of TFT to calculate discount.">
               <v-text-field
                 label="Balance"
+                :disabled="currentbalance"
                 suffix="TFT"
                 type="number"
                 v-bind="props"
@@ -230,6 +232,7 @@ watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance], async ()
         certified: isCertified.value,
       });
     } else {
+      if (!balance.value) balance.value = 0;
       pkgs = await grid.value.calculator.calculate({
         cru: CRU.value,
         mru: MRU.value,
@@ -242,6 +245,12 @@ watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance], async ()
     }
 
     setPriceList(pkgs);
+  }
+});
+
+watch(currentbalance, (newCurrentBalance, oldCurrentBalance) => {
+  if (oldCurrentBalance && !newCurrentBalance) {
+    balance.value = 0;
   }
 });
 
@@ -289,6 +298,10 @@ onMounted(async () => {
       console.error("Error fetching the grid:", error);
     });
 });
+
+function openManual() {
+  window.open("https://manual.grid.tf/cloud/cloudunits_pricing.html", "_blank");
+}
 </script>
 
 <style>

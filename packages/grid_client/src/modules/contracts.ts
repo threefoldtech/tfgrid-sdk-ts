@@ -18,12 +18,14 @@ import {
   ContractsByTwinId,
   ContractState,
   CreateServiceContractModel,
+  GetActiveContractsModel,
   GetDedicatedNodePriceModel,
   GetServiceContractModel,
   NameContractCreateModel,
   NameContractGetModel,
   NodeContractCreateModel,
   NodeContractUpdateModel,
+  RentContractCreateModel,
   RentContractGetModel,
   ServiceContractApproveModel,
   ServiceContractBillModel,
@@ -78,6 +80,14 @@ class Contracts {
   async create_name(options: NameContractCreateModel) {
     return (await this.client.contracts.createName(options)).apply();
   }
+
+  @expose
+  @validateInput
+  @checkBalance
+  async createRent(options: RentContractCreateModel) {
+    return (await this.client.contracts.createRent(options)).apply();
+  }
+
   @expose
   @validateInput
   async get(options: ContractGetModel) {
@@ -99,6 +109,12 @@ class Contracts {
   @validateInput
   async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceModel) {
     return await this.client.contracts.getDedicatedNodeExtraFee(options);
+  }
+
+  @expose
+  @validateInput
+  async getActiveContracts(options: GetActiveContractsModel) {
+    return await this.client.contracts.getActiveContracts(options);
   }
 
   @expose

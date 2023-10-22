@@ -515,6 +515,7 @@ class TwinDeploymentHandler {
             if (twinDeployment.deployment.challenge_hash() === contract.contractType.nodeContract.deploymentHash) {
               twinDeployment.deployment.contract_id = contract.contractId;
               if (
+                twinDeployment.returnNetworkContracts ||
                 !(
                   twinDeployment.deployment.workloads.length === 1 &&
                   twinDeployment.deployment.workloads[0].type === WorkloadTypes.network
@@ -539,6 +540,7 @@ class TwinDeploymentHandler {
             if (twinDeployment.deployment.challenge_hash() === contract.contractType.nodeContract.deploymentHash) {
               twinDeployment.nodeId = contract.contractType.nodeContract.nodeId;
               if (
+                twinDeployment.returnNetworkContracts ||
                 !(
                   twinDeployment.deployment.workloads.length === 1 &&
                   twinDeployment.deployment.workloads[0].type === WorkloadTypes.network
