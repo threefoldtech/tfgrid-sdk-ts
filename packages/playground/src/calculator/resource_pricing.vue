@@ -1,11 +1,11 @@
 <template>
-  <v-container class="custom-container">
+  <div class="border px-4 pb-4 rounded position-relative mt-2">
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
       <v-icon size="30" class="pr-3">mdi-calculator</v-icon>
       <v-card-title class="pa-0">Pricing Calculator</v-card-title>
     </v-card>
     <v-card class="pa-3">
-      <v-row class="mt-3 px-3 pl-6" style="max-width: 74.7rem">
+      <v-row class="mt-3 px-3 pl-6">
         <v-alert type="info" variant="tonal">
           For more information about Threefold Pricing check <a class="app-link" @click="openManual()">here</a>
         </v-alert>
@@ -178,7 +178,7 @@
         </v-col>
       </v-row>
     </v-card>
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts" setup>

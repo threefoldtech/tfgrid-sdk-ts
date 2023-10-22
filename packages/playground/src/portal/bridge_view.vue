@@ -1,5 +1,5 @@
 <template>
-  <v-container class="custom-container">
+  <div class="border px-4 pb-4 rounded position-relative mt-2">
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
       <v-icon size="30" class="pr-3">mdi-swap-horizontal</v-icon>
       <v-card-title class="pa-0">Transfer TFT Across Chains</v-card-title>
@@ -22,7 +22,7 @@
         <v-btn color="blue" class="ml-auto" @click="navigation">Learn How?</v-btn>
       </v-row>
     </v-card>
-  </v-container>
+  </div>
 
   <!-- Deposit Dialog -->
   <deposit-dialog
