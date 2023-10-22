@@ -4,6 +4,34 @@ import type { INode } from "@/utils/filter_nodes";
 
 import type * as validators from "../utils/validators";
 
+export enum ProfileTypes {
+  DIY,
+  TITAN,
+}
+
+export enum Certification {
+  NONE = 0,
+  CERTIFIED = 1,
+  GOLD_CERTIFIED = 2,
+}
+
+export interface FarmingProfileOptions {
+  type: ProfileTypes;
+  name: string;
+  memory: number;
+  cpu: number;
+  hdd: number;
+  ssd: number;
+  price: number;
+  priceAfter5Years: number;
+  maximumTokenPrice: number;
+  powerUtilization: number;
+  powerCost: number;
+  certified: Certification;
+  publicIp: boolean;
+  investmentCostHW: number;
+  nuRequiredPerCu: number;
+}
 export interface K8SWorker {
   name: string;
   cpu: number;

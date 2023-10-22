@@ -70,6 +70,10 @@ interface QueryContractsGetOptions {
   id: number;
 }
 
+interface ActiveContractsOptions {
+  nodeId: number;
+}
+
 interface QueryContractsGetContractByActiveRentOptions {
   nodeId: number;
 }
@@ -102,6 +106,12 @@ class QueryContracts {
   async getContractIdByActiveRentForNode(options: QueryContractsGetContractByActiveRentOptions): Promise<number> {
     const res = await this.client.api.query.smartContractModule.activeRentContractForNode(options.nodeId);
     return res.toPrimitive() as number;
+  }
+
+  @checkConnection
+  async getActiveContracts(options: ActiveContractsOptions): Promise<number[]> {
+    const res = await this.client.api.query.smartContractModule.activeNodeContracts(options.nodeId);
+    return res.toPrimitive() as number[];
   }
 
   @checkConnection

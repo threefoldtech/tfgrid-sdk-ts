@@ -1,10 +1,15 @@
 import axios from "axios";
 
-import { sign, type SignReturn } from "./sign";
+import { KeypairType, sign, type SignReturn } from "./sign";
 import { type AcceptConfig, type ErrorType, type RequestData, type SignProps, ThreefoldProvider } from "./types";
 
 export default class ThreefoldSigner extends ThreefoldProvider {
   private MNEMONIC = import.meta.env.VITE_MNEMONIC;
+  private CONFIG: AcceptConfig = {
+    scriptContent: "",
+    pdfData: "",
+    keypairType: KeypairType.sr25519,
+  };
 
   async use(props: SignProps): Promise<ErrorType> {
     console.warn("Using the normal provider, Please make sure that you provide the mnemonic in the .env file.");
@@ -29,6 +34,8 @@ export default class ThreefoldSigner extends ThreefoldProvider {
     let data: SignReturn;
 
     try {
+      this.CONFIG = config;
+
       if (config.pdfData) {
         data = await sign(config.pdfData, this.MNEMONIC, config.keypairType);
         return await this.__request(data);
@@ -45,6 +52,7 @@ export default class ThreefoldSigner extends ThreefoldProvider {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async __request(data: SignReturn, account?: boolean): Promise<ErrorType> {
     const requestBody: RequestData = {
+      content: this.CONFIG.scriptContent,
       pdfUrl: this.props.pdfurl,
       pubkey: data.publicKey,
       signature: data.signature,

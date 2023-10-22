@@ -185,8 +185,8 @@ const routes: AppRoute[] = [
     ],
   },
   {
-    title: "Explorer",
     icon: "mdi-database-search-outline",
+    title: "Explorer",
     items: [
       {
         title: "Statistics",
@@ -241,24 +241,45 @@ const routes: AppRoute[] = [
           ],
         } as any,
       ]),
+
   {
-    title: "Other Services",
-    icon: "mdi-toolbox",
+    title: "Metrics",
     items: [
       {
         title: "Monitoring",
         icon: "mdi-equalizer",
         url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
       },
+    ],
+  },
+  {
+    title: "Bootstrap",
+    items: [
       {
-        title: "0-bootstrap",
+        title: "0-Bootstrap",
         icon: "mdi-earth",
         url: "https://bootstrap.grid.tf/",
       },
+    ],
+  },
+  {
+    title: "0Hub",
+    icon: "mdi-toolbox",
+    items: [
       {
         title: "0-Hub",
         icon: "mdi-open-in-new",
         url: "https://hub.grid.tf/",
+      },
+    ],
+  },
+  {
+    title: "Grid Services",
+    items: [
+      {
+        title: "Grid Services",
+        icon: "mdi-grid-large",
+        url: "https://status.grid.tf/status/threefold",
       },
     ],
   },
@@ -381,6 +402,7 @@ export default {
   bottom: 15px;
   right: 25px;
 }
+
 .v-tooltip > .v-overlay__content {
   opacity: 10;
   color: white;
@@ -416,6 +438,9 @@ a {
 }
 
 .mosha__toast__content__text {
+  font-size: 14px !important;
+}
+.font-14 {
   font-size: 14px !important;
 }
 </style>

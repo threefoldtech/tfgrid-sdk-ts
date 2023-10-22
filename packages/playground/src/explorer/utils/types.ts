@@ -124,6 +124,7 @@ export const nodeInitializer: GridNode = {
   twin: { twinId: 0, accountId: "", publicKey: "", relay: "" },
   stats: nodeStatsInitializer,
   cards: [],
+  num_gpu: 0,
 };
 
 export type FarmFilterInputs = {

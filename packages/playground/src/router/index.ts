@@ -42,6 +42,11 @@ const router = createRouter({
           component: () => import("../portal/transfer_view.vue"),
           meta: { title: "Transfer" },
         },
+        {
+          path: "dedicated-nodes",
+          component: () => import("../portal/dedicated_nodes_view.vue"),
+          meta: { title: "Dedicated Nodes" },
+        },
       ],
     },
 
@@ -52,6 +57,12 @@ const router = createRouter({
           path: "pricing",
           component: () => import("../calculator/resource_pricing.vue"),
           meta: { title: "Resource Pricing" },
+        },
+
+        {
+          path: "simulator",
+          component: () => import("../portal/simulator_view.vue"),
+          meta: { title: "Twin" },
         },
       ],
     },
