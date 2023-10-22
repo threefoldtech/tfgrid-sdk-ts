@@ -37,7 +37,7 @@ yarn install
 ## Build
 
 ```bash
-yarn lerna run build
+make build
 ```
 
 ## Related Documentations
