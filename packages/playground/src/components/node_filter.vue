@@ -1,6 +1,7 @@
 <template>
   <form-validator valid-on-init ref="formRef" @update:model-value="$emit('update:valid', $event)">
     <v-expansion-panels
+      class="mb-3"
       @update:model-value="
         e => {
           if (typeof e === 'number') {

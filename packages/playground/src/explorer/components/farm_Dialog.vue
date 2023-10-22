@@ -15,6 +15,13 @@
         <v-toolbar-title>{{ farm.name }}</v-toolbar-title>
       </v-toolbar>
 
+      <template v-if="loading">
+        <v-card class="d-flex justify-center align-center h-screen">
+          <v-progress-circular color="primary" indeterminate :size="128" :width="5" />
+          <p class="mt-2">Loading farm details...</p>
+        </v-card>
+      </template>
+
       <v-sheet :loading="loading" class="d-flex justify-center align-start">
         <v-card class="d-inline-flex flex-column ma-5" max-width="50%">
           <v-card-item title="Farm Details"> </v-card-item>
@@ -86,22 +93,19 @@ const props = defineProps({
     type: Object as PropType<IFarm>,
     required: true,
   },
-  twinId: {
-    type: Number,
-    required: true,
-  },
 });
 
-const dialog = ref<boolean>(false);
+const dialog = ref<boolean>(true);
 const loading = ref<boolean>(false);
-const twins = ref<Twin[]>();
 const twin = ref<Twin>();
 
 const _getTwins = async () => {
   loading.value = true;
   try {
-    const { data } = await getTwins();
-    twins.value = data;
+    const { data } = await getTwins({
+      twinId: props.farm.twinId,
+    });
+    twin.value = data[0];
   } catch (error) {
     console.log(error);
   } finally {
@@ -109,20 +113,16 @@ const _getTwins = async () => {
   }
 };
 
-const getTwin = (twinId: number) => twins.value?.find(twin => twin.twinId === twinId);
-
 watch(
-  () => props.twinId,
-  async (twinId: number) => {
-    if (twinId > 0) {
+  () => props.farm,
+  async (farm: IFarm) => {
+    if (farm.twinId > 0) {
       loading.value = true;
-      const _twin = getTwin(twinId);
-      twin.value = _twin;
-      router.push({ path: route.path, query: { twinId: twinId } });
+      await _getTwins();
+      router.push({ path: route.path, query: { twinId: farm.twinId } });
       loading.value = false;
     }
   },
-  { deep: true },
 );
 
 watch(

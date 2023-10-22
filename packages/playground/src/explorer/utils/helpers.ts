@@ -9,6 +9,7 @@ import {
   NodeStatus,
   type Pagination,
   type Twin,
+  type TwinsQuery,
 } from "@threefold/gridproxy_client";
 import { byCountry } from "country-code-lookup";
 
@@ -166,9 +167,9 @@ export async function getFarms(queries: Partial<FarmsQuery>): Promise<Pagination
   }
 }
 
-export async function getTwins(): Promise<Pagination<Twin[]>> {
+export async function getTwins(queries: Partial<TwinsQuery> = {}): Promise<Pagination<Twin[]>> {
   try {
-    const twins = await gridProxyClient.twins.list();
+    const twins = await gridProxyClient.twins.list(queries);
     return JSON.parse(JSON.stringify(twins));
   } catch (error) {
     console.error("An error occurred while requesting twins:", error);

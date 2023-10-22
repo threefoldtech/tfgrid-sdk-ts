@@ -1,18 +1,12 @@
 <template>
-  <node-filters v-model="filterInputs" v-model:valid="isValidForm" @update:model-value="inputFiltersReset" />
   <view-layout>
     <v-row>
       <v-col>
-        <!-- table -->
+        <node-filters v-model="filterInputs" v-model:valid="isValidForm" @update:model-value="inputFiltersReset" />
         <FarmsTable :items="farms" :loading="loading" v-model:selectedFarm="selectedFarm" @open-dialog="openDialog" />
       </v-col>
     </v-row>
-    <farmDialog
-      :farm="selectedFarm!"
-      :twinId="selectedTwinId"
-      :openDialog="isDialogOpened"
-      @close-dialog="closeDialog"
-    />
+    <farmDialog v-if="selectedFarm" :openDialog="isDialogOpened" :farm="selectedFarm" @close-dialog="closeDialog" />
   </view-layout>
 </template>
 
@@ -50,7 +44,6 @@ const loading = ref<boolean>(false);
 const farms = ref<IFarm[]>([]);
 const isDialogOpened = ref<boolean>(false);
 const selectedFarm = ref<IFarm>();
-const selectedTwinId = ref<number>(0);
 const filterInputs = ref<FarmFilterInputs>(inputsInitializer);
 const filterOptions = ref<FarmFilterOptions>(farmOptionsInitializer);
 const isValidForm = ref<boolean>(false);
@@ -85,9 +78,14 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
   }
 };
 
-const openDialog = (item: any) => {
+const checkPath = async () => {
+  if (route.query.twinId) {
+    router.replace(route.path);
+  }
+};
+
+const openDialog = (item: IFarm) => {
   selectedFarm.value = item;
-  selectedTwinId.value = item.twinId;
   isDialogOpened.value = true;
 };
 
@@ -96,7 +94,6 @@ const closeDialog = () => {
     router.replace(route.path);
   }
   isDialogOpened.value = false;
-  selectedTwinId.value = 0;
 };
 
 watch(
@@ -116,6 +113,7 @@ const inputFiltersReset = (nFltrNptsVal: FarmFilterInputs) => {
 };
 
 onMounted(async () => {
+  await checkPath();
   const queries = getFarmQueries(mixedFilters.value);
   await _getFarms(queries);
 });
