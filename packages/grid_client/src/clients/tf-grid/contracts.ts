@@ -60,6 +60,7 @@ class TFContracts extends Contracts {
                   state
                   createdAt
                   nodeID
+                  numberOfPublicIPs
                 }
                 rentContracts(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, limit: $rentContractsCount) {
                   contractID

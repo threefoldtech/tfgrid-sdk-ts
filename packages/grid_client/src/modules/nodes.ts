@@ -1,10 +1,10 @@
-import urlJoin from "url-join";
-
 import { TFClient } from "../clients";
 import { GridClientConfig } from "../config";
-import { events, send, validateInput } from "../helpers";
+import { events, validateInput } from "../helpers";
 import { expose } from "../helpers/expose";
+import { capacity } from "./capacity";
 import {
+  FilterOptions,
   NodeGetModel,
   NodePowerModel,
   RentContractCreateModel,
@@ -15,8 +15,10 @@ import { checkBalance } from "./utils";
 
 class Nodes {
   client: TFClient;
+  capacity: capacity;
   constructor(public config: GridClientConfig) {
     this.client = config.tfclient;
+    this.capacity = new capacity(config);
   }
 
   @expose
@@ -78,6 +80,17 @@ class Nodes {
   @checkBalance
   async setNodePower(options: NodePowerModel) {
     return (await this.client.nodes.setPower(options)).apply();
+  }
+
+  @expose
+  async all() {
+    return await this.capacity.getAllNodes();
+  }
+
+  @expose
+  @validateInput
+  async filter(options?: FilterOptions) {
+    return await this.capacity.filterNodes(options);
   }
 }
 
