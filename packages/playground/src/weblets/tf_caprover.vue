@@ -118,7 +118,7 @@ const workers = ref<CW[]>([]);
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Caprover.toLowerCase();
+  const projectName = ProjectName.Caprover.toLowerCase() + "/" + leader.value.name;
 
   try {
     layout.value?.validateSSH();
