@@ -53,14 +53,18 @@ interface NodeLocation {
   longitude: number;
 }
 
-interface AddNodePublicConfigOptions {
+interface NodePublicConfigOptions {
   farmId: number;
   nodeId: number;
-  publicConfig: {
-    ip?: number;
-    gw?: number;
-    ip6?: number;
-    gw6?: number;
+  publicConfig?: {
+    ip4?: {
+      ip: number;
+      gw: number;
+    };
+    ip6?: {
+      ip: number;
+      gw: number;
+    };
     domain?: string;
   };
 }
@@ -106,7 +110,7 @@ class Nodes extends QueryNodes {
   }
 
   @checkConnection
-  async addNodePublicConfig(options: AddNodePublicConfigOptions) {
+  async addNodePublicConfig(options: NodePublicConfigOptions) {
     const extrinsic = this.client.api.tx.tfgridModule.addNodePublicConfig(
       options.farmId,
       options.nodeId,

@@ -671,17 +671,19 @@ class AddFarmIPModel {
   @Expose() @IsNotEmpty() @IsIP() gw: number;
 }
 
+class IPConfig {
+  @Expose() @IsOptional() @IsIP() ip: number;
+  @Expose() @IsOptional() gw: number;
+}
 class PublicConfigModel {
-  @Expose() @IsOptional() @IsIP() ip?: number;
-  @Expose() @IsOptional() gw?: number;
-  @Expose() @IsOptional() @IsIP() ip6?: number;
-  @Expose() @IsOptional() gw6?: number;
+  @IsOptional() ip4?: IPConfig;
+  @IsOptional() ip6?: IPConfig;
   @Expose() @IsString() @IsOptional() domain?: string;
 }
 class AddPublicConfig {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
-  @Expose() @IsNotEmpty() publicConfig: PublicConfigModel;
+  @Expose() publicConfig?: PublicConfigModel;
 }
 
 class RemoveFarmIPModel {

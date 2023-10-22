@@ -207,12 +207,7 @@
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <AddPublicConfig
-          class="me-2"
-          :nodeId="item.raw.nodeId"
-          :farmId="item.raw.farmId"
-          :publicConfig="item.raw.publicConfig"
-        />
+        <AddPublicConfig class="me-2" :nodeId="item.raw.nodeId" :farmId="item.raw.farmId" v-model="publicConfig" />
         <SetExtraFee class="me-2" :nodeId="item.raw.nodeId" />
       </template>
     </v-data-table>
@@ -289,7 +284,7 @@ export default {
       gwv6?: number;
       domain?: string;
     }
-    const publicConfig = ref<IPublicConfig>();
+    const publicConfig = ref<IPublicConfig>({});
     const resourcesPanel = ref([]);
     const receiptsPanel = ref([]);
     const uptime = ref();

@@ -17,7 +17,6 @@
         }
       "
       expand-on-click
-      return-object
     >
       <template v-slot:top>
         <v-toolbar flat color="primary">
@@ -76,7 +75,8 @@
                   color="primary"
                   variant="tonal"
                   @click="setStellarAddress(item.raw.farmId, address)"
-                  :disabled="!valid"
+                  :loading="isAdding"
+                  :disabled="!valid || isAdding"
                   >Submit</v-btn
                 >
                 <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
@@ -146,6 +146,7 @@ export default {
     const valid = ref(false);
     const address = ref();
     const isValidAddress = ref(false);
+    const isAdding = ref(false);
 
     onMounted(async () => {
       await getUserFarms();
@@ -164,12 +165,15 @@ export default {
 
     async function setStellarAddress(farmId: number, stellarAddress: string) {
       try {
+        isAdding.value = true;
         await gridStore.grid.farms.addStellarAddress({ farmId, stellarAddress });
         createCustomToast("Address Added successfully!", ToastType.success);
         showDialogue.value = false;
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to add address!", ToastType.danger);
+      } finally {
+        isAdding.value = false;
       }
     }
 
@@ -193,6 +197,7 @@ export default {
       address,
       valid,
       isValidAddress,
+      isAdding,
       getUserFarms,
       setStellarAddress,
       customStellarValidation,

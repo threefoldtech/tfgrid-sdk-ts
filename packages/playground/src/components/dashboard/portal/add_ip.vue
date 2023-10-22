@@ -76,6 +76,7 @@
               color="primary"
               @click="addFarmIp($props.farmId, $props.gateway)"
               @update:modelValue="$emit('update:isAdded', $event)"
+              :loading="isAdding"
               :disabled="!valid || isAdding"
               >Add</v-btn
             >

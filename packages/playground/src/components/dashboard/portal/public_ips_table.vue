@@ -1,4 +1,4 @@
-<template v-if="isRemoved">
+<template>
   <div class="my-6">
     <v-data-table :headers="headers" :items="publicIps" class="elevation-1">
       <template v-slot:top>
@@ -37,7 +37,7 @@
               <v-btn
                 color="red-darken-1"
                 @click="removeFarmIp({ farmId: $props.farmId, ip: item.raw.ip }, index)"
-                :loading="loading"
+                :loading="isRemoving"
                 :disabled="isRemoving"
                 >Delete</v-btn
               >
@@ -96,7 +96,6 @@ export default {
     const publicIP = ref();
     const toPublicIP = ref();
     const gateway = ref();
-    const isRemoved = ref(false);
     const isRemoving = ref(false);
 
     onMounted(async () => {
@@ -115,7 +114,6 @@ export default {
         isRemoving.value = true;
         await gridStore.grid.farms.removeFarmIp({ ip: options.ip, farmId: options.farmId });
         createCustomToast("IP is deleted successfully!", ToastType.success);
-        isRemoved.value = true;
         showDialogue.value = false;
         publicIps.value.splice(index, 1);
       } catch (error) {
@@ -135,7 +133,6 @@ export default {
       gateway,
       loading,
       showDialogue,
-      isRemoved,
       isRemoving,
       removeFarmIp,
     };
