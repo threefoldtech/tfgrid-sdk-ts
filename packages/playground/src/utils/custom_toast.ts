@@ -42,14 +42,14 @@ export function createCustomToast(content: string, type: ToastType) {
   setTimeout(() => {
     // Change the colors of the icons/contents of all opened toast to be `tonal` as vuetify.
     const leftIcons = document.getElementsByClassName("mosha__icon");
-    const closIcons = document.getElementsByClassName("mosha__toast__close-icon");
+    const closeIcons = document.getElementsByClassName("mosha__toast__close-icon");
     const contents = document.getElementsByClassName("mosha__toast__content");
 
-    if (leftIcons && closIcons && contents) {
+    if (leftIcons && closeIcons && contents) {
       for (let index = 0; index < leftIcons.length; index++) {
         const svgIcon = leftIcons[index].children[0];
         svgIcon.classList.add(`mosha__icon__${theme}__${type}`);
-        closIcons[index].classList.add(`${theme}__${type}`);
+        closeIcons[index].classList.add(`${theme}__${type}`);
         contents[index].classList.add(`${theme}__${type}`);
       }
     }

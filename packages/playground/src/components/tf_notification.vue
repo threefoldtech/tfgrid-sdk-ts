@@ -5,7 +5,14 @@
 <script lang="ts" setup>
 import "mosha-vue-toastify/dist/style.css";
 
-import { ContractStates, GridClient, type NodeInfo } from "@threefold/grid_client";
+import {
+  ContractStates,
+  type GqlContracts,
+  type GqlNodeContract,
+  type GqlRentContract,
+  GridClient,
+  type NodeInfo,
+} from "@threefold/grid_client";
 import { onMounted } from "vue";
 import { ref } from "vue";
 
@@ -18,30 +25,39 @@ import { getGrid } from "../utils/grid";
 const profileManager = useProfileManager();
 const contractsCount = ref(0);
 
-async function isThereAnOfflineNodes(grid: GridClient | null) {
+async function checkOfflineDeployments(grid: GridClient | null) {
   const deploymentsNodeIds: number[] = [];
   const nodesWithPubIps: number[] = [];
 
   const offlineNodes: NodeInfo[] = await getOfflineNodes(grid);
-  const userContracts: any = await grid!.contracts.listMyContracts();
-  userContracts.nodeContracts.map((contract: any) => {
+  const myContracts: GqlContracts = await grid!.contracts.listMyContracts();
+  const contracts: (GqlNodeContract | GqlRentContract)[] = [...myContracts.nodeContracts, ...myContracts.rentContracts];
+
+  contracts.map(contract => {
     deploymentsNodeIds.push(contract.nodeID);
-    if (contract.numberOfPublicIPs > 0) {
+    if ("numberOfPublicIPs" in contract && contract.numberOfPublicIPs > 0) {
       nodesWithPubIps.push(contract.nodeID);
     }
   });
 
-  const userOfflineDeployments: NodeInfo[] = offlineNodes
-    .map(node => JSON.parse(JSON.stringify(node)))
-    .filter(node => deploymentsNodeIds.includes(node.nodeId));
+  const userOfflineDeployments = [];
+  const withPubIp = [];
 
-  const withPubIp = userOfflineDeployments.filter(node => nodesWithPubIps.includes(node.nodeId));
+  offlineNodes.map(node => {
+    if (deploymentsNodeIds.includes(node.nodeId)) {
+      userOfflineDeployments.push(node);
+    }
 
-  const deps = userOfflineDeployments.length;
-  if (deps) {
+    if (nodesWithPubIps.includes(node.nodeId)) {
+      withPubIp.push(node);
+    }
+  });
+
+  const deplen = userOfflineDeployments.length;
+  if (deplen) {
     const withPublicIpsMessage = `${withPubIp.length} of them with public ${withPubIp.length > 1 ? "IPs" : "IP"}`;
     createCustomToast(
-      `You have ${deps} ${deps > 1 ? "contracts" : "contract"} on an offline ${deps > 1 ? "nodes" : "node"}${
+      `You have ${deplen} ${deplen > 1 ? "contracts" : "contract"} on an offline ${deplen > 1 ? "nodes" : "node"}${
         withPubIp.length ? withPublicIpsMessage : ""
       }`,
       ToastType.warning,
@@ -54,7 +70,7 @@ onMounted(async () => {
     const grid = await getGrid(profileManager.profile!);
     const contracts: any = await grid!.contracts.listMyContracts({ state: [ContractStates.GracePeriod] });
 
-    await isThereAnOfflineNodes(grid);
+    await checkOfflineDeployments(grid);
 
     if (
       contracts.nameContracts.length != 0 ||
