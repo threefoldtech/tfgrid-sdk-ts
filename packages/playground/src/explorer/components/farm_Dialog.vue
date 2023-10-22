@@ -1,74 +1,129 @@
 <template>
-  <v-row justify="center">
-    <v-dialog
-      v-model="dialog"
-      fullscreen
-      @update:modelValue="(val:boolean) => $emit('close-dialog', val)"
-      :scrim="false"
-      transition="dialog-bottom-transition"
-      hide-overlay
-    >
-      <v-toolbar dark color="info">
-        <v-btn icon dark @click="() => $emit('close-dialog', false)">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-        <v-toolbar-title>{{ farm.name }}</v-toolbar-title>
+  <v-dialog
+    v-model="dialog"
+    @update:modelValue="(val:boolean) => $emit('close-dialog', val)"
+    transition="dialog-bottom-transition"
+  >
+    <v-container>
+      <v-toolbar dark color="info" v-if="!loading">
+        <div class="d-flex justify-end">
+          <v-btn icon dark @click="() => $emit('close-dialog', false)">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </div>
       </v-toolbar>
 
       <template v-if="loading">
-        <v-card class="d-flex justify-center align-center h-screen">
-          <v-progress-circular color="primary" indeterminate :size="128" :width="5" />
+        <div color="transparent" class="text-center">
+          <v-progress-circular color="primary" indeterminate :size="50" :width="5" />
           <p class="mt-2">Loading farm details...</p>
-        </v-card>
+        </div>
       </template>
 
-      <v-sheet :loading="loading" class="d-flex justify-center align-start">
-        <v-card class="d-inline-flex flex-column ma-5" max-width="50%">
-          <v-card-item title="Farm Details"> </v-card-item>
-          <v-card-text variant="tonal">
-            <v-row>
-              <v-col class="text-h6" cols="6"> ID </v-col>
-              <v-col cols="6" class="text-body-6 text-right">
-                {{ farm.farmId }}
-              </v-col>
-              <v-divider></v-divider>
-              <v-col class="text-h6" cols="6"> Name </v-col>
-              <v-col cols="6" class="text-body-6 text-right">
-                {{ farm.name }}
-              </v-col>
-              <v-divider></v-divider>
-              <v-col class="text-h6" cols="6"> Stellar Address </v-col>
-              <v-col cols="6" class="text-body-6 text-right">
-                {{ farm.stellarAddress == "" ? "None" : farm.stellarAddress }}
-              </v-col>
-            </v-row>
-          </v-card-text>
+      <template v-else>
+        <v-card class="h-100">
+          <v-row class="pa-8 mt-2" justify-md="start" justify-sm="center">
+            <v-col cols="12" md="6" sm="8">
+              <v-card-title class="bg-info">
+                <h4 class="text-center">
+                  <v-icon icon="mdi-webpack" size="x-large" />
+                  Farm Details
+                </h4>
+              </v-card-title>
+              <v-card-item class="mt-2 mb-2 px-0">
+                <v-row class="bb-gray">
+                  <v-col class="d-flex justify-start align-center font-weight-bold ml-3 text-subtitle-1"> ID </v-col>
+                  <v-col class="d-flex justify-end align-center mr-3 text-body-6">
+                    {{ farm.farmId }}
+                  </v-col>
+                  <v-divider></v-divider>
+                  <v-col class="d-flex justify-start align-center font-weight-bold ml-3 text-subtitle-1"> Name </v-col>
+                  <v-col class="d-flex justify-end align-center mr-3 text-body-6">
+                    {{ farm.name }}
+                  </v-col>
+                  <v-divider></v-divider>
+                  <v-col class="d-flex justify-start align-center font-weight-bold ml-3 text-subtitle-1">
+                    Stellar Address
+                  </v-col>
+                  <v-col class="d-flex justify-end align-center mr-3 text-body-6">
+                    <v-tooltip
+                      v-if="farm.stellarAddress"
+                      location="top"
+                      text="Copy the stellar address to the clipboard."
+                    >
+                      <template #activator="{ props }">
+                        <p v-bind="props" v-if="farm.stellarAddress">
+                          {{
+                            farm.stellarAddress.length > maxLenChar
+                              ? farm.stellarAddress.slice(0, maxLenChar) + "..."
+                              : farm.stellarAddress
+                          }}
+                        </p>
+                        <v-icon
+                          v-if="farm.stellarAddress && farm.stellarAddress.length"
+                          class="ml-1"
+                          v-bind="props"
+                          icon="mdi-content-copy"
+                          @click="copy(farm.stellarAddress)"
+                        />
+                      </template>
+                    </v-tooltip>
+                    <p v-else>None</p>
+                  </v-col>
+                </v-row>
+              </v-card-item>
+            </v-col>
+            <v-col cols="12" md="6" sm="8" v-if="twin">
+              <v-card-title class="bg-info">
+                <h4 class="text-center">
+                  <v-icon icon="mdi-account" size="x-large" />
+                  Twin Details
+                </h4>
+              </v-card-title>
+              <v-card-item class="mt-2 mb-2 px-0">
+                <v-row>
+                  <v-col class="d-flex justify-start align-center font-weight-bold ml-3 text-subtitle-1"> ID </v-col>
+                  <v-col class="d-flex justify-end align-center mr-3 text-body-6">
+                    {{ twin.twinId }}
+                  </v-col>
+                  <v-divider></v-divider>
+                  <v-col class="d-flex justify-start align-center font-weight-bold ml-3 text-subtitle-1">
+                    Account ID
+                  </v-col>
+                  <v-col class="d-flex justify-end align-center mr-3 text-body-6">
+                    <v-tooltip v-if="twin.accountId" location="top" text="Copy the account id to the clipboard.">
+                      <template #activator="{ props }">
+                        <p v-bind="props" v-if="twin.accountId">
+                          {{
+                            twin.accountId.length > maxLenChar
+                              ? twin.accountId.slice(0, maxLenChar) + "..."
+                              : twin.accountId
+                          }}
+                        </p>
+                        <v-icon
+                          v-if="twin.accountId && twin.accountId.length"
+                          class="ml-1"
+                          v-bind="props"
+                          icon="mdi-content-copy"
+                          @click="copy(twin.accountId)"
+                        />
+                      </template>
+                    </v-tooltip>
+                    <p v-else>None</p>
+                  </v-col>
+                  <v-divider></v-divider>
+                  <v-col class="d-flex justify-start align-center font-weight-bold ml-3 text-subtitle-1"> Relay </v-col>
+                  <v-col class="d-flex justify-end align-center mr-3 text-body-6">
+                    {{ twin.relay }}
+                  </v-col>
+                </v-row>
+              </v-card-item>
+            </v-col>
+          </v-row>
         </v-card>
-
-        <v-card class="d-inline-flex flex-column ma-5" max-width="75%" v-if="twin">
-          <v-card-item title="Farm Twin Details"> </v-card-item>
-          <v-card-text variant="tonal">
-            <v-row>
-              <v-col class="text-h6" cols="6"> ID </v-col>
-              <v-col cols="6" class="text-body-6 text-right">
-                {{ twin.twinId }}
-              </v-col>
-              <v-divider></v-divider>
-              <v-col class="text-h6" cols="6"> Account ID </v-col>
-              <v-col cols="6" class="text-body-6 text-right">
-                {{ twin.accountId }}
-              </v-col>
-              <v-divider></v-divider>
-              <v-col class="text-h6" cols="6"> Relay </v-col>
-              <v-col cols="6" class="text-body-6 text-right">
-                {{ twin.relay }}
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-sheet>
-    </v-dialog>
-  </v-row>
+      </template>
+    </v-container>
+  </v-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -78,6 +133,7 @@ import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import router from "@/router";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import type { IFarm } from "../farms.vue";
 import { getTwins } from "../utils/helpers";
@@ -98,6 +154,7 @@ const props = defineProps({
 const dialog = ref<boolean>(true);
 const loading = ref<boolean>(false);
 const twin = ref<Twin>();
+const maxLenChar = 30;
 
 const _getTwins = async () => {
   loading.value = true;
@@ -111,6 +168,11 @@ const _getTwins = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+const copy = (address: string) => {
+  navigator.clipboard.writeText(address);
+  createCustomToast("Copied!", ToastType.success);
 };
 
 watch(
@@ -142,3 +204,13 @@ export default {
   name: "Farm Dialog",
 };
 </script>
+
+<style>
+.v-list-item__prepend > .v-icon,
+.v-list-item__append > .v-icon {
+  opacity: 1 !important;
+}
+.v-toolbar__content {
+  justify-content: end !important;
+}
+</style>
