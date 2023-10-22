@@ -17,11 +17,8 @@ export interface GetHostnameOptions {
   twinId: number;
 }
 export function getSubdomain(options: GetHostnameOptions) {
-  return (
-    SolutionCode[options.projectName as keyof typeof SolutionCode] +
-    options.twinId +
-    options.deploymentName.toLowerCase()
-  );
+  const [projectName] = options.projectName.split("/");
+  return SolutionCode[projectName as keyof typeof SolutionCode] + options.twinId + options.deploymentName.toLowerCase();
 }
 
 export interface DeployGatewayNameOptions {
@@ -62,4 +59,11 @@ export async function rollbackDeployment(grid: GridClient, name: string) {
   }
 
   return result;
+}
+
+export type GridGateway = Awaited<ReturnType<typeof loadDeploymentGateways>>[0];
+export async function loadDeploymentGateways(grid: GridClient) {
+  const gws = await grid.gateway.list();
+  const items = await Promise.all(gws.map(gw => grid.gateway.getObj(gw)));
+  return items.flat();
 }

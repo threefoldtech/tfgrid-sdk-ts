@@ -10,6 +10,7 @@
     show-select
     v-model="selectedItems"
     hide-no-data
+    :return-object="returnObject"
   >
     <template #[`column.data-table-select`]>
       <div class="d-flex align-center justify-space-between">
@@ -82,6 +83,7 @@ export default {
     deleting: { type: Boolean, required: true },
     modelValue: { type: Array as PropType<any[]>, required: true },
     noDataText: String,
+    returnObject: Boolean,
   },
   // inheritAttrs: true will allow to use @click:row from <ListTable @click:row="listener" />
   // by default it's true but added he to make it clear

@@ -25,6 +25,14 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
+
+          <IconActionBtn icon="mdi-cog" tooltip="Deploy FQDN Gateway" @click="dialog = item.value.deploymentName" />
+
+          <ManageGatewayDialog
+            v-if="dialog === item.value.deploymentName"
+            :vm="item.value"
+            @close="dialog = undefined"
+          />
         </template>
 
         <template #VM-actions="{ item }">
@@ -32,6 +40,14 @@
             tooltip="Show Details"
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
+          />
+
+          <IconActionBtn icon="mdi-cog" tooltip="Manage Gateways" @click="dialog = item.value.deploymentName" />
+
+          <ManageGatewayDialog
+            v-if="dialog === item.value.deploymentName"
+            :vm="item.value"
+            @close="dialog = undefined"
           />
         </template>
 
@@ -248,7 +264,9 @@
               'http://' +
               (item.value[0].publicIP?.ip
                 ? item.value[0].publicIP.ip.slice(0, -3)
-                : '[' + item.value[0].planetary + ']')
+                : item.value[0].planetary
+                ? '[' + item.value[0].planetary + ']'
+                : item.value[0].interfaces[0].ip)
             "
           />
         </template>
@@ -339,6 +357,7 @@ import { deploymentListEnvironments } from "../constants/deployment_list";
 import { useProfileManager } from "../stores";
 import { deleteDeployment } from "../utils/delete_deployment";
 import { getGrid, updateGrid } from "../utils/grid";
+
 const props = defineProps<{
   projectName?: ProjectName;
   title?: string;
@@ -430,6 +449,7 @@ import { useDeploymentListManager } from "../components/deployment_list_manager.
 import IconActionBtn from "../components/icon_action_btn.vue";
 import K8sDeploymentTable from "../components/k8s_deployment_table.vue";
 import ManageCaproverWorkerDialog from "../components/manage_caprover_worker_dialog.vue";
+import ManageGatewayDialog from "../components/manage_gateway_dialog.vue";
 import ManageK8SWorkerDialog from "../components/manage_k8s_worker_dialog.vue";
 import VmDeploymentTable from "../components/vm_deployment_table.vue";
 import { ProjectName } from "../types";
@@ -442,6 +462,7 @@ export default {
     K8sDeploymentTable,
     ManageK8SWorkerDialog,
     ManageCaproverWorkerDialog,
+    ManageGatewayDialog,
   },
 };
 </script>
