@@ -274,6 +274,16 @@ const routes: AppRoute[] = [
     ],
   },
   {
+    title: "Grid Services",
+    items: [
+      {
+        title: "Grid Services",
+        icon: "mdi-grid-large",
+        url: "https://status.grid.tf/status/threefold",
+      },
+    ],
+  },
+  {
     title: "Help",
     items: [
       {
@@ -452,6 +462,9 @@ a {
 }
 
 .mosha__toast__content__text {
+  font-size: 14px !important;
+}
+.font-14 {
   font-size: 14px !important;
 }
 </style>
