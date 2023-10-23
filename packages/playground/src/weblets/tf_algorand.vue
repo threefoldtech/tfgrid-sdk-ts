@@ -229,7 +229,7 @@ watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Algorand.toLowerCase();
+  const projectName = ProjectName.Algorand.toLowerCase() + "/" + name.value;
 
   try {
     layout.value?.validateSSH();

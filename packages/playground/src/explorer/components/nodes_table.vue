@@ -135,6 +135,7 @@ export default {
 .v-data-table-header th,
 .v-data-table-header td {
   white-space: nowrap;
+  font-size: 14px;
 }
 .v-data-table__tr {
   line-height: 55px;

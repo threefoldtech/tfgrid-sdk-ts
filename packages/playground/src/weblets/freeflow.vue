@@ -151,7 +151,7 @@ function finalize(deployment: any) {
 async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.FreeFlow.toLowerCase();
+  const projectName = ProjectName.FreeFlow.toLowerCase() + "/" + threebotName.value;
 
   const domain = customDomain ? gatewayName.domain : threebotName.value + "." + gatewayName.domain;
 

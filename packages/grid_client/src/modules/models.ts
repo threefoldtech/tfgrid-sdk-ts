@@ -699,6 +699,20 @@ class pingFarmModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
 }
 
+class NetworkAddNodeModel {
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() ipRange: string;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+  @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
+  @Expose() @IsString() @IsOptional() description?: string;
+}
+
+class NetworkHasNodeModel {
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() ipRange: string;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+}
+
 class NetworkGetModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
 }
@@ -844,6 +858,8 @@ export {
   SetServiceContractFeesModel,
   SetServiceContractMetadataModel,
   GetServiceContractModel,
+  NetworkAddNodeModel,
+  NetworkHasNodeModel,
   NetworkGetModel,
   NodeGetModel,
   SetDedicatedNodeExtraFeesModel,
