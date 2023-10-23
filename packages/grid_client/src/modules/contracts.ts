@@ -1,5 +1,6 @@
 import * as PATH from "path";
 
+import { GqlNameContract, GqlNodeContract, GqlRentContract } from "../clients/tf-grid";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
@@ -218,10 +219,10 @@ class Contracts {
   @expose
   @validateInput
   @checkBalance
-  async cancelMyContracts(): Promise<Record<string, number>[]> {
+  async cancelMyContracts(): Promise<(GqlNameContract | GqlRentContract | GqlNodeContract)[]> {
     const contracts = await this.client.contracts.cancelMyContracts({ graphqlURL: this.config.graphqlURL });
     for (const contract of contracts) {
-      await this.invalidateDeployment(contract.contractId);
+      await this.invalidateDeployment(+contract.contractID);
     }
     return contracts;
   }
