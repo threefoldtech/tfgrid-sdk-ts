@@ -23,8 +23,8 @@ const profileManager = useProfileManager();
 const contractsCount = ref(0);
 
 async function checkOfflineDeployments(grid: GridClient | null) {
-  const deploymentsNodeIds = new Set();
-  const nodesWithPubIps = new Set();
+  const deploymentsNodeIds: number[] = [];
+  const nodesWithPubIps: number[] = [];
 
   const offlineNodes: NodeInfo[] = await getOfflineNodes(grid);
   const myContracts: GqlContracts = await grid!.contracts.listMyContracts();
@@ -34,18 +34,18 @@ async function checkOfflineDeployments(grid: GridClient | null) {
   const withPubIp = [];
 
   for (const contract of contracts) {
-    deploymentsNodeIds.add(contract.nodeID);
+    deploymentsNodeIds.push(contract.nodeID);
     if ("numberOfPublicIPs" in contract && contract.numberOfPublicIPs > 0) {
-      nodesWithPubIps.add(contract.nodeID);
+      nodesWithPubIps.push(contract.nodeID);
     }
   }
 
   for (const node of offlineNodes) {
-    if (deploymentsNodeIds.has(node.nodeId)) {
+    if (deploymentsNodeIds.includes(node.nodeId)) {
       userOfflineDeployments.push(node);
     }
 
-    if (nodesWithPubIps.has(node.nodeId)) {
+    if (nodesWithPubIps.includes(node.nodeId)) {
       withPubIp.push(node);
     }
   }
