@@ -14,7 +14,9 @@
     <v-container v-if="showDialogue">
       <v-dialog v-model="showDialogue" max-width="600">
         <v-card>
-          <v-toolbar color="primary" dark class="custom-toolbar">Create Farm</v-toolbar>
+          <v-toolbar color="primary" dark class="custom-toolbar">
+            <p class="mb-5">Create Farm</p>
+          </v-toolbar>
           <div class="pt-6 px-6">
             <form-validator v-model="valid">
               <input-validator
@@ -83,8 +85,7 @@ export default {
 
 <style scoped>
 .custom-toolbar {
-  font-size: 20px;
-  font-weight: bold;
+  height: 2.5rem !important;
   padding-left: 10px;
 }
 </style>

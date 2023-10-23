@@ -11,7 +11,9 @@
     <span v-if="showDialogue">
       <v-dialog v-model="showDialogue" max-width="600">
         <v-card>
-          <v-toolbar color="primary" dark class="custom-toolbar">Set Additional Fees</v-toolbar>
+          <v-toolbar color="primary" dark class="custom-toolbar">
+            <p class="mb-5">Set Additional Fees</p>
+          </v-toolbar>
           <v-card-text>
             Additional fees will be added to your node {{ $props.nodeId }} (for the special hardware you’re providing
             e.g. GPUs) while renting.
@@ -123,8 +125,7 @@ export default {
 
 <style scoped>
 .custom-toolbar {
-  font-size: 20px;
-  font-weight: bold;
+  height: 2.5rem !important;
   padding-left: 10px;
 }
 </style>

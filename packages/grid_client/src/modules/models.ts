@@ -534,12 +534,6 @@ class FarmsGetModel {
   @Expose() @IsInt() @Min(1) @IsOptional() maxResult?: number; // default 50
 }
 
-class UserFarmsGetModel {
-  @Expose() @IsInt() @Min(1) @IsNotEmpty() twinId: number;
-}
-
-class UserNodesGetModel extends UserFarmsGetModel {}
-
 class NodesGetModel extends FarmsGetModel {}
 
 class FarmHasFreePublicIPsModel {
@@ -856,11 +850,9 @@ export {
   GetDedicatedNodePriceModel,
   SwapToStellarModel,
   ListenToMintCompletedModel,
-  UserFarmsGetModel,
   AddFarmIPModel,
   RemoveFarmIPModel,
   AddStellarModel,
   AddPublicConfig,
-  UserNodesGetModel,
   GetActiveContractsModel,
 };

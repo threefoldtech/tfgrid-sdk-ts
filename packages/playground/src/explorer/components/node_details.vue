@@ -133,7 +133,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .v-list-item__prepend > .v-icon,
 .v-list-item__append > .v-icon {
   opacity: 1 !important;

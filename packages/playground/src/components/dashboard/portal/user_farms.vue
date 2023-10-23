@@ -1,10 +1,14 @@
 <template v-if="farms">
   <div class="my-6">
     <v-text-field class="mb-6" v-model="search" label="Search Farm" single-line hide-details></v-text-field>
-    <v-data-table
+    <v-data-table-server
+      :loading="loading"
+      :items-length="farmsCount"
+      loading-text="Loading farms..."
       :headers="headers"
-      :items="farms"
       :search="search"
+      :items="farms"
+      v-model:items-per-page="pageSize"
       show-expand
       :expanded="expanded"
       @update:expanded="
@@ -16,7 +20,17 @@
           }
         }
       "
+      @update:options="getUserFarms"
+      :hover="true"
+      :items-per-page-options="[
+        { value: 5, title: '5' },
+        { value: 10, title: '10' },
+        { value: 15, title: '15' },
+        { value: 50, title: '50' },
+      ]"
+      v-model:page="page"
       expand-on-click
+      return-object
     >
       <template v-slot:top>
         <v-toolbar flat color="primary">
@@ -85,7 +99,7 @@
           </v-dialog>
         </v-container>
       </template>
-    </v-data-table>
+    </v-data-table-server>
   </div>
 </template>
 
@@ -93,6 +107,8 @@
 import type { FarmInfo } from "@threefold/grid_client";
 import { StrKey } from "stellar-sdk";
 import { onMounted, ref } from "vue";
+
+import { gridProxyClient } from "@/clients";
 
 import { useGrid, useProfileManager } from "../../../stores";
 import { createCustomToast, ToastType } from "../../../utils/custom_toast";
@@ -129,19 +145,13 @@ export default {
         align: "center",
         key: "certificationType",
       },
-      // {
-      //   title: "Pricing Policy ID",
-      //   align: "center",
-      //   key: "pricingPolicyId",
-      // },
-      // {
-      //   title: "Stellar Address",
-      //   align: "center",
-      //   key: "stellarAddress",
-      // },
     ] as any[];
+    const loading = ref(false);
+    const page = ref<number>(1);
+    const pageSize = ref(10);
     const expanded = ref<any[]>();
     const farms = ref<FarmInfo[]>();
+    const farmsCount = ref();
     const showDialogue = ref(false);
     const valid = ref(false);
     const address = ref();
@@ -154,12 +164,20 @@ export default {
 
     async function getUserFarms() {
       try {
-        const userFarms = await gridStore.grid.capacity.getUserFarms({ twinId });
-        farms.value = userFarms;
-        return userFarms;
+        const { data, count } = await gridProxyClient.farms.list({
+          retCount: true,
+          twinId,
+          page: page.value,
+          size: pageSize.value,
+        });
+        farms.value = data;
+        farmsCount.value = count ?? 0;
+        return farms.value;
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to get user farms!", ToastType.danger);
+      } finally {
+        loading.value = false;
       }
     }
 
@@ -191,6 +209,9 @@ export default {
       gridStore,
       headers,
       farms,
+      loading,
+      page,
+      pageSize,
       expanded,
       search,
       showDialogue,
@@ -198,6 +219,7 @@ export default {
       valid,
       isValidAddress,
       isAdding,
+      farmsCount,
       getUserFarms,
       setStellarAddress,
       customStellarValidation,

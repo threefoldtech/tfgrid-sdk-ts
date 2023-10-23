@@ -1,18 +1,16 @@
 <template>
   <div class="my-6">
-    <v-data-table :headers="headers" :items="publicIps" class="elevation-1">
+    <AddIP
+      v-model:farmId="$props.farmId"
+      v-model:type="type"
+      v-model:publicIP="publicIP"
+      v-model:toPublicIP="toPublicIP"
+      v-model:gateway="gateway"
+      @add-publicIPs="publicIps.push(...$event)"
+    />
+    <v-data-table v-if="publicIps?.length > 0" :headers="headers" :items="publicIps" class="elevation-1">
       <template v-slot:top>
-        <div class="d-flex ma-4 align-center">
-          <p class="text-subtitle-1 font-weight-bold p-3 w-50">Public IPs</p>
-          <AddIP
-            v-model:farmId="$props.farmId"
-            v-model:type="type"
-            v-model:publicIP="publicIP"
-            v-model:toPublicIP="toPublicIP"
-            v-model:gateway="gateway"
-            @add-publicIPs="publicIps.push(...$event)"
-          />
-        </div>
+        <p class="text-subtitle-1 font-weight-bold pa-4 ma-4 w-50">Public IPs</p>
       </template>
       <template #[`item.ip`]="{ item }">
         {{ item.raw.ip || "-" }}
@@ -31,7 +29,9 @@
         </v-btn>
         <v-dialog v-model="showDialogue" max-width="600">
           <v-card>
-            <v-toolbar color="primary" dark class="font-weight-bold px-3">Delete IP</v-toolbar>
+            <v-toolbar color="primary" dark class="custom-toolbar">
+              <p class="mb-5">Create Farm</p>
+            </v-toolbar>
             <v-card-text> Are you sure you want to delete IP {{ item.raw.ip }}? </v-card-text>
             <v-card-actions class="justify-end px-5 pb-5 pt-0">
               <v-btn
@@ -140,7 +140,8 @@ export default {
 };
 </script>
 <style scoped>
-.v-toolbar {
-  max-height: 3rem;
+.custom-toolbar {
+  height: 2.5rem !important;
+  padding-left: 10px;
 }
 </style>

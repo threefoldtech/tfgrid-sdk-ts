@@ -1,7 +1,7 @@
 <template v-if="nodes">
   <div class="my-6">
     <v-card color="primary rounded-b-0">
-      <v-card-title class="py-1 text-subtitle-1 font-weight-bold">Your Nodes</v-card-title>
+      <v-card-title class="py-1 text-subtitle-1">Your Nodes</v-card-title>
     </v-card>
     <v-data-table
       :headers="headers"
@@ -17,6 +17,12 @@
           }
         }
       "
+      :items-per-page-options="[
+        { value: 5, title: '5' },
+        { value: 10, title: '10' },
+        { value: 15, title: '15' },
+        { value: 50, title: '50' },
+      ]"
       expand-on-click
       return-object
     >
@@ -24,132 +30,22 @@
         <tr>
           <td :colspan="columns.length" key="item.id">
             <v-container>
-              <v-card outlined>
-                <v-card-title>
-                  <span class="headline">Node Details</span>
-                </v-card-title>
-                <v-card-text>
-                  <v-row :justify="'space-around'">
-                    <v-col cols="8">
-                      <v-row no-gutters>
-                        <v-col col="2">
-                          <span>Node ID</span>
-                        </v-col>
-                        <v-col cols="9">
-                          <span>{{ item.raw.nodeId }}</span>
-                        </v-col>
-                      </v-row>
-
-                      <v-row no-gutters>
-                        <v-col col="2">
-                          <span>Farm ID</span>
-                        </v-col>
-                        <v-col cols="9">
-                          <span>{{ item.raw.farmId }}</span>
-                        </v-col>
-                      </v-row>
-
-                      <v-row no-gutters>
-                        <v-col col="2">
-                          <span>Twin ID</span>
-                        </v-col>
-                        <v-col cols="9">
-                          <span>{{ item.raw.twinId }}</span>
-                        </v-col>
-                      </v-row>
-
-                      <v-row no-gutters>
-                        <v-col col="2">
-                          <span>Certification</span>
-                        </v-col>
-                        <v-col cols="9">
-                          <span>{{ item.raw.certificationType }}</span>
-                        </v-col>
-                      </v-row>
-
-                      <v-row no-gutters>
-                        <v-col col="2">
-                          <span>First boot at</span>
-                        </v-col>
-                        <v-col cols="9">
-                          <span>{{ new Date(parseInt(item.raw.created) * 1000) }}</span>
-                        </v-col>
-                      </v-row>
-
-                      <v-row no-gutters>
-                        <v-col col="2">
-                          <span>Updated at</span>
-                        </v-col>
-                        <v-col cols="9">
-                          <span>{{ new Date(parseInt(item.raw.updatedAt) * 1000) }}</span>
-                        </v-col>
-                      </v-row>
-
-                      <v-row no-gutters>
-                        <v-col col="2">
-                          <span>Country</span>
-                        </v-col>
-                        <v-col cols="9">
-                          <span>{{ item.raw.country }}</span>
-                        </v-col>
-                      </v-row>
-
-                      <v-row no-gutters>
-                        <v-col col="2">
-                          <span>City</span>
-                        </v-col>
-                        <v-col cols="9">
-                          <span>{{ item.raw.city }}</span>
-                        </v-col>
-                      </v-row>
-
-                      <v-row no-gutters>
-                        <v-col col="2">
-                          <span>Serial Number</span>
-                        </v-col>
-                        <v-col cols="9">
-                          <span>{{ item.raw.serialNumber }}</span>
-                        </v-col>
-                      </v-row>
-
-                      <v-row no-gutters>
-                        <v-col col="2">
-                          <span>Farming Policy ID</span>
-                        </v-col>
-                        <v-col cols="9">
-                          <span>{{ item.raw.farmingPolicyId }}</span>
-                        </v-col>
-                      </v-row>
-                    </v-col>
-                    <v-col cols="4" class="text-center" :align-self="'center'">
-                      <v-tooltip bottom>
-                        <template v-slot:activator="{ props }">
-                          <v-progress-circular
-                            v-bind="props"
-                            :rotate="-90"
-                            :size="150"
-                            :width="12"
-                            :model-value="item.raw.uptime"
-                            class="my-3"
-                            color="primary"
-                          />
-                          <p>Uptime: {{ item.raw.uptime }}%</p>
-                        </template>
-                        <span>Current Node Uptime Percentage (since start of the current minting period)</span>
-                      </v-tooltip>
-                    </v-col>
-                  </v-row>
-                </v-card-text>
-              </v-card>
+              <card-details
+                :loading="false"
+                title="Node Details"
+                icon="mdi-resistor-nodes"
+                :items="getNodeDetails(item.raw)"
+              ></card-details>
             </v-container>
-
             <v-expansion-panels v-model="resourcesPanel" :disabled="false" focusable>
               <v-expansion-panel>
                 <v-expansion-panel-title> Resource Units Reserved </v-expansion-panel-title>
                 <v-expansion-panel-text>
                   <v-row class="mt-5 mb-5">
                     <v-col v-for="(value, key) in item.raw.total_resources" :key="key" align="center">
-                      <p class="text-center text-uppercase">{{ key }}</p>
+                      <p class="text-center text-uppercase">
+                        {{ key === "cru" ? "cpu" : key === "mru" ? "ram" : key }}
+                      </p>
                       <v-flex class="text-truncate">
                         <v-tooltip bottom class="d-none">
                           <template v-slot:activator="{ props }">
@@ -217,6 +113,8 @@
 <script lang="ts">
 import { onMounted, ref } from "vue";
 
+import CardDetails from "@/explorer/components/node_details_cards/card_details.vue";
+import type { NodeDetailsCard } from "@/explorer/utils/types";
 import {
   getNodeAvailability,
   getNodeMintingFixupReceipts,
@@ -225,7 +123,7 @@ import {
 } from "@/utils/node";
 
 import { gridProxyClient } from "../../../clients";
-import { useGrid, useProfileManager } from "../../../stores";
+import { useProfileManager } from "../../../stores";
 import { createCustomToast, ToastType } from "../../../utils/custom_toast";
 import AddPublicConfig from "./add_public_config.vue";
 import NodeMintingDetails from "./NodeMintingDetails.vue";
@@ -237,9 +135,9 @@ export default {
     NodeMintingDetails,
     AddPublicConfig,
     SetExtraFee,
+    CardDetails,
   },
   setup() {
-    const gridStore = useGrid();
     const profileManager = useProfileManager();
     const nodes = ref<NodeInterface[]>();
     const headers = [
@@ -272,6 +170,7 @@ export default {
         title: "Actions",
         align: "center",
         key: "actions",
+        sortable: false,
       },
     ] as any[];
 
@@ -302,10 +201,10 @@ export default {
     async function getUserNodes() {
       try {
         const twinId = profileManager.profile!.twinId;
-        const userFarms = await gridStore.grid.capacity.getUserFarms({ twinId });
-        const farmIds = userFarms.map(farm => farm.farmId).join(",");
-        const { data } = await gridProxyClient.nodes.list({ farmIds });
-        const _nodes = data as unknown as NodeInterface[];
+        const { data } = await gridProxyClient.farms.list({ twinId });
+        const farmIds = data.map(farm => farm.farmId).join(",");
+        const res = await gridProxyClient.nodes.list({ farmIds });
+        const _nodes = res.data as unknown as NodeInterface[];
 
         const nodesWithResources = _nodes.map(async (node: NodeInterface) => {
           try {
@@ -336,7 +235,7 @@ export default {
     }
 
     function getColor(status: string) {
-      return status === "down" ? "red" : "primary";
+      return status === "down" ? "tonal" : "primary";
     }
 
     function getPercentage(item: any, type: any) {
@@ -349,6 +248,22 @@ export default {
 
     function byteToGB(capacity: number) {
       return (capacity / 1024 / 1024 / 1024).toFixed(2);
+    }
+
+    function getNodeDetails(item: any): NodeDetailsCard[] {
+      return [
+        { name: "Node ID", value: item.nodeId },
+        { name: "Farm ID", value: item.farmId },
+        { name: "Twin ID", value: item.twinId },
+        { name: "Certification", value: item.certificationType },
+        { name: "First Boot at", value: new Date(parseInt(item.created) * 1000) },
+        { name: "Updated at", value: new Date(parseInt(item.updatedAt) * 1000) },
+        { name: "Country", value: item.country },
+        { name: "City", value: item.city },
+        { name: "Serial Number", value: item.serialNumber },
+        { name: "Pricing Policy", value: item.farmingPolicyId },
+        { name: "Uptime", value: item.uptime + "%" },
+      ];
     }
 
     return {
@@ -364,6 +279,7 @@ export default {
       getColor,
       getPercentage,
       byteToGB,
+      getNodeDetails,
     };
   },
 };
