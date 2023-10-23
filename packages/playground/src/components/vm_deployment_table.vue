@@ -113,7 +113,11 @@ async function loadDeployments() {
   if (chunk3.count > 0) await grid!.gateway.list();
 
   const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
-  const failedDeployments = [...(chunk1 as any).failedDeployments, ...(chunk2 as any).failedDeployments];
+  const failedDeployments = [
+    ...(chunk1 as any).failedDeployments,
+    ...(chunk2 as any).failedDeployments,
+    ...(chunk3 as any).failedDeployments,
+  ];
   namesOfFailedDeployments.value = failedDeployments.join(", ");
 
   count.value = vms.count;
