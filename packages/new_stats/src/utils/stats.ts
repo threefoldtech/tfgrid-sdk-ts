@@ -1,7 +1,16 @@
-import { Network, type Stats } from "@threefold/gridproxy_client";
+import GridProxyClient, { Network, NodeStatus, type Stats } from "@threefold/gridproxy_client";
 
 import type { NetworkStats } from "@/types";
 // import { stat } from "fs";
+
+export async function getStats(network: Network): Promise<Stats> {
+  try {
+    const client = new GridProxyClient(network);
+    return await client.stats.get({ status: NodeStatus.Up });
+  } catch (error) {
+    throw new Error(`Failed to retrieve ${network} network statistics`);
+  }
+}
 
 function mergeNodeDistribution(stats: Stats["nodesDistribution"][]) {
   const keys = new Set(stats.map(obj => Object.keys(obj)).flat());

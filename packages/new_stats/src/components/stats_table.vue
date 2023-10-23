@@ -47,23 +47,12 @@
 
 <script lang="ts" setup>
 import { Network } from "@threefold/gridproxy_client";
-import { storeToRefs } from "pinia";
-import { computed, ref, watch } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
-import { useStatsStore } from "../store/stats/index";
 import type { IStatistics, NetworkStats } from "../types/index";
-import { formatData } from "../utils/formatData";
+import { formatData, getStats } from "../utils/stats";
 import toTeraOrGigaOrPeta from "../utils/toTeraOrGegaOrPeta";
 import StatisticsCard from "./statistics_card.vue";
-const $store = useStatsStore();
-const { getNetworkStats } = storeToRefs($store);
-const networkStats = computed((): NetworkStats => {
-  return {
-    dev: getNetworkStats.value(Network.Dev),
-    main: getNetworkStats.value(Network.Main),
-    test: getNetworkStats.value(Network.Test),
-  };
-});
 
 const props = defineProps({
   networks: {
@@ -71,13 +60,14 @@ const props = defineProps({
     require: true,
   },
 });
+
 async function getStatsData(refresh = false) {
   if (props.networks) {
     props.networks.forEach(async (network: Network) => {
       if (!networkStats.value[network] || refresh)
         try {
           loading.value = true;
-          await $store.getStats(network.toLowerCase() as Network);
+          networkStats.value[network] = await getStats(network.toLowerCase() as Network);
         } catch (error) {
           console.log(error);
         } finally {
@@ -92,9 +82,19 @@ watch(
   { deep: true },
 );
 const loading = ref(true);
-defineExpose({ loading, getStatsData });
 const failed = ref(false);
+defineExpose({ loading, getStatsData });
 
+const networkStats: Ref<NetworkStats> = ref({
+  dev: undefined,
+  main: undefined,
+  test: undefined,
+});
+const nodesDistribution = computed(() => JSON.stringify(stats.value.nodesDistribution));
+
+const stats = computed(() => {
+  return formatData(props.networks as Network[], networkStats.value);
+});
 const Istats = computed((): IStatistics[] => {
   {
     return [
@@ -113,15 +113,10 @@ const Istats = computed((): IStatistics[] => {
     ];
   }
 });
-
-const nodesDistribution = computed(() => JSON.stringify(stats.value.nodesDistribution));
-
-const stats = computed(() => {
-  return formatData(props.networks as Network[], networkStats.value);
-});
 </script>
 <script lang="ts">
 export default {
   name: "StatsTable",
 };
 </script>
+../utils/stats
