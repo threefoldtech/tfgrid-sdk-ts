@@ -92,6 +92,7 @@ export function getWireguardConfig(grid: GridClient, name: string) {
 export type K8S = { masters: any[]; workers: any[]; deploymentName: string; wireguard?: any };
 export async function loadK8s(grid: GridClient) {
   const clusters = await grid.k8s.list();
+  const failedK8s: string[] = [];
 
   const projectName = grid.clientOptions.projectName;
   const grids = (await Promise.all(
@@ -104,6 +105,7 @@ export async function loadK8s(grid: GridClient) {
         `%c[Error] failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`,
         "color: rgb(207, 102, 121)",
       );
+      failedK8s.push(name);
       return null;
     });
   });
@@ -140,6 +142,7 @@ export async function loadK8s(grid: GridClient) {
   return <LoadedDeployments<K8S>>{
     count: clusters.length,
     items: data,
+    failedK8s,
   };
 }
 

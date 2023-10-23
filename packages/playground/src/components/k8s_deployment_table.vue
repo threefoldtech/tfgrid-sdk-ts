@@ -1,6 +1,10 @@
 <template>
   <v-alert v-if="!loading && count && items.length < count" type="warning" variant="tonal">
-    Failed to load <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
+    Failed to load deployment{{ count - items.length > 1 ? "s" : "" }} with name{{
+      count - items.length > 1 ? "s" : ""
+    }}
+    <strong>{{ namesOfFailedDeployments }}</strong
+    >.
   </v-alert>
 
   <ListTable
@@ -76,6 +80,7 @@ defineEmits<{ (event: "update:model-value", value: any[]): void }>();
 const count = ref<number>();
 const items = ref<any[]>([]);
 const loading = ref(false);
+const namesOfFailedDeployments = ref("");
 
 onMounted(loadDeployments);
 async function loadDeployments() {
@@ -87,6 +92,9 @@ async function loadDeployments() {
   const chunk3 = await loadK8s(updateGrid(grid!, { projectName: "" }));
 
   const clusters = mergeLoadedDeployments(chunk1, chunk2, chunk3);
+  const failedDeployments = [...(chunk1 as any).failedK8s, ...(chunk2 as any).failedK8s, ...(chunk3 as any).failedK8s];
+  namesOfFailedDeployments.value = failedDeployments.join(", ");
+
   count.value = clusters.count;
   items.value = clusters.items;
   loading.value = false;
