@@ -31,6 +31,7 @@ class GridClientConfig {
   twinId: number;
   seed: string;
   deploymentTimeoutMinutes: number;
+  disableMigration: boolean;
 }
 class ClientOptions {
   constructor(
@@ -48,6 +49,7 @@ class ClientOptions {
     public relayURL?: string,
     public activationURL?: string,
     public deploymentTimeoutMinutes?: number,
+    public disableMigration?: boolean,
   ) {}
 }
 

@@ -52,6 +52,7 @@ class GridClient {
       keypairType: clientOptions.keypairType ? clientOptions.keypairType : KeypairType.sr25519,
       backendStorageType: clientOptions.backendStorageType ? clientOptions.backendStorageType : BackendStorageType.auto,
       deploymentTimeoutMinutes: clientOptions.deploymentTimeoutMinutes ? clientOptions.deploymentTimeoutMinutes : 10,
+      disableMigration: clientOptions.disableMigration || false,
     };
     if (
       !(
@@ -153,6 +154,7 @@ class GridClient {
       twinId: this.twinId,
       seed: this.clientOptions.seed,
       deploymentTimeoutMinutes: this.clientOptions.deploymentTimeoutMinutes,
+      disableMigration: this.clientOptions.disableMigration,
     };
     for (const module of Object.getOwnPropertyNames(modules).filter(item => typeof modules[item] === "function")) {
       if (module.includes("Model")) {

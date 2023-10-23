@@ -30,6 +30,7 @@ async function getClient(): Promise<GridClient> {
     network: config.network,
     mnemonic: config.mnemonic,
     storeSecret: config.storeSecret,
+    disableMigration: true,
   });
   await gridClient.connect();
   return gridClient;

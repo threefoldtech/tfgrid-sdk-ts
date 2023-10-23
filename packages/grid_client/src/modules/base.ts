@@ -48,6 +48,10 @@ class BaseModule {
   }
 
   getNewDeploymentPath(...paths: string[]): string {
+    if (this.config.disableMigration) {
+      return PATH.join(this.getDeploymentPath(""), ...paths);
+    }
+
     return PATH.join(this.config.storePath, this.moduleName, this.projectName, ...paths);
   }
 
@@ -140,11 +144,14 @@ class BaseModule {
       }
 
       const { deploymentData, deploymentHash: hash } = nodeContract;
-      const oldData = JSON.parse(deploymentData || "{}") as unknown as {
-        type: string;
-        name: string;
-        projectName: string;
-      };
+
+      let oldData: any;
+      try {
+        oldData = JSON.parse(deploymentData);
+      } catch {
+        oldData = {};
+      }
+
       const { name, projectName } = oldData;
 
       let instanceName = name;
@@ -214,7 +221,10 @@ class BaseModule {
   }
 
   async _list(): Promise<string[]> {
-    await this._migrateListKeys();
+    if (!this.config.disableMigration) {
+      await this._migrateListKeys();
+    }
+
     return this.backendStorage.list(this.getNewDeploymentPath(""));
   }
 
