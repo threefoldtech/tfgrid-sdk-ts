@@ -17,11 +17,13 @@
 
     <v-dialog v-model="openVotePopup" max-width="600">
       <v-card>
-        <v-toolbar color="primary" dark class="custom-toolbar">Vote Reminder</v-toolbar>
+        <v-toolbar color="primary" dark class="custom-toolbar bold-text">Vote Reminder</v-toolbar>
         <v-card-text>There are {{ numberOfProposalsToVoteOn }} active proposals you can vote on now</v-card-text>
         <v-card-actions class="justify-end pa-5">
-          <v-btn @click="openVotePopup = false" class="grey lighten-2 black--text">Close</v-btn>
-          <v-btn @click="redirectToDao" class="primary white--text">Vote</v-btn>
+          <v-btn @click="redirectToDao" variant="elevated" color="primary" class="mr-2 text-subtitle-2">Vote</v-btn>
+          <v-btn @click="openVotePopup = false" variant="outlined" color="anchor" class="mr-2 text-subtitle-2"
+            >Close</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -180,13 +182,18 @@ function copy(id: string) {
 }
 
 .custom-button {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: bold;
 }
 
 .custom-toolbar {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: bold;
   padding-left: 10px;
+}
+
+.bold-text {
+  font-weight: 500;
+  padding-left: 1rem;
 }
 </style>

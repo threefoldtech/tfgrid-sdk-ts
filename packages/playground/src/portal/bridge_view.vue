@@ -74,8 +74,7 @@
             </v-text-field>
           </v-form>
         </v-card-text>
-        <v-card-actions class="justify-end">
-          <v-btn color="primary" class="bold-text" @click="openWithdrawDialog = false"> Close </v-btn>
+        <v-card-actions class="justify-end pb-4 px-6">
           <v-btn
             class="white--text"
             @click="withdrawTFT(target, amount)"
@@ -83,6 +82,7 @@
             :loading="loadingWithdraw"
             >Send</v-btn
           >
+          <v-btn variant="outlined" color="anchor" class="bold-text" @click="openWithdrawDialog = false"> Close </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -233,7 +233,7 @@ export default {
 }
 
 .bold-text {
-  font-weight: bold;
+  font-weight: 500;
   padding-left: 1rem;
 }
 </style>
