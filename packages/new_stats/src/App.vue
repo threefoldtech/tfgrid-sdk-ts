@@ -12,7 +12,7 @@ import StatisticsView from "./views/statistics.vue";
 
   <main>
     <StatisticsView />
-    <v-sheet style="position: static; bottom: 0%" class="w-100 d-flex align-center justify-center">
+    <v-sheet style="position: relative; bottom: 0%" class="w-100 d-flex align-center justify-center">
       <p class="my-1 font-weight-bold">{{ new Date().getFullYear() }} - ThreeFoldTech</p>
     </v-sheet>
   </main>

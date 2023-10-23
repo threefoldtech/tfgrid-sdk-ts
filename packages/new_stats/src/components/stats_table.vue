@@ -1,14 +1,14 @@
 <template>
   <div>
-    <v-sheet color="transparent" v-if="loading" class="d-flex align-center justify-center">
+    <v-sheet color="transparent" height="82vh" v-if="loading" class="d-flex align-center justify-center">
       <v-container class="text-center d-block">
         <v-progress-circular size="40" indeterminate />
         <p class="pt-4 font-weight-bold">Loading stats data</p>
       </v-container>
     </v-sheet>
     <!--error-->
-    <v-sheet color="transparent" height="80vh" v-else-if="failed" class="d-flex align-center justify-center">
-      <v-container class="text-center w-50">
+    <v-sheet color="transparent" height="82vh" v-else-if="failed" class="d-flex align-center w-100 justify-center">
+      <v-container class="text-center">
         <v-icon color="error" size="x-large">mdi-close-circle-outline</v-icon>
         <v-container class="text-error">
           Failed to get stats data, Please check you internet connection or try again later</v-container
@@ -64,11 +64,11 @@ const props = defineProps({
 });
 
 async function getStatsData(refresh = false) {
-  failed.value = false;
   if (props.networks) {
     props.networks.forEach(async (network: Network) => {
       if (!networkStats.value[network] || refresh)
         try {
+          failed.value = false;
           loading.value = true;
           networkStats.value[network] = await getStats(network.toLowerCase() as Network);
         } catch (error) {
