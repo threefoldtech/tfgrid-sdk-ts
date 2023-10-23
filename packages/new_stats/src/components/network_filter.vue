@@ -1,18 +1,13 @@
 <template>
-  <v-row class="d-flex pt-4">
-    <v-col class="d-flex justify-start py-0 align-center">
-      <div v-for="(network, index) in networks" :key="index" style="min-width: fit-content" class="px-2">
-        <v-switch
-          hide-details
-          color="primary"
-          :model-value="network.value"
-          @update:model-value="updateNetworks($event, index)"
-          inset
-          :label="network.label + ' Nodes'"
-        />
-      </div>
-    </v-col>
-    <v-col class="d-flex justify-end pb-0">
+  <v-row class="d-flex pt-4 align-center">
+    <v-col
+      order-xl="last"
+      order-lg="last"
+      cols="12"
+      lg="6"
+      xl="6"
+      class="d-flex justify-lg-end justify-xl-end justify-center pb-2 align-center"
+    >
       <v-btn
         flat
         variant="outlined"
@@ -24,8 +19,36 @@
         <p class="font-weight-bold text-capitalize">Refresh</p>
       </v-btn>
     </v-col>
-    <v-divider :thickness="1" class="border-opacity-50 pb-4" color="gray"></v-divider>
+    <v-col
+      cols="12"
+      lg="6"
+      xl="6"
+      class="d-flex justify-end justify-lg-start justify-xl-start flex-wrap py-0 align-center"
+    >
+      <v-col
+        cla
+        cols="12"
+        lg="3"
+        xl="3"
+        v-for="(network, index) in networks"
+        :key="index"
+        class="py-0 px-1 d-flex text-center justify-center"
+      >
+        <div class="pa-0">
+          <v-switch
+            style="min-width: fit-content"
+            hide-details
+            color="primary"
+            :model-value="network.value"
+            @update:model-value="updateNetworks($event, index)"
+            inset
+            :label="network.label + ' Nodes'"
+          />
+        </div>
+      </v-col>
+    </v-col>
   </v-row>
+  <v-divider :thickness="1" class="border-opacity-50 mt-4" color="gray"></v-divider>
 </template>
 
 <script lang="ts" setup>
