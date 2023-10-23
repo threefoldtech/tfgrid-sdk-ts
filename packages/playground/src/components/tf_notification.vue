@@ -3,8 +3,6 @@
 </template>
 
 <script lang="ts" setup>
-import "mosha-vue-toastify/dist/style.css";
-
 import {
   ContractStates,
   type GqlContracts,
@@ -13,8 +11,7 @@ import {
   GridClient,
   type NodeInfo,
 } from "@threefold/grid_client";
-import { onMounted } from "vue";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 
 import { getOfflineNodes } from "@/utils/get_offline_nodes";
 
@@ -26,40 +23,42 @@ const profileManager = useProfileManager();
 const contractsCount = ref(0);
 
 async function checkOfflineDeployments(grid: GridClient | null) {
-  const deploymentsNodeIds: number[] = [];
-  const nodesWithPubIps: number[] = [];
+  const deploymentsNodeIds = new Set();
+  const nodesWithPubIps = new Set();
 
   const offlineNodes: NodeInfo[] = await getOfflineNodes(grid);
   const myContracts: GqlContracts = await grid!.contracts.listMyContracts();
   const contracts: (GqlNodeContract | GqlRentContract)[] = [...myContracts.nodeContracts, ...myContracts.rentContracts];
 
-  contracts.map(contract => {
-    deploymentsNodeIds.push(contract.nodeID);
-    if ("numberOfPublicIPs" in contract && contract.numberOfPublicIPs > 0) {
-      nodesWithPubIps.push(contract.nodeID);
-    }
-  });
-
   const userOfflineDeployments = [];
   const withPubIp = [];
 
-  offlineNodes.map(node => {
-    if (deploymentsNodeIds.includes(node.nodeId)) {
+  for (const contract of contracts) {
+    deploymentsNodeIds.add(contract.nodeID);
+    if ("numberOfPublicIPs" in contract && contract.numberOfPublicIPs > 0) {
+      nodesWithPubIps.add(contract.nodeID);
+    }
+  }
+
+  for (const node of offlineNodes) {
+    if (deploymentsNodeIds.has(node.nodeId)) {
       userOfflineDeployments.push(node);
     }
 
-    if (nodesWithPubIps.includes(node.nodeId)) {
+    if (nodesWithPubIps.has(node.nodeId)) {
       withPubIp.push(node);
     }
-  });
+  }
 
-  const deplen = userOfflineDeployments.length;
-  if (deplen) {
+  // Get the deployments length.
+  const deploymentLength = userOfflineDeployments.length;
+
+  if (deploymentLength) {
     const withPublicIpsMessage = `${withPubIp.length} of them with public ${withPubIp.length > 1 ? "IPs" : "IP"}`;
     createCustomToast(
-      `You have ${deplen} ${deplen > 1 ? "contracts" : "contract"} on an offline ${deplen > 1 ? "nodes" : "node"}${
-        withPubIp.length ? withPublicIpsMessage : ""
-      }`,
+      `You have ${deploymentLength} ${deploymentLength > 1 ? "contracts" : "contract"} on an offline ${
+        deploymentLength > 1 ? "nodes " : "node "
+      }${withPubIp.length ? withPublicIpsMessage : ""}`,
       ToastType.warning,
     );
   }
