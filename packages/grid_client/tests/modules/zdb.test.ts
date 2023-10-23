@@ -2,7 +2,7 @@ import { createClient } from "redis";
 
 import { FilterOptions, generateString, GridClient, ZDBModel, ZdbModes, ZDBSModel } from "../../src";
 import { getClient } from "../client_loader";
-import { bytesToGB, checkNodeAvail, generateInt, log } from "../utils";
+import { bytesToGB, generateInt, getOnlineNode, log } from "../utils";
 
 jest.setTimeout(300000);
 
@@ -70,7 +70,7 @@ test("TC1236 - ZDB: Deploy ZDBs", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
   }
-  const nodeId = await checkNodeAvail(nodes);
+  const nodeId = await getOnlineNode(nodes);
   if (nodeId == -1) return;
 
   //Zdb Model

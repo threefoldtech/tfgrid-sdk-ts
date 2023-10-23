@@ -8,7 +8,7 @@ import {
   randomChoice,
 } from "../../src";
 import { config, getClient } from "../client_loader";
-import { bytesToGB, checkNodeAvail, generateInt, k8sWait, log, RemoteRun, splitIP } from "../utils";
+import { bytesToGB, generateInt, getOnlineNode, k8sWait, log, RemoteRun, splitIP } from "../utils";
 
 jest.setTimeout(300000);
 
@@ -79,13 +79,13 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
     if (allNodes.length >= 2) {
-      const qsfsNode1 = await checkNodeAvail(allNodes);
+      const qsfsNode1 = await getOnlineNode(allNodes);
       if (qsfsNode1 == -1) return;
-      let qsfsNode2 = await checkNodeAvail(allNodes);
+      let qsfsNode2 = await getOnlineNode(allNodes);
       if (qsfsNode2 == -1) return;
       let maxCount = 3;
       while (qsfsNode1 == qsfsNode2 && maxCount > 0) {
-        qsfsNode2 = await checkNodeAvail(allNodes);
+        qsfsNode2 = await getOnlineNode(allNodes);
         if (qsfsNode2 == -1) return;
         maxCount--;
       }
@@ -109,13 +109,13 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
     if (allNodes.length >= 2) {
-      const qsfsNode1 = await checkNodeAvail(allNodes);
+      const qsfsNode1 = await getOnlineNode(allNodes);
       if (qsfsNode1 == -1) return;
-      let qsfsNode2 = await checkNodeAvail(allNodes);
+      let qsfsNode2 = await getOnlineNode(allNodes);
       if (qsfsNode2 == -1) return;
       let maxCount = 3;
       while (qsfsNode1 == qsfsNode2 && maxCount > 0) {
-        qsfsNode2 = await checkNodeAvail(allNodes);
+        qsfsNode2 = await getOnlineNode(allNodes);
         if (qsfsNode2 == -1) return;
         maxCount--;
       }
@@ -154,7 +154,7 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
   }
-  const nodeId = await checkNodeAvail(nodes);
+  const nodeId = await getOnlineNode(nodes);
   if (nodeId == -1) return;
 
   //QSFS Model
@@ -364,13 +364,13 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
     if (allNodes.length >= 2) {
-      const qsfsNode1 = await checkNodeAvail(allNodes);
+      const qsfsNode1 = await getOnlineNode(allNodes);
       if (qsfsNode1 == -1) return;
-      let qsfsNode2 = await checkNodeAvail(allNodes);
+      let qsfsNode2 = await getOnlineNode(allNodes);
       if (qsfsNode2 == -1) return;
       let maxCount = 3;
       while (qsfsNode1 == qsfsNode2 && maxCount > 0) {
-        qsfsNode2 = await checkNodeAvail(allNodes);
+        qsfsNode2 = await getOnlineNode(allNodes);
         if (qsfsNode2 == -1) return;
         maxCount--;
       }
@@ -394,13 +394,13 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
     if (allNodes.length >= 2) {
-      const qsfsNode1 = await checkNodeAvail(allNodes);
+      const qsfsNode1 = await getOnlineNode(allNodes);
       if (qsfsNode1 == -1) return;
-      let qsfsNode2 = await checkNodeAvail(allNodes);
+      let qsfsNode2 = await getOnlineNode(allNodes);
       if (qsfsNode2 == -1) return;
       let maxCount = 3;
       while (qsfsNode1 == qsfsNode2 && maxCount > 0) {
-        qsfsNode2 = await checkNodeAvail(allNodes);
+        qsfsNode2 = await getOnlineNode(allNodes);
         if (qsfsNode2 == -1) return;
         maxCount--;
       }
@@ -471,13 +471,13 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
   }
-  const masterNodeId = await checkNodeAvail(masterNode);
+  const masterNodeId = await getOnlineNode(masterNode);
   if (masterNodeId == -1) return;
-  let workerNodeId = await checkNodeAvail(workerNode);
+  let workerNodeId = await getOnlineNode(workerNode);
   if (workerNodeId == -1) return;
   let maxCount = 3;
   while (masterNodeId == workerNodeId && maxCount > 0) {
-    workerNodeId = await checkNodeAvail(workerNode);
+    workerNodeId = await getOnlineNode(workerNode);
     if (workerNodeId == -1) return;
     maxCount--;
   }

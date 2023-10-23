@@ -3,7 +3,7 @@ import { setTimeout } from "timers/promises";
 
 import { FilterOptions, GatewayNameModel, generateString, GridClient, MachinesModel, randomChoice } from "../../src";
 import { config, getClient } from "../client_loader";
-import { checkNodeAvail, generateInt, log, splitIP } from "../utils";
+import { generateInt, getOnlineNode, log, splitIP } from "../utils";
 
 jest.setTimeout(300000);
 
@@ -63,7 +63,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
     farmId: 1,
     availableFor: await gridClient.twins.get_my_twin_id(),
   } as FilterOptions);
-  const gatewayNodeId = await checkNodeAvail(gatewayNodes);
+  const gatewayNodeId = await getOnlineNode(gatewayNodes);
   if (gatewayNodeId == -1) return;
 
   //Node Selection
@@ -95,7 +95,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
   }
-  const nodeId = await checkNodeAvail(nodes);
+  const nodeId = await getOnlineNode(nodes);
   if (nodeId == -1) return;
 
   //VM Model

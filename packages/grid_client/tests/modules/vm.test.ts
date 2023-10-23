@@ -1,6 +1,6 @@
 import { FilterOptions, generateString, GridClient, MachineModel, MachinesModel, randomChoice } from "../../src";
 import { config, getClient } from "../client_loader";
-import { bytesToGB, checkNodeAvail, generateInt, log, RemoteRun, splitIP } from "../utils";
+import { bytesToGB, generateInt, getOnlineNode, log, RemoteRun, splitIP } from "../utils";
 
 jest.setTimeout(300000);
 
@@ -76,7 +76,7 @@ test("TC1228 - VM: Deploy a VM", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
   }
-  const nodeId = await checkNodeAvail(nodes);
+  const nodeId = await getOnlineNode(nodes);
   if (nodeId == -1) return;
 
   //VM Model
@@ -244,7 +244,7 @@ test("TC1229 - VM: Deploy a VM With a Disk", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
   }
-  const nodeId = await checkNodeAvail(nodes);
+  const nodeId = await getOnlineNode(nodes);
   if (nodeId == -1) return;
 
   //VM Model
@@ -421,13 +421,13 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
     } as FilterOptions);
   }
 
-  const vm1NodeId = await checkNodeAvail(vm1Nodes);
+  const vm1NodeId = await getOnlineNode(vm1Nodes);
   if (vm1NodeId == -1) return;
-  let vm2NodeId = await checkNodeAvail(vm2Nodes);
+  let vm2NodeId = await getOnlineNode(vm2Nodes);
   if (vm2NodeId == -1) return;
   let maxCount = 3;
   while (vm1NodeId == vm2NodeId && maxCount > 0) {
-    vm2NodeId = await checkNodeAvail(vm2Nodes);
+    vm2NodeId = await getOnlineNode(vm2Nodes);
     if (vm2NodeId == -1) return;
     maxCount--;
   }

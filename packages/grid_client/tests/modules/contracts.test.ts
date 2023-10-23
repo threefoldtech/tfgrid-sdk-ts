@@ -9,7 +9,7 @@ import {
   NodeContractUpdateModel,
 } from "../../src";
 import { getClient } from "../client_loader";
-import { checkNodeAvail, generateHash, log } from "../utils";
+import { generateHash, getOnlineNode, log } from "../utils";
 
 jest.setTimeout(300000);
 
@@ -35,7 +35,7 @@ test("TC1269 - Contracts: Create Node Contract", async () => {
     availableFor: await gridClient.twins.get_my_twin_id(),
     farmId: 1,
   } as FilterOptions);
-  const nodeId = await checkNodeAvail(nodes);
+  const nodeId = await getOnlineNode(nodes);
   if (nodeId == -1) return;
   const hash = generateHash(generateString(8));
   const data = generateString(64);
@@ -106,7 +106,7 @@ test("TC1271 - Contracts: Get Node Contract By Node ID & Contract Hash", async (
     availableFor: await gridClient.twins.get_my_twin_id(),
     farmId: 1,
   } as FilterOptions);
-  const nodeId = await checkNodeAvail(nodes);
+  const nodeId = await getOnlineNode(nodes);
   if (nodeId == -1) return;
   const hash = generateHash(generateString(8));
   const data = generateString(64);
@@ -188,7 +188,7 @@ test("TC1273 - Contracts: Update Node Contract", async () => {
     availableFor: await gridClient.twins.get_my_twin_id(),
     farmId: 1,
   } as FilterOptions);
-  const nodeId = await checkNodeAvail(nodes);
+  const nodeId = await getOnlineNode(nodes);
   if (nodeId == -1) return;
   const hash = generateHash(generateString(8));
   const data = generateString(64);

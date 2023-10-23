@@ -81,7 +81,7 @@ async function k8sWait(masterSSHClient, k8sMasterName, k8sWorkerName, waitTime, 
   }
 }
 
-async function checkNodeAvail(Nodes) {
+async function getOnlineNode(Nodes) {
   const gridClient = await getClient();
   let node;
   while (Nodes.length > 0) {
@@ -101,4 +101,4 @@ async function checkNodeAvail(Nodes) {
   return node.nodeId;
 }
 
-export { log, generateHash, generateInt, splitIP, bytesToGB, RemoteRun, returnRelay, k8sWait, checkNodeAvail };
+export { log, generateHash, generateInt, splitIP, bytesToGB, RemoteRun, returnRelay, k8sWait, getOnlineNode };
