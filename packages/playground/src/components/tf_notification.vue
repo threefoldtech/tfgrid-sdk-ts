@@ -9,7 +9,6 @@ import {
   type GqlNodeContract,
   type GqlRentContract,
   GridClient,
-  type NodeInfo,
 } from "@threefold/grid_client";
 import { onMounted, ref } from "vue";
 
@@ -23,10 +22,8 @@ const profileManager = useProfileManager();
 const contractsCount = ref(0);
 
 async function checkOfflineDeployments(grid: GridClient | null) {
-  const deploymentsNodeIds: number[] = [];
-  const nodesWithPubIps: number[] = [];
+  const offlineNodesids = (await getOfflineNodes(grid, { flat: true })) as number[];
 
-  const offlineNodes: NodeInfo[] = await getOfflineNodes(grid);
   const myContracts: GqlContracts = await grid!.contracts.listMyContracts();
   const contracts: (GqlNodeContract | GqlRentContract)[] = [...myContracts.nodeContracts, ...myContracts.rentContracts];
 
@@ -34,19 +31,11 @@ async function checkOfflineDeployments(grid: GridClient | null) {
   const withPubIp = [];
 
   for (const contract of contracts) {
-    deploymentsNodeIds.push(contract.nodeID);
-    if ("numberOfPublicIPs" in contract && contract.numberOfPublicIPs > 0) {
-      nodesWithPubIps.push(contract.nodeID);
-    }
-  }
-
-  for (const node of offlineNodes) {
-    if (deploymentsNodeIds.includes(node.nodeId)) {
-      userOfflineDeployments.push(node);
-    }
-
-    if (nodesWithPubIps.includes(node.nodeId)) {
-      withPubIp.push(node);
+    if (offlineNodesids.includes(contract.nodeID)) {
+      userOfflineDeployments.push(contract.nodeID);
+      if ("numberOfPublicIPs" in contract && contract.numberOfPublicIPs > 0) {
+        withPubIp.push(contract.contractID);
+      }
     }
   }
 
@@ -54,7 +43,9 @@ async function checkOfflineDeployments(grid: GridClient | null) {
   const deploymentLength = userOfflineDeployments.length;
 
   if (deploymentLength) {
-    const withPublicIpsMessage = `${withPubIp.length} of them with public ${withPubIp.length > 1 ? "IPs" : "IP"}`;
+    const withPublicIpsMessage = `${withPubIp.length} ${deploymentLength > 1 ? "of them" : ""} with public ${
+      withPubIp.length > 1 ? "IPs" : "IP"
+    }`;
     createCustomToast(
       `You have ${deploymentLength} ${deploymentLength > 1 ? "contracts" : "contract"} on an offline ${
         deploymentLength > 1 ? "nodes " : "node "
