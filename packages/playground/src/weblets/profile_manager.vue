@@ -191,7 +191,7 @@
                   ref="passwordInput"
                 >
                   <v-tooltip
-                    location="bottom"
+                    location="top right"
                     text="Used to encrypt your mnemonic on your local system, and is used to login from the same device."
                   >
                     <template #activator="{ props: tooltipProps }">
