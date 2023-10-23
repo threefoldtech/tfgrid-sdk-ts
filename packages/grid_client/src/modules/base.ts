@@ -48,10 +48,6 @@ class BaseModule {
   }
 
   getNewDeploymentPath(...paths: string[]): string {
-    if (this.config.disableMigration) {
-      return PATH.join(this.getDeploymentPath(""), ...paths);
-    }
-
     return PATH.join(this.config.storePath, this.moduleName, this.projectName, ...paths);
   }
 
