@@ -1,21 +1,12 @@
 <template>
-  <v-container fluid class="pa-0">
-    <v-sheet color="title" class="w-100 d-flex align-center justify-center">
-      <v-icon class="mr-1" size="large" icon="mdi-chart-scatter-plot"> </v-icon>
-      <p class="my-2 font-weight-bold text-h6">Statistics</p>
-    </v-sheet>
-    <v-col cols="11" class="mx-auto pb-0">
-      <networkFilter
-        @refresh="statsTableRef.getStatsData(true)"
-        :loading="statsTableRef?.loading"
-        v-model="networks"
-      ></networkFilter>
-      <statsTable :networks="networks" ref="statsTableRef"></statsTable>
-    </v-col>
-    <v-sheet style="position: fixed; bottom: 0%" class="w-100 d-flex align-center justify-center">
-      <p class="my-1 font-weight-bold">{{ new Date().getFullYear() }} - ThreeFoldTech</p>
-    </v-sheet>
-  </v-container>
+  <v-col cols="11" class="mx-auto pt-0 pb-4">
+    <networkFilter
+      @refresh="statsTableRef.getStatsData(true)"
+      :loading="statsTableRef?.loading"
+      v-model="networks"
+    ></networkFilter>
+    <statsTable :networks="networks" ref="statsTableRef"></statsTable>
+  </v-col>
 </template>
 
 <script lang="ts" setup>

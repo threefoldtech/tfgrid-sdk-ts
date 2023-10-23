@@ -17,7 +17,7 @@
         flat
         variant="outlined"
         :loading="loading"
-        color="#74DDC3"
+        color="secondary"
         prepend-icon="mdi-reload"
         @click="emits('refresh')"
       >

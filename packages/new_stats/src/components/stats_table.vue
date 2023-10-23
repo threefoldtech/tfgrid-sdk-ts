@@ -1,22 +1,24 @@
 <template>
   <div>
-    <v-sheet color="transparent" height="100vh" v-if="loading" class="d-flex align-center justify-center">
+    <v-sheet color="transparent" v-if="loading" class="d-flex align-center justify-center">
       <v-container class="text-center d-block">
         <v-progress-circular size="40" indeterminate />
         <p class="pt-4 font-weight-bold">Loading stats data</p>
       </v-container>
     </v-sheet>
+    <!--error-->
+    <v-sheet color="transparent" height="80vh" v-else-if="failed" class="d-flex align-center justify-center">
+      <v-container class="text-center w-50">
+        <v-icon color="error" size="x-large">mdi-close-circle-outline</v-icon>
+        <v-container class="text-error">
+          Failed to get stats data, Please check you internet connection or try again later</v-container
+        >
+        <v-btn class="text-capitalize" @click="getStatsData(true)" color="secondary">Try again </v-btn>
+      </v-container>
+    </v-sheet>
     <v-container fluid class="py-0 pt-4 ml-2 d-flex justify-center" v-else>
       <v-row class="w-100">
-        <!-- <v-col color="red" v-if="failed">
-          <v-alert type="error" variant="tonal">
-            Failed to get stats data after 3 attempts, Feel free to contact the support team or try again later.
-            <v-btn @click="fetchData" color="transparent">
-              <v-icon> mdi-refresh</v-icon>
-            </v-btn>
-          </v-alert>
-        </v-col> -->
-        <v-col xl="8" lg="8" md="12" cols="12" class="mt-4 pb-0 px-0">
+        <v-col xl="8" lg="8" md="12" cols="12" class="mt-2 pb-0 px-0">
           <v-col xl="12" lg="12" cols="9" class="mx-auto">
             <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
           </v-col>
@@ -62,6 +64,7 @@ const props = defineProps({
 });
 
 async function getStatsData(refresh = false) {
+  failed.value = false;
   if (props.networks) {
     props.networks.forEach(async (network: Network) => {
       if (!networkStats.value[network] || refresh)
@@ -69,7 +72,7 @@ async function getStatsData(refresh = false) {
           loading.value = true;
           networkStats.value[network] = await getStats(network.toLowerCase() as Network);
         } catch (error) {
-          console.log(error);
+          failed.value = true;
         } finally {
           loading.value = false;
         }
