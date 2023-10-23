@@ -190,14 +190,21 @@
                   #="{ props: validationProps }"
                   ref="passwordInput"
                 >
-                  <VTextField
-                    label="Password"
-                    v-model="password"
-                    v-bind="{ ...passwordInputProps, ...validationProps }"
-                    :disabled="creatingAccount || activatingAccount || activating"
-                    hint="Used to encrypt your mnemonic on your local system, and is used to login from the same device."
-                    class="mb-4"
-                  />
+                  <v-tooltip
+                    location="top right"
+                    text="Used to encrypt your mnemonic on your local system, and is used to login from the same device."
+                  >
+                    <template #activator="{ props: tooltipProps }">
+                      <div v-bind="tooltipProps">
+                        <VTextField
+                          label="Password"
+                          v-model="password"
+                          v-bind="{ ...passwordInputProps, ...validationProps }"
+                          :disabled="creatingAccount || activatingAccount || activating"
+                        />
+                      </div>
+                    </template>
+                  </v-tooltip>
                 </InputValidator>
               </PasswordInputWrapper>
 
