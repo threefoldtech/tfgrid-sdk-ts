@@ -28,7 +28,7 @@
                   <v-btn
                     @click.stop
                     v-bind="props"
-                    color="white"
+                    :color="theme.name.value === AppThemeSelection.light ? 'black' : 'white'"
                     icon="mdi-information-outline"
                     height="24px"
                     width="24px"
@@ -366,7 +366,10 @@ import Cryptr from "cryptr";
 import md5 from "md5";
 import { computed, onMounted, type Ref, ref, watch } from "vue";
 import { nextTick } from "vue";
+import { useTheme } from "vuetify";
 import { generateKeyPair } from "web-ssh-keygen";
+
+import { AppThemeSelection } from "@/utils/app_theme";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useInputRef } from "../hooks/input_validator";
@@ -387,6 +390,8 @@ interface Credentials {
   passwordHash?: string;
   mnemonicHash?: string;
 }
+
+const theme = useTheme();
 
 const props = defineProps({
   modelValue: {
