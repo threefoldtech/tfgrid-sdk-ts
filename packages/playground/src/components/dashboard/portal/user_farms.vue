@@ -1,14 +1,20 @@
 <template v-if="farms">
   <div class="my-6">
-    <v-text-field class="mb-6" v-model="search" label="Search Farm" single-line hide-details></v-text-field>
+    <v-text-field
+      class="mb-6"
+      v-model="search"
+      label="Search farm by ID or farm name"
+      single-line
+      hide-details
+    ></v-text-field>
     <v-data-table-server
       :loading="loading"
       :items-length="farmsCount"
-      loading-text="Loading farms..."
-      :headers="headers"
       :search="search"
+      :headers="headers"
       :items="farms"
       v-model:items-per-page="pageSize"
+      v-model:page="page"
       show-expand
       :expanded="expanded"
       @update:expanded="
@@ -20,6 +26,7 @@
           }
         }
       "
+      expand-on-click
       @update:options="getUserFarms"
       :hover="true"
       :items-per-page-options="[
@@ -28,8 +35,6 @@
         { value: 15, title: '15' },
         { value: 50, title: '50' },
       ]"
-      v-model:page="page"
-      expand-on-click
       return-object
     >
       <template v-slot:top>
@@ -40,14 +45,14 @@
       <template v-slot:expanded-row="{ columns, item }">
         <tr>
           <td :colspan="columns.length">
-            <v-row class="d-flex justify-space-between">
-              <v-col cols="8" class="my-4">
-                <span> Stellar Address: </span>
-                <span> {{ item.raw.stellarAddress || "-" }} </span>
-              </v-col>
-              <v-col cols="4" class="my-4">
-                <span> Pricing Policy: </span>
-                <span> {{ item.raw.pricingPolicyId || "-" }} </span>
+            <v-row>
+              <v-col cols="12" class="mt-4">
+                <card-details
+                  :loading="false"
+                  title="Farm Details"
+                  icon="mdi-silo"
+                  :items="getFarmDetails(item.raw)"
+                ></card-details>
               </v-col>
             </v-row>
             <PublicIPsTable :farmId="item.raw.farmId" />
@@ -109,6 +114,7 @@ import { StrKey } from "stellar-sdk";
 import { onMounted, ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
+import CardDetails from "@/explorer/components/node_details_cards/card_details.vue";
 
 import { useGrid, useProfileManager } from "../../../stores";
 import { createCustomToast, ToastType } from "../../../utils/custom_toast";
@@ -118,6 +124,7 @@ export default {
   name: "UserFarms",
   components: {
     PublicIPsTable,
+    CardDetails,
   },
   setup() {
     const gridStore = useGrid();
@@ -129,21 +136,25 @@ export default {
         title: "Farm ID",
         align: "center",
         key: "farmId",
+        sortable: false,
       },
       {
         title: "Farm Name",
         align: "center",
         key: "name",
+        sortable: false,
       },
       {
         title: "Linked Twin ID",
         align: "center",
         key: "twinId",
+        sortable: false,
       },
       {
         title: "Certification Type",
         align: "center",
         key: "certificationType",
+        sortable: false,
       },
     ] as any[];
     const loading = ref(false);
@@ -162,17 +173,33 @@ export default {
       await getUserFarms();
     });
 
+    function fetch(items: FarmInfo[]) {
+      const start = (page.value - 1) * pageSize.value;
+      const end = start + pageSize.value;
+
+      let filteredItems;
+      if (search.value) {
+        filteredItems = items.filter(
+          item => item.name.toLowerCase().includes(search.value!.toLowerCase()) || item.farmId == +search.value!,
+        );
+      }
+
+      const paginated = filteredItems ? filteredItems.slice(start, end) : items;
+
+      return paginated;
+    }
+
     async function getUserFarms() {
       try {
-        const { data, count } = await gridProxyClient.farms.list({
-          retCount: true,
+        const { data } = await gridProxyClient.farms.list({
           twinId,
           page: page.value,
           size: pageSize.value,
         });
-        farms.value = data;
-        farmsCount.value = count ?? 0;
-        return farms.value;
+
+        const filteredFarms = fetch(data);
+        farms.value = filteredFarms as unknown as FarmInfo[];
+        farmsCount.value = filteredFarms.length;
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to get user farms!", ToastType.danger);
@@ -205,6 +232,25 @@ export default {
       return undefined;
     }
 
+    const copy = (address: string) => {
+      navigator.clipboard.writeText(address);
+      createCustomToast("Copied!", ToastType.success);
+    };
+
+    function getFarmDetails(item: any) {
+      return [
+        {
+          name: "Stellar Address",
+          value: item.stellarAddress || "-",
+          icon: item.stellarAddress ? "mdi-content-copy" : undefined,
+          callback: copy,
+          hint: "Copy the stellar address to the clipboard.",
+        },
+        { name: "Dedicated", value: item.dedicated },
+        { name: "Pricing Policy", value: item.pricingPolicyId },
+      ];
+    }
+
     return {
       gridStore,
       headers,
@@ -223,6 +269,7 @@ export default {
       getUserFarms,
       setStellarAddress,
       customStellarValidation,
+      getFarmDetails,
     };
   },
 };

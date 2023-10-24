@@ -3,9 +3,19 @@
     <v-card color="primary rounded-b-0">
       <v-card-title class="py-1 text-subtitle-1">Your Nodes</v-card-title>
     </v-card>
-    <v-data-table
-      :headers="headers"
+    <v-data-table-server
+      :loading="loading"
       :items="nodes"
+      :items-length="nodesCount"
+      :items-per-page-options="[
+        { value: 5, title: '5' },
+        { value: 10, title: '10' },
+        { value: 15, title: '15' },
+        { value: 50, title: '50' },
+      ]"
+      :headers="headers"
+      v-model:page="page"
+      v-model:items-per-page="pageSize"
       show-expand
       :expanded="expanded"
       @update:expanded="
@@ -17,12 +27,8 @@
           }
         }
       "
-      :items-per-page-options="[
-        { value: 5, title: '5' },
-        { value: 10, title: '10' },
-        { value: 15, title: '15' },
-        { value: 50, title: '50' },
-      ]"
+      @update:options="getUserNodes"
+      :hover="true"
       expand-on-click
       return-object
     >
@@ -106,11 +112,12 @@
         <AddPublicConfig class="me-2" :nodeId="item.raw.nodeId" :farmId="item.raw.farmId" v-model="publicConfig" />
         <SetExtraFee class="me-2" :nodeId="item.raw.nodeId" />
       </template>
-    </v-data-table>
+    </v-data-table-server>
   </div>
 </template>
 
 <script lang="ts">
+import moment from "moment";
 import { onMounted, ref } from "vue";
 
 import CardDetails from "@/explorer/components/node_details_cards/card_details.vue";
@@ -139,32 +146,40 @@ export default {
   },
   setup() {
     const profileManager = useProfileManager();
+    const loading = ref(false);
+    const page = ref<number>(1);
+    const pageSize = ref(10);
     const nodes = ref<NodeInterface[]>();
     const headers = [
       {
         title: "Node ID",
         align: "center",
         key: "nodeId",
+        sortable: false,
       },
       {
         title: "Farm ID",
         align: "center",
         key: "farmId",
+        sortable: false,
       },
       {
         title: "Country",
         align: "center",
         key: "country",
+        sortable: false,
       },
       {
         title: "Serial Number",
         align: "center",
         key: "serialNumber",
+        sortable: false,
       },
       {
         title: "Status",
         align: "center",
         key: "status",
+        sortable: false,
       },
       {
         title: "Actions",
@@ -187,11 +202,12 @@ export default {
     const resourcesPanel = ref([]);
     const receiptsPanel = ref([]);
     const uptime = ref();
+    const nodesCount = ref();
 
     onMounted(async () => {
       const nodes = await getUserNodes();
       await Promise.all(
-        nodes!.map(async (n, i) => {
+        nodes!.map(async (n, _) => {
           n.uptime = +(await getNodeUptimePercentage(n.nodeId));
           return n.uptime;
         }),
@@ -200,17 +216,24 @@ export default {
 
     async function getUserNodes() {
       try {
+        loading.value = true;
         const twinId = profileManager.profile!.twinId;
-        const { data } = await gridProxyClient.farms.list({ twinId });
-        const farmIds = data.map(farm => farm.farmId).join(",");
-        const res = await gridProxyClient.nodes.list({ farmIds });
-        const _nodes = res.data as unknown as NodeInterface[];
+        const farms = await gridProxyClient.farms.list({ twinId });
+        const farmIds = farms.data.map(farm => farm.farmId).join(",");
+        const { data, count } = await gridProxyClient.nodes.list({
+          farmIds,
+          retCount: true,
+          page: page.value,
+          size: pageSize.value,
+        });
 
+        const _nodes = data as unknown as NodeInterface[];
+        nodesCount.value = count ?? 0;
         const nodesWithResources = _nodes.map(async (node: NodeInterface) => {
           try {
             const network = process.env.NETWORK || (window as any).env.NETWORK;
             node.receipts = [];
-            if (network == "dev") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
+            if (network == "main") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
             node.availability = await getNodeAvailability(node.nodeId);
           } catch (error) {
             node.receipts = [];
@@ -231,6 +254,8 @@ export default {
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to get user nodes!", ToastType.danger);
+      } finally {
+        loading.value = false;
       }
     }
 
@@ -256,8 +281,8 @@ export default {
         { name: "Farm ID", value: item.farmId },
         { name: "Twin ID", value: item.twinId },
         { name: "Certification", value: item.certificationType },
-        { name: "First Boot at", value: new Date(parseInt(item.created) * 1000) },
-        { name: "Updated at", value: new Date(parseInt(item.updatedAt) * 1000) },
+        { name: "First Boot at", value: moment(item.created * 1000).format("MM-DD-YY, HH:mm A") },
+        { name: "Updated at", value: moment(item.updatedAt * 1000).format("MM-DD-YY, HH:mm A") },
         { name: "Country", value: item.country },
         { name: "City", value: item.city },
         { name: "Serial Number", value: item.serialNumber },
@@ -267,6 +292,9 @@ export default {
     }
 
     return {
+      loading,
+      page,
+      pageSize,
       nodes,
       headers,
       expanded,
@@ -275,6 +303,7 @@ export default {
       receiptsPanel,
       publicConfig,
       uptime,
+      nodesCount,
       getUserNodes,
       getColor,
       getPercentage,
