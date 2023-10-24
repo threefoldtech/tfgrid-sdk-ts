@@ -49,6 +49,16 @@
     </v-col>
   </v-row>
   <v-divider :thickness="1" class="border-opacity-50 mt-4" color="gray"></v-divider>
+  <v-dialog v-model="filterError" width="auto">
+    <v-alert
+      closable
+      text="You should select one network at least"
+      color="#3C351D"
+      class="text-warning"
+      type="warning"
+      @click:close="filterError = false"
+    ></v-alert>
+  </v-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -68,8 +78,11 @@ const emits = defineEmits<{
   (events: "refresh"): void;
 }>();
 const selectedNetworks = ref([Network.Dev, Network.Main, Network.Test]);
+const filterError = ref(false);
 function updateNetworks(event: Event | undefined, index: number) {
   const network = networks.value[index].label.toLowerCase() as Network;
+  filterError.value = false;
+
   if (event) {
     if (!selectedNetworks.value.includes(network)) {
       selectedNetworks.value.push(network);
@@ -77,6 +90,10 @@ function updateNetworks(event: Event | undefined, index: number) {
     networks.value[index].value = true;
   } else {
     if (selectedNetworks.value.includes(network)) {
+      if (selectedNetworks.value.length <= 1) {
+        filterError.value = true;
+        return;
+      }
       selectedNetworks.value.forEach((element, index) => {
         if (network == element) selectedNetworks.value.splice(index, 1);
       });
@@ -93,4 +110,9 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.v-overlay__scrim {
+  background: black;
+  opacity: 0.6;
+}
+</style>
