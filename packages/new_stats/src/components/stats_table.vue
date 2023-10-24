@@ -1,11 +1,13 @@
 <template>
   <div>
+    <!--loading-->
     <v-sheet color="transparent" height="82vh" v-if="loading" class="d-flex align-center justify-center">
       <v-container class="text-center d-block">
         <v-progress-circular size="40" indeterminate />
         <p class="pt-4 font-weight-bold">Loading stats data</p>
       </v-container>
     </v-sheet>
+
     <!--error-->
     <v-sheet color="transparent" height="82vh" v-else-if="failed" class="d-flex align-center w-100 justify-center">
       <v-container class="text-center">
@@ -16,6 +18,7 @@
         <v-btn class="text-capitalize" @click="getStatsData(true)" color="secondary">Try again </v-btn>
       </v-container>
     </v-sheet>
+
     <v-container fluid class="py-0 pt-4 ml-2 d-flex justify-center" v-else>
       <v-row class="w-100">
         <v-col xl="8" lg="8" md="12" cols="12" class="mt-2 pb-0 px-0">
@@ -63,6 +66,41 @@ const props = defineProps({
   },
 });
 
+const loading = ref(true);
+const failed = ref(false);
+
+const networkStats: Ref<NetworkStats> = ref({
+  dev: undefined,
+  main: undefined,
+  test: undefined,
+});
+
+const formattedStats = computed(() => {
+  return formatData(props.networks as Network[], networkStats.value);
+});
+const nodesDistribution = computed(() => JSON.stringify(formattedStats.value.nodesDistribution));
+const Istats = computed((): IStatistics[] => {
+  {
+    return [
+      { data: formattedStats.value.nodes, title: "Nodes Online", icon: "mdi-laptop" },
+      { data: formattedStats.value.farms, title: "Farms", icon: "mdi-tractor" },
+      { data: formattedStats.value.countries, title: "Countries", icon: "mdi-earth" },
+      { data: formattedStats.value.totalCru, title: "CPUs", icon: "mdi-cpu-64-bit" },
+      { data: toTeraOrGigaOrPeta(formattedStats.value.totalSru.toString()), title: "SSD Storage", icon: "mdi-nas" },
+      {
+        data: toTeraOrGigaOrPeta(formattedStats.value.totalHru.toString()),
+        title: "HDD Storage",
+        icon: "mdi-harddisk",
+      },
+      { data: toTeraOrGigaOrPeta(formattedStats.value.totalMru.toString()), title: "RAM", icon: "mdi-memory" },
+      { data: formattedStats.value.accessNodes, title: "Access Nodes", icon: "mdi-gate" },
+      { data: formattedStats.value.gateways, title: "Gateways", icon: "mdi-boom-gate-outline" },
+      { data: formattedStats.value.twins, title: "Twins", icon: "mdi-brain" },
+      { data: formattedStats.value.publicIps, title: "Public IPs", icon: "mdi-access-point" },
+      { data: formattedStats.value.contracts, title: "Contracts", icon: "mdi-file-document-edit-outline" },
+    ];
+  }
+});
 async function getStatsData(refresh = false) {
   if (props.networks) {
     props.networks.forEach(async (network: Network) => {
@@ -84,42 +122,11 @@ watch(
   async () => await getStatsData(),
   { deep: true },
 );
-const loading = ref(true);
-const failed = ref(false);
+
 defineExpose({ loading, getStatsData });
-
-const networkStats: Ref<NetworkStats> = ref({
-  dev: undefined,
-  main: undefined,
-  test: undefined,
-});
-const nodesDistribution = computed(() => JSON.stringify(stats.value.nodesDistribution));
-
-const stats = computed(() => {
-  return formatData(props.networks as Network[], networkStats.value);
-});
-const Istats = computed((): IStatistics[] => {
-  {
-    return [
-      { data: stats.value.nodes, title: "Nodes Online", icon: "mdi-laptop" },
-      { data: stats.value.farms, title: "Farms", icon: "mdi-tractor" },
-      { data: stats.value.countries, title: "Countries", icon: "mdi-earth" },
-      { data: stats.value.totalCru, title: "CPUs", icon: "mdi-cpu-64-bit" },
-      { data: toTeraOrGigaOrPeta(stats.value.totalSru.toString()), title: "SSD Storage", icon: "mdi-nas" },
-      { data: toTeraOrGigaOrPeta(stats.value.totalHru.toString()), title: "HDD Storage", icon: "mdi-harddisk" },
-      { data: toTeraOrGigaOrPeta(stats.value.totalMru.toString()), title: "RAM", icon: "mdi-memory" },
-      { data: stats.value.accessNodes, title: "Access Nodes", icon: "mdi-gate" },
-      { data: stats.value.gateways, title: "Gateways", icon: "mdi-boom-gate-outline" },
-      { data: stats.value.twins, title: "Twins", icon: "mdi-brain" },
-      { data: stats.value.publicIps, title: "Public IPs", icon: "mdi-access-point" },
-      { data: stats.value.contracts, title: "Contracts", icon: "mdi-file-document-edit-outline" },
-    ];
-  }
-});
 </script>
 <script lang="ts">
 export default {
   name: "StatsTable",
 };
 </script>
-../utils/stats
