@@ -40,7 +40,7 @@ export abstract class AbstractBuilder<T> {
     }
   }
 
-  public async build(path: string, timeout = 5000): Promise<Response> {
+  public async build(path: string, timeout = 10000): Promise<Response> {
     assertString(path);
     assertPattern(path, /^\//);
 
@@ -64,8 +64,6 @@ export abstract class AbstractBuilder<T> {
         signal: controller.signal,
       });
       return response;
-    } catch (error: any) {
-      throw new Error(error);
     } finally {
       clearTimeout(timeoutId);
     }
