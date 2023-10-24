@@ -264,7 +264,7 @@ function addDisk() {
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.VM.toLowerCase();
+  const projectName = ProjectName.VM.toLowerCase() + "/" + name.value;
 
   try {
     const grid = await getGrid(profileManager.profile!, projectName);

@@ -73,6 +73,7 @@ export interface GridNode {
   twin: Twin;
   stats: NodeStats;
   cards: GPUCard[];
+  num_gpu: number;
 }
 
 export class GatewaysClient extends AbstractClient<GatewayBuilder, GatewaysQuery> {

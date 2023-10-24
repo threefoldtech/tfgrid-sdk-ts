@@ -1,5 +1,6 @@
 import * as PATH from "path";
 
+import { GqlNameContract, GqlNodeContract, GqlRentContract } from "../clients/tf-grid";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
@@ -18,12 +19,14 @@ import {
   ContractsByTwinId,
   ContractState,
   CreateServiceContractModel,
+  GetActiveContractsModel,
   GetDedicatedNodePriceModel,
   GetServiceContractModel,
   NameContractCreateModel,
   NameContractGetModel,
   NodeContractCreateModel,
   NodeContractUpdateModel,
+  RentContractCreateModel,
   RentContractGetModel,
   ServiceContractApproveModel,
   ServiceContractBillModel,
@@ -78,6 +81,14 @@ class Contracts {
   async create_name(options: NameContractCreateModel) {
     return (await this.client.contracts.createName(options)).apply();
   }
+
+  @expose
+  @validateInput
+  @checkBalance
+  async createRent(options: RentContractCreateModel) {
+    return (await this.client.contracts.createRent(options)).apply();
+  }
+
   @expose
   @validateInput
   async get(options: ContractGetModel) {
@@ -99,6 +110,12 @@ class Contracts {
   @validateInput
   async getDedicatedNodeExtraFee(options: GetDedicatedNodePriceModel) {
     return await this.client.contracts.getDedicatedNodeExtraFee(options);
+  }
+
+  @expose
+  @validateInput
+  async getActiveContracts(options: GetActiveContractsModel) {
+    return await this.client.contracts.getActiveContracts(options);
   }
 
   @expose
@@ -202,10 +219,10 @@ class Contracts {
   @expose
   @validateInput
   @checkBalance
-  async cancelMyContracts(): Promise<Record<string, number>[]> {
+  async cancelMyContracts(): Promise<(GqlNameContract | GqlRentContract | GqlNodeContract)[]> {
     const contracts = await this.client.contracts.cancelMyContracts({ graphqlURL: this.config.graphqlURL });
     for (const contract of contracts) {
-      await this.invalidateDeployment(contract.contractId);
+      await this.invalidateDeployment(+contract.contractID);
     }
     return contracts;
   }
