@@ -16,10 +16,13 @@ e.g
 tfchain
   |_ tfkvstore
     |_ machines
-      |_ vm # projectName
+    | |_ vm # projectName
+    |    |_ testvm # instanceName
+    |      |_ testvm
+    |          |_ contracts.json
+    |_ gateways
+       |_ vm # projectName
          |_ testvm # instanceName
-           |_ testvm
-           |   |_ contracts.json
            |_ testvmGateway
               |_ contracts.json
 ```
