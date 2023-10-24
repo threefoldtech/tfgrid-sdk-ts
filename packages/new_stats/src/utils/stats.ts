@@ -1,7 +1,6 @@
 import GridProxyClient, { Network, NodeStatus, type Stats } from "@threefold/gridproxy_client";
 
 import type { NetworkStats } from "@/types";
-// import { stat } from "fs";
 
 export async function getStats(network: Network): Promise<Stats> {
   try {

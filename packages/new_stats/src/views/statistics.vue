@@ -15,6 +15,7 @@ import { type Ref, ref } from "vue";
 
 import networkFilter from "../components/network_filter.vue";
 import statsTable from "../components/stats_table.vue";
+
 const statsTableRef = ref();
 const networks = ref() as Ref<Network[]>;
 </script>
