@@ -49,6 +49,8 @@
     </v-col>
   </v-row>
   <v-divider :thickness="1" class="border-opacity-50 mt-4" color="gray"></v-divider>
+
+  <!--warning dialog-->
   <v-dialog v-model="filterError" width="auto">
     <v-alert
       closable
@@ -64,25 +66,29 @@
 <script lang="ts" setup>
 import { Network } from "@threefold/gridproxy_client";
 import { onMounted, ref } from "vue";
+defineProps({
+  loading: Boolean,
+});
+
+const emits = defineEmits<{
+  (events: "update:modelValue", value?: string[]): void;
+  (events: "refresh"): void;
+}>();
+const filterError = ref(false);
 
 const networks = ref([
   { label: "Dev", value: true },
   { label: "Main", value: true },
   { label: "Test", value: true },
 ]);
-defineProps({
-  loading: Boolean,
-});
-const emits = defineEmits<{
-  (events: "update:modelValue", value?: string[]): void;
-  (events: "refresh"): void;
-}>();
+
+// initial state; all network selected
 const selectedNetworks = ref([Network.Dev, Network.Main, Network.Test]);
-const filterError = ref(false);
+
+onMounted(() => emits("update:modelValue", selectedNetworks.value));
+
 function updateNetworks(event: Event | undefined, index: number) {
   const network = networks.value[index].label.toLowerCase() as Network;
-  filterError.value = false;
-
   if (event) {
     if (!selectedNetworks.value.includes(network)) {
       selectedNetworks.value.push(network);
@@ -102,7 +108,6 @@ function updateNetworks(event: Event | undefined, index: number) {
   }
   emits("update:modelValue", selectedNetworks.value);
 }
-onMounted(() => emits("update:modelValue", selectedNetworks.value));
 </script>
 <script lang="ts">
 export default {
