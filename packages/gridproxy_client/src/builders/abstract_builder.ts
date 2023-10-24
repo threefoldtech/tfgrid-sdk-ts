@@ -63,13 +63,11 @@ export abstract class AbstractBuilder<T> {
       const response = await fetch(`${this.uri}${path}${query}`, {
         signal: controller.signal,
       });
-
-      clearTimeout(timeoutId);
       return response;
-    } catch (error) {
-      // Handle fetch or abort errors here
+    } catch (error: any) {
+      throw new Error(error);
+    } finally {
       clearTimeout(timeoutId);
-      throw error;
     }
   }
 }

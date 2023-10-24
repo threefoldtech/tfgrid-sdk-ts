@@ -136,7 +136,6 @@ export default {
           node.value = _node;
           router.push({ path: route.path, query: { nodeId: node.value.nodeId } });
         } catch (err) {
-          console.error(err);
           isError.value = true;
           errorMessage.value = `Failed to load node with ID ${props.nodeId}. The node might be offline or unresponsive. You can try requesting it again.`;
         } finally {
