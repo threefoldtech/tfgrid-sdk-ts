@@ -4,7 +4,7 @@
     <v-sheet color="transparent" height="82vh" v-if="loading" class="d-flex align-center justify-center">
       <v-container class="text-center d-block">
         <v-progress-circular size="40" indeterminate />
-        <p class="pt-4 font-weight-bold">Loading stats data</p>
+        <p class="pt-4 font-weight-bold">Loading Statistics</p>
       </v-container>
     </v-sheet>
 
