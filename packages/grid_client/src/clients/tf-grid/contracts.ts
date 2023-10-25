@@ -60,7 +60,7 @@ export interface GqlContracts {
 
 export interface GqlConsumption {
   contracts: GqlContracts;
-  billReports: GqlContractBillReports[];
+  contractBillReports: GqlContractBillReports[];
 }
 
 export interface GqlContractBillReports {
@@ -166,7 +166,7 @@ class TFContracts extends Contracts {
     try {
       const response = await gqlClient.query(body, { contractId: options.id });
       const gqlConsumption: GqlConsumption = response["data"] as GqlConsumption;
-      const billReports = gqlConsumption.billReports;
+      const billReports = gqlConsumption.contractBillReports;
       if (billReports.length === 0) {
         return 0;
       } else {
