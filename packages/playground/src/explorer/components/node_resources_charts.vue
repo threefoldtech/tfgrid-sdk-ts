@@ -2,7 +2,7 @@
   <div class="node-resources mt-10">
     <v-row justify="center">
       <v-col cols="8">
-        <h2 class="node-resources-title text-center text-h4 flex justify-center items-center">
+        <h2 class="text-center text-h4 flex justify-center items-center">
           <v-icon size="40" class="mr-2">mdi-chart-pie</v-icon>
           Node {{ node.nodeId }} Resources
           <v-chip :color="getNodeStatusColor(node.status).color">
@@ -111,4 +111,3 @@ export default {
   },
 };
 </script>
-@/utils/get_metrics_url

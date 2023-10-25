@@ -1,14 +1,14 @@
 <template>
   <v-dialog
     v-model="dialog"
-    @update:modelValue="(val:boolean) => $emit('close-dialog', val)"
+    @update:modelValue="(val:boolean) => closeDialog(val)"
     :scrim="false"
     transition="dialog-bottom-transition"
     hide-overlay
   >
-    <v-toolbar dark color="info">
-      <div class="d-flex justify-center">
-        <v-btn icon dark @click="() => $emit('close-dialog', false)">
+    <v-toolbar style="height: 48px" dark color="primary">
+      <div class="mr-1">
+        <v-btn icon dark @click="(val:boolean) => closeDialog(val)">
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </div>
@@ -18,6 +18,19 @@
       <v-card class="d-flex justify-center align-center h-screen">
         <v-progress-circular color="primary" indeterminate :size="128" :width="5" />
         <p class="mt-2">Loading node details...</p>
+      </v-card>
+    </template>
+
+    <template v-else-if="isError">
+      <v-card class="d-flex justify-center align-center h-screen">
+        <div class="text-center w-100 pa-3">
+          <v-icon variant="tonal" color="error" style="font-size: 50px" icon="mdi-close-circle-outline" />
+          <p class="mt-4 mb-4 font-weight-bold text-error">
+            {{ errorMessage }}
+          </p>
+          <v-btn class="mr-4" @click="requestNode" color="primary" text="Try Again" />
+          <v-btn @click="(val:boolean) => closeDialog(val)" color="error" variant="outlined" text="Cancel" />
+        </div>
       </v-card>
     </template>
 
@@ -41,7 +54,7 @@
           <v-col cols="12" md="6" sm="8">
             <interfaces-details-card :node="node" />
           </v-col>
-          <v-col v-if="node.cards.length" cols="12" md="6" sm="8">
+          <v-col v-if="node.cards?.length" cols="12" md="6" sm="8">
             <gpu-details-card :node="node" />
           </v-col>
           <v-col v-if="node.publicConfig && node.publicConfig.domain" cols="12" md="6" sm="8">
@@ -54,10 +67,11 @@
 </template>
 
 <script lang="ts">
-import type { GridNode } from "@threefold/gridproxy_client";
+import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
 import { type PropType, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
+import { getNodeStatusColor } from "@/explorer/utils/helpers";
 import router from "@/router";
 
 import { getNode } from "../utils/helpers";
@@ -87,6 +101,7 @@ export default {
       required: true,
     },
   },
+
   components: {
     NodeResourcesCharts,
     NodeDetailsCard,
@@ -99,24 +114,38 @@ export default {
     PublicConfigDetailsCard,
   },
 
-  setup(props) {
+  setup(props, { emit }) {
     const loading = ref(false);
     const dialog = ref(false);
+    const isError = ref(false);
+    const errorMessage = ref("");
     const route = useRoute();
     const node = ref<GridNode>(nodeInitializer);
 
-    watch(
-      () => props.nodeId,
-      async (nodeId: number) => {
-        if (nodeId > 0) {
+    function closeDialog(newValue: boolean) {
+      isError.value = false;
+      errorMessage.value = "";
+      emit("close-dialog", newValue);
+    }
+
+    async function requestNode() {
+      isError.value = false;
+      if (props.nodeId > 0) {
+        try {
           loading.value = true;
-          const _node: GridNode = await getNode(nodeId, props.options);
+          const _node: GridNode = await getNode(props.nodeId, props.options);
           node.value = _node;
           router.push({ path: route.path, query: { nodeId: node.value.nodeId } });
+        } catch (err) {
+          isError.value = true;
+          errorMessage.value = `Failed to load node with ID ${props.nodeId}. The node might be offline or unresponsive. You can try requesting it again.`;
+        } finally {
           loading.value = false;
         }
-      },
-    );
+      }
+    }
+
+    watch(() => props.nodeId, requestNode);
 
     watch(
       () => props.openDialog,
@@ -124,10 +153,18 @@ export default {
         dialog.value = newValue as boolean;
       },
     );
+
     return {
+      NodeStatus,
+
       dialog,
       node,
       loading,
+      isError,
+      errorMessage,
+      requestNode,
+      closeDialog,
+      getNodeStatusColor,
     };
   },
 };
@@ -140,5 +177,8 @@ export default {
 }
 .v-toolbar__content {
   justify-content: end !important;
+}
+.v-toolbar__content {
+  height: 48px !important;
 }
 </style>
