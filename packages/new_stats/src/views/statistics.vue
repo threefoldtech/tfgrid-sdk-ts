@@ -1,5 +1,5 @@
 <template>
-  <v-col cols="11" class="mx-auto pt-0 pb-4">
+  <v-col cols="11" class="mx-auto pt-0">
     <networkFilter
       @refresh="statsTableRef.getStatsData(true)"
       :loading="statsTableRef?.loading"

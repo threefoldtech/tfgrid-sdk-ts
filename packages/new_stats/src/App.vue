@@ -3,18 +3,19 @@ import StatisticsView from "./views/statistics.vue";
 </script>
 
 <template>
-  <header>
-    <v-sheet color="title" class="w-100 d-flex align-center justify-center">
-      <v-icon class="mr-1" size="large" icon="mdi-chart-scatter-plot"> </v-icon>
-      <p class="my-2 font-weight-bold text-h6">Statistics</p>
-    </v-sheet>
-  </header>
-
   <main>
-    <StatisticsView />
-    <v-sheet style="position: relative; bottom: 0%" class="w-100 d-flex align-center justify-center">
-      <p class="my-1 font-weight-bold">{{ new Date().getFullYear() }} - ThreeFoldTech</p>
-    </v-sheet>
+    <v-app full-height>
+      <v-sheet color="title" class="w-100 d-flex align-center justify-center">
+        <v-icon class="mr-1" size="large" icon="mdi-chart-scatter-plot"> </v-icon>
+        <p class="my-2 font-weight-bold text-h6">Statistics</p>
+      </v-sheet>
+      <StatisticsView />
+      <v-footer color="black" class="pa-0 mt-2 d-flex flex-column">
+        <div class="my-auto bg-black text-center w-100">
+          {{ new Date().getFullYear() }} — <strong>ThreeFoldTech</strong>
+        </div>
+      </v-footer>
+    </v-app>
   </main>
 </template>
 
