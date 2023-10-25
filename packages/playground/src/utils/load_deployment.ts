@@ -127,7 +127,7 @@ export async function loadK8s(grid: GridClient) {
     const timeoutPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
         reject(new Error("Timeout"));
-      }, 5000);
+      }, 10000);
     });
 
     try {
