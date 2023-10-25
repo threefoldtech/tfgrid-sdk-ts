@@ -20,6 +20,7 @@
     >
       <input-tooltip tooltip="Select a node ID to deploy on.">
         <v-autocomplete
+          v-if="selection == 'automated'"
           select
           label="Node"
           :items="availableNodes"
@@ -50,6 +51,19 @@
             </v-list-item>
           </template>
         </v-autocomplete>
+        <v-text-field
+          v-else-if="selection == 'manual'"
+          label="Name"
+          v-model="ManualselectedNode"
+          :disabled="loadingNodes"
+          v-bind="{
+            ...props,
+            loading: props.loading,
+            hint: pingingNode ? `Checking if the disks will fit in the node's storage pools... ` : props.hint,
+            error: !!errorMessage,
+            errorMessages: !!errorMessage ? errorMessage : undefined,
+          }"
+        />
       </input-tooltip>
       <input-validator
         v-if="selectedNode && filters.hasGPU"
@@ -121,7 +135,8 @@ const loadingNodes = ref(false);
 const loadingCards = ref(false);
 const shouldBeUpdated = ref(false);
 const errorMessage = ref<string>();
-const selectedNode = ref() as Ref<INode | undefined>;
+const ManualselectedNode = ref();
+const selectedNode = ref<INode | undefined>();
 const selectedCards = ref<Array<string>>([]);
 const nodeCards = ref<Array<NodeGPUCardType>>([]);
 const cards: NodeGPUCardType[] = [];
@@ -163,7 +178,6 @@ watch(
     errorMessage.value = ``;
 
     const grid = await getGrid(profileManager.profile!);
-
     if (node && grid) {
       await validateNodeStoragePool(
         grid,
@@ -208,11 +222,23 @@ watch(
 watch(
   () => props.selection,
   async (value, oldValue) => {
-    value === "manual" ? await loadNodes(undefined) : false;
+    if (value === "automated") {
+      selectedNode.value = undefined;
+    }
+    ManualselectedNode.value = undefined;
   },
   { deep: false },
 );
 
+watch(
+  () => ManualselectedNode.value,
+  async (value, oldValue) => {
+    if (value != undefined || value != null) {
+      selectedNode.value = { nodeId: Number(value) };
+    }
+  },
+  { deep: false },
+);
 watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
   if (l || !s) return;
   shouldBeUpdated.value = false;
@@ -290,6 +316,7 @@ async function validateNodeStoragePool(grid: GridClient, nodeId: number, disks: 
   validator.value?.setStatus(ValidatorStatus.Pending);
   pingingNode.value = true;
   try {
+    loadingNodes.value = true;
     await grid.capacity.checkNodeCapacityPool({
       nodeId,
       ssdDisks: disks,
@@ -307,6 +334,7 @@ async function validateNodeStoragePool(grid: GridClient, nodeId: number, disks: 
     validator.value?.setStatus(ValidatorStatus.Invalid);
     emptyResult.value = true;
   } finally {
+    loadingNodes.value = false;
     pingingNode.value = false;
     farmManager?.setLoading(false);
   }
