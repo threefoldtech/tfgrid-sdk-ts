@@ -182,7 +182,7 @@
 </template>
 
 <script lang="ts" setup>
-import { watch } from "vue";
+import { capitalize, watch } from "vue";
 import { onMounted } from "vue";
 import { ref } from "vue";
 
@@ -261,8 +261,8 @@ async function setPriceList(pkgs: any): Promise<PriceType[]> {
       label: "Dedicated Node",
       price: `${pkgs.dedicatedPrice}`,
       color: "black",
-      packageName: pkgs.dedicatedPackage,
-      backgroundColor: color(pkgs.dedicatedPackage),
+      packageName: capitalize(pkgs.dedicatedPackage.package),
+      backgroundColor: color(pkgs.dedicatedPackage.package),
       TFTs: (+pkgs.dedicatedPrice / TFTPrice.value).toFixed(2),
       info: "A user can reserve an entire node then use it exclusively to deploy solutions",
     },
@@ -270,8 +270,8 @@ async function setPriceList(pkgs: any): Promise<PriceType[]> {
       label: "Shared Node",
       price: `${pkgs.sharedPrice}`,
       color: "black",
-      packageName: pkgs.sharedPackage,
-      backgroundColor: color(pkgs.sharedPackage),
+      packageName: capitalize(pkgs.sharedPackage.package),
+      backgroundColor: color(pkgs.sharedPackage.package),
       TFTs: (+pkgs.sharedPrice / TFTPrice.value).toFixed(2),
       info: "Shared Nodes allow several users to host various workloads on a single node",
     },

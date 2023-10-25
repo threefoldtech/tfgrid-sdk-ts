@@ -111,4 +111,3 @@ export default {
   },
 };
 </script>
-@/utils/get_metrics_url

@@ -39,7 +39,7 @@ export const getCountryCode = (node: GridNode): string => {
  */
 export const getNodeStatusColor = (status: string): NodeStatusColor => {
   if (status === NodeStatus.Up) {
-    return { color: "info", status: NodeStatus.Up };
+    return { color: "primary", status: NodeStatus.Up };
   } else if (status === NodeStatus.Standby) {
     return { color: "warning", status: NodeStatus.Standby };
   } else {
@@ -129,7 +129,7 @@ export const getQueries = (mixedFilters: MixedFilter): Partial<NodesQuery> => {
     freeHru: mixedFilters.inputs.freeHru.value ? toBytes(+mixedFilters.inputs.freeHru.value!) : undefined,
     freeMru: mixedFilters.inputs.freeMru.value ? toBytes(+mixedFilters.inputs.freeMru.value!) : undefined,
     freeSru: mixedFilters.inputs.freeSru.value ? toBytes(+mixedFilters.inputs.freeSru.value!) : undefined,
-    hasGpu: mixedFilters.options.gpu,
+    hasGpu: mixedFilters.options.gpu ? mixedFilters.options.gpu : undefined,
   };
   if (mixedFilters.options.gateway) {
     options.domain = mixedFilters.options.gateway;
