@@ -27,7 +27,7 @@
                     :key="item.route"
                     :value="item.route"
                     @click="clickHandler(item)"
-                    :color="theme.name.value === AppThemeSelection.light ? 'info' : 'primary'"
+                    :color="theme.name.value === AppThemeSelection.light ? 'primary' : 'info'"
                     :active="$route.path === item.route"
                   >
                     <template v-slot:prepend v-if="item.icon">
@@ -51,7 +51,7 @@
                   :value="item.route"
                   @click="clickHandler(item)"
                   :active="$route.path === item.route"
-                  :color="theme.name.value === AppThemeSelection.light ? 'info' : 'primary'"
+                  :color="theme.name.value === AppThemeSelection.light ? 'primary' : 'info'"
                 >
                   <template v-slot:prepend v-if="item.icon">
                     <v-img
