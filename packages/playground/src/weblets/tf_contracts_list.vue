@@ -91,8 +91,8 @@
     <v-card>
       <v-card-title class="text-h5 mt-2"> Are you sure you want to delete the following contracts? </v-card-title>
       <v-alert class="ma-4" type="warning" variant="tonal"
-        >It is advisable to remove the contract from its solution page, especially
-        when multiple contracts may be linked to the same instance.</v-alert
+        >It is advisable to remove the contract from its solution page, especially when multiple contracts may be linked
+        to the same instance.</v-alert
       >
       <v-alert class="mx-4" type="warning" variant="tonal">Deleting contracts may take a while to complete.</v-alert>
       <v-card-text>
@@ -138,7 +138,7 @@
 
 <script lang="ts" setup>
 import { ContractStates, type GridClient } from "@threefold/grid_client";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 import { useProfileManager } from "../stores";
 import type { VDataTableHeader } from "../types";
@@ -162,6 +162,8 @@ const headers: VDataTableHeader = [
   { title: "Solution Name", key: "solutionName" },
   { title: "Created At", key: "createdAt" },
   { title: "Expiration", key: "expiration" },
+  { title: "Node ID", key: "nodeId", sortable: false },
+  { title: "Node Status", key: "nodestatus", sortable: false },
   { title: "Details", key: "actions", sortable: false },
 ];
 
@@ -170,8 +172,15 @@ async function onMount() {
   contracts.value = [];
   grid.value = await getGrid(profileManager.profile!);
   contracts.value = await getUserContracts(grid.value!);
+  const nodeStatus = await getNodeStatus(nodeIDs.value);
+  console.log(nodeStatus);
   loading.value = false;
 }
+
+const nodeIDs = computed(() => {
+  const allNodes = contracts.value.map(contract => contract.nodeId);
+  return [...new Set(allNodes)];
+});
 
 const loadingContractId = ref<number>();
 const contractLocked = ref<ContractLock>();
@@ -260,11 +269,27 @@ async function onDelete() {
   }
   deleting.value = false;
 }
+
+async function getNodeStatus(nodeIDs: (number | undefined)[]) {
+  const resultPromises = nodeIDs.map(async nodeId => {
+    if (nodeId == undefined) return {};
+    const status = (await gridProxyClient.nodes.byId(nodeId)).status;
+    return { [nodeId]: status };
+  });
+
+  const resultsArray = await Promise.all(resultPromises);
+
+  // Use reduce to merge objects in the resultsArray
+  const statusObject = resultsArray.reduce((acc, obj) => Object.assign(acc, obj), {});
+
+  return statusObject;
+}
 </script>
 
 <script lang="ts">
 import type { ContractLock } from "@threefold/tfchain_client";
 
+import { gridProxyClient } from "../clients";
 import ListTable from "../components/list_table.vue";
 import { solutionType } from "../types/index";
 import { downloadAsJson, normalizeError } from "../utils/helpers";
