@@ -1,12 +1,17 @@
 import type { GridClient } from "@threefold/grid_client";
 
 import { formatConsumption } from "./contracts";
-import { updateGrid } from "./grid";
+import { getGrid, updateGrid } from "./grid";
 import { normalizeError } from "./helpers";
 
 export interface LoadedDeployments<T> {
   count: number;
   items: T[];
+}
+
+interface FailedDeployment {
+  name: string;
+  nodes: number[];
 }
 
 export interface LoadVMsOptions {
@@ -15,15 +20,33 @@ export interface LoadVMsOptions {
 export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   const machines = await grid.machines.list();
   let count = machines.length;
+  const failedDeployments: FailedDeployment[] = [];
 
-  const promises = machines.map(name => {
-    return grid.machines.getObj(name).catch(e => {
+  const promises = machines.map(async (name, index) => {
+    const nodeIds = await grid.machines._getDeploymentNodeIds(name);
+    const machinePromise = grid.machines.getObj(name);
+    const timeoutPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        reject(new Error("Timeout"));
+      }, 10000);
+    });
+
+    try {
+      const result = await Promise.race([machinePromise, timeoutPromise]);
+
+      if (result instanceof Error && result.message === "Timeout") {
+        console.log(`%c[Error] Timeout loading deployment with name ${name}`, "color: rgb(207, 102, 121)");
+        return null;
+      } else {
+        return result;
+      }
+    } catch (e) {
       console.log(
         `%c[Error] failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`,
         "color: rgb(207, 102, 121)",
       );
-      return null;
-    });
+      failedDeployments.push({ name, nodes: nodeIds });
+    }
   });
   const items = await Promise.all(promises);
   const vms = items
@@ -67,6 +90,7 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   return <LoadedDeployments<any[]>>{
     count,
     items: data,
+    failedDeployments,
   };
 }
 export function getWireguardConfig(grid: GridClient, name: string) {
@@ -79,14 +103,32 @@ export function getWireguardConfig(grid: GridClient, name: string) {
 export type K8S = { masters: any[]; workers: any[]; deploymentName: string; wireguard?: any };
 export async function loadK8s(grid: GridClient) {
   const clusters = await grid.k8s.list();
-  const promises = clusters.map(name => {
-    return grid.k8s.getObj(name).catch(e => {
+  const failedDeployments: FailedDeployment[] = [];
+
+  const promises = clusters.map(async (name, index) => {
+    const nodeIds = await grid.k8s._getDeploymentNodeIds(name);
+    const clusterPromise = grid.k8s.getObj(name);
+    const timeoutPromise = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        reject(new Error("Timeout"));
+      }, 10000);
+    });
+
+    try {
+      const result = await Promise.race([clusterPromise, timeoutPromise]);
+      if (result instanceof Error && result.message === "Timeout") {
+        console.log(`%c[Error] Timeout loading deployment with name ${name}`, "color: rgb(207, 102, 121)");
+        return null;
+      } else {
+        return result;
+      }
+    } catch (e) {
       console.log(
         `%c[Error] failed to load deployment with name ${name}:\n${normalizeError(e, "No errors were provided.")}`,
         "color: rgb(207, 102, 121)",
       );
-      return null;
-    });
+      failedDeployments.push({ name, nodes: nodeIds });
+    }
   });
   const items = (await Promise.all(promises)) as any[];
   const k8s = items
@@ -119,6 +161,7 @@ export async function loadK8s(grid: GridClient) {
   return <LoadedDeployments<K8S>>{
     count: clusters.length,
     items: data,
+    failedDeployments,
   };
 }
 
