@@ -20,15 +20,12 @@
     </v-sheet>
 
     <v-container fluid class="py-0 pt-4 ml-2 d-flex justify-center" v-else>
-      <v-row class="w-100">
+      <v-row class="w-100 py-0">
         <v-col xl="8" lg="8" md="12" cols="12" class="mt-2 pb-0 px-0">
-          <v-col xl="12" lg="12" cols="9" class="mx-auto">
+          <v-col xl="12" lg="12" cols="12" class="mx-auto pb-0">
             <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
           </v-col>
         </v-col>
-        <div style="height: 80vhd" class="my-auto">
-          <v-divider :thickness="2" class="border-opacity-50" color="gray" vertical></v-divider>
-        </div>
 
         <v-col v-if="Istats.length !== 0" class="d-flex flex-wrap justify-center pt-6 pb-0 px-0">
           <v-col
@@ -37,9 +34,9 @@
             xl="5"
             lg="5"
             md="3"
-            sm="4"
-            xs="4"
-            cols="12"
+            sm="9"
+            xs="9"
+            cols="9"
             class="text-center pt-1 pb-0"
           >
             <StatisticsCard :item="item" />
