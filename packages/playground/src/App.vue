@@ -18,14 +18,16 @@
               <template v-for="route in routes" :key="route.title">
                 <v-list-group v-if="route.items.length > 1" :value="route.title">
                   <template v-slot:activator="{ props }">
-                    <v-list-item v-bind="props" :prepend-icon="route.icon" :title="route.title"></v-list-item>
+                    <v-list-item style="font-weight: 500" v-bind="props" :prepend-icon="route.icon">
+                      <v-list-item-title class="font-weight-bold">{{ route.title }}</v-list-item-title>
+                    </v-list-item>
                   </template>
                   <v-list-item
                     v-for="item in route.items"
                     :key="item.route"
                     :value="item.route"
                     @click="clickHandler(item)"
-                    color="secondary"
+                    :color="theme.name.value === AppThemeSelection.light ? 'info' : 'primary'"
                     :active="$route.path === item.route"
                   >
                     <template v-slot:prepend v-if="item.icon">
@@ -39,7 +41,7 @@
                       <v-icon v-else width="26">{{ item.icon }}</v-icon>
                     </template>
 
-                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                    <v-list-item-title class="font-weight-bold">{{ item.title }}</v-list-item-title>
                   </v-list-item>
                 </v-list-group>
                 <v-list-item
@@ -48,8 +50,8 @@
                   :key="item.route"
                   :value="item.route"
                   @click="clickHandler(item)"
-                  color="secondary"
                   :active="$route.path === item.route"
+                  :color="theme.name.value === AppThemeSelection.light ? 'info' : 'primary'"
                 >
                   <template v-slot:prepend v-if="item.icon">
                     <v-img
@@ -62,7 +64,7 @@
                     <v-icon v-else width="26">{{ item.icon }}</v-icon>
                   </template>
 
-                  <v-list-item-title>{{ item.title }}</v-list-item-title>
+                  <v-list-item-title class="font-weight-bold">{{ item.title }}</v-list-item-title>
                 </v-list-item>
               </template>
             </v-list>

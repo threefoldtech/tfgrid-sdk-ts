@@ -18,11 +18,16 @@
           </p>
           <template v-else-if="balance">
             <p>
-              Balance: <strong :style="{ color: '#76e2c8' }">{{ normalizeBalance(balance.free, true) }} TFT</strong>
+              Balance:
+              <strong :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'">
+                {{ normalizeBalance(balance.free, true) }} TFT
+              </strong>
             </p>
             <p>
               Locked:
-              <strong :style="{ color: '#76e2c8' }">{{ normalizeBalance(balance.locked, true) || 0 }} TFT</strong>
+              <strong :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'">
+                {{ normalizeBalance(balance.locked, true) || 0 }} TFT
+              </strong>
               <v-tooltip text="Locked balance documentation" location="bottom right">
                 <template #activator="{ props }">
                   <v-btn
