@@ -117,9 +117,9 @@ async function loadDeployments() {
       : await loadVms(updateGrid(grid!, { projectName: "" }), { filter });
   const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
   const failedDeployments = [
-    ...(chunk1 as any).failedDeployments,
-    ...(chunk2 as any).failedDeployments,
-    ...(chunk3.count !== 0 ? (chunk3 as any).failedDeployments : []),
+    ...(Array.isArray((chunk1 as any).failedDeployments) ? (chunk1 as any).failedDeployments : []),
+    ...(Array.isArray((chunk2 as any).failedDeployments) ? (chunk2 as any).failedDeployments : []),
+    ...(Array.isArray((chunk3 as any).failedDeployments) ? (chunk3 as any).failedDeployments : []),
   ];
   console.log("Failed Deployments: ", failedDeployments);
   namesOfFailedDeployments.value = formatFailedDeployments(failedDeployments as any);
