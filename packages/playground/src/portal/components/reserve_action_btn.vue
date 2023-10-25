@@ -22,7 +22,7 @@
       :loading="loadingReserveNode"
       :disabled="disableButton"
       v-if="node.rentedByTwinId === 0"
-      style="background: #1aa18f"
+      color="primary"
       @click="reserveNode"
     >
       Reserve

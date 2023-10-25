@@ -18,17 +18,22 @@
           </p>
           <template v-else-if="balance">
             <p>
-              Balance: <strong :style="{ color: '#76e2c8' }">{{ normalizeBalance(balance.free, true) }} TFT</strong>
+              Balance:
+              <strong :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'">
+                {{ normalizeBalance(balance.free, true) }} TFT
+              </strong>
             </p>
             <p>
               Locked:
-              <strong :style="{ color: '#76e2c8' }">{{ normalizeBalance(balance.locked, true) || 0 }} TFT</strong>
+              <strong :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'">
+                {{ normalizeBalance(balance.locked, true) || 0 }} TFT
+              </strong>
               <v-tooltip text="Locked balance documentation" location="bottom right">
                 <template #activator="{ props }">
                   <v-btn
                     @click.stop
                     v-bind="props"
-                    color="white"
+                    :color="theme.name.value === AppThemeSelection.light ? 'black' : 'white'"
                     icon="mdi-information-outline"
                     height="24px"
                     width="24px"
@@ -366,7 +371,10 @@ import Cryptr from "cryptr";
 import md5 from "md5";
 import { computed, onMounted, type Ref, ref, watch } from "vue";
 import { nextTick } from "vue";
+import { useTheme } from "vuetify";
 import { generateKeyPair } from "web-ssh-keygen";
+
+import { AppThemeSelection } from "@/utils/app_theme";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useInputRef } from "../hooks/input_validator";
@@ -387,6 +395,8 @@ interface Credentials {
   passwordHash?: string;
   mnemonicHash?: string;
 }
+
+const theme = useTheme();
 
 const props = defineProps({
   modelValue: {
