@@ -23,7 +23,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .v-data-table__td {
   white-space: nowrap;
   font-size: 0.875rem;
