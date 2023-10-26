@@ -43,7 +43,7 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
         console.log(`%c[Error] Timeout loading deployment with name ${name}`, "color: rgb(207, 102, 121)");
         return null;
       } else if ((result as any).length === 0) {
-        console.log(`%c[Error] failed to load deployment with name ${name}}`, "color: rgb(207, 102, 121)");
+        console.log(`%c[Error] failed to load deployment with name ${name}`, "color: rgb(207, 102, 121)");
         failedDeployments.push({ name, nodes: nodeIds });
       } else {
         return result;
