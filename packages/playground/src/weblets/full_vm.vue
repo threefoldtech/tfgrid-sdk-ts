@@ -9,9 +9,10 @@
     :dedicated="dedicated"
     title-image="images/icons/vm.png"
   >
-    <template #title> Deploy a Full Virtual Machine <v-btn @click="triggerIntro"> Trigger Intro</v-btn> </template>
+    <template #title> Deploy a Full Virtual Machine </template>
 
     <d-tabs
+      prefix="fvm"
       :tabs="[
         { title: 'Config', value: 'config' },
         { title: 'Disks', value: 'disks' },
@@ -152,7 +153,7 @@
             #="{ props }"
           >
             <input-tooltip tooltip="Disk name.">
-              <v-text-field label="Name" v-model="disks[index].name" v-bind="props" />
+              <v-text-field class="fvm-diskname" label="Name" v-model="disks[index].name" v-bind="props" />
             </input-tooltip>
           </input-validator>
           <input-validator
@@ -166,7 +167,13 @@
             #="{ props }"
           >
             <input-tooltip tooltip="Disk Size.">
-              <v-text-field label="Size (GB)" type="number" v-model.number="disks[index].size" v-bind="props" />
+              <v-text-field
+                class="fvm-disksize"
+                label="Size (GB)"
+                type="number"
+                v-model.number="disks[index].size"
+                v-bind="props"
+              />
             </input-tooltip>
           </input-validator>
         </ExpandableLayout>
@@ -187,8 +194,7 @@
 </template>
 
 <script lang="ts" setup>
-import introJs from "intro.js";
-import { type Ref, ref, watch } from "vue";
+import { onMounted, type Ref, ref, watch } from "vue";
 
 import Network from "../components/networks.vue";
 import SelectFarmManager from "../components/select_farm_manager.vue";
@@ -199,6 +205,7 @@ import { type Farm, type Flist, ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
+import { startGuide } from "../utils/intro";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
@@ -206,25 +213,9 @@ const tabs = ref();
 const profileManager = useProfileManager();
 const solution = ref() as Ref<SolutionFlavor>;
 
-function triggerIntro() {
-  introJs()
-    .setOptions({
-      exitOnEsc: false,
-      exitOnOverlayClick: false,
-      steps: [
-        { element: ".fvm-name", title: "title", intro: "intro" },
-        { element: ".vm-image", title: "title", intro: "intro" },
-        { element: ".vm-capacity", title: "title", intro: "intro" },
-        { element: ".select-networks", title: "title", intro: "intro" },
-        { element: ".fvm-gpu", title: "title", intro: "intro" },
-        { element: ".fvm-dedicated", title: "title", intro: "intro" },
-        { element: ".fvm-certified", title: "title", intro: "intro" },
-        { element: ".select-node", title: "title", intro: "intro" },
-        { element: ".fvm-deloy", title: "title", intro: "intro" },
-      ],
-    })
-    .start();
-}
+onMounted(async () => {
+  await startGuide("fvm.yaml");
+});
 
 const images: VmImage[] = [
   {

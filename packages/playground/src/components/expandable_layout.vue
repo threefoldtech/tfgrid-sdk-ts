@@ -12,6 +12,7 @@
             @click="$emit('add')"
             v-bind="props"
             :disabled="disabled"
+            class="expandable-plus"
           />
         </template>
       </v-tooltip>
@@ -32,6 +33,7 @@
                 @click="remove(index)"
                 v-if="!required.includes(index)"
                 v-bind="props"
+                class="expandable-remove"
               />
             </template>
           </v-tooltip>
