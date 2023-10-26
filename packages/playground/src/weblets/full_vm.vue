@@ -9,7 +9,7 @@
     :dedicated="dedicated"
     title-image="images/icons/vm.png"
   >
-    <template #title> Deploy a Full Virtual Machine </template>
+    <template #title> Deploy a Full Virtual Machine <v-btn @click="triggerIntro"> Trigger Intro</v-btn> </template>
 
     <d-tabs
       :tabs="[
@@ -32,7 +32,7 @@
           #="{ props }"
         >
           <input-tooltip tooltip="Instance name.">
-            <v-text-field label="Name" v-model="name" v-bind="props" />
+            <v-text-field class="fvm-name" label="Name" v-model="name" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
@@ -61,18 +61,42 @@
           When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
           "
         >
-          <v-switch color="primary" inset label="GPU" v-model="hasGPU" :disabled="loadingFarm" hide-details />
+          <v-switch
+            class="fvm-gpu"
+            color="primary"
+            inset
+            label="GPU"
+            v-model="hasGPU"
+            :disabled="loadingFarm"
+            hide-details
+          />
         </input-tooltip>
         <input-tooltip
           inline
           tooltip="Click to know more about dedicated nodes."
           href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
         >
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
+          <v-switch
+            class="fvm-dedicated"
+            color="primary"
+            inset
+            label="Dedicated"
+            v-model="dedicated"
+            :disabled="loadingFarm"
+            hide-details
+          />
         </input-tooltip>
 
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
+          <v-switch
+            class="fvm-certified"
+            color="primary"
+            inset
+            label="Certified"
+            v-model="certified"
+            :disabled="loadingFarm"
+            hide-details
+          />
         </input-tooltip>
 
         <SelectFarmManager>
@@ -150,12 +174,20 @@
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid || network?.error">Deploy </v-btn>
+      <v-btn
+        class="fvm-deloy"
+        color="primary"
+        variant="tonal"
+        @click="deploy"
+        :disabled="tabs?.invalid || network?.error"
+        >Deploy
+      </v-btn>
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
+import introJs from "intro.js";
 import { type Ref, ref, watch } from "vue";
 
 import Network from "../components/networks.vue";
@@ -173,6 +205,26 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 const solution = ref() as Ref<SolutionFlavor>;
+
+function triggerIntro() {
+  introJs()
+    .setOptions({
+      exitOnEsc: false,
+      exitOnOverlayClick: false,
+      steps: [
+        { element: ".fvm-name", title: "title", intro: "intro" },
+        { element: ".vm-image", title: "title", intro: "intro" },
+        { element: ".vm-capacity", title: "title", intro: "intro" },
+        { element: ".select-networks", title: "title", intro: "intro" },
+        { element: ".fvm-gpu", title: "title", intro: "intro" },
+        { element: ".fvm-dedicated", title: "title", intro: "intro" },
+        { element: ".fvm-certified", title: "title", intro: "intro" },
+        { element: ".select-node", title: "title", intro: "intro" },
+        { element: ".fvm-deloy", title: "title", intro: "intro" },
+      ],
+    })
+    .start();
+}
 
 const images: VmImage[] = [
   {

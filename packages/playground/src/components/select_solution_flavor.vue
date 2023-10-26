@@ -4,6 +4,7 @@
       tooltip="Choosing the appropriate computing resources and performance capabilities for a virtual instance or server. When provisioning a virtual machine or cloud instance, the 'Select instance capacity' step allows users to specify the desired CPU, memory, storage, and network resources for their virtual environment."
     >
       <v-select
+        class="vm-capacity"
         label="Select instance capacity"
         v-bind="props"
         :items="packages"

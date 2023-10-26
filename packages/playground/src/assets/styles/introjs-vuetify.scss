@@ -1,0 +1,89 @@
+.introjs-tooltip {
+  background-color: rgb(var(--v-theme-on-surface-variant));
+  color: rgb(var(--v-theme-on-surface));
+}
+
+.introjs-button,
+.introjs-button:hover,
+.introjs-button:focus,
+.introjs-button:active,
+.introjs-disabled,
+.introjs-disabled:focus,
+.introjs-disabled:hover {
+  outline: none;
+  background-image: none;
+  background-color: transparent;
+  color: rgb(var(--v-theme-on-surface));
+  border: 1px solid transparent;
+  border-radius: 50px;
+  box-shadow: none;
+  outline: none;
+  text-shadow: none;
+}
+
+.introjs-button:hover,
+.introjs-button:focus,
+.introjs-button:active {
+  border: 1px solid rgb(var(--v-theme-on-surface));
+}
+
+.introjs-button {
+  color: rgb(var(--v-theme-primary)) !important;
+}
+
+.introjs-disabled,
+.introjs-disabled:focus,
+.introjs-disabled:hover {
+  color: rgb(var(--v-theme-on-surface)) !important;
+  opacity: var(--v-medium-emphasis-opacity);
+  border: 1px solid transparent;
+}
+
+.introjs-arrow {
+  border: 10px solid rgb(var(--v-theme-on-surface));
+}
+.introjs-arrow.top,
+.introjs-arrow.top-middle,
+.introjs-arrow.top-right {
+  border-color: transparent transparent rgb(var(--v-theme-on-surface-variant));
+  top: -20px;
+  left: 20px;
+}
+
+.introjs-arrow.bottom,
+.introjs-arrow.bottom-middle,
+.introjs-arrow.bottom-right {
+  border-color: rgb(var(--v-theme-on-surface-variant)) transparent transparent;
+  bottom: -20px;
+  left: 20px;
+}
+
+.introjs-arrow.left,
+.introjs-arrow.right {
+  top: 20px;
+}
+
+.introjs-arrow.left-bottom,
+.introjs-arrow.right-bottom {
+  bottom: 20px;
+}
+
+.introjs-arrow.left,
+.introjs-arrow.left-bottom {
+  left: -20px;
+  border-color: transparent rgb(var(--v-theme-on-surface-variant)) transparent transparent;
+}
+
+.introjs-arrow.right,
+.introjs-arrow.right-bottom {
+  right: -20px;
+  border-color: transparent transparent transparent rgb(var(--v-theme-on-surface-variant));
+}
+
+.introjs-skipbutton {
+  color: rgb(var(--v-theme-error)) !important;
+}
+
+.introjs-tooltipbuttons {
+  border-color: rgba(var(--v-theme-on-surface), var(--v-border-opacity)) !important;
+}

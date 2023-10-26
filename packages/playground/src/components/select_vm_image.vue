@@ -3,6 +3,7 @@
     tooltip="A virtual machine (VM) image is a snapshot or template of a virtual machine that contains the necessary components to create and run a virtual instance of an operating system. It includes the operating system, installed applications, configurations, and any additional files or data required for the virtual machine, also you can put your own image/flist by choosing the other option."
   >
     <v-autocomplete
+      class="vm-image"
       label="VM Image"
       :items="[...$props.images, { name: 'Other' }]"
       return-object

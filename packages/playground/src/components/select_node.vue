@@ -20,6 +20,7 @@
     >
       <input-tooltip tooltip="Select a node ID to deploy on.">
         <v-autocomplete
+          class="select-node"
           select
           label="Node"
           :items="availableNodes"
@@ -81,7 +82,7 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { onMounted, type PropType, type Ref, ref, watch } from "vue";
+import { type PropType, type Ref, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
 
