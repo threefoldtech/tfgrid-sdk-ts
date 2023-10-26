@@ -6,9 +6,9 @@
     transition="dialog-bottom-transition"
     hide-overlay
   >
-    <v-toolbar style="height: 48px" dark color="primary">
-      <div class="mr-1">
-        <v-btn icon dark @click="(val:boolean) => closeDialog(val)">
+    <v-toolbar>
+      <div class="d-flex justify-center">
+        <v-btn icon dark @click="() => $emit('close-dialog', false)">
           <v-icon>mdi-close</v-icon>
         </v-btn>
       </div>

@@ -405,3 +405,9 @@ export default {
   name: "SimulatorFarming",
 };
 </script>
+
+<style>
+.label {
+  font-size: 0.875rem;
+}
+</style>

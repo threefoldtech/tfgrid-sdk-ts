@@ -2,8 +2,8 @@
   <div class="node-resources mt-10">
     <v-row justify="center">
       <v-col cols="8">
-        <h2 class="text-center text-h4 flex justify-center items-center">
-          <v-icon size="40" class="mr-2">mdi-chart-pie</v-icon>
+        <h2 class="node-resources-title text-center text-h5 flex justify-center items-center">
+          <v-icon size="32" class="mr-2">mdi-chart-pie</v-icon>
           Node {{ node.nodeId }} Resources
           <v-chip :color="getNodeStatusColor(node.status).color">
             {{ node.status === NodeStatus.Up ? "Online" : node.status === NodeStatus.Standby ? "Standby" : "Offline" }}
@@ -16,7 +16,7 @@
       <div v-for="item in resources" :key="item.name" class="mx-6 d-flex flex-column pt-2 mt-2 align-center">
         <div class="mb-2">{{ item.name }}</div>
         <div class="text-center">
-          <v-progress-circular :model-value="item.value" :size="150" :width="15" color="primary"
+          <v-progress-circular :model-value="item.value" :size="150" :width="15" color="info"
             >{{ item.value !== "NaN" ? item.value + "%" : "N/A" }}
           </v-progress-circular>
         </div>
@@ -27,7 +27,7 @@
       <v-progress-circular v-if="loading" indeterminate color="primary" :size="50" class="mt-10 mb-10" />
 
       <v-btn
-        rounded="lg"
+        rounded="md"
         variant="flat"
         color="primary"
         v-if="isNodeReadyToVisit()"

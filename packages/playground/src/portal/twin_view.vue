@@ -17,16 +17,17 @@
 
     <v-dialog v-model="openVotePopup" max-width="600">
       <v-card>
-        <v-toolbar color="primary" dark class="custom-toolbar">Vote Reminder</v-toolbar>
+        <v-toolbar color="primary" dark class="custom-toolbar bold-text">Vote Reminder</v-toolbar>
         <v-card-text>There are {{ numberOfProposalsToVoteOn }} active proposals you can vote on now</v-card-text>
         <v-card-actions class="justify-end pa-5">
-          <v-btn @click="openVotePopup = false" class="grey lighten-2 black--text">Close</v-btn>
-          <v-btn @click="redirectToDao" class="primary white--text">Vote</v-btn>
+          <v-btn @click="redirectToDao" variant="elevated" color="primary" class="mr-2 text-subtitle-2">Vote</v-btn>
+          <v-btn @click="openVotePopup = false" variant="outlined" color="anchor" class="mr-2 text-subtitle-2"
+            >Close</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <v-container class="custom-container">
+    <div class="border px-4 pb-4 rounded position-relative mt-2">
       <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
         <v-icon size="30" class="pr-3">mdi-account-supervisor-outline</v-icon>
         <v-card-title class="pa-0">Twin Details</v-card-title>
@@ -60,7 +61,7 @@
           <v-btn class="custom-button bg-primary" @click="editTwin">Edit</v-btn>
         </v-card-actions>
       </v-card>
-    </v-container>
+    </div>
   </div>
 </template>
 
@@ -181,13 +182,18 @@ function copy(id: string) {
 }
 
 .custom-button {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: bold;
 }
 
 .custom-toolbar {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: bold;
   padding-left: 10px;
+}
+
+.bold-text {
+  font-weight: 500;
+  padding-left: 1rem;
 }
 </style>
