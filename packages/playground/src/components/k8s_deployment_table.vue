@@ -15,8 +15,17 @@
         <v-card-title style="color: #ffcc00; font-weight: bold">Failed Deployments</v-card-title>
         <v-divider color="#FFCC00" />
         <v-card-text>
-          <div v-if="namesOfFailedDeployments === ''">Failed to load, Please contact support.</div>
-          <div v-html="namesOfFailedDeployments"></div>
+          <ul>
+            <li v-for="deployment in failedDeployments" :key="deployment.name">
+              {{
+                deployment.nodes.length > 0
+                  ? `${deployment.name} on node${deployment.nodes.length > 1 ? "s" : ""}: ${deployment.nodes.join(
+                      ", ",
+                    )}`
+                  : deployment.name
+              }}
+            </li>
+          </ul>
         </v-card-text>
         <v-card-actions class="justify-end">
           <v-btn @click="showDialog = false" class="grey lighten-2 black--text" color="#FFCC00">Close</v-btn>
@@ -87,9 +96,9 @@ import { getGrid, updateGrid } from "../utils/grid";
 import { loadK8s, mergeLoadedDeployments } from "../utils/load_deployment";
 
 const profileManager = useProfileManager();
-const namesOfFailedDeployments = ref("");
 const showDialog = ref(false);
 const showEncryption = ref(false);
+const failedDeployments = ref<any[]>([]);
 
 const props = defineProps<{
   projectName: string;
@@ -112,31 +121,14 @@ async function loadDeployments() {
   const chunk3 = await loadK8s(updateGrid(grid!, { projectName: "" }));
 
   const clusters = mergeLoadedDeployments(chunk1, chunk2, chunk3);
-  const failedDeployments = [
+  failedDeployments.value = [
     ...(Array.isArray((chunk1 as any).failedDeployments) ? (chunk1 as any).failedDeployments : []),
     ...(Array.isArray((chunk2 as any).failedDeployments) ? (chunk2 as any).failedDeployments : []),
     ...(Array.isArray((chunk3 as any).failedDeployments) ? (chunk3 as any).failedDeployments : []),
   ];
-  namesOfFailedDeployments.value = formatFailedDeployments(failedDeployments as any);
   count.value = clusters.count;
   items.value = clusters.items;
   loading.value = false;
-}
-function formatFailedDeployments(failedDeployments: []) {
-  let formattedText = "<ul>";
-  for (const deployment of failedDeployments as { name: string; nodes: string[] }[]) {
-    if (deployment.nodes.length > 0) {
-      formattedText += ` <li>${deployment.name} on node${
-        deployment.nodes.length > 1 ? "s" : ""
-      }: ${deployment.nodes.join(", ")}</li>`;
-    } else {
-      formattedText += ` <li>${deployment.name}</li>`;
-      showEncryption.value = true;
-    }
-  }
-  formattedText += "</ul>";
-
-  return formattedText;
 }
 
 defineExpose({ loadDeployments });
