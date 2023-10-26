@@ -15,6 +15,7 @@
         <v-card-title style="color: #ffcc00; font-weight: bold">Failed Deployments</v-card-title>
         <v-divider color="#FFCC00" />
         <v-card-text>
+          <div v-if="namesOfFailedDeployments === ''">Failed to load, Please contact support.</div>
           <div v-html="namesOfFailedDeployments"></div>
         </v-card-text>
         <v-card-actions class="justify-end">
@@ -130,7 +131,7 @@ function formatFailedDeployments(failedDeployments: []) {
         ", ",
       )}<br>`;
     } else {
-      formattedText += `- <strong>${deployment.name}<br>`;
+      formattedText += `- ${deployment.name}<br>`;
       showEncryption.value = true;
     }
   }

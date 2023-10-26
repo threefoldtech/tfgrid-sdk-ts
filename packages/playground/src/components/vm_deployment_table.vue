@@ -121,9 +121,7 @@ async function loadDeployments() {
     ...(Array.isArray((chunk2 as any).failedDeployments) ? (chunk2 as any).failedDeployments : []),
     ...(Array.isArray((chunk3 as any).failedDeployments) ? (chunk3 as any).failedDeployments : []),
   ];
-  console.log("Failed Deployments: ", failedDeployments);
   namesOfFailedDeployments.value = formatFailedDeployments(failedDeployments as any);
-
   count.value = vms.count;
   items.value = vms.items;
 
@@ -138,7 +136,7 @@ function formatFailedDeployments(failedDeployments: []) {
         ", ",
       )}<br>`;
     } else {
-      formattedText += `- <strong>${deployment.name}<br>`;
+      formattedText += `- ${deployment.name}<br>`;
       showEncryption.value = true;
     }
   }
