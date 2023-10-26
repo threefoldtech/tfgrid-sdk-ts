@@ -1,0 +1,58 @@
+name: Mass Deployments
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+jobs:
+  mass-deployments:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    env:
+      NETWORK: main
+      RMB_PROXY: true
+      STORE_SECRET: secret
+      MNEMONIC: ${{ secrets.MNEMONIC }}
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/v2.1.1
+      - name: Set up node 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "yarn"
+
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git libtool tmux redis net-tools
+      - name: Install
+        run: |
+          yarn
+          lerna run build --no-private
+
+      - name: Run test batch vms
+        id: batchvms
+        continue-on-error: true
+        run: |
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/batch_vms.ts
+
+      - name: Cleanup - Delete all contracts
+        id: deleteall
+        run: |
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/delete_all_contracts.ts
+
+      - name: Test Results
+        run: |
+          echo Batch Vms: ${{ steps.batchvms.outcome }}
+          echo Delete all contracts: ${{ steps.deleteall.outcome }}
+
+      - name: Check test script status
+        if: |
+          steps.batchvms.outcome != 'success'
+        run: exit 1

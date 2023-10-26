@@ -97,7 +97,7 @@ async function main() {
   log("Failed Deployments: " + failedCount);
 
   // List of failed deployments errors
-  console.log("Failed deployments errors", errors);
+  log("Failed deployments errors: " + errors);
 
   await grid3.disconnect();
 }
