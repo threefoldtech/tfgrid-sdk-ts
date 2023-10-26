@@ -2,12 +2,35 @@ import GridProxyClient, { Network, NodeStatus, type Stats } from "@threefold/gri
 
 import type { NetworkStats } from "@/types";
 
+function mergeStatsData(stats: Stats[]): Stats {
+  const res = stats[0];
+  for (let i = 1; i < stats.length; i++) {
+    res.accessNodes += stats[i].accessNodes;
+    res.contracts += stats[i].contracts;
+    res.countries += stats[i].countries;
+    res.farms += stats[i].farms;
+    res.gateways += stats[i].gateways;
+    res.nodes += stats[i].nodes;
+    res.publicIps += stats[i].publicIps;
+    res.totalCru += stats[i].totalCru;
+    res.totalHru += stats[i].totalHru;
+    res.totalMru += stats[i].totalMru;
+    res.totalSru += stats[i].totalSru;
+    res.twins += stats[i].twins;
+    res.nodesDistribution = mergeNodeDistribution([res.nodesDistribution, stats[i].nodesDistribution]);
+  }
+
+  return res;
+}
+
 export async function getStats(network: Network): Promise<Stats> {
   try {
     const client = new GridProxyClient(network);
-    return await client.stats.get({ status: NodeStatus.Up });
+    const upStats = await client.stats.get({ status: NodeStatus.Up });
+    const standbyStats = await client.stats.get({ status: NodeStatus.Standby });
+    return mergeStatsData([upStats, standbyStats]);
   } catch (error) {
-    throw new Error(`Failed to retrieve ${network} network statistics`);
+    throw new Error(`Failed to retrieve ${network} network statistics: ${error}`);
   }
 }
 
@@ -24,7 +47,7 @@ function mergeNodeDistribution(stats: Stats["nodesDistribution"][]) {
 }
 
 export function formatData(network: Network[] = [Network.Main], totalStat: NetworkStats) {
-  const res: Stats = {
+  let res: Stats = {
     nodes: 0,
     farms: 0,
     countries: 0,
@@ -39,25 +62,11 @@ export function formatData(network: Network[] = [Network.Main], totalStat: Netwo
     contracts: 0,
     nodesDistribution: {},
   };
-  const totalNodesDistribution = [];
   for (let i = 0; i < network.length; i++) {
-    const target = totalStat[network[i]];
-    if (target === undefined) continue;
-    res.accessNodes += target.accessNodes;
-    res.contracts += target.contracts;
-    res.countries += target.countries;
-    res.farms += target.farms;
-    res.gateways += target.gateways;
-    res.nodes += target.nodes;
-    res.publicIps += target.publicIps;
-    res.totalCru += target.totalCru;
-    res.totalHru += target.totalHru;
-    res.totalMru += target.totalMru;
-    res.totalSru += target.totalSru;
-    res.twins += target.twins;
-    totalNodesDistribution.push(target.nodesDistribution);
+    const currentStats = totalStat[network[i]];
+    if (!currentStats) continue;
+    res = mergeStatsData([res, currentStats]);
   }
 
-  res.nodesDistribution = mergeNodeDistribution(totalNodesDistribution);
   return res;
 }
