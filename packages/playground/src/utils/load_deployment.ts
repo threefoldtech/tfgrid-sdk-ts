@@ -42,6 +42,9 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
       if (result instanceof Error && result.message === "Timeout") {
         console.log(`%c[Error] Timeout loading deployment with name ${name}`, "color: rgb(207, 102, 121)");
         return null;
+      } else if ((result as any).length === 0) {
+        console.log(`%c[Error] failed to load deployment with name ${name}}`, "color: rgb(207, 102, 121)");
+        failedDeployments.push({ name, nodes: nodeIds });
       } else {
         return result;
       }
@@ -135,6 +138,9 @@ export async function loadK8s(grid: GridClient) {
       if (result instanceof Error && result.message === "Timeout") {
         console.log(`%c[Error] Timeout loading deployment with name ${name}`, "color: rgb(207, 102, 121)");
         return null;
+      } else if ((result as any).masters.length === 0 && (result as any).workers.length === 0) {
+        console.log(`%c[Error] failed to load deployment with name ${name}}`, "color: rgb(207, 102, 121)");
+        failedDeployments.push({ name, nodes: nodeIds });
       } else {
         return result;
       }

@@ -124,17 +124,19 @@ async function loadDeployments() {
 }
 
 function formatFailedDeployments(failedDeployments: []) {
-  let formattedText = "";
+  let formattedText = "<ul>";
   for (const deployment of failedDeployments as { name: string; nodes: string[] }[]) {
     if (deployment.nodes.length > 0) {
-      formattedText += `- ${deployment.name} on node${deployment.nodes.length > 1 ? "s" : ""}: ${deployment.nodes.join(
-        ", ",
-      )}<br>`;
+      formattedText += ` <li>${deployment.name} on node${
+        deployment.nodes.length > 1 ? "s" : ""
+      }: ${deployment.nodes.join(", ")}</li>`;
     } else {
-      formattedText += `- <strong>${deployment.name}<br>`;
+      formattedText += ` <li>${deployment.name}</li>`;
       showEncryption.value = true;
     }
   }
+  formattedText += "</ul>";
+
   return formattedText;
 }
 
