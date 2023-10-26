@@ -12,7 +12,7 @@ const STATS_MAPPER: BuilderMapper<StatsQuery> = {
 
 const STATS_VALIDATOR: BuilderValidator<StatsQuery> = {
   status(value) {
-    assertIn(value, [NodeStatus.Up, NodeStatus.Down]);
+    assertIn(value, [NodeStatus.Up, NodeStatus.Down, NodeStatus.Standby]);
   },
 };
 
