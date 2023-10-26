@@ -14,11 +14,11 @@ import { log } from "./utils";
 async function main() {
   const grid3 = await getClient();
 
-  const extrinsics = [];
+  const errors: any = [];
   let failedCount = 0;
   let successCount = 0;
 
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 100; i++) {
     //Generating the resources
     const cru = 1;
     const mru = 256;
@@ -81,25 +81,23 @@ async function main() {
     vms.metadata = "";
     vms.description = "test deploying VMs via ts grid3 client";
 
-    // // deploy vms
+    // deploy vm
     try {
-      extrinsics.push(await grid3.machines.deploy(vms));
+      await grid3.machines.deploy(vms);
+      successCount++;
     } catch (error) {
       log(error);
+      errors.push(error);
+      failedCount++;
+      continue;
     }
   }
 
-  try {
-    // log("extrinsics array: " + extrinsics);
-    const res = await grid3.utility.batchAll({ extrinsics });
-    log("Response: " + res);
-    successCount++;
-    log("Successful Count: " + successCount);
-  } catch (error) {
-    log(error);
-    failedCount++;
-    log("Failed Count: " + failedCount);
-  }
+  log("Successful Deployments: " + successCount);
+  log("Failed Deployments: " + failedCount);
+
+  // List of failed deployments errors
+  console.log("Failed deployments errors", errors);
 
   await grid3.disconnect();
 }
