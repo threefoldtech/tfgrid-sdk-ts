@@ -8,23 +8,25 @@ import {
   NetworkModel,
   randomChoice,
 } from "../src";
-import { generateInt } from "../tests/utils";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function main() {
   const grid3 = await getClient();
 
+  const extrinsics = [];
+  let failedCount = 0;
+  let successCount = 0;
+
   for (let i = 0; i < 2; i++) {
     //Generating the resources
-    const cru = generateInt(1, 4);
-    const mru = generateInt(256, 4096);
-    const diskSize = generateInt(5, 25);
-    const rootFs = generateInt(1, 5);
+    const cru = 1;
+    const mru = 256;
+    const diskSize = 5;
+    const rootFs = 1;
     const vmName = "vm" + generateString(8);
     const deploymentName = "dep" + generateString(8);
-    let publicIp: number | boolean = generateInt(0, 1);
-    publicIp = publicIp === 0 ? false : true;
+    const publicIp = false;
 
     // create network Object
     const n = new NetworkModel();
@@ -78,13 +80,25 @@ async function main() {
     vms.machines = [vm];
     vms.metadata = "";
     vms.description = "test deploying VMs via ts grid3 client";
-    // deploy vms
-    const res = await grid3.machines.deploy(vms);
-    log(res);
 
-    // get the deployment
-    const l = await grid3.machines.getObj(vms.name);
-    log(l);
+    // // deploy vms
+    try {
+      extrinsics.push(await grid3.machines.deploy(vms));
+    } catch (error) {
+      log(error);
+    }
+  }
+
+  try {
+    // log("extrinsics array: " + extrinsics);
+    const res = await grid3.utility.batchAll({ extrinsics });
+    log("Response: " + res);
+    successCount++;
+    log("Successful Count: " + successCount);
+  } catch (error) {
+    log(error);
+    failedCount++;
+    log("Failed Count: " + failedCount);
   }
 
   await grid3.disconnect();
