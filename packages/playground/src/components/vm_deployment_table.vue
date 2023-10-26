@@ -1,13 +1,38 @@
 <template>
   <div>
     <v-alert v-if="!loading && count && items.length < count" type="warning" variant="tonal">
-      Failed to load <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }};
+      Failed to load <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
+
       <span>
-        This might happen because the node is down or it's not reachable or the deployment{{
-          count - items.length > 1 ? "s are" : " is"
-        }}
-        encrypted by another key.
+        This might happen because the node is down or it's not reachable
+        <span v-if="showEncryption"
+          >or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span
+        >.
       </span>
+      <v-icon class="custom-icon" @click="showDialog = true">mdi-file-document-outline </v-icon>
+
+      <v-dialog transition="dialog-bottom-transition" v-model="showDialog" persistent max-width="500px">
+        <v-card>
+          <v-card-title style="color: #ffcc00; font-weight: bold">Failed Deployments</v-card-title>
+          <v-divider color="#FFCC00" />
+          <v-card-text>
+            <ul>
+              <li v-for="deployment in failedDeployments" :key="deployment.name">
+                {{
+                  deployment.nodes.length > 0
+                    ? `${deployment.name} on node${deployment.nodes.length > 1 ? "s" : ""}: ${deployment.nodes.join(
+                        ", ",
+                      )}`
+                    : deployment.name
+                }}
+              </li>
+            </ul>
+          </v-card-text>
+          <v-card-actions class="justify-end">
+            <v-btn @click="showDialog = false" class="grey lighten-2 black--text" color="#FFCC00">Close</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-alert>
 
     <ListTable
@@ -80,6 +105,9 @@ defineEmits<{ (event: "update:model-value", value: any[]): void }>();
 const loading = ref(false);
 const count = ref<number>();
 const items = ref<any[]>([]);
+const showDialog = ref(false);
+const showEncryption = ref(false);
+const failedDeployments = ref<any[]>([]);
 
 onMounted(loadDeployments);
 async function loadDeployments() {
@@ -98,7 +126,11 @@ async function loadDeployments() {
       ? { count: 0, items: [] }
       : await loadVms(updateGrid(grid!, { projectName: "" }), { filter });
   const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
-
+  failedDeployments.value = [
+    ...(Array.isArray((chunk1 as any).failedDeployments) ? (chunk1 as any).failedDeployments : []),
+    ...(Array.isArray((chunk2 as any).failedDeployments) ? (chunk2 as any).failedDeployments : []),
+    ...(Array.isArray((chunk3 as any).failedDeployments) ? (chunk3 as any).failedDeployments : []),
+  ];
   count.value = vms.count;
   items.value = vms.items;
 
@@ -160,3 +192,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.custom-icon {
+  float: right;
+}
+</style>
