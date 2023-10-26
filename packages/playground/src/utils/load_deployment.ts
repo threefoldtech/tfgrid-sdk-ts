@@ -22,7 +22,7 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   let count = machines.length;
   const failedDeployments: FailedDeployment[] = [];
 
-  const promises = machines.map(async (name, index) => {
+  const promises = machines.map(async name => {
     const nodeIds = await grid.machines._getDeploymentNodeIds(name);
     const machinePromise = grid.machines.getObj(name);
     const timeoutPromise = new Promise((resolve, reject) => {
