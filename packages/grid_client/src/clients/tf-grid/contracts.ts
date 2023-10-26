@@ -133,8 +133,7 @@ class TFContracts extends Contracts {
         rentContractsCount: rentContractsCount,
       });
 
-      const data = response["data"] as GqlContracts;
-      return data;
+      return response["data"] as GqlContracts;
     } catch (err) {
       throw Error(`Error listing contracts by twin id ${options.twinId}: ${err}`);
     }
@@ -188,7 +187,7 @@ class TFContracts extends Contracts {
             }
           }
         }
-        if (!duration!) {
+        if (!duration) {
           duration = 1;
         }
         return amountBilled
