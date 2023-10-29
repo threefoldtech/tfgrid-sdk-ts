@@ -9,7 +9,7 @@ Also, you can select one or more networks to get their stats.
 
 - **Prerequisite**
 
-  - Nodejs 16^
+  - Nodejs 18^
 
 - **Clone the repository**
 
