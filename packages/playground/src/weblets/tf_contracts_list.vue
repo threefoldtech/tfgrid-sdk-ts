@@ -173,7 +173,7 @@ const headers: VDataTableHeader = [
   { title: "Solution Name", key: "solutionName" },
   { title: "Created At", key: "createdAt" },
   { title: "Expiration", key: "expiration" },
-  { title: "Node ID", key: "nodeId", sortable: false },
+  { title: "Node ID", key: "nodeId" },
   { title: "Node Status", key: "nodeStatus", sortable: false },
   { title: "Details", key: "actions", sortable: false },
 ];
