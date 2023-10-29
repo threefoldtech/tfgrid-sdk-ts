@@ -99,20 +99,18 @@ const Istats = computed((): IStatistics[] => {
   }
 });
 async function getStatsData(refresh = false) {
-  if (props.networks) {
-    props.networks.forEach(async (network: Network) => {
-      if (!networkStats.value[network] || refresh)
-        try {
-          failed.value = false;
-          loading.value = true;
-          networkStats.value[network] = await getStats(network.toLowerCase() as Network);
-        } catch (error) {
-          failed.value = true;
-        } finally {
-          loading.value = false;
-        }
-    });
-  }
+  props.networks!.forEach(async (network: Network) => {
+    if (!networkStats.value[network] || refresh)
+      try {
+        failed.value = false;
+        loading.value = true;
+        networkStats.value[network] = await getStats(network.toLowerCase() as Network);
+      } catch (error) {
+        failed.value = true;
+      } finally {
+        loading.value = false;
+      }
+  });
 }
 watch(
   () => props.networks,
