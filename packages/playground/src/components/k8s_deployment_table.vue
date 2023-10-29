@@ -92,7 +92,13 @@ async function loadDeployments() {
   const chunk3 = await loadK8s(updateGrid(grid!, { projectName: "" }));
 
   const clusters = mergeLoadedDeployments(chunk1, chunk2, chunk3);
-  const failedDeployments = [...(chunk1 as any).failedK8s, ...(chunk2 as any).failedK8s, ...(chunk3 as any).failedK8s];
+  const failedDeployments = [
+    // [
+    ...(Array.isArray((chunk1 as any).failedK8s) ? (chunk1 as any).failedK8s : []),
+    ...(Array.isArray((chunk2 as any).failedDeployments) ? (chunk2 as any).failedK8s : []),
+    ...(Array.isArray((chunk3 as any).failedDeployments) ? (chunk3 as any).failedK8s : []),
+  ];
+  // ...(chunk1 as any).failedK8s, ...(chunk2 as any).failedK8s, ...(chunk3 as any).failedK8s];
   namesOfFailedDeployments.value = failedDeployments.join(", ");
 
   count.value = clusters.count;
