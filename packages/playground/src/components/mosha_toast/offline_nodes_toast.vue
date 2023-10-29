@@ -2,9 +2,9 @@
   <div class="mosha__toast__content d-block">
     You have
     <button class="link-color" :onclick="() => router.push('/contractslist')">
-      {{ deploymentLen }} {{ deploymentLen > 1 ? "contract" : "contracts" }}
+      {{ deploymentLen }} {{ deploymentLen > 1 ? "contracts" : "contract" }}
     </button>
-    on offline or standby nodes
+    on offline or standby {{ deploymentLen > 1 ? "nodes" : "node" }}
     <v-spacer />
     <span v-if="withPubIpLen >= 1">
       {{ withPubIpLen }} {{ deploymentLen > 1 ? "of them" : "" }} with public {{ withPubIpLen > 1 ? "IPs" : "IP" }}
