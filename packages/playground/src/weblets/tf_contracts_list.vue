@@ -49,6 +49,16 @@
       <template #[`item.solutionType`]="{ item }">
         {{ solutionType[item.value.solutionType] ?? item.value.solutionType }}
       </template>
+      <template #[`item.nodeStatus`]="{ item }">
+        <v-chip
+          v-if="item.value.nodeId !== '-' && !loading"
+          :color="getNodeStateColor(nodeStatus[item.value.nodeId])"
+          class="text-capitalize"
+        >
+          {{ nodeStatus[item.value.nodeId] }}
+        </v-chip>
+        <p v-else>-</p>
+      </template>
       <template #[`item.actions`]="{ item }">
         <v-tooltip text="Show Details">
           <template #activator="{ props }">
@@ -138,7 +148,7 @@
 
 <script lang="ts" setup>
 import { ContractStates, type GridClient } from "@threefold/grid_client";
-import { computed, ref } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { useProfileManager } from "../stores";
 import type { VDataTableHeader } from "../types";
@@ -152,6 +162,7 @@ const loading = ref(false);
 const isExporting = ref(false);
 const grid = ref<GridClient | null>();
 const selectedContracts = ref<NormalizedContract[]>([]);
+const nodeStatus = ref() as Ref<{ [x: number]: NodeStatus }>;
 const headers: VDataTableHeader = [
   { title: "PLACEHOLDER", key: "data-table-select" },
   { title: "ID", key: "contractId" },
@@ -163,7 +174,7 @@ const headers: VDataTableHeader = [
   { title: "Created At", key: "createdAt" },
   { title: "Expiration", key: "expiration" },
   { title: "Node ID", key: "nodeId", sortable: false },
-  { title: "Node Status", key: "nodestatus", sortable: false },
+  { title: "Node Status", key: "nodeStatus", sortable: false },
   { title: "Details", key: "actions", sortable: false },
 ];
 
@@ -172,8 +183,7 @@ async function onMount() {
   contracts.value = [];
   grid.value = await getGrid(profileManager.profile!);
   contracts.value = await getUserContracts(grid.value!);
-  const nodeStatus = await getNodeStatus(nodeIDs.value);
-  console.log(nodeStatus);
+  nodeStatus.value = await getNodeStatus(nodeIDs.value);
   loading.value = false;
 }
 
@@ -272,21 +282,29 @@ async function onDelete() {
 
 async function getNodeStatus(nodeIDs: (number | undefined)[]) {
   const resultPromises = nodeIDs.map(async nodeId => {
-    if (nodeId == undefined) return {};
+    if (typeof nodeId !== "number") return {};
     const status = (await gridProxyClient.nodes.byId(nodeId)).status;
     return { [nodeId]: status };
   });
 
   const resultsArray = await Promise.all(resultPromises);
 
-  // Use reduce to merge objects in the resultsArray
-  const statusObject = resultsArray.reduce((acc, obj) => Object.assign(acc, obj), {});
-
-  return statusObject;
+  return resultsArray.reduce((acc, obj) => Object.assign(acc, obj), {});
+}
+function getNodeStateColor(state: NodeStatus): string {
+  switch (state) {
+    case NodeStatus.Up:
+      return "success";
+    case NodeStatus.Down:
+      return "error";
+    case NodeStatus.Standby:
+      return "warning";
+  }
 }
 </script>
 
 <script lang="ts">
+import { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
 
 import { gridProxyClient } from "../clients";
