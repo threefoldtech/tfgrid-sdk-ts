@@ -169,7 +169,7 @@
                 >
               </p>
               <span class="package">
-                <b>{{ price.packageName != "None" ? price.packageName + " Package: " : "" }}</b></span
+                <b>{{ price.packageName != "none" ? capitalize(price.packageName) + " Package: " : "" }}</b></span
               >
               <b>${{ price.price }}/month, {{ price.TFTs }} TFT/month. </b>
             </span>
@@ -261,7 +261,7 @@ async function setPriceList(pkgs: any): Promise<PriceType[]> {
       label: "Dedicated Node",
       price: `${pkgs.dedicatedPrice}`,
       color: "black",
-      packageName: capitalize(pkgs.dedicatedPackage.package),
+      packageName: pkgs.dedicatedPackage.package,
       backgroundColor: color(pkgs.dedicatedPackage.package),
       TFTs: (+pkgs.dedicatedPrice / TFTPrice.value).toFixed(2),
       info: "A user can reserve an entire node then use it exclusively to deploy solutions",
@@ -270,7 +270,7 @@ async function setPriceList(pkgs: any): Promise<PriceType[]> {
       label: "Shared Node",
       price: `${pkgs.sharedPrice}`,
       color: "black",
-      packageName: capitalize(pkgs.sharedPackage.package),
+      packageName: pkgs.sharedPackage.package,
       backgroundColor: color(pkgs.sharedPackage.package),
       TFTs: (+pkgs.sharedPrice / TFTPrice.value).toFixed(2),
       info: "Shared Nodes allow several users to host various workloads on a single node",
