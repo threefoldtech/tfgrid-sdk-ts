@@ -1,4 +1,4 @@
-import GridProxyClient, { Network } from "tf_gridproxy_client";
+import GridProxyClient, { Network } from "@threefold/gridproxy_client";
 import TFGridGqlClient, { Networks } from "tfgrid-gql";
 
 const network = process.env.NETWORK || window.env.NETWORK;
