@@ -169,7 +169,7 @@
                 >
               </p>
               <span class="package">
-                <b>{{ price.packageName != "none" ? price.packageName + " Package: " : "" }}</b></span
+                <b>{{ price.packageName != "None" ? price.packageName + " Package: " : "" }}</b></span
               >
               <b>${{ price.price }}/month, {{ price.TFTs }} TFT/month. </b>
             </span>
