@@ -53,6 +53,9 @@
             validators.required('Password is required.'),
             validators.minLength('Password must be at least 6 characters.', 6),
             validators.maxLength('Password cannot exceed 15 characters.', 15),
+            validators.pattern('Password should not contain whitespaces.', {
+              pattern: /^[^\s]+$/,
+            }),
           ]"
           #="{ props: validatorProps }"
         >
@@ -162,7 +165,7 @@ const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 const loadingFarm = ref(false);
-const name = ref(generateName(9, { prefix: "wp" }));
+const name = ref(generateName({ prefix: "wp" }));
 const username = ref("admin");
 const email = ref("");
 const password = ref(generatePassword());
@@ -185,7 +188,7 @@ function finalize(deployment: any) {
 }
 async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
-  const projectName = ProjectName.Wordpress.toLowerCase();
+  const projectName = ProjectName.Wordpress.toLowerCase() + "/" + name.value;
   const subdomain = getSubdomain({
     deploymentName: name.value,
     projectName,

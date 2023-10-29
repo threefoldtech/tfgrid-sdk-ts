@@ -122,7 +122,7 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
-const name = ref(generateName(9, { prefix: "ss" }));
+const name = ref(generateName({ prefix: "ss" }));
 const endpoint = ref("");
 const ipv4 = ref(false);
 const solution = ref() as Ref<SolutionFlavor>;
@@ -146,7 +146,7 @@ function finalize(deployment: any) {
 async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Subsquid.toLowerCase();
+  const projectName = ProjectName.Subsquid.toLowerCase() + "/" + name.value;
 
   const subdomain = getSubdomain({
     deploymentName: name.value,

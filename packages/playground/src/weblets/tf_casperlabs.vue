@@ -112,7 +112,7 @@ const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref(generateName(9, { prefix: "cl" }));
+const name = ref(generateName({ prefix: "cl" }));
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
 const flist: Flist = {
@@ -134,7 +134,7 @@ function finalize(deployment: any) {
 async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Casperlabs.toLowerCase();
+  const projectName = ProjectName.Casperlabs.toLowerCase() + "/" + name.value;
 
   const subdomain = getSubdomain({
     deploymentName: name.value,

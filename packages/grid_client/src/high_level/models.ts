@@ -15,6 +15,7 @@ class TwinDeployment {
     public nodeId: number,
     public network: Network | null = null,
     public solutionProviderId: number | null = null,
+    public returnNetworkContracts = false,
   ) {}
 }
 

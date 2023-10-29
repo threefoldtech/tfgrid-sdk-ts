@@ -48,6 +48,9 @@
             validators.required('Password is required.'),
             validators.minLength('Password must be at least 6 characters.', 6),
             validators.maxLength('Password cannot exceed 15 characters.', 15),
+            validators.pattern('Password should not contain whitespaces.', {
+              pattern: /^[^\s]+$/,
+            }),
           ]"
           #="{ props: validatorProps }"
         >
@@ -131,7 +134,7 @@ const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref(generateName(9, { prefix: "pt" }));
+const name = ref(generateName({ prefix: "pt" }));
 const email = ref("");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
@@ -155,7 +158,7 @@ function finalize(deployment: any) {
 async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Peertube.toLowerCase();
+  const projectName = ProjectName.Peertube.toLowerCase() + "/" + name.value;
 
   const subdomain = getSubdomain({
     deploymentName: name.value,

@@ -264,15 +264,13 @@ async function loadNodes(farmId: number) {
           }
         }
         availableNodes.value = nodesArr.value;
-        selectedNode.value = undefined;
       } else {
-        selectedNode.value = undefined;
         availableNodes.value = [];
       }
     } catch (e) {
       errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
     } finally {
-      validator.value?.setStatus(ValidatorStatus.Invalid);
+      validator.value?.setStatus(ValidatorStatus.Init);
       loadingNodes.value = false;
       farmManager?.setLoading(false);
     }

@@ -136,7 +136,7 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref(generateName(9, { prefix: "mm" }));
+const name = ref(generateName({ prefix: "mm" }));
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
 const loadingFarm = ref(false);
@@ -160,7 +160,7 @@ function finalize(deployment: any) {
 async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Mattermost.toLowerCase();
+  const projectName = ProjectName.Mattermost.toLowerCase() + "/" + name.value;
 
   const subdomain = getSubdomain({
     deploymentName: name.value,

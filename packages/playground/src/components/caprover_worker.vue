@@ -93,7 +93,7 @@ import { generateName } from "../utils/strings";
 import SelectFarm from "./select_farm.vue";
 import SelectSolutionFlavor from "./select_solution_flavor.vue";
 
-export function createWorker(name: string = generateName(9, { prefix: "wr" })): CaproverWorker {
+export function createWorker(name: string = generateName({ prefix: "wr" })): CaproverWorker {
   return { name };
 }
 

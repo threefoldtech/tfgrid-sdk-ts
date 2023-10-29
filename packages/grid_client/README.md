@@ -19,11 +19,11 @@ grid_client is a client used for deploying workloads (VMs, ZDBs, k8s, etc.) on g
 
 ## Installation
 
-> **Warning**: For **Qanet**, Please use @2.0.0 version
+> **Warning**: For **Qanet**, Please use @2.1.1 version
 
-> **Warning**: For **Testnet**, Please use @2.0.0 version
+> **Warning**: For **Testnet**, Please use @2.1.1 version
 
-> **Warning**: For **Mainnet**, Please use @2.0.0 version
+> **Warning**: For **Mainnet**, Please use @2.1.1 version
 
 ### External package
 

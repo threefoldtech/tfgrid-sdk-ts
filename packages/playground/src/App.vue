@@ -153,7 +153,7 @@ const routes: AppRoute[] = [
       { title: "Discourse", icon: "discourse.png", route: "/discourse" },
       { title: "Taiga", icon: "taiga.png", route: "/taiga" },
       { title: "Owncloud", icon: "owncloud.png", route: "/owncloud" },
-      // { title: "Nextcloud", icon: "nextcloud.png", route: "/nextcloud" },
+      { title: "Nextcloud", icon: "nextcloud.png", route: "/nextcloud" },
       { title: "Presearch", icon: "presearch.png", route: "/presearch" },
       { title: "Subsquid", icon: "subsquid.png", route: "/subsquid" },
       { title: "Casperlabs", icon: "casperlabs.png", route: "/casperlabs" },

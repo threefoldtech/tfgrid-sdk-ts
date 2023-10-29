@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threefold UI</title>
+
+    <!-- Include the PDF style component, uncomment the script line after copying the build js/css in the same dir -->
+    <link rel="stylesheet" href="./tailwind.css">
+</head>
+
+<body>
+
+    <!-- Use the pdf-signer custom element with required attributes -->
+    <pdf-signer dest="http://localhost:3000/api/verify"
+        pdfUrl="https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf"
+        network="dev" />
+
+        <!-- <script-editor dest="http://localhost:3000/api/verify"
+        network="dev" /> -->
+    <!-- Include the PDF Signer component script, uncomment the script line after copying the build js/css in the same dir -->
+    <script src="./threefold-ui.umd.js"></script> 
+</body>
+
+</html>

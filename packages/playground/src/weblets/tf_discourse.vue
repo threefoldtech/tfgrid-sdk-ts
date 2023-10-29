@@ -157,7 +157,7 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref(generateName(9, { prefix: "dc" }));
+const name = ref(generateName({ prefix: "dc" }));
 const email = ref("");
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
@@ -183,7 +183,7 @@ function finalize(deployment: any) {
 async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Discourse.toLowerCase();
+  const projectName = ProjectName.Discourse.toLowerCase() + "/" + name.value;
 
   const subdomain = getSubdomain({
     deploymentName: name.value,

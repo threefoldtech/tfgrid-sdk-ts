@@ -139,7 +139,7 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 
-const name = ref(generateName(8, { prefix: "ps" }));
+const name = ref(generateName({ prefix: "ps" }));
 const code = ref("");
 const ipv4 = ref(false);
 const planetary = ref(true);
@@ -163,7 +163,7 @@ const selectedNode = ref() as Ref<INode>;
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Presearch.toLowerCase();
+  const projectName = ProjectName.Presearch.toLowerCase() + "/" + name.value;
 
   try {
     layout.value?.validateSSH();

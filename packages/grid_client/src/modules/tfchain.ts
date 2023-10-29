@@ -54,12 +54,7 @@ class TFChain implements blockchainInterface {
     this.storeSecret = config.storeSecret as string;
     this.keypairType = config.keypairType;
     this.network = config.network;
-    this.tfClient = new TFClient(
-      this.config.substrateURL,
-      this.config.mnemonic,
-      this.config.storeSecret,
-      this.config.keypairType,
-    );
+    this.tfClient = config.tfclient;
   }
 
   getPath() {

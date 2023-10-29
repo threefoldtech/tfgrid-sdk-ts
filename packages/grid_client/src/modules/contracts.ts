@@ -39,7 +39,7 @@ class Contracts {
   client: TFClient;
   nodes: Nodes;
   constructor(public config: GridClientConfig) {
-    this.client = new TFClient(config.substrateURL, config.mnemonic, config.storeSecret, config.keypairType);
+    this.client = config.tfclient;
     this.nodes = new Nodes(config.graphqlURL, config.proxyURL, config.rmbClient);
   }
 

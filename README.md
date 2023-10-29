@@ -19,12 +19,13 @@ This repo contains the typescript clients and projects for Threefold grid.
 - [rmb peer client](./packages/rmb_peer_client/README.md)
 - [rmb peer server](./packages/rmb_peer_server/README.md)
 - [Playground](./packages/playground/README.md)
+- [UI](./packages/UI/README.md)
 
 ## Requirements
 
 The main requirements are:
 
-- [Node.js](https://nodejs.org/en) 18^
+- [Node.js](https://nodejs.org/en) ^18
 - [Lerna](https://lerna.js.org/) 7.1.1
 
 ## Install

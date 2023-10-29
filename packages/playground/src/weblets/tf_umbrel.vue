@@ -53,6 +53,9 @@
             validators.required('Password is required.'),
             validators.minLength('Password must be at least 6 characters.', 6),
             validators.maxLength('Password cannot exceed 15 characters.', 15),
+            validators.pattern('Password should not contain whitespaces.', {
+              pattern: /^[^\s]+$/,
+            }),
           ]"
           #="{ props: validatorProps }"
         >
@@ -62,7 +65,14 @@
         </input-validator>
       </password-input-wrapper>
 
-      <Network v-model:ipv4="ipv4" :disabled="loadingFarm" />
+      <Network
+        required
+        ref="network"
+        v-model:ipv4="ipv4"
+        v-model:planetary="planetary"
+        v-model:wireguard="wireguard"
+        :disabled="loadingFarm"
+      />
 
       <SelectSolutionFlavor
         v-model="solution"
@@ -121,6 +131,7 @@
 <script lang="ts" setup>
 import { computed, type Ref, ref } from "vue";
 
+import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import type { Farm, Flist, solutionFlavor as SolutionFlavor } from "../types";
@@ -135,10 +146,13 @@ const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
 
-const name = ref(generateName(9, { prefix: "um" }));
+const name = ref(generateName({ prefix: "um" }));
 const username = ref("admin");
 const password = ref(generatePassword());
 const ipv4 = ref(false);
+const planetary = ref(true);
+const wireguard = ref(false);
+const network = ref();
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
 const loadingFarm = ref(false);
@@ -153,7 +167,7 @@ const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solut
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Umbrel.toLowerCase();
+  const projectName = ProjectName.Umbrel.toLowerCase() + "/" + name.value;
 
   try {
     layout.value?.validateSSH();
@@ -163,6 +177,9 @@ async function deploy() {
 
     const vm = await deployVM(grid!, {
       name: name.value,
+      network: {
+        addAccess: wireguard.value,
+      },
       machines: [
         {
           name: name.value,
@@ -183,7 +200,7 @@ async function deploy() {
           farmId: farm.value.farmID,
           farmName: farm.value.name,
           country: farm.value.country,
-          planetary: true,
+          planetary: planetary.value,
           publicIpv4: ipv4.value,
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
