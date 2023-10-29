@@ -1,4 +1,4 @@
-import { type FilterOptions, type GridClient, type NodeInfo, NodeStatus } from "@threefold/grid_client";
+import type { FilterOptions, GridClient, NodeInfo } from "@threefold/grid_client";
 import { ref } from "vue";
 
 const requestPageNumber = ref<number>(1);
@@ -12,13 +12,13 @@ type NodeFilters = FilterOptions & {
 };
 
 /**
- * Retrieves offline nodes from the grid proxy using the grid client.
- * If requestPageNumber is 0, returns the existing offline nodes data,
- * otherwise fetches the next page of offline nodes and appends it to the result.
+ * Retrieves nodes from the grid proxy using the grid client with some of filters.
+ * If requestPageNumber is 0, returns the existing nodes data,
+ * otherwise fetches the next page of nodes and appends it to the result.
  * @param {GridClient | null} grid - The GridClient instance to fetch nodes from.
  * @returns {Promise<NodeInfo[]>} A Promise that resolves to an array of offline NodeInfo objects.
  */
-export async function getOfflineNodes(grid: GridClient | null, options?: NodeFilters): Promise<NodeInfo[] | number[]> {
+export async function getAllNodes(grid: GridClient | null, options?: NodeFilters): Promise<NodeInfo[] | number[]> {
   const isFlat = options?.flat || false;
 
   const isLastPage = requestPageNumber.value === 0;
@@ -31,7 +31,7 @@ export async function getOfflineNodes(grid: GridClient | null, options?: NodeFil
   } else {
     const offNodes: NodeInfo[] = await grid!.nodes.filter({
       ...options,
-      status: NodeStatus.down,
+      // status: NodeStatus.down,
       page: requestPageNumber.value,
     });
 
@@ -43,5 +43,5 @@ export async function getOfflineNodes(grid: GridClient | null, options?: NodeFil
       requestPageNumber.value = 0;
     }
   }
-  return getOfflineNodes(grid, options);
+  return getAllNodes(grid, options);
 }
