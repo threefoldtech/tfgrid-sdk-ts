@@ -1,8 +1,7 @@
 name: Mass Deployments
 
 on:
-  schedule:
-    - cron: "0 1 * * *"
+  push:
   workflow_dispatch:
 
 jobs:
