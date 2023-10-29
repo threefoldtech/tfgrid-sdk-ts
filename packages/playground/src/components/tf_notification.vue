@@ -17,6 +17,7 @@ import { getOfflineNodes } from "@/utils/get_offline_nodes";
 import { useProfileManager } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid } from "../utils/grid";
+import TFNotificationContent from "./tf_notification_content.vue";
 
 const profileManager = useProfileManager();
 const contractsCount = ref(0);
@@ -43,15 +44,17 @@ async function checkOfflineDeployments(grid: GridClient | null) {
   const deploymentLength = userOfflineDeployments.length;
 
   if (deploymentLength) {
-    const withPublicIpsMessage = `${withPubIp.length} ${deploymentLength > 1 ? "of them" : ""} with public ${
+    const contractIpsMsg = `${withPubIp.length} ${deploymentLength > 1 ? "of them" : ""} with public ${
       withPubIp.length > 1 ? "IPs" : "IP"
     }`;
-    createCustomToast(
-      `You have ${deploymentLength} ${deploymentLength > 1 ? "contracts" : "contract"} on an offline ${
-        deploymentLength > 1 ? "nodes " : "node "
-      }${withPubIp.length ? withPublicIpsMessage : ""}`,
-      ToastType.warning,
-    );
+
+    const offlineNodeMsg = `You have ${deploymentLength} ${
+      deploymentLength > 1 ? "contracts" : "contract"
+    } on an offline ${deploymentLength > 1 ? "nodes " : "node "}${withPubIp.length ? contractIpsMsg : ""}`;
+
+    const props = { content: offlineNodeMsg, linkContent: "See in contracts page", link: `/contractslist` };
+
+    createCustomToast(TFNotificationContent, ToastType.warning, props);
   }
 }
 
