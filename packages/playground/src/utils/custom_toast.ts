@@ -46,13 +46,17 @@ export function createCustomToast(
     showIcon: true,
     type,
     toastBackgroundColor: colors[type],
+    onClose: () => {
+      console.log("Closed.....");
+    },
   };
 
   if (typeof customComponent === "string") {
     createToast(customComponent, toastOptions);
   } else {
     const component = withProps(customComponent as any, componentProps || {});
-    createToast(component as ToastContent, toastOptions);
+    const toast = createToast(component as ToastContent, toastOptions);
+    componentProps!.toast = toast;
   }
 
   setTimeout(() => {

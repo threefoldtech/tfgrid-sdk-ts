@@ -1,7 +1,7 @@
 <template>
   <div class="mosha__toast__content d-block">
     You have
-    <button class="link-color" :onclick="() => router.push('/contractslist')">
+    <button class="link-color" :onclick="navigateToContractsList">
       {{ deploymentLen }} {{ deploymentLen > 1 ? "contracts" : "contract" }}
     </button>
     on offline or standby {{ deploymentLen > 1 ? "nodes" : "node" }}
@@ -13,6 +13,8 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from "vue";
+
 import router from "@/router";
 
 export default {
@@ -25,11 +27,24 @@ export default {
       type: Number,
       required: true,
     },
+    toast: {
+      type: Object as PropType<{
+        close: () => void;
+      }>,
+      required: false,
+    },
   },
 
-  setup() {
+  setup(props) {
+    const navigateToContractsList = () => {
+      router.push("/contractslist");
+      if (props.toast) {
+        props.toast.close();
+      }
+    };
     return {
       router,
+      navigateToContractsList,
     };
   },
 };
