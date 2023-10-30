@@ -108,7 +108,7 @@ onMounted(async () => {
 </script>
 
 <script lang="ts">
-import FarmDialog from "./components/farm_Dialog.vue";
+import FarmDialog from "./components/farm_dialog.vue";
 import FarmsTable from "./components/farms_table.vue";
 
 export default {
