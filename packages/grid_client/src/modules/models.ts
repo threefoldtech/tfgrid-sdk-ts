@@ -573,6 +573,7 @@ class FilterOptions {
   @Expose() @IsOptional() @IsBoolean() hasGPU?: boolean;
   @Expose() @IsOptional() @IsBoolean() rentable?: boolean;
   @Expose() @IsOptional() @IsInt() @Min(1) rentedBy?: number;
+  @Expose() @IsOptional() @IsBoolean() randomize?: boolean;
 }
 
 enum CertificationType {
@@ -597,6 +598,7 @@ class FarmFilterOptions {
   @Expose() @IsOptional() @IsInt() page?: number;
   @Expose() @IsOptional() @IsInt() size?: number;
   @Expose() @IsOptional() @IsInt() farmId?: number;
+  @Expose() @IsOptional() @IsBoolean() randomize?: boolean;
 }
 
 class CalculatorModel {
