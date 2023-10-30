@@ -1,7 +1,8 @@
 name: Mass Deployments
 
 on:
-  push:
+  schedule:
+    - cron: "0 1 * * *"
   workflow_dispatch:
 
 jobs:
@@ -18,6 +19,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/v2.2.0
       - name: Set up node 18
         uses: actions/setup-node@v3
         with:
