@@ -1,4 +1,4 @@
-# Grid New Stats
+# Grid Stats
 
 ## Introduction
 
