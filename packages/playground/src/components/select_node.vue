@@ -54,7 +54,7 @@
         <v-text-field
           v-else-if="selection == 'manual'"
           label="Name"
-          v-model="ManualselectedNode"
+          v-model.number="ManualselectedNode"
           :disabled="loadingNodes"
           v-bind="{
             ...props,
@@ -95,6 +95,7 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
+// import type { FilterOptions } from "@threefold/grid_client";
 import { type PropType, type Ref, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
@@ -234,6 +235,16 @@ watch(
   () => ManualselectedNode.value,
   async (value, oldValue) => {
     if (value != undefined || value != null) {
+      // workaround for checking for available nodes
+      // const grid = await getGrid(profileManager.profile!);
+      // if (grid) {
+      //   const filters: FilterOptions = {
+      //     nodeId: value,
+      //   };
+      //   const nodes = await grid.capacity.filterNodes(filters);
+      //   console.log("nodes", nodes);
+      // }
+
       selectedNode.value = { nodeId: Number(value) };
     }
   },
