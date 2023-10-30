@@ -40,23 +40,33 @@ export abstract class AbstractBuilder<T> {
     }
   }
 
-  public async build(path: string): Promise<Response> {
+  public async build(path: string, timeout = 10000): Promise<Response> {
     assertString(path);
     assertPattern(path, /^\//);
 
-    const out: string[] = [];
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-    for (const key in this.__queries) {
-      if (this.__queries[key] === undefined || this.__queries[key] === null || this.__queries[key] === "") {
-        continue;
+    try {
+      const out: string[] = [];
+
+      for (const key in this.__queries) {
+        if (this.__queries[key] === undefined || this.__queries[key] === null || this.__queries[key] === "") {
+          continue;
+        }
+
+        this.__validator[key](this.__queries[key]!);
+        out.push(`${this.__mapper[key]}=${this.__queries[key]}`);
       }
 
-      this.__validator[key](this.__queries[key]!);
-      out.push(`${this.__mapper[key]}=${this.__queries[key]}`);
+      const query = out.length > 0 ? `?${out.join("&")}` : "";
+      const response = await fetch(`${this.uri}${path}${query}`, {
+        signal: controller.signal,
+      });
+      return response;
+    } finally {
+      clearTimeout(timeoutId);
     }
-
-    const query = out.length > 0 ? `?${out.join("&")}` : "";
-    return fetch(`${this.uri}${path}${query}`);
   }
 }
 

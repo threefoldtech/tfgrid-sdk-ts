@@ -10,6 +10,8 @@ import { Decimal } from "decimal.js";
 import { ContractStates } from "../../modules";
 import { Graphql } from "../graphql/client";
 
+export type DiscountLevel = "None" | "Default" | "Bronze" | "Silver" | "Gold";
+
 export interface ListContractByTwinIdOptions {
   graphqlURL: string;
   twinId: number;
@@ -54,6 +56,19 @@ export interface GqlContracts {
   nameContracts: GqlNameContract[];
   nodeContracts: GqlNodeContract[];
   rentContracts: GqlRentContract[];
+}
+
+export interface GqlConsumption {
+  contracts: GqlContracts;
+  contractBillReports: GqlContractBillReports[];
+}
+
+export interface GqlContractBillReports {
+  id: string;
+  contractID: number;
+  discountReceived: DiscountLevel;
+  amountBilled: number;
+  timestamp: number;
 }
 
 export interface ListContractByAddressOptions {
@@ -118,8 +133,7 @@ class TFContracts extends Contracts {
         rentContractsCount: rentContractsCount,
       });
 
-      const data = response["data"] as GqlContracts;
-      return data;
+      return response["data"] as GqlContracts;
     } catch (err) {
       throw Error(`Error listing contracts by twin id ${options.twinId}: ${err}`);
     }
@@ -150,30 +164,30 @@ class TFContracts extends Contracts {
           }`;
     try {
       const response = await gqlClient.query(body, { contractId: options.id });
-      const gqlContracts: GqlContracts = response["data"] as GqlContracts;
-      const billReports = ["contractBillReports"];
+      const gqlConsumption: GqlConsumption = response["data"] as GqlConsumption;
+      const billReports = gqlConsumption.contractBillReports;
       if (billReports.length === 0) {
         return 0;
       } else {
         let duration: number;
-        const amountBilled = new Decimal(billReports[0]["amountBilled"]);
+        const amountBilled = new Decimal(billReports[0].amountBilled);
         if (billReports.length === 2) {
-          duration = (billReports[0]["timestamp"] - billReports[1]["timestamp"]) / 3600; // one hour
+          duration = (billReports[0].timestamp - billReports[1].timestamp) / 3600; // one hour
         } else {
           let createdAt: number;
           for (const contracts of [
-            gqlContracts.nodeContracts,
-            gqlContracts.nameContracts,
-            gqlContracts.rentContracts,
+            gqlConsumption.contracts.nodeContracts,
+            gqlConsumption.contracts.nameContracts,
+            gqlConsumption.contracts.rentContracts,
           ]) {
             if (contracts.length === 1) {
               createdAt = +contracts[0].createdAt;
-              duration = (billReports[0]["timestamp"] - createdAt) / 3600;
+              duration = (billReports[0].timestamp - createdAt) / 3600;
               break;
             }
           }
         }
-        if (!duration!) {
+        if (!duration) {
           duration = 1;
         }
         return amountBilled

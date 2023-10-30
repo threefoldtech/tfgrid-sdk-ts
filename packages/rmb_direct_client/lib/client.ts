@@ -145,7 +145,10 @@ class Client {
       }
       console.log(err);
       throw new Error({
-        message: `Unable to establish a connection with the RMB server. Please check your internet connection and try again. If the problem persists, please contact our support.`,
+        message: `Unable to establish a connection with the RMB server ${this.relayUrl.replace(
+          "wss://",
+          "",
+        )}. Please check your internet connection and try again. If the problem persists, please contact our support.`,
       });
     }
   }

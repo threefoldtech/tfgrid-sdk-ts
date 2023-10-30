@@ -14,7 +14,7 @@
         <v-expansion-panel-title>
           <template v-slot:default="{}">
             <v-row no-gutters>
-              <v-col cols="4" class="d-flex justify-start text-h6"> Filters</v-col>
+              <v-col cols="4" class="d-flex justify-start text-subtitle-1"> Filters</v-col>
             </v-row>
           </template>
         </v-expansion-panel-title>
@@ -112,3 +112,8 @@ export default defineComponent({
   },
 });
 </script>
+<style scoped>
+.v-expansion-panel-title {
+  padding: 6px 24px;
+}
+</style>
