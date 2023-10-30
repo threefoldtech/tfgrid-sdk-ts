@@ -49,6 +49,16 @@
       <template #[`item.solutionType`]="{ item }">
         {{ solutionType[item.value.solutionType] ?? item.value.solutionType }}
       </template>
+      <template #[`item.nodeStatus`]="{ item }">
+        <v-chip
+          v-if="item.value.nodeId !== '-' && !loading"
+          :color="getNodeStateColor(nodeStatus[item.value.nodeId])"
+          class="text-capitalize"
+        >
+          {{ nodeStatus[item.value.nodeId] }}
+        </v-chip>
+        <p v-else>-</p>
+      </template>
       <template #[`item.actions`]="{ item }">
         <v-tooltip text="Show Details">
           <template #activator="{ props }">
@@ -91,8 +101,8 @@
     <v-card>
       <v-card-title class="text-h5 mt-2"> Are you sure you want to delete the following contracts? </v-card-title>
       <v-alert class="ma-4" type="warning" variant="tonal"
-        >It is advisable to remove the contract from its solution page, especially
-        when multiple contracts may be linked to the same instance.</v-alert
+        >It is advisable to remove the contract from its solution page, especially when multiple contracts may be linked
+        to the same instance.</v-alert
       >
       <v-alert class="mx-4" type="warning" variant="tonal">Deleting contracts may take a while to complete.</v-alert>
       <v-card-text>
@@ -138,7 +148,7 @@
 
 <script lang="ts" setup>
 import { ContractStates, type GridClient } from "@threefold/grid_client";
-import { ref } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { useProfileManager } from "../stores";
 import type { VDataTableHeader } from "../types";
@@ -152,6 +162,7 @@ const loading = ref(false);
 const isExporting = ref(false);
 const grid = ref<GridClient | null>();
 const selectedContracts = ref<NormalizedContract[]>([]);
+const nodeStatus = ref() as Ref<{ [x: number]: NodeStatus }>;
 const headers: VDataTableHeader = [
   { title: "PLACEHOLDER", key: "data-table-select" },
   { title: "ID", key: "contractId" },
@@ -162,6 +173,8 @@ const headers: VDataTableHeader = [
   { title: "Solution Name", key: "solutionName" },
   { title: "Created At", key: "createdAt" },
   { title: "Expiration", key: "expiration" },
+  { title: "Node ID", key: "nodeId" },
+  { title: "Node Status", key: "nodeStatus", sortable: false },
   { title: "Details", key: "actions", sortable: false },
 ];
 
@@ -170,8 +183,14 @@ async function onMount() {
   contracts.value = [];
   grid.value = await getGrid(profileManager.profile!);
   contracts.value = await getUserContracts(grid.value!);
+  nodeStatus.value = await getNodeStatus(nodeIDs.value);
   loading.value = false;
 }
+
+const nodeIDs = computed(() => {
+  const allNodes = contracts.value.map(contract => contract.nodeId);
+  return [...new Set(allNodes)];
+});
 
 const loadingContractId = ref<number>();
 const contractLocked = ref<ContractLock>();
@@ -260,11 +279,35 @@ async function onDelete() {
   }
   deleting.value = false;
 }
+
+async function getNodeStatus(nodeIDs: (number | undefined)[]) {
+  const resultPromises = nodeIDs.map(async nodeId => {
+    if (typeof nodeId !== "number") return {};
+    const status = (await gridProxyClient.nodes.byId(nodeId)).status;
+    return { [nodeId]: status };
+  });
+
+  const resultsArray = await Promise.all(resultPromises);
+
+  return resultsArray.reduce((acc, obj) => Object.assign(acc, obj), {});
+}
+function getNodeStateColor(state: NodeStatus): string {
+  switch (state) {
+    case NodeStatus.Up:
+      return "success";
+    case NodeStatus.Down:
+      return "error";
+    case NodeStatus.Standby:
+      return "warning";
+  }
+}
 </script>
 
 <script lang="ts">
+import { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
 
+import { gridProxyClient } from "../clients";
 import ListTable from "../components/list_table.vue";
 import { solutionType } from "../types/index";
 import { downloadAsJson, normalizeError } from "../utils/helpers";
