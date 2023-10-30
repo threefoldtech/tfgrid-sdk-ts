@@ -6,7 +6,7 @@
   <div class="pt-5">
     <v-card>
       <v-tabs v-model="activeTab" align-tabs="center">
-        <v-tab v-for="(tab, index) in tabs" :key="index" :value="index" color="primary">
+        <v-tab v-for="(tab, index) in tabs" :key="index" :value="index" color="info">
           {{ tab.label }}
         </v-tab>
       </v-tabs>

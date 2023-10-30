@@ -1,8 +1,8 @@
 <template>
   <v-card :loading="loading">
-    <v-alert class="pa-5" style="height: 20px" color="info">
-      <h4 class="text-center">
-        <v-icon :icon="icon" size="x-large" />
+    <v-alert class="pa-5" style="height: 20px" color="primary">
+      <h4 class="text-center font-weight-medium">
+        <v-icon :icon="icon" size="large" />
         {{ title }}
       </h4>
     </v-alert>
