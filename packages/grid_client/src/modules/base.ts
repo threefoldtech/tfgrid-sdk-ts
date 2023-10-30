@@ -106,111 +106,121 @@ class BaseModule {
 
   async _migrateListKeys(): Promise<void> {
     const oldPath = this.getDeploymentPath("");
+    const keys = await this.backendStorage.list(oldPath);
 
-    const oldKeys = await this.backendStorage.list(oldPath);
-    if (oldKeys.length === 0) {
-      return;
-    }
+    const __getValue = (key: string) => {
+      const path = PATH.join(oldPath, key, "contracts.json");
+      return this.backendStorage.load(path).catch(error => {
+        console.log(`Error while fetching key('${key}'):`, error.message || error);
+      });
+    };
 
-    const values = await Promise.all(
-      oldKeys.map(k =>
-        this.backendStorage.load(PATH.join(oldPath, k, "contracts.json")).catch(error => {
-          console.log(`Error while fetching contarct data PATH[${PATH.join(oldPath, k, "contracts.json")}]`, error);
-          return null;
-        }),
-      ),
-    );
+    const values = await Promise.all(keys.map(__getValue));
 
-    const contracts = await Promise.all(
-      values.flat(1).map(value => {
-        if (value) return this.tfClient.contracts.get({ id: value.contract_id });
+    const __updatePath = (key: string, index: number) => {
+      const value = values[index];
+      const from = PATH.join(oldPath, key, "contracts.json");
+      const to = this.getNewDeploymentPath(key, "contracts.json");
+
+      if (!value || from === to) {
         return Promise.resolve(null);
-      }),
-    );
-
-    const updateContractsExts: Promise<any>[] = [];
-    for (const contract of contracts) {
-      if (!contract) {
-        continue;
       }
 
-      const { nodeContract } = contract.contractType || {};
-      if (!nodeContract) {
-        continue;
-      }
+      return [this.backendStorage.dump(to, value), this.backendStorage.remove(from)];
+    };
 
-      const { deploymentData, deploymentHash: hash } = nodeContract;
-      const oldData = JSON.parse(deploymentData || "{}") as unknown as {
-        type: string;
-        name: string;
-        projectName: string;
-      };
-      const { name, projectName } = oldData;
-
-      let instanceName = name;
-
-      if (this.moduleName === "gateways") {
-        const [, instance] = name.split(this.config.twinId.toString());
-        if (instance) {
-          instanceName = instance;
-        }
-      }
-
-      if (projectName?.endsWith(`/${instanceName}`)) {
-        continue;
-      }
-
-      oldData.projectName = `${projectName}/${instanceName}`;
-
-      updateContractsExts.push(
-        this.tfClient.contracts.updateNode({
-          id: contract.contractId,
-          data: JSON.stringify(oldData),
-          hash,
-        }),
-      );
-    }
-
-    const _updateContractsExts = await Promise.all(updateContractsExts.flat(1));
-    const __updateContractsExts = _updateContractsExts.flat(1).filter(Boolean);
-    await this.tfClient.applyAllExtrinsics(__updateContractsExts);
-
-    let ext1: any[] = [];
-    let ext2: any[] = [];
-
-    for (let i = 0; i < oldKeys.length; i++) {
-      const oldKey = oldKeys[i];
-
-      let newKey = oldKey;
-      if (this.moduleName === "gateways") {
-        const [, key] = oldKey.split(this.config.twinId.toString());
-        if (key) {
-          newKey = key;
-        }
-      }
-
-      const value = values[i];
-      const from = PATH.join(oldPath, oldKey, "contracts.json");
-      const to = this.getNewDeploymentPath(
-        ...(this.projectName.includes(newKey) ? [oldKey] : [newKey, oldKey]),
-        "contracts.json",
-      );
-
-      if (value) {
-        ext1.push(this.backendStorage.dump(to, value));
-        ext2.push(this.backendStorage.remove(from));
-      }
-    }
-
-    ext1 = await Promise.all(ext1.flat(1));
-    ext2 = await Promise.all(ext2.flat(1));
+    const exts = await Promise.all(keys.map(__updatePath).flat(1));
 
     if (this.backendStorage.type === BackendStorageType.tfkvstore) {
-      ext1 = ext1.flat(1).filter(x => !!x);
-      ext2 = ext2.flat(1).filter(x => !!x);
-
-      await this.tfClient.applyAllExtrinsics(ext1.concat(ext2));
+      await this.tfClient.applyAllExtrinsics(exts.flat(1).filter(Boolean));
     }
+
+    // const oldPath = this.getDeploymentPath("");
+    // const oldKeys = await this.backendStorage.list(oldPath);
+    // if (oldKeys.length === 0) {
+    //   return;
+    // }
+    // const values = await Promise.all(
+    //   oldKeys.map(k =>
+    //     this.backendStorage.load(PATH.join(oldPath, k, "contracts.json")).catch(error => {
+    //       console.log(`Error while fetching contarct data PATH[${PATH.join(oldPath, k, "contracts.json")}]`, error);
+    //       return null;
+    //     }),
+    //   ),
+    // );
+    // const contracts = await Promise.all(
+    //   values.flat(1).map(value => {
+    //     if (value) return this.tfClient.contracts.get({ id: value.contract_id });
+    //     return Promise.resolve(null);
+    //   }),
+    // );
+    // const updateContractsExts: Promise<any>[] = [];
+    // for (const contract of contracts) {
+    //   if (!contract) {
+    //     continue;
+    //   }
+    //   const { nodeContract } = contract.contractType || {};
+    //   if (!nodeContract) {
+    //     continue;
+    //   }
+    //   const { deploymentData, deploymentHash: hash } = nodeContract;
+    //   const oldData = JSON.parse(deploymentData || "{}") as unknown as {
+    //     type: string;
+    //     name: string;
+    //     projectName: string;
+    //   };
+    //   const { name, projectName } = oldData;
+    //   let instanceName = name;
+    //   if (this.moduleName === "gateways") {
+    //     const [, instance] = name.split(this.config.twinId.toString());
+    //     if (instance) {
+    //       instanceName = instance;
+    //     }
+    //   }
+    //   if (projectName?.endsWith(`/${instanceName}`)) {
+    //     continue;
+    //   }
+    //   oldData.projectName = `${projectName}/${instanceName}`;
+    //   updateContractsExts.push(
+    //     this.tfClient.contracts.updateNode({
+    //       id: contract.contractId,
+    //       data: JSON.stringify(oldData),
+    //       hash,
+    //     }),
+    //   );
+    // }
+    // const _updateContractsExts = await Promise.all(updateContractsExts.flat(1));
+    // const __updateContractsExts = _updateContractsExts.flat(1).filter(Boolean);
+    // await this.tfClient.applyAllExtrinsics(__updateContractsExts);
+    // let ext1: any[] = [];
+    // let ext2: any[] = [];
+    // for (let i = 0; i < oldKeys.length; i++) {
+    //   const oldKey = oldKeys[i];
+    //   let newKey = oldKey;
+    //   if (this.moduleName === "gateways") {
+    //     const [, key] = oldKey.split(this.config.twinId.toString());
+    //     if (key) {
+    //       newKey = key;
+    //     }
+    //   }
+    //   const value = values[i];
+    //   const from = PATH.join(oldPath, oldKey, "contracts.json");
+    //   const to = this.getNewDeploymentPath(
+    //     ...(this.projectName.includes(newKey) ? [oldKey] : [newKey, oldKey]),
+    //     "contracts.json",
+    //   );
+    //   if (value) {
+    //     ext1.push(this.backendStorage.dump(to, value));
+    //     ext2.push(this.backendStorage.remove(from));
+    //   }
+    // }
+    // ext1 = await Promise.all(ext1.flat(1));
+    // ext2 = await Promise.all(ext2.flat(1));
+    // if (this.backendStorage.type === BackendStorageType.tfkvstore) {
+    //   ext1 = ext1.flat(1).filter(x => !!x);
+    //   ext2 = ext2.flat(1).filter(x => !!x);
+    //   await this.tfClient.applyAllExtrinsics(ext1.concat(ext2));
+    // }
   }
 
   async _list(): Promise<string[]> {
