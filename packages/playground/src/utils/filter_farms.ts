@@ -1,4 +1,4 @@
-import type { CertificationType, Farm, FarmsQuery, Pagination } from "@threefold/gridproxy_client";
+import type { Farm, FarmsQuery, Pagination } from "@threefold/gridproxy_client";
 
 import { gridProxyClient } from "@/clients";
 import type { FarmFilterInputs } from "@/explorer/utils/types";
@@ -6,23 +6,7 @@ import type { FarmFilterInputs } from "@/explorer/utils/types";
 import { isNumeric, min, startsWith, validateResourceMaxNumber } from "./validators";
 
 export async function getFilteredFarms(options: FarmsQuery): Promise<Pagination<Farm[]>> {
-  const filters: FarmsQuery = {
-    page: options.page,
-    size: options.size,
-    retCount: options.retCount,
-    freeIps: options.freeIps,
-    totalIps: options.totalIps,
-    version: options.version,
-    nameContains: options.nameContains,
-    dedicated: options.dedicated,
-    stellarAddress: options.stellarAddress,
-    pricingPolicyId: options.pricingPolicyId,
-    farmId: options.farmId,
-    twinId: options.twinId,
-    name: options.name,
-    certificationType: options.certificationType as CertificationType,
-  };
-  const farms = await gridProxyClient.farms.list(filters);
+  const farms = await gridProxyClient.farms.list(options);
   return farms;
 }
 
