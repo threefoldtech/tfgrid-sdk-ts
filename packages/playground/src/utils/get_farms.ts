@@ -1,7 +1,5 @@
 import type { FarmFilterOptions, FarmInfo, GridClient } from "@threefold/grid_client";
-import type { Farm as IFarm } from "@threefold/gridproxy_client";
-
-import type { Farm } from "@/types";
+import type { Farm } from "@threefold/gridproxy_client";
 
 import { gqlClient, gridProxyClient } from "../clients";
 
@@ -12,7 +10,7 @@ export async function getFarms(
   grid: GridClient,
   filters: FarmFilterOptions,
   options: GetFarmsOptions = {},
-): Promise<Farm[]> {
+): Promise<FarmInfo[]> {
   let farms = await grid.capacity.filterFarms({ ...filters }).catch(() => []);
 
   if (options.exclusiveFor && !filters.publicIp) {
@@ -20,11 +18,7 @@ export async function getFarms(
     farms = farms.filter(farm => !blockedFarms.has(farm.farmId));
   }
 
-  return farms.map(farm => ({
-    name: farm.name,
-    farmID: farm.farmId,
-    country: filters.country,
-  }));
+  return farms;
 }
 
 export async function getBlockedFarmSet(exclusiveFor: string): Promise<Set<number>> {
@@ -60,12 +54,9 @@ export async function getBlockedFarmSet(exclusiveFor: string): Promise<Set<numbe
 
 export async function getAllFarms() {
   const farms = await gridProxyClient.farms.listAll();
-  console.log(farms);
   return farms;
 }
 
-// export function fallbackDataExtractor<T = GetDataQueryType, K extends keyof T = keyof T>(key: K): (state: IState) => T[K]; // prettier-ignore
-// export function fallbackDataExtractor<T = GetDataQueryType, K extends keyof T = keyof T>(key: K, state: IState): T[K]; // prettier-ignore
 export function fallbackDataExtractor(key: any, state?: any) {
   if (state) return state.data?.[key] ?? [];
   return (state: any) => state.data?.[key] ?? [];
