@@ -1,5 +1,4 @@
 import type { FarmFilterOptions, FarmInfo, GridClient } from "@threefold/grid_client";
-import type { Farm } from "@threefold/gridproxy_client";
 
 import { gqlClient, gridProxyClient } from "../clients";
 
