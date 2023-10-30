@@ -3,7 +3,7 @@ import type { Farm, FarmsQuery, Pagination } from "@threefold/gridproxy_client";
 import { gridProxyClient } from "@/clients";
 import type { FarmFilterInputs } from "@/explorer/utils/types";
 
-import { isNumeric, min, startsWith, validateResourceMaxNumber } from "./validators";
+import { isAlphanumeric, isNumeric, min, startsWith, validateResourceMaxNumber } from "./validators";
 
 export async function getFilteredFarms(options: FarmsQuery): Promise<Pagination<Farm[]>> {
   const farms = await gridProxyClient.farms.list(options);
@@ -20,6 +20,7 @@ export const inputsInitializer: FarmFilterInputs = {
         isNumeric("This field accepts numbers only.", { no_symbols: true }),
         min("The farm id should be larger then zero.", 1),
         startsWith("The farm id start with zero.", "0"),
+        isAlphanumeric("Farm name should be alphanumeric"),
       ],
     ],
     type: "text",
