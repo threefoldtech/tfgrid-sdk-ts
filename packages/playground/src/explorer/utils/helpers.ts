@@ -160,7 +160,7 @@ export const getFarmQueries = (mixedFilters: FarmMixedFilter) => {
 export async function getFarms(queries: Partial<FarmsQuery>): Promise<Pagination<Farm[]>> {
   try {
     const farms = await gridProxyClient.farms.list(queries);
-    return JSON.parse(JSON.stringify(farms));
+    return farms;
   } catch (error) {
     console.error("An error occurred while requesting farms:", error);
     throw error;

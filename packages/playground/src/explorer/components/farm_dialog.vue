@@ -24,54 +24,7 @@
         <v-card class="h-100">
           <v-row class="pa-8 mt-2" justify-md="start" justify-sm="center">
             <v-col cols="12" md="6" sm="8">
-              <v-card-title class="bg-info">
-                <h4 class="text-center">
-                  <v-icon icon="mdi-webpack" size="x-large" />
-                  Farm Details
-                </h4>
-              </v-card-title>
-              <v-card-item class="mt-2 mb-2 px-0">
-                <v-row class="bb-gray">
-                  <v-col class="d-flex justify-start align-center font-weight-bold ml-3 text-subtitle-1"> ID </v-col>
-                  <v-col class="d-flex justify-end align-center mr-3 text-body-6">
-                    {{ farm.farmId }}
-                  </v-col>
-                  <v-divider></v-divider>
-                  <v-col class="d-flex justify-start align-center font-weight-bold ml-3 text-subtitle-1"> Name </v-col>
-                  <v-col class="d-flex justify-end align-center mr-3 text-body-6">
-                    {{ farm.name }}
-                  </v-col>
-                  <v-divider></v-divider>
-                  <v-col class="d-flex justify-start align-center font-weight-bold ml-3 text-subtitle-1">
-                    Stellar Address
-                  </v-col>
-                  <v-col class="d-flex justify-end align-center mr-3 text-body-6">
-                    <v-tooltip
-                      v-if="farm.stellarAddress"
-                      location="top"
-                      text="Copy the stellar address to the clipboard."
-                    >
-                      <template #activator="{ props }">
-                        <p v-bind="props" v-if="farm.stellarAddress">
-                          {{
-                            farm.stellarAddress.length > maxLenChar
-                              ? farm.stellarAddress.slice(0, maxLenChar) + "..."
-                              : farm.stellarAddress
-                          }}
-                        </p>
-                        <v-icon
-                          v-if="farm.stellarAddress && farm.stellarAddress.length"
-                          class="ml-1"
-                          v-bind="props"
-                          icon="mdi-content-copy"
-                          @click="copy(farm.stellarAddress)"
-                        />
-                      </template>
-                    </v-tooltip>
-                    <p v-else>None</p>
-                  </v-col>
-                </v-row>
-              </v-card-item>
+              <farm-details-card :farm="farm" />
             </v-col>
             <v-col cols="12" md="6" sm="8" v-if="twin">
               <v-card-title class="bg-info">
@@ -127,7 +80,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { Twin } from "@threefold/gridproxy_client";
+import type { Farm, Twin } from "@threefold/gridproxy_client";
 import type { PropType } from "vue";
 import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
@@ -135,7 +88,6 @@ import { useRoute } from "vue-router";
 import router from "@/router";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
-import type { IFarm } from "../farms.vue";
 import { getTwins } from "../utils/helpers";
 
 const route = useRoute();
@@ -146,7 +98,7 @@ const props = defineProps({
     required: true,
   },
   farm: {
-    type: Object as PropType<IFarm>,
+    type: Object as PropType<Farm>,
     required: true,
   },
 });
@@ -177,7 +129,7 @@ const copy = (address: string) => {
 
 watch(
   () => props.farm,
-  async (farm: IFarm) => {
+  async (farm: Farm) => {
     if (farm.twinId > 0) {
       loading.value = true;
       await _getTwins();
@@ -197,12 +149,6 @@ watch(
 onMounted(async () => {
   await _getTwins();
 });
-</script>
-
-<script lang="ts">
-export default {
-  name: "Farm Dialog",
-};
 </script>
 
 <style>

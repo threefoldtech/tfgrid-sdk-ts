@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { CertificationType, FarmsQuery, PublicIp } from "@threefold/gridproxy_client";
+import type { Farm, FarmsQuery } from "@threefold/gridproxy_client";
 import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
@@ -26,24 +26,12 @@ import {
   farmOptionsInitializer,
 } from "./utils/types";
 
-export interface IFarm {
-  farmId: number;
-  name: string;
-  twinId: number;
-  pricingPolicyId: number;
-  certificationType: CertificationType;
-  publicIps: PublicIp[];
-  stellarAddress?: string;
-  totalPublicIp: number;
-  usedPublicIp: number;
-  freePublicIp: number;
-}
 const route = useRoute();
 
 const loading = ref<boolean>(false);
-const farms = ref<IFarm[]>([]);
+const farms = ref<Farm[]>([]);
 const isDialogOpened = ref<boolean>(false);
-const selectedFarm = ref<IFarm>();
+const selectedFarm = ref<Farm>();
 const filterInputs = ref<FarmFilterInputs>(inputsInitializer);
 const filterOptions = ref<FarmFilterOptions>(farmOptionsInitializer);
 const isValidForm = ref<boolean>(false);
@@ -84,7 +72,7 @@ const checkPath = async () => {
   }
 };
 
-const openDialog = (item: IFarm) => {
+const openDialog = (item: Farm) => {
   selectedFarm.value = item;
   isDialogOpened.value = true;
 };
@@ -120,14 +108,14 @@ onMounted(async () => {
 </script>
 
 <script lang="ts">
-import farmDialog from "./components/farm_Dialog.vue";
+import FarmDialog from "./components/farm_Dialog.vue";
 import FarmsTable from "./components/farms_table.vue";
 
 export default {
   name: "Farms",
   components: {
     FarmsTable,
-    farmDialog,
+    FarmDialog,
   },
 };
 </script>

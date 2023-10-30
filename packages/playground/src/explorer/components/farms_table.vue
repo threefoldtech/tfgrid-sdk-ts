@@ -18,11 +18,10 @@
 </template>
 
 <script lang="ts" setup>
+import type { Farm } from "@threefold/gridproxy_client";
 import type { PropType } from "vue";
 
 import type { VDataTableHeader } from "@/types";
-
-import type { IFarm } from "../farms.vue";
 
 const emit = defineEmits(["open-dialog"]);
 const openSheet = (_e: any, { item }: any) => {
@@ -32,7 +31,7 @@ const openSheet = (_e: any, { item }: any) => {
 defineProps({
   items: {
     required: true,
-    type: Object as PropType<IFarm[]>,
+    type: Object as PropType<Farm[]>,
   },
   loading: {
     required: true,
