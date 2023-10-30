@@ -7,7 +7,7 @@
     <v-container v-if="showDialogue">
       <v-dialog v-model="showDialogue" max-width="600">
         <v-card>
-          <v-toolbar color="primary" dark class="custom-toolbar">
+          <v-toolbar color="primary" class="custom-toolbar">
             <p class="mb-5">Add Public IP to Farm</p>
           </v-toolbar>
           <div class="pa-6">
@@ -28,11 +28,11 @@
                   v-bind:="props"
                   @update:model-value="$emit('update:publicIP', $event)"
                   outlined
-                  :label="type === 'Single' ? 'IP' : 'From IP'"
+                  :label="type === IPType.single ? 'IP' : 'From IP'"
                 ></v-text-field>
               </input-validator>
               <input-validator
-                v-if="type === 'Range'"
+                v-if="type === IPType.range"
                 :value="$props.toPublicIP"
                 :rules="[validators.required('IP is required.'), validators.isIPRange('Not a valid IP'), toIpCheck]"
                 #="{ props }"
@@ -85,7 +85,7 @@
             <v-btn
               variant="tonal"
               @click="showRange"
-              :disabled="!valid || $props.type === 'Single' || !$props.toPublicIP"
+              :disabled="!valid || $props.type === IPType.single || !$props.toPublicIP"
               >Show IPs Range</v-btn
             >
             <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
@@ -102,6 +102,8 @@ import { getIPRange } from "get-ip-range";
 import { default as PrivateIp } from "private-ip";
 import { ref, watch } from "vue";
 
+import { IPType } from "@/utils/types";
+
 import { useGrid } from "../../../stores";
 import { createCustomToast, ToastType } from "../../../utils/custom_toast";
 
@@ -113,7 +115,7 @@ export default {
     const gridStore = useGrid();
     const valid = ref(false);
     const IPs = ref<string[]>();
-    const items = ref<string[]>(["Single", "Range"]);
+    const items = ref<string[]>([IPType.single, IPType.range]);
     const selectedItem = ref(props.type);
     const loading = ref(false);
     const isAdded = ref(false);
@@ -201,7 +203,7 @@ export default {
       const start = props.publicIP.split("/")[0];
       let end = props.toPublicIP.split("/")[0];
 
-      if (props.type === "Single") end = start;
+      if (props.type === IPType.single) end = start;
 
       IPs.value = getIPRange(start, end);
       IPs.value.forEach((ip, i) => {
@@ -212,7 +214,7 @@ export default {
     async function addFarmIp(farmId: number, gw: number) {
       try {
         isAdding.value = true;
-        if (props.type === "Range") {
+        if (props.type === IPType.range) {
           addIPs();
         }
         if (IPs.value && IPs.value.length > 1) {
@@ -243,6 +245,7 @@ export default {
       isAdding,
       inRange,
       showIPs,
+      IPType,
       showRange,
       addIPs,
       addFarmIp,

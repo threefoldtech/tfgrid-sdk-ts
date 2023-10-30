@@ -22,7 +22,11 @@
             <form-validator v-model="valid">
               <input-validator
                 :value="fee"
-                :rules="[validators.required('Fee is required.'), validators.isNumeric('Fee must be a valid number.')]"
+                :rules="[
+                  validators.required('Fee is required.'),
+                  validators.isNumeric('Fee must be a valid number.'),
+                  validators.min('Fee must be a number larger than 0.', 1),
+                ]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Fee is in USD/month">

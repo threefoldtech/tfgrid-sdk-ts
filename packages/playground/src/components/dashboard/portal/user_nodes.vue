@@ -49,9 +49,7 @@
                 <v-expansion-panel-text>
                   <v-row class="mt-5 mb-5">
                     <v-col v-for="(value, key) in item.raw.total_resources" :key="key" align="center">
-                      <p class="text-center text-uppercase">
-                        {{ key === "cru" ? "cpu" : key === "mru" ? "ram" : key }}
-                      </p>
+                      <p class="text-center">{{ getKey(key) }}</p>
                       <v-flex class="text-truncate">
                         <v-tooltip bottom class="d-none">
                           <template v-slot:activator="{ props }">
@@ -291,6 +289,19 @@ export default {
       ];
     }
 
+    function getKey(key: any) {
+      switch (key) {
+        case "mru":
+          return "RAM";
+        case "sru":
+          return "SSD";
+        case "hru":
+          return "HDD";
+        case "cru":
+          return "CPU";
+      }
+    }
+
     return {
       loading,
       page,
@@ -309,6 +320,7 @@ export default {
       getPercentage,
       byteToGB,
       getNodeDetails,
+      getKey,
     };
   },
 };

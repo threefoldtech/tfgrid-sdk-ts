@@ -21,7 +21,7 @@
       </template>
 
       <template #[`item.contract_id`]="{ item }">
-        {{ item.raw.ip || "-" }}
+        {{ item.raw.contract_id || "-" }}
       </template>
       <template #[`item.actions`]="{ item, index }">
         <v-btn color="red-darken-1" @click="showDialogue = true" :disabled="loading" :loading="loading">
@@ -55,6 +55,7 @@ import type { RemoveFarmIPModel } from "@threefold/grid_client";
 import { onMounted, ref } from "vue";
 
 import { useGrid } from "@/stores";
+import { IPType } from "@/utils/types";
 
 import { createCustomToast, ToastType } from "../../../utils/custom_toast";
 import AddIP from "./add_ip.vue";
@@ -88,10 +89,6 @@ export default {
     const publicIps = ref();
     const loading = ref(false);
     const showDialogue = ref(false);
-    enum IPType {
-      single = "Single",
-      range = "Range",
-    }
     const type = ref(IPType.single);
     const publicIP = ref();
     const toPublicIP = ref();
