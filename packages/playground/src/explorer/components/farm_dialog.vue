@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog">
+  <v-dialog v-model="dialog" hide-overlay transition="dialog-bottom-transition" :scrim="false">
     <v-container>
       <v-toolbar>
         <div class="d-flex justify-center">
@@ -12,17 +12,17 @@
       <template v-if="loading">
         <div color="transparent" class="text-center">
           <v-progress-circular color="primary" indeterminate :size="50" :width="5" />
-          <p class="mt-2">Loading farm details...</p>
+          <p>Loading farm details...</p>
         </div>
       </template>
 
       <template v-else>
-        <v-card class="h-100">
-          <v-row class="pa-8 mt-2" justify-md="start" justify-sm="center">
-            <v-col cols="12" md="6" sm="8">
+        <v-card>
+          <v-row class="pa-5">
+            <v-col>
               <farm-details-card :farm="farm" />
             </v-col>
-            <v-col cols="12" md="6" sm="8">
+            <v-col>
               <twin-details-card :farm="farm" />
             </v-col>
           </v-row>
