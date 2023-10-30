@@ -36,11 +36,11 @@ jobs:
           yarn
           lerna run build --no-private
 
-      - name: Run test batch vms
-        id: batchvms
+      - name: Run test mass deployments
+        id: massdeployments
         continue-on-error: true
         run: |
-          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/batch_vms.ts
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/mass_deployments.ts
 
       - name: Cleanup - Delete all contracts
         id: deleteall
@@ -49,10 +49,10 @@ jobs:
 
       - name: Test Results
         run: |
-          echo Batch Vms: ${{ steps.batchvms.outcome }}
+          echo Batch Vms: ${{ steps.massdeployments.outcome }}
           echo Delete all contracts: ${{ steps.deleteall.outcome }}
 
       - name: Check test script status
         if: |
-          steps.batchvms.outcome != 'success'
+          steps.massdeployments.outcome != 'success'
         run: exit 1

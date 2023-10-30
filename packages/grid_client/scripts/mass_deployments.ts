@@ -44,7 +44,13 @@ async function main() {
       nodeMRU: mru / 1024,
       nodeSRU: diskSize + rootFs,
       publicIp: publicIp,
+      availableFor: await grid3.twins.get_my_twin_id(),
+      randomize: true,
     } as FarmFilterOptions);
+
+    if (farms.length < 1) {
+      throw new Error("No farms found");
+    }
 
     //Node Selection
     const nodes = await grid3.capacity.filterNodes({
@@ -53,14 +59,19 @@ async function main() {
       sru: rootFs + diskSize,
       availableFor: await grid3.twins.get_my_twin_id(),
       farmId: +randomChoice(farms).farmId,
+      randomize: true,
     } as FilterOptions);
 
-    const nodeId = +randomChoice(nodes).nodeId;
+    if (nodes.length < 1) {
+      errors.push("Node not found");
+      failedCount++;
+      continue;
+    }
 
     // create vm node Object
     const vm = new MachineModel();
     vm.name = vmName;
-    vm.node_id = nodeId;
+    vm.node_id = nodes[0].nodeId;
     vm.disks = [disk1];
     vm.public_ip = publicIp;
     vm.planetary = true;
@@ -97,7 +108,11 @@ async function main() {
   log("Failed Deployments: " + failedCount);
 
   // List of failed deployments errors
-  log("Failed deployments errors: " + errors);
+  log("Failed deployments errors: ");
+  for (let i = 0; i < errors.length; i++) {
+    log(errors[i]);
+    log("---------------------------------------------");
+  }
 
   await grid3.disconnect();
 }
