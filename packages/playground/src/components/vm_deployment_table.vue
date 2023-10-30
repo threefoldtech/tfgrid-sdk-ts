@@ -91,6 +91,7 @@ const items = ref<any[]>([]);
 const namesOfFailedDeployments = ref("");
 
 onMounted(loadDeployments);
+
 async function loadDeployments() {
   items.value = [];
   loading.value = true;
@@ -111,12 +112,11 @@ async function loadDeployments() {
       ? { count: 0, items: [] }
       : await loadVms(updateGrid(grid!, { projectName: "" }), { filter });
   if (chunk3.count > 0) await grid!.gateway.list();
-
   const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
   const failedDeployments = [
-    ...(chunk1 as any).failedDeployments,
-    ...(chunk2 as any).failedDeployments,
-    ...(chunk3 as any).failedDeployments,
+    ...((chunk1 as any).failedDeployments ?? []),
+    ...((chunk2 as any).failedDeployments ?? []),
+    ...((chunk3 as any).failedDeployments ?? []),
   ];
   namesOfFailedDeployments.value = failedDeployments.join(", ");
 
