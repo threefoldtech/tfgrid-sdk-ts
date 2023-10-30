@@ -58,12 +58,8 @@ export default {
   setup(props, { emit }) {
     const loading = ref(false);
     const dialog = ref(props.openDialog);
-    const isError = ref(false);
-    const errorMessage = ref("");
 
     function closeDialog(newValue: boolean) {
-      isError.value = false;
-      errorMessage.value = "";
       emit("close-dialog", newValue);
     }
 
@@ -77,8 +73,6 @@ export default {
     return {
       dialog,
       loading,
-      errorMessage,
-      isError,
       closeDialog,
     };
   },
