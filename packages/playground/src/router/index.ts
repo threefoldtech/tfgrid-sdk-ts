@@ -76,7 +76,7 @@ const router = createRouter({
         },
         {
           path: "farms",
-          component: () => import("../explorer/farms.vue"),
+          component: () => import("../explorer/views/farms.vue"),
           meta: { title: "Farms" },
         },
       ],

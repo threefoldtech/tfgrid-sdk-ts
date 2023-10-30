@@ -16,15 +16,15 @@ import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import router from "@/router";
-import { inputsInitializer } from "@/utils/filter_farms";
 
-import { getFarmQueries, getFarms } from "./utils/helpers";
+import { inputsInitializer } from "../../utils/filter_farms";
+import { getFarmQueries, getFarms } from "../utils/helpers";
 import {
   type FarmFilterInputs,
   type FarmFilterOptions,
   type FarmMixedFilter,
   farmOptionsInitializer,
-} from "./utils/types";
+} from "../utils/types";
 
 const route = useRoute();
 
@@ -108,8 +108,8 @@ onMounted(async () => {
 </script>
 
 <script lang="ts">
-import FarmDialog from "./components/farm_dialog.vue";
-import FarmsTable from "./components/farms_table.vue";
+import FarmDialog from "../components/farm_dialog.vue";
+import FarmsTable from "../components/farms_table.vue";
 
 export default {
   name: "Farms",

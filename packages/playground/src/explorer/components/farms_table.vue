@@ -17,63 +17,68 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts">
 import type { Farm } from "@threefold/gridproxy_client";
 import type { PropType } from "vue";
 
 import type { VDataTableHeader } from "@/types";
-
-const emit = defineEmits(["open-dialog"]);
-const openSheet = (_e: any, { item }: any) => {
-  emit("open-dialog", item.value);
+export default {
+  props: {
+    items: {
+      required: true,
+      type: Object as PropType<Farm[]>,
+    },
+    loading: {
+      required: true,
+      type: Boolean,
+    },
+  },
+  setup(props, { emit }) {
+    const openSheet = (_e: any, { item }: any) => {
+      emit("open-dialog", item.value);
+    };
+    const itemPerPage = 10;
+    const headers: VDataTableHeader = [
+      { title: "ID", key: "farmId" },
+      { title: "Name", key: "name" },
+      {
+        title: "Total Public IPs",
+        key: "totalPublicIp",
+        align: "start",
+        sortable: false,
+      },
+      {
+        title: "Free Public IPs",
+        key: "freePublicIp",
+        align: "start",
+        sortable: false,
+      },
+      {
+        title: "Used Public IPs",
+        key: "usedPublicIp",
+        align: "start",
+        sortable: false,
+      },
+      {
+        title: "Certification Type",
+        key: "certificationType",
+        align: "start",
+        sortable: false,
+      },
+      {
+        title: "Pricing Policy",
+        key: "pricingPolicyId",
+        align: "start",
+        sortable: false,
+      },
+    ];
+    return {
+      headers,
+      itemPerPage,
+      openSheet,
+    };
+  },
 };
-
-defineProps({
-  items: {
-    required: true,
-    type: Object as PropType<Farm[]>,
-  },
-  loading: {
-    required: true,
-    type: Boolean,
-  },
-});
-
-const itemPerPage = 10;
-const headers: VDataTableHeader = [
-  { title: "ID", key: "farmId" },
-  { title: "Name", key: "name" },
-  {
-    title: "Total Public IPs",
-    key: "totalPublicIp",
-    align: "start",
-    sortable: false,
-  },
-  {
-    title: "Free Public IPs",
-    key: "freePublicIp",
-    align: "start",
-    sortable: false,
-  },
-  {
-    title: "Used Public IPs",
-    key: "usedPublicIp",
-    align: "start",
-    sortable: false,
-  },
-  {
-    title: "Certification Type",
-    key: "certificationType",
-    align: "start",
-    sortable: false,
-  },
-  {
-    title: "Pricing Policy",
-    key: "pricingPolicyId",
-    align: "start",
-    sortable: false,
-  },
-];
 </script>
 
 <style>
