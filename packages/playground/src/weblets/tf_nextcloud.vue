@@ -110,7 +110,9 @@
       </SelectFarmManager>
     </form-validator>
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" :disabled="!valid" @click="deploy">Deploy</v-btn>
+      <v-btn color="primary" variant="tonal" :disabled="!valid || selectedNode === undefined" @click="deploy"
+        >Deploy</v-btn
+      >
     </template>
   </weblet-layout>
 </template>

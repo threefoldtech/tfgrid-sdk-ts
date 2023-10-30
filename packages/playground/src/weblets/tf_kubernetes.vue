@@ -72,7 +72,18 @@
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn variant="tonal" color="primary" @click="deploy" :disabled="tabs?.invalid"> Deploy </v-btn>
+      <v-btn
+        variant="tonal"
+        color="primary"
+        @click="deploy"
+        :disabled="
+          tabs?.invalid ||
+          master.selectedNode === undefined ||
+          workers.some(worker => worker.selectedNode === undefined)
+        "
+      >
+        Deploy
+      </v-btn>
     </template>
   </weblet-layout>
 </template>
