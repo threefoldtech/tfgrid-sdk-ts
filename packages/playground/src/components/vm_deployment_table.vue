@@ -27,7 +27,11 @@
                       : deployment.name
                   }}
                   <template v-if="deployment.contracts && deployment.contracts.length > 0">
-                    with contract id: {{ deployment.contracts.map(contract => contract.contract_id).join(", ") }}
+                    with contract id:
+                    <span v-for="(contract, index) in deployment.contracts" :key="index">
+                      {{ contract.contract_id }}
+                      <template v-if="index < deployment.contracts.length - 1">, </template>
+                    </span>
                   </template>
                 </div>
               </v-list-item>
