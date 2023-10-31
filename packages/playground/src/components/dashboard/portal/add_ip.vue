@@ -229,7 +229,7 @@ export default {
         createCustomToast("IP is added successfully.", ToastType.success);
       } catch (error) {
         console.log(error);
-        createCustomToast("Failed to add IP.", ToastType.danger);
+        createCustomToast(`Failed to add IP. ${error}`, ToastType.danger);
       } finally {
         isAdding.value = false;
       }

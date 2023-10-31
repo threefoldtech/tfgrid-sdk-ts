@@ -30,7 +30,7 @@
         <v-dialog v-model="showDialogue" max-width="600">
           <v-card>
             <v-toolbar color="primary" dark class="custom-toolbar">
-              <p class="mb-5">Create Farm</p>
+              <p class="mb-5">Delete IP</p>
             </v-toolbar>
             <v-card-text> Are you sure you want to delete IP {{ item.raw.ip }}? </v-card-text>
             <v-card-actions class="justify-end px-5 pb-5 pt-0">

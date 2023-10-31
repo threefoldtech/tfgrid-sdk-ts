@@ -130,8 +130,8 @@ import {
 import { gridProxyClient } from "../../../clients";
 import { useProfileManager } from "../../../stores";
 import { createCustomToast, ToastType } from "../../../utils/custom_toast";
-import AddPublicConfig from "./add_public_config.vue";
 import NodeMintingDetails from "./NodeMintingDetails.vue";
+import AddPublicConfig from "./public_config.vue";
 import SetExtraFee from "./set_extra_fee.vue";
 
 export default {
