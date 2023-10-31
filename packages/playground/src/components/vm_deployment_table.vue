@@ -25,6 +25,13 @@
                       )}`
                     : deployment.name
                 }}
+                with contract id:
+                <template v-if="deployment.contracts && deployment.contracts.length > 0">
+                  <span v-for="contract in deployment.contracts" :key="contract.contract_id">
+                    {{ contract.contract_id }}&nbsp;
+                  </span>
+                </template>
+                <template v-else> No contracts found. </template>
               </li>
             </ul>
           </v-card-text>
@@ -141,6 +148,8 @@ async function loadDeployments() {
     ...(Array.isArray((chunk2 as any).failedDeployments) ? (chunk2 as any).failedDeployments : []),
     ...(Array.isArray((chunk3 as any).failedDeployments) ? (chunk3 as any).failedDeployments : []),
   ];
+
+  console.log("Failed Deployments: ", failedDeployments.value);
 
   count.value = vms.count;
   items.value = vms.items;

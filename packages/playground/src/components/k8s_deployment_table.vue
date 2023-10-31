@@ -15,17 +15,20 @@
         <v-card-title style="color: #ffcc00; font-weight: bold">Failed Deployments</v-card-title>
         <v-divider color="#FFCC00" />
         <v-card-text>
-          <ul>
-            <li v-for="deployment in failedDeployments" :key="deployment.name">
-              {{
-                deployment.nodes.length > 0
-                  ? `${deployment.name} on node${deployment.nodes.length > 1 ? "s" : ""}: ${deployment.nodes.join(
-                      ", ",
-                    )}`
-                  : deployment.name
-              }}
-            </li>
-          </ul>
+          <li v-for="deployment in failedDeployments" :key="deployment.name">
+            {{
+              deployment.nodes.length > 0
+                ? `${deployment.name} on node${deployment.nodes.length > 1 ? "s" : ""}: ${deployment.nodes.join(", ")}`
+                : deployment.name
+            }}
+            with contract id:
+            <template v-if="deployment.contracts && deployment.contracts.length > 0">
+              <span v-for="contract in deployment.contracts" :key="contract.contract_id">
+                {{ contract.contract_id }}&nbsp;
+              </span>
+            </template>
+            <template v-else> No contracts found. </template>
+          </li>
         </v-card-text>
         <v-card-actions class="justify-end">
           <v-btn @click="showDialog = false" class="grey lighten-2 black--text" color="#FFCC00">Close</v-btn>
@@ -126,6 +129,8 @@ async function loadDeployments() {
     ...(Array.isArray((chunk2 as any).failedDeployments) ? (chunk2 as any).failedDeployments : []),
     ...(Array.isArray((chunk3 as any).failedDeployments) ? (chunk3 as any).failedDeployments : []),
   ];
+
+  console.log("Failed k8s: ", failedDeployments.value);
 
   count.value = clusters.count;
   items.value = clusters.items;
