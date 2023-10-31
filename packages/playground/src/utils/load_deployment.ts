@@ -1,5 +1,7 @@
 import type { GridClient } from "@threefold/grid_client";
 
+import { ProjectName } from "@/types";
+
 import { formatConsumption } from "./contracts";
 import { getGrid, updateGrid } from "./grid";
 import { normalizeError } from "./helpers";
@@ -29,13 +31,23 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   )) as GridClient[];
 
   const promises = machines.map(async (name, index) => {
-    const nodeIds = await grids[index].machines._getDeploymentNodeIds(name);
+    let nodeIds: number[] = [];
     const contracts = await grids[index].machines.getDeploymentContracts(name);
+    try {
+      nodeIds = await grids[index].machines._getDeploymentNodeIds(name);
+      if (nodeIds.length == 0) {
+        count--;
+        return;
+      }
+    } catch (e) {
+      failedDeployments.push({ name, nodes: nodeIds, contracts: contracts });
+    }
+
     const machinePromise = grids[index].machines.getObj(name);
     const timeoutPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
         reject(new Error("Timeout"));
-      }, 10000);
+      }, 100);
     });
 
     try {
