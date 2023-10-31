@@ -48,7 +48,7 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     const timeoutPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
         reject(new Error("Timeout"));
-      }, 100);
+      }, 10000);
     });
 
     try {
