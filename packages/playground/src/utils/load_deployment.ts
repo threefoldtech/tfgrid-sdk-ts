@@ -44,6 +44,7 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
         return;
       }
     } catch (e) {
+      console.log(e);
       failedDeployments.push({ name, nodes: nodeIds, contracts: contracts });
       return;
     }
