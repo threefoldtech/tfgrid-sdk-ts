@@ -354,6 +354,7 @@ class Nodes {
       has_gpu: options.hasGPU,
       rented_by: options.rentedBy,
       rentable: options.rentable,
+      randomize: options.randomize,
     };
     if (options.gateway) {
       params["ipv4"] = true;
@@ -383,6 +384,7 @@ class Nodes {
       node_rented_by: options.nodeRentedBy,
       node_certified: options.nodeCertified,
       farm_id: options.farmId,
+      randomize: options.randomize,
     };
     return Object.entries(params)
       .map(param => param.join("="))
