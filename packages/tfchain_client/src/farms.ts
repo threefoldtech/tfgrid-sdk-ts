@@ -35,19 +35,19 @@ interface QueryFarmsGetOptions {
 interface CreateFarmOptions {
   name: string;
   publicIps?: {
-    ip?: number;
-    gw?: number;
+    ip?: string;
+    gw?: string;
   };
 }
 interface AddFarmIPOptions {
   farmId: number;
-  ip: number;
-  gw: number;
+  ip: string;
+  gw: string;
 }
 
 interface RemoveFarmIPOptions {
   farmId: number;
-  ip: number;
+  ip: string;
 }
 
 interface AddStellarOptions {

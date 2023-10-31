@@ -64,13 +64,18 @@
 <script lang="ts">
 import { jsPDF } from "jspdf";
 import moment from "moment";
-import { computed, ref } from "vue";
+import { computed, type PropType, ref } from "vue";
 
-import { generateReceipt, type receiptInterface } from "@/utils/node";
+import { generateReceipt, type NodeInterface, type receiptInterface } from "@/utils/node";
 
 export default {
   name: "NodeMintingDetails",
-  props: ["node"],
+  props: {
+    node: {
+      type: Object as PropType<NodeInterface>,
+      required: true,
+    },
+  },
   setup(props) {
     const showMenu = ref(false);
     const menu = ref(false);

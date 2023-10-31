@@ -92,7 +92,7 @@
               <v-expansion-panel>
                 <v-expansion-panel-title> Node Statistics </v-expansion-panel-title>
                 <v-expansion-panel-text>
-                  <NodeMintingDetails :node="item" />
+                  <NodeMintingDetails :node="item.value" />
                 </v-expansion-panel-text>
               </v-expansion-panel>
             </v-expansion-panels>
@@ -126,6 +126,7 @@ import {
   getNodeUptimePercentage,
   type NodeInterface,
 } from "@/utils/node";
+import type { IPublicConfig } from "@/utils/types";
 
 import { gridProxyClient } from "../../../clients";
 import { useProfileManager } from "../../../stores";
@@ -189,14 +190,7 @@ export default {
 
     const expanded = ref<string[]>();
     const network = process.env.NETWORK || window.env.NETWORK;
-    interface IPublicConfig {
-      ipv4?: number;
-      gwv4?: number;
-      ipv6?: number;
-      gwv6?: number;
-      domain?: string;
-    }
-    const publicConfig = ref<IPublicConfig>({});
+    const publicConfig = ref<IPublicConfig | {}>({});
     const resourcesPanel = ref([]);
     const receiptsPanel = ref([]);
     const uptime = ref();

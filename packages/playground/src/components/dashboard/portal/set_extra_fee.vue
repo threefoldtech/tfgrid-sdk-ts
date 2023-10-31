@@ -66,7 +66,12 @@ import { createCustomToast, ToastType } from "../../../utils/custom_toast";
 
 export default {
   name: "SetExtraFee",
-  props: ["nodeId"],
+  props: {
+    nodeId: {
+      type: Number,
+      required: true,
+    },
+  },
   setup(props) {
     const showDialogue = ref(false);
     const isAdding = ref(false);

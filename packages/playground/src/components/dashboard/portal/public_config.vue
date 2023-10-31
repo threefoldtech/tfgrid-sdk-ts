@@ -17,12 +17,12 @@
           <div class="pt-6 px-6">
             <form-validator v-model="valid">
               <input-validator
-                :value="$props.modelValue.ipv4"
+                :value="$props.modelValue.ip4"
                 :rules="[validators.required('IPv4 is required.'), validators.isIP('IP is not valid.', 4)]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IPV4 address in CIDR format xx.xx.xx.xx/xx">
-                  <v-text-field v-model="$props.modelValue.ipv4" v-bind="props" outlined label="IPv4"></v-text-field>
+                  <v-text-field v-model="$props.modelValue.ip4" v-bind="props" outlined label="IPv4"></v-text-field>
                 </input-tooltip>
               </input-validator>
 
@@ -37,12 +37,12 @@
               </input-validator>
 
               <input-validator
-                :value="$props.modelValue.ipv6"
+                :value="$props.modelValue.ip6"
                 :rules="[validators.required('IPv6 is required.'), validators.isIP('IP is not valid.', 6)]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IPV6 address in format x:x:x:x:x:x:x:x">
-                  <v-text-field v-model="$props.modelValue.ipv6" v-bind:="props" outlined label="IPv6"></v-text-field>
+                  <v-text-field v-model="$props.modelValue.ip6" v-bind:="props" outlined label="IPv6"></v-text-field>
                 </input-tooltip>
               </input-validator>
 
@@ -119,14 +119,30 @@
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import { type PropType, ref } from "vue";
+
+import type { IPublicConfig } from "@/utils/types";
 
 import { useGrid } from "../../../stores";
 import { createCustomToast, ToastType } from "../../../utils/custom_toast";
 
 export default {
   name: "AddPublicConfig",
-  props: ["nodeId", "farmId", "modelValue"],
+  props: {
+    nodeId: {
+      type: Number,
+      required: true,
+    },
+    farmId: {
+      type: Number,
+      required: true,
+    },
+    modelValue: {
+      type: Object as PropType<IPublicConfig>,
+      required: true,
+    },
+  },
+
   setup(props) {
     const showDialogue = ref(false);
     const isAdding = ref(false);
@@ -143,8 +159,8 @@ export default {
           farmId: props.farmId,
           nodeId: props.nodeId,
           publicConfig: {
-            ip4: { ip: props.modelValue.ipv4, gw: props.modelValue.gw4 },
-            ip6: { ip: props.modelValue.ipv6 as number, gw: props.modelValue.gw6 },
+            ip4: { ip: props.modelValue.ip4, gw: props.modelValue.gw4 },
+            ip6: { ip: props.modelValue.ip6 as string, gw: props.modelValue.gw6 as string },
             domain: props.modelValue.domain,
           },
         });
@@ -163,6 +179,11 @@ export default {
         await gridStore.grid.nodes.addNodePublicConfig({
           farmId: props.farmId,
           nodeId: props.nodeId,
+          publicConfig: {
+            ip4: { ip: "", gw: "" },
+            ip6: { ip: "", gw: "" },
+            domain: "",
+          },
         });
         createCustomToast("Public config removed successfully.", ToastType.success);
       } catch (error) {

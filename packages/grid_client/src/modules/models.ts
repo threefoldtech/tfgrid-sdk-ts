@@ -655,34 +655,34 @@ class FarmIdModel {
 }
 
 class FarmPublicIPsModel {
-  @Expose() @IsOptional() @IsIP() ip?: number;
-  @Expose() @IsOptional() gw?: number;
+  @Expose() @IsOptional() @IsIP() ip?: string;
+  @Expose() @IsOptional() gw?: string;
 }
 
 class AddFarmIPModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
-  @Expose() @IsNotEmpty() ip: number;
-  @Expose() @IsNotEmpty() @IsIP() gw: number;
+  @Expose() @IsNotEmpty() ip: string;
+  @Expose() @IsNotEmpty() @IsIP() gw: string;
 }
 
 class IPConfig {
-  @Expose() @IsOptional() @IsIP() ip: number;
-  @Expose() @IsOptional() gw: number;
+  @Expose() @IsNotEmpty() @IsIP() ip: string;
+  @Expose() @IsNotEmpty() gw: string;
 }
 class PublicConfigModel {
-  @IsOptional() ip4?: IPConfig;
+  @IsNotEmpty() ip4: IPConfig;
   @IsOptional() ip6?: IPConfig;
   @Expose() @IsString() @IsOptional() domain?: string;
 }
 class AddPublicConfig {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
-  @Expose() publicConfig?: PublicConfigModel;
+  @Expose() publicConfig: PublicConfigModel;
 }
 
 class RemoveFarmIPModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
-  @Expose() @IsNotEmpty() ip: number;
+  @Expose() @IsNotEmpty() ip: string;
 }
 
 class AddStellarModel {

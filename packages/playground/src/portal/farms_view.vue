@@ -26,7 +26,7 @@ export default {
     CreateFarm,
   },
   setup() {
-    const name = ref<string>();
+    const name = ref<string>("");
     return {
       name,
     };

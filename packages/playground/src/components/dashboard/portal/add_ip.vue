@@ -109,7 +109,28 @@ import { createCustomToast, ToastType } from "../../../utils/custom_toast";
 
 export default {
   name: "AddIP",
-  props: ["farmId", "type", "publicIP", "toPublicIP", "gateway"],
+  props: {
+    farmId: {
+      type: Number,
+      required: true,
+    },
+    type: {
+      type: String,
+      required: true,
+    },
+    publicIP: {
+      type: String,
+      required: true,
+    },
+    toPublicIP: {
+      type: String,
+      required: true,
+    },
+    gateway: {
+      type: String,
+      required: true,
+    },
+  },
   setup(props, context) {
     const showDialogue = ref(false);
     const gridStore = useGrid();
@@ -211,7 +232,7 @@ export default {
       });
     }
 
-    async function addFarmIp(farmId: number, gw: number) {
+    async function addFarmIp(farmId: number, gw: string) {
       try {
         isAdding.value = true;
         if (props.type === IPType.range) {
@@ -219,11 +240,11 @@ export default {
         }
         if (IPs.value && IPs.value.length > 1) {
           for (const ip in IPs) {
-            await gridStore.grid.farms.addFarmIp({ farmId, ip: +ip, gw });
+            await gridStore.grid.farms.addFarmIp({ farmId, ip: ip, gw });
             context.emit("add-publicIPs", [{ ip: +ip, gw }]);
           }
         } else {
-          await gridStore.grid.farms.addFarmIp({ farmId, ip: props.publicIP as number, gw });
+          await gridStore.grid.farms.addFarmIp({ farmId, ip: props.publicIP, gw });
           context.emit("add-publicIPs", [{ ip: props.publicIP, gw }]);
         }
         createCustomToast("IP is added successfully.", ToastType.success);

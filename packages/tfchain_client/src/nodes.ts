@@ -56,14 +56,14 @@ interface NodeLocation {
 interface NodePublicConfigOptions {
   farmId: number;
   nodeId: number;
-  publicConfig?: {
-    ip4?: {
-      ip: number;
-      gw: number;
+  publicConfig: {
+    ip4: {
+      ip: string;
+      gw: string;
     };
     ip6?: {
-      ip: number;
-      gw: number;
+      ip: string;
+      gw: string;
     };
     domain?: string;
   };

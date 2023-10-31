@@ -57,7 +57,12 @@ import { createCustomToast, ToastType } from "../../../utils/custom_toast";
 
 export default {
   name: "CreateFarm",
-  props: ["name"],
+  props: {
+    name: {
+      type: String,
+      required: true,
+    },
+  },
   setup(props) {
     const showDialogue = ref(false);
     const isCreating = ref(false);

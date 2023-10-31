@@ -63,7 +63,12 @@ import AddIP from "./add_ip.vue";
 
 export default {
   name: "PublicIPsTable",
-  props: ["farmId"],
+  props: {
+    farmId: {
+      type: Number,
+      required: true,
+    },
+  },
   components: {
     AddIP,
   },
