@@ -115,7 +115,6 @@ export function getWireguardConfig(grid: GridClient, name: string) {
 export type K8S = { masters: any[]; workers: any[]; deploymentName: string; wireguard?: any };
 export async function loadK8s(grid: GridClient) {
   const clusters = await grid.k8s.list();
-  console.log("Clusters: ", clusters);
 
   const projectName = grid.clientOptions.projectName;
   const grids = (await Promise.all(
@@ -125,7 +124,6 @@ export async function loadK8s(grid: GridClient) {
 
   const promises = clusters.map(async (name, index) => {
     const contracts = await grids[index].k8s.getDeploymentContracts(name);
-    console.log("Contarcts: ", contracts);
     const nodeIds = await grids[index].k8s._getDeploymentNodeIds(name);
     const clusterPromise = grids[index].k8s.getObj(name);
     const timeoutPromise = new Promise((resolve, reject) => {
