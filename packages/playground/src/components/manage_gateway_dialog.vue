@@ -88,7 +88,7 @@
             </input-tooltip>
 
             <div :style="{ marginTop: '-10px' }">
-              <domain-name hide-title v-model="domainName" />
+              <domain-name :available-for="profileManager.profile?.twinId" hide-title v-model="domainName" />
             </div>
 
             <input-validator
@@ -278,6 +278,8 @@ export default {
     }
 
     return {
+      profileManager,
+
       prefix,
       layout,
       gatewayTab,

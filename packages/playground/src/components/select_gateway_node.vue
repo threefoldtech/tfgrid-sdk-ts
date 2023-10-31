@@ -81,7 +81,12 @@ import type { Farm } from "../types";
 import { loadGatewayNodes } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 
-const props = defineProps<{ modelValue?: GatewayNode; farmData?: Farm; customDomain?: boolean }>();
+const props = defineProps<{
+  modelValue?: GatewayNode;
+  farmData?: Farm;
+  customDomain?: boolean;
+  availableFor?: number;
+}>();
 const emits = defineEmits<{ (event: "update:model-value", value: GatewayNode | undefined): void }>();
 
 const profileManager = useProfileManager();
@@ -115,6 +120,7 @@ async function loadNextPage() {
     page: page.value++,
     size,
     farmId: props.customDomain ? props.farmData?.farmID : undefined,
+    availableFor: props.availableFor,
   };
   nodes = await loadGatewayNodes(grid!, options);
 
