@@ -149,8 +149,6 @@ async function loadDeployments() {
     ...(Array.isArray((chunk3 as any).failedDeployments) ? (chunk3 as any).failedDeployments : []),
   ];
 
-  console.log("Failed Deployments: ", failedDeployments.value);
-
   count.value = vms.count;
   items.value = vms.items;
 
