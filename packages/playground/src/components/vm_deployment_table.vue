@@ -125,25 +125,33 @@ const failedDeployments = ref<any[]>([]);
 
 onMounted(loadDeployments);
 async function loadDeployments() {
+  const migrateGateways = props.projectName.toLowerCase() !== "fullvm" && props.projectName.toLowerCase() !== "vm";
+
   items.value = [];
   loading.value = true;
   const grid = await getGrid(profileManager.profile!, props.projectName);
   const chunk1 = await loadVms(grid!);
-  if (chunk1.count > 0) await grid!.gateway.list();
+  if (chunk1.count > 0 && migrateGateways) {
+    await migrateModule(grid!.gateway);
+  }
 
   const chunk2 = await loadVms(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }));
-  if (chunk2.count > 0) await grid!.gateway.list();
+  if (chunk2.count > 0 && migrateGateways) {
+    await migrateModule(grid!.gateway);
+  }
 
   const filter =
-    props.projectName === ProjectName.VM
+    props.projectName.toLowerCase() === ProjectName.VM.toLowerCase()
       ? undefined
       : ([vm]: [{ flist: string }]) => vm.flist.replace(/-/g, "").includes(props.projectName.toLowerCase());
 
   const chunk3 =
-    props.projectName === ProjectName.Fullvm
+    props.projectName.toLowerCase() === ProjectName.Fullvm.toLowerCase()
       ? { count: 0, items: [] }
       : await loadVms(updateGrid(grid!, { projectName: "" }), { filter });
-  if (chunk3.count > 0) await grid!.gateway.list();
+  if (chunk3.count > 0 && migrateGateways) {
+    await migrateModule(grid!.gateway);
+  }
 
   const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
   failedDeployments.value = [
@@ -211,6 +219,7 @@ defineExpose({ loadDeployments });
 
 <script lang="ts">
 import { ProjectName } from "../types";
+import { migrateModule } from "../utils/migration";
 import ListTable from "./list_table.vue";
 
 export default {

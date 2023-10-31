@@ -8,7 +8,7 @@ import { RMB } from "../clients";
 import { Graphql } from "../clients/graphql/client";
 import { TFClient } from "../clients/tf-grid/client";
 import { send } from "../helpers/requests";
-import { FarmFilterOptions, FilterOptions } from "../modules/models";
+import { FarmFilterOptions, FilterOptions, NodeStatus } from "../modules/models";
 
 interface FarmInfo {
   name: string;
@@ -348,12 +348,13 @@ class Nodes {
       city: options.city,
       dedicated: options.dedicated,
       available_for: options.availableFor,
-      status: "up",
+      status: options.status ? options.status : NodeStatus.up,
       page: options.page,
       size: options.size,
       has_gpu: options.hasGPU,
       rented_by: options.rentedBy,
       rentable: options.rentable,
+      randomize: options.randomize,
     };
     if (options.gateway) {
       params["ipv4"] = true;
@@ -383,6 +384,7 @@ class Nodes {
       node_rented_by: options.nodeRentedBy,
       node_certified: options.nodeCertified,
       farm_id: options.farmId,
+      randomize: options.randomize,
     };
     return Object.entries(params)
       .map(param => param.join("="))

@@ -5,6 +5,7 @@ import { ProjectName } from "@/types";
 import { formatConsumption } from "./contracts";
 import { getGrid, updateGrid } from "./grid";
 import { normalizeError } from "./helpers";
+import { migrateModule } from "./migration";
 
 export interface LoadedDeployments<T> {
   count: number;
@@ -21,7 +22,10 @@ export interface LoadVMsOptions {
   filter?(vm: any): boolean;
 }
 export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
+  await migrateModule(grid.machines);
+
   const machines = await grid.machines.list();
+
   let count = machines.length;
   const failedDeployments: FailedDeployment[] = [];
 
@@ -127,6 +131,8 @@ export function getWireguardConfig(grid: GridClient, name: string) {
 
 export type K8S = { masters: any[]; workers: any[]; deploymentName: string; wireguard?: any };
 export async function loadK8s(grid: GridClient) {
+  await migrateModule(grid.k8s);
+
   const clusters = await grid.k8s.list();
 
   const projectName = grid.clientOptions.projectName;

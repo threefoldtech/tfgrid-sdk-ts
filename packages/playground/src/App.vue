@@ -291,4 +291,46 @@ export default {
 a {
   color: #5695ff !important;
 }
+
+.custom-toolbar-title {
+  max-width: 17rem !important;
+}
+.mosha__toast__content-wrapper {
+  margin-bottom: -2px;
+}
+.mosha__toast__slot-wrapper {
+  margin-bottom: -2px;
+}
+.mosha__icon {
+  margin-right: 6px !important;
+  margin-top: 2px;
+}
+
+.mosha__icon__dark__warning {
+  fill: #ffcc00 !important;
+}
+
+.mosha__icon__light__warning {
+  fill: #fb8c00 !important;
+}
+
+.mosha__toast__content.dark__warning {
+  color: #ffcc00;
+}
+
+.mosha__toast__content.light__warning {
+  color: #fb8c00;
+}
+
+.mosha__toast__close-icon.dark__warning::before {
+  color: #ffcc00 !important;
+}
+
+.mosha__toast__close-icon.light__warning::before {
+  color: #fb8c00 !important;
+}
+
+.mosha__toast__content__text {
+  font-size: 14px !important;
+}
 </style>

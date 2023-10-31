@@ -29,7 +29,13 @@
     </v-expand-transition>
     <div v-if="(!$props.hasIPv4 || !customDomain) && !loading">
       <v-expand-transition>
-        <SelectGatewayNode ref="selectGateway" v-model="gatewayNode" customDomain :farmData="farmData" />
+        <SelectGatewayNode
+          :available-for="$props.availableFor"
+          ref="selectGateway"
+          v-model="gatewayNode"
+          customDomain
+          :farmData="farmData"
+        />
       </v-expand-transition>
       <v-expand-transition>
         <v-alert
@@ -75,6 +81,7 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    availableFor: Number,
   },
   emits: {
     "update:model-value": (value: DomainModel) => true || value,
