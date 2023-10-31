@@ -35,11 +35,11 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   )) as GridClient[];
 
   const promises = machines.map(async (name, index) => {
-    let nodeIds: number[] = [];
-    const contracts = await grids[index].machines.getDeploymentContracts(name);
+    let contracts: any[] = [];
+    const nodeIds = await grids[index].machines._getDeploymentNodeIds(name);
+    contracts = await grids[index].machines.getDeploymentContracts(name);
     try {
-      nodeIds = await grids[index].machines._getDeploymentNodeIds(name);
-      if (nodeIds.length == 0) {
+      if (contracts.length === 0) {
         count--;
         return;
       }
