@@ -1,6 +1,7 @@
 import {
   ContractLockOptions,
   Contracts,
+  ExtrinsicResult,
   GetDedicatedNodePriceOptions,
   SetDedicatedNodeExtraFeesOptions,
 } from "@threefold/tfchain_client";
@@ -9,10 +10,65 @@ import { Decimal } from "decimal.js";
 import { ContractStates } from "../../modules";
 import { Graphql } from "../graphql/client";
 
+export type DiscountLevel = "None" | "Default" | "Bronze" | "Silver" | "Gold";
+
 export interface ListContractByTwinIdOptions {
   graphqlURL: string;
   twinId: number;
   stateList?: ContractStates[];
+}
+
+export interface ContractUsedResources {
+  contract: GqlNodeContract;
+  hru: number;
+  sru: number;
+  cru: number;
+  mru: number;
+}
+
+export interface GqlBaseContract {
+  id: string;
+  gridVersion: string;
+  contractID: string;
+  twinID: string;
+  state: string;
+  createdAt: string;
+  solutionProviderID: string;
+}
+
+export interface GqlNameContract extends GqlBaseContract {
+  name: string;
+}
+
+export interface GqlNodeContract extends GqlBaseContract {
+  nodeID: number;
+  deploymentData: string;
+  deploymentHash: string;
+  numberOfPublicIPs: number;
+  resourcesUsed: ContractUsedResources;
+}
+
+export interface GqlRentContract extends GqlBaseContract {
+  nodeID: number;
+}
+
+export interface GqlContracts {
+  nameContracts: GqlNameContract[];
+  nodeContracts: GqlNodeContract[];
+  rentContracts: GqlRentContract[];
+}
+
+export interface GqlConsumption {
+  contracts: GqlContracts;
+  contractBillReports: GqlContractBillReports[];
+}
+
+export interface GqlContractBillReports {
+  id: string;
+  contractID: number;
+  discountReceived: DiscountLevel;
+  amountBilled: number;
+  timestamp: number;
 }
 
 export interface ListContractByAddressOptions {
@@ -36,7 +92,7 @@ export interface CancelMyContractOptions {
 }
 
 class TFContracts extends Contracts {
-  async listContractsByTwinId(options: ListContractByTwinIdOptions) {
+  async listContractsByTwinId(options: ListContractByTwinIdOptions): Promise<GqlContracts> {
     options.stateList = options.stateList || [ContractStates.Created, ContractStates.GracePeriod];
     const state = `[${options.stateList.join(", ")}]`;
     const gqlClient = new Graphql(options.graphqlURL);
@@ -60,6 +116,7 @@ class TFContracts extends Contracts {
                   state
                   createdAt
                   nodeID
+                  numberOfPublicIPs
                 }
                 rentContracts(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, limit: $rentContractsCount) {
                   contractID
@@ -76,7 +133,7 @@ class TFContracts extends Contracts {
         rentContractsCount: rentContractsCount,
       });
 
-      return response["data"];
+      return response["data"] as GqlContracts;
     } catch (err) {
       throw Error(`Error listing contracts by twin id ${options.twinId}: ${err}`);
     }
@@ -107,23 +164,25 @@ class TFContracts extends Contracts {
           }`;
     try {
       const response = await gqlClient.query(body, { contractId: options.id });
-      const billReports = response["data"]["contractBillReports"];
+      const gqlConsumption: GqlConsumption = response["data"] as GqlConsumption;
+      const billReports = gqlConsumption.contractBillReports;
       if (billReports.length === 0) {
         return 0;
       } else {
         let duration: number;
-        const amountBilled = new Decimal(billReports[0]["amountBilled"]);
+        const amountBilled = new Decimal(billReports[0].amountBilled);
         if (billReports.length === 2) {
-          duration = (billReports[0]["timestamp"] - billReports[1]["timestamp"]) / 3600; // one hour
+          duration = (billReports[0].timestamp - billReports[1].timestamp) / 3600; // one hour
         } else {
-          const nodeContracts = response["data"]["nodeContracts"];
-          const nameContracts = response["data"]["nameContracts"];
-          const rentContracts = response["data"]["rentContracts"];
           let createdAt: number;
-          for (const contracts of [nodeContracts, nameContracts, rentContracts]) {
+          for (const contracts of [
+            gqlConsumption.contracts.nodeContracts,
+            gqlConsumption.contracts.nameContracts,
+            gqlConsumption.contracts.rentContracts,
+          ]) {
             if (contracts.length === 1) {
-              createdAt = contracts[0]["createdAt"];
-              duration = (billReports[0]["timestamp"] - createdAt) / 3600;
+              createdAt = +contracts[0].createdAt;
+              duration = (billReports[0].timestamp - createdAt) / 3600;
               break;
             }
           }
@@ -150,7 +209,7 @@ class TFContracts extends Contracts {
     });
   }
 
-  async listMyContracts(options: ListMyContractOptions) {
+  async listMyContracts(options: ListMyContractOptions): Promise<GqlContracts> {
     const twinId = await this.client.twins.getMyTwinId();
     return await this.listContractsByTwinId({
       graphqlURL: options.graphqlURL,
@@ -171,23 +230,22 @@ class TFContracts extends Contracts {
    * @param  {CancelMyContractOptions} options
    * @returns {Promise<Record<string, number>[]>}
    */
-  async cancelMyContracts(options: CancelMyContractOptions): Promise<Record<string, number>[]> {
+  async cancelMyContracts(
+    options: CancelMyContractOptions,
+  ): Promise<(GqlNameContract | GqlRentContract | GqlNodeContract)[]> {
     const allContracts = await this.listMyContracts(options);
-    const contracts = [
-      ...allContracts["nameContracts"],
-      ...allContracts["nodeContracts"],
-      ...allContracts["rentContracts"],
-    ];
+    const contracts = [...allContracts.nameContracts, ...allContracts.nodeContracts, ...allContracts.rentContracts];
+
     const ids: number[] = [];
     for (const contract of contracts) {
-      ids.push(contract["contractID"]);
+      ids.push(+contract.contractID);
     }
     await this.batchCancelContracts(ids);
     return contracts;
   }
 
   async batchCancelContracts(ids: number[]): Promise<number[]> {
-    const extrinsics = [];
+    const extrinsics: ExtrinsicResult<number>[] = [];
     for (const id of ids) {
       extrinsics.push(await this.cancel({ id }));
     }
