@@ -27,7 +27,6 @@
                 {{ contract.contract_id }}&nbsp;
               </span>
             </template>
-            <template v-else> No contracts found. </template>
           </li>
         </v-card-text>
         <v-card-actions class="justify-end">
