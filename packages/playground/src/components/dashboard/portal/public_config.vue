@@ -93,13 +93,15 @@
 
     <template v-if="showClearDialogue">
       <v-dialog v-model="showClearDialogue" width="650">
-        <v-card class="pa-4">
+        <v-card>
+          <v-toolbar color="primary" dark class="custom-toolbar">
+            <p class="mb-5">Remove Public Config</p>
+          </v-toolbar>
           <v-card-text> Are you certain you want to remove this node's public config? </v-card-text>
           <v-alert variant="tonal" type="warning" class="ma-4">
             <p>This action is reversible!</p>
           </v-alert>
-          <v-card-actions>
-            <v-spacer></v-spacer>
+          <v-card-actions class="justify-end px-5 pb-5 pt-0">
             <v-btn
               text="Remove"
               color="white"

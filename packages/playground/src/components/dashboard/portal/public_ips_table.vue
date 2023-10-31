@@ -35,12 +35,13 @@
             <v-card-text> Are you sure you want to delete IP {{ item.raw.ip }}? </v-card-text>
             <v-card-actions class="justify-end px-5 pb-5 pt-0">
               <v-btn
-                color="red-darken-1"
-                @click="removeFarmIp({ farmId: $props.farmId, ip: item.raw.ip }, index)"
+                text="Delete"
+                color="white"
                 :loading="isRemoving"
                 :disabled="isRemoving"
-                >Delete</v-btn
-              >
+                class="bg-red-lighten-1"
+                @click="removeFarmIp({ farmId: $props.farmId, ip: item.raw.ip }, index)"
+              ></v-btn>
               <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
             </v-card-actions>
           </v-card>

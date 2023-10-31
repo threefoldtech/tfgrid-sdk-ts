@@ -1,6 +1,6 @@
 <template v-if="nodes">
   <div class="my-6">
-    <v-card color="primary rounded-b-0">
+    <v-card color="primary rounded-0">
       <v-card-title class="py-1 text-subtitle-1">Your Nodes</v-card-title>
     </v-card>
     <v-data-table-server
