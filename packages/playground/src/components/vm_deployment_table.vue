@@ -25,10 +25,10 @@
                       )}`
                     : deployment.name
                 }}
-                with contract id:
                 <template v-if="deployment.contracts && deployment.contracts.length > 0">
+                  with contract id:
                   <span v-for="contract in deployment.contracts" :key="contract.contract_id">
-                    {{ contract.contract_id }}&nbsp;
+                    {{ contract.contract_id }} .
                   </span>
                 </template>
               </li>
