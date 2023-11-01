@@ -181,6 +181,7 @@ const headers: VDataTableHeader = [
 
 async function onMount() {
   loading.value = true;
+  failedContractId.value = undefined;
   contracts.value = [];
   grid.value = await getGrid(profileManager.profile!);
   contracts.value = await getUserContracts(grid.value!);
