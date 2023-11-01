@@ -28,9 +28,14 @@ async function _migrateContracts(module: BaseModule, values: any[]) {
     return module.tfClient.contracts.get({ id: value[0].contract_id });
   }
 
-  function __updateContract(contract: null | Contract) {
-    const nodeContract = contract?.contractType?.nodeContract;
+  function __updateContract(contract: null | Contract, index: number) {
+    const gracePeriod = contract?.state?.gracePeriod || 0;
+    if (!contract || gracePeriod > 0) {
+      values[index] = null;
+      return [];
+    }
 
+    const nodeContract = contract?.contractType?.nodeContract;
     if (!nodeContract) {
       return [];
     }
