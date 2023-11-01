@@ -13,7 +13,6 @@
         refresh
       </v-btn>
     </template>
-
     <ListTable
       :headers="headers"
       :items="contracts"
@@ -60,16 +59,18 @@
         <p v-else>-</p>
       </template>
       <template #[`item.actions`]="{ item }">
-        <v-tooltip text="Show Details">
+        <v-tooltip :text="failedContractId == item.value.contractId ? 'Retry' : 'Show Details'">
           <template #activator="{ props }">
             <v-btn
+              :color="failedContractId == item.value.contractId ? 'error' : ''"
               variant="tonal"
               @click="showDetails(item.value)"
               :disabled="(loading && loadingContractId !== item.value.contractId) || deleting"
               :loading="loadingContractId == item.value.contractId"
               v-bind="props"
             >
-              <v-icon>mdi-eye-outline</v-icon>
+              <v-icon class="pt-1" v-if="failedContractId == item.value.contractId">mdi-refresh</v-icon>
+              <v-icon v-else>mdi-eye-outline</v-icon>
             </v-btn>
           </template>
         </v-tooltip>
@@ -193,9 +194,11 @@ const nodeIDs = computed(() => {
 });
 
 const loadingContractId = ref<number>();
+const failedContractId = ref<number>();
 const contractLocked = ref<ContractLock>();
 
 async function showDetails(value: any) {
+  failedContractId.value = undefined;
   if (value.type === "name" || value.type === "rent") {
     return layout.value.openDialog(value, false, true);
   }
@@ -206,7 +209,8 @@ async function showDetails(value: any) {
     const deployment = await grid.value?.zos.getDeployment({ contractId });
     return layout.value.openDialog(deployment, false, true);
   } catch (e) {
-    layout.value.setStatus("failed", normalizeError(e, `Failed to load details of contract(${contractId})`));
+    failedContractId.value = contractId;
+    createCustomToast(`Failed to load details of contract ID: ${contractId}`, ToastType.danger);
   } finally {
     loadingContractId.value = undefined;
     loading.value = false;
@@ -310,6 +314,7 @@ import type { ContractLock } from "@threefold/tfchain_client";
 import { gridProxyClient } from "../clients";
 import ListTable from "../components/list_table.vue";
 import { solutionType } from "../types/index";
+import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { downloadAsJson, normalizeError } from "../utils/helpers";
 
 export default {
