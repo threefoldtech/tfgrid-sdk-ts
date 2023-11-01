@@ -148,7 +148,7 @@
         color="primary"
         variant="tonal"
         @click="deploy(domainNameCmp?.domain, domainNameCmp?.customDomain)"
-        :disabled="tabs?.invalid || !selectedNode"
+        :disabled="tabs?.invalid"
       >
         Deploy
       </v-btn>
