@@ -112,7 +112,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="error" variant="text" @click="onDelete"> Remove </v-btn>
+        <v-btn color="error" variant="text" @click="onDelete"> Delete </v-btn>
         <v-btn color="error" variant="tonal" @click="deletingDialog = false"> Cancel </v-btn>
       </v-card-actions>
     </v-card>
