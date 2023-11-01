@@ -207,6 +207,14 @@ import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
 import TFNotification from "./components/tf_notification.vue";
 import ProfileManager from "./weblets/profile_manager.vue";
 
+const THEME_KEY = "APP_CURRENT_THEME";
+
+const theme = localStorage.getItem(THEME_KEY);
+if (!theme) {
+  // Users visit the website for the first time or clear the cache.
+  localStorage.setItem(THEME_KEY, "dark");
+}
+
 interface AppRoute {
   title: string;
   items: AppRouteItem[];
