@@ -213,6 +213,8 @@ export default {
         isAdding.value = true;
         await gridStore.grid.farms.addStellarAddress({ farmId, stellarAddress });
         createCustomToast("Address Added successfully!", ToastType.success);
+        const farm = farms.value!.filter(farm => farm.farmId === farmId);
+        farm[0].stellarAddress = stellarAddress;
         showDialogue.value = false;
       } catch (error) {
         console.log(error);
