@@ -21,6 +21,18 @@ interface FailedDeployment {
 export interface LoadVMsOptions {
   filter?(vm: any): boolean;
 }
+
+async function getDeploymentContracts(grid: GridClient, name: string, projectName: string) {
+  const contracts1 = await grid.machines.getDeploymentContracts(name);
+  if (contracts1.length) {
+    return contracts1;
+  }
+
+  // will raise error if can't decrypt
+  const contracts2 = await updateGrid(grid, { projectName }).machines.getDeploymentContracts(name);
+  return contracts2;
+}
+
 export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   await migrateModule(grid.machines);
 
@@ -29,15 +41,16 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   let count = machines.length;
   const failedDeployments: FailedDeployment[] = [];
 
-  const projectName = grid.clientOptions.projectName;
+  const projectName = grid.clientOptions.projectName || "";
   const grids = (await Promise.all(
-    machines.map(n => getGrid(grid.clientOptions, `${projectName}/${n}`)),
+    machines.map(n => getGrid(grid.clientOptions, projectName ? `${projectName}/${n}` : n)),
   )) as GridClient[];
 
   const promises = machines.map(async (name, index) => {
     let contracts: any[] = [];
     try {
-      contracts = await grids[index].machines.getDeploymentContracts(name);
+      contracts = await getDeploymentContracts(grids[index], name, projectName);
+
       if (contracts.length === 0) {
         count--;
         return;

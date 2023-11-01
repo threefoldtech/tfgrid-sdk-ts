@@ -46,9 +46,6 @@ export function createCustomToast(
     showIcon: true,
     type,
     toastBackgroundColor: colors[type],
-    onClose: () => {
-      console.log("Closed.....");
-    },
   };
 
   if (typeof customComponent === "string") {

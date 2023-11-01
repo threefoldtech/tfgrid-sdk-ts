@@ -108,6 +108,19 @@ class BaseModule {
     const oldPath = this.getDeploymentPath("");
     const keys = await this.backendStorage.list(oldPath);
 
+    if (this.backendStorage.type === BackendStorageType.tfkvstore) {
+      const exts = await Promise.all(
+        keys.map(key =>
+          this.backendStorage.storage.moveValue!(
+            PATH.join(oldPath, key, "contracts.json"),
+            this.getNewDeploymentPath(key, "contracts.json"),
+          ),
+        ),
+      );
+      await this.tfClient.applyAllExtrinsics(exts.flat(1).filter(Boolean));
+      return;
+    }
+
     const __getValue = (key: string) => {
       const path = PATH.join(oldPath, key, "contracts.json");
       return this.backendStorage.load(path).catch(error => {
@@ -129,11 +142,7 @@ class BaseModule {
       return [this.backendStorage.dump(to, value), this.backendStorage.remove(from)];
     };
 
-    const exts = await Promise.all(keys.map(__updatePath).flat(1));
-
-    if (this.backendStorage.type === BackendStorageType.tfkvstore) {
-      await this.tfClient.applyAllExtrinsics(exts.flat(1).filter(Boolean));
-    }
+    await Promise.all(keys.map(__updatePath).flat(1));
   }
 
   async _list(): Promise<string[]> {
