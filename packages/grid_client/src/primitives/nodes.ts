@@ -131,7 +131,6 @@ class Nodes {
     if (Object.keys(accessNodes).length === 0) {
       throw Error("Couldn't find any node with public config");
     }
-    console.log(accessNodes);
     return accessNodes;
   }
 
