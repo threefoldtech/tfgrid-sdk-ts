@@ -18,7 +18,7 @@
             <form-validator v-model="valid">
               <input-validator
                 :value="$props.modelValue.ip4"
-                :rules="[validators.required('IPv4 is required.'), validators.isIP('IP is not valid.', 4)]"
+                :rules="[validators.required('IPv4 is required.'), validators.isIPRange('IP is not valid.', 4)]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IPV4 address in CIDR format xx.xx.xx.xx/xx">
@@ -28,17 +28,22 @@
 
               <input-validator
                 :value="$props.modelValue.gw4"
-                :rules="[validators.required('Gateway is required.')]"
+                :rules="[validators.required('Gateway is required.'), validators.isIP('Gateway is not valid.', 4)]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Gateway for the IP in ipv4 format">
-                  <v-text-field v-model="$props.modelValue.gw4" v-bind:="props" outlined label="Gateway"></v-text-field>
+                  <v-text-field
+                    v-model="$props.modelValue.gw4"
+                    v-bind:="props"
+                    outlined
+                    label="Gateway IPv4"
+                  ></v-text-field>
                 </input-tooltip>
               </input-validator>
 
               <input-validator
                 :value="$props.modelValue.ip6"
-                :rules="[validators.required('IPv6 is required.'), validators.isIP('IP is not valid.', 6)]"
+                :rules="[validators.required('IPv6 is required.'), validators.isIPRange('IP is not valid.', 6)]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IPV6 address in format x:x:x:x:x:x:x:x">
@@ -48,11 +53,16 @@
 
               <input-validator
                 :value="$props.modelValue.gw6"
-                :rules="[validators.required('Gateway is required.')]"
+                :rules="[validators.required('Gateway is required.'), validators.isIP('Gateway is not valid.', 6)]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Gateway for the IP in ipv6 format">
-                  <v-text-field v-model="$props.modelValue.gw6" v-bind:="props" outlined label="Gateway"></v-text-field>
+                  <v-text-field
+                    v-model="$props.modelValue.gw6"
+                    v-bind:="props"
+                    outlined
+                    label="Gateway IPv6"
+                  ></v-text-field>
                 </input-tooltip>
               </input-validator>
 
@@ -167,7 +177,7 @@ export default {
         createCustomToast("Public config saved successfully.", ToastType.success);
       } catch (error) {
         console.log(error);
-        createCustomToast("Failed to save config!", ToastType.danger);
+        createCustomToast(`Failed to save config. ${error}.`, ToastType.danger);
       } finally {
         isSaving.value = false;
       }

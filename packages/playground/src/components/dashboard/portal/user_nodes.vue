@@ -107,7 +107,7 @@
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <AddPublicConfig class="me-2" :nodeId="item.raw.nodeId" :farmId="item.raw.farmId" v-model="publicConfig" />
+        <PublicConfig class="me-2" :nodeId="item.raw.nodeId" :farmId="item.raw.farmId" v-model="publicConfig" />
         <SetExtraFee class="me-2" :nodeId="item.raw.nodeId" />
       </template>
     </v-data-table-server>
@@ -132,14 +132,14 @@ import { gridProxyClient } from "../../../clients";
 import { useProfileManager } from "../../../stores";
 import { createCustomToast, ToastType } from "../../../utils/custom_toast";
 import NodeMintingDetails from "./NodeMintingDetails.vue";
-import AddPublicConfig from "./public_config.vue";
+import PublicConfig from "./public_config.vue";
 import SetExtraFee from "./set_extra_fee.vue";
 
 export default {
   name: "UserNodes",
   components: {
     NodeMintingDetails,
-    AddPublicConfig,
+    PublicConfig,
     SetExtraFee,
     CardDetails,
   },
@@ -190,7 +190,13 @@ export default {
 
     const expanded = ref<string[]>();
     const network = process.env.NETWORK || window.env.NETWORK;
-    const publicConfig = ref<IPublicConfig | {}>({});
+    const publicConfig = ref<IPublicConfig>({
+      ip4: "",
+      gw4: "",
+      ip6: "",
+      gw6: "",
+      domain: "",
+    });
     const resourcesPanel = ref([]);
     const receiptsPanel = ref([]);
     const uptime = ref();
