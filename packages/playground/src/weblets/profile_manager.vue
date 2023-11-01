@@ -1,7 +1,7 @@
 <template>
   <VDialog
     scrollable
-    width="80%"
+    width="60%"
     :model-value="$props.modelValue"
     @update:model-value="$emit('update:model-value', $event)"
   >
@@ -62,16 +62,29 @@
         </v-tooltip>
       </VCard>
     </template>
-
+    <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+      <!-- <v-icon size="30" class="pr-3">mdi-account-arrow-right-outline</v-icon> -->
+      <v-card-title class="pa-0">Connect your TFChain Wallet</v-card-title>
+    </v-card>
     <WebletLayout disable-alerts>
-      <template #title> Connect your TFChain Wallet </template>
-      <template #subtitle>
+      <!-- <template #title> Connect your TFChain Wallet </template> -->
+      <v-alert variant="tonal" class="mb-6" v-if="activeTab === 0">
+                <p :style="{ maxWidth: '880px' }">
+                  Please visit
+                  <a class="app-link" href="https://manual.grid.tf/playground/wallet_connector.html" target="_blank">
+                    the manual
+                  </a>
+                    get started.
+                </p>
+      </v-alert>
+
+      <!-- <template #subtitle>
         Please visit
         <a class="app-link" href="https://manual.grid.tf/playground/wallet_connector.html" target="_blank">
           the manual
         </a>
         get started.
-      </template>
+      </template> -->
 
       <DTabs
         v-if="!profileManager.profile"
@@ -234,7 +247,7 @@
             </FormValidator>
 
             <div class="d-flex justify-center">
-              <VBtn
+              <VBtn class="mr-2"
                 type="submit"
                 color="secondary"
                 variant="tonal"
@@ -245,10 +258,10 @@
                   activatingAccount ||
                   (activeTab === 1 && isValidConnectConfirmationPassword)
                 "
-                size="large"
               >
                 {{ activeTab === 0 ? "Login" : "Connect" }}
               </VBtn>
+              <VBtn color="error" variant="outlined" @click="$emit('update:modelValue', false)"> Close </VBtn>
             </div>
           </form>
         </VContainer>
@@ -348,8 +361,6 @@
           <VTextField label="Address" readonly v-model="profileManager.profile.address" v-bind="props" />
         </CopyInputWrapper>
       </template>
-
-      <template #footer-actions>
         <VBtn
           color="error"
           variant="tonal"
@@ -359,8 +370,8 @@
         >
           Logout
         </VBtn>
-        <VBtn color="error" variant="outlined" @click="$emit('update:modelValue', false)"> Close </VBtn>
-      </template>
+        <!-- <VBtn color="error" variant="outlined" @click="$emit('update:modelValue', false)"> Close </VBtn> -->
+      
     </WebletLayout>
   </VDialog>
 </template>
