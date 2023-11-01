@@ -112,9 +112,9 @@ class Nodes {
       });
   }
 
-  async getAccessNodes(): Promise<Record<string, unknown>> {
+  async getAccessNodes(availableFor?: number): Promise<Record<string, unknown>> {
     const accessNodes = {};
-    const nodes = await this.filterNodes({ accessNodeV4: true, accessNodeV6: true });
+    const nodes = await this.filterNodes({ accessNodeV4: true, accessNodeV6: true, availableFor });
     for (const node of nodes) {
       const ipv4 = node.publicConfig.ipv4;
       const ipv6 = node.publicConfig.ipv6;
