@@ -114,15 +114,20 @@ class Nodes {
 
   async getAccessNodes(availableFor?: number): Promise<Record<string, unknown>> {
     const accessNodes = {};
-    const nodes = await this.filterNodes({ accessNodeV4: true, accessNodeV6: true, availableFor });
-    for (const node of nodes) {
-      const ipv4 = node.publicConfig.ipv4;
-      const ipv6 = node.publicConfig.ipv6;
-      const domain = node.publicConfig.domain;
-      if (PrivateIp(ipv4.split("/")[0]) === false) {
-        accessNodes[+node.nodeId] = { ipv4: ipv4, ipv6: ipv6, domain: domain };
+    let nodes: NodeInfo[] = [];
+    let page = 1;
+    do {
+      nodes = await this.filterNodes({ accessNodeV4: true, accessNodeV6: true, availableFor, page });
+      for (const node of nodes) {
+        const ipv4 = node.publicConfig.ipv4;
+        const ipv6 = node.publicConfig.ipv6;
+        const domain = node.publicConfig.domain;
+        if (PrivateIp(ipv4.split("/")[0]) === false) {
+          accessNodes[+node.nodeId] = { ipv4: ipv4, ipv6: ipv6, domain: domain };
+        }
       }
-    }
+      page++;
+    } while (nodes.length);
     if (Object.keys(accessNodes).length === 0) {
       throw Error("Couldn't find any node with public config");
     }
