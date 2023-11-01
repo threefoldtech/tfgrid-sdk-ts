@@ -90,7 +90,14 @@
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid"> Deploy </v-btn>
+      <v-btn
+        color="primary"
+        variant="tonal"
+        @click="deploy"
+        :disabled="tabs?.invalid || !leader.selectedNode || workers.some(worker => !worker.selectedNode)"
+      >
+        Deploy
+      </v-btn>
     </template>
   </weblet-layout>
 </template>
