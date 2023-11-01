@@ -15,6 +15,7 @@
     <input-validator
       ref="validator"
       :rules="[validators.required('Node id is required.')]"
+      :async-rules="[() => validateNodeStoragePool(selectedNode)]"
       :value="selectedNode"
       #="{ props }"
     >
@@ -27,10 +28,9 @@
           return-object
           v-model="selectedNode"
           :disabled="loadingNodes || pingingNode"
-          :loading="loadingNodes || pingingNode"
           v-bind="{
             ...props,
-            loading: props.loading || loadingNodes,
+            loading: props.loading || loadingNodes || pingingNode,
             hint: pingingNode ? `Checking if the disks will fit in the node's storage pools... ` : props.hint,
             error: !!errorMessage,
             errorMessages: !!errorMessage ? errorMessage : undefined,
@@ -158,20 +158,7 @@ watch(selectedCards, async () => {
 watch(
   () => selectedNode.value,
   async node => {
-    //reset the outer value to avoid any data conflict
-    emits("update:modelValue", undefined);
     errorMessage.value = ``;
-
-    const grid = await getGrid(profileManager.profile!);
-
-    if (node && grid) {
-      await validateNodeStoragePool(
-        grid,
-        node.nodeId,
-        props.filters.diskSizes.map(disk => disk * 1024 ** 3),
-        props.rootFileSystemSize * 1024 ** 3,
-      );
-    }
 
     if (node && props.filters.hasGPU) {
       loadingCards.value = true;
@@ -277,25 +264,27 @@ async function loadNodes(farmId: number) {
     }
   }
 }
-async function validateNodeStoragePool(grid: GridClient, nodeId: number, disks: number[], rootFileSystemSize: number) {
+async function validateNodeStoragePool(validatingNode: INode | undefined) {
+  if (!validatingNode) return { message: "Node id is required." };
   farmManager?.setLoading(true);
   validator.value?.setStatus(ValidatorStatus.Pending);
+  const grid = await getGrid(profileManager.profile!);
   pingingNode.value = true;
   try {
-    await grid.capacity.checkNodeCapacityPool({
-      nodeId,
-      ssdDisks: disks,
-      rootfsDisks: [rootFileSystemSize],
+    await grid!.capacity.checkNodeCapacityPool({
+      nodeId: validatingNode.nodeId,
+      ssdDisks: props.filters.diskSizes.map(disk => disk * 1024 ** 3),
+      rootfsDisks: [props.rootFileSystemSize * 1024 ** 3],
       hddDisks: [],
     });
     emits("update:modelValue", {
-      nodeId: nodeId,
+      nodeId: validatingNode.nodeId,
       cards: cards,
     });
     await validator.value?.validate();
   } catch (e) {
-    errorMessage.value = `Couldn't fit the required disks in Node ${nodeId} storage pools, please select another node`;
-    availableNodes.value = availableNodes.value.filter(node => node.nodeId !== nodeId);
+    errorMessage.value = `Couldn't fit the required disks in Node ${validatingNode.nodeId} storage pools, please select another node`;
+    availableNodes.value = availableNodes.value.filter(node => node.nodeId !== validatingNode.nodeId);
     validator.value?.setStatus(ValidatorStatus.Invalid);
     emptyResult.value = true;
   } finally {
