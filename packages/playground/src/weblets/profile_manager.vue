@@ -270,7 +270,7 @@
 
       <template v-if="profileManager.profile">
         <v-row class="py-2 pb-5">
-          <v-col cols="7">
+          <v-col cols="7" sm="12" md="6" lg="7">
             <PasswordInputWrapper #="{ props }">
               <VTextField
                 label="Mnemonic"
