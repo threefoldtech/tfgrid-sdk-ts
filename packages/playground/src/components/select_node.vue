@@ -32,8 +32,8 @@
             ...props,
             loading: props.loading || loadingNodes || pingingNode,
             hint: pingingNode ? `Checking if the disks will fit in the node's storage pools... ` : props.hint,
-            error: !!errorMessage,
-            errorMessages: !!errorMessage ? errorMessage : undefined,
+            error: !!errorMessage || props.error,
+            errorMessages: errorMessage || props.errorMessages,
           }"
         >
           <template v-slot:item="{ item, props }">
@@ -268,9 +268,9 @@ async function validateNodeStoragePool(validatingNode: INode | undefined) {
   if (!validatingNode) return { message: "Node id is required." };
   farmManager?.setLoading(true);
   validator.value?.setStatus(ValidatorStatus.Pending);
-  const grid = await getGrid(profileManager.profile!);
   pingingNode.value = true;
   try {
+    const grid = await getGrid(profileManager.profile!);
     await grid!.capacity.checkNodeCapacityPool({
       nodeId: validatingNode.nodeId,
       ssdDisks: props.filters.diskSizes.map(disk => disk * 1024 ** 3),
@@ -281,12 +281,13 @@ async function validateNodeStoragePool(validatingNode: INode | undefined) {
       nodeId: validatingNode.nodeId,
       cards: cards,
     });
-    await validator.value?.validate();
   } catch (e) {
-    errorMessage.value = `Couldn't fit the required disks in Node ${validatingNode.nodeId} storage pools, please select another node`;
     availableNodes.value = availableNodes.value.filter(node => node.nodeId !== validatingNode.nodeId);
     validator.value?.setStatus(ValidatorStatus.Invalid);
     emptyResult.value = true;
+    return {
+      message: `Couldn't fit the required disks in Node ${validatingNode.nodeId} storage pools, please select another node`,
+    };
   } finally {
     pingingNode.value = false;
     farmManager?.setLoading(false);
