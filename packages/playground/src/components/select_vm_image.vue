@@ -84,14 +84,20 @@ watch(
 );
 
 function isFlistExist(flist: string) {
-  return fetch(flist + ".md5")
-    .then(res => res.status !== 200)
-    .then(invalid => {
-      if (invalid) throw new Error();
-    })
-    .catch(() => {
-      return { message: `Couldn't find flist with the provided url.`, isExist: false };
-    });
+  if (flist.includes(".flist")) {
+    return fetch(flist + ".md5")
+      .then(res => res.status !== 200)
+      .then(invalid => {
+        if (invalid) throw new Error();
+      })
+      .catch(() => {
+        return { message: `Couldn't find flist with the provided url.`, isExist: false };
+      });
+  } else {
+    if (!flist.endsWith(".fl")) {
+      return { message: `Not supported flist url` };
+    }
+  }
 }
 </script>
 
