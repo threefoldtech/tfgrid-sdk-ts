@@ -14,13 +14,21 @@ class TFKVStore extends KVStore {
     super(client);
   }
 
-  async set(options: KVStoreSetOptions) {
+  async set(options: KVStoreSetOptions & { encrypt?: boolean }) {
+    if (!options.encrypt) {
+      return super.set({ key: options.key, value: options.value });
+    }
+
     const encryptedValue = this.encrypt(options.value);
     return super.set({ key: options.key, value: encryptedValue });
   }
 
-  async get(options: KVStoreGetOptions) {
+  async get(options: KVStoreGetOptions & { decrypt?: boolean }) {
     const encryptedValue = await super.get(options);
+    if (!options.decrypt) {
+      return encryptedValue;
+    }
+
     if (encryptedValue) {
       try {
         return this.decrypt(encryptedValue);

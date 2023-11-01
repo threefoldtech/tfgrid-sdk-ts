@@ -373,9 +373,11 @@ class TwinDeleteModel {
 class KVStoreSetModel {
   @Expose() @IsString() @IsNotEmpty() key: string;
   @Expose() @IsString() @IsNotEmpty() value: string;
+  @Expose() @IsBoolean() @IsOptional() encrypt?: boolean;
 }
 class KVStoreGetModel {
   @Expose() @IsString() @IsNotEmpty() key: string;
+  @Expose() @IsBoolean() @IsOptional() decrypt?: boolean;
 }
 class KVStoreRemoveModel {
   @Expose() @IsString() @IsNotEmpty() key: string;
