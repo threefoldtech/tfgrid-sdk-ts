@@ -130,6 +130,7 @@ const profileManager = useProfileManager();
 
 const openProfile = ref(true);
 const hasActiveProfile = computed(() => !!profileManager.profile);
+checkAppTheme();
 
 watch(
   () => $route.meta,
@@ -196,6 +197,15 @@ function clickHandler({ route, url }: AppRouteItem): void {
     window.open(url, "_blank");
   }
 }
+
+function checkAppTheme() {
+  const THEME_KEY = "APP_CURRENT_THEME";
+  const theme = localStorage.getItem(THEME_KEY);
+  if (!theme) {
+    // Users visit the website for the first time or clear the cache.
+    localStorage.setItem(THEME_KEY, "dark");
+  }
+}
 </script>
 
 <script lang="ts">
@@ -206,14 +216,6 @@ import DeploymentListManager from "./components/deployment_list_manager.vue";
 import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
 import TFNotification from "./components/tf_notification.vue";
 import ProfileManager from "./weblets/profile_manager.vue";
-
-const THEME_KEY = "APP_CURRENT_THEME";
-
-const theme = localStorage.getItem(THEME_KEY);
-if (!theme) {
-  // Users visit the website for the first time or clear the cache.
-  localStorage.setItem(THEME_KEY, "dark");
-}
 
 interface AppRoute {
   title: string;
