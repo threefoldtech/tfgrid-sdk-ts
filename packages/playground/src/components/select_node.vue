@@ -26,9 +26,8 @@
           item-title="nodeId"
           return-object
           v-model="selectedNode"
-          @update:model-value="selectedNode = $event"
-          :disabled="loadingNodes"
-          :loading="loadingNodes"
+          :disabled="loadingNodes || pingingNode"
+          :loading="loadingNodes || pingingNode"
           v-bind="{
             ...props,
             loading: props.loading || loadingNodes,
@@ -159,6 +158,8 @@ watch(selectedCards, async () => {
 watch(
   () => selectedNode.value,
   async node => {
+    //reset the outer value to avoid any data conflict
+    emits("update:modelValue", undefined);
     errorMessage.value = ``;
 
     const grid = await getGrid(profileManager.profile!);
