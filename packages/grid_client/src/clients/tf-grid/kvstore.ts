@@ -15,7 +15,7 @@ class TFKVStore extends KVStore {
   }
 
   async set(options: KVStoreSetOptions & { encrypt?: boolean }) {
-    if (!options.encrypt) {
+    if (options.encrypt === false) {
       return super.set({ key: options.key, value: options.value });
     }
 
@@ -25,7 +25,7 @@ class TFKVStore extends KVStore {
 
   async get(options: KVStoreGetOptions & { decrypt?: boolean }) {
     const encryptedValue = await super.get(options);
-    if (!options.decrypt) {
+    if (options.decrypt === false) {
       return encryptedValue;
     }
 

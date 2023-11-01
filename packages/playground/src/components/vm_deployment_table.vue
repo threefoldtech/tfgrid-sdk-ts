@@ -11,30 +11,15 @@
       </span>
       <v-icon class="custom-icon" @click="showDialog = true">mdi-file-document-outline </v-icon>
 
-      <v-dialog transition="dialog-bottom-transition" v-model="showDialog" persistent max-width="500px">
+      <v-dialog transition="dialog-bottom-transition" v-model="showDialog" max-width="500px" scrollable>
         <v-card>
           <v-card-title style="color: #ffcc00; font-weight: bold">Failed Deployments</v-card-title>
           <v-divider color="#FFCC00" />
           <v-card-text>
-            <v-list>
-              <v-list-item v-for="deployment in failedDeployments" :key="deployment.name">
-                <div>
-                  {{
-                    deployment.nodes.length > 0
-                      ? `- ${deployment.name} on node${deployment.nodes.length > 1 ? "s" : ""}: ${deployment.nodes.join(
-                          ", ",
-                        )}`
-                      : deployment.name
-                  }}
-                  <template v-if="deployment.contracts && deployment.contracts.length > 0">
-                    with contract id:
-                    <span v-for="(contract, index) in deployment.contracts" :key="index">
-                      {{ contract.contract_id }}
-                      <template v-if="index < deployment.contracts.length - 1">, </template>
-                    </span>
-                  </template>
-                </div>
-              </v-list-item>
+            <v-list :items="failedDeploymentList" item-props lines="three">
+              <template v-slot:subtitle="{ subtitle }">
+                <div v-html="subtitle"></div>
+              </template>
             </v-list>
           </v-card-text>
           <v-card-actions class="justify-end">
@@ -43,7 +28,6 @@
         </v-card>
       </v-dialog>
     </v-alert>
-    <!-- v-list -->
 
     <ListTable
       :headers="filteredHeaders"
@@ -121,7 +105,13 @@ const count = ref<number>();
 const items = ref<any[]>([]);
 const showDialog = ref(false);
 const showEncryption = ref(false);
-const failedDeployments = ref<any[]>([]);
+const failedDeployments = ref<
+  {
+    name: string;
+    nodes?: number[];
+    contracts?: { contract_id: number; node_id: number }[];
+  }[]
+>([]);
 
 onMounted(loadDeployments);
 async function loadDeployments() {
@@ -212,6 +202,36 @@ const filteredHeaders = computed(() => {
   }
 
   return headers;
+});
+
+const failedDeploymentList = computed(() => {
+  return failedDeployments.value
+    .map(({ name, nodes = [], contracts = [] }, index) => {
+      const nodeMessage =
+        nodes.length > 0
+          ? `<span class="ml-4 text-primary font-weight-bold">On Node:</span> ${nodes.join(", ")}.<br/>`
+          : "";
+      const contractMessage =
+        contracts.length > 0
+          ? ` <span class="ml-4 text-primary font-weight-bold">With Contract ID:</span> ${contracts
+              .map(c => c.contract_id)
+              .join(", ")}.`
+          : "";
+
+      const subtitle =
+        nodeMessage + contractMessage === ""
+          ? `<span class="ml-4 text-error font-weight-bold">Error:</span> Failed to decrypt deployment data.`
+          : nodeMessage + contractMessage;
+
+      const item: any[] = [{ title: name, subtitle }];
+
+      if (index + 1 !== failedDeployments.value.length) {
+        item.push({ type: "divider", inset: false });
+      }
+
+      return item;
+    })
+    .flat(1);
 });
 
 defineExpose({ loadDeployments });
