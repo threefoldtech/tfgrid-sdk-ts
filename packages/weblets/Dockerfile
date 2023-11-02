@@ -1,5 +1,5 @@
 # choose the Image which has Node installed already
-FROM node:18 AS build
+FROM node:18.16.0 AS build
 
 # add arg for the network
 ARG NETWORK
