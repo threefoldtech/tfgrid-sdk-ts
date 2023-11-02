@@ -16,11 +16,11 @@
           }
         "
       >
-        <template #title>Manage Gateways ({{ $props.vm?.[0]?.name }})</template>
+        <template #title>Manage Domains ({{ $props.vm?.[0]?.name }})</template>
 
         <v-tabs align-tabs="center" color="primary" class="mb-6" v-model="gatewayTab" :disabled="deleting">
-          <v-tab>Gateway List</v-tab>
-          <v-tab>Add new gateway</v-tab>
+          <v-tab>Domains List</v-tab>
+          <v-tab>Add new domain</v-tab>
         </v-tabs>
 
         <div v-show="gatewayTab === 0" :class="{ 'pb-2': !loadingGateways, 'pb-6': loadingGateways }">
@@ -88,7 +88,7 @@
             </input-tooltip>
 
             <div :style="{ marginTop: '-10px' }">
-              <domain-name hide-title v-model="domainName" />
+              <domain-name :available-for="profileManager.profile?.twinId" hide-title v-model="domainName" />
             </div>
 
             <input-validator
@@ -278,6 +278,8 @@ export default {
     }
 
     return {
+      profileManager,
+
       prefix,
       layout,
       gatewayTab,

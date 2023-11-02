@@ -13,7 +13,6 @@
         refresh
       </v-btn>
     </template>
-
     <ListTable
       :headers="headers"
       :items="contracts"
@@ -49,17 +48,29 @@
       <template #[`item.solutionType`]="{ item }">
         {{ solutionType[item.value.solutionType] ?? item.value.solutionType }}
       </template>
+      <template #[`item.nodeStatus`]="{ item }">
+        <v-chip
+          v-if="item.value.nodeId !== '-' && !loading"
+          :color="getNodeStateColor(nodeStatus[item.value.nodeId])"
+          class="text-capitalize"
+        >
+          {{ nodeStatus[item.value.nodeId] }}
+        </v-chip>
+        <p v-else>-</p>
+      </template>
       <template #[`item.actions`]="{ item }">
-        <v-tooltip text="Show Details">
+        <v-tooltip :text="failedContractId == item.value.contractId ? 'Retry' : 'Show Details'">
           <template #activator="{ props }">
             <v-btn
+              :color="failedContractId == item.value.contractId ? 'error' : ''"
               variant="tonal"
               @click="showDetails(item.value)"
               :disabled="(loading && loadingContractId !== item.value.contractId) || deleting"
               :loading="loadingContractId == item.value.contractId"
               v-bind="props"
             >
-              <v-icon>mdi-eye-outline</v-icon>
+              <v-icon class="pt-1" v-if="failedContractId == item.value.contractId">mdi-refresh</v-icon>
+              <v-icon v-else>mdi-eye-outline</v-icon>
             </v-btn>
           </template>
         </v-tooltip>
@@ -102,7 +113,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="error" variant="text" @click="onDelete"> Remove </v-btn>
+        <v-btn color="error" variant="text" @click="onDelete"> Delete </v-btn>
         <v-btn color="error" variant="tonal" @click="deletingDialog = false"> Cancel </v-btn>
       </v-card-actions>
     </v-card>
@@ -138,7 +149,7 @@
 
 <script lang="ts" setup>
 import { ContractStates, type GridClient } from "@threefold/grid_client";
-import { ref } from "vue";
+import { computed, type Ref, ref } from "vue";
 
 import { useProfileManager } from "../stores";
 import type { VDataTableHeader } from "../types";
@@ -152,6 +163,7 @@ const loading = ref(false);
 const isExporting = ref(false);
 const grid = ref<GridClient | null>();
 const selectedContracts = ref<NormalizedContract[]>([]);
+const nodeStatus = ref() as Ref<{ [x: number]: NodeStatus }>;
 const headers: VDataTableHeader = [
   { title: "PLACEHOLDER", key: "data-table-select" },
   { title: "ID", key: "contractId" },
@@ -162,21 +174,32 @@ const headers: VDataTableHeader = [
   { title: "Solution Name", key: "solutionName" },
   { title: "Created At", key: "createdAt" },
   { title: "Expiration", key: "expiration" },
+  { title: "Node ID", key: "nodeId" },
+  { title: "Node Status", key: "nodeStatus", sortable: false },
   { title: "Details", key: "actions", sortable: false },
 ];
 
 async function onMount() {
   loading.value = true;
+  failedContractId.value = undefined;
   contracts.value = [];
   grid.value = await getGrid(profileManager.profile!);
   contracts.value = await getUserContracts(grid.value!);
+  nodeStatus.value = await getNodeStatus(nodeIDs.value);
   loading.value = false;
 }
 
+const nodeIDs = computed(() => {
+  const allNodes = contracts.value.map(contract => contract.nodeId);
+  return [...new Set(allNodes)];
+});
+
 const loadingContractId = ref<number>();
+const failedContractId = ref<number>();
 const contractLocked = ref<ContractLock>();
 
 async function showDetails(value: any) {
+  failedContractId.value = undefined;
   if (value.type === "name" || value.type === "rent") {
     return layout.value.openDialog(value, false, true);
   }
@@ -187,7 +210,8 @@ async function showDetails(value: any) {
     const deployment = await grid.value?.zos.getDeployment({ contractId });
     return layout.value.openDialog(deployment, false, true);
   } catch (e) {
-    layout.value.setStatus("failed", normalizeError(e, `Failed to load details of contract(${contractId})`));
+    failedContractId.value = contractId;
+    createCustomToast(`Failed to load details of contract ID: ${contractId}`, ToastType.danger);
   } finally {
     loadingContractId.value = undefined;
     loading.value = false;
@@ -260,13 +284,38 @@ async function onDelete() {
   }
   deleting.value = false;
 }
+
+async function getNodeStatus(nodeIDs: (number | undefined)[]) {
+  const resultPromises = nodeIDs.map(async nodeId => {
+    if (typeof nodeId !== "number") return {};
+    const status = (await gridProxyClient.nodes.byId(nodeId)).status;
+    return { [nodeId]: status };
+  });
+
+  const resultsArray = await Promise.all(resultPromises);
+
+  return resultsArray.reduce((acc, obj) => Object.assign(acc, obj), {});
+}
+function getNodeStateColor(state: NodeStatus): string {
+  switch (state) {
+    case NodeStatus.Up:
+      return "success";
+    case NodeStatus.Down:
+      return "error";
+    case NodeStatus.Standby:
+      return "warning";
+  }
+}
 </script>
 
 <script lang="ts">
+import { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
 
+import { gridProxyClient } from "../clients";
 import ListTable from "../components/list_table.vue";
 import { solutionType } from "../types/index";
+import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { downloadAsJson, normalizeError } from "../utils/helpers";
 
 export default {
