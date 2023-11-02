@@ -36,7 +36,7 @@ export function createCustomToast(
   type: ToastType,
   componentProps?: Record<string, unknown>,
 ) {
-  const theme = localStorage.getItem("APP_CURRENT_THEME");
+  const theme = localStorage.getItem("APP_CURRENT_THEME") || "dark";
   const colors = theme === "dark" ? darkModeColors : lightModeColors;
 
   const toastOptions: ToastOptions = {
