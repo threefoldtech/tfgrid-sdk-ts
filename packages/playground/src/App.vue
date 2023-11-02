@@ -479,4 +479,7 @@ a {
 .font-14 {
   font-size: 14px !important;
 }
+.v-label {
+  font-size: 0.875rem;
+}
 </style>
