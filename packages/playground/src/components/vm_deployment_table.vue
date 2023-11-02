@@ -25,37 +25,37 @@
       @click:row="$attrs['onClick:row']"
     >
       <template #[`item.name`]="{ item }">
-        {{ item.value[0].name }}
+        {{ item.value.name }}
       </template>
 
       <template #[`item.ipv4`]="{ item }">
-        {{ item.value[0].publicIP?.ip?.split("/")?.[0] || item.value[0].publicIP?.ip || "-" }}
+        {{ item.value.publicIP?.ip?.split("/")?.[0] || item.value.publicIP?.ip || "-" }}
       </template>
 
       <template #[`item.ipv6`]="{ item }">
-        {{ item.value[0].publicIP?.ip6 || "-" }}
+        {{ item.value.publicIP?.ip6 || "-" }}
       </template>
 
       <template #[`item.planetary`]="{ item }">
-        {{ item.value[0].planetary || "-" }}
+        {{ item.value.planetary || "-" }}
       </template>
 
       <template #[`item.wireguard`]="{ item }">
-        {{ item.value[0].interfaces[0].ip || "-" }}
+        {{ item.value.interfaces.ip || "-" }}
       </template>
 
       <template #[`item.flist`]="{ item }">
-        <v-tooltip :text="item.value[0].flist" location="bottom right">
+        <v-tooltip :text="item.value.flist" location="bottom right">
           <template #activator="{ props }">
             <p v-bind="props">
-              {{ item.value[0].flist.replace("https://hub.grid.tf/", "").replace(".flist", "") }}
+              {{ item.value.flist.replace("https://hub.grid.tf/", "").replace(".flist", "") }}
             </p>
           </template>
         </v-tooltip>
       </template>
 
       <template #[`item.billing`]="{ item }">
-        {{ item.value[0].billing }}
+        {{ item.value.billing }}
       </template>
       <template #[`item.actions`]="{ item }">
         <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item.value)">
@@ -121,22 +121,22 @@ async function loadDeployments() {
   namesOfFailedDeployments.value = failedDeployments.join(", ");
 
   count.value = vms.count;
-  items.value = vms.items;
+  items.value = vms.items.flat(1);
 
   loading.value = false;
 }
 
 const filteredHeaders = computed(() => {
   let headers = [
-    { title: "PLACEHOLDER", key: "data-table-select" },
+    { title: "PLACEHOLDER", key: "data-tabl  -select" },
     { title: "Name", key: "name" },
-    { title: "Public IPv4", key: "ipv4" },
-    { title: "Public IPv6", key: "ipv6" },
-    { title: "Planetary Network IP", key: "planetary" },
-    { title: "WireGuard", key: "wireguard" },
+    { title: "Public IPv4", key: "ipv4", sortable: false },
+    { title: "Public IPv6", key: "ipv6", sortable: false },
+    { title: "Planetary Network IP", key: "planetary", sortable: false },
+    { title: "WireGuard", key: "wireguard", sortable: false },
     { title: "Flist", key: "flist" },
     { title: "Cost", key: "billing" },
-    { title: "Actions", key: "actions" },
+    { title: "Actions", key: "actions", sortable: false },
   ];
 
   const IPV6Solutions = [ProjectName.VM, ProjectName.Fullvm] as string[];
