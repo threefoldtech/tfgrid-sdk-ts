@@ -63,7 +63,6 @@
       </VCard>
     </template>
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-      <!-- <v-icon size="30" class="pr-3">mdi-account-arrow-right-outline</v-icon> -->
       <v-card-title class="pa-0">Connect your TFChain Wallet</v-card-title>
     </v-card>
     <WebletLayout disable-alerts>
@@ -288,7 +287,6 @@
               <template #activator="{ props }">
                 <CopyInputWrapper :data="profileManager.profile.ssh" #="{ props: copyInputProps }">
                   <VTextarea
-                    class="text-subtitle-2"
                     label="Public SSH Key"
                     no-resize
                     :spellcheck="false"
@@ -322,7 +320,7 @@
               </VBtn>
               <VBtn
                 class="text-subtitle-2"
-                color="primary"
+                color="secondary"
                 variant="outlined"
                 @click="updateSSH"
                 :disabled="!ssh || profileManager.profile.ssh === ssh || updatingSSH || !isEnoughBalance(balance)"
