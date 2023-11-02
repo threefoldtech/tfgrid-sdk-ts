@@ -128,7 +128,7 @@ async function loadDeployments() {
 
 const filteredHeaders = computed(() => {
   let headers = [
-    { title: "PLACEHOLDER", key: "data-tabl  -select" },
+    { title: "PLACEHOLDER", key: "data-table-select" },
     { title: "Name", key: "name" },
     { title: "Public IPv4", key: "ipv4", sortable: false },
     { title: "Public IPv6", key: "ipv6", sortable: false },
