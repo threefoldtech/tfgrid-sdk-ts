@@ -130,7 +130,6 @@ const profileManager = useProfileManager();
 
 const openProfile = ref(true);
 const hasActiveProfile = computed(() => !!profileManager.profile);
-checkAppTheme();
 
 watch(
   () => $route.meta,
@@ -195,15 +194,6 @@ function clickHandler({ route, url }: AppRouteItem): void {
     $router.push(route);
   } else if (url) {
     window.open(url, "_blank");
-  }
-}
-
-function checkAppTheme() {
-  const THEME_KEY = "APP_CURRENT_THEME";
-  const theme = localStorage.getItem(THEME_KEY);
-  if (!theme) {
-    // Users visit the website for the first time or clear the cache.
-    localStorage.setItem(THEME_KEY, "dark");
   }
 }
 </script>
