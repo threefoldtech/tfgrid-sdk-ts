@@ -1,4 +1,5 @@
 <template>
+  <RouteToSolutions />
   <view-layout>
     <MicroVm />
 
@@ -9,6 +10,7 @@
 </template>
 
 <script lang="ts">
+import RouteToSolutions from "../components/back_to_solutions.vue";
 import { ProjectName } from "../types";
 import MicroVm from "../weblets/micro_vm.vue";
 import TfDeploymentList from "../weblets/tf_deployment_list.vue";
@@ -18,6 +20,7 @@ export default {
   components: {
     MicroVm,
     TfDeploymentList,
+    RouteToSolutions,
   },
   setup() {
     return { name: ProjectName.VM };
