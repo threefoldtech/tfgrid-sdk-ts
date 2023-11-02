@@ -79,8 +79,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { GridClient } from "@threefold/grid_client";
-import { onMounted, type PropType, type Ref, ref, watch } from "vue";
+import { type PropType, type Ref, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
 
@@ -271,7 +270,9 @@ async function validateNodeStoragePool(validatingNode: INode | undefined) {
   pingingNode.value = true;
   try {
     const grid = await getGrid(profileManager.profile!);
-    await grid!.capacity.checkNodeCapacityPool({
+    if (!grid) throw new Error("Connection issue please try again");
+
+    await grid.capacity.checkNodeCapacityPool({
       nodeId: validatingNode.nodeId,
       ssdDisks: props.filters.diskSizes.map(disk => disk * 1024 ** 3),
       rootfsDisks: [props.rootFileSystemSize * 1024 ** 3],
