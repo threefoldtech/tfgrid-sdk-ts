@@ -4177,11 +4177,6 @@
   resolved "https://registry.yarnpkg.com/@threefold/extension_api/-/extension_api-0.0.1-rc6.tgz#9271ac014f8cfc5b0351f75bc7bee6f9e5e744a2"
   integrity sha512-rICTgNT7NuAlJCi9PcQ4l5q4jh0aQ/9nilXu9SHHo4toSYd9NxeI4HxF+Vmk1vR8O7iA101SoRhJrJCAqjtROw==
 
-"@threefold/gridproxy_client@^2.1.1-rc1":
-  version "2.1.1-rc1"
-  resolved "https://registry.yarnpkg.com/@threefold/gridproxy_client/-/gridproxy_client-2.1.1-rc1.tgz#3e79b375d8bb5bcd598d2248308cce2841f78913"
-  integrity sha512-IPT3irRQ4MzBUK1BRBCMeagU8JO5RhpIjt+TzgrQJMYfgTzoo597uirfdsnzXoAiHK/oJhokQx9wr5mBOcFgRQ==
-
 "@tootallnate/once@2":
   version "2.0.0"
   resolved "https://registry.npmjs.org/@tootallnate/once/-/once-2.0.0.tgz"
