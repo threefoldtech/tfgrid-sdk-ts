@@ -110,6 +110,7 @@
 
 <script lang="ts">
 import type { FarmInfo } from "@threefold/grid_client";
+import { debounce } from "lodash";
 import { StrKey } from "stellar-sdk";
 import { onMounted, ref } from "vue";
 
@@ -173,6 +174,7 @@ export default {
       await getUserFarms();
     });
 
+    const reloadFarms = debounce(getUserFarms, 20000);
     function fetch(items: FarmInfo[]) {
       const start = (page.value - 1) * pageSize.value;
       const end = start + pageSize.value;
@@ -213,9 +215,9 @@ export default {
         isAdding.value = true;
         await gridStore.grid.farms.addStellarAddress({ farmId, stellarAddress });
         createCustomToast("Address Added successfully!", ToastType.success);
-        const farm = farms.value!.filter(farm => farm.farmId === farmId);
-        farm[0].stellarAddress = stellarAddress;
         showDialogue.value = false;
+        createCustomToast("Table may take sometime to update the changes.", ToastType.info);
+        await reloadFarms();
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to add address!", ToastType.danger);
