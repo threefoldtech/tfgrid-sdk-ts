@@ -382,7 +382,14 @@
         >
           Logout
         </VBtn>
-        <!-- <VBtn color="anchor" variant="outlined" @click="$emit('update:modelValue', false)"> Close </VBtn> -->
+        <VBtn
+          v-if="profileManager.profile"
+          color="anchor"
+          variant="outlined"
+          @click="$emit('update:modelValue', false)"
+        >
+          Close
+        </VBtn>
       </div>
     </WebletLayout>
   </VDialog>

@@ -419,7 +419,7 @@ export default {
   z-index: 99;
   background-color: rgb(var(--v-theme-background));
   color: var(--v-theme-text);
-  font-weight: 900;
+  font-weight: 400;
 }
 
 a {
