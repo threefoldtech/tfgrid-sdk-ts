@@ -96,6 +96,12 @@ class Capacity {
 
   @expose
   @validateInput
+  async getFarmsCount(options?: FarmFilterOptions): Promise<string> {
+    return await this.nodes.getFarmsCount(options);
+  }
+
+  @expose
+  @validateInput
   async checkFarmHasFreePublicIps(options?: FarmHasFreePublicIPsModel): Promise<boolean> {
     return await this.nodes.checkFarmHasFreePublicIps(options.farmId);
   }

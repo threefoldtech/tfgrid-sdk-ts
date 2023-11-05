@@ -619,6 +619,7 @@ class FarmFilterOptions {
   @Expose() @IsOptional() @IsInt() ownedBy?: number;
   @Expose() @IsOptional() @IsInt() farmId?: number;
   @Expose() @IsOptional() @IsBoolean() randomize?: boolean;
+  @Expose() @IsOptional() @IsBoolean() ret_count?: boolean;
 }
 
 class CalculatorModel {

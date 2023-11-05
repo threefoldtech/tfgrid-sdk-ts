@@ -5,7 +5,7 @@ import urlJoin from "url-join";
 
 import { RMB } from "../clients";
 import { Graphql } from "../clients/graphql/client";
-import { send } from "../helpers/requests";
+import { send, sendWithFullResponse } from "../helpers/requests";
 import { FarmFilterOptions, FilterOptions, NodeStatus } from "../modules/models";
 
 interface FarmInfo {
@@ -317,6 +317,16 @@ class Nodes {
     return farms;
   }
 
+  async getFarmsCount(options: FilterOptions = {}, url = ""): Promise<string> {
+    url = url || this.proxyURL;
+    const query = this.getFarmUrlQuery({ ...options, ret_count: true });
+    try {
+      return (await sendWithFullResponse("get", urlJoin(url, `/farms?${query}`), "", {})).headers["count"];
+    } catch (err) {
+      throw Error(`Error while requesting the grid proxy due ${err}`);
+    }
+  }
+
   /**
    * Get farm id from farm name.
    * It returns 0 in case the farm name is not found.
@@ -388,6 +398,7 @@ class Nodes {
       node_certified: options.nodeCertified,
       farm_id: options.farmId,
       randomize: options.randomize,
+      ret_count: options.ret_count,
     };
     return Object.entries(params)
       .map(param => param.join("="))
