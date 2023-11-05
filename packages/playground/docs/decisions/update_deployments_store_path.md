@@ -1,4 +1,4 @@
-# 2. update_deployment_store_path
+# 1. update_deployment_store_path
 
 Date: 2023-10-22
 
