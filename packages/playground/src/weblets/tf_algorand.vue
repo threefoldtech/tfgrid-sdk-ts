@@ -220,7 +220,7 @@ const firstRound = ref(24000000);
 const lastRound = ref(26000000);
 const farm = ref() as Ref<Farm>;
 const dedicated = ref(false);
-const certified = ref(false);
+const certified = ref(undefined);
 const loadingFarm = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const rootFilesystemSize = computed(() => storage.value);

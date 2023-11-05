@@ -132,7 +132,7 @@ const flist: Flist = {
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
-const certified = ref(false);
+const certified = ref(undefined);
 const loadingFarm = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const domainNameCmp = ref();

@@ -134,7 +134,7 @@ const flist: Flist = {
   entryPoint: "/",
 };
 const dedicated = ref(false);
-const certified = ref(false);
+const certified = ref(undefined);
 const selectedNode = ref() as Ref<INode>;
 const rootFilesystemSize = 2;
 async function deploy() {

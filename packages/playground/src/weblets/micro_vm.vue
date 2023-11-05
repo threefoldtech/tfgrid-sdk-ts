@@ -237,7 +237,7 @@ const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
 const network = ref();
 const dedicated = ref(false);
-const certified = ref(false);
+const certified = ref(undefined);
 const selectedNode = ref() as Ref<INode>;
 const loadingFarm = ref(false);
 const rootFilesystemSize = computed(() => solution.value?.disk);

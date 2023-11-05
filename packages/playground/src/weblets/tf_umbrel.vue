@@ -161,7 +161,7 @@ const flist: Flist = {
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
-const certified = ref(false);
+const certified = ref(undefined);
 const selectedNode = ref() as Ref<INode>;
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 async function deploy() {

@@ -176,7 +176,7 @@ const flist: Flist = {
   entryPoint: "/init.sh",
 };
 const dedicated = ref(false);
-const certified = ref(false);
+const certified = ref(undefined);
 const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
 const domainNameCmp = ref();

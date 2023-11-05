@@ -165,7 +165,7 @@ const ipv4 = ref(false);
 const domainNameCmp = ref();
 const smtp = ref(createSMTPServer());
 const dedicated = ref(false);
-const certified = ref(false);
+const certified = ref(undefined);
 const loadingFarm = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));

@@ -125,7 +125,7 @@ const farm = ref() as Ref<Farm>;
 const flist = ref<Flist>();
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
-const certified = ref(false);
+const certified = ref(undefined);
 const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
 const rootFileSystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
