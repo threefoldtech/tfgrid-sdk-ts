@@ -141,7 +141,12 @@
         >
           <v-switch color="primary" inset label="With a Public IPv4" v-model="ipv4" hide-details />
         </input-tooltip>
-        <input-tooltip inline class="px-2" tooltip="Use current balance to calculate the discount.">
+        <input-tooltip
+          v-if="hasActiveProfile"
+          inline
+          class="px-2"
+          tooltip="Use current balance to calculate the discount."
+        >
           <v-switch color="primary" inset label="Use current balance" v-model="currentbalance" hide-details />
         </input-tooltip>
       </v-row>
@@ -182,7 +187,7 @@
 </template>
 
 <script lang="ts" setup>
-import { capitalize, watch } from "vue";
+import { capitalize, computed, watch } from "vue";
 import { onMounted } from "vue";
 import { ref } from "vue";
 
@@ -216,7 +221,7 @@ const prices = ref<PriceType[]>([]);
 
 const grid = ref();
 const profileManager = useProfileManager();
-
+const hasActiveProfile = computed(() => !!profileManager.profile);
 watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance], async () => {
   let pkgs: any;
   if (!valid.value.error) {

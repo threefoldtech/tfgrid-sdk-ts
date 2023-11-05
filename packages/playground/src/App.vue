@@ -4,7 +4,7 @@
       <v-navigation-drawer
         width="280"
         :permanent="permanent"
-        :model-value="hasActiveProfile && openSidebar"
+        :model-value="openSidebar"
         @update:model-value="openSidebar = $event"
       >
         <div :style="{ paddingTop: '64px' }">
@@ -127,7 +127,8 @@
               <router-view v-slot="{ Component }">
                 <transition name="fade">
                   <div :key="$route.path">
-                    <component :is="Component" v-if="hasActiveProfile"></component>
+                    <component :is="Component" v-if="isAuthorized($route.path)"></component>
+                    <component :is="Component" v-else-if="hasActiveProfile"></component>
                     <ConnectWalletLanding @openProfile="openProfile = true" v-else />
                   </div>
                 </transition>
@@ -313,6 +314,11 @@ function clickHandler({ route, url }: AppRouteItem): void {
   } else if (url) {
     window.open(url, "_blank");
   }
+}
+
+function isAuthorized(route: string) {
+  const items = ["portal", "contractslist", "solutions"];
+  return !items.some(substr => route.startsWith(`/${substr}`));
 }
 
 $router.beforeEach((to, from, next) => {
