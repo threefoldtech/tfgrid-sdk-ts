@@ -2,7 +2,9 @@
   <section>
     <h6 class="text-h5 mb-4 mt-2">Choose a Location</h6>
     <SelectCountry v-model="country" />
-
+    {{ page }}
+    {{ selectedPages }}
+    {{ shouldBeUpdated }}
     <input-validator :rules="[validators.required('Farm is required.')]" :value="farm?.farmID" ref="farmInput">
       <input-tooltip tooltip="The name of the farm that you want to deploy inside it.">
         <v-autocomplete
@@ -41,13 +43,13 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, type PropType, ref, watch } from "vue";
+import { onMounted, onUnmounted, type PropType, Ref, ref, watch } from "vue";
 
 import { useInputRef } from "@/hooks/input_validator";
 
 import { useProfileManager } from "../stores/profile_manager";
 import type { Farm } from "../types";
-import { getFarms } from "../utils/get_farms";
+import { getFarms, getFarmsPages } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
 import { useFarmGatewayManager } from "./farm_gateway_manager.vue";
 import { useFarm } from "./select_farm_manager.vue";
@@ -75,8 +77,8 @@ const emits = defineEmits<{
   (event: "update:loading", value: boolean): void;
 }>();
 
-const SIZE = 20;
-const page = ref(1);
+const SIZE = 50;
+const page = ref();
 
 const farmInput = useInputRef();
 const profileManager = useProfileManager();
@@ -107,6 +109,7 @@ watch(
   },
   { immediate: true },
 );
+const selectedPages = ref([]) as Ref<number[]>;
 
 const farms = ref<Farm[]>([]);
 let initialized = false;
@@ -115,9 +118,10 @@ async function loadFarms() {
 
   loading.value = true;
   const oldFarm = farm.value;
-
   const grid = await getGrid(profileManager.profile!);
   const filters = props.filters;
+  if (!page.value) await resetPages();
+  console.log("get farms on page:", page.value);
   const _farms = await getFarms(
     grid!,
     {
@@ -158,17 +162,48 @@ async function loadFarms() {
       initialized = true;
     }
   }
-
-  page.value = _farms.length < SIZE ? -1 : page.value + 1;
+  selectedPages.value.push(page.value);
+  page.value = selectedPages.value.length === pagesCount.value ? -1 : setRandomPage();
   loading.value = false;
 }
 onMounted(loadFarms);
 onUnmounted(() => FarmGatewayManager?.unregister());
-
+function setRandomPage() {
+  let randPage = Math.floor(Math.random() * (pagesCount.value - 1) + 1);
+  console.log(randPage, "init");
+  while (selectedPages.value.includes(randPage)) randPage = Math.floor(Math.random() * pagesCount.value);
+  return randPage;
+}
 const shouldBeUpdated = ref(false);
+const pagesCount = ref(1);
+async function resetPages() {
+  const grid = await getGrid(profileManager.profile!);
+  if (!grid) {
+    console.log("can't get the grid");
+    pagesCount.value = 1;
+  } else {
+    pagesCount.value = await getFarmsPages(grid, {
+      size: SIZE,
+      page: page.value,
+      country: country.value,
+      nodeMRU: props.filters.memory ? Math.round(props.filters.memory / 1024) : undefined,
+      nodeHRU: props.filters.disk,
+      nodeSRU: props.filters.ssd,
+      publicIp: props.filters.publicIp,
+      availableFor: grid!.twinId,
+      nodeCertified: props.filters.certified,
+      nodeRentedBy: props.filters.rentedBy ? props.filters.rentedBy : undefined,
+      nodeHasGPU: props.filters.hasGPU ? props.filters.hasGPU : undefined,
+    });
+    console.log(pagesCount.value, "pages");
+  }
+  selectedPages.value = [];
+  page.value = setRandomPage();
+}
+
 watch(
   () => ({ ...props.filters, country: country.value }),
-  (value, oldValue) => {
+  async (value, oldValue) => {
     if (
       value.cpu === oldValue.cpu &&
       value.memory === oldValue.memory &&
@@ -181,13 +216,14 @@ watch(
       value.hasGPU === oldValue.hasGPU
     )
       return;
-
     shouldBeUpdated.value = true;
+    await resetPages();
   },
 );
 
 watch([loading, shouldBeUpdated], async ([l, s]) => {
   if (l || !s) return;
+  selectedPages.value = [];
   shouldBeUpdated.value = false;
   clearTimeout(delay.value);
   delay.value = setTimeout(async () => {
@@ -198,6 +234,7 @@ watch([loading, shouldBeUpdated], async ([l, s]) => {
 </script>
 
 <script lang="ts">
+import { FarmFilterOptions } from "@threefold/grid_client";
 import { nextTick } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";

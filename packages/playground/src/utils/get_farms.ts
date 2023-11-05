@@ -7,6 +7,17 @@ import { gqlClient, gridProxyClient } from "../clients";
 export interface GetFarmsOptions {
   exclusiveFor?: string;
 }
+
+export async function getFarmsPages(grid: GridClient, filters: FarmFilterOptions): Promise<number> {
+  try {
+    const count = (await grid.capacity.getFarmsCount(filters)) || 1;
+    console.log(count, filters);
+    return Math.ceil(count / 50);
+  } catch {
+    return 1;
+  }
+}
+
 export async function getFarms(
   grid: GridClient,
   filters: FarmFilterOptions,
