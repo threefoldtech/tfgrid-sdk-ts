@@ -1,12 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-btn
-        color="blue"
-        class="ml-auto bold-text"
-        @click="showDialogue = true"
-        :disabled="isCreating"
-        :loading="isCreating"
+      <v-btn color="blue" class="ml-auto bold-text" @click="showDialogue = true" :disabled="isCreating"
         >Create Farm</v-btn
       >
     </v-row>
@@ -40,7 +35,14 @@
             </form-validator>
           </div>
           <v-card-actions class="justify-end px-5 pb-5 pt-0">
-            <v-btn color="primary" variant="tonal" @click="createFarm" :disabled="!valid">Create</v-btn>
+            <v-btn
+              color="primary"
+              variant="tonal"
+              @click="createFarm"
+              :loading="isCreating"
+              :disabled="!valid || isCreating"
+              >Create</v-btn
+            >
             <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
           </v-card-actions>
         </v-card>

@@ -204,12 +204,14 @@ export default {
 
     onMounted(async () => {
       const nodes = await getUserNodes();
-      await Promise.all(
-        nodes!.map(async (n, _) => {
-          n.uptime = +(await getNodeUptimePercentage(n.nodeId));
-          return n.uptime;
-        }),
-      );
+      if (nodes) {
+        await Promise.all(
+          nodes.map(async (n, _) => {
+            n.uptime = +(await getNodeUptimePercentage(n.nodeId));
+            return n.uptime;
+          }),
+        );
+      }
     });
 
     async function getUserNodes() {
