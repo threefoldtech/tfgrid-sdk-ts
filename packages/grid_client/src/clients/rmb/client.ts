@@ -6,7 +6,7 @@ class RMB {
     this.client = rmbClient;
   }
 
-  async request(destTwinIds: number[], cmd: string, payload: string, expiration = 60, retires = 1) {
+  async request(destTwinIds: number[], cmd: string, payload: string, expiration = 10, retires = 1) {
     let result;
     try {
       const requestId = await this.client.send(cmd, payload, destTwinIds[0], expiration / 60);
