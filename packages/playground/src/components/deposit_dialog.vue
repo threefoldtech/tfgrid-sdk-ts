@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-dialog transition="dialog-bottom-transition" max-width="1000" v-model="depositDialog" persistent>
+    <v-dialog transition="dialog-bottom-transition" max-width="1000" v-model="depositDialog">
       <v-card>
         <v-toolbar color="primary" dark class="d-flex justify-center bold-text"> Deposit TFT </v-toolbar>
         <v-card-text>
