@@ -23,13 +23,15 @@
                 :rules="[validators.required('IP is required.'), validators.isIPRange('Not a valid IP'), ipcheck]"
                 #="{ props }"
               >
-                <v-text-field
-                  :model-value="$props.publicIP"
-                  v-bind:="props"
-                  @update:model-value="$emit('update:publicIP', $event)"
-                  outlined
-                  :label="type === IPType.single ? 'IP' : 'From IP'"
-                ></v-text-field>
+                <input-tooltip tooltip="IP address in CIDR format xxx.xxx.xxx.xxx/xx">
+                  <v-text-field
+                    :model-value="$props.publicIP"
+                    v-bind:="props"
+                    @update:model-value="$emit('update:publicIP', $event)"
+                    outlined
+                    :label="type === IPType.single ? 'IP' : 'From IP'"
+                  ></v-text-field>
+                </input-tooltip>
               </input-validator>
               <input-validator
                 v-if="type === IPType.range"
@@ -37,13 +39,15 @@
                 :rules="[validators.required('IP is required.'), validators.isIPRange('Not a valid IP'), toIpCheck]"
                 #="{ props }"
               >
-                <v-text-field
-                  :model-value="$props.toPublicIP"
-                  v-bind:="props"
-                  @update:model-value="$emit('update:toPublicIP', $event)"
-                  outlined
-                  label="To IP"
-                ></v-text-field>
+                <input-tooltip tooltip="IP address in CIDR format xxx.xxx.xxx.xxx/xx">
+                  <v-text-field
+                    :model-value="$props.toPublicIP"
+                    v-bind:="props"
+                    @update:model-value="$emit('update:toPublicIP', $event)"
+                    outlined
+                    label="To IP"
+                  ></v-text-field>
+                </input-tooltip>
               </input-validator>
               <input-validator
                 :value="$props.gateway"
@@ -54,13 +58,15 @@
                 ]"
                 #="{ props }"
               >
-                <v-text-field
-                  :model-value="$props.gateway"
-                  v-bind:="props"
-                  @update:model-value="$emit('update:gateway', $event)"
-                  outlined
-                  label="Gateway"
-                ></v-text-field>
+                <input-tooltip tooltip="Gateway for the IP in ipv4 format">
+                  <v-text-field
+                    :model-value="$props.gateway"
+                    v-bind:="props"
+                    @update:model-value="$emit('update:gateway', $event)"
+                    outlined
+                    label="Gateway"
+                  ></v-text-field>
+                </input-tooltip>
               </input-validator>
             </form-validator>
           </div>
