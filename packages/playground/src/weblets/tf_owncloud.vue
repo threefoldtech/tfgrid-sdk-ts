@@ -8,6 +8,7 @@
     :certified="certified"
     :dedicated="dedicated"
     title-image="images/icons/owncloud.png"
+    :is-weblets="true"
   >
     <template #title>Deploy an OwnCloud Instance </template>
 

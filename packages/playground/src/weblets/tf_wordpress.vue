@@ -8,6 +8,7 @@
     :certified="certified"
     :dedicated="dedicated"
     title-image="images/icons/wordpress.png"
+    :is-weblets="true"
   >
     <template #title>Deploy a Wordpress Instance </template>
 

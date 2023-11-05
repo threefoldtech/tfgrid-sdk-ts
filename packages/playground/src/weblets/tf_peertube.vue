@@ -8,6 +8,7 @@
     :certified="certified"
     :dedicated="dedicated"
     title-image="images/icons/peertube.png"
+    :is-weblets="true"
   >
     <template #title>Deploy a Peertube Instance</template>
     <form-validator v-model="valid">

@@ -9,6 +9,7 @@
     :certified="certified"
     :dedicated="dedicated"
     title-image="images/icons/vm.png"
+    :is-weblets="true"
   >
     <template #title>Deploy a Micro Virtual Machine </template>
 

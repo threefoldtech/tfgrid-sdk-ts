@@ -8,6 +8,7 @@
     :certified="certified"
     :dedicated="dedicated"
     title-image="images/icons/nextcloud.png"
+    :is-weblets="true"
   >
     <template #title>Deploy a Nextcloud All-in-One Instance </template>
     <form-validator v-model="valid">

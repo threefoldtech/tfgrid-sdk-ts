@@ -3,6 +3,13 @@
     <section class="d-flex align-center">
       <div>
         <v-card-title v-if="$slots.title" class="font-weight-bold d-flex align-center title">
+          <router-link to="/solutions" v-if="isWeblets">
+            <v-btn prepend-icon="mdi-arrow-left" variant="text" color="secondary">
+              <template v-slot:prepend>
+                <v-icon color="secondary"></v-icon>
+              </template>
+            </v-btn>
+          </router-link>
           <img
             :src="baseUrl + titleImage"
             alt="title image"
@@ -148,6 +155,11 @@ const props = defineProps({
     default: () => false,
   },
   dedicated: {
+    type: Boolean,
+    required: false,
+    default: () => false,
+  },
+  isWeblets: {
     type: Boolean,
     required: false,
     default: () => false,

@@ -8,6 +8,7 @@
     :certified="certified"
     :dedicated="dedicated"
     title-image="images/icons/casperlabs.png"
+    :is-weblets="true"
   >
     <template #title>Deploy a Casperlabs Instance </template>
 

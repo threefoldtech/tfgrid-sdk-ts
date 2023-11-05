@@ -8,6 +8,7 @@
     :certified="certified"
     :dedicated="dedicated"
     title-image="images/icons/presearch.png"
+    :is-weblets="true"
   >
     <template #title>Deploy a Presearch Instance</template>
 

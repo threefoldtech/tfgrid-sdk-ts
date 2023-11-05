@@ -8,6 +8,7 @@
     :certified="certified"
     :dedicated="dedicated"
     title-image="images/icons/mattermost.png"
+    :is-weblets="true"
   >
     <template #title>Deploy a Mattermost Instance </template>
 

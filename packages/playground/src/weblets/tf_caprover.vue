@@ -14,6 +14,7 @@
     :certified="leader.certified"
     :dedicated="leader.dedicated"
     title-image="images/icons/caprover.png"
+    :is-weblets="true"
   >
     <template #title>Deploy a Caprover Instance</template>
     <d-tabs

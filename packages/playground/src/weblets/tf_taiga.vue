@@ -8,6 +8,7 @@
     :certified="certified"
     :dedicated="dedicated"
     title-image="images/icons/taiga.png"
+    :is-weblets="true"
   >
     <template #title>Deploy a Taiga Instance</template>
     <d-tabs

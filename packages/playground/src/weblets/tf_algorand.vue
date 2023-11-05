@@ -8,6 +8,7 @@
     :certified="certified"
     :dedicated="dedicated"
     title-image="images/icons/algorand.png"
+    :is-weblets="true"
   >
     <template #title>Deploy a Algorand Instance </template>
     <form-validator v-model="valid">

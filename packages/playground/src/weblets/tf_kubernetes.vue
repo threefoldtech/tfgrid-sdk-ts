@@ -10,6 +10,7 @@
     :certified="master.certified"
     :dedicated="master.dedicated"
     title-image="images/icons/kubernetes.png"
+    :is-weblets="true"
   >
     <template #title>Deploy a Kubernetes cluster</template>
     <d-tabs

@@ -8,6 +8,7 @@
     :dedicated="dedicated"
     :ipv4="ipv4"
     title-image="images/icons/freeflow.png"
+    :is-weblets="true"
   >
     <template #title>Deploy a Freeflow Instance </template>
 
