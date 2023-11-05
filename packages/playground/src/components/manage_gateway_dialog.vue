@@ -204,8 +204,8 @@ export default {
     const passThrough = ref(false);
     const valid = ref(false);
 
-    const ip = props.vm[0].interfaces[0].ip as string;
-    const networkName = props.vm[0].interfaces[0].network as string;
+    const ip = props.vm.interfaces[0].ip as string;
+    const networkName = props.vm.interfaces[0].network as string;
 
     onMounted(async () => {
       const grid = await getGrid(profileManager.profile!);
