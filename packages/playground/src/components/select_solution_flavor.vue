@@ -72,9 +72,9 @@ import type { solutionFlavor } from "../types";
 type Package = PropType<solutionFlavor>;
 
 const props = defineProps({
-  minimum: { type: Object as Package, default: () => ({ cpu: 1, memory: 1024 * 2, disk: 15 }) },
-  standard: { type: Object as Package, default: () => ({ cpu: 2, memory: 1024 * 2, disk: 100 }) },
-  recommended: {
+  small: { type: Object as Package, default: () => ({ cpu: 1, memory: 1024 * 2, disk: 15 }) },
+  medium: { type: Object as Package, default: () => ({ cpu: 2, memory: 1024 * 2, disk: 100 }) },
+  large: {
     type: Object as Package,
     default: () => ({ cpu: 4, memory: 1024 * 4, disk: 250 }),
   },
@@ -83,19 +83,19 @@ const props = defineProps({
 const emits = defineEmits<{ (event: "update:model-value", value?: solutionFlavor): void }>();
 
 const packages = computed(() => {
-  const { minimum, standard, recommended } = props;
+  const { small, medium, large } = props;
   return [
     {
-      title: `Minimum(CPU: ${minimum.cpu} vCores, Memory: ${minimum.memory} MB, SSD: ${minimum.disk} GB)`,
-      value: minimum,
+      title: `Small(CPU: ${small.cpu} vCores, Memory: ${small.memory} MB, SSD: ${small.disk} GB)`,
+      value: small,
     },
     {
-      title: `Standard(CPU: ${standard.cpu} vCores, Memory: ${standard.memory} MB, SSD: ${standard.disk} GB)`,
-      value: standard,
+      title: `Medium(CPU: ${medium.cpu} vCores, Memory: ${medium.memory} MB, SSD: ${medium.disk} GB)`,
+      value: medium,
     },
     {
-      title: `Recommended(CPU: ${recommended.cpu} vCores, Memory: ${recommended.memory} MB, SSD: ${recommended.disk} GB)`,
-      value: recommended,
+      title: `Large(CPU: ${large.cpu} vCores, Memory: ${large.memory} MB, SSD: ${large.disk} GB)`,
+      value: large,
     },
     { title: "Custom", value: "custom" },
   ];
