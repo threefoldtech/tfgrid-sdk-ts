@@ -5,7 +5,7 @@ import { ExtrinsicResult } from "@threefold/tfchain_client";
 import { TFClient } from "../clients/tf-grid/client";
 import { KeypairType } from "../zos/deployment";
 import BackendStorageInterface from "./BackendStorageInterface";
-import { crop } from "./utils";
+import { crop, cropKey } from "./utils";
 
 const SPLIT_SIZE = 1490;
 
@@ -95,6 +95,9 @@ class TFKVStoreBackend implements BackendStorageInterface {
   }
 
   public async moveValue(fromKey: string, toKey: string): Promise<ExtrinsicResult<void>[]> {
+    fromKey = cropKey(fromKey);
+    toKey = cropKey(toKey);
+
     const exts: ExtrinsicResult<void>[] = [];
 
     for (let i = 0; ; i++) {
