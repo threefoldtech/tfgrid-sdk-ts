@@ -15,7 +15,7 @@
         { title: 'Public IPv4', key: 'ipv4', sortable: false },
         { title: 'Public IPv6', key: 'ipv6', sortable: false },
         { title: 'Planetary Network IP', key: 'planetary', sortable: false },
-        { title: 'Workers', key: 'workers' },
+        { title: 'Workers', key: 'workersLength' },
         { title: 'Billing Rate', key: 'billing' },
         { title: 'Actions', key: 'actions', sortable: false },
       ]"
@@ -83,7 +83,7 @@ async function loadDeployments() {
     item.ipv4 = item.masters[0].publicIP?.ip?.split("/")?.[0] || item.masters[0].publicIP?.ip || "None";
     item.ipv6 = item.masters[0].publicIP?.ip6 || "None";
     item.planetary = item.masters[0].planetary || "None";
-    item.workers = item.workers.length;
+    item.workersLength = item.workers.length;
     item.billing = item.masters[0].billing;
     return item;
   });
