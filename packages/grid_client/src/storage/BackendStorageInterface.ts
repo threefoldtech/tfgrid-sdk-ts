@@ -1,3 +1,5 @@
+import { ExtrinsicResult } from "@threefold/tfchain_client";
+
 interface BackendStorageInterface {
   // get a value from the storage
   get(key: string);
@@ -10,6 +12,9 @@ interface BackendStorageInterface {
 
   // list all keys in the storage
   list(key: string);
+
+  // This method currently only implemented in tfkvstore
+  moveValue?(fromKey: string, toKey: string): Promise<ExtrinsicResult<void>[]>;
 }
 
 export default BackendStorageInterface;
