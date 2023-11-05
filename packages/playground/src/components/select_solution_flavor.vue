@@ -72,11 +72,11 @@ import type { solutionFlavor } from "../types";
 type Package = PropType<solutionFlavor>;
 
 const props = defineProps({
-  minimum: { type: Object as Package, default: () => ({ cpu: 1, memory: 1024 * 2, disk: 15 }) },
-  standard: { type: Object as Package, default: () => ({ cpu: 2, memory: 1024 * 2, disk: 100 }) },
+  minimum: { type: Object as Package, default: () => ({ cpu: 1, memory: 2, disk: 15 }) },
+  standard: { type: Object as Package, default: () => ({ cpu: 2, memory: 2, disk: 100 }) },
   recommended: {
     type: Object as Package,
-    default: () => ({ cpu: 4, memory: 1024 * 4, disk: 250 }),
+    default: () => ({ cpu: 4, memory: 16, disk: 250 }),
   },
   disabled: { type: Boolean },
 });
@@ -86,15 +86,15 @@ const packages = computed(() => {
   const { minimum, standard, recommended } = props;
   return [
     {
-      title: `Minimum(CPU: ${minimum.cpu} vCores, Memory: ${minimum.memory} MB, SSD: ${minimum.disk} GB)`,
+      title: `Minimum(CPU: ${minimum.cpu} vCores, Memory: ${minimum.memory} GB, SSD: ${minimum.disk} GB)`,
       value: minimum,
     },
     {
-      title: `Standard(CPU: ${standard.cpu} vCores, Memory: ${standard.memory} MB, SSD: ${standard.disk} GB)`,
+      title: `Standard(CPU: ${standard.cpu} vCores, Memory: ${standard.memory} GB, SSD: ${standard.disk} GB)`,
       value: standard,
     },
     {
-      title: `Recommended(CPU: ${recommended.cpu} vCores, Memory: ${recommended.memory} MB, SSD: ${recommended.disk} GB)`,
+      title: `Recommended(CPU: ${recommended.cpu} vCores, Memory: ${recommended.memory} GB, SSD: ${recommended.disk} GB)`,
       value: recommended,
     },
     { title: "Custom", value: "custom" },
@@ -111,7 +111,7 @@ watch(
   value => {
     if (value === "custom" || typeof value === "string") return;
     cpu.value = value.cpu;
-    memory.value = value.memory;
+    memory.value = value.memory * 1024;
     disk.value = value.disk;
   },
   { immediate: true },

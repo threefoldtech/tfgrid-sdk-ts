@@ -40,9 +40,9 @@
 
         <SelectVmImage :images="images" v-model="flist" />
         <SelectSolutionFlavor
-          :minimum="{ cpu: 1, memory: 1024 * 1, disk: 25 }"
-          :standard="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
-          :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+          :minimum="{ cpu: 1, memory: 1, disk: 25 }"
+          :standard="{ cpu: 2, memory: 4, disk: 50 }"
+          :recommended="{ cpu: 4, memory: 16, disk: 100 }"
           v-model="solution"
           :disabled="loadingFarm"
         />

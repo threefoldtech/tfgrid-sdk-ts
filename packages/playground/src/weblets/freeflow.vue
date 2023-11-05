@@ -39,9 +39,9 @@
 
       <SelectSolutionFlavor
         v-model="solution"
-        :minimum="{ cpu: 1, memory: 1024 * 4, disk: 100 }"
-        :standard="{ cpu: 2, memory: 1024 * 16, disk: 500 }"
-        :recommended="{ cpu: 4, memory: 1024 * 32, disk: 1000 }"
+        :minimum="{ cpu: 1, memory: 4, disk: 100 }"
+        :standard="{ cpu: 2, memory: 16, disk: 500 }"
+        :recommended="{ cpu: 4, memory: 16, disk: 1000 }"
         :disabled="loadingFarm"
       />
       <Networks v-model:ipv4="ipv4" :disabled="loadingFarm"></Networks>

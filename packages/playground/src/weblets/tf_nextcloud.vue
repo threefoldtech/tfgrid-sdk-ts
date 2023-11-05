@@ -63,9 +63,9 @@
       </v-alert>
 
       <SelectSolutionFlavor
-        :minimum="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
-        :standard="{ cpu: 4, memory: 1024 * 8, disk: 500 }"
-        :recommended="{ cpu: 4, memory: 1024 * 16, disk: 1000 }"
+        :minimum="{ cpu: 2, memory: 4, disk: 50 }"
+        :standard="{ cpu: 4, memory: 8, disk: 500 }"
+        :recommended="{ cpu: 4, memory: 16, disk: 1000 }"
         v-model="solution"
       />
 
