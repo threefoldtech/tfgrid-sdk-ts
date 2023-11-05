@@ -372,9 +372,11 @@ class TwinDeleteModel {
 class KVStoreSetModel {
   @Expose() @IsString() @IsNotEmpty() key: string;
   @Expose() @IsString() @IsNotEmpty() value: string;
+  @Expose() @IsBoolean() @IsOptional() encrypt?: boolean;
 }
 class KVStoreGetModel {
   @Expose() @IsString() @IsNotEmpty() key: string;
+  @Expose() @IsBoolean() @IsOptional() decrypt?: boolean;
 }
 class KVStoreRemoveModel {
   @Expose() @IsString() @IsNotEmpty() key: string;
@@ -589,6 +591,7 @@ class FilterOptions {
   @Expose() @IsOptional() @IsBoolean() hasGPU?: boolean;
   @Expose() @IsOptional() @IsBoolean() rentable?: boolean;
   @Expose() @IsOptional() @IsInt() @Min(1) rentedBy?: number;
+  @Expose() @IsOptional() @IsBoolean() randomize?: boolean;
   @Expose() @IsOptional() @Transform(({ value }) => NodeStatus[value]) @IsEnum(NodeStatus) status?: NodeStatus;
 }
 
@@ -615,6 +618,7 @@ class FarmFilterOptions {
   @Expose() @IsOptional() @IsInt() size?: number;
   @Expose() @IsOptional() @IsInt() ownedBy?: number;
   @Expose() @IsOptional() @IsInt() farmId?: number;
+  @Expose() @IsOptional() @IsBoolean() randomize?: boolean;
 }
 
 class CalculatorModel {
