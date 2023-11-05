@@ -96,7 +96,7 @@ class Capacity {
 
   @expose
   @validateInput
-  async getFarmsCount(options?: FarmFilterOptions): Promise<string> {
+  async getFarmsCount(options?: FarmFilterOptions): Promise<number> {
     return await this.nodes.getFarmsCount(options);
   }
 

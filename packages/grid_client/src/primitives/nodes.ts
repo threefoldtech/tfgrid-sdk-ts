@@ -317,11 +317,19 @@ class Nodes {
     return farms;
   }
 
-  async getFarmsCount(options: FilterOptions = {}, url = ""): Promise<string> {
+  /**
+   * Retrieves the count of available farms with optional filter options.
+   *
+   * @param options - An object containing filter options to refine the farm count.
+   * @param url - (Optional) The URL to send the request to. If not provided, it defaults to the proxy URL defined in the class.
+   * @returns A Promise that resolves to the count of available farms as a number.
+   * @throws Error if there is an issue with the HTTP request or response.
+   */
+  async getFarmsCount(options: FilterOptions = {}, url = ""): Promise<number> {
     url = url || this.proxyURL;
     const query = this.getFarmUrlQuery({ ...options, ret_count: true });
     try {
-      return (await sendWithFullResponse("get", urlJoin(url, `/farms?${query}`), "", {})).headers["count"];
+      return +(await sendWithFullResponse("get", urlJoin(url, `/farms?${query}`), "", {})).headers["count"];
     } catch (err) {
       throw Error(`Error while requesting the grid proxy due ${err}`);
     }
