@@ -1,5 +1,4 @@
 <template>
-  <RouteToSolutions />
   <view-layout>
     <TfCaprover />
 
@@ -10,7 +9,6 @@
 </template>
 
 <script lang="ts">
-import RouteToSolutions from "../components/back_to_solutions.vue";
 import { ProjectName } from "../types";
 import TfCaprover from "../weblets/tf_caprover.vue";
 import TfDeploymentList from "../weblets/tf_deployment_list.vue";
@@ -20,7 +18,6 @@ export default {
   components: {
     TfCaprover,
     TfDeploymentList,
-    RouteToSolutions,
   },
   setup() {
     return { name: ProjectName.Caprover };

@@ -1,16 +1,24 @@
 <template>
-  <router-link to="/solutions">
-    <v-btn prepend-icon="mdi-arrow-left" variant="text" color="secondary">
-      <template v-slot:prepend>
-        <v-icon color="secondary"></v-icon>
-      </template>
-      Back
-    </v-btn>
-  </router-link>
+  <div>
+    <router-link v-if="showBackButton" :to="backButtonDestination">
+      <v-btn prepend-icon="mdi-arrow-left" variant="text" color="secondary">Back</v-btn>
+    </router-link>
+    <router-view></router-view>
+  </div>
 </template>
 
 <script lang="ts">
-export default {
+import { defineComponent } from "vue";
+
+export default defineComponent({
   name: "RouteToSolutions",
-};
+  computed: {
+    showBackButton() {
+      return this.$route.path !== "/solutions";
+    },
+    backButtonDestination() {
+      return "/solutions";
+    },
+  },
+});
 </script>

@@ -1,5 +1,4 @@
 <template>
-  <RouteToSolutions />
   <view-layout>
     <TfDiscourse />
 
@@ -10,7 +9,6 @@
 </template>
 
 <script lang="ts">
-import RouteToSolutions from "../components/back_to_solutions.vue";
 import { ProjectName } from "../types";
 import TfDeploymentList from "../weblets/tf_deployment_list.vue";
 import TfDiscourse from "../weblets/tf_discourse.vue";
@@ -20,7 +18,6 @@ export default {
   components: {
     TfDeploymentList,
     TfDiscourse,
-    RouteToSolutions,
   },
   setup() {
     return { name: ProjectName.Discourse };

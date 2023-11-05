@@ -78,6 +78,7 @@ const router = createRouter({
     },
     {
       path: "/solutions",
+      component: () => import("@/components/back_to_solutions.vue"),
       children: [
         {
           path: "",
