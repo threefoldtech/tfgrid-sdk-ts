@@ -2,9 +2,6 @@
   <section>
     <h6 class="text-h5 mb-4 mt-2">Choose a Location</h6>
     <SelectCountry v-model="country" />
-    {{ page }}
-    {{ selectedPages }}
-    {{ shouldBeUpdated }}
     <input-validator :rules="[validators.required('Farm is required.')]" :value="farm?.farmID" ref="farmInput">
       <input-tooltip tooltip="The name of the farm that you want to deploy inside it.">
         <v-autocomplete
@@ -30,8 +27,6 @@
                 @click="loadFarms"
                 :loading="loading"
               >
-                <!-- @click="loadNextPage" -->
-                <!-- :loading="loading" -->
                 Load More Farms
               </v-btn>
             </div>
@@ -43,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, type PropType, Ref, ref, watch } from "vue";
+import { onMounted, onUnmounted, type PropType, type Ref, ref, watch } from "vue";
 
 import { useInputRef } from "@/hooks/input_validator";
 
@@ -77,7 +72,7 @@ const emits = defineEmits<{
   (event: "update:loading", value: boolean): void;
 }>();
 
-const SIZE = 50;
+const SIZE = 20;
 const page = ref();
 
 const farmInput = useInputRef();
@@ -137,12 +132,8 @@ async function loadFarms() {
     },
     { exclusiveFor: props.exclusiveFor },
   );
-
-  if (page.value === 1) {
-    farms.value = _farms;
-  } else {
-    farms.value = farms.value.concat(_farms);
-  }
+  console.log(`Request done on page ${page.value} of ${pagesCount.value}`);
+  farms.value = farms.value.concat(_farms);
 
   if (oldFarm) {
     farm.value = undefined;
@@ -166,15 +157,18 @@ async function loadFarms() {
 }
 onMounted(resetPages);
 onUnmounted(() => FarmGatewayManager?.unregister());
+
+const shouldBeUpdated = ref(false);
+const pagesCount = ref();
+
 function setRandomPage() {
   let randPage = Math.floor(Math.random() * pagesCount.value) + 1;
-  while (selectedPages.value.includes(randPage)) randPage = Math.floor(Math.random() * pagesCount.value);
+  while (selectedPages.value.includes(randPage)) randPage = Math.floor(Math.random() * pagesCount.value) + 1;
   return randPage;
 }
-const shouldBeUpdated = ref(false);
-const pagesCount = ref(1);
 async function resetPages() {
   loading.value = true;
+  farmInput.value?.setStatus(ValidatorStatus.Pending);
   selectedPages.value = [];
   const grid = await getGrid(profileManager.profile!);
   if (!grid) {
@@ -214,7 +208,6 @@ watch(
     )
       return;
     shouldBeUpdated.value = true;
-    await resetPages();
   },
 );
 
