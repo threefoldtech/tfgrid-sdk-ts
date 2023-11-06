@@ -101,8 +101,8 @@
       </template>
 
       <template #[`item.status`]="{ item }">
-        <v-chip :color="getColor(item.raw.status)">
-          {{ item.raw.status }}
+        <v-chip :color="getNodeStatusColor(item.raw.status as string).color">
+          {{ capitalize(item.raw.status as string) }}
         </v-chip>
       </template>
 
@@ -117,8 +117,10 @@
 <script lang="ts">
 import moment from "moment";
 import { onMounted, ref } from "vue";
+import { capitalize } from "vue";
 
 import CardDetails from "@/explorer/components/node_details_cards/card_details.vue";
+import { getNodeStatusColor } from "@/explorer/utils/helpers";
 import type { NodeDetailsCard } from "@/explorer/utils/types";
 import {
   getNodeAvailability,
@@ -229,7 +231,7 @@ export default {
 
         const _nodes = data as unknown as NodeInterface[];
         nodesCount.value = count ?? 0;
-        const nodesWithResources = _nodes.map(async (node: NodeInterface) => {
+        const nodesWithReceipts = _nodes.map(async (node: NodeInterface) => {
           try {
             const network = process.env.NETWORK || (window as any).env.NETWORK;
             node.receipts = [];
@@ -249,7 +251,7 @@ export default {
           return node;
         });
 
-        nodes.value = await Promise.all(nodesWithResources);
+        nodes.value = await Promise.all(nodesWithReceipts);
         return nodes.value;
       } catch (error) {
         console.log(error);
@@ -257,10 +259,6 @@ export default {
       } finally {
         loading.value = false;
       }
-    }
-
-    function getColor(status: string) {
-      return status === "down" ? "tonal" : "primary";
     }
 
     function getPercentage(item: any, type: any) {
@@ -318,11 +316,12 @@ export default {
       uptime,
       nodesCount,
       getUserNodes,
-      getColor,
+      getNodeStatusColor,
       getPercentage,
       byteToGB,
       getNodeDetails,
       getKey,
+      capitalize,
     };
   },
 };

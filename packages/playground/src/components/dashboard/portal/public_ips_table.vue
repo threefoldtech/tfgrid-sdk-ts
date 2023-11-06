@@ -109,7 +109,7 @@ export default {
         const farm = await gridStore.grid.farms.getFarmByID({ id });
         publicIps.value = farm.publicIps;
       } catch (error) {
-        console.log(error);
+        createCustomToast(`Failed to get public IPs! ${error}`, ToastType.danger);
       }
     }
     async function removeFarmIp(options: RemoveFarmIPModel, index: number) {
