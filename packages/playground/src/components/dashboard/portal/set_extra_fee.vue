@@ -25,7 +25,7 @@
                 :rules="[
                   validators.required('Fee is required.'),
                   validators.isNumeric('Fee must be a valid number.'),
-                  validators.min('Fee must be a number larger than 0.', 1),
+                  validators.min('Fee must be a 0 or more.', 0),
                 ]"
                 #="{ props }"
               >
@@ -33,6 +33,7 @@
                   <v-text-field
                     v-model="fee"
                     v-bind:="props"
+                    suffix="USD/month"
                     outlined
                     label="Additional Fees"
                     :disabled="isSetting"
