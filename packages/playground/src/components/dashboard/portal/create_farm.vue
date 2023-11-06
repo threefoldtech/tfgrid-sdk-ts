@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts">
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 
 import { useGrid } from "../../../stores";
 import { createCustomToast, ToastType } from "../../../utils/custom_toast";
@@ -64,20 +64,28 @@ export default {
       type: String,
       required: true,
     },
+    userFarms: {
+      type: Object,
+      required: true,
+    },
   },
   setup(props) {
     const showDialogue = ref(false);
     const isCreating = ref(false);
     const gridStore = useGrid();
     const valid = ref(false);
-    onMounted(() => {});
     async function createFarm() {
       try {
+        isCreating.value = true;
         await gridStore.grid.farms.create({ name: props.name });
         createCustomToast("Farm created successfully.", ToastType.success);
+        createCustomToast("Table may take sometime to update the changes.", ToastType.info);
+        await props.userFarms.reloadFarms();
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to create farm.", ToastType.danger);
+      } finally {
+        isCreating.value = false;
       }
     }
     return {

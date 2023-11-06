@@ -127,7 +127,7 @@ export default {
     PublicIPsTable,
     CardDetails,
   },
-  setup() {
+  setup(_, context) {
     const gridStore = useGrid();
     const profile = useProfileManager().profile;
     const twinId = profile!.twinId;
@@ -175,6 +175,7 @@ export default {
     });
 
     const reloadFarms = debounce(getUserFarms, 20000);
+    context.expose({ reloadFarms });
     function fetch(items: FarmInfo[]) {
       const start = (page.value - 1) * pageSize.value;
       const end = start + pageSize.value;
