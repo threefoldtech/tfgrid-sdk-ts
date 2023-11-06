@@ -120,8 +120,6 @@ async function loadFarms() {
   const oldFarm = farm.value;
   const grid = await getGrid(profileManager.profile!);
   const filters = props.filters;
-  if (!page.value) await resetPages();
-  console.log("get farms on page:", page.value);
   const _farms = await getFarms(
     grid!,
     {
@@ -166,17 +164,18 @@ async function loadFarms() {
   page.value = selectedPages.value.length === pagesCount.value ? -1 : setRandomPage();
   loading.value = false;
 }
-onMounted(loadFarms);
+onMounted(resetPages);
 onUnmounted(() => FarmGatewayManager?.unregister());
 function setRandomPage() {
-  let randPage = Math.floor(Math.random() * (pagesCount.value - 1) + 1);
-  console.log(randPage, "init");
+  let randPage = Math.floor(Math.random() * pagesCount.value) + 1;
   while (selectedPages.value.includes(randPage)) randPage = Math.floor(Math.random() * pagesCount.value);
   return randPage;
 }
 const shouldBeUpdated = ref(false);
 const pagesCount = ref(1);
 async function resetPages() {
+  loading.value = true;
+  selectedPages.value = [];
   const grid = await getGrid(profileManager.profile!);
   if (!grid) {
     console.log("can't get the grid");
@@ -184,7 +183,6 @@ async function resetPages() {
   } else {
     pagesCount.value = await getFarmsPages(grid, {
       size: SIZE,
-      page: page.value,
       country: country.value,
       nodeMRU: props.filters.memory ? Math.round(props.filters.memory / 1024) : undefined,
       nodeHRU: props.filters.disk,
@@ -195,10 +193,9 @@ async function resetPages() {
       nodeRentedBy: props.filters.rentedBy ? props.filters.rentedBy : undefined,
       nodeHasGPU: props.filters.hasGPU ? props.filters.hasGPU : undefined,
     });
-    console.log(pagesCount.value, "pages");
   }
-  selectedPages.value = [];
   page.value = setRandomPage();
+  await loadFarms();
 }
 
 watch(
@@ -223,12 +220,10 @@ watch(
 
 watch([loading, shouldBeUpdated], async ([l, s]) => {
   if (l || !s) return;
-  selectedPages.value = [];
   shouldBeUpdated.value = false;
   clearTimeout(delay.value);
   delay.value = setTimeout(async () => {
-    page.value = 1;
-    await loadFarms();
+    await resetPages();
   }, 2000);
 });
 </script>
