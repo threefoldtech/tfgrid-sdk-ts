@@ -8,11 +8,10 @@ export interface GetFarmsOptions {
   exclusiveFor?: string;
 }
 
-export async function getFarmsPages(grid: GridClient, filters: FarmFilterOptions): Promise<number> {
+export async function getFarmsPages(grid: GridClient, filters: FarmFilterOptions, pageSize: number): Promise<number> {
   try {
     const count = (await grid.capacity.getFarmsCount(filters)) || 1;
-    console.log(count, filters);
-    return Math.ceil(count / 50);
+    return Math.ceil(count / pageSize);
   } catch {
     return 1;
   }
