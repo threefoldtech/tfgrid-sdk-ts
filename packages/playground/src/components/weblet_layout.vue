@@ -20,9 +20,6 @@
         <slot name="header-actions" :hasProfile="!!profileManager.profile" />
       </div>
     </section>
-
-    <!-- <v-divider :class="{ 'mb-2': true, 'mt-5': !!$slots.subtitle, 'mt-2': !$slots.subtitle }" /> -->
-
     <v-card-text>
       <slot v-if="disableAlerts" />
       <template v-else>

@@ -76,15 +76,7 @@
           get started.
         </p>
       </v-alert>
-
-      <!-- <template #subtitle>
-        Please visit
-        <a class="app-link" href="https://manual.grid.tf/playground/wallet_connector.html" target="_blank">
-          the manual
-        </a>
-        get started.
-      </template> -->
-
+      
       <DTabs
         v-if="!profileManager.profile"
         :tabs="getTabs()"
