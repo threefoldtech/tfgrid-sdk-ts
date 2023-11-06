@@ -3,6 +3,7 @@ import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { AddFarmIPModel, AddStellarModel, CreateFarmModel, FarmIdModel, RemoveFarmIPModel } from "./models";
+import { checkBalance } from "./utils";
 
 class Farms {
   client: TFClient;
@@ -13,24 +14,28 @@ class Farms {
 
   @expose
   @validateInput
+  @checkBalance
   async create(options: CreateFarmModel) {
     return (await this.client.farms.create(options)).apply();
   }
 
   @expose
   @validateInput
+  @checkBalance
   async addFarmIp(options: AddFarmIPModel) {
     return (await this.client.farms.addFarmIp(options)).apply();
   }
 
   @expose
   @validateInput
+  @checkBalance
   async removeFarmIp(options: RemoveFarmIPModel) {
     return (await this.client.farms.removeFarmIp(options)).apply();
   }
 
   @expose
   @validateInput
+  @checkBalance
   async addStellarAddress(options: AddStellarModel) {
     return (await this.client.farms.addStellarAddress(options)).apply();
   }

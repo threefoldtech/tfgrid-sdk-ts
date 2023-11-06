@@ -659,13 +659,14 @@ class FarmIdModel {
 }
 
 class FarmPublicIPsModel {
-  @Expose() @IsOptional() @IsIP() ip?: string;
-  @Expose() @IsOptional() gw?: string;
+  @Expose() @IsNotEmpty() @IsIP() ip: string;
+  @Expose() @IsNotEmpty() gw: string;
+  @Expose() @IsOptional() contractId?: number;
 }
 
 class AddFarmIPModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
-  @Expose() @IsNotEmpty() ip: string;
+  @Expose() @IsNotEmpty() @IsString() ip: string;
   @Expose() @IsNotEmpty() @IsIP() gw: string;
 }
 
@@ -674,19 +675,23 @@ class IPConfig {
   @Expose() @IsNotEmpty() gw: string;
 }
 class PublicConfigModel {
-  @IsNotEmpty() ip4: IPConfig;
-  @IsOptional() ip6?: IPConfig;
+  @Expose() @IsNotEmpty() @Type(() => IPConfig) @ValidateNested({ each: true }) ip4: IPConfig;
+  @Expose() @IsOptional() @Type(() => IPConfig) @ValidateNested({ each: true }) ip6?: IPConfig;
   @Expose() @IsString() @IsOptional() domain?: string;
 }
 class AddPublicConfig {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
-  @Expose() publicConfig: PublicConfigModel;
+  @Expose()
+  @IsNotEmpty()
+  @Type(() => PublicConfigModel)
+  @ValidateNested({ each: true })
+  publicConfig: PublicConfigModel;
 }
 
 class RemoveFarmIPModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
-  @Expose() @IsNotEmpty() ip: string;
+  @Expose() @IsNotEmpty() @IsIP() ip: string;
 }
 
 class AddStellarModel {
@@ -696,7 +701,11 @@ class AddStellarModel {
 
 class CreateFarmModel {
   @Expose() @IsString() @IsNotEmpty() @MaxLength(NameLength) name: string;
-  @Expose() @IsOptional() publicIps?: FarmPublicIPsModel;
+  @Expose()
+  @IsOptional()
+  @Type(() => FarmPublicIPsModel)
+  @ValidateNested({ each: true })
+  publicIps?: FarmPublicIPsModel[];
 }
 
 class pingFarmModel {
