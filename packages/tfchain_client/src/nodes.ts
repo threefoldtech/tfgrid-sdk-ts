@@ -116,7 +116,7 @@ class Nodes extends QueryNodes {
       options.nodeId,
       options.publicConfig,
     );
-    return this.client.patchExtrinsic(extrinsic);
+    return this.client.patchExtrinsic<NodePublicConfigOptions["nodeId"]>(extrinsic);
   }
 }
 

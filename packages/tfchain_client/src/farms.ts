@@ -77,25 +77,25 @@ class Farms extends QueryFarms {
   @checkConnection
   async create(options: CreateFarmOptions) {
     const extrinsic = this.client.api.tx.tfgridModule.createFarm(options.name, options.publicIps);
-    return this.client.patchExtrinsic(extrinsic);
+    return this.client.patchExtrinsic<Farm>(extrinsic);
   }
 
   @checkConnection
   async addFarmIp(options: AddFarmIPOptions) {
     const extrinsic = this.client.api.tx.tfgridModule.addFarmIp(options.farmId, options.ip, options.gw);
-    return this.client.patchExtrinsic(extrinsic);
+    return this.client.patchExtrinsic<Farm>(extrinsic);
   }
 
   @checkConnection
   async removeFarmIp(options: RemoveFarmIPOptions) {
     const extrinsic = this.client.api.tx.tfgridModule.removeFarmIp(options.farmId, options.ip);
-    return this.client.patchExtrinsic(extrinsic);
+    return this.client.patchExtrinsic<Farm>(extrinsic);
   }
 
   @checkConnection
   async addStellarAddress(options: AddStellarOptions) {
     const extrinsic = this.client.api.tx.tfgridModule.addStellarPayoutV2address(options.farmId, options.stellarAddress);
-    return this.client.patchExtrinsic(extrinsic);
+    return this.client.patchExtrinsic<AddStellarOptions["farmId"]>(extrinsic);
   }
 }
 
