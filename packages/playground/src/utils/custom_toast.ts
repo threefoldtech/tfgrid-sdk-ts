@@ -1,4 +1,5 @@
-import { createToast, type ToastOptions } from "mosha-vue-toastify";
+import { createToast, type ToastContent, type ToastOptions, withProps } from "mosha-vue-toastify";
+import type { Component } from "vue";
 
 export enum ToastType {
   danger = "danger",
@@ -24,8 +25,18 @@ const lightModeColors = {
   warning: "#FEF1E0",
 };
 
-export function createCustomToast(content: string, type: ToastType) {
-  const theme = localStorage.getItem("APP_CURRENT_THEME");
+/**
+ * Creates a custom toast notification.
+ * @param {Component | string} customComponent - The Vue component or a string message for the toast.
+ * @param {ToastType} type - The type of toast. (e.g. ToastType.warning).
+ * @param {Record<string, unknown>} [componentProps] - (optional): Additional props to pass to the component.
+ */
+export function createCustomToast(
+  customComponent: Component | string,
+  type: ToastType,
+  componentProps?: Record<string, unknown>,
+) {
+  const theme = localStorage.getItem("APP_CURRENT_THEME") || "dark";
   const colors = theme === "dark" ? darkModeColors : lightModeColors;
 
   const toastOptions: ToastOptions = {
@@ -37,7 +48,13 @@ export function createCustomToast(content: string, type: ToastType) {
     toastBackgroundColor: colors[type],
   };
 
-  createToast(content, toastOptions);
+  if (typeof customComponent === "string") {
+    createToast(customComponent, toastOptions);
+  } else {
+    const component = withProps(customComponent as any, componentProps || {});
+    const toast = createToast(component as ToastContent, toastOptions);
+    componentProps!.toast = toast;
+  }
 
   setTimeout(() => {
     // Change the colors of the icons/contents of all opened toast to be `tonal` as vuetify.
@@ -50,6 +67,9 @@ export function createCustomToast(content: string, type: ToastType) {
         const svgIcon = leftIcons[index].children[0];
         svgIcon.classList.add(`mosha__icon__${theme}__${type}`);
         closeIcons[index].classList.add(`${theme}__${type}`);
+      }
+
+      for (let index = 0; index < contents.length; index++) {
         contents[index].classList.add(`${theme}__${type}`);
       }
     }
