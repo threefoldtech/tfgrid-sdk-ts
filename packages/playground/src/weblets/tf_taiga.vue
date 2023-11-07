@@ -86,8 +86,8 @@
 
         <SelectSolutionFlavor
           v-model="solution"
-          :small="{ cpu: 2, memory: 2, disk: 100 }"
-          :medium="{ cpu: 2, memory: 4, disk: 150 }"
+          :small="{ cpu: 2, memory: 4, disk: 100 }"
+          :medium="{ cpu: 4, memory: 8, disk: 150 }"
           :disabled="loadingFarm"
         />
         <!-- <Networks v-model:ipv4="ipv4" /> -->

@@ -73,7 +73,7 @@ type Package = PropType<solutionFlavor>;
 
 const props = defineProps({
   small: { type: Object as Package, default: () => ({ cpu: 1, memory: 2, disk: 15 }) },
-  medium: { type: Object as Package, default: () => ({ cpu: 2, memory: 2, disk: 100 }) },
+  medium: { type: Object as Package, default: () => ({ cpu: 2, memory: 4, disk: 100 }) },
   large: {
     type: Object as Package,
     default: () => ({ cpu: 4, memory: 16, disk: 250 }),

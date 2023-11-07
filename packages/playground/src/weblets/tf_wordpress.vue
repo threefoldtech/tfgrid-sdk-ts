@@ -85,7 +85,7 @@
 
       <SelectSolutionFlavor
         v-model="solution"
-        :medium="{ cpu: 2, memory: 2, disk: 50 }"
+        :medium="{ cpu: 2, memory: 4, disk: 50 }"
         :large="{ cpu: 4, memory: 16, disk: 100 }"
         :disabled="loadingFarm"
       />
