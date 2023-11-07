@@ -107,6 +107,7 @@
         </v-toolbar>
 
         <v-toolbar
+          color="transparent"
           v-if="navbarConfig"
           class="border position-fixed py-0 d-flex pr-2"
           :style="{
@@ -119,9 +120,14 @@
         >
           <v-container>
             <v-row>
-              <v-breadcrumbs :items="navbarConfig.path">
+              <v-breadcrumbs :items="navbarConfig.path" active-color="secondary">
                 <template v-slot:divider>
                   <v-icon icon="mdi-chevron-right"></v-icon>
+                </template>
+                <template v-slot:item="{ item }">
+                  <router-link :to="item.to" :class="{ 'clickable-item': !item.disabled }">
+                    {{ item.title }}
+                  </router-link>
                 </template>
               </v-breadcrumbs>
             </v-row>
