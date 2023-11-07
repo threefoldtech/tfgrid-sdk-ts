@@ -3,6 +3,18 @@
   <div class="pt-5">
     <node-filter v-model="filterInputs" v-model:valid="isValidForm" :form-disabled="isFormLoading" />
   </div>
+  <div>
+    <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
+      <v-switch
+        color="primary"
+        inset
+        label="GPU Node (Only)"
+        v-model="gpuFilter"
+        hide-details
+        :disabled="isFormLoading"
+      />
+    </input-tooltip>
+  </div>
   <div class="pt-5">
     <v-card>
       <v-tabs v-model="activeTab" align-tabs="center">
@@ -137,7 +149,7 @@ const nodesCount = ref(0);
 const filterInputs = ref<DedicatedNodeFilters>(DedicatedNodeInitializer);
 const isValidForm = ref<boolean>(false);
 const isFormLoading = ref<boolean>(true);
-
+const gpuFilter = ref(false);
 const tabParams = {
   0: {
     rentable: true,
@@ -175,6 +187,7 @@ const _loadData = async () => {
       totalCru: filterInputs.value.total_cru.value ? +filterInputs.value.total_cru.value : undefined,
       gpuVendorName: filterInputs.value.gpu_vendor_name.value ? filterInputs.value.gpu_vendor_name.value : "",
       gpuDeviceName: filterInputs.value.gpu_device_name.value ? filterInputs.value.gpu_device_name.value : "",
+      hasGpu: gpuFilter.value ? true : undefined,
     });
 
     if (data.count === 0) {
@@ -224,7 +237,7 @@ watch(activeTab, async () => {
 });
 
 watch(
-  [page, pageSize, isValidForm, filterInputs],
+  [page, pageSize, isValidForm, filterInputs, gpuFilter],
   async ([newPage, newPageSize, newIsValidForm]) => {
     page.value = newPage;
     pageSize.value = newPageSize;
