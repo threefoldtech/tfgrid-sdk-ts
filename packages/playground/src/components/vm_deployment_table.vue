@@ -38,6 +38,7 @@
       @update:model-value="$emit('update:model-value', $event)"
       :no-data-text="`No ${projectName} deployments found on this account.`"
       @click:row="$attrs['onClick:row']"
+      :sort-by="sortBy"
     >
       <template #[`item.name`]="{ item }">
         {{ item.value.name }}
@@ -247,6 +248,15 @@ export default {
   name: "VmDeploymentTable",
   components: {
     ListTable,
+  },
+  data() {
+    return {
+      sortBy: [
+        { key: "name", order: "asc" },
+        { key: "flist", order: "asc" },
+        { key: "billing", order: "asc" },
+      ],
+    };
   },
 };
 </script>

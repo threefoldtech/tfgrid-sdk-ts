@@ -57,6 +57,7 @@
       @update:model-value="$emit('update:model-value', $event)"
       :no-data-text="`No Kubernetes deployments found on this account.`"
       @click:row="$attrs['onClick:row']"
+      :sort-by="sortBy"
     >
       <template #[`item.actions`]="{ item }">
         <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item.value)">
@@ -133,6 +134,15 @@ export default {
   name: "K8sDeploymentTable",
   components: {
     ListTable,
+  },
+  data() {
+    return {
+      sortBy: [
+        { key: "name", order: "asc" },
+        { key: "workersLength", order: "asc" },
+        { key: "billing", order: "asc" },
+      ],
+    };
   },
 };
 </script>
