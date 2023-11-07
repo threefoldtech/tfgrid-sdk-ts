@@ -56,21 +56,6 @@ export async function getAllFarms() {
   return farms;
 }
 
-export function fallbackDataExtractor(key: any, state?: any) {
-  if (state) return state.data?.[key] ?? [];
-  return (state: any) => state.data?.[key] ?? [];
-}
-export function getFarmPublicIPs(state: any, farmId: number): [number, number, number] {
-  const farm = fallbackDataExtractor("farms")(state).find((f: { farmId: number }) => f.farmId === farmId);
-  if (farm) {
-    const freePublicIps = getFarmFreePublicIps(farm);
-    const usedPublicIps = getFarmUsedPublicIps(farm);
-    const totalPublicIps = farm.publicIPs.length;
-    return [totalPublicIps, freePublicIps, usedPublicIps];
-  }
-  return [0, 0, 0];
-}
-
 export function getFarmFreePublicIps(farm: any): number {
   const freePublicIps = farm.publicIPs.filter((x: any) => x.contractId == 0);
   return freePublicIps.length;
