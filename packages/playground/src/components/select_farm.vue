@@ -137,6 +137,12 @@ async function loadFarms() {
   const _farms = await getFarms(grid!, prepareFilters(props.filters, grid!.twinId), {
     exclusiveFor: props.exclusiveFor,
   });
+  selectedPages.value.push(page.value);
+  if (!_farms.length && selectedPages.value.length !== pagesCount.value) {
+    page.value = setRandomPage();
+    await loadFarms();
+    return;
+  }
   farms.value = farms.value.concat(_farms);
 
   if (oldFarm) {
@@ -155,7 +161,7 @@ async function loadFarms() {
       initialized = true;
     }
   }
-  selectedPages.value.push(page.value);
+
   page.value = selectedPages.value.length === pagesCount.value ? -1 : setRandomPage();
   loading.value = false;
 }
