@@ -62,7 +62,7 @@
 
 <script setup lang="ts">
 import { Decimal } from "decimal.js";
-import { onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import QrcodeGenerator from "../components/qrcode_generator.vue";
@@ -73,6 +73,7 @@ import { getGrid } from "../utils/grid";
 const depositDialog = ref(false);
 const emits = defineEmits(["close"]);
 const profileManager = useProfileManager();
+let destroyed = false;
 const loading = ref(false);
 const dots = ref(".");
 const interval = ref<number | null>(null);
@@ -108,12 +109,14 @@ onMounted(async () => {
     const address = profileManager.profile?.address as string;
     const receivedDeposit = await grid!.bridge.listenToMintCompleted({ address: address });
     loading.value = false;
+    if (destroyed) return;
     const DecimalDeposit = new Decimal(receivedDeposit);
     const divisor = new Decimal(10000000);
     createCustomToast(`You have received ${DecimalDeposit.dividedBy(divisor)} TFT`, ToastType.success);
     await ProfileManagerController.reloadBalance();
     closeDialog();
   } catch (e) {
+    if (destroyed) return;
     console.log(e);
     createCustomToast(e as string, ToastType.danger);
     closeDialog();
@@ -124,6 +127,10 @@ const closeDialog = () => {
   depositDialog.value = false;
   emits("close");
 };
+
+onBeforeUnmount(() => {
+  destroyed = true;
+});
 </script>
 
 <style>
