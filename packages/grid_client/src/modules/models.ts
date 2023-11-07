@@ -732,7 +732,7 @@ class NetworkGetModel {
 
 class SetDedicatedNodeExtraFeesModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
-  @Expose() @IsInt() @IsNotEmpty() @Min(1) extraFee: number;
+  @Expose() @IsNumber() @IsNotEmpty() @Min(0) extraFee: number;
 }
 
 class GetDedicatedNodePriceModel {

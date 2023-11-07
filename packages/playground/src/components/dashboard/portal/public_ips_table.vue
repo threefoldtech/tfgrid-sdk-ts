@@ -23,32 +23,42 @@
       <template #[`item.contract_id`]="{ item }">
         {{ item.raw.contract_id || "-" }}
       </template>
-      <template #[`item.actions`]="{ item, index }">
-        <v-btn color="red-darken-1" @click="showDialogue = true" :disabled="loading" :loading="loading">
+      <template #[`item.actions`]="{ item }">
+        <v-btn
+          color="red-darken-1"
+          @click="
+            () => {
+              showDialogue = true;
+              itemToDelete = item.raw;
+            }
+          "
+          :disabled="loading"
+          :loading="loading"
+        >
           Delete IP
         </v-btn>
-        <v-dialog v-model="showDialogue" max-width="600">
-          <v-card>
-            <v-toolbar color="primary" dark class="custom-toolbar">
-              <p class="mb-5">Delete IP</p>
-            </v-toolbar>
-            <v-card-text> Are you sure you want to delete IP {{ item.raw.ip }}? </v-card-text>
-            <v-card-actions class="justify-end px-5 pb-5 pt-0">
-              <v-btn
-                text="Delete"
-                color="white"
-                :loading="isRemoving"
-                :disabled="isRemoving"
-                class="bg-red-lighten-1"
-                @click="removeFarmIp({ farmId: $props.farmId, ip: item.raw.ip }, index)"
-              ></v-btn>
-              <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
       </template>
       <template #bottom></template>
     </v-data-table>
+    <v-dialog v-model="showDialogue" max-width="600">
+      <v-card>
+        <v-toolbar color="primary" class="custom-toolbar">
+          <p class="mb-5">Delete IP</p>
+        </v-toolbar>
+        <v-card-text> Are you sure you want to delete IP {{ itemToDelete.ip }}? </v-card-text>
+        <v-card-actions class="justify-end px-5 pb-5 pt-0">
+          <v-btn
+            text="Delete"
+            color="white"
+            :loading="isRemoving"
+            :disabled="isRemoving"
+            class="bg-red-lighten-1"
+            @click="removeFarmIp({ farmId: $props.farmId, ip: itemToDelete.ip }, index)"
+          ></v-btn>
+          <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 <script lang="ts">
@@ -100,6 +110,7 @@ export default {
     const toPublicIP = ref();
     const gateway = ref();
     const isRemoving = ref(false);
+    const itemToDelete = ref();
 
     onMounted(async () => {
       await getFarmByID(props.farmId);
@@ -137,6 +148,7 @@ export default {
       loading,
       showDialogue,
       isRemoving,
+      itemToDelete,
       removeFarmIp,
     };
   },
