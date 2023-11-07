@@ -328,6 +328,7 @@ class Nodes {
   async getFarmsCount(options: FilterOptions = {}, url = ""): Promise<number> {
     url = url || this.proxyURL;
     options.ret_count = true;
+    options.page = 1;
     const query = this.getFarmUrlQuery(options);
     try {
       return +(await sendWithFullResponse("get", urlJoin(url, `/farms?${query}`), "", {})).headers["count"];
