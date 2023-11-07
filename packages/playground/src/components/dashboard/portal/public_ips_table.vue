@@ -13,15 +13,14 @@
         <p class="text-subtitle-1 font-weight-bold pa-4 ma-4 w-50">Public IPs</p>
       </template>
       <template #[`item.ip`]="{ item }">
-        {{ item.raw.ip || "-" }}
+        {{ item.value.ip || "-" }}
       </template>
-
       <template #[`item.gateway`]="{ item }">
-        {{ item.raw.gateway || "-" }}
+        {{ item.value.gateway || "-" }}
       </template>
 
       <template #[`item.contract_id`]="{ item }">
-        {{ item.raw.contract_id || "-" }}
+        {{ item.value.contract_id || "-" }}
       </template>
       <template #[`item.actions`]="{ item, index }">
         <v-btn
@@ -45,7 +44,7 @@
         <v-toolbar color="primary" class="custom-toolbar">
           <p class="mb-5">Delete IP</p>
         </v-toolbar>
-        <v-card-text> Are you sure you want to delete IP {{ itemToDelete.ip }}? </v-card-text>
+        <v-card-text> Are you sure you want to delete IP {{ itemToDelete?.ip }}? </v-card-text>
         <v-card-actions class="justify-end px-5 pb-5 pt-0">
           <v-btn
             text="Delete"
@@ -53,7 +52,7 @@
             :loading="isRemoving"
             :disabled="isRemoving"
             class="bg-red-lighten-1"
-            @click="removeFarmIp({ farmId: $props.farmId, ip: itemToDelete.ip }, itemToDelete.index)"
+            @click="removeFarmIp({ farmId: $props.farmId, ip: itemToDelete?.ip }, itemToDelete?.index)"
           ></v-btn>
           <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
         </v-card-actions>
@@ -128,13 +127,13 @@ export default {
         isRemoving.value = true;
         await gridStore.grid.farms.removeFarmIp({ ip: options.ip, farmId: options.farmId });
         createCustomToast("IP is deleted successfully!", ToastType.success);
-        showDialogue.value = false;
         publicIps.value.splice(index, 1);
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to delete IP!", ToastType.danger);
       } finally {
         isRemoving.value = false;
+        showDialogue.value = false;
         itemToDelete.value = undefined;
       }
     }
