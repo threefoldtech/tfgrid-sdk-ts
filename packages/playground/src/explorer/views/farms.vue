@@ -16,6 +16,7 @@ import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import router from "@/router";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import { inputsInitializer } from "../../utils/filter_farms";
 import { getFarmQueries, getFarms } from "../utils/helpers";
@@ -60,7 +61,7 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
       };
     });
   } catch (error) {
-    console.log(error);
+    createCustomToast(`Could not retrieve farms due to ${error}`, ToastType.danger);
   } finally {
     loading.value = false;
   }
