@@ -80,7 +80,7 @@
         </template>
       </v-navigation-drawer>
 
-      <v-main :style="{ paddingTop: '70px' }">
+      <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
         <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }">
           <v-toolbar-title class="custom-toolbar-title">
             <v-img
@@ -104,6 +104,28 @@
           <AppTheme />
           <v-divider vertical class="mx-2" />
           <ProfileManager v-model="openProfile" />
+        </v-toolbar>
+
+        <v-toolbar
+          v-if="navbarConfig"
+          class="border position-fixed py-0 d-flex pr-2"
+          :style="{
+            zIndex: 1005,
+            top: '66.5px',
+            right: 0,
+            width: permanent && openSidebar && hasActiveProfile ? 'calc(100% - 280px)' : '100%',
+          }"
+          height="50"
+        >
+          <v-container>
+            <v-row>
+              <v-breadcrumbs :items="navbarConfig.path">
+                <template v-slot:divider>
+                  <v-icon icon="mdi-chevron-right"></v-icon>
+                </template>
+              </v-breadcrumbs>
+            </v-row>
+          </v-container>
         </v-toolbar>
 
         <DeploymentListManager>
@@ -156,10 +178,14 @@ const network = process.env.NETWORK || (window as any).env.NETWORK;
 const openProfile = ref(true);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
+const navbarConfig = ref();
 
 watch(
   () => $route.meta,
-  meta => (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
+  meta => {
+    (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
+      (navbarConfig.value = meta.navbarConfig);
+  },
 );
 
 // eslint-disable-next-line no-undef

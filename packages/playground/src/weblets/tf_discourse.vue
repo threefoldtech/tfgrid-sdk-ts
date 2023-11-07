@@ -8,7 +8,6 @@
     :dedicated="dedicated"
     :ipv4="ipv4"
     title-image="images/icons/discourse.png"
-    :is-weblets="true"
   >
     <template #title> Deploy a Discourse Instance </template>
     <d-tabs

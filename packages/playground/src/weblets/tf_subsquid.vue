@@ -8,7 +8,6 @@
     :certified="certified"
     :dedicated="dedicated"
     title-image="images/icons/subsquid.png"
-    :is-weblets="true"
   >
     <template #title>Deploy a Subsquid Instance </template>
 

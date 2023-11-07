@@ -8,7 +8,6 @@
     :dedicated="dedicated"
     ipv4
     title-image="images/icons/vm.png"
-    :is-weblets="true"
   >
     <template #title>Deploy a Node Pilot</template>
     <form-validator v-model="valid">

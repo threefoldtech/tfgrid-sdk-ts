@@ -8,7 +8,6 @@
     :certified="certified"
     :dedicated="dedicated"
     title-image="images/icons/umbrel.png"
-    :is-weblets="true"
   >
     <template #title>Deploy an Umbrel Instance </template>
 

@@ -8,7 +8,6 @@
     :certified="certified"
     :dedicated="dedicated"
     title-image="images/icons/funkwhale.png"
-    :is-weblets="true"
   >
     <template #title>Deploy a Funkwhale Instance </template>
 
