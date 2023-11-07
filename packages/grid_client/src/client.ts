@@ -5,7 +5,7 @@ import urlJoin from "url-join";
 import { Graphql } from "./clients";
 import { TFClient } from "./clients/tf-grid/client";
 import { ClientOptions, GridClientConfig, NetworkEnv } from "./config";
-import { send } from "./helpers";
+import { send, toHexSeed } from "./helpers";
 import { isExposed } from "./helpers/expose";
 import { generateString } from "./helpers/utils";
 import * as modules from "./modules/index";
@@ -46,10 +46,12 @@ class GridClient {
   modules: string[] = [];
 
   constructor(public clientOptions: ClientOptions) {
+    const mnemonic = toHexSeed(clientOptions.mnemonic);
+
     this.clientOptions = {
-      mnemonic: clientOptions.mnemonic,
+      mnemonic,
       network: clientOptions.network,
-      storeSecret: clientOptions.storeSecret ? clientOptions.storeSecret : clientOptions.mnemonic,
+      storeSecret: clientOptions.storeSecret ? clientOptions.storeSecret : mnemonic,
       projectName: clientOptions.projectName ? clientOptions.projectName : "",
       keypairType: clientOptions.keypairType ? clientOptions.keypairType : KeypairType.sr25519,
       backendStorageType: clientOptions.backendStorageType ? clientOptions.backendStorageType : BackendStorageType.auto,

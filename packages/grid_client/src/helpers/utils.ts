@@ -1,4 +1,5 @@
-import nacl, { randomBytes } from "tweetnacl";
+import { isAddress, mnemonicToMiniSecret } from "@polkadot/util-crypto";
+import nacl, { box, randomBytes } from "tweetnacl";
 import utils from "tweetnacl-util";
 
 function generateString(length: number): string {
@@ -36,4 +37,14 @@ function log(message) {
   console.log(JSON.stringify(message, null, 2));
 }
 
-export { generateString, getRandomNumber, randomChoice, randomSecret, randomSecretAsHex, randomNonce, log };
+function toHexSeed(mnemonic: string): string {
+  if (isAddress(mnemonic)) {
+    return mnemonic;
+  }
+
+  const seed = mnemonicToMiniSecret(mnemonic);
+  const keypair = box.keyPair.fromSecretKey(seed.slice(0, 32));
+  return "0x" + Buffer.from(keypair.secretKey).toString("hex");
+}
+
+export { generateString, getRandomNumber, randomChoice, randomSecret, randomSecretAsHex, randomNonce, log, toHexSeed };
