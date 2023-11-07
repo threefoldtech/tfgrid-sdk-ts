@@ -109,7 +109,7 @@
 </template>
 
 <script lang="ts">
-import type { FarmInfo } from "@threefold/grid_client";
+import type { Farm } from "@threefold/gridproxy_client";
 import { debounce } from "lodash";
 import { StrKey } from "stellar-sdk";
 import { onMounted, ref } from "vue";
@@ -162,7 +162,7 @@ export default {
     const page = ref<number>(1);
     const pageSize = ref(10);
     const expanded = ref<any[]>();
-    const farms = ref<FarmInfo[]>();
+    const farms = ref<Farm[]>();
     const farmsCount = ref();
     const showDialogue = ref(false);
     const valid = ref(false);
@@ -176,7 +176,7 @@ export default {
 
     const reloadFarms = debounce(getUserFarms, 20000);
     context.expose({ reloadFarms });
-    function fetch(items: FarmInfo[]) {
+    function filter(items: Farm[]) {
       const start = (page.value - 1) * pageSize.value;
       const end = start + pageSize.value;
 
@@ -200,8 +200,8 @@ export default {
           size: pageSize.value,
         });
 
-        const filteredFarms = fetch(data);
-        farms.value = filteredFarms as unknown as FarmInfo[];
+        const filteredFarms = filter(data);
+        farms.value = filteredFarms as unknown as Farm[];
         farmsCount.value = filteredFarms.length;
       } catch (error) {
         console.log(error);

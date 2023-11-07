@@ -1,49 +1,15 @@
 import "jspdf-autotable";
 
+import type { GridNode } from "@threefold/gridproxy_client";
 import axios from "axios";
 import type { jsPDF } from "jspdf";
 import moment from "moment";
 
 import { gqlClient } from "@/clients";
 
-export interface NodeInterface {
-  id: string;
-  nodeId: number;
-  farmId: number;
-  twinId: number;
-  country: string;
-  gridVersion: number;
-  city: string;
-  uptime: number;
-  created: number;
-  farmingPolicyId: number;
-  updatedAt: number;
-  total_resources: {
-    cru: number;
-    sru: number;
-    hru: number;
-    mru: number;
-  };
-  used_resources: {
-    cru: number;
-    sru: number;
-    hru: number;
-    mru: number;
-  };
-  location: {
-    country: string;
-    city: string;
-  };
-  publicConfig: {
-    domain: string;
-    gw4: string;
-    gw6: string;
-    ipv4: string;
-    ipv6: string;
-  };
-  status: string;
-  certificationType: string;
-  dedicated: boolean;
+import type { CloudUnits, Fixup, Minting } from "./mintings";
+
+export interface NodeInterface extends GridNode {
   extraFee: number;
   rentContractId: number;
   rentedByTwinId: number;
@@ -60,21 +26,9 @@ export interface receiptInterface {
   fixupStart?: number;
   fixupEnd?: number;
   tft?: number;
-  cloud_units: {
-    cu: number;
-    su: number;
-    nu: number;
-  };
-  fixup_cloud_units?: {
-    cu: number;
-    su: number;
-    nu: number;
-  };
-  correct_cloud_units?: {
-    cu: number;
-    su: number;
-    nu: number;
-  };
+  cloud_units: CloudUnits;
+  fixup_cloud_units?: CloudUnits;
+  correct_cloud_units?: CloudUnits;
   startPeriodTimestamp: number;
   endPeriodTimestamp: number;
   fixupReward?: number;
@@ -327,19 +281,8 @@ export async function getNodeMintingFixupReceipts(nodeId: number) {
       (rec: {
         hash: any;
         receipt: {
-          Minting: {
-            period: { start: number; end: number };
-            reward: { musd: number; tft: number };
-            cloud_units: { cu: number; su: number; nu: number };
-          };
-          Fixup: {
-            period: { start: number; end: number };
-            minted_cloud_units: { cu: number; su: number; nu: number };
-            fixup_cloud_units: { cu: number; su: number; nu: number };
-            correct_cloud_units: { cu: number; su: number; nu: number };
-            minted_reward: { musd: number; tft: number };
-            fixup_reward: { musd: number; tft: number };
-          };
+          Minting: Minting;
+          Fixup: Fixup;
         };
       }) => {
         if (rec.receipt.Minting) {

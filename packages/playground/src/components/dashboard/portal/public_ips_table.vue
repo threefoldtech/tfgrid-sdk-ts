@@ -23,13 +23,13 @@
       <template #[`item.contract_id`]="{ item }">
         {{ item.raw.contract_id || "-" }}
       </template>
-      <template #[`item.actions`]="{ item }">
+      <template #[`item.actions`]="{ item, index }">
         <v-btn
           color="red-darken-1"
           @click="
             () => {
               showDialogue = true;
-              itemToDelete = item.raw;
+              itemToDelete = { ip: item.raw.ip, index };
             }
           "
           :disabled="loading"
@@ -53,7 +53,7 @@
             :loading="isRemoving"
             :disabled="isRemoving"
             class="bg-red-lighten-1"
-            @click="removeFarmIp({ farmId: $props.farmId, ip: itemToDelete.ip }, index)"
+            @click="removeFarmIp({ farmId: $props.farmId, ip: itemToDelete.ip }, itemToDelete.index)"
           ></v-btn>
           <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
         </v-card-actions>
@@ -135,6 +135,7 @@ export default {
         createCustomToast("Failed to delete IP!", ToastType.danger);
       } finally {
         isRemoving.value = false;
+        itemToDelete.value = undefined;
       }
     }
     return {
