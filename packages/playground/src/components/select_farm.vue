@@ -166,6 +166,7 @@ function setRandomPage() {
   return randPage;
 }
 async function resetPages() {
+  farms.value = [];
   loading.value = true;
   farmInput.value?.setStatus(ValidatorStatus.Pending);
   selectedPages.value = [];
