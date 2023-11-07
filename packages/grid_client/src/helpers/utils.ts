@@ -1,4 +1,5 @@
 import { isAddress, mnemonicToMiniSecret } from "@polkadot/util-crypto";
+import { Buffer } from "buffer";
 import nacl, { box, randomBytes } from "tweetnacl";
 import utils from "tweetnacl-util";
 

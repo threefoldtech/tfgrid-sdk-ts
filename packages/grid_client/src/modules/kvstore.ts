@@ -19,6 +19,34 @@ class KVStore {
   @expose
   @validateInput
   async get(options: KVStoreGetModel) {
+    if (this.config.oldStoreSecret) {
+      const oldBackendStorage = new KVStore({
+        ...this.config,
+        storePath: this.config.oldStoreSecret as string,
+        tfclient: new TFClient(
+          this.client.url,
+          this.client.mnemonic,
+          this.config.oldStoreSecret,
+          this.client.keypairType,
+        ),
+        oldStoreSecret: "",
+      });
+
+      try {
+        const value = await oldBackendStorage.get(options);
+
+        if (value) {
+          const promises = [this.set({ key: options.key, value }), oldBackendStorage.remove(options)];
+          const exts: any[] = await Promise.all(promises.flat(1).filter(Boolean));
+          await this.client.applyAllExtrinsics(exts.flat(1).filter(Boolean));
+        }
+      } catch (error) {
+        console.log("Failed to load key or key isn't found", error.message || error);
+      } finally {
+        await oldBackendStorage.client.disconnect();
+      }
+    }
+
     return await this.client.kvStore.get(options);
   }
 
