@@ -180,6 +180,7 @@ const headers: VDataTableHeader = [
 ];
 
 async function onMount() {
+  selectedContracts.value = [];
   loading.value = true;
   failedContractId.value = undefined;
   contracts.value = [];
@@ -187,7 +188,6 @@ async function onMount() {
   contracts.value = await getUserContracts(grid.value!);
   nodeStatus.value = await getNodeStatus(nodeIDs.value);
   loading.value = false;
-  selectedContracts.value = [];
 }
 
 const nodeIDs = computed(() => {
