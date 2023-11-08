@@ -11,13 +11,7 @@ const SPLIT_SIZE = 1490;
 
 class TFKVStoreBackend implements BackendStorageInterface {
   client: TFClient;
-  constructor(
-    private url: string,
-    private mnemonic: string,
-    storeSecret: string | Uint8Array,
-    private keypairType: KeypairType,
-    private oldStoreSecret?: string | Uint8Array,
-  ) {
+  constructor(url: string, mnemonic: string, storeSecret: string | Uint8Array, keypairType: KeypairType) {
     this.client = new TFClient(url, mnemonic, storeSecret, keypairType);
   }
 
@@ -36,24 +30,6 @@ class TFKVStoreBackend implements BackendStorageInterface {
 
   @crop
   async get(key: string) {
-    if (this.oldStoreSecret) {
-      const oldBackendStorage = new TFKVStoreBackend(this.url, this.mnemonic, this.oldStoreSecret, this.keypairType);
-
-      try {
-        const value = await oldBackendStorage.get(key);
-
-        if (value) {
-          const promises = [this.set(key, value), oldBackendStorage.remove(key)];
-          const exts: any[] = await Promise.all(promises.flat(1).filter(Boolean));
-          await this.client.applyAllExtrinsics(exts.flat(1).filter(Boolean));
-        }
-      } catch (error) {
-        console.log("Failed to load key or key isn't found", error.message || error);
-      } finally {
-        await oldBackendStorage.client.disconnect();
-      }
-    }
-
     let value = await this.client.kvStore.get({ key });
     if (!value) {
       return '""';
