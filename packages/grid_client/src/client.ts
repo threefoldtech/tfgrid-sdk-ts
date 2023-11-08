@@ -172,10 +172,16 @@ class GridClient {
   }
 
   private get _migrationKey() {
-    return this.config.mnemonic + this.config.network + this.config.storePath + this.config.oldStoreSecret;
+    return this.config.mnemonic + this.config.network + this.config.storeSecret + this.config.oldStoreSecret;
   }
 
   private async _migrateKeys(): Promise<void> {
+    const grid = new GridClient({
+      ...this.config,
+      storeSecret: this.config.oldStoreSecret as string,
+      oldStoreSecret: "",
+    });
+
     const __getValue = (key: string) => {
       return grid.kvstore.get({ key }).catch(() => null);
     };
@@ -187,12 +193,6 @@ class GridClient {
 
       return this.tfclient.kvStore.set({ key, value });
     };
-
-    const grid = new GridClient({
-      ...this.config,
-      storeSecret: this.config.oldStoreSecret as string,
-      oldStoreSecret: "",
-    });
 
     try {
       await grid.connect();
@@ -207,8 +207,6 @@ class GridClient {
       GridClient.migrated.add(this._migrationKey);
     } catch (error) {
       console.log("Failed to migrate all keys", error.message || error);
-    } finally {
-      await grid?.disconnect();
     }
   }
 
