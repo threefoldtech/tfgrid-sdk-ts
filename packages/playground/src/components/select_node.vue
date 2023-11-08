@@ -218,9 +218,9 @@ async function loadNodes(farmId: number) {
   errorMessage.value = "";
   const filters = props.filters;
   farmManager?.setLoading(true);
-  const grid = await getGrid(profileManager.profile!);
-  if (grid) {
-    try {
+  try {
+    const grid = await getGrid(profileManager.profile!);
+    if (grid) {
       const res = await getFilteredNodes(grid, {
         farmId: farmId,
         cpu: filters.cpu,
@@ -254,15 +254,16 @@ async function loadNodes(farmId: number) {
       } else {
         availableNodes.value = [];
       }
-    } catch (e) {
-      errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
-    } finally {
-      validator.value?.setStatus(ValidatorStatus.Init);
-      loadingNodes.value = false;
-      farmManager?.setLoading(false);
     }
+  } catch (e) {
+    errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
+  } finally {
+    validator.value?.setStatus(ValidatorStatus.Init);
+    loadingNodes.value = false;
+    farmManager?.setLoading(false);
   }
 }
+
 async function validateNodeStoragePool(validatingNode: INode | undefined) {
   if (!validatingNode) return { message: "Node id is required." };
   farmManager?.setLoading(true);
