@@ -3,7 +3,7 @@ import type { FilterOptions, GridClient, NodeInfo } from "@threefold/grid_client
 import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
 import type { NodeFilters } from "@/components/select_node.vue";
 
-import { isAlphanumeric, isDecimal, isNumeric, min, startsWith, validateResourceMaxNumber } from "./validators";
+import { isAlphanumeric, isNumeric, min, startsWith, validateResourceMaxNumber } from "./validators";
 
 export interface NodeGPUCardType {
   id: string;
