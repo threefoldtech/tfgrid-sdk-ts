@@ -6,9 +6,9 @@
   </div>
 
   <view-layout>
-    <node-filters
+    <filters
       :form-disabled="isFormLoading"
-      v-model="filterInputs"
+      v-model="FilterNodeInputs"
       v-model:valid="isValidForm"
       @update:model-value="inputFiltersReset"
     />
@@ -27,7 +27,7 @@
                             color="primary"
                             inset
                             label="Gateways (Only)"
-                            v-model="filterOptions.gateway"
+                            v-model="NodeFilterOptions.gateway"
                             hide-details
                             :disabled="isFormLoading"
                           />
@@ -39,7 +39,7 @@
                             color="primary"
                             inset
                             label="GPU Node (Only)"
-                            v-model="filterOptions.gpu"
+                            v-model="NodeFilterOptions.gpu"
                             hide-details
                             :disabled="isFormLoading"
                           />
@@ -59,7 +59,7 @@
                       <v-col cols="7">
                         <v-select
                           class="p-4"
-                          v-model="filterOptions.status"
+                          v-model="NodeFilterOptions.status"
                           :items="nodeStatusOptions"
                           label="Select Nodes Status"
                           variant="underlined"
@@ -79,8 +79,8 @@
               </div>
               <nodes-table
                 v-model="nodes"
-                v-model:size="filterOptions.size"
-                v-model:page="filterOptions.page"
+                v-model:size="NodeFilterOptions.size"
+                v-model:page="NodeFilterOptions.page"
                 :count="nodesCount"
                 :loading="loading"
                 v-model:selectedNode="selectedNodeId"
@@ -110,15 +110,15 @@ import { useRoute } from "vue-router";
 import NodeDetails from "@/explorer/components/node_details.vue";
 import NodesTable from "@/explorer/components/nodes_table.vue";
 import router from "@/router";
-import { inputsInitializer } from "@/utils/filter_nodes";
 
-import { getQueries, requestNodes } from "../utils/helpers";
+import type { FilterNodeInputs } from "../../utils/filter_nodes";
+import { inputsInitializer } from "../../utils/filter_nodes";
+import { getNodeQueries, requestNodes } from "../utils/helpers";
 import {
-  type FilterInputs,
-  type FilterOptions,
   type GridProxyRequestConfig,
-  type MixedFilter,
-  optionsInitializer,
+  type MixedNodeFilter,
+  type NodeFilterOptions,
+  nodeOptionsInitializer,
 } from "../utils/types";
 
 export default {
@@ -127,9 +127,9 @@ export default {
     NodeDetails,
   },
   setup() {
-    const filterInputs = ref<FilterInputs>(inputsInitializer);
-    const filterOptions = ref<FilterOptions>(optionsInitializer);
-    const mixedFilters = ref<MixedFilter>({ inputs: filterInputs.value, options: filterOptions.value });
+    const FilterNodeInputs = ref<FilterNodeInputs>(inputsInitializer);
+    const NodeFilterOptions = ref<NodeFilterOptions>(nodeOptionsInitializer);
+    const MixedNodeFilters = ref<MixedNodeFilter>({ inputs: FilterNodeInputs.value, options: NodeFilterOptions.value });
 
     const loading = ref<boolean>(true);
     const isFormLoading = ref<boolean>(true);
@@ -172,22 +172,22 @@ export default {
     const request = debounce(_requestNodes, 1000);
 
     watch(
-      mixedFilters,
+      MixedNodeFilters,
       async () => {
-        const queries = getQueries(mixedFilters.value);
+        const queries = getNodeQueries(MixedNodeFilters.value);
         await request(queries, { loadFarm: true });
       },
       { deep: true },
     );
 
     // The mixed filters should reset to the default value again..
-    const inputFiltersReset = (nFltrNptsVal: FilterInputs) => {
-      mixedFilters.value.inputs = nFltrNptsVal;
-      mixedFilters.value.options.status = NodeStatus.Up;
-      mixedFilters.value.options.gpu = undefined;
-      mixedFilters.value.options.gateway = undefined;
-      mixedFilters.value.options.page = 1;
-      mixedFilters.value.options.size = 10;
+    const inputFiltersReset = (nFltrNptsVal: FilterNodeInputs) => {
+      MixedNodeFilters.value.inputs = nFltrNptsVal;
+      MixedNodeFilters.value.options.status = NodeStatus.Up;
+      MixedNodeFilters.value.options.gpu = undefined;
+      MixedNodeFilters.value.options.gateway = undefined;
+      MixedNodeFilters.value.options.page = 1;
+      MixedNodeFilters.value.options.size = 10;
     };
 
     const checkSelectedNode = async () => {
@@ -212,7 +212,7 @@ export default {
 
     onMounted(async () => {
       await checkSelectedNode();
-      const queries = getQueries(mixedFilters.value);
+      const queries = getNodeQueries(MixedNodeFilters.value);
       await request(queries, { loadFarm: true });
     });
 
@@ -227,8 +227,8 @@ export default {
       selectedNodeoptions,
       nodeStatusOptions,
 
-      filterInputs,
-      filterOptions,
+      FilterNodeInputs,
+      NodeFilterOptions,
       isDialogOpened,
       isValidForm,
 

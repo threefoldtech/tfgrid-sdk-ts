@@ -1,25 +1,13 @@
 import { CertificationType, type GridNode, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
 import { capitalize } from "vue";
 
-import type { AsyncRule, SyncRule } from "../../components/input_validator.vue";
-
-export type NodeInputFilterType = {
-  label: string;
-  placeholder: string;
-  value?: string | undefined;
-  rules?: [syncRules: SyncRule[], asyncRules?: AsyncRule[]];
-  error?: string;
-  type: string;
-};
+import type { FilterFarmInputs } from "@/utils/filter_farms";
+import type { FilterNodeInputs } from "@/utils/filter_nodes";
 
 // The input filters<nodeId, farmIds..etc> and the option filters<status, gpu...etc>
-export type MixedFilter = {
-  inputs: FilterInputs;
-  options: FilterOptions;
-};
 
 // Status, GPU, Gateway, and any other option should be add here.
-export type FilterOptions = {
+export type NodeFilterOptions = {
   status: NodeStatus;
   gpu: boolean | undefined;
   gateway: boolean | undefined;
@@ -27,23 +15,22 @@ export type FilterOptions = {
   size: number;
 };
 
-// Input fields
-export type FilterInputs = {
-  nodeId: NodeInputFilterType;
-  farmIds: NodeInputFilterType;
-  farmName: NodeInputFilterType;
-  country: NodeInputFilterType;
-  freeSru: NodeInputFilterType;
-  freeHru: NodeInputFilterType;
-  freeMru: NodeInputFilterType;
+export type FarmFilterOptions = {
+  farmId: number | undefined;
+  farmName: string | undefined;
 };
 
-export const optionsInitializer: FilterOptions = {
+export const nodeOptionsInitializer: NodeFilterOptions = {
   gateway: undefined,
   gpu: undefined,
   page: 1,
   size: 10,
   status: capitalize(NodeStatus.Up) as NodeStatus,
+};
+
+export const farmOptionsInitializer: FarmFilterOptions = {
+  farmId: 1,
+  farmName: "",
 };
 
 export type ResourceWrapper = {
@@ -121,23 +108,13 @@ export const nodeInitializer: GridNode = {
   cards: [],
   num_gpu: 0,
 };
-
-export type FarmFilterInputs = {
-  farmId: NodeInputFilterType;
-  name: NodeInputFilterType;
-  twinId: NodeInputFilterType;
-  certificationType: NodeInputFilterType;
-  pricingPolicyId: NodeInputFilterType;
+// The input filters<nodeId, farmIds..etc> and the option filters<status, gpu...etc>
+export type MixedNodeFilter = {
+  inputs: FilterNodeInputs;
+  options: NodeFilterOptions;
 };
 
-export type FarmFilterOptions = {
-  page: number;
-  size: number;
-  retCount: boolean;
-};
-
-export const farmOptionsInitializer: FarmFilterOptions = {
-  page: 1,
-  size: 10,
-  retCount: true,
+export type MixedFarmFilter = {
+  inputs: FilterFarmInputs;
+  options: FarmFilterOptions;
 };

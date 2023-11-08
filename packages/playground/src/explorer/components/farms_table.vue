@@ -37,6 +37,7 @@ export default {
     const openSheet = (_e: any, { item }: any) => {
       emit("open-dialog", item.value);
     };
+
     const itemPerPage = 10;
     const headers: VDataTableHeader = [
       { title: "ID", key: "farmId" },
@@ -72,6 +73,7 @@ export default {
         sortable: false,
       },
     ];
+
     return {
       headers,
       itemPerPage,

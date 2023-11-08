@@ -1,5 +1,6 @@
 import {
   type Farm,
+  type FarmsQuery,
   type GridNode,
   type NodesExtractOptions,
   type NodesQuery,
@@ -13,7 +14,7 @@ import { byCountry } from "country-code-lookup";
 
 import { gridProxyClient } from "@/clients";
 
-import type { MixedFilter, NodeStatusColor } from "./types";
+import type { MixedFarmFilter, MixedNodeFilter, NodeStatusColor } from "./types";
 
 export const getCountryCode = (node: GridNode): string => {
   if (!node) {
@@ -119,7 +120,17 @@ export const toBytes = (resource: number | undefined): number => {
   return resource ? resource * 1024 * 1024 * 1024 : 0;
 };
 
-export const getQueries = (mixedFilters: MixedFilter): Partial<NodesQuery> => {
+export const getFarmQueries = (mixedFilters: MixedFarmFilter): Partial<FarmsQuery> => {
+  const options: Partial<FarmsQuery> = {
+    retCount: true,
+    farmId: mixedFilters.inputs.farmId.value ? +mixedFilters.inputs.farmId.value.trim() : undefined,
+    name: mixedFilters.inputs.farmName.value ? mixedFilters.inputs.farmName.value.toLowerCase().trim() : undefined,
+  };
+
+  return options;
+};
+
+export const getNodeQueries = (mixedFilters: MixedNodeFilter): Partial<NodesQuery> => {
   const options: Partial<NodesQuery> = {
     retCount: true,
     nodeId: +mixedFilters.inputs.nodeId.value! || undefined,
@@ -141,9 +152,9 @@ export const getQueries = (mixedFilters: MixedFilter): Partial<NodesQuery> => {
   return options;
 };
 
-export async function getFarms(): Promise<Pagination<Farm[]>> {
+export async function getFarms(queries: Partial<FarmsQuery>): Promise<Pagination<Farm[]>> {
   try {
-    const farms = await gridProxyClient.farms.list();
+    const farms = await gridProxyClient.farms.list(queries);
     return farms;
   } catch (error) {
     console.error("An error occurred while requesting farms:", error);

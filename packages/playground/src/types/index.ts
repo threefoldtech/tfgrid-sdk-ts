@@ -1,8 +1,18 @@
 import type { VDataTable } from "vuetify/lib/labs/components";
 
+import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
 import type { INode } from "@/utils/filter_nodes";
 
 import type * as validators from "../utils/validators";
+// Input attrs
+export type InputFilterType = {
+  label: string;
+  placeholder: string;
+  value?: string | undefined;
+  rules?: [syncRules: SyncRule[], asyncRules?: AsyncRule[]];
+  error?: string;
+  type: string;
+};
 
 export enum ProfileTypes {
   DIY,

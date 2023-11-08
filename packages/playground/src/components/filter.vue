@@ -64,14 +64,14 @@
 <script lang="ts">
 import { defineComponent, type PropType, ref, watch } from "vue";
 
-import { useFormRef } from "@/hooks/form_validator";
-import type { NodeInputFilterType } from "@/utils/filter_nodes";
+import { useFormRef } from "../hooks/form_validator";
+import type { InputFilterType } from "../types";
 
 export default defineComponent({
-  name: "NodeFilters",
+  name: "Filters",
   props: {
     modelValue: {
-      type: Object as PropType<{ [key: string]: NodeInputFilterType }>,
+      type: Object as PropType<{ [key: string]: InputFilterType }>,
       required: true,
     },
     formDisabled: Boolean,
@@ -84,7 +84,7 @@ export default defineComponent({
 
     watch(
       () => props.modelValue,
-      (newValue: PropType<{ [key: string]: NodeInputFilterType }>) => {
+      (newValue: PropType<{ [key: string]: InputFilterType }>) => {
         const hasNonEmptyValue = Object.keys(newValue).some(obj => {
           return Reflect.get(newValue, obj).value && Reflect.get(newValue, obj).value.length >= 1;
         });

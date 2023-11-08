@@ -1,7 +1,7 @@
 <template>
   <!-- Filters -->
   <div class="pt-5">
-    <node-filter v-model="filterInputs" v-model:valid="isValidForm" :form-disabled="isFormLoading" />
+    <filters :model-value="filterInputs" :valid="isValidForm" :form-disabled="isFormLoading" />
   </div>
   <div class="pt-5">
     <v-card>
@@ -246,7 +246,7 @@ async function reloadTable() {
 <script lang="ts">
 import { debounce } from "lodash";
 
-import NodeFilter from "@/components/node_filter.vue";
+import Filters from "@/components/filter.vue";
 import { type DedicatedNodeFilters, DedicatedNodeInitializer } from "@/utils/filter_nodes";
 
 import NodeDetails from "./node_details.vue";
@@ -257,7 +257,7 @@ export default {
   components: {
     ReserveBtn,
     NodeDetails,
-    NodeFilter,
+    Filters,
   },
 };
 </script>

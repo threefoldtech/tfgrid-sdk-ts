@@ -2,6 +2,12 @@
   <view-layout>
     <v-row>
       <v-col>
+        <filters
+          v-model="filterFarmInputs"
+          @update:model-value="inputFiltersReset"
+          :form-disabled="isFormLoading"
+          v-model:valid="isValidForm"
+        />
         <FarmsTable :items="farms" :loading="loading" :selectedFarm="selectedFarm" @open-dialog="openDialog" />
       </v-col>
     </v-row>
@@ -11,23 +17,33 @@
 
 <script lang="ts" setup>
 import type { Farm } from "@threefold/gridproxy_client";
-import { onMounted, ref } from "vue";
+import debounce from "lodash/debounce.js";
+import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import router from "../../router";
-import { getFarms } from "../utils/helpers";
-
+import type { FilterFarmInputs } from "../../utils/filter_farms";
+import { inputsInitializer } from "../../utils/filter_farms";
+import { getFarmQueries, getFarms } from "../utils/helpers";
+import type { FarmFilterOptions, MixedFarmFilter } from "../utils/types";
+import { farmOptionsInitializer } from "../utils/types";
 const route = useRoute();
 
 const loading = ref<boolean>(false);
 const farms = ref<Farm[]>();
 const isDialogOpened = ref<boolean>(false);
 const selectedFarm = ref<Farm>();
+const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer);
+const filterOptions = ref<FarmFilterOptions>(farmOptionsInitializer);
+const mixedFarmFilters = ref<MixedFarmFilter>({ inputs: filterFarmInputs.value, options: filterOptions.value });
+const isFormLoading = ref<boolean>(true);
+const isValidForm = ref<boolean>(false);
 
-onMounted(async () => {
-  await checkPath();
+const _getFarms = async (queries: Partial<FarmsQuery>) => {
   loading.value = true;
-  const { count, data } = await getFarms();
+  isFormLoading.value = true;
+
+  const { count, data } = await getFarms(queries);
   if (data) {
     farms.value = data.map(farm => {
       const ips = farm.publicIps;
@@ -41,7 +57,13 @@ onMounted(async () => {
       };
     });
   }
+  isFormLoading.value = false;
   loading.value = false;
+};
+onMounted(async () => {
+  await checkPath();
+
+  await _getFarms({});
 });
 
 const checkPath = async () => {
@@ -49,7 +71,22 @@ const checkPath = async () => {
     router.replace(route.path);
   }
 };
-
+const request = debounce(_getFarms, 1000);
+watch(
+  mixedFarmFilters,
+  async () => {
+    const queries = getFarmQueries(mixedFarmFilters.value);
+    if (isValidForm.value) {
+      await request(queries);
+    }
+  },
+  { deep: true },
+);
+const inputFiltersReset = (nFltrNptsVal: FilterFarmInputs) => {
+  mixedFarmFilters.value.inputs = nFltrNptsVal;
+  nFltrNptsVal.farmId;
+  nFltrNptsVal.farmName;
+};
 const openDialog = (item: Farm) => {
   selectedFarm.value = item;
   isDialogOpened.value = true;
@@ -64,6 +101,9 @@ const closeDialog = () => {
 </script>
 
 <script lang="ts">
+import type { FarmsQuery } from "@threefold/gridproxy_client";
+
+import Filters from "../../components/filter.vue";
 import FarmDialog from "../components/farm_dialog.vue";
 import FarmsTable from "../components/farms_table.vue";
 
@@ -72,6 +112,7 @@ export default {
   components: {
     FarmsTable,
     FarmDialog,
+    Filters,
   },
 };
 </script>
