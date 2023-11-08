@@ -51,17 +51,3 @@ export async function getBlockedFarmSet(exclusiveFor: string): Promise<Set<numbe
   );
   return new Set(farms.map(farm => farm.farmId));
 }
-
-export async function getAllFarms() {
-  const farms = await gridProxyClient.farms.listAll();
-  return farms;
-}
-
-export function getFarmFreePublicIps(farm: any): number {
-  const freePublicIps = farm.publicIPs.filter((x: any) => x.contractId == 0);
-  return freePublicIps.length;
-}
-export function getFarmUsedPublicIps(farm: any): number {
-  const freePublicIps = farm.publicIPs.filter((x: any) => x.contractId != 0);
-  return freePublicIps.length;
-}
