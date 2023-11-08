@@ -1,4 +1,5 @@
-import { isAddress, mnemonicToMiniSecret } from "@polkadot/util-crypto";
+import { mnemonicToMiniSecret } from "@polkadot/util-crypto";
+import { validateMnemonic } from "bip39";
 import { Buffer } from "buffer";
 import nacl, { box, randomBytes } from "tweetnacl";
 import utils from "tweetnacl-util";
@@ -39,13 +40,14 @@ function log(message) {
 }
 
 function toHexSeed(mnemonic: string): string {
-  if (isAddress(mnemonic)) {
-    return mnemonic;
+  if (validateMnemonic(mnemonic)) {
+    const seed = mnemonicToMiniSecret(mnemonic);
+    const keypair = box.keyPair.fromSecretKey(seed.slice(0, 32));
+    return "0x" + Buffer.from(keypair.secretKey).toString("hex");
   }
 
-  const seed = mnemonicToMiniSecret(mnemonic);
-  const keypair = box.keyPair.fromSecretKey(seed.slice(0, 32));
-  return "0x" + Buffer.from(keypair.secretKey).toString("hex");
+  mnemonic = mnemonic.length === 64 ? mnemonic : mnemonic.slice(2);
+  return "0x" + mnemonic;
 }
 
 export { generateString, getRandomNumber, randomChoice, randomSecret, randomSecretAsHex, randomNonce, log, toHexSeed };

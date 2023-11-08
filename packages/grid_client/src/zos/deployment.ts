@@ -101,7 +101,7 @@ class Deployment {
 
     const keyr = new Keyring({ type: keypairType });
     await waitReady();
-    const key = keyr.addFromMnemonic(mnemonic);
+    const key = keyr.addFromUri(mnemonic);
     const signed_msg = key.sign(message_bytes);
     const hex_signed_msg = this.to_hex(signed_msg);
 

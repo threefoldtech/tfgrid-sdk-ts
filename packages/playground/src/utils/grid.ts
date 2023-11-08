@@ -9,7 +9,6 @@ export async function getGrid(profile: Pick<Profile, "mnemonic">, projectName?: 
   const grid = new GridClient({
     mnemonic: profile.mnemonic,
     network,
-    oldStoreSecret: profile.mnemonic,
     backendStorageType: BackendStorageType.tfkvstore,
     projectName,
 

@@ -1,5 +1,6 @@
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
 import AwaitLock from "await-lock";
+import { validateMnemonic } from "bip39";
 import * as PATH from "path";
 import urlJoin from "url-join";
 
@@ -48,14 +49,19 @@ class GridClient {
   bridge: modules.bridge;
   modules: string[] = [];
 
+  private readonly _mnemonic: string;
+
   constructor(public clientOptions: ClientOptions) {
+    if (!clientOptions.storeSecret && validateMnemonic(clientOptions.mnemonic)) {
+      this._mnemonic = clientOptions.mnemonic;
+    }
+
     const mnemonic = toHexSeed(clientOptions.mnemonic);
 
     this.clientOptions = {
       mnemonic,
       network: clientOptions.network,
       storeSecret: clientOptions.storeSecret ? clientOptions.storeSecret : mnemonic,
-      oldStoreSecret: clientOptions.oldStoreSecret,
       projectName: clientOptions.projectName ? clientOptions.projectName : "",
       keypairType: clientOptions.keypairType ? clientOptions.keypairType : KeypairType.sr25519,
       backendStorageType: clientOptions.backendStorageType ? clientOptions.backendStorageType : BackendStorageType.auto,
@@ -140,11 +146,7 @@ class GridClient {
 
     const migrationKey = this._migrationKey;
 
-    if (
-      this.config.oldStoreSecret &&
-      this.config.storeSecret !== this.config.oldStoreSecret &&
-      !GridClient.migrated.has(migrationKey)
-    ) {
+    if (this._mnemonic && this.config.storeSecret !== this._mnemonic && !GridClient.migrated.has(migrationKey)) {
       if (!GridClient.migrationLock.has(migrationKey)) {
         GridClient.migrationLock.set(migrationKey, new AwaitLock());
       }
@@ -172,14 +174,13 @@ class GridClient {
   }
 
   private get _migrationKey() {
-    return this.config.mnemonic + this.config.network + this.config.storeSecret + this.config.oldStoreSecret;
+    return this.config.mnemonic + this.config.network + this.config.storeSecret + this._mnemonic;
   }
 
   private async _migrateKeys(): Promise<void> {
     const grid = new GridClient({
       ...this.config,
-      storeSecret: this.config.oldStoreSecret as string,
-      oldStoreSecret: "",
+      storeSecret: this._mnemonic as string,
     });
 
     const __getValue = (key: string) => {
@@ -217,7 +218,6 @@ class GridClient {
       network: this.clientOptions.network,
       mnemonic: this.clientOptions.mnemonic,
       storeSecret: this.clientOptions.storeSecret,
-      oldStoreSecret: this.clientOptions.oldStoreSecret,
       rmbClient: this.rmbClient,
       tfclient: this.tfclient,
       projectName: this.clientOptions.projectName,

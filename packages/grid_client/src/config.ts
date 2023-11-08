@@ -17,7 +17,6 @@ class GridClientConfig {
   network: NetworkEnv;
   mnemonic: string;
   storeSecret: string | Uint8Array;
-  oldStoreSecret: string | Uint8Array;
   rmbClient: RMBClient;
   tfclient: TFClient;
   projectName: string;
@@ -38,7 +37,6 @@ class ClientOptions {
     public mnemonic: string,
     public network: NetworkEnv,
     public storeSecret?: string,
-    public oldStoreSecret?: string,
     public projectName?: string,
     public backendStorageType?: BackendStorageType,
     public keypairType?: KeypairType,
