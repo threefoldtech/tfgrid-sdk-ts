@@ -2,7 +2,6 @@
   <view-layout>
     <v-row>
       <v-col>
-        <node-filters v-model="filterInputs" :valid="isValidForm" @update:model-value="inputFiltersReset" />
         <FarmsTable :items="farms" :loading="loading" :selectedFarm="selectedFarm" @open-dialog="openDialog" />
       </v-col>
     </v-row>
@@ -11,43 +10,25 @@
 </template>
 
 <script lang="ts" setup>
-import type { Farm, FarmsQuery } from "@threefold/gridproxy_client";
-import { onMounted, ref, watch } from "vue";
+import type { Farm } from "@threefold/gridproxy_client";
+import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 import router from "../../router";
-import { createCustomToast, ToastType } from "../../utils/custom_toast";
-import { inputsInitializer } from "../../utils/filter_farms";
-import { getFarmQueries, getFarms } from "../utils/helpers";
-import {
-  type FarmFilterInputs,
-  type FarmFilterOptions,
-  type FarmMixedFilter,
-  farmOptionsInitializer,
-} from "../utils/types";
+import { getFarms } from "../utils/helpers";
 
 const route = useRoute();
 
 const loading = ref<boolean>(false);
-const farms = ref<Farm[]>([]);
+const farms = ref<Farm[]>();
 const isDialogOpened = ref<boolean>(false);
 const selectedFarm = ref<Farm>();
-const filterInputs = ref<FarmFilterInputs>(inputsInitializer);
-const filterOptions = ref<FarmFilterOptions>(farmOptionsInitializer);
-const isValidForm = ref<boolean>(false);
-const farmsCount = ref<number>(0);
-const mixedFilters = ref<FarmMixedFilter>({
-  inputs: filterInputs.value,
-  options: filterOptions.value,
-});
 
-const _getFarms = async (queries: Partial<FarmsQuery>) => {
+onMounted(async () => {
+  await checkPath();
   loading.value = true;
-  try {
-    const { count, data } = await getFarms(queries);
-    if (count) {
-      farmsCount.value = count;
-    }
+  const { count, data } = await getFarms();
+  if (data) {
     farms.value = data.map(farm => {
       const ips = farm.publicIps;
       const total = ips.length;
@@ -59,12 +40,9 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
         freePublicIp: total - used,
       };
     });
-  } catch (error) {
-    createCustomToast(`Could not retrieve farms due to ${error}`, ToastType.danger);
-  } finally {
-    loading.value = false;
   }
-};
+  loading.value = false;
+});
 
 const checkPath = async () => {
   if (route.query.twinId) {
@@ -83,28 +61,6 @@ const closeDialog = () => {
   }
   isDialogOpened.value = false;
 };
-
-watch(
-  mixedFilters,
-  async () => {
-    const queries = getFarmQueries(mixedFilters.value);
-    await _getFarms(queries);
-  },
-  { deep: true },
-);
-
-const inputFiltersReset = (nFltrNptsVal: FarmFilterInputs) => {
-  mixedFilters.value.inputs = nFltrNptsVal;
-  mixedFilters.value.options.page = 1;
-  mixedFilters.value.options.size = 10;
-  mixedFilters.value.options.retCount = true;
-};
-
-onMounted(async () => {
-  await checkPath();
-  const queries = getFarmQueries(mixedFilters.value);
-  await _getFarms(queries);
-});
 </script>
 
 <script lang="ts">

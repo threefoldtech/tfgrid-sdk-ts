@@ -1,7 +1,5 @@
 import {
-  type CertificationType,
   type Farm,
-  type FarmsQuery,
   type GridNode,
   type NodesExtractOptions,
   type NodesQuery,
@@ -15,7 +13,7 @@ import { byCountry } from "country-code-lookup";
 
 import { gridProxyClient } from "@/clients";
 
-import type { FarmMixedFilter, MixedFilter, NodeStatusColor } from "./types";
+import type { MixedFilter, NodeStatusColor } from "./types";
 
 export const getCountryCode = (node: GridNode): string => {
   if (!node) {
@@ -143,23 +141,9 @@ export const getQueries = (mixedFilters: MixedFilter): Partial<NodesQuery> => {
   return options;
 };
 
-export const getFarmQueries = (mixedFilters: FarmMixedFilter) => {
-  const options: Partial<FarmsQuery> = {
-    farmId: +mixedFilters.inputs.farmId.value! || undefined,
-    name: mixedFilters.inputs.name.value || undefined,
-    twinId: +mixedFilters.inputs.twinId.value! || undefined,
-    certificationType: (mixedFilters.inputs.certificationType.value as CertificationType) || undefined,
-    pricingPolicyId: +mixedFilters.inputs.pricingPolicyId.value! || undefined,
-    page: mixedFilters.options.page,
-    size: mixedFilters.options.size,
-    retCount: mixedFilters.options.retCount,
-  };
-  return options;
-};
-
-export async function getFarms(queries: Partial<FarmsQuery>): Promise<Pagination<Farm[]>> {
+export async function getFarms(): Promise<Pagination<Farm[]>> {
   try {
-    const farms = await gridProxyClient.farms.list(queries);
+    const farms = await gridProxyClient.farms.list();
     return farms;
   } catch (error) {
     console.error("An error occurred while requesting farms:", error);

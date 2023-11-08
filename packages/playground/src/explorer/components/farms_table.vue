@@ -21,11 +21,11 @@
 import type { Farm } from "@threefold/gridproxy_client";
 import type { PropType } from "vue";
 
-import type { VDataTableHeader } from "@/types";
+import type { VDataTableHeader } from "../../types";
 export default {
   props: {
     items: {
-      required: true,
+      required: false,
       type: Object as PropType<Farm[]>,
     },
     loading: {

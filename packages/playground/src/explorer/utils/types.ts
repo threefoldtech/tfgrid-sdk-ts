@@ -18,11 +18,6 @@ export type MixedFilter = {
   options: FilterOptions;
 };
 
-export type FarmMixedFilter = {
-  inputs: FarmFilterInputs;
-  options: FarmFilterOptions;
-};
-
 // Status, GPU, Gateway, and any other option should be add here.
 export type FilterOptions = {
   status: NodeStatus;
