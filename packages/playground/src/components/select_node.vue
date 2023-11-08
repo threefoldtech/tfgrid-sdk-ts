@@ -289,11 +289,11 @@ async function validateNodeStoragePool(validatingNode: INode | undefined) {
 
     if (e?.toString().includes("Cannot fit the required SSD disk with size")) {
       return {
-        message: `Couldn't fit the required disks in Node ${validatingNode.nodeId} storage pools, please select another node`,
+        message: `Although node ${validatingNode.nodeId} appears to have sufficient storage capacity for your workload, it lacks a single internal partition capable of accommodating it. Please select a different node.`,
       };
     } else {
       return {
-        message: "Something went wrong while checking storage pools. Please check your connection and try again.",
+        message: "Something went wrong while checking status of the node. Please check your connection and try again.",
       };
     }
   } finally {
