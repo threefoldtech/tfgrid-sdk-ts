@@ -286,9 +286,16 @@ async function validateNodeStoragePool(validatingNode: INode | undefined) {
     availableNodes.value = availableNodes.value.filter(node => node.nodeId !== validatingNode.nodeId);
     validator.value?.setStatus(ValidatorStatus.Invalid);
     emptyResult.value = true;
-    return {
-      message: `Couldn't fit the required disks in Node ${validatingNode.nodeId} storage pools, please select another node`,
-    };
+
+    if (e?.toString().includes("Cannot fit the required SSD disk with size")) {
+      return {
+        message: `Couldn't fit the required disks in Node ${validatingNode.nodeId} storage pools, please select another node`,
+      };
+    } else {
+      return {
+        message: "Something went wrong while checking storage pools. Please check your connection and try again.",
+      };
+    }
   } finally {
     pingingNode.value = false;
     farmManager?.setLoading(false);
