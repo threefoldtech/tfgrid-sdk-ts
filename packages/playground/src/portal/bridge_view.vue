@@ -38,7 +38,7 @@
 
   <!-- Withdraw Dialog -->
   <v-container v-if="openWithdrawDialog">
-    <v-dialog transition="dialog-bottom-transition" max-width="1000" v-model="openWithdrawDialog" persistent>
+    <v-dialog transition="dialog-bottom-transition" max-width="1000" v-model="openWithdrawDialog">
       <v-card>
         <v-toolbar color="primary" dark class="bold-text justify-center"> Withdraw TFT </v-toolbar>
         <v-card-text>
