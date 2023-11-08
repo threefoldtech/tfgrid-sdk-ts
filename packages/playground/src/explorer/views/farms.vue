@@ -19,15 +19,12 @@
 import type { Farm } from "@threefold/gridproxy_client";
 import debounce from "lodash/debounce.js";
 import { onMounted, ref, watch } from "vue";
-import { useRoute } from "vue-router";
 
-import router from "../../router";
 import type { FilterFarmInputs } from "../../utils/filter_farms";
 import { inputsInitializer } from "../../utils/filter_farms";
 import { getFarmQueries, getFarms } from "../utils/helpers";
 import type { FarmFilterOptions, MixedFarmFilter } from "../utils/types";
 import { farmOptionsInitializer } from "../utils/types";
-const route = useRoute();
 
 const loading = ref<boolean>(false);
 const farms = ref<Farm[]>();
@@ -61,16 +58,9 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
   loading.value = false;
 };
 onMounted(async () => {
-  await checkPath();
-
   await _getFarms({});
 });
 
-const checkPath = async () => {
-  if (route.query.twinId) {
-    router.replace(route.path);
-  }
-};
 const request = debounce(_getFarms, 1000);
 watch(
   mixedFarmFilters,
@@ -93,9 +83,6 @@ const openDialog = (item: Farm) => {
 };
 
 const closeDialog = () => {
-  if (route.query.twinId) {
-    router.replace(route.path);
-  }
   isDialogOpened.value = false;
 };
 </script>
