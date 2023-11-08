@@ -107,12 +107,12 @@
         </v-toolbar>
 
         <v-toolbar
-          color="transparent"
           v-if="navbarConfig"
+          :color="theme.name.value === AppThemeSelection.dark ? '#121212' : 'background'"
           class="border position-fixed py-0 d-flex pr-2"
           :style="{
             zIndex: 1005,
-            top: '66.5px',
+            top: '65.5px',
             right: 0,
             width: permanent && openSidebar && hasActiveProfile ? 'calc(100% - 280px)' : '100%',
           }"
@@ -510,5 +510,9 @@ a {
 }
 .font-14 {
   font-size: 14px !important;
+}
+
+.v-breadcrumbs-item--disabled {
+  opacity: 1;
 }
 </style>
