@@ -142,7 +142,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
@@ -161,6 +161,10 @@ watch(
   () => $route.meta,
   meta => (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
 );
+
+onMounted(() => {
+  (window as any).loaded = true;
+});
 
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
