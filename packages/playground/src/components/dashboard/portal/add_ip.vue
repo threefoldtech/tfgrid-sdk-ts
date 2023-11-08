@@ -218,6 +218,11 @@ export default {
           message: "Gateway IP not in the provided IP range.",
         };
       }
+      if (props.publicIP.split("/")[0] === props.gateway || props.toPublicIP.split("/")[0] === props.gateway) {
+        return {
+          message: "IPs cannot be the same.",
+        };
+      }
       return undefined;
     }
 

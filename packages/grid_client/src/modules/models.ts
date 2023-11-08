@@ -682,11 +682,7 @@ class PublicConfigModel {
 class AddPublicConfig {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
-  @Expose()
-  @IsNotEmpty()
-  @Type(() => PublicConfigModel)
-  @ValidateNested({ each: true })
-  publicConfig: PublicConfigModel;
+  @Expose() publicConfig: PublicConfigModel | null;
 }
 
 class RemoveFarmIPModel {

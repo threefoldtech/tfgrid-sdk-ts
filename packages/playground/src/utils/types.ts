@@ -4,9 +4,9 @@ export enum IPType {
 }
 
 export interface IPublicConfig {
-  ip4: string;
+  ipv4: string;
   gw4: string;
-  ip6?: string;
+  ipv6?: string;
   gw6?: string;
   domain?: string;
 }

@@ -107,7 +107,13 @@
       </template>
 
       <template #[`item.actions`]="{ item }">
-        <PublicConfig class="me-2" :nodeId="item.raw.nodeId" :farmId="item.raw.farmId" v-model="publicConfig" />
+        <PublicConfig
+          class="me-2"
+          :nodeId="item.raw.nodeId"
+          :farmId="item.raw.farmId"
+          v-model="item.raw.publicConfig"
+          @remove-config="getUserNodes"
+        />
         <SetExtraFee class="me-2" :nodeId="item.raw.nodeId" />
       </template>
     </v-data-table-server>
@@ -128,7 +134,6 @@ import {
   getNodeUptimePercentage,
   type NodeInterface,
 } from "@/utils/node";
-import type { IPublicConfig } from "@/utils/types";
 
 import { gridProxyClient } from "../../../clients";
 import { useProfileManager } from "../../../stores";
@@ -192,13 +197,6 @@ export default {
 
     const expanded = ref<string[]>();
     const network = process.env.NETWORK || window.env.NETWORK;
-    const publicConfig = ref<IPublicConfig>({
-      ip4: "",
-      gw4: "",
-      ip6: "",
-      gw6: "",
-      domain: "",
-    });
     const resourcesPanel = ref([]);
     const receiptsPanel = ref([]);
     const uptime = ref();
@@ -312,7 +310,6 @@ export default {
       network,
       resourcesPanel,
       receiptsPanel,
-      publicConfig,
       uptime,
       nodesCount,
       getUserNodes,

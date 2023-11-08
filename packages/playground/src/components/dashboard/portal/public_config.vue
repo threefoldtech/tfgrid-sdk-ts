@@ -17,12 +17,12 @@
           <div class="pt-6 px-6">
             <form-validator v-model="valid">
               <input-validator
-                :value="$props.modelValue.ip4"
+                :value="$props.modelValue.ipv4"
                 :rules="[validators.required('IPv4 is required.'), validators.isIPRange('IP is not valid.', 4)]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IPV4 address in CIDR format xx.xx.xx.xx/xx">
-                  <v-text-field v-model="$props.modelValue.ip4" v-bind="props" outlined label="IPv4"></v-text-field>
+                  <v-text-field v-model="$props.modelValue.ipv4" v-bind="props" outlined label="IPv4"></v-text-field>
                 </input-tooltip>
               </input-validator>
 
@@ -40,20 +40,21 @@
                   ></v-text-field>
                 </input-tooltip>
               </input-validator>
-
               <input-validator
-                :value="$props.modelValue.ip6"
-                :rules="[validators.required('IPv6 is required.'), validators.isIPRange('IP is not valid.', 6)]"
+                :value="$props.modelValue.ipv6"
+                :rules="[validators.isIPRange('IP is not valid.', 6)]"
+                validate-on="input"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IPV6 address in format x:x:x:x:x:x:x:x">
-                  <v-text-field v-model="$props.modelValue.ip6" v-bind:="props" outlined label="IPv6"></v-text-field>
+                  <v-text-field v-model="$props.modelValue.ipv6" v-bind:="props" outlined label="IPv6"></v-text-field>
                 </input-tooltip>
               </input-validator>
 
               <input-validator
                 :value="$props.modelValue.gw6"
-                :rules="[validators.required('Gateway is required.'), validators.isIP('Gateway is not valid.', 6)]"
+                :rules="[gw => validators.isIP('Gateway is not valid.', 6)(gw)]"
+                validate-on="input"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Gateway for the IP in ipv6 format">
@@ -68,7 +69,8 @@
 
               <input-validator
                 :value="$props.modelValue.domain"
-                :rules="[validators.required('Domain is required.')]"
+                :rules="[domain => validators.isURL('Wrong domain format.')(domain)]"
+                validate-on="input"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Domain for web gateway">
@@ -87,7 +89,7 @@
               @click="showClearDialogue = true"
               color="white"
               class="bg-red-lighten-1"
-              :disabled="Object.values($props.modelValue).every(value => value == '')"
+              :disabled="isRemoving || Object.values(config).every(value => value == '')"
               >Remove Config</v-btn
             >
             <div>
@@ -129,8 +131,10 @@
 </template>
 
 <script lang="ts">
-import { type PropType, ref } from "vue";
+import type { GridNode } from "@threefold/gridproxy_client";
+import { onMounted, type PropType, ref } from "vue";
 
+import { gridProxyClient } from "@/clients";
 import type { IPublicConfig } from "@/utils/types";
 
 import { useGrid } from "../../../stores";
@@ -153,7 +157,7 @@ export default {
     },
   },
 
-  setup(props) {
+  setup(props, context) {
     const showDialogue = ref(false);
     const isAdding = ref(false);
     const gridStore = useGrid();
@@ -161,6 +165,21 @@ export default {
     const showClearDialogue = ref(false);
     const isRemoving = ref(false);
     const isSaving = ref(false);
+    const config = ref();
+
+    onMounted(async () => {
+      config.value = await getPublicConfig();
+    });
+
+    async function getPublicConfig() {
+      try {
+        const node: GridNode = await gridProxyClient.nodes.byId(props.nodeId);
+        const config = node.publicConfig;
+        return config;
+      } catch (error) {
+        console.log(`Failed to get node: ${error}`);
+      }
+    }
 
     async function AddConfig() {
       try {
@@ -169,9 +188,13 @@ export default {
           farmId: props.farmId,
           nodeId: props.nodeId,
           publicConfig: {
-            ip4: { ip: props.modelValue.ip4, gw: props.modelValue.gw4 },
-            ip6: { ip: props.modelValue.ip6 as string, gw: props.modelValue.gw6 as string },
-            domain: props.modelValue.domain,
+            ip4: { ip: props.modelValue.ipv4, gw: props.modelValue.gw4 },
+            ip6:
+              {
+                ip: props.modelValue.ipv6 as string,
+                gw: props.modelValue.gw6 as string,
+              } || undefined,
+            domain: props.modelValue.domain || undefined,
           },
         });
         createCustomToast("Public config saved successfully.", ToastType.success);
@@ -189,16 +212,15 @@ export default {
         await gridStore.grid.nodes.addNodePublicConfig({
           farmId: props.farmId,
           nodeId: props.nodeId,
-          publicConfig: {
-            ip4: { ip: "", gw: "" },
-            ip6: { ip: "", gw: "" },
-            domain: "",
-          },
+          publicConfig: null,
         });
         createCustomToast("Public config removed successfully.", ToastType.success);
+        setTimeout(() => {
+          context.emit("remove-config");
+        }, 5000);
       } catch (error) {
         console.log(error);
-        createCustomToast("Failed to remove config!", ToastType.danger);
+        createCustomToast(`Failed to remove config. ${error}`, ToastType.danger);
       } finally {
         isRemoving.value = false;
         showClearDialogue.value = false;
@@ -211,6 +233,7 @@ export default {
       showClearDialogue,
       isRemoving,
       isSaving,
+      config,
       AddConfig,
       removeConfig,
     };
