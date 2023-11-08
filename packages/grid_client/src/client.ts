@@ -1,4 +1,5 @@
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
+import AwaitLock from "await-lock";
 import * as PATH from "path";
 import urlJoin from "url-join";
 
@@ -16,6 +17,8 @@ import { KeypairType } from "./zos/deployment";
 class GridClient {
   static rmbClients: Map<string, RMBClient> = new Map();
   static connecting = new Set<string>();
+  static migrationLock = new Map<string, AwaitLock>();
+  static migrated = new Set<string>();
   config: GridClientConfig;
   rmbClient: RMBClient;
   tfclient: TFClient;
@@ -134,7 +137,79 @@ class GridClient {
       throw Error(`Couldn't find a user for the provided mnemonic on ${this.clientOptions.network} network.`);
     }
     this._connect();
+
+    const migrationKey = this._migrationKey;
+
+    if (
+      this.config.oldStoreSecret &&
+      this.config.storeSecret !== this.config.oldStoreSecret &&
+      !GridClient.migrated.has(migrationKey)
+    ) {
+      if (!GridClient.migrationLock.has(migrationKey)) {
+        GridClient.migrationLock.set(migrationKey, new AwaitLock());
+      }
+
+      const lock = GridClient.migrationLock.get(migrationKey);
+
+      if (lock) {
+        try {
+          await lock.acquireAsync();
+          if (!GridClient.migrated.has(migrationKey)) {
+            await this._migrateKeys();
+          }
+        } catch (error) {
+          console.log("Failed to migrate all keys", error.message || error);
+        } finally {
+          if (lock.acquired) {
+            lock.release();
+            GridClient.migrationLock.delete(migrationKey);
+          }
+        }
+      }
+    }
+
     GridClient.connecting.delete(key);
+  }
+
+  private get _migrationKey() {
+    return this.config.mnemonic + this.config.network + this.config.storePath + this.config.oldStoreSecret;
+  }
+
+  private async _migrateKeys(): Promise<void> {
+    const __getValue = (key: string) => {
+      return grid.kvstore.get({ key }).catch(() => null);
+    };
+
+    const __migrateKey = (key: string, value: string | null) => {
+      if (!value) {
+        return [];
+      }
+
+      return this.tfclient.kvStore.set({ key, value });
+    };
+
+    const grid = new GridClient({
+      ...this.config,
+      storeSecret: this.config.oldStoreSecret as string,
+      oldStoreSecret: "",
+    });
+
+    try {
+      await grid.connect();
+
+      const keys = await grid.kvstore.list();
+      const values = await Promise.all(keys.map(__getValue));
+
+      const promises = values.map((value, i) => __migrateKey(keys[i], value));
+      const exts = await Promise.all(promises.flat(1).filter(Boolean));
+
+      await this.tfclient.applyAllExtrinsics(exts.flat(1).filter(Boolean));
+      GridClient.migrated.add(this._migrationKey);
+    } catch (error) {
+      console.log("Failed to migrate all keys", error.message || error);
+    } finally {
+      await grid?.disconnect();
+    }
   }
 
   _connect(): void {
