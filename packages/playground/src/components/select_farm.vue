@@ -43,8 +43,7 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted, type PropType, ref, watch } from "vue";
 
-import { useInputRef } from "@/hooks/input_validator";
-
+import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores/profile_manager";
 import type { Farm } from "../types";
 import { getFarms } from "../utils/get_farms";
@@ -200,8 +199,7 @@ watch([loading, shouldBeUpdated], async ([l, s]) => {
 <script lang="ts">
 import { nextTick } from "vue";
 
-import { ValidatorStatus } from "@/hooks/form_validator";
-
+import { ValidatorStatus } from "../hooks/form_validator";
 import SelectCountry from "./select_country.vue";
 
 export default {

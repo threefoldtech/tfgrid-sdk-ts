@@ -1,6 +1,7 @@
-import type { FarmFilterOptions, FarmInfo, GridClient } from "@threefold/grid_client";
+import type { FarmFilterOptions, GridClient } from "@threefold/grid_client";
 
 import { gqlClient, gridProxyClient } from "../clients";
+import type { Farm } from "../types";
 
 export interface GetFarmsOptions {
   exclusiveFor?: string;
@@ -9,7 +10,7 @@ export async function getFarms(
   grid: GridClient,
   filters: FarmFilterOptions,
   options: GetFarmsOptions = {},
-): Promise<FarmInfo[]> {
+): Promise<Farm[]> {
   let farms = await grid.capacity.filterFarms({ ...filters }).catch(() => []);
 
   if (options.exclusiveFor && !filters.publicIp) {
@@ -17,7 +18,7 @@ export async function getFarms(
     farms = farms.filter(farm => !blockedFarms.has(farm.farmId));
   }
 
-  return farms;
+  return farms.map(farm => ({ name: farm.name, farmID: farm.farmId, country: filters.country }));
 }
 
 export async function getBlockedFarmSet(exclusiveFor: string): Promise<Set<number>> {
