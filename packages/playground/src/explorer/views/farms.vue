@@ -2,8 +2,8 @@
   <view-layout>
     <v-row>
       <v-col>
-        <node-filters v-model="filterInputs" v-model:valid="isValidForm" @update:model-value="inputFiltersReset" />
-        <FarmsTable :items="farms" :loading="loading" v-model:selectedFarm="selectedFarm" @open-dialog="openDialog" />
+        <node-filters v-model="filterInputs" :valid="isValidForm" @update:model-value="inputFiltersReset" />
+        <FarmsTable :items="farms" :loading="loading" :selectedFarm="selectedFarm" @open-dialog="openDialog" />
       </v-col>
     </v-row>
     <farmDialog v-if="selectedFarm" :openDialog="isDialogOpened" :farm="selectedFarm" @close-dialog="closeDialog" />
@@ -15,9 +15,8 @@ import type { Farm, FarmsQuery } from "@threefold/gridproxy_client";
 import { onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
-import router from "@/router";
-import { createCustomToast, ToastType } from "@/utils/custom_toast";
-
+import router from "../../router";
+import { createCustomToast, ToastType } from "../../utils/custom_toast";
 import { inputsInitializer } from "../../utils/filter_farms";
 import { getFarmQueries, getFarms } from "../utils/helpers";
 import {
