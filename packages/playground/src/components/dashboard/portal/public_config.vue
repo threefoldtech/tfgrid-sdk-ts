@@ -15,7 +15,7 @@
             <p class="mb-5">Add a public config to your node with ID: {{ $props.nodeId }}</p>
           </v-toolbar>
           <div class="pt-6 px-6">
-            <form-validator v-model="valid">
+            <form-validator v-model="valid" ref="formRef">
               <input-validator
                 :value="$props.modelValue.ipv4"
                 :rules="[validators.required('IPv4 is required.'), validators.isIPRange('IP is not valid.', 4)]"
@@ -139,6 +139,7 @@ import _ from "lodash";
 import { onMounted, type PropType, ref, watch } from "vue";
 
 import { gridProxyClient } from "@/clients";
+import { useFormRef } from "@/hooks/form_validator";
 import type { IPublicConfig } from "@/utils/types";
 
 import { useGrid } from "../../../stores";
@@ -171,6 +172,7 @@ export default {
     const isSaving = ref(false);
     const config = ref();
     const isConfigChanged = ref(false);
+    const formRef = useFormRef();
 
     onMounted(async () => {
       config.value = await getPublicConfig();
@@ -180,6 +182,7 @@ export default {
       () => ({ ...props.modelValue }),
       (old, newValue) => {
         isConfigChanged.value = !_.isEqual(old, newValue) && !_.isEqual(props.modelValue, config.value);
+        formRef.value.validate();
       },
     );
 
@@ -247,6 +250,7 @@ export default {
       isSaving,
       config,
       isConfigChanged,
+      formRef,
       AddConfig,
       removeConfig,
     };
