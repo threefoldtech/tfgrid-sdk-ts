@@ -39,15 +39,15 @@ function log(message) {
   console.log(JSON.stringify(message, null, 2));
 }
 
-function toHexSeed(mnemonic: string): string {
-  if (validateMnemonic(mnemonic)) {
-    const seed = mnemonicToMiniSecret(mnemonic);
+function toHexSeed(mnemonicOrHexSeed: string): string {
+  if (validateMnemonic(mnemonicOrHexSeed)) {
+    const seed = mnemonicToMiniSecret(mnemonicOrHexSeed);
     const keypair = box.keyPair.fromSecretKey(seed.slice(0, 32));
     return "0x" + Buffer.from(keypair.secretKey).toString("hex");
   }
 
-  mnemonic = mnemonic.length === 64 ? mnemonic : mnemonic.slice(2);
-  return "0x" + mnemonic;
+  const seed = mnemonicOrHexSeed.length === 64 ? mnemonicOrHexSeed : mnemonicOrHexSeed.slice(2);
+  return "0x" + seed;
 }
 
 export { generateString, getRandomNumber, randomChoice, randomSecret, randomSecretAsHex, randomNonce, log, toHexSeed };

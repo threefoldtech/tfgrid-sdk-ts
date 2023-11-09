@@ -1,5 +1,5 @@
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
-import AwaitLock from "await-lock";
+import type AwaitLock from "await-lock";
 import { validateMnemonic } from "bip39";
 import * as PATH from "path";
 import urlJoin from "url-join";
@@ -7,7 +7,7 @@ import urlJoin from "url-join";
 import { Graphql } from "./clients";
 import { TFClient } from "./clients/tf-grid/client";
 import { ClientOptions, GridClientConfig, NetworkEnv } from "./config";
-import { migrateKeysDecryption, send, toHexSeed } from "./helpers";
+import { migrateKeysEncryption, send, toHexSeed } from "./helpers";
 import { isExposed } from "./helpers/expose";
 import { generateString } from "./helpers/utils";
 import * as modules from "./modules/index";
@@ -49,19 +49,19 @@ class GridClient {
   bridge: modules.bridge;
   modules: string[] = [];
 
-  protected readonly _mnemonic: string;
+  readonly _mnemonic: string;
 
   constructor(public clientOptions: ClientOptions) {
     if (!clientOptions.storeSecret && validateMnemonic(clientOptions.mnemonic)) {
       this._mnemonic = clientOptions.mnemonic;
     }
 
-    const mnemonic = toHexSeed(clientOptions.mnemonic);
+    const hexSeed = toHexSeed(clientOptions.mnemonic);
 
     this.clientOptions = {
-      mnemonic,
+      mnemonic: hexSeed,
       network: clientOptions.network,
-      storeSecret: clientOptions.storeSecret ? clientOptions.storeSecret : mnemonic,
+      storeSecret: clientOptions.storeSecret ? clientOptions.storeSecret : hexSeed,
       projectName: clientOptions.projectName ? clientOptions.projectName : "",
       keypairType: clientOptions.keypairType ? clientOptions.keypairType : KeypairType.sr25519,
       backendStorageType: clientOptions.backendStorageType ? clientOptions.backendStorageType : BackendStorageType.auto,
@@ -144,37 +144,9 @@ class GridClient {
     }
     this._connect();
 
-    const migrationKey = this._migrationKey;
-
-    if (this._mnemonic && this.config.storeSecret !== this._mnemonic && !GridClient.migrated.has(migrationKey)) {
-      if (!GridClient.migrationLock.has(migrationKey)) {
-        GridClient.migrationLock.set(migrationKey, new AwaitLock());
-      }
-
-      const lock = GridClient.migrationLock.get(migrationKey);
-
-      if (lock) {
-        try {
-          await lock.acquireAsync();
-          if (!GridClient.migrated.has(migrationKey)) {
-            await migrateKeysDecryption.apply(this, [GridClient]);
-          }
-        } catch (error) {
-          console.log("Failed to migrate all keys", error.message || error);
-        } finally {
-          if (lock.acquired) {
-            lock.release();
-            GridClient.migrationLock.delete(migrationKey);
-          }
-        }
-      }
-    }
+    await migrateKeysEncryption.apply(this, [GridClient]);
 
     GridClient.connecting.delete(key);
-  }
-
-  protected get _migrationKey() {
-    return this.config.mnemonic + this.config.network + this.config.storeSecret + this._mnemonic;
   }
 
   _connect(): void {
