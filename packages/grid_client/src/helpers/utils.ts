@@ -1,7 +1,7 @@
 import { mnemonicToMiniSecret } from "@polkadot/util-crypto";
 import { validateMnemonic } from "bip39";
 import { Buffer } from "buffer";
-import nacl, { box, randomBytes } from "tweetnacl";
+import nacl, { randomBytes } from "tweetnacl";
 import utils from "tweetnacl-util";
 
 function generateString(length: number): string {
@@ -42,8 +42,7 @@ function log(message) {
 function toHexSeed(mnemonicOrHexSeed: string): string {
   if (validateMnemonic(mnemonicOrHexSeed)) {
     const seed = mnemonicToMiniSecret(mnemonicOrHexSeed);
-    const keypair = box.keyPair.fromSecretKey(seed.slice(0, 32));
-    return "0x" + Buffer.from(keypair.secretKey).toString("hex");
+    return "0x" + Buffer.from(seed).toString("hex");
   }
 
   const seed = mnemonicOrHexSeed.length === 64 ? mnemonicOrHexSeed : mnemonicOrHexSeed.slice(2);
