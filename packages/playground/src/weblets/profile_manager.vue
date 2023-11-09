@@ -90,13 +90,13 @@
             <FormValidator v-model="isValidForm">
               <v-alert type="warning" variant="tonal" class="mb-6" v-if="activeTab === 1" color="primary">
                 <p :style="{ maxWidth: '880px' }">
-                  To connect your wallet, you will need to enter your mnemonic which will be encrypted using the
-                  password. Mnemonic will never be shared outside of this device.
+                  To connect your wallet, you will need to enter your Mnemonic or Hex Seed which will be encrypted using
+                  the password. Mnemonic or Hex Seed will never be shared outside of this device.
                 </p>
               </v-alert>
               <VTooltip
                 v-if="activeTab === 1"
-                text="Mnemonic are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonic or click the 'Create Account' button to create an account and generate mnemonic."
+                text="Mnemonic or Hex Seed are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing (Mnemonic or Hex Seed) or click the 'Create Account' button to create an account and generate mnemonic."
                 location="bottom"
                 max-width="700px"
               >
@@ -105,7 +105,7 @@
                     <InputValidator
                       :value="mnemonic"
                       :rules="[
-                        validators.required('Mnemonic is required.'),
+                        validators.required('Mnemonic or Hex Seed is required.'),
                         v => {
                           if (
                             validateMnemonic(v) ||
@@ -116,19 +116,19 @@
                             return;
                           }
 
-                          return { message: 'Mnemonic doesn\'t seem to be valid.' };
+                          return { message: 'Mnemonic or Hex Seed doesn\'t seem to be valid.' };
                         },
                       ]"
                       :async-rules="[validateMnInput]"
-                      valid-message="Mnemonic is valid."
+                      valid-message="Mnemonic or Hex Seed is valid."
                       #="{ props: validationProps }"
                       ref="mnemonicInput"
                       :disable-validation="creatingAccount || activatingAccount || activating"
                     >
                       <div v-bind="tooltipProps">
                         <VTextField
-                          label="Mnemonic"
-                          placeholder="Please insert your mnemonic"
+                          label="Mnemonic or Hex Seed"
+                          placeholder="Please insert your Mnemonic or Hex Seed"
                           v-model="mnemonic"
                           v-bind="{ ...passwordInputProps, ...validationProps }"
                           :disabled="creatingAccount || activatingAccount || activating"
@@ -268,7 +268,7 @@
       <template v-if="profileManager.profile">
         <PasswordInputWrapper #="{ props }">
           <VTextField
-            label="Mnemonic"
+            label="Your Hex Seed"
             readonly
             v-model="profileManager.profile.mnemonic"
             v-bind="props"
