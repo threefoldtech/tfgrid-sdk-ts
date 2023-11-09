@@ -184,8 +184,8 @@ const headers: VDataTableHeader = [
 ];
 const loadingError = ref("");
 async function onMount() {
-  selectedContracts.value = [];
   loadingError.value = "";
+  selectedContracts.value = [];
   loading.value = true;
   failedContractId.value = undefined;
   contracts.value = [];
