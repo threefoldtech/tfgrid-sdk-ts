@@ -106,7 +106,13 @@
                       :value="mnemonic"
                       :rules="[
                         validators.required('Mnemonic is required.'),
-                        v => (validateMnemonic(v) ? undefined : { message: `Mnemonic doesn't seem to be valid.` }),
+                        v => {
+                          if (validateMnemonic(v) || isAddress(v.slice(2)) || isAddress(v)) {
+                            return;
+                          }
+
+                          return { message: 'Mnemonic doesn\'t seem to be valid.' };
+                        },
                       ]"
                       :async-rules="[validateMnInput]"
                       valid-message="Mnemonic is valid."
@@ -366,6 +372,7 @@
 </template>
 
 <script lang="ts" setup>
+import { isAddress } from "@polkadot/util-crypto";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import md5 from "md5";
