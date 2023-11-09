@@ -1,6 +1,5 @@
-import * as secp from "@noble/secp256k1";
+import { getSharedSecret, utils } from "@noble/secp256k1";
 import { KeyringPair } from "@polkadot/keyring/types";
-import * as bip39 from "bip39";
 import { Buffer } from "buffer";
 
 export enum KPType {
@@ -16,10 +15,7 @@ export function sign(payload: string | Uint8Array, signer: KeyringPair) {
   return sigPrefixed;
 }
 
-export async function createShared(pubKey: Uint8Array, mnemonic: string) {
-  const seed = await bip39.mnemonicToSeed(mnemonic);
-  const privateKey = new Uint8Array(seed).slice(0, 32);
-  const pointX = secp.getSharedSecret(privateKey, pubKey);
-  const key = await secp.utils.sha256(pointX.slice(1, 33));
-  return key;
+export function createShared(pubKey: Uint8Array, hexSeed: string) {
+  const pointX = getSharedSecret(hexSeed.slice(2), pubKey);
+  return utils.sha256(pointX.slice(1, 33));
 }
