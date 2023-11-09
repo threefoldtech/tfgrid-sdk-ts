@@ -14,7 +14,7 @@
       </v-btn>
     </template>
     <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="loadingError">
-      {{ loadingError }}
+      Failed to list your contracts: {{ loadingError }}
     </v-alert>
     <ListTable
       v-else
