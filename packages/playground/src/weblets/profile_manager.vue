@@ -107,7 +107,12 @@
                       :rules="[
                         validators.required('Mnemonic is required.'),
                         v => {
-                          if (validateMnemonic(v) || isAddress(v.slice(2)) || isAddress(v)) {
+                          if (
+                            validateMnemonic(v) ||
+                            v.length === 64 ||
+                            v.length === 66 ||
+                            isAddress(v.length === 64 ? v : v.slice(2))
+                          ) {
                             return;
                           }
 
