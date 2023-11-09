@@ -321,8 +321,8 @@ function getTotalCost(contracts: NormalizedContract[]) {
   for (const contract of contracts) {
     const matching = contract.consumption.match(/(\d+(\.\d+)?) TFT\/hour/);
     if (matching) {
-      const value = Decimal(matching[1]);
-      totalCost.value += value;
+      const value = new Decimal(matching[1]);
+      totalCost.value += +value;
     }
   }
   return parseFloat(totalCost.value.toFixed(3));
