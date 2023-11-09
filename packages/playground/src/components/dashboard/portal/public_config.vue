@@ -8,7 +8,7 @@
       </template>
     </v-tooltip>
 
-    <span v-if="showDialogue">
+    <template v-if="showDialogue">
       <v-dialog v-model="showDialogue" max-width="600">
         <v-card>
           <v-toolbar color="primary" dark class="custom-toolbar">
@@ -42,8 +42,7 @@
               </input-validator>
               <input-validator
                 :value="$props.modelValue.ipv6"
-                :rules="[validators.isIPRange('IP is not valid.', 6)]"
-                validate-on="input"
+                :rules="[value => validators.isIPRange('IP is not valid.', 6)(value)]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IPV6 address in format x:x:x:x:x:x:x:x">
@@ -53,8 +52,7 @@
 
               <input-validator
                 :value="$props.modelValue.gw6"
-                :rules="[gw => validators.isIP('Gateway is not valid.', 6)(gw)]"
-                validate-on="input"
+                :rules="[value => validators.isIP('Gateway is not valid.', 6)(value)]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Gateway for the IP in ipv6 format">
@@ -70,7 +68,6 @@
               <input-validator
                 :value="$props.modelValue.domain"
                 :rules="[domain => validators.isURL('Wrong domain format.')(domain)]"
-                validate-on="input"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Domain for web gateway">
@@ -93,15 +90,21 @@
               >Remove Config</v-btn
             >
             <div>
-              <v-btn color="primary" variant="tonal" @click="AddConfig" :loading="isSaving" :disabled="!valid"
-                >Save</v-btn
+              <v-btn
+                color="primary"
+                variant="tonal"
+                @click="AddConfig"
+                :loading="isSaving"
+                :disabled="isSaving || !valid || (!valid && !isConfigChanged)"
               >
+                Save
+              </v-btn>
               <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
             </div>
           </v-card-actions>
         </v-card>
       </v-dialog>
-    </span>
+    </template>
 
     <template v-if="showClearDialogue">
       <v-dialog v-model="showClearDialogue" width="650">
@@ -132,7 +135,8 @@
 
 <script lang="ts">
 import type { GridNode } from "@threefold/gridproxy_client";
-import { onMounted, type PropType, ref } from "vue";
+import _ from "lodash";
+import { onMounted, type PropType, ref, watch } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import type { IPublicConfig } from "@/utils/types";
@@ -166,10 +170,18 @@ export default {
     const isRemoving = ref(false);
     const isSaving = ref(false);
     const config = ref();
+    const isConfigChanged = ref(false);
 
     onMounted(async () => {
       config.value = await getPublicConfig();
     });
+
+    watch(
+      () => ({ ...props.modelValue }),
+      (old, newValue) => {
+        isConfigChanged.value = !_.isEqual(old, newValue) && !_.isEqual(props.modelValue, config.value);
+      },
+    );
 
     async function getPublicConfig() {
       try {
@@ -234,6 +246,7 @@ export default {
       isRemoving,
       isSaving,
       config,
+      isConfigChanged,
       AddConfig,
       removeConfig,
     };
