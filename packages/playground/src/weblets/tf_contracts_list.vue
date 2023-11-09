@@ -180,6 +180,7 @@ const headers: VDataTableHeader = [
 ];
 
 async function onMount() {
+  selectedContracts.value = [];
   loading.value = true;
   failedContractId.value = undefined;
   contracts.value = [];
