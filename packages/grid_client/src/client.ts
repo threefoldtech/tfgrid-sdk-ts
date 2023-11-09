@@ -7,7 +7,7 @@ import urlJoin from "url-join";
 import { Graphql } from "./clients";
 import { TFClient } from "./clients/tf-grid/client";
 import { ClientOptions, GridClientConfig, NetworkEnv } from "./config";
-import { send, toHexSeed } from "./helpers";
+import { migrateKeysDecryption, send, toHexSeed } from "./helpers";
 import { isExposed } from "./helpers/expose";
 import { generateString } from "./helpers/utils";
 import * as modules from "./modules/index";
@@ -49,7 +49,7 @@ class GridClient {
   bridge: modules.bridge;
   modules: string[] = [];
 
-  private readonly _mnemonic: string;
+  protected readonly _mnemonic: string;
 
   constructor(public clientOptions: ClientOptions) {
     if (!clientOptions.storeSecret && validateMnemonic(clientOptions.mnemonic)) {
@@ -157,7 +157,7 @@ class GridClient {
         try {
           await lock.acquireAsync();
           if (!GridClient.migrated.has(migrationKey)) {
-            await this._migrateKeys();
+            await migrateKeysDecryption.apply(this, [GridClient]);
           }
         } catch (error) {
           console.log("Failed to migrate all keys", error.message || error);
@@ -173,42 +173,8 @@ class GridClient {
     GridClient.connecting.delete(key);
   }
 
-  private get _migrationKey() {
+  protected get _migrationKey() {
     return this.config.mnemonic + this.config.network + this.config.storeSecret + this._mnemonic;
-  }
-
-  private async _migrateKeys(): Promise<void> {
-    const grid = new GridClient({
-      ...this.config,
-      storeSecret: this._mnemonic as string,
-    });
-
-    const __getValue = (key: string) => {
-      return grid.kvstore.get({ key }).catch(() => null);
-    };
-
-    const __migrateKey = (key: string, value: string | null) => {
-      if (!value) {
-        return [];
-      }
-
-      return this.tfclient.kvStore.set({ key, value });
-    };
-
-    try {
-      await grid.connect();
-
-      const keys = await grid.kvstore.list();
-      const values = await Promise.all(keys.map(__getValue));
-
-      const promises = values.map((value, i) => __migrateKey(keys[i], value));
-      const exts = await Promise.all(promises.flat(1).filter(Boolean));
-
-      await this.tfclient.applyAllExtrinsics(exts.flat(1).filter(Boolean));
-      GridClient.migrated.add(this._migrationKey);
-    } catch (error) {
-      console.log("Failed to migrate all keys", error.message || error);
-    }
   }
 
   _connect(): void {
