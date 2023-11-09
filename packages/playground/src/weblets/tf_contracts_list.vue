@@ -154,6 +154,7 @@
 
 <script lang="ts" setup>
 import { ContractStates, type GridClient } from "@threefold/grid_client";
+import { Decimal } from "decimal.js";
 import { computed, type Ref, ref } from "vue";
 
 import { useProfileManager } from "../stores";
@@ -320,7 +321,7 @@ function getTotalCost(contracts: NormalizedContract[]) {
   for (const contract of contracts) {
     const matching = contract.consumption.match(/(\d+(\.\d+)?) TFT\/hour/);
     if (matching) {
-      const value = parseFloat(matching[1]);
+      const value = Decimal(matching[1]);
       totalCost.value += value;
     }
   }
