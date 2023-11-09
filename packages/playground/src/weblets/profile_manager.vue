@@ -334,7 +334,7 @@
           <v-col>
             <section class="d-flex flex-column align-center">
               <p class="mb-4 text-center">
-                Scan the QRcode using
+                Scan the QR code using
                 <a class="app-link" href="https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html" target="_blank">
                   ThreeFold Connect
                 </a>
