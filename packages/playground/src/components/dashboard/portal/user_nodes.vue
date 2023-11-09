@@ -82,14 +82,8 @@
                 </v-expansion-panel-text>
               </v-expansion-panel>
             </v-expansion-panels>
-            <v-expansion-panels
-              v-if="network == 'main' && item.raw.status === 'up'"
-              :disabled="false"
-              focusable
-              single
-              model-value
-            >
-              <v-expansion-panel>
+            <v-expansion-panels v-if="network == 'main'" :disabled="false" focusable single model-value>
+              <v-expansion-panel class="my-3">
                 <v-expansion-panel-title class="bg-primary"> Node Statistics </v-expansion-panel-title>
                 <v-expansion-panel-text>
                   <NodeMintingDetails :node="item.value" />

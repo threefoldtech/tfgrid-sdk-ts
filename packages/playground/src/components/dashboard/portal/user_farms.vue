@@ -62,6 +62,9 @@
                   >Bootstrap Node Image</v-btn
                 >
                 <v-btn class="bg-primary" @click="showDialogue = true">Add/Edit Stellar Payout Address</v-btn>
+                <v-btn class="bg-primary" @click="downloadFarmReceipts(item.value.farmId)"
+                  >Download Minting Receipts</v-btn
+                >
               </v-card-actions>
             </v-row>
           </td>
@@ -110,12 +113,20 @@
 
 <script lang="ts">
 import type { Farm } from "@threefold/gridproxy_client";
+import { jsPDF } from "jspdf";
 import { debounce } from "lodash";
 import { StrKey } from "stellar-sdk";
 import { onMounted, ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import CardDetails from "@/explorer/components/node_details_cards/card_details.vue";
+import {
+  generateNodeSummary,
+  generateReceipt,
+  getNodeAvailability,
+  getNodeMintingFixupReceipts,
+  type NodeInterface,
+} from "@/utils/node";
 
 import { useGrid, useProfileManager } from "../../../stores";
 import { createCustomToast, ToastType } from "../../../utils/custom_toast";
@@ -256,6 +267,48 @@ export default {
       ];
     }
 
+    async function downloadFarmReceipts(farmId: number) {
+      // farm summary receipt
+      const docSum = new jsPDF();
+      const { data, count } = await gridProxyClient.nodes.list({
+        farmIds: farmId.toString(),
+        retCount: true,
+      });
+
+      // show toast & return if farm has no nodes
+      if (count === 0) {
+        createCustomToast("Farm has no nodes.", ToastType.info);
+        return;
+      }
+      const _nodes = data as unknown as NodeInterface[];
+      const nodesWithReceipts = _nodes.map(async (node: NodeInterface) => {
+        try {
+          const network = process.env.NETWORK || (window as any).env.NETWORK;
+          node.receipts = [];
+          if (network == "main") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
+          node.availability = await getNodeAvailability(node.nodeId);
+          console.log("node.availability", node.availability);
+        } catch (error) {
+          createCustomToast(`Couldn't download farm reciepts. ${error}`, ToastType.danger);
+        }
+
+        return node;
+      });
+      const nodes = await Promise.all(nodesWithReceipts);
+      generateNodeSummary(docSum, nodes);
+      docSum.addPage();
+
+      // each node receipt
+      nodes.map((node: any, i: number) => {
+        generateReceipt(docSum, node);
+        docSum.text(`${i + 1}`, 185, docSum.internal.pageSize.height - 10);
+        docSum.addPage();
+      });
+
+      // download the full receipts
+      docSum.save(`farm_${farmId}_receipt.pdf`);
+    }
+
     return {
       gridStore,
       headers,
@@ -275,6 +328,7 @@ export default {
       setStellarAddress,
       customStellarValidation,
       getFarmDetails,
+      downloadFarmReceipts,
     };
   },
 };

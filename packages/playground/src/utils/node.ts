@@ -106,10 +106,10 @@ export async function getNodeAvailability(nodeId: number) {
   return { downtime: downtime, currentPeriod: secondsSinceCurrentPeriodStart };
 }
 
-export function getFarmUptimePercentage(farm: NodeInterface[]) {
+export async function getFarmUptimePercentage(farm: NodeInterface[]) {
   let uptime = 0;
   for (let i = 0; i < farm.length; i++) {
-    uptime += +getNodeUptimePercentage(farm[i].nodeId);
+    uptime += +(await getNodeUptimePercentage(farm[i].nodeId));
   }
   return (uptime / farm.length).toFixed(2);
 }
@@ -124,7 +124,7 @@ export function getTime(num: number | undefined) {
   }
   return new Date();
 }
-export function generateNodeSummary(doc: jsPDF, nodes: NodeInterface[]) {
+export async function generateNodeSummary(doc: jsPDF, nodes: NodeInterface[]) {
   doc.setFontSize(15);
   const topY = 20;
   const topX = 60;
@@ -164,7 +164,7 @@ export function generateNodeSummary(doc: jsPDF, nodes: NodeInterface[]) {
     cellX,
     cellY + lineOffset * 4,
   );
-  doc.text(`Uptime: ${getFarmUptimePercentage(nodes)}%`, cellX, cellY + lineOffset * 5);
+  doc.text(`Uptime: ${await getFarmUptimePercentage(nodes)}%`, cellX, cellY + lineOffset * 5);
 }
 
 export function generatePage(doc: jsPDF, receiptsBatch: receiptInterface[], page: number) {
@@ -254,9 +254,11 @@ export async function generateReceipt(doc: jsPDF, node: NodeInterface) {
     topY + lineOffset * 4,
   );
   doc.text(
-    `Uptime: ${+(await getNodeUptimePercentage(node.nodeId))}% - ${Math.floor(
-      moment.duration(node.uptime, "seconds").asDays(),
-    )} days`,
+    node.uptime === 0
+      ? `Uptime: 0%`
+      : `Uptime: ${+(await getNodeUptimePercentage(node.nodeId))}% - ${Math.floor(
+          moment.duration(node.uptime, "seconds").asDays(),
+        )} days`,
     cellX,
     topY + lineOffset * 5,
   );
