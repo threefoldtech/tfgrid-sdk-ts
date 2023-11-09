@@ -66,7 +66,6 @@
       <v-card-title class="pa-0">Connect your TFChain Wallet</v-card-title>
     </v-card>
     <WebletLayout disable-alerts>
-      <!-- <template #title> Connect your TFChain Wallet </template> -->
       <v-alert variant="tonal" class="mb-6" v-if="activeTab === 0">
         <p :style="{ maxWidth: '880px' }">
           Please visit
@@ -76,7 +75,7 @@
           get started.
         </p>
       </v-alert>
-      
+
       <DTabs
         v-if="!profileManager.profile"
         :tabs="getTabs()"
