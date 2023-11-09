@@ -77,7 +77,7 @@
       </template>
     </ListTable>
     <div class="pt-4">
-      <v-alert variant="tonal" color="secondary" class="pt-4" v-if="contracts.length !== 0"
+      <v-alert variant="tonal" color="secondary" class="pt-4" v-if="contracts.length && totalCost"
         >Total Cost: {{ totalCost }} TFT/hour ≈ {{ (totalCost * 24 * 30).toFixed(3) }} TFT/month</v-alert
       >
     </div>
