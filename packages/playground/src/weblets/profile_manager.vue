@@ -110,7 +110,7 @@
                           if (
                             validateMnemonic(v) ||
                             v.length === 64 ||
-                            v.length === 66 ||
+                            (v.length === 66 && v.startsWith('0x')) ||
                             isAddress(v.length === 64 ? v : v.slice(2))
                           ) {
                             return;
