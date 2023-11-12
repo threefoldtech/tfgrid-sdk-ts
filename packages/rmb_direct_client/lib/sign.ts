@@ -1,5 +1,6 @@
 import { getSharedSecret, utils } from "@noble/secp256k1";
 import { KeyringPair } from "@polkadot/keyring/types";
+import { isAddress } from "@polkadot/util-crypto";
 import { mnemonicToSeedSync, validateMnemonic } from "bip39";
 import { Buffer } from "buffer";
 
@@ -17,11 +18,17 @@ export function sign(payload: string | Uint8Array, signer: KeyringPair) {
 }
 
 export function createShared(pubKey: Uint8Array, hexSeedOrMnemonic: string) {
-  let privateKey: Uint8Array | string = hexSeedOrMnemonic.slice(2);
+  let privateKey: Uint8Array | string;
 
-  if (validateMnemonic(hexSeedOrMnemonic)) {
+  if (hexSeedOrMnemonic.length === 66 && isAddress(hexSeedOrMnemonic)) {
+    privateKey = hexSeedOrMnemonic.slice(2);
+  } else if (hexSeedOrMnemonic.length === 64 && isAddress(`0x${hexSeedOrMnemonic}`)) {
+    privateKey = hexSeedOrMnemonic;
+  } else if (validateMnemonic(hexSeedOrMnemonic)) {
     const seed = mnemonicToSeedSync(hexSeedOrMnemonic);
     privateKey = new Uint8Array(seed).slice(0, 32);
+  } else {
+    throw new Error(`Expected a valid mnemonic or hexSeed in "createShared" but got "${hexSeedOrMnemonic}".`);
   }
 
   const pointX = getSharedSecret(privateKey, pubKey);
