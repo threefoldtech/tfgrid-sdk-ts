@@ -30,6 +30,7 @@
 </template>
 
 <script lang="ts">
+import { onMounted } from "vue";
 interface Card {
   title: string;
   excerpt: string;
@@ -40,6 +41,9 @@ interface Card {
 export default {
   name: "SolutionsView",
   setup() {
+    onMounted(() => {
+      window.scrollTo(0, 0);
+    });
     const cards: Card[] = [
       {
         title: "Full Virtual Machine",
