@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/vm.png"
   >
     <template #title> Deploy a Full Virtual Machine </template>
@@ -204,7 +205,7 @@ const ipv6 = ref(false);
 const planetary = ref(true);
 const wireguard = ref(false);
 const dedicated = ref(false);
-const certified = ref(undefined);
+const certified = ref(false);
 const farm = ref() as Ref<Farm>;
 const loadingFarm = ref(false);
 const disks = ref<Disk[]>([]);
@@ -226,6 +227,15 @@ watch(
   dedicated => {
     if (dedicated === false) {
       hasGPU.value = dedicated;
+    }
+  },
+  { immediate: true },
+);
+watch(
+  selectedNode,
+  selectedNode => {
+    if (selectedNode) {
+      console.log("selectedNode in fullvm: ", selectedNode);
     }
   },
   { immediate: true },

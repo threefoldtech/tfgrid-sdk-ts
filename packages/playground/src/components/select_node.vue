@@ -160,7 +160,11 @@ watch(selectedCards, async () => {
     }
   }
   if (selectedNode.value && selectedCards.value) {
-    emits("update:modelValue", { nodeId: selectedNode.value.nodeId, cards: cards });
+    emits("update:modelValue", {
+      nodeId: selectedNode.value.nodeId,
+      cards: cards,
+      certified: selectedNode.value.certified,
+    });
   }
 });
 
@@ -291,6 +295,7 @@ async function validateNodeStoragePool(validatingNode: INode | undefined) {
     emits("update:modelValue", {
       nodeId: validatingNode.nodeId,
       cards: cards,
+      certified: validatingNode.certified,
     });
   } catch (e) {
     availableNodes.value = availableNodes.value.filter(node => node.nodeId !== validatingNode.nodeId);

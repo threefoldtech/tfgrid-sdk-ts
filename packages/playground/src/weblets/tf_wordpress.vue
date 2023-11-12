@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/wordpress.png"
   >
     <template #title>Deploy a Wordpress Instance </template>
@@ -177,7 +178,7 @@ const flist: Flist = {
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
-const certified = ref(undefined);
+const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));

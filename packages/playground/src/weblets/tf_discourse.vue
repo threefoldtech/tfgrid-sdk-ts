@@ -7,6 +7,7 @@
     :certified="certified"
     :dedicated="dedicated"
     :ipv4="ipv4"
+    :SelectedNode="selectedNode"
     title-image="images/icons/discourse.png"
   >
     <template #title> Deploy a Discourse Instance </template>
@@ -165,7 +166,7 @@ const ipv4 = ref(false);
 const domainNameCmp = ref();
 const smtp = ref(createSMTPServer());
 const dedicated = ref(false);
-const certified = ref(undefined);
+const certified = ref(false);
 const loadingFarm = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));

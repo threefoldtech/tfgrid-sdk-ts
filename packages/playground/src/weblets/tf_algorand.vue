@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/algorand.png"
   >
     <template #title>Deploy a Algorand Instance </template>
@@ -220,7 +221,7 @@ const firstRound = ref(24000000);
 const lastRound = ref(26000000);
 const farm = ref() as Ref<Farm>;
 const dedicated = ref(false);
-const certified = ref(undefined);
+const certified = ref(false);
 const loadingFarm = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const rootFilesystemSize = computed(() => storage.value);

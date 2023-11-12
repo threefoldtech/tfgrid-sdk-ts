@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/nextcloud.png"
   >
     <template #title>Deploy a Nextcloud All-in-One Instance </template>
@@ -119,7 +120,7 @@ const flist: Flist = {
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
-const certified = ref(undefined);
+const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
 const loadingFarm = ref(false);

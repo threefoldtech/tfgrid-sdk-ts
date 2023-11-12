@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/presearch.png"
   >
     <template #title>Deploy a Presearch Instance</template>
@@ -157,7 +158,7 @@ const flist: Flist = {
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
-const certified = ref(undefined);
+const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
 
 async function deploy() {

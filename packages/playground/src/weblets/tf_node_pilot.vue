@@ -7,6 +7,7 @@
     :certified="certified"
     :dedicated="dedicated"
     ipv4
+    :SelectedNode="selectedNode"
     title-image="images/icons/vm.png"
   >
     <template #title>Deploy a Node Pilot</template>
@@ -134,7 +135,7 @@ const flist: Flist = {
   entryPoint: "/",
 };
 const dedicated = ref(false);
-const certified = ref(undefined);
+const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const rootFilesystemSize = 2;
 async function deploy() {

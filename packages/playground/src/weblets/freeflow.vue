@@ -7,6 +7,7 @@
     :certified="certified"
     :dedicated="dedicated"
     :ipv4="ipv4"
+    :SelectedNode="selectedNode"
     title-image="images/icons/freeflow.png"
   >
     <template #title>Deploy a Freeflow Instance </template>
@@ -125,7 +126,7 @@ const farm = ref() as Ref<Farm>;
 const flist = ref<Flist>();
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
-const certified = ref(undefined);
+const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
 const rootFileSystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));

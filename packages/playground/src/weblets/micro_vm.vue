@@ -8,6 +8,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/vm.png"
   >
     <template #title>Deploy a Micro Virtual Machine </template>
@@ -237,7 +238,7 @@ const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
 const network = ref();
 const dedicated = ref(false);
-const certified = ref(undefined);
+const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const loadingFarm = ref(false);
 const rootFilesystemSize = computed(() => solution.value?.disk);
