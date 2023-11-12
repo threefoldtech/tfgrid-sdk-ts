@@ -351,9 +351,9 @@ $router.beforeEach((to, from, next) => {
   if (to.path === "/" && hasActiveProfile) {
     next({ path: "portal/twin" });
   } else {
-    window.scrollTo(0, 0);
     next();
   }
+  window.scrollTo(0, 0);
 });
 </script>
 
