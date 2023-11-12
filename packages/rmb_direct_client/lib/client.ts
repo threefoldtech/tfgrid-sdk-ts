@@ -240,6 +240,9 @@ class Client {
     retries: number = this.retries,
   ) {
     try {
+      // need to check if destination twinId exists by fetching dest twin from chain first
+      this.destTwin = await this.tfclient.twins.get({ id: destinationTwinId });
+
       // create new envelope with given data and destination
       const envelope = new Envelope({
         uid: uuidv4(),
@@ -247,8 +250,6 @@ class Client {
         expiration: expirationMinutes * 60,
         source: this.source,
       });
-      // need to check if destination twinId exists by fetching dest twin from chain first
-      this.destTwin = await this.tfclient.twins.get({ id: destinationTwinId });
       envelope.destination = new Address({ twin: this.destTwin.id });
 
       if (requestCommand) {
