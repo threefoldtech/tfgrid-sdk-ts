@@ -278,7 +278,7 @@ export async function generateReceipt(doc: jsPDF, node: NodeInterface) {
 
 export async function getNodeMintingFixupReceipts(nodeId: number) {
   let nodeReceipts: receiptInterface[] = [];
-  await axios.get(`https://alpha.minting.tfchain.grid.tf/api/v1/node/${nodeId}`).then(res =>
+  await axios.get(`${window.env.MINTING_URL}/api/v1/node/${nodeId}`).then(res =>
     res.data.map(
       (rec: {
         hash: any;

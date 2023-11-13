@@ -2,7 +2,13 @@ import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
-import { AddFarmIPModel, AddStellarModel, CreateFarmModel, FarmIdModel, RemoveFarmIPModel } from "./models";
+import {
+  AddFarmIPModel,
+  AddStellarAddressToFarmModel,
+  CreateFarmModel,
+  FarmIdModel,
+  RemoveFarmIPModel,
+} from "./models";
 import { checkBalance } from "./utils";
 
 class Farms {
@@ -36,7 +42,7 @@ class Farms {
   @expose
   @validateInput
   @checkBalance
-  async addStellarAddress(options: AddStellarModel) {
+  async addStellarAddress(options: AddStellarAddressToFarmModel) {
     return (await this.client.farms.addStellarAddress(options)).apply();
   }
 

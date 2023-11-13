@@ -218,7 +218,7 @@ export default {
           message: "Gateway IP not in the provided IP range.",
         };
       }
-      if (props.publicIP.split("/")[0] === props.gateway || props.toPublicIP.split("/")[0] === props.gateway) {
+      if (props.publicIP?.split("/")[0] === props.gateway || props.toPublicIP?.split("/")[0] === props.gateway) {
         return {
           message: "IPs cannot be the same.",
         };
@@ -256,7 +256,7 @@ export default {
             extrinsics.push(await gridStore.grid.farms.addFarmIp({ farmId, ip: IPs.value[ip], gw }));
             context.emit("add-publicIPs", [{ ip: +ip, gateway: gw }]);
           }
-          await gridStore.grid.utility.batch(extrinsics as unknown as BatchModel<AddFarmIPModel>);
+          await gridStore.grid.utility.batchAll({ extrinsics });
         } else {
           await gridStore.grid.farms.addFarmIp({ farmId, ip: props.publicIP, gw });
           context.emit("add-publicIPs", [{ ip: props.publicIP, gateway: gw }]);

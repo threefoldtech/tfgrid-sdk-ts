@@ -660,8 +660,7 @@ class FarmIdModel {
 
 class FarmPublicIPsModel {
   @Expose() @IsNotEmpty() @IsIP() ip: string;
-  @Expose() @IsNotEmpty() gw: string;
-  @Expose() @IsOptional() contractId?: number;
+  @Expose() @IsNotEmpty() @IsString() gw: string;
 }
 
 class AddFarmIPModel {
@@ -675,8 +674,8 @@ class IPConfig {
   @Expose() @IsNotEmpty() @IsIP() gw: string;
 }
 class PublicConfigModel {
-  @Expose() @IsNotEmpty() @Type(() => IPConfig) @ValidateNested({ each: true }) ip4: IPConfig;
-  @Expose() @IsOptional() @Type(() => IPConfig) @ValidateNested({ each: true }) ip6?: IPConfig;
+  @Expose() @IsNotEmpty() @Type(() => IPConfig) @ValidateNested() ip4: IPConfig;
+  @Expose() @IsOptional() @Type(() => IPConfig) @ValidateNested() ip6?: IPConfig;
   @Expose() @IsString() @IsOptional() domain?: string;
 }
 class AddPublicConfig {
@@ -687,10 +686,10 @@ class AddPublicConfig {
 
 class RemoveFarmIPModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
-  @Expose() @IsNotEmpty() ip: string;
+  @Expose() @IsNotEmpty() @IsString() ip: string;
 }
 
-class AddStellarModel {
+class AddStellarAddressToFarmModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
   @Expose() @IsString() @IsNotEmpty() stellarAddress: string;
 }
@@ -877,7 +876,7 @@ export {
   ListenToMintCompletedModel,
   AddFarmIPModel,
   RemoveFarmIPModel,
-  AddStellarModel,
+  AddStellarAddressToFarmModel,
   AddPublicConfig,
   GetActiveContractsModel,
 };
