@@ -182,7 +182,7 @@ export default {
       () => ({ ...props.modelValue }),
       (old, newValue) => {
         isConfigChanged.value = !_.isEqual(old, newValue) && !_.isEqual(props.modelValue, config.value);
-        formRef.value.validate();
+        formRef.value?.validate();
       },
     );
 

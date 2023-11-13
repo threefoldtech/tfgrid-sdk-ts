@@ -34,6 +34,7 @@ interface QueryFarmsGetOptions {
 interface PublicIp {
   ip: string;
   gw: string;
+  contractId?: number;
 }
 
 interface CreateFarmOptions {
@@ -82,19 +83,19 @@ class Farms extends QueryFarms {
   @checkConnection
   async addFarmIp(options: AddFarmIPOptions) {
     const extrinsic = this.client.api.tx.tfgridModule.addFarmIp(options.farmId, options.ip, options.gw);
-    return this.client.patchExtrinsic<void>(extrinsic);
+    return this.client.patchExtrinsic(extrinsic);
   }
 
   @checkConnection
   async removeFarmIp(options: RemoveFarmIPOptions) {
     const extrinsic = this.client.api.tx.tfgridModule.removeFarmIp(options.farmId, options.ip);
-    return this.client.patchExtrinsic<void>(extrinsic);
+    return this.client.patchExtrinsic(extrinsic);
   }
 
   @checkConnection
   async addStellarAddress(options: AddStellarOptions) {
     const extrinsic = this.client.api.tx.tfgridModule.addStellarPayoutV2address(options.farmId, options.stellarAddress);
-    return this.client.patchExtrinsic<void>(extrinsic);
+    return this.client.patchExtrinsic(extrinsic);
   }
 }
 

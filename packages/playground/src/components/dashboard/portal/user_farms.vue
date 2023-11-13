@@ -62,7 +62,7 @@
                   >Bootstrap Node Image</v-btn
                 >
                 <v-btn class="bg-primary" @click="showDialogue = true">Add/Edit Stellar Payout Address</v-btn>
-                <v-btn class="bg-primary" @click="downloadFarmReceipts(item.value.farmId)"
+                <v-btn v-if="network == 'main'" class="bg-primary" @click="downloadFarmReceipts(item.value.farmId)"
                   >Download Minting Receipts</v-btn
                 >
               </v-card-actions>
@@ -180,6 +180,7 @@ export default {
     const address = ref();
     const isValidAddress = ref(false);
     const isAdding = ref(false);
+    const network = process.env.NETWORK || (window as any).env.NETWORK;
 
     onMounted(async () => {
       await getUserFarms();
@@ -283,9 +284,8 @@ export default {
       const _nodes = data as unknown as NodeInterface[];
       const nodesWithReceipts = _nodes.map(async (node: NodeInterface) => {
         try {
-          const network = process.env.NETWORK || (window as any).env.NETWORK;
           node.receipts = [];
-          if (network == "main") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
+          node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
           node.availability = await getNodeAvailability(node.nodeId);
           console.log("node.availability", node.availability);
         } catch (error) {
@@ -324,6 +324,7 @@ export default {
       isValidAddress,
       isAdding,
       farmsCount,
+      network,
       getUserFarms,
       setStellarAddress,
       customStellarValidation,
