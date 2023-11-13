@@ -95,7 +95,7 @@
                 variant="tonal"
                 @click="AddConfig"
                 :loading="isSaving"
-                :disabled="isSaving || !valid || (!valid && !isConfigChanged)"
+                :disabled="isSaving || !valid || (valid && !isConfigChanged)"
               >
                 Save
               </v-btn>
@@ -205,11 +205,10 @@ export default {
           publicConfig: {
             ip4: { ip: props.modelValue.ipv4, gw: props.modelValue.gw4 },
             ip6:
-              {
-                ip: props.modelValue.ipv6 as string,
-                gw: props.modelValue.gw6 as string,
-              } || undefined,
-            domain: props.modelValue.domain || undefined,
+              props.modelValue.ipv6 && props.modelValue.gw6
+                ? { ip: props.modelValue.ipv6 as string, gw: props.modelValue.gw6 as string }
+                : null,
+            domain: props.modelValue.domain || null,
           },
         });
         createCustomToast("Public config saved successfully.", ToastType.success);
@@ -227,7 +226,6 @@ export default {
         await gridStore.grid.nodes.addNodePublicConfig({
           farmId: props.farmId,
           nodeId: props.nodeId,
-          publicConfig: null,
         });
         createCustomToast("Public config removed successfully.", ToastType.success);
         setTimeout(() => {

@@ -675,13 +675,13 @@ class IPConfig {
 }
 class PublicConfigModel {
   @Expose() @IsNotEmpty() @Type(() => IPConfig) @ValidateNested() ip4: IPConfig;
-  @Expose() @IsOptional() @Type(() => IPConfig) @ValidateNested() ip6?: IPConfig;
-  @Expose() @IsString() @IsOptional() domain?: string;
+  @Expose() @IsOptional() ip6: IPConfig | null;
+  @Expose() @IsOptional() @IsString() domain: string | null;
 }
 class AddPublicConfig {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
-  @Expose() publicConfig: PublicConfigModel | null;
+  @Expose() @IsOptional() @Type(() => PublicConfigModel) @ValidateNested() publicConfig?: PublicConfigModel | null;
 }
 
 class RemoveFarmIPModel {

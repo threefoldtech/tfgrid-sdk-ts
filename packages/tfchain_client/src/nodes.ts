@@ -56,7 +56,7 @@ interface NodeLocation {
 interface NodePublicConfigOptions {
   farmId: number;
   nodeId: number;
-  publicConfig: {
+  publicConfig?: {
     ip4: {
       ip: string;
       gw: string;
@@ -64,9 +64,9 @@ interface NodePublicConfigOptions {
     ip6?: {
       ip: string;
       gw: string;
-    };
-    domain?: string;
-  };
+    } | null;
+    domain?: string | null;
+  } | null;
 }
 export interface QueryNodesGetOptions {
   id: number;
