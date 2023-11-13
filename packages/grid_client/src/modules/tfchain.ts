@@ -307,7 +307,7 @@ class TFChain implements blockchainInterface {
     const hash = MD5(options.content);
     const message_bytes = Uint8Array.from(Buffer.from(hash.toString(), "hex"));
     const keyr = new Keyring({ type: this.keypairType });
-    const key = keyr.addFromMnemonic(mnemonics);
+    const key = keyr.addFromUri(mnemonics);
     await waitReady();
     const signed = key.sign(message_bytes);
     return Buffer.from(signed).toString("hex");
