@@ -104,10 +104,11 @@ class TFKVStoreBackend implements BackendStorageInterface {
       const key = i === 0 ? fromKey : fromKey + "." + i;
       const value = await this.client.kvStore.get({ key, decrypt: false });
       if (value) {
-        const e = await Promise.all([
-          this.client.kvStore.set({ key: toKey, value, encrypt: false }),
-          this.client.kvStore.delete({ key }),
-        ]);
+        const promises = [this.client.kvStore.set({ key: toKey, value, encrypt: false })];
+        if (fromKey !== toKey) {
+          promises.push(this.client.kvStore.delete({ key }));
+        }
+        const e = await Promise.all(promises);
         exts.push(...e.flat(1));
       } else {
         break;
