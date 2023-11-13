@@ -22,6 +22,11 @@
       no-data-text="No contracts found on this account."
       v-bind:onClick:row="loading || deleting ? undefined : onClickRow"
     >
+      <template #[`item.consumption`]="{ item }">
+        <p v-if="item.raw.consumption !== 0">{{ item.raw.consumption.toFixed(3) }} TFT/hour</p>
+        <p v-else>No Data Available</p>
+      </template>
+
       <template #[`item.state`]="{ item }">
         <v-tooltip
           v-if="item && item.value.state === ContractStates.GracePeriod"
@@ -320,11 +325,7 @@ function getNodeStateColor(state: NodeStatus): string {
 function getTotalCost(contracts: NormalizedContract[]) {
   totalCost.value = 0;
   for (const contract of contracts) {
-    const matching = contract.consumption.match(/(\d+(\.\d+)?) TFT\/hour/);
-    if (matching) {
-      const value = new Decimal(matching[1]);
-      totalCost.value = +new Decimal(totalCost.value).add(value);
-    }
+    totalCost.value = +new Decimal(totalCost.value).add(contract.consumption);
   }
   return +totalCost.value.toFixed(3);
 }
