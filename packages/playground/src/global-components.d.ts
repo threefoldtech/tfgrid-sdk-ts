@@ -40,7 +40,7 @@ declare global {
       STELLAR_NETWORK: string;
       STELLAR_HORIZON_URL: string;
       TFT_ASSET_ISSUER: string;
-      TIME_OUT: number;
+      TIMEOUT: number;
     };
   }
 }
