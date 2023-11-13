@@ -71,7 +71,7 @@ test("TC1236 - ZDB: Deploy ZDBs", async () => {
     } as FilterOptions);
   }
   const nodeId = await getOnlineNode(nodes);
-  if (nodeId == -1) return;
+  if (nodeId == -1) throw new Error("no nodes available to complete this test");
 
   //Zdb Model
   const zdb: ZDBModel = {

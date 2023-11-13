@@ -124,14 +124,14 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
     } as FilterOptions);
   }
   const masterNodeId = await getOnlineNode(masterNode);
-  if (masterNodeId == -1) return;
+  if (masterNodeId == -1) throw new Error("no nodes available to complete this test");
   let workerNodeId = await getOnlineNode(workerNode);
-  if (workerNodeId == -1) return;
+  if (workerNodeId == -1) throw new Error("no nodes available to complete this test");
 
   let maxCount = 3;
   while (masterNodeId == workerNodeId && maxCount > 0) {
     workerNodeId = await getOnlineNode(workerNode);
-    if (workerNodeId == -1) return;
+    if (workerNodeId == -1) throw new Error("no nodes available to complete this test");
     maxCount--;
   }
 
@@ -390,14 +390,14 @@ test("TC1232 - Kubernetes: Add Worker", async () => {
     } as FilterOptions);
   }
   const masterNodeId = await getOnlineNode(masterNode);
-  if (masterNodeId == -1) return;
+  if (masterNodeId == -1) throw new Error("no nodes available to complete this test");
   let workerNodeId = await getOnlineNode(workerNode);
-  if (workerNodeId == -1) return;
+  if (workerNodeId == -1) throw new Error("no nodes available to complete this test");
 
   let maxCount = 3;
   while (masterNodeId == workerNodeId && maxCount > 0) {
     workerNodeId = await getOnlineNode(workerNode);
-    if (workerNodeId == -1) return;
+    if (workerNodeId == -1) throw new Error("no nodes available to complete this test");
     maxCount--;
   }
 
@@ -643,14 +643,14 @@ test("TC1233 - Kubernetes: Delete Worker", async () => {
     } as FilterOptions);
   }
   const masterNodeId = await getOnlineNode(masterNode);
-  if (masterNodeId == -1) return;
+  if (masterNodeId == -1) throw new Error("no nodes available to complete this test");
   let workerNodeId = await getOnlineNode(workerNode);
-  if (workerNodeId == -1) return;
+  if (workerNodeId == -1) throw new Error("no nodes available to complete this test");
 
   let maxCount = 3;
   while (masterNodeId == workerNodeId && maxCount > 0) {
     workerNodeId = await getOnlineNode(workerNode);
-    if (workerNodeId == -1) return;
+    if (workerNodeId == -1) throw new Error("no nodes available to complete this test");
     maxCount--;
   }
 

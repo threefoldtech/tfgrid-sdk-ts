@@ -80,13 +80,13 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
     } as FilterOptions);
     if (allNodes.length >= 2) {
       const qsfsNode1 = await getOnlineNode(allNodes);
-      if (qsfsNode1 == -1) return;
+      if (qsfsNode1 == -1) throw new Error("no nodes available to complete this test");
       let qsfsNode2 = await getOnlineNode(allNodes);
-      if (qsfsNode2 == -1) return;
+      if (qsfsNode2 == -1) throw new Error("no nodes available to complete this test");
       let maxCount = 3;
       while (qsfsNode1 == qsfsNode2 && maxCount > 0) {
         qsfsNode2 = await getOnlineNode(allNodes);
-        if (qsfsNode2 == -1) return;
+        if (qsfsNode2 == -1) throw new Error("no nodes available to complete this test");
         maxCount--;
       }
       qsfsNodes.push(qsfsNode1, qsfsNode2);
@@ -110,13 +110,13 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
     } as FilterOptions);
     if (allNodes.length >= 2) {
       const qsfsNode1 = await getOnlineNode(allNodes);
-      if (qsfsNode1 == -1) return;
+      if (qsfsNode1 == -1) throw new Error("no nodes available to complete this test");
       let qsfsNode2 = await getOnlineNode(allNodes);
-      if (qsfsNode2 == -1) return;
+      if (qsfsNode2 == -1) throw new Error("no nodes available to complete this test");
       let maxCount = 3;
       while (qsfsNode1 == qsfsNode2 && maxCount > 0) {
         qsfsNode2 = await getOnlineNode(allNodes);
-        if (qsfsNode2 == -1) return;
+        if (qsfsNode2 == -1) throw new Error("no nodes available to complete this test");
         maxCount--;
       }
       qsfsNodes.push(qsfsNode1, qsfsNode2);
@@ -155,7 +155,7 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
     } as FilterOptions);
   }
   const nodeId = await getOnlineNode(nodes);
-  if (nodeId == -1) return;
+  if (nodeId == -1) throw new Error("no nodes available to complete this test");
 
   //QSFS Model
   const qsfs: QSFSZDBSModel = {
@@ -365,13 +365,13 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
     } as FilterOptions);
     if (allNodes.length >= 2) {
       const qsfsNode1 = await getOnlineNode(allNodes);
-      if (qsfsNode1 == -1) return;
+      if (qsfsNode1 == -1) throw new Error("no nodes available to complete this test");
       let qsfsNode2 = await getOnlineNode(allNodes);
-      if (qsfsNode2 == -1) return;
+      if (qsfsNode2 == -1) throw new Error("no nodes available to complete this test");
       let maxCount = 3;
       while (qsfsNode1 == qsfsNode2 && maxCount > 0) {
         qsfsNode2 = await getOnlineNode(allNodes);
-        if (qsfsNode2 == -1) return;
+        if (qsfsNode2 == -1) throw new Error("no nodes available to complete this test");
         maxCount--;
       }
       qsfsNodes.push(qsfsNode1, qsfsNode2);
@@ -395,13 +395,13 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
     } as FilterOptions);
     if (allNodes.length >= 2) {
       const qsfsNode1 = await getOnlineNode(allNodes);
-      if (qsfsNode1 == -1) return;
+      if (qsfsNode1 == -1) throw new Error("no nodes available to complete this test");
       let qsfsNode2 = await getOnlineNode(allNodes);
-      if (qsfsNode2 == -1) return;
+      if (qsfsNode2 == -1) throw new Error("no nodes available to complete this test");
       let maxCount = 3;
       while (qsfsNode1 == qsfsNode2 && maxCount > 0) {
         qsfsNode2 = await getOnlineNode(allNodes);
-        if (qsfsNode2 == -1) return;
+        if (qsfsNode2 == -1) throw new Error("no nodes available to complete this test");
         maxCount--;
       }
       qsfsNodes.push(qsfsNode1, qsfsNode2);
@@ -472,13 +472,13 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
     } as FilterOptions);
   }
   const masterNodeId = await getOnlineNode(masterNode);
-  if (masterNodeId == -1) return;
+  if (masterNodeId == -1) throw new Error("no nodes available to complete this test");
   let workerNodeId = await getOnlineNode(workerNode);
-  if (workerNodeId == -1) return;
+  if (workerNodeId == -1) throw new Error("no nodes available to complete this test");
   let maxCount = 3;
   while (masterNodeId == workerNodeId && maxCount > 0) {
     workerNodeId = await getOnlineNode(workerNode);
-    if (workerNodeId == -1) return;
+    if (workerNodeId == -1) throw new Error("no nodes available to complete this test");
     maxCount--;
   }
 

@@ -64,7 +64,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
     availableFor: await gridClient.twins.get_my_twin_id(),
   } as FilterOptions);
   const gatewayNodeId = await getOnlineNode(gatewayNodes);
-  if (gatewayNodeId == -1) return;
+  if (gatewayNodeId == -1) throw new Error("no nodes available to complete this test");
 
   //Node Selection
   let nodes;
@@ -96,7 +96,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
     } as FilterOptions);
   }
   const nodeId = await getOnlineNode(nodes);
-  if (nodeId == -1) return;
+  if (nodeId == -1) throw new Error("no nodes available to complete this test");
 
   //VM Model
   const vms: MachinesModel = {
