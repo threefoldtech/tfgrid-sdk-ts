@@ -3,17 +3,25 @@ import { log } from "./utils";
 
 async function main() {
   const grid3 = await getClient();
-  try {
-    log(await grid3.zos.pingNode({ nodeId: 15 }));
-  } catch {
-    log(`node 15 is offline`);
-  }
-  try {
-    log(await grid3.zos.pingNode({ nodeId: 1111111111 }));
-  } catch {
-    log("node 111111 is offline");
-  }
+  const node1 = 1;
+  const node2 = 1111111111;
+
+  await pingNode(grid3, { nodeId: node1 });
+
+  await pingNode(grid3, { nodeId: node2 });
+
   await grid3.disconnect();
+}
+
+async function pingNode(client, nodeId) {
+  try {
+    const res = await client.zos.pingNode(nodeId);
+    log("================= Ping result =================");
+    log(res);
+    log("================= Ping result =================");
+  } catch (error) {
+    log(`Node ${nodeId.nodeId} is offline`);
+  }
 }
 
 main();

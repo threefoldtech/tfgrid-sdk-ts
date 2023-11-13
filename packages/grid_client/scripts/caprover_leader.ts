@@ -46,27 +46,56 @@ async function main() {
 
   // create VMs Object
   const vms = new MachinesModel();
-  vms.name = "newVMS5";
+  vms.name = "newVMS51";
   vms.network = n;
   vms.machines = [vm];
   vms.metadata = "";
   vms.description = "caprover leader machine/node";
 
-  // deploy vms
-  const res = await grid3.machines.deploy(vms);
-  log(res);
+  //Deploy Caprover cluster
+  await deploy(grid3, vms);
 
-  // get the deployment
-  const l = await grid3.machines.getObj(vms.name);
-  log(l);
+  //Get the deployment
+  await getDeployment(grid3, vms.name, vm);
 
-  log(`You can access Caprover via the browser using: https://captain.${vm.env.CAPROVER_ROOT_DOMAIN}`);
-
-  // // delete
-  // const d = await grid3.machines.delete({ name: vms.name });
-  // log(d);
+  //Uncomment the line below to cancel the deployment
+  // await cancel(grid3, { name: vms.name });
 
   await grid3.disconnect();
+}
+
+async function deploy(client, vms) {
+  try {
+    const res = await client.machines.deploy(vms);
+    log("================= Deploying Caprover cluster =================");
+    log(res);
+    log("================= Deploying Caprover cluster =================");
+  } catch (error) {
+    log("Error while Deploying the VM " + error);
+  }
+}
+
+async function getDeployment(client, vms, vm) {
+  try {
+    const res = await client.machines.getObj(vms);
+    log("================= Getting deployment information =================");
+    log(res);
+    log(`You can access Caprover via the browser using: http://captain.${vm.env.CAPROVER_ROOT_DOMAIN}`);
+    log("================= Getting deployment information =================");
+  } catch (error) {
+    log("Error while getting the deployment " + error);
+  }
+}
+
+async function cancel(client, vms) {
+  try {
+    const res = await client.machines.delete(vms);
+    log("================= Canceling the deployment =================");
+    log(res);
+    log("================= Canceling the deployment =================");
+  } catch (error) {
+    log("Error while canceling the deployment " + error);
+  }
 }
 
 main();

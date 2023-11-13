@@ -60,19 +60,49 @@ async function main() {
   k.description = "test deploying k8s via ts grid3 client";
   k.ssh_key = config.ssh_key;
 
-  // deploy
-  const res = await grid3.k8s.deploy(k);
-  log(res);
+  //Deploy K8s
+  await deploy(grid3, k);
 
-  // get the deployment
-  const l = await grid3.k8s.getObj(k.name);
-  log(l);
+  //Get the deployment
+  await getDeployment(grid3, k.name);
 
-  // // delete
-  // const d = await grid3.k8s.delete({ name: k.name });
-  // log(d);
+  //Uncomment the line below to cancel the deployment
+  // await cancel(grid3, { name: k.name });
 
   await grid3.disconnect();
+}
+
+async function deploy(client, k8s) {
+  try {
+    const res = await client.k8s.deploy(k8s);
+    log("================= Deploying K8s =================");
+    log(res);
+    log("================= Deploying K8s =================");
+  } catch (error) {
+    log("Error while Deploying the cluster " + error);
+  }
+}
+
+async function getDeployment(client, k8s) {
+  try {
+    const res = await client.k8s.getObj(k8s);
+    log("================= Getting deployment information =================");
+    log(res);
+    log("================= Getting deployment information =================");
+  } catch (error) {
+    log("Error while getting the deployment " + error);
+  }
+}
+
+async function cancel(client, k8s) {
+  try {
+    const res = await client.k8s.delete(k8s);
+    log("================= Canceling the deployment =================");
+    log(res);
+    log("================= Canceling the deployment =================");
+  } catch (error) {
+    log("Error while canceling the deployment " + error);
+  }
 }
 
 main();

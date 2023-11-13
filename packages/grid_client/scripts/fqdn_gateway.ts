@@ -18,19 +18,49 @@ async function main() {
   // the backends have to be in this format `http://ip:port` or `https://ip:port`, and the `ip` pingable from the node so using the ygg ip or public ip if available.
   gw.backends = ["http://185.206.122.35:8000"];
 
-  // deploy
-  const res = await grid3.gateway.deploy_fqdn(gw);
-  log(res);
+  //Deploy VMs
+  await deploy(grid3, gw);
 
-  // get the deployment
-  const l = await grid3.gateway.getObj(gw.name);
-  log(l);
+  //Get the deployment
+  await getDeployment(grid3, gw.name);
 
-  // // delete
-  // const d = await grid3.gateway.delete_fqdn({ name: gw.name });
-  // log(d);
+  //Uncomment the line below to cancel the deployment
+  // await cancel(grid3, { name: gw.name });
 
   grid3.disconnect();
+}
+
+async function deploy(client, gw) {
+  try {
+    const res = await client.gateway.deploy_fqdn(gw);
+    log("================= Deploying FQDN gateway =================");
+    log(res);
+    log("================= Deploying FQDN gateway =================");
+  } catch (error) {
+    log("Error while Deploying the gateway " + error);
+  }
+}
+
+async function getDeployment(client, gw) {
+  try {
+    const res = await client.gateway.getObj(gw);
+    log("================= Getting deployment information =================");
+    log(res);
+    log("================= Getting deployment information =================");
+  } catch (error) {
+    log("Error while getting the deployment " + error);
+  }
+}
+
+async function cancel(client, gw) {
+  try {
+    const res = await client.gateway.delete_fqdn(gw);
+    log("================= Canceling the deployment =================");
+    log(res);
+    log("================= Canceling the deployment =================");
+  } catch (error) {
+    log("Error while canceling the deployment " + error);
+  }
 }
 
 main();

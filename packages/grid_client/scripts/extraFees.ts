@@ -6,21 +6,37 @@ async function main() {
 
   const node = { nodeId: 73 };
 
-  const extraFees = await grid3.contracts.setDedicatedNodeExtraFee({ ...node, extraFee: 5 });
+  const extraFee = 5;
 
-  console.log(extraFees);
+  //Set extra fee
+  await setExtraFee(grid3, node, extraFee);
 
-  grid3.contracts
-    .getDedicatedNodeExtraFee(node)
-    .then(res => {
-      log(res);
-    })
-    .catch(err => {
-      throw err;
-    })
-    .finally(() => {
-      grid3.disconnect();
-    });
+  //Get extra fee
+  await getExtraFee(grid3, node);
+
+  await grid3.disconnect();
+}
+
+async function setExtraFee(client, node, extraFee) {
+  try {
+    const res = await client.contracts.setDedicatedNodeExtraFee({ ...node, extraFee: extraFee });
+    log("================= Setting extra fee =================");
+    log(res);
+    log("================= Setting extra fee =================");
+  } catch (error) {
+    log("Error while setting extra fee " + error);
+  }
+}
+
+async function getExtraFee(client, node) {
+  try {
+    const res = await client.contracts.getDedicatedNodeExtraFee(node);
+    log("================= Getting extra fee =================");
+    log(res);
+    log("================= Getting extra fee =================");
+  } catch (error) {
+    log("Error while getting extra fee " + error);
+  }
 }
 
 main();

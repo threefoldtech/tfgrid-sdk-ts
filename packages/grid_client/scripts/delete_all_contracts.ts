@@ -4,17 +4,21 @@ import { log } from "./utils";
 async function main() {
   const grid3 = await getClient();
 
-  grid3.contracts
-    .cancelMyContracts()
-    .then(cancellation_res => {
-      log(cancellation_res);
-    })
-    .catch(err => {
-      throw err;
-    })
-    .finally(() => {
-      grid3.disconnect();
-    });
+  //Delete all contracts
+  await deleteAllContracts(grid3);
+
+  await grid3.disconnect();
+}
+
+async function deleteAllContracts(client) {
+  try {
+    const res = await client.contracts.cancelMyContracts();
+    log("================= Deleting all contracts =================");
+    log(res);
+    log("================= Deleting all contracts =================");
+  } catch (error) {
+    log("Error while deleting contracts " + error);
+  }
 }
 
 main();
