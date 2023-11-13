@@ -63,8 +63,7 @@ function calcDiskSize(disks: { size: number }[]) {
 
 async function deploy(layout: any) {
   layout.setStatus("deploy");
-  const grid = await getGrid(profileManager.profile!);
-  console.log(props.data.deploymentName);
+  const grid = await getGrid(profileManager.profile!, props.data.deploymentName);
 
   deployWorker(grid!, {
     ...worker.value,
