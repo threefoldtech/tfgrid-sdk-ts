@@ -103,7 +103,6 @@
 </template>
 
 <script lang="ts">
-import type { AddFarmIPModel, BatchModel } from "@threefold/grid_client";
 import { contains } from "cidr-tools";
 import { getIPRange } from "get-ip-range";
 import { default as PrivateIp } from "private-ip";
@@ -113,7 +112,6 @@ import { IPType } from "@/utils/types";
 
 import { useGrid } from "../../../stores";
 import { createCustomToast, ToastType } from "../../../utils/custom_toast";
-
 export default {
   name: "AddIP",
   props: {
@@ -251,10 +249,17 @@ export default {
           addIPs();
         }
         if (IPs.value && IPs.value.length > 1) {
-          const extrinsics = [];
+          const extrinsics: any[] = [];
           for (const ip in IPs.value) {
-            extrinsics.push(await gridStore.grid.farms.addFarmIp({ farmId, ip: IPs.value[ip], gw }));
-            context.emit("add-publicIPs", [{ ip: +ip, gateway: gw }]);
+            extrinsics.push(
+              await gridStore.grid.tfchain.tfClient.farms.client.api.tx.tfgridModule.addFarmIp(
+                farmId,
+                IPs.value[ip],
+                gw,
+              ),
+            );
+
+            context.emit("add-publicIPs", [{ ip: IPs.value[ip], gateway: gw }]);
           }
           await gridStore.grid.utility.batchAll({ extrinsics });
         } else {
