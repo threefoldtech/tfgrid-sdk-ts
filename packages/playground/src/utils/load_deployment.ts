@@ -59,7 +59,7 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     const timeoutPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
         reject(new Error("Timeout"));
-      }, 10000);
+      }, window.env.TIME_OUT);
     });
 
     try {
@@ -157,7 +157,7 @@ export async function loadK8s(grid: GridClient) {
       const timeoutPromise = new Promise((resolve, reject) => {
         setTimeout(() => {
           reject(new Error("Timeout"));
-        }, 10000);
+        }, window.env.TIME_OUT);
       });
 
       const result = await Promise.race([clusterPromise, timeoutPromise]);
