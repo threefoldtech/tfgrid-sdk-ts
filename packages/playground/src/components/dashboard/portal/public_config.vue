@@ -212,6 +212,8 @@ export default {
           },
         });
         createCustomToast("Public config saved successfully.", ToastType.success);
+        context.emit("add-config", props.modelValue);
+        showDialogue.value = false;
       } catch (error) {
         console.log(error);
         createCustomToast(`Failed to save config. ${error}.`, ToastType.danger);
@@ -228,9 +230,14 @@ export default {
           nodeId: props.nodeId,
         });
         createCustomToast("Public config removed successfully.", ToastType.success);
-        setTimeout(() => {
-          context.emit("remove-config");
-        }, 5000);
+        context.emit("remove-config", {
+          ipv4: "",
+          gw4: "",
+          ipv6: "",
+          gw6: "",
+          domain: "",
+        });
+        showDialogue.value = false;
       } catch (error) {
         console.log(error);
         createCustomToast(`Failed to remove config. ${error}`, ToastType.danger);
