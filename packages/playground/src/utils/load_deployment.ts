@@ -1,7 +1,5 @@
 import type { GridClient } from "@threefold/grid_client";
 
-import { ProjectName } from "@/types";
-
 import { formatConsumption } from "./contracts";
 import { getGrid, updateGrid } from "./grid";
 import { normalizeError } from "./helpers";
@@ -136,7 +134,7 @@ export function getWireguardConfig(grid: GridClient, name: string) {
     .finally(() => updateGrid(grid, { projectName }));
 }
 
-export type K8S = { masters: any[]; workers: any[]; deploymentName: string; wireguard?: any };
+export type K8S = { masters: any[]; workers: any[]; deploymentName: string; projectName: string; wireguard?: any };
 export async function loadK8s(grid: GridClient) {
   await migrateModule(grid.k8s);
 

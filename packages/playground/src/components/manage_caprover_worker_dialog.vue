@@ -81,12 +81,11 @@
 import { ref } from "vue";
 
 import { useProfileManager } from "../stores";
-import { ProjectName } from "../types";
 import { addMachine, deleteMachine, loadVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import rootFs from "../utils/root_fs";
 
-const props = defineProps<{ master: any; data: any[] }>();
+const props = defineProps<{ master: any; data: any[]; projectName: string }>();
 const emits = defineEmits<{ (event: "close"): void; (event: "update:caprover", data: any): void }>();
 
 const profileManager = useProfileManager();
@@ -113,7 +112,7 @@ async function deploy(layout: any) {
 
   try {
     layout.value?.validateSSH();
-    const grid = await getGrid(profileManager.profile!, props.master?.projectName);
+    const grid = await getGrid(profileManager.profile!, props.projectName);
 
     await layout.validateBalance(grid);
 
@@ -153,7 +152,7 @@ async function deploy(layout: any) {
 
 async function onDelete(cb: (workers: any[]) => void) {
   deleting.value = true;
-  const grid = await getGrid(profileManager.profile!, ProjectName.Caprover.toLowerCase());
+  const grid = await getGrid(profileManager.profile!, props.projectName);
   for (const worker of selectedWorkers.value) {
     console.log(props.master.name, worker.name);
 
