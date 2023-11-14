@@ -16,7 +16,7 @@ disk.mountpoint = "/testdisk";
 // create vm node Object
 const vm = new MachineModel();
 vm.name = "testvm";
-vm.node_id = 1;
+vm.node_id = 17;
 vm.disks = [disk];
 vm.public_ip = false;
 vm.planetary = true;

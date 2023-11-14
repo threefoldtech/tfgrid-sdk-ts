@@ -99,38 +99,18 @@ async function main() {
   k.description = "test deploying k8s via ts grid3 client";
   k.ssh_key = config.ssh_key;
 
-  // // deploy qsfs
-  // const res = await grid3.qsfs_zdbs.deploy(qsfs);
-  // log(">>>>>>>>>>>>>>>QSFS backend has been created<<<<<<<<<<<<<<<");
-  // log(res);
+  //Deploy QSFS
+  await deployQsfs(grid3, qsfs);
 
-  // const kubernetes = await grid3.k8s.deploy(k);
-  // log(">>>>>>>>>>>>>>>kubernetes has been created<<<<<<<<<<<<<<<");
-  // log(kubernetes);
+  //Deploy K8s
+  await deploy(grid3, k);
 
-  // // get the deployment
-  // const l = await grid3.k8s.getObj(k.name);
-  // log(">>>>>>>>>>>>>>>Deployment result<<<<<<<<<<<<<<<");
-  // log(l);
+  //Get the deployment
+  await getDeployment(grid3, k.name);
 
-  // // delete
-  // const d = await grid3.k8s.delete({ name: k.name });
-  // log(d);
-  // const r = await grid3.qsfs_zdbs.delete({ name: qsfs_name });
-  // log(r);
-
-  // //Deploy QSFS
-  // await deployQsfs(grid3, qsfs);
-
-  // //Deploy K8s
-  // await deploy(grid3, k);
-
-  // //Get the deployment
-  // await getDeployment(grid3, k.name);
-
-  //Uncomment the line below to cancel the deployment
-  await cancel(grid3, { name: k.name });
-  await deleteQsfs(grid3, { name: qsfs_name });
+  // //Uncomment the line below to cancel the deployment
+  // await cancel(grid3, { name: k.name });
+  // await deleteQsfs(grid3, { name: qsfs_name });
 
   await grid3.disconnect();
 }

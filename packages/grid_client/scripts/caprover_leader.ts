@@ -46,7 +46,7 @@ async function main() {
 
   // create VMs Object
   const vms = new MachinesModel();
-  vms.name = "newVMS51";
+  vms.name = "newVMS5";
   vms.network = n;
   vms.machines = [vm];
   vms.metadata = "";
