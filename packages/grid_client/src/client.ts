@@ -1,11 +1,13 @@
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
+import type AwaitLock from "await-lock";
+import { validateMnemonic } from "bip39";
 import * as PATH from "path";
 import urlJoin from "url-join";
 
 import { Graphql } from "./clients";
 import { TFClient } from "./clients/tf-grid/client";
 import { ClientOptions, GridClientConfig, NetworkEnv } from "./config";
-import { send } from "./helpers";
+import { migrateKeysEncryption, send, toHexSeed } from "./helpers";
 import { isExposed } from "./helpers/expose";
 import { generateString } from "./helpers/utils";
 import * as modules from "./modules/index";
@@ -16,6 +18,8 @@ import { KeypairType } from "./zos/deployment";
 class GridClient {
   static rmbClients: Map<string, RMBClient> = new Map();
   static connecting = new Set<string>();
+  static migrationLock = new Map<string, AwaitLock>();
+  static migrated = new Set<string>();
   config: GridClientConfig;
   rmbClient: RMBClient;
   tfclient: TFClient;
@@ -45,11 +49,19 @@ class GridClient {
   bridge: modules.bridge;
   modules: string[] = [];
 
+  readonly _mnemonic: string;
+
   constructor(public clientOptions: ClientOptions) {
+    if (!clientOptions.storeSecret && validateMnemonic(clientOptions.mnemonic)) {
+      this._mnemonic = clientOptions.mnemonic;
+    }
+
+    const hexSeed = toHexSeed(clientOptions.mnemonic);
+
     this.clientOptions = {
-      mnemonic: clientOptions.mnemonic,
+      mnemonic: hexSeed,
       network: clientOptions.network,
-      storeSecret: clientOptions.storeSecret ? clientOptions.storeSecret : clientOptions.mnemonic,
+      storeSecret: clientOptions.storeSecret ? clientOptions.storeSecret : hexSeed,
       projectName: clientOptions.projectName ? clientOptions.projectName : "",
       keypairType: clientOptions.keypairType ? clientOptions.keypairType : KeypairType.sr25519,
       backendStorageType: clientOptions.backendStorageType ? clientOptions.backendStorageType : BackendStorageType.auto,
@@ -131,6 +143,9 @@ class GridClient {
       throw Error(`Couldn't find a user for the provided mnemonic on ${this.clientOptions.network} network.`);
     }
     this._connect();
+
+    await migrateKeysEncryption.apply(this, [GridClient]);
+
     GridClient.connecting.delete(key);
   }
 

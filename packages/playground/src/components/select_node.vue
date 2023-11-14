@@ -287,9 +287,16 @@ async function validateNodeStoragePool(validatingNode: INode | undefined) {
     availableNodes.value = availableNodes.value.filter(node => node.nodeId !== validatingNode.nodeId);
     validator.value?.setStatus(ValidatorStatus.Invalid);
     emptyResult.value = true;
-    return {
-      message: `Couldn't fit the required disks in Node ${validatingNode.nodeId} storage pools, please select another node`,
-    };
+
+    if (e?.toString().includes("Cannot fit the required SSD disk with size")) {
+      return {
+        message: `Although node ${validatingNode.nodeId} appears to have sufficient storage capacity for your workload, it lacks a single internal partition capable of accommodating it. Please select a different node.`,
+      };
+    } else {
+      return {
+        message: "Something went wrong while checking status of the node. Please check your connection and try again.",
+      };
+    }
   } finally {
     pingingNode.value = false;
     farmManager?.setLoading(false);

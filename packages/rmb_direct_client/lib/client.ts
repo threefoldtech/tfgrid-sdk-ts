@@ -361,7 +361,7 @@ class Client {
   async createSigner() {
     await waitReady();
     const keyring = new Keyring({ type: this.keypairType });
-    this.signer = keyring.addFromMnemonic(this.mnemonics);
+    this.signer = keyring.addFromUri(this.mnemonics);
   }
   updateSource() {
     this.source.twin = this.twin.id;
