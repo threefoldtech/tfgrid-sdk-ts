@@ -66,16 +66,14 @@ watch(
   mixedFarmFilters,
   async () => {
     const queries = getFarmQueries(mixedFarmFilters.value);
-    if (isValidForm.value) {
-      await request(queries);
-    }
+    await request(queries);
   },
   { deep: true },
 );
 const inputFiltersReset = (nFltrNptsVal: FilterFarmInputs) => {
   mixedFarmFilters.value.inputs = nFltrNptsVal;
-  nFltrNptsVal.farmId;
-  nFltrNptsVal.farmName;
+  nFltrNptsVal.farmId.value = undefined;
+  nFltrNptsVal.name.value = undefined;
 };
 const openDialog = (item: Farm) => {
   selectedFarm.value = item;

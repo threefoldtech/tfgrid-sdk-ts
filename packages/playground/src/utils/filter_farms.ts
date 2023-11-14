@@ -3,7 +3,7 @@ import { isAlphanumeric, isInt, isNumeric } from "./validators";
 
 export type FilterFarmInputs = {
   farmId: InputFilterType;
-  farmName: InputFilterType;
+  name: InputFilterType;
 };
 export const inputsInitializer: FilterFarmInputs = {
   farmId: {
@@ -12,7 +12,7 @@ export const inputsInitializer: FilterFarmInputs = {
     rules: [[isNumeric("Should be a number"), isInt("should be an integer")]],
     type: "text",
   },
-  farmName: {
+  name: {
     label: "Farm Name",
     placeholder: "e.g myfarm",
     rules: [[isAlphanumeric("Farm name should be made of either numbers or letters")]],

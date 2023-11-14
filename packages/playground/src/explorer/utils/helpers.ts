@@ -123,8 +123,8 @@ export const toBytes = (resource: number | undefined): number => {
 export const getFarmQueries = (mixedFilters: MixedFarmFilter): Partial<FarmsQuery> => {
   const options: Partial<FarmsQuery> = {
     retCount: true,
-    farmId: mixedFilters.inputs.farmId.value ? +mixedFilters.inputs.farmId.value.trim() : undefined,
-    name: mixedFilters.inputs.farmName.value ? mixedFilters.inputs.farmName.value.toLowerCase().trim() : undefined,
+    farmId: +mixedFilters.inputs.farmId.value! || undefined,
+    name: mixedFilters.inputs.name.value ? mixedFilters.inputs.name.value.toLowerCase().trim() : undefined,
   };
 
   return options;
