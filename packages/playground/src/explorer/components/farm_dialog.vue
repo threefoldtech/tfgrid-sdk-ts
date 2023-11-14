@@ -1,10 +1,10 @@
 <template>
   <v-dialog v-model="dialog" hide-overlay transition="dialog-bottom-transition" :scrim="false">
     <v-container>
-      <v-toolbar>
+      <v-toolbar :height="35">
         <div class="d-flex justify-center">
           <v-btn icon dark @click="() => $emit('close-dialog', false)">
-            <v-icon>mdi-close</v-icon>
+            <v-icon size="20s">mdi-close</v-icon>
           </v-btn>
         </div>
       </v-toolbar>
