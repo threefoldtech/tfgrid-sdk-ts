@@ -95,7 +95,7 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-// import type { FilterOptions } from "@threefold/grid_client";
+import type { FilterOptions } from "@threefold/grid_client";
 import { type PropType, type Ref, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
@@ -245,7 +245,8 @@ watch(
       //   console.log("nodes", nodes);
       // }
 
-      selectedNode.value = { nodeId: Number(value) };
+      // selectedNode.value = { nodeId: Number(value) };
+      checkRentedNode();
     }
   },
   { deep: false },
@@ -268,6 +269,41 @@ watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
 
 function getChipColor(item: any) {
   return item === "Dedicated" ? "success" : "secondary";
+}
+async function checkRentedNode() {
+  const grid = await getGrid(profileManager.profile!);
+  // const filters = props.filters;
+  console.log("filters.rentedBy ", profileManager.profile?.twinId);
+  const filters: FilterOptions = {
+    rentedBy: profileManager.profile?.twinId,
+  };
+  console.log("selectedNode.value ", ManualselectedNode.value);
+  const filters2 = props.filters;
+  //   const filters: FilterOptions = {
+  //   farmId: options.farmId ? options.farmId : undefined,
+  //   cru: options.cpu,
+  //   mru: Math.round(options.memory / 1024),
+  //   sru: options.diskSizes.reduce((total, disk) => total + disk),
+  //   publicIPs: options.ipv4,
+  //   hasGPU: options.hasGPU,
+  //   rentedBy: options.rentedBy ? grid.twinId : undefined,
+  //   certified: options.certified,
+  //   availableFor: grid.twinId,
+  // };
+  const nodes = await grid?.capacity.filterNodes(filters);
+  const node = await grid?.capacity.nodes.getNode(Number(ManualselectedNode.value));
+  console.log("node ", node);
+
+  if (node?.rentedByTwinId !== profileManager.profile?.twinId && node?.rentedByTwinId !== 0) {
+    errorMessage.value = `Node ${ManualselectedNode.value} is rented by someone else`;
+    loadingNodes.value = false;
+  }
+  // console.log(node?.)
+  // else if(node?.cru !== ){
+  // }
+  // else if(){
+
+  // }
 }
 
 async function loadNodes(farmId: number | undefined) {
