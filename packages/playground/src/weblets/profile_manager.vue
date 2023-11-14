@@ -18,17 +18,22 @@
           </p>
           <template v-else-if="balance">
             <p>
-              Balance: <strong :style="{ color: '#76e2c8' }">{{ normalizeBalance(balance.free, true) }} TFT</strong>
+              Balance:
+              <strong :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'">
+                {{ normalizeBalance(balance.free, true) }} TFT
+              </strong>
             </p>
             <p>
               Locked:
-              <strong :style="{ color: '#76e2c8' }">{{ normalizeBalance(balance.locked, true) || 0 }} TFT</strong>
+              <strong :class="theme.name.value === AppThemeSelection.light ? 'text-primary' : 'text-info'">
+                {{ normalizeBalance(balance.locked, true) || 0 }} TFT
+              </strong>
               <v-tooltip text="Locked balance documentation" location="bottom right">
                 <template #activator="{ props }">
                   <v-btn
                     @click.stop
                     v-bind="props"
-                    color="white"
+                    :color="theme.name.value === AppThemeSelection.light ? 'black' : 'white'"
                     icon="mdi-information-outline"
                     height="24px"
                     width="24px"
@@ -85,13 +90,13 @@
             <FormValidator v-model="isValidForm">
               <v-alert type="warning" variant="tonal" class="mb-6" v-if="activeTab === 1" color="primary">
                 <p :style="{ maxWidth: '880px' }">
-                  To connect your wallet, you will need to enter your mnemonic which will be encrypted using the
-                  password. Mnemonic will never be shared outside of this device.
+                  To connect your wallet, you will need to enter your Mnemonic or Hex Seed which will be encrypted using
+                  the password. Mnemonic or Hex Seed will never be shared outside of this device.
                 </p>
               </v-alert>
               <VTooltip
                 v-if="activeTab === 1"
-                text="Mnemonic are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing mnemonic or click the 'Create Account' button to create an account and generate mnemonic."
+                text="Mnemonic or Hex Seed are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing (Mnemonic or Hex Seed) or click the 'Create Account' button to create an account and generate mnemonic."
                 location="bottom"
                 max-width="700px"
               >
@@ -100,19 +105,28 @@
                     <InputValidator
                       :value="mnemonic"
                       :rules="[
-                        validators.required('Mnemonic is required.'),
-                        v => (validateMnemonic(v) ? undefined : { message: `Mnemonic doesn't seem to be valid.` }),
+                        validators.required('Mnemonic or Hex Seed is required.'),
+                        v => {
+                          if (
+                            validateMnemonic(v) ||
+                            ((v.length === 64 || v.length === 66) && isAddress(v.length === 66 ? v : `0x${v}`))
+                          ) {
+                            return;
+                          }
+
+                          return { message: 'Mnemonic or Hex Seed doesn\'t seem to be valid.' };
+                        },
                       ]"
                       :async-rules="[validateMnInput]"
-                      valid-message="Mnemonic is valid."
+                      valid-message="Mnemonic or Hex Seed is valid."
                       #="{ props: validationProps }"
                       ref="mnemonicInput"
                       :disable-validation="creatingAccount || activatingAccount || activating"
                     >
                       <div v-bind="tooltipProps">
                         <VTextField
-                          label="Mnemonic"
-                          placeholder="Please insert your mnemonic"
+                          label="Mnemonic or Hex Seed"
+                          placeholder="Please insert your Mnemonic or Hex Seed"
                           v-model="mnemonic"
                           v-bind="{ ...passwordInputProps, ...validationProps }"
                           :disabled="creatingAccount || activatingAccount || activating"
@@ -191,7 +205,7 @@
                   ref="passwordInput"
                 >
                   <v-tooltip
-                    location="bottom"
+                    location="top right"
                     text="Used to encrypt your mnemonic on your local system, and is used to login from the same device."
                   >
                     <template #activator="{ props: tooltipProps }">
@@ -252,7 +266,7 @@
       <template v-if="profileManager.profile">
         <PasswordInputWrapper #="{ props }">
           <VTextField
-            label="Mnemonic"
+            label="Your Hex Seed"
             readonly
             v-model="profileManager.profile.mnemonic"
             v-bind="props"
@@ -361,12 +375,16 @@
 </template>
 
 <script lang="ts" setup>
+import { isAddress } from "@polkadot/util-crypto";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import md5 from "md5";
 import { computed, onMounted, type Ref, ref, watch } from "vue";
 import { nextTick } from "vue";
+import { useTheme } from "vuetify";
 import { generateKeyPair } from "web-ssh-keygen";
+
+import { AppThemeSelection } from "@/utils/app_theme";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useInputRef } from "../hooks/input_validator";
@@ -387,6 +405,8 @@ interface Credentials {
   passwordHash?: string;
   mnemonicHash?: string;
 }
+
+const theme = useTheme();
 
 const props = defineProps({
   modelValue: {

@@ -45,7 +45,7 @@
             <v-form>
               <v-text-field
                 readonly
-                label="Mnemonic"
+                label="Hex Seed"
                 :value="$store.state.profile.mnemonic"
                 :type="showMnemonic ? 'text' : 'password'"
                 :append-icon="showMnemonic ? 'mdi-eye-outline' : 'mdi-eye-off-outline'"
@@ -116,16 +116,16 @@
               @submit.prevent="connect"
             >
               <v-alert type="warning" text>
-                To connect your wallet, you will need to enter your mnemonic which will be encrypted using the password.
-                Mnemonic will never be shared outside of this device.
+                To connect your wallet, you will need to enter your Mnemonic or Hex Seed which will be encrypted using
+                the password. Mnemonic or Hex Seed will never be shared outside of this device.
               </v-alert>
 
               <v-tooltip bottom>
                 <template #activator="{ on, attrs }">
                   <div v-on="on" v-bind="attrs">
                     <v-text-field
-                      label="Mnemonic"
-                      placeholder="Please insert your mnemonic"
+                      label="Mnemonic or Hex Seed"
+                      placeholder="Please insert your Mnemonic or Hex Seed"
                       :error-messages="mnemonicError || activateAccountError"
                       :value="mnemonic"
                       @input="
@@ -142,8 +142,9 @@
                 </template>
 
                 <p class="font-weight-black" :style="{ maxWidth: '600px' }">
-                  Mnemonic are your private key. They are used to represent you on the ThreeFold Grid. You can paste
-                  existing mnemonic or click the 'Create Account' button to create an account and generate mnemonic.
+                  Mnemonic or Hex Seed are your private key. They are used to represent you on the ThreeFold Grid. You
+                  can paste existing (Mnemonic/Hex Seed) or click the 'Create Account' button to create an account and
+                  generate mnemonic.
                 </p>
               </v-tooltip>
 
@@ -244,6 +245,7 @@
 
 <script lang="ts">
 import type { ApiPromise } from "@polkadot/api";
+import { isAddress } from "@polkadot/util-crypto";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import md5 from "md5";
@@ -326,18 +328,32 @@ export default class TfChainConnector extends Vue {
     return this.mnemonicError?.toLowerCase().includes("couldn't find a user for the provided mnemonic") ?? false;
   }
 
+  _isValidAddress(address: string) {
+    if (address.length === 66) {
+      return isAddress(address);
+    }
+
+    if (address.length === 64) {
+      return isAddress("0x" + address);
+    }
+
+    return false;
+  }
+
   @Watch("mnemonic")
   async checkMnemonic(mnemonic: string = this.mnemonic) {
     this.validatingMnemonic = true;
     this.mnemonicError = null;
 
-    if (!mnemonic) this.mnemonicError = "Mnemonic is required.";
-    else if (!validateMnemonic(mnemonic)) this.mnemonicError = "Mnemonic doesn't seem to be valid.";
+    if (!mnemonic) this.mnemonicError = "Mnemonic or Hex Seed is required.";
+    else if (!validateMnemonic(mnemonic) && !this._isValidAddress(mnemonic))
+      this.mnemonicError = "Mnemonic or Hex Seed doesn't seem to be valid.";
     else {
       try {
         await getGrid(mnemonic);
       } catch (err) {
-        this.mnemonicError = (err as any).message || "Couldn't connect to chain using the provided mnemonic.";
+        this.mnemonicError =
+          (err as any).message || "Couldn't connect to chain using the provided mnemonic or hex seed.";
       }
     }
 
@@ -412,7 +428,6 @@ export default class TfChainConnector extends Vue {
   public validateLoginPassword(value: string) {
     if (!value) return "Password is required";
     if (value.length < 6) return "Password must be at least 6 characters.";
-    console.log(localStorage.getItem(key));
 
     const wallet = JSON.parse(localStorage.getItem(key) || "{}");
     if (wallet.password !== md5(value)) return "Please provide a valid password.";
@@ -460,7 +475,7 @@ export default class TfChainConnector extends Vue {
       if (msg.toLowerCase().includes("couldn't find a user for the provided mnemonic")) {
         this.activateAccountModal = true;
       } else {
-        this.mnemonicError = msg || "Failed to connect mnemonic on grid.";
+        this.mnemonicError = msg || "Failed to connect mnemonic or hex seed on grid.";
       }
     } finally {
       this.connecting = false;

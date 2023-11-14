@@ -1,5 +1,5 @@
 # choose the Image which has Node installed already
-FROM node:18 AS build
+FROM node:18.16.0 AS build
 
 # add arg for the network
 ARG NETWORK
@@ -13,9 +13,6 @@ WORKDIR /app
 # copy project files and folders to the current working directory (i.e. 'app' folder)
 COPY . .
 
-# increase the max memory for node
-ENV NODE_OPTIONS="--max-old-space-size=8192 --openssl-legacy-provider"
-
 # install project dependencies
 RUN yarn install && yarn workspace @threefold/weblets deps
 
@@ -23,7 +20,12 @@ RUN yarn install && yarn workspace @threefold/weblets deps
 RUN cd packages/weblets/playground && yarn add @threefold/grid_client@${VERSION}
 
 # build project solutions
-RUN yarn lerna run build --no-private && yarn workspace @threefold/weblets build:app
+RUN yarn lerna run build --no-private
+
+# increase the max memory for node
+ENV NODE_OPTIONS="--max-old-space-size=8192 --openssl-legacy-provider"
+
+RUN yarn workspace @threefold/weblets build:app
 
 # install nginx
 FROM nginx:1.19-alpine

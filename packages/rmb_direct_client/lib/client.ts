@@ -145,7 +145,10 @@ class Client {
       }
       console.log(err);
       throw new Error({
-        message: `Unable to establish a connection with the RMB server. Please check your internet connection and try again. If the problem persists, please contact our support.`,
+        message: `Unable to establish a connection with the RMB server ${this.relayUrl.replace(
+          "wss://",
+          "",
+        )}. Please check your internet connection and try again. If the problem persists, please contact our support.`,
       });
     }
   }
@@ -237,6 +240,9 @@ class Client {
     retries: number = this.retries,
   ) {
     try {
+      // need to check if destination twinId exists by fetching dest twin from chain first
+      this.destTwin = await this.tfclient.twins.get({ id: destinationTwinId });
+
       // create new envelope with given data and destination
       const envelope = new Envelope({
         uid: uuidv4(),
@@ -244,8 +250,6 @@ class Client {
         expiration: expirationMinutes * 60,
         source: this.source,
       });
-      // need to check if destination twinId exists by fetching dest twin from chain first
-      this.destTwin = await this.tfclient.twins.get({ id: destinationTwinId });
       envelope.destination = new Address({ twin: this.destTwin.id });
 
       if (requestCommand) {
@@ -358,7 +362,7 @@ class Client {
   async createSigner() {
     await waitReady();
     const keyring = new Keyring({ type: this.keypairType });
-    this.signer = keyring.addFromMnemonic(this.mnemonics);
+    this.signer = keyring.addFromUri(this.mnemonics);
   }
   updateSource() {
     this.source.twin = this.twin.id;

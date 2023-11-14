@@ -2,6 +2,8 @@ import { type FilterOptions, GatewayFQDNModel, GatewayNameModel, type GridClient
 
 import { SolutionCode } from "@/types";
 
+import { migrateModule } from "./migration";
+
 export function loadGatewayNodes(grid: GridClient, options: Omit<FilterOptions, "gateway"> = {}) {
   return grid.capacity
     .filterNodes({

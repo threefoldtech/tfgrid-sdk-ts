@@ -1,6 +1,11 @@
 <template>
   <v-container>
-    <v-dialog transition="dialog-bottom-transition" max-width="1000" v-model="depositDialog" persistent>
+    <v-dialog
+      transition="dialog-bottom-transition"
+      max-width="1000"
+      v-model="depositDialog"
+      @update:model-value="closeDialog"
+    >
       <v-card>
         <v-toolbar color="primary" dark class="d-flex justify-center bold-text"> Deposit TFT </v-toolbar>
         <v-card-text>
@@ -40,14 +45,14 @@
               </v-col>
               <v-divider class="my-4" horizontal></v-divider>
             </v-row>
-            <v-alert type="warning" variant="tonal" class="d-flex row justify-start mb-6" color="primary">
+            <v-alert type="warning" variant="tonal" class="d-flex row justify-start" color="primary">
               <p :style="{ maxWidth: '880px' }">
                 Amount: should be larger than {{ depositFee }}TFT (deposit fee is: {{ depositFee }}TFT)
               </p>
             </v-alert>
           </v-container>
           <v-card-actions class="justify-end">
-            <v-btn color="primary" class="bold-text" @click="closeDialog"> Close </v-btn>
+            <v-btn variant="outlined" color="anchor" class="mr-2 text-subtitle-2" @click="closeDialog"> Close </v-btn>
           </v-card-actions>
         </v-card-text>
       </v-card>

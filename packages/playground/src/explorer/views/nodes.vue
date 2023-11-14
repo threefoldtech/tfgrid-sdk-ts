@@ -1,19 +1,18 @@
 <template>
-  <node-filters
-    :form-disabled="isFormLoading"
-    v-model="filterInputs"
-    v-model:valid="isValidForm"
-    @update:model-value="inputFiltersReset"
-  />
-
-  <div class="hint mb-2 mt-3">
+  <div class="hint">
     <v-alert type="info" variant="tonal">
       Node statuses are updated every 90 minutes. For a realtime status, please click on the row.
     </v-alert>
   </div>
 
   <view-layout>
-    <div class="nodes">
+    <node-filters
+      :form-disabled="isFormLoading"
+      v-model="filterInputs"
+      v-model:valid="isValidForm"
+      @update:model-value="inputFiltersReset"
+    />
+    <div class="nodes mt-5">
       <div class="nodes-inner">
         <v-row>
           <v-col cols="12">
@@ -241,3 +240,8 @@ export default {
   },
 };
 </script>
+<style scoped>
+.v-label {
+  font-size: 0.875rem;
+}
+</style>

@@ -6,7 +6,6 @@
         :permanent="permanent"
         :model-value="hasActiveProfile && openSidebar"
         @update:model-value="openSidebar = $event"
-        theme="dark"
       >
         <div :style="{ paddingTop: '64px' }">
           <div
@@ -19,14 +18,16 @@
               <template v-for="route in routes" :key="route.title">
                 <v-list-group v-if="route.items.length > 1" :value="route.title">
                   <template v-slot:activator="{ props }">
-                    <v-list-item v-bind="props" :prepend-icon="route.icon" :title="route.title"></v-list-item>
+                    <v-list-item style="font-weight: 500" v-bind="props" :prepend-icon="route.icon">
+                      <v-list-item-title class="font-weight-bold">{{ route.title }}</v-list-item-title>
+                    </v-list-item>
                   </template>
                   <v-list-item
                     v-for="item in route.items"
                     :key="item.route"
                     :value="item.route"
                     @click="clickHandler(item)"
-                    color="secondary"
+                    :color="theme.name.value === AppThemeSelection.light ? 'primary' : 'info'"
                     :active="$route.path === item.route"
                   >
                     <template v-slot:prepend v-if="item.icon">
@@ -40,7 +41,7 @@
                       <v-icon v-else width="26">{{ item.icon }}</v-icon>
                     </template>
 
-                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                    <v-list-item-title class="font-weight-bold">{{ item.title }}</v-list-item-title>
                   </v-list-item>
                 </v-list-group>
                 <v-list-item
@@ -49,8 +50,8 @@
                   :key="item.route"
                   :value="item.route"
                   @click="clickHandler(item)"
-                  color="secondary"
                   :active="$route.path === item.route"
+                  :color="theme.name.value === AppThemeSelection.light ? 'primary' : 'info'"
                 >
                   <template v-slot:prepend v-if="item.icon">
                     <v-img
@@ -63,7 +64,7 @@
                     <v-icon v-else width="26">{{ item.icon }}</v-icon>
                   </template>
 
-                  <v-list-item-title>{{ item.title }}</v-list-item-title>
+                  <v-list-item-title class="font-weight-bold">{{ item.title }}</v-list-item-title>
                 </v-list-item>
               </template>
             </v-list>
@@ -80,14 +81,16 @@
       </v-navigation-drawer>
 
       <v-main :style="{ paddingTop: '70px' }">
-        <v-toolbar
-          color="rgb(49, 49, 49)"
-          class="position-fixed pr-2"
-          theme="dark"
-          :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }"
-        >
+        <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }">
           <v-toolbar-title class="custom-toolbar-title">
-            <v-img :src="baseUrl + 'images/logoTF.png'" width="160px" />
+            <v-img
+              :src="`${
+                theme.name.value === AppThemeSelection.light
+                  ? baseUrl + 'images/logoTF_dark.png'
+                  : baseUrl + 'images/logoTF_light.png'
+              }`"
+              width="160px"
+            />
           </v-toolbar-title>
 
           <v-spacer>
@@ -139,8 +142,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useTheme } from "vuetify";
 
 import { useProfileManager } from "./stores/profile_manager";
 
@@ -151,10 +155,16 @@ const network = process.env.NETWORK || (window as any).env.NETWORK;
 
 const openProfile = ref(true);
 const hasActiveProfile = computed(() => !!profileManager.profile);
+const theme = useTheme();
+
 watch(
   () => $route.meta,
   meta => (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
 );
+
+onMounted(() => {
+  (window as any).loaded = true;
+});
 
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
@@ -215,7 +225,7 @@ const routes: AppRoute[] = [
   },
   {
     title: "Playground",
-    items: [{ title: "Solutions", icon: "vm.png", route: "/solutions" }],
+    items: [{ title: "Solutions", icon: "mdi-lightbulb-on-outline", route: "/solutions" }],
   },
   {
     title: "My Account",
@@ -319,6 +329,8 @@ $router.beforeEach((to, from, next) => {
 </script>
 
 <script lang="ts">
+import { AppThemeSelection } from "@/utils/app_theme";
+
 import AppInfo from "./components/app_info.vue";
 import AppTheme from "./components/app_theme.vue";
 import ConnectWalletLanding from "./components/connect_wallet_landing.vue";
@@ -404,10 +416,14 @@ export default {
 }
 
 .v-tooltip > .v-overlay__content {
-  opacity: 10;
-  color: white;
+  // background: var(--v-theme-surface);
+  border-color: rgba(var(--v-border-color), var(--v-border-opacity)) !important;
+  border-width: thin !important;
+  border-style: solid !important;
+  z-index: 99;
+  background-color: rgb(var(--v-theme-background));
+  color: var(--v-theme-text);
   font-weight: 900;
-  background-color: rgb(71, 70, 70);
 }
 
 a {
@@ -432,12 +448,42 @@ a {
 .mosha__toast__content-wrapper {
   margin-bottom: -2px;
 }
+.mosha__toast__slot-wrapper {
+  margin-bottom: -2px;
+}
 .mosha__icon {
   margin-right: 6px !important;
   margin-top: 2px;
 }
 
+.mosha__icon__dark__warning {
+  fill: #ffcc00 !important;
+}
+
+.mosha__icon__light__warning {
+  fill: #fb8c00 !important;
+}
+
+.mosha__toast__content.dark__warning {
+  color: #ffcc00;
+}
+
+.mosha__toast__content.light__warning {
+  color: #fb8c00;
+}
+
+.mosha__toast__close-icon.dark__warning::before {
+  color: #ffcc00 !important;
+}
+
+.mosha__toast__close-icon.light__warning::before {
+  color: #fb8c00 !important;
+}
+
 .mosha__toast__content__text {
+  font-size: 14px !important;
+}
+.font-14 {
   font-size: 14px !important;
 }
 </style>

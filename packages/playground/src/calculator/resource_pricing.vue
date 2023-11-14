@@ -1,11 +1,11 @@
 <template>
-  <v-container class="custom-container">
+  <div class="border px-4 pb-4 rounded position-relative mt-2">
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
       <v-icon size="30" class="pr-3">mdi-calculator</v-icon>
       <v-card-title class="pa-0">Pricing Calculator</v-card-title>
     </v-card>
     <v-card class="pa-3">
-      <v-row class="mt-3 px-3 pl-6" style="max-width: 74.7rem">
+      <v-row class="mt-3 px-3 pl-6">
         <v-alert type="info" variant="tonal">
           For more information about Threefold Pricing check <a class="app-link" @click="openManual()">here</a>
         </v-alert>
@@ -169,7 +169,7 @@
                 >
               </p>
               <span class="package">
-                <b>{{ price.packageName != "none" ? price.packageName + " Package: " : "" }}</b></span
+                <b>{{ price.packageName != "none" ? capitalize(price.packageName) + " Package: " : "" }}</b></span
               >
               <b>${{ price.price }}/month, {{ price.TFTs }} TFT/month. </b>
             </span>
@@ -178,11 +178,11 @@
         </v-col>
       </v-row>
     </v-card>
-  </v-container>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { watch } from "vue";
+import { capitalize, watch } from "vue";
 import { onMounted } from "vue";
 import { ref } from "vue";
 
@@ -261,8 +261,8 @@ async function setPriceList(pkgs: any): Promise<PriceType[]> {
       label: "Dedicated Node",
       price: `${pkgs.dedicatedPrice}`,
       color: "black",
-      packageName: pkgs.dedicatedPackage,
-      backgroundColor: color(pkgs.dedicatedPackage),
+      packageName: pkgs.dedicatedPackage.package,
+      backgroundColor: color(pkgs.dedicatedPackage.package),
       TFTs: (+pkgs.dedicatedPrice / TFTPrice.value).toFixed(2),
       info: "A user can reserve an entire node then use it exclusively to deploy solutions",
     },
@@ -270,8 +270,8 @@ async function setPriceList(pkgs: any): Promise<PriceType[]> {
       label: "Shared Node",
       price: `${pkgs.sharedPrice}`,
       color: "black",
-      packageName: pkgs.sharedPackage,
-      backgroundColor: color(pkgs.sharedPackage),
+      packageName: pkgs.sharedPackage.package,
+      backgroundColor: color(pkgs.sharedPackage.package),
       TFTs: (+pkgs.sharedPrice / TFTPrice.value).toFixed(2),
       info: "Shared Nodes allow several users to host various workloads on a single node",
     },

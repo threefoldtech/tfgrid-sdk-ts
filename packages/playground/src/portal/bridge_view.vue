@@ -1,5 +1,5 @@
 <template>
-  <v-container class="custom-container">
+  <div class="border px-4 pb-4 rounded position-relative mt-2">
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
       <v-icon size="30" class="pr-3">mdi-swap-horizontal</v-icon>
       <v-card-title class="pa-0">Transfer TFT Across Chains</v-card-title>
@@ -22,7 +22,7 @@
         <v-btn color="blue" class="ml-auto" @click="navigation">Learn How?</v-btn>
       </v-row>
     </v-card>
-  </v-container>
+  </div>
 
   <!-- Deposit Dialog -->
   <deposit-dialog
@@ -38,7 +38,7 @@
 
   <!-- Withdraw Dialog -->
   <v-container v-if="openWithdrawDialog">
-    <v-dialog transition="dialog-bottom-transition" max-width="1000" v-model="openWithdrawDialog" persistent>
+    <v-dialog transition="dialog-bottom-transition" max-width="1000" v-model="openWithdrawDialog">
       <v-card>
         <v-toolbar color="primary" dark class="bold-text justify-center"> Withdraw TFT </v-toolbar>
         <v-card-text>
@@ -74,8 +74,7 @@
             </v-text-field>
           </v-form>
         </v-card-text>
-        <v-card-actions class="justify-end">
-          <v-btn color="primary" class="bold-text" @click="openWithdrawDialog = false"> Close </v-btn>
+        <v-card-actions class="justify-end pb-4 px-6">
           <v-btn
             class="white--text"
             @click="withdrawTFT(target, amount)"
@@ -83,6 +82,7 @@
             :loading="loadingWithdraw"
             >Send</v-btn
           >
+          <v-btn variant="outlined" color="anchor" class="bold-text" @click="openWithdrawDialog = false"> Close </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -233,7 +233,7 @@ export default {
 }
 
 .bold-text {
-  font-weight: bold;
+  font-weight: 500;
   padding-left: 1rem;
 }
 </style>

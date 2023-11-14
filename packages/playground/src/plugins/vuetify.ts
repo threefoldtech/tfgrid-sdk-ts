@@ -25,12 +25,13 @@ const vuetify = createVuetify({
           info: "#7de3c8",
           warning: "#FFCC00",
           link: "#5695ff",
-          anchor: "#ffffff",
+          anchor: "#9e9e9e",
         },
       },
       light: {
         dark: false,
         colors: {
+          background: "#f6f6f6",
           primary: "#1AA18F",
           info: "#1AA18F",
           secondary: "#14A1B8",
