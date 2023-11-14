@@ -2,6 +2,39 @@ import { FilterOptions, ZDBModel, ZdbModes, ZDBSModel } from "../src";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
+async function deploy(client, zdb) {
+  try {
+    const res = await client.zdbs.deploy(zdb);
+    log("================= Deploying ZDBs =================");
+    log(res);
+    log("================= Deploying ZDBs =================");
+  } catch (error) {
+    log("Error while Deploying the ZDBs " + error);
+  }
+}
+
+async function getDeployment(client, zdb) {
+  try {
+    const res = await client.zdbs.getObj(zdb);
+    log("================= Getting deployment information =================");
+    log(res);
+    log("================= Getting deployment information =================");
+  } catch (error) {
+    log("Error while getting the deployment " + error);
+  }
+}
+
+async function cancel(client, zdb) {
+  try {
+    const res = await client.zdbs.delete(zdb);
+    log("================= Canceling the deployment =================");
+    log(res);
+    log("================= Canceling the deployment =================");
+  } catch (error) {
+    log("Error while canceling the deployment " + error);
+  }
+}
+
 async function main() {
   const grid3 = await getClient();
 
@@ -27,17 +60,14 @@ async function main() {
   zdbs.zdbs = [zdb];
   zdbs.metadata = "";
 
-  // deploy zdb
-  const res = await grid3.zdbs.deploy(zdbs);
-  log(res);
+  //Deploy ZDBs
+  await deploy(grid3, zdbs);
 
-  // get the deployment
-  const l = await grid3.zdbs.getObj(zdbs.name);
-  log(l);
+  //Get the deployment
+  await getDeployment(grid3, zdbs.name);
 
-  // // delete
-  // const d = await grid3.zdbs.delete({ name: zdbs.name });
-  // log(d);
+  //Uncomment the line below to cancel the deployment
+  // await cancel(grid3, { name: zdbs.name });
 
   await grid3.disconnect();
 }

@@ -38,21 +38,6 @@ vms.machines = [vm];
 vms.metadata = "";
 vms.description = "test deploying VMs via ts grid3 client";
 
-async function main() {
-  const grid3 = await getClient();
-
-  //Deploy VMs
-  await deploy(grid3, vms);
-
-  //Get the deployment
-  await getDeployment(grid3, vms.name);
-
-  //Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name: vms.name });
-
-  await grid3.disconnect();
-}
-
 async function deploy(client, vms) {
   try {
     const res = await client.machines.deploy(vms);
@@ -84,6 +69,21 @@ async function cancel(client, vms) {
   } catch (error) {
     log("Error while canceling the deployment " + error);
   }
+}
+
+async function main() {
+  const grid3 = await getClient();
+
+  //Deploy VMs
+  await deploy(grid3, vms);
+
+  //Get the deployment
+  await getDeployment(grid3, vms.name);
+
+  //Uncomment the line below to cancel the deployment
+  // await cancel(grid3, { name: vms.name });
+
+  await grid3.disconnect();
 }
 
 main();

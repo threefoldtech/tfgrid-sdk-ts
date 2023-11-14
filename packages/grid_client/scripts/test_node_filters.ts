@@ -1,38 +1,85 @@
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
+async function getFarms(client) {
+  try {
+    const res = await client.capacity.getFarms();
+    log("================= Getting farms =================");
+    log(res);
+    log("================= Getting farms =================");
+  } catch (error) {
+    log("Error while getting farms " + error);
+  }
+}
+
+async function getNodes(client) {
+  try {
+    const res = await client.capacity.getNodes();
+    log("================= Getting nodes =================");
+    log(res);
+    log("================= Getting nodes =================");
+  } catch (error) {
+    log("Error while getting nodes " + error);
+  }
+}
+
+async function getNodesByFarmId(client, farmId) {
+  try {
+    const res = await client.capacity.getNodesByFarmId(farmId);
+    log("================= Getting nodes =================");
+    log(res);
+    log("================= Getting nodes =================");
+  } catch (error) {
+    log("Error while getting nodes " + error);
+  }
+}
+
+async function getNodeFreeResources(client, nodeId) {
+  try {
+    const res = await client.capacity.getNodeFreeResources(nodeId);
+    log("================= Getting resources =================");
+    log(res);
+    log("================= Getting resources =================");
+  } catch (error) {
+    log("Error while getting resources " + error);
+  }
+}
+
+async function filterNodes(client, filterOptions) {
+  try {
+    const res = await client.capacity.filterNodes(filterOptions);
+    log("================= Filtering nodes =================");
+    log(res);
+    log("================= Filtering nodes =================");
+  } catch (error) {
+    log("Error while filtering nodes " + error);
+  }
+}
+
 async function main() {
   const grid3 = await getClient();
-  try {
-    log("getFarms");
-    const f = await grid3.capacity.getFarms();
-    log(f);
 
-    log("getNodes");
-    const n = await grid3.capacity.getNodes();
-    log(n);
+  //Get farms
+  await getFarms(grid3);
 
-    log("getNodesByFarmID(1)");
-    const z = await grid3.capacity.getNodesByFarmId({ farmId: 1 });
-    log(z);
+  //Get nodes
+  await getNodes(grid3);
 
-    log("NodeFreeResources(1)");
-    const c = await grid3.capacity.getNodeFreeResources({ nodeId: 14 });
-    log(c);
+  //Get nodes by farm Id
+  await getNodesByFarmId(grid3, { farmId: 1 });
 
-    log("filterNodes");
-    const x = await grid3.capacity.filterNodes({
-      country: "Belgium",
-      publicIPs: true,
-      cru: 20,
-      sru: 50,
-    });
-    log(x);
-  } catch (e) {
-    console.error(e);
-  } finally {
-    await grid3.disconnect();
-  }
+  //Get nodes' free resources
+  await getNodeFreeResources(grid3, { nodeId: 14 });
+
+  //Filter nodes
+  await filterNodes(grid3, {
+    country: "Belgium",
+    publicIPs: true,
+    cru: 20,
+    sru: 50,
+  });
+
+  await grid3.disconnect();
 }
 
 main();
