@@ -41,9 +41,9 @@
 
         <SelectVmImage :images="images" v-model="flist" />
         <SelectSolutionFlavor
-          :small="{ cpu: 1, memory: 1024 * 1, disk: 25 }"
-          :medium="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
-          :large="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+          :small="{ cpu: 1, memory: 2, disk: 25 }"
+          :medium="{ cpu: 2, memory: 4, disk: 50 }"
+          :large="{ cpu: 4, memory: 16, disk: 100 }"
           v-model="solution"
           :disabled="loadingFarm"
         />

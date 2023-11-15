@@ -77,9 +77,9 @@
 
       <SelectSolutionFlavor
         v-model="solution"
-        :small="{ cpu: 2, memory: 1024 * 2, disk: 10 }"
-        :medium="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
-        :large="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+        :small="{ cpu: 1, memory: 2, disk: 10 }"
+        :medium="{ cpu: 2, memory: 4, disk: 50 }"
+        :large="{ cpu: 4, memory: 16, disk: 100 }"
         :disabled="loadingFarm"
       />
 
