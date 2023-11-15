@@ -1,4 +1,5 @@
 import * as Dao from "./dao";
 import * as KVStore from "./kvstore";
 import * as SmartContract from "./smart_contract";
-export { Dao, KVStore, SmartContract };
+import * as TFGrid from "./tfgrid";
+export { Dao, KVStore, SmartContract, TFGrid };
