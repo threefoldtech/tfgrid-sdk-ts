@@ -8,7 +8,14 @@
           :form-disabled="isFormLoading"
           v-model:valid="isValidForm"
         />
-        <FarmsTable :items="farms" :loading="loading" :selectedFarm="selectedFarm" @open-dialog="openDialog" />
+
+        <FarmsTable
+          :items="farms"
+          :loading="loading"
+          :selectedFarm="selectedFarm"
+          @open-dialog="openDialog"
+          :count="totalFarms"
+        />
       </v-col>
     </v-row>
     <farmDialog v-if="selectedFarm" :openDialog="isDialogOpened" :farm="selectedFarm" @close-dialog="closeDialog" />
@@ -35,7 +42,7 @@ const filterOptions = ref<FarmFilterOptions>(farmOptionsInitializer);
 const mixedFarmFilters = ref<MixedFarmFilter>({ inputs: filterFarmInputs.value, options: filterOptions.value });
 const isFormLoading = ref<boolean>(true);
 const isValidForm = ref<boolean>(false);
-
+const totalFarms = ref(0);
 const _getFarms = async (queries: Partial<FarmsQuery>) => {
   loading.value = true;
   isFormLoading.value = true;
@@ -54,6 +61,10 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
       };
     });
   }
+  if (farms.value) {
+    totalFarms.value = farms.value.length;
+  }
+
   isFormLoading.value = false;
   loading.value = false;
 };

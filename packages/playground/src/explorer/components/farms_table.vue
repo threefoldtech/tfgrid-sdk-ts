@@ -4,9 +4,15 @@
       <v-col>
         <v-data-table
           :loading="loading"
-          :items-per-page="itemPerPage"
           :headers="headers"
           :items="items"
+          :items-length="count"
+          :items-per-page="$props.size"
+          :items-per-page-options="[
+            { value: 5, title: '5' },
+            { value: 10, title: '10' },
+            { value: 15, title: '15' },
+          ]"
           class="elevation-1"
           @click:row="openSheet"
         >
@@ -31,6 +37,10 @@ export default {
     loading: {
       required: true,
       type: Boolean,
+    },
+    count: {
+      required: true,
+      type: Number,
     },
   },
   setup(props, { emit }) {
