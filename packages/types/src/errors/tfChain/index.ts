@@ -3,4 +3,6 @@ import * as KVStore from "./kvstore";
 import * as SmartContract from "./smart_contract";
 import * as TFGrid from "./tfgrid";
 import * as TFTBridge from "./tft_bridge";
-export { Dao, KVStore, SmartContract, TFGrid, TFTBridge };
+import * as TFTPrice from "./tft_price";
+
+export { Dao, KVStore, SmartContract, TFGrid, TFTBridge, TFTPrice };
