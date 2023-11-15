@@ -564,6 +564,12 @@ export class InvalidDomain extends BaseError {
   }
 }
 
+export class MethodIsDeprecated extends BaseError {
+  constructor(message: string) {
+    super(Errors.MethodIsDeprecated, message);
+  }
+}
+
 export class InterfaceNameTooShort extends BaseError {
   constructor(message: string) {
     super(Errors.InterfaceNameTooShort, message);
