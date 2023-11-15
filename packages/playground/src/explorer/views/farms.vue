@@ -18,7 +18,13 @@
         />
       </v-col>
     </v-row>
-    <farmDialog v-if="selectedFarm" :openDialog="isDialogOpened" :farm="selectedFarm" @close-dialog="closeDialog" />
+    <farmDialog
+      v-if="selectedFarm"
+      :openDialog="isDialogOpened"
+      :farm="selectedFarm"
+      @update:model-value="closeDialog"
+      @close-dialog="closeDialog"
+    />
   </view-layout>
 </template>
 

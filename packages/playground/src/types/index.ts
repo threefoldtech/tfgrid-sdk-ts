@@ -8,7 +8,7 @@ import type * as validators from "../utils/validators";
 export type InputFilterType = {
   label: string;
   placeholder: string;
-  value?: string | undefined;
+  value?: string;
   rules?: [syncRules: SyncRule[], asyncRules?: AsyncRule[]];
   error?: string;
   type: string;
