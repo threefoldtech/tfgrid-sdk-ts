@@ -28,11 +28,6 @@ export const nodeOptionsInitializer: NodeFilterOptions = {
   status: capitalize(NodeStatus.Up) as NodeStatus,
 };
 
-export const farmOptionsInitializer: FarmFilterOptions = {
-  farmId: 1,
-  farmName: "",
-};
-
 export type ResourceWrapper = {
   name: string;
   value: string;
@@ -115,6 +110,6 @@ export type MixedNodeFilter = {
 };
 
 export type MixedFarmFilter = {
-  inputs: FilterFarmInputs;
-  options: FarmFilterOptions;
+  inputs?: FilterFarmInputs;
+  options?: FarmFilterOptions;
 };

@@ -31,14 +31,13 @@ import type { FilterFarmInputs } from "../../utils/filter_farms";
 import { inputsInitializer } from "../../utils/filter_farms";
 import { getFarmQueries, getFarms } from "../utils/helpers";
 import type { FarmFilterOptions, MixedFarmFilter } from "../utils/types";
-import { farmOptionsInitializer } from "../utils/types";
 
 const loading = ref<boolean>(false);
 const farms = ref<Farm[]>();
 const isDialogOpened = ref<boolean>(false);
 const selectedFarm = ref<Farm>();
 const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer);
-const filterOptions = ref<FarmFilterOptions>(farmOptionsInitializer);
+const filterOptions = ref<FarmFilterOptions>();
 const mixedFarmFilters = ref<MixedFarmFilter>({ inputs: filterFarmInputs.value, options: filterOptions.value });
 const isFormLoading = ref<boolean>(true);
 const isValidForm = ref<boolean>(false);
