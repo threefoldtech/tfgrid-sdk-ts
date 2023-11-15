@@ -1,3 +1,3 @@
-import * as DAO from "./dao";
-
-export { DAO };
+import * as Dao from "./dao";
+import * as KVStore from "./kvstore";
+export { Dao, KVStore };
