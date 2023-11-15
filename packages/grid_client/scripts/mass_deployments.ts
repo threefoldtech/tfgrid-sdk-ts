@@ -31,15 +31,10 @@ async function main() {
     for (let i = 0; i < batchSize; i++) {
       const cru = 1;
       const mru = 256;
-      const diskSize = 5;
+      const diskSize = 1;
       const rootFs = 1;
       const vmName = "vm" + generateString(8);
-      const deploymentName = "dep" + generateString(8);
       const publicIp = false;
-
-      const n = new NetworkModel();
-      n.name = "nw" + generateString(5);
-      n.ip_range = "10.238.0.0/16";
 
       // create disk Object
       const disk1 = new DiskModel();
