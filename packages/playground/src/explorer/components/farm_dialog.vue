@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" hide-overlay transition="dialog-bottom-transition" :scrim="false">
+  <v-dialog v-model="dialog" hide-overlay transition="dialog-bottom-transition" :scrim="false" persistent>
     <v-container>
       <v-toolbar :height="35">
         <div class="d-flex justify-center">
