@@ -13,6 +13,7 @@ import {
 import { byCountry } from "country-code-lookup";
 
 import { gridProxyClient } from "@/clients";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import type { MixedFarmFilter, MixedNodeFilter, NodeStatusColor } from "./types";
 
@@ -158,6 +159,7 @@ export async function getFarms(queries: Partial<FarmsQuery>): Promise<Pagination
     return farms;
   } catch (error) {
     console.error("An error occurred while requesting farms:", error);
+    createCustomToast("Failed to get farms!", ToastType.danger);
     throw error;
   }
 }
