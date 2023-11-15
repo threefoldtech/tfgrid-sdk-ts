@@ -1,4 +1,4 @@
-import { BaseError } from "..";
+import { BaseError } from "../base_error";
 export enum Errors {
   TwinNotExists = 1,
   NodeNotExists,

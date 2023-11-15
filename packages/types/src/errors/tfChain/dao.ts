@@ -1,4 +1,4 @@
-import { BaseError } from "../index";
+import { BaseError } from "../base_error";
 
 export enum Errors {
   NoneValue = 1,

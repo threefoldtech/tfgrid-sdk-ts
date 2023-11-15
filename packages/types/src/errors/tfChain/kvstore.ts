@@ -1,4 +1,4 @@
-import { BaseError } from "..";
+import { BaseError } from "../base_error";
 export enum Errors {
   NoValueStored = 1,
   KeyIsTooLarge,

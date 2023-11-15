@@ -1,7 +1,8 @@
 {
   "name": "@threefold/types",
   "version": "1.0.0",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
     "devDependencies": {
     "@types/node": "^18.11.9",

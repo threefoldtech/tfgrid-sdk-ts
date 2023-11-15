@@ -1,8 +1,8 @@
-import * as Dao from "./dao";
-import * as KVStore from "./kvstore";
-import * as SmartContract from "./smart_contract";
-import * as TFGrid from "./tfgrid";
-import * as TFTBridge from "./tft_bridge";
-import * as TFTPrice from "./tft_price";
+import * as dao from "./dao";
+import * as tfkvStore from "./kvstore";
+import * as smartContractModule from "./smart_contract";
+import * as tfgridModule from "./tfgrid";
+import * as tftBridgeModule from "./tft_bridge";
+import * as tftPriceModule from "./tft_price";
 
-export { Dao, KVStore, SmartContract, TFGrid, TFTBridge, TFTPrice };
+export { dao, tfkvStore, smartContractModule, tfgridModule, tftBridgeModule, tftPriceModule };
