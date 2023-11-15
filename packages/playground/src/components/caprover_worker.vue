@@ -19,8 +19,8 @@
 
     <SelectSolutionFlavor
       v-model="$props.modelValue.solution"
-      :small="{ cpu: 1, memory: 1024, disk: 50 }"
-      :medium="{ cpu: 2, memory: 1024 * 2, disk: 100 }"
+      :small="{ cpu: 1, memory: 2, disk: 50 }"
+      :medium="{ cpu: 2, memory: 4, disk: 100 }"
       :disabled="loadingFarm"
     />
 

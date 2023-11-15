@@ -14,7 +14,7 @@ const darkModeColors = {
   default: "#313131",
   info: "#2196F3",
   success: "#1AA18F",
-  warning: "#3C351D",
+  warning: "#FFCC00",
 };
 
 const lightModeColors = {
@@ -22,7 +22,7 @@ const lightModeColors = {
   default: "#313131",
   info: "#2196F3",
   success: "#1AA18F",
-  warning: "#FEF1E0",
+  warning: "#FFCC00",
 };
 
 /**

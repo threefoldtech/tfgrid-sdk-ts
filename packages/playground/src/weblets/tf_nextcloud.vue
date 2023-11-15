@@ -30,9 +30,9 @@
       </input-validator>
 
       <SelectSolutionFlavor
-        :small="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
-        :medium="{ cpu: 4, memory: 1024 * 8, disk: 500 }"
-        :large="{ cpu: 4, memory: 1024 * 16, disk: 1000 }"
+        :small="{ cpu: 2, memory: 4, disk: 50 }"
+        :medium="{ cpu: 4, memory: 8, disk: 500 }"
+        :large="{ cpu: 4, memory: 16, disk: 1000 }"
         v-model="solution"
       />
       <Networks v-model:ipv4="ipv4" :disabled="loadingFarm" />
