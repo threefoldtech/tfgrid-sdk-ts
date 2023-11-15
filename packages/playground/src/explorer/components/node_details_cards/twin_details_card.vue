@@ -61,15 +61,15 @@ export default {
       }
 
       return [
-        { name: "ID", value: twinId },
+        { name: "ID", value: twinId || "-" },
         {
           name: "Account ID",
-          value: accountId,
+          value: accountId || "-",
           icon: "mdi-content-copy",
           callback: copy,
           hint: "Copy the account id to the clipboard.",
         },
-        { name: "Relay", value: relay },
+        { name: "Relay", value: relay || "::1" },
       ];
     };
 
