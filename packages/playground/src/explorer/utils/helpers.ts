@@ -164,10 +164,10 @@ export async function getFarms(queries: Partial<FarmsQuery>): Promise<Pagination
   }
 }
 
-export async function getTwins(queries: Partial<TwinsQuery> = {}): Promise<Pagination<Twin[]>> {
+export async function getFarmTwinByTwinId(queries: Partial<TwinsQuery> = {}): Promise<Twin> {
   try {
     const twins = await gridProxyClient.twins.list(queries);
-    return twins;
+    return twins.data[0] as Twin;
   } catch (error) {
     console.error("An error occurred while requesting twins:", error);
     throw error;

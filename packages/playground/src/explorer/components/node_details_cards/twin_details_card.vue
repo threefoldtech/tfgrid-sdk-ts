@@ -9,7 +9,7 @@ import { onMounted, type PropType, ref } from "vue";
 import type { NodeDetailsCard } from "@/explorer/utils/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
-import { getTwins } from "../../utils/helpers";
+import { getFarmTwinByTwinId } from "../../utils/helpers";
 import CardDetails from "./card_details.vue";
 
 export default {
@@ -35,10 +35,7 @@ export default {
       loading.value = true;
 
       if (props.farm) {
-        const { data } = await getTwins({
-          twinId: props.farm.twinId,
-        });
-        twin.value = data[0];
+        twin.value = await getFarmTwinByTwinId({ twinId: props.farm.twinId });
       } else if (props.node) {
         twin.value = props.node.twin;
       }
