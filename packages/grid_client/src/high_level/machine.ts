@@ -174,7 +174,7 @@ class VMHL extends HighLevelBase {
     let hasAccessNode = false;
     let accessNodes: Record<string, unknown> = {};
     if (addAccess) {
-      accessNodes = await this.nodes.getAccessNodes();
+      accessNodes = await this.nodes.getAccessNodes(this.config.twinId);
       for (const accessNode of Object.keys(accessNodes)) {
         if (network.nodeExists(Number(accessNode))) {
           hasAccessNode = true;
@@ -197,7 +197,7 @@ class VMHL extends HighLevelBase {
       let access_node_id = randomChoice(filteredAccessNodes);
       if (accessNodeId) {
         if (!filteredAccessNodes.includes(accessNodeId))
-          throw Error(`Node ${accessNodeId} is not an access not or maybe it's down`);
+          throw Error(`Node ${accessNodeId} is not an access node or maybe it's down`);
 
         access_node_id = accessNodeId;
       }

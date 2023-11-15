@@ -83,7 +83,7 @@ class Network {
       throw Error(`Node ${node_id} does not exist in the network. Please add it first`);
     }
     events.emit("logs", `Adding access to node ${node_id}`);
-    const accessNodes = await this.capacity.getAccessNodes();
+    const accessNodes = await this.capacity.getAccessNodes(this.config.twinId);
     if (Object.keys(accessNodes).includes(node_id.toString())) {
       if (ipv4 && !accessNodes[node_id]["ipv4"]) {
         throw Error(`Node ${node_id} does not have ipv4 public config.`);
@@ -279,7 +279,7 @@ class Network {
       return this._accessNodes;
     }
     const accessNodes: number[] = [];
-    const allAccessNodes = await this.capacity.getAccessNodes();
+    const allAccessNodes = await this.capacity.getAccessNodes(this.config.twinId);
     for (const accessNode of Object.keys(allAccessNodes)) {
       if (this.nodeExists(+accessNode)) {
         accessNodes.push(+accessNode);

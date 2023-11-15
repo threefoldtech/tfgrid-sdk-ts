@@ -15,6 +15,7 @@
     <input-validator
       ref="validator"
       :rules="[validators.required('Node id is required.')]"
+      :async-rules="[() => validateNodeStoragePool(selectedNode)]"
       :value="selectedNode"
       #="{ props }"
     >
@@ -26,15 +27,13 @@
           item-title="nodeId"
           return-object
           v-model="selectedNode"
-          @update:model-value="selectedNode = $event"
-          :disabled="loadingNodes"
-          :loading="loadingNodes"
+          :disabled="loadingNodes || pingingNode"
           v-bind="{
             ...props,
-            loading: props.loading || loadingNodes,
+            loading: props.loading || loadingNodes || pingingNode,
             hint: pingingNode ? `Checking if the disks will fit in the node's storage pools... ` : props.hint,
-            error: !!errorMessage,
-            errorMessages: !!errorMessage ? errorMessage : undefined,
+            error: !!errorMessage || props.error,
+            errorMessages: errorMessage || props.errorMessages,
           }"
         >
           <template v-slot:item="{ item, props }">
@@ -80,8 +79,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { GridClient } from "@threefold/grid_client";
-import { onMounted, type PropType, type Ref, ref, watch } from "vue";
+import { type PropType, type Ref, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
 
@@ -161,17 +159,6 @@ watch(
   async node => {
     errorMessage.value = ``;
 
-    const grid = await getGrid(profileManager.profile!);
-
-    if (node && grid) {
-      await validateNodeStoragePool(
-        grid,
-        node.nodeId,
-        props.filters.diskSizes.map(disk => disk * 1024 ** 3),
-        props.rootFileSystemSize * 1024 ** 3,
-      );
-    }
-
     if (node && props.filters.hasGPU) {
       loadingCards.value = true;
       const grid = await getGrid(profileManager.profile!);
@@ -231,9 +218,9 @@ async function loadNodes(farmId: number) {
   errorMessage.value = "";
   const filters = props.filters;
   farmManager?.setLoading(true);
-  const grid = await getGrid(profileManager.profile!);
-  if (grid) {
-    try {
+  try {
+    const grid = await getGrid(profileManager.profile!);
+    if (grid) {
       const res = await getFilteredNodes(grid, {
         farmId: farmId,
         cpu: filters.cpu,
@@ -267,36 +254,49 @@ async function loadNodes(farmId: number) {
       } else {
         availableNodes.value = [];
       }
-    } catch (e) {
-      errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
-    } finally {
-      validator.value?.setStatus(ValidatorStatus.Init);
-      loadingNodes.value = false;
-      farmManager?.setLoading(false);
     }
+  } catch (e) {
+    errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
+  } finally {
+    validator.value?.setStatus(ValidatorStatus.Init);
+    loadingNodes.value = false;
+    farmManager?.setLoading(false);
   }
 }
-async function validateNodeStoragePool(grid: GridClient, nodeId: number, disks: number[], rootFileSystemSize: number) {
+
+async function validateNodeStoragePool(validatingNode: INode | undefined) {
+  if (!validatingNode) return { message: "Node id is required." };
   farmManager?.setLoading(true);
   validator.value?.setStatus(ValidatorStatus.Pending);
   pingingNode.value = true;
   try {
+    const grid = await getGrid(profileManager.profile!);
+    if (!grid) throw new Error("Connection issue please try again");
+
     await grid.capacity.checkNodeCapacityPool({
-      nodeId,
-      ssdDisks: disks,
-      rootfsDisks: [rootFileSystemSize],
+      nodeId: validatingNode.nodeId,
+      ssdDisks: props.filters.diskSizes.map(disk => disk * 1024 ** 3),
+      rootfsDisks: [props.rootFileSystemSize * 1024 ** 3],
       hddDisks: [],
     });
     emits("update:modelValue", {
-      nodeId: nodeId,
+      nodeId: validatingNode.nodeId,
       cards: cards,
     });
-    await validator.value?.validate();
   } catch (e) {
-    errorMessage.value = `Couldn't fit the required disks in Node ${nodeId} storage pools, please select another node`;
-    availableNodes.value = availableNodes.value.filter(node => node.nodeId !== nodeId);
+    availableNodes.value = availableNodes.value.filter(node => node.nodeId !== validatingNode.nodeId);
     validator.value?.setStatus(ValidatorStatus.Invalid);
     emptyResult.value = true;
+
+    if (e?.toString().includes("Cannot fit the required SSD disk with size")) {
+      return {
+        message: `Although node ${validatingNode.nodeId} appears to have sufficient storage capacity for your workload, it lacks a single internal partition capable of accommodating it. Please select a different node.`,
+      };
+    } else {
+      return {
+        message: "Something went wrong while checking status of the node. Please check your connection and try again.",
+      };
+    }
   } finally {
     pingingNode.value = false;
     farmManager?.setLoading(false);

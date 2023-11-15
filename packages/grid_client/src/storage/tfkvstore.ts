@@ -1,5 +1,6 @@
 import { SubmittableExtrinsic } from "@polkadot/api-base/types";
 import { ISubmittableResult } from "@polkadot/types/types";
+import { ExtrinsicResult } from "@threefold/tfchain_client";
 
 import { TFClient } from "../clients/tf-grid/client";
 import { KeypairType } from "../zos/deployment";
@@ -91,6 +92,26 @@ class TFKVStoreBackend implements BackendStorageInterface {
     }
     splits[k] = value;
     return splits;
+  }
+
+  public async moveValue(fromKey: string, toKey: string): Promise<ExtrinsicResult<void>[]> {
+    const exts: ExtrinsicResult<void>[] = [];
+
+    for (let i = 0; ; i++) {
+      const key = i === 0 ? fromKey : fromKey + "." + i;
+      const value = await this.client.kvStore.get({ key, decrypt: false });
+      if (value) {
+        const e = await Promise.all([
+          this.client.kvStore.set({ key: toKey, value, encrypt: false }),
+          this.client.kvStore.delete({ key }),
+        ]);
+        exts.push(...e.flat(1));
+      } else {
+        break;
+      }
+    }
+
+    return exts;
   }
 }
 

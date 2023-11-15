@@ -142,7 +142,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
@@ -161,6 +161,10 @@ watch(
   () => $route.meta,
   meta => (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
 );
+
+onMounted(() => {
+  (window as any).loaded = true;
+});
 
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
@@ -370,7 +374,7 @@ export default {
 
 <style lang="scss" global>
 :root {
-  --link-color: #3d7ad4;
+  --link-color: #5695ff;
 }
 
 .app-link {
@@ -444,38 +448,43 @@ a {
 .mosha__toast__content-wrapper {
   margin-bottom: -2px;
 }
+.mosha__toast__slot-wrapper {
+  margin-bottom: -2px;
+}
 .mosha__icon {
   margin-right: 6px !important;
   margin-top: 2px;
 }
 
 .mosha__icon__dark__warning {
-  fill: #ffcc00 !important;
+  fill: #5d5d5d !important;
 }
 
 .mosha__icon__light__warning {
-  fill: #fb8c00 !important;
+  fill: #5d5d5d !important;
 }
 
 .mosha__toast__content.dark__warning {
-  color: #ffcc00;
+  color: #5d5d5d;
 }
 
 .mosha__toast__content.light__warning {
-  color: #fb8c00;
+  color: #5d5d5d;
 }
 
 .mosha__toast__close-icon.dark__warning::before {
-  color: #ffcc00 !important;
+  color: #5d5d5d !important;
 }
 
 .mosha__toast__close-icon.light__warning::before {
-  color: #fb8c00 !important;
+  color: #5d5d5d !important;
 }
 
-.mosha__toast__content__text {
+.mosha__toast {
   font-size: 14px !important;
+  font-weight: 600 !important;
 }
+
 .font-14 {
   font-size: 14px !important;
 }
