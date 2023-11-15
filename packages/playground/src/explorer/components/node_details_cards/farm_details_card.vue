@@ -47,11 +47,11 @@ export default {
       if (props.node) {
         farmId = props.node.farmId.toString();
         farmName = props.node.farm.name;
-        farmStellarAddress = props.node.farm.stellarAddress;
+        farmStellarAddress = props.node.farm.stellarAddress.length ? props.node.farm.stellarAddress : "-";
       } else if (props.farm) {
         farmId = props.farm.farmId.toString();
         farmName = props.farm.name;
-        farmStellarAddress = props.farm.stellarAddress;
+        farmStellarAddress = props.farm.stellarAddress.length ? props.farm.stellarAddress : "-";
       }
       return [
         { name: "ID", value: farmId },

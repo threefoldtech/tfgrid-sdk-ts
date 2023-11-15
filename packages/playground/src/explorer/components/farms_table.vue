@@ -7,7 +7,6 @@
           :headers="headers"
           :items="items"
           :items-length="count"
-          :items-per-page="$props.size"
           :items-per-page-options="[
             { value: 5, title: '5' },
             { value: 10, title: '10' },
