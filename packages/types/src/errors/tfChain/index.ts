@@ -1,3 +1,4 @@
 import * as Dao from "./dao";
 import * as KVStore from "./kvstore";
-export { Dao, KVStore };
+import * as SmartContract from "./smart_contract";
+export { Dao, KVStore, SmartContract };
