@@ -2,7 +2,7 @@
   <div class="table-content">
     <v-row>
       <v-col>
-        <v-data-table
+        <v-data-table-server
           :loading="loading"
           :headers="headers"
           :items="items"
@@ -16,7 +16,7 @@
           @click:row="openSheet"
         >
           <template #loading />
-        </v-data-table>
+        </v-data-table-server>
       </v-col>
     </v-row>
   </div>
@@ -92,7 +92,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .v-data-table-header th,
 .v-data-table-header td {
   white-space: nowrap;
