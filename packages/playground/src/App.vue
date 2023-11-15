@@ -80,7 +80,7 @@
         </template>
       </v-navigation-drawer>
 
-      <v-main :style="{ paddingTop: '70px' }">
+      <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
         <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }">
           <v-toolbar-title class="custom-toolbar-title">
             <v-img
@@ -104,6 +104,34 @@
           <AppTheme />
           <v-divider vertical class="mx-2" />
           <ProfileManager v-model="openProfile" />
+        </v-toolbar>
+
+        <v-toolbar
+          v-if="navbarConfig"
+          :color="theme.name.value === AppThemeSelection.dark ? '#121212' : 'background'"
+          class="border position-fixed py-0 d-flex pr-2"
+          :style="{
+            zIndex: 1005,
+            top: '65.5px',
+            right: 0,
+            width: permanent && openSidebar && hasActiveProfile ? 'calc(100% - 280px)' : '100%',
+          }"
+          height="50"
+        >
+          <v-container>
+            <v-row>
+              <v-breadcrumbs :items="navbarConfig.path" active-color="secondary">
+                <template v-slot:divider>
+                  <v-icon icon="mdi-chevron-right"></v-icon>
+                </template>
+                <template v-slot:item="{ item }">
+                  <router-link :to="item.to" :class="{ 'clickable-item': !item.disabled }">
+                    {{ item.title }}
+                  </router-link>
+                </template>
+              </v-breadcrumbs>
+            </v-row>
+          </v-container>
         </v-toolbar>
 
         <DeploymentListManager>
@@ -156,10 +184,14 @@ const network = process.env.NETWORK || (window as any).env.NETWORK;
 const openProfile = ref(true);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
+const navbarConfig = ref();
 
 watch(
   () => $route.meta,
-  meta => (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
+  meta => {
+    (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
+      (navbarConfig.value = meta.navbarConfig);
+  },
 );
 
 onMounted(() => {
@@ -325,6 +357,7 @@ $router.beforeEach((to, from, next) => {
   } else {
     next();
   }
+  window.scrollTo(0, 0);
 });
 </script>
 
@@ -487,5 +520,9 @@ a {
 
 .font-14 {
   font-size: 14px !important;
+}
+
+.v-breadcrumbs-item--disabled {
+  opacity: 1;
 }
 </style>
