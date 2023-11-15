@@ -16,8 +16,8 @@ export type NodeFilterOptions = {
 };
 
 export type FarmFilterOptions = {
-  farmId: number | undefined;
-  farmName: string | undefined;
+  farmId: number;
+  farmName: string;
 };
 
 export const nodeOptionsInitializer: NodeFilterOptions = {
