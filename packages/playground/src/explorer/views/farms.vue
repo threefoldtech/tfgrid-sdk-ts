@@ -45,27 +45,31 @@ const totalFarms = ref(0);
 const _getFarms = async (queries: Partial<FarmsQuery>) => {
   loading.value = true;
   isFormLoading.value = true;
-
-  const { count, data } = await getFarms(queries);
-  if (data) {
-    farms.value = data.map(farm => {
-      const ips = farm.publicIps;
-      const total = ips.length;
-      const used = ips.filter(x => x.contract_id === 0).length;
-      return {
-        ...farm,
-        totalPublicIp: total,
-        usedPublicIp: used,
-        freePublicIp: total - used,
-      };
-    });
+  try {
+    const { count, data } = await getFarms(queries);
+    if (data) {
+      farms.value = data.map(farm => {
+        const ips = farm.publicIps;
+        const total = ips.length;
+        const used = ips.filter(x => x.contract_id === 0).length;
+        return {
+          ...farm,
+          totalPublicIp: total,
+          usedPublicIp: used,
+          freePublicIp: total - used,
+        };
+      });
+    }
+    if (farms.value) {
+      totalFarms.value = farms.value.length;
+    }
+  } catch (err) {
+    console.log("could not get farms:", err);
+    createCustomToast("Failed to get farms!", ToastType.danger);
+  } finally {
+    isFormLoading.value = false;
+    loading.value = false;
   }
-  if (farms.value) {
-    totalFarms.value = farms.value.length;
-  }
-
-  isFormLoading.value = false;
-  loading.value = false;
 };
 onMounted(async () => {
   await _getFarms({});
@@ -97,8 +101,10 @@ const closeDialog = () => {
 
 <script lang="ts">
 import type { FarmsQuery } from "@threefold/gridproxy_client";
+import { createContext } from "vm";
 
 import Filters from "../../components/filter.vue";
+import { createCustomToast, ToastType } from "../../utils/custom_toast";
 import FarmDialog from "../components/farm_dialog.vue";
 import FarmsTable from "../components/farms_table.vue";
 
