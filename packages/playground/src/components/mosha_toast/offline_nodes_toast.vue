@@ -1,7 +1,7 @@
 <template>
   <div class="mosha__toast__content d-block">
     You have
-    <button class="link-color" :onclick="navigateToContractsList">
+    <button class="text-decoration-underline" :onclick="navigateToContractsList">
       {{ deploymentLen }} {{ deploymentLen > 1 ? "contracts" : "contract" }}
     </button>
     on offline or standby {{ deploymentLen > 1 ? "nodes" : "node" }}
