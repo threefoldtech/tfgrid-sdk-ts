@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --build tsconfig.json"
+  },
   "license": "MIT",
     "devDependencies": {
     "@types/node": "^18.11.9",
