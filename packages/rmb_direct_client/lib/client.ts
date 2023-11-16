@@ -114,11 +114,10 @@ class Client {
       if (!this.twin) {
         throw new Error({ message: "twin does not exist, please create a twin first" });
       }
+      const relayHostName = this.relayUrl.replace("wss://", "").replace("/", "");
       const pk = generatePublicKey(this.mnemonics);
-      if (this.twin.pk !== pk) {
-        await (
-          await this.tfclient.twins.update({ pk, relay: this.relayUrl.replace("wss://", "").replace("/", "") })
-        ).apply();
+      if (this.twin.pk !== pk || this.twin.relay !== relayHostName) {
+        await (await this.tfclient.twins.update({ pk, relay: relayHostName })).apply();
         this.twin.pk = pk;
       }
 

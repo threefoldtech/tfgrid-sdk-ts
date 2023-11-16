@@ -174,7 +174,7 @@ class VMHL extends HighLevelBase {
     let hasAccessNode = false;
     let accessNodes: Record<string, unknown> = {};
     if (addAccess) {
-      accessNodes = await this.nodes.getAccessNodes();
+      accessNodes = await this.nodes.getAccessNodes(this.config.twinId);
       for (const accessNode of Object.keys(accessNodes)) {
         if (network.nodeExists(Number(accessNode))) {
           hasAccessNode = true;

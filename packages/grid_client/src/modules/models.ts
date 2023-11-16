@@ -31,6 +31,12 @@ enum ContractStates {
   GracePeriod = "GracePeriod",
 }
 
+export enum NodeStatus {
+  up = "up",
+  down = "down",
+  standBy = "standby",
+}
+
 //TODO: find a way to validate all fields are passed while casting data to any of these classes.
 class AlgorandAccountCreateModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
@@ -367,9 +373,11 @@ class TwinDeleteModel {
 class KVStoreSetModel {
   @Expose() @IsString() @IsNotEmpty() key: string;
   @Expose() @IsString() @IsNotEmpty() value: string;
+  @Expose() @IsBoolean() @IsOptional() encrypt?: boolean;
 }
 class KVStoreGetModel {
   @Expose() @IsString() @IsNotEmpty() key: string;
+  @Expose() @IsBoolean() @IsOptional() decrypt?: boolean;
 }
 class KVStoreRemoveModel {
   @Expose() @IsString() @IsNotEmpty() key: string;
@@ -573,6 +581,8 @@ class FilterOptions {
   @Expose() @IsOptional() @IsBoolean() hasGPU?: boolean;
   @Expose() @IsOptional() @IsBoolean() rentable?: boolean;
   @Expose() @IsOptional() @IsInt() @Min(1) rentedBy?: number;
+  @Expose() @IsOptional() @IsBoolean() randomize?: boolean;
+  @Expose() @IsOptional() @Transform(({ value }) => NodeStatus[value]) @IsEnum(NodeStatus) status?: NodeStatus;
 }
 
 enum CertificationType {
@@ -597,6 +607,7 @@ class FarmFilterOptions {
   @Expose() @IsOptional() @IsInt() page?: number;
   @Expose() @IsOptional() @IsInt() size?: number;
   @Expose() @IsOptional() @IsInt() farmId?: number;
+  @Expose() @IsOptional() @IsBoolean() randomize?: boolean;
 }
 
 class CalculatorModel {

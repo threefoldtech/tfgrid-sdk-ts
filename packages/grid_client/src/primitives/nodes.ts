@@ -8,7 +8,7 @@ import { RMB } from "../clients";
 import { Graphql } from "../clients/graphql/client";
 import { TFClient } from "../clients/tf-grid/client";
 import { send } from "../helpers/requests";
-import { FarmFilterOptions, FilterOptions } from "../modules/models";
+import { FarmFilterOptions, FilterOptions, NodeStatus } from "../modules/models";
 
 interface FarmInfo {
   name: string;
@@ -112,21 +112,25 @@ class Nodes {
       });
   }
 
-  async getAccessNodes(): Promise<Record<string, unknown>> {
+  async getAccessNodes(availableFor?: number): Promise<Record<string, unknown>> {
     const accessNodes = {};
-    const nodes = await this.filterNodes({ accessNodeV4: true, accessNodeV6: true });
-    for (const node of nodes) {
-      const ipv4 = node.publicConfig.ipv4;
-      const ipv6 = node.publicConfig.ipv6;
-      const domain = node.publicConfig.domain;
-      if (PrivateIp(ipv4.split("/")[0]) === false) {
-        accessNodes[+node.nodeId] = { ipv4: ipv4, ipv6: ipv6, domain: domain };
+    let nodes: NodeInfo[] = [];
+    let page = 1;
+    do {
+      nodes = await this.filterNodes({ accessNodeV4: true, accessNodeV6: true, availableFor, page });
+      for (const node of nodes) {
+        const ipv4 = node.publicConfig.ipv4;
+        const ipv6 = node.publicConfig.ipv6;
+        const domain = node.publicConfig.domain;
+        if (PrivateIp(ipv4.split("/")[0]) === false) {
+          accessNodes[+node.nodeId] = { ipv4: ipv4, ipv6: ipv6, domain: domain };
+        }
       }
-    }
+      page++;
+    } while (nodes.length);
     if (Object.keys(accessNodes).length === 0) {
       throw Error("Couldn't find any node with public config");
     }
-    console.log(accessNodes);
     return accessNodes;
   }
 
@@ -348,12 +352,13 @@ class Nodes {
       city: options.city,
       dedicated: options.dedicated,
       available_for: options.availableFor,
-      status: "up",
+      status: options.status ? options.status : NodeStatus.up,
       page: options.page,
       size: options.size,
       has_gpu: options.hasGPU,
       rented_by: options.rentedBy,
       rentable: options.rentable,
+      randomize: options.randomize,
     };
     if (options.gateway) {
       params["ipv4"] = true;
@@ -383,6 +388,7 @@ class Nodes {
       node_rented_by: options.nodeRentedBy,
       node_certified: options.nodeCertified,
       farm_id: options.farmId,
+      randomize: options.randomize,
     };
     return Object.entries(params)
       .map(param => param.join("="))

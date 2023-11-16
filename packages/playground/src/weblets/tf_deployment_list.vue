@@ -26,7 +26,7 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
 
-          <IconActionBtn icon="mdi-cog" tooltip="Deploy FQDN Gateway" @click="dialog = item.value.deploymentName" />
+          <IconActionBtn icon="mdi-cog" tooltip="Manage Domains" @click="dialog = item.value.deploymentName" />
 
           <ManageGatewayDialog
             v-if="dialog === item.value.deploymentName"
@@ -42,7 +42,7 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
 
-          <IconActionBtn icon="mdi-cog" tooltip="Manage Gateways" @click="dialog = item.value.deploymentName" />
+          <IconActionBtn icon="mdi-cog" tooltip="Manage Domains" @click="dialog = item.value.deploymentName" />
 
           <ManageGatewayDialog
             v-if="dialog === item.value.deploymentName"
@@ -69,6 +69,7 @@
             v-if="dialog === item.value.deploymentName"
             :master="item.value[0]"
             :data="item.value.slice(1)"
+            :project-name="item.value.projectName || item.value[0].projectName"
             @close="dialog = undefined"
             @update:caprover="item.value = $event"
           />
