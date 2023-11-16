@@ -5,7 +5,7 @@ import urlJoin from "url-join";
 
 import { RMB } from "../clients";
 import { Graphql } from "../clients/graphql/client";
-import { send } from "../helpers/requests";
+import { send, sendWithFullResponse } from "../helpers/requests";
 import { FarmFilterOptions, FilterOptions, NodeStatus } from "../modules/models";
 
 interface FarmInfo {
@@ -48,6 +48,8 @@ interface NodeInfo {
   hasGPU: boolean;
   extraFee: number;
   rentedByTwinId: number;
+  inDedicatedFarm: boolean;
+  rentContractId: number;
 }
 interface PublicConfig {
   domain: string;
@@ -318,6 +320,26 @@ class Nodes {
   }
 
   /**
+   * Retrieves the count of available farms with optional filter options.
+   *
+   * @param options - An object containing filter options to refine the farm count.
+   * @param url - (Optional) The URL to send the request to. If not provided, it defaults to the proxy URL defined in the class.
+   * @returns A Promise that resolves to the count of available farms as a number.
+   * @throws Error if there is an issue with the HTTP request or response.
+   */
+  async getFarmsCount(options: FilterOptions = {}, url = ""): Promise<number> {
+    url = url || this.proxyURL;
+    options.ret_count = true;
+    options.page = 1;
+    const query = this.getFarmUrlQuery(options);
+    try {
+      return +(await sendWithFullResponse("get", urlJoin(url, `/farms?${query}`), "", {})).headers["count"];
+    } catch (err) {
+      throw Error(`Error while requesting the grid proxy due ${err}`);
+    }
+  }
+
+  /**
    * Get farm id from farm name.
    * It returns 0 in case the farm name is not found.
    * @param  {string} name
@@ -388,6 +410,7 @@ class Nodes {
       node_certified: options.nodeCertified,
       farm_id: options.farmId,
       randomize: options.randomize,
+      ret_count: options.ret_count,
     };
     return Object.entries(params)
       .map(param => param.join("="))
@@ -408,8 +431,8 @@ class Nodes {
 
   async nodeAvailableForTwinId(nodeId: number, twinId: number): Promise<boolean> {
     return send("get", urlJoin(this.proxyURL, `/nodes/${nodeId}`), "", {})
-      .then(node => {
-        if (node.rentedByTwinId != twinId && (node.dedicated || node.rentContractId != 0)) {
+      .then((node: NodeInfo) => {
+        if (node.rentedByTwinId != twinId && (node.inDedicatedFarm || node.rentContractId != 0)) {
           return false;
         }
         return true;

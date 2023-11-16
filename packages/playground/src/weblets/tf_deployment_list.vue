@@ -69,6 +69,7 @@
             v-if="dialog === item.value.deploymentName"
             :master="item.value[0]"
             :data="item.value.slice(1)"
+            :project-name="item.value.projectName || item.value[0].projectName"
             @close="dialog = undefined"
             @update:caprover="item.value = $event"
           />
@@ -407,22 +408,28 @@ watch(activeTab, () => (selectedItems.value = []));
 async function onDelete(k8s = false) {
   deletingDialog.value = false;
   deleting.value = true;
-  const grid = await getGrid(profileManager.profile!);
-  for (const item of selectedItems.value) {
-    try {
-      await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
-        name: item.deploymentName,
-        projectName: item.projectName,
-        k8s,
-      });
-    } catch (e: any) {
-      console.log("Error while deleting deployment", e.message);
+  try {
+    const grid = await getGrid(profileManager.profile!);
+    for (const item of selectedItems.value) {
+      try {
+        await deleteDeployment(updateGrid(grid!, { projectName: item.projectName }), {
+          name: item.deploymentName,
+          projectName: item.projectName,
+          k8s,
+        });
+      } catch (e: any) {
+        createCustomToast(`Failed to delete deployment with name: ${item.deploymentName}`, ToastType.danger);
+        console.log("Error while deleting deployment", e.message);
+        continue;
+      }
+      table.value?.loadDeployments();
     }
+  } catch (e) {
+    createCustomToast((e as Error).message, ToastType.danger);
+  } finally {
+    selectedItems.value = [];
+    deleting.value = false;
   }
-
-  selectedItems.value = [];
-  table.value?.loadDeployments();
-  deleting.value = false;
 }
 
 const VMS: string[] = [ProjectName.Fullvm, ProjectName.VM, ProjectName.NodePilot];
@@ -459,6 +466,7 @@ import ManageGatewayDialog from "../components/manage_gateway_dialog.vue";
 import ManageK8SWorkerDialog from "../components/manage_k8s_worker_dialog.vue";
 import VmDeploymentTable from "../components/vm_deployment_table.vue";
 import { ProjectName } from "../types";
+import { createCustomToast, ToastType } from "../utils/custom_toast";
 
 export default {
   name: "TfDeploymentList",

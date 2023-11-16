@@ -3,6 +3,7 @@
 # Env vars with default values
 MODE="${MODE:=dev}"
 STELLAR_NETWORK="${STELLAR_NETWORK:=test}"
+TIMEOUT="${TIMEOUT:=10000}"
 
 # Env vars must provide in `custom` mode
 REQUIRED_ENV_VARS=(
@@ -108,6 +109,7 @@ window.env = {
   STELLAR_HORIZON_URL: '$STELLAR_HORIZON_URL',
   TFT_ASSET_ISSUER: '$TFT_ASSET_ISSUER',
   MINTING_URL: '$MINTING_URL'
+  TIMEOUT: +'$TIMEOUT'
 };
 "
 

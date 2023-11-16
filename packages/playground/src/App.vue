@@ -80,7 +80,7 @@
         </template>
       </v-navigation-drawer>
 
-      <v-main :style="{ paddingTop: '70px' }">
+      <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
         <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }">
           <v-toolbar-title class="custom-toolbar-title">
             <v-img
@@ -106,6 +106,34 @@
           <ProfileManager v-model="openProfile" />
         </v-toolbar>
 
+        <v-toolbar
+          v-if="navbarConfig"
+          :color="theme.name.value === AppThemeSelection.dark ? '#121212' : 'background'"
+          class="border position-fixed py-0 d-flex pr-2"
+          :style="{
+            zIndex: 1005,
+            top: '65.5px',
+            right: 0,
+            width: permanent && openSidebar && hasActiveProfile ? 'calc(100% - 280px)' : '100%',
+          }"
+          height="50"
+        >
+          <v-container>
+            <v-row>
+              <v-breadcrumbs :items="navbarConfig.path" active-color="secondary">
+                <template v-slot:divider>
+                  <v-icon icon="mdi-chevron-right"></v-icon>
+                </template>
+                <template v-slot:item="{ item }">
+                  <router-link :to="item.to" :class="{ 'clickable-item': !item.disabled }">
+                    {{ item.title }}
+                  </router-link>
+                </template>
+              </v-breadcrumbs>
+            </v-row>
+          </v-container>
+        </v-toolbar>
+
         <DeploymentListManager>
           <v-container fluid :style="{ paddingBottom: '100px' }">
             <div class="d-flex align-center">
@@ -127,7 +155,7 @@
               <router-view v-slot="{ Component }">
                 <transition name="fade">
                   <div :key="$route.path">
-                    <component :is="Component" v-if="hasActiveProfile"></component>
+                    <component :is="Component" v-if="hasActiveProfile && hasGrid"></component>
                     <ConnectWalletLanding @openProfile="openProfile = true" v-else />
                   </div>
                 </transition>
@@ -151,15 +179,21 @@ import { useProfileManager } from "./stores/profile_manager";
 const $route = useRoute();
 const $router = useRouter();
 const profileManager = useProfileManager();
+const gridStore = useGrid();
 const network = process.env.NETWORK || (window as any).env.NETWORK;
 
 const openProfile = ref(true);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
+const navbarConfig = ref();
 
+const hasGrid = computed(() => !!gridStore.grid);
 watch(
   () => $route.meta,
-  meta => (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
+  meta => {
+    (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
+      (navbarConfig.value = meta.navbarConfig);
+  },
 );
 
 onMounted(() => {
@@ -325,6 +359,7 @@ $router.beforeEach((to, from, next) => {
   } else {
     next();
   }
+  window.scrollTo(0, 0);
 });
 </script>
 
@@ -340,6 +375,7 @@ import FundsCard from "./components/funds_card.vue";
 import ProfileManagerController from "./components/profile_manager_controller.vue";
 import TftSwapPrice from "./components/swap_price.vue";
 import TFNotification from "./components/tf_notification.vue";
+import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
 
 interface AppRoute {
@@ -371,119 +407,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss" global>
-:root {
-  --link-color: #3d7ad4;
-}
-
-.app-link {
-  text-decoration: none;
-  font-weight: bold;
-  color: var(--link-color);
-  cursor: pointer;
-}
-
-.fade-leave-active,
-.fade-enter-active {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  pointer-events: none;
-
-  transition: opacity 1s;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.capitalize {
-  text-transform: capitalize !important;
-}
-
-.v-btn {
-  text-transform: capitalize !important;
-  font-size: 1rem !important;
-}
-
-.version {
-  position: absolute;
-  bottom: 15px;
-  right: 25px;
-}
-
-.v-tooltip > .v-overlay__content {
-  // background: var(--v-theme-surface);
-  border-color: rgba(var(--v-border-color), var(--v-border-opacity)) !important;
-  border-width: thin !important;
-  border-style: solid !important;
-  z-index: 99;
-  background-color: rgb(var(--v-theme-background));
-  color: var(--v-theme-text);
-  font-weight: 900;
-}
-
-a {
-  color: #5695ff !important;
-}
-
-.v-list-item__prepend {
-  width: 35px !important;
-}
-
-.v-list-item-title {
-  font-size: 0.875rem;
-}
-
-.v-list-item--density-default.v-list-item--one-line {
-  min-height: 40px;
-}
-
-.custom-toolbar-title {
-  max-width: 17rem !important;
-}
-.mosha__toast__content-wrapper {
-  margin-bottom: -2px;
-}
-.mosha__toast__slot-wrapper {
-  margin-bottom: -2px;
-}
-.mosha__icon {
-  margin-right: 6px !important;
-  margin-top: 2px;
-}
-
-.mosha__icon__dark__warning {
-  fill: #ffcc00 !important;
-}
-
-.mosha__icon__light__warning {
-  fill: #fb8c00 !important;
-}
-
-.mosha__toast__content.dark__warning {
-  color: #ffcc00;
-}
-
-.mosha__toast__content.light__warning {
-  color: #fb8c00;
-}
-
-.mosha__toast__close-icon.dark__warning::before {
-  color: #ffcc00 !important;
-}
-
-.mosha__toast__close-icon.light__warning::before {
-  color: #fb8c00 !important;
-}
-
-.mosha__toast__content__text {
-  font-size: 14px !important;
-}
-.font-14 {
-  font-size: 14px !important;
-}
-</style>

@@ -1,5 +1,5 @@
 <template>
-  <v-tabs v-show="!hideTabs" v-model="activeTab" align-tabs="center" color="primary" class="mb-6">
+  <v-tabs v-show="!hideTabs" v-model="activeTab" align-tabs="center" color="secondary" class="mb-6">
     <v-tab v-for="tab in tabs" :key="tab.value" :disabled="disabled">
       <v-icon :icon="tab.icon" class="mr-2" v-if="tab.icon" />
       <img

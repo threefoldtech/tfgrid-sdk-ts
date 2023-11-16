@@ -2,7 +2,6 @@
   <section>
     <h6 class="text-h5 mb-4 mt-2">Choose a Location</h6>
     <SelectCountry v-model="country" />
-
     <input-validator :rules="[validators.required('Farm is required.')]" :value="farm?.farmID" ref="farmInput">
       <input-tooltip tooltip="The name of the farm that you want to deploy inside it.">
         <v-autocomplete
@@ -28,8 +27,6 @@
                 @click="loadFarms"
                 :loading="loading"
               >
-                <!-- @click="loadNextPage" -->
-                <!-- :loading="loading" -->
                 Load More Farms
               </v-btn>
             </div>
@@ -41,13 +38,13 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, type PropType, ref, watch } from "vue";
+import { onMounted, onUnmounted, type PropType, type Ref, ref, watch } from "vue";
 
 import { useInputRef } from "@/hooks/input_validator";
 
 import { useProfileManager } from "../stores/profile_manager";
 import type { Farm } from "../types";
-import { getFarms } from "../utils/get_farms";
+import { getFarms, getFarmsPages } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
 import { useFarmGatewayManager } from "./farm_gateway_manager.vue";
 import { useFarm } from "./select_farm_manager.vue";
@@ -76,7 +73,7 @@ const emits = defineEmits<{
 }>();
 
 const SIZE = 20;
-const page = ref(1);
+const page = ref();
 
 const farmInput = useInputRef();
 const profileManager = useProfileManager();
@@ -107,40 +104,46 @@ watch(
   },
   { immediate: true },
 );
+const selectedPages = ref([]) as Ref<number[]>;
 
 const farms = ref<Farm[]>([]);
 let initialized = false;
+const shouldBeUpdated = ref(false);
+const pagesCount = ref();
+
+function prepareFilters(filters: Filters, twinId: number): FarmFilterOptions {
+  return {
+    size: SIZE,
+    page: page.value,
+    country: country.value,
+    nodeMRU: filters.memory ? Math.round(filters.memory / 1024) : undefined,
+    nodeHRU: filters.disk,
+    nodeSRU: filters.ssd,
+    publicIp: filters.publicIp,
+    availableFor: twinId,
+    nodeCertified: filters.certified,
+    nodeRentedBy: filters.rentedBy ? filters.rentedBy : undefined,
+    nodeHasGPU: filters.hasGPU ? filters.hasGPU : undefined,
+  };
+}
+
 async function loadFarms() {
   farmInput.value?.setStatus(ValidatorStatus.Pending);
 
   loading.value = true;
   const oldFarm = farm.value;
-
   const grid = await getGrid(profileManager.profile!);
   const filters = props.filters;
-  const _farms = await getFarms(
-    grid!,
-    {
-      size: SIZE,
-      page: page.value,
-      country: country.value,
-      nodeMRU: filters.memory ? Math.round(filters.memory / 1024) : undefined,
-      nodeHRU: filters.disk,
-      nodeSRU: filters.ssd,
-      publicIp: filters.publicIp,
-      availableFor: grid!.twinId,
-      nodeCertified: filters.certified,
-      nodeRentedBy: filters.rentedBy ? filters.rentedBy : undefined,
-      nodeHasGPU: filters.hasGPU ? filters.hasGPU : undefined,
-    },
-    { exclusiveFor: props.exclusiveFor },
-  );
-
-  if (page.value === 1) {
-    farms.value = _farms;
-  } else {
-    farms.value = farms.value.concat(_farms);
+  const _farms = await getFarms(grid!, prepareFilters(props.filters, grid!.twinId), {
+    exclusiveFor: props.exclusiveFor,
+  });
+  selectedPages.value.push(page.value);
+  if (!_farms.length && selectedPages.value.length !== pagesCount.value) {
+    page.value = setRandomPage();
+    await loadFarms();
+    return;
   }
+  farms.value = farms.value.concat(_farms);
 
   if (oldFarm) {
     farm.value = undefined;
@@ -159,16 +162,37 @@ async function loadFarms() {
     }
   }
 
-  page.value = _farms.length < SIZE ? -1 : page.value + 1;
+  page.value = selectedPages.value.length === pagesCount.value ? -1 : setRandomPage();
   loading.value = false;
 }
-onMounted(loadFarms);
+
+function setRandomPage() {
+  let randPage = Math.floor(Math.random() * pagesCount.value) + 1;
+  while (selectedPages.value.includes(randPage)) randPage = Math.floor(Math.random() * pagesCount.value) + 1;
+  return randPage;
+}
+async function resetPages() {
+  farms.value = [];
+  loading.value = true;
+  farmInput.value?.setStatus(ValidatorStatus.Pending);
+  selectedPages.value = [];
+  const grid = await getGrid(profileManager.profile!);
+  if (!grid) {
+    console.log("can't get the grid");
+    pagesCount.value = 1;
+  } else {
+    pagesCount.value = await getFarmsPages(grid, prepareFilters(props.filters, grid.twinId), SIZE);
+  }
+  page.value = setRandomPage();
+  await loadFarms();
+}
+
+onMounted(resetPages);
 onUnmounted(() => FarmGatewayManager?.unregister());
 
-const shouldBeUpdated = ref(false);
 watch(
   () => ({ ...props.filters, country: country.value }),
-  (value, oldValue) => {
+  async (value, oldValue) => {
     if (
       value.cpu === oldValue.cpu &&
       value.memory === oldValue.memory &&
@@ -181,7 +205,6 @@ watch(
       value.hasGPU === oldValue.hasGPU
     )
       return;
-
     shouldBeUpdated.value = true;
   },
 );
@@ -191,13 +214,13 @@ watch([loading, shouldBeUpdated], async ([l, s]) => {
   shouldBeUpdated.value = false;
   clearTimeout(delay.value);
   delay.value = setTimeout(async () => {
-    page.value = 1;
-    await loadFarms();
+    await resetPages();
   }, 2000);
 });
 </script>
 
 <script lang="ts">
+import type { FarmFilterOptions } from "@threefold/grid_client";
 import { nextTick } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
