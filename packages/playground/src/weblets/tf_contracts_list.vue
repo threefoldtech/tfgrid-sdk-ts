@@ -185,9 +185,7 @@ const headers: VDataTableHeader = [
 const loadingError = ref("");
 async function onMount() {
   loadingError.value = "";
-  selectedContracts.value = [];
   loading.value = true;
-  failedContractId.value = undefined;
   contracts.value = [];
   try {
     grid.value = await getGrid(profileManager.profile!);
@@ -196,6 +194,8 @@ async function onMount() {
   } catch (e) {
     loadingError.value = (e as Error).message;
   } finally {
+    failedContractId.value = undefined;
+    selectedContracts.value = [];
     loading.value = false;
   }
 }
