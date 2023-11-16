@@ -132,685 +132,690 @@ export enum Errors {
   InvalidTimestampHint,
 }
 
-export class NoneValue extends BaseError {
+class TFGridErrors extends BaseError {
+  constructor(code: number, message: string) {
+    super(code, message, "tfgridModule");
+  }
+}
+export class NoneValue extends TFGridErrors {
   constructor(message: string) {
     super(Errors.NoneValue, message);
   }
 }
 
-export class StorageOverflow extends BaseError {
+export class StorageOverflow extends TFGridErrors {
   constructor(message: string) {
     super(Errors.StorageOverflow, message);
   }
 }
 
-export class CannotCreateNode extends BaseError {
+export class CannotCreateNode extends TFGridErrors {
   constructor(message: string) {
     super(Errors.CannotCreateNode, message);
   }
 }
 
-export class NodeNotExists extends BaseError {
+export class NodeNotExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.NodeNotExists, message);
   }
 }
 
-export class NodeWithTwinIdExists extends BaseError {
+export class NodeWithTwinIdExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.NodeWithTwinIdExists, message);
   }
 }
 
-export class CannotDeleteNode extends BaseError {
+export class CannotDeleteNode extends TFGridErrors {
   constructor(message: string) {
     super(Errors.CannotDeleteNode, message);
   }
 }
 
-export class NodeDeleteNotAuthorized extends BaseError {
+export class NodeDeleteNotAuthorized extends TFGridErrors {
   constructor(message: string) {
     super(Errors.NodeDeleteNotAuthorized, message);
   }
 }
 
-export class NodeUpdateNotAuthorized extends BaseError {
+export class NodeUpdateNotAuthorized extends TFGridErrors {
   constructor(message: string) {
     super(Errors.NodeUpdateNotAuthorized, message);
   }
 }
 
-export class FarmExists extends BaseError {
+export class FarmExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.FarmExists, message);
   }
 }
 
-export class FarmNotExists extends BaseError {
+export class FarmNotExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.FarmNotExists, message);
   }
 }
 
-export class CannotCreateFarmWrongTwin extends BaseError {
+export class CannotCreateFarmWrongTwin extends TFGridErrors {
   constructor(message: string) {
     super(Errors.CannotCreateFarmWrongTwin, message);
   }
 }
 
-export class CannotUpdateFarmWrongTwin extends BaseError {
+export class CannotUpdateFarmWrongTwin extends TFGridErrors {
   constructor(message: string) {
     super(Errors.CannotUpdateFarmWrongTwin, message);
   }
 }
 
-export class CannotDeleteFarm extends BaseError {
+export class CannotDeleteFarm extends TFGridErrors {
   constructor(message: string) {
     super(Errors.CannotDeleteFarm, message);
   }
 }
 
-export class CannotDeleteFarmWithPublicIPs extends BaseError {
+export class CannotDeleteFarmWithPublicIPs extends TFGridErrors {
   constructor(message: string) {
     super(Errors.CannotDeleteFarmWithPublicIPs, message);
   }
 }
 
-export class CannotDeleteFarmWithNodesAssigned extends BaseError {
+export class CannotDeleteFarmWithNodesAssigned extends TFGridErrors {
   constructor(message: string) {
     super(Errors.CannotDeleteFarmWithNodesAssigned, message);
   }
 }
 
-export class CannotDeleteFarmWrongTwin extends BaseError {
+export class CannotDeleteFarmWrongTwin extends TFGridErrors {
   constructor(message: string) {
     super(Errors.CannotDeleteFarmWrongTwin, message);
   }
 }
 
-export class IpExists extends BaseError {
+export class IpExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.IpExists, message);
   }
 }
 
-export class IpNotExists extends BaseError {
+export class IpNotExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.IpNotExists, message);
   }
 }
 
-export class EntityWithNameExists extends BaseError {
+export class EntityWithNameExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.EntityWithNameExists, message);
   }
 }
 
-export class EntityWithPubkeyExists extends BaseError {
+export class EntityWithPubkeyExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.EntityWithPubkeyExists, message);
   }
 }
 
-export class EntityNotExists extends BaseError {
+export class EntityNotExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.EntityNotExists, message);
   }
 }
 
-export class EntitySignatureDoesNotMatch extends BaseError {
+export class EntitySignatureDoesNotMatch extends TFGridErrors {
   constructor(message: string) {
     super(Errors.EntitySignatureDoesNotMatch, message);
   }
 }
 
-export class EntityWithSignatureAlreadyExists extends BaseError {
+export class EntityWithSignatureAlreadyExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.EntityWithSignatureAlreadyExists, message);
   }
 }
 
-export class CannotUpdateEntity extends BaseError {
+export class CannotUpdateEntity extends TFGridErrors {
   constructor(message: string) {
     super(Errors.CannotUpdateEntity, message);
   }
 }
 
-export class CannotDeleteEntity extends BaseError {
+export class CannotDeleteEntity extends TFGridErrors {
   constructor(message: string) {
     super(Errors.CannotDeleteEntity, message);
   }
 }
 
-export class SignatureLengthIsIncorrect extends BaseError {
+export class SignatureLengthIsIncorrect extends TFGridErrors {
   constructor(message: string) {
     super(Errors.SignatureLengthIsIncorrect, message);
   }
 }
 
-export class TwinExists extends BaseError {
+export class TwinExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.TwinExists, message);
   }
 }
 
-export class TwinNotExists extends BaseError {
+export class TwinNotExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.TwinNotExists, message);
   }
 }
 
-export class TwinWithPubkeyExists extends BaseError {
+export class TwinWithPubkeyExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.TwinWithPubkeyExists, message);
   }
 }
 
-export class CannotCreateTwin extends BaseError {
+export class CannotCreateTwin extends TFGridErrors {
   constructor(message: string) {
     super(Errors.CannotCreateTwin, message);
   }
 }
 
-export class UnauthorizedToUpdateTwin extends BaseError {
+export class UnauthorizedToUpdateTwin extends TFGridErrors {
   constructor(message: string) {
     super(Errors.UnauthorizedToUpdateTwin, message);
   }
 }
 
-export class TwinCannotBoundToItself extends BaseError {
+export class TwinCannotBoundToItself extends TFGridErrors {
   constructor(message: string) {
     super(Errors.TwinCannotBoundToItself, message);
   }
 }
 
-export class PricingPolicyExists extends BaseError {
+export class PricingPolicyExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.PricingPolicyExists, message);
   }
 }
 
-export class PricingPolicyNotExists extends BaseError {
+export class PricingPolicyNotExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.PricingPolicyNotExists, message);
   }
 }
 
-export class PricingPolicyWithDifferentIdExists extends BaseError {
+export class PricingPolicyWithDifferentIdExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.PricingPolicyWithDifferentIdExists, message);
   }
 }
 
-export class CertificationCodeExists extends BaseError {
+export class CertificationCodeExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.CertificationCodeExists, message);
   }
 }
 
-export class FarmingPolicyAlreadyExists extends BaseError {
+export class FarmingPolicyAlreadyExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.FarmingPolicyAlreadyExists, message);
   }
 }
 
-export class FarmPayoutAdressAlreadyRegistered extends BaseError {
+export class FarmPayoutAdressAlreadyRegistered extends TFGridErrors {
   constructor(message: string) {
     super(Errors.FarmPayoutAdressAlreadyRegistered, message);
   }
 }
 
-export class FarmerDoesNotHaveEnoughFunds extends BaseError {
+export class FarmerDoesNotHaveEnoughFunds extends TFGridErrors {
   constructor(message: string) {
     super(Errors.FarmerDoesNotHaveEnoughFunds, message);
   }
 }
 
-export class UserDidNotSignTermsAndConditions extends BaseError {
+export class UserDidNotSignTermsAndConditions extends TFGridErrors {
   constructor(message: string) {
     super(Errors.UserDidNotSignTermsAndConditions, message);
   }
 }
 
-export class FarmerDidNotSignTermsAndConditions extends BaseError {
+export class FarmerDidNotSignTermsAndConditions extends TFGridErrors {
   constructor(message: string) {
     super(Errors.FarmerDidNotSignTermsAndConditions, message);
   }
 }
 
-export class FarmerNotAuthorized extends BaseError {
+export class FarmerNotAuthorized extends TFGridErrors {
   constructor(message: string) {
     super(Errors.FarmerNotAuthorized, message);
   }
 }
 
-export class InvalidFarmName extends BaseError {
+export class InvalidFarmName extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidFarmName, message);
   }
 }
 
-export class AlreadyCertifier extends BaseError {
+export class AlreadyCertifier extends TFGridErrors {
   constructor(message: string) {
     super(Errors.AlreadyCertifier, message);
   }
 }
 
-export class NotCertifier extends BaseError {
+export class NotCertifier extends TFGridErrors {
   constructor(message: string) {
     super(Errors.NotCertifier, message);
   }
 }
 
-export class NotAllowedToCertifyNode extends BaseError {
+export class NotAllowedToCertifyNode extends TFGridErrors {
   constructor(message: string) {
     super(Errors.NotAllowedToCertifyNode, message);
   }
 }
 
-export class FarmingPolicyNotExists extends BaseError {
+export class FarmingPolicyNotExists extends TFGridErrors {
   constructor(message: string) {
     super(Errors.FarmingPolicyNotExists, message);
   }
 }
 
-export class RelayTooShort extends BaseError {
+export class RelayTooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.RelayTooShort, message);
   }
 }
 
-export class RelayTooLong extends BaseError {
+export class RelayTooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.RelayTooLong, message);
   }
 }
 
-export class InvalidRelay extends BaseError {
+export class InvalidRelay extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidRelay, message);
   }
 }
 
-export class FarmNameTooShort extends BaseError {
+export class FarmNameTooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.FarmNameTooShort, message);
   }
 }
 
-export class FarmNameTooLong extends BaseError {
+export class FarmNameTooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.FarmNameTooLong, message);
   }
 }
 
-export class InvalidPublicIP extends BaseError {
+export class InvalidPublicIP extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidPublicIP, message);
   }
 }
 
-export class PublicIPTooShort extends BaseError {
+export class PublicIPTooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.PublicIPTooShort, message);
   }
 }
 
-export class PublicIPTooLong extends BaseError {
+export class PublicIPTooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.PublicIPTooLong, message);
   }
 }
 
-export class GatewayIPTooShort extends BaseError {
+export class GatewayIPTooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.GatewayIPTooShort, message);
   }
 }
 
-export class GatewayIPTooLong extends BaseError {
+export class GatewayIPTooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.GatewayIPTooLong, message);
   }
 }
 
-export class IP4TooShort extends BaseError {
+export class IP4TooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.IP4TooShort, message);
   }
 }
 
-export class IP4TooLong extends BaseError {
+export class IP4TooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.IP4TooLong, message);
   }
 }
 
-export class InvalidIP4 extends BaseError {
+export class InvalidIP4 extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidIP4, message);
   }
 }
 
-export class GW4TooShort extends BaseError {
+export class GW4TooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.GW4TooShort, message);
   }
 }
 
-export class GW4TooLong extends BaseError {
+export class GW4TooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.GW4TooLong, message);
   }
 }
 
-export class InvalidGW4 extends BaseError {
+export class InvalidGW4 extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidGW4, message);
   }
 }
 
-export class IP6TooShort extends BaseError {
+export class IP6TooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.IP6TooShort, message);
   }
 }
 
-export class IP6TooLong extends BaseError {
+export class IP6TooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.IP6TooLong, message);
   }
 }
 
-export class InvalidIP6 extends BaseError {
+export class InvalidIP6 extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidIP6, message);
   }
 }
 
-export class GW6TooShort extends BaseError {
+export class GW6TooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.GW6TooShort, message);
   }
 }
 
-export class GW6TooLong extends BaseError {
+export class GW6TooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.GW6TooLong, message);
   }
 }
 
-export class InvalidGW6 extends BaseError {
+export class InvalidGW6 extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidGW6, message);
   }
 }
 
-export class DomainTooShort extends BaseError {
+export class DomainTooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.DomainTooShort, message);
   }
 }
 
-export class DomainTooLong extends BaseError {
+export class DomainTooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.DomainTooLong, message);
   }
 }
 
-export class InvalidDomain extends BaseError {
+export class InvalidDomain extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidDomain, message);
   }
 }
 
-export class MethodIsDeprecated extends BaseError {
+export class MethodIsDeprecated extends TFGridErrors {
   constructor(message: string) {
     super(Errors.MethodIsDeprecated, message);
   }
 }
 
-export class InterfaceNameTooShort extends BaseError {
+export class InterfaceNameTooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InterfaceNameTooShort, message);
   }
 }
 
-export class InterfaceNameTooLong extends BaseError {
+export class InterfaceNameTooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InterfaceNameTooLong, message);
   }
 }
 
-export class InvalidInterfaceName extends BaseError {
+export class InvalidInterfaceName extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidInterfaceName, message);
   }
 }
 
-export class InterfaceMacTooShort extends BaseError {
+export class InterfaceMacTooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InterfaceMacTooShort, message);
   }
 }
 
-export class InterfaceMacTooLong extends BaseError {
+export class InterfaceMacTooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InterfaceMacTooLong, message);
   }
 }
 
-export class InvalidMacAddress extends BaseError {
+export class InvalidMacAddress extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidMacAddress, message);
   }
 }
 
-export class InterfaceIpTooShort extends BaseError {
+export class InterfaceIpTooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InterfaceIpTooShort, message);
   }
 }
 
-export class InterfaceIpTooLong extends BaseError {
+export class InterfaceIpTooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InterfaceIpTooLong, message);
   }
 }
 
-export class InvalidInterfaceIP extends BaseError {
+export class InvalidInterfaceIP extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidInterfaceIP, message);
   }
 }
 
-export class InvalidZosVersion extends BaseError {
+export class InvalidZosVersion extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidZosVersion, message);
   }
 }
 
-export class FarmingPolicyExpired extends BaseError {
+export class FarmingPolicyExpired extends TFGridErrors {
   constructor(message: string) {
     super(Errors.FarmingPolicyExpired, message);
   }
 }
 
-export class InvalidHRUInput extends BaseError {
+export class InvalidHRUInput extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidHRUInput, message);
   }
 }
 
-export class InvalidSRUInput extends BaseError {
+export class InvalidSRUInput extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidSRUInput, message);
   }
 }
 
-export class InvalidCRUInput extends BaseError {
+export class InvalidCRUInput extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidCRUInput, message);
   }
 }
 
-export class InvalidMRUInput extends BaseError {
+export class InvalidMRUInput extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidMRUInput, message);
   }
 }
 
-export class LatitudeInputTooShort extends BaseError {
+export class LatitudeInputTooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.LatitudeInputTooShort, message);
   }
 }
 
-export class LatitudeInputTooLong extends BaseError {
+export class LatitudeInputTooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.LatitudeInputTooLong, message);
   }
 }
 
-export class InvalidLatitudeInput extends BaseError {
+export class InvalidLatitudeInput extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidLatitudeInput, message);
   }
 }
 
-export class LongitudeInputTooShort extends BaseError {
+export class LongitudeInputTooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.LongitudeInputTooShort, message);
   }
 }
 
-export class LongitudeInputTooLong extends BaseError {
+export class LongitudeInputTooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.LongitudeInputTooLong, message);
   }
 }
 
-export class InvalidLongitudeInput extends BaseError {
+export class InvalidLongitudeInput extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidLongitudeInput, message);
   }
 }
 
-export class CountryNameTooShort extends BaseError {
+export class CountryNameTooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.CountryNameTooShort, message);
   }
 }
 
-export class CountryNameTooLong extends BaseError {
+export class CountryNameTooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.CountryNameTooLong, message);
   }
 }
 
-export class InvalidCountryName extends BaseError {
+export class InvalidCountryName extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidCountryName, message);
   }
 }
 
-export class CityNameTooShort extends BaseError {
+export class CityNameTooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.CityNameTooShort, message);
   }
 }
 
-export class CityNameTooLong extends BaseError {
+export class CityNameTooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.CityNameTooLong, message);
   }
 }
 
-export class InvalidCityName extends BaseError {
+export class InvalidCityName extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidCityName, message);
   }
 }
 
-export class InvalidCountryCityPair extends BaseError {
+export class InvalidCountryCityPair extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidCountryCityPair, message);
   }
 }
 
-export class SerialNumberTooShort extends BaseError {
+export class SerialNumberTooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.SerialNumberTooShort, message);
   }
 }
 
-export class SerialNumberTooLong extends BaseError {
+export class SerialNumberTooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.SerialNumberTooLong, message);
   }
 }
 
-export class InvalidSerialNumber extends BaseError {
+export class InvalidSerialNumber extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidSerialNumber, message);
   }
 }
 
-export class DocumentLinkInputTooShort extends BaseError {
+export class DocumentLinkInputTooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.DocumentLinkInputTooShort, message);
   }
 }
 
-export class DocumentLinkInputTooLong extends BaseError {
+export class DocumentLinkInputTooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.DocumentLinkInputTooLong, message);
   }
 }
 
-export class InvalidDocumentLinkInput extends BaseError {
+export class InvalidDocumentLinkInput extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidDocumentLinkInput, message);
   }
 }
 
-export class DocumentHashInputTooShort extends BaseError {
+export class DocumentHashInputTooShort extends TFGridErrors {
   constructor(message: string) {
     super(Errors.DocumentHashInputTooShort, message);
   }
 }
 
-export class DocumentHashInputTooLong extends BaseError {
+export class DocumentHashInputTooLong extends TFGridErrors {
   constructor(message: string) {
     super(Errors.DocumentHashInputTooLong, message);
   }
 }
 
-export class InvalidDocumentHashInput extends BaseError {
+export class InvalidDocumentHashInput extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidDocumentHashInput, message);
   }
 }
 
-export class InvalidPublicConfig extends BaseError {
+export class InvalidPublicConfig extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidPublicConfig, message);
   }
 }
 
-export class UnauthorizedToChangePowerTarget extends BaseError {
+export class UnauthorizedToChangePowerTarget extends TFGridErrors {
   constructor(message: string) {
     super(Errors.UnauthorizedToChangePowerTarget, message);
   }
 }
 
-export class InvalidRelayAddress extends BaseError {
+export class InvalidRelayAddress extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidRelayAddress, message);
   }
 }
 
-export class InvalidTimestampHint extends BaseError {
+export class InvalidTimestampHint extends TFGridErrors {
   constructor(message: string) {
     super(Errors.InvalidTimestampHint, message);
   }

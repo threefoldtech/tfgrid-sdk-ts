@@ -1,7 +1,7 @@
 import { BaseError } from "../base_error";
 
 export enum Errors {
-  ErrFetchingPrice = 1,
+  ErrFetchingPrice,
   OffchainSignedTxError,
   NoLocalAcctForSigning,
   AccountUnauthorizedToSetPrice,
@@ -11,49 +11,54 @@ export enum Errors {
   WrongAuthority,
 }
 
-export class ErrFetchingPrice extends BaseError {
+class TFTPrice extends BaseError {
+  constructor(code: number, message: string) {
+    super(code, message, "tftPriceModule");
+  }
+}
+export class ErrFetchingPrice extends TFTPrice {
   constructor(message: string) {
     super(Errors.ErrFetchingPrice, message);
   }
 }
 
-export class OffchainSignedTxError extends BaseError {
+export class OffchainSignedTxError extends TFTPrice {
   constructor(message: string) {
     super(Errors.OffchainSignedTxError, message);
   }
 }
 
-export class NoLocalAcctForSigning extends BaseError {
+export class NoLocalAcctForSigning extends TFTPrice {
   constructor(message: string) {
     super(Errors.NoLocalAcctForSigning, message);
   }
 }
 
-export class AccountUnauthorizedToSetPrice extends BaseError {
+export class AccountUnauthorizedToSetPrice extends TFTPrice {
   constructor(message: string) {
     super(Errors.AccountUnauthorizedToSetPrice, message);
   }
 }
 
-export class MaxPriceBelowMinPriceError extends BaseError {
+export class MaxPriceBelowMinPriceError extends TFTPrice {
   constructor(message: string) {
     super(Errors.MaxPriceBelowMinPriceError, message);
   }
 }
 
-export class MinPriceAboveMaxPriceError extends BaseError {
+export class MinPriceAboveMaxPriceError extends TFTPrice {
   constructor(message: string) {
     super(Errors.MinPriceAboveMaxPriceError, message);
   }
 }
 
-export class IsNotAnAuthority extends BaseError {
+export class IsNotAnAuthority extends TFTPrice {
   constructor(message: string) {
     super(Errors.IsNotAnAuthority, message);
   }
 }
 
-export class WrongAuthority extends BaseError {
+export class WrongAuthority extends TFTPrice {
   constructor(message: string) {
     super(Errors.WrongAuthority, message);
   }
