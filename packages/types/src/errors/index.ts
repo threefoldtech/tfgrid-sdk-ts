@@ -1,3 +1,4 @@
-import * as GenericErrors from "./base_error";
-import * as TFChainErrors from "./tfChain/index";
-export { GenericErrors, TFChainErrors };
+export { ValidationError, TimeoutError } from "./base_error";
+export { TFChainError } from "./tfChain/tfchain_error";
+
+export * as TFChainErrors from "./tfChain/index";
