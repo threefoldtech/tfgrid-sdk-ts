@@ -16,6 +16,7 @@
           :model-value="shouldBeUpdated ? undefined : farm"
           @update:model-value="farm = $event"
           :error-messages="!loading && !farms.length ? 'No farms where found with the specified resources.' : undefined"
+          v-model:search="search"
         >
           <template v-slot:append-item v-if="page !== -1">
             <div class="px-4 mt-4">
@@ -28,8 +29,6 @@
                 @click="loadFarms"
                 :loading="loading"
               >
-                <!-- @click="loadNextPage" -->
-                <!-- :loading="loading" -->
                 Load More Farms
               </v-btn>
             </div>
@@ -81,13 +80,27 @@ const page = ref(1);
 const farmInput = useInputRef();
 const profileManager = useProfileManager();
 const country = ref<string>();
-
+const search = ref<string>();
 const farm = ref<Farm>();
 const farmManager = useFarm();
 watch([farm, country], ([f, c]) => {
   farmManager?.setFarmId(f?.farmID);
   emits("update:modelValue", f ? { farmID: f.farmID, name: f.name, country: c ?? undefined } : undefined);
 });
+
+watch(search, (newSearch, oldSearch) => {
+  setTimeout(async () => {
+    if (newSearch != "") {
+      console.log({ search: newSearch });
+
+      const { data } = await gridProxyClient.farms.list({ nameContains: newSearch });
+      farms.value = data;
+    } else if (newSearch === "") {
+      await loadFarms();
+    }
+  }, 2000);
+});
+
 const loading = ref(false);
 const loadingNodes = ref(farmManager?.getLoading());
 const delay = ref();
@@ -200,6 +213,7 @@ watch([loading, shouldBeUpdated], async ([l, s]) => {
 <script lang="ts">
 import { nextTick } from "vue";
 
+import { gridProxyClient } from "@/clients";
 import { ValidatorStatus } from "@/hooks/form_validator";
 
 import SelectCountry from "./select_country.vue";
