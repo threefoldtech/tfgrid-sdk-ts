@@ -409,7 +409,7 @@ class Nodes {
   async nodeAvailableForTwinId(nodeId: number, twinId: number): Promise<boolean> {
     return send("get", urlJoin(this.proxyURL, `/nodes/${nodeId}`), "", {})
       .then(node => {
-        if (node.rentedByTwinId != twinId && (node.dedicated || node.rentContractId != 0)) {
+        if (node.rentedByTwinId != twinId && (node.inDedicatedFarm || node.rentContractId != 0)) {
           return false;
         }
         return true;
