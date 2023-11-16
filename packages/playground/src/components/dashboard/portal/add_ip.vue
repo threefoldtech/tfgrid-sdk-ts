@@ -251,13 +251,7 @@ export default {
         if (IPs.value && IPs.value.length > 1) {
           const extrinsics: any[] = [];
           for (const ip in IPs.value) {
-            extrinsics.push(
-              await gridStore.grid.tfchain.tfClient.farms.client.api.tx.tfgridModule.addFarmIp(
-                farmId,
-                IPs.value[ip],
-                gw,
-              ),
-            );
+            extrinsics.push(await gridStore.grid.tfchain.tfClient.farms.addFarmIp({ farmId, ip: IPs.value[ip], gw }));
 
             context.emit("add-publicIPs", [{ ip: IPs.value[ip], gateway: gw }]);
           }
