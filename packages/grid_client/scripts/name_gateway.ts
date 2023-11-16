@@ -44,12 +44,13 @@ async function main() {
     farmId: 1,
   };
 
-  const gw = new GatewayNameModel();
-  gw.name = "test313123";
-  gw.node_id = +(await grid3.capacity.filterNodes(gatewayQueryOptions))[0].nodeId;
-  gw.tls_passthrough = false;
-  // the backends have to be in this format `http://ip:port` or `https://ip:port`, and the `ip` pingable from the node so using the ygg ip or public ip if available.
-  gw.backends = ["http://185.206.122.35:8000"];
+  const gw: GatewayNameModel = {
+    name: "test",
+    node_id: +(await grid3.capacity.filterNodes(gatewayQueryOptions))[0].nodeId,
+    tls_passthrough: false,
+    // the backends have to be in this format `http://ip:port` or `https://ip:port`, and the `ip` pingable from the node so using the ygg ip or public ip if available.
+    backends: ["http://185.206.122.35:8000"],
+  };
 
   //Deploy gateway
   await deploy(grid3, gw);

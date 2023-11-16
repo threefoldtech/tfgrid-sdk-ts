@@ -1,9 +1,14 @@
+import { SetDedicatedNodeExtraFeesModel } from "../src";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function setExtraFee(client, node, extraFee) {
   try {
-    const res = await client.contracts.setDedicatedNodeExtraFee({ ...node, extraFee: extraFee });
+    const nodeModel: SetDedicatedNodeExtraFeesModel = {
+      nodeId: node,
+      extraFee: extraFee,
+    };
+    const res = await client.contracts.setDedicatedNodeExtraFee(nodeModel);
     log("================= Setting extra fee =================");
     log(res);
     log("================= Setting extra fee =================");
@@ -26,7 +31,7 @@ async function getExtraFee(client, node) {
 async function main() {
   const grid3 = await getClient();
 
-  const node = { nodeId: 73 };
+  const node = 73;
 
   const extraFee = 5;
 

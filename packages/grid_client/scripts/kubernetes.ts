@@ -1,4 +1,4 @@
-import { FilterOptions, K8SModel, KubernetesNodeModel, NetworkModel } from "../src";
+import { FilterOptions, K8SModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -38,12 +38,6 @@ async function cancel(client, k8s) {
 async function main() {
   const grid3 = await getClient();
 
-  // create network Object
-  const n = new NetworkModel();
-  n.name = "monNetwork";
-  n.ip_range = "10.238.0.0/16";
-  n.addAccess = true;
-
   const masterQueryOptions: FilterOptions = {
     cru: 2,
     mru: 2, // GB
@@ -60,38 +54,44 @@ async function main() {
     farmId: 1,
   };
 
-  // create k8s node Object
-  const master = new KubernetesNodeModel();
-  master.name = "master";
-  master.node_id = +(await grid3.capacity.filterNodes(masterQueryOptions))[0].nodeId;
-  master.cpu = 1;
-  master.memory = 1024;
-  master.rootfs_size = 0;
-  master.disk_size = 1;
-  master.public_ip = false;
-  master.planetary = true;
-
-  // create k8s node Object
-  const worker = new KubernetesNodeModel();
-  worker.name = "worker";
-  worker.node_id = +(await grid3.capacity.filterNodes(workerQueryOptions))[0].nodeId;
-  worker.cpu = 1;
-  worker.memory = 1024;
-  worker.rootfs_size = 0;
-  worker.disk_size = 1;
-  worker.public_ip = false;
-  worker.planetary = true;
-
-  // create k8s Object
-  const k = new K8SModel();
-  k.name = "testk8s";
-  k.secret = "secret";
-  k.network = n;
-  k.masters = [master];
-  k.workers = [worker];
-  k.metadata = "";
-  k.description = "test deploying k8s via ts grid3 client";
-  k.ssh_key = config.ssh_key;
+  const k: K8SModel = {
+    name: "testk8s",
+    secret: "secret",
+    network: {
+      name: "monNetwork",
+      ip_range: "10.238.0.0/16",
+      addAccess: true,
+    },
+    masters: [
+      {
+        name: "master",
+        node_id: +(await grid3.capacity.filterNodes(masterQueryOptions))[0].nodeId,
+        cpu: 1,
+        memory: 1024,
+        rootfs_size: 0,
+        disk_size: 1,
+        public_ip: false,
+        public_ip6: false,
+        planetary: true,
+      },
+    ],
+    workers: [
+      {
+        name: "worker",
+        node_id: +(await grid3.capacity.filterNodes(workerQueryOptions))[0].nodeId,
+        cpu: 1,
+        memory: 1024,
+        rootfs_size: 0,
+        disk_size: 1,
+        public_ip: false,
+        public_ip6: false,
+        planetary: true,
+      },
+    ],
+    metadata: "",
+    description: "test deploying k8s via ts grid3 client",
+    ssh_key: config.ssh_key,
+  };
 
   //Deploy K8s
   await deploy(grid3, k);

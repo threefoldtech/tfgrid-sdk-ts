@@ -1,3 +1,12 @@
+import {
+  BlockchainDeleteModel,
+  BlockchainGetModel,
+  BlockchainSignModel,
+  StellarWalletBalanceByAddressModel,
+  StellarWalletCreateModel,
+  StellarWalletInitModel,
+  StellarWalletTransferModel,
+} from "../src";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -116,45 +125,73 @@ async function deleteAccount(client, account) {
 async function main() {
   const grid3 = await getClient();
 
-  //Create account
-  const created_account = await create(grid3, { name: "stellarTest" });
+  const createAccount: StellarWalletCreateModel = {
+    name: "stellarTest",
+  };
 
-  //Initialize account
-  await init(grid3, {
+  const account: StellarWalletInitModel = {
     name: "stellarTest2",
     secret: "SBCWGJ4A4IHDUUXPASQBL7VKGZGNRMVNV66GO5P6FU6Q4NDKHIHZFRKI",
-  });
+  };
+
+  const getAccount: BlockchainGetModel = {
+    name: "stellarTest2",
+  };
+
+  const signMessage: BlockchainSignModel = {
+    name: "stellarTest2",
+    content: "message",
+  };
+
+  const deleteAccount1: BlockchainDeleteModel = {
+    name: "stellarTest",
+  };
+
+  const deleteAccount2: BlockchainDeleteModel = {
+    name: "stellarTest2",
+  };
+
+  //Create account
+  const created_account = await create(grid3, createAccount);
+
+  //Initialize account
+  await init(grid3, account);
 
   //List accounts
   await list(grid3);
 
   //Check if the account exists
-  await exist(grid3, { name: "stellarTest2" });
+  await exist(grid3, getAccount);
 
   //Get account
-  const test_account = await get(grid3, { name: "stellarTest2" });
+  const test_account = await get(grid3, getAccount);
 
   //Get balance by account address
-  await balanceByAddress(grid3, { address: test_account.public_key });
+  const getBalance: StellarWalletBalanceByAddressModel = {
+    address: test_account.public_key,
+  };
+  await balanceByAddress(grid3, { address: getBalance });
 
   //Get account assets
-  await assets(grid3, { name: "stellarTest2" });
+  await assets(grid3, getAccount);
 
   //Sign message
-  await sign(grid3, { name: "stellarTest2", content: "message" });
+  await sign(grid3, signMessage);
 
   //Pay
-  await pay(grid3, {
+  const transaction: StellarWalletTransferModel = {
     name: "stellarTest2",
     address_dest: created_account.public_key,
     amount: 1,
     description: "paytest",
     asset: "XLM",
-  });
+  };
+
+  await pay(grid3, transaction);
 
   //Delete account
-  await deleteAccount(grid3, { name: "stellarTest" });
-  await deleteAccount(grid3, { name: "stellarTest2" });
+  await deleteAccount(grid3, deleteAccount1);
+  await deleteAccount(grid3, deleteAccount2);
 
   grid3.disconnect();
 }

@@ -1,3 +1,4 @@
+import { FilterOptions, NodeFreeResourcesModel, NodesByFarmIdModel } from "../src";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -59,6 +60,21 @@ async function filterNodes(client, filterOptions) {
 async function main() {
   const grid3 = await getClient();
 
+  const nodeOptions: FilterOptions = {
+    country: "Belgium",
+    publicIPs: true,
+    cru: 20,
+    sru: 50,
+  };
+
+  const farm: NodesByFarmIdModel = {
+    farmId: 1,
+  };
+
+  const node: NodeFreeResourcesModel = {
+    nodeId: 14,
+  };
+
   //Get farms
   await getFarms(grid3);
 
@@ -66,18 +82,13 @@ async function main() {
   await getNodes(grid3);
 
   //Get nodes by farm Id
-  await getNodesByFarmId(grid3, { farmId: 1 });
+  await getNodesByFarmId(grid3, farm);
 
   //Get nodes' free resources
-  await getNodeFreeResources(grid3, { nodeId: 14 });
+  await getNodeFreeResources(grid3, node);
 
   //Filter nodes
-  await filterNodes(grid3, {
-    country: "Belgium",
-    publicIPs: true,
-    cru: 20,
-    sru: 50,
-  });
+  await filterNodes(grid3, nodeOptions);
 
   await grid3.disconnect();
 }

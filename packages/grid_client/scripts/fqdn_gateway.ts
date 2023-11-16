@@ -43,13 +43,15 @@ async function main() {
     gateway: true,
     farmId: 1,
   };
-  const gw = new GatewayFQDNModel();
-  gw.name = "applyFQDN";
-  gw.node_id = +(await grid3.capacity.filterNodes(gatewayQueryOptions))[0].nodeId;
-  gw.fqdn = "test.hamada.grid.tf";
-  gw.tls_passthrough = false;
-  // the backends have to be in this format `http://ip:port` or `https://ip:port`, and the `ip` pingable from the node so using the ygg ip or public ip if available.
-  gw.backends = ["http://185.206.122.35:8000"];
+
+  const gw: GatewayFQDNModel = {
+    name: "applyFQDN",
+    node_id: +(await grid3.capacity.filterNodes(gatewayQueryOptions))[0].nodeId,
+    fqdn: "test.hamada.grid.tf",
+    tls_passthrough: false,
+    // the backends have to be in this format `http://ip:port` or `https://ip:port`, and the `ip` pingable from the node so using the ygg ip or public ip if available.
+    backends: ["http://185.206.122.35:8000"],
+  };
 
   //Deploy VMs
   await deploy(grid3, gw);

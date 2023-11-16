@@ -1,4 +1,4 @@
-import { FilterOptions, K8SModel, KubernetesNodeModel, NetworkModel } from "../src";
+import { FilterOptions, K8SModel, QSFSZDBSModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -94,7 +94,7 @@ async function main() {
   }
 
   //create qsfs object
-  const qsfs = {
+  const qsfs: QSFSZDBSModel = {
     name: qsfs_name,
     count: 8,
     node_ids: qsfsNodes,
@@ -104,55 +104,55 @@ async function main() {
     metadata: "",
   };
 
-  // create network Object
-  const n = new NetworkModel();
-  n.name = "k8sqsfsNetwork";
-  n.ip_range = "10.238.0.0/16";
-
-  // create k8s node Object
-  const master = new KubernetesNodeModel();
-  master.name = "master";
-  master.node_id = +(await grid3.capacity.filterNodes(masterQueryOptions))[0].nodeId;
-  master.cpu = 1;
-  master.memory = 1024;
-  master.rootfs_size = 0;
-  master.disk_size = 1;
-  master.public_ip = false;
-  master.planetary = true;
-  master.qsfs_disks = [
-    {
-      qsfs_zdbs_name: qsfs_name,
-      name: "testQsfsK8sd1",
-      minimal_shards: 2,
-      expected_shards: 4,
-      encryption_key: "hamada",
-      prefix: "hamada",
-      cache: 1,
-      mountpoint: "/myqsfsdisk",
+  const k: K8SModel = {
+    name: "testk8sqsfs",
+    secret: "secret",
+    network: {
+      name: "k8sqsfsNetwork",
+      ip_range: "10.238.0.0/16",
     },
-  ];
-
-  // create k8s node Object
-  const worker = new KubernetesNodeModel();
-  worker.name = "worker";
-  worker.node_id = +(await grid3.capacity.filterNodes(workerQueryOptions))[0].nodeId;
-  worker.cpu = 1;
-  worker.memory = 1024;
-  worker.rootfs_size = 0;
-  worker.disk_size = 1;
-  worker.public_ip = false;
-  worker.planetary = true;
-
-  // create k8s Object
-  const k = new K8SModel();
-  k.name = "testk8sqsfs";
-  k.secret = "secret";
-  k.network = n;
-  k.masters = [master];
-  k.workers = [worker];
-  k.metadata = "";
-  k.description = "test deploying k8s via ts grid3 client";
-  k.ssh_key = config.ssh_key;
+    masters: [
+      {
+        name: "master",
+        node_id: +(await grid3.capacity.filterNodes(masterQueryOptions))[0].nodeId,
+        cpu: 1,
+        memory: 1024,
+        rootfs_size: 0,
+        disk_size: 1,
+        public_ip: false,
+        public_ip6: false,
+        planetary: true,
+        qsfs_disks: [
+          {
+            qsfs_zdbs_name: qsfs_name,
+            name: "testQsfsK8sd1",
+            minimal_shards: 2,
+            expected_shards: 4,
+            encryption_key: "hamada",
+            prefix: "hamada",
+            cache: 1,
+            mountpoint: "/myqsfsdisk",
+          },
+        ],
+      },
+    ],
+    workers: [
+      {
+        name: "worker",
+        node_id: +(await grid3.capacity.filterNodes(workerQueryOptions))[0].nodeId,
+        cpu: 1,
+        memory: 1024,
+        rootfs_size: 0,
+        disk_size: 1,
+        public_ip: false,
+        public_ip6: false,
+        planetary: true,
+      },
+    ],
+    metadata: "",
+    description: "test deploying k8s via ts grid3 client",
+    ssh_key: config.ssh_key,
+  };
 
   //Deploy QSFS
   await deployQsfs(grid3, qsfs);

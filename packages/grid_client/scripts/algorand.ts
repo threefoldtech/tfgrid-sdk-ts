@@ -1,4 +1,15 @@
-import { GridClient } from "../src";
+import {
+  AlgorandAccountAssetsFromAddressModel,
+  AlgorandAccountCreateModel,
+  AlgorandAccountInitModel,
+  AlgorandCreateTransactionModel,
+  AlgorandSignatureModel,
+  AlgorandTransferModel,
+  BlockchainDeleteModel,
+  BlockchainGetModel,
+  BlockchainSignModel,
+  GridClient,
+} from "../src";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 let grid3: GridClient;
@@ -31,9 +42,10 @@ async function main() {
 
 async function createAccount(account_name: string) {
   try {
-    const account_created = await grid3.algorand.create({
+    const account_created: AlgorandAccountCreateModel = {
       name: account_name,
-    });
+    };
+    await grid3.algorand.create(account_created);
     log(account_created);
   } catch (err) {
     console.log(err);
@@ -41,10 +53,11 @@ async function createAccount(account_name: string) {
 }
 async function importAccount(account_name: string, account_mnemonic: string) {
   try {
-    const account_imported = await grid3.algorand.init({
+    const importedAccount: AlgorandAccountInitModel = {
       name: account_name,
       secret: account_mnemonic,
-    });
+    };
+    const account_imported = await grid3.algorand.init(importedAccount);
     log(account_imported);
   } catch (err) {
     console.log(err);
@@ -52,9 +65,10 @@ async function importAccount(account_name: string, account_mnemonic: string) {
 }
 async function getAccountAssetsFromName(account_name: string) {
   try {
-    const account_assets = await grid3.algorand.assets({
+    const assets: BlockchainGetModel = {
       name: account_name,
-    });
+    };
+    const account_assets = await grid3.algorand.assets(assets);
     log(account_assets);
   } catch (err) {
     console.log(err);
@@ -62,9 +76,10 @@ async function getAccountAssetsFromName(account_name: string) {
 }
 async function getAccountAssetsFromAddress(account_address: string) {
   try {
-    const account_assets = await grid3.algorand.assetsByAddress({
+    const assets: AlgorandAccountAssetsFromAddressModel = {
       address: account_address,
-    });
+    };
+    const account_assets = await grid3.algorand.assetsByAddress(assets);
     log(account_assets);
   } catch (err) {
     console.log(err);
@@ -73,12 +88,13 @@ async function getAccountAssetsFromAddress(account_address: string) {
 async function createTransaction(account_name: string) {
   try {
     const receiver = "HZ57J3K46JIJXILONBBZOHX6BKPXEM2VVXNRFSUED6DKFD5ZD24PMJ3MVA";
-    const account_tx = await grid3.algorand.createTransaction({
+    const transaction: AlgorandCreateTransactionModel = {
       name: account_name,
       address_dest: receiver,
       amount: 100,
       description: "my nana",
-    });
+    };
+    const account_tx = await grid3.algorand.createTransaction(transaction);
     log(account_tx);
   } catch (err) {
     console.log(err);
@@ -86,7 +102,10 @@ async function createTransaction(account_name: string) {
 }
 async function getAccountMnemonicFromName(account_name) {
   try {
-    const account = await grid3.algorand.get({ name: account_name });
+    const getAccount: BlockchainGetModel = {
+      name: account_name,
+    };
+    const account = await grid3.algorand.get(getAccount);
     log(account);
   } catch (err) {
     console.log(err);
@@ -94,9 +113,10 @@ async function getAccountMnemonicFromName(account_name) {
 }
 async function deleteAccount(account_name: string) {
   try {
-    const deleteAccountConfirmation = await grid3.algorand.delete({
+    const deleteAccount: BlockchainDeleteModel = {
       name: account_name,
-    });
+    };
+    const deleteAccountConfirmation = await grid3.algorand.delete(deleteAccount);
     log(deleteAccountConfirmation);
   } catch (err) {
     console.log(err);
@@ -112,7 +132,10 @@ async function listAccounts() {
 }
 async function checkAccountExistsFromName(account_name: string) {
   try {
-    const accountExist = await grid3.algorand.exist({ name: account_name });
+    const account: BlockchainGetModel = {
+      name: account_name,
+    };
+    const accountExist = await grid3.algorand.exist(account);
     log(accountExist);
   } catch (err) {
     console.log(err);
@@ -120,7 +143,11 @@ async function checkAccountExistsFromName(account_name: string) {
 }
 async function signBytes(account_name: string, text: string) {
   try {
-    const signed_txn = await grid3.algorand.sign({ content: text, name: account_name });
+    const message: BlockchainSignModel = {
+      content: text,
+      name: account_name,
+    };
+    const signed_txn = await grid3.algorand.sign(message);
     log(signed_txn);
   } catch (err) {
     console.log(err);
@@ -129,14 +156,19 @@ async function signBytes(account_name: string, text: string) {
 async function signTransaction(account_name: string) {
   try {
     const receiver = "HZ57J3K46JIJXILONBBZOHX6BKPXEM2VVXNRFSUED6DKFD5ZD24PMJ3MVA";
-    const txn = await grid3.algorand.createTransaction({
+    const transactionModel: AlgorandCreateTransactionModel = {
       name: account_name,
       address_dest: receiver,
       amount: 100,
       description: "my nana",
-    });
+    };
+    const txn = await grid3.algorand.createTransaction(transactionModel);
 
-    const signed_txn = await grid3.algorand.sign_txn({ txn: txn, name: account_name });
+    const transaction: AlgorandSignatureModel = {
+      txn: txn,
+      name: account_name,
+    };
+    const signed_txn = await grid3.algorand.sign_txn(transaction);
     log(signed_txn);
   } catch (err) {
     console.log(err);
@@ -145,12 +177,13 @@ async function signTransaction(account_name: string) {
 async function transferAccount(account_name: string) {
   try {
     const receiver = "HZ57J3K46JIJXILONBBZOHX6BKPXEM2VVXNRFSUED6DKFD5ZD24PMJ3MVA";
-    const account_tx = await grid3.algorand.pay({
+    const transfer: AlgorandTransferModel = {
       name: account_name,
       address_dest: receiver,
       amount: 100,
       description: "my nana",
-    });
+    };
+    const account_tx = await grid3.algorand.pay(transfer);
     log(account_tx);
   } catch (err) {
     console.log(err);

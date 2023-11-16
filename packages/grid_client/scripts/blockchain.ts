@@ -1,4 +1,4 @@
-import { GridClient } from "../src";
+import { BlockchainCreateModel, BlockchainInitModel, GridClient } from "../src";
 import { blockchainType } from "../src/modules/blockchainInterface";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
@@ -82,13 +82,16 @@ async function main() {
   await grid3.disconnect();
 }
 
-async function createAccount(account_name: string, blockchain_type: blockchainType, ip?: string) {
+async function createAccount(account_name: string, blockchain_type: blockchainType) {
   try {
-    const account_created = await grid3.blockchain.create({
+    //change the relay to the desired network
+    const relay = "relay.dev.grid.tf";
+    const account: BlockchainCreateModel = {
       name: account_name,
-      ip: ip,
+      relay: relay,
       blockchain_type: blockchain_type,
-    });
+    };
+    const account_created = await grid3.blockchain.create(account);
     log(account_created);
     return account_created;
   } catch (err) {
@@ -98,11 +101,12 @@ async function createAccount(account_name: string, blockchain_type: blockchainTy
 
 async function importAccount(account_name: string, secret: string, blockchain_type: blockchainType) {
   try {
-    const account_imported = await grid3.blockchain.init({
+    const account: BlockchainInitModel = {
       name: account_name,
       secret: secret,
       blockchain_type: blockchain_type,
-    });
+    };
+    const account_imported = await grid3.blockchain.init(account);
     log(account_imported);
   } catch (err) {
     console.log(err);

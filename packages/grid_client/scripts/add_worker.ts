@@ -47,17 +47,18 @@ async function main() {
     farmId: 1,
   };
 
-  // create k8s node Object
-  const worker = new AddWorkerModel();
-  worker.deployment_name = "testk8s";
-  worker.name = "worker2";
-  worker.node_id = +(await grid3.capacity.filterNodes(workerQueryOptions))[0].nodeId;
-  worker.cpu = 2;
-  worker.memory = 1024;
-  worker.rootfs_size = 0;
-  worker.disk_size = 8;
-  worker.public_ip = false;
-  worker.planetary = true;
+  const worker: AddWorkerModel = {
+    deployment_name: "testk8s",
+    name: "worker2",
+    node_id: +(await grid3.capacity.filterNodes(workerQueryOptions))[0].nodeId,
+    cpu: 2,
+    memory: 1024,
+    rootfs_size: 0,
+    disk_size: 8,
+    public_ip: false,
+    public_ip6: false,
+    planetary: true,
+  };
 
   //Add Worker
   await addWorker(grid3, worker);

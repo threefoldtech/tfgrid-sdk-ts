@@ -1,4 +1,4 @@
-import { FilterOptions, ZDBModel, ZdbModes, ZDBSModel } from "../src";
+import { FilterOptions, ZdbModes, ZDBSModel } from "../src";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -45,20 +45,21 @@ async function main() {
     farmId: 1,
   };
 
-  // create zdb object
-  const zdb = new ZDBModel();
-  zdb.name = "hamada";
-  zdb.node_id = +(await grid3.capacity.filterNodes(zdbQueryOptions))[0].nodeId;
-  zdb.mode = ZdbModes.user;
-  zdb.disk_size = 1;
-  zdb.publicNamespace = false;
-  zdb.password = "testzdb";
-
-  // create zdbs object
-  const zdbs = new ZDBSModel();
-  zdbs.name = "tttzdbs";
-  zdbs.zdbs = [zdb];
-  zdbs.metadata = "";
+  const zdbs: ZDBSModel = {
+    name: "tttzdbs",
+    zdbs: [
+      {
+        name: "hamada",
+        node_id: +(await grid3.capacity.filterNodes(zdbQueryOptions))[0].nodeId,
+        mode: ZdbModes.user,
+        disk_size: 1,
+        publicNamespace: false,
+        password: "testzdb",
+      },
+    ],
+    metadata: "",
+    description: "test zdbs",
+  };
 
   //Deploy ZDBs
   await deploy(grid3, zdbs);

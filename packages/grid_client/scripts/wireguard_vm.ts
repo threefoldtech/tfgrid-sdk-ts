@@ -1,4 +1,4 @@
-import { FilterOptions, GatewayNameModel, GridClient, MachineModel, MachinesModel, NetworkModel } from "../src";
+import { FilterOptions, GatewayNameModel, MachineModel, MachinesModel, NetworkModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 

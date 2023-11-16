@@ -1,3 +1,4 @@
+import { ZOSGetDeploymentModel, ZOSNodeModel } from "../src";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -94,29 +95,37 @@ async function main() {
   const nodeId = 11;
   const contractId = 2766;
 
+  const contract: ZOSGetDeploymentModel = {
+    contractId: contractId,
+  };
+
+  const node: ZOSNodeModel = {
+    nodeId: nodeId,
+  };
+
   //Ping Node
-  await pingNode(grid3, { nodeId });
+  await pingNode(grid3, node);
 
   //Get deployment
-  await getDeployment(grid3, { contractId });
+  await getDeployment(grid3, contract);
 
   //Has public IPV6
-  await hasPublicIPv6(grid3, { nodeId });
+  await hasPublicIPv6(grid3, node);
 
   //List network interfaces
-  await listNetworkInterfaces(grid3, { nodeId });
+  await listNetworkInterfaces(grid3, node);
 
   //List network public IPs
-  await listNetworkPublicIPs(grid3, { nodeId });
+  await listNetworkPublicIPs(grid3, node);
 
   //Get network public config
-  await getNetworkPublicConfig(grid3, { nodeId });
+  await getNetworkPublicConfig(grid3, node);
 
   //Get storage pools
-  await getStoragePools(grid3, { nodeId });
+  await getStoragePools(grid3, node);
 
   //Get GPU info
-  await getNodeGPUInfo(grid3, { nodeId });
+  await getNodeGPUInfo(grid3, node);
 
   await grid3.disconnect();
 }
