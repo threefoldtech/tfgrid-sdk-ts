@@ -1,6 +1,3 @@
+import * as GenericErrors from "./base_error";
 import * as TFChainErrors from "./tfChain/index";
-
-export { TFChainErrors };
-
-//  const error = TFChainErrors["dao"]["NoneValue"]
-// console.log(error)
+export { GenericErrors, TFChainErrors };
