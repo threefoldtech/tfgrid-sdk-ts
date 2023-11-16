@@ -33,8 +33,11 @@ export async function deployK8s(grid: GridClient, options: DeployK8SOptions) {
   return data;
 }
 
-export function loadK8S(grid: GridClient, name: string) {
-  return grid.k8s.getObj(name);
+export async function loadK8S(grid: GridClient, name: string) {
+  const k8s = grid.k8s.getObj(name);
+  (k8s as any).deploymentName = name;
+  (k8s as any).projectName = grid.clientOptions.projectName;
+  return k8s;
 }
 
 async function createWorker(data: K8SWorker) {
