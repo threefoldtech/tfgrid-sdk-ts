@@ -22,6 +22,11 @@
       no-data-text="No contracts found on this account."
       v-bind:onClick:row="loading || deleting ? undefined : onClickRow"
     >
+      <template #[`item.consumption`]="{ item }">
+        <p v-if="item.raw.consumption !== 0">{{ item.raw.consumption.toFixed(3) }} TFT/hour</p>
+        <p v-else>No Data Available</p>
+      </template>
+
       <template #[`item.state`]="{ item }">
         <v-tooltip
           v-if="item && item.value.state === ContractStates.GracePeriod"
@@ -76,6 +81,11 @@
         </v-tooltip>
       </template>
     </ListTable>
+    <div class="pt-4">
+      <v-alert variant="tonal" color="secondary" class="pt-4" v-if="contracts.length && totalCost"
+        >Total Cost: {{ totalCost }} TFT/hour ≈ {{ (totalCost * 24 * 30).toFixed(3) }} TFT/month</v-alert
+      >
+    </div>
 
     <template #footer-actions>
       <v-btn
@@ -149,6 +159,7 @@
 
 <script lang="ts" setup>
 import { ContractStates, type GridClient } from "@threefold/grid_client";
+import { Decimal } from "decimal.js";
 import { computed, type Ref, ref } from "vue";
 
 import { useProfileManager } from "../stores";
@@ -164,6 +175,7 @@ const isExporting = ref(false);
 const grid = ref<GridClient | null>();
 const selectedContracts = ref<NormalizedContract[]>([]);
 const nodeStatus = ref() as Ref<{ [x: number]: NodeStatus }>;
+const totalCost = ref(0);
 const headers: VDataTableHeader = [
   { title: "PLACEHOLDER", key: "data-table-select" },
   { title: "ID", key: "contractId" },
@@ -180,11 +192,13 @@ const headers: VDataTableHeader = [
 ];
 
 async function onMount() {
+  selectedContracts.value = [];
   loading.value = true;
   failedContractId.value = undefined;
   contracts.value = [];
   grid.value = await getGrid(profileManager.profile!);
   contracts.value = await getUserContracts(grid.value!);
+  totalCost.value = getTotalCost(contracts.value);
   nodeStatus.value = await getNodeStatus(nodeIDs.value);
   loading.value = false;
 }
@@ -272,6 +286,7 @@ async function onDelete() {
       });
     }
     contracts.value = contracts.value!.filter(c => !selectedContracts.value.includes(c));
+    totalCost.value = getTotalCost(contracts.value);
     selectedContracts.value = [];
   } catch (e) {
     if ((e as Error).message.includes("Inability to pay some fees")) {
@@ -305,6 +320,14 @@ function getNodeStateColor(state: NodeStatus): string {
     case NodeStatus.Standby:
       return "warning";
   }
+}
+
+function getTotalCost(contracts: NormalizedContract[]) {
+  totalCost.value = 0;
+  for (const contract of contracts) {
+    totalCost.value = +new Decimal(totalCost.value).add(contract.consumption);
+  }
+  return +totalCost.value.toFixed(3);
 }
 </script>
 

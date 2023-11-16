@@ -72,11 +72,11 @@ import type { solutionFlavor } from "../types";
 type Package = PropType<solutionFlavor>;
 
 const props = defineProps({
-  small: { type: Object as Package, default: () => ({ cpu: 1, memory: 1024 * 2, disk: 15 }) },
-  medium: { type: Object as Package, default: () => ({ cpu: 2, memory: 1024 * 2, disk: 100 }) },
+  small: { type: Object as Package, default: () => ({ cpu: 1, memory: 2, disk: 15 }) },
+  medium: { type: Object as Package, default: () => ({ cpu: 2, memory: 4, disk: 100 }) },
   large: {
     type: Object as Package,
-    default: () => ({ cpu: 4, memory: 1024 * 4, disk: 250 }),
+    default: () => ({ cpu: 4, memory: 16, disk: 250 }),
   },
   disabled: { type: Boolean },
 });
@@ -86,15 +86,15 @@ const packages = computed(() => {
   const { small, medium, large } = props;
   return [
     {
-      title: `Small(CPU: ${small.cpu} vCores, Memory: ${small.memory} MB, SSD: ${small.disk} GB)`,
+      title: `Small(CPU: ${small.cpu} vCores, Memory: ${small.memory} GB, SSD: ${small.disk} GB)`,
       value: small,
     },
     {
-      title: `Medium(CPU: ${medium.cpu} vCores, Memory: ${medium.memory} MB, SSD: ${medium.disk} GB)`,
+      title: `Medium(CPU: ${medium.cpu} vCores, Memory: ${medium.memory} GB, SSD: ${medium.disk} GB)`,
       value: medium,
     },
     {
-      title: `Large(CPU: ${large.cpu} vCores, Memory: ${large.memory} MB, SSD: ${large.disk} GB)`,
+      title: `Large(CPU: ${large.cpu} vCores, Memory: ${large.memory} GB, SSD: ${large.disk} GB)`,
       value: large,
     },
     { title: "Custom", value: "custom" },
@@ -111,7 +111,7 @@ watch(
   value => {
     if (value === "custom" || typeof value === "string") return;
     cpu.value = value.cpu;
-    memory.value = value.memory;
+    memory.value = value.memory * 1024;
     disk.value = value.disk;
   },
   { immediate: true },

@@ -197,7 +197,7 @@ class VMHL extends HighLevelBase {
       let access_node_id = randomChoice(filteredAccessNodes);
       if (accessNodeId) {
         if (!filteredAccessNodes.includes(accessNodeId))
-          throw Error(`Node ${accessNodeId} is not an access not or maybe it's down`);
+          throw Error(`Node ${accessNodeId} is not an access node or maybe it's down`);
 
         access_node_id = accessNodeId;
       }
