@@ -1,22 +1,6 @@
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
-async function main() {
-  const grid3 = await getClient();
-
-  const node = { nodeId: 73 };
-
-  const extraFee = 5;
-
-  //Set extra fee
-  await setExtraFee(grid3, node, extraFee);
-
-  //Get extra fee
-  await getExtraFee(grid3, node);
-
-  await grid3.disconnect();
-}
-
 async function setExtraFee(client, node, extraFee) {
   try {
     const res = await client.contracts.setDedicatedNodeExtraFee({ ...node, extraFee: extraFee });
@@ -37,6 +21,22 @@ async function getExtraFee(client, node) {
   } catch (error) {
     log("Error while getting extra fee " + error);
   }
+}
+
+async function main() {
+  const grid3 = await getClient();
+
+  const node = { nodeId: 73 };
+
+  const extraFee = 5;
+
+  //Set extra fee
+  await setExtraFee(grid3, node, extraFee);
+
+  //Get extra fee
+  await getExtraFee(grid3, node);
+
+  await grid3.disconnect();
 }
 
 main();

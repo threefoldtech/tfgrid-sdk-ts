@@ -2,6 +2,61 @@ import { FilterOptions, K8SModel, KubernetesNodeModel, NetworkModel } from "../s
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
+async function deployQsfs(client, qsfs) {
+  try {
+    const res = await client.qsfs_zdbs.deploy(qsfs);
+    log("================= Deploying QSFS =================");
+    log(res);
+    log("================= Deploying QSFS =================");
+  } catch (error) {
+    log("Error while Deploying QSFS " + error);
+  }
+}
+
+async function deploy(client, k8s) {
+  try {
+    const res = await client.k8s.deploy(k8s);
+    log("================= Deploying K8s =================");
+    log(res);
+    log("================= Deploying K8s =================");
+  } catch (error) {
+    log("Error while Deploying the cluster " + error);
+  }
+}
+
+async function getDeployment(client, k8s) {
+  try {
+    const res = await client.k8s.getObj(k8s);
+    log("================= Getting deployment information =================");
+    log(res);
+    log("================= Getting deployment information =================");
+  } catch (error) {
+    log("Error while getting the deployment " + error);
+  }
+}
+
+async function cancel(client, k8s) {
+  try {
+    const res = await client.k8s.delete(k8s);
+    log("================= Canceling the deployment =================");
+    log(res);
+    log("================= Canceling the deployment =================");
+  } catch (error) {
+    log("Error while canceling the deployment " + error);
+  }
+}
+
+async function deleteQsfs(client, qsfs) {
+  try {
+    const res = await client.qsfs_zdbs.delete(qsfs);
+    log("================= Deleting QSFS =================");
+    log(res);
+    log("================= Deleting QSFS =================");
+  } catch (error) {
+    log("Error while deleting qsfs " + error);
+  }
+}
+
 async function main() {
   const grid3 = await getClient();
 
@@ -113,61 +168,6 @@ async function main() {
   // await deleteQsfs(grid3, { name: qsfs_name });
 
   await grid3.disconnect();
-}
-
-async function deployQsfs(client, qsfs) {
-  try {
-    const res = await client.qsfs_zdbs.deploy(qsfs);
-    log("================= Deploying QSFS =================");
-    log(res);
-    log("================= Deploying QSFS =================");
-  } catch (error) {
-    log("Error while Deploying QSFS " + error);
-  }
-}
-
-async function deploy(client, k8s) {
-  try {
-    const res = await client.k8s.deploy(k8s);
-    log("================= Deploying K8s =================");
-    log(res);
-    log("================= Deploying K8s =================");
-  } catch (error) {
-    log("Error while Deploying the cluster " + error);
-  }
-}
-
-async function getDeployment(client, k8s) {
-  try {
-    const res = await client.k8s.getObj(k8s);
-    log("================= Getting deployment information =================");
-    log(res);
-    log("================= Getting deployment information =================");
-  } catch (error) {
-    log("Error while getting the deployment " + error);
-  }
-}
-
-async function cancel(client, k8s) {
-  try {
-    const res = await client.k8s.delete(k8s);
-    log("================= Canceling the deployment =================");
-    log(res);
-    log("================= Canceling the deployment =================");
-  } catch (error) {
-    log("Error while canceling the deployment " + error);
-  }
-}
-
-async function deleteQsfs(client, qsfs) {
-  try {
-    const res = await client.qsfs_zdbs.delete(qsfs);
-    log("================= Deleting QSFS =================");
-    log(res);
-    log("================= Deleting QSFS =================");
-  } catch (error) {
-    log("Error while deleting qsfs " + error);
-  }
 }
 
 main();

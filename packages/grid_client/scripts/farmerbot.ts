@@ -3,6 +3,28 @@ import { FarmerBotFindNodeModel } from "../src/high_level/farmerbot";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
+async function pingFarm(client, farm) {
+  try {
+    const res = await client.farmerbot.pingFarm(farm);
+    log("================= Pinging farm =================");
+    log(res);
+    log("================= Pinging farm =================");
+  } catch (error) {
+    log("Error while pinging farm " + error);
+  }
+}
+
+async function findNode(client, FarmerBotFindNode) {
+  try {
+    const res = await client.farmerbot.findNode(FarmerBotFindNode);
+    log("================= Finding node =================");
+    log(res);
+    log("================= Finding node =================");
+  } catch (error) {
+    log("Error while finding node " + error);
+  }
+}
+
 async function main() {
   const grid3 = await getClient();
   const farm: pingFarmModel = {
@@ -25,28 +47,6 @@ async function main() {
   await findNode(grid3, FarmerBotFindNode);
 
   await grid3.disconnect();
-}
-
-async function pingFarm(client, farm) {
-  try {
-    const res = await client.farmerbot.pingFarm(farm);
-    log("================= Pinging farm =================");
-    log(res);
-    log("================= Pinging farm =================");
-  } catch (error) {
-    log("Error while pinging farm " + error);
-  }
-}
-
-async function findNode(client, FarmerBotFindNode) {
-  try {
-    const res = await client.farmerbot.findNode(FarmerBotFindNode);
-    log("================= Finding node =================");
-    log(res);
-    log("================= Finding node =================");
-  } catch (error) {
-    log("Error while finding node " + error);
-  }
 }
 
 main();

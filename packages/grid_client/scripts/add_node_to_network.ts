@@ -1,18 +1,27 @@
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
+async function addNode(client, node) {
+  try {
+    const res = await client.networks.addNode(node);
+    log("================= Adding node =================");
+    log(res);
+    log("================= Adding node =================");
+  } catch (error) {
+    log("Error while adding node " + error);
+  }
+}
+
 async function main() {
   const grid3 = await getClient();
-  try {
-    // if the network is not created, it will create one and add this node to it.
-    const res = await grid3.networks.addNode({
-      name: "wedtest",
-      ipRange: "10.249.0.0/16",
-      nodeId: 14,
-    });
-    log(res);
-  } finally {
-    grid3.disconnect();
-  }
+
+  // if the network is not created, it will create one and add this node to it.
+  await addNode(grid3, {
+    name: "wedtest",
+    ipRange: "10.249.0.0/16",
+    nodeId: 14,
+  });
+
+  await grid3.disconnect();
 }
 main();

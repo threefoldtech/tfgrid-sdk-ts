@@ -6,6 +6,17 @@ import { NetworkEnv } from "../src/config";
 import config from "./config.json";
 import { log } from "./utils";
 
+async function createAccount(client, relay) {
+  try {
+    const res = await client.tfchain.createAccount(relay, true);
+    log("================= Creating account =================");
+    log(res);
+    log("================= Creating account =================");
+  } catch (error) {
+    log("Error while creating account " + error);
+  }
+}
+
 async function main() {
   let network;
 
@@ -23,17 +34,6 @@ async function main() {
 
   //Create Account
   await createAccount(client, relay);
-}
-
-async function createAccount(client, relay) {
-  try {
-    const res = await client.tfchain.createAccount(relay, true);
-    log("================= Creating account =================");
-    log(res);
-    log("================= Creating account =================");
-  } catch (error) {
-    log("Error while creating account " + error);
-  }
 }
 
 main();

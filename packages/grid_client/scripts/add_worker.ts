@@ -4,6 +4,39 @@ import { log } from "./utils";
 
 // Please run kubernetes script first before running this one to create the cluster.
 
+async function addWorker(client, worker) {
+  try {
+    const res = await client.k8s.add_worker(worker);
+    log("================= Adding worker =================");
+    log(res);
+    log("================= Adding worker =================");
+  } catch (error) {
+    log("Error while adding the worker" + error);
+  }
+}
+
+async function getWorker(client, worker) {
+  try {
+    const res = await client.k8s.getObj(worker);
+    log("================= Getting worker information =================");
+    log(res);
+    log("================= Getting worker information =================");
+  } catch (error) {
+    log("Error while getting the worker" + error);
+  }
+}
+
+async function deleteWorker(client, worker) {
+  try {
+    const res = await client.k8s.delete_worker(worker);
+    log("================= Deleting the worker =================");
+    log(res);
+    log("================= Deleting the worker =================");
+  } catch (error) {
+    log("Error while deleting the worker" + error);
+  }
+}
+
 async function main() {
   const grid3 = await getClient();
 
@@ -36,39 +69,6 @@ async function main() {
   // await deleteWorker(grid3, { name: worker.name, deployment_name: worker.deployment_name });
 
   await grid3.disconnect();
-}
-
-async function addWorker(client, worker) {
-  try {
-    const res = await client.k8s.add_worker(worker);
-    log("================= Adding worker =================");
-    log(res);
-    log("================= Adding worker =================");
-  } catch (error) {
-    log("Error while adding the worker" + error);
-  }
-}
-
-async function getWorker(client, worker) {
-  try {
-    const res = await client.k8s.getObj(worker);
-    log("================= Getting worker information =================");
-    log(res);
-    log("================= Getting worker information =================");
-  } catch (error) {
-    log("Error while getting the worker" + error);
-  }
-}
-
-async function deleteWorker(client, worker) {
-  try {
-    const res = await client.k8s.delete_worker(worker);
-    log("================= Deleting the worker =================");
-    log(res);
-    log("================= Deleting the worker =================");
-  } catch (error) {
-    log("Error while deleting the worker" + error);
-  }
 }
 
 main();

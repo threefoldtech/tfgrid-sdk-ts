@@ -1,15 +1,6 @@
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
-async function main() {
-  const grid3 = await getClient();
-
-  //Delete all contracts
-  await deleteAllContracts(grid3);
-
-  await grid3.disconnect();
-}
-
 async function deleteAllContracts(client) {
   try {
     const res = await client.contracts.cancelMyContracts();
@@ -19,6 +10,15 @@ async function deleteAllContracts(client) {
   } catch (error) {
     log("Error while deleting contracts " + error);
   }
+}
+
+async function main() {
+  const grid3 = await getClient();
+
+  //Delete all contracts
+  await deleteAllContracts(grid3);
+
+  await grid3.disconnect();
 }
 
 main();
