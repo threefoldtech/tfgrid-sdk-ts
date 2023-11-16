@@ -48,6 +48,8 @@ interface NodeInfo {
   hasGPU: boolean;
   extraFee: number;
   rentedByTwinId: number;
+  inDedicatedFarm: boolean;
+  rentContractId: number;
 }
 interface PublicConfig {
   domain: string;
@@ -408,7 +410,7 @@ class Nodes {
 
   async nodeAvailableForTwinId(nodeId: number, twinId: number): Promise<boolean> {
     return send("get", urlJoin(this.proxyURL, `/nodes/${nodeId}`), "", {})
-      .then(node => {
+      .then((node: NodeInfo) => {
         if (node.rentedByTwinId != twinId && (node.inDedicatedFarm || node.rentContractId != 0)) {
           return false;
         }
