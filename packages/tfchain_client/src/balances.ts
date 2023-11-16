@@ -1,3 +1,5 @@
+import { ValidationError } from "@threefold/types";
+
 import { Client, QueryClient } from "./client";
 import { checkConnection } from "./utils";
 
@@ -42,7 +44,7 @@ class Balances extends QueryBalances {
   @checkConnection
   async transfer(options: BalanceTransferOptions) {
     if (isNaN(options.amount) || options.amount <= 0) {
-      throw Error("Amount must be a positive numeric value");
+      throw new ValidationError("Amount must be a positive numeric value");
     }
 
     const extrinsic = await this.client.api.tx.balances.transfer(options.address, options.amount);
