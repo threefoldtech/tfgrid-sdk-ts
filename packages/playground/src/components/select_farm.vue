@@ -75,11 +75,11 @@ const emits = defineEmits<{
 
 const SIZE = 20;
 const page = ref();
-
 const farmInput = useInputRef();
 const profileManager = useProfileManager();
 const country = ref<string>();
 const search = ref<string>();
+const searchInput = ref<string>();
 const farm = ref<Farm>();
 const farmManager = useFarm();
 watch([farm, country], ([f, c]) => {
@@ -87,18 +87,14 @@ watch([farm, country], ([f, c]) => {
   emits("update:modelValue", f ? { farmID: f.farmID, name: f.name, country: c ?? undefined } : undefined);
 });
 
-watch(search, (newSearch, oldSearch) => {
-  setTimeout(async () => {
-    if (newSearch != "") {
-      console.log({ search: newSearch });
-
-      const { data } = await gridProxyClient.farms.list({ nameContains: newSearch });
-      farms.value = data;
-    } else if (newSearch === "") {
-      await loadFarms();
+watch(
+  search,
+  debounce(async (value, oldValue) => {
+    if (value !== oldValue && value && value?.length > 2 && oldValue != undefined && oldValue !== "") {
+      await resetPages();
     }
-  }, 2000);
-});
+  }, 2000),
+);
 
 const loading = ref(false);
 const loadingNodes = ref(farmManager?.getLoading());
@@ -144,14 +140,18 @@ function prepareFilters(filters: Filters, twinId: number): FarmFilterOptions {
 
 async function loadFarms() {
   farmInput.value?.setStatus(ValidatorStatus.Pending);
-
   loading.value = true;
   const oldFarm = farm.value;
   const grid = await getGrid(profileManager.profile!);
-  const filters = props.filters;
-  const _farms = await getFarms(grid!, prepareFilters(props.filters, grid!.twinId), {
-    exclusiveFor: props.exclusiveFor,
-  });
+  let _farms: Farm[] = [];
+  if (searchInput.value && searchInput.value?.length > 0) {
+    const { data } = await gridProxyClient.farms.list({ nameContains: searchInput.value });
+    _farms = data;
+  } else {
+    _farms = await getFarms(grid!, prepareFilters(props.filters, grid!.twinId), {
+      exclusiveFor: props.exclusiveFor,
+    });
+  }
   selectedPages.value.push(page.value);
   if (!_farms.length && selectedPages.value.length !== pagesCount.value) {
     page.value = setRandomPage();
@@ -191,6 +191,7 @@ async function resetPages() {
   loading.value = true;
   farmInput.value?.setStatus(ValidatorStatus.Pending);
   selectedPages.value = [];
+  searchInput.value = search.value;
   const grid = await getGrid(profileManager.profile!);
   if (!grid) {
     console.log("can't get the grid");
@@ -236,6 +237,7 @@ watch([loading, shouldBeUpdated], async ([l, s]) => {
 
 <script lang="ts">
 import type { FarmFilterOptions } from "@threefold/grid_client";
+import { debounce } from "lodash";
 import { nextTick } from "vue";
 
 import { gridProxyClient } from "@/clients";
