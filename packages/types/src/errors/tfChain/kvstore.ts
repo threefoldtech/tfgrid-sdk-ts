@@ -1,4 +1,5 @@
 import { BaseError } from "../base_error";
+import { ErrorModules } from "../modules";
 export enum Errors {
   NoValueStored,
   KeyIsTooLarge,
@@ -7,7 +8,7 @@ export enum Errors {
 
 class KVStoreError extends BaseError {
   constructor(code: number, message: string) {
-    super(code, message, "tfkvStore");
+    super(code, message, ErrorModules.TFKVStore);
   }
 }
 export class NoValueStored extends KVStoreError {

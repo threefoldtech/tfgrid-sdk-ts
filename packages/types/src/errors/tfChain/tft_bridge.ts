@@ -1,4 +1,5 @@
 import { BaseError } from "../base_error";
+import { ErrorModules } from "../modules";
 
 export enum Errors {
   ValidatorExists,
@@ -26,7 +27,7 @@ export enum Errors {
 
 class TFTBridge extends BaseError {
   constructor(code: number, message: string) {
-    super(code, message, "tftBridgeModule");
+    super(code, message, ErrorModules.TFTBridge);
   }
 }
 

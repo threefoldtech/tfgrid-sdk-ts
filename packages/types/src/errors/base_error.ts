@@ -1,12 +1,4 @@
-export type ErrorModules =
-  | "Generic"
-  //chain modules
-  | "dao"
-  | "tfkvStore"
-  | "smartContractModule"
-  | "tfgridModule"
-  | "tftBridgeModule"
-  | "tftPriceModule";
+import { ErrorModules } from "./modules";
 
 export enum Generic {
   TFChainError,
@@ -23,11 +15,11 @@ export class BaseError extends Error {
 
 export class ValidationError extends BaseError {
   constructor(message: string) {
-    super(Generic.ValidationError, message, "Generic");
+    super(Generic.ValidationError, message, ErrorModules.Generic);
   }
 }
 export class TimeoutError extends BaseError {
   constructor(message: string) {
-    super(Generic.TimeoutError, message, "Generic");
+    super(Generic.TimeoutError, message, ErrorModules.Generic);
   }
 }

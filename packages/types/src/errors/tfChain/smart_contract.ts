@@ -1,4 +1,5 @@
 import { BaseError } from "../base_error";
+import { ErrorModules } from "../modules";
 export enum Errors {
   TwinNotExists,
   NodeNotExists,
@@ -55,7 +56,7 @@ export enum Errors {
 }
 class SmartContractError extends BaseError {
   constructor(code: number, message: string) {
-    super(code, message, "smartContractModule");
+    super(code, message, ErrorModules.SmartContract);
   }
 }
 export class TwinNotExists extends SmartContractError {

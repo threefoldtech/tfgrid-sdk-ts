@@ -1,4 +1,5 @@
 import { BaseError } from "../base_error";
+import { ErrorModules } from "../modules";
 
 export enum Errors {
   ErrFetchingPrice,
@@ -13,7 +14,7 @@ export enum Errors {
 
 class TFTPrice extends BaseError {
   constructor(code: number, message: string) {
-    super(code, message, "tftPriceModule");
+    super(code, message, ErrorModules.TFTPrice);
   }
 }
 export class ErrFetchingPrice extends TFTPrice {

@@ -1,4 +1,5 @@
 import { BaseError } from "../base_error";
+import { ErrorModules } from "../modules";
 
 export enum Errors {
   NoneValue,
@@ -22,7 +23,7 @@ export enum Errors {
 
 class DaoError extends BaseError {
   constructor(code: number, message: string) {
-    super(code, message, "dao");
+    super(code, message, ErrorModules.Dao);
   }
 }
 export class NoneValue extends DaoError {

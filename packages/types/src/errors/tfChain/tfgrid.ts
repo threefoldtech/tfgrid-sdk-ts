@@ -1,4 +1,5 @@
 import { BaseError } from "../base_error";
+import { ErrorModules } from "../modules";
 
 export enum Errors {
   NoneValue = 1,
@@ -134,7 +135,7 @@ export enum Errors {
 
 class TFGridErrors extends BaseError {
   constructor(code: number, message: string) {
-    super(code, message, "tfgridModule");
+    super(code, message, ErrorModules.TFGrid);
   }
 }
 export class NoneValue extends TFGridErrors {
