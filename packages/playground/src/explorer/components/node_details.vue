@@ -6,7 +6,7 @@
     transition="dialog-bottom-transition"
     hide-overlay
   >
-    <v-toolbar>
+    <v-toolbar color="primary">
       <div class="d-flex justify-center">
         <v-btn icon dark @click="() => $emit('close-dialog', false)">
           <v-icon>mdi-close</v-icon>
@@ -175,10 +175,8 @@ export default {
 .v-list-item__append > .v-icon {
   opacity: 1 !important;
 }
-.v-toolbar__content {
+:deep(.v-toolbar__content) {
   justify-content: end !important;
-}
-.v-toolbar__content {
   height: 48px !important;
 }
 </style>
