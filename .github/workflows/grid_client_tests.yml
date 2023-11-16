@@ -4,12 +4,23 @@ on:
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
+    inputs:
+      network:
+        type: choice
+        description: 'which network to run tests on'
+        required: true
+        default: 'dev'
+        options: 
+        - 'dev'
+        - 'qa'
+        - 'test'
+        - 'main'
 
 jobs:
   tests:
     runs-on: ubuntu-20.04
     env:
-      NETWORK: ${{ secrets.NETWORK }}
+      NETWORK: ${{ github.event.inputs.network }}
       RMB_PROXY: true
       STORE_SECRET: secret
       MNEMONIC: ${{ secrets.MNEMONIC }}
