@@ -3,6 +3,7 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { waitReady } from "@polkadot/wasm-crypto";
 import { Client as TFClient } from "@threefold/tfchain_client";
+import { ConnectionError, RMBError, ValidationError } from "@threefold/types";
 import base64url from "base64url";
 import { Buffer } from "buffer";
 import { v4 as uuidv4 } from "uuid";
@@ -41,7 +42,7 @@ class Client {
     }
 
     if (!(keypairType.toLowerCase().trim() in KPType)) {
-      throw new Error({ message: "Unsupported Keypair type" });
+      throw new ValidationError("Unsupported Keypair type");
     }
 
     Client.connections.set(key, this);
@@ -91,7 +92,7 @@ class Client {
         }
       };
     } catch (err) {
-      throw new Error({ message: `Unable to create websocket connection due to ${err}` });
+      throw new ConnectionError(`Unable to create websocket connection due to ${err}`);
     }
   }
   async connect() {
@@ -103,16 +104,17 @@ class Client {
       const twinId = await this.tfclient.twins.getTwinIdByAccountId({ accountId: this.signer.address });
       this.twin = await this.tfclient.twins.get({ id: twinId });
       if (!twinId) {
-        throw new Error({ message: `Couldn't find a user for the provided mnemonic on this network.` });
+        throw new ValidationError(`Couldn't find a user for the provided mnemonic on this network.`);
       }
     } catch (e) {
       console.log(e);
-      throw new Error({ message: `Couldn't find a user for the provided mnemonic on this network.` });
+      //TODO is this a valid error message?
+      throw new ConnectionError(`Couldn't find a user for the provided mnemonic on this network.`);
     }
 
     try {
       if (!this.twin) {
-        throw new Error({ message: "twin does not exist, please create a twin first" });
+        throw new ValidationError("twin does not exist, please create a twin first");
       }
       const relayHostName = this.relayUrl.replace("wss://", "").replace("/", "");
       const pk = generatePublicKey(this.mnemonics);
@@ -143,12 +145,12 @@ class Client {
         c.close();
       }
       console.log(err);
-      throw new Error({
-        message: `Unable to establish a connection with the RMB server ${this.relayUrl.replace(
+      throw new ConnectionError(
+        `Unable to establish a connection with the RMB server ${this.relayUrl.replace(
           "wss://",
           "",
         )}. Please check your internet connection and try again. If the problem persists, please contact our support.`,
-      });
+      );
     }
   }
 
@@ -212,9 +214,7 @@ class Client {
           await this.waitForOpenConnection();
         } catch (er) {
           if (retries === retriesCount) {
-            const e = new Error();
-            e.message = `Failed to open connection after try for ${retriesCount} times.`;
-            throw e;
+            throw new ConnectionError(`Failed to open connection after try for ${retriesCount} times.`);
           }
           this.createConnection();
         }
@@ -227,7 +227,7 @@ class Client {
 
       return clientEnvelope.uid;
     } catch (err) {
-      throw new Error({ message: `Unable to send due to ${err}` });
+      throw new RMBError(`Unable to send due to ${err}`);
     }
   }
 
@@ -275,9 +275,7 @@ class Client {
           await this.waitForOpenConnection();
         } catch (er) {
           if (retries === retriesCount) {
-            const e = new Error();
-            e.message = `Failed to open connection after try for ${retriesCount} times.`;
-            throw e;
+            throw new ConnectionError(`Failed to open connection after try for ${retriesCount} times.`);
           }
           this.createConnection();
         }
@@ -290,7 +288,7 @@ class Client {
 
       return clientEnvelope.uid;
     } catch (err) {
-      throw new Error({ message: `Unable to send due to ${err}` });
+      throw new RMBError(`Unable to send due to ${err}`);
     }
   }
   // if pong is received reset timer (40 seconds)

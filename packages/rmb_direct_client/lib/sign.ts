@@ -1,9 +1,9 @@
 import { getSharedSecret, utils } from "@noble/secp256k1";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { isAddress } from "@polkadot/util-crypto";
+import { ValidationError } from "@threefold/types";
 import { mnemonicToSeedSync, validateMnemonic } from "bip39";
 import { Buffer } from "buffer";
-
 export enum KPType {
   sr25519 = "sr25519",
   ed25519 = "ed25519",
@@ -28,7 +28,7 @@ export function createShared(pubKey: Uint8Array, hexSeedOrMnemonic: string) {
     const seed = mnemonicToSeedSync(hexSeedOrMnemonic);
     privateKey = new Uint8Array(seed).slice(0, 32);
   } else {
-    throw new Error(`Expected a valid mnemonic or hexSeed in "createShared" but got "${hexSeedOrMnemonic}".`);
+    throw new ValidationError(`Expected a valid mnemonic or hexSeed in "createShared" but got "${hexSeedOrMnemonic}".`);
   }
 
   const pointX = getSharedSecret(privateKey, pubKey);
