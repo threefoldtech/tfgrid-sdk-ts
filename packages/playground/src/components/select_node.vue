@@ -58,7 +58,6 @@
           v-bind="{
             ...props,
             loading: props.loading,
-            hint: pingingNode ? `Checking if the disks will fit in the node's storage pools... ` : props.hint,
             error: !!errorMessage,
             errorMessages: !!errorMessage ? errorMessage : undefined,
           }"
@@ -179,12 +178,11 @@ watch(
 
     const grid = await getGrid(profileManager.profile!);
     if (node && grid) {
-      await validateNodeStoragePool(
-        grid,
-        node.nodeId,
-        props.filters.diskSizes.map(disk => disk * 1024 ** 3),
-        props.rootFileSystemSize * 1024 ** 3,
-      );
+      if (props.selection === "automated") {
+        await validateNodeStoragePool(node);
+      } else {
+        await checkRentedNode();
+      }
     }
 
     if (node && props.filters.hasGPU) {
@@ -244,8 +242,8 @@ watch(
       //   console.log("nodes", nodes);
       // }
 
-      // selectedNode.value = { nodeId: Number(value) };
-      checkRentedNode();
+      selectedNode.value = { nodeId: Number(value) };
+      // checkRentedNode();
     }
   },
   { deep: false },
@@ -253,17 +251,20 @@ watch(
 watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
   if (l || !s) return;
   shouldBeUpdated.value = false;
-  farmManager?.subscribe(farmId => {
-    if (!farmId) {
-      selectedNode.value = undefined;
-      availableNodes.value = [];
-      return;
-    }
-    clearTimeout(delay.value);
-    delay.value = setTimeout(() => {
-      loadNodes(farmId);
-    }, 1000);
-  });
+  if (props.selection === "automated") {
+    console.log("automated");
+    farmManager?.subscribe(farmId => {
+      if (!farmId) {
+        selectedNode.value = undefined;
+        availableNodes.value = [];
+        return;
+      }
+      clearTimeout(delay.value);
+      delay.value = setTimeout(() => {
+        loadNodes(farmId);
+      }, 1000);
+    });
+  }
 });
 
 function getChipColor(item: any) {
@@ -271,38 +272,32 @@ function getChipColor(item: any) {
 }
 async function checkRentedNode() {
   const grid = await getGrid(profileManager.profile!);
-  // const filters = props.filters;
-  console.log("filters.rentedBy ", profileManager.profile?.twinId);
-  const filters: FilterOptions = {
-    rentedBy: profileManager.profile?.twinId,
-  };
-  console.log("selectedNode.value ", ManualselectedNode.value);
-  const filters2 = props.filters;
-  //   const filters: FilterOptions = {
-  //   farmId: options.farmId ? options.farmId : undefined,
-  //   cru: options.cpu,
-  //   mru: Math.round(options.memory / 1024),
-  //   sru: options.diskSizes.reduce((total, disk) => total + disk),
-  //   publicIPs: options.ipv4,
-  //   hasGPU: options.hasGPU,
-  //   rentedBy: options.rentedBy ? grid.twinId : undefined,
-  //   certified: options.certified,
-  //   availableFor: grid.twinId,
-  // };
-  const nodes = await grid?.capacity.filterNodes(filters);
+  const filters = props.filters;
+  errorMessage.value = ``;
+  loadingNodes.value = true;
   const node = await grid?.capacity.nodes.getNode(Number(ManualselectedNode.value));
-  console.log("node ", node);
+  if (node) {
+    const gridproxy = window.env.GRIDPROXY_URL;
+    const diskSizes = [...filters.diskSizes, props.rootFileSystemSize];
 
-  if (node?.rentedByTwinId !== profileManager.profile?.twinId && node?.rentedByTwinId !== 0) {
-    errorMessage.value = `Node ${ManualselectedNode.value} is rented by someone else`;
-    loadingNodes.value = false;
+    const freeresources = await grid?.capacity.nodes.getNodeFreeResources(node.nodeId, "proxy", gridproxy);
+    console.log("Free resources: ", freeresources);
+    if (node.rentedByTwinId !== profileManager.profile?.twinId && node.rentedByTwinId !== 0) {
+      errorMessage.value = `Node ${ManualselectedNode.value} is rented by someone else`;
+    } else if (filters.ipv4 && !node.publicConfig.ipv4) {
+      errorMessage.value = `Node ${ManualselectedNode.value} is not assigned to a public ip`;
+    } else if (freeresources && freeresources.cru < filters.cpu) {
+      errorMessage.value = `Node ${ManualselectedNode.value} doesn't have enough cpu`;
+    } else if (freeresources && freeresources.mru < Math.round(filters.memory / 1024)) {
+      errorMessage.value = `Node ${ManualselectedNode.value} doesn't have enough memory`;
+    } else if (freeresources && freeresources.sru < filters.diskSizes.reduce((total, disk) => total + disk)) {
+      errorMessage.value = `Node ${ManualselectedNode.value} doesn't have enough sru`;
+    }
+  } else {
+    errorMessage.value = `Node ${ManualselectedNode.value} is not on the grid`;
   }
-  // console.log(node?.)
-  // else if(node?.cru !== ){
-  // }
-  // else if(){
-
-  // }
+  loadingNodes.value = false;
+  pingingNode.value = false;
 }
 
 async function loadNodes(farmId: number | undefined) {

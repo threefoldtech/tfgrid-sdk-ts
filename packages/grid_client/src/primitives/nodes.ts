@@ -253,6 +253,7 @@ class Nodes {
           const node: RMBNodeCapacity = res;
           const ret: NodeResources = { cru: 0, mru: 0, hru: 0, sru: 0, ipv4u: 0 };
 
+          ret.cru = +node.total.cru;
           ret.mru = +node.total.mru - +node.used.mru;
           ret.sru = +node.total.sru - +node.used.sru;
           ret.hru = +node.total.hru - +node.used.hru;
@@ -272,7 +273,7 @@ class Nodes {
       .then(res => {
         const node: NodeCapacity = res;
         const ret: NodeResources = { cru: 0, mru: 0, hru: 0, sru: 0, ipv4u: 0 };
-
+        ret.cru = +node.capacity.total_resources.cru;
         ret.mru = +node.capacity.total_resources.mru - +node.capacity.used_resources.mru;
         ret.sru = +node.capacity.total_resources.sru - +node.capacity.used_resources.sru;
         ret.hru = +node.capacity.total_resources.hru - +node.capacity.used_resources.hru;
