@@ -5,6 +5,7 @@ export enum Generic {
   GridClientError,
   ValidationError,
   TimeoutError,
+  ConnectionError,
 }
 export class BaseError extends Error {
   constructor(public code: number, message: string, public module: ErrorModules) {
@@ -21,5 +22,11 @@ export class ValidationError extends BaseError {
 export class TimeoutError extends BaseError {
   constructor(message: string) {
     super(Generic.TimeoutError, message, ErrorModules.Generic);
+  }
+}
+
+export class ConnectionError extends BaseError {
+  constructor(message: string) {
+    super(Generic.ConnectionError, message, ErrorModules.Generic);
   }
 }
