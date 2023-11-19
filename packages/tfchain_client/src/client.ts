@@ -179,10 +179,10 @@ class QueryClient {
   ): Promise<T> {
     await this.connect();
     if (!this.checkSection(section)) {
-      throw new TFChainError(`<${section}> is not defined on the chain`);
+      throw new ValidationError(`<${section}> is not defined on the chain`);
     }
     if (!this.checkMethod(section, method)) {
-      throw new TFChainError(`<${method}> is not defined on the chain under ${section}`);
+      throw new ValidationError(`<${method}> is not defined on the chain under ${section}`);
     }
 
     return new Promise<T>(async (resolve, reject) => {
