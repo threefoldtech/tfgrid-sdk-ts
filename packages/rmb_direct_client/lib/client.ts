@@ -3,7 +3,7 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { waitReady } from "@polkadot/wasm-crypto";
 import { Client as TFClient } from "@threefold/tfchain_client";
-import { ConnectionError, RMBError, ValidationError } from "@threefold/types";
+import { ConnectionError, RMBError, TimeoutError, ValidationError } from "@threefold/types";
 import base64url from "base64url";
 import { Buffer } from "buffer";
 import { v4 as uuidv4 } from "uuid";
@@ -183,7 +183,7 @@ class Client {
       const interval = setInterval(() => {
         if (currentAttempt > maxNumberOfAttempts - 1) {
           clearInterval(interval);
-          reject(new Error({ message: "Maximum number of attempts exceeded" }));
+          reject(new ConnectionError("Maximum number of attempts exceeded"));
         } else if (this.con && this.con.readyState === this.con.OPEN) {
           clearInterval(interval);
           resolve("connected");
@@ -322,7 +322,8 @@ class Client {
             }
           } else {
             this.responses.delete(requestID);
-            reject("invalid signature, discarding response");
+            //TODO what is the probate error type
+            reject(new ValidationError("invalid signature, discarding response"));
             break;
           }
         }
@@ -331,7 +332,7 @@ class Client {
           const err = envelope.error;
           if (err) {
             this.responses.delete(requestID);
-            reject(`${err.code} ${err.message}`);
+            reject(new RMBError(`${err.code} ${err.message}`));
             break;
           }
         } else if (envelope && envelope.pong) {
@@ -343,7 +344,7 @@ class Client {
       }
       if (envelope && envelope.expiration) {
         this.responses.delete(requestID);
-        reject(`Didn't get a response after ${envelope.expiration} seconds`);
+        reject(new TimeoutError(`Didn't get a response after ${envelope.expiration} seconds`));
       }
     });
   }
