@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, type PropType, type Ref, ref, watch } from "vue";
+import { nextTick, onMounted, onUnmounted, type PropType, type Ref, ref, watch } from "vue";
 
 import { useInputRef } from "@/hooks/input_validator";
 
@@ -146,7 +146,7 @@ async function loadFarms() {
   let _farms: Farm[] = [];
   if (searchInput.value && searchInput.value?.length > 0) {
     const { data } = await gridProxyClient.farms.list({ nameContains: searchInput.value });
-    _farms = data;
+    _farms = data.map((obj: any) => _.mapKeys(obj, (_, key) => (key === "farmId" ? "farmID" : key)));
   } else {
     _farms = await getFarms(grid!, prepareFilters(props.filters, grid!.twinId), {
       exclusiveFor: props.exclusiveFor,
@@ -168,9 +168,6 @@ async function loadFarms() {
 
   if (!farm.value) {
     farm.value = farms.value[0];
-  }
-
-  if (!farm.value) {
     farmInput.value.setStatus(initialized ? ValidatorStatus.Invalid : ValidatorStatus.Init);
     if (!initialized) {
       initialized = true;
@@ -238,7 +235,7 @@ watch([loading, shouldBeUpdated], async ([l, s]) => {
 <script lang="ts">
 import type { FarmFilterOptions } from "@threefold/grid_client";
 import { debounce } from "lodash";
-import { nextTick } from "vue";
+import _ from "lodash";
 
 import { gridProxyClient } from "@/clients";
 import { ValidatorStatus } from "@/hooks/form_validator";
