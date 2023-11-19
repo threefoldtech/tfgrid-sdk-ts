@@ -39,9 +39,9 @@
 
           <template v-slot:[`item.dedicated`]="{ item }">
             <p class="text-left mt-1 mb-0">
-              <v-chip :color="getNodeTypeColor(item.columns.dedicated).color">
+              <v-chip :color="getNodeTypeColor(item.columns.dedicated as boolean).color">
                 <span>
-                  {{ capitalize(getNodeTypeColor(item.columns.dedicated).type) }}
+                  {{ capitalize(getNodeTypeColor(item.columns.dedicated as boolean).type) }}
                 </span>
               </v-chip>
             </p>
