@@ -51,7 +51,7 @@ export const getNodeTypeColor = (dedicated: boolean): NodeTypeColor => {
   if (dedicated) {
     return { color: "primary", type: "dedicated" };
   } else {
-    return { color: "warning", type: "shared" };
+    return { color: "success", type: "shared" };
   }
 };
 
