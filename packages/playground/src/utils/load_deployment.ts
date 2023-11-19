@@ -1,7 +1,5 @@
 import type { GridClient } from "@threefold/grid_client";
 
-import { ProjectName } from "@/types";
-
 import { formatConsumption } from "./contracts";
 import { getGrid, updateGrid } from "./grid";
 import { normalizeError } from "./helpers";
@@ -47,26 +45,19 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   )) as GridClient[];
 
   const promises = machines.map(async (name, index) => {
-    let contracts: any[] = [];
-    try {
-      contracts = await getDeploymentContracts(grids[index], name, projectName);
+    const contracts = await getDeploymentContracts(grids[index], name, projectName).catch(() => []);
+    const nodeIds = await grids[index].machines._getDeploymentNodeIds(name).catch(() => []);
 
-      if (contracts.length === 0) {
-        count--;
-        return;
-      }
-    } catch (e) {
-      console.log(e);
-      failedDeployments.push({ name, nodes: [], contracts: contracts });
+    if (contracts.length === 0) {
+      count--;
       return;
     }
 
-    const nodeIds = await grids[index].machines._getDeploymentNodeIds(name);
     const machinePromise = grids[index].machines.getObj(name);
     const timeoutPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
         reject(new Error("Timeout"));
-      }, 10000);
+      }, window.env.TIMEOUT);
     });
 
     try {
@@ -143,7 +134,7 @@ export function getWireguardConfig(grid: GridClient, name: string) {
     .finally(() => updateGrid(grid, { projectName }));
 }
 
-export type K8S = { masters: any[]; workers: any[]; deploymentName: string; wireguard?: any };
+export type K8S = { masters: any[]; workers: any[]; deploymentName: string; projectName: string; wireguard?: any };
 export async function loadK8s(grid: GridClient) {
   await migrateModule(grid.k8s);
 
@@ -157,16 +148,17 @@ export async function loadK8s(grid: GridClient) {
   const failedDeployments: FailedDeployment[] = [];
 
   const promises = clusters.map(async (name, index) => {
-    const contracts = await grids[index].k8s.getDeploymentContracts(name);
-    const nodeIds = await grids[index].k8s._getDeploymentNodeIds(name);
-    const clusterPromise = grids[index].k8s.getObj(name);
-    const timeoutPromise = new Promise((resolve, reject) => {
-      setTimeout(() => {
-        reject(new Error("Timeout"));
-      }, 10000);
-    });
+    const contracts = await grids[index].k8s.getDeploymentContracts(name).catch(() => []);
+    const nodeIds = await grids[index].k8s._getDeploymentNodeIds(name).catch(() => []);
 
     try {
+      const clusterPromise = grids[index].k8s.getObj(name);
+      const timeoutPromise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          reject(new Error("Timeout"));
+        }, window.env.TIMEOUT);
+      });
+
       const result = await Promise.race([clusterPromise, timeoutPromise]);
       if (result instanceof Error && result.message === "Timeout") {
         console.log(`%c[Error] Timeout loading deployment with name ${name}`, "color: rgb(207, 102, 121)");

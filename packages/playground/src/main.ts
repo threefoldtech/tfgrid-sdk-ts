@@ -1,4 +1,5 @@
 import "mosha-vue-toastify/dist/style.css";
+import "./global.css";
 
 import { createPinia } from "pinia";
 import { createApp } from "vue";

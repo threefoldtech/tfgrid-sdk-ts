@@ -13,7 +13,7 @@ import { validateMnemonic } from "bip39";
 import { Balances, QueryBalances } from "./balances";
 import { Contracts, QueryContracts } from "./contracts";
 import { Dao, QueryDao } from "./dao";
-import { QueryFarms } from "./farms";
+import { Farms, QueryFarms } from "./farms";
 import { KVStore } from "./kvstore";
 import { Nodes, QueryNodes } from "./nodes";
 import { QueryPricingPolicies } from "./pricing_policies";
@@ -231,6 +231,7 @@ class Client extends QueryClient {
   termsAndConditions: TermsAndConditions = new TermsAndConditions(this);
   kvStore: KVStore = new KVStore(this);
   twins: Twins = new Twins(this);
+  farms: Farms = new Farms(this);
   dao: Dao = new Dao(this);
   tftBridge: Bridge = new Bridge(this);
   declare url: string;

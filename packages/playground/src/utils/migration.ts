@@ -58,7 +58,7 @@ async function _migrateContracts(module: BaseModule, values: any[]) {
       return [];
     }
 
-    oldData.projectName = `${projectName}/${instanceName}`;
+    oldData.projectName = projectName ? `${projectName}/${instanceName}` : instanceName;
     return module.tfClient.contracts.updateNode({
       id: contract.contractId,
       data: JSON.stringify(oldData),
