@@ -2,7 +2,7 @@ import { BaseError } from "../base_error";
 import { ErrorModules } from "../modules";
 
 export enum Errors {
-  NoneValue = 1,
+  NoneValue,
   StorageOverflow,
 
   CannotCreateNode,
