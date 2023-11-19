@@ -35,7 +35,7 @@ async function cancel(client, gw) {
   }
 }
 
-// read more about the gateway types in this doc: https://github.com/threefoldtech/zos/tree/main/docs/gateway
+// read more about the gateway types in this doc: https://github.com/threefoldtech/zos/tree/main/docs/internals/gateway
 async function main() {
   const grid3 = await getClient();
 
