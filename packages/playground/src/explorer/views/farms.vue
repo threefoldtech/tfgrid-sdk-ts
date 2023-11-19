@@ -9,13 +9,24 @@
           v-model:valid="isValidForm"
         />
 
-        <FarmsTable
-          :items="farms"
+        <v-data-table-server
           :loading="loading"
-          :selectedFarm="selectedFarm"
-          @open-dialog="openDialog"
-          :count="totalFarms"
-        />
+          :headers="headers"
+          :items="farms"
+          :items-length="totalFarms"
+          :items-per-page-options="[
+            { value: 5, title: '5' },
+            { value: 10, title: '10' },
+            { value: 15, title: '15' },
+          ]"
+          v-model:items-per-page="size"
+          v-model:page="page"
+          class="elevation-1"
+          @update:options="updateFarms"
+          @click:row="openSheet"
+        >
+          <template #loading />
+        </v-data-table-server>
       </v-col>
     </v-row>
     <farmDialog
@@ -33,21 +44,29 @@ import type { Farm } from "@threefold/gridproxy_client";
 import debounce from "lodash/debounce.js";
 import { onMounted, ref, watch } from "vue";
 
+import type { VDataTableHeader } from "../../types";
 import type { FilterFarmInputs } from "../../utils/filter_farms";
 import { inputsInitializer } from "../../utils/filter_farms";
 import { getFarmQueries, getFarms } from "../utils/helpers";
 import type { FarmFilterOptions, MixedFarmFilter } from "../utils/types";
-
 const loading = ref<boolean>(false);
 const farms = ref<Farm[]>();
 const isDialogOpened = ref<boolean>(false);
 const selectedFarm = ref<Farm>();
 const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer);
-const filterOptions = ref<FarmFilterOptions>();
+const size = ref(5);
+const page = ref(1);
+const filterOptions = ref<FarmFilterOptions>({
+  size: size.value,
+  page: page.value,
+  farmId: undefined,
+  farmName: undefined,
+});
 const mixedFarmFilters = ref<MixedFarmFilter>({ inputs: filterFarmInputs.value, options: filterOptions.value });
 const isFormLoading = ref<boolean>(true);
 const isValidForm = ref<boolean>(false);
 const totalFarms = ref(0);
+
 const _getFarms = async (queries: Partial<FarmsQuery>) => {
   loading.value = true;
   isFormLoading.value = true;
@@ -78,22 +97,24 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
   }
 };
 onMounted(async () => {
-  await _getFarms({});
+  await _getFarms({ page: 1, size: 5 });
 });
 
 const request = debounce(_getFarms, 1000);
-watch(
-  mixedFarmFilters,
-  async () => {
-    const queries = getFarmQueries(mixedFarmFilters.value);
-    await request(queries);
-  },
-  { deep: true },
-);
+const updateFarms = async () => {
+  const queries = getFarmQueries(mixedFarmFilters.value);
+
+  await request(queries);
+};
+watch(mixedFarmFilters, updateFarms, { deep: true });
+
 const inputFiltersReset = (nFltrNptsVal: FilterFarmInputs) => {
   mixedFarmFilters.value.inputs = nFltrNptsVal;
   nFltrNptsVal.farmId.value = undefined;
   nFltrNptsVal.name.value = undefined;
+};
+const openSheet = (_e: any, { item }: any) => {
+  openDialog(item.value);
 };
 const openDialog = (item: Farm) => {
   selectedFarm.value = item;
@@ -103,21 +124,52 @@ const openDialog = (item: Farm) => {
 const closeDialog = () => {
   isDialogOpened.value = false;
 };
+const headers: VDataTableHeader = [
+  { title: "ID", key: "farmId" },
+  { title: "Name", key: "name" },
+  {
+    title: "Total Public IPs",
+    key: "totalPublicIp",
+    align: "start",
+    sortable: false,
+  },
+  {
+    title: "Free Public IPs",
+    key: "freePublicIp",
+    align: "start",
+    sortable: false,
+  },
+  {
+    title: "Used Public IPs",
+    key: "usedPublicIp",
+    align: "start",
+    sortable: false,
+  },
+  {
+    title: "Certification Type",
+    key: "certificationType",
+    align: "start",
+    sortable: false,
+  },
+  {
+    title: "Pricing Policy",
+    key: "pricingPolicyId",
+    align: "start",
+    sortable: false,
+  },
+];
 </script>
 
 <script lang="ts">
 import type { FarmsQuery } from "@threefold/gridproxy_client";
-import { createContext } from "vm";
 
 import Filters from "../../components/filter.vue";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
 import FarmDialog from "../components/farm_dialog.vue";
-import FarmsTable from "../components/farms_table.vue";
 
 export default {
   name: "Farms",
   components: {
-    FarmsTable,
     FarmDialog,
     Filters,
   },

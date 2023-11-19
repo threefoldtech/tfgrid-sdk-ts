@@ -16,8 +16,10 @@ export type NodeFilterOptions = {
 };
 
 export type FarmFilterOptions = {
-  farmId: number;
-  farmName: string;
+  farmId?: number;
+  farmName?: string;
+  page?: number;
+  size?: number;
 };
 
 export const nodeOptionsInitializer: NodeFilterOptions = {
