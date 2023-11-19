@@ -10,7 +10,7 @@ import { byCountry } from "country-code-lookup";
 
 import { gridProxyClient } from "@/clients";
 
-import type { MixedFilter, NodeStatusColor } from "./types";
+import type { MixedFilter, NodeStatusColor, NodeTypeColor } from "./types";
 
 export const getCountryCode = (node: GridNode): string => {
   if (!node) {
@@ -44,6 +44,14 @@ export const getNodeStatusColor = (status: string): NodeStatusColor => {
     return { color: "warning", status: NodeStatus.Standby };
   } else {
     return { color: "error", status: NodeStatus.Down };
+  }
+};
+
+export const getNodeTypeColor = (dedicated: boolean): NodeTypeColor => {
+  if (dedicated) {
+    return { color: "primary", type: "dedicated" };
+  } else {
+    return { color: "warning", type: "shared" };
   }
 };
 

@@ -36,6 +36,16 @@
               </v-chip>
             </p>
           </template>
+
+          <template v-slot:[`item.dedicated`]="{ item }">
+            <p class="text-left mt-1 mb-0">
+              <v-chip :color="getNodeTypeColor(item.columns.dedicated).color">
+                <span>
+                  {{ capitalize(getNodeTypeColor(item.columns.dedicated).type) }}
+                </span>
+              </v-chip>
+            </p>
+          </template>
         </v-data-table-server>
       </v-col>
     </v-row>
@@ -48,7 +58,7 @@ import type { PropType } from "vue";
 import { capitalize } from "vue";
 import type { VDataTable } from "vuetify/labs/VDataTable";
 
-import { getNodeStatusColor } from "@/explorer/utils/helpers";
+import { getNodeStatusColor, getNodeTypeColor } from "@/explorer/utils/helpers";
 import formatResourceSize from "@/utils/format_resource_size";
 import toReadableDate from "@/utils/to_readable_data";
 
@@ -114,6 +124,7 @@ export default {
       { title: "GPU", key: "num_gpu", align: "start", sortable: false },
       { title: "Uptime", key: "uptime", align: "start", sortable: false, value: item => toReadableDate(item.uptime) },
       { title: "Status", key: "status", align: "start", sortable: false },
+      { title: "Type", key: "dedicated", align: "start", sortable: false },
     ];
 
     const openSheet = (_e: any, { item }: any) => {
@@ -124,6 +135,7 @@ export default {
       headers,
       nodeStatusOptions,
       getNodeStatusColor,
+      getNodeTypeColor,
       openSheet,
       capitalize,
     };
