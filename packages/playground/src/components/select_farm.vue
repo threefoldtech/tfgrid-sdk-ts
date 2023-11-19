@@ -146,7 +146,13 @@ async function loadFarms() {
   let _farms: Farm[] = [];
   if (searchInput.value && searchInput.value?.length > 0) {
     const { data } = await gridProxyClient.farms.list({ nameContains: searchInput.value });
-    _farms = data.map((obj: any) => _.mapKeys(obj, (_, key) => (key === "farmId" ? "farmID" : key)));
+    _farms = data.map((_farm: any) => {
+      return {
+        name: _farm.name,
+        farmID: _farm.farmId,
+        country: _farm.country,
+      };
+    });
   } else {
     _farms = await getFarms(grid!, prepareFilters(props.filters, grid!.twinId), {
       exclusiveFor: props.exclusiveFor,
@@ -235,7 +241,6 @@ watch([loading, shouldBeUpdated], async ([l, s]) => {
 <script lang="ts">
 import type { FarmFilterOptions } from "@threefold/grid_client";
 import { debounce } from "lodash";
-import _ from "lodash";
 
 import { gridProxyClient } from "@/clients";
 import { ValidatorStatus } from "@/hooks/form_validator";
