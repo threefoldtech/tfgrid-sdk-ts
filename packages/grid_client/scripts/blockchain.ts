@@ -4,7 +4,6 @@ import { getClient } from "./client_loader";
 import { log } from "./utils";
 
 let grid3: GridClient;
-const ip = "2a02:1812:1443:300:7913:de17:4c83:ecb2";
 const message = "a message";
 const hexMessage = message
   .split("")
@@ -17,17 +16,46 @@ async function main() {
 
   grid3 = await getClient();
 
-  await createAccount("createAlgorand", blockchainType.algorand);
-  const stellar_account = await createAccount("createStellar", blockchainType.stellar);
-  const tfchain_account = await createAccount("createTfchain", blockchainType.tfchain, ip);
+  //change the relay to the desired network
+  const relay = "relay.dev.grid.tf";
 
-  await importAccount("algorandClient", algorand_mnemonic, blockchainType.algorand);
-  await importAccount(
-    "stellarClient",
-    "SBCWGJ4A4IHDUUXPASQBL7VKGZGNRMVNV66GO5P6FU6Q4NDKHIHZFRKI",
-    blockchainType.stellar,
-  );
-  await importAccount("tfchainClient", grid3.mnemonic, blockchainType.tfchain);
+  const algorandAccount: BlockchainCreateModel = {
+    name: "createAlgorand",
+    blockchain_type: blockchainType.algorand,
+  };
+  const stellarAccount: BlockchainCreateModel = {
+    name: "createStellar",
+    relay: relay,
+    blockchain_type: blockchainType.stellar,
+  };
+  const tfchainAccount: BlockchainCreateModel = {
+    name: "createTfchain",
+    relay: relay,
+    blockchain_type: blockchainType.tfchain,
+  };
+  const importAlgorand: BlockchainInitModel = {
+    name: "algorandClient",
+    secret: algorand_mnemonic,
+    blockchain_type: blockchainType.algorand,
+  };
+  const importStellar: BlockchainInitModel = {
+    name: "stellarClient",
+    secret: "SBCWGJ4A4IHDUUXPASQBL7VKGZGNRMVNV66GO5P6FU6Q4NDKHIHZFRKI",
+    blockchain_type: blockchainType.stellar,
+  };
+  const importTFchain: BlockchainInitModel = {
+    name: "tfchainClient",
+    secret: grid3.clientOptions.mnemonic,
+    blockchain_type: blockchainType.tfchain,
+  };
+
+  await createAccount(algorandAccount);
+  const stellar_account = await createAccount(stellarAccount);
+  const tfchain_account = await createAccount(tfchainAccount);
+
+  await importAccount(importAlgorand);
+  await importAccount(importStellar);
+  await importAccount(importTFchain);
 
   // List all
   const accounts = await grid3.blockchain.list();
@@ -82,15 +110,8 @@ async function main() {
   await grid3.disconnect();
 }
 
-async function createAccount(account_name: string, blockchain_type: blockchainType) {
+async function createAccount(account) {
   try {
-    //change the relay to the desired network
-    const relay = "relay.dev.grid.tf";
-    const account: BlockchainCreateModel = {
-      name: account_name,
-      relay: relay,
-      blockchain_type: blockchain_type,
-    };
     const account_created = await grid3.blockchain.create(account);
     log(account_created);
     return account_created;
@@ -99,13 +120,8 @@ async function createAccount(account_name: string, blockchain_type: blockchainTy
   }
 }
 
-async function importAccount(account_name: string, secret: string, blockchain_type: blockchainType) {
+async function importAccount(account) {
   try {
-    const account: BlockchainInitModel = {
-      name: account_name,
-      secret: secret,
-      blockchain_type: blockchain_type,
-    };
     const account_imported = await grid3.blockchain.init(account);
     log(account_imported);
   } catch (err) {
