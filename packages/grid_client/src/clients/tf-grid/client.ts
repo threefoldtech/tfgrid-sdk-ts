@@ -1,4 +1,5 @@
 import { Client } from "@threefold/tfchain_client";
+import { ValidationError } from "@threefold/types";
 
 import { KeypairType } from "../../zos/deployment";
 import { TFBalances } from "./balances";
@@ -27,7 +28,7 @@ class TFClient extends Client {
     super({ url, mnemonicOrSecret: mnemonic, keypairType });
 
     if (!storeSecret) {
-      throw new Error("Couldn't create TFClient without store secret");
+      throw new ValidationError("Couldn't create TFClient without store secret");
     }
   }
 }

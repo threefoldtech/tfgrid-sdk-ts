@@ -5,6 +5,7 @@ import {
   GetDedicatedNodePriceOptions,
   SetDedicatedNodeExtraFeesOptions,
 } from "@threefold/tfchain_client";
+import { GraphQLError } from "@threefold/types";
 import { Decimal } from "decimal.js";
 
 import { ContractStates } from "../../modules";
@@ -135,7 +136,7 @@ class TFContracts extends Contracts {
 
       return response["data"] as GqlContracts;
     } catch (err) {
-      throw Error(`Error listing contracts by twin id ${options.twinId}: ${err}`);
+      throw new GraphQLError(`Error listing contracts by twin id ${options.twinId}: ${err}`);
     }
   }
 
@@ -196,7 +197,7 @@ class TFContracts extends Contracts {
           .toNumber();
       }
     } catch (err) {
-      throw Error(`Error getting consumption for contract ${options.id}: ${err}`);
+      throw new GraphQLError(`Error getting consumption for contract ${options.id}: ${err}`);
     }
   }
 
