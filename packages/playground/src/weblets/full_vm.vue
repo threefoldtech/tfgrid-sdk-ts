@@ -231,15 +231,6 @@ watch(
   },
   { immediate: true },
 );
-watch(
-  selectedNode,
-  selectedNode => {
-    if (selectedNode) {
-      console.log("selectedNode in fullvm: ", selectedNode);
-    }
-  },
-  { immediate: true },
-);
 
 watch(
   hasGPU,
