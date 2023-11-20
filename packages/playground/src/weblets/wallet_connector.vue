@@ -31,10 +31,15 @@
         <span v-else-if="!wallet.profile">Connect your TFChain Wallet</span>
 
         <div class="d-flex justify-space-between" v-else>
-          <div class="d-flex flex-column justify-center text-left">
-            <p class="mt-2">Balance: <span class="font-weight-bold text-info">26649988813.784 TFT</span></p>
+          <p v-if="loadingBalance" class="d-flex justify-center align-center font-weight-bold">Loading...</p>
+          <div class="d-flex flex-column justify-center text-left" v-else>
+            <p class="mt-2">
+              Balance: <span class="font-weight-bold text-info">{{ balance?.free || 0 }} TFT</span>
+            </p>
             <div class="d-flex align-center">
-              <p>Locked: <span class="font-weight-bold text-info">100.998 TFT</span></p>
+              <p>
+                Locked: <span class="font-weight-bold text-info">{{ balance?.locked || 0 }} TFT</span>
+              </p>
               <v-tooltip text="Locked balance documentation">
                 <template #activator="{ props }">
                   <v-btn
@@ -59,7 +64,7 @@
                 color="error"
                 variant="tonal"
                 class="ml-2"
-                @click.stop="wallet.set(null)"
+                @click.stop="logout()"
                 v-bind="props"
               />
             </template>
@@ -105,15 +110,6 @@
                       :hint="sshHint"
                       :persistent-hint="!!sshHint"
                     />
-                    <!-- 
-                      :hint="
-                        updatingSSH
-                          ? 'Updating your public ssh key.'
-                          : generatingSSH
-                          ? 'Generating a new public ssh key.'
-                          : SSHKeyHint
-                      "
-                       -->
                   </copy-input-wrapper>
                 </template>
               </v-tooltip>
@@ -192,7 +188,7 @@
           @click="
             () => {
               openDialog = false;
-              wallet.set(null);
+              logout();
             }
           "
         >
@@ -206,13 +202,14 @@
 
 <script lang="ts">
 import { ThreefoldWalletConnectorApi } from "@threefold/extension_api";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
+import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import QrcodeGenerator from "../components/qrcode_generator.vue";
 import { clearableRef } from "../hooks";
 import { useProfileManager } from "../stores";
-import { getGrid, loadProfile, storeSSH } from "../utils/grid";
+import { type Balance, getGrid, loadBalance, loadProfile, storeSSH } from "../utils/grid";
 import { downloadAsFile } from "../utils/helpers";
 
 export default {
@@ -222,6 +219,7 @@ export default {
     const openDialog = ref(false);
     const network = process.env.NETWORK || window.env.NETWORK;
     const wallet = useProfileManager();
+    const profileManagerController = useProfileManagerController();
 
     const checkingInstallation = ref(true);
     const isInstalled = ref(false);
@@ -233,12 +231,68 @@ export default {
       requestingAccess.value = false;
     }
 
+    profileManagerController.set({ loadBalance: updateBalance });
+
+    const loadingBalance = ref(false);
+    const balance = ref<Balance>();
+    async function updateBalance() {
+      loadingBalance.value = true;
+      try {
+        if (!wallet.profile) {
+          console.log("Error UpdateBalance requires active wallet.");
+          return;
+        }
+
+        const grid = await getGrid(wallet.profile);
+        if (!grid) {
+          return updateBalance();
+        }
+
+        balance.value = await loadBalance(grid);
+      } catch {
+        return updateBalance();
+      } finally {
+        loadingBalance.value = false;
+      }
+    }
+
+    let intervalTime: ReturnType<typeof setInterval>;
+    watch(
+      () => wallet.profile,
+      profile => {
+        if (intervalTime) clearInterval(intervalTime);
+        if (!profile) return;
+        intervalTime = setInterval(updateBalance, 120_000);
+        updateBalance();
+      },
+      { immediate: true, deep: true },
+    );
+
     onMounted(async () => {
       isInstalled.value = await ThreefoldWalletConnectorApi.isInstalled();
       checkingInstallation.value = false;
+      if (!isInstalled.value) {
+        return;
+      }
 
-      if (isInstalled.value) {
-        await requestAccess();
+      await requestAccess();
+      if (!grantedPermission.value) {
+        return;
+      }
+
+      const seed = sessionStorage.getItem("seed");
+      if (!seed) {
+        return;
+      }
+
+      try {
+        connecting.value = true;
+        await login({ mnemonic: seed });
+      } catch (error) {
+        logout();
+        console.log(error);
+      } finally {
+        connecting.value = false;
       }
     });
 
@@ -250,9 +304,14 @@ export default {
       connecting.value = false;
     }
 
+    function logout() {
+      wallet.set(null);
+      sessionStorage.removeItem("seed");
+    }
+
     async function login(account: { mnemonic: string } | null) {
       if (!account) {
-        return wallet.set(null);
+        return logout();
       }
 
       try {
@@ -261,11 +320,12 @@ export default {
           throw new Error("Failed to init grid.");
         }
         const profile = await loadProfile(grid);
+        sessionStorage.setItem("seed", profile.mnemonic);
         wallet.set(profile);
         ssh.value = profile.ssh;
       } catch (error) {
         console.log("Failed to connect", (error as Error).message || error);
-        wallet.set(null);
+        logout();
       }
     }
 
@@ -378,6 +438,7 @@ export default {
           url: "https://apps.apple.com/us/app/threefold-connect/id1459845885",
         },
       ],
+      logout,
 
       /* Manage ssh */
       ssh,
@@ -386,6 +447,10 @@ export default {
       generatingSSH,
       generateSSH,
       sshHint: _sshHint,
+
+      /* balance */
+      loadingBalance,
+      balance,
     };
   },
 };
