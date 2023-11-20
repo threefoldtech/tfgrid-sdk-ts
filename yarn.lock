@@ -4177,6 +4177,11 @@
   resolved "https://registry.yarnpkg.com/@threefold/extension_api/-/extension_api-0.0.1-rc6.tgz#9271ac014f8cfc5b0351f75bc7bee6f9e5e744a2"
   integrity sha512-rICTgNT7NuAlJCi9PcQ4l5q4jh0aQ/9nilXu9SHHo4toSYd9NxeI4HxF+Vmk1vR8O7iA101SoRhJrJCAqjtROw==
 
+"@threefold/extension_api@^0.0.1-rc9":
+  version "0.0.1-rc9"
+  resolved "https://registry.yarnpkg.com/@threefold/extension_api/-/extension_api-0.0.1-rc9.tgz#d0b63ecfb4115ba8ff51ca9cb2bf7fdeba676b37"
+  integrity sha512-F4TJ0ORcS7qVKHuvcucbOG4vHBBQZ/vTx45EeSKIYNOgTktmlEejux2tyjBogXGIud4dTa7wBThkmo9gP9CKUQ==
+
 "@tootallnate/once@2":
   version "2.0.0"
   resolved "https://registry.npmjs.org/@tootallnate/once/-/once-2.0.0.tgz"
@@ -4559,6 +4564,13 @@
   version "16.18.52"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-16.18.52.tgz#70c56b55d0d7e15fafa875127e95a92605c59c9b"
   integrity sha512-sm2aph6cRSsTMFYFgI+RpPLunXO9ClJkpizUVdT7KmGeyfQ14xnjTMT/f3MHcfKqevXqGT6BgVFzW8wcEoDUtA==
+
+"@types/node@^18.11.9":
+  version "18.18.10"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.18.10.tgz#4971bffdf3a43977c4c8166aa714b2c0b05b3256"
+  integrity sha512-luANqZxPmjTll8bduz4ACs/lNTCLuWssCyjqTY9yLdsv1xnViQp3ISKwsEWOIecO13JWUqjVdig/Vjjc09o8uA==
+  dependencies:
+    undici-types "~5.26.4"
 
 "@types/node@^18.14.2":
   version "18.16.12"
@@ -19424,6 +19436,11 @@ undefsafe@^2.0.5:
   version "2.0.5"
   resolved "https://registry.npmjs.org/undefsafe/-/undefsafe-2.0.5.tgz"
   integrity sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==
+
+undici-types@~5.26.4:
+  version "5.26.5"
+  resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-5.26.5.tgz#bcd539893d00b56e964fd2657a4866b221a65617"
+  integrity sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==
 
 unicode-canonical-property-names-ecmascript@^2.0.0:
   version "2.0.0"

@@ -103,6 +103,7 @@
           <v-divider vertical class="mx-2" />
           <AppTheme />
           <v-divider vertical class="mx-2" />
+          <wallet-connector />
           <ProfileManager v-model="openProfile" />
         </v-toolbar>
 
@@ -376,7 +377,7 @@ import ProfileManagerController from "./components/profile_manager_controller.vu
 import TftSwapPrice from "./components/swap_price.vue";
 import TFNotification from "./components/tf_notification.vue";
 import { useGrid } from "./stores";
-import ProfileManager from "./weblets/profile_manager.vue";
+import WalletConnector from "./weblets/wallet_connector.vue";
 
 interface AppRoute {
   title: string;
@@ -396,7 +397,7 @@ export default {
   components: {
     TFNotification,
     DisclaimerToolbar,
-    ProfileManager,
+    WalletConnector,
     DeploymentListManager,
     AppTheme,
     ConnectWalletLanding,

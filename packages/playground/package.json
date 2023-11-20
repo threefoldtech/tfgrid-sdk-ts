@@ -25,7 +25,7 @@
     "mosha-vue-toastify": "^1.0.23",
     "pinia": "^2.0.32",
     "qrcode": "^1.5.1",
-    "@threefold/graphql_client":"^2.1.1",
+    "@threefold/graphql_client": "^2.1.1",
     "validator": "^13.9.0",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6",
@@ -34,7 +34,8 @@
     "get-ip-range": "^4.0.1",
     "chart.js": "^4.4.0",
     "vue-chartjs": "^5.2.0",
-    "moment": "^2.29.4"
+    "moment": "^2.29.4",
+    "@threefold/extension_api": "^0.0.1-rc9"
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.0",
