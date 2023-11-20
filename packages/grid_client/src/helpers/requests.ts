@@ -1,3 +1,4 @@
+import { RequestError } from "@threefold/types";
 import { default as axios, Method } from "axios";
 
 async function sendWithFullResponse(method: Method, url: string, body: string, headers: Record<string, string>) {
@@ -9,7 +10,7 @@ async function sendWithFullResponse(method: Method, url: string, body: string, h
   };
   const response = await axios(options);
   if (response.status >= 400) {
-    throw Error(`HTTP request failed with status code: ${response.status} due to: ${response.data}`);
+    throw new RequestError(`HTTP request failed with status code: ${response.status} due to: ${response.data}`);
   }
   return response;
 }

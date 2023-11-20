@@ -1,3 +1,4 @@
+import { ValidationError } from "@threefold/types";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
 
@@ -6,7 +7,7 @@ async function validateObject(obj) {
   // errors is an array of validation errors
   if (errors.length > 0) {
     console.log("Validation failed. errors:", errors);
-    throw Error(`Validation failed. errors: ${errors}`);
+    throw new ValidationError(`Validation failed. errors: ${errors}`);
   } else {
     console.log("Validation succeed");
   }
