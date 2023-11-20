@@ -98,18 +98,12 @@ class Client {
   async connect() {
     if (this.con) return;
 
-    try {
-      await this.tfclient.connect();
-      await this.createSigner();
-      const twinId = await this.tfclient.twins.getTwinIdByAccountId({ accountId: this.signer.address });
-      this.twin = await this.tfclient.twins.get({ id: twinId });
-      if (!twinId) {
-        throw new ValidationError(`Couldn't find a user for the provided mnemonic on this network.`);
-      }
-    } catch (e) {
-      console.log(e);
-      //TODO is this a valid error message?
-      throw new ConnectionError(`Couldn't find a user for the provided mnemonic on this network.`);
+    await this.tfclient.connect();
+    await this.createSigner();
+    const twinId = await this.tfclient.twins.getTwinIdByAccountId({ accountId: this.signer.address });
+    this.twin = await this.tfclient.twins.get({ id: twinId });
+    if (!twinId) {
+      throw new ValidationError(`Couldn't find a user for the provided mnemonic on this network.`);
     }
 
     try {
