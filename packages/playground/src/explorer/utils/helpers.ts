@@ -15,9 +15,7 @@ import { byCountry } from "country-code-lookup";
 import { gridProxyClient } from "@/clients";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
-
-import type { MixedFarmFilter, MixedNodeFilter, NodeStatusColor } from "./types";
-
+import type { MixedFarmFilter, MixedNodeFilter, NodeStatusColor, NodeTypeColor } from "./types";
 
 export const getCountryCode = (node: GridNode): string => {
   if (!node) {
