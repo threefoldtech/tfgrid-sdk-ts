@@ -9,7 +9,9 @@ function panic(message: string): never {
  * Assertion
  */
 export function assertHasField(fields: any): AssertReturn {
-  if (Object.keys(fields).length === 0) throw new ValidationError(`[Object] must contain at least 1 field.`);
+  if (Object.keys(fields).length === 0) {
+    throw new ValidationError(`[Object] must contain at least 1 field.`);
+  }
   for (const key in fields) {
     if (fields[key] instanceof Object) assertHasField(fields[key]);
     else if (fields[key] !== true)
