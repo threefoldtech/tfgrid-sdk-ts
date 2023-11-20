@@ -11,7 +11,7 @@ type GridClientCtor = {
 export async function migrateKeysEncryption(this: GridClient, GridClient: GridClientCtor): Promise<void> {
   const migrationKey = this.config.mnemonic + this.config.network + this.config.storeSecret + this._mnemonic;
 
-  async function _migrateKeysEncryption() {
+  const _migrateKeysEncryption = async () => {
     const grid = new GridClient({
       ...this.config,
       storeSecret: this._mnemonic as string,
@@ -43,7 +43,7 @@ export async function migrateKeysEncryption(this: GridClient, GridClient: GridCl
     } catch (error) {
       console.log("Failed to migrate all keys", error.message || error);
     }
-  }
+  };
 
   if (this._mnemonic && this.config.storeSecret !== this._mnemonic && !GridClient.migrated.has(migrationKey)) {
     if (!GridClient.migrationLock.has(migrationKey)) {

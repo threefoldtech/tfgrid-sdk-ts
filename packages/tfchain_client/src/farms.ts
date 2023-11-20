@@ -1,5 +1,4 @@
-import { QueryClient } from "./client";
-import { PublicIp } from "./types";
+import { Client, QueryClient } from "./client";
 import { checkConnection } from "./utils";
 
 enum Certification {
@@ -32,6 +31,31 @@ interface QueryFarmsGetOptions {
   id: number;
 }
 
+interface PublicIp {
+  ip: string;
+  gw: string;
+  contractId?: number;
+}
+
+interface CreateFarmOptions {
+  name: string;
+  publicIps?: PublicIp[];
+}
+interface AddFarmIPOptions {
+  farmId: number;
+  ip: string;
+  gw: string;
+}
+
+interface RemoveFarmIPOptions {
+  farmId: number;
+  ip: string;
+}
+
+interface AddStellarOptions {
+  farmId: number;
+  stellarAddress: string;
+}
 class QueryFarms {
   constructor(public client: QueryClient) {
     this.client = client;
@@ -44,4 +68,35 @@ class QueryFarms {
   }
 }
 
-export { QueryFarms, Farm, Certification, FarmingPolicyLimits };
+class Farms extends QueryFarms {
+  constructor(public client: Client) {
+    super(client);
+    this.client = client;
+  }
+
+  @checkConnection
+  async create(options: CreateFarmOptions) {
+    const extrinsic = this.client.api.tx.tfgridModule.createFarm(options.name, options.publicIps);
+    return this.client.patchExtrinsic<Farm>(extrinsic);
+  }
+
+  @checkConnection
+  async addFarmIp(options: AddFarmIPOptions) {
+    const extrinsic = this.client.api.tx.tfgridModule.addFarmIp(options.farmId, options.ip, options.gw);
+    return this.client.patchExtrinsic(extrinsic);
+  }
+
+  @checkConnection
+  async removeFarmIp(options: RemoveFarmIPOptions) {
+    const extrinsic = this.client.api.tx.tfgridModule.removeFarmIp(options.farmId, options.ip);
+    return this.client.patchExtrinsic(extrinsic);
+  }
+
+  @checkConnection
+  async addStellarAddress(options: AddStellarOptions) {
+    const extrinsic = this.client.api.tx.tfgridModule.addStellarPayoutV2address(options.farmId, options.stellarAddress);
+    return this.client.patchExtrinsic(extrinsic);
+  }
+}
+
+export { QueryFarms, Farms, Farm, Certification, FarmingPolicyLimits };

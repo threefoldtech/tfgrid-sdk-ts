@@ -20,9 +20,6 @@
         <slot name="header-actions" :hasProfile="!!profileManager.profile" />
       </div>
     </section>
-
-    <v-divider :class="{ 'mb-2': true, 'mt-5': !!$slots.subtitle, 'mt-2': !$slots.subtitle }" />
-
     <v-card-text>
       <slot v-if="disableAlerts" />
       <template v-else>
@@ -40,8 +37,8 @@
 
     <template v-if="dedicated && !status">
       <v-alert class="mb-4 mx-4" type="info" variant="tonal">
-        You need to rent a dedicated node from our
-        <a :href="dashboardURL" target="_blank" class="app-link"> Dashboard </a>
+        You need to rent a node from the
+        <router-link to="/portal/dedicated-nodes" class="app-link">Dedicated Nodes page</router-link>
         before deploying on it.
       </v-alert>
     </template>
