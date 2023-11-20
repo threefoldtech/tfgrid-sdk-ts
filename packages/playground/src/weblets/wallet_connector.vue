@@ -235,7 +235,7 @@ export default {
 
     const loadingBalance = ref(false);
     const balance = ref<Balance>();
-    async function updateBalance() {
+    async function updateBalance(): Promise<void> {
       loadingBalance.value = true;
       try {
         if (!wallet.profile) {

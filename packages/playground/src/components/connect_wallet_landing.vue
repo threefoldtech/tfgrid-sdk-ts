@@ -1,8 +1,6 @@
 <template>
   <div :style="{ paddingBottom: '250px' }">
-    <v-alert type="info" variant="tonal">
-      Please connect to your tfchain wallet <a class="app-link" @click="$emit('openProfile')">here</a>
-    </v-alert>
+    <v-alert type="info" variant="tonal"> Please connect to your tfchain wallet. </v-alert>
     <v-container class="custom-container">
       <h4 class="text-center text-h3 mt-16">A Co-Owned Global Sovereign Internet</h4>
       <v-container class="d-flex justify-center mt-4">

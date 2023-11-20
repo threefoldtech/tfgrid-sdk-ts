@@ -104,7 +104,6 @@
           <AppTheme />
           <v-divider vertical class="mx-2" />
           <wallet-connector />
-          <ProfileManager v-model="openProfile" />
         </v-toolbar>
 
         <v-toolbar
@@ -157,7 +156,7 @@
                 <transition name="fade">
                   <div :key="$route.path">
                     <component :is="Component" v-if="hasActiveProfile && hasGrid"></component>
-                    <ConnectWalletLanding @openProfile="openProfile = true" v-else />
+                    <ConnectWalletLanding v-else />
                   </div>
                 </transition>
               </router-view>
@@ -183,7 +182,6 @@ const profileManager = useProfileManager();
 const gridStore = useGrid();
 const network = process.env.NETWORK || (window as any).env.NETWORK;
 
-const openProfile = ref(true);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
 const navbarConfig = ref();
