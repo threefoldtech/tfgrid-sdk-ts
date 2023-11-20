@@ -3,7 +3,7 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { waitReady } from "@polkadot/wasm-crypto";
 import { Client as TFClient } from "@threefold/tfchain_client";
-import { ConnectionError, RMBError, TimeoutError, ValidationError } from "@threefold/types";
+import { ConnectionError, InvalidResponse, RMBError, TimeoutError, ValidationError } from "@threefold/types";
 import base64url from "base64url";
 import { Buffer } from "buffer";
 import { v4 as uuidv4 } from "uuid";
@@ -316,8 +316,7 @@ class Client {
             }
           } else {
             this.responses.delete(requestID);
-            //TODO what is the probate error type
-            reject(new ValidationError("invalid signature, discarding response"));
+            reject(new InvalidResponse("invalid signature, discarding response"));
             break;
           }
         }
