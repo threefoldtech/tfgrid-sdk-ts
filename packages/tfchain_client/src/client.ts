@@ -6,6 +6,7 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { waitReady } from "@polkadot/wasm-crypto";
+import { TFChainError, TFChainErrors, TimeoutError, ValidationError } from "@threefold/types";
 import AwaitLock from "await-lock";
 import { validateMnemonic } from "bip39";
 
@@ -59,7 +60,7 @@ class QueryClient {
   async loadKeyPairOrSigner(): Promise<void> {} // to be overridden in the full client
   checkInputs(): void {
     if (!this.url) {
-      throw Error("url should be provided");
+      throw new ValidationError("url should be provided");
     }
   }
   private async wait(connection = true): Promise<void> {
@@ -69,7 +70,7 @@ class QueryClient {
       if (!connection && !this.api.isConnected) return;
       await new Promise(f => setTimeout(f, 100));
     }
-    if (connection) throw Error(`Client couldn't connect to ${this.url} after 10 seconds`);
+    if (connection) throw new TimeoutError(`Client couldn't connect to ${this.url} after 10 seconds`);
   }
 
   async newProvider() {
@@ -178,10 +179,10 @@ class QueryClient {
   ): Promise<T> {
     await this.connect();
     if (!this.checkSection(section)) {
-      throw new Error(`<${section}> is not defined on the chain`);
+      throw new ValidationError(`<${section}> is not defined on the chain`);
     }
     if (!this.checkMethod(section, method)) {
-      throw new Error(`<${method}> is not defined on the chain under ${section}`);
+      throw new ValidationError(`<${method}> is not defined on the chain under ${section}`);
     }
 
     return new Promise<T>(async (resolve, reject) => {
@@ -246,15 +247,15 @@ class Client extends QueryClient {
   }
 
   checkInputs(): void {
-    if (!this.url) throw Error("url should be provided");
+    if (!this.url) throw new ValidationError("url should be provided");
     if (!SUPPORTED_KEYPAIR_TYPES.includes(this.keypairType)) {
-      throw Error(
+      throw new ValidationError(
         `Keypair type ${this.keypairType} is not a valid type. Should be either of: ${SUPPORTED_KEYPAIR_TYPES}`,
       );
     }
 
     if ((this.mnemonicOrSecret && this.extSigner) || !(this.mnemonicOrSecret || this.extSigner)) {
-      throw Error("mnemonicOrSecret or extension signer should be provided");
+      throw new ValidationError("mnemonicOrSecret or extension signer should be provided");
     }
     if (this.mnemonicOrSecret) {
       if (this.mnemonicOrSecret === "//Alice") {
@@ -262,13 +263,13 @@ class Client extends QueryClient {
       } else if (!validateMnemonic(this.mnemonicOrSecret)) {
         if (this.mnemonicOrSecret.includes(" "))
           // seed shouldn't have spaces
-          throw Error("Invalid mnemonic! Must be bip39 compliant");
+          throw new ValidationError("Invalid mnemonic! Must be bip39 compliant");
 
         if (!this.mnemonicOrSecret.startsWith("0x"))
-          throw Error("Invalid secret seed. secret seed should starts with 0x");
+          throw new ValidationError("Invalid secret seed. secret seed should starts with 0x");
         const secret = this.mnemonicOrSecret.substring(2);
-        if (secret.length !== 64) throw Error("Invalid secret length. Secret length should be 64");
-        if (!isValidSeed(secret)) throw Error("Invalid secret seed");
+        if (secret.length !== 64) throw new ValidationError("Invalid secret length. Secret length should be 64");
+        if (!isValidSeed(secret)) throw new ValidationError("Invalid secret seed");
       }
     }
   }
@@ -282,7 +283,7 @@ class Client extends QueryClient {
         this.keypair = keyring.addFromUri(this.mnemonicOrSecret);
         this.address = this.keypair.address;
       } catch (error) {
-        throw Error("Invalid mnemonic or secret seed! Please check your input.");
+        throw new ValidationError("Invalid mnemonic or secret seed! Please check your input.");
       }
     }
     if (this.extSigner && !this.address) {
@@ -352,11 +353,16 @@ class Client extends QueryClient {
           resultSections.length > 0
         )
           section = resultSections[0];
-        throw Error(
-          `Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error: ${
-            Object.keys(this.api.errors[section])[+e] ?? e
-          }`,
-        );
+        const errorName = TFChainErrors[section].Errors[+e];
+        if (errorName) {
+          throw new TFChainErrors[section][errorName](`Failed to apply ${JSON.stringify(extrinsic.method.toHuman())}`);
+        } else {
+          throw new TFChainError(
+            `Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error: ${
+              Object.keys(this.api.errors[section])[+e] ?? e
+            }`,
+          );
+        }
       });
   }
   async applyExtrinsic<T>(
