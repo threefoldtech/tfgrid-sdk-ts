@@ -16,6 +16,8 @@
           @update:model-value="farm = $event"
           :error-messages="!loading && !farms.length ? 'No farms where found with the specified resources.' : undefined"
           v-model:search="search"
+          append-inner-icon="mdi-refresh"
+          @click:append-inner="resetSearch"
         >
           <template v-slot:append-item v-if="page !== -1">
             <div class="px-4 mt-4">
@@ -71,6 +73,7 @@ const props = defineProps({
 const emits = defineEmits<{
   (event: "update:modelValue", value?: Farm): void;
   (event: "update:loading", value: boolean): void;
+  (event: "update:search", value?: string): void;
 }>();
 
 const SIZE = 20;
@@ -236,6 +239,13 @@ watch([loading, shouldBeUpdated], async ([l, s]) => {
     await resetPages();
   }, 2000);
 });
+
+async function resetSearch() {
+  search.value = "";
+  await resetPages();
+  search.value = farm.value?.name;
+  emits("update:search", search.value ?? undefined);
+}
 </script>
 
 <script lang="ts">

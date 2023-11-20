@@ -118,6 +118,7 @@
               }"
               v-model="farm"
               v-model:loading="loadingFarm"
+              v-model:search="farmName"
             />
             <SelectNode
               v-model="selectedNode"
@@ -178,6 +179,7 @@ const username = ref("admin");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
+const farmName = ref();
 const loadingFarm = ref(false);
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/owncloud-10.9.1.flist",

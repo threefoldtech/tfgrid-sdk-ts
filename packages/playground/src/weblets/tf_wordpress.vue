@@ -115,6 +115,7 @@
             }"
             v-model="farm"
             v-model:loading="loadingFarm"
+            v-model:search="farmName"
           />
 
           <SelectNode
@@ -172,6 +173,7 @@ const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const domainNameCmp = ref();
 const farm = ref() as Ref<Farm>;
+const farmName = ref();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/tf-wordpress-latest.flist",
   entryPoint: "/sbin/zinit init",
