@@ -120,6 +120,7 @@ const inputFiltersReset = (nFltrNptsVal: FilterFarmInputs) => {
   mixedFarmFilters.value.inputs = nFltrNptsVal;
   nFltrNptsVal.farmId.value = undefined;
   nFltrNptsVal.name.value = undefined;
+  nFltrNptsVal.pricingPolicyId.value = undefined;
 };
 const openSheet = (_e: any, { item }: any) => {
   openDialog(item.value);

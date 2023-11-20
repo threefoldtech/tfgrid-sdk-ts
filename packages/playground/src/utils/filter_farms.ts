@@ -10,7 +10,13 @@ export const inputsInitializer: FilterFarmInputs = {
   farmId: {
     label: "Farm IDs",
     placeholder: "e.g. 1,2,3.",
-    rules: [[isNumeric("Should be a number"), isInt("should be an integer")]],
+    rules: [
+      [
+        isNumeric("Should be a number"),
+        min("The pricing policy should be larger then zero.", 1),
+        isInt("should be an integer"),
+      ],
+    ],
     type: "text",
   },
   name: {
@@ -22,7 +28,6 @@ export const inputsInitializer: FilterFarmInputs = {
   pricingPolicyId: {
     label: "Pricing Policy",
     placeholder: "e.g 1",
-    value: undefined,
     rules: [
       [
         isNumeric("This field accepts numbers only.", { no_symbols: true }),
