@@ -90,6 +90,7 @@ const fetchData = async () => {
       nodesDistribution.value = JSON.stringify(stats!.nodesDistribution);
       Istats.value = [
         { data: stats!.nodes, title: "Nodes Online", icon: "mdi-laptop" },
+        { data: stats!.dedicatedNodes, title: "Dedicated Nodes", icon: "mdi-resistor-nodes" },
         { data: stats!.farms, title: "Farms", icon: "mdi-tractor" },
         { data: stats!.countries, title: "Countries", icon: "mdi-earth" },
         { data: stats!.totalCru, title: "CPUs", icon: "mdi-cpu-64-bit" },

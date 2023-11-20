@@ -1,4 +1,4 @@
-import { FilterOptions, GatewayNameModel, GridClient, MachineModel, MachinesModel, NetworkModel } from "../src";
+import { FilterOptions, GatewayNameModel, MachineModel, MachinesModel, NetworkModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -46,6 +46,73 @@ function createGwModel(node_id: number, ip: string, networkName: string, name: s
   } as GatewayNameModel;
 }
 
+async function deployVM(client, vms) {
+  try {
+    const res = await client.machines.deploy(vms);
+    log("================= Deploying VM =================");
+    log(res);
+    log("================= Deploying VM =================");
+  } catch (error) {
+    log("Error while Deploying the VM " + error);
+  }
+}
+
+async function getVMDeployment(client, vms) {
+  try {
+    const res = await client.machines.getObj(vms);
+    log("================= Getting deployment information =================");
+    log(res);
+    log("================= Getting deployment information =================");
+    return res;
+  } catch (error) {
+    log("Error while getting the deployment " + error);
+  }
+}
+
+async function deployGw(client, gw) {
+  try {
+    const res = await client.gateway.deploy_name(gw);
+    log("================= Deploying name gateway =================");
+    log(res);
+    log("================= Deploying name gateway =================");
+  } catch (error) {
+    log("Error while Deploying the gateway " + error);
+  }
+}
+
+async function getGwDeployment(client, gw) {
+  try {
+    const res = await client.gateway.getObj(gw);
+    log("================= Getting deployment information =================");
+    log(res);
+    log("================= Getting deployment information =================");
+  } catch (error) {
+    log("Error while getting the deployment " + error);
+  }
+}
+
+async function deleteVM(client, vms) {
+  try {
+    const res = await client.machines.delete(vms);
+    log("================= Canceling the VM deployment =================");
+    log(res);
+    log("================= Canceling the VM deployment =================");
+  } catch (error) {
+    log("Error while canceling the deployment " + error);
+  }
+}
+
+async function deleteGw(client, gw) {
+  try {
+    const res = await client.gateway.delete_name(gw);
+    log("================= Canceling the GW deployment =================");
+    log(res);
+    log("================= Canceling the GW deployment =================");
+  } catch (error) {
+    log("Error while canceling the deployment " + error);
+  }
+}
+
 async function main() {
   const grid3 = await getClient();
 
@@ -65,30 +132,24 @@ async function main() {
   log(`Deploying vm on node: ${vmNode}, with network node: ${gwNode}`);
 
   // deploy the vm
-  const vmResult = await grid3.machines.deploy(machines);
-  log(vmResult);
+  await deployVM(grid3, machines);
 
-  const deployedVm = await grid3.machines.getObj(machines.name);
-  log("+++ deployed vm +++");
-  log(deployedVm);
+  //Get VM deployment
+  const deployedVm = await getVMDeployment(grid3, machines.name);
 
   const vmPrivateIP = (deployedVm as { interfaces: { ip: string }[] }[])[0].interfaces[0].ip;
   const gateway = createGwModel(gwNode, vmPrivateIP, network.name, "pyserver1", 8000);
   log(`deploying gateway ${network.name} on node ${gwNode}`);
 
-  const gatewayResult = await grid3.gateway.deploy_name(gateway);
-  log(gatewayResult);
+  //Deploy GW
+  await deployGw(grid3, gateway);
 
-  log("+++ Deployed gateway +++");
-
-  const l = await grid3.gateway.getObj(gateway.name);
-  log(l);
+  //Get GW deployment
+  await getGwDeployment(grid3, gateway.name);
 
   // delete
-  // const deletedMachines = await grid3.machines.delete({ name:  machines.name});
-  // log(deletedMachines);
-  // const deletedGW = await grid3.gateway.delete_name({ name: gateway.name});
-  // log(deletedGW);
+  // await deleteVM(grid3, { name: machines.name });
+  // await deleteGw(grid3, { name: gateway.name });
 
   await grid3.disconnect();
 }
