@@ -22,7 +22,7 @@
           v-model:items-per-page="size"
           v-model:page="page"
           class="elevation-1"
-          @update:options="updateFarms"
+          @update:options="updateQueries"
           @click:row="openSheet"
         >
           <template #loading />
@@ -59,8 +59,6 @@ const page = ref(1);
 const filterOptions = ref<FarmFilterOptions>({
   size: size.value,
   page: page.value,
-  farmId: undefined,
-  farmName: undefined,
 });
 const mixedFarmFilters = ref<MixedFarmFilter>({ inputs: filterFarmInputs.value, options: filterOptions.value });
 const isFormLoading = ref<boolean>(true);
@@ -85,9 +83,6 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
         };
       });
     }
-    if (farms.value) {
-      totalFarms.value = farms.value.length;
-    }
   } catch (err) {
     console.log("could not get farms:", err);
     createCustomToast("Failed to get farms!", ToastType.danger);
@@ -97,7 +92,12 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
   }
 };
 onMounted(async () => {
-  await _getFarms({ page: 1, size: 5 });
+  await _getFarms({});
+  if (farms.value) {
+    totalFarms.value = farms.value.length;
+  }
+
+  await updateFarms();
 });
 
 const request = debounce(_getFarms, 1000);
@@ -106,7 +106,15 @@ const updateFarms = async () => {
 
   await request(queries);
 };
-watch(mixedFarmFilters, updateFarms, { deep: true });
+
+const updateQueries = () => {
+  const options = mixedFarmFilters.value.options;
+  if (options) {
+    options!.page = page;
+    options!.size = size;
+  }
+};
+watch(mixedFarmFilters.value, updateFarms, { deep: true });
 
 const inputFiltersReset = (nFltrNptsVal: FilterFarmInputs) => {
   mixedFarmFilters.value.inputs = nFltrNptsVal;
@@ -162,6 +170,7 @@ const headers: VDataTableHeader = [
 
 <script lang="ts">
 import type { FarmsQuery } from "@threefold/gridproxy_client";
+import { update } from "lodash";
 
 import Filters from "../../components/filter.vue";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";

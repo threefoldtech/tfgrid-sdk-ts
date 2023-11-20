@@ -16,8 +16,6 @@ export type NodeFilterOptions = {
 };
 
 export type FarmFilterOptions = {
-  farmId?: number;
-  farmName?: string;
   page?: number;
   size?: number;
 };
