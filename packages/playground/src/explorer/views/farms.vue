@@ -110,8 +110,8 @@ const updateFarms = async () => {
 const updateQueries = () => {
   const options = mixedFarmFilters.value.options;
   if (options) {
-    options!.page = page;
-    options!.size = size;
+    options!.page = page.value;
+    options!.size = size.value;
   }
 };
 watch(mixedFarmFilters.value, updateFarms, { deep: true });
