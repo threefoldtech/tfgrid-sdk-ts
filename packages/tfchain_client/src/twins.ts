@@ -1,3 +1,5 @@
+import { ValidationError } from "@threefold/types";
+
 import { Client, QueryClient } from "./client";
 import { checkConnection } from "./utils";
 
@@ -25,7 +27,7 @@ class QueryTwins {
   @checkConnection
   async get(options: QueryTwinsGetOptions): Promise<Twin> {
     if (isNaN(options.id) || options.id <= 0) {
-      throw Error("Invalid twin id. Twin id must be positive integer");
+      throw new ValidationError("Invalid twin id. Twin id must be positive integer");
     }
     const res = await this.client.api.query.tfgridModule.twins(options.id);
     return res.toPrimitive() as unknown as Twin;

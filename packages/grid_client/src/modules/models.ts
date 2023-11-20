@@ -660,6 +660,51 @@ class FarmIdModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) id: number;
 }
 
+class FarmPublicIPsModel {
+  @Expose() @IsNotEmpty() @IsIP() ip: string;
+  @Expose() @IsNotEmpty() @IsString() gw: string;
+}
+
+class AddFarmIPModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsNotEmpty() @IsString() ip: string;
+  @Expose() @IsNotEmpty() @IsIP() gw: string;
+}
+
+class IPConfig {
+  @Expose() @IsNotEmpty() @IsString() ip: string;
+  @Expose() @IsNotEmpty() @IsIP() gw: string;
+}
+class PublicConfigModel {
+  @Expose() @IsNotEmpty() @Type(() => IPConfig) @ValidateNested() ip4: IPConfig;
+  @Expose() @IsOptional() ip6: IPConfig | null;
+  @Expose() @IsOptional() @IsString() domain: string | null;
+}
+class AddPublicConfig {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+  @Expose() @IsOptional() @Type(() => PublicConfigModel) @ValidateNested() publicConfig?: PublicConfigModel | null;
+}
+
+class RemoveFarmIPModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsNotEmpty() @IsString() ip: string;
+}
+
+class AddStellarAddressToFarmModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsString() @IsNotEmpty() stellarAddress: string;
+}
+
+class CreateFarmModel {
+  @Expose() @IsString() @IsNotEmpty() @MaxLength(NameLength) name: string;
+  @Expose()
+  @IsOptional()
+  @Type(() => FarmPublicIPsModel)
+  @ValidateNested({ each: true })
+  publicIps?: FarmPublicIPsModel[];
+}
+
 class pingFarmModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
 }
@@ -684,7 +729,7 @@ class NetworkGetModel {
 
 class SetDedicatedNodeExtraFeesModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
-  @Expose() @IsInt() @IsNotEmpty() @Min(1) extraFee: number;
+  @Expose() @IsNumber() @IsNotEmpty() @Min(0) extraFee: number;
 }
 
 class GetDedicatedNodePriceModel {
@@ -814,6 +859,7 @@ export {
   ZOSNodeModel,
   NodePowerModel,
   FarmIdModel,
+  CreateFarmModel,
   pingFarmModel,
   CreateServiceContractModel,
   ServiceContractApproveModel,
@@ -830,5 +876,9 @@ export {
   GetDedicatedNodePriceModel,
   SwapToStellarModel,
   ListenToMintCompletedModel,
+  AddFarmIPModel,
+  RemoveFarmIPModel,
+  AddStellarAddressToFarmModel,
+  AddPublicConfig,
   GetActiveContractsModel,
 };

@@ -4,6 +4,7 @@ import { events, validateInput } from "../helpers";
 import { expose } from "../helpers/expose";
 import { capacity } from "./capacity";
 import {
+  AddPublicConfig,
   FilterOptions,
   NodeGetModel,
   NodePowerModel,
@@ -80,6 +81,13 @@ class Nodes {
   @checkBalance
   async setNodePower(options: NodePowerModel) {
     return (await this.client.nodes.setPower(options)).apply();
+  }
+
+  @expose
+  @validateInput
+  @checkBalance
+  async addNodePublicConfig(options: AddPublicConfig) {
+    return (await this.client.nodes.addNodePublicConfig(options)).apply();
   }
 
   @expose

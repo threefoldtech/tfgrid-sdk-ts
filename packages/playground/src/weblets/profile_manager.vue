@@ -1,7 +1,7 @@
 <template>
   <VDialog
     scrollable
-    width="80%"
+    width="60%"
     :model-value="$props.modelValue"
     @update:model-value="$emit('update:model-value', $event)"
   >
@@ -62,16 +62,19 @@
         </v-tooltip>
       </VCard>
     </template>
-
+    <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
+      <v-card-title class="pa-0">Connect your TFChain Wallet</v-card-title>
+    </v-card>
     <WebletLayout disable-alerts>
-      <template #title> Connect your TFChain Wallet </template>
-      <template #subtitle>
-        Please visit
-        <a class="app-link" href="https://manual.grid.tf/playground/wallet_connector.html" target="_blank">
-          the manual
-        </a>
-        get started.
-      </template>
+      <v-alert variant="tonal" class="mb-6" v-if="activeTab === 0">
+        <p :style="{ maxWidth: '880px' }">
+          Please visit
+          <a class="app-link" href="https://manual.grid.tf/playground/wallet_connector.html" target="_blank">
+            the manual
+          </a>
+          get started.
+        </p>
+      </v-alert>
 
       <DTabs
         v-if="!profileManager.profile"
@@ -88,7 +91,7 @@
         <VContainer>
           <form @submit.prevent="activeTab === 0 ? login() : storeAndLogin()">
             <FormValidator v-model="isValidForm">
-              <v-alert type="warning" variant="tonal" class="mb-6" v-if="activeTab === 1" color="primary">
+              <v-alert type="warning" variant="tonal" class="mb-6" v-if="activeTab === 1">
                 <p :style="{ maxWidth: '880px' }">
                   To connect your wallet, you will need to enter your Mnemonic or Hex Seed which will be encrypted using
                   the password. Mnemonic or Hex Seed will never be shared outside of this device.
@@ -242,8 +245,9 @@
               </v-alert>
             </FormValidator>
 
-            <div class="d-flex justify-center">
+            <div class="d-flex justify-center mt-2">
               <VBtn
+                class="mr-2"
                 type="submit"
                 color="secondary"
                 variant="tonal"
@@ -254,112 +258,120 @@
                   activatingAccount ||
                   (activeTab === 1 && isValidConnectConfirmationPassword)
                 "
-                size="large"
               >
                 {{ activeTab === 0 ? "Login" : "Connect" }}
               </VBtn>
+              <VBtn color="anchor" variant="outlined" @click="$emit('update:modelValue', false)"> Close </VBtn>
             </div>
           </form>
         </VContainer>
       </DTabs>
 
       <template v-if="profileManager.profile">
-        <PasswordInputWrapper #="{ props }">
-          <VTextField
-            label="Your Hex Seed"
-            readonly
-            v-model="profileManager.profile.mnemonic"
-            v-bind="props"
-            :disabled="activating || creatingAccount || activatingAccount"
-          />
-        </PasswordInputWrapper>
-
-        <section class="d-flex flex-column align-center">
-          <p class="font-weight-bold mb-4">
-            Scan the QRcode using
-            <a class="app-link" href="https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html" target="_blank">
-              ThreeFold Connect
-            </a>
-            to fund your account
-          </p>
-          <QrcodeGenerator
-            :data="'TFT:' + bridge + '?message=twin_' + profileManager.profile.twinId + '&sender=me&amount=100'"
-          />
-          <div class="d-flex justify-center my-4">
-            <a
-              v-for="(app, index) in apps"
-              :key="app.alt"
-              :style="{ cursor: 'pointer', width: '150px' }"
-              :class="{ 'mr-2': index === 0 }"
-              :title="app.alt"
-              v-html="app.src"
-              :href="app.url"
-              target="_blank"
-            />
-          </div>
-        </section>
-
-        <VTooltip
-          text="SSH Keys are used to authenticate you to the deployment instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
-          location="bottom"
-          max-width="700px"
-        >
-          <template #activator="{ props }">
-            <CopyInputWrapper :data="profileManager.profile.ssh" #="{ props: copyInputProps }">
-              <VTextarea
-                label="Public SSH Key"
-                no-resize
-                :spellcheck="false"
-                v-model.trim="ssh"
-                v-bind="{ ...props, ...copyInputProps }"
-                :disabled="updatingSSH || generatingSSH"
-                :hint="
-                  updatingSSH
-                    ? 'Updating your public ssh key.'
-                    : generatingSSH
-                    ? 'Generating a new public ssh key.'
-                    : SSHKeyHint
-                "
-                :persistent-hint="updatingSSH || generatingSSH || !!SSHKeyHint"
-                :rules="[value => !!value || 'SSH key is required']"
+        <v-row class="py-2 pb-5">
+          <v-col cols="7" sm="12" md="6" lg="7">
+            <PasswordInputWrapper #="{ props }">
+              <VTextField
+                label="Your Hex Seed"
+                readonly
+                v-model="profileManager.profile.mnemonic"
+                v-bind="props"
+                :disabled="activating || creatingAccount || activatingAccount"
               />
+            </PasswordInputWrapper>
+            <VTooltip
+              text="SSH Keys are used to authenticate you to the deployment instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
+              location="bottom"
+              max-width="600px"
+            >
+              <template #activator="{ props }">
+                <CopyInputWrapper :data="profileManager.profile.ssh" #="{ props: copyInputProps }">
+                  <VTextarea
+                    label="Public SSH Key"
+                    no-resize
+                    :spellcheck="false"
+                    v-model.trim="ssh"
+                    v-bind="{ ...props, ...copyInputProps }"
+                    :disabled="updatingSSH || generatingSSH"
+                    :hint="
+                      updatingSSH
+                        ? 'Updating your public ssh key.'
+                        : generatingSSH
+                        ? 'Generating a new public ssh key.'
+                        : SSHKeyHint
+                    "
+                    :persistent-hint="updatingSSH || generatingSSH || !!SSHKeyHint"
+                    :rules="[value => !!value || 'SSH key is required']"
+                  />
+                </CopyInputWrapper>
+              </template>
+            </VTooltip>
+
+            <div class="d-flex justify-end mb-5">
+              <VBtn
+                class="mr-2 text-subtitle-2"
+                color="secondary"
+                variant="tonal"
+                :disabled="!!ssh || updatingSSH || generatingSSH || !isEnoughBalance(balance)"
+                :loading="generatingSSH"
+                @click="generateSSH"
+              >
+                Generate SSH Keys
+              </VBtn>
+              <VBtn
+                class="text-subtitle-2"
+                color="secondary"
+                variant="outlined"
+                @click="updateSSH"
+                :disabled="!ssh || profileManager.profile.ssh === ssh || updatingSSH || !isEnoughBalance(balance)"
+                :loading="updatingSSH"
+              >
+                Update Public SSH Key
+              </VBtn>
+            </div>
+
+            <CopyInputWrapper :data="profileManager.profile.twinId.toString()" #="{ props }">
+              <VTextField label="Twin ID" readonly v-model="profileManager.profile.twinId" v-bind="props" />
             </CopyInputWrapper>
-          </template>
-        </VTooltip>
 
-        <VRow class="mb-3">
-          <VSpacer />
-          <VBtn
-            color="secondary"
-            variant="text"
-            :disabled="!!ssh || updatingSSH || generatingSSH || !isEnoughBalance(balance)"
-            :loading="generatingSSH"
-            @click="generateSSH"
-          >
-            Generate SSH Keys
-          </VBtn>
-          <VBtn
-            color="primary"
-            variant="text"
-            @click="updateSSH"
-            :disabled="!ssh || profileManager.profile.ssh === ssh || updatingSSH || !isEnoughBalance(balance)"
-            :loading="updatingSSH"
-          >
-            Update Public SSH Key
-          </VBtn>
-        </VRow>
+            <CopyInputWrapper :data="profileManager.profile.address" #="{ props }">
+              <VTextField label="Address" readonly v-model="profileManager.profile.address" v-bind="props" />
+            </CopyInputWrapper>
+          </v-col>
+          <v-divider class="mx-4" vertical></v-divider>
 
-        <CopyInputWrapper :data="profileManager.profile.twinId.toString()" #="{ props }">
-          <VTextField label="Twin ID" readonly v-model="profileManager.profile.twinId" v-bind="props" />
-        </CopyInputWrapper>
-
-        <CopyInputWrapper :data="profileManager.profile.address" #="{ props }">
-          <VTextField label="Address" readonly v-model="profileManager.profile.address" v-bind="props" />
-        </CopyInputWrapper>
+          <v-col>
+            <section class="d-flex flex-column align-center">
+              <p class="mb-4 text-center">
+                Scan the QR code using
+                <a class="app-link" href="https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html" target="_blank">
+                  ThreeFold Connect
+                </a>
+                to fund your account
+              </p>
+              <QrcodeGenerator
+                :data="'TFT:' + bridge + '?message=twin_' + profileManager.profile.twinId + '&sender=me&amount=100'"
+              />
+              <div class="d-flex justify-center my-4">
+                <a
+                  v-for="(app, index) in apps"
+                  :key="app.alt"
+                  :style="{ cursor: 'pointer', width: '150px' }"
+                  :class="{ 'mr-2': index === 0 }"
+                  :title="app.alt"
+                  v-html="app.src"
+                  :href="app.url"
+                  target="_blank"
+                />
+              </div>
+            </section>
+          </v-col>
+        </v-row>
       </template>
-
-      <template #footer-actions>
+      <!-- <v-divider horizontal></v-divider> -->
+      <div class="d-flex justify-end mt-4 mb-2">
         <VBtn
+          class="mr-2"
           color="error"
           variant="tonal"
           @click="logout"
@@ -368,8 +380,15 @@
         >
           Logout
         </VBtn>
-        <VBtn color="error" variant="outlined" @click="$emit('update:modelValue', false)"> Close </VBtn>
-      </template>
+        <VBtn
+          v-if="profileManager.profile"
+          color="anchor"
+          variant="outlined"
+          @click="$emit('update:modelValue', false)"
+        >
+          Close
+        </VBtn>
+      </div>
     </WebletLayout>
   </VDialog>
 </template>
@@ -740,3 +759,8 @@ export default {
   },
 };
 </script>
+<style>
+.v-field__input {
+  font-size: small;
+}
+</style>

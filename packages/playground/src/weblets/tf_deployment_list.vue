@@ -69,6 +69,7 @@
             v-if="dialog === item.value.deploymentName"
             :master="item.value[0]"
             :data="item.value.slice(1)"
+            :project-name="item.value.projectName || item.value[0].projectName"
             @close="dialog = undefined"
             @update:caprover="item.value = $event"
           />

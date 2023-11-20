@@ -19,7 +19,7 @@ export async function deployVM(grid: GridClient, options: DeployVMOptions) {
   vms.name = options.name;
   await grid.machines.getObj(vms.name); //invalidating the cashed keys
   vms.network = createNetwork(options.network);
-  vms.machines = await Promise.all(options.machines.map(machine => createMachine(grid, machine)));
+  vms.machines = await Promise.all(options.machines.map(createMachine));
   vms.metadata = options.metadata;
   vms.description = options.description;
   await grid.machines.deploy(vms);
@@ -29,12 +29,13 @@ export async function deployVM(grid: GridClient, options: DeployVMOptions) {
 export async function loadVM(grid: GridClient, name: string) {
   const vm = (await grid.machines.getObj(name)) as any;
   vm.deploymentName = name;
+  vm.projectName = grid.clientOptions.projectName;
   const wireguard = await getWireguardConfig(grid, vm[0].interfaces[0].network).catch(() => []);
   vm.wireguard = wireguard[0];
   return vm;
 }
 
-async function createMachine(grid: GridClient, machine: Machine): Promise<MachineModel> {
+async function createMachine(machine: Machine): Promise<MachineModel> {
   const vm = new MachineModel();
   vm.name = machine.name;
   vm.node_id = machine.nodeId!;
