@@ -6,6 +6,16 @@ import type { Farm } from "../types";
 export interface GetFarmsOptions {
   exclusiveFor?: string;
 }
+
+export async function getFarmsPages(grid: GridClient, filters: FarmFilterOptions, pageSize: number): Promise<number> {
+  try {
+    const count = (await grid.capacity.getFarmsCount(filters)) || 1;
+    return Math.ceil(count / pageSize);
+  } catch {
+    return 1;
+  }
+}
+
 export async function getFarms(
   grid: GridClient,
   filters: FarmFilterOptions,

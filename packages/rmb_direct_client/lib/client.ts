@@ -114,11 +114,10 @@ class Client {
       if (!this.twin) {
         throw new Error({ message: "twin does not exist, please create a twin first" });
       }
+      const relayHostName = this.relayUrl.replace("wss://", "").replace("/", "");
       const pk = generatePublicKey(this.mnemonics);
-      if (this.twin.pk !== pk) {
-        await (
-          await this.tfclient.twins.update({ pk, relay: this.relayUrl.replace("wss://", "").replace("/", "") })
-        ).apply();
+      if (this.twin.pk !== pk || this.twin.relay !== relayHostName) {
+        await (await this.tfclient.twins.update({ pk, relay: relayHostName })).apply();
         this.twin.pk = pk;
       }
 
@@ -240,6 +239,9 @@ class Client {
     retries: number = this.retries,
   ) {
     try {
+      // need to check if destination twinId exists by fetching dest twin from chain first
+      this.destTwin = await this.tfclient.twins.get({ id: destinationTwinId });
+
       // create new envelope with given data and destination
       const envelope = new Envelope({
         uid: uuidv4(),
@@ -247,8 +249,6 @@ class Client {
         expiration: expirationMinutes * 60,
         source: this.source,
       });
-      // need to check if destination twinId exists by fetching dest twin from chain first
-      this.destTwin = await this.tfclient.twins.get({ id: destinationTwinId });
       envelope.destination = new Address({ twin: this.destTwin.id });
 
       if (requestCommand) {

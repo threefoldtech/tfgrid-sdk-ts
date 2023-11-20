@@ -15,7 +15,9 @@ import { byCountry } from "country-code-lookup";
 import { gridProxyClient } from "@/clients";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
+
 import type { MixedFarmFilter, MixedNodeFilter, NodeStatusColor } from "./types";
+
 
 export const getCountryCode = (node: GridNode): string => {
   if (!node) {
@@ -49,6 +51,14 @@ export const getNodeStatusColor = (status: string): NodeStatusColor => {
     return { color: "warning", status: NodeStatus.Standby };
   } else {
     return { color: "error", status: NodeStatus.Down };
+  }
+};
+
+export const getNodeTypeColor = (dedicated: boolean): NodeTypeColor => {
+  if (dedicated) {
+    return { color: "primary", type: "dedicated" };
+  } else {
+    return { color: "success", type: "shared" };
   }
 };
 

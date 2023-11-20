@@ -240,8 +240,3 @@ export default {
   },
 };
 </script>
-<style scoped>
-.v-label {
-  font-size: 0.875rem;
-}
-</style>

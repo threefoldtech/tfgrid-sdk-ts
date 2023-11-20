@@ -43,6 +43,7 @@ declare global {
       STELLAR_HORIZON_URL: string;
       TFT_ASSET_ISSUER: string;
       MINTING_URL: string;
+      TIMEOUT: number;
     };
   }
 }
