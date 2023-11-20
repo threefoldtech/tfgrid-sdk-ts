@@ -69,17 +69,41 @@ async function main() {
   };
 
   await getClient().then(res => (grid3 = res));
+
+  //Create Account
   await createAccount(account);
+
+  //Import Account
   await importAccount(importedAccount);
+
+  //Get assets from account address
   await getAccountAssetsFromAddress(accountAddress);
+
+  //Get assets from account name
   await getAccountAssetsFromName(accountName);
+
+  //Create Transaction
   await createTransaction(transaction);
+
+  //Sign Bytes
   await signBytes(message);
+
+  //Sign Transaction
   await signTransaction(transactionModel);
+
+  //Get mnemonic from account name
   await getAccountMnemonicFromName(accountName);
+
+  //Check if the account exists from account name
   await checkAccountExistsFromName(accountName);
+
+  //List Accounts
   await listAccounts();
+
+  //Transfer funds
   await transferAccount(transfer);
+
+  //Delete Accounts
   await deleteAccount(deleteAccount1);
   await deleteAccount(deleteAccount2);
 
