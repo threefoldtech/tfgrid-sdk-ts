@@ -130,13 +130,16 @@ export const toBytes = (resource: number | undefined): number => {
 };
 
 export const getFarmQueries = (mixedFilters: MixedFarmFilter): Partial<FarmsQuery> => {
-  let farmId, name, page, size;
+  let farmId, name, page, size, pricingPolicy;
   if (mixedFilters.inputs) {
     if (mixedFilters.inputs.farmId.value) {
       farmId = +mixedFilters.inputs.farmId.value;
     }
     if (mixedFilters.inputs.name.value) {
       name = mixedFilters.inputs.name.value.toLowerCase().trim();
+    }
+    if (mixedFilters.inputs.pricingPolicyId.value) {
+      pricingPolicy = +mixedFilters.inputs.pricingPolicyId.value;
     }
   }
 
@@ -152,6 +155,7 @@ export const getFarmQueries = (mixedFilters: MixedFarmFilter): Partial<FarmsQuer
     retCount: true,
     farmId: farmId || undefined,
     name: name || undefined,
+    pricingPolicyId: pricingPolicy || undefined,
     page: page || undefined,
     size: size || undefined,
   };

@@ -1,10 +1,10 @@
 import type { InputFilterType } from "../types";
-import { isAlphanumeric, isInt, isNumeric, isString } from "./validators";
+import { isAlphanumeric, isInt, isNumeric, min, validateResourceMaxNumber } from "./validators";
 
 export type FilterFarmInputs = {
   farmId: InputFilterType;
   name: InputFilterType;
-  certification: InputFilterType;
+  pricingPolicyId: InputFilterType;
 };
 export const inputsInitializer: FilterFarmInputs = {
   farmId: {
@@ -19,10 +19,17 @@ export const inputsInitializer: FilterFarmInputs = {
     rules: [[isAlphanumeric("Farm name should be made of either numbers or letters")]],
     type: "text",
   },
-  certification: {
-    label: "Certification Type",
-    placeholder: "e.g certified",
-    rules: [[isString("Certification type should be written in only letters")]],
+  pricingPolicyId: {
+    label: "Pricing Policy",
+    placeholder: "Filter by pricing policy",
+    value: undefined,
+    rules: [
+      [
+        isNumeric("This field accepts numbers only.", { no_symbols: true }),
+        min("The pricing policy should be larger then zero.", 1),
+        validateResourceMaxNumber("This value is out of range."),
+      ],
+    ],
     type: "text",
   },
 };
