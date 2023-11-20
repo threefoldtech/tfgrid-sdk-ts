@@ -80,6 +80,7 @@ const Istats = computed((): IStatistics[] => {
   {
     return [
       { data: formattedStats.value.nodes, title: "Nodes Online", icon: "mdi-laptop" },
+      { data: formattedStats.value.dedicatedNodes, title: "Dedicated Nodes", icon: "mdi-resistor-nodes" },
       { data: formattedStats.value.farms, title: "Farms", icon: "mdi-tractor" },
       { data: formattedStats.value.countries, title: "Countries", icon: "mdi-earth" },
       { data: formattedStats.value.totalCru, title: "CPUs", icon: "mdi-cpu-64-bit" },

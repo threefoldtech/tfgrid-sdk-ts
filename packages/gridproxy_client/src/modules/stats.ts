@@ -15,6 +15,7 @@ export interface Stats {
   twins: number;
   contracts: number;
   nodesDistribution: { [key: string]: number };
+  dedicatedNodes: number;
 }
 
 export class StatsClient extends AbstractClient<StatsBuilder, StatsQuery> {
