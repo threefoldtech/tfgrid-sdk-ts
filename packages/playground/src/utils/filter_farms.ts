@@ -5,6 +5,7 @@ export type FilterFarmInputs = {
   farmId: InputFilterType;
   name: InputFilterType;
   pricingPolicyId: InputFilterType;
+  totalIps: InputFilterType;
 };
 export const inputsInitializer: FilterFarmInputs = {
   farmId: {
@@ -33,6 +34,18 @@ export const inputsInitializer: FilterFarmInputs = {
         isNumeric("This field accepts numbers only.", { no_symbols: true }),
         min("The pricing policy should be larger then zero.", 1),
         validateResourceMaxNumber("This value is out of range."),
+      ],
+    ],
+    type: "text",
+  },
+  totalIps: {
+    label: "Total  PubIPs",
+    placeholder: "e.g. 1,2,3.",
+    rules: [
+      [
+        isNumeric("Should be a number"),
+        min("The pricing policy should be larger then zero.", 1),
+        isInt("should be an integer"),
       ],
     ],
     type: "text",
