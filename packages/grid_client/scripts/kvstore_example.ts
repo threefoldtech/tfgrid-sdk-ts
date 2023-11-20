@@ -1,6 +1,50 @@
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
+async function setKey(client, key) {
+  try {
+    const res = await client.kvstore.set(key);
+    log("================= Setting the key =================");
+    log(res);
+    log("================= Setting the key =================");
+  } catch (error) {
+    log("Error while setting the key " + error);
+  }
+}
+
+async function listAllKeys(client) {
+  try {
+    const res = await client.kvstore.list();
+    log("================= Listing all keys =================");
+    log(res);
+    log("================= Listing all keys =================");
+  } catch (error) {
+    log("Error while listing keys " + error);
+  }
+}
+
+async function getKey(client, key) {
+  try {
+    const res = await client.kvstore.get(key);
+    log("================= Getting key =================");
+    log(res);
+    log("================= Getting key =================");
+  } catch (error) {
+    log("Error while getting key " + error);
+  }
+}
+
+async function removeKey(client, key) {
+  try {
+    const res = await client.kvstore.remove(key);
+    log("================= Removing key =================");
+    log(res);
+    log("================= Removing key =================");
+  } catch (error) {
+    log("Error while removing key " + error);
+  }
+}
+
 /*
 KVStore example usage:
 */
@@ -11,28 +55,24 @@ async function main() {
 
   //then every module will use the KVStore to save its configuration and restore it.
 
-  // also you can use it like this:
-  const db = gridClient.kvstore;
-
   // set key
   const key = "hamada";
   const exampleObj = {
     key1: "value1",
     key2: 2,
   };
-  // set key
-  await db.set({ key, value: JSON.stringify(exampleObj) });
 
-  // list all the keys
-  const keys = await db.list();
-  log(keys);
+  //Set key
+  await setKey(gridClient, { key, value: JSON.stringify(exampleObj) });
 
-  // get the key
-  const data = await db.get({ key });
-  log(JSON.parse(data));
+  //List all keys
+  await listAllKeys(gridClient);
 
-  // remove the key
-  await db.remove({ key });
+  //Get key
+  await getKey(gridClient, { key });
+
+  //Remove key
+  await removeKey(gridClient, { key });
 
   await gridClient.disconnect();
 }
