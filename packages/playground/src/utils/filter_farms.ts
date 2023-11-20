@@ -21,7 +21,7 @@ export const inputsInitializer: FilterFarmInputs = {
   },
   pricingPolicyId: {
     label: "Pricing Policy",
-    placeholder: "Filter by pricing policy",
+    placeholder: "e.g 1",
     value: undefined,
     rules: [
       [
