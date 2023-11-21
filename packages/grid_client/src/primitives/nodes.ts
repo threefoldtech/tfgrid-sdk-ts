@@ -35,6 +35,7 @@ interface NodeInfo {
   uptime: number;
   created: number;
   farmingPolicyId: number;
+  inDedicatedFarm: boolean;
   updatedAt: string;
   total_resources: NodeResources;
   used_resources: NodeResources;
