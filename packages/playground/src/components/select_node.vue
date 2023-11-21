@@ -62,7 +62,7 @@
         </v-autocomplete>
         <v-text-field
           v-else-if="selection == 'manual'"
-          label="Name"
+          label="Node Id"
           v-model.number="ManualselectedNode"
           :disabled="loadingNodes"
           v-bind="{
