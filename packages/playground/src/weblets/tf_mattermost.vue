@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/mattermost.png"
   >
     <template #title>Deploy a Mattermost Instance </template>
@@ -82,6 +83,7 @@
               }"
               v-model="farm"
               v-model:loading="loadingFarm"
+              v-model:search="farmName"
             />
 
             <SelectNode
@@ -143,6 +145,7 @@ const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "mm" }));
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
+const farmName = ref();
 const loadingFarm = ref(false);
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/mattermost-latest.flist",

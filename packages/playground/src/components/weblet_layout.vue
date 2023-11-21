@@ -20,9 +20,6 @@
         <slot name="header-actions" :hasProfile="!!profileManager.profile" />
       </div>
     </section>
-
-    <v-divider :class="{ 'mb-2': true, 'mt-5': !!$slots.subtitle, 'mt-2': !$slots.subtitle }" />
-
     <v-card-text>
       <slot v-if="disableAlerts" />
       <template v-else>
@@ -40,8 +37,8 @@
 
     <template v-if="dedicated && !status">
       <v-alert class="mb-4 mx-4" type="info" variant="tonal">
-        You need to rent a dedicated node from our
-        <a :href="dashboardURL" target="_blank" class="app-link"> Dashboard </a>
+        You need to rent a node from the
+        <router-link to="/portal/dedicated-nodes" class="app-link">Dedicated Nodes page</router-link>
         before deploying on it.
       </v-alert>
     </template>
@@ -82,6 +79,9 @@
           approximately
           <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span> USD per
           month.
+          <div v-if="certificationType === 'Certified'">
+            You selected a certified node. Please note that this deployment costs more TFT.
+          </div>
         </div>
 
         <a href="https://manual.grid.tf/cloud/cloudunits_pricing.html" target="_blank" class="app-link">
@@ -112,6 +112,7 @@ import debounce from "lodash/debounce.js";
 import { computed, ref, watch } from "vue";
 
 import { useProfileManager } from "../stores";
+import type { INode } from "../utils/filter_nodes";
 import { getGrid, loadBalance } from "../utils/grid";
 import { getDashboardURL, normalizeBalance } from "../utils/helpers";
 
@@ -152,6 +153,10 @@ const props = defineProps({
     required: false,
     default: () => false,
   },
+  SelectedNode: {
+    type: Object as () => INode,
+    required: false,
+  },
 });
 const emits = defineEmits<{ (event: "mount"): void; (event: "back"): void }>();
 const baseUrl = import.meta.env.BASE_URL;
@@ -159,6 +164,7 @@ const profileManager = useProfileManager();
 
 const status = ref<WebletStatus>();
 const message = ref<string>();
+const certificationType = ref<string>();
 function onLogMessage(msg: string) {
   if (typeof msg === "string") {
     message.value = msg;
@@ -252,8 +258,11 @@ const onlyIPV4TftPrice = ref<number>();
 const onlyIPV4UsdPrice = ref<number>();
 
 watch(
-  () => [props.cpu, props.memory, props.disk, props.ipv4, props.certified, props.dedicated],
+  () => [props.cpu, props.memory, props.disk, props.ipv4, props.certified, props.dedicated, props.SelectedNode],
   debounce((value, oldValue) => {
+    if (value[6]) {
+      certificationType.value = value[6].certified;
+    }
     if (
       oldValue &&
       value[0] === oldValue[0] &&
@@ -261,7 +270,8 @@ watch(
       value[2] === oldValue[2] &&
       value[3] === oldValue[3] &&
       value[4] === oldValue[4] &&
-      value[5] === oldValue[5]
+      value[5] === oldValue[5] &&
+      value[6] === oldValue[6]
     )
       return;
     shouldUpdateCost.value = true;
@@ -300,7 +310,7 @@ async function loadCost(profile: { mnemonic: string }) {
     mru: typeof props.disk === "number" ? (props.memory ?? 0) / 1024 : 0,
     hru: 0,
     ipv4u: props.ipv4,
-    certified: props.certified,
+    certified: !props.certified && props.SelectedNode?.certified === "Certified" ? true : props.certified,
   });
   await getIPv1Price(grid!);
   usd.value = props.dedicated ? dedicatedPrice : sharedPrice;

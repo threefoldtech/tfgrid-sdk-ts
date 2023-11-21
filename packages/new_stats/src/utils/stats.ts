@@ -6,6 +6,7 @@ function mergeStatsData(stats: Stats[]): Stats {
   const res = stats[0];
   for (let i = 1; i < stats.length; i++) {
     res.accessNodes += stats[i].accessNodes;
+    res.dedicatedNodes += stats[i].dedicatedNodes;
     res.contracts += stats[i].contracts;
     res.countries += stats[i].countries;
     res.farms += stats[i].farms;
@@ -61,10 +62,14 @@ export function formatData(network: Network[] = [Network.Main], totalStat: Netwo
     twins: 0,
     contracts: 0,
     nodesDistribution: {},
+    dedicatedNodes: 0,
   };
   for (let i = 0; i < network.length; i++) {
     const currentStats = totalStat[network[i]];
     if (!currentStats) continue;
+    if (Number.isNaN(currentStats.dedicatedNodes)) {
+      currentStats.dedicatedNodes = 0;
+    }
     res = mergeStatsData([res, currentStats]);
   }
 

@@ -118,6 +118,7 @@
         }"
         v-model="$props.modelValue.farm"
         v-model:loading="loadingFarm"
+        v-model:search="farmName"
       />
 
       <SelectNode
@@ -142,7 +143,7 @@ defineProps<{ modelValue: K8SWorker }>();
 const emits = defineEmits<{ (event: "update:loading", value: boolean): void }>();
 const farmManager = useFarm();
 const loadingFarm = ref(farmManager?.getLoading());
-
+const farmName = ref();
 watch(loadingFarm, (loadingFarm): void => {
   emits("update:loading", loadingFarm!);
 });

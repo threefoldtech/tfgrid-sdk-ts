@@ -8,6 +8,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/vm.png"
   >
     <template #title>Deploy a Micro Virtual Machine </template>
@@ -81,6 +82,7 @@
             }"
             v-model="farm"
             v-model:loading="loadingFarm"
+            v-model:search="farmName"
           />
           <SelectNode
             v-model="selectedNode"
@@ -236,6 +238,7 @@ const ipv6 = ref(false);
 const planetary = ref(true);
 const wireguard = ref(false);
 const farm = ref() as Ref<Farm>;
+const farmName = ref();
 const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
 const network = ref();

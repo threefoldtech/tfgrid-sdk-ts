@@ -43,9 +43,19 @@
                 <v-list-item-title>
                   {{ item.raw.nodeId }}
                 </v-list-item-title>
-                <v-chip v-bind="props" :color="getChipColor(item.raw.state)" class="ml-3">
-                  {{ item.raw.state }}
-                </v-chip>
+                <div>
+                  <v-chip
+                    v-if="item.raw.certified === 'Certified'"
+                    v-bind="props"
+                    :color="getChipColor(item.raw.certified)"
+                    class="ml-3"
+                  >
+                    {{ item.raw.certified }}
+                  </v-chip>
+                  <v-chip v-bind="props" :color="getChipColor(item.raw.state)" class="ml-3">
+                    {{ item.raw.state }}
+                  </v-chip>
+                </div>
               </v-list-item-content>
             </v-list-item>
           </template>
@@ -166,7 +176,11 @@ watch(selectedCards, async () => {
     }
   }
   if (selectedNode.value && selectedCards.value) {
-    emits("update:modelValue", { nodeId: selectedNode.value.nodeId, cards: cards });
+    emits("update:modelValue", {
+      nodeId: selectedNode.value.nodeId,
+      cards: cards,
+      certified: selectedNode.value.certified,
+    });
   }
 });
 
@@ -260,7 +274,7 @@ watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
 });
 
 function getChipColor(item: any) {
-  return item === "Dedicated" ? "success" : "secondary";
+  return item === "Dedicated" ? "success" : item === "Certified" ? "primary" : "secondary";
 }
 function validateSelectedNodeFilters(
   validatingNode: INode,
@@ -289,7 +303,6 @@ async function validateManualSelectedNode(validatingNode: INode) {
     errorMessage.value = ``;
     loadingNodes.value = true;
     const node = await grid?.capacity.nodes.getNode(Number(validatingNode.nodeId));
-
     if (node) {
       const freeresources = await grid?.capacity.nodes.getNodeFreeResources(
         node.nodeId,
@@ -343,6 +356,7 @@ async function loadNodes(farmId: number | undefined) {
             nodesArr.value.push({
               nodeId: node.nodeId,
               state: node.rentedByTwinId ? "Dedicated" : "Shared",
+              certified: node.certificationType,
             });
           }
         }
@@ -379,6 +393,7 @@ async function validateNodeStoragePool(validatingNode: INode | undefined) {
     emits("update:modelValue", {
       nodeId: validatingNode.nodeId,
       cards: cards,
+      certified: validatingNode.certified,
     });
   } catch (e) {
     availableNodes.value = availableNodes.value.filter(node => node.nodeId !== validatingNode.nodeId);

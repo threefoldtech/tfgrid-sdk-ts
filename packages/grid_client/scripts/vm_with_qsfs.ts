@@ -2,6 +2,61 @@ import { FilterOptions, MachinesModel, QSFSZDBSModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
+async function deployQsfs(client, qsfs) {
+  try {
+    const res = await client.qsfs_zdbs.deploy(qsfs);
+    log("================= Deploying QSFS =================");
+    log(res);
+    log("================= Deploying QSFS =================");
+  } catch (error) {
+    log("Error while Deploying QSFS " + error);
+  }
+}
+
+async function deploy(client, vms) {
+  try {
+    const res = await client.machines.deploy(vms);
+    log("================= Deploying VM =================");
+    log(res);
+    log("================= Deploying VM =================");
+  } catch (error) {
+    log("Error while Deploying the VM " + error);
+  }
+}
+
+async function getDeployment(client, vms) {
+  try {
+    const res = await client.machines.getObj(vms);
+    log("================= Getting deployment information =================");
+    log(res);
+    log("================= Getting deployment information =================");
+  } catch (error) {
+    log("Error while getting the deployment " + error);
+  }
+}
+
+async function cancel(client, vms) {
+  try {
+    const res = await client.machines.delete(vms);
+    log("================= Canceling the deployment =================");
+    log(res);
+    log("================= Canceling the deployment =================");
+  } catch (error) {
+    log("Error while canceling the deployment " + error);
+  }
+}
+
+async function deleteQsfs(client, qsfs) {
+  try {
+    const res = await client.qsfs_zdbs.delete(qsfs);
+    log("================= Deleting QSFS =================");
+    log(res);
+    log("================= Deleting QSFS =================");
+  } catch (error) {
+    log("Error while deleting qsfs " + error);
+  }
+}
+
 async function main() {
   const grid3 = await getClient();
 
@@ -89,28 +144,18 @@ async function main() {
     description: "test deploying VMs via ts grid3 client",
   };
 
-  async function cancel(grid3) {
-    // delete
-    const d = await grid3.machines.delete({ name: machines_name });
-    log(d);
-    const r = await grid3.qsfs_zdbs.delete({ name: qsfs_name });
-    log(r);
-  }
-  //deploy qsfs
-  const res = await grid3.qsfs_zdbs.deploy(qsfs);
-  log(">>>>>>>>>>>>>>>QSFS backend has been created<<<<<<<<<<<<<<<");
-  log(res);
+  //Deploy QSFS
+  await deployQsfs(grid3, qsfs);
 
-  const vm_res = await grid3.machines.deploy(vms);
-  log(">>>>>>>>>>>>>>>vm has been created<<<<<<<<<<<<<<<");
-  log(vm_res);
+  //Deploy VMs
+  await deploy(grid3, vms);
 
-  // get the deployment
-  const l = await grid3.machines.getObj(vms.name);
-  log(">>>>>>>>>>>>>>>Deployment result<<<<<<<<<<<<<<<");
-  log(l);
+  //Get the deployment
+  await getDeployment(grid3, vms.name);
 
-  // await cancel(grid3);
+  //Uncomment the line below to cancel the deployment
+  // await cancel(grid3, { name: machines_name });
+  // await deleteQsfs(grid3, { name: qsfs_name });
 
   await grid3.disconnect();
 }

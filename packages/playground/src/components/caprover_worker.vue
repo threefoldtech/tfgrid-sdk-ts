@@ -48,6 +48,7 @@
         }"
         v-model="$props.modelValue.farm"
         v-model:loading="loadingFarm"
+        v-model:search="farmName"
       />
 
       <SelectNode
@@ -80,7 +81,7 @@ const profileManager = useProfileManager();
 const farmManager = useFarm();
 const selection = ref();
 const loadingFarm = ref(farmManager?.getLoading());
-
+const farmName = ref();
 watch(loadingFarm, (loadingFarm): void => {
   emits("update:loading", loadingFarm!);
 });

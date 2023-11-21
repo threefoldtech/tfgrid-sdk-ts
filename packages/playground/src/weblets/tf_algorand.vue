@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/algorand.png"
   >
     <template #title>Deploy a Algorand Instance </template>
@@ -165,6 +166,7 @@
           }"
           v-model="farm"
           v-model:loading="loadingFarm"
+          v-model:search="farmName"
         />
         <SelectNode
           v-model="selectedNode"
@@ -223,6 +225,7 @@ const wordsLength = computed(() => (account.value ? account.value.split(" ").len
 const firstRound = ref(24000000);
 const lastRound = ref(26000000);
 const farm = ref() as Ref<Farm>;
+const farmName = ref();
 const dedicated = ref(false);
 const certified = ref(false);
 const loadingFarm = ref(false);

@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/subsquid.png"
   >
     <template #title>Deploy a Subsquid Instance </template>
@@ -74,6 +75,7 @@
             }"
             v-model="farm"
             v-model:loading="loadingFarm"
+            v-model:search="farmName"
           />
 
           <SelectNode
@@ -131,6 +133,7 @@ const endpoint = ref("");
 const ipv4 = ref(false);
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
+const farmName = ref();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/subsquid-latest.flist",
   entryPoint: "/sbin/zinit init",
