@@ -93,6 +93,9 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
           farms.value = farms.value.sort((a, b) => {
             const aValue = a[sortKey];
             const bValue = b[sortKey];
+            if (isNaN(aValue)) {
+              return sortOrder === "desc" ? ("" + bValue).localeCompare(aValue) : ("" + aValue).localeCompare(bValue);
+            }
             return sortOrder === "desc" ? bValue - aValue : aValue - bValue;
           });
         }
