@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/mattermost.png"
   >
     <template #title>Deploy a Mattermost Instance </template>

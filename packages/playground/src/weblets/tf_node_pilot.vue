@@ -7,6 +7,7 @@
     :certified="certified"
     :dedicated="dedicated"
     ipv4
+    :SelectedNode="selectedNode"
     title-image="images/icons/vm.png"
   >
     <template #title>Deploy a Node Pilot</template>

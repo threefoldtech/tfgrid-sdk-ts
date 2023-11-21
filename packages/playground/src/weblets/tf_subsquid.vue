@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/subsquid.png"
   >
     <template #title>Deploy a Subsquid Instance </template>
