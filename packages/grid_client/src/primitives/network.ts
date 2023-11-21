@@ -1,3 +1,4 @@
+import { GridClientErrors, ValidationError, WrappedError } from "@threefold/types";
 import { Buffer } from "buffer";
 import { plainToInstance } from "class-transformer";
 import { Addr } from "netaddr";
@@ -49,10 +50,10 @@ class Network {
 
   constructor(public name: string, public ipRange: string, public config: GridClientConfig) {
     if (Addr(ipRange).prefix !== 16) {
-      throw Error("Network ip_range should have a prefix 16");
+      throw new ValidationError("Network ip_range should have a prefix 16");
     }
     if (!this.isPrivateIP(ipRange)) {
-      throw Error("Network ip_range should be a private range");
+      throw new ValidationError("Network ip_range should be a private range");
     }
     this.backendStorage = new BackendStorage(
       config.backendStorageType,
@@ -80,16 +81,16 @@ class Network {
 
   async addAccess(node_id: number, ipv4: boolean): Promise<string> {
     if (!this.nodeExists(node_id)) {
-      throw Error(`Node ${node_id} does not exist in the network. Please add it first`);
+      throw new ValidationError(`Node ${node_id} does not exist in the network. Please add it first`);
     }
     events.emit("logs", `Adding access to node ${node_id}`);
     const accessNodes = await this.capacity.getAccessNodes(this.config.twinId);
     if (Object.keys(accessNodes).includes(node_id.toString())) {
       if (ipv4 && !accessNodes[node_id]["ipv4"]) {
-        throw Error(`Node ${node_id} does not have ipv4 public config.`);
+        throw new GridClientErrors.Nodes.InvalidResourcesError(`Node ${node_id} does not have ipv4 public config.`);
       }
     } else {
-      throw Error(`Node ${node_id} is not an access node.`);
+      throw new GridClientErrors.Nodes.AccessNodeError(`Node ${node_id} is not an access node.`);
     }
 
     const nodeWGListeningPort = this.getNodeWGListeningPort(node_id);
@@ -99,7 +100,9 @@ class Network {
     } else if (accessNodes[node_id]["ipv6"]) {
       endpoint = `[${accessNodes[node_id]["ipv6"].split("/")[0]}]:${nodeWGListeningPort}`;
     } else {
-      throw Error(`Couldn't find ipv4 or ipv6 in the public config of node ${node_id} `);
+      throw new GridClientErrors.Nodes.InvalidResourcesError(
+        `Couldn't find ipv4 or ipv6 in the public config of node ${node_id} `,
+      );
     }
 
     const nodesWGPubkey = await this.getNodeWGPublicKey(node_id);
@@ -209,7 +212,7 @@ class Network {
     events.emit("logs", `Loading network ${this.name}`);
     const network = await this.getNetwork();
     if (network["ip_range"] !== this.ipRange) {
-      throw Error(`The same network name ${this.name} with a different ip range already exists`);
+      throw new ValidationError(`The same network name ${this.name} with a different ip range already exists`);
     }
 
     await this.tfClient.connect();
@@ -222,7 +225,7 @@ class Network {
       try {
         res = await this.rmb.request([node_twin_id], "zos.deployment.get", payload);
       } catch (e) {
-        throw Error(`Failed to load network deployment ${node.contract_id} due to ${e}`);
+        throw new WrappedError(`Failed to load network deployment ${node.contract_id}`, e);
       }
       res["node_id"] = node.node_id;
       for (const workload of res["workloads"]) {
@@ -330,7 +333,7 @@ class Network {
         ip = ip.increment();
       }
     } else {
-      throw Error("node_id or subnet must be specified");
+      throw new ValidationError("node_id or subnet must be specified");
     }
     if (ip) {
       ip = ip.toString().split("/")[0];
@@ -340,20 +343,20 @@ class Network {
           return ip;
         }
       }
-      throw Error(`node_id is not in the network. Please add it first`);
+      throw new ValidationError(`node_id is not in the network. Please add it first`);
     }
   }
   validateUserIP(node_id: number, ip_address = "") {
     const reserved_ips = this.getNodeReservedIps(node_id);
     if (reserved_ips.includes(ip_address)) {
-      throw Error(`private ip ${ip_address} is being used please select another ip or leave it empty`);
+      throw new ValidationError(`private ip ${ip_address} is being used please select another ip or leave it empty`);
     }
 
     const nodeSubnet = this.getNodeSubnet(node_id);
     const ip = Addr(ip_address);
 
     if (!Addr(nodeSubnet).contains(ip)) {
-      throw Error(`Selected ip is not available in node subnet, node subnet: ${nodeSubnet}`);
+      throw new ValidationError(`Selected ip is not available in node subnet, node subnet: ${nodeSubnet}`);
     }
     for (const node of this.nodes) {
       if (node.node_id === node_id) {
@@ -425,7 +428,7 @@ class Network {
       this.reservedSubnets.push(subnet);
       return subnet;
     } else {
-      throw Error(`subnet ${subnet} is not free`);
+      throw new ValidationError(`subnet ${subnet} is not free`);
     }
   }
 
@@ -473,7 +476,7 @@ class Network {
     try {
       result = await this.rmb.request([node_twin_id], "zos.network.list_wg_ports", "");
     } catch (e) {
-      throw Error(`Couldn't get free Wireguard ports for node ${node_id} due to ${e}`);
+      throw new WrappedError(`Couldn't get free Wireguard ports for node ${node_id}`, e);
     }
     events.emit("logs", `Node ${node_id} reserved ports: ${JSON.stringify(result)}`);
 
@@ -515,7 +518,7 @@ class Network {
       try {
         result = await this.rmb.request([node_twin_id], "zos.network.interfaces", "");
       } catch (e) {
-        throw Error(`Couldn't get the network interfaces for node ${node_id} due to ${e}`);
+        throw new WrappedError(`Couldn't get the network interfaces for node ${node_id}`, e);
       }
       events.emit("logs", `Node ${node_id} network interfaces: ${JSON.stringify(result)}`);
 
@@ -624,7 +627,7 @@ PersistentKeepalive = 25\nEndpoint = ${endpoint}`;
       }
       const accessNodes = await this.getAccessNodes();
       if (accessNodes.length === 0) {
-        throw Error(
+        throw new GridClientErrors.Nodes.AccessNodeError(
           `Couldn't add node ${net["node_id"]} as it's a hidden node ` +
             `and there is no access node in this network ${this.name}. ` +
             "Please add addAccess = true in the network configuration.",
