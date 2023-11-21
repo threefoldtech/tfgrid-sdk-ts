@@ -12,7 +12,7 @@ export async function getGrid(profile: Pick<Profile, "mnemonic">, projectName?: 
     backendStorageType: BackendStorageType.tfkvstore,
     projectName,
 
-    ...(network !== NetworkEnv.custom
+    ...(import.meta.env.DEV && network !== NetworkEnv.custom
       ? {}
       : {
           substrateURL: window.env.SUBSTRATE_URL,
