@@ -11,6 +11,7 @@ export enum Network {
   Test = "test",
   Dev = "dev",
   Qa = "qa",
+  Custom = "custom",
 }
 
 export default class GridProxyClient {
@@ -20,10 +21,14 @@ export default class GridProxyClient {
     return this.__uri;
   }
 
-  constructor(network: Network) {
-    assertIn(network, [Network.Main, Network.Test, Network.Dev, Network.Qa]);
+  constructor(network: Network, url?: string) {
+    assertIn(network, [Network.Main, Network.Test, Network.Dev, Network.Qa, Network.Custom]);
 
-    this.__uri = network === Network.Main ? "https://gridproxy.grid.tf" : `https://gridproxy.${network}.grid.tf`;
+    if (network === Network.Custom && url) {
+      this.__uri = url;
+    } else {
+      this.__uri = network === Network.Main ? "https://gridproxy.grid.tf" : `https://gridproxy.${network}.grid.tf`;
+    }
 
     this.contracts = new ContractsClient(this.__uri);
     this.farms = new FarmsClient(this.__uri);
