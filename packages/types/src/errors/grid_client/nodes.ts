@@ -5,6 +5,7 @@ export enum Errors {
   UnavailableForTwin,
   InvalidResourcesError,
   DiskAllocationError,
+  AccessNodeError,
 }
 class TFGridNodesError extends BaseError {
   constructor(code: number, message: string) {
@@ -21,5 +22,11 @@ export class InvalidResourcesError extends TFGridNodesError {
 export class DiskAllocationError extends TFGridNodesError {
   constructor(message: string) {
     super(Errors.DiskAllocationError, message);
+  }
+}
+
+export class AccessNodeError extends TFGridNodesError {
+  constructor(message: string) {
+    super(Errors.AccessNodeError, message);
   }
 }
