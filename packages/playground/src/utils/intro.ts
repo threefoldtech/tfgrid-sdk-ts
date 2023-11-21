@@ -19,20 +19,23 @@ export async function startGuide(file: `${string}.yaml` | `${string}.json`) {
     options = yaml.load(text) as Partial<Options>;
   }
 
-  type Step = Partial<IntroStep & { triggerClick: boolean }>;
+  type Step = IntroStep & { triggerClick?: boolean };
 
   const steps = options.steps as Step[];
 
   const intro = introJs().setOptions({
     steps,
     dontShowAgain: import.meta.env.PROD,
+    dontShowAgainCookie: file,
     disableInteraction: true,
     exitOnEsc: false,
     exitOnOverlayClick: false,
-    showBullets: false,
+    showBullets: import.meta.env.DEV,
   });
 
   intro.onchange(async el => {
+    console.log(el);
+
     const step = steps[intro.currentStep()];
     if (step.triggerClick) {
       el.click();

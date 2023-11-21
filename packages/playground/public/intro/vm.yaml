@@ -1,9 +1,9 @@
 steps:
-  - element: .fvm-config
+  - element: .vm-config
     title: Configuration Tab
-    intro: Fill required configuration in order to be able to deploy full virtual machine on tfgrid.
+    intro: Fill required configuration in order to be able to deploy micro virtual machine on tfgrid.
 
-  - element: .fvm-name
+  - element: .vm-name
     title: Instance Name
     intro: "Choose a name for your instance or leave the auto-generated name.<br /><br />Note: only lower-case letters and numbers allowed."
 
@@ -19,31 +19,36 @@ steps:
     title: Network Options
     intro: "Select a network for your workload connection."
 
-  - element: .fvm-gpu
-    title: Nodes With GPU
-    intro: "Selecting a Node with GPU. When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard."
-
-  - element: .fvm-dedicated
+  - element: .vm-dedicated
     title: Dedicated Nodes
     intro: "<a class='app-link' target='_blank' href='https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html'>Find More</a>"
 
-  - element: .fvm-certified
+  - element: .vm-certified
     title: Certified Nodes
     intro: Renting capacity on certified nodes is charged 25% extra.
 
-  - element: .fvm.select-node
+  - element: .vm.select-node
     title: Select Node
     intro: "Select a node ID to deploy on."
 
-  - element: .fvm-disks
+  - element: .vm-env
+    triggerClick: true
+    title: Environment Variables Tab
+    intro: "Config your VM's environment variables as needed."
+
+  - element: .vm-envs.expandable-plus
+    title: Add an environment variable
+    intro: "Click the + button to add an environment variable to your deployment. This is optional for micro VM."
+
+  - element: .vm-disks
     triggerClick: true
     title: Disks Tab
     intro: "Config your VM's disks as needed."
 
-  - element: .fvm.expandable-plus
+  - element: .vm-disks.expandable-plus
     title: Add a disk
     intro: "Click the + button to add a disk to your deployment. This is optional for full VM."
 
-  - element: .fvm-deloy
+  - element: .vm-deloy
     title: Deploy
     intro: "Once you're ready, click deploy."

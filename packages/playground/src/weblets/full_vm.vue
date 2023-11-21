@@ -115,6 +115,7 @@
             v-model:loading="loadingFarm"
           />
           <SelectNode
+            prefix="fvm"
             v-model="selectedNode"
             :filters="{
               farmId: farm?.farmID,
@@ -134,6 +135,7 @@
 
       <template #disks>
         <ExpandableLayout
+          prefix="fvm"
           v-model="disks"
           @add="addDisk"
           title="Add additional disk space to your full virtual machine"

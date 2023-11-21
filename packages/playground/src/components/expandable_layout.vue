@@ -12,7 +12,7 @@
             @click="$emit('add')"
             v-bind="props"
             :disabled="disabled"
-            class="expandable-plus"
+            :class="[prefix, 'expandable-plus']"
           />
         </template>
       </v-tooltip>
@@ -58,6 +58,10 @@ const props = defineProps({
   },
   disabled: Boolean,
   title: String,
+  prefix: {
+    type: String,
+    default: () => "",
+  },
 });
 const emits = defineEmits<{
   (event: "update:modelValue", value: any[]): void;
