@@ -1,6 +1,3 @@
-disableInteraction: false
-exitOnEsc: false
-exitOnOverlayClick: false
 steps:
   - element: .fvm-config
     title: Configuration Tab

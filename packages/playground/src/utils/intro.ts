@@ -23,7 +23,14 @@ export async function startGuide(file: `${string}.yaml` | `${string}.json`) {
 
   const steps = options.steps as Step[];
 
-  const intro = introJs().setOptions(options);
+  const intro = introJs().setOptions({
+    steps,
+    dontShowAgain: import.meta.env.PROD,
+    disableInteraction: true,
+    exitOnEsc: false,
+    exitOnOverlayClick: false,
+    showBullets: false,
+  });
 
   intro.onchange(async el => {
     const step = steps[intro.currentStep()];
