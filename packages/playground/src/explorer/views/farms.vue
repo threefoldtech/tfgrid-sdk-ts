@@ -73,7 +73,9 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
   isFormLoading.value = true;
   try {
     const { count, data } = await getFarms(queries);
-    if (data) {
+
+    if (data && count) {
+      totalFarms.value = count;
       farms.value = data.map(farm => {
         const ips = farm.publicIps;
         const total = ips.length;
@@ -111,9 +113,6 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
 };
 onMounted(async () => {
   await _getFarms({});
-  if (farms.value) {
-    totalFarms.value = farms.value.length;
-  }
 
   await updateFarms();
 });
