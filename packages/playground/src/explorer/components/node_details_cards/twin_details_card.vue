@@ -66,7 +66,7 @@ export default {
           callback: copy,
           hint: "Copy the account id to the clipboard.",
         },
-        { name: "Relay", value: relay || "::1" },
+        { name: "Relay", value: relay || "-" },
       ];
     };
 
