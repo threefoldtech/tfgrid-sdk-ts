@@ -13,6 +13,7 @@
   >
     <template #title>Deploy a Kubernetes cluster</template>
     <d-tabs
+      prefix="k8s"
       :tabs="[
         { title: 'Config', value: 'config' },
         { title: 'Master', value: 'master' },
@@ -34,7 +35,7 @@
           #="{ props }"
         >
           <input-tooltip tooltip="Instance name.">
-            <v-text-field label="Name" v-model="name" v-bind="{ ...props }" />
+            <v-text-field label="Name" class="k8s-cluster-name" v-model="name" v-bind="{ ...props }" />
           </input-tooltip>
         </input-validator>
 
@@ -54,7 +55,12 @@
             <input-tooltip
               tooltip="The Kubernetes Cluster Token is a specially generated authentication token used for accessing and managing a Kubernetes cluster."
             >
-              <v-text-field label="Cluster Token" v-bind="{ ...props, ...validationProps }" v-model="clusterToken" />
+              <v-text-field
+                label="Cluster Token"
+                class="k8s-cluster-token"
+                v-bind="{ ...props, ...validationProps }"
+                v-model="clusterToken"
+              />
             </input-tooltip>
           </password-input-wrapper>
         </input-validator>
@@ -65,30 +71,35 @@
       </template>
 
       <template #workers>
-        <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }" :disabled="loadingFarm">
+        <ExpandableLayout prefix="k8s" v-model="workers" @add="addWorker" #="{ index }" :disabled="loadingFarm">
           <K8SWorker v-model="workers[index]" v-model:loading="loadingFarm" />
         </ExpandableLayout>
       </template>
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn variant="tonal" color="primary" @click="deploy" :disabled="tabs?.invalid"> Deploy </v-btn>
+      <v-btn variant="tonal" class="k8s-deploy" color="primary" @click="deploy" :disabled="tabs?.invalid">
+        Deploy
+      </v-btn>
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 
 import { createWorker } from "../components/k8s_worker.vue";
+import { useDialogService } from "../components/vuetify_dialog/DialogLockService.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import type { K8SWorker as K8sWorker } from "../types";
 import { deployK8s } from "../utils/deploy_k8s";
 import { getGrid } from "../utils/grid";
+import { startGuide } from "../utils/intro";
 import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
+const dialogService = useDialogService();
 const tabs = ref();
 const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "k8s" }));
@@ -96,6 +107,13 @@ const clusterToken = ref(generatePassword(10));
 const master = ref(createWorker(generateName({ prefix: "mr" })));
 const workers = ref<K8sWorker[]>([]);
 const loadingFarm = ref(false);
+
+onMounted(() => dialogService.enqueue(startTour));
+onBeforeUnmount(() => dialogService.dequeue(startTour));
+async function startTour() {
+  await startGuide("k8s.yaml");
+}
+
 function addWorker() {
   workers.value.push(createWorker());
 }

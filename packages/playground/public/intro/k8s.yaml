@@ -1,0 +1,66 @@
+steps:
+  - element: .k8s-config
+    title: Configuration Tab
+    intro: PLACEHOLDER
+
+  - element: .k8s-cluster-name
+    title: Instance Name
+    intro: PLACEHOLDER
+
+  - element: .k8s-cluster-token
+    title: Cluster Token
+    intro: PLACEHOLDER
+
+  - element: .k8s-master
+    triggerClick: true
+    title: Master Tab
+    intro: PLACEHOLDER
+
+  - element: .k8s-name
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .k8s-cpu
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .k8s-memory
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .k8s-disk
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .root-fs
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .toggle-root-fs
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .k8s-dedicated
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .k8s-certified
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .k8s.select-node
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .k8s-workers
+    triggerClick: true
+    title: Workers Tab
+    intro: PLACEHOLDER
+
+  - element: .k8s.expandable-plus
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .k8s-deploy
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
