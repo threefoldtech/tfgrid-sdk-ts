@@ -1,5 +1,5 @@
 import { RequestError } from "@threefold/types";
-import { default as axios, Method } from "axios";
+import { AxiosError, default as axios, Method } from "axios";
 
 async function sendWithFullResponse(method: Method, url: string, body: string, headers: Record<string, string>) {
   const options = {
@@ -8,11 +8,13 @@ async function sendWithFullResponse(method: Method, url: string, body: string, h
     data: body,
     headers: headers,
   };
-  const response = await axios(options);
-  if (response.status >= 400) {
-    throw new RequestError(`HTTP request failed with status code: ${response.status} due to: ${response.data}`);
+  try {
+    return await axios(options);
+  } catch (e) {
+    const { response } = e as AxiosError;
+    const errorMessage = (response?.data as { error: string }).error;
+    throw new RequestError(`HTTP request failed ${errorMessage ? "due to " + errorMessage : ""}`, response?.status);
   }
-  return response;
 }
 
 async function send(method: Method, url: string, body: string, headers: Record<string, string>) {
