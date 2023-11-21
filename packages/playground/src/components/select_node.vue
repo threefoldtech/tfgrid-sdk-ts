@@ -92,8 +92,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { GridClient } from "@threefold/grid_client";
-import type { FilterOptions } from "@threefold/grid_client";
+import type { NodeInfo, NodeResources } from "@threefold/grid_client";
 import { type PropType, type Ref, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
@@ -175,13 +174,12 @@ watch(
   () => selectedNode.value,
   async node => {
     errorMessage.value = ``;
-
     const grid = await getGrid(profileManager.profile!);
     if (node && grid) {
       if (props.selection === "automated") {
         await validateNodeStoragePool(node);
       } else {
-        await checkRentedNode();
+        await validateManualSelectedNode(node);
       }
     }
 
@@ -200,11 +198,12 @@ watch(
 );
 
 watch(
-  () => ({ ...props.filters }),
-  (value, oldValue) => {
+  () => props.filters,
+  async (value, oldValue) => {
     if (
       value.farmId === oldValue.farmId &&
-      value.diskSizes === oldValue.diskSizes &&
+      value.diskSizes.length === oldValue.diskSizes.length &&
+      new Set([...value.diskSizes, ...oldValue.diskSizes]).size === value.diskSizes.length &&
       value.cpu === oldValue.cpu &&
       value.memory === oldValue.memory &&
       value.certified === oldValue.certified &&
@@ -212,18 +211,23 @@ watch(
       value.hasGPU === oldValue.hasGPU
     )
       return;
-    shouldBeUpdated.value = true;
+    if (props.selection === "manual" && selectedNode.value) {
+      await validateManualSelectedNode(selectedNode.value);
+    } else {
+      shouldBeUpdated.value = true;
+    }
   },
-  { deep: false },
+  { deep: true },
 );
 
 watch(
   () => props.selection,
   async (value, oldValue) => {
-    if (value === "automated") {
+    errorMessage.value = ``;
+    if (value !== oldValue) {
       selectedNode.value = undefined;
+      ManualselectedNode.value = undefined;
     }
-    ManualselectedNode.value = undefined;
   },
   { deep: false },
 );
@@ -232,18 +236,7 @@ watch(
   () => ManualselectedNode.value,
   async (value, oldValue) => {
     if (value != undefined || value != null) {
-      // workaround for checking for available nodes
-      // const grid = await getGrid(profileManager.profile!);
-      // if (grid) {
-      //   const filters: FilterOptions = {
-      //     nodeId: value,
-      //   };
-      //   const nodes = await grid.capacity.filterNodes(filters);
-      //   console.log("nodes", nodes);
-      // }
-
       selectedNode.value = { nodeId: Number(value) };
-      // checkRentedNode();
     }
   },
   { deep: false },
@@ -252,7 +245,6 @@ watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
   if (l || !s) return;
   shouldBeUpdated.value = false;
   if (props.selection === "automated") {
-    console.log("automated");
     farmManager?.subscribe(farmId => {
       if (!farmId) {
         selectedNode.value = undefined;
@@ -270,36 +262,51 @@ watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
 function getChipColor(item: any) {
   return item === "Dedicated" ? "success" : "secondary";
 }
-async function checkRentedNode() {
-  const grid = await getGrid(profileManager.profile!);
-  const filters = props.filters;
-  errorMessage.value = ``;
-  loadingNodes.value = true;
-  const node = await grid?.capacity.nodes.getNode(Number(ManualselectedNode.value));
-  if (node) {
-    const gridproxy = window.env.GRIDPROXY_URL;
-    const diskSizes = [...filters.diskSizes, props.rootFileSystemSize];
-
-    const freeresources = await grid?.capacity.nodes.getNodeFreeResources(node.nodeId, "proxy", gridproxy);
-    console.log("Free resources: ", freeresources);
-    if (node.rentedByTwinId !== profileManager.profile?.twinId && node.rentedByTwinId !== 0) {
-      errorMessage.value = `Node ${ManualselectedNode.value} is rented by someone else`;
-    } else if (filters.ipv4 && !node.publicConfig.ipv4) {
-      errorMessage.value = `Node ${ManualselectedNode.value} is not assigned to a public ip`;
-    } else if (freeresources && freeresources.cru < filters.cpu) {
-      errorMessage.value = `Node ${ManualselectedNode.value} doesn't have enough cpu`;
-    } else if (freeresources && freeresources.mru < Math.round(filters.memory / 1024)) {
-      errorMessage.value = `Node ${ManualselectedNode.value} doesn't have enough memory`;
-    } else if (freeresources && freeresources.sru < filters.diskSizes.reduce((total, disk) => total + disk)) {
-      errorMessage.value = `Node ${ManualselectedNode.value} doesn't have enough sru`;
-    }
-  } else {
-    errorMessage.value = `Node ${ManualselectedNode.value} is not on the grid`;
+function validateSelectedNodeFilters(
+  validatingNode: INode,
+  node: NodeInfo,
+  freeresources: NodeResources | undefined,
+  filters: NodeFilters,
+) {
+  if (node.inDedicatedFarm && node.rentedByTwinId !== profileManager.profile?.twinId) {
+    errorMessage.value = `Node ${validatingNode.nodeId} belongs to a dedicated farm and not rented by you`;
+  } else if (node.rentedByTwinId !== profileManager.profile?.twinId && node.rentedByTwinId !== 0) {
+    errorMessage.value = `Node ${validatingNode.nodeId} is rented by someone else`;
+  } else if (filters.ipv4 && !node.publicConfig.ipv4) {
+    errorMessage.value = `Node ${validatingNode.nodeId} is not assigned to a public ip`;
+  } else if (freeresources && freeresources.cru < filters.cpu) {
+    errorMessage.value = `Node ${validatingNode.nodeId} doesn't have enough CPU`;
+  } else if (freeresources && freeresources.mru < Math.round(filters.memory / 1024)) {
+    errorMessage.value = `Node ${validatingNode.nodeId} doesn't have enough memory`;
+  } else if (freeresources && freeresources.sru < filters.diskSizes.reduce((total, disk) => total + disk)) {
+    errorMessage.value = `Node ${validatingNode.nodeId} doesn't have enough SRU`;
   }
-  loadingNodes.value = false;
-  pingingNode.value = false;
 }
+async function validateManualSelectedNode(validatingNode: INode) {
+  try {
+    const grid = await getGrid(profileManager.profile!);
+    const filters = props.filters;
+    errorMessage.value = ``;
+    loadingNodes.value = true;
+    const node = await grid?.capacity.nodes.getNode(Number(validatingNode.nodeId));
 
+    if (node) {
+      const freeresources = await grid?.capacity.nodes.getNodeFreeResources(
+        node.nodeId,
+        "proxy",
+        window.env.GRIDPROXY_URL,
+      );
+      validateSelectedNodeFilters(validatingNode, node, freeresources, filters);
+    } else {
+      errorMessage.value = `Node ${validatingNode.nodeId} is not on the grid`;
+    }
+  } catch (e) {
+    console.error(`An error occurred: ${e}`);
+  } finally {
+    validator.value?.setStatus(ValidatorStatus.Init);
+    loadingNodes.value = false;
+  }
+}
 async function loadNodes(farmId: number | undefined) {
   availableNodes.value = [];
   selectedNode.value = undefined;
