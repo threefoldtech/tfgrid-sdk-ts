@@ -21,6 +21,7 @@
           ]"
           v-model:items-per-page="size"
           v-model:page="page"
+          v-model:sort-by="sortBy"
           class="elevation-1"
           @update:options="updateQueries"
           @click:row="openSheet"
@@ -56,9 +57,11 @@ const selectedFarm = ref<Farm>();
 const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer);
 const size = ref(10);
 const page = ref(1);
+const sortBy = ref([]);
 const filterOptions = ref<FarmFilterOptions>({
   size: size.value,
   page: page.value,
+  sortBy: sortBy.value,
 });
 const mixedFarmFilters = ref<MixedFarmFilter>({ inputs: filterFarmInputs.value, options: filterOptions.value });
 const isFormLoading = ref<boolean>(true);
@@ -82,6 +85,18 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
           freePublicIp: total - used,
         };
       });
+      if (mixedFarmFilters.value.options) {
+        if (mixedFarmFilters.value.options.sortBy?.length) {
+          const sortKey = sortBy.value[0].key;
+          const sortOrder = sortBy.value[0].order;
+          console.log(sortKey, sortOrder);
+          farms.value = farms.value.sort((a, b) => {
+            const aValue = a[sortKey];
+            const bValue = b[sortKey];
+            return sortOrder === "desc" ? bValue - aValue : aValue - bValue;
+          });
+        }
+      }
     }
   } catch (err) {
     console.log("could not get farms:", err);
@@ -112,6 +127,7 @@ const updateQueries = () => {
   if (options) {
     options.page = page.value;
     options.size = size.value;
+    options.sortBy = sortBy.value;
   }
 };
 watch(mixedFarmFilters.value, updateFarms, { deep: true });

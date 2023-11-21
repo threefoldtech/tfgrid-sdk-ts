@@ -14,10 +14,14 @@ export type NodeFilterOptions = {
   page: number;
   size: number;
 };
-
+export type TableSortByOption = {
+  key: number;
+  order: string;
+};
 export type FarmFilterOptions = {
   page?: number;
   size?: number;
+  sortBy?: TableSortByOption[];
 };
 
 export const nodeOptionsInitializer: NodeFilterOptions = {
