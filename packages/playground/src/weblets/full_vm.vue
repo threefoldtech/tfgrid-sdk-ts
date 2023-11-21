@@ -194,10 +194,11 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, type Ref, ref, watch } from "vue";
+import { onBeforeUnmount, onMounted, type Ref, ref, watch } from "vue";
 
 import Network from "../components/networks.vue";
 import SelectFarmManager from "../components/select_farm_manager.vue";
+import { useDialogService } from "../components/vuetify_dialog/DialogLockService.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import type { solutionFlavor as SolutionFlavor } from "../types";
@@ -211,11 +212,14 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
+const dialogService = useDialogService();
 const solution = ref() as Ref<SolutionFlavor>;
 
-onMounted(async () => {
+onMounted(() => dialogService.enqueue(startTour));
+onBeforeUnmount(() => dialogService.dequeue(startTour));
+async function startTour() {
   await startGuide("fvm.yaml");
-});
+}
 
 const images: VmImage[] = [
   {
