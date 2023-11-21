@@ -1,3 +1,4 @@
+import "mosha-vue-toastify/dist/style.css";
 import "intro.js/minified/introjs.min.css";
 import "./assets/styles/introjs-vuetify.scss";
 
