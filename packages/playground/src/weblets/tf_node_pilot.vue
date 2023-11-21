@@ -88,6 +88,7 @@
           }"
           v-model="farm"
           v-model:loading="loadingFarm"
+          v-model:search="farmName"
         />
 
         <SelectNode
@@ -130,6 +131,7 @@ const name = ref(generateName({ prefix: "np" }));
 const cpu = ref(8);
 const memory = ref(8192);
 const farm = ref() as Ref<Farm>;
+const farmName = ref();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
   entryPoint: "/",

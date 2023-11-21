@@ -99,6 +99,7 @@
               }"
               v-model="farm"
               v-model:loading="loadingFarm"
+              v-model:search="farmName"
             />
 
             <SelectNode
@@ -162,6 +163,7 @@ const name = ref(generateName({ prefix: "dc" }));
 const email = ref("");
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
+const farmName = ref();
 const ipv4 = ref(false);
 const domainNameCmp = ref();
 const smtp = ref(createSMTPServer());

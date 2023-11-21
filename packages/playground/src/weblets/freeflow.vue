@@ -71,6 +71,7 @@
             }"
             v-model="farm"
             v-model:loading="loadingFarm"
+            v-model:search="farmName"
           />
 
           <SelectNode
@@ -123,6 +124,7 @@ const profileManager = useProfileManager();
 const threebotName = ref<string>("");
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
+const farmName = ref();
 const flist = ref<Flist>();
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);

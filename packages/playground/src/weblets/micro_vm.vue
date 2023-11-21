@@ -81,6 +81,7 @@
             }"
             v-model="farm"
             v-model:loading="loadingFarm"
+            v-model:search="farmName"
           />
           <SelectNode
             v-model="selectedNode"
@@ -234,6 +235,7 @@ const ipv6 = ref(false);
 const planetary = ref(true);
 const wireguard = ref(false);
 const farm = ref() as Ref<Farm>;
+const farmName = ref();
 const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
 const network = ref();
