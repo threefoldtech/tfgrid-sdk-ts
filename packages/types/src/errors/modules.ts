@@ -7,4 +7,8 @@ export enum ErrorModules {
   TFGrid = "tfgridModule",
   TFTBridge = "tfgridModule",
   TFTPrice = "tftPriceModule",
+  //grid client modules
+  // Farm = "tfGridFarm",
+  Network = "tfGridNetwork",
+  Node = "tfGridNode",
 }
