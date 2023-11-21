@@ -54,7 +54,7 @@ const farms = ref<Farm[]>();
 const isDialogOpened = ref<boolean>(false);
 const selectedFarm = ref<Farm>();
 const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer);
-const size = ref(5);
+const size = ref(10);
 const page = ref(1);
 const filterOptions = ref<FarmFilterOptions>({
   size: size.value,
