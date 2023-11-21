@@ -114,7 +114,7 @@
             zIndex: 1005,
             top: '65.5px',
             right: 0,
-            width: permanent && openSidebar && hasActiveProfile ? 'calc(100% - 280px)' : '100%',
+            width: openSidebar && hasActiveProfile ? 'calc(100% - 280px)' : '100%',
           }"
           height="50"
         >
