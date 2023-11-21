@@ -7,27 +7,26 @@ on:
     inputs:
       network:
         type: choice
-        description: 'which network to run tests on'
+        description: "Which network to run tests on"
         required: true
-        default: 'dev'
+        default: "dev"
         options: 
-        - 'dev'
-        - 'qa'
-        - 'test'
-        - 'main'
-
+        - "dev"
+        - "qa"
+        - "test"
+        - "main"
 jobs:
   tests:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       NETWORK: ${{ github.event.inputs.network }}
       RMB_PROXY: true
       STORE_SECRET: secret
       MNEMONIC: ${{ secrets.MNEMONIC }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up node 18
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: "yarn"
