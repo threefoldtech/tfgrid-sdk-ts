@@ -17,6 +17,7 @@
   >
     <template #title>Deploy a Caprover Instance</template>
     <d-tabs
+      prefix="caprover"
       :tabs="[
         { title: 'Config', value: 'config' },
         { title: 'Leader', value: 'leader' },
@@ -36,7 +37,7 @@
           #="{ props }"
         >
           <input-tooltip tooltip="Domain name.">
-            <v-text-field label="Domain" v-model="domain" v-bind="props" />
+            <v-text-field label="Domain" class="caprover-domain" v-model="domain" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
@@ -72,7 +73,12 @@
             #="{ props: validationProps }"
           >
             <input-tooltip tooltip="Instance admin password.">
-              <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validationProps }" />
+              <v-text-field
+                label="Password"
+                class="caprover-password"
+                v-model="password"
+                v-bind="{ ...props, ...validationProps }"
+              />
             </input-tooltip>
           </input-validator>
         </password-input-wrapper>
@@ -83,37 +89,48 @@
       </template>
 
       <template #workers>
-        <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }" :disabled="loadingFarm">
+        <ExpandableLayout prefix="caprover" v-model="workers" @add="addWorker" #="{ index }" :disabled="loadingFarm">
           <CaproverWorker v-model="workers[index]" v-model:loading="loadingFarm" />
         </ExpandableLayout>
       </template>
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid"> Deploy </v-btn>
+      <v-btn color="primary" class="caprover-deploy" variant="tonal" @click="deploy" :disabled="tabs?.invalid">
+        Deploy
+      </v-btn>
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 
+import { useDialogService } from "../components/vuetify_dialog/DialogLockService.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type CaproverWorker as CW, ProjectName } from "../types";
 import { deployVM, type Env, type Machine } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
+import { startGuide } from "../utils/intro";
 import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
+const dialogService = useDialogService();
 const loadingFarm = ref(false);
 const domain = ref("");
 const password = ref(generatePassword(10));
 const leader = ref(createWorker(generateName({ prefix: "cr" })));
 const workers = ref<CW[]>([]);
+
+onMounted(() => dialogService.enqueue(startTour));
+onBeforeUnmount(() => dialogService.enqueue(startTour));
+async function startTour() {
+  await startGuide("caprover.yaml");
+}
 
 async function deploy() {
   layout.value.setStatus("deploy");
