@@ -12,11 +12,7 @@ export const inputsInitializer: FilterFarmInputs = {
     label: "Farm IDs",
     placeholder: "e.g. 1,2,3.",
     rules: [
-      [
-        isNumeric("Should be a number"),
-        min("The pricing policy should be larger then zero.", 1),
-        isInt("should be an integer"),
-      ],
+      [isNumeric("Should be a number"), min("The ID should be larger then zero.", 1), isInt("should be an integer")],
     ],
     type: "text",
   },
@@ -44,7 +40,7 @@ export const inputsInitializer: FilterFarmInputs = {
     rules: [
       [
         isNumeric("Should be a number"),
-        min("The pricing policy should be larger then zero.", 1),
+        min("Total Public IP should be larger then zero.", 1),
         isInt("should be an integer"),
       ],
     ],
