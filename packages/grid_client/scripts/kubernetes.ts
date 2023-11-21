@@ -1,15 +1,42 @@
-import { FilterOptions, K8SModel, KubernetesNodeModel, NetworkModel } from "../src";
+import { FilterOptions, K8SModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
+async function deploy(client, k8s) {
+  try {
+    const res = await client.k8s.deploy(k8s);
+    log("================= Deploying K8s =================");
+    log(res);
+    log("================= Deploying K8s =================");
+  } catch (error) {
+    log("Error while Deploying the cluster " + error);
+  }
+}
+
+async function getDeployment(client, k8s) {
+  try {
+    const res = await client.k8s.getObj(k8s);
+    log("================= Getting deployment information =================");
+    log(res);
+    log("================= Getting deployment information =================");
+  } catch (error) {
+    log("Error while getting the deployment " + error);
+  }
+}
+
+async function cancel(client, k8s) {
+  try {
+    const res = await client.k8s.delete(k8s);
+    log("================= Canceling the deployment =================");
+    log(res);
+    log("================= Canceling the deployment =================");
+  } catch (error) {
+    log("Error while canceling the deployment " + error);
+  }
+}
+
 async function main() {
   const grid3 = await getClient();
-
-  // create network Object
-  const n = new NetworkModel();
-  n.name = "monNetwork";
-  n.ip_range = "10.238.0.0/16";
-  n.addAccess = true;
 
   const masterQueryOptions: FilterOptions = {
     cru: 2,
@@ -27,50 +54,53 @@ async function main() {
     farmId: 1,
   };
 
-  // create k8s node Object
-  const master = new KubernetesNodeModel();
-  master.name = "master";
-  master.node_id = +(await grid3.capacity.filterNodes(masterQueryOptions))[0].nodeId;
-  master.cpu = 1;
-  master.memory = 1024;
-  master.rootfs_size = 0;
-  master.disk_size = 1;
-  master.public_ip = false;
-  master.planetary = true;
+  const k: K8SModel = {
+    name: "testk8s",
+    secret: "secret",
+    network: {
+      name: "monNetwork",
+      ip_range: "10.238.0.0/16",
+      addAccess: true,
+    },
+    masters: [
+      {
+        name: "master",
+        node_id: +(await grid3.capacity.filterNodes(masterQueryOptions))[0].nodeId,
+        cpu: 1,
+        memory: 1024,
+        rootfs_size: 0,
+        disk_size: 1,
+        public_ip: false,
+        public_ip6: false,
+        planetary: true,
+      },
+    ],
+    workers: [
+      {
+        name: "worker",
+        node_id: +(await grid3.capacity.filterNodes(workerQueryOptions))[0].nodeId,
+        cpu: 1,
+        memory: 1024,
+        rootfs_size: 0,
+        disk_size: 1,
+        public_ip: false,
+        public_ip6: false,
+        planetary: true,
+      },
+    ],
+    metadata: "",
+    description: "test deploying k8s via ts grid3 client",
+    ssh_key: config.ssh_key,
+  };
 
-  // create k8s node Object
-  const worker = new KubernetesNodeModel();
-  worker.name = "worker";
-  worker.node_id = +(await grid3.capacity.filterNodes(workerQueryOptions))[0].nodeId;
-  worker.cpu = 1;
-  worker.memory = 1024;
-  worker.rootfs_size = 0;
-  worker.disk_size = 1;
-  worker.public_ip = false;
-  worker.planetary = true;
+  //Deploy K8s
+  await deploy(grid3, k);
 
-  // create k8s Object
-  const k = new K8SModel();
-  k.name = "testk8s";
-  k.secret = "secret";
-  k.network = n;
-  k.masters = [master];
-  k.workers = [worker];
-  k.metadata = "";
-  k.description = "test deploying k8s via ts grid3 client";
-  k.ssh_key = config.ssh_key;
+  //Get the deployment
+  await getDeployment(grid3, k.name);
 
-  // deploy
-  const res = await grid3.k8s.deploy(k);
-  log(res);
-
-  // get the deployment
-  const l = await grid3.k8s.getObj(k.name);
-  log(l);
-
-  // // delete
-  // const d = await grid3.k8s.delete({ name: k.name });
-  // log(d);
+  //Uncomment the line below to cancel the deployment
+  // await cancel(grid3, { name: k.name });
 
   await grid3.disconnect();
 }

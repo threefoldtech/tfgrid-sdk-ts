@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/nextcloud.png"
   >
     <template #title>Deploy a Nextcloud All-in-One Instance </template>
@@ -62,6 +63,7 @@
             }"
             v-model="farm"
             v-model:loading="loadingFarm"
+            v-model:search="farmName"
           />
           <SelectNode
             v-model="selectedNode"
@@ -114,6 +116,7 @@ const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "nc" }));
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
+const farmName = ref();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/threefoldtech-nextcloudaio-latest.flist",
   entryPoint: "/sbin/zinit init",
