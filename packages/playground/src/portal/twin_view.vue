@@ -129,7 +129,7 @@ onMounted(validateEdit);
 async function validateEdit() {
   try {
     const pk = await generatePublicKey(profileManager.profile!.mnemonic);
-    if (profileManager.profile?.relay !== window.env.RELAY_DOMAIN) {
+    if (profileManager.profile?.relay !== window.env.RELAY_DOMAIN.replace("wss://", "")) {
       updateRelay.value = true;
     }
 
