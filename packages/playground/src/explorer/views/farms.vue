@@ -57,7 +57,8 @@ const selectedFarm = ref<Farm>();
 const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer);
 const size = ref(10);
 const page = ref(1);
-const sortBy = ref([]);
+
+const sortBy = ref([{ key: "", order: undefined }]);
 const filterOptions = ref<FarmFilterOptions>({
   size: size.value,
   page: page.value,
@@ -89,17 +90,27 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
       });
       if (mixedFarmFilters.value.options) {
         if (mixedFarmFilters.value.options.sortBy?.length) {
-          const sortKey = sortBy.value[0].key;
-          const sortOrder = sortBy.value[0].order;
+          if (sortBy.value[0] && sortBy.value[0]) {
+            const sortKey = sortBy.value[0].key;
+            const sortOrder = sortBy.value[0].order;
+            if (sortKey && sortOrder) {
+              farms.value = farms.value.sort((a, b) => {
+                let aValue: any, bValue: any;
+                if (sortKey == "farmId") {
+                  aValue = a.farmId;
+                  bValue = b.farmId;
+                } else {
+                  aValue = a.name;
+                  bValue = b.name;
+                }
 
-          farms.value = farms.value.sort((a, b) => {
-            const aValue = a[sortKey];
-            const bValue = b[sortKey];
-            if (isNaN(aValue)) {
-              return sortOrder === "desc" ? ("" + bValue).localeCompare(aValue) : ("" + aValue).localeCompare(bValue);
+                if (typeof aValue == "string" && typeof bValue == "string") {
+                  return sortOrder === "desc" ? bValue.localeCompare(aValue) : aValue.localeCompare(bValue);
+                }
+                return sortOrder === "desc" ? bValue - aValue : aValue - bValue;
+              });
             }
-            return sortOrder === "desc" ? bValue - aValue : aValue - bValue;
-          });
+          }
         }
       }
     }
@@ -193,6 +204,7 @@ import { update } from "lodash";
 
 import Filters from "../../components/filter.vue";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
+import { isString } from "../../utils/validators";
 import FarmDialog from "../components/farm_dialog.vue";
 
 export default {
