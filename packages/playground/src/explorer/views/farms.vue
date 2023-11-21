@@ -91,7 +91,7 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
         if (mixedFarmFilters.value.options.sortBy?.length) {
           const sortKey = sortBy.value[0].key;
           const sortOrder = sortBy.value[0].order;
-          console.log(sortKey, sortOrder);
+
           farms.value = farms.value.sort((a, b) => {
             const aValue = a[sortKey];
             const bValue = b[sortKey];
