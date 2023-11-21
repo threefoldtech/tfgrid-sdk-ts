@@ -2,10 +2,12 @@ import { BaseError } from "../base_error";
 import { ErrorModules } from "../modules";
 
 export enum Errors {
-  UnavailableForTwin,
+  UnavailableNodeError,
   InvalidResourcesError,
   DiskAllocationError,
   AccessNodeError,
+  GPUNotFoundError,
+  GPULockedError,
 }
 class TFGridNodesError extends BaseError {
   constructor(code: number, message: string) {
@@ -28,5 +30,23 @@ export class DiskAllocationError extends TFGridNodesError {
 export class AccessNodeError extends TFGridNodesError {
   constructor(message: string) {
     super(Errors.AccessNodeError, message);
+  }
+}
+
+export class UnavailableNodeError extends TFGridNodesError {
+  constructor(message: string) {
+    super(Errors.UnavailableNodeError, message);
+  }
+}
+
+export class GPUNotFoundError extends TFGridNodesError {
+  constructor(message: string) {
+    super(Errors.GPUNotFoundError, message);
+  }
+}
+
+export class GPULockedError extends TFGridNodesError {
+  constructor(message: string) {
+    super(Errors.GPULockedError, message);
   }
 }
