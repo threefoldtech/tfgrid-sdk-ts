@@ -75,8 +75,8 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
   try {
     const { count, data } = await getFarms(queries);
 
-    if (data && count) {
-      totalFarms.value = count;
+    if (data) {
+      totalFarms.value = count || 0;
       farms.value = data.map(farm => {
         const ips = farm.publicIps;
         const total = ips.length;
@@ -88,6 +88,7 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
           freePublicIp: total - used,
         };
       });
+
       if (mixedFarmFilters.value.options) {
         if (mixedFarmFilters.value.options.sortBy?.length) {
           if (sortBy.value[0] && sortBy.value[0]) {
@@ -123,8 +124,6 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
   }
 };
 onMounted(async () => {
-  await _getFarms({});
-
   await updateFarms();
 });
 
@@ -135,7 +134,7 @@ const updateFarms = async () => {
   await request(queries);
 };
 
-const updateQueries = () => {
+const updateQueries = async () => {
   const options = mixedFarmFilters.value.options;
   if (options) {
     options.page = page.value;
@@ -149,6 +148,7 @@ const inputFiltersReset = (nFltrNptsVal: FilterFarmInputs) => {
   mixedFarmFilters.value.inputs = nFltrNptsVal;
   nFltrNptsVal.farmId.value = undefined;
   nFltrNptsVal.name.value = undefined;
+  nFltrNptsVal.totalIps.value = undefined;
   nFltrNptsVal.pricingPolicyId.value = undefined;
 };
 const openSheet = (_e: any, { item }: any) => {
@@ -200,11 +200,9 @@ const headers: VDataTableHeader = [
 
 <script lang="ts">
 import type { FarmsQuery } from "@threefold/gridproxy_client";
-import { update } from "lodash";
 
 import Filters from "../../components/filter.vue";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
-import { isString } from "../../utils/validators";
 import FarmDialog from "../components/farm_dialog.vue";
 
 export default {

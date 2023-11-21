@@ -156,12 +156,12 @@ export const getFarmQueries = (mixedFilters: MixedFarmFilter): Partial<FarmsQuer
   }
   const options: Partial<FarmsQuery> = {
     retCount: true,
-    farmId: farmId || undefined,
-    name: name || undefined,
-    pricingPolicyId: pricingPolicy || undefined,
-    totalIps: totalIps || undefined,
-    page: page || undefined,
-    size: size || undefined,
+    farmId: farmId,
+    name: name,
+    pricingPolicyId: pricingPolicy,
+    totalIps: totalIps,
+    page: page,
+    size: size,
   };
 
   return options;
