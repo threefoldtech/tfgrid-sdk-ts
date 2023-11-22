@@ -5,7 +5,6 @@ import {
   GetDedicatedNodePriceOptions,
   SetDedicatedNodeExtraFeesOptions,
 } from "@threefold/tfchain_client";
-import { GraphQLError } from "@threefold/types";
 import { Decimal } from "decimal.js";
 
 import { formatErrorMessage } from "../../helpers";
