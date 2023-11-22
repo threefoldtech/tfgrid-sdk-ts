@@ -1,11 +1,5 @@
 <template>
-  <card-details
-    :loading="loading"
-    title="Node Twin Details"
-    :items="twinFields"
-    icon="mdi-account"
-    @vnode-updated="updateCard"
-  />
+  <card-details :loading="loading" title="Node Twin Details" :items="twinFields" icon="mdi-account" />
 </template>
 
 <script lang="ts">
@@ -36,23 +30,25 @@ export default {
     const loading = ref<boolean>(false);
     const twinFields = ref<NodeDetailsCard[]>();
     const twin = ref<Twin>();
-    const updateCard = async () => {
-      await new Promise(resolve => {
-        setTimeout(resolve, 20000);
-        loading.value = false;
-        return;
-      });
-    };
+
     onMounted(async () => {
       loading.value = true;
 
       if (props.farm) {
-        twin.value = await getFarmTwinByTwinId({ twinId: props.farm.twinId });
+        try {
+          twin.value = await getFarmTwinByTwinId({ twinId: props.farm.twinId });
+        } catch (err) {
+          createCustomToast(
+            "Failed to load Twin details due to Slow Network. Please try again later.",
+            ToastType.danger,
+          );
+          loading.value = false;
+          return;
+        }
       } else if (props.node) {
         twin.value = props.node.twin;
       }
       twinFields.value = getNodeTwinDetailsCard();
-      loading.value = false;
     });
 
     const copy = (address: string) => {
@@ -85,7 +81,6 @@ export default {
     return {
       twinFields,
       loading,
-      updateCard,
     };
   },
 };
