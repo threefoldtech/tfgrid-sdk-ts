@@ -4,17 +4,20 @@
 <script lang="ts" setup>
 import { provide, type Ref, ref, watch } from "vue";
 
-const subscribtion: any[] = [];
-const farm = ref() as Ref<number | undefined>;
+import type { Farm } from "../types";
+
+const subscribtion = new Set<(f?: Farm) => void>();
+const farm = ref<Farm>();
 const LoadingNodes = ref(false);
+
 provide("farm:manager", {
   setFarmId(_farm) {
     farm.value = _farm;
   },
   subscribe(fn) {
-    subscribtion.push(fn);
+    subscribtion.add(fn);
     return () => {
-      subscribtion.splice(subscribtion.indexOf(fn), 1);
+      subscribtion.delete(fn);
     };
   },
   setLoading(loading: boolean) {
@@ -32,14 +35,14 @@ watch(farm, farm => {
 <script lang="ts">
 import { inject } from "vue";
 export interface IFarm {
-  setFarmId(farmId?: number): void;
-  subscribe(fn: (farm?: number) => void): () => void;
+  setFarmId(farmId?: Farm): void;
+  subscribe(fn: (farm?: Farm) => void): () => void;
   setLoading(loading: boolean): void;
   getLoading(): Ref<boolean>;
 }
 
-export function useFarm(): IFarm | null {
-  return inject("farm:manager", null);
+export function useFarm() {
+  return inject("farm:manager") as IFarm;
 }
 
 export default {

@@ -1,7 +1,7 @@
 <template>
   <section>
     <h6 class="text-h5 mb-4 mt-2">Choose a Location</h6>
-    <SelectCountry v-model="country" />
+    <select-location v-model="location" />
     <input-validator :rules="[validators.required('Farm is required.')]" :value="farm?.farmID" ref="farmInput">
       <input-tooltip tooltip="The name of the farm that you want to deploy inside it.">
         <v-autocomplete
@@ -51,6 +51,7 @@ import { getFarms, getFarmsPages } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
 import { useFarmGatewayManager } from "./farm_gateway_manager.vue";
 import { useFarm } from "./select_farm_manager.vue";
+import { createLocation, defaultCountry } from "./select_location.vue";
 
 export interface Filters {
   publicIp?: boolean;
@@ -80,15 +81,20 @@ const SIZE = 20;
 const page = ref();
 const farmInput = useInputRef();
 const profileManager = useProfileManager();
-const country = ref<string>();
+const location = ref(createLocation());
 const search = ref<string>();
 const searchInput = ref<string>();
 const farm = ref<Farm>();
 const farmManager = useFarm();
-watch([farm, country], ([f, c]) => {
-  farmManager?.setFarmId(f?.farmID);
-  emits("update:modelValue", f ? { farmID: f.farmID, name: f.name, country: c ?? undefined } : undefined);
-});
+watch(
+  [farm, location],
+  ([f, c]) => {
+    const farm = { farmID: f?.farmID || -1, name: f?.name || defaultFarm, country: c.country, region: c.region };
+    farmManager.setFarmId(farm);
+    emits("update:modelValue", farm);
+  },
+  { immediate: true },
+);
 
 watch(
   search,
@@ -111,7 +117,7 @@ watch(
     }
 
     if (farm && !loading) {
-      farm.country = country.value;
+      farm.country = location.value.country;
       FarmGatewayManager?.register(farm);
       FarmGatewayManager?.setLoading(false);
     }
@@ -129,7 +135,7 @@ function prepareFilters(filters: Filters, twinId: number): FarmFilterOptions {
   return {
     size: SIZE,
     page: page.value,
-    country: country.value,
+    country: location.value.country === defaultCountry ? undefined : location.value.country,
     nodeMRU: filters.memory ? Math.round(filters.memory / 1024) : undefined,
     nodeHRU: filters.disk,
     nodeSRU: filters.ssd,
@@ -167,7 +173,10 @@ async function loadFarms() {
     await loadFarms();
     return;
   }
-  farms.value = farms.value.concat(_farms);
+  farms.value = [
+    { name: defaultFarm, farmID: -1, country: location.value.country, region: location.value.region },
+    ...farms.value.concat(_farms),
+  ];
 
   if (oldFarm) {
     farm.value = undefined;
@@ -213,7 +222,7 @@ onMounted(resetPages);
 onUnmounted(() => FarmGatewayManager?.unregister());
 
 watch(
-  () => ({ ...props.filters, country: country.value }),
+  () => ({ ...props.filters, country: location.value.country }),
   async (value, oldValue) => {
     if (
       value.cpu === oldValue.cpu &&
@@ -255,12 +264,14 @@ import { debounce } from "lodash";
 import { gridProxyClient } from "@/clients";
 import { ValidatorStatus } from "@/hooks/form_validator";
 
-import SelectCountry from "./select_country.vue";
+import SelectLocation from "./select_location.vue";
+
+export const defaultFarm = "All Farms";
 
 export default {
   name: "SelectFarm",
   components: {
-    SelectCountry,
+    SelectLocation,
   },
 };
 </script>

@@ -60,7 +60,8 @@ export interface CaproverWorker {
 export interface Farm {
   name: string;
   farmID: number;
-  country?: string;
+  country: string;
+  region: string;
 }
 
 export interface Flist {

@@ -33,6 +33,7 @@ export async function getFilteredNodes(grid: GridClient, options: NodeFilters): 
     rentedBy: options.rentedBy ? grid.twinId : undefined,
     certified: options.certified,
     availableFor: grid.twinId,
+    country: options.country,
   };
   const nodes = await grid.capacity.filterNodes(filters);
   return nodes;

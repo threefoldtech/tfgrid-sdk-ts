@@ -20,45 +20,51 @@
       #="{ props }"
     >
       <input-tooltip tooltip="Select a node ID to deploy on.">
-        <v-autocomplete
-          select
-          label="Node"
-          :items="availableNodes"
-          item-title="nodeId"
-          return-object
-          v-model="selectedNode"
-          :disabled="loadingNodes || pingingNode"
-          v-bind="{
-            ...props,
-            loading: props.loading || loadingNodes || pingingNode,
-            hint: pingingNode ? `Checking if the disks will fit in the node's storage pools... ` : props.hint,
-            error: !!errorMessage || props.error,
-            errorMessages: errorMessage || props.errorMessages,
-          }"
-        >
-          <template v-slot:item="{ item, props }">
-            <v-list-item @click="props.onClick" :class="{ 'v-list-item--active': props.isActive }">
-              <v-list-item-content class="d-flex justify-space-between">
-                <v-list-item-title>
-                  {{ item.raw.nodeId }}
-                </v-list-item-title>
-                <div>
-                  <v-chip
-                    v-if="item.raw.certified === 'Certified'"
-                    v-bind="props"
-                    :color="getChipColor(item.raw.certified)"
-                    class="ml-3"
-                  >
-                    {{ item.raw.certified }}
-                  </v-chip>
-                  <v-chip v-bind="props" :color="getChipColor(item.raw.state)" class="ml-3">
-                    {{ item.raw.state }}
-                  </v-chip>
-                </div>
-              </v-list-item-content>
-            </v-list-item>
-          </template>
-        </v-autocomplete>
+        <div class="w-100 d-flex">
+          <v-autocomplete
+            select
+            label="Node"
+            :items="availableNodes"
+            item-title="nodeId"
+            return-object
+            v-model="selectedNode"
+            :disabled="loadingNodes || pingingNode"
+            v-bind="{
+              ...props,
+              loading: props.loading || loadingNodes || pingingNode,
+              hint: pingingNode ? `Checking if the disks will fit in the node's storage pools... ` : props.hint,
+              error: !!errorMessage || props.error,
+              errorMessages: errorMessage || props.errorMessages,
+            }"
+          >
+            <template v-slot:item="{ item, props }">
+              <v-list-item @click="props.onClick" :class="{ 'v-list-item--active': props.isActive }">
+                <v-list-item-content class="d-flex justify-space-between">
+                  <v-list-item-title>
+                    {{ item.raw.nodeId }}
+                  </v-list-item-title>
+                  <div>
+                    <v-chip
+                      v-if="item.raw.certified === 'Certified'"
+                      v-bind="props"
+                      :color="getChipColor(item.raw.certified)"
+                      class="ml-3"
+                    >
+                      {{ item.raw.certified }}
+                    </v-chip>
+                    <v-chip v-bind="props" :color="getChipColor(item.raw.state)" class="ml-3">
+                      {{ item.raw.state }}
+                    </v-chip>
+                  </div>
+                </v-list-item-content>
+              </v-list-item>
+            </template>
+          </v-autocomplete>
+
+          <v-btn class="ml-2 mt-2" variant="tonal" color="info" :loading="loadingNodes" @click="loadNodes">
+            Load Nodes
+          </v-btn>
+        </div>
       </input-tooltip>
       <input-validator
         v-if="selectedNode && filters.hasGPU"
@@ -89,15 +95,17 @@
 </template>
 
 <script lang="ts" setup>
-import { type PropType, type Ref, ref, watch } from "vue";
+import { onBeforeUnmount, type PropType, type Ref, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
 
 import { useProfileManager } from "../stores/profile_manager";
+import type { Farm } from "../types";
 import { getFilteredNodes, getNodeCards, type INode, type NodeGPUCardType } from "../utils/filter_nodes";
 import { getGrid } from "../utils/grid";
 import { getCardName, normalizeError } from "../utils/helpers";
 import { useFarm } from "./select_farm_manager.vue";
+import { defaultCountry } from "./select_location.vue";
 
 export interface NodeFilters {
   farmId?: number;
@@ -111,6 +119,7 @@ export interface NodeFilters {
   rentedBy?: number;
   type?: string;
   availableFor?: number;
+  country?: string;
 }
 
 const emits = defineEmits<{ (event: "update:modelValue", value?: INode): void }>();
@@ -126,7 +135,6 @@ const availableNodes = ref<Array<INode>>([]);
 const nodesArr = ref<Array<INode>>([]);
 const loadingNodes = ref(false);
 const loadingCards = ref(false);
-const shouldBeUpdated = ref(false);
 const errorMessage = ref<string>();
 const selectedNode = ref() as Ref<INode | undefined>;
 const selectedCards = ref<Array<string>>([]);
@@ -135,7 +143,10 @@ const cards: NodeGPUCardType[] = [];
 const emptyResult = ref(false);
 const validator = ref();
 const pingingNode = ref(false);
-const delay = ref();
+
+const farm = ref<Farm>();
+const unsubscribe = farmManager.subscribe(f => (farm.value = f));
+onBeforeUnmount(unsubscribe);
 
 function isSelectionEmpty(node: INode | undefined, selectedCards: string[]): boolean {
   if (!node || availableNodes.value.length === 0) {
@@ -187,44 +198,12 @@ watch(
   { immediate: true },
 );
 
-watch(
-  () => ({ ...props.filters }),
-  (value, oldValue) => {
-    if (
-      value.farmId === oldValue.farmId &&
-      value.diskSizes === oldValue.diskSizes &&
-      value.cpu === oldValue.cpu &&
-      value.memory === oldValue.memory &&
-      value.certified === oldValue.certified &&
-      value.rentedBy === oldValue.rentedBy &&
-      value.hasGPU === oldValue.hasGPU
-    )
-      return;
-    shouldBeUpdated.value = true;
-  },
-  { deep: false },
-);
-
-watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
-  if (l || !s) return;
-  shouldBeUpdated.value = false;
-  farmManager?.subscribe(farmId => {
-    if (!farmId) {
-      selectedNode.value = undefined;
-      availableNodes.value = [];
-      return;
-    }
-    clearTimeout(delay.value);
-    delay.value = setTimeout(() => {
-      loadNodes(farmId);
-    }, 1000);
-  });
-});
-
 function getChipColor(item: any) {
   return item === "Dedicated" ? "success" : item === "Certified" ? "primary" : "secondary";
 }
-async function loadNodes(farmId: number) {
+async function loadNodes() {
+  const { farmID = -1, country, region } = farm.value || {};
+  const farmId = farmID > 0 ? farmID : undefined;
   availableNodes.value = [];
   selectedNode.value = undefined;
   loadingNodes.value = true;
@@ -235,7 +214,7 @@ async function loadNodes(farmId: number) {
     const grid = await getGrid(profileManager.profile!);
     if (grid) {
       const res = await getFilteredNodes(grid, {
-        farmId: farmId,
+        farmId,
         cpu: filters.cpu,
         memory: filters.memory,
         diskSizes: [...filters.diskSizes, props.rootFileSystemSize],
@@ -244,6 +223,7 @@ async function loadNodes(farmId: number) {
         certified: filters.certified,
         rentedBy: filters.rentedBy,
         availableFor: grid.twinId,
+        country: country === defaultCountry ? undefined : country,
       });
 
       if (res?.length === 0 || farmId === undefined) {
