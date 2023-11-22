@@ -202,8 +202,13 @@ export async function getFarms(queries: Partial<FarmsQuery>): Promise<Pagination
 
 export async function getFarmTwinByTwinId(queries: Partial<TwinsQuery> = {}): Promise<Twin> {
   try {
-    const twins = await gridProxyClient.twins.list(queries);
-    return twins.data[0] as Twin;
+    return await new Promise(resolve => {
+      setTimeout(async () => {
+        const twins = await gridProxyClient.twins.list(queries);
+        return twins.data[0] as Twin;
+      }, 1000);
+      setTimeout(resolve, 1000);
+    });
   } catch (error) {
     console.error("An error occurred while requesting twins:", error);
     throw error;

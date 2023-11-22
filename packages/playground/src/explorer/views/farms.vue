@@ -169,6 +169,12 @@ const openDialog = (item: Farm) => {
 const closeDialog = () => {
   isDialogOpened.value = false;
 };
+async function reloadTable() {
+  await new Promise(resolve => {
+    setTimeout(resolve, 20000);
+  });
+  await updateFarms();
+}
 const headers: VDataTableHeader = [
   { title: "ID", key: "farmId" },
   { title: "Name", key: "name" },
@@ -211,7 +217,6 @@ import type { FarmsQuery } from "@threefold/gridproxy_client";
 import Filters from "../../components/filter.vue";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
 import FarmDialog from "../components/farm_dialog.vue";
-
 export default {
   name: "Farms",
   components: {
