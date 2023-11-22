@@ -88,31 +88,9 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
           freePublicIp: total - used,
         };
       });
-
-      if (mixedFarmFilters.value.options) {
-        if (mixedFarmFilters.value.options.sortBy?.length) {
-          if (sortBy.value[0] && sortBy.value[0]) {
-            const sortKey = sortBy.value[0].key;
-            const sortOrder = sortBy.value[0].order;
-            if (sortKey && sortOrder) {
-              farms.value = farms.value.sort((a, b) => {
-                let aValue: any, bValue: any;
-                if (sortKey == "farmId") {
-                  aValue = a.farmId;
-                  bValue = b.farmId;
-                } else {
-                  aValue = a.name;
-                  bValue = b.name;
-                }
-
-                if (typeof aValue == "string" && typeof bValue == "string") {
-                  return sortOrder === "desc" ? bValue.localeCompare(aValue) : aValue.localeCompare(bValue);
-                }
-                return sortOrder === "desc" ? bValue - aValue : aValue - bValue;
-              });
-            }
-          }
-        }
+      if (sortBy.value[0]) {
+        await updateQueries();
+        updateSorting();
       }
     }
   } catch (err) {
@@ -129,11 +107,38 @@ onMounted(async () => {
 
 const request = debounce(_getFarms, 1000);
 const updateFarms = async () => {
+  await updateQueries();
   const queries = getFarmQueries(mixedFarmFilters.value);
 
   await request(queries);
 };
+const updateSorting = () => {
+  if (mixedFarmFilters.value.options) {
+    if (mixedFarmFilters.value.options.sortBy?.length) {
+      if (sortBy.value[0] && sortBy.value[0]) {
+        const sortKey = sortBy.value[0].key;
+        const sortOrder = sortBy.value[0].order;
+        if (sortKey && sortOrder && farms.value) {
+          farms.value.sort((a, b) => {
+            let aValue: any, bValue: any;
+            if (sortKey == "farmId") {
+              aValue = a.farmId;
+              bValue = b.farmId;
+            } else {
+              aValue = a.name;
+              bValue = b.name;
+            }
 
+            if (typeof aValue == "string" && typeof bValue == "string") {
+              return sortOrder === "desc" ? bValue.localeCompare(aValue) : aValue.localeCompare(bValue);
+            }
+            return sortOrder === "desc" ? bValue - aValue : aValue - bValue;
+          });
+        }
+      }
+    }
+  }
+};
 const updateQueries = async () => {
   const options = mixedFarmFilters.value.options;
   if (options) {
