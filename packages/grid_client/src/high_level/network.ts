@@ -1,3 +1,4 @@
+import { ValidationError } from "@threefold/types";
 import { Addr } from "netaddr";
 
 import { DeploymentFactory, Network } from "../primitives";
@@ -17,7 +18,7 @@ class NetworkHL extends HighLevelBase {
 
     const workload = await network.addNode(nodeId, networkMetadata, description);
     if (!workload) {
-      throw Error(`Node ${nodeId} is already exist on network ${networkName}`);
+      throw new ValidationError(`Node ${nodeId} is already exist on network ${networkName}`);
     }
 
     const twinDeployments: TwinDeployment[] = [];
