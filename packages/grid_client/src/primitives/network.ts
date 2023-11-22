@@ -1,4 +1,4 @@
-import { GridClientErrors, ValidationError, WrappedError } from "@threefold/types";
+import { GridClientErrors, ValidationError } from "@threefold/types";
 import { Buffer } from "buffer";
 import { plainToInstance } from "class-transformer";
 import { Addr } from "netaddr";
@@ -10,7 +10,7 @@ import { RMB } from "../clients/rmb/client";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
-import { getRandomNumber, randomChoice } from "../helpers/utils";
+import { formatErrorMessage, getRandomNumber, randomChoice } from "../helpers/utils";
 import { BackendStorage, BackendStorageType } from "../storage/backend";
 import { Deployment } from "../zos/deployment";
 import { Workload, WorkloadTypes } from "../zos/workload";
@@ -225,7 +225,8 @@ class Network {
       try {
         res = await this.rmb.request([node_twin_id], "zos.deployment.get", payload);
       } catch (e) {
-        throw new WrappedError(`Failed to load network deployment ${node.contract_id}`, e);
+        (e as Error).message = formatErrorMessage(`Failed to load network deployment ${node.contract_id}`, e);
+        throw e;
       }
       res["node_id"] = node.node_id;
       for (const workload of res["workloads"]) {
@@ -476,7 +477,8 @@ class Network {
     try {
       result = await this.rmb.request([node_twin_id], "zos.network.list_wg_ports", "");
     } catch (e) {
-      throw new WrappedError(`Couldn't get free Wireguard ports for node ${node_id}`, e);
+      (e as Error).message = formatErrorMessage(`Couldn't get free Wireguard ports for node ${node_id}`, e);
+      throw e;
     }
     events.emit("logs", `Node ${node_id} reserved ports: ${JSON.stringify(result)}`);
 
@@ -518,7 +520,8 @@ class Network {
       try {
         result = await this.rmb.request([node_twin_id], "zos.network.interfaces", "");
       } catch (e) {
-        throw new WrappedError(`Couldn't get the network interfaces for node ${node_id}`, e);
+        (e as Error).message = formatErrorMessage(`Couldn't get the network interfaces for node ${node_id}`, e);
+        throw e;
       }
       events.emit("logs", `Node ${node_id} network interfaces: ${JSON.stringify(result)}`);
 

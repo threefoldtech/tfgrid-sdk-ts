@@ -1,16 +1,10 @@
 import { Contract, ExtrinsicResult } from "@threefold/tfchain_client";
-import {
-  BaseError,
-  GridClientErrors,
-  TFChainError,
-  TimeoutError,
-  ValidationError,
-  WrappedError,
-} from "@threefold/types";
+import { BaseError, GridClientErrors, TFChainError, TimeoutError, ValidationError } from "@threefold/types";
 
 import { RMB } from "../clients";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
+import { formatErrorMessage } from "../helpers";
 import { events } from "../helpers/events";
 import { validateObject } from "../helpers/validator";
 import { DeploymentFactory, Nodes } from "../primitives/index";
@@ -63,10 +57,11 @@ class TwinDeploymentHandler {
       const node_twin_id = await this.nodes.getNodeTwinId(twinDeployment.nodeId);
       await this.rmb.request([node_twin_id], `zos.deployment.${twinDeployment.operation}`, payload);
     } catch (e) {
-      throw new WrappedError(
+      (e as Error).message = formatErrorMessage(
         `Failed to ${twinDeployment.operation} the deployment on node ${twinDeployment.nodeId}`,
         e,
       );
+      throw e;
     }
   }
 

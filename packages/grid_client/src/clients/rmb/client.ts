@@ -1,5 +1,7 @@
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
-import { BaseError, GridClientErrors, RMBError, WrappedError } from "@threefold/types";
+import { BaseError, RMBError } from "@threefold/types";
+
+import { formatErrorMessage } from "../../helpers";
 class RMB {
   client: RMBClient;
   constructor(rmbClient: RMBClient) {
@@ -13,10 +15,11 @@ class RMB {
       result = await this.client.read(requestId);
     } catch (e) {
       if (e instanceof BaseError) {
-        throw new WrappedError(
+        e.message = formatErrorMessage(
           `Failed to send request to twinId ${destTwinIds} with command: ${cmd}, payload: ${payload}`,
           e,
         );
+        throw e;
       }
       throw new RMBError(
         `Failed to send request to twinId ${destTwinIds} with command: ${cmd}, payload: ${payload} due to ${e}`,

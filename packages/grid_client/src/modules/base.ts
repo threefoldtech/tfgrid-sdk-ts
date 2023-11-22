@@ -1,8 +1,10 @@
+import { ValidationError } from "@threefold/types";
 import * as PATH from "path";
 
 import { RMB } from "../clients";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
+import { formatErrorMessage } from "../helpers";
 import { HighLevelBase } from "../high_level/base";
 import { KubernetesHL } from "../high_level/kubernetes";
 import { VMHL } from "../high_level/machine";
@@ -304,7 +306,7 @@ class BaseModule {
       try {
         deployment = await this.rmb.request([node_twin_id], "zos.deployment.get", payload);
       } catch (e) {
-        throw Error(`Failed to get deployment due to ${e}`);
+        (e as Error).message = formatErrorMessage(`Failed to get deployment`, e);
       }
       let found = false;
       for (const workload of deployment.workloads) {
