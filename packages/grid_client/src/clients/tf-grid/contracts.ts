@@ -8,6 +8,7 @@ import {
 import { GraphQLError } from "@threefold/types";
 import { Decimal } from "decimal.js";
 
+import { formatErrorMessage } from "../../helpers";
 import { ContractStates } from "../../modules";
 import { Graphql } from "../graphql/client";
 
@@ -136,7 +137,8 @@ class TFContracts extends Contracts {
 
       return response["data"] as GqlContracts;
     } catch (err) {
-      throw new GraphQLError(`Error listing contracts by twin id ${options.twinId}: ${err}`);
+      (err as Error).message = formatErrorMessage(`Error listing contracts by twin id ${options.twinId}`, err);
+      throw err;
     }
   }
 
@@ -197,7 +199,8 @@ class TFContracts extends Contracts {
           .toNumber();
       }
     } catch (err) {
-      throw new GraphQLError(`Error getting consumption for contract ${options.id}: ${err}`);
+      (err as Error).message = formatErrorMessage(`Error getting consumption for contract ${options.id}`, err);
+      throw err;
     }
   }
 
