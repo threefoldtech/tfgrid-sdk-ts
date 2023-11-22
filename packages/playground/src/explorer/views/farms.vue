@@ -7,6 +7,7 @@
           @update:model-value="inputFiltersReset"
           :form-disabled="isFormLoading"
           v-model:valid="isValidForm"
+          @update:valid="updateFarms"
         />
 
         <v-data-table-server
@@ -89,7 +90,6 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
         };
       });
       if (sortBy.value[0]) {
-        await updateQueries();
         updateSorting();
       }
     }
@@ -102,13 +102,15 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
   }
 };
 onMounted(async () => {
-  await updateFarms();
+  await updateFarms(isValidForm.value);
 });
 
 const request = debounce(_getFarms, 1000);
-const updateFarms = async () => {
-  await updateQueries();
+const updateFarms = async (e: boolean) => {
+  isValidForm.value = e;
+
   if (isValidForm.value) {
+    await updateQueries();
     const queries = getFarmQueries(mixedFarmFilters.value);
     await request(queries);
   }
