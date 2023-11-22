@@ -13,8 +13,8 @@ export const inputsInitializer: FilterFarmInputs = {
     placeholder: "e.g. 1,2,3.",
     rules: [
       [
-        isNumeric("Should be a number", { no_symbols: true }),
-        min("The ID should be larger then zero.", 1),
+        isNumeric("This field accepts numbers only.", { no_symbols: true }),
+        min("The ID should be larger than zero.", 1),
         isInt("should be an integer"),
       ],
     ],
@@ -32,7 +32,7 @@ export const inputsInitializer: FilterFarmInputs = {
     rules: [
       [
         isNumeric("This field accepts numbers only.", { no_symbols: true }),
-        min("The pricing policy should be larger then zero.", 1),
+        min("The pricing policy should be larger than zero.", 1),
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
@@ -43,8 +43,8 @@ export const inputsInitializer: FilterFarmInputs = {
     placeholder: "e.g. 1,2,3.",
     rules: [
       [
-        isNumeric("Should be a number"),
-        min("Total Public IP should be larger then zero.", 1),
+        isNumeric("This field accepts numbers only.", { no_symbols: true }),
+        min("Total Public IP should be larger than zero.", 1),
         isInt("should be an integer"),
       ],
     ],
