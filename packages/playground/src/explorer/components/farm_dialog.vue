@@ -18,14 +18,12 @@
 
       <template v-else>
         <v-card>
-          <v-row class="pa-5">
-            <v-col>
-              <farm-details-card :farm="farm" />
-            </v-col>
-            <v-col>
-              <twin-details-card :farm="farm" />
-            </v-col>
-          </v-row>
+          <v-col>
+            <farm-details-card :farm="farm" />
+          </v-col>
+          <v-col>
+            <twin-details-card :farm="farm" />
+          </v-col>
         </v-card>
       </template>
     </v-container>
