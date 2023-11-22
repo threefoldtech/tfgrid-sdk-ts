@@ -161,7 +161,7 @@ class Nodes {
     if (url) r = url;
     else r = this.proxyURL;
 
-    return send("get", urlJoin(r, `/farmssss?page=${page}&size=${pageSize}`), "", {})
+    return send("get", urlJoin(r, `/farms?page=${page}&size=${pageSize}`), "", {})
       .then(res => {
         return res;
       })
