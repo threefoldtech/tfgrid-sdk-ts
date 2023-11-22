@@ -108,9 +108,10 @@ onMounted(async () => {
 const request = debounce(_getFarms, 1000);
 const updateFarms = async () => {
   await updateQueries();
-  const queries = getFarmQueries(mixedFarmFilters.value);
-
-  await request(queries);
+  if (isValidForm.value) {
+    const queries = getFarmQueries(mixedFarmFilters.value);
+    await request(queries);
+  }
 };
 const updateSorting = () => {
   if (mixedFarmFilters.value.options) {
