@@ -76,7 +76,7 @@ class TwinDeploymentHandler {
   checkWorkload(workload: Workload, targetWorkload: Workload, nodeId: number): boolean {
     let state = false;
     if (workload.result.state === "error") {
-      throw new GridClientErrors.Workloads.WorkloadDeploymentError(
+      throw new GridClientErrors.Workloads.WorkloadDeployError(
         `Failed to deploy ${workload.type} with name ${workload.name} on node ${nodeId} due to: ${workload.result.message}`,
       );
     } else if (workload.result.state === "ok") {

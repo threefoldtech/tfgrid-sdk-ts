@@ -1,4 +1,4 @@
-import { ValidationError } from "@threefold/types";
+import { GridClientErrors, ValidationError } from "@threefold/types";
 import * as PATH from "path";
 
 import { RMB } from "../clients";
@@ -432,7 +432,7 @@ class BaseModule {
       });
 
       if (pubIPOldWorkload != "" && twinDeployments.length == 0)
-        throw Error(`Cannot remove a public IP of an existent deployment`);
+        throw new GridClientErrors.Workloads.WorkloadUpdateError(`Cannot remove a public IP of an existent deployment`);
 
       oldDeployment = await this.deploymentFactory.fromObj(oldDeployment);
       const node_id = await this._getNodeIdFromContractId(name, oldDeployment.contract_id);
@@ -452,8 +452,14 @@ class BaseModule {
         if (zmachineOldWorkloads.filter(value => zmachineTwinWorkloads.includes(value)).length == 0) continue;
 
         if (pubIPTwinWorkload != pubIPOldWorkload) {
-          if (pubIPTwinWorkload == "") throw Error(`Cannot remove a public IP of an existent deployment`);
-          if (pubIPOldWorkload == "") throw Error(`Cannot add a public IP to an existent deployment`);
+          if (pubIPTwinWorkload == "")
+            throw new GridClientErrors.Workloads.WorkloadUpdateError(
+              `Cannot remove a public IP of an existent deployment`,
+            );
+          if (pubIPOldWorkload == "")
+            throw new GridClientErrors.Workloads.WorkloadUpdateError(
+              `Cannot add a public IP to an existent deployment`,
+            );
         }
       }
     }
@@ -576,7 +582,7 @@ class BaseModule {
         return contracts;
       }
     }
-    throw Error(`Instance with name ${name} is not found`);
+    throw new ValidationError(`Instance with name ${name} is not found`);
   }
 
   async _delete(name: string) {

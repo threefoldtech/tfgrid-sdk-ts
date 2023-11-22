@@ -50,7 +50,7 @@ function toHexSeed(mnemonicOrHexSeed: string): string {
 }
 
 function formatErrorMessage(prefix: string, error: Error) {
-  return `${prefix}\n\tDue to:${error.message}`;
+  return `${prefix}\n\tDue to: ${error.message}`;
 }
 
 export {
