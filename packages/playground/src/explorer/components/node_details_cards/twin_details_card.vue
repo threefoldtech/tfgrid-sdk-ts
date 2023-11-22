@@ -1,5 +1,11 @@
 <template>
-  <card-details :loading="loading" title="Node Twin Details" :items="twinFields" icon="mdi-account" />
+  <card-details
+    :loading="loading"
+    title="Node Twin Details"
+    :items="twinFields"
+    icon="mdi-account"
+    @vnode-updated="updateCard"
+  />
 </template>
 
 <script lang="ts">
@@ -30,7 +36,13 @@ export default {
     const loading = ref<boolean>(false);
     const twinFields = ref<NodeDetailsCard[]>();
     const twin = ref<Twin>();
-
+    const updateCard = async () => {
+      await new Promise(resolve => {
+        setTimeout(resolve, 20000);
+        loading.value = false;
+        return;
+      });
+    };
     onMounted(async () => {
       loading.value = true;
 
@@ -73,6 +85,7 @@ export default {
     return {
       twinFields,
       loading,
+      updateCard,
     };
   },
 };
