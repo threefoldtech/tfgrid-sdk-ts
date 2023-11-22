@@ -16,8 +16,6 @@
           @update:model-value="farm = $event"
           :error-messages="!loading && !farms.length ? 'No farms where found with the specified resources.' : undefined"
           v-model:search="search"
-          append-inner-icon="mdi-refresh"
-          @click:append-inner="resetSearch"
         >
           <template v-slot:append-item v-if="page !== -1">
             <div class="px-4 mt-4">
@@ -41,7 +39,7 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onMounted, onUnmounted, type PropType, type Ref, ref, watch } from "vue";
+import { onMounted, onUnmounted, type PropType, type Ref, ref, watch } from "vue";
 
 import { useInputRef } from "@/hooks/input_validator";
 
@@ -90,14 +88,15 @@ watch([farm, country], ([f, c]) => {
   emits("update:modelValue", f ? { farmID: f.farmID, name: f.name, country: c ?? undefined } : undefined);
 });
 
-watch(
-  search,
-  debounce(async (value, oldValue) => {
-    if (value !== oldValue && value && value?.length > 2 && oldValue != undefined && oldValue !== "") {
-      await resetPages();
-    }
-  }, 2000),
-);
+watch(search, (value, oldValue) => {
+  if (value !== oldValue && value && value?.length > 2 && oldValue != undefined && oldValue !== "") {
+    emits("update:search", searchInput.value ?? undefined);
+    clearTimeout(delay.value);
+    delay.value = setTimeout(() => {
+      shouldBeUpdated.value = true;
+    }, 2000);
+  }
+});
 
 const loading = ref(false);
 const loadingNodes = ref(farmManager?.getLoading());
@@ -144,7 +143,6 @@ function prepareFilters(filters: Filters, twinId: number): FarmFilterOptions {
 async function loadFarms() {
   farmInput.value?.setStatus(ValidatorStatus.Pending);
   loading.value = true;
-  const oldFarm = farm.value;
   const grid = await getGrid(profileManager.profile!);
   let _farms: Farm[] = [];
   if (searchInput.value && searchInput.value?.length > 0) {
@@ -169,20 +167,11 @@ async function loadFarms() {
   }
   farms.value = farms.value.concat(_farms);
 
-  if (oldFarm) {
-    farm.value = undefined;
-    await nextTick();
-    farm.value = farms.value.find(f => f.name === oldFarm.name);
+  farm.value = farms.value[0];
+  farmInput.value.setStatus(initialized ? ValidatorStatus.Invalid : ValidatorStatus.Init);
+  if (!initialized) {
+    initialized = true;
   }
-
-  if (!farm.value) {
-    farm.value = farms.value[0];
-    farmInput.value.setStatus(initialized ? ValidatorStatus.Invalid : ValidatorStatus.Init);
-    if (!initialized) {
-      initialized = true;
-    }
-  }
-
   page.value = selectedPages.value.length === pagesCount.value ? -1 : setRandomPage();
   loading.value = false;
 }
@@ -215,18 +204,7 @@ onUnmounted(() => FarmGatewayManager?.unregister());
 watch(
   () => ({ ...props.filters, country: country.value }),
   async (value, oldValue) => {
-    if (
-      value.cpu === oldValue.cpu &&
-      value.memory === oldValue.memory &&
-      value.ssd === oldValue.ssd &&
-      value.disk === oldValue.disk &&
-      value.publicIp === oldValue.publicIp &&
-      value.country === oldValue.country &&
-      value.certified === oldValue.certified &&
-      value.rentedBy === oldValue.rentedBy &&
-      value.hasGPU === oldValue.hasGPU
-    )
-      return;
+    if (_.isEqual(value, oldValue)) return;
     shouldBeUpdated.value = true;
   },
 );
@@ -239,18 +217,11 @@ watch([loading, shouldBeUpdated], async ([l, s]) => {
     await resetPages();
   }, 2000);
 });
-
-async function resetSearch() {
-  search.value = "";
-  await resetPages();
-  search.value = farm.value?.name;
-  emits("update:search", search.value ?? undefined);
-}
 </script>
 
 <script lang="ts">
 import type { FarmFilterOptions } from "@threefold/grid_client";
-import { debounce } from "lodash";
+import _ from "lodash";
 
 import { gridProxyClient } from "@/clients";
 import { ValidatorStatus } from "@/hooks/form_validator";
