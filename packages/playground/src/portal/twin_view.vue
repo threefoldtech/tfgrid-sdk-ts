@@ -1,11 +1,26 @@
 <template>
   <div>
+    <v-container v-if="deleteRelay">
+      <v-dialog v-model="deleteRelay" max-width="600">
+        <v-card>
+          <v-toolbar color="primary" dark class="custom-toolbar">Edit Twin</v-toolbar>
+          <div class="text-h2 pa-10">
+            <v-text-field v-model="selectedRelay" outlined label="Relay" :error-messages="errorMsg"></v-text-field>
+          </div>
+          <v-card-actions class="justify-end pa-5">
+            <v-btn @click="deleteRelay = false" class="grey lighten-2 black--text">Close</v-btn>
+            <v-btn @click="UpdateRelay" class="primary white--text">Save</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-container>
+
     <v-container v-if="editingTwin">
       <v-dialog v-model="editingTwin" max-width="600">
         <v-card>
           <v-toolbar color="primary" dark class="custom-toolbar">Edit Twin</v-toolbar>
           <div class="text-h2 pa-10">
-            <v-text-field v-model="relay" outlined label="Relay" :error-messages="errorMsg"></v-text-field>
+            <v-text-field v-model="selectedRelay" outlined label="Relay" :error-messages="errorMsg"></v-text-field>
           </div>
           <v-card-actions class="justify-end pa-5">
             <v-btn @click="editingTwin = false" class="grey lighten-2 black--text">Close</v-btn>
@@ -33,7 +48,95 @@
         <v-card-title class="pa-0">Twin Details</v-card-title>
       </v-card>
 
-      <v-card>
+      <v-container>
+        <v-row>
+          <v-col>
+            <v-card class="mx-auto" title="Twin ID" prepend-icon="mdi-id-card">
+              <template #subtitle>
+                <strong>{{ profileManager.profile?.twinId.toString() }}</strong>
+              </template>
+            </v-card>
+          </v-col>
+
+          <v-col>
+            <v-card class="mx-auto" title="Twin Address" prepend-icon="mdi-at">
+              <template #subtitle>
+                <div class="w-100 d-flex justify-space-between align-center">
+                  <strong>{{ profileManager.profile?.address }}</strong>
+                  <v-icon @click="copy(profileManager.profile?.address as string)"> mdi-content-copy </v-icon>
+                </div>
+              </template>
+            </v-card>
+          </v-col>
+
+          <v-col cols="12">
+            <v-card class="mx-auto" :title="relays.length ? 'Relays' : 'Relay'" prepend-icon="mdi-swap-horizontal">
+              <div class="pa-5">
+                <v-row>
+                  <v-col v-for="(relay, index) in relays" :key="relay">
+                    <v-card variant="tonal" class="w-100" :title="`Relay ${index + 1}`" prepend-icon="mdi-link-variant">
+                      <template #append>
+                        <v-btn
+                          v-if="selectedRelay != relay"
+                          title="Edit this relay"
+                          @click="selectedRelay = relay"
+                          elevation="0"
+                          icon="mdi-pencil"
+                        >
+                          <template #default>
+                            <v-icon color="info"></v-icon>
+                          </template>
+                        </v-btn>
+                        <v-btn
+                          v-if="selectedRelay != relay"
+                          title="Delete this relay"
+                          @click="deleteRelay = true"
+                          elevation="0"
+                          icon="mdi-trash-can"
+                        >
+                          <template #default>
+                            <v-icon color="error"></v-icon>
+                          </template>
+                        </v-btn>
+                      </template>
+                      <template #subtitle>
+                        <div v-if="selectedRelay && selectedRelay === relay">
+                          <v-text-field v-model="selectedRelay" />
+                          <v-btn
+                            class="mr-4"
+                            color="success"
+                            variant="tonal"
+                            title="Update"
+                            @click="selectedRelay = undefined"
+                            elevation="2"
+                          >
+                            Update
+                          </v-btn>
+                          <v-btn
+                            color="error"
+                            variant="outlined"
+                            title="Cancel"
+                            @click="selectedRelay = undefined"
+                            elevation="2"
+                          >
+                            Cancel
+                          </v-btn>
+                        </div>
+                        <strong v-else class="font-bold text-lg">{{ relay }}</strong>
+                      </template>
+                    </v-card>
+                  </v-col>
+                </v-row>
+              </div>
+              <v-card-actions class="justify-end mx-4 mb-4">
+                <v-btn width="10%" class="custom-button bg-primary" @click="editTwin">New Relay</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+
+      <!-- <v-card>
         <v-list class="custom-list">
           <v-row>
             <v-col cols="1" sm="2" class="column-style my-4">
@@ -41,7 +144,7 @@
               <v-divider></v-divider>
               <v-list-item> Address </v-list-item>
               <v-divider></v-divider>
-              <v-list-item> Relay </v-list-item>
+              <v-list-item> {{ relays.length > 1 ? "Relays" : "Relay" }} </v-list-item>
             </v-col>
             <v-col cols="1" sm="10" class="my-4">
               <v-list-item> {{ profileManager.profile?.twinId.toString() }} </v-list-item>
@@ -53,21 +156,29 @@
                 </div>
               </v-list-item>
               <v-divider></v-divider>
-              <v-list-item> {{ profileManager.profile?.relay }} </v-list-item>
+              <v-list-item>
+                <v-select
+                  class="pa-0"
+                  hide-details="auto"
+                  variant="underlined"
+                  :readonly="true"
+                  v-model="selectedRelay"
+                  :items="relays"
+                ></v-select>
+              </v-list-item>
             </v-col>
           </v-row>
         </v-list>
-        <v-card-actions v-if="updateRelay" class="justify-end mx-4 mb-4">
+        <v-card-actions class="justify-end mx-4 mb-4">
           <v-btn class="custom-button bg-primary" @click="editTwin">Edit</v-btn>
         </v-card-actions>
-      </v-card>
+      </v-card> -->
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { generatePublicKey } from "@threefold/rmb_direct_client";
-import type { Proposal } from "@threefold/tfchain_client";
 import { onMounted, ref } from "vue";
 
 import router from "../router";
@@ -79,15 +190,25 @@ import { getGrid } from "../utils/grid";
 const profileManager = useProfileManager();
 
 const editingTwin = ref(false);
-const relay = ref(profileManager.profile?.relay || "");
-const updateRelay = ref(false);
 const errorMsg = ref("");
 const openVotePopup = ref(false);
 const numberOfProposalsToVoteOn = ref(0);
 const userFarms = ref<Farm[]>();
 const activeProposalsUserHasVotedOn = ref(0);
+
+const selectedRelay = ref<string>();
+const deleteRelay = ref<boolean>(false);
+const relays = ref<string[]>([]);
+
 onMounted(async () => {
   const profile = profileManager.profile!;
+  profile.relay = "r1.3x0.me_relay.dev.grid.tf";
+  relays.value = profile.relay.split("_");
+
+  console.log("relays.value", relays.value);
+
+  // relays.value.push()
+
   const grid = await getGrid(profile);
   if (!grid) {
     createCustomToast("Fetch Grid Failed", ToastType.danger);
@@ -107,6 +228,7 @@ onMounted(async () => {
   if (!numberOfActiveProposals) {
     return;
   }
+
   activeProposals.forEach(proposal => {
     if (proposal.nayes.filter(naye => userFarmId.includes(naye.farmId)).length) {
       activeProposalsUserHasVotedOn.value++;
@@ -125,38 +247,24 @@ onMounted(async () => {
 function redirectToDao() {
   router.push({ path: "/portal/dao" });
 }
-onMounted(validateEdit);
-async function validateEdit() {
-  try {
-    const pk = await generatePublicKey(profileManager.profile!.mnemonic);
-    if (profileManager.profile?.relay !== window.env.RELAY_DOMAIN.replace("wss://", "")) {
-      updateRelay.value = true;
-    }
-
-    if (profileManager.profile?.pk !== pk) {
-      UpdateRelay();
-    }
-  } catch (e) {
-    console.log(e);
-  }
-}
 
 function editTwin() {
-  console.log("editing twin");
   editingTwin.value = true;
 }
 
 async function UpdateRelay() {
-  try {
-    const pk = await generatePublicKey(profileManager.profile!.mnemonic);
-    const grid = await getGrid(profileManager.profile!);
-    await grid?.twins.update({ relay: relay.value });
-    profileManager.updateRelay(relay.value);
-    profileManager.updatePk(pk);
-    updateRelay.value = false;
-  } catch (e) {
-    errorMsg.value = (e as any).message;
-    console.log("could not update relay or pk, Error: ", e);
+  const profile = profileManager.profile;
+  if (profile) {
+    try {
+      const pk = await generatePublicKey(profile.mnemonic);
+      const grid = await getGrid(profile);
+      await grid?.twins.update({ relay: profile.relay });
+      profileManager.updateRelay(profile.relay);
+      profileManager.updatePk(pk);
+    } catch (e) {
+      errorMsg.value = (e as any).message;
+      console.log("could not update relay or pk, Error: ", e);
+    }
   }
 }
 
