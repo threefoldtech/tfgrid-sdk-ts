@@ -11,7 +11,7 @@
       </span>
       <v-icon class="custom-icon" @click="showDialog = true">mdi-file-document-outline </v-icon>
 
-      <v-dialog transition="dialog-bottom-transition" v-model="showDialog" max-width="500px">
+      <v-dialog transition="dialog-bottom-transition" v-model="showDialog" persistent max-width="500px">
         <v-card>
           <v-card-title style="color: #ffcc00; font-weight: bold">Failed Deployments</v-card-title>
           <v-divider color="#FFCC00" />
