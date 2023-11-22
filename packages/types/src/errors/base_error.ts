@@ -18,13 +18,6 @@ export class BaseError extends Error {
   }
 }
 
-export class WrappedError extends BaseError {
-  constructor(message: string, error: BaseError) {
-    super(error.code, `${message} due to: ${error.message}`, error.module);
-    this.name = error.name;
-  }
-}
-
 export class ValidationError extends BaseError {
   constructor(message: string) {
     super(Generic.ValidationError, message, ErrorModules.Generic);

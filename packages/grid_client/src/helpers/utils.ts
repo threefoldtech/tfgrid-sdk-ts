@@ -49,4 +49,18 @@ function toHexSeed(mnemonicOrHexSeed: string): string {
   return "0x" + seed;
 }
 
-export { generateString, getRandomNumber, randomChoice, randomSecret, randomSecretAsHex, randomNonce, log, toHexSeed };
+function formatErrorMessage(prefix: string, error: Error) {
+  return `${prefix}\n\tDue to:${error.message}`;
+}
+
+export {
+  generateString,
+  getRandomNumber,
+  randomChoice,
+  randomSecret,
+  randomSecretAsHex,
+  randomNonce,
+  log,
+  toHexSeed,
+  formatErrorMessage,
+};
