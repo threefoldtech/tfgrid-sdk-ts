@@ -7,7 +7,6 @@
           @update:model-value="inputFiltersReset"
           :form-disabled="isFormLoading"
           v-model:valid="isValidForm"
-          @update:valid="updateFarms"
         />
 
         <v-data-table-server
@@ -71,44 +70,44 @@ const isValidForm = ref<boolean>(false);
 const totalFarms = ref(0);
 
 const _getFarms = async (queries: Partial<FarmsQuery>) => {
-  loading.value = true;
-  isFormLoading.value = true;
-  try {
-    const { count, data } = await getFarms(queries);
+  if (isValidForm.value) {
+    loading.value = true;
+    isFormLoading.value = true;
+    try {
+      const { count, data } = await getFarms(queries);
 
-    if (data) {
-      totalFarms.value = count || 0;
-      farms.value = data.map(farm => {
-        const ips = farm.publicIps;
-        const total = ips.length;
-        const used = ips.filter(x => x.contract_id === 0).length;
-        return {
-          ...farm,
-          totalPublicIp: total,
-          usedPublicIp: used,
-          freePublicIp: total - used,
-        };
-      });
-      if (sortBy.value[0]) {
-        updateSorting();
+      if (data) {
+        totalFarms.value = count || 0;
+        farms.value = data.map(farm => {
+          const ips = farm.publicIps;
+          const total = ips.length;
+          const used = ips.filter(x => x.contract_id === 0).length;
+          return {
+            ...farm,
+            totalPublicIp: total,
+            usedPublicIp: used,
+            freePublicIp: total - used,
+          };
+        });
+        if (sortBy.value[0]) {
+          updateSorting();
+        }
       }
+    } catch (err) {
+      console.log("could not get farms:", err);
+      createCustomToast("Failed to get farms!", ToastType.danger);
+    } finally {
+      isFormLoading.value = false;
+      loading.value = false;
     }
-  } catch (err) {
-    console.log("could not get farms:", err);
-    createCustomToast("Failed to get farms!", ToastType.danger);
-  } finally {
-    isFormLoading.value = false;
-    loading.value = false;
   }
 };
 onMounted(async () => {
-  await updateFarms(isValidForm.value);
+  await updateFarms();
 });
 
 const request = debounce(_getFarms, 1000);
-const updateFarms = async (e: boolean) => {
-  isValidForm.value = e;
-
+const updateFarms = async () => {
   if (isValidForm.value) {
     await updateQueries();
     const queries = getFarmQueries(mixedFarmFilters.value);
@@ -150,7 +149,7 @@ const updateQueries = async () => {
     options.sortBy = sortBy.value;
   }
 };
-watch(mixedFarmFilters.value, async () => await updateFarms(isValidForm.value), { deep: true });
+watch(mixedFarmFilters.value, updateFarms, { deep: true });
 
 const inputFiltersReset = (nFltrNptsVal: FilterFarmInputs) => {
   mixedFarmFilters.value.inputs = nFltrNptsVal;
