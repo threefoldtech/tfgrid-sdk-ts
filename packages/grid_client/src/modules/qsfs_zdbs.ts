@@ -1,3 +1,5 @@
+import { ValidationError } from "@threefold/types";
+
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
 import { expose } from "../helpers/expose";
@@ -22,7 +24,7 @@ class QSFSZdbsModule extends BaseModule {
 
   async _createDeployment(options: QSFSZDBSModel): Promise<TwinDeployment[]> {
     if (options.count < 3) {
-      throw Error("QSFS zdbs count can't be less than 3");
+      throw new ValidationError("QSFS zdbs count can't be less than 3");
     }
     const count = options.count + 4; // 4 zdbs for meta
     const twinDeployments = [];
@@ -59,7 +61,7 @@ class QSFSZdbsModule extends BaseModule {
   @checkBalance
   async deploy(options: QSFSZDBSModel) {
     if (await this.exists(options.name)) {
-      throw Error(`Another QSFS ZDBs deployment with the same name ${options.name} already exists`);
+      throw new ValidationError(`Another QSFS ZDBs deployment with the same name ${options.name} already exists`);
     }
     events.emit("logs", `Start creating the QSFS ZDBs deployment with name ${options.name}`);
     const twinDeployments = await this._createDeployment(options);

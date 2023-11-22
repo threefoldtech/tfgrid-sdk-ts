@@ -2,8 +2,10 @@ import { BaseError } from "../base_error";
 import { ErrorModules } from "../modules";
 
 export enum Errors {
-  WorkloadDeletionError,
-  WorkloadDeploymentError,
+  WorkloadDeleteError,
+  WorkloadDeployError,
+  WorkloadUpdateError,
+  WorkloadCreateError,
 }
 class TFGridWorkloadError extends BaseError {
   constructor(code: number, message: string) {
@@ -11,14 +13,26 @@ class TFGridWorkloadError extends BaseError {
   }
 }
 
-export class WorkloadDeletionError extends TFGridWorkloadError {
+export class WorkloadDeleteError extends TFGridWorkloadError {
   constructor(message: string) {
-    super(Errors.WorkloadDeletionError, message);
+    super(Errors.WorkloadDeleteError, message);
   }
 }
 
-export class WorkloadDeploymentError extends TFGridWorkloadError {
+export class WorkloadDeployError extends TFGridWorkloadError {
   constructor(message: string) {
-    super(Errors.WorkloadDeploymentError, message);
+    super(Errors.WorkloadDeployError, message);
+  }
+}
+
+export class WorkloadUpdateError extends TFGridWorkloadError {
+  constructor(message: string) {
+    super(Errors.WorkloadUpdateError, message);
+  }
+}
+
+export class WorkloadCreateError extends TFGridWorkloadError {
+  constructor(message: string) {
+    super(Errors.WorkloadCreateError, message);
   }
 }
