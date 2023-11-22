@@ -150,7 +150,7 @@ const updateQueries = async () => {
     options.sortBy = sortBy.value;
   }
 };
-watch(mixedFarmFilters.value, updateFarms, { deep: true });
+watch(mixedFarmFilters.value, async () => await updateFarms(isValidForm.value), { deep: true });
 
 const inputFiltersReset = (nFltrNptsVal: FilterFarmInputs) => {
   mixedFarmFilters.value.inputs = nFltrNptsVal;
