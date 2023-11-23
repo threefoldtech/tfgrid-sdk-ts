@@ -15,7 +15,7 @@ export interface INode {
   nodeId: number;
   state?: string;
   cards?: NodeGPUCardType[];
-  certified: string;
+  certified?: string;
 }
 
 export async function getNodeCards(grid: GridClient, nodeId: number): Promise<NodeGPUCardType[]> {

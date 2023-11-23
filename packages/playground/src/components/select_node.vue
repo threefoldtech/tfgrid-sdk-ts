@@ -1,6 +1,5 @@
 <template>
   <section>
-    <h6 class="text-h5 mb-4">Select a Node</h6>
     <v-alert
       class="mb-2"
       type="warning"
@@ -106,6 +105,7 @@ import type { NodeInfo, NodeResources } from "@threefold/grid_client";
 import { type PropType, type Ref, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
+import { Selection } from "@/utils/types";
 
 import { useProfileManager } from "../stores/profile_manager";
 import { getFilteredNodes, getNodeCards, type INode, type NodeGPUCardType } from "../utils/filter_nodes";
@@ -190,7 +190,7 @@ watch(
     errorMessage.value = ``;
     const grid = await getGrid(profileManager.profile!);
     if (node && grid) {
-      if (props.selection === "automated") {
+      if (props.selection === Selection.AUTOMATED) {
         await validateNodeStoragePool(node);
       } else {
         await validateManualSelectedNode(node);
@@ -225,9 +225,10 @@ watch(
       value.hasGPU === oldValue.hasGPU
     )
       return;
-    if (props.selection === "manual" && selectedNode.value) {
+    if (props.selection === Selection.MANUAL && selectedNode.value) {
       await validateManualSelectedNode(selectedNode.value);
-    } else {
+    }
+    if (props.selection === Selection.AUTOMATED) {
       shouldBeUpdated.value = true;
     }
   },
@@ -258,19 +259,17 @@ watch(
 watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
   if (l || !s) return;
   shouldBeUpdated.value = false;
-  if (props.selection === "automated") {
-    farmManager?.subscribe(farmId => {
-      if (!farmId) {
-        selectedNode.value = undefined;
-        availableNodes.value = [];
-        return;
-      }
-      clearTimeout(delay.value);
-      delay.value = setTimeout(() => {
-        loadNodes(farmId);
-      }, 1000);
-    });
-  }
+  farmManager?.subscribe(farmId => {
+    if (!farmId) {
+      selectedNode.value = undefined;
+      availableNodes.value = [];
+      return;
+    }
+    clearTimeout(delay.value);
+    delay.value = setTimeout(() => {
+      loadNodes(farmId);
+    }, 1000);
+  });
 });
 
 function getChipColor(item: any) {
@@ -301,7 +300,7 @@ async function validateManualSelectedNode(validatingNode: INode) {
     const grid = await getGrid(profileManager.profile!);
     const filters = props.filters;
     errorMessage.value = ``;
-    loadingNodes.value = true;
+    // loadingNodes.value = true;
     const node = await grid?.capacity.nodes.getNode(Number(validatingNode.nodeId));
     if (node) {
       const freeresources = await grid?.capacity.nodes.getNodeFreeResources(
@@ -317,7 +316,7 @@ async function validateManualSelectedNode(validatingNode: INode) {
     console.error(`An error occurred: ${e}`);
   } finally {
     validator.value?.setStatus(ValidatorStatus.Init);
-    loadingNodes.value = false;
+    // loadingNodes.value = false;
   }
 }
 async function loadNodes(farmId: number | undefined) {
@@ -393,7 +392,7 @@ async function validateNodeStoragePool(validatingNode: INode | undefined) {
     emits("update:modelValue", {
       nodeId: validatingNode.nodeId,
       cards: cards,
-      certified: validatingNode.certified,
+      certified: validatingNode?.certified,
     });
   } catch (e) {
     availableNodes.value = availableNodes.value.filter(node => node.nodeId !== validatingNode.nodeId);

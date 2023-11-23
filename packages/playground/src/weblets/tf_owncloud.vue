@@ -109,7 +109,7 @@
           <NodeSelector v-model="selection" />
           <SelectFarmManager>
             <SelectFarm
-              v-if="selection == 'automated'"
+              v-if="selection == Selection.AUTOMATED"
               :filters="{
                 cpu: solution?.cpu,
                 memory: solution?.memory,
@@ -163,6 +163,8 @@
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
 import { computed, type Ref, ref } from "vue";
+
+import { Selection } from "@/utils/types";
 
 import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
