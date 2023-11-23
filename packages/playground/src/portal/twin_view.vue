@@ -270,10 +270,12 @@ async function updatedRelay(profile: Profile, newRelays: string) {
 function validateRelay(relay: string): string | undefined {
   // Check the provided relay and return string as error message in case of valid and undefined if not.
   const specialChars = /[`!@#$%^&*()_+\-=\\[\]{};':"\\|,<>\\/?~ ]/;
-  if (!relay === undefined || relay.trim().length === 0) {
+  if (!relay || relay.trim().length === 0) {
     return "Please enter a valid relay.";
   } else if (relay.trim().length < 5) {
     return "The relay length must be equal to or more than 5 chars.";
+  } else if (relay.trim().length > 255) {
+    return "The relay length must lower than 255 chars.";
   } else if (!relay.includes(".")) {
     return "The relay must be parts separated by dots.";
   } else if (specialChars.test(relay)) {

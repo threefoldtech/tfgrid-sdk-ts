@@ -68,7 +68,7 @@
                       <div>
                         <v-btn
                           :loading="isLoading"
-                          :disabled="isLoading || selectedRelay === relay"
+                          :disabled="isLoading || selectedRelay === relay || errorMessage !== undefined"
                           class="mr-4"
                           color="success"
                           variant="tonal"
@@ -95,7 +95,7 @@
               </v-col>
             </v-row>
           </div>
-          <v-card-actions class="justify-end mx-4 mb-4">
+          <v-card-actions v-if="relays.length < 4" class="justify-end mx-4 mb-4">
             <v-btn width="10%" class="custom-button bg-primary" @click="newRelay">New Relay</v-btn>
           </v-card-actions>
         </v-card>
