@@ -205,7 +205,7 @@ const version = process.env.VERSION as any;
 
 const routes: AppRoute[] = [
   {
-    title: "Portal",
+    title: "Dashboard",
     icon: "mdi-account-convert-outline",
     items: [
       {
