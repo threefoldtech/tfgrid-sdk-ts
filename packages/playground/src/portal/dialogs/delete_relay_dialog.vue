@@ -11,7 +11,14 @@
           </div>
         </v-toolbar>
 
-        <div class="text-center pa-8 pb-1 mb-5">
+        <div v-if="relays.length === 1" class="mt-4 pa-8">
+          <v-alert variant="tonal" type="warning">
+            You cannot delete this relay as it is the only one connected. Please connect another relay before attempting
+            to delete this one.
+          </v-alert>
+        </div>
+
+        <div v-else class="text-center pa-8 pb-1 mb-5">
           <v-icon size="40">mdi-archive-lock-outline</v-icon>
           <h4 class="mt-2">
             This action cannot be undone, you are about to delete the '
@@ -27,6 +34,7 @@
 
         <v-card-actions class="justify-end pa-5 pt-4">
           <v-btn
+            v-if="relays.length > 1"
             :disabled="isLoading"
             :loading="isLoading"
             @click="emits('confirm', $props.relay)"
@@ -55,11 +63,15 @@ import { defineComponent, defineProps, type PropType } from "vue";
 
 defineProps({
   isDelete: {
-    type: Boolean,
+    type: Object as PropType<boolean>,
     required: true,
   },
   relay: {
-    type: String,
+    type: Object as PropType<string>,
+    required: true,
+  },
+  relays: {
+    type: Object as PropType<string[]>,
     required: true,
   },
   errorMessage: {

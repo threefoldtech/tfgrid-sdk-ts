@@ -105,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent, defineProps, type PropType, ref } from "vue";
+import { defineComponent, defineProps, type PropType, ref, watch } from "vue";
 
 import { useProfileManager } from "../../stores";
 
@@ -124,13 +124,15 @@ defineProps({
   },
 });
 
-const emits = defineEmits(["copy-address", "delete-relay", "update-relay", "new-relay"]);
+const emits = defineEmits(["copy-address", "delete-relay", "update-relay", "new-relay", "validate-relay"]);
 
 const profileManager = useProfileManager();
 const address = profileManager.profile?.address;
 const isEditRelay = ref<boolean>(false);
 const selectedRelay = ref<string | undefined>();
 let selectedRelayCopy: string | undefined = selectedRelay.value;
+
+watch(selectedRelay, () => emits("validate-relay", selectedRelay.value), { deep: true });
 
 const onUpdateRelay = (relay: string, newValue: string) => {
   emits("update-relay", relay, newValue);

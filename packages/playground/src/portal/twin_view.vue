@@ -4,6 +4,7 @@
       v-if="isDeleteRelay"
       :is-delete="isDeleteRelay"
       :relay="selectedRelay!"
+      :relays="relays"
       :is-loading="isLoading"
       :errorMessage="errorMessage"
       @confirm="onConfirmDeleteRelay"
@@ -25,7 +26,7 @@
       :is-new-relay="isNewRelay"
       @save="onAddNewRelay"
       @cancel="cancelNewRelay"
-      @validate-relay="onValidateRelay"
+      @validate-relay="onValidateNewRelay"
     />
 
     <div class="border px-4 pb-4 rounded position-relative mt-2">
@@ -42,6 +43,7 @@
         @delete-relay="onDeleteRelay"
         @update-relay="onUpdateRelay"
         @new-relay="onNewRelay"
+        @validate-relay="onValidateUpdateRelay"
       />
     </div>
   </div>
@@ -259,22 +261,36 @@ async function updatedRelay(profile: Profile, newRelays: string) {
   const pk = generatePublicKey(profile.mnemonic);
   const grid = await getGrid(profile);
   // TODO: Check the error here.
-  // await grid?.twins.update({ relay: newRelays });
+  await grid?.twins.update({ relay: newRelays });
 
   profileManager.updateRelay(newRelays);
   profileManager.updatePk(pk);
 }
 
-function onValidateRelay(relay: string) {
-  // An event from the new relay dialog component emits when updating the value of the entred relay to validate it.
+function validateRelay(relay: string): string | undefined {
+  // Check the provided relay and return string as error message in case of valid and undefined if not.
   const specialChars = /[`!@#$%^&*()_+\-=\\[\]{};':"\\|,<>\\/?~ ]/;
   if (!relay === undefined || relay.trim().length === 0) {
-    newErrorMessage.value = "Please enter a valid relay.";
+    return "Please enter a valid relay.";
+  } else if (relay.trim().length < 5) {
+    return "The relay length must be equal to or more than 5 chars.";
+  } else if (!relay.includes(".")) {
+    return "The relay must be parts separated by dots.";
   } else if (specialChars.test(relay)) {
-    newErrorMessage.value = "Relay cannot contain special chars or spaces.";
+    return "The relay cannot contain special chars or spaces.";
   } else {
-    newErrorMessage.value = undefined;
+    return undefined;
   }
+}
+
+function onValidateUpdateRelay(relay: string) {
+  // An event from the new relay dialog component emits when updating the value of the entred relay to validate it.
+  errorMessage.value = validateRelay(relay);
+}
+
+function onValidateNewRelay(relay: string) {
+  // An event from the new relay dialog component emits when updating the value of the entred relay to validate it.
+  newErrorMessage.value = validateRelay(relay);
 }
 
 function redirectToDao() {
@@ -287,6 +303,7 @@ function closeVotePopup() {
 
 function cancelNewRelay() {
   isNewRelay.value = false;
+  newErrorMessage.value = undefined;
 }
 </script>
 

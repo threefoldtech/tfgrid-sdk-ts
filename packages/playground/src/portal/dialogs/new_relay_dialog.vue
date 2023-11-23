@@ -64,11 +64,11 @@ defineProps({
   },
 });
 
-const emits = defineEmits(["save", "cancel", "validateRelay"]);
+const emits = defineEmits(["save", "cancel", "validate-relay"]);
 const save = () => emits("save", relay.value);
 const cancel = () => emits("cancel");
 
-watch(relay, () => emits("validateRelay", relay.value), { deep: true });
+watch(relay, () => emits("validate-relay", relay.value), { deep: true });
 </script>
 
 <script lang="ts">
