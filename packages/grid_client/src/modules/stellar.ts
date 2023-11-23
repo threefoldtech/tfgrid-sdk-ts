@@ -277,7 +277,6 @@ class Stellar implements blockchainInterface {
       console.log("Success! View the transaction at: ", transactionResult._links.transaction.href);
       return transactionResult._links.transaction.href;
     } catch (e) {
-      console.log("An error has occurred:", e);
       throw new GridClientErrors.GridClientError(`An error has occurred: ${e}`);
     }
   }
