@@ -226,6 +226,11 @@ const routes: AppRoute[] = [
         route: "/dashboard/dedicated-nodes",
       },
       { title: "DAO", icon: "mdi-note-check-outline", route: "/dashboard/dao" },
+      {
+        title: "Contracts",
+        icon: "mdi-file-document-edit",
+        route: "/contractslist",
+      },
     ],
   },
   {
@@ -300,16 +305,7 @@ const routes: AppRoute[] = [
     title: "Playground",
     items: [{ title: "Solutions", icon: "mdi-lightbulb-on-outline", route: "/solutions" }],
   },
-  {
-    title: "My Account",
-    items: [
-      {
-        title: "Contracts",
-        icon: "mdi-file-document-edit",
-        route: "/contractslist",
-      },
-    ],
-  },
+
   ...(network !== "main"
     ? []
     : [
