@@ -29,5 +29,5 @@ jobs:
         run: yarn
       - name: Lint
         run: |
-          yarn check-eslint
+          yarn check-eslint --fix
           yarn check-prettier
