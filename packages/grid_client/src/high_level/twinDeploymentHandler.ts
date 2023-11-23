@@ -29,7 +29,7 @@ class TwinDeploymentHandler {
     if (id) {
       const c = await this.tfclient.contracts.get({ id });
       if (c && c.twinId !== this.config.twinId) {
-        throw new ValidationError(`Name contract with name ${name} is already reserved`);
+        throw new ValidationError(`Name contract with name ${name} is already reserved.`);
       }
     }
     try {
