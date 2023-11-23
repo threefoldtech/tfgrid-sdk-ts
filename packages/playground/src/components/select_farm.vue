@@ -251,7 +251,6 @@ async function resetSearch() {
 import type { FarmFilterOptions } from "@threefold/grid_client";
 import { debounce } from "lodash";
 
-
 import { gridProxyClient } from "@/clients";
 import { ValidatorStatus } from "@/hooks/form_validator";
 
