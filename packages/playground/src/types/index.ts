@@ -1,3 +1,5 @@
+import { CertificationType, type GridNode, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
+import { capitalize } from "vue";
 import type { VDataTable } from "vuetify/lib/labs/components";
 
 import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
@@ -51,7 +53,7 @@ export interface K8SWorker {
   ipv6: boolean;
   planetary: boolean;
   rootFsSize: number;
-  farm?: Farm;
+  farm?: FarmInterface;
   selectedNode?: INode;
   rentedBy?: number;
   dedicated: boolean;
@@ -61,13 +63,13 @@ export interface K8SWorker {
 export interface CaproverWorker {
   selectedNode?: INode;
   name: string;
-  farm?: Farm;
+  farm?: FarmInterface;
   solution?: solutionFlavor;
   dedicated?: boolean;
   certified?: boolean;
 }
 
-export interface Farm {
+export interface FarmInterface {
   name: string;
   farmID: number;
   country?: string;
@@ -185,10 +187,6 @@ export interface SMTPServer {
 }
 
 export type Validators = typeof validators;
-import { CertificationType, type GridNode, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
-import { capitalize } from "vue";
-
-import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
 
 export type NodeInputFilterType = {
   label: string;
@@ -226,6 +224,37 @@ export type FilterInputs = {
 };
 
 export const optionsInitializer: FilterOptions = {
+  gateway: undefined,
+  gpu: undefined,
+  page: 1,
+  size: 10,
+  status: capitalize(NodeStatus.Up) as NodeStatus,
+};
+
+import type { FilterFarmInputs } from "@/utils/filter_farms";
+import type { FilterNodeInputs } from "@/utils/filter_nodes";
+
+// The input filters<nodeId, farmIds..etc> and the option filters<status, gpu...etc>
+
+// Status, GPU, Gateway, and any other option should be add here.
+export type NodeFilterOptions = {
+  status: NodeStatus;
+  gpu: boolean | undefined;
+  gateway: boolean | undefined;
+  page: number;
+  size: number;
+};
+type TableSortOption = {
+  key: string | undefined;
+  order: boolean | "desc" | "asc" | undefined;
+};
+export type FarmFilterOptions = {
+  page?: number;
+  size?: number;
+  sortBy?: TableSortOption[];
+};
+
+export const nodeOptionsInitializer: NodeFilterOptions = {
   gateway: undefined,
   gpu: undefined,
   page: 1,
@@ -312,4 +341,14 @@ export const nodeInitializer: GridNode = {
   stats: nodeStatsInitializer,
   cards: [],
   num_gpu: 0,
+};
+// The input filters<nodeId, farmIds..etc> and the option filters<status, gpu...etc>
+export type MixedNodeFilter = {
+  inputs: FilterNodeInputs;
+  options: NodeFilterOptions;
+};
+
+export type MixedFarmFilter = {
+  inputs?: FilterFarmInputs;
+  options?: FarmFilterOptions;
 };

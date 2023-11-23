@@ -67,12 +67,11 @@
 
 <script lang="ts" setup>
 import { generatePublicKey } from "@threefold/rmb_direct_client";
-import type { Proposal } from "@threefold/tfchain_client";
 import { onMounted, ref } from "vue";
 
 import router from "../router";
 import { useProfileManager } from "../stores";
-import type { Farm } from "../types";
+import type { FarmInterface } from "../types";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getFarms } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
@@ -84,7 +83,7 @@ const updateRelay = ref(false);
 const errorMsg = ref("");
 const openVotePopup = ref(false);
 const numberOfProposalsToVoteOn = ref(0);
-const userFarms = ref<Farm[]>();
+const userFarms = ref<FarmInterface[]>();
 const activeProposalsUserHasVotedOn = ref(0);
 onMounted(async () => {
   const profile = profileManager.profile!;

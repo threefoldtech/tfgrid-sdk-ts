@@ -503,7 +503,12 @@ const router = createRouter({
     {
       path: "/nodes",
       component: () => import("@/views/nodes.vue"),
-      meta: { title: "Explorer Nodes" },
+      meta: { title: "Nodes" },
+    },
+    {
+      path: "/farms",
+      component: () => import("@/views/farms.vue"),
+      meta: { title: "Farms" },
     },
     {
       path: "/stats",

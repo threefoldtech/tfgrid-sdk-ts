@@ -136,7 +136,7 @@ import { computed, type Ref, ref } from "vue";
 import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, Flist, solutionFlavor as SolutionFlavor } from "../types";
+import type { FarmInterface, Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
@@ -156,7 +156,7 @@ const planetary = ref(true);
 const wireguard = ref(false);
 const network = ref();
 const solution = ref() as Ref<SolutionFlavor>;
-const farm = ref() as Ref<Farm>;
+const farm = ref() as Ref<FarmInterface>;
 const farmName = ref();
 const loadingFarm = ref(false);
 const flist: Flist = {

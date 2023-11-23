@@ -242,7 +242,7 @@ import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
-import type { Farm } from "../types";
+import type { FarmInterface } from "../types";
 import { getFarms } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
 
@@ -259,7 +259,7 @@ const loadingVote = ref(false);
 const isValidFarm = ref(false);
 const selectedProposal = ref("");
 const selectedFarm = ref();
-const userFarms = ref<Farm[]>();
+const userFarms = ref<FarmInterface[]>();
 
 const profileManager = useProfileManager();
 const profile = ref(profileManager.profile!);

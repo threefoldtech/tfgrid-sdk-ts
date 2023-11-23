@@ -1,12 +1,59 @@
 import type { FarmFilterOptions, GridClient } from "@threefold/grid_client";
+import type { Farm, FarmsQuery, Pagination, Twin, TwinsQuery } from "@threefold/gridproxy_client";
+
+import type { MixedFarmFilter } from "@/types";
+import type { FarmInterface } from "@/types";
 
 import { gqlClient, gridProxyClient } from "../clients";
-import type { Farm } from "../types";
+import { createCustomToast, ToastType } from "./custom_toast";
 
 export interface GetFarmsOptions {
   exclusiveFor?: string;
 }
+export const getFarmQueries = (mixedFilters: MixedFarmFilter): Partial<FarmsQuery> => {
+  let farmId, name, page, size, totalIps;
+  if (mixedFilters.inputs) {
+    if (mixedFilters.inputs.farmId.value) {
+      farmId = +mixedFilters.inputs.farmId.value;
+    }
+    if (mixedFilters.inputs.name.value) {
+      name = mixedFilters.inputs.name.value.toLowerCase().trim();
+    }
 
+    if (mixedFilters.inputs.totalIps.value) {
+      totalIps = Number(mixedFilters.inputs.totalIps.value);
+    }
+  }
+
+  if (mixedFilters.options) {
+    if (mixedFilters.options.page) {
+      page = +mixedFilters.options.page;
+    }
+    if (mixedFilters.options.size) {
+      size = +mixedFilters.options.size;
+    }
+  }
+  const options: Partial<FarmsQuery> = {
+    retCount: true,
+    farmId: farmId,
+    name: name,
+    totalIps: totalIps,
+    page: page,
+    size: size,
+  };
+
+  return options;
+};
+export async function getFarmsExplorer(queries: Partial<FarmsQuery>): Promise<Pagination<Farm[]>> {
+  try {
+    const farms = await gridProxyClient.farms.list(queries);
+    return farms;
+  } catch (error) {
+    console.error("An error occurred while requesting farms:", error);
+    createCustomToast("Failed to get farms!", ToastType.danger);
+    throw error;
+  }
+}
 export async function getFarmsPages(grid: GridClient, filters: FarmFilterOptions, pageSize: number): Promise<number> {
   try {
     const count = (await grid.capacity.getFarmsCount(filters)) || 1;
@@ -20,7 +67,7 @@ export async function getFarms(
   grid: GridClient,
   filters: FarmFilterOptions,
   options: GetFarmsOptions = {},
-): Promise<Farm[]> {
+): Promise<FarmInterface[]> {
   let farms;
   if (filters) {
     farms = await grid.capacity.filterFarms({ ...filters }).catch(() => []);
@@ -65,4 +112,14 @@ export async function getBlockedFarmSet(exclusiveFor: string): Promise<Set<numbe
     Array.from(new Set(nodes.map(node => node.nodeID))).map(id => gridProxyClient.nodes.byId(id)),
   );
   return new Set(farms.map(farm => farm.farmId));
+}
+export async function getFarmTwinByTwinId(queries: Partial<TwinsQuery> = {}): Promise<Twin> {
+  try {
+    const twins = await gridProxyClient.twins.list(queries);
+
+    return twins.data[0] as Twin;
+  } catch (error) {
+    console.error("An error occurred while requesting twins:", error);
+    throw error;
+  }
 }

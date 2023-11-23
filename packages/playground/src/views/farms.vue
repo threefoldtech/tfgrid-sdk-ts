@@ -45,11 +45,11 @@ import type { Farm } from "@threefold/gridproxy_client";
 import debounce from "lodash/debounce.js";
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 
-import type { VDataTableHeader } from "../../types";
-import type { FilterFarmInputs } from "../../utils/filter_farms";
-import { inputsInitializer } from "../../utils/filter_farms";
-import { getFarmQueries, getFarms } from "../utils/helpers";
-import type { FarmFilterOptions, MixedFarmFilter } from "../utils/types";
+import type { VDataTableHeader } from "@/types";
+import type { FarmFilterOptions, MixedFarmFilter } from "@/types";
+import type { FilterFarmInputs } from "@/utils/filter_farms";
+import { inputsInitializer } from "@/utils/filter_farms";
+import { getFarmQueries, getFarmsExplorer } from "@/utils/get_farms";
 const loading = ref<boolean>(false);
 const farms = ref<Farm[]>();
 const isDialogOpened = ref<boolean>(false);
@@ -74,7 +74,7 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
     loading.value = true;
     isFormLoading.value = true;
     try {
-      const { count, data } = await getFarms(queries);
+      const { count, data } = await getFarmsExplorer(queries);
 
       if (data) {
         totalFarms.value = count || 0;
@@ -211,8 +211,9 @@ const headers: VDataTableHeader = [
 <script lang="ts">
 import type { FarmsQuery } from "@threefold/gridproxy_client";
 
-import Filters from "../../components/filter.vue";
-import { createCustomToast, ToastType } from "../../utils/custom_toast";
+import Filters from "@/components/filter.vue";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
+
 import FarmDialog from "../components/farm_dialog.vue";
 export default {
   name: "Farms",

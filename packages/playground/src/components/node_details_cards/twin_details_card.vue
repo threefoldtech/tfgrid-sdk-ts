@@ -8,8 +8,8 @@ import { onMounted, type PropType, ref } from "vue";
 
 import type { NodeDetailsCard } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import { getFarmTwinByTwinId } from "@/utils/get_farms";
 
-import { getFarmTwinByTwinId } from "../../utils/helpers";
 import CardDetails from "./card_details.vue";
 
 export default {
