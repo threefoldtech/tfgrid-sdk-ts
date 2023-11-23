@@ -140,7 +140,7 @@ export const getFarmQueries = (mixedFilters: MixedFarmFilter): Partial<FarmsQuer
     }
 
     if (mixedFilters.inputs.totalIps.value) {
-      totalIps = +mixedFilters.inputs.totalIps.value;
+      totalIps = Number(mixedFilters.inputs.totalIps.value);
     }
   }
 
