@@ -28,7 +28,7 @@ jobs:
         if: ${{env.NETWORK}} == ""
         run: echo "NETWORK=dev" >> $GITHUB_ENV
       - uses: actions/checkout@v4
-      - name: Set up node 18
+      - name: Set up node version
         uses: actions/setup-node@v4
         with:
           node-version: 18
