@@ -252,7 +252,7 @@ class GridClient {
   async invoke(message, args) {
     const namespaces = message.split(".");
     if (namespaces.length > 2) {
-      throw new ValidationError(`Message must include 2 parts only not ${namespaces.length}`);
+      throw new ValidationError(`Message must include 2 parts only not ${namespaces.length}`.);
     }
 
     const method = namespaces.pop();
