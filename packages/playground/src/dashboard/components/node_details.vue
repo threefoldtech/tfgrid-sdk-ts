@@ -93,9 +93,9 @@ import type { GridNode } from "@threefold/gridproxy_client";
 import { onMounted, type PropType, ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
-import { getNode } from "@/explorer/utils/helpers";
-import type { NodeDetailsCard } from "@/explorer/utils/types";
-import { nodeInitializer } from "@/explorer/utils/types";
+import type { NodeDetailsCard } from "@/types";
+import { nodeInitializer } from "@/types";
+import { getNode } from "@/utils/get_nodes";
 import toTeraOrGigaOrPeta from "@/utils/toTeraOrGegaOrPeta";
 
 const dNodeError = ref(false);
@@ -214,8 +214,8 @@ function loadingDots() {
 </script>
 
 <script lang="ts">
-import CardDetails from "@/explorer/components/node_details_cards/card_details.vue";
-import GPUDetailsCard from "@/explorer/components/node_details_cards/gpu_details_card.vue";
+import CardDetails from "@/components/node_details_cards/card_details.vue";
+import GPUDetailsCard from "@/components/node_details_cards/gpu_details_card.vue";
 
 export default {
   name: "Node Details",

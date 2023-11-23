@@ -217,7 +217,7 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
 </script>
 
 <script lang="ts">
-import DepositDialog from "../components/deposit_dialog.vue";
+import DepositDialog from "@/components/deposit_dialog.vue";
 
 export default {
   name: "Bridge",

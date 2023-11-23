@@ -1,18 +1,18 @@
 <template>
-  <card-details :loading="loading" title="Node Twin Details" :items="twinFields" icon="mdi-account" />
+  <card-details :loading="loading" title="Public Configs Details" :items="publicConfigFields" icon="mdi-cog" />
 </template>
 
 <script lang="ts">
 import type { GridNode } from "@threefold/gridproxy_client";
 import { onMounted, type PropType, ref } from "vue";
 
-import type { NodeDetailsCard } from "@/explorer/utils/types";
+import type { NodeDetailsCard } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import CardDetails from "./card_details.vue";
 
 export default {
-  name: "TwinDetailsCard",
+  name: "PublicConfigDetailsCard",
   components: { CardDetails },
   props: {
     node: {
@@ -23,11 +23,11 @@ export default {
 
   setup(props) {
     const loading = ref<boolean>(false);
-    const twinFields = ref<NodeDetailsCard[]>();
+    const publicConfigFields = ref<NodeDetailsCard[]>();
 
     const mount = () => {
       loading.value = true;
-      twinFields.value = getNodeTwinDetailsCard();
+      publicConfigFields.value = getNodeTwinDetailsCard();
       loading.value = false;
     };
 
@@ -40,20 +40,22 @@ export default {
 
     const getNodeTwinDetailsCard = (): NodeDetailsCard[] => {
       return [
-        { name: "ID", value: props.node.twin.twinId.toString() },
+        { name: "IPv4", value: props.node.publicConfig.ipv4 },
         {
-          name: "Account ID",
-          value: props.node.twin.accountId,
+          name: "IPv6",
+          value: props.node.publicConfig.ipv6,
           icon: "mdi-content-copy",
           callback: copy,
-          hint: "Copy the account id to the clipboard.",
+          hint: "Copy the IPv6 to the clipboard.",
         },
-        { name: "Relay", value: props.node.twin.relay },
+        { name: "GW4", value: props.node.publicConfig.gw4 },
+        { name: "GW6", value: props.node.publicConfig.gw6 },
+        { name: "Domain", value: props.node.publicConfig.domain },
       ];
     };
 
     return {
-      twinFields,
+      publicConfigFields,
       loading,
     };
   },

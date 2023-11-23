@@ -1,18 +1,18 @@
 <template>
-  <card-details :loading="loading" title="Public Configs Details" :items="publicConfigFields" icon="mdi-cog" />
+  <card-details :loading="loading" title="Farm Details" :items="farmFields" icon="mdi-webpack" />
 </template>
 
 <script lang="ts">
 import type { GridNode } from "@threefold/gridproxy_client";
 import { onMounted, type PropType, ref } from "vue";
 
-import type { NodeDetailsCard } from "@/explorer/utils/types";
+import type { NodeDetailsCard } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import CardDetails from "./card_details.vue";
 
 export default {
-  name: "PublicConfigDetailsCard",
+  name: "FarmDetailsCard",
   components: { CardDetails },
   props: {
     node: {
@@ -23,11 +23,11 @@ export default {
 
   setup(props) {
     const loading = ref<boolean>(false);
-    const publicConfigFields = ref<NodeDetailsCard[]>();
+    const farmFields = ref<NodeDetailsCard[]>();
 
     const mount = () => {
       loading.value = true;
-      publicConfigFields.value = getNodeTwinDetailsCard();
+      farmFields.value = getFarmDetails();
       loading.value = false;
     };
 
@@ -38,24 +38,22 @@ export default {
       createCustomToast("Copied!", ToastType.success);
     };
 
-    const getNodeTwinDetailsCard = (): NodeDetailsCard[] => {
+    const getFarmDetails = (): NodeDetailsCard[] => {
       return [
-        { name: "IPv4", value: props.node.publicConfig.ipv4 },
+        { name: "ID", value: props.node.farmId.toString() },
+        { name: "Name", value: props.node.farm.name },
         {
-          name: "IPv6",
-          value: props.node.publicConfig.ipv6,
+          name: "Stellar Address",
+          value: props.node.farm.stellarAddress,
           icon: "mdi-content-copy",
           callback: copy,
-          hint: "Copy the IPv6 to the clipboard.",
+          hint: "Copy the stellar address to the clipboard.",
         },
-        { name: "GW4", value: props.node.publicConfig.gw4 },
-        { name: "GW6", value: props.node.publicConfig.gw6 },
-        { name: "Domain", value: props.node.publicConfig.domain },
       ];
     };
 
     return {
-      publicConfigFields,
+      farmFields,
       loading,
     };
   },

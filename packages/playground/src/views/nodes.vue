@@ -107,19 +107,18 @@ import debounce from "lodash/debounce.js";
 import { capitalize, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
-import NodeDetails from "@/explorer/components/node_details.vue";
-import NodesTable from "@/explorer/components/nodes_table.vue";
+import NodeDetails from "@/components/node_details.vue";
+import NodesTable from "@/components/nodes_table.vue";
 import router from "@/router";
-import { inputsInitializer } from "@/utils/filter_nodes";
-
-import { getQueries, requestNodes } from "../utils/helpers";
 import {
   type FilterInputs,
   type FilterOptions,
   type GridProxyRequestConfig,
   type MixedFilter,
   optionsInitializer,
-} from "../utils/types";
+} from "@/types";
+import { inputsInitializer } from "@/utils/filter_nodes";
+import { getQueries, requestNodes } from "@/utils/get_nodes";
 
 export default {
   components: {

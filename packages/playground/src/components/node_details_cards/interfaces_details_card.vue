@@ -13,7 +13,7 @@ import type { GridNode } from "@threefold/gridproxy_client";
 import { onMounted, type PropType, ref } from "vue";
 
 import { gqlClient } from "@/clients";
-import type { NodeDetailsCard } from "@/explorer/utils/types";
+import type { NodeDetailsCard } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import CardDetails from "./card_details.vue";

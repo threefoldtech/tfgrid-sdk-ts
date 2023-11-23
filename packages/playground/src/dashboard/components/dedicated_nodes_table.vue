@@ -97,8 +97,8 @@ import type { VDataTable } from "vuetify/labs/VDataTable";
 import { VDataTableServer } from "vuetify/labs/VDataTable";
 
 import { gridProxyClient } from "@/clients";
-import { toBytes } from "@/explorer/utils/helpers";
 import { useProfileManager } from "@/stores";
+import { toBytes } from "@/utils/get_nodes";
 import { getGrid } from "@/utils/grid";
 import { toGigaBytes } from "@/utils/helpers";
 import toTeraOrGigaOrPeta from "@/utils/toTeraOrGegaOrPeta";

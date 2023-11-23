@@ -121,11 +121,11 @@ import { onMounted, ref } from "vue";
 import { capitalize } from "vue";
 
 import { gridProxyClient } from "@/clients";
-import CardDetails from "@/explorer/components/node_details_cards/card_details.vue";
-import { getNodeStatusColor } from "@/explorer/utils/helpers";
-import type { NodeDetailsCard } from "@/explorer/utils/types";
+import CardDetails from "@/components/node_details_cards/card_details.vue";
 import { useProfileManager } from "@/stores";
+import type { NodeDetailsCard } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import { getNodeStatusColor } from "@/utils/get_nodes";
 import {
   getNodeAvailability,
   getNodeMintingFixupReceipts,

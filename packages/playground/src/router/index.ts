@@ -71,16 +71,7 @@ const router = createRouter({
         },
       ],
     },
-    {
-      path: "/explorer",
-      children: [
-        {
-          path: "stats",
-          component: () => import("../explorer/stats.vue"),
-          meta: { title: "Statistics" },
-        },
-      ],
-    },
+
     {
       path: "/solutions",
       children: [
@@ -511,8 +502,13 @@ const router = createRouter({
     },
     {
       path: "/explorer/nodes",
-      component: () => import("@/explorer/views/nodes.vue"),
+      component: () => import("@/views/nodes.vue"),
       meta: { title: "Explorer Nodes" },
+    },
+    {
+      path: "stats",
+      component: () => import("@/views/stats.vue"),
+      meta: { title: "Statistics" },
     },
     {
       path: "/:pathMatch(.*)*",

@@ -71,19 +71,18 @@ import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
 import { type PropType, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
-import { getNodeStatusColor } from "@/explorer/utils/helpers";
+import CountryDetailsCard from "@/components/node_details_cards/country_details_card.vue";
+import FarmDetailsCard from "@/components/node_details_cards/farm_details_card.vue";
+import GpuDetailsCard from "@/components/node_details_cards/gpu_details_card.vue";
+import InterfacesDetailsCard from "@/components/node_details_cards/interfaces_details_card.vue";
+import LocationDetailsCard from "@/components/node_details_cards/location_details_card.vue";
+import NodeDetailsCard from "@/components/node_details_cards/node_details_card.vue";
+import PublicConfigDetailsCard from "@/components/node_details_cards/public_config_details_card.vue";
+import TwinDetailsCard from "@/components/node_details_cards/twin_details_card.vue";
 import router from "@/router";
+import { type GridProxyRequestConfig, nodeInitializer } from "@/types";
+import { getNode, getNodeStatusColor } from "@/utils/get_nodes";
 
-import { getNode } from "../utils/helpers";
-import { type GridProxyRequestConfig, nodeInitializer } from "../utils/types";
-import CountryDetailsCard from "./node_details_cards/country_details_card.vue";
-import FarmDetailsCard from "./node_details_cards/farm_details_card.vue";
-import GpuDetailsCard from "./node_details_cards/gpu_details_card.vue";
-import InterfacesDetailsCard from "./node_details_cards/interfaces_details_card.vue";
-import LocationDetailsCard from "./node_details_cards/location_details_card.vue";
-import NodeDetailsCard from "./node_details_cards/node_details_card.vue";
-import PublicConfigDetailsCard from "./node_details_cards/public_config_details_card.vue";
-import TwinDetailsCard from "./node_details_cards/twin_details_card.vue";
 import NodeResourcesCharts from "./node_resources_charts.vue";
 
 export default {

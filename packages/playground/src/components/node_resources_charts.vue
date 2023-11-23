@@ -44,9 +44,9 @@
 import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
 import { type PropType, ref } from "vue";
 
-import { getNodeStatusColor } from "@/explorer/utils/helpers";
-import type { ResourceWrapper } from "@/explorer/utils/types";
+import type { ResourceWrapper } from "@/types";
 import { GrafanaStatistics } from "@/utils/get_metrics_url";
+import { getNodeStatusColor } from "@/utils/get_nodes";
 
 export default {
   props: {

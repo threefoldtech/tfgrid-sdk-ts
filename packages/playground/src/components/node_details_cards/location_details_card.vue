@@ -14,7 +14,7 @@
 import type { GridNode } from "@threefold/gridproxy_client";
 import { type PropType, ref } from "vue";
 
-import type { NodeDetailsCard } from "@/explorer/utils/types";
+import type { NodeDetailsCard } from "@/types";
 
 import CardDetails from "./card_details.vue";
 

@@ -6,8 +6,8 @@
 import type { GridNode } from "@threefold/gridproxy_client";
 import { onMounted, type PropType, ref } from "vue";
 
-import { getCountryCode } from "@/explorer/utils/helpers";
-import type { NodeDetailsCard } from "@/explorer/utils/types";
+import type { NodeDetailsCard } from "@/types";
+import { getCountryCode } from "@/utils/get_nodes";
 
 import CardDetails from "./card_details.vue";
 

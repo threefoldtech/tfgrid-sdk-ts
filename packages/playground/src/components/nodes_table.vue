@@ -58,8 +58,8 @@ import type { PropType } from "vue";
 import { capitalize } from "vue";
 import type { VDataTable } from "vuetify/labs/VDataTable";
 
-import { getNodeStatusColor, getNodeTypeColor } from "@/explorer/utils/helpers";
 import formatResourceSize from "@/utils/format_resource_size";
+import { getNodeStatusColor, getNodeTypeColor } from "@/utils/get_nodes";
 import toReadableDate from "@/utils/to_readable_data";
 
 export default {

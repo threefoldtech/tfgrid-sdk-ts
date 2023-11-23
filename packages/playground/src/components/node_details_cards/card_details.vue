@@ -67,7 +67,7 @@
 import type { GridNode } from "@threefold/gridproxy_client";
 import { capitalize, onMounted, type PropType, ref } from "vue";
 
-import type { NodeDetailsCard } from "@/explorer/utils/types";
+import type { NodeDetailsCard } from "@/types";
 
 export default {
   name: "CardDetails",

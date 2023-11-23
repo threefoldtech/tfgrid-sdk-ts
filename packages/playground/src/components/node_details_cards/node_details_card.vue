@@ -6,7 +6,7 @@
 import type { GridNode } from "@threefold/gridproxy_client";
 import { onMounted, type PropType, ref } from "vue";
 
-import type { NodeDetailsCard } from "@/explorer/utils/types";
+import type { NodeDetailsCard } from "@/types";
 import toHumanDate from "@/utils/date";
 import formatResourceSize from "@/utils/format_resource_size";
 
