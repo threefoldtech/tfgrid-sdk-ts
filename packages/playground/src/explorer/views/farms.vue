@@ -43,7 +43,7 @@
 <script lang="ts" setup>
 import type { Farm } from "@threefold/gridproxy_client";
 import debounce from "lodash/debounce.js";
-import { onMounted, ref, watch } from "vue";
+import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 import type { VDataTableHeader } from "../../types";
 import type { FilterFarmInputs } from "../../utils/filter_farms";
@@ -104,6 +104,9 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
 };
 onMounted(async () => {
   await updateFarms();
+});
+onBeforeUnmount(() => {
+  inputFiltersReset(filterFarmInputs.value);
 });
 
 const request = debounce(_getFarms, 1000);
