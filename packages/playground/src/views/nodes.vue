@@ -6,7 +6,7 @@
   </div>
 
   <view-layout>
-    <node-filters
+    <filters
       :form-disabled="isFormLoading"
       v-model="filterInputs"
       v-model:valid="isValidForm"
