@@ -36,7 +36,7 @@ class TwinDeploymentHandler {
       return await this.tfclient.contracts.createName({ name });
     } catch (e) {
       //TODO ERROR should be handled in tfchain
-      throw new TFChainError(`Failed to create name contract ${name} due to ${e}`);
+      throw new TFChainError(`Failed to create name contract ${name} due to ${e}.`);
     }
   }
 
