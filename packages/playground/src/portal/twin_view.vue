@@ -1,307 +1,297 @@
 <template>
   <div>
-    <v-container v-if="deleteRelay">
-      <v-dialog v-model="deleteRelay" max-width="600">
-        <v-card>
-          <v-toolbar color="primary" dark class="custom-toolbar">Edit Twin</v-toolbar>
-          <div class="text-h2 pa-10">
-            <v-text-field v-model="selectedRelay" outlined label="Relay" :error-messages="errorMsg"></v-text-field>
-          </div>
-          <v-card-actions class="justify-end pa-5">
-            <v-btn @click="deleteRelay = false" class="grey lighten-2 black--text">Close</v-btn>
-            <v-btn @click="UpdateRelay" class="primary white--text">Save</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-container>
+    <delete-relay-dialog
+      v-if="isDeleteRelay"
+      :is-delete="isDeleteRelay"
+      :relay="selectedRelay!"
+      :is-loading="isLoading"
+      :errorMessage="errorMessage"
+      @confirm="onConfirmDeleteRelay"
+      @cancel="onCancelDeleteRelay"
+    />
 
-    <v-container v-if="editingTwin">
-      <v-dialog v-model="editingTwin" max-width="600">
-        <v-card>
-          <v-toolbar color="primary" dark class="custom-toolbar">Edit Twin</v-toolbar>
-          <div class="text-h2 pa-10">
-            <v-text-field v-model="selectedRelay" outlined label="Relay" :error-messages="errorMsg"></v-text-field>
-          </div>
-          <v-card-actions class="justify-end pa-5">
-            <v-btn @click="editingTwin = false" class="grey lighten-2 black--text">Close</v-btn>
-            <v-btn @click="UpdateRelay" class="primary white--text">Save</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-    </v-container>
+    <vote-reminder-dialog
+      v-if="isOpenVotePopup"
+      :open-vote-popup="isOpenVotePopup"
+      :numberOfProposalsToVoteOn="numberOfProposalsToVoteOn"
+      @vote="redirectToDao"
+      @close="closeVotePopup"
+    />
 
-    <v-dialog v-model="openVotePopup" max-width="600">
-      <v-card>
-        <v-toolbar color="primary" dark class="custom-toolbar bold-text">Vote Reminder</v-toolbar>
-        <v-card-text>There are {{ numberOfProposalsToVoteOn }} active proposals you can vote on now</v-card-text>
-        <v-card-actions class="justify-end pa-5">
-          <v-btn @click="redirectToDao" variant="elevated" color="primary" class="mr-2 text-subtitle-2">Vote</v-btn>
-          <v-btn @click="openVotePopup = false" variant="outlined" color="anchor" class="mr-2 text-subtitle-2"
-            >Close</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <NewRelayDialog
+      v-if="isNewRelay"
+      :is-loading="isLoading"
+      :error-message="newErrorMessage"
+      :is-new-relay="isNewRelay"
+      @save="onAddNewRelay"
+      @cancel="cancelNewRelay"
+      @validate-relay="onValidateRelay"
+    />
+
     <div class="border px-4 pb-4 rounded position-relative mt-2">
       <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
         <v-icon size="30" class="pr-3">mdi-account-supervisor-outline</v-icon>
         <v-card-title class="pa-0">Twin Details</v-card-title>
       </v-card>
 
-      <v-container>
-        <v-row>
-          <v-col>
-            <v-card class="mx-auto" title="Twin ID" prepend-icon="mdi-id-card">
-              <template #subtitle>
-                <strong>{{ profileManager.profile?.twinId.toString() }}</strong>
-              </template>
-            </v-card>
-          </v-col>
-
-          <v-col>
-            <v-card class="mx-auto" title="Twin Address" prepend-icon="mdi-at">
-              <template #subtitle>
-                <div class="w-100 d-flex justify-space-between align-center">
-                  <strong>{{ profileManager.profile?.address }}</strong>
-                  <v-icon @click="copy(profileManager.profile?.address as string)"> mdi-content-copy </v-icon>
-                </div>
-              </template>
-            </v-card>
-          </v-col>
-
-          <v-col cols="12">
-            <v-card class="mx-auto" :title="relays.length ? 'Relays' : 'Relay'" prepend-icon="mdi-swap-horizontal">
-              <div class="pa-5">
-                <v-row>
-                  <v-col v-for="(relay, index) in relays" :key="relay">
-                    <v-card variant="tonal" class="w-100" :title="`Relay ${index + 1}`" prepend-icon="mdi-link-variant">
-                      <template #append>
-                        <v-btn
-                          v-if="selectedRelay != relay"
-                          title="Edit this relay"
-                          @click="selectedRelay = relay"
-                          elevation="0"
-                          icon="mdi-pencil"
-                        >
-                          <template #default>
-                            <v-icon color="info"></v-icon>
-                          </template>
-                        </v-btn>
-                        <v-btn
-                          v-if="selectedRelay != relay"
-                          title="Delete this relay"
-                          @click="deleteRelay = true"
-                          elevation="0"
-                          icon="mdi-trash-can"
-                        >
-                          <template #default>
-                            <v-icon color="error"></v-icon>
-                          </template>
-                        </v-btn>
-                      </template>
-                      <template #subtitle>
-                        <div v-if="selectedRelay && selectedRelay === relay">
-                          <v-text-field v-model="selectedRelay" />
-                          <v-btn
-                            class="mr-4"
-                            color="success"
-                            variant="tonal"
-                            title="Update"
-                            @click="selectedRelay = undefined"
-                            elevation="2"
-                          >
-                            Update
-                          </v-btn>
-                          <v-btn
-                            color="error"
-                            variant="outlined"
-                            title="Cancel"
-                            @click="selectedRelay = undefined"
-                            elevation="2"
-                          >
-                            Cancel
-                          </v-btn>
-                        </div>
-                        <strong v-else class="font-bold text-lg">{{ relay }}</strong>
-                      </template>
-                    </v-card>
-                  </v-col>
-                </v-row>
-              </div>
-              <v-card-actions class="justify-end mx-4 mb-4">
-                <v-btn width="10%" class="custom-button bg-primary" @click="editTwin">New Relay</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-container>
-
-      <!-- <v-card>
-        <v-list class="custom-list">
-          <v-row>
-            <v-col cols="1" sm="2" class="column-style my-4">
-              <v-list-item> ID </v-list-item>
-              <v-divider></v-divider>
-              <v-list-item> Address </v-list-item>
-              <v-divider></v-divider>
-              <v-list-item> {{ relays.length > 1 ? "Relays" : "Relay" }} </v-list-item>
-            </v-col>
-            <v-col cols="1" sm="10" class="my-4">
-              <v-list-item> {{ profileManager.profile?.twinId.toString() }} </v-list-item>
-              <v-divider></v-divider>
-              <v-list-item>
-                <div style="display: flex; justify-content: space-between; align-items: center">
-                  <span>{{ profileManager.profile?.address }}</span>
-                  <v-icon @click="copy(profileManager.profile?.address as string)"> mdi-content-copy </v-icon>
-                </div>
-              </v-list-item>
-              <v-divider></v-divider>
-              <v-list-item>
-                <v-select
-                  class="pa-0"
-                  hide-details="auto"
-                  variant="underlined"
-                  :readonly="true"
-                  v-model="selectedRelay"
-                  :items="relays"
-                ></v-select>
-              </v-list-item>
-            </v-col>
-          </v-row>
-        </v-list>
-        <v-card-actions class="justify-end mx-4 mb-4">
-          <v-btn class="custom-button bg-primary" @click="editTwin">Edit</v-btn>
-        </v-card-actions>
-      </v-card> -->
+      <twin-details-component
+        :relays="relays"
+        :is-loading="isLoading"
+        :errorMessage="errorMessage"
+        @copy-address="onCopyAddress"
+        @delete-relay="onDeleteRelay"
+        @update-relay="onUpdateRelay"
+        @new-relay="onNewRelay"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { generatePublicKey } from "@threefold/rmb_direct_client";
-import { onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 
-import router from "../router";
-import { useProfileManager } from "../stores";
+import router from "@/router";
+import { useProfileManager } from "@/stores";
+import type { Profile } from "@/stores/profile_manager";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import { getFarms } from "@/utils/get_farms";
+import { getGrid } from "@/utils/grid";
+
 import type { Farm } from "../types";
-import { createCustomToast, ToastType } from "../utils/custom_toast";
-import { getFarms } from "../utils/get_farms";
-import { getGrid } from "../utils/grid";
+import TwinDetailsComponent from "./components/twin_details.vue";
+import DeleteRelayDialog from "./dialogs/delete_relay_dialog.vue";
+import NewRelayDialog from "./dialogs/new_relay_dialog.vue";
+import VoteReminderDialog from "./dialogs/vote_reminder_dialog.vue";
+
 const profileManager = useProfileManager();
 
-const editingTwin = ref(false);
-const errorMsg = ref("");
-const openVotePopup = ref(false);
-const numberOfProposalsToVoteOn = ref(0);
-const userFarms = ref<Farm[]>();
-const activeProposalsUserHasVotedOn = ref(0);
+const isDeleteRelay = ref<boolean>(false);
+const isOpenVotePopup = ref<boolean>(false);
+const isLoading = ref<boolean>(false);
+const isNewRelay = ref<boolean>(false);
 
 const selectedRelay = ref<string>();
-const deleteRelay = ref<boolean>(false);
+const errorMessage = ref<string>();
+const newErrorMessage = ref<string>();
 const relays = ref<string[]>([]);
 
+const numberOfProposalsToVoteOn = ref(0);
+const activeProposalsUserHasVotedOn = ref(0);
+const userFarms = ref<Farm[]>();
+
 onMounted(async () => {
-  const profile = profileManager.profile!;
-  profile.relay = "r1.3x0.me_relay.dev.grid.tf";
-  relays.value = profile.relay.split("_");
-
-  console.log("relays.value", relays.value);
-
-  // relays.value.push()
-
-  const grid = await getGrid(profile);
-  if (!grid) {
-    createCustomToast("Fetch Grid Failed", ToastType.danger);
-
-    return;
-  }
-  userFarms.value = await getFarms(grid, { ownedBy: profile.twinId }, {});
-  if (!userFarms.value.length) {
-    return;
-  }
-  const proposals = grid.dao.get();
-  const userFarmId = userFarms.value.map(farm => farm.farmID);
-
-  const activeProposals = (await proposals)?.active;
-  const numberOfActiveProposals = activeProposals ? activeProposals.length : 0;
-
-  if (!numberOfActiveProposals) {
-    return;
-  }
-
-  activeProposals.forEach(proposal => {
-    if (proposal.nayes.filter(naye => userFarmId.includes(naye.farmId)).length) {
-      activeProposalsUserHasVotedOn.value++;
-    } else if (proposal.ayes.filter(aye => userFarmId.includes(aye.farmId)).length) {
-      activeProposalsUserHasVotedOn.value++;
+  const profile = profileManager.profile;
+  if (profile) {
+    // profile.relay = "r1.3x0.me_relay.dev.grid.tf"; // For testing.
+    relays.value = profile.relay.split("_");
+    const grid = await getGrid(profile);
+    if (!grid) {
+      createCustomToast("Fetch Grid Failed", ToastType.danger);
+      return;
     }
-  });
 
-  if (activeProposalsUserHasVotedOn.value == numberOfActiveProposals) {
+    userFarms.value = await getFarms(grid, { ownedBy: profile.twinId }, {});
+    if (!userFarms.value.length) {
+      return;
+    }
+
+    const proposals = grid.dao.get();
+    const userFarmId = userFarms.value.map(farm => farm.farmID);
+
+    const activeProposals = (await proposals)?.active;
+    const numberOfActiveProposals = activeProposals ? activeProposals.length : 0;
+
+    if (!numberOfActiveProposals) {
+      return;
+    }
+
+    activeProposals.forEach(proposal => {
+      if (proposal.nayes.filter(naye => userFarmId.includes(naye.farmId)).length) {
+        activeProposalsUserHasVotedOn.value++;
+      } else if (proposal.ayes.filter(aye => userFarmId.includes(aye.farmId)).length) {
+        activeProposalsUserHasVotedOn.value++;
+      }
+    });
+
+    if (activeProposalsUserHasVotedOn.value == numberOfActiveProposals) {
+      return;
+    }
+    numberOfProposalsToVoteOn.value = numberOfActiveProposals - activeProposalsUserHasVotedOn.value;
+    isOpenVotePopup.value = true;
+  }
+});
+
+function onCopyAddress(address: string) {
+  // An event from the twin details component emits when copy the profile address.
+  navigator.clipboard.writeText(address);
+  createCustomToast("Address copied to clipboard", ToastType.success);
+}
+
+function onNewRelay() {
+  // An event from the twin details component emits when requesting to add a new relay.
+  onCancelDeleteRelay();
+  isNewRelay.value = true;
+  errorMessage.value = undefined;
+}
+
+function onDeleteRelay(relay: string) {
+  // An event from the twin details component emits when selecting a relay for deletion.
+  selectedRelay.value = relay;
+  isDeleteRelay.value = true;
+}
+
+function onCancelDeleteRelay() {
+  // An event from the delete dialog component emits when canceling the selected relay.
+  selectedRelay.value = undefined;
+  errorMessage.value = undefined;
+  isDeleteRelay.value = false;
+}
+
+async function onConfirmDeleteRelay(relay: string) {
+  // An event from the delete dialog component emits when deleting the selected relay.
+  errorMessage.value = undefined;
+  isLoading.value = true;
+  if (relay) {
+    const profile = profileManager.profile;
+    errorMessage.value = undefined;
+    isLoading.value = true;
+    const relayIdx = relays.value.indexOf(relay);
+    if (relayIdx === -1) {
+      errorMessage.value = "Cannot find the selected relay in your relays, please try again.";
+      createCustomToast(errorMessage.value, ToastType.danger);
+      isLoading.value = false;
+      return;
+    }
+
+    if (profile) {
+      try {
+        // We should make the relays separated by underscores first.
+        const newRelays = [...relays.value];
+        newRelays.splice(relays.value.indexOf(relay), 1);
+        const newRelays_ = newRelays.join("_");
+        await updatedRelay(profile, newRelays_);
+      } catch (e) {
+        createCustomToast(`Could not delete relay or pk, Error: ${e}`, ToastType.danger);
+        errorMessage.value = (e as any).message;
+        isLoading.value = false;
+        return;
+      }
+      relays.value.splice(relays.value.indexOf(relay), 1);
+      createCustomToast(`Relay '${relay}' has been deleted successfully.`, ToastType.success);
+      onCancelDeleteRelay();
+      isLoading.value = false;
+    }
+  } else {
+    createCustomToast("Delete failed: Cannot find the selected relay.", ToastType.danger);
+    isLoading.value = false;
     return;
   }
-  numberOfProposalsToVoteOn.value = numberOfActiveProposals - activeProposalsUserHasVotedOn.value;
-  openVotePopup.value = true;
-});
+}
+
+async function onUpdateRelay(oldRelay: string, newRelay: string) {
+  // An event from the twin details component emits when updating the selected relay.
+  const profile = profileManager.profile;
+  errorMessage.value = undefined;
+  isLoading.value = true;
+  const relayIdx = relays.value.indexOf(oldRelay);
+  if (relayIdx === -1) {
+    errorMessage.value = "Cannot find the selected relay in your relays, please try again.";
+    createCustomToast(errorMessage.value, ToastType.danger);
+    isLoading.value = false;
+    return;
+  }
+
+  if (profile) {
+    try {
+      // We should make the relays separated by underscores first.
+      const newRelays = [...relays.value];
+      newRelays.splice(relays.value.indexOf(oldRelay), 1);
+      newRelays.splice(relayIdx, 0, newRelay);
+      const newRelays_ = newRelays.join("_");
+
+      await updatedRelay(profile, newRelays_);
+    } catch (e) {
+      createCustomToast(`Could not update relay or pk, Error: ${e}`, ToastType.danger);
+      errorMessage.value = (e as any).message;
+      isLoading.value = false;
+      throw new Error((e as any).message);
+    }
+
+    // Update the list of relays to be displayed in UI.
+    relays.value.splice(relays.value.indexOf(oldRelay), 1);
+    relays.value.splice(relayIdx, 0, newRelay);
+    createCustomToast(`Relay '${oldRelay}' has been updated to ${newRelay} successfully.`, ToastType.success);
+    isLoading.value = false;
+  }
+}
+
+async function onAddNewRelay(relay: string) {
+  // An event from the new relay component emits when adding new relay.
+  const profile = profileManager.profile;
+  errorMessage.value = undefined;
+  isLoading.value = true;
+
+  if (profile) {
+    try {
+      // We should make the relays separated by underscores first.
+      const newRelays = [...relays.value, relay];
+      const newRelays_ = newRelays.join("_");
+
+      await updatedRelay(profile, newRelays_);
+    } catch (e) {
+      createCustomToast(`Could not update relay or pk, Error: ${e}`, ToastType.danger);
+      newErrorMessage.value = (e as any).message;
+      isLoading.value = false;
+      throw new Error((e as any).message);
+    }
+
+    // Update the list of relays to be displayed in UI.
+    relays.value.push(relay);
+    createCustomToast(`Relays have been updated with new ${relay} relay successfully.`, ToastType.success);
+    isLoading.value = false;
+    isNewRelay.value = false;
+  }
+}
+
+async function updatedRelay(profile: Profile, newRelays: string) {
+  // Update the profile relay in tf-chain.
+  const pk = generatePublicKey(profile.mnemonic);
+  const grid = await getGrid(profile);
+  // TODO: Check the error here.
+  // await grid?.twins.update({ relay: newRelays });
+
+  profileManager.updateRelay(newRelays);
+  profileManager.updatePk(pk);
+}
+
+function onValidateRelay(relay: string) {
+  // An event from the new relay dialog component emits when updating the value of the entred relay to validate it.
+  const specialChars = /[`!@#$%^&*()_+\-=\\[\]{};':"\\|,<>\\/?~ ]/;
+  if (!relay === undefined || relay.trim().length === 0) {
+    newErrorMessage.value = "Please enter a valid relay.";
+  } else if (specialChars.test(relay)) {
+    newErrorMessage.value = "Relay cannot contain special chars or spaces.";
+  } else {
+    newErrorMessage.value = undefined;
+  }
+}
 
 function redirectToDao() {
   router.push({ path: "/portal/dao" });
 }
 
-function editTwin() {
-  editingTwin.value = true;
+function closeVotePopup() {
+  isOpenVotePopup.value = false;
 }
 
-async function UpdateRelay() {
-  const profile = profileManager.profile;
-  if (profile) {
-    try {
-      const pk = await generatePublicKey(profile.mnemonic);
-      const grid = await getGrid(profile);
-      await grid?.twins.update({ relay: profile.relay });
-      profileManager.updateRelay(profile.relay);
-      profileManager.updatePk(pk);
-    } catch (e) {
-      errorMsg.value = (e as any).message;
-      console.log("could not update relay or pk, Error: ", e);
-    }
-  }
-}
-
-function copy(id: string) {
-  navigator.clipboard.writeText(id);
-  createCustomToast("Address copied to clipboard", ToastType.success);
+function cancelNewRelay() {
+  isNewRelay.value = false;
 }
 </script>
 
-<style>
-.custom-container {
-  width: 80%;
-}
-
-.custom-list {
-  overflow: hidden;
-  font-size: 1rem;
-  padding: 10px;
-}
-
-.column-style {
-  border-right: 0.1px solid #8a8a8a;
-}
-
-.custom-button {
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.custom-toolbar {
-  font-size: 16px;
-  font-weight: bold;
-  padding-left: 10px;
-}
-
-.bold-text {
-  font-weight: 500;
-  padding-left: 1rem;
-}
-</style>
+<script lang="ts">
+export default defineComponent({
+  name: "TwinView",
+});
+</script>
