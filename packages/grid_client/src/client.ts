@@ -259,7 +259,7 @@ class GridClient {
 
     const module_name = namespaces[0];
     if (!this.modules.includes(module_name)) {
-      throw new GridClientErrors.GridClientError(`gridclient.${module_name} module doesn't exist`);
+      throw new GridClientErrors.GridClientError(`gridclient.${module_name} module doesn't exist.`);
     }
     const module = this[namespaces[0]];
 
