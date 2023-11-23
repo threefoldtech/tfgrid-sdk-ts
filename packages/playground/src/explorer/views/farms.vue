@@ -156,7 +156,6 @@ const inputFiltersReset = (nFltrNptsVal: FilterFarmInputs) => {
   nFltrNptsVal.farmId.value = undefined;
   nFltrNptsVal.name.value = undefined;
   nFltrNptsVal.totalIps.value = undefined;
-  nFltrNptsVal.pricingPolicyId.value = undefined;
 };
 const openSheet = (_e: any, { item }: any) => {
   openDialog(item.value);
@@ -169,12 +168,7 @@ const openDialog = (item: Farm) => {
 const closeDialog = () => {
   isDialogOpened.value = false;
 };
-async function reloadTable() {
-  await new Promise(resolve => {
-    setTimeout(resolve, 20000);
-  });
-  await updateFarms();
-}
+
 const headers: VDataTableHeader = [
   { title: "ID", key: "farmId" },
   { title: "Name", key: "name" },
