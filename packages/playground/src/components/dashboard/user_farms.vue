@@ -120,6 +120,8 @@ import { onMounted, ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import CardDetails from "@/explorer/components/node_details_cards/card_details.vue";
+import { useGrid, useProfileManager } from "@/stores";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import {
   generateNodeSummary,
   generateReceipt,
@@ -128,8 +130,6 @@ import {
   type NodeInterface,
 } from "@/utils/node";
 
-import { useGrid, useProfileManager } from "../../../stores";
-import { createCustomToast, ToastType } from "../../../utils/custom_toast";
 import PublicIPsTable from "./public_ips_table.vue";
 
 export default {

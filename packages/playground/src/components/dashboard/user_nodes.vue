@@ -120,9 +120,12 @@ import moment from "moment";
 import { onMounted, ref } from "vue";
 import { capitalize } from "vue";
 
+import { gridProxyClient } from "@/clients";
 import CardDetails from "@/explorer/components/node_details_cards/card_details.vue";
 import { getNodeStatusColor } from "@/explorer/utils/helpers";
 import type { NodeDetailsCard } from "@/explorer/utils/types";
+import { useProfileManager } from "@/stores";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import {
   getNodeAvailability,
   getNodeMintingFixupReceipts,
@@ -130,9 +133,6 @@ import {
   type NodeInterface,
 } from "@/utils/node";
 
-import { gridProxyClient } from "../../../clients";
-import { useProfileManager } from "../../../stores";
-import { createCustomToast, ToastType } from "../../../utils/custom_toast";
 import NodeMintingDetails from "./NodeMintingDetails.vue";
 import PublicConfig from "./public_config.vue";
 import SetExtraFee from "./set_extra_fee.vue";

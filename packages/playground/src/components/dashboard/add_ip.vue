@@ -110,8 +110,8 @@ import { ref, watch } from "vue";
 
 import { IPType } from "@/utils/types";
 
-import { useGrid } from "../../../stores";
-import { createCustomToast, ToastType } from "../../../utils/custom_toast";
+import { useGrid } from "../../stores";
+import { createCustomToast, ToastType } from "../../utils/custom_toast";
 export default {
   name: "AddIP",
   props: {

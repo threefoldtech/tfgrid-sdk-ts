@@ -67,7 +67,7 @@ import { onMounted, ref } from "vue";
 import { useGrid } from "@/stores";
 import { IPType } from "@/utils/types";
 
-import { createCustomToast, ToastType } from "../../../utils/custom_toast";
+import { createCustomToast, ToastType } from "../../utils/custom_toast";
 import AddIP from "./add_ip.vue";
 
 export default {

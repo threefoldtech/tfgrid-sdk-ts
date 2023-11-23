@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import NodesTable from "@/portal/components/dedicated_nodes_table.vue";
+import NodesTable from "@/dashboard/components/dedicated_nodes_table.vue";
 
 export default {
   name: "Dedicated Node",

@@ -62,8 +62,8 @@
 <script lang="ts">
 import { onMounted, ref, watch } from "vue";
 
-import { useGrid } from "../../../stores";
-import { createCustomToast, ToastType } from "../../../utils/custom_toast";
+import { useGrid } from "../../stores";
+import { createCustomToast, ToastType } from "../../utils/custom_toast";
 
 export default {
   name: "SetExtraFee",

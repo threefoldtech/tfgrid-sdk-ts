@@ -57,8 +57,8 @@
 <script lang="ts">
 import { ref } from "vue";
 
-import { useGrid } from "../../../stores";
-import { createCustomToast, ToastType } from "../../../utils/custom_toast";
+import { useGrid } from "../../stores";
+import { createCustomToast, ToastType } from "../../utils/custom_toast";
 
 export default {
   name: "CreateFarm",

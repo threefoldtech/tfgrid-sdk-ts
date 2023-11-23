@@ -142,8 +142,8 @@ import { gridProxyClient } from "@/clients";
 import { useFormRef } from "@/hooks/form_validator";
 import type { IPublicConfig } from "@/utils/types";
 
-import { useGrid } from "../../../stores";
-import { createCustomToast, ToastType } from "../../../utils/custom_toast";
+import { useGrid } from "../../stores";
+import { createCustomToast, ToastType } from "../../utils/custom_toast";
 
 export default {
   name: "AddPublicConfig",
