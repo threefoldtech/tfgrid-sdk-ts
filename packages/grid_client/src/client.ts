@@ -184,7 +184,7 @@ class GridClient {
       await send("get", urlJoin(urls.rmbProxy, "version"), "", {});
     } catch (err) {
       console.log(err.message);
-      (err as Error).message = formatErrorMessage("Failed to connect to Grid proxy server", err);
+      (err as Error).message = formatErrorMessage("Failed to connect to Grid proxy server.", err);
       throw err;
     }
 
