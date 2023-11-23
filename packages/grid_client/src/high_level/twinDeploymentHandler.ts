@@ -58,7 +58,7 @@ class TwinDeploymentHandler {
       await this.rmb.request([node_twin_id], `zos.deployment.${twinDeployment.operation}`, payload);
     } catch (e) {
       (e as Error).message = formatErrorMessage(
-        `Failed to ${twinDeployment.operation} the deployment on node ${twinDeployment.nodeId}`,
+        `Failed to ${twinDeployment.operation} the deployment on node ${twinDeployment.nodeId}.`,
         e,
       );
       throw e;
