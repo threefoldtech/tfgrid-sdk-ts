@@ -1,5 +1,5 @@
 import type { InputFilterType } from "../types";
-import { isAlphanumeric, isInt, isNumeric, min, validateResourceMaxNumber } from "./validators";
+import { isAlphanumeric, isInt, isNumeric, isString, min, validateResourceMaxNumber } from "./validators";
 
 export type FilterFarmInputs = {
   farmId: InputFilterType;
@@ -23,7 +23,7 @@ export const inputsInitializer: FilterFarmInputs = {
   name: {
     label: "Farm Name",
     placeholder: "e.g myfarm",
-    rules: [[isAlphanumeric("Farm name should be made of either numbers or letters")]],
+    rules: [[isString("Farm name should be made of either numbers or letters")]],
     type: "text",
   },
   pricingPolicyId: {
