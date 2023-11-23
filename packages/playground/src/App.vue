@@ -230,16 +230,24 @@ const routes: AppRoute[] = [
   },
   {
     icon: "mdi-database-search-outline",
-    title: "Explorer",
+    title: "Statistics",
     items: [
       {
         title: "Statistics",
         icon: "mdi-chart-scatter-plot",
-        route: "/explorer/stats",
+        route: "/stats",
       },
-      { title: "Nodes", icon: "mdi-access-point", route: "/explorer/nodes" },
-      { title: "Farms", icon: "mdi-lan-connect", route: "/explorer/farms" },
     ],
+  },
+  {
+    icon: "mdi-access-point",
+    title: "Nodes",
+    items: [{ title: "Nodes", icon: "mdi-access-point", route: "/nodes" }],
+  },
+  {
+    icon: "mdi-access-point",
+    title: "Farms",
+    items: [{ title: "Farms", icon: "mdi-lan-connect", route: "/farms" }],
   },
   {
     icon: "mdi-toolbox-outline",
