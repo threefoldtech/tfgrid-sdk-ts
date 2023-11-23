@@ -43,8 +43,7 @@
 <script lang="ts" setup>
 import { nextTick, onMounted, onUnmounted, type PropType, type Ref, ref, watch } from "vue";
 
-import { useInputRef } from "@/hooks/input_validator";
-
+import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores/profile_manager";
 import type { Farm } from "../types";
 import { getFarms, getFarmsPages } from "../utils/get_farms";
@@ -251,6 +250,7 @@ async function resetSearch() {
 <script lang="ts">
 import type { FarmFilterOptions } from "@threefold/grid_client";
 import { debounce } from "lodash";
+
 
 import { gridProxyClient } from "@/clients";
 import { ValidatorStatus } from "@/hooks/form_validator";
