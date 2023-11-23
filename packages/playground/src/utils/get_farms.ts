@@ -1,8 +1,7 @@
-import type { FarmFilterOptions, FarmInfo, GridClient } from "@threefold/grid_client";
-
-import type { Farm } from "@/types";
+import type { FarmFilterOptions, GridClient } from "@threefold/grid_client";
 
 import { gqlClient, gridProxyClient } from "../clients";
+import type { Farm } from "../types";
 
 export interface GetFarmsOptions {
   exclusiveFor?: string;
@@ -22,7 +21,12 @@ export async function getFarms(
   filters: FarmFilterOptions,
   options: GetFarmsOptions = {},
 ): Promise<Farm[]> {
-  let farms = await grid.capacity.filterFarms({ ...filters }).catch(() => []);
+  let farms;
+  if (filters) {
+    farms = await grid.capacity.filterFarms({ ...filters }).catch(() => []);
+  } else {
+    farms = await grid.capacity.getAllFarms().catch(() => []);
+  }
 
   if (options.exclusiveFor && !filters.publicIp) {
     const blockedFarms = await getBlockedFarmSet(options.exclusiveFor);
@@ -37,7 +41,11 @@ export async function getBlockedFarmSet(exclusiveFor: string): Promise<Set<numbe
     { totalCount: true },
     {
       orderBy: ["id_ASC"],
-      where: { deploymentData_contains: exclusiveFor, state_eq: "Created", numberOfPublicIPs_eq: 0 },
+      where: {
+        deploymentData_contains: exclusiveFor,
+        state_eq: "Created",
+        numberOfPublicIPs_eq: 0,
+      },
     },
   );
 
@@ -45,7 +53,11 @@ export async function getBlockedFarmSet(exclusiveFor: string): Promise<Set<numbe
     { nodeID: true },
     {
       limit: totalCount,
-      where: { deploymentData_contains: exclusiveFor, state_eq: "Created", numberOfPublicIPs_eq: 0 },
+      where: {
+        deploymentData_contains: exclusiveFor,
+        state_eq: "Created",
+        numberOfPublicIPs_eq: 0,
+      },
     },
   );
 

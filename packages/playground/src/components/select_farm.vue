@@ -43,8 +43,7 @@
 <script lang="ts" setup>
 import { nextTick, onMounted, onUnmounted, type PropType, type Ref, ref, watch } from "vue";
 
-import { useInputRef } from "@/hooks/input_validator";
-
+import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores/profile_manager";
 import type { Farm } from "../types";
 import { getFarms, getFarmsPages } from "../utils/get_farms";

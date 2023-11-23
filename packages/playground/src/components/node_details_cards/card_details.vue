@@ -42,7 +42,7 @@
                   }}
                 </p>
                 <v-icon
-                  v-if="item.value && item.value.length"
+                  v-if="item.value && item.value.length && item.value != '-'"
                   class="ml-1"
                   v-bind="props"
                   :icon="item.icon"
