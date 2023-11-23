@@ -49,7 +49,6 @@ interface NodeInfo {
   hasGPU: boolean;
   extraFee: number;
   rentedByTwinId: number;
-  inDedicatedFarm: boolean;
   rentContractId: number;
 }
 interface PublicConfig {
