@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/presearch.png"
   >
     <template #title>Deploy a Presearch Instance</template>
@@ -81,6 +82,7 @@
             exclusive-for="research"
             v-model="farm"
             v-model:loading="loadingFarm"
+            v-model:search="farmName"
           />
 
           <SelectNode
@@ -149,6 +151,7 @@ const rootFilesystemSize = rootFs(cpu, memory);
 const loadingFarm = ref(false);
 const dockerDiskSize = 10;
 const farm = ref() as Ref<Farm>;
+const farmName = ref();
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
 const network = ref();

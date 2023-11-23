@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/vm.png"
   >
     <template #title> Deploy a Full Virtual Machine </template>
@@ -88,6 +89,7 @@
             }"
             v-model="farm"
             v-model:loading="loadingFarm"
+            v-model:search="farmName"
           />
           <SelectNode
             v-model="selectedNode"
@@ -173,7 +175,7 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 const solution = ref() as Ref<SolutionFlavor>;
-
+const farmName = ref();
 const images: VmImage[] = [
   {
     name: "Ubuntu-22.04",

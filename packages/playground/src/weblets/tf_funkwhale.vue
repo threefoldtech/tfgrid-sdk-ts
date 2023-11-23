@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/funkwhale.png"
   >
     <template #title>Deploy a Funkwhale Instance </template>
@@ -114,6 +115,7 @@
             }"
             v-model="farm"
             v-model:loading="loadingFarm"
+            v-model:search="farmName"
           />
 
           <SelectNode
@@ -170,6 +172,7 @@ const email = ref("");
 const password = ref(generatePassword(12));
 const solution = ref() as Ref<SolutionFlavor>;
 const farm = ref() as Ref<Farm>;
+const farmName = ref();
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/funkwhale-dec21.flist",

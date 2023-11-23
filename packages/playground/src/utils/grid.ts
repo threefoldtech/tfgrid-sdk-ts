@@ -1,4 +1,4 @@
-import { BackendStorageType, GridClient, type NetworkEnv } from "@threefold/grid_client";
+import { BackendStorageType, GridClient, NetworkEnv } from "@threefold/grid_client";
 
 import type { Profile } from "../stores/profile_manager";
 
@@ -12,7 +12,7 @@ export async function getGrid(profile: Pick<Profile, "mnemonic">, projectName?: 
     backendStorageType: BackendStorageType.tfkvstore,
     projectName,
 
-    ...(import.meta.env.DEV
+    ...(import.meta.env.DEV && network !== NetworkEnv.custom
       ? {}
       : {
           substrateURL: window.env.SUBSTRATE_URL,

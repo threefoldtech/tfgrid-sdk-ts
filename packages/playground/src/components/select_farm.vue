@@ -15,6 +15,9 @@
           :model-value="shouldBeUpdated ? undefined : farm"
           @update:model-value="farm = $event"
           :error-messages="!loading && !farms.length ? 'No farms where found with the specified resources.' : undefined"
+          v-model:search="search"
+          append-inner-icon="mdi-refresh"
+          @click:append-inner="resetSearch"
         >
           <template v-slot:append-item v-if="page !== -1">
             <div class="px-4 mt-4">
@@ -38,7 +41,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted, type PropType, type Ref, ref, watch } from "vue";
+import { nextTick, onMounted, onUnmounted, type PropType, type Ref, ref, watch } from "vue";
 
 import { useInputRef } from "@/hooks/input_validator";
 
@@ -70,21 +73,32 @@ const props = defineProps({
 const emits = defineEmits<{
   (event: "update:modelValue", value?: Farm): void;
   (event: "update:loading", value: boolean): void;
+  (event: "update:search", value?: string): void;
 }>();
 
 const SIZE = 20;
 const page = ref();
-
 const farmInput = useInputRef();
 const profileManager = useProfileManager();
 const country = ref<string>();
-
+const search = ref<string>();
+const searchInput = ref<string>();
 const farm = ref<Farm>();
 const farmManager = useFarm();
 watch([farm, country], ([f, c]) => {
   farmManager?.setFarmId(f?.farmID);
   emits("update:modelValue", f ? { farmID: f.farmID, name: f.name, country: c ?? undefined } : undefined);
 });
+
+watch(
+  search,
+  debounce(async (value, oldValue) => {
+    if (value !== oldValue && value && value?.length > 2 && oldValue != undefined && oldValue !== "") {
+      await resetPages();
+    }
+  }, 2000),
+);
+
 const loading = ref(false);
 const loadingNodes = ref(farmManager?.getLoading());
 const delay = ref();
@@ -129,14 +143,24 @@ function prepareFilters(filters: Filters, twinId: number): FarmFilterOptions {
 
 async function loadFarms() {
   farmInput.value?.setStatus(ValidatorStatus.Pending);
-
   loading.value = true;
   const oldFarm = farm.value;
   const grid = await getGrid(profileManager.profile!);
-  const filters = props.filters;
-  const _farms = await getFarms(grid!, prepareFilters(props.filters, grid!.twinId), {
-    exclusiveFor: props.exclusiveFor,
-  });
+  let _farms: Farm[] = [];
+  if (searchInput.value && searchInput.value?.length > 0) {
+    const { data } = await gridProxyClient.farms.list({ nameContains: searchInput.value });
+    _farms = data.map((_farm: any) => {
+      return {
+        name: _farm.name,
+        farmID: _farm.farmId,
+        country: _farm.country,
+      };
+    });
+  } else {
+    _farms = await getFarms(grid!, prepareFilters(props.filters, grid!.twinId), {
+      exclusiveFor: props.exclusiveFor,
+    });
+  }
   selectedPages.value.push(page.value);
   if (!_farms.length && selectedPages.value.length !== pagesCount.value) {
     page.value = setRandomPage();
@@ -153,9 +177,6 @@ async function loadFarms() {
 
   if (!farm.value) {
     farm.value = farms.value[0];
-  }
-
-  if (!farm.value) {
     farmInput.value.setStatus(initialized ? ValidatorStatus.Invalid : ValidatorStatus.Init);
     if (!initialized) {
       initialized = true;
@@ -176,6 +197,7 @@ async function resetPages() {
   loading.value = true;
   farmInput.value?.setStatus(ValidatorStatus.Pending);
   selectedPages.value = [];
+  searchInput.value = search.value;
   const grid = await getGrid(profileManager.profile!);
   if (!grid) {
     console.log("can't get the grid");
@@ -217,12 +239,20 @@ watch([loading, shouldBeUpdated], async ([l, s]) => {
     await resetPages();
   }, 2000);
 });
+
+async function resetSearch() {
+  search.value = "";
+  await resetPages();
+  search.value = farm.value?.name;
+  emits("update:search", search.value ?? undefined);
+}
 </script>
 
 <script lang="ts">
 import type { FarmFilterOptions } from "@threefold/grid_client";
-import { nextTick } from "vue";
+import { debounce } from "lodash";
 
+import { gridProxyClient } from "@/clients";
 import { ValidatorStatus } from "@/hooks/form_validator";
 
 import SelectCountry from "./select_country.vue";
