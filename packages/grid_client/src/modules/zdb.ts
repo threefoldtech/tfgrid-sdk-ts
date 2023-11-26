@@ -1,3 +1,5 @@
+import { ValidationError } from "@threefold/types";
+
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
 import { expose } from "../helpers/expose";
@@ -29,7 +31,7 @@ class ZdbsModule extends BaseModule {
     });
     for (const instance of options.zdbs) {
       if (zdbs_names.includes(instance.name))
-        throw Error(`Another zdb with the same name ${instance.name} already exists`);
+        throw new ValidationError(`Another zdb with the same name ${instance.name} already exists.`);
       zdbs_names.push(instance.name);
 
       const twinDeployment = await this.zdb.create(
@@ -53,7 +55,7 @@ class ZdbsModule extends BaseModule {
   @checkBalance
   async deploy(options: ZDBSModel) {
     if (await this.exists(options.name)) {
-      throw Error(`Another zdb deployment with the same name ${options.name} already exists`);
+      throw new ValidationError(`Another zdb deployment with the same name ${options.name} already exists.`);
     }
     events.emit("logs", `Start creating the ZDB deployment with name ${options.name}`);
     const twinDeployments = await this._createDeployment(options);
@@ -112,7 +114,7 @@ class ZdbsModule extends BaseModule {
   @checkBalance
   async update(options: ZDBSModel) {
     if (!(await this.exists(options.name))) {
-      throw Error(`There is no zdb deployment with name: ${options.name}`);
+      throw new ValidationError(`There is no zdb deployment with name: ${options.name}.`);
     }
     const oldDeployments = await this._get(options.name);
     const twinDeployments = await this._createDeployment(options);
@@ -124,12 +126,12 @@ class ZdbsModule extends BaseModule {
   @checkBalance
   async add_zdb(options: AddZDBModel) {
     if (!(await this.exists(options.deployment_name))) {
-      throw Error(`There is no zdb deployment with name: ${options.deployment_name}`);
+      throw new ValidationError(`There is no zdb deployment with name: ${options.deployment_name}.`);
     }
     const oldDeployments = await this._get(options.deployment_name);
     if (this.workloadExists(options.name, oldDeployments))
-      throw Error(
-        `There is another zdb with the same name "${options.name}" in this deployment ${options.deployment_name}`,
+      throw new ValidationError(
+        `There is another zdb with the same name "${options.name}" in this deployment ${options.deployment_name}.`,
       );
     events.emit("logs", `Start adding ZDB instance: ${options.name} to deployment: ${options.deployment_name}`);
     const twinDeployment = await this.zdb.create(
@@ -152,7 +154,7 @@ class ZdbsModule extends BaseModule {
   @checkBalance
   async delete_zdb(options: DeleteZDBModel) {
     if (!(await this.exists(options.deployment_name))) {
-      throw Error(`There is no zdb deployment with name: ${options.deployment_name}`);
+      throw new ValidationError(`There is no zdb deployment with name: ${options.deployment_name}.`);
     }
     events.emit("logs", `Start deleting ZDB instance: ${options.name} from deployment: ${options.deployment_name}`);
     return await this._deleteInstance(this.zdb, options.deployment_name, options.name);

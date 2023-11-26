@@ -1,3 +1,4 @@
+import { GridClientErrors } from "@threefold/types";
 import { Expose } from "class-transformer";
 import { IsBoolean, IsDefined, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from "class-validator";
 import uuid4 from "uuid4";
@@ -101,10 +102,10 @@ class FarmerBot {
       if (nodeId) {
         return nodeId;
       } else {
-        throw new Error("Couldn't find a suitable node. Please try again.");
+        throw new GridClientErrors.Farms.NodeSelectionError("Couldn't find a suitable node. Please try again.");
       }
     } else {
-      throw new Error(node.error);
+      throw new GridClientErrors.Farms.FarmerBotError(node.error);
     }
   }
 
@@ -135,7 +136,7 @@ class FarmerBot {
     const pingedFarm = await this.rmb.request([farm.twinId], "execute_job", payload, 20);
 
     if (pingedFarm.error) {
-      throw Error(pingedFarm.error);
+      throw new GridClientErrors.Farms.FarmerBotError(pingedFarm.error);
     } else {
       return pingedFarm;
     }
