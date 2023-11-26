@@ -136,7 +136,7 @@ class TFContracts extends Contracts {
 
       return response["data"] as GqlContracts;
     } catch (err) {
-      (err as Error).message = formatErrorMessage(`Error listing contracts by twin id ${options.twinId}`, err);
+      (err as Error).message = formatErrorMessage(`Error listing contracts by twin id ${options.twinId}.`, err);
       throw err;
     }
   }
