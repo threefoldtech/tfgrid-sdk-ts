@@ -1,44 +1,30 @@
 import { CertificationType, type GridNode, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
 import { capitalize } from "vue";
 
-import type { AsyncRule, SyncRule } from "../../components/input_validator.vue";
-
-export type NodeInputFilterType = {
-  label: string;
-  placeholder: string;
-  value?: string | undefined;
-  rules?: [syncRules: SyncRule[], asyncRules?: AsyncRule[]];
-  error?: string;
-  type: string;
-};
+import type { FilterFarmInputs } from "@/utils/filter_farms";
+import type { FilterNodeInputs } from "@/utils/filter_nodes";
 
 // The input filters<nodeId, farmIds..etc> and the option filters<status, gpu...etc>
-export type MixedFilter = {
-  inputs: FilterInputs;
-  options: FilterOptions;
-};
 
 // Status, GPU, Gateway, and any other option should be add here.
-export type FilterOptions = {
+export type NodeFilterOptions = {
   status: NodeStatus;
   gpu: boolean | undefined;
   gateway: boolean | undefined;
   page: number;
   size: number;
 };
-
-// Input fields
-export type FilterInputs = {
-  nodeId: NodeInputFilterType;
-  farmIds: NodeInputFilterType;
-  farmName: NodeInputFilterType;
-  country: NodeInputFilterType;
-  freeSru: NodeInputFilterType;
-  freeHru: NodeInputFilterType;
-  freeMru: NodeInputFilterType;
+type TableSortOption = {
+  key: string | undefined;
+  order: boolean | "desc" | "asc" | undefined;
+};
+export type FarmFilterOptions = {
+  page?: number;
+  size?: number;
+  sortBy?: TableSortOption[];
 };
 
-export const optionsInitializer: FilterOptions = {
+export const nodeOptionsInitializer: NodeFilterOptions = {
   gateway: undefined,
   gpu: undefined,
   page: 1,
@@ -125,4 +111,14 @@ export const nodeInitializer: GridNode = {
   stats: nodeStatsInitializer,
   cards: [],
   num_gpu: 0,
+};
+// The input filters<nodeId, farmIds..etc> and the option filters<status, gpu...etc>
+export type MixedNodeFilter = {
+  inputs: FilterNodeInputs;
+  options: NodeFilterOptions;
+};
+
+export type MixedFarmFilter = {
+  inputs?: FilterFarmInputs;
+  options?: FarmFilterOptions;
 };
