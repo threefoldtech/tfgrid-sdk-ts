@@ -1,5 +1,5 @@
 import { Contract, ExtrinsicResult } from "@threefold/tfchain_client";
-import { BaseError, GridClientErrors, TFChainErrors, TimeoutError, ValidationError } from "@threefold/types";
+import { BaseError, GridClientErrors, TFChainError, TimeoutError, ValidationError } from "@threefold/types";
 
 import { RMB } from "../clients";
 import { TFClient } from "../clients/tf-grid/client";
@@ -36,7 +36,7 @@ class TwinDeploymentHandler {
       return await this.tfclient.contracts.createName({ name });
     } catch (e) {
       //TODO ERROR should be handled in tfchain
-      throw new TFChainErrors.TFChainError(`Failed to create name contract ${name} due to ${e}.`);
+      throw new TFChainError(`Failed to create name contract ${name} due to ${e}.`);
     }
   }
 

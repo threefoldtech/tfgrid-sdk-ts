@@ -1,6 +1,6 @@
 import { Keyring } from "@polkadot/keyring";
 import { waitReady } from "@polkadot/wasm-crypto";
-import { BaseError, TFChainErrors, ValidationError } from "@threefold/types";
+import { BaseError, TFChainError, ValidationError } from "@threefold/types";
 import axios from "axios";
 import { generateMnemonic } from "bip39";
 import { Buffer } from "buffer";
@@ -148,7 +148,7 @@ class TFChain implements blockchainInterface {
         e.message = formatErrorMessage(`Could not update account mnemonics`, e);
         throw e;
       }
-      throw new TFChainErrors.TFChainError(`Could not update account mnemonics: ${e}`);
+      throw new TFChainError(`Could not update account mnemonics: ${e}`);
     }
     return client.address;
   }
@@ -225,7 +225,7 @@ class TFChain implements blockchainInterface {
         e.message = formatErrorMessage(`Could not complete transfer transaction`, e);
         throw e;
       }
-      throw new TFChainErrors.TFChainError(`Could not complete transfer transaction: ${e}`);
+      throw new TFChainError(`Could not complete transfer transaction: ${e}`);
     }
   }
   @expose
@@ -248,7 +248,7 @@ class TFChain implements blockchainInterface {
         e.message = formatErrorMessage(`Could not complete transfer transaction`, e);
         throw e;
       }
-      throw new TFChainErrors.TFChainError(`Could not complete transfer transaction: ${e}`);
+      throw new TFChainError(`Could not complete transfer transaction: ${e}`);
     }
   }
 
@@ -301,7 +301,7 @@ class TFChain implements blockchainInterface {
       await new Promise(f => setTimeout(f, 1000));
     }
     if (balance.free <= 0) {
-      throw new TFChainErrors.TFChainError("Couldn't activate the newly created account.");
+      throw new TFChainError("Couldn't activate the newly created account.");
     }
     await (
       await client.termsAndConditions.accept({ documentLink: "https://library.threefold.me/info/legal/#/" })

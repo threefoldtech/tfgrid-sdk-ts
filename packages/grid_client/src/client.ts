@@ -1,5 +1,5 @@
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
-import { GridClientErrors, TFChainErrors, ValidationError } from "@threefold/types";
+import { GridClientErrors, TFChainError, ValidationError } from "@threefold/types";
 import type AwaitLock from "await-lock";
 import { validateMnemonic } from "bip39";
 import * as PATH from "path";
@@ -137,7 +137,7 @@ class GridClient {
       }
     } catch (e) {
       console.log(e);
-      throw new TFChainErrors.TFChainError(
+      throw new TFChainError(
         `Couldn't get the user twin for the provided mnemonic on ${this.clientOptions.network} network.`,
       );
     }
