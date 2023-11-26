@@ -35,8 +35,8 @@ export async function loadProfile(grid: GridClient): Promise<Profile> {
 }
 
 export async function getMetadata(grid: GridClient): Promise<{ [key: string]: any }> {
-  const metadata = await grid.kvstore.get({ key: "metadata" });
   try {
+    const metadata = await grid.kvstore.get({ key: "metadata" });
     return JSON.parse(metadata);
   } catch {
     return {};
