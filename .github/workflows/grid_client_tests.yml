@@ -1,8 +1,8 @@
 name: Grid Client Tests
 
 on:
-  push:
-    branches: [Development_fix_gird_tests_yml]
+  schedule:
+    - cron: 0 0 * * *
   workflow_dispatch:
     inputs:
       network:
