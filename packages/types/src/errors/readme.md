@@ -1,1 +1,65 @@
 # TF SDK Errors
+
+Errors in this package are divided into 11 [module](./modules.ts) each module have its own specified errors.
+
+## Error Modules
+
+### Generic
+
+This module contains the generic errors like Validation and TimeOut.
+
+Also, in some cases, we have an error that comes from one of the clients, but we don't know what the error is exactly; in this case, we use a generic error like `RMBError` to mention that this error comes from the RMB client.
+
+#### Generic Errors
+
+0. TFChainError
+1. GridClientError
+2. ValidationError
+3. TimeoutError
+4. ConnectionError
+5. RMBError
+6. InvalidResponse
+7. RequestError
+
+### Grid Client Errors
+
+This section will have all errors that related to GridClient
+
+#### Farm `tfGridFarm`
+
+For Errors that comes from farms or related to farms resources and farmer bot we are using this module
+
+0. InvalidResourcesError
+1. FarmerBotError
+2. NodeSelectionError
+
+#### Node `tfGridNode`
+
+For Errors that comes from node or related to node resources and node network
+
+0. UnavailableNodeError
+1. InvalidResourcesError
+2. DiskAllocationError
+3. AccessNodeError
+4. GPUNotFoundError
+5. GPULockedError
+
+#### Workloads `tfGridWorkloads`
+
+For Errors that related to workloads and deployments operations
+
+0. WorkloadDeleteError
+1. WorkloadDeployError
+2. WorkloadUpdateError
+3. WorkloadCreateError
+
+### TFChain Errors
+
+This section includes all errors in the used [TF Chain pallets](https://github.com/threefoldtech/tfchain/tree/development/substrate-node/pallets)
+
+- [Dao](./tfchain/dao.ts) `dao`
+- [TFKVStore](./tfchain/kvstore.ts) `tfkvStore`
+- [SmartContract](./tfchain/smart_contract.ts) `smartContractModule`
+- [TFGrid](./tfchain/tfgrid.ts) `tfgridModule`
+- [TFTBridge](./tfchain/tft_bridge.ts) `tfgridModule`
+- [TFTPrice](./tfchain/tft_price.ts) `tftPriceModule`
