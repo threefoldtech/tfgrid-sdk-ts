@@ -1,6 +1,13 @@
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
 import { QueryClient } from "@threefold/tfchain_client";
-import { BaseError, GridClientErrors, RequestError, TFChainError, ValidationError } from "@threefold/types";
+import {
+  BaseError,
+  GridClientError,
+  GridClientErrors,
+  RequestError,
+  TFChainError,
+  ValidationError,
+} from "@threefold/types";
 import { default as PrivateIp } from "private-ip";
 import urlJoin from "url-join";
 
@@ -301,7 +308,7 @@ class Nodes {
           (e as Error).message = formatErrorMessage(`Couldn't get Node with ID ${nodeId}.`, e);
           throw e;
         }
-        throw new GridClientErrors.GridClientError(`Couldn't get Node with ID ${nodeId} due to ${e}`);
+        throw new GridClientError(`Couldn't get Node with ID ${nodeId} due to ${e}`);
       });
   }
 

@@ -1,4 +1,4 @@
-import { GridClientErrors, ValidationError } from "@threefold/types";
+import { GridClientError, ValidationError } from "@threefold/types";
 
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
@@ -129,7 +129,7 @@ class Blockchain implements blockchainInterface {
     if (!this.current_account) throw new ValidationError(`No account is selected. Please select an account first.`);
 
     if (this.blockchain_type != options.blockchain_type_dest)
-      throw new GridClientErrors.GridClientError(`Transfer between blockchains isn't implemented yet.`);
+      throw new GridClientError(`Transfer between blockchains isn't implemented yet.`);
 
     const modified_options: BlockchainPayModel = {
       name: this.current_account,

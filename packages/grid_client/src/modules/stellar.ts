@@ -1,4 +1,4 @@
-import { GridClientErrors, RequestError, ValidationError } from "@threefold/types";
+import { GridClientError, RequestError, ValidationError } from "@threefold/types";
 import axios, { AxiosError } from "axios";
 import { Buffer } from "buffer";
 import * as PATH from "path";
@@ -163,7 +163,7 @@ class Stellar implements blockchainInterface {
       const oldSecret = options.secret;
       options.secret = secret;
       await this.init(options);
-      throw new GridClientErrors.GridClientError(`Couldn't import wallet with the secret ${oldSecret} due to: ${e}`);
+      throw new GridClientError(`Couldn't import wallet with the secret ${oldSecret} due to: ${e}`);
     }
   }
 
@@ -277,7 +277,7 @@ class Stellar implements blockchainInterface {
       console.log("Success! View the transaction at: ", transactionResult._links.transaction.href);
       return transactionResult._links.transaction.href;
     } catch (e) {
-      throw new GridClientErrors.GridClientError(`An error has occurred: ${e}`);
+      throw new GridClientError(`An error has occurred: ${e}`);
     }
   }
 
