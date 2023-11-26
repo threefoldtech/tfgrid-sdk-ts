@@ -8,11 +8,15 @@ export async function getGrid(mnemonic: string) {
     mnemonic,
     network: config.network as NetworkEnv,
     backendStorageType: BackendStorageType.tfkvstore,
-    relayURL: config.relay,
-    graphqlURL: config.graphqlUrl,
-    substrateURL: config.wsUrl,
-    activationURL: config.activationServiceUrl,
-    proxyURL: config.gridproxyUrl,
+    ...((config.network as NetworkEnv) !== NetworkEnv.custom
+      ? {}
+      : {
+          relayURL: config.relay,
+          graphqlURL: config.graphqlUrl,
+          substrateURL: config.wsUrl,
+          activationURL: config.activationServiceUrl,
+          proxyURL: config.gridproxyUrl,
+        }),
   });
 
   await grid.connect();
@@ -24,11 +28,15 @@ export function activateAccountAndCreateTwin(mnemonic: string) {
     network: config.network as NetworkEnv,
     mnemonic,
     storeSecret: mnemonic,
-    relayURL: config.relay,
-    graphqlURL: config.graphqlUrl,
-    substrateURL: config.wsUrl,
-    activationURL: config.activationServiceUrl,
-    proxyURL: config.gridproxyUrl,
+    ...((config.network as NetworkEnv) !== NetworkEnv.custom
+      ? {}
+      : {
+          relayURL: config.relay,
+          graphqlURL: config.graphqlUrl,
+          substrateURL: config.wsUrl,
+          activationURL: config.activationServiceUrl,
+          proxyURL: config.gridproxyUrl,
+        }),
   });
   grid._connect();
   const relay = grid.getDefaultUrls(config.network as NetworkEnv).relay.slice(6);
@@ -91,11 +99,15 @@ export function createAccount() {
     network,
     mnemonic: "",
     storeSecret: "test",
-    relayURL: config.relay,
-    graphqlURL: config.graphqlUrl,
-    substrateURL: config.wsUrl,
-    activationURL: config.activationServiceUrl,
-    proxyURL: config.gridproxyUrl,
+    ...((config.network as NetworkEnv) !== NetworkEnv.custom
+      ? {}
+      : {
+          relayURL: config.relay,
+          graphqlURL: config.graphqlUrl,
+          substrateURL: config.wsUrl,
+          activationURL: config.activationServiceUrl,
+          proxyURL: config.gridproxyUrl,
+        }),
   });
   grid._connect();
   const relay = grid.getDefaultUrls(network).relay.slice(6);
