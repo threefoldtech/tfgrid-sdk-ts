@@ -60,7 +60,7 @@ class BackendStorage {
       const storage = require("./localstorage");
       this.storage = new storage.LocalStorage();
     } else {
-      throw new ValidationError("Unsupported type for backend");
+      throw new ValidationError("Unsupported type for backend.");
     }
   }
 

@@ -30,11 +30,11 @@ class Nodes {
   async reserve(options: RentContractCreateModel) {
     const rentContractId = await this.getRentContractId({ nodeId: options.nodeId });
     if (rentContractId) {
-      throw new GridClientErrors.Nodes.UnavailableNodeError(`Node is already rented`);
+      throw new GridClientErrors.Nodes.UnavailableNodeError(`Node is already rented.`);
     }
     try {
       const res = await (await this.client.contracts.createRent(options)).apply();
-      events.emit("logs", `Rent contract with id: ${res.contractId} has been created`);
+      events.emit("logs", `Rent contract with id: ${res.contractId} has been created.`);
       return res;
     } catch (e) {
       //TODO Errors should be handled in tfchain

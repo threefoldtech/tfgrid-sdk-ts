@@ -29,23 +29,23 @@ class TwinDeploymentHandler {
     if (id) {
       const c = await this.tfclient.contracts.get({ id });
       if (c && c.twinId !== this.config.twinId) {
-        throw new ValidationError(`Name contract with name ${name} is already reserved`);
+        throw new ValidationError(`Name contract with name ${name} is already reserved.`);
       }
     }
     try {
       return await this.tfclient.contracts.createName({ name });
     } catch (e) {
       //TODO ERROR should be handled in tfchain
-      throw new TFChainError(`Failed to create name contract ${name} due to ${e}`);
+      throw new TFChainError(`Failed to create name contract ${name} due to ${e}.`);
     }
   }
 
   async deleteNameContract(name: string) {
     const c = await this.tfclient.contracts.getContractIdByName({ name });
     if (!c) {
-      events.emit("logs", `Couldn't find a name contract with name ${name} to delete`);
+      events.emit("logs", `Couldn't find a name contract with name ${name} to delete.`);
     } else {
-      events.emit("logs", `Deleting name contract with name: ${name} and id: ${c}`);
+      events.emit("logs", `Deleting name contract with name: ${name} and id: ${c}.`);
       return await this.tfclient.contracts.cancel({ id: c });
     }
   }
@@ -58,7 +58,7 @@ class TwinDeploymentHandler {
       await this.rmb.request([node_twin_id], `zos.deployment.${twinDeployment.operation}`, payload);
     } catch (e) {
       (e as Error).message = formatErrorMessage(
-        `Failed to ${twinDeployment.operation} the deployment on node ${twinDeployment.nodeId}`,
+        `Failed to ${twinDeployment.operation} the deployment on node ${twinDeployment.nodeId}.`,
         e,
       );
       throw e;
@@ -77,7 +77,7 @@ class TwinDeploymentHandler {
     let state = false;
     if (workload.result.state === "error") {
       throw new GridClientErrors.Workloads.WorkloadDeployError(
-        `Failed to deploy ${workload.type} with name ${workload.name} on node ${nodeId} due to: ${workload.result.message}`,
+        `Failed to deploy ${workload.type} with name ${workload.name} on node ${nodeId} due to: ${workload.result.message}.`,
       );
     } else if (workload.result.state === "ok") {
       state = true;
@@ -115,7 +115,7 @@ class TwinDeploymentHandler {
       }
       await new Promise(f => setTimeout(f, 2000));
     }
-    throw new TimeoutError(`Deployment with contract_id: ${contract_id} failed to be ready after ${timeout} minutes`);
+    throw new TimeoutError(`Deployment with contract_id: ${contract_id} failed to be ready after ${timeout} minutes.`);
   }
 
   async waitForDeployments(twinDeployments: TwinDeployment[], timeout = this.config.deploymentTimeoutMinutes) {
@@ -303,7 +303,7 @@ class TwinDeploymentHandler {
         throw new GridClientErrors.Farms.InvalidResourcesError(
           `Farm ${farmId} doesn't have enough public IPs: requested IPs=${farmIPs.get(
             farmId,
-          )}, available IPs=${freeIps}`,
+          )}, available IPs=${freeIps}.`,
         );
       }
     }
@@ -355,7 +355,7 @@ class TwinDeploymentHandler {
         }))
       ) {
         throw new GridClientErrors.Nodes.InvalidResourcesError(
-          `Node ${twinDeployment.nodeId} doesn't have enough resources: sru=${sru}, mru=${mru}`,
+          `Node ${twinDeployment.nodeId} doesn't have enough resources: sru=${sru}, mru=${mru} .`,
         );
       }
       if (workloads.length && (rootfsDisks.length || ssdDisks.length || hddDisks.length)) {
@@ -575,7 +575,7 @@ class TwinDeploymentHandler {
     } catch (e) {
       await this.rollback(contracts);
       if (e instanceof BaseError) throw e;
-      throw new GridClientErrors.GridClientError(`Couldn't handle twin Deployment due to: ${e}`);
+      throw new GridClientErrors.GridClientError(`Couldn't handle twin Deployment due to: ${e} .`);
     }
     return resultContracts;
   }

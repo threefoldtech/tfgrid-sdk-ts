@@ -34,7 +34,7 @@ class TFKVStore extends KVStore {
       try {
         return this.decrypt(encryptedValue);
       } catch (e) {
-        throw new GridClientErrors.GridClientError(`Couldn't decrypt key: ${options.key}`);
+        throw new GridClientErrors.GridClientError(`Couldn't decrypt key: ${options.key}.`);
       }
     }
     return encryptedValue;

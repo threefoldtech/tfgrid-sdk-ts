@@ -432,7 +432,9 @@ class BaseModule {
       });
 
       if (pubIPOldWorkload != "" && twinDeployments.length == 0)
-        throw new GridClientErrors.Workloads.WorkloadUpdateError(`Cannot remove a public IP of an existent deployment`);
+        throw new GridClientErrors.Workloads.WorkloadUpdateError(
+          `Cannot remove a public IP of an existent deployment.`,
+        );
 
       oldDeployment = await this.deploymentFactory.fromObj(oldDeployment);
       const node_id = await this._getNodeIdFromContractId(name, oldDeployment.contract_id);
@@ -454,11 +456,11 @@ class BaseModule {
         if (pubIPTwinWorkload != pubIPOldWorkload) {
           if (pubIPTwinWorkload == "")
             throw new GridClientErrors.Workloads.WorkloadUpdateError(
-              `Cannot remove a public IP of an existent deployment`,
+              `Cannot remove a public IP of an existent deployment.`,
             );
           if (pubIPOldWorkload == "")
             throw new GridClientErrors.Workloads.WorkloadUpdateError(
-              `Cannot add a public IP to an existent deployment`,
+              `Cannot add a public IP to an existent deployment.`,
             );
         }
       }
@@ -582,7 +584,7 @@ class BaseModule {
         return contracts;
       }
     }
-    throw new ValidationError(`Instance with name ${name} is not found`);
+    throw new ValidationError(`Instance with name ${name} is not found.`);
   }
 
   async _delete(name: string) {

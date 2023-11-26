@@ -50,10 +50,10 @@ class Network {
 
   constructor(public name: string, public ipRange: string, public config: GridClientConfig) {
     if (Addr(ipRange).prefix !== 16) {
-      throw new ValidationError("Network ip_range should have a prefix 16");
+      throw new ValidationError("Network ip_range should have a prefix 16.");
     }
     if (!this.isPrivateIP(ipRange)) {
-      throw new ValidationError("Network ip_range should be a private range");
+      throw new ValidationError("Network ip_range should be a private range.");
     }
     this.backendStorage = new BackendStorage(
       config.backendStorageType,
@@ -81,7 +81,7 @@ class Network {
 
   async addAccess(node_id: number, ipv4: boolean): Promise<string> {
     if (!this.nodeExists(node_id)) {
-      throw new ValidationError(`Node ${node_id} does not exist in the network. Please add it first`);
+      throw new ValidationError(`Node ${node_id} does not exist in the network. Please add it first.`);
     }
     events.emit("logs", `Adding access to node ${node_id}`);
     const accessNodes = await this.capacity.getAccessNodes(this.config.twinId);
@@ -101,7 +101,7 @@ class Network {
       endpoint = `[${accessNodes[node_id]["ipv6"].split("/")[0]}]:${nodeWGListeningPort}`;
     } else {
       throw new GridClientErrors.Nodes.InvalidResourcesError(
-        `Couldn't find ipv4 or ipv6 in the public config of node ${node_id} `,
+        `Couldn't find ipv4 or ipv6 in the public config of node ${node_id}.`,
       );
     }
 
@@ -212,7 +212,7 @@ class Network {
     events.emit("logs", `Loading network ${this.name}`);
     const network = await this.getNetwork();
     if (network["ip_range"] !== this.ipRange) {
-      throw new ValidationError(`The same network name ${this.name} with a different ip range already exists`);
+      throw new ValidationError(`The same network name ${this.name} with a different ip range already exists.`);
     }
 
     await this.tfClient.connect();
@@ -334,7 +334,7 @@ class Network {
         ip = ip.increment();
       }
     } else {
-      throw new ValidationError("node_id or subnet must be specified");
+      throw new ValidationError("node_id or subnet must be specified.");
     }
     if (ip) {
       ip = ip.toString().split("/")[0];
@@ -344,13 +344,13 @@ class Network {
           return ip;
         }
       }
-      throw new ValidationError(`node_id is not in the network. Please add it first`);
+      throw new ValidationError(`node_id is not in the network. Please add it first.`);
     }
   }
   validateUserIP(node_id: number, ip_address = "") {
     const reserved_ips = this.getNodeReservedIps(node_id);
     if (reserved_ips.includes(ip_address)) {
-      throw new ValidationError(`private ip ${ip_address} is being used please select another ip or leave it empty`);
+      throw new ValidationError(`private ip ${ip_address} is being used please select another ip or leave it empty.`);
     }
 
     const nodeSubnet = this.getNodeSubnet(node_id);
@@ -429,7 +429,7 @@ class Network {
       this.reservedSubnets.push(subnet);
       return subnet;
     } else {
-      throw new ValidationError(`subnet ${subnet} is not free`);
+      throw new ValidationError(`subnet ${subnet} is not free.`);
     }
   }
 

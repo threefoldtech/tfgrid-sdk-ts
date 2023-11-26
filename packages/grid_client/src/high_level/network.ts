@@ -18,7 +18,7 @@ class NetworkHL extends HighLevelBase {
 
     const workload = await network.addNode(nodeId, networkMetadata, description);
     if (!workload) {
-      throw new ValidationError(`Node ${nodeId} is already exist on network ${networkName}`);
+      throw new ValidationError(`Node ${nodeId} already exists on network ${networkName}.`);
     }
 
     const twinDeployments: TwinDeployment[] = [];

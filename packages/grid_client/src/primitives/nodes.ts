@@ -105,7 +105,7 @@ class Nodes {
       .query(body, { nodeId: node_id })
       .then(response => {
         if (response["data"]["nodes"]["length"] === 0) {
-          throw new ValidationError(`Couldn't find a node with id: ${node_id}`);
+          throw new ValidationError(`Couldn't find a node with id: ${node_id}.`);
         }
         return response["data"]["nodes"][0]["twinID"];
       })
@@ -132,7 +132,7 @@ class Nodes {
       page++;
     } while (nodes.length);
     if (Object.keys(accessNodes).length === 0) {
-      throw new GridClientErrors.Nodes.InvalidResourcesError("Couldn't find any node with public config");
+      throw new GridClientErrors.Nodes.InvalidResourcesError("Couldn't find any node with public config.");
     }
     return accessNodes;
   }
@@ -143,7 +143,7 @@ class Nodes {
       .get({ id: contractId })
       .then(contract => {
         if (!contract.contractType.nodeContract)
-          throw new ValidationError(`Couldn't get node id for this contract ${contractId}. It's not a node contract`);
+          throw new ValidationError(`Couldn't get node id for this contract ${contractId}. It's not a node contract.`);
         return contract.contractType.nodeContract.nodeId;
       })
       .catch(err => {
@@ -233,7 +233,7 @@ class Nodes {
     return send("get", urlJoin(r, `/nodes?farm_id=${farmId}&size=${nodesCount}`), "", {})
       .then(res => {
         if (res) return res;
-        else throw new ValidationError(`The farm with id ${farmId}: doesn't have any nodes`);
+        else throw new ValidationError(`The farm with id ${farmId}: doesn't have any nodes.`);
       })
       .catch(e => {
         (e as Error).message = formatErrorMessage(`Error getting nodes by farm ID ${farmId}`, e);
@@ -298,7 +298,7 @@ class Nodes {
           throw new ValidationError(`Node: ${nodeId} is not found`);
         }
         if (e instanceof BaseError) {
-          (e as Error).message = formatErrorMessage(`Couldn't get Node with ID ${nodeId}`, e);
+          (e as Error).message = formatErrorMessage(`Couldn't get Node with ID ${nodeId}.`, e);
           throw e;
         }
         throw new GridClientErrors.GridClientError(`Couldn't get Node with ID ${nodeId} due to ${e}`);
@@ -485,7 +485,7 @@ class Nodes {
     disks.forEach(disk => {
       if (!this.allocateDiskToPools(pools, disk)) {
         throw new Error(
-          `Cannot fit the required ${type.toUpperCase()} disk with size ${(disk / 1024 ** 3).toFixed(2)} GB`,
+          `Cannot fit the required ${type.toUpperCase()} disk with size ${(disk / 1024 ** 3).toFixed(2)} GB.`,
         );
       }
       this.sortArrayDesc(pools);
@@ -540,7 +540,7 @@ class Nodes {
         `${(error as Error).message}, on Node ${nodeId} with disk pools:
          SSD:  ${ssdPools.map(disk => (disk / 1024 ** 3).toFixed(2).toString() + "GB ")} 
          HDD:  ${hddPools.map(disk => (disk / 1024 ** 3).toFixed(2).toString() + "GB ")}
-    Please select another Node\n`,
+    Please select another Node.\n`,
       );
     }
   }

@@ -63,7 +63,7 @@ class VMHL extends HighLevelBase {
 
     if (!(await this.nodes.nodeHasResources(nodeId, { sru: totalDisksSize, mru: memory / 1024 }))) {
       throw new GridClientErrors.Nodes.InvalidResourcesError(
-        `Node ${nodeId} doesn't have enough resources: sru=${totalDisksSize}, mru=${memory / 1024}`,
+        `Node ${nodeId} doesn't have enough resources: sru=${totalDisksSize}, mru=${memory / 1024} .`,
       );
     }
 
@@ -85,7 +85,7 @@ class VMHL extends HighLevelBase {
       const qsfsZdbs = await qsfsZdbsModule.getZdbs(d.qsfs_zdbs_name);
       if (qsfsZdbs.groups.length === 0 || qsfsZdbs.meta.length === 0) {
         throw new ValidationError(
-          `Couldn't find a qsfs zdbs with name ${d.qsfs_zdbs_name}. Please create one with qsfs_zdbs module`,
+          `Couldn't find a qsfs zdbs with name ${d.qsfs_zdbs_name}. Please create one with qsfs_zdbs module.`,
         );
       }
       let minimalShards = Math.ceil((qsfsZdbs.groups.length * 3) / 5);
@@ -93,13 +93,13 @@ class VMHL extends HighLevelBase {
       if (d.minimal_shards) {
         minimalShards = d.minimal_shards;
         if (minimalShards >= qsfsZdbs.groups.length) {
-          throw new ValidationError("Minimal shards can't be more than the number of zdbs in qsfs_zdbs deployment");
+          throw new ValidationError("Minimal shards can't be more than the number of zdbs in qsfs_zdbs deployment.");
         }
       }
       if (d.expected_shards) {
         expectedShards = d.expected_shards;
         if (expectedShards > qsfsZdbs.groups.length) {
-          throw new ValidationError("Expected shards can't be more than the number of zdbs in qsfs_zdbs deployment");
+          throw new ValidationError("Expected shards can't be more than the number of zdbs in qsfs_zdbs deployment.");
         }
       }
       const groups = new ZdbGroup();
@@ -142,23 +142,25 @@ class VMHL extends HighLevelBase {
       const nodeTwinId = await this.nodes.getNodeTwinId(nodeId);
       const gpuList = await this.rmb.request([nodeTwinId], "zos.gpu.list", "");
       if (gpuList.length <= 0) {
-        throw new GridClientErrors.Nodes.InvalidResourcesError(`The selected node ${nodeId} doesn't have GPU card`);
+        throw new GridClientErrors.Nodes.InvalidResourcesError(`The selected node ${nodeId} doesn't have GPU card.`);
       }
       for (const g of gpus) {
         const found = gpuList.filter(item => item.id === g);
         if (found.length === 0) {
-          throw new GridClientErrors.Nodes.GPUNotFoundError(`Couldn't find the GPU with id: "${g}" in node: ${nodeId}`);
+          throw new GridClientErrors.Nodes.GPUNotFoundError(
+            `Couldn't find the GPU with id: "${g}" in node: ${nodeId}.`,
+          );
         }
         if (found[0].contract !== 0) {
           throw new GridClientErrors.Nodes.GPULockedError(
-            `This GPU: "${g}" is currently in use by another VM with contract id: ${found[0].contract}`,
+            `This GPU: "${g}" is currently in use by another VM with contract id: ${found[0].contract}.`,
           );
         }
       }
 
       const node = await this.nodes.getNode(nodeId);
       if (node.rentedByTwinId !== this.config.twinId) {
-        throw new GridClientErrors.Nodes.UnavailableNodeError(`This node ${nodeId} is not rented by the current user`);
+        throw new GridClientErrors.Nodes.UnavailableNodeError(`This node ${nodeId} is not rented by the current user.`);
       }
     }
 
@@ -205,7 +207,7 @@ class VMHL extends HighLevelBase {
       if (accessNodeId) {
         if (!filteredAccessNodes.includes(accessNodeId))
           throw new GridClientErrors.Nodes.AccessNodeError(
-            `Node ${accessNodeId} is not an access node or maybe it's down`,
+            `Node ${accessNodeId} is not an access node or maybe it's down.`,
           );
 
         access_node_id = accessNodeId;

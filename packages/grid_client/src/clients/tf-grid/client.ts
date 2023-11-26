@@ -28,7 +28,7 @@ class TFClient extends Client {
     super({ url, mnemonicOrSecret: mnemonic, keypairType });
 
     if (!storeSecret) {
-      throw new ValidationError("Couldn't create TFClient without store secret");
+      throw new ValidationError("Couldn't create TFClient without store secret.");
     }
   }
 }

@@ -184,7 +184,7 @@ class GridClient {
       await send("get", urlJoin(urls.rmbProxy, "version"), "", {});
     } catch (err) {
       console.log(err.message);
-      (err as Error).message = formatErrorMessage("Failed to connect to Grid proxy server", err);
+      (err as Error).message = formatErrorMessage("Failed to connect to Grid proxy server.", err);
       throw err;
     }
 
@@ -193,7 +193,7 @@ class GridClient {
       await gql.query("query { __typename }");
     } catch (err) {
       console.log(err.message);
-      (err as Error).message = formatErrorMessage("Failed to connect to Graphql server", err);
+      (err as Error).message = formatErrorMessage("Failed to connect to Graphql server.", err);
       throw err;
     }
   }
@@ -252,23 +252,23 @@ class GridClient {
   async invoke(message, args) {
     const namespaces = message.split(".");
     if (namespaces.length > 2) {
-      throw new ValidationError(`Message must include 2 parts only not ${namespaces.length}`);
+      throw new ValidationError(`Message must include 2 parts only not ${namespaces.length}.`);
     }
 
     const method = namespaces.pop();
 
     const module_name = namespaces[0];
     if (!this.modules.includes(module_name)) {
-      throw new GridClientErrors.GridClientError(`gridclient.${module_name} module doesn't exist`);
+      throw new GridClientErrors.GridClientError(`gridclient.${module_name} module doesn't exist.`);
     }
     const module = this[namespaces[0]];
 
     if (typeof module[method] !== "function") {
-      throw new GridClientErrors.GridClientError(`${module_name}.${method} function doesn't exist`);
+      throw new GridClientErrors.GridClientError(`${module_name}.${method} function doesn't exist.`);
     }
 
     if (isExposed(module, method) == false) {
-      throw new GridClientErrors.GridClientError(`gridclient.${module_name}.${method} cannot be exposed`);
+      throw new GridClientErrors.GridClientError(`gridclient.${module_name}.${method} cannot be exposed.`);
     }
     return await module[method].apply(module, [args]);
   }

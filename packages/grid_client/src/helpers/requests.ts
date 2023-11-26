@@ -13,7 +13,7 @@ async function sendWithFullResponse(method: Method, url: string, body: string, h
   } catch (e) {
     const { response } = e as AxiosError;
     const errorMessage = (response?.data as { error: string }).error;
-    throw new RequestError(`HTTP request failed ${errorMessage ? "due to " + errorMessage : ""}`, response?.status);
+    throw new RequestError(`HTTP request failed ${errorMessage ? "due to " + errorMessage : ""}.`, response?.status);
   }
 }
 

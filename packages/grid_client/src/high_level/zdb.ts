@@ -23,7 +23,7 @@ class ZdbHL extends HighLevelBase {
   ): Promise<TwinDeployment> {
     if (!(await this.nodes.nodeHasResources(node_id, { hru: disk_size }))) {
       throw new GridClientErrors.Nodes.InvalidResourcesError(
-        `Node ${node_id} doesn't have enough resources: hru=${disk_size}`,
+        `Node ${node_id} doesn't have enough resources: hru=${disk_size} .`,
       );
     }
     events.emit("logs", `Creating a zdb on node: ${node_id}`);

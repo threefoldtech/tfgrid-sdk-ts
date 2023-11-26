@@ -7,7 +7,7 @@ async function validateObject(obj) {
   // errors is an array of validation errors
   if (errors.length > 0) {
     console.log("Validation failed. errors:", errors);
-    throw new ValidationError(`Validation failed. errors: ${errors}`);
+    throw new ValidationError(`Validation failed. errors: ${errors}.`);
   }
 }
 // used as decorator
