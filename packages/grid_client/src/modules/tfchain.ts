@@ -87,7 +87,7 @@ class TFChain implements blockchainInterface {
   async save(name: string, mnemonic: string) {
     const [path, data] = await this._load();
     if (data[name]) {
-      throw new ValidationError(`An account with the same name ${name} already exists`);
+      throw new ValidationError(`An account with the same name ${name} already exists.`);
     }
     const updateOperations = await this.backendStorage.update(path, name, mnemonic);
     await this.saveIfKVStoreBackend(updateOperations);
@@ -129,7 +129,7 @@ class TFChain implements blockchainInterface {
   @validateInput
   async update(options: TfchainWalletInitModel) {
     if (!(await this.exist(options))) {
-      throw new ValidationError(`Couldn't find an account with name ${options.name}`);
+      throw new ValidationError(`Couldn't find an account with name ${options.name}.`);
     }
     const client = new TFClient(this.substrateURL, options.secret, this.storeSecret, this.keypairType);
     await client.connect();
@@ -182,7 +182,7 @@ class TFChain implements blockchainInterface {
   @validateInput
   async assets(options: BlockchainGetModel): Promise<BlockchainAssetsModel> {
     if (!(await this.exist(options))) {
-      throw new ValidationError(`Couldn't find an account with name ${options.name}`);
+      throw new ValidationError(`Couldn't find an account with name ${options.name}.`);
     }
     const mnemonics = await this.getMnemonics(options.name);
     const client = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
@@ -256,7 +256,7 @@ class TFChain implements blockchainInterface {
   @validateInput
   async delete(options: BlockchainDeleteModel) {
     if (!(await this.exist(options))) {
-      throw new ValidationError(`Couldn't find an account with name ${options.name}`);
+      throw new ValidationError(`Couldn't find an account with name ${options.name}.`);
     }
     const path = this.getPath();
     const updateOperations = await this.backendStorage.update(path, options.name, "", StorageUpdateAction.delete);
@@ -268,7 +268,7 @@ class TFChain implements blockchainInterface {
   @validateInput
   async create(options: TfchainCreateModel): Promise<BlockchainCreateResultModel> {
     if (await this.exist({ name: options.name })) {
-      throw new ValidationError(`An account with the same name ${options.name} already exists`);
+      throw new ValidationError(`An account with the same name ${options.name} already exists.`);
     }
     const createdAccount = await this.createAccount(options.relay as string);
     await this.init({ name: options.name, secret: createdAccount.mnemonic });
@@ -301,7 +301,7 @@ class TFChain implements blockchainInterface {
       await new Promise(f => setTimeout(f, 1000));
     }
     if (balance.free <= 0) {
-      throw new TFChainError("Couldn't activate the newly created account");
+      throw new TFChainError("Couldn't activate the newly created account.");
     }
     await (
       await client.termsAndConditions.accept({ documentLink: "https://library.threefold.me/info/legal/#/" })

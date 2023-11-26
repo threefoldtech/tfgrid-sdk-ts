@@ -252,7 +252,7 @@ class GridClient {
   async invoke(message, args) {
     const namespaces = message.split(".");
     if (namespaces.length > 2) {
-      throw new ValidationError(`Message must include 2 parts only not ${namespaces.length}`.);
+      throw new ValidationError(`Message must include 2 parts only not ${namespaces.length}.`);
     }
 
     const method = namespaces.pop();
@@ -264,11 +264,11 @@ class GridClient {
     const module = this[namespaces[0]];
 
     if (typeof module[method] !== "function") {
-      throw new GridClientErrors.GridClientError(`${module_name}.${method} function doesn't exist`);
+      throw new GridClientErrors.GridClientError(`${module_name}.${method} function doesn't exist.`);
     }
 
     if (isExposed(module, method) == false) {
-      throw new GridClientErrors.GridClientError(`gridclient.${module_name}.${method} cannot be exposed`);
+      throw new GridClientErrors.GridClientError(`gridclient.${module_name}.${method} cannot be exposed.`);
     }
     return await module[method].apply(module, [args]);
   }

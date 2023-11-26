@@ -33,7 +33,7 @@ class GWModule extends BaseModule {
   @checkBalance
   async deploy_fqdn(options: GatewayFQDNModel) {
     if (await this.exists(options.name)) {
-      throw new ValidationError(`Another gateway deployment with the same name ${options.name} already exists`);
+      throw new ValidationError(`Another gateway deployment with the same name ${options.name} already exists.`);
     }
     events.emit("logs", `Start creating the gateway deployment with name ${options.name}`);
     const metadata = JSON.stringify({
@@ -62,7 +62,7 @@ class GWModule extends BaseModule {
   @checkBalance
   async deploy_name(options: GatewayNameModel) {
     if (await this.exists(options.name)) {
-      throw new ValidationError(`Another gateway deployment with the same name ${options.name} already exists`);
+      throw new ValidationError(`Another gateway deployment with the same name ${options.name} already exists.`);
     }
     events.emit("logs", `Start creating the gateway deployment with name ${options.name}`);
     const metadata = JSON.stringify({

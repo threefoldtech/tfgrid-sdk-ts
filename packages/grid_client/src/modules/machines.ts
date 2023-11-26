@@ -45,7 +45,7 @@ class MachinesModule extends BaseModule {
 
     for (const machine of options.machines) {
       if (machines_names.includes(machine.name))
-        throw new ValidationError(`Another machine with the same name ${machine.name} already exists`);
+        throw new ValidationError(`Another machine with the same name ${machine.name} already exists.`);
       machines_names.push(machine.name);
 
       const [TDeployments, wgConfig] = await this.vm.create(
@@ -87,7 +87,7 @@ class MachinesModule extends BaseModule {
   @checkBalance
   async deploy(options: MachinesModel) {
     if (await this.exists(options.name)) {
-      throw new ValidationError(`Another machine deployment with the same name ${options.name} already exists`);
+      throw new ValidationError(`Another machine deployment with the same name ${options.name} already exists.`);
     }
     events.emit("logs", `Start creating the machine deployment with name ${options.name}`);
     const [twinDeployments, , wireguardConfig] = await this._createDeployment(options);
@@ -137,7 +137,7 @@ class MachinesModule extends BaseModule {
     const networkName = workload.data["network"].interfaces[0].network;
     const networkIpRange = Addr(workload.data["network"].interfaces[0].ip).mask(16).toString();
     if (networkName !== options.network.name || networkIpRange !== options.network.ip_range) {
-      throw new GridClientErrors.Workloads.WorkloadUpdateError("Network name and ip_range can't be changed");
+      throw new GridClientErrors.Workloads.WorkloadUpdateError("Network name and ip_range can't be changed.");
     }
 
     const [twinDeployments, network] = await this._createDeployment(options);
@@ -149,12 +149,12 @@ class MachinesModule extends BaseModule {
   @checkBalance
   async add_machine(options: AddMachineModel) {
     if (!(await this.exists(options.deployment_name))) {
-      throw new ValidationError(`There are no machine deployments with the name: ${options.deployment_name}`);
+      throw new ValidationError(`There are no machine deployments with the name: ${options.deployment_name}.`);
     }
     const oldDeployments = await this._get(options.deployment_name);
     if (this.workloadExists(options.name, oldDeployments))
       throw new ValidationError(
-        `There is another machine with the same name "${options.name}" in the same deployment ${options.deployment_name}`,
+        `There is another machine with the same name "${options.name}" in the same deployment ${options.deployment_name}.`,
       );
 
     events.emit("logs", `Start adding machine: ${options.name} to deployment: ${options.deployment_name}`);
@@ -200,7 +200,7 @@ class MachinesModule extends BaseModule {
   @checkBalance
   async delete_machine(options: DeleteMachineModel) {
     if (!(await this.exists(options.deployment_name))) {
-      throw new ValidationError(`There are no machine deployments with the name: ${options.deployment_name}`);
+      throw new ValidationError(`There are no machine deployments with the name: ${options.deployment_name}.`);
     }
     events.emit("logs", `Start deleting machine: ${options.name} from deployment: ${options.deployment_name}`);
     return await this._deleteInstance(this.vm, options.deployment_name, options.name);

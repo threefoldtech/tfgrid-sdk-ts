@@ -57,7 +57,7 @@ class Blockchain implements blockchainInterface {
   async select(options: BlockchainGetModel) {
     const account_exists = await this.exist(options);
 
-    if (!account_exists) throw new ValidationError(`Account ${options.name} doesn't exist`);
+    if (!account_exists) throw new ValidationError(`Account ${options.name} doesn't exist.`);
 
     this.current_account = options.name;
     this.blockchain_type = await this.exist_in(options);
@@ -68,7 +68,7 @@ class Blockchain implements blockchainInterface {
   async create(options: BlockchainCreateModel): Promise<BlockchainCreateResultModel> {
     const account_exists = await this.exist(options);
 
-    if (account_exists) throw new ValidationError(`Name ${options.name} already exists`);
+    if (account_exists) throw new ValidationError(`Name ${options.name} already exists.`);
 
     return this[options.blockchain_type].create(options);
   }
@@ -76,7 +76,7 @@ class Blockchain implements blockchainInterface {
   @expose
   @validateInput
   async sign(options: BlockchainSignNoNameModel) {
-    if (!this.current_account) throw new ValidationError(`No account is selected. Please select an account first`);
+    if (!this.current_account) throw new ValidationError(`No account is selected. Please select an account first.`);
 
     const modified_options: BlockchainSignModel = { name: this.current_account, content: options.content };
 
@@ -92,7 +92,7 @@ class Blockchain implements blockchainInterface {
   @expose
   @validateInput
   async get(): Promise<BlockchainGetResultModel> {
-    if (!this.current_account) throw new ValidationError(`No account is selected. Please select an account first`);
+    if (!this.current_account) throw new ValidationError(`No account is selected. Please select an account first.`);
 
     const options = { name: this.current_account };
 
@@ -115,7 +115,7 @@ class Blockchain implements blockchainInterface {
   @expose
   @validateInput
   async assets(): Promise<BlockchainAssetsModel> {
-    if (!this.current_account) throw new ValidationError(`No account is selected. Please select an account first`);
+    if (!this.current_account) throw new ValidationError(`No account is selected. Please select an account first.`);
 
     const options = { name: this.current_account };
 
@@ -126,10 +126,10 @@ class Blockchain implements blockchainInterface {
   @validateInput
   // TODO : bridge, still
   async pay(options: BlockchainPayNoNameModel) {
-    if (!this.current_account) throw new ValidationError(`No account is selected. Please select an account first`);
+    if (!this.current_account) throw new ValidationError(`No account is selected. Please select an account first.`);
 
     if (this.blockchain_type != options.blockchain_type_dest)
-      throw new GridClientErrors.GridClientError(`Transfer between blockchains isn't implemented yet`);
+      throw new GridClientErrors.GridClientError(`Transfer between blockchains isn't implemented yet.`);
 
     const modified_options: BlockchainPayModel = {
       name: this.current_account,
@@ -146,7 +146,7 @@ class Blockchain implements blockchainInterface {
   @expose
   @validateInput
   async delete() {
-    if (!this.current_account) throw new ValidationError(`No account is selected. Please select an account first`);
+    if (!this.current_account) throw new ValidationError(`No account is selected. Please select an account first.`);
 
     const options: BlockchainDeleteModel = { name: this.current_account };
 
