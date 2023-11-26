@@ -198,7 +198,7 @@ class TFContracts extends Contracts {
           .toNumber();
       }
     } catch (err) {
-      (err as Error).message = formatErrorMessage(`Error getting consumption for contract ${options.id}`, err);
+      (err as Error).message = formatErrorMessage(`Error getting consumption for contract ${options.id}.`, err);
       throw err;
     }
   }
