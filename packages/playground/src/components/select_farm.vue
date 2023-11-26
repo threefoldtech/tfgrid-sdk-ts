@@ -14,6 +14,7 @@
           return-object
           :model-value="shouldBeUpdated ? undefined : farm"
           @update:model-value="farm = $event"
+          @click:clear="resetPages"
           :error-messages="!loading && !farms.length ? 'No farms where found with the specified resources.' : undefined"
           v-model:search="search"
         >
@@ -79,7 +80,7 @@ const page = ref();
 const farmInput = useInputRef();
 const profileManager = useProfileManager();
 const country = ref<string>();
-const search = ref<string>();
+const search = ref<string>("");
 const searchInput = ref<string>();
 const farm = ref<Farm>();
 const farmManager = useFarm();
@@ -89,7 +90,14 @@ watch([farm, country], ([f, c]) => {
 });
 
 watch(search, (value, oldValue) => {
-  if (value !== oldValue && value && value?.length > 2 && oldValue != undefined && oldValue !== "") {
+  if (
+    value !== oldValue &&
+    value.trim() !== "" &&
+    value?.length > 2 &&
+    oldValue != undefined &&
+    oldValue !== "" &&
+    value !== farm.value?.name
+  ) {
     emits("update:search", searchInput.value ?? undefined);
     clearTimeout(delay.value);
     delay.value = setTimeout(() => {
@@ -167,7 +175,10 @@ async function loadFarms() {
   }
   farms.value = farms.value.concat(_farms);
 
-  farm.value = farms.value[0];
+  farm.value =
+    farms.value.find(f => {
+      return f.name === searchInput.value;
+    }) || farms.value[0];
   farmInput.value.setStatus(initialized ? ValidatorStatus.Invalid : ValidatorStatus.Init);
   if (!initialized) {
     initialized = true;
