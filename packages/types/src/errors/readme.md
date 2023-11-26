@@ -2,6 +2,46 @@
 
 Errors in this package are divided into 11 [module](./modules.ts) each module have its own specified errors.
 
+## BaseError class
+
+The `BaseError` class is our starting point, this class extends the `Error` class .
+`BaseError` have three main properties `code`, `message`, `module`.
+
+- code: is the index of the error class in it's module `Error` enum.
+  - If you have a module and error code you can find the error class easily.
+  - for example `Generic` module have `Errors` enum and the class of `RequestError` a code 7
+- message: describes what happened and it comes from the class constructor.
+- module: it is the error category.
+
+In each module we create a private class that only sets the module value in the extended `ErrorBase` class, then all sub-category error classes extends this class.
+
+### Build
+
+```ts
+yarn build
+```
+
+### Usage
+
+you can use errors by adding `@threefold/types` to your project
+
+```bash
+yarn add @threefold/types
+```
+
+Then import the needed error class and throw your new error
+for example:
+
+```ts
+import { ValidationError, GridClientErrors } from "@threefold/types";
+....
+
+throw new ValidationError("error message")
+....
+
+throw new GridClientErrors.Farms.InvalidResourcesError("error message")
+```
+
 ## Error Modules
 
 ### Generic
