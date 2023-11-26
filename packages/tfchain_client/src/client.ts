@@ -6,7 +6,7 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { waitReady } from "@polkadot/wasm-crypto";
-import { TFChainError, TFChainErrors, TimeoutError, ValidationError } from "@threefold/types";
+import { TFChainErrors, TimeoutError, ValidationError } from "@threefold/types";
 import AwaitLock from "await-lock";
 import { validateMnemonic } from "bip39";
 
@@ -357,7 +357,7 @@ class Client extends QueryClient {
         if (errorName) {
           throw new TFChainErrors[section][errorName](`Failed to apply ${JSON.stringify(extrinsic.method.toHuman())}`);
         } else {
-          throw new TFChainError(
+          throw new TFChainErrors.TFChainError(
             `Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error: ${
               Object.keys(this.api.errors[section])[+e] ?? e
             }`,

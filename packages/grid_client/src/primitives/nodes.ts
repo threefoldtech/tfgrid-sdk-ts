@@ -1,6 +1,6 @@
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
 import { QueryClient } from "@threefold/tfchain_client";
-import { BaseError, GridClientErrors, RequestError, TFChainError, ValidationError } from "@threefold/types";
+import { BaseError, GridClientErrors, RequestError, TFChainErrors, ValidationError } from "@threefold/types";
 import { default as PrivateIp } from "private-ip";
 import urlJoin from "url-join";
 
@@ -148,7 +148,7 @@ class Nodes {
       })
       .catch(err => {
         //TODO add error handling in QueryClient/contracts
-        throw new TFChainError(`Error getting node ID from contract ID ${contractId}: ${err}`);
+        throw new TFChainErrors.TFChainError(`Error getting node ID from contract ID ${contractId}: ${err}`);
       });
   }
 

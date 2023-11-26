@@ -1,4 +1,4 @@
-import { TFChainError } from "@threefold/types";
+import { TFChainErrors } from "@threefold/types";
 
 import { Client, QueryClient } from "./client";
 import { PublicIp } from "./types";
@@ -149,7 +149,9 @@ class QueryContracts {
 
       return gracePeriodStartTime + TWO_WEEKS;
     } catch (err) {
-      throw new TFChainError(`Error getting current block number for contract ${options.id} deletion: ${err}`);
+      throw new TFChainErrors.TFChainError(
+        `Error getting current block number for contract ${options.id} deletion: ${err}`,
+      );
     }
   }
 
