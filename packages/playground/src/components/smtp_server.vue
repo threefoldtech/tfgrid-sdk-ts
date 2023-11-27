@@ -10,7 +10,13 @@
       inline
       tooltip="When the SMTP server is enabled, the system is capable of sending outgoing emails through the SMTP server."
     >
-      <v-switch color="primary" inset label="Toggle SMTP Server Enable" v-model="$props.modelValue.enabled" />
+      <v-switch
+        :class="[prefix, 'toggle-smtp']"
+        color="primary"
+        inset
+        label="Toggle SMTP Server Enable"
+        v-model="$props.modelValue.enabled"
+      />
     </input-tooltip>
 
     <template v-if="$props.modelValue.enabled || persistent">
@@ -24,6 +30,7 @@
       >
         <input-tooltip tooltip="SMTP admin email.">
           <v-text-field
+            :class="[prefix, 'smtp-admin-email']"
             label="Admin Email"
             placeholder="email@example.com"
             v-model="$props.modelValue.username"
@@ -48,6 +55,7 @@
         >
           <input-tooltip tooltip="SMTP admin password.">
             <v-text-field
+              :class="[prefix, 'smtp-admin-password']"
               label="Admin Password"
               placeholder="email@example.com"
               v-model="$props.modelValue.password"
@@ -69,6 +77,7 @@
       >
         <input-tooltip tooltip="From email address.">
           <v-text-field
+            :class="[prefix, 'smtp-from-email']"
             label="From Email Address"
             placeholder="email@example.com"
             v-model="$props.modelValue.email"
@@ -85,6 +94,7 @@
       >
         <input-tooltip tooltip="SMTP host server.">
           <v-text-field
+            :class="[prefix, 'smtp-hostname']"
             label="Hostname"
             placeholder="email@example.com"
             v-model="$props.modelValue.hostname"
@@ -100,7 +110,12 @@
         #="{ props }"
       >
         <input-tooltip tooltip="SMTP port server.">
-          <v-text-field label="Port" v-model.number="$props.modelValue.port" v-bind="props" />
+          <v-text-field
+            :class="[prefix, 'smtp-port']"
+            label="Port"
+            v-model.number="$props.modelValue.port"
+            v-bind="props"
+          />
         </input-tooltip>
       </input-validator>
 
@@ -110,7 +125,7 @@
         inline
         tooltip="TLS (Transport Layer Security) is a cryptographic protocol that ensures secure communication over a network. It provides encryption, authentication, and data integrity, making it an essential component for secure deployments."
       >
-        <v-switch color="primary" inset label="Use TLS" v-bind="props" />
+        <v-switch :class="[prefix, 'smtp-tls']" color="primary" inset label="Use TLS" v-bind="props" />
       </input-tooltip>
 
       <input-tooltip
@@ -119,7 +134,7 @@
         inline
         tooltip="SSL (Secure Sockets Layer) is an older cryptographic protocol that was widely used for secure communication before being superseded by TLS. SSL and TLS are often used interchangeably, but technically TLS is the successor of SSL."
       >
-        <v-switch color="primary" inset label="Use SSL" v-bind="props" />
+        <v-switch :class="[prefix, 'smtp-ssl']" color="primary" inset label="Use SSL" v-bind="props" />
       </input-tooltip>
     </template>
   </div>
@@ -132,6 +147,7 @@ defineProps<{
   tls?: boolean;
   email?: boolean;
   persistent?: boolean;
+  prefix?: string;
 }>();
 </script>
 

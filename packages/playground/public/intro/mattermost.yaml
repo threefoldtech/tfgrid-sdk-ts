@@ -1,0 +1,45 @@
+steps:
+  - element: .mm-base
+    title: PLACEHOLDER
+    intro: PLCAEHOLDER
+
+  - element: .mm-name
+    title: PLACEHOLDER
+    intro: PLCAEHOLDER
+
+  - element: .vm-capacity
+    title: PLACEHOLDER
+    intro: PLCAEHOLDER
+
+  - element: .mm-dedicated
+    title: PLACEHOLDER
+    intro: PLCAEHOLDER
+
+  - element: .mm-certified
+    title: PLACEHOLDER
+    intro: PLCAEHOLDER
+
+  - element: .mm.select-node
+    title: PLACEHOLDER
+    intro: PLCAEHOLDER
+
+  - element: .mm.custom-domain
+    title: PLACEHOLDER
+    intro: PLCAEHOLDER
+
+  - element: .mm.select-gateway
+    title: PLACEHOLDER
+    intro: PLCAEHOLDER
+
+  - element: .mm-smtp
+    title: PLACEHOLDER
+    intro: PLCAEHOLDER
+    triggerClick: true
+
+  - element: .mm.toggle-smtp
+    title: PLACEHOLDER
+    intro: PLCAEHOLDER
+
+  - element: .mm-deploy
+    title: PLACEHOLDER
+    intro: PLCAEHOLDER

@@ -12,6 +12,7 @@
     <template #title>Deploy a Mattermost Instance </template>
 
     <d-tabs
+      prefix="mm"
       :tabs="[
         { title: 'Base', value: 'base' },
         { title: 'SMTP Server', value: 'smtp' },
@@ -32,7 +33,7 @@
           #="{ props }"
         >
           <input-tooltip tooltip="Instance name.">
-            <v-text-field label="Name" v-model="name" v-bind="props" />
+            <v-text-field class="mm-name" label="Name" v-model="name" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
@@ -56,6 +57,7 @@
               v-model="dedicated"
               :disabled="loadingFarm"
               hide-details
+              class="mm-dedicated"
             />
           </input-tooltip>
           <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
@@ -66,6 +68,7 @@
               v-model="certified"
               :disabled="loadingFarm"
               hide-details
+              class="mm-certified"
             />
           </input-tooltip>
 
@@ -84,6 +87,7 @@
             />
 
             <SelectNode
+              prefix="mm"
               v-model="selectedNode"
               :filters="{
                 farmId: farm?.farmID,
@@ -97,17 +101,18 @@
             />
           </SelectFarmManager>
 
-          <DomainName :hasIPv4="ipv4" ref="domainNameCmp" />
+          <DomainName prefix="mm" :hasIPv4="ipv4" ref="domainNameCmp" />
         </FarmGatewayManager>
       </template>
 
       <template #smtp>
-        <SmtpServer v-model="smtp" />
+        <SmtpServer prefix="mm" v-model="smtp" />
       </template>
     </d-tabs>
 
     <template #footer-actions>
       <v-btn
+        class="mm-deploy"
         color="primary"
         variant="tonal"
         @click="deploy(domainNameCmp?.domain, domainNameCmp?.customDomain)"
@@ -121,8 +126,9 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref } from "vue";
+import { computed, onMounted, onUnmounted, type Ref, ref } from "vue";
 
+import { useDialogService } from "../components/vuetify_dialog/DialogLockService.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
@@ -130,7 +136,16 @@ import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
+import { startGuide } from "../utils/intro";
 import { generateName, generatePassword } from "../utils/strings";
+
+const dialogService = useDialogService();
+
+onMounted(() => dialogService.enqueue(startTour));
+onUnmounted(() => dialogService.dequeue(startTour));
+async function startTour() {
+  await startGuide("mattermost.yaml");
+}
 
 const layout = useLayout();
 const tabs = ref();
