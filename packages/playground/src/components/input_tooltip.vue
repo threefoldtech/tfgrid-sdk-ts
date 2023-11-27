@@ -6,7 +6,7 @@
         <div class="d-flex" :class="{ 'w-100': !inline }">
           <slot></slot>
           <span
-            :style="{ cursor: 'help', marginTop: '17.5px' }"
+            :style="{ cursor: 'help', marginTop: $props.noMargin ? '' : '17.5px' }"
             class="ml-3"
             @mouseenter="propsRef?.onMouseenter"
             @mouseleave="propsRef?.onMouseleave"
@@ -43,6 +43,10 @@ export default {
     },
     href: {
       type: String,
+      required: false,
+    },
+    noMargin: {
+      type: Boolean,
       required: false,
     },
   },
