@@ -1,6 +1,6 @@
 # TS SDK Errors
 
-Errors in this package are divided into 11 [module](./modules.ts) each module have its own specified errors.
+Errors in this package are divided into 11 [modules](./modules.ts) each module has its own specified errors.
 
 ## BaseError class
 
