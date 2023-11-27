@@ -63,7 +63,7 @@ Also, in some cases, we have an error that comes from one of the clients, but we
 
 ### Grid Client Errors
 
-This section will have all errors that related to GridClient
+This section will have all errors that are related to GridClient
 
 #### Farm `tfGridFarm`
 
