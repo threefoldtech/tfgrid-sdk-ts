@@ -234,6 +234,26 @@ const routes: AppRoute[] = [
     ],
   },
   {
+    title: "Calculators",
+    icon: "mdi-calculator",
+    items: [
+      {
+        title: "Pricing Calculator",
+        icon: "mdi-currency-usd",
+        route: "/calculator/pricing",
+      },
+      {
+        title: "Simulator",
+        icon: "mdi-chart-line",
+        route: "/calculator/simulator",
+      },
+    ],
+  },
+  {
+    title: "Playground",
+    items: [{ title: "Solutions", icon: "mdi-lightbulb-on-outline", route: "/solutions" }],
+  },
+  {
     icon: "mdi-database-search-outline",
     title: "Statistics",
     items: [
@@ -284,26 +304,6 @@ const routes: AppRoute[] = [
         url: "https://manual.grid.tf/",
       },
     ],
-  },
-  {
-    title: "Calculators",
-    icon: "mdi-calculator",
-    items: [
-      {
-        title: "Pricing Calculator",
-        icon: "mdi-currency-usd",
-        route: "/calculator/pricing",
-      },
-      {
-        title: "Simulator",
-        icon: "mdi-chart-line",
-        route: "/calculator/simulator",
-      },
-    ],
-  },
-  {
-    title: "Playground",
-    items: [{ title: "Solutions", icon: "mdi-lightbulb-on-outline", route: "/solutions" }],
   },
 
   ...(network !== "main"
