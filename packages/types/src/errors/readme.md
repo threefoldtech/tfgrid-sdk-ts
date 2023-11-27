@@ -9,7 +9,7 @@ The `BaseError` class is our starting point, this class extends the `Error` clas
 
 - code: is the index of the error class in it's module `Error` enum.
   - If you have a module and error code you can find the error class easily.
-  - for example `Generic` module have `Errors` enum and the class of `RequestError` a code 7
+  - for example, the `Generic` module has `Errors` enum and the class of `RequestError` a code 7.
 - message: describes what happened and it comes from the class constructor.
 - module: it is the error category.
 
