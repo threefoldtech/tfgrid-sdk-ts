@@ -38,8 +38,8 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip tooltip="Subsquid websockt endpoint.">
-          <v-text-field label="Websockt Endpoint" v-model="endpoint" v-bind="props" />
+        <input-tooltip tooltip="Subsquid websocket endpoint.">
+          <v-text-field label="Websocket Endpoint" v-model="endpoint" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
