@@ -1,0 +1,48 @@
+steps:
+  - element: .funkwhale-name
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .funkwhale-username
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .funkwhale-email
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .funkwhale-admin-password
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .vm-capacity
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .select-networks
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .funkwhale-dedicated
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .funkwhale-certified
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .funkwhale.select-node
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .funkwhale.custom-domain
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .funkwhale.select-gateway
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .funkwhale-deploy
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
