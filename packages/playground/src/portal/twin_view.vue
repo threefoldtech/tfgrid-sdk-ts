@@ -41,7 +41,7 @@
               <v-divider></v-divider>
               <v-list-item> Address </v-list-item>
               <v-divider></v-divider>
-              <input-tooltip tooltip="Relay" :align-center="true" :class="'d-flex align-center'">
+              <input-tooltip tooltip="Relay" :align-center="true" :class="'d-flex align-center'" location="bottom">
                 <v-list-item> Relay </v-list-item>
               </input-tooltip>
             </v-col>

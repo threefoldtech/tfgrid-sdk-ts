@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex">
-    <v-tooltip :text="tooltip || 'None!'">
+    <v-tooltip :text="tooltip || 'None!'" :location="location">
       <template #activator="{ props }">
         {{ getPropsRef(props) }}
         <div class="d-flex" :class="{ 'w-100': !inline, 'align-center': alignCenter }">
@@ -28,7 +28,8 @@
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import { type PropType, ref } from "vue";
+import type { VTooltip } from "vuetify/components/VTooltip";
 
 export default {
   name: "InputTooltip",
@@ -47,6 +48,10 @@ export default {
     },
     alignCenter: {
       type: Boolean,
+      required: false,
+    },
+    location: {
+      type: String as PropType<VTooltip["location"]>,
       required: false,
     },
   },
