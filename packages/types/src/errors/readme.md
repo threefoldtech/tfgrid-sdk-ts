@@ -67,7 +67,7 @@ This section will have all errors that are related to GridClient
 
 #### Farm `tfGridFarm`
 
-For Errors that comes from farms or related to farms resources and farmer bot we are using this module
+For Errors that come from farms or are related to farms resources and farmer bot, we are using this module
 
 0. InvalidResourcesError
 1. FarmerBotError
