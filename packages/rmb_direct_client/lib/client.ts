@@ -56,8 +56,8 @@ class Client {
     return this.read(reqId)
       .catch(async () => await this.reconnect())
       .finally(() => {
-        this.__pingPongTimeout = setTimeout(() => {
-          if (this.con?.readyState === this.con?.OPEN) this.__pingPong();
+        this.__pingPongTimeout = setTimeout(async () => {
+          if (this.con?.readyState === this.con?.OPEN) await this.__pingPong();
         }, 20 * 1000);
       });
   }
@@ -120,7 +120,7 @@ class Client {
       this.updateSource();
       this.createConnection();
       await this.waitForOpenConnection();
-      this.__pingPong();
+      await this.__pingPong();
 
       if (this.isEnvNode()) {
         process.on("SIGTERM", this.disconnectAndExit);
