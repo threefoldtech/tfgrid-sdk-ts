@@ -3,7 +3,15 @@
     <h6 class="text-h5" v-if="!$props.hideTitle">Domain Name</h6>
     <v-tooltip location="top" text="Use Custom domain name">
       <template #activator="{ props }">
-        <v-switch v-bind="props" v-model="customDomain" hide-details color="primary" inset label="Custom domain" />
+        <v-switch
+          :class="[prefix, 'custom-domain']"
+          v-bind="props"
+          v-model="customDomain"
+          hide-details
+          color="primary"
+          inset
+          label="Custom domain"
+        />
       </template>
     </v-tooltip>
     <v-expand-transition>
@@ -30,6 +38,7 @@
     <div v-if="(!$props.hasIPv4 || !customDomain) && !loading">
       <v-expand-transition>
         <SelectGatewayNode
+          :prefix="prefix"
           :available-for="$props.availableFor"
           ref="selectGateway"
           v-model="gatewayNode"
@@ -69,6 +78,7 @@ export interface DomainModel {
 export default {
   name: "DomainName",
   props: {
+    prefix: { type: String, default: () => "" },
     modelValue: {
       type: Object as PropType<DomainModel>,
       required: false,

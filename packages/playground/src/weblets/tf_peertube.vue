@@ -24,7 +24,7 @@
         #="{ props }"
       >
         <input-tooltip tooltip="Instance name.">
-          <v-text-field label="Name" v-model="name" v-bind="props" />
+          <v-text-field class="peertube-name" label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -37,7 +37,7 @@
         #="{ props }"
       >
         <input-tooltip tooltip="Peertube admin email.">
-          <v-text-field label="Admin Email" v-model="email" v-bind="props" />
+          <v-text-field class="peertube-email" label="Admin Email" v-model="email" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -55,7 +55,12 @@
           #="{ props: validatorProps }"
         >
           <input-tooltip tooltip="Peertube admin password.">
-            <v-text-field label="Admin Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
+            <v-text-field
+              class="peertube-admin-password"
+              label="Admin Password"
+              v-model="password"
+              v-bind="{ ...props, ...validatorProps }"
+            />
           </input-tooltip>
         </input-validator>
       </password-input-wrapper>
@@ -68,10 +73,26 @@
           tooltip="Click to know more about dedicated nodes."
           href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
         >
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
+          <v-switch
+            class="peertube-dedicated"
+            color="primary"
+            inset
+            label="Dedicated"
+            v-model="dedicated"
+            :disabled="loadingFarm"
+            hide-details
+          />
         </input-tooltip>
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
+          <v-switch
+            class="peertube-certified"
+            color="primary"
+            inset
+            label="Certified"
+            v-model="certified"
+            :disabled="loadingFarm"
+            hide-details
+          />
         </input-tooltip>
 
         <SelectFarmManager>
@@ -89,6 +110,7 @@
           />
 
           <SelectNode
+            prefix="peertube"
             v-model="selectedNode"
             :filters="{
               farmId: farm?.farmID,
@@ -101,12 +123,13 @@
             :root-file-system-size="rootFilesystemSize"
           />
         </SelectFarmManager>
-        <DomainName :hasIPv4="ipv4" ref="domainNameCmp" />
+        <DomainName prefix="peertube" :hasIPv4="ipv4" ref="domainNameCmp" />
       </FarmGatewayManager>
     </form-validator>
 
     <template #footer-actions>
       <v-btn
+        class="peertube-deploy"
         color="primary"
         variant="tonal"
         @click="deploy(domainNameCmp?.domain, domainNameCmp?.customDomain)"
@@ -120,15 +143,25 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref } from "vue";
+import { computed, onMounted, onUnmounted, type Ref, ref } from "vue";
 
+import { useDialogService } from "../components/vuetify_dialog/DialogLockService.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
+import { startGuide } from "../utils/intro";
 import { generateName, generatePassword } from "../utils/strings";
+
+const dialogService = useDialogService();
+
+onMounted(() => dialogService.enqueue(startInto));
+onUnmounted(() => dialogService.dequeue(startInto));
+async function startInto() {
+  await startGuide("peertube.yaml");
+}
 
 const layout = useLayout();
 const valid = ref(false);
