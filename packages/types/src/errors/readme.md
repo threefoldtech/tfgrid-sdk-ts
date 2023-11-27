@@ -86,7 +86,7 @@ For Errors that come from node or are related to node resources and node network
 
 #### Workloads `tfGridWorkloads`
 
-For Errors that related to workloads and deployments operations
+For Errors that are related to workloads and deployments operations
 
 0. WorkloadDeleteError
 1. WorkloadDeployError
