@@ -5,7 +5,7 @@ Errors in this package are divided into 11 [module](./modules.ts) each module ha
 ## BaseError class
 
 The `BaseError` class is our starting point, this class extends the `Error` class .
-`BaseError` have three main properties `code`, `message`, `module`.
+`BaseError` has three main properties `code`, `message`, `module`.
 
 - code: is the index of the error class in it's module `Error` enum.
   - If you have a module and error code you can find the error class easily.
