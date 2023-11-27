@@ -44,7 +44,7 @@ export const getFarmQueries = (mixedFilters: MixedFarmFilter): Partial<FarmsQuer
 
   return options;
 };
-export async function getFarmsExplorer(queries: Partial<FarmsQuery>): Promise<Pagination<Farm[]>> {
+export async function getAllFarms(queries: Partial<FarmsQuery>): Promise<Pagination<Farm[]>> {
   try {
     const farms = await gridProxyClient.farms.list(queries);
     return farms;

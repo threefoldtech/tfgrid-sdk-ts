@@ -49,7 +49,7 @@ import type { VDataTableHeader } from "@/types";
 import type { FarmFilterOptions, MixedFarmFilter } from "@/types";
 import type { FilterFarmInputs } from "@/utils/filter_farms";
 import { inputsInitializer } from "@/utils/filter_farms";
-import { getFarmQueries, getFarmsExplorer } from "@/utils/get_farms";
+import { getAllFarms, getFarmQueries } from "@/utils/get_farms";
 const loading = ref<boolean>(false);
 const farms = ref<Farm[]>();
 const isDialogOpened = ref<boolean>(false);
@@ -74,7 +74,7 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
     loading.value = true;
     isFormLoading.value = true;
     try {
-      const { count, data } = await getFarmsExplorer(queries);
+      const { count, data } = await getAllFarms(queries);
 
       if (data) {
         totalFarms.value = count || 0;

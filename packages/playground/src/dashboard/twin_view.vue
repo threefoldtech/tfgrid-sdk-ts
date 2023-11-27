@@ -122,7 +122,7 @@ onMounted(async () => {
 });
 
 function redirectToDao() {
-  router.push({ path: "/portal/dao" });
+  router.push({ path: "/dashboard/dao" });
 }
 onMounted(validateEdit);
 async function validateEdit() {
