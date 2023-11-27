@@ -75,7 +75,7 @@ For Errors that comes from farms or related to farms resources and farmer bot we
 
 #### Node `tfGridNode`
 
-For Errors that comes from node or related to node resources and node network
+For Errors that come from node or are related to node resources and node network
 
 0. UnavailableNodeError
 1. InvalidResourcesError
