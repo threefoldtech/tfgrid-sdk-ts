@@ -54,7 +54,7 @@ class Client {
     if (this.__pingPongTimeout) clearTimeout(this.__pingPongTimeout);
     const reqId = await this.ping();
     return this.read(reqId)
-      .catch(() => this.reconnect())
+      .catch(async () => await this.reconnect())
       .finally(() => {
         this.__pingPongTimeout = setTimeout(() => {
           if (this.con?.readyState === this.con?.OPEN) this.__pingPong();
@@ -160,8 +160,8 @@ class Client {
     process.exit(0);
   }
 
-  reconnect() {
-    this.connect();
+  async reconnect() {
+    await this.connect();
   }
   close() {
     if (this.__pingPongTimeout) clearTimeout(this.__pingPongTimeout);
