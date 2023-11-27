@@ -41,11 +41,9 @@
               <v-divider></v-divider>
               <v-list-item> Address </v-list-item>
               <v-divider></v-divider>
-              <div class="d-flex align-center">
-                <input-tooltip inline tooltip="Relay" :no-margin="true" :class="'d-flex align-center'">
-                  <v-list-item> Relay </v-list-item>
-                </input-tooltip>
-              </div>
+              <input-tooltip tooltip="Relay" :align-center="true" :class="'d-flex align-center'">
+                <v-list-item> Relay </v-list-item>
+              </input-tooltip>
             </v-col>
             <v-col cols="1" sm="10" class="my-4">
               <v-list-item> {{ profileManager.profile?.twinId.toString() }} </v-list-item>

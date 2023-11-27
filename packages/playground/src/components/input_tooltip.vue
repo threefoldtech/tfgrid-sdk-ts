@@ -3,10 +3,10 @@
     <v-tooltip :text="tooltip || 'None!'">
       <template #activator="{ props }">
         {{ getPropsRef(props) }}
-        <div class="d-flex" :class="{ 'w-100': !inline }">
+        <div class="d-flex" :class="{ 'w-100': !inline, 'align-center': alignCenter }">
           <slot></slot>
           <span
-            :style="{ cursor: 'help', marginTop: $props.noMargin ? '' : '17.5px' }"
+            :style="{ cursor: 'help', marginTop: $props.alignCenter ? '' : '17.5px' }"
             class="ml-3"
             @mouseenter="propsRef?.onMouseenter"
             @mouseleave="propsRef?.onMouseleave"
@@ -45,7 +45,7 @@ export default {
       type: String,
       required: false,
     },
-    noMargin: {
+    alignCenter: {
       type: Boolean,
       required: false,
     },
