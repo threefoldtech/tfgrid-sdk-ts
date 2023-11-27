@@ -52,6 +52,14 @@ const router = createRouter({
           component: () => import("../dashboard/dedicated_nodes_view.vue"),
           meta: { title: "Dedicated Nodes" },
         },
+        {
+          path: "contracts-list",
+          component: () => import("../dashboard/contracts_list.vue"),
+          meta: {
+            title: "Contracts List",
+            info: { page: "info/contracts_list.md" },
+          },
+        },
       ],
     },
 
@@ -480,14 +488,7 @@ const router = createRouter({
         },
       ],
     },
-    {
-      path: "/contractslist",
-      component: () => import("../views/contracts_list.vue"),
-      meta: {
-        title: "Contracts List",
-        info: { page: "info/contracts_list.md" },
-      },
-    },
+
     {
       path: "/minting",
       component: () => import("../views/minting_view.vue"),

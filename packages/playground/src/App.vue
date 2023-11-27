@@ -229,7 +229,7 @@ const routes: AppRoute[] = [
       {
         title: "Contracts",
         icon: "mdi-file-document-edit",
-        route: "/contractslist",
+        route: "/dashboard/contracts-list",
       },
     ],
   },
