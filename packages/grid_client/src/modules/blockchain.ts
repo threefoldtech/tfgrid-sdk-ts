@@ -30,7 +30,7 @@ class Blockchain implements blockchainInterface {
   current_account: string;
   blockchain_type: blockchainType;
 
-  constructor(config: GridClientConfig) {
+  constructor(public config: GridClientConfig) {
     this.stellar = new stellar(config);
     this.algorand = new algorand(config);
     this.tfchain = new tfchain(config);

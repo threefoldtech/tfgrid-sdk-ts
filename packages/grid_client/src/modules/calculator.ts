@@ -20,7 +20,7 @@ interface PricingInfo {
 class Calculator {
   client: TFClient;
 
-  constructor(config: GridClientConfig) {
+  constructor(public config: GridClientConfig) {
     this.client = config.tfclient;
   }
   @expose

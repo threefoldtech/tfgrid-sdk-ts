@@ -17,7 +17,7 @@ class QSFSZdbsModule extends BaseModule {
   moduleName = "qsfs_zdbs";
   workloadTypes = [WorkloadTypes.zdb];
   zdb: ZdbHL;
-  constructor(config: GridClientConfig) {
+  constructor(public config: GridClientConfig) {
     super(config);
     this.zdb = new ZdbHL(config);
   }
