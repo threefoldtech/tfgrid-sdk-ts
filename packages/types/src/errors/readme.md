@@ -1,4 +1,4 @@
-# TF SDK Errors
+# TS SDK Errors
 
 Errors in this package are divided into 11 [module](./modules.ts) each module have its own specified errors.
 
