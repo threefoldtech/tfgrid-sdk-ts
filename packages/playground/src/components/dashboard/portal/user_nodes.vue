@@ -218,6 +218,7 @@ export default {
         loading.value = true;
         const twinId = profileManager.profile!.twinId;
         const farms = await gridProxyClient.farms.list({ twinId });
+        if (!farms.data.length) return [];
         const farmIds = farms.data.map(farm => farm.farmId).join(",");
         const { data, count } = await gridProxyClient.nodes.list({
           farmIds,
