@@ -61,12 +61,13 @@
         </v-autocomplete>
         <v-text-field
           v-else-if="selection == 'manual'"
-          label="Node Id"
+          label="Node ID"
           v-model.number="ManualselectedNode"
           :disabled="loadingNodes"
           v-bind="{
             ...props,
             loading: props.loading,
+            hint: pingingNode ? `Validating Node` : props.hint,
             error: !!errorMessage,
             errorMessages: !!errorMessage ? errorMessage : undefined,
           }"
@@ -193,7 +194,9 @@ watch(
       if (props.selection === Selection.AUTOMATED) {
         await validateNodeStoragePool(node);
       } else {
-        await validateManualSelectedNode(node);
+        delay.value = setTimeout(() => {
+          validateManualSelectedNode(node);
+        }, 1000);
       }
     }
 
@@ -223,10 +226,16 @@ watch(
       value.certified === oldValue.certified &&
       value.rentedBy === oldValue.rentedBy &&
       value.hasGPU === oldValue.hasGPU
-    )
+    ) {
       return;
-    if (props.selection === Selection.MANUAL && selectedNode.value) {
-      await validateManualSelectedNode(selectedNode.value);
+    }
+    if (props.selection === Selection.MANUAL) {
+      clearTimeout(delay.value);
+      delay.value = setTimeout(() => {
+        if (selectedNode.value) {
+          validateManualSelectedNode(selectedNode.value);
+        }
+      }, 1000);
     }
     if (props.selection === Selection.AUTOMATED) {
       shouldBeUpdated.value = true;
@@ -286,13 +295,13 @@ function validateSelectedNodeFilters(
   } else if (node.rentedByTwinId !== profileManager.profile?.twinId && node.rentedByTwinId !== 0) {
     errorMessage.value = `Node ${validatingNode.nodeId} is rented by someone else`;
   } else if (filters.ipv4 && !node.publicConfig.ipv4) {
-    errorMessage.value = `Node ${validatingNode.nodeId} is not assigned to a public ip`;
+    errorMessage.value = `Node ${validatingNode.nodeId} is not assigned to a PublicIP`;
   } else if (freeresources && freeresources.cru < filters.cpu) {
     errorMessage.value = `Node ${validatingNode.nodeId} doesn't have enough CPU`;
   } else if (freeresources && freeresources.mru < Math.round(filters.memory / 1024)) {
-    errorMessage.value = `Node ${validatingNode.nodeId} doesn't have enough memory`;
+    errorMessage.value = `Node ${validatingNode.nodeId} doesn't have enough Memory`;
   } else if (freeresources && freeresources.sru < filters.diskSizes.reduce((total, disk) => total + disk)) {
-    errorMessage.value = `Node ${validatingNode.nodeId} doesn't have enough SRU`;
+    errorMessage.value = `Node ${validatingNode.nodeId} doesn't have enough Storage`;
   }
 }
 async function validateManualSelectedNode(validatingNode: INode) {
@@ -300,7 +309,8 @@ async function validateManualSelectedNode(validatingNode: INode) {
     const grid = await getGrid(profileManager.profile!);
     const filters = props.filters;
     errorMessage.value = ``;
-    // loadingNodes.value = true;
+    loadingNodes.value = true;
+    pingingNode.value = true;
     const node = await grid?.capacity.nodes.getNode(Number(validatingNode.nodeId));
     if (node) {
       const freeresources = await grid?.capacity.nodes.getNodeFreeResources(
@@ -316,7 +326,8 @@ async function validateManualSelectedNode(validatingNode: INode) {
     console.error(`An error occurred: ${e}`);
   } finally {
     validator.value?.setStatus(ValidatorStatus.Init);
-    // loadingNodes.value = false;
+    loadingNodes.value = false;
+    pingingNode.value = false;
   }
 }
 async function loadNodes(farmId: number | undefined) {
