@@ -81,7 +81,7 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
         farms.value = data.map(farm => {
           const ips = farm.publicIps;
           const total = ips.length;
-          const used = ips.filter(x => x.contract_id === 0).length;
+          const used = ips.filter(x => x.contract_id !== 0).length;
           return {
             ...farm,
             totalPublicIp: total,
@@ -158,7 +158,7 @@ const inputFiltersReset = (nFltrNptsVal: FilterFarmInputs) => {
   mixedFarmFilters.value.inputs = nFltrNptsVal;
   nFltrNptsVal.farmId.value = undefined;
   nFltrNptsVal.name.value = undefined;
-  nFltrNptsVal.totalIps.value = undefined;
+  nFltrNptsVal.freeIps.value = undefined;
 };
 const openSheet = (_e: any, { item }: any) => {
   openDialog(item.value);
