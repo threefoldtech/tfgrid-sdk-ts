@@ -103,7 +103,7 @@
 
             <div :style="{ marginTop: '-10px' }">
               <input-tooltip
-                tooltip="Disabling TLS Pass Through allows gateway traffic termination. Meanwhile, enabling it allows backend service TLS termination."
+                tooltip="When enabled, the backend service will terminate the TLS traffic, otherwise the gateway service will do the TLS traffic termination."
                 inline
               >
                 <v-switch
@@ -137,7 +137,7 @@
           >
             Delete
           </v-btn>
-          <v-btn color="primary" variant="tonal" @click="deployGateway" :disabled="!valid" v-else> Add a domain </v-btn>
+          <v-btn color="primary" variant="tonal" @click="deployGateway" :disabled="!valid" v-else> Add </v-btn>
         </template>
       </weblet-layout>
     </v-dialog>
