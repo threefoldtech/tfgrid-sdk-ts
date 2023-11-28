@@ -1,5 +1,5 @@
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
-import { GridClientErrors, TFChainError, ValidationError } from "@threefold/types";
+import { GridClientError, TFChainError, ValidationError } from "@threefold/types";
 import type AwaitLock from "await-lock";
 import { validateMnemonic } from "bip39";
 import * as PATH from "path";
@@ -259,16 +259,16 @@ class GridClient {
 
     const module_name = namespaces[0];
     if (!this.modules.includes(module_name)) {
-      throw new GridClientErrors.GridClientError(`gridclient.${module_name} module doesn't exist.`);
+      throw new GridClientError(`gridclient.${module_name} module doesn't exist.`);
     }
     const module = this[namespaces[0]];
 
     if (typeof module[method] !== "function") {
-      throw new GridClientErrors.GridClientError(`${module_name}.${method} function doesn't exist.`);
+      throw new GridClientError(`${module_name}.${method} function doesn't exist.`);
     }
 
     if (isExposed(module, method) == false) {
-      throw new GridClientErrors.GridClientError(`gridclient.${module_name}.${method} cannot be exposed.`);
+      throw new GridClientError(`gridclient.${module_name}.${method} cannot be exposed.`);
     }
     return await module[method].apply(module, [args]);
   }

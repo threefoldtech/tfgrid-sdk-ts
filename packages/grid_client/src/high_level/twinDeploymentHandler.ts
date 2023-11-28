@@ -1,5 +1,12 @@
 import { Contract, ExtrinsicResult } from "@threefold/tfchain_client";
-import { BaseError, GridClientErrors, TFChainError, TimeoutError, ValidationError } from "@threefold/types";
+import {
+  BaseError,
+  GridClientError,
+  GridClientErrors,
+  TFChainError,
+  TimeoutError,
+  ValidationError,
+} from "@threefold/types";
 
 import { RMB } from "../clients";
 import { TFClient } from "../clients/tf-grid/client";
@@ -575,7 +582,7 @@ class TwinDeploymentHandler {
     } catch (e) {
       await this.rollback(contracts);
       if (e instanceof BaseError) throw e;
-      throw new GridClientErrors.GridClientError(`Couldn't handle twin Deployment due to: ${e} .`);
+      throw new GridClientError(`Couldn't handle twin Deployment due to: ${e} .`);
     }
     return resultContracts;
   }
