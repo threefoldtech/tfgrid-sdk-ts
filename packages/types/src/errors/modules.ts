@@ -1,6 +1,8 @@
 export enum ErrorModules {
   Generic = "Generic",
-  //tfchain modules
+  Farm = "tfGridFarm",
+  Node = "tfGridNode",
+  Workloads = "tfGridWorkloads",
   Dao = "dao",
   TFKVStore = "tfkvStore",
   SmartContract = "smartContractModule",

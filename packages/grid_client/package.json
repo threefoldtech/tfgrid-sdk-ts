@@ -36,7 +36,8 @@
     "url-join": "^4.0.1",
     "url-parse": "^1.5.10",
     "uuid4": "^2.0.2",
-    "await-lock": "^2.2.2"
+    "await-lock": "^2.2.2",
+    "@threefold/types": "1.0.0"
   },
   "devDependencies": {
     "@types/jest": "^29.2.6",

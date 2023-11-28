@@ -8,6 +8,7 @@ export enum Generic {
   ConnectionError,
   RMBError,
   InvalidResponse,
+  RequestError,
 }
 export class BaseError extends Error {
   constructor(public code: number, message: string, public module: ErrorModules) {
@@ -42,5 +43,11 @@ export class RMBError extends BaseError {
 export class InvalidResponse extends BaseError {
   constructor(message: string) {
     super(Generic.InvalidResponse, message, ErrorModules.Generic);
+  }
+}
+
+export class RequestError extends BaseError {
+  constructor(message: string, public statusCode = -1) {
+    super(Generic.RequestError, message, ErrorModules.Generic);
   }
 }

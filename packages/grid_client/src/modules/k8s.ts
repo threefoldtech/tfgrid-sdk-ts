@@ -1,3 +1,4 @@
+import { GridClientErrors, ValidationError } from "@threefold/types";
 import { Addr } from "netaddr";
 
 import { GridClientConfig } from "../config";
@@ -89,7 +90,7 @@ class K8sModule extends BaseModule {
     const workers_names: string[] = [];
     for (const master of options.masters) {
       if (masters_names.includes(master.name))
-        throw Error(`Another master with the same name ${master.name} already exists`);
+        throw new ValidationError(`Another master with the same name ${master.name} already exists.`);
       masters_names.push(master.name);
 
       const [twinDeployments, wgConfig] = await this.kubernetes.add_master(
@@ -127,12 +128,12 @@ class K8sModule extends BaseModule {
     if (masterIps.length === 0) {
       masterIps = await this._getMastersIp(options.name, deployments);
       if (masterIps.length === 0) {
-        throw Error("Couldn't get master ip");
+        throw new GridClientErrors.Workloads.WorkloadCreateError("Couldn't get master ip");
       }
     }
     for (const worker of options.workers!) {
       if (workers_names.includes(worker.name))
-        throw Error(`Another worker with the same name ${worker.name} already exists`);
+        throw new ValidationError(`Another worker with the same name ${worker.name} already exists.`);
       workers_names.push(worker.name);
 
       const [twinDeployments] = await this.kubernetes.add_worker(
@@ -172,11 +173,11 @@ class K8sModule extends BaseModule {
   @checkBalance
   async deploy(options: K8SModel) {
     if (options.masters.length > 1) {
-      throw Error("Multiple masters are not supported");
+      throw new ValidationError("Multiple masters are not supported");
     }
 
     if (await this.exists(options.name)) {
-      throw Error(`Another k8s deployment with the same name ${options.name} already exists`);
+      throw new ValidationError(`Another k8s deployment with the same name ${options.name} already exists.`);
     }
 
     events.emit("logs", `Start creating the cluster with name ${options.name}`);
@@ -224,26 +225,26 @@ class K8sModule extends BaseModule {
   @checkBalance
   async update(options: K8SModel) {
     if (!(await this.exists(options.name))) {
-      throw Error(`There is no k8s deployment with the name: ${options.name}`);
+      throw new ValidationError(`There is no k8s deployment with the name: ${options.name}.`);
     }
     if (options.masters.length > 1) {
-      throw Error("Multiple masters are not supported");
+      throw new ValidationError("Multiple masters are not supported.");
     }
     const oldDeployments = await this._get(options.name);
 
     const masterIps = await this._getMastersIp(options.name, oldDeployments);
     if (masterIps.length === 0) {
-      throw Error("Couldn't get master ip");
+      throw new GridClientErrors.Workloads.WorkloadUpdateError("Couldn't get master ip.");
     }
     const masterWorkloads = await this._getMastersWorkload(options.name, oldDeployments);
     if (masterWorkloads.length === 0) {
-      throw Error("Couldn't get master node");
+      throw new GridClientErrors.Workloads.WorkloadUpdateError("Couldn't get master node.");
     }
     const masterWorkload = masterWorkloads[0];
     const networkName = masterWorkload.data["network"].interfaces[0].network;
     const networkIpRange = Addr(masterWorkload.data["network"].interfaces[0].ip).mask(16).toString();
     if (networkName !== options.network.name && networkIpRange !== options.network.ip_range) {
-      throw Error("Network name and ip_range can't be changed");
+      throw new GridClientErrors.Workloads.WorkloadUpdateError("Network name and ip_range can't be changed.");
     }
 
     //TODO: check that the master nodes are not changed
@@ -256,17 +257,17 @@ class K8sModule extends BaseModule {
   @checkBalance
   async add_worker(options: AddWorkerModel) {
     if (!(await this.exists(options.deployment_name))) {
-      throw Error(`There is no k8s deployment with the name: ${options.deployment_name}`);
+      throw new ValidationError(`There is no k8s deployment with the name: ${options.deployment_name}.`);
     }
     const oldDeployments = await this._get(options.deployment_name);
     if (this.workloadExists(options.name, oldDeployments))
-      throw Error(
-        `There is another worker with the same name "${options.name}" in this cluster ${options.deployment_name}`,
+      throw new ValidationError(
+        `There is another worker with the same name "${options.name}" in this cluster ${options.deployment_name}.`,
       );
     events.emit("logs", `Start adding worker: ${options.name} to cluster: ${options.deployment_name}`);
     const masterWorkloads = await this._getMastersWorkload(options.deployment_name, oldDeployments);
     if (masterWorkloads.length === 0) {
-      throw Error("Couldn't get master node");
+      throw new GridClientErrors.Workloads.WorkloadUpdateError("Couldn't get master node.");
     }
     const masterWorkload = masterWorkloads[masterWorkloads.length - 1];
     const networkName = masterWorkload.data["network"].interfaces[0].network;
@@ -308,7 +309,7 @@ class K8sModule extends BaseModule {
   @checkBalance
   async delete_worker(options: DeleteWorkerModel) {
     if (!(await this.exists(options.deployment_name))) {
-      throw Error(`There is no k8s deployment with the name: ${options.deployment_name}`);
+      throw new ValidationError(`There is no k8s deployment with the name: ${options.deployment_name}.`);
     }
     events.emit("logs", `Start deleting worker: ${options.name} from cluster: ${options.deployment_name}`);
     return await this._deleteInstance(this.kubernetes, options.deployment_name, options.name);
