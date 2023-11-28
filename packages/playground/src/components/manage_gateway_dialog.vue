@@ -120,7 +120,7 @@
             </div>
 
             <copy-input-wrapper #="{ props }" :data="networkName">
-              <v-text-field label="Wireguard Interface Name" v-model="networkName" readonly v-bind="props" />
+              <v-text-field label="Network name" v-model="networkName" readonly v-bind="props" />
             </copy-input-wrapper>
 
             <copy-input-wrapper #="{ props }" :data="ip">
