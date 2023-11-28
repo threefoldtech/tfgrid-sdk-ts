@@ -81,7 +81,7 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
         farms.value = data.map(farm => {
           const ips = farm.publicIps;
           const total = ips.length;
-          const used = ips.filter(x => x.contract_id === 0).length;
+          const used = ips.filter(x => x.contract_id !== 0).length;
           return {
             ...farm,
             totalPublicIp: total,
