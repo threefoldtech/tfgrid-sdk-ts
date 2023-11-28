@@ -85,9 +85,7 @@
                 ]"
                 #="{ props }"
               >
-                <v-text-field label="Subdomain" :prefix="prefix" v-model.trim="subdomain" v-bind="props">
-                  <template #>a</template>
-                </v-text-field>
+                <v-text-field label="Subdomain" :prefix="prefix" v-model.trim="subdomain" v-bind="props" />
               </input-validator>
             </input-tooltip>
 
