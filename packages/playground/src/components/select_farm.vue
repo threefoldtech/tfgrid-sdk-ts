@@ -17,8 +17,9 @@
           @click:clear="resetPages"
           :error-messages="!loading && !farms.length ? 'No farms where found with the specified resources.' : undefined"
           v-model:search="search"
+          hide-no-data
         >
-          <template v-slot:append-item v-if="page !== -1">
+          <template v-slot:append-item v-if="page !== -1 && !searchInput">
             <div class="px-4 mt-4">
               <v-btn
                 block
