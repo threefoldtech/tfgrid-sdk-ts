@@ -27,7 +27,7 @@
                 #="{ props }"
               >
                 <input-tooltip tooltip="Twin ID of Recipient Account">
-                  <v-text-field label="Recipient TwinID:" v-bind="props" v-model="recipientTwinId"></v-text-field>
+                  <v-text-field label="Recipient Twin ID:" v-bind="props" v-model="recipientTwinId"></v-text-field>
                 </input-tooltip>
               </input-validator>
 
