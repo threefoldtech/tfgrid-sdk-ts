@@ -158,7 +158,7 @@ const inputFiltersReset = (nFltrNptsVal: FilterFarmInputs) => {
   mixedFarmFilters.value.inputs = nFltrNptsVal;
   nFltrNptsVal.farmId.value = undefined;
   nFltrNptsVal.name.value = undefined;
-  nFltrNptsVal.totalIps.value = undefined;
+  nFltrNptsVal.freeIps.value = undefined;
 };
 const openSheet = (_e: any, { item }: any) => {
   openDialog(item.value);
