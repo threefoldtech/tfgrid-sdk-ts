@@ -1,3 +1,5 @@
+import { GridClientErrors, TFChainError } from "@threefold/types";
+
 import { TFClient } from "../clients";
 import { GridClientConfig } from "../config";
 import { events, validateInput } from "../helpers";
@@ -28,14 +30,15 @@ class Nodes {
   async reserve(options: RentContractCreateModel) {
     const rentContractId = await this.getRentContractId({ nodeId: options.nodeId });
     if (rentContractId) {
-      throw Error(`Node is already rented`);
+      throw new GridClientErrors.Nodes.UnavailableNodeError(`Node is already rented.`);
     }
     try {
       const res = await (await this.client.contracts.createRent(options)).apply();
-      events.emit("logs", `Rent contract with id: ${res.contractId} has been created`);
+      events.emit("logs", `Rent contract with id: ${res.contractId} has been created.`);
       return res;
     } catch (e) {
-      throw Error(`Failed to create rent contract on node ${options.nodeId} due to ${e}`);
+      //TODO Errors should be handled in tfchain
+      throw new TFChainError(`Failed to create rent contract on node ${options.nodeId} due to ${e}`);
     }
   }
 
@@ -53,7 +56,7 @@ class Nodes {
       events.emit("logs", `Rent contract for node ${options.nodeId} has been deleted`);
       return res;
     } catch (e) {
-      throw Error(`Failed to delete rent contract on node ${options.nodeId} due to ${e}`);
+      throw new TFChainError(`Failed to delete rent contract on node ${options.nodeId} due to ${e}`);
     }
   }
 
@@ -66,7 +69,7 @@ class Nodes {
         return res;
       })
       .catch(err => {
-        throw Error(`Error getting rent for node ${options.nodeId}: ${err}`);
+        throw new TFChainError(`Error getting rent for node ${options.nodeId}: ${err}`);
       });
   }
 

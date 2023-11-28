@@ -5,7 +5,7 @@ export type FilterFarmInputs = {
   farmId: InputFilterType;
   name: InputFilterType;
 
-  totalIps: InputFilterType;
+  freeIps: InputFilterType;
 };
 export const inputsInitializer: FilterFarmInputs = {
   farmId: {
@@ -27,13 +27,13 @@ export const inputsInitializer: FilterFarmInputs = {
     type: "text",
   },
 
-  totalIps: {
-    label: "Total  PubIPs",
+  freeIps: {
+    label: "Free PubIPs",
     placeholder: "e.g. 1,2,3.",
     rules: [
       [
         isNumeric("This field accepts numbers only.", { no_symbols: true }),
-        min("Total Public IP should be larger than zero.", 1),
+        min("Free Public IP should be larger than zero.", 1),
         isInt("should be an integer"),
       ],
     ],
