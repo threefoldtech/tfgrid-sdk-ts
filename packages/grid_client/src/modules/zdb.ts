@@ -16,7 +16,7 @@ class ZdbsModule extends BaseModule {
   fileName = "zdbs.json";
   workloadTypes = [WorkloadTypes.zdb];
   zdb: ZdbHL;
-  constructor(config: GridClientConfig) {
+  constructor(public config: GridClientConfig) {
     super(config);
     this.zdb = new ZdbHL(config);
   }
