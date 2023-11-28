@@ -37,9 +37,23 @@
         <v-list class="custom-list">
           <v-row>
             <v-col cols="1" sm="2" class="column-style my-4">
-              <v-list-item> ID </v-list-item>
+              <input-tooltip
+                tooltip="Your unique identifier for your twin on the ThreeFold chain."
+                :align-center="true"
+                :class="'d-flex align-center'"
+                location="right center"
+              >
+                <v-list-item class="align-id"> ID </v-list-item>
+              </input-tooltip>
               <v-divider></v-divider>
-              <v-list-item> Address </v-list-item>
+              <input-tooltip
+                tooltip="Your public address on the ThreeFold chain."
+                :align-center="true"
+                :class="'d-flex align-center'"
+                location="right center"
+              >
+                <v-list-item> Address </v-list-item>
+              </input-tooltip>
               <v-divider></v-divider>
               <input-tooltip
                 tooltip="Relay is a component that facilitates the reliable and secure transfer of messages between different entities within the ThreeFold ecosystem."
@@ -47,7 +61,7 @@
                 :class="'d-flex align-center'"
                 location="bottom end"
               >
-                <v-list-item> Relay </v-list-item>
+                <v-list-item class="align-relay"> Relay </v-list-item>
               </input-tooltip>
             </v-col>
             <v-col cols="1" sm="10" class="my-4">
@@ -202,5 +216,13 @@ function copy(id: string) {
 .bold-text {
   font-weight: 500;
   padding-left: 1rem;
+}
+
+.align-id {
+  margin-right: 43px;
+}
+
+.align-relay {
+  margin-right: 18px;
 }
 </style>
