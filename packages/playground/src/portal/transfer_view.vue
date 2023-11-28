@@ -15,9 +15,9 @@
           <v-card class="pa-5 my-5" flat>
             <form-validator v-model="isValidTwinIDTransfer">
               <input-validator
-                :value="receipientTwinId"
+                :value="recipientTwinId"
                 :rules="[
-                  validators.required('Recepient Twin ID is required'),
+                  validators.required('Recipient Twin ID is required'),
                   validators.isNotEmpty('Invalid Twin ID'),
                   validators.isNumeric('Twin ID should be a number'),
                   validators.min('Twin ID should be more than 0', 1),
@@ -26,8 +26,8 @@
                 :async-rules="[isValidTwinID]"
                 #="{ props }"
               >
-                <input-tooltip tooltip="Enter Twin ID of Receipient Account">
-                  <v-text-field label="Recipient TwinID:" v-bind="props" v-model="receipientTwinId"></v-text-field>
+                <input-tooltip tooltip="Twin ID of Recipient Account">
+                  <v-text-field label="Recipient Twin ID:" v-bind="props" v-model="recipientTwinId"></v-text-field>
                 </input-tooltip>
               </input-validator>
 
@@ -68,17 +68,17 @@
           <v-card class="pa-5 my-5" flat>
             <form-validator v-model="isValidAddressTransfer">
               <input-validator
-                :value="receipientAddress"
+                :value="recipientAddress"
                 :rules="[
-                  validators.required('Receipient address is required '),
+                  validators.required('Recipient address is required '),
                   validators.isAlphanumeric('Invalid Address'),
                   isSameAddress,
                 ]"
                 :async-rules="[isValidAddress]"
                 #="{ props }"
               >
-                <input-tooltip tooltip="Enter Address of Receipient Account">
-                  <v-text-field label="Recipient Address:" v-model="receipientAddress" v-bind="props"> </v-text-field>
+                <input-tooltip tooltip="Address of Recipient Account">
+                  <v-text-field label="Recipient Address:" v-model="recipientAddress" v-bind="props"> </v-text-field>
                 </input-tooltip>
               </input-validator>
               <input-validator
@@ -130,13 +130,13 @@ import { getGrid, loadBalance } from "../utils/grid";
 
 const profileManagerController = useProfileManagerController();
 const activeTab = ref(0);
-const receipientTwinId = ref("");
+const recipientTwinId = ref("");
 const isValidTwinIDTransfer = ref(false);
 const transferAmount = ref(1);
 const loadingTwinIDTransfer = ref(false);
 const loadingAddressTransfer = ref(false);
 const isValidAddressTransfer = ref(false);
-const receipientAddress = ref("");
+const recipientAddress = ref("");
 const profileManager = useProfileManager();
 const profile = ref(profileManager.profile!);
 const loadingBalance = ref(true);
@@ -173,14 +173,14 @@ async function isValidAddress() {
   const grid = await getGrid(profile.value);
   const keyring = new Keyring({ type: "sr25519" });
   try {
-    keyring.addFromAddress(receipientAddress.value.trim());
+    keyring.addFromAddress(recipientAddress.value.trim());
   } catch (error) {
     return { message: "Invalid address." };
   }
   try {
     if (grid) {
       const twinId = await grid.twins.get_twin_id_by_account_id({
-        public_key: receipientAddress.value.trim(),
+        public_key: recipientAddress.value.trim(),
       });
       recepTwinFromAddress.value = await grid.twins.get({ id: twinId });
       if (recepTwinFromAddress.value == null) {
@@ -193,8 +193,8 @@ async function isValidAddress() {
 }
 function clearInput() {
   transferAmount.value = 1;
-  receipientTwinId.value = "";
-  receipientAddress.value = "";
+  recipientTwinId.value = "";
+  recipientAddress.value = "";
 }
 async function getFreeBalance() {
   const grid = await getGrid(profile.value);
@@ -205,11 +205,11 @@ async function getFreeBalance() {
     loadingBalance.value = false;
   }
 }
-async function transfer(receipientTwin: Twin) {
+async function transfer(recipientTwin: Twin) {
   const grid = await getGrid(profile.value);
   try {
     if (grid) {
-      await grid.balance.transfer({ address: receipientTwin.accountId, amount: transferAmount.value });
+      await grid.balance.transfer({ address: recipientTwin.accountId, amount: transferAmount.value });
       createCustomToast("Transaction Complete!", ToastType.success);
       profileManagerController.reloadBalance();
       await getFreeBalance();
@@ -229,7 +229,7 @@ function createInvalidTransferToast(message: string) {
 async function submitFormTwinID() {
   const grid = await getGrid(profile.value);
   if (grid) {
-    const twinDetails = await grid.twins.get({ id: parseInt(receipientTwinId.value.trim()) });
+    const twinDetails = await grid.twins.get({ id: parseInt(recipientTwinId.value.trim()) });
     if (twinDetails != null) {
       loadingTwinIDTransfer.value = true;
       await transfer(twinDetails);
