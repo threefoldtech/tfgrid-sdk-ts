@@ -56,7 +56,7 @@
               </input-tooltip>
               <v-divider></v-divider>
               <input-tooltip
-                tooltip="Relay is a component that facilitates the reliable and secure transfer of messages between different entities within the ThreeFold ecosystem."
+                tooltip="A relay is a component that facilitates the reliable and secure transfer of messages between different entities within the ThreeFold ecosystem."
                 :align-center="true"
                 :class="'d-flex align-center'"
                 location="bottom end"
