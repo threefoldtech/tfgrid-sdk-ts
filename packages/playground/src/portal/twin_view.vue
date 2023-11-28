@@ -43,7 +43,7 @@
                 :class="'d-flex align-center'"
                 location="right center"
               >
-                <v-list-item class="align-id"> ID </v-list-item>
+                <v-list-item class="mr-auto"> ID </v-list-item>
               </input-tooltip>
               <v-divider></v-divider>
               <input-tooltip
@@ -52,7 +52,7 @@
                 :class="'d-flex align-center'"
                 location="right center"
               >
-                <v-list-item> Address </v-list-item>
+                <v-list-item class="mr-auto"> Address </v-list-item>
               </input-tooltip>
               <v-divider></v-divider>
               <input-tooltip
@@ -61,7 +61,7 @@
                 :class="'d-flex align-center'"
                 location="bottom end"
               >
-                <v-list-item class="align-relay"> Relay </v-list-item>
+                <v-list-item class="mr-auto"> Relay </v-list-item>
               </input-tooltip>
             </v-col>
             <v-col cols="1" sm="10" class="my-4">
@@ -216,13 +216,5 @@ function copy(id: string) {
 .bold-text {
   font-weight: 500;
   padding-left: 1rem;
-}
-
-.align-id {
-  margin-right: 43px;
-}
-
-.align-relay {
-  margin-right: 18px;
 }
 </style>
