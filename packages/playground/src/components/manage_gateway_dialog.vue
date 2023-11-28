@@ -44,7 +44,7 @@
             :loading="loadingGateways"
             v-model="gatewaysToDelete"
             :deleting="deleting"
-            no-data-text="No gateways found for this deployment."
+            no-data-text="No domains attached to this virtual machine."
           >
             <template #[`item.name`]="{ item }">
               {{ item.value.name.slice(item.value.name.startsWith(prefix) ? prefix.length : 0) }}
@@ -66,7 +66,9 @@
 
         <div v-show="gatewayTab === 1">
           <form-validator v-model="valid">
-            <input-tooltip tooltip="Subdomain will be used as a gateway name incase of selecting a custom domain.">
+            <input-tooltip
+              :tooltip="`Selecting custom domain sets subdomain as gateway name. Prefix(${prefix}) is project name and twin ID.`"
+            >
               <input-validator
                 :value="subdomain"
                 :rules="[
@@ -83,7 +85,9 @@
                 ]"
                 #="{ props }"
               >
-                <v-text-field label="Subdomain" :prefix="prefix" v-model.trim="subdomain" v-bind="props" />
+                <v-text-field label="Subdomain" :prefix="prefix" v-model.trim="subdomain" v-bind="props">
+                  <template #>a</template>
+                </v-text-field>
               </input-validator>
             </input-tooltip>
 
@@ -101,7 +105,7 @@
 
             <div :style="{ marginTop: '-10px' }">
               <input-tooltip
-                tooltip="Disabling TLS Pass Through will let the gateway terminate the traffic, while Enabling it will let your backend service to do the TLS termination."
+                tooltip="Disabling TLS Pass Through allows gateway traffic termination. Meanwhile, enabling it allows backend service TLS termination."
                 inline
               >
                 <v-switch
@@ -116,11 +120,11 @@
             </div>
 
             <copy-input-wrapper #="{ props }" :data="networkName">
-              <v-text-field label="Network Name" v-model="networkName" readonly v-bind="props" />
+              <v-text-field label="Wireguard Interface Name" v-model="networkName" readonly v-bind="props" />
             </copy-input-wrapper>
 
             <copy-input-wrapper #="{ props }" :data="ip">
-              <v-text-field label="IP Address" v-model="ip" readonly v-bind="props" />
+              <v-text-field label="Wireguard IP Address" v-model="ip" readonly v-bind="props" />
             </copy-input-wrapper>
           </form-validator>
         </div>
@@ -135,7 +139,7 @@
           >
             Delete
           </v-btn>
-          <v-btn color="primary" variant="tonal" @click="deployGateway" :disabled="!valid" v-else> Deploy </v-btn>
+          <v-btn color="primary" variant="tonal" @click="deployGateway" :disabled="!valid" v-else> Add a domain </v-btn>
         </template>
       </weblet-layout>
     </v-dialog>
