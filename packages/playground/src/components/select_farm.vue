@@ -18,6 +18,7 @@
           :error-messages="!loading && !farms.length ? 'No farms where found with the specified resources.' : undefined"
           v-model:search="search"
           hide-no-data
+          @keyup="reloadOnEmptySearch"
         >
           <template v-slot:append-item v-if="page !== -1 && !searchInput">
             <div class="px-4 mt-4">
@@ -228,6 +229,13 @@ watch([loading, shouldBeUpdated], async ([l, s]) => {
     await resetPages();
   }, 2000);
 });
+
+watch([shouldBeUpdated, loading, farms, search], reloadOnEmptySearch);
+function reloadOnEmptySearch() {
+  if (search.value === "" && !loading.value && farms.value.length === 0 && !shouldBeUpdated.value) {
+    shouldBeUpdated.value = true;
+  }
+}
 </script>
 
 <script lang="ts">
