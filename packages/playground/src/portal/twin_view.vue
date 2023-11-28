@@ -41,7 +41,12 @@
               <v-divider></v-divider>
               <v-list-item> Address </v-list-item>
               <v-divider></v-divider>
-              <input-tooltip tooltip="Relay" :align-center="true" :class="'d-flex align-center'" location="bottom">
+              <input-tooltip
+                tooltip="Relay is a component that facilitates the reliable and secure transfer of messages between different entities within the ThreeFold ecosystem."
+                :align-center="true"
+                :class="'d-flex align-center'"
+                location="bottom end"
+              >
                 <v-list-item> Relay </v-list-item>
               </input-tooltip>
             </v-col>
