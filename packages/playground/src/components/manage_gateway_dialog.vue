@@ -79,8 +79,8 @@
                   validators.minLength('Subdomain must be at least 4 characters.', 4),
                   subdomain =>
                     validators.maxLength(
-                      `Subdomain cannot exceed ${15 - prefix.length} characters.`,
-                      15 - prefix.length,
+                      `Subdomain cannot exceed ${35 - prefix.length} characters.`,
+                      35 - prefix.length,
                     )(subdomain),
                 ]"
                 #="{ props }"
@@ -213,8 +213,9 @@ export default {
       const grid = await getGrid(profileManager.profile!);
       prefix.value =
         (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
-        grid!.config.twinId;
-      subdomain.value = generateName({}, 15 - prefix.value.length);
+        grid!.config.twinId +
+        props.vm?.[0]?.name;
+      subdomain.value = generateName({}, 35 - prefix.value.length > 7 ? 7 : 35 - prefix.value.length);
       await grid!.disconnect();
       await loadGateways();
     });
