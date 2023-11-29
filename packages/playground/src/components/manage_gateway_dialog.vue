@@ -23,6 +23,38 @@
           <v-tab>Add new domain</v-tab>
         </v-tabs>
 
+        <v-alert
+          type="warning"
+          variant="tonal"
+          class="mb-4"
+          v-if="failedToListGws.length && gatewayTab === 0 && !loadingGateways"
+        >
+          Failed to list {{ failedToListGws.length }} domains.
+
+          <template #append>
+            <v-btn
+              icon="mdi-format-list-bulleted-square"
+              variant="plain"
+              size="x-small"
+              @click="failedDomainDialog = true"
+            />
+          </template>
+        </v-alert>
+
+        <v-dialog v-model="failedDomainDialog" max-width="400px">
+          <v-card>
+            <v-card-title class="bg-warning">Failed Domains</v-card-title>
+
+            <v-card-text>
+              <v-list lines="one">
+                <v-list-item v-for="gw in failedToListGws" :key="gw">
+                  <span>* {{ gw }}</span>
+                </v-list-item>
+              </v-list>
+            </v-card-text>
+          </v-card>
+        </v-dialog>
+
         <div v-show="gatewayTab === 0" :class="{ 'pb-2': !loadingGateways, 'pb-6': loadingGateways }">
           <div class="d-flex justify-end mb-4">
             <v-btn color="primary" :loading="loadingGateways" :disabled="deleting" @click="loadGateways" variant="tonal"
@@ -220,13 +252,17 @@ export default {
 
     const loadingGateways = ref(false);
     const gateways = ref<GridGateway[]>([]);
+    const failedToListGws = ref<string[]>([]);
+    const failedDomainDialog = ref(false);
     async function loadGateways() {
       try {
         gateways.value = [];
         gatewaysToDelete.value = [];
         loadingGateways.value = true;
         const grid = await getGrid(profileManager.profile!, props.vm.projectName);
-        gateways.value = await loadDeploymentGateways(grid!);
+        const { gateways: gws, failedToList } = await loadDeploymentGateways(grid!);
+        gateways.value = gws;
+        failedToListGws.value = failedToList;
       } catch (error) {
         layout.value.setStatus("failed", normalizeError(error, "Failed to list this deployment's domains."));
       } finally {
@@ -292,6 +328,8 @@ export default {
 
       loadingGateways,
       gateways,
+      failedToListGws,
+      failedDomainDialog,
 
       subdomain,
       port,
