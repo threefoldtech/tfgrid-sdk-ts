@@ -14,11 +14,11 @@ struct Payload {
   content? string
   signature string
   keypair KeypairType @[json: 'keypairType']
-};
+}
 
 pub struct VServerConfig {
   port int
-};
+}
 
 struct VServerApp {
 	vweb.Context
