@@ -205,40 +205,32 @@ const version = process.env.VERSION as any;
 
 const routes: AppRoute[] = [
   {
-    title: "Portal",
+    title: "Dashboard",
     icon: "mdi-account-convert-outline",
     items: [
       {
         title: "Twin",
         icon: "mdi-account-supervisor-outline",
-        route: "/portal/twin",
+        route: "/dashboard/twin",
       },
-      { title: "Bridge", icon: "mdi-swap-horizontal", route: "/portal/bridge" },
+      { title: "Bridge", icon: "mdi-swap-horizontal", route: "/dashboard/bridge" },
       {
         title: "Transfer",
         icon: "mdi-account-arrow-right-outline",
-        route: "/portal/transfer",
+        route: "/dashboard/transfer",
       },
-      { title: "Farms", icon: "mdi-silo", route: "/portal/farms" },
+      { title: "Farms", icon: "mdi-silo", route: "/dashboard/farms" },
       {
         title: "Dedicated Nodes",
         icon: "mdi-resistor-nodes",
-        route: "/portal/dedicated-nodes",
+        route: "/dashboard/dedicated-nodes",
       },
-      { title: "DAO", icon: "mdi-note-check-outline", route: "/portal/dao" },
-    ],
-  },
-  {
-    icon: "mdi-database-search-outline",
-    title: "Explorer",
-    items: [
+      { title: "DAO", icon: "mdi-note-check-outline", route: "/dashboard/dao" },
       {
-        title: "Statistics",
-        icon: "mdi-chart-scatter-plot",
-        route: "/explorer/stats",
+        title: "Contracts",
+        icon: "mdi-file-document-edit",
+        route: "/dashboard/contracts-list",
       },
-      { title: "Nodes", icon: "mdi-access-point", route: "/explorer/nodes" },
-      { title: "Farms", icon: "mdi-lan-connect", route: "/explorer/farms" },
     ],
   },
   {
@@ -262,15 +254,58 @@ const routes: AppRoute[] = [
     items: [{ title: "Solutions", icon: "mdi-lightbulb-on-outline", route: "/solutions" }],
   },
   {
-    title: "My Account",
+    icon: "mdi-database-search-outline",
+    title: "Statistics",
     items: [
       {
-        title: "Contracts",
-        icon: "mdi-file-document-edit",
-        route: "/contractslist",
+        title: "Statistics",
+        icon: "mdi-chart-scatter-plot",
+        route: "/stats",
       },
     ],
   },
+  {
+    icon: "mdi-access-point",
+    title: "Nodes",
+    items: [{ title: "Nodes", icon: "mdi-access-point", route: "/nodes" }],
+  },
+  {
+    icon: "mdi-access-point",
+    title: "Farms",
+    items: [{ title: "Farms", icon: "mdi-lan-connect", route: "/farms" }],
+  },
+  {
+    icon: "mdi-toolbox-outline",
+    title: "Services",
+    items: [
+      {
+        title: "0-Hub",
+        icon: "mdi-open-in-new",
+        url: "https://hub.grid.tf/",
+      },
+      {
+        title: "Monitoring",
+        icon: "mdi-equalizer",
+        url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
+      },
+      {
+        title: "0-Bootstrap",
+        icon: "mdi-earth",
+        url: "https://bootstrap.grid.tf/",
+      },
+      {
+        title: "Grid Services",
+        icon: "mdi-grid-large",
+        url: "https://status.grid.tf/status/threefold",
+      },
+      {
+        title: "Manual",
+        icon: "mdi-book-open-page-variant-outline",
+        url: "https://manual.grid.tf/",
+      },
+    ],
+  },
+
   ...(network !== "main"
     ? []
     : [
@@ -285,58 +320,6 @@ const routes: AppRoute[] = [
           ],
         } as any,
       ]),
-
-  {
-    title: "Metrics",
-    items: [
-      {
-        title: "Monitoring",
-        icon: "mdi-equalizer",
-        url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
-      },
-    ],
-  },
-  {
-    title: "Bootstrap",
-    items: [
-      {
-        title: "0-Bootstrap",
-        icon: "mdi-earth",
-        url: "https://bootstrap.grid.tf/",
-      },
-    ],
-  },
-  {
-    title: "0Hub",
-    icon: "mdi-toolbox",
-    items: [
-      {
-        title: "0-Hub",
-        icon: "mdi-open-in-new",
-        url: "https://hub.grid.tf/",
-      },
-    ],
-  },
-  {
-    title: "Grid Services",
-    items: [
-      {
-        title: "Grid Services",
-        icon: "mdi-grid-large",
-        url: "https://status.grid.tf/status/threefold",
-      },
-    ],
-  },
-  {
-    title: "Help",
-    items: [
-      {
-        title: "Manual",
-        icon: "mdi-book-open-page-variant-outline",
-        url: "https://manual.grid.tf/",
-      },
-    ],
-  },
 ];
 
 // eslint-disable-next-line no-undef
@@ -355,7 +338,7 @@ function clickHandler({ route, url }: AppRouteItem): void {
 
 $router.beforeEach((to, from, next) => {
   if (to.path === "/" && hasActiveProfile) {
-    next({ path: "portal/twin" });
+    next({ path: "dashboard/twin" });
   } else {
     next();
   }

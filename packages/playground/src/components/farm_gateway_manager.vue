@@ -4,12 +4,12 @@
 <script lang="ts" setup>
 import { provide, type Ref, ref } from "vue";
 
-import type { Farm } from "@/types";
+import type { FarmInterface } from "@/types";
 
-const FarmGateway = ref() as Ref<Farm | undefined>;
+const FarmGateway = ref() as Ref<FarmInterface | undefined>;
 const Loading = ref(false);
 provide("farm:gateway:manager", {
-  register(farmData: Farm) {
+  register(farmData: FarmInterface) {
     FarmGateway.value = farmData;
   },
   setLoading(loading: boolean) {
@@ -29,11 +29,11 @@ provide("farm:gateway:manager", {
 <script lang="ts">
 import { inject } from "vue";
 export interface FarmGatewayManager {
-  register(farmData: Farm | undefined): void;
+  register(farmData: FarmInterface | undefined): void;
   unregister(): void;
   setLoading(loading: boolean): void;
   getLoading(): boolean;
-  load(): Farm;
+  load(): FarmInterface;
 }
 
 export function useFarmGatewayManager(): FarmGatewayManager | null {

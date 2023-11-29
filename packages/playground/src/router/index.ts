@@ -19,38 +19,46 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes: [
     {
-      path: "/portal",
+      path: "/dashboard",
       children: [
         {
           name: "Twin",
           path: "twin",
-          component: () => import("../portal/twin_view.vue"),
+          component: () => import("../dashboard/twin_view.vue"),
           meta: { title: "Twin" },
         },
         {
           path: "dao",
-          component: () => import("../portal/dao_view.vue"),
+          component: () => import("../dashboard/dao_view.vue"),
           meta: { title: "Dao" },
         },
         {
           path: "bridge",
-          component: () => import("../portal/bridge_view.vue"),
+          component: () => import("../dashboard/bridge_view.vue"),
           meta: { title: "Bridge" },
         },
         {
           path: "transfer",
-          component: () => import("../portal/transfer_view.vue"),
+          component: () => import("../dashboard/transfer_view.vue"),
           meta: { title: "Transfer" },
         },
         {
           path: "farms",
-          component: () => import("../portal/farms_view.vue"),
+          component: () => import("../dashboard/farms_view.vue"),
           meta: { title: "Farms" },
         },
         {
           path: "dedicated-nodes",
-          component: () => import("../portal/dedicated_nodes_view.vue"),
+          component: () => import("../dashboard/dedicated_nodes_view.vue"),
           meta: { title: "Dedicated Nodes" },
+        },
+        {
+          path: "contracts-list",
+          component: () => import("../dashboard/contracts_list.vue"),
+          meta: {
+            title: "Contracts List",
+            info: { page: "info/contracts_list.md" },
+          },
         },
       ],
     },
@@ -66,26 +74,12 @@ const router = createRouter({
 
         {
           path: "simulator",
-          component: () => import("../portal/simulator_view.vue"),
+          component: () => import("../dashboard/simulator_view.vue"),
           meta: { title: "Twin" },
         },
       ],
     },
-    {
-      path: "/explorer",
-      children: [
-        {
-          path: "stats",
-          component: () => import("../explorer/stats.vue"),
-          meta: { title: "Statistics" },
-        },
-        {
-          path: "farms",
-          component: () => import("../explorer/views/farms.vue"),
-          meta: { title: "Farms" },
-        },
-      ],
-    },
+
     {
       path: "/solutions",
       children: [
@@ -494,14 +488,7 @@ const router = createRouter({
         },
       ],
     },
-    {
-      path: "/contractslist",
-      component: () => import("../views/contracts_list.vue"),
-      meta: {
-        title: "Contracts List",
-        info: { page: "info/contracts_list.md" },
-      },
-    },
+
     {
       path: "/minting",
       component: () => import("../views/minting_view.vue"),
@@ -515,9 +502,19 @@ const router = createRouter({
       },
     },
     {
-      path: "/explorer/nodes",
-      component: () => import("@/explorer/views/nodes.vue"),
-      meta: { title: "Explorer Nodes" },
+      path: "/nodes",
+      component: () => import("@/views/nodes.vue"),
+      meta: { title: "Nodes" },
+    },
+    {
+      path: "/farms",
+      component: () => import("@/views/farms.vue"),
+      meta: { title: "Farms" },
+    },
+    {
+      path: "/stats",
+      component: () => import("@/views/stats.vue"),
+      meta: { title: "Statistics" },
     },
     {
       path: "/:pathMatch(.*)*",
