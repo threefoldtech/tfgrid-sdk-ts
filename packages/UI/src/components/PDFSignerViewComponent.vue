@@ -55,13 +55,12 @@
 
 <script lang="ts">
 import { onMounted, ref } from "vue";
-import { createLoadingTask, VuePdf } from "vue3-pdfjs";
+import { createLoadingTask, VuePdf } from "vue3-pdfjs/esm";
 
-import { KeypairType } from "@/utils/sign";
-import ThreefoldSigner from "@/utils/threefoldSignerProvider";
-import { AlertOptions, type ErrorType, type ThreefoldProvider } from "@/utils/types";
-
+import { KeypairType } from "../utils/sign";
 import ThreefoldConnector from "../utils/threefoldConnectorProvider";
+import ThreefoldSigner from "../utils/threefoldSignerProvider";
+import { AlertOptions, type ErrorType, type ThreefoldProvider } from "../utils/types";
 import CustomAlertComponent from "./CustomAlertComponent.vue";
 import LoadingSpinnerComponent from "./LoadingSpinnerComponent.vue";
 
