@@ -113,7 +113,7 @@
         <div v-show="gatewayTab === 1">
           <form-validator v-model="valid">
             <input-tooltip
-              :tooltip="`Selecting custom domain sets subdomain as gateway name. Prefix(${prefix}) is solution name, twin ID and deployment name.`"
+              :tooltip="`Selecting custom domain sets subdomain as gateway name. Prefix(${prefix}) is solution name, twin ID, and deployment name.`"
             >
               <input-validator
                 :value="subdomain"
