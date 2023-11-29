@@ -65,7 +65,7 @@ If the signature cannot be verified, the server will respond with an HTTP status
 ### How to run the server
 
 ```sh
-$server_example npx ts-node src/server.ts
+$node-server-example npx ts-node src/server.ts
 ```
 
 Use this Node.js server example to handle PDF signature verification within your application.
