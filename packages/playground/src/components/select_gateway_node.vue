@@ -10,7 +10,7 @@
     >
       <v-autocomplete
         label="Select gateway"
-        placeholder="Please select a domain."
+        placeholder="Please select a gateway."
         :items="items"
         item-title="domain"
         return-object
