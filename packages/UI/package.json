@@ -3,6 +3,9 @@
   "version": "2.2.0-rc4",
   "private": false,
   "main": "dist/threefold-ui.umd.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check build-only && yarn tailwind-build",
