@@ -23,7 +23,7 @@ class GWModule extends BaseModule {
   workloadTypes = [WorkloadTypes.gatewayfqdnproxy, WorkloadTypes.gatewaynameproxy];
   gateway: GatewayHL;
 
-  constructor(config: GridClientConfig) {
+  constructor(public config: GridClientConfig) {
     super(config);
     this.gateway = new GatewayHL(config);
   }

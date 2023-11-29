@@ -37,11 +37,32 @@
         <v-list class="custom-list">
           <v-row>
             <v-col cols="1" sm="2" class="column-style my-4">
-              <v-list-item> ID </v-list-item>
+              <input-tooltip
+                tooltip="Your unique identifier for your twin on the ThreeFold chain."
+                :align-center="true"
+                :class="'d-flex align-center'"
+                location="right center"
+              >
+                <v-list-item class="mr-auto"> ID </v-list-item>
+              </input-tooltip>
               <v-divider></v-divider>
-              <v-list-item> Address </v-list-item>
+              <input-tooltip
+                tooltip="Your public address on the ThreeFold chain."
+                :align-center="true"
+                :class="'d-flex align-center'"
+                location="right center"
+              >
+                <v-list-item class="mr-auto"> Address </v-list-item>
+              </input-tooltip>
               <v-divider></v-divider>
-              <v-list-item> Relay </v-list-item>
+              <input-tooltip
+                tooltip="A relay is a component that facilitates the reliable and secure transfer of messages between different entities within the ThreeFold ecosystem."
+                :align-center="true"
+                :class="'d-flex align-center'"
+                location="bottom end"
+              >
+                <v-list-item class="mr-auto"> Relay </v-list-item>
+              </input-tooltip>
             </v-col>
             <v-col cols="1" sm="10" class="my-4">
               <v-list-item> {{ profileManager.profile?.twinId.toString() }} </v-list-item>
