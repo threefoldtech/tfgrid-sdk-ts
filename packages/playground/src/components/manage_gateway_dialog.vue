@@ -41,16 +41,16 @@
           </template>
         </v-alert>
 
-        <v-dialog v-model="failedDomainDialog" max-width="400px">
+        <v-dialog v-model="failedDomainDialog" max-width="400px" scrollable>
           <v-card>
             <v-card-title class="bg-warning">Failed Domains</v-card-title>
 
             <v-card-text>
-              <v-list lines="one">
-                <v-list-item v-for="gw in failedToListGws" :key="gw">
-                  <span>* {{ gw }}</span>
-                </v-list-item>
-              </v-list>
+              <ul style="list-style: square">
+                <li v-for="gw in failedToListGws" :key="gw">
+                  <span>{{ gw.slice(prefix.length) }}</span>
+                </li>
+              </ul>
             </v-card-text>
           </v-card>
         </v-dialog>
