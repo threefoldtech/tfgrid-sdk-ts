@@ -76,6 +76,15 @@ class GridClient {
         this.clientOptions.network === NetworkEnv.main
       )
     ) {
+      if (
+        !clientOptions.substrateURL ||
+        !clientOptions.proxyURL ||
+        !clientOptions.graphqlURL ||
+        !clientOptions.activationURL ||
+        !clientOptions.relayURL
+      )
+        //TODO throw a grid client error when its pr got merged
+        throw new Error("In Case of using a custom network, Must provide urls in GridClientOptions");
       this.clientOptions.network = NetworkEnv.custom;
       this.clientOptions.substrateURL = clientOptions.substrateURL;
       this.clientOptions.proxyURL = clientOptions.proxyURL;
