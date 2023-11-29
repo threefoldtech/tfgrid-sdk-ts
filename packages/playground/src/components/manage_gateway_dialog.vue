@@ -215,19 +215,23 @@ export default {
         (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
         grid!.config.twinId;
       subdomain.value = generateName({}, 15 - prefix.value.length);
-      await grid!.disconnect();
       await loadGateways();
     });
 
     const loadingGateways = ref(false);
     const gateways = ref<GridGateway[]>([]);
     async function loadGateways() {
-      gateways.value = [];
-      gatewaysToDelete.value = [];
-      loadingGateways.value = true;
-      const grid = await getGrid(profileManager.profile!, props.vm.projectName);
-      gateways.value = await loadDeploymentGateways(grid!);
-      loadingGateways.value = false;
+      try {
+        gateways.value = [];
+        gatewaysToDelete.value = [];
+        loadingGateways.value = true;
+        const grid = await getGrid(profileManager.profile!, props.vm.projectName);
+        gateways.value = await loadDeploymentGateways(grid!);
+      } catch (error) {
+        layout.value.setStatus("failed", normalizeError(error, "Failed to list this deployment's domains."));
+      } finally {
+        loadingGateways.value = false;
+      }
     }
 
     async function deployGateway() {
