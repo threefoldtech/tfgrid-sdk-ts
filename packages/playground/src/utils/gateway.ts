@@ -68,12 +68,23 @@ export async function loadDeploymentGateways(grid: GridClient) {
   const failedToList: string[] = [];
   const gws = await grid.gateway.list();
   const items = await Promise.all(
-    gws.map(gw =>
-      grid.gateway.getObj(gw).catch(() => {
-        failedToList.push(gw);
-        return null;
-      }),
-    ),
+    gws.map(gw => {
+      let timeout: ReturnType<typeof setTimeout>;
+
+      return Promise.race([
+        grid.gateway.getObj(gw),
+        new Promise((_, rej) => {
+          timeout = setTimeout(() => {
+            rej("Timeout!");
+          }, window.env.TIMEOUT);
+        }),
+      ])
+        .catch(() => {
+          failedToList.push(gw);
+          return null;
+        })
+        .finally(() => timeout && clearTimeout(timeout));
+    }),
   );
   return { gateways: items.flat().filter(Boolean) as GridGateway[], failedToList };
 }

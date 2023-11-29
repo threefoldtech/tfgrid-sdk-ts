@@ -48,7 +48,13 @@
             <v-card-text>
               <ul style="list-style: square">
                 <li v-for="gw in failedToListGws" :key="gw">
-                  <span>{{ gw.slice(prefix.length) }}</span>
+                  <span>{{
+                    gw.startsWith(prefix)
+                      ? gw.slice(prefix.length)
+                      : gw.startsWith(oldPrefix)
+                      ? gw.slice(oldPrefix.length)
+                      : gw
+                  }}</span>
                 </li>
               </ul>
             </v-card-text>
@@ -79,7 +85,15 @@
             no-data-text="No domains attached to this virtual machine."
           >
             <template #[`item.name`]="{ item }">
-              {{ item.value.name.slice(item.value.name.startsWith(prefix) ? prefix.length : 0) }}
+              {{
+                item.value.name.slice(
+                  item.value.name.startsWith(prefix)
+                    ? prefix.length
+                    : item.value.name.startsWith(oldPrefix)
+                    ? oldPrefix.length
+                    : 0,
+                )
+              }}
             </template>
 
             <template #[`item.tls_passthrough`]="{ item }">
@@ -99,7 +113,7 @@
         <div v-show="gatewayTab === 1">
           <form-validator v-model="valid">
             <input-tooltip
-              :tooltip="`Selecting custom domain sets subdomain as gateway name. Prefix(${prefix}) is project name and twin ID.`"
+              :tooltip="`Selecting custom domain sets subdomain as gateway name. Prefix(${prefix}) is project name, twin ID and deployment name.`"
             >
               <input-validator
                 :value="subdomain"
@@ -231,6 +245,7 @@ export default {
     const layout = useLayout();
     const gatewayTab = ref(0);
 
+    const oldPrefix = ref("");
     const prefix = ref("");
     const subdomain = ref("");
     const domainName = ref<DomainModel>();
@@ -243,10 +258,10 @@ export default {
 
     onMounted(async () => {
       const grid = await getGrid(profileManager.profile!);
-      prefix.value =
+      oldPrefix.value =
         (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
-        grid!.config.twinId +
-        props.vm?.[0]?.name;
+        grid!.config.twinId;
+      prefix.value = oldPrefix.value + props.vm?.[0]?.name;
       subdomain.value = generateName({}, 35 - prefix.value.length > 7 ? 7 : 35 - prefix.value.length);
       await loadGateways();
     });
@@ -323,6 +338,7 @@ export default {
     return {
       profileManager,
 
+      oldPrefix,
       prefix,
       layout,
       gatewayTab,
