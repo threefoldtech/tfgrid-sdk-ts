@@ -48,7 +48,7 @@ async function main() {
         nodeSRU: diskSize + rootFs,
         publicIp: publicIp,
         availableFor: await grid3.twins.get_my_twin_id(),
-        randomize: false,
+        randomize: true,
       } as FarmFilterOptions);
 
       if (farms.length < 1) {
@@ -61,7 +61,7 @@ async function main() {
         sru: rootFs + diskSize,
         availableFor: await grid3.twins.get_my_twin_id(),
         farmId: +randomChoice(farms).farmId,
-        randomize: false,
+        randomize: true,
       } as FilterOptions);
 
       if (nodes.length < 1) {
@@ -69,12 +69,11 @@ async function main() {
         failedCount++;
         continue;
       }
-      const id = +randomChoice(nodes).nodeId;
 
       // create vm node Object
       const vm = new MachineModel();
       vm.name = vmName;
-      vm.node_id = id;
+      vm.node_id = nodes[0].nodeId;
       vm.disks = [disk1];
       vm.public_ip = publicIp;
       vm.planetary = true;
@@ -93,6 +92,7 @@ async function main() {
     const n = new NetworkModel();
     n.name = "nw" + generateString(5);
     n.ip_range = "10.238.0.0/16";
+    n.addAccess = true;
 
     // create VMs Object
     const vms = new MachinesModel();
