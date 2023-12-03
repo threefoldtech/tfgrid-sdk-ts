@@ -181,7 +181,7 @@ import { Selection } from "@/utils/types";
 import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
+import type { FarmInterface, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
@@ -198,7 +198,7 @@ const username = ref("admin");
 const password = ref(generatePassword());
 const email = ref("");
 const solution = ref() as Ref<SolutionFlavor>;
-const farm = ref() as Ref<Farm>;
+const farm = ref() as Ref<FarmInterface>;
 const farmName = ref();
 const loadingFarm = ref(false);
 const flist: Flist = {

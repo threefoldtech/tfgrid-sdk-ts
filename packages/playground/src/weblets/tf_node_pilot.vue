@@ -123,7 +123,7 @@ import { Selection } from "@/utils/types";
 import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import { type Farm, type Flist, ProjectName } from "../types";
+import { type FarmInterface, type Flist, ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
@@ -135,7 +135,7 @@ const loadingFarm = ref(false);
 const name = ref(generateName({ prefix: "np" }));
 const cpu = ref(8);
 const memory = ref(8192);
-const farm = ref() as Ref<Farm>;
+const farm = ref() as Ref<FarmInterface>;
 const farmName = ref();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",

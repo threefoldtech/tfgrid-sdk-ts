@@ -1,3 +1,5 @@
+import { ValidationError } from "@threefold/types";
+
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
 import { expose } from "../helpers/expose";
@@ -21,7 +23,7 @@ class GWModule extends BaseModule {
   workloadTypes = [WorkloadTypes.gatewayfqdnproxy, WorkloadTypes.gatewaynameproxy];
   gateway: GatewayHL;
 
-  constructor(config: GridClientConfig) {
+  constructor(public config: GridClientConfig) {
     super(config);
     this.gateway = new GatewayHL(config);
   }
@@ -31,7 +33,7 @@ class GWModule extends BaseModule {
   @checkBalance
   async deploy_fqdn(options: GatewayFQDNModel) {
     if (await this.exists(options.name)) {
-      throw Error(`Another gateway deployment with the same name ${options.name} already exists`);
+      throw new ValidationError(`Another gateway deployment with the same name ${options.name} already exists.`);
     }
     events.emit("logs", `Start creating the gateway deployment with name ${options.name}`);
     const metadata = JSON.stringify({
@@ -60,7 +62,7 @@ class GWModule extends BaseModule {
   @checkBalance
   async deploy_name(options: GatewayNameModel) {
     if (await this.exists(options.name)) {
-      throw Error(`Another gateway deployment with the same name ${options.name} already exists`);
+      throw new ValidationError(`Another gateway deployment with the same name ${options.name} already exists.`);
     }
     events.emit("logs", `Start creating the gateway deployment with name ${options.name}`);
     const metadata = JSON.stringify({

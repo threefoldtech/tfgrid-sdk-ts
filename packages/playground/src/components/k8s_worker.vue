@@ -156,7 +156,7 @@ import NodeSelector from "../components/node_selection.vue";
 import SelectFarmManager, { useFarm } from "../components/select_farm_manager.vue";
 import SelectNode from "../components/select_node.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, K8SWorker } from "../types";
+import type { FarmInterface, K8SWorker } from "../types";
 import type { INode } from "../utils/filter_nodes";
 import { generateName } from "../utils/strings";
 import RootFsSize from "./root_fs_size.vue";
@@ -174,7 +174,7 @@ export function createWorker(name: string = generateName({ prefix: "wr" })): K8S
     ipv6: false,
     planetary: true,
     rootFsSize: 2,
-    farm: undefined as Farm | undefined,
+    farm: undefined as FarmInterface | undefined,
     selectedNode: undefined as INode | undefined,
     dedicated: false,
     certified: false,
