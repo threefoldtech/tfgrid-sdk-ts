@@ -33,6 +33,7 @@
         v-for="(network, index) in networks"
         :key="index"
         class="py-0 px-1 d-flex text-center justify-center"
+        :style="{ order: network.label === 'Main' ? 1 : 0 }"
       >
         <div class="pa-0">
           <v-switch
