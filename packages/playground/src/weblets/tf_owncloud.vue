@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/owncloud.png"
   >
     <template #title>Deploy an OwnCloud Instance </template>
@@ -118,6 +119,7 @@
               }"
               v-model="farm"
               v-model:loading="loadingFarm"
+              v-model:search="farmName"
             />
             <SelectNode
               v-model="selectedNode"
@@ -162,7 +164,7 @@ import { computed, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
+import type { FarmInterface, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
@@ -177,7 +179,8 @@ const name = ref(generateName({ prefix: "oc" }));
 const username = ref("admin");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
-const farm = ref() as Ref<Farm>;
+const farm = ref() as Ref<FarmInterface>;
+const farmName = ref();
 const loadingFarm = ref(false);
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/owncloud-10.9.1.flist",

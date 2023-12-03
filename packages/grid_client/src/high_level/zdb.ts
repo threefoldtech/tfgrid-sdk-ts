@@ -1,7 +1,8 @@
+import { GridClientErrors } from "@threefold/types";
+
 import { events } from "../helpers/events";
 import { Operations, TwinDeployment } from "../high_level/models";
 import { DeploymentFactory } from "../primitives/deployment";
-import { Nodes } from "../primitives/nodes";
 import { ZdbPrimitive } from "../primitives/zdb";
 import { Deployment } from "../zos/deployment";
 import { WorkloadTypes } from "../zos/workload";
@@ -21,7 +22,9 @@ class ZdbHL extends HighLevelBase {
     solutionProviderId?: number,
   ): Promise<TwinDeployment> {
     if (!(await this.nodes.nodeHasResources(node_id, { hru: disk_size }))) {
-      throw Error(`Node ${node_id} doesn't have enough resources: hru=${disk_size}`);
+      throw new GridClientErrors.Nodes.InvalidResourcesError(
+        `Node ${node_id} doesn't have enough resources: hru=${disk_size} .`,
+      );
     }
     events.emit("logs", `Creating a zdb on node: ${node_id}`);
     const deploymentFactory = new DeploymentFactory(this.config);

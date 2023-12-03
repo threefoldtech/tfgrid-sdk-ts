@@ -9,6 +9,7 @@
     :ipv4="master.ipv4"
     :certified="master.certified"
     :dedicated="master.dedicated"
+    :SelectedNode="master.selectedNode"
     title-image="images/icons/kubernetes.png"
   >
     <template #title>Deploy a Kubernetes cluster</template>

@@ -7,6 +7,7 @@
     :certified="certified"
     :dedicated="dedicated"
     ipv4
+    :SelectedNode="selectedNode"
     title-image="images/icons/vm.png"
   >
     <template #title>Deploy a Node Pilot</template>
@@ -87,6 +88,7 @@
           }"
           v-model="farm"
           v-model:loading="loadingFarm"
+          v-model:search="farmName"
         />
 
         <SelectNode
@@ -116,7 +118,7 @@ import { type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import { type Farm, type Flist, ProjectName } from "../types";
+import { type FarmInterface, type Flist, ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
@@ -128,7 +130,8 @@ const loadingFarm = ref(false);
 const name = ref(generateName({ prefix: "np" }));
 const cpu = ref(8);
 const memory = ref(8192);
-const farm = ref() as Ref<Farm>;
+const farm = ref() as Ref<FarmInterface>;
+const farmName = ref();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
   entryPoint: "/",

@@ -1,3 +1,4 @@
+import { ValidationError } from "@threefold/types";
 import getAppDataPath from "appdata-path";
 import * as PATH from "path";
 
@@ -59,7 +60,7 @@ class BackendStorage {
       const storage = require("./localstorage");
       this.storage = new storage.LocalStorage();
     } else {
-      throw Error("Unsupported type for backend");
+      throw new ValidationError("Unsupported type for backend.");
     }
   }
 

@@ -1,3 +1,5 @@
+import { ConnectionError } from "@threefold/types";
+
 import { Client } from "../../lib/client";
 
 async function main() {
@@ -23,7 +25,7 @@ async function main() {
     // print response
     console.log({ response });
   } catch (err) {
-    throw new Error(`RMB Client connection failed due to ${err}`);
+    throw new ConnectionError(`RMB Client connection failed due to ${err}`);
   } finally {
     client.close();
   }
