@@ -16,7 +16,7 @@
           }
         "
       >
-        <template #title>Manage Domains ({{ $props.vm?.[0]?.name }})</template>
+        <template #title>Manage Domains ({{ $props.vm.name }})</template>
 
         <v-tabs align-tabs="center" color="primary" class="mb-6" v-model="gatewayTab" :disabled="deleting">
           <v-tab>Domains List</v-tab>
@@ -261,7 +261,7 @@ export default {
       oldPrefix.value =
         (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
         grid!.config.twinId;
-      prefix.value = oldPrefix.value + props.vm?.[0]?.name;
+      prefix.value = oldPrefix.value + props.vm.name;
       subdomain.value = generateName({}, 35 - prefix.value.length > 7 ? 7 : 35 - prefix.value.length);
       await loadGateways();
     });
