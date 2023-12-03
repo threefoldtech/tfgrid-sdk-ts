@@ -80,7 +80,7 @@
         </template>
       </v-navigation-drawer>
 
-      <v-main :style="{ paddingTop: '70px' }">
+      <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
         <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }">
           <v-toolbar-title class="custom-toolbar-title">
             <v-img
@@ -106,6 +106,34 @@
           <ProfileManager v-model="openProfile" />
         </v-toolbar>
 
+        <v-toolbar
+          v-if="navbarConfig"
+          :color="theme.name.value === AppThemeSelection.dark ? '#121212' : 'background'"
+          class="border position-fixed py-0 d-flex pr-2"
+          :style="{
+            zIndex: 1005,
+            top: '65.5px',
+            right: 0,
+            width: openSidebar && hasActiveProfile ? 'calc(100% - 280px)' : '100%',
+          }"
+          height="50"
+        >
+          <v-container>
+            <v-row>
+              <v-breadcrumbs :items="navbarConfig.path" active-color="secondary">
+                <template v-slot:divider>
+                  <v-icon icon="mdi-chevron-right"></v-icon>
+                </template>
+                <template v-slot:item="{ item }">
+                  <router-link :to="item.to" :class="{ 'clickable-item': !item.disabled }">
+                    {{ item.title }}
+                  </router-link>
+                </template>
+              </v-breadcrumbs>
+            </v-row>
+          </v-container>
+        </v-toolbar>
+
         <DeploymentListManager>
           <v-container fluid :style="{ paddingBottom: '100px' }">
             <div class="d-flex align-center">
@@ -127,7 +155,7 @@
               <router-view v-slot="{ Component }">
                 <transition name="fade">
                   <div :key="$route.path">
-                    <component :is="Component" v-if="hasActiveProfile"></component>
+                    <component :is="Component" v-if="hasActiveProfile && hasGrid"></component>
                     <ConnectWalletLanding @openProfile="openProfile = true" v-else />
                   </div>
                 </transition>
@@ -151,15 +179,21 @@ import { useProfileManager } from "./stores/profile_manager";
 const $route = useRoute();
 const $router = useRouter();
 const profileManager = useProfileManager();
+const gridStore = useGrid();
 const network = process.env.NETWORK || (window as any).env.NETWORK;
 
 const openProfile = ref(true);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
+const navbarConfig = ref();
 
+const hasGrid = computed(() => !!gridStore.grid);
 watch(
   () => $route.meta,
-  meta => (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
+  meta => {
+    (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
+      (navbarConfig.value = meta.navbarConfig);
+  },
 );
 
 onMounted(() => {
@@ -171,40 +205,32 @@ const version = process.env.VERSION as any;
 
 const routes: AppRoute[] = [
   {
-    title: "Portal",
+    title: "Dashboard",
     icon: "mdi-account-convert-outline",
     items: [
       {
         title: "Twin",
         icon: "mdi-account-supervisor-outline",
-        route: "/portal/twin",
+        route: "/dashboard/twin",
       },
-      { title: "Bridge", icon: "mdi-swap-horizontal", route: "/portal/bridge" },
+      { title: "Bridge", icon: "mdi-swap-horizontal", route: "/dashboard/bridge" },
       {
         title: "Transfer",
         icon: "mdi-account-arrow-right-outline",
-        route: "/portal/transfer",
+        route: "/dashboard/transfer",
       },
-      { title: "Farms", icon: "mdi-silo", route: "/portal/farms" },
+      { title: "Farms", icon: "mdi-silo", route: "/dashboard/farms" },
       {
         title: "Dedicated Nodes",
         icon: "mdi-resistor-nodes",
-        route: "/portal/dedicated-nodes",
+        route: "/dashboard/dedicated-nodes",
       },
-      { title: "DAO", icon: "mdi-note-check-outline", route: "/portal/dao" },
-    ],
-  },
-  {
-    icon: "mdi-database-search-outline",
-    title: "Explorer",
-    items: [
+      { title: "DAO", icon: "mdi-note-check-outline", route: "/dashboard/dao" },
       {
-        title: "Statistics",
-        icon: "mdi-chart-scatter-plot",
-        route: "/explorer/stats",
+        title: "Contracts",
+        icon: "mdi-file-document-edit",
+        route: "/dashboard/contracts-list",
       },
-      { title: "Nodes", icon: "mdi-access-point", route: "/explorer/nodes" },
-      { title: "Farms", icon: "mdi-lan-connect", route: "/explorer/farms" },
     ],
   },
   {
@@ -228,15 +254,58 @@ const routes: AppRoute[] = [
     items: [{ title: "Solutions", icon: "mdi-lightbulb-on-outline", route: "/solutions" }],
   },
   {
-    title: "My Account",
+    icon: "mdi-database-search-outline",
+    title: "Statistics",
     items: [
       {
-        title: "Contracts",
-        icon: "mdi-file-document-edit",
-        route: "/contractslist",
+        title: "Statistics",
+        icon: "mdi-chart-scatter-plot",
+        route: "/stats",
       },
     ],
   },
+  {
+    icon: "mdi-access-point",
+    title: "Nodes",
+    items: [{ title: "Nodes", icon: "mdi-access-point", route: "/nodes" }],
+  },
+  {
+    icon: "mdi-access-point",
+    title: "Farms",
+    items: [{ title: "Farms", icon: "mdi-lan-connect", route: "/farms" }],
+  },
+  {
+    icon: "mdi-toolbox-outline",
+    title: "Services",
+    items: [
+      {
+        title: "0-Hub",
+        icon: "mdi-open-in-new",
+        url: "https://hub.grid.tf/",
+      },
+      {
+        title: "Monitoring",
+        icon: "mdi-equalizer",
+        url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
+      },
+      {
+        title: "0-Bootstrap",
+        icon: "mdi-earth",
+        url: "https://bootstrap.grid.tf/",
+      },
+      {
+        title: "Grid Services",
+        icon: "mdi-grid-large",
+        url: "https://status.grid.tf/status/threefold",
+      },
+      {
+        title: "Manual",
+        icon: "mdi-book-open-page-variant-outline",
+        url: "https://manual.grid.tf/",
+      },
+    ],
+  },
+
   ...(network !== "main"
     ? []
     : [
@@ -251,58 +320,6 @@ const routes: AppRoute[] = [
           ],
         } as any,
       ]),
-
-  {
-    title: "Metrics",
-    items: [
-      {
-        title: "Monitoring",
-        icon: "mdi-equalizer",
-        url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
-      },
-    ],
-  },
-  {
-    title: "Bootstrap",
-    items: [
-      {
-        title: "0-Bootstrap",
-        icon: "mdi-earth",
-        url: "https://bootstrap.grid.tf/",
-      },
-    ],
-  },
-  {
-    title: "0Hub",
-    icon: "mdi-toolbox",
-    items: [
-      {
-        title: "0-Hub",
-        icon: "mdi-open-in-new",
-        url: "https://hub.grid.tf/",
-      },
-    ],
-  },
-  {
-    title: "Grid Services",
-    items: [
-      {
-        title: "Grid Services",
-        icon: "mdi-grid-large",
-        url: "https://status.grid.tf/status/threefold",
-      },
-    ],
-  },
-  {
-    title: "Help",
-    items: [
-      {
-        title: "Manual",
-        icon: "mdi-book-open-page-variant-outline",
-        url: "https://manual.grid.tf/",
-      },
-    ],
-  },
 ];
 
 // eslint-disable-next-line no-undef
@@ -321,10 +338,11 @@ function clickHandler({ route, url }: AppRouteItem): void {
 
 $router.beforeEach((to, from, next) => {
   if (to.path === "/" && hasActiveProfile) {
-    next({ path: "portal/twin" });
+    next({ path: "dashboard/twin" });
   } else {
     next();
   }
+  window.scrollTo(0, 0);
 });
 </script>
 
@@ -340,6 +358,7 @@ import FundsCard from "./components/funds_card.vue";
 import ProfileManagerController from "./components/profile_manager_controller.vue";
 import TftSwapPrice from "./components/swap_price.vue";
 import TFNotification from "./components/tf_notification.vue";
+import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
 
 interface AppRoute {
@@ -371,121 +390,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss" global>
-:root {
-  --link-color: #5695ff;
-}
-
-.app-link {
-  text-decoration: none;
-  font-weight: bold;
-  color: var(--link-color);
-  cursor: pointer;
-}
-
-.fade-leave-active,
-.fade-enter-active {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  pointer-events: none;
-
-  transition: opacity 1s;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.capitalize {
-  text-transform: capitalize !important;
-}
-
-.v-btn {
-  text-transform: capitalize !important;
-  font-size: 1rem !important;
-}
-
-.version {
-  position: absolute;
-  bottom: 15px;
-  right: 25px;
-}
-
-.v-tooltip > .v-overlay__content {
-  // background: var(--v-theme-surface);
-  border-color: rgba(var(--v-border-color), var(--v-border-opacity)) !important;
-  border-width: thin !important;
-  border-style: solid !important;
-  z-index: 99;
-  background-color: rgb(var(--v-theme-background));
-  color: var(--v-theme-text);
-  font-weight: 900;
-}
-
-a {
-  color: #5695ff !important;
-}
-
-.v-list-item__prepend {
-  width: 35px !important;
-}
-
-.v-list-item-title {
-  font-size: 0.875rem;
-}
-
-.v-list-item--density-default.v-list-item--one-line {
-  min-height: 40px;
-}
-
-.custom-toolbar-title {
-  max-width: 17rem !important;
-}
-.mosha__toast__content-wrapper {
-  margin-bottom: -2px;
-}
-.mosha__toast__slot-wrapper {
-  margin-bottom: -2px;
-}
-.mosha__icon {
-  margin-right: 6px !important;
-  margin-top: 2px;
-}
-
-.mosha__icon__dark__warning {
-  fill: #5d5d5d !important;
-}
-
-.mosha__icon__light__warning {
-  fill: #5d5d5d !important;
-}
-
-.mosha__toast__content.dark__warning {
-  color: #5d5d5d;
-}
-
-.mosha__toast__content.light__warning {
-  color: #5d5d5d;
-}
-
-.mosha__toast__close-icon.dark__warning::before {
-  color: #5d5d5d !important;
-}
-
-.mosha__toast__close-icon.light__warning::before {
-  color: #5d5d5d !important;
-}
-
-.mosha__toast {
-  font-size: 14px !important;
-  font-weight: 600 !important;
-}
-
-.font-14 {
-  font-size: 14px !important;
-}
-</style>

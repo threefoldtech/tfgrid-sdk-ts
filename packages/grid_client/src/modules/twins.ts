@@ -7,7 +7,7 @@ import { checkBalance } from "./utils";
 
 class Twins {
   client: TFClient;
-  constructor(config: GridClientConfig) {
+  constructor(public config: GridClientConfig) {
     this.client = config.tfclient;
   }
 

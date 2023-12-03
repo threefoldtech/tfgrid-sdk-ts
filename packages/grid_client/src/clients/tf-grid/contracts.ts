@@ -7,6 +7,7 @@ import {
 } from "@threefold/tfchain_client";
 import { Decimal } from "decimal.js";
 
+import { formatErrorMessage } from "../../helpers";
 import { ContractStates } from "../../modules";
 import { Graphql } from "../graphql/client";
 
@@ -135,7 +136,8 @@ class TFContracts extends Contracts {
 
       return response["data"] as GqlContracts;
     } catch (err) {
-      throw Error(`Error listing contracts by twin id ${options.twinId}: ${err}`);
+      (err as Error).message = formatErrorMessage(`Error listing contracts by twin id ${options.twinId}.`, err);
+      throw err;
     }
   }
 
@@ -196,7 +198,8 @@ class TFContracts extends Contracts {
           .toNumber();
       }
     } catch (err) {
-      throw Error(`Error getting consumption for contract ${options.id}: ${err}`);
+      (err as Error).message = formatErrorMessage(`Error getting consumption for contract ${options.id}.`, err);
+      throw err;
     }
   }
 

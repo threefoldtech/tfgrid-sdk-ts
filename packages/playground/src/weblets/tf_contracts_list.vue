@@ -13,7 +13,11 @@
         refresh
       </v-btn>
     </template>
+    <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="loadingError">
+      Failed to list your contracts: {{ loadingError }}
+    </v-alert>
     <ListTable
+      v-else
       :headers="headers"
       :items="contracts"
       :loading="loading"
@@ -190,17 +194,23 @@ const headers: VDataTableHeader = [
   { title: "Node Status", key: "nodeStatus", sortable: false },
   { title: "Details", key: "actions", sortable: false },
 ];
-
+const loadingError = ref("");
 async function onMount() {
-  selectedContracts.value = [];
+  loadingError.value = "";
   loading.value = true;
-  failedContractId.value = undefined;
   contracts.value = [];
-  grid.value = await getGrid(profileManager.profile!);
-  contracts.value = await getUserContracts(grid.value!);
-  totalCost.value = getTotalCost(contracts.value);
-  nodeStatus.value = await getNodeStatus(nodeIDs.value);
-  loading.value = false;
+  try {
+    grid.value = await getGrid(profileManager.profile!);
+    contracts.value = await getUserContracts(grid.value!);
+    totalCost.value = getTotalCost(contracts.value);
+    nodeStatus.value = await getNodeStatus(nodeIDs.value);
+  } catch (e) {
+    loadingError.value = (e as Error).message;
+  } finally {
+    failedContractId.value = undefined;
+    selectedContracts.value = [];
+    loading.value = false;
+  }
 }
 
 const nodeIDs = computed(() => {

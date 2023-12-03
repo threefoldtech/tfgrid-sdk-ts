@@ -117,6 +117,7 @@
         }"
         v-model="$props.modelValue.farm"
         v-model:loading="loadingFarm"
+        v-model:search="farmName"
       />
 
       <SelectNode
@@ -140,7 +141,7 @@ defineProps<{ modelValue: K8SWorker }>();
 const emits = defineEmits<{ (event: "update:loading", value: boolean): void }>();
 const farmManager = useFarm();
 const loadingFarm = ref(farmManager?.getLoading());
-
+const farmName = ref();
 watch(loadingFarm, (loadingFarm): void => {
   emits("update:loading", loadingFarm!);
 });
@@ -152,7 +153,7 @@ import { ref, watch } from "vue";
 import SelectFarmManager, { useFarm } from "../components/select_farm_manager.vue";
 import SelectNode from "../components/select_node.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, K8SWorker } from "../types";
+import type { FarmInterface, K8SWorker } from "../types";
 import type { INode } from "../utils/filter_nodes";
 import { generateName } from "../utils/strings";
 import RootFsSize from "./root_fs_size.vue";
@@ -170,7 +171,7 @@ export function createWorker(name: string = generateName({ prefix: "wr" })): K8S
     ipv6: false,
     planetary: true,
     rootFsSize: 2,
-    farm: undefined as Farm | undefined,
+    farm: undefined as FarmInterface | undefined,
     selectedNode: undefined as INode | undefined,
     dedicated: false,
     certified: false,

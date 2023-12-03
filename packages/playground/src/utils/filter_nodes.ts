@@ -1,10 +1,9 @@
 import type { FilterOptions, GridClient, NodeInfo } from "@threefold/grid_client";
 
-import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
 import type { NodeFilters } from "@/components/select_node.vue";
 
-import { isAlphanumeric, isDecimal, isNumeric, min, startsWith, validateResourceMaxNumber } from "./validators";
-
+import type { InputFilterType } from "../types";
+import { isAlphanumeric, isNumeric, min, startsWith, validateResourceMaxNumber } from "./validators";
 export interface NodeGPUCardType {
   id: string;
   vendor: string;
@@ -15,6 +14,7 @@ export interface INode {
   nodeId: number;
   state?: string;
   cards?: NodeGPUCardType[];
+  certified: string;
 }
 
 export async function getNodeCards(grid: GridClient, nodeId: number): Promise<NodeGPUCardType[]> {
@@ -39,39 +39,29 @@ export async function getFilteredNodes(grid: GridClient, options: NodeFilters): 
 
 // Node filters used in #Explorer, #Dedicated Nodes...
 
-// Input attrs
-export type NodeInputFilterType = {
-  label: string;
-  placeholder: string;
-  value?: string | undefined;
-  rules?: [syncRules: SyncRule[], asyncRules?: AsyncRule[]];
-  error?: string;
-  type: string;
-};
-
 // Input fields
-export type FilterInputs = {
-  nodeId: NodeInputFilterType;
-  farmIds: NodeInputFilterType;
-  farmName: NodeInputFilterType;
-  country: NodeInputFilterType;
-  freeSru: NodeInputFilterType;
-  freeHru: NodeInputFilterType;
-  freeMru: NodeInputFilterType;
+export type FilterNodeInputs = {
+  nodeId: InputFilterType;
+  farmIds: InputFilterType;
+  farmName: InputFilterType;
+  country: InputFilterType;
+  freeSru: InputFilterType;
+  freeHru: InputFilterType;
+  freeMru: InputFilterType;
 };
 
 // Input fields for dedicated nodes
 export type DedicatedNodeFilters = {
-  total_sru: NodeInputFilterType;
-  total_hru: NodeInputFilterType;
-  total_mru: NodeInputFilterType;
-  total_cru: NodeInputFilterType;
-  gpu_vendor_name: NodeInputFilterType;
-  gpu_device_name: NodeInputFilterType;
+  total_sru: InputFilterType;
+  total_hru: InputFilterType;
+  total_mru: InputFilterType;
+  total_cru: InputFilterType;
+  gpu_vendor_name: InputFilterType;
+  gpu_device_name: InputFilterType;
 };
 
 // Default input Initialization
-export const inputsInitializer: FilterInputs = {
+export const inputsInitializer: FilterNodeInputs = {
   nodeId: {
     label: "Node ID",
     placeholder: "Filter by node id.",
