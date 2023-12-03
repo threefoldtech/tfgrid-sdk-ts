@@ -111,8 +111,9 @@ onBeforeUnmount(() => {
 
 const request = debounce(_getFarms, 1000);
 const updateFarms = async () => {
-  if (isValidForm.value) {
-    await updateQueries();
+  if (isValidForm.value && filterFarmInputs) {
+    await updateQueries(filterFarmInputs.value);
+
     const queries = getFarmQueries(mixedFarmFilters.value);
     await request(queries);
   }
@@ -144,8 +145,21 @@ const updateSorting = () => {
     }
   }
 };
-const updateQueries = async () => {
+const updateQueries = async (nFltrNptsVal: FilterFarmInputs) => {
   const options = mixedFarmFilters.value.options;
+  const inputs = mixedFarmFilters.value.inputs;
+  if (inputs) {
+    if (nFltrNptsVal.farmId) {
+      inputs.farmId.value = nFltrNptsVal.farmId.value;
+    }
+    if (nFltrNptsVal.name) {
+      inputs.name.value = nFltrNptsVal.name.value;
+    }
+    if (nFltrNptsVal.freeIps) {
+      inputs.freeIps.value = nFltrNptsVal.freeIps.value;
+    }
+  }
+
   if (options) {
     options.page = page.value;
     options.size = size.value;
