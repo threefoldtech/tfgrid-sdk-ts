@@ -78,7 +78,7 @@
       <NodeSelector v-model="selection" />
       <SelectFarmManager>
         <SelectFarmId
-          v-if="selection == 'automated'"
+          v-if="selection == Selection.AUTOMATED"
           :filters="{
             cpu,
             memory,
@@ -117,6 +117,8 @@
 
 <script lang="ts" setup>
 import { type Ref, ref } from "vue";
+
+import { Selection } from "@/utils/types";
 
 import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";

@@ -20,7 +20,7 @@
     >
       <input-tooltip tooltip="Select a node ID to deploy on.">
         <v-autocomplete
-          v-if="selection == 'automated'"
+          v-if="selection == Selection.AUTOMATED"
           select
           label="Node"
           :items="availableNodes"
@@ -60,8 +60,9 @@
           </template>
         </v-autocomplete>
         <v-text-field
-          v-else-if="selection == 'manual'"
+          v-else-if="selection == Selection.MANUAL"
           label="Node ID"
+          type="number"
           v-model.number="ManualselectedNode"
           :disabled="loadingNodes"
           v-bind="{
@@ -144,7 +145,7 @@ const loadingNodes = ref(false);
 const loadingCards = ref(false);
 const shouldBeUpdated = ref(false);
 const errorMessage = ref<string>();
-const ManualselectedNode = ref();
+const ManualselectedNode = ref<number>();
 const selectedNode = ref<INode | undefined>();
 const selectedCards = ref<Array<string>>([]);
 const nodeCards = ref<Array<NodeGPUCardType>>([]);
@@ -194,9 +195,9 @@ watch(
       if (props.selection === Selection.AUTOMATED) {
         await validateNodeStoragePool(node);
       } else {
-        delay.value = setTimeout(() => {
+        if (node.nodeId !== 0) {
           validateManualSelectedNode(node);
-        }, 1000);
+        }
       }
     }
 
@@ -229,13 +230,8 @@ watch(
     ) {
       return;
     }
-    if (props.selection === Selection.MANUAL) {
-      clearTimeout(delay.value);
-      delay.value = setTimeout(() => {
-        if (selectedNode.value) {
-          validateManualSelectedNode(selectedNode.value);
-        }
-      }, 1000);
+    if (props.selection === Selection.MANUAL && selectedNode.value) {
+      validateManualSelectedNode(selectedNode.value);
     }
     if (props.selection === Selection.AUTOMATED) {
       shouldBeUpdated.value = true;
@@ -259,8 +255,11 @@ watch(
 watch(
   () => ManualselectedNode.value,
   async (value, oldValue) => {
-    if (value != undefined || value != null) {
-      selectedNode.value = { nodeId: Number(value) };
+    if (value !== undefined || value !== null) {
+      clearTimeout(delay.value);
+      delay.value = setTimeout(() => {
+        selectedNode.value = { nodeId: Number(value) };
+      }, 1000);
     }
   },
   { deep: false },
@@ -290,18 +289,29 @@ function validateSelectedNodeFilters(
   freeresources: NodeResources | undefined,
   filters: NodeFilters,
 ) {
-  if (node.inDedicatedFarm && node.rentedByTwinId !== profileManager.profile?.twinId) {
-    errorMessage.value = `Node ${validatingNode.nodeId} belongs to a dedicated farm and not rented by you`;
-  } else if (node.rentedByTwinId !== profileManager.profile?.twinId && node.rentedByTwinId !== 0) {
-    errorMessage.value = `Node ${validatingNode.nodeId} is rented by someone else`;
+  const twinId = profileManager.profile?.twinId;
+  const nodeId = validatingNode.nodeId;
+
+  const isNotRentingNode = node.rentedByTwinId !== twinId && node.rentedByTwinId !== 0;
+  const isNotRentingDedicatedFarm = node.inDedicatedFarm && node.rentedByTwinId !== twinId;
+
+  if (isNotRentingDedicatedFarm) {
+    errorMessage.value = `Node ${nodeId} belongs to a dedicated farm and is not rented by you`;
+  } else if (isNotRentingNode) {
+    errorMessage.value = `Node ${nodeId} is rented by someone else`;
   } else if (filters.ipv4 && !node.publicConfig.ipv4) {
-    errorMessage.value = `Node ${validatingNode.nodeId} is not assigned to a PublicIP`;
-  } else if (freeresources && freeresources.cru < filters.cpu) {
-    errorMessage.value = `Node ${validatingNode.nodeId} doesn't have enough CPU`;
-  } else if (freeresources && freeresources.mru < Math.round(filters.memory / 1024)) {
-    errorMessage.value = `Node ${validatingNode.nodeId} doesn't have enough Memory`;
-  } else if (freeresources && freeresources.sru < filters.diskSizes.reduce((total, disk) => total + disk)) {
-    errorMessage.value = `Node ${validatingNode.nodeId} doesn't have enough Storage`;
+    errorMessage.value = `Node ${nodeId} is not assigned to a PublicIP`;
+  } else if (freeresources) {
+    const { cru, mru, sru } = freeresources;
+    const { cpu, memory, diskSizes } = filters;
+
+    if (cru < cpu) {
+      errorMessage.value = `Node ${nodeId} doesn't have enough CPU`;
+    } else if (mru < Math.round(memory / 1024)) {
+      errorMessage.value = `Node ${nodeId} doesn't have enough Memory`;
+    } else if (sru < diskSizes.reduce((total, disk) => total + disk)) {
+      errorMessage.value = `Node ${nodeId} doesn't have enough Storage`;
+    }
   }
 }
 async function validateManualSelectedNode(validatingNode: INode) {
