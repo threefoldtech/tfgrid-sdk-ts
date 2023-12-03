@@ -42,8 +42,6 @@ export default {
             "Failed to load Twin details due to Slow Network. Please try again later.",
             ToastType.danger,
           );
-          loading.value = false;
-          return;
         } finally {
           loading.value = false;
         }
