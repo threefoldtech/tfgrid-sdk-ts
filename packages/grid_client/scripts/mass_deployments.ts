@@ -17,8 +17,8 @@ async function main() {
   const errors: any = [];
   let failedCount = 0;
   let successCount = 0;
-  const batchSize = 20;
-  const totalVMs = 100;
+  const batchSize = 10;
+  const totalVMs = 50;
   const batches = totalVMs / batchSize;
 
   console.time("Total Deployment Time");
