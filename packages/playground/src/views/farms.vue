@@ -85,7 +85,6 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
           return {
             ...farm,
             totalPublicIp: total,
-            usedPublicIp: used,
             freePublicIp: total - used,
           };
         });
@@ -198,14 +197,8 @@ const headers: VDataTableHeader = [
     sortable: false,
   },
   {
-    title: "Free Public IPs",
+    title: "Available Public IPs",
     key: "freePublicIp",
-    align: "start",
-    sortable: false,
-  },
-  {
-    title: "Used Public IPs",
-    key: "usedPublicIp",
     align: "start",
     sortable: false,
   },
