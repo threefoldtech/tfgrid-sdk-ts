@@ -303,23 +303,13 @@ const routes: AppRoute[] = [
         icon: "mdi-book-open-page-variant-outline",
         url: "https://manual.grid.tf/",
       },
+      {
+        title: "Minting",
+        icon: "mdi-file-document-edit",
+        route: "/minting",
+      },
     ],
   },
-
-  ...(network !== "main"
-    ? []
-    : [
-        {
-          title: "Minting",
-          items: [
-            {
-              title: "Minting",
-              icon: "mdi-file-document-edit",
-              route: "/minting",
-            },
-          ],
-        } as any,
-      ]),
 ];
 
 // eslint-disable-next-line no-undef
