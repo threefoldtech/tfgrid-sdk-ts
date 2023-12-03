@@ -110,13 +110,11 @@ onBeforeUnmount(() => {
 });
 
 const request = debounce(_getFarms, 1000);
-const updateFarms = async () => {
-  if (isValidForm.value && filterFarmInputs) {
-    await updateQueries(filterFarmInputs.value);
 
-    const queries = getFarmQueries(mixedFarmFilters.value);
-    await request(queries);
-  }
+const updateFarms = async () => {
+  const queries = await getFarmQueries(mixedFarmFilters.value);
+
+  await request(queries);
 };
 const updateSorting = () => {
   if (mixedFarmFilters.value.options) {
@@ -145,10 +143,10 @@ const updateSorting = () => {
     }
   }
 };
-const updateQueries = async (nFltrNptsVal: FilterFarmInputs) => {
-  const options = mixedFarmFilters.value.options;
+const updateQueries = async () => {
   const inputs = mixedFarmFilters.value.inputs;
-  if (inputs) {
+  if (inputs && filterFarmInputs.value) {
+    const nFltrNptsVal = filterFarmInputs.value;
     if (nFltrNptsVal.farmId) {
       inputs.farmId.value = nFltrNptsVal.farmId.value;
     }
@@ -159,15 +157,19 @@ const updateQueries = async (nFltrNptsVal: FilterFarmInputs) => {
       inputs.freeIps.value = nFltrNptsVal.freeIps.value;
     }
   }
-
+  const options = mixedFarmFilters.value.options;
   if (options) {
     options.page = page.value;
     options.size = size.value;
     options.sortBy = sortBy.value;
   }
+  await updateFarms();
 };
-watch(mixedFarmFilters.value, updateFarms, { deep: true });
 
+watch(mixedFarmFilters.value, updateFarms, { deep: true });
+watch(filterFarmInputs.value, updateQueries, { deep: true });
+watch(page, updateQueries, { deep: true });
+watch(size, updateQueries, { deep: true });
 const inputFiltersReset = (nFltrNptsVal: FilterFarmInputs) => {
   mixedFarmFilters.value.inputs = nFltrNptsVal;
   nFltrNptsVal.farmId.value = undefined;
