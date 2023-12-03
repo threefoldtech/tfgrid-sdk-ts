@@ -41,7 +41,6 @@ export const getFarmQueries = (mixedFilters: MixedFarmFilter): Partial<FarmsQuer
     page: page,
     size: size,
   };
-  console.log(options);
 
   return options;
 };
