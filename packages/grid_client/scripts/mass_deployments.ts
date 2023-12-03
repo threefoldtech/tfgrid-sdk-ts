@@ -1,3 +1,4 @@
+import { Client } from "../../tfchain_client/dist/es6";
 import {
   DiskModel,
   FarmFilterOptions,
@@ -15,6 +16,7 @@ async function main() {
   const grid3 = await getClient();
 
   const errors: any = [];
+  const offlineNodes: any = [];
   let failedCount = 0;
   let successCount = 0;
   const batchSize = 5;
@@ -60,7 +62,7 @@ async function main() {
         mru: mru / 1024,
         sru: rootFs + diskSize,
         availableFor: await grid3.twins.get_my_twin_id(),
-        farmId: +randomChoice(farms).farmId,
+        farmId: farms[0].farmId,
         randomize: true,
       } as FilterOptions);
 
@@ -68,6 +70,16 @@ async function main() {
         errors.push("Node not found");
         failedCount++;
         continue;
+      }
+
+      try {
+        const res = await grid3.zos.pingNode({ nodeId: nodes[0].nodeId });
+        log("================= Ping result =================");
+        log(res);
+        log("================= Ping result =================");
+      } catch (error) {
+        offlineNodes.push(error);
+        log(`Node ${nodes[0].nodeId} is offline`);
       }
 
       // create vm node Object
@@ -125,6 +137,11 @@ async function main() {
   log("Failed deployments errors: ");
   for (let i = 0; i < errors.length; i++) {
     log(errors[i]);
+    log("---------------------------------------------");
+  }
+  log("Failed Nodes: ");
+  for (let i = 0; i < offlineNodes.length; i++) {
+    log(offlineNodes[i]);
     log("---------------------------------------------");
   }
 
