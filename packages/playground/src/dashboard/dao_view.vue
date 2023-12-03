@@ -213,6 +213,7 @@
                 reached, the proposal is dissapproved.</span
               >
               <br />
+              <br />
               <h2>How do we count weight:</h2>
               <span
                 >Votes are weighted based on the farmers stake in the network. One vote by default is 1 weight.</span
@@ -220,7 +221,8 @@
               <span> If the farmers has nodes, the weight of the vote is calulcated as following:</span>
               <span
                 ><b>
-                  The farmer's vote weight is equal to the sum of all nodes of the farmer: (node CU * 2 + node SU)</b
+                  The farmer's vote weight is the sum of all the farmer's nodes weight. A node's weight is calculated
+                  as: node CU * 2 + node SU.</b
                 ></span
               >
             </div>
