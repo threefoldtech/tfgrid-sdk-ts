@@ -1,5 +1,5 @@
 <template>
-  <card-details :loading="loading" title="Node Twin Details" :items="twinFields" icon="mdi-account" />
+  <card-details :loading="loading" title="Twin Details" :items="twinFields" icon="mdi-account" />
 </template>
 
 <script lang="ts">
@@ -44,6 +44,8 @@ export default {
           );
           loading.value = false;
           return;
+        } finally {
+          loading.value = false;
         }
       } else if (props.node) {
         twin.value = props.node.twin;
