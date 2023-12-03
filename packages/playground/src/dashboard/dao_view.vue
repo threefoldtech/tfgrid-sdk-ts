@@ -36,28 +36,32 @@
           </v-card>
 
           <v-card class="my-3 pa-5" v-for="(proposal, i) in filteredProposals(tab.content.value)" :key="i">
-            <v-card-title class="pa-0 mb-5" v-if="proposal.action">
+            <v-card-title class="pa-0 mb-5 font-weight-bold" v-if="proposal.action">
               {{ proposal.action }}
             </v-card-title>
-            <!-- <v-card-subtitle class="pb-0">
-              <p class="font-weight-bold">
-                Proposal hash: <span class="text--secondary">{{ proposal.hash }}</span>
-              </p>
-            </v-card-subtitle> -->
+            <v-divider class="mt-1 mb-5 text-red-700" v-if="proposal.action" />
+
             <v-card-text class="pb-0">
-              <v-row>
-                <p class="font-weight-medium mr-3">Description:</p>
-                <span class="text--secondary">
-                  {{ proposal.description }}
-                  <a v-bind:href="proposal.link" v-bind:target="'blank'">More details</a>
-                </span>
+              <v-row class="my-1">
+                <p class="font-weight-bold mr-3">Description:</p>
+                <div class="text--secondary d-flex justify-center ma-0">
+                  <input-tooltip
+                    inline
+                    tooltip="More details"
+                    v-bind:href="proposal.link"
+                    v-bind:target="'blank'"
+                    alignCenter="true"
+                  >
+                    {{ proposal.description }}
+                  </input-tooltip>
+                </div>
               </v-row>
-              <v-row v-if="expired(proposal.end)">
-                <p class="font-weight-medium mr-3">You can vote until:</p>
+              <v-row v-if="expired(proposal.end)" class="my-1">
+                <p class="font-weight-bold mr-3">You can vote until:</p>
                 <span class="text--secondary">{{ proposal.end }}</span>
               </v-row>
-              <v-row v-else>
-                <p class="font-weight-medium mr-3">Voting ended on:</p>
+              <v-row v-else class="my-1">
+                <p class="font-weight-bold mr-3">Voting ended on:</p>
                 <span class="text--secondary">{{ proposal.end }}</span>
               </v-row>
             </v-card-text>
