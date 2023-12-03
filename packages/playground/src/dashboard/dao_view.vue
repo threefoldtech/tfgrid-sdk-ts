@@ -36,25 +36,27 @@
           </v-card>
 
           <v-card class="my-3 pa-5" v-for="(proposal, i) in filteredProposals(tab.content.value)" :key="i">
-            <v-card-title class="pa-0 mb-5 font-weight-bold" v-if="proposal.action">
-              {{ proposal.action }}
-            </v-card-title>
-            <v-divider class="mt-1 mb-5 text-red-700" v-if="proposal.action" />
+            <div class="d-flex justify-space-between">
+              <v-card-title class="pa-0 mb-5 font-weight-bold" v-if="proposal.action">
+                {{ proposal.action }}
+              </v-card-title>
+              <v-btn
+                @click="resetFilters"
+                variant="tonal"
+                color="primary"
+                v-bind:href="proposal.link"
+                v-bind:target="'blank'"
+                >Details</v-btn
+              >
+            </div>
+
+            <v-divider class="mt-1 mb-5 text-red-700" />
 
             <v-card-text class="pb-0">
               <v-row class="my-1">
                 <p class="font-weight-bold mr-3">Description:</p>
-                <div class="text--secondary d-flex justify-center ma-0">
-                  <input-tooltip
-                    inline
-                    tooltip="More details"
-                    v-bind:href="proposal.link"
-                    v-bind:target="'blank'"
-                    alignCenter="true"
-                  >
-                    {{ proposal.description }}
-                  </input-tooltip>
-                </div>
+
+                <span> {{ proposal.description }}</span>
               </v-row>
               <v-row v-if="expired(proposal.end)" class="my-1">
                 <p class="font-weight-bold mr-3">You can vote until:</p>
