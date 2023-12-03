@@ -191,7 +191,7 @@ const hasGrid = computed(() => !!gridStore.grid);
 watch(
   () => $route.meta,
   meta => {
-    (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
+    (document.title = "Threefold Dashboard" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
       (navbarConfig.value = meta.navbarConfig);
   },
 );
