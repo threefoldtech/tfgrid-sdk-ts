@@ -493,13 +493,6 @@ const router = createRouter({
       path: "/minting",
       component: () => import("../views/minting_view.vue"),
       meta: { title: "Minting" },
-      beforeEnter(_, __, next) {
-        const network = process.env.NETWORK || window.env.NETWORK;
-        if (network !== NetworkEnv.main) {
-          return next({ path: "/page-not-found" });
-        }
-        next();
-      },
     },
     {
       path: "/nodes",
