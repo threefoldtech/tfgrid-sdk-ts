@@ -65,6 +65,7 @@ const fetchStats = async () => {
       loading.value = true;
       failed.value = false;
       const data = await gridProxyClient.stats.get({ status: NodeStatus.Up });
+
       return data;
     } catch (error) {
       if (retryCount < 3) {
@@ -97,6 +98,7 @@ const fetchData = async () => {
         { data: toTeraOrGigaOrPeta(stats!.totalSru.toString()), title: "SSD Storage", icon: "mdi-nas" },
         { data: toTeraOrGigaOrPeta(stats!.totalHru.toString()), title: "HDD Storage", icon: "mdi-harddisk" },
         { data: toTeraOrGigaOrPeta(stats!.totalMru.toString()), title: "RAM", icon: "mdi-memory" },
+        { data: stats!.totalGpu, title: "GPUs", icon: "mdi-memory" },
         { data: stats!.accessNodes, title: "Access Nodes", icon: "mdi-gate" },
         { data: stats!.gateways, title: "Gateways", icon: "mdi-boom-gate-outline" },
         { data: stats!.twins, title: "Twins", icon: "mdi-brain" },

@@ -17,6 +17,7 @@ function mergeStatsData(stats: Stats[]): Stats {
     res.totalHru += stats[i].totalHru;
     res.totalMru += stats[i].totalMru;
     res.totalSru += stats[i].totalSru;
+    res.totalGpu += stats[i].totalGpu;
     res.twins += stats[i].twins;
     res.nodesDistribution = mergeNodeDistribution([res.nodesDistribution, stats[i].nodesDistribution]);
   }
@@ -56,6 +57,7 @@ export function formatData(network: Network[] = [Network.Main], totalStat: Netwo
     totalSru: 0,
     totalMru: 0,
     totalHru: 0,
+    totalGpu: 0,
     publicIps: 0,
     accessNodes: 0,
     gateways: 0,
