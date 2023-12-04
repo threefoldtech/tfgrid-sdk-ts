@@ -1,5 +1,9 @@
 import { ContractStates, type GridClient } from "@threefold/grid_client";
 import { NodeStatus } from "@threefold/gridproxy_client";
+import type { Ref } from "vue";
+
+import { gridProxyClient } from "@/clients";
+import type { VDataTableHeader } from "@/types";
 
 import { normalizeBalance } from "./helpers";
 
@@ -7,12 +11,14 @@ export async function getUserContracts(grid: GridClient) {
   const res: any = await grid!.contracts.listMyContracts();
 
   const promises = [
-    res.nameContracts.map((c: any) => normalizeContract(grid!, c, ContractType.NAME)),
-    res.nodeContracts.map((c: any) => normalizeContract(grid!, c, ContractType.NODE)),
-    res.rentContracts.map((c: any) => normalizeContract(grid!, c, ContractType.RENT)),
+    ...res.nameContracts.map((c: any) => normalizeContract(grid!, c, ContractType.NAME)),
+    ...res.nodeContracts.map((c: any) => normalizeContract(grid!, c, ContractType.NODE)),
+    ...res.rentContracts.map((c: any) => normalizeContract(grid!, c, ContractType.RENT)),
   ];
 
-  return Promise.all(promises.flat(1));
+  return Promise.allSettled(promises).then(results =>
+    results.flatMap(result => (result.status === "fulfilled" ? result.value : [])),
+  );
 }
 
 async function normalizeContract(
@@ -58,33 +64,42 @@ async function normalizeContract(
 }
 
 export function getNodeStateColor(state: NodeStatus): string {
-  switch (state) {
-    case NodeStatus.Up:
-      return "success";
-    case NodeStatus.Down:
-      return "error";
-    case NodeStatus.Standby:
-      return "warning";
-  }
+  const colorMap = {
+    [NodeStatus.Up]: "success",
+    [NodeStatus.Down]: "error",
+    [NodeStatus.Standby]: "warning",
+  };
+
+  return colorMap[state] || "";
 }
 
 export function getStateColor(state: ContractStates): string {
-  switch (state) {
-    case ContractStates.Created:
-      return "success";
-    case ContractStates.Deleted:
-      return "error";
-    case ContractStates.GracePeriod:
-      return "warning";
-    case ContractStates.OutOfFunds:
-      return "info";
-  }
+  const stateMap = {
+    [ContractStates.Created]: "success",
+    [ContractStates.Deleted]: "error",
+    [ContractStates.GracePeriod]: "warning",
+    [ContractStates.OutOfFunds]: "info",
+  };
+
+  return stateMap[state] || "";
 }
 
 export function formatConsumption(value: number): string {
   value = +value;
   if (isNaN(value) || value <= 0) return "No Data Available";
   return normalizeBalance(value) + " TFT/hour";
+}
+
+export async function getNodeStatus(nodeIDs: (number | undefined)[]) {
+  const resultPromises = nodeIDs.map(async nodeId => {
+    if (typeof nodeId !== "number") return {};
+    const status = (await gridProxyClient.nodes.byId(nodeId)).status;
+    return { [nodeId]: status };
+  });
+
+  const resultsArray = await Promise.all(resultPromises);
+
+  return resultsArray.reduce((acc, obj) => Object.assign(acc, obj), {});
 }
 
 export interface NormalizedContract {
@@ -106,3 +121,13 @@ export enum ContractType {
   RENT = "rent",
   NAME = "name",
 }
+
+export type ContractsTableType = {
+  headers: VDataTableHeader;
+  type: ContractType;
+  icon: string;
+  title: string;
+  grid: Ref<GridClient | undefined>;
+  contracts: Ref<any[]>;
+  loading: Ref<boolean>;
+};

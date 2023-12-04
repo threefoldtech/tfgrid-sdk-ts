@@ -2,31 +2,26 @@
   <weblet-layout ref="layout" @mount="() => {}">
     <!-- Data Table -->
     <v-data-table
-      :loading="$props.loading"
-      :headers="tableHeaders"
-      :items="$props.contracts"
+      :loading="$props.loading.value"
+      :headers="$props.tableHeaders"
+      :items="$props.contracts.value"
       item-value="name"
       select-strategy="single"
       show-select
     >
       <template #loading>
         <div class="text-center">
-          <small>Loading node contracts...</small>
+          <small> {{ capitalize(`Loading ${$props.contractsType} contracts...`) }}</small>
         </div>
-      </template>
-
-      <template #[`item.consumption`]="{ item }">
-        <p v-if="item.raw.consumption !== 0">{{ item.raw.consumption.toFixed(3) }} TFT/hour</p>
-        <p v-else>No Data Available</p>
       </template>
 
       <template #[`item.nodeStatus`]="{ item }">
         <v-chip
-          v-if="item.value.nodeId !== '-' && !$props.loading"
-          :color="getNodeStateColor(item.value.nodeStatus)"
+          v-if="$props.nodeStatus && item.value.nodeId !== '-' && !$props.loading.value"
+          :color="getNodeStateColor($props.nodeStatus[item.value.nodeId])"
           class="text-capitalize"
         >
-          {{ item.value.nodeStatus }}
+          {{ $props.nodeStatus[item.value.nodeId] }}
         </v-chip>
         <p v-else>-</p>
       </template>
@@ -75,18 +70,41 @@
 
 <script lang="ts" setup>
 import { ContractStates, type GridClient } from "@threefold/grid_client";
+import type { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
-import { defineComponent, defineProps, type PropType, ref } from "vue";
+import { defineComponent, type PropType, type Ref, ref } from "vue";
+import { capitalize } from "vue";
 
 import type { VDataTableHeader } from "@/types";
-import { getNodeStateColor, getStateColor } from "@/utils/contracts";
+import { ContractType, getNodeStateColor, getStateColor } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { normalizeError } from "@/utils/helpers";
 
 const props = defineProps({
-  contracts: Array as PropType<any[]>,
-  grid: Object as PropType<GridClient>,
-  loading: Boolean,
+  contracts: {
+    type: Object as PropType<Ref<any[]>>,
+    required: true,
+  },
+  nodeStatus: {
+    type: Object as PropType<{ [x: number]: NodeStatus }>,
+    required: true,
+  },
+  grid: {
+    type: Object as PropType<Ref<GridClient | undefined>>,
+    required: true,
+  },
+  loading: {
+    type: Object as PropType<Ref<boolean>>,
+    required: true,
+  },
+  tableHeaders: {
+    type: Array as PropType<VDataTableHeader>,
+    required: false,
+  },
+  contractsType: {
+    type: Object as PropType<ContractType>,
+    required: true,
+  },
 });
 
 const layout = ref();
@@ -99,30 +117,18 @@ const contractStateDialog = ref<boolean>(false);
 const failedContractId = ref<number>();
 const loadingContractId = ref<number>();
 
-const tableHeaders: VDataTableHeader = [
-  { title: "PLACEHOLDER", key: "data-table-select" },
-  { title: "ID", key: "contractId" },
-  { title: "State", key: "state" },
-  { title: "Billing Rate", key: "consumption" },
-  { title: "Solution Type", key: "solutionType" },
-  { title: "Solution Name", key: "solutionName" },
-  { title: "Created At", key: "createdAt" },
-  // { title: "Expiration", key: "expiration" },
-  { title: "Node ID", key: "nodeID" },
-  { title: "Node Status", key: "nodeStatus", sortable: false },
-  { title: "Details", key: "actions", sortable: false },
-];
-
 async function showDetails(value: any) {
   failedContractId.value = undefined;
   if (value.type === "name" || value.type === "rent") {
     return layout.value.openDialog(value, false, true);
   }
+
   loadingShowDetails.value = true;
   const contractId: number = value.contractId;
   loadingContractId.value = contractId;
+
   try {
-    const deployment = await props.grid?.zos.getDeployment({ contractId });
+    const deployment = await props.grid.value?.zos.getDeployment({ contractId });
     return layout.value.openDialog(deployment, false, true);
   } catch (e) {
     failedContractId.value = contractId;
@@ -136,7 +142,7 @@ async function showDetails(value: any) {
 async function contractLockDetails(contractId: number) {
   contractStateDialog.value = true;
   loadingShowDetails.value = true;
-  await props.grid?.contracts
+  await props.grid.value?.contracts
     .contractLock({ id: contractId })
     .then((data: ContractLock) => {
       contractLocked.value = data;
@@ -151,7 +157,7 @@ async function contractLockDetails(contractId: number) {
 
 <script lang="ts">
 export default defineComponent({
-  name: "TfNodeContractsList",
+  name: "TfContractsList",
   components: {},
 });
 </script>
