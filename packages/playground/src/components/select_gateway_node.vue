@@ -2,7 +2,7 @@
   <input-validator
     ref="validator"
     :value="$props.modelValue?.id"
-    :rules="[validators.required('Gateway node is required.')]"
+    :rules="[validators.required('Domain is required.')]"
     #="{ props }"
   >
     <input-tooltip
@@ -10,7 +10,7 @@
     >
       <v-autocomplete
         :class="[prefix, 'select-gateway']"
-        label="Select gateway"
+        label="Select domain"
         placeholder="Please select a domain."
         :items="items"
         item-title="domain"
@@ -28,7 +28,6 @@
         <template v-slot:append-item v-if="page !== -1">
           <div class="px-4 mt-4">
             <v-btn
-              v-if="gatewayOption == 'farm'"
               block
               color="secondary"
               variant="tonal"
@@ -37,31 +36,7 @@
               @click="loadNextPage"
               :loading="loading"
             >
-              Load More Gateway Nodes in {{ farmData?.name }}
-            </v-btn>
-            <v-btn
-              v-else-if="gatewayOption == 'country'"
-              block
-              color="secondary"
-              variant="tonal"
-              rounded="large"
-              size="large"
-              @click="loadNextPage"
-              :loading="loading"
-            >
-              Load More Gateway Nodes in {{ farmData?.country }}
-            </v-btn>
-            <v-btn
-              v-else
-              block
-              color="secondary"
-              variant="tonal"
-              rounded="large"
-              size="large"
-              @click="loadNextPage"
-              :loading="loading"
-            >
-              Load More Gateway Nodes
+              {{ loadMoreText }}
             </v-btn>
           </div>
         </template>
@@ -72,7 +47,7 @@
 
 <script lang="ts" setup>
 import type { FilterOptions } from "@threefold/grid_client";
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
 
@@ -157,6 +132,18 @@ function normalizeGatewayNode(item: any): GatewayNode {
     ip: item.publicConfig.ipv4.split("/")[0],
   };
 }
+
+const loadMoreText = computed(() => {
+  const farm = props.farmData;
+  const base = "Load More Domains";
+
+  if (farm) {
+    if (gatewayOption.value === "farm") return `${base} in ${farm.name}`;
+    if (gatewayOption.value === "country") return `${base} in ${farm.country}`;
+  }
+
+  return base;
+});
 </script>
 
 <script lang="ts">
