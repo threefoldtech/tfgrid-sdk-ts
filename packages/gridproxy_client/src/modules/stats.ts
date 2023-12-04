@@ -8,7 +8,7 @@ export interface Stats {
   totalCru: number;
   totalSru: number;
   totalMru: number;
-  totalGpu: number;
+  gpus: number;
   totalHru: number;
   publicIps: number;
   accessNodes: number;

@@ -98,13 +98,14 @@ const fetchData = async () => {
         { data: toTeraOrGigaOrPeta(stats!.totalSru.toString()), title: "SSD Storage", icon: "mdi-nas" },
         { data: toTeraOrGigaOrPeta(stats!.totalHru.toString()), title: "HDD Storage", icon: "mdi-harddisk" },
         { data: toTeraOrGigaOrPeta(stats!.totalMru.toString()), title: "RAM", icon: "mdi-memory" },
-        { data: stats!.totalGpu, title: "GPUs", icon: "mdi-memory" },
+        { data: stats!.gpus, title: "GPUs", icon: "mdi-memory" },
         { data: stats!.accessNodes, title: "Access Nodes", icon: "mdi-gate" },
         { data: stats!.gateways, title: "Gateways", icon: "mdi-boom-gate-outline" },
         { data: stats!.twins, title: "Twins", icon: "mdi-brain" },
         { data: stats!.publicIps, title: "Public IPs", icon: "mdi-access-point" },
         { data: stats!.contracts, title: "Contracts", icon: "mdi-file-document-edit-outline" },
       ];
+
       loading.value = false;
     }
   } catch (error) {
