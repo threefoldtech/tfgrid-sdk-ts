@@ -1,0 +1,50 @@
+steps:
+  - element: .caprover-config
+    title: Configuration Tab
+    intro: PLACEHOLDER
+
+  - element: .caprover-domain
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .caprover-password
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .caprover-leader
+    triggerClick: true
+    title: Leader Tab
+    intro: PLACEHOLDER
+
+  - element: .caprover-name
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .caprover-flavor
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .caprover-dedicated
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .caprover-certified
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .caprover.select-node
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .caprover-workers
+    triggerClick: true
+    title: Workers Tab
+    intro: PLACEHOLDER
+
+  - element: .caprover.expandable-plus
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .caprover-deploy
+    title: PLACEHOLDER
+    intro: PLACEHOLDER

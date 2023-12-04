@@ -7,7 +7,14 @@
         ref="input"
         #="{ props }"
       >
-        <v-text-field label="SSD Storage (GB)" type="number" :disabled="!edit" v-model.number="value" v-bind="props" />
+        <v-text-field
+          label="SSD Storage (GB)"
+          class="root-fs"
+          type="number"
+          :disabled="!edit"
+          v-model.number="value"
+          v-bind="props"
+        />
       </input-validator>
     </div>
 
@@ -15,7 +22,7 @@
       text="Allows adjusting the size of the root filesystem. The root filesystem is the primary storage location for the operating system and its associated files."
     >
       <template v-slot:activator="{ props }">
-        <v-switch inset color="primary" v-model="edit" v-bind="props" />
+        <v-switch inset color="primary" class="toggle-root-fs" v-model="edit" v-bind="props" />
       </template>
     </v-tooltip>
   </div>

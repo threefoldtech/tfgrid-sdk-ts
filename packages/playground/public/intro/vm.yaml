@@ -1,0 +1,54 @@
+steps:
+  - element: .vm-config
+    title: Configuration Tab
+    intro: Fill required configuration in order to be able to deploy micro virtual machine on tfgrid.
+
+  - element: .vm-name
+    title: Instance Name
+    intro: "Choose a name for your instance or leave the auto-generated name.<br /><br />Note: only lower-case letters and numbers allowed."
+
+  - element: .vm-image
+    title: Choose Virtual Machine Image
+    intro: "You can choose a supported VM image or import a custom fList.<br /><br /><a class='app-link' target='_blank' href='https://manual.grid.tf/playground/fullVm.html'>Find More</a>"
+
+  - element: .vm-capacity
+    title: Select you instance capacity
+    intro: "You can choose a preconfigured capacity settings or set your own custom capacity."
+
+  - element: .select-networks
+    title: Network Options
+    intro: "Select a network for your workload connection."
+
+  - element: .vm-dedicated
+    title: Dedicated Nodes
+    intro: "<a class='app-link' target='_blank' href='https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html'>Find More</a>"
+
+  - element: .vm-certified
+    title: Certified Nodes
+    intro: Renting capacity on certified nodes is charged 25% extra.
+
+  - element: .vm.select-node
+    title: Select Node
+    intro: "Select a node ID to deploy on."
+
+  - element: .vm-env
+    triggerClick: true
+    title: Environment Variables Tab
+    intro: "Config your VM's environment variables as needed."
+
+  - element: .vm-envs.expandable-plus
+    title: Add an environment variable
+    intro: "Click the + button to add an environment variable to your deployment. This is optional for micro VM."
+
+  - element: .vm-disks
+    triggerClick: true
+    title: Disks Tab
+    intro: "Config your VM's disks as needed."
+
+  - element: .vm-disks.expandable-plus
+    title: Add a disk
+    intro: "Click the + button to add a disk to your deployment. This is optional for full VM."
+
+  - element: .vm-deloy
+    title: Deploy
+    intro: "Once you're ready, click deploy."

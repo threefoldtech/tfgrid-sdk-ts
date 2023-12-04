@@ -1,6 +1,6 @@
 <template>
   <v-tabs v-show="!hideTabs" v-model="activeTab" align-tabs="center" color="primary" class="mb-6">
-    <v-tab v-for="tab in tabs" :key="tab.value" :disabled="disabled">
+    <v-tab v-for="tab in tabs" :key="tab.value" :disabled="disabled" :class="($props.prefix || '') + '-' + tab.value">
       <v-icon :icon="tab.icon" class="mr-2" v-if="tab.icon" />
       <img
         :src="baseUrl + tab.imgPath"
@@ -54,6 +54,7 @@ const props = defineProps<{
   disabled?: boolean;
   destroy?: boolean;
   hideTabs?: boolean;
+  prefix?: string;
 }>();
 const emits = defineEmits<{
   (event: "update:modelValue", value: number): void;

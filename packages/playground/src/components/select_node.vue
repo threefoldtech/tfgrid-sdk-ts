@@ -21,6 +21,7 @@
     >
       <input-tooltip tooltip="Select a node ID to deploy on.">
         <v-autocomplete
+          :class="[prefix, 'select-node']"
           select
           label="Node"
           :items="availableNodes"
@@ -109,6 +110,7 @@ const props = defineProps({
   modelValue: { type: Object as PropType<INode> },
   filters: { default: () => ({} as NodeFilters), type: Object as PropType<NodeFilters> },
   rootFileSystemSize: { type: Number, required: true },
+  prefix: { type: String, default: () => "" },
 });
 const farmManager = useFarm();
 const profileManager = useProfileManager();

@@ -1,0 +1,65 @@
+steps:
+  - element: .discourse-config
+    title: Configuration Tab
+    intro: PLACEHOLDER
+
+  - element: .discourse-name
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .discourse-email
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .vm-capacity
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .discourse-dedicated
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .discourse-certified
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .discourse.select-node
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .discourse.custom-domain
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .discourse.select-gateway
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .discourse-mail
+    triggerClick: true
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .discourse.smtp-admin-email
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .discourse.smtp-admin-password
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .discourse.smtp-hostname
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .discourse.smtp-port
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .discourse.smtp-tls
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .discourse-deploy
+    title: PLACEHOLDER
+    intro: PLACEHOLDER

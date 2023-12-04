@@ -1,0 +1,40 @@
+steps:
+  - element: .peertube-name
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .peertube-email
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .peertube-admin-password
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .vm-capacity
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .peertube-dedicated
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .peertube-certified
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .peertube.select-node
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .peertube.custom-domain
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .peertube.select-gateway
+    title: PLACEHOLDER
+    intro: PLACEHOLDER
+
+  - element: .peertube-deploy
+    title: PLACEHOLDER
+    intro: PLACEHOLDER

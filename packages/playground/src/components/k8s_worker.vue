@@ -13,7 +13,7 @@
       #="{ props }"
     >
       <input-tooltip tooltip="Node name.">
-        <v-text-field label="Name" v-model="$props.modelValue.name" v-bind="props" />
+        <v-text-field label="Name" class="k8s-name" v-model="$props.modelValue.name" v-bind="props" />
       </input-tooltip>
     </input-validator>
 
@@ -31,6 +31,7 @@
         <v-text-field
           label="CPU (vCores)"
           type="number"
+          class="k8s-cpu"
           v-model.number="$props.modelValue.cpu"
           v-bind="props"
           :disabled="loadingFarm"
@@ -54,6 +55,7 @@
           type="number"
           v-model.number="$props.modelValue.memory"
           v-bind="props"
+          class="k8s-memory"
           :disabled="loadingFarm"
         />
       </input-tooltip>
@@ -71,6 +73,7 @@
     >
       <input-tooltip tooltip="Disk Size.">
         <v-text-field
+          class="k8s-disk"
           label="Size (GB)"
           type="number"
           v-model.number="$props.modelValue.diskSize"
@@ -99,10 +102,24 @@
       tooltip="Click to know more about dedicated nodes."
       href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
     >
-      <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" :disabled="loadingFarm" />
+      <v-switch
+        color="primary"
+        class="k8s-dedicated"
+        inset
+        label="Dedicated"
+        v-model="$props.modelValue.dedicated"
+        :disabled="loadingFarm"
+      />
     </input-tooltip>
     <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-      <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" :disabled="loadingFarm" />
+      <v-switch
+        color="primary"
+        inset
+        class="k8s-certified"
+        label="Certified"
+        v-model="$props.modelValue.certified"
+        :disabled="loadingFarm"
+      />
     </input-tooltip>
 
     <SelectFarmManager>
@@ -120,6 +137,7 @@
       />
 
       <SelectNode
+        prefix="k8s"
         v-model="$props.modelValue.selectedNode"
         :filters="{
           farmId: $props.modelValue.farm?.farmID,

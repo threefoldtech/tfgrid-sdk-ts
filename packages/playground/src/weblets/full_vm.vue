@@ -12,6 +12,7 @@
     <template #title> Deploy a Full Virtual Machine </template>
 
     <d-tabs
+      prefix="fvm"
       :tabs="[
         { title: 'Config', value: 'config' },
         { title: 'Disks', value: 'disks' },
@@ -32,7 +33,7 @@
           #="{ props }"
         >
           <input-tooltip tooltip="Instance name.">
-            <v-text-field label="Name" v-model="name" v-bind="props" />
+            <v-text-field class="fvm-name" label="Name" v-model="name" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
@@ -61,18 +62,42 @@
           When selecting a node with GPU resources, please make sure that you have a rented node. To rent a node and gain access to GPU capabilities, you can use our dashboard.
           "
         >
-          <v-switch color="primary" inset label="GPU" v-model="hasGPU" :disabled="loadingFarm" hide-details />
+          <v-switch
+            class="fvm-gpu"
+            color="primary"
+            inset
+            label="GPU"
+            v-model="hasGPU"
+            :disabled="loadingFarm"
+            hide-details
+          />
         </input-tooltip>
         <input-tooltip
           inline
           tooltip="Click to know more about dedicated nodes."
           href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
         >
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
+          <v-switch
+            class="fvm-dedicated"
+            color="primary"
+            inset
+            label="Dedicated"
+            v-model="dedicated"
+            :disabled="loadingFarm"
+            hide-details
+          />
         </input-tooltip>
 
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
+          <v-switch
+            class="fvm-certified"
+            color="primary"
+            inset
+            label="Certified"
+            v-model="certified"
+            :disabled="loadingFarm"
+            hide-details
+          />
         </input-tooltip>
 
         <SelectFarmManager>
@@ -90,6 +115,7 @@
             v-model:loading="loadingFarm"
           />
           <SelectNode
+            prefix="fvm"
             v-model="selectedNode"
             :filters="{
               farmId: farm?.farmID,
@@ -109,6 +135,7 @@
 
       <template #disks>
         <ExpandableLayout
+          prefix="fvm"
           v-model="disks"
           @add="addDisk"
           title="Add additional disk space to your full virtual machine"
@@ -128,7 +155,7 @@
             #="{ props }"
           >
             <input-tooltip tooltip="Disk name.">
-              <v-text-field label="Name" v-model="disks[index].name" v-bind="props" />
+              <v-text-field class="fvm-diskname" label="Name" v-model="disks[index].name" v-bind="props" />
             </input-tooltip>
           </input-validator>
           <input-validator
@@ -142,7 +169,13 @@
             #="{ props }"
           >
             <input-tooltip tooltip="Disk Size.">
-              <v-text-field label="Size (GB)" type="number" v-model.number="disks[index].size" v-bind="props" />
+              <v-text-field
+                class="fvm-disksize"
+                label="Size (GB)"
+                type="number"
+                v-model.number="disks[index].size"
+                v-bind="props"
+              />
             </input-tooltip>
           </input-validator>
         </ExpandableLayout>
@@ -150,16 +183,24 @@
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" @click="deploy" :disabled="tabs?.invalid || network?.error">Deploy </v-btn>
+      <v-btn
+        class="fvm-deloy"
+        color="primary"
+        variant="tonal"
+        @click="deploy"
+        :disabled="tabs?.invalid || network?.error"
+        >Deploy
+      </v-btn>
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref, watch } from "vue";
+import { onBeforeUnmount, onMounted, type Ref, ref, watch } from "vue";
 
 import Network from "../components/networks.vue";
 import SelectFarmManager from "../components/select_farm_manager.vue";
+import { useDialogService } from "../components/vuetify_dialog/DialogLockService.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import type { solutionFlavor as SolutionFlavor } from "../types";
@@ -167,12 +208,20 @@ import { type Farm, type Flist, ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
+import { startGuide } from "../utils/intro";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
+const dialogService = useDialogService();
 const solution = ref() as Ref<SolutionFlavor>;
+
+onMounted(() => dialogService.enqueue(startTour));
+onBeforeUnmount(() => dialogService.dequeue(startTour));
+async function startTour() {
+  await startGuide("fvm.yaml");
+}
 
 const images: VmImage[] = [
   {

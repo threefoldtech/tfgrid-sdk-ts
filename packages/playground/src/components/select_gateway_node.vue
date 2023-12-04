@@ -9,6 +9,7 @@
       tooltip="Creates a subdomain for your instance on the selected domain to be able to access your instance from the browser."
     >
       <v-autocomplete
+        :class="[prefix, 'select-gateway']"
         label="Select domain"
         placeholder="Please select a domain."
         :items="items"
@@ -61,6 +62,7 @@ const props = defineProps<{
   farmData?: Farm;
   customDomain?: boolean;
   availableFor?: number;
+  prefix?: string;
 }>();
 const emits = defineEmits<{ (event: "update:model-value", value: GatewayNode | undefined): void }>();
 

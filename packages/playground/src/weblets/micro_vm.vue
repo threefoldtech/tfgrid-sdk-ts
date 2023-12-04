@@ -13,6 +13,7 @@
     <template #title>Deploy a Micro Virtual Machine </template>
 
     <d-tabs
+      prefix="vm"
       :tabs="[
         { title: 'Config', value: 'config' },
         { title: 'Environment Variables', value: 'env' },
@@ -34,7 +35,7 @@
           #="{ props }"
         >
           <input-tooltip tooltip="Instance name.">
-            <v-text-field label="Name" v-model="name" v-bind="props" />
+            <v-text-field label="Name" class="vm-name" v-model="name" v-bind="props" />
           </input-tooltip>
         </input-validator>
 
@@ -61,11 +62,27 @@
           tooltip="Click to know more about dedicated nodes."
           href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
         >
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
+          <v-switch
+            color="primary"
+            class="vm-dedicated"
+            inset
+            label="Dedicated"
+            v-model="dedicated"
+            :disabled="loadingFarm"
+            hide-details
+          />
         </input-tooltip>
 
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
+          <v-switch
+            color="primary"
+            class="vm-certified"
+            inset
+            label="Certified"
+            v-model="certified"
+            :disabled="loadingFarm"
+            hide-details
+          />
         </input-tooltip>
 
         <SelectFarmManager>
@@ -82,6 +99,7 @@
             v-model:loading="loadingFarm"
           />
           <SelectNode
+            prefix="vm"
             v-model="selectedNode"
             :filters="{
               farmId: farm?.farmID,
@@ -100,6 +118,7 @@
 
       <template #env>
         <ExpandableLayout
+          prefix="vm-envs"
           v-model="envs"
           @add="envs.push({ key: '', value: '' })"
           #="{ index, isRequired }"
@@ -134,6 +153,7 @@
 
       <template #disks>
         <ExpandableLayout
+          prefix="vm-disks"
           v-model="disks"
           @add="addDisk"
           title="Add additional disk space to your micro virtual machine"
@@ -177,26 +197,42 @@
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" :disabled="tabs?.invalid || network?.error" @click="deploy">Deploy</v-btn>
+      <v-btn
+        color="primary"
+        class="vm-deloy"
+        variant="tonal"
+        :disabled="tabs?.invalid || network?.error"
+        @click="deploy"
+        >Deploy</v-btn
+      >
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
-import { computed, type Ref, ref } from "vue";
+import { computed, onMounted, onUnmounted, type Ref, ref } from "vue";
 
 import Network from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
+import { useDialogService } from "../components/vuetify_dialog/DialogLockService.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type Farm, type Flist, ProjectName } from "../types";
 import { deployVM, type Disk, type Env } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
+import { startGuide } from "../utils/intro";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
+const dialogService = useDialogService();
+
+onMounted(() => dialogService.enqueue(startTour));
+onUnmounted(() => dialogService.dequeue(startTour));
+async function startTour() {
+  await startGuide("vm.yaml");
+}
 
 const images = [
   {

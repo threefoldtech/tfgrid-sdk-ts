@@ -6,9 +6,12 @@ import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import { VDataTable } from "vuetify/labs/VDataTable";
 
+import CustomDialog from "../components/vuetify_dialog/CustomDialog.vue";
+
 const vuetify = createVuetify({
   components: {
     ...components,
+    VDialog: CustomDialog,
     VDataTable,
   },
   directives,
