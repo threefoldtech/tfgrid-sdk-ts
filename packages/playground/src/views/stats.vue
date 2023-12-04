@@ -27,9 +27,9 @@
           <v-col class="mx-auto mt-15 pr-2">
             <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
           </v-col>
-          <v-divider class="v-divider--vertical mx-2 my-4" />
+          <v-divider class="v-divider--vertical mx-2 my-4" sm="0" />
           <v-col v-if="Istats.length !== 0" class="d-flex flex-wrap justify-center">
-            <v-col v-for="item of Istats" :key="item.title" xl="6" lg="6" md="4" sm="12" cols="12" class="px-2 py-2">
+            <v-col v-for="item of Istats" :key="item.title" xl="6" lg="6" md="12" sm="12" cols="12" class="px-2 py-2">
               <StatisticsCard :item="item" />
             </v-col>
           </v-col>
