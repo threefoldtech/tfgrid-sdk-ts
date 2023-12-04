@@ -26,6 +26,8 @@
       </template>
       <template #[`item.actions`]="{ item, index }">
         <v-btn
+          class="text-subtitle-2"
+          size="small"
           color="red-darken-1"
           @click="
             () => {

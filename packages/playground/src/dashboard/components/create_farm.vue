@@ -1,7 +1,12 @@
 <template>
   <v-container>
     <v-row>
-      <v-btn color="blue" class="ml-auto bold-text" @click="showDialogue = true" :disabled="isCreating"
+      <v-btn
+        variant="outlined"
+        color="secondary"
+        class="ml-auto bold-text"
+        @click="showDialogue = true"
+        :disabled="isCreating"
         >Create Farm</v-btn
       >
     </v-row>

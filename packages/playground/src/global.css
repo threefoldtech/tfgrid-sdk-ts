@@ -117,3 +117,10 @@ a {
 .v-breadcrumbs-item--disabled {
   opacity: 1;
 }
+
+.v-list-item-title,
+.v-label,
+.v-data-table-header__content,
+.v-data-table__tr {
+  font-size: 0.875rem !important;
+}

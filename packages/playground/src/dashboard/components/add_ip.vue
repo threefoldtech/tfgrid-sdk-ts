@@ -1,7 +1,14 @@
 <template>
   <v-container>
     <v-row>
-      <v-btn color="blue" class="ml-auto bold-text" @click="showDialogue = true" :loading="loading">Add IP</v-btn>
+      <v-btn
+        variant="outlined"
+        color="secondary"
+        class="ml-auto bold-text mb-3"
+        @click="showDialogue = true"
+        :loading="loading"
+        >Add IP</v-btn
+      >
     </v-row>
 
     <v-container v-if="showDialogue">

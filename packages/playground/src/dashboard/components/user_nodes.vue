@@ -1,7 +1,7 @@
 <template v-if="nodes">
   <div class="my-6">
     <v-card color="primary rounded-0">
-      <v-card-title class="py-1 text-subtitle-1">Your Nodes</v-card-title>
+      <v-card-title class="py-1 text-subtitle-1 text-center">Your Nodes</v-card-title>
     </v-card>
     <v-data-table-server
       :loading="loading"

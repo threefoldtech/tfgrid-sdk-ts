@@ -39,7 +39,7 @@
     >
       <template v-slot:top>
         <v-toolbar flat color="primary">
-          <v-toolbar-title class="mb-6 text-subtitle-1">Your Farms</v-toolbar-title>
+          <v-toolbar-title class="mb-6 text-subtitle-1 text-center">Your Farms</v-toolbar-title>
         </v-toolbar>
       </template>
       <template v-slot:expanded-row="{ columns, item }">
@@ -47,22 +47,22 @@
           <td :colspan="columns.length">
             <v-row>
               <v-col cols="12" class="mt-4">
-                <card-details
-                  :loading="false"
-                  title="Farm Details"
-                  icon="mdi-silo"
-                  :items="getFarmDetails(item.raw)"
-                ></card-details>
+                <card-details :loading="false" title="Farm Details" :items="getFarmDetails(item.raw)"></card-details>
               </v-col>
             </v-row>
 
             <PublicIPsTable :farmId="item.raw.farmId" />
             <v-row class="d-flex justify-center pb-5">
               <v-card-actions>
-                <v-btn class="bg-primary" v-bind:href="'https://v3.bootstrap.grid.tf/'" target="blank"
+                <v-btn
+                  class="bg-primary text-subtitle-1 px-6"
+                  v-bind:href="'https://v3.bootstrap.grid.tf/'"
+                  target="blank"
                   >Bootstrap Node Image</v-btn
                 >
-                <v-btn class="bg-primary" @click="showDialogue = true">Add/Edit Stellar Payout Address</v-btn>
+                <v-btn class="text-subtitle-1 px-6" color="secondary" variant="outlined" @click="showDialogue = true"
+                  >Add/Edit Stellar Payout Address</v-btn
+                >
                 <v-btn v-if="network == 'main'" class="bg-primary" @click="downloadFarmReceipts(item.value.farmId)"
                   >Download Minting Receipts</v-btn
                 >
