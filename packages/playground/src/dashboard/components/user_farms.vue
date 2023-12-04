@@ -55,6 +55,7 @@
                 ></card-details>
               </v-col>
             </v-row>
+
             <PublicIPsTable :farmId="item.raw.farmId" />
             <v-row class="d-flex justify-center pb-5">
               <v-card-actions>

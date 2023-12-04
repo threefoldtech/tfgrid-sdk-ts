@@ -10,7 +10,9 @@
     />
     <v-data-table v-if="publicIps?.length > 0" :headers="headers" :items="publicIps" class="elevation-1">
       <template v-slot:top>
-        <p class="text-subtitle-1 font-weight-bold pa-4 ma-4 w-50">Public IPs</p>
+        <v-alert class="pa-5" style="height: 20px">
+          <h4 class="text-center font-weight-medium">Public IPs</h4>
+        </v-alert>
       </template>
       <template #[`item.ip`]="{ item }">
         {{ item.value.ip || "-" }}
