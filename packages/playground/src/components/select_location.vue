@@ -16,6 +16,8 @@
 import { computed, onMounted, type PropType, ref } from "vue";
 
 import { gqlClient } from "../clients";
+import { createCustomToast, ToastType } from "../utils/custom_toast";
+import { normalizeError } from "../utils/helpers";
 
 export type Location = { country: string; region: string };
 export type Locations = { [region: string]: string[] };
@@ -41,7 +43,10 @@ async function getLocations(tries = 1) {
     return locations;
   } catch (error) {
     if (tries === 3) {
-      console.log("Error while getLocations", (error as Error).message || error);
+      createCustomToast(
+        normalizeError(error, "Something went wrong while getting available locations."),
+        ToastType.danger,
+      );
       return {};
     }
     return getLocations(tries + 1);
