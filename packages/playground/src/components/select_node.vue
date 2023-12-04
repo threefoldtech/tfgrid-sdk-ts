@@ -40,6 +40,7 @@
               error: filtersUpdated ? undefined : !!errorMessage || props.error,
               errorMessages: filtersUpdated ? undefined : errorMessage || props.errorMessages,
             }"
+            :class="{ 'warning-hint-input': filtersUpdated }"
           >
             <template v-slot:item="{ item, props }">
               <v-list-item @click="props.onClick" :class="{ 'v-list-item--active': props.isActive }">
@@ -348,3 +349,9 @@ export default {
   name: "SelectNode",
 };
 </script>
+
+<style lang="scss">
+.warning-hint-input .v-messages__message {
+  color: rgb(var(--v-theme-warning)) !important;
+}
+</style>
