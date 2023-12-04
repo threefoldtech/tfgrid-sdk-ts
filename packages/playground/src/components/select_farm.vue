@@ -43,10 +43,9 @@
 <script lang="ts" setup>
 import { nextTick, onMounted, onUnmounted, type PropType, type Ref, ref, watch } from "vue";
 
-import { useInputRef } from "@/hooks/input_validator";
-
+import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores/profile_manager";
-import type { Farm } from "../types";
+import type { FarmInterface } from "../types";
 import { getFarms, getFarmsPages } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
 import { useFarmGatewayManager } from "./farm_gateway_manager.vue";
@@ -65,14 +64,14 @@ export interface Filters {
 }
 const FarmGatewayManager = useFarmGatewayManager();
 const props = defineProps({
-  modelValue: { type: Object as PropType<Farm> },
+  modelValue: { type: Object as PropType<FarmInterface> },
   country: String,
   filters: { default: () => ({} as Filters), type: Object as PropType<Filters> },
   exclusiveFor: String,
   loading: Boolean,
 });
 const emits = defineEmits<{
-  (event: "update:modelValue", value?: Farm): void;
+  (event: "update:modelValue", value?: FarmInterface): void;
   (event: "update:loading", value: boolean): void;
   (event: "update:search", value?: string): void;
 }>();
@@ -84,7 +83,7 @@ const profileManager = useProfileManager();
 const location = ref(createLocation());
 const search = ref<string>();
 const searchInput = ref<string>();
-const farm = ref<Farm>();
+const farm = ref<FarmInterface>();
 const farmManager = useFarm();
 watch(
   [farm, location],
@@ -126,7 +125,7 @@ watch(
 );
 const selectedPages = ref([]) as Ref<number[]>;
 
-const farms = ref<Farm[]>([]);
+const farms = ref<FarmInterface[]>([]);
 let initialized = false;
 const shouldBeUpdated = ref(false);
 const pagesCount = ref();
@@ -152,7 +151,7 @@ async function loadFarms() {
   loading.value = true;
   const oldFarm = farm.value;
   const grid = await getGrid(profileManager.profile!);
-  let _farms: Farm[] = [];
+  let _farms: FarmInterface[] = [];
   if (searchInput.value && searchInput.value?.length > 0) {
     const { data } = await gridProxyClient.farms.list({ nameContains: searchInput.value });
     _farms = data.map((_farm: any) => {

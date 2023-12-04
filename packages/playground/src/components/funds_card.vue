@@ -16,7 +16,7 @@
     </template>
     <div>
       Get TFT on Stellar using BTC or Credit card, then you can bridge it to your tfchain account using the Bridge in
-      the portal section.
+      the dashboard section.
       <v-btn
         icon
         small

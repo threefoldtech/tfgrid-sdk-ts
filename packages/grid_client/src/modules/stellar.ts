@@ -1,4 +1,5 @@
-import axios from "axios";
+import { GridClientError, RequestError, ValidationError } from "@threefold/types";
+import axios, { AxiosError } from "axios";
 import { Buffer } from "buffer";
 import * as PATH from "path";
 import { default as StellarSdk } from "stellar-sdk";
@@ -69,7 +70,7 @@ class Stellar implements blockchainInterface {
   async save(name: string, secret: string) {
     const [path, data] = await this._load();
     if (data[name]) {
-      throw Error(`A wallet with the same name ${name} already exists`);
+      throw new ValidationError(`A wallet with the same name ${name} already exists.`);
     }
     const updateOperations = await this.backendStorage.update(path, name, secret);
     await this.saveIfKVStoreBackend(updateOperations);
@@ -78,7 +79,7 @@ class Stellar implements blockchainInterface {
   async getWalletSecret(name: string) {
     const [, data] = await this._load();
     if (!data[name]) {
-      throw Error(`Couldn't find a wallet with name ${name}`);
+      throw new ValidationError(`Couldn't find a wallet with name ${name}.`);
     }
     return data[name];
   }
@@ -87,14 +88,14 @@ class Stellar implements blockchainInterface {
   @validateInput
   async create(options: StellarWalletCreateModel): Promise<BlockchainCreateResultModel> {
     const account_exists = await this.exist({ name: options.name });
-    if (account_exists) throw Error(`Name ${options.name} already exists`);
+    if (account_exists) throw new ValidationError(`Name ${options.name} already exists`);
 
     const account = StellarSdk.Keypair.random();
     const publicKey = account.publicKey();
     try {
       await axios.get(`https://friendbot.stellar.org?addr=${encodeURIComponent(publicKey)}`);
     } catch (e) {
-      throw Error(`An error happened while creating your account. ${e}`);
+      throw new RequestError(`An error happened while creating your account. ${e}`, (e as AxiosError).response?.status);
     }
 
     await this.save(options.name, account.secret());
@@ -150,7 +151,7 @@ class Stellar implements blockchainInterface {
   @validateInput
   async update(options: StellarWalletInitModel) {
     if (!(await this.exist(options))) {
-      throw Error(`Couldn't find a wallet with name ${options.name} to update`);
+      throw new ValidationError(`Couldn't find a wallet with name ${options.name} to update.`);
     }
     const secret = await this.getWalletSecret(options.name);
     const deleteWallet = new BlockchainDeleteModel();
@@ -162,7 +163,7 @@ class Stellar implements blockchainInterface {
       const oldSecret = options.secret;
       options.secret = secret;
       await this.init(options);
-      throw Error(`Couldn't import wallet with the secret ${oldSecret} due to: ${e}`);
+      throw new GridClientError(`Couldn't import wallet with the secret ${oldSecret} due to: ${e}`);
     }
   }
 
@@ -194,7 +195,7 @@ class Stellar implements blockchainInterface {
   async assets(options: BlockchainGetModel): Promise<BlockchainAssetsModel> {
     const secret = await this.getWalletSecret(options.name);
     if (!secret) {
-      throw Error(`Couldn't find a wallet with name ${options.name}`);
+      throw new ValidationError(`Couldn't find a wallet with name ${options.name}.`);
     }
     const walletKeypair = StellarSdk.Keypair.fromSecret(secret);
     const walletPublicKey = walletKeypair.publicKey();
@@ -230,7 +231,7 @@ class Stellar implements blockchainInterface {
   async pay(options: StellarWalletTransferModel) {
     const secret = await this.getWalletSecret(options.name);
     if (!secret) {
-      throw Error(`Couldn't find a wallet with name ${options.name}`);
+      throw new ValidationError(`Couldn't find a wallet with name ${options.name}`);
     }
     const sourceKeypair = StellarSdk.Keypair.fromSecret(secret);
     const sourcePublicKey = sourceKeypair.publicKey();
@@ -245,7 +246,7 @@ class Stellar implements blockchainInterface {
         }
       }
       if (!issuer) {
-        throw Error(`couldn't find this asset ${options.asset} on source wallet`);
+        throw new ValidationError(`couldn't find this asset ${options.asset} on source wallet.`);
       }
       asset = new StellarSdk.Asset(options.asset, issuer);
     } else {
@@ -276,8 +277,7 @@ class Stellar implements blockchainInterface {
       console.log("Success! View the transaction at: ", transactionResult._links.transaction.href);
       return transactionResult._links.transaction.href;
     } catch (e) {
-      console.log("An error has occured:", e);
-      throw Error(e);
+      throw new GridClientError(`An error has occurred: ${e}`);
     }
   }
 
@@ -286,7 +286,7 @@ class Stellar implements blockchainInterface {
   async delete(options: BlockchainDeleteModel) {
     const [path, data] = await this._load();
     if (!data[options.name]) {
-      throw Error(`Couldn't find a wallet with name ${options.name}`);
+      throw new ValidationError(`Couldn't find a wallet with name ${options.name}.`);
     }
     const updateOperations = await this.backendStorage.update(path, options.name, "", StorageUpdateAction.delete);
     await this.saveIfKVStoreBackend(updateOperations);

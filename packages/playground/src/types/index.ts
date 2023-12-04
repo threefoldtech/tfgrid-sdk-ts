@@ -1,8 +1,20 @@
+import { CertificationType, type GridNode, type NodeStats, NodeStatus } from "@threefold/gridproxy_client";
+import { capitalize } from "vue";
 import type { VDataTable } from "vuetify/lib/labs/components";
 
+import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
 import type { INode } from "@/utils/filter_nodes";
 
 import type * as validators from "../utils/validators";
+// Input attrs
+export type InputFilterType = {
+  label: string;
+  placeholder: string;
+  value?: string;
+  rules?: [syncRules: SyncRule[], asyncRules?: AsyncRule[]];
+  error?: string;
+  type: string;
+};
 
 export enum ProfileTypes {
   DIY,
@@ -41,7 +53,7 @@ export interface K8SWorker {
   ipv6: boolean;
   planetary: boolean;
   rootFsSize: number;
-  farm?: Farm;
+  farm?: FarmInterface;
   selectedNode?: INode;
   rentedBy?: number;
   dedicated: boolean;
@@ -51,13 +63,13 @@ export interface K8SWorker {
 export interface CaproverWorker {
   selectedNode?: INode;
   name: string;
-  farm?: Farm;
+  farm?: FarmInterface;
   solution?: solutionFlavor;
   dedicated?: boolean;
   certified?: boolean;
 }
 
-export interface Farm {
+export interface FarmInterface {
   name: string;
   farmID: number;
   country: string;
@@ -176,3 +188,168 @@ export interface SMTPServer {
 }
 
 export type Validators = typeof validators;
+
+export type NodeInputFilterType = {
+  label: string;
+  placeholder: string;
+  value?: string | undefined;
+  rules?: [syncRules: SyncRule[], asyncRules?: AsyncRule[]];
+  error?: string;
+  type: string;
+};
+
+// The input filters<nodeId, farmIds..etc> and the option filters<status, gpu...etc>
+export type MixedFilter = {
+  inputs: FilterInputs;
+  options: FilterOptions;
+};
+
+// Status, GPU, Gateway, and any other option should be add here.
+export type FilterOptions = {
+  status: NodeStatus;
+  gpu: boolean | undefined;
+  gateway: boolean | undefined;
+  page: number;
+  size: number;
+};
+
+// Input fields
+export type FilterInputs = {
+  nodeId: NodeInputFilterType;
+  farmIds: NodeInputFilterType;
+  farmName: NodeInputFilterType;
+  country: NodeInputFilterType;
+  freeSru: NodeInputFilterType;
+  freeHru: NodeInputFilterType;
+  freeMru: NodeInputFilterType;
+};
+
+export const optionsInitializer: FilterOptions = {
+  gateway: undefined,
+  gpu: undefined,
+  page: 1,
+  size: 10,
+  status: capitalize(NodeStatus.Up) as NodeStatus,
+};
+
+import type { FilterFarmInputs } from "@/utils/filter_farms";
+import type { FilterNodeInputs } from "@/utils/filter_nodes";
+
+// The input filters<nodeId, farmIds..etc> and the option filters<status, gpu...etc>
+
+// Status, GPU, Gateway, and any other option should be add here.
+export type NodeFilterOptions = {
+  status: NodeStatus;
+  gpu: boolean | undefined;
+  gateway: boolean | undefined;
+  page: number;
+  size: number;
+};
+type TableSortOption = {
+  key: string | undefined;
+  order: boolean | "desc" | "asc" | undefined;
+};
+export type FarmFilterOptions = {
+  page?: number;
+  size?: number;
+  sortBy?: TableSortOption[];
+};
+
+export const nodeOptionsInitializer: NodeFilterOptions = {
+  gateway: undefined,
+  gpu: undefined,
+  page: 1,
+  size: 10,
+  status: capitalize(NodeStatus.Up) as NodeStatus,
+};
+
+export type ResourceWrapper = {
+  name: string;
+  value: string;
+};
+
+export type NodeDetailsCard = {
+  name: string;
+  value?: string;
+  imgSrc?: string;
+  hint?: string;
+  icon?: string;
+  callback?: (value: string) => void;
+  nameHint?: string; // v-chip hint beside the item name.
+  nameHintColor?: string; // The v-chip color
+};
+
+export type GridProxyRequestConfig = {
+  loadFarm?: boolean;
+  loadTwin?: boolean;
+  loadStats?: boolean;
+  loadGpu?: boolean;
+};
+
+export type NodeStatusColor = {
+  color: string;
+  status: string;
+};
+
+export type NodeTypeColor = {
+  color: string;
+  type: string;
+};
+
+export const nodeStatsInitializer: NodeStats = {
+  system: { cru: 0, hru: 0, ipv4u: 0, mru: 0, sru: 0 },
+  total: { cru: 0, hru: 0, ipv4u: 0, mru: 0, sru: 0 },
+  used: { cru: 0, hru: 0, ipv4u: 0, mru: 0, sru: 0 },
+  users: {
+    deployments: 0,
+    workloads: 0,
+  },
+};
+
+export const nodeInitializer: GridNode = {
+  id: "",
+  nodeId: 0,
+  farmId: 0,
+  twinId: 0,
+  country: "",
+  gridVersion: 0,
+  city: "",
+  uptime: 0,
+  created: 0,
+  farmingPolicyId: 0,
+  updatedAt: 0,
+  total_resources: { mru: 0, sru: 0, hru: 0, cru: 0 },
+  used_resources: { mru: 0, sru: 0, hru: 0, cru: 0 },
+  location: { city: "", country: "", latitude: 0, longitude: 0 },
+  publicConfig: { domain: "", gw4: "", ipv6: "", gw6: "", ipv4: "" },
+  status: NodeStatus.Up,
+  certificationType: CertificationType.Diy,
+  dedicated: false,
+  rentContractId: 0,
+  rentedByTwinId: 0,
+  farm: {
+    certificationType: CertificationType.Diy,
+    dedicated: false,
+    farmId: 0,
+    name: "",
+    pricingPolicyId: 0,
+    publicIps: [],
+    twinId: 0,
+    stellarAddress: "",
+  },
+  publicIps: { free: 0, total: 0, used: 0 },
+  twin: { twinId: 0, accountId: "", publicKey: "", relay: "" },
+  stats: nodeStatsInitializer,
+  cards: [],
+  num_gpu: 0,
+};
+// The input filters<nodeId, farmIds..etc> and the option filters<status, gpu...etc>
+export type MixedNodeFilter = {
+  inputs: FilterNodeInputs;
+  options: NodeFilterOptions;
+};
+
+export type MixedFarmFilter = {
+  inputs?: FilterFarmInputs;
+  options?: FarmFilterOptions;
+};

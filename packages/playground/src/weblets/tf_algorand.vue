@@ -193,10 +193,9 @@
 <script lang="ts" setup>
 import { computed, type Ref, ref, watch } from "vue";
 
-import Network from "../components/networks.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import { type Farm, type Flist, ProjectName, type Validators } from "../types";
+import { type FarmInterface, type Flist, ProjectName, type Validators } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
@@ -220,7 +219,7 @@ const account = ref("");
 const wordsLength = computed(() => (account.value ? account.value.split(" ").length : 0));
 const firstRound = ref(24000000);
 const lastRound = ref(26000000);
-const farm = ref() as Ref<Farm>;
+const farm = ref() as Ref<FarmInterface>;
 const farmName = ref();
 const dedicated = ref(false);
 const certified = ref(false);

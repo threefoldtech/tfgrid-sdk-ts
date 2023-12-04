@@ -63,7 +63,7 @@
       </VCard>
     </template>
     <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
-      <v-card-title class="pa-0">Connect your TFChain Wallet</v-card-title>
+      <v-card-title class="pa-0">TFChain Wallet</v-card-title>
     </v-card>
     <WebletLayout disable-alerts>
       <v-alert variant="tonal" class="mb-6" v-if="activeTab === 0">
@@ -110,6 +110,7 @@
                       :rules="[
                         validators.required('Mnemonic or Hex Seed is required.'),
                         v => {
+                          clearError();
                           if (
                             validateMnemonic(v) ||
                             ((v.length === 64 || v.length === 66) && isAddress(v.length === 66 ? v : `0x${v}`))

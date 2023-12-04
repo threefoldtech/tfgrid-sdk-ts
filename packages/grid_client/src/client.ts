@@ -1,4 +1,5 @@
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
+import { GridClientError, TFChainError, ValidationError } from "@threefold/types";
 import type AwaitLock from "await-lock";
 import { validateMnemonic } from "bip39";
 import * as PATH from "path";
@@ -9,7 +10,7 @@ import { TFClient } from "./clients/tf-grid/client";
 import { ClientOptions, GridClientConfig, NetworkEnv } from "./config";
 import { migrateKeysEncryption, send, toHexSeed } from "./helpers";
 import { isExposed } from "./helpers/expose";
-import { generateString } from "./helpers/utils";
+import { formatErrorMessage, generateString } from "./helpers/utils";
 import * as modules from "./modules/index";
 import { appPath } from "./storage/backend";
 import { BackendStorage, BackendStorageType } from "./storage/backend";
@@ -75,6 +76,15 @@ class GridClient {
         this.clientOptions.network === NetworkEnv.main
       )
     ) {
+      if (
+        !clientOptions.substrateURL ||
+        !clientOptions.proxyURL ||
+        !clientOptions.graphqlURL ||
+        !clientOptions.activationURL ||
+        !clientOptions.relayURL
+      )
+        //TODO throw a grid client error when its pr got merged
+        throw new Error("In Case of using a custom network, Must provide urls in GridClientOptions");
       this.clientOptions.network = NetworkEnv.custom;
       this.clientOptions.substrateURL = clientOptions.substrateURL;
       this.clientOptions.proxyURL = clientOptions.proxyURL;
@@ -112,11 +122,7 @@ class GridClient {
 
     if (!isConnecting) {
       await this.tfclient.connect();
-      try {
-        await this.rmbClient.connect();
-      } catch (e) {
-        throw Error(e.message);
-      }
+      await this.rmbClient.connect();
 
       await this.testConnectionUrls(urls);
 
@@ -140,7 +146,9 @@ class GridClient {
       }
     } catch (e) {
       console.log(e);
-      throw Error(`Couldn't find a user for the provided mnemonic on ${this.clientOptions.network} network.`);
+      throw new TFChainError(
+        `Couldn't get the user twin for the provided mnemonic on ${this.clientOptions.network} network.`,
+      );
     }
     this._connect();
 
@@ -185,7 +193,8 @@ class GridClient {
       await send("get", urlJoin(urls.rmbProxy, "version"), "", {});
     } catch (err) {
       console.log(err.message);
-      throw Error("failed to connect to Grid proxy server");
+      (err as Error).message = formatErrorMessage("Failed to connect to Grid proxy server.", err);
+      throw err;
     }
 
     try {
@@ -193,7 +202,8 @@ class GridClient {
       await gql.query("query { __typename }");
     } catch (err) {
       console.log(err.message);
-      throw Error("failed to connect to Graphql server");
+      (err as Error).message = formatErrorMessage("Failed to connect to Graphql server.", err);
+      throw err;
     }
   }
 
@@ -251,23 +261,23 @@ class GridClient {
   async invoke(message, args) {
     const namespaces = message.split(".");
     if (namespaces.length > 2) {
-      throw `Message must include 2 parts only not ${namespaces.length}`;
+      throw new ValidationError(`Message must include 2 parts only not ${namespaces.length}.`);
     }
 
     const method = namespaces.pop();
 
     const module_name = namespaces[0];
     if (!this.modules.includes(module_name)) {
-      throw `gridclient.${module_name} module doesn't exist`;
+      throw new GridClientError(`gridclient.${module_name} module doesn't exist.`);
     }
     const module = this[namespaces[0]];
 
     if (typeof module[method] !== "function") {
-      throw `${module_name}.${method} function doesn't exist`;
+      throw new GridClientError(`${module_name}.${method} function doesn't exist.`);
     }
 
     if (isExposed(module, method) == false) {
-      throw `gridclient.${module_name}.${method} cannot be exposed`;
+      throw new GridClientError(`gridclient.${module_name}.${method} cannot be exposed.`);
     }
     return await module[method].apply(module, [args]);
   }
