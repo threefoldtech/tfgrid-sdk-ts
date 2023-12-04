@@ -1,4 +1,3 @@
-import { Client } from "../../tfchain_client/dist/es6";
 import {
   DiskModel,
   FarmFilterOptions,
@@ -7,7 +6,6 @@ import {
   MachineModel,
   MachinesModel,
   NetworkModel,
-  randomChoice,
 } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
@@ -16,7 +14,7 @@ async function main() {
   const grid3 = await getClient();
 
   const errors: any = [];
-  const offlineNodes: any = [];
+  const offlineNodes: number[] = [];
   let failedCount = 0;
   let successCount = 0;
   const batchSize = 5;
@@ -64,7 +62,7 @@ async function main() {
         availableFor: await grid3.twins.get_my_twin_id(),
         farmId: farms[0].farmId,
         randomize: true,
-        nodeExclude: Array.from(offlineNodes),
+        nodeExclude: offlineNodes,
       } as FilterOptions);
 
       if (nodes.length < 1) {
@@ -81,7 +79,7 @@ async function main() {
         log(res);
         log("================= Ping result =================");
       } catch (error) {
-        offlineNodes.push(error);
+        offlineNodes.push(nodes[0].nodeId);
         log(`Node ${nodes[0].nodeId} is offline`);
       }
 
