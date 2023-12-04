@@ -165,10 +165,10 @@ const updateQueries = async () => {
   await updateFarms();
 };
 
-watch(mixedFarmFilters.value, updateFarms, { deep: true });
-watch(filterFarmInputs.value, updateQueries, { deep: true });
-watch(page, updateQueries, { deep: true });
-watch(size, updateQueries, { deep: true });
+watch(mixedFarmFilters, updateFarms, { deep: true });
+watch(filterFarmInputs, updateQueries, { deep: true });
+watch(page, updateQueries);
+watch(size, updateQueries);
 const inputFiltersReset = (nFltrNptsVal: FilterFarmInputs) => {
   mixedFarmFilters.value.inputs = nFltrNptsVal;
   nFltrNptsVal.farmId.value = undefined;
