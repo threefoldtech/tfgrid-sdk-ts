@@ -40,14 +40,7 @@
               <v-card-title class="pa-0 mb-5 font-weight-bold" v-if="proposal.action">
                 {{ proposal.action }}
               </v-card-title>
-              <v-btn
-                @click="resetFilters"
-                variant="tonal"
-                color="primary"
-                v-bind:href="proposal.link"
-                v-bind:target="'blank'"
-                >Details</v-btn
-              >
+              <v-btn variant="tonal" color="primary" v-bind:href="proposal.link" v-bind:target="'blank'">Details</v-btn>
             </div>
 
             <v-divider class="mt-1 mb-5 text-red-700" />
