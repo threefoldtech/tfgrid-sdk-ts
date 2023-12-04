@@ -35,17 +35,18 @@
       <template v-slot:expanded-row="{ columns, item }">
         <tr>
           <td :colspan="columns.length" key="item.id">
-            <v-container>
-              <card-details
-                :loading="false"
-                title="Node Details"
-                icon="mdi-resistor-nodes"
-                :items="getNodeDetails(item.raw)"
-              ></card-details>
-            </v-container>
+            <card-details
+              class="my-4"
+              :loading="false"
+              title="Node Details"
+              :items="getNodeDetails(item.raw)"
+            ></card-details>
+
             <v-expansion-panels v-model="resourcesPanel" :disabled="false" focusable>
-              <v-expansion-panel>
-                <v-expansion-panel-title class="bg-primary"> Resource Units Reserved </v-expansion-panel-title>
+              <v-expansion-panel class="my-4">
+                <v-expansion-panel-title color="primary" class="bg-primar">
+                  Resource Units Reserved
+                </v-expansion-panel-title>
                 <v-expansion-panel-text>
                   <v-row class="mt-5 mb-5">
                     <v-col v-for="(value, key) in item.raw.total_resources" :key="key" align="center">
@@ -82,6 +83,7 @@
                 </v-expansion-panel-text>
               </v-expansion-panel>
             </v-expansion-panels>
+
             <v-expansion-panels v-if="network == 'main'" :disabled="false" focusable single model-value>
               <v-expansion-panel class="my-3">
                 <v-expansion-panel-title class="bg-primary"> Node Statistics </v-expansion-panel-title>
