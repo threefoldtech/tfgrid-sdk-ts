@@ -50,7 +50,7 @@ import { getFarms, getFarmsPages } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
 import { useFarmGatewayManager } from "./farm_gateway_manager.vue";
 import { useFarm } from "./select_farm_manager.vue";
-import { createLocation, defaultCountry } from "./select_location.vue";
+import { createLocation, defaultCountry, defaultRegion } from "./select_location.vue";
 
 export interface Filters {
   publicIp?: boolean;
@@ -133,8 +133,9 @@ const pagesCount = ref();
 function prepareFilters(filters: Filters, twinId: number): FarmFilterOptions {
   return {
     size: SIZE,
-    page: page.value,
+    page: Math.max(1, isNaN(page.value) ? 0 : page.value),
     country: location.value.country === defaultCountry ? undefined : location.value.country,
+    region: location.value.region === defaultRegion ? undefined : location.value.region,
     nodeMRU: filters.memory ? Math.round(filters.memory / 1024) : undefined,
     nodeHRU: filters.disk,
     nodeSRU: filters.ssd,
@@ -159,7 +160,7 @@ async function loadFarms() {
         name: _farm.name,
         farmID: _farm.farmId,
         country: _farm.country,
-      };
+      } as FarmInterface;
     });
   } else {
     _farms = await getFarms(grid!, prepareFilters(props.filters, grid!.twinId), {

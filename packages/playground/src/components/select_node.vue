@@ -61,7 +61,14 @@
             </template>
           </v-autocomplete>
 
-          <v-btn class="ml-2 mt-2" variant="tonal" color="info" :loading="loadingNodes" @click="loadNodes">
+          <v-btn
+            class="ml-2 mt-2"
+            variant="tonal"
+            color="info"
+            :loading="loadingNodes"
+            :disabled="pingingNode"
+            @click="loadNodes"
+          >
             Load Nodes
           </v-btn>
         </div>
@@ -100,12 +107,12 @@ import { onBeforeUnmount, type PropType, type Ref, ref, watch } from "vue";
 import { ValidatorStatus } from "@/hooks/form_validator";
 
 import { useProfileManager } from "../stores/profile_manager";
-import type { Farm } from "../types";
+import type { FarmInterface } from "../types";
 import { getFilteredNodes, getNodeCards, type INode, type NodeGPUCardType } from "../utils/filter_nodes";
 import { getGrid } from "../utils/grid";
 import { getCardName, normalizeError } from "../utils/helpers";
 import { useFarm } from "./select_farm_manager.vue";
-import { defaultCountry } from "./select_location.vue";
+import { defaultCountry, defaultRegion } from "./select_location.vue";
 
 export interface NodeFilters {
   farmId?: number;
@@ -120,6 +127,7 @@ export interface NodeFilters {
   type?: string;
   availableFor?: number;
   country?: string;
+  region?: string;
 }
 
 const emits = defineEmits<{ (event: "update:modelValue", value?: INode): void }>();
@@ -144,7 +152,7 @@ const emptyResult = ref(false);
 const validator = ref();
 const pingingNode = ref(false);
 
-const farm = ref<Farm>();
+const farm = ref<FarmInterface>();
 const unsubscribe = farmManager.subscribe(f => (farm.value = f));
 onBeforeUnmount(unsubscribe);
 
@@ -205,6 +213,7 @@ async function loadNodes() {
   const { farmID = -1, country, region } = farm.value || {};
   const farmId = farmID > 0 ? farmID : undefined;
   availableNodes.value = [];
+  const oldSelectedNode = selectedNode.value;
   selectedNode.value = undefined;
   loadingNodes.value = true;
   errorMessage.value = "";
@@ -224,14 +233,8 @@ async function loadNodes() {
         rentedBy: filters.rentedBy,
         availableFor: grid.twinId,
         country: country === defaultCountry ? undefined : country,
+        region: region === defaultRegion ? undefined : region,
       });
-
-      if (res?.length === 0 || farmId === undefined) {
-        selectedNode.value = undefined;
-        emptyResult.value = true;
-        loadingNodes.value = false;
-        return;
-      }
 
       if (res) {
         nodesArr.value = [];
@@ -247,6 +250,14 @@ async function loadNodes() {
         availableNodes.value = nodesArr.value;
       } else {
         availableNodes.value = [];
+      }
+
+      if (oldSelectedNode) {
+        const index = availableNodes.value.findIndex(n => oldSelectedNode.nodeId === n.nodeId);
+
+        if (index !== -1) {
+          selectedNode.value = availableNodes.value[index];
+        }
       }
     }
   } catch (e) {

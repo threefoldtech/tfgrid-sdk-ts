@@ -386,6 +386,7 @@ class Nodes {
       rented_by: options.rentedBy,
       rentable: options.rentable,
       randomize: options.randomize,
+      region: options.region,
     };
     if (options.gateway) {
       params["ipv4"] = true;
@@ -418,6 +419,7 @@ class Nodes {
       farm_id: options.farmId,
       randomize: options.randomize,
       ret_count: options.ret_count,
+      region: options.region,
     };
     return Object.entries(params)
       .map(param => param.join("="))
