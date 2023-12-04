@@ -64,7 +64,9 @@
                     <v-icon v-else width="26">{{ item.icon }}</v-icon>
                   </template>
 
-                  <v-list-item-title class="font-weight-bold">{{ item.title }}</v-list-item-title>
+                  <v-tooltip :text="item.tooltip">
+                    <v-list-item-title class="font-weight-bold">{{ item.title }}</v-list-item-title>
+                  </v-tooltip>
                 </v-list-item>
               </template>
             </v-list>
@@ -279,34 +281,44 @@ const routes: AppRoute[] = [
     title: "Services",
     items: [
       {
-        title: "0-Hub",
-        icon: "mdi-open-in-new",
-        url: "https://hub.grid.tf/",
-      },
-      {
-        title: "Monitoring",
-        icon: "mdi-equalizer",
-        url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
-      },
-      {
         title: "0-Bootstrap",
         icon: "mdi-earth",
         url: "https://bootstrap.grid.tf/",
+        tooltip: "Download Zero-OS Images",
       },
       {
-        title: "Grid Services",
-        icon: "mdi-grid-large",
-        url: "https://status.grid.tf/status/threefold",
-      },
-      {
-        title: "Manual",
-        icon: "mdi-book-open-page-variant-outline",
-        url: "https://manual.grid.tf/",
+        title: "0-Hub",
+        icon: "mdi-open-in-new",
+        url: "https://hub.grid.tf/",
+        tooltip: "Find or Publish your Flist",
       },
       {
         title: "Minting",
         icon: "mdi-file-document-edit",
         route: "/minting",
+        tooltip: "TFGrid Minting Explorer",
+      },
+      {
+        title: "Monitoring",
+        icon: "mdi-equalizer",
+        url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
+        tooltip: "Monitor Zero-OS nodes",
+      },
+      {
+        title: "Grid Health",
+        icon: "mdi-grid-large",
+        url: "https://status.grid.tf/status/threefold",
+        tooltip: "Status of Threefold Services",
+      },
+    ],
+  },
+  {
+    title: "Manual",
+    items: [
+      {
+        title: "Manual",
+        icon: "mdi-book-open-page-variant-outline",
+        url: "https://manual.grid.tf/",
       },
     ],
   },
@@ -362,6 +374,7 @@ interface AppRouteItem {
   route?: string;
   url?: string;
   icon?: string;
+  tooltip?: string;
 }
 
 export default {
