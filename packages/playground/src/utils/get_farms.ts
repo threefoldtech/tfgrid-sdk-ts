@@ -80,7 +80,12 @@ export async function getFarms(
     farms = farms.filter(farm => !blockedFarms.has(farm.farmId));
   }
 
-  return farms.map(farm => ({ name: farm.name, farmID: farm.farmId, country: filters.country }));
+  return farms.map(farm => ({
+    name: farm.name,
+    farmID: farm.farmId,
+    country: filters.country as string,
+    region: filters.region as string,
+  }));
 }
 
 export async function getBlockedFarmSet(exclusiveFor: string): Promise<Set<number>> {

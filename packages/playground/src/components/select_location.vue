@@ -28,7 +28,7 @@ export function createLocation(): Location {
   return { region: defaultRegion, country: defaultCountry };
 }
 
-async function getLocations(tries = 1) {
+async function getLocations(tries = 1): Promise<Locations> {
   try {
     const { totalCount: limit } = await gqlClient
       .countriesConnection({ totalCount: true }, { orderBy: ["name_ASC"] })
