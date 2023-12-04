@@ -74,6 +74,8 @@ async function main() {
 
       try {
         const res = await grid3.zos.pingNode({ nodeId: nodes[0].nodeId });
+        log("================= Node Id =================");
+        log(nodes[0].nodeId);
         log("================= Ping result =================");
         log(res);
         log("================= Ping result =================");
