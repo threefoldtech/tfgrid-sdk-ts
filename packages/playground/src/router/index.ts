@@ -492,7 +492,7 @@ const router = createRouter({
     {
       path: "/minting",
       component: () => import("../views/minting_view.vue"),
-      meta: { title: "Minting" },
+      meta: { title: "Minting", info: { page: "info/minting.md" } },
     },
     {
       path: "/nodes",

@@ -1,6 +1,9 @@
 <template>
   <view-layout>
-    <h2 class="mb-5 text-capitalize">Alpha software - all data subject to change</h2>
+    <h2 class="mb-4 text-capitalize">Grid Minting Explorer</h2>
+    <v-alert variant="tonal" type="warning" class="mb-4 pa-2">
+      <p>All data subject to change</p>
+    </v-alert>
     <v-form @submit.prevent="mintingHash()" class="d-inline-flex w-100">
       <FormValidator v-model="isValidForm">
         <InputValidator
@@ -10,7 +13,6 @@
             validators.equal('Receipt hash must be 64 characters long.', 64),
             validators.isHash('Invalid hash', 'sha256'),
           ]"
-          valid-message="Receipt hash is valid."
           #="{ props: validationProps }"
           ref="hashInput"
         >
