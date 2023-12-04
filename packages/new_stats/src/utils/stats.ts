@@ -72,6 +72,9 @@ export function formatData(network: Network[] = [Network.Main], totalStat: Netwo
     if (Number.isNaN(currentStats.dedicatedNodes)) {
       currentStats.dedicatedNodes = 0;
     }
+    if (Number.isNaN(currentStats.totalGpu)) {
+      currentStats.totalGpu = 0;
+    }
     res = mergeStatsData([res, currentStats]);
   }
 
