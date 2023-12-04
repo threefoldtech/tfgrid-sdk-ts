@@ -3,7 +3,7 @@
     <div class="border px-4 pb-4 rounded position-relative mt-2">
       <v-card color="primary" class="d-flex justify-center items-center mt-3 pa-3 text-center">
         <v-icon size="30" class="pr-3" color="white">mdi-chart-scatter-plot</v-icon>
-        <v-card-title class="pa-0">statistics</v-card-title>
+        <v-card-title class="pa-0">Statistics</v-card-title>
       </v-card>
       <div class="text-center">
         <v-row align="center" justify="center">

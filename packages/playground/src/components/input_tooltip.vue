@@ -13,13 +13,9 @@
             @focus="propsRef?.onFocus"
             @blur="propsRef?.onBlur"
           >
-            <a v-if="href" :href="href" target="_blank">
-              <v-icon>mdi-information</v-icon>
-            </a>
-
-            <template v-else>
+            <a :href="href" target="_blank">
               <v-icon>mdi-information-outline</v-icon>
-            </template>
+            </a>
           </span>
         </div>
       </template>
