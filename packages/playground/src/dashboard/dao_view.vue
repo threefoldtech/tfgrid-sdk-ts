@@ -197,7 +197,7 @@
       </v-dialog>
       <v-dialog v-model="openInfoModal" width="50vw">
         <v-card>
-          <v-card-title class="text-h5"> Proposals information </v-card-title>
+          <v-card-title class="text-h5"> Proposals Information </v-card-title>
 
           <v-card-text>
             <div class="textContainer">
