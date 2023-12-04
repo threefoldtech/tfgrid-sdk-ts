@@ -32,9 +32,13 @@
             v-bind="{
               ...props,
               loading: props.loading || loadingNodes || pingingNode,
-              hint: pingingNode ? `Checking if the disks will fit in the node's storage pools... ` : props.hint,
-              error: !!errorMessage || props.error,
-              errorMessages: errorMessage || props.errorMessages,
+              hint: filtersUpdated
+                ? 'Please load nodes to list nodes matching your new requirements.'
+                : pingingNode
+                ? `Checking if the disks will fit in the node's storage pools... `
+                : props.hint,
+              error: filtersUpdated ? undefined : !!errorMessage || props.error,
+              errorMessages: filtersUpdated ? undefined : errorMessage || props.errorMessages,
             }"
           >
             <template v-slot:item="{ item, props }">
@@ -102,7 +106,8 @@
 </template>
 
 <script lang="ts" setup>
-import { onBeforeUnmount, type PropType, type Ref, ref, watch } from "vue";
+import equals from "lodash/fp/equals.js";
+import { onBeforeUnmount, onMounted, type PropType, type Ref, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
 
@@ -209,7 +214,35 @@ watch(
 function getChipColor(item: any) {
   return item === "Dedicated" ? "success" : item === "Certified" ? "primary" : "secondary";
 }
+
+const filtersUpdated = ref(false);
+const baseFilters = ref();
+watch(
+  () => props.filters,
+  (value, oldValue) => {
+    if (filtersUpdated.value && baseFilters.value) {
+      if (equals(baseFilters.value, value)) {
+        validator.value?.setStatus(ValidatorStatus.Valid);
+        filtersUpdated.value = false;
+      }
+    }
+
+    if (value && oldValue && !equals(value, oldValue)) {
+      validator.value?.setStatus(ValidatorStatus.Init);
+      filtersUpdated.value = true;
+
+      if (!baseFilters.value) {
+        baseFilters.value = value;
+      }
+    }
+  },
+  { deep: true },
+);
+
+onMounted(loadNodes);
 async function loadNodes() {
+  filtersUpdated.value = false;
+  baseFilters.value = undefined;
   const { farmID = -1, country, region } = farm.value || {};
   const farmId = farmID > 0 ? farmID : undefined;
   availableNodes.value = [];
