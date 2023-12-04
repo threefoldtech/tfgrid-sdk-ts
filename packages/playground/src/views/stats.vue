@@ -24,7 +24,7 @@
               </v-btn>
             </v-alert>
           </v-col>
-          <v-col cols="12" sm="12" md="12" lg="8" class="mx-auto mt-3">
+          <v-col class="mx-auto mt-3 pr-2">
             <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
           </v-col>
           <v-divider class="v-divider--vertical mx-2 my-4" />
