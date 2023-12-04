@@ -11,6 +11,7 @@
   >
     <template #title> Deploy a Discourse Instance </template>
     <d-tabs
+      prefix="discourse"
       :tabs="[
         { title: 'Config', value: 'config' },
         { title: 'Mail Server', value: 'mail' },
@@ -31,7 +32,7 @@
           #="{ props }"
         >
           <input-tooltip tooltip="Instance name.">
-            <v-text-field label="Name" v-model="name" v-bind="props" />
+            <v-text-field class="discourse-name" label="Name" v-model="name" v-bind="props" />
           </input-tooltip>
         </input-validator>
         <input-validator
@@ -44,6 +45,7 @@
         >
           <input-tooltip tooltip="This email will be used to login to your instance.">
             <v-text-field
+              class="discourse-email"
               label="Email"
               placeholder="This email will be used to login to your instance."
               v-model="email"
@@ -66,6 +68,7 @@
             href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
           >
             <v-switch
+              class="discourse-dedicated"
               color="primary"
               inset
               label="Dedicated"
@@ -77,6 +80,7 @@
 
           <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
             <v-switch
+              class="discourse-certified"
               color="primary"
               inset
               label="Certified"
@@ -101,6 +105,7 @@
             />
 
             <SelectNode
+              prefix="discourse"
               v-model="selectedNode"
               :filters="{
                 farmId: farm?.farmID,
@@ -113,18 +118,19 @@
               :root-file-system-size="rootFilesystemSize"
             />
           </SelectFarmManager>
-          <DomainName :hasIPv4="ipv4" ref="domainNameCmp" />
+          <DomainName prefix="discourse" :hasIPv4="ipv4" ref="domainNameCmp" />
         </FarmGatewayManager>
       </template>
 
       <template #mail>
-        <SmtpServer v-model="smtp" :persistent="true" :tls="true">
+        <SmtpServer prefix="discourse" v-model="smtp" :persistent="true" :tls="true">
           Discourse needs SMTP service so please configure these settings properly.
         </SmtpServer>
       </template>
     </d-tabs>
     <template #footer-actions>
       <v-btn
+        class="discourse-deploy"
         color="primary"
         variant="tonal"
         @click="deploy(domainNameCmp?.domain, domainNameCmp?.customDomain)"
@@ -140,8 +146,9 @@
 import type { GridClient } from "@threefold/grid_client";
 import { Buffer } from "buffer";
 import TweetNACL from "tweetnacl";
-import { computed, type Ref, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, type Ref, ref } from "vue";
 
+import { useDialogService } from "../components/vuetify_dialog/DialogLockService.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
@@ -150,8 +157,17 @@ import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
+import { startGuide } from "../utils/intro";
 import rootFs from "../utils/root_fs";
 import { generateName, generatePassword } from "../utils/strings";
+
+const dialogService = useDialogService();
+
+onMounted(() => dialogService.enqueue(startTour));
+onBeforeUnmount(() => dialogService.dequeue(startTour));
+async function startTour() {
+  await startGuide("discourse.yaml");
+}
 
 const layout = useLayout();
 const tabs = ref();
