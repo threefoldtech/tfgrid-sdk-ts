@@ -1,141 +1,60 @@
-import {
-  ContractStates,
-  type GqlNameContract,
-  type GqlNodeContract,
-  type GqlRentContract,
-  GridClient,
-} from "@threefold/grid_client";
+import { ContractStates, type GridClient } from "@threefold/grid_client";
 import { NodeStatus } from "@threefold/gridproxy_client";
-
-import { gridProxyClient } from "@/clients";
 
 import { normalizeBalance } from "./helpers";
 
-export type GqlNameContractWrapper = GqlNameContract & { consumption?: number; expiration?: string };
-export type GqlNodeContractWrapper = GqlNodeContract & {
-  nodeStatus?: NodeStatus;
-  consumption?: number;
-  contractId?: number;
-  solutionName?: string;
-  solutionType?: string;
-  expiration?: string;
-};
+export async function getUserContracts(grid: GridClient) {
+  const res: any = await grid!.contracts.listMyContracts();
 
-/**
- * Retrieves the status of each node contract and assigns it to the `nodeStatus` property of the contract.
- * @param contracts - An array of `GqlNodeContract` objects representing node contracts.
- * @returns An array of `GqlNodeContractWrapper` objects with the `nodeStatus` property updated for each contract.
- */
-async function nameContrctWrapper(
-  contracts: GqlNameContractWrapper[],
-  grid: GridClient,
-): Promise<GqlNameContractWrapper[]> {
-  let consumption: number;
+  const promises = [
+    res.nameContracts.map((c: any) => normalizeContract(grid!, c, ContractType.NAME)),
+    res.nodeContracts.map((c: any) => normalizeContract(grid!, c, ContractType.NODE)),
+    res.rentContracts.map((c: any) => normalizeContract(grid!, c, ContractType.RENT)),
+  ];
 
-  for (const contract of contracts) {
-    const id = +contract.contractID;
-    try {
-      consumption = await grid.contracts.getConsumption({ id });
-    } catch {
-      consumption = 0;
-    }
-
-    let expiration = "-";
-    if (contract.state === ContractStates.GracePeriod) {
-      const exp = await grid.contracts.getDeletionTime({ id });
-      expiration = new Date(exp).toLocaleString();
-    }
-
-    contract.consumption = consumption;
-    contract.expiration = expiration;
-    contract.createdAt = new Date(+contract.createdAt * 1000).toLocaleString();
-  }
-
-  console.log("Name contracts: ", contracts);
-  return contracts;
+  return Promise.all(promises.flat(1));
 }
 
-/**
- * Retrieves the status of each node contract and assigns it to the `nodeStatus` property of the contract.
- * @param contracts - An array of `GqlNodeContract` objects representing node contracts.
- * @returns An array of `GqlNodeContractWrapper` objects with the `nodeStatus` property updated for each contract.
- */
-async function nodeContrctWrapper(
-  contracts: GqlNodeContractWrapper[],
+async function normalizeContract(
   grid: GridClient,
-): Promise<GqlNodeContractWrapper[]> {
-  let data: { [key: string]: string };
-  let consumption: number;
-
-  for (const contract of contracts) {
-    data = JSON.parse(contract.deploymentData);
-    const id = +contract.contractID;
-    try {
-      consumption = await grid.contracts.getConsumption({ id });
-    } catch {
-      consumption = 0;
-    }
-
-    let expiration = "-";
-    if (contract.state === ContractStates.GracePeriod) {
-      const exp = await grid.contracts.getDeletionTime({ id });
-      expiration = new Date(exp).toLocaleString();
-    }
-
-    const status = (await gridProxyClient.nodes.byId(contract.nodeID)).status;
-    contract.nodeStatus = status;
-    contract.consumption = consumption;
-    contract.solutionName = data.name;
-    contract.contractId = id;
-    contract.expiration = expiration;
-    contract.createdAt = new Date(+contract.createdAt * 1000).toLocaleString();
-    contract.solutionType = data.projectName || data.type;
-  }
-
-  console.log("Node contracts: ", contracts);
-  return contracts;
-}
-
-/**
- * Normalizes an array of contracts based on the contract type.
- * @param contracts - An array of contracts.
- * @param type - The contract type.
- * @returns A Promise that resolves to an array of normalized contracts.
- */
-export async function normalizeContracts(
-  contracts: GqlContractType[],
-  grid: GridClient,
+  c: { [key: string]: any },
   type: ContractType,
-): Promise<GqlContractType[]> {
-  switch (type) {
-    case ContractType.NODE:
-      return await nodeContrctWrapper(contracts as GqlNodeContractWrapper[], grid);
-    case ContractType.NAME:
-      return await nameContrctWrapper(contracts as GqlNameContractWrapper[], grid);
-    case ContractType.RENT:
-      return contracts;
-    default:
-      throw new Error("Invalid contract type");
-  }
-}
+): Promise<NormalizedContract> {
+  const id = +c.contractID;
 
-/**
- * Determines the color associated with a given contract state.
- * @param state - The contract state for which the color needs to be determined.
- * @returns A string representing the color associated with the given contract state.
- * @throws {Error} If the contract state is invalid.
- */
-export function getStateColor(state: ContractStates): string {
-  switch (state) {
-    case ContractStates.Created:
-      return "success";
-    case ContractStates.Deleted:
-      return "error";
-    case ContractStates.GracePeriod:
-      return "warning";
-    case ContractStates.OutOfFunds:
-      return "info";
+  let data: { [key: string]: string };
+  try {
+    data = JSON.parse(c.deploymentData);
+  } catch {
+    data = { name: c.name };
   }
+
+  let expiration = "-";
+  if (c.state === ContractStates.GracePeriod) {
+    const exp = await grid.contracts.getDeletionTime({ id });
+    expiration = new Date(exp).toLocaleString();
+  }
+
+  let consumption: string;
+  try {
+    consumption = formatConsumption(await grid.contracts.getConsumption({ id }));
+  } catch {
+    consumption = formatConsumption(0);
+  }
+
+  return {
+    contractId: id,
+    twinID: c.twinID,
+    type,
+    state: c.state,
+    createdAt: new Date(+c.createdAt * 1000).toLocaleString(),
+    nodeId: c.nodeID || "-",
+    solutionProviderID: c.solutionProviderID,
+    solutionName: data.name || "-",
+    solutionType: data.projectName || data.type || "-",
+    expiration,
+    consumption,
+  };
 }
 
 export function getNodeStateColor(state: NodeStatus): string {
@@ -149,41 +68,18 @@ export function getNodeStateColor(state: NodeStatus): string {
   }
 }
 
-// export async function normalizeContract(
-//   grid: GridClient,
-//   c: { [key: string]: any },
-//   type: "name" | "node" | "rent",
-// ): Promise<NormalizedContract> {
-//   let nodeStatus;
-//   const id = +c.contractID;
-//   const nodeId = c.nodeID;
-
-//   console.log("nodeId: ", nodeId);
-//   if (nodeId) {
-
-//   }
-
-//   let consumption: number;
-//   try {
-//     consumption = await grid.contracts.getConsumption({ id });
-//   } catch {
-//     consumption = 0;
-//   }
-
-//   return {
-//     contractId: id,
-//     twinID: c.twinID,
-//     type,
-//     state: c.state,
-//     createdAt: new Date(+c.createdAt * 1000).toLocaleString(),
-//     nodeId: c.nodeID || "-",
-//     solutionProviderID: c.solutionProviderID,
-
-//     expiration,
-//     consumption,
-//     nodeStatus,
-//   };
-// }
+export function getStateColor(state: ContractStates): string {
+  switch (state) {
+    case ContractStates.Created:
+      return "success";
+    case ContractStates.Deleted:
+      return "error";
+    case ContractStates.GracePeriod:
+      return "warning";
+    case ContractStates.OutOfFunds:
+      return "info";
+  }
+}
 
 export function formatConsumption(value: number): string {
   value = +value;
@@ -200,8 +96,7 @@ export interface NormalizedContract {
   solutionName?: string;
   solutionType?: string;
   expiration?: string;
-  nodeStatus?: string;
-  consumption: number;
+  consumption: string;
   solutionProviderID: number;
   twinID: number;
 }
@@ -211,5 +106,3 @@ export enum ContractType {
   RENT = "rent",
   NAME = "name",
 }
-
-export type GqlContractType = GqlNodeContract | GqlNameContract | GqlRentContract;

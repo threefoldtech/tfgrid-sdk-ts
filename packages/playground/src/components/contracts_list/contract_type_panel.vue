@@ -45,7 +45,7 @@ import { defineComponent, type PropType, ref } from "vue";
 import NameContracts from "@/components/contracts_list/name_contracts.vue";
 import NodeContracts from "@/components/contracts_list/node_contracts.vue";
 import RentContracts from "@/components/contracts_list/rent_contracts.vue";
-import { ContractType, type GqlContractType } from "@/utils/contracts";
+import { ContractType } from "@/utils/contracts";
 
 const isDataLoading = ref<boolean>(false);
 const deleting = ref<boolean>(false);
@@ -59,7 +59,7 @@ export default defineComponent({
     title: String,
     isLoading: Boolean,
     icon: String,
-    contracts: Array as PropType<GqlContractType[]>,
+    contracts: Array as PropType<any[]>,
     grid: Object as PropType<GridClient>,
     type: Object as PropType<ContractType>,
   },

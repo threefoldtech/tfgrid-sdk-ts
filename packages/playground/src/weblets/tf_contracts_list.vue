@@ -58,7 +58,7 @@ import { defineComponent, ref } from "vue";
 
 import ContractTypePanel from "@/components/contracts_list/contract_type_panel.vue";
 import { useProfileManager } from "@/stores/profile_manager";
-import { ContractType, type GqlContractType, normalizeContracts } from "@/utils/contracts";
+import { ContractType, getUserContracts } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { getGrid } from "@/utils/grid";
 
@@ -66,9 +66,9 @@ const isLoading = ref<boolean>(false);
 const profileManager = useProfileManager();
 const grid = ref<GridClient>();
 
-const nameContracts = ref<GqlContractType[]>([]);
-const nodeContracts = ref<GqlContractType[]>([]);
-const rentContracts = ref<GqlContractType[]>([]);
+const nameContracts = ref<any[]>([]);
+const nodeContracts = ref<any[]>([]);
+const rentContracts = ref<any[]>([]);
 
 const panel = ref<number[]>([0, 1]);
 
@@ -78,10 +78,10 @@ async function onMount() {
     const _grid = await getGrid(profileManager.profile);
     if (_grid) {
       grid.value = _grid;
-      const contracts = await grid.value.contracts.listMyContracts();
-      nodeContracts.value = await normalizeContracts(contracts.nodeContracts, grid.value, ContractType.NODE);
-      nameContracts.value = await normalizeContracts(contracts.nodeContracts, grid.value, ContractType.NAME);
-      rentContracts.value = await normalizeContracts(contracts.nodeContracts, grid.value, ContractType.RENT);
+      const contracts = await getUserContracts(grid.value);
+      nodeContracts.value = contracts.filter(c => c.type === ContractType.NODE);
+      nameContracts.value = contracts.filter(c => c.type === ContractType.NAME);
+      rentContracts.value = contracts.filter(c => c.type === ContractType.RENT);
     } else {
       createCustomToast("Failed to initialize an instance of grid type.", ToastType.danger, {});
     }

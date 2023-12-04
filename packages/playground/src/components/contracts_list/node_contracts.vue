@@ -79,13 +79,12 @@ import type { ContractLock } from "@threefold/tfchain_client";
 import { defineComponent, defineProps, type PropType, ref } from "vue";
 
 import type { VDataTableHeader } from "@/types";
-import { getNodeStateColor, getStateColor, type GqlContractType } from "@/utils/contracts";
+import { getNodeStateColor, getStateColor } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { normalizeError } from "@/utils/helpers";
-// import { normalizeError } from "@/utils/helpers";
 
 const props = defineProps({
-  contracts: Array as PropType<GqlContractType[]>,
+  contracts: Array as PropType<any[]>,
   grid: Object as PropType<GridClient>,
   loading: Boolean,
 });
