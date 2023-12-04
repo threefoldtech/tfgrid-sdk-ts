@@ -64,6 +64,7 @@ async function main() {
         availableFor: await grid3.twins.get_my_twin_id(),
         farmId: farms[0].farmId,
         randomize: true,
+        nodeExclude: Array.from(offlineNodes),
       } as FilterOptions);
 
       if (nodes.length < 1) {
