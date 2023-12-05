@@ -198,6 +198,10 @@ watch(
   async node => {
     errorMessage.value = ``;
 
+    if (node) {
+      baseFilters.value = props.filters;
+    }
+
     if (node && props.filters.hasGPU) {
       loadingCards.value = true;
       const grid = await getGrid(profileManager.profile!);
@@ -216,34 +220,24 @@ function getChipColor(item: any) {
   return item === "Dedicated" ? "success" : item === "Certified" ? "primary" : "secondary";
 }
 
-const filtersUpdated = ref(false);
 const baseFilters = ref();
+const filtersUpdated = ref(false);
 watch(
   () => props.filters,
-  (value, oldValue) => {
-    if (filtersUpdated.value && baseFilters.value) {
-      if (equals(baseFilters.value, value)) {
-        validator.value?.setStatus(ValidatorStatus.Valid);
-        filtersUpdated.value = false;
-      }
+  value => {
+    if (!value || !baseFilters.value) {
+      return;
     }
 
-    if (value && oldValue && !equals(value, oldValue)) {
-      validator.value?.setStatus(ValidatorStatus.Init);
-      filtersUpdated.value = true;
-
-      if (!baseFilters.value) {
-        baseFilters.value = value;
-      }
-    }
+    filtersUpdated.value = !equals(value, baseFilters.value);
   },
   { deep: true },
 );
 
 onMounted(loadNodes);
 async function loadNodes() {
-  filtersUpdated.value = false;
   baseFilters.value = undefined;
+  filtersUpdated.value = false;
   const { farmID = -1, country, region } = farm.value || {};
   const farmId = farmID > 0 ? farmID : undefined;
   availableNodes.value = [];
