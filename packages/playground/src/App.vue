@@ -19,7 +19,15 @@
                 <v-list-group v-if="route.items.length > 1" :value="route.title">
                   <template v-slot:activator="{ props }">
                     <v-list-item style="font-weight: 500" v-bind="props" :prepend-icon="route.icon">
-                      <v-list-item-title class="font-weight-bold">{{ route.title }}</v-list-item-title>
+                      <v-list-item-title class="font-weight-bold">
+                        <v-tooltip :text="route.tooltip" :disabled="!route.tooltip">
+                          <template #activator="{ props }">
+                            <span v-bind="props">
+                              {{ route.title }}
+                            </span>
+                          </template>
+                        </v-tooltip>
+                      </v-list-item-title>
                     </v-list-item>
                   </template>
                   <v-list-item
@@ -41,7 +49,15 @@
                       <v-icon v-else width="26">{{ item.icon }}</v-icon>
                     </template>
 
-                    <v-list-item-title class="font-weight-bold">{{ item.title }}</v-list-item-title>
+                    <v-list-item-title class="font-weight-bold">
+                      <v-tooltip :text="item.tooltip" :disabled="!item.tooltip">
+                        <template #activator="{ props }">
+                          <span v-bind="props">
+                            {{ item.title }}
+                          </span>
+                        </template>
+                      </v-tooltip>
+                    </v-list-item-title>
                   </v-list-item>
                 </v-list-group>
                 <v-list-item
@@ -64,9 +80,15 @@
                     <v-icon v-else width="26">{{ item.icon }}</v-icon>
                   </template>
 
-                  <v-tooltip :text="item.tooltip">
-                    <v-list-item-title class="font-weight-bold">{{ item.title }}</v-list-item-title>
-                  </v-tooltip>
+                  <v-list-item-title class="font-weight-bold">
+                    <v-tooltip :text="item.tooltip" :disabled="!item.tooltip">
+                      <template #activator="{ props }">
+                        <span v-bind="props">
+                          {{ item.title }}
+                        </span>
+                      </template>
+                    </v-tooltip>
+                  </v-list-item-title>
                 </v-list-item>
               </template>
             </v-list>
@@ -367,6 +389,7 @@ interface AppRoute {
   title: string;
   items: AppRouteItem[];
   icon?: string;
+  tooltip?: string;
 }
 
 interface AppRouteItem {
