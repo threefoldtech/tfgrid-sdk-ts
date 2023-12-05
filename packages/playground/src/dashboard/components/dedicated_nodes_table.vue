@@ -1,7 +1,12 @@
 <template>
   <!-- Filters -->
   <div class="pt-5">
-    <filters :model-value="filterInputs" :valid="isValidForm" :form-disabled="isFormLoading" />
+    <filters
+      @update:model-value="inputFiltersReset"
+      :model-value="filterInputs"
+      :valid="isValidForm"
+      :form-disabled="isFormLoading"
+    />
   </div>
   <div>
     <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
@@ -146,10 +151,10 @@ const activeTab = ref(0);
 const loading = ref(false);
 const nodes = ref<any[]>();
 const nodesCount = ref(0);
-const filterInputs = ref<DedicatedNodeFilters>(DedicatedNodeInitializer);
+const filterInputs = ref<DedicatedNodeFilters>(DedicatedNodeInitializer());
 const isValidForm = ref<boolean>(false);
 const isFormLoading = ref<boolean>(true);
-const gpuFilter = ref(false);
+const gpuFilter = ref<boolean | undefined>();
 const tabParams = {
   0: {
     rentable: true,
@@ -161,6 +166,12 @@ const tabParams = {
     rentedBy: profileManager.profile?.twinId,
     retCount: true,
   },
+};
+
+// The mixed filters should reset to the default value again..
+const inputFiltersReset = (nFltrNptsVal: DedicatedNodeFilters) => {
+  filterInputs.value = nFltrNptsVal;
+  gpuFilter.value = undefined;
 };
 
 onMounted(async () => {
@@ -187,7 +198,7 @@ const _loadData = async () => {
       totalCru: filterInputs.value.total_cru.value ? +filterInputs.value.total_cru.value : undefined,
       gpuVendorName: filterInputs.value.gpu_vendor_name.value ? filterInputs.value.gpu_vendor_name.value : "",
       gpuDeviceName: filterInputs.value.gpu_device_name.value ? filterInputs.value.gpu_device_name.value : "",
-      hasGpu: gpuFilter.value ? true : undefined,
+      hasGpu: gpuFilter.value,
     });
 
     if (data.count === 0) {
@@ -232,13 +243,23 @@ const _loadData = async () => {
 
 const loadData = debounce(_loadData, 1000);
 
-watch(activeTab, async () => {
-  await loadData();
-});
+watch(
+  [filterInputs, gpuFilter, activeTab],
+  async () => {
+    if (!gpuFilter.value) {
+      gpuFilter.value = undefined;
+    }
+    await loadData();
+  },
+  { deep: true },
+);
 
 watch(
   [page, pageSize, isValidForm, filterInputs, gpuFilter],
   async ([newPage, newPageSize, newIsValidForm]) => {
+    if (!gpuFilter.value) {
+      gpuFilter.value = undefined;
+    }
     page.value = newPage;
     pageSize.value = newPageSize;
     if (newIsValidForm) {
@@ -260,6 +281,7 @@ async function reloadTable() {
 import { debounce } from "lodash";
 
 import Filters from "@/components/filter.vue";
+import type { FilterInputs } from "@/types";
 import { type DedicatedNodeFilters, DedicatedNodeInitializer } from "@/utils/filter_nodes";
 
 import NodeDetails from "./node_details.vue";

@@ -43,7 +43,7 @@
 <script lang="ts" setup>
 import type { Farm } from "@threefold/gridproxy_client";
 import debounce from "lodash/debounce.js";
-import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 
 import type { VDataTableHeader } from "@/types";
 import type { FarmFilterOptions, MixedFarmFilter } from "@/types";
@@ -54,7 +54,7 @@ const loading = ref<boolean>(false);
 const farms = ref<Farm[]>();
 const isDialogOpened = ref<boolean>(false);
 const selectedFarm = ref<Farm>();
-const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer);
+const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer());
 const size = ref(10);
 const page = ref(1);
 
@@ -64,7 +64,12 @@ const filterOptions = ref<FarmFilterOptions>({
   page: page.value,
   sortBy: sortBy.value,
 });
-const mixedFarmFilters = ref<MixedFarmFilter>({ inputs: filterFarmInputs.value, options: filterOptions.value });
+
+const mixedFarmFilters = computed<MixedFarmFilter>(() => ({
+  inputs: filterFarmInputs.value,
+  options: filterOptions.value,
+}));
+
 const isFormLoading = ref<boolean>(true);
 const isValidForm = ref<boolean>(false);
 const totalFarms = ref(0);
@@ -104,9 +109,6 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
 onMounted(async () => {
   await updateFarms();
 });
-onBeforeUnmount(() => {
-  inputFiltersReset(filterFarmInputs.value);
-});
 
 const request = debounce(_getFarms, 1000);
 
@@ -115,6 +117,7 @@ const updateFarms = async () => {
 
   await request(queries);
 };
+
 const updateSorting = () => {
   if (mixedFarmFilters.value.options) {
     if (mixedFarmFilters.value.options.sortBy?.length) {
@@ -169,12 +172,17 @@ watch(mixedFarmFilters, updateFarms, { deep: true });
 watch(filterFarmInputs, updateQueries, { deep: true });
 watch(page, updateQueries);
 watch(size, updateQueries);
+
+// The filters should reset to the default value again..
 const inputFiltersReset = (nFltrNptsVal: FilterFarmInputs) => {
-  mixedFarmFilters.value.inputs = nFltrNptsVal;
-  nFltrNptsVal.farmId.value = undefined;
-  nFltrNptsVal.name.value = undefined;
-  nFltrNptsVal.freeIps.value = undefined;
+  filterFarmInputs.value = nFltrNptsVal;
+  filterOptions.value = {
+    page: 1,
+    size: 10,
+    sortBy: [{ key: "", order: undefined }],
+  };
 };
+
 const openSheet = (_e: any, { item }: any) => {
   openDialog(item.value);
 };

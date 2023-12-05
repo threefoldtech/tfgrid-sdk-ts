@@ -129,7 +129,7 @@ export default {
   setup() {
     const filterInputs = ref<FilterInputs>(inputsInitializer());
     const filterOptions = ref<FilterOptions>(optionsInitializer());
-    const mixedFilters = computed(() => ({ inputs: filterInputs.value, options: filterOptions.value }));
+    const mixedFilters = computed<MixedFilter>(() => ({ inputs: filterInputs.value, options: filterOptions.value }));
 
     const loading = ref<boolean>(true);
     const isFormLoading = ref<boolean>(true);
@@ -180,7 +180,7 @@ export default {
       { deep: true },
     );
 
-    // The mixed filters should reset to the default value again..
+    // The filters should reset to the default value again..
     const inputFiltersReset = (nFltrNptsVal: FilterInputs) => {
       filterInputs.value = nFltrNptsVal;
       filterOptions.value = {
