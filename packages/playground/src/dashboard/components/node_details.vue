@@ -15,11 +15,11 @@
     </div>
   </td>
 
-  <td :colspan="columnsLen" v-else>
+  <td :style="{ backgroundColor: 'rgb(var(--v-theme-background))'}" :colspan="columnsLen" v-else>
     <v-row class="ma-2">
       <v-col :cols="getColSize">
         <div class="mt-3">
-          <card-details
+          <card-details :style="{ backgroundColor: 'rgb(var(--v-theme-background))'}"
             :loading="false"
             title="Node Resources"
             icon="mdi-harddisk"
@@ -30,7 +30,7 @@
 
       <v-col :cols="getColSize">
         <div class="mt-3">
-          <card-details
+          <card-details :style="{ backgroundColor: 'rgb(var(--v-theme-background))'}"
             :loading="false"
             title="Location"
             icon="mdi-map-marker"
@@ -41,7 +41,7 @@
 
       <v-col :cols="getColSize" class="{ 'mt-n8': getColSize() === 6 }">
         <div class="mt-3">
-          <card-details
+          <card-details :style="{ backgroundColor: 'rgb(var(--v-theme-background))'}"
             :loading="false"
             title="Farm details"
             icon="mdi-silo"
