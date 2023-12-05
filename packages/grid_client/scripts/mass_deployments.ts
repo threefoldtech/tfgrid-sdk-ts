@@ -43,6 +43,7 @@ async function main() {
       disk1.mountpoint = "/newDisk1";
 
       //Farm Selection
+      console.time("Filter Farms Time");
       const farms = await grid3.capacity.filterFarms({
         nodeMRU: mru / 1024,
         nodeSRU: diskSize + rootFs,
@@ -50,11 +51,13 @@ async function main() {
         availableFor: await grid3.twins.get_my_twin_id(),
         randomize: true,
       } as FarmFilterOptions);
+      console.timeEnd("Total Filter Farms Time");
 
       if (farms.length < 1) {
         throw new Error("No farms found");
       }
       //Node Selection
+      console.time("Filter Nodes Time");
       const nodes = await grid3.capacity.filterNodes({
         cru: cru,
         mru: mru / 1024,
@@ -64,6 +67,7 @@ async function main() {
         randomize: true,
         nodeExclude: offlineNodes,
       } as FilterOptions);
+      console.timeEnd("Total Filter Nodes Time");
 
       if (nodes.length < 1) {
         errors.push("Node not found");
@@ -72,8 +76,11 @@ async function main() {
       }
       let id = 0;
 
+      //TODO: Promise and ping
       log("================= Node Id =================");
       log(nodes[0].nodeId);
+      console.time("PingTime");
+
       try {
         const res = await grid3.zos.pingNode({ nodeId: nodes[0].nodeId });
         id = nodes[0].nodeId;
@@ -85,6 +92,7 @@ async function main() {
         offlineNodes.push(nodes[0].nodeId);
         log(`Node ${nodes[0].nodeId} is offline`);
       }
+      console.timeEnd("Total Ping Node Time");
 
       // create vm node Object
       const vm = new MachineModel();
