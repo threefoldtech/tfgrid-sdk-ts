@@ -63,8 +63,12 @@
     </input-validator>
     <input-validator
       v-else-if="selection == Selection.MANUAL"
-      :value="ManualselectedNode"
-      :rules="[validators.required('Node ID is required.')]"
+      :value="manualselectedNode"
+      :rules="[
+        validators.required('Node ID is required.'),
+        validators.isInt('Node ID must be a valid number.'),
+        validators.min('Node ID must be a valid number.', 1),
+      ]"
       :async-rules="[nodeId => validateManualSelectedNode({ nodeId: +nodeId })]"
       #="{ props }"
       :debounce-time="1000"
@@ -72,7 +76,7 @@
       <v-text-field
         label="Node ID"
         type="number"
-        v-model.number="ManualselectedNode"
+        v-model.number="manualselectedNode"
         :disabled="loadingNodes"
         v-bind="{
           ...props,
@@ -151,7 +155,7 @@ const loadingNodes = ref(false);
 const loadingCards = ref(false);
 const shouldBeUpdated = ref(false);
 const errorMessage = ref<string>();
-const ManualselectedNode = ref<number>();
+const manualselectedNode = ref<number>();
 const selectedNode = ref<INode | undefined>();
 const selectedCards = ref<Array<string>>([]);
 const nodeCards = ref<Array<NodeGPUCardType>>([]);
@@ -195,7 +199,6 @@ watch(selectedCards, async () => {
 watch(
   () => selectedNode.value,
   async node => {
-    errorMessage.value = ``;
     const grid = await getGrid(profileManager.profile!);
     if (node && grid) {
       if (props.selection === Selection.AUTOMATED) {
@@ -232,10 +235,7 @@ watch(
     ) {
       return;
     }
-    console.log("In watch filters");
     if (props.selection === Selection.MANUAL && selectedNode.value) {
-      // console.log("In watch filters ,but Manual");
-
       validateManualSelectedNode(selectedNode.value);
     }
     if (props.selection === Selection.AUTOMATED) {
@@ -251,14 +251,14 @@ watch(
     errorMessage.value = undefined;
     if (value !== oldValue) {
       selectedNode.value = undefined;
-      ManualselectedNode.value = undefined;
+      manualselectedNode.value = undefined;
     }
   },
   { deep: false },
 );
 
 watch(
-  () => ManualselectedNode.value,
+  () => manualselectedNode.value,
   async (value, oldValue) => {
     if (value !== undefined || value !== null) {
       clearTimeout(delay.value);
@@ -291,7 +291,7 @@ function getChipColor(item: any) {
 function validateSelectedNodeFilters(
   validatingNode: INode,
   node: NodeInfo,
-  freeresources: NodeResources | undefined,
+  freeResources: NodeResources | undefined,
   filters: NodeFilters,
 ) {
   const twinId = profileManager.profile?.twinId;
@@ -306,8 +306,8 @@ function validateSelectedNodeFilters(
     throw new Error(`Node ${nodeId} is rented by someone else`);
   } else if (filters.ipv4 && !node.publicConfig.ipv4) {
     throw new Error(`Node ${nodeId} is not assigned to a PublicIP`);
-  } else if (freeresources) {
-    const { cru, mru, sru } = freeresources;
+  } else if (freeResources) {
+    const { cru, mru, sru } = freeResources;
     const { cpu, memory, diskSizes } = filters;
 
     if (cru < cpu) {
@@ -327,12 +327,15 @@ async function validateManualSelectedNode(validatingNode?: INode) {
     const filters = props.filters;
     const node = await grid?.capacity.nodes.getNode(Number(validatingNode.nodeId));
     if (node) {
-      const freeresources = await grid?.capacity.nodes.getNodeFreeResources(
+      if (node.status == "down") {
+        throw new Error(`Node ${validatingNode.nodeId} is down`);
+      }
+      const freeResources = await grid?.capacity.nodes.getNodeFreeResources(
         node.nodeId,
         "proxy",
         window.env.GRIDPROXY_URL,
       );
-      validateSelectedNodeFilters(validatingNode, node, freeresources, filters);
+      validateSelectedNodeFilters(validatingNode, node, freeResources, filters);
     } else {
       throw new Error(`Node ${validatingNode.nodeId} is not on the grid`);
     }
