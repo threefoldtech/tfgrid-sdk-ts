@@ -12,12 +12,13 @@
           :loading="loading"
           item-title="name"
           return-object
-          :model-value="shouldBeUpdated ? undefined : farm"
+          :model-value="shouldBeUpdated || loading ? undefined : farm"
           @update:model-value="farm = $event"
           :error-messages="!loading && !farms.length ? 'No farms where found with the specified resources.' : undefined"
           v-model:search="search"
           append-inner-icon="mdi-refresh"
           @click:append-inner="resetSearch"
+          @blur="!search ? resetSearch() : undefined"
         >
           <template v-slot:append-item v-if="page !== -1">
             <div class="px-4 mt-4">
