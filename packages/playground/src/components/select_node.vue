@@ -108,7 +108,7 @@
 
 <script lang="ts" setup>
 import equals from "lodash/fp/equals.js";
-import { onBeforeUnmount, onMounted, type PropType, type Ref, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, type PropType, type Ref, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
 
@@ -136,7 +136,10 @@ export interface NodeFilters {
   region?: string;
 }
 
-const emits = defineEmits<{ (event: "update:modelValue", value?: INode): void }>();
+const emits = defineEmits<{
+  (event: "update:modelValue", value?: INode): void;
+  (event: "update:loading", value?: boolean): void;
+}>();
 
 const props = defineProps({
   modelValue: { type: Object as PropType<INode> },
@@ -337,6 +340,12 @@ async function validateNodeStoragePool(validatingNode: INode | undefined) {
     farmManager?.setLoading(false);
   }
 }
+
+const _isLoading = computed(() => {
+  return loadingNodes.value || pingingNode.value || validator.value?.status === ValidatorStatus.Pending;
+});
+
+watch(_isLoading, loading => farmManager?.setLoading(loading));
 </script>
 
 <script lang="ts">

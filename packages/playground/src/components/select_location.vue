@@ -6,9 +6,16 @@
       @update:model-value="$emit('update:model-value', { country: defaultCountry, region: $event })"
       :items="regions"
       :loading="loading"
+      :disabled="$props.disabled"
     />
 
-    <v-autocomplete label="Country" v-model="$props.modelValue.country" :items="countries" :loading="loading" />
+    <v-autocomplete
+      label="Country"
+      v-model="$props.modelValue.country"
+      :items="countries"
+      :loading="loading"
+      :disabled="$props.disabled"
+    />
   </div>
 </template>
 
@@ -64,6 +71,7 @@ export default {
   name: "SelectLocation",
   props: {
     modelValue: { type: Object as PropType<Location>, required: true },
+    disabled: Boolean,
   },
   emits: {
     "update:model-value": (value: Location) => true || value,

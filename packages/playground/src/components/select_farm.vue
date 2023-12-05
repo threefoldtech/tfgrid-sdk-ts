@@ -1,7 +1,7 @@
 <template>
   <section>
     <h6 class="text-h5 mb-4 mt-2">Choose a Location</h6>
-    <select-location v-model="location" />
+    <select-location v-model="location" :disabled="loading || loadingNodes" />
     <input-validator :rules="[validators.required('Farm is required.')]" :value="farm?.farmID" ref="farmInput">
       <input-tooltip tooltip="The name of the farm that you want to deploy inside it.">
         <v-autocomplete
