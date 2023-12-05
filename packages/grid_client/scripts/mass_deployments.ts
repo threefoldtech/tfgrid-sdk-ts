@@ -71,8 +71,6 @@ async function main() {
         continue;
       }
 
-      let id = 0;
-
       log("================= Node Id =================");
       log(nodes[0].nodeId);
       try {
@@ -80,9 +78,7 @@ async function main() {
         log("================= Ping result =================");
         log(res);
         log("================= Ping result =================");
-        id = nodes[0].nodeId;
       } catch (error) {
-        id = nodes[1].nodeId;
         offlineNodes.push(nodes[0].nodeId);
         log(`Node ${nodes[0].nodeId} is offline`);
       }
@@ -90,7 +86,7 @@ async function main() {
       // create vm node Object
       const vm = new MachineModel();
       vm.name = vmName;
-      vm.node_id = id;
+      vm.node_id = nodes[0].nodeId;
       vm.disks = [disk1];
       vm.public_ip = publicIp;
       vm.planetary = true;
