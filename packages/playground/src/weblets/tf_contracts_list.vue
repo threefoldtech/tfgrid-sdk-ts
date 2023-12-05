@@ -1,69 +1,63 @@
 <template>
-  <div class="d-flex justify-start">
-    <v-card :loading="!totalCost" style="width: 40%" class="mb-5 bg-blue-primary-lighten-3">
-      <template #title>
-        <v-row>
-          <v-col class="d-flex justify-start"> Total cost of contracts </v-col>
-          <v-col class="d-flex justify-end"> <small class="text-info">ID 143</small> </v-col>
-        </v-row>
-      </template>
-      <template #text>
-        <strong v-if="totalCost" class="text-primary">
-          {{ totalCost }} TFT/hour ≈ {{ (totalCost * 24 * 30).toFixed(3) }} TFT/month
-        </strong>
-        <small v-else> loading total cost... </small>
-      </template>
-    </v-card>
-  </div>
   <!-- Error Alert -->
   <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="loadingErrorMessage">
     Error while listing contracts due: {{ loadingErrorMessage }}
   </v-alert>
-  <weblet-layout :class="'mt-0 pt-0'" ref="layout" @mount="onMount">
-    <template #title>Contracts List</template>
 
-    <template #header-actions="{ hasProfile }">
-      <v-btn
-        prepend-icon="mdi-refresh"
-        color="primary"
-        variant="tonal"
-        class="mt-3"
-        :disabled="isLoading || !hasProfile"
-        @click="onMount"
-      >
+  <v-card variant="text" class="mb-4">
+    <section class="d-flex align-center">
+      <v-card-title class="font-weight-bold d-flex align-center title ma-0 pa-0"> Contracts List </v-card-title>
+      <v-spacer />
+      <v-btn prepend-icon="mdi-refresh" color="info" variant="outlined" :disabled="isLoading" @click="onMount">
         refresh
       </v-btn>
+    </section>
+  </v-card>
+
+  <v-card variant="tonal" :loading="!totalCost" class="mb-3 bg-blue-primary-lighten-3">
+    <template #title>
+      <v-row>
+        <v-col class="d-flex justify-start"> <p class="text-subtitle-1">Total cost of contracts</p> </v-col>
+      </v-row>
     </template>
+    <template #text>
+      <strong v-if="totalCost" class="text-primary">
+        {{ totalCost }} TFT/hour ≈ {{ (totalCost * 24 * 30).toFixed(3) }} TFT/month
+      </strong>
+      <small v-else> loading total cost... </small>
+    </template>
+  </v-card>
 
-    <v-expansion-panels v-model="panel" multiple>
-      <v-expansion-panel class="mb-4" :elevation="3" v-for="(table, idx) of contractsTables" :key="idx">
-        <v-expansion-panel-title color="primary" style="height: 50px !important; min-height: 15px !important">
-          <v-icon size="24" class="pr-3">{{ table.icon }}</v-icon>
-          <v-card-title class="pa-0 text-subtitle-1">
-            <strong>{{ table.title }}</strong>
-          </v-card-title>
-        </v-expansion-panel-title>
+  <template> </template>
 
-        <v-expansion-panel-text>
-          <contracts-table
-            :node-status="nodeStatus"
-            :loading="table.loading"
-            :contracts="table.contracts"
-            :grid="table.grid"
-            :contracts-type="table.type"
-            :table-headers="table.headers"
-          />
-        </v-expansion-panel-text>
-      </v-expansion-panel>
-    </v-expansion-panels>
-  </weblet-layout>
+  <v-expansion-panels v-model="panel" multiple>
+    <v-expansion-panel class="mb-4" :elevation="3" v-for="(table, idx) of contractsTables" :key="idx">
+      <v-expansion-panel-title color="primary" style="height: 50px !important; min-height: 15px !important">
+        <v-icon size="24" class="pr-3">{{ table.icon }}</v-icon>
+        <v-card-title class="pa-0 text-subtitle-1">
+          <strong>{{ table.title }}</strong>
+        </v-card-title>
+      </v-expansion-panel-title>
+
+      <v-expansion-panel-text>
+        <contracts-table
+          :node-status="nodeStatus"
+          :loading="table.loading"
+          :contracts="table.contracts"
+          :grid="table.grid"
+          :contracts-type="table.type"
+          :table-headers="table.headers"
+        />
+      </v-expansion-panel-text>
+    </v-expansion-panel>
+  </v-expansion-panels>
 </template>
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import { Decimal } from "decimal.js";
-import { computed, defineComponent, type Ref, ref } from "vue";
+import { computed, defineComponent, onMounted, type Ref, ref } from "vue";
 
 import ContractsTable from "@/components/contracts_list/contracts_table.vue";
 import { useProfileManager } from "@/stores/profile_manager";
@@ -89,7 +83,7 @@ const rentContracts = ref<NormalizedContract[]>([]);
 const loadingErrorMessage = ref<string>();
 const totalCost = ref<number>();
 
-const panel = ref<number[]>([0, 1]);
+const panel = ref<number[]>([0, 1, 2]);
 const nodeStatus = ref() as Ref<{ [x: number]: NodeStatus }>;
 
 const nodeIDs = computed(() => {
@@ -97,7 +91,10 @@ const nodeIDs = computed(() => {
   return [...new Set(allNodes)];
 });
 
+onMounted(onMount);
+
 async function onMount() {
+  totalCost.value = undefined;
   isLoading.value = true;
   loadingErrorMessage.value = undefined;
   if (profileManager.profile) {
@@ -131,22 +128,10 @@ async function onMount() {
   isLoading.value = false;
 }
 
-/**
- * Removes all non-numeric characters from a string.
- * @param {string} str - The input string from which non-numeric characters will be removed.
- * @returns {string} - The resulting string with only numeric characters.
- */
-function onlyNumbers(str: string) {
-  return str.replace(/\D/g, "");
-}
-
 function getTotalCost(contracts: NormalizedContract[]) {
   totalCost.value = 0;
   for (const contract of contracts) {
-    console.log(onlyNumbers(contract.consumption));
-    console.log(+onlyNumbers(contract.consumption));
-    // TODO: This needs to be float number.
-    // totalCost.value = +new Decimal(totalCost.value).add(new Decimal(+));
+    totalCost.value = +new Decimal(totalCost.value).add(contract.consumption);
   }
   return +totalCost.value.toFixed(3);
 }

@@ -47,6 +47,11 @@
         </v-chip>
       </template>
 
+      <template #[`item.consumption`]="{ item }">
+        <p v-if="item.raw.consumption !== 0">{{ item.raw.consumption.toFixed(3) }} TFT/hour</p>
+        <p v-else>No Data Available</p>
+      </template>
+
       <template #[`item.actions`]="{ item }">
         <v-tooltip :text="failedContractId == item.value.contractId ? 'Retry' : 'Show Details'">
           <template #activator="{ props }">

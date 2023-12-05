@@ -41,11 +41,11 @@ async function normalizeContract(
     expiration = new Date(exp).toLocaleString();
   }
 
-  let consumption: string;
+  let consumption: number;
   try {
-    consumption = formatConsumption(await grid.contracts.getConsumption({ id }));
+    consumption = await grid.contracts.getConsumption({ id });
   } catch {
-    consumption = formatConsumption(0);
+    consumption = 0;
   }
 
   return {
@@ -111,7 +111,7 @@ export interface NormalizedContract {
   solutionName?: string;
   solutionType?: string;
   expiration?: string;
-  consumption: string;
+  consumption: number;
   solutionProviderID: number;
   twinID: number;
 }
