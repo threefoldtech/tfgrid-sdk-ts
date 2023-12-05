@@ -1,5 +1,3 @@
-import { setTimeout } from "timers/promises";
-
 import {
   FilterOptions,
   generateString,
@@ -10,7 +8,7 @@ import {
   randomChoice,
 } from "../../src";
 import { config, getClient } from "../client_loader";
-import { bytesToGB, generateInt, k8sWait, log, RemoteRun, splitIP } from "../utils";
+import { bytesToGB, generateInt, getOnlineNode, k8sWait, log, RemoteRun, splitIP } from "../utils";
 
 jest.setTimeout(300000);
 
@@ -81,10 +79,15 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
     if (allNodes.length >= 2) {
-      const qsfsNode1 = +randomChoice(allNodes).nodeId;
-      let qsfsNode2 = +randomChoice(allNodes).nodeId;
-      while (qsfsNode1 == qsfsNode2) {
-        qsfsNode2 = +randomChoice(allNodes).nodeId;
+      const qsfsNode1 = await getOnlineNode(allNodes);
+      if (qsfsNode1 == -1) throw new Error("no nodes available to complete this test");
+      let qsfsNode2 = await getOnlineNode(allNodes);
+      if (qsfsNode2 == -1) throw new Error("no nodes available to complete this test");
+      let maxCount = 3;
+      while (qsfsNode1 == qsfsNode2 && maxCount > 0) {
+        qsfsNode2 = await getOnlineNode(allNodes);
+        if (qsfsNode2 == -1) throw new Error("no nodes available to complete this test");
+        maxCount--;
       }
       qsfsNodes.push(qsfsNode1, qsfsNode2);
     } else {
@@ -106,10 +109,15 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
     if (allNodes.length >= 2) {
-      const qsfsNode1 = +randomChoice(allNodes).nodeId;
-      let qsfsNode2 = +randomChoice(allNodes).nodeId;
-      while (qsfsNode1 == qsfsNode2) {
-        qsfsNode2 = +randomChoice(allNodes).nodeId;
+      const qsfsNode1 = await getOnlineNode(allNodes);
+      if (qsfsNode1 == -1) throw new Error("no nodes available to complete this test");
+      let qsfsNode2 = await getOnlineNode(allNodes);
+      if (qsfsNode2 == -1) throw new Error("no nodes available to complete this test");
+      let maxCount = 3;
+      while (qsfsNode1 == qsfsNode2 && maxCount > 0) {
+        qsfsNode2 = await getOnlineNode(allNodes);
+        if (qsfsNode2 == -1) throw new Error("no nodes available to complete this test");
+        maxCount--;
       }
       qsfsNodes.push(qsfsNode1, qsfsNode2);
     } else {
@@ -146,7 +154,8 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
   }
-  const nodeId = +randomChoice(nodes).nodeId;
+  const nodeId = await getOnlineNode(nodes);
+  if (nodeId == -1) throw new Error("no nodes available to complete this test");
 
   //QSFS Model
   const qsfs: QSFSZDBSModel = {
@@ -355,10 +364,15 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
     if (allNodes.length >= 2) {
-      const qsfsNode1 = +randomChoice(allNodes).nodeId;
-      let qsfsNode2 = +randomChoice(allNodes).nodeId;
-      while (qsfsNode1 == qsfsNode2) {
-        qsfsNode2 = +randomChoice(allNodes).nodeId;
+      const qsfsNode1 = await getOnlineNode(allNodes);
+      if (qsfsNode1 == -1) throw new Error("no nodes available to complete this test");
+      let qsfsNode2 = await getOnlineNode(allNodes);
+      if (qsfsNode2 == -1) throw new Error("no nodes available to complete this test");
+      let maxCount = 3;
+      while (qsfsNode1 == qsfsNode2 && maxCount > 0) {
+        qsfsNode2 = await getOnlineNode(allNodes);
+        if (qsfsNode2 == -1) throw new Error("no nodes available to complete this test");
+        maxCount--;
       }
       qsfsNodes.push(qsfsNode1, qsfsNode2);
     } else {
@@ -380,10 +394,15 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
     if (allNodes.length >= 2) {
-      const qsfsNode1 = +randomChoice(allNodes).nodeId;
-      let qsfsNode2 = +randomChoice(allNodes).nodeId;
-      while (qsfsNode1 == qsfsNode2) {
-        qsfsNode2 = +randomChoice(allNodes).nodeId;
+      const qsfsNode1 = await getOnlineNode(allNodes);
+      if (qsfsNode1 == -1) throw new Error("no nodes available to complete this test");
+      let qsfsNode2 = await getOnlineNode(allNodes);
+      if (qsfsNode2 == -1) throw new Error("no nodes available to complete this test");
+      let maxCount = 3;
+      while (qsfsNode1 == qsfsNode2 && maxCount > 0) {
+        qsfsNode2 = await getOnlineNode(allNodes);
+        if (qsfsNode2 == -1) throw new Error("no nodes available to complete this test");
+        maxCount--;
       }
       qsfsNodes.push(qsfsNode1, qsfsNode2);
     } else {
@@ -452,10 +471,15 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
   }
-  const masterNodeId = +randomChoice(masterNode).nodeId;
-  let workerNodeId = +randomChoice(workerNode).nodeId;
-  while (masterNodeId == workerNodeId) {
-    workerNodeId = +randomChoice(workerNode).nodeId;
+  const masterNodeId = await getOnlineNode(masterNode);
+  if (masterNodeId == -1) throw new Error("no nodes available to complete this test");
+  let workerNodeId = await getOnlineNode(workerNode);
+  if (workerNodeId == -1) throw new Error("no nodes available to complete this test");
+  let maxCount = 3;
+  while (masterNodeId == workerNodeId && maxCount > 0) {
+    workerNodeId = await getOnlineNode(workerNode);
+    if (workerNodeId == -1) throw new Error("no nodes available to complete this test");
+    maxCount--;
   }
 
   //QSFS Config

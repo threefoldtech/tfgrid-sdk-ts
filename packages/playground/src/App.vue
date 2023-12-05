@@ -191,7 +191,7 @@ const hasGrid = computed(() => !!gridStore.grid);
 watch(
   () => $route.meta,
   meta => {
-    (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
+    (document.title = "Threefold Dashboard" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
       (navbarConfig.value = meta.navbarConfig);
   },
 );
@@ -303,23 +303,13 @@ const routes: AppRoute[] = [
         icon: "mdi-book-open-page-variant-outline",
         url: "https://manual.grid.tf/",
       },
+      {
+        title: "Minting",
+        icon: "mdi-file-document-edit",
+        route: "/minting",
+      },
     ],
   },
-
-  ...(network !== "main"
-    ? []
-    : [
-        {
-          title: "Minting",
-          items: [
-            {
-              title: "Minting",
-              icon: "mdi-file-document-edit",
-              route: "/minting",
-            },
-          ],
-        } as any,
-      ]),
 ];
 
 // eslint-disable-next-line no-undef

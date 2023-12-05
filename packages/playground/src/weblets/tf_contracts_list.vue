@@ -99,7 +99,7 @@
         :disabled="isExporting || contracts.length === 0"
         @click="exportData"
       >
-        Export My Data
+        Export
       </v-btn>
       <v-btn
         variant="outlined"
