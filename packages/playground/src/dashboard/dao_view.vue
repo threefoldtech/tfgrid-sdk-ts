@@ -36,13 +36,15 @@
           </v-card>
 
           <v-card class="my-3 pa-5" v-for="(proposal, i) in filteredProposals(tab.content.value)" :key="i">
-            <div class="d-flex justify-space-between">
+            <div
+              class="d-flex align-center"
+              :style="{ justifyContent: proposal.action ? 'space-between' : 'flex-end' }"
+            >
               <v-card-title class="pa-0 mb-5 font-weight-bold" v-if="proposal.action">
                 {{ proposal.action }}
               </v-card-title>
               <v-btn variant="tonal" color="primary" v-bind:href="proposal.link" v-bind:target="'blank'">Details</v-btn>
             </div>
-
             <v-divider class="mt-1 mb-5 text-red-700" />
 
             <v-card-text class="pb-0">
