@@ -53,7 +53,7 @@
         </template>
 
         <template v-slot:[`item.price`]="{ item }">
-          <v-tooltip bottom color="primary" close-delay="1000">
+          <v-tooltip bottom color="primary" close-delay="100">
             <template v-slot:activator="{ isActive, props }">
               <span v-bind="props" v-on="isActive">{{ item.raw.price }} *</span>
             </template>
