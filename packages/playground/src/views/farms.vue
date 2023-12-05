@@ -85,7 +85,6 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
           return {
             ...farm,
             totalPublicIp: total,
-            usedPublicIp: used,
             freePublicIp: total - used,
           };
         });
@@ -110,12 +109,11 @@ onBeforeUnmount(() => {
 });
 
 const request = debounce(_getFarms, 1000);
+
 const updateFarms = async () => {
-  if (isValidForm.value) {
-    await updateQueries();
-    const queries = getFarmQueries(mixedFarmFilters.value);
-    await request(queries);
-  }
+  const queries = await getFarmQueries(mixedFarmFilters.value);
+
+  await request(queries);
 };
 const updateSorting = () => {
   if (mixedFarmFilters.value.options) {
@@ -145,15 +143,32 @@ const updateSorting = () => {
   }
 };
 const updateQueries = async () => {
+  const inputs = mixedFarmFilters.value.inputs;
+  if (inputs && filterFarmInputs.value) {
+    const nFltrNptsVal = filterFarmInputs.value;
+    if (nFltrNptsVal.farmId) {
+      inputs.farmId.value = nFltrNptsVal.farmId.value;
+    }
+    if (nFltrNptsVal.name) {
+      inputs.name.value = nFltrNptsVal.name.value;
+    }
+    if (nFltrNptsVal.freeIps) {
+      inputs.freeIps.value = nFltrNptsVal.freeIps.value;
+    }
+  }
   const options = mixedFarmFilters.value.options;
   if (options) {
     options.page = page.value;
     options.size = size.value;
     options.sortBy = sortBy.value;
   }
+  await updateFarms();
 };
-watch(mixedFarmFilters.value, updateFarms, { deep: true });
 
+watch(mixedFarmFilters, updateFarms, { deep: true });
+watch(filterFarmInputs, updateQueries, { deep: true });
+watch(page, updateQueries);
+watch(size, updateQueries);
 const inputFiltersReset = (nFltrNptsVal: FilterFarmInputs) => {
   mixedFarmFilters.value.inputs = nFltrNptsVal;
   nFltrNptsVal.farmId.value = undefined;
@@ -182,14 +197,8 @@ const headers: VDataTableHeader = [
     sortable: false,
   },
   {
-    title: "Free Public IPs",
+    title: "Available Public IPs",
     key: "freePublicIp",
-    align: "start",
-    sortable: false,
-  },
-  {
-    title: "Used Public IPs",
-    key: "usedPublicIp",
     align: "start",
     sortable: false,
   },
