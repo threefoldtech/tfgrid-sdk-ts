@@ -1,11 +1,26 @@
 <template>
+  <div class="d-flex justify-start">
+    <v-card :loading="!totalCost" style="width: 40%" class="mb-5 bg-blue-primary-lighten-3">
+      <template #title>
+        <v-row>
+          <v-col class="d-flex justify-start"> Total cost of contracts </v-col>
+          <v-col class="d-flex justify-end"> <small class="text-info">ID 143</small> </v-col>
+        </v-row>
+      </template>
+      <template #text>
+        <strong v-if="totalCost" class="text-primary">
+          {{ totalCost }} TFT/hour ≈ {{ (totalCost * 24 * 30).toFixed(3) }} TFT/month
+        </strong>
+        <small v-else> loading total cost... </small>
+      </template>
+    </v-card>
+  </div>
+  <!-- Error Alert -->
+  <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="loadingErrorMessage">
+    Error while listing contracts due: {{ loadingErrorMessage }}
+  </v-alert>
   <weblet-layout :class="'mt-0 pt-0'" ref="layout" @mount="onMount">
     <template #title>Contracts List</template>
-
-    <!-- Error Alert -->
-    <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="loadingErrorMessage">
-      Error while listing contracts due: {{ loadingErrorMessage }}
-    </v-alert>
 
     <template #header-actions="{ hasProfile }">
       <v-btn
@@ -22,9 +37,11 @@
 
     <v-expansion-panels v-model="panel" multiple>
       <v-expansion-panel class="mb-4" :elevation="3" v-for="(table, idx) of contractsTables" :key="idx">
-        <v-expansion-panel-title color="primary">
-          <v-icon size="30" class="pr-3">{{ table.icon }}</v-icon>
-          <v-card-title class="pa-0">{{ table.title }}</v-card-title>
+        <v-expansion-panel-title color="primary" style="height: 50px !important; min-height: 15px !important">
+          <v-icon size="24" class="pr-3">{{ table.icon }}</v-icon>
+          <v-card-title class="pa-0 text-subtitle-1">
+            <strong>{{ table.title }}</strong>
+          </v-card-title>
         </v-expansion-panel-title>
 
         <v-expansion-panel-text>
@@ -45,12 +62,19 @@
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
+import { Decimal } from "decimal.js";
 import { computed, defineComponent, type Ref, ref } from "vue";
 
 import ContractsTable from "@/components/contracts_list/contracts_table.vue";
 import { useProfileManager } from "@/stores/profile_manager";
 import type { VDataTableHeader } from "@/types";
-import { type ContractsTableType, ContractType, getNodeStatus, getUserContracts } from "@/utils/contracts";
+import {
+  type ContractsTableType,
+  ContractType,
+  getNodeStatus,
+  getUserContracts,
+  type NormalizedContract,
+} from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { getGrid } from "@/utils/grid";
 
@@ -58,11 +82,12 @@ const isLoading = ref<boolean>(false);
 const profileManager = useProfileManager();
 const grid = ref<GridClient>();
 
-const contracts = ref<any[]>([]);
-const nameContracts = ref<any[]>([]);
-const nodeContracts = ref<any[]>([]);
-const rentContracts = ref<any[]>([]);
+const contracts = ref<NormalizedContract[]>([]);
+const nameContracts = ref<NormalizedContract[]>([]);
+const nodeContracts = ref<NormalizedContract[]>([]);
+const rentContracts = ref<NormalizedContract[]>([]);
 const loadingErrorMessage = ref<string>();
+const totalCost = ref<number>();
 
 const panel = ref<number[]>([0, 1]);
 const nodeStatus = ref() as Ref<{ [x: number]: NodeStatus }>;
@@ -85,6 +110,7 @@ async function onMount() {
         nameContracts.value = contracts.value.filter(c => c.type === ContractType.NAME);
         rentContracts.value = contracts.value.filter(c => c.type === ContractType.RENT);
         nodeStatus.value = await getNodeStatus(nodeIDs.value);
+        totalCost.value = getTotalCost(contracts.value);
       } catch (error: any) {
         loadingErrorMessage.value = error.message;
         createCustomToast(`Error while listing contracts due: ${error.message}`, ToastType.danger, {});
@@ -103,6 +129,26 @@ async function onMount() {
     );
   }
   isLoading.value = false;
+}
+
+/**
+ * Removes all non-numeric characters from a string.
+ * @param {string} str - The input string from which non-numeric characters will be removed.
+ * @returns {string} - The resulting string with only numeric characters.
+ */
+function onlyNumbers(str: string) {
+  return str.replace(/\D/g, "");
+}
+
+function getTotalCost(contracts: NormalizedContract[]) {
+  totalCost.value = 0;
+  for (const contract of contracts) {
+    console.log(onlyNumbers(contract.consumption));
+    console.log(+onlyNumbers(contract.consumption));
+    // TODO: This needs to be float number.
+    // totalCost.value = +new Decimal(totalCost.value).add(new Decimal(+));
+  }
+  return +totalCost.value.toFixed(3);
 }
 
 const baseTableHeaders: VDataTableHeader = [

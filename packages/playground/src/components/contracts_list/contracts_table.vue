@@ -76,13 +76,13 @@ import { defineComponent, type PropType, type Ref, ref } from "vue";
 import { capitalize } from "vue";
 
 import type { VDataTableHeader } from "@/types";
-import { ContractType, getNodeStateColor, getStateColor } from "@/utils/contracts";
+import { ContractType, getNodeStateColor, getStateColor, type NormalizedContract } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { normalizeError } from "@/utils/helpers";
 
 const props = defineProps({
   contracts: {
-    type: Object as PropType<Ref<any[]>>,
+    type: Object as PropType<Ref<NormalizedContract[]>>,
     required: true,
   },
   nodeStatus: {

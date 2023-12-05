@@ -128,6 +128,6 @@ export type ContractsTableType = {
   icon: string;
   title: string;
   grid: Ref<GridClient | undefined>;
-  contracts: Ref<any[]>;
+  contracts: Ref<NormalizedContract[]>;
   loading: Ref<boolean>;
 };
