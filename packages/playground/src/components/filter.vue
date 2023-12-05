@@ -62,57 +62,53 @@
   </form-validator>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { defineComponent, type PropType, ref, watch } from "vue";
 
 import { useFormRef } from "../hooks/form_validator";
 import type { InputFilterType } from "../types";
 
+const props = defineProps({
+  modelValue: {
+    type: Object as PropType<{ [key: string]: InputFilterType }>,
+    required: true,
+  },
+  formDisabled: Boolean,
+  valid: Boolean,
+});
+
+const emit = defineEmits(["update:model-value", "update:valid"]);
+
+const formRef = useFormRef();
+const panel = [0];
+const isFiltersTouched = ref<boolean>(false);
+
+watch(
+  () => props.modelValue,
+  (newValue: PropType<{ [key: string]: InputFilterType }>) => {
+    const hasNonEmptyValue = Object.keys(newValue).some(obj => {
+      return Reflect.get(newValue, obj).value && Reflect.get(newValue, obj).value.length >= 1;
+    });
+
+    isFiltersTouched.value = hasNonEmptyValue;
+  },
+  { deep: true },
+);
+
+const resetFilters = () => {
+  emit(
+    "update:model-value",
+    Object.keys(props.modelValue).reduce((res, key) => {
+      res[key] = { ...props.modelValue[key], value: undefined };
+      return res;
+    }, {} as any),
+  );
+};
+</script>
+
+<script lang="ts">
 export default defineComponent({
   name: "Filters",
-  props: {
-    modelValue: {
-      type: Object as PropType<{ [key: string]: InputFilterType }>,
-      required: true,
-    },
-    formDisabled: Boolean,
-    valid: Boolean,
-  },
-
-  setup(props, { emit }) {
-    const formRef = useFormRef();
-    const panel = [0];
-    const isFiltersTouched = ref<boolean>(false);
-
-    watch(
-      () => props.modelValue,
-      (newValue: PropType<{ [key: string]: InputFilterType }>) => {
-        const hasNonEmptyValue = Object.keys(newValue).some(obj => {
-          return Reflect.get(newValue, obj).value && Reflect.get(newValue, obj).value.length >= 1;
-        });
-
-        isFiltersTouched.value = hasNonEmptyValue;
-      },
-      { deep: true },
-    );
-
-    const resetFilters = () => {
-      emit(
-        "update:model-value",
-        Object.keys(props.modelValue).reduce((res, key) => {
-          res[key] = { ...props.modelValue[key], value: undefined };
-          return res;
-        }, {} as any),
-      );
-    };
-
-    return {
-      resetFilters,
-      isFiltersTouched,
-      formRef,
-      panel,
-    };
-  },
 });
 </script>
 <style scoped>
