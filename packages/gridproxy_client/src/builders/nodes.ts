@@ -9,8 +9,10 @@ export interface NodesQuery {
   freeMru: number;
   freeHru: number;
   freeSru: number;
+  freeGpu: number;
   totalMru: number;
   totalCru: number;
+  totalGpu: number;
   totalSru: number;
   totalHru: number;
   freeIps: number;
@@ -44,6 +46,7 @@ const NODES_MAPPER: BuilderMapper<NodesQuery> = {
   freeMru: "free_mru",
   freeHru: "free_hru",
   freeSru: "free_sru",
+  freeGpu: "free_gpu",
   freeIps: "free_ips",
   status: "status",
   city: "city",
@@ -70,6 +73,7 @@ const NODES_MAPPER: BuilderMapper<NodesQuery> = {
   totalHru: "total_hru",
   totalMru: "total_mru",
   totalSru: "total_sru",
+  totalGpu: "total_gpu",
 };
 
 const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
@@ -79,6 +83,7 @@ const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
   freeMru: assertNatural,
   freeHru: assertNatural,
   freeSru: assertNatural,
+  freeGpu: assertNatural,
   freeIps: assertNatural,
   status(value) {
     assertIn(value, [NodeStatus.Up, NodeStatus.Down, NodeStatus.Standby]);
@@ -114,6 +119,7 @@ const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
   totalHru: assertInt,
   totalMru: assertInt,
   totalSru: assertInt,
+  totalGpu: assertInt,
 };
 
 export class NodesBuilder extends AbstractBuilder<NodesQuery> {
