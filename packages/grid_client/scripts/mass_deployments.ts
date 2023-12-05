@@ -7,21 +7,29 @@ import {
   MachineModel,
   MachinesModel,
   NetworkModel,
+  randomChoice,
 } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
-async function pingNodes(grid3: GridClient, nodes: any[]): Promise<any> {
+async function pingNodes(grid3: GridClient, nodes: any[]): Promise<any[]> {
   const pingPromises = nodes.map(async node => {
+    const pingPromise = grid3.zos.pingNode({ nodeId: node.nodeId });
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`Timeout: Ping to node ${node.nodeId} took too long`)), 10000),
+    );
+
     try {
-      const res = await grid3.zos.pingNode({ nodeId: node.nodeId });
+      const res = await Promise.race([pingPromise, timeoutPromise]);
       return { node, res };
     } catch (error) {
       return { node, error };
     }
   });
 
-  return Promise.race(pingPromises);
+  const results = await Promise.all(pingPromises);
+
+  return results;
 }
 
 async function main() {
@@ -31,15 +39,75 @@ async function main() {
   const offlineNodes: number[] = [];
   let failedCount = 0;
   let successCount = 0;
-  const batchSize = 5;
-  const totalVMs = 50;
+  const batchSize = 50;
+  const totalVMs = 200;
   const batches = totalVMs / batchSize;
 
   console.time("Total Deployment Time");
+  // resources
+  const cru = 1;
+  const mru = 256;
+  const diskSize = 1;
+  const rootFs = 1;
+  const publicIp = false;
+
+  console.time("Farms Time");
+
+  const farms = await grid3.capacity.filterFarms({
+    nodeMRU: mru / 1024,
+    nodeSRU: diskSize + rootFs,
+    publicIp: publicIp,
+    availableFor: await grid3.twins.get_my_twin_id(),
+    randomize: true,
+  } as FarmFilterOptions);
+  console.timeEnd("Farms Time");
+
+  if (farms.length < 1) {
+    throw new Error("No farms found");
+  }
 
   for (let i = 0; i < batches; i++) {
     console.time("Batch " + (i + 1));
 
+    const nodesPromises = Array.from({ length: batchSize }, async () => {
+      const farmId = +randomChoice(farms).farmId;
+      return grid3.capacity.filterNodes({
+        cru: cru,
+        mru: mru / 1024,
+        sru: rootFs + diskSize,
+        availableFor: await grid3.twins.get_my_twin_id(),
+        farmId: farmId,
+        randomize: true,
+        nodeExclude: [
+          958, 1116, 721, 1097, 1107, 2597, 3263, 1118, 1126, 1226, 1398, 1361, 1334, 1335, 1941, 1744, 1090, 1732,
+          1719, 1296,
+        ],
+      } as FilterOptions);
+    });
+
+    const nodes = await Promise.all(nodesPromises);
+
+    let flattenedNodes = nodes.flat();
+
+    console.time("Ping Nodes");
+    try {
+      const results = await pingNodes(grid3, flattenedNodes);
+      results.forEach(({ node, res, error }) => {
+        if (res) {
+          console.log(`Node ${node.nodeId} is online`);
+        } else {
+          offlineNodes.push(node.nodeId);
+          console.log(`Node ${node.nodeId} is offline`);
+          console.error("Error:", error);
+        }
+      });
+    } catch (error) {
+      console.error("Error pinging nodes:", error);
+    } finally {
+      console.timeEnd("Ping Nodes");
+    }
+
+    // Batch Deployment
     const batchVMs: MachineModel[] = [];
 
     for (let i = 0; i < batchSize; i++) {
@@ -50,65 +118,27 @@ async function main() {
       const vmName = "vm" + generateString(8);
       const publicIp = false;
 
-      // create disk Object
       const disk1 = new DiskModel();
       disk1.name = "d" + generateString(5);
       disk1.size = diskSize;
       disk1.mountpoint = "/newDisk1";
 
-      //Farm Selection
-      console.time("Filter Farms Time");
-      const farms = await grid3.capacity.filterFarms({
-        nodeMRU: mru / 1024,
-        nodeSRU: diskSize + rootFs,
-        publicIp: publicIp,
-        availableFor: await grid3.twins.get_my_twin_id(),
-        randomize: true,
-      } as FarmFilterOptions);
-      console.timeEnd("Total Filter Farms Time");
+      flattenedNodes = nodes.flat().sort(() => Math.random() - 0.5);
 
-      if (farms.length < 1) {
-        throw new Error("No farms found");
-      }
-      //Node Selection
-      console.time("Filter Nodes Time");
-      const nodes = await grid3.capacity.filterNodes({
-        cru: cru,
-        mru: mru / 1024,
-        sru: rootFs + diskSize,
-        availableFor: await grid3.twins.get_my_twin_id(),
-        farmId: farms[0].farmId,
-        randomize: true,
-        nodeExclude: offlineNodes,
-      } as FilterOptions);
-      console.timeEnd("Total Filter Nodes Time");
+      const onlineNode = flattenedNodes.find(node => !offlineNodes.includes(node.nodeId));
 
-      if (nodes.length < 1) {
-        errors.push("Node not found");
+      if (!onlineNode) {
+        errors.push("No online nodes available for deployment");
         failedCount++;
         continue;
       }
-      let id = 0;
 
-      console.time("Ping Nodes");
-      const { node, res } = await pingNodes(grid3, nodes);
-      console.timeEnd("Ping Nodes");
-
-      if (res) {
-        id = node.nodeId;
-        log("================= Ping result =================");
-        log(res);
-        log("================= Ping result =================");
-      } else {
-        id = node.nodeId;
-        offlineNodes.push(node.nodeId);
-        log(`Node ${node.nodeId} is offline`);
-      }
+      const selectedNodeId = onlineNode.nodeId;
 
       // create vm node Object
       const vm = new MachineModel();
       vm.name = vmName;
-      vm.node_id = id;
+      vm.node_id = selectedNodeId;
       vm.disks = [disk1];
       vm.public_ip = publicIp;
       vm.planetary = true;
