@@ -106,8 +106,8 @@
           :nodeId="item.raw.nodeId"
           :farmId="item.raw.farmId"
           v-model="item.raw.publicConfig"
-          @remove-config="(item.raw.publicConfig = $event), reloadNodes"
-          @add-config="(item.raw.publicConfig = $event), reloadNodes"
+          @remove-config="(item.raw.publicConfig = $event), reloadNodes()"
+          @add-config="(item.raw.publicConfig = $event), reloadNodes()"
         />
         <SetExtraFee class="me-2" :nodeId="item.raw.nodeId" />
       </template>
@@ -194,9 +194,11 @@ export default {
 
     onMounted(async () => await getUserNodes());
 
-    const reloadNodes = setTimeout(async () => {
-      await getUserNodes();
-    }, 10000);
+    async function reloadNodes() {
+      setTimeout(async () => {
+        await getUserNodes();
+      }, 10000);
+    }
 
     async function getUserNodes() {
       try {
