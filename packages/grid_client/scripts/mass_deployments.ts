@@ -70,15 +70,18 @@ async function main() {
         failedCount++;
         continue;
       }
+      let id = 0;
 
       log("================= Node Id =================");
       log(nodes[0].nodeId);
       try {
         const res = await grid3.zos.pingNode({ nodeId: nodes[0].nodeId });
+        id = nodes[0].nodeId;
         log("================= Ping result =================");
         log(res);
         log("================= Ping result =================");
       } catch (error) {
+        nodes.length > 1 ? (id = nodes[1].nodeId) : (id = nodes[0].nodeId);
         offlineNodes.push(nodes[0].nodeId);
         log(`Node ${nodes[0].nodeId} is offline`);
       }
@@ -86,7 +89,7 @@ async function main() {
       // create vm node Object
       const vm = new MachineModel();
       vm.name = vmName;
-      vm.node_id = nodes[0].nodeId;
+      vm.node_id = id;
       vm.disks = [disk1];
       vm.public_ip = publicIp;
       vm.planetary = true;
