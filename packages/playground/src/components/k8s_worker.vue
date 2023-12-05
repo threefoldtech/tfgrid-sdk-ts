@@ -107,7 +107,7 @@
     <NodeSelector v-model="selection" />
     <SelectFarmManager>
       <SelectFarm
-        v-if="selection == 'automated'"
+        v-if="selection == Selection.AUTOMATED"
         :filters="{
           cpu: $props.modelValue.cpu,
           memory: $props.modelValue.memory,
@@ -151,6 +151,8 @@ watch(loadingFarm, (loadingFarm): void => {
 
 <script lang="ts">
 import { ref, watch } from "vue";
+
+import { Selection } from "@/utils/types";
 
 import NodeSelector from "../components/node_selection.vue";
 import SelectFarmManager, { useFarm } from "../components/select_farm_manager.vue";

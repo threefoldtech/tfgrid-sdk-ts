@@ -17,10 +17,10 @@
       :async-rules="[() => validateNodeStoragePool(selectedNode)]"
       :value="selectedNode"
       #="{ props }"
+      v-if="selection == Selection.AUTOMATED"
     >
       <input-tooltip tooltip="Select a node ID to deploy on.">
         <v-autocomplete
-          v-if="selection == Selection.AUTOMATED"
           select
           label="Node"
           :items="availableNodes"
@@ -59,45 +59,51 @@
             </v-list-item>
           </template>
         </v-autocomplete>
-        <v-text-field
-          v-else-if="selection == Selection.MANUAL"
-          label="Node ID"
-          type="number"
-          v-model.number="ManualselectedNode"
-          :disabled="loadingNodes"
-          v-bind="{
-            ...props,
-            loading: props.loading,
-            hint: pingingNode ? `Validating Node` : props.hint,
-            error: !!errorMessage,
-            errorMessages: !!errorMessage ? errorMessage : undefined,
-          }"
+      </input-tooltip>
+    </input-validator>
+    <input-validator
+      v-else-if="selection == Selection.MANUAL"
+      :value="ManualselectedNode"
+      :rules="[validators.required('Node ID is required.')]"
+      :async-rules="[nodeId => validateManualSelectedNode({ nodeId: +nodeId })]"
+      #="{ props }"
+      :debounce-time="1000"
+    >
+      <v-text-field
+        label="Node ID"
+        type="number"
+        v-model.number="ManualselectedNode"
+        :disabled="loadingNodes"
+        v-bind="{
+          ...props,
+          hint: pingingNode ? `Validating Node` : props.hint,
+        }"
+      />
+    </input-validator>
+
+    <input-validator
+      v-if="selectedNode && filters.hasGPU"
+      :rules="[
+        validators.required('Please select at least one card.'),
+        validators.min('Please select at least one card.', 1),
+      ]"
+      :value="selectedCards.length"
+      #="{ props }"
+    >
+      <input-tooltip
+        tooltip="Please select at least one card from the available GPU cards. Note that if you have a deployment that already uses certain cards, they will not appear in the selection area. You have the option to select one or more cards.."
+      >
+        <v-autocomplete
+          select
+          label="Node cards"
+          :model-value="selectedCards"
+          :items="nodeCards?.map(card => getCardName(card))"
+          :disabled="loadingCards"
+          multiple
+          @update:model-value="selectedCards = $event"
+          v-bind="{ ...props, loading: props.loading || loadingCards }"
         />
       </input-tooltip>
-      <input-validator
-        v-if="selectedNode && filters.hasGPU"
-        :rules="[
-          validators.required('Please select at least one card.'),
-          validators.min('Please select at least one card.', 1),
-        ]"
-        :value="selectedCards.length"
-        #="{ props }"
-      >
-        <input-tooltip
-          tooltip="Please select at least one card from the available GPU cards. Note that if you have a deployment that already uses certain cards, they will not appear in the selection area. You have the option to select one or more cards.."
-        >
-          <v-autocomplete
-            select
-            label="Node cards"
-            :model-value="selectedCards"
-            :items="nodeCards?.map(card => getCardName(card))"
-            :disabled="loadingCards"
-            multiple
-            @update:model-value="selectedCards = $event"
-            v-bind="{ ...props, loading: props.loading || loadingCards }"
-          />
-        </input-tooltip>
-      </input-validator>
     </input-validator>
   </section>
 </template>
@@ -194,10 +200,6 @@ watch(
     if (node && grid) {
       if (props.selection === Selection.AUTOMATED) {
         await validateNodeStoragePool(node);
-      } else {
-        if (node.nodeId !== 0) {
-          validateManualSelectedNode(node);
-        }
       }
     }
 
@@ -230,7 +232,10 @@ watch(
     ) {
       return;
     }
+    console.log("In watch filters");
     if (props.selection === Selection.MANUAL && selectedNode.value) {
+      // console.log("In watch filters ,but Manual");
+
       validateManualSelectedNode(selectedNode.value);
     }
     if (props.selection === Selection.AUTOMATED) {
@@ -243,7 +248,7 @@ watch(
 watch(
   () => props.selection,
   async (value, oldValue) => {
-    errorMessage.value = ``;
+    errorMessage.value = undefined;
     if (value !== oldValue) {
       selectedNode.value = undefined;
       ManualselectedNode.value = undefined;
@@ -296,31 +301,30 @@ function validateSelectedNodeFilters(
   const isNotRentingDedicatedFarm = node.inDedicatedFarm && node.rentedByTwinId !== twinId;
 
   if (isNotRentingDedicatedFarm) {
-    errorMessage.value = `Node ${nodeId} belongs to a dedicated farm and is not rented by you`;
+    throw new Error(`Node ${nodeId} belongs to a dedicated farm and is not rented by you`);
   } else if (isNotRentingNode) {
-    errorMessage.value = `Node ${nodeId} is rented by someone else`;
+    throw new Error(`Node ${nodeId} is rented by someone else`);
   } else if (filters.ipv4 && !node.publicConfig.ipv4) {
-    errorMessage.value = `Node ${nodeId} is not assigned to a PublicIP`;
+    throw new Error(`Node ${nodeId} is not assigned to a PublicIP`);
   } else if (freeresources) {
     const { cru, mru, sru } = freeresources;
     const { cpu, memory, diskSizes } = filters;
 
     if (cru < cpu) {
-      errorMessage.value = `Node ${nodeId} doesn't have enough CPU`;
+      throw new Error(`Node ${nodeId} doesn't have enough CPU`);
     } else if (mru < Math.round(memory / 1024)) {
-      errorMessage.value = `Node ${nodeId} doesn't have enough Memory`;
+      throw new Error(`Node ${nodeId} doesn't have enough Memory`);
     } else if (sru < diskSizes.reduce((total, disk) => total + disk)) {
-      errorMessage.value = `Node ${nodeId} doesn't have enough Storage`;
+      throw new Error(`Node ${nodeId} doesn't have enough Storage`);
     }
   }
 }
-async function validateManualSelectedNode(validatingNode: INode) {
+
+async function validateManualSelectedNode(validatingNode?: INode) {
+  if (!validatingNode) return;
   try {
     const grid = await getGrid(profileManager.profile!);
     const filters = props.filters;
-    errorMessage.value = ``;
-    loadingNodes.value = true;
-    pingingNode.value = true;
     const node = await grid?.capacity.nodes.getNode(Number(validatingNode.nodeId));
     if (node) {
       const freeresources = await grid?.capacity.nodes.getNodeFreeResources(
@@ -330,15 +334,23 @@ async function validateManualSelectedNode(validatingNode: INode) {
       );
       validateSelectedNodeFilters(validatingNode, node, freeresources, filters);
     } else {
-      errorMessage.value = `Node ${validatingNode.nodeId} is not on the grid`;
+      throw new Error(`Node ${validatingNode.nodeId} is not on the grid`);
     }
+    emits("update:modelValue", {
+      nodeId: validatingNode.nodeId,
+      cards: cards,
+      certified: validatingNode?.certified,
+    });
   } catch (e) {
     console.error(`An error occurred: ${e}`);
-  } finally {
-    validator.value?.setStatus(ValidatorStatus.Init);
-    loadingNodes.value = false;
-    pingingNode.value = false;
+    return {
+      message: normalizeError(
+        e,
+        "Something went wrong while checking status of the node. Please check your connection and try again.",
+      ),
+    };
   }
+  return undefined;
 }
 async function loadNodes(farmId: number | undefined) {
   availableNodes.value = [];
