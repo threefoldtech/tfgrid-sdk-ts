@@ -37,8 +37,8 @@
                 : pingingNode
                 ? `Checking if the disks will fit in the node's storage pools... `
                 : props.hint,
-              error: filtersUpdated ? undefined : !!errorMessage || props.error,
-              errorMessages: filtersUpdated ? undefined : errorMessage || props.errorMessages,
+              error: isLoading ? false : filtersUpdated ? undefined : !!errorMessage || props.error,
+              errorMessages: isLoading ? undefined : filtersUpdated ? undefined : errorMessage || props.errorMessages,
             }"
             :class="{ 'warning-hint-input': filtersUpdated }"
           >
@@ -289,7 +289,11 @@ async function loadNodes() {
 
         if (index !== -1) {
           selectedNode.value = availableNodes.value[index];
+        } else {
+          validator.value?.setStatus(ValidatorStatus.Init);
         }
+      } else {
+        validator.value?.setStatus(ValidatorStatus.Init);
       }
     }
   } catch (e) {
@@ -341,11 +345,11 @@ async function validateNodeStoragePool(validatingNode: INode | undefined) {
   }
 }
 
-const _isLoading = computed(() => {
+const isLoading = computed(() => {
   return loadingNodes.value || pingingNode.value || validator.value?.status === ValidatorStatus.Pending;
 });
 
-watch(_isLoading, loading => farmManager?.setLoading(loading));
+watch(isLoading, loading => farmManager?.setLoading(loading));
 </script>
 
 <script lang="ts">

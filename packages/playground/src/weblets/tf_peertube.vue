@@ -99,6 +99,8 @@
               diskSizes: [solution?.disk],
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
+              country: farm?.country,
+              region: farm?.region,
             }"
             :root-file-system-size="rootFilesystemSize"
           />

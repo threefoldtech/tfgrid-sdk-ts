@@ -179,6 +179,8 @@
             diskSizes: type === 'indexer' ? [50] : [],
             rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
             certified: certified,
+            country: farm?.country,
+            region: farm?.region,
           }"
           :root-file-system-size="rootFilesystemSize"
         />

@@ -223,21 +223,9 @@ onMounted(resetPages);
 onUnmounted(() => FarmGatewayManager?.unregister());
 
 watch(
-  () => ({ ...props.filters, country: location.value.country }),
+  () => ({ ...props.filters, country: location.value.country, region: location.value.region }),
   async (value, oldValue) => {
-    if (
-      value.cpu === oldValue.cpu &&
-      value.memory === oldValue.memory &&
-      value.ssd === oldValue.ssd &&
-      value.disk === oldValue.disk &&
-      value.publicIp === oldValue.publicIp &&
-      value.country === oldValue.country &&
-      value.certified === oldValue.certified &&
-      value.rentedBy === oldValue.rentedBy &&
-      value.hasGPU === oldValue.hasGPU
-    )
-      return;
-    shouldBeUpdated.value = true;
+    shouldBeUpdated.value = !equals(value, oldValue);
   },
 );
 
@@ -261,6 +249,7 @@ async function resetSearch() {
 <script lang="ts">
 import type { FarmFilterOptions } from "@threefold/grid_client";
 import { debounce } from "lodash";
+import equals from "lodash/fp/equals.js";
 
 import { gridProxyClient } from "@/clients";
 import { ValidatorStatus } from "@/hooks/form_validator";

@@ -59,6 +59,8 @@
           diskSizes: [$props.modelValue.solution?.disk ?? 0],
           rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
           certified: $props.modelValue.certified,
+          country: $props.modelValue.farm?.country,
+          region: $props.modelValue.farm?.region,
         }"
         :root-file-system-size="rootFilesystemSize"
       />
