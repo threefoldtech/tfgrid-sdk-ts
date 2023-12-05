@@ -9,6 +9,7 @@
           }
         }
       "
+      v-model="panel"
     >
       <v-expansion-panel>
         <v-expansion-panel-title>
@@ -81,7 +82,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const formRef = useFormRef();
     const isFiltersTouched = ref<boolean>(false);
-
+    const panel = ref(0);
     watch(
       () => props.modelValue,
       (newValue: PropType<{ [key: string]: InputFilterType }>) => {
@@ -108,6 +109,7 @@ export default defineComponent({
       resetFilters,
       isFiltersTouched,
       formRef,
+      panel,
     };
   },
 });
