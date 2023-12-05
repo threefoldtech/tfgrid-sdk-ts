@@ -3,12 +3,26 @@ import {
   FarmFilterOptions,
   FilterOptions,
   generateString,
+  GridClient,
   MachineModel,
   MachinesModel,
   NetworkModel,
 } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
+
+async function pingNodes(grid3: GridClient, nodes: any[]): Promise<any> {
+  const pingPromises = nodes.map(async node => {
+    try {
+      const res = await grid3.zos.pingNode({ nodeId: node.nodeId });
+      return { node, res };
+    } catch (error) {
+      return { node, error };
+    }
+  });
+
+  return Promise.race(pingPromises);
+}
 
 async function main() {
   const grid3 = await getClient();
@@ -76,23 +90,20 @@ async function main() {
       }
       let id = 0;
 
-      //TODO: Promise and ping
-      log("================= Node Id =================");
-      log(nodes[0].nodeId);
-      console.time("PingTime");
+      console.time("Ping Nodes");
+      const { node, res } = await pingNodes(grid3, nodes);
+      console.timeEnd("Ping Nodes");
 
-      try {
-        const res = await grid3.zos.pingNode({ nodeId: nodes[0].nodeId });
-        id = nodes[0].nodeId;
+      if (res) {
+        id = node.nodeId;
         log("================= Ping result =================");
         log(res);
         log("================= Ping result =================");
-      } catch (error) {
-        nodes.length > 1 ? (id = nodes[1].nodeId) : (id = nodes[0].nodeId);
-        offlineNodes.push(nodes[0].nodeId);
-        log(`Node ${nodes[0].nodeId} is offline`);
+      } else {
+        id = node.nodeId;
+        offlineNodes.push(node.nodeId);
+        log(`Node ${node.nodeId} is offline`);
       }
-      console.timeEnd("Total Ping Node Time");
 
       // create vm node Object
       const vm = new MachineModel();
