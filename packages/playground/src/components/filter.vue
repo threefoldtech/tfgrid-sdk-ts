@@ -1,6 +1,7 @@
 <template>
   <form-validator valid-on-init ref="formRef" @update:model-value="$emit('update:valid', $event)">
     <v-expansion-panels
+      v-model="panel"
       class="mb-3"
       @update:model-value="
         e => {
@@ -80,6 +81,7 @@ export default defineComponent({
 
   setup(props, { emit }) {
     const formRef = useFormRef();
+    const panel = [0];
     const isFiltersTouched = ref<boolean>(false);
 
     watch(
@@ -108,6 +110,7 @@ export default defineComponent({
       resetFilters,
       isFiltersTouched,
       formRef,
+      panel,
     };
   },
 });
