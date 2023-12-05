@@ -230,6 +230,7 @@ watch(
     }
 
     filtersUpdated.value = !equals(value, baseFilters.value);
+    validator.value?.setStatus(filtersUpdated.value ? ValidatorStatus.Init : ValidatorStatus.Valid);
   },
   { deep: true },
 );
