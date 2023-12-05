@@ -223,13 +223,13 @@ export type FilterInputs = {
   freeMru: NodeInputFilterType;
 };
 
-export const optionsInitializer: FilterOptions = {
+export const optionsInitializer: () => FilterOptions = () => ({
   gateway: undefined,
   gpu: undefined,
   page: 1,
   size: 10,
   status: capitalize(NodeStatus.Up) as NodeStatus,
-};
+});
 
 import type { FilterFarmInputs } from "@/utils/filter_farms";
 import type { FilterNodeInputs } from "@/utils/filter_nodes";

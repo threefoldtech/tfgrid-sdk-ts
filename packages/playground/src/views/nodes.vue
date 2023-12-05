@@ -8,7 +8,7 @@
   <view-layout>
     <filters
       :form-disabled="isFormLoading"
-      v-model="filterInputs"
+      :model-value="filterInputs"
       v-model:valid="isValidForm"
       @update:model-value="inputFiltersReset"
     />
@@ -105,6 +105,7 @@
 import { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
 import debounce from "lodash/debounce.js";
 import { capitalize, onMounted, ref, watch } from "vue";
+import { computed } from "vue";
 import { useRoute } from "vue-router";
 
 import NodeDetails from "@/components/node_details.vue";
@@ -126,9 +127,9 @@ export default {
     NodeDetails,
   },
   setup() {
-    const filterInputs = ref<FilterInputs>(inputsInitializer);
-    const filterOptions = ref<FilterOptions>(optionsInitializer);
-    const mixedFilters = ref<MixedFilter>({ inputs: filterInputs.value, options: filterOptions.value });
+    const filterInputs = ref<FilterInputs>(inputsInitializer());
+    const filterOptions = ref<FilterOptions>(optionsInitializer());
+    const mixedFilters = computed(() => ({ inputs: filterInputs.value, options: filterOptions.value }));
 
     const loading = ref<boolean>(true);
     const isFormLoading = ref<boolean>(true);
@@ -181,12 +182,15 @@ export default {
 
     // The mixed filters should reset to the default value again..
     const inputFiltersReset = (nFltrNptsVal: FilterInputs) => {
-      mixedFilters.value.inputs = nFltrNptsVal;
-      mixedFilters.value.options.status = NodeStatus.Up;
-      mixedFilters.value.options.gpu = undefined;
-      mixedFilters.value.options.gateway = undefined;
-      mixedFilters.value.options.page = 1;
-      mixedFilters.value.options.size = 10;
+      filterInputs.value = nFltrNptsVal;
+      filterOptions.value = {
+        ...filterOptions.value,
+        status: NodeStatus.Up,
+        gpu: undefined,
+        gateway: undefined,
+        page: 1,
+        size: 10,
+      };
     };
 
     const checkSelectedNode = async () => {

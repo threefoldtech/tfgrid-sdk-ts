@@ -61,7 +61,7 @@ export type DedicatedNodeFilters = {
 };
 
 // Default input Initialization
-export const inputsInitializer: FilterNodeInputs = {
+export const inputsInitializer: () => FilterNodeInputs = () => ({
   nodeId: {
     label: "Node ID",
     placeholder: "Filter by node id.",
@@ -146,9 +146,9 @@ export const inputsInitializer: FilterNodeInputs = {
     ],
     type: "text",
   },
-};
+});
 
-export const DedicatedNodeInitializer: DedicatedNodeFilters = {
+export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
   total_cru: {
     label: "Total CPU (Cores)",
     placeholder: "Filter by total Cores.",
@@ -224,4 +224,4 @@ export const DedicatedNodeInitializer: DedicatedNodeFilters = {
       ],
     ],
   },
-};
+});
