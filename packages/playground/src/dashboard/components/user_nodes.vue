@@ -217,8 +217,13 @@ export default {
       try {
         loading.value = true;
         const twinId = profileManager.profile!.twinId;
-        const data = await gridProxyClient.nodes.nodesOwnedBy(twinId);
-        const count = data.length;
+
+        const { data, count } = await gridProxyClient.nodes.list({
+          retCount: true,
+          page: page.value,
+          size: pageSize.value,
+          ownedBy: twinId,
+        });
 
         const _nodes = data as unknown as NodeInterface[];
         nodesCount.value = count ?? 0;

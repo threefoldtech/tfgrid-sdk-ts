@@ -116,11 +116,6 @@ export class NodesClient extends AbstractClient<NodesBuilder, NodesQuery> {
     return res.json();
   }
 
-  public async nodesOwnedBy(twinId: number): Promise<Node[]> {
-    const res = await this.builder({}).build(`/nodes?owned_by=${twinId}`);
-    return res.json();
-  }
-
   private async loadFarms(farmIds: number[]): Promise<void> {
     farmIds = farmIds.filter(id => !this.farms.has(id));
     const ids = Array.from(new Set(farmIds));
