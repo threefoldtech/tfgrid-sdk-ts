@@ -8,6 +8,7 @@ import {
   MachinesModel,
   NetworkModel,
   randomChoice,
+  TwinDeployment,
 } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
@@ -39,7 +40,7 @@ async function main() {
   let failedCount = 0;
   let successCount = 0;
   const batchSize = 50;
-  const totalVMs = 50;
+  const totalVMs = 250;
   const batches = totalVMs / batchSize;
 
   // resources
@@ -65,7 +66,9 @@ async function main() {
 
   console.time("Total Deployment Time");
 
-  for (let i = 0; i < batches; i++) {
+  for (let batch = 0; batch < batches; batch++) {
+    console.time("Batch " + (batch + 1));
+
     const nodesPromises = Array.from({ length: batchSize }, async () => {
       const farmId = +randomChoice(farms).farmId;
       return grid3.capacity.filterNodes({
@@ -75,6 +78,10 @@ async function main() {
         availableFor: await grid3.twins.get_my_twin_id(),
         farmId: farmId,
         randomize: true,
+        nodeExclude: [
+          958, 1116, 721, 1097, 1107, 2597, 3263, 1118, 1126, 1226, 1398, 1361, 1334, 1335, 1941, 1744, 1090, 1732,
+          1719, 1296,
+        ],
       } as FilterOptions);
     });
 
@@ -100,9 +107,10 @@ async function main() {
       console.timeEnd("Ping Nodes");
     }
 
+    flattenedNodes = flattenedNodes.filter(node => !offlineNodes.includes(node.nodeId));
+
     // Batch Deployment
     const batchVMs: MachinesModel[] = [];
-
     for (let i = 0; i < batchSize; i++) {
       const vmName = "vm" + generateString(8);
 
@@ -111,23 +119,18 @@ async function main() {
       disk1.size = diskSize;
       disk1.mountpoint = "/newDisk1";
 
-      // shuffle array
-      flattenedNodes = nodes.flat().sort(() => Math.random() - 0.5);
-
-      const onlineNode = flattenedNodes.find(node => !offlineNodes.includes(node.nodeId));
-
-      if (!onlineNode) {
+      if (flattenedNodes.length < 0) {
         errors.push("No online nodes available for deployment");
         failedCount++;
         continue;
       }
 
-      const selectedNodeId = onlineNode.nodeId;
+      const selectedNode = flattenedNodes.pop();
 
       // create vm node Object
       const vm = new MachineModel();
       vm.name = vmName;
-      vm.node_id = selectedNodeId;
+      vm.node_id = selectedNode.nodeId;
       vm.disks = [disk1];
       vm.public_ip = publicIp;
       vm.planetary = true;
@@ -139,22 +142,25 @@ async function main() {
       vm.env = {
         SSH_KEY: config.ssh_key,
       };
-      // create network model for whole batch
+
+      // create network model for each vm
       const n = new NetworkModel();
       n.name = "nw" + generateString(5);
       n.ip_range = "10.238.0.0/16";
       n.addAccess = true;
 
-      // create VMs Object
+      // create VMs Object for each vm
       const vms = new MachinesModel();
-      vms.name = "vm " + vmName + " in batch" + (i + 1);
+      vms.name = "batch" + (batch + 1);
       vms.network = n;
       vms.machines = [vm];
       vms.metadata = "";
-      vms.description = "Test deploying VM with name " + vmName + "via ts grid3 client - Batch " + (i + 1);
+      vms.description = "Test deploying vm with name " + vm.name + " via ts grid3 client - Batch " + (batch + 1);
 
       batchVMs.push(vms);
     }
+
+    const allTwinDeployments: TwinDeployment[] = [];
 
     const deploymentPromises = batchVMs.map(async (vms, index) => {
       try {
@@ -165,30 +171,27 @@ async function main() {
         return { twinDeployments: null, batchIndex: index };
       }
     });
-
-    console.time("Preparing Batch " + (i + 1));
+    console.time("Preparing Batch " + (batch + 1));
     const deploymentResults = await Promise.all(deploymentPromises);
-    console.timeEnd("Preparing Batch " + (i + 1));
+    console.timeEnd("Preparing Batch " + (batch + 1));
 
-    console.time("Deploy Batch " + (i + 1));
-
-    for (const { twinDeployments, batchIndex } of deploymentResults) {
+    for (const { twinDeployments } of deploymentResults) {
       if (twinDeployments) {
-        try {
-          const vms = batchVMs[batchIndex];
-          const contracts = await grid3.machines.twinDeploymentHandler.handle(twinDeployments);
-          await grid3.machines.save(vms.name, contracts);
-          successCount += batchSize;
-        } catch (error) {
-          log(error);
-          errors.push(error);
-          failedCount += batchSize;
-          continue;
-        } finally {
-          console.timeEnd("Deploy Batch " + (i + 1));
-        }
+        allTwinDeployments.push(...twinDeployments);
       }
     }
+
+    try {
+      const contracts = await grid3.machines.twinDeploymentHandler.handle(allTwinDeployments);
+      successCount += batchSize;
+      log(`Successfully handled and saved contracts for all twin deployments`);
+    } catch (error) {
+      failedCount += batchSize;
+      errors.push(error);
+      log(`Error handling contracts for all twin deployments: ${error}`);
+    }
+
+    console.timeEnd("Batch " + (batch + 1));
   }
 
   console.timeEnd("Total Deployment Time");
