@@ -14,7 +14,7 @@ export const getFarmQueries = (mixedFilters: MixedFarmFilter): Partial<FarmsQuer
   let farmId, name, page, size, freeIps;
   if (mixedFilters.inputs) {
     if (mixedFilters.inputs.farmId.value) {
-      farmId = +mixedFilters.inputs.farmId.value;
+      farmId = Number(mixedFilters.inputs.farmId.value);
     }
     if (mixedFilters.inputs.name.value) {
       name = mixedFilters.inputs.name.value.toLowerCase().trim();
@@ -36,7 +36,7 @@ export const getFarmQueries = (mixedFilters: MixedFarmFilter): Partial<FarmsQuer
   const options: Partial<FarmsQuery> = {
     retCount: true,
     farmId: farmId,
-    name: name,
+    nameContains: name,
     freeIps: freeIps,
     page: page,
     size: size,
