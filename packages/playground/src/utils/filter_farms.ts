@@ -31,13 +31,13 @@ export const inputsInitializer: () => FilterFarmInputs = () => ({
 
   freeIps: {
     label: "Free PubIPs",
-    placeholder: "Filter by free public ips",
+    placeholder: "Filter by free public IPs",
     rules: [
       [
         isNumeric("This field accepts numbers only.", { no_symbols: true }),
         min("Free Public IP should be larger than zero.", 1),
         isInt("should be an integer"),
-        validateResourceMaxNumber("This is not a valid public ip."),
+        validateResourceMaxNumber("This is not a valid public IP."),
       ],
     ],
     type: "text",

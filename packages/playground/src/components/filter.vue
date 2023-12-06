@@ -80,7 +80,7 @@ const props = defineProps({
 const emit = defineEmits(["update:model-value", "update:valid"]);
 
 const formRef = useFormRef();
-const panel = [0];
+const panel = ref([0]);
 const isFiltersTouched = ref<boolean>(false);
 
 watch(
