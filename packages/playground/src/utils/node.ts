@@ -114,9 +114,12 @@ export async function getFarmUptimePercentage(farm: NodeInterface[]) {
   return (uptime / farm.length).toFixed(2);
 }
 
+export function calculateUptime(currentPeriod = 0, downtime = 0) {
+  return (((currentPeriod - downtime) / currentPeriod) * 100).toFixed(2);
+}
 export async function getNodeUptimePercentage(nodeId: number) {
   const availability = await getNodeAvailability(nodeId);
-  return (((availability?.currentPeriod - availability?.downtime) / availability?.currentPeriod) * 100).toFixed(2);
+  return calculateUptime(availability.currentPeriod, availability.downtime);
 }
 export function getTime(num: number | undefined) {
   if (num) {
