@@ -69,7 +69,7 @@
         validators.isInt('Node ID must be a valid number.'),
         validators.min('Node ID must be a valid number.', 1),
       ]"
-      :async-rules="[nodeId => validateManualSelectedNode({ nodeId: +nodeId })]"
+      :async-rules="[() => validateManualSelectedNode(manualselectedNode)]"
       #="{ props }"
       :debounce-time="1000"
     >
@@ -235,8 +235,8 @@ watch(
     ) {
       return;
     }
-    if (props.selection === Selection.MANUAL && selectedNode.value) {
-      validateManualSelectedNode(selectedNode.value);
+    if (props.selection === Selection.MANUAL && manualselectedNode.value) {
+      manualselectedNode.value = undefined;
     }
     if (props.selection === Selection.AUTOMATED) {
       shouldBeUpdated.value = true;
@@ -257,18 +257,6 @@ watch(
   { deep: false },
 );
 
-watch(
-  () => manualselectedNode.value,
-  async (value, oldValue) => {
-    if (value !== undefined || value !== null) {
-      clearTimeout(delay.value);
-      delay.value = setTimeout(() => {
-        selectedNode.value = { nodeId: Number(value) };
-      }, 1000);
-    }
-  },
-  { deep: false },
-);
 watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
   if (l || !s) return;
   shouldBeUpdated.value = false;
@@ -289,61 +277,61 @@ function getChipColor(item: any) {
   return item === "Dedicated" ? "success" : item === "Certified" ? "primary" : "secondary";
 }
 function validateSelectedNodeFilters(
-  validatingNode: INode,
+  validatingNodeId: number,
   node: NodeInfo,
   freeResources: NodeResources | undefined,
   filters: NodeFilters,
 ) {
   const twinId = profileManager.profile?.twinId;
-  const nodeId = validatingNode.nodeId;
 
   const isNotRentingNode = node.rentedByTwinId !== twinId && node.rentedByTwinId !== 0;
   const isNotRentingDedicatedFarm = node.inDedicatedFarm && node.rentedByTwinId !== twinId;
 
   if (isNotRentingDedicatedFarm) {
-    throw new Error(`Node ${nodeId} belongs to a dedicated farm and is not rented by you`);
+    throw new Error(`Node ${validatingNodeId} belongs to a dedicated farm and is not rented by you`);
   } else if (isNotRentingNode) {
-    throw new Error(`Node ${nodeId} is rented by someone else`);
+    throw new Error(`Node ${validatingNodeId} is rented by someone else`);
   } else if (filters.ipv4 && !node.publicConfig.ipv4) {
-    throw new Error(`Node ${nodeId} is not assigned to a PublicIP`);
+    throw new Error(`Node ${validatingNodeId} is not assigned to a PublicIP`);
   } else if (freeResources) {
     const { cru, mru, sru } = freeResources;
     const { cpu, memory } = filters;
     const diskSizes = [...filters.diskSizes, props.rootFileSystemSize];
 
     if (cru < cpu) {
-      throw new Error(`Node ${nodeId} doesn't have enough CPU`);
+      throw new Error(`Node ${validatingNodeId} doesn't have enough CPU`);
     } else if (mru < Math.round(memory / 1024)) {
-      throw new Error(`Node ${nodeId} doesn't have enough Memory`);
+      throw new Error(`Node ${validatingNodeId} doesn't have enough Memory`);
     } else if (sru < diskSizes.reduce((total, disk) => total + disk)) {
-      throw new Error(`Node ${nodeId} doesn't have enough Storage`);
+      throw new Error(`Node ${validatingNodeId} doesn't have enough Storage`);
     }
   }
 }
 
-async function validateManualSelectedNode(validatingNode?: INode) {
-  if (!validatingNode) return;
+async function validateManualSelectedNode(validatingNodeId?: number) {
+  if (!validatingNodeId) return;
   try {
     const grid = await getGrid(profileManager.profile!);
     const filters = props.filters;
-    const node = await grid?.capacity.nodes.getNode(Number(validatingNode.nodeId));
+    const node = await grid?.capacity.nodes.getNode(validatingNodeId);
     if (node) {
       if (node.status == "down") {
-        throw new Error(`Node ${validatingNode.nodeId} is down`);
+        throw new Error(`Node ${validatingNodeId} is down`);
       }
       const freeResources = await grid?.capacity.nodes.getNodeFreeResources(
         node.nodeId,
         "proxy",
         window.env.GRIDPROXY_URL,
       );
-      validateSelectedNodeFilters(validatingNode, node, freeResources, filters);
+      validateSelectedNodeFilters(validatingNodeId, node, freeResources, filters);
     } else {
-      throw new Error(`Node ${validatingNode.nodeId} is not on the grid`);
+      throw new Error(`Node ${validatingNodeId} is not on the grid`);
     }
+    selectedNode.value = { nodeId: Number(validatingNodeId) };
     emits("update:modelValue", {
-      nodeId: validatingNode.nodeId,
+      nodeId: selectedNode.value.nodeId,
       cards: cards,
-      certified: validatingNode?.certified,
+      certified: selectedNode.value?.certified,
     });
   } catch (e) {
     console.error(`An error occurred: ${e}`);
