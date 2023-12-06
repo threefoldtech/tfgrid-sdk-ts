@@ -192,7 +192,7 @@ export default {
     const uptime = ref();
     const nodesCount = ref();
 
-    onMounted(async () => await getUserNodes());
+    onMounted(getUserNodes);
 
     async function reloadNodes() {
       setTimeout(async () => {
