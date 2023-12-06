@@ -74,7 +74,7 @@
             :disabled="pingingNode"
             @click="loadNodes"
           >
-            Load Nodes
+            {{ capitalize("Load nodes") }}
           </v-btn>
         </div>
       </input-tooltip>
@@ -108,7 +108,7 @@
 
 <script lang="ts" setup>
 import equals from "lodash/fp/equals.js";
-import { computed, onBeforeUnmount, onMounted, type PropType, type Ref, ref, watch } from "vue";
+import { capitalize, computed, onBeforeUnmount, onMounted, type PropType, type Ref, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
 
@@ -231,8 +231,9 @@ watch(
     // if (!value || !baseFilters.value) {
     //   return;
     // }
-
-    filtersUpdated.value = !equals(value, baseFilters.value);
+    if (validator.value?.status !== ValidatorStatus.Init) {
+      filtersUpdated.value = !equals(value, baseFilters.value);
+    }
     validator.value?.setStatus(filtersUpdated.value ? ValidatorStatus.Init : ValidatorStatus.Valid);
   },
   { deep: true },
