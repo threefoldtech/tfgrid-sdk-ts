@@ -174,6 +174,7 @@
         </div>
 
         <template #footer-actions>
+          <v-btn color="error" variant="tonal" @click="$emit('close')">Close</v-btn>
           <v-btn
             color="error"
             variant="outlined"
