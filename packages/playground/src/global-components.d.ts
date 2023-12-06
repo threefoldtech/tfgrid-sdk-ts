@@ -2,6 +2,7 @@ import type { NetworkEnv } from "@threefold/grid_client";
 
 import CopyInputWrapper from "./components/copy_input_wrapper.vue";
 import DTabs from "./components/dynamic_tabs.vue";
+import Filters from "./components/filter.vue";
 import FormValidator from "./components/form_validator.vue";
 import InputTooltip from "./components/input_tooltip.vue";
 import InputValidator from "./components/input_validator.vue";
@@ -20,6 +21,7 @@ declare module "@vue/runtime-core" {
     FormValidator: typeof FormValidator;
     ViewLayout: typeof ViewLayout;
     InputTooltip: typeof InputTooltip;
+    Filters: typeof Filters;
   }
 
   interface ComponentCustomProperties {
@@ -40,6 +42,7 @@ declare global {
       STELLAR_NETWORK: string;
       STELLAR_HORIZON_URL: string;
       TFT_ASSET_ISSUER: string;
+      MINTING_URL: string;
       TIMEOUT: number;
     };
   }

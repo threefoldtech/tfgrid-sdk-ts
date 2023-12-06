@@ -30,8 +30,8 @@ export function useForm(): FormValidatorService | null {
   return inject(formValidatorKey, null);
 }
 
+export function useFormRef(): Ref<FormValidatorService>;
 export function useFormRef(isArray: true): Ref<FormValidatorService[]>;
-export function useFormRef(isArray: false): Ref<FormValidatorService>;
-export function useFormRef(isArray = false) {
+export function useFormRef(isArray?: true) {
   return isArray ? (ref([]) as Ref<FormValidatorService[]>) : (ref() as Ref<FormValidatorService>);
 }

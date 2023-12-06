@@ -1,189 +1,352 @@
 <template>
   <v-app>
-    <v-navigation-drawer
-      width="280"
-      :permanent="permanent"
-      :model-value="hasActiveProfile && openSidebar"
-      @update:model-value="openSidebar = $event"
-      theme="dark"
-    >
-      <div :style="{ paddingTop: '64px' }">
-        <div
-          :style="{
-            maxHeight: 'calc(100vh - 64px)',
-            overflowY: 'auto',
-          }"
-        >
-          <v-list>
-            <template v-for="route in routes" :key="route.title">
-              <v-list-subheader>{{ route.title }}</v-list-subheader>
-              <v-list-item
-                v-for="item in route.items"
-                :key="item.route"
-                :value="item.route"
-                @click="clickHandler(item)"
-                active-color="primary"
-                :active="$route.path === item.route"
-              >
-                <template v-slot:prepend v-if="item.icon">
-                  <v-img
-                    v-if="item.icon.includes('.')"
-                    class="mr-4"
-                    width="26"
-                    :src="baseUrl + 'images/icons/' + item.icon"
-                    :alt="item.title"
-                  />
-                  <v-icon v-else>{{ item.icon }}</v-icon>
-                </template>
-
-                <v-list-item-title>{{ item.title }}</v-list-item-title>
-              </v-list-item>
-            </template>
-          </v-list>
-        </div>
-      </div>
-
-      <template v-if="version">
-        <div class="version">
-          <v-chip color="primary">
-            {{ version }}
-          </v-chip>
-        </div>
-      </template>
-    </v-navigation-drawer>
-
-    <v-main :style="{ paddingTop: '70px' }">
-      <v-toolbar
-        color="rgb(49, 49, 49)"
-        class="position-fixed pr-2"
-        theme="dark"
-        :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }"
+    <profile-manager-controller>
+      <v-navigation-drawer
+        width="280"
+        :permanent="permanent"
+        :model-value="hasActiveProfile && openSidebar"
+        @update:model-value="openSidebar = $event"
       >
-        <v-toolbar-title>
-          <v-img :src="baseUrl + 'images/logoTF.png'" width="160px" />
-        </v-toolbar-title>
+        <div :style="{ paddingTop: '64px' }">
+          <div
+            :style="{
+              maxHeight: 'calc(100vh - 64px)',
+              overflowY: 'auto',
+            }"
+          >
+            <v-list>
+              <template v-for="route in routes" :key="route.title">
+                <v-list-group v-if="route.items.length > 1" :value="route.title">
+                  <template v-slot:activator="{ props }">
+                    <v-list-item style="font-weight: 500" v-bind="props" :prepend-icon="route.icon">
+                      <v-list-item-title class="font-weight-bold">
+                        <v-tooltip :text="route.tooltip" :disabled="!route.tooltip">
+                          <template #activator="{ props }">
+                            <span v-bind="props">
+                              {{ route.title }}
+                            </span>
+                          </template>
+                        </v-tooltip>
+                      </v-list-item-title>
+                    </v-list-item>
+                  </template>
+                  <v-list-item
+                    v-for="item in route.items"
+                    :key="item.route"
+                    :value="item.route"
+                    @click="clickHandler(item)"
+                    :color="theme.name.value === AppThemeSelection.light ? 'primary' : 'info'"
+                    :active="$route.path === item.route"
+                  >
+                    <template v-slot:prepend v-if="item.icon">
+                      <v-img
+                        v-if="item.icon.includes('.')"
+                        class="mr-7"
+                        width="24"
+                        :src="baseUrl + 'images/icons/' + item.icon"
+                        :alt="item.title"
+                      />
+                      <v-icon v-else width="26">{{ item.icon }}</v-icon>
+                    </template>
 
-        <v-spacer></v-spacer>
+                    <v-list-item-title class="font-weight-bold">
+                      <v-tooltip :text="item.tooltip" :disabled="!item.tooltip">
+                        <template #activator="{ props }">
+                          <span v-bind="props">
+                            {{ item.title }}
+                          </span>
+                        </template>
+                      </v-tooltip>
+                    </v-list-item-title>
+                  </v-list-item>
+                </v-list-group>
+                <v-list-item
+                  v-else
+                  v-for="item in route.items"
+                  :key="item.route"
+                  :value="item.route"
+                  @click="clickHandler(item)"
+                  :active="$route.path === item.route"
+                  :color="theme.name.value === AppThemeSelection.light ? 'primary' : 'info'"
+                >
+                  <template v-slot:prepend v-if="item.icon">
+                    <v-img
+                      v-if="item.icon.includes('.')"
+                      class="mr-7"
+                      width="24"
+                      :src="baseUrl + 'images/icons/' + item.icon"
+                      :alt="item.title"
+                    />
+                    <v-icon v-else width="26">{{ item.icon }}</v-icon>
+                  </template>
 
-        <v-btn
-          v-for="(link, index) in navbarLinks"
-          :key="index"
-          color="var(--link-color)"
-          variant="text"
-          target="_blank"
-          :href="link.url"
-          :prepend-icon="link.icon && link.label ? link.icon : undefined"
-          :icon="link.icon && !link.label ? link.icon : undefined"
-          :text="link.label"
-        />
-        <v-divider vertical v-if="navbarLinks.length" />
-        <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
-        <v-divider vertical class="mx-2" />
-        <AppTheme />
-        <v-divider vertical class="mx-2" />
-        <ProfileManager v-model="openProfile" />
-      </v-toolbar>
+                  <v-list-item-title class="font-weight-bold">
+                    <v-tooltip :text="item.tooltip" :disabled="!item.tooltip">
+                      <template #activator="{ props }">
+                        <span v-bind="props">
+                          {{ item.title }}
+                        </span>
+                      </template>
+                    </v-tooltip>
+                  </v-list-item-title>
+                </v-list-item>
+              </template>
+            </v-list>
+          </div>
+        </div>
 
-      <DeploymentListManager>
-        <v-container fluid :style="{ paddingBottom: '100px' }">
-          <div class="d-flex align-center">
-            <v-btn
-              color="primary"
-              @click="openSidebar = true"
-              icon="mdi-menu"
-              variant="tonal"
-              class="mr-2"
-              :disabled="!hasActiveProfile"
-              v-if="!permanent"
+        <template v-if="version">
+          <div class="version">
+            <v-chip color="secondary">
+              {{ version }}
+            </v-chip>
+          </div>
+        </template>
+      </v-navigation-drawer>
+
+      <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
+        <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }">
+          <v-toolbar-title class="custom-toolbar-title">
+            <v-img
+              :src="`${
+                theme.name.value === AppThemeSelection.light
+                  ? baseUrl + 'images/logoTF_dark.png'
+                  : baseUrl + 'images/logoTF_light.png'
+              }`"
+              width="160px"
             />
-            <div :style="{ width: '100%' }" class="mb-4">
-              <DisclaimerToolbar />
-            </div>
-          </div>
+          </v-toolbar-title>
 
-          <div :style="{ position: 'relative' }">
-            <router-view v-slot="{ Component }">
-              <transition name="fade">
-                <div :key="$route.path">
-                  <component :is="Component" v-if="hasActiveProfile"></component>
-                  <ConnectWalletLanding @openProfile="openProfile = true" v-else />
-                </div>
-              </transition>
-            </router-view>
-          </div>
-        </v-container>
-      </DeploymentListManager>
-      <TFNotification v-if="hasActiveProfile" />
-    </v-main>
+          <v-spacer>
+            <div class="d-flex align-center justify-start">
+              <TftSwapPrice class="pr-4"></TftSwapPrice>
+              <FundsCard v-if="hasActiveProfile"></FundsCard>
+            </div>
+          </v-spacer>
+          <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
+          <v-divider vertical class="mx-2" />
+          <AppTheme />
+          <v-divider vertical class="mx-2" />
+          <ProfileManager v-model="openProfile" />
+        </v-toolbar>
+
+        <v-toolbar
+          v-if="navbarConfig"
+          :color="theme.name.value === AppThemeSelection.dark ? '#121212' : 'background'"
+          class="border position-fixed py-0 d-flex pr-2"
+          :style="{
+            zIndex: 1005,
+            top: '65.5px',
+            right: 0,
+            width: openSidebar && hasActiveProfile ? 'calc(100% - 280px)' : '100%',
+          }"
+          height="50"
+        >
+          <v-container>
+            <v-row>
+              <v-breadcrumbs :items="navbarConfig.path" active-color="secondary">
+                <template v-slot:divider>
+                  <v-icon icon="mdi-chevron-right"></v-icon>
+                </template>
+                <template v-slot:item="{ item }">
+                  <router-link :to="item.to" :class="{ 'clickable-item': !item.disabled }">
+                    {{ item.title }}
+                  </router-link>
+                </template>
+              </v-breadcrumbs>
+            </v-row>
+          </v-container>
+        </v-toolbar>
+
+        <DeploymentListManager>
+          <v-container fluid :style="{ paddingBottom: '100px' }">
+            <div class="d-flex align-center">
+              <v-btn
+                color="secondary"
+                @click="openSidebar = true"
+                icon="mdi-menu"
+                variant="tonal"
+                class="mr-2"
+                :disabled="!hasActiveProfile"
+                v-if="!permanent"
+              />
+              <div :style="{ width: '100%' }" class="mb-4">
+                <DisclaimerToolbar />
+              </div>
+            </div>
+
+            <div :style="{ position: 'relative' }">
+              <router-view v-slot="{ Component }">
+                <transition name="fade">
+                  <div :key="$route.path">
+                    <component :is="Component" v-if="hasActiveProfile && hasGrid"></component>
+                    <ConnectWalletLanding @openProfile="openProfile = true" v-else />
+                  </div>
+                </transition>
+              </router-view>
+            </div>
+          </v-container>
+        </DeploymentListManager>
+        <TFNotification v-if="hasActiveProfile" />
+      </v-main>
+    </profile-manager-controller>
   </v-app>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useTheme } from "vuetify";
 
 import { useProfileManager } from "./stores/profile_manager";
 
 const $route = useRoute();
 const $router = useRouter();
 const profileManager = useProfileManager();
+const gridStore = useGrid();
+const network = process.env.NETWORK || (window as any).env.NETWORK;
 
 const openProfile = ref(true);
 const hasActiveProfile = computed(() => !!profileManager.profile);
+const theme = useTheme();
+const navbarConfig = ref();
 
+const hasGrid = computed(() => !!gridStore.grid);
 watch(
   () => $route.meta,
-  meta => (document.title = "TF Playground" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
+  meta => {
+    (document.title = "Threefold Dashboard" + (meta && "title" in meta ? ` | ${meta.title}` : ``)),
+      (navbarConfig.value = meta.navbarConfig);
+  },
 );
+
+onMounted(() => {
+  (window as any).loaded = true;
+});
 
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
 
 const routes: AppRoute[] = [
   {
-    title: "Deployments",
+    title: "Dashboard",
+    icon: "mdi-account-convert-outline",
     items: [
-      { title: "Full Virtual Machine", icon: "vm.png", route: "/" },
-      { title: "Micro Virtual Machine", icon: "vm.png", route: "/vm" },
-      { title: "Kubernetes", icon: "kubernetes.png", route: "/kubernetes" },
-      { title: "CapRover", icon: "caprover.png", route: "/caprover" },
-      { title: "Peertube", icon: "peertube.png", route: "/peertube" },
-      { title: "Funkwhale", icon: "funkwhale.png", route: "/funkwhale" },
-      { title: "Mattermost", icon: "mattermost.png", route: "/mattermost" },
-      { title: "Discourse", icon: "discourse.png", route: "/discourse" },
-      { title: "Taiga", icon: "taiga.png", route: "/taiga" },
-      { title: "Owncloud", icon: "owncloud.png", route: "/owncloud" },
-      { title: "Nextcloud", icon: "nextcloud.png", route: "/nextcloud" },
-      { title: "Presearch", icon: "presearch.png", route: "/presearch" },
-      { title: "Subsquid", icon: "subsquid.png", route: "/subsquid" },
-      { title: "Casperlabs", icon: "casperlabs.png", route: "/casperlabs" },
-      { title: "Algorand", icon: "algorand.png", route: "/algorand" },
-      { title: "Node Pilot", icon: "vm.png", route: "/nodepilot" },
-      { title: "Wordpress", icon: "wordpress.png", route: "/wordpress" },
-      { title: "Umbrel", icon: "umbrel.png", route: "/umbrel" },
-      // { title: "Freeflow", icon: "freeflow.png", route: "/freeflow" },
+      {
+        title: "Twin",
+        icon: "mdi-account-supervisor-outline",
+        route: "/dashboard/twin",
+      },
+      { title: "Bridge", icon: "mdi-swap-horizontal", route: "/dashboard/bridge" },
+      {
+        title: "Transfer",
+        icon: "mdi-account-arrow-right-outline",
+        route: "/dashboard/transfer",
+      },
+      { title: "Farms", icon: "mdi-silo", route: "/dashboard/farms" },
+      {
+        title: "Dedicated Nodes",
+        icon: "mdi-resistor-nodes",
+        route: "/dashboard/dedicated-nodes",
+      },
+      { title: "DAO", icon: "mdi-note-check-outline", route: "/dashboard/dao" },
+      {
+        title: "Contracts",
+        icon: "mdi-file-document-edit",
+        route: "/dashboard/contracts-list",
+      },
     ],
   },
   {
-    title: "My Account",
-    items: [{ title: "Contracts", route: "/contractslist" }],
+    title: "Calculators",
+    icon: "mdi-calculator",
+    items: [
+      {
+        title: "Pricing Calculator",
+        icon: "mdi-currency-usd",
+        route: "/calculator/pricing",
+      },
+      {
+        title: "Simulator",
+        icon: "mdi-chart-line",
+        route: "/calculator/simulator",
+      },
+    ],
   },
   {
-    title: "Help",
-    items: [{ title: "Manual", icon: "mdi-open-in-new", url: "https://manual.grid.tf/" }],
+    title: "Playground",
+    items: [{ title: "Solutions", icon: "mdi-lightbulb-on-outline", route: "/solutions" }],
   },
-];
-
-const navbarLinks: NavbarLink[] = [
   {
-    label: "Help",
-    url: "https://manual.grid.tf/",
+    icon: "mdi-database-search-outline",
+    title: "Statistics",
+    items: [
+      {
+        title: "Statistics",
+        icon: "mdi-chart-scatter-plot",
+        route: "/stats",
+      },
+    ],
+  },
+  {
+    icon: "mdi-access-point",
+    title: "Nodes",
+    items: [{ title: "Nodes", icon: "mdi-access-point", route: "/nodes" }],
+  },
+  {
+    icon: "mdi-access-point",
+    title: "Farms",
+    items: [{ title: "Farms", icon: "mdi-lan-connect", route: "/farms" }],
+  },
+  {
+    icon: "mdi-toolbox-outline",
+    title: "Services",
+    items: [
+      {
+        title: "0-Bootstrap",
+        icon: "mdi-earth",
+        url: "https://bootstrap.grid.tf/",
+        tooltip: "Download Zero-OS Images",
+      },
+      {
+        title: "0-Hub",
+        icon: "mdi-open-in-new",
+        url: "https://hub.grid.tf/",
+        tooltip: "Find or Publish your Flist",
+      },
+      {
+        title: "Minting",
+        icon: "mdi-file-document-edit",
+        route: "/minting",
+        tooltip: "TFGrid Minting Explorer",
+      },
+      {
+        title: "Monitoring",
+        icon: "mdi-equalizer",
+        url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
+        tooltip: "Monitor Zero-OS nodes",
+      },
+      {
+        title: "Grid Health",
+        icon: "mdi-grid-large",
+        url: "https://status.grid.tf/status/threefold",
+        tooltip: "Status of Threefold Services",
+      },
+    ],
+  },
+  {
+    title: "Manual",
+    items: [
+      {
+        title: "Manual",
+        icon: "mdi-book-open-page-variant-outline",
+        url: "https://manual.grid.tf/",
+      },
+    ],
   },
 ];
 
 // eslint-disable-next-line no-undef
-const network = process.env.NETWORK || (window as any).env.NETWORK;
-
 const permanent = window.innerWidth > 980;
 const openSidebar = ref(permanent);
 
@@ -196,20 +359,37 @@ function clickHandler({ route, url }: AppRouteItem): void {
     window.open(url, "_blank");
   }
 }
+
+$router.beforeEach((to, from, next) => {
+  if (to.path === "/" && hasActiveProfile) {
+    next({ path: "dashboard/twin" });
+  } else {
+    next();
+  }
+  window.scrollTo(0, 0);
+});
 </script>
 
 <script lang="ts">
+import { AppThemeSelection } from "@/utils/app_theme";
+
 import AppInfo from "./components/app_info.vue";
 import AppTheme from "./components/app_theme.vue";
 import ConnectWalletLanding from "./components/connect_wallet_landing.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
 import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
+import FundsCard from "./components/funds_card.vue";
+import ProfileManagerController from "./components/profile_manager_controller.vue";
+import TftSwapPrice from "./components/swap_price.vue";
 import TFNotification from "./components/tf_notification.vue";
+import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
 
 interface AppRoute {
   title: string;
   items: AppRouteItem[];
+  icon?: string;
+  tooltip?: string;
 }
 
 interface AppRouteItem {
@@ -217,12 +397,7 @@ interface AppRouteItem {
   route?: string;
   url?: string;
   icon?: string;
-}
-
-interface NavbarLink {
-  label?: string;
-  url: string;
-  icon?: string;
+  tooltip?: string;
 }
 
 export default {
@@ -235,102 +410,9 @@ export default {
     AppTheme,
     ConnectWalletLanding,
     AppInfo,
+    TftSwapPrice,
+    FundsCard,
+    ProfileManagerController,
   },
 };
 </script>
-
-<style lang="scss" global>
-:root {
-  --link-color: #3d7ad4;
-}
-
-.app-link {
-  text-decoration: none;
-  font-weight: bold;
-  color: var(--link-color);
-  cursor: pointer;
-}
-
-.fade-leave-active,
-.fade-enter-active {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  pointer-events: none;
-
-  transition: opacity 1s;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.capitalize {
-  text-transform: capitalize !important;
-}
-
-.v-btn {
-  text-transform: capitalize !important;
-  font-size: 1rem !important;
-}
-
-.version {
-  position: absolute;
-  bottom: 15px;
-  right: 25px;
-}
-.v-tooltip > .v-overlay__content {
-  opacity: 10;
-  color: white;
-  font-weight: 900;
-  background-color: rgb(71, 70, 70);
-}
-
-a {
-  color: #5695ff !important;
-}
-
-.custom-toolbar-title {
-  max-width: 17rem !important;
-}
-.mosha__toast__content-wrapper {
-  margin-bottom: -2px;
-}
-.mosha__toast__slot-wrapper {
-  margin-bottom: -2px;
-}
-.mosha__icon {
-  margin-right: 6px !important;
-  margin-top: 2px;
-}
-
-.mosha__icon__dark__warning {
-  fill: #ffcc00 !important;
-}
-
-.mosha__icon__light__warning {
-  fill: #fb8c00 !important;
-}
-
-.mosha__toast__content.dark__warning {
-  color: #ffcc00;
-}
-
-.mosha__toast__content.light__warning {
-  color: #fb8c00;
-}
-
-.mosha__toast__close-icon.dark__warning::before {
-  color: #ffcc00 !important;
-}
-
-.mosha__toast__close-icon.light__warning::before {
-  color: #fb8c00 !important;
-}
-
-.mosha__toast__content__text {
-  font-size: 14px !important;
-}
-</style>

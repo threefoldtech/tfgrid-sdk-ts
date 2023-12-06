@@ -46,6 +46,7 @@ export default {
   emits: {
     "update:modelValue": (valid: boolean) => valid,
     "update:status": (status: ValidatorStatus) => status,
+    "update:error": (error: string | null) => true || error,
   },
   setup(props, { emit, expose }) {
     const { uid } = getCurrentInstance() as { uid: number };
@@ -64,6 +65,7 @@ export default {
     }
 
     const error = ref<string | null>(null);
+    watch(error, error => emit("update:error", error), { immediate: true });
     async function validate(value = props.value): Promise<boolean> {
       setStatus(ValidatorStatus.Pending);
 

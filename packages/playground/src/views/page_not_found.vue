@@ -1,9 +1,11 @@
 <template>
   <img class="centered-img" :src="baseUrl + 'images/404.png'" />
-  <p class="text1">Oops. The page you were looking for doesn't exist.</p>
-  <p class="text2">You may have mistyped address or the page may have been moved</p>
+  <p class="text1">Oops! The page you were looking for doesn't exist.</p>
+  <p class="text2">You may have mistyped address or the page may have been moved.</p>
   <div style="text-align: center">
-    <v-btn color="primary" variant="text" @click="$router.push('/')"> Take me back to the home page</v-btn>
+    <v-btn color="primary" variant="text" @click="$router.push({ name: 'Twin' })">
+      Take me back to the Home page.</v-btn
+    >
   </div>
 </template>
 
@@ -30,14 +32,14 @@ export default {
 }
 
 .text1 {
-  font-size: 30px;
+  font-size: 20px;
   text-align: center;
-  font-weight: 500;
-  margin-top: 50px;
+  font-weight: 400;
+  margin-top: 10px;
 }
 
 .text2 {
-  font-size: 20px;
+  font-size: 16px;
   text-align: center;
   font-weight: 400;
 }

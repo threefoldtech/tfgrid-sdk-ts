@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/vm.png"
   >
     <template #title> Deploy a Full Virtual Machine </template>
@@ -38,9 +39,9 @@
 
         <SelectVmImage :images="images" v-model="flist" />
         <SelectSolutionFlavor
-          :minimum="{ cpu: 1, memory: 1024 * 1, disk: 25 }"
-          :standard="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
-          :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+          :small="{ cpu: 1, memory: 2, disk: 25 }"
+          :medium="{ cpu: 2, memory: 4, disk: 50 }"
+          :large="{ cpu: 4, memory: 16, disk: 100 }"
           :disabled="loadingFarm"
           v-model="solution"
         />
@@ -88,6 +89,7 @@
             }"
             v-model="farm"
             v-model:loading="loadingFarm"
+            v-model:search="farmName"
           />
           <SelectNode
             v-model="selectedNode"
@@ -163,7 +165,7 @@ import SelectFarmManager from "../components/select_farm_manager.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import type { solutionFlavor as SolutionFlavor } from "../types";
-import { type Farm, type Flist, ProjectName } from "../types";
+import { type FarmInterface, type Flist, ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
@@ -173,7 +175,7 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 const solution = ref() as Ref<SolutionFlavor>;
-
+const farmName = ref();
 const images: VmImage[] = [
   {
     name: "Ubuntu-22.04",
@@ -205,7 +207,7 @@ const planetary = ref(true);
 const wireguard = ref(false);
 const dedicated = ref(false);
 const certified = ref(false);
-const farm = ref() as Ref<Farm>;
+const farm = ref() as Ref<FarmInterface>;
 const loadingFarm = ref(false);
 const disks = ref<Disk[]>([]);
 const network = ref();

@@ -42,9 +42,19 @@
                 <v-list-item-title>
                   {{ item.raw.nodeId }}
                 </v-list-item-title>
-                <v-chip v-bind="props" :color="getChipColor(item.raw.state)" class="ml-3">
-                  {{ item.raw.state }}
-                </v-chip>
+                <div>
+                  <v-chip
+                    v-if="item.raw.certified === 'Certified'"
+                    v-bind="props"
+                    :color="getChipColor(item.raw.certified)"
+                    class="ml-3"
+                  >
+                    {{ item.raw.certified }}
+                  </v-chip>
+                  <v-chip v-bind="props" :color="getChipColor(item.raw.state)" class="ml-3">
+                    {{ item.raw.state }}
+                  </v-chip>
+                </div>
               </v-list-item-content>
             </v-list-item>
           </template>
@@ -150,7 +160,11 @@ watch(selectedCards, async () => {
     }
   }
   if (selectedNode.value && selectedCards.value) {
-    emits("update:modelValue", { nodeId: selectedNode.value.nodeId, cards: cards });
+    emits("update:modelValue", {
+      nodeId: selectedNode.value.nodeId,
+      cards: cards,
+      certified: selectedNode.value.certified,
+    });
   }
 });
 
@@ -208,9 +222,8 @@ watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
 });
 
 function getChipColor(item: any) {
-  return item === "Dedicated" ? "success" : "secondary";
+  return item === "Dedicated" ? "success" : item === "Certified" ? "primary" : "secondary";
 }
-
 async function loadNodes(farmId: number) {
   availableNodes.value = [];
   selectedNode.value = undefined;
@@ -218,9 +231,9 @@ async function loadNodes(farmId: number) {
   errorMessage.value = "";
   const filters = props.filters;
   farmManager?.setLoading(true);
-  const grid = await getGrid(profileManager.profile!);
-  if (grid) {
-    try {
+  try {
+    const grid = await getGrid(profileManager.profile!);
+    if (grid) {
       const res = await getFilteredNodes(grid, {
         farmId: farmId,
         cpu: filters.cpu,
@@ -247,6 +260,7 @@ async function loadNodes(farmId: number) {
             nodesArr.value.push({
               nodeId: node.nodeId,
               state: node.rentedByTwinId ? "Dedicated" : "Shared",
+              certified: node.certificationType,
             });
           }
         }
@@ -254,15 +268,16 @@ async function loadNodes(farmId: number) {
       } else {
         availableNodes.value = [];
       }
-    } catch (e) {
-      errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
-    } finally {
-      validator.value?.setStatus(ValidatorStatus.Init);
-      loadingNodes.value = false;
-      farmManager?.setLoading(false);
     }
+  } catch (e) {
+    errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
+  } finally {
+    validator.value?.setStatus(ValidatorStatus.Init);
+    loadingNodes.value = false;
+    farmManager?.setLoading(false);
   }
 }
+
 async function validateNodeStoragePool(validatingNode: INode | undefined) {
   if (!validatingNode) return { message: "Node id is required." };
   farmManager?.setLoading(true);
@@ -281,14 +296,22 @@ async function validateNodeStoragePool(validatingNode: INode | undefined) {
     emits("update:modelValue", {
       nodeId: validatingNode.nodeId,
       cards: cards,
+      certified: validatingNode.certified,
     });
   } catch (e) {
     availableNodes.value = availableNodes.value.filter(node => node.nodeId !== validatingNode.nodeId);
     validator.value?.setStatus(ValidatorStatus.Invalid);
     emptyResult.value = true;
-    return {
-      message: `Couldn't fit the required disks in Node ${validatingNode.nodeId} storage pools, please select another node`,
-    };
+
+    if (e?.toString().includes("Cannot fit the required SSD disk with size")) {
+      return {
+        message: `Although node ${validatingNode.nodeId} appears to have sufficient storage capacity for your workload, it lacks a single internal partition capable of accommodating it. Please select a different node.`,
+      };
+    } else {
+      return {
+        message: "Something went wrong while checking status of the node. Please check your connection and try again.",
+      };
+    }
   } finally {
     pingingNode.value = false;
     farmManager?.setLoading(false);

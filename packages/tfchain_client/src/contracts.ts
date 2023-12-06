@@ -1,3 +1,5 @@
+import { TFChainError } from "@threefold/types";
+
 import { Client, QueryClient } from "./client";
 import { PublicIp } from "./types";
 import { checkConnection } from "./utils";
@@ -70,6 +72,10 @@ interface QueryContractsGetOptions {
   id: number;
 }
 
+interface ActiveContractsOptions {
+  nodeId: number;
+}
+
 interface QueryContractsGetContractByActiveRentOptions {
   nodeId: number;
 }
@@ -105,6 +111,12 @@ class QueryContracts {
   }
 
   @checkConnection
+  async getActiveContracts(options: ActiveContractsOptions): Promise<number[]> {
+    const res = await this.client.api.query.smartContractModule.activeNodeContracts(options.nodeId);
+    return res.toPrimitive() as number[];
+  }
+
+  @checkConnection
   async getContractIdByName(options: QueryContractGetContractByNameOptions): Promise<number> {
     const res = await this.client.api.query.smartContractModule.contractIDByNameRegistration(options.name);
     return res.toPrimitive() as number;
@@ -137,7 +149,7 @@ class QueryContracts {
 
       return gracePeriodStartTime + TWO_WEEKS;
     } catch (err) {
-      throw Error(`Error getting current block number for contract ${options.id} deletion: ${err}`);
+      throw new TFChainError(`Error getting current block number for contract ${options.id} deletion: ${err}`);
     }
   }
 

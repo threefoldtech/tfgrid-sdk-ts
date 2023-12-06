@@ -1,4 +1,5 @@
 export * from "./k8s";
+export * from "./dao";
 export * from "./machines";
 export * from "./models";
 export * from "./zdb";
@@ -20,3 +21,4 @@ export * from "./utility";
 export * from "./farmerbot";
 export * from "./farms";
 export * from "./networks";
+export * from "./bridge";

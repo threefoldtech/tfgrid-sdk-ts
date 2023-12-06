@@ -284,7 +284,6 @@ class RentContractDeleteModel {
 class ContractGetModel {
   @Expose() @IsInt() @Min(1) id: number;
 }
-
 class ContractGetByNodeIdAndHashModel {
   @Expose() @IsInt() @Min(1) node_id: number;
   @Expose() @IsString() @IsNotEmpty() hash: string;
@@ -386,7 +385,12 @@ class KVStoreRemoveModel {
 class KVStoreBatchRemoveModel {
   @Expose() @ArrayNotEmpty() @IsString({ each: true }) keys: string[];
 }
-
+class DaoVoteModel {
+  @Expose() @IsString() @IsNotEmpty() address: string;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsBoolean() approve: boolean;
+  @Expose() @IsString() @IsNotEmpty() hash: string;
+}
 class BalanceGetModel {
   @Expose() @IsString() @IsNotEmpty() address: string;
 }
@@ -431,7 +435,13 @@ class TfchainWalletInitModel {
 class TfchainWalletBalanceByAddressModel {
   @Expose() @IsString() @IsNotEmpty() address: string;
 }
-
+class TfchainDaoVoteModel {
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() address: string;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsBoolean() approve: boolean;
+  @Expose() @IsString() @IsNotEmpty() hash: string;
+}
 class TfchainWalletTransferModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() address_dest: string;
@@ -582,6 +592,7 @@ class FilterOptions {
   @Expose() @IsOptional() @IsBoolean() rentable?: boolean;
   @Expose() @IsOptional() @IsInt() @Min(1) rentedBy?: number;
   @Expose() @IsOptional() @IsBoolean() randomize?: boolean;
+  @Expose() @IsOptional() @IsBoolean() ret_count?: boolean;
   @Expose() @IsOptional() @Transform(({ value }) => NodeStatus[value]) @IsEnum(NodeStatus) status?: NodeStatus;
 }
 
@@ -606,8 +617,10 @@ class FarmFilterOptions {
   @Expose() @IsOptional() @IsInt() @Min(1) nodeRentedBy?: number;
   @Expose() @IsOptional() @IsInt() page?: number;
   @Expose() @IsOptional() @IsInt() size?: number;
+  @Expose() @IsOptional() @IsInt() ownedBy?: number;
   @Expose() @IsOptional() @IsInt() farmId?: number;
   @Expose() @IsOptional() @IsBoolean() randomize?: boolean;
+  @Expose() @IsOptional() @IsBoolean() ret_count?: boolean;
 }
 
 class CalculatorModel {
@@ -647,6 +660,51 @@ class FarmIdModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) id: number;
 }
 
+class FarmPublicIPsModel {
+  @Expose() @IsNotEmpty() @IsIP() ip: string;
+  @Expose() @IsNotEmpty() @IsString() gw: string;
+}
+
+class AddFarmIPModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsNotEmpty() @IsString() ip: string;
+  @Expose() @IsNotEmpty() @IsIP() gw: string;
+}
+
+class IPConfig {
+  @Expose() @IsNotEmpty() @IsString() ip: string;
+  @Expose() @IsNotEmpty() @IsIP() gw: string;
+}
+class PublicConfigModel {
+  @Expose() @IsNotEmpty() @Type(() => IPConfig) @ValidateNested() ip4: IPConfig;
+  @Expose() @IsOptional() ip6: IPConfig | null;
+  @Expose() @IsOptional() @IsString() domain: string | null;
+}
+class AddPublicConfig {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+  @Expose() @IsOptional() @Type(() => PublicConfigModel) @ValidateNested() publicConfig?: PublicConfigModel | null;
+}
+
+class RemoveFarmIPModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsNotEmpty() @IsString() ip: string;
+}
+
+class AddStellarAddressToFarmModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsString() @IsNotEmpty() stellarAddress: string;
+}
+
+class CreateFarmModel {
+  @Expose() @IsString() @IsNotEmpty() @MaxLength(NameLength) name: string;
+  @Expose()
+  @IsOptional()
+  @Type(() => FarmPublicIPsModel)
+  @ValidateNested({ each: true })
+  publicIps?: FarmPublicIPsModel[];
+}
+
 class pingFarmModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
 }
@@ -671,10 +729,23 @@ class NetworkGetModel {
 
 class SetDedicatedNodeExtraFeesModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
-  @Expose() @IsInt() @IsNotEmpty() @Min(1) extraFee: number;
+  @Expose() @IsNumber() @IsNotEmpty() @Min(0) extraFee: number;
 }
 
 class GetDedicatedNodePriceModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+}
+
+class SwapToStellarModel {
+  @Expose() @IsNotEmpty() @IsString() target: string;
+  @Expose() @IsNotEmpty() @Min(1) amount: number;
+}
+
+class ListenToMintCompletedModel {
+  @Expose() @IsNotEmpty() @IsString() address: string;
+}
+
+class GetActiveContractsModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
 }
 
@@ -686,6 +757,7 @@ export {
   AlgorandCreateTransactionModel,
   AlgorandTransferModel,
   DiskModel,
+  DaoVoteModel,
   NetworkModel,
   MachineModel,
   MachinesModel,
@@ -762,6 +834,7 @@ export {
   TfchainWalletBalanceByAddressModel,
   TfchainWalletTransferModel,
   TfchainCreateModel,
+  TfchainDaoVoteModel,
   WalletMessageSignModel,
   BlockchainCreateModel,
   BlockchainCreateResultModel,
@@ -786,6 +859,7 @@ export {
   ZOSNodeModel,
   NodePowerModel,
   FarmIdModel,
+  CreateFarmModel,
   pingFarmModel,
   CreateServiceContractModel,
   ServiceContractApproveModel,
@@ -800,4 +874,11 @@ export {
   NodeGetModel,
   SetDedicatedNodeExtraFeesModel,
   GetDedicatedNodePriceModel,
+  SwapToStellarModel,
+  ListenToMintCompletedModel,
+  AddFarmIPModel,
+  RemoveFarmIPModel,
+  AddStellarAddressToFarmModel,
+  AddPublicConfig,
+  GetActiveContractsModel,
 };

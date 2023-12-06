@@ -45,8 +45,16 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
   )) as GridClient[];
 
   const promises = machines.map(async (name, index) => {
-    const contracts = await getDeploymentContracts(grids[index], name, projectName).catch(() => []);
-    const nodeIds = await grids[index].machines._getDeploymentNodeIds(name).catch(() => []);
+    let contracts: any[] = [];
+    let nodeIds: number[] = [];
+
+    try {
+      contracts = await getDeploymentContracts(grids[index], name, projectName);
+      nodeIds = await grids[index].machines._getDeploymentNodeIds(name);
+    } catch {
+      failedDeployments.push({ name, contracts: [], nodes: [] });
+      return;
+    }
 
     if (contracts.length === 0) {
       count--;
@@ -139,6 +147,7 @@ export async function loadK8s(grid: GridClient) {
   await migrateModule(grid.k8s);
 
   const clusters = await grid.k8s.list();
+  const failedK8s: string[] = [];
 
   const projectName = grid.clientOptions.projectName;
   const grids = (await Promise.all(
@@ -147,8 +156,16 @@ export async function loadK8s(grid: GridClient) {
   const failedDeployments: FailedDeployment[] = [];
 
   const promises = clusters.map(async (name, index) => {
-    const contracts = await grids[index].k8s.getDeploymentContracts(name).catch(() => []);
-    const nodeIds = await grids[index].k8s._getDeploymentNodeIds(name).catch(() => []);
+    let contracts: any[] = [];
+    let nodeIds: number[] = [];
+
+    try {
+      contracts = await grids[index].k8s.getDeploymentContracts(name);
+      nodeIds = await grids[index].k8s._getDeploymentNodeIds(name);
+    } catch {
+      failedDeployments.push({ name, contracts: [], nodes: [] });
+      return;
+    }
 
     try {
       const clusterPromise = grids[index].k8s.getObj(name);

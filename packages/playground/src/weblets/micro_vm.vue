@@ -8,6 +8,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/vm.png"
   >
     <template #title>Deploy a Micro Virtual Machine </template>
@@ -40,9 +41,9 @@
 
         <SelectVmImage :images="images" v-model="flist" />
         <SelectSolutionFlavor
-          :minimum="{ cpu: 1, memory: 1024 * 1, disk: 25 }"
-          :standard="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
-          :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+          :small="{ cpu: 1, memory: 2, disk: 25 }"
+          :medium="{ cpu: 2, memory: 4, disk: 50 }"
+          :large="{ cpu: 4, memory: 16, disk: 100 }"
           v-model="solution"
           :disabled="loadingFarm"
         />
@@ -80,6 +81,7 @@
             }"
             v-model="farm"
             v-model:loading="loadingFarm"
+            v-model:search="farmName"
           />
           <SelectNode
             v-model="selectedNode"
@@ -189,7 +191,7 @@ import Network from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import { type Farm, type Flist, ProjectName } from "../types";
+import { type FarmInterface, type Flist, ProjectName } from "../types";
 import { deployVM, type Disk, type Env } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
@@ -232,7 +234,8 @@ const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
 const wireguard = ref(false);
-const farm = ref() as Ref<Farm>;
+const farm = ref() as Ref<FarmInterface>;
+const farmName = ref();
 const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
 const network = ref();

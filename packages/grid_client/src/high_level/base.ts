@@ -1,3 +1,4 @@
+import { GridClientErrors } from "@threefold/types";
 import { Addr } from "netaddr";
 
 import { RMB } from "../clients/rmb/client";
@@ -179,7 +180,7 @@ class HighLevelBase {
     ],
   ): Promise<TwinDeployment[]> {
     if (types.includes(WorkloadTypes.network)) {
-      throw Error("Network workload can't be deleted");
+      throw new GridClientErrors.Workloads.WorkloadDeleteError("Network workload can't be deleted.");
     }
     let twinDeployments: TwinDeployment[] = [];
     const node_id = await this.nodes.getNodeIdFromContractId(deployment.contract_id, this.config.substrateURL);

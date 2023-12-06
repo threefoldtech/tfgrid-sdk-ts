@@ -16,7 +16,7 @@
           }
         "
       >
-        <template #title>Manage Domains ({{ $props.vm?.[0]?.name }})</template>
+        <template #title>Manage Domains ({{ $props.vm.name }})</template>
 
         <v-tabs align-tabs="center" color="primary" class="mb-6" v-model="gatewayTab" :disabled="deleting">
           <v-tab>Domains List</v-tab>
@@ -253,15 +253,15 @@ export default {
     const passThrough = ref(false);
     const valid = ref(false);
 
-    const ip = props.vm[0].interfaces[0].ip as string;
-    const networkName = props.vm[0].interfaces[0].network as string;
+    const ip = props.vm.interfaces[0].ip as string;
+    const networkName = props.vm.interfaces[0].network as string;
 
     onMounted(async () => {
       const grid = await getGrid(profileManager.profile!);
       oldPrefix.value =
         (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
         grid!.config.twinId;
-      prefix.value = oldPrefix.value + props.vm?.[0]?.name;
+      prefix.value = oldPrefix.value + props.vm.name;
       subdomain.value = generateName({}, 35 - prefix.value.length > 7 ? 7 : 35 - prefix.value.length);
       await loadGateways();
     });

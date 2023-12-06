@@ -16,36 +16,6 @@ import { GridClient } from "../src/client";
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
-// Main function
-async function main() {
-  try {
-    // Initialize the client
-    const client = await getClient();
-
-    // Get a list of rentable nodes
-    const rentableNodes = await getRentableNodes(client);
-
-    // If there are rentable nodes available
-    if (rentableNodes.length) {
-      const reservedNodeId = rentableNodes[0].nodeId;
-
-      // Reserve the first available node
-      await reserveNode(client, reservedNodeId);
-
-      // Get the rent contract for the reserved node
-      await getRentContract(client, reservedNodeId);
-
-      // Uncomment the line below if you intend to perform unreserve.
-      // await unreserve(client, reservedNodeId);
-    }
-
-    // Disconnect the client
-    await client.disconnect();
-  } catch (error) {
-    console.error("An error occurred:", error);
-  }
-}
-
 // Get rent contract ID for a node
 async function getRentContract(client: GridClient, nodeId: number) {
   try {
@@ -100,6 +70,36 @@ async function unreserve(client: GridClient, nodeId: number) {
     log("================= Unreserved Node =================");
   } catch (error) {
     console.error("Error unreserving node:", error);
+  }
+}
+
+// Main function
+async function main() {
+  try {
+    // Initialize the client
+    const client = await getClient();
+
+    // Get a list of rentable nodes
+    const rentableNodes = await getRentableNodes(client);
+
+    // If there are rentable nodes available
+    if (rentableNodes.length) {
+      const reservedNodeId = rentableNodes[0].nodeId;
+
+      // Reserve the first available node
+      await reserveNode(client, reservedNodeId);
+
+      // Get the rent contract for the reserved node
+      await getRentContract(client, reservedNodeId);
+
+      // Uncomment the line below if you intend to perform unreserve.
+      // await unreserve(client, reservedNodeId);
+    }
+
+    // Disconnect the client
+    await client.disconnect();
+  } catch (error) {
+    console.error("An error occurred:", error);
   }
 }
 

@@ -52,13 +52,13 @@ import { ValidatorStatus } from "@/hooks/form_validator";
 
 import { useProfileManager } from "../stores";
 import type { GatewayNode } from "../types";
-import type { Farm } from "../types";
+import type { FarmInterface } from "../types";
 import { loadGatewayNodes } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 
 const props = defineProps<{
   modelValue?: GatewayNode;
-  farmData?: Farm;
+  farmData?: FarmInterface;
   customDomain?: boolean;
   availableFor?: number;
 }>();

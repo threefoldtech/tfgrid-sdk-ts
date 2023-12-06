@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/casperlabs.png"
   >
     <template #title>Deploy a Casperlabs Instance </template>
@@ -31,9 +32,9 @@
 
       <SelectSolutionFlavor
         v-model="solution"
-        :minimum="{ cpu: 1, memory: 1024 * 4, disk: 100 }"
-        :standard="{ cpu: 2, memory: 1024 * 16, disk: 500 }"
-        :recommended="{ cpu: 4, memory: 1024 * 32, disk: 1000 }"
+        :small="{ cpu: 2, memory: 4, disk: 100 }"
+        :medium="{ cpu: 4, memory: 16, disk: 500 }"
+        :large="{ cpu: 8, memory: 32, disk: 1000 }"
         :disabled="loadingFarm"
       />
       <Networks v-model:ipv4="ipv4" :disabled="loadingFarm" />
@@ -63,6 +64,7 @@
             }"
             v-model="farm"
             v-model:loading="loadingFarm"
+            v-model:search="farmName"
           />
           <SelectNode
             v-model="selectedNode"
@@ -100,7 +102,7 @@ import { computed, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
+import type { FarmInterface, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
@@ -114,7 +116,8 @@ const profileManager = useProfileManager();
 
 const name = ref(generateName({ prefix: "cl" }));
 const solution = ref() as Ref<SolutionFlavor>;
-const farm = ref() as Ref<Farm>;
+const farm = ref() as Ref<FarmInterface>;
+const farmName = ref();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/casperlabs-latest.flist",
   entryPoint: "/sbin/zinit init",

@@ -19,6 +19,8 @@ This repo contains the typescript clients and projects for Threefold grid.
 - [rmb peer client](./packages/rmb_peer_client/README.md)
 - [rmb peer server](./packages/rmb_peer_server/README.md)
 - [Playground](./packages/playground/README.md)
+- [graphql_client](./packages/graphql_client/README.md)
+- [gridproxy_client](./packages/gridproxy_client/README.md)
 - [UI](./packages/UI/README.md)
 
 ## Requirements
