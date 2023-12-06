@@ -204,17 +204,12 @@ export default {
       try {
         loading.value = true;
         const twinId = profileManager.profile!.twinId;
-        const farms = await gridProxyClient.farms.list({ twinId });
-        if (!farms.data.length) {
-          nodesCount.value = 0;
-          return [];
-        }
-        const farmIds = farms.data.map(farm => farm.farmId).join(",");
+
         const { data, count } = await gridProxyClient.nodes.list({
-          farmIds,
           retCount: true,
           page: page.value,
           size: pageSize.value,
+          ownedBy: twinId,
         });
 
         const _nodes = data as unknown as NodeInterface[];
