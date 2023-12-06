@@ -4,6 +4,8 @@
 MODE="${MODE:=dev}"
 STELLAR_NETWORK="${STELLAR_NETWORK:=test}"
 TIMEOUT="${TIMEOUT:=10000}"
+MINTING_URL="https://alpha.minting.tfchain.grid.tf"
+
 
 # Env vars must provide in `custom` mode
 REQUIRED_ENV_VARS=(
@@ -30,7 +32,6 @@ case $MODE in
     RELAY_DOMAIN='wss://relay.dev.grid.tf'
     BRIDGE_TFT_ADDRESS=GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG
     STELLAR_NETWORK=test
-    MINTING_URL="https://alpha.minting.tfchain.grid.tf"
   ;;
 
   "qa")
@@ -41,7 +42,6 @@ case $MODE in
     RELAY_DOMAIN='wss://relay.qa.grid.tf'
     BRIDGE_TFT_ADDRESS=GAQH7XXFBRWXT2SBK6AHPOLXDCLXVFAKFSOJIRMRNCDINWKHGI6UYVKM
     STELLAR_NETWORK=test
-    MINTING_URL="https://alpha.minting.tfchain.grid.tf"
   ;;
 
   "test")
@@ -52,7 +52,6 @@ case $MODE in
     RELAY_DOMAIN='wss://relay.test.grid.tf'
     BRIDGE_TFT_ADDRESS=GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4
     STELLAR_NETWORK=main
-    MINTING_URL="https://alpha.minting.tfchain.grid.tf"
   ;;
 
   "main")
@@ -63,7 +62,6 @@ case $MODE in
     RELAY_DOMAIN='wss://relay.grid.tf'
     BRIDGE_TFT_ADDRESS=GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC
     STELLAR_NETWORK=main
-    MINTING_URL="https://alpha.minting.tfchain.grid.tf"
   ;;
 
   "custom")
