@@ -228,9 +228,9 @@ const filtersUpdated = ref(false);
 watch(
   () => props.filters,
   value => {
-    if (!value || !baseFilters.value) {
-      return;
-    }
+    // if (!value || !baseFilters.value) {
+    //   return;
+    // }
 
     filtersUpdated.value = !equals(value, baseFilters.value);
     validator.value?.setStatus(filtersUpdated.value ? ValidatorStatus.Init : ValidatorStatus.Valid);
