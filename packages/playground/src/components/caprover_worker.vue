@@ -63,6 +63,7 @@
           region: $props.modelValue.farm?.region,
         }"
         :root-file-system-size="rootFilesystemSize"
+        :loading-farm="loadingFarm"
       />
     </SelectFarmManager>
   </div>

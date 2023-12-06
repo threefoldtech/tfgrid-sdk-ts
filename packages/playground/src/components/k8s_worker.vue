@@ -132,6 +132,7 @@
           country: $props.modelValue.farm?.country,
           region: $props.modelValue.farm?.region,
         }"
+        :loading-farm="loadingFarm"
         :root-file-system-size="$props.modelValue.rootFsSize"
       />
     </SelectFarmManager>

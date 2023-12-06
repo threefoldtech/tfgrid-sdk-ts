@@ -133,6 +133,7 @@
                 country: farm?.country,
                 region: farm?.region,
               }"
+              :loading-farm="loadingFarm"
               :root-file-system-size="rootFilesystemSize"
             />
           </SelectFarmManager>

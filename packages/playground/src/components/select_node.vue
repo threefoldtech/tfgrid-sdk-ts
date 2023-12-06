@@ -33,7 +33,7 @@
             item-title="nodeId"
             return-object
             v-model="selectedNode"
-            :disabled="loadingNodes || pingingNode"
+            :disabled="loadingNodes || pingingNode || filtersUpdated || $props.loadingFarm"
             v-bind="{
               ...props,
               loading: props.loading || loadingNodes || pingingNode,
@@ -65,13 +65,12 @@
               </v-list-item>
             </template>
           </v-autocomplete>
-
           <v-btn
             class="ml-2 mt-2"
             variant="tonal"
             color="info"
-            :loading="loadingNodes"
-            :disabled="pingingNode"
+            :loading="loadingNodes || pingingNode"
+            :disabled="$props.loadingFarm || loadingNodes || pingingNode"
             @click="loadNodes"
           >
             {{ capitalize("Load nodes") }}
@@ -143,6 +142,7 @@ const emits = defineEmits<{
 
 const props = defineProps({
   modelValue: { type: Object as PropType<INode> },
+  loadingFarm: { type: Boolean, required: true },
   filters: { default: () => ({} as NodeFilters), type: Object as PropType<NodeFilters> },
   rootFileSystemSize: { type: Number, required: true },
 });

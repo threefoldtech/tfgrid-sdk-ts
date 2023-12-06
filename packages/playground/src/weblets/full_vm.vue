@@ -107,6 +107,7 @@
               region: farm?.region,
             }"
             :root-file-system-size="rootFilesystemSize"
+            :loading-farm="loadingFarm"
           />
         </SelectFarmManager>
       </template>

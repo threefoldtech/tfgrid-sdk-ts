@@ -87,6 +87,7 @@
               region: farm?.region,
             }"
             :root-file-system-size="rootFileSystemSize"
+            :loading-farm="loadingFarm"
           />
         </SelectFarmManager>
         <DomainName :hasIPv4="ipv4" ref="domainNameCmp"></DomainName>
