@@ -6,7 +6,6 @@ STELLAR_NETWORK="${STELLAR_NETWORK:=test}"
 TIMEOUT="${TIMEOUT:=10000}"
 MINTING_URL="https://alpha.minting.tfchain.grid.tf"
 
-
 # Env vars must provide in `custom` mode
 REQUIRED_ENV_VARS=(
     GRAPHQL_URL
