@@ -39,7 +39,7 @@ async function main() {
   let failedCount = 0;
   let successCount = 0;
   const batchSize = 50;
-  const totalVMs = 200;
+  const totalVMs = 50;
   const batches = totalVMs / batchSize;
 
   // resources
@@ -66,8 +66,6 @@ async function main() {
   console.time("Total Deployment Time");
 
   for (let i = 0; i < batches; i++) {
-    console.time("Batch " + (i + 1));
-
     const nodesPromises = Array.from({ length: batchSize }, async () => {
       const farmId = +randomChoice(farms).farmId;
       return grid3.capacity.filterNodes({
@@ -103,7 +101,7 @@ async function main() {
     }
 
     // Batch Deployment
-    const batchVMs: MachineModel[] = [];
+    const batchVMs: MachinesModel[] = [];
 
     for (let i = 0; i < batchSize; i++) {
       const vmName = "vm" + generateString(8);
@@ -141,34 +139,55 @@ async function main() {
       vm.env = {
         SSH_KEY: config.ssh_key,
       };
+      // create network model for whole batch
+      const n = new NetworkModel();
+      n.name = "nw" + generateString(5);
+      n.ip_range = "10.238.0.0/16";
+      n.addAccess = true;
 
-      batchVMs.push(vm);
+      // create VMs Object
+      const vms = new MachinesModel();
+      vms.name = "vm " + vmName + " in batch" + (i + 1);
+      vms.network = n;
+      vms.machines = [vm];
+      vms.metadata = "";
+      vms.description = "Test deploying VM with name " + vmName + "via ts grid3 client - Batch " + (i + 1);
+
+      batchVMs.push(vms);
     }
-    // create network model for whole batch
-    const n = new NetworkModel();
-    n.name = "nw" + generateString(5);
-    n.ip_range = "10.238.0.0/16";
-    n.addAccess = true;
 
-    // create VMs Object
-    const vms = new MachinesModel();
-    vms.name = "batch" + (i + 1);
-    vms.network = n;
-    vms.machines = batchVMs;
-    vms.metadata = "";
-    vms.description = "Test deploying VMs via ts grid3 client - Batch " + (i + 1);
+    const deploymentPromises = batchVMs.map(async (vms, index) => {
+      try {
+        const [twinDeployments, _, __] = await grid3.machines._createDeployment(vms);
+        return { twinDeployments, batchIndex: index };
+      } catch (error) {
+        log(`Error creating deployment for batch ${index + 1}: ${error}`);
+        return { twinDeployments: null, batchIndex: index };
+      }
+    });
 
-    // deploy vm
-    try {
-      await grid3.machines.deploy(vms);
-      successCount += batchSize;
-    } catch (error) {
-      log(error);
-      errors.push(error);
-      failedCount += batchSize;
-      continue;
-    } finally {
-      console.timeEnd("Batch " + (i + 1));
+    console.time("Preparing Batch " + (i + 1));
+    const deploymentResults = await Promise.all(deploymentPromises);
+    console.timeEnd("Preparing Batch " + (i + 1));
+
+    console.time("Deploy Batch " + (i + 1));
+
+    for (const { twinDeployments, batchIndex } of deploymentResults) {
+      if (twinDeployments) {
+        try {
+          const vms = batchVMs[batchIndex];
+          const contracts = await grid3.machines.twinDeploymentHandler.handle(twinDeployments);
+          await grid3.machines.save(vms.name, contracts);
+          successCount += batchSize;
+        } catch (error) {
+          log(error);
+          errors.push(error);
+          failedCount += batchSize;
+          continue;
+        } finally {
+          console.timeEnd("Deploy Batch " + (i + 1));
+        }
+      }
     }
   }
 
