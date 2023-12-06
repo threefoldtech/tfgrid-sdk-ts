@@ -12,6 +12,11 @@
       You have no rented nodes that match your selected resources. Please try changing your selected resources or rent a
       node that matches your requirements.
     </v-alert>
+
+    <v-alert v-if="filtersUpdated" type="warning" variant="tonal" class="text-warning mb-2 variant-tonal">
+      Please press on <strong>load nodes</strong> button to list nodes matching your new requirements.
+    </v-alert>
+
     <input-validator
       ref="validator"
       :rules="[validators.required('Node id is required.')]"
@@ -32,15 +37,10 @@
             v-bind="{
               ...props,
               loading: props.loading || loadingNodes || pingingNode,
-              hint: filtersUpdated
-                ? 'Please load nodes to list nodes matching your new requirements.'
-                : pingingNode
-                ? `Checking if the disks will fit in the node's storage pools... `
-                : props.hint,
-              error: isLoading ? false : filtersUpdated ? undefined : !!errorMessage || props.error,
-              errorMessages: isLoading ? undefined : filtersUpdated ? undefined : errorMessage || props.errorMessages,
+              hint: pingingNode ? `Checking if the disks will fit in the node's storage pools... ` : props.hint,
+              error: isLoading ? false : !!errorMessage || props.error,
+              errorMessages: isLoading ? undefined : errorMessage || props.errorMessages,
             }"
-            :class="{ 'warning-hint-input': filtersUpdated }"
           >
             <template v-slot:item="{ item, props }">
               <v-list-item @click="props.onClick" :class="{ 'v-list-item--active': props.isActive }">
