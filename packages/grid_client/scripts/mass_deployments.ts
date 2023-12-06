@@ -34,7 +34,6 @@ async function pingNodes(grid3: GridClient, nodes: any[]): Promise<any[]> {
 
 async function main() {
   const grid3 = await getClient();
-
   const errors: any = [];
   const offlineNodes: number[] = [];
   let failedCount = 0;
@@ -43,7 +42,6 @@ async function main() {
   const totalVMs = 200;
   const batches = totalVMs / batchSize;
 
-  console.time("Total Deployment Time");
   // resources
   const cru = 1;
   const mru = 256;
@@ -52,7 +50,6 @@ async function main() {
   const publicIp = false;
 
   console.time("Farms Time");
-
   const farms = await grid3.capacity.filterFarms({
     nodeMRU: mru / 1024,
     nodeSRU: diskSize + rootFs,
@@ -66,6 +63,8 @@ async function main() {
     throw new Error("No farms found");
   }
 
+  console.time("Total Deployment Time");
+
   for (let i = 0; i < batches; i++) {
     console.time("Batch " + (i + 1));
 
@@ -78,10 +77,6 @@ async function main() {
         availableFor: await grid3.twins.get_my_twin_id(),
         farmId: farmId,
         randomize: true,
-        nodeExclude: [
-          958, 1116, 721, 1097, 1107, 2597, 3263, 1118, 1126, 1226, 1398, 1361, 1334, 1335, 1941, 1744, 1090, 1732,
-          1719, 1296,
-        ],
       } as FilterOptions);
     });
 
@@ -111,18 +106,14 @@ async function main() {
     const batchVMs: MachineModel[] = [];
 
     for (let i = 0; i < batchSize; i++) {
-      const cru = 1;
-      const mru = 256;
-      const diskSize = 1;
-      const rootFs = 1;
       const vmName = "vm" + generateString(8);
-      const publicIp = false;
 
       const disk1 = new DiskModel();
       disk1.name = "d" + generateString(5);
       disk1.size = diskSize;
       disk1.mountpoint = "/newDisk1";
 
+      // shuffle array
       flattenedNodes = nodes.flat().sort(() => Math.random() - 0.5);
 
       const onlineNode = flattenedNodes.find(node => !offlineNodes.includes(node.nodeId));
@@ -192,6 +183,7 @@ async function main() {
     log(errors[i]);
     log("---------------------------------------------");
   }
+  // List of offline nodes
   log("Failed Nodes: ");
   for (let i = 0; i < offlineNodes.length; i++) {
     log(offlineNodes[i]);
