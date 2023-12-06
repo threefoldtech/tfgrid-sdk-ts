@@ -64,6 +64,7 @@
     <input-validator
       v-else-if="selection == Selection.MANUAL"
       :value="manualselectedNode"
+      ref="manualField"
       :rules="[
         validators.required('Node ID is required.'),
         validators.isInt('Node ID must be a valid number.'),
@@ -80,6 +81,8 @@
         :disabled="loadingNodes"
         v-bind="{
           ...props,
+          loading: props.loading || loadingNodes,
+          error: props.error,
           hint: pingingNode ? `Validating Node` : props.hint,
         }"
       />
@@ -162,6 +165,7 @@ const nodeCards = ref<Array<NodeGPUCardType>>([]);
 const cards: NodeGPUCardType[] = [];
 const emptyResult = ref(false);
 const validator = ref();
+const manualField = ref();
 const pingingNode = ref(false);
 const delay = ref();
 
@@ -231,12 +235,14 @@ watch(
       value.memory === oldValue.memory &&
       value.certified === oldValue.certified &&
       value.rentedBy === oldValue.rentedBy &&
+      value.ipv4 === oldValue.ipv4 &&
+      value.ipv6 === oldValue.ipv6 &&
       value.hasGPU === oldValue.hasGPU
     ) {
       return;
     }
     if (props.selection === Selection.MANUAL && manualselectedNode.value) {
-      manualselectedNode.value = undefined;
+      manualField.value?.validate();
     }
     if (props.selection === Selection.AUTOMATED) {
       shouldBeUpdated.value = true;
@@ -311,18 +317,28 @@ function validateSelectedNodeFilters(
 async function validateManualSelectedNode(validatingNodeId?: number) {
   if (!validatingNodeId) return;
   try {
+    loadingNodes.value = true;
     const grid = await getGrid(profileManager.profile!);
     const filters = props.filters;
+    const twinId = profileManager.profile?.twinId;
     const node = await grid?.capacity.nodes.getNode(validatingNodeId);
     if (node) {
       if (node.status == "down") {
         throw new Error(`Node ${validatingNodeId} is down`);
+      }
+      if (filters.certified && node.certificationType !== "Certified") {
+        throw new Error(`Node ${validatingNodeId} is not Certified`);
+      }
+      if (filters.rentedBy && node.rentedByTwinId !== twinId) {
+        throw new Error(`Node ${validatingNodeId} is not Dedicated`);
       }
       const freeResources = await grid?.capacity.nodes.getNodeFreeResources(
         node.nodeId,
         "proxy",
         window.env.GRIDPROXY_URL,
       );
+      console.log("freeResources", freeResources);
+
       validateSelectedNodeFilters(validatingNodeId, node, freeResources, filters);
     } else {
       throw new Error(`Node ${validatingNodeId} is not on the grid`);
@@ -341,6 +357,8 @@ async function validateManualSelectedNode(validatingNodeId?: number) {
         "Something went wrong while checking status of the node. Please check your connection and try again.",
       ),
     };
+  } finally {
+    loadingNodes.value = false;
   }
   return undefined;
 }
