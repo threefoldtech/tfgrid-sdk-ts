@@ -308,7 +308,8 @@ function validateSelectedNodeFilters(
     throw new Error(`Node ${nodeId} is not assigned to a PublicIP`);
   } else if (freeResources) {
     const { cru, mru, sru } = freeResources;
-    const { cpu, memory, diskSizes } = filters;
+    const { cpu, memory } = filters;
+    const diskSizes = [...filters.diskSizes, props.rootFileSystemSize];
 
     if (cru < cpu) {
       throw new Error(`Node ${nodeId} doesn't have enough CPU`);
