@@ -148,15 +148,15 @@ const updateSorting = () => {
 const updateQueries = async () => {
   const inputs = mixedFarmFilters.value.inputs;
   if (inputs && filterFarmInputs.value) {
-    const nFltrNptsVal = filterFarmInputs.value;
-    if (nFltrNptsVal.farmId) {
-      inputs.farmId.value = nFltrNptsVal.farmId.value;
+    const filtersInputValues = filterFarmInputs.value;
+    if (filtersInputValues.farmId) {
+      inputs.farmId.value = filtersInputValues.farmId.value;
     }
-    if (nFltrNptsVal.name) {
-      inputs.name.value = nFltrNptsVal.name.value;
+    if (filtersInputValues.name) {
+      inputs.name.value = filtersInputValues.name.value;
     }
-    if (nFltrNptsVal.freeIps) {
-      inputs.freeIps.value = nFltrNptsVal.freeIps.value;
+    if (filtersInputValues.freeIps) {
+      inputs.freeIps.value = filtersInputValues.freeIps.value;
     }
   }
   const options = mixedFarmFilters.value.options;
@@ -174,8 +174,8 @@ watch(page, updateQueries);
 watch(size, updateQueries);
 
 // The filters should reset to the default value again..
-const inputFiltersReset = (nFltrNptsVal: FilterFarmInputs) => {
-  filterFarmInputs.value = nFltrNptsVal;
+const inputFiltersReset = (filtersInputValues: FilterFarmInputs) => {
+  filterFarmInputs.value = filtersInputValues;
   filterOptions.value = {
     page: 1,
     size: 10,

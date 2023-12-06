@@ -181,8 +181,8 @@ export default {
     );
 
     // The filters should reset to the default value again..
-    const inputFiltersReset = (nFltrNptsVal: FilterInputs) => {
-      filterInputs.value = nFltrNptsVal;
+    const inputFiltersReset = (filtersInputValues: FilterInputs) => {
+      filterInputs.value = filtersInputValues;
       filterOptions.value = {
         ...filterOptions.value,
         status: NodeStatus.Up,

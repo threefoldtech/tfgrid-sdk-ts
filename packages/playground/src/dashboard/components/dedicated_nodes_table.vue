@@ -169,8 +169,8 @@ const tabParams = {
 };
 
 // The mixed filters should reset to the default value again..
-const inputFiltersReset = (nFltrNptsVal: DedicatedNodeFilters) => {
-  filterInputs.value = nFltrNptsVal;
+const inputFiltersReset = (filtersInputValues: DedicatedNodeFilters) => {
+  filterInputs.value = filtersInputValues;
   gpuFilter.value = undefined;
 };
 
