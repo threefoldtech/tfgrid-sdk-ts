@@ -237,6 +237,15 @@ watch(
   },
   { immediate: true },
 );
+watch(
+  () => selection.value,
+  (value, oldValue) => {
+    if (value !== oldValue) {
+      loadingFarm.value = false;
+    }
+  },
+  { deep: false },
+);
 
 watch(
   hasGPU,
