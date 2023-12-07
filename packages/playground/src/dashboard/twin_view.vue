@@ -92,7 +92,6 @@
 import { generatePublicKey } from "@threefold/rmb_direct_client";
 import { onMounted, ref } from "vue";
 
-import CopyReadonlyInput from "../components/copy_readonly_input.vue";
 import router from "../router";
 import { useProfileManager } from "../stores";
 import type { FarmInterface } from "../types";
