@@ -14,8 +14,7 @@
     </v-alert>
 
     <v-alert v-if="filtersUpdated" type="warning" variant="tonal" class="text-warning mb-2 variant-tonal">
-      Please press on <strong>{{ capitalize("load nodes") }}</strong> button to list nodes matching your new
-      requirements.
+      Please press on <strong>Load Nodes</strong> button to list nodes matching your new requirements.
     </v-alert>
 
     <input-validator
@@ -74,7 +73,7 @@
             :disabled="$props.loadingFarm || loadingNodes || pingingNode"
             @click="loadNodes"
           >
-            {{ capitalize("load nodes") }}
+            Load Nodes
           </v-btn>
         </div>
       </input-tooltip>
