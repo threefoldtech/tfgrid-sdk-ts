@@ -42,6 +42,7 @@ export default {
     validMessage: String,
     hint: String,
     disableValidation: Boolean,
+    debounceTime: Number,
   },
   emits: {
     "update:modelValue": (valid: boolean) => valid,
@@ -66,7 +67,9 @@ export default {
 
     const error = ref<string | null>(null);
     watch(error, error => emit("update:error", error), { immediate: true });
-    async function validate(value = props.value): Promise<boolean> {
+
+    const _validate = async function (value = props.value): Promise<boolean> {
+      blured.value = true;
       setStatus(ValidatorStatus.Pending);
 
       value = (value || "").toString();
@@ -87,8 +90,9 @@ export default {
 
       setStatus(error.value ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
       return !error.value;
-    }
-    const debouncedValidate = debounce(validate, 250);
+    };
+    const validate = props.debounceTime ? debounce(_validate, props.debounceTime) : _validate;
+    const debouncedValidate = props.debounceTime ? validate : debounce(validate, 250);
 
     const initializedInput = ref(false);
     watch(
@@ -103,7 +107,6 @@ export default {
           }
         }
 
-        setStatus(ValidatorStatus.Pending);
         debouncedValidate(value);
       },
       { immediate: true },
@@ -133,7 +136,7 @@ export default {
 
     // Set Form connection
     const obj: InputValidatorService = {
-      validate,
+      validate: validate as InputValidatorService["validate"],
       setStatus,
       reset() {
         blured.value = false;

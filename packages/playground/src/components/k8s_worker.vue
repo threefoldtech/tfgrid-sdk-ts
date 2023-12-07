@@ -104,9 +104,10 @@
     <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
       <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" :disabled="loadingFarm" />
     </input-tooltip>
-
+    <NodeSelector v-model="selection" />
     <SelectFarmManager>
       <SelectFarm
+        v-if="selection == Selection.AUTOMATED"
         :filters="{
           cpu: $props.modelValue.cpu,
           memory: $props.modelValue.memory,
@@ -122,6 +123,7 @@
 
       <SelectNode
         v-model="$props.modelValue.selectedNode"
+        :selection="selection"
         :filters="{
           farmId: $props.modelValue.farm?.farmID,
           cpu: $props.modelValue.cpu,
@@ -145,11 +147,23 @@ const farmName = ref();
 watch(loadingFarm, (loadingFarm): void => {
   emits("update:loading", loadingFarm!);
 });
+watch(
+  () => selection.value,
+  (value, oldValue) => {
+    if (value !== oldValue) {
+      loadingFarm.value = false;
+    }
+  },
+  { deep: false },
+);
 </script>
 
 <script lang="ts">
 import { ref, watch } from "vue";
 
+import { Selection } from "@/utils/types";
+
+import NodeSelector from "../components/node_selection.vue";
 import SelectFarmManager, { useFarm } from "../components/select_farm_manager.vue";
 import SelectNode from "../components/select_node.vue";
 import { useProfileManager } from "../stores";
@@ -160,7 +174,7 @@ import RootFsSize from "./root_fs_size.vue";
 import SelectFarm from "./select_farm.vue";
 
 const profileManager = useProfileManager();
-
+const selection = ref();
 export function createWorker(name: string = generateName({ prefix: "wr" })): K8SWorker {
   return {
     name,
