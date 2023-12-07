@@ -36,7 +36,7 @@
       <v-card>
         <v-list class="custom-list">
           <v-row>
-            <v-col cols="1" sm="2" class="column-style my-4">
+            <v-col cols="1" sm="2" class="column-style my-4" style="min-width: fit-content">
               <input-tooltip
                 tooltip="Your unique identifier for your twin on the ThreeFold chain."
                 :align-center="true"
@@ -64,12 +64,14 @@
                 <v-list-item class="mr-auto"> Relay </v-list-item>
               </input-tooltip>
             </v-col>
-            <v-col cols="1" sm="10" class="my-4">
+            <v-col class="my-4">
               <v-list-item> {{ profileManager.profile?.twinId.toString() }} </v-list-item>
               <v-divider></v-divider>
               <v-list-item>
                 <div style="display: flex; justify-content: space-between; align-items: center">
-                  <span>{{ profileManager.profile?.address }}</span>
+                  <div class="pr-2" style="overflow-x: hidden">
+                    <span>{{ profileManager.profile?.address }}</span>
+                  </div>
                   <v-icon @click="copy(profileManager.profile?.address as string)"> mdi-content-copy </v-icon>
                 </div>
               </v-list-item>
@@ -90,6 +92,7 @@
 import { generatePublicKey } from "@threefold/rmb_direct_client";
 import { onMounted, ref } from "vue";
 
+import CopyReadonlyInput from "../components/copy_readonly_input.vue";
 import router from "../router";
 import { useProfileManager } from "../stores";
 import type { FarmInterface } from "../types";
