@@ -697,7 +697,7 @@ class AddStellarAddressToFarmModel {
 }
 
 class CreateFarmModel {
-  @Expose() @IsString() @IsNotEmpty() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @MaxLength(40) name: string;
   @Expose()
   @IsOptional()
   @Type(() => FarmPublicIPsModel)
@@ -710,7 +710,7 @@ class pingFarmModel {
 }
 
 class NetworkAddNodeModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(40) name: string;
   @Expose() @IsString() @IsNotEmpty() ipRange: string;
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
   @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
