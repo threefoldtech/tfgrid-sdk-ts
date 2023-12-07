@@ -306,12 +306,15 @@ function validateSelectedNodeFilters(
 
     if (cru < cpu) {
       throw new Error(`Node ${validatingNodeId} doesn't have enough CPU`);
-    } else if (mru < Math.round(memory / 1024)) {
+    } else if (mru < Math.ceil(_g2b(Math.round(memory / 1024)))) {
       throw new Error(`Node ${validatingNodeId} doesn't have enough Memory`);
-    } else if (sru < diskSizes.reduce((total, disk) => total + disk)) {
+    } else if (sru < Math.ceil(diskSizes.reduce((total, disk) => total + disk))) {
       throw new Error(`Node ${validatingNodeId} doesn't have enough Storage`);
     }
   }
+}
+function _g2b(GB: number): number {
+  return GB * 1024 ** 3;
 }
 
 async function validateManualSelectedNode(validatingNodeId?: number) {
@@ -328,6 +331,9 @@ async function validateManualSelectedNode(validatingNodeId?: number) {
       }
       if (filters.certified && node.certificationType !== "Certified") {
         throw new Error(`Node ${validatingNodeId} is not Certified`);
+      }
+      if (filters.rentedBy && node.rentedByTwinId) {
+        throw new Error(`Node ${validatingNodeId} is Dedicated, but rented by someone else`);
       }
       if (filters.rentedBy && node.rentedByTwinId !== twinId) {
         throw new Error(`Node ${validatingNodeId} is not Dedicated`);
