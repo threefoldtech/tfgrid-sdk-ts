@@ -14,13 +14,10 @@ import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function pingNodes(grid3: GridClient, nodes: any[]): Promise<any[]> {
-  const pingPromises = nodes.map(async node => {
-    try {
-      const res = await grid3.zos.pingNode({ nodeId: node.nodeId });
-      return { node, res };
-    } catch (error) {
-      return { node, error };
-    }
+  const pingPromises = nodes.map(node => {
+    const pingPromise = grid3.zos.pingNode({ nodeId: node.nodeId });
+
+    return pingPromise.then(res => ({ node, res })).catch(error => ({ node, error }));
   });
 
   const results = await Promise.all(pingPromises);
