@@ -159,7 +159,7 @@ async function main() {
         const [twinDeployments, _, __] = await grid3.machines._createDeployment(vms);
         return { twinDeployments, batchIndex: index };
       } catch (error) {
-        log(`Error creating deployment for batch ${index + 1}: ${error}`);
+        log(`Error creating deployment for batch ${batch + 1}: ${error}`);
         return { twinDeployments: null, batchIndex: index };
       }
     });
