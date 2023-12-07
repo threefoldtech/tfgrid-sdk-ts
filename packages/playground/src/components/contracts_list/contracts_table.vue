@@ -1,20 +1,25 @@
 <template>
+  <!-- Weblet Layout for displaying a list of contracts -->
   <weblet-layout ref="layout" @mount="() => {}">
-    <!-- Data Table -->
-    <v-data-table
-      :loading="$props.loading.value"
+    <!-- ListTable component for rendering contract data in a table -->
+    <list-table
+      v-if="$props.tableHeaders"
       :headers="$props.tableHeaders"
-      :items="$props.contracts.value"
-      item-value="name"
-      select-strategy="single"
-      show-select
+      :items="contracts"
+      :loading="$props.loading.value"
+      :deleting="deleting"
+      v-model="selectedContracts"
+      :no-data-text="capitalize(`No ${props.contractsType} contracts found on this account.`)"
+      v-bind:onClick:row="loading || deleting ? undefined : onClickRow"
     >
+      <!-- Loading template when contracts are being fetched -->
       <template #loading>
         <div class="text-center">
           <small> {{ capitalize(`Loading ${$props.contractsType} contracts...`) }}</small>
         </div>
       </template>
 
+      <!-- Template for rendering Node Status as V-Chip components -->
       <template #[`item.nodeStatus`]="{ item }">
         <v-chip
           v-if="$props.nodeStatus && item.value.nodeId !== '-' && !$props.loading.value"
@@ -26,6 +31,7 @@
         <p v-else>-</p>
       </template>
 
+      <!-- Template for rendering contract state as V-Chip components -->
       <template #[`item.state`]="{ item }">
         <v-tooltip
           v-if="item && item.value.state === ContractStates.GracePeriod"
@@ -47,11 +53,13 @@
         </v-chip>
       </template>
 
+      <!-- Template for rendering consumption information -->
       <template #[`item.consumption`]="{ item }">
         <p v-if="item.raw.consumption !== 0">{{ item.raw.consumption.toFixed(3) }} TFT/hour</p>
         <p v-else>No Data Available</p>
       </template>
 
+      <!-- Template for rendering actions (Show Details or Retry) -->
       <template #[`item.actions`]="{ item }">
         <v-tooltip :text="failedContractId == item.value.contractId ? 'Retry' : 'Show Details'">
           <template #activator="{ props }">
@@ -69,11 +77,60 @@
           </template>
         </v-tooltip>
       </template>
-    </v-data-table>
+    </list-table>
+
+    <!-- Footer actions section with Export and Delete buttons -->
+    <template #footer-actions>
+      <v-btn
+        variant="outlined"
+        color="error"
+        prepend-icon="mdi-export-variant"
+        :disabled="isExporting || !contracts || contracts.length === 0"
+        @click="exportData"
+      >
+        Export My Data
+      </v-btn>
+
+      <v-btn
+        variant="outlined"
+        color="error"
+        :disabled="!selectedContracts.length || loadingDelete || deleting"
+        prepend-icon="mdi-trash-can-outline"
+        @click="deletingDialog = true"
+      >
+        Delete
+      </v-btn>
+    </template>
   </weblet-layout>
+
+  <!-- Deleting Dialog for confirming contract deletion -->
+  <v-dialog width="70%" v-model="deletingDialog">
+    <v-card>
+      <v-card-title class="text-h5 mt-2"> Are you sure you want to delete the following contracts? </v-card-title>
+      <v-alert class="ma-4" type="warning" variant="tonal"
+        >It is advisable to remove the contract from its solution page, especially when multiple contracts may be linked
+        to the same instance.</v-alert
+      >
+
+      <v-alert class="mx-4" type="warning" variant="tonal">Deleting contracts may take a while to complete.</v-alert>
+      <v-card-text>
+        <v-chip class="ma-1" color="primary" label v-for="c in selectedContracts" :key="c.contractId">
+          {{ c.contractId }}
+        </v-chip>
+      </v-card-text>
+
+      <!-- Actions for confirming or canceling contract deletion -->
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="error" variant="text" @click="onDelete"> Delete </v-btn>
+        <v-btn color="error" variant="tonal" @click="deletingDialog = false"> Cancel </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script lang="ts" setup>
+// Import necessary types and libraries
 import { ContractStates, type GridClient } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
@@ -83,8 +140,11 @@ import { capitalize } from "vue";
 import type { VDataTableHeader } from "@/types";
 import { ContractType, getNodeStateColor, getStateColor, type NormalizedContract } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
-import { normalizeError } from "@/utils/helpers";
+import { downloadAsJson, normalizeError } from "@/utils/helpers";
 
+import ListTable from "../../components/list_table.vue";
+
+// Define props and emits for the component
 const props = defineProps({
   contracts: {
     type: Object as PropType<Ref<NormalizedContract[]>>,
@@ -112,16 +172,25 @@ const props = defineProps({
   },
 });
 
+// Define emits for the component
+const emits = defineEmits(["update:deleted-contracts"]);
+
+// Define refs and variables used in the component
 const layout = ref();
 const contractLocked = ref<ContractLock>();
-
 const deleting = ref<boolean>(false);
+const snackbar = ref<boolean>(false);
 const loadingShowDetails = ref<boolean>(false);
+const loadingDelete = ref<boolean>(false);
 const contractStateDialog = ref<boolean>(false);
-
+const isExporting = ref<boolean>(false);
+const deletingDialog = ref<boolean>(false);
 const failedContractId = ref<number>();
 const loadingContractId = ref<number>();
+const selectedContracts = ref<NormalizedContract[]>([]);
+const contracts = ref<Ref<NormalizedContract[]>>(props.contracts);
 
+// Function to show details of a contract
 async function showDetails(value: any) {
   failedContractId.value = undefined;
   if (value.type === "name" || value.type === "rent") {
@@ -144,6 +213,7 @@ async function showDetails(value: any) {
   }
 }
 
+// Function to fetch contract lock details
 async function contractLockDetails(contractId: number) {
   contractStateDialog.value = true;
   loadingShowDetails.value = true;
@@ -158,9 +228,48 @@ async function contractLockDetails(contractId: number) {
     });
   loadingShowDetails.value = false;
 }
+
+// Function to export contract data as JSON
+function exportData() {
+  isExporting.value = true;
+  downloadAsJson(contracts.value);
+  isExporting.value = false;
+}
+
+// Function called on clicking a row to show details
+const onClickRow = (_: any, data: any) => showDetails(data.item.value);
+
+// Function to handle contract deletion
+async function onDelete() {
+  deletingDialog.value = false;
+  deleting.value = true;
+
+  try {
+    if (selectedContracts.value.length === contracts.value.length) {
+      await props.grid.value?.contracts.cancelMyContracts();
+    } else {
+      await props.grid.value?.contracts.batchCancelContracts({
+        ids: selectedContracts.value.map(c => c.contractId),
+      });
+    }
+    contracts.value = contracts.value.filter(c => !selectedContracts.value.includes(c));
+    emits("update:deleted-contracts", contracts.value);
+    selectedContracts.value = [];
+  } catch (e) {
+    if ((e as Error).message.includes("Inability to pay some fees")) {
+      contracts.value = contracts.value.filter(c => !selectedContracts.value.includes(c));
+      selectedContracts.value = [];
+      snackbar.value = true;
+    } else {
+      layout.value.setStatus("failed", normalizeError(e, `Failed to delete some of the selected contracts.`));
+    }
+  }
+  deleting.value = false;
+}
 </script>
 
 <script lang="ts">
+// Export the component definition
 export default defineComponent({
   name: "TfContractsList",
   components: {},

@@ -4,6 +4,7 @@
     Error while listing contracts due: {{ loadingErrorMessage }}
   </v-alert>
 
+  <!-- Contracts List Card -->
   <v-card variant="text" class="mb-4">
     <section class="d-flex align-center">
       <v-card-title class="font-weight-bold d-flex align-center title ma-0 pa-0"> Contracts List </v-card-title>
@@ -14,6 +15,7 @@
     </section>
   </v-card>
 
+  <!-- Total Cost Card -->
   <v-card variant="tonal" :loading="!totalCost" class="mb-3 bg-blue-primary-lighten-3">
     <template #title>
       <v-row>
@@ -28,8 +30,7 @@
     </template>
   </v-card>
 
-  <template> </template>
-
+  <!-- Contracts Tables -->
   <v-expansion-panels v-model="panel" multiple>
     <v-expansion-panel class="mb-4" :elevation="3" v-for="(table, idx) of contractsTables" :key="idx">
       <v-expansion-panel-title color="primary" style="height: 50px !important; min-height: 15px !important">
@@ -40,6 +41,7 @@
       </v-expansion-panel-title>
 
       <v-expansion-panel-text>
+        <!-- Contracts Table Component -->
         <contracts-table
           :node-status="nodeStatus"
           :loading="table.loading"
@@ -47,55 +49,15 @@
           :grid="table.grid"
           :contracts-type="table.type"
           :table-headers="table.headers"
+          @update:deleted-contracts="onDeletedContracts"
         />
       </v-expansion-panel-text>
-
-      <template #footer-actions>
-        <v-btn
-          variant="outlined"
-          color="error"
-          prepend-icon="mdi-export-variant"
-          :disabled="isExporting || contracts.length === 0"
-          @click="exportData"
-        >
-          Export My Data
-        </v-btn>
-        <v-btn
-          variant="outlined"
-          color="error"
-          :disabled="!selectedContracts.length || isLoading || deleting"
-          prepend-icon="mdi-trash-can-outline"
-          @click="deletingDialog = true"
-        >
-          Delete
-        </v-btn>
-      </template>
     </v-expansion-panel>
   </v-expansion-panels>
-
-  <v-dialog width="70%" v-model="deletingDialog">
-    <v-card>
-      <v-card-title class="text-h5 mt-2"> Are you sure you want to delete the following contracts? </v-card-title>
-      <v-alert class="ma-4" type="warning" variant="tonal"
-        >It is advisable to remove the contract from its solution page, especially when multiple contracts may be linked
-        to the same instance.</v-alert
-      >
-      <v-alert class="mx-4" type="warning" variant="tonal">Deleting contracts may take a while to complete.</v-alert>
-      <v-card-text>
-        <v-chip class="ma-1" color="primary" label v-for="c in selectedContracts" :key="c.contractId">
-          {{ c.contractId }}
-        </v-chip>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="error" variant="text" @click="onDelete"> Delete </v-btn>
-        <v-btn color="error" variant="tonal" @click="deletingDialog = false"> Cancel </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
 </template>
 
 <script lang="ts" setup>
+// Import necessary types and libraries
 import type { GridClient } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import { Decimal } from "decimal.js";
@@ -113,8 +75,8 @@ import {
 } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { getGrid } from "@/utils/grid";
-import { downloadAsJson } from "@/utils/helpers";
 
+// Define reactive variables
 const isLoading = ref<boolean>(false);
 const profileManager = useProfileManager();
 const grid = ref<GridClient>();
@@ -125,31 +87,33 @@ const nodeContracts = ref<NormalizedContract[]>([]);
 const rentContracts = ref<NormalizedContract[]>([]);
 const loadingErrorMessage = ref<string>();
 const totalCost = ref<number>();
-const isExporting = ref(false);
-const selectedContracts = ref<NormalizedContract[]>([]);
-const deleting = ref(false);
-const deletingDialog = ref(false);
 
 const panel = ref<number[]>([0, 1, 2]);
 const nodeStatus = ref() as Ref<{ [x: number]: NodeStatus }>;
 
+// Computed property to get unique node IDs from contracts
 const nodeIDs = computed(() => {
   const allNodes = contracts.value.map(contract => contract.nodeId);
   return [...new Set(allNodes)];
 });
 
+// On component mount, fetch contracts and update UI
 onMounted(onMount);
-const onDelete = () => {};
 
 async function onMount() {
+  // Initialize variables
   totalCost.value = undefined;
   isLoading.value = true;
   loadingErrorMessage.value = undefined;
+
+  // Check if a user profile is available
   if (profileManager.profile) {
+    // Initialize Grid instance
     const _grid = await getGrid(profileManager.profile);
     if (_grid) {
       grid.value = _grid;
       try {
+        // Fetch user contracts, node status, and calculate total cost
         contracts.value = await getUserContracts(grid.value);
         nodeContracts.value = contracts.value.filter(c => c.type === ContractType.NODE);
         nameContracts.value = contracts.value.filter(c => c.type === ContractType.NAME);
@@ -157,6 +121,7 @@ async function onMount() {
         nodeStatus.value = await getNodeStatus(nodeIDs.value);
         totalCost.value = getTotalCost(contracts.value);
       } catch (error: any) {
+        // Handle errors and display toast messages
         loadingErrorMessage.value = error.message;
         createCustomToast(`Error while listing contracts due: ${error.message}`, ToastType.danger, {});
       }
@@ -173,9 +138,12 @@ async function onMount() {
       {},
     );
   }
+
+  // Update UI
   isLoading.value = false;
 }
 
+// Calculate the total cost of contracts
 function getTotalCost(contracts: NormalizedContract[]) {
   totalCost.value = 0;
   for (const contract of contracts) {
@@ -184,14 +152,15 @@ function getTotalCost(contracts: NormalizedContract[]) {
   return +totalCost.value.toFixed(3);
 }
 
-function exportData() {
-  isExporting.value = true;
-  downloadAsJson(contracts?.value);
-  isExporting.value = false;
+// Handle updates when contracts are deleted
+function onDeletedContracts(_contracts: NormalizedContract[]) {
+  contracts.value = _contracts;
+  totalCost.value = undefined;
+  totalCost.value = getTotalCost(contracts.value);
 }
 
+// Define base table headers for contracts tables
 const baseTableHeaders: VDataTableHeader = [
-  // Add any field that may be used in all of the tables here.
   { title: "PLACEHOLDER", key: "data-table-select" },
   { title: "ID", key: "contractId" },
   { title: "State", key: "state" },
@@ -199,6 +168,7 @@ const baseTableHeaders: VDataTableHeader = [
   { title: "Created At", key: "createdAt" },
 ];
 
+// Define specific table headers for each contract type
 const nodeTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
   { title: "Solution Type", key: "solutionType" },
@@ -206,7 +176,7 @@ const nodeTableHeaders: VDataTableHeader = [
   { title: "Expiration", key: "expiration" },
   { title: "Node ID", key: "nodeId" },
   { title: "Node Status", key: "nodeStatus", sortable: false },
-  { title: "Details", key: "actions", sortable: false }, // Should be always last item.
+  { title: "Details", key: "actions", sortable: false },
 ];
 
 const nameTableHeaders: VDataTableHeader = [
@@ -223,6 +193,7 @@ const RentTableHeaders: VDataTableHeader = [
   { title: "Details", key: "actions", sortable: false },
 ];
 
+// Define contracts tables with their specific configurations
 const contractsTables: ContractsTableType[] = [
   {
     headers: nodeTableHeaders,
@@ -255,6 +226,7 @@ const contractsTables: ContractsTableType[] = [
 </script>
 
 <script lang="ts">
+// Export the component definition
 export default defineComponent({
   name: "TfContractsList",
   components: {},
