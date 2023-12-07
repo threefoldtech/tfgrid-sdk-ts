@@ -581,7 +581,6 @@ class FilterOptions {
   @Expose() @IsOptional() @IsBoolean() certified?: boolean;
   @Expose() @IsOptional() @IsInt({ each: true }) @Min(1, { each: true }) nodeExclude?: number[];
   @Expose() @IsOptional() @IsInt() @Min(1) farmId?: number;
-  @Expose() @IsOptional() @IsInt({ each: true }) @Min(1, { each: true }) farmsIds?: number[];
   @Expose() @IsOptional() @IsString() farmName?: string;
   @Expose() @IsOptional() @IsString() country?: string;
   @Expose() @IsOptional() @IsString() city?: string;

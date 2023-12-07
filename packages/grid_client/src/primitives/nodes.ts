@@ -20,7 +20,6 @@ import { FarmFilterOptions, FilterOptions, NodeStatus } from "../modules/models"
 interface FarmInfo {
   name: string;
   farmId: number;
-  farmsIds: number[];
   twinId: number;
   pricingPolicyId: number;
   certificationType: string;
@@ -374,7 +373,7 @@ class Nodes {
       ipv6: options.accessNodeV6,
       gateway: options.gateway,
       certification_type: options.certified ? "Certified" : "",
-      farm_ids: options.farmsIds ? options.farmsIds : [options.farmId],
+      farm_ids: [options.farmId],
       farm_name: options.farmName,
       country: options.country,
       city: options.city,
