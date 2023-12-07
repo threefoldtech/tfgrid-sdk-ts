@@ -2,7 +2,7 @@ import local_server
 
 fn main (){
 	config := local_server.VServerConfig{
-		port: 2000
+		port: 3000
 	}
 
 	server := local_server.init(config)
