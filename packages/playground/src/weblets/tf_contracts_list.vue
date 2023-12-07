@@ -49,8 +49,50 @@
           :table-headers="table.headers"
         />
       </v-expansion-panel-text>
+
+      <template #footer-actions>
+        <v-btn
+          variant="outlined"
+          color="error"
+          prepend-icon="mdi-export-variant"
+          :disabled="isExporting || contracts.length === 0"
+          @click="exportData"
+        >
+          Export My Data
+        </v-btn>
+        <v-btn
+          variant="outlined"
+          color="error"
+          :disabled="!selectedContracts.length || isLoading || deleting"
+          prepend-icon="mdi-trash-can-outline"
+          @click="deletingDialog = true"
+        >
+          Delete
+        </v-btn>
+      </template>
     </v-expansion-panel>
   </v-expansion-panels>
+
+  <v-dialog width="70%" v-model="deletingDialog">
+    <v-card>
+      <v-card-title class="text-h5 mt-2"> Are you sure you want to delete the following contracts? </v-card-title>
+      <v-alert class="ma-4" type="warning" variant="tonal"
+        >It is advisable to remove the contract from its solution page, especially when multiple contracts may be linked
+        to the same instance.</v-alert
+      >
+      <v-alert class="mx-4" type="warning" variant="tonal">Deleting contracts may take a while to complete.</v-alert>
+      <v-card-text>
+        <v-chip class="ma-1" color="primary" label v-for="c in selectedContracts" :key="c.contractId">
+          {{ c.contractId }}
+        </v-chip>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="error" variant="text" @click="onDelete"> Delete </v-btn>
+        <v-btn color="error" variant="tonal" @click="deletingDialog = false"> Cancel </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -71,6 +113,7 @@ import {
 } from "@/utils/contracts";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { getGrid } from "@/utils/grid";
+import { downloadAsJson } from "@/utils/helpers";
 
 const isLoading = ref<boolean>(false);
 const profileManager = useProfileManager();
@@ -82,6 +125,10 @@ const nodeContracts = ref<NormalizedContract[]>([]);
 const rentContracts = ref<NormalizedContract[]>([]);
 const loadingErrorMessage = ref<string>();
 const totalCost = ref<number>();
+const isExporting = ref(false);
+const selectedContracts = ref<NormalizedContract[]>([]);
+const deleting = ref(false);
+const deletingDialog = ref(false);
 
 const panel = ref<number[]>([0, 1, 2]);
 const nodeStatus = ref() as Ref<{ [x: number]: NodeStatus }>;
@@ -92,6 +139,7 @@ const nodeIDs = computed(() => {
 });
 
 onMounted(onMount);
+const onDelete = () => {};
 
 async function onMount() {
   totalCost.value = undefined;
@@ -134,6 +182,12 @@ function getTotalCost(contracts: NormalizedContract[]) {
     totalCost.value = +new Decimal(totalCost.value).add(contract.consumption);
   }
   return +totalCost.value.toFixed(3);
+}
+
+function exportData() {
+  isExporting.value = true;
+  downloadAsJson(contracts?.value);
+  isExporting.value = false;
 }
 
 const baseTableHeaders: VDataTableHeader = [
