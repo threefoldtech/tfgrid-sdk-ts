@@ -69,7 +69,7 @@
               <v-divider></v-divider>
               <v-list-item>
                 <div style="display: flex; justify-content: space-between; align-items: center">
-                  <div class="pr-2" style="overflow-x: hidden">
+                  <div class="pr-2" style="overflow: hidden; word-wrap: normal">
                     <span>{{ profileManager.profile?.address }}</span>
                   </div>
                   <v-icon @click="copy(profileManager.profile?.address as string)"> mdi-content-copy </v-icon>
