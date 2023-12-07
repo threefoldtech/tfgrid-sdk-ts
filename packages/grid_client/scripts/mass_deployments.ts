@@ -23,9 +23,13 @@ async function pingNodes(grid3: GridClient, nodes: any[]): Promise<any[]> {
     }
   });
 
-  const results = await Promise.all(pingPromises);
-
-  return results;
+  try {
+    const results = await Promise.all(pingPromises);
+    return results;
+  } catch (e) {
+    console.log(e);
+    return [];
+  }
 }
 
 async function main() {
