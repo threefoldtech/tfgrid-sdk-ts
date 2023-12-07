@@ -303,12 +303,11 @@ function validateSelectedNodeFilters(
     const { cru, mru, sru } = freeResources;
     const { cpu, memory } = filters;
     const diskSizes = [...filters.diskSizes, props.rootFileSystemSize];
-
     if (cru < cpu) {
       throw new Error(`Node ${validatingNodeId} doesn't have enough CPU`);
     } else if (mru < Math.ceil(_g2b(Math.round(memory / 1024)))) {
       throw new Error(`Node ${validatingNodeId} doesn't have enough Memory`);
-    } else if (sru < Math.ceil(diskSizes.reduce((total, disk) => total + disk))) {
+    } else if (sru < Math.ceil(_g2b(diskSizes.reduce((total, disk) => total + disk)))) {
       throw new Error(`Node ${validatingNodeId} doesn't have enough Storage`);
     }
   }
@@ -343,13 +342,11 @@ async function validateManualSelectedNode(validatingNodeId?: number) {
         "proxy",
         window.env.GRIDPROXY_URL,
       );
-      console.log("freeResources", freeResources);
-
       validateSelectedNodeFilters(validatingNodeId, node, freeResources, filters);
     } else {
       throw new Error(`Node ${validatingNodeId} is not on the grid`);
     }
-    selectedNode.value = { nodeId: Number(validatingNodeId) };
+    selectedNode.value = { nodeId: Number(validatingNodeId), certified: node.certificationType };
     emits("update:modelValue", {
       nodeId: selectedNode.value.nodeId,
       cards: cards,
