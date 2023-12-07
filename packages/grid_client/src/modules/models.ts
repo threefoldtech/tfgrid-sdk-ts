@@ -23,6 +23,7 @@ import { Deployment } from "../zos/deployment";
 import { ZdbModes } from "../zos/zdb";
 import { blockchainType } from "./blockchainInterface";
 const NameLength = 15;
+const FarmNameLength = 40;
 
 enum ContractStates {
   Created = "Created",
@@ -697,7 +698,7 @@ class AddStellarAddressToFarmModel {
 }
 
 class CreateFarmModel {
-  @Expose() @IsString() @IsNotEmpty() @MaxLength(40) name: string;
+  @Expose() @IsString() @IsNotEmpty() @MaxLength(FarmNameLength) name: string;
   @Expose()
   @IsOptional()
   @Type(() => FarmPublicIPsModel)
