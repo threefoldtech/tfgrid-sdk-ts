@@ -3,7 +3,7 @@ import { NodeStatus } from "@threefold/gridproxy_client";
 import type { Ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
-import type { VDataTableHeader } from "@/types";
+import { solutionType, type VDataTableHeader } from "@/types";
 
 import { normalizeBalance } from "./helpers";
 
@@ -21,6 +21,14 @@ export async function getUserContracts(grid: GridClient) {
   );
 }
 
+function parseProjectName(projectName: string) {
+  const parts = projectName.split("/");
+  if (parts.length) {
+    projectName = solutionType[parts[0]];
+  }
+  return projectName;
+}
+
 async function normalizeContract(
   grid: GridClient,
   c: { [key: string]: any },
@@ -31,6 +39,7 @@ async function normalizeContract(
   let data: { [key: string]: string };
   try {
     data = JSON.parse(c.deploymentData);
+    data.projectName = parseProjectName(data.projectName);
   } catch {
     data = { name: c.name };
   }
