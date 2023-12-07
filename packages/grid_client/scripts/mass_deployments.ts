@@ -15,13 +15,8 @@ import { log } from "./utils";
 
 async function pingNodes(grid3: GridClient, nodes: any[]): Promise<any[]> {
   const pingPromises = nodes.map(async node => {
-    const pingPromise = grid3.zos.pingNode({ nodeId: node.nodeId });
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error(`Timeout: Ping to node ${node.nodeId} took too long`)), 10000),
-    );
-
     try {
-      const res = await Promise.race([pingPromise, timeoutPromise]);
+      const res = await grid3.zos.pingNode({ nodeId: node.nodeId });
       return { node, res };
     } catch (error) {
       return { node, error };
@@ -36,6 +31,7 @@ async function pingNodes(grid3: GridClient, nodes: any[]): Promise<any[]> {
 async function main() {
   const grid3 = await getClient();
   grid3.clientOptions.deploymentTimeoutMinutes = 2;
+  await grid3.connect();
 
   const errors: any = [];
   const offlineNodes: number[] = [];
@@ -48,14 +44,13 @@ async function main() {
   // resources
   const cru = 1;
   const mru = 256;
-  const diskSize = 1;
   const rootFs = 1;
   const publicIp = false;
 
   console.time("Farms Time");
   const farms = await grid3.capacity.filterFarms({
     nodeMRU: mru / 1024,
-    nodeSRU: diskSize + rootFs,
+    nodeSRU: rootFs,
     publicIp: publicIp,
     availableFor: await grid3.twins.get_my_twin_id(),
     randomize: true,
@@ -72,18 +67,14 @@ async function main() {
     console.time("Batch " + (batch + 1));
 
     const nodesPromises = Array.from({ length: batchSize }, async () => {
-      const farmId = +randomChoice(farms).farmId;
+      const farmIds = farms.map(farm => farm.farmId);
       return grid3.capacity.filterNodes({
         cru: cru,
         mru: mru / 1024,
-        sru: rootFs + diskSize,
+        sru: rootFs,
         availableFor: await grid3.twins.get_my_twin_id(),
-        farmId: farmId,
+        farmsIds: farmIds,
         randomize: true,
-        nodeExclude: [
-          958, 1116, 721, 1097, 1107, 2597, 3263, 1118, 1126, 1226, 1398, 1361, 1334, 1335, 1941, 1744, 1090, 1732,
-          1719, 1296,
-        ],
       } as FilterOptions);
     });
 
@@ -118,7 +109,6 @@ async function main() {
 
       const disk1 = new DiskModel();
       disk1.name = "d" + generateString(5);
-      disk1.size = diskSize;
       disk1.mountpoint = "/newDisk1";
 
       if (flattenedNodes.length < 0) {
