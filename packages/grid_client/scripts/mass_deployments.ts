@@ -35,6 +35,8 @@ async function pingNodes(grid3: GridClient, nodes: any[]): Promise<any[]> {
 
 async function main() {
   const grid3 = await getClient();
+  grid3.clientOptions.deploymentTimeoutMinutes = 2;
+
   const errors: any = [];
   const offlineNodes: number[] = [];
   let failedCount = 0;
