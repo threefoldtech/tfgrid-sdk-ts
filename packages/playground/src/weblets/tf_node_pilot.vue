@@ -7,6 +7,7 @@
     :certified="certified"
     :dedicated="dedicated"
     ipv4
+    :SelectedNode="selectedNode"
     title-image="images/icons/vm.png"
   >
     <template #title>Deploy a Node Pilot</template>
@@ -74,9 +75,10 @@
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
         <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
       </input-tooltip>
-
+      <NodeSelector v-model="selection" />
       <SelectFarmManager>
         <SelectFarmId
+          v-if="selection == Selection.AUTOMATED"
           :filters="{
             cpu,
             memory,
@@ -87,10 +89,12 @@
           }"
           v-model="farm"
           v-model:loading="loadingFarm"
+          v-model:search="farmName"
         />
 
         <SelectNode
           v-model="selectedNode"
+          :selection="selection"
           :filters="{
             farmId: farm?.farmID,
             cpu,
@@ -114,21 +118,25 @@
 <script lang="ts" setup>
 import { type Ref, ref } from "vue";
 
+import { Selection } from "@/utils/types";
+
+import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import { type Farm, type Flist, ProjectName } from "../types";
+import { type FarmInterface, type Flist, ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
-
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
+const selection = ref();
 const loadingFarm = ref(false);
 const name = ref(generateName({ prefix: "np" }));
 const cpu = ref(8);
 const memory = ref(8192);
-const farm = ref() as Ref<Farm>;
+const farm = ref() as Ref<FarmInterface>;
+const farmName = ref();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
   entryPoint: "/",
@@ -140,7 +148,7 @@ const rootFilesystemSize = 2;
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.NodePilot.toLowerCase();
+  const projectName = ProjectName.NodePilot.toLowerCase() + "/" + name.value;
 
   try {
     layout.value?.validateSSH();

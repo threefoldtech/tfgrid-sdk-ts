@@ -7,6 +7,7 @@
     :certified="certified"
     :dedicated="dedicated"
     :ipv4="ipv4"
+    :SelectedNode="selectedNode"
     title-image="images/icons/freeflow.png"
   >
     <template #title>Deploy a Freeflow Instance </template>
@@ -39,9 +40,9 @@
 
       <SelectSolutionFlavor
         v-model="solution"
-        :minimum="{ cpu: 1, memory: 1024 * 4, disk: 100 }"
-        :standard="{ cpu: 2, memory: 1024 * 16, disk: 500 }"
-        :recommended="{ cpu: 4, memory: 1024 * 32, disk: 1000 }"
+        :small="{ cpu: 1, memory: 4, disk: 100 }"
+        :medium="{ cpu: 2, memory: 16, disk: 500 }"
+        :large="{ cpu: 4, memory: 32, disk: 1000 }"
         :disabled="loadingFarm"
       />
       <Networks v-model:ipv4="ipv4" :disabled="loadingFarm"></Networks>
@@ -70,6 +71,7 @@
             }"
             v-model="farm"
             v-model:loading="loadingFarm"
+            v-model:search="farmName"
           />
 
           <SelectNode
@@ -108,7 +110,7 @@ import { computed, onMounted, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
+import type { FarmInterface, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
 import { deployGatewayName, rollbackDeployment } from "../utils/gateway";
@@ -121,7 +123,8 @@ const profileManager = useProfileManager();
 
 const threebotName = ref<string>("");
 const solution = ref() as Ref<SolutionFlavor>;
-const farm = ref() as Ref<Farm>;
+const farm = ref() as Ref<FarmInterface>;
+const farmName = ref();
 const flist = ref<Flist>();
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
@@ -151,7 +154,7 @@ function finalize(deployment: any) {
 async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.FreeFlow.toLowerCase();
+  const projectName = ProjectName.FreeFlow.toLowerCase() + "/" + threebotName.value;
 
   const domain = customDomain ? gatewayName.domain : threebotName.value + "." + gatewayName.domain;
 

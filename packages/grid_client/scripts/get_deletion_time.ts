@@ -1,20 +1,25 @@
 import { getClient } from "./client_loader";
 import { log } from "./utils";
 
+async function getDeletionTime(client, contractId) {
+  try {
+    const res = await client.contracts.getDeletionTime({ id: contractId });
+    log("================= Getting deletion time =================");
+    log(res);
+    log("================= Getting deletion time =================");
+  } catch (error) {
+    log("Error while getting deletion time " + error);
+  }
+}
+
 async function main() {
   const grid3 = await getClient();
+  const contractId = 1834;
 
-  grid3.contracts
-    .getDeletionTime({ id: 1834 })
-    .then(deleteionTime => {
-      log(deleteionTime);
-    })
-    .catch(err => {
-      throw err;
-    })
-    .finally(() => {
-      grid3.disconnect();
-    });
+  //Get Deletion time
+  await getDeletionTime(grid3, contractId);
+
+  await grid3.disconnect();
 }
 
 main();

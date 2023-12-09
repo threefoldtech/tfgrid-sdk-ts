@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/presearch.png"
   >
     <template #title>Deploy a Presearch Instance</template>
@@ -67,9 +68,10 @@
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
           <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
-
+        <NodeSelector v-model="selection" />
         <SelectFarmManager>
           <SelectFarm
+            v-if="selection == Selection.AUTOMATED"
             :filters="{
               cpu,
               memory,
@@ -81,10 +83,12 @@
             exclusive-for="research"
             v-model="farm"
             v-model:loading="loadingFarm"
+            v-model:search="farmName"
           />
 
           <SelectNode
             v-model="selectedNode"
+            :selection="selection"
             :filters="{
               farmId: farm?.farmID,
               cpu,
@@ -123,12 +127,15 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref } from "vue";
+import { type Ref, ref, watch } from "vue";
+
+import { Selection } from "@/utils/types";
 
 import Network from "../components/networks.vue";
+import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import { type Farm, type Flist, ProjectName } from "../types";
+import { type FarmInterface, type Flist, ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
@@ -138,7 +145,7 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
-
+const selection = ref();
 const name = ref(generateName({ prefix: "ps" }));
 const code = ref("");
 const ipv4 = ref(false);
@@ -148,7 +155,8 @@ const memory = 512;
 const rootFilesystemSize = rootFs(cpu, memory);
 const loadingFarm = ref(false);
 const dockerDiskSize = 10;
-const farm = ref() as Ref<Farm>;
+const farm = ref() as Ref<FarmInterface>;
+const farmName = ref();
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
 const network = ref();
@@ -159,11 +167,20 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
+watch(
+  () => selection.value,
+  (value, oldValue) => {
+    if (value !== oldValue) {
+      loadingFarm.value = false;
+    }
+  },
+  { deep: false },
+);
 
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Presearch.toLowerCase();
+  const projectName = ProjectName.Presearch.toLowerCase() + "/" + name.value;
 
   try {
     layout.value?.validateSSH();

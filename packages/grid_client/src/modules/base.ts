@@ -1,8 +1,10 @@
+import { GridClientErrors, ValidationError } from "@threefold/types";
 import * as PATH from "path";
 
 import { RMB } from "../clients";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
+import { formatErrorMessage } from "../helpers";
 import { HighLevelBase } from "../high_level/base";
 import { KubernetesHL } from "../high_level/kubernetes";
 import { VMHL } from "../high_level/machine";
@@ -44,12 +46,11 @@ class BaseModule {
       config.backendStorage,
       config.seed,
     );
-    this.tfClient = new TFClient(
-      this.config.substrateURL,
-      this.config.mnemonic,
-      this.config.storeSecret,
-      this.config.keypairType,
-    );
+    this.tfClient = config.tfclient;
+  }
+
+  getNewDeploymentPath(...paths: string[]): string {
+    return PATH.join(this.config.storePath, this.moduleName, this.projectName, ...paths);
   }
 
   getDeploymentPath(name: string): string {
@@ -57,7 +58,7 @@ class BaseModule {
   }
 
   async getDeploymentContracts(name: string) {
-    const path = PATH.join(this.getDeploymentPath(name), "contracts.json");
+    const path = this.getNewDeploymentPath(name, "contracts.json");
     const contracts = await this.backendStorage.load(path);
     if (!contracts) {
       return [];
@@ -66,7 +67,7 @@ class BaseModule {
   }
 
   async save(name: string, contracts: Record<string, unknown[]>) {
-    const contractsPath = PATH.join(this.getDeploymentPath(name), "contracts.json");
+    const contractsPath = PATH.join(this.getNewDeploymentPath(name), "contracts.json");
     const wireguardPath = PATH.join(this.getDeploymentPath(name), `${name}.conf`);
     const oldContracts = await this.getDeploymentContracts(name);
     let StoreContracts = oldContracts;
@@ -105,8 +106,50 @@ class BaseModule {
     }
   }
 
+  async _migrateListKeys(): Promise<void> {
+    const oldPath = this.getDeploymentPath("");
+    const keys = await this.backendStorage.list(oldPath);
+
+    if (this.backendStorage.type === BackendStorageType.tfkvstore) {
+      const exts = await Promise.all(
+        keys.map(key =>
+          this.backendStorage.storage.moveValue!(
+            PATH.join(oldPath, key, "contracts.json"),
+            this.getNewDeploymentPath(key, "contracts.json"),
+          ),
+        ),
+      );
+      await this.tfClient.applyAllExtrinsics(exts.flat(1).filter(Boolean));
+      return;
+    }
+
+    const __getValue = (key: string) => {
+      const path = PATH.join(oldPath, key, "contracts.json");
+      return this.backendStorage.load(path).catch(error => {
+        console.log(`Error while fetching key('${key}'):`, error.message || error);
+      });
+    };
+
+    const values = await Promise.all(keys.map(__getValue));
+
+    const __updatePath = (key: string, index: number) => {
+      const value = values[index];
+      const from = PATH.join(oldPath, key, "contracts.json");
+      const to = this.getNewDeploymentPath(key, "contracts.json");
+
+      if (!value || from === to) {
+        return Promise.resolve(null);
+      }
+
+      return [this.backendStorage.dump(to, value), this.backendStorage.remove(from)];
+    };
+
+    await Promise.all(keys.map(__updatePath).flat(1));
+  }
+
   async _list(): Promise<string[]> {
-    return await this.backendStorage.list(this.getDeploymentPath(""));
+    await this._migrateListKeys();
+    return this.backendStorage.list(this.getNewDeploymentPath(""));
   }
 
   async exists(name: string): Promise<boolean> {
@@ -263,7 +306,7 @@ class BaseModule {
       try {
         deployment = await this.rmb.request([node_twin_id], "zos.deployment.get", payload);
       } catch (e) {
-        throw Error(`Failed to get deployment due to ${e}`);
+        (e as Error).message = formatErrorMessage(`Failed to get deployment`, e);
       }
       let found = false;
       for (const workload of deployment.workloads) {
@@ -389,7 +432,9 @@ class BaseModule {
       });
 
       if (pubIPOldWorkload != "" && twinDeployments.length == 0)
-        throw Error(`Cannot remove a public IP of an existent deployment`);
+        throw new GridClientErrors.Workloads.WorkloadUpdateError(
+          `Cannot remove a public IP of an existent deployment.`,
+        );
 
       oldDeployment = await this.deploymentFactory.fromObj(oldDeployment);
       const node_id = await this._getNodeIdFromContractId(name, oldDeployment.contract_id);
@@ -409,8 +454,14 @@ class BaseModule {
         if (zmachineOldWorkloads.filter(value => zmachineTwinWorkloads.includes(value)).length == 0) continue;
 
         if (pubIPTwinWorkload != pubIPOldWorkload) {
-          if (pubIPTwinWorkload == "") throw Error(`Cannot remove a public IP of an existent deployment`);
-          if (pubIPOldWorkload == "") throw Error(`Cannot add a public IP to an existent deployment`);
+          if (pubIPTwinWorkload == "")
+            throw new GridClientErrors.Workloads.WorkloadUpdateError(
+              `Cannot remove a public IP of an existent deployment.`,
+            );
+          if (pubIPOldWorkload == "")
+            throw new GridClientErrors.Workloads.WorkloadUpdateError(
+              `Cannot add a public IP to an existent deployment.`,
+            );
         }
       }
     }
@@ -533,7 +584,7 @@ class BaseModule {
         return contracts;
       }
     }
-    throw Error(`Instance with name ${name} is not found`);
+    throw new ValidationError(`Instance with name ${name} is not found.`);
   }
 
   async _delete(name: string) {

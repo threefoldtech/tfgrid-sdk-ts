@@ -9,6 +9,7 @@
     :ipv4="master.ipv4"
     :certified="master.certified"
     :dedicated="master.dedicated"
+    :SelectedNode="master.selectedNode"
     title-image="images/icons/kubernetes.png"
   >
     <template #title>Deploy a Kubernetes cluster</template>
@@ -105,7 +106,7 @@ async function deploy() {
 
   try {
     layout.value?.validateSSH();
-    const grid = await getGrid(profileManager.profile!);
+    const grid = await getGrid(profileManager.profile!, name.value);
 
     await layout.value.validateBalance(grid!);
 

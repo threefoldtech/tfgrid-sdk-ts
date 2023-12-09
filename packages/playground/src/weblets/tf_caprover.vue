@@ -13,6 +13,7 @@
     :ipv4="true"
     :certified="leader.certified"
     :dedicated="leader.dedicated"
+    :SelectedNode="leader.selectedNode"
     title-image="images/icons/caprover.png"
   >
     <template #title>Deploy a Caprover Instance</template>
@@ -118,7 +119,7 @@ const workers = ref<CW[]>([]);
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Caprover.toLowerCase();
+  const projectName = ProjectName.Caprover.toLowerCase() + "/" + leader.value.name;
 
   try {
     layout.value?.validateSSH();

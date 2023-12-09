@@ -1,10 +1,14 @@
 import { defineStore } from "pinia";
 
+import { useGrid } from "./grid";
+
 export interface Profile {
   mnemonic: string;
   ssh: string;
   twinId: number;
   address: string;
+  relay: string;
+  pk: string;
 }
 
 interface State {
@@ -19,10 +23,21 @@ const useProfileManager = defineStore("profile-manager", {
   actions: {
     set(profile: Profile | null) {
       this.profile = profile;
+      useGrid().set(profile);
     },
     updateSSH(ssh: string) {
       if (this.profile) {
         this.profile.ssh = ssh;
+      }
+    },
+    updateRelay(relay: string) {
+      if (this.profile) {
+        this.profile.relay = relay;
+      }
+    },
+    updatePk(pk: string) {
+      if (this.profile) {
+        this.profile.pk = pk;
       }
     },
     clear() {

@@ -3,6 +3,7 @@
 # Env vars with default values
 MODE="${MODE:=dev}"
 STELLAR_NETWORK="${STELLAR_NETWORK:=test}"
+TIMEOUT="${TIMEOUT:=10000}"
 
 # Env vars must provide in `custom` mode
 REQUIRED_ENV_VARS=(
@@ -12,6 +13,7 @@ REQUIRED_ENV_VARS=(
     ACTIVATION_SERVICE_URL
     RELAY_DOMAIN
     BRIDGE_TFT_ADDRESS
+    MINTING_URL
 )
 
 STELLAR_ENV_Vars=(
@@ -24,8 +26,8 @@ case $MODE in
     GRAPHQL_URL='https://graphql.dev.grid.tf/graphql'
     GRIDPROXY_URL='https://gridproxy.dev.grid.tf'
     SUBSTRATE_URL='wss://tfchain.dev.grid.tf/ws'
-    ACTIVATION_SERVICE_URL='https://activation.dev.grid.tf'
-    RELAY_DOMAIN='relay.dev.grid.tf'
+    ACTIVATION_SERVICE_URL='https://activation.dev.grid.tf/activation/activate'
+    RELAY_DOMAIN='wss://relay.dev.grid.tf'
     BRIDGE_TFT_ADDRESS=GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG
     STELLAR_NETWORK=test
   ;;
@@ -34,8 +36,8 @@ case $MODE in
     GRAPHQL_URL='https://graphql.qa.grid.tf/graphql'
     GRIDPROXY_URL='https://gridproxy.qa.grid.tf'
     SUBSTRATE_URL='wss://tfchain.qa.grid.tf/ws'
-    ACTIVATION_SERVICE_URL='https://activation.qa.grid.tf'
-    RELAY_DOMAIN='relay.qa.grid.tf'
+    ACTIVATION_SERVICE_URL='https://activation.qa.grid.tf/activation/activate'
+    RELAY_DOMAIN='wss://relay.qa.grid.tf'
     BRIDGE_TFT_ADDRESS=GAQH7XXFBRWXT2SBK6AHPOLXDCLXVFAKFSOJIRMRNCDINWKHGI6UYVKM
     STELLAR_NETWORK=test
   ;;
@@ -44,8 +46,8 @@ case $MODE in
     GRAPHQL_URL='https://graphql.test.grid.tf/graphql'
     GRIDPROXY_URL='https://gridproxy.test.grid.tf'
     SUBSTRATE_URL='wss://tfchain.test.grid.tf/ws'
-    ACTIVATION_SERVICE_URL='https://activation.test.grid.tf'
-    RELAY_DOMAIN='relay.test.grid.tf'
+    ACTIVATION_SERVICE_URL='https://activation.test.grid.tf/activation/activate'
+    RELAY_DOMAIN='wss://relay.test.grid.tf'
     BRIDGE_TFT_ADDRESS=GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4
     STELLAR_NETWORK=main
   ;;
@@ -54,10 +56,11 @@ case $MODE in
     GRAPHQL_URL='https://graphql.grid.tf/graphql'
     GRIDPROXY_URL='https://gridproxy.grid.tf'
     SUBSTRATE_URL='wss://tfchain.grid.tf/ws'
-    ACTIVATION_SERVICE_URL='https://activation.grid.tf'
-    RELAY_DOMAIN='relay.grid.tf'
+    ACTIVATION_SERVICE_URL='https://activation.grid.tf/activation/activate'
+    RELAY_DOMAIN='wss://relay.grid.tf'
     BRIDGE_TFT_ADDRESS=GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC
     STELLAR_NETWORK=main
+    MINTING_URL="https://alpha.minting.tfchain.grid.tf"
   ;;
 
   "custom")
@@ -104,7 +107,9 @@ window.env = {
   BRIDGE_TFT_ADDRESS: '$BRIDGE_TFT_ADDRESS',
   STELLAR_NETWORK: '$STELLAR_NETWORK',
   STELLAR_HORIZON_URL: '$STELLAR_HORIZON_URL',
-  TFT_ASSET_ISSUER: '$TFT_ASSET_ISSUER'
+  TFT_ASSET_ISSUER: '$TFT_ASSET_ISSUER',
+  MINTING_URL: '$MINTING_URL',
+  TIMEOUT: +'$TIMEOUT'
 };
 "
 

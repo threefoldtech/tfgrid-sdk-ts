@@ -7,6 +7,7 @@
     :certified="certified"
     :dedicated="dedicated"
     :ipv4="ipv4"
+    :SelectedNode="selectedNode"
     title-image="images/icons/discourse.png"
   >
     <template #title> Deploy a Discourse Instance </template>
@@ -54,8 +55,8 @@
 
         <SelectSolutionFlavor
           v-model="solution"
-          :standard="{ cpu: 2, memory: 1024 * 2, disk: 50 }"
-          :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+          :medium="{ cpu: 2, memory: 4, disk: 50 }"
+          :large="{ cpu: 4, memory: 16, disk: 100 }"
           :disabled="loadingFarm"
         />
         <!-- <Networks v-model:ipv4="ipv4" /> -->
@@ -85,9 +86,10 @@
               hide-details
             />
           </input-tooltip>
-
+          <NodeSelector v-model="selection" />
           <SelectFarmManager>
             <SelectFarm
+              v-if="selection == Selection.AUTOMATED"
               :filters="{
                 cpu: solution?.cpu,
                 memory: solution?.memory,
@@ -98,10 +100,12 @@
               }"
               v-model="farm"
               v-model:loading="loadingFarm"
+              v-model:search="farmName"
             />
 
             <SelectNode
               v-model="selectedNode"
+              :selection="selection"
               :filters="{
                 farmId: farm?.farmID,
                 cpu: solution?.cpu,
@@ -140,11 +144,14 @@
 import type { GridClient } from "@threefold/grid_client";
 import { Buffer } from "buffer";
 import TweetNACL from "tweetnacl";
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
+import { Selection } from "@/utils/types";
+
+import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
+import type { FarmInterface, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
@@ -152,15 +159,15 @@ import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 import { generateName, generatePassword } from "../utils/strings";
-
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
-
+const selection = ref();
 const name = ref(generateName({ prefix: "dc" }));
 const email = ref("");
 const solution = ref() as Ref<SolutionFlavor>;
-const farm = ref() as Ref<Farm>;
+const farm = ref() as Ref<FarmInterface>;
+const farmName = ref();
 const ipv4 = ref(false);
 const domainNameCmp = ref();
 const smtp = ref(createSMTPServer());
@@ -173,6 +180,15 @@ const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.2.flist",
   entryPoint: "/sbin/zinit init",
 };
+watch(
+  () => selection.value,
+  (value, oldValue) => {
+    if (value !== oldValue) {
+      loadingFarm.value = false;
+    }
+  },
+  { deep: false },
+);
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
@@ -183,7 +199,7 @@ function finalize(deployment: any) {
 async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Discourse.toLowerCase();
+  const projectName = ProjectName.Discourse.toLowerCase() + "/" + name.value;
 
   const subdomain = getSubdomain({
     deploymentName: name.value,

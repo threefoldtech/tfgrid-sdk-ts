@@ -1,4 +1,4 @@
-import { BackendStorageType, GridClient, type NetworkEnv } from "@threefold/grid_client";
+import { BackendStorageType, GridClient, NetworkEnv } from "@threefold/grid_client";
 
 import type { Profile } from "../stores/profile_manager";
 
@@ -12,7 +12,7 @@ export async function getGrid(profile: Pick<Profile, "mnemonic">, projectName?: 
     backendStorageType: BackendStorageType.tfkvstore,
     projectName,
 
-    ...(import.meta.env.DEV
+    ...(import.meta.env.DEV && network !== NetworkEnv.custom
       ? {}
       : {
           substrateURL: window.env.SUBSTRATE_URL,
@@ -40,6 +40,15 @@ export function createAccount() {
     network,
     mnemonic: "",
     storeSecret: "test",
+    ...(import.meta.env.DEV && network !== NetworkEnv.custom
+      ? {}
+      : {
+          substrateURL: window.env.SUBSTRATE_URL,
+          proxyURL: window.env.GRIDPROXY_URL,
+          graphqlURL: window.env.GRAPHQL_URL,
+          activationURL: window.env.ACTIVATION_SERVICE_URL,
+          relayURL: window.env.RELAY_DOMAIN,
+        }),
   });
   grid._connect();
   const relay = grid.getDefaultUrls(network).relay.slice(6);
@@ -51,6 +60,15 @@ export function activateAccountAndCreateTwin(mnemonic: string) {
     network,
     mnemonic,
     storeSecret: mnemonic,
+    ...(import.meta.env.DEV && network !== NetworkEnv.custom
+      ? {}
+      : {
+          substrateURL: window.env.SUBSTRATE_URL,
+          proxyURL: window.env.GRIDPROXY_URL,
+          graphqlURL: window.env.GRAPHQL_URL,
+          activationURL: window.env.ACTIVATION_SERVICE_URL,
+          relayURL: window.env.RELAY_DOMAIN,
+        }),
   });
   grid._connect();
   const relay = grid.getDefaultUrls(network).relay.slice(6);
@@ -75,12 +93,14 @@ export async function loadProfile(grid: GridClient): Promise<Profile> {
     ssh: await readSSH(grid),
     twinId: grid!.twinId,
     address: grid.tfclient.address,
+    relay: grid.getDefaultUrls(network).relay.slice(6),
+    pk: (await grid.twins.get({ id: grid!.twinId })).pk,
   };
 }
 
 export async function getMetadata(grid: GridClient): Promise<{ [key: string]: any }> {
-  const metadata = await grid.kvstore.get({ key: "metadata" });
   try {
+    const metadata = await grid.kvstore.get({ key: "metadata" });
     return JSON.parse(metadata);
   } catch {
     return {};

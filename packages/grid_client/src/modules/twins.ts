@@ -7,8 +7,8 @@ import { checkBalance } from "./utils";
 
 class Twins {
   client: TFClient;
-  constructor(config: GridClientConfig) {
-    this.client = new TFClient(config.substrateURL, config.mnemonic, config.storeSecret, config.keypairType);
+  constructor(public config: GridClientConfig) {
+    this.client = config.tfclient;
   }
 
   @expose

@@ -1,4 +1,5 @@
 import * as secp from "@noble/secp256k1";
+import { ValidationError } from "@threefold/types";
 import * as bip39 from "bip39";
 import { Buffer } from "buffer";
 import * as cryptoJs from "crypto-js";
@@ -25,7 +26,7 @@ export function generatePublicKey(secret: string) {
     }
 
     if (!isValidSeed(privKey) || privKey.length !== 64) {
-      throw new Error("Invalid seed. Couldn't get public key from the provided seed.");
+      throw new ValidationError("Invalid seed. Couldn't get public key from the provided seed.");
     }
   }
 

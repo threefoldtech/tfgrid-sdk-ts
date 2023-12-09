@@ -11,6 +11,7 @@ import {
   FarmsGetModel,
   FilterOptions,
   NodeFreeResourcesModel,
+  NodeIdFromContractIdModel,
   NodesByFarmIdModel,
   NodesGetModel,
 } from "./models";
@@ -95,6 +96,12 @@ class Capacity {
 
   @expose
   @validateInput
+  async getFarmsCount(options?: FarmFilterOptions): Promise<number> {
+    return await this.nodes.getFarmsCount(options);
+  }
+
+  @expose
+  @validateInput
   async checkFarmHasFreePublicIps(options?: FarmHasFreePublicIPsModel): Promise<boolean> {
     return await this.nodes.checkFarmHasFreePublicIps(options.farmId);
   }
@@ -137,6 +144,12 @@ class Capacity {
       options.rootfsDisks,
       options.nodeId,
     );
+  }
+
+  @expose
+  @validateInput
+  async getNodeIdFromContractId(options: NodeIdFromContractIdModel) {
+    return await this.nodes.getNodeIdFromContractId(options.contractId, this.config.substrateURL);
   }
 }
 

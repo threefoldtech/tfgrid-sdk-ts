@@ -2,7 +2,7 @@
   <slot />
 </template>
 <script lang="ts" setup>
-import { provide, type Ref, ref, watch } from "vue";
+import { provide, type Ref, ref } from "vue";
 
 const subscribtion: any[] = [];
 const farm = ref() as Ref<number | undefined>;
@@ -10,9 +10,11 @@ const LoadingNodes = ref(false);
 provide("farm:manager", {
   setFarmId(_farm) {
     farm.value = _farm;
+    subscribtion.forEach(fn => fn(_farm));
   },
   subscribe(fn) {
     subscribtion.push(fn);
+    fn(farm.value);
     return () => {
       subscribtion.splice(subscribtion.indexOf(fn), 1);
     };
@@ -24,10 +26,6 @@ provide("farm:manager", {
     return LoadingNodes;
   },
 } as IFarm);
-
-watch(farm, farm => {
-  subscribtion.forEach(s => s(farm));
-});
 </script>
 <script lang="ts">
 import { inject } from "vue";

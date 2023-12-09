@@ -1,3 +1,4 @@
+import { RequestError, ValidationError } from "@threefold/types";
 import { default as AlgoSdk } from "algosdk";
 import axios from "axios";
 import * as PATH from "path";
@@ -42,12 +43,7 @@ class Algorand implements blockchainInterface {
       config.backendStorage,
       config.seed,
     );
-    this.tfClient = new TFClient(
-      this.config.substrateURL,
-      this.config.mnemonic,
-      this.config.storeSecret,
-      this.config.keypairType,
-    );
+    this.tfClient = config.tfclient;
   }
 
   private async saveIfKVStoreBackend(extrinsics) {
@@ -63,7 +59,7 @@ class Algorand implements blockchainInterface {
   async save(name: string, value: string) {
     const [path, data] = await this._load();
     if (data[name]) {
-      throw Error(`A wallet with the same name ${name} already exists`);
+      throw new ValidationError(`A wallet with the same name ${name} already exists.`);
     }
     const updateOperations = await this.backendStorage.update(path, name, value);
     await this.saveIfKVStoreBackend(updateOperations);
@@ -102,7 +98,7 @@ class Algorand implements blockchainInterface {
   async delete(options: BlockchainDeleteModel) {
     const [path, data] = await this._load();
     if (!data[options.name]) {
-      throw Error(`Couldn't find a wallet with name ${options.name}`);
+      throw new ValidationError(`Couldn't find a wallet with name ${options.name}.`);
     }
     const updateOperations = await this.backendStorage.update(path, options.name, "", StorageUpdateAction.delete);
     await this.saveIfKVStoreBackend(updateOperations);
@@ -112,7 +108,7 @@ class Algorand implements blockchainInterface {
   @validateInput
   async create(options: AlgorandAccountCreateModel): Promise<BlockchainCreateResultModel> {
     const account_exists = await this.exist({ name: options.name });
-    if (account_exists) throw Error(`Name ${options.name} already exists`);
+    if (account_exists) throw new ValidationError(`Name ${options.name} already exists.`);
 
     const account = await AlgoSdk.generateAccount();
     const account_mnemonic = AlgoSdk.secretKeyToMnemonic(account.sk);
@@ -164,7 +160,7 @@ class Algorand implements blockchainInterface {
   async get(options: BlockchainGetModel): Promise<BlockchainGetResultModel> {
     const [, data] = await this._load();
     if (!data[options.name]) {
-      throw Error(`Couldn't find a wallet with name ${options.name}`);
+      throw new ValidationError(`Couldn't find a wallet with name ${options.name}.`);
     }
     const mnemonic = data[options.name];
     const account = await AlgoSdk.mnemonicToSecretKey(mnemonic);
@@ -238,7 +234,7 @@ class Algorand implements blockchainInterface {
       const submitted_txn = await axios.post(urlJoin(this.baseUrl, `v2/transactions`), signedTxn?.blob);
       return submitted_txn.data;
     } catch (error) {
-      throw error.response.data.message;
+      throw new RequestError(error.response.data.message, error.response.status);
     }
   }
 }

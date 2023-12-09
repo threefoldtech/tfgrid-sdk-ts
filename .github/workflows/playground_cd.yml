@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - development
+      - development_313
     paths:
       - "packages/playground/**"
   workflow_dispatch:
@@ -19,6 +20,8 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=8192"
 
     strategy:
       matrix:
@@ -47,6 +50,7 @@ jobs:
           VERSION=${VERSION:0:7} NETWORK=dev yarn build
 
       - name: Copying files to staging server
+        if: ${{ github.ref == 'refs/heads/development' }}
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.DEV_REMOTE_HOST }}
@@ -57,4 +61,18 @@ jobs:
           port: ${{ secrets.PORT }}
           source: "packages/playground/dist/"
           target: "${{ secrets.PLAYGROUND_REMOTE_DIR }}"
+          strip_components: 3
+
+      - name: Copying files to staging server
+        if: ${{ github.ref == 'refs/heads/development_313' }}
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.DEV_REMOTE_HOST }}
+          username: ${{ secrets.DEV_REMOTE_USER }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          passphrase: ${{ secrets.DEV_SSH_KEY_PASSPHRASE }}
+          rm: true
+          port: ${{ secrets.PORT }}
+          source: "packages/playground/dist/"
+          target: "/opt/playground_new/devnet/dist"
           strip_components: 3

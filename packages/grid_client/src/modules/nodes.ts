@@ -1,10 +1,13 @@
-import urlJoin from "url-join";
+import { GridClientErrors, TFChainError } from "@threefold/types";
 
 import { TFClient } from "../clients";
 import { GridClientConfig } from "../config";
-import { events, send, validateInput } from "../helpers";
+import { events, validateInput } from "../helpers";
 import { expose } from "../helpers/expose";
+import { capacity } from "./capacity";
 import {
+  AddPublicConfig,
+  FilterOptions,
   NodeGetModel,
   NodePowerModel,
   RentContractCreateModel,
@@ -15,8 +18,10 @@ import { checkBalance } from "./utils";
 
 class Nodes {
   client: TFClient;
+  capacity: capacity;
   constructor(public config: GridClientConfig) {
-    this.client = new TFClient(config.substrateURL, config.mnemonic, config.storeSecret, config.keypairType);
+    this.client = config.tfclient;
+    this.capacity = new capacity(config);
   }
 
   @expose
@@ -25,14 +30,15 @@ class Nodes {
   async reserve(options: RentContractCreateModel) {
     const rentContractId = await this.getRentContractId({ nodeId: options.nodeId });
     if (rentContractId) {
-      throw Error(`Node is already rented`);
+      throw new GridClientErrors.Nodes.UnavailableNodeError(`Node is already rented.`);
     }
     try {
       const res = await (await this.client.contracts.createRent(options)).apply();
-      events.emit("logs", `Rent contract with id: ${res.contractId} has been created`);
+      events.emit("logs", `Rent contract with id: ${res.contractId} has been created.`);
       return res;
     } catch (e) {
-      throw Error(`Failed to create rent contract on node ${options.nodeId} due to ${e}`);
+      //TODO Errors should be handled in tfchain
+      throw new TFChainError(`Failed to create rent contract on node ${options.nodeId} due to ${e}`);
     }
   }
 
@@ -50,7 +56,7 @@ class Nodes {
       events.emit("logs", `Rent contract for node ${options.nodeId} has been deleted`);
       return res;
     } catch (e) {
-      throw Error(`Failed to delete rent contract on node ${options.nodeId} due to ${e}`);
+      throw new TFChainError(`Failed to delete rent contract on node ${options.nodeId} due to ${e}`);
     }
   }
 
@@ -63,7 +69,7 @@ class Nodes {
         return res;
       })
       .catch(err => {
-        throw Error(`Error getting rent for node ${options.nodeId}: ${err}`);
+        throw new TFChainError(`Error getting rent for node ${options.nodeId}: ${err}`);
       });
   }
 
@@ -78,6 +84,24 @@ class Nodes {
   @checkBalance
   async setNodePower(options: NodePowerModel) {
     return (await this.client.nodes.setPower(options)).apply();
+  }
+
+  @expose
+  @validateInput
+  @checkBalance
+  async addNodePublicConfig(options: AddPublicConfig) {
+    return (await this.client.nodes.addNodePublicConfig(options)).apply();
+  }
+
+  @expose
+  async all() {
+    return await this.capacity.getAllNodes();
+  }
+
+  @expose
+  @validateInput
+  async filter(options?: FilterOptions) {
+    return await this.capacity.filterNodes(options);
   }
 }
 

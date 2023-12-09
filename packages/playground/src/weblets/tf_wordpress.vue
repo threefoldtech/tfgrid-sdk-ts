@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/wordpress.png"
   >
     <template #title>Deploy a Wordpress Instance </template>
@@ -85,8 +86,8 @@
 
       <SelectSolutionFlavor
         v-model="solution"
-        :standard="{ cpu: 2, memory: 1024 * 2, disk: 50 }"
-        :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+        :medium="{ cpu: 2, memory: 4, disk: 50 }"
+        :large="{ cpu: 4, memory: 16, disk: 100 }"
         :disabled="loadingFarm"
       />
       <Networks v-model:ipv4="ipv4" />
@@ -102,9 +103,10 @@
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
           <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
-
+        <NodeSelector v-model="selection" />
         <SelectFarmManager>
           <SelectFarm
+            v-if="selection == Selection.AUTOMATED"
             :filters="{
               cpu: solution?.cpu,
               memory: solution?.memory,
@@ -115,10 +117,12 @@
             }"
             v-model="farm"
             v-model:loading="loadingFarm"
+            v-model:search="farmName"
           />
 
           <SelectNode
             v-model="selectedNode"
+            :selection="selection"
             :filters="{
               farmId: farm?.farmID,
               cpu: solution?.cpu,
@@ -149,11 +153,14 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
+import { Selection } from "@/utils/types";
+
+import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
+import type { FarmInterface, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
@@ -162,6 +169,7 @@ import { normalizeError } from "../utils/helpers";
 import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
+const selection = ref();
 const valid = ref(false);
 const profileManager = useProfileManager();
 const loadingFarm = ref(false);
@@ -171,7 +179,8 @@ const email = ref("");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const domainNameCmp = ref();
-const farm = ref() as Ref<Farm>;
+const farm = ref() as Ref<FarmInterface>;
+const farmName = ref();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/tf-wordpress-latest.flist",
   entryPoint: "/sbin/zinit init",
@@ -181,6 +190,16 @@ const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
+watch(
+  () => selection.value,
+  (value, oldValue) => {
+    if (value !== oldValue) {
+      loadingFarm.value = false;
+    }
+  },
+  { deep: false },
+);
+
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed a Wordpress instance.");
@@ -188,7 +207,7 @@ function finalize(deployment: any) {
 }
 async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
-  const projectName = ProjectName.Wordpress.toLowerCase();
+  const projectName = ProjectName.Wordpress.toLowerCase() + "/" + name.value;
   const subdomain = getSubdomain({
     deploymentName: name.value,
     projectName,

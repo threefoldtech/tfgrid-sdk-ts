@@ -1,8 +1,17 @@
 import { Contract, ExtrinsicResult } from "@threefold/tfchain_client";
+import {
+  BaseError,
+  GridClientError,
+  GridClientErrors,
+  TFChainError,
+  TimeoutError,
+  ValidationError,
+} from "@threefold/types";
 
 import { RMB } from "../clients";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
+import { formatErrorMessage } from "../helpers";
 import { events } from "../helpers/events";
 import { validateObject } from "../helpers/validator";
 import { DeploymentFactory, Nodes } from "../primitives/index";
@@ -16,7 +25,7 @@ class TwinDeploymentHandler {
   nodes: Nodes;
 
   constructor(public config: GridClientConfig) {
-    this.tfclient = new TFClient(config.substrateURL, config.mnemonic, config.storeSecret, config.keypairType);
+    this.tfclient = config.tfclient;
     this.deploymentFactory = new DeploymentFactory(this.config);
     this.rmb = new RMB(config.rmbClient);
     this.nodes = new Nodes(this.config.graphqlURL, this.config.proxyURL, this.config.rmbClient);
@@ -27,22 +36,23 @@ class TwinDeploymentHandler {
     if (id) {
       const c = await this.tfclient.contracts.get({ id });
       if (c && c.twinId !== this.config.twinId) {
-        throw Error(`Name contract with name ${name} is already reserved`);
+        throw new ValidationError(`Name contract with name ${name} is already reserved.`);
       }
     }
     try {
       return await this.tfclient.contracts.createName({ name });
     } catch (e) {
-      throw Error(`Failed to create name contract ${name} due to ${e}`);
+      //TODO ERROR should be handled in tfchain
+      throw new TFChainError(`Failed to create name contract ${name} due to ${e}.`);
     }
   }
 
   async deleteNameContract(name: string) {
     const c = await this.tfclient.contracts.getContractIdByName({ name });
     if (!c) {
-      events.emit("logs", `Couldn't find a name contract with name ${name} to delete`);
+      events.emit("logs", `Couldn't find a name contract with name ${name} to delete.`);
     } else {
-      events.emit("logs", `Deleting name contract with name: ${name} and id: ${c}`);
+      events.emit("logs", `Deleting name contract with name: ${name} and id: ${c}.`);
       return await this.tfclient.contracts.cancel({ id: c });
     }
   }
@@ -54,12 +64,16 @@ class TwinDeploymentHandler {
       const node_twin_id = await this.nodes.getNodeTwinId(twinDeployment.nodeId);
       await this.rmb.request([node_twin_id], `zos.deployment.${twinDeployment.operation}`, payload);
     } catch (e) {
-      throw Error(`Failed to ${twinDeployment.operation} the deployment on node ${twinDeployment.nodeId} due to ${e}`);
+      (e as Error).message = formatErrorMessage(
+        `Failed to ${twinDeployment.operation} the deployment on node ${twinDeployment.nodeId}.`,
+        e,
+      );
+      throw e;
     }
   }
 
   async getDeployment(contract_id: number) {
-    const node_id = await this.nodes.getNodeIdFromContractId(contract_id, this.config.mnemonic);
+    const node_id = await this.nodes.getNodeIdFromContractId(contract_id, this.config.substrateURL);
     const node_twin_id = await this.nodes.getNodeTwinId(node_id);
 
     const payload = JSON.stringify({ contract_id: contract_id });
@@ -69,8 +83,8 @@ class TwinDeploymentHandler {
   checkWorkload(workload: Workload, targetWorkload: Workload, nodeId: number): boolean {
     let state = false;
     if (workload.result.state === "error") {
-      throw Error(
-        `Failed to deploy ${workload.type} with name ${workload.name} on node ${nodeId} due to: ${workload.result.message}`,
+      throw new GridClientErrors.Workloads.WorkloadDeployError(
+        `Failed to deploy ${workload.type} with name ${workload.name} on node ${nodeId} due to: ${workload.result.message}.`,
       );
     } else if (workload.result.state === "ok") {
       state = true;
@@ -83,7 +97,7 @@ class TwinDeploymentHandler {
 
   async waitForDeployment(twinDeployment: TwinDeployment, timeout = this.config.deploymentTimeoutMinutes) {
     const contract_id = twinDeployment.deployment.contract_id;
-    const node_id = await this.nodes.getNodeIdFromContractId(contract_id, this.config.mnemonic);
+    const node_id = await this.nodes.getNodeIdFromContractId(contract_id, this.config.substrateURL);
 
     const now = new Date().getTime();
     while (new Date().getTime() < now + timeout * 1000 * 60) {
@@ -108,7 +122,7 @@ class TwinDeploymentHandler {
       }
       await new Promise(f => setTimeout(f, 2000));
     }
-    throw Error(`Deployment with contract_id: ${contract_id} failed to be ready after ${timeout} minutes`);
+    throw new TimeoutError(`Deployment with contract_id: ${contract_id} failed to be ready after ${timeout} minutes.`);
   }
 
   async waitForDeployments(twinDeployments: TwinDeployment[], timeout = this.config.deploymentTimeoutMinutes) {
@@ -265,6 +279,43 @@ class TwinDeploymentHandler {
     return deployments;
   }
 
+  async checkFarmIps(twinDeployments: TwinDeployment[]) {
+    const farmIPs: Map<number, number> = new Map();
+
+    for (const twinDeployment of twinDeployments) {
+      if (twinDeployment.operation !== Operations.deploy) {
+        continue;
+      }
+
+      if (twinDeployment.publicIps === 0) {
+        continue;
+      }
+
+      const node = await this.nodes.getNode(twinDeployment.nodeId);
+      if (!node) {
+        continue;
+      }
+      if (!farmIPs.has(node.farmId)) {
+        farmIPs.set(node.farmId, twinDeployment.publicIps);
+      } else {
+        farmIPs.set(node.farmId, farmIPs.get(node.farmId)! + twinDeployment.publicIps);
+      }
+    }
+
+    for (const farmId of farmIPs.keys()) {
+      const _farm = await this.tfclient.farms.get({ id: farmId });
+      const freeIps = _farm.publicIps.filter(res => res.contractId === 0).length;
+
+      if (freeIps < farmIPs.get(farmId)!) {
+        throw new GridClientErrors.Farms.InvalidResourcesError(
+          `Farm ${farmId} doesn't have enough public IPs: requested IPs=${farmIPs.get(
+            farmId,
+          )}, available IPs=${freeIps}.`,
+        );
+      }
+    }
+  }
+
   async checkNodesCapacity(twinDeployments: TwinDeployment[]) {
     for (const twinDeployment of twinDeployments) {
       let workloads: Workload[] = [];
@@ -310,7 +361,9 @@ class TwinDeploymentHandler {
           mru: mru / 1024 ** 3,
         }))
       ) {
-        throw Error(`Node ${twinDeployment.nodeId} doesn't have enough resources: sru=${sru}, mru=${mru}`);
+        throw new GridClientErrors.Nodes.InvalidResourcesError(
+          `Node ${twinDeployment.nodeId} doesn't have enough resources: sru=${sru}, mru=${mru} .`,
+        );
       }
       if (workloads.length && (rootfsDisks.length || ssdDisks.length || hddDisks.length)) {
         await this.nodes.verifyNodeStoragePoolCapacity(ssdDisks, hddDisks, rootfsDisks, +twinDeployment.nodeId);
@@ -439,6 +492,8 @@ class TwinDeploymentHandler {
     twinDeployments = await this.merge(twinDeployments);
     await this.validate(twinDeployments);
     await this.checkNodesCapacity(twinDeployments);
+    await this.checkFarmIps(twinDeployments);
+
     const contracts = { created: [], updated: [], deleted: [] };
     const resultContracts = { created: [], updated: [], deleted: [] };
     let nodeExtrinsics: ExtrinsicResult<Contract>[] = [];
@@ -476,6 +531,7 @@ class TwinDeploymentHandler {
             if (twinDeployment.deployment.challenge_hash() === contract.contractType.nodeContract.deploymentHash) {
               twinDeployment.deployment.contract_id = contract.contractId;
               if (
+                twinDeployment.returnNetworkContracts ||
                 !(
                   twinDeployment.deployment.workloads.length === 1 &&
                   twinDeployment.deployment.workloads[0].type === WorkloadTypes.network
@@ -500,6 +556,7 @@ class TwinDeploymentHandler {
             if (twinDeployment.deployment.challenge_hash() === contract.contractType.nodeContract.deploymentHash) {
               twinDeployment.nodeId = contract.contractType.nodeContract.nodeId;
               if (
+                twinDeployment.returnNetworkContracts ||
                 !(
                   twinDeployment.deployment.workloads.length === 1 &&
                   twinDeployment.deployment.workloads[0].type === WorkloadTypes.network
@@ -524,7 +581,8 @@ class TwinDeploymentHandler {
       await this.saveNetworks(twinDeployments);
     } catch (e) {
       await this.rollback(contracts);
-      throw Error(e);
+      if (e instanceof BaseError) throw e;
+      throw new GridClientError(`Couldn't handle twin Deployment due to: ${e} .`);
     }
     return resultContracts;
   }

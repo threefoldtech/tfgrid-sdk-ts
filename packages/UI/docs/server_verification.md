@@ -1,6 +1,10 @@
-# Node.js Server Example for PDF Signature Verification
+# Node.js Server Example for PDF/Editor Signature Verification
 
-This Node.js server is designed to facilitate communication between the server and the PDFSigner component. It includes a `verify` endpoint responsible for verifying requested signatures and returning the validation status.
+This Node.js server is designed to facilitate communication between the server and the `(PDFSigner, ScriptEditor)` components. It includes a `verify` endpoint responsible for verifying requested signatures and returning the validation status.
+
+# Vlang Server Example for PDF/Editor Signature Verification
+
+This Vlang server is designed to facilitate communication between the server and the `(PDFSigner, ScriptEditor)` components. It includes a `verify` endpoint responsible for printing out the request payload.
 
 ## Usage
 
@@ -27,6 +31,17 @@ The expected request body follows this TypeScript pattern:
 let payLoad: Payload = {
   twinid: 0,
   pdfUrl: "",
+  pubkey: "",
+  signature: "",
+};
+```
+
+The expected request body follows this Vlang pattern:
+
+```vlang
+payLoad := {
+  twinid: 0,
+  pdf_url: "",
   pubkey: "",
   signature: "",
 };
@@ -64,8 +79,16 @@ If the signature cannot be verified, the server will respond with an HTTP status
 
 ### How to run the server
 
+- NodeJS server
+
 ```sh
-$server_example npx ts-node src/server.ts
+$server_example/nodejs-server npx ts-node src/server.ts
 ```
 
-Use this Node.js server example to handle PDF signature verification within your application.
+- Vlang server
+
+```sh
+$server_example/vlang-server v run main.v
+```
+
+Use this NodeJS/Vlang servers examples to handle PDF/Editor signature verification within your application.

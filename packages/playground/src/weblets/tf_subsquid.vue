@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/subsquid.png"
   >
     <template #title>Deploy a Subsquid Instance </template>
@@ -37,15 +38,15 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip tooltip="Subsquid websockt endpoint.">
-          <v-text-field label="Websockt Endpoint" v-model="endpoint" v-bind="props" />
+        <input-tooltip tooltip="Subsquid websocket endpoint.">
+          <v-text-field label="Websocket Endpoint" v-model="endpoint" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
       <SelectSolutionFlavor
         v-model="solution"
-        :minimum="{ cpu: 1, memory: 1024, disk: 50 }"
-        :standard="{ cpu: 2, memory: 1024 * 2, disk: 100 }"
+        :small="{ cpu: 1, memory: 2, disk: 50 }"
+        :medium="{ cpu: 2, memory: 4, disk: 100 }"
         :disabled="loadingFarm"
       />
       <!-- <Networks v-model:ipv4="ipv4" /> -->
@@ -60,9 +61,10 @@
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
           <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
-
+        <NodeSelector v-model="selection" />
         <SelectFarmManager>
           <SelectFarm
+            v-if="selection == Selection.AUTOMATED"
             :filters="{
               cpu: solution?.cpu,
               memory: solution?.memory,
@@ -73,10 +75,12 @@
             }"
             v-model="farm"
             v-model:loading="loadingFarm"
+            v-model:search="farmName"
           />
 
           <SelectNode
             v-model="selectedNode"
+            :selection="selection"
             :filters="{
               farmId: farm?.farmID,
               cpu: solution?.cpu,
@@ -107,11 +111,14 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
+import { Selection } from "@/utils/types";
+
+import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
+import type { FarmInterface, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
@@ -120,13 +127,15 @@ import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
 
 const layout = useLayout();
+const selection = ref();
 const valid = ref(false);
 const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "ss" }));
 const endpoint = ref("");
 const ipv4 = ref(false);
 const solution = ref() as Ref<SolutionFlavor>;
-const farm = ref() as Ref<Farm>;
+const farm = ref() as Ref<FarmInterface>;
+const farmName = ref();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/subsquid-latest.flist",
   entryPoint: "/sbin/zinit init",
@@ -137,6 +146,15 @@ const loadingFarm = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const domainNameCmp = ref();
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
+watch(
+  () => selection.value,
+  (value, oldValue) => {
+    if (value !== oldValue) {
+      loadingFarm.value = false;
+    }
+  },
+  { deep: false },
+);
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
@@ -146,7 +164,7 @@ function finalize(deployment: any) {
 async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Subsquid.toLowerCase();
+  const projectName = ProjectName.Subsquid.toLowerCase() + "/" + name.value;
 
   const subdomain = getSubdomain({
     deploymentName: name.value,

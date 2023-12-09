@@ -1,3 +1,4 @@
+import { ValidationError } from "@threefold/types";
 import getAppDataPath from "appdata-path";
 import * as PATH from "path";
 
@@ -24,7 +25,7 @@ enum BackendStorageType {
 }
 
 class BackendStorage {
-  storage;
+  storage: BackendStorageInterface;
   constructor(
     public type: BackendStorageType = BackendStorageType.auto,
     substrateURL = "",
@@ -59,7 +60,7 @@ class BackendStorage {
       const storage = require("./localstorage");
       this.storage = new storage.LocalStorage();
     } else {
-      throw Error("Unsupported type for backend");
+      throw new ValidationError("Unsupported type for backend.");
     }
   }
 
@@ -76,8 +77,8 @@ class BackendStorage {
     return JSON.parse(data.toString());
   }
 
-  async list(key: string) {
-    return await this.storage.list(key);
+  list(key: string): Promise<string[]> {
+    return this.storage.list(key);
   }
 
   async remove(key: string) {

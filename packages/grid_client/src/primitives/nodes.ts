@@ -1,13 +1,21 @@
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
+import { QueryClient } from "@threefold/tfchain_client";
+import {
+  BaseError,
+  GridClientError,
+  GridClientErrors,
+  RequestError,
+  TFChainError,
+  ValidationError,
+} from "@threefold/types";
 import { default as PrivateIp } from "private-ip";
 import urlJoin from "url-join";
 
-import { GridClient } from "../client";
 import { RMB } from "../clients";
 import { Graphql } from "../clients/graphql/client";
-import { TFClient } from "../clients/tf-grid/client";
-import { send } from "../helpers/requests";
-import { FarmFilterOptions, FilterOptions } from "../modules/models";
+import { formatErrorMessage } from "../helpers";
+import { send, sendWithFullResponse } from "../helpers/requests";
+import { FarmFilterOptions, FilterOptions, NodeStatus } from "../modules/models";
 
 interface FarmInfo {
   name: string;
@@ -22,7 +30,7 @@ interface FarmInfo {
 interface PublicIps {
   id: string;
   ip: string;
-  contractId: number;
+  contract_id: number; // Added to match the one in the farm interface || TODO: Should we replace the whole http requests to be done with the gridProxy.
   gateway: string;
 }
 
@@ -36,6 +44,7 @@ interface NodeInfo {
   uptime: number;
   created: number;
   farmingPolicyId: number;
+  inDedicatedFarm: boolean;
   updatedAt: string;
   total_resources: NodeResources;
   used_resources: NodeResources;
@@ -49,6 +58,7 @@ interface NodeInfo {
   hasGPU: boolean;
   extraFee: number;
   rentedByTwinId: number;
+  rentContractId: number;
 }
 interface PublicConfig {
   domain: string;
@@ -102,49 +112,50 @@ class Nodes {
       .query(body, { nodeId: node_id })
       .then(response => {
         if (response["data"]["nodes"]["length"] === 0) {
-          throw Error(`Couldn't find a node with id: ${node_id}`);
+          throw new ValidationError(`Couldn't find a node with id: ${node_id}.`);
         }
         return response["data"]["nodes"][0]["twinID"];
       })
-      .catch(err => {
-        throw Error(`Error getting node twin ID for ID ${node_id}: ${err}`);
+      .catch(e => {
+        (e as Error).message = formatErrorMessage(`Error getting node twin ID for ID ${node_id}`, e);
+        throw e;
       });
   }
 
-  async getAccessNodes(): Promise<Record<string, unknown>> {
+  async getAccessNodes(availableFor?: number): Promise<Record<string, unknown>> {
     const accessNodes = {};
-    const nodes = await this.filterNodes({ accessNodeV4: true, accessNodeV6: true });
-    for (const node of nodes) {
-      const ipv4 = node.publicConfig.ipv4;
-      const ipv6 = node.publicConfig.ipv6;
-      const domain = node.publicConfig.domain;
-      if (PrivateIp(ipv4.split("/")[0]) === false) {
-        accessNodes[+node.nodeId] = { ipv4: ipv4, ipv6: ipv6, domain: domain };
+    let nodes: NodeInfo[] = [];
+    let page = 1;
+    do {
+      nodes = await this.filterNodes({ accessNodeV4: true, accessNodeV6: true, availableFor, page });
+      for (const node of nodes) {
+        const ipv4 = node.publicConfig.ipv4;
+        const ipv6 = node.publicConfig.ipv6;
+        const domain = node.publicConfig.domain;
+        if (PrivateIp(ipv4.split("/")[0]) === false) {
+          accessNodes[+node.nodeId] = { ipv4: ipv4, ipv6: ipv6, domain: domain };
+        }
       }
-    }
+      page++;
+    } while (nodes.length);
     if (Object.keys(accessNodes).length === 0) {
-      throw Error("Couldn't find any node with public config");
+      throw new GridClientErrors.Nodes.InvalidResourcesError("Couldn't find any node with public config.");
     }
-    console.log(accessNodes);
     return accessNodes;
   }
 
-  async getNodeIdFromContractId(contractId: number, mnemonic: string): Promise<number> {
-    const tfclient = new TFClient(
-      GridClient.config.substrateURL,
-      mnemonic,
-      GridClient.config.storeSecret,
-      GridClient.config.keypairType,
-    );
+  async getNodeIdFromContractId(contractId: number, substrateURL: string): Promise<number> {
+    const tfclient = new QueryClient(substrateURL);
     return tfclient.contracts
       .get({ id: contractId })
       .then(contract => {
         if (!contract.contractType.nodeContract)
-          throw Error(`Couldn't get node id for this contract ${contractId}. It's not a node contract`);
+          throw new ValidationError(`Couldn't get node id for this contract ${contractId}. It's not a node contract.`);
         return contract.contractType.nodeContract.nodeId;
       })
       .catch(err => {
-        throw Error(`Error getting node ID from contract ID ${contractId}: ${err}`);
+        //TODO add error handling in QueryClient/contracts
+        throw new TFChainError(`Error getting node ID from contract ID ${contractId}: ${err}`);
       });
   }
 
@@ -161,8 +172,9 @@ class Nodes {
       .then(res => {
         return res;
       })
-      .catch(err => {
-        throw Error(`Error listing farms with page ${page} and size ${pageSize}: ${err}`);
+      .catch((err: Error) => {
+        err.message = formatErrorMessage(`Error listing farms with page ${page} and size ${pageSize}`, err);
+        throw err;
       });
   }
 
@@ -171,7 +183,8 @@ class Nodes {
       const farmsCount = await this.gqlClient.getItemTotalCount("farms", "(orderBy: farmID_ASC)");
       return await this.getFarms(1, farmsCount, url);
     } catch (err) {
-      throw Error(`Error listing all farms: ${err}`);
+      (err as Error).message = formatErrorMessage(`Error listing all farms`, err);
+      throw err;
     }
   }
 
@@ -180,7 +193,7 @@ class Nodes {
       farms = await this.getAllFarms(url);
     }
     return farms
-      .filter(farm => farm.publicIps.filter(ip => ip.contractId === 0).length > 0)
+      .filter(farm => farm.publicIps.filter(ip => ip.contract_id === 0).length > 0)
       .map(farm => farm.farmId)
       .includes(farmId);
   }
@@ -193,8 +206,9 @@ class Nodes {
       .then(ret => {
         return ret;
       })
-      .catch(err => {
-        throw Error(`Error listing nodes with page ${page} and size ${pageSize}: ${err}`);
+      .catch(e => {
+        (e as Error).message = formatErrorMessage(`Error listing nodes with page ${page} and size ${pageSize}`, e);
+        throw e;
       });
   }
 
@@ -202,8 +216,9 @@ class Nodes {
     try {
       const nodesCount = await this.gqlClient.getItemTotalCount("nodes", "(orderBy: nodeID_ASC)");
       return await this.getNodes(1, nodesCount, url);
-    } catch (err) {
-      throw Error(`Error listing all nodes: ${err}`);
+    } catch (e) {
+      (e as Error).message = formatErrorMessage(`Error listing all nodes`, e);
+      throw e;
     }
   }
 
@@ -214,8 +229,9 @@ class Nodes {
         "nodes",
         `(where: {farmID_eq: ${farmId}}, orderBy: nodeID_ASC)`,
       );
-    } catch (err) {
-      throw Error(`Error getting total nodes count: ${err}`);
+    } catch (e) {
+      (e as Error).message = formatErrorMessage(`Error getting total nodes count`, e);
+      throw e;
     }
     let r: string;
     if (url) r = url;
@@ -224,10 +240,11 @@ class Nodes {
     return send("get", urlJoin(r, `/nodes?farm_id=${farmId}&size=${nodesCount}`), "", {})
       .then(res => {
         if (res) return res;
-        else throw new Error(`The farm with id ${farmId}: doesn't have any nodes`);
+        else throw new ValidationError(`The farm with id ${farmId}: doesn't have any nodes.`);
       })
-      .catch(err => {
-        throw Error(`Error getting nodes by farm ID ${farmId}: ${err}`);
+      .catch(e => {
+        (e as Error).message = formatErrorMessage(`Error getting nodes by farm ID ${farmId}`, e);
+        throw e;
       });
   }
 
@@ -240,8 +257,9 @@ class Nodes {
       .then(ret => {
         if (ret.length !== 0) return ret[0];
       })
-      .catch(err => {
-        throw Error(`Error getting node with ID ${nodeId}: ${err}`);
+      .catch(e => {
+        (e as Error).message = formatErrorMessage(`Error getting node with ID ${nodeId}`, e);
+        throw e;
       });
   }
 
@@ -255,14 +273,16 @@ class Nodes {
           const node: RMBNodeCapacity = res;
           const ret: NodeResources = { cru: 0, mru: 0, hru: 0, sru: 0, ipv4u: 0 };
 
+          ret.cru = +node.total.cru;
           ret.mru = +node.total.mru - +node.used.mru;
           ret.sru = +node.total.sru - +node.used.sru;
           ret.hru = +node.total.hru - +node.used.hru;
 
           return ret;
         })
-        .catch(err => {
-          throw Error(`Error getting node ${nodeId}: ${err}`);
+        .catch(e => {
+          (e as Error).message = formatErrorMessage(`Error getting node ${nodeId}`, e);
+          throw e;
         });
     }
 
@@ -274,22 +294,22 @@ class Nodes {
       .then(res => {
         const node: NodeCapacity = res;
         const ret: NodeResources = { cru: 0, mru: 0, hru: 0, sru: 0, ipv4u: 0 };
-
+        ret.cru = +node.capacity.total_resources.cru;
         ret.mru = +node.capacity.total_resources.mru - +node.capacity.used_resources.mru;
         ret.sru = +node.capacity.total_resources.sru - +node.capacity.used_resources.sru;
         ret.hru = +node.capacity.total_resources.hru - +node.capacity.used_resources.hru;
 
         return ret;
       })
-      .catch(err => {
-        console.log(err);
-        if (err.response.status === 404) {
-          throw Error(`Node: ${nodeId} is not found`);
-        } else if (err.response.status === 502) {
-          throw Error(`Node: ${nodeId} is not reachable`);
-        } else {
-          throw err;
+      .catch(e => {
+        if (e instanceof RequestError && e.statusCode == 404) {
+          throw new ValidationError(`Node: ${nodeId} is not found`);
         }
+        if (e instanceof BaseError) {
+          (e as Error).message = formatErrorMessage(`Couldn't get Node with ID ${nodeId}.`, e);
+          throw e;
+        }
+        throw new GridClientError(`Couldn't get Node with ID ${nodeId} due to ${e}`);
       });
   }
 
@@ -297,11 +317,7 @@ class Nodes {
     let nodes: NodeInfo[] = [];
     url = url || this.proxyURL;
     const query = this.getNodeUrlQuery(options);
-    try {
-      nodes = await send("get", urlJoin(url, `/nodes?${query}`), "", {});
-    } catch (err) {
-      throw Error(`Error while requesting the grid proxy due ${err}`);
-    }
+    nodes = await send("get", urlJoin(url, `/nodes?${query}`), "", {});
     if (nodes.length) {
       nodes = nodes.filter(n => !(options.nodeExclude && options.nodeExclude?.includes(n.nodeId)));
     }
@@ -311,12 +327,24 @@ class Nodes {
     let farms: FarmInfo[] = [];
     url = url || this.proxyURL;
     const query = this.getFarmUrlQuery(options);
-    try {
-      farms = await send("get", urlJoin(url, `/farms?${query}`), "", {});
-    } catch (err) {
-      throw Error(`Error while requesting the grid proxy due ${err}`);
-    }
+    farms = await send("get", urlJoin(url, `/farms?${query}`), "", {});
     return farms;
+  }
+
+  /**
+   * Retrieves the count of available farms with optional filter options.
+   *
+   * @param options - An object containing filter options to refine the farm count.
+   * @param url - (Optional) The URL to send the request to. If not provided, it defaults to the proxy URL defined in the class.
+   * @returns A Promise that resolves to the count of available farms as a number.
+   * @throws Error if there is an issue with the HTTP request or response.
+   */
+  async getFarmsCount(options: FilterOptions = {}, url = ""): Promise<number> {
+    url = url || this.proxyURL;
+    options.ret_count = true;
+    options.page = 1;
+    const query = this.getFarmUrlQuery(options);
+    return +(await sendWithFullResponse("get", urlJoin(url, `/farms?${query}`), "", {})).headers["count"];
   }
 
   /**
@@ -352,12 +380,13 @@ class Nodes {
       city: options.city,
       dedicated: options.dedicated,
       available_for: options.availableFor,
-      status: "up",
+      status: options.status ? options.status : NodeStatus.up,
       page: options.page,
       size: options.size,
       has_gpu: options.hasGPU,
       rented_by: options.rentedBy,
       rentable: options.rentable,
+      randomize: options.randomize,
     };
     if (options.gateway) {
       params["ipv4"] = true;
@@ -383,9 +412,13 @@ class Nodes {
       node_status: "up",
       page: options.page,
       size: options.size,
+      twin_id: options.ownedBy,
       node_has_gpu: options.nodeHasGPU,
       node_rented_by: options.nodeRentedBy,
       node_certified: options.nodeCertified,
+      farm_id: options.farmId,
+      randomize: options.randomize,
+      ret_count: options.ret_count,
     };
     return Object.entries(params)
       .map(param => param.join("="))
@@ -406,14 +439,18 @@ class Nodes {
 
   async nodeAvailableForTwinId(nodeId: number, twinId: number): Promise<boolean> {
     return send("get", urlJoin(this.proxyURL, `/nodes/${nodeId}`), "", {})
-      .then(node => {
-        if (node.rentedByTwinId != twinId && (node.dedicated || node.rentContractId != 0)) {
+      .then((node: NodeInfo) => {
+        if (node.rentedByTwinId != twinId && (node.inDedicatedFarm || node.rentContractId != 0)) {
           return false;
         }
         return true;
       })
-      .catch(err => {
-        throw Error(`Error checking if node ${nodeId} is available for twin ${twinId}: ${err}`);
+      .catch(e => {
+        (e as Error).message = formatErrorMessage(
+          `Error checking if node ${nodeId} is available for twin ${twinId}`,
+          e,
+        );
+        throw e;
       });
   }
 
@@ -456,7 +493,7 @@ class Nodes {
     disks.forEach(disk => {
       if (!this.allocateDiskToPools(pools, disk)) {
         throw new Error(
-          `Cannot fit the required ${type.toUpperCase()} disk with size ${(disk / 1024 ** 3).toFixed(2)} GB`,
+          `Cannot fit the required ${type.toUpperCase()} disk with size ${(disk / 1024 ** 3).toFixed(2)} GB.`,
         );
       }
       this.sortArrayDesc(pools);
@@ -489,8 +526,9 @@ class Nodes {
           disk.type === DiskTypes.SSD ? ssdPools.push(disk.size - disk.used) : hddPools.push(disk.size - disk.used);
         },
       );
-    } catch (err) {
-      throw new Error(`Error getting node ${nodeId}: ${err}`);
+    } catch (e) {
+      (e as Error).message = formatErrorMessage(`Error getting node ${nodeId}`, e);
+      throw e;
     }
 
     this.sortArrayDesc(hddPools);
@@ -506,11 +544,11 @@ class Nodes {
       this.fitDisksInDisksPool(rootFileSystemDisks, ssdPools, DiskTypes.SSD);
       return true;
     } catch (error) {
-      throw new Error(
+      throw new GridClientErrors.Nodes.DiskAllocationError(
         `${(error as Error).message}, on Node ${nodeId} with disk pools:
          SSD:  ${ssdPools.map(disk => (disk / 1024 ** 3).toFixed(2).toString() + "GB ")} 
          HDD:  ${hddPools.map(disk => (disk / 1024 ** 3).toFixed(2).toString() + "GB ")}
-    Please select another Node\n`,
+    Please select another Node.\n`,
       );
     }
   }

@@ -19,8 +19,8 @@
 
     <SelectSolutionFlavor
       v-model="$props.modelValue.solution"
-      :minimum="{ cpu: 1, memory: 1024, disk: 50 }"
-      :standard="{ cpu: 2, memory: 1024 * 2, disk: 100 }"
+      :small="{ cpu: 1, memory: 2, disk: 50 }"
+      :medium="{ cpu: 2, memory: 4, disk: 100 }"
       :disabled="loadingFarm"
     />
 
@@ -34,9 +34,10 @@
     <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
       <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" :disabled="loadingFarm" />
     </input-tooltip>
-
+    <NodeSelector v-model="selection" />
     <SelectFarmManager>
       <SelectFarm
+        v-if="selection == Selection.AUTOMATED"
         :filters="{
           cpu: $props.modelValue.solution?.cpu,
           memory: $props.modelValue.solution?.memory,
@@ -47,10 +48,12 @@
         }"
         v-model="$props.modelValue.farm"
         v-model:loading="loadingFarm"
+        v-model:search="farmName"
       />
 
       <SelectNode
         v-model="$props.modelValue.selectedNode"
+        :selection="selection"
         :filters="{
           farmId: $props.modelValue.farm?.farmID,
           cpu: $props.modelValue.solution?.cpu ?? 0,
@@ -66,9 +69,9 @@
 </template>
 
 <script lang="ts" setup>
+import NodeSelector from "../components/node_selection.vue";
 import { useProfileManager } from "../stores";
 import rootFs from "../utils/root_fs";
-
 const emits = defineEmits<{ (event: "update:loading", value: boolean): void }>();
 const props = defineProps<{ modelValue: CaproverWorker }>();
 const rootFilesystemSize = computed(() =>
@@ -76,15 +79,27 @@ const rootFilesystemSize = computed(() =>
 );
 const profileManager = useProfileManager();
 const farmManager = useFarm();
+const selection = ref();
 const loadingFarm = ref(farmManager?.getLoading());
-
+const farmName = ref();
 watch(loadingFarm, (loadingFarm): void => {
   emits("update:loading", loadingFarm!);
 });
+watch(
+  () => selection.value,
+  (value, oldValue) => {
+    if (value !== oldValue) {
+      loadingFarm.value = false;
+    }
+  },
+  { deep: false },
+);
 </script>
 
 <script lang="ts">
 import { computed, ref, watch } from "vue";
+
+import { Selection } from "@/utils/types";
 
 import SelectFarmManager, { useFarm } from "../components/select_farm_manager.vue";
 import SelectNode from "../components/select_node.vue";

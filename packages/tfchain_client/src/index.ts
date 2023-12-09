@@ -1,4 +1,5 @@
 export * from "./balances";
+export * from "./dao";
 export * from "./client";
 export * from "./contracts";
 export * from "./farms";
@@ -10,3 +11,4 @@ export * from "./tft_price";
 export * from "./twins";
 export * from "./types";
 export * from "./utility";
+export * from "./tft_bridge";
