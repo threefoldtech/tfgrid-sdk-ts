@@ -117,8 +117,8 @@
               hide-details
             />
           </input-tooltip>
-          <NodeSelector v-model="selection" />
           <SelectFarmManager>
+            <NodeSelector v-model="selection" />
             <SelectFarm
               v-if="selection == Selection.AUTOMATED"
               :filters="{

@@ -50,8 +50,8 @@
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
         <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
       </input-tooltip>
-      <NodeSelector v-model="selection" />
       <SelectFarmManager>
+        <NodeSelector v-model="selection" />
         <FarmGateWayManager>
           <SelectFarm
             v-if="selection == Selection.AUTOMATED"
