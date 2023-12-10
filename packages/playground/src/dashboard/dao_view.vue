@@ -188,10 +188,10 @@
             </form-validator>
           </v-card-text>
           <v-card-actions class="justify-end">
+            <v-btn @click="openVDialog = false" color="grey lighten-2 black--text">Close</v-btn>
             <v-btn @click="castVote" :loading="loadingVote" color="primary white--text" :disabled="!isValidFarm"
               >Vote</v-btn
             >
-            <v-btn @click="openVDialog = false" color="grey lighten-2 black--text">Close</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

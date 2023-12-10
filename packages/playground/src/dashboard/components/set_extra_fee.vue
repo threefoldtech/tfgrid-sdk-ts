@@ -43,6 +43,7 @@
             </form-validator>
           </div>
           <v-card-actions class="justify-end px-5 pb-5 pt-0">
+            <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
             <v-btn
               color="primary"
               variant="tonal"
@@ -51,7 +52,6 @@
               :disabled="!valid || isSetting || isDisabled"
               >Save</v-btn
             >
-            <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
