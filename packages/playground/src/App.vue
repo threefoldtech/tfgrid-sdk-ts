@@ -143,13 +143,7 @@
           height="50"
         >
           <v-container>
-            <v-row class="justify-end">
-              <v-btn
-                icon="mdi-arrow-left"
-                v-if="navbarConfig.back"
-                class="align-self-center mr-auto"
-                @click="navigateToPrevRoute(navbarConfig.path)"
-              ></v-btn>
+            <v-row>
               <v-breadcrumbs :items="navbarConfig.path" active-color="secondary">
                 <template v-slot:divider>
                   <v-icon icon="mdi-chevron-right"></v-icon>
