@@ -1,5 +1,5 @@
 import type { ComputedRef, Ref } from "vue";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 export type AsyncTask<T, A extends any[]> = (...args: A) => Promise<T>;
 export interface TaskResult<T, E, A extends any[]> {
@@ -11,11 +11,6 @@ export interface TaskResult<T, E, A extends any[]> {
 
 export type UseAsyncReturn<T, E, A extends any[]> = ComputedRef<TaskResult<T, E, A>>;
 
-export interface UseAsyncOptions {
-  trigger?: boolean;
-  preventMutlipleRun?: boolean;
-}
-
 export type AsyncTaskOptions<A extends any[]> = { init?: boolean; defaultArgs?: A };
 function normalizeOptions<A extends any[]>(options: AsyncTaskOptions<A> = {}): Required<AsyncTaskOptions<A>> {
   return {
@@ -24,7 +19,7 @@ function normalizeOptions<A extends any[]>(options: AsyncTaskOptions<A> = {}): R
   };
 }
 
-export function useAsync<T, E, A extends any[] = []>(
+export function useAsync<T, E = Error, A extends any[] = []>(
   task: AsyncTask<T, A>,
   options?: AsyncTaskOptions<A>,
 ): UseAsyncReturn<T, E, A> {
@@ -34,28 +29,33 @@ export function useAsync<T, E, A extends any[] = []>(
   const error = ref(null) as Ref<E | null>;
   const loading = ref(false) as Ref<boolean>;
 
-  let runningTasks = 0;
+  let taskIdCounter = 0;
+
   async function run(...args: A) {
-    runningTasks++;
+    const taskId = ++taskIdCounter;
     loading.value = true;
     error.value = null;
     data.value = null;
 
     try {
-      data.value = await task(...args);
+      const res = await task(...args);
+      if (taskId === taskIdCounter) {
+        data.value = res;
+      }
     } catch (err) {
-      data.value = null;
-      error.value = err as E;
+      if (taskId === taskIdCounter) {
+        data.value = null;
+        error.value = err as E;
+      }
     } finally {
-      runningTasks--;
-      if (runningTasks === 0) {
+      if (taskId === taskIdCounter) {
         loading.value = false;
       }
     }
   }
 
   if (_options.init) {
-    run(..._options.defaultArgs);
+    onMounted(() => run(..._options.defaultArgs));
   }
 
   return computed(() => {

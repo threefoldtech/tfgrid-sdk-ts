@@ -8,23 +8,31 @@
       <v-radio label="Manual" value="manual"></v-radio>
     </v-radio-group>
 
-    <TfSelectLocation />
+    <div v-if="wayToSelect === 'automated'">
+      <TfSelectLocation v-model="location" />
+    </div>
+
+    <div v-else>Manual (not yet implemented)</div>
   </section>
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import { type Ref, ref } from "vue";
 
+import type { SelectedLocation } from "../../types/nodeSelector";
 import TfSelectLocation from "./TfSelectLocation.vue";
 
 export default {
   name: "TfSelectNode",
   components: { TfSelectLocation },
   setup() {
-    const wayToSelect = ref<"manual" | "automated">("automated");
+    const wayToSelect = ref<"manual" | "automated">("automated") as Ref;
+    const location = ref<SelectedLocation>({ region: "Europe" });
 
     return {
       wayToSelect,
+
+      location,
     };
   },
 };
