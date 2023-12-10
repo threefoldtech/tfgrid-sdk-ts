@@ -444,11 +444,7 @@ async function loadNodes() {
 
           if (index !== -1) {
             selectedNode.value = availableNodes.value[index];
-          } else {
-            validator.value?.setStatus(ValidatorStatus.Init);
           }
-        } else {
-          validator.value?.setStatus(ValidatorStatus.Init);
         }
       }
     }
@@ -462,7 +458,7 @@ async function loadNodes() {
 
     errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
   } finally {
-    validator.value?.setStatus(ValidatorStatus.Init);
+    validator.value?.setStatus(selectedNode.value ? ValidatorStatus.Pending : ValidatorStatus.Init);
     loadingNodes.value = false;
     farmManager?.setLoading(false);
   }
