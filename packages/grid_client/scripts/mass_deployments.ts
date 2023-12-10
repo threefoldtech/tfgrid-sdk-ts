@@ -105,7 +105,6 @@ async function main() {
 
       if (onlineNodes.length <= 0) {
         errors.push("No online nodes available for deployment");
-        failedCount++;
         continue;
       }
       const selectedNode = onlineNodes.pop();
