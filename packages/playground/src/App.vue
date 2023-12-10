@@ -143,7 +143,13 @@
           height="50"
         >
           <v-container>
-            <v-row>
+            <v-row class="justify-end">
+              <v-btn
+                icon="mdi-arrow-left"
+                v-if="navbarConfig.back"
+                class="align-self-center mr-auto"
+                @click="navigateToPrevRoute(navbarConfig.path)"
+              ></v-btn>
               <v-breadcrumbs :items="navbarConfig.path" active-color="secondary">
                 <template v-slot:divider>
                   <v-icon icon="mdi-chevron-right"></v-icon>
@@ -154,12 +160,6 @@
                   </router-link>
                 </template>
               </v-breadcrumbs>
-              <v-btn
-                icon="mdi-arrow-right"
-                v-if="navbarConfig.back"
-                class="align-self-center ml-auto"
-                @click="navigateToPrevRoute(navbarConfig.path)"
-              ></v-btn>
             </v-row>
           </v-container>
         </v-toolbar>
