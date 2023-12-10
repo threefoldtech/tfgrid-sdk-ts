@@ -154,6 +154,12 @@
                   </router-link>
                 </template>
               </v-breadcrumbs>
+              <v-btn
+                icon="mdi-arrow-right"
+                v-if="navbarConfig.back"
+                class="align-self-center ml-auto"
+                @click="navigateToPrevRoute(navbarConfig.path)"
+              ></v-btn>
             </v-row>
           </v-container>
         </v-toolbar>
@@ -226,6 +232,13 @@ onMounted(() => {
 
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
+
+function navigateToPrevRoute(path: any) {
+  const firstItem = path[0];
+  if (firstItem && firstItem.to) {
+    $router.push(firstItem.to);
+  }
+}
 
 const routes: AppRoute[] = [
   {
