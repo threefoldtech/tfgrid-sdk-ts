@@ -77,7 +77,7 @@ const emits = defineEmits<{
   (event: "update:search", value?: string): void;
 }>();
 
-const SIZE = 1;
+const SIZE = 20;
 const page = ref();
 const farmInput = useInputRef();
 const profileManager = useProfileManager();
