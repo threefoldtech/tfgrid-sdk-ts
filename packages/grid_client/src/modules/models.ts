@@ -23,6 +23,7 @@ import { Deployment } from "../zos/deployment";
 import { ZdbModes } from "../zos/zdb";
 import { blockchainType } from "./blockchainInterface";
 const NameLength = 15;
+const FarmNameLength = 40;
 
 enum ContractStates {
   Created = "Created",
@@ -215,7 +216,7 @@ class QSFSZDBGetModel extends BaseGetDeleteModel {}
 class QSFSZDBDeleteModel extends BaseGetDeleteModel {}
 
 class BaseGatewayNameModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength + 10) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength + 20) name: string;
 }
 
 class GatewayFQDNModel extends BaseGatewayNameModel {
@@ -699,7 +700,7 @@ class AddStellarAddressToFarmModel {
 }
 
 class CreateFarmModel {
-  @Expose() @IsString() @IsNotEmpty() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() @MaxLength(FarmNameLength) name: string;
   @Expose()
   @IsOptional()
   @Type(() => FarmPublicIPsModel)

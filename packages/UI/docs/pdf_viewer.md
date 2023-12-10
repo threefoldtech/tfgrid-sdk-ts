@@ -3,7 +3,8 @@
 ## Table of Contents
 
 1. [Introduction](#introduction)
-2. [Usage](#usage)
+2. [Installation](#installation)
+3. [Usage](#usage)
    - [Building the PDF Signer](#building-the-pdf-signer)
    - [Example of Usage](#example-of-usage)
    - [Using Providers and Extensions](#using-providers-and-extensions)
@@ -18,6 +19,31 @@ The PDF Signer Web Component simplifies the process of signing PDF documents and
 - Easily sign PDF documents.
 - Seamlessly submit signed documents to a designated endpoint.
 
+## Installation
+
+To install the `UI` package via [npm](https://www.npmjs.com/), use the following command:
+
+```sh
+npm i @threefold/ui
+```
+
+Then, import the package and its styles into your project:
+
+```vue
+<script setup lang="ts">
+import "@threefold2/ui";
+import "@threefold2/ui/dist/tailwind.css"; // Import the style from the dist files
+</script>
+<template>
+  <!-- Example usage of the PDF signer component -->
+  <pdf-signer
+    dest="http://localhost:3000/api/verify"
+    pdfUrl="https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf"
+    network="dev"
+  />
+</template>
+```
+
 ## Usage
 
 ### Building the PDF Signer
@@ -28,13 +54,13 @@ To use the PDF Signer Web Component, follow these steps:
 
 2. Navigate to the `repository/packages/UI` directory.
 
-3. Choose which provider you are going to use [see providers section](#using-providers-and-extensions)
+3. Choose the provider you are going to use [see providers section](#using-providers-and-extensions).
 
 4. Run `yarn build` to generate the required distribution files.
 
 5. Locate the `dist` folder created in the previous step.
 
-6. Copy the `dist/threefold-ui.umd.js` file and include it in your project's HTML files.
+6. Copy the `dist/threefold-ui.umd.js` file and include it in your project's HTML files:
 
 ```html
 <body>
@@ -43,7 +69,7 @@ To use the PDF Signer Web Component, follow these steps:
 </body>
 ```
 
-6. Copy the `dist/tailwind.css` file and use it for styling.
+7. Copy the `dist/tailwind.css` file and use it for styling:
 
 ```html
 <head>
@@ -52,7 +78,7 @@ To use the PDF Signer Web Component, follow these steps:
 </head>
 ```
 
-7. Include the `pdf-signer` custom element tag in your HTML file as follows:
+8. Include the `pdf-signer` custom element tag in your HTML file as follows:
 
 ```html
 <body>
@@ -64,7 +90,7 @@ To use the PDF Signer Web Component, follow these steps:
 </body>
 ```
 
-8. The `pdf-signer` HTML tag accepts three parameters:
+9. The `pdf-signer` HTML tag accepts three parameters:
 
 - `dest`: The destination where the signed script should be sent. Refer to [this document](./server_verification.md) for more information, and you can find a [server example here](../examples/server-example/).
 
@@ -117,14 +143,13 @@ The PDF Signer Web Component now supports providers and extensions for enhanced 
 
 - **threefoldConnectorProvider**: An extension that connects to the Threefold Connector extension for enhanced capabilities.
 
-To specify the provider or extension to use, you can set an environment variable in your project. For example, to use the `threefoldSignerProvider`, set the following environment variable:
+To specify the provider or extension to use, set an environment variable in your project. For example, to use the `threefoldSignerProvider`, set the following environment variable:
 
 ```bash
 VITE_MNEMONIC="<your_mnemonic_here>"
 ```
 
-and to use the `threefoldConnectorProvider` extension please make sure that you installed and enabled access the extension. `PS: The extension is still under development`
-comment the above line to be:
+To use the `threefoldConnectorProvider` extension, ensure it is installed and enabled. (Note: The extension is still under development.) You can comment out the mnemonic line as follows:
 
 ```bash
 # VITE_MNEMONIC="<your_mnemonic_here>"

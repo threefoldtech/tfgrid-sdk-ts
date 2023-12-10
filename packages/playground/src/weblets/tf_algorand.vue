@@ -152,9 +152,10 @@
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
         <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
       </input-tooltip>
-
+      <NodeSelector v-model="selection" />
       <SelectFarmManager>
         <SelectFarm
+          v-if="selection == Selection.AUTOMATED"
           :filters="{
             cpu: cpu,
             memory: memory,
@@ -169,6 +170,7 @@
         />
         <SelectNode
           v-model="selectedNode"
+          :selection="selection"
           :filters="{
             farmId: farm?.farmID,
             cpu,
@@ -196,6 +198,10 @@
 <script lang="ts" setup>
 import { computed, type Ref, ref, watch } from "vue";
 
+import { Selection } from "@/utils/types";
+
+import Network from "../components/networks.vue";
+import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type FarmInterface, type Flist, ProjectName, type Validators } from "../types";
@@ -207,6 +213,7 @@ const layout = useLayout();
 const valid = ref(false);
 const lastRoundInput = ref();
 const profileManager = useProfileManager();
+const selection = ref();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/algorand-latest.flist",
   entryPoint: "/sbin/zinit init",
@@ -230,6 +237,15 @@ const loadingFarm = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const rootFilesystemSize = computed(() => storage.value);
 watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()));
+watch(
+  () => selection.value,
+  (value, oldValue) => {
+    if (value !== oldValue) {
+      loadingFarm.value = false;
+    }
+  },
+  { deep: false },
+);
 
 async function deploy() {
   layout.value.setStatus("deploy");

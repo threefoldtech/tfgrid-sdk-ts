@@ -68,9 +68,10 @@
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
           <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
-
+        <NodeSelector v-model="selection" />
         <SelectFarmManager>
           <SelectFarm
+            v-if="selection == Selection.AUTOMATED"
             :filters="{
               cpu: solution?.cpu,
               memory: solution?.memory,
@@ -85,6 +86,7 @@
           />
           <SelectNode
             v-model="selectedNode"
+            :selection="selection"
             :filters="{
               farmId: farm?.farmID,
               cpu: solution?.cpu,
@@ -188,9 +190,12 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
+
+import { Selection } from "@/utils/types";
 
 import Network from "../components/networks.vue";
+import NodeSelector from "../components/node_selection.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
@@ -198,9 +203,9 @@ import { type FarmInterface, type Flist, ProjectName } from "../types";
 import { deployVM, type Disk, type Env } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
-
 const layout = useLayout();
 const tabs = ref();
+const selection = ref();
 const profileManager = useProfileManager();
 
 const images = [
@@ -266,6 +271,15 @@ function addDisk() {
     mountPoint: "/mnt/" + name,
   });
 }
+watch(
+  () => selection.value,
+  (value, oldValue) => {
+    if (value !== oldValue) {
+      loadingFarm.value = false;
+    }
+  },
+  { deep: false },
+);
 
 async function deploy() {
   layout.value.setStatus("deploy");

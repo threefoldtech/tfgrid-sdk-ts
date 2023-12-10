@@ -86,9 +86,10 @@
               hide-details
             />
           </input-tooltip>
-
+          <NodeSelector v-model="selection" />
           <SelectFarmManager>
             <SelectFarm
+              v-if="selection == Selection.AUTOMATED"
               :filters="{
                 cpu: solution?.cpu,
                 memory: solution?.memory,
@@ -104,6 +105,7 @@
 
             <SelectNode
               v-model="selectedNode"
+              :selection="selection"
               :filters="{
                 farmId: farm?.farmID,
                 cpu: solution?.cpu,
@@ -145,8 +147,11 @@
 import type { GridClient } from "@threefold/grid_client";
 import { Buffer } from "buffer";
 import TweetNACL from "tweetnacl";
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
+import { Selection } from "@/utils/types";
+
+import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import type { FarmInterface, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
@@ -157,11 +162,10 @@ import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 import { generateName, generatePassword } from "../utils/strings";
-
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
-
+const selection = ref();
 const name = ref(generateName({ prefix: "dc" }));
 const email = ref("");
 const solution = ref() as Ref<SolutionFlavor>;
@@ -179,6 +183,15 @@ const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.2.flist",
   entryPoint: "/sbin/zinit init",
 };
+watch(
+  () => selection.value,
+  (value, oldValue) => {
+    if (value !== oldValue) {
+      loadingFarm.value = false;
+    }
+  },
+  { deep: false },
+);
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();

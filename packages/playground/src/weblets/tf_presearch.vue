@@ -68,9 +68,10 @@
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
           <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
-
+        <NodeSelector v-model="selection" />
         <SelectFarmManager>
           <SelectFarm
+            v-if="selection == Selection.AUTOMATED"
             :filters="{
               cpu,
               memory,
@@ -87,6 +88,7 @@
 
           <SelectNode
             v-model="selectedNode"
+            :selection="selection"
             :filters="{
               farmId: farm?.farmID,
               cpu,
@@ -128,9 +130,12 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref } from "vue";
+import { type Ref, ref, watch } from "vue";
+
+import { Selection } from "@/utils/types";
 
 import Network from "../components/networks.vue";
+import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import { type FarmInterface, type Flist, ProjectName } from "../types";
@@ -143,7 +148,7 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
-
+const selection = ref();
 const name = ref(generateName({ prefix: "ps" }));
 const code = ref("");
 const ipv4 = ref(false);
@@ -165,6 +170,15 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
+watch(
+  () => selection.value,
+  (value, oldValue) => {
+    if (value !== oldValue) {
+      loadingFarm.value = false;
+    }
+  },
+  { deep: false },
+);
 
 async function deploy() {
   layout.value.setStatus("deploy");

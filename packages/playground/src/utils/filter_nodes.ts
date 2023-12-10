@@ -14,7 +14,7 @@ export interface INode {
   nodeId: number;
   state?: string;
   cards?: NodeGPUCardType[];
-  certified: string;
+  certified?: string;
 }
 
 export async function getNodeCards(grid: GridClient, nodeId: number): Promise<NodeGPUCardType[]> {
@@ -63,7 +63,7 @@ export type DedicatedNodeFilters = {
 };
 
 // Default input Initialization
-export const inputsInitializer: FilterNodeInputs = {
+export const inputsInitializer: () => FilterNodeInputs = () => ({
   nodeId: {
     label: "Node ID",
     placeholder: "Filter by node id.",
@@ -72,6 +72,7 @@ export const inputsInitializer: FilterNodeInputs = {
         isNumeric("This field accepts numbers only.", { no_symbols: true }),
         min("The node id should be larger then zero.", 1),
         startsWith("The node id start with zero.", "0"),
+        validateResourceMaxNumber("This is not a valid ID."),
       ],
     ],
     type: "text",
@@ -148,15 +149,19 @@ export const inputsInitializer: FilterNodeInputs = {
     ],
     type: "text",
   },
-};
+});
 
-export const DedicatedNodeInitializer: DedicatedNodeFilters = {
+export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
   total_cru: {
     label: "Total CPU (Cores)",
     placeholder: "Filter by total Cores.",
     type: "text",
     rules: [
-      [isNumeric("This Field accepts only a valid number."), min("This Field must be a number larger than 0.", 1)],
+      [
+        isNumeric("This Field accepts only a valid number."),
+        min("This Field must be a number larger than 0.", 1),
+        validateResourceMaxNumber("This value is out of range."),
+      ],
     ],
   },
   total_mru: {
@@ -226,4 +231,4 @@ export const DedicatedNodeInitializer: DedicatedNodeFilters = {
       ],
     ],
   },
-};
+});

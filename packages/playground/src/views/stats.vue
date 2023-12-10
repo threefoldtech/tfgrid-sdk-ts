@@ -24,30 +24,31 @@
               </v-btn>
             </v-alert>
           </v-col>
-          <v-col cols="12" sm="12" md="12" lg="8" class="mx-auto mt-3">
+          <v-col cols="7" class="mx-auto mt-15 pr-2">
             <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
           </v-col>
-          <v-divider class="v-divider--vertical mx-2 my-4" />
+          <v-divider class="v-divider--vertical mx-2 my-4" sm="0" />
           <v-col v-if="Istats.length !== 0" class="d-flex flex-wrap justify-center">
-            <v-col v-for="item of Istats" :key="item.title" xl="6" lg="6" md="4" sm="12" cols="12" class="px-2 py-0">
+            <v-col v-for="item of Istats" :key="item.title" xl="4" lg="6" md="12" sm="12" cols="12" class="px-2 py-2">
               <StatisticsCard :item="item" />
             </v-col>
           </v-col>
         </v-row>
       </v-card>
-      <!-- <v-divider class="mt-4 mb-2" /> -->
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { NodeStatus, type Stats } from "@threefold/gridproxy_client";
+import { NodeStatus, type Stats as GridProxyStats } from "@threefold/gridproxy_client";
 import { onMounted, ref } from "vue";
 
 import { gridProxyClient } from "../clients";
 import StatisticsCard from "../components/statistics_card.vue";
 import type { IStatistics as IStatistics } from "../types";
 import toTeraOrGigaOrPeta from "../utils/toTeraOrGegaOrPeta";
+
+type Stats = GridProxyStats & { gpus: number };
 
 const loading = ref(true);
 const failed = ref(false);
@@ -65,7 +66,8 @@ const fetchStats = async () => {
       loading.value = true;
       failed.value = false;
       const data = await gridProxyClient.stats.get({ status: NodeStatus.Up });
-      return data;
+
+      return data as Stats;
     } catch (error) {
       if (retryCount < 3) {
         console.log("Error fetching stats:", error);
@@ -97,12 +99,14 @@ const fetchData = async () => {
         { data: toTeraOrGigaOrPeta(stats!.totalSru.toString()), title: "SSD Storage", icon: "mdi-nas" },
         { data: toTeraOrGigaOrPeta(stats!.totalHru.toString()), title: "HDD Storage", icon: "mdi-harddisk" },
         { data: toTeraOrGigaOrPeta(stats!.totalMru.toString()), title: "RAM", icon: "mdi-memory" },
+        { data: stats!.gpus, title: "GPUs", icon: "mdi-memory" },
         { data: stats!.accessNodes, title: "Access Nodes", icon: "mdi-gate" },
         { data: stats!.gateways, title: "Gateways", icon: "mdi-boom-gate-outline" },
         { data: stats!.twins, title: "Twins", icon: "mdi-brain" },
         { data: stats!.publicIps, title: "Public IPs", icon: "mdi-access-point" },
         { data: stats!.contracts, title: "Contracts", icon: "mdi-file-document-edit-outline" },
       ];
+
       loading.value = false;
     }
   } catch (error) {
