@@ -11,6 +11,7 @@ class Utility {
 
   @checkConnection
   async batch<T>(extrinsics: ExtrinsicResult<T>[]): Promise<T[]> {
+    extrinsics = extrinsics.filter(Boolean);
     if (extrinsics.length > 0) {
       const { resultSections, resultEvents } = this.extractResultSectionsAndEvents(extrinsics);
       const batchExtrinsic = await this.client.api.tx.utility.batch(extrinsics);
@@ -21,6 +22,7 @@ class Utility {
 
   @checkConnection
   async batchAll<T>(extrinsics: ExtrinsicResult<T>[]): Promise<T[]> {
+    extrinsics = extrinsics.filter(Boolean);
     if (extrinsics.length > 0) {
       const { resultSections, resultEvents } = this.extractResultSectionsAndEvents(extrinsics);
       const batchAllExtrinsic = await this.client.api.tx.utility.batchAll(extrinsics);
