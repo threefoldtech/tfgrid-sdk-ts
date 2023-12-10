@@ -40,13 +40,15 @@
 </template>
 
 <script lang="ts" setup>
-import { NodeStatus, type Stats } from "@threefold/gridproxy_client";
+import { NodeStatus, type Stats as GridProxyStats } from "@threefold/gridproxy_client";
 import { onMounted, ref } from "vue";
 
 import { gridProxyClient } from "../clients";
 import StatisticsCard from "../components/statistics_card.vue";
 import type { IStatistics as IStatistics } from "../types";
 import toTeraOrGigaOrPeta from "../utils/toTeraOrGegaOrPeta";
+
+type Stats = GridProxyStats & { gpus: number };
 
 const loading = ref(true);
 const failed = ref(false);
@@ -65,7 +67,7 @@ const fetchStats = async () => {
       failed.value = false;
       const data = await gridProxyClient.stats.get({ status: NodeStatus.Up });
 
-      return data;
+      return data as Stats;
     } catch (error) {
       if (retryCount < 3) {
         console.log("Error fetching stats:", error);

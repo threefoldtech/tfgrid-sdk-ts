@@ -59,5 +59,6 @@ export default {
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
+  font-size: 16px;
 }
 </style>

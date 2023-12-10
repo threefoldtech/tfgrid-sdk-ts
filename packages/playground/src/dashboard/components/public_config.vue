@@ -90,6 +90,7 @@
               >Remove Config</v-btn
             >
             <div>
+              <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
               <v-btn
                 color="primary"
                 variant="tonal"
@@ -99,7 +100,6 @@
               >
                 Save
               </v-btn>
-              <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
             </div>
           </v-card-actions>
         </v-card>

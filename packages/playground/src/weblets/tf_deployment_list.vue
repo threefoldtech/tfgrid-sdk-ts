@@ -346,10 +346,10 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
+        <v-btn color="error" variant="tonal" @click="deletingDialog = false">Close</v-btn>
         <v-btn color="error" variant="outlined" @click="onDelete(tabs[activeTab].value.toLowerCase() === 'kubernetes')">
           Delete
         </v-btn>
-        <v-btn color="error" variant="tonal" @click="deletingDialog = false">Close</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

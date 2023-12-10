@@ -131,7 +131,7 @@
         </v-toolbar>
 
         <v-toolbar
-          v-if="navbarConfig"
+          v-if="navbarConfig && hasActiveProfile"
           :color="theme.name.value === AppThemeSelection.dark ? '#121212' : 'background'"
           class="border position-fixed py-0 d-flex pr-2"
           :style="{
@@ -227,15 +227,28 @@ onMounted(() => {
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
 
+function navigateToPrevRoute(path: any) {
+  const firstItem = path[0];
+  if (firstItem && firstItem.to) {
+    $router.push(firstItem.to);
+  }
+}
+
 const routes: AppRoute[] = [
   {
     title: "Dashboard",
     icon: "mdi-account-convert-outline",
     items: [
       {
-        title: "Twin",
+        title: "Your Twin",
         icon: "mdi-account-supervisor-outline",
         route: "/dashboard/twin",
+      },
+      { title: "Your Farms", icon: "mdi-silo", route: "/dashboard/farms" },
+      {
+        title: "Your Contracts",
+        icon: "mdi-file-document-edit",
+        route: "/dashboard/contracts-list",
       },
       { title: "Bridge", icon: "mdi-swap-horizontal", route: "/dashboard/bridge" },
       {
@@ -243,18 +256,12 @@ const routes: AppRoute[] = [
         icon: "mdi-account-arrow-right-outline",
         route: "/dashboard/transfer",
       },
-      { title: "Farms", icon: "mdi-silo", route: "/dashboard/farms" },
       {
         title: "Dedicated Nodes",
         icon: "mdi-resistor-nodes",
         route: "/dashboard/dedicated-nodes",
       },
       { title: "DAO", icon: "mdi-note-check-outline", route: "/dashboard/dao" },
-      {
-        title: "Contracts",
-        icon: "mdi-file-document-edit",
-        route: "/dashboard/contracts-list",
-      },
     ],
   },
   {

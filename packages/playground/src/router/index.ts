@@ -25,7 +25,20 @@ const router = createRouter({
           name: "Twin",
           path: "twin",
           component: () => import("../dashboard/twin_view.vue"),
-          meta: { title: "Twin" },
+          meta: { title: "Your Twin" },
+        },
+        {
+          path: "farms",
+          component: () => import("../dashboard/farms_view.vue"),
+          meta: { title: "Your Farms" },
+        },
+        {
+          path: "contracts-list",
+          component: () => import("../dashboard/contracts_list.vue"),
+          meta: {
+            title: "Your Contracts List",
+            info: { page: "info/contracts_list.md" },
+          },
         },
         {
           path: "dao",
@@ -43,22 +56,9 @@ const router = createRouter({
           meta: { title: "Transfer" },
         },
         {
-          path: "farms",
-          component: () => import("../dashboard/farms_view.vue"),
-          meta: { title: "Farms" },
-        },
-        {
           path: "dedicated-nodes",
           component: () => import("../dashboard/dedicated_nodes_view.vue"),
           meta: { title: "Dedicated Nodes" },
-        },
-        {
-          path: "contracts-list",
-          component: () => import("../dashboard/contracts_list.vue"),
-          meta: {
-            title: "Contracts List",
-            info: { page: "info/contracts_list.md" },
-          },
         },
       ],
     },
@@ -492,7 +492,7 @@ const router = createRouter({
     {
       path: "/minting",
       component: () => import("../views/minting_view.vue"),
-      meta: { title: "Minting" },
+      meta: { title: "Minting", info: { page: "info/minting.md" } },
     },
     {
       path: "/nodes",
