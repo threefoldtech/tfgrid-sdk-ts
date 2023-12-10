@@ -260,9 +260,15 @@ const baseFilters = ref();
 const filtersUpdated = ref(false);
 watch(
   () => props.filters,
-  value => {
+  (value, oldValue) => {
     if (!baseFilters.value) {
-      baseFilters.value = value;
+      if (!oldValue) return;
+
+      baseFilters.value = oldValue;
+
+      filtersUpdated.value = true;
+      validator.value?.setStatus(ValidatorStatus.Init);
+      return;
     }
 
     filtersUpdated.value = !equals(value, baseFilters.value);
