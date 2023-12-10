@@ -99,7 +99,8 @@ watch(
 watch(
   search,
   debounce(async (value, oldValue) => {
-    if (value !== oldValue && value && value?.length > 2 && oldValue != undefined && oldValue !== "") {
+    const requireSeach = !farms.value.some(f => f.name === value);
+    if (requireSeach && value !== oldValue && value && value?.length > 2 && oldValue != undefined && oldValue !== "") {
       await resetPages();
     }
   }, 2000),
