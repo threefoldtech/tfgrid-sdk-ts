@@ -112,6 +112,8 @@
             :loading-farm="loadingFarm"
           />
         </SelectFarmManager>
+
+        <TfSelectNode />
       </template>
 
       <template #disks>

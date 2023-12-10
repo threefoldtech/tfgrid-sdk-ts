@@ -7,6 +7,7 @@ import Filters from "./components/filter.vue";
 import FormValidator from "./components/form_validator.vue";
 import InputTooltip from "./components/input_tooltip.vue";
 import InputValidator from "./components/input_validator.vue";
+import TfSelectNode from "./components/node_selector/TfSelectNode.vue";
 import PasswordInputWrapper from "./components/password_input_wrapper.vue";
 import ViewLayout from "./components/view_layout.vue";
 import WebletLayout from "./components/weblet_layout.vue";
@@ -22,6 +23,7 @@ const GLOBAL_COMPONENTS: { [key: string]: Component } = {
   ViewLayout,
   InputTooltip,
   Filters,
+  TfSelectNode,
 };
 
 export function defineGlobals(app: App<Element>): void {
