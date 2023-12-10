@@ -13,7 +13,7 @@
     </v-alert>
 
     <v-alert
-      v-if="filtersUpdated && selection == Selection.AUTOMATED"
+      v-if="filtersUpdated && selection === Selection.AUTOMATED"
       type="warning"
       variant="tonal"
       class="text-warning mb-2 variant-tonal"
@@ -271,7 +271,7 @@ watch(
 
       baseFilters.value = oldValue;
 
-      filtersUpdated.value = true;
+      filtersUpdated.value = availableNodes.value.length > 0 && !selectedNode.value;
       validator.value?.setStatus(ValidatorStatus.Init);
       return;
     }
