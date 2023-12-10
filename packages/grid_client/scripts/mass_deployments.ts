@@ -1,5 +1,4 @@
 import {
-  DiskModel,
   FarmFilterOptions,
   FilterOptions,
   generateString,
@@ -7,7 +6,6 @@ import {
   MachineModel,
   MachinesModel,
   NetworkModel,
-  randomChoice,
   TwinDeployment,
 } from "../src";
 import { config, getClient } from "./client_loader";
@@ -23,17 +21,14 @@ async function pingNodes(grid3: GridClient, nodes: any[]): Promise<any[]> {
     }
   });
 
-  try {
-    const results = await Promise.all(pingPromises);
-    return results;
-  } catch (e) {
-    console.log(e);
-    return [];
-  }
+  const results = await Promise.all(pingPromises);
+  return results;
 }
 
 async function main() {
   const grid3 = await getClient();
+
+  // Timeout for deploying vm is 2 min
   grid3.clientOptions.deploymentTimeoutMinutes = 2;
   await grid3.connect();
 
@@ -77,7 +72,7 @@ async function main() {
         mru: mru / 1024,
         sru: rootFs,
         availableFor: await grid3.twins.get_my_twin_id(),
-        farmsIds: farmIds,
+        farmIds: farmIds,
         randomize: true,
       } as FilterOptions);
     });
@@ -95,7 +90,9 @@ async function main() {
         } else {
           offlineNodes.push(node.nodeId);
           console.log(`Node ${node.nodeId} is offline`);
-          console.error("Error:", error);
+          if (error) {
+            console.error("Error:", error);
+          }
         }
       });
     } catch (error) {
@@ -111,10 +108,6 @@ async function main() {
     for (let i = 0; i < batchSize; i++) {
       const vmName = "vm" + generateString(8);
 
-      const disk1 = new DiskModel();
-      disk1.name = "d" + generateString(5);
-      disk1.mountpoint = "/newDisk1";
-
       if (flattenedNodes.length < 0) {
         errors.push("No online nodes available for deployment");
         failedCount++;
@@ -127,7 +120,7 @@ async function main() {
       const vm = new MachineModel();
       vm.name = vmName;
       vm.node_id = selectedNode.nodeId;
-      vm.disks = [disk1];
+      vm.disks = [];
       vm.public_ip = publicIp;
       vm.planetary = true;
       vm.cpu = cru;
@@ -178,7 +171,7 @@ async function main() {
     }
 
     try {
-      const contracts = await grid3.machines.twinDeploymentHandler.handle(allTwinDeployments);
+      await grid3.machines.twinDeploymentHandler.handle(allTwinDeployments);
       successCount += batchSize;
       log(`Successfully handled and saved contracts for all twin deployments`);
     } catch (error) {
@@ -195,12 +188,13 @@ async function main() {
   log("Successful Deployments: " + successCount);
   log("Failed Deployments: " + failedCount);
 
-  // List of failed deployments errors
+  // List of failed deployments' errors
   log("Failed deployments errors: ");
   for (let i = 0; i < errors.length; i++) {
     log(errors[i]);
     log("---------------------------------------------");
   }
+
   // List of offline nodes
   log("Failed Nodes: ");
   for (let i = 0; i < offlineNodes.length; i++) {

@@ -47,6 +47,7 @@ interface NodeInfo {
   updatedAt: string;
   total_resources: NodeResources;
   used_resources: NodeResources;
+  farm_ids: number[];
   location: {
     country: string;
     city: string;
@@ -373,7 +374,7 @@ class Nodes {
       ipv6: options.accessNodeV6,
       gateway: options.gateway,
       certification_type: options.certified ? "Certified" : "",
-      farm_ids: [options.farmId],
+      farm_ids: options.farmIds ? options.farmIds : [options.farmId],
       farm_name: options.farmName,
       country: options.country,
       city: options.city,
