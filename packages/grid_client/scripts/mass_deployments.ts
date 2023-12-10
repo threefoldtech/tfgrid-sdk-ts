@@ -103,13 +103,12 @@ async function main() {
     for (let i = 0; i < batchSize; i++) {
       const vmName = "vm" + generateString(8);
 
-      if (onlineNodes.length < 0) {
+      const selectedNode = onlineNodes.pop();
+      if (onlineNodes.length <= 0) {
         errors.push("No online nodes available for deployment");
         failedCount++;
         continue;
       }
-
-      const selectedNode = onlineNodes.pop();
 
       // create vm node Object
       const vm = new MachineModel();
