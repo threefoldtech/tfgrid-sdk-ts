@@ -240,9 +240,15 @@ const routes: AppRoute[] = [
     icon: "mdi-account-convert-outline",
     items: [
       {
-        title: "Twin",
+        title: "Your Twin",
         icon: "mdi-account-supervisor-outline",
         route: "/dashboard/twin",
+      },
+      { title: "Your Farms", icon: "mdi-silo", route: "/dashboard/farms" },
+      {
+        title: "Your Contracts",
+        icon: "mdi-file-document-edit",
+        route: "/dashboard/contracts-list",
       },
       { title: "Bridge", icon: "mdi-swap-horizontal", route: "/dashboard/bridge" },
       {
@@ -250,18 +256,12 @@ const routes: AppRoute[] = [
         icon: "mdi-account-arrow-right-outline",
         route: "/dashboard/transfer",
       },
-      { title: "Farms", icon: "mdi-silo", route: "/dashboard/farms" },
       {
         title: "Dedicated Nodes",
         icon: "mdi-resistor-nodes",
         route: "/dashboard/dedicated-nodes",
       },
       { title: "DAO", icon: "mdi-note-check-outline", route: "/dashboard/dao" },
-      {
-        title: "Contracts",
-        icon: "mdi-file-document-edit",
-        route: "/dashboard/contracts-list",
-      },
     ],
   },
   {
