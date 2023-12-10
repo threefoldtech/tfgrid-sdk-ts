@@ -14,7 +14,7 @@ import { log } from "./utils";
 
 async function pingNodes(
   grid3: GridClient,
-  nodes: any[],
+  nodes: NodeInfo[],
 ): Promise<Promise<{ node: NodeInfo; error?: Error; res?: unknown }[]>> {
   const pingPromises = nodes.map(async node => {
     try {
@@ -40,8 +40,8 @@ async function main() {
   const offlineNodes: number[] = [];
   let failedCount = 0;
   let successCount = 0;
-  const batchSize = 5;
-  const totalVMs = 10;
+  const batchSize = 50;
+  const totalVMs = 250;
   const batches = totalVMs / batchSize;
 
   // resources
@@ -69,56 +69,47 @@ async function main() {
   for (let batch = 0; batch < batches; batch++) {
     console.time("Batch " + (batch + 1));
 
-    const nodesPromises = Array.from({ length: batchSize }, async () => {
-      const farmIds = farms.map(farm => farm.farmId);
-      return grid3.capacity.filterNodes({
-        cru: cru,
-        mru: mru / 1024,
-        sru: rootFs,
-        availableFor: await grid3.twins.get_my_twin_id(),
-        farmIds: farmIds,
-        randomize: true,
-      } as FilterOptions);
-    });
-
-    const nodes = await Promise.all(nodesPromises);
-
-    let flattenedNodes = nodes.flat();
+    const farmIds = farms.map(farm => farm.farmId);
+    const nodes = await grid3.capacity.filterNodes({
+      cru: cru,
+      mru: mru / 1024,
+      sru: rootFs,
+      availableFor: await grid3.twins.get_my_twin_id(),
+      farmIds: farmIds,
+      randomize: true,
+    } as FilterOptions);
 
     console.time("Ping Nodes");
-    try {
-      const results = await pingNodes(grid3, flattenedNodes);
-      results.forEach(({ node, res, error }) => {
-        if (res) {
-          console.log(`Node ${node.nodeId} is online`);
-        } else {
-          offlineNodes.push(node.nodeId);
-          console.log(`Node ${node.nodeId} is offline`);
-          if (error) {
-            console.error("Error:", error);
-          }
-        }
-      });
-    } catch (error) {
-      console.error("Error pinging nodes:", error);
-    } finally {
-      console.timeEnd("Ping Nodes");
-    }
+    const results = await pingNodes(grid3, nodes);
+    console.timeEnd("Ping Nodes");
 
-    flattenedNodes = flattenedNodes.filter(node => !offlineNodes.includes(node.nodeId));
+    // Check nodes results
+    results.forEach(({ node, res, error }) => {
+      if (res) {
+        console.log(`Node ${node.nodeId} is online`);
+      } else {
+        offlineNodes.push(node.nodeId);
+        console.log(`Node ${node.nodeId} is offline`);
+        if (error) {
+          console.error("Error:", error);
+        }
+      }
+    });
+
+    const onlineNodes = nodes.filter(node => !offlineNodes.includes(node.nodeId));
 
     // Batch Deployment
     const batchVMs: MachinesModel[] = [];
     for (let i = 0; i < batchSize; i++) {
       const vmName = "vm" + generateString(8);
 
-      if (flattenedNodes.length < 0) {
+      if (onlineNodes.length < 0) {
         errors.push("No online nodes available for deployment");
         failedCount++;
         continue;
       }
 
-      const selectedNode = flattenedNodes.pop();
+      const selectedNode = onlineNodes.pop();
 
       // create vm node Object
       const vm = new MachineModel();
