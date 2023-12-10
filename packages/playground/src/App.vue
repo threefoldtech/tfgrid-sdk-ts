@@ -250,7 +250,7 @@ const routes: AppRoute[] = [
         icon: "mdi-account-arrow-right-outline",
         route: "/dashboard/transfer",
       },
-      { title: "Farms", icon: "mdi-silo", route: "/dashboard/farms" },
+      { title: "Your Farms", icon: "mdi-silo", route: "/dashboard/farms" },
       {
         title: "Dedicated Nodes",
         icon: "mdi-resistor-nodes",
