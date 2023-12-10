@@ -2,17 +2,19 @@
 title: Minting
 ---
 
-Minting is based on blockchain data according to strict rules that are carried out by computers with humans involved only to check for errors and to sign the resulting transactions.
+[Minting](https://manual.grid.tf/faq/faq.html?highlight=receipt%20hash#farming-rewards-and-related-notions) is based on blockchain data according to strict rules that are carried out by computers with humans involved only to check for errors and to sign the resulting transactions.
 
-<br />
-<h2> How to get receipt hashes to test? </h2>
-<br />
-
-You can get receipt hashes through the following https://alpha.minting.tfchain.grid.tf/api/v1/node/$NODE_ID
-
-for example:
-https://alpha.minting.tfchain.grid.tf/api/v1/node/42
+By connecting a 3Node to the Grid, you get Farming Rewards. If you set a public IP address for the Grid to use, you will receive additional rewards when your 3Node is being utilized by users on the Grid. Rewards are distributed once a month, around the 8th\*.
 
 <br />
 
-For more info [Read the documentation](https://manual.grid.tf/faq/faq.html#what-is-the-tft-minting-process-is-it-fully-automated).
+A user can verify the 3Nodes' payments on Stellar Blockchain through the Threefold's minting tool by using the hash recipet from the payment.[More Details](https://manual.grid.tf/faq/faq.html?highlight=receipt%20hash#on-threefold-grid-v3-how-can-i-verify-my-3nodes-payments-on-stellar-blockchain)
+
+<br />
+
+The TFT minting address on Stellar Chain:
+[GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47](https://stellar.expert/explorer/public/account/GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47)
+
+<br />
+
+For more questions about minting, please contact the [support team](https://threefold.io/support/) or click on the chat icon.
