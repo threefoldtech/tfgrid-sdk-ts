@@ -360,7 +360,7 @@ function clickHandler({ route, url }: AppRouteItem): void {
 }
 
 function isAuthorized(route: string) {
-  const items = ["portal", "contractslist", "solutions"];
+  const items = ["dashboard", "farms", "nodes", "solutions"];
   return !items.some(substr => route.startsWith(`/${substr}`));
 }
 
@@ -386,7 +386,6 @@ import FundsCard from "./components/funds_card.vue";
 import ProfileManagerController from "./components/profile_manager_controller.vue";
 import TftSwapPrice from "./components/swap_price.vue";
 import TFNotification from "./components/tf_notification.vue";
-import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
 
 interface AppRoute {
