@@ -7,14 +7,19 @@
       <v-radio label="Automated" value="automated" class="mr-6"></v-radio>
       <v-radio label="Manual" value="manual"></v-radio>
     </v-radio-group>
+
+    <TfSelectLocation />
   </section>
 </template>
 
 <script lang="ts">
 import { ref } from "vue";
 
+import TfSelectLocation from "./TfSelectLocation.vue";
+
 export default {
   name: "TfSelectNode",
+  components: { TfSelectLocation },
   setup() {
     const wayToSelect = ref<"manual" | "automated">("automated");
 
