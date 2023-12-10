@@ -154,7 +154,9 @@ async function loadFarms() {
   const oldFarm = farm.value;
   const grid = await getGrid(profileManager.profile!);
   let _farms: FarmInterface[] = [];
-  if (searchInput.value && searchInput.value?.length > 0) {
+
+  const requireSeach = farm.value && searchInput.value !== farm.value.name;
+  if (searchInput.value && searchInput.value?.length > 0 && requireSeach) {
     const { data } = await gridProxyClient.farms.list({ nameContains: searchInput.value });
     _farms = data.map((_farm: any) => {
       return {
