@@ -131,7 +131,7 @@
         </v-toolbar>
 
         <v-toolbar
-          v-if="navbarConfig"
+          v-if="navbarConfig && hasActiveProfile"
           :color="theme.name.value === AppThemeSelection.dark ? '#121212' : 'background'"
           class="border position-fixed py-0 d-flex pr-2"
           :style="{
@@ -226,6 +226,13 @@ onMounted(() => {
 
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
+
+function navigateToPrevRoute(path: any) {
+  const firstItem = path[0];
+  if (firstItem && firstItem.to) {
+    $router.push(firstItem.to);
+  }
+}
 
 const routes: AppRoute[] = [
   {
