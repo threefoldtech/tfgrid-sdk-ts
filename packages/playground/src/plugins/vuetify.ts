@@ -25,7 +25,7 @@ const vuetify = createVuetify({
           info: "#7de3c8",
           warning: "#FFCC00",
           link: "#5695ff",
-          anchor: "#9e9e9e",
+          anchor: "#d4d4d4",
         },
       },
       light: {
