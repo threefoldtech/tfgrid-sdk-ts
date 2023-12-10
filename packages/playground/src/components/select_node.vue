@@ -456,7 +456,7 @@ async function loadNodes() {
     const msg = (e as Error).message || (e as string) || "";
 
     if (msg.trim().toLowerCase().startsWith("validation failed")) {
-      errorMessage.value = "Please provide a valid data.";
+      errorMessage.value = "Please provide valid data.";
       return;
     }
 
