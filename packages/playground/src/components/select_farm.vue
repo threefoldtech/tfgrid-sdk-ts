@@ -77,7 +77,7 @@ const emits = defineEmits<{
   (event: "update:search", value?: string): void;
 }>();
 
-const SIZE = 20;
+const SIZE = 1;
 const page = ref();
 const farmInput = useInputRef();
 const profileManager = useProfileManager();
@@ -179,7 +179,7 @@ async function loadFarms() {
   }
   farms.value = [
     { name: defaultFarm, farmID: -1, country: location.value.country, region: location.value.region },
-    ...farms.value.concat(_farms),
+    ...farms.value.slice(1).concat(_farms),
   ];
 
   if (oldFarm) {
