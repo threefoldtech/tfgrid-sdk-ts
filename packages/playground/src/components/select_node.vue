@@ -12,7 +12,12 @@
       node that matches your requirements.
     </v-alert>
 
-    <v-alert v-if="filtersUpdated" type="warning" variant="tonal" class="text-warning mb-2 variant-tonal">
+    <v-alert
+      v-if="filtersUpdated && selection == Selection.AUTOMATED"
+      type="warning"
+      variant="tonal"
+      class="text-warning mb-2 variant-tonal"
+    >
       Please press on <strong>Load Nodes</strong> button to list nodes matching your new requirements.
     </v-alert>
 
