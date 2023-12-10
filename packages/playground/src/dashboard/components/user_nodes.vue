@@ -34,13 +34,13 @@
     >
       <template v-slot:expanded-row="{ columns, item }">
         <tr>
-          <td :colspan="columns.length" key="item.id">
-            <card-details
-              class="my-4"
-              :loading="false"
-              title="Node Details"
-              :items="getNodeDetails(item.raw)"
-            ></card-details>
+          <td
+            class="py-4 px-8 border border-anchor"
+            :style="{ backgroundColor: 'rgb(var(--v-theme-background))' }"
+            :colspan="columns.length"
+            key="item.id"
+          >
+            <card-details :loading="false" title="Node Details" :items="getNodeDetails(item.raw)"></card-details>
 
             <v-expansion-panels v-model="resourcesPanel" :disabled="false" focusable>
               <v-expansion-panel class="my-4">

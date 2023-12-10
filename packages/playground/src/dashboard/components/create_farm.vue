@@ -1,12 +1,16 @@
 <template>
   <v-container>
-    <v-row>
+    <v-row class="text-center flex justify-center">
       <v-btn
         variant="outlined"
         color="secondary"
-        class="ml-auto bold-text"
-        @click="showDialogue = true"
-        :disabled="isCreating"
+        class="text-subtitle-1 px-6 mr-2"
+        v-bind:href="'https://v3.bootstrap.grid.tf/'"
+        target="blank"
+        >Bootstrap Node Image</v-btn
+      >
+
+      <v-btn class="bg-primary text-subtitle-1 px-6" @click="showDialogue = true" :disabled="isCreating"
         >Create Farm</v-btn
       >
     </v-row>

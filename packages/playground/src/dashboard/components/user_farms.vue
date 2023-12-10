@@ -44,7 +44,11 @@
       </template>
       <template v-slot:expanded-row="{ columns, item }">
         <tr>
-          <td :colspan="columns.length">
+          <td
+            class="border border-anchor px-8 py-4"
+            :style="{ backgroundColor: 'rgb(var(--v-theme-background))' }"
+            :colspan="columns.length"
+          >
             <v-row>
               <v-col cols="12" class="mt-4">
                 <card-details :loading="false" title="Farm Details" :items="getFarmDetails(item.raw)"></card-details>
@@ -54,14 +58,11 @@
             <PublicIPsTable :farmId="item.raw.farmId" />
             <v-row class="d-flex justify-center pb-5">
               <v-card-actions>
-                <v-btn
-                  class="bg-primary text-subtitle-1 px-6"
-                  v-bind:href="'https://v3.bootstrap.grid.tf/'"
-                  target="blank"
-                  >Bootstrap Node Image</v-btn
-                >
                 <v-btn class="text-subtitle-1 px-6" color="secondary" variant="outlined" @click="showDialogue = true"
                   >Add/Edit Stellar Payout Address</v-btn
+                >
+                <v-btn class="bg-primary text-subtitle-1 px-6" @click="showDialogue = true" :loading="loading"
+                  >Add IP</v-btn
                 >
                 <v-btn v-if="network == 'main'" class="bg-primary" @click="downloadFarmReceipts(item.value.farmId)"
                   >Download Minting Receipts</v-btn
@@ -102,7 +103,9 @@
                   :disabled="!valid || isAdding"
                   >Submit</v-btn
                 >
-                <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
+                <v-btn @click="showDialogue = false" color="anchor" variant="outlined" class="lighten-2 black--text"
+                  >Close</v-btn
+                >
               </v-card-actions>
             </v-card>
           </v-dialog>

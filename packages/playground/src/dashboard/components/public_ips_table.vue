@@ -82,9 +82,9 @@ export default {
       required: true,
     },
   },
-  components: {
-    AddIP,
-  },
+  // components: {
+  //   AddIP,
+  // },
   setup(props) {
     const gridStore = useGrid();
     const headers = [

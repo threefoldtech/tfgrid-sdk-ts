@@ -2,7 +2,14 @@
   <span>
     <v-tooltip text="Set Additional Fees">
       <template #activator="{ props }">
-        <v-icon v-bind="props" size="small" :disabled="isAdding" :loading="isAdding" @click="showDialogue = true">
+        <v-icon
+          class="mx-1"
+          v-bind="props"
+          size="large"
+          :disabled="isAdding"
+          :loading="isAdding"
+          @click="showDialogue = true"
+        >
           mdi-code-string
         </v-icon>
       </template>
@@ -51,7 +58,9 @@
               :disabled="!valid || isSetting || isDisabled"
               >Save</v-btn
             >
-            <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
+            <v-btn @click="showDialogue = false" color="anchor" variant="outlined" class="lighten-2 black--text"
+              >Close</v-btn
+            >
           </v-card-actions>
         </v-card>
       </v-dialog>
