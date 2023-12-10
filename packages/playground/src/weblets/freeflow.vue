@@ -83,8 +83,11 @@
               diskSizes: disks.map(disk => disk.size),
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
+              country: farm?.country,
+              region: farm?.region,
             }"
             :root-file-system-size="rootFileSystemSize"
+            :loading-farm="loadingFarm"
           />
         </SelectFarmManager>
         <DomainName :hasIPv4="ipv4" ref="domainNameCmp"></DomainName>

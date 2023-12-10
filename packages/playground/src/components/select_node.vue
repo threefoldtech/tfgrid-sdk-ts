@@ -11,6 +11,16 @@
       You have no rented nodes that match your selected resources. Please try changing your selected resources or rent a
       node that matches your requirements.
     </v-alert>
+
+    <v-alert
+      v-if="filtersUpdated && selection === Selection.AUTOMATED"
+      type="warning"
+      variant="tonal"
+      class="text-warning mb-2 variant-tonal"
+    >
+      Please press on <strong>Load Nodes</strong> button to list nodes matching your new requirements.
+    </v-alert>
+
     <input-validator
       ref="validator"
       :rules="[validators.required('Node id is required.')]"
@@ -20,45 +30,57 @@
       v-if="selection == Selection.AUTOMATED"
     >
       <input-tooltip tooltip="Select a node ID to deploy on.">
-        <v-autocomplete
-          select
-          label="Node"
-          :items="availableNodes"
-          item-title="nodeId"
-          return-object
-          v-model="selectedNode"
-          :disabled="loadingNodes || pingingNode"
-          v-bind="{
-            ...props,
-            loading: props.loading || loadingNodes || pingingNode,
-            hint: pingingNode ? `Checking if the disks will fit in the node's storage pools... ` : props.hint,
-            error: !!errorMessage || props.error,
-            errorMessages: errorMessage || props.errorMessages,
-          }"
-        >
-          <template v-slot:item="{ item, props }">
-            <v-list-item @click="props.onClick" :class="{ 'v-list-item--active': props.isActive }">
-              <v-list-item-content class="d-flex justify-space-between">
-                <v-list-item-title>
-                  {{ item.raw.nodeId }}
-                </v-list-item-title>
-                <div>
-                  <v-chip
-                    v-if="item.raw.certified === 'Certified'"
-                    v-bind="props"
-                    :color="getChipColor(item.raw.certified)"
-                    class="ml-3"
-                  >
-                    {{ item.raw.certified }}
-                  </v-chip>
-                  <v-chip v-bind="props" :color="getChipColor(item.raw.state)" class="ml-3">
-                    {{ item.raw.state }}
-                  </v-chip>
-                </div>
-              </v-list-item-content>
-            </v-list-item>
-          </template>
-        </v-autocomplete>
+        <div class="w-100 d-flex">
+          <v-autocomplete
+            select
+            label="Node"
+            :items="availableNodes"
+            item-title="nodeId"
+            return-object
+            v-model="selectedNode"
+            :disabled="loadingNodes || pingingNode || filtersUpdated || $props.loadingFarm"
+            v-bind="{
+              ...props,
+              loading: props.loading || loadingNodes || pingingNode,
+              hint: pingingNode ? `Checking if the disks will fit in the node's storage pools... ` : props.hint,
+              error: _isLoading ? false : !!errorMessage || props.error,
+              errorMessages: _isLoading ? undefined : errorMessage || props.errorMessages,
+            }"
+          >
+            <template v-slot:item="{ item, props }">
+              <v-list-item @click="props.onClick" :class="{ 'v-list-item--active': props.isActive }">
+                <v-list-item-content class="d-flex justify-space-between">
+                  <v-list-item-title>
+                    {{ item.raw.nodeId }}
+                  </v-list-item-title>
+                  <div>
+                    <v-chip
+                      v-if="item.raw.certified === 'Certified'"
+                      v-bind="props"
+                      :color="getChipColor(item.raw.certified)"
+                      class="ml-3"
+                    >
+                      {{ item.raw.certified }}
+                    </v-chip>
+                    <v-chip v-bind="props" :color="getChipColor(item.raw.state)" class="ml-3">
+                      {{ item.raw.state }}
+                    </v-chip>
+                  </div>
+                </v-list-item-content>
+              </v-list-item>
+            </template>
+          </v-autocomplete>
+          <v-btn
+            class="ml-2 mt-2"
+            variant="tonal"
+            color="info"
+            :loading="loadingNodes || pingingNode"
+            :disabled="$props.loadingFarm || loadingNodes || pingingNode"
+            @click="loadNodes"
+          >
+            Load Nodes
+          </v-btn>
+        </div>
       </input-tooltip>
     </input-validator>
     <input-validator
@@ -117,16 +139,19 @@
 
 <script lang="ts" setup>
 import type { NodeInfo, NodeResources } from "@threefold/grid_client";
-import { type PropType, type Ref, ref, watch } from "vue";
+import equals from "lodash/fp/equals.js";
+import { computed, onBeforeUnmount, onMounted, type PropType, ref, watch } from "vue";
 
 import { ValidatorStatus } from "@/hooks/form_validator";
 import { Selection } from "@/utils/types";
 
 import { useProfileManager } from "../stores/profile_manager";
+import type { FarmInterface } from "../types";
 import { getFilteredNodes, getNodeCards, type INode, type NodeGPUCardType } from "../utils/filter_nodes";
 import { getGrid } from "../utils/grid";
 import { getCardName, normalizeError } from "../utils/helpers";
 import { useFarm } from "./select_farm_manager.vue";
+import { defaultCountry, defaultRegion } from "./select_location.vue";
 
 export interface NodeFilters {
   farmId?: number;
@@ -140,13 +165,19 @@ export interface NodeFilters {
   rentedBy?: number;
   type?: string;
   availableFor?: number;
+  country?: string;
+  region?: string;
 }
 
-const emits = defineEmits<{ (event: "update:modelValue", value?: INode): void }>();
+const emits = defineEmits<{
+  (event: "update:modelValue", value?: INode): void;
+  (event: "update:loading", value?: boolean): void;
+}>();
 
 const props = defineProps({
   selection: String,
   modelValue: { type: Object as PropType<INode> },
+  loadingFarm: { type: Boolean, required: true },
   filters: { default: () => ({} as NodeFilters), type: Object as PropType<NodeFilters> },
   rootFileSystemSize: { type: Number, required: true },
 });
@@ -156,7 +187,6 @@ const availableNodes = ref<Array<INode>>([]);
 const nodesArr = ref<Array<INode>>([]);
 const loadingNodes = ref(false);
 const loadingCards = ref(false);
-const shouldBeUpdated = ref(false);
 const errorMessage = ref<string>();
 const manualselectedNode = ref<number>();
 const selectedNode = ref<INode | undefined>();
@@ -167,7 +197,10 @@ const emptyResult = ref(false);
 const validator = ref();
 const manualField = ref();
 const pingingNode = ref(false);
-const delay = ref();
+
+const farm = ref<FarmInterface>();
+const unsubscribe = farmManager.subscribe(f => (farm.value = f));
+onBeforeUnmount(unsubscribe);
 
 function isSelectionEmpty(node: INode | undefined, selectedCards: string[]): boolean {
   if (!node || availableNodes.value.length === 0) {
@@ -210,6 +243,10 @@ watch(
       }
     }
 
+    if (node) {
+      baseFilters.value = props.filters;
+    }
+
     if (node && props.filters.hasGPU) {
       loadingCards.value = true;
       const grid = await getGrid(profileManager.profile!);
@@ -224,28 +261,43 @@ watch(
   { immediate: true },
 );
 
+const baseFilters = ref();
+const filtersUpdated = ref(false);
+watch(
+  () => props.filters,
+  (value, oldValue) => {
+    if (!baseFilters.value) {
+      if (!oldValue) return;
+
+      baseFilters.value = oldValue;
+
+      filtersUpdated.value = availableNodes.value.length > 0 && !selectedNode.value;
+      validator.value?.setStatus(ValidatorStatus.Init);
+      return;
+    }
+
+    filtersUpdated.value = !equals(value, baseFilters.value);
+    validator.value?.setStatus(
+      filtersUpdated.value || !selectedNode.value ? ValidatorStatus.Init : ValidatorStatus.Valid,
+    );
+  },
+  { deep: true },
+);
+
+onMounted(() => {
+  baseFilters.value = undefined;
+  loadNodes();
+});
+
 watch(
   () => props.filters,
   async (value, oldValue) => {
-    if (
-      value.farmId === oldValue.farmId &&
-      value.diskSizes.length === oldValue.diskSizes.length &&
-      new Set([...value.diskSizes, ...oldValue.diskSizes]).size === value.diskSizes.length &&
-      value.cpu === oldValue.cpu &&
-      value.memory === oldValue.memory &&
-      value.certified === oldValue.certified &&
-      value.rentedBy === oldValue.rentedBy &&
-      value.ipv4 === oldValue.ipv4 &&
-      value.ipv6 === oldValue.ipv6 &&
-      value.hasGPU === oldValue.hasGPU
-    ) {
+    if (equals(value, oldValue)) {
       return;
     }
+
     if (props.selection === Selection.MANUAL && manualselectedNode.value) {
       manualField.value?.validate();
-    }
-    if (props.selection === Selection.AUTOMATED) {
-      shouldBeUpdated.value = true;
     }
   },
   { deep: true },
@@ -262,22 +314,6 @@ watch(
   },
   { deep: false },
 );
-
-watch([loadingNodes, shouldBeUpdated], async ([l, s]) => {
-  if (l || !s) return;
-  shouldBeUpdated.value = false;
-  farmManager?.subscribe(farmId => {
-    if (!farmId) {
-      selectedNode.value = undefined;
-      availableNodes.value = [];
-      return;
-    }
-    clearTimeout(delay.value);
-    delay.value = setTimeout(() => {
-      loadNodes(farmId);
-    }, 1000);
-  });
-});
 
 function getChipColor(item: any) {
   return item === "Dedicated" ? "success" : item === "Certified" ? "primary" : "secondary";
@@ -365,8 +401,16 @@ async function validateManualSelectedNode(validatingNodeId?: number) {
   }
   return undefined;
 }
-async function loadNodes(farmId: number | undefined) {
+async function loadNodes() {
+  if (props.selection === Selection.AUTOMATED) {
+    baseFilters.value = undefined;
+    filtersUpdated.value = false;
+  }
+
+  const { farmID = -1, country, region } = farm.value || {};
+  const farmId = farmID > 0 ? farmID : undefined;
   availableNodes.value = [];
+  const oldSelectedNode = selectedNode.value;
   selectedNode.value = undefined;
   loadingNodes.value = true;
   errorMessage.value = "";
@@ -376,7 +420,7 @@ async function loadNodes(farmId: number | undefined) {
     const grid = await getGrid(profileManager.profile!);
     if (grid) {
       const res = await getFilteredNodes(grid, {
-        farmId: farmId,
+        farmId,
         cpu: filters.cpu,
         memory: filters.memory,
         diskSizes: [...filters.diskSizes, props.rootFileSystemSize],
@@ -385,14 +429,9 @@ async function loadNodes(farmId: number | undefined) {
         certified: filters.certified,
         rentedBy: filters.rentedBy,
         availableFor: grid.twinId,
+        country: country === defaultCountry ? undefined : country,
+        region: region === defaultRegion ? undefined : region,
       });
-
-      if (res?.length === 0) {
-        selectedNode.value = undefined;
-        emptyResult.value = true;
-        loadingNodes.value = false;
-        return;
-      }
 
       if (res) {
         nodesArr.value = [];
@@ -409,11 +448,28 @@ async function loadNodes(farmId: number | undefined) {
       } else {
         availableNodes.value = [];
       }
+
+      if (props.selection === Selection.AUTOMATED) {
+        if (oldSelectedNode) {
+          const index = availableNodes.value.findIndex(n => oldSelectedNode.nodeId === n.nodeId);
+
+          if (index !== -1) {
+            selectedNode.value = availableNodes.value[index];
+          }
+        }
+      }
     }
   } catch (e) {
+    const msg = (e as Error).message || (e as string) || "";
+
+    if (msg.trim().toLowerCase().startsWith("validation failed")) {
+      errorMessage.value = "Please provide valid data.";
+      return;
+    }
+
     errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
   } finally {
-    validator.value?.setStatus(ValidatorStatus.Init);
+    validator.value?.setStatus(selectedNode.value ? ValidatorStatus.Pending : ValidatorStatus.Init);
     loadingNodes.value = false;
     farmManager?.setLoading(false);
   }
@@ -460,6 +516,11 @@ async function validateNodeStoragePool(validatingNode: INode | undefined) {
     farmManager?.setLoading(false);
   }
 }
+
+const isLoading = computed(() => loadingNodes.value || pingingNode.value || validator.value?.status === ValidatorStatus.Pending); // prettier-ignore
+const _isLoading = computed(() => isLoading.value || filtersUpdated.value || props.loadingFarm);
+
+watch(isLoading, loading => farmManager?.setLoading(loading));
 </script>
 
 <script lang="ts">
@@ -467,3 +528,9 @@ export default {
   name: "SelectNode",
 };
 </script>
+
+<style lang="scss">
+.warning-hint-input .v-messages__message {
+  color: rgb(var(--v-theme-warning)) !important;
+}
+</style>

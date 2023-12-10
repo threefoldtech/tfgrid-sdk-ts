@@ -209,7 +209,7 @@ export default {
           retCount: true,
           page: page.value,
           size: pageSize.value,
-          ownedBy: twinId,
+          rentedBy: twinId as number,
         });
 
         const _nodes = data as unknown as NodeInterface[];

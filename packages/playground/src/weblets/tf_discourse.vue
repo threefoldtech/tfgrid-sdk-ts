@@ -86,8 +86,8 @@
               hide-details
             />
           </input-tooltip>
-          <NodeSelector v-model="selection" />
           <SelectFarmManager>
+            <NodeSelector v-model="selection" />
             <SelectFarm
               v-if="selection == Selection.AUTOMATED"
               :filters="{
@@ -113,7 +113,10 @@
                 diskSizes: [solution?.disk],
                 rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
                 certified: certified,
+                country: farm?.country,
+                region: farm?.region,
               }"
+              :loading-farm="loadingFarm"
               :root-file-system-size="rootFilesystemSize"
             />
           </SelectFarmManager>

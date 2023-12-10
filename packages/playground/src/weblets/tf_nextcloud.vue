@@ -74,7 +74,10 @@
               diskSizes: [solution?.disk],
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
+              country: farm?.country,
+              region: farm?.region,
             }"
+            :loading-farm="loadingFarm"
             :root-file-system-size="rootFilesystemSize"
           />
           <DomainName :hasIPv4="ipv4" ref="domainNameCmp" />
