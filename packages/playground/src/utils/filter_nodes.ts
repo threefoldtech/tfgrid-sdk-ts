@@ -1,10 +1,9 @@
 import type { FilterOptions, GridClient, NodeInfo } from "@threefold/grid_client";
 
-import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
 import type { NodeFilters } from "@/components/select_node.vue";
 
-import { isAlphanumeric, isDecimal, isNumeric, min, startsWith, validateResourceMaxNumber } from "./validators";
-
+import type { InputFilterType } from "../types";
+import { isAlphanumeric, isNumeric, min, startsWith, validateResourceMaxNumber } from "./validators";
 export interface NodeGPUCardType {
   id: string;
   vendor: string;
@@ -15,6 +14,7 @@ export interface INode {
   nodeId: number;
   state?: string;
   cards?: NodeGPUCardType[];
+  certified?: string;
 }
 
 export async function getNodeCards(grid: GridClient, nodeId: number): Promise<NodeGPUCardType[]> {
@@ -39,39 +39,29 @@ export async function getFilteredNodes(grid: GridClient, options: NodeFilters): 
 
 // Node filters used in #Explorer, #Dedicated Nodes...
 
-// Input attrs
-export type NodeInputFilterType = {
-  label: string;
-  placeholder: string;
-  value?: string | undefined;
-  rules?: [syncRules: SyncRule[], asyncRules?: AsyncRule[]];
-  error?: string;
-  type: string;
-};
-
 // Input fields
-export type FilterInputs = {
-  nodeId: NodeInputFilterType;
-  farmIds: NodeInputFilterType;
-  farmName: NodeInputFilterType;
-  country: NodeInputFilterType;
-  freeSru: NodeInputFilterType;
-  freeHru: NodeInputFilterType;
-  freeMru: NodeInputFilterType;
+export type FilterNodeInputs = {
+  nodeId: InputFilterType;
+  farmIds: InputFilterType;
+  farmName: InputFilterType;
+  country: InputFilterType;
+  freeSru: InputFilterType;
+  freeHru: InputFilterType;
+  freeMru: InputFilterType;
 };
 
 // Input fields for dedicated nodes
 export type DedicatedNodeFilters = {
-  total_sru: NodeInputFilterType;
-  total_hru: NodeInputFilterType;
-  total_mru: NodeInputFilterType;
-  total_cru: NodeInputFilterType;
-  gpu_vendor_name: NodeInputFilterType;
-  gpu_device_name: NodeInputFilterType;
+  total_sru: InputFilterType;
+  total_hru: InputFilterType;
+  total_mru: InputFilterType;
+  total_cru: InputFilterType;
+  gpu_vendor_name: InputFilterType;
+  gpu_device_name: InputFilterType;
 };
 
 // Default input Initialization
-export const inputsInitializer: FilterInputs = {
+export const inputsInitializer: () => FilterNodeInputs = () => ({
   nodeId: {
     label: "Node ID",
     placeholder: "Filter by node id.",
@@ -80,6 +70,7 @@ export const inputsInitializer: FilterInputs = {
         isNumeric("This field accepts numbers only.", { no_symbols: true }),
         min("The node id should be larger then zero.", 1),
         startsWith("The node id start with zero.", "0"),
+        validateResourceMaxNumber("This is not a valid ID."),
       ],
     ],
     type: "text",
@@ -156,15 +147,19 @@ export const inputsInitializer: FilterInputs = {
     ],
     type: "text",
   },
-};
+});
 
-export const DedicatedNodeInitializer: DedicatedNodeFilters = {
+export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
   total_cru: {
     label: "Total CPU (Cores)",
     placeholder: "Filter by total Cores.",
     type: "text",
     rules: [
-      [isNumeric("This Field accepts only a valid number."), min("This Field must be a number larger than 0.", 1)],
+      [
+        isNumeric("This Field accepts only a valid number."),
+        min("This Field must be a number larger than 0.", 1),
+        validateResourceMaxNumber("This value is out of range."),
+      ],
     ],
   },
   total_mru: {
@@ -234,4 +229,4 @@ export const DedicatedNodeInitializer: DedicatedNodeFilters = {
       ],
     ],
   },
-};
+});

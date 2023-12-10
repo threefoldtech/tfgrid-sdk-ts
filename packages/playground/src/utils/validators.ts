@@ -4,7 +4,7 @@ import type { IsEmailOptions } from "validator/lib/isEmail";
 import type { IsFQDNOptions } from "validator/lib/isFQDN";
 import type { IsURLOptions } from "validator/lib/isURL";
 
-import { toBytes } from "@/explorer/utils/helpers";
+import { toBytes } from "@/utils/get_nodes";
 
 export function required(msg: string) {
   return (value: string) => {
@@ -80,8 +80,7 @@ export function startsWith(msg: string, char: string) {
 
 export function validateResourceMaxNumber(msg: string) {
   return (value: string) => {
-    const valueInBytes = toBytes(+value);
-    if (+valueInBytes > BigInt(2 ** 64 - 1)) {
+    if (+value > BigInt(2 ** 32 - 1)) {
       return { message: msg };
     }
   };

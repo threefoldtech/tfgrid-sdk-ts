@@ -1,6 +1,6 @@
 {
   "name": "@threefold/playground",
-  "version": "2.1.1",
+  "version": "2.2.0-rc6",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@mdi/font": "^7.2.96",
-    "@threefold/grid_client": "^2.1.1",
-    "@threefold/gridproxy_client": "^2.1.1",
+    "@threefold/grid_client": "^2.2.0-rc6",
+    "@threefold/gridproxy_client": "^2.1.1-rc1",
     "bip39": "^3.1.0",
     "cryptr": "^6.2.0",
     "decimal.js": "^10.4.3",
@@ -31,6 +31,7 @@
     "vue-router": "^4.1.6",
     "vuetify": "^3.1.15",
     "web-ssh-keygen": "^0.1.2",
+    "get-ip-range": "^4.0.1",
     "chart.js": "^4.4.0",
     "vue-chartjs": "^5.2.0",
     "moment": "^2.29.4"

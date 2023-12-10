@@ -8,6 +8,7 @@ export interface Stats {
   totalCru: number;
   totalSru: number;
   totalMru: number;
+  gpus: number;
   totalHru: number;
   publicIps: number;
   accessNodes: number;
@@ -15,6 +16,7 @@ export interface Stats {
   twins: number;
   contracts: number;
   nodesDistribution: { [key: string]: number };
+  dedicatedNodes: number;
 }
 
 export class StatsClient extends AbstractClient<StatsBuilder, StatsQuery> {

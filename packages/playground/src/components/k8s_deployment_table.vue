@@ -1,64 +1,74 @@
 <template>
-  <v-alert v-if="!loading && count && items.length < count" type="warning" variant="tonal">
-    Failed to load deployment{{ count - items.length > 1 ? "s" : "" }} with name{{
-      count - items.length > 1 ? "s" : ""
-    }}
-    <strong>{{ namesOfFailedDeployments }}</strong
-    >.
-  </v-alert>
+  <div>
+    <v-alert v-if="!loading && count && items.length < count" type="warning" variant="tonal">
+      Failed to load <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
 
-  <ListTable
-    :headers="[
-      { title: 'PLACEHOLDER', key: 'data-table-select' },
-      { title: 'Name', key: 'name' },
-      { title: 'Public IPv4', key: 'ipv4' },
-      { title: 'Public IPv6', key: 'ipv6' },
-      { title: 'Planetary Network IP', key: 'planetary' },
-      { title: 'Workers', key: 'workers' },
-      { title: 'Billing Rate', key: 'billing' },
-      { title: 'Actions', key: 'actions' },
-    ]"
-    :items="items"
-    :loading="loading"
-    :deleting="deleting"
-    :model-value="$props.modelValue"
-    @update:model-value="$emit('update:model-value', $event)"
-    :no-data-text="`No Kubernetes deployments found on this account.`"
-    @click:row="$attrs['onClick:row']"
-  >
-    <template #[`item.name`]="{ item }">
-      {{ item.value.deploymentName }}
-    </template>
+      <span>
+        This might happen because the node is down or it's not reachable
+        <span v-if="showEncryption"
+          >or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span
+        >.
+      </span>
+      <v-icon class="custom-icon" @click="showDialog = true">mdi-file-document-outline </v-icon>
 
-    <template #[`item.ipv4`]="{ item }">
-      {{ item.value.masters[0].publicIP?.ip?.split("/")?.[0] || item.value.masters[0].publicIP?.ip || "None" }}
-    </template>
+      <v-dialog transition="dialog-bottom-transition" v-model="showDialog" max-width="500px">
+        <v-card>
+          <v-card-title style="color: #ffcc00; font-weight: bold">Failed Deployments</v-card-title>
+          <v-divider color="#FFCC00" />
+          <v-card-text>
+            <li v-for="deployment in failedDeployments" :key="deployment.name">
+              {{
+                deployment.nodes.length > 0
+                  ? `${deployment.name} on node${deployment.nodes.length > 1 ? "s" : ""}: ${deployment.nodes.join(
+                      ", ",
+                    )}`
+                  : deployment.name
+              }}
+              <template v-if="deployment.contracts && deployment.contracts.length > 0">
+                with contract id:
+                <span v-for="contract in deployment.contracts" :key="contract.contract_id">
+                  {{ contract.contract_id }} .
+                </span>
+              </template>
+            </li>
+          </v-card-text>
+          <v-card-actions class="justify-end">
+            <v-btn @click="showDialog = false" class="grey lighten-2 black--text" color="#FFCC00">Close</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-alert>
 
-    <template #[`item.ipv6`]="{ item }">
-      {{ item.value.masters[0].publicIP?.ip6 || "None" }}
-    </template>
-
-    <template #[`item.planetary`]="{ item }">
-      {{ item.value.masters[0].planetary || "None" }}
-    </template>
-
-    <template #[`item.workers`]="{ item }">
-      {{ item.value.workers.length }}
-    </template>
-
-    <template #[`item.billing`]="{ item }">
-      {{ item.value.masters[0].billing }}
-    </template>
-
-    <template #[`item.actions`]="{ item }">
-      <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item.value)">
-        Deleting...
-      </v-chip>
-      <v-btn-group variant="tonal" v-else>
-        <slot name="actions" :item="item"></slot>
-      </v-btn-group>
-    </template>
-  </ListTable>
+    <ListTable
+      :headers="[
+        { title: 'PLACEHOLDER', key: 'data-table-select' },
+        { title: 'Name', key: 'name' },
+        { title: 'Public IPv4', key: 'ipv4', sortable: false },
+        { title: 'Public IPv6', key: 'ipv6', sortable: false },
+        { title: 'Planetary Network IP', key: 'planetary', sortable: false },
+        { title: 'Workers', key: 'workersLength' },
+        { title: 'Billing Rate', key: 'billing' },
+        { title: 'Actions', key: 'actions', sortable: false },
+      ]"
+      :items="items"
+      :loading="loading"
+      :deleting="deleting"
+      :model-value="$props.modelValue"
+      @update:model-value="$emit('update:model-value', $event)"
+      :no-data-text="`No Kubernetes deployments found on this account.`"
+      @click:row="$attrs['onClick:row']"
+      :sort-by="sortBy"
+    >
+      <template #[`item.actions`]="{ item }">
+        <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item.value)">
+          Deleting...
+        </v-chip>
+        <v-btn-group variant="tonal" v-else>
+          <slot name="actions" :item="item"></slot>
+        </v-btn-group>
+      </template>
+    </ListTable>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -69,6 +79,9 @@ import { getGrid, updateGrid } from "../utils/grid";
 import { loadK8s, mergeLoadedDeployments } from "../utils/load_deployment";
 
 const profileManager = useProfileManager();
+const showDialog = ref(false);
+const showEncryption = ref(false);
+const failedDeployments = ref<any[]>([]);
 
 const props = defineProps<{
   projectName: string;
@@ -92,15 +105,22 @@ async function loadDeployments() {
   const chunk3 = await loadK8s(updateGrid(grid!, { projectName: "" }));
 
   const clusters = mergeLoadedDeployments(chunk1, chunk2, chunk3);
-  const failedDeployments = [
-    ...((chunk1 as any).failedK8s ?? []),
-    ...((chunk2 as any).failedK8s ?? []),
-    ...((chunk3 as any).failedK8s ?? []),
+  failedDeployments.value = [
+    ...(Array.isArray((chunk1 as any).failedDeployments) ? (chunk1 as any).failedDeployments : []),
+    ...(Array.isArray((chunk2 as any).failedDeployments) ? (chunk2 as any).failedDeployments : []),
+    ...(Array.isArray((chunk3 as any).failedDeployments) ? (chunk3 as any).failedDeployments : []),
   ];
-  namesOfFailedDeployments.value = failedDeployments.join(", ");
 
   count.value = clusters.count;
-  items.value = clusters.items;
+  items.value = clusters.items.map((item: any) => {
+    item.name = item.deploymentName;
+    item.ipv4 = item.masters[0].publicIP?.ip?.split("/")?.[0] || item.masters[0].publicIP?.ip || "None";
+    item.ipv6 = item.masters[0].publicIP?.ip6 || "None";
+    item.planetary = item.masters[0].planetary || "None";
+    item.workersLength = item.workers.length;
+    item.billing = item.masters[0].billing;
+    return item;
+  });
   loading.value = false;
 }
 
@@ -114,6 +134,15 @@ export default {
   name: "K8sDeploymentTable",
   components: {
     ListTable,
+  },
+  data() {
+    return {
+      sortBy: [
+        { key: "name", order: "asc" },
+        { key: "workersLength", order: "asc" },
+        { key: "billing", order: "asc" },
+      ],
+    };
   },
 };
 </script>

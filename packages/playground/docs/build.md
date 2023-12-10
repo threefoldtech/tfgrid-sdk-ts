@@ -2,7 +2,7 @@
 
 ## Run the script
 
-- you can run the script anywhere but make sure the generated config file are placed in [config.js](../config.js)
+- you can run the script anywhere but make sure the generated config file are placed in [config.js](../public/config.js)
 
 ```bash
 cd packages/playground/public

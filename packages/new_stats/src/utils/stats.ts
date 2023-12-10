@@ -6,6 +6,7 @@ function mergeStatsData(stats: Stats[]): Stats {
   const res = stats[0];
   for (let i = 1; i < stats.length; i++) {
     res.accessNodes += stats[i].accessNodes;
+    res.dedicatedNodes += stats[i].dedicatedNodes;
     res.contracts += stats[i].contracts;
     res.countries += stats[i].countries;
     res.farms += stats[i].farms;
@@ -16,6 +17,7 @@ function mergeStatsData(stats: Stats[]): Stats {
     res.totalHru += stats[i].totalHru;
     res.totalMru += stats[i].totalMru;
     res.totalSru += stats[i].totalSru;
+    res.gpus += stats[i].gpus;
     res.twins += stats[i].twins;
     res.nodesDistribution = mergeNodeDistribution([res.nodesDistribution, stats[i].nodesDistribution]);
   }
@@ -55,16 +57,24 @@ export function formatData(network: Network[] = [Network.Main], totalStat: Netwo
     totalSru: 0,
     totalMru: 0,
     totalHru: 0,
+    gpus: 0,
     publicIps: 0,
     accessNodes: 0,
     gateways: 0,
     twins: 0,
     contracts: 0,
     nodesDistribution: {},
+    dedicatedNodes: 0,
   };
   for (let i = 0; i < network.length; i++) {
     const currentStats = totalStat[network[i]];
     if (!currentStats) continue;
+    if (Number.isNaN(currentStats.dedicatedNodes)) {
+      currentStats.dedicatedNodes = 0;
+    }
+    if (Number.isNaN(currentStats.gpus)) {
+      currentStats.gpus = 0;
+    }
     res = mergeStatsData([res, currentStats]);
   }
 

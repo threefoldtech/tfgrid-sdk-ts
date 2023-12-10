@@ -1,7 +1,7 @@
 <template>
   <v-sheet width="100%" v-model="domain">
     <h6 class="text-h5" v-if="!$props.hideTitle">Domain Name</h6>
-    <v-tooltip location="top" text="Use Custom domain name">
+    <v-tooltip location="top" text="Use a custom domain">
       <template #activator="{ props }">
         <v-switch v-bind="props" v-model="customDomain" hide-details color="primary" inset label="Custom domain" />
       </template>
@@ -29,7 +29,13 @@
     </v-expand-transition>
     <div v-if="(!$props.hasIPv4 || !customDomain) && !loading">
       <v-expand-transition>
-        <SelectGatewayNode ref="selectGateway" v-model="gatewayNode" customDomain :farmData="farmData" />
+        <SelectGatewayNode
+          :available-for="$props.availableFor"
+          ref="selectGateway"
+          v-model="gatewayNode"
+          customDomain
+          :farmData="farmData"
+        />
       </v-expand-transition>
       <v-expand-transition>
         <v-alert
@@ -75,6 +81,7 @@ export default {
       type: Boolean,
       default: () => false,
     },
+    availableFor: Number,
   },
   emits: {
     "update:model-value": (value: DomainModel) => true || value,

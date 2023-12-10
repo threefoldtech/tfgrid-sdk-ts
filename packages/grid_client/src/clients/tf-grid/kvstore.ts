@@ -1,4 +1,5 @@
 import { KVStore, KVStoreGetOptions, KVStoreSetOptions } from "@threefold/tfchain_client";
+import { GridClientError } from "@threefold/types";
 import Crypto from "crypto-js";
 import nacl from "tweetnacl";
 import utils from "tweetnacl-util";
@@ -14,18 +15,26 @@ class TFKVStore extends KVStore {
     super(client);
   }
 
-  async set(options: KVStoreSetOptions) {
+  async set(options: KVStoreSetOptions & { encrypt?: boolean }) {
+    if (options.encrypt === false) {
+      return super.set({ key: options.key, value: options.value });
+    }
+
     const encryptedValue = this.encrypt(options.value);
     return super.set({ key: options.key, value: encryptedValue });
   }
 
-  async get(options: KVStoreGetOptions) {
+  async get(options: KVStoreGetOptions & { decrypt?: boolean }) {
     const encryptedValue = await super.get(options);
+    if (options.decrypt === false) {
+      return encryptedValue;
+    }
+
     if (encryptedValue) {
       try {
         return this.decrypt(encryptedValue);
       } catch (e) {
-        throw Error(`Couldn't decrypt key: ${options.key}`);
+        throw new GridClientError(`Couldn't decrypt key: ${options.key}.`);
       }
     }
     return encryptedValue;

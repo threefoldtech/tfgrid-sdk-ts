@@ -9,20 +9,24 @@ import {
   type GqlNodeContract,
   type GqlRentContract,
   GridClient,
+  NodeStatus,
 } from "@threefold/grid_client";
 import { onMounted, ref } from "vue";
 
-import { getOfflineNodes } from "@/utils/get_offline_nodes";
+import { getAllNodes } from "@/utils/get_nodes";
 
 import { useProfileManager } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid } from "../utils/grid";
+import OfflineNodesToast from "./mosha_toast/offline_nodes_toast.vue";
 
 const profileManager = useProfileManager();
 const contractsCount = ref(0);
 
 async function checkOfflineDeployments(grid: GridClient | null) {
-  const offlineNodesids = (await getOfflineNodes(grid, { flat: true })) as number[];
+  const offlineNodesids = (await getAllNodes(grid, { flat: true, status: NodeStatus.down })) as number[];
+  const standByNodesids = (await getAllNodes(grid, { flat: true, status: NodeStatus.standBy })) as number[];
+  const offlineAndStandbyNodes = [...offlineNodesids, ...standByNodesids];
 
   const myContracts: GqlContracts = await grid!.contracts.listMyContracts();
   const contracts: (GqlNodeContract | GqlRentContract)[] = [...myContracts.nodeContracts, ...myContracts.rentContracts];
@@ -31,7 +35,7 @@ async function checkOfflineDeployments(grid: GridClient | null) {
   const withPubIp = [];
 
   for (const contract of contracts) {
-    if (offlineNodesids.includes(contract.nodeID)) {
+    if (offlineAndStandbyNodes.includes(contract.nodeID)) {
       userOfflineDeployments.push(contract.nodeID);
       if ("numberOfPublicIPs" in contract && contract.numberOfPublicIPs > 0) {
         withPubIp.push(contract.contractID);
@@ -40,18 +44,11 @@ async function checkOfflineDeployments(grid: GridClient | null) {
   }
 
   // Get the deployments length.
-  const deploymentLength = userOfflineDeployments.length;
+  const deploymentLen = userOfflineDeployments.length;
 
-  if (deploymentLength) {
-    const withPublicIpsMessage = `${withPubIp.length} ${deploymentLength > 1 ? "of them" : ""} with public ${
-      withPubIp.length > 1 ? "IPs" : "IP"
-    }`;
-    createCustomToast(
-      `You have ${deploymentLength} ${deploymentLength > 1 ? "contracts" : "contract"} on an offline ${
-        deploymentLength > 1 ? "nodes " : "node "
-      }${withPubIp.length ? withPublicIpsMessage : ""}`,
-      ToastType.warning,
-    );
+  if (deploymentLen) {
+    const props = { deploymentLen, withPubIpLen: withPubIp.length };
+    createCustomToast(OfflineNodesToast, ToastType.warning, props);
   }
 }
 
@@ -69,7 +66,13 @@ onMounted(async () => {
     ) {
       contractsCount.value =
         contracts.nameContracts.length + contracts.nodeContracts.length + contracts.rentContracts.length;
-      createCustomToast("You have " + contractsCount.value + " contracts in grace period", ToastType.warning);
+      createCustomToast(
+        "You have " +
+          contractsCount.value +
+          (contractsCount.value > 1 ? " contracts" : " contract") +
+          " in grace period",
+        ToastType.warning,
+      );
     }
     await new Promise(resolve => setTimeout(resolve, 15 * 60 * 1000));
   }

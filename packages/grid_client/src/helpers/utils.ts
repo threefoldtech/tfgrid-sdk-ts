@@ -1,3 +1,6 @@
+import { mnemonicToMiniSecret } from "@polkadot/util-crypto";
+import { validateMnemonic } from "bip39";
+import { Buffer } from "buffer";
 import nacl, { randomBytes } from "tweetnacl";
 import utils from "tweetnacl-util";
 
@@ -36,4 +39,28 @@ function log(message) {
   console.log(JSON.stringify(message, null, 2));
 }
 
-export { generateString, getRandomNumber, randomChoice, randomSecret, randomSecretAsHex, randomNonce, log };
+function toHexSeed(mnemonicOrHexSeed: string): string {
+  if (validateMnemonic(mnemonicOrHexSeed)) {
+    const seed = mnemonicToMiniSecret(mnemonicOrHexSeed);
+    return "0x" + Buffer.from(seed).toString("hex");
+  }
+
+  const seed = mnemonicOrHexSeed.length === 64 ? mnemonicOrHexSeed : mnemonicOrHexSeed.slice(2);
+  return "0x" + seed;
+}
+
+function formatErrorMessage(prefix: string, error: Error) {
+  return `${prefix}\n\t ${error.message}`;
+}
+
+export {
+  generateString,
+  getRandomNumber,
+  randomChoice,
+  randomSecret,
+  randomSecretAsHex,
+  randomNonce,
+  log,
+  toHexSeed,
+  formatErrorMessage,
+};

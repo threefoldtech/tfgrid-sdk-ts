@@ -16,12 +16,50 @@
           }
         "
       >
-        <template #title>Manage Gateways ({{ $props.vm?.[0]?.name }})</template>
+        <template #title>Manage Domains ({{ $props.vm.name }})</template>
 
         <v-tabs align-tabs="center" color="primary" class="mb-6" v-model="gatewayTab" :disabled="deleting">
-          <v-tab>Gateway List</v-tab>
-          <v-tab>Add new gateway</v-tab>
+          <v-tab>Domains List</v-tab>
+          <v-tab>Add new domain</v-tab>
         </v-tabs>
+
+        <v-alert
+          type="warning"
+          variant="tonal"
+          class="mb-4"
+          v-if="failedToListGws.length && gatewayTab === 0 && !loadingGateways"
+        >
+          Failed to list {{ failedToListGws.length }} domains.
+
+          <template #append>
+            <v-btn
+              icon="mdi-format-list-bulleted-square"
+              variant="plain"
+              size="x-small"
+              @click="failedDomainDialog = true"
+            />
+          </template>
+        </v-alert>
+
+        <v-dialog v-model="failedDomainDialog" max-width="400px" scrollable>
+          <v-card>
+            <v-card-title class="bg-warning">Failed Domains</v-card-title>
+
+            <v-card-text>
+              <ul style="list-style: square">
+                <li v-for="gw in failedToListGws" :key="gw">
+                  <span>{{
+                    gw.startsWith(prefix)
+                      ? gw.slice(prefix.length)
+                      : gw.startsWith(oldPrefix)
+                      ? gw.slice(oldPrefix.length)
+                      : gw
+                  }}</span>
+                </li>
+              </ul>
+            </v-card-text>
+          </v-card>
+        </v-dialog>
 
         <div v-show="gatewayTab === 0" :class="{ 'pb-2': !loadingGateways, 'pb-6': loadingGateways }">
           <div class="d-flex justify-end mb-4">
@@ -44,10 +82,18 @@
             :loading="loadingGateways"
             v-model="gatewaysToDelete"
             :deleting="deleting"
-            no-data-text="No gateways found for this deployment."
+            no-data-text="No domains attached to this virtual machine."
           >
             <template #[`item.name`]="{ item }">
-              {{ item.value.name.slice(item.value.name.startsWith(prefix) ? prefix.length : 0) }}
+              {{
+                item.value.name.slice(
+                  item.value.name.startsWith(prefix)
+                    ? prefix.length
+                    : item.value.name.startsWith(oldPrefix)
+                    ? oldPrefix.length
+                    : 0,
+                )
+              }}
             </template>
 
             <template #[`item.tls_passthrough`]="{ item }">
@@ -66,7 +112,9 @@
 
         <div v-show="gatewayTab === 1">
           <form-validator v-model="valid">
-            <input-tooltip tooltip="Subdomain will be used as a gateway name incase of selecting a custom domain.">
+            <input-tooltip
+              :tooltip="`Selecting custom domain sets subdomain as gateway name. Prefix(${prefix}) is solution name, twin ID, and deployment name.`"
+            >
               <input-validator
                 :value="subdomain"
                 :rules="[
@@ -77,8 +125,8 @@
                   validators.minLength('Subdomain must be at least 4 characters.', 4),
                   subdomain =>
                     validators.maxLength(
-                      `Subdomain cannot exceed ${15 - prefix.length} characters.`,
-                      15 - prefix.length,
+                      `Subdomain cannot exceed ${35 - prefix.length} characters.`,
+                      35 - prefix.length,
                     )(subdomain),
                 ]"
                 #="{ props }"
@@ -88,7 +136,7 @@
             </input-tooltip>
 
             <div :style="{ marginTop: '-10px' }">
-              <domain-name hide-title v-model="domainName" />
+              <domain-name :available-for="profileManager.profile?.twinId" hide-title v-model="domainName" />
             </div>
 
             <input-validator
@@ -101,7 +149,7 @@
 
             <div :style="{ marginTop: '-10px' }">
               <input-tooltip
-                tooltip="Disabling TLS Pass Through will let the gateway terminate the traffic, while Enabling it will let your backend service to do the TLS termination."
+                tooltip="When enabled, the backend service will terminate the TLS traffic, otherwise the gateway service will do the TLS traffic termination."
                 inline
               >
                 <v-switch
@@ -116,16 +164,17 @@
             </div>
 
             <copy-input-wrapper #="{ props }" :data="networkName">
-              <v-text-field label="Network Name" v-model="networkName" readonly v-bind="props" />
+              <v-text-field label="Network name" v-model="networkName" readonly v-bind="props" />
             </copy-input-wrapper>
 
             <copy-input-wrapper #="{ props }" :data="ip">
-              <v-text-field label="IP Address" v-model="ip" readonly v-bind="props" />
+              <v-text-field label="Wireguard IP Address" v-model="ip" readonly v-bind="props" />
             </copy-input-wrapper>
           </form-validator>
         </div>
 
         <template #footer-actions>
+          <v-btn color="error" variant="tonal" @click="$emit('close')">Close</v-btn>
           <v-btn
             color="error"
             variant="outlined"
@@ -135,7 +184,7 @@
           >
             Delete
           </v-btn>
-          <v-btn color="primary" variant="tonal" @click="deployGateway" :disabled="!valid" v-else> Deploy </v-btn>
+          <v-btn color="primary" variant="tonal" @click="deployGateway" :disabled="!valid" v-else> Add </v-btn>
         </template>
       </weblet-layout>
     </v-dialog>
@@ -197,6 +246,7 @@ export default {
     const layout = useLayout();
     const gatewayTab = ref(0);
 
+    const oldPrefix = ref("");
     const prefix = ref("");
     const subdomain = ref("");
     const domainName = ref<DomainModel>();
@@ -204,28 +254,37 @@ export default {
     const passThrough = ref(false);
     const valid = ref(false);
 
-    const ip = props.vm[0].interfaces[0].ip as string;
-    const networkName = props.vm[0].interfaces[0].network as string;
+    const ip = props.vm.interfaces[0].ip as string;
+    const networkName = props.vm.interfaces[0].network as string;
 
     onMounted(async () => {
       const grid = await getGrid(profileManager.profile!);
-      prefix.value =
+      oldPrefix.value =
         (props.vm.projectName.toLowerCase().includes(ProjectName.Fullvm.toLowerCase()) ? "fvm" : "vm") +
         grid!.config.twinId;
-      subdomain.value = generateName({}, 15 - prefix.value.length);
-      await grid!.disconnect();
+      prefix.value = oldPrefix.value + props.vm.name;
+      subdomain.value = generateName({}, 35 - prefix.value.length > 7 ? 7 : 35 - prefix.value.length);
       await loadGateways();
     });
 
     const loadingGateways = ref(false);
     const gateways = ref<GridGateway[]>([]);
+    const failedToListGws = ref<string[]>([]);
+    const failedDomainDialog = ref(false);
     async function loadGateways() {
-      gateways.value = [];
-      gatewaysToDelete.value = [];
-      loadingGateways.value = true;
-      const grid = await getGrid(profileManager.profile!, props.vm.projectName);
-      gateways.value = await loadDeploymentGateways(grid!);
-      loadingGateways.value = false;
+      try {
+        gateways.value = [];
+        gatewaysToDelete.value = [];
+        loadingGateways.value = true;
+        const grid = await getGrid(profileManager.profile!, props.vm.projectName);
+        const { gateways: gws, failedToList } = await loadDeploymentGateways(grid!);
+        gateways.value = gws;
+        failedToListGws.value = failedToList;
+      } catch (error) {
+        layout.value.setStatus("failed", normalizeError(error, "Failed to list this deployment's domains."));
+      } finally {
+        loadingGateways.value = false;
+      }
     }
 
     async function deployGateway() {
@@ -278,12 +337,17 @@ export default {
     }
 
     return {
+      profileManager,
+
+      oldPrefix,
       prefix,
       layout,
       gatewayTab,
 
       loadingGateways,
       gateways,
+      failedToListGws,
+      failedDomainDialog,
 
       subdomain,
       port,

@@ -110,7 +110,6 @@ test("TC1271 - Contracts: Get Node Contract By Node ID & Contract Hash", async (
   const hash = generateHash(generateString(8));
   const data = generateString(64);
   const publicIp = 0;
-  const twinId = await gridClient.twins.get_my_twin_id();
 
   // Create Contract
   const contract: NodeContractCreateModel = {
@@ -149,7 +148,6 @@ test("TC1272 - Contracts: Get Name Contract", async () => {
 
   //TestData
   const name = generateString(15).toLowerCase();
-  const twinId = await gridClient.twins.get_my_twin_id();
 
   //Create Contract
   const contract: NameContractCreateModel = {

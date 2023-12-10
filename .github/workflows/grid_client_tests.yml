@@ -2,21 +2,34 @@ name: Grid Client Tests
 
 on:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: 0 0 * * *
   workflow_dispatch:
-
+    inputs:
+      network:
+        type: choice
+        description: "Which network to run tests on"
+        required: true
+        default: "dev"
+        options: 
+        - "dev"
+        - "qa"
+        - "test"
+        - "main"
 jobs:
   tests:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
-      NETWORK: ${{ secrets.NETWORK }}
+      NETWORK: ${{ github.event.inputs.network }}
       RMB_PROXY: true
       STORE_SECRET: secret
       MNEMONIC: ${{ secrets.MNEMONIC }}
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up node 18
-        uses: actions/setup-node@v2
+      - name: set network for Schedule
+        if: ${{env.NETWORK}} == ""
+        run: echo "NETWORK=dev" >> $GITHUB_ENV
+      - uses: actions/checkout@v4
+      - name: Set up node version
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: "yarn"
@@ -28,7 +41,8 @@ jobs:
           gpg --export 569130E8CA20FBC4CB3FDE555898470A764B32C9 | sudo apt-key add -
           echo 'deb http://neilalexander.s3.dualstack.eu-west-2.amazonaws.com/deb/ debian yggdrasil' | sudo tee /etc/apt/sources.list.d/yggdrasil.list
           sudo apt-get update
-          sudo apt-get install yggdrasil
+          wget https://github.com/yggdrasil-network/yggdrasil-go/releases/download/v0.4.7/yggdrasil-0.4.7-amd64.deb
+          sudo dpkg -i yggdrasil-0.4.7-amd64.deb
           sudo systemctl enable yggdrasil
           PEERS=$(curl https://raw.githubusercontent.com/threefoldtech/zos-config/main/development.json | jq '.yggdrasil.peers[]' -r | sed 's/\//\\\//g' | sed -z 's/\n/\\n/g')
           sudo  sed -i -- 's/Peers\: \[\]/Peers: [\n'"$PEERS"']/g' /etc/yggdrasil.conf

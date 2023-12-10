@@ -106,8 +106,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="secondary" variant="tonal" @click="copy">Copy</v-btn>
           <v-btn color="error" variant="tonal" @click="$emit('close')">Close</v-btn>
+          <v-btn color="secondary" variant="tonal" @click="copy">Copy</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

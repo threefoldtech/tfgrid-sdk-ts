@@ -63,8 +63,7 @@ function calcDiskSize(disks: { size: number }[]) {
 
 async function deploy(layout: any) {
   layout.setStatus("deploy");
-  const grid = await getGrid(profileManager.profile!);
-  console.log(props.data.deploymentName);
+  const grid = await getGrid(profileManager.profile!, props.data.projectName);
 
   deployWorker(grid!, {
     ...worker.value,
@@ -83,7 +82,7 @@ async function deploy(layout: any) {
 
 async function onDelete(cb: (workers: any[]) => void) {
   deleting.value = true;
-  const grid = await getGrid(profileManager.profile!);
+  const grid = await getGrid(profileManager.profile!, props.data.projectName);
 
   for (const worker of selectedWorkers.value) {
     try {

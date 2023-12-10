@@ -1,6 +1,7 @@
 <template>
   <copy-input-wrapper :data="data" :loading="loading" #="{ props }">
     <v-textarea
+      readonly
       variant="outlined"
       :label="label"
       :model-value="data"
@@ -10,7 +11,15 @@
       :loading="loading"
       v-if="textarea"
     />
-    <v-text-field variant="outlined" :label="label" :model-value="data" v-bind="props" :loading="loading" v-else />
+    <v-text-field
+      variant="outlined"
+      readonly
+      :label="label"
+      :model-value="data"
+      v-bind="props"
+      :loading="loading"
+      v-else
+    />
   </copy-input-wrapper>
 </template>
 

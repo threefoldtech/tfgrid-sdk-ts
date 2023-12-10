@@ -1,8 +1,10 @@
+import { GridClientErrors, ValidationError } from "@threefold/types";
 import * as PATH from "path";
 
 import { RMB } from "../clients";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
+import { formatErrorMessage } from "../helpers";
 import { HighLevelBase } from "../high_level/base";
 import { KubernetesHL } from "../high_level/kubernetes";
 import { VMHL } from "../high_level/machine";
@@ -106,111 +108,43 @@ class BaseModule {
 
   async _migrateListKeys(): Promise<void> {
     const oldPath = this.getDeploymentPath("");
+    const keys = await this.backendStorage.list(oldPath);
 
-    const oldKeys = await this.backendStorage.list(oldPath);
-    if (oldKeys.length === 0) {
+    if (this.backendStorage.type === BackendStorageType.tfkvstore) {
+      const exts = await Promise.all(
+        keys.map(key =>
+          this.backendStorage.storage.moveValue!(
+            PATH.join(oldPath, key, "contracts.json"),
+            this.getNewDeploymentPath(key, "contracts.json"),
+          ),
+        ),
+      );
+      await this.tfClient.applyAllExtrinsics(exts.flat(1).filter(Boolean));
       return;
     }
 
-    const values = await Promise.all(
-      oldKeys.map(k =>
-        this.backendStorage.load(PATH.join(oldPath, k, "contracts.json")).catch(error => {
-          console.log(`Error while fetching contarct data PATH[${PATH.join(oldPath, k, "contracts.json")}]`, error);
-          return null;
-        }),
-      ),
-    );
+    const __getValue = (key: string) => {
+      const path = PATH.join(oldPath, key, "contracts.json");
+      return this.backendStorage.load(path).catch(error => {
+        console.log(`Error while fetching key('${key}'):`, error.message || error);
+      });
+    };
 
-    const contracts = await Promise.all(
-      values.flat(1).map(value => {
-        if (value) return this.tfClient.contracts.get({ id: value.contract_id });
+    const values = await Promise.all(keys.map(__getValue));
+
+    const __updatePath = (key: string, index: number) => {
+      const value = values[index];
+      const from = PATH.join(oldPath, key, "contracts.json");
+      const to = this.getNewDeploymentPath(key, "contracts.json");
+
+      if (!value || from === to) {
         return Promise.resolve(null);
-      }),
-    );
-
-    const updateContractsExts: Promise<any>[] = [];
-    for (const contract of contracts) {
-      if (!contract) {
-        continue;
       }
 
-      const { nodeContract } = contract.contractType || {};
-      if (!nodeContract) {
-        continue;
-      }
+      return [this.backendStorage.dump(to, value), this.backendStorage.remove(from)];
+    };
 
-      const { deploymentData, deploymentHash: hash } = nodeContract;
-      const oldData = JSON.parse(deploymentData || "{}") as unknown as {
-        type: string;
-        name: string;
-        projectName: string;
-      };
-      const { name, projectName } = oldData;
-
-      let instanceName = name;
-
-      if (this.moduleName === "gateways") {
-        const [, instance] = name.split(this.config.twinId.toString());
-        if (instance) {
-          instanceName = instance;
-        }
-      }
-
-      if (projectName?.endsWith(`/${instanceName}`)) {
-        continue;
-      }
-
-      oldData.projectName = `${projectName}/${instanceName}`;
-
-      updateContractsExts.push(
-        this.tfClient.contracts.updateNode({
-          id: contract.contractId,
-          data: JSON.stringify(oldData),
-          hash,
-        }),
-      );
-    }
-
-    const _updateContractsExts = await Promise.all(updateContractsExts.flat(1));
-    const __updateContractsExts = _updateContractsExts.flat(1).filter(Boolean);
-    await this.tfClient.applyAllExtrinsics(__updateContractsExts);
-
-    let ext1: any[] = [];
-    let ext2: any[] = [];
-
-    for (let i = 0; i < oldKeys.length; i++) {
-      const oldKey = oldKeys[i];
-
-      let newKey = oldKey;
-      if (this.moduleName === "gateways") {
-        const [, key] = oldKey.split(this.config.twinId.toString());
-        if (key) {
-          newKey = key;
-        }
-      }
-
-      const value = values[i];
-      const from = PATH.join(oldPath, oldKey, "contracts.json");
-      const to = this.getNewDeploymentPath(
-        ...(this.projectName.includes(newKey) ? [oldKey] : [newKey, oldKey]),
-        "contracts.json",
-      );
-
-      if (value) {
-        ext1.push(this.backendStorage.dump(to, value));
-        ext2.push(this.backendStorage.remove(from));
-      }
-    }
-
-    ext1 = await Promise.all(ext1.flat(1));
-    ext2 = await Promise.all(ext2.flat(1));
-
-    if (this.backendStorage.type === BackendStorageType.tfkvstore) {
-      ext1 = ext1.flat(1).filter(x => !!x);
-      ext2 = ext2.flat(1).filter(x => !!x);
-
-      await this.tfClient.applyAllExtrinsics(ext1.concat(ext2));
-    }
+    await Promise.all(keys.map(__updatePath).flat(1));
   }
 
   async _list(): Promise<string[]> {
@@ -372,7 +306,7 @@ class BaseModule {
       try {
         deployment = await this.rmb.request([node_twin_id], "zos.deployment.get", payload);
       } catch (e) {
-        throw Error(`Failed to get deployment due to ${e}`);
+        (e as Error).message = formatErrorMessage(`Failed to get deployment`, e);
       }
       let found = false;
       for (const workload of deployment.workloads) {
@@ -498,7 +432,9 @@ class BaseModule {
       });
 
       if (pubIPOldWorkload != "" && twinDeployments.length == 0)
-        throw Error(`Cannot remove a public IP of an existent deployment`);
+        throw new GridClientErrors.Workloads.WorkloadUpdateError(
+          `Cannot remove a public IP of an existent deployment.`,
+        );
 
       oldDeployment = await this.deploymentFactory.fromObj(oldDeployment);
       const node_id = await this._getNodeIdFromContractId(name, oldDeployment.contract_id);
@@ -518,8 +454,14 @@ class BaseModule {
         if (zmachineOldWorkloads.filter(value => zmachineTwinWorkloads.includes(value)).length == 0) continue;
 
         if (pubIPTwinWorkload != pubIPOldWorkload) {
-          if (pubIPTwinWorkload == "") throw Error(`Cannot remove a public IP of an existent deployment`);
-          if (pubIPOldWorkload == "") throw Error(`Cannot add a public IP to an existent deployment`);
+          if (pubIPTwinWorkload == "")
+            throw new GridClientErrors.Workloads.WorkloadUpdateError(
+              `Cannot remove a public IP of an existent deployment.`,
+            );
+          if (pubIPOldWorkload == "")
+            throw new GridClientErrors.Workloads.WorkloadUpdateError(
+              `Cannot add a public IP to an existent deployment.`,
+            );
         }
       }
     }
@@ -642,7 +584,7 @@ class BaseModule {
         return contracts;
       }
     }
-    throw Error(`Instance with name ${name} is not found`);
+    throw new ValidationError(`Instance with name ${name} is not found.`);
   }
 
   async _delete(name: string) {

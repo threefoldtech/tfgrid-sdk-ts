@@ -23,6 +23,7 @@ import { Deployment } from "../zos/deployment";
 import { ZdbModes } from "../zos/zdb";
 import { blockchainType } from "./blockchainInterface";
 const NameLength = 15;
+const FarmNameLength = 40;
 
 enum ContractStates {
   Created = "Created",
@@ -215,7 +216,7 @@ class QSFSZDBGetModel extends BaseGetDeleteModel {}
 class QSFSZDBDeleteModel extends BaseGetDeleteModel {}
 
 class BaseGatewayNameModel {
-  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength + 10) name: string;
+  @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength + 20) name: string;
 }
 
 class GatewayFQDNModel extends BaseGatewayNameModel {
@@ -372,9 +373,11 @@ class TwinDeleteModel {
 class KVStoreSetModel {
   @Expose() @IsString() @IsNotEmpty() key: string;
   @Expose() @IsString() @IsNotEmpty() value: string;
+  @Expose() @IsBoolean() @IsOptional() encrypt?: boolean;
 }
 class KVStoreGetModel {
   @Expose() @IsString() @IsNotEmpty() key: string;
+  @Expose() @IsBoolean() @IsOptional() decrypt?: boolean;
 }
 class KVStoreRemoveModel {
   @Expose() @IsString() @IsNotEmpty() key: string;
@@ -589,6 +592,8 @@ class FilterOptions {
   @Expose() @IsOptional() @IsBoolean() hasGPU?: boolean;
   @Expose() @IsOptional() @IsBoolean() rentable?: boolean;
   @Expose() @IsOptional() @IsInt() @Min(1) rentedBy?: number;
+  @Expose() @IsOptional() @IsBoolean() randomize?: boolean;
+  @Expose() @IsOptional() @IsBoolean() ret_count?: boolean;
   @Expose() @IsOptional() @Transform(({ value }) => NodeStatus[value]) @IsEnum(NodeStatus) status?: NodeStatus;
 }
 
@@ -615,6 +620,8 @@ class FarmFilterOptions {
   @Expose() @IsOptional() @IsInt() size?: number;
   @Expose() @IsOptional() @IsInt() ownedBy?: number;
   @Expose() @IsOptional() @IsInt() farmId?: number;
+  @Expose() @IsOptional() @IsBoolean() randomize?: boolean;
+  @Expose() @IsOptional() @IsBoolean() ret_count?: boolean;
 }
 
 class CalculatorModel {
@@ -654,6 +661,51 @@ class FarmIdModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) id: number;
 }
 
+class FarmPublicIPsModel {
+  @Expose() @IsNotEmpty() @IsIP() ip: string;
+  @Expose() @IsNotEmpty() @IsString() gw: string;
+}
+
+class AddFarmIPModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsNotEmpty() @IsString() ip: string;
+  @Expose() @IsNotEmpty() @IsIP() gw: string;
+}
+
+class IPConfig {
+  @Expose() @IsNotEmpty() @IsString() ip: string;
+  @Expose() @IsNotEmpty() @IsIP() gw: string;
+}
+class PublicConfigModel {
+  @Expose() @IsNotEmpty() @Type(() => IPConfig) @ValidateNested() ip4: IPConfig;
+  @Expose() @IsOptional() ip6: IPConfig | null;
+  @Expose() @IsOptional() @IsString() domain: string | null;
+}
+class AddPublicConfig {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+  @Expose() @IsOptional() @Type(() => PublicConfigModel) @ValidateNested() publicConfig?: PublicConfigModel | null;
+}
+
+class RemoveFarmIPModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsNotEmpty() @IsString() ip: string;
+}
+
+class AddStellarAddressToFarmModel {
+  @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
+  @Expose() @IsString() @IsNotEmpty() stellarAddress: string;
+}
+
+class CreateFarmModel {
+  @Expose() @IsString() @IsNotEmpty() @MaxLength(FarmNameLength) name: string;
+  @Expose()
+  @IsOptional()
+  @Type(() => FarmPublicIPsModel)
+  @ValidateNested({ each: true })
+  publicIps?: FarmPublicIPsModel[];
+}
+
 class pingFarmModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) farmId: number;
 }
@@ -678,7 +730,7 @@ class NetworkGetModel {
 
 class SetDedicatedNodeExtraFeesModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
-  @Expose() @IsInt() @IsNotEmpty() @Min(1) extraFee: number;
+  @Expose() @IsNumber() @IsNotEmpty() @Min(0) extraFee: number;
 }
 
 class GetDedicatedNodePriceModel {
@@ -808,6 +860,7 @@ export {
   ZOSNodeModel,
   NodePowerModel,
   FarmIdModel,
+  CreateFarmModel,
   pingFarmModel,
   CreateServiceContractModel,
   ServiceContractApproveModel,
@@ -824,5 +877,9 @@ export {
   GetDedicatedNodePriceModel,
   SwapToStellarModel,
   ListenToMintCompletedModel,
+  AddFarmIPModel,
+  RemoveFarmIPModel,
+  AddStellarAddressToFarmModel,
+  AddPublicConfig,
   GetActiveContractsModel,
 };

@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/umbrel.png"
   >
     <template #title>Deploy an Umbrel Instance </template>
@@ -76,9 +77,9 @@
 
       <SelectSolutionFlavor
         v-model="solution"
-        :minimum="{ cpu: 2, memory: 1024 * 2, disk: 10 }"
-        :standard="{ cpu: 2, memory: 1024 * 4, disk: 50 }"
-        :recommended="{ cpu: 4, memory: 1024 * 4, disk: 100 }"
+        :small="{ cpu: 1, memory: 2, disk: 10 }"
+        :medium="{ cpu: 2, memory: 4, disk: 50 }"
+        :large="{ cpu: 4, memory: 16, disk: 100 }"
         :disabled="loadingFarm"
       />
 
@@ -92,9 +93,10 @@
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
         <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
       </input-tooltip>
-
+      <NodeSelector v-model="selection" />
       <SelectFarmManager>
         <SelectFarm
+          v-if="selection == Selection.AUTOMATED"
           :filters="{
             cpu: solution?.cpu,
             memory: solution?.memory,
@@ -105,10 +107,12 @@
           }"
           v-model="farm"
           v-model:loading="loadingFarm"
+          v-model:search="farmName"
         />
 
         <SelectNode
           v-model="selectedNode"
+          :selection="selection"
           :filters="{
             farmId: farm?.farmID,
             cpu: solution?.cpu,
@@ -129,23 +133,25 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
+
+import { Selection } from "@/utils/types";
 
 import Network from "../components/networks.vue";
+import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { Farm, Flist, solutionFlavor as SolutionFlavor } from "../types";
+import type { FarmInterface, Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 import { generateName, generatePassword } from "../utils/strings";
-
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
-
+const selection = ref();
 const name = ref(generateName({ prefix: "um" }));
 const username = ref("admin");
 const password = ref(generatePassword());
@@ -154,7 +160,8 @@ const planetary = ref(true);
 const wireguard = ref(false);
 const network = ref();
 const solution = ref() as Ref<SolutionFlavor>;
-const farm = ref() as Ref<Farm>;
+const farm = ref() as Ref<FarmInterface>;
+const farmName = ref();
 const loadingFarm = ref(false);
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/umbrel-latest.flist",
@@ -164,6 +171,16 @@ const dedicated = ref(false);
 const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
+watch(
+  () => selection.value,
+  (value, oldValue) => {
+    if (value !== oldValue) {
+      loadingFarm.value = false;
+    }
+  },
+  { deep: false },
+);
+
 async function deploy() {
   layout.value.setStatus("deploy");
 

@@ -1,20 +1,20 @@
-interface Period {
+export interface Period {
   start: number;
   end: number;
 }
 
-interface CloudUnits {
+export interface CloudUnits {
   cu: number;
   su: number;
   nu: number;
 }
 
-interface Reward {
+export interface Reward {
   tft: number;
   musd: number;
 }
 
-interface ResourcesUnits {
+export interface ResourcesUnits {
   cru: number;
   mru: number;
   hru: number;
@@ -27,7 +27,7 @@ export interface Receipt {
   stellar_payout_address: string;
 }
 
-interface Minting extends Receipt {
+export interface Minting extends Receipt {
   cloud_units: CloudUnits;
   farm_name: string;
   measured_uptime: number;
@@ -37,7 +37,7 @@ interface Minting extends Receipt {
   tft_connection_price: number;
 }
 
-interface Fixup extends Receipt {
+export interface Fixup extends Receipt {
   correct_cloud_units: CloudUnits;
   correct_reward: Reward;
   fixup_cloud_units: CloudUnits;

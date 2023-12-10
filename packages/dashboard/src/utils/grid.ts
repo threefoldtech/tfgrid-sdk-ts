@@ -8,6 +8,15 @@ export async function getGrid(mnemonic: string) {
     mnemonic,
     network: config.network as NetworkEnv,
     backendStorageType: BackendStorageType.tfkvstore,
+    ...((config.network as NetworkEnv) !== NetworkEnv.custom
+      ? {}
+      : {
+          relayURL: config.relay,
+          graphqlURL: config.graphqlUrl,
+          substrateURL: config.wsUrl,
+          activationURL: config.activationServiceUrl,
+          proxyURL: config.gridproxyUrl,
+        }),
   });
 
   await grid.connect();
@@ -19,6 +28,15 @@ export function activateAccountAndCreateTwin(mnemonic: string) {
     network: config.network as NetworkEnv,
     mnemonic,
     storeSecret: mnemonic,
+    ...((config.network as NetworkEnv) !== NetworkEnv.custom
+      ? {}
+      : {
+          relayURL: config.relay,
+          graphqlURL: config.graphqlUrl,
+          substrateURL: config.wsUrl,
+          activationURL: config.activationServiceUrl,
+          proxyURL: config.gridproxyUrl,
+        }),
   });
   grid._connect();
   const relay = grid.getDefaultUrls(config.network as NetworkEnv).relay.slice(6);
@@ -35,8 +53,8 @@ export async function loadProfile(grid: GridClient): Promise<Profile> {
 }
 
 export async function getMetadata(grid: GridClient): Promise<{ [key: string]: any }> {
-  const metadata = await grid.kvstore.get({ key: "metadata" });
   try {
+    const metadata = await grid.kvstore.get({ key: "metadata" });
     return JSON.parse(metadata);
   } catch {
     return {};
@@ -81,6 +99,15 @@ export function createAccount() {
     network,
     mnemonic: "",
     storeSecret: "test",
+    ...((config.network as NetworkEnv) !== NetworkEnv.custom
+      ? {}
+      : {
+          relayURL: config.relay,
+          graphqlURL: config.graphqlUrl,
+          substrateURL: config.wsUrl,
+          activationURL: config.activationServiceUrl,
+          proxyURL: config.gridproxyUrl,
+        }),
   });
   grid._connect();
   const relay = grid.getDefaultUrls(network).relay.slice(6);

@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :certified="certified"
     :dedicated="dedicated"
+    :SelectedNode="selectedNode"
     title-image="images/icons/algorand.png"
   >
     <template #title>Deploy a Algorand Instance </template>
@@ -151,9 +152,10 @@
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
         <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
       </input-tooltip>
-
+      <NodeSelector v-model="selection" />
       <SelectFarmManager>
         <SelectFarm
+          v-if="selection == Selection.AUTOMATED"
           :filters="{
             cpu: cpu,
             memory: memory,
@@ -164,9 +166,11 @@
           }"
           v-model="farm"
           v-model:loading="loadingFarm"
+          v-model:search="farmName"
         />
         <SelectNode
           v-model="selectedNode"
+          :selection="selection"
           :filters="{
             farmId: farm?.farmID,
             cpu,
@@ -191,10 +195,13 @@
 <script lang="ts" setup>
 import { computed, type Ref, ref, watch } from "vue";
 
+import { Selection } from "@/utils/types";
+
 import Network from "../components/networks.vue";
+import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import { type Farm, type Flist, ProjectName, type Validators } from "../types";
+import { type FarmInterface, type Flist, ProjectName, type Validators } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
@@ -203,6 +210,7 @@ const layout = useLayout();
 const valid = ref(false);
 const lastRoundInput = ref();
 const profileManager = useProfileManager();
+const selection = ref();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/algorand-latest.flist",
   entryPoint: "/sbin/zinit init",
@@ -218,13 +226,23 @@ const account = ref("");
 const wordsLength = computed(() => (account.value ? account.value.split(" ").length : 0));
 const firstRound = ref(24000000);
 const lastRound = ref(26000000);
-const farm = ref() as Ref<Farm>;
+const farm = ref() as Ref<FarmInterface>;
+const farmName = ref();
 const dedicated = ref(false);
 const certified = ref(false);
 const loadingFarm = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const rootFilesystemSize = computed(() => storage.value);
 watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()));
+watch(
+  () => selection.value,
+  (value, oldValue) => {
+    if (value !== oldValue) {
+      loadingFarm.value = false;
+    }
+  },
+  { deep: false },
+);
 
 async function deploy() {
   layout.value.setStatus("deploy");

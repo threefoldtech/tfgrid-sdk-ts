@@ -1,4 +1,5 @@
 import { Balance, Balances, BalanceTransferOptions, Client, QueryBalancesGetOptions } from "@threefold/tfchain_client";
+import { GridClientError } from "@threefold/types";
 import { Decimal } from "decimal.js";
 
 class TFBalances extends Balances {
@@ -19,7 +20,7 @@ class TFBalances extends Balances {
 
   async getMoreFunds() {
     if (this.client.url !== "wss://tfchain.dev.grid.tf/ws" && this.client.url !== "wss://tfchain.qa.grid.tf/ws") {
-      throw "Unable to get more TFTs";
+      throw new GridClientError("Unable to get more TFTs.");
     }
     await this.client.connect();
     const client = new Client({ url: this.client.url, mnemonicOrSecret: "//Alice" });

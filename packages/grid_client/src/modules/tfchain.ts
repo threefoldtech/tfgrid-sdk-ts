@@ -1,5 +1,6 @@
 import { Keyring } from "@polkadot/keyring";
 import { waitReady } from "@polkadot/wasm-crypto";
+import { BaseError, TFChainError, ValidationError } from "@threefold/types";
 import axios from "axios";
 import { generateMnemonic } from "bip39";
 import { Buffer } from "buffer";
@@ -8,6 +9,7 @@ import * as PATH from "path";
 
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
+import { formatErrorMessage } from "../helpers";
 import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { appPath, BackendStorage, BackendStorageType, StorageUpdateAction } from "../storage/backend";
@@ -85,7 +87,7 @@ class TFChain implements blockchainInterface {
   async save(name: string, mnemonic: string) {
     const [path, data] = await this._load();
     if (data[name]) {
-      throw Error(`An account with the same name ${name} already exists`);
+      throw new ValidationError(`An account with the same name ${name} already exists.`);
     }
     const updateOperations = await this.backendStorage.update(path, name, mnemonic);
     await this.saveIfKVStoreBackend(updateOperations);
@@ -103,7 +105,7 @@ class TFChain implements blockchainInterface {
   async getMnemonics(name: string) {
     const [, data] = await this._load();
     if (!data[name]) {
-      throw Error(`An account with the name ${name} does not exist.`);
+      throw new ValidationError(`An account with the name ${name} does not exist.`);
     }
     return data[name];
   }
@@ -127,7 +129,7 @@ class TFChain implements blockchainInterface {
   @validateInput
   async update(options: TfchainWalletInitModel) {
     if (!(await this.exist(options))) {
-      throw Error(`Couldn't find an account with name ${options.name}`);
+      throw new ValidationError(`Couldn't find an account with name ${options.name}.`);
     }
     const client = new TFClient(this.substrateURL, options.secret, this.storeSecret, this.keypairType);
     await client.connect();
@@ -142,7 +144,11 @@ class TFChain implements blockchainInterface {
       );
       await this.saveIfKVStoreBackend(updateOperations);
     } catch (e) {
-      throw Error(`could not update account mnemonics: ${e}`);
+      if (e instanceof BaseError) {
+        e.message = formatErrorMessage(`Could not update account mnemonics`, e);
+        throw e;
+      }
+      throw new TFChainError(`Could not update account mnemonics: ${e}`);
     }
     return client.address;
   }
@@ -176,7 +182,7 @@ class TFChain implements blockchainInterface {
   @validateInput
   async assets(options: BlockchainGetModel): Promise<BlockchainAssetsModel> {
     if (!(await this.exist(options))) {
-      throw Error(`Couldn't find an account with name ${options.name}`);
+      throw new ValidationError(`Couldn't find an account with name ${options.name}.`);
     }
     const mnemonics = await this.getMnemonics(options.name);
     const client = new TFClient(this.substrateURL, mnemonics, this.storeSecret, this.keypairType);
@@ -214,7 +220,12 @@ class TFChain implements blockchainInterface {
     try {
       await (await sourceClient.balances.transfer({ address: options.address_dest, amount: options.amount })).apply();
     } catch (e) {
-      throw Error(`Could not complete transfer transaction: ${e}`);
+      //TODO error should be handled in tfchain?
+      if (e instanceof BaseError) {
+        e.message = formatErrorMessage(`Could not complete transfer transaction`, e);
+        throw e;
+      }
+      throw new TFChainError(`Could not complete transfer transaction: ${e}`);
     }
   }
   @expose
@@ -233,7 +244,11 @@ class TFChain implements blockchainInterface {
         })
       ).apply();
     } catch (e) {
-      throw Error(`Could not complete transfer transaction: ${e}`);
+      if (e instanceof BaseError) {
+        e.message = formatErrorMessage(`Could not complete transfer transaction`, e);
+        throw e;
+      }
+      throw new TFChainError(`Could not complete transfer transaction: ${e}`);
     }
   }
 
@@ -241,7 +256,7 @@ class TFChain implements blockchainInterface {
   @validateInput
   async delete(options: BlockchainDeleteModel) {
     if (!(await this.exist(options))) {
-      throw Error(`Couldn't find an account with name ${options.name}`);
+      throw new ValidationError(`Couldn't find an account with name ${options.name}.`);
     }
     const path = this.getPath();
     const updateOperations = await this.backendStorage.update(path, options.name, "", StorageUpdateAction.delete);
@@ -253,7 +268,7 @@ class TFChain implements blockchainInterface {
   @validateInput
   async create(options: TfchainCreateModel): Promise<BlockchainCreateResultModel> {
     if (await this.exist({ name: options.name })) {
-      throw Error(`An account with the same name ${options.name} already exists`);
+      throw new ValidationError(`An account with the same name ${options.name} already exists.`);
     }
     const createdAccount = await this.createAccount(options.relay as string);
     await this.init({ name: options.name, secret: createdAccount.mnemonic });
@@ -286,7 +301,7 @@ class TFChain implements blockchainInterface {
       await new Promise(f => setTimeout(f, 1000));
     }
     if (balance.free <= 0) {
-      throw Error("Couldn't activate the newly created account");
+      throw new TFChainError("Couldn't activate the newly created account.");
     }
     await (
       await client.termsAndConditions.accept({ documentLink: "https://library.threefold.me/info/legal/#/" })
@@ -307,7 +322,7 @@ class TFChain implements blockchainInterface {
     const hash = MD5(options.content);
     const message_bytes = Uint8Array.from(Buffer.from(hash.toString(), "hex"));
     const keyr = new Keyring({ type: this.keypairType });
-    const key = keyr.addFromMnemonic(mnemonics);
+    const key = keyr.addFromUri(mnemonics);
     await waitReady();
     const signed = key.sign(message_bytes);
     return Buffer.from(signed).toString("hex");

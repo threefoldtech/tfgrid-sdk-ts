@@ -2,6 +2,8 @@ import { type FilterOptions, GatewayFQDNModel, GatewayNameModel, type GridClient
 
 import { SolutionCode } from "@/types";
 
+import { migrateModule } from "./migration";
+
 export function loadGatewayNodes(grid: GridClient, options: Omit<FilterOptions, "gateway"> = {}) {
   return grid.capacity
     .filterNodes({
@@ -61,9 +63,28 @@ export async function rollbackDeployment(grid: GridClient, name: string) {
   return result;
 }
 
-export type GridGateway = Awaited<ReturnType<typeof loadDeploymentGateways>>[0];
+export type GridGateway = Awaited<ReturnType<GridClient["gateway"]["getObj"]>>[0];
 export async function loadDeploymentGateways(grid: GridClient) {
+  const failedToList: string[] = [];
   const gws = await grid.gateway.list();
-  const items = await Promise.all(gws.map(gw => grid.gateway.getObj(gw)));
-  return items.flat();
+  const items = await Promise.all(
+    gws.map(gw => {
+      let timeout: ReturnType<typeof setTimeout>;
+
+      return Promise.race([
+        grid.gateway.getObj(gw),
+        new Promise((_, rej) => {
+          timeout = setTimeout(() => {
+            rej("Timeout!");
+          }, window.env.TIMEOUT);
+        }),
+      ])
+        .catch(() => {
+          failedToList.push(gw);
+          return null;
+        })
+        .finally(() => timeout && clearTimeout(timeout));
+    }),
+  );
+  return { gateways: items.flat().filter(Boolean) as GridGateway[], failedToList };
 }

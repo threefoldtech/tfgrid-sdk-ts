@@ -40,7 +40,7 @@ export function normalizeBalance(num: number | string | undefined, floor = false
     else return "~ <0.001";
   }
 
-  return (+num).toFixed(3).replace(/0+$/g, "");
+  return (+num).toFixed(3).replace(/\.0+$/g, "");
 }
 
 export function isEnoughBalance(balance: any, min = 0.001): boolean {
