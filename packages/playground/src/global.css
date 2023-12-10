@@ -46,10 +46,9 @@
   border-width: thin !important;
   border-style: solid !important;
   z-index: 99;
-  background-color: rgb(var(--v-theme-background)) !important;
-  color: var(--v-theme-text) !important;
-  font-weight: 400 !important;
-  font-size: 0.875rem !important;
+  background-color: rgb(var(--v-theme-background));
+  color: var(--v-theme-text);
+  font-weight: 900;
 }
 
 a {
@@ -117,11 +116,4 @@ a {
 
 .v-breadcrumbs-item--disabled {
   opacity: 1;
-}
-
-.v-list-item-title,
-.v-label,
-.v-data-table-header__content,
-.v-data-table__tr {
-  font-size: 0.875rem !important;
 }
