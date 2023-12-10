@@ -36,8 +36,8 @@ async function main() {
   const offlineNodes: number[] = [];
   let failedCount = 0;
   let successCount = 0;
-  const batchSize = 5;
-  const totalVMs = 10;
+  const batchSize = 50;
+  const totalVMs = 250;
   const batches = totalVMs / batchSize;
 
   // resources
