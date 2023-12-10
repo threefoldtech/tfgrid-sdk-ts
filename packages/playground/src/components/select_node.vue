@@ -38,8 +38,8 @@
               ...props,
               loading: props.loading || loadingNodes || pingingNode,
               hint: pingingNode ? `Checking if the disks will fit in the node's storage pools... ` : props.hint,
-              error: isLoading ? false : !!errorMessage || props.error,
-              errorMessages: isLoading ? undefined : errorMessage || props.errorMessages,
+              error: _isLoading ? false : !!errorMessage || props.error,
+              errorMessages: _isLoading ? undefined : errorMessage || props.errorMessages,
             }"
           >
             <template v-slot:item="{ item, props }">
@@ -261,33 +261,28 @@ const filtersUpdated = ref(false);
 watch(
   () => props.filters,
   value => {
-    if (validator.value?.status !== ValidatorStatus.Init) {
-      filtersUpdated.value = !equals(value, baseFilters.value);
+    if (!baseFilters.value) {
+      baseFilters.value = value;
     }
+
+    filtersUpdated.value = !equals(value, baseFilters.value);
     validator.value?.setStatus(filtersUpdated.value ? ValidatorStatus.Init : ValidatorStatus.Valid);
   },
   { deep: true },
 );
 
-onMounted(loadNodes);
+onMounted(() => {
+  baseFilters.value = undefined;
+  loadNodes();
+});
 
 watch(
   () => props.filters,
   async (value, oldValue) => {
-    if (
-      value.farmId === oldValue.farmId &&
-      value.diskSizes.length === oldValue.diskSizes.length &&
-      new Set([...value.diskSizes, ...oldValue.diskSizes]).size === value.diskSizes.length &&
-      value.cpu === oldValue.cpu &&
-      value.memory === oldValue.memory &&
-      value.certified === oldValue.certified &&
-      value.rentedBy === oldValue.rentedBy &&
-      value.ipv4 === oldValue.ipv4 &&
-      value.ipv6 === oldValue.ipv6 &&
-      value.hasGPU === oldValue.hasGPU
-    ) {
+    if (equals(value, oldValue)) {
       return;
     }
+
     if (props.selection === Selection.MANUAL && manualselectedNode.value) {
       manualField.value?.validate();
     }
@@ -456,6 +451,13 @@ async function loadNodes() {
       }
     }
   } catch (e) {
+    const msg = (e as Error).message || (e as string) || "";
+
+    if (msg.trim().toLowerCase().startsWith("validation failed")) {
+      errorMessage.value = "Please provide a valid data.";
+      return;
+    }
+
     errorMessage.value = normalizeError(e, "Something went wrong while fetching nodes.");
   } finally {
     validator.value?.setStatus(ValidatorStatus.Init);
@@ -506,9 +508,8 @@ async function validateNodeStoragePool(validatingNode: INode | undefined) {
   }
 }
 
-const isLoading = computed(() => {
-  return loadingNodes.value || pingingNode.value || validator.value?.status === ValidatorStatus.Pending;
-});
+const isLoading = computed(() => loadingNodes.value || pingingNode.value || validator.value?.status === ValidatorStatus.Pending); // prettier-ignore
+const _isLoading = computed(() => isLoading.value || filtersUpdated.value || props.loadingFarm);
 
 watch(isLoading, loading => farmManager?.setLoading(loading));
 </script>
