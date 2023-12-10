@@ -131,7 +131,7 @@
         </v-toolbar>
 
         <v-toolbar
-          v-if="navbarConfig"
+          v-if="navbarConfig && hasActiveProfile"
           :color="theme.name.value === AppThemeSelection.dark ? '#121212' : 'background'"
           class="border position-fixed py-0 d-flex pr-2"
           :style="{
