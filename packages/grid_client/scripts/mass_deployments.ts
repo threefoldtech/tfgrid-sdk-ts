@@ -6,12 +6,16 @@ import {
   MachineModel,
   MachinesModel,
   NetworkModel,
+  NodeInfo,
   TwinDeployment,
 } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
-async function pingNodes(grid3: GridClient, nodes: any[]): Promise<any[]> {
+async function pingNodes(
+  grid3: GridClient,
+  nodes: any[],
+): Promise<Promise<{ node: NodeInfo; error?: Error; res?: unknown }[]>> {
   const pingPromises = nodes.map(async node => {
     try {
       const res = await grid3.zos.pingNode({ nodeId: node.nodeId });
@@ -36,8 +40,8 @@ async function main() {
   const offlineNodes: number[] = [];
   let failedCount = 0;
   let successCount = 0;
-  const batchSize = 50;
-  const totalVMs = 250;
+  const batchSize = 5;
+  const totalVMs = 10;
   const batches = totalVMs / batchSize;
 
   // resources
