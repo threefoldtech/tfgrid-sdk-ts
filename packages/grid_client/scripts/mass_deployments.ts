@@ -30,14 +30,14 @@ async function main() {
 
   // Timeout for deploying vm is 2 min
   grid3.clientOptions.deploymentTimeoutMinutes = 2;
-  await grid3.connect();
+  await grid3._connect();
 
   const errors: any = [];
   const offlineNodes: number[] = [];
   let failedCount = 0;
   let successCount = 0;
-  const batchSize = 50;
-  const totalVMs = 250;
+  const batchSize = 5;
+  const totalVMs = 10;
   const batches = totalVMs / batchSize;
 
   // resources
