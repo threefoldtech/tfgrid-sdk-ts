@@ -348,6 +348,15 @@ class Nodes {
     return +(await sendWithFullResponse("get", urlJoin(url, `/farms?${query}`), "", {})).headers["count"];
   }
 
+  async getNodesCount(options: FilterOptions = {}, url = ""): Promise<number> {
+    const _options = { ...options };
+    url = url || this.proxyURL;
+    _options.ret_count = true;
+    _options.page = 1;
+    const query = this.getNodeUrlQuery(_options);
+    return +(await sendWithFullResponse("get", urlJoin(url, `/nodes?${query}`), "", {})).headers["count"];
+  }
+
   /**
    * Get farm id from farm name.
    * It returns 0 in case the farm name is not found.
