@@ -6,14 +6,31 @@
 
     <div class="d-flex">
       <VAutocomplete
+        ref="nodeInput"
         label="Node"
         placeholder="Select node"
         :items="loadedNodes"
         item-title="nodeId"
         return-object
         :model-value="$props.modelValue"
-        @update:model-value="$emit('update:model-value', $event)"
+        @update:model-value="bindModelValue($event)"
         :disabled="filtersUpdated"
+        :loading="nodeInputValidateTask.loading"
+        required
+        :hint="
+          nodeInputValidateTask.loading ? `Checking if the disks will fit in the node's storage pools...` : undefined
+        "
+        :persistent-hint="nodeInputValidateTask.loading"
+        clearable
+        @click:clear="bindModelValue()"
+        :error="!!nodeInputValidateTask.error && !filtersUpdated"
+        :error-messages="!filtersUpdated ? nodeInputValidateTask.error || undefined : undefined"
+        @blur.once="
+          () => {
+            touched = true;
+            !nodeInputValidateTask.initialized && nodeInputValidateTask.run($props.modelValue);
+          }
+        "
       >
         <template #item="{ item, props }">
           <VListItem v-bind="props">
@@ -38,6 +55,7 @@
               variant="tonal"
               :loading="nodesTask.loading"
               prepend-icon="mdi-reload"
+              :disabled="nodeInputValidateTask.loading"
             >
               Load More Nodes
             </VBtn>
@@ -51,6 +69,7 @@
         class="mt-2 ml-2"
         @click="resetPageAndReloadNodes()"
         :loading="pageCountTask.loading || nodesTask.loading"
+        :disabled="nodeInputValidateTask.loading"
       >
         Load Nodes
       </VBtn>
@@ -59,9 +78,10 @@
 </template>
 
 <script lang="ts">
-import type { FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
+import type { FarmInfo, FilterOptions } from "@threefold/grid_client";
 import equals from "lodash/fp/equals.js";
 import { computed, nextTick, onMounted, type PropType, ref } from "vue";
+import type { VInput } from "vuetify/components/VInput";
 
 import { useAsync, useWatchDeep } from "../../hooks";
 import { useGrid } from "../../stores";
@@ -74,10 +94,17 @@ import {
   normalizeNodeOptions,
 } from "../../utils/nodeSelector";
 
+export interface SelectedNode {
+  nodeId: number;
+  state?: "Dedicated" | "Shared";
+  // cards?: NodeGPUCardType[];
+  certified?: string;
+}
+
 export default {
   name: "TfAutoNodeSelector",
   props: {
-    modelValue: Object as PropType<NodeInfo>,
+    modelValue: Object as PropType<SelectedNode>,
     filters: {
       type: Object as PropType<NodeSelectorFilters>,
       required: true,
@@ -92,22 +119,22 @@ export default {
     },
   },
   emits: {
-    "update:model-value": (node?: NodeInfo) => true || node,
+    "update:model-value": (node?: SelectedNode) => true || node,
   },
   setup(props, ctx) {
     const gridStore = useGrid();
-    const loadedNodes = ref<NodeInfo[]>([]);
+    const loadedNodes = ref<SelectedNode[]>([]);
     const nodesTask = useAsync(loadNodes, {
       onBeforeTask() {
         const oldNode = props.modelValue;
-        ctx.emit("update:model-value");
+        bindModelValue();
         return oldNode?.nodeId;
       },
       onAfterTask({ data }, oldNodeId: number) {
-        loadedNodes.value = loadedNodes.value.concat(data as NodeInfo[]);
+        loadedNodes.value = loadedNodes.value.concat(data as SelectedNode[]);
         if (oldNodeId) {
           const index = loadedNodes.value.findIndex(n => n.nodeId === oldNodeId);
-          ctx.emit("update:model-value", loadedNodes.value[index]);
+          bindModelValue(loadedNodes.value[index]);
         }
         nextPage();
       },
@@ -169,6 +196,42 @@ export default {
       return reloadNodes();
     }
 
+    const nodeInput = ref<VInput>();
+    const nodeInputValidateTask = useAsync<true, string, [SelectedNode | undefined]>(async node => {
+      if (!node || !node.nodeId) {
+        throw "Node ID is required.";
+      }
+
+      try {
+        await gridStore.client.capacity.checkNodeCapacityPool({
+          nodeId: node.nodeId,
+          ssdDisks: [props.filters.solutionDisk ?? 0, ...(props.filters.ssdDisks || [])]
+            .filter(Boolean)
+            .map(disk => disk * 1024 ** 3),
+          rootfsDisks: [(props.filters.rootFilesystemSize ?? 0) * 1024 ** 3],
+          hddDisks: props.filters.hddDisks || [],
+        });
+        return true;
+      } catch (error) {
+        if (error?.toString().includes("Cannot fit the required SSD disk with size")) {
+          throw (
+            "Although node " +
+            node.nodeId +
+            " appears to have sufficient storage capacity for your workload, it lacks a single internal " +
+            "partition capable of accommodating it. Please select a different node."
+          );
+        }
+
+        throw "Something went wrong while checking status of the node. Please check your connection and try again.";
+      }
+    });
+
+    const touched = ref(false);
+    function bindModelValue(node?: SelectedNode) {
+      ctx.emit("update:model-value", node);
+      (touched.value || node) && nodeInputValidateTask.value.run(node);
+    }
+
     return {
       pageCountTask,
       nodesTask,
@@ -178,6 +241,11 @@ export default {
       page,
 
       filtersUpdated,
+      nodeInput,
+      nodeInputValidateTask,
+
+      touched,
+      bindModelValue,
     };
   },
 };

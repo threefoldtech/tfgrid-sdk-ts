@@ -12,8 +12,6 @@
       <TfSelectLocation v-model="location" />
       <TfSelectFarm :filters="filters" :location="location" v-model="farm" />
       <TfAutoNodeSelector :filters="filters" :location="location" :farm="farm" v-model="node" />
-
-      node: {{ node }}
     </div>
 
     <div v-else>Manual (not yet implemented)</div>
@@ -21,11 +19,11 @@
 </template>
 
 <script lang="ts">
-import type { FarmInfo, NodeInfo } from "@threefold/grid_client";
+import type { FarmInfo } from "@threefold/grid_client";
 import { type PropType, type Ref, ref } from "vue";
 
 import type { NodeSelectorFilters, SelectedLocation } from "../../types/nodeSelector";
-import TfAutoNodeSelector from "./TfAutoNodeSelector.vue";
+import TfAutoNodeSelector, { type SelectedNode } from "./TfAutoNodeSelector.vue";
 import TfSelectFarm from "./TfSelectFarm.vue";
 import TfSelectLocation from "./TfSelectLocation.vue";
 
@@ -42,7 +40,7 @@ export default {
     const wayToSelect = ref<"manual" | "automated">("automated");
     const location = ref<SelectedLocation>({});
     const farm = ref({}) as Ref<FarmInfo>;
-    const node = ref<NodeInfo>();
+    const node = ref<SelectedNode>();
 
     return { wayToSelect, location, farm, node };
   },
