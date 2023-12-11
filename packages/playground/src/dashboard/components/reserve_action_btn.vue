@@ -17,7 +17,7 @@
       </v-card>
     </v-dialog>
     <v-btn
-      small
+      size="small"
       outlined
       :loading="loadingReserveNode"
       :disabled="disableButton"
