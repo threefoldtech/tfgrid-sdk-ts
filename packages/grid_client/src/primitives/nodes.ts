@@ -340,10 +340,11 @@ class Nodes {
    * @throws Error if there is an issue with the HTTP request or response.
    */
   async getFarmsCount(options: FilterOptions = {}, url = ""): Promise<number> {
+    const _options = { ...options };
     url = url || this.proxyURL;
-    options.ret_count = true;
-    options.page = 1;
-    const query = this.getFarmUrlQuery(options);
+    _options.ret_count = true;
+    _options.page = 1;
+    const query = this.getFarmUrlQuery(_options);
     return +(await sendWithFullResponse("get", urlJoin(url, `/farms?${query}`), "", {})).headers["count"];
   }
 
