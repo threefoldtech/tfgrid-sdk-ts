@@ -53,7 +53,8 @@
         <v-card-text> Are you sure you want to delete IP {{ itemToDelete?.ip }}? </v-card-text>
         <v-card-actions class="justify-end px-5 pb-5 pt-0">
           <v-btn
-            text="Delete"
+            variant="outlined"
+            text="Confirm"
             color="error"
             :loading="isRemoving"
             :disabled="isRemoving"
