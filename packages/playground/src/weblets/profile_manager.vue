@@ -247,8 +247,9 @@
             </FormValidator>
 
             <div class="d-flex justify-center mt-2">
+              <VBtn color="anchor" variant="outlined" @click="$emit('update:modelValue', false)"> Close </VBtn>
               <VBtn
-                class="mr-2"
+                class="ml-2"
                 type="submit"
                 color="secondary"
                 variant="tonal"
@@ -262,7 +263,6 @@
               >
                 {{ activeTab === 0 ? "Login" : "Connect" }}
               </VBtn>
-              <VBtn color="anchor" variant="outlined" @click="$emit('update:modelValue', false)"> Close </VBtn>
             </div>
           </form>
         </VContainer>
@@ -372,7 +372,15 @@
       <!-- <v-divider horizontal></v-divider> -->
       <div class="d-flex justify-end mt-4 mb-2">
         <VBtn
-          class="mr-2"
+          v-if="profileManager.profile"
+          color="anchor"
+          variant="outlined"
+          @click="$emit('update:modelValue', false)"
+        >
+          Close
+        </VBtn>
+        <VBtn
+          class="ml-2"
           color="error"
           variant="tonal"
           @click="logout"
@@ -380,14 +388,6 @@
           :disabled="updatingSSH || generatingSSH || loadingBalance"
         >
           Logout
-        </VBtn>
-        <VBtn
-          v-if="profileManager.profile"
-          color="anchor"
-          variant="outlined"
-          @click="$emit('update:modelValue', false)"
-        >
-          Close
         </VBtn>
       </div>
     </WebletLayout>

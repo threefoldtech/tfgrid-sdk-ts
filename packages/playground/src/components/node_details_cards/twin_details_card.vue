@@ -1,5 +1,5 @@
 <template>
-  <card-details :loading="loading" title="Node Twin Details" :items="twinFields" icon="mdi-account" />
+  <card-details :loading="loading" title="Twin Details" :items="twinFields" icon="mdi-account" />
 </template>
 
 <script lang="ts">
@@ -42,8 +42,8 @@ export default {
             "Failed to load Twin details due to Slow Network. Please try again later.",
             ToastType.danger,
           );
+        } finally {
           loading.value = false;
-          return;
         }
       } else if (props.node) {
         twin.value = props.node.twin;

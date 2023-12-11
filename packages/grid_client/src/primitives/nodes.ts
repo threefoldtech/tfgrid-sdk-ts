@@ -44,6 +44,7 @@ interface NodeInfo {
   uptime: number;
   created: number;
   farmingPolicyId: number;
+  inDedicatedFarm: boolean;
   updatedAt: string;
   total_resources: NodeResources;
   used_resources: NodeResources;
@@ -57,7 +58,6 @@ interface NodeInfo {
   hasGPU: boolean;
   extraFee: number;
   rentedByTwinId: number;
-  inDedicatedFarm: boolean;
   rentContractId: number;
 }
 interface PublicConfig {
@@ -273,6 +273,7 @@ class Nodes {
           const node: RMBNodeCapacity = res;
           const ret: NodeResources = { cru: 0, mru: 0, hru: 0, sru: 0, ipv4u: 0 };
 
+          ret.cru = +node.total.cru;
           ret.mru = +node.total.mru - +node.used.mru;
           ret.sru = +node.total.sru - +node.used.sru;
           ret.hru = +node.total.hru - +node.used.hru;
@@ -293,7 +294,7 @@ class Nodes {
       .then(res => {
         const node: NodeCapacity = res;
         const ret: NodeResources = { cru: 0, mru: 0, hru: 0, sru: 0, ipv4u: 0 };
-
+        ret.cru = +node.capacity.total_resources.cru;
         ret.mru = +node.capacity.total_resources.mru - +node.capacity.used_resources.mru;
         ret.sru = +node.capacity.total_resources.sru - +node.capacity.used_resources.sru;
         ret.hru = +node.capacity.total_resources.hru - +node.capacity.used_resources.hru;
@@ -373,7 +374,7 @@ class Nodes {
       ipv6: options.accessNodeV6,
       gateway: options.gateway,
       certification_type: options.certified ? "Certified" : "",
-      farm_ids: [options.farmId],
+      farm_ids: options.farmId ? [options.farmId] : options.farmIds,
       farm_name: options.farmName,
       country: options.country,
       city: options.city,
@@ -386,6 +387,7 @@ class Nodes {
       rented_by: options.rentedBy,
       rentable: options.rentable,
       randomize: options.randomize,
+      region: options.region,
     };
     if (options.gateway) {
       params["ipv4"] = true;
@@ -418,6 +420,7 @@ class Nodes {
       farm_id: options.farmId,
       randomize: options.randomize,
       ret_count: options.ret_count,
+      region: options.region,
     };
     return Object.entries(params)
       .map(param => param.join("="))

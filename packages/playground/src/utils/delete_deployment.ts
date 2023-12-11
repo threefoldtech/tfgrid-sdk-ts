@@ -93,7 +93,7 @@ function isVm(projectName: string) {
 }
 
 async function deleteVmGateways(grid: GridClient) {
-  const gateways = await loadDeploymentGateways(grid);
+  const { gateways } = await loadDeploymentGateways(grid);
   for (const gateway of gateways) {
     try {
       if (gateway.type.includes("name")) {

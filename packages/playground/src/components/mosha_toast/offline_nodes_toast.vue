@@ -37,7 +37,7 @@ export default {
 
   setup(props) {
     const navigateToContractsList = () => {
-      router.push("/contractslist");
+      router.push("/dashboard/contracts-list");
       if (props.toast) {
         props.toast.close();
       }
@@ -59,5 +59,6 @@ export default {
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
+  font-size: 16px;
 }
 </style>

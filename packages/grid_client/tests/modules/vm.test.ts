@@ -1,6 +1,6 @@
 import { FilterOptions, generateString, GridClient, MachineModel, MachinesModel, randomChoice } from "../../src";
 import { config, getClient } from "../client_loader";
-import { bytesToGB, generateInt, log, RemoteRun, splitIP } from "../utils";
+import { bytesToGB, generateInt, getOnlineNode, log, RemoteRun, splitIP } from "../utils";
 
 jest.setTimeout(300000);
 
@@ -76,7 +76,8 @@ test("TC1228 - VM: Deploy a VM", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
   }
-  const nodeId = +randomChoice(nodes).nodeId;
+  const nodeId = await getOnlineNode(nodes);
+  if (nodeId == -1) throw new Error("no nodes available to complete this test");
 
   //VM Model
   const vms: MachinesModel = {
@@ -243,7 +244,8 @@ test("TC1229 - VM: Deploy a VM With a Disk", async () => {
       availableFor: await gridClient.twins.get_my_twin_id(),
     } as FilterOptions);
   }
-  const nodeId = +randomChoice(nodes).nodeId;
+  const nodeId = await getOnlineNode(nodes);
+  if (nodeId == -1) throw new Error("no nodes available to complete this test");
 
   //VM Model
   const vms: MachinesModel = {
@@ -419,10 +421,15 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
     } as FilterOptions);
   }
 
-  const vm1NodeId = +randomChoice(vm1Nodes).nodeId;
-  let vm2NodeId = +randomChoice(vm2Nodes).nodeId;
-  while (vm1NodeId == vm2NodeId) {
-    vm2NodeId = +randomChoice(vm2Nodes).nodeId;
+  const vm1NodeId = await getOnlineNode(vm1Nodes);
+  if (vm1NodeId == -1) throw new Error("no nodes available to complete this test");
+  let vm2NodeId = await getOnlineNode(vm2Nodes);
+  if (vm2NodeId == -1) throw new Error("no nodes available to complete this test");
+  let maxCount = 3;
+  while (vm1NodeId == vm2NodeId && maxCount > 0) {
+    vm2NodeId = await getOnlineNode(vm2Nodes);
+    if (vm2NodeId == -1) throw new Error("no nodes available to complete this test");
+    maxCount--;
   }
   const vmNodes = [vm1NodeId, vm2NodeId];
 

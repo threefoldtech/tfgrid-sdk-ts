@@ -103,9 +103,10 @@
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
           <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
-
         <SelectFarmManager>
+          <NodeSelector v-model="selection" />
           <SelectFarm
+            v-if="selection == Selection.AUTOMATED"
             :filters="{
               cpu: solution?.cpu,
               memory: solution?.memory,
@@ -121,6 +122,7 @@
 
           <SelectNode
             v-model="selectedNode"
+            :selection="selection"
             :filters="{
               farmId: farm?.farmID,
               cpu: solution?.cpu,
@@ -128,7 +130,10 @@
               diskSizes: [solution?.disk],
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
+              country: farm?.country,
+              region: farm?.region,
             }"
+            :loading-farm="loadingFarm"
             :root-file-system-size="rootFilesystemSize"
           />
         </SelectFarmManager>
@@ -151,8 +156,11 @@
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref } from "vue";
+import { computed, type Ref, ref, watch } from "vue";
 
+import { Selection } from "@/utils/types";
+
+import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import type { FarmInterface, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
@@ -164,6 +172,7 @@ import { normalizeError } from "../utils/helpers";
 import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
+const selection = ref();
 const valid = ref(false);
 const profileManager = useProfileManager();
 const loadingFarm = ref(false);
@@ -184,6 +193,16 @@ const certified = ref(false);
 const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
+watch(
+  () => selection.value,
+  (value, oldValue) => {
+    if (value !== oldValue) {
+      loadingFarm.value = false;
+    }
+  },
+  { deep: false },
+);
+
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed a Wordpress instance.");
