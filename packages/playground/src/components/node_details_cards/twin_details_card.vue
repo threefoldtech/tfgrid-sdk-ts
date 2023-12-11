@@ -47,6 +47,7 @@ export default {
         }
       } else if (props.node) {
         twin.value = props.node.twin;
+        loading.value = false;
       }
       twinFields.value = getNodeTwinDetailsCard();
     });
