@@ -17,7 +17,8 @@ export type AsyncTaskOptions<T, E, A extends any[]> = {
   init?: boolean;
   defaultArgs?: A;
   default?: T;
-  onAfterTask?(task: TaskResult<T, E, A>): void;
+  onAfterTask?(task: TaskResult<T, E, A>, beforeTaskReturn: any): void;
+  onBeforeTask?(): any;
 };
 function normalizeOptions<T, E, A extends any[]>(
   options: AsyncTaskOptions<T, E, A> = {},
@@ -27,6 +28,7 @@ function normalizeOptions<T, E, A extends any[]>(
     defaultArgs: options.defaultArgs ?? ([] as unknown as A),
     default: options.default || (null as T),
     onAfterTask: options.onAfterTask || noop,
+    onBeforeTask: options.onBeforeTask || noop,
   };
 }
 
@@ -64,6 +66,7 @@ export function useAsync<T, E = Error, A extends any[] = []>(
     loading.value = true;
     error.value = null;
     data.value = _options.default;
+    const ret = _options.onBeforeTask();
 
     try {
       const res = await task(...args);
@@ -78,7 +81,7 @@ export function useAsync<T, E = Error, A extends any[] = []>(
     } finally {
       if (taskId === taskIdCounter) {
         loading.value = false;
-        _options.onAfterTask(asyncTask.value);
+        _options.onAfterTask(asyncTask.value, ret);
       }
     }
   }
