@@ -1,16 +1,8 @@
 <template>
+  <v-btn class="bg-primary text-subtitle-1 px-6 ml-2 mr-3" @click="showDialogue = true" :loading="loading"
+    >Add IP</v-btn
+  >
   <v-container>
-    <v-row>
-      <v-btn
-        variant="outlined"
-        color="secondary"
-        class="ml-auto bold-text mb-3"
-        @click="showDialogue = true"
-        :loading="loading"
-        >Add IP</v-btn
-      >
-    </v-row>
-
     <v-container v-if="showDialogue">
       <v-dialog v-model="showDialogue" max-width="600">
         <v-card>

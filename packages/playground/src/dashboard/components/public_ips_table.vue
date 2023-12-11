@@ -1,5 +1,5 @@
 <template>
-  <div class="my-6">
+  <v-row justify="end">
     <AddIP
       v-model:farmId="$props.farmId"
       v-model:type="type"
@@ -8,6 +8,8 @@
       v-model:gateway="gateway"
       @add-publicIPs="publicIps.push(...$event)"
     />
+  </v-row>
+  <div>
     <v-data-table v-if="publicIps?.length > 0" :headers="headers" :items="publicIps" class="elevation-1">
       <template v-slot:top>
         <v-alert class="pa-5" style="height: 20px">
@@ -81,9 +83,9 @@ export default {
       required: true,
     },
   },
-  // components: {
-  //   AddIP,
-  // },
+  components: {
+    AddIP,
+  },
   setup(props) {
     const gridStore = useGrid();
     const headers = [

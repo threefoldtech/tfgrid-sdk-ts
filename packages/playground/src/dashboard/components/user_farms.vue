@@ -54,20 +54,18 @@
                 <card-details :loading="false" title="Farm Details" :items="getFarmDetails(item.raw)"></card-details>
               </v-col>
             </v-row>
-
-            <PublicIPsTable :farmId="item.raw.farmId" />
-            <v-row class="d-flex justify-center pb-5">
-              <v-card-actions>
-                <v-btn class="text-subtitle-1 px-6" color="secondary" variant="outlined" @click="showDialogue = true"
-                  >Add/Edit Stellar Payout Address</v-btn
-                >
-                <v-btn class="bg-primary text-subtitle-1 px-6" @click="showDialogue = true" :loading="loading"
-                  >Add IP</v-btn
-                >
-                <v-btn v-if="network == 'main'" class="bg-primary" @click="downloadFarmReceipts(item.value.farmId)"
-                  >Download Minting Receipts</v-btn
-                >
-              </v-card-actions>
+            <v-row>
+              <v-col cols="12">
+                <v-card-actions class="justify-center">
+                  <v-btn class="text-subtitle-1 px-6" color="secondary" variant="outlined" @click="showDialogue = true">
+                    Add/Edit Stellar Payout Address
+                  </v-btn>
+                  <v-btn v-if="network == 'main'" class="bg-primary" @click="downloadFarmReceipts(item.value.farmId)">
+                    Download Minting Receipts
+                  </v-btn>
+                </v-card-actions>
+                <PublicIPsTable :farmId="item.raw.farmId" />
+              </v-col>
             </v-row>
           </td>
         </tr>
@@ -267,7 +265,7 @@ export default {
           callback: copy,
           hint: "Copy the stellar address to the clipboard.",
         },
-        { name: "Dedicated", value: item.dedicated },
+        { name: "Dedicated", value: item.dedicated ? "Yes" : "No" },
         { name: "Pricing Policy", value: item.pricingPolicyId },
       ];
     }
