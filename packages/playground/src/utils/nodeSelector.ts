@@ -1,8 +1,16 @@
-import type { FarmFilterOptions, FarmInfo, GridClient } from "@threefold/grid_client";
+import type { FarmFilterOptions, FarmInfo } from "@threefold/grid_client";
 import { NodeStatus } from "@threefold/gridproxy_client";
+import shuffle from "lodash/fp/shuffle.js";
+import type { Ref } from "vue";
 
 import { gqlClient, gridProxyClient } from "../clients";
-import type { Locations, NodeSelectorFilters, NormalizeFarmFiltersOptions } from "../types/nodeSelector";
+import type { useGrid } from "../stores";
+import type {
+  Locations,
+  NodeSelectorFilters,
+  NormalizeFarmFiltersOptions,
+  SelectedLocation,
+} from "../types/nodeSelector";
 
 export async function getLocations(): Promise<Locations> {
   const countries = await gqlClient.countries({ name: true, subregion: true });
@@ -17,6 +25,14 @@ export async function getLocations(): Promise<Locations> {
     }
   }
   return locations;
+}
+
+export function normalizeFarmOptions(
+  gridStore: ReturnType<typeof useGrid>,
+  location: SelectedLocation,
+  page: Ref<number>,
+) {
+  return { size: window.env.PAGE_SIZE, page: page.value, location, twinId: gridStore.client.twinId };
 }
 
 export function normalizeFarmFilters(
@@ -43,8 +59,26 @@ export function normalizeFarmFilters(
   };
 }
 
-export async function loadFarms(grid: GridClient, filters: FarmFilterOptions, exclusiveFor?: string) {
-  const farms = await grid.capacity.filterFarms(filters);
+export async function getPageCount(gridStore: ReturnType<typeof useGrid>, filters: FarmFilterOptions) {
+  const count = await gridStore.client.capacity.getFarmsCount(filters);
+  return Math.ceil(count / window.env.PAGE_SIZE);
+}
+
+export function* createPageGen(count: number) {
+  const pages = shuffle(Array.from({ length: count }, (_, i) => i + 1));
+  for (const page of pages) {
+    yield page;
+  }
+
+  return -1;
+}
+
+export async function loadFarms(
+  gridStore: ReturnType<typeof useGrid>,
+  filters: FarmFilterOptions,
+  exclusiveFor?: string,
+) {
+  const farms = await gridStore.client.capacity.filterFarms(filters);
 
   if (exclusiveFor && !filters.publicIp) {
     const blockedFarms = await getBlockedFarmSet(exclusiveFor);

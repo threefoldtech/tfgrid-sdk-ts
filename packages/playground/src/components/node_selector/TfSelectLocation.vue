@@ -20,11 +20,11 @@
         :items="regions"
         :model-value="$props.modelValue.region || regions[0]"
         @update:model-value="
-          region =>
-            $emit('update:model-value', {
-              country: $props.modelValue.country,
-              region: !region || region === regions[0] ? undefined : region,
-            })
+          $event => {
+            const region = !$event || $event === regions[0] ? undefined : $event;
+            if ($props.modelValue.region !== region)
+              $emit('update:model-value', { country: $props.modelValue.country, region });
+          }
         "
         clearable
         @click:clear="$emit('update:model-value', { country: $props.modelValue.country })"
@@ -36,11 +36,11 @@
         :items="countries"
         :model-value="$props.modelValue.country || countries[0]"
         @update:model-value="
-          country =>
-            $emit('update:model-value', {
-              region: $props.modelValue.region,
-              country: !country || country === countries[0] ? undefined : country,
-            })
+          $event => {
+            const country = !$event || $event === countries[0] ? undefined : $event;
+            if ($props.modelValue.country !== country)
+              $emit('update:model-value', { region: $props.modelValue.region, country });
+          }
         "
         clearable
         @click:clear="$emit('update:model-value', { region: $props.modelValue.region })"
