@@ -7,6 +7,8 @@ export interface TaskResult<T, E, A extends any[]> {
   loading: boolean;
   data: T | null;
   error: E | null;
+  initialized: boolean;
+  reset(): void;
 }
 
 export type UseAsyncReturn<T, E, A extends any[]> = ComputedRef<TaskResult<T, E, A>>;
@@ -19,6 +21,8 @@ function normalizeOptions<A extends any[]>(options: AsyncTaskOptions<A> = {}): R
   };
 }
 
+/* Tries, debounce */
+
 export function useAsync<T, E = Error, A extends any[] = []>(
   task: AsyncTask<T, A>,
   options?: AsyncTaskOptions<A>,
@@ -28,10 +32,12 @@ export function useAsync<T, E = Error, A extends any[] = []>(
   const data = ref(null) as Ref<T | null>;
   const error = ref(null) as Ref<E | null>;
   const loading = ref(false) as Ref<boolean>;
+  const initialized = ref(false) as Ref<boolean>;
 
   let taskIdCounter = 0;
 
   async function run(...args: A) {
+    initialized.value = true;
     const taskId = ++taskIdCounter;
     loading.value = true;
     error.value = null;
@@ -54,6 +60,13 @@ export function useAsync<T, E = Error, A extends any[] = []>(
     }
   }
 
+  function reset() {
+    data.value = null;
+    error.value = null;
+    loading.value = false;
+    initialized.value = false;
+  }
+
   if (_options.init) {
     onMounted(() => run(..._options.defaultArgs));
   }
@@ -64,6 +77,8 @@ export function useAsync<T, E = Error, A extends any[] = []>(
       data: data.value,
       error: error.value,
       loading: loading.value,
+      initialized: initialized.value,
+      reset,
     };
   });
 }

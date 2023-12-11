@@ -7,16 +7,19 @@ import type { Profile } from "./profile_manager";
 
 interface IGrid {
   grid: GridClient;
+  client: GridClient;
 }
 
 const useGrid = defineStore("grid-client", {
   state: (): IGrid => {
-    return { grid: null as any };
+    return { grid: null as any, client: null as any };
   },
 
   actions: {
     async set(profile: Profile | null) {
-      this.grid = profile ? ((await getGrid(profile)) as any) : null;
+      const gridClient = profile ? ((await getGrid(profile)) as any) : null;
+      this.grid = gridClient;
+      this.client = gridClient;
     },
   },
 });

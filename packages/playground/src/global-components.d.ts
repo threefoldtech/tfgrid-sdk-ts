@@ -46,6 +46,7 @@ declare global {
       TFT_ASSET_ISSUER: string;
       MINTING_URL: string;
       TIMEOUT: number;
+      PAGE_SIZE: number;
     };
   }
 }

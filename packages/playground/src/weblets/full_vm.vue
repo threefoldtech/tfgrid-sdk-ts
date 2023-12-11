@@ -113,7 +113,20 @@
           />
         </SelectFarmManager>
 
-        <TfSelectNode />
+        <TfSelectNode
+          :filters="{
+            ipv4,
+            ipv6,
+            hasGPU,
+            certified,
+            dedicated,
+            cpu: solution?.cpu,
+            ssdDisks: disks.map(disk => disk.size),
+            solutionDisk: solution?.disk,
+            memory: solution?.memory,
+            rootFilesystemSize,
+          }"
+        />
       </template>
 
       <template #disks>
