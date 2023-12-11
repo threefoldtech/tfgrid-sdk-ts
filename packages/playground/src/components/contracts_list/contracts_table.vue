@@ -1,7 +1,5 @@
 <template>
-  <!-- Weblet Layout for displaying a list of contracts -->
   <weblet-layout ref="layout" @mount="() => {}">
-    <!-- ListTable component for rendering contract data in a table -->
     <list-table
       v-if="$props.tableHeaders"
       :headers="$props.tableHeaders"
@@ -12,14 +10,6 @@
       :no-data-text="capitalize(`No ${props.contractsType} contracts found on this account.`)"
       v-bind:onClick:row="loading || deleting ? undefined : onClickRow"
     >
-      <!-- Loading template when contracts are being fetched -->
-      <template #loading>
-        <div class="text-center">
-          <small> {{ capitalize(`Loading ${$props.contractsType} contracts...`) }}</small>
-        </div>
-      </template>
-
-      <!-- Template for rendering Node Status as V-Chip components -->
       <template #[`item.nodeStatus`]="{ item }">
         <v-chip
           v-if="$props.nodeStatus && item.value.nodeId !== '-' && !$props.loading.value"
@@ -31,7 +21,6 @@
         <p v-else>-</p>
       </template>
 
-      <!-- Template for rendering contract state as V-Chip components -->
       <template #[`item.state`]="{ item }">
         <v-tooltip
           v-if="item && item.value.state === ContractStates.GracePeriod"
@@ -53,13 +42,11 @@
         </v-chip>
       </template>
 
-      <!-- Template for rendering consumption information -->
       <template #[`item.consumption`]="{ item }">
         <p v-if="item.raw.consumption !== 0">{{ item.raw.consumption.toFixed(3) }} TFT/hour</p>
         <p v-else>No Data Available</p>
       </template>
 
-      <!-- Template for rendering actions (Show Details or Retry) -->
       <template #[`item.actions`]="{ item }">
         <v-tooltip :text="failedContractId == item.value.contractId ? 'Retry' : 'Show Details'">
           <template #activator="{ props }">
@@ -79,7 +66,6 @@
       </template>
     </list-table>
 
-    <!-- Footer actions section with Export and Delete buttons -->
     <template #footer-actions>
       <v-btn
         variant="outlined"
@@ -103,7 +89,6 @@
     </template>
   </weblet-layout>
 
-  <!-- Deleting Dialog for confirming contract deletion -->
   <v-dialog width="70%" v-model="deletingDialog">
     <v-card>
       <v-card-title class="text-h5 mt-2"> Are you sure you want to delete the following contracts? </v-card-title>
@@ -118,12 +103,10 @@
           {{ c.contractId }}
         </v-chip>
       </v-card-text>
-
-      <!-- Actions for confirming or canceling contract deletion -->
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="error" variant="text" @click="onDelete"> Delete </v-btn>
         <v-btn color="error" variant="tonal" @click="deletingDialog = false"> Cancel </v-btn>
+        <v-btn color="error" variant="text" @click="onDelete"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -144,7 +127,6 @@ import { downloadAsJson, normalizeError } from "@/utils/helpers";
 
 import ListTable from "../../components/list_table.vue";
 
-// Define props and emits for the component
 const props = defineProps({
   contracts: {
     type: Object as PropType<Ref<NormalizedContract[]>>,
@@ -172,10 +154,8 @@ const props = defineProps({
   },
 });
 
-// Define emits for the component
 const emits = defineEmits(["update:deleted-contracts"]);
 
-// Define refs and variables used in the component
 const layout = ref();
 const contractLocked = ref<ContractLock>();
 const deleting = ref<boolean>(false);
@@ -269,7 +249,6 @@ async function onDelete() {
 </script>
 
 <script lang="ts">
-// Export the component definition
 export default defineComponent({
   name: "TfContractsList",
   components: {},

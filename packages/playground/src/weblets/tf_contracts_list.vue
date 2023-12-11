@@ -57,7 +57,6 @@
 </template>
 
 <script lang="ts" setup>
-// Import necessary types and libraries
 import type { GridClient } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import { Decimal } from "decimal.js";
@@ -76,7 +75,6 @@ import {
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { getGrid } from "@/utils/grid";
 
-// Define reactive variables
 const isLoading = ref<boolean>(false);
 const profileManager = useProfileManager();
 const grid = ref<GridClient>();
@@ -97,18 +95,15 @@ const nodeIDs = computed(() => {
   return [...new Set(allNodes)];
 });
 
-// On component mount, fetch contracts and update UI
 onMounted(onMount);
 
 async function onMount() {
-  // Initialize variables
-  totalCost.value = undefined;
+  contracts.value = nameContracts.value = nodeContracts.value = rentContracts.value = [];
   isLoading.value = true;
+  totalCost.value = undefined;
   loadingErrorMessage.value = undefined;
 
-  // Check if a user profile is available
   if (profileManager.profile) {
-    // Initialize Grid instance
     const _grid = await getGrid(profileManager.profile);
     if (_grid) {
       grid.value = _grid;
