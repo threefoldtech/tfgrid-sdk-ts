@@ -1,3 +1,5 @@
+import type { FarmInfo } from "@threefold/grid_client";
+
 export type Locations = {
   [region: string]: string[];
 };
@@ -24,4 +26,12 @@ export interface NormalizeFarmFiltersOptions {
   page: number;
   twinId: number;
   location: SelectedLocation;
+}
+
+export interface NormalizeNodeFiltersOptions {
+  size: number;
+  page: number;
+  twinId: number;
+  location: SelectedLocation;
+  farm: Partial<FarmInfo>;
 }

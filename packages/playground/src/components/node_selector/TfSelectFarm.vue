@@ -60,7 +60,7 @@ import { useGrid } from "../../stores";
 import type { NodeSelectorFilters, SelectedLocation } from "../../types/nodeSelector";
 import {
   createPageGen,
-  getPageCount,
+  getFarmPageCount,
   loadFarms,
   normalizeFarmFilters,
   normalizeFarmOptions,
@@ -100,7 +100,7 @@ export default {
     const options = computed(() => normalizeFarmOptions(gridStore, props.location, page));
     const filters = computed(() => normalizeFarmFilters(props.filters, options.value));
 
-    const pageCountTask = useAsync(getPageCount, { default: 1 });
+    const pageCountTask = useAsync(getFarmPageCount, { default: 1 });
     const page = ref(-1);
     let pageGen: ReturnType<typeof createPageGen>;
     function nextPage() {
@@ -118,7 +118,7 @@ export default {
         loadedFarms.value = [];
         return reloadFarms();
       },
-      { immediate: true, debounce: 1000, ignoreFields: ["page"] },
+      { immediate: true, deep: true, debounce: 1000, ignoreFields: ["page"] },
     );
 
     /* Load farms with search */

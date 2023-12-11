@@ -1,4 +1,4 @@
-import type { FarmFilterOptions, FarmInfo } from "@threefold/grid_client";
+import type { FarmFilterOptions, FarmInfo, FilterOptions } from "@threefold/grid_client";
 import { NodeStatus } from "@threefold/gridproxy_client";
 import shuffle from "lodash/fp/shuffle.js";
 import type { Ref } from "vue";
@@ -9,6 +9,7 @@ import type {
   Locations,
   NodeSelectorFilters,
   NormalizeFarmFiltersOptions,
+  NormalizeNodeFiltersOptions,
   SelectedLocation,
 } from "../types/nodeSelector";
 
@@ -31,7 +32,7 @@ export function normalizeFarmOptions(
   gridStore: ReturnType<typeof useGrid>,
   location: SelectedLocation,
   page: Ref<number>,
-) {
+): NormalizeFarmFiltersOptions {
   return { size: window.env.PAGE_SIZE, page: page.value, location, twinId: gridStore.client.twinId };
 }
 
@@ -50,16 +51,16 @@ export function normalizeFarmFilters(
     nodeHRU: (filters.hddDisks || []).reduce((t, d) => t + d, 0) || undefined,
     nodeSRU:
       (filters.ssdDisks || []).reduce(
-        (t, d) => t + d,
-        (filters.solutionDisk || 0) + (filters.rootFilesystemSize || 0),
+        (t, s) => t + s,
+        (filters.solutionDisk ?? 0) + (filters.rootFilesystemSize ?? 0),
       ) || undefined,
-    publicIp: filters.ipv4,
-    nodeCertified: filters.certified,
-    nodeHasGPU: filters.hasGPU,
+    publicIp: filters.ipv4 || undefined,
+    nodeCertified: filters.certified || undefined,
+    nodeHasGPU: filters.hasGPU || undefined,
   };
 }
 
-export async function getPageCount(gridStore: ReturnType<typeof useGrid>, filters: FarmFilterOptions) {
+export async function getFarmPageCount(gridStore: ReturnType<typeof useGrid>, filters: FarmFilterOptions) {
   const count = await gridStore.client.capacity.getFarmsCount(filters);
   return Math.ceil(count / window.env.PAGE_SIZE);
 }
@@ -122,4 +123,48 @@ export async function getBlockedFarmSet(exclusiveFor: string) {
 export async function searchFarms(query: string) {
   const { data } = await gridProxyClient.farms.list({ nameContains: query });
   return data as FarmInfo[];
+}
+
+export function normalizeNodeOptions(
+  gridStore: ReturnType<typeof useGrid>,
+  location: SelectedLocation,
+  page: Ref<number>,
+  farm: Partial<FarmInfo>,
+): NormalizeNodeFiltersOptions {
+  return { size: window.env.PAGE_SIZE, page: page.value, location, twinId: gridStore.client.twinId, farm };
+}
+
+export function normalizeNodeFilters(
+  filters: NodeSelectorFilters,
+  options: NormalizeNodeFiltersOptions,
+): FilterOptions {
+  return {
+    page: options.page,
+    size: options.size,
+    farmId: options.farm.farmId,
+    cru: filters.cpu,
+    mru: filters.memory ? Math.round(filters.memory / 1024) : undefined,
+    hru: (filters.hddDisks || []).reduce((t, d) => t + d, 0) || undefined,
+    sru:
+      (filters.ssdDisks || []).reduce(
+        (t, s) => t + s,
+        (filters.solutionDisk ?? 0) + (filters.rootFilesystemSize ?? 0),
+      ) || undefined,
+    publicIPs: filters.ipv4 || undefined,
+    hasGPU: filters.hasGPU || undefined,
+    rentedBy: filters.dedicated ? options.twinId : undefined,
+    certified: filters.certified || undefined,
+    availableFor: options.twinId,
+    region: options.location.region,
+    country: options.location.country,
+  };
+}
+
+export function loadNodes(gridStore: ReturnType<typeof useGrid>, filters: FilterOptions) {
+  return gridStore.client.capacity.filterNodes(filters);
+}
+
+export async function getNodePageCount(gridStore: ReturnType<typeof useGrid>, filters: FarmFilterOptions) {
+  const count = await gridStore.client.capacity.getNodesCount(filters);
+  return Math.ceil(count / window.env.PAGE_SIZE);
 }
