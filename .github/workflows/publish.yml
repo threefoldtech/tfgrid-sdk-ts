@@ -32,11 +32,11 @@ jobs:
         run: lerna run build --no-private
 
       - name: Publish Pre-release
-        if: contains(github.ref, 'rc')
+        if: contains(github.ref, 'rc') ||  contains(github.ref, 'alpha')
         run: lerna publish from-package --no-private --yes --dist-tag edge
 
       - name: Publish Release
-        if: "!contains(github.ref, 'rc')"
+        if: ${{ !contains(github.ref, 'rc') && !contains(github.ref, 'alpha') }}
         run: lerna publish from-package --no-private --yes
         
 
