@@ -4,10 +4,11 @@
     <button class="text-decoration-underline" :onclick="navigateToContractsList">
       {{ deploymentLen }} {{ deploymentLen > 1 ? "contracts" : "contract" }}
     </button>
-    on offline or standby {{ deploymentLen > 1 ? "nodes" : "node" }}
+    on offline {{ deploymentLen > 1 ? "nodes" : "node" }}.
     <v-spacer />
     <span v-if="withPubIpLen >= 1">
-      {{ withPubIpLen }} {{ deploymentLen > 1 ? "of them" : "" }} with public {{ withPubIpLen > 1 ? "IPs" : "IP" }}
+      and {{ withPubIpLen }} {{ deploymentLen > 1 ? "of them" : "" }} with public {{ withPubIpLen > 1 ? "IPs" : "IP" }}.
+      You're still being billed for public IPs.
     </span>
   </div>
 </template>
