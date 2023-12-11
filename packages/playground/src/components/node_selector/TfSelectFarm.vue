@@ -89,8 +89,14 @@ export default {
     const gridStore = useGrid();
 
     /* Load farms with filters */
-    const farmsTask = useAsync(loadFarms, { onAfterTask: nextPage, default: [] });
     const loadedFarms = ref<FarmInfo[]>([]);
+    const farmsTask = useAsync(loadFarms, {
+      onAfterTask({ data }) {
+        loadedFarms.value = loadedFarms.value.concat(data as FarmInfo[]);
+        nextPage();
+      },
+      default: [],
+    });
     const options = computed(() => normalizeFarmOptions(gridStore, props.location, page));
     const filters = computed(() => normalizeFarmFilters(props.filters, options.value));
 
@@ -101,6 +107,7 @@ export default {
       page.value = pageGen?.next().value ?? -1;
     }
 
+    const reloadFarms = () => farmsTask.value.run(gridStore, filters.value, props.filters.exclusiveFor);
     useWatchDeep(
       filters,
       async filters => {
@@ -113,11 +120,6 @@ export default {
       },
       { immediate: true, debounce: 1000, ignoreFields: ["page"] },
     );
-
-    async function reloadFarms() {
-      await farmsTask.value.run(gridStore, filters.value, props.filters.exclusiveFor);
-      loadedFarms.value = loadedFarms.value.concat(farmsTask.value.data as FarmInfo[]);
-    }
 
     /* Load farms with search */
     const searchTask = useAsync(searchFarms);
