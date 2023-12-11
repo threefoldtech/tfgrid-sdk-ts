@@ -28,7 +28,7 @@
         <v-btn
           class="text-subtitle-2"
           size="small"
-          color="red-darken-1"
+          color="error"
           @click="
             () => {
               showDialogue = true;
@@ -52,10 +52,9 @@
         <v-card-actions class="justify-end px-5 pb-5 pt-0">
           <v-btn
             text="Delete"
-            color="white"
+            color="error"
             :loading="isRemoving"
             :disabled="isRemoving"
-            class="bg-red-lighten-1"
             @click="removeFarmIp({ farmId: $props.farmId, ip: itemToDelete?.ip }, itemToDelete?.index)"
           ></v-btn>
           <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>

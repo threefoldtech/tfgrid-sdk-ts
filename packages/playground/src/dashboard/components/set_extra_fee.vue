@@ -10,7 +10,7 @@
           :loading="isAdding"
           @click="showDialogue = true"
         >
-          mdi-code-string
+          mdi-currency-usd
         </v-icon>
       </template>
     </v-tooltip>
