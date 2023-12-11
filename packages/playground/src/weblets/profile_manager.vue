@@ -66,7 +66,7 @@
       <v-card-title class="pa-0">TFChain Wallet</v-card-title>
     </v-card>
     <WebletLayout disable-alerts>
-      <v-alert variant="tonal" class="mb-6" v-if="activeTab === 0">
+      <v-alert variant="tonal" class="mb-6">
         <p :style="{ maxWidth: '880px' }">
           Please visit
           <a class="app-link" href="https://manual.grid.tf/playground/wallet_connector.html" target="_blank">
