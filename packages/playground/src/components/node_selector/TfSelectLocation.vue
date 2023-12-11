@@ -2,11 +2,7 @@
   <section>
     <h6 class="text-h5 mb-4 mt-2">Choose a Location</h6>
 
-    <VRow justify="center" class="mb-6" v-if="locationsTask.loading">
-      <VProgressCircular indeterminate color="primary" size="75" width="6" />
-    </VRow>
-
-    <VAlert type="error" class="text-body-1" v-else-if="locationsTask.error">
+    <VAlert type="error" class="text-body-1" v-if="locationsTask.error">
       Failed to load locations. Please try again!
       <template #append>
         <VBtn icon="mdi-reload" color="error" variant="plain" density="compact" @click="locationsTask.run()" />
@@ -17,6 +13,7 @@
       <VAutocomplete
         label="Region"
         placeholder="Select a region"
+        :loading="locationsTask.loading"
         :items="regions"
         :model-value="$props.modelValue.region || regions[0]"
         @update:model-value="
@@ -33,6 +30,7 @@
       <VAutocomplete
         label="Country"
         placeholder="Select a country"
+        :loading="locationsTask.loading"
         :items="countries"
         :model-value="$props.modelValue.country || countries[0]"
         @update:model-value="
