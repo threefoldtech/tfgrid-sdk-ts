@@ -36,7 +36,7 @@ jobs:
         run: lerna publish from-package --no-private --yes --dist-tag edge
 
       - name: Publish Release
-        if: "!contains(github.ref, 'rc') || !contains(github.ref, 'alpha')"
+        if: ${{ !contains(github.ref, 'rc') || !contains(github.ref, 'alpha') }}
         run: lerna publish from-package --no-private --yes
         
 
