@@ -130,8 +130,9 @@ export function normalizeNodeOptions(
   location: SelectedLocation,
   page: Ref<number>,
   farm: Partial<FarmInfo>,
+  gateway?: boolean,
 ): NormalizeNodeFiltersOptions {
-  return { size: window.env.PAGE_SIZE, page: page.value, location, twinId: gridStore.client.twinId, farm };
+  return { size: window.env.PAGE_SIZE, page: page.value, location, twinId: gridStore.client.twinId, farm, gateway };
 }
 
 export function normalizeNodeFilters(
@@ -157,6 +158,7 @@ export function normalizeNodeFilters(
     // availableFor: options.twinId,
     region: options.location.region,
     country: options.location.country,
+    gateway: options.gateway,
   };
 }
 
@@ -169,13 +171,6 @@ export async function getNodePageCount(gridStore: ReturnType<typeof useGrid>, fi
   return Math.ceil(count / window.env.PAGE_SIZE);
 }
 
-export async function getNodeGpuCards(gridStore: ReturnType<typeof useGrid>, node: NodeInfo) {
-  const card = await gridStore.client.zos.getNodeGPUInfo(node);
-  return Array.from({ length: 12 }, () => card)
-    .flat()
-    .map((c, i) => {
-      c.device += i;
-      c.id += i;
-      return { ...c };
-    });
+export function getNodeGpuCards(gridStore: ReturnType<typeof useGrid>, node: NodeInfo) {
+  return gridStore.client.zos.getNodeGPUInfo(node);
 }

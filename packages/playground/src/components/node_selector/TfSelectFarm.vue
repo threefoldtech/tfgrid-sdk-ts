@@ -91,8 +91,19 @@ export default {
     /* Load farms with filters */
     const loadedFarms = ref<FarmInfo[]>([]);
     const farmsTask = useAsync(loadFarms, {
-      onAfterTask({ data }) {
+      onBeforeTask() {
+        if (!searchTask.value.initialized) {
+          const oldFarm = props.modelValue;
+          ctx.emit("update:model-value", farms.value[0]);
+          return oldFarm?.farmId;
+        }
+      },
+      onAfterTask({ data }, oldFarmId?: number) {
         loadedFarms.value = loadedFarms.value.concat(data as FarmInfo[]);
+        if (oldFarmId) {
+          const index = loadedFarms.value.findIndex(f => f.farmId === oldFarmId);
+          ctx.emit("update:model-value", loadedFarms.value[index]);
+        }
         nextPage();
       },
       default: [],

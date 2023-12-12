@@ -19,6 +19,7 @@ export interface NodeSelectorFilters {
   certified?: boolean;
   dedicated?: boolean;
   exclusiveFor?: string;
+  gateway?: boolean;
 }
 
 export interface NormalizeFarmFiltersOptions {
@@ -34,4 +35,5 @@ export interface NormalizeNodeFiltersOptions {
   twinId: number;
   location: SelectedLocation;
   farm: Partial<FarmInfo>;
+  gateway?: boolean;
 }

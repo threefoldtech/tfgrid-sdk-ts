@@ -125,6 +125,7 @@
             solutionDisk: solution?.disk,
             memory: solution?.memory,
             rootFilesystemSize,
+            gateway: true,
           }"
         />
       </template>

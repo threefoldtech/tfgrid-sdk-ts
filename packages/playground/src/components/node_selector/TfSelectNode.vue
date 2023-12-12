@@ -19,6 +19,7 @@
         v-model:valid="validNode"
       />
       <TfSelectGpu :node="node" :valid-node="validNode" v-if="filters.hasGPU" v-model="gpuCards" />
+      <TfDomainName :filters="filters" :location="location" :farm="farm" v-if="filters.gateway" />
     </div>
 
     <div v-else>Manual (not yet implemented)</div>
@@ -31,13 +32,14 @@ import { type PropType, type Ref, ref } from "vue";
 
 import type { NodeSelectorFilters, SelectedLocation } from "../../types/nodeSelector";
 import TfAutoNodeSelector from "./TfAutoNodeSelector.vue";
+import TfDomainName from "./TfDomainName.vue";
 import TfSelectFarm from "./TfSelectFarm.vue";
 import TfSelectGpu from "./TfSelectGpu.vue";
 import TfSelectLocation from "./TfSelectLocation.vue";
 
 export default {
   name: "TfSelectNode",
-  components: { TfSelectLocation, TfSelectFarm, TfAutoNodeSelector, TfSelectGpu },
+  components: { TfSelectLocation, TfSelectFarm, TfAutoNodeSelector, TfSelectGpu, TfDomainName },
   props: {
     filters: {
       type: Object as PropType<NodeSelectorFilters>,

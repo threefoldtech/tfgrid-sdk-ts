@@ -19,12 +19,11 @@
         @update:model-value="
           $event => {
             const region = !$event || $event === regions[0] ? undefined : $event;
-            if ($props.modelValue.region !== region)
-              $emit('update:model-value', { country: $props.modelValue.country, region });
+            if ($props.modelValue.region !== region) $emit('update:model-value', { region });
           }
         "
         clearable
-        @click:clear="$emit('update:model-value', { country: $props.modelValue.country })"
+        @click:clear="$emit('update:model-value', {})"
       />
 
       <VAutocomplete
@@ -53,6 +52,7 @@ import { computed, type PropType } from "vue";
 import { useAsync } from "../../hooks";
 import type { SelectedLocation } from "../../types/nodeSelector";
 import { getLocations } from "../../utils/nodeSelector";
+import type { Locations } from "../select_location.vue";
 
 export default {
   name: "TfSelectLocation",
@@ -65,10 +65,16 @@ export default {
   emits: {
     "update:model-value": (value: SelectedLocation) => true || value,
   },
-  setup() {
-    const locationsTask = useAsync(getLocations, { init: true });
-    const regions = computed(() => ["All Regions", ...Object.keys(locationsTask.value.data || {})]);
-    const countries = computed(() => ["All Countries", ...Object.values(locationsTask.value.data || {}).flat(1)]);
+  setup(props) {
+    const locationsTask = useAsync(getLocations, { init: true, default: {} });
+    const regions = computed(() => ["All Regions", ...Object.keys(locationsTask.value.data as Locations)]);
+    const countries = computed(() => {
+      const res = ["All Countries"];
+      if (!props.modelValue.region) {
+        return res.concat(Object.values(locationsTask.value.data as Locations).flat(1));
+      }
+      return res.concat((locationsTask.value.data as Locations)[props.modelValue.region] || []);
+    });
 
     return { locationsTask, regions, countries };
   },
