@@ -30,10 +30,10 @@ export async function getLocations(): Promise<Locations> {
 
 export function normalizeFarmOptions(
   gridStore: ReturnType<typeof useGrid>,
-  location: SelectedLocation,
+  location: SelectedLocation | undefined,
   page: Ref<number>,
 ): NormalizeFarmFiltersOptions {
-  return { size: window.env.PAGE_SIZE, page: page.value, location, twinId: gridStore.client.twinId };
+  return { size: window.env.PAGE_SIZE, page: page.value, location: location || {}, twinId: gridStore.client.twinId };
 }
 
 export function normalizeFarmFilters(
@@ -127,12 +127,19 @@ export async function searchFarms(query: string) {
 
 export function normalizeNodeOptions(
   gridStore: ReturnType<typeof useGrid>,
-  location: SelectedLocation,
+  location: SelectedLocation | undefined,
   page: Ref<number>,
   farm: Partial<FarmInfo>,
   gateway?: boolean,
 ): NormalizeNodeFiltersOptions {
-  return { size: window.env.PAGE_SIZE, page: page.value, location, twinId: gridStore.client.twinId, farm, gateway };
+  return {
+    size: window.env.PAGE_SIZE,
+    page: page.value,
+    location: location || {},
+    twinId: gridStore.client.twinId,
+    farm,
+    gateway,
+  };
 }
 
 export function normalizeNodeFilters(

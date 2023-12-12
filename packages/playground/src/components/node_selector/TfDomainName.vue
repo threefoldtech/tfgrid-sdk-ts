@@ -78,10 +78,7 @@ export default {
       type: Object as PropType<NodeSelectorFilters>,
       required: true,
     },
-    location: {
-      type: Object as PropType<SelectedLocation>,
-      required: true,
-    },
+    location: Object as PropType<SelectedLocation>,
     farm: {
       type: Object as PropType<FarmInfo>,
       required: true,

@@ -9,6 +9,7 @@
     </v-radio-group>
 
     <template v-if="wayToSelect === 'automated'">
+      location {{ location }}
       <TfSelectLocation v-model="location" v-if="wayToSelect === 'automated'" />
       <TfSelectFarm :filters="filters" :location="location" v-model="farm" v-if="wayToSelect === 'automated'" />
 
@@ -79,7 +80,7 @@ export default {
   },
   setup(props, ctx) {
     const wayToSelect = ref<"manual" | "automated">("automated");
-    const location = ref<SelectedLocation>({});
+    const location = ref<SelectedLocation>();
     const farm = ref({}) as Ref<FarmInfo>;
 
     const node = ref<NodeInfo>();
