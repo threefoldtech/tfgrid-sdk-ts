@@ -52,8 +52,7 @@
 
 <script lang="ts">
 import type { FarmInfo } from "@threefold/grid_client";
-import { computed, type PropType, ref } from "vue";
-import { nextTick } from "vue";
+import { computed, nextTick, type PropType, ref } from "vue";
 
 import { useAsync, useWatchDeep } from "../../hooks";
 import { useGrid } from "../../stores";

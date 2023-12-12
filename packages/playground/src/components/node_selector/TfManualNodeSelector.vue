@@ -17,11 +17,11 @@ import type { NodeInfo } from "@threefold/grid_client";
 import isInt from "validator/lib/isInt";
 import { computed, type PropType, ref, watch } from "vue";
 
-import { useAsync, useWatchDeep } from "@/hooks";
-import { useGrid } from "@/stores";
-import type { NodeSelectorFilters } from "@/types/nodeSelector";
-import { normalizeError } from "@/utils/helpers";
-import { resolveAsync } from "@/utils/nodeSelector";
+import { useAsync, useWatchDeep } from "../../hooks";
+import { useGrid } from "../../stores";
+import type { NodeSelectorFilters } from "../../types/nodeSelector";
+import { normalizeError } from "../../utils/helpers";
+import { resolveAsync } from "../../utils/nodeSelector";
 
 const _defaultError =
   "Something went wrong while checking status of the node. Please check your connection and try again.";
