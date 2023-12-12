@@ -71,10 +71,10 @@
         variant="outlined"
         color="error"
         prepend-icon="mdi-export-variant"
-        :disabled="isExporting || !contracts || contracts.length === 0"
+        :disabled="isExporting || !contracts || contracts.length === 0 || loadingDelete || deleting"
         @click="exportData"
       >
-        Export My Data
+        Export
       </v-btn>
 
       <v-btn
