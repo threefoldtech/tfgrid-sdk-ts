@@ -16,12 +16,7 @@
         :loading="locationsTask.loading"
         :items="regions"
         :model-value="$props.modelValue.region || regions[0]"
-        @update:model-value="
-          $event => {
-            const region = !$event || $event === regions[0] ? undefined : $event;
-            if ($props.modelValue.region !== region) $emit('update:model-value', { region });
-          }
-        "
+        @update:model-value="updateRegion"
         clearable
         @click:clear="$emit('update:model-value', {})"
       />
@@ -32,13 +27,7 @@
         :loading="locationsTask.loading"
         :items="countries"
         :model-value="$props.modelValue.country || countries[0]"
-        @update:model-value="
-          $event => {
-            const country = !$event || $event === countries[0] ? undefined : $event;
-            if ($props.modelValue.country !== country)
-              $emit('update:model-value', { region: $props.modelValue.region, country });
-          }
-        "
+        @update:model-value="updateCountry"
         clearable
         @click:clear="$emit('update:model-value', { region: $props.modelValue.region })"
       />
@@ -78,7 +67,21 @@ export default {
 
     onUnmounted(() => ctx.emit("update:model-value", {}));
 
-    return { locationsTask, regions, countries };
+    function updateRegion(newRegion?: string | null): void {
+      const region = !newRegion || newRegion === regions.value[0] ? undefined : newRegion;
+      if (props.modelValue.region !== region) {
+        ctx.emit("update:model-value", { region });
+      }
+    }
+
+    function updateCountry(newCountry?: string | null): void {
+      const country = !newCountry || newCountry === countries.value[0] ? undefined : newCountry;
+      if (props.modelValue.country !== country) {
+        ctx.emit("update:model-value", { region: props.modelValue.region, country });
+      }
+    }
+
+    return { locationsTask, regions, countries, updateRegion, updateCountry };
   },
 };
 </script>

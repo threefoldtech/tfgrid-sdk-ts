@@ -14,10 +14,7 @@
           validate-on="input"
           :rules="[
             d => (d ? true : 'Domain name is required.'),
-            d => {
-              const err = validators.isFQDN('Please provide a valid domain name.')(d);
-              return err?.message || true;
-            },
+            d => validators.isFQDN('Please provide a valid domain name.')(d)?.message || true,
           ]"
           v-if="enableCustomDomain"
           @blur="($refs.customDomainInput as VInput).validate()"
