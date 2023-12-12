@@ -7,7 +7,7 @@
       :loading="$props.loading.value"
       :deleting="deleting"
       v-model="selectedContracts"
-      :no-data-text="capitalize(`No ${props.contractsType} contracts found on this account.`)"
+      :no-data-text="capitalize(`No ${props.contractsType} contracts found on your account.`)"
       v-bind:onClick:row="loading || deleting ? undefined : onClickRow"
     >
       <template #[`item.nodeStatus`]="{ item }">
@@ -225,13 +225,9 @@ async function onDelete() {
   deleting.value = true;
 
   try {
-    if (selectedContracts.value.length === contracts.value.length) {
-      await props.grid.value?.contracts.cancelMyContracts();
-    } else {
-      await props.grid.value?.contracts.batchCancelContracts({
-        ids: selectedContracts.value.map(c => c.contractId),
-      });
-    }
+    await props.grid.value?.contracts.batchCancelContracts({
+      ids: selectedContracts.value.map(c => c.contractId),
+    });
     contracts.value = contracts.value.filter(c => !selectedContracts.value.includes(c));
     emits("update:deleted-contracts", contracts.value);
     selectedContracts.value = [];
