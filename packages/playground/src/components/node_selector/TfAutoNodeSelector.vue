@@ -88,7 +88,8 @@
 <script lang="ts">
 import type { FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
 import equals from "lodash/fp/equals.js";
-import { computed, nextTick, onMounted, type PropType, ref } from "vue";
+import { computed, nextTick, onMounted, type PropType, ref, watch } from "vue";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VInput } from "vuetify/components/VInput";
 
 import { useAsync, useWatchDeep } from "../../hooks";
@@ -118,9 +119,11 @@ export default {
       type: Object as PropType<Partial<FarmInfo>>,
       required: true,
     },
+    valid: Boolean,
   },
   emits: {
     "update:model-value": (node?: NodeInfo) => true || node,
+    "update:valid": (valid: boolean) => true || valid,
   },
   setup(props, ctx) {
     const gridStore = useGrid();
@@ -205,9 +208,6 @@ export default {
       }
 
       try {
-        // console.log("gpus list");
-        // console.log("gpus", await gridStore.client.zos.getNodeGPUInfo(node));
-
         await gridStore.client.capacity.checkNodeCapacityPool({
           nodeId: node.nodeId,
           ssdDisks: [props.filters.solutionDisk ?? 0, ...(props.filters.ssdDisks || [])]
@@ -236,6 +236,13 @@ export default {
       ctx.emit("update:model-value", node);
       (touched.value || node) && nodeInputValidateTask.value.run(node);
     }
+
+    // update v-model:valid
+    const valid = computed(() => {
+      const { initialized, data } = nodeInputValidateTask.value;
+      return initialized && data === true;
+    });
+    watch(valid, valid => ctx.emit("update:valid", valid), { immediate: true });
 
     return {
       pageCountTask,
