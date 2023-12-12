@@ -269,8 +269,8 @@
       </DTabs>
 
       <template v-if="profileManager.profile">
-        <v-row class="py-2 pb-5">
-          <v-col cols="7" sm="12" md="6" lg="7">
+        <v-row class="justify-space-around py-2 pb-5">
+          <v-col cols="7" sm="12" md="12" lg="7">
             <PasswordInputWrapper #="{ props }">
               <VTextField
                 label="Your Hex Seed"
@@ -341,7 +341,7 @@
           </v-col>
           <v-divider class="mx-4" vertical></v-divider>
 
-          <v-col>
+          <v-col cols="12" lg="4">
             <section class="d-flex flex-column align-center">
               <p class="mb-4 text-center">
                 Scan the QR code using
