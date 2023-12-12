@@ -173,6 +173,7 @@ export default {
           if (equals(filters, baseFilters.value)) {
             baseFilters.value = undefined;
             filtersUpdated.value = false;
+            props.modelValue && nodeInputValidateTask.value.run(props.modelValue);
             return;
           }
 

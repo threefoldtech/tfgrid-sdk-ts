@@ -113,6 +113,8 @@
           />
         </SelectFarmManager> -->
 
+        {{ selectionDetails }}
+
         <TfSelectionDetails
           :filters="{
             ipv4,
@@ -126,9 +128,20 @@
             memory: solution?.memory,
             rootFilesystemSize,
           }"
-          require-domain
-          v-model:valid="isValid"
+          :require-domain="requireDomain"
+          v-model="selectionDetails"
         />
+
+        <VRow justify="center" align="center">
+          <VChip color="error" class="mr-4">For Demo only*</VChip>
+          <VSwitch
+            label="toggle domain name selection (note domain is not used in full_vm but still we need to test it)"
+            hide-details
+            inset
+            color="error"
+            v-model="requireDomain"
+          />
+        </VRow>
       </template>
 
       <template #disks>
@@ -195,7 +208,8 @@ import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
 
-const isValid = ref(false);
+const selectionDetails = ref<SelectionDetails>();
+const requireDomain = ref(false);
 
 const layout = useLayout();
 const tabs = ref();
@@ -332,6 +346,7 @@ import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
+import type { SelectionDetails } from "../types/nodeSelector";
 import type { INode } from "../utils/filter_nodes";
 
 export default {

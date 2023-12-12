@@ -42,7 +42,7 @@ export function normalizeFarmFilters(
 ): FarmFilterOptions {
   return {
     size: options.size,
-    page: options.page,
+    page: Math.max(1, options.page),
     // availableFor: options.twinId,
     country: options.location.country,
     region: options.location.region,
@@ -147,7 +147,7 @@ export function normalizeNodeFilters(
   options: NormalizeNodeFiltersOptions,
 ): FilterOptions {
   return {
-    page: options.page,
+    page: Math.max(1, options.page),
     size: options.size,
     farmId: options.farm.farmId,
     cru: filters.cpu,

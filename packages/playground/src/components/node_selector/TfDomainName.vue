@@ -54,7 +54,7 @@
 
 <script lang="ts">
 import type { FarmInfo, NodeInfo } from "@threefold/grid_client";
-import { computed, onUnmounted, type PropType, ref, watch } from "vue";
+import { computed, nextTick, onUnmounted, type PropType, ref, watch } from "vue";
 import { onMounted } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VInput } from "vuetify/components/VInput";
@@ -117,6 +117,7 @@ export default {
         await pageCountTask.value.run(gridStore, filters);
         pageGen = createPageGen(pageCountTask.value.data as number);
         nextPage();
+        await nextTick();
         loadedDomains.value = [];
         return reloadDomains();
       },
