@@ -194,7 +194,7 @@ async function getGrafanaUrl() {
   if (grid) {
     if (contract.value.type !== ContractType.NAME) {
       const nodeId = await grid.capacity.getNodeIdFromContractId({
-        contractId: contract.value.contractId,
+        contractId: contract.value.contractId || contract.value.contract_id,
       });
       const node = await gridProxyClient.nodes.byId(nodeId);
       const grafana = new GrafanaStatistics(node, 2);
