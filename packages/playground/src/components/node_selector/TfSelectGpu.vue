@@ -5,8 +5,8 @@
     multiple
     :model-value="$props.modelValue"
     @update:model-value="
-      $emit('update:model-value', $event);
-      $emit('update:status', $event.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
+      bindModelValue($event);
+      bindStatus($event.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
     "
     :items="(cardsTask.data as GPUCardInfo[])"
     item-title="device"
@@ -19,15 +19,13 @@
     :disabled="!$props.validNode"
     :hint="$props.validNode ? undefined : 'Please select a valid node to load it\'s GPU cards.'"
     :persistent-hint="!$props.validNode"
-    @update:menu="
-      opened => !opened && $props.modelValue.length === 0 && $emit('update:status', ValidatorStatus.Invalid)
-    "
+    @update:menu="opened => !opened && $props.modelValue.length === 0 && bindStatus(ValidatorStatus.Invalid)"
   />
 </template>
 
 <script lang="ts">
 import type { GPUCardInfo, NodeInfo } from "@threefold/grid_client";
-import { onUnmounted, type PropType } from "vue";
+import { onMounted, onUnmounted, type PropType } from "vue";
 
 import { useAsync, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";
@@ -53,22 +51,34 @@ export default {
     useWatchDeep(
       () => [props.validNode, props.node],
       ([valid, node]) => {
-        ctx.emit("update:model-value", []);
+        bindModelValue();
         if (valid && node) {
           return cardsTask.value.run(gridStore, node as NodeInfo);
         }
-        ctx.emit("update:status", ValidatorStatus.Init);
+        bindStatus();
         cardsTask.value.initialized && cardsTask.value.reset();
       },
       { immediate: true, deep: true },
     );
 
     onUnmounted(() => {
-      ctx.emit("update:model-value", []);
-      ctx.emit("update:status", ValidatorStatus.Init);
+      bindModelValue();
+      bindStatus();
     });
 
-    return { ValidatorStatus, cardsTask };
+    function bindModelValue(cards?: GPUCardInfo[]) {
+      ctx.emit("update:model-value", cards || []);
+    }
+
+    onMounted(() => {
+      bindModelValue();
+      bindStatus();
+    });
+    function bindStatus(status?: ValidatorStatus) {
+      ctx.emit("update:status", status || ValidatorStatus.Init);
+    }
+
+    return { ValidatorStatus, cardsTask, bindModelValue, bindStatus };
   },
 };
 </script>

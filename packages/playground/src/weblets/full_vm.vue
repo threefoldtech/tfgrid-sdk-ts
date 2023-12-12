@@ -126,6 +126,7 @@
             memory: solution?.memory,
             rootFilesystemSize,
           }"
+          require-domain
           v-model:valid="isValid"
         />
       </template>

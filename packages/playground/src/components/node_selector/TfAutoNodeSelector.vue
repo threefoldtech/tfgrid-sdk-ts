@@ -15,7 +15,7 @@
         item-title="nodeId"
         return-object
         :model-value="$props.modelValue"
-        @update:model-value="bindModelValue($event)"
+        @update:model-value="bindModelValueAndValidate($event)"
         :disabled="filtersUpdated"
         :loading="nodeInputValidateTask.loading"
         required
@@ -25,7 +25,7 @@
         :persistent-hint="nodeInputValidateTask.loading"
         clearable
         @click:clear="
-          bindModelValue();
+          bindModelValueAndValidate();
           ($refs.nodeInput as VInput)?.$el.querySelector('input').blur();
           nodeInputValidateTask.reset();
           touched = false;
@@ -189,7 +189,7 @@ export default {
     );
 
     async function resetPageAndReloadNodes() {
-      ctx.emit("update:status", ValidatorStatus.Init);
+      bindStatus();
       nodeInputValidateTask.value.reset();
       touched.value = false;
       baseFilters.value = undefined;
@@ -232,23 +232,32 @@ export default {
         }
       },
       {
-        onBeforeTask: () => ctx.emit("update:status", ValidatorStatus.Pending),
+        onBeforeTask: () => bindStatus(ValidatorStatus.Pending),
         onAfterTask: ({ data }) => {
-          ctx.emit("update:status", data ? ValidatorStatus.Valid : ValidatorStatus.Invalid);
+          bindStatus(data ? ValidatorStatus.Valid : ValidatorStatus.Invalid);
         },
       },
     );
 
     const touched = ref(false);
-    function bindModelValue(node?: NodeInfo) {
-      ctx.emit("update:model-value", node);
+    function bindModelValueAndValidate(node?: NodeInfo) {
+      bindModelValue(node);
       (touched.value || node) && nodeInputValidateTask.value.run(node);
     }
 
     onUnmounted(() => {
-      ctx.emit("update:model-value");
-      ctx.emit("update:status", ValidatorStatus.Init);
+      bindModelValue();
+      bindStatus();
     });
+
+    function bindModelValue(node?: NodeInfo): void {
+      ctx.emit("update:model-value", node);
+    }
+
+    onMounted(bindStatus);
+    function bindStatus(status?: ValidatorStatus): void {
+      ctx.emit("update:status", status || ValidatorStatus.Init);
+    }
 
     return {
       pageCountTask,
@@ -262,7 +271,8 @@ export default {
       nodeInputValidateTask,
 
       touched,
-      bindModelValue,
+      bindModelValueAndValidate,
+      bindStatus,
     };
   },
 };

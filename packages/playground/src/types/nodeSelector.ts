@@ -19,7 +19,6 @@ export interface NodeSelectorFilters {
   certified?: boolean;
   dedicated?: boolean;
   exclusiveFor?: string;
-  gateway?: boolean;
 }
 
 export interface NormalizeFarmFiltersOptions {
@@ -47,8 +46,8 @@ export interface DomainInfo {
 export interface SelectionDetails {
   type: "manual" | "automatic";
   node?: NodeInfo;
-  farm: Partial<FarmInfo>;
-  location: SelectedLocation;
+  farm?: Partial<FarmInfo>;
+  location?: SelectedLocation;
   gpuCards: GPUCardInfo[];
   domain?: DomainInfo;
 }

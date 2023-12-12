@@ -55,6 +55,7 @@
 <script lang="ts">
 import type { FarmInfo, NodeInfo } from "@threefold/grid_client";
 import { computed, onUnmounted, type PropType, ref, watch } from "vue";
+import { onMounted } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VInput } from "vuetify/components/VInput";
 
@@ -132,10 +133,7 @@ export default {
 
     const domainNameValid = ref<boolean | null>(null);
     watch(domainNameValid, valid => {
-      ctx.emit(
-        "update:status",
-        valid === null ? ValidatorStatus.Init : valid ? ValidatorStatus.Valid : ValidatorStatus.Invalid,
-      );
+      bindStatus(valid === null ? ValidatorStatus.Init : valid ? ValidatorStatus.Valid : ValidatorStatus.Invalid);
     });
 
     useWatchDeep(
@@ -145,14 +143,23 @@ export default {
           enabledCustomDomain: enableCustomDomain.value,
           customDomain: customDomain.value,
         } as DomainInfo),
-      domain => ctx.emit("update:model-value", domain),
+      domain => bindModelValue(domain),
       { immediate: true, deep: true },
     );
 
     onUnmounted(() => {
-      ctx.emit("update:model-value");
-      ctx.emit("update:status", ValidatorStatus.Init);
+      bindModelValue();
+      bindStatus();
     });
+
+    function bindModelValue(domain?: DomainInfo): void {
+      ctx.emit("update:model-value", domain);
+    }
+
+    onMounted(bindStatus);
+    function bindStatus(status?: ValidatorStatus): void {
+      ctx.emit("update:status", status || ValidatorStatus.Init);
+    }
 
     return {
       page,

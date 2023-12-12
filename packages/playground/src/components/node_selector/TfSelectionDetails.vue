@@ -9,12 +9,8 @@
     </v-radio-group>
 
     <template v-if="wayToSelect === 'automated'">
-      location {{ location }}
       <TfSelectLocation v-model="location" v-if="wayToSelect === 'automated'" />
-
-      farm {{ farm }}
       <TfSelectFarm :filters="filters" :location="location" v-model="farm" v-if="wayToSelect === 'automated'" />
-
       <TfAutoNodeSelector
         :filters="filters"
         :location="location"
@@ -24,7 +20,6 @@
         v-if="wayToSelect === 'automated'"
       />
     </template>
-
     <TfManualNodeSelector :filters="filters" v-model="node" v-model:status="nodeStatus" v-else />
 
     <VExpandTransition>
@@ -44,7 +39,7 @@
         :farm="farm"
         v-model="domain"
         v-model:status="domainStatus"
-        v-if="filters.gateway"
+        v-if="requireDomain"
       />
     </VExpandTransition>
   </section>
@@ -74,6 +69,7 @@ export default {
       type: Object as PropType<NodeSelectorFilters>,
       default: () => ({}),
     },
+    requireDomain: Boolean,
     status: String as PropType<ValidatorStatus>,
   },
   emits: {
@@ -86,13 +82,13 @@ export default {
     const farm = ref<FarmInfo>();
 
     const node = ref<NodeInfo>();
-    const nodeStatus = ref(ValidatorStatus.Init);
+    const nodeStatus = ref<ValidatorStatus>();
 
     const gpuCards = ref<GPUCardInfo[]>([]);
-    const gpuStatus = ref(ValidatorStatus.Init);
+    const gpuStatus = ref<ValidatorStatus>();
 
     const domain = ref<DomainInfo>();
-    const domainStatus = ref(ValidatorStatus.Init);
+    const domainStatus = ref<ValidatorStatus>();
 
     const selectionDetails = computed(() => {
       return {
@@ -104,7 +100,7 @@ export default {
         domain: domain.value,
       } as SelectionDetails;
     });
-    watch(selectionDetails, s => ctx.emit("update:model-value", s), { immediate: true, deep: true });
+    watch(selectionDetails, bindModelValue, { immediate: true, deep: true });
 
     /* Adapter to work with old code validation */
     const { uid } = getCurrentInstance() as { uid: number };
@@ -125,7 +121,7 @@ export default {
     const invalid = computed(() => {
       return (
         nodeStatus.value === ValidatorStatus.Invalid ||
-        (props.filters.gateway && domainStatus.value === ValidatorStatus.Invalid) ||
+        (props.requireDomain && domainStatus.value === ValidatorStatus.Invalid) ||
         (props.filters.hasGPU && gpuStatus.value === ValidatorStatus.Invalid)
       );
     });
@@ -133,7 +129,7 @@ export default {
     const pending = computed(() => {
       return (
         nodeStatus.value === ValidatorStatus.Pending ||
-        (props.filters.gateway && domainStatus.value === ValidatorStatus.Pending) ||
+        (props.requireDomain && domainStatus.value === ValidatorStatus.Pending) ||
         (props.filters.hasGPU && gpuStatus.value === ValidatorStatus.Pending)
       );
     });
@@ -141,7 +137,7 @@ export default {
     const valid = computed(() => {
       return (
         nodeStatus.value === ValidatorStatus.Valid &&
-        (!props.filters.gateway || (props.filters.gateway && domainStatus.value === ValidatorStatus.Valid)) &&
+        (!props.requireDomain || (props.requireDomain && domainStatus.value === ValidatorStatus.Valid)) &&
         (!props.filters.hasGPU || (props.filters.hasGPU && gpuStatus.value === ValidatorStatus.Valid))
       );
     });
@@ -157,10 +153,19 @@ export default {
       status,
       status => {
         form?.updateStatus(uid, status);
-        ctx.emit("update:status", status);
+        bindStatus(status);
       },
       { deep: true, immediate: true },
     );
+
+    function bindModelValue(value: SelectionDetails): void {
+      ctx.emit("update:model-value", value);
+    }
+
+    onUnmounted(bindStatus);
+    function bindStatus(status?: ValidatorStatus): void {
+      ctx.emit("update:status", status || ValidatorStatus.Init);
+    }
 
     return {
       ValidatorStatus,
