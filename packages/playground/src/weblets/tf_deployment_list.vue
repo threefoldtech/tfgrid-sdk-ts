@@ -267,14 +267,7 @@
             tooltip="Admin Panel"
             color="anchor"
             icon="mdi-view-dashboard"
-            :href="
-              'http://' +
-              (item.value[0].publicIP?.ip
-                ? item.value[0].publicIP.ip.slice(0, -3)
-                : item.value[0].planetary
-                ? '[' + item.value[0].planetary + ']'
-                : item.value[0].interfaces[0].ip)
-            "
+            :href="getUmbrelULR(item.value)"
           />
         </template>
 
@@ -454,6 +447,12 @@ deploymentListManager?.register(uid, () => {
   return table.value?.loadDeployments;
 });
 
+function getUmbrelULR(item: any) {
+  const urlPrefix = "";
+  if (item?.publicIP?.ip) return `http://${item.publicIP?.ip.slice(0, -3)}`;
+  if (item?.planetary) return `http://[${item.planetary}]`;
+  return `http://${item.interfaces[0].ip}`;
+}
 onUnmounted(() => deploymentListManager?.unregister(uid));
 </script>
 
