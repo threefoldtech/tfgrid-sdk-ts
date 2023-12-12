@@ -199,6 +199,10 @@ export default {
     async function AddConfig() {
       try {
         isSaving.value = true;
+        if (props.modelValue.gw4 === props.modelValue.ipv4 || props.modelValue.gw6 === props.modelValue.ipv6) {
+          createCustomToast(`Failed to save config.IP and Gateway should be different.`, ToastType.danger);
+          return;
+        }
         await gridStore.grid.nodes.addNodePublicConfig({
           farmId: props.farmId,
           nodeId: props.nodeId,
