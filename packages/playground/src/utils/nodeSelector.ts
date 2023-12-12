@@ -1,4 +1,4 @@
-import type { FarmFilterOptions, FarmInfo, FilterOptions } from "@threefold/grid_client";
+import type { FarmFilterOptions, FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
 import { NodeStatus } from "@threefold/gridproxy_client";
 import shuffle from "lodash/fp/shuffle.js";
 import type { Ref } from "vue";
@@ -167,4 +167,15 @@ export function loadNodes(gridStore: ReturnType<typeof useGrid>, filters: Filter
 export async function getNodePageCount(gridStore: ReturnType<typeof useGrid>, filters: FarmFilterOptions) {
   const count = await gridStore.client.capacity.getNodesCount(filters);
   return Math.ceil(count / window.env.PAGE_SIZE);
+}
+
+export async function getNodeGpuCards(gridStore: ReturnType<typeof useGrid>, node: NodeInfo) {
+  const card = await gridStore.client.zos.getNodeGPUInfo(node);
+  return Array.from({ length: 12 }, () => card)
+    .flat()
+    .map((c, i) => {
+      c.device += i;
+      c.id += i;
+      return { ...c };
+    });
 }

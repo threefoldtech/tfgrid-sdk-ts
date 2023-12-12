@@ -16,8 +16,9 @@
         :location="location"
         :farm="farm"
         v-model="node"
-        v-model:valid="nodeFormValid"
+        v-model:valid="validNode"
       />
+      <TfSelectGpu :node="node" :valid-node="validNode" v-if="filters.hasGPU" v-model="gpuCards" />
     </div>
 
     <div v-else>Manual (not yet implemented)</div>
@@ -25,17 +26,18 @@
 </template>
 
 <script lang="ts">
-import type { FarmInfo, NodeInfo } from "@threefold/grid_client";
+import type { FarmInfo, GPUCardInfo, NodeInfo } from "@threefold/grid_client";
 import { type PropType, type Ref, ref } from "vue";
 
 import type { NodeSelectorFilters, SelectedLocation } from "../../types/nodeSelector";
 import TfAutoNodeSelector from "./TfAutoNodeSelector.vue";
 import TfSelectFarm from "./TfSelectFarm.vue";
+import TfSelectGpu from "./TfSelectGpu.vue";
 import TfSelectLocation from "./TfSelectLocation.vue";
 
 export default {
   name: "TfSelectNode",
-  components: { TfSelectLocation, TfSelectFarm, TfAutoNodeSelector },
+  components: { TfSelectLocation, TfSelectFarm, TfAutoNodeSelector, TfSelectGpu },
   props: {
     filters: {
       type: Object as PropType<NodeSelectorFilters>,
@@ -46,11 +48,12 @@ export default {
     const wayToSelect = ref<"manual" | "automated">("automated");
     const location = ref<SelectedLocation>({});
     const farm = ref({}) as Ref<FarmInfo>;
+
     const node = ref<NodeInfo>();
+    const validNode = ref(false);
+    const gpuCards = ref<GPUCardInfo[]>([]);
 
-    const nodeFormValid = ref(false);
-
-    return { wayToSelect, location, farm, node, nodeFormValid };
+    return { wayToSelect, location, farm, node, validNode, gpuCards };
   },
 };
 </script>
