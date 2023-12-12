@@ -130,7 +130,6 @@ class DashboardPage:
         self.browser.find_element(*self.login_password_input).send_keys(Keys.CONTROL + "a")
         self.browser.find_element(*self.login_password_input).send_keys(Keys.DELETE)
         self.browser.find_element(*self.login_password_input).send_keys(password)
-        time.sleep(2)
         return self.browser.find_element(*self.login_button)
 
     def create_account(self):
@@ -202,6 +201,10 @@ class DashboardPage:
         self.browser.find_element(*self.connect_apple_button).click()
         return self.get_link()
 
+    def wait_for_button(self, button):
+        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(button))
+        return button
+    
     def wait_for(self, keyword):
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), '"+ keyword +"')]")))
         return True

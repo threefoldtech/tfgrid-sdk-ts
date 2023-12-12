@@ -61,7 +61,7 @@ def test_import_account(browser):
     dashboard_page.import_account(get_seed())
     dashboard_page.click_button(dashboard_page.connect_your_wallet(password))
     dashboard_page.logout_account()
-    assert dashboard_page.login_account(password).is_enabled() == True
+    assert dashboard_page.wait_for_button(dashboard_page.login_account(password)).is_enabled() == True
 
 
 def test_create_account(browser):
@@ -81,7 +81,7 @@ def test_create_account(browser):
     dashboard_page.accept_terms_conditions()
     dashboard_page.click_button(connect_button)
     dashboard_page.logout_account()
-    assert dashboard_page.login_account(password).is_enabled() == True
+    assert dashboard_page.wait_for_button(dashboard_page.login_account(password)).is_enabled() == True
 
 
 def test_account_validation(browser):
@@ -118,7 +118,7 @@ def test_account_validation(browser):
     assert dashboard_page.wait_for('find a matching wallet for this password. Please connect your wallet first.')
     assert dashboard_page.login_account('').get_attribute("disabled") == 'true'
     assert dashboard_page.wait_for('Password is required')
-    assert dashboard_page.login_account('123456').get_attribute("disabled") == None
+    assert dashboard_page.wait_for_button(dashboard_page.login_account('123456')).is_enabled() == True
 
 
 def test_login_links(browser):
