@@ -9,18 +9,19 @@
     </v-radio-group>
 
     <template v-if="wayToSelect === 'automated'">
-      <TfSelectLocation v-model="location" />
-      <TfSelectFarm :filters="filters" :location="location" v-model="farm" />
+      <TfSelectLocation v-model="location" v-if="wayToSelect === 'automated'" />
+      <TfSelectFarm :filters="filters" :location="location" v-model="farm" v-if="wayToSelect === 'automated'" />
       <TfAutoNodeSelector
         :filters="filters"
         :location="location"
         :farm="farm"
         v-model="node"
         v-model:valid="validNode"
+        v-if="wayToSelect === 'automated'"
       />
     </template>
 
-    <template v-else>Manual (not yet implemented)</template>
+    <TfManualNodeSelector :filters="filters" v-model="node" v-model:valid="validNode" v-else />
 
     <VExpandTransition>
       <TfSelectGpu :node="node" :valid-node="validNode" v-if="filters.hasGPU" v-model="gpuCards" />
@@ -49,13 +50,14 @@ import type { InputValidatorService } from "../../hooks/input_validator";
 import type { DomainInfo, NodeSelectorFilters, SelectedLocation } from "../../types/nodeSelector";
 import TfAutoNodeSelector from "./TfAutoNodeSelector.vue";
 import TfDomainName from "./TfDomainName.vue";
+import TfManualNodeSelector from "./TfManualNodeSelector.vue";
 import TfSelectFarm from "./TfSelectFarm.vue";
 import TfSelectGpu from "./TfSelectGpu.vue";
 import TfSelectLocation from "./TfSelectLocation.vue";
 
 export default {
   name: "TfSelectNode",
-  components: { TfSelectLocation, TfSelectFarm, TfAutoNodeSelector, TfSelectGpu, TfDomainName },
+  components: { TfSelectLocation, TfSelectFarm, TfAutoNodeSelector, TfManualNodeSelector, TfSelectGpu, TfDomainName },
   props: {
     filters: {
       type: Object as PropType<NodeSelectorFilters>,
@@ -67,7 +69,7 @@ export default {
     "update:valid": (valid: boolean) => true || valid,
   },
   setup(props, ctx) {
-    const wayToSelect = ref<"manual" | "automated">("automated");
+    const wayToSelect = ref<"manual" | "automated">("manual");
     const location = ref<SelectedLocation>({});
     const farm = ref({}) as Ref<FarmInfo>;
 

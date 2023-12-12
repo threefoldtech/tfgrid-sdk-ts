@@ -174,3 +174,13 @@ export async function getNodePageCount(gridStore: ReturnType<typeof useGrid>, fi
 export function getNodeGpuCards(gridStore: ReturnType<typeof useGrid>, node: NodeInfo) {
   return gridStore.client.zos.getNodeGPUInfo(node);
 }
+
+export async function resolveAsync<T, E>(promise: Promise<T>): Promise<[T, null]>;
+export async function resolveAsync<T, E>(promise: Promise<T>): Promise<[null, E]>;
+export async function resolveAsync(promise: Promise<any>): Promise<any> {
+  try {
+    return [await promise, null];
+  } catch (error) {
+    return [null, error];
+  }
+}
