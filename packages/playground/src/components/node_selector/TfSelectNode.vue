@@ -11,7 +11,14 @@
     <div v-if="wayToSelect === 'automated'">
       <TfSelectLocation v-model="location" />
       <TfSelectFarm :filters="filters" :location="location" v-model="farm" />
-      <TfAutoNodeSelector :filters="filters" :location="location" :farm="farm" v-model="node" />
+
+      <TfAutoNodeSelector
+        :filters="filters"
+        :location="location"
+        :farm="farm"
+        v-model="node"
+        v-model:valid="nodeFormValid"
+      />
     </div>
 
     <div v-else>Manual (not yet implemented)</div>
@@ -19,11 +26,11 @@
 </template>
 
 <script lang="ts">
-import type { FarmInfo } from "@threefold/grid_client";
+import type { FarmInfo, NodeInfo } from "@threefold/grid_client";
 import { type PropType, type Ref, ref } from "vue";
 
 import type { NodeSelectorFilters, SelectedLocation } from "../../types/nodeSelector";
-import TfAutoNodeSelector, { type SelectedNode } from "./TfAutoNodeSelector.vue";
+import TfAutoNodeSelector from "./TfAutoNodeSelector.vue";
 import TfSelectFarm from "./TfSelectFarm.vue";
 import TfSelectLocation from "./TfSelectLocation.vue";
 
@@ -40,9 +47,11 @@ export default {
     const wayToSelect = ref<"manual" | "automated">("automated");
     const location = ref<SelectedLocation>({});
     const farm = ref({}) as Ref<FarmInfo>;
-    const node = ref<SelectedNode>();
+    const node = ref<NodeInfo>();
 
-    return { wayToSelect, location, farm, node };
+    const nodeFormValid = ref(false);
+
+    return { wayToSelect, location, farm, node, nodeFormValid };
   },
 };
 </script>

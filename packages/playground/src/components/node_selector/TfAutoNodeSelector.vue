@@ -22,15 +22,23 @@
         "
         :persistent-hint="nodeInputValidateTask.loading"
         clearable
-        @click:clear="bindModelValue()"
+        @click:clear="
+          bindModelValue();
+          ($refs.nodeInput as VInput)?.$el.querySelector('input').blur();
+          nodeInputValidateTask.reset();
+          touched = false;
+        "
         :error="!!nodeInputValidateTask.error && !filtersUpdated"
         :error-messages="!filtersUpdated ? nodeInputValidateTask.error || undefined : undefined"
-        @blur.once="
-          () => {
-            touched = true;
-            !nodeInputValidateTask.initialized && nodeInputValidateTask.run($props.modelValue);
-          }
+        @blur="
+          touched
+            ? undefined
+            : (() => {
+                touched = true;
+                !nodeInputValidateTask.initialized && nodeInputValidateTask.run($props.modelValue);
+              })()
         "
+        :rules="[() => true]"
       >
         <template #item="{ item, props }">
           <VListItem v-bind="props">
@@ -78,7 +86,7 @@
 </template>
 
 <script lang="ts">
-import type { FarmInfo, FilterOptions } from "@threefold/grid_client";
+import type { FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
 import equals from "lodash/fp/equals.js";
 import { computed, nextTick, onMounted, type PropType, ref } from "vue";
 import type { VInput } from "vuetify/components/VInput";
@@ -94,17 +102,10 @@ import {
   normalizeNodeOptions,
 } from "../../utils/nodeSelector";
 
-export interface SelectedNode {
-  nodeId: number;
-  state?: "Dedicated" | "Shared";
-  // cards?: NodeGPUCardType[];
-  certified?: string;
-}
-
 export default {
   name: "TfAutoNodeSelector",
   props: {
-    modelValue: Object as PropType<SelectedNode>,
+    modelValue: Object as PropType<NodeInfo>,
     filters: {
       type: Object as PropType<NodeSelectorFilters>,
       required: true,
@@ -119,11 +120,11 @@ export default {
     },
   },
   emits: {
-    "update:model-value": (node?: SelectedNode) => true || node,
+    "update:model-value": (node?: NodeInfo) => true || node,
   },
   setup(props, ctx) {
     const gridStore = useGrid();
-    const loadedNodes = ref<SelectedNode[]>([]);
+    const loadedNodes = ref<NodeInfo[]>([]);
     const nodesTask = useAsync(loadNodes, {
       onBeforeTask() {
         const oldNode = props.modelValue;
@@ -131,7 +132,7 @@ export default {
         return oldNode?.nodeId;
       },
       onAfterTask({ data }, oldNodeId: number) {
-        loadedNodes.value = loadedNodes.value.concat(data as SelectedNode[]);
+        loadedNodes.value = loadedNodes.value.concat(data as NodeInfo[]);
         if (oldNodeId) {
           const index = loadedNodes.value.findIndex(n => n.nodeId === oldNodeId);
           bindModelValue(loadedNodes.value[index]);
@@ -186,6 +187,8 @@ export default {
     );
 
     async function resetPageAndReloadNodes() {
+      nodeInputValidateTask.value.reset();
+      touched.value = false;
       baseFilters.value = undefined;
       filtersUpdated.value = false;
       await pageCountTask.value.run(gridStore, filters.value);
@@ -196,13 +199,15 @@ export default {
       return reloadNodes();
     }
 
-    const nodeInput = ref<VInput>();
-    const nodeInputValidateTask = useAsync<true, string, [SelectedNode | undefined]>(async node => {
+    const nodeInputValidateTask = useAsync<true, string, [NodeInfo | undefined]>(async node => {
       if (!node || !node.nodeId) {
         throw "Node ID is required.";
       }
 
       try {
+        // console.log("gpus list");
+        // console.log("gpus", await gridStore.client.zos.getNodeGPUInfo(node));
+
         await gridStore.client.capacity.checkNodeCapacityPool({
           nodeId: node.nodeId,
           ssdDisks: [props.filters.solutionDisk ?? 0, ...(props.filters.ssdDisks || [])]
@@ -227,7 +232,7 @@ export default {
     });
 
     const touched = ref(false);
-    function bindModelValue(node?: SelectedNode) {
+    function bindModelValue(node?: NodeInfo) {
       ctx.emit("update:model-value", node);
       (touched.value || node) && nodeInputValidateTask.value.run(node);
     }
@@ -241,7 +246,6 @@ export default {
       page,
 
       filtersUpdated,
-      nodeInput,
       nodeInputValidateTask,
 
       touched,

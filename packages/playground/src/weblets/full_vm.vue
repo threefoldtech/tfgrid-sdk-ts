@@ -75,7 +75,7 @@
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
           <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
-        <SelectFarmManager>
+        <!-- <SelectFarmManager>
           <NodeSelector v-model="selection" />
           <SelectFarm
             v-if="selection == Selection.AUTOMATED"
@@ -111,7 +111,7 @@
             :root-file-system-size="rootFilesystemSize"
             :loading-farm="loadingFarm"
           />
-        </SelectFarmManager>
+        </SelectFarmManager> -->
 
         <TfSelectNode
           :filters="{
@@ -325,9 +325,6 @@ async function deploy() {
 
 <script lang="ts">
 import ExpandableLayout from "../components/expandable_layout.vue";
-import NodeSelector from "../components/node_selection.vue";
-import SelectFarm from "../components/select_farm.vue";
-import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -338,9 +335,7 @@ export default {
   components: {
     SelectVmImage,
     SelectSolutionFlavor,
-    SelectFarm,
     ExpandableLayout,
-    SelectNode,
   },
 };
 </script>
