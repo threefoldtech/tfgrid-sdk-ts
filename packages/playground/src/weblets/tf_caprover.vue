@@ -49,11 +49,7 @@
 
           <p class="font-weight-bold mt-4">
             If you don't know what Captain root domain is, make sure to visit the
-            <a
-              target="_blank"
-              href="https://manual.grid.tf/weblets/weblets_caprover.html?highlight=caprover#caprover"
-              :style="{ color: 'inherit' }"
-            >
+            <a target="_blank" href="https://manual.grid.tf/playground/caprover.html" :style="{ color: 'inherit' }">
               Quick start documentation.
             </a>
           </p>
