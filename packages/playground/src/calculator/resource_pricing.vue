@@ -192,6 +192,7 @@ import { onMounted } from "vue";
 import { ref } from "vue";
 
 import { useProfileManager } from "@/stores/profile_manager";
+import { Calculator } from "@/utils/calculator";
 import { getGrid } from "@/utils/grid";
 
 import { color } from "../utils/background_color";
@@ -222,11 +223,12 @@ const prices = ref<PriceType[]>([]);
 const grid = ref();
 const profileManager = useProfileManager();
 const hasActiveProfile = computed(() => !!profileManager.profile);
+const calculator = computed(() => grid.value?.calculator || new Calculator());
 watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance], async () => {
   let pkgs: any;
   if (!valid.value.error) {
     if (currentbalance.value) {
-      const accountBalance = await grid.value.balance.getMyBalance();
+      const accountBalance = await grid.value?.balance.getMyBalance();
       balance.value = accountBalance.free;
       pkgs = await grid.value.calculator.calculateWithMyBalance({
         cru: CRU.value,
@@ -238,7 +240,7 @@ watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance], async ()
       });
     } else {
       if (!balance.value) balance.value = 0;
-      pkgs = await grid.value.calculator.calculate({
+      pkgs = await calculator.value?.calculate({
         cru: CRU.value,
         mru: MRU.value,
         hru: HRU.value,
@@ -260,7 +262,7 @@ watch(currentbalance, (newCurrentBalance, oldCurrentBalance) => {
 });
 
 async function setPriceList(pkgs: any): Promise<PriceType[]> {
-  TFTPrice.value = await grid.value.calculator.tftPrice();
+  TFTPrice.value = await calculator.value.tftPrice();
   prices.value = [
     {
       label: "Dedicated Node",
@@ -288,7 +290,7 @@ onMounted(async () => {
   getGrid(profileManager.profile!)
     .then(async result => {
       grid.value = result;
-      const pkgs = await grid.value.calculator.calculate({
+      const pkgs = await calculator.value.calculate({
         cru: CRU.value,
         mru: MRU.value,
         hru: HRU.value,
@@ -297,7 +299,7 @@ onMounted(async () => {
         certified: isCertified.value,
         balance: balance.value,
       });
-      setPriceList(pkgs);
+      await setPriceList(pkgs);
     })
     .catch(error => {
       console.error("Error fetching the grid:", error);
