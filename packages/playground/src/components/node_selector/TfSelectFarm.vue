@@ -102,7 +102,9 @@ export default {
         loadedFarms.value = loadedFarms.value.concat(data as FarmInfo[]);
         if (oldFarmId) {
           const index = loadedFarms.value.findIndex(f => f.farmId === oldFarmId);
-          ctx.emit("update:model-value", loadedFarms.value[index]);
+          if (loadedFarms.value[index]) {
+            ctx.emit("update:model-value", loadedFarms.value[index]);
+          }
         }
         nextPage();
       },

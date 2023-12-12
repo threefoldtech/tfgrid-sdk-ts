@@ -18,8 +18,13 @@
         v-model="node"
         v-model:valid="validNode"
       />
-      <TfSelectGpu :node="node" :valid-node="validNode" v-if="filters.hasGPU" v-model="gpuCards" />
-      <TfDomainName :filters="filters" :location="location" :farm="farm" v-if="filters.gateway" />
+      <VExpandTransition>
+        <TfSelectGpu :node="node" :valid-node="validNode" v-if="filters.hasGPU" v-model="gpuCards" />
+      </VExpandTransition>
+
+      <VExpandTransition>
+        <TfDomainName :filters="filters" :location="location" :farm="farm" v-model="domain" v-if="filters.gateway" />
+      </VExpandTransition>
     </div>
 
     <div v-else>Manual (not yet implemented)</div>
@@ -30,7 +35,7 @@
 import type { FarmInfo, GPUCardInfo, NodeInfo } from "@threefold/grid_client";
 import { type PropType, type Ref, ref } from "vue";
 
-import type { NodeSelectorFilters, SelectedLocation } from "../../types/nodeSelector";
+import type { DomainInfo, NodeSelectorFilters, SelectedLocation } from "../../types/nodeSelector";
 import TfAutoNodeSelector from "./TfAutoNodeSelector.vue";
 import TfDomainName from "./TfDomainName.vue";
 import TfSelectFarm from "./TfSelectFarm.vue";
@@ -55,7 +60,9 @@ export default {
     const validNode = ref(false);
     const gpuCards = ref<GPUCardInfo[]>([]);
 
-    return { wayToSelect, location, farm, node, validNode, gpuCards };
+    const domain = ref<DomainInfo>();
+
+    return { wayToSelect, location, farm, node, validNode, gpuCards, domain };
   },
 };
 </script>

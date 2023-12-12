@@ -2,19 +2,68 @@
   <section>
     <h6 class="text-h5 mb-4 mt-2">Domain Name</h6>
 
-    <!-- <VSwitch color="primary" inset label="Custom Domain" v-model="enableCustomDomain" /> -->
+    <VSwitch color="primary" inset label="Custom Domain" v-model="enableCustomDomain" hide-details />
 
-    <VAutocomplete label="Select domain" placeholder="Select a domain" :items="[]" />
+    <VForm v-model="domainNameValid">
+      <VExpandTransition>
+        <VTextField
+          ref="customDomainInput"
+          label="Custom Domain"
+          placeholder="Your custom domain"
+          v-model="customDomain"
+          validate-on="input"
+          :rules="[
+            d => (d ? true : 'Domain name is required.'),
+            d => {
+              const err = validators.isFQDN('Please provide a valid domain name.')(d);
+              return err?.message || true;
+            },
+          ]"
+          v-if="enableCustomDomain"
+          @blur="($refs.customDomainInput as VInput).validate()"
+        />
+      </VExpandTransition>
+
+      <VAutocomplete
+        ref="domainInput"
+        validate-on="input"
+        label="Select domain"
+        placeholder="Select a domain"
+        :items="loadedDomains"
+        item-title="publicConfig.domain"
+        v-model="selectedDomain"
+        :rules="[d => (d ? true : 'Domain is required.')]"
+        @update:menu="opened => !opened && $nextTick().then(($refs.domainInput as VInput).validate)"
+        @blur="$nextTick().then(($refs.domainInput as VInput).validate)"
+      >
+        <template #append-item v-if="page !== -1">
+          <VContainer>
+            <VBtn
+              @click="reloadDomains()"
+              block
+              color="secondary"
+              variant="tonal"
+              :loading="domainsTask.loading"
+              prepend-icon="mdi-reload"
+            >
+              Load More Domains
+            </VBtn>
+          </VContainer>
+        </template>
+      </VAutocomplete>
+    </VForm>
   </section>
 </template>
 
 <script lang="ts">
 import type { FarmInfo, NodeInfo } from "@threefold/grid_client";
 import { computed, type PropType, ref, watch } from "vue";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { VInput } from "vuetify/components/VInput";
 
 import { useAsync, useWatchDeep } from "../../hooks";
 import { useGrid } from "../../stores";
-import type { NodeSelectorFilters, SelectedLocation } from "../../types/nodeSelector";
+import type { DomainInfo, NodeSelectorFilters, SelectedLocation } from "../../types/nodeSelector";
 import {
   createPageGen,
   getNodePageCount,
@@ -26,6 +75,7 @@ import {
 export default {
   name: "TfDomainName",
   props: {
+    modelValue: Object as PropType<DomainInfo>,
     filters: {
       type: Object as PropType<NodeSelectorFilters>,
       required: true,
@@ -38,8 +88,13 @@ export default {
       type: Object as PropType<FarmInfo>,
       required: true,
     },
+    valid: Boolean,
   },
-  setup(props) {
+  emits: {
+    "update:model-value": (domain: DomainInfo) => true || domain,
+    "update:valid": (valid: boolean) => true || valid,
+  },
+  setup(props, ctx) {
     const gridStore = useGrid();
 
     const loadedDomains = ref<NodeInfo[]>([]);
@@ -61,16 +116,54 @@ export default {
     const options = computed(() => normalizeNodeOptions(gridStore, props.location, page, props.farm, true));
     const filters = computed(() => normalizeNodeFilters(props.filters, options.value));
 
-    let w = 0;
-    watch(filters, () => console.log("watch", ++w), { immediate: true, deep: true });
+    const reloadDomains = () => domainsTask.value.run(gridStore, filters.value);
 
-    let d = 0;
-    useWatchDeep(filters, () => console.log("watchDeep", ++d), { immediate: true, debounce: 500, deep: true });
-    // const enableCustomDomain = ref(false);
-    // const selectedDomain = ref()
+    useWatchDeep(
+      filters,
+      async filters => {
+        await pageCountTask.value.run(gridStore, filters);
+        pageGen = createPageGen(pageCountTask.value.data as number);
+        nextPage();
+        loadedDomains.value = [];
+        return reloadDomains();
+      },
+      {
+        immediate: true,
+        debounce: 500,
+        deep: true,
+        ignoreFields: ["page"],
+      },
+    );
+    const enableCustomDomain = ref(false);
+    const customDomain = ref("");
+    const selectedDomain = ref<NodeInfo | null>(null);
+
+    const domainNameValid = ref(false);
+    watch(domainNameValid, valid => ctx.emit("update:valid", valid), { immediate: true });
+
+    useWatchDeep(
+      () =>
+        ({
+          selectedDomain: selectedDomain.value,
+          enabledCustomDomain: enableCustomDomain.value,
+          customDomain: customDomain.value,
+        } as DomainInfo),
+      domain => ctx.emit("update:model-value", domain),
+      { immediate: true, deep: true },
+    );
 
     return {
-      /* enableCustomDomain */
+      page,
+
+      domainNameValid,
+
+      enableCustomDomain,
+      customDomain,
+
+      domainsTask,
+      loadedDomains,
+      selectedDomain,
+      reloadDomains,
     };
   },
 };

@@ -1,4 +1,4 @@
-import type { FarmInfo } from "@threefold/grid_client";
+import type { FarmInfo, NodeInfo } from "@threefold/grid_client";
 
 export type Locations = {
   [region: string]: string[];
@@ -36,4 +36,10 @@ export interface NormalizeNodeFiltersOptions {
   location: SelectedLocation;
   farm: Partial<FarmInfo>;
   gateway?: boolean;
+}
+
+export interface DomainInfo {
+  selectedDomain: NodeInfo | null;
+  enabledCustomDomain: boolean;
+  customDomain: string;
 }

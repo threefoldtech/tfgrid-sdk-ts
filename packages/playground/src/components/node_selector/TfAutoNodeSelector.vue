@@ -1,8 +1,10 @@
 <template>
   <section>
-    <VAlert type="warning" class="mb-4" v-if="filtersUpdated">
-      Please press on <strong>Load Nodes</strong> button to list nodes matching your new requirements.
-    </VAlert>
+    <VFadeTransition>
+      <VAlert type="warning" class="mb-4" v-if="filtersUpdated">
+        Please press on <strong>Load Nodes</strong> button to list nodes matching your new requirements.
+      </VAlert>
+    </VFadeTransition>
 
     <div class="d-flex">
       <VAutocomplete
