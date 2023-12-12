@@ -240,7 +240,7 @@ export default {
     // update v-model:valid
     const valid = computed(() => {
       const { initialized, data } = nodeInputValidateTask.value;
-      return initialized && data === true;
+      return initialized && data === true && !filtersUpdated.value;
     });
     watch(valid, valid => ctx.emit("update:valid", valid), { immediate: true });
 

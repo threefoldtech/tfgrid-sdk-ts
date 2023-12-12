@@ -11,7 +11,6 @@
     <div v-if="wayToSelect === 'automated'">
       <TfSelectLocation v-model="location" />
       <TfSelectFarm :filters="filters" :location="location" v-model="farm" />
-
       <TfAutoNodeSelector
         :filters="filters"
         :location="location"
