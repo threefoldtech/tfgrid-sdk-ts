@@ -6,23 +6,24 @@
     :loading="farmsTask.loading"
     item-title="name"
     :model-value="modelValue || farms[0]"
-    @update:model-value="
-      $event => {
-        if ($event !== $props.modelValue) {
-          $emit('update:model-value', $event || farms[0]);
-        }
-      }
-    "
+    @update:model-value="bindModelValue"
     clearable
     @click:clear="onClear()"
     return-object
-    @vue:mounted="if (!modelValue || !modelValue.name) $emit('update:model-value', farms[0]);"
     prepend-inner-icon="mdi-magnify"
     v-model:menu="menuOpened"
     :focused="focused"
     @update:focused="updateFocused($event)"
     v-model:search.trim="searchQuery"
     @keyup="searchForFarms"
+    :hint="
+      pageCountTask.loading
+        ? 'Preparing to load farms'
+        : searchQuery === '' && !menuOpened && focused
+        ? 'Type any desired farm name to search for...'
+        : undefined
+    "
+    :persistent-hint="pageCountTask.loading || (searchQuery === '' && !menuOpened && focused)"
   >
     <template #no-data v-if="searchTask.loading">
       <div class="d-flex pa-2">
@@ -31,6 +32,10 @@
           Searching for farms with query <strong>{{ searchQuery }}</strong>
         </p>
       </div>
+    </template>
+
+    <template #prepend-item v-if="searchQuery === '' && menuOpened">
+      <span class="px-4 text-caption text-medium-emphasis">Type any desired farm name to search for...</span>
     </template>
 
     <template #append-item v-if="!searchTask.initialized && page !== -1">
@@ -79,7 +84,7 @@ export default {
     location: Object as PropType<SelectedLocation>,
   },
   emits: {
-    "update:model-value": (farm: FarmInfo) => true || farm,
+    "update:model-value": (farm?: FarmInfo) => true || farm,
   },
   setup(props, ctx) {
     const gridStore = useGrid();
@@ -90,7 +95,7 @@ export default {
       onBeforeTask() {
         if (!searchTask.value.initialized) {
           const oldFarm = props.modelValue;
-          ctx.emit("update:model-value", farms.value[0]);
+          bindModelValue();
           return oldFarm?.farmId;
         }
       },
@@ -98,9 +103,7 @@ export default {
         loadedFarms.value = loadedFarms.value.concat(data as FarmInfo[]);
         if (oldFarmId) {
           const index = loadedFarms.value.findIndex(f => f.farmId === oldFarmId);
-          if (loadedFarms.value[index]) {
-            ctx.emit("update:model-value", loadedFarms.value[index]);
-          }
+          bindModelValue(loadedFarms.value[index]);
         }
         nextPage();
       },
@@ -160,7 +163,7 @@ export default {
     }
 
     function onClear() {
-      ctx.emit("update:model-value", farms.value[0]);
+      bindModelValue();
       searchTask.value.reset();
       oldSearchQuery = "";
     }
@@ -176,12 +179,17 @@ export default {
       return res.concat(loadedFarms.value);
     });
 
-    onUnmounted(() => ctx.emit("update:model-value", {} as FarmInfo));
+    onUnmounted(bindModelValue);
+    function bindModelValue(farm?: FarmInfo) {
+      const f = !farm || !farm.farmId ? undefined : farm;
+      f !== props.modelValue && ctx.emit("update:model-value", f);
+    }
 
     return {
       farmsTask,
       page,
       reloadFarms,
+      pageCountTask,
 
       searchTask,
       menuOpened,
@@ -192,6 +200,8 @@ export default {
 
       onClear,
       farms,
+
+      bindModelValue,
     };
   },
 };

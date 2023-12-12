@@ -11,6 +11,8 @@
     <template v-if="wayToSelect === 'automated'">
       location {{ location }}
       <TfSelectLocation v-model="location" v-if="wayToSelect === 'automated'" />
+
+      farm {{ farm }}
       <TfSelectFarm :filters="filters" :location="location" v-model="farm" v-if="wayToSelect === 'automated'" />
 
       <TfAutoNodeSelector
@@ -51,7 +53,7 @@
 <script lang="ts">
 import type { FarmInfo, GPUCardInfo, NodeInfo } from "@threefold/grid_client";
 import noop from "lodash/fp/noop.js";
-import { computed, getCurrentInstance, onMounted, onUnmounted, type PropType, type Ref, ref, watch } from "vue";
+import { computed, getCurrentInstance, onMounted, onUnmounted, type PropType, ref, watch } from "vue";
 
 import { useForm, ValidatorStatus } from "../../hooks/form_validator";
 import type { InputValidatorService } from "../../hooks/input_validator";
@@ -81,7 +83,7 @@ export default {
   setup(props, ctx) {
     const wayToSelect = ref<"manual" | "automated">("automated");
     const location = ref<SelectedLocation>();
-    const farm = ref({}) as Ref<FarmInfo>;
+    const farm = ref<FarmInfo>();
 
     const node = ref<NodeInfo>();
     const nodeStatus = ref(ValidatorStatus.Init);

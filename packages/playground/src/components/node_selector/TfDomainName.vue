@@ -79,10 +79,7 @@ export default {
       required: true,
     },
     location: Object as PropType<SelectedLocation>,
-    farm: {
-      type: Object as PropType<FarmInfo>,
-      required: true,
-    },
+    farm: Object as PropType<FarmInfo>,
     status: String as PropType<ValidatorStatus>,
   },
   emits: {
