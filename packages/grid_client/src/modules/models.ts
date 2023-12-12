@@ -752,6 +752,13 @@ class GetActiveContractsModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
 }
 
+interface GPUCardInfo {
+  id: string;
+  contract: number;
+  device: string;
+  vendor: string;
+}
+
 export {
   AlgorandAccountCreateModel,
   AlgorandAccountInitModel,
@@ -884,4 +891,5 @@ export {
   AddStellarAddressToFarmModel,
   AddPublicConfig,
   GetActiveContractsModel,
+  GPUCardInfo,
 };

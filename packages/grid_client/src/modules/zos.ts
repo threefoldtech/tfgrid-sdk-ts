@@ -7,7 +7,7 @@ import { TwinDeploymentHandler } from "../high_level/twinDeploymentHandler";
 import { DeploymentFactory } from "../primitives/deployment";
 import { Nodes } from "../primitives/nodes";
 import { WorkloadTypes } from "../zos/workload";
-import { PingNodeOptionsModel, ZOSGetDeploymentModel, ZOSModel, ZOSNodeModel } from "./models";
+import { GPUCardInfo, PingNodeOptionsModel, ZOSGetDeploymentModel, ZOSModel, ZOSNodeModel } from "./models";
 import { checkBalance } from "./utils";
 
 class Zos {
@@ -101,7 +101,7 @@ class Zos {
 
   @expose
   @validateInput
-  async getNodeGPUInfo(options: ZOSNodeModel) {
+  async getNodeGPUInfo(options: ZOSNodeModel): Promise<GPUCardInfo[]> {
     const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
     return await this.rmb.request([nodeTwinId], "zos.gpu.list", "");
   }
