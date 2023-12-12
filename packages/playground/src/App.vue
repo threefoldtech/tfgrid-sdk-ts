@@ -162,13 +162,12 @@
           <v-container fluid :style="{ paddingBottom: '100px' }">
             <div class="d-flex align-center">
               <v-btn
+                v-if="!openSidebar"
                 color="secondary"
                 @click="openSidebar = true"
                 icon="mdi-menu"
                 variant="tonal"
                 class="mr-2"
-                :disabled="!hasActiveProfile"
-                v-if="!permanent"
               />
               <div :style="{ width: '100%' }" class="mb-4">
                 <DisclaimerToolbar />
