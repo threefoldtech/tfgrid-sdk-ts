@@ -44,14 +44,15 @@
         <v-alert type="warning" variant="tonal" class="mb-6">
           <p :style="{ maxWidth: '880px' }">
             You will need to point a wildcard DNS entry for the domain you entered above to this CapRover instance IP
-            Address after deployment, otherwise, you won't be able to access the CapRover dashboard using this domain.
+            Address after deployment. Otherwise, you won't be able to access the CapRover dashboard using this domain.
           </p>
 
           <p class="font-weight-bold mt-4">
-            If you don't know what Captain root domain is, make sure to visit the
+            If you don't know what the Captain root domain is, make sure to read the
             <a target="_blank" href="https://manual.grid.tf/playground/caprover.html" :style="{ color: 'inherit' }">
-              Quick start documentation.
+              quick start documentation
             </a>
+            .
           </p>
         </v-alert>
 
