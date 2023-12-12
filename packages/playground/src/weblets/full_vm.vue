@@ -125,8 +125,8 @@
             solutionDisk: solution?.disk,
             memory: solution?.memory,
             rootFilesystemSize,
-            gateway: true,
           }"
+          v-model:valid="isValid"
         />
       </template>
 
@@ -193,6 +193,8 @@ import { deployVM, type Disk } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
+
+const isValid = ref(false);
 
 const layout = useLayout();
 const tabs = ref();
