@@ -8,6 +8,7 @@
     :error-messages="validationTask.error || undefined"
     :persistent-hint="validationTask.loading || (validationTask.initialized && validationTask.data === true)"
     :hint="validationTask.loading ? 'Validating node...' : validationTask.data ? `Node ${nodeId} is valid.` : undefined"
+    @blur="validationTask.initialized ? undefined : validationTask.run(nodeId)"
   />
 </template>
 
@@ -113,6 +114,12 @@ export default {
       ctx.emit("update:model-value", node);
       return true;
     });
+
+    // revalidate if filters updated
+    useWatchDeep(
+      () => props.filters,
+      () => validationTask.value.initialized && validationTask.value.run(nodeId.value),
+    );
 
     useWatchDeep(nodeId, validationTask.value.run, { debounce: 250 });
 

@@ -24,7 +24,13 @@
     <TfManualNodeSelector :filters="filters" v-model="node" v-model:valid="validNode" v-else />
 
     <VExpandTransition>
-      <TfSelectGpu :node="node" :valid-node="validNode" v-if="filters.hasGPU" v-model="gpuCards" />
+      <TfSelectGpu
+        :node="node"
+        :valid-node="validNode"
+        v-model="gpuCards"
+        v-model:valid="gpuValid"
+        v-if="filters.hasGPU"
+      />
     </VExpandTransition>
 
     <VExpandTransition>
@@ -76,6 +82,7 @@ export default {
     const node = ref<NodeInfo>();
     const validNode = ref(false);
     const gpuCards = ref<GPUCardInfo[]>([]);
+    const gpuValid = ref(false);
 
     const domain = ref<DomainInfo>();
     const validDomain = ref(false);
@@ -83,7 +90,11 @@ export default {
     /* Adapter to work with old code validation */
     const { uid } = getCurrentInstance() as { uid: number };
     const form = useForm();
-    const valid = computed(() => validNode.value && (!props.filters.gateway || validDomain.value));
+    const valid = computed(() => {
+      const gateway = !props.filters.gateway || validDomain.value;
+      const gpu = !props.filters.hasGPU || gpuValid.value;
+      return validNode.value && gateway && gpu;
+    });
 
     const fakeService: InputValidatorService = {
       validate: () => Promise.resolve(valid.value),
@@ -104,7 +115,7 @@ export default {
       { immediate: true },
     );
 
-    return { wayToSelect, location, farm, node, validNode, gpuCards, domain, validDomain };
+    return { wayToSelect, location, farm, node, validNode, gpuCards, gpuValid, domain, validDomain };
   },
 };
 </script>

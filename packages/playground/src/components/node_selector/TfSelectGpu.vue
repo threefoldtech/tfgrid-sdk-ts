@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import type { GPUCardInfo, NodeInfo } from "@threefold/grid_client";
-import type { PropType } from "vue";
+import { computed, type PropType, watch } from "vue";
 
 import { useAsync, useWatchDeep } from "../../hooks";
 import { useGrid } from "../../stores";
@@ -31,9 +31,11 @@ export default {
     modelValue: { type: Object as PropType<GPUCardInfo[]>, required: true },
     node: Object as PropType<NodeInfo>,
     validNode: { type: Boolean, required: true },
+    valid: Boolean,
   },
   emits: {
     "update:model-value": (cards: GPUCardInfo[]) => true || cards,
+    "update:valid": (valid: boolean) => true || valid,
   },
   setup(props, ctx) {
     const gridStore = useGrid();
@@ -50,6 +52,9 @@ export default {
       },
       { immediate: true, deep: true },
     );
+
+    const valid = computed(() => props.validNode && props.modelValue.length > 0);
+    watch(valid, valid => ctx.emit("update:valid", valid), { immediate: true });
 
     return { cardsTask };
   },
