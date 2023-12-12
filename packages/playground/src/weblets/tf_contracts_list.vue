@@ -16,14 +16,14 @@
   </v-card>
 
   <!-- Total Cost Card -->
-  <v-card variant="tonal" :loading="!totalCost" class="mb-3 bg-blue-primary-lighten-3">
+  <v-card variant="tonal" :loading="totalCost === undefined" class="mb-3 bg-blue-primary-lighten-3">
     <template #title>
       <v-row>
         <v-col class="d-flex justify-start"> <p class="text-subtitle-1">Total cost of contracts</p> </v-col>
       </v-row>
     </template>
     <template #text>
-      <strong v-if="totalCost" class="text-primary">
+      <strong v-if="totalCost != undefined" class="text-primary">
         {{ totalCost }} TFT/hour ≈ {{ (totalCost * 24 * 30).toFixed(3) }} TFT/month
       </strong>
       <small v-else> loading total cost... </small>
