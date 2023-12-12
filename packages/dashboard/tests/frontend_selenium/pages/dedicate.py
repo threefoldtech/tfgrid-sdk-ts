@@ -1,8 +1,10 @@
 import math
+from utils.utils import byte_converter
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import time
 
 """
 This module contains Dedicate Node page elements.
@@ -21,11 +23,18 @@ class DedicatePage:
     search_bar = (By.XPATH ,'/html/body/div[1]/div[1]/div[3]/div/div/div[1]/div/div[1]/div/input')
     node_table = (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div/div[2]/div[1]/table/tbody/tr')
     twin_id_label = (By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[1]/div[2]/div[1]/div/div[2]/div[1]')
-    reservation_button = (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div/div[2]/div[1]/table/tbody/tr/td[9]/div/button')
     ok_btn = (By.XPATH, "//*[@id='app']/div[4]/div/div/div[3]/button[1]")
-    close_login_button = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div[4]/button')
+    close_login_button = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div[4]/button[2]')
     twin_details = (By.XPATH, "//*[contains(text(), 'Twin Details')]")
-    table_xpath = '//div/div/div[1]/table/tbody/tr'
+    filter_button = (By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div/div[1]/div[1]/div/div/div[1]/div[1]/div[2]/div/i')
+    filter_sru_button = (By.XPATH, "//*[contains(text(), 'Total SRU (GB)')]")
+    filter_hru_button = (By.XPATH, "//*[contains(text(), 'Total HRU (GB)')]")
+    filter_mru_button = (By.XPATH, "//*[contains(text(), 'Total MRU (GB)')]")
+    filter_cru_button = (By.XPATH, "//*[contains(text(), 'Total CRU (Cores)')]")
+    filter_gpu_vendor_button = (By.XPATH, "//*[contains(text(), 's vendor name')]")
+    filter_gpu_device_button = (By.XPATH, "//*[contains(text(), 's device name')]")
+    filter_resource_input = '/html/body/div[1]/div[1]/div[2]/div/div[1]/div/div[1]/section/div['
+    table_xpath = '//*[@id="app"]/div[1]/div[2]/div/div[1]/div/div[2]/div/div[2]/div/div/div/div[1]/table/tbody/tr'
 
 
     def __init__(self, browser):
@@ -60,6 +69,12 @@ class DedicatePage:
         for i in range(len(node_list)):
             city.append(node_list[i]['city'])
         return city
+    
+    def get_node_gpu(self, node_list):
+        gpu = []
+        for i in range(len(node_list)):
+            gpu.append(node_list[i]['num_gpu'])
+        return gpu
     
     def get_node_cru(self, node_list):
         cru = []
@@ -175,27 +190,74 @@ class DedicatePage:
         for i in range(1, len(self.browser.find_elements(*self.node_table))+1):
             price.append(str(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[8]").text))
         return price
-    
+
+    def table_nodes(self):
+        nodes = []
+        checking_table = self.browser.find_element(By.XPATH, f'//*[@id="app"]/div[1]/div[2]/div/div[1]/div/div[2]/div/div[2]/div/div/div/div[1]/table/tbody/tr').text
+        if(checking_table == 'No matching records found' or checking_table == 'No data available'):
+            return nodes
+        for i in range(1, len(self.browser.find_elements(By.XPATH, self.table_xpath))+1):
+            if i <= len(self.browser.find_elements(By.XPATH, self.table_xpath))+1:
+                details = []
+                text = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[6]").text
+                details.append(byte_converter(text)) # SRU
+                text = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[7]").text
+                details.append(byte_converter(text)) # HRU
+                text = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[5]").text
+                details.append(byte_converter(text)) # MRU
+                text = self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[4]").text
+                details.append(int(text)) # CRU
+                nodes.append(details)
+        return nodes
+
+    def select_filters(self):
+        self.browser.find_element(By.XPATH, "//*[contains(text(), 'Rented')]").click()
+        self.browser.find_element(*self.filter_button).click()
+        self.browser.find_element(*self.filter_sru_button).click()
+        self.browser.find_element(*self.filter_hru_button).click()
+        self.browser.find_element(*self.filter_mru_button).click()
+        self.browser.find_element(*self.filter_cru_button).click()
+        self.browser.find_element(*self.filter_gpu_vendor_button).click()
+        self.browser.find_element(*self.filter_gpu_device_button).click()
+        self.browser.find_element(*self.filter_button).click()
+
+    def filter_input(self, data, resource, validation):
+        for i in range(6):
+            resource_input = (By.XPATH, self.filter_resource_input + str(i+1) + ']/div/div[2]/div/div[1]/div[1]/input')
+            self.browser.find_element(*resource_input).send_keys(Keys.CONTROL + "a")
+            self.browser.find_element(*resource_input).send_keys(Keys.DELETE)
+            if (i == resource):
+                self.browser.find_element(*resource_input).send_keys(data)
+                self.browser.find_element(*resource_input).send_keys(Keys.CONTROL + "a")
+                self.browser.find_element(*resource_input).send_keys(Keys.CONTROL + "x")
+                self.browser.find_element(*resource_input).send_keys(Keys.CONTROL + "v")
+                time.sleep(5)
+        if not validation :
+            self.browser.find_element(*resource_input).send_keys(Keys.PAGE_UP + Keys.PAGE_UP)
+
     def node_details(self):
         self.browser.find_element(*self.node_id).click()
         nodes = []
-        tables = ["rentable", "rented"]
+        tables = ["Rentable", "Rented"]
         for table in tables:
-            self.browser.find_element(By.XPATH, "//*[contains(text(), '"+table.capitalize()+"')]").click()
+            self.browser.find_element(By.XPATH, "//*[contains(text(), '"+table+"')]").click()
             if(self.browser.find_element(By.XPATH, f'//*[@id="app"]/div[1]/div[2]/div/div[1]/div/div[2]/div/div[2]/div/div/div/div[1]/table/tbody/tr').text == 'No data available'):
-                continue 
-            for i in range(1, len(self.browser.find_elements(By.XPATH, f"//*[@id='{table}']{self.table_xpath}"))+1):
+                continue
+            if table == "Rented":
+                WebDriverWait(self.browser, 30).until(EC.visibility_of_any_elements_located((By.XPATH, "//*[contains(text(), 'Taken')]")))
+            for i in range(1, len(self.browser.find_elements(By.XPATH, self.table_xpath))+1):
                 details = []
-                self.browser.find_element(By.XPATH, f"//*[@id='{table}']{self.table_xpath}[{str(i)}]/td[1]/button").click()
-                details.append(int(self.browser.find_element(By.XPATH, f"//*[@id='{table}']{self.table_xpath}[{str(i)}]/td[2]").text)) # Node ID
-                details.append(self.browser.find_element(By.XPATH, f"//*[@id='{table}']{self.table_xpath}[{str(i+1)}]/td/div/div[1]/div/div[2]/div/div/div[1]").text) # CPU Resource Unit
-                details.append(self.browser.find_element(By.XPATH, f"//*[@id='{table}']{self.table_xpath}[{str(i+1)}]/td/div/div[1]/div/div[2]/div/div/div[2]").text) # Disk Resource Unit (HDD)
-                details.append(self.browser.find_element(By.XPATH, f"//*[@id='{table}']{self.table_xpath}[{str(i+1)}]/td/div/div[1]/div/div[2]/div/div/div[3]").text) # Disk Resource Unit (SSD)
-                details.append(self.browser.find_element(By.XPATH, f"//*[@id='{table}']{self.table_xpath}[{str(i+1)}]/td/div/div[1]/div/div[2]/div/div/div[4]").text) # Memory Resource Unit
-                details.append(self.browser.find_element(By.XPATH, f"//*[@id='{table}']{self.table_xpath}[{str(i+1)}]/td/div/div[2]/div/div[2]/div/div/div[1]").text) # Country
-                details.append(self.browser.find_element(By.XPATH, f"//*[@id='{table}']{self.table_xpath}[{str(i+1)}]/td/div/div[2]/div/div[2]/div/div/div[2]").text) # City
-                details.append(self.browser.find_element(By.XPATH, f"//*[@id='{table}']{self.table_xpath}[{str(i+1)}]/td/div/div[3]/div/div[2]/div/div/div").text) # Farm Public Ips
-                self.browser.find_element(By.XPATH, f"//*[@id='{table}']{self.table_xpath}[{str(i)}]/td[1]/button").click()
+                self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[1]/button").click()
+                details.append(int(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[2]").text)) # Node ID
+                details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div/div[1]/div/div[2]/div/div/div[1]").text) # CPU Resource Unit
+                details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div/div[1]/div/div[2]/div/div/div[2]").text) # Disk Resource Unit (HDD)
+                details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div/div[1]/div/div[2]/div/div/div[3]").text) # Disk Resource Unit (SSD)
+                details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div/div[1]/div/div[2]/div/div/div[4]").text) # Memory Resource Unit
+                details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div/div[2]/div/div[2]/div/div/div[1]").text) # Country
+                details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div/div[2]/div/div[2]/div/div/div[2]").text) # City
+                details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i+1)}]/td/div/div[3]/div/div[2]/div/div/div[4]").text) # Farm Public Ips
+                details.append(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[8]").text) # GPU
+                self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[1]/button").click()
                 nodes.append(details)
         return nodes
 
@@ -206,17 +268,17 @@ class DedicatePage:
         return 0
 
     def reserve_node(self, id):
-        for i in range(1, len(self.browser.find_elements(By.XPATH, f"//*[@id='app']{self.table_xpath}"))+1):
-            if(int(self.browser.find_element(By.XPATH, f"//*[@id='app']{self.table_xpath}[{str(i)}]/td[2]").text) == id):
-                self.browser.find_element(By.XPATH, f"//*[@id='app']{self.table_xpath}[{str(i)}]/td[9]/div/button").click()
+        for i in range(1, len(self.browser.find_elements(By.XPATH, self.table_xpath))+1):
+            if(int(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[2]").text) == id):
+                self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[10]/div/button").click()
 
     def unreserve_node(self, id):
         self.browser.find_element(By.XPATH, "//*[contains(text(), 'Rented')]").click()
         WebDriverWait(self.browser, 30).until(EC.invisibility_of_element_located((By.XPATH, "//*[contains(text(), 'loading nodes ...')]")))
         WebDriverWait(self.browser, 30).until(EC.visibility_of_any_elements_located((By.XPATH, "//*[contains(text(), ' Unreserve ')]")))
-        for i in range(1, len(self.browser.find_elements(By.XPATH, f"//*[@id='app']{self.table_xpath}"))+1):
-            if(int(self.browser.find_element(By.XPATH, f"//*[@id='app']{self.table_xpath}[{str(i)}]/td[2]").text) == id):
-                self.browser.find_element(By.XPATH, f"//*[@id='app']{self.table_xpath}[{str(i)}]/td[9]/div/button").click()
+        for i in range(1, len(self.browser.find_elements(By.XPATH, f"{self.table_xpath}"))+1):
+            if(int(self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[2]").text) == id):
+                self.browser.find_element(By.XPATH, f"{self.table_xpath}[{str(i)}]/td[10]/div/button").click()
                 WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), 'Are you sure you want to unreserve this dedicated node?')]")))
                 self.browser.find_element(*self.ok_btn).click()
 

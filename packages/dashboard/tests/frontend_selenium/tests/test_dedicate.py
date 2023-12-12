@@ -1,8 +1,9 @@
-from utils.utils import generate_string, get_seed
+from utils.utils import generate_string, get_seed, get_min, get_max, filter_result
 from utils.grid_proxy import GridProxy
 from pages.dedicate import DedicatePage
 from pages.dashboard import DashboardPage
 import pytest
+import random
 
 #  Time required for the run (12 cases) is approximately 3 minutes.
 
@@ -14,7 +15,7 @@ def before_test_setup(browser):
     password = generate_string()
     dashboard_page.open_and_load()
     dashboard_page.import_account(get_seed())
-    dashboard_page.connect_your_wallet(password).click()
+    dashboard_page.click_button(dashboard_page.connect_your_wallet(password))
     dedicate_page.navigate()
     return dedicate_page, grid_proxy
 
@@ -169,6 +170,58 @@ def test_dedicate_page(browser):
 #     assert dedicate_page.sort_node_price() == sorted(price, reverse=True)
 #     assert dedicate_page.sort_node_price() == sorted(price, reverse=False)
 
+@pytest.mark.parametrize("resource",[0, 1, 2, 3])
+def test_filter_resource(browser, resource):
+    """
+      Test Case: TC2034 - Filter Resource
+      Steps:
+          - Navigate to the dashboard.
+          - Login.
+          - Click on Dedicate Node from side menu.
+          - Select filter.
+          - Enter the resource value. 
+      Result: The nodes with enough resources that matches the filters.
+    """
+    dedicate_page, _ = before_test_setup(browser)
+    dedicate_page.select_filters()
+    full_nodes = dedicate_page.table_nodes()
+    dedicate_page.filter_input('10000', resource, False)
+    min = int(get_min(full_nodes, resource))
+    max = int(get_max(full_nodes, resource))
+    test_data = random.randint(min-10,max+10)
+    dedicate_page.filter_input(test_data, resource, False)
+    nodes = dedicate_page.table_nodes()
+    assert filter_result(full_nodes, test_data, resource) == len(nodes)
+    if len(nodes) != 0 :
+        for node in nodes :
+            assert test_data <= node[resource]
+            assert filter_result(full_nodes, test_data, resource)
+
+
+def test_filter_validation(browser):
+    """
+      Test Case: TC2035 - Filter Resource Validation
+      Steps:
+          - Navigate to the dashboard.
+          - Login.
+          - Click on Dedicate Node from side menu.
+          - Select filter.
+          - Enter the resource value.
+      Result: Input should only accept correct format or give an alert in invalide case.
+    """
+    dedicate_page, _ = before_test_setup(browser)
+    dedicate_page.select_filters()
+    cases = ['f', generate_string(), '1a', '!@#(/)+', '.', '-', '+', '1.23.4']
+    for i in range(4):
+        for case in cases:
+            dedicate_page.filter_input(case, i, True)
+            assert dedicate_page.wait_for('This Field accepts only a valid number.')
+        dedicate_page.filter_input('0', i, True)
+        assert dedicate_page.wait_for('This field must be a number larger than 0.')
+    for i in range(2):
+        dedicate_page.filter_input('!@#(/)+', i+4, True)
+        assert dedicate_page.wait_for('This field does not accept special characters.')
+
 
 def test_node_details(browser):
     """
@@ -191,6 +244,7 @@ def test_node_details(browser):
         assert dedicate_page.get_node_location(node_list)[i] in nodes[i][5]
         assert dedicate_page.get_node_city(node_list)[i] in nodes[i][6]
         assert str(grid_proxy.get_farm_ips((dedicate_page.get_farm_id(nodes[i][0], node_list)))) in nodes[i][7]
+        assert str(dedicate_page.get_node_gpu(node_list)[i]) == nodes[i][8]
 
 
 def test_reserve_node(browser):

@@ -2,24 +2,19 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import time
 
 """
 This module contains Twin page elements.
 """
 class TwinPage:
 
-    close_login_button = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div[4]/button')
+    close_login_button = (By.XPATH, '/html/body/div[2]/div[25]/div[2]/div[2]/div[2]/v-tab-item/div/form/div[6]/button[1]')
     twin_details_label = (By.XPATH, "//*[contains(text(), 'Twin Details')]")
-    relay_edit_list = (By.XPATH, '//*[@id="app"]/div[4]/div/div/div[1]/form/div/div/div[1]/div[1]/div[1]/div')
-    relay_edit_option = (By.XPATH, '/html/body/div[1]/div[5]/div/div/div/div')
-    edit_relay_button = (By.XPATH, "//*[contains(text(), 'Edit')]")
-    submit_button = (By.XPATH, '//*[@id="app"]/div[4]/div/div/div[2]/button[2]')
-    get_tft_button = (By.XPATH, "//*[contains(text(), 'GET TFT')]")
-    locked_info_button = (By.XPATH, '//*[@id="app"]/div[1]/div[1]/header/div/div[3]/div/section/div[1]/div/p/span[2]/a/span/i')
-    twin_id_label = (By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[1]/div[2]/div[1]/div/div[2]/div[1]')
-    twin_address_text = (By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[1]/div[2]/div[1]/div/div[2]/div[2]')
-    twin_relay_text = (By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[1]/div[2]/div[1]/div/div[2]/div[3]')
+    get_tft_button = (By.XPATH, "/html/body/div[1]/div/div/main/header/div/div[2]/div/button")
+    locked_info_button = (By.XPATH, '/html/body/div[1]/div/div/main/header/div/div[3]/div[2]/p[2]/a/span[3]/i')
+    twin_id_label = (By.XPATH, '/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div/div[2]/div[2]/div/div[2]/div[1]/div')
+    twin_address_text = (By.XPATH, '/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/span')
+    twin_relay_text = (By.XPATH, '/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div/div[2]/div[2]/div/div[2]/div[3]/div')
 
 
     def __init__(self, browser):

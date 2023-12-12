@@ -13,8 +13,10 @@ def get_seed():
         try:
             seed = json.loads(os.environ["TFCHAIN_MNEMONICS"])["TFCHAIN_MNEMONICS"]
         except:
-            print("You must add account seed either in Config.ini or by exporting TFCHAIN_MNEMONICS.")
+            print(
+                "You must add account seed either in Config.ini or by exporting TFCHAIN_MNEMONICS.")
     return str(seed)
+
 
 def get_node_seed():
     config = configparser.ConfigParser()
@@ -24,8 +26,10 @@ def get_node_seed():
         try:
             seed = os.environ["TFCHAIN_NODE_MNEMONICS"]
         except:
-            print("You must add account seed either in Config.ini or by exporting TFCHAIN_NODE_MNEMONICS.")
+            print(
+                "You must add account seed either in Config.ini or by exporting TFCHAIN_NODE_MNEMONICS.")
     return str(seed)
+
 
 def get_stellar_address():
     config = configparser.ConfigParser()
@@ -35,77 +39,124 @@ def get_stellar_address():
         try:
             address = os.environ["STELLAR_ADDRESS"]
         except:
-            print("You must add account stellar address either in Config.ini or by exporting STELLAR_ADDRESS.")
+            print(
+                "You must add account stellar address either in Config.ini or by exporting STELLAR_ADDRESS.")
     return str(address)
-      
+
+
+def get_hex():
+    config = configparser.ConfigParser()
+    config.read('Config.ini')
+    hex_seed = config['Utils']['hex_seed']
+    if (hex_seed == ''):
+        try:
+            hex_seed = json.loads(os.environ["TFCHAIN_HEX"])
+        except:
+            print(
+                "You must add account Hex Seed either in Config.ini or by exporting TFCHAIN_MNEMONICS.")
+    return str(hex_seed)
+
+
 def generate_string():
     chars = string.ascii_uppercase + string.digits
     return (''.join(random.choice(chars) for _ in range(10)))
 
+
 def generate_leters():
-    chars =  string.digits 
+    chars = string.digits
     return (''.join(random.choice(chars) for _ in range(10)))
+
 
 def generate_ip():
     first = ['2']
-    second=['','0','1','2','3','4','5']
-    port=['16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32']
-    ip=''.join(random.choice(first))+''.join(random.choice(second))+'.'
-    ip+=''.join(random.choice(first))+''.join(random.choice(second)) +''.join(random.choice(second))+'.'
-    ip+=''.join(random.choice(first))+''.join(random.choice(second))+''.join(random.choice(second))+'.'
-    ip+=''.join(random.choice(first))+''.join(random.choice(second))+''.join(random.choice(second))+'/'
-    ip+=''.join(random.choice(port))
-    return ip     
-
-def generate_gateway():
-    first = ['1','2']
-    second=['','0','1','2','3','4','5']
-    gateway=''.join(random.choice(first))+''.join(random.choice(second))+''.join(random.choice(second))+'.'
-    gateway+=''.join(random.choice(first))+''.join(random.choice(second)) +''.join(random.choice(second))+'.'
-    gateway+=''.join(random.choice(first))+''.join(random.choice(second))+''.join(random.choice(second))+'.'
-    gateway+=''.join(random.choice(first))+''.join(random.choice(second))+''.join(random.choice(second))
-    return gateway  
-
-def generate_inavalid_ip():
-    first = ['6','7','8','9']
-    second=['6','7','8','9']
-    port=random.randrange(0,15)
-    ip=''.join(random.choice(first))+''.join(random.choice(second))+''.join(random.choice(second))+'.'
-    ip+=''.join(random.choice(first))+''.join(random.choice(second)) +''.join(random.choice(second))+'.'
-    ip+=''.join(random.choice(first))+''.join(random.choice(second))+''.join(random.choice(second))+'.'
-    ip+=''.join(random.choice(first))+''.join(random.choice(second))+''.join(random.choice(second))+'/'
-    ip+=str(port)
+    second = ['', '0', '1', '2', '3', '4', '5']
+    port = ['16', '17', '18', '19', '20', '21', '22', '23',
+        '24', '25', '26', '27', '28', '29', '30', '31', '32']
+    ip = ''.join(random.choice(first))+''.join(random.choice(second))+'.'
+    ip += ''.join(random.choice(first))+''.join(random.choice(second)
+                  ) + ''.join(random.choice(second))+'.'
+    ip += ''.join(random.choice(first))+''.join(random.choice(second)
+                  )+''.join(random.choice(second))+'.'
+    ip += ''.join(random.choice(first))+''.join(random.choice(second)
+                  )+''.join(random.choice(second))+'/'
+    ip += ''.join(random.choice(port))
     return ip
 
-def generate_inavalid_gateway():
-    first = ['6','7','8','9']
-    second=['6','7','8','9']
-    gateway=''.join(random.choice(first))+''.join(random.choice(second))+''.join(random.choice(second))+'.'
-    gateway+=''.join(random.choice(first))+''.join(random.choice(second)) +''.join(random.choice(second))+'.'
-    gateway+=''.join(random.choice(first))+''.join(random.choice(second))+''.join(random.choice(second))+'.'
-    gateway+=''.join(random.choice(first))+''.join(random.choice(second))+''.join(random.choice(second))
+
+def generate_gateway():
+    first = ['1', '2']
+    second = ['', '0', '1', '2', '3', '4', '5']
+    gateway = ''.join(random.choice(
+        first))+''.join(random.choice(second))+''.join(random.choice(second))+'.'
+    gateway += ''.join(random.choice(first)) + \
+                       ''.join(random.choice(second)) + \
+                               ''.join(random.choice(second))+'.'
+    gateway += ''.join(random.choice(first)) + \
+                       ''.join(random.choice(second)) + \
+                               ''.join(random.choice(second))+'.'
+    gateway += ''.join(random.choice(first)) + \
+                       ''.join(random.choice(second)) + \
+                               ''.join(random.choice(second))
     return gateway
 
+
+def generate_inavalid_ip():
+    first = ['6', '7', '8', '9']
+    second = ['6', '7', '8', '9']
+    port = random.randrange(0, 15)
+    ip = ''.join(random.choice(first))+''.join(random.choice(second)
+                 )+''.join(random.choice(second))+'.'
+    ip += ''.join(random.choice(first))+''.join(random.choice(second)
+                  ) + ''.join(random.choice(second))+'.'
+    ip += ''.join(random.choice(first))+''.join(random.choice(second)
+                  )+''.join(random.choice(second))+'.'
+    ip += ''.join(random.choice(first))+''.join(random.choice(second)
+                  )+''.join(random.choice(second))+'/'
+    ip += str(port)
+    return ip
+
+
+def generate_inavalid_gateway():
+    first = ['6', '7', '8', '9']
+    second = ['6', '7', '8', '9']
+    gateway = ''.join(random.choice(
+        first))+''.join(random.choice(second))+''.join(random.choice(second))+'.'
+    gateway += ''.join(random.choice(first)) + \
+                       ''.join(random.choice(second)) + \
+                               ''.join(random.choice(second))+'.'
+    gateway += ''.join(random.choice(first)) + \
+                       ''.join(random.choice(second)) + \
+                               ''.join(random.choice(second))+'.'
+    gateway += ''.join(random.choice(first)) + \
+                       ''.join(random.choice(second)) + \
+                               ''.join(random.choice(second))
+    return gateway
+
+
 def valid_amount():
-    decimal= ((random.randrange(1,9)))
-    rational= (str(random.uniform(0.001,0.1)))
+    decimal = ((random.randrange(1, 9)))
+    rational = (str(random.uniform(0.001, 0.1)))
     sum = rational[0:5]
-    list=[decimal,float(sum)]
-    return(random.choice(list))
-      
+    list = [decimal, float(sum)]
+    return (random.choice(list))
+
+
 def invalid_amount():
-    rational= (str(random.uniform(100,10000)))
+    rational = (str(random.uniform(100, 10000)))
     return rational
 
+
 def invalid_amount_negtive():
-    negative= (str(random.randrange(1,99)))
-    negative= '-'+negative
+    negative = (str(random.randrange(1, 99)))
+    negative = '-'+negative
     return negative
 
+
 def invalid_address():
-    chars  =string.ascii_uppercase +string.digits
-    begin='5'
+    chars = string.ascii_uppercase + string.digits
+    begin = '5'
     return (begin+''.join(random.choice(chars) for _ in range(47)))
+
 
 def randomize_public_ipv4():
     ips = ['1.0.0.0', '9.255.255.255', '11.0.0.0', '126.255.255.255', '129.0.0.0', '169.253.255.255',
@@ -114,3 +165,36 @@ def randomize_public_ipv4():
     ip = random.choice(ips)
     ip_subnet = ip + '/' + random.choice(['26', '27', '28', '29'])
     return ip_subnet, ip
+
+
+def byte_converter(value):
+    if value != '0':
+        if value[-2] == 'P':
+            return float(value[:-3])*(1024*2)
+        elif value[-2] == 'T':
+            return float(value[:-3])*1024
+        else:
+            return float(value[:-3])
+    else:
+        return float(value)
+
+def get_min(nodes, resource):
+    min = nodes[0][resource]
+    for node in nodes:
+        if min > node[resource]:
+            min = node[resource]
+    return min
+
+def get_max(nodes, resource):
+    max = nodes[0][resource]
+    for node in nodes:
+        if max < node[resource]:
+            max = node[resource]
+    return max
+
+def filter_result(nodes, data, resource):
+    result = 0
+    for node in nodes:
+        if node[resource] >= data :
+            result += 1
+    return result
