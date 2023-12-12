@@ -203,6 +203,7 @@ export default {
     async function getUserFarms() {
       try {
         const { data, count } = await gridProxyClient.farms.list({
+          retCount: true,
           twinId,
           page: page.value,
           size: pageSize.value,
