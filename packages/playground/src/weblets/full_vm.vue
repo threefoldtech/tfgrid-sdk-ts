@@ -113,7 +113,7 @@
           />
         </SelectFarmManager> -->
 
-        <TfSelectNode
+        <TfSelectionDetails
           :filters="{
             ipv4,
             ipv6,

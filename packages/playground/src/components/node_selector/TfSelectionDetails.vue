@@ -63,7 +63,7 @@ import TfSelectGpu from "./TfSelectGpu.vue";
 import TfSelectLocation from "./TfSelectLocation.vue";
 
 export default {
-  name: "TfSelectNode",
+  name: "TfSelectionDetails",
   components: { TfSelectLocation, TfSelectFarm, TfAutoNodeSelector, TfManualNodeSelector, TfSelectGpu, TfDomainName },
   props: {
     modelValue: Object as PropType<SelectionDetails>,
