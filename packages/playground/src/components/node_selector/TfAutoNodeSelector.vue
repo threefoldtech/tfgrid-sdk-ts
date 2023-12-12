@@ -182,11 +182,13 @@ export default {
           }
 
           filtersUpdated.value = true;
+          nodeInputValidateTask.value.loading && nodeInputValidateTask.value.reset();
           return;
         }
 
         baseFilters.value = oldFilters;
         filtersUpdated.value = !equals(filters, oldFilters);
+        filtersUpdated.value && nodeInputValidateTask.value.loading && nodeInputValidateTask.value.reset();
       },
       { deep: true, ignoreFields: ["page"] },
     );

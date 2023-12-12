@@ -53,7 +53,7 @@ import { computed, getCurrentInstance, onMounted, onUnmounted, type PropType, ty
 
 import { useForm, ValidatorStatus } from "../../hooks/form_validator";
 import type { InputValidatorService } from "../../hooks/input_validator";
-import type { DomainInfo, NodeSelectorFilters, SelectedLocation } from "../../types/nodeSelector";
+import type { DomainInfo, NodeSelectorFilters, SelectedLocation, SelectionDetails } from "../../types/nodeSelector";
 import TfAutoNodeSelector from "./TfAutoNodeSelector.vue";
 import TfDomainName from "./TfDomainName.vue";
 import TfManualNodeSelector from "./TfManualNodeSelector.vue";
@@ -65,6 +65,7 @@ export default {
   name: "TfSelectNode",
   components: { TfSelectLocation, TfSelectFarm, TfAutoNodeSelector, TfManualNodeSelector, TfSelectGpu, TfDomainName },
   props: {
+    modelValue: Object as PropType<SelectionDetails>,
     filters: {
       type: Object as PropType<NodeSelectorFilters>,
       default: () => ({}),
@@ -72,6 +73,7 @@ export default {
     valid: Boolean,
   },
   emits: {
+    "update:model-value": (value: SelectionDetails) => true || value,
     "update:valid": (valid: boolean) => true || valid,
   },
   setup(props, ctx) {
@@ -115,7 +117,19 @@ export default {
       { immediate: true },
     );
 
-    return { wayToSelect, location, farm, node, validNode, gpuCards, gpuValid, domain, validDomain };
+    const selectionDetails = computed(() => {
+      return {
+        type: wayToSelect.value,
+        node: node.value,
+        farm: farm.value,
+        gpuCards: gpuCards.value,
+        location: location.value,
+        domain: domain.value,
+      } as SelectionDetails;
+    });
+    watch(selectionDetails, s => ctx.emit("update:model-value", s), { immediate: true });
+
+    return { wayToSelect, location, farm, node, validNode, gpuCards, gpuValid, domain, validDomain, selectionDetails };
   },
 };
 </script>

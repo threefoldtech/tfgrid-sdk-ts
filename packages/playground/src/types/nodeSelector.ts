@@ -1,4 +1,4 @@
-import type { FarmInfo, NodeInfo } from "@threefold/grid_client";
+import type { FarmInfo, GPUCardInfo, NodeInfo } from "@threefold/grid_client";
 
 export type Locations = {
   [region: string]: string[];
@@ -42,4 +42,13 @@ export interface DomainInfo {
   selectedDomain: NodeInfo | null;
   enabledCustomDomain: boolean;
   customDomain: string;
+}
+
+export interface SelectionDetails {
+  type: "manual" | "automatic";
+  node?: NodeInfo;
+  farm: Partial<FarmInfo>;
+  location: SelectedLocation;
+  gpuCards: GPUCardInfo[];
+  domain?: DomainInfo;
 }
