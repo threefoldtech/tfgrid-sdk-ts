@@ -57,11 +57,12 @@
 
 <script lang="ts">
 import type { FarmInfo, NodeInfo } from "@threefold/grid_client";
-import { computed, type PropType, ref, watch } from "vue";
+import { computed, onUnmounted, type PropType, ref, watch } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VInput } from "vuetify/components/VInput";
 
 import { useAsync, useWatchDeep } from "../../hooks";
+import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
 import type { DomainInfo, NodeSelectorFilters, SelectedLocation } from "../../types/nodeSelector";
 import {
@@ -88,11 +89,11 @@ export default {
       type: Object as PropType<FarmInfo>,
       required: true,
     },
-    valid: Boolean,
+    status: String as PropType<ValidatorStatus>,
   },
   emits: {
-    "update:model-value": (domain: DomainInfo) => true || domain,
-    "update:valid": (valid: boolean) => true || valid,
+    "update:model-value": (domain?: DomainInfo) => true || domain,
+    "update:status": (status: ValidatorStatus) => true || status,
   },
   setup(props, ctx) {
     const gridStore = useGrid();
@@ -138,8 +139,13 @@ export default {
     const customDomain = ref("");
     const selectedDomain = ref<NodeInfo | null>(null);
 
-    const domainNameValid = ref(false);
-    watch(domainNameValid, valid => ctx.emit("update:valid", valid), { immediate: true });
+    const domainNameValid = ref<boolean | null>(null);
+    watch(domainNameValid, valid => {
+      ctx.emit(
+        "update:status",
+        valid === null ? ValidatorStatus.Init : valid ? ValidatorStatus.Valid : ValidatorStatus.Invalid,
+      );
+    });
 
     useWatchDeep(
       () =>
@@ -151,6 +157,11 @@ export default {
       domain => ctx.emit("update:model-value", domain),
       { immediate: true, deep: true },
     );
+
+    onUnmounted(() => {
+      ctx.emit("update:model-value");
+      ctx.emit("update:status", ValidatorStatus.Init);
+    });
 
     return {
       page,

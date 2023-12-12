@@ -47,7 +47,7 @@
 </template>
 
 <script lang="ts">
-import { computed, type PropType } from "vue";
+import { computed, onUnmounted, type PropType } from "vue";
 
 import { useAsync } from "../../hooks";
 import type { SelectedLocation } from "../../types/nodeSelector";
@@ -65,7 +65,7 @@ export default {
   emits: {
     "update:model-value": (value: SelectedLocation) => true || value,
   },
-  setup(props) {
+  setup(props, ctx) {
     const locationsTask = useAsync(getLocations, { init: true, default: {} });
     const regions = computed(() => ["All Regions", ...Object.keys(locationsTask.value.data as Locations)]);
     const countries = computed(() => {
@@ -75,6 +75,8 @@ export default {
       }
       return res.concat((locationsTask.value.data as Locations)[props.modelValue.region] || []);
     });
+
+    onUnmounted(() => ctx.emit("update:model-value", {}));
 
     return { locationsTask, regions, countries };
   },

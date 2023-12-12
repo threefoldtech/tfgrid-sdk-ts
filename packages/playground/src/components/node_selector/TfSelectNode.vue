@@ -11,24 +11,25 @@
     <template v-if="wayToSelect === 'automated'">
       <TfSelectLocation v-model="location" v-if="wayToSelect === 'automated'" />
       <TfSelectFarm :filters="filters" :location="location" v-model="farm" v-if="wayToSelect === 'automated'" />
+
       <TfAutoNodeSelector
         :filters="filters"
         :location="location"
         :farm="farm"
         v-model="node"
-        v-model:valid="validNode"
+        v-model:status="nodeStatus"
         v-if="wayToSelect === 'automated'"
       />
     </template>
 
-    <TfManualNodeSelector :filters="filters" v-model="node" v-model:valid="validNode" v-else />
+    <TfManualNodeSelector :filters="filters" v-model="node" v-model:status="nodeStatus" v-else />
 
     <VExpandTransition>
       <TfSelectGpu
         :node="node"
-        :valid-node="validNode"
+        :valid-node="nodeStatus === ValidatorStatus.Valid"
         v-model="gpuCards"
-        v-model:valid="gpuValid"
+        v-model:status="gpuStatus"
         v-if="filters.hasGPU"
       />
     </VExpandTransition>
@@ -39,7 +40,7 @@
         :location="location"
         :farm="farm"
         v-model="domain"
-        v-model:valid="validDomain"
+        v-model:status="domainStatus"
         v-if="filters.gateway"
       />
     </VExpandTransition>
@@ -70,52 +71,25 @@ export default {
       type: Object as PropType<NodeSelectorFilters>,
       default: () => ({}),
     },
-    valid: Boolean,
+    status: String as PropType<ValidatorStatus>,
   },
   emits: {
     "update:model-value": (value: SelectionDetails) => true || value,
-    "update:valid": (valid: boolean) => true || valid,
+    "update:status": (value: ValidatorStatus) => true || value,
   },
   setup(props, ctx) {
-    const wayToSelect = ref<"manual" | "automated">("manual");
+    const wayToSelect = ref<"manual" | "automated">("automated");
     const location = ref<SelectedLocation>({});
     const farm = ref({}) as Ref<FarmInfo>;
 
     const node = ref<NodeInfo>();
-    const validNode = ref(false);
+    const nodeStatus = ref(ValidatorStatus.Init);
+
     const gpuCards = ref<GPUCardInfo[]>([]);
-    const gpuValid = ref(false);
+    const gpuStatus = ref(ValidatorStatus.Init);
 
     const domain = ref<DomainInfo>();
-    const validDomain = ref(false);
-
-    /* Adapter to work with old code validation */
-    const { uid } = getCurrentInstance() as { uid: number };
-    const form = useForm();
-    const valid = computed(() => {
-      const gateway = !props.filters.gateway || validDomain.value;
-      const gpu = !props.filters.hasGPU || gpuValid.value;
-      return validNode.value && gateway && gpu;
-    });
-
-    const fakeService: InputValidatorService = {
-      validate: () => Promise.resolve(valid.value),
-      setStatus: noop,
-      reset: noop,
-      status: ValidatorStatus.Init,
-      error: null,
-    };
-
-    onMounted(() => form?.register(uid, fakeService));
-    onUnmounted(() => form?.unregister(uid));
-    watch(
-      valid,
-      valid => {
-        form?.updateStatus(uid, valid ? ValidatorStatus.Valid : ValidatorStatus.Invalid);
-        ctx.emit("update:valid", valid);
-      },
-      { immediate: true },
-    );
+    const domainStatus = ref(ValidatorStatus.Init);
 
     const selectionDetails = computed(() => {
       return {
@@ -127,9 +101,77 @@ export default {
         domain: domain.value,
       } as SelectionDetails;
     });
-    watch(selectionDetails, s => ctx.emit("update:model-value", s), { immediate: true });
+    watch(selectionDetails, s => ctx.emit("update:model-value", s), { immediate: true, deep: true });
 
-    return { wayToSelect, location, farm, node, validNode, gpuCards, gpuValid, domain, validDomain, selectionDetails };
+    /* Adapter to work with old code validation */
+    const { uid } = getCurrentInstance() as { uid: number };
+    const form = useForm();
+
+    const fakeService: InputValidatorService = {
+      validate: () => Promise.resolve(true),
+      setStatus: noop,
+      reset: noop,
+      status: ValidatorStatus.Init,
+      error: null,
+    };
+
+    onMounted(() => form?.register(uid, fakeService));
+    onUnmounted(() => form?.unregister(uid));
+
+    // update status
+    const invalid = computed(() => {
+      return (
+        nodeStatus.value === ValidatorStatus.Invalid ||
+        (props.filters.gateway && domainStatus.value === ValidatorStatus.Invalid) ||
+        (props.filters.hasGPU && gpuStatus.value === ValidatorStatus.Invalid)
+      );
+    });
+
+    const pending = computed(() => {
+      return (
+        nodeStatus.value === ValidatorStatus.Pending ||
+        (props.filters.gateway && domainStatus.value === ValidatorStatus.Pending) ||
+        (props.filters.hasGPU && gpuStatus.value === ValidatorStatus.Pending)
+      );
+    });
+
+    const valid = computed(() => {
+      return (
+        nodeStatus.value === ValidatorStatus.Valid &&
+        (!props.filters.gateway || (props.filters.gateway && domainStatus.value === ValidatorStatus.Valid)) &&
+        (!props.filters.hasGPU || (props.filters.hasGPU && gpuStatus.value === ValidatorStatus.Valid))
+      );
+    });
+
+    const status = computed(() => {
+      if (invalid.value) return ValidatorStatus.Invalid;
+      if (pending.value) return ValidatorStatus.Pending;
+      if (valid.value) return ValidatorStatus.Valid;
+      return ValidatorStatus.Init;
+    });
+
+    watch(
+      status,
+      status => {
+        form?.updateStatus(uid, status);
+        ctx.emit("update:status", status);
+      },
+      { deep: true, immediate: true },
+    );
+
+    return {
+      ValidatorStatus,
+      wayToSelect,
+      location,
+      farm,
+      node,
+      nodeStatus,
+      gpuCards,
+      gpuStatus,
+      domain,
+      domainStatus,
+      selectionDetails,
+    };
   },
 };
 </script>

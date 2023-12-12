@@ -4,24 +4,33 @@
     placeholder="Select GPU Cards"
     multiple
     :model-value="$props.modelValue"
-    @update:model-value="$emit('update:model-value', $event)"
+    @update:model-value="
+      $emit('update:model-value', $event);
+      $emit('update:status', $event.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
+    "
     :items="(cardsTask.data as GPUCardInfo[])"
     item-title="device"
     :loading="cardsTask.loading"
     :error="!!cardsTask.error"
-    :error-messages="cardsTask.error?.message"
+    :error-messages="
+      $props.status === ValidatorStatus.Invalid ? 'Please select at least 1 GPU card.' : cardsTask.error?.message
+    "
     return-object
     :disabled="!$props.validNode"
     :hint="$props.validNode ? undefined : 'Please select a valid node to load it\'s GPU cards.'"
     :persistent-hint="!$props.validNode"
+    @update:menu="
+      opened => !opened && $props.modelValue.length === 0 && $emit('update:status', ValidatorStatus.Invalid)
+    "
   />
 </template>
 
 <script lang="ts">
 import type { GPUCardInfo, NodeInfo } from "@threefold/grid_client";
-import { computed, type PropType, watch } from "vue";
+import { onUnmounted, type PropType } from "vue";
 
 import { useAsync, useWatchDeep } from "../../hooks";
+import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
 import { getNodeGpuCards } from "../../utils/nodeSelector";
 
@@ -30,12 +39,12 @@ export default {
   props: {
     modelValue: { type: Object as PropType<GPUCardInfo[]>, required: true },
     node: Object as PropType<NodeInfo>,
-    validNode: { type: Boolean, required: true },
-    valid: Boolean,
+    validNode: Boolean,
+    status: String as PropType<ValidatorStatus>,
   },
   emits: {
     "update:model-value": (cards: GPUCardInfo[]) => true || cards,
-    "update:valid": (valid: boolean) => true || valid,
+    "update:status": (status: ValidatorStatus) => true || status,
   },
   setup(props, ctx) {
     const gridStore = useGrid();
@@ -48,15 +57,18 @@ export default {
         if (valid && node) {
           return cardsTask.value.run(gridStore, node as NodeInfo);
         }
+        ctx.emit("update:status", ValidatorStatus.Init);
         cardsTask.value.initialized && cardsTask.value.reset();
       },
       { immediate: true, deep: true },
     );
 
-    const valid = computed(() => props.validNode && props.modelValue.length > 0);
-    watch(valid, valid => ctx.emit("update:valid", valid), { immediate: true });
+    onUnmounted(() => {
+      ctx.emit("update:model-value", []);
+      ctx.emit("update:status", ValidatorStatus.Init);
+    });
 
-    return { cardsTask };
+    return { ValidatorStatus, cardsTask };
   },
 };
 </script>

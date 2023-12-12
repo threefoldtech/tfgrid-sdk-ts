@@ -52,7 +52,7 @@
 
 <script lang="ts">
 import type { FarmInfo } from "@threefold/grid_client";
-import { computed, nextTick, type PropType, ref } from "vue";
+import { computed, nextTick, onUnmounted, type PropType, ref } from "vue";
 
 import { useAsync, useWatchDeep } from "../../hooks";
 import { useGrid } from "../../stores";
@@ -178,6 +178,8 @@ export default {
 
       return res.concat(loadedFarms.value);
     });
+
+    onUnmounted(() => ctx.emit("update:model-value", {} as FarmInfo));
 
     return {
       farmsTask,

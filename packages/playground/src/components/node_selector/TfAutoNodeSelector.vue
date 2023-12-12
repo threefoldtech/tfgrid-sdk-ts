@@ -90,11 +90,12 @@
 <script lang="ts">
 import type { FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
 import equals from "lodash/fp/equals.js";
-import { computed, nextTick, onMounted, type PropType, ref, watch } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, type PropType, ref } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VInput } from "vuetify/components/VInput";
 
 import { useAsync, useWatchDeep } from "../../hooks";
+import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
 import type { NodeSelectorFilters, SelectedLocation } from "../../types/nodeSelector";
 import {
@@ -121,11 +122,11 @@ export default {
       type: Object as PropType<Partial<FarmInfo>>,
       required: true,
     },
-    valid: Boolean,
+    status: String as PropType<ValidatorStatus>,
   },
   emits: {
     "update:model-value": (node?: NodeInfo) => true || node,
-    "update:valid": (valid: boolean) => true || valid,
+    "update:status": (status: ValidatorStatus) => true || status,
   },
   setup(props, ctx) {
     const gridStore = useGrid();
@@ -194,6 +195,7 @@ export default {
     );
 
     async function resetPageAndReloadNodes() {
+      ctx.emit("update:status", ValidatorStatus.Init);
       nodeInputValidateTask.value.reset();
       touched.value = false;
       baseFilters.value = undefined;
@@ -206,34 +208,42 @@ export default {
       return reloadNodes();
     }
 
-    const nodeInputValidateTask = useAsync<true, string, [NodeInfo | undefined]>(async node => {
-      if (!node || !node.nodeId) {
-        throw "Node ID is required.";
-      }
-
-      try {
-        await gridStore.client.capacity.checkNodeCapacityPool({
-          nodeId: node.nodeId,
-          ssdDisks: [props.filters.solutionDisk ?? 0, ...(props.filters.ssdDisks || [])]
-            .filter(Boolean)
-            .map(disk => disk * 1024 ** 3),
-          rootfsDisks: [(props.filters.rootFilesystemSize ?? 0) * 1024 ** 3],
-          hddDisks: props.filters.hddDisks || [],
-        });
-        return true;
-      } catch (error) {
-        if (error?.toString().includes("Cannot fit the required SSD disk with size")) {
-          throw (
-            "Although node " +
-            node.nodeId +
-            " appears to have sufficient storage capacity for your workload, it lacks a single internal " +
-            "partition capable of accommodating it. Please select a different node."
-          );
+    const nodeInputValidateTask = useAsync<true, string, [NodeInfo | undefined]>(
+      async node => {
+        if (!node || !node.nodeId) {
+          throw "Node ID is required.";
         }
 
-        throw "Something went wrong while checking status of the node. Please check your connection and try again.";
-      }
-    });
+        try {
+          await gridStore.client.capacity.checkNodeCapacityPool({
+            nodeId: node.nodeId,
+            ssdDisks: [props.filters.solutionDisk ?? 0, ...(props.filters.ssdDisks || [])]
+              .filter(Boolean)
+              .map(disk => disk * 1024 ** 3),
+            rootfsDisks: [(props.filters.rootFilesystemSize ?? 0) * 1024 ** 3],
+            hddDisks: props.filters.hddDisks || [],
+          });
+          return true;
+        } catch (error) {
+          if (error?.toString().includes("Cannot fit the required SSD disk with size")) {
+            throw (
+              "Although node " +
+              node.nodeId +
+              " appears to have sufficient storage capacity for your workload, it lacks a single internal " +
+              "partition capable of accommodating it. Please select a different node."
+            );
+          }
+
+          throw "Something went wrong while checking status of the node. Please check your connection and try again.";
+        }
+      },
+      {
+        onBeforeTask: () => ctx.emit("update:status", ValidatorStatus.Pending),
+        onAfterTask: ({ data }) => {
+          ctx.emit("update:status", data ? ValidatorStatus.Valid : ValidatorStatus.Invalid);
+        },
+      },
+    );
 
     const touched = ref(false);
     function bindModelValue(node?: NodeInfo) {
@@ -241,12 +251,10 @@ export default {
       (touched.value || node) && nodeInputValidateTask.value.run(node);
     }
 
-    // update v-model:valid
-    const valid = computed(() => {
-      const { initialized, data } = nodeInputValidateTask.value;
-      return initialized && data === true && !filtersUpdated.value;
+    onUnmounted(() => {
+      ctx.emit("update:model-value");
+      ctx.emit("update:status", ValidatorStatus.Init);
     });
-    watch(valid, valid => ctx.emit("update:valid", valid), { immediate: true });
 
     return {
       pageCountTask,
