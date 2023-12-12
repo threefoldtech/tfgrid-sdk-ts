@@ -355,10 +355,10 @@
               />
               <div class="d-flex justify-center my-4">
                 <a
-                  v-for="(app, index) in apps"
+                  v-for="app in apps"
                   :key="app.alt"
                   :style="{ cursor: 'pointer', width: '150px' }"
-                  :class="{ 'mr-2': index === 0 }"
+                  class="mr-2"
                   :title="app.alt"
                   v-html="app.src"
                   :href="app.url"
