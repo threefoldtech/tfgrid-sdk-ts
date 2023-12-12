@@ -173,7 +173,7 @@ const contracts = ref<Ref<NormalizedContract[]>>(props.contracts);
 // Function to show details of a contract
 async function showDetails(value: any) {
   failedContractId.value = undefined;
-  if (value.type === "name" || value.type === "rent") {
+  if (value.type === ContractType.NAME || value.type === ContractType.RENT) {
     return layout.value.openDialog(value, false, true);
   }
 
