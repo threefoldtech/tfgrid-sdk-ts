@@ -71,7 +71,7 @@ import type { VInput } from "vuetify/components/VInput";
 import { useAsync, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
-import type { DomainInfo, NodeSelectorFilters, SelectedLocation } from "../../types/nodeSelector";
+import type { DomainInfo, NodeSelectorFilters } from "../../types/nodeSelector";
 import { createPageGen, getNodePageCount, loadNodes } from "../../utils/nodeSelector";
 
 export default {
@@ -82,7 +82,6 @@ export default {
       type: Object as PropType<NodeSelectorFilters>,
       required: true,
     },
-    location: Object as PropType<SelectedLocation>,
     farm: Object as PropType<FarmInfo>,
     status: String as PropType<ValidatorStatus>,
   },

@@ -35,7 +35,6 @@
     <VExpandTransition>
       <TfDomainName
         :filters="filters"
-        :location="location"
         :farm="farm"
         v-model="domain"
         v-model:status="domainStatus"
