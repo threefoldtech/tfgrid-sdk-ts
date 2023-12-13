@@ -27,6 +27,12 @@ Playground is a Vue application that helps with deploying solutions on TF Grid v
   make build
   ```
 
+  > If the build fails due to a memory issue, please use the following command
+
+```bash
+export NODE_OPTIONS="--max-old-space-size=8192"
+```
+
 ## Getting Started
 
 > For detailed information you can read the [Getting Started](./docs/getting_started.md) documentation.
