@@ -161,6 +161,7 @@ const profileManager = useProfileManager();
 
 function copy() {
   navigator.clipboard.writeText(code.value);
+  createCustomToast("Copied!", ToastType.success);
 }
 
 function getLabel(key: string): string {
@@ -191,13 +192,14 @@ async function getGrafanaUrl() {
   isLoading.value = true;
   const grid = await getGrid(profileManager.profile!);
   if (grid) {
-    const nodeId = await grid.capacity.getNodeIdFromContractId({
-      contractId: contract.value.contractId,
-    });
-
-    const node = await gridProxyClient.nodes.byId(nodeId);
-    const grafana = new GrafanaStatistics(node, 2);
-    grafanaURL.value = await grafana.getUrl();
+    if (contract.value.type !== ContractType.NAME) {
+      const nodeId = await grid.capacity.getNodeIdFromContractId({
+        contractId: contract.value.contractId || contract.value.contract_id,
+      });
+      const node = await gridProxyClient.nodes.byId(nodeId);
+      const grafana = new GrafanaStatistics(node, 2);
+      grafanaURL.value = await grafana.getUrl();
+    }
   }
   isLoading.value = false;
 }
@@ -295,6 +297,8 @@ function getTooltipText(contract: any, index: number) {
 
 <script lang="ts">
 import { useProfileManager } from "@/stores/profile_manager";
+import { ContractType } from "@/utils/contracts";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { GrafanaStatistics } from "@/utils/get_metrics_url";
 import { getGrid } from "@/utils/grid";
 
