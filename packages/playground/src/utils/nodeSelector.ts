@@ -44,7 +44,7 @@ export function normalizeFarmFilters(
   return {
     size: options.size,
     page: Math.max(1, options.page),
-    // availableFor: options.twinId,
+    availableFor: options.twinId,
     country: options.location.country,
     region: options.location.region,
     nodeMRU: filters.memory ? Math.round(filters.memory / 1024) : undefined,
@@ -161,7 +161,7 @@ export function normalizeNodeFilters(
     hasGPU: filters.hasGPU || undefined,
     rentedBy: filters.dedicated ? options.twinId : undefined,
     certified: filters.certified || undefined,
-    // availableFor: options.twinId,
+    availableFor: options.twinId,
     region: options.location.region,
     country: options.location.country,
     gateway: options.gateway,
