@@ -160,6 +160,9 @@ export default {
           if (count) {
             nodesCount.value = count;
           }
+          if (count == 0) {
+            nodesCount.value = 0;
+          }
         } catch (err) {
           console.log(err);
         } finally {
