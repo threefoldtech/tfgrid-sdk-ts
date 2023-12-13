@@ -29,7 +29,7 @@
                   validators.required('Farm name is required.'),
                   name => validators.isAlpha('Farm name must start with an alphabet char.')(name[0]),
                   validators.minLength('Farm name minimum length is 2 chars.', 2),
-                  validators.maxLength('Farm name maximum length is 15 chars.', 15),
+                  validators.maxLength('Farm name maximum length is 40 chars.', 40),
                   validators.pattern('Farm name  should not contain whitespaces.', {
                     pattern: /^[^\s]+$/,
                   }),
@@ -47,6 +47,7 @@
             </form-validator>
           </div>
           <v-card-actions class="justify-end px-5 pb-5 pt-0">
+            <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
             <v-btn
               color="primary"
               variant="tonal"
@@ -55,7 +56,6 @@
               :disabled="!valid || isCreating"
               >Create</v-btn
             >
-            <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

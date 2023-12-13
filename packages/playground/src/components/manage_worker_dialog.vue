@@ -25,6 +25,7 @@
       </form-validator>
 
       <template #footer-actions>
+        <v-btn color="error" variant="tonal" v-if="!deleting" @click="$emit('close')"> Close </v-btn>
         <v-btn
           color="error"
           variant="outlined"
@@ -44,7 +45,6 @@
         >
           Deploy
         </v-btn>
-        <v-btn color="error" variant="tonal" v-if="!deleting" @click="$emit('close')"> Close </v-btn>
       </template>
     </weblet-layout>
   </v-dialog>

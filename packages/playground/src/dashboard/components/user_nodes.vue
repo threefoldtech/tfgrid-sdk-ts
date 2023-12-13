@@ -108,8 +108,8 @@
           :nodeId="item.raw.nodeId"
           :farmId="item.raw.farmId"
           v-model="item.raw.publicConfig"
-          @remove-config="(item.raw.publicConfig = $event), reloadNodes"
-          @add-config="(item.raw.publicConfig = $event), reloadNodes"
+          @remove-config="(item.raw.publicConfig = $event), reloadNodes()"
+          @add-config="(item.raw.publicConfig = $event), reloadNodes()"
         />
         <SetExtraFee class="me-2" :nodeId="item.raw.nodeId" />
       </template>
@@ -128,12 +128,7 @@ import { useProfileManager } from "@/stores";
 import type { NodeDetailsCard } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { getNodeStatusColor } from "@/utils/get_nodes";
-import {
-  getNodeAvailability,
-  getNodeMintingFixupReceipts,
-  getNodeUptimePercentage,
-  type NodeInterface,
-} from "@/utils/node";
+import { calculateUptime, getNodeAvailability, getNodeMintingFixupReceipts, type NodeInterface } from "@/utils/node";
 
 import NodeMintingDetails from "./NodeMintingDetails.vue";
 import PublicConfig from "./public_config.vue";
@@ -199,37 +194,24 @@ export default {
     const uptime = ref();
     const nodesCount = ref();
 
-    onMounted(async () => {
-      const nodes = await getUserNodes();
-      if (nodes) {
-        await Promise.all(
-          nodes.map(async (n, _) => {
-            n.uptime = +(await getNodeUptimePercentage(n.nodeId));
-            return n.uptime;
-          }),
-        );
-      }
-    });
+    onMounted(getUserNodes);
 
-    const reloadNodes = setTimeout(async () => {
-      await getUserNodes();
-    }, 10000);
+    async function reloadNodes() {
+      setTimeout(async () => {
+        await getUserNodes();
+      }, 10000);
+    }
 
     async function getUserNodes() {
       try {
         loading.value = true;
         const twinId = profileManager.profile!.twinId;
-        const farms = await gridProxyClient.farms.list({ twinId });
-        if (!farms.data.length) {
-          nodesCount.value = 0;
-          return [];
-        }
-        const farmIds = farms.data.map(farm => farm.farmId).join(",");
+
         const { data, count } = await gridProxyClient.nodes.list({
-          farmIds,
           retCount: true,
           page: page.value,
           size: pageSize.value,
+          rentedBy: twinId as number,
         });
 
         const _nodes = data as unknown as NodeInterface[];
@@ -240,6 +222,7 @@ export default {
             node.receipts = [];
             if (network == "main") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
             node.availability = await getNodeAvailability(node.nodeId);
+            node.uptime = +calculateUptime(node.availability.currentPeriod, node.availability.downtime);
           } catch (error) {
             node.receipts = [];
             node.used_resources = {
@@ -249,6 +232,7 @@ export default {
               cru: 0,
             };
             node.availability = { downtime: 0, currentPeriod: 0 };
+            node.uptime = 0;
           }
 
           return node;

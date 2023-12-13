@@ -75,9 +75,10 @@
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
           <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
         </input-tooltip>
-
         <SelectFarmManager>
+          <NodeSelector v-model="selection" />
           <SelectFarm
+            v-if="selection == Selection.AUTOMATED"
             :filters="{
               cpu: solution?.cpu,
               memory: solution?.memory,
@@ -93,6 +94,7 @@
           />
           <SelectNode
             v-model="selectedNode"
+            :selection="selection"
             :filters="{
               farmId: farm?.farmID,
               cpu: solution?.cpu,
@@ -103,8 +105,11 @@
               hasGPU: hasGPU,
               rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
               certified: certified,
+              country: farm?.country,
+              region: farm?.region,
             }"
             :root-file-system-size="rootFilesystemSize"
+            :loading-farm="loadingFarm"
           />
         </SelectFarmManager>
       </template>
@@ -160,6 +165,8 @@
 <script lang="ts" setup>
 import { type Ref, ref, watch } from "vue";
 
+import { Selection } from "@/utils/types";
+
 import Network from "../components/networks.vue";
 import SelectFarmManager from "../components/select_farm_manager.vue";
 import { useLayout } from "../components/weblet_layout.vue";
@@ -173,6 +180,7 @@ import { generateName } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
+const selection = ref();
 const profileManager = useProfileManager();
 const solution = ref() as Ref<SolutionFlavor>;
 const farmName = ref();
@@ -231,6 +239,15 @@ watch(
     }
   },
   { immediate: true },
+);
+watch(
+  () => selection.value,
+  (value, oldValue) => {
+    if (value !== oldValue) {
+      loadingFarm.value = false;
+    }
+  },
+  { deep: false },
 );
 
 watch(
@@ -293,6 +310,7 @@ async function deploy() {
 
 <script lang="ts">
 import ExpandableLayout from "../components/expandable_layout.vue";
+import NodeSelector from "../components/node_selection.vue";
 import SelectFarm from "../components/select_farm.vue";
 import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";

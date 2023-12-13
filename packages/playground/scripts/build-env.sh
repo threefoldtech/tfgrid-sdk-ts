@@ -4,6 +4,7 @@
 MODE="${MODE:=dev}"
 STELLAR_NETWORK="${STELLAR_NETWORK:=test}"
 TIMEOUT="${TIMEOUT:=10000}"
+MINTING_URL="https://alpha.minting.tfchain.grid.tf"
 
 # Env vars must provide in `custom` mode
 REQUIRED_ENV_VARS=(
@@ -60,7 +61,6 @@ case $MODE in
     RELAY_DOMAIN='wss://relay.grid.tf'
     BRIDGE_TFT_ADDRESS=GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC
     STELLAR_NETWORK=main
-    MINTING_URL="https://alpha.minting.tfchain.grid.tf"
   ;;
 
   "custom")

@@ -82,6 +82,7 @@
           </v-dialog>
 
           <v-card-actions class="justify-end pa-5">
+            <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
             <v-btn
               variant="tonal"
               color="primary"
@@ -94,7 +95,6 @@
             <v-btn variant="tonal" @click="showRange" :disabled="!valid || type === IPType.single || !toPublicIP"
               >Show IPs Range</v-btn
             >
-            <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

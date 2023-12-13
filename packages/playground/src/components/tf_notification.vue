@@ -66,7 +66,13 @@ onMounted(async () => {
     ) {
       contractsCount.value =
         contracts.nameContracts.length + contracts.nodeContracts.length + contracts.rentContracts.length;
-      createCustomToast("You have " + contractsCount.value + " contracts in grace period", ToastType.warning);
+      createCustomToast(
+        "You have " +
+          contractsCount.value +
+          (contractsCount.value > 1 ? " contracts" : " contract") +
+          " in grace period",
+        ToastType.warning,
+      );
     }
     await new Promise(resolve => setTimeout(resolve, 15 * 60 * 1000));
   }

@@ -42,6 +42,7 @@
         </v-toolbar>
         <v-card-text> Are you sure you want to delete IP {{ itemToDelete?.ip }}? </v-card-text>
         <v-card-actions class="justify-end px-5 pb-5 pt-0">
+          <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
           <v-btn
             variant="outlined"
             text="Confirm"
@@ -50,7 +51,6 @@
             :disabled="isRemoving"
             @click="removeFarmIp({ farmId: $props.farmId, ip: itemToDelete?.ip }, itemToDelete?.index)"
           ></v-btn>
-          <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

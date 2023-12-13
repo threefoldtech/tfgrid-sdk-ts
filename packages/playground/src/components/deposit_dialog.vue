@@ -13,25 +13,17 @@
             <v-row class="py-2 pb-5">
               <v-col cols="6" class="mx-4">
                 <div class="mb-2">
-                  <p class="mb-3">
+                  <p class="mb-8">
                     Send a
                     {{ selectedName ? selectedName.charAt(0).toUpperCase() + selectedName.slice(1) : "" }} transaction
                     with your TFT's to deposit to:
                   </p>
                 </div>
-                <ul>
-                  <li class="mb-2">
-                    Destination:
-                    <p class="text-subtitle-2">{{ depositWallet }}</p>
-                  </li>
-                  <li>
-                    Memo Text:
-                    <p class="text-subtitle-2">twin_{{ twinId }}</p>
-                  </li>
-                  <div style="position: absolute; bottom: 10rem">
-                    <p :style="{ paddingBottom: '3rem', color: '#7de3c8' }">Waiting for receiving TFTs{{ dots }}</p>
-                  </div>
-                </ul>
+                <CopyReadonlyInput label="Destination" :data="depositWallet"></CopyReadonlyInput>
+                <CopyReadonlyInput label="Memo Text" :data="`twin_${twinId}`"></CopyReadonlyInput>
+                <div style="position: absolute; bottom: 10rem">
+                  <p :style="{ paddingBottom: '3rem', color: '#7de3c8' }">Waiting for receiving TFTs{{ dots }}</p>
+                </div>
               </v-col>
               <v-divider class="mx-4" vertical></v-divider>
               <v-col>
@@ -69,7 +61,7 @@ import QrcodeGenerator from "../components/qrcode_generator.vue";
 import { useProfileManager } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid } from "../utils/grid";
-
+import CopyReadonlyInput from "./copy_readonly_input.vue";
 const depositDialog = ref(false);
 const emits = defineEmits(["close"]);
 const profileManager = useProfileManager();

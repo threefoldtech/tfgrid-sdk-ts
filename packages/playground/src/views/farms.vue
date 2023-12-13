@@ -43,7 +43,7 @@
 <script lang="ts" setup>
 import type { Farm } from "@threefold/gridproxy_client";
 import debounce from "lodash/debounce.js";
-import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 
 import type { VDataTableHeader } from "@/types";
 import type { FarmFilterOptions, MixedFarmFilter } from "@/types";
@@ -54,7 +54,7 @@ const loading = ref<boolean>(false);
 const farms = ref<Farm[]>();
 const isDialogOpened = ref<boolean>(false);
 const selectedFarm = ref<Farm>();
-const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer);
+const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer());
 const size = ref(10);
 const page = ref(1);
 
@@ -64,7 +64,12 @@ const filterOptions = ref<FarmFilterOptions>({
   page: page.value,
   sortBy: sortBy.value,
 });
-const mixedFarmFilters = ref<MixedFarmFilter>({ inputs: filterFarmInputs.value, options: filterOptions.value });
+
+const mixedFarmFilters = computed<MixedFarmFilter>(() => ({
+  inputs: filterFarmInputs.value,
+  options: filterOptions.value,
+}));
+
 const isFormLoading = ref<boolean>(true);
 const isValidForm = ref<boolean>(false);
 const totalFarms = ref(0);
@@ -85,7 +90,6 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
           return {
             ...farm,
             totalPublicIp: total,
-            usedPublicIp: used,
             freePublicIp: total - used,
           };
         });
@@ -105,18 +109,15 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
 onMounted(async () => {
   await updateFarms();
 });
-onBeforeUnmount(() => {
-  inputFiltersReset(filterFarmInputs.value);
-});
 
 const request = debounce(_getFarms, 1000);
+
 const updateFarms = async () => {
-  if (isValidForm.value) {
-    await updateQueries();
-    const queries = getFarmQueries(mixedFarmFilters.value);
-    await request(queries);
-  }
+  const queries = await getFarmQueries(mixedFarmFilters.value);
+
+  await request(queries);
 };
+
 const updateSorting = () => {
   if (mixedFarmFilters.value.options) {
     if (mixedFarmFilters.value.options.sortBy?.length) {
@@ -145,21 +146,43 @@ const updateSorting = () => {
   }
 };
 const updateQueries = async () => {
+  const inputs = mixedFarmFilters.value.inputs;
+  if (inputs && filterFarmInputs.value) {
+    const filtersInputValues = filterFarmInputs.value;
+    if (filtersInputValues.farmId) {
+      inputs.farmId.value = filtersInputValues.farmId.value;
+    }
+    if (filtersInputValues.name) {
+      inputs.name.value = filtersInputValues.name.value;
+    }
+    if (filtersInputValues.freeIps) {
+      inputs.freeIps.value = filtersInputValues.freeIps.value;
+    }
+  }
   const options = mixedFarmFilters.value.options;
   if (options) {
     options.page = page.value;
     options.size = size.value;
     options.sortBy = sortBy.value;
   }
+  await updateFarms();
 };
-watch(mixedFarmFilters.value, updateFarms, { deep: true });
 
-const inputFiltersReset = (nFltrNptsVal: FilterFarmInputs) => {
-  mixedFarmFilters.value.inputs = nFltrNptsVal;
-  nFltrNptsVal.farmId.value = undefined;
-  nFltrNptsVal.name.value = undefined;
-  nFltrNptsVal.freeIps.value = undefined;
+watch(mixedFarmFilters, updateFarms, { deep: true });
+watch(filterFarmInputs, updateQueries, { deep: true });
+watch(page, updateQueries);
+watch(size, updateQueries);
+
+// The filters should reset to the default value again..
+const inputFiltersReset = (filtersInputValues: FilterFarmInputs) => {
+  filterFarmInputs.value = filtersInputValues;
+  filterOptions.value = {
+    page: 1,
+    size: 10,
+    sortBy: [{ key: "", order: undefined }],
+  };
 };
+
 const openSheet = (_e: any, { item }: any) => {
   openDialog(item.value);
 };
@@ -182,14 +205,8 @@ const headers: VDataTableHeader = [
     sortable: false,
   },
   {
-    title: "Free Public IPs",
+    title: "Available Public IPs",
     key: "freePublicIp",
-    align: "start",
-    sortable: false,
-  },
-  {
-    title: "Used Public IPs",
-    key: "usedPublicIp",
     align: "start",
     sortable: false,
   },
