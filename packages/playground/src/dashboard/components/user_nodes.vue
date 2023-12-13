@@ -44,9 +44,7 @@
 
             <v-expansion-panels v-model="resourcesPanel" :disabled="false" focusable>
               <v-expansion-panel class="my-4">
-                <v-expansion-panel-title color="primary" class="bg-primar">
-                  Resource Units Reserved
-                </v-expansion-panel-title>
+                <v-expansion-panel-title> Resource Units Reserved </v-expansion-panel-title>
                 <v-expansion-panel-text>
                   <v-row class="mt-5 mb-5">
                     <v-col v-for="(value, key) in item.raw.total_resources" :key="key" align="center">
@@ -86,7 +84,7 @@
 
             <v-expansion-panels v-if="network == 'main'" :disabled="false" focusable single model-value>
               <v-expansion-panel class="my-3">
-                <v-expansion-panel-title class="bg-primary"> Node Statistics </v-expansion-panel-title>
+                <v-expansion-panel-title> Node Statistics </v-expansion-panel-title>
                 <v-expansion-panel-text>
                   <NodeMintingDetails :node="item.value" />
                 </v-expansion-panel-text>
