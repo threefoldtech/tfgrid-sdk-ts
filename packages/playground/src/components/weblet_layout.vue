@@ -115,6 +115,7 @@ import { useProfileManager } from "../stores";
 import type { INode } from "../utils/filter_nodes";
 import { getGrid, loadBalance } from "../utils/grid";
 import { getDashboardURL, normalizeBalance } from "../utils/helpers";
+import { isValidSelectionDetailsFilters } from "../utils/nodeSelector";
 
 const props = defineProps({
   disableAlerts: {
@@ -161,6 +162,16 @@ const props = defineProps({
 const emits = defineEmits<{ (event: "mount"): void; (event: "back"): void }>();
 const baseUrl = import.meta.env.BASE_URL;
 const profileManager = useProfileManager();
+
+const validFilters = computed(() =>
+  isValidSelectionDetailsFilters({
+    cpu: props.cpu,
+    solutionDisk: props.disk,
+    memory: props.memory,
+    ipv4: props.ipv4,
+    certified: props.certified,
+  }),
+);
 
 const status = ref<WebletStatus>();
 const message = ref<string>();
@@ -302,12 +313,16 @@ async function getIPv1Price(grid: GridClient) {
 }
 
 async function loadCost(profile: { mnemonic: string }) {
+  if (!validFilters.value) {
+    return;
+  }
+
   costLoading.value = true;
   const grid = await getGrid(profile);
   const { sharedPrice, dedicatedPrice } = await grid!.calculator.calculateWithMyBalance({
     cru: typeof props.cpu === "number" ? props.cpu : 0,
     sru: typeof props.disk === "number" ? props.disk : 0,
-    mru: typeof props.disk === "number" ? (props.memory ?? 0) / 1024 : 0,
+    mru: typeof props.memory === "number" ? (props.memory ?? 0) / 1024 : 0,
     hru: 0,
     ipv4u: props.ipv4,
     certified: !props.certified && props.SelectedNode?.certified === "Certified" ? true : props.certified,

@@ -152,8 +152,6 @@ export default {
     useWatchDeep(
       filters,
       async filters => {
-        console.log("filters", filters);
-
         await pageCountTask.value.run(gridStore, filters);
         pageGen = createPageGen(pageCountTask.value.data as number);
         nextPage();
