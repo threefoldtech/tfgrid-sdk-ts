@@ -1,14 +1,4 @@
 <template>
-  <v-row justify="end">
-    <AddIP
-      v-model:farmId="$props.farmId"
-      v-model:type="type"
-      v-model:publicIP="publicIP"
-      v-model:toPublicIP="toPublicIP"
-      v-model:gateway="gateway"
-      @add-publicIPs="publicIps.push(...$event)"
-    />
-  </v-row>
   <div>
     <v-data-table v-if="publicIps?.length > 0" :headers="headers" :items="publicIps" class="elevation-1">
       <template v-slot:top>
@@ -66,15 +56,15 @@
     </v-dialog>
   </div>
 </template>
+
 <script lang="ts">
 import type { RemoveFarmIPModel } from "@threefold/grid_client";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 
 import { useGrid } from "@/stores";
 import { IPType } from "@/utils/types";
 
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
-import AddIP from "./add_ip.vue";
 
 export default {
   name: "PublicIPsTable",
@@ -83,9 +73,7 @@ export default {
       type: Number,
       required: true,
     },
-  },
-  components: {
-    AddIP,
+    refreshPublicIPs: Boolean,
   },
   setup(props) {
     const gridStore = useGrid();
@@ -143,6 +131,13 @@ export default {
         itemToDelete.value = undefined;
       }
     }
+    watch(
+      () => props.refreshPublicIPs,
+      () => {
+        getFarmByID(props.farmId);
+      },
+      { deep: true },
+    );
     return {
       gridStore,
       headers,

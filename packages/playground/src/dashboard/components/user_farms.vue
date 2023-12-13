@@ -54,17 +54,20 @@
                 <card-details :loading="false" title="Farm Details" :items="getFarmDetails(item.raw)"></card-details>
               </v-col>
             </v-row>
-            <PublicIPsTable :farmId="item.raw.farmId" />
             <v-row>
               <v-col cols="12 my-2">
-                <v-card-actions class="justify-center">
-                  <v-btn class="text-subtitle-1 px-6" color="primary" variant="elevated" @click="showDialogue = true">
-                    Add/Edit Stellar Payout Address
-                  </v-btn>
-                  <v-btn v-if="network == 'main'" class="bg-primary" @click="downloadFarmReceipts(item.value.farmId)">
-                    Download Minting Receipts
-                  </v-btn>
+                <v-card-actions>
+                  <v-row class="justify-center">
+                    <v-btn class="text-subtitle-1 px-6" color="primary" variant="elevated" @click="showDialogue = true">
+                      Add/Edit Stellar Payout Address
+                    </v-btn>
+                    <v-btn v-if="network == 'main'" class="bg-primary" @click="downloadFarmReceipts(item.value.farmId)">
+                      Download Minting Receipts
+                    </v-btn>
+                    <AddIP v-model:farmId="item.raw.farmId" @ip-added-successfully="handleIpAdded" />
+                  </v-row>
                 </v-card-actions>
+                <PublicIPsTable :farmId="item.raw.farmId" :refreshPublicIPs="refreshPublicIPs" />
               </v-col>
             </v-row>
           </td>
@@ -132,6 +135,7 @@ import {
   type NodeInterface,
 } from "@/utils/node";
 
+import AddIP from "./add_ip.vue";
 import PublicIPsTable from "./public_ips_table.vue";
 
 export default {
@@ -139,6 +143,7 @@ export default {
   components: {
     PublicIPsTable,
     CardDetails,
+    AddIP,
   },
   setup(_, context) {
     const gridStore = useGrid();
@@ -183,6 +188,7 @@ export default {
     const isValidAddress = ref(false);
     const isAdding = ref(false);
     const network = process.env.NETWORK || (window as any).env.NETWORK;
+    const refreshPublicIPs = ref(false);
 
     onMounted(async () => {
       await getUserFarms();
@@ -311,6 +317,10 @@ export default {
       docSum.save(`farm_${farmId}_receipt.pdf`);
     }
 
+    function handleIpAdded() {
+      refreshPublicIPs.value = !refreshPublicIPs.value;
+    }
+
     return {
       gridStore,
       headers,
@@ -332,6 +342,8 @@ export default {
       customStellarValidation,
       getFarmDetails,
       downloadFarmReceipts,
+      handleIpAdded,
+      refreshPublicIPs,
     };
   },
 };
