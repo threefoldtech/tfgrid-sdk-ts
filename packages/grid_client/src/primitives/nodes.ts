@@ -376,6 +376,7 @@ class Nodes {
 
   getNodeUrlQuery(options: FilterOptions = {}) {
     const params = {
+      total_cru: options.cru || "",
       free_mru: Math.ceil(this._g2b(options.mru)) || "",
       free_sru: Math.ceil(this._g2b(options.sru)) || "",
       free_hru: Math.ceil(this._g2b(options.hru)) || "",
