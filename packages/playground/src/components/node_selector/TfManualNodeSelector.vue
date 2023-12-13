@@ -112,10 +112,10 @@ export default {
         const { cpu = 0, memory = 0, ssdDisks = [], solutionDisk = 0, rootFilesystemSize = 0 } = props.filters;
 
         const memorySize = memory / 1024;
-        const requiredMru = Math.ceil(Math.pow(Math.round(memorySize) * 1024, 3));
+        const requiredMru = Math.ceil(Math.round(memorySize) * 1024 ** 3);
 
         const diskSize = ssdDisks.reduce((t, d) => t + d, rootFilesystemSize + solutionDisk);
-        const requiredDisk = Math.ceil(Math.pow(diskSize, 3));
+        const requiredDisk = Math.ceil(diskSize * 1024 ** 3);
 
         switch (true) {
           case cru < cpu:
