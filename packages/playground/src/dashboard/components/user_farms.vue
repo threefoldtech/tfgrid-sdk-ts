@@ -58,10 +58,21 @@
               <v-col cols="12 my-2">
                 <v-card-actions>
                   <v-row class="justify-center">
-                    <v-btn class="text-subtitle-1 px-6" color="primary" variant="elevated" @click="showDialogue = true">
+                    <v-btn
+                      class="text-subtitle-1 px-6"
+                      color="secondary"
+                      variant="outlined"
+                      @click="showDialogue = true"
+                    >
                       Add/Edit Stellar Payout Address
                     </v-btn>
-                    <v-btn v-if="network == 'main'" class="bg-primary" @click="downloadFarmReceipts(item.value.farmId)">
+                    <v-btn
+                      class="text-subtitle-1 px-6"
+                      v-if="network == 'main'"
+                      color="secondary"
+                      variant="outlined"
+                      @click="downloadFarmReceipts(item.value.farmId)"
+                    >
                       Download Minting Receipts
                     </v-btn>
                     <AddIP v-model:farmId="item.raw.farmId" @ip-added-successfully="handleIpAdded" />
