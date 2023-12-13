@@ -16,6 +16,7 @@
             label="Custom Domain"
             placeholder="Your custom domain"
             v-model="customDomain"
+            @vue:mounted="customDomain && ($refs.customDomainInput as VInput).validate()"
             validate-on="input"
             :rules="[
               d => (d ? true : 'Domain name is required.'),
@@ -26,37 +27,63 @@
         </VExpandTransition>
       </input-tooltip>
 
-      <input-tooltip
-        tooltip="Creates a subdomain for your instance on the selected domain to be able to access your instance from the browser."
-      >
-        <VAutocomplete
-          ref="domainInput"
-          validate-on="input"
-          label="Select domain"
-          placeholder="Select a domain"
-          :items="loadedDomains"
-          item-title="publicConfig.domain"
-          v-model="selectedDomain"
-          :rules="[d => (d ? true : 'Domain is required.')]"
-          @update:menu="opened => !opened && $nextTick().then(($refs.domainInput as VInput).validate)"
-          @blur="$nextTick().then(($refs.domainInput as VInput).validate)"
+      <VExpandTransition>
+        <input-tooltip
+          tooltip="Creates a subdomain for your instance on the selected domain to be able to access your instance from the browser."
+          v-if="!disableSelectedDomain"
         >
-          <template #append-item v-if="page !== -1">
-            <VContainer>
-              <VBtn
-                @click="reloadDomains()"
-                block
-                color="secondary"
-                variant="tonal"
-                :loading="domainsTask.loading"
-                prepend-icon="mdi-reload"
-              >
-                Load More Domains
-              </VBtn>
-            </VContainer>
-          </template>
-        </VAutocomplete>
-      </input-tooltip>
+          <VAutocomplete
+            ref="domainInput"
+            validate-on="input"
+            label="Select domain"
+            placeholder="Select a domain"
+            :items="loadedDomains"
+            item-title="publicConfig.domain"
+            v-model="selectedDomain"
+            @vue:mounted="selectedDomain && ($refs.domainInput as VInput).validate()"
+            :rules="[d => (d ? true : 'Domain is required.')]"
+            @update:menu="opened => !opened && $nextTick().then(($refs.domainInput as VInput).validate)"
+            @blur="$nextTick().then(($refs.domainInput as VInput).validate)"
+            return-object
+          >
+            <template #append-item v-if="page !== -1">
+              <VContainer>
+                <VBtn
+                  @click="reloadDomains()"
+                  block
+                  color="secondary"
+                  variant="tonal"
+                  :loading="domainsTask.loading"
+                  prepend-icon="mdi-reload"
+                >
+                  Load More Domains
+                </VBtn>
+              </VContainer>
+            </template>
+          </VAutocomplete>
+        </input-tooltip>
+      </VExpandTransition>
+
+      <VExpandTransition>
+        <v-expand-transition>
+          <v-alert
+            v-if="
+              !disableSelectedDomain &&
+              useFQDN &&
+              modelValue &&
+              modelValue.customDomain &&
+              selectedDomain?.publicConfig?.ipv4
+            "
+            class="mb-4"
+            type="warning"
+            variant="tonal"
+          >
+            Before starting the deployment, Please make sure to create an A record on your name provider with
+            <span class="font-weight-bold">{{ customDomain }}</span> pointing to
+            <span class="font-weight-bold">{{ selectedDomain.publicConfig.ipv4.split("/")[0] }}</span>
+          </v-alert>
+        </v-expand-transition>
+      </VExpandTransition>
     </VForm>
   </section>
 </template>
@@ -143,16 +170,20 @@ export default {
       bindStatus(valid === null ? ValidatorStatus.Init : valid ? ValidatorStatus.Valid : ValidatorStatus.Invalid);
     });
 
-    useWatchDeep(
-      () =>
-        ({
-          selectedDomain: selectedDomain.value,
-          enabledCustomDomain: enableCustomDomain.value,
-          customDomain: customDomain.value,
-        } as DomainInfo),
-      domain => bindModelValue(domain),
-      { immediate: true, deep: true },
-    );
+    const disableSelectedDomain = computed(() => enableCustomDomain.value && props.filters.ipv4 === true);
+    const useFQDN = computed(() => enableCustomDomain.value && props.filters.ipv4 === false);
+
+    const domain = computed<DomainInfo>(() => {
+      return {
+        selectedDomain: disableSelectedDomain.value ? null : selectedDomain.value,
+        enableSelectedDomain: !disableSelectedDomain.value,
+        enabledCustomDomain: enableCustomDomain.value,
+        customDomain: enableCustomDomain.value ? customDomain.value : "",
+        useFQDN: useFQDN.value,
+      };
+    });
+
+    useWatchDeep(domain, bindModelValue, { immediate: true, deep: true });
 
     onUnmounted(() => {
       bindModelValue();
@@ -180,6 +211,9 @@ export default {
       loadedDomains,
       selectedDomain,
       reloadDomains,
+
+      disableSelectedDomain,
+      useFQDN,
     };
   },
 };

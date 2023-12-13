@@ -39,8 +39,10 @@ export interface NormalizeNodeFiltersOptions {
 
 export interface DomainInfo {
   selectedDomain: NodeInfo | null;
-  enabledCustomDomain: boolean;
+  enableSelectedDomain: boolean;
   customDomain: string;
+  enabledCustomDomain: boolean;
+  useFQDN: boolean;
 }
 
 export interface SelectionDetails {
