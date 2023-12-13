@@ -28,7 +28,15 @@
 
               <input-validator
                 :value="$props.modelValue.gw4"
-                :rules="[validators.required('Gateway is required.'), validators.isIP('Gateway is not valid.', 4)]"
+                :rules="[
+                  validators.required('Gateway is required.'),
+                  validators.isIP('Gateway is not valid.', 4),
+                  validators.ipNotEqualGateway(
+                    $props.modelValue.ipv4,
+                    $props.modelValue.gw4,
+                    'Gateway IPv4 should not be equal to IPv4.',
+                  ),
+                ]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Gateway for the IP in ipv4 format">
@@ -52,7 +60,14 @@
 
               <input-validator
                 :value="$props.modelValue.gw6"
-                :rules="[value => validators.isIP('Gateway is not valid.', 6)(value)]"
+                :rules="[
+                  value => validators.isIP('Gateway is not valid.', 6)(value),
+                  validators.ipNotEqualGateway(
+                    $props.modelValue.ipv4,
+                    $props.modelValue.gw4,
+                    'Gateway IPv6 should not be equal to IPv6.',
+                  ),
+                ]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Gateway for the IP in ipv6 format">
