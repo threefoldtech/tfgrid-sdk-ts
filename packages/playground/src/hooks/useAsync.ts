@@ -19,6 +19,7 @@ export type AsyncTaskOptions<T, E, A extends any[]> = {
   default?: T;
   onAfterTask?(task: TaskResult<T, E, A>, beforeTaskReturn: any): void;
   onBeforeTask?(): any;
+  onReset?(): void;
 };
 function normalizeOptions<T, E, A extends any[]>(
   options: AsyncTaskOptions<T, E, A> = {},
@@ -29,6 +30,7 @@ function normalizeOptions<T, E, A extends any[]>(
     default: options.default || (null as T),
     onAfterTask: options.onAfterTask || noop,
     onBeforeTask: options.onBeforeTask || noop,
+    onReset: options.onReset || noop,
   };
 }
 
@@ -88,6 +90,7 @@ export function useAsync<T, E = Error, A extends any[] = []>(
 
   function reset() {
     initialized.value = false;
+    _options.onReset();
   }
 
   if (_options.init) {

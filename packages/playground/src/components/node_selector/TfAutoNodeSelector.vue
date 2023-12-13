@@ -180,13 +180,13 @@ export default {
           }
 
           filtersUpdated.value = true;
-          nodeInputValidateTask.value.loading && nodeInputValidateTask.value.reset();
+          nodeInputValidateTask.value.initialized && nodeInputValidateTask.value.reset();
           return;
         }
 
         baseFilters.value = oldFilters;
         filtersUpdated.value = !equals(filters, oldFilters);
-        filtersUpdated.value && nodeInputValidateTask.value.loading && nodeInputValidateTask.value.reset();
+        filtersUpdated.value && nodeInputValidateTask.value.initialized && nodeInputValidateTask.value.reset();
       },
       { deep: true, ignoreFields: ["page"] },
     );
@@ -236,9 +236,8 @@ export default {
       },
       {
         onBeforeTask: () => bindStatus(ValidatorStatus.Pending),
-        onAfterTask: ({ data }) => {
-          bindStatus(data ? ValidatorStatus.Valid : ValidatorStatus.Invalid);
-        },
+        onAfterTask: ({ data }) => bindStatus(data ? ValidatorStatus.Valid : ValidatorStatus.Invalid),
+        onReset: bindStatus,
       },
     );
 

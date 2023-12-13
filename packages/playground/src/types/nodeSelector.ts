@@ -33,7 +33,7 @@ export interface NormalizeNodeFiltersOptions {
   page: number;
   twinId: number;
   location: SelectedLocation;
-  farm: Partial<FarmInfo>;
+  farm?: FarmInfo;
   gateway?: boolean;
 }
 
@@ -48,7 +48,7 @@ export interface DomainInfo {
 export interface SelectionDetails {
   type: "manual" | "automatic";
   node?: NodeInfo;
-  farm?: Partial<FarmInfo>;
+  farm?: FarmInfo;
   location?: SelectedLocation;
   gpuCards: GPUCardInfo[];
   domain?: DomainInfo;
