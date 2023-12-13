@@ -1,15 +1,20 @@
 <template>
-  <VTextField
-    label="Node ID"
-    placeholder="Add your desired node id to validate"
-    type="number"
-    v-model.number="nodeId"
-    :error="!!validationTask.error"
-    :error-messages="validationTask.error || undefined"
-    :persistent-hint="validationTask.loading || (validationTask.initialized && validationTask.data === true)"
-    :hint="validationTask.loading ? 'Validating node...' : validationTask.data ? `Node ${nodeId} is valid.` : undefined"
-    @blur="validationTask.initialized ? undefined : validationTask.run(nodeId)"
-  />
+  <input-tooltip tooltip="Node ID to deploy on.">
+    <VTextField
+      label="Node ID"
+      placeholder="Add your desired node id to validate"
+      class="w-100"
+      type="number"
+      v-model.number="nodeId"
+      :error="!!validationTask.error"
+      :error-messages="validationTask.error || undefined"
+      :persistent-hint="validationTask.loading || (validationTask.initialized && validationTask.data === true)"
+      :hint="
+        validationTask.loading ? 'Validating node...' : validationTask.data ? `Node ${nodeId} is valid.` : undefined
+      "
+      @blur="validationTask.initialized ? undefined : validationTask.run(nodeId)"
+    />
+  </input-tooltip>
 </template>
 
 <script lang="ts">
@@ -81,8 +86,10 @@ export default {
           case props.filters.dedicated && node.rentedByTwinId === 0:
             throw `Node ${nodeId} is not Dedicated`;
 
-          case props.filters.dedicated && node.rentedByTwinId !== gridStore.client.twinId:
+          case props.filters.dedicated && node.rentedByTwinId !== gridStore.client.twinId: {
+            console.log(node.rentedByTwinId, gridStore.client.twinId);
             throw `Node ${nodeId} is Dedicated, but rented by someone else`;
+          }
 
           case props.filters.ipv4 && !node.publicConfig.ipv4:
             throw `Node ${nodeId} is not assigned to a PublicIP`;
@@ -128,7 +135,7 @@ export default {
     // revalidate if filters updated
     useWatchDeep(
       () => props.filters,
-      () => validationTask.value.initialized && validationTask.value.run(nodeId.value),
+      () => validationTask.value.initialized && nodeId.value && validationTask.value.run(nodeId.value),
     );
 
     useWatchDeep(nodeId, validationTask.value.run, { debounce: 250 });

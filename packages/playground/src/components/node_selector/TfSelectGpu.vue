@@ -1,26 +1,31 @@
 <template>
-  <VAutocomplete
-    label="GPU Cards"
-    placeholder="Select GPU Cards"
-    multiple
-    :model-value="$props.modelValue"
-    @update:model-value="
-      bindModelValue($event);
-      bindStatus($event.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
-    "
-    :items="(cardsTask.data as GPUCardInfo[])"
-    item-title="device"
-    :loading="cardsTask.loading"
-    :error="!!cardsTask.error"
-    :error-messages="
-      $props.status === ValidatorStatus.Invalid ? 'Please select at least 1 GPU card.' : cardsTask.error?.message
-    "
-    return-object
-    :disabled="!$props.validNode"
-    :hint="$props.validNode ? undefined : 'Please select a valid node to load it\'s GPU cards.'"
-    :persistent-hint="!$props.validNode"
-    @update:menu="opened => !opened && $props.modelValue.length === 0 && bindStatus(ValidatorStatus.Invalid)"
-  />
+  <input-tooltip
+    tooltip="Please select at least one card from the available GPU cards. Note that if you have a deployment that already uses certain cards, they will not appear in the selection area. You have the option to select one or more cards.."
+  >
+    <VAutocomplete
+      label="GPU Cards"
+      placeholder="Select GPU Cards"
+      class="w-100"
+      multiple
+      :model-value="$props.modelValue"
+      @update:model-value="
+        bindModelValue($event);
+        bindStatus($event.length === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
+      "
+      :items="(cardsTask.data as GPUCardInfo[])"
+      item-title="device"
+      :loading="cardsTask.loading"
+      :error="!!cardsTask.error"
+      :error-messages="
+        $props.status === ValidatorStatus.Invalid ? 'Please select at least 1 GPU card.' : cardsTask.error?.message
+      "
+      return-object
+      :disabled="!$props.validNode"
+      :hint="$props.validNode ? undefined : 'Please select a valid node to load it\'s GPU cards.'"
+      :persistent-hint="!$props.validNode"
+      @update:menu="opened => !opened && $props.modelValue.length === 0 && bindStatus(ValidatorStatus.Invalid)"
+    />
+  </input-tooltip>
 </template>
 
 <script lang="ts">

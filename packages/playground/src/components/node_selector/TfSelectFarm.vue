@@ -1,58 +1,61 @@
 <template>
-  <VAutocomplete
-    label="Farm Name"
-    placeholder="Select a farm"
-    :items="farms"
-    :loading="farmsTask.loading"
-    item-title="name"
-    :model-value="modelValue || farms[0]"
-    @update:model-value="bindModelValue"
-    clearable
-    @click:clear="onClear()"
-    return-object
-    prepend-inner-icon="mdi-magnify"
-    v-model:menu="menuOpened"
-    :focused="focused"
-    @update:focused="updateFocused($event)"
-    v-model:search.trim="searchQuery"
-    @keyup="searchForFarms"
-    :hint="
-      pageCountTask.loading
-        ? 'Preparing to load farms'
-        : searchQuery === '' && !menuOpened && focused
-        ? 'Type any desired farm name to search for...'
-        : undefined
-    "
-    :persistent-hint="pageCountTask.loading || (searchQuery === '' && !menuOpened && focused)"
-  >
-    <template #no-data v-if="searchTask.loading">
-      <div class="d-flex pa-2">
-        <VProgressCircular indeterminate color="primary" size="20" width="3" />
-        <p class="ml-2">
-          Searching for farms with query <strong>{{ searchQuery }}</strong>
-        </p>
-      </div>
-    </template>
+  <input-tooltip tooltip="The name of the farm that you want to deploy inside it.">
+    <VAutocomplete
+      label="Farm Name"
+      placeholder="Select a farm"
+      class="w-100"
+      :items="farms"
+      :loading="farmsTask.loading"
+      item-title="name"
+      :model-value="modelValue || farms[0]"
+      @update:model-value="bindModelValue"
+      clearable
+      @click:clear="onClear()"
+      return-object
+      prepend-inner-icon="mdi-magnify"
+      v-model:menu="menuOpened"
+      :focused="focused"
+      @update:focused="updateFocused($event)"
+      v-model:search.trim="searchQuery"
+      @keyup="searchForFarms"
+      :hint="
+        pageCountTask.loading
+          ? 'Preparing to load farms'
+          : searchQuery === '' && !menuOpened && focused
+          ? 'Type any desired farm name to search for...'
+          : undefined
+      "
+      :persistent-hint="pageCountTask.loading || (searchQuery === '' && !menuOpened && focused)"
+    >
+      <template #no-data v-if="searchTask.loading">
+        <div class="d-flex pa-2">
+          <VProgressCircular indeterminate color="primary" size="20" width="3" />
+          <p class="ml-2">
+            Searching for farms with query <strong>{{ searchQuery }}</strong>
+          </p>
+        </div>
+      </template>
 
-    <template #prepend-item v-if="searchQuery === '' && menuOpened">
-      <span class="px-4 text-caption text-medium-emphasis">Type any desired farm name to search for...</span>
-    </template>
+      <template #prepend-item v-if="searchQuery === '' && menuOpened">
+        <span class="px-4 text-caption text-medium-emphasis">Type any desired farm name to search for...</span>
+      </template>
 
-    <template #append-item v-if="!searchTask.initialized && page !== -1">
-      <VContainer>
-        <VBtn
-          @click="reloadFarms()"
-          block
-          color="secondary"
-          variant="tonal"
-          :loading="farmsTask.loading"
-          prepend-icon="mdi-reload"
-        >
-          Load More Farms
-        </VBtn>
-      </VContainer>
-    </template>
-  </VAutocomplete>
+      <template #append-item v-if="!searchTask.initialized && page !== -1">
+        <VContainer>
+          <VBtn
+            @click="reloadFarms()"
+            block
+            color="secondary"
+            variant="tonal"
+            :loading="farmsTask.loading"
+            prepend-icon="mdi-reload"
+          >
+            Load More Farms
+          </VBtn>
+        </VContainer>
+      </template>
+    </VAutocomplete>
+  </input-tooltip>
 </template>
 
 <script lang="ts">

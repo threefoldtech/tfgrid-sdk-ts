@@ -6,84 +6,86 @@
       </VAlert>
     </VFadeTransition>
 
-    <div class="d-flex">
-      <VAutocomplete
-        ref="nodeInput"
-        label="Node"
-        placeholder="Select node"
-        :items="loadedNodes"
-        item-title="nodeId"
-        return-object
-        :model-value="$props.modelValue"
-        @update:model-value="bindModelValueAndValidate($event)"
-        :disabled="filtersUpdated"
-        :loading="nodeInputValidateTask.loading"
-        required
-        :hint="
-          nodeInputValidateTask.loading ? `Checking if the disks will fit in the node's storage pools...` : undefined
-        "
-        :persistent-hint="nodeInputValidateTask.loading"
-        clearable
-        @click:clear="
-          bindModelValueAndValidate();
-          ($refs.nodeInput as VInput)?.$el.querySelector('input').blur();
-          nodeInputValidateTask.reset();
-          touched = false;
-        "
-        :error="!!nodeInputValidateTask.error && !filtersUpdated"
-        :error-messages="!filtersUpdated ? nodeInputValidateTask.error || undefined : undefined"
-        @blur="
-          touched
-            ? undefined
-            : (() => {
-                touched = true;
-                !nodeInputValidateTask.initialized && nodeInputValidateTask.run($props.modelValue);
-              })()
-        "
-        :rules="[() => true]"
-      >
-        <template #item="{ item, props }">
-          <VListItem v-bind="props">
-            <template #title> {{ item.value.nodeId }} </template>
-            <template #append>
-              <VChip class="mr-2" v-if="item.value.certificationType.toLowerCase() === 'certified'" color="primary">
-                Certified
-              </VChip>
-              <VChip :color="item.value.rentedByTwinId === 0 ? 'secondary' : 'success'">
-                {{ item.value.rentedByTwinId === 0 ? "Shared" : "Dedicated" }}
-              </VChip>
-            </template>
-          </VListItem>
-        </template>
+    <input-tooltip tooltip="Select a node ID to deploy on.">
+      <div class="d-flex w-100">
+        <VAutocomplete
+          ref="nodeInput"
+          label="Node"
+          placeholder="Select node"
+          :items="loadedNodes"
+          item-title="nodeId"
+          return-object
+          :model-value="$props.modelValue"
+          @update:model-value="bindModelValueAndValidate($event)"
+          :disabled="filtersUpdated"
+          :loading="nodeInputValidateTask.loading"
+          required
+          :hint="
+            nodeInputValidateTask.loading ? `Checking if the disks will fit in the node's storage pools...` : undefined
+          "
+          :persistent-hint="nodeInputValidateTask.loading"
+          clearable
+          @click:clear="
+            bindModelValueAndValidate();
+            ($refs.nodeInput as VInput)?.$el.querySelector('input').blur();
+            nodeInputValidateTask.reset();
+            touched = false;
+          "
+          :error="!!nodeInputValidateTask.error && !filtersUpdated"
+          :error-messages="!filtersUpdated ? nodeInputValidateTask.error || undefined : undefined"
+          @blur="
+            touched
+              ? undefined
+              : (() => {
+                  touched = true;
+                  !nodeInputValidateTask.initialized && nodeInputValidateTask.run($props.modelValue);
+                })()
+          "
+          :rules="[() => true]"
+        >
+          <template #item="{ item, props }">
+            <VListItem v-bind="props">
+              <template #title> {{ item.value.nodeId }} </template>
+              <template #append>
+                <VChip class="mr-2" v-if="item.value.certificationType.toLowerCase() === 'certified'" color="primary">
+                  Certified
+                </VChip>
+                <VChip :color="item.value.rentedByTwinId === 0 ? 'secondary' : 'success'">
+                  {{ item.value.rentedByTwinId === 0 ? "Shared" : "Dedicated" }}
+                </VChip>
+              </template>
+            </VListItem>
+          </template>
 
-        <template #append-item v-if="page !== -1">
-          <VContainer>
-            <VBtn
-              @click="reloadNodes()"
-              block
-              color="secondary"
-              variant="tonal"
-              :loading="nodesTask.loading"
-              prepend-icon="mdi-reload"
-              :disabled="nodeInputValidateTask.loading"
-            >
-              Load More Nodes
-            </VBtn>
-          </VContainer>
-        </template>
-      </VAutocomplete>
+          <template #append-item v-if="page !== -1">
+            <VContainer>
+              <VBtn
+                @click="reloadNodes()"
+                block
+                color="secondary"
+                variant="tonal"
+                :loading="nodesTask.loading"
+                prepend-icon="mdi-reload"
+                :disabled="nodeInputValidateTask.loading"
+              >
+                Load More Nodes
+              </VBtn>
+            </VContainer>
+          </template>
+        </VAutocomplete>
 
-      <VBtn
-        variant="tonal"
-        color="secondary"
-        class="mt-2 ml-2"
-        @click="resetPageAndReloadNodes()"
-        :loading="pageCountTask.loading || nodesTask.loading"
-        :disabled="nodeInputValidateTask.loading"
-      >
-        Load Nodes
-      </VBtn>
-    </div>
+        <VBtn
+          variant="tonal"
+          color="secondary"
+          class="mt-2 ml-2"
+          @click="resetPageAndReloadNodes()"
+          :loading="pageCountTask.loading || nodesTask.loading"
+          :disabled="nodeInputValidateTask.loading"
+        >
+          Load Nodes
+        </VBtn>
+      </div>
+    </input-tooltip>
   </section>
 </template>
 

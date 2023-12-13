@@ -2,52 +2,61 @@
   <section>
     <h6 class="text-h5 mb-4 mt-2">Domain Name</h6>
 
-    <VSwitch color="primary" inset label="Custom Domain" v-model="enableCustomDomain" hide-details />
+    <input-tooltip tooltip="Use a custom domain">
+      <div>
+        <VSwitch color="primary" inset label="Custom Domain" v-model="enableCustomDomain" hide-details />
+      </div>
+    </input-tooltip>
 
     <VForm v-model="domainNameValid">
-      <VExpandTransition>
-        <VTextField
-          ref="customDomainInput"
-          label="Custom Domain"
-          placeholder="Your custom domain"
-          v-model="customDomain"
-          validate-on="input"
-          :rules="[
-            d => (d ? true : 'Domain name is required.'),
-            d => validators.isFQDN('Please provide a valid domain name.')(d)?.message || true,
-          ]"
-          v-if="enableCustomDomain"
-          @blur="($refs.customDomainInput as VInput).validate()"
-        />
-      </VExpandTransition>
+      <input-tooltip tooltip="Domain Name that will points to this instance" v-if="enableCustomDomain">
+        <VExpandTransition>
+          <VTextField
+            ref="customDomainInput"
+            label="Custom Domain"
+            placeholder="Your custom domain"
+            v-model="customDomain"
+            validate-on="input"
+            :rules="[
+              d => (d ? true : 'Domain name is required.'),
+              d => validators.isFQDN('Please provide a valid domain name.')(d)?.message || true,
+            ]"
+            @blur="($refs.customDomainInput as VInput).validate()"
+          />
+        </VExpandTransition>
+      </input-tooltip>
 
-      <VAutocomplete
-        ref="domainInput"
-        validate-on="input"
-        label="Select domain"
-        placeholder="Select a domain"
-        :items="loadedDomains"
-        item-title="publicConfig.domain"
-        v-model="selectedDomain"
-        :rules="[d => (d ? true : 'Domain is required.')]"
-        @update:menu="opened => !opened && $nextTick().then(($refs.domainInput as VInput).validate)"
-        @blur="$nextTick().then(($refs.domainInput as VInput).validate)"
+      <input-tooltip
+        tooltip="Creates a subdomain for your instance on the selected domain to be able to access your instance from the browser."
       >
-        <template #append-item v-if="page !== -1">
-          <VContainer>
-            <VBtn
-              @click="reloadDomains()"
-              block
-              color="secondary"
-              variant="tonal"
-              :loading="domainsTask.loading"
-              prepend-icon="mdi-reload"
-            >
-              Load More Domains
-            </VBtn>
-          </VContainer>
-        </template>
-      </VAutocomplete>
+        <VAutocomplete
+          ref="domainInput"
+          validate-on="input"
+          label="Select domain"
+          placeholder="Select a domain"
+          :items="loadedDomains"
+          item-title="publicConfig.domain"
+          v-model="selectedDomain"
+          :rules="[d => (d ? true : 'Domain is required.')]"
+          @update:menu="opened => !opened && $nextTick().then(($refs.domainInput as VInput).validate)"
+          @blur="$nextTick().then(($refs.domainInput as VInput).validate)"
+        >
+          <template #append-item v-if="page !== -1">
+            <VContainer>
+              <VBtn
+                @click="reloadDomains()"
+                block
+                color="secondary"
+                variant="tonal"
+                :loading="domainsTask.loading"
+                prepend-icon="mdi-reload"
+              >
+                Load More Domains
+              </VBtn>
+            </VContainer>
+          </template>
+        </VAutocomplete>
+      </input-tooltip>
     </VForm>
   </section>
 </template>
