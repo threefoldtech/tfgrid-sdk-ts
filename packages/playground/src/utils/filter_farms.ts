@@ -30,7 +30,7 @@ export const inputsInitializer: () => FilterFarmInputs = () => ({
   },
 
   freeIps: {
-    label: "Free PubIPs",
+    label: "Free Public IPs",
     placeholder: "Filter by free public IPs",
     rules: [
       [

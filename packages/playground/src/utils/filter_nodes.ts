@@ -3,7 +3,7 @@ import type { FilterOptions, GridClient, NodeInfo } from "@threefold/grid_client
 import type { NodeFilters } from "@/components/select_node.vue";
 
 import type { InputFilterType } from "../types";
-import { isAlphanumeric, isNumeric, min, startsWith, validateResourceMaxNumber } from "./validators";
+import { isAlphanumeric, isInt, isNumeric, min, startsWith, validateResourceMaxNumber } from "./validators";
 export interface NodeGPUCardType {
   id: string;
   vendor: string;
@@ -32,6 +32,8 @@ export async function getFilteredNodes(grid: GridClient, options: NodeFilters): 
     rentedBy: options.rentedBy ? grid.twinId : undefined,
     certified: options.certified,
     availableFor: grid.twinId,
+    country: options.country,
+    region: options.region,
   };
   const nodes = await grid.capacity.filterNodes(filters);
   return nodes;
@@ -76,26 +78,14 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
     type: "text",
   },
   farmIds: {
-    label: "Farm IDs",
-    placeholder: "e.g. 1,2,3.",
+    label: "Farm ID",
+    placeholder: "Filter by farm id",
     rules: [
       [
-        (value: string) => {
-          if (value.endsWith(",") || value.includes(" ")) {
-            return { message: "Invalid farm ids format." };
-          }
-
-          const ids = value.split(",").map(parseFloat);
-          const visNumeric = isNumeric("This field accepts numbers only.", { no_symbols: true });
-          const vMin = min("The farm ids should be larger then zero.", 1);
-
-          for (const id of ids) {
-            const err1 = visNumeric(String(id));
-            const err2 = vMin(String(id));
-            if (err1) return err1;
-            if (err2) return err2;
-          }
-        },
+        isNumeric("This field accepts numbers only.", { no_symbols: true }),
+        min("The ID should be larger than zero.", 1),
+        isInt("should be an integer"),
+        validateResourceMaxNumber("This is not a valid ID."),
       ],
     ],
     type: "text",

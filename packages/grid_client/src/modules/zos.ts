@@ -45,7 +45,7 @@ class Zos {
   @validateInput
   async pingNode(options: PingNodeOptionsModel): Promise<boolean> {
     const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
-    return await this.rmb.request([nodeTwinId], "zos.system.version", "", 20, 1);
+    return await this.rmb.request([nodeTwinId], "zos.system.version", "", 10, 1);
   }
 
   @expose

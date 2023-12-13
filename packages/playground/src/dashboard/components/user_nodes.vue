@@ -117,7 +117,7 @@
 
 <script lang="ts">
 import moment from "moment";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { capitalize } from "vue";
 
 import { gridProxyClient } from "@/clients";
@@ -192,8 +192,6 @@ export default {
     const uptime = ref();
     const nodesCount = ref();
 
-    onMounted(getUserNodes);
-
     async function reloadNodes() {
       setTimeout(async () => {
         await getUserNodes();
@@ -209,7 +207,7 @@ export default {
           retCount: true,
           page: page.value,
           size: pageSize.value,
-          ownedBy: twinId,
+          ownedBy: twinId as number,
         });
 
         const _nodes = data as unknown as NodeInterface[];
