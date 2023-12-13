@@ -4,7 +4,7 @@
 MODE="${MODE:=dev}"
 STELLAR_NETWORK="${STELLAR_NETWORK:=test}"
 TIMEOUT="${TIMEOUT:=10000}"
-PAGE_SIZE="${PAGE_SIZE:20}"
+PAGE_SIZE="${PAGE_SIZE:=20}"
 MINTING_URL="https://alpha.minting.tfchain.grid.tf"
 
 # Env vars must provide in `custom` mode
