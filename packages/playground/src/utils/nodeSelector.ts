@@ -67,11 +67,11 @@ export async function getFarmPageCount(gridStore: ReturnType<typeof useGrid>, fi
 }
 
 export function* createPageGen(count: number) {
-  const pages = shuffle(Array.from({ length: count }, (_, i) => i + 1));
+  const pages = shuffle(Array.from({ length: count - 1 }, (_, i) => i + 1));
   for (const page of pages) {
     yield page;
   }
-
+  yield count;
   return -1;
 }
 
