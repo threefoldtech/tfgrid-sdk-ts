@@ -19,13 +19,16 @@
       v-model:search.trim="searchQuery"
       @keyup="searchForFarms"
       :hint="
-        pageCountTask.loading
+        !validFilters
+          ? 'Please provide valid data.'
+          : pageCountTask.loading
           ? 'Preparing to load farms'
           : searchQuery === '' && !menuOpened && focused
           ? 'Type any desired farm name to search for...'
           : undefined
       "
-      :persistent-hint="pageCountTask.loading || (searchQuery === '' && !menuOpened && focused)"
+      :persistent-hint="!validFilters || pageCountTask.loading || (searchQuery === '' && !menuOpened && focused)"
+      :disabled="!validFilters"
     >
       <template #no-data v-if="searchTask.loading">
         <div class="d-flex pa-2">
@@ -64,7 +67,7 @@ import { computed, nextTick, onUnmounted, type PropType, ref } from "vue";
 
 import { useAsync, useWatchDeep } from "../../hooks";
 import { useGrid } from "../../stores";
-import type { NodeSelectorFilters, SelectedLocation } from "../../types/nodeSelector";
+import type { SelectedLocation, SelectionDetailsFilters } from "../../types/nodeSelector";
 import {
   createPageGen,
   getFarmPageCount,
@@ -80,8 +83,9 @@ export default {
   name: "TfSelectFarm",
   props: {
     modelValue: Object as PropType<FarmInfo>,
+    validFilters: { type: Boolean, required: true },
     filters: {
-      type: Object as PropType<NodeSelectorFilters>,
+      type: Object as PropType<SelectionDetailsFilters>,
       required: true,
     },
     location: Object as PropType<SelectedLocation>,
@@ -95,6 +99,7 @@ export default {
     /* Load farms with filters */
     const loadedFarms = ref<FarmInfo[]>([]);
     const farmsTask = useAsync(loadFarms, {
+      shouldRun: () => props.validFilters,
       onBeforeTask() {
         if (!searchTask.value.initialized) {
           const oldFarm = props.modelValue;
@@ -115,7 +120,7 @@ export default {
     const options = computed(() => normalizeFarmOptions(gridStore, props.location, page));
     const filters = computed(() => normalizeFarmFilters(props.filters, options.value));
 
-    const pageCountTask = useAsync(getFarmPageCount, { default: 1 });
+    const pageCountTask = useAsync(getFarmPageCount, { default: 1, shouldRun: () => props.validFilters });
     const page = ref(-1);
     let pageGen: ReturnType<typeof createPageGen>;
     function nextPage() {
@@ -137,7 +142,7 @@ export default {
     );
 
     /* Load farms with search */
-    const searchTask = useAsync(searchFarms);
+    const searchTask = useAsync(searchFarms, { shouldRun: () => props.validFilters });
     let oldSearchQuery = "";
     const searchQuery = ref("");
 

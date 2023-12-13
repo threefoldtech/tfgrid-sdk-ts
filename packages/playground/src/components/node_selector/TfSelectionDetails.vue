@@ -10,8 +10,15 @@
 
     <template v-if="wayToSelect === 'automated'">
       <TfSelectLocation v-model="location" v-if="wayToSelect === 'automated'" />
-      <TfSelectFarm :filters="filters" :location="location" v-model="farm" v-if="wayToSelect === 'automated'" />
+      <TfSelectFarm
+        :valid-filters="validFilters"
+        :filters="filters"
+        :location="location"
+        v-model="farm"
+        v-if="wayToSelect === 'automated'"
+      />
       <TfAutoNodeSelector
+        :valid-filters="validFilters"
         :filters="filters"
         :location="location"
         :farm="farm"
@@ -20,7 +27,13 @@
         v-if="wayToSelect === 'automated'"
       />
     </template>
-    <TfManualNodeSelector :filters="filters" v-model="node" v-model:status="nodeStatus" v-else />
+    <TfManualNodeSelector
+      :valid-filters="validFilters"
+      :filters="filters"
+      v-model="node"
+      v-model:status="nodeStatus"
+      v-else
+    />
 
     <VExpandTransition>
       <TfSelectGpu
@@ -51,7 +64,8 @@ import { computed, getCurrentInstance, onMounted, onUnmounted, type PropType, re
 
 import { useForm, ValidatorStatus } from "../../hooks/form_validator";
 import type { InputValidatorService } from "../../hooks/input_validator";
-import type { DomainInfo, NodeSelectorFilters, SelectedLocation, SelectionDetails } from "../../types/nodeSelector";
+import type { DomainInfo, SelectedLocation, SelectionDetails, SelectionDetailsFilters } from "../../types/nodeSelector";
+import { isValidSelectionDetailsFilters } from "../../utils/nodeSelector";
 import TfAutoNodeSelector from "./TfAutoNodeSelector.vue";
 import TfDomainName from "./TfDomainName.vue";
 import TfManualNodeSelector from "./TfManualNodeSelector.vue";
@@ -65,7 +79,7 @@ export default {
   props: {
     modelValue: Object as PropType<SelectionDetails>,
     filters: {
-      type: Object as PropType<NodeSelectorFilters>,
+      type: Object as PropType<SelectionDetailsFilters>,
       default: () => ({}),
     },
     requireDomain: Boolean,
@@ -76,6 +90,8 @@ export default {
     "update:status": (value: ValidatorStatus) => true || value,
   },
   setup(props, ctx) {
+    const validFilters = computed(() => isValidSelectionDetailsFilters(props.filters));
+
     const wayToSelect = ref<"manual" | "automated">("automated");
     const location = ref<SelectedLocation>();
     const farm = ref<FarmInfo>();
@@ -167,6 +183,7 @@ export default {
     }
 
     return {
+      validFilters,
       ValidatorStatus,
       wayToSelect,
       location,

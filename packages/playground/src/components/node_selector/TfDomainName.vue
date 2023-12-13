@@ -38,6 +38,7 @@
             label="Select domain"
             placeholder="Select a domain"
             :items="loadedDomains"
+            :loading="domainsTask.loading"
             item-title="publicConfig.domain"
             v-model="selectedDomain"
             @vue:mounted="selectedDomain && ($refs.domainInput as VInput).validate()"
@@ -98,7 +99,7 @@ import type { VInput } from "vuetify/components/VInput";
 import { useAsync, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
-import type { DomainInfo, NodeSelectorFilters } from "../../types/nodeSelector";
+import type { DomainInfo, SelectionDetailsFilters } from "../../types/nodeSelector";
 import { createPageGen, getNodePageCount, loadNodes } from "../../utils/nodeSelector";
 
 export default {
@@ -106,7 +107,7 @@ export default {
   props: {
     modelValue: Object as PropType<DomainInfo>,
     filters: {
-      type: Object as PropType<NodeSelectorFilters>,
+      type: Object as PropType<SelectionDetailsFilters>,
       required: true,
     },
     farm: Object as PropType<FarmInfo>,
@@ -121,7 +122,9 @@ export default {
 
     const loadedDomains = ref<NodeInfo[]>([]);
     const domainsTask = useAsync(loadNodes, {
-      onAfterTask({ data }) {
+      onAfterTask({ data, error }) {
+        console.log(data, error, filters.value);
+
         loadedDomains.value = loadedDomains.value.concat(data as NodeInfo[]);
         nextPage();
       },
@@ -149,6 +152,8 @@ export default {
     useWatchDeep(
       filters,
       async filters => {
+        console.log("filters", filters);
+
         await pageCountTask.value.run(gridStore, filters);
         pageGen = createPageGen(pageCountTask.value.data as number);
         nextPage();

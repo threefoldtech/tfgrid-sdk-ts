@@ -2,15 +2,16 @@ import type { FarmFilterOptions, FarmInfo, FilterOptions, NodeInfo } from "@thre
 import { NodeStatus } from "@threefold/gridproxy_client";
 import shuffle from "lodash/fp/shuffle.js";
 import type { Ref } from "vue";
+import { z } from "zod";
 
 import { gqlClient, gridProxyClient } from "../clients";
 import type { useGrid } from "../stores";
 import type {
   Locations,
-  NodeSelectorFilters,
   NormalizeFarmFiltersOptions,
   NormalizeNodeFiltersOptions,
   SelectedLocation,
+  SelectionDetailsFilters,
 } from "../types/nodeSelector";
 
 export async function getLocations(): Promise<Locations> {
@@ -37,7 +38,7 @@ export function normalizeFarmOptions(
 }
 
 export function normalizeFarmFilters(
-  filters: NodeSelectorFilters,
+  filters: SelectionDetailsFilters,
   options: NormalizeFarmFiltersOptions,
 ): FarmFilterOptions {
   return {
@@ -141,7 +142,7 @@ export function normalizeNodeOptions(
 }
 
 export function normalizeNodeFilters(
-  filters: NodeSelectorFilters,
+  filters: SelectionDetailsFilters,
   options: NormalizeNodeFiltersOptions,
 ): FilterOptions {
   return {
@@ -182,7 +183,7 @@ export async function getNodeGpuCards(gridStore: ReturnType<typeof useGrid>, nod
   return cards || [];
 }
 
-export async function resolveAsync<T, E>(promise: Promise<T>): Promise<[T, null]>;
+export async function resolveAsync<T>(promise: Promise<T>): Promise<[T, null]>;
 export async function resolveAsync<T, E>(promise: Promise<T>): Promise<[null, E]>;
 export async function resolveAsync(promise: Promise<any>): Promise<any> {
   try {
@@ -190,4 +191,26 @@ export async function resolveAsync(promise: Promise<any>): Promise<any> {
   } catch (error) {
     return [null, error];
   }
+}
+
+const selectionDetailsFiltersValidator = z.object({
+  ipv4: z.boolean().optional(),
+  ivp6: z.boolean().optional(),
+  hasGPU: z.boolean().optional(),
+  cpu: z.number().int().min(1).max(32),
+  memory: z.number().int().min(256).max(262144),
+  ssdDisks: z.array(z.number().min(1).max(10000)).optional(),
+  hddDisks: z.array(z.number().min(1).max(10000)).optional(),
+  rootFilesystemSize: z
+    .number()
+    .min(500 / 1024)
+    .optional(),
+  solutionDisk: z.number().int().min(15).max(10000).optional(),
+  certified: z.boolean().optional(),
+  dedicated: z.boolean().optional(),
+  exclusiveFor: z.string().optional(),
+});
+
+export function isValidSelectionDetailsFilters(filters: SelectionDetailsFilters): boolean {
+  return selectionDetailsFiltersValidator.safeParse(filters).success;
 }

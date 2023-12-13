@@ -8,9 +8,18 @@
       v-model.number="nodeId"
       :error="!!validationTask.error"
       :error-messages="validationTask.error || undefined"
-      :persistent-hint="validationTask.loading || (validationTask.initialized && validationTask.data === true)"
+      :disabled="!validFilters"
+      :persistent-hint="
+        !validFilters || validationTask.loading || (validationTask.initialized && validationTask.data === true)
+      "
       :hint="
-        validationTask.loading ? 'Validating node...' : validationTask.data ? `Node ${nodeId} is valid.` : undefined
+        !validFilters
+          ? 'Please provide valid data.'
+          : validationTask.loading
+          ? 'Validating node...'
+          : validationTask.data
+          ? `Node ${nodeId} is valid.`
+          : undefined
       "
       @blur="validationTask.initialized ? undefined : validationTask.run(nodeId)"
     />
@@ -22,11 +31,10 @@ import type { NodeInfo } from "@threefold/grid_client";
 import isInt from "validator/lib/isInt";
 import { onUnmounted, type PropType, ref, watch } from "vue";
 
-import { ValidatorStatus } from "@/hooks/form_validator";
-
 import { useAsync, useWatchDeep } from "../../hooks";
+import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
-import type { NodeSelectorFilters } from "../../types/nodeSelector";
+import type { SelectionDetailsFilters } from "../../types/nodeSelector";
 import { normalizeError } from "../../utils/helpers";
 import { resolveAsync } from "../../utils/nodeSelector";
 
@@ -37,8 +45,9 @@ export default {
   name: "TfManualNodeSelector",
   props: {
     modelValue: Object as PropType<NodeInfo>,
+    validFilters: { type: Boolean, required: true },
     filters: {
-      type: Object as PropType<NodeSelectorFilters>,
+      type: Object as PropType<SelectionDetailsFilters>,
       required: true,
     },
     status: String as PropType<ValidatorStatus>,
@@ -123,6 +132,7 @@ export default {
         return true;
       },
       {
+        shouldRun: () => props.validFilters,
         onBeforeTask: () => ctx.emit("update:status", ValidatorStatus.Pending),
         onAfterTask: ({ data }) => {
           ctx.emit("update:status", data ? ValidatorStatus.Valid : ValidatorStatus.Invalid);

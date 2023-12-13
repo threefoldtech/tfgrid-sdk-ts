@@ -6,7 +6,7 @@ export type Locations = {
 
 export type SelectedLocation = { country?: string; region?: string };
 
-export interface NodeSelectorFilters {
+export interface SelectionDetailsFilters {
   ipv4?: boolean;
   ipv6?: boolean;
   hasGPU?: boolean;

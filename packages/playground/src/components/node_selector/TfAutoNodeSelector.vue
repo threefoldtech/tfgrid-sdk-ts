@@ -17,13 +17,17 @@
           return-object
           :model-value="$props.modelValue"
           @update:model-value="bindModelValueAndValidate($event)"
-          :disabled="filtersUpdated"
+          :disabled="!validFilters || filtersUpdated"
           :loading="nodeInputValidateTask.loading"
           required
           :hint="
-            nodeInputValidateTask.loading ? `Checking if the disks will fit in the node's storage pools...` : undefined
+            !validFilters
+              ? 'Please provide valid data.'
+              : nodeInputValidateTask.loading
+              ? `Checking if the disks will fit in the node's storage pools...`
+              : undefined
           "
-          :persistent-hint="nodeInputValidateTask.loading"
+          :persistent-hint="!validFilters || nodeInputValidateTask.loading"
           clearable
           @click:clear="
             bindModelValueAndValidate();
@@ -99,7 +103,7 @@ import type { VInput } from "vuetify/components/VInput";
 import { useAsync, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
-import type { NodeSelectorFilters, SelectedLocation } from "../../types/nodeSelector";
+import type { SelectedLocation, SelectionDetailsFilters } from "../../types/nodeSelector";
 import {
   createPageGen,
   getNodePageCount,
@@ -112,8 +116,9 @@ export default {
   name: "TfAutoNodeSelector",
   props: {
     modelValue: Object as PropType<NodeInfo>,
+    validFilters: { type: Boolean, required: true },
     filters: {
-      type: Object as PropType<NodeSelectorFilters>,
+      type: Object as PropType<SelectionDetailsFilters>,
       required: true,
     },
     location: Object as PropType<SelectedLocation>,
@@ -128,6 +133,7 @@ export default {
     const gridStore = useGrid();
     const loadedNodes = ref<NodeInfo[]>([]);
     const nodesTask = useAsync(loadNodes, {
+      shouldRun: () => props.validFilters,
       onBeforeTask() {
         const oldNode = props.modelValue;
         bindModelValue();
@@ -144,7 +150,7 @@ export default {
       default: [],
     });
 
-    const pageCountTask = useAsync(getNodePageCount, { default: 1 });
+    const pageCountTask = useAsync(getNodePageCount, { default: 1, shouldRun: () => props.validFilters });
     const page = ref(-1);
     let pageGen: ReturnType<typeof createPageGen>;
     function nextPage() {
@@ -235,6 +241,7 @@ export default {
         }
       },
       {
+        shouldRun: () => props.validFilters,
         onBeforeTask: () => bindStatus(ValidatorStatus.Pending),
         onAfterTask: ({ data }) => bindStatus(data ? ValidatorStatus.Valid : ValidatorStatus.Invalid),
         onReset: bindStatus,
