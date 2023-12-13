@@ -62,7 +62,7 @@
 </template>
 
 <script lang="ts">
-import type { FarmInfo, NodeInfo } from "@threefold/grid_client";
+import type { FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
 import { computed, nextTick, onUnmounted, type PropType, ref, watch } from "vue";
 import { onMounted } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -72,13 +72,7 @@ import { useAsync, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
 import type { DomainInfo, NodeSelectorFilters, SelectedLocation } from "../../types/nodeSelector";
-import {
-  createPageGen,
-  getNodePageCount,
-  loadNodes,
-  normalizeNodeFilters,
-  normalizeNodeOptions,
-} from "../../utils/nodeSelector";
+import { createPageGen, getNodePageCount, loadNodes } from "../../utils/nodeSelector";
 
 export default {
   name: "TfDomainName",
@@ -115,8 +109,14 @@ export default {
       page.value = pageGen?.next().value ?? -1;
     }
 
-    const options = computed(() => normalizeNodeOptions(gridStore, props.location, page, props.farm, true));
-    const filters = computed(() => normalizeNodeFilters(props.filters, options.value));
+    const enableCustomDomain = ref(false);
+    const filters = computed<FilterOptions>(() => ({
+      gateway: true,
+      size: window.env.PAGE_SIZE,
+      page: Math.max(1, page.value),
+      farmId: enableCustomDomain.value ? props.farm?.farmId : undefined,
+      availableFor: gridStore.client.twinId,
+    }));
 
     const reloadDomains = () => domainsTask.value.run(gridStore, filters.value);
 
@@ -132,12 +132,10 @@ export default {
       },
       {
         immediate: true,
-        debounce: 500,
         deep: true,
         ignoreFields: ["page"],
       },
     );
-    const enableCustomDomain = ref(false);
     const customDomain = ref("");
     const selectedDomain = ref<NodeInfo | null>(null);
 
