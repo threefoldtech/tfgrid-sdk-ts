@@ -30,13 +30,35 @@
         </v-data-table-server>
       </v-col>
     </v-row>
-    <farmDialog
-      v-if="selectedFarm"
-      :openDialog="isDialogOpened"
-      :farm="selectedFarm"
-      @update:model-value="closeDialog"
-      @close-dialog="closeDialog"
-    />
+    <v-dialog v-model="dialog" hide-overlay transition="dialog-bottom-transition">
+      <v-container>
+        <v-toolbar :height="35">
+          <div class="d-flex justify-center">
+            <v-btn icon dark @click="() => (dialog = false)">
+              <v-icon size="20s">mdi-close</v-icon>
+            </v-btn>
+          </div>
+        </v-toolbar>
+
+        <template v-if="loading">
+          <div color="transparent" class="text-center">
+            <v-progress-circular color="primary" indeterminate :size="50" :width="5" />
+            <p>Loading farm details...</p>
+          </div>
+        </template>
+
+        <template v-else>
+          <v-card>
+            <v-col>
+              <farm-details-card :farm="selectedFarm" />
+            </v-col>
+            <v-col>
+              <twin-details-card :farm="selectedFarm" />
+            </v-col>
+          </v-card>
+        </template>
+      </v-container>
+    </v-dialog>
   </view-layout>
 </template>
 
@@ -52,12 +74,12 @@ import { inputsInitializer } from "@/utils/filter_farms";
 import { getAllFarms, getFarmQueries } from "@/utils/get_farms";
 const loading = ref<boolean>(false);
 const farms = ref<Farm[]>();
-const isDialogOpened = ref<boolean>(false);
+
 const selectedFarm = ref<Farm>();
 const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer());
 const size = ref(10);
 const page = ref(1);
-
+const dialog = ref(false);
 const sortBy = ref([{ key: "", order: undefined }]);
 const filterOptions = ref<FarmFilterOptions>({
   size: size.value,
@@ -188,11 +210,7 @@ const openSheet = (_e: any, { item }: any) => {
 };
 const openDialog = (item: Farm) => {
   selectedFarm.value = item;
-  isDialogOpened.value = true;
-};
-
-const closeDialog = () => {
-  isDialogOpened.value = false;
+  dialog.value = true;
 };
 
 const headers: VDataTableHeader = [
@@ -229,14 +247,15 @@ const headers: VDataTableHeader = [
 import type { FarmsQuery } from "@threefold/gridproxy_client";
 
 import Filters from "@/components/filter.vue";
+import FarmDetailsCard from "@/components/node_details_cards/farm_details_card.vue";
+import TwinDetailsCard from "@/components/node_details_cards/twin_details_card.vue";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
-
-import FarmDialog from "../components/farm_dialog.vue";
 export default {
   name: "Farms",
   components: {
-    FarmDialog,
     Filters,
+    FarmDetailsCard,
+    TwinDetailsCard,
   },
 };
 </script>
