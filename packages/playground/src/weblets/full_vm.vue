@@ -87,20 +87,8 @@
             memory: solution?.memory,
             rootFilesystemSize,
           }"
-          :require-domain="requireDomain"
           v-model="selectionDetails"
         />
-
-        <VRow justify="center" align="center">
-          <VChip color="error" class="mr-4">For Demo only*</VChip>
-          <VSwitch
-            label="toggle domain name selection (note domain is not used in full_vm but still we need to test it)"
-            hide-details
-            inset
-            color="error"
-            v-model="requireDomain"
-          />
-        </VRow>
       </template>
 
       <template #disks>
@@ -164,7 +152,6 @@ import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
 
 const selectionDetails = ref<SelectionDetails>();
-const requireDomain = ref(false);
 
 const layout = useLayout();
 const tabs = ref();
