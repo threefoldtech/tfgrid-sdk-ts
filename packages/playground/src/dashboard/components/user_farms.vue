@@ -54,10 +54,12 @@
                 <card-details :loading="false" title="Farm Details" :items="getFarmDetails(item.raw)"></card-details>
               </v-col>
             </v-row>
+
             <v-row>
               <v-col cols="12 my-2">
+                <PublicIPsTable :farmId="item.raw.farmId" :refreshPublicIPs="refreshPublicIPs" />
                 <v-card-actions>
-                  <v-row class="justify-center">
+                  <v-row class="justify-center mt-3">
                     <v-btn
                       class="text-subtitle-1 px-6"
                       color="secondary"
@@ -78,7 +80,6 @@
                     <AddIP v-model:farmId="item.raw.farmId" @ip-added-successfully="handleIpAdded" />
                   </v-row>
                 </v-card-actions>
-                <PublicIPsTable :farmId="item.raw.farmId" :refreshPublicIPs="refreshPublicIPs" />
               </v-col>
             </v-row>
           </td>
