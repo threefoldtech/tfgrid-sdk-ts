@@ -122,9 +122,7 @@ export default {
 
     const loadedDomains = ref<NodeInfo[]>([]);
     const domainsTask = useAsync(loadNodes, {
-      onAfterTask({ data, error }) {
-        console.log(data, error, filters.value);
-
+      onAfterTask({ data }) {
         loadedDomains.value = loadedDomains.value.concat(data as NodeInfo[]);
         nextPage();
       },
