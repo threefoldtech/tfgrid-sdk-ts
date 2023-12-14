@@ -33,9 +33,7 @@
   position: relative;
   width: 100px;
   overflow: hidden;
-  transition-property: height, opacity;
-  transition-duration: 0.3s;
-  transition-timing-function: ease;
+  transition: opacity 0.3s ease, height 0.3s ease 0.3s;
   height: 0;
   opacity: 0;
 }
@@ -57,10 +55,6 @@
   box-shadow: 32px 0 #74ddc3;
   left: 0;
   top: 0;
-}
-
-.app-loader.active:before,
-.app-loader.active:after {
   animation: ballMoveX 0.7s linear infinite;
 }
 
@@ -68,9 +62,6 @@
   box-shadow: none;
   transform-origin: 40px 0;
   transform: rotate(-153deg);
-}
-
-.app-loader.active:after {
   animation: rotateLoader 0.7s linear infinite;
 }
 

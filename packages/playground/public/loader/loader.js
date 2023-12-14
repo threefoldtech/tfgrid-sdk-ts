@@ -13,7 +13,7 @@ const refreshBtn = document.querySelector(".app-loader-refresh");
 const slowConnectionTime = 60 * 1000;
 const noConnectionTime = 120 * 1000;
 const appLoaderContainerTime = 0.3 * 1000;
-const welcomeMsgTime = 1 * 1000;
+const welcomeMsgTime = (1 + appLoaderContainerTime / 1000) * 1000;
 
 let t1 = setTimeout(function () {
   t1 = null;
