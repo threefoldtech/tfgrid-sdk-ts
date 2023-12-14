@@ -117,7 +117,7 @@
 
 <script lang="ts">
 import moment from "moment";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { capitalize } from "vue";
 
 import { gridProxyClient } from "@/clients";
@@ -191,8 +191,6 @@ export default {
     const receiptsPanel = ref([]);
     const uptime = ref();
     const nodesCount = ref();
-
-    onMounted(getUserNodes);
 
     async function reloadNodes() {
       setTimeout(async () => {

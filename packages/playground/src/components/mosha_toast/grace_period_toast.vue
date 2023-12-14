@@ -4,13 +4,7 @@
     <button class="text-decoration-underline" :onclick="navigateToContractsList">
       {{ deploymentLen }} {{ deploymentLen > 1 ? "contracts" : "contract" }}
     </button>
-    <v-spacer />
-    <span v-if="withPubIpLen >= 1">
-      on offline {{ deploymentLen > 1 ? "nodes" : "node" }}, and {{ withPubIpLen }}
-      {{ deploymentLen > 1 ? "of them" : "" }} with public {{ withPubIpLen > 1 ? "IPs" : "IP" }}. You're still being
-      billed for public IPs.
-    </span>
-    <span v-else> on offline {{ deploymentLen > 1 ? "nodes" : "node" }}. </span>
+    in grace period
   </div>
 </template>
 
@@ -22,10 +16,6 @@ import router from "@/router";
 export default {
   props: {
     deploymentLen: {
-      type: Number,
-      required: true,
-    },
-    withPubIpLen: {
       type: Number,
       required: true,
     },

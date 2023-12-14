@@ -92,6 +92,7 @@ export default {
         await gridStore.grid.farms.create({ name: props.name });
         createCustomToast("Farm created successfully.", ToastType.success);
         createCustomToast("Table may take sometime to update the changes.", ToastType.info);
+        showDialogue.value = false;
         await props.userFarms.reloadFarms();
       } catch (error) {
         console.log(error);

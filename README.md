@@ -42,6 +42,12 @@ yarn install
 yarn lerna run build
 ```
 
+> If the build fails due to a memory issue, please use the following command
+
+```bash
+export NODE_OPTIONS="--max-old-space-size=8192"
+```
+
 ## Related Documentations
 
 - [Configure the editor/IDE](./docs/editor_config.md)
