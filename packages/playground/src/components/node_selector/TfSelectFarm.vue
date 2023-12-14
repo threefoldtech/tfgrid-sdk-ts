@@ -3,7 +3,7 @@
     <VAutocomplete
       label="Farm Name"
       placeholder="Select a farm"
-      class="w-100"
+      class="w-100 mb-1"
       :items="farms"
       :loading="farmsTask.loading"
       item-title="name"
@@ -21,13 +21,18 @@
       :hint="
         !validFilters
           ? 'Please provide valid data.'
-          : pageCountTask.loading
+          : pageCountTask.loading || !farmsTask.initialized
           ? 'Preparing to load farms'
           : searchQuery === '' && !menuOpened && focused
           ? 'Type any desired farm name to search for...'
           : undefined
       "
-      :persistent-hint="!validFilters || pageCountTask.loading || (searchQuery === '' && !menuOpened && focused)"
+      :persistent-hint="
+        !validFilters ||
+        !farmsTask.initialized ||
+        pageCountTask.loading ||
+        (searchQuery === '' && !menuOpened && focused)
+      "
       :disabled="!validFilters"
     >
       <template #no-data v-if="searchTask.loading">
@@ -128,6 +133,8 @@ export default {
     }
 
     const reloadFarms = () => farmsTask.value.run(gridStore, filters.value, props.filters.exclusiveFor);
+
+    useWatchDeep(filters, farmsTask.value.reset);
     useWatchDeep(
       filters,
       async filters => {

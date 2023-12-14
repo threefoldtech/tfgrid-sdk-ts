@@ -1,7 +1,7 @@
 <template>
   <section>
     <VFadeTransition>
-      <VAlert type="warning" class="mb-4 mt-2" v-if="filtersUpdated">
+      <VAlert type="warning" class="mb-4 mt-1" v-if="filtersUpdated">
         Please press on <strong>Load Nodes</strong> button to list nodes matching your new requirements.
       </VAlert>
     </VFadeTransition>
