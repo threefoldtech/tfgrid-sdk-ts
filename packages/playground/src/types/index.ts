@@ -245,14 +245,10 @@ export type NodeFilterOptions = {
   page: number;
   size: number;
 };
-type TableSortOption = {
-  key: string | undefined;
-  order: boolean | "desc" | "asc" | undefined;
-};
+
 export type FarmFilterOptions = {
   page?: number;
   size?: number;
-  sortBy?: TableSortOption[];
 };
 
 export const nodeOptionsInitializer: NodeFilterOptions = {
