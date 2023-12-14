@@ -214,7 +214,7 @@ export default {
         farmsCount.value = count || filteredFarms.length;
       } catch (error) {
         console.log(error);
-        createCustomToast("Failed to get user farms!", ToastType.danger);
+        createCustomToast("Failed to get farms. Please check your connection.", ToastType.danger);
       } finally {
         loading.value = false;
       }
