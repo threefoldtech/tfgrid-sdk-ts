@@ -26,9 +26,7 @@
           v-bind:sortable="false"
           :on-update:sort-by="undefined"
           class="elevation-1"
-          :on-update:items-per-page="updateQueries"
           :on-update:model-value="updateQueries"
-          :on-update:page="updateQueries"
           @click:row="openSheet"
         >
           <template #loading />
