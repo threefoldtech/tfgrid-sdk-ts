@@ -32,7 +32,7 @@
     </v-row>
     <v-dialog v-model="dialog" hide-overlay transition="dialog-bottom-transition">
       <v-container>
-        <v-toolbar color="primary" :height="35">
+        <v-toolbar :height="35">
           <div class="ml-auto">
             <v-btn icon dark @click="() => (dialog = false)">
               <v-icon>mdi-close</v-icon>
