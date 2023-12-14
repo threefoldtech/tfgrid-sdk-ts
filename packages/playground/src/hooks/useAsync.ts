@@ -21,6 +21,7 @@ export type AsyncTaskOptions<T, E, A extends any[]> = {
   onBeforeTask?(): any;
   onReset?(): void;
   shouldRun?(): boolean;
+  tries?: number;
 };
 function normalizeOptions<T, E, A extends any[]>(
   options: AsyncTaskOptions<T, E, A> = {},
@@ -33,6 +34,7 @@ function normalizeOptions<T, E, A extends any[]>(
     onBeforeTask: options.onBeforeTask || noop,
     onReset: options.onReset || noop,
     shouldRun: options.shouldRun || (() => true),
+    tries: typeof options.tries !== "number" ? 3 : Math.max(1, options.tries),
   };
 }
 
@@ -53,45 +55,59 @@ export function useAsync<T, E = Error, A extends any[] = []>(
 
   const asyncTask = computed(() => {
     const init = initialized.value;
+    const isLoading = loading.value;
 
     return {
       run,
-      data: init ? data.value : _options.default,
-      error: init ? error.value : null,
-      loading: init ? loading.value : false,
+      data: init && !isLoading ? data.value : _options.default,
+      error: init && !isLoading ? error.value : null,
+      loading: init ? isLoading : false,
       initialized: init,
       reset,
     };
   });
 
-  async function run(...args: A) {
+  async function run(...args: A): Promise<void> {
     if (!_options.shouldRun()) {
       initialized.value = false;
       return;
     }
 
     initialized.value = true;
+    const ret = _options.onBeforeTask();
     const taskId = ++taskIdCounter;
     loading.value = true;
-    error.value = null;
-    data.value = _options.default;
-    const ret = _options.onBeforeTask();
 
+    for (let i = 0; i < _options.tries; i++) {
+      if (taskId !== taskIdCounter) {
+        return;
+      }
+
+      if (await __run(args, taskId)) {
+        break;
+      }
+    }
+
+    if (taskId === taskIdCounter) {
+      loading.value = false;
+      _options.onAfterTask(asyncTask.value, ret);
+    }
+  }
+
+  async function __run(args: A, taskId: number): Promise<boolean> {
     try {
       const res = await task(...args);
       if (taskId === taskIdCounter) {
         data.value = res;
+        error.value = null;
       }
+      return true;
     } catch (err) {
       if (taskId === taskIdCounter) {
         data.value = _options.default;
         error.value = err as E;
       }
-    } finally {
-      if (taskId === taskIdCounter) {
-        loading.value = false;
-        _options.onAfterTask(asyncTask.value, ret);
-      }
+      return false;
     }
   }
 
