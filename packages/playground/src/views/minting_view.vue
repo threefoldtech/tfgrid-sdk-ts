@@ -107,7 +107,7 @@
                 <input-tooltip
                   inline
                   :alignCenter="true"
-                  :tooltip="`${(item.Minting.tft_connection_price / 1e3).toFixed(3)}$/TFT`"
+                  :tooltip="`1 TFT = ${(item.Minting.tft_connection_price / 1e3).toFixed(3)}$`"
                 >
                   Farmed {{ (item.Minting.reward.tft / 1e7).toFixed(3) }} TFT that's almost =
                   {{ (item.Minting.reward.musd / 1e3).toFixed(3) }}$
