@@ -1,7 +1,7 @@
 <template>
   <section>
     <VFadeTransition>
-      <VAlert type="warning" class="mb-4 mt-1" v-if="filtersUpdated">
+      <VAlert type="warning" class="mb-4 mt-1" v-if="filtersUpdated && validFilters">
         Please press on <strong>Load Nodes</strong> button to list nodes matching your new requirements.
       </VAlert>
     </VFadeTransition>
@@ -84,7 +84,7 @@
           class="mt-2 ml-2"
           @click="resetPageAndReloadNodes()"
           :loading="pageCountTask.loading || nodesTask.loading"
-          :disabled="nodeInputValidateTask.loading"
+          :disabled="nodeInputValidateTask.loading || !validFilters"
         >
           Load Nodes
         </VBtn>
