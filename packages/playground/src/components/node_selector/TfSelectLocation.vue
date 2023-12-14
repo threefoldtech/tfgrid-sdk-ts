@@ -2,7 +2,7 @@
   <section>
     <h6 class="text-h5 mb-4 mt-2">Choose a Location</h6>
 
-    <VAlert type="error" class="text-body-1" v-if="locationsTask.error">
+    <VAlert type="error" class="text-body-1 mb-4" v-if="locationsTask.error">
       Failed to load locations. Please try again!
       <template #append>
         <VBtn icon="mdi-reload" color="error" variant="plain" density="compact" @click="locationsTask.run()" />
