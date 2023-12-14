@@ -32,10 +32,10 @@
     </v-row>
     <v-dialog v-model="dialog" hide-overlay transition="dialog-bottom-transition">
       <v-container>
-        <v-toolbar :height="35">
-          <div class="d-flex justify-center">
+        <v-toolbar color="primary">
+          <div class="ml-auto">
             <v-btn icon dark @click="() => (dialog = false)">
-              <v-icon size="20s">mdi-close</v-icon>
+              <v-icon>mdi-close</v-icon>
             </v-btn>
           </div>
         </v-toolbar>
