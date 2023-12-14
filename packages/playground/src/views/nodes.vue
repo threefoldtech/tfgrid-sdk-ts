@@ -92,7 +92,7 @@
       </div>
     </div>
     <node-details
-      :options="selectedNodeoptions"
+      :filter-options="filterOptions"
       :nodeId="selectedNodeId"
       :openDialog="isDialogOpened"
       @close-dialog="closeDialog"
@@ -104,8 +104,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
 import debounce from "lodash/debounce.js";
-import { capitalize, onMounted, ref, watch } from "vue";
-import { computed } from "vue";
+import { capitalize, computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import NodeDetails from "@/components/node_details.vue";
@@ -137,12 +136,6 @@ export default {
     const nodesCount = ref<number>(0);
 
     const selectedNodeId = ref<number>(0);
-    const selectedNodeoptions = ref<GridProxyRequestConfig>({
-      loadFarm: true,
-      loadTwin: true,
-      loadStats: true,
-      loadGpu: true,
-    });
 
     const isDialogOpened = ref<boolean>(false);
     const isValidForm = ref<boolean>(false);
@@ -157,7 +150,7 @@ export default {
         try {
           const { count, data } = await requestNodes(queries, config);
           nodes.value = data;
-            nodesCount.value = count ?? 0
+          nodesCount.value = count ?? 0;
         } catch (err) {
           console.log(err);
         } finally {
@@ -225,7 +218,6 @@ export default {
       nodesCount,
 
       selectedNodeId,
-      selectedNodeoptions,
       nodeStatusOptions,
 
       filterInputs,
