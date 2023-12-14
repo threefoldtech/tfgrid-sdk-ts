@@ -13,8 +13,6 @@
           :loading="loading"
           :headers="headers"
           :items="farms"
-          :sort-asc-icon="false"
-          :sort-desc-icon="false"
           :items-length="totalFarms"
           :items-per-page-options="[
             { value: 5, title: '5' },
@@ -23,9 +21,7 @@
           ]"
           v-model:items-per-page="size"
           v-model:page="page"
-          v-bind:sortable="false"
-          :on-update:sort-by="undefined"
-          class="elevation-1"
+          :disable-sort="true"
           :on-update:model-value="updateQueries"
           @click:row="openSheet"
         >
@@ -165,8 +161,8 @@ const closeDialog = () => {
 };
 
 const headers: VDataTableHeader = [
-  { title: "ID", key: "farmId" },
-  { title: "Name", key: "name" },
+  { title: "ID", key: "farmId", sortable: false },
+  { title: "Name", key: "name", sortable: false },
   {
     title: "Total Public IPs",
     key: "totalPublicIp",
