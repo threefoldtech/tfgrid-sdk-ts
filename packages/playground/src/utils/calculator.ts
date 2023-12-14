@@ -33,12 +33,17 @@ interface PricingInfo {
   };
 }
 
+type Level = {
+  duration: number;
+  discount: number;
+};
+
 type DiscountLevels = {
-  none: { duration: number; discount: number };
-  default: { duration: number; discount: number };
-  bronze: { duration: number; discount: number };
-  silver: { duration: number; discount: number };
-  gold: { duration: number; discount: number };
+  none: Level;
+  default: Level;
+  bronze: Level;
+  silver: Level;
+  gold: Level;
 };
 
 class Calculator {

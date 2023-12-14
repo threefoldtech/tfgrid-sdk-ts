@@ -115,7 +115,7 @@
             <input-tooltip tooltip="The amount of TFT to calculate discount.">
               <v-text-field
                 label="Balance"
-                :disabled="currentbalance"
+                :disabled="currentbalance && hasActiveProfile"
                 suffix="TFT"
                 type="number"
                 v-bind="props"
@@ -222,15 +222,19 @@ const prices = ref<PriceType[]>([]);
 
 const grid = ref();
 const profileManager = useProfileManager();
-const hasActiveProfile = computed(() => !!profileManager.profile);
-const calculator = computed(() => grid.value?.calculator || new Calculator());
+const hasActiveProfile = computed(() => {
+  return !!profileManager.profile;
+});
+const calculator = computed(() => {
+  return hasActiveProfile.value ? grid.value?.calculator : new Calculator();
+});
 watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance], async () => {
   let pkgs: any;
   if (!valid.value.error) {
     if (currentbalance.value) {
       const accountBalance = await grid.value?.balance.getMyBalance();
-      balance.value = accountBalance.free;
-      pkgs = await grid.value.calculator.calculateWithMyBalance({
+      balance.value = accountBalance?.free;
+      pkgs = await grid.value?.calculator.calculateWithMyBalance({
         cru: CRU.value,
         mru: MRU.value,
         hru: HRU.value,
@@ -262,7 +266,7 @@ watch(currentbalance, (newCurrentBalance, oldCurrentBalance) => {
 });
 
 async function setPriceList(pkgs: any): Promise<PriceType[]> {
-  TFTPrice.value = await calculator.value.tftPrice();
+  TFTPrice.value = await calculator.value?.tftPrice();
   prices.value = [
     {
       label: "Dedicated Node",
@@ -287,9 +291,10 @@ async function setPriceList(pkgs: any): Promise<PriceType[]> {
 }
 
 onMounted(async () => {
-  getGrid(profileManager.profile!)
-    .then(async result => {
-      grid.value = result;
+  if (hasActiveProfile.value) {
+    getGrid(profileManager.profile!);
+  } else {
+    try {
       const pkgs = await calculator.value.calculate({
         cru: CRU.value,
         mru: MRU.value,
@@ -300,10 +305,10 @@ onMounted(async () => {
         balance: balance.value,
       });
       await setPriceList(pkgs);
-    })
-    .catch(error => {
+    } catch (error) {
       console.error("Error fetching the grid:", error);
-    });
+    }
+  }
 });
 
 function openManual() {
