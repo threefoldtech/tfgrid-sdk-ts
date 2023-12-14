@@ -187,7 +187,7 @@ async function deploy() {
       name: name.value,
       network: {
         accessNodeId: selectionDetails.value?.domain?.selectedDomain?.nodeId,
-        addAccess: !selectionDetails.value?.domain?.enableSelectedDomain,
+        addAccess: selectionDetails.value?.domain?.enableSelectedDomain,
       },
       machines: [
         {
@@ -255,7 +255,7 @@ async function deploy() {
       ip: vm[0].interfaces[0].ip,
       port: 80,
       networkName: vm[0].interfaces[0].network,
-      fqdn: selectedDomain?.useFQDN ? domain.publicConfig.domain : undefined,
+      fqdn: selectedDomain?.useFQDN ? selectedDomain.customDomain : undefined,
     });
 
     finalize(vm);
