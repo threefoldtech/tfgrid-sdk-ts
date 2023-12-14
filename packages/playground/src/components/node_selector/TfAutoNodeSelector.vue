@@ -144,6 +144,7 @@ export default {
         if (oldNodeId) {
           const index = loadedNodes.value.findIndex(n => n.nodeId === oldNodeId);
           bindModelValue(loadedNodes.value[index]);
+          index !== -1 && nodeInputValidateTask.value.run(loadedNodes.value[index]);
         }
         nextPage();
       },
