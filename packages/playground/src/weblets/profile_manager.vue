@@ -357,8 +357,8 @@
                 <a
                   v-for="app in apps"
                   :key="app.alt"
-                  :style="{ cursor: 'pointer', width: '150px' }"
-                  class="mr-2"
+                  :style="{ cursor: 'pointer', width: '9rem' }"
+                  class="app-btn mr-2"
                   :title="app.alt"
                   v-html="app.src"
                   :href="app.url"
@@ -763,5 +763,10 @@ export default {
 <style>
 .v-field__input {
   font-size: small;
+}
+@media only screen and (max-width: 1400px) {
+  .app-btn {
+    width: 8rem !important;
+  }
 }
 </style>
