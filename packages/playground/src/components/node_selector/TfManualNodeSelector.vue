@@ -10,11 +10,16 @@
       :error-messages="validationTask.error || undefined"
       :disabled="!validFilters"
       :persistent-hint="
-        !validFilters || validationTask.loading || (validationTask.initialized && validationTask.data === true)
+        (nodeId && !validationTask.initialized) ||
+        !validFilters ||
+        validationTask.loading ||
+        (validationTask.initialized && validationTask.data === true)
       "
       :hint="
         !validFilters
           ? 'Please provide valid data.'
+          : nodeId && !validationTask.initialized
+          ? 'Preparing to validate node.'
           : validationTask.loading
           ? 'Validating node...'
           : validationTask.data
@@ -61,7 +66,7 @@ export default {
     const nodeId = ref<number>();
 
     // reset node to mark form as invalid
-    watch(nodeId, () => ctx.emit("update:model-value"));
+    watch(nodeId, () => bindModelValue());
 
     const validationTask = useAsync<true | string, string, [id: number | undefined]>(
       async nodeId => {
@@ -128,30 +133,47 @@ export default {
             throw `Node ${nodeId} doesn't have enough Storage`;
         }
 
-        ctx.emit("update:model-value", node);
+        bindModelValue(node);
         return true;
       },
       {
+        onReset: bindStatus,
         shouldRun: () => props.validFilters,
-        onBeforeTask: () => ctx.emit("update:status", ValidatorStatus.Pending),
+        onBeforeTask: () => bindStatus(ValidatorStatus.Pending),
         onAfterTask: ({ data }) => {
-          ctx.emit("update:status", data ? ValidatorStatus.Valid : ValidatorStatus.Invalid);
+          bindStatus(data ? ValidatorStatus.Valid : ValidatorStatus.Invalid);
         },
       },
     );
 
+    // reset validation to prevent form from being valid
+    useWatchDeep(() => props.filters, validationTask.value.reset);
+
     // revalidate if filters updated
     useWatchDeep(
       () => props.filters,
-      () => validationTask.value.initialized && nodeId.value && validationTask.value.run(nodeId.value),
+      () => nodeId.value && validationTask.value.run(nodeId.value),
+      { debounce: 250 },
     );
 
     useWatchDeep(nodeId, validationTask.value.run, { debounce: 250 });
+    useWatchDeep(
+      () => props.validFilters,
+      valid => !valid && validationTask.value.initialized && validationTask.value.reset(),
+    );
 
     onUnmounted(() => {
-      ctx.emit("update:model-value");
-      ctx.emit("update:status", ValidatorStatus.Init);
+      bindModelValue();
+      bindStatus();
     });
+
+    function bindModelValue(node?: NodeInfo): void {
+      ctx.emit("update:model-value", node);
+    }
+
+    function bindStatus(status?: ValidatorStatus): void {
+      ctx.emit("update:status", status || ValidatorStatus.Init);
+    }
 
     return { nodeId, validationTask };
   },
