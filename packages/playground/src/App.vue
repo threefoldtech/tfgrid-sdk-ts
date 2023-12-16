@@ -1,5 +1,6 @@
 <template>
   <v-app>
+    <TfNavigationLoader />
     <profile-manager-controller>
       <v-navigation-drawer
         width="280"
@@ -389,6 +390,7 @@ import FundsCard from "./components/funds_card.vue";
 import ProfileManagerController from "./components/profile_manager_controller.vue";
 import TftSwapPrice from "./components/swap_price.vue";
 import TFNotification from "./components/tf_notification.vue";
+import TfNavigationLoader from "./components/TfNavigationLoader.vue";
 import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
 
@@ -420,6 +422,7 @@ export default {
     TftSwapPrice,
     FundsCard,
     ProfileManagerController,
+    TfNavigationLoader,
   },
 };
 </script>
