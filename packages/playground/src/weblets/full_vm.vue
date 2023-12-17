@@ -5,7 +5,6 @@
     :memory="solution?.memory"
     :disk="disks.reduce((total, disk) => total + disk.size, solution?.disk + 2)"
     :ipv4="ipv4"
-    :certified="certified"
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
     title-image="images/icons/vm.png"
