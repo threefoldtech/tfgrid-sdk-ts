@@ -1,7 +1,9 @@
 <template>
   <div :style="{ paddingBottom: '250px' }">
     <v-alert type="info" variant="tonal">
-      Connect your TFChain Wallet <a class="app-link" @click="$emit('openProfile')">here</a>
+      Connect your TFChain
+      <a class="app-link" @click="$emit('openProfile')">Wallet</a>
+      to view {{ pageTitle }}
     </v-alert>
     <v-container class="custom-container">
       <h4 class="text-center text-h3 mt-16">A Co-Owned Global Sovereign Internet</h4>
@@ -75,6 +77,8 @@
 </template>
 
 <script lang="ts">
+import { computed } from "vue";
+import { useRoute } from "vue-router";
 import { useTheme } from "vuetify";
 
 import { getCapacityURL } from "../utils/getCapacityUrl";
@@ -86,9 +90,11 @@ export default {
     const baseUrl = import.meta.env.BASE_URL;
     const network = process.env.NETWORK || (window as any).env.NETWORK;
     const capacityURL = getCapacityURL(network);
-
+    const route = useRoute();
+    const pageTitle = computed(() => route.meta.title);
     return {
       theme,
+      pageTitle,
       stats: [
         {
           label: "Capacity",
