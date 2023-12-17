@@ -4,6 +4,7 @@ import { KeypairType } from "@polkadot/util-crypto/types";
 import { waitReady } from "@polkadot/wasm-crypto";
 import { Client as TFClient } from "@threefold/tfchain_client";
 import { ConnectionError, InvalidResponse, RMBError, TimeoutError, ValidationError } from "@threefold/types";
+import AwaitLock from "await-lock";
 import base64url from "base64url";
 import { Buffer } from "buffer";
 import { v4 as uuidv4 } from "uuid";
@@ -16,6 +17,7 @@ import { generatePublicKey } from "./util";
 
 class Client {
   static connections = new Map<string, Client>();
+  private connectingLock = new AwaitLock();
   signer!: KeyringPair;
   source: Address = new Address();
   responses = new Map<string, ClientEnvelope>();
@@ -96,55 +98,60 @@ class Client {
     }
   }
   async connect() {
-    if (this.con) return;
-
-    await this.tfclient.connect();
-    await this.createSigner();
-    const twinId = await this.tfclient.twins.getTwinIdByAccountId({ accountId: this.signer.address });
-    this.twin = await this.tfclient.twins.get({ id: twinId });
-    if (!twinId) {
-      throw new ValidationError(`Couldn't find a user for the provided mnemonic on this network.`);
-    }
-
     try {
-      if (!this.twin) {
-        throw new ValidationError("twin does not exist, please create a twin first");
-      }
-      const relayHostName = this.relayUrl.replace("wss://", "").replace("/", "");
-      const pk = generatePublicKey(this.mnemonics);
-      if (this.twin.pk !== pk || this.twin.relay !== relayHostName) {
-        await (await this.tfclient.twins.update({ pk, relay: relayHostName })).apply();
-        this.twin.pk = pk;
+      await this.connectingLock.acquireAsync();
+      if (this.con) return;
+
+      await this.tfclient.connect();
+      await this.createSigner();
+      const twinId = await this.tfclient.twins.getTwinIdByAccountId({ accountId: this.signer.address });
+      this.twin = await this.tfclient.twins.get({ id: twinId });
+      if (!twinId) {
+        throw new ValidationError(`Couldn't find a user for the provided mnemonic on this network.`);
       }
 
-      this.updateSource();
-      this.createConnection();
-      await this.waitForOpenConnection();
-      this.__pingPong();
+      try {
+        if (!this.twin) {
+          throw new ValidationError("twin does not exist, please create a twin first");
+        }
+        const relayHostName = this.relayUrl.replace("wss://", "").replace("/", "");
+        const pk = generatePublicKey(this.mnemonics);
+        if (this.twin.pk !== pk || this.twin.relay !== relayHostName) {
+          await (await this.tfclient.twins.update({ pk, relay: relayHostName })).apply();
+          this.twin.pk = pk;
+        }
 
-      if (this.isEnvNode()) {
-        process.on("SIGTERM", this.disconnectAndExit);
-        process.on("SIGINT", this.disconnectAndExit);
-        process.on("SIGUSR1", this.disconnectAndExit);
-        process.on("SIGUSR2", this.disconnectAndExit);
-      } else {
-        window.onbeforeunload = () => {
-          return "";
-        };
-        window.onunload = this.disconnect;
+        this.updateSource();
+        this.createConnection();
+        await this.waitForOpenConnection();
+        this.__pingPong();
+
+        if (this.isEnvNode()) {
+          process.on("SIGTERM", this.disconnectAndExit);
+          process.on("SIGINT", this.disconnectAndExit);
+          process.on("SIGUSR1", this.disconnectAndExit);
+          process.on("SIGUSR2", this.disconnectAndExit);
+        } else {
+          window.onbeforeunload = () => {
+            return "";
+          };
+          window.onunload = this.disconnect;
+        }
+      } catch (err) {
+        const c = this.con as WSConnection;
+        if (c && c.readyState == c.OPEN) {
+          c.close();
+        }
+        console.log(err);
+        throw new ConnectionError(
+          `Unable to establish a connection with the RMB server ${this.relayUrl.replace(
+            "wss://",
+            "",
+          )}. Please check your internet connection and try again. If the problem persists, please contact our support.`,
+        );
       }
-    } catch (err) {
-      const c = this.con as WSConnection;
-      if (c && c.readyState == c.OPEN) {
-        c.close();
-      }
-      console.log(err);
-      throw new ConnectionError(
-        `Unable to establish a connection with the RMB server ${this.relayUrl.replace(
-          "wss://",
-          "",
-        )}. Please check your internet connection and try again. If the problem persists, please contact our support.`,
-      );
+    } finally {
+      this.connectingLock.release();
     }
   }
 

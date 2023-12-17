@@ -89,30 +89,31 @@ class QueryClient {
   async connect() {
     this.checkInputs();
     await this.loadKeyPairOrSigner();
-    if (this.api && this.api.isConnected) return;
-    if (Object.keys(QueryClient.connections).includes(this.url)) {
-      this.api = QueryClient.connections[this.url];
-      if (this.api && this.api.isConnected) return;
+    try {
       await this.connectingLock.acquireAsync();
+      if (this.api && this.api.isConnected) return;
+      if (Object.keys(QueryClient.connections).includes(this.url)) {
+        this.api = QueryClient.connections[this.url];
+        if (this.api && this.api.isConnected) return;
+        await this.newProvider();
+        return;
+      }
+
       await this.newProvider();
+
+      if (isEnvNode()) {
+        process.on("SIGTERM", this.disconnectAndExit.bind(this));
+        process.on("SIGINT", this.disconnectAndExit.bind(this));
+        process.on("SIGUSR1", this.disconnectAndExit.bind(this));
+        process.on("SIGUSR2", this.disconnectAndExit.bind(this));
+      } else {
+        window.onbeforeunload = () => {
+          return "";
+        };
+        window.onunload = this.disconnect.bind(this);
+      }
+    } finally {
       this.connectingLock.release();
-      return;
-    }
-
-    await this.connectingLock.acquireAsync();
-    await this.newProvider();
-    this.connectingLock.release();
-
-    if (isEnvNode()) {
-      process.on("SIGTERM", this.disconnectAndExit.bind(this));
-      process.on("SIGINT", this.disconnectAndExit.bind(this));
-      process.on("SIGUSR1", this.disconnectAndExit.bind(this));
-      process.on("SIGUSR2", this.disconnectAndExit.bind(this));
-    } else {
-      window.onbeforeunload = () => {
-        return "";
-      };
-      window.onunload = this.disconnect.bind(this);
     }
   }
 
