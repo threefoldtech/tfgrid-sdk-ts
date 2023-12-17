@@ -197,6 +197,7 @@
                   You will need to provide the password used while connecting your wallet.
                 </p>
               </v-alert>
+              <v-autocomplete :items="[...keyType]" return-object item-title="name" v-model="keyPairType" />
               <PasswordInputWrapper #="{ props: passwordInputProps }">
                 <InputValidator
                   :value="password"
@@ -243,6 +244,9 @@
               </PasswordInputWrapper>
               <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="loginError">
                 {{ loginError }}
+              </v-alert>
+              <v-alert variant="tonal" type="warning">
+                <p>Using different keypair types will lead to a completely different account.</p>
               </v-alert>
             </FormValidator>
 
@@ -425,6 +429,8 @@ interface Credentials {
   passwordHash?: string;
   mnemonicHash?: string;
 }
+const keyType = ["sr25519", "ed25519"];
+const keyPairType = ref();
 
 const theme = useTheme();
 
@@ -700,6 +706,7 @@ profileManagerController.set({ loadBalance: __loadBalance });
 
 function login() {
   const credentials: Credentials = getCredentials();
+  console.log(credentials);
   if (credentials.mnemonicHash && credentials.passwordHash) {
     if (credentials.passwordHash === md5(password.value)) {
       const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
