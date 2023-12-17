@@ -96,6 +96,7 @@
 <script lang="ts">
 import type { FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
 import equals from "lodash/fp/equals.js";
+import sample from "lodash/fp/sample.js";
 import { computed, nextTick, onMounted, onUnmounted, type PropType, ref } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VInput } from "vuetify/components/VInput";
@@ -140,13 +141,30 @@ export default {
         bindModelValue();
         return oldNode?.nodeId;
       },
-      onAfterTask({ data }, oldNodeId: number) {
+      async onBeforeLoadingFinish(nodes, error, oldNodeId: number) {
+        if (oldNodeId || !nodes) {
+          return;
+        }
+
+        const checks = await Promise.allSettled(nodes.map(n => checkNodeCapacityPool(gridStore, n, props.filters)));
+        const allowedNodes = checks.map((c, i) => (c.status === "fulfilled" ? nodes[i] : null)).filter(Boolean);
+        const node = sample(allowedNodes);
+
+        if (node) {
+          touched.value = true;
+          bindModelValue(node);
+          bindStatus(ValidatorStatus.Valid);
+        }
+      },
+      async onAfterTask({ data }, oldNodeId: number) {
         loadedNodes.value = loadedNodes.value.concat(data as NodeInfo[]);
+
         if (oldNodeId) {
           const index = loadedNodes.value.findIndex(n => n.nodeId === oldNodeId);
           bindModelValue(loadedNodes.value[index]);
           index !== -1 && nodeInputValidateTask.value.run(loadedNodes.value[index]);
         }
+
         nextPage();
       },
       default: [],

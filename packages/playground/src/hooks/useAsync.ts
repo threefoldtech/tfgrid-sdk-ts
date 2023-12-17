@@ -17,10 +17,11 @@ export type AsyncTaskOptions<T, E, A extends any[]> = {
   init?: boolean;
   defaultArgs?: A;
   default?: T;
-  onAfterTask?(task: TaskResult<T, E, A>, beforeTaskReturn: any): void;
+  onAfterTask?(task: TaskResult<T, E, A>, beforeTaskReturn: any): any;
   onBeforeTask?(): any;
-  onReset?(): void;
-  shouldRun?(): boolean;
+  onBeforeLoadingFinish?(data: T | null, error: E | null, beforeTaskReturn: any): any;
+  onReset?(): any;
+  shouldRun?(): boolean | Promise<boolean>;
   tries?: number;
 };
 function normalizeOptions<T, E, A extends any[]>(
@@ -32,6 +33,7 @@ function normalizeOptions<T, E, A extends any[]>(
     default: options.default || (null as T),
     onAfterTask: options.onAfterTask || noop,
     onBeforeTask: options.onBeforeTask || noop,
+    onBeforeLoadingFinish: options.onBeforeLoadingFinish || noop,
     onReset: options.onReset || noop,
     shouldRun: options.shouldRun || (() => true),
     tries: typeof options.tries !== "number" ? 3 : Math.max(1, options.tries),
@@ -68,13 +70,13 @@ export function useAsync<T, E = Error, A extends any[] = []>(
   });
 
   async function run(...args: A): Promise<void> {
-    if (!_options.shouldRun()) {
+    if (!(await _options.shouldRun())) {
       initialized.value = false;
       return;
     }
 
     initialized.value = true;
-    const ret = _options.onBeforeTask();
+    const ret = await _options.onBeforeTask();
     const taskId = ++taskIdCounter;
     loading.value = true;
 
@@ -89,6 +91,7 @@ export function useAsync<T, E = Error, A extends any[] = []>(
     }
 
     if (taskId === taskIdCounter) {
+      await _options.onBeforeLoadingFinish(data.value, error.value, ret);
       loading.value = false;
       _options.onAfterTask(asyncTask.value, ret);
     }
