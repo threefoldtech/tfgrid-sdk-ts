@@ -36,6 +36,7 @@ import type { NodeInfo } from "@threefold/grid_client";
 import isInt from "validator/lib/isInt";
 import { onUnmounted, type PropType, ref, watch } from "vue";
 
+import { gridProxyClient } from "../../clients";
 import { useAsync, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
@@ -87,6 +88,15 @@ export default {
           throw normalizeError(e0, _defaultError);
         }
 
+        const [{ data: farms }, e1] = await resolveAsync(gridProxyClient.farms.list({ farmId: node.farmId }));
+        if (e1) {
+          throw normalizeError(e1, _defaultError);
+        }
+
+        if (farms.length === 0) {
+          throw "Couldn't load farm data for that Node ID";
+        }
+
         switch (true) {
           case node === undefined || node === null:
             throw `Node ${nodeId} is not on the grid`;
@@ -103,14 +113,14 @@ export default {
           case props.filters.dedicated && node.rentedByTwinId !== gridStore.client.twinId:
             throw `Node ${nodeId} is Dedicated, but rented by someone else`;
 
-          case props.filters.ipv4 && !node.publicConfig.ipv4:
+          case props.filters.ipv4 && farms[0].publicIps.every(p => p.contract_id !== 0):
             throw `Node ${nodeId} is not assigned to a PublicIP`;
         }
 
         const args = [nodeId, "proxy", gridStore.client.config.proxyURL] as const;
-        const [resources, e1] = await resolveAsync(gridStore.client.capacity.nodes.getNodeFreeResources(...args));
-        if (e1) {
-          throw normalizeError(e1, _defaultError);
+        const [resources, e2] = await resolveAsync(gridStore.client.capacity.nodes.getNodeFreeResources(...args));
+        if (e2) {
+          throw normalizeError(e2, _defaultError);
         }
 
         const { cru, mru, sru } = resources;
