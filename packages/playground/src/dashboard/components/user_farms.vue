@@ -122,6 +122,7 @@ import { gridProxyClient } from "@/clients";
 import CardDetails from "@/components/node_details_cards/card_details.vue";
 import { useGrid, useProfileManager } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import { normalizeError } from "@/utils/helpers";
 import {
   generateNodeSummary,
   generateReceipt,
@@ -214,7 +215,10 @@ export default {
         farmsCount.value = count || filteredFarms.length;
       } catch (error) {
         console.log(error);
-        createCustomToast("Failed to get farms. Please check your connection.", ToastType.danger);
+        createCustomToast(
+          normalizeError(error as Error | string | undefined, "Failed to get farms. Please check your connection."),
+          ToastType.danger,
+        );
       } finally {
         loading.value = false;
       }
