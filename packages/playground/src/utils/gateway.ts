@@ -1,8 +1,7 @@
 import { type FilterOptions, GatewayFQDNModel, GatewayNameModel, type GridClient } from "@threefold/grid_client";
 
 import { SolutionCode } from "@/types";
-
-import { migrateModule } from "./migration";
+import type { DomainInfo } from "@/types/nodeSelector";
 
 export function loadGatewayNodes(grid: GridClient, options: Omit<FilterOptions, "gateway"> = {}) {
   return grid.capacity
@@ -51,6 +50,48 @@ export async function deployGatewayName(grid: GridClient, options: DeployGateway
     return grid.gateway.deploy_fqdn(domain);
   }
   return grid.gateway.deploy_name(gateway);
+}
+
+export interface DeployGatewayConfig {
+  subdomain: string;
+  ip: string;
+  port: number;
+  network: string;
+  tlsPassthrough?: boolean;
+}
+
+export async function deployGatewayName2(
+  grid: GridClient | null,
+  domain: DomainInfo | undefined,
+  config: DeployGatewayConfig,
+) {
+  if (!grid) {
+    throw new Error("Please provide a valid grid connection");
+  }
+
+  if (!domain || !domain.selectedDomain) {
+    throw new Error("Please provide a valid domain name data.");
+  }
+
+  //invalidating the cashed keys
+  await grid.gateway.getObj(config.subdomain);
+
+  const id = process.env.INTERNAL_SOLUTION_PROVIDER_ID;
+
+  const gw = new GatewayNameModel();
+  gw.name = config.subdomain;
+  gw.node_id = domain.selectedDomain.nodeId;
+  gw.tls_passthrough = config.tlsPassthrough || false;
+  gw.backends = [`${config.tlsPassthrough ? "" : "http://"}${config.ip}:${config.port}`];
+  gw.network = config.network;
+  gw.solutionProviderId = id ? +id : undefined;
+
+  if (domain.useFQDN) {
+    (gw as GatewayFQDNModel).fqdn = domain.customDomain;
+    return grid.gateway.delete_fqdn(gw);
+  }
+
+  return grid.gateway.delete_name(gw);
 }
 
 export async function rollbackDeployment(grid: GridClient, name: string) {

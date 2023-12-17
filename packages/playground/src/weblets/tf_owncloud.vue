@@ -129,7 +129,7 @@ import { useProfileManager } from "../stores";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
-import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
+import { deployGatewayName2, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { generateName, generatePassword } from "../utils/strings";
 
@@ -235,27 +235,20 @@ async function deploy() {
     return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a owncloud instance."));
   }
 
-  const selectedDomain = selectionDetails.value?.domain;
-
-  if (!selectedDomain?.enableSelectedDomain) {
+  if (!selectionDetails.value?.domain?.enableSelectedDomain) {
     vm[0].customDomain = selectionDetails.value?.domain?.customDomain;
     finalize(vm);
     return;
   }
+
   try {
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
 
-    const domain = selectedDomain.selectedDomain;
-    if (!domain) {
-      throw new Error("Please provide a valid domain name data.");
-    }
-    await deployGatewayName(grid!, {
-      name: subdomain,
-      nodeId: domain.nodeId!,
+    await deployGatewayName2(grid, selectionDetails.value.domain, {
+      subdomain,
       ip: vm[0].interfaces[0].ip,
       port: 80,
-      networkName: vm[0].interfaces[0].network,
-      fqdn: selectedDomain?.useFQDN ? selectedDomain.customDomain : undefined,
+      network: vm[0].interfaces[0].network,
     });
 
     finalize(vm);

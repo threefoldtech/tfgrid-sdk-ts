@@ -4,7 +4,7 @@ import type { Profile } from "../stores/profile_manager";
 
 const network = (process.env.NETWORK as NetworkEnv) || window.env.NETWORK;
 
-export async function getGrid(profile: Pick<Profile, "mnemonic">, projectName?: string) {
+export async function getGrid(profile?: Pick<Profile, "mnemonic">, projectName?: string) {
   if (!profile) return null;
   const grid = new GridClient({
     mnemonic: profile.mnemonic,
