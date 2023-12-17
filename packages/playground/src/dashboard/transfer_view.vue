@@ -37,8 +37,11 @@
                 :rules="[
                   validators.required('Transfer amount is required '),
                   validators.isNumeric('Amount should be a number.'),
-                  validators.min('Amount must be greater than 0', 0.001),
-                  validators.max('Insufficient funds', +freeBalance.toFixed(3)),
+                  validators.min('Amount must be greater than 0.', 0.001),
+                  validators.max('Insufficient funds.', freeBalance),
+                  validators.pattern('Amount can have 3 decimals only.', {
+                    pattern: /^\d+(\.\d{1,3})?$/,
+                  }),
                 ]"
                 #="{ props }"
               >
@@ -87,8 +90,11 @@
                 :rules="[
                   validators.required('Transfer amount is required '),
                   validators.isNumeric('Amount should be a number.'),
-                  validators.min('Amount must be greater than 0', 0.001),
-                  validators.max('Insufficient funds', +freeBalance.toFixed(3)),
+                  validators.min('Amount must be greater than 0.', 0.001),
+                  validators.max('Insufficient funds.', freeBalance),
+                  validators.pattern('Amount can have 3 decimals only.', {
+                    pattern: /^\d+(\.\d{1,3})?$/,
+                  }),
                 ]"
                 #="{ props }"
               >
