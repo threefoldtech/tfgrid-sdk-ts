@@ -114,7 +114,7 @@ export default {
           case props.filters.dedicated && node.rentedByTwinId !== gridStore.client.twinId:
             throw `Node ${nodeId} is Dedicated, but rented by someone else`;
 
-          case node.rentedByTwinId !== gridStore.client.twinId:
+          case node.rentedByTwinId !== 0 && node.rentedByTwinId !== gridStore.client.twinId:
             throw `Node ${nodeId} is rented by someone else`;
 
           case props.filters.ipv4 && farms[0].publicIps.every(p => p.contract_id !== 0):
@@ -162,15 +162,16 @@ export default {
 
     // reset validation to prevent form from being valid
     useWatchDeep(() => props.filters, validationTask.value.reset);
+    useWatchDeep(nodeId, validationTask.value.reset);
 
     // revalidate if filters updated
     useWatchDeep(
       () => props.filters,
       () => nodeId.value && validationTask.value.run(nodeId.value),
-      { debounce: 250 },
+      { debounce: 1000 },
     );
 
-    useWatchDeep(nodeId, validationTask.value.run, { debounce: 250 });
+    useWatchDeep(nodeId, validationTask.value.run, { debounce: 1000 });
     useWatchDeep(
       () => props.validFilters,
       valid => !valid && validationTask.value.initialized && validationTask.value.reset(),
