@@ -88,6 +88,10 @@ export default {
           throw normalizeError(e0, _defaultError);
         }
 
+        if (node === undefined || node === null) {
+          throw `Node ${nodeId} is not on the grid`;
+        }
+
         const [{ data: farms }, e1] = await resolveAsync(gridProxyClient.farms.list({ farmId: node.farmId }));
         if (e1) {
           throw normalizeError(e1, _defaultError);
@@ -98,9 +102,6 @@ export default {
         }
 
         switch (true) {
-          case node === undefined || node === null:
-            throw `Node ${nodeId} is not on the grid`;
-
           case node.status === "down":
             throw `Node ${nodeId} is down`;
 
