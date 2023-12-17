@@ -142,7 +142,7 @@ export default {
         return oldNode?.nodeId;
       },
       async onBeforeLoadingFinish(nodes, error, oldNodeId: number) {
-        if (oldNodeId || !nodes) {
+        if (oldNodeId || !nodes || error) {
           return;
         }
 
