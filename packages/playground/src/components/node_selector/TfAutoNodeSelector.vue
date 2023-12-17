@@ -105,6 +105,7 @@ import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
 import type { SelectedLocation, SelectionDetailsFilters } from "../../types/nodeSelector";
 import {
+  checkNodeCapacityPool,
   createPageGen,
   getNodePageCount,
   loadNodes,
@@ -213,34 +214,7 @@ export default {
     }
 
     const nodeInputValidateTask = useAsync<true, string, [NodeInfo | undefined]>(
-      async node => {
-        if (!node || !node.nodeId) {
-          throw "Node ID is required.";
-        }
-
-        try {
-          await gridStore.client.capacity.checkNodeCapacityPool({
-            nodeId: node.nodeId,
-            ssdDisks: [props.filters.solutionDisk ?? 0, ...(props.filters.ssdDisks || [])]
-              .filter(Boolean)
-              .map(disk => disk * 1024 ** 3),
-            rootfsDisks: [(props.filters.rootFilesystemSize ?? 0) * 1024 ** 3],
-            hddDisks: props.filters.hddDisks || [],
-          });
-          return true;
-        } catch (error) {
-          if (error?.toString().includes("Cannot fit the required SSD disk with size")) {
-            throw (
-              "Although node " +
-              node.nodeId +
-              " appears to have sufficient storage capacity for your workload, it lacks a single internal " +
-              "partition capable of accommodating it. Please select a different node."
-            );
-          }
-
-          throw "Something went wrong while checking status of the node. Please check your connection and try again.";
-        }
-      },
+      node => checkNodeCapacityPool(gridStore, node, props.filters),
       {
         shouldRun: () => props.validFilters,
         onBeforeTask: () => bindStatus(ValidatorStatus.Pending),

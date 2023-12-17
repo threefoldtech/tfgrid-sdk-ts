@@ -42,7 +42,7 @@ import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
 import type { SelectionDetailsFilters } from "../../types/nodeSelector";
 import { normalizeError } from "../../utils/helpers";
-import { resolveAsync } from "../../utils/nodeSelector";
+import { checkNodeCapacityPool, resolveAsync } from "../../utils/nodeSelector";
 
 const _defaultError =
   "Something went wrong while checking status of the node. Please check your connection and try again.";
@@ -146,6 +146,8 @@ export default {
           case sru < requiredDisk:
             throw `Node ${nodeId} doesn't have enough Storage`;
         }
+
+        await checkNodeCapacityPool(gridStore, node, props.filters);
 
         bindModelValue(node);
         return true;
