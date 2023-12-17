@@ -187,14 +187,16 @@
 </template>
 
 <script lang="ts" setup>
+import { QueryClient } from "@threefold/tfchain_client";
 import { capitalize, computed, watch } from "vue";
 import { onMounted } from "vue";
 import { ref } from "vue";
 
 import { useProfileManager } from "@/stores/profile_manager";
-import { Calculator } from "@/utils/calculator";
 import { getGrid } from "@/utils/grid";
 
+import { calculator as Calculator } from "../../../grid_client/dist/es6";
+import { useGrid } from "../stores";
 import { color } from "../utils/background_color";
 
 const CRU = ref<number>(1);
@@ -219,42 +221,32 @@ interface PriceType {
   info: string;
 }
 const prices = ref<PriceType[]>([]);
-
-const grid = ref();
+const gridStore = useGrid();
 const profileManager = useProfileManager();
 const hasActiveProfile = computed(() => {
   return !!profileManager.profile;
 });
 const calculator = computed(() => {
-  return hasActiveProfile.value ? grid.value?.calculator : new Calculator();
+  return hasActiveProfile.value && gridStore.grid
+    ? gridStore.grid?.calculator
+    : new Calculator(new QueryClient(window.env.SUBSTRATE_URL));
 });
 watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance], async () => {
   let pkgs: any;
   if (!valid.value.error) {
     if (currentbalance.value) {
-      const accountBalance = await grid.value?.balance.getMyBalance();
+      const accountBalance = await gridStore.grid?.balance.getMyBalance();
       balance.value = accountBalance?.free;
-      pkgs = await grid.value?.calculator.calculateWithMyBalance({
-        cru: CRU.value,
-        mru: MRU.value,
-        hru: HRU.value,
-        sru: SRU.value,
-        ipv4u: ipv4.value,
-        certified: isCertified.value,
-      });
-    } else {
-      if (!balance.value) balance.value = 0;
-      pkgs = await calculator.value?.calculate({
-        cru: CRU.value,
-        mru: MRU.value,
-        hru: HRU.value,
-        sru: SRU.value,
-        ipv4u: ipv4.value,
-        certified: isCertified.value,
-        balance: balance.value,
-      });
     }
-
+    pkgs = await calculator.value?.calculate({
+      cru: CRU.value,
+      mru: MRU.value,
+      hru: HRU.value,
+      sru: SRU.value,
+      ipv4u: ipv4.value,
+      certified: isCertified.value,
+      balance: balance.value || 0,
+    });
     setPriceList(pkgs);
   }
 });
