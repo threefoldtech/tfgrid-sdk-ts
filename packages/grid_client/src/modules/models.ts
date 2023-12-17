@@ -606,7 +606,7 @@ enum CertificationType {
 }
 
 class FarmFilterOptions {
-  @Expose() @IsOptional() @Min(0) cru?: number;
+  @Expose() @IsOptional() @Min(0) nodeCRU?: number; // Cores
   @Expose() @IsOptional() @Min(0) nodeMRU?: number; // GB
   @Expose() @IsOptional() @Min(0) nodeSRU?: number; // GB
   @Expose() @IsOptional() @Min(0) nodeHRU?: number; // GB

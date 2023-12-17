@@ -413,7 +413,7 @@ class Nodes {
 
   getFarmUrlQuery(options: FarmFilterOptions = {}) {
     const params = {
-      total_cru: options.cru || "",
+      node_total_cru: options.nodeCRU || "",
       node_free_mru: Math.ceil(this._g2b(options.nodeMRU)) || "",
       node_free_sru: Math.ceil(this._g2b(options.nodeSRU)) || "",
       node_free_hru: Math.ceil(this._g2b(options.nodeHRU)) || "",
