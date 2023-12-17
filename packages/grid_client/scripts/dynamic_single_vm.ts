@@ -10,6 +10,7 @@ async function deploy(client, vms) {
     log("================= Deploying VM =================");
   } catch (error) {
     log("Error while Deploying the VM " + error);
+    process.exitCode = 1;
   }
 }
 
@@ -21,6 +22,7 @@ async function getDeployment(client, vms) {
     log("================= Getting deployment information =================");
   } catch (error) {
     log("Error while getting the deployment " + error);
+    process.exitCode = 1;
   }
 }
 
@@ -32,6 +34,7 @@ async function cancel(client, vms) {
     log("================= Canceling the deployment =================");
   } catch (error) {
     log("Error while canceling the deployment " + error);
+    process.exitCode = 1;
   }
 }
 

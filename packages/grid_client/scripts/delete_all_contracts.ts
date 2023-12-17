@@ -9,6 +9,7 @@ async function deleteAllContracts(client) {
     log("================= Deleting all contracts =================");
   } catch (error) {
     log("Error while deleting contracts " + error);
+    process.exitCode = 1;
   }
 }
 

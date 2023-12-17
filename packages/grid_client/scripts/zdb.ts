@@ -10,6 +10,7 @@ async function deploy(client, zdb) {
     log("================= Deploying ZDBs =================");
   } catch (error) {
     log("Error while Deploying the ZDBs " + error);
+    process.exitCode = 1;
   }
 }
 
@@ -21,6 +22,7 @@ async function getDeployment(client, zdb) {
     log("================= Getting deployment information =================");
   } catch (error) {
     log("Error while getting the deployment " + error);
+    process.exitCode = 1;
   }
 }
 
@@ -32,6 +34,7 @@ async function cancel(client, zdb) {
     log("================= Canceling the deployment =================");
   } catch (error) {
     log("Error while canceling the deployment " + error);
+    process.exitCode = 1;
   }
 }
 

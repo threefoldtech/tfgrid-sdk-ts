@@ -9,6 +9,7 @@ async function setKey(client, key) {
     log("================= Setting the key =================");
   } catch (error) {
     log("Error while setting the key " + error);
+    process.exitCode = 1;
   }
 }
 
@@ -20,6 +21,7 @@ async function listAllKeys(client) {
     log("================= Listing all keys =================");
   } catch (error) {
     log("Error while listing keys " + error);
+    process.exitCode = 1;
   }
 }
 
@@ -31,6 +33,7 @@ async function getKey(client, key) {
     log("================= Getting key =================");
   } catch (error) {
     log("Error while getting key " + error);
+    process.exitCode = 1;
   }
 }
 
@@ -42,6 +45,7 @@ async function removeKey(client, key) {
     log("================= Removing key =================");
   } catch (error) {
     log("Error while removing key " + error);
+    process.exitCode = 1;
   }
 }
 
