@@ -47,6 +47,7 @@ export function normalizeFarmFilters(
     availableFor: options.twinId,
     country: options.location.country,
     region: options.location.region,
+    nodeCRU: filters.cpu,
     nodeMRU: filters.memory ? Math.round(filters.memory / 1024) : undefined,
     nodeRentedBy: filters.dedicated ? options.twinId : undefined,
     nodeHRU: (filters.hddDisks || []).reduce((t, d) => t + d, 0) || undefined,
