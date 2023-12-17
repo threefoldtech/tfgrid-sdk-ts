@@ -114,6 +114,9 @@ export default {
           case props.filters.dedicated && node.rentedByTwinId !== gridStore.client.twinId:
             throw `Node ${nodeId} is Dedicated, but rented by someone else`;
 
+          case node.rentedByTwinId !== gridStore.client.twinId:
+            throw `Node ${nodeId} is rented by someone else`;
+
           case props.filters.ipv4 && farms[0].publicIps.every(p => p.contract_id !== 0):
             throw `Node ${nodeId} is not assigned to a PublicIP`;
         }
