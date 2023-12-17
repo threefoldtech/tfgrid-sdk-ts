@@ -193,7 +193,6 @@ import { onMounted } from "vue";
 import { ref } from "vue";
 
 import { useProfileManager } from "@/stores/profile_manager";
-import { getGrid } from "@/utils/grid";
 
 import { calculator as Calculator } from "../../../grid_client/dist/es6";
 import { useGrid } from "../stores";
@@ -231,10 +230,10 @@ const calculator = computed(() => {
     ? gridStore.grid?.calculator
     : new Calculator(new QueryClient(window.env.SUBSTRATE_URL));
 });
-watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance], async () => {
+watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance, hasActiveProfile], async () => {
   let pkgs: any;
   if (!valid.value.error) {
-    if (currentbalance.value) {
+    if (currentbalance.value && hasActiveProfile.value && gridStore.grid) {
       const accountBalance = await gridStore.grid?.balance.getMyBalance();
       balance.value = accountBalance?.free;
     }
@@ -283,24 +282,16 @@ async function setPriceList(pkgs: any): Promise<PriceType[]> {
 }
 
 onMounted(async () => {
-  if (hasActiveProfile.value) {
-    getGrid(profileManager.profile!);
-  } else {
-    try {
-      const pkgs = await calculator.value.calculate({
-        cru: CRU.value,
-        mru: MRU.value,
-        hru: HRU.value,
-        sru: SRU.value,
-        ipv4u: ipv4.value,
-        certified: isCertified.value,
-        balance: balance.value,
-      });
-      await setPriceList(pkgs);
-    } catch (error) {
-      console.error("Error fetching the grid:", error);
-    }
-  }
+  const pkgs = await calculator.value.calculate({
+    cru: CRU.value,
+    mru: MRU.value,
+    hru: HRU.value,
+    sru: SRU.value,
+    ipv4u: ipv4.value,
+    certified: isCertified.value,
+    balance: balance.value,
+  });
+  await setPriceList(pkgs);
 });
 
 function openManual() {
