@@ -197,7 +197,7 @@
                   You will need to provide the password used while connecting your wallet.
                 </p>
               </v-alert>
-              <v-autocomplete :items="[...keyType]" return-object item-title="name" v-model="keyPairType" />
+              <v-autocomplete :items="[...keyType]" item-title="name" v-model="keyPairType" />
               <PasswordInputWrapper #="{ props: passwordInputProps }">
                 <InputValidator
                   :value="password"
@@ -430,7 +430,7 @@ interface Credentials {
   mnemonicHash?: string;
 }
 const keyType = ["sr25519", "ed25519"];
-const keyPairType = ref();
+const keyPairType = ref("sr25519");
 
 const theme = useTheme();
 
@@ -634,6 +634,7 @@ async function createNewAccount() {
   creatingAccount.value = true;
   try {
     const account = await createAccount();
+    console.log("account", account);
     mnemonic.value = account.mnemonic;
   } catch (e) {
     createAccountError.value = normalizeError(e, "Something went wrong while creating new account.");
