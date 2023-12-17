@@ -202,7 +202,6 @@ export default {
       try {
         loading.value = true;
         const twinId = profileManager.profile!.twinId;
-        console.log("Twin ID", twinId);
 
         const { data, count } = await gridProxyClient.nodes.list({
           retCount: true,
@@ -210,8 +209,6 @@ export default {
           size: pageSize.value,
           ownedBy: twinId as number,
         });
-        console.log("Data", data);
-        console.log("Count ", count);
 
         const _nodes = data as unknown as NodeInterface[];
         nodesCount.value = count ?? 0;
