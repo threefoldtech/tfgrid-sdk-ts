@@ -37,8 +37,8 @@
                 :rules="[
                   validators.required('Transfer amount is required '),
                   validators.isNumeric('Amount should be a number.'),
-                  validators.min('Amount must be greater than 0', 0.00000000001),
-                  validators.max('Insufficient funds', freeBalance),
+                  validators.min('Amount must be greater than 0', 0.001),
+                  validators.max('Insufficient funds', +freeBalance.toFixed(3)),
                 ]"
                 #="{ props }"
               >
@@ -87,8 +87,8 @@
                 :rules="[
                   validators.required('Transfer amount is required '),
                   validators.isNumeric('Amount should be a number.'),
-                  validators.min('Amount must be greater than 0', 0.00000000001),
-                  validators.max('Insufficient funds', freeBalance),
+                  validators.min('Amount must be greater than 0', 0.001),
+                  validators.max('Insufficient funds', +freeBalance.toFixed(3)),
                 ]"
                 #="{ props }"
               >
