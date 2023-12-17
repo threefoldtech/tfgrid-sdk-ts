@@ -57,7 +57,7 @@ class Calculator {
   @validateInput
   async tftPrice() {
     const pricing = await this.client.tftPrice.get();
-    return pricing;
+    return this.client instanceof TFClient ? pricing : pricing / 1000;
   }
   @validateInput
   private async pricing(options: CalculatorModel) {
@@ -83,7 +83,7 @@ class Calculator {
     const discount = pricing.dedicatedDiscount;
     let dedicatedPrice = pricing.musd_month - pricing.musd_month * (+discount / 100);
     let sharedPrice = pricing.musd_month;
-    const TFTPrice = this.client instanceof TFClient ? await this.tftPrice() : (await this.tftPrice()) / 1000;
+    const TFTPrice = await this.tftPrice();
     if (options.balance) {
       balance = TFTPrice * options.balance * 10000000;
     }
