@@ -108,7 +108,7 @@ export default {
             throw `Node ${nodeId} is not Certified`;
 
           case props.filters.dedicated && node.rentedByTwinId === 0:
-            throw `Node ${nodeId} is not Dedicated`;
+            throw `Node ${nodeId} is not rented`;
 
           case props.filters.dedicated && node.rentedByTwinId !== gridStore.client.twinId:
             throw `Node ${nodeId} is Dedicated, but rented by someone else`;
