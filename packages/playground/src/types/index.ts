@@ -60,12 +60,11 @@ export interface K8SWorker {
 }
 
 export interface CaproverWorker {
-  selectedNode?: INode;
   name: string;
-  farm?: FarmInterface;
   solution?: solutionFlavor;
   dedicated?: boolean;
   certified?: boolean;
+  selectionDetails?: SelectionDetails;
 }
 
 export interface FarmInterface {
