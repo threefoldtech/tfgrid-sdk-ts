@@ -206,7 +206,7 @@ const selectionDetailsFiltersValidator = z.object({
     .number()
     .min(500 / 1024)
     .optional(),
-  solutionDisk: z.number().int().min(15).max(10000).optional(),
+  solutionDisk: z.number().int().min(10).max(10000).optional(),
   certified: z.boolean().optional(),
   dedicated: z.boolean().optional(),
   exclusiveFor: z.string().optional(),
