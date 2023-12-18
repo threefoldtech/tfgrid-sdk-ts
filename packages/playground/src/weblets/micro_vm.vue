@@ -6,9 +6,8 @@
     :memory="solution?.memory"
     :disk="disks.reduce((total, disk) => total + disk.size, rootFilesystemSize)"
     :ipv4="ipv4"
-    :certified="certified"
     :dedicated="dedicated"
-    :SelectedNode="selectedNode"
+    :SelectedNode="selectionDetails?.node"
     title-image="images/icons/vm.png"
   >
     <template #title>Deploy a Micro Virtual Machine </template>
@@ -45,7 +44,6 @@
           :medium="{ cpu: 2, memory: 4, disk: 50 }"
           :large="{ cpu: 4, memory: 16, disk: 100 }"
           v-model="solution"
-          :disabled="loadingFarm"
         />
 
         <Network
@@ -54,7 +52,6 @@
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
           v-model:wireguard="wireguard"
-          :disabled="loadingFarm"
           ref="network"
         />
         <input-tooltip
@@ -62,47 +59,27 @@
           tooltip="Click to know more about dedicated nodes."
           href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
         >
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>
 
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
+          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
         </input-tooltip>
-        <SelectFarmManager>
-          <NodeSelector v-model="selection" />
-          <SelectFarm
-            v-if="selection == Selection.AUTOMATED"
-            :filters="{
-              cpu: solution?.cpu,
-              memory: solution?.memory,
-              publicIp: ipv4,
-              ssd: disks.reduce((total, disk) => total + disk.size, rootFilesystemSize),
-              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-              certified: certified,
-            }"
-            v-model="farm"
-            v-model:loading="loadingFarm"
-            v-model:search="farmName"
-          />
-          <SelectNode
-            v-model="selectedNode"
-            :selection="selection"
-            :filters="{
-              farmId: farm?.farmID,
-              cpu: solution?.cpu,
-              memory: solution?.memory,
-              ipv4: ipv4,
-              ipv6: ipv4,
-              diskSizes: [solution?.disk, ...disks.map(disk => disk.size)],
-              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-              certified: certified,
-              country: farm?.country,
-              region: farm?.region,
-            }"
-            :loading-farm="loadingFarm"
-            :root-file-system-size="rootFilesystemSize"
-          />
-        </SelectFarmManager>
+
+        <TfSelectionDetails
+          :filters="{
+            ipv4,
+            ipv6,
+            certified,
+            dedicated,
+            cpu: solution?.cpu,
+            ssdDisks: disks.map(disk => disk.size),
+            solutionDisk: solution?.disk,
+            memory: solution?.memory,
+            rootFilesystemSize,
+          }"
+          v-model="selectionDetails"
+        />
       </template>
 
       <template #env>
@@ -145,7 +122,6 @@
           @add="addDisk"
           title="Add additional disk space to your micro virtual machine"
           #="{ index }"
-          :disabled="loadingFarm"
         >
           <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
           <input-validator
@@ -190,22 +166,19 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, type Ref, ref, watch } from "vue";
-
-import { Selection } from "@/utils/types";
+import { computed, type Ref, ref } from "vue";
 
 import Network from "../components/networks.vue";
-import NodeSelector from "../components/node_selection.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import { type FarmInterface, type Flist, ProjectName } from "../types";
+import { type Flist, ProjectName } from "../types";
 import { deployVM, type Disk, type Env } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
+
 const layout = useLayout();
 const tabs = ref();
-const selection = ref();
 const profileManager = useProfileManager();
 
 const images = [
@@ -242,16 +215,14 @@ const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
 const wireguard = ref(false);
-const farm = ref() as Ref<FarmInterface>;
-const farmName = ref();
 const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
 const network = ref();
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<INode>;
-const loadingFarm = ref(false);
 const rootFilesystemSize = computed(() => solution.value?.disk);
+const selectionDetails = ref<SelectionDetails>();
+
 function layoutMount() {
   if (envs.value.length > 0) {
     envs.value.splice(0, 1);
@@ -271,15 +242,6 @@ function addDisk() {
     mountPoint: "/mnt/" + name,
   });
 }
-watch(
-  () => selection.value,
-  (value, oldValue) => {
-    if (value !== oldValue) {
-      loadingFarm.value = false;
-    }
-  },
-  { deep: false },
-);
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -303,16 +265,13 @@ async function deploy() {
           memory: solution.value.memory,
           flist: flist.value!.value,
           entryPoint: flist.value!.entryPoint,
-          farmId: farm.value.farmID,
-          farmName: farm.value.name,
-          country: farm.value.country,
           disks: disks.value,
           envs: envs.value,
           planetary: planetary.value,
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           rootFilesystemSize: rootFilesystemSize.value,
-          nodeId: selectedNode.value.nodeId,
+          nodeId: selectionDetails.value?.node?.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },
@@ -330,13 +289,10 @@ async function deploy() {
 
 <script lang="ts">
 import ExpandableLayout from "../components/expandable_layout.vue";
-import SelectFarm from "../components/select_farm.vue";
-import SelectFarmManager from "../components/select_farm_manager.vue";
-import SelectNode from "../components/select_node.vue";
 import SelectVmImage from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { solutionFlavor as SolutionFlavor } from "../types";
-import type { INode } from "../utils/filter_nodes";
+import type { SelectionDetails } from "../types/nodeSelector";
 import { normalizeError } from "../utils/helpers";
 
 const solution = ref() as Ref<SolutionFlavor>;
@@ -346,10 +302,7 @@ export default {
   components: {
     SelectVmImage,
     SelectSolutionFlavor,
-    SelectFarm,
-    SelectNode,
     ExpandableLayout,
-    SelectFarmManager,
   },
 };
 </script>
