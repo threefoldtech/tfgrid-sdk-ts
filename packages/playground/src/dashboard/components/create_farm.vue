@@ -96,7 +96,7 @@ export default {
     }
     function validateFarmName(name: string) {
       if (!name.split("").every((c: string) => /[a-zA-Z0-9\-_]/.test(c))) {
-        return { message: "Invalid Farm Name" };
+        return { message: "Farm name can only contain alphabetic letters, numbers, '-' or '_'" };
       }
     }
     return {
