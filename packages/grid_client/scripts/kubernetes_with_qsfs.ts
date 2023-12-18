@@ -53,7 +53,7 @@ async function deleteQsfs(client, qsfs) {
     log(res);
     log("================= Deleting QSFS =================");
   } catch (error) {
-    log("Error while deleting qsfs ", error.message);
+    console.error("Error while deleting qsfs ", error.message);
   }
 }
 
