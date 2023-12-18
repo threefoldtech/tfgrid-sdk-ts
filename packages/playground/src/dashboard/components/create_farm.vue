@@ -19,11 +19,13 @@
                 :rules="[
                   validators.required('Farm name is required.'),
                   name => validators.isAlpha('Farm name must start with an alphabet char.')(name[0]),
-                  validators.minLength('Farm name minimum length is 2 chars.', 2),
+                  validators.minLength('Farm name minimum length is 3 chars.', 3),
                   validators.maxLength('Farm name maximum length is 40 chars.', 40),
                   validators.pattern('Farm name  should not contain whitespaces.', {
                     pattern: /^[^\s]+$/,
                   }),
+
+                  validateFarmName,
                 ]"
                 #="{ props }"
               >
@@ -92,11 +94,17 @@ export default {
         isCreating.value = false;
       }
     }
+    function validateFarmName(name: string) {
+      if (!name.split("").every((c: string) => /[a-zA-Z0-9\-_]/.test(c))) {
+        return { message: "Invalid Farm Name" };
+      }
+    }
     return {
       showDialogue,
       isCreating,
       valid,
       createFarm,
+      validateFarmName,
     };
   },
 };
