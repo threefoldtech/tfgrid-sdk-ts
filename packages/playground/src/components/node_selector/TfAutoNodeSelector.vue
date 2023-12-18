@@ -143,7 +143,7 @@ export default {
       },
       async onBeforeLoadingFinish(nodes, error, oldNodeId: number) {
         const index = loadedNodes.value.concat(nodes ?? []).findIndex(n => n.nodeId === oldNodeId);
-        if ((oldNodeId && index !== -1) || !nodes || error) {
+        if (!oldNodeId || (oldNodeId && index !== -1) || !nodes || error) {
           return;
         }
 
