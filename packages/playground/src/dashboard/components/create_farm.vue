@@ -21,7 +21,7 @@
                   name => validators.isAlpha('Farm name must start with an alphabet char.')(name[0]),
                   validators.minLength('Farm name minimum length is 3 chars.', 3),
                   validators.maxLength('Farm name maximum length is 40 chars.', 40),
-                  validators.pattern('Farm name  should not contain whitespaces.', {
+                  validators.pattern('Farm name should not contain whitespaces.', {
                     pattern: /^[^\s]+$/,
                   }),
 
