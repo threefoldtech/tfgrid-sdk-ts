@@ -1,3 +1,5 @@
+import { QueryClient } from "@threefold/tfchain_client";
+
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { expose } from "../helpers/expose";
@@ -18,10 +20,10 @@ interface PricingInfo {
 }
 
 class Calculator {
-  client: TFClient;
+  client: TFClient | QueryClient;
 
-  constructor(public config: GridClientConfig) {
-    this.client = config.tfclient;
+  constructor(config: GridClientConfig | QueryClient) {
+    this.client = config instanceof QueryClient ? config : config.tfclient;
   }
   @expose
   @validateInput
@@ -55,7 +57,7 @@ class Calculator {
   @validateInput
   async tftPrice() {
     const pricing = await this.client.tftPrice.get();
-    return pricing;
+    return this.client instanceof TFClient ? pricing : pricing / 1000;
   }
   @validateInput
   private async pricing(options: CalculatorModel) {
@@ -136,8 +138,11 @@ class Calculator {
   }
 
   async calculateWithMyBalance(options: CalculatorModel) {
-    const balances = await this.client.balances.getMyBalance();
-    const balance = balances.free;
+    let balance = options.balance;
+    if (this.client instanceof TFClient) {
+      const balances = await this.client.balances.getMyBalance();
+      balance = balances.free;
+    }
     const calculate = await this.calculate({
       cru: options.cru,
       mru: options.mru,

@@ -24,7 +24,7 @@
     </template>
     <template #text>
       <strong v-if="totalCost != undefined" class="text-primary">
-        {{ totalCost }} TFT/hour ≈ {{ totalCost * 24 * 30 }} TFT/month
+        {{ totalCost }} TFT/hour ≈ {{ totalCost === 0 ? 0 : (totalCost * 24 * 30).toFixed(3) }} TFT/month
       </strong>
       <small v-else> loading total cost... </small>
     </template>
