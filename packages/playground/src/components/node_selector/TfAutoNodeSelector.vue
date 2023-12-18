@@ -142,7 +142,8 @@ export default {
         return oldNode?.nodeId;
       },
       async onBeforeLoadingFinish(nodes, error, oldNodeId: number) {
-        if (oldNodeId || !nodes || error) {
+        const index = loadedNodes.value.concat(nodes ?? []).findIndex(n => n.nodeId === oldNodeId);
+        if ((oldNodeId && index !== -1) || !nodes || error) {
           return;
         }
 
@@ -159,10 +160,10 @@ export default {
       async onAfterTask({ data }, oldNodeId: number) {
         loadedNodes.value = loadedNodes.value.concat(data as NodeInfo[]);
 
-        if (oldNodeId) {
-          const index = loadedNodes.value.findIndex(n => n.nodeId === oldNodeId);
+        const index = loadedNodes.value.findIndex(n => n.nodeId === oldNodeId);
+        if (oldNodeId && index !== -1) {
           bindModelValue(loadedNodes.value[index]);
-          index !== -1 && nodeInputValidateTask.value.run(loadedNodes.value[index]);
+          nodeInputValidateTask.value.run(loadedNodes.value[index]);
         }
 
         nextPage();
