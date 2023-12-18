@@ -127,21 +127,34 @@
                       ref="mnemonicInput"
                       :disable-validation="creatingAccount || activatingAccount || activating"
                     >
-                      <div v-bind="tooltipProps">
-                        <VTextField
-                          label="Mnemonic or Hex Seed"
-                          placeholder="Please insert your Mnemonic or Hex Seed"
-                          v-model="mnemonic"
-                          v-bind="{ ...passwordInputProps, ...validationProps }"
-                          :disabled="creatingAccount || activatingAccount || activating"
-                        />
-                      </div>
+                      <v-row>
+                        <v-col cols="10">
+                          <div v-bind="tooltipProps">
+                            <VTextField
+                              label="Mnemonic or Hex Seed"
+                              placeholder="Please insert your Mnemonic or Hex Seed"
+                              v-model="mnemonic"
+                              v-bind="{ ...passwordInputProps, ...validationProps }"
+                              :disabled="creatingAccount || activatingAccount || activating"
+                            />
+                          </div>
+                        </v-col>
+                        <v-col cols="2">
+                          <v-autocomplete
+                            :items="[...keyType]"
+                            item-title="name"
+                            v-model="keypairType"
+                            v-if="activeTab === 1"
+                          />
+                        </v-col>
+                      </v-row>
+
                       <div class="d-flex justify-end mb-10">
                         <VBtn
                           class="mt-2 ml-3"
                           color="primary"
                           variant="tonal"
-                          :disabled="!shouldActivateAccount"
+                          :disabled="!shouldActivateAccount || keypairType === KeypairType.ed25519"
                           :loading="activatingAccount"
                           @click="openAcceptTerms = termsLoading = true"
                         >
@@ -151,7 +164,9 @@
                           class="mt-2 ml-3"
                           color="secondary"
                           variant="tonal"
-                          :disabled="isValidForm || !!mnemonic || shouldActivateAccount"
+                          :disabled="
+                            isValidForm || !!mnemonic || shouldActivateAccount || keypairType === KeypairType.ed25519
+                          "
                           :loading="creatingAccount"
                           @click="openAcceptTerms = termsLoading = true"
                         >
@@ -197,7 +212,6 @@
                   You will need to provide the password used while connecting your wallet.
                 </p>
               </v-alert>
-              <v-autocomplete :items="[...keyType]" item-title="name" v-model="keyPairType" />
               <PasswordInputWrapper #="{ props: passwordInputProps }">
                 <InputValidator
                   :value="password"
@@ -245,7 +259,7 @@
               <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="loginError">
                 {{ loginError }}
               </v-alert>
-              <v-alert variant="tonal" type="warning">
+              <v-alert variant="tonal" type="warning" v-if="activeTab === 1">
                 <p>Using different keypair types will lead to a completely different account.</p>
               </v-alert>
             </FormValidator>
@@ -400,6 +414,7 @@
 
 <script lang="ts" setup>
 import { isAddress } from "@polkadot/util-crypto";
+import { KeypairType } from "@threefold/grid_client";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import md5 from "md5";
@@ -430,7 +445,7 @@ interface Credentials {
   mnemonicHash?: string;
 }
 const keyType = ["sr25519", "ed25519"];
-const keyPairType = ref("sr25519");
+const keypairType = ref(KeypairType.sr25519);
 
 const theme = useTheme();
 
@@ -605,7 +620,7 @@ async function activate(mnemonic: string) {
   activating.value = true;
   sessionStorage.setItem("password", password.value);
   try {
-    const grid = await getGrid({ mnemonic });
+    const grid = await getGrid({ mnemonic, keypairType: keypairType.value });
     const profile = await loadProfile(grid!);
     ssh.value = profile.ssh;
     profileManager.set({ ...profile, mnemonic });
@@ -617,7 +632,7 @@ async function activate(mnemonic: string) {
 }
 
 function validateMnInput(mnemonic: string) {
-  return getGrid({ mnemonic })
+  return getGrid({ mnemonic, keypairType: keypairType.value })
     .then(() => undefined)
     .catch(e => {
       return { message: normalizeError(e, "Something went wrong. please try again.") };
