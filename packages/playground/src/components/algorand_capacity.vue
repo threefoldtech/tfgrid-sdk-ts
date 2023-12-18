@@ -75,7 +75,7 @@ import { ref, watch } from "vue";
 
 import type { Validators } from "../types";
 
-const props = defineProps<{ network: string; type: string; disabled: boolean }>();
+const props = defineProps<{ network: string; type: string; disabled?: boolean }>();
 const emits = defineEmits<{
   (event: "update:cpu", value?: number): void;
   (event: "update:memory", value?: number): void;
