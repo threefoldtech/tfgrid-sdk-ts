@@ -66,7 +66,7 @@
       <v-card-title class="pa-0">TFChain Wallet</v-card-title>
     </v-card>
     <WebletLayout disable-alerts>
-      <v-alert variant="tonal" class="mb-6" v-if="activeTab === 0">
+      <v-alert variant="tonal" class="mb-6">
         <p :style="{ maxWidth: '880px' }">
           Please visit
           <a class="app-link" href="https://manual.grid.tf/playground/wallet_connector.html" target="_blank">
@@ -247,8 +247,9 @@
             </FormValidator>
 
             <div class="d-flex justify-center mt-2">
+              <VBtn color="anchor" variant="outlined" @click="$emit('update:modelValue', false)"> Close </VBtn>
               <VBtn
-                class="mr-2"
+                class="ml-2"
                 type="submit"
                 color="secondary"
                 variant="tonal"
@@ -262,15 +263,14 @@
               >
                 {{ activeTab === 0 ? "Login" : "Connect" }}
               </VBtn>
-              <VBtn color="anchor" variant="outlined" @click="$emit('update:modelValue', false)"> Close </VBtn>
             </div>
           </form>
         </VContainer>
       </DTabs>
 
       <template v-if="profileManager.profile">
-        <v-row class="py-2 pb-5">
-          <v-col cols="7" sm="12" md="6" lg="7">
+        <v-row class="justify-space-around py-2 pb-5">
+          <v-col cols="7" sm="12" md="12" lg="7">
             <PasswordInputWrapper #="{ props }">
               <VTextField
                 label="Your Hex Seed"
@@ -341,7 +341,7 @@
           </v-col>
           <v-divider class="mx-4" vertical></v-divider>
 
-          <v-col>
+          <v-col cols="12" lg="4">
             <section class="d-flex flex-column align-center">
               <p class="mb-4 text-center">
                 Scan the QR code using
@@ -355,10 +355,10 @@
               />
               <div class="d-flex justify-center my-4">
                 <a
-                  v-for="(app, index) in apps"
+                  v-for="app in apps"
                   :key="app.alt"
-                  :style="{ cursor: 'pointer', width: '150px' }"
-                  :class="{ 'mr-2': index === 0 }"
+                  :style="{ cursor: 'pointer', width: '9rem' }"
+                  class="app-btn mr-2"
                   :title="app.alt"
                   v-html="app.src"
                   :href="app.url"
@@ -372,7 +372,15 @@
       <!-- <v-divider horizontal></v-divider> -->
       <div class="d-flex justify-end mt-4 mb-2">
         <VBtn
-          class="mr-2"
+          v-if="profileManager.profile"
+          color="anchor"
+          variant="outlined"
+          @click="$emit('update:modelValue', false)"
+        >
+          Close
+        </VBtn>
+        <VBtn
+          class="ml-2"
           color="error"
           variant="tonal"
           @click="logout"
@@ -380,14 +388,6 @@
           :disabled="updatingSSH || generatingSSH || loadingBalance"
         >
           Logout
-        </VBtn>
-        <VBtn
-          v-if="profileManager.profile"
-          color="anchor"
-          variant="outlined"
-          @click="$emit('update:modelValue', false)"
-        >
-          Close
         </VBtn>
       </div>
     </WebletLayout>
@@ -518,7 +518,9 @@ const SSHKeyHint = ref("");
 const ssh = ref("");
 const mnemonicInput = useInputRef();
 const shouldActivateAccount = computed(
-  () => mnemonicInput.value?.error?.toLowerCase()?.includes("couldn't find a user for the provided mnemonic") || false,
+  () =>
+    mnemonicInput.value?.error?.toLowerCase()?.includes("couldn't get the user twin for the provided mnemonic") ||
+    false,
 );
 let sshTimeout: any;
 const isValidConnectConfirmationPassword = computed(() =>
@@ -763,5 +765,10 @@ export default {
 <style>
 .v-field__input {
   font-size: small;
+}
+@media only screen and (max-width: 1400px) {
+  .app-btn {
+    width: 8rem !important;
+  }
 }
 </style>

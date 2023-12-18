@@ -581,6 +581,7 @@ class FilterOptions {
   @Expose() @IsOptional() @IsBoolean() gateway?: boolean;
   @Expose() @IsOptional() @IsBoolean() certified?: boolean;
   @Expose() @IsOptional() @IsInt({ each: true }) @Min(1, { each: true }) nodeExclude?: number[];
+  @Expose() @IsOptional() @IsInt({ each: true }) @Min(1, { each: true }) farmIds?: number[];
   @Expose() @IsOptional() @IsInt() @Min(1) farmId?: number;
   @Expose() @IsOptional() @IsString() farmName?: string;
   @Expose() @IsOptional() @IsString() country?: string;
@@ -595,6 +596,7 @@ class FilterOptions {
   @Expose() @IsOptional() @IsBoolean() randomize?: boolean;
   @Expose() @IsOptional() @IsBoolean() ret_count?: boolean;
   @Expose() @IsOptional() @Transform(({ value }) => NodeStatus[value]) @IsEnum(NodeStatus) status?: NodeStatus;
+  @Expose() @IsOptional() @IsString() region?: string;
 }
 
 enum CertificationType {
@@ -622,6 +624,7 @@ class FarmFilterOptions {
   @Expose() @IsOptional() @IsInt() farmId?: number;
   @Expose() @IsOptional() @IsBoolean() randomize?: boolean;
   @Expose() @IsOptional() @IsBoolean() ret_count?: boolean;
+  @Expose() @IsOptional() @IsString() region?: string;
 }
 
 class CalculatorModel {

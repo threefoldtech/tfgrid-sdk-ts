@@ -18,6 +18,7 @@ import { getAllNodes } from "@/utils/get_nodes";
 import { useProfileManager } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid } from "../utils/grid";
+import GracePeriodToast from "./mosha_toast/grace_period_toast.vue";
 import OfflineNodesToast from "./mosha_toast/offline_nodes_toast.vue";
 
 const profileManager = useProfileManager();
@@ -51,23 +52,27 @@ async function checkOfflineDeployments(grid: GridClient | null) {
     createCustomToast(OfflineNodesToast, ToastType.warning, props);
   }
 }
+async function checkGracePeriodDeployments(grid: GridClient | null) {
+  const contracts: any = await grid!.contracts.listMyContracts({ state: [ContractStates.GracePeriod] });
+  if (
+    contracts.nameContracts.length != 0 ||
+    contracts.nodeContracts.length != 0 ||
+    contracts.rentContracts.length != 0
+  ) {
+    contractsCount.value =
+      contracts.nameContracts.length + contracts.nodeContracts.length + contracts.rentContracts.length;
+    const props = { deploymentLen: contractsCount.value };
+    createCustomToast(GracePeriodToast, ToastType.warning, props);
+  }
+}
 
 onMounted(async () => {
   while (profileManager.profile) {
     const grid = await getGrid(profileManager.profile!);
-    const contracts: any = await grid!.contracts.listMyContracts({ state: [ContractStates.GracePeriod] });
 
     await checkOfflineDeployments(grid);
+    await checkGracePeriodDeployments(grid);
 
-    if (
-      contracts.nameContracts.length != 0 ||
-      contracts.nodeContracts.length != 0 ||
-      contracts.rentContracts.length != 0
-    ) {
-      contractsCount.value =
-        contracts.nameContracts.length + contracts.nodeContracts.length + contracts.rentContracts.length;
-      createCustomToast("You have " + contractsCount.value + " contracts in grace period", ToastType.warning);
-    }
     await new Promise(resolve => setTimeout(resolve, 15 * 60 * 1000));
   }
 });

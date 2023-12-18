@@ -1,4 +1,5 @@
 import * as secp from "@noble/secp256k1";
+import { mnemonicToMiniSecret } from "@polkadot/util-crypto";
 import { ValidationError } from "@threefold/types";
 import * as bip39 from "bip39";
 import { Buffer } from "buffer";
@@ -17,8 +18,7 @@ export function generatePublicKey(secret: string) {
   let privKey;
 
   if (bip39.validateMnemonic(secret)) {
-    const seed = bip39.mnemonicToSeedSync(secret);
-    privKey = new Uint8Array(seed).slice(0, 32);
+    privKey = mnemonicToMiniSecret(secret);
   } else {
     privKey = secret;
     if (secret.startsWith("0x")) {

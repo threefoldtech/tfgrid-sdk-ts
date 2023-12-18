@@ -4,7 +4,7 @@
       <v-navigation-drawer
         width="280"
         :permanent="permanent"
-        :model-value="hasActiveProfile && openSidebar"
+        :model-value="openSidebar"
         @update:model-value="openSidebar = $event"
       >
         <div :style="{ paddingTop: '64px' }">
@@ -131,7 +131,7 @@
         </v-toolbar>
 
         <v-toolbar
-          v-if="navbarConfig"
+          v-if="navbarConfig && hasActiveProfile"
           :color="theme.name.value === AppThemeSelection.dark ? '#121212' : 'background'"
           class="border position-fixed py-0 d-flex pr-2"
           :style="{
@@ -162,13 +162,12 @@
           <v-container fluid :style="{ paddingBottom: '100px' }">
             <div class="d-flex align-center">
               <v-btn
+                v-if="!openSidebar"
                 color="secondary"
                 @click="openSidebar = true"
                 icon="mdi-menu"
                 variant="tonal"
                 class="mr-2"
-                :disabled="!hasActiveProfile"
-                v-if="!permanent"
               />
               <div :style="{ width: '100%' }" class="mb-4">
                 <DisclaimerToolbar />
@@ -179,7 +178,8 @@
               <router-view v-slot="{ Component }">
                 <transition name="fade">
                   <div :key="$route.path">
-                    <component :is="Component" v-if="hasActiveProfile && hasGrid"></component>
+                    <component :is="Component" v-if="isAuthorized($route.path)"></component>
+                    <component :is="Component" v-else-if="hasActiveProfile && hasGrid"></component>
                     <ConnectWalletLanding @openProfile="openProfile = true" v-else />
                   </div>
                 </transition>
@@ -227,15 +227,28 @@ onMounted(() => {
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
 
+function navigateToPrevRoute(path: any) {
+  const firstItem = path[0];
+  if (firstItem && firstItem.to) {
+    $router.push(firstItem.to);
+  }
+}
+
 const routes: AppRoute[] = [
   {
     title: "Dashboard",
     icon: "mdi-account-convert-outline",
     items: [
       {
-        title: "Twin",
+        title: "Your Twin",
         icon: "mdi-account-supervisor-outline",
         route: "/dashboard/twin",
+      },
+      { title: "Your Farms", icon: "mdi-silo", route: "/dashboard/farms" },
+      {
+        title: "Your Contracts",
+        icon: "mdi-file-document-edit",
+        route: "/dashboard/contracts-list",
       },
       { title: "Bridge", icon: "mdi-swap-horizontal", route: "/dashboard/bridge" },
       {
@@ -243,18 +256,12 @@ const routes: AppRoute[] = [
         icon: "mdi-account-arrow-right-outline",
         route: "/dashboard/transfer",
       },
-      { title: "Farms", icon: "mdi-silo", route: "/dashboard/farms" },
       {
         title: "Dedicated Nodes",
         icon: "mdi-resistor-nodes",
         route: "/dashboard/dedicated-nodes",
       },
       { title: "DAO", icon: "mdi-note-check-outline", route: "/dashboard/dao" },
-      {
-        title: "Contracts",
-        icon: "mdi-file-document-edit",
-        route: "/dashboard/contracts-list",
-      },
     ],
   },
   {
@@ -358,6 +365,11 @@ function clickHandler({ route, url }: AppRouteItem): void {
   } else if (url) {
     window.open(url, "_blank");
   }
+}
+
+function isAuthorized(route: string) {
+  const items = ["dashboard", "solutions"];
+  return !items.some(substr => route.startsWith(`/${substr}`));
 }
 
 $router.beforeEach((to, from, next) => {

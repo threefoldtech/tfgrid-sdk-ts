@@ -1,6 +1,9 @@
 <template>
   <view-layout>
-    <h2 class="mb-5 text-capitalize">Alpha software - all data subject to change</h2>
+    <h2 class="mb-4 text-capitalize">Grid Minting Explorer</h2>
+    <v-alert variant="tonal" type="warning" class="mb-4 pa-2">
+      <p>All data subject to change</p>
+    </v-alert>
     <v-form @submit.prevent="mintingHash()" class="d-inline-flex w-100">
       <FormValidator v-model="isValidForm">
         <InputValidator
@@ -10,7 +13,6 @@
             validators.equal('Receipt hash must be 64 characters long.', 64),
             validators.isHash('Invalid hash', 'sha256'),
           ]"
-          valid-message="Receipt hash is valid."
           #="{ props: validationProps }"
           ref="hashInput"
         >
@@ -102,9 +104,15 @@
             </v-col>
             <v-col cols="10">
               <v-list-item>
-                {{ item.Minting.reward.tft.toFixed(7) }} TFT ({{ item.Minting.reward.musd.toFixed(3) }}$ at
-                {{ item.Minting.tft_connection_price.toFixed(3) }}$/TFT)</v-list-item
-              >
+                <input-tooltip
+                  inline
+                  :alignCenter="true"
+                  :tooltip="`1 TFT = ${(item.Minting.tft_connection_price / 1e3).toFixed(3)}$`"
+                >
+                  Farmed {{ (item.Minting.reward.tft / 1e7).toFixed(3) }} TFT that's almost =
+                  {{ (item.Minting.reward.musd / 1e3).toFixed(3) }}$
+                </input-tooltip>
+              </v-list-item>
               <v-list-item> {{ item.Minting.stellar_payout_address }}</v-list-item>
             </v-col>
           </v-row>

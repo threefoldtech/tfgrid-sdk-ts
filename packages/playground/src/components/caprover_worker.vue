@@ -34,8 +34,8 @@
     <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
       <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" :disabled="loadingFarm" />
     </input-tooltip>
-    <NodeSelector v-model="selection" />
     <SelectFarmManager>
+      <NodeSelector v-model="selection" />
       <SelectFarm
         v-if="selection == Selection.AUTOMATED"
         :filters="{
@@ -61,8 +61,11 @@
           diskSizes: [$props.modelValue.solution?.disk ?? 0],
           rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
           certified: $props.modelValue.certified,
+          country: $props.modelValue.farm?.country,
+          region: $props.modelValue.farm?.region,
         }"
         :root-file-system-size="rootFilesystemSize"
+        :loading-farm="loadingFarm"
       />
     </SelectFarmManager>
   </div>

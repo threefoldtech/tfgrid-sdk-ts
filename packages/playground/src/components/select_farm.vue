@@ -1,7 +1,7 @@
 <template>
   <section>
     <h6 class="text-h5 mb-4 mt-2">Choose a Location</h6>
-    <SelectCountry v-model="country" />
+    <select-location v-model="location" :disabled="loading || loadingNodes" />
     <input-validator :rules="[validators.required('Farm is required.')]" :value="farm?.farmID" ref="farmInput">
       <input-tooltip tooltip="The name of the farm that you want to deploy inside it.">
         <v-autocomplete
@@ -12,12 +12,13 @@
           :loading="loading"
           item-title="name"
           return-object
-          :model-value="shouldBeUpdated ? undefined : farm"
+          :model-value="shouldBeUpdated || loading ? undefined : farm"
           @update:model-value="farm = $event"
           :error-messages="!loading && !farms.length ? 'No farms where found with the specified resources.' : undefined"
           v-model:search="search"
-          append-inner-icon="mdi-refresh"
-          @click:append-inner="resetSearch"
+          @blur="!search ? resetSearch() : undefined"
+          clearable
+          @click:clear="resetSearch"
         >
           <template v-slot:append-item v-if="page !== -1">
             <div class="px-4 mt-4">
@@ -50,6 +51,7 @@ import { getFarms, getFarmsPages } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
 import { useFarmGatewayManager } from "./farm_gateway_manager.vue";
 import { useFarm } from "./select_farm_manager.vue";
+import { createLocation, defaultCountry, defaultRegion } from "./select_location.vue";
 
 export interface Filters {
   publicIp?: boolean;
@@ -79,20 +81,26 @@ const SIZE = 20;
 const page = ref();
 const farmInput = useInputRef();
 const profileManager = useProfileManager();
-const country = ref<string>();
+const location = ref(createLocation());
 const search = ref<string>();
 const searchInput = ref<string>();
 const farm = ref<FarmInterface>();
 const farmManager = useFarm();
-watch([farm, country], ([f, c]) => {
-  farmManager?.setFarmId(f?.farmID);
-  emits("update:modelValue", f ? { farmID: f.farmID, name: f.name, country: c ?? undefined } : undefined);
-});
+watch(
+  [farm, location],
+  ([f, c]) => {
+    const farm = { farmID: f?.farmID || -1, name: f?.name || defaultFarm, country: c.country, region: c.region };
+    farmManager.setFarmId(farm);
+    emits("update:modelValue", farm);
+  },
+  { immediate: true },
+);
 
 watch(
   search,
   debounce(async (value, oldValue) => {
-    if (value !== oldValue && value && value?.length > 2 && oldValue != undefined && oldValue !== "") {
+    const requireSeach = !farms.value.some(f => f.name === value);
+    if (requireSeach && value !== oldValue && value && value?.length > 2 && oldValue != undefined && oldValue !== "") {
       await resetPages();
     }
   }, 2000),
@@ -110,7 +118,7 @@ watch(
     }
 
     if (farm && !loading) {
-      farm.country = country.value;
+      farm.country = location.value.country;
       FarmGatewayManager?.register(farm);
       FarmGatewayManager?.setLoading(false);
     }
@@ -127,8 +135,9 @@ const pagesCount = ref();
 function prepareFilters(filters: Filters, twinId: number): FarmFilterOptions {
   return {
     size: SIZE,
-    page: page.value,
-    country: country.value,
+    page: Math.max(1, isNaN(page.value) ? 0 : page.value),
+    country: location.value.country === defaultCountry ? undefined : location.value.country,
+    region: location.value.region === defaultRegion ? undefined : location.value.region,
     nodeMRU: filters.memory ? Math.round(filters.memory / 1024) : undefined,
     nodeHRU: filters.disk,
     nodeSRU: filters.ssd,
@@ -146,14 +155,16 @@ async function loadFarms() {
   const oldFarm = farm.value;
   const grid = await getGrid(profileManager.profile!);
   let _farms: FarmInterface[] = [];
-  if (searchInput.value && searchInput.value?.length > 0) {
+
+  const requireSeach = farm.value && searchInput.value !== farm.value.name;
+  if (searchInput.value && searchInput.value?.length > 0 && requireSeach) {
     const { data } = await gridProxyClient.farms.list({ nameContains: searchInput.value });
     _farms = data.map((_farm: any) => {
       return {
         name: _farm.name,
         farmID: _farm.farmId,
         country: _farm.country,
-      };
+      } as FarmInterface;
     });
   } else {
     _farms = await getFarms(grid!, prepareFilters(props.filters, grid!.twinId), {
@@ -166,7 +177,10 @@ async function loadFarms() {
     await loadFarms();
     return;
   }
-  farms.value = farms.value.concat(_farms);
+  farms.value = [
+    { name: defaultFarm, farmID: -1, country: location.value.country, region: location.value.region },
+    ...farms.value.slice(1).concat(_farms),
+  ];
 
   if (oldFarm) {
     farm.value = undefined;
@@ -212,21 +226,9 @@ onMounted(resetPages);
 onUnmounted(() => FarmGatewayManager?.unregister());
 
 watch(
-  () => ({ ...props.filters, country: country.value }),
+  () => ({ ...props.filters, country: location.value.country, region: location.value.region }),
   async (value, oldValue) => {
-    if (
-      value.cpu === oldValue.cpu &&
-      value.memory === oldValue.memory &&
-      value.ssd === oldValue.ssd &&
-      value.disk === oldValue.disk &&
-      value.publicIp === oldValue.publicIp &&
-      value.country === oldValue.country &&
-      value.certified === oldValue.certified &&
-      value.rentedBy === oldValue.rentedBy &&
-      value.hasGPU === oldValue.hasGPU
-    )
-      return;
-    shouldBeUpdated.value = true;
+    shouldBeUpdated.value = !equals(value, oldValue);
   },
 );
 
@@ -250,16 +252,19 @@ async function resetSearch() {
 <script lang="ts">
 import type { FarmFilterOptions } from "@threefold/grid_client";
 import { debounce } from "lodash";
+import equals from "lodash/fp/equals.js";
 
 import { gridProxyClient } from "@/clients";
 import { ValidatorStatus } from "@/hooks/form_validator";
 
-import SelectCountry from "./select_country.vue";
+import SelectLocation from "./select_location.vue";
+
+export const defaultFarm = "All Farms";
 
 export default {
   name: "SelectFarm",
   components: {
-    SelectCountry,
+    SelectLocation,
   },
 };
 </script>
