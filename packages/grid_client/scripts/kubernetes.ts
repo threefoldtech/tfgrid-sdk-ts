@@ -9,8 +9,7 @@ async function deploy(client, k8s) {
     log(res);
     log("================= Deploying K8s =================");
   } catch (error) {
-    log("Error while Deploying the cluster " + error);
-    process.exitCode = 1;
+    console.error("Error while Deploying the cluster ", error.message);
   }
 }
 
@@ -21,8 +20,7 @@ async function getDeployment(client, k8s) {
     log(res);
     log("================= Getting deployment information =================");
   } catch (error) {
-    log("Error while getting the deployment " + error);
-    process.exitCode = 1;
+    console.error("Error while getting the deployment ", error.message);
   }
 }
 
@@ -33,8 +31,7 @@ async function cancel(client, k8s) {
     log(res);
     log("================= Canceling the deployment =================");
   } catch (error) {
-    log("Error while canceling the deployment " + error);
-    process.exitCode = 1;
+    console.error("Error while canceling the deployment ", error.message);
   }
 }
 

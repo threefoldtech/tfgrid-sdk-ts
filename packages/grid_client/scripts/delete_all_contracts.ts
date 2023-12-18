@@ -8,8 +8,7 @@ async function deleteAllContracts(client) {
     log(res);
     log("================= Deleting all contracts =================");
   } catch (error) {
-    log("Error while deleting contracts " + error);
-    process.exitCode = 1;
+    console.error("Error while deleting contracts ", error.message);
   }
 }
 

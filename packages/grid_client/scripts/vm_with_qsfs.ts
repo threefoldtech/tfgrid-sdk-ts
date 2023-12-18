@@ -9,8 +9,7 @@ async function deployQsfs(client, qsfs) {
     log(res);
     log("================= Deploying QSFS =================");
   } catch (error) {
-    log("Error while Deploying QSFS " + error);
-    process.exitCode = 1;
+    console.error("Error while Deploying QSFS ", error.message);
   }
 }
 
@@ -21,8 +20,7 @@ async function deploy(client, vms) {
     log(res);
     log("================= Deploying VM =================");
   } catch (error) {
-    log("Error while Deploying the VM " + error);
-    process.exitCode = 1;
+    console.error("Error while Deploying the VM ", error.message);
   }
 }
 
@@ -33,8 +31,7 @@ async function getDeployment(client, vms) {
     log(res);
     log("================= Getting deployment information =================");
   } catch (error) {
-    log("Error while getting the deployment " + error);
-    process.exitCode = 1;
+    console.error("Error while getting the deployment ", error.message);
   }
 }
 
@@ -45,8 +42,7 @@ async function cancel(client, vms) {
     log(res);
     log("================= Canceling the deployment =================");
   } catch (error) {
-    log("Error while canceling the deployment " + error);
-    process.exitCode = 1;
+    console.error("Error while canceling the deployment ", error.message);
   }
 }
 
@@ -57,8 +53,7 @@ async function deleteQsfs(client, qsfs) {
     log(res);
     log("================= Deleting QSFS =================");
   } catch (error) {
-    log("Error while deleting qsfs " + error);
-    process.exitCode = 1;
+    console.error("Error while deleting qsfs ", error.message);
   }
 }
 
