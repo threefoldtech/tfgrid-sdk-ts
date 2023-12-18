@@ -1,49 +1,51 @@
 <template>
   <section>
-    <h3 class="bg-primary pa-2 text-h6 rounded">Node Selection</h3>
-    <p class="text-h6 mb-4 mt-2 ml-2">Choose a way to select Node</p>
+    <template v-if="!disableNodeSelection">
+      <h3 class="bg-primary pa-2 text-h6 rounded">Node Selection</h3>
+      <p class="text-h6 mb-4 mt-2 ml-2">Choose a way to select Node</p>
 
-    <v-radio-group v-model="wayToSelect" color="primary" inline>
-      <v-radio label="Automated" value="automated" class="mr-6"></v-radio>
-      <v-radio label="Manual" value="manual"></v-radio>
-    </v-radio-group>
+      <v-radio-group v-model="wayToSelect" color="primary" inline>
+        <v-radio label="Automated" value="automated" class="mr-6"></v-radio>
+        <v-radio label="Manual" value="manual"></v-radio>
+      </v-radio-group>
 
-    <template v-if="wayToSelect === 'automated'">
-      <TfSelectLocation v-model="location" v-if="wayToSelect === 'automated'" />
-      <TfSelectFarm
+      <template v-if="wayToSelect === 'automated'">
+        <TfSelectLocation v-model="location" v-if="wayToSelect === 'automated'" />
+        <TfSelectFarm
+          :valid-filters="validFilters"
+          :filters="filters"
+          :location="location"
+          v-model="farm"
+          v-if="wayToSelect === 'automated'"
+        />
+        <TfAutoNodeSelector
+          :valid-filters="validFilters"
+          :filters="filters"
+          :location="location"
+          :farm="farm"
+          v-model="node"
+          v-model:status="nodeStatus"
+          v-if="wayToSelect === 'automated'"
+        />
+      </template>
+      <TfManualNodeSelector
         :valid-filters="validFilters"
         :filters="filters"
-        :location="location"
-        v-model="farm"
-        v-if="wayToSelect === 'automated'"
-      />
-      <TfAutoNodeSelector
-        :valid-filters="validFilters"
-        :filters="filters"
-        :location="location"
-        :farm="farm"
         v-model="node"
         v-model:status="nodeStatus"
-        v-if="wayToSelect === 'automated'"
+        v-else
       />
-    </template>
-    <TfManualNodeSelector
-      :valid-filters="validFilters"
-      :filters="filters"
-      v-model="node"
-      v-model:status="nodeStatus"
-      v-else
-    />
 
-    <VExpandTransition>
-      <TfSelectGpu
-        :node="node"
-        :valid-node="nodeStatus === ValidatorStatus.Valid"
-        v-model="gpuCards"
-        v-model:status="gpuStatus"
-        v-if="filters.hasGPU"
-      />
-    </VExpandTransition>
+      <VExpandTransition>
+        <TfSelectGpu
+          :node="node"
+          :valid-node="nodeStatus === ValidatorStatus.Valid"
+          v-model="gpuCards"
+          v-model:status="gpuStatus"
+          v-if="filters.hasGPU"
+        />
+      </VExpandTransition>
+    </template>
 
     <VExpandTransition>
       <TfDomainName
@@ -83,6 +85,7 @@ export default {
       default: () => ({}),
     },
     requireDomain: Boolean,
+    disableNodeSelection: { type: Boolean, default: () => false },
     status: String as PropType<ValidatorStatus>,
   },
   emits: {
@@ -132,10 +135,9 @@ export default {
     onMounted(() => form?.register(uid, fakeService));
     onUnmounted(() => form?.unregister(uid));
 
-    // update status
     const invalid = computed(() => {
       return (
-        nodeStatus.value === ValidatorStatus.Invalid ||
+        (!props.disableNodeSelection && nodeStatus.value === ValidatorStatus.Invalid) ||
         (props.requireDomain && domainStatus.value === ValidatorStatus.Invalid) ||
         (props.filters.hasGPU && gpuStatus.value === ValidatorStatus.Invalid)
       );
@@ -143,7 +145,7 @@ export default {
 
     const pending = computed(() => {
       return (
-        nodeStatus.value === ValidatorStatus.Pending ||
+        (!props.disableNodeSelection && nodeStatus.value === ValidatorStatus.Pending) ||
         (props.requireDomain && domainStatus.value === ValidatorStatus.Pending) ||
         (props.filters.hasGPU && gpuStatus.value === ValidatorStatus.Pending)
       );
@@ -151,7 +153,7 @@ export default {
 
     const valid = computed(() => {
       return (
-        nodeStatus.value === ValidatorStatus.Valid &&
+        (props.disableNodeSelection || (!props.disableNodeSelection && nodeStatus.value === ValidatorStatus.Valid)) &&
         (!props.requireDomain || (props.requireDomain && domainStatus.value === ValidatorStatus.Valid)) &&
         (!props.filters.hasGPU || (props.filters.hasGPU && gpuStatus.value === ValidatorStatus.Valid))
       );
