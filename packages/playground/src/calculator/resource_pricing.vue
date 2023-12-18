@@ -115,7 +115,7 @@
             <input-tooltip tooltip="The amount of TFT to calculate discount.">
               <v-text-field
                 label="Balance"
-                :disabled="currentbalance"
+                :disabled="currentbalance && hasActiveProfile"
                 suffix="TFT"
                 type="number"
                 v-bind="props"
@@ -141,7 +141,12 @@
         >
           <v-switch color="primary" inset label="With a Public IPv4" v-model="ipv4" hide-details />
         </input-tooltip>
-        <input-tooltip inline class="px-2" tooltip="Use current balance to calculate the discount.">
+        <input-tooltip
+          v-if="hasActiveProfile"
+          inline
+          class="px-2"
+          tooltip="Use current balance to calculate the discount."
+        >
           <v-switch color="primary" inset label="Use current balance" v-model="currentbalance" hide-details />
         </input-tooltip>
       </v-row>
@@ -182,13 +187,15 @@
 </template>
 
 <script lang="ts" setup>
-import { capitalize, watch } from "vue";
+import { QueryClient } from "@threefold/tfchain_client";
+import { capitalize, computed, watch } from "vue";
 import { onMounted } from "vue";
 import { ref } from "vue";
 
 import { useProfileManager } from "@/stores/profile_manager";
-import { getGrid } from "@/utils/grid";
 
+import { calculator as Calculator } from "../../../grid_client/dist/es6";
+import { useGrid } from "../stores";
 import { color } from "../utils/background_color";
 
 const CRU = ref<number>(1);
@@ -213,37 +220,32 @@ interface PriceType {
   info: string;
 }
 const prices = ref<PriceType[]>([]);
-
-const grid = ref();
+const gridStore = useGrid();
 const profileManager = useProfileManager();
-
-watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance], async () => {
+const hasActiveProfile = computed(() => {
+  return !!profileManager.profile;
+});
+const calculator = computed(() => {
+  return hasActiveProfile.value && gridStore.grid
+    ? gridStore.grid?.calculator
+    : new Calculator(new QueryClient(window.env.SUBSTRATE_URL));
+});
+watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance, hasActiveProfile], async () => {
   let pkgs: any;
   if (!valid.value.error) {
-    if (currentbalance.value) {
-      const accountBalance = await grid.value.balance.getMyBalance();
-      balance.value = accountBalance.free;
-      pkgs = await grid.value.calculator.calculateWithMyBalance({
-        cru: CRU.value,
-        mru: MRU.value,
-        hru: HRU.value,
-        sru: SRU.value,
-        ipv4u: ipv4.value,
-        certified: isCertified.value,
-      });
-    } else {
-      if (!balance.value) balance.value = 0;
-      pkgs = await grid.value.calculator.calculate({
-        cru: CRU.value,
-        mru: MRU.value,
-        hru: HRU.value,
-        sru: SRU.value,
-        ipv4u: ipv4.value,
-        certified: isCertified.value,
-        balance: balance.value,
-      });
+    if (currentbalance.value && hasActiveProfile.value && gridStore.grid) {
+      const accountBalance = await gridStore.grid?.balance.getMyBalance();
+      balance.value = accountBalance?.free;
     }
-
+    pkgs = await calculator.value?.calculate({
+      cru: CRU.value,
+      mru: MRU.value,
+      hru: HRU.value,
+      sru: SRU.value,
+      ipv4u: ipv4.value,
+      certified: isCertified.value,
+      balance: balance.value || 0,
+    });
     setPriceList(pkgs);
   }
 });
@@ -255,7 +257,7 @@ watch(currentbalance, (newCurrentBalance, oldCurrentBalance) => {
 });
 
 async function setPriceList(pkgs: any): Promise<PriceType[]> {
-  TFTPrice.value = await grid.value.calculator.tftPrice();
+  TFTPrice.value = await calculator.value?.tftPrice();
   prices.value = [
     {
       label: "Dedicated Node",
@@ -280,23 +282,16 @@ async function setPriceList(pkgs: any): Promise<PriceType[]> {
 }
 
 onMounted(async () => {
-  getGrid(profileManager.profile!)
-    .then(async result => {
-      grid.value = result;
-      const pkgs = await grid.value.calculator.calculate({
-        cru: CRU.value,
-        mru: MRU.value,
-        hru: HRU.value,
-        sru: SRU.value,
-        ipv4u: ipv4.value,
-        certified: isCertified.value,
-        balance: balance.value,
-      });
-      setPriceList(pkgs);
-    })
-    .catch(error => {
-      console.error("Error fetching the grid:", error);
-    });
+  const pkgs = await calculator.value.calculate({
+    cru: CRU.value,
+    mru: MRU.value,
+    hru: HRU.value,
+    sru: SRU.value,
+    ipv4u: ipv4.value,
+    certified: isCertified.value,
+    balance: balance.value,
+  });
+  await setPriceList(pkgs);
 });
 
 function openManual() {
