@@ -273,7 +273,7 @@
           <v-col cols="7" sm="12" md="12" lg="7">
             <PasswordInputWrapper #="{ props }">
               <VTextField
-                label="Your Hex Seed"
+                label="Your Mnemonic"
                 readonly
                 v-model="profileManager.profile.mnemonic"
                 v-bind="props"
@@ -602,7 +602,7 @@ async function activate(mnemonic: string) {
     const grid = await getGrid({ mnemonic });
     const profile = await loadProfile(grid!);
     ssh.value = profile.ssh;
-    profileManager.set(profile);
+    profileManager.set({ ...profile, mnemonic });
   } catch (e) {
     loginError.value = normalizeError(e, "Something went wrong while login.");
   } finally {
