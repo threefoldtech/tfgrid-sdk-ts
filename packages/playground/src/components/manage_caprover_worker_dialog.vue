@@ -61,7 +61,8 @@
           </li>
           <li>
             Insert worker node public IP
-            <strong>{{ caproverData[caproverData.length - 1].publicIP.ip }}</strong> and add your private SSH Key.
+            <strong>{{ caproverData.workers[caproverData.workers.length - 1].publicIP.ip }}</strong> and add your
+            private SSH Key.
           </li>
           <li>Click <strong>Join cluster</strong> button.</li>
         </ol>
@@ -130,9 +131,10 @@ async function deploy(layout: any) {
       ],
       flist: "https://hub.grid.tf/tf-official-apps/tf-caprover-main.flist",
       entryPoint: "/sbin/zinit init",
-      farmId: worker.value.farm!.farmID,
-      farmName: worker.value.farm!.name,
-      country: worker.value.farm!.country,
+      farmId: worker.value.selectionDetails!.farm?.farmId,
+      farmName: worker.value.selectionDetails!.farm?.name,
+      country: worker.value.selectionDetails!.location?.country,
+      region: worker.value.selectionDetails!.location?.region,
       planetary: true,
       publicIpv4: true,
       envs: [
@@ -142,7 +144,10 @@ async function deploy(layout: any) {
       rootFilesystemSize: rootFs(worker.value.solution!.cpu, worker.value.solution!.memory),
     });
 
-    caproverData.value = vm;
+    const [leader, ...workers] = vm;
+    leader.workers = workers;
+    leader.projectName = props.projectName;
+    caproverData.value = leader;
     deployedDialog.value = true;
     layout.setStatus("success", `Successfully add a new worker to Caprover('${props.master.name}') Instance.`);
   } catch (e) {
@@ -168,7 +173,10 @@ async function onDelete(cb: (workers: any[]) => void) {
   selectedWorkers.value = [];
   const data = await loadVM(grid!, props.master.name);
   cb(data.slice(1));
-  emits("update:caprover", data);
+  const [leader, ...workers] = data;
+  leader.workers = workers;
+  leader.projectName = props.projectName;
+  emits("update:caprover", leader);
   deleting.value = false;
 }
 </script>
