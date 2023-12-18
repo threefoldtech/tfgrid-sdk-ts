@@ -38,8 +38,8 @@
                   validators.required('Transfer amount is required '),
                   validators.isNumeric('Amount should be a number.'),
                   validators.min('Amount must be greater than 0.', 0.001),
-                  validators.max('Insufficient funds.', freeBalance),
                   validators.isDecimal('Amount can have 3 decimals only.', { decimal_digits: '0,3' }),
+                  validators.max('Insufficient funds.', freeBalance),
                 ]"
                 #="{ props }"
               >
@@ -89,8 +89,8 @@
                   validators.required('Transfer amount is required '),
                   validators.isNumeric('Amount should be a number.'),
                   validators.min('Amount must be greater than 0.', 0.001),
-                  validators.max('Insufficient funds.', freeBalance),
                   validators.isDecimal('Amount can have 3 decimals only.', { decimal_digits: '0,3' }),
+                  validators.max('Insufficient funds.', freeBalance),
                 ]"
                 #="{ props }"
               >
