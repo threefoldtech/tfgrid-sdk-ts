@@ -158,7 +158,6 @@
           memory,
           rootFilesystemSize,
         }"
-        require-domain
         v-model="selectionDetails"
       />
     </form-validator>
