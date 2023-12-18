@@ -4,6 +4,7 @@
     "target": "esnext",
     "declaration": true,
     "outDir": "./dist/node",
+    "allowJs": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "skipLibCheck": true
