@@ -104,9 +104,15 @@
             </v-col>
             <v-col cols="10">
               <v-list-item>
-                {{ item.Minting.reward.tft.toFixed(7) }} TFT ({{ item.Minting.reward.musd.toFixed(3) }}$ at
-                {{ item.Minting.tft_connection_price.toFixed(3) }}$/TFT)</v-list-item
-              >
+                <input-tooltip
+                  inline
+                  :alignCenter="true"
+                  :tooltip="`1 TFT = ${(item.Minting.tft_connection_price / 1e3).toFixed(3)}$`"
+                >
+                  Farmed {{ (item.Minting.reward.tft / 1e7).toFixed(3) }} TFT that's almost =
+                  {{ (item.Minting.reward.musd / 1e3).toFixed(3) }}$
+                </input-tooltip>
+              </v-list-item>
               <v-list-item> {{ item.Minting.stellar_payout_address }}</v-list-item>
             </v-col>
           </v-row>

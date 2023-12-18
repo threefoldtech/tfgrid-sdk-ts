@@ -21,22 +21,43 @@
           ]"
           v-model:items-per-page="size"
           v-model:page="page"
-          v-model:sort-by="sortBy"
-          class="elevation-1"
-          @update:options="updateQueries"
+          :disable-sort="true"
+          :on-update:model-value="updateQueries"
           @click:row="openSheet"
         >
           <template #loading />
         </v-data-table-server>
       </v-col>
     </v-row>
-    <farmDialog
-      v-if="selectedFarm"
-      :openDialog="isDialogOpened"
-      :farm="selectedFarm"
-      @update:model-value="closeDialog"
-      @close-dialog="closeDialog"
-    />
+    <v-dialog v-model="dialog" hide-overlay transition="dialog-bottom-transition">
+      <v-container>
+        <v-toolbar :height="35">
+          <div class="ml-auto">
+            <v-btn icon dark @click="() => (dialog = false)">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+          </div>
+        </v-toolbar>
+
+        <template v-if="loading">
+          <div color="transparent" class="text-center">
+            <v-progress-circular color="primary" indeterminate :size="50" :width="5" />
+            <p>Loading farm details...</p>
+          </div>
+        </template>
+
+        <template v-else>
+          <v-card>
+            <v-col>
+              <farm-details-card :farm="selectedFarm" />
+            </v-col>
+            <v-col>
+              <twin-details-card :farm="selectedFarm" />
+            </v-col>
+          </v-card>
+        </template>
+      </v-container>
+    </v-dialog>
   </view-layout>
 </template>
 
@@ -52,17 +73,17 @@ import { inputsInitializer } from "@/utils/filter_farms";
 import { getAllFarms, getFarmQueries } from "@/utils/get_farms";
 const loading = ref<boolean>(false);
 const farms = ref<Farm[]>();
-const isDialogOpened = ref<boolean>(false);
+
 const selectedFarm = ref<Farm>();
 const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer());
 const size = ref(10);
 const page = ref(1);
 
-const sortBy = ref([{ key: "", order: undefined }]);
+const dialog = ref(false);
+
 const filterOptions = ref<FarmFilterOptions>({
   size: size.value,
   page: page.value,
-  sortBy: sortBy.value,
 });
 
 const mixedFarmFilters = computed<MixedFarmFilter>(() => ({
@@ -93,9 +114,6 @@ const _getFarms = async (queries: Partial<FarmsQuery>) => {
             freePublicIp: total - used,
           };
         });
-        if (sortBy.value[0]) {
-          updateSorting();
-        }
       }
     } catch (err) {
       console.log("could not get farms:", err);
@@ -118,33 +136,6 @@ const updateFarms = async () => {
   await request(queries);
 };
 
-const updateSorting = () => {
-  if (mixedFarmFilters.value.options) {
-    if (mixedFarmFilters.value.options.sortBy?.length) {
-      if (sortBy.value[0] && sortBy.value[0]) {
-        const sortKey = sortBy.value[0].key;
-        const sortOrder = sortBy.value[0].order;
-        if (sortKey && sortOrder && farms.value) {
-          farms.value.sort((a, b) => {
-            let aValue: any, bValue: any;
-            if (sortKey == "farmId") {
-              aValue = a.farmId;
-              bValue = b.farmId;
-            } else {
-              aValue = a.name;
-              bValue = b.name;
-            }
-
-            if (typeof aValue == "string" && typeof bValue == "string") {
-              return sortOrder === "desc" ? bValue.localeCompare(aValue) : aValue.localeCompare(bValue);
-            }
-            return sortOrder === "desc" ? bValue - aValue : aValue - bValue;
-          });
-        }
-      }
-    }
-  }
-};
 const updateQueries = async () => {
   const inputs = mixedFarmFilters.value.inputs;
   if (inputs && filterFarmInputs.value) {
@@ -163,7 +154,6 @@ const updateQueries = async () => {
   if (options) {
     options.page = page.value;
     options.size = size.value;
-    options.sortBy = sortBy.value;
   }
   await updateFarms();
 };
@@ -179,7 +169,6 @@ const inputFiltersReset = (filtersInputValues: FilterFarmInputs) => {
   filterOptions.value = {
     page: 1,
     size: 10,
-    sortBy: [{ key: "", order: undefined }],
   };
 };
 
@@ -188,16 +177,12 @@ const openSheet = (_e: any, { item }: any) => {
 };
 const openDialog = (item: Farm) => {
   selectedFarm.value = item;
-  isDialogOpened.value = true;
-};
-
-const closeDialog = () => {
-  isDialogOpened.value = false;
+  dialog.value = true;
 };
 
 const headers: VDataTableHeader = [
-  { title: "ID", key: "farmId" },
-  { title: "Name", key: "name" },
+  { title: "ID", key: "farmId", sortable: false },
+  { title: "Name", key: "name", sortable: false },
   {
     title: "Total Public IPs",
     key: "totalPublicIp",
@@ -229,14 +214,15 @@ const headers: VDataTableHeader = [
 import type { FarmsQuery } from "@threefold/gridproxy_client";
 
 import Filters from "@/components/filter.vue";
+import FarmDetailsCard from "@/components/node_details_cards/farm_details_card.vue";
+import TwinDetailsCard from "@/components/node_details_cards/twin_details_card.vue";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
-
-import FarmDialog from "../components/farm_dialog.vue";
 export default {
   name: "Farms",
   components: {
-    FarmDialog,
     Filters,
+    FarmDetailsCard,
+    TwinDetailsCard,
   },
 };
 </script>

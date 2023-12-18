@@ -116,7 +116,7 @@ import type { Farm } from "@threefold/gridproxy_client";
 import { jsPDF } from "jspdf";
 import { debounce } from "lodash";
 import { StrKey } from "stellar-sdk";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import CardDetails from "@/components/node_details_cards/card_details.vue";
@@ -182,10 +182,6 @@ export default {
     const isAdding = ref(false);
     const network = process.env.NETWORK || (window as any).env.NETWORK;
 
-    onMounted(async () => {
-      await getUserFarms();
-    });
-
     const reloadFarms = debounce(getUserFarms, 20000);
     context.expose({ reloadFarms });
     function filter(items: Farm[]) {
@@ -206,7 +202,8 @@ export default {
 
     async function getUserFarms() {
       try {
-        const { data } = await gridProxyClient.farms.list({
+        const { data, count } = await gridProxyClient.farms.list({
+          retCount: true,
           twinId,
           page: page.value,
           size: pageSize.value,
@@ -214,7 +211,7 @@ export default {
 
         const filteredFarms = filter(data);
         farms.value = filteredFarms as unknown as Farm[];
-        farmsCount.value = filteredFarms.length;
+        farmsCount.value = count || filteredFarms.length;
       } catch (error) {
         console.log(error);
         createCustomToast("Failed to get user farms!", ToastType.danger);

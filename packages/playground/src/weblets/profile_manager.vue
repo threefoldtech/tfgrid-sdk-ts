@@ -269,11 +269,11 @@
       </DTabs>
 
       <template v-if="profileManager.profile">
-        <v-row class="py-2 pb-5">
-          <v-col cols="7" sm="12" md="6" lg="7">
+        <v-row class="justify-space-around py-2 pb-5">
+          <v-col cols="7" sm="12" md="12" lg="7">
             <PasswordInputWrapper #="{ props }">
               <VTextField
-                label="Your Hex Seed"
+                label="Your Mnemonic"
                 readonly
                 v-model="profileManager.profile.mnemonic"
                 v-bind="props"
@@ -341,7 +341,7 @@
           </v-col>
           <v-divider class="mx-4" vertical></v-divider>
 
-          <v-col>
+          <v-col cols="12" lg="4">
             <section class="d-flex flex-column align-center">
               <p class="mb-4 text-center">
                 Scan the QR code using
@@ -355,10 +355,10 @@
               />
               <div class="d-flex justify-center my-4">
                 <a
-                  v-for="(app, index) in apps"
+                  v-for="app in apps"
                   :key="app.alt"
-                  :style="{ cursor: 'pointer', width: '150px' }"
-                  :class="{ 'mr-2': index === 0 }"
+                  :style="{ cursor: 'pointer', width: '9rem' }"
+                  class="app-btn mr-2"
                   :title="app.alt"
                   v-html="app.src"
                   :href="app.url"
@@ -518,7 +518,9 @@ const SSHKeyHint = ref("");
 const ssh = ref("");
 const mnemonicInput = useInputRef();
 const shouldActivateAccount = computed(
-  () => mnemonicInput.value?.error?.toLowerCase()?.includes("couldn't find a user for the provided mnemonic") || false,
+  () =>
+    mnemonicInput.value?.error?.toLowerCase()?.includes("couldn't get the user twin for the provided mnemonic") ||
+    false,
 );
 let sshTimeout: any;
 const isValidConnectConfirmationPassword = computed(() =>
@@ -600,7 +602,7 @@ async function activate(mnemonic: string) {
     const grid = await getGrid({ mnemonic });
     const profile = await loadProfile(grid!);
     ssh.value = profile.ssh;
-    profileManager.set(profile);
+    profileManager.set({ ...profile, mnemonic });
   } catch (e) {
     loginError.value = normalizeError(e, "Something went wrong while login.");
   } finally {
@@ -763,5 +765,10 @@ export default {
 <style>
 .v-field__input {
   font-size: small;
+}
+@media only screen and (max-width: 1400px) {
+  .app-btn {
+    width: 8rem !important;
+  }
 }
 </style>
