@@ -41,53 +41,52 @@
             key="item.id"
           >
             <card-details :loading="false" title="Node Details" :items="getNodeDetails(item.raw)"></card-details>
-
             <v-expansion-panels v-model="resourcesPanel" :disabled="false" focusable>
               <v-expansion-panel class="my-4">
-                <v-expansion-panel-title> Resource Units Reserved </v-expansion-panel-title>
-                <v-expansion-panel-text>
-                  <v-row class="mt-5 mb-5">
-                    <v-col v-for="(value, key) in item.raw.total_resources" :key="key" align="center">
-                      <p class="text-center">{{ getKey(key) }}</p>
-                      <v-flex class="text-truncate">
-                        <v-tooltip bottom class="d-none">
-                          <template v-slot:activator="{ props }">
-                            <v-progress-circular
-                              v-bind="props"
-                              :rotate="-90"
-                              :size="150"
-                              :width="12"
-                              :model-value="getPercentage(item.raw, key)"
-                              class="my-3"
-                              color="primary"
-                            />
-                            <template v-if="item.raw.used_resources">
-                              <p v-if="item.raw.total_resources[key] > 1000">
-                                {{ byteToGB(item.raw.used_resources[key]) }} /
-                                {{ byteToGB(item.raw.total_resources[key]) }} GB
-                              </p>
-
-                              <p v-else-if="item.raw.total_resources[key] == 0">NA</p>
-                              <p v-else>
-                                {{ item.raw.used_resources[key] }} /
-                                {{ item.raw.total_resources[key] }}
-                              </p>
-                            </template>
+                <v-alert class="pa-5" style="height: 20px">
+                  <h4 class="text-center font-weight-medium">Resource Units Reserved</h4>
+                </v-alert>
+                <v-row class="mt-5 mb-5">
+                  <v-col v-for="(value, key) in item.raw.total_resources" :key="key" align="center">
+                    <p class="text-center">{{ getKey(key) }}</p>
+                    <v-flex class="text-truncate">
+                      <v-tooltip bottom class="d-none">
+                        <template v-slot:activator="{ props }">
+                          <v-progress-circular
+                            v-bind="props"
+                            :rotate="-90"
+                            :size="150"
+                            :width="12"
+                            :model-value="getPercentage(item.raw, key)"
+                            class="my-3"
+                            color="primary"
+                          />
+                          <template v-if="item.raw.used_resources">
+                            <p v-if="item.raw.total_resources[key] > 1000">
+                              {{ byteToGB(item.raw.used_resources[key]) }} /
+                              {{ byteToGB(item.raw.total_resources[key]) }} GB
+                            </p>
+                            <p v-else-if="item.raw.total_resources[key] == 0">NA</p>
+                            <p v-else>
+                              {{ item.raw.used_resources[key] }} /
+                              {{ item.raw.total_resources[key] }}
+                            </p>
                           </template>
-                        </v-tooltip>
-                      </v-flex>
-                    </v-col>
-                  </v-row>
-                </v-expansion-panel-text>
+                        </template>
+                      </v-tooltip>
+                    </v-flex>
+                  </v-col>
+                </v-row>
               </v-expansion-panel>
             </v-expansion-panels>
 
             <v-expansion-panels v-if="network == 'main'" :disabled="false" focusable single model-value>
               <v-expansion-panel class="my-3">
-                <v-expansion-panel-title> Node Statistics </v-expansion-panel-title>
-                <v-expansion-panel-text>
-                  <NodeMintingDetails :node="item.value" />
-                </v-expansion-panel-text>
+                <v-alert class="pa-5" style="height: 20px">
+                  <h4 class="text-center font-weight-medium">Node Statistics</h4>
+                </v-alert>
+
+                <NodeMintingDetails :node="item.value" />
               </v-expansion-panel>
             </v-expansion-panels>
           </td>
