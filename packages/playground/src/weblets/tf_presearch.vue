@@ -5,9 +5,8 @@
     :memory="memory"
     :disk="rootFilesystemSize + dockerDiskSize"
     :ipv4="ipv4"
-    :certified="certified"
     :dedicated="dedicated"
-    :SelectedNode="selectedNode"
+    :SelectedNode="selectionDetails?.node"
     title-image="images/icons/presearch.png"
   >
     <template #title>Deploy a Presearch Instance</template>
@@ -56,54 +55,33 @@
             </input-tooltip>
           </password-input-wrapper>
         </input-validator>
-        <Network required v-model:ipv4="ipv4" v-model:planetary="planetary" ref="network" :disabled="loadingFarm" />
+
+        <Network required v-model:ipv4="ipv4" v-model:planetary="planetary" ref="network" />
 
         <input-tooltip
           inline
           tooltip="Click to know more about dedicated nodes."
           href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
         >
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
+          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>
         <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
+          <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
         </input-tooltip>
-        <SelectFarmManager>
-          <NodeSelector v-model="selection" />
-          <SelectFarm
-            v-if="selection == Selection.AUTOMATED"
-            :filters="{
-              cpu,
-              memory,
-              ssd: rootFilesystemSize + dockerDiskSize,
-              publicIp: ipv4,
-              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-              certified: certified,
-            }"
-            exclusive-for="research"
-            v-model="farm"
-            v-model:loading="loadingFarm"
-            v-model:search="farmName"
-          />
 
-          <SelectNode
-            v-model="selectedNode"
-            :selection="selection"
-            :filters="{
-              farmId: farm?.farmID,
-              cpu,
-              memory,
-              ipv4: ipv4,
-              diskSizes: [dockerDiskSize],
-              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-              certified: certified,
-              country: farm?.country,
-              region: farm?.region,
-            }"
-            :loading-farm="loadingFarm"
-            :root-file-system-size="rootFilesystemSize"
-          />
-        </SelectFarmManager>
+        <TfSelectionDetails
+          :filters="{
+            ipv4,
+            certified,
+            dedicated,
+            cpu,
+            ssdDisks: [dockerDiskSize],
+            memory,
+            rootFilesystemSize,
+            exclusiveFor: 'research',
+          }"
+          v-model="selectionDetails"
+        />
       </template>
 
       <template #restore>
@@ -130,15 +108,12 @@
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref, watch } from "vue";
-
-import { Selection } from "@/utils/types";
+import { ref } from "vue";
 
 import Network from "../components/networks.vue";
-import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import { type FarmInterface, type Flist, ProjectName } from "../types";
+import { type Flist, ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
@@ -148,7 +123,6 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
-const selection = ref();
 const name = ref(generateName({ prefix: "ps" }));
 const code = ref("");
 const ipv4 = ref(false);
@@ -156,10 +130,7 @@ const planetary = ref(true);
 const cpu = 1;
 const memory = 512;
 const rootFilesystemSize = rootFs(cpu, memory);
-const loadingFarm = ref(false);
 const dockerDiskSize = 10;
-const farm = ref() as Ref<FarmInterface>;
-const farmName = ref();
 const privateRestoreKey = ref("");
 const publicRestoreKey = ref("");
 const network = ref();
@@ -169,16 +140,7 @@ const flist: Flist = {
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<INode>;
-watch(
-  () => selection.value,
-  (value, oldValue) => {
-    if (value !== oldValue) {
-      loadingFarm.value = false;
-    }
-  },
-  { deep: false },
-);
+const selectionDetails = ref<SelectionDetails>();
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -207,11 +169,8 @@ async function deploy() {
               size: dockerDiskSize,
             },
           ],
-          farmId: farm.value.farmID,
-          farmName: farm.value.name,
           planetary: planetary.value,
           publicIpv4: ipv4.value,
-          country: farm.value.country,
           envs: [
             {
               key: "SSH_KEY",
@@ -231,7 +190,7 @@ async function deploy() {
             },
           ],
           rootFilesystemSize: rootFilesystemSize,
-          nodeId: selectedNode.value.nodeId,
+          nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },
@@ -248,18 +207,10 @@ async function deploy() {
 </script>
 
 <script lang="ts">
-import SelectFarm from "../components/select_farm.vue";
-import SelectFarmManager from "../components/select_farm_manager.vue";
-import SelectNode from "../components/select_node.vue";
 import { deploymentListEnvironments } from "../constants";
-import type { INode } from "../utils/filter_nodes";
+import type { SelectionDetails } from "../types/nodeSelector";
 
 export default {
   name: "TFPresearch",
-  components: {
-    SelectFarm,
-    SelectNode,
-    SelectFarmManager,
-  },
 };
 </script>
