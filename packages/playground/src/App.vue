@@ -194,6 +194,7 @@
 </template>
 
 <script lang="ts" setup>
+import noop from "lodash/fp/noop.js";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
@@ -220,9 +221,7 @@ watch(
   },
 );
 
-onMounted(() => {
-  (window as any).loaded = true;
-});
+onMounted(window.$$appLoader || noop);
 
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
