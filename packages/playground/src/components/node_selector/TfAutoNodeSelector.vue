@@ -141,9 +141,11 @@ export default {
         bindModelValue();
         return oldNode?.nodeId;
       },
-      async onBeforeLoadingFinish(nodes, error, oldNodeId: number) {
+      async onBeforeLoadingFinish(data, __, oldNodeId: number) {
+        const nodes = data ?? [];
         const index = loadedNodes.value.concat(nodes ?? []).findIndex(n => n.nodeId === oldNodeId);
-        if (!oldNodeId || (oldNodeId && index !== -1) || !nodes || error) {
+
+        if (oldNodeId && index !== -1) {
           return;
         }
 
