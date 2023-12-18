@@ -48,7 +48,7 @@ window.$$appLoader = () => {
   refreshBtn && refreshBtn.classList.remove("active");
   loader && loader.classList.remove("active");
   if (msgElement) {
-    msgElement.textContent = "Dashboard content loaded, Welcome!";
+    msgElement.textContent = "Dashboard loaded. Welcome!";
   }
 
   setTimeout(() => {
