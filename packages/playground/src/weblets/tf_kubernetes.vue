@@ -9,7 +9,7 @@
     :ipv4="master.ipv4"
     :certified="master.certified"
     :dedicated="master.dedicated"
-    :SelectedNode="master.selectedNode"
+    :SelectedNode="master.selectionDetails?.node"
     title-image="images/icons/kubernetes.png"
   >
     <template #title>Deploy a Kubernetes cluster</template>
@@ -62,12 +62,12 @@
       </template>
 
       <template #master>
-        <K8SWorker v-model="master" loadingFarm />
+        <K8SWorker v-model="master" />
       </template>
 
       <template #workers>
-        <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }" :disabled="loadingFarm">
-          <K8SWorker v-model="workers[index]" v-model:loading="loadingFarm" />
+        <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }">
+          <K8SWorker v-model="workers[index]" />
         </ExpandableLayout>
       </template>
     </d-tabs>
@@ -96,7 +96,7 @@ const name = ref(generateName({ prefix: "k8s" }));
 const clusterToken = ref(generatePassword(10));
 const master = ref(createWorker(generateName({ prefix: "mr" })));
 const workers = ref<K8sWorker[]>([]);
-const loadingFarm = ref(false);
+
 function addWorker() {
   workers.value.push(createWorker());
 }

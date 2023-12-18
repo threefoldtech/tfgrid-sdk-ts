@@ -53,11 +53,10 @@ export interface K8SWorker {
   ipv6: boolean;
   planetary: boolean;
   rootFsSize: number;
-  farm?: FarmInterface;
-  selectedNode?: INode;
   rentedBy?: number;
   dedicated: boolean;
   certified: boolean;
+  selectionDetails?: SelectionDetails;
 }
 
 export interface CaproverWorker {
@@ -232,8 +231,9 @@ export const optionsInitializer: () => FilterOptions = () => ({
   status: capitalize(NodeStatus.Up) as NodeStatus,
 });
 
-import type { FilterFarmInputs } from "@/utils/filter_farms";
-import type { FilterNodeInputs } from "@/utils/filter_nodes";
+import type { FilterFarmInputs } from "../utils/filter_farms";
+import type { FilterNodeInputs } from "../utils/filter_nodes";
+import type { SelectionDetails } from "./nodeSelector";
 
 // The input filters<nodeId, farmIds..etc> and the option filters<status, gpu...etc>
 
