@@ -187,7 +187,7 @@
             </div>
           </v-container>
         </DeploymentListManager>
-        <TFNotification v-if="hasActiveProfile" />
+        <TFNotification v-if="hasActiveProfile && hasGrid" />
       </v-main>
     </profile-manager-controller>
   </v-app>
