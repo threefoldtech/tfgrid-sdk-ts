@@ -137,16 +137,24 @@
                         />
                       </div>
                       <div class="d-flex justify-end mb-10">
-                        <VBtn
-                          class="mt-2 ml-3"
-                          color="primary"
-                          variant="tonal"
-                          :disabled="!shouldActivateAccount"
-                          :loading="activatingAccount"
-                          @click="openAcceptTerms = termsLoading = true"
-                        >
-                          Activate account
-                        </VBtn>
+                        <v-tooltip>
+                          <template v-slot:activator="{ isActive, props }">
+                            <VBtn
+                              class="mt-2 ml-3"
+                              color="primary"
+                              variant="tonal"
+                              :disabled="!shouldActivateAccount"
+                              :loading="activatingAccount"
+                              @click="openAcceptTerms = termsLoading = true"
+                              v-bind="props"
+                              v-on="isActive"
+                            >
+                              Activate account
+                            </VBtn>
+                          </template>
+                          <span>To connect to your wallet, you should accept terms and conditions first.</span>
+                        </v-tooltip>
+
                         <VBtn
                           class="mt-2 ml-3"
                           color="secondary"
