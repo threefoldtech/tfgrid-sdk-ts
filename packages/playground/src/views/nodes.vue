@@ -157,7 +157,7 @@ export default {
         try {
           const { count, data } = await requestNodes(queries, config);
           nodes.value = data;
-            nodesCount.value = count ?? 0
+          nodesCount.value = count ?? 0;
         } catch (err) {
           console.log(err);
         } finally {
