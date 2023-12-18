@@ -88,10 +88,10 @@ export async function deployGatewayName2(
 
   if (domain.useFQDN) {
     (gw as GatewayFQDNModel).fqdn = domain.customDomain;
-    return grid.gateway.delete_fqdn(gw);
+    return grid.gateway.deploy_fqdn(gw as GatewayFQDNModel);
   }
 
-  return grid.gateway.delete_name(gw);
+  return grid.gateway.deploy_name(gw);
 }
 
 export async function rollbackDeployment(grid: GridClient, name: string) {
