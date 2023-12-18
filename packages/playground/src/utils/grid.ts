@@ -1,15 +1,18 @@
-import { BackendStorageType, GridClient, NetworkEnv } from "@threefold/grid_client";
+import { BackendStorageType, GridClient, KeypairType, NetworkEnv } from "@threefold/grid_client";
 
 import type { Profile } from "../stores/profile_manager";
 
 const network = (process.env.NETWORK as NetworkEnv) || window.env.NETWORK;
-export async function getGrid(profile: Pick<Profile, "mnemonic" | "keypairType">, projectName?: string) {
+export async function getGrid(
+  profile: Pick<Profile, "mnemonic"> & Partial<Pick<Profile, "keypairType">>,
+  projectName?: string,
+) {
   if (!profile) return null;
   const grid = new GridClient({
     mnemonic: profile.mnemonic,
     network,
     backendStorageType: BackendStorageType.tfkvstore,
-    keypairType: profile.keypairType,
+    keypairType: profile.keypairType || KeypairType.sr25519,
     projectName,
 
     ...(import.meta.env.DEV && network !== NetworkEnv.custom
