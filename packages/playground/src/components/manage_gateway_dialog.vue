@@ -136,7 +136,7 @@
             </input-tooltip>
 
             <div :style="{ marginTop: '-10px' }">
-              <domain-name :available-for="profileManager.profile?.twinId" hide-title v-model="domainName" />
+              <TfSelectionDetails disable-node-selection require-domain v-model="selectionDetails" />
             </div>
 
             <input-validator
@@ -226,18 +226,18 @@ import { onMounted, type PropType, ref } from "vue";
 
 import { useProfileManager } from "../stores";
 import { ProjectName } from "../types";
-import { deployGatewayName, type GridGateway, loadDeploymentGateways } from "../utils/gateway";
+import type { SelectionDetails } from "../types/nodeSelector";
+import { deployGatewayName2, type GridGateway, loadDeploymentGateways } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
-import DomainName, { type DomainModel } from "./domain_name.vue";
 import IconActionBtn from "./icon_action_btn.vue";
 import ListTable from "./list_table.vue";
 import { useLayout } from "./weblet_layout.vue";
 
 export default {
   name: "ManageGatewayDialog",
-  components: { ListTable, DomainName, IconActionBtn },
+  components: { ListTable, IconActionBtn },
   props: {
     vm: { type: Array as PropType<any>, required: true },
   },
@@ -249,10 +249,10 @@ export default {
     const oldPrefix = ref("");
     const prefix = ref("");
     const subdomain = ref("");
-    const domainName = ref<DomainModel>();
     const port = ref(80);
     const passThrough = ref(false);
     const valid = ref(false);
+    const selectionDetails = ref<SelectionDetails>();
 
     const ip = props.vm.interfaces[0].ip as string;
     const networkName = props.vm.interfaces[0].network as string;
@@ -294,19 +294,23 @@ export default {
         const [x, y] = ip.split(".");
         const grid = await getGrid(profileManager.profile!, props.vm.projectName);
 
-        const data = { name: networkName, ipRange: `${x}.${y}.0.0/16`, nodeId: domainName.value!.gateway.id! };
+        const data = {
+          name: networkName,
+          ipRange: `${x}.${y}.0.0/16`,
+          nodeId: selectionDetails.value!.domain!.selectedDomain!.nodeId,
+        };
+
         const hasNode = await grid!.networks.hasNode(data);
+
         if (!hasNode) {
           await grid!.networks.addNode(data);
         }
 
-        await deployGatewayName(grid!, {
-          name: prefix.value + subdomain.value,
-          nodeId: domainName.value!.gateway.id!,
+        await deployGatewayName2(grid, selectionDetails.value!.domain, {
+          subdomain: prefix.value + subdomain.value,
           ip,
-          networkName,
           port: port.value,
-          fqdn: domainName.value!.hasCustomDomain ? domainName.value!.customDomain : undefined,
+          network: networkName,
           tlsPassthrough: passThrough.value,
         });
         layout.value.setStatus("success", "Successfully deployed gateway.");
@@ -351,7 +355,7 @@ export default {
 
       subdomain,
       port,
-      domainName,
+      selectionDetails,
       passThrough,
       valid,
 

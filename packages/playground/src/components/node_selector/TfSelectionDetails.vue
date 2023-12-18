@@ -51,6 +51,7 @@
       <TfDomainName
         :filters="filters"
         :farm="farm"
+        :hide-title="$props.disableNodeSelection"
         v-model="domain"
         v-model:status="domainStatus"
         v-if="requireDomain"

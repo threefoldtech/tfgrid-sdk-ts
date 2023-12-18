@@ -1,6 +1,6 @@
 <template>
   <section>
-    <h6 class="text-h5 mb-4 mt-2">Domain Name</h6>
+    <h6 class="text-h5 mb-4 mt-2" v-if="!hideTitle">Domain Name</h6>
 
     <input-tooltip tooltip="Use a custom domain">
       <div>
@@ -107,6 +107,7 @@ export default {
       required: true,
     },
     farm: Object as PropType<FarmInfo>,
+    hideTitle: Boolean,
     status: String as PropType<ValidatorStatus>,
   },
   emits: {
