@@ -9,8 +9,8 @@
     </input-tooltip>
 
     <VForm v-model="domainNameValid">
-      <input-tooltip tooltip="Domain Name that will points to this instance" v-if="enableCustomDomain">
-        <VExpandTransition>
+      <VExpandTransition>
+        <input-tooltip tooltip="Domain Name that will points to this instance" v-if="enableCustomDomain">
           <VTextField
             ref="customDomainInput"
             label="Custom Domain"
@@ -24,8 +24,8 @@
             ]"
             @blur="($refs.customDomainInput as VInput).validate()"
           />
-        </VExpandTransition>
-      </input-tooltip>
+        </input-tooltip>
+      </VExpandTransition>
 
       <VExpandTransition>
         <input-tooltip
@@ -65,26 +65,22 @@
         </input-tooltip>
       </VExpandTransition>
 
-      <VExpandTransition>
-        <v-expand-transition>
-          <v-alert
-            v-if="
-              !disableSelectedDomain &&
-              useFQDN &&
-              modelValue &&
-              modelValue.customDomain &&
-              selectedDomain?.publicConfig?.ipv4
-            "
-            class="mb-4"
-            type="warning"
-            variant="tonal"
-          >
-            Before starting the deployment, Please make sure to create an A record on your name provider with
-            <span class="font-weight-bold">{{ customDomain }}</span> pointing to
-            <span class="font-weight-bold">{{ selectedDomain.publicConfig.ipv4.split("/")[0] }}</span>
-          </v-alert>
-        </v-expand-transition>
-      </VExpandTransition>
+      <v-alert
+        v-if="
+          !disableSelectedDomain &&
+          useFQDN &&
+          modelValue &&
+          modelValue.customDomain &&
+          selectedDomain?.publicConfig?.ipv4
+        "
+        class="mb-4"
+        type="warning"
+        variant="tonal"
+      >
+        Before starting the deployment, Please make sure to create an A record on your name provider with
+        <span class="font-weight-bold">{{ customDomain }}</span> pointing to
+        <span class="font-weight-bold">{{ selectedDomain.publicConfig.ipv4.split("/")[0] }}</span>
+      </v-alert>
     </VForm>
   </section>
 </template>
