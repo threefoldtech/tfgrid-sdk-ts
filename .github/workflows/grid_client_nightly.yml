@@ -91,6 +91,20 @@ jobs:
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/delete_all_contracts.ts
 
+      - name: Run check up - List all contracts
+        id: command_step
+        run: |
+          output=$(yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/list_all_contracts.ts)
+          echo "::set-output name=myOutput::$output"
+
+      - name: Check if contracts are Empty
+        run: |
+          arrays=("${{ steps.command_step.outputs.myOutput }}")
+          # Check if all three [Name - Node - Rent] contracts are empty
+          if [ -n "${arrays[0]}" ] || [ -n "${arrays[1]}" ] || [ -n "${arrays[2]}" ]; then
+          echo "Deletion failed; at least one array is not empty."
+          exit 1
+
       - name: Test Results
         run: |
           echo Dynamic Single Vm: ${{ steps.dynamicsinglevm.outcome }}
