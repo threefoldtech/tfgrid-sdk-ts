@@ -94,6 +94,7 @@ jobs:
       - name: Run check up - List all contracts
         id: command_step
         run: |
+          sleep 15
           output=$(yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/list_all_contracts.ts)
           echo "::set-output name=myOutput::$output"
 
