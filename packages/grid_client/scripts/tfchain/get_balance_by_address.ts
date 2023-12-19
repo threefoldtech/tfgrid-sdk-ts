@@ -3,14 +3,10 @@ import { getClient } from "../client_loader";
 import { log } from "../utils";
 
 async function getBalanceByAddress(client, address) {
-  try {
-    const res = await client.tfchain.balanceByAddress(address);
-    log("================= Getting balance =================");
-    log(res);
-    log("================= Getting balance =================");
-  } catch (error) {
-    log("Error while getting balance" + error);
-  }
+  const res = await client.tfchain.balanceByAddress(address);
+  log("================= Getting balance =================");
+  log(res);
+  log("================= Getting balance =================");
 }
 
 async function main() {

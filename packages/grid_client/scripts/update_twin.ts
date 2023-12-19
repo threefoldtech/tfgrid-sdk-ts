@@ -3,14 +3,10 @@ import { getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function updateTwin(client, relay) {
-  try {
-    const res = await client.twins.update(relay);
-    log("================= Updating twin =================");
-    log(res);
-    log("================= Updating twin =================");
-  } catch (error) {
-    log("Error while updating twin " + error);
-  }
+  const res = await client.twins.update(relay);
+  log("================= Updating twin =================");
+  log(res);
+  log("================= Updating twin =================");
 }
 
 async function main() {

@@ -7,14 +7,10 @@ import config from "./config.json";
 import { log } from "./utils";
 
 async function createAccount(client, relay) {
-  try {
-    const res = await client.tfchain.createAccount(relay, true);
-    log("================= Creating account =================");
-    log(res);
-    log("================= Creating account =================");
-  } catch (error) {
-    log("Error while creating account " + error);
-  }
+  const res = await client.tfchain.createAccount(relay, true);
+  log("================= Creating account =================");
+  log(res);
+  log("================= Creating account =================");
 }
 
 async function main() {

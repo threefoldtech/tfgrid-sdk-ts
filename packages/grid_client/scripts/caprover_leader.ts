@@ -3,37 +3,25 @@ import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function deploy(client, vms) {
-  try {
-    const res = await client.machines.deploy(vms);
-    log("================= Deploying Caprover cluster =================");
-    log(res);
-    log("================= Deploying Caprover cluster =================");
-  } catch (error) {
-    log("Error while Deploying the VM " + error);
-  }
+  const res = await client.machines.deploy(vms);
+  log("================= Deploying Caprover cluster =================");
+  log(res);
+  log("================= Deploying Caprover cluster =================");
 }
 
 async function getDeployment(client, vms) {
-  try {
-    const res = await client.machines.getObj(vms);
-    log("================= Getting deployment information =================");
-    log(res);
-    log(`You can access Caprover via the browser using: http://captain.${res[0].env.CAPROVER_ROOT_DOMAIN}`);
-    log("================= Getting deployment information =================");
-  } catch (error) {
-    log("Error while getting the deployment " + error);
-  }
+  const res = await client.machines.getObj(vms);
+  log("================= Getting deployment information =================");
+  log(res);
+  log(`You can access Caprover via the browser using: http://captain.${res[0].env.CAPROVER_ROOT_DOMAIN}`);
+  log("================= Getting deployment information =================");
 }
 
 async function cancel(client, vms) {
-  try {
-    const res = await client.machines.delete(vms);
-    log("================= Canceling the deployment =================");
-    log(res);
-    log("================= Canceling the deployment =================");
-  } catch (error) {
-    log("Error while canceling the deployment " + error);
-  }
+  const res = await client.machines.delete(vms);
+  log("================= Canceling the deployment =================");
+  log(res);
+  log("================= Canceling the deployment =================");
 }
 
 async function main() {

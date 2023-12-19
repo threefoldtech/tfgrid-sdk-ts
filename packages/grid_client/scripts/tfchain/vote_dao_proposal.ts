@@ -3,25 +3,17 @@ import { getClient } from "../client_loader";
 import { log } from "../utils";
 
 async function importAccount(client, account) {
-  try {
-    const res = await client.tfchain.init(account);
-    log("================= Importing account =================");
-    log(res);
-    log("================= Importing account =================");
-  } catch (error) {
-    log("Error while importing account" + error);
-  }
+  const res = await client.tfchain.init(account);
+  log("================= Importing account =================");
+  log(res);
+  log("================= Importing account =================");
 }
 
 async function vote(client, vote) {
-  try {
-    const res = await client.tfchain.vote(vote);
-    log("================= Voting =================");
-    log(res);
-    log("================= Voting =================");
-  } catch (error) {
-    log("Error while voting " + error);
-  }
+  const res = await client.tfchain.vote(vote);
+  log("================= Voting =================");
+  log(res);
+  log("================= Voting =================");
 }
 
 async function main() {

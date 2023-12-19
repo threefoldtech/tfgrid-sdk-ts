@@ -2,25 +2,17 @@ import { getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function listNetworks(client) {
-  try {
-    const res = await client.networks.list();
-    log("================= Listing Networks =================");
-    log(res);
-    log("================= Listing Networks =================");
-  } catch (error) {
-    log("Error while listing networks " + error);
-  }
+  const res = await client.networks.list();
+  log("================= Listing Networks =================");
+  log(res);
+  log("================= Listing Networks =================");
 }
 
 async function getNetworkConfig(client, networkName) {
-  try {
-    const res = await client.networks.getWireGuardConfigs({ name: networkName });
-    log("================= Getting network config =================");
-    log(res);
-    log("================= Getting network config =================");
-  } catch (error) {
-    log("Error while getting network config " + error);
-  }
+  const res = await client.networks.getWireGuardConfigs({ name: networkName });
+  log("================= Getting network config =================");
+  log(res);
+  log("================= Getting network config =================");
 }
 
 async function main() {
