@@ -42,33 +42,48 @@
     >
       <template v-slot:top>
         <v-toolbar flat color="primary">
-          <v-toolbar-title class="mb-6 text-subtitle-1">Your Farms</v-toolbar-title>
+          <v-toolbar-title class="mb-6 text-subtitle-1 text-center">Your Farms</v-toolbar-title>
         </v-toolbar>
       </template>
       <template v-slot:expanded-row="{ columns, item }">
         <tr>
-          <td :colspan="columns.length">
+          <td
+            class="border border-anchor px-8 py-4"
+            :style="{ backgroundColor: 'rgb(var(--v-theme-background))' }"
+            :colspan="columns.length"
+          >
             <v-row>
               <v-col cols="12" class="mt-4">
-                <card-details
-                  :loading="false"
-                  title="Farm Details"
-                  icon="mdi-silo"
-                  :items="getFarmDetails(item.raw)"
-                ></card-details>
+                <card-details :loading="false" title="Farm Details" :items="getFarmDetails(item.raw)"></card-details>
               </v-col>
             </v-row>
-            <PublicIPsTable :farmId="item.raw.farmId" />
-            <v-row class="d-flex justify-center pb-5">
-              <v-card-actions>
-                <v-btn class="bg-primary" v-bind:href="'https://v3.bootstrap.grid.tf/'" target="blank"
-                  >Bootstrap Node Image</v-btn
-                >
-                <v-btn class="bg-primary" @click="showDialogue = true">Add/Edit Stellar Payout Address</v-btn>
-                <v-btn v-if="network == 'main'" class="bg-primary" @click="downloadFarmReceipts(item.value.farmId)"
-                  >Download Minting Receipts</v-btn
-                >
-              </v-card-actions>
+
+            <v-row>
+              <v-col cols="12 my-2">
+                <PublicIPsTable :farmId="item.raw.farmId" :refreshPublicIPs="refreshPublicIPs" />
+                <v-card-actions>
+                  <v-row class="justify-center mt-3">
+                    <v-btn
+                      class="text-subtitle-1 px-6"
+                      color="secondary"
+                      variant="outlined"
+                      @click="showDialogue = true"
+                    >
+                      Add/Edit Stellar Payout Address
+                    </v-btn>
+                    <v-btn
+                      class="text-subtitle-1 px-6"
+                      v-if="network == 'main'"
+                      color="secondary"
+                      variant="outlined"
+                      @click="downloadFarmReceipts(item.value.farmId)"
+                    >
+                      Download Minting Receipts
+                    </v-btn>
+                    <AddIP v-model:farmId="item.raw.farmId" @ip-added-successfully="handleIpAdded" />
+                  </v-row>
+                </v-card-actions>
+              </v-col>
             </v-row>
           </td>
         </tr>
@@ -133,6 +148,7 @@ import {
   type NodeInterface,
 } from "@/utils/node";
 
+import AddIP from "./add_ip.vue";
 import PublicIPsTable from "./public_ips_table.vue";
 
 export default {
@@ -140,6 +156,7 @@ export default {
   components: {
     PublicIPsTable,
     CardDetails,
+    AddIP,
   },
   setup(_, context) {
     const gridStore = useGrid();
@@ -184,6 +201,7 @@ export default {
     const isValidAddress = ref(false);
     const isAdding = ref(false);
     const network = process.env.NETWORK || (window as any).env.NETWORK;
+    const refreshPublicIPs = ref(false);
 
     const reloadFarms = debounce(getUserFarms, 20000);
     context.expose({ reloadFarms });
@@ -263,7 +281,7 @@ export default {
           callback: copy,
           hint: "Copy the stellar address to the clipboard.",
         },
-        { name: "Dedicated", value: item.dedicated },
+        { name: "Dedicated", value: item.dedicated ? "Yes" : "No" },
         { name: "Pricing Policy", value: item.pricingPolicyId },
       ];
     }
@@ -309,6 +327,10 @@ export default {
       docSum.save(`farm_${farmId}_receipt.pdf`);
     }
 
+    function handleIpAdded() {
+      refreshPublicIPs.value = !refreshPublicIPs.value;
+    }
+
     return {
       gridStore,
       headers,
@@ -330,6 +352,8 @@ export default {
       customStellarValidation,
       getFarmDetails,
       downloadFarmReceipts,
+      handleIpAdded,
+      refreshPublicIPs,
     };
   },
 };
