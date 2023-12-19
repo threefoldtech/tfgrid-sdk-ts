@@ -1,8 +1,6 @@
 import type { FarmFilterOptions, FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
 import { NodeStatus } from "@threefold/gridproxy_client";
-import shuffle from "lodash/fp/shuffle.js";
 import type { DeepPartial } from "utility-types";
-import type { ComputedRef, Ref } from "vue";
 import { z } from "zod";
 
 import { gqlClient, gridProxyClient } from "../clients";
@@ -171,6 +169,29 @@ export function normalizeNodeFilters(
 
 export function loadNodes(gridStore: ReturnType<typeof useGrid>, filters: FilterOptions) {
   return gridStore.client.capacity.filterNodes(filters);
+}
+
+export async function loadValidNodes(
+  gridStore: ReturnType<typeof useGrid>,
+  selectionFitlers: SelectionDetailsFilters,
+  filters: FilterOptions,
+  pagination: ReturnType<typeof usePagination>,
+): Promise<NodeInfo[]> {
+  let page = pagination.value.page;
+
+  while (page !== -1) {
+    const nodes = await loadNodes(gridStore, { ...filters, page });
+    const checks = await Promise.allSettled(nodes.map(n => checkNodeCapacityPool(gridStore, n, selectionFitlers)));
+    const validNodes = checks.map((c, i) => (c.status === "fulfilled" ? nodes[i] : null)).filter(Boolean) as NodeInfo[];
+
+    if (validNodes.length > 0) {
+      return validNodes;
+    }
+
+    page = pagination.value.next();
+  }
+
+  return [];
 }
 
 export async function getNodePageCount(gridStore: ReturnType<typeof useGrid>, filters: FarmFilterOptions) {

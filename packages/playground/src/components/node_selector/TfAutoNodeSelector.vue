@@ -96,6 +96,7 @@
 <script lang="ts">
 import type { FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
 import equals from "lodash/fp/equals.js";
+import sample from "lodash/fp/sample.js";
 import { computed, nextTick, onMounted, onUnmounted, type PropType, ref } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VInput } from "vuetify/components/VInput";
@@ -107,7 +108,7 @@ import type { SelectedLocation, SelectionDetailsFilters } from "../../types/node
 import {
   checkNodeCapacityPool,
   getNodePageCount,
-  loadNodes,
+  loadValidNodes,
   normalizeNodeFilters,
   normalizeNodeOptions,
 } from "../../utils/nodeSelector";
@@ -132,46 +133,21 @@ export default {
   setup(props, ctx) {
     const gridStore = useGrid();
     const loadedNodes = ref<NodeInfo[]>([]);
-    const nodesTask = useAsync(loadNodes, {
+    const nodesTask = useAsync(loadValidNodes, {
       shouldRun: () => props.validFilters,
       onBeforeTask() {
         const oldNode = props.modelValue;
         bindModelValue();
         return oldNode?.nodeId;
       },
-      onAfterTask({ data }) {
+      onAfterTask({ data }, oldNodeId: number) {
         loadedNodes.value = loadedNodes.value.concat(data as NodeInfo[]);
+
+        const node = loadedNodes.value.find(n => n.nodeId === oldNodeId) || sample(loadedNodes.value);
+        node && bindModelValue(node);
+        node && nodeInputValidateTask.value.run(node);
         pagination.value.next();
       },
-      // async onBeforeLoadingFinish(data, __, oldNodeId: number) {
-      //   const nodes = data ?? [];
-      //   const index = loadedNodes.value.concat(nodes ?? []).findIndex(n => n.nodeId === oldNodeId);
-
-      //   if (oldNodeId && index !== -1) {
-      //     return;
-      //   }
-
-      //   const checks = await Promise.allSettled(nodes.map(n => checkNodeCapacityPool(gridStore, n, props.filters)));
-      //   const allowedNodes = checks.map((c, i) => (c.status === "fulfilled" ? nodes[i] : null)).filter(Boolean);
-      //   const node = sample(allowedNodes);
-
-      //   if (node) {
-      //     touched.value = true;
-      //     bindModelValue(node);
-      //     bindStatus(ValidatorStatus.Valid);
-      //   }
-      // },
-      // async onAfterTask({ data }, oldNodeId: number) {
-      //   loadedNodes.value = loadedNodes.value.concat(data as NodeInfo[]);
-
-      //   const index = loadedNodes.value.findIndex(n => n.nodeId === oldNodeId);
-      //   if (oldNodeId && index !== -1) {
-      //     bindModelValue(loadedNodes.value[index]);
-      //     nodeInputValidateTask.value.run(loadedNodes.value[index]);
-      //   }
-
-      //   nextPage();
-      // },
       default: [],
     });
 
@@ -181,7 +157,7 @@ export default {
     const options = computed(() => normalizeNodeOptions(gridStore, props.location, pagination, props.farm));
     const filters = computed(() => normalizeNodeFilters(props.filters, options.value));
 
-    const reloadNodes = () => nodesTask.value.run(gridStore, filters.value);
+    const reloadNodes = () => nodesTask.value.run(gridStore, props.filters, filters.value, pagination);
 
     let initialized = false;
     onMounted(async () => {
