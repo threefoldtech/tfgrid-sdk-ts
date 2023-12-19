@@ -19,7 +19,6 @@ export type AsyncTaskOptions<T, E, A extends any[]> = {
   default?: T;
   onAfterTask?(task: TaskResult<T, E, A>, beforeTaskReturn: any): any;
   onBeforeTask?(): any;
-  onBeforeLoadingFinish?(data: T | null, error: E | null, beforeTaskReturn: any): any;
   onReset?(): any;
   shouldRun?(): boolean | Promise<boolean>;
   tries?: number;
@@ -33,7 +32,6 @@ function normalizeOptions<T, E, A extends any[]>(
     default: options.default || (null as T),
     onAfterTask: options.onAfterTask || noop,
     onBeforeTask: options.onBeforeTask || noop,
-    onBeforeLoadingFinish: options.onBeforeLoadingFinish || noop,
     onReset: options.onReset || noop,
     shouldRun: options.shouldRun || (() => true),
     tries: typeof options.tries !== "number" ? 3 : Math.max(1, options.tries),
@@ -91,7 +89,6 @@ export function useAsync<T, E = Error, A extends any[] = []>(
     }
 
     if (taskId === taskIdCounter) {
-      await _options.onBeforeLoadingFinish(data.value, error.value, ret);
       loading.value = false;
       _options.onAfterTask(asyncTask.value, ret);
     }

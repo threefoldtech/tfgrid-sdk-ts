@@ -141,35 +141,35 @@ export default {
         bindModelValue();
         return oldNode?.nodeId;
       },
-      async onBeforeLoadingFinish(data, __, oldNodeId: number) {
-        const nodes = data ?? [];
-        const index = loadedNodes.value.concat(nodes ?? []).findIndex(n => n.nodeId === oldNodeId);
+      // async onBeforeLoadingFinish(data, __, oldNodeId: number) {
+      //   const nodes = data ?? [];
+      //   const index = loadedNodes.value.concat(nodes ?? []).findIndex(n => n.nodeId === oldNodeId);
 
-        if (oldNodeId && index !== -1) {
-          return;
-        }
+      //   if (oldNodeId && index !== -1) {
+      //     return;
+      //   }
 
-        const checks = await Promise.allSettled(nodes.map(n => checkNodeCapacityPool(gridStore, n, props.filters)));
-        const allowedNodes = checks.map((c, i) => (c.status === "fulfilled" ? nodes[i] : null)).filter(Boolean);
-        const node = sample(allowedNodes);
+      //   const checks = await Promise.allSettled(nodes.map(n => checkNodeCapacityPool(gridStore, n, props.filters)));
+      //   const allowedNodes = checks.map((c, i) => (c.status === "fulfilled" ? nodes[i] : null)).filter(Boolean);
+      //   const node = sample(allowedNodes);
 
-        if (node) {
-          touched.value = true;
-          bindModelValue(node);
-          bindStatus(ValidatorStatus.Valid);
-        }
-      },
-      async onAfterTask({ data }, oldNodeId: number) {
-        loadedNodes.value = loadedNodes.value.concat(data as NodeInfo[]);
+      //   if (node) {
+      //     touched.value = true;
+      //     bindModelValue(node);
+      //     bindStatus(ValidatorStatus.Valid);
+      //   }
+      // },
+      // async onAfterTask({ data }, oldNodeId: number) {
+      //   loadedNodes.value = loadedNodes.value.concat(data as NodeInfo[]);
 
-        const index = loadedNodes.value.findIndex(n => n.nodeId === oldNodeId);
-        if (oldNodeId && index !== -1) {
-          bindModelValue(loadedNodes.value[index]);
-          nodeInputValidateTask.value.run(loadedNodes.value[index]);
-        }
+      //   const index = loadedNodes.value.findIndex(n => n.nodeId === oldNodeId);
+      //   if (oldNodeId && index !== -1) {
+      //     bindModelValue(loadedNodes.value[index]);
+      //     nodeInputValidateTask.value.run(loadedNodes.value[index]);
+      //   }
 
-        nextPage();
-      },
+      //   nextPage();
+      // },
       default: [],
     });
 
