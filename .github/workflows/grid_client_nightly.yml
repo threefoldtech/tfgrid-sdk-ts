@@ -100,7 +100,9 @@ jobs:
 
       - name: Check if contracts are Empty
         run: |
-          arrays=("${{ steps.command_step.outputs.myOutput }}")
+          contract_json=$(echo "${{ steps.command_step.outputs.myOutput }}" | sed '1d;$d')
+          # Convert the middle line to three arrays
+          IFS=', ' read -r -a arrays <<< "$(echo "$contract_json" | awk -F':|,' '{print $2, $4, $6}')"
           # Check if all three [Name - Node - Rent] contracts are empty
           if [ -n "${arrays[0]}" ] || [ -n "${arrays[1]}" ] || [ -n "${arrays[2]}" ]; then
           echo "Deletion failed; at least one array is not empty."
