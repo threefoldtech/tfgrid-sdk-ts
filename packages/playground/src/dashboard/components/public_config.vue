@@ -31,11 +31,12 @@
                 :rules="[
                   validators.required('Gateway is required.'),
                   validators.isIP('Gateway is not valid.', 4),
-                  validators.ipNotEqualGateway(
-                    $props.modelValue.ipv4,
-                    $props.modelValue.gw4,
-                    'Gateway IPv4 should not be equal to IPv4.',
-                  ),
+                  value =>
+                    validators.ipNotEqualGateway(
+                      $props.modelValue.ipv4,
+                      $props.modelValue.gw4,
+                      'Gateway IPv4 should not be equal to IPv4.',
+                    )(value),
                 ]"
                 #="{ props }"
               >
@@ -50,7 +51,10 @@
               </input-validator>
               <input-validator
                 :value="$props.modelValue.ipv6"
-                :rules="[value => validators.isIPRange('IP is not valid.', 6)(value)]"
+                :rules="[
+                  value => ($props.modelValue.gw6 !== '' ? validators.required('IPv6 is required.')(value) : '') as RuleReturn,
+                  value => validators.isIPRange('IP is not valid.', 6)(value),
+                ]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IPV6 address in format x:x:x:x:x:x:x:x">
@@ -61,12 +65,13 @@
               <input-validator
                 :value="$props.modelValue.gw6"
                 :rules="[
+                  value => ($props.modelValue.ipv6 !== '' ? validators.required('Gateway is required.')(value) : '') as RuleReturn,
                   value => validators.isIP('Gateway is not valid.', 6)(value),
-                  validators.ipNotEqualGateway(
-                    $props.modelValue.ipv4,
-                    $props.modelValue.gw4,
+                  value => validators.ipNotEqualGateway(
+                    $props.modelValue.ipv6!,
+                    $props.modelValue.gw6!,
                     'Gateway IPv6 should not be equal to IPv6.',
-                  ),
+                  )(value),
                 ]"
                 #="{ props }"
               >
@@ -154,6 +159,7 @@ import _ from "lodash";
 import { onMounted, type PropType, ref, watch } from "vue";
 
 import { gridProxyClient } from "@/clients";
+import type { RuleReturn } from "@/components/input_validator.vue";
 import { useFormRef } from "@/hooks/form_validator";
 import type { IPublicConfig } from "@/utils/types";
 
