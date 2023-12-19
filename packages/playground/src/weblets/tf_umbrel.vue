@@ -88,6 +88,9 @@
       </input-tooltip>
 
       <TfSelectionDetails
+        :filters-validators="{
+          solutionDisk: { min: 10 },
+        }"
         :filters="{
           ipv4,
           certified,
