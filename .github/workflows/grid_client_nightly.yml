@@ -96,7 +96,7 @@ jobs:
         run: |
           sleep 15
           output=$(yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/list_all_contracts.ts)
-          echo "::set-output name=myOutput::$output"
+          run: echo "{myOutput}={$output}" >> $GITHUB_OUTPUT
 
       - name: Check if contracts are Empty
         run: |
