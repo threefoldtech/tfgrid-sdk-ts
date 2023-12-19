@@ -131,6 +131,7 @@
 
 <script lang="ts">
 import type { Farm } from "@threefold/gridproxy_client";
+import { ConnectionError } from "@threefold/types";
 import { jsPDF } from "jspdf";
 import { debounce } from "lodash";
 import { StrKey } from "stellar-sdk";
@@ -235,7 +236,11 @@ export default {
         farmsCount.value = count || filteredFarms.length;
       } catch (error) {
         console.log(error);
-        createCustomToast("Failed to get farms. Please check your connection.", ToastType.danger);
+        if (error instanceof ConnectionError) {
+          createCustomToast("Failed to get farms. Please check your connection.", ToastType.danger);
+        } else {
+          createCustomToast("Failed to get farms.", ToastType.danger);
+        }
       } finally {
         loading.value = false;
       }
