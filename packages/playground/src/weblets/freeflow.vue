@@ -91,7 +91,7 @@ import { useProfileManager } from "../stores";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
-import { deployGatewayName2, rollbackDeployment } from "../utils/gateway";
+import { deployGatewayName, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 
@@ -186,7 +186,7 @@ async function deploy() {
   try {
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
 
-    await deployGatewayName2(grid, selectionDetails.value.domain, {
+    await deployGatewayName(grid, selectionDetails.value.domain, {
       subdomain: threebotName.value,
       ip: vm[0].interfaces[0].ip,
       port: 80,

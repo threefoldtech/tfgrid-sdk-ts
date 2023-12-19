@@ -22,36 +22,6 @@ export function getSubdomain(options: GetHostnameOptions) {
   return SolutionCode[projectName as keyof typeof SolutionCode] + options.twinId + options.deploymentName.toLowerCase();
 }
 
-export interface DeployGatewayNameOptions {
-  name: string;
-  nodeId: number;
-  tlsPassthrough?: boolean;
-  ip: string;
-  port: number;
-  networkName: string;
-  fqdn?: string;
-}
-export async function deployGatewayName(grid: GridClient, options: DeployGatewayNameOptions) {
-  const gateway = new GatewayNameModel();
-  gateway.name = options.name;
-  await grid.gateway.getObj(gateway.name); //invalidating the cashed keys
-  gateway.node_id = options.nodeId;
-  gateway.tls_passthrough = options.tlsPassthrough || false;
-  if (gateway.tls_passthrough) {
-    gateway.backends = [`${options.ip}:${options.port}`];
-  } else {
-    gateway.backends = [`http://${options.ip}:${options.port}`];
-  }
-  gateway.network = options.networkName;
-  gateway.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
-  if (options.fqdn) {
-    const domain = gateway as GatewayFQDNModel;
-    domain.fqdn = options.fqdn;
-    return grid.gateway.deploy_fqdn(domain);
-  }
-  return grid.gateway.deploy_name(gateway);
-}
-
 export interface DeployGatewayConfig {
   subdomain: string;
   ip: string;
@@ -60,7 +30,7 @@ export interface DeployGatewayConfig {
   tlsPassthrough?: boolean;
 }
 
-export async function deployGatewayName2(
+export async function deployGatewayName(
   grid: GridClient | null,
   domain: DomainInfo | undefined,
   config: DeployGatewayConfig,

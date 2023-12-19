@@ -109,7 +109,7 @@ import { useProfileManager } from "../stores";
 import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
-import { deployGatewayName2, getSubdomain, rollbackDeployment } from "../utils/gateway";
+import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
@@ -209,7 +209,7 @@ async function deploy() {
   try {
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
 
-    await deployGatewayName2(grid, selectionDetails.value.domain, {
+    await deployGatewayName(grid, selectionDetails.value.domain, {
       subdomain,
       ip: vm[0].interfaces[0].ip,
       port: 80,

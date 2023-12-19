@@ -227,7 +227,7 @@ import { onMounted, type PropType, ref } from "vue";
 import { useProfileManager } from "../stores";
 import { ProjectName } from "../types";
 import type { SelectionDetails } from "../types/nodeSelector";
-import { deployGatewayName2, type GridGateway, loadDeploymentGateways } from "../utils/gateway";
+import { deployGatewayName, type GridGateway, loadDeploymentGateways } from "../utils/gateway";
 import { getGrid } from "../utils/grid";
 import { normalizeError } from "../utils/helpers";
 import { generateName } from "../utils/strings";
@@ -306,7 +306,7 @@ export default {
           await grid!.networks.addNode(data);
         }
 
-        await deployGatewayName2(grid, selectionDetails.value!.domain, {
+        await deployGatewayName(grid, selectionDetails.value!.domain, {
           subdomain: prefix.value + subdomain.value,
           ip,
           port: port.value,
