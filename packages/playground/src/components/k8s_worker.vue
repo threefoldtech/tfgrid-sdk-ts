@@ -87,12 +87,16 @@
     </input-tooltip>
 
     <TfSelectionDetails
+      :filters-validators="{
+        memory: { min: 1024 },
+        rootFilesystemSize: { min: rootFs($props.modelValue.cpu ?? 0, $props.modelValue.memory ?? 0) },
+      }"
       :filters="{
         ipv4: $props.modelValue.ipv4,
         certified: $props.modelValue.certified,
         dedicated: $props.modelValue.dedicated,
         cpu: $props.modelValue.cpu,
-        solutionDisk: $props.modelValue.diskSize,
+        ssdDisks: [$props.modelValue.diskSize],
         memory: $props.modelValue.memory,
         rootFilesystemSize: $props.modelValue.rootFsSize,
       }"
@@ -105,6 +109,7 @@
 import type { PropType } from "vue";
 
 import type { K8SWorker } from "../types";
+import rootFs from "../utils/root_fs";
 import { generateName } from "../utils/strings";
 import RootFsSize from "./root_fs_size.vue";
 
@@ -132,6 +137,9 @@ export default {
       type: Object as PropType<K8SWorker>,
       required: true,
     },
+  },
+  setup() {
+    return { rootFs };
   },
 };
 </script>
