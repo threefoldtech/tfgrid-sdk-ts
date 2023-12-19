@@ -120,7 +120,7 @@
 
           <v-spacer>
             <div class="d-flex align-center justify-start">
-              <TftSwapPrice class="pr-4"></TftSwapPrice>
+              <TftSwapPrice class="pr-4" v-if="hasActiveProfile && hasGrid"></TftSwapPrice>
               <FundsCard v-if="hasActiveProfile"></FundsCard>
             </div>
           </v-spacer>
