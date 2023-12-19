@@ -250,9 +250,7 @@
             color="anchor"
             :href="
               'http://' +
-              (item.value[0].publicIP?.ip
-                ? item.value[0].publicIP.ip.slice(0, -3)
-                : '[' + item.value[0].planetary + ']')
+              (item.value.publicIP?.ip ? item.value.publicIP.ip.slice(0, -3) : '[' + item.value.planetary + ']')
             "
           />
         </template>
@@ -269,11 +267,11 @@
             icon="mdi-view-dashboard"
             :href="
               'http://' +
-              (item.value[0].publicIP?.ip
-                ? item.value[0].publicIP.ip.slice(0, -3)
-                : item.value[0].planetary
-                ? '[' + item.value[0].planetary + ']'
-                : item.value[0].interfaces[0].ip)
+              (item.value.publicIP?.ip
+                ? item.value.publicIP.ip.slice(0, -3)
+                : item.value.planetary
+                ? '[' + item.value.planetary + ']'
+                : item.value.interfaces[0].ip)
             "
           />
         </template>

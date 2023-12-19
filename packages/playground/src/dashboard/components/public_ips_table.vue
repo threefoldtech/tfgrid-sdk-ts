@@ -1,16 +1,10 @@
 <template>
-  <div class="my-6">
-    <AddIP
-      v-model:farmId="$props.farmId"
-      v-model:type="type"
-      v-model:publicIP="publicIP"
-      v-model:toPublicIP="toPublicIP"
-      v-model:gateway="gateway"
-      @add-publicIPs="publicIps.push(...$event)"
-    />
+  <div>
     <v-data-table v-if="publicIps?.length > 0" :headers="headers" :items="publicIps" class="elevation-1">
       <template v-slot:top>
-        <p class="text-subtitle-1 font-weight-bold pa-4 ma-4 w-50">Public IPs</p>
+        <v-alert class="pa-5" style="height: 20px">
+          <h4 class="text-center font-weight-medium">Public IPs</h4>
+        </v-alert>
       </template>
       <template #[`item.ip`]="{ item }">
         {{ item.value.ip || "-" }}
@@ -24,7 +18,9 @@
       </template>
       <template #[`item.actions`]="{ item, index }">
         <v-btn
-          color="red-darken-1"
+          class="text-subtitle-2"
+          size="small"
+          color="error"
           @click="
             () => {
               showDialogue = true;
@@ -48,11 +44,11 @@
         <v-card-actions class="justify-end px-5 pb-5 pt-0">
           <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
           <v-btn
-            text="Delete"
-            color="white"
+            variant="outlined"
+            text="Confirm"
+            color="error"
             :loading="isRemoving"
             :disabled="isRemoving"
-            class="bg-red-lighten-1"
             @click="removeFarmIp({ farmId: $props.farmId, ip: itemToDelete?.ip }, itemToDelete?.index)"
           ></v-btn>
         </v-card-actions>
@@ -60,15 +56,15 @@
     </v-dialog>
   </div>
 </template>
+
 <script lang="ts">
 import type { RemoveFarmIPModel } from "@threefold/grid_client";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 
 import { useGrid } from "@/stores";
 import { IPType } from "@/utils/types";
 
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
-import AddIP from "./add_ip.vue";
 
 export default {
   name: "PublicIPsTable",
@@ -77,9 +73,7 @@ export default {
       type: Number,
       required: true,
     },
-  },
-  components: {
-    AddIP,
+    refreshPublicIPs: Boolean,
   },
   setup(props) {
     const gridStore = useGrid();
@@ -137,6 +131,13 @@ export default {
         itemToDelete.value = undefined;
       }
     }
+    watch(
+      () => props.refreshPublicIPs,
+      () => {
+        getFarmByID(props.farmId);
+      },
+      { deep: true },
+    );
     return {
       gridStore,
       headers,

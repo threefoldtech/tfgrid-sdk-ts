@@ -1,7 +1,16 @@
 <template>
   <v-container>
-    <v-row>
-      <v-btn color="blue" class="ml-auto bold-text" @click="showDialogue = true" :disabled="isCreating"
+    <v-row class="text-center flex justify-center">
+      <v-btn
+        variant="outlined"
+        color="secondary"
+        class="text-subtitle-1 px-6 mr-2"
+        v-bind:href="'https://v3.bootstrap.grid.tf/'"
+        target="blank"
+        >Bootstrap Node Image</v-btn
+      >
+
+      <v-btn class="bg-primary text-subtitle-1 px-6" @click="showDialogue = true" :disabled="isCreating"
         >Create Farm</v-btn
       >
     </v-row>
@@ -19,11 +28,13 @@
                 :rules="[
                   validators.required('Farm name is required.'),
                   name => validators.isAlpha('Farm name must start with an alphabet char.')(name[0]),
-                  validators.minLength('Farm name minimum length is 2 chars.', 2),
+                  validators.minLength('Farm name minimum length is 3 chars.', 3),
                   validators.maxLength('Farm name maximum length is 40 chars.', 40),
-                  validators.pattern('Farm name  should not contain whitespaces.', {
+                  validators.pattern('Farm name should not contain whitespaces.', {
                     pattern: /^[^\s]+$/,
                   }),
+
+                  validateFarmName,
                 ]"
                 #="{ props }"
               >
@@ -92,11 +103,17 @@ export default {
         isCreating.value = false;
       }
     }
+    function validateFarmName(name: string) {
+      if (!name.split("").every((c: string) => /[a-zA-Z0-9\-_]/.test(c))) {
+        return { message: "Farm name can only contain alphabetic letters, numbers, '-' or '_'" };
+      }
+    }
     return {
       showDialogue,
       isCreating,
       valid,
       createFarm,
+      validateFarmName,
     };
   },
 };
