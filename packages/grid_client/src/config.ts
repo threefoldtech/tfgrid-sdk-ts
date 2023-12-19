@@ -21,7 +21,7 @@ class GridClientConfig {
   tfclient: TFClient;
   projectName: string;
   backendStorageType: BackendStorageType;
-  backendStorage: BackendStorageInterface;
+  backendStorage?: BackendStorageInterface;
   keypairType: KeypairType;
   storePath: string;
   graphqlURL: string;
@@ -29,7 +29,7 @@ class GridClientConfig {
   substrateURL: string;
   activationURL: string;
   twinId: number;
-  seed: string;
+  seed?: string;
   deploymentTimeoutMinutes: number;
 }
 class ClientOptions {

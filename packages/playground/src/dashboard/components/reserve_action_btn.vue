@@ -4,20 +4,20 @@
       <v-card>
         <v-card-title class="pt-4">
           <span style="display: flex; align-items: center">
-            <v-icon color="warning" style="mr-1: 15">mdi-alert</v-icon>
-            Are you sure you want to unreserve this dedicated node?
+            <v-icon class="mr-2" color="warning">mdi-alert</v-icon>
+            Unreserve this dedicated node?
           </span>
         </v-card-title>
-        <v-divider style="color: #1aa18f" />
+        <v-divider />
         <v-card-text>This will free up the node for others on the chain</v-card-text>
         <v-card-actions class="justify-end">
-          <v-btn variant="outlined" color="primary" @click="unReserveNode" :loading="loadingUnreserveNode">Yes</v-btn>
-          <v-btn variant="outlined" color="primary" @click="openUnreserveDialog = false">No</v-btn>
+          <v-btn variant="outlined" color="anchor" @click="openUnreserveDialog = false">Close</v-btn>
+          <v-btn variant="outlined" color="error" @click="unReserveNode" :loading="loadingUnreserveNode">Confirm</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
     <v-btn
-      small
+      size="small"
       outlined
       :loading="loadingReserveNode"
       :disabled="disableButton"
@@ -29,9 +29,9 @@
     </v-btn>
 
     <v-btn
-      small
+      size="small"
       outlined
-      color="red"
+      color="error"
       :loading="loadingUnreserveBtn"
       :disabled="disableButton"
       v-if="node.rentedByTwinId === profileManager.profile?.twinId"
