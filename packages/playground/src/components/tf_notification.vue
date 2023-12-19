@@ -22,11 +22,9 @@ async function checkOfflineDeployments() {
     const ids = uniq(contracts.map(c => c.nodeID));
     const settledNodes = await Promise.allSettled(ids.map(id => gridProxyClient.nodes.byId(id)));
 
-    const fakeNode = { status: "up" } as GridNode;
-    const offlineAndStandbyNodes = settledNodes
-      .map(n => (n.status === "fulfilled" ? n.value : fakeNode))
-      .filter(n => n.status !== "up")
-      .map(n => n.nodeId);
+    const offlineAndStandbyNodes = settledNodes.map(n =>
+      n.status === "fulfilled" && n.value.status !== "up" ? n.value.nodeId : -1,
+    );
 
     const userOfflineDeployments = [];
     const withPubIp = [];
