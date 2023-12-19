@@ -3,7 +3,7 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { waitReady } from "@polkadot/wasm-crypto";
 import { Client as TFClient } from "@threefold/tfchain_client";
-import { ConnectionError, InvalidResponse, RMBError, TimeoutError, ValidationError } from "@threefold/types";
+import { BaseError, ConnectionError, InvalidResponse, RMBError, TimeoutError, ValidationError } from "@threefold/types";
 import AwaitLock from "await-lock";
 import base64url from "base64url";
 import { Buffer } from "buffer";
@@ -142,7 +142,15 @@ class Client {
         if (c && c.readyState == c.OPEN) {
           c.close();
         }
-        console.log(err);
+        if (err instanceof BaseError) {
+          err.message = `Unable to establish a connection with the RMB server ${this.relayUrl.replace(
+            "wss://",
+            "",
+          )}\n\t${
+            err.message
+          }\n\tPlease check your internet connection and try again. If the problem persists, please contact our support.`;
+          throw err;
+        }
         throw new ConnectionError(
           `Unable to establish a connection with the RMB server ${this.relayUrl.replace(
             "wss://",
