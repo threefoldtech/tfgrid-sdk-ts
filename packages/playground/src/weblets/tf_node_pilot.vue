@@ -72,6 +72,10 @@
       </input-tooltip>
 
       <TfSelectionDetails
+        :filters-validators="{
+          cpu: { min: 8 },
+          memory: { min: 8192 },
+        }"
         :filters="{
           ipv4: true,
           certified,
