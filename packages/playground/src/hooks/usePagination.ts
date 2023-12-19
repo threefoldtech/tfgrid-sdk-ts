@@ -2,7 +2,7 @@ import shuffle from "lodash/fp/shuffle.js";
 import { computed, ref } from "vue";
 
 function normalizePages(count: number) {
-  if (count === 0) {
+  if (count < 1) {
     return [-1];
   }
 
