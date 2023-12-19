@@ -1,6 +1,7 @@
 import type { FarmFilterOptions, FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
 import { NodeStatus } from "@threefold/gridproxy_client";
 import shuffle from "lodash/fp/shuffle.js";
+import type { DeepPartial } from "utility-types";
 import type { Ref } from "vue";
 import { z } from "zod";
 
@@ -10,8 +11,10 @@ import type {
   Locations,
   NormalizeFarmFiltersOptions,
   NormalizeNodeFiltersOptions,
+  NumericValidator,
   SelectedLocation,
   SelectionDetailsFilters,
+  SelectionDetailsFiltersValidators,
 } from "../types/nodeSelector";
 
 export async function getLocations(): Promise<Locations> {
@@ -194,26 +197,62 @@ export async function resolveAsync(promise: Promise<any>): Promise<any> {
   }
 }
 
-const selectionDetailsFiltersValidator = z.object({
-  ipv4: z.boolean().optional(),
-  ivp6: z.boolean().optional(),
-  hasGPU: z.boolean().optional(),
-  cpu: z.number().int().min(1).max(32),
-  memory: z.number().int().min(256).max(262144),
-  ssdDisks: z.array(z.number().min(1).max(10000)).optional(),
-  hddDisks: z.array(z.number().min(1).max(10000)).optional(),
-  rootFilesystemSize: z
-    .number()
-    .min(500 / 1024)
-    .optional(),
-  solutionDisk: z.number().int().min(10).max(10000).optional(),
-  certified: z.boolean().optional(),
-  dedicated: z.boolean().optional(),
-  exclusiveFor: z.string().optional(),
-});
+function normalizeNumericValidator(
+  validator: DeepPartial<NumericValidator> = {},
+  fallback: NumericValidator,
+): NumericValidator {
+  return {
+    type: validator.type || fallback.type,
+    min: validator.min || fallback.min,
+    max: validator.max || fallback.max,
+  };
+}
 
-export function isValidSelectionDetailsFilters(filters: SelectionDetailsFilters): boolean {
-  return selectionDetailsFiltersValidator.safeParse(filters).success;
+function normalizeFiltersValidators(
+  validators: DeepPartial<SelectionDetailsFiltersValidators>,
+): SelectionDetailsFiltersValidators {
+  return {
+    cpu: normalizeNumericValidator(validators.cpu, { type: "int", min: 1, max: 32 }),
+    memory: normalizeNumericValidator(validators.memory, { type: "int", min: 256, max: 262144 }),
+    ssdDisks: normalizeNumericValidator(validators.ssdDisks, { type: "int", min: 1, max: 10000 }),
+    hddDisks: normalizeNumericValidator(validators.hddDisks, { type: "int", min: 1, max: 10000 }),
+    rootFilesystemSize: normalizeNumericValidator(validators.rootFilesystemSize, {
+      type: "number",
+      min: 500 / 1024,
+      max: 10000,
+    }),
+    solutionDisk: normalizeNumericValidator(validators.solutionDisk, { type: "int", min: 15, max: 10000 }),
+  };
+}
+
+function createNumericValidator(validator: NumericValidator): z.ZodNumber {
+  const v = z.number().min(validator.min).max(validator.max);
+
+  if (validator.type === "number") {
+    return v;
+  }
+
+  return v.int();
+}
+
+export function createSelectionDetailsFiltersValidator(validators: DeepPartial<SelectionDetailsFiltersValidators>) {
+  const vts = normalizeFiltersValidators(validators);
+
+  return z.object({
+    ipv4: z.boolean().optional(),
+    ivp6: z.boolean().optional(),
+    hasGPU: z.boolean().optional(),
+    certified: z.boolean().optional(),
+    dedicated: z.boolean().optional(),
+    exclusiveFor: z.string().optional(),
+
+    cpu: createNumericValidator(vts.cpu),
+    memory: createNumericValidator(vts.memory),
+    ssdDisks: z.array(createNumericValidator(vts.ssdDisks)).optional(),
+    hddDisks: z.array(createNumericValidator(vts.hddDisks)).optional(),
+    rootFilesystemSize: createNumericValidator(vts.rootFilesystemSize).optional(),
+    solutionDisk: createNumericValidator(vts.solutionDisk).optional(),
+  });
 }
 
 export async function checkNodeCapacityPool(

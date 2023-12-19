@@ -21,6 +21,21 @@ export interface SelectionDetailsFilters {
   exclusiveFor?: string;
 }
 
+export interface NumericValidator {
+  type: "int" | "number";
+  min: number;
+  max: number;
+}
+
+export interface SelectionDetailsFiltersValidators {
+  cpu: NumericValidator;
+  memory: NumericValidator;
+  ssdDisks: NumericValidator;
+  hddDisks: NumericValidator;
+  rootFilesystemSize: NumericValidator;
+  solutionDisk: NumericValidator;
+}
+
 export interface NormalizeFarmFiltersOptions {
   size: number;
   page: number;
@@ -47,6 +62,7 @@ export interface DomainInfo {
 
 export interface SelectionDetails {
   type: "manual" | "automatic";
+  validFilters: boolean;
   node?: NodeInfo;
   farm?: FarmInfo;
   location?: SelectedLocation;

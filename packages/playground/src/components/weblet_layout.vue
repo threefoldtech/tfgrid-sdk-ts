@@ -123,7 +123,6 @@ import { computed, ref, watch } from "vue";
 import { useProfileManager } from "../stores";
 import { getGrid, loadBalance } from "../utils/grid";
 import { normalizeBalance } from "../utils/helpers";
-import { isValidSelectionDetailsFilters } from "../utils/nodeSelector";
 
 const props = defineProps({
   disableAlerts: {
@@ -158,19 +157,11 @@ const props = defineProps({
     default: () => false,
   },
   SelectedNode: Object as PropType<NodeInfo | INode>,
+  validFilters: Boolean,
 });
 const emits = defineEmits<{ (event: "mount"): void; (event: "back"): void }>();
 const baseUrl = import.meta.env.BASE_URL;
 const profileManager = useProfileManager();
-
-const validFilters = computed(() =>
-  isValidSelectionDetailsFilters({
-    cpu: props.cpu,
-    solutionDisk: props.disk,
-    memory: props.memory,
-    ipv4: props.ipv4,
-  }),
-);
 
 const status = ref<WebletStatus>();
 const message = ref<string>();
@@ -304,7 +295,7 @@ async function getIPv1Price(grid: GridClient) {
 }
 
 async function loadCost(profile: { mnemonic: string }) {
-  if (!validFilters.value) {
+  if (!props.validFilters) {
     return;
   }
 

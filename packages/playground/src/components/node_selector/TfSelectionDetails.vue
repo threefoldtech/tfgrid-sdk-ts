@@ -63,12 +63,20 @@
 <script lang="ts">
 import type { FarmInfo, GPUCardInfo, NodeInfo } from "@threefold/grid_client";
 import noop from "lodash/fp/noop.js";
+import type { DeepPartial } from "utility-types";
 import { computed, getCurrentInstance, onMounted, onUnmounted, type PropType, ref, watch } from "vue";
 
+import { useWatchDeep } from "../../hooks";
 import { useForm, ValidatorStatus } from "../../hooks/form_validator";
 import type { InputValidatorService } from "../../hooks/input_validator";
-import type { DomainInfo, SelectedLocation, SelectionDetails, SelectionDetailsFilters } from "../../types/nodeSelector";
-import { isValidSelectionDetailsFilters } from "../../utils/nodeSelector";
+import type {
+  DomainInfo,
+  SelectedLocation,
+  SelectionDetails,
+  SelectionDetailsFilters,
+  SelectionDetailsFiltersValidators,
+} from "../../types/nodeSelector";
+import { createSelectionDetailsFiltersValidator } from "../../utils/nodeSelector";
 import TfAutoNodeSelector from "./TfAutoNodeSelector.vue";
 import TfDomainName from "./TfDomainName.vue";
 import TfManualNodeSelector from "./TfManualNodeSelector.vue";
@@ -85,6 +93,10 @@ export default {
       type: Object as PropType<SelectionDetailsFilters>,
       default: () => ({}),
     },
+    filtersValidators: {
+      type: Object as PropType<DeepPartial<SelectionDetailsFiltersValidators>>,
+      default: () => ({}),
+    },
     requireDomain: Boolean,
     disableNodeSelection: { type: Boolean, default: () => false },
     status: String as PropType<ValidatorStatus>,
@@ -94,7 +106,8 @@ export default {
     "update:status": (value: ValidatorStatus) => true || value,
   },
   setup(props, ctx) {
-    const validFilters = computed(() => isValidSelectionDetailsFilters(props.filters));
+    const filtersValidator = computed(() => createSelectionDetailsFiltersValidator(props.filtersValidators));
+    const validFilters = computed(() => filtersValidator.value.safeParse(props.filters).success);
 
     const wayToSelect = ref<"manual" | "automated">("automated");
     const location = ref<SelectedLocation>();
@@ -112,6 +125,7 @@ export default {
     const selectionDetails = computed(() => {
       return {
         type: wayToSelect.value,
+        validFilters: validFilters.value,
         node: node.value,
         farm: farm.value,
         gpuCards: gpuCards.value,
@@ -119,7 +133,7 @@ export default {
         domain: domain.value,
       } as SelectionDetails;
     });
-    watch(selectionDetails, bindModelValue, { immediate: true, deep: true });
+    useWatchDeep(selectionDetails, bindModelValue, { immediate: true, deep: true });
 
     /* Adapter to work with old code validation */
     const { uid } = getCurrentInstance() as { uid: number };
