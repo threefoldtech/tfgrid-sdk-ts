@@ -41,8 +41,8 @@ const SYSTEM = "system";
 const UTILITY = "utility";
 
 class QueryClient {
-  static connections: Map<string, ApiPromise> = new Map();
-  private connectingLock = new AwaitLock();
+  static connections: Map<string, { api: ApiPromise; disconnectHandler: any }> = new Map();
+  static connectingLock = new AwaitLock();
   api: ApiPromise;
   contracts: QueryContracts = new QueryContracts(this);
   balances: QueryBalances = new QueryBalances(this);
@@ -74,53 +74,50 @@ class QueryClient {
   }
 
   async newProvider() {
-    await this.disconnect.bind(this);
-    if (this.api) {
-      delete this.api;
-    }
+    try {
+      await QueryClient.connectingLock.acquireAsync();
+      await this.disconnect.bind(this)();
 
-    const provider = new WsProvider(this.url);
-    this.api = await ApiPromise.create({ provider });
-    await this.wait();
-    QueryClient.connections[this.url] = this.api;
-    this.api.on("disconnected", this.__disconnectHandler);
+      const provider = new WsProvider(this.url);
+      this.api = await ApiPromise.create({ provider });
+      await this.wait();
+      QueryClient.connections.set(this.url, { api: this.api, disconnectHandler: this.__disconnectHandler });
+      this.api.on("disconnected", this.__disconnectHandler);
+    } finally {
+      QueryClient.connectingLock.release();
+    }
   }
 
   async connect() {
     this.checkInputs();
     await this.loadKeyPairOrSigner();
-    try {
-      await this.connectingLock.acquireAsync();
+    if (this.api && this.api.isConnected) return;
+    if (QueryClient.connections.has(this.url)) {
+      this.api = QueryClient.connections.get(this.url)!.api;
       if (this.api && this.api.isConnected) return;
-      if (Object.keys(QueryClient.connections).includes(this.url)) {
-        this.api = QueryClient.connections[this.url];
-        if (this.api && this.api.isConnected) return;
-        await this.newProvider();
-        return;
-      }
+    }
+    await this.newProvider();
 
-      await this.newProvider();
-
-      if (isEnvNode()) {
-        process.on("SIGTERM", this.disconnectAndExit.bind(this));
-        process.on("SIGINT", this.disconnectAndExit.bind(this));
-        process.on("SIGUSR1", this.disconnectAndExit.bind(this));
-        process.on("SIGUSR2", this.disconnectAndExit.bind(this));
-      } else {
-        window.onbeforeunload = () => {
-          return "";
-        };
-        window.onunload = this.disconnect.bind(this);
-      }
-    } finally {
-      this.connectingLock.release();
+    if (isEnvNode()) {
+      process.on("SIGTERM", this.disconnectAndExit.bind(this));
+      process.on("SIGINT", this.disconnectAndExit.bind(this));
+      process.on("SIGUSR1", this.disconnectAndExit.bind(this));
+      process.on("SIGUSR2", this.disconnectAndExit.bind(this));
+    } else {
+      window.onbeforeunload = () => {
+        return "";
+      };
+      window.onunload = this.disconnect.bind(this);
     }
   }
 
   async disconnect(): Promise<void> {
+    if (QueryClient.connections.has(this.url)) {
+      this.api = QueryClient.connections.get(this.url)!.api;
+    }
     if (this.api && this.api.isConnected) {
       console.log("disconnecting");
-      this.api.off("disconnected", this.__disconnectHandler);
+      this.api.off("disconnected", QueryClient.connections.get(this.url)!.disconnectHandler);
       await this.api.disconnect();
       await this.wait(false);
     }

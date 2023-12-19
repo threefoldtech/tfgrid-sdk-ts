@@ -17,7 +17,7 @@ import { generatePublicKey } from "./util";
 
 class Client {
   static connections = new Map<string, Client>();
-  private connectingLock = new AwaitLock();
+  static connectingLock = new AwaitLock();
   signer!: KeyringPair;
   source: Address = new Address();
   responses = new Map<string, ClientEnvelope>();
@@ -99,7 +99,7 @@ class Client {
   }
   async connect() {
     try {
-      await this.connectingLock.acquireAsync();
+      await Client.connectingLock.acquireAsync();
       if (this.con) return;
 
       await this.tfclient.connect();
@@ -151,7 +151,7 @@ class Client {
         );
       }
     } finally {
-      this.connectingLock.release();
+      Client.connectingLock.release();
     }
   }
 
