@@ -80,15 +80,7 @@
           <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span> USD per
           month.
 
-          <!-- TODO: remove backward compatibility by replacing the following code -->
-          <!-- SelectedNode?.certificationType -->
-          <div
-            v-if="
-              SelectedNode &&
-              ('certificationType' in SelectedNode ? SelectedNode.certificationType : SelectedNode.certified) ===
-                'Certified'
-            "
-          >
+          <div v-if="SelectedNode?.certificationType === 'Certified'">
             You selected a certified node. Please note that this deployment costs more TFT.
           </div>
         </div>
@@ -156,7 +148,7 @@ const props = defineProps({
     required: false,
     default: () => false,
   },
-  SelectedNode: Object as PropType<NodeInfo | INode>,
+  SelectedNode: Object as PropType<NodeInfo>,
   validFilters: Boolean,
 });
 const emits = defineEmits<{ (event: "mount"): void; (event: "back"): void }>();
@@ -309,14 +301,7 @@ async function loadCost(profile: { mnemonic: string }) {
     mru: typeof props.memory === "number" ? (props.memory ?? 0) / 1024 : 0,
     hru: 0,
     ipv4u: props.ipv4,
-    // TODO: remove backward compatibility by replacing the following code
-    // props.SelectedNode?.certificationType === "Certified" ?? false,
-    certified:
-      (props.SelectedNode &&
-        ("certificationType" in props.SelectedNode
-          ? props.SelectedNode.certificationType
-          : props.SelectedNode.certified) === "Certified") ??
-      false,
+    certified: props.SelectedNode?.certificationType === "Certified" ?? false,
   });
   await getIPv1Price(grid!);
   usd.value = props.dedicated ? dedicatedPrice : sharedPrice;
@@ -328,7 +313,6 @@ async function loadCost(profile: { mnemonic: string }) {
 <script lang="ts">
 import type { ComputedRef, PropType, Ref } from "vue";
 
-import type { INode } from "../utils/filter_nodes";
 import type { Balance } from "../utils/grid";
 import DeploymentDataDialog from "./deployment_data_dialog.vue";
 import { useDeploymentListManager } from "./deployment_list_manager.vue";
