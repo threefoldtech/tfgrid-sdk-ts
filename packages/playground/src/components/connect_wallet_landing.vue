@@ -52,7 +52,9 @@
         </div>
 
         <div class="d-flex justify-center mt-5">
-          <v-btn color="primary" target="_blank" :href="capacityURL"> Explore ThreeFold Grid Capacity </v-btn>
+          <v-btn color="primary" target="_blank" @click="$router.push('/stats')">
+            Explore ThreeFold Grid Capacity
+          </v-btn>
         </div>
       </div>
       <div class="text-center">
@@ -78,19 +80,16 @@
 
 <script lang="ts">
 import { computed } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
-
-import { getCapacityURL } from "../utils/getCapacityUrl";
 
 export default {
   name: "ConnectWalletLanding",
   setup() {
     const theme = useTheme();
     const baseUrl = import.meta.env.BASE_URL;
-    const network = process.env.NETWORK || (window as any).env.NETWORK;
-    const capacityURL = getCapacityURL(network);
     const route = useRoute();
+    const $router = useRouter();
     const pageTitle = computed(() => route.meta.title);
     return {
       theme,
@@ -118,7 +117,7 @@ export default {
         },
       ],
       baseUrl,
-      capacityURL,
+      $router,
     };
   },
 };
