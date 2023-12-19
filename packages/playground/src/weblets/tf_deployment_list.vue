@@ -68,7 +68,7 @@
           <ManageCaproverWorkerDialog
             v-if="dialog === item.value.deploymentName"
             :master="item.value"
-            :data="item.value.workers"
+            :data="item.value.workers || []"
             :project-name="item.value.projectName"
             @close="dialog = undefined"
             @update:caprover="item.value = $event"
