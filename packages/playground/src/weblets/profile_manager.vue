@@ -97,6 +97,13 @@
                   the password. Mnemonic or Hex Seed will never be shared outside of this device.
                 </p>
               </v-alert>
+
+              <v-alert variant="tonal" type="info" class="mb-6" v-if="keypairType === KeypairType.ed25519">
+                <p>
+                  Please note that generation of ed25519 Keys isn't supported, you can only import pre existing ones.
+                </p>
+              </v-alert>
+
               <VTooltip
                 v-if="activeTab === 1"
                 text="Mnemonic or Hex Seed are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing (Mnemonic or Hex Seed) or click the 'Create Account' button to create an account and generate mnemonic."
@@ -267,7 +274,7 @@
               <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="loginError">
                 {{ loginError }}
               </v-alert>
-              <v-alert variant="tonal" type="warning" v-if="activeTab === 1">
+              <v-alert variant="tonal" type="warning" class="mb-6" v-if="activeTab === 1">
                 <p>Using different keypair types will lead to a completely different account.</p>
               </v-alert>
             </FormValidator>
@@ -483,6 +490,15 @@ watch(
     }
   },
 );
+watch(
+  () => keypairType.value,
+  async (value, oldValue) => {
+    if (value !== oldValue) {
+      mnemonicInput.value?.validate();
+    }
+  },
+  { deep: false },
+);
 
 function mounted() {
   if (isStoredCredentials()) {
@@ -659,7 +675,6 @@ async function createNewAccount() {
   creatingAccount.value = true;
   try {
     const account = await createAccount();
-    console.log("account", account);
     mnemonic.value = account.mnemonic;
   } catch (e) {
     createAccountError.value = normalizeError(e, "Something went wrong while creating new account.");
@@ -732,7 +747,6 @@ profileManagerController.set({ loadBalance: __loadBalance });
 
 function login() {
   const credentials: Credentials = getCredentials();
-  console.log(credentials);
   if (credentials.mnemonicHash && credentials.passwordHash) {
     if (credentials.passwordHash === md5(password.value)) {
       const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
