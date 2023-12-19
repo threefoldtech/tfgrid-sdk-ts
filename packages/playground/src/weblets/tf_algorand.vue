@@ -150,12 +150,23 @@
       </input-tooltip>
 
       <TfSelectionDetails
+        :filters-validators="{
+          cpu: { min: type === 'relay' || type === 'indexer' ? 4 : 2 },
+          memory: { min: type === 'relay' || type === 'indexer' ? 8192 : 4096 },
+          ssdDisks:
+            type === 'relay'
+              ? { min: 950, max: 1150 }
+              : type === 'indexer'
+              ? { min: 1500, max: 1700 }
+              : { min: 100, max: 300 },
+        }"
         :filters="{
           ipv4,
           certified,
           dedicated,
           cpu,
-          ssdDisks: type === 'indexer' ? [storage, 50] : [storage],
+          ssdDisks: [storage],
+          solutionDisk: type === 'indexer' ? 50 : undefined,
           memory,
           rootFilesystemSize,
         }"

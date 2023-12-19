@@ -117,7 +117,7 @@ function customCpuValidation(validators: Validators) {
 function customMemoryValidation(validators: Validators) {
   return (value: string) => {
     const min = getMinCapacity(props.network, props.type);
-    const maybeError = validators.min(`Minimum allowed memory is ${min.memory} GB.`, min.memory)(value);
+    const maybeError = validators.min(`Minimum allowed memory is ${min.memory} MB.`, min.memory)(value);
     return maybeError ? maybeError : validators.max("Maximum allowed memory is 256 GB.", 256 * 1024)(value);
   };
 }
