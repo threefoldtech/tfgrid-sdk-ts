@@ -117,3 +117,7 @@ a {
 .v-breadcrumbs-item--disabled {
   opacity: 1;
 }
+
+.v-btn {
+  padding: 0rem 0.75rem !important;
+}

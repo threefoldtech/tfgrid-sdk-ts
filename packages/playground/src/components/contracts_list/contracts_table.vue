@@ -69,7 +69,7 @@
     <template #footer-actions>
       <v-btn
         variant="outlined"
-        color="error"
+        color="anchor"
         prepend-icon="mdi-export-variant"
         :disabled="isExporting || !contracts || contracts.length === 0 || loadingDelete || deleting"
         @click="exportData"

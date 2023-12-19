@@ -75,9 +75,11 @@
           </v-form>
         </v-card-text>
         <v-card-actions class="justify-end pb-4 px-6">
-          <v-btn variant="outlined" color="anchor" class="bold-text" @click="openWithdrawDialog = false"> Close </v-btn>
+          <v-btn variant="outlined" color="anchor" class="px-3" @click="openWithdrawDialog = false"> Close </v-btn>
           <v-btn
-            class="white--text"
+            class="px-3"
+            color="secondary"
+            variant="outlined"
             @click="withdrawTFT(target, amount)"
             :disabled="!isValidSwap || validatingAddress"
             :loading="loadingWithdraw"
