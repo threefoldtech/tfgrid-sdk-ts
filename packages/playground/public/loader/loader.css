@@ -1,0 +1,137 @@
+.app-loader-dialog {
+  display: flex;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  min-height: 100vh;
+  background-color: #212121;
+  z-index: 999999;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+
+.app-loader-dialog.active {
+  opacity: 1;
+}
+
+.app-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 30vh;
+}
+
+.app-loader-logo {
+  max-width: 100%;
+  display: block;
+  margin-bottom: 50px;
+}
+
+.app-loader {
+  position: relative;
+  width: 100px;
+  overflow: hidden;
+  transition: opacity 0.3s ease, height 0.3s ease 0.3s;
+  height: 0;
+  opacity: 0;
+}
+
+.app-loader.active {
+  height: 16px;
+  opacity: 1;
+  overflow: visible;
+}
+
+.app-loader:before,
+.app-loader:after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #74ddc3;
+  box-shadow: 32px 0 #74ddc3;
+  left: 0;
+  top: 0;
+  animation: ballMoveX 0.7s linear infinite;
+}
+
+.app-loader:after {
+  box-shadow: none;
+  transform-origin: 40px 0;
+  transform: rotate(-153deg);
+  animation: rotateLoader 0.7s linear infinite;
+}
+
+@keyframes rotateLoader {
+  0%,
+  10% {
+    transform: rotate(-153deg);
+  }
+  90%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
+@keyframes ballMoveX {
+  0%,
+  10% {
+    transform: translateX(0);
+  }
+  90%,
+  100% {
+    transform: translateX(32px);
+  }
+}
+
+.app-loader-msg {
+  color: #fff;
+  margin: 0;
+  margin-top: 35px;
+  font-family: sans-serif;
+  max-width: 500px;
+  line-height: 1;
+  text-align: center;
+}
+
+.app-loader-refresh {
+  border: none;
+  outline: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  background-color: rgba(115, 221, 195, 0.2);
+  color: white;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition-property: opacity, background-color;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+  margin-top: 20px;
+}
+
+.app-loader-refresh.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.app-loader-refresh:hover {
+  background-color: rgba(115, 221, 195, 0.3);
+}
+
+.app-loader-refresh:active,
+.app-loader-refresh:focus {
+  background-color: rgba(115, 221, 195, 0.5);
+}
+
+.app-loader-refresh:focus {
+  box-shadow: 0 0 0 2px rgba(115, 221, 195, 0.5);
+}

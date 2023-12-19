@@ -61,7 +61,7 @@
             tooltip="Admin Panel"
             color="anchor"
             icon="mdi-view-dashboard"
-            :href="'http://captain.' + item.value[0].env.CAPROVER_ROOT_DOMAIN"
+            :href="'http://captain.' + item.value.env.CAPROVER_ROOT_DOMAIN"
           />
           <IconActionBtn icon="mdi-cog" tooltip="Manage Workers" @click="dialog = item.value.deploymentName" />
 
@@ -85,7 +85,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value[0].env.PEERTUBE_WEBSERVER_HOSTNAME"
+            :href="'https://' + item.value.env.PEERTUBE_WEBSERVER_HOSTNAME"
           />
         </template>
 
@@ -99,7 +99,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value[0].env.FUNKWHALE_HOSTNAME"
+            :href="'https://' + item.value.env.FUNKWHALE_HOSTNAME"
           />
         </template>
 
@@ -113,13 +113,13 @@
             tooltip="Admin Panel"
             color="anchor"
             icon="mdi-view-dashboard"
-            :href="'http://' + item.value[0].env.DOMAIN_NAME + '/admin/'"
+            :href="'http://' + item.value.env.DOMAIN_NAME + '/admin/'"
           />
           <IconActionBtn
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value[0].env.DOMAIN_NAME"
+            :href="'https://' + item.value.env.DOMAIN_NAME"
           />
         </template>
 
@@ -137,7 +137,7 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Visit" color="anchor" icon="mdi-web" :href="item.value[0].env.SITE_URL" />
+          <IconActionBtn tooltip="Visit" color="anchor" icon="mdi-web" :href="item.value.env.SITE_URL" />
         </template>
 
         <template #Discourse-actions="{ item }">
@@ -150,7 +150,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value[0].env.DISCOURSE_HOSTNAME"
+            :href="'https://' + item.value.env.DISCOURSE_HOSTNAME"
           />
         </template>
 
@@ -164,7 +164,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value[0].env.DIGITALTWIN_APPID"
+            :href="'https://' + item.value.env.DIGITALTWIN_APPID"
           />
         </template>
 
@@ -178,7 +178,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value[0].env.CASPERLABS_HOSTNAME"
+            :href="'https://' + item.value.env.CASPERLABS_HOSTNAME"
           />
         </template>
 
@@ -192,7 +192,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value[0].env.OWNCLOUD_DOMAIN"
+            :href="'https://' + item.value.env.OWNCLOUD_DOMAIN"
           />
         </template>
 
@@ -206,13 +206,13 @@
             tooltip="Open Nextcloud"
             color="anchor"
             icon="mdi-web"
-            :href="'https://' + item.value[0].env.NEXTCLOUD_DOMAIN"
+            :href="'https://' + item.value.env.NEXTCLOUD_DOMAIN"
           />
           <IconActionBtn
             tooltip="Nextcloud Setup"
             color="anchor"
             icon="mdi-view-dashboard"
-            :href="'https://' + item.value[0].env.NEXTCLOUD_AIO_LINK"
+            :href="'https://' + item.value.env.NEXTCLOUD_AIO_LINK"
           />
         </template>
 
@@ -226,7 +226,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value[0].env.SUBSQUID_WEBSERVER_HOSTNAME + '/graphql'"
+            :href="'https://' + item.value.env.SUBSQUID_WEBSERVER_HOSTNAME + '/graphql'"
           />
         </template>
 
@@ -250,9 +250,7 @@
             color="anchor"
             :href="
               'http://' +
-              (item.value[0].publicIP?.ip
-                ? item.value[0].publicIP.ip.slice(0, -3)
-                : '[' + item.value[0].planetary + ']')
+              (item.value.publicIP?.ip ? item.value.publicIP.ip.slice(0, -3) : '[' + item.value.planetary + ']')
             "
           />
         </template>
@@ -269,11 +267,11 @@
             icon="mdi-view-dashboard"
             :href="
               'http://' +
-              (item.value[0].publicIP?.ip
-                ? item.value[0].publicIP.ip.slice(0, -3)
-                : item.value[0].planetary
-                ? '[' + item.value[0].planetary + ']'
-                : item.value[0].interfaces[0].ip)
+              (item.value.publicIP?.ip
+                ? item.value.publicIP.ip.slice(0, -3)
+                : item.value.planetary
+                ? '[' + item.value.planetary + ']'
+                : item.value.interfaces[0].ip)
             "
           />
         </template>
@@ -284,12 +282,12 @@
             icon="mdi-eye-outline"
             @click="openDialog(tabs[activeTab].value, item)"
           />
-          <IconActionBtn tooltip="Visit" color="anchor" icon="mdi-web" :href="'https://' + item.value[0].env.WP_URL" />
+          <IconActionBtn tooltip="Visit" color="anchor" icon="mdi-web" :href="'https://' + item.value.env.WP_URL" />
           <IconActionBtn
             tooltip="Admin Panel"
             color="anchor"
             icon="mdi-view-dashboard"
-            :href="'https://' + item.value[0].env.WP_URL + '/wp-admin'"
+            :href="'https://' + item.value.env.WP_URL + '/wp-admin'"
           />
         </template>
       </VmDeploymentTable>

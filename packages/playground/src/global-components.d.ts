@@ -31,6 +31,7 @@ declare module "@vue/runtime-core" {
 
 declare global {
   interface Window {
+    $$appLoader: () => void;
     env: {
       NETWORK: NetworkEnv;
       GRAPHQL_URL: string;

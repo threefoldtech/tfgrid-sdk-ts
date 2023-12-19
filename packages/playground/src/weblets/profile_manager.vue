@@ -137,16 +137,24 @@
                         />
                       </div>
                       <div class="d-flex justify-end mb-10">
-                        <VBtn
-                          class="mt-2 ml-3"
-                          color="primary"
-                          variant="tonal"
-                          :disabled="!shouldActivateAccount"
-                          :loading="activatingAccount"
-                          @click="openAcceptTerms = termsLoading = true"
-                        >
-                          Activate account
-                        </VBtn>
+                        <v-tooltip>
+                          <template v-slot:activator="{ isActive, props }">
+                            <VBtn
+                              class="mt-2 ml-3"
+                              color="primary"
+                              variant="tonal"
+                              :disabled="!shouldActivateAccount"
+                              :loading="activatingAccount"
+                              @click="openAcceptTerms = termsLoading = true"
+                              v-bind="props"
+                              v-on="isActive"
+                            >
+                              Activate account
+                            </VBtn>
+                          </template>
+                          <span>To connect to your wallet, you should accept terms and conditions first.</span>
+                        </v-tooltip>
+
                         <VBtn
                           class="mt-2 ml-3"
                           color="secondary"
@@ -273,7 +281,7 @@
           <v-col cols="7" sm="12" md="12" lg="7">
             <PasswordInputWrapper #="{ props }">
               <VTextField
-                label="Your Hex Seed"
+                label="Your Mnemonic"
                 readonly
                 v-model="profileManager.profile.mnemonic"
                 v-bind="props"
@@ -518,7 +526,9 @@ const SSHKeyHint = ref("");
 const ssh = ref("");
 const mnemonicInput = useInputRef();
 const shouldActivateAccount = computed(
-  () => mnemonicInput.value?.error?.toLowerCase()?.includes("couldn't find a user for the provided mnemonic") || false,
+  () =>
+    mnemonicInput.value?.error?.toLowerCase()?.includes("couldn't get the user twin for the provided mnemonic") ||
+    false,
 );
 let sshTimeout: any;
 const isValidConnectConfirmationPassword = computed(() =>
@@ -600,7 +610,7 @@ async function activate(mnemonic: string) {
     const grid = await getGrid({ mnemonic });
     const profile = await loadProfile(grid!);
     ssh.value = profile.ssh;
-    profileManager.set(profile);
+    profileManager.set({ ...profile, mnemonic });
   } catch (e) {
     loginError.value = normalizeError(e, "Something went wrong while login.");
   } finally {

@@ -1,7 +1,7 @@
 <template v-if="nodes">
   <div class="my-6">
     <v-card color="primary rounded-0">
-      <v-card-title class="py-1 text-subtitle-1">Your Nodes</v-card-title>
+      <v-card-title class="py-1 text-subtitle-1 text-center">Your Nodes</v-card-title>
     </v-card>
     <v-data-table-server
       :loading="loading"
@@ -34,62 +34,61 @@
     >
       <template v-slot:expanded-row="{ columns, item }">
         <tr>
-          <td :colspan="columns.length" key="item.id">
-            <v-container>
-              <card-details
-                :loading="false"
-                title="Node Details"
-                icon="mdi-resistor-nodes"
-                :items="getNodeDetails(item.raw)"
-              ></card-details>
-            </v-container>
-            <v-expansion-panels v-model="resourcesPanel" :disabled="false" focusable>
-              <v-expansion-panel>
-                <v-expansion-panel-title class="bg-primary"> Resource Units Reserved </v-expansion-panel-title>
-                <v-expansion-panel-text>
-                  <v-row class="mt-5 mb-5">
-                    <v-col v-for="(value, key) in item.raw.total_resources" :key="key" align="center">
-                      <p class="text-center">{{ getKey(key) }}</p>
-                      <v-flex class="text-truncate">
-                        <v-tooltip bottom class="d-none">
-                          <template v-slot:activator="{ props }">
-                            <v-progress-circular
-                              v-bind="props"
-                              :rotate="-90"
-                              :size="150"
-                              :width="12"
-                              :model-value="getPercentage(item.raw, key)"
-                              class="my-3"
-                              color="primary"
-                            />
-                            <template v-if="item.raw.used_resources">
-                              <p v-if="item.raw.total_resources[key] > 1000">
-                                {{ byteToGB(item.raw.used_resources[key]) }} /
-                                {{ byteToGB(item.raw.total_resources[key]) }} GB
-                              </p>
+          <td
+            class="py-4 px-8 border border-anchor"
+            :style="{ backgroundColor: 'rgb(var(--v-theme-background))' }"
+            :colspan="columns.length"
+            key="item.id"
+          >
+            <card-details :loading="false" title="Node Details" :items="getNodeDetails(item.raw)"></card-details>
 
-                              <p v-else-if="item.raw.total_resources[key] == 0">NA</p>
-                              <p v-else>
-                                {{ item.raw.used_resources[key] }} /
-                                {{ item.raw.total_resources[key] }}
-                              </p>
-                            </template>
+            <v-card class="mt-4">
+              <v-alert class="pa-5" style="height: 20px">
+                <h4 class="text-center font-weight-medium">Resource Units Reserved</h4>
+              </v-alert>
+              <v-card-item>
+                <v-row class="mt-5 mb-5">
+                  <v-col v-for="(value, key) in item.raw.total_resources" :key="key" align="center">
+                    <p class="text-center">{{ getKey(key) }}</p>
+                    <v-flex class="text-truncate">
+                      <v-tooltip bottom class="d-none">
+                        <template v-slot:activator="{ props }">
+                          <v-progress-circular
+                            v-bind="props"
+                            :rotate="-90"
+                            :size="150"
+                            :width="12"
+                            :model-value="getPercentage(item.raw, key)"
+                            class="my-3"
+                            color="primary"
+                          />
+                          <template v-if="item.raw.used_resources">
+                            <p v-if="item.raw.total_resources[key] > 1000">
+                              {{ byteToGB(item.raw.used_resources[key]) }} /
+                              {{ byteToGB(item.raw.total_resources[key]) }} GB
+                            </p>
+                            <p v-else-if="item.raw.total_resources[key] == 0">NA</p>
+                            <p v-else>
+                              {{ item.raw.used_resources[key] }} /
+                              {{ item.raw.total_resources[key] }}
+                            </p>
                           </template>
-                        </v-tooltip>
-                      </v-flex>
-                    </v-col>
-                  </v-row>
-                </v-expansion-panel-text>
-              </v-expansion-panel>
-            </v-expansion-panels>
-            <v-expansion-panels v-if="network == 'main'" :disabled="false" focusable single model-value>
-              <v-expansion-panel class="my-3">
-                <v-expansion-panel-title class="bg-primary"> Node Statistics </v-expansion-panel-title>
-                <v-expansion-panel-text>
-                  <NodeMintingDetails :node="item.value" />
-                </v-expansion-panel-text>
-              </v-expansion-panel>
-            </v-expansion-panels>
+                        </template>
+                      </v-tooltip>
+                    </v-flex>
+                  </v-col>
+                </v-row>
+              </v-card-item>
+            </v-card>
+
+            <v-card class="mt-4" v-if="network == 'main'" focusable single model-value>
+              <v-alert class="pa-5" style="height: 20px">
+                <h4 class="text-center font-weight-medium">Node Statistics</h4>
+              </v-alert>
+              <v-card-item>
+                <NodeMintingDetails :node="item.value" />
+              </v-card-item>
+            </v-card>
           </td>
         </tr>
       </template>
