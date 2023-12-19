@@ -7,6 +7,7 @@
     :dedicated="dedicated"
     :ipv4="ipv4"
     :SelectedNode="selectionDetails?.node"
+    :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/discourse.png"
   >
     <template #title> Deploy a Discourse Instance </template>

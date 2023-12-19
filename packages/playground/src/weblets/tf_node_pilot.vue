@@ -7,6 +7,7 @@
     :dedicated="dedicated"
     ipv4
     :SelectedNode="selectionDetails?.node"
+    :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/vm.png"
   >
     <template #title>Deploy a Node Pilot</template>

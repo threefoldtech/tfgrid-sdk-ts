@@ -10,6 +10,7 @@
     :certified="master.certified"
     :dedicated="master.dedicated"
     :SelectedNode="master.selectionDetails?.node"
+    :valid-filters="master.selectionDetails?.validFilters"
     title-image="images/icons/kubernetes.png"
   >
     <template #title>Deploy a Kubernetes cluster</template>

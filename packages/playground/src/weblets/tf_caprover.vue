@@ -13,6 +13,7 @@
     :ipv4="true"
     :dedicated="leader.dedicated"
     :SelectedNode="leader.selectionDetails?.node"
+    :valid-filters="leader.selectionDetails?.validFilters"
     title-image="images/icons/caprover.png"
   >
     <template #title>Deploy a Caprover Instance</template>

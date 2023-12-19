@@ -7,6 +7,7 @@
     :ipv4="ipv4"
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
+    :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/funkwhale.png"
   >
     <template #title>Deploy a Funkwhale Instance </template>

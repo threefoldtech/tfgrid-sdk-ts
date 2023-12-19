@@ -246,7 +246,9 @@ watch(
 );
 
 /* Calculate Price */
-const showPrice = computed(() => !!profileManager.profile && props.cpu && props.memory && props.disk);
+const showPrice = computed(
+  () => props.validFilters && !!profileManager.profile && props.cpu && props.memory && props.disk,
+);
 const usd = ref<number>();
 const tft = ref<number>();
 const costLoading = ref(false);

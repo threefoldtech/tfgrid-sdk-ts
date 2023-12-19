@@ -8,6 +8,7 @@
     :certified="certified"
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
+    :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/owncloud.png"
   >
     <template #title>Deploy an OwnCloud Instance </template>
