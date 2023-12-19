@@ -61,7 +61,7 @@
             </VListItem>
           </template>
 
-          <template #append-item v-if="page !== -1">
+          <template #append-item v-if="pagination.page !== -1">
             <VContainer>
               <VBtn
                 @click="reloadNodes()"
@@ -96,18 +96,16 @@
 <script lang="ts">
 import type { FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
 import equals from "lodash/fp/equals.js";
-import sample from "lodash/fp/sample.js";
 import { computed, nextTick, onMounted, onUnmounted, type PropType, ref } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VInput } from "vuetify/components/VInput";
 
-import { useAsync, useWatchDeep } from "../../hooks";
+import { useAsync, usePagination, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
 import type { SelectedLocation, SelectionDetailsFilters } from "../../types/nodeSelector";
 import {
   checkNodeCapacityPool,
-  createPageGen,
   getNodePageCount,
   loadNodes,
   normalizeNodeFilters,
@@ -140,6 +138,10 @@ export default {
         const oldNode = props.modelValue;
         bindModelValue();
         return oldNode?.nodeId;
+      },
+      onAfterTask({ data }) {
+        loadedNodes.value = loadedNodes.value.concat(data as NodeInfo[]);
+        pagination.value.next();
       },
       // async onBeforeLoadingFinish(data, __, oldNodeId: number) {
       //   const nodes = data ?? [];
@@ -174,13 +176,9 @@ export default {
     });
 
     const pageCountTask = useAsync(getNodePageCount, { default: 1, shouldRun: () => props.validFilters });
-    const page = ref(-1);
-    let pageGen: ReturnType<typeof createPageGen>;
-    function nextPage() {
-      page.value = pageGen?.next().value ?? -1;
-    }
+    const pagination = usePagination();
 
-    const options = computed(() => normalizeNodeOptions(gridStore, props.location, page, props.farm));
+    const options = computed(() => normalizeNodeOptions(gridStore, props.location, pagination, props.farm));
     const filters = computed(() => normalizeNodeFilters(props.filters, options.value));
 
     const reloadNodes = () => nodesTask.value.run(gridStore, filters.value);
@@ -227,8 +225,7 @@ export default {
       baseFilters.value = undefined;
       filtersUpdated.value = false;
       await pageCountTask.value.run(gridStore, filters.value);
-      pageGen = createPageGen(pageCountTask.value.data as number);
-      nextPage();
+      pagination.value.reset(pageCountTask.value.data as number);
       await nextTick();
       loadedNodes.value = [];
       return reloadNodes();
@@ -270,7 +267,7 @@ export default {
       loadedNodes,
       reloadNodes,
       resetPageAndReloadNodes,
-      page,
+      pagination,
 
       filtersUpdated,
       nodeInputValidateTask,

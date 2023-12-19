@@ -48,7 +48,7 @@
         <span class="px-4 text-caption text-medium-emphasis">Type any desired farm name to search for...</span>
       </template>
 
-      <template #append-item v-if="!searchTask.initialized && page !== -1">
+      <template #append-item v-if="!searchTask.initialized && pagination.page !== -1">
         <VContainer>
           <VBtn
             @click="reloadFarms()"
@@ -70,11 +70,10 @@
 import type { FarmInfo } from "@threefold/grid_client";
 import { computed, nextTick, onUnmounted, type PropType, ref } from "vue";
 
-import { useAsync, useWatchDeep } from "../../hooks";
+import { useAsync, usePagination, useWatchDeep } from "../../hooks";
 import { useGrid } from "../../stores";
 import type { SelectedLocation, SelectionDetailsFilters } from "../../types/nodeSelector";
 import {
-  createPageGen,
   getFarmPageCount,
   loadFarms,
   normalizeFarmFilters,
@@ -118,19 +117,15 @@ export default {
           const index = loadedFarms.value.findIndex(f => f.farmId === oldFarmId);
           bindModelValue(loadedFarms.value[index]);
         }
-        nextPage();
+        pagination.value.next();
       },
       default: [],
     });
-    const options = computed(() => normalizeFarmOptions(gridStore, props.location, page));
+    const options = computed(() => normalizeFarmOptions(gridStore, props.location, pagination));
     const filters = computed(() => normalizeFarmFilters(props.filters, options.value));
 
     const pageCountTask = useAsync(getFarmPageCount, { default: 1, shouldRun: () => props.validFilters });
-    const page = ref(-1);
-    let pageGen: ReturnType<typeof createPageGen>;
-    function nextPage() {
-      page.value = pageGen?.next().value ?? -1;
-    }
+    const pagination = usePagination();
 
     const reloadFarms = () => farmsTask.value.run(gridStore, filters.value, props.filters.exclusiveFor);
 
@@ -139,8 +134,7 @@ export default {
       filters,
       async filters => {
         await pageCountTask.value.run(gridStore, filters);
-        pageGen = createPageGen(pageCountTask.value.data as number);
-        nextPage();
+        pagination.value.reset(pageCountTask.value.data as number);
         await nextTick();
         loadedFarms.value = [];
         return reloadFarms();
@@ -202,7 +196,7 @@ export default {
 
     return {
       farmsTask,
-      page,
+      pagination,
       reloadFarms,
       pageCountTask,
 

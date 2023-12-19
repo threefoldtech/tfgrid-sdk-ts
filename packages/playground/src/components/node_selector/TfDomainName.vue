@@ -47,7 +47,7 @@
             @blur="$nextTick().then(($refs.domainInput as VInput).validate)"
             return-object
           >
-            <template #append-item v-if="page !== -1">
+            <template #append-item v-if="pagination.page !== -1">
               <VContainer>
                 <VBtn
                   @click="reloadDomains()"
@@ -92,11 +92,11 @@ import { onMounted } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VInput } from "vuetify/components/VInput";
 
-import { useAsync, useWatchDeep } from "../../hooks";
+import { useAsync, usePagination, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";
 import { useGrid } from "../../stores";
 import type { DomainInfo, SelectionDetailsFilters } from "../../types/nodeSelector";
-import { createPageGen, getNodePageCount, loadNodes } from "../../utils/nodeSelector";
+import { getNodePageCount, loadNodes } from "../../utils/nodeSelector";
 
 export default {
   name: "TfDomainName",
@@ -121,23 +121,19 @@ export default {
     const domainsTask = useAsync(loadNodes, {
       onAfterTask({ data }) {
         loadedDomains.value = loadedDomains.value.concat(data as NodeInfo[]);
-        nextPage();
+        pagination.value.next();
       },
       default: [],
     });
 
     const pageCountTask = useAsync(getNodePageCount, { default: 1 });
-    const page = ref(-1);
-    let pageGen: ReturnType<typeof createPageGen>;
-    function nextPage() {
-      page.value = pageGen?.next().value ?? -1;
-    }
+    const pagination = usePagination();
 
     const enableCustomDomain = ref(false);
     const filters = computed<FilterOptions>(() => ({
       gateway: true,
       size: window.env.PAGE_SIZE,
-      page: Math.max(1, page.value),
+      page: Math.max(1, pagination.value.page),
       farmId: enableCustomDomain.value ? props.farm?.farmId : undefined,
       availableFor: gridStore.client.twinId,
     }));
@@ -148,8 +144,7 @@ export default {
       filters,
       async filters => {
         await pageCountTask.value.run(gridStore, filters);
-        pageGen = createPageGen(pageCountTask.value.data as number);
-        nextPage();
+        pagination.value.reset(pageCountTask.value.data as number);
         await nextTick();
         loadedDomains.value = [];
         return reloadDomains();
@@ -198,7 +193,7 @@ export default {
     }
 
     return {
-      page,
+      pagination,
 
       domainNameValid,
 

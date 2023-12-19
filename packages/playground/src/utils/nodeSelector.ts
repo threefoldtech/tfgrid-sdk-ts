@@ -2,10 +2,11 @@ import type { FarmFilterOptions, FarmInfo, FilterOptions, NodeInfo } from "@thre
 import { NodeStatus } from "@threefold/gridproxy_client";
 import shuffle from "lodash/fp/shuffle.js";
 import type { DeepPartial } from "utility-types";
-import type { Ref } from "vue";
+import type { ComputedRef, Ref } from "vue";
 import { z } from "zod";
 
 import { gqlClient, gridProxyClient } from "../clients";
+import type { usePagination } from "../hooks";
 import type { useGrid } from "../stores";
 import type {
   Locations,
@@ -35,9 +36,14 @@ export async function getLocations(): Promise<Locations> {
 export function normalizeFarmOptions(
   gridStore: ReturnType<typeof useGrid>,
   location: SelectedLocation | undefined,
-  page: Ref<number>,
+  pagination: ReturnType<typeof usePagination>,
 ): NormalizeFarmFiltersOptions {
-  return { size: window.env.PAGE_SIZE, page: page.value, location: location || {}, twinId: gridStore.client.twinId };
+  return {
+    size: window.env.PAGE_SIZE,
+    page: pagination.value.page,
+    location: location || {},
+    twinId: gridStore.client.twinId,
+  };
 }
 
 export function normalizeFarmFilters(
@@ -68,15 +74,6 @@ export function normalizeFarmFilters(
 export async function getFarmPageCount(gridStore: ReturnType<typeof useGrid>, filters: FarmFilterOptions) {
   const count = await gridStore.client.capacity.getFarmsCount(filters);
   return Math.ceil(count / window.env.PAGE_SIZE);
-}
-
-export function* createPageGen(count: number) {
-  const pages = shuffle(Array.from({ length: count - 1 }, (_, i) => i + 1));
-  for (const page of pages) {
-    yield page;
-  }
-  yield count;
-  return -1;
 }
 
 export async function loadFarms(
@@ -133,12 +130,12 @@ export async function searchFarms(query: string) {
 export function normalizeNodeOptions(
   gridStore: ReturnType<typeof useGrid>,
   location: SelectedLocation | undefined,
-  page: Ref<number>,
+  pagination: ReturnType<typeof usePagination>,
   farm: FarmInfo | undefined,
 ): NormalizeNodeFiltersOptions {
   return {
     size: window.env.PAGE_SIZE,
-    page: page.value,
+    page: pagination.value.page,
     location: location || {},
     twinId: gridStore.client.twinId,
     farm,
