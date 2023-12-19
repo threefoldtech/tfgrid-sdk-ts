@@ -42,7 +42,7 @@
           >
             <card-details :loading="false" title="Node Details" :items="getNodeDetails(item.raw)"></card-details>
 
-            <v-card>
+            <v-card class="mt-4">
               <v-alert class="pa-5" style="height: 20px">
                 <h4 class="text-center font-weight-medium">Resource Units Reserved</h4>
               </v-alert>
@@ -81,7 +81,7 @@
               </v-card-item>
             </v-card>
 
-            <v-card v-if="network == 'main'" focusable single model-value>
+            <v-card class="mt-4" v-if="network == 'main'" focusable single model-value>
               <v-alert class="pa-5" style="height: 20px">
                 <h4 class="text-center font-weight-medium">Node Statistics</h4>
               </v-alert>
