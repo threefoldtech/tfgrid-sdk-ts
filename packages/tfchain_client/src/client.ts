@@ -83,6 +83,8 @@ class QueryClient {
       await this.wait();
       QueryClient.connections.set(this.url, { api: this.api, disconnectHandler: this.__disconnectHandler });
       this.api.on("disconnected", this.__disconnectHandler);
+    } catch (e) {
+      throw new TFChainError("Unable to establish a connection with the chain:\n" + e);
     } finally {
       QueryClient.connectingLock.release();
     }
