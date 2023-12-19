@@ -3,58 +3,38 @@ import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function deployQsfs(client, qsfs) {
-  try {
-    const res = await client.qsfs_zdbs.deploy(qsfs);
-    log("================= Deploying QSFS =================");
-    log(res);
-    log("================= Deploying QSFS =================");
-  } catch (error) {
-    console.error("Error while Deploying QSFS ", error.message);
-  }
+  const res = await client.qsfs_zdbs.deploy(qsfs);
+  log("================= Deploying QSFS =================");
+  log(res);
+  log("================= Deploying QSFS =================");
 }
 
 async function deploy(client, vms) {
-  try {
-    const res = await client.machines.deploy(vms);
-    log("================= Deploying VM =================");
-    log(res);
-    log("================= Deploying VM =================");
-  } catch (error) {
-    console.error("Error while Deploying the VM ", error.message);
-  }
+  const res = await client.machines.deploy(vms);
+  log("================= Deploying VM =================");
+  log(res);
+  log("================= Deploying VM =================");
 }
 
 async function getDeployment(client, vms) {
-  try {
-    const res = await client.machines.getObj(vms);
-    log("================= Getting deployment information =================");
-    log(res);
-    log("================= Getting deployment information =================");
-  } catch (error) {
-    console.error("Error while getting the deployment ", error.message);
-  }
+  const res = await client.machines.getObj(vms);
+  log("================= Getting deployment information =================");
+  log(res);
+  log("================= Getting deployment information =================");
 }
 
 async function cancel(client, vms) {
-  try {
-    const res = await client.machines.delete(vms);
-    log("================= Canceling the deployment =================");
-    log(res);
-    log("================= Canceling the deployment =================");
-  } catch (error) {
-    console.error("Error while canceling the deployment ", error.message);
-  }
+  const res = await client.machines.delete(vms);
+  log("================= Canceling the deployment =================");
+  log(res);
+  log("================= Canceling the deployment =================");
 }
 
 async function deleteQsfs(client, qsfs) {
-  try {
-    const res = await client.qsfs_zdbs.delete(qsfs);
-    log("================= Deleting QSFS =================");
-    log(res);
-    log("================= Deleting QSFS =================");
-  } catch (error) {
-    console.error("Error while deleting qsfs ", error.message);
-  }
+  const res = await client.qsfs_zdbs.delete(qsfs);
+  log("================= Deleting QSFS =================");
+  log(res);
+  log("================= Deleting QSFS =================");
 }
 
 async function main() {

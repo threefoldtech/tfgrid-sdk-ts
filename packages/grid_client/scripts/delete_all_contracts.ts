@@ -2,14 +2,10 @@ import { getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function deleteAllContracts(client) {
-  try {
-    const res = await client.contracts.cancelMyContracts();
-    log("================= Deleting all contracts =================");
-    log(res);
-    log("================= Deleting all contracts =================");
-  } catch (error) {
-    console.error("Error while deleting contracts ", error.message);
-  }
+  const res = await client.contracts.cancelMyContracts();
+  log("================= Deleting all contracts =================");
+  log(res);
+  log("================= Deleting all contracts =================");
 }
 
 async function main() {
