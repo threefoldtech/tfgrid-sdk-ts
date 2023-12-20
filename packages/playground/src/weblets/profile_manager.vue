@@ -525,11 +525,20 @@ const isValidForm = ref(false);
 const SSHKeyHint = ref("");
 const ssh = ref("");
 const mnemonicInput = useInputRef();
-const shouldActivateAccount = computed(
-  () =>
-    mnemonicInput.value?.error?.toLowerCase()?.includes("couldn't get the user twin for the provided mnemonic") ||
-    false,
-);
+
+function isNonActiveMessage(msg: string) {
+  msg = msg.toLowerCase();
+  return (
+    msg.includes("couldn't get the user twin for the provided mnemonic") ||
+    msg.includes("invalid twin id") ||
+    msg.includes("couldn't get the user twin")
+  );
+}
+
+const shouldActivateAccount = computed(() => {
+  const msg = mnemonicInput.value?.error || "";
+  return isNonActiveMessage(msg) || false;
+});
 let sshTimeout: any;
 const isValidConnectConfirmationPassword = computed(() =>
   !validateConfirmPassword(confirmPassword.value) ? false : true,
@@ -622,7 +631,12 @@ function validateMnInput(mnemonic: string) {
   return getGrid({ mnemonic })
     .then(() => undefined)
     .catch(e => {
-      return { message: normalizeError(e, "Something went wrong. please try again.") };
+      const msg = normalizeError(e, "Something went wrong. please try again.");
+      return {
+        message: isNonActiveMessage(msg)
+          ? `Couldn't get the user twin for the provided mnemonic in ${process.env.NETWORK || window.env.NETWORK}net.`
+          : msg,
+      };
     });
 }
 
