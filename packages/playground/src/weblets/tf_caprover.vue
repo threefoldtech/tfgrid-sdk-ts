@@ -129,7 +129,7 @@ async function deploy() {
         normalizeCaproverWorker(leader.value, [
           { key: "SWM_NODE_MODE", value: "leader" },
           { key: "CAPROVER_ROOT_DOMAIN", value: domain.value },
-          { key: "CAPTAIN_IMAGE_VERSION", value: "latest" },
+          { key: "CAPTAIN_IMAGE_VERSION", value: "1.10.1" },
           { key: "PUBLIC_KEY", value: profileManager.profile!.ssh },
           { key: "DEFAULT_PASSWORD", value: password.value },
           { key: "CAPTAIN_IS_DEBUG", value: "true" },
