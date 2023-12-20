@@ -564,8 +564,9 @@ const ssh = ref("");
 const mnemonicInput = useInputRef();
 const shouldActivateAccount = computed(
   () =>
-    mnemonicInput.value?.error?.toLowerCase()?.includes("couldn't get the user twin for the provided mnemonic") ||
-    false,
+    mnemonicInput.value?.error
+      ?.toLowerCase()
+      ?.includes("couldn't get the user twin for the provided mnemonic and keytype") || false,
 );
 let sshTimeout: any;
 const isValidConnectConfirmationPassword = computed(() =>
