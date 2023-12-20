@@ -1,6 +1,6 @@
 <template>
   <v-card :loading="loading">
-    <v-alert class="pa-5" style="height: 20px" color="primary">
+    <v-alert class="pa-5" style="height: 20px">
       <h4 class="text-center font-weight-medium">
         <v-icon :icon="icon" size="large" />
         {{ title }}
@@ -79,7 +79,7 @@ export default {
 
     icon: {
       type: String,
-      required: true,
+      required: false,
     },
     node: {
       type: Object as PropType<GridNode>,

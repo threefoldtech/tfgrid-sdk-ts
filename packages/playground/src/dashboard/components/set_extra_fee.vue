@@ -2,8 +2,15 @@
   <span>
     <v-tooltip text="Set Additional Fees">
       <template #activator="{ props }">
-        <v-icon v-bind="props" size="small" :disabled="isAdding" :loading="isAdding" @click="showDialogue = true">
-          mdi-code-string
+        <v-icon
+          class="mx-1"
+          v-bind="props"
+          size="large"
+          :disabled="isAdding"
+          :loading="isAdding"
+          @click="showDialogue = true"
+        >
+          mdi-currency-usd
         </v-icon>
       </template>
     </v-tooltip>

@@ -15,7 +15,7 @@
     </div>
   </td>
 
-  <td :colspan="columnsLen" v-else>
+  <td :style="{ backgroundColor: 'rgb(var(--v-theme-background))' }" :colspan="columnsLen" v-else>
     <v-row class="ma-2">
       <v-col :cols="getColSize">
         <div class="mt-3">

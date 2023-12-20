@@ -1,9 +1,8 @@
 <template>
+  <v-btn class="bg-primary text-subtitle-1 px-6 ml-2 mr-3" @click="showDialogue = true" :loading="loading"
+    >Add IP</v-btn
+  >
   <v-container>
-    <v-row>
-      <v-btn color="blue" class="ml-auto bold-text" @click="showDialogue = true" :loading="loading">Add IP</v-btn>
-    </v-row>
-
     <v-container v-if="showDialogue">
       <v-dialog v-model="showDialogue" max-width="600">
         <v-card>
@@ -15,34 +14,37 @@
               <v-select
                 :items="items"
                 label="Choose how to enter IP"
-                v-model="selectedItem"
+                v-model="type"
                 @update:model-value="$emit('update:type', $event)"
               ></v-select>
               <input-validator
-                :value="$props.publicIP"
+                :value="publicIP"
                 :rules="[validators.required('IP is required.'), validators.isIPRange('Not a valid IP'), ipcheck]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IP address in CIDR format xxx.xxx.xxx.xxx/xx">
                   <v-text-field
-                    :model-value="$props.publicIP"
+                    v-model="publicIP"
                     v-bind:="props"
-                    @update:model-value="$emit('update:publicIP', $event)"
                     outlined
+                    type="text"
                     :label="type === IPType.single ? 'IP' : 'From IP'"
+                    @update:model-value="$emit('update:PublicIP', $event)"
                   ></v-text-field>
                 </input-tooltip>
               </input-validator>
+
               <input-validator
                 v-if="type === IPType.range"
-                :value="$props.toPublicIP"
+                :value="toPublicIP"
                 :rules="[validators.required('IP is required.'), validators.isIPRange('Not a valid IP'), toIpCheck]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IP address in CIDR format xxx.xxx.xxx.xxx/xx">
                   <v-text-field
-                    :model-value="$props.toPublicIP"
+                    v-model="toPublicIP"
                     v-bind:="props"
+                    type="text"
                     @update:model-value="$emit('update:toPublicIP', $event)"
                     outlined
                     label="To IP"
@@ -50,7 +52,7 @@
                 </input-tooltip>
               </input-validator>
               <input-validator
-                :value="$props.gateway"
+                :value="gateway"
                 :rules="[
                   validators.required('Gateway is required.'),
                   validators.isIP('Gateway is not valid.'),
@@ -60,8 +62,9 @@
               >
                 <input-tooltip tooltip="Gateway for the IP in ipv4 format">
                   <v-text-field
-                    :model-value="$props.gateway"
+                    v-model="gateway"
                     v-bind:="props"
+                    type="text"
                     @update:model-value="$emit('update:gateway', $event)"
                     outlined
                     label="Gateway"
@@ -83,16 +86,13 @@
             <v-btn
               variant="tonal"
               color="primary"
-              @click="addFarmIp($props.farmId, $props.gateway)"
+              @click="addFarmIp($props.farmId, gateway)"
               @update:modelValue="$emit('update:isAdded', $event)"
               :loading="isAdding"
               :disabled="!valid || isAdding"
               >Add</v-btn
             >
-            <v-btn
-              variant="tonal"
-              @click="showRange"
-              :disabled="!valid || $props.type === IPType.single || !$props.toPublicIP"
+            <v-btn variant="tonal" @click="showRange" :disabled="!valid || type === IPType.single || !toPublicIP"
               >Show IPs Range</v-btn
             >
           </v-card-actions>
@@ -119,38 +119,25 @@ export default {
       type: Number,
       required: true,
     },
-    type: {
-      type: String,
-      required: true,
-    },
-    publicIP: {
-      type: String,
-      required: true,
-    },
-    toPublicIP: {
-      type: String,
-      required: true,
-    },
-    gateway: {
-      type: String,
-      required: true,
-    },
   },
-  setup(props, context) {
+  setup(_, context) {
     const showDialogue = ref(false);
     const gridStore = useGrid();
     const valid = ref(false);
     const IPs = ref<string[]>();
     const items = ref<string[]>([IPType.single, IPType.range]);
-    const selectedItem = ref(props.type);
+    const type = ref("Single");
+    const publicIP = ref("");
     const loading = ref(false);
     const isAdded = ref(false);
     const isAdding = ref(false);
     const inRange = ref<boolean>();
     const showIPs = ref(false);
+    const toPublicIP = ref("");
+    const gateway = ref("");
 
     watch(
-      [() => props.publicIP, () => props.gateway],
+      [() => publicIP.value, () => gateway.value],
       ([newPublicIP, newGateway], [_, _2]) => {
         try {
           inRange.value = contains(newPublicIP, newGateway);
@@ -163,7 +150,7 @@ export default {
     );
 
     function ipcheck() {
-      if (PrivateIp(props.publicIP.split("/")[0])) {
+      if (PrivateIp(publicIP.value.split("/")[0])) {
         return {
           message: "IP is not public",
         };
@@ -172,14 +159,14 @@ export default {
     }
 
     function toIpCheck() {
-      if (props.toPublicIP.split("/")[1] !== props.publicIP.split("/")[1]) {
+      if (toPublicIP.value.split("/")[1] !== publicIP.value.split("/")[1]) {
         return {
           message: "Subnet is different.",
         };
       }
 
       if (
-        parseInt(props.toPublicIP.split("/")[0].split(".")[3]) <= parseInt(props.publicIP.split("/")[0].split(".")[3])
+        parseInt(toPublicIP.value.split("/")[0].split(".")[3]) <= parseInt(publicIP.value.split("/")[0].split(".")[3])
       ) {
         return {
           message: "To IP must be bigger than From IP.",
@@ -187,22 +174,22 @@ export default {
       }
 
       if (
-        props.toPublicIP.substring(0, props.toPublicIP.lastIndexOf(".")) !=
-        props.publicIP.substring(0, props.publicIP.lastIndexOf("."))
+        toPublicIP.value.substring(0, toPublicIP.value.lastIndexOf(".")) !=
+        publicIP.value.substring(0, publicIP.value.lastIndexOf("."))
       ) {
         return {
           message: "IPs are not the same.",
         };
       }
       if (
-        parseInt(props.toPublicIP.split("/")[0].split(".")[3]) - parseInt(props.publicIP.split("/")[0].split(".")[3]) >
+        parseInt(toPublicIP.value.split("/")[0].split(".")[3]) - parseInt(publicIP.value.split("/")[0].split(".")[3]) >
         16
       ) {
         return {
           message: "Range must not exceed 16.",
         };
       }
-      if (PrivateIp(props.publicIP.split("/")[0])) {
+      if (PrivateIp(publicIP.value.split("/")[0])) {
         return {
           message: "IP is not public.",
         };
@@ -216,7 +203,7 @@ export default {
           message: "Gateway IP not in the provided IP range.",
         };
       }
-      if (props.publicIP?.split("/")[0] === props.gateway || props.toPublicIP?.split("/")[0] === props.gateway) {
+      if (publicIP?.value.split("/")[0] === gateway.value || toPublicIP?.value.split("/")[0] === gateway.value) {
         return {
           message: "IPs cannot be the same.",
         };
@@ -230,11 +217,11 @@ export default {
     }
 
     function addIPs() {
-      const sub = props.publicIP.split("/")[1];
-      const start = props.publicIP.split("/")[0];
-      let end = props.toPublicIP.split("/")[0];
+      const sub = publicIP.value.split("/")[1];
+      const start = publicIP.value.split("/")[0];
+      let end = toPublicIP.value.split("/")[0];
 
-      if (props.type === IPType.single) end = start;
+      if (type.value === IPType.single) end = start;
 
       IPs.value = getIPRange(start, end);
       IPs.value.forEach((ip, i) => {
@@ -245,21 +232,19 @@ export default {
     async function addFarmIp(farmId: number, gw: string) {
       try {
         isAdding.value = true;
-        if (props.type === IPType.range) {
+        if (type.value === IPType.range) {
           addIPs();
         }
         if (IPs.value && IPs.value.length > 1) {
           const extrinsics: any[] = [];
           for (const ip in IPs.value) {
             extrinsics.push(await gridStore.grid.tfchain.tfClient.farms.addFarmIp({ farmId, ip: IPs.value[ip], gw }));
-
-            context.emit("add-publicIPs", [{ ip: IPs.value[ip], gateway: gw }]);
           }
           await gridStore.grid.utility.batchAll({ extrinsics });
         } else {
-          await gridStore.grid.farms.addFarmIp({ farmId, ip: props.publicIP, gw });
-          context.emit("add-publicIPs", [{ ip: props.publicIP, gateway: gw }]);
+          await gridStore.grid.farms.addFarmIp({ farmId, ip: publicIP.value, gw });
         }
+        context.emit("ip-added-successfully");
         createCustomToast("IP is added successfully.", ToastType.success);
       } catch (error) {
         console.log(error);
@@ -273,7 +258,6 @@ export default {
       valid,
       IPs,
       items,
-      selectedItem,
       loading,
       isAdded,
       isAdding,
@@ -286,6 +270,10 @@ export default {
       ipcheck,
       toIpCheck,
       gatewayCheck,
+      type,
+      publicIP,
+      toPublicIP,
+      gateway,
     };
   },
 };

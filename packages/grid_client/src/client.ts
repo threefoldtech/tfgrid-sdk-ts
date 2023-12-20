@@ -17,7 +17,6 @@ import { BackendStorage, BackendStorageType } from "./storage/backend";
 import { KeypairType } from "./zos/deployment";
 
 class GridClient {
-  static rmbClients: Map<string, RMBClient> = new Map();
   static connecting = new Set<string>();
   static migrationLock = new Map<string, AwaitLock>();
   static migrated = new Set<string>();
@@ -95,50 +94,41 @@ class GridClient {
   }
   async connect(): Promise<void> {
     const urls = this.getDefaultUrls(this.clientOptions.network);
-    const key = `${urls.substrate}:${this.clientOptions.mnemonic}:${this.clientOptions.keypairType}`;
-
-    const isConnecting = GridClient.connecting.has(key);
-    GridClient.connecting.add(key); // Add Client to connecting set.
 
     this.tfclient = new TFClient(
       urls.substrate,
       this.clientOptions.mnemonic,
-      this.clientOptions.storeSecret,
+      this.clientOptions.storeSecret!,
       this.clientOptions.keypairType,
     );
-    if (Object.keys(GridClient.rmbClients).includes(key)) {
-      this.rmbClient = GridClient.rmbClients[key];
+
+    this.rmbClient = new RMBClient(
+      urls.substrate,
+      urls.relay,
+      this.clientOptions.mnemonic,
+      generateString(10),
+      this.clientOptions.keypairType!,
+      5,
+    );
+
+    await this.tfclient.connect();
+    await this.rmbClient.connect();
+
+    await this.testConnectionUrls(urls);
+
+    if (BackendStorage.isEnvNode()) {
+      process.on("SIGTERM", this.disconnectAndExit);
+      process.on("SIGINT", this.disconnectAndExit);
+      process.on("SIGUSR1", this.disconnectAndExit);
+      process.on("SIGUSR2", this.disconnectAndExit);
+      process.removeAllListeners();
     } else {
-      this.rmbClient = new RMBClient(
-        urls.substrate,
-        urls.relay,
-        this.clientOptions.mnemonic,
-        generateString(10),
-        this.clientOptions.keypairType,
-        5,
-      );
-      GridClient.rmbClients[key] = this.rmbClient;
+      window.onbeforeunload = () => {
+        return "";
+      };
+      window.onunload = this.disconnect;
     }
 
-    if (!isConnecting) {
-      await this.tfclient.connect();
-      await this.rmbClient.connect();
-
-      await this.testConnectionUrls(urls);
-
-      if (BackendStorage.isEnvNode()) {
-        process.on("SIGTERM", this.disconnectAndExit);
-        process.on("SIGINT", this.disconnectAndExit);
-        process.on("SIGUSR1", this.disconnectAndExit);
-        process.on("SIGUSR2", this.disconnectAndExit);
-        process.removeAllListeners();
-      } else {
-        window.onbeforeunload = () => {
-          return "";
-        };
-        window.onunload = this.disconnect;
-      }
-    }
     try {
       this.twinId = await this.tfclient.twins.getMyTwinId();
       if (!this.twinId) {
@@ -153,8 +143,6 @@ class GridClient {
     this._connect();
 
     await migrateKeysEncryption.apply(this, [GridClient]);
-
-    GridClient.connecting.delete(key);
   }
 
   _connect(): void {
@@ -163,13 +151,13 @@ class GridClient {
     this.config = {
       network: this.clientOptions.network,
       mnemonic: this.clientOptions.mnemonic,
-      storeSecret: this.clientOptions.storeSecret,
+      storeSecret: this.clientOptions.storeSecret!,
       rmbClient: this.rmbClient,
       tfclient: this.tfclient,
-      projectName: this.clientOptions.projectName,
-      backendStorageType: this.clientOptions.backendStorageType,
+      projectName: this.clientOptions.projectName!,
+      backendStorageType: this.clientOptions.backendStorageType!,
       backendStorage: this.clientOptions.backendStorage,
-      keypairType: this.clientOptions.keypairType,
+      keypairType: this.clientOptions.keypairType!,
       storePath: storePath,
       graphqlURL: urls.graphql,
       proxyURL: urls.rmbProxy,
@@ -177,7 +165,7 @@ class GridClient {
       activationURL: urls.activation,
       twinId: this.twinId,
       seed: this.clientOptions.seed,
-      deploymentTimeoutMinutes: this.clientOptions.deploymentTimeoutMinutes,
+      deploymentTimeoutMinutes: this.clientOptions.deploymentTimeoutMinutes!,
     };
     for (const module of Object.getOwnPropertyNames(modules).filter(item => typeof modules[item] === "function")) {
       if (module.includes("Model")) {
@@ -234,27 +222,23 @@ class GridClient {
       urls.graphql = "https://graph.grid.tf/graphql";
       urls.activation = "https://activation.grid.tf/activation/activate";
     } else {
-      urls.rmbProxy = this.clientOptions.proxyURL;
-      urls.relay = this.clientOptions.relayURL;
-      urls.substrate = this.clientOptions.substrateURL;
-      urls.graphql = this.clientOptions.graphqlURL;
-      urls.activation = this.clientOptions.activationURL;
+      urls.rmbProxy = this.clientOptions.proxyURL!;
+      urls.relay = this.clientOptions.relayURL!;
+      urls.substrate = this.clientOptions.substrateURL!;
+      urls.graphql = this.clientOptions.graphqlURL!;
+      urls.activation = this.clientOptions.activationURL!;
     }
     return urls;
   }
 
   async disconnect(): Promise<void> {
     if (this.tfclient) await this.tfclient.disconnect();
-    for (const key of Object.keys(GridClient.rmbClients)) {
-      await GridClient.rmbClients[key].close();
-    }
+    if (this.rmbClient) await this.rmbClient.close();
   }
 
   async disconnectAndExit(): Promise<void> {
     if (this.tfclient) await this.tfclient.disconnect();
-    for (const key of Object.keys(GridClient.rmbClients)) {
-      await GridClient.rmbClients[key].close();
-    }
+    if (this.rmbClient) await this.rmbClient.close();
     process.exit(0);
   }
 
