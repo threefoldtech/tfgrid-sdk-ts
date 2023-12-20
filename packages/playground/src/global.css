@@ -121,3 +121,8 @@ a {
 .v-btn {
   padding: 0rem 0.75rem !important;
 }
+
+.v-list-item-title,
+.v-label--clickable {
+  font-size: 0.875rem !important;
+}

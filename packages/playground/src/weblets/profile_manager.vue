@@ -142,7 +142,7 @@
                             <VBtn
                               class="mt-2 ml-3"
                               color="primary"
-                              variant="tonal"
+                              variant="outlined"
                               :disabled="!shouldActivateAccount"
                               :loading="activatingAccount"
                               @click="openAcceptTerms = termsLoading = true"
@@ -157,8 +157,7 @@
 
                         <VBtn
                           class="mt-2 ml-3"
-                          color="secondary"
-                          variant="tonal"
+                          color="primary"
                           :disabled="isValidForm || !!mnemonic || shouldActivateAccount"
                           :loading="creatingAccount"
                           @click="openAcceptTerms = termsLoading = true"
@@ -260,7 +259,7 @@
                 class="ml-2"
                 type="submit"
                 color="secondary"
-                variant="tonal"
+                variant="outlined"
                 :loading="activating"
                 :disabled="
                   !isValidForm ||
@@ -390,7 +389,6 @@
         <VBtn
           class="ml-2"
           color="error"
-          variant="tonal"
           @click="logout"
           v-if="profileManager.profile"
           :disabled="updatingSSH || generatingSSH || loadingBalance"

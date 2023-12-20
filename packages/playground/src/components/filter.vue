@@ -51,7 +51,7 @@
                 :disabled="!isFiltersTouched || formDisabled"
                 @click="resetFilters"
                 variant="outlined"
-                color="primary"
+                color="secondary"
                 >Reset Filters</v-btn
               >
             </v-col>
