@@ -76,7 +76,7 @@ async function main() {
           SWM_NODE_MODE: "leader",
           CAPROVER_ROOT_DOMAIN: "rafy.grid.tf", // update me
           DEFAULT_PASSWORD: "captain42",
-          CAPTAIN_IMAGE_VERSION: "latest",
+          CAPTAIN_IMAGE_VERSION: "1.10.1",
         },
       },
     ],

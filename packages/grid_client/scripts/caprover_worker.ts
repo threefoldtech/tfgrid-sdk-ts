@@ -75,7 +75,7 @@ async function main() {
           PUBLIC_KEY: config.ssh_key,
           SWM_NODE_MODE: "worker",
           LEADER_PUBLIC_IP: "185.206.122.157",
-          CAPTAIN_IMAGE_VERSION: "latest",
+          CAPTAIN_IMAGE_VERSION: "1.10.1",
         },
       },
     ],
