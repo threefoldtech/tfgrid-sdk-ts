@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 
 export function useOnline() {
   const online = ref(true);
@@ -23,4 +23,10 @@ export function useOnline() {
   });
 
   return online;
+}
+
+export function useOffline() {
+  const online = useOnline();
+
+  return computed(() => !online.value);
 }
