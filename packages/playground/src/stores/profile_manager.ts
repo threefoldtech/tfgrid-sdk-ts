@@ -1,3 +1,4 @@
+import type { KeypairType } from "@threefold/grid_client";
 import { defineStore } from "pinia";
 
 import { useGrid } from "./grid";
@@ -9,6 +10,7 @@ export interface Profile {
   address: string;
   relay: string;
   pk: string;
+  keypairType: KeypairType | undefined;
 }
 
 interface State {
