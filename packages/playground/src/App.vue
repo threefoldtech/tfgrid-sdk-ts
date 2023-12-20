@@ -143,20 +143,18 @@
           }"
           height="50"
         >
-          <v-container>
-            <v-row>
-              <v-breadcrumbs :items="navbarConfig.path" active-color="secondary">
-                <template v-slot:divider>
-                  <v-icon icon="mdi-chevron-right"></v-icon>
-                </template>
-                <template v-slot:item="{ item }">
-                  <router-link :to="item.to" :class="{ 'clickable-item': !item.disabled }">
-                    {{ item.title }}
-                  </router-link>
-                </template>
-              </v-breadcrumbs>
-            </v-row>
-          </v-container>
+          <v-row>
+            <v-breadcrumbs class="ma-3" :items="navbarConfig.path" active-color="secondary">
+              <template v-slot:divider>
+                <v-icon icon="mdi-chevron-right"></v-icon>
+              </template>
+              <template v-slot:item="{ item }">
+                <router-link :to="item.to" :class="{ 'clickable-item': !item.disabled }">
+                  {{ item.title }}
+                </router-link>
+              </template>
+            </v-breadcrumbs>
+          </v-row>
         </v-toolbar>
 
         <DeploymentListManager>
