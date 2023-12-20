@@ -6,7 +6,7 @@
     :items="gpuFields"
     icon="mdi-credit-card-settings-outline"
   >
-    <template #gpu-hint-message>
+    <template #gpu-hint-message v-if="node.cards?.length">
       <v-chip class="d-flex justify-center ma-4 mt-1" color="info">
         Select a GPU card ID from the below selection to load its data.
       </v-chip>
@@ -23,6 +23,19 @@
         </v-col>
       </v-row>
     </template>
+
+    <!-- <template v-else-if="isError">
+      <v-card class="d-flex justify-center align-center h-screen">
+        <div class="text-center w-100 pa-3">
+          <v-icon variant="tonal" color="error" style="font-size: 50px" icon="mdi-close-circle-outline" />
+          <p class="mt-4 mb-4 font-weight-bold text-error">
+            {{ errorMessage }}
+          </p>
+          <v-btn class="mr-4" @click="requestNode" color="primary" text="Try Again" />
+          <v-btn @click="(val:boolean) => closeDialog(val)" color="error" variant="outlined" text="Cancel" />
+        </div>
+      </v-card>
+    </template> -->
   </card-details>
 </template>
 
@@ -61,12 +74,14 @@ export default {
 
     const mount = () => {
       loading.value = true;
-      selectedCard.value = props.node.cards[0];
-      props.node.cards.map((card: GPUCard) => {
-        cardsIds.value.push(card.id);
-      });
-      cardId.value = cardsIds.value[0];
-      gpuFields.value = getNodeTwinDetailsCard();
+      if (props.node.cards?.length > 0) {
+        selectedCard.value = props.node.cards[0];
+        props.node.cards.map((card: GPUCard) => {
+          cardsIds.value.push(card.id);
+        });
+        cardId.value = cardsIds.value[0];
+        gpuFields.value = getNodeTwinDetailsCard();
+      }
       loading.value = false;
     };
 

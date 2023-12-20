@@ -92,7 +92,7 @@ export default {
               Reflect.get(props.node.stats.total, i)) *
             100;
         } else {
-          value = NaN;
+          value = (Reflect.get(props.node.used_resources, i) / Reflect.get(props.node.total_resources, i)) * 100;
         }
         loading.value = false;
         return {

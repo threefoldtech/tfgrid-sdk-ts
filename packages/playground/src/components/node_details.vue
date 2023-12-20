@@ -13,14 +13,12 @@
         </v-btn>
       </div>
     </v-toolbar>
-
     <template v-if="loading">
       <v-card class="d-flex justify-center align-center h-screen">
         <v-progress-circular color="primary" indeterminate :size="128" :width="5" />
         <p class="mt-2">Loading node details...</p>
       </v-card>
     </template>
-
     <template v-else-if="isError">
       <v-card class="d-flex justify-center align-center h-screen">
         <div class="text-center w-100 pa-3">
@@ -54,7 +52,7 @@
           <v-col cols="12" md="6" sm="8">
             <interfaces-details-card :node="node" />
           </v-col>
-          <v-col v-if="node.cards?.length" cols="12" md="6" sm="8">
+          <v-col v-if="node.cards?.length || node.num_gpu > 0" cols="12" md="6" sm="8">
             <gpu-details-card :node="node" />
           </v-col>
           <v-col v-if="node.publicConfig && node.publicConfig.domain" cols="12" md="6" sm="8">
