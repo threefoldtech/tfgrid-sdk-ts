@@ -131,7 +131,6 @@
 
 <script lang="ts">
 import type { Farm } from "@threefold/gridproxy_client";
-import { ConnectionError } from "@threefold/types";
 import { jsPDF } from "jspdf";
 import { debounce } from "lodash";
 import { StrKey } from "stellar-sdk";
