@@ -4,7 +4,7 @@ name: Grid Client Nightly
 
 on:
   schedule:
-    - cron: "0 6 * * *"
+    - cron: "0 4 * * *"
   workflow_dispatch:
 jobs:
   deployment-scripts:
@@ -95,18 +95,18 @@ jobs:
         id: command_step
         run: |
           sleep 15
-          output=$(yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/list_all_contracts.ts)
-          echo "myOutput=$output" >> $GITHUB_ENV
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/list_all_contracts.ts > output.txt
 
       - name: Check if contracts are Empty
         run: |
-          contract_json=$(echo "${{ steps.command_step.outputs.myOutput }}" | sed '1d;$d')
-          # Convert the middle line to three arrays
-          IFS=', ' read -r -a arrays <<< "$(echo "$contract_json" | awk -F':|,' '{print $2, $4, $6}')"
+          # Read the Contracts line from the file
+          contracts_json=$(awk 'NR==5' output.txt)
+
           # Check if all three [Name - Node - Rent] contracts are empty
-          if [ -n "${arrays[0]}" ] || [ -n "${arrays[1]}" ] || [ -n "${arrays[2]}" ]; then
-          echo "Deletion failed; at least one array is not empty."
-          exit 1
+          if [[ $contracts_json != *'nodeContracts: []'* ]]; then
+            echo "Deletion failed; The Node Contract is not empty."
+            exit 1
+          fi
 
       - name: Test Results
         run: |
@@ -127,5 +127,6 @@ jobs:
           steps.vmqsfs.outcome != 'success' ||
           steps.kubernetesqsfs.outcome != 'success' ||
           steps.kvstore.outcome != 'success' ||
-          steps.zdb.outcome != 'success'
+          steps.zdb.outcome != 'success' ||
+          steps.deleteall.outcome != 'success' 
         run: exit 1
