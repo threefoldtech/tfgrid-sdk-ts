@@ -1,16 +1,16 @@
 <template>
   <VDialog scrollable persistent min-width="400px" max-width="700px" :model-value="offline || failed">
     <VCard>
-      <VCardTitle class="font-weight-black text-center text-h4 bg-primary py-8" v-text="title" />
+      <VCardTitle class="v-card-title font-weight-black text-center text-h5 bg-primary py-3" v-text="title" />
       <VCardText class="text-center">
-        <VProgressCircular indeterminate size="80" width="8" color="info" v-if="!failed" />
-        <VIcon icon="mdi-close-circle" class="text-h1" color="error" v-else />
+        <VIcon icon="mdi-close-circle-outline" class="text-h3" color="error" v-if="failed" />
+        <VProgressCircular indeterminate size="40" width="5" color="info" v-else />
 
-        <p class="mt-4" v-text="description" />
+        <p class="my-4" v-text="description" />
       </VCardText>
 
       <VCardActions class="d-flex justify-center mb-4" v-if="failed">
-        <VBtn prepend-icon="mdi-reload" variant="tonal" color="error" @click="reload">Reload Now</VBtn>
+        <VBtn prepend-icon="mdi-reload" variant="outlined" color="secondary" @click="reload">Reload Now</VBtn>
       </VCardActions>
     </VCard>
   </VDialog>
