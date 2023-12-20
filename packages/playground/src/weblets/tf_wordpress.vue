@@ -5,9 +5,9 @@
     :memory="solution?.memory"
     :disk="solution?.disk"
     :ipv4="ipv4"
-    :certified="certified"
     :dedicated="dedicated"
-    :SelectedNode="selectedNode"
+    :SelectedNode="selectionDetails?.node"
+    :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/wordpress.png"
   >
     <template #title>Deploy a Wordpress Instance </template>
@@ -88,82 +88,50 @@
         v-model="solution"
         :medium="{ cpu: 2, memory: 4, disk: 50 }"
         :large="{ cpu: 4, memory: 16, disk: 100 }"
-        :disabled="loadingFarm"
       />
+
       <Networks v-model:ipv4="ipv4" />
 
-      <FarmGatewayManager>
-        <input-tooltip
-          inline
-          tooltip="Click to know more about dedicated nodes."
-          href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
-        >
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
-        </input-tooltip>
-        <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
-        </input-tooltip>
-        <SelectFarmManager>
-          <NodeSelector v-model="selection" />
-          <SelectFarm
-            v-if="selection == Selection.AUTOMATED"
-            :filters="{
-              cpu: solution?.cpu,
-              memory: solution?.memory,
-              ssd: (solution?.disk ?? 0) + rootFilesystemSize,
-              publicIp: ipv4,
-              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-              certified: certified,
-            }"
-            v-model="farm"
-            v-model:loading="loadingFarm"
-            v-model:search="farmName"
-          />
+      <input-tooltip
+        inline
+        tooltip="Click to know more about dedicated nodes."
+        href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+      >
+        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+      </input-tooltip>
 
-          <SelectNode
-            v-model="selectedNode"
-            :selection="selection"
-            :filters="{
-              farmId: farm?.farmID,
-              cpu: solution?.cpu,
-              memory: solution?.memory,
-              diskSizes: [solution?.disk],
-              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-              certified: certified,
-              country: farm?.country,
-              region: farm?.region,
-            }"
-            :loading-farm="loadingFarm"
-            :root-file-system-size="rootFilesystemSize"
-          />
-        </SelectFarmManager>
-        <DomainName :hasIPv4="ipv4" ref="domainNameCmp"></DomainName>
-      </FarmGatewayManager>
+      <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+        <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+      </input-tooltip>
+
+      <TfSelectionDetails
+        :filters="{
+          ipv4,
+          certified,
+          dedicated,
+          cpu: solution?.cpu,
+          solutionDisk: solution?.disk,
+          memory: solution?.memory,
+          rootFilesystemSize,
+        }"
+        require-domain
+        v-model="selectionDetails"
+      />
     </form-validator>
 
     <template #footer-actions>
-      <v-btn
-        color="primary"
-        variant="tonal"
-        @click="deploy(domainNameCmp?.domain, domainNameCmp?.customDomain)"
-        :disabled="!valid"
-      >
-        Deploy
-      </v-btn>
+      <v-btn color="primary" variant="tonal" @click="deploy()" :disabled="!valid"> Deploy </v-btn>
     </template>
   </weblet-layout>
 </template>
 
 <script lang="ts" setup>
 import type { GridClient } from "@threefold/grid_client";
-import { computed, type Ref, ref, watch } from "vue";
+import { computed, type Ref, ref } from "vue";
 
-import { Selection } from "@/utils/types";
-
-import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { FarmInterface, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
+import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { deployGatewayName, getSubdomain, rollbackDeployment } from "../utils/gateway";
@@ -172,51 +140,42 @@ import { normalizeError } from "../utils/helpers";
 import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
-const selection = ref();
 const valid = ref(false);
 const profileManager = useProfileManager();
-const loadingFarm = ref(false);
 const name = ref(generateName({ prefix: "wp" }));
 const username = ref("admin");
 const email = ref("");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
-const domainNameCmp = ref();
-const farm = ref() as Ref<FarmInterface>;
-const farmName = ref();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/tf-wordpress-latest.flist",
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
-watch(
-  () => selection.value,
-  (value, oldValue) => {
-    if (value !== oldValue) {
-      loadingFarm.value = false;
-    }
-  },
-  { deep: false },
-);
+const selectionDetails = ref<SelectionDetails>();
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed a Wordpress instance.");
   layout.value.openDialog(deployment, deploymentListEnvironments.wordpress);
 }
-async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
+async function deploy() {
   layout.value.setStatus("deploy");
+
   const projectName = ProjectName.Wordpress.toLowerCase() + "/" + name.value;
+
   const subdomain = getSubdomain({
     deploymentName: name.value,
     projectName,
     twinId: profileManager.profile!.twinId,
   });
-  const domain = customDomain ? gatewayName.domain : subdomain + "." + gatewayName.domain;
+
+  const domain = selectionDetails.value?.domain?.enabledCustomDomain
+    ? selectionDetails.value.domain.customDomain
+    : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;
 
   let grid: GridClient | null;
   let vm: any;
@@ -229,8 +188,8 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
     vm = await deployVM(grid!, {
       name: name.value,
       network: {
-        accessNodeId: gatewayName.id,
-        addAccess: !!gatewayName.id,
+        addAccess: selectionDetails.value!.domain!.enableSelectedDomain,
+        accessNodeId: selectionDetails.value?.domain?.selectedDomain?.nodeId,
       },
       machines: [
         {
@@ -245,10 +204,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
           ],
           flist: flist.value,
           entryPoint: flist.entryPoint,
-          farmId: farm.value.farmID,
-          farmName: farm.value.name,
           publicIpv4: ipv4.value,
-          country: farm.value.country,
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "MYSQL_USER", value: username.value },
@@ -256,7 +212,7 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
             { key: "ADMIN_EMAIL", value: email.value },
             { key: "WP_URL", value: domain },
           ],
-          nodeId: selectedNode.value.nodeId,
+          nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
           rootFilesystemSize: rootFilesystemSize.value,
@@ -266,20 +222,21 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   } catch (e) {
     return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Wordpress instance."));
   }
-  if (customDomain && ipv4.value) {
-    vm[0].customDomain = gatewayName.domain;
+
+  if (!selectionDetails.value?.domain?.enableSelectedDomain) {
+    vm[0].customDomain = selectionDetails.value?.domain?.customDomain;
     finalize(vm);
     return;
   }
+
   try {
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
-    await deployGatewayName(grid!, {
-      name: subdomain,
-      nodeId: gatewayName.id!,
+
+    await deployGatewayName(grid, selectionDetails.value.domain, {
+      subdomain,
       ip: vm[0].interfaces[0].ip,
       port: 80,
-      networkName: vm[0].interfaces[0].network,
-      fqdn: gatewayName?.useFQDN ? gatewayName?.domain : undefined,
+      network: vm[0].interfaces[0].network,
     });
 
     finalize(vm);
@@ -293,27 +250,14 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
 </script>
 
 <script lang="ts">
-import DomainName from "../components/domain_name.vue";
-import FarmGatewayManager from "../components/farm_gateway_manager.vue";
 import Networks from "../components/networks.vue";
-import SelectFarm from "../components/select_farm.vue";
-import SelectFarmManager from "../components/select_farm_manager.vue";
-import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
-import type { INode } from "../utils/filter_nodes";
+import type { SelectionDetails } from "../types/nodeSelector";
 import rootFs from "../utils/root_fs";
 
 export default {
   name: "TFWordpress",
-  components: {
-    SelectSolutionFlavor,
-    SelectFarm,
-    SelectNode,
-    Networks,
-    DomainName,
-    FarmGatewayManager,
-    SelectFarmManager,
-  },
+  components: { SelectSolutionFlavor, Networks },
 };
 </script>

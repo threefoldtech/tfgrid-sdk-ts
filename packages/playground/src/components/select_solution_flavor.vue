@@ -48,7 +48,7 @@
         :rules="[
           validators.required('SSD Storage size is required.'),
           validators.isInt('SSD Storage size must be a valid integer.'),
-          validators.min('Minimum allowed ssd storage size is 15 GB.', 15),
+          validators.min(`Minimum allowed ssd storage size is ${minDiskSize} GB.`, minDiskSize),
           validators.max('Maximum allowed ssd storage size is 10000 GB.', 10000),
         ]"
         #="{ props }"
@@ -81,6 +81,8 @@ const props = defineProps({
   disabled: { type: Boolean },
 });
 const emits = defineEmits<{ (event: "update:model-value", value?: solutionFlavor): void }>();
+
+const minDiskSize = computed(() => Math.min(15, props.small.disk, props.medium.disk, props.large.disk));
 
 const packages = computed(() => {
   const { small, medium, large } = props;
