@@ -129,6 +129,10 @@
           <AppTheme />
           <v-divider vertical class="mx-2" />
           <ProfileManager v-model="openProfile" />
+
+          <VToolbarItems class="ml-2">
+            <TfWalletConnector />
+          </VToolbarItems>
         </v-toolbar>
 
         <v-toolbar
@@ -393,6 +397,7 @@ import ProfileManagerController from "./components/profile_manager_controller.vu
 import TftSwapPrice from "./components/swap_price.vue";
 import TFNotification from "./components/tf_notification.vue";
 import TfNavigationLoader from "./components/TfNavigationLoader.vue";
+import TfWalletConnector from "./components/wallet_connector/TfWalletConnector.vue";
 import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
 
@@ -425,6 +430,7 @@ export default {
     FundsCard,
     ProfileManagerController,
     TfNavigationLoader,
+    TfWalletConnector,
   },
 };
 </script>
