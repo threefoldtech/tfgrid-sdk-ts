@@ -415,6 +415,7 @@ import { generateKeyPair } from "web-ssh-keygen";
 import { AppThemeSelection } from "@/utils/app_theme";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
+import { useOnline } from "../hooks";
 import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
 import {
@@ -445,23 +446,31 @@ const props = defineProps({
 });
 defineEmits<{ (event: "update:modelValue", value: boolean): void }>();
 
+const online = useOnline();
 watch(
-  () => props.modelValue,
-  m => {
-    if (m) {
-      nextTick().then(mounted);
-    } else {
-      nextTick().then(() => {
-        if (isStoredCredentials()) {
-          activeTab.value = 0;
-        } else {
-          activeTab.value = 1;
-        }
-        clearFields();
-      });
+  () => [online.value, props.modelValue],
+  ([online, m], [wasOnline]) => {
+    if (!wasOnline && online) {
+      handleModelValue(true);
     }
+
+    handleModelValue(online && m);
   },
 );
+function handleModelValue(m: boolean) {
+  if (m) {
+    nextTick().then(mounted);
+  } else {
+    nextTick().then(() => {
+      if (isStoredCredentials()) {
+        activeTab.value = 0;
+      } else {
+        activeTab.value = 1;
+      }
+      clearFields();
+    });
+  }
+}
 
 function mounted() {
   if (isStoredCredentials()) {
