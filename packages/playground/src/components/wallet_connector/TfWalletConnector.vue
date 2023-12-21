@@ -41,10 +41,10 @@
 <script lang="ts">
 import { ref } from "vue";
 
-import { useSessionStorage } from "@/hooks";
-
+import { useAsync, useSessionStorage } from "../../hooks";
 import { $key, provideWalletService, useExtensionCredentials, useLocalCredentials } from "../../hooks/wallet_connector";
 import { useGrid, useProfileManager } from "../../stores";
+import type { Profile } from "../../stores/profile_manager";
 import WalletContainer from "./internals/WalletContainer.vue";
 import WalletLayout from "./internals/WalletLayout.vue";
 
@@ -59,6 +59,25 @@ export default {
     const extensionCredentials = useExtensionCredentials();
     const localCredentials = useLocalCredentials();
     const passwordStorage = useSessionStorage("password");
+    const balanceTask = useAsync(
+      async () => {
+        console.log(await gridStore.client.balance.getMyBalance());
+
+        return true;
+      },
+      {
+        shouldRun: () => !!gridStore.client,
+        pollingTime: 5_000,
+      },
+    );
+
+    function logout() {
+      profileManager.set(null);
+      extensionCredentials.remove();
+      localCredentials.remove();
+      passwordStorage.remove();
+      balanceTask.value.stopPolling();
+    }
 
     provideWalletService({
       $key,
@@ -66,14 +85,11 @@ export default {
       extensionCredentials,
       localCredentials,
       passwordStorage,
+      login(profile) {
+        profileManager.set(profile);
+      },
+      logout,
     });
-
-    function logout() {
-      profileManager.set(null);
-      extensionCredentials.remove();
-      localCredentials.remove();
-      passwordStorage.remove();
-    }
 
     return { gridStore, active, logout };
   },

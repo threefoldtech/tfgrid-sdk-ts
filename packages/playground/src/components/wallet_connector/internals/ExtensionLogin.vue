@@ -1,5 +1,6 @@
 <template>
   <section>
+    {{ installedTask }}
     <VAlert type="info" text="TFChain Wallet Extension is not yet installed!" v-if="!installedTask.data">
       <template #append>
         <VBtn
@@ -53,7 +54,6 @@ import { onMounted, ref } from "vue";
 import { network } from "../../../clients";
 import { useAsync } from "../../../hooks";
 import { useWalletService } from "../../../hooks/wallet_connector";
-import { useProfileManager } from "../../../stores/profile_manager";
 import { getGrid, loadProfile } from "../../../utils/grid";
 import { resolveAsync } from "../../../utils/nodeSelector";
 
@@ -63,7 +63,6 @@ export default {
   name: "ExtensionLogin",
   setup() {
     const walletService = useWalletService();
-    const profileManger = useProfileManager();
 
     const loadingMessage = ref(_defaultLoadingMsg);
 
@@ -103,7 +102,7 @@ export default {
         }
 
         walletService.extensionCredentials.set(loginCredentials.mnemonic, loginCredentials.keypairType);
-        profileManger.set(profile);
+        walletService.login(profile);
       },
       {
         tries: 1,

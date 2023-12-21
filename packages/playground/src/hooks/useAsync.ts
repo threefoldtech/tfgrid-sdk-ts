@@ -9,6 +9,8 @@ export interface TaskResult<T, E, A extends any[]> {
   error: E | null;
   initialized: boolean;
   reset(): void;
+  startPolling(): void;
+  stopPolling(): void;
 }
 
 export type UseAsyncReturn<T, E, A extends any[]> = ComputedRef<TaskResult<T, E, A>>;
@@ -22,7 +24,9 @@ export type AsyncTaskOptions<T, E, A extends any[]> = {
   onReset?(): any;
   shouldRun?(): boolean | Promise<boolean>;
   tries?: number;
+  pollingTime?: number;
 };
+
 function normalizeOptions<T, E, A extends any[]>(
   options: AsyncTaskOptions<T, E, A> = {},
 ): Required<AsyncTaskOptions<T, E, A>> {
@@ -35,6 +39,7 @@ function normalizeOptions<T, E, A extends any[]>(
     onReset: options.onReset || noop,
     shouldRun: options.shouldRun || (() => true),
     tries: typeof options.tries !== "number" ? 3 : Math.max(1, options.tries),
+    pollingTime: options.pollingTime || 0,
   };
 }
 
@@ -64,8 +69,34 @@ export function useAsync<T, E = Error, A extends any[] = []>(
       loading: init ? isLoading : false,
       initialized: init,
       reset,
+      startPolling,
+      stopPolling,
     };
   });
+
+  let _polling: ReturnType<typeof setInterval> | undefined;
+
+  function _assertPollingTime() {
+    if (!_options.pollingTime) {
+      throw new Error("Can't start polling without setting pollingtime");
+    }
+  }
+
+  function startPolling() {
+    _assertPollingTime();
+    if (!_polling) {
+      run(..._options.defaultArgs);
+      _polling = setInterval(() => run(..._options.defaultArgs), _options.pollingTime);
+    }
+  }
+
+  function stopPolling() {
+    _assertPollingTime();
+    if (_polling) {
+      clearInterval(_polling);
+      _polling = undefined;
+    }
+  }
 
   async function run(...args: A): Promise<void> {
     if (!(await _options.shouldRun())) {
@@ -121,6 +152,9 @@ export function useAsync<T, E = Error, A extends any[] = []>(
 
   if (_options.init) {
     onMounted(() => run(..._options.defaultArgs));
+    if (_options.pollingTime) {
+      _polling = setInterval(() => run(..._options.defaultArgs), _options.pollingTime);
+    }
   }
 
   return asyncTask;

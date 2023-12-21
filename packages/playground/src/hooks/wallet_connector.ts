@@ -2,6 +2,7 @@ import Cryptr from "cryptr";
 import md5 from "md5";
 import { computed, inject, provide, type Ref } from "vue";
 
+import type { Profile } from "../stores/profile_manager";
 import { useLocalStorage, useSessionStorage } from "./useStorage";
 
 const version = 1;
@@ -13,6 +14,8 @@ export interface WalletService {
   passwordStorage: ReturnType<typeof useSessionStorage>;
   localCredentials: ReturnType<typeof useLocalCredentials>;
   extensionCredentials: ReturnType<typeof useExtensionCredentials>;
+  login(profile: Profile): void;
+  logout(): void;
 }
 
 export function provideWalletService(service: WalletService) {
