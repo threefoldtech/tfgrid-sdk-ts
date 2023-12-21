@@ -139,6 +139,7 @@ export default {
       isError.value = false;
       isLiveStats.value = false;
       errorLoadingStatsMessage.value = undefined;
+      nodeOptions.loadStats = true;
 
       if (props.nodeId > 0) {
         try {
@@ -155,11 +156,7 @@ export default {
           errorLoadingStatsMessage.value =
             "The node appears like it's up but it is physically down maybe because it's gone to offline mode.";
           nodeOptions.loadStats = false;
-
-          if (props.filterOptions.gpu && !nodeOptions.loadGpu) {
-            nodeOptions.loadGpu = true;
-          }
-
+          nodeOptions.loadGpu = false;
           try {
             const _node: GridNode = await getNode(props.nodeId, nodeOptions);
             node.value = _node;

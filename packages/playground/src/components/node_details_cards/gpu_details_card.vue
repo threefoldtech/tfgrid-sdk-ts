@@ -6,36 +6,36 @@
     :items="gpuFields"
     icon="mdi-credit-card-settings-outline"
   >
-    <template #gpu-hint-message v-if="node.cards?.length">
-      <v-chip class="d-flex justify-center ma-4 mt-1" color="info">
-        Select a GPU card ID from the below selection to load its data.
-      </v-chip>
-      <v-row class="bb-gray">
-        <v-col class="ml-3 d-flex justify-start align-center">
-          Card ID
-          <v-chip class="ml-4" :color="selectedCard.contract ? 'warning' : 'primary'">
-            {{ selectedCard.contract ? "Reserved" : "Available" }}
-          </v-chip>
-        </v-col>
-        <v-col class="mr-3 d-flex justify-end align-center">
-          <v-select chips clearable hide-details="auto" v-model="cardId" :items="cardsIds" variant="outlined" />
-          <v-icon class="ml-1" :icon="'mdi-content-copy'" @click="copy(cardId)" />
-        </v-col>
-      </v-row>
+    <template #gpu-hint-message>
+      <div v-if="node.cards?.length">
+        <v-chip class="d-flex justify-center ma-4 mt-1" color="info">
+          Select a GPU card ID from the below selection to load its data.
+        </v-chip>
+        <v-row class="bb-gray">
+          <v-col class="ml-3 d-flex justify-start align-center">
+            Card ID
+            <v-chip class="ml-4" :color="selectedCard.contract ? 'warning' : 'primary'">
+              {{ selectedCard.contract ? "Reserved" : "Available" }}
+            </v-chip>
+          </v-col>
+          <v-col class="mr-3 d-flex justify-end align-center">
+            <v-select chips clearable hide-details="auto" v-model="cardId" :items="cardsIds" variant="outlined" />
+            <v-icon class="ml-1" :icon="'mdi-content-copy'" @click="copy(cardId)" />
+          </v-col>
+        </v-row>
+      </div>
+      <div v-if="isError">
+        <v-card class="d-flex justify-center align-center">
+          <div class="text-center">
+            <v-icon variant="tonal" color="error" style="font-size: 50px" icon="mdi-close-circle-outline" />
+            <p class="mt-4 mb-4 font-weight-bold text-error">
+              {{ errorMessage }}
+            </p>
+            <!-- <v-btn class="mr-4" @click="requestNode" color="primary" text="Try Again" /> -->
+          </div>
+        </v-card>
+      </div>
     </template>
-
-    <!-- <template v-else-if="isError">
-      <v-card class="d-flex justify-center align-center h-screen">
-        <div class="text-center w-100 pa-3">
-          <v-icon variant="tonal" color="error" style="font-size: 50px" icon="mdi-close-circle-outline" />
-          <p class="mt-4 mb-4 font-weight-bold text-error">
-            {{ errorMessage }}
-          </p>
-          <v-btn class="mr-4" @click="requestNode" color="primary" text="Try Again" />
-          <v-btn @click="(val:boolean) => closeDialog(val)" color="error" variant="outlined" text="Cancel" />
-        </div>
-      </v-card>
-    </template> -->
   </card-details>
 </template>
 
@@ -65,6 +65,8 @@ export default {
     const cardsIds = ref<string[]>([]);
     const cardId = ref<string>("");
     const selectedCard = ref<GPUCard>(props.node.cards[0]);
+    const isError = ref<boolean>(false);
+    const errorMessage = ref("");
 
     watch(cardId, newCardId => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -81,6 +83,9 @@ export default {
         });
         cardId.value = cardsIds.value[0];
         gpuFields.value = getNodeTwinDetailsCard();
+      } else {
+        isError.value = true;
+        errorMessage.value = `Failed to load node with ID ${props.node.nodeId}. The node might be offline or unresponsive. You can try requesting it again.`;
       }
       loading.value = false;
     };
@@ -117,6 +122,8 @@ export default {
       cardsIds,
       cardId,
       selectedCard,
+      isError,
+      errorMessage,
       copy,
     };
   },
