@@ -1,8 +1,7 @@
 import { type FilterOptions, GatewayFQDNModel, GatewayNameModel, type GridClient } from "@threefold/grid_client";
 
 import { SolutionCode } from "@/types";
-
-import { migrateModule } from "./migration";
+import type { DomainInfo } from "@/types/nodeSelector";
 
 export function loadGatewayNodes(grid: GridClient, options: Omit<FilterOptions, "gateway"> = {}) {
   return grid.capacity
@@ -23,34 +22,46 @@ export function getSubdomain(options: GetHostnameOptions) {
   return SolutionCode[projectName as keyof typeof SolutionCode] + options.twinId + options.deploymentName.toLowerCase();
 }
 
-export interface DeployGatewayNameOptions {
-  name: string;
-  nodeId: number;
-  tlsPassthrough?: boolean;
+export interface DeployGatewayConfig {
+  subdomain: string;
   ip: string;
   port: number;
-  networkName: string;
-  fqdn?: string;
+  network: string;
+  tlsPassthrough?: boolean;
 }
-export async function deployGatewayName(grid: GridClient, options: DeployGatewayNameOptions) {
-  const gateway = new GatewayNameModel();
-  gateway.name = options.name;
-  await grid.gateway.getObj(gateway.name); //invalidating the cashed keys
-  gateway.node_id = options.nodeId;
-  gateway.tls_passthrough = options.tlsPassthrough || false;
-  if (gateway.tls_passthrough) {
-    gateway.backends = [`${options.ip}:${options.port}`];
-  } else {
-    gateway.backends = [`http://${options.ip}:${options.port}`];
+
+export async function deployGatewayName(
+  grid: GridClient | null,
+  domain: DomainInfo | undefined,
+  config: DeployGatewayConfig,
+) {
+  if (!grid) {
+    throw new Error("Please provide a valid grid connection");
   }
-  gateway.network = options.networkName;
-  gateway.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
-  if (options.fqdn) {
-    const domain = gateway as GatewayFQDNModel;
-    domain.fqdn = options.fqdn;
-    return grid.gateway.deploy_fqdn(domain);
+
+  if (!domain || !domain.selectedDomain) {
+    throw new Error("Please provide a valid domain name data.");
   }
-  return grid.gateway.deploy_name(gateway);
+
+  //invalidating the cashed keys
+  await grid.gateway.getObj(config.subdomain);
+
+  const id = process.env.INTERNAL_SOLUTION_PROVIDER_ID;
+
+  const gw = new GatewayNameModel();
+  gw.name = config.subdomain;
+  gw.node_id = domain.selectedDomain.nodeId;
+  gw.tls_passthrough = config.tlsPassthrough || false;
+  gw.backends = [`${config.tlsPassthrough ? "" : "http://"}${config.ip}:${config.port}`];
+  gw.network = config.network;
+  gw.solutionProviderId = id ? +id : undefined;
+
+  if (domain.useFQDN) {
+    (gw as GatewayFQDNModel).fqdn = domain.customDomain;
+    return grid.gateway.deploy_fqdn(gw as GatewayFQDNModel);
+  }
+
+  return grid.gateway.deploy_name(gw);
 }
 
 export async function rollbackDeployment(grid: GridClient, name: string) {

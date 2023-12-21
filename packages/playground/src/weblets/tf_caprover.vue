@@ -11,9 +11,9 @@
       )
     "
     :ipv4="true"
-    :certified="leader.certified"
     :dedicated="leader.dedicated"
-    :SelectedNode="leader.selectedNode"
+    :SelectedNode="leader.selectionDetails?.node"
+    :valid-filters="leader.selectionDetails?.validFilters"
     title-image="images/icons/caprover.png"
   >
     <template #title>Deploy a Caprover Instance</template>
@@ -80,8 +80,8 @@
       </template>
 
       <template #workers>
-        <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }" :disabled="loadingFarm">
-          <CaproverWorker v-model="workers[index]" v-model:loading="loadingFarm" />
+        <ExpandableLayout v-model="workers" @add="addWorker" #="{ index }">
+          <CaproverWorker v-model="workers[index]" />
         </ExpandableLayout>
       </template>
     </d-tabs>
@@ -106,7 +106,6 @@ import { generateName, generatePassword } from "../utils/strings";
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
-const loadingFarm = ref(false);
 const domain = ref("");
 const password = ref(generatePassword(10));
 const leader = ref(createWorker(generateName({ prefix: "cr" })));
@@ -129,7 +128,7 @@ async function deploy() {
         normalizeCaproverWorker(leader.value, [
           { key: "SWM_NODE_MODE", value: "leader" },
           { key: "CAPROVER_ROOT_DOMAIN", value: domain.value },
-          { key: "CAPTAIN_IMAGE_VERSION", value: "latest" },
+          { key: "CAPTAIN_IMAGE_VERSION", value: "1.10.1" },
           { key: "PUBLIC_KEY", value: profileManager.profile!.ssh },
           { key: "DEFAULT_PASSWORD", value: password.value },
           { key: "CAPTAIN_IS_DEBUG", value: "true" },
@@ -162,9 +161,6 @@ function normalizeCaproverWorker(worker: CW, envs: Env[]): Machine {
     memory: worker.solution!.memory,
     flist: "https://hub.grid.tf/tf-official-apps/tf-caprover-latest.flist",
     entryPoint: "/sbin/zinit init",
-    farmId: worker.farm!.farmID,
-    farmName: worker.farm!.name,
-    country: worker.farm!.country,
     publicIpv4: true,
     planetary: true,
     rootFilesystemSize: rootFs(worker.solution!.cpu, worker.solution!.memory),
@@ -176,7 +172,7 @@ function normalizeCaproverWorker(worker: CW, envs: Env[]): Machine {
       },
     ],
     envs,
-    nodeId: worker.selectedNode?.nodeId,
+    nodeId: worker.selectionDetails!.node!.nodeId,
     rentedBy: worker.dedicated ? profileManager.profile?.twinId : undefined,
     certified: worker.certified,
   };
