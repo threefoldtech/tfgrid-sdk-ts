@@ -10,7 +10,7 @@ import {
   InvalidResponse,
   RMBError,
   TimeoutError,
-  TwinDoesNotExistError,
+  TwinNotExistError,
   ValidationError,
 } from "@threefold/types";
 import AwaitLock from "await-lock";
@@ -115,13 +115,13 @@ class Client {
 
       const twinId = await this.tfclient.twins.getTwinIdByAccountId({ accountId: this.signer.address });
       if (!twinId) {
-        throw new TwinDoesNotExistError(`Couldn't find a user for the provided mnemonic on this network.`);
+        throw new TwinNotExistError(`Couldn't find a user for the provided mnemonic on this network.`);
       }
 
       this.twin = await this.tfclient.twins.get({ id: twinId });
       try {
         if (!this.twin) {
-          throw new TwinDoesNotExistError("Twin does not exist, please create a twin first");
+          throw new TwinNotExistError("Twin does not exist, please create a twin first");
         }
 
         this.updateSource();
@@ -151,7 +151,7 @@ class Client {
         if (c && c.readyState == c.OPEN) {
           c.close();
         }
-        if (err instanceof TwinDoesNotExistError || err instanceof InsufficientBalanceError) throw err;
+        if (err instanceof TwinNotExistError || err instanceof InsufficientBalanceError) throw err;
         if (err instanceof BaseError) {
           err.message = `Unable to establish a connection with the RMB server ${this.relayUrl.replace(
             "wss://",

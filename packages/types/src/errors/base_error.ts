@@ -9,7 +9,7 @@ export enum Generic {
   RMBError,
   InvalidResponse,
   RequestError,
-  TwinDoesNotExistError,
+  TwinNotExistError,
   InsufficientBalanceError,
 }
 export class BaseError extends Error {
@@ -56,7 +56,7 @@ export class RequestError extends BaseError {
 
 export class TwinNotExistError extends BaseError {
   constructor(message: string) {
-    super(Generic.TwinDoesNotExistError, message, ErrorModules.Generic);
+    super(Generic.TwinNotExistError, message, ErrorModules.Generic);
   }
 }
 
