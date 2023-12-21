@@ -1,5 +1,5 @@
 <template>
-  <VDialog v-model="active" scrollable min-width="60%" max-width="700px" eager>
+  <VDialog v-model="active" scrollable min-width="min(90%, 900px)" max-width="900px" eager>
     <template #activator="{ props }">
       <VBtn variant="flat" v-bind="props">
         <template #prepend>
