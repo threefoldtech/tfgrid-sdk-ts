@@ -120,10 +120,6 @@ class Client {
 
       this.twin = await this.tfclient.twins.get({ id: twinId });
       try {
-        if (!this.twin) {
-          throw new TwinNotExistError("Twin does not exist, please create a twin first");
-        }
-
         this.updateSource();
         this.createConnection();
         await this.waitForOpenConnection();
