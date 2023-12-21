@@ -72,8 +72,7 @@
           </v-autocomplete>
           <v-btn
             class="ml-2 mt-2"
-            variant="tonal"
-            color="info"
+            color="primary"
             :loading="loadingNodes || pingingNode"
             :disabled="$props.loadingFarm || loadingNodes || pingingNode"
             @click="loadNodes"

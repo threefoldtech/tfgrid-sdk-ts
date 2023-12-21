@@ -18,7 +18,7 @@
       >
         <template #title>Manage Domains ({{ $props.vm.name }})</template>
 
-        <v-tabs align-tabs="center" color="primary" class="mb-6" v-model="gatewayTab" :disabled="deleting">
+        <v-tabs align-tabs="center" color="secondary" class="mb-6" v-model="gatewayTab" :disabled="deleting">
           <v-tab>Domains List</v-tab>
           <v-tab>Add new domain</v-tab>
         </v-tabs>
@@ -63,7 +63,12 @@
 
         <div v-show="gatewayTab === 0" :class="{ 'pb-2': !loadingGateways, 'pb-6': loadingGateways }">
           <div class="d-flex justify-end mb-4">
-            <v-btn color="primary" :loading="loadingGateways" :disabled="deleting" @click="loadGateways" variant="tonal"
+            <v-btn
+              color="secondary"
+              :loading="loadingGateways"
+              :disabled="deleting"
+              @click="loadGateways"
+              variant="outlined"
               >Reload</v-btn
             >
           </div>
@@ -174,7 +179,7 @@
         </div>
 
         <template #footer-actions>
-          <v-btn color="error" variant="tonal" @click="$emit('close')">Close</v-btn>
+          <v-btn color="anchor" variant="outlined" @click="$emit('close')">Close</v-btn>
           <v-btn
             color="error"
             variant="outlined"
@@ -184,7 +189,7 @@
           >
             Delete
           </v-btn>
-          <v-btn color="primary" variant="tonal" @click="deployGateway" :disabled="!valid" v-else> Add </v-btn>
+          <v-btn color="secondary" variant="outlined" @click="deployGateway" :disabled="!valid" v-else> Add </v-btn>
         </template>
       </weblet-layout>
     </v-dialog>

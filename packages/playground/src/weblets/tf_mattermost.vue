@@ -115,8 +115,8 @@
 
     <template #footer-actions>
       <v-btn
-        color="primary"
-        variant="tonal"
+        color="secondary"
+        variant="outlined"
         @click="deploy(domainNameCmp?.domain, domainNameCmp?.customDomain)"
         :disabled="tabs?.invalid"
       >

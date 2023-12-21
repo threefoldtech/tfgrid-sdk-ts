@@ -24,15 +24,7 @@
             :loading="loading"
         /></InputValidator>
 
-        <VBtn
-          type="submit"
-          color="primary"
-          variant="tonal"
-          :disabled="!isValidForm"
-          :loading="loading"
-          size="x-large"
-          rounded="lg"
-        >
+        <VBtn type="submit" color="secondary" variant="outlined" :disabled="!isValidForm" :loading="loading">
           View
         </VBtn>
       </FormValidator>

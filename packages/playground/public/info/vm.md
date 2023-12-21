@@ -6,7 +6,7 @@ Deploy a micro virtual machine on Threefold Grid. We provide few images managed 
 
 <br />
 
-#### Compared to Full VMs
+##### Compared to Full VMs
 
 - Full VM contains a default disk attached to it which is not the case in the Micro VM where you needed to make sure to attach a disk to it or the VM will fail
 - The default disk is mounted on / so if you want to attach any additional disks, you have to choose a different mounting point
