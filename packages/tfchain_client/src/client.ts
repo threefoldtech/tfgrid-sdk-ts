@@ -6,7 +6,14 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { waitReady } from "@polkadot/wasm-crypto";
-import { BaseError, TFChainError, TFChainErrors, TimeoutError, ValidationError } from "@threefold/types";
+import {
+  BaseError,
+  InsufficientBalanceError,
+  TFChainError,
+  TFChainErrors,
+  TimeoutError,
+  ValidationError,
+} from "@threefold/types";
 import AwaitLock from "await-lock";
 import { validateMnemonic } from "bip39";
 
@@ -358,15 +365,19 @@ class Client extends QueryClient {
           resultSections.length > 0
         )
           section = resultSections[0];
+        //TODO no need to do the following lines only check if the error is instanceof base error and edit the message
         const errorName = TFChainErrors[section].Errors[+e];
         if (errorName) {
           throw new TFChainErrors[section][errorName](`Failed to apply ${JSON.stringify(extrinsic.method.toHuman())}`);
         } else {
-          throw new TFChainError(
-            `Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error: ${
-              Object.keys(this.api.errors[section])[+e] ?? e
-            }`,
-          );
+          const errorMsg = `Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error: ${
+            Object.keys(this.api.errors[section])[+e] ?? e
+          }`;
+
+          if ((e as Error).message.includes("Inability to pay some fees")) {
+            throw new InsufficientBalanceError(errorMsg);
+          }
+          throw new TFChainError(errorMsg);
         }
       });
   }
