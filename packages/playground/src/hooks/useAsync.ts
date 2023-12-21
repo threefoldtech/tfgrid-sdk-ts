@@ -113,6 +113,9 @@ export function useAsync<T, E = Error, A extends any[] = []>(
 
   function reset() {
     initialized.value = false;
+    data.value = _options.default;
+    error.value = null;
+    loading.value = false;
     _options.onReset();
   }
 

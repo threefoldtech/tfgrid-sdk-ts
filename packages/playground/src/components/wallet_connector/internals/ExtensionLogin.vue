@@ -1,6 +1,6 @@
 <template>
   <section>
-    <VAlert type="info" text="TFChain Wallet Extension is not yet installed.!" v-if="!installedTask.data">
+    <VAlert type="info" text="TFChain Wallet Extension is not yet installed!" v-if="!installedTask.data">
       <template #append>
         <VBtn
           href="https://github.com/threefoldtech/tf-wallet-connector-extension?tab=readme-ov-file#threefold-wallet-connector-extension-threefoldextension"
@@ -13,25 +13,35 @@
       </template>
     </VAlert>
 
-    <VBtn
-      v-else
-      block
-      text="Login With TFChain Wallet Extension"
-      size="x-large"
-      color="primary"
-      variant="tonal"
-      @click="loginTask.run()"
-      :loading="loginTask.loading"
-    />
+    <template v-else>
+      <VBtn
+        block
+        text="Login With TFChain Wallet Extension"
+        size="x-large"
+        color="primary"
+        variant="tonal"
+        @click="loginTask.run()"
+        :loading="loginTask.loading"
+      >
+        <template #loader>
+          <VRow justify="center" align="center">
+            <VProgressCircular size="20" width="2" indeterminate color="primary" />
+            <span class="ml-2">Selecting account...</span>
+          </VRow>
+        </template>
+      </VBtn>
 
-    <VFadeTransition>
-      <VAlert
-        type="error"
-        v-if="loginTask.initialized && !loginTask.loading && loginTask.error"
-        class="mt-4"
-        :text="loginTask.error"
-      />
-    </VFadeTransition>
+      <VFadeTransition>
+        <VAlert
+          type="error"
+          class="mt-4"
+          :text="loginTask.error"
+          closable
+          @click:close="resetLoginTask"
+          v-if="loginTask.initialized && !loginTask.loading && loginTask.error"
+        />
+      </VFadeTransition>
+    </template>
   </section>
 </template>
 
@@ -59,10 +69,17 @@ export default {
 
         return account;
       },
-      { tries: 1 },
+      {
+        tries: 1,
+        onAfterTask: ({ error }) => error && setTimeout(resetLoginTask, 5_000),
+      },
     );
 
-    return { installedTask, loginTask };
+    function resetLoginTask() {
+      loginTask.value.initialized && !loginTask.value.loading && loginTask.value.reset();
+    }
+
+    return { installedTask, loginTask, resetLoginTask };
   },
 };
 </script>

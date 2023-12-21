@@ -17,6 +17,7 @@
     <VForm v-model="formValid">
       <PasswordInputWrapper #="{ props }">
         <VTextField
+          ref="mnemonicInput"
           class="mnemonic-input mt-4"
           label="Mnemonic or Hex Seed"
           placeholder="Please insert your Mnemonic or Hex Seed"
@@ -115,7 +116,6 @@ import { isAddress } from "@polkadot/util-crypto";
 import { KeypairType } from "@threefold/grid_client";
 import { validateMnemonic } from "bip39";
 import { computed, ref } from "vue";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VTextField } from "vuetify/components/VTextField";
 
 import { network } from "../../../clients";
@@ -156,6 +156,7 @@ export default {
       { tries: 1 },
     );
 
+    const mnemonicInput = ref<VTextField>();
     const mnemonic = ref("");
     const keypairType = ref<KeypairType>(KeypairType.sr25519);
     const password = ref("");
@@ -163,7 +164,11 @@ export default {
     /* Validate mnemonic input */
     const mnemonicDeps = computed(() => ({ mnemonic: mnemonic.value, keypairType: keypairType.value }));
     useWatchDeep(mnemonicDeps, validateMnemonicTask.value.reset);
-    useWatchDeep(mnemonicDeps, d => validateMnemonicTask.value.run(d.mnemonic, d.keypairType), { debounce: 1000 });
+    useWatchDeep(
+      mnemonicDeps,
+      d => mnemonicInput.value?.dirty && validateMnemonicTask.value.run(d.mnemonic, d.keypairType),
+      { debounce: 1000 },
+    );
 
     const formValid = ref(false);
     const valid = computed(() => formValid.value && validateMnemonicTask.value.data === true);
@@ -172,6 +177,7 @@ export default {
       walletService,
       formValid,
       validateMnemonicTask,
+      mnemonicInput,
       mnemonic,
       KeypairType,
       password,
