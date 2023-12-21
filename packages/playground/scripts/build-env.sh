@@ -4,6 +4,7 @@
 MODE="${MODE:=dev}"
 STELLAR_NETWORK="${STELLAR_NETWORK:=test}"
 TIMEOUT="${TIMEOUT:=10000}"
+PAGE_SIZE="${PAGE_SIZE:=20}"
 MINTING_URL="https://alpha.minting.tfchain.grid.tf"
 
 # Env vars must provide in `custom` mode
@@ -109,7 +110,8 @@ window.env = {
   STELLAR_HORIZON_URL: '$STELLAR_HORIZON_URL',
   TFT_ASSET_ISSUER: '$TFT_ASSET_ISSUER',
   MINTING_URL: '$MINTING_URL',
-  TIMEOUT: +'$TIMEOUT'
+  TIMEOUT: +'$TIMEOUT',
+  PAGE_SIZE: +'$PAGE_SIZE'
 };
 "
 

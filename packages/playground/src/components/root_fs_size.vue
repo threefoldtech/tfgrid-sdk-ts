@@ -3,7 +3,11 @@
     <div :style="{ width: '100%' }" class="mr-4">
       <input-validator
         :value="value"
-        :rules="[validators.required('SSD Storage is required.'), dynamicValidateRootFs(validators)]"
+        :rules="[
+          validators.required('SSD Storage is required.'),
+          dynamicValidateRootFs(validators),
+          validators.max('Maximum allowed SSD Storage is 10000 GB.', 10000),
+        ]"
         ref="input"
         #="{ props }"
       >

@@ -21,7 +21,6 @@
       v-model="$props.modelValue.solution"
       :small="{ cpu: 1, memory: 2, disk: 50 }"
       :medium="{ cpu: 2, memory: 4, disk: 100 }"
-      :disabled="loadingFarm"
     />
 
     <input-tooltip
@@ -29,86 +28,33 @@
       tooltip="Click to know more about dedicated nodes."
       href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
     >
-      <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" :disabled="loadingFarm" />
+      <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" />
     </input-tooltip>
     <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-      <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" :disabled="loadingFarm" />
+      <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" />
     </input-tooltip>
-    <SelectFarmManager>
-      <NodeSelector v-model="selection" />
-      <SelectFarm
-        v-if="selection == Selection.AUTOMATED"
-        :filters="{
-          cpu: $props.modelValue.solution?.cpu,
-          memory: $props.modelValue.solution?.memory,
-          publicIp: true,
-          ssd: ($props.modelValue.solution?.disk ?? 0) + rootFilesystemSize,
-          rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
-          certified: $props.modelValue.certified,
-        }"
-        v-model="$props.modelValue.farm"
-        v-model:loading="loadingFarm"
-        v-model:search="farmName"
-      />
 
-      <SelectNode
-        v-model="$props.modelValue.selectedNode"
-        :selection="selection"
-        :filters="{
-          farmId: $props.modelValue.farm?.farmID,
-          cpu: $props.modelValue.solution?.cpu ?? 0,
-          memory: $props.modelValue.solution?.memory ?? 0,
-          diskSizes: [$props.modelValue.solution?.disk ?? 0],
-          rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
-          certified: $props.modelValue.certified,
-          country: $props.modelValue.farm?.country,
-          region: $props.modelValue.farm?.region,
-        }"
-        :root-file-system-size="rootFilesystemSize"
-        :loading-farm="loadingFarm"
-      />
-    </SelectFarmManager>
+    <TfSelectionDetails
+      :filters="{
+        ipv4: true,
+        certified: $props.modelValue.certified,
+        dedicated: $props.modelValue.dedicated,
+        cpu: $props.modelValue.solution?.cpu,
+        solutionDisk: $props.modelValue.solution?.disk,
+        memory: $props.modelValue.solution?.memory,
+        rootFilesystemSize,
+      }"
+      v-model="$props.modelValue.selectionDetails"
+    />
   </div>
 </template>
 
-<script lang="ts" setup>
-import NodeSelector from "../components/node_selection.vue";
-import { useProfileManager } from "../stores";
-import rootFs from "../utils/root_fs";
-const emits = defineEmits<{ (event: "update:loading", value: boolean): void }>();
-const props = defineProps<{ modelValue: CaproverWorker }>();
-const rootFilesystemSize = computed(() =>
-  rootFs(props.modelValue.solution?.cpu ?? 0, props.modelValue.solution?.memory ?? 0),
-);
-const profileManager = useProfileManager();
-const farmManager = useFarm();
-const selection = ref();
-const loadingFarm = ref(farmManager?.getLoading());
-const farmName = ref();
-watch(loadingFarm, (loadingFarm): void => {
-  emits("update:loading", loadingFarm!);
-});
-watch(
-  () => selection.value,
-  (value, oldValue) => {
-    if (value !== oldValue) {
-      loadingFarm.value = false;
-    }
-  },
-  { deep: false },
-);
-</script>
-
 <script lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, type PropType } from "vue";
 
-import { Selection } from "@/utils/types";
-
-import SelectFarmManager, { useFarm } from "../components/select_farm_manager.vue";
-import SelectNode from "../components/select_node.vue";
 import type { CaproverWorker } from "../types";
+import rootFs from "../utils/root_fs";
 import { generateName } from "../utils/strings";
-import SelectFarm from "./select_farm.vue";
 import SelectSolutionFlavor from "./select_solution_flavor.vue";
 
 export function createWorker(name: string = generateName({ prefix: "wr" })): CaproverWorker {
@@ -117,11 +63,15 @@ export function createWorker(name: string = generateName({ prefix: "wr" })): Cap
 
 export default {
   name: "CaproverWorker",
-  components: {
-    SelectSolutionFlavor,
-    SelectFarm,
-    SelectNode,
-    SelectFarmManager,
+  components: { SelectSolutionFlavor },
+  props: { modelValue: { type: Object as PropType<CaproverWorker>, required: true } },
+  setup(props) {
+    const rootFilesystemSize = computed(() => {
+      const { cpu = 0, memory = 0 } = props.modelValue.solution || {};
+      return rootFs(cpu, memory);
+    });
+
+    return { rootFilesystemSize };
   },
 };
 </script>

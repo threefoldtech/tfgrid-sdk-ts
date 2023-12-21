@@ -1,5 +1,7 @@
 <template>
   <v-app>
+    <TfNavigationLoader />
+    <TfOfflineNotifier />
     <profile-manager-controller>
       <v-navigation-drawer
         width="280"
@@ -119,7 +121,7 @@
 
           <v-spacer>
             <div class="d-flex align-center justify-start">
-              <TftSwapPrice class="pr-4"></TftSwapPrice>
+              <TftSwapPrice class="pr-4" v-if="hasActiveProfile && hasGrid"></TftSwapPrice>
               <FundsCard v-if="hasActiveProfile"></FundsCard>
             </div>
           </v-spacer>
@@ -142,20 +144,18 @@
           }"
           height="50"
         >
-          <v-container>
-            <v-row>
-              <v-breadcrumbs :items="navbarConfig.path" active-color="secondary">
-                <template v-slot:divider>
-                  <v-icon icon="mdi-chevron-right"></v-icon>
-                </template>
-                <template v-slot:item="{ item }">
-                  <router-link :to="item.to" :class="{ 'clickable-item': !item.disabled }">
-                    {{ item.title }}
-                  </router-link>
-                </template>
-              </v-breadcrumbs>
-            </v-row>
-          </v-container>
+          <v-row>
+            <v-breadcrumbs class="ma-3" :items="navbarConfig.path" active-color="secondary">
+              <template v-slot:divider>
+                <v-icon icon="mdi-chevron-right"></v-icon>
+              </template>
+              <template v-slot:item="{ item }">
+                <router-link :to="item.to" :class="{ 'clickable-item': !item.disabled }">
+                  {{ item.title }}
+                </router-link>
+              </template>
+            </v-breadcrumbs>
+          </v-row>
         </v-toolbar>
 
         <DeploymentListManager>
@@ -187,7 +187,7 @@
             </div>
           </v-container>
         </DeploymentListManager>
-        <TFNotification v-if="hasActiveProfile" />
+        <TFNotification v-if="hasActiveProfile && hasGrid" />
       </v-main>
     </profile-manager-controller>
   </v-app>
@@ -393,6 +393,8 @@ import FundsCard from "./components/funds_card.vue";
 import ProfileManagerController from "./components/profile_manager_controller.vue";
 import TftSwapPrice from "./components/swap_price.vue";
 import TFNotification from "./components/tf_notification.vue";
+import TfNavigationLoader from "./components/TfNavigationLoader.vue";
+import TfOfflineNotifier from "./components/TfOfflineNotifier.vue";
 import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
 
@@ -424,6 +426,8 @@ export default {
     TftSwapPrice,
     FundsCard,
     ProfileManagerController,
+    TfNavigationLoader,
+    TfOfflineNotifier,
   },
 };
 </script>
