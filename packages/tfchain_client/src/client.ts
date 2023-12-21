@@ -6,7 +6,7 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { waitReady } from "@polkadot/wasm-crypto";
-import { TFChainError, TFChainErrors, TimeoutError, ValidationError } from "@threefold/types";
+import { BaseError, TFChainError, TFChainErrors, TimeoutError, ValidationError } from "@threefold/types";
 import AwaitLock from "await-lock";
 import { validateMnemonic } from "bip39";
 
@@ -84,7 +84,12 @@ class QueryClient {
       QueryClient.connections.set(this.url, { api: this.api, disconnectHandler: this.__disconnectHandler });
       this.api.on("disconnected", this.__disconnectHandler);
     } catch (e) {
-      throw new TFChainError("Unable to establish a connection with the chain:\n" + e);
+      const message = "Unable to establish a connection with the chain:\n";
+      if (e instanceof BaseError) {
+        e.message = message + e.message;
+        throw e;
+      }
+      throw new TFChainError(message + e);
     } finally {
       QueryClient.connectingLock.release();
     }
