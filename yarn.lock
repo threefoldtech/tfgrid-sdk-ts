@@ -4177,6 +4177,11 @@
   resolved "https://registry.yarnpkg.com/@threefold/extension_api/-/extension_api-0.0.1-rc6.tgz#9271ac014f8cfc5b0351f75bc7bee6f9e5e744a2"
   integrity sha512-rICTgNT7NuAlJCi9PcQ4l5q4jh0aQ/9nilXu9SHHo4toSYd9NxeI4HxF+Vmk1vR8O7iA101SoRhJrJCAqjtROw==
 
+"@threefold/extension_api@^0.0.1-rc9":
+  version "0.0.1-rc9"
+  resolved "https://registry.yarnpkg.com/@threefold/extension_api/-/extension_api-0.0.1-rc9.tgz#d0b63ecfb4115ba8ff51ca9cb2bf7fdeba676b37"
+  integrity sha512-F4TJ0ORcS7qVKHuvcucbOG4vHBBQZ/vTx45EeSKIYNOgTktmlEejux2tyjBogXGIud4dTa7wBThkmo9gP9CKUQ==
+
 "@tootallnate/once@2":
   version "2.0.0"
   resolved "https://registry.npmjs.org/@tootallnate/once/-/once-2.0.0.tgz"

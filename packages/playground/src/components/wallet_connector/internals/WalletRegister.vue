@@ -118,13 +118,12 @@ import { computed, ref } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { VTextField } from "vuetify/components/VTextField";
 
+import { network } from "../../../clients";
 import { useAsync, useWatchDeep } from "../../../hooks";
 import { useWalletService } from "../../../hooks/wallet_connector";
 import { getGrid } from "../../../utils/grid";
 import { normalizeError } from "../../../utils/helpers";
 import { resolveAsync } from "../../../utils/nodeSelector";
-
-const network = process.env.NETWORK || window.env.NETWORK;
 
 export default {
   name: "WalletRegister",

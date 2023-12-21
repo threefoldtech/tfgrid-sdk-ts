@@ -31,6 +31,21 @@
         </VRow>
       </VContainer>
     </VForm>
+
+    <div class="position-relative my-6">
+      <VDivider />
+      <span
+        class="position-absolute px-2 bg-surface"
+        :style="{
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+        }"
+        v-text="'OR'"
+      />
+    </div>
+
+    <ExtensionLogin />
   </section>
 </template>
 
@@ -39,9 +54,11 @@ import { onMounted, ref } from "vue";
 
 import { useSessionStorage } from "../../../hooks";
 import { useCredentials, useWalletService } from "../../../hooks/wallet_connector";
+import ExtensionLogin from "./ExtensionLogin.vue";
 
 export default {
   name: "WalletLogin",
+  components: { ExtensionLogin },
   setup() {
     const walletService = useWalletService();
     const passwordStorage = useSessionStorage("password");
@@ -81,7 +98,13 @@ export default {
       passwordStorage.value = password.value;
     }
 
-    return { walletService, valid, validatePassword, password, login };
+    return {
+      walletService,
+      valid,
+      validatePassword,
+      password,
+      login,
+    };
   },
 };
 </script>
