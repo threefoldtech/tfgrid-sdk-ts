@@ -1,5 +1,5 @@
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
-import { GridClientError, TwinDoesNotExistError, ValidationError } from "@threefold/types";
+import { GridClientError, TwinNotExistError, ValidationError } from "@threefold/types";
 import type AwaitLock from "await-lock";
 import { validateMnemonic } from "bip39";
 import * as PATH from "path";
@@ -114,7 +114,7 @@ class GridClient {
     await this.tfclient.connect();
     this.twinId = await this.tfclient.twins.getMyTwinId();
     if (!this.twinId) {
-      throw new TwinDoesNotExistError(
+      throw new TwinNotExistError(
         `Couldn't find a user for the provided mnemonic on ${this.clientOptions.network} network.`,
       );
     }
