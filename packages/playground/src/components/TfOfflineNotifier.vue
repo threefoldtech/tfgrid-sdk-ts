@@ -72,7 +72,7 @@ export default {
 
     const description = computed(() => {
       if (failed.value) {
-        return `Failed to reconnect. Please reload dashboard.`;
+        return `No internet connection detected. Please check your connection.`;
       }
 
       return `We're attempting to automatically reconnect you to dashboard. If your internet connection is ok. otherwise you
