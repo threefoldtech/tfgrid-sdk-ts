@@ -3,7 +3,6 @@ import { capitalize } from "vue";
 import type { VDataTable } from "vuetify/lib/labs/components";
 
 import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
-import type { INode } from "@/utils/filter_nodes";
 
 import type * as validators from "../utils/validators";
 // Input attrs
@@ -204,7 +203,7 @@ export type MixedFilter = {
 
 // Status, GPU, Gateway, and any other option should be add here.
 export type FilterOptions = {
-  status: NodeStatus;
+  status: NodeStatus | undefined;
   gpu: boolean | undefined;
   gateway: boolean | undefined;
   page: number;
@@ -227,7 +226,7 @@ export const optionsInitializer: () => FilterOptions = () => ({
   gpu: undefined,
   page: 1,
   size: 10,
-  status: capitalize(NodeStatus.Up) as NodeStatus,
+  status: undefined,
 });
 
 import type { FilterFarmInputs } from "../utils/filter_farms";
