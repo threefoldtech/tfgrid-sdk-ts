@@ -178,6 +178,10 @@ onMounted(async () => {
   await loadData();
 });
 
+function convert(value: string | undefined) {
+  return value ? Math.floor(toBytes(+value)) : undefined;
+}
+
 const _loadData = async () => {
   const params = tabParams[activeTab.value as keyof typeof tabParams];
 
@@ -192,12 +196,12 @@ const _loadData = async () => {
       ...params,
       size: pageSize.value,
       page: page.value,
-      totalSru: filterInputs.value.total_sru.value ? toBytes(+filterInputs.value.total_sru.value) : undefined,
-      totalMru: filterInputs.value.total_mru.value ? toBytes(+filterInputs.value.total_mru.value) : undefined,
-      totalHru: filterInputs.value.total_hru.value ? toBytes(+filterInputs.value.total_hru.value) : undefined,
+      totalSru: convert(filterInputs.value.total_sru.value),
+      totalMru: convert(filterInputs.value.total_mru.value),
+      totalHru: convert(filterInputs.value.total_hru.value),
       totalCru: filterInputs.value.total_cru.value ? +filterInputs.value.total_cru.value : undefined,
-      gpuVendorName: filterInputs.value.gpu_vendor_name.value ? filterInputs.value.gpu_vendor_name.value : "",
-      gpuDeviceName: filterInputs.value.gpu_device_name.value ? filterInputs.value.gpu_device_name.value : "",
+      gpuVendorName: filterInputs.value.gpu_vendor_name.value || "",
+      gpuDeviceName: filterInputs.value.gpu_device_name.value || "",
       hasGpu: gpuFilter.value,
     });
 
