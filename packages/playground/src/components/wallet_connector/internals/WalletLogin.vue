@@ -7,31 +7,75 @@
       class="mb-6"
     />
 
-    <VForm v-model="valid">
+    <VForm v-model="valid" @submit.prevent="login">
       <PasswordInputWrapper #="{ props }">
         <VTextField
           label="Password"
           placeholder="Your stored wallet's password"
-          :rules="[v => (v ? true : 'Password is required.')]"
+          :rules="[validatePassword]"
           v-bind="props"
-          autofocus
+          v-model.trim="password"
         />
       </PasswordInputWrapper>
 
-      <VBtn type="submit" variant="tonal" color="primary" :disabled="!valid">Login</VBtn>
+      <VContainer>
+        <VRow justify="center">
+          <VBtn type="button" variant="outlined" class="mr-2" @click="walletService.active.value = false">Close</VBtn>
+          <VBtn type="submit" variant="tonal" color="primary" :disabled="!valid">Login</VBtn>
+        </VRow>
+      </VContainer>
     </VForm>
   </section>
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
+
+import { useSessionStorage } from "../../../hooks";
+import { useCredentials, useWalletService } from "../../../hooks/wallet_connector";
 
 export default {
   name: "WalletLogin",
   setup() {
-    const valid = ref<null | boolean>(null);
+    const walletService = useWalletService();
+    const passwordStorage = useSessionStorage("password");
+    const credentials = useCredentials();
+    const password = ref("");
 
-    return { valid };
+    const valid = ref<null | boolean>(null);
+    function validatePassword(password?: string) {
+      switch (true) {
+        case !password:
+          return "Password is required.";
+
+        case password && password.length < 6:
+          return "Password must be at least 6 characters.";
+
+        case password && !credentials.check(password):
+          return "We couldn't find a matching wallet for this password. Please connect your wallet first.";
+      }
+
+      return true;
+    }
+
+    onMounted(() => {
+      password.value = passwordStorage.value || "";
+      password.value && login();
+    });
+
+    function login() {
+      const mnemonic = credentials.getMnemonic(password.value);
+
+      if (!mnemonic) {
+        return console.log("Something went wrong - this case should be impossible");
+      }
+
+      // Login here
+      console.log("login", mnemonic);
+      passwordStorage.value = password.value;
+    }
+
+    return { walletService, valid, validatePassword, password, login };
   },
 };
 </script>

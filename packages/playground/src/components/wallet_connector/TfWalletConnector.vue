@@ -41,7 +41,7 @@
 <script lang="ts">
 import { ref } from "vue";
 
-import { provideWalletService } from "../../hooks/wallet_connector";
+import { $key, provideWalletService } from "../../hooks/wallet_connector";
 import WalletContainer from "./internals/WalletContainer.vue";
 import WalletLayout from "./internals/WalletLayout.vue";
 
@@ -52,6 +52,7 @@ export default {
     const active = ref(false);
 
     provideWalletService({
+      $key,
       active,
     });
 
