@@ -1,6 +1,6 @@
 <template>
   <VCard>
-    <VCardTitle class="py-2 bg-primary text-center">TFChain Wallet</VCardTitle>
+    <VCardTitle class="py-2 bg-primary text-center" v-text="'TFChain Wallet'" />
     <VCardText>
       <VContainer>
         <VAlert class="mb-4">

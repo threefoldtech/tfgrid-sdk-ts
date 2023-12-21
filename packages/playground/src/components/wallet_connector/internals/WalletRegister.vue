@@ -96,8 +96,14 @@
 
       <VContainer class="mt-4">
         <VRow justify="center">
-          <VBtn type="button" variant="outlined" class="mr-2" @click="walletService.active.value = false">Close</VBtn>
-          <VBtn type="submit" variant="tonal" color="primary" :disabled="!valid">Login</VBtn>
+          <VBtn
+            type="button"
+            variant="outlined"
+            class="mr-2"
+            @click="walletService.active.value = false"
+            text="Close"
+          />
+          <VBtn type="submit" variant="tonal" color="primary" :disabled="!valid" text="Connect" />
         </VRow>
       </VContainer>
     </VForm>

@@ -5,7 +5,7 @@
         <template #prepend>
           <VIcon icon="mdi-account" size="x-large" />
         </template>
-        <span class="font-weight-bold">Connect your TFChain Wallet</span>
+        <span class="font-weight-bold" v-text="'Connect your TFChain Wallet'" />
 
         <!-- Login -->
         <!-- <div class="text-left">

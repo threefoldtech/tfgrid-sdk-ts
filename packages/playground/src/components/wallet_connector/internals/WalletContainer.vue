@@ -1,7 +1,7 @@
 <template>
   <VTabs v-model="activeTab" align-tabs="center" color="primary" class="mb-6">
-    <VTab>Login</VTab>
-    <VTab>Connect Your Wallet</VTab>
+    <VTab text="Login" />
+    <VTab text="Connect Your Wallet" />
   </VTabs>
 
   <VWindow v-model="activeTab">
