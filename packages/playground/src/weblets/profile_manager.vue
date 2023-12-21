@@ -390,6 +390,7 @@
           class="ml-2"
           color="error"
           @click="logout"
+          variant="outlined"
           v-if="profileManager.profile"
           :disabled="updatingSSH || generatingSSH || loadingBalance"
         >
