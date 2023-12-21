@@ -36,7 +36,7 @@ export default async function deployCaprover(data: Caprover, profile: IProfile) 
   machine.env = {
     SWM_NODE_MODE: "leader",
     CAPROVER_ROOT_DOMAIN: domain,
-    CAPTAIN_IMAGE_VERSION: "1.10.1",
+    CAPTAIN_IMAGE_VERSION: "latest",
     PUBLIC_KEY: publicKey,
     DEFAULT_PASSWORD: password,
     CAPTAIN_IS_DEBUG: "true",
