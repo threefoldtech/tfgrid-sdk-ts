@@ -92,7 +92,7 @@
             <v-btn
               @click="showClearDialogue = true"
               color="error"
-              variant="flat"
+              variant="outlined"
               :disabled="isRemoving || Object.values(config).every(value => value == '')"
               >Remove Config</v-btn
             >
