@@ -54,7 +54,7 @@ export class RequestError extends BaseError {
   }
 }
 
-export class TwinDoesNotExistError extends BaseError {
+export class TwinNotExistError extends BaseError {
   constructor(message: string) {
     super(Generic.TwinDoesNotExistError, message, ErrorModules.Generic);
   }
