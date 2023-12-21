@@ -25,8 +25,11 @@ async function pingNodes(
     }
   });
 
-  const results = await Promise.all(pingPromises);
-  return results;
+  const result = await Promise.allSettled(pingPromises).then(results =>
+    results.flatMap(r => (r.status === "fulfilled" ? r.value : [])),
+  );
+
+  return result;
 }
 
 async function main() {
@@ -154,7 +157,9 @@ async function main() {
       }
     });
     console.time("Preparing Batch " + (batch + 1));
-    const deploymentResults = await Promise.all(deploymentPromises);
+    const deploymentResults = await Promise.allSettled(deploymentPromises).then(results =>
+      results.flatMap(r => (r.status === "fulfilled" ? r.value : [])),
+    );
     console.timeEnd("Preparing Batch " + (batch + 1));
 
     for (const { twinDeployments } of deploymentResults) {
