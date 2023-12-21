@@ -200,11 +200,11 @@
       </v-dialog>
       <v-dialog v-model="openInfoModal" width="50vw">
         <v-card>
-          <v-card-title class="text-h5"> Proposals Information </v-card-title>
-
+          <v-card-title class="text-h5 my-2"> Proposals Information </v-card-title>
+          <v-divider></v-divider>
           <v-card-text>
             <div class="textContainer">
-              <h2>General</h2>
+              <h3>General</h3>
               <span>A proposal can be created by one of the council members of tfchain.</span>
               <span> Once a proposal has reached it's timelimit, voting stops and a proposal can be closed.</span>
               <span>
@@ -217,7 +217,7 @@
               >
               <br />
               <br />
-              <h2>How do we count weight:</h2>
+              <h3>How do we count weight:</h3>
               <span
                 >Votes are weighted based on the farmers stake in the network. One vote by default is 1 weight.</span
               >
@@ -235,7 +235,7 @@
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn @click="openInfoModal = false"> Close </v-btn>
+            <v-btn @click="openInfoModal = false" class="my-1" color="anchor" variant="outlined"> Close </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
