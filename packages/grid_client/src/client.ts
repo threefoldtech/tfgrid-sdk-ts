@@ -1,5 +1,5 @@
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
-import { GridClientError, TFChainError, ValidationError } from "@threefold/types";
+import { GridClientError, TwinDoesNotExistError, ValidationError } from "@threefold/types";
 import type AwaitLock from "await-lock";
 import { validateMnemonic } from "bip39";
 import * as PATH from "path";
@@ -112,7 +112,12 @@ class GridClient {
     );
 
     await this.tfclient.connect();
-    await this.rmbClient.connect();
+    this.twinId = await this.tfclient.twins.getMyTwinId();
+    if (!this.twinId) {
+      throw new TwinDoesNotExistError(
+        `Couldn't find a user for the provided mnemonic on ${this.clientOptions.network} network.`,
+      );
+    }
 
     await this.testConnectionUrls(urls);
 
@@ -121,6 +126,7 @@ class GridClient {
       process.on("SIGINT", this.disconnectAndExit);
       process.on("SIGUSR1", this.disconnectAndExit);
       process.on("SIGUSR2", this.disconnectAndExit);
+      //TODO move this line to disconnectAndExit
       process.removeAllListeners();
     } else {
       window.onbeforeunload = () => {
@@ -129,19 +135,8 @@ class GridClient {
       window.onunload = this.disconnect;
     }
 
-    try {
-      this.twinId = await this.tfclient.twins.getMyTwinId();
-      if (!this.twinId) {
-        throw Error(`Couldn't find a user for the provided mnemonic on ${this.clientOptions.network} network.`);
-      }
-    } catch (e) {
-      console.log(e);
-      throw new TFChainError(
-        `Couldn't get the user twin for the provided mnemonic on ${this.clientOptions.network} network.`,
-      );
-    }
     this._connect();
-
+    await this.rmbClient.connect();
     await migrateKeysEncryption.apply(this, [GridClient]);
   }
 
