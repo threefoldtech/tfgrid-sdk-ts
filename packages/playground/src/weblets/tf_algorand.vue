@@ -5,9 +5,9 @@
     :memory="memory"
     :disk="storage + (type === 'indexer' ? 50 : 0)"
     :ipv4="ipv4"
-    :certified="certified"
     :dedicated="dedicated"
-    :SelectedNode="selectedNode"
+    :SelectedNode="selectionDetails?.node"
+    :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/algorand.png"
   >
     <template #title>Deploy a Algorand Instance </template>
@@ -28,14 +28,14 @@
           <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
-      <v-switch color="primary" inset label="IPv4" v-model="ipv4" :disabled="loadingFarm" hide-details />
+      <v-switch color="primary" inset label="IPv4" v-model="ipv4" hide-details />
+
       <AlgorandCapacity
         :network="network"
         :type="type"
         v-model:cpu.number="cpu"
         v-model:memory.number="memory"
         v-model:storage.number="storage"
-        v-model:disabled="loadingFarm"
       >
         <input-tooltip tooltip="Select a network to work against.">
           <v-select
@@ -47,7 +47,6 @@
               { title: 'Devnet', value: 'devnet' },
             ]"
             v-model="network"
-            :disabled="loadingFarm"
           />
         </input-tooltip>
 
@@ -61,7 +60,6 @@
               { title: 'Indexer', value: 'indexer' },
             ]"
             v-model="type"
-            :disabled="loadingFarm"
           />
         </input-tooltip>
 
@@ -112,7 +110,6 @@
                 v-model.number="firstRound"
                 v-bind="props"
                 type="number"
-                :disabled="loadingFarm"
               />
             </input-tooltip>
           </input-validator>
@@ -134,7 +131,6 @@
                 v-model.number="lastRound"
                 v-bind="props"
                 type="number"
-                :disabled="loadingFarm"
               />
             </input-tooltip>
           </input-validator>
@@ -146,48 +142,36 @@
         tooltip="Click to know more about dedicated nodes."
         href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
       >
-        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
+        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
       </input-tooltip>
 
       <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-        <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
+        <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
       </input-tooltip>
-      <SelectFarmManager>
-        <NodeSelector v-model="selection" />
-        <SelectFarm
-          v-if="selection == Selection.AUTOMATED"
-          :filters="{
-            cpu: cpu,
-            memory: memory,
-            ssd: storage + (type === 'indexer' ? 50 : 0),
-            publicIp: ipv4,
-            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-            certified: certified,
-          }"
-          v-model="farm"
-          v-model:loading="loadingFarm"
-          v-model:search="farmName"
-        />
-        <SelectNode
-          v-model="selectedNode"
-          :selection="selection"
-          :filters="{
-            farmId: farm?.farmID,
-            cpu,
-            memory,
-            ipv4: ipv4,
-            ipv6: ipv4,
-            type: type,
-            diskSizes: type === 'indexer' ? [50] : [],
-            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-            certified: certified,
-            country: farm?.country,
-            region: farm?.region,
-          }"
-          :loading-farm="loadingFarm"
-          :root-file-system-size="rootFilesystemSize"
-        />
-      </SelectFarmManager>
+
+      <TfSelectionDetails
+        :filters-validators="{
+          cpu: { min: type === 'relay' || type === 'indexer' ? 4 : 2 },
+          memory: { min: type === 'relay' || type === 'indexer' ? 8192 : 4096 },
+          ssdDisks:
+            type === 'relay'
+              ? { min: 950, max: 1150 }
+              : type === 'indexer'
+              ? { min: 1500, max: 1700 }
+              : { min: 100, max: 300 },
+        }"
+        :filters="{
+          ipv4,
+          certified,
+          dedicated,
+          cpu,
+          ssdDisks: [storage],
+          solutionDisk: type === 'indexer' ? 50 : undefined,
+          memory,
+          rootFilesystemSize,
+        }"
+        v-model="selectionDetails"
+      />
     </form-validator>
     <template #footer-actions>
       <v-btn color="secondary" variant="outlined" @click="deploy" :disabled="!valid"> Deploy </v-btn>
@@ -198,13 +182,9 @@
 <script lang="ts" setup>
 import { computed, type Ref, ref, watch } from "vue";
 
-import { Selection } from "@/utils/types";
-
-import Network from "../components/networks.vue";
-import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import { type FarmInterface, type Flist, ProjectName, type Validators } from "../types";
+import { type Flist, ProjectName, type Validators } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
@@ -213,7 +193,6 @@ const layout = useLayout();
 const valid = ref(false);
 const lastRoundInput = ref();
 const profileManager = useProfileManager();
-const selection = ref();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/algorand-latest.flist",
   entryPoint: "/sbin/zinit init",
@@ -229,23 +208,12 @@ const account = ref("");
 const wordsLength = computed(() => (account.value ? account.value.split(" ").length : 0));
 const firstRound = ref(24000000);
 const lastRound = ref(26000000);
-const farm = ref() as Ref<FarmInterface>;
-const farmName = ref();
 const dedicated = ref(false);
 const certified = ref(false);
-const loadingFarm = ref(false);
-const selectedNode = ref() as Ref<INode>;
 const rootFilesystemSize = computed(() => storage.value);
+const selectionDetails = ref<SelectionDetails>();
+
 watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()));
-watch(
-  () => selection.value,
-  (value, oldValue) => {
-    if (value !== oldValue) {
-      loadingFarm.value = false;
-    }
-  },
-  { deep: false },
-);
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -265,9 +233,6 @@ async function deploy() {
           name: name.value,
           cpu: cpu.value,
           memory: memory.value,
-          farmId: farm.value.farmID,
-          farmName: farm.value.name,
-          country: farm.value.country,
           flist: flist.value,
           entryPoint: flist.entryPoint,
           disks:
@@ -282,7 +247,7 @@ async function deploy() {
           rootFilesystemSize: rootFilesystemSize.value,
           publicIpv4: ipv4.value,
           planetary: true,
-          nodeId: selectedNode.value.nodeId,
+          nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
 
@@ -326,20 +291,12 @@ function customLastRoundValidation(validators: Validators) {
 
 <script lang="ts">
 import AlgorandCapacity from "../components/algorand_capacity.vue";
-import SelectFarm from "../components/select_farm.vue";
-import SelectFarmManager from "../components/select_farm_manager.vue";
-import SelectNode from "../components/select_node.vue";
 import { deploymentListEnvironments } from "../constants";
-import type { INode } from "../utils/filter_nodes";
+import type { SelectionDetails } from "../types/nodeSelector";
 import { normalizeError } from "../utils/helpers";
 
 export default {
   name: "TfAlgorand",
-  components: {
-    SelectFarm,
-    SelectNode,
-    AlgorandCapacity,
-    SelectFarmManager,
-  },
+  components: { AlgorandCapacity },
 };
 </script>

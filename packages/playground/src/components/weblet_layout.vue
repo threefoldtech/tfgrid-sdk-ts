@@ -79,7 +79,8 @@
           approximately
           <span class="font-weight-black">{{ costLoading ? "Calculating..." : normalizeBalance(usd) }}</span> USD per
           month.
-          <div v-if="certificationType === 'Certified'">
+
+          <div v-if="SelectedNode?.certificationType === 'Certified'">
             You selected a certified node. Please note that this deployment costs more TFT.
           </div>
         </div>
@@ -107,14 +108,13 @@
 </template>
 
 <script lang="ts" setup>
-import { events, type GridClient } from "@threefold/grid_client";
+import { events, type GridClient, type NodeInfo } from "@threefold/grid_client";
 import debounce from "lodash/debounce.js";
 import { computed, ref, watch } from "vue";
 
 import { useProfileManager } from "../stores";
-import type { INode } from "../utils/filter_nodes";
 import { getGrid, loadBalance } from "../utils/grid";
-import { getDashboardURL, normalizeBalance } from "../utils/helpers";
+import { normalizeBalance } from "../utils/helpers";
 
 const props = defineProps({
   disableAlerts: {
@@ -143,20 +143,13 @@ const props = defineProps({
     required: false,
     default: () => false,
   },
-  certified: {
-    type: Boolean,
-    required: false,
-    default: () => false,
-  },
   dedicated: {
     type: Boolean,
     required: false,
     default: () => false,
   },
-  SelectedNode: {
-    type: Object as () => INode,
-    required: false,
-  },
+  SelectedNode: Object as PropType<NodeInfo>,
+  validFilters: Boolean,
 });
 const emits = defineEmits<{ (event: "mount"): void; (event: "back"): void }>();
 const baseUrl = import.meta.env.BASE_URL;
@@ -164,15 +157,11 @@ const profileManager = useProfileManager();
 
 const status = ref<WebletStatus>();
 const message = ref<string>();
-const certificationType = ref<string>();
 function onLogMessage(msg: string) {
   if (typeof msg === "string") {
     message.value = msg;
   }
 }
-
-const network = process.env.NETWORK || window.env.NETWORK;
-const dashboardURL = getDashboardURL(network);
 
 watch(status, s => {
   if (s === "deploy") events.addListener("logs", onLogMessage);
@@ -249,7 +238,9 @@ watch(
 );
 
 /* Calculate Price */
-const showPrice = computed(() => !!profileManager.profile && props.cpu && props.memory && props.disk);
+const showPrice = computed(
+  () => props.validFilters && !!profileManager.profile && props.cpu && props.memory && props.disk,
+);
 const usd = ref<number>();
 const tft = ref<number>();
 const costLoading = ref(false);
@@ -258,11 +249,8 @@ const onlyIPV4TftPrice = ref<number>();
 const onlyIPV4UsdPrice = ref<number>();
 
 watch(
-  () => [props.cpu, props.memory, props.disk, props.ipv4, props.certified, props.dedicated, props.SelectedNode],
+  () => [props.cpu, props.memory, props.disk, props.ipv4, props.dedicated, props.SelectedNode],
   debounce((value, oldValue) => {
-    if (value[6]) {
-      certificationType.value = value[6].certified;
-    }
     if (
       oldValue &&
       value[0] === oldValue[0] &&
@@ -270,8 +258,7 @@ watch(
       value[2] === oldValue[2] &&
       value[3] === oldValue[3] &&
       value[4] === oldValue[4] &&
-      value[5] === oldValue[5] &&
-      value[6] === oldValue[6]
+      value[5] === oldValue[5]
     )
       return;
     shouldUpdateCost.value = true;
@@ -302,15 +289,19 @@ async function getIPv1Price(grid: GridClient) {
 }
 
 async function loadCost(profile: { mnemonic: string }) {
+  if (!props.validFilters) {
+    return;
+  }
+
   costLoading.value = true;
   const grid = await getGrid(profile);
   const { sharedPrice, dedicatedPrice } = await grid!.calculator.calculateWithMyBalance({
     cru: typeof props.cpu === "number" ? props.cpu : 0,
     sru: typeof props.disk === "number" ? props.disk : 0,
-    mru: typeof props.disk === "number" ? (props.memory ?? 0) / 1024 : 0,
+    mru: typeof props.memory === "number" ? (props.memory ?? 0) / 1024 : 0,
     hru: 0,
     ipv4u: props.ipv4,
-    certified: !props.certified && props.SelectedNode?.certified === "Certified" ? true : props.certified,
+    certified: props.SelectedNode?.certificationType === "Certified" ?? false,
   });
   await getIPv1Price(grid!);
   usd.value = props.dedicated ? dedicatedPrice : sharedPrice;
@@ -320,7 +311,7 @@ async function loadCost(profile: { mnemonic: string }) {
 </script>
 
 <script lang="ts">
-import type { ComputedRef, Ref } from "vue";
+import type { ComputedRef, PropType, Ref } from "vue";
 
 import type { Balance } from "../utils/grid";
 import DeploymentDataDialog from "./deployment_data_dialog.vue";

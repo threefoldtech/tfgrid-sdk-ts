@@ -97,6 +97,13 @@
                   the password. Mnemonic or Hex Seed will never be shared outside of this device.
                 </p>
               </v-alert>
+
+              <v-alert variant="tonal" type="info" class="mb-6" v-if="keypairType === KeypairType.ed25519">
+                <p>
+                  Please note that generation of ed25519 Keys isn't supported, you can only import pre existing ones.
+                </p>
+              </v-alert>
+
               <VTooltip
                 v-if="activeTab === 1"
                 text="Mnemonic or Hex Seed are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing (Mnemonic or Hex Seed) or click the 'Create Account' button to create an account and generate mnemonic."
@@ -127,23 +134,36 @@
                       ref="mnemonicInput"
                       :disable-validation="creatingAccount || activatingAccount || activating"
                     >
-                      <div v-bind="tooltipProps">
-                        <VTextField
-                          label="Mnemonic or Hex Seed"
-                          placeholder="Please insert your Mnemonic or Hex Seed"
-                          v-model="mnemonic"
-                          v-bind="{ ...passwordInputProps, ...validationProps }"
-                          :disabled="creatingAccount || activatingAccount || activating"
-                        />
-                      </div>
+                      <v-row>
+                        <v-col cols="10">
+                          <div v-bind="tooltipProps">
+                            <VTextField
+                              label="Mnemonic or Hex Seed"
+                              placeholder="Please insert your Mnemonic or Hex Seed"
+                              v-model="mnemonic"
+                              v-bind="{ ...passwordInputProps, ...validationProps }"
+                              :disabled="creatingAccount || activatingAccount || activating"
+                            />
+                          </div>
+                        </v-col>
+                        <v-col cols="2">
+                          <v-autocomplete
+                            :items="[...keyType]"
+                            item-title="name"
+                            v-model="keypairType"
+                            v-if="activeTab === 1"
+                          />
+                        </v-col>
+                      </v-row>
+
                       <div class="d-flex justify-end mb-10">
                         <v-tooltip>
                           <template v-slot:activator="{ isActive, props }">
                             <VBtn
                               class="mt-2 ml-3"
-                              color="primary"
+                              color="secondary"
                               variant="outlined"
-                              :disabled="!shouldActivateAccount"
+                              :disabled="!shouldActivateAccount || keypairType === KeypairType.ed25519"
                               :loading="activatingAccount"
                               @click="openAcceptTerms = termsLoading = true"
                               v-bind="props"
@@ -158,7 +178,9 @@
                         <VBtn
                           class="mt-2 ml-3"
                           color="primary"
-                          :disabled="isValidForm || !!mnemonic || shouldActivateAccount"
+                          :disabled="
+                            isValidForm || !!mnemonic || shouldActivateAccount || keypairType === KeypairType.ed25519
+                          "
                           :loading="creatingAccount"
                           @click="openAcceptTerms = termsLoading = true"
                         >
@@ -250,6 +272,9 @@
               </PasswordInputWrapper>
               <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="loginError">
                 {{ loginError }}
+              </v-alert>
+              <v-alert variant="tonal" type="warning" class="mb-6" v-if="activeTab === 1">
+                <p>Using different keypair types will lead to a completely different account.</p>
               </v-alert>
             </FormValidator>
 
@@ -403,6 +428,7 @@
 
 <script lang="ts" setup>
 import { isAddress } from "@polkadot/util-crypto";
+import { KeypairType } from "@threefold/grid_client";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
 import md5 from "md5";
@@ -414,6 +440,7 @@ import { generateKeyPair } from "web-ssh-keygen";
 import { AppThemeSelection } from "@/utils/app_theme";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
+import { useOnline } from "../hooks";
 import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
 import {
@@ -432,6 +459,8 @@ interface Credentials {
   passwordHash?: string;
   mnemonicHash?: string;
 }
+const keyType = ["sr25519", "ed25519"];
+const keypairType = ref(KeypairType.sr25519);
 
 const theme = useTheme();
 
@@ -444,22 +473,39 @@ const props = defineProps({
 });
 defineEmits<{ (event: "update:modelValue", value: boolean): void }>();
 
+const online = useOnline();
 watch(
-  () => props.modelValue,
-  m => {
-    if (m) {
-      nextTick().then(mounted);
-    } else {
-      nextTick().then(() => {
-        if (isStoredCredentials()) {
-          activeTab.value = 0;
-        } else {
-          activeTab.value = 1;
-        }
-        clearFields();
-      });
+  () => [online.value, props.modelValue],
+  ([online, m], [wasOnline]) => {
+    if (!wasOnline && online) {
+      handleModelValue(true);
+    }
+
+    handleModelValue(online && m);
+  },
+);
+function handleModelValue(m: boolean) {
+  if (m) {
+    nextTick().then(mounted);
+  } else {
+    nextTick().then(() => {
+      if (isStoredCredentials()) {
+        activeTab.value = 0;
+      } else {
+        activeTab.value = 1;
+      }
+      clearFields();
+    });
+  }
+}
+watch(
+  () => keypairType.value,
+  async (value, oldValue) => {
+    if (value !== oldValue) {
+      mnemonicInput.value?.validate();
     }
   },
+  { deep: false },
 );
 
 function mounted() {
@@ -524,11 +570,21 @@ const isValidForm = ref(false);
 const SSHKeyHint = ref("");
 const ssh = ref("");
 const mnemonicInput = useInputRef();
-const shouldActivateAccount = computed(
-  () =>
-    mnemonicInput.value?.error?.toLowerCase()?.includes("couldn't get the user twin for the provided mnemonic") ||
-    false,
-);
+
+function isNonActiveMessage(msg: string) {
+  msg = msg.toLowerCase();
+  return (
+    msg.includes("couldn't get the user twin for the provided mnemonic") ||
+    msg.includes("invalid twin id") ||
+    msg.includes("couldn't get the user twin")
+  );
+}
+
+const shouldActivateAccount = computed(() => {
+  const msg = mnemonicInput.value?.error || "";
+  return isNonActiveMessage(msg) || false;
+});
+
 let sshTimeout: any;
 const isValidConnectConfirmationPassword = computed(() =>
   !validateConfirmPassword(confirmPassword.value) ? false : true,
@@ -606,7 +662,7 @@ async function activate(mnemonic: string) {
   activating.value = true;
   sessionStorage.setItem("password", password.value);
   try {
-    const grid = await getGrid({ mnemonic });
+    const grid = await getGrid({ mnemonic, keypairType: keypairType.value });
     const profile = await loadProfile(grid!);
     ssh.value = profile.ssh;
     profileManager.set({ ...profile, mnemonic });
@@ -618,10 +674,15 @@ async function activate(mnemonic: string) {
 }
 
 function validateMnInput(mnemonic: string) {
-  return getGrid({ mnemonic })
+  return getGrid({ mnemonic, keypairType: keypairType.value })
     .then(() => undefined)
     .catch(e => {
-      return { message: normalizeError(e, "Something went wrong. please try again.") };
+      const msg = normalizeError(e, "Something went wrong. please try again.");
+      return {
+        message: isNonActiveMessage(msg)
+          ? `Couldn't get the user twin for the provided mnemonic in ${process.env.NETWORK || window.env.NETWORK}net.`
+          : msg,
+      };
     });
 }
 

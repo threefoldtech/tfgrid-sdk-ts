@@ -1,6 +1,4 @@
-import type { FilterOptions, GridClient, NodeInfo } from "@threefold/grid_client";
-
-import type { NodeFilters } from "@/components/select_node.vue";
+import type { GridClient } from "@threefold/grid_client";
 
 import type { InputFilterType } from "../types";
 import { isAlphanumeric, isInt, isNumeric, min, startsWith, validateResourceMaxNumber } from "./validators";
@@ -19,24 +17,6 @@ export interface INode {
 
 export async function getNodeCards(grid: GridClient, nodeId: number): Promise<NodeGPUCardType[]> {
   return grid.zos.getNodeGPUInfo({ nodeId });
-}
-
-export async function getFilteredNodes(grid: GridClient, options: NodeFilters): Promise<NodeInfo[]> {
-  const filters: FilterOptions = {
-    farmId: options.farmId ? options.farmId : undefined,
-    cru: options.cpu,
-    mru: Math.round(options.memory / 1024),
-    sru: options.diskSizes.reduce((total, disk) => total + disk),
-    publicIPs: options.ipv4,
-    hasGPU: options.hasGPU,
-    rentedBy: options.rentedBy ? grid.twinId : undefined,
-    certified: options.certified,
-    availableFor: grid.twinId,
-    country: options.country,
-    region: options.region,
-  };
-  const nodes = await grid.capacity.filterNodes(filters);
-  return nodes;
 }
 
 // Node filters used in #Explorer, #Dedicated Nodes...

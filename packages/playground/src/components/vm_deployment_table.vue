@@ -153,7 +153,12 @@ async function loadDeployments() {
   ];
 
   count.value = vms.count;
-  items.value = vms.items.flat(1);
+  items.value = vms.items.map(([leader, ...workers]) => {
+    if (workers.length) {
+      leader.workers = workers;
+    }
+    return leader;
+  });
 
   loading.value = false;
 }

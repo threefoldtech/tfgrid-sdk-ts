@@ -28,13 +28,7 @@
       #="{ props }"
     >
       <input-tooltip tooltip="The number of virtual cores allocated to your instance.">
-        <v-text-field
-          label="CPU (vCores)"
-          type="number"
-          v-model.number="$props.modelValue.cpu"
-          v-bind="props"
-          :disabled="loadingFarm"
-        />
+        <v-text-field label="CPU (vCores)" type="number" v-model.number="$props.modelValue.cpu" v-bind="props" />
       </input-tooltip>
     </input-validator>
 
@@ -49,13 +43,7 @@
       #="{ props }"
     >
       <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
-        <v-text-field
-          label="Memory (MB)"
-          type="number"
-          v-model.number="$props.modelValue.memory"
-          v-bind="props"
-          :disabled="loadingFarm"
-        />
+        <v-text-field label="Memory (MB)" type="number" v-model.number="$props.modelValue.memory" v-bind="props" />
       </input-tooltip>
     </input-validator>
 
@@ -70,13 +58,7 @@
       #="{ props }"
     >
       <input-tooltip tooltip="Disk Size.">
-        <v-text-field
-          label="Size (GB)"
-          type="number"
-          v-model.number="$props.modelValue.diskSize"
-          v-bind="props"
-          :disabled="loadingFarm"
-        />
+        <v-text-field label="Size (GB)" type="number" v-model.number="$props.modelValue.diskSize" v-bind="props" />
       </input-tooltip>
     </input-validator>
 
@@ -84,14 +66,12 @@
       v-model:ipv4="$props.modelValue.ipv4"
       v-model:ipv6="$props.modelValue.ipv6"
       v-model:planetary="$props.modelValue.planetary"
-      :disabled="loadingFarm"
     />
 
     <RootFsSize
       :cpu="$props.modelValue.cpu"
       :memory="$props.modelValue.memory"
       v-model.number="$props.modelValue.rootFsSize"
-      :disabled="loadingFarm"
     />
 
     <input-tooltip
@@ -99,85 +79,40 @@
       tooltip="Click to know more about dedicated nodes."
       href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
     >
-      <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" :disabled="loadingFarm" />
+      <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" />
     </input-tooltip>
-    <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-      <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" :disabled="loadingFarm" />
-    </input-tooltip>
-    <SelectFarmManager>
-      <NodeSelector v-model="selection" />
-      <SelectFarm
-        v-if="selection == Selection.AUTOMATED"
-        :filters="{
-          cpu: $props.modelValue.cpu,
-          memory: $props.modelValue.memory,
-          publicIp: $props.modelValue.ipv4,
-          ssd: ($props.modelValue.diskSize ?? 0) + $props.modelValue.rootFsSize,
-          rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
-          certified: $props.modelValue.certified,
-        }"
-        v-model="$props.modelValue.farm"
-        v-model:loading="loadingFarm"
-        v-model:search="farmName"
-      />
 
-      <SelectNode
-        v-model="$props.modelValue.selectedNode"
-        :selection="selection"
-        :filters="{
-          farmId: $props.modelValue.farm?.farmID,
-          cpu: $props.modelValue.cpu,
-          memory: $props.modelValue.memory,
-          diskSizes: [$props.modelValue?.diskSize ?? 0],
-          rentedBy: $props.modelValue.dedicated ? profileManager.profile?.twinId : undefined,
-          certified: $props.modelValue.certified,
-          country: $props.modelValue.farm?.country,
-          region: $props.modelValue.farm?.region,
-        }"
-        :loading-farm="loadingFarm"
-        :root-file-system-size="$props.modelValue.rootFsSize"
-      />
-    </SelectFarmManager>
+    <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+      <v-switch color="primary" inset label="Certified" v-model="$props.modelValue.certified" />
+    </input-tooltip>
+
+    <TfSelectionDetails
+      :filters-validators="{
+        memory: { min: 1024 },
+        rootFilesystemSize: { min: rootFs($props.modelValue.cpu ?? 0, $props.modelValue.memory ?? 0) },
+      }"
+      :filters="{
+        ipv4: $props.modelValue.ipv4,
+        certified: $props.modelValue.certified,
+        dedicated: $props.modelValue.dedicated,
+        cpu: $props.modelValue.cpu,
+        ssdDisks: [$props.modelValue.diskSize],
+        memory: $props.modelValue.memory,
+        rootFilesystemSize: $props.modelValue.rootFsSize,
+      }"
+      v-model="$props.modelValue.selectionDetails"
+    />
   </div>
 </template>
 
-<script lang="ts" setup>
-defineProps<{ modelValue: K8SWorker }>();
-const emits = defineEmits<{ (event: "update:loading", value: boolean): void }>();
-const farmManager = useFarm();
-const loadingFarm = ref(farmManager?.getLoading());
-const farmName = ref();
-watch(loadingFarm, (loadingFarm): void => {
-  emits("update:loading", loadingFarm!);
-});
-watch(
-  () => selection.value,
-  (value, oldValue) => {
-    if (value !== oldValue) {
-      loadingFarm.value = false;
-    }
-  },
-  { deep: false },
-);
-</script>
-
 <script lang="ts">
-import { ref, watch } from "vue";
+import type { PropType } from "vue";
 
-import { Selection } from "@/utils/types";
-
-import NodeSelector from "../components/node_selection.vue";
-import SelectFarmManager, { useFarm } from "../components/select_farm_manager.vue";
-import SelectNode from "../components/select_node.vue";
-import { useProfileManager } from "../stores";
-import type { FarmInterface, K8SWorker } from "../types";
-import type { INode } from "../utils/filter_nodes";
+import type { K8SWorker } from "../types";
+import rootFs from "../utils/root_fs";
 import { generateName } from "../utils/strings";
 import RootFsSize from "./root_fs_size.vue";
-import SelectFarm from "./select_farm.vue";
 
-const profileManager = useProfileManager();
-const selection = ref();
 export function createWorker(name: string = generateName({ prefix: "wr" })): K8SWorker {
   return {
     name,
@@ -188,8 +123,6 @@ export function createWorker(name: string = generateName({ prefix: "wr" })): K8S
     ipv6: false,
     planetary: true,
     rootFsSize: 2,
-    farm: undefined as FarmInterface | undefined,
-    selectedNode: undefined as INode | undefined,
     dedicated: false,
     certified: false,
     rentedBy: undefined,
@@ -198,11 +131,15 @@ export function createWorker(name: string = generateName({ prefix: "wr" })): K8S
 
 export default {
   name: "K8SWorker",
-  components: {
-    SelectFarm,
-    RootFsSize,
-    SelectNode,
-    SelectFarmManager,
+  components: { RootFsSize },
+  props: {
+    modelValue: {
+      type: Object as PropType<K8SWorker>,
+      required: true,
+    },
+  },
+  setup() {
+    return { rootFs };
   },
 };
 </script>

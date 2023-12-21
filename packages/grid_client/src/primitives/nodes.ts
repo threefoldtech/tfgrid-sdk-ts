@@ -340,11 +340,21 @@ class Nodes {
    * @throws Error if there is an issue with the HTTP request or response.
    */
   async getFarmsCount(options: FilterOptions = {}, url = ""): Promise<number> {
+    const _options = { ...options };
     url = url || this.proxyURL;
-    options.ret_count = true;
-    options.page = 1;
-    const query = this.getFarmUrlQuery(options);
+    _options.ret_count = true;
+    _options.page = 1;
+    const query = this.getFarmUrlQuery(_options);
     return +(await sendWithFullResponse("get", urlJoin(url, `/farms?${query}`), "", {})).headers["count"];
+  }
+
+  async getNodesCount(options: FilterOptions = {}, url = ""): Promise<number> {
+    const _options = { ...options };
+    url = url || this.proxyURL;
+    _options.ret_count = true;
+    _options.page = 1;
+    const query = this.getNodeUrlQuery(_options);
+    return +(await sendWithFullResponse("get", urlJoin(url, `/nodes?${query}`), "", {})).headers["count"];
   }
 
   /**
@@ -366,6 +376,7 @@ class Nodes {
 
   getNodeUrlQuery(options: FilterOptions = {}) {
     const params = {
+      total_cru: options.cru || "",
       free_mru: Math.ceil(this._g2b(options.mru)) || "",
       free_sru: Math.ceil(this._g2b(options.sru)) || "",
       free_hru: Math.ceil(this._g2b(options.hru)) || "",
@@ -387,6 +398,7 @@ class Nodes {
       rented_by: options.rentedBy,
       rentable: options.rentable,
       randomize: options.randomize,
+      ret_count: options.ret_count,
       region: options.region,
     };
     if (options.gateway) {
@@ -401,6 +413,7 @@ class Nodes {
 
   getFarmUrlQuery(options: FarmFilterOptions = {}) {
     const params = {
+      node_total_cru: options.nodeCRU || "",
       node_free_mru: Math.ceil(this._g2b(options.nodeMRU)) || "",
       node_free_sru: Math.ceil(this._g2b(options.nodeSRU)) || "",
       node_free_hru: Math.ceil(this._g2b(options.nodeHRU)) || "",

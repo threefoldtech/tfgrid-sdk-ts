@@ -7,7 +7,8 @@
     :certified="certified"
     :dedicated="dedicated"
     :ipv4="ipv4"
-    :SelectedNode="selectedNode"
+    :SelectedNode="selectionDetails?.node"
+    :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/freeflow.png"
   >
     <template #title>Deploy a Freeflow Instance </template>
@@ -43,66 +44,40 @@
         :small="{ cpu: 1, memory: 4, disk: 100 }"
         :medium="{ cpu: 2, memory: 16, disk: 500 }"
         :large="{ cpu: 4, memory: 32, disk: 1000 }"
-        :disabled="loadingFarm"
       />
-      <Networks v-model:ipv4="ipv4" :disabled="loadingFarm"></Networks>
-      <FarmGatewayManager>
-        <input-tooltip
-          inline
-          tooltip="Click to know more about dedicated nodes."
-          href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
-        >
-          <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
-        </input-tooltip>
 
-        <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-          <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
-        </input-tooltip>
+      <Networks v-model:ipv4="ipv4"></Networks>
 
-        <SelectFarmManager>
-          <SelectFarm
-            :filters="{
-              cpu: solution?.cpu,
-              memory: solution?.memory,
-              ssd: (solution?.disk ?? 0) + rootFileSystemSize,
-              publicIp: ipv4,
-              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-              certified: certified,
-            }"
-            v-model="farm"
-            v-model:loading="loadingFarm"
-            v-model:search="farmName"
-          />
+      <input-tooltip
+        inline
+        tooltip="Click to know more about dedicated nodes."
+        href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+      >
+        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
+      </input-tooltip>
 
-          <SelectNode
-            v-model="selectedNode"
-            :filters="{
-              farmId: farm?.farmID,
-              cpu: solution?.cpu,
-              memory: solution?.memory,
-              diskSizes: disks.map(disk => disk.size),
-              rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-              certified: certified,
-              country: farm?.country,
-              region: farm?.region,
-            }"
-            :root-file-system-size="rootFileSystemSize"
-            :loading-farm="loadingFarm"
-          />
-        </SelectFarmManager>
-        <DomainName :hasIPv4="ipv4" ref="domainNameCmp"></DomainName>
-      </FarmGatewayManager>
+      <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+        <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+      </input-tooltip>
+
+      <TfSelectionDetails
+        :filters="{
+          ipv4,
+          certified,
+          dedicated,
+          cpu: solution?.cpu,
+          solutionDisk: solution?.disk,
+          memory: solution?.memory,
+          rootFilesystemSize,
+          ssdDisks: disks.map(d => d.size),
+        }"
+        require-domain
+        v-model="selectionDetails"
+      />
     </form-validator>
 
     <template #footer-actions>
-      <v-btn
-        color="primary"
-        variant="tonal"
-        @click="deploy(domainNameCmp?.domain, domainNameCmp?.customDomain)"
-        :disabled="!valid"
-      >
-        Deploy
-      </v-btn>
+      <v-btn color="primary" variant="tonal" @click="deploy()" :disabled="!valid"> Deploy </v-btn>
     </template>
   </weblet-layout>
 </template>
@@ -113,7 +88,7 @@ import { computed, onMounted, type Ref, ref } from "vue";
 
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { FarmInterface, Flist, GatewayNode, solutionFlavor as SolutionFlavor } from "../types";
+import type { Flist, solutionFlavor as SolutionFlavor } from "../types";
 import { ProjectName } from "../types";
 import { deployVM, type Disk } from "../utils/deploy_vm";
 import { deployGatewayName, rollbackDeployment } from "../utils/gateway";
@@ -126,16 +101,13 @@ const profileManager = useProfileManager();
 
 const threebotName = ref<string>("");
 const solution = ref() as Ref<SolutionFlavor>;
-const farm = ref() as Ref<FarmInterface>;
-const farmName = ref();
 const flist = ref<Flist>();
 const disks = ref<Disk[]>([]);
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<INode>;
 const ipv4 = ref(false);
-const rootFileSystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
-const loadingFarm = ref(false);
+const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
+const selectionDetails = ref<SelectionDetails>();
 onMounted(() => {
   disks.value.push({
     name: "disk",
@@ -148,18 +120,21 @@ onMounted(() => {
     entryPoint: "/sbin/zinit init",
   };
 });
-const domainNameCmp = ref();
+
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
   layout.value.setStatus("success", "Successfully deployed a Freeflow instance.");
   layout.value.openDialog(deployment, deploymentListEnvironments.freeflow);
 }
-async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
+
+async function deploy() {
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.FreeFlow.toLowerCase() + "/" + threebotName.value;
 
-  const domain = customDomain ? gatewayName.domain : threebotName.value + "." + gatewayName.domain;
+  const domain = selectionDetails.value!.domain!.enabledCustomDomain
+    ? selectionDetails.value!.domain!.customDomain
+    : threebotName.value + "." + selectionDetails.value!.domain!.selectedDomain!.publicConfig.domain;
 
   let grid: GridClient | null;
   let vm: any;
@@ -173,8 +148,8 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
     vm = await deployVM(grid!, {
       name: threebotName.value,
       network: {
-        addAccess: !!gatewayName.id,
-        accessNodeId: gatewayName.id,
+        addAccess: selectionDetails.value!.domain!.enableSelectedDomain,
+        accessNodeId: selectionDetails.value!.domain!.selectedDomain?.nodeId,
       },
       machines: [
         {
@@ -184,28 +159,26 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
           disks: disks.value,
           flist: flist?.value!.value,
           entryPoint: flist.value!.entryPoint,
-          farmId: farm.value.farmID,
-          farmName: farm.value.name,
           publicIpv4: ipv4.value,
-          country: farm.value.country,
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "USER_ID", value: threebotName.value },
             { key: "DIGITALTWIN_APPID", value: domain },
             { key: "NODE_ENV", value: "staging" },
           ],
-          nodeId: selectedNode.value.nodeId,
+          nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
-          rootFilesystemSize: rootFileSystemSize.value,
+          rootFilesystemSize: rootFilesystemSize.value,
         },
       ],
     });
   } catch (e) {
     return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Freeflow instance."));
   }
-  if (customDomain && ipv4.value) {
-    vm[0].customDomain = gatewayName.domain;
+
+  if (!selectionDetails.value?.domain?.enableSelectedDomain) {
+    vm[0].customDomain = selectionDetails.value?.domain?.customDomain;
     finalize(vm);
     return;
   }
@@ -213,13 +186,11 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
   try {
     layout.value.setStatus("deploy", "Preparing to deploy gateway...");
 
-    await deployGatewayName(grid!, {
-      name: threebotName.value,
-      nodeId: gatewayName.id!,
+    await deployGatewayName(grid, selectionDetails.value.domain, {
+      subdomain: threebotName.value,
       ip: vm[0].interfaces[0].ip,
       port: 80,
-      networkName: vm[0].interfaces[0].network,
-      fqdn: gatewayName?.useFQDN ? gatewayName?.domain : undefined,
+      network: vm[0].interfaces[0].network,
     });
 
     finalize(vm);
@@ -233,27 +204,14 @@ async function deploy(gatewayName: GatewayNode, customDomain: boolean) {
 </script>
 
 <script lang="ts">
-import DomainName from "../components/domain_name.vue";
-import FarmGatewayManager from "../components/farm_gateway_manager.vue";
 import Networks from "../components/networks.vue";
-import SelectFarm from "../components/select_farm.vue";
-import SelectFarmManager from "../components/select_farm_manager.vue";
-import SelectNode from "../components/select_node.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
-import type { INode } from "../utils/filter_nodes";
+import type { SelectionDetails } from "../types/nodeSelector";
 import rootFs from "../utils/root_fs";
 
 export default {
   name: "TFFreeflow",
-  components: {
-    SelectSolutionFlavor,
-    SelectFarm,
-    DomainName,
-    FarmGatewayManager,
-    Networks,
-    SelectNode,
-    SelectFarmManager,
-  },
+  components: { SelectSolutionFlavor, Networks },
 };
 </script>

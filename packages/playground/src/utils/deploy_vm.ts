@@ -121,6 +121,7 @@ export interface Machine {
   envs?: Env[];
   disks?: Disk[];
   country?: string;
+  region?: string;
   qsfsDisks?: QsfsDisk[];
   gpus?: string[];
   hasGPU?: boolean;
@@ -144,6 +145,7 @@ export async function addMachine(grid: GridClient, options: AddMachineOptions) {
     cru: options.cpu,
     mru: Math.round(options.memory / 1024),
     country: options.country,
+    region: options.region,
     farmId: options.farmId,
     farmName: options.farmName,
     hru: options.qsfsDisks?.reduce((total, disk) => total + disk.cache, 0),

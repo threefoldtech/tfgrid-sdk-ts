@@ -4,10 +4,10 @@
     :cpu="cpu"
     :memory="memory"
     :disk="32"
-    :certified="certified"
     :dedicated="dedicated"
     ipv4
-    :SelectedNode="selectedNode"
+    :SelectedNode="selectionDetails?.node"
+    :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/vm.png"
   >
     <template #title>Deploy a Node Pilot</template>
@@ -55,13 +55,7 @@
         #="{ props }"
       >
         <input-tooltip tooltip="The amount of RAM (Random Access Memory) allocated to your instance.">
-          <v-text-field
-            label="Memory (MB)"
-            type="number"
-            v-model.number="memory"
-            v-bind="props"
-            :disabled="loadingFarm"
-          />
+          <v-text-field label="Memory (MB)" type="number" v-model.number="memory" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -70,46 +64,29 @@
         tooltip="Click to know more about dedicated nodes."
         href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
       >
-        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" :disabled="loadingFarm" hide-details />
+        <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
       </input-tooltip>
-      <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
-        <v-switch color="primary" inset label="Certified" v-model="certified" :disabled="loadingFarm" hide-details />
-      </input-tooltip>
-      <SelectFarmManager>
-        <NodeSelector v-model="selection" />
-        <SelectFarmId
-          v-if="selection == Selection.AUTOMATED"
-          :filters="{
-            cpu,
-            memory,
-            ssd: 30 + rootFilesystemSize,
-            publicIp: true,
-            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-            certified: certified,
-          }"
-          v-model="farm"
-          v-model:loading="loadingFarm"
-          v-model:search="farmName"
-        />
 
-        <SelectNode
-          v-model="selectedNode"
-          :selection="selection"
-          :filters="{
-            farmId: farm?.farmID,
-            cpu,
-            memory,
-            ipv4: true,
-            diskSizes: [15, 15],
-            rentedBy: dedicated ? profileManager.profile?.twinId : undefined,
-            certified: certified,
-            country: farm?.country,
-            region: farm?.region,
-          }"
-          :loading-farm="loadingFarm"
-          :root-file-system-size="rootFilesystemSize"
-        />
-      </SelectFarmManager>
+      <input-tooltip inline tooltip="Renting capacity on certified nodes is charged 25% extra.">
+        <v-switch color="primary" inset label="Certified" v-model="certified" hide-details />
+      </input-tooltip>
+
+      <TfSelectionDetails
+        :filters-validators="{
+          cpu: { min: 8 },
+          memory: { min: 8192 },
+        }"
+        :filters="{
+          ipv4: true,
+          certified,
+          dedicated,
+          cpu,
+          ssdDisks: [15, 15],
+          memory,
+          rootFilesystemSize,
+        }"
+        v-model="selectionDetails"
+      />
     </form-validator>
 
     <template #footer-actions>
@@ -121,33 +98,26 @@
 <script lang="ts" setup>
 import { type Ref, ref } from "vue";
 
-import { Selection } from "@/utils/types";
-
-import NodeSelector from "../components/node_selection.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import { type FarmInterface, type Flist, ProjectName } from "../types";
+import { type Flist, ProjectName } from "../types";
 import { deployVM } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
 import { generateName } from "../utils/strings";
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
-const selection = ref();
-const loadingFarm = ref(false);
 const name = ref(generateName({ prefix: "np" }));
 const cpu = ref(8);
 const memory = ref(8192);
-const farm = ref() as Ref<FarmInterface>;
-const farmName = ref();
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-vms/node-pilot-zdbfs.flist",
   entryPoint: "/",
 };
 const dedicated = ref(false);
 const certified = ref(false);
-const selectedNode = ref() as Ref<INode>;
 const rootFilesystemSize = 2;
+const selectionDetails = ref<SelectionDetails>();
 async function deploy() {
   layout.value.setStatus("deploy");
 
@@ -168,9 +138,6 @@ async function deploy() {
           memory: memory.value,
           flist: flist.value,
           entryPoint: flist.entryPoint,
-          farmId: farm.value.farmID,
-          farmName: farm.value.name,
-          country: farm.value.country,
           publicIpv4: true,
           publicIpv6: true,
           planetary: false,
@@ -186,7 +153,7 @@ async function deploy() {
               mountPoint: "/mnt/" + generateName(),
             },
           ],
-          nodeId: selectedNode.value.nodeId,
+          nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
           certified: certified.value,
         },
@@ -203,19 +170,11 @@ async function deploy() {
 </script>
 
 <script lang="ts">
-import SelectFarmId from "../components/select_farm.vue";
-import SelectFarmManager from "../components/select_farm_manager.vue";
-import SelectNode from "../components/select_node.vue";
 import { deploymentListEnvironments } from "../constants";
-import type { INode } from "../utils/filter_nodes";
+import type { SelectionDetails } from "../types/nodeSelector";
 import { normalizeError } from "../utils/helpers";
 
 export default {
   name: "NodePilot",
-  components: {
-    SelectFarmId,
-    SelectNode,
-    SelectFarmManager,
-  },
 };
 </script>
