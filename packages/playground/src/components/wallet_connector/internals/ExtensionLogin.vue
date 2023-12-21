@@ -26,7 +26,7 @@
         <template #loader>
           <VRow justify="center" align="center">
             <VProgressCircular size="20" width="2" indeterminate color="primary" />
-            <span class="ml-2">Selecting account...</span>
+            <span class="ml-2" v-text="loadingMessage" />
           </VRow>
         </template>
       </VBtn>
@@ -46,32 +46,71 @@
 </template>
 
 <script lang="ts">
-import { type PublicAccount, ThreefoldWalletConnectorApi } from "@threefold/extension_api";
+import { ThreefoldWalletConnectorApi } from "@threefold/extension_api";
+import type { KeypairType } from "@threefold/grid_client";
+import { onMounted, ref } from "vue";
 
 import { network } from "../../../clients";
 import { useAsync } from "../../../hooks";
+import { useWalletService } from "../../../hooks/wallet_connector";
+import { useProfileManager } from "../../../stores/profile_manager";
+import { getGrid, loadProfile } from "../../../utils/grid";
+import { resolveAsync } from "../../../utils/nodeSelector";
+
+const _defaultLoadingMsg = "Loading...";
 
 export default {
   name: "ExtensionLogin",
   setup() {
+    const walletService = useWalletService();
+    const profileManger = useProfileManager();
+
+    const loadingMessage = ref(_defaultLoadingMsg);
+
     const installedTask = useAsync(() => ThreefoldWalletConnectorApi.isInstalled() as Promise<boolean>, { init: true });
-    const loginTask = useAsync<PublicAccount, string>(
-      async () => {
-        const grantedAccess = await ThreefoldWalletConnectorApi.requestAccess();
-        if (!grantedAccess) {
-          throw `Failed to Granted Access Permission.`;
+    const loginTask = useAsync<void, string, [mnemonic?: string, keypairType?: string]>(
+      async (mnemonic, keypairType) => {
+        type LoginCredentials = { mnemonic: string; keypairType: KeypairType };
+
+        let loginCredentials = { mnemonic, keypairType } as LoginCredentials;
+
+        if (!mnemonic || !keypairType) {
+          loadingMessage.value = `Requesting to granted access permission...`;
+          const [grantedAccess, e0] = await resolveAsync(ThreefoldWalletConnectorApi.requestAccess());
+          if (!grantedAccess || e0) {
+            throw `Failed to Granted Access Permission.`;
+          }
+
+          loadingMessage.value = `Selecting Account...`;
+          const [account, e1] = await resolveAsync(ThreefoldWalletConnectorApi.selectDecryptedAccount(network));
+          if (!account || e1) {
+            throw `Failed to select account. Please try again.`;
+          }
+
+          loginCredentials = account as LoginCredentials;
         }
 
-        const account = await ThreefoldWalletConnectorApi.selectDecryptedAccount(network);
-        if (!account) {
-          throw `Failed to select account. Please try again.`;
+        loadingMessage.value = `Successfully selected an account! instantiate a connection to chain...`;
+        const [grid, e2] = await resolveAsync(getGrid(loginCredentials));
+        if (!grid || e2) {
+          throw `Failed to instantiate a connection to chain.`;
         }
 
-        return account;
+        loadingMessage.value = `Successfully instantiated a connection to chain! Loading your wallet information...`;
+        const [profile, e3] = await resolveAsync(loadProfile(grid));
+        if (!profile || e3) {
+          throw `Failed to load user profile.`;
+        }
+
+        walletService.extensionCredentials.set(loginCredentials.mnemonic, loginCredentials.keypairType);
+        profileManger.set(profile);
       },
       {
         tries: 1,
-        onAfterTask: ({ error }) => error && setTimeout(resetLoginTask, 5_000),
+        onAfterTask({ error }) {
+          error && setTimeout(resetLoginTask, 5_000);
+          loadingMessage.value = _defaultLoadingMsg;
+        },
       },
     );
 
@@ -79,7 +118,12 @@ export default {
       loginTask.value.initialized && !loginTask.value.loading && loginTask.value.reset();
     }
 
-    return { installedTask, loginTask, resetLoginTask };
+    onMounted(() => {
+      const c = walletService.extensionCredentials.value;
+      c && loginTask.value.run(c.mnemonic, c.keypairType);
+    });
+
+    return { installedTask, loginTask, loadingMessage, resetLoginTask };
   },
 };
 </script>

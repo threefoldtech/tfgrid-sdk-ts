@@ -25,6 +25,10 @@ export function useStorage(api: Window["localStorage"] | Window["sessionStorage"
 
         setStorage(value);
       },
+      remove() {
+        data.value = undefined;
+        setStorage(undefined);
+      },
     };
   };
 }

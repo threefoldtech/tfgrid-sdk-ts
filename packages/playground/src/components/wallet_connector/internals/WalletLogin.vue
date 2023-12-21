@@ -52,8 +52,7 @@
 <script lang="ts">
 import { onMounted, ref } from "vue";
 
-import { useSessionStorage } from "../../../hooks";
-import { useCredentials, useWalletService } from "../../../hooks/wallet_connector";
+import { useWalletService } from "../../../hooks/wallet_connector";
 import ExtensionLogin from "./ExtensionLogin.vue";
 
 export default {
@@ -61,8 +60,6 @@ export default {
   components: { ExtensionLogin },
   setup() {
     const walletService = useWalletService();
-    const passwordStorage = useSessionStorage("password");
-    const credentials = useCredentials();
     const password = ref("");
 
     const valid = ref<null | boolean>(null);
@@ -74,7 +71,7 @@ export default {
         case password && password.length < 6:
           return "Password must be at least 6 characters.";
 
-        case password && !credentials.check(password):
+        case password && !walletService.localCredentials.check(password):
           return "We couldn't find a matching wallet for this password. Please connect your wallet first.";
       }
 
@@ -82,20 +79,20 @@ export default {
     }
 
     onMounted(() => {
-      password.value = passwordStorage.value || "";
+      password.value = walletService.passwordStorage.value || "";
       password.value && login();
     });
 
     function login() {
-      const mnemonic = credentials.getMnemonic(password.value);
+      const c = walletService.localCredentials.get(password.value);
 
-      if (!mnemonic) {
+      if (!c) {
         return console.log("Something went wrong - this case should be impossible");
       }
 
       // Login here
-      console.log("login", mnemonic);
-      passwordStorage.value = password.value;
+      console.log("login", c);
+      walletService.passwordStorage.value = password.value;
     }
 
     return {

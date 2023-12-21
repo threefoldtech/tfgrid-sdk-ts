@@ -10,6 +10,9 @@ export const $key = "wallet.v" + version;
 export interface WalletService {
   $key: string;
   active: Ref<boolean>;
+  passwordStorage: ReturnType<typeof useSessionStorage>;
+  localCredentials: ReturnType<typeof useLocalCredentials>;
+  extensionCredentials: ReturnType<typeof useExtensionCredentials>;
 }
 
 export function provideWalletService(service: WalletService) {
@@ -20,18 +23,22 @@ export function useWalletService() {
   return inject($key) as WalletService;
 }
 
-export interface EncryptedCredentials {
+export interface EncryptedLocalCredentials {
   passwordHash: string;
   mnemonicHash: string;
+  keypairTypeHash: string;
 }
 
-function isCredentialsObject(maybeCredentials: any) {
+function isLocalCredentialsObject(maybeCredentials: any): maybeCredentials is EncryptedLocalCredentials {
   return (
+    maybeCredentials &&
     typeof maybeCredentials === "object" &&
     maybeCredentials.passwordHash &&
     typeof maybeCredentials.passwordHash === "string" &&
     maybeCredentials.mnemonicHash &&
-    typeof maybeCredentials.mnemonicHash === "string"
+    typeof maybeCredentials.mnemonicHash === "string" &&
+    maybeCredentials.keypairTypeHash &&
+    typeof maybeCredentials.keypairTypeHash === "string"
   );
 }
 
@@ -39,13 +46,13 @@ function createCryptr(password: string) {
   return new Cryptr(password, { pbkdf2Iterations: 10, saltLength: 10 });
 }
 
-export function useCredentials() {
+export function useLocalCredentials() {
   const storedCredentials = useLocalStorage($key);
 
-  const credentials = computed<EncryptedCredentials | undefined>(() => {
+  const credentials = computed<EncryptedLocalCredentials | undefined>(() => {
     try {
       const credentials = JSON.parse(storedCredentials.value || "");
-      if (isCredentialsObject(credentials)) {
+      if (isLocalCredentialsObject(credentials)) {
         return credentials;
       }
     } catch {
@@ -59,13 +66,14 @@ export function useCredentials() {
     get value() {
       return credentials.value;
     },
-    set(password: string, mnemonic: string) {
+    set(password: string, mnemonic: string, keypairType: string) {
       const cryptr = createCryptr(password);
       const mnemonicHash = cryptr.encrypt(mnemonic);
+      const keypairTypeHash = cryptr.encrypt(keypairType);
       const passwordHash = md5(password);
-      storedCredentials.value = JSON.stringify({ passwordHash, mnemonicHash });
+      storedCredentials.value = JSON.stringify({ passwordHash, mnemonicHash, keypairTypeHash });
     },
-    getMnemonic(password?: string): string | undefined {
+    get(password?: string) {
       const c = credentials.value;
 
       if (!c || !password || c.passwordHash !== md5(password)) {
@@ -74,7 +82,7 @@ export function useCredentials() {
 
       try {
         const cryptr = createCryptr(password);
-        return cryptr.decrypt(c.mnemonicHash);
+        return { mnemonic: cryptr.decrypt(c.mnemonicHash), keypairType: cryptr.decrypt(c.keypairTypeHash) };
       } catch {
         return undefined;
       }
@@ -88,6 +96,51 @@ export function useCredentials() {
       }
 
       return false;
+    },
+    remove() {
+      storedCredentials.value = undefined;
+    },
+  };
+}
+
+export interface ExtensionCredentials {
+  mnemonic: string;
+  keypairType: string;
+}
+
+function isExtensionCredentialsObject(maybeCredentials: any): maybeCredentials is ExtensionCredentials {
+  return (
+    maybeCredentials &&
+    typeof maybeCredentials === "object" &&
+    maybeCredentials.mnemonic &&
+    typeof maybeCredentials.mnemonic === "string" &&
+    maybeCredentials.keypairType &&
+    typeof maybeCredentials.keypairType === "string"
+  );
+}
+
+export function useExtensionCredentials() {
+  const storedCredentials = useSessionStorage("credentials");
+
+  const credentials = computed<ExtensionCredentials | undefined>(() => {
+    try {
+      const credentials = JSON.parse(storedCredentials.value || "");
+      if (isExtensionCredentialsObject(credentials)) {
+        return credentials;
+      }
+    } catch {
+      return undefined;
+    }
+
+    return undefined;
+  });
+
+  return {
+    get value() {
+      return credentials.value;
+    },
+    set(mnemonic: string, keypairType: string) {
+      storedCredentials.value = JSON.stringify({ mnemonic, keypairType });
     },
     remove() {
       storedCredentials.value = undefined;
