@@ -6,6 +6,7 @@ import { Client as TFClient } from "@threefold/tfchain_client";
 import {
   BaseError,
   ConnectionError,
+  InsufficientBalanceError,
   InvalidResponse,
   RMBError,
   TimeoutError,
@@ -108,8 +109,7 @@ class Client {
   async connect() {
     try {
       await Client.connectingLock.acquireAsync();
-      if (this.con) return;
-
+      if (this.con && this.con.readyState === this.con.OPEN) return;
       await this.tfclient.connect();
       await this.createSigner();
 
@@ -142,7 +142,7 @@ class Client {
         }
         const relayHostName = this.relayUrl.replace("wss://", "").replace("/", "");
         const pk = generatePublicKey(this.mnemonics);
-        if (this.twin.pk == pk || this.twin.relay !== relayHostName) {
+        if (this.twin.pk !== pk || this.twin.relay !== relayHostName) {
           await (await this.tfclient.twins.update({ pk, relay: relayHostName })).apply();
           this.twin.pk = pk;
         }
@@ -151,7 +151,7 @@ class Client {
         if (c && c.readyState == c.OPEN) {
           c.close();
         }
-        if (err instanceof TwinDoesNotExistError) throw err;
+        if (err instanceof TwinDoesNotExistError || err instanceof InsufficientBalanceError) throw err;
         if (err instanceof BaseError) {
           err.message = `Unable to establish a connection with the RMB server ${this.relayUrl.replace(
             "wss://",
