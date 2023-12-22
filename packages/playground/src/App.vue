@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <TfNavigationLoader />
+    <TfOfflineNotifier />
     <profile-manager-controller>
       <v-navigation-drawer
         width="280"
@@ -120,7 +121,7 @@
 
           <v-spacer>
             <div class="d-flex align-center justify-start">
-              <TftSwapPrice class="pr-4"></TftSwapPrice>
+              <TftSwapPrice class="pr-4" v-if="hasActiveProfile && hasGrid"></TftSwapPrice>
               <FundsCard v-if="hasActiveProfile"></FundsCard>
             </div>
           </v-spacer>
@@ -397,6 +398,7 @@ import ProfileManagerController from "./components/profile_manager_controller.vu
 import TftSwapPrice from "./components/swap_price.vue";
 import TFNotification from "./components/tf_notification.vue";
 import TfNavigationLoader from "./components/TfNavigationLoader.vue";
+import TfOfflineNotifier from "./components/TfOfflineNotifier.vue";
 import TfWalletConnector from "./components/wallet_connector/TfWalletConnector.vue";
 import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
@@ -431,6 +433,7 @@ export default {
     ProfileManagerController,
     TfNavigationLoader,
     TfWalletConnector,
+    TfOfflineNotifier,
   },
 };
 </script>
