@@ -1,6 +1,5 @@
 <template>
   <section>
-    {{ installedTask }}
     <VAlert type="info" text="TFChain Wallet Extension is not yet installed!" v-if="!installedTask.data">
       <template #append>
         <VBtn
@@ -101,8 +100,13 @@ export default {
           throw `Failed to load user profile.`;
         }
 
+        const [, e4] = await resolveAsync(walletService.login(profile));
+        if (e4) {
+          // This should never be the case
+          throw `Failed to login to your wallet`;
+        }
+
         walletService.extensionCredentials.set(loginCredentials.mnemonic, loginCredentials.keypairType);
-        walletService.login(profile);
       },
       {
         tries: 1,

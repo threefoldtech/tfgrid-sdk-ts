@@ -25,7 +25,7 @@ const useProfileManager = defineStore("profile-manager", {
   actions: {
     set(profile: Profile | null) {
       this.profile = profile;
-      useGrid().set(profile);
+      return useGrid().set(profile);
     },
     updateSSH(ssh: string) {
       if (this.profile) {

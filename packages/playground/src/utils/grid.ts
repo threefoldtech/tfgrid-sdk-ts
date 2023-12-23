@@ -92,13 +92,13 @@ export async function loadBalance(grid: GridClient): Promise<Balance> {
 
 export async function loadProfile(grid: GridClient): Promise<Profile> {
   return {
-    mnemonic: grid.clientOptions!.mnemonic,
+    mnemonic: grid._mnemonic,
     ssh: await readSSH(grid),
-    twinId: grid!.twinId,
+    twinId: grid.twinId,
     address: grid.tfclient.address,
     relay: grid.getDefaultUrls(network).relay.slice(6),
-    pk: (await grid.twins.get({ id: grid!.twinId })).pk,
-    keypairType: grid.clientOptions!.keypairType,
+    pk: (await grid.twins.get({ id: grid.twinId })).pk,
+    keypairType: grid.clientOptions.keypairType,
   };
 }
 

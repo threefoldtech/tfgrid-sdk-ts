@@ -14,7 +14,7 @@ export interface WalletService {
   passwordStorage: ReturnType<typeof useSessionStorage>;
   localCredentials: ReturnType<typeof useLocalCredentials>;
   extensionCredentials: ReturnType<typeof useExtensionCredentials>;
-  login(profile: Profile): void;
+  login(profile: Profile): Promise<void>;
   logout(): void;
 }
 

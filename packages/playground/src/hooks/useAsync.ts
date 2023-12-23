@@ -2,59 +2,63 @@ import noop from "lodash/fp/noop.js";
 import { computed, type ComputedRef, onMounted, type Ref, ref } from "vue";
 
 export type AsyncTask<T, A extends any[]> = (...args: A) => Promise<T>;
-export interface TaskResult<T, E, A extends any[]> {
+export interface TaskResult<T, E, A extends any[], M = T> {
   run(...args: A): Promise<void>;
   loading: boolean;
-  data: T | null;
+  data: M | null;
   error: E | null;
   initialized: boolean;
   reset(): void;
   startPolling(): void;
   stopPolling(): void;
+  isPolling: boolean;
 }
 
-export type UseAsyncReturn<T, E, A extends any[]> = ComputedRef<TaskResult<T, E, A>>;
+export type UseAsyncReturn<T, E, A extends any[], M = T> = ComputedRef<TaskResult<T, E, A, M>>;
 
-export type AsyncTaskOptions<T, E, A extends any[]> = {
+export type AsyncTaskOptions<T, E, A extends any[], M = T> = {
   init?: boolean;
   defaultArgs?: A;
-  default?: T;
-  onAfterTask?(task: TaskResult<T, E, A>, beforeTaskReturn: any): any;
+  default?: M;
+  onAfterTask?(task: TaskResult<T, E, A, M>, beforeTaskReturn: any): any;
   onBeforeTask?(): any;
   onReset?(): any;
   shouldRun?(): boolean | Promise<boolean>;
   tries?: number;
   pollingTime?: number;
+  map?(data: T): M;
 };
 
-function normalizeOptions<T, E, A extends any[]>(
-  options: AsyncTaskOptions<T, E, A> = {},
-): Required<AsyncTaskOptions<T, E, A>> {
+function normalizeOptions<T, E, A extends any[], M = T>(
+  options: AsyncTaskOptions<T, E, A, M> = {},
+): Required<AsyncTaskOptions<T, E, A, M>> {
   return {
     init: options.init ?? false,
     defaultArgs: options.defaultArgs ?? ([] as unknown as A),
-    default: options.default || (null as T),
+    default: options.default || (null as M),
     onAfterTask: options.onAfterTask || noop,
     onBeforeTask: options.onBeforeTask || noop,
     onReset: options.onReset || noop,
     shouldRun: options.shouldRun || (() => true),
     tries: typeof options.tries !== "number" ? 3 : Math.max(1, options.tries),
     pollingTime: options.pollingTime || 0,
+    map: options.map || (d => d as unknown as M),
   };
 }
 
 /* Tries, debounce */
 
-export function useAsync<T, E = Error, A extends any[] = []>(
+export function useAsync<T, E = Error, A extends any[] = [], M = T>(
   task: AsyncTask<T, A>,
-  options?: AsyncTaskOptions<T, E, A>,
-): UseAsyncReturn<T, E, A> {
+  options?: AsyncTaskOptions<T, E, A, M>,
+): UseAsyncReturn<T, E, A, M> {
   const _options = normalizeOptions(options);
 
-  const data = ref(_options.default) as Ref<T | null>;
+  const data = ref(_options.default) as Ref<M | null>;
   const error = ref(null) as Ref<E | null>;
   const loading = ref(false) as Ref<boolean>;
   const initialized = ref(false) as Ref<boolean>;
+  const polling = ref<ReturnType<typeof setInterval>>();
 
   let taskIdCounter = 0;
 
@@ -62,7 +66,7 @@ export function useAsync<T, E = Error, A extends any[] = []>(
     const init = initialized.value;
     const isLoading = loading.value;
 
-    return {
+    const task: TaskResult<T, E, A, M> = {
       run,
       data: init && !isLoading ? data.value : _options.default,
       error: init && !isLoading ? error.value : null,
@@ -71,10 +75,11 @@ export function useAsync<T, E = Error, A extends any[] = []>(
       reset,
       startPolling,
       stopPolling,
+      isPolling: init && polling.value ? !!polling.value : false,
     };
-  });
 
-  let _polling: ReturnType<typeof setInterval> | undefined;
+    return task;
+  });
 
   function _assertPollingTime() {
     if (!_options.pollingTime) {
@@ -84,17 +89,17 @@ export function useAsync<T, E = Error, A extends any[] = []>(
 
   function startPolling() {
     _assertPollingTime();
-    if (!_polling) {
+    if (!polling.value) {
       run(..._options.defaultArgs);
-      _polling = setInterval(() => run(..._options.defaultArgs), _options.pollingTime);
+      polling.value = setInterval(() => run(..._options.defaultArgs), _options.pollingTime);
     }
   }
 
   function stopPolling() {
     _assertPollingTime();
-    if (_polling) {
-      clearInterval(_polling);
-      _polling = undefined;
+    if (polling.value) {
+      clearInterval(polling.value);
+      polling.value = undefined;
     }
   }
 
@@ -129,7 +134,7 @@ export function useAsync<T, E = Error, A extends any[] = []>(
     try {
       const res = await task(...args);
       if (taskId === taskIdCounter) {
-        data.value = res;
+        data.value = _options.map(res);
         error.value = null;
       }
       return true;
@@ -153,7 +158,7 @@ export function useAsync<T, E = Error, A extends any[] = []>(
   if (_options.init) {
     onMounted(() => run(..._options.defaultArgs));
     if (_options.pollingTime) {
-      _polling = setInterval(() => run(..._options.defaultArgs), _options.pollingTime);
+      polling.value = setInterval(() => run(..._options.defaultArgs), _options.pollingTime);
     }
   }
 
