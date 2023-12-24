@@ -10,12 +10,16 @@ export default function toTeraOrGiga(value?: string) {
 
   let gb = val / giga;
 
-  if (gb < 1024) return `${gb.toFixed(2)} GB`;
+  if (gb < 1024) return `${toDecimalTwo(gb)} GB`;
 
   gb = gb / 1024;
 
-  if (gb < 1024) return `${gb.toFixed(2)} TB`;
+  if (gb < 1024) return `${toDecimalTwo(gb)} TB`;
 
   gb = gb / 1024;
-  return `${gb.toFixed(2)} PB`;
+  return `${toDecimalTwo(gb)} PB`;
+}
+
+function toDecimalTwo(val: number) {
+  return Math.floor(val * 100) / 100;
 }
