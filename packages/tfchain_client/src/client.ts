@@ -365,7 +365,6 @@ class Client extends QueryClient {
           resultSections.length > 0
         )
           section = resultSections[0];
-        //TODO no need to do the following lines only check if the error is instanceof base error and edit the message
         const errorName = TFChainErrors[section].Errors[+e];
         if (errorName) {
           throw new TFChainErrors[section][errorName](`Failed to apply ${JSON.stringify(extrinsic.method.toHuman())}`);
