@@ -178,7 +178,7 @@
                   <v-select
                     :items="userFarms"
                     :item-title="item => `${item.name}`"
-                    :item-value="item => item.farmID"
+                    :item-value="item => item.farmId"
                     label="Select a farm"
                     v-model="selectedFarm"
                     v-bind="props"
@@ -246,9 +246,10 @@ import type moment from "moment";
 import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
+import { gridProxyClient } from "@/clients";
+
 import { useProfileManager } from "../stores";
 import type { FarmInterface } from "../types";
-import { getFarms } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
 
 const loadingProposals = ref(true);
@@ -280,8 +281,11 @@ onMounted(async () => {
     proposals.value = await grid?.dao.get();
     activeProposals.value = proposals.value.active.filter(proposal => proposal.hash);
     inactiveProposals.value = proposals.value.inactive.filter(proposal => proposal.hash);
+    const { data } = await gridProxyClient.farms.list({
+      twinId: profile.value.twinId,
+    });
+    userFarms.value = data as unknown as FarmInterface[];
 
-    userFarms.value = await getFarms(grid, { ownedBy: profile.value.twinId }, {});
     loadingProposals.value = false;
   }
 });

@@ -92,11 +92,12 @@
 import { generatePublicKey } from "@threefold/rmb_direct_client";
 import { onMounted, ref } from "vue";
 
+import { gridProxyClient } from "@/clients";
+
 import router from "../router";
 import { useProfileManager } from "../stores";
 import type { FarmInterface } from "../types";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
-import { getFarms } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
 const profileManager = useProfileManager();
 
@@ -116,7 +117,10 @@ onMounted(async () => {
 
     return;
   }
-  userFarms.value = await getFarms(grid, { ownedBy: profile.twinId }, {});
+  const { data } = await gridProxyClient.farms.list({
+    twinId: profile.twinId,
+  });
+  userFarms.value = data as unknown as FarmInterface[];
   if (!userFarms.value.length) {
     return;
   }
