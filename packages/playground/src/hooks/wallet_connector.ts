@@ -20,6 +20,7 @@ export interface WalletService {
   login(profile: Profile): Promise<void>;
   logout(): void;
   locked: Ref<boolean>;
+  activeTab: Ref<number>;
 }
 
 export function provideWalletService(service: WalletService) {

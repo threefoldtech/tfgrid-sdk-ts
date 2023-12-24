@@ -1,11 +1,15 @@
 <template>
-  <VTabs v-model="activeTab" align-tabs="center" color="primary" class="mb-6">
-    <VTab text="Login" />
+  <p class="font-weight-bold mb-4">Login With TFChain Wallet Extension</p>
+  <ExtensionLogin />
+  <TextDivider text="OR" />
+
+  <VTabs v-model="walletService.activeTab.value" align-tabs="center" color="primary" class="mb-6" mandatory>
+    <VTab text="Login" v-if="walletService.localCredentials.value" />
     <VTab text="Connect Your Wallet" />
   </VTabs>
 
-  <VWindow v-model="activeTab">
-    <VWindowItem>
+  <VWindow v-model="walletService.activeTab.value">
+    <VWindowItem v-if="walletService.localCredentials.value">
       <WalletLogin />
     </VWindowItem>
 
@@ -16,18 +20,19 @@
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
-
+import { useWalletService } from "../../../hooks/wallet_connector";
+import ExtensionLogin from "./ExtensionLogin.vue";
+import TextDivider from "./TextDivider.vue";
 import WalletLogin from "./WalletLogin.vue";
 import WalletRegister from "./WalletRegister.vue";
 
 export default {
   name: "WalletContainer",
-  components: { WalletLogin, WalletRegister },
+  components: { WalletLogin, WalletRegister, TextDivider, ExtensionLogin },
   setup() {
-    const activeTab = ref(0);
+    const walletService = useWalletService();
 
-    return { activeTab };
+    return { walletService };
   },
 };
 </script>

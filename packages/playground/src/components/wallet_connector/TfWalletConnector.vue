@@ -85,9 +85,11 @@ export default {
       passwordStorage.remove();
       balanceTask.value.stopPolling();
       balance.value = { free: "0", frozen: "0" };
+      activeTab.value = 0;
     }
 
     const locked = ref(false);
+    const activeTab = ref(0);
 
     provideWalletService({
       $key,
@@ -100,6 +102,7 @@ export default {
       },
       logout,
       locked,
+      activeTab,
     });
 
     return { gridStore, profileManager, active, logout, balanceTask, balance };

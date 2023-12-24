@@ -41,21 +41,6 @@
         </VRow>
       </VContainer>
     </VForm>
-
-    <div class="position-relative my-6">
-      <VDivider />
-      <span
-        class="position-absolute px-2 bg-surface"
-        :style="{
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-        }"
-        v-text="'OR'"
-      />
-    </div>
-
-    <ExtensionLogin />
   </section>
 </template>
 
@@ -64,11 +49,9 @@ import { onMounted, ref } from "vue";
 
 import { useAsync } from "../../../hooks";
 import { connectAndLoginProfile, useWalletService } from "../../../hooks/wallet_connector";
-import ExtensionLogin from "./ExtensionLogin.vue";
 
 export default {
   name: "WalletLogin",
-  components: { ExtensionLogin },
   setup() {
     const walletService = useWalletService();
     const password = ref("");
