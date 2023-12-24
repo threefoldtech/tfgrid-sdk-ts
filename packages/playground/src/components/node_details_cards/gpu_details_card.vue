@@ -61,7 +61,7 @@ export default {
     },
     nodeOptions: {
       type: Object as PropType<GridProxyRequestConfig>,
-      required: true,
+      required: false,
     },
   },
 
@@ -101,16 +101,15 @@ export default {
     onMounted(mount);
 
     async function RerequestNode() {
-      nodeOptions.value.loadGpu = true;
       errorMessage.value = "";
       isError.value = false;
-      if (node.value.nodeId > 0) {
+      if (node.value.nodeId > 0 && nodeOptions.value) {
+        nodeOptions.value.loadGpu = true;
         try {
           loading.value = true;
 
           const _node: GridNode = await getNode(node.value.nodeId, nodeOptions.value);
           node.value = _node;
-          // console.log("node", node.value);
           mount();
         } catch (_) {
           isError.value = true;
