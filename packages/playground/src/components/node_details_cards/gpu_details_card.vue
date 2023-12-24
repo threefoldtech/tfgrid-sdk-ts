@@ -31,7 +31,7 @@
             <p class="mt-4 mb-4 font-weight-bold text-error">
               {{ errorMessage }}
             </p>
-            <!-- <v-btn class="mr-4" @click="requestNode" color="primary" text="Try Again" /> -->
+            <v-btn class="mr-4" @click="RerequestNode" color="primary" text="Try Again" />
           </div>
         </v-card>
       </div>
@@ -45,7 +45,9 @@ import { onMounted, type PropType, ref } from "vue";
 import { watch } from "vue";
 
 import type { NodeDetailsCard } from "@/types";
+import type { GridProxyRequestConfig } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import { getNode } from "@/utils/get_nodes";
 
 import CardDetails from "./card_details.vue";
 
@@ -57,6 +59,10 @@ export default {
       type: Object as PropType<GridNode>,
       required: true,
     },
+    nodeOptions: {
+      type: Object as PropType<GridProxyRequestConfig>,
+      required: true,
+    },
   },
 
   setup(props) {
@@ -66,32 +72,54 @@ export default {
     const cardId = ref<string>("");
     const selectedCard = ref<GPUCard>(props.node.cards[0]);
     const isError = ref<boolean>(false);
-    const errorMessage = ref("");
+    const errorMessage = ref<string>("");
+    const node = ref(props.node);
+    const nodeOptions = ref(props.nodeOptions);
 
     watch(cardId, newCardId => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      selectedCard.value = props.node.cards.find(card => card.id === newCardId)!;
+      selectedCard.value = node.value.cards.find(card => card.id === newCardId)!;
       gpuFields.value = getNodeTwinDetailsCard();
     });
 
     const mount = () => {
       loading.value = true;
-      if (props.node.cards?.length > 0) {
-        selectedCard.value = props.node.cards[0];
-        props.node.cards.map((card: GPUCard) => {
+      if (node.value.cards?.length > 0) {
+        selectedCard.value = node.value.cards[0];
+        node.value.cards.map((card: GPUCard) => {
           cardsIds.value.push(card.id);
         });
         cardId.value = cardsIds.value[0];
         gpuFields.value = getNodeTwinDetailsCard();
       } else {
         isError.value = true;
-        errorMessage.value = `Failed to load node with ID ${props.node.nodeId}. The node might be offline or unresponsive. You can try requesting it again.`;
+        errorMessage.value = `Failed to load node with ID ${node.value.nodeId}. The node might be offline or unresponsive. You can try requesting it again.`;
       }
       loading.value = false;
     };
 
     onMounted(mount);
 
+    async function RerequestNode() {
+      nodeOptions.value.loadGpu = true;
+      errorMessage.value = "";
+      isError.value = false;
+      if (node.value.nodeId > 0) {
+        try {
+          loading.value = true;
+
+          const _node: GridNode = await getNode(node.value.nodeId, nodeOptions.value);
+          node.value = _node;
+          // console.log("node", node.value);
+          mount();
+        } catch (_) {
+          isError.value = true;
+          errorMessage.value = `Failed to load node with ID ${node.value.nodeId}. The node might be offline or unresponsive. You can try requesting it again.`;
+        } finally {
+          loading.value = false;
+        }
+      }
+    }
     const copy = (value: string) => {
       navigator.clipboard.writeText(value);
       createCustomToast("Copied!", ToastType.success);
@@ -125,6 +153,7 @@ export default {
       isError,
       errorMessage,
       copy,
+      RerequestNode,
     };
   },
 };

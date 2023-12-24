@@ -53,7 +53,7 @@
             <interfaces-details-card :node="node" />
           </v-col>
           <v-col v-if="node.cards?.length || node.num_gpu > 0" cols="12" md="6" sm="8">
-            <gpu-details-card :node="node" />
+            <gpu-details-card :node="node" :nodeOptions="nodeOptions" />
           </v-col>
           <v-col v-if="node.publicConfig && node.publicConfig.domain" cols="12" md="6" sm="8">
             <public-config-details-card :node="node" />
@@ -190,6 +190,7 @@ export default {
       errorMessage,
       isLiveStats,
       errorLoadingStatsMessage,
+      nodeOptions,
       requestNode,
       closeDialog,
       getNodeStatusColor,
