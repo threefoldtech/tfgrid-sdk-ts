@@ -5,7 +5,7 @@
  */
 export default function formatResourceSize(sizeInBytes?: number): string {
   if (sizeInBytes === undefined || sizeInBytes === null || isNaN(sizeInBytes) || sizeInBytes === 0) {
-    return "0 Bytes";
+    return "0";
   }
 
   const giga = 1024 ** 3; // One gigabyte in bytes

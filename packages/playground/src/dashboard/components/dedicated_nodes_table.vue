@@ -103,10 +103,10 @@ import { VDataTableServer } from "vuetify/labs/VDataTable";
 
 import { gridProxyClient } from "@/clients";
 import { useProfileManager } from "@/stores";
+import formatResourceSize from "@/utils/format_resource_size";
 import { convert } from "@/utils/get_nodes";
 import { getGrid } from "@/utils/grid";
 import { toGigaBytes } from "@/utils/helpers";
-import toTeraOrGigaOrPeta from "@/utils/toTeraOrGegaOrPeta";
 
 const headers: VDataTable["headers"] = [
   { title: "Node ID", key: "nodeId", sortable: false },
@@ -115,19 +115,19 @@ const headers: VDataTable["headers"] = [
   {
     title: "RAM",
     key: "total_resources.mru",
-    value: item => toTeraOrGigaOrPeta(item.total_resources.mru),
+    value: item => formatResourceSize(item.total_resources.mru),
     sortable: false,
   },
   {
     title: "SSD",
     key: "total_resources.sru",
-    value: item => toTeraOrGigaOrPeta(item.total_resources.sru),
+    value: item => formatResourceSize(item.total_resources.sru),
     sortable: false,
   },
   {
     title: "HDD",
     key: "total_resources.hru",
-    value: item => toTeraOrGigaOrPeta(item.total_resources.hru),
+    value: item => formatResourceSize(item.total_resources.hru),
     sortable: false,
   },
   { title: "GPU", key: "num_gpu", sortable: false },
