@@ -76,7 +76,11 @@ class QueryClient {
   async newProvider() {
     try {
       await QueryClient.connectingLock.acquireAsync();
-      await this.disconnect.bind(this)();
+      if (QueryClient.connections.has(this.url)) {
+        this.api = QueryClient.connections.get(this.url)!.api;
+        if (this.api && this.api.isConnected) return;
+      }
+      await this.disconnect();
 
       const provider = new WsProvider(this.url);
       this.api = await ApiPromise.create({ provider });
