@@ -179,7 +179,7 @@ onMounted(async () => {
 });
 
 function convert(value: string | undefined) {
-  return value ? Math.floor(toBytes(+value)) : undefined;
+  return value ? Math.ceil(toBytes(+value)) : undefined;
 }
 
 const _loadData = async () => {
@@ -192,6 +192,14 @@ const _loadData = async () => {
   loading.value = true;
   isFormLoading.value = true;
   try {
+    const totalCruValue = filterInputs.value.total_cru.value;
+    if (totalCruValue !== undefined && !Number.isInteger(+totalCruValue)) {
+      loading.value = false;
+      nodes.value = [];
+      nodesCount.value = 0;
+      isFormLoading.value = false;
+      return;
+    }
     const data = await gridProxyClient.nodes.list({
       ...params,
       size: pageSize.value,
@@ -199,7 +207,7 @@ const _loadData = async () => {
       totalSru: convert(filterInputs.value.total_sru.value),
       totalMru: convert(filterInputs.value.total_mru.value),
       totalHru: convert(filterInputs.value.total_hru.value),
-      totalCru: filterInputs.value.total_cru.value ? +filterInputs.value.total_cru.value : undefined,
+      totalCru: totalCruValue ? +totalCruValue : undefined,
       gpuVendorName: filterInputs.value.gpu_vendor_name.value || "",
       gpuDeviceName: filterInputs.value.gpu_device_name.value || "",
       hasGpu: gpuFilter.value,
@@ -285,7 +293,6 @@ async function reloadTable() {
 import { debounce } from "lodash";
 
 import Filters from "@/components/filter.vue";
-import type { FilterInputs } from "@/types";
 import { type DedicatedNodeFilters, DedicatedNodeInitializer } from "@/utils/filter_nodes";
 
 import NodeDetails from "./node_details.vue";

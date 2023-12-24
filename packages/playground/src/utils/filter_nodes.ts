@@ -126,7 +126,7 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
     type: "text",
     rules: [
       [
-        isNumeric("This Field accepts only a valid number."),
+        isInt("This Field accepts only a valid number."),
         min("This Field must be a number larger than 0.", 1),
         validateResourceMaxNumber("This value is out of range."),
       ],

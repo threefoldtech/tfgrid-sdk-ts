@@ -3,7 +3,6 @@ import { capitalize } from "vue";
 import type { VDataTable } from "vuetify/lib/labs/components";
 
 import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
-import type { INode } from "@/utils/filter_nodes";
 
 import type * as validators from "../utils/validators";
 // Input attrs

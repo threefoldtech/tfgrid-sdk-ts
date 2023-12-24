@@ -4,8 +4,6 @@ import type { IsEmailOptions } from "validator/lib/isEmail";
 import type { IsFQDNOptions } from "validator/lib/isFQDN";
 import type { IsURLOptions } from "validator/lib/isURL";
 
-import { toBytes } from "@/utils/get_nodes";
-
 export function required(msg: string) {
   return (value: string) => {
     if (value === "" || value === undefined || value === null) {
