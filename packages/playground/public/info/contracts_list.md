@@ -12,6 +12,3 @@ To explore further contract details, check [Node Contract Documentation](https:/
 - The Billing Rate: How much the contract costs you per hour
 - Solution type and name if the contract creator provided them
 - Full details about the contracts as well in JSON format
-
-<br />
-<br />
