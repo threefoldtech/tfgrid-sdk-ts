@@ -34,6 +34,7 @@
           :persistent-hint="(mnemonic && !validateMnemonicTask.initialized) || validateMnemonicTask.loading"
           :loading="validateMnemonicTask.loading"
           v-model="mnemonic"
+          autofocus
         >
           <template #append>
             <VSelect

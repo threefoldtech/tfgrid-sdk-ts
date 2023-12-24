@@ -65,7 +65,7 @@ export default {
 
     const loadingMessage = ref(_defaultLoadingMsg);
 
-    const installedTask = useAsync(() => ThreefoldWalletConnectorApi.isInstalled() as Promise<boolean>, { init: true });
+    const installedTask = useAsync(ThreefoldWalletConnectorApi.isInstalled, { init: true });
     const loginTask = useAsync<void, string, [mnemonic?: string, keypairType?: string]>(
       async (mnemonic, keypairType) => {
         type LoginCredentials = { mnemonic: string; keypairType: KeypairType };
@@ -88,10 +88,10 @@ export default {
           loginCredentials = account as LoginCredentials;
         }
 
-        loadingMessage.value = `Instantiating a connection to chain...`;
+        loadingMessage.value = `Instantiating connection to chain...`;
         const [grid, e2] = await resolveAsync(getGrid(loginCredentials));
         if (!grid || e2) {
-          throw `Failed to instantiate a connection to chain.`;
+          throw `Failed to instantiate connection to chain.`;
         }
 
         loadingMessage.value = `Loading your wallet information...`;
