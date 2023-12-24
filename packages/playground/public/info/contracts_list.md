@@ -8,7 +8,14 @@ For more details about Contract Types, Billing Cycle & Grace Period, check [Cont
 To explore further contract details, check [Node Contract Documentation](https://manual.grid.tf/playground/contracts_list.html)
 <br />
 
-- Contract State: Created, GracePeriod (and also know how many tokens are needed to fund contracts in graceperiod to resume your workloads), and the expiration date of these contracts
-- The Billing Rate: How much the contract costs you per hour
-- Solution type and name if the contract creator provided them
-- Full details about the contracts as well in JSON format
+- Contract State provides you with the following information:
+
+  - An indicator of whether the contract is created or in the grace period
+  - The number of tokens needed to fund contracts in the grace period to resume the workload
+  - Contract expiration date
+
+  <br />
+
+- The Billing Rate: The Billing Rate (i.e contract cost per hour)
+- Solution type and name (if provided by contract creator)
+- Full contracts details in JSON format
