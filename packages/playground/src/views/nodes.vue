@@ -64,6 +64,7 @@
                           label="Select Nodes Status"
                           variant="underlined"
                           :disabled="isFormLoading"
+                          @update:model-value="statusReset"
                           open-on-clear
                           clearable
                         ></v-select>
@@ -190,7 +191,14 @@ export default {
         size: 10,
       };
     };
+    const statusReset = (status: NodeStatus) => {
+      const options = mixedFilters.value.options;
+      options.page = 1;
+      options.size = 10;
+      // reset filters
 
+      filterInputs.value = inputsInitializer();
+    };
     const checkSelectedNode = async () => {
       if (route.query.nodeId) {
         selectedNodeId.value = +route.query.nodeId;
@@ -227,6 +235,7 @@ export default {
       selectedNodeId,
       selectedNodeoptions,
       nodeStatusOptions,
+      statusReset,
 
       filterInputs,
       filterOptions,
