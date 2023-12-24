@@ -11,11 +11,9 @@
         <template v-else>
           <p class="font-weight-bold" v-text="'Loading...'" v-if="balanceTask.loading" />
           <div v-else class="text-left">
-            <p class="mb-1">
-              Balance: <span class="font-weight-bold text-secondary" v-text="balanceTask.data!.free + 'TFT'" />
-            </p>
+            <p class="mb-1">Balance: <span class="font-weight-bold text-secondary" v-text="balance.free + 'TFT'" /></p>
             <p class="d-flex align-center">
-              Locked: <span class="font-weight-bold text-secondary ml-2" v-text="balanceTask.data!.frozen + 'TFT'" />
+              Locked: <span class="font-weight-bold text-secondary ml-2" v-text="balance.frozen + 'TFT'" />
               <VBtn
                 :style="{ height: '24px', width: '24px' }"
                 icon="mdi-information-outline"
@@ -66,13 +64,18 @@ export default {
     const localCredentials = useLocalCredentials();
     const passwordStorage = useSessionStorage("password");
 
+    const balance = ref({ free: "0", frozen: "0" });
     const balanceTask = useAsync(
       () => new Promise(res => setTimeout(res, 1000)).then(() => gridStore.client.balance.getMyBalance()),
       {
         shouldRun: () => !!gridStore.client,
         pollingTime: 60_000,
-        default: { free: "0", frozen: "0" },
         map: d => ({ free: normalizeBalance(d.free, true), frozen: normalizeBalance(d.frozen, true) }),
+        onAfterTask({ data }) {
+          if (data) {
+            balance.value = data;
+          }
+        },
       },
     );
 
@@ -81,6 +84,7 @@ export default {
       extensionCredentials.remove();
       passwordStorage.remove();
       balanceTask.value.stopPolling();
+      balance.value = { free: "0", frozen: "0" };
     }
 
     const locked = ref(false);
@@ -98,7 +102,7 @@ export default {
       locked,
     });
 
-    return { gridStore, profileManager, active, logout, balanceTask };
+    return { gridStore, profileManager, active, logout, balanceTask, balance };
   },
 };
 </script>

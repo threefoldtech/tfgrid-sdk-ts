@@ -134,7 +134,7 @@ export function useExtensionCredentials() {
 
   const credentials = computed<ExtensionCredentials | undefined>(() => {
     try {
-      const credentials = JSON.parse(storedCredentials.value || "");
+      const credentials = JSON.parse(atob(storedCredentials.value || ""));
       if (isExtensionCredentialsObject(credentials)) {
         return credentials;
       }
@@ -150,7 +150,7 @@ export function useExtensionCredentials() {
       return credentials.value;
     },
     set(mnemonic: string, keypairType: string) {
-      storedCredentials.value = JSON.stringify({ mnemonic, keypairType });
+      storedCredentials.value = btoa(JSON.stringify({ mnemonic, keypairType }));
     },
     remove() {
       storedCredentials.value = undefined;
