@@ -7,7 +7,7 @@
       class="mb-6"
     />
 
-    <VForm v-model="valid" @submit.prevent="login">
+    <VForm v-model="valid" @submit.prevent="loginTask.run(password)" :disabled="walletService.locked.value">
       <PasswordInputWrapper #="{ props }">
         <VTextField
           label="Password"
@@ -16,6 +16,8 @@
           v-bind="props"
           v-model.trim="password"
           autofocus
+          :error="!!loginTask.error"
+          :error-messages="loginTask.error ?? undefined"
         />
       </PasswordInputWrapper>
 
@@ -28,7 +30,14 @@
             @click="walletService.active.value = false"
             text="Close"
           />
-          <VBtn type="submit" variant="tonal" color="primary" :disabled="!valid" text="Login" />
+          <VBtn
+            type="submit"
+            variant="tonal"
+            color="primary"
+            :disabled="!valid || (walletService.locked.value && !loginTask.loading)"
+            text="Login"
+            :loading="loginTask.loading"
+          />
         </VRow>
       </VContainer>
     </VForm>
@@ -53,7 +62,8 @@
 <script lang="ts">
 import { onMounted, ref } from "vue";
 
-import { useWalletService } from "../../../hooks/wallet_connector";
+import { useAsync } from "../../../hooks";
+import { connectAndLoginProfile, useWalletService } from "../../../hooks/wallet_connector";
 import ExtensionLogin from "./ExtensionLogin.vue";
 
 export default {
@@ -81,27 +91,39 @@ export default {
 
     onMounted(() => {
       password.value = walletService.passwordStorage.value || "";
-      password.value && login();
+      password.value && loginTask.value.run(password.value);
     });
 
-    function login() {
-      const c = walletService.localCredentials.get(password.value);
+    const loginTask = useAsync<void, string, [string]>(
+      async (password: string) => {
+        const credentials = walletService.localCredentials.get(password);
 
-      if (!c) {
-        return console.log("Something went wrong - this case should be impossible");
-      }
+        // this should never happen
+        if (!credentials || !credentials.mnemonic || !credentials.keypairType) {
+          throw `Credentials isn't valid.`;
+        }
 
-      // Login here
-      console.log("login", c);
-      walletService.passwordStorage.value = password.value;
-    }
+        await connectAndLoginProfile(walletService, credentials.mnemonic, credentials.keypairType);
+
+        walletService.passwordStorage.value = password;
+      },
+      {
+        onBeforeTask: () => (walletService.locked.value = true),
+        onAfterTask({ error }) {
+          walletService.locked.value = false;
+          if (error) {
+            setTimeout(() => loginTask.value.initialized && loginTask.value.reset(), 5_000);
+          }
+        },
+      },
+    );
 
     return {
       walletService,
       valid,
       validatePassword,
       password,
-      login,
+      loginTask,
     };
   },
 };

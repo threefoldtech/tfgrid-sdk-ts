@@ -38,9 +38,16 @@
 
       <VContainer>
         <VRow no-gutters>
-          <VCol cols="6" v-for="(app, index) in apps" :key="app">
-            <div role="button" :class="{ 'pr-1': index === 0, 'pl-1': 'index === 1' }">
-              <VImg :src="app" width="100%" :alt="index === 0 ? 'play-store' : 'apple-store'" />
+          <VCol cols="6" v-for="(app, index) in apps" :key="app.url">
+            <div :class="{ 'pr-1': index === 0, 'pl-1': 'index === 1' }">
+              <VImg
+                v-ripple
+                :src="app.img"
+                width="100%"
+                :alt="index === 0 ? 'play-store' : 'apple-store'"
+                role="button"
+                @click="visitUrl(app.url)"
+              />
             </div>
           </VCol>
         </VRow>
@@ -78,7 +85,16 @@ export default {
   setup() {
     const walletService = useWalletService();
 
-    return { walletService, bridge, apps: [android, ios] };
+    const apps = [
+      { img: android, url: "https://play.google.com/store/apps/details?id=org.jimber.threebotlogin&hl=en&gl=US" },
+      { img: ios, url: "https://apps.apple.com/us/app/threefold-connect/id1459845885" },
+    ];
+
+    function visitUrl(url: string): void {
+      window.open(url, "_blank");
+    }
+
+    return { walletService, bridge, apps, visitUrl };
   },
 };
 </script>

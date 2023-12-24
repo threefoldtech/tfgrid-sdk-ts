@@ -22,6 +22,7 @@
         variant="tonal"
         @click="loginTask.run()"
         :loading="loginTask.loading"
+        :disabled="walletService.locked.value && !loginTask.loading"
       >
         <template #loader>
           <VRow justify="center" align="center">
@@ -52,8 +53,7 @@ import { onMounted, ref } from "vue";
 
 import { network } from "../../../clients";
 import { useAsync } from "../../../hooks";
-import { useWalletService } from "../../../hooks/wallet_connector";
-import { getGrid, loadProfile } from "../../../utils/grid";
+import { connectAndLoginProfile, useWalletService } from "../../../hooks/wallet_connector";
 import { resolveAsync } from "../../../utils/nodeSelector";
 
 const _defaultLoadingMsg = "Loading...";
@@ -88,29 +88,17 @@ export default {
           loginCredentials = account as LoginCredentials;
         }
 
-        loadingMessage.value = `Instantiating connection to chain...`;
-        const [grid, e2] = await resolveAsync(getGrid(loginCredentials));
-        if (!grid || e2) {
-          throw `Failed to instantiate connection to chain.`;
-        }
-
         loadingMessage.value = `Loading your wallet information...`;
-        const [profile, e3] = await resolveAsync(loadProfile(grid));
-        if (!profile || e3) {
-          throw `Failed to load user profile.`;
-        }
-
-        const [, e4] = await resolveAsync(walletService.login(profile));
-        if (e4) {
-          // This should never be the case
-          throw `Failed to login to your wallet`;
-        }
+        await connectAndLoginProfile(walletService, loginCredentials.mnemonic, loginCredentials.keypairType);
 
         walletService.extensionCredentials.set(loginCredentials.mnemonic, loginCredentials.keypairType);
       },
       {
         tries: 1,
+        onBeforeTask: () => (walletService.locked.value = true),
         onAfterTask({ error }) {
+          walletService.locked.value = false;
+
           error && setTimeout(resetLoginTask, 5_000);
           loadingMessage.value = _defaultLoadingMsg;
         },
@@ -126,7 +114,7 @@ export default {
       c && loginTask.value.run(c.mnemonic, c.keypairType);
     });
 
-    return { installedTask, loginTask, loadingMessage, resetLoginTask };
+    return { walletService, installedTask, loginTask, loadingMessage, resetLoginTask };
   },
 };
 </script>

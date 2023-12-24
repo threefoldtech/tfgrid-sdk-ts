@@ -14,7 +14,11 @@
       />
     </VFadeTransition>
 
-    <VForm v-model="formValid">
+    <VForm
+      v-model="formValid"
+      @submit.prevent="connectTask.run(mnemonic, keypairType)"
+      :disabled="walletService.locked.value"
+    >
       <PasswordInputWrapper #="{ props }">
         <VTextField
           ref="mnemonicInput"
@@ -59,14 +63,15 @@
             variant="tonal"
             color="primary"
             class="mr-2"
-            :disabled="!(validateMnemonicTask.error === noTwinFoundError)"
+            :disabled="!(validateMnemonicTask.error === noTwinFoundError) || walletService.locked.value"
           />
+
           <VBtn
             type="button"
             text="Create Account"
             variant="tonal"
             color="secondary"
-            :disabled="keypairType === KeypairType.ed25519 || !!mnemonic"
+            :disabled="keypairType === KeypairType.ed25519 || !!mnemonic || walletService.locked.value"
           />
         </VRow>
       </VContainer>
@@ -103,6 +108,15 @@
 
       <VAlert type="warning" text="Using different keypair types will lead to a completely different account." />
 
+      <VAlert
+        type="error"
+        v-if="connectTask.error"
+        :text="connectTask.error"
+        class="mt-4"
+        closable
+        @click:close="connectTask.reset"
+      />
+
       <VContainer class="mt-4">
         <VRow justify="center">
           <VBtn
@@ -112,7 +126,14 @@
             @click="walletService.active.value = false"
             text="Close"
           />
-          <VBtn type="submit" variant="tonal" color="primary" :disabled="!valid" text="Connect" />
+          <VBtn
+            type="submit"
+            variant="tonal"
+            color="primary"
+            :disabled="!valid || (walletService.locked.value && !connectTask.loading)"
+            text="Connect"
+            :loading="connectTask.loading"
+          />
         </VRow>
       </VContainer>
     </VForm>
@@ -128,7 +149,7 @@ import type { VTextField } from "vuetify/components/VTextField";
 
 import { network } from "../../../clients";
 import { useAsync, useWatchDeep } from "../../../hooks";
-import { useWalletService } from "../../../hooks/wallet_connector";
+import { connectAndLoginProfile, useWalletService } from "../../../hooks/wallet_connector";
 import { getGrid } from "../../../utils/grid";
 import { normalizeError } from "../../../utils/helpers";
 import { resolveAsync } from "../../../utils/nodeSelector";
@@ -183,6 +204,25 @@ export default {
     const formValid = ref(false);
     const valid = computed(() => formValid.value && validateMnemonicTask.value.data === true);
 
+    const connectTask = useAsync<void, string, [string, KeypairType]>(
+      async (mnemonic: string, keypairType: KeypairType) => {
+        await connectAndLoginProfile(walletService, mnemonic, keypairType);
+
+        walletService.localCredentials.set(password.value, mnemonic, keypairType);
+        walletService.passwordStorage.value = password.value;
+      },
+      {
+        shouldRun: () => valid.value,
+        onBeforeTask: () => (walletService.locked.value = true),
+        onAfterTask({ error }) {
+          walletService.locked.value = false;
+          if (error) {
+            setTimeout(() => connectTask.value.initialized && connectTask.value.reset(), 5_000);
+          }
+        },
+      },
+    );
+
     return {
       walletService,
       formValid,
@@ -194,6 +234,7 @@ export default {
       valid,
       keypairType,
       noTwinFoundError,
+      connectTask,
     };
   },
 };

@@ -37,10 +37,7 @@
     </template>
 
     <WalletLayout>
-      <div v-show="!gridStore.client">
-        <WalletContainer />
-      </div>
-
+      <WalletContainer v-if="!gridStore.client" />
       <WalletDetails v-if="profileManager.profile && gridStore.client" :profile="profileManager.profile" />
     </WalletLayout>
   </VDialog>
@@ -82,10 +79,11 @@ export default {
     function logout() {
       profileManager.set(null);
       extensionCredentials.remove();
-      localCredentials.remove();
       passwordStorage.remove();
       balanceTask.value.stopPolling();
     }
+
+    const locked = ref(false);
 
     provideWalletService({
       $key,
@@ -97,6 +95,7 @@ export default {
         return profileManager.set(profile).then(balanceTask.value.startPolling);
       },
       logout,
+      locked,
     });
 
     return { gridStore, profileManager, active, logout, balanceTask };

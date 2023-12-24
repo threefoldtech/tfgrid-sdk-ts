@@ -1,8 +1,11 @@
+import type { KeypairType } from "@threefold/grid_client";
 import Cryptr from "cryptr";
 import md5 from "md5";
 import { computed, inject, provide, type Ref } from "vue";
 
 import type { Profile } from "../stores/profile_manager";
+import { getGrid, loadProfile } from "../utils/grid";
+import { resolveAsync } from "../utils/nodeSelector";
 import { useLocalStorage, useSessionStorage } from "./useStorage";
 
 const version = 1;
@@ -16,6 +19,7 @@ export interface WalletService {
   extensionCredentials: ReturnType<typeof useExtensionCredentials>;
   login(profile: Profile): Promise<void>;
   logout(): void;
+  locked: Ref<boolean>;
 }
 
 export function provideWalletService(service: WalletService) {
@@ -85,7 +89,10 @@ export function useLocalCredentials() {
 
       try {
         const cryptr = createCryptr(password);
-        return { mnemonic: cryptr.decrypt(c.mnemonicHash), keypairType: cryptr.decrypt(c.keypairTypeHash) };
+        return {
+          mnemonic: cryptr.decrypt(c.mnemonicHash),
+          keypairType: cryptr.decrypt(c.keypairTypeHash) as KeypairType,
+        };
       } catch {
         return undefined;
       }
@@ -149,4 +156,26 @@ export function useExtensionCredentials() {
       storedCredentials.value = undefined;
     },
   };
+}
+
+export async function connectAndLoginProfile(
+  walletService: ReturnType<typeof useWalletService>,
+  mnemonic: string,
+  keypairType: KeypairType,
+) {
+  const [grid, e0] = await resolveAsync(getGrid({ mnemonic, keypairType }));
+  if (!grid || e0) {
+    throw `Failed to instantiate connection to chain.`;
+  }
+
+  const [profile, e1] = await resolveAsync(loadProfile(grid));
+  if (!profile || e1) {
+    throw `Failed to load user profile.`;
+  }
+
+  const [, e2] = await resolveAsync(walletService.login(profile));
+  if (e2) {
+    // This should never be the case
+    throw `Failed to login to your wallet.`;
+  }
 }
