@@ -762,7 +762,7 @@ async function __loadBalance(profile?: Profile) {
     balance.value = await loadBalance(grid!);
     loadingBalance.value = false;
   } catch {
-    __loadBalance(profile);
+    setTimeout(() => __loadBalance(profile), 5_000);
   }
 }
 
