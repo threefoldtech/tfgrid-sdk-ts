@@ -3,7 +3,14 @@
   <ExtensionLogin />
   <TextDivider text="OR" />
 
-  <VTabs v-model="walletService.activeTab.value" align-tabs="center" color="primary" class="mb-6" mandatory>
+  <VTabs
+    v-model="walletService.activeTab.value"
+    align-tabs="center"
+    color="primary"
+    class="mb-6"
+    mandatory
+    :disabled="walletService.locked.value"
+  >
     <VTab text="Login" v-if="walletService.localCredentials.value" />
     <VTab text="Connect Your Wallet" />
   </VTabs>

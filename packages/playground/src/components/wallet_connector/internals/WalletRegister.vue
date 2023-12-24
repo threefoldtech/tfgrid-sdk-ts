@@ -26,16 +26,34 @@
           label="Mnemonic or Hex Seed"
           placeholder="Please insert your Mnemonic or Hex Seed"
           v-bind="props"
-          :error="!validateMnemonicTask.loading && !!validateMnemonicTask.error"
-          :error-messages="validateMnemonicTask.error ?? undefined"
+          :error="
+            !generateAccountTask.loading &&
+            !activateAccountTask.loading &&
+            !validateMnemonicTask.loading &&
+            (!!validateMnemonicTask.error || !!validateMnemonicTask.error || !!generateAccountTask.error)
+          "
+          :error-messages="
+            generateAccountTask.loading || activateAccountTask.loading
+              ? undefined
+              : validateMnemonicTask.error || generateAccountTask.error || activateAccountTask.error || undefined
+          "
           :hint="
-            mnemonic && !validateMnemonicTask.initialized
+            generateAccountTask.loading
+              ? 'Generating new account...'
+              : activateAccountTask.loading
+              ? 'Activating your account...'
+              : mnemonic && !validateMnemonicTask.initialized
               ? 'Prepare to validate mnemonic'
               : validateMnemonicTask.loading
               ? 'Validating...'
               : undefined
           "
-          :persistent-hint="(mnemonic && !validateMnemonicTask.initialized) || validateMnemonicTask.loading"
+          :persistent-hint="
+            generateAccountTask.loading ||
+            activateAccountTask.loading ||
+            (mnemonic && !validateMnemonicTask.initialized) ||
+            validateMnemonicTask.loading
+          "
           :loading="validateMnemonicTask.loading"
           v-model="mnemonic"
           autofocus
@@ -55,26 +73,35 @@
         </VTextField>
       </PasswordInputWrapper>
 
-      <VContainer class="mb-4">
-        <VRow justify="end">
-          <VBtn
-            type="button"
-            text="Activate Account"
-            variant="tonal"
-            color="primary"
-            class="mr-2"
-            :disabled="!(validateMnemonicTask.error === noTwinFoundError) || walletService.locked.value"
-          />
+      <VFadeTransition>
+        <VContainer class="mb-4" v-if="keypairType !== KeypairType.ed25519">
+          <VRow justify="end">
+            <VBtn
+              type="button"
+              text="Activate Account"
+              variant="tonal"
+              color="primary"
+              class="mr-2"
+              :disabled="
+                !(validateMnemonicTask.error === noTwinFoundError) ||
+                (walletService.locked.value && !activateAccountTask.loading)
+              "
+              @click="requestTermsAndConditions = 'activate'"
+              :loading="activateAccountTask.loading"
+            />
 
-          <VBtn
-            type="button"
-            text="Create Account"
-            variant="tonal"
-            color="secondary"
-            :disabled="keypairType === KeypairType.ed25519 || !!mnemonic || walletService.locked.value"
-          />
-        </VRow>
-      </VContainer>
+            <VBtn
+              type="button"
+              text="Create Account"
+              variant="tonal"
+              color="secondary"
+              :disabled="!!mnemonic || (walletService.locked.value && !generateAccountTask.loading)"
+              @click="requestTermsAndConditions = 'generate'"
+              :loading="generateAccountTask.loading"
+            />
+          </VRow>
+        </VContainer>
+      </VFadeTransition>
 
       <PasswordInputWrapper #="{ props }">
         <VTextField
@@ -137,6 +164,12 @@
         </VRow>
       </VContainer>
     </VForm>
+
+    <TermsAndConditions
+      v-if="requestTermsAndConditions"
+      @accept="requestTermsAndConditions === 'activate' ? activateAccountTask.run() : generateAccountTask.run()"
+      @exit="requestTermsAndConditions = undefined"
+    />
   </section>
 </template>
 
@@ -150,14 +183,16 @@ import type { VTextField } from "vuetify/components/VTextField";
 import { network } from "../../../clients";
 import { useAsync, useWatchDeep } from "../../../hooks";
 import { connectAndLoginProfile, useWalletService } from "../../../hooks/wallet_connector";
-import { getGrid } from "../../../utils/grid";
+import { activateAccountAndCreateTwin, createAccount, getGrid } from "../../../utils/grid";
 import { normalizeError } from "../../../utils/helpers";
 import { resolveAsync } from "../../../utils/nodeSelector";
+import TermsAndConditions from "./TermsAndConditions.vue";
 
 const noTwinFoundError = `Couldn't get the user twin for the provided mnemonic in ${network}net.`;
 
 export default {
   name: "WalletRegister",
+  components: { TermsAndConditions },
   setup() {
     const walletService = useWalletService();
     const validateMnemonicTask = useAsync<true, string, [string, KeypairType]>(
@@ -223,6 +258,48 @@ export default {
       },
     );
 
+    const showTermsAndConditions = ref(false);
+    const requestTermsAndConditions = ref<"activate" | "generate">();
+
+    const activateAccountTask = useAsync<void, string>(
+      async () => {
+        const [account, e0] = await resolveAsync(activateAccountAndCreateTwin(mnemonic.value));
+        if (!account || e0) {
+          throw normalizeError(e0, "Failed to activate Account.");
+        }
+      },
+      {
+        onBeforeTask: () => {
+          walletService.locked.value = true;
+          showTermsAndConditions.value = false;
+        },
+        onAfterTask({ error }) {
+          walletService.locked.value = false;
+          !error && validateMnemonicTask.value.run(mnemonic.value, keypairType.value);
+        },
+      },
+    );
+
+    const generateAccountTask = useAsync<void, string>(
+      async () => {
+        const [account, e0] = await resolveAsync(createAccount());
+        if (!account || e0) {
+          throw normalizeError(e0, "Failed to create a new account.");
+        }
+
+        mnemonic.value = account.mnemonic;
+      },
+      {
+        onBeforeTask: () => {
+          walletService.locked.value = true;
+          showTermsAndConditions.value = false;
+        },
+        onAfterTask() {
+          walletService.locked.value = false;
+        },
+      },
+    );
+
     return {
       walletService,
       formValid,
@@ -235,6 +312,11 @@ export default {
       keypairType,
       noTwinFoundError,
       connectTask,
+
+      showTermsAndConditions,
+      requestTermsAndConditions,
+      activateAccountTask,
+      generateAccountTask,
     };
   },
 };
