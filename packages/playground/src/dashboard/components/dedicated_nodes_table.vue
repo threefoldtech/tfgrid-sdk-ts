@@ -103,7 +103,7 @@ import { VDataTableServer } from "vuetify/labs/VDataTable";
 
 import { gridProxyClient } from "@/clients";
 import { useProfileManager } from "@/stores";
-import { toBytes } from "@/utils/get_nodes";
+import { convert } from "@/utils/get_nodes";
 import { getGrid } from "@/utils/grid";
 import { toGigaBytes } from "@/utils/helpers";
 import toTeraOrGigaOrPeta from "@/utils/toTeraOrGegaOrPeta";
@@ -177,10 +177,6 @@ const inputFiltersReset = (filtersInputValues: DedicatedNodeFilters) => {
 onMounted(async () => {
   await loadData();
 });
-
-function convert(value: string | undefined) {
-  return value ? Math.ceil(toBytes(+value)) : undefined;
-}
 
 const _loadData = async () => {
   const params = tabParams[activeTab.value as keyof typeof tabParams];

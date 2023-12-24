@@ -18,14 +18,18 @@ export default function formatResourceSize(sizeInBytes?: number): string {
 
   if (sizeInBytes < tera) {
     const sizeInGB = sizeInBytes / giga;
-    return sizeInGB.toFixed(2) + " GB";
+    return toFixedTwo(sizeInGB) + " GB";
   }
 
   if (sizeInBytes < peta) {
     const sizeInTB = sizeInBytes / tera;
-    return sizeInTB.toFixed(2) + " TB";
+    return toFixedTwo(sizeInTB) + " TB";
   }
 
   const sizeInPB = sizeInBytes / peta;
-  return sizeInPB.toFixed(2) + " PB";
+  return toFixedTwo(sizeInPB) + " PB";
+}
+
+function toFixedTwo(val: number) {
+  return Math.floor(val * 100) / 100;
 }

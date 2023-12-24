@@ -219,6 +219,9 @@ export type FilterInputs = {
   freeSru: NodeInputFilterType;
   freeHru: NodeInputFilterType;
   freeMru: NodeInputFilterType;
+  totalSru: NodeInputFilterType;
+  totalHru: NodeInputFilterType;
+  totalMru: NodeInputFilterType;
 };
 
 export const optionsInitializer: () => FilterOptions = () => ({
