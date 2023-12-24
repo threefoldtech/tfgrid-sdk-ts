@@ -52,13 +52,20 @@
 
       <VContainer class="mb-4">
         <VRow justify="end">
-          <VBtn type="button" text="Activate Account" variant="tonal" color="primary" class="mr-2" />
+          <VBtn
+            type="button"
+            text="Activate Account"
+            variant="tonal"
+            color="primary"
+            class="mr-2"
+            :disabled="!(validateMnemonicTask.error === noTwinFoundError)"
+          />
           <VBtn
             type="button"
             text="Create Account"
             variant="tonal"
             color="secondary"
-            :disabled="keypairType === KeypairType.ed25519"
+            :disabled="keypairType === KeypairType.ed25519 || !!mnemonic"
           />
         </VRow>
       </VContainer>
@@ -125,6 +132,8 @@ import { getGrid } from "../../../utils/grid";
 import { normalizeError } from "../../../utils/helpers";
 import { resolveAsync } from "../../../utils/nodeSelector";
 
+const noTwinFoundError = `Couldn't get the user twin for the provided mnemonic in ${network}net.`;
+
 export default {
   name: "WalletRegister",
   setup() {
@@ -145,7 +154,7 @@ export default {
           const error = normalizeError(e0, "Something went wrong. please try again.");
 
           if (error.toLowerCase().includes("invalid twin id")) {
-            throw `Couldn't get the user twin for the provided mnemonic in ${network}net.`;
+            throw noTwinFoundError;
           }
 
           throw error;
@@ -183,6 +192,7 @@ export default {
       password,
       valid,
       keypairType,
+      noTwinFoundError,
     };
   },
 };

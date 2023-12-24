@@ -15,6 +15,7 @@
           :rules="[validatePassword]"
           v-bind="props"
           v-model.trim="password"
+          autofocus
         />
       </PasswordInputWrapper>
 

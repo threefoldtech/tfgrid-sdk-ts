@@ -88,13 +88,13 @@ export default {
           loginCredentials = account as LoginCredentials;
         }
 
-        loadingMessage.value = `Successfully selected an account! instantiate a connection to chain...`;
+        loadingMessage.value = `Instantiating a connection to chain...`;
         const [grid, e2] = await resolveAsync(getGrid(loginCredentials));
         if (!grid || e2) {
           throw `Failed to instantiate a connection to chain.`;
         }
 
-        loadingMessage.value = `Successfully instantiated a connection to chain! Loading your wallet information...`;
+        loadingMessage.value = `Loading your wallet information...`;
         const [profile, e3] = await resolveAsync(loadProfile(grid));
         if (!profile || e3) {
           throw `Failed to load user profile.`;

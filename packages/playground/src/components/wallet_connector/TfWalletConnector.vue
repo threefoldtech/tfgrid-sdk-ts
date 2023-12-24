@@ -1,5 +1,5 @@
 <template>
-  <VDialog v-model="active" scrollable min-width="min(94%, 950px)" max-width="950px" eager>
+  <VDialog v-model="active" scrollable min-width="min(94%, 1050px)" max-width="1050px" eager>
     <template #activator="{ props }">
       <VBtn variant="flat" v-bind="props">
         <template #prepend>
@@ -64,7 +64,7 @@ export default {
     const gridStore = useGrid();
     const profileManager = useProfileManager();
 
-    const active = ref(false);
+    const active = ref(true);
     const extensionCredentials = useExtensionCredentials();
     const localCredentials = useLocalCredentials();
     const passwordStorage = useSessionStorage("password");
