@@ -189,7 +189,7 @@ export type Validators = typeof validators;
 export type NodeInputFilterType = {
   label: string;
   placeholder: string;
-  value?: string | undefined;
+  value?: string;
   rules?: [syncRules: SyncRule[], asyncRules?: AsyncRule[]];
   error?: string;
   type: string;
@@ -203,9 +203,9 @@ export type MixedFilter = {
 
 // Status, GPU, Gateway, and any other option should be add here.
 export type FilterOptions = {
-  status: NodeStatus | undefined;
-  gpu: boolean | undefined;
-  gateway: boolean | undefined;
+  status?: NodeStatus;
+  gpu?: boolean;
+  gateway?: boolean;
   page: number;
   size: number;
 };
@@ -238,8 +238,8 @@ import type { SelectionDetails } from "./nodeSelector";
 // Status, GPU, Gateway, and any other option should be add here.
 export type NodeFilterOptions = {
   status: NodeStatus;
-  gpu: boolean | undefined;
-  gateway: boolean | undefined;
+  gpu?: boolean;
+  gateway?: boolean;
   page: number;
   size: number;
 };
