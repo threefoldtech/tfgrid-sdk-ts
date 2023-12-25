@@ -16,7 +16,7 @@
     <div v-else>
       <v-card>
         <h4 class="d-flex justify-center pa-4">
-          User, you can now vote on proposals!
+          You can now vote on proposals!
           <v-icon @click="openInfoModal = true" class="mx-3"> mdi-information-outline </v-icon>
         </h4>
         <v-tabs v-model="activeTab" align-tabs="center">
