@@ -93,7 +93,7 @@
 import { default as StellarSdk, StrKey } from "stellar-sdk";
 import { onMounted, ref } from "vue";
 
-import { useProfileManagerController } from "../components/profile_manager_controller.vue";
+import { useWalletService } from "../hooks/wallet_connector";
 import { useProfileManager } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid, loadBalance } from "../utils/grid";
@@ -116,7 +116,7 @@ const loadingWithdraw = ref(false);
 const depositWallet = ref("");
 const qrCodeText = ref("");
 const depositFee = ref(0);
-const ProfileManagerController = useProfileManagerController();
+const walletService = useWalletService();
 
 onMounted(async () => {
   selectedName.value = items.value.filter(item => item.id === selectedItem.value.id)[0].name;
@@ -203,7 +203,7 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
     target.value = "";
     amount.value = 2;
     loadingWithdraw.value = false;
-    await ProfileManagerController.reloadBalance();
+    await walletService.reloadBalance();
     createCustomToast("Transaction Succeeded", ToastType.success);
   } catch (e) {
     console.log("Error withdrawing, Error: ", e);

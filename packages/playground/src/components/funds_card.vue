@@ -32,7 +32,7 @@
 <script lang="ts">
 import { ref } from "vue";
 
-import { useProfileManagerController } from "../components/profile_manager_controller.vue";
+import { useWalletService } from "../hooks/wallet_connector";
 import { useProfileManager } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid } from "../utils/grid";
@@ -42,7 +42,8 @@ export default {
   setup() {
     const loadingAddTFT = ref(false);
     const profileManager = useProfileManager();
-    const ProfileManagerController = useProfileManagerController();
+    const walletService = useWalletService();
+
     const addTFT = async () => {
       if (window.env.NETWORK !== "dev" && window.env.NETWORK !== "qa") {
         window.open("https://gettft.com/gettft/", "_blank");
@@ -51,7 +52,7 @@ export default {
         try {
           const grid = await getGrid(profileManager.profile!);
           await grid?.balance.getMoreFunds();
-          await ProfileManagerController.reloadBalance();
+          await walletService.reloadBalance();
           loadingAddTFT.value = false;
           createCustomToast("Success! You have received TFTs.", ToastType.success);
         } catch (e) {

@@ -125,12 +125,12 @@ import { Keyring } from "@polkadot/keyring";
 import type { Twin } from "@threefold/tfchain_client";
 import { onMounted, ref } from "vue";
 
-import { useProfileManagerController } from "../components/profile_manager_controller.vue";
+import { useWalletService } from "../hooks/wallet_connector";
 import { useProfileManager } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid, loadBalance } from "../utils/grid";
 
-const profileManagerController = useProfileManagerController();
+const walletService = useWalletService();
 const activeTab = ref(0);
 const recipientTwinId = ref("");
 const isValidTwinIDTransfer = ref(false);
@@ -213,7 +213,7 @@ async function transfer(recipientTwin: Twin) {
     if (grid) {
       await grid.balance.transfer({ address: recipientTwin.accountId, amount: transferAmount.value });
       createCustomToast("Transaction Complete!", ToastType.success);
-      profileManagerController.reloadBalance();
+      walletService.reloadBalance();
       await getFreeBalance();
     }
   } catch (err) {
