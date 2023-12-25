@@ -178,7 +178,7 @@
                   <v-select
                     :items="userFarms"
                     :item-title="item => `${item.name}`"
-                    :item-value="item => item.farmId"
+                    :item-value="item => item.farmID"
                     label="Select a farm"
                     v-model="selectedFarm"
                     v-bind="props"
@@ -204,6 +204,7 @@
             <div class="textContainer">
               <h2>General</h2>
               <span>A proposal can be created by one of the council members of tfchain.</span>
+              <span> Only farms with one up node or more are allowed to vote.</span>
               <span> Once a proposal has reached it's timelimit, voting stops and a proposal can be closed.</span>
               <span>
                 A proposal is either approved or dissapproved based on the majority of the weights of yes / no votes
@@ -246,10 +247,9 @@ import type moment from "moment";
 import { createToast } from "mosha-vue-toastify";
 import { onMounted, ref } from "vue";
 
-import { gridProxyClient } from "@/clients";
-
 import { useProfileManager } from "../stores";
 import type { FarmInterface } from "../types";
+import { getFarms } from "../utils/get_farms";
 import { getGrid } from "../utils/grid";
 
 const loadingProposals = ref(true);
@@ -281,11 +281,8 @@ onMounted(async () => {
     proposals.value = await grid?.dao.get();
     activeProposals.value = proposals.value.active.filter(proposal => proposal.hash);
     inactiveProposals.value = proposals.value.inactive.filter(proposal => proposal.hash);
-    const { data } = await gridProxyClient.farms.list({
-      twinId: profile.value.twinId,
-    });
-    userFarms.value = data as unknown as FarmInterface[];
 
+    userFarms.value = await getFarms(grid, { ownedBy: profile.value.twinId }, {});
     loadingProposals.value = false;
   }
 });
