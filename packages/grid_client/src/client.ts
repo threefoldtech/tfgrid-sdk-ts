@@ -120,6 +120,7 @@ class GridClient {
     }
 
     await this.testConnectionUrls(urls);
+    await this.rmbClient.connect();
 
     if (BackendStorage.isEnvNode()) {
       process.on("SIGTERM", this.disconnectAndExit);
@@ -134,7 +135,6 @@ class GridClient {
     }
 
     this._connect();
-    await this.rmbClient.connect();
     await migrateKeysEncryption.apply(this, [GridClient]);
   }
 
@@ -230,8 +230,7 @@ class GridClient {
   }
 
   async disconnectAndExit(): Promise<void> {
-    if (this.tfclient) await this.tfclient.disconnect();
-    if (this.rmbClient) await this.rmbClient.close();
+    await this.disconnect();
     process.removeAllListeners();
     process.exit(0);
   }
