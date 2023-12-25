@@ -110,6 +110,9 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+  <v-snackbar variant="tonal" color="error" v-model="snackbar" :timeout="5000">
+    Failed to delete some keys, You don't have enough tokens
+  </v-snackbar>
 </template>
 
 <script lang="ts" setup>
@@ -117,6 +120,7 @@
 import { ContractStates, type GridClient } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
+import { InsufficientBalanceError } from "@threefold/types";
 import { defineComponent, type PropType, type Ref, ref } from "vue";
 import { capitalize } from "vue";
 
@@ -232,7 +236,7 @@ async function onDelete() {
     emits("update:deleted-contracts", contracts.value);
     selectedContracts.value = [];
   } catch (e) {
-    if ((e as Error).message.includes("Inability to pay some fees")) {
+    if (e instanceof InsufficientBalanceError) {
       contracts.value = contracts.value.filter(c => !selectedContracts.value.includes(c));
       selectedContracts.value = [];
       snackbar.value = true;
