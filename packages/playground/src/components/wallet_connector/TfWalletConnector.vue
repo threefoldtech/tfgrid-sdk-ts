@@ -11,9 +11,9 @@
         <template v-else>
           <p class="font-weight-bold" v-text="'Loading...'" v-if="balanceTask.loading" />
           <div v-else class="text-left">
-            <p class="mb-1">Balance: <span class="font-weight-bold text-secondary" v-text="balance.free + 'TFT'" /></p>
+            <p class="mb-1">Balance: <span class="font-weight-bold text-secondary" v-text="balance.free + ' TFT'" /></p>
             <p class="d-flex align-center">
-              Locked: <span class="font-weight-bold text-secondary ml-2" v-text="balance.frozen + 'TFT'" />
+              Locked: <span class="font-weight-bold text-secondary ml-2" v-text="balance.frozen + ' TFT'" />
               <VTooltip text="Locked balance documentation">
                 <template #activator="{ props }">
                   <VBtn
