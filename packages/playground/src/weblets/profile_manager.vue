@@ -439,8 +439,10 @@ import { useTheme } from "vuetify";
 import { generateKeyPair } from "web-ssh-keygen";
 
 import { AppThemeSelection } from "@/utils/app_theme";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
+import { useOnline } from "../hooks";
 import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
 import {
@@ -454,7 +456,6 @@ import {
 } from "../utils/grid";
 import { isEnoughBalance, normalizeError } from "../utils/helpers";
 import { downloadAsFile, normalizeBalance } from "../utils/helpers";
-
 interface Credentials {
   passwordHash?: string;
   mnemonicHash?: string;
@@ -473,23 +474,31 @@ const props = defineProps({
 });
 defineEmits<{ (event: "update:modelValue", value: boolean): void }>();
 
+const online = useOnline();
 watch(
-  () => props.modelValue,
-  m => {
-    if (m) {
-      nextTick().then(mounted);
-    } else {
-      nextTick().then(() => {
-        if (isStoredCredentials()) {
-          activeTab.value = 0;
-        } else {
-          activeTab.value = 1;
-        }
-        clearFields();
-      });
+  () => [online.value, props.modelValue],
+  ([online, m], [wasOnline]) => {
+    if (!wasOnline && online) {
+      handleModelValue(true);
     }
+
+    handleModelValue(online && m);
   },
 );
+function handleModelValue(m: boolean) {
+  if (m) {
+    nextTick().then(mounted);
+  } else {
+    nextTick().then(() => {
+      if (isStoredCredentials()) {
+        activeTab.value = 0;
+      } else {
+        activeTab.value = 1;
+      }
+      clearFields();
+    });
+  }
+}
 watch(
   () => keypairType.value,
   async (value, oldValue) => {
@@ -741,9 +750,9 @@ async function generateSSH() {
   generatingSSH.value = false;
   SSHKeyHint.value = "SSH key generated successfully.";
 }
-
+let BalanceWarningRaised = false;
 const loadingBalance = ref(false);
-async function __loadBalance(profile?: Profile) {
+async function __loadBalance(profile?: Profile, tries = 1) {
   profile = profile || profileManager.profile!;
   if (!profile) return;
 
@@ -751,9 +760,20 @@ async function __loadBalance(profile?: Profile) {
     loadingBalance.value = true;
     const grid = await getGrid(profile);
     balance.value = await loadBalance(grid!);
+    if (!BalanceWarningRaised && balance.value?.free) {
+      if (balance.value?.free < 0.01) {
+        createCustomToast("Your balance is too low, Please fund your account.", ToastType.warning);
+        BalanceWarningRaised = true;
+      }
+    }
     loadingBalance.value = false;
   } catch {
-    __loadBalance(profile);
+    if (tries > 10) {
+      loadingBalance.value = false;
+      return;
+    }
+
+    setTimeout(() => __loadBalance(profile, tries + 1), Math.floor(Math.exp(tries) * 1_000));
   }
 }
 

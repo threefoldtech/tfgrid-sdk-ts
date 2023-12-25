@@ -6,7 +6,14 @@ import { KeyringPair } from "@polkadot/keyring/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { waitReady } from "@polkadot/wasm-crypto";
-import { TFChainError, TFChainErrors, TimeoutError, ValidationError } from "@threefold/types";
+import {
+  BaseError,
+  InsufficientBalanceError,
+  TFChainError,
+  TFChainErrors,
+  TimeoutError,
+  ValidationError,
+} from "@threefold/types";
 import AwaitLock from "await-lock";
 import { validateMnemonic } from "bip39";
 
@@ -76,13 +83,24 @@ class QueryClient {
   async newProvider() {
     try {
       await QueryClient.connectingLock.acquireAsync();
-      await this.disconnect.bind(this)();
+      if (QueryClient.connections.has(this.url)) {
+        this.api = QueryClient.connections.get(this.url)!.api;
+        if (this.api && this.api.isConnected) return;
+      }
+      await this.disconnect();
 
       const provider = new WsProvider(this.url);
       this.api = await ApiPromise.create({ provider });
       await this.wait();
       QueryClient.connections.set(this.url, { api: this.api, disconnectHandler: this.__disconnectHandler });
       this.api.on("disconnected", this.__disconnectHandler);
+    } catch (e) {
+      const message = "Unable to establish a connection with the chain:\n";
+      if (e instanceof BaseError) {
+        e.message = message + e.message;
+        throw e;
+      }
+      throw new TFChainError(message + e);
     } finally {
       QueryClient.connectingLock.release();
     }
@@ -355,11 +373,14 @@ class Client extends QueryClient {
         if (errorName) {
           throw new TFChainErrors[section][errorName](`Failed to apply ${JSON.stringify(extrinsic.method.toHuman())}`);
         } else {
-          throw new TFChainError(
-            `Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error: ${
-              Object.keys(this.api.errors[section])[+e] ?? e
-            }`,
-          );
+          const errorMsg = `Failed to apply ${JSON.stringify(extrinsic.method.toHuman())} due to error: ${
+            Object.keys(this.api.errors[section])[+e] ?? e
+          }`;
+
+          if ((e as Error).message.includes("Inability to pay some fees")) {
+            throw new InsufficientBalanceError(errorMsg);
+          }
+          throw new TFChainError(errorMsg);
         }
       });
   }

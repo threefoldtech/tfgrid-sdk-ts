@@ -82,6 +82,7 @@ const router = createRouter({
 
     {
       path: "/solutions",
+      meta: { title: "Solutions" },
       children: [
         {
           path: "",
