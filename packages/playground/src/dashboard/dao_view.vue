@@ -203,16 +203,21 @@
           <v-card-text>
             <div class="textContainer">
               <h2>General</h2>
-              <span>A proposal can be created by one of the council members of tfchain.</span>
-              <span> Only farms with one up node or more are allowed to vote.</span>
-              <span> Once a proposal has reached it's timelimit, voting stops and a proposal can be closed.</span>
+              <span
+                >TFChain council members have exclusive authority to generate proposals, while owners of farms
+                containing one or more up nodes can cast votes.</span
+              >
+              <span> The voting process concludes at the designated maturity date and time of the proposal.</span>
               <span>
-                A proposal is either approved or dissapproved based on the majority of the weights of yes / no votes
-                (50%).</span
+                Decisions regarding the proposal's acceptance or rejection are determined by a majority of weighted
+                votes.</span
               >
               <span>
-                A minimal participation threshold must be met. If there are not enough votes and the timelimit is
-                reached, the proposal is dissapproved.</span
+                However, a minimum participation threshold must be attained in order for the voting process to be
+                considered valid.
+              </span>
+              <span>
+                If the vote count is insufficient and the time limit is reached, the proposal will be rejected.</span
               >
               <br />
               <br />
