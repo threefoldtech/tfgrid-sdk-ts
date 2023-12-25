@@ -10,7 +10,7 @@
       :form-disabled="isFormLoading"
       v-model:model-value="filterInputs"
       v-model:valid="isValidForm"
-      v-model:options="filterOptions"
+      :options="filterOptions"
       @update:options="pagReset"
       @update:model-value="inputFiltersReset"
     />
