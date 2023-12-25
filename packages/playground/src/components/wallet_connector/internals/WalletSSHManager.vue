@@ -33,7 +33,7 @@
           variant="tonal"
           color="secondary"
           text="Generate SSH Keys"
-          :disabled="!!editedSsh"
+          :disabled="!!editedSsh || (walletService.locked.value && !generateTask.loading)"
           :loading="generateTask.loading"
           @click="generateTask.run()"
         />
@@ -42,7 +42,7 @@
           color="secondary"
           text="Update Public SSH Keys"
           :loading="updateTask.loading"
-          :disabled="!!editedSsh && ssh === editedSsh"
+          :disabled="!editedSsh || ssh === editedSsh || (walletService.locked.value && !updateTask.loading)"
           @click="updateTask.run()"
         />
       </VRow>
@@ -56,6 +56,7 @@ import { ref } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
 import { useAsync } from "../../../hooks";
+import { useWalletService } from "../../../hooks/wallet_connector";
 import { useGrid, useProfileManager } from "../../../stores";
 import { storeSSH } from "../../../utils/grid";
 import { downloadAsFile, normalizeError } from "../../../utils/helpers";
@@ -69,6 +70,7 @@ export default {
   setup(props) {
     const profileManager = useProfileManager();
     const gridStore = useGrid();
+    const walletService = useWalletService();
 
     const generateTask = useAsync<string, string>(
       async () => {
@@ -98,11 +100,13 @@ export default {
       {
         shouldRun: () => !!gridStore.client,
         default: "",
-        onAfterTask({ data }) {
-          data && setTimeout(generateTask.value.reset, 5_000);
-        },
         onBeforeTask() {
+          walletService.locked.value = true;
           updateTask.value.initialized && updateTask.value.reset();
+        },
+        onAfterTask({ data }) {
+          walletService.locked.value = false;
+          data && setTimeout(generateTask.value.reset, 5_000);
         },
       },
     );
@@ -121,18 +125,20 @@ export default {
       {
         shouldRun: () => !!gridStore.client,
         default: "",
-        onAfterTask({ data }) {
-          data && setTimeout(updateTask.value.reset, 5_000);
-        },
         onBeforeTask() {
+          walletService.locked.value = true;
           generateTask.value.initialized && generateTask.value.reset();
+        },
+        onAfterTask({ data }) {
+          walletService.locked.value = false;
+          data && setTimeout(updateTask.value.reset, 5_000);
         },
       },
     );
 
     const editedSsh = ref(props.ssh);
 
-    return { editedSsh, generateTask, updateTask };
+    return { walletService, editedSsh, generateTask, updateTask };
   },
 };
 </script>

@@ -129,10 +129,9 @@
           <v-divider vertical class="mx-2" />
           <AppTheme />
           <v-divider vertical class="mx-2" />
-          <ProfileManager v-model="openProfile" />
 
-          <VToolbarItems class="ml-2">
-            <TfWalletConnector />
+          <VToolbarItems>
+            <TfWalletConnector ref="walletServiceCmp" />
           </VToolbarItems>
         </v-toolbar>
 
@@ -184,7 +183,7 @@
                   <div :key="$route.path">
                     <component :is="Component" v-if="isAuthorized($route.path)"></component>
                     <component :is="Component" v-else-if="hasActiveProfile && hasGrid"></component>
-                    <ConnectWalletLanding @openProfile="openProfile = true" v-else />
+                    <ConnectWalletLanding @openProfile="walletServiceCmp.active = true" v-else />
                   </div>
                 </transition>
               </router-view>
@@ -203,15 +202,18 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
+import { useWalletServiceCmp } from "./hooks/wallet_connector";
 import { useProfileManager } from "./stores/profile_manager";
 
 const $route = useRoute();
 const $router = useRouter();
 const profileManager = useProfileManager();
 const gridStore = useGrid();
+
+const walletServiceCmp = useWalletServiceCmp();
+
 const network = process.env.NETWORK || (window as any).env.NETWORK;
 
-const openProfile = ref(false);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
 const navbarConfig = ref();
@@ -401,7 +403,6 @@ import TfNavigationLoader from "./components/TfNavigationLoader.vue";
 import TfOfflineNotifier from "./components/TfOfflineNotifier.vue";
 import TfWalletConnector from "./components/wallet_connector/TfWalletConnector.vue";
 import { useGrid } from "./stores";
-import ProfileManager from "./weblets/profile_manager.vue";
 
 interface AppRoute {
   title: string;
@@ -423,7 +424,6 @@ export default {
   components: {
     TFNotification,
     DisclaimerToolbar,
-    ProfileManager,
     DeploymentListManager,
     AppTheme,
     ConnectWalletLanding,

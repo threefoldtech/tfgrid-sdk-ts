@@ -1,7 +1,7 @@
 import type { KeypairType } from "@threefold/grid_client";
 import Cryptr from "cryptr";
 import md5 from "md5";
-import { computed, inject, provide, type Ref } from "vue";
+import { computed, inject, provide, type Ref, ref, type UnwrapRef } from "vue";
 
 import type { Profile } from "../stores/profile_manager";
 import { getGrid, loadProfile } from "../utils/grid";
@@ -24,11 +24,16 @@ export interface WalletService {
 }
 
 export function provideWalletService(service: WalletService) {
-  return provide($key, service);
+  provide($key, service);
+  return service;
 }
 
 export function useWalletService() {
   return inject($key) as WalletService;
+}
+
+export function useWalletServiceCmp() {
+  return ref() as Ref<UnwrapRef<WalletService>>;
 }
 
 export interface EncryptedLocalCredentials {

@@ -29,7 +29,14 @@
         </template>
 
         <template #append v-if="gridStore.client">
-          <VBtn :style="{ height: '48px' }" icon="mdi-logout" color="error" variant="tonal" @click.stop="logout" />
+          <VBtn
+            :style="{ height: '48px' }"
+            icon="mdi-logout"
+            color="error"
+            variant="tonal"
+            @click.stop="logout"
+            :disabled="walletService.locked.value"
+          />
         </template>
       </VBtn>
     </template>
@@ -55,7 +62,7 @@ import WalletLayout from "./internals/WalletLayout.vue";
 export default {
   name: "TfWalletConnector",
   components: { WalletLayout, WalletContainer, WalletDetails },
-  setup() {
+  setup(_, ctx) {
     const gridStore = useGrid();
     const profileManager = useProfileManager();
 
@@ -91,7 +98,7 @@ export default {
     const locked = ref(false);
     const activeTab = ref(0);
 
-    provideWalletService({
+    const walletService = provideWalletService({
       $key,
       active,
       extensionCredentials,
@@ -105,7 +112,9 @@ export default {
       activeTab,
     });
 
-    return { gridStore, profileManager, active, logout, balanceTask, balance };
+    ctx.expose(walletService);
+
+    return { walletService, gridStore, profileManager, active, logout, balanceTask, balance };
   },
 };
 </script>

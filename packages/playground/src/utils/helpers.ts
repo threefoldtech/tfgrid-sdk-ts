@@ -27,7 +27,7 @@ export function normalizeError(error: any, fallbackError: string): string {
 }
 
 export function normalizeBalance(num: number | string | undefined, floor = false): string {
-  if (!num || isNaN(+num)) return (num || "").toString();
+  if (!num || isNaN(+num)) return (num || "0").toString();
 
   if (floor) {
     return (Math.floor(+num * 1000) / 1000).toString();

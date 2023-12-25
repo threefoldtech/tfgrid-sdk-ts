@@ -57,7 +57,13 @@
 
   <VRow justify="end" class="mt-6">
     <VBtn variant="outlined" text="Close" class="mr-2" @click="walletService.active.value = false" />
-    <VBtn variant="tonal" color="error" text="Logout" @click="walletService.logout" />
+    <VBtn
+      variant="tonal"
+      color="error"
+      text="Logout"
+      @click="walletService.logout"
+      :disabled="walletService.locked.value"
+    />
   </VRow>
 </template>
 
