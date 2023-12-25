@@ -126,8 +126,6 @@ class GridClient {
       process.on("SIGINT", this.disconnectAndExit);
       process.on("SIGUSR1", this.disconnectAndExit);
       process.on("SIGUSR2", this.disconnectAndExit);
-      //TODO move this line to disconnectAndExit
-      process.removeAllListeners();
     } else {
       window.onbeforeunload = () => {
         return "";
@@ -234,6 +232,7 @@ class GridClient {
   async disconnectAndExit(): Promise<void> {
     if (this.tfclient) await this.tfclient.disconnect();
     if (this.rmbClient) await this.rmbClient.close();
+    process.removeAllListeners();
     process.exit(0);
   }
 
