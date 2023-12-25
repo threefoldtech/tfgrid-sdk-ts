@@ -1,7 +1,7 @@
 import { BackendStorageType, GridClient, KeypairType, NetworkEnv } from "@threefold/grid_client";
+import { InsufficientBalanceError } from "@threefold/types";
 
 import type { Profile } from "../stores/profile_manager";
-
 const network = (process.env.NETWORK as NetworkEnv) || window.env.NETWORK;
 export async function getGrid(
   profile: Pick<Profile, "mnemonic"> & Partial<Pick<Profile, "keypairType">>,
@@ -25,7 +25,11 @@ export async function getGrid(
           relayURL: window.env.RELAY_DOMAIN,
         }),
   });
-  await grid.connect();
+  try {
+    await grid.connect();
+  } catch (e) {
+    if (!(e instanceof InsufficientBalanceError)) throw e;
+  }
   return grid;
 }
 
