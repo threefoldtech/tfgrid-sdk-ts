@@ -10,8 +10,6 @@
       :form-disabled="isFormLoading"
       v-model:model-value="filterInputs"
       v-model:valid="isValidForm"
-      :options="filterOptions"
-      @update:options="pagReset"
       @update:model-value="inputFiltersReset"
     />
     <div class="nodes mt-5">
@@ -186,9 +184,7 @@ export default {
       filterInputs.value = filtersInputValues;
       filterOptions.value = optionsInitializer();
     };
-    const pagReset = () => {
-      filterOptions.value = optionsInitializer();
-    };
+
     const statusReset = () => {
       const options = mixedFilters.value.options;
       options.page = 1;
@@ -234,7 +230,6 @@ export default {
       selectedNodeoptions,
       nodeStatusOptions,
       statusReset,
-      pagReset,
 
       filterInputs,
       filterOptions,
