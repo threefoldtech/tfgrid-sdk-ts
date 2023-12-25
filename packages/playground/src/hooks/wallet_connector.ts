@@ -1,7 +1,7 @@
 import type { KeypairType } from "@threefold/grid_client";
 import Cryptr from "cryptr";
 import md5 from "md5";
-import { computed, inject, provide, type Ref, ref, type UnwrapRef } from "vue";
+import { type App, computed, inject, type Ref, ref, type UnwrapRef } from "vue";
 
 import type { Profile } from "../stores/profile_manager";
 import { getGrid, loadProfile } from "../utils/grid";
@@ -21,10 +21,11 @@ export interface WalletService {
   logout(): void;
   locked: Ref<boolean>;
   activeTab: Ref<number>;
+  reloadBalance(): Promise<void>;
 }
 
-export function provideWalletService(service: WalletService) {
-  provide($key, service);
+export function provideWalletService(app: App<Element>, service: WalletService) {
+  app.provide($key, service);
   return service;
 }
 

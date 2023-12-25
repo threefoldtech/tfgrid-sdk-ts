@@ -5,3 +5,4 @@ export * from "./usePagination";
 export * from "./useNavigationStatus";
 export * from "./useStorage";
 export * from "./useOnline";
+export * from "./useApp";

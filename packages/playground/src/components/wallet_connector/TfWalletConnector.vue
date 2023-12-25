@@ -61,7 +61,7 @@
 <script lang="ts">
 import { ref } from "vue";
 
-import { useAsync, useSessionStorage } from "../../hooks";
+import { useApp, useAsync, useSessionStorage } from "../../hooks";
 import { $key, provideWalletService, useExtensionCredentials, useLocalCredentials } from "../../hooks/wallet_connector";
 import { useGrid, useProfileManager } from "../../stores";
 import { normalizeBalance } from "../../utils/helpers";
@@ -75,6 +75,7 @@ export default {
   setup(_, ctx) {
     const gridStore = useGrid();
     const profileManager = useProfileManager();
+    const app = useApp();
 
     const active = ref(true);
     const extensionCredentials = useExtensionCredentials();
@@ -108,7 +109,7 @@ export default {
     const locked = ref(false);
     const activeTab = ref(0);
 
-    const walletService = provideWalletService({
+    const walletService = provideWalletService(app, {
       $key,
       active,
       extensionCredentials,
@@ -120,6 +121,9 @@ export default {
       logout,
       locked,
       activeTab,
+      reloadBalance() {
+        return balanceTask.value.run();
+      },
     });
 
     ctx.expose(walletService);
