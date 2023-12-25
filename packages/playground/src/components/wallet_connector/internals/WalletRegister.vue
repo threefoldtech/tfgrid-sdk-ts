@@ -219,7 +219,8 @@ export default {
         if (!grid || e0) {
           const error = normalizeError(e0, "Something went wrong. please try again.");
 
-          if (error.toLowerCase().includes("invalid twin id")) {
+          const err = error.toLowerCase();
+          if (err.includes("invalid twin id") || err.includes("couldn't find a user for the provided mnemonic")) {
             throw noTwinFoundError;
           }
 
