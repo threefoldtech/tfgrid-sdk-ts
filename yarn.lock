@@ -4172,6 +4172,11 @@
   resolved "https://registry.yarnpkg.com/@substrate/ss58-registry/-/ss58-registry-1.43.0.tgz#93108e45cb7ef6d82560c153e3692c2aa1c711b3"
   integrity sha512-USEkXA46P9sqClL7PZv0QFsit4S8Im97wchKG0/H/9q3AT/S76r40UHfCr4Un7eBJPE23f7fU9BZ0ITpP9MCsA==
 
+"@threefold/extension_api@^0.0.1-rc10":
+  version "0.0.1-rc10"
+  resolved "https://registry.yarnpkg.com/@threefold/extension_api/-/extension_api-0.0.1-rc10.tgz#5d9e204ada3957508a4dc074154046f5cbcd51f3"
+  integrity sha512-DcUBZM5WKwv8UcqiGb/yCQJ9YbzVGn9/QVHq7ELOaekV+Z2cz0pwwYCyNNVbRnMMWGvKO/aiADk8x0sXW8wkyg==
+
 "@threefold/extension_api@^0.0.1-rc6":
   version "0.0.1-rc6"
   resolved "https://registry.yarnpkg.com/@threefold/extension_api/-/extension_api-0.0.1-rc6.tgz#9271ac014f8cfc5b0351f75bc7bee6f9e5e744a2"
