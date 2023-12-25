@@ -14,29 +14,39 @@
             <p class="mb-1">Balance: <span class="font-weight-bold text-secondary" v-text="balance.free + 'TFT'" /></p>
             <p class="d-flex align-center">
               Locked: <span class="font-weight-bold text-secondary ml-2" v-text="balance.frozen + 'TFT'" />
-              <VBtn
-                :style="{ height: '24px', width: '24px' }"
-                icon="mdi-information-outline"
-                href="https://manual.grid.tf/tfchain/tfchain.html?highlight=locked#contract-locking"
-                target="_blank"
-                size="xs"
-                color="none"
-                class="ml-2 text-white"
-                @click.stop
-              />
+              <VTooltip text="Locked balance documentation">
+                <template #activator="{ props }">
+                  <VBtn
+                    :style="{ height: '24px', width: '24px' }"
+                    icon="mdi-information-outline"
+                    href="https://manual.grid.tf/tfchain/tfchain.html?highlight=locked#contract-locking"
+                    target="_blank"
+                    size="xs"
+                    color="none"
+                    class="ml-2 text-white"
+                    @click.stop
+                    v-bind="props"
+                  />
+                </template>
+              </VTooltip>
             </p>
           </div>
         </template>
 
         <template #append v-if="gridStore.client">
-          <VBtn
-            :style="{ height: '48px' }"
-            icon="mdi-logout"
-            color="error"
-            variant="tonal"
-            @click.stop="logout"
-            :disabled="walletService.locked.value"
-          />
+          <VTooltip text="Logout">
+            <template #activator="{ props }">
+              <VBtn
+                :style="{ height: '48px' }"
+                icon="mdi-logout"
+                color="error"
+                variant="tonal"
+                @click.stop="logout"
+                :disabled="walletService.locked.value"
+                v-bind="props"
+              />
+            </template>
+          </VTooltip>
         </template>
       </VBtn>
     </template>

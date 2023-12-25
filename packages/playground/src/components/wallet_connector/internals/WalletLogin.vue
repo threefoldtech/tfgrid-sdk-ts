@@ -8,18 +8,22 @@
     />
 
     <VForm v-model="valid" @submit.prevent="loginTask.run(password)" :disabled="walletService.locked.value">
-      <PasswordInputWrapper #="{ props }">
-        <VTextField
-          label="Password"
-          placeholder="Your stored wallet's password"
-          :rules="[validatePassword]"
-          v-bind="props"
-          v-model.trim="password"
-          autofocus
-          :error="!!loginTask.error"
-          :error-messages="loginTask.error ?? undefined"
-        />
-      </PasswordInputWrapper>
+      <InputTooltip
+        tooltip="Used to encrypt your mnemonic on your local system, and is used to login from the same device."
+      >
+        <PasswordInputWrapper #="{ props }">
+          <VTextField
+            label="Password"
+            placeholder="Your stored wallet's password"
+            :rules="[validatePassword]"
+            v-bind="props"
+            v-model.trim="password"
+            autofocus
+            :error="!!loginTask.error"
+            :error-messages="loginTask.error ?? undefined"
+          />
+        </PasswordInputWrapper>
+      </InputTooltip>
 
       <VContainer>
         <VRow justify="center">

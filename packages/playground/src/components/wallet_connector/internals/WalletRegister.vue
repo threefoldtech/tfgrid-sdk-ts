@@ -19,59 +19,64 @@
       @submit.prevent="connectTask.run(mnemonic, keypairType)"
       :disabled="walletService.locked.value"
     >
-      <PasswordInputWrapper #="{ props }">
-        <VTextField
-          ref="mnemonicInput"
-          class="mnemonic-input mt-4"
-          label="Mnemonic or Hex Seed"
-          placeholder="Please insert your Mnemonic or Hex Seed"
-          v-bind="props"
-          :error="
-            !generateAccountTask.loading &&
-            !activateAccountTask.loading &&
-            !validateMnemonicTask.loading &&
-            (!!validateMnemonicTask.error || !!validateMnemonicTask.error || !!generateAccountTask.error)
-          "
-          :error-messages="
-            generateAccountTask.loading || activateAccountTask.loading
-              ? undefined
-              : validateMnemonicTask.error || generateAccountTask.error || activateAccountTask.error || undefined
-          "
-          :hint="
-            generateAccountTask.loading
-              ? 'Generating new account...'
-              : activateAccountTask.loading
-              ? 'Activating your account...'
-              : mnemonic && !validateMnemonicTask.initialized
-              ? 'Prepare to validate mnemonic'
-              : validateMnemonicTask.loading
-              ? 'Validating...'
-              : undefined
-          "
-          :persistent-hint="
-            generateAccountTask.loading ||
-            activateAccountTask.loading ||
-            (mnemonic && !validateMnemonicTask.initialized) ||
-            validateMnemonicTask.loading
-          "
-          :loading="validateMnemonicTask.loading"
-          v-model="mnemonic"
-          autofocus
-        >
-          <template #append>
-            <VSelect
-              :items="['sr25519', 'ed25519']"
-              hide-details
-              v-model="keypairType"
-              :disabled="validateMnemonicTask.loading"
-            >
-              <template #item="{ props }">
-                <VListItem v-bind="props" />
-              </template>
-            </VSelect>
-          </template>
-        </VTextField>
-      </PasswordInputWrapper>
+      <InputTooltip
+        tooltip="Mnemonic or Hex Seed are your private key. They are used to represent you on the ThreeFold Grid. You can paste existing (Mnemonic or Hex Seed) or click the 'Create Account' button to create an account and generate mnemonic."
+        align-center
+      >
+        <PasswordInputWrapper #="{ props }">
+          <VTextField
+            ref="mnemonicInput"
+            class="mnemonic-input mt-4"
+            label="Mnemonic or Hex Seed"
+            placeholder="Please insert your Mnemonic or Hex Seed"
+            v-bind="props"
+            :error="
+              !generateAccountTask.loading &&
+              !activateAccountTask.loading &&
+              !validateMnemonicTask.loading &&
+              (!!validateMnemonicTask.error || !!validateMnemonicTask.error || !!generateAccountTask.error)
+            "
+            :error-messages="
+              generateAccountTask.loading || activateAccountTask.loading
+                ? undefined
+                : validateMnemonicTask.error || generateAccountTask.error || activateAccountTask.error || undefined
+            "
+            :hint="
+              generateAccountTask.loading
+                ? 'Generating new account...'
+                : activateAccountTask.loading
+                ? 'Activating your account...'
+                : mnemonic && !validateMnemonicTask.initialized
+                ? 'Prepare to validate mnemonic'
+                : validateMnemonicTask.loading
+                ? 'Validating...'
+                : undefined
+            "
+            :persistent-hint="
+              generateAccountTask.loading ||
+              activateAccountTask.loading ||
+              (mnemonic && !validateMnemonicTask.initialized) ||
+              validateMnemonicTask.loading
+            "
+            :loading="validateMnemonicTask.loading"
+            v-model="mnemonic"
+            autofocus
+          >
+            <template #append>
+              <VSelect
+                :items="['sr25519', 'ed25519']"
+                hide-details
+                v-model="keypairType"
+                :disabled="validateMnemonicTask.loading"
+              >
+                <template #item="{ props }">
+                  <VListItem v-bind="props" />
+                </template>
+              </VSelect>
+            </template>
+          </VTextField>
+        </PasswordInputWrapper>
+      </InputTooltip>
 
       <VFadeTransition>
         <VContainer class="mb-4" v-if="keypairType !== KeypairType.ed25519">
@@ -103,22 +108,26 @@
         </VContainer>
       </VFadeTransition>
 
-      <PasswordInputWrapper #="{ props }">
-        <VTextField
-          label="Password"
-          placeholder="Your password"
-          :model-value="password"
-          @update:model-value="
-            password = $event.trim();
-            ($refs.confirmPasswordInput as VTextField).dirty && ($refs.confirmPasswordInput as VTextField).validate();
-          "
-          :rules="[
-            p => (p ? true : 'Password is required.'),
-            p => (p.length < 6 ? 'Password must be at least 6 characters.' : true),
-          ]"
-          v-bind="props"
-        />
-      </PasswordInputWrapper>
+      <InputTooltip
+        tooltip="Used to encrypt your mnemonic on your local system, and is used to login from the same device."
+      >
+        <PasswordInputWrapper #="{ props }">
+          <VTextField
+            label="Password"
+            placeholder="Your password"
+            :model-value="password"
+            @update:model-value="
+              password = $event.trim();
+              ($refs.confirmPasswordInput as VTextField).dirty && ($refs.confirmPasswordInput as VTextField).validate();
+            "
+            :rules="[
+              p => (p ? true : 'Password is required.'),
+              p => (p.length < 6 ? 'Password must be at least 6 characters.' : true),
+            ]"
+            v-bind="props"
+          />
+        </PasswordInputWrapper>
+      </InputTooltip>
 
       <PasswordInputWrapper #="{ props }">
         <VTextField

@@ -4,7 +4,6 @@
       <VTextarea
         label="Public SSH Key"
         placeholder="Your Public SSh Key"
-        v-bind="props"
         v-model.trim="editedSsh"
         spellcheck="false"
         :disabled="generateTask.loading || updateTask.loading"
@@ -23,7 +22,19 @@
         :persistent-hint="!generateTask.error && !updateTask.error"
         :error-messages="(generateTask.error || updateTask.error) ?? undefined"
         :error="!!generateTask.error || !!updateTask.error"
-      />
+      >
+        <template #append-inner>
+          <div class="h-100 w-100 d-flex flex-column align-center">
+            <VBtn :icon="props['append-inner-icon']" @click="props['onClick:append-inner']" variant="plain" />
+            <VSpacer />
+            <div class="mr-3 mb-4">
+              <InputTooltip
+                tooltip="SSH Keys are used to authenticate you to the deployment instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
+              />
+            </div>
+          </div>
+        </template>
+      </VTextarea>
     </CopyInputWrapper>
 
     <VContainer>

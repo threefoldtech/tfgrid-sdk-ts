@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex">
-    <v-tooltip :text="tooltip || 'None!'" :location="location">
+    <v-tooltip :location="location">
       <template #activator="{ props }">
         {{ getPropsRef(props) }}
         <div class="d-flex" :class="{ 'w-100': !inline, 'align-center': alignCenter }">
@@ -12,6 +12,7 @@
             @mouseleave="propsRef?.onMouseleave"
             @focus="propsRef?.onFocus"
             @blur="propsRef?.onBlur"
+            @click.stop
           >
             <a :href="href" target="_blank">
               <v-icon>mdi-information-outline</v-icon>
@@ -19,6 +20,8 @@
           </span>
         </div>
       </template>
+
+      <p :style="{ maxWidth: '700px' }" v-text="tooltip || 'None!'" />
     </v-tooltip>
   </div>
 </template>
