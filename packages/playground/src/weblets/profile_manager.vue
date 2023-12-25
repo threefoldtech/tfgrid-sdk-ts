@@ -762,7 +762,12 @@ async function __loadBalance(profile?: Profile, tries = 1) {
     balance.value = await loadBalance(grid!);
     loadingBalance.value = false;
   } catch {
-    setTimeout(() => __loadBalance(profile, tries + 1), Math.floor(Math.min(3_600, Math.exp(tries))) * 1_000);
+    if (tries > 10) {
+      loadingBalance.value = false;
+      return;
+    }
+
+    setTimeout(() => __loadBalance(profile, tries + 1), Math.floor(Math.exp(tries) * 1_000));
   }
 }
 
