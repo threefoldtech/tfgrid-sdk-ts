@@ -77,7 +77,7 @@ const props = defineProps({
   valid: Boolean,
 });
 
-const emit = defineEmits(["update:model-value", "update:valid"]);
+const emit = defineEmits(["update:model-value", "update:valid", "update:options"]);
 
 const formRef = useFormRef();
 const panel = ref([0]);
@@ -89,6 +89,7 @@ watch(
     const hasNonEmptyValue = Object.keys(newValue).some(obj => {
       return Reflect.get(newValue, obj).value && Reflect.get(newValue, obj).value.length >= 1;
     });
+    emit("update:options");
 
     isFiltersTouched.value = hasNonEmptyValue;
   },
