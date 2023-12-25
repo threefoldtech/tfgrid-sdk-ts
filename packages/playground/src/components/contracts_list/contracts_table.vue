@@ -110,9 +110,6 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
-  <v-snackbar variant="tonal" color="error" v-model="snackbar" :timeout="5000">
-    Failed to delete some keys, You don't have enough tokens
-  </v-snackbar>
 </template>
 
 <script lang="ts" setup>
@@ -239,7 +236,7 @@ async function onDelete() {
     if (e instanceof InsufficientBalanceError) {
       contracts.value = contracts.value.filter(c => !selectedContracts.value.includes(c));
       selectedContracts.value = [];
-      snackbar.value = true;
+      createCustomToast("Failed to delete some keys, You don't have enough tokens", ToastType.danger);
     } else {
       layout.value.setStatus("failed", normalizeError(e, `Failed to delete some of the selected contracts.`));
     }
