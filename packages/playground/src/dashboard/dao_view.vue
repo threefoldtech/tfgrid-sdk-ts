@@ -209,7 +209,7 @@
               >
               <span> The voting process concludes at the designated maturity date and time of the proposal.</span>
               <span>
-                Decisions regarding the proposal's acceptance or rejection are determined by a majority of weighted
+                Decisions regarding the proposal's acceptance or rejection are determined by the majority of weighted
                 votes.</span
               >
               <span>
