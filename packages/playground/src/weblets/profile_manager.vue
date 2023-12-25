@@ -752,7 +752,7 @@ async function generateSSH() {
 }
 let BalanceWarningRaised = false;
 const loadingBalance = ref(false);
-async function __loadBalance(profile?: Profile) {
+async function __loadBalance(profile?: Profile, tries = 1) {
   profile = profile || profileManager.profile!;
   if (!profile) return;
 
@@ -768,7 +768,12 @@ async function __loadBalance(profile?: Profile) {
     }
     loadingBalance.value = false;
   } catch {
-    __loadBalance(profile);
+    if (tries > 10) {
+      loadingBalance.value = false;
+      return;
+    }
+
+    setTimeout(() => __loadBalance(profile, tries + 1), Math.floor(Math.exp(tries) * 1_000));
   }
 }
 
