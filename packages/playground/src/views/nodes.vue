@@ -8,7 +8,7 @@
   <view-layout>
     <filters
       :form-disabled="isFormLoading"
-      :model-value="filterInputs"
+      v-model:model-value="filterInputs"
       v-model:valid="isValidForm"
       @update:model-value="inputFiltersReset"
     />
@@ -64,6 +64,7 @@
                           label="Select Nodes Status"
                           variant="underlined"
                           :disabled="isFormLoading"
+                          @update:model-value="statusReset"
                           open-on-clear
                           clearable
                         ></v-select>
@@ -181,16 +182,17 @@ export default {
     // The filters should reset to the default value again..
     const inputFiltersReset = (filtersInputValues: FilterInputs) => {
       filterInputs.value = filtersInputValues;
-      filterOptions.value = {
-        ...filterOptions.value,
-        status: NodeStatus.Up,
-        gpu: undefined,
-        gateway: undefined,
-        page: 1,
-        size: 10,
-      };
+      filterOptions.value = optionsInitializer();
     };
 
+    const statusReset = () => {
+      const options = mixedFilters.value.options;
+      options.page = 1;
+      options.size = 10;
+      // reset filters
+
+      filterInputs.value = inputsInitializer();
+    };
     const checkSelectedNode = async () => {
       if (route.query.nodeId) {
         selectedNodeId.value = +route.query.nodeId;
@@ -227,6 +229,7 @@ export default {
       selectedNodeId,
       selectedNodeoptions,
       nodeStatusOptions,
+      statusReset,
 
       filterInputs,
       filterOptions,
