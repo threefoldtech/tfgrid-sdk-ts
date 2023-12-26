@@ -170,12 +170,12 @@ async function main() {
 
     try {
       await grid3.machines.twinDeploymentHandler.handle(allTwinDeployments);
-      successCount += batchSize;
-      log(`Successfully handled and saved contracts for all twin deployments`);
+      successCount += deploymentResults.length;
+      failedCount += batchSize - deploymentResults.length;
+      log(`Successfully handled and saved contracts for some twin deployments`);
     } catch (error) {
-      failedCount += batchSize;
       errors.push(error);
-      log(`Error handling contracts for all twin deployments: ${error}`);
+      log(`Error handling contracts for twin deployments: ${error}`);
     }
 
     console.timeEnd("Batch " + (batch + 1));
