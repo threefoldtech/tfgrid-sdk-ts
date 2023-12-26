@@ -30,16 +30,9 @@
           location="right"
         >
           <template #activator="{ props }">
-            <VBtn
-              icon="mdi-information"
-              v-bind="props"
-              class="text-white mr-4 ml-1 order-3 transparent-background button-size"
-            />
+            <VBtn icon="mdi-information" v-bind="props" class="text-white mr-4 ml-1 order-3" color="transparent" />
           </template>
         </VTooltip>
-
-        <!-- <br />
-        {{ totalCostUSD }} USD/hour ≈ {{ totalCostUSD === 0 ? 0 : (totalCostUSD! * 24 * 30).toFixed(3) }} USD/month -->
       </strong>
       <small v-else> loading total cost... </small>
     </template>
@@ -248,9 +241,3 @@ export default defineComponent({
   components: {},
 });
 </script>
-
-<style scoped>
-.transparent-background {
-  background-color: transparent !important;
-}
-</style>
