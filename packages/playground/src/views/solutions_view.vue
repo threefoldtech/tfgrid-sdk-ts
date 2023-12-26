@@ -18,7 +18,7 @@
                 />
                 <v-card-title class="d-inline-block">
                   {{ card.title }}
-                  <v-chip v-if="card.community" class="ml-2 pulse-animation" color="#1AA18F" small text-color="white">
+                  <v-chip v-if="card.flare" class="ml-2 pulse-animation" color="#1AA18F" small text-color="white">
                     Community
                   </v-chip>
                 </v-card-title>
@@ -38,7 +38,7 @@ interface Card {
   excerpt: string;
   icon: string;
   route: string;
-  community?: boolean;
+  flare?: string;
 }
 
 export default {
@@ -120,7 +120,7 @@ export default {
           "Nextcloud is a suite of client-server software for creating and using file hosting services. Nextcloud provides functionality similar to Dropbox, Office 365 or Google Drive.",
         icon: "nextcloud.png",
         route: "/nextcloud",
-        community: true,
+        flare: "Community",
       },
       {
         title: "Presearch",
