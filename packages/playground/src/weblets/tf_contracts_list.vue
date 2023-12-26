@@ -24,15 +24,13 @@
     </template>
     <template #text>
       <strong v-if="totalCost != undefined" class="text-primary">
-        {{ totalCost }} TFT/hour ≈ {{ totalCost === 0 ? 0 : (totalCost * 24 * 30).toFixed(3) }} TFT/month
-        <VTooltip
-          :text="`${totalCostUSD} USD/hour ≈ ${totalCostUSD === 0 ? 0 : (totalCostUSD! * 24 * 30).toFixed(3)} USD/month`"
-          location="right"
+        <input-tooltip
+          inline
+          :alignCenter="true"
+          :tooltip="`${totalCostUSD} USD/hour ≈ ${totalCostUSD === 0 ? 0 : (totalCostUSD! * 24 * 30).toFixed(3)} USD/month`"
         >
-          <template #activator="{ props }">
-            <VBtn icon="mdi-information" v-bind="props" class="text-white mr-4 ml-1 order-3" color="transparent" />
-          </template>
-        </VTooltip>
+          {{ totalCost }} TFT/hour ≈ {{ totalCost === 0 ? 0 : (totalCost * 24 * 30).toFixed(3) }} TFT/month
+        </input-tooltip>
       </strong>
       <small v-else> loading total cost... </small>
     </template>
