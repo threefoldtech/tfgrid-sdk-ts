@@ -705,6 +705,15 @@ export function isString(msg: string) {
   };
 }
 
+export function ipNotEqualGateway(ip: string, gw: string, msg: string) {
+  return (value: string) => {
+    const address = ip.split("/")[0];
+    if (gw === address) {
+      return { message: msg, isNotEqualStrings: true };
+    }
+  };
+}
+
 export interface RegexPattern {
   pattern: string | RegExp;
   flags?: string | undefined;
