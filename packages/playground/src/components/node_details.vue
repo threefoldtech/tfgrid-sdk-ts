@@ -41,7 +41,7 @@
           </v-col>
           <v-col cols="12" md="6" sm="8">
             <country-details-card :node="node" />
-            <location-details-card :node="node" />
+            <location-details-card class="mt-5" :node="node" />
           </v-col>
           <v-col cols="12" md="6" sm="8">
             <farm-details-card :node="node" />
