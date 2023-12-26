@@ -120,7 +120,6 @@ class GridClient {
     }
 
     await this.testConnectionUrls(urls);
-    await this.rmbClient.connect();
 
     if (BackendStorage.isEnvNode()) {
       process.on("SIGTERM", this.disconnectAndExit);
@@ -133,8 +132,8 @@ class GridClient {
       };
       window.onunload = this.disconnect;
     }
-
     this._connect();
+    await this.rmbClient.connect();
     await migrateKeysEncryption.apply(this, [GridClient]);
   }
 
