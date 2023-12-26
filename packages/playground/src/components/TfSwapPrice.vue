@@ -1,7 +1,7 @@
 <template>
   <VContainer>
     <VRow align="center">
-      <span v-if="showPrice" v-text="usdPrice + ' USD'" :class="{ 'order-0': !swap, 'order-2': swap }" />
+      <span v-if="showPrice" v-text="usdPrice + ' USD'" :class="{ 'order-0': swap, 'order-2': !swap }" />
       <VTooltip :text="priceTask.error || ''" :disabled="!priceTask.error">
         <template #activator="{ props }">
           <VBtn
@@ -14,7 +14,7 @@
           />
         </template>
       </VTooltip>
-      <span v-if="showPrice" v-text="tftPrice + ' TFT'" :class="{ 'order-2': !swap, 'order-0': swap }" />
+      <span v-if="showPrice" v-text="tftPrice + ' TFT'" :class="{ 'order-2': swap, 'order-0': !swap }" />
 
       <VTooltip text="More information" location="left">
         <template #activator="{ props }">
@@ -60,7 +60,7 @@ export default {
     const swap = ref(false);
     const toggleSwap = () => (swap.value = !swap.value);
 
-    const usdPrice = computed(() => {
+    const tftPrice = computed(() => {
       if (!swap.value || !priceTask.value.initialized) {
         return 1;
       }
@@ -69,7 +69,7 @@ export default {
       return Math.floor(r * 1000) / 1000;
     });
 
-    const tftPrice = computed(() => {
+    const usdPrice = computed(() => {
       if (swap.value || !priceTask.value.initialized) {
         return 1;
       }
