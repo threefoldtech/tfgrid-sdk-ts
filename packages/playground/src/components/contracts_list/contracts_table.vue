@@ -117,6 +117,7 @@
 import { ContractStates, type GridClient } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
+import { DeploymentKeyDeletionError, InsufficientBalanceError } from "@threefold/types";
 import { defineComponent, type PropType, type Ref, ref } from "vue";
 import { capitalize } from "vue";
 
@@ -232,10 +233,10 @@ async function onDelete() {
     emits("update:deleted-contracts", contracts.value);
     selectedContracts.value = [];
   } catch (e) {
-    if ((e as Error).message.includes("Inability to pay some fees")) {
+    if (e instanceof DeploymentKeyDeletionError) {
       contracts.value = contracts.value.filter(c => !selectedContracts.value.includes(c));
       selectedContracts.value = [];
-      snackbar.value = true;
+      createCustomToast("Failed to delete some keys, You don't have enough tokens", ToastType.danger);
     } else {
       layout.value.setStatus("failed", normalizeError(e, `Failed to delete some of the selected contracts.`));
     }
