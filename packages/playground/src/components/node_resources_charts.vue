@@ -5,9 +5,12 @@
         <h2 class="node-resources-title text-center text-h5 flex justify-center items-center">
           <v-icon size="32" class="mr-2">mdi-chart-pie</v-icon>
           Node {{ node.nodeId }} Resources
-          <v-chip :color="getNodeStatusColor(node.status).color">
+
+          <v-chip v-if="isLiveStats" :color="getNodeStatusColor(node.status).color">
             {{ node.status === NodeStatus.Up ? "Online" : node.status === NodeStatus.Standby ? "Standby" : "Offline" }}
           </v-chip>
+          <!-- As isLiveStats=False means we can't reach the node to get the stats from it live. -->
+          <v-chip v-else :color="getNodeStatusColor(NodeStatus.Down).color"> Offline </v-chip>
         </h2>
       </v-col>
     </v-row>
@@ -25,17 +28,19 @@
 
     <v-row justify="center">
       <v-progress-circular v-if="loading" indeterminate color="primary" :size="50" class="mt-10 mb-10" />
-
       <v-btn
         rounded="md"
         variant="flat"
         color="primary"
         v-if="isNodeReadyToVisit()"
-        class="mt-15"
+        class="mt-10"
         @click="getNodeHealthUrl"
       >
         Check Node Health
       </v-btn>
+    </v-row>
+    <v-row justify="center" class="w-50 mt-10" style="margin: 0 auto">
+      <v-alert variant="tonal" type="warning" v-if="hintMessage">{{ hintMessage }}</v-alert>
     </v-row>
   </div>
 </template>
@@ -52,6 +57,14 @@ export default {
   props: {
     node: {
       type: Object as PropType<GridNode>,
+      required: true,
+    },
+    isLiveStats: {
+      type: Boolean,
+      required: true,
+    },
+    hintMessage: {
+      type: Object as PropType<string | undefined>,
       required: true,
     },
   },
@@ -79,7 +92,7 @@ export default {
               Reflect.get(props.node.stats.total, i)) *
             100;
         } else {
-          value = NaN;
+          value = (Reflect.get(props.node.used_resources, i) / Reflect.get(props.node.total_resources, i)) * 100;
         }
         loading.value = false;
         return {
