@@ -24,7 +24,13 @@
     </template>
     <template #text>
       <strong v-if="totalCost != undefined" class="text-primary">
-        {{ totalCost }} TFT/hour ≈ {{ totalCost === 0 ? 0 : (totalCost * 24 * 30).toFixed(3) }} TFT/month
+        <input-tooltip
+          inline
+          :alignCenter="true"
+          :tooltip="`${totalCostUSD} USD/hour ≈ ${totalCostUSD === 0 ? 0 : (totalCostUSD! * 24 * 30).toFixed(3)} USD/month`"
+        >
+          {{ totalCost }} TFT/hour ≈ {{ totalCost === 0 ? 0 : (totalCost * 24 * 30).toFixed(3) }} TFT/month
+        </input-tooltip>
       </strong>
       <small v-else> loading total cost... </small>
     </template>
@@ -75,6 +81,8 @@ import {
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { getGrid } from "@/utils/grid";
 
+import { queryClient } from "../clients";
+
 const isLoading = ref<boolean>(false);
 const profileManager = useProfileManager();
 const grid = ref<GridClient>();
@@ -85,6 +93,7 @@ const nodeContracts = ref<NormalizedContract[]>([]);
 const rentContracts = ref<NormalizedContract[]>([]);
 const loadingErrorMessage = ref<string>();
 const totalCost = ref<number>();
+const totalCostUSD = ref<number>();
 
 const panel = ref<number[]>([0, 1, 2]);
 const nodeStatus = ref() as Ref<{ [x: number]: NodeStatus }>;
@@ -101,6 +110,7 @@ async function onMount() {
   contracts.value = nameContracts.value = nodeContracts.value = rentContracts.value = [];
   isLoading.value = true;
   totalCost.value = undefined;
+  totalCostUSD.value = undefined;
   loadingErrorMessage.value = undefined;
 
   if (profileManager.profile) {
@@ -115,6 +125,8 @@ async function onMount() {
         rentContracts.value = contracts.value.filter(c => c.type === ContractType.RENT);
         nodeStatus.value = await getNodeStatus(nodeIDs.value);
         totalCost.value = getTotalCost(contracts.value);
+        const TFTInUSD = await queryClient.tftPrice.get();
+        totalCostUSD.value = totalCost.value / TFTInUSD;
       } catch (error: any) {
         // Handle errors and display toast messages
         loadingErrorMessage.value = error.message;
