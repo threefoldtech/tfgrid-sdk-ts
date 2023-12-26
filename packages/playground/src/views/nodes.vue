@@ -1,7 +1,7 @@
 <template>
   <div class="hint">
     <v-alert type="info" variant="tonal">
-      Node statuses are updated every 90 minutes. For a realtime status, please click on the row.
+      Node status is updated every 90 minutes. For a realtime status, click on the row.
     </v-alert>
   </div>
 
