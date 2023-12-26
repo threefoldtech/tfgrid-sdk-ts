@@ -459,6 +459,7 @@ import { downloadAsFile, normalizeBalance } from "../utils/helpers";
 interface Credentials {
   passwordHash?: string;
   mnemonicHash?: string;
+  keypairTypeHash?: string;
 }
 const keyType = ["sr25519", "ed25519"];
 const keypairType = ref(KeypairType.sr25519);
@@ -538,10 +539,11 @@ function getCredentials() {
   return credentials;
 }
 
-function setCredentials(passwordHash: string, mnemonicHash: string): Credentials {
+function setCredentials(passwordHash: string, mnemonicHash: string, keypairTypeHash: string): Credentials {
   const credentials: Credentials = {
-    passwordHash: passwordHash,
-    mnemonicHash: mnemonicHash,
+    passwordHash,
+    mnemonicHash,
+    keypairTypeHash,
   };
   localStorage.setItem(WALLET_KEY, JSON.stringify(credentials));
   return credentials;
@@ -658,12 +660,12 @@ function clearFields() {
   mnemonic.value = "";
 }
 
-async function activate(mnemonic: string) {
+async function activate(mnemonic: string, keypairType: KeypairType) {
   clearError();
   activating.value = true;
   sessionStorage.setItem("password", password.value);
   try {
-    const grid = await getGrid({ mnemonic, keypairType: keypairType.value });
+    const grid = await getGrid({ mnemonic, keypairType });
     const profile = await loadProfile(grid!);
     ssh.value = profile.ssh;
     profileManager.set({ ...profile, mnemonic });
@@ -786,7 +788,10 @@ function login() {
     if (credentials.passwordHash === md5(password.value)) {
       const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
       const mnemonic = cryptr.decrypt(credentials.mnemonicHash);
-      activate(mnemonic);
+      const keypairType = credentials.keypairTypeHash
+        ? cryptr.decrypt(credentials.keypairTypeHash)
+        : KeypairType.sr25519;
+      activate(mnemonic, keypairType as KeypairType);
     }
   }
 }
@@ -794,8 +799,9 @@ function login() {
 function storeAndLogin() {
   const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
   const mnemonicHash = cryptr.encrypt(mnemonic.value);
-  setCredentials(md5(password.value), mnemonicHash);
-  activate(mnemonic.value);
+  const keypairTypeHash = cryptr.encrypt(keypairType.value);
+  setCredentials(md5(password.value), mnemonicHash, keypairTypeHash);
+  activate(mnemonic.value, keypairType.value);
 }
 
 function validatePassword(value: string) {
