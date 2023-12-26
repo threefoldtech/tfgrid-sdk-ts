@@ -169,6 +169,10 @@ export const toBytes = (resource: number | undefined): number => {
   return resource ? resource * 1024 * 1024 * 1024 : 0;
 };
 
+export function convert(value: string | undefined) {
+  return value ? Math.ceil(toBytes(+value)) : undefined;
+}
+
 export const getQueries = (mixedFilters: MixedFilter): Partial<NodesQuery> => {
   const options: Partial<NodesQuery> = {
     retCount: true,
@@ -179,9 +183,12 @@ export const getQueries = (mixedFilters: MixedFilter): Partial<NodesQuery> => {
     status: mixedFilters.options.status ? (mixedFilters.options.status.toLocaleLowerCase() as NodeStatus) : undefined,
     page: mixedFilters.options.page,
     size: mixedFilters.options.size,
-    freeHru: mixedFilters.inputs.freeHru.value ? toBytes(+mixedFilters.inputs.freeHru.value!) : undefined,
-    freeMru: mixedFilters.inputs.freeMru.value ? toBytes(+mixedFilters.inputs.freeMru.value!) : undefined,
-    freeSru: mixedFilters.inputs.freeSru.value ? toBytes(+mixedFilters.inputs.freeSru.value!) : undefined,
+    freeHru: convert(mixedFilters.inputs.freeHru.value),
+    freeMru: convert(mixedFilters.inputs.freeMru.value),
+    freeSru: convert(mixedFilters.inputs.freeSru.value),
+    totalHru: convert(mixedFilters.inputs.totalHru.value),
+    totalMru: convert(mixedFilters.inputs.totalMru.value),
+    totalSru: convert(mixedFilters.inputs.totalSru.value),
     hasGpu: mixedFilters.options.gpu ? mixedFilters.options.gpu : undefined,
   };
   if (mixedFilters.options.gateway) {

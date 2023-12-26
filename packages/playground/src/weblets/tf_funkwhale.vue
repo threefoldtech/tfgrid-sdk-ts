@@ -254,7 +254,6 @@ import Networks from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
-import type { INode } from "../utils/filter_nodes";
 import rootFs from "../utils/root_fs";
 
 export default {
