@@ -317,57 +317,59 @@ class TwinDeploymentHandler {
   }
 
   async checkNodesCapacity(twinDeployments: TwinDeployment[]) {
-    for (const twinDeployment of twinDeployments) {
-      let workloads: Workload[] = [];
+    await Promise.all(twinDeployments.map(d => this.checkNodeCapacity(d)));
+  }
 
-      if (twinDeployment.operation == Operations.deploy) {
-        workloads = twinDeployment.deployment.workloads;
-      }
+  async checkNodeCapacity(twinDeployment: TwinDeployment) {
+    let workloads: Workload[] = [];
 
-      if (twinDeployment.operation == Operations.update) {
-        const deployment_version = twinDeployment.deployment.version;
-        workloads = twinDeployment.deployment.workloads.filter(workload => workload.version == deployment_version);
-      }
+    if (twinDeployment.operation == Operations.deploy) {
+      workloads = twinDeployment.deployment.workloads;
+    }
 
-      let hru = 0;
-      let sru = 0;
-      let mru = 0;
-      const rootfsDisks: number[] = [];
-      const ssdDisks: number[] = [];
-      const hddDisks: number[] = [];
-      for (const workload of workloads) {
-        if (workload.type == WorkloadTypes.zmachine) {
-          rootfsDisks.push(workload.data["size"]);
-          sru += workload.data["size"];
-        }
-        if (workload.type == WorkloadTypes.zmount) {
-          ssdDisks.push(workload.data["size"]);
-          sru += workload.data["size"];
-        }
-        if (workload.type == WorkloadTypes.zdb) {
-          hddDisks.push(workload.data["size"]);
-          hru += workload.data["size"];
-        }
-        if (workload.type == WorkloadTypes.zmachine) {
-          mru += workload.data["compute_capacity"].memory;
-        }
-      }
+    if (twinDeployment.operation == Operations.update) {
+      const deployment_version = twinDeployment.deployment.version;
+      workloads = twinDeployment.deployment.workloads.filter(workload => workload.version == deployment_version);
+    }
 
-      if (
-        workloads.length !== 0 &&
-        !(await this.nodes.nodeHasResources(+twinDeployment.nodeId, {
-          hru: hru / 1024 ** 3,
-          sru: sru / 1024 ** 3,
-          mru: mru / 1024 ** 3,
-        }))
-      ) {
-        throw new GridClientErrors.Nodes.InvalidResourcesError(
-          `Node ${twinDeployment.nodeId} doesn't have enough resources: sru=${sru}, mru=${mru} .`,
-        );
+    let hru = 0;
+    let sru = 0;
+    let mru = 0;
+    const rootfsDisks: number[] = [];
+    const ssdDisks: number[] = [];
+    const hddDisks: number[] = [];
+    for (const workload of workloads) {
+      if (workload.type == WorkloadTypes.zmachine) {
+        rootfsDisks.push(workload.data["size"]);
+        sru += workload.data["size"];
       }
-      if (workloads.length && (rootfsDisks.length || ssdDisks.length || hddDisks.length)) {
-        await this.nodes.verifyNodeStoragePoolCapacity(ssdDisks, hddDisks, rootfsDisks, +twinDeployment.nodeId);
+      if (workload.type == WorkloadTypes.zmount) {
+        ssdDisks.push(workload.data["size"]);
+        sru += workload.data["size"];
       }
+      if (workload.type == WorkloadTypes.zdb) {
+        hddDisks.push(workload.data["size"]);
+        hru += workload.data["size"];
+      }
+      if (workload.type == WorkloadTypes.zmachine) {
+        mru += workload.data["compute_capacity"].memory;
+      }
+    }
+
+    if (
+      workloads.length !== 0 &&
+      !(await this.nodes.nodeHasResources(+twinDeployment.nodeId, {
+        hru: hru / 1024 ** 3,
+        sru: sru / 1024 ** 3,
+        mru: mru / 1024 ** 3,
+      }))
+    ) {
+      throw new GridClientErrors.Nodes.InvalidResourcesError(
+        `Node ${twinDeployment.nodeId} doesn't have enough resources: sru=${sru}, mru=${mru} .`,
+      );
+    }
+    if (workloads.length && (rootfsDisks.length || ssdDisks.length || hddDisks.length)) {
+      await this.nodes.verifyNodeStoragePoolCapacity(ssdDisks, hddDisks, rootfsDisks, +twinDeployment.nodeId);
     }
   }
 
