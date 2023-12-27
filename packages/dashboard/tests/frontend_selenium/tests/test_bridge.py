@@ -2,7 +2,7 @@ from utils.utils import generate_leters, generate_string, get_seed, get_stellar_
 from pages.dashboard import DashboardPage
 from utils.grid_proxy import GridProxy
 from pages.bridge import BridgePage
-
+import time
 #  Time required for the run (11 cases) is approximately 3 minutes.
 
 
@@ -15,7 +15,6 @@ def before_test_setup(browser):
     dashboard_page.click_button(dashboard_page.connect_your_wallet(password))
     bridge_page.navigate_to_bridge()
     return bridge_page
-
 
 def test_navigate_bridge(browser):
     """
@@ -42,6 +41,7 @@ def test_transfer_chain(browser):
     """
     bridge_page = before_test_setup(browser)
     bridge_page.transfer_chain()
+    assert 'stellar' in browser.page_source
 
 
 def test_choose_deposit(browser):
@@ -57,7 +57,6 @@ def test_choose_deposit(browser):
       Result: Deposit tft will be shown.
     """
     bridge_page = before_test_setup(browser)
-    bridge_page.transfer_chain()
     bridge_page.choose_deposit()
     assert 'Deposit TFT' in browser.page_source
 
@@ -150,11 +149,13 @@ def test_check_withdraw_invalid_stellar(browser):
     """
     bridge_page = before_test_setup(browser)
     bridge_page.transfer_chain()
-    bridge_page.setup_withdraw_tft(0.001)
+    bridge_page.setup_withdraw_tft(3)
     cases = [' ', generate_string(), generate_leters(), '!@##$%$E^/>|ز%^(;:^*)']
     for case in cases:
         assert bridge_page.check_withdraw_invalid_stellar(case) == False
         assert bridge_page.wait_for('invalid address')
+    assert bridge_page.check_withdraw_invalid_stellar('GDNEFLS7YFBER7Z53N7DGR5OYEOEHBSKNW6KDIEK7PAQ4PNMUUONI6VS') == False
+    assert bridge_page.wait_for('Address not found')
 
 
 def test_check_withdraw_tft_amount(browser):
@@ -172,8 +173,8 @@ def test_check_withdraw_tft_amount(browser):
     """
     bridge_page = before_test_setup(browser)
     bridge_page.transfer_chain()
-    cases = [2, 2.001, 2.111]
     balance = bridge_page.setup_widthdraw_address(get_stellar_address())
+    cases = [2, 8.001, 10.111]
     cases.append(format(float(balance)-1, '.3f'))
     for case in cases:
         assert bridge_page.check_withdraw_tft_amount(case) == True
@@ -225,5 +226,5 @@ def test_check_withdraw(browser):
     min_balance = float(balance)-2
     max_balance = float(balance)-2.11
     bridge_page.check_withdraw(get_stellar_address(), '2.1').click()
-    assert bridge_page.wait_for('Withdraw submitted!')
+    assert bridge_page.wait_for('Transaction Succeeded')
     assert format(float(max_balance), '.3f') <= format(float(bridge_page.get_balance_withdraw(balance)), '.3f') <= format(float(min_balance), '.3f')

@@ -10,43 +10,45 @@ This module contains Bridge page elements.
 
 class BridgePage:
 
-    bridge=(By.XPATH, '//*[@id="app"]/div[1]/nav/div[1]/div[1]/div[2]/div[2]/div/div/a[2]/div[2]/div')
+    close_login_button = (By.XPATH, '/html/body/div[2]/div[25]/div[2]/div[2]/div[2]/v-tab-item/div/form/div[6]/button[1]')
+    sidebar = (By.XPATH, '/html/body/div[1]/div/div/nav/div/div[1]/div/div/div[1]/div[1]/div[3]/i')
     twin_details = (By.XPATH, "//*[contains(text(), 'Twin Details')]")
-    stellar_choose=(By.XPATH, "//*[contains(text(), 'stellar')]") 
-    stellar=(By.XPATH,'//*[@role="option"]')
-    deposit=(By.XPATH, "//*[contains(text(), 'deposit')]")
-    withdraw=(By.XPATH, "//*[contains(text(), 'withdraw')]")
-    howdone=(By.XPATH, "//*[contains(text(), 'How is it done?')]")
-    submit_button=(By.XPATH, "//*[@id='app']/div[5]/div/div/div[3]/button[2]")
-    stellar_address=(By.XPATH, '/html/body/div[1]/div[5]/div/div/div[2]/form/div[1]/div/div[1]/div/input')
-    amount_tft=(By.XPATH, '/html/body/div[1]/div[5]/div/div/div[2]/form/div[2]/div/div[1]/div/input')
+    bridge_page=(By.XPATH, '/html/body/div[1]/div/div/nav/div/div[1]/div/div/div[1]/div[2]/div[4]')
     transfer_tft_title = (By.XPATH, "//*[contains(text(), 'Transfer TFT Across Chains')]")
-    twin_address_text = (By.XPATH, '//*[@id="app"]/div[1]/div[3]/div/div/div/div[2]/div/div/div/div[2]')
+    stellar_choose=(By.XPATH, "//*[contains(text(), 'stellar')]") 
+    deposit=(By.XPATH, "/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/button[1]")   
+    withdraw=(By.XPATH, "/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/button[2]")
+    howdone=(By.XPATH, "/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/button[3]")
+    deposite_bridge_address = (By.XPATH, "/html/body/div[2]/div[29]/div[2]/div/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div/div[3]/input")
+    twin_id_text = (By.XPATH,"/html/body/div[2]/div[29]/div[2]/div/div[2]/div[1]/div[1]/div[1]/div[3]/div[1]/div/div[3]/input")
+    twin_address_text = (By.XPATH, '/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/span')
+    twin_page = (By.XPATH, '/html/body/div[1]/div/div/nav/div/div[1]/div/div/div[1]/div[2]/div[1]')
+    deposit_close_button = (By.XPATH,'/html/body/div[2]/div[29]/div[2]/div/div[2]/div[2]/button')
+    stellar_address=(By.XPATH, '/html/body/div[2]/div[29]/div[2]/div/div[3]/form/div[1]/div[1]/div/div[3]/input')
+    amount_tft=(By.XPATH, '/html/body/div[2]/div[29]/div[2]/div/div[3]/form/div[2]/div[1]/div/div[3]/input')
+    submit_button=(By.XPATH, "/html/body/div[2]/div[29]/div[2]/div/div[4]/button[2]")
+    balance_text = (By.XPATH,'/html/body/div[1]/div/div/main/header/div/div[3]/div[2]/p[1]/strong')
     tft_amount_text = (By.XPATH,"//*[contains(text(), 'Amount: should be larger than 1TFT (deposit fee is: 1TFT)')]")
-    deposite_bridge_address = (By.XPATH, "//*[@id='app']/div[5]/div/div/div[1]/div/div[1]/div[1]/ul/li[1]/b")
-    twin_id_text = (By.XPATH,"//*[@id='app']/div[5]/div/div/div[1]/div/div[1]/div[1]/ul/li[2]/b")
-    balance_text = (By.XPATH,'//*[@id="app"]/div[1]/div[1]/header/div/div[3]/div/section/div[1]/div/p/span[1]')
-    balance_withdraw = (By.XPATH,'//*[@id="app"]/div[2]/div[1]/header/div/div[3]/div/section/div[1]/div/p/span[1]')
-    close_login_button = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div[4]/button[2]')
-    
-    
+
+
     def __init__(self, browser):
         self.browser = browser
 
     def navigate_to_bridge(self):
         self.browser.find_element(*self.close_login_button).click()
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.twin_details))
-        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.bridge))
-        self.browser.find_element(*self.bridge).click()
+        self.browser.find_element(*self.sidebar).click()
+        WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.bridge_page))
+        self.browser.find_element(*self.bridge_page).click()
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.transfer_tft_title))
     
     def twin_address(self):
-        self.browser.refresh()
+        self.browser.find_element(*self.deposit_close_button).click()
+        self.browser.find_element(*self.twin_page).click()
         return self.browser.find_element(*self.twin_address_text).text 
 
     def transfer_chain(self):
         self.browser.find_element(*self.stellar_choose).click()
-        self.browser.find_element(*self.stellar).click()
 
     def choose_deposit(self):
         self.browser.find_element(*self.deposit).click()
@@ -63,21 +65,27 @@ class BridgePage:
     def check_deposit(self):
         self.browser.find_element(*self.deposit).click() 
         amount_text = self.browser.find_element(*self.tft_amount_text).text
-        bridge_address = self.browser.find_element(*self.deposite_bridge_address).text
-        twin_id = self.browser.find_element(*self.twin_id_text).text
+        bridge_address =  self.browser.find_element(*self.deposite_bridge_address).get_attribute("value")
+        twin_id = self.browser.find_element(*self.twin_id_text).get_attribute("value")
         return twin_id, amount_text, bridge_address
 
     def setup_withdraw_tft(self, data):
         self.browser.find_element(*self.withdraw).click()
+        self.browser.find_element(*self.amount_tft).send_keys(Keys.CONTROL + "a")
+        self.browser.find_element(*self.amount_tft).send_keys(Keys.DELETE)
         self.browser.find_element(*self.amount_tft).send_keys(data)
     
     def setup_widthdraw_address(self, data):
-        balance = self.browser.find_element(*self.balance_text).text[9:-4]
+        balance = self.browser.find_element(*self.balance_text).text[:-4]
         self.browser.find_element(*self.withdraw).click()
+        self.browser.find_element(*self.stellar_address).send_keys(Keys.CONTROL + "a")
+        self.browser.find_element(*self.stellar_address).send_keys(Keys.DELETE)
         self.browser.find_element(*self.stellar_address).send_keys(data)
         return balance
 
     def check_withdraw_invalid_stellar(self, data):
+        self.browser.find_element(*self.stellar_address).send_keys(Keys.CONTROL + "a")
+        self.browser.find_element(*self.stellar_address).send_keys(Keys.DELETE)
         self.browser.find_element(*self.stellar_address).send_keys(data)
         return self.browser.find_element(*self.submit_button).is_enabled()
 
@@ -96,22 +104,30 @@ class BridgePage:
 
     def check_withdraw(self, address, amount):
         self.browser.find_element(*self.withdraw).click()
+        self.browser.find_element(*self.stellar_address).send_keys(Keys.CONTROL + "a")
+        self.browser.find_element(*self.stellar_address).send_keys(Keys.DELETE)
         self.browser.find_element(*self.stellar_address).send_keys(address)
+        self.browser.find_element(*self.amount_tft).send_keys(Keys.CONTROL + "a")
+        self.browser.find_element(*self.amount_tft).send_keys(Keys.DELETE)
         self.browser.find_element(*self.amount_tft).send_keys(amount)
         WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(self.submit_button))
         return self.browser.find_element(*self.submit_button)
     
     def get_balance(self):
-        return self.browser.find_element(*self.balance_text).text[9:-4]
+        return self.browser.find_element(*self.balance_text).text[:-4]
     
     def get_balance_withdraw(self, balance):
-        new_balance = self.browser.find_element(*self.balance_withdraw).text[9:-4]
+        new_balance = self.browser.find_element(*self.balance_text).text[:-4]
         self.browser.refresh()
         alert = Alert(self.browser)
         alert.accept()
         while(new_balance==balance):
-            new_balance = self.browser.find_element(*self.balance_withdraw).text[9:-4]
+            new_balance = self.browser.find_element(*self.balance_text).text[:-4]
         return new_balance
+
+    def wait_for_button(self, button):
+        WebDriverWait(self.browser, 30).until(EC.element_to_be_clickable(button))
+        return button
 
     def wait_for(self, keyword):
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located((By.XPATH, "//*[contains(text(), '"+ keyword +"')]")))
