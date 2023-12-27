@@ -176,7 +176,7 @@
               <span class="package">
                 <b>{{ price.packageName != "none" ? capitalize(price.packageName) + " Package: " : "" }}</b></span
               >
-              <b>${{ Number(price.price).toFixed(6) }}/month, {{ Number(price.TFTs).toFixed(6) }} TFT/month. </b>
+              <b>${{ Number(price.price).toFixed(4) }}/month, {{ Number(price.TFTs).toFixed(4) }} TFT/month. </b>
             </span>
             <span> {{ price.info }}</span>
           </v-card>
