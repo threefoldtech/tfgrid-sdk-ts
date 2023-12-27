@@ -230,11 +230,7 @@
               <PasswordInputWrapper #="{ props: passwordInputProps }">
                 <InputValidator
                   :value="password"
-                  :rules="[
-                    validators.required('Password is required.'),
-                    validators.minLength('Password must be at least 6 characters.', 6),
-                    validatePassword,
-                  ]"
+                  :rules="[validators.minLength('Password must be at least 6 characters.', 6), validatePassword]"
                   #="{ props: validationProps }"
                   ref="passwordInput"
                 >
