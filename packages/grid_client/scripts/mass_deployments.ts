@@ -165,13 +165,14 @@ async function main() {
     for (const { twinDeployments } of deploymentResults) {
       if (twinDeployments) {
         allTwinDeployments.push(...twinDeployments);
+        successCount++;
+      } else {
+        failedCount++;
       }
     }
 
     try {
       await grid3.machines.twinDeploymentHandler.handle(allTwinDeployments);
-      successCount += deploymentResults.length;
-      failedCount += batchSize - deploymentResults.length;
       log(`Successfully handled and saved contracts for some twin deployments`);
     } catch (error) {
       errors.push(error);
