@@ -165,9 +165,6 @@ async function main() {
     for (const { twinDeployments } of deploymentResults) {
       if (twinDeployments) {
         allTwinDeployments.push(...twinDeployments);
-        successCount++;
-      } else {
-        failedCount++;
       }
     }
 
@@ -176,8 +173,11 @@ async function main() {
       log(`Successfully handled and saved contracts for some twin deployments`);
     } catch (error) {
       errors.push(error);
+      failedCount += batchSize;
       log(`Error handling contracts for twin deployments: ${error}`);
     }
+
+    successCount = totalVMs - failedCount;
 
     console.timeEnd("Batch " + (batch + 1));
   }
