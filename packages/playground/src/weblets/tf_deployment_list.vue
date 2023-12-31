@@ -332,10 +332,10 @@
     </template>
   </weblet-layout>
 
-  <v-dialog v-model="deletingDialog" scrollable width="50%">
+  <v-dialog v-model="deletingDialog" scrollable width="40%">
     <v-card>
       <v-card-title>
-        <strong>Are you sure you want to delete the following deployments?</strong>
+        <strong>Delete the following deployments?</strong>
       </v-card-title>
       <v-card-text>
         <v-chip class="ma-1" color="primary" v-for="item in selectedItems" :key="item.deploymentName">
@@ -344,7 +344,7 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn color="error" variant="tonal" @click="deletingDialog = false">Close</v-btn>
+        <v-btn color="anchar" variant="outlined" @click="deletingDialog = false">Cancel</v-btn>
         <v-btn color="error" variant="outlined" @click="onDelete(tabs[activeTab].value.toLowerCase() === 'kubernetes')">
           Delete
         </v-btn>

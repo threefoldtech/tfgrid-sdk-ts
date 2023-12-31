@@ -80,10 +80,7 @@
                         >Threshold: {{ proposal.nayes.length + proposal.ayes.length }}/{{ proposal.threshold }}
                       </span>
                     </div>
-                    <v-btn
-                      color="grey lighten-2 text-black"
-                      @click="openVoteDialog(proposal.hash, false)"
-                      :disabled="loadingVote"
+                    <v-btn color="anchor" @click="openVoteDialog(proposal.hash, false)" :disabled="loadingVote"
                       >No <v-divider class="mx-3" vertical />{{ proposal.nayes.length }}
                     </v-btn>
                   </v-row>
@@ -150,7 +147,7 @@
                       v-else
                       rounded
                       v-model="proposal.nayesProgress"
-                      color="grey lighten-2"
+                      color="anchor"
                       backgroundColor="#e0e0e0"
                       height="24"
                       :style="{
@@ -191,8 +188,13 @@
             </form-validator>
           </v-card-text>
           <v-card-actions class="justify-end">
-            <v-btn @click="openVDialog = false" color="grey lighten-2 black--text">Close</v-btn>
-            <v-btn @click="castVote" :loading="loadingVote" color="primary white--text" :disabled="!isValidFarm"
+            <v-btn @click="openVDialog = false" variant="outlined" color="anchor">Close</v-btn>
+            <v-btn
+              @click="castVote"
+              :loading="loadingVote"
+              variant="outlined"
+              color="secondary"
+              :disabled="!isValidFarm"
               >Vote</v-btn
             >
           </v-card-actions>
