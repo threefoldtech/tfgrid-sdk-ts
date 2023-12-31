@@ -19,11 +19,12 @@
       <VTooltip text="More information" location="left">
         <template #activator="{ props }">
           <VBtn
-            icon="mdi-information"
+            icon="mdi-information-outline"
             href="https://stellar.expert/explorer/public/asset/TFT-GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47-1?asset[]=TFT-GBOVQKJYHXRR3DX6NOX2RRYFRCUMSADGDESTDNBDS6CDVLGVESRTAC47-1&filter=markets&market=USDC-GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN-1"
             target="_blank"
             v-bind="props"
-            class="text-white mr-4 ml-1 order-3"
+            color="anchor"
+            class="mr-4 ml-1 order-3"
           />
         </template>
       </VTooltip>

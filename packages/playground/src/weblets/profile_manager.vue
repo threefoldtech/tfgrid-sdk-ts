@@ -344,7 +344,7 @@
               <VBtn
                 class="mr-2 text-subtitle-2"
                 color="secondary"
-                variant="tonal"
+                variant="outlined"
                 :disabled="!!ssh || updatingSSH || generatingSSH || !isEnoughBalance(balance)"
                 :loading="generatingSSH"
                 @click="generateSSH"
