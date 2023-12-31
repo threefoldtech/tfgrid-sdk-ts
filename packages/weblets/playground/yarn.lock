@@ -1529,16 +1529,16 @@
   resolved "https://registry.yarnpkg.com/@substrate/ss58-registry/-/ss58-registry-1.43.0.tgz#93108e45cb7ef6d82560c153e3692c2aa1c711b3"
   integrity sha512-USEkXA46P9sqClL7PZv0QFsit4S8Im97wchKG0/H/9q3AT/S76r40UHfCr4Un7eBJPE23f7fU9BZ0ITpP9MCsA==
 
-"@threefold/grid_client@2.3.0-alpha2":
-  version "2.3.0-alpha2"
-  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.3.0-alpha2.tgz#3d77744f627087e21d27ba743e1a6fff1050f3e8"
-  integrity sha512-cP7DGDS91uCZf5EA4QSbojAXxvjGqO4CLSmd2g0zGMUlys8B5OkeGuJx/uMxWEwA/FO6+YPcoWYgO2Mb4n5D8g==
+"@threefold/grid_client@2.3.0-alpha3":
+  version "2.3.0-alpha3"
+  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.3.0-alpha3.tgz#0bfed96716c51028c8cf1758a09170a9bfd172e5"
+  integrity sha512-81lGQXvsY6gO0MJDEIbVVNkGmjLHNy5XlEZ+z4ISR4O3YaGQxQLUlmUXxYIOob07pw0oYdt7x5Vf3iFcQX9cWw==
   dependencies:
     "@jimber/pkid" "1.0.4"
     "@noble/secp256k1" "^1.7.1"
-    "@threefold/rmb_direct_client" "^2.3.0-alpha2"
-    "@threefold/tfchain_client" "^2.3.0-alpha2"
-    "@threefold/types" "^2.3.0-alpha2"
+    "@threefold/rmb_direct_client" "^2.3.0-alpha3"
+    "@threefold/tfchain_client" "^2.3.0-alpha3"
+    "@threefold/types" "^2.3.0-alpha3"
     algosdk "^1.19.0"
     appdata-path "^1.0.0"
     await-lock "^2.2.2"
@@ -1561,15 +1561,15 @@
     url-parse "^1.5.10"
     uuid4 "^2.0.2"
 
-"@threefold/rmb_direct_client@^2.3.0-alpha2":
-  version "2.3.0-alpha2"
-  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-2.3.0-alpha2.tgz#032f849513bd62c264508d7ae637572c884b424e"
-  integrity sha512-rXnbrphGZizxUwHkSK8K0F8TBvjoJqb0GnkNYEkaiHKkWWTE4bLyDgIQWiEKZN0bn6kMS6WDBTTBDLNAr5boSQ==
+"@threefold/rmb_direct_client@^2.3.0-alpha3":
+  version "2.3.0-alpha3"
+  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-2.3.0-alpha3.tgz#abc69e3fce53aa06093b6584556b5e2a22efca37"
+  integrity sha512-k/AIGl/lZKbvPlbeaD/XV2eeRDa4IoAVa1C71Fcj+Ys8rriuqcciAWqr8vsI5c5IeWDDllDjrV1xIBNC33m6pw==
   dependencies:
     "@noble/secp256k1" "^1.7.1"
     "@polkadot/api" "^8.9.1"
-    "@threefold/tfchain_client" "^2.3.0-alpha2"
-    "@threefold/types" "^2.3.0-alpha2"
+    "@threefold/tfchain_client" "^2.3.0-alpha3"
+    "@threefold/types" "^2.3.0-alpha3"
     base64url "^3.0.1"
     bip39 "^3.1.0"
     buffer "^6.0.3"
@@ -1579,20 +1579,20 @@
     uuid "^8.3.2"
     ws "^8.12.0"
 
-"@threefold/tfchain_client@^2.3.0-alpha2":
-  version "2.3.0-alpha2"
-  resolved "https://registry.yarnpkg.com/@threefold/tfchain_client/-/tfchain_client-2.3.0-alpha2.tgz#2ed2a00244a2874d9ec65e759006ab72f401c81a"
-  integrity sha512-N8eI6oxDdLLk6tnjcvoQFejm5lz6bFDWWmWATK1odaOnfeptNgBGTH/Uc+BFKdyXwb6AXYQGCHmHgcUAh1aOww==
+"@threefold/tfchain_client@^2.3.0-alpha3":
+  version "2.3.0-alpha3"
+  resolved "https://registry.yarnpkg.com/@threefold/tfchain_client/-/tfchain_client-2.3.0-alpha3.tgz#75f55be9b60dfc525d10219b30e2552aded7db45"
+  integrity sha512-Sm+eg8QOgl88ZZm5nmiLjRaUoG0Q/V+AN/YNJ31ywP453drATvtRXOvLg7iyhA4OMCVfj44kkHpjFmBESIN7bA==
   dependencies:
     "@polkadot/api" "^8.9.1"
-    "@threefold/types" "^2.3.0-alpha2"
+    "@threefold/types" "^2.3.0-alpha3"
     await-lock "^2.2.2"
     bip39 "^3.1.0"
 
-"@threefold/types@^2.3.0-alpha2":
-  version "2.3.0-alpha2"
-  resolved "https://registry.yarnpkg.com/@threefold/types/-/types-2.3.0-alpha2.tgz#322374b08f11c40e5f337b0fa03e98fe0686323f"
-  integrity sha512-8TZ8VCxkHIy5vUMyMeOFOfjDGKHK9g+7HnR7pyxyUo1P2vG5qWGLeiybWdn/UOV15YuS6sMZEAHTOI4BqpWAhA==
+"@threefold/types@^2.3.0-alpha3":
+  version "2.3.0-alpha3"
+  resolved "https://registry.yarnpkg.com/@threefold/types/-/types-2.3.0-alpha3.tgz#ee4c7a825ab68c69a6d8f78b1da5fc92ea96c1d4"
+  integrity sha512-zgFYX1R8YMir0T2eKbwTd1SmlvbcA5lgL/u90phZsvfLWYqB02WcDqu08TjxOwtE4h8eXDj1fR5nT3iEvGEVlw==
 
 "@types/babel__core@^7.1.0":
   version "7.1.16"
