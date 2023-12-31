@@ -143,11 +143,9 @@ class Client {
           this.twin.pk = pk;
         }
       } catch (err) {
-        const c = this.con as WSConnection;
-        if (c && c.readyState == c.OPEN) {
-          c.close();
-        }
-        if (err instanceof TwinNotExistError || err instanceof InsufficientBalanceError) throw err;
+        if (err instanceof InsufficientBalanceError) throw err;
+        this.disconnect();
+        if (err instanceof TwinNotExistError) throw err;
         if (err instanceof BaseError) {
           err.message = `Unable to establish a connection with the RMB server ${this.relayUrl.replace(
             "wss://",
@@ -170,24 +168,22 @@ class Client {
   }
 
   disconnect() {
+    if (this.__pingPongTimeout) clearTimeout(this.__pingPongTimeout);
     this.tfclient.disconnect();
-    for (const connection of Client.connections.values()) {
-      connection.con.close();
-    }
+    if (this.con?.readyState !== this.con?.CLOSED) this.con.close();
   }
 
   disconnectAndExit() {
-    this.disconnect();
+    if (this.__pingPongTimeout) clearTimeout(this.__pingPongTimeout);
+    for (const connection of Client.connections.values()) {
+      connection.con.close();
+    }
+    process.removeAllListeners();
     process.exit(0);
   }
 
   reconnect() {
     this.connect();
-  }
-  close() {
-    if (this.__pingPongTimeout) clearTimeout(this.__pingPongTimeout);
-    this.tfclient.disconnect();
-    if (this.con?.readyState !== this.con?.CLOSED) this.con.close();
   }
   waitForOpenConnection() {
     return new Promise((resolve, reject) => {

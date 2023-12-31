@@ -143,7 +143,9 @@ class QueryClient {
 
   async disconnectAndExit(): Promise<void> {
     // this should be only used by nodejs process
+    // TODO: loop on map keys
     await this.disconnect();
+    process.removeAllListeners();
     process.exit(0);
   }
 
