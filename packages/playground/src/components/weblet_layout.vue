@@ -93,7 +93,7 @@
       <v-card-actions>
         <v-spacer />
         <slot name="footer-actions" v-if="!status" />
-        <v-btn v-else color="secondary" variant="text" :loading="status === 'deploy'" @click="reset"> Back </v-btn>
+        <v-btn v-else color="secondary" variant="outlined" :loading="status === 'deploy'" @click="reset"> Back </v-btn>
       </v-card-actions>
     </template>
   </v-card>

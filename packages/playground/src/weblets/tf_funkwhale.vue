@@ -119,7 +119,7 @@
     </form-validator>
 
     <template #footer-actions>
-      <v-btn color="secoundry" variant="outlined" @click="deploy()" :disabled="!valid"> Deploy </v-btn>
+      <v-btn color="secondary" variant="outlined" @click="deploy()" :disabled="!valid"> Deploy </v-btn>
     </template>
   </weblet-layout>
 </template>
