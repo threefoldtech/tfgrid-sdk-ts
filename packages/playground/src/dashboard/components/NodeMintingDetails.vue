@@ -53,7 +53,7 @@
           </div>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="secondary" @click="downloadNodeReceipt" :disabled="!node.receipts"
+            <v-btn color="secondary" variant="outlined" @click="downloadNodeReceipt" :disabled="!node.receipts"
               >Download Node Receipt</v-btn
             >
           </v-card-actions>

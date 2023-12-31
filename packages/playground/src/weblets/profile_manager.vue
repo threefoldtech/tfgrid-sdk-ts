@@ -161,8 +161,8 @@
                           <template v-slot:activator="{ isActive, props }">
                             <VBtn
                               class="mt-2 ml-3"
-                              color="primary"
-                              variant="tonal"
+                              color="secondary"
+                              variant="outlined"
                               :disabled="!shouldActivateAccount || keypairType === KeypairType.ed25519"
                               :loading="activatingAccount"
                               @click="openAcceptTerms = termsLoading = true"
@@ -177,8 +177,7 @@
 
                         <VBtn
                           class="mt-2 ml-3"
-                          color="secondary"
-                          variant="tonal"
+                          color="primary"
                           :disabled="
                             isValidForm || !!mnemonic || shouldActivateAccount || keypairType === KeypairType.ed25519
                           "
@@ -285,7 +284,7 @@
                 class="ml-2"
                 type="submit"
                 color="secondary"
-                variant="tonal"
+                variant="outlined"
                 :loading="activating"
                 :disabled="
                   !isValidForm ||
@@ -345,7 +344,7 @@
               <VBtn
                 class="mr-2 text-subtitle-2"
                 color="secondary"
-                variant="tonal"
+                variant="outlined"
                 :disabled="!!ssh || updatingSSH || generatingSSH || !isEnoughBalance(balance)"
                 :loading="generatingSSH"
                 @click="generateSSH"
@@ -415,8 +414,8 @@
         <VBtn
           class="ml-2"
           color="error"
-          variant="tonal"
           @click="logout"
+          variant="outlined"
           v-if="profileManager.profile"
           :disabled="updatingSSH || generatingSSH || loadingBalance"
         >

@@ -7,8 +7,8 @@
         <template #activator="{ props }">
           <v-btn
             icon="mdi-plus"
-            variant="tonal"
-            color="primary"
+            variant="outlined"
+            color="secondary"
             @click="$emit('add')"
             v-bind="props"
             :disabled="disabled"

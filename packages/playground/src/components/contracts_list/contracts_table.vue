@@ -69,7 +69,7 @@
     <template #footer-actions>
       <v-btn
         variant="outlined"
-        color="error"
+        color="anchor"
         prepend-icon="mdi-export-variant"
         :disabled="isExporting || !contracts || contracts.length === 0 || loadingDelete || deleting"
         @click="exportData"
@@ -89,9 +89,9 @@
     </template>
   </weblet-layout>
 
-  <v-dialog width="70%" v-model="deletingDialog">
+  <v-dialog width="800" v-model="deletingDialog">
     <v-card>
-      <v-card-title class="text-h5 mt-2"> Are you sure you want to delete the following contracts? </v-card-title>
+      <v-card-title class="text-h5 mt-2"> Delete the following contracts? </v-card-title>
       <v-alert class="ma-4" type="warning" variant="tonal"
         >It is advisable to remove the contract from its solution page, especially when multiple contracts may be linked
         to the same instance.</v-alert
@@ -105,8 +105,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="error" variant="tonal" @click="deletingDialog = false"> Cancel </v-btn>
-        <v-btn color="error" variant="text" @click="onDelete"> Delete </v-btn>
+        <v-btn color="anchor" variant="outlined" @click="deletingDialog = false"> Cancel </v-btn>
+        <v-btn color="error" variant="outlined" @click="onDelete"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

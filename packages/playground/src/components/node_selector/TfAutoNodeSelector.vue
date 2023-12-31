@@ -79,7 +79,7 @@
         </VAutocomplete>
 
         <VBtn
-          variant="tonal"
+          variant="outlined"
           color="secondary"
           class="mt-2 ml-2"
           @click="resetPageAndReloadNodes()"

@@ -51,10 +51,10 @@
             </form-validator>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn @click="clearInput" class="primary white--text">Clear</v-btn>
+              <v-btn @click="clearInput" color="anchor" variant="outlined">Clear</v-btn>
               <v-btn
-                color="primary"
-                variant="tonal"
+                color="secondary"
+                variant="outlined"
                 :loading="loadingTwinIDTransfer"
                 :disabled="!isValidTwinIDTransfer"
                 @click="submitFormTwinID"
@@ -102,11 +102,11 @@
             </form-validator>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn @click="clearInput" class="primary white--text">Clear</v-btn>
+              <v-btn @click="clearInput" color="anchor" variant="outlined">Clear</v-btn>
 
               <v-btn
-                color="primary"
-                variant="tonal"
+                color="secondary"
+                variant="outlined"
                 :loading="loadingAddressTransfer"
                 :disabled="!isValidAddressTransfer"
                 @click="submitFormAddress"
