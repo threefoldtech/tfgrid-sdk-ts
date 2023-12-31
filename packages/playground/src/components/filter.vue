@@ -55,6 +55,11 @@
                 >Reset Filters</v-btn
               >
             </v-col>
+            <v-col cols="12" sm="4" md="2" class="d-flex justify-start align-center mb-6 ml-4">
+              <v-btn :disabled="!isFiltersTouched || !valid" @click="applyFilters" variant="tonal" color="primary"
+                >Apply Filters</v-btn
+              >
+            </v-col>
           </v-row>
         </v-expansion-panel-text>
       </v-expansion-panel>
@@ -86,13 +91,15 @@ const isFiltersTouched = ref<boolean>(false);
 watch(
   () => props.modelValue,
   (newValue: PropType<{ [key: string]: InputFilterType }>) => {
-    const hasNonEmptyValue = Object.keys(newValue).some(obj => {
+    isFiltersTouched.value = Object.keys(newValue).some(obj => {
       return Reflect.get(newValue, obj).value && Reflect.get(newValue, obj).value.length >= 1;
     });
-    emit("update:model-value", props.modelValue), (isFiltersTouched.value = hasNonEmptyValue);
   },
   { deep: true },
 );
+const applyFilters = () => {
+  emit("update:model-value", props.modelValue);
+};
 
 const resetFilters = () => {
   emit(
