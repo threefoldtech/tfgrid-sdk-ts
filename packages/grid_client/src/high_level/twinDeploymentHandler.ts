@@ -7,7 +7,6 @@ import {
   TimeoutError,
   ValidationError,
 } from "@threefold/types";
-import groupBy from "lodash/fp/groupBy.js";
 
 import { RMB } from "../clients";
 import { TFClient } from "../clients/tf-grid/client";
@@ -318,7 +317,11 @@ class TwinDeploymentHandler {
   }
 
   async checkNodesCapacity(twinDeployments: TwinDeployment[]) {
-    const deployments = groupBy(x => x.nodeId, twinDeployments);
+    const deployments = twinDeployments.reduce((res, twinDeployment) => {
+      res[twinDeployment.nodeId] = res[twinDeployment.nodeId] || [];
+      res[twinDeployment.nodeId].push(twinDeployment);
+      return res;
+    }, {} as { [nodeId: number]: TwinDeployment[] });
     await Promise.all(Object.keys(deployments).map(nodeId => this._checkNodeCapacity(+nodeId, deployments[nodeId])));
   }
 
