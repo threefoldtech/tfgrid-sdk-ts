@@ -25,8 +25,11 @@ async function pingNodes(
     }
   });
 
-  const results = await Promise.all(pingPromises);
-  return results;
+  const result = await Promise.allSettled(pingPromises).then(results =>
+    results.flatMap(r => (r.status === "fulfilled" ? r.value : [])),
+  );
+
+  return result;
 }
 
 async function main() {
@@ -154,23 +157,26 @@ async function main() {
       }
     });
     console.time("Preparing Batch " + (batch + 1));
-    const deploymentResults = await Promise.all(deploymentPromises);
+    const deploymentResults = await Promise.allSettled(deploymentPromises).then(results =>
+      results.flatMap(r => (r.status === "fulfilled" ? r.value : [])),
+    );
     console.timeEnd("Preparing Batch " + (batch + 1));
 
     for (const { twinDeployments } of deploymentResults) {
       if (twinDeployments) {
         allTwinDeployments.push(...twinDeployments);
+        successCount++;
+      } else {
+        failedCount++;
       }
     }
 
     try {
       await grid3.machines.twinDeploymentHandler.handle(allTwinDeployments);
-      successCount += batchSize;
-      log(`Successfully handled and saved contracts for all twin deployments`);
+      log(`Successfully handled and saved contracts for some twin deployments`);
     } catch (error) {
-      failedCount += batchSize;
       errors.push(error);
-      log(`Error handling contracts for all twin deployments: ${error}`);
+      log(`Error handling contracts for twin deployments: ${error}`);
     }
 
     console.timeEnd("Batch " + (batch + 1));
