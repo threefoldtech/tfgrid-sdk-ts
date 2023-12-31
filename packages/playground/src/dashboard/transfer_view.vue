@@ -43,7 +43,7 @@
                 ]"
                 #="{ props }"
               >
-                <input-tooltip tooltip="0.01 transaction fee will be deducted">
+                <input-tooltip tooltip="Up to 0.01 transaction fee will be deducted">
                   <v-text-field label="Transfer Amount:" v-bind="props" v-model.number="transferAmount"></v-text-field>
                 </input-tooltip>
               </input-validator>
@@ -94,7 +94,7 @@
                 ]"
                 #="{ props }"
               >
-                <input-tooltip tooltip="0.01 transaction fee will be deducted">
+                <input-tooltip tooltip="Up to 0.01 transaction fee will be deducted">
                   <v-text-field label="Transfer Amount:" v-bind="props" v-model.number="transferAmount"></v-text-field>
                 </input-tooltip>
               </input-validator>

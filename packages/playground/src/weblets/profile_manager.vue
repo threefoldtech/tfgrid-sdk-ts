@@ -438,6 +438,7 @@ import { useTheme } from "vuetify";
 import { generateKeyPair } from "web-ssh-keygen";
 
 import { AppThemeSelection } from "@/utils/app_theme";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useOnline } from "../hooks";
@@ -454,10 +455,10 @@ import {
 } from "../utils/grid";
 import { isEnoughBalance, normalizeError } from "../utils/helpers";
 import { downloadAsFile, normalizeBalance } from "../utils/helpers";
-
 interface Credentials {
   passwordHash?: string;
   mnemonicHash?: string;
+  keypairTypeHash?: string;
 }
 const keyType = ["sr25519", "ed25519"];
 const keypairType = ref(KeypairType.sr25519);
@@ -537,10 +538,11 @@ function getCredentials() {
   return credentials;
 }
 
-function setCredentials(passwordHash: string, mnemonicHash: string): Credentials {
+function setCredentials(passwordHash: string, mnemonicHash: string, keypairTypeHash: string): Credentials {
   const credentials: Credentials = {
-    passwordHash: passwordHash,
-    mnemonicHash: mnemonicHash,
+    passwordHash,
+    mnemonicHash,
+    keypairTypeHash,
   };
   localStorage.setItem(WALLET_KEY, JSON.stringify(credentials));
   return credentials;
@@ -657,12 +659,12 @@ function clearFields() {
   mnemonic.value = "";
 }
 
-async function activate(mnemonic: string) {
+async function activate(mnemonic: string, keypairType: KeypairType) {
   clearError();
   activating.value = true;
   sessionStorage.setItem("password", password.value);
   try {
-    const grid = await getGrid({ mnemonic, keypairType: keypairType.value });
+    const grid = await getGrid({ mnemonic, keypairType });
     const profile = await loadProfile(grid!);
     ssh.value = profile.ssh;
     profileManager.set({ ...profile, mnemonic });
@@ -749,9 +751,9 @@ async function generateSSH() {
   generatingSSH.value = false;
   SSHKeyHint.value = "SSH key generated successfully.";
 }
-
+let BalanceWarningRaised = false;
 const loadingBalance = ref(false);
-async function __loadBalance(profile?: Profile) {
+async function __loadBalance(profile?: Profile, tries = 1) {
   profile = profile || profileManager.profile!;
   if (!profile) return;
 
@@ -759,9 +761,20 @@ async function __loadBalance(profile?: Profile) {
     loadingBalance.value = true;
     const grid = await getGrid(profile);
     balance.value = await loadBalance(grid!);
+    if (!BalanceWarningRaised && balance.value?.free) {
+      if (balance.value?.free < 0.01) {
+        createCustomToast("Your balance is too low, Please fund your account.", ToastType.warning);
+        BalanceWarningRaised = true;
+      }
+    }
     loadingBalance.value = false;
   } catch {
-    __loadBalance(profile);
+    if (tries > 10) {
+      loadingBalance.value = false;
+      return;
+    }
+
+    setTimeout(() => __loadBalance(profile, tries + 1), Math.floor(Math.exp(tries) * 1_000));
   }
 }
 
@@ -774,7 +787,10 @@ function login() {
     if (credentials.passwordHash === md5(password.value)) {
       const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
       const mnemonic = cryptr.decrypt(credentials.mnemonicHash);
-      activate(mnemonic);
+      const keypairType = credentials.keypairTypeHash
+        ? cryptr.decrypt(credentials.keypairTypeHash)
+        : KeypairType.sr25519;
+      activate(mnemonic, keypairType as KeypairType);
     }
   }
 }
@@ -782,8 +798,9 @@ function login() {
 function storeAndLogin() {
   const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
   const mnemonicHash = cryptr.encrypt(mnemonic.value);
-  setCredentials(md5(password.value), mnemonicHash);
-  activate(mnemonic.value);
+  const keypairTypeHash = cryptr.encrypt(keypairType.value);
+  setCredentials(md5(password.value), mnemonicHash, keypairTypeHash);
+  activate(mnemonic.value, keypairType.value);
 }
 
 function validatePassword(value: string) {

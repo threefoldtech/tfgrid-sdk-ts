@@ -153,6 +153,7 @@ export default {
         return true;
       },
       {
+        tries: 1,
         onReset: bindStatus,
         shouldRun: () => props.validFilters,
         onBeforeTask: () => bindStatus(ValidatorStatus.Pending),

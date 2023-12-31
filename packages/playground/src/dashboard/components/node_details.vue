@@ -95,8 +95,8 @@ import { onMounted, type PropType, ref } from "vue";
 import { gridProxyClient } from "@/clients";
 import type { NodeDetailsCard } from "@/types";
 import { nodeInitializer } from "@/types";
+import formatResourceSize from "@/utils/format_resource_size";
 import { getNode } from "@/utils/get_nodes";
-import toTeraOrGigaOrPeta from "@/utils/toTeraOrGegaOrPeta";
 
 const dNodeError = ref(false);
 const dNodeLoading = ref(true);
@@ -190,9 +190,9 @@ const getCountryResourceCard = (): NodeDetailsCard[] => {
 const getNodeResourceCard = (): NodeDetailsCard[] => {
   return [
     { name: "CPU", value: props.node.total_resources.cru.toString() + " CPU" },
-    { name: "Memory", value: toTeraOrGigaOrPeta(props.node.total_resources.mru.toString()) },
-    { name: "Disk(SSD)", value: toTeraOrGigaOrPeta(props.node.total_resources.sru.toString()) },
-    { name: "Disk(HDD)", value: toTeraOrGigaOrPeta(props.node.total_resources.hru.toString()) },
+    { name: "Memory", value: formatResourceSize(props.node.total_resources.mru) },
+    { name: "Disk(SSD)", value: formatResourceSize(props.node.total_resources.sru) },
+    { name: "Disk(HDD)", value: formatResourceSize(props.node.total_resources.hru) },
   ];
 };
 

@@ -210,6 +210,7 @@ export default {
     const nodeInputValidateTask = useAsync<true, string, [NodeInfo | undefined]>(
       node => checkNodeCapacityPool(gridStore, node, props.filters),
       {
+        tries: 1,
         shouldRun: () => props.validFilters,
         onBeforeTask: () => bindStatus(ValidatorStatus.Pending),
         onAfterTask: ({ data }) => bindStatus(data ? ValidatorStatus.Valid : ValidatorStatus.Invalid),
