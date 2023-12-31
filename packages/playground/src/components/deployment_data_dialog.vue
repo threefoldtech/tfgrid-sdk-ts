@@ -106,7 +106,7 @@
         </v-card-text>
         <v-card-actions class="my-1">
           <v-spacer />
-          <v-btn color="anchore" variant="outlined" @click="$emit('close')">Close</v-btn>
+          <v-btn color="anchor" variant="outlined" @click="$emit('close')">Close</v-btn>
           <v-btn color="secondary" variant="outlined" @click="copy">Copy</v-btn>
         </v-card-actions>
       </v-card>

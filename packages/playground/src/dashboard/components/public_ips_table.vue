@@ -40,7 +40,7 @@
         <v-toolbar color="primary" class="custom-toolbar">
           <p class="mb-5">Delete IP</p>
         </v-toolbar>
-        <v-card-text class="text-subtitle-1"> You sure you want to delete IP {{ itemToDelete?.ip }}? </v-card-text>
+        <v-card-text class="text-subtitle-1">Delete IP {{ itemToDelete?.ip }}? </v-card-text>
         <v-card-actions class="justify-end px-5 pb-5 pt-0">
           <v-btn @click="showDialogue = false" variant="outlined" color="anchor">Close</v-btn>
           <v-btn
