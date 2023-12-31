@@ -38,6 +38,10 @@ class Nodes {
       return res;
     } catch (e) {
       //TODO Errors should be handled in tfchain
+      if (e instanceof BaseError) {
+        e.message = `Failed to create rent contract on node ${options.nodeId} due to ${e.message}`;
+        throw e;
+      }
       throw new TFChainError(`Failed to create rent contract on node ${options.nodeId} due to ${e}`);
     }
   }

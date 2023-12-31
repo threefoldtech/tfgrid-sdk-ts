@@ -125,8 +125,11 @@ export default {
           loadingReserveNode.value = false;
         }, 20000);
       } catch (e) {
-        console.log("Error: ", e);
-        createCustomToast(normalizeError(e, "Failed to rent node."), ToastType.danger);
+        if (e instanceof InsufficientBalanceError) {
+          createCustomToast(`Can't delete rent contract due to Insufficient balance`, ToastType.danger);
+        } else {
+          createCustomToast(normalizeError(e, "Failed to delete rent contract."), ToastType.danger);
+        }
         loadingReserveNode.value = false;
       }
     }
