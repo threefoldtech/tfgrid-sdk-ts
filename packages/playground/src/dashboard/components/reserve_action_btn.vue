@@ -50,6 +50,7 @@ import { type PropType, ref } from "vue";
 import { useProfileManager } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { getGrid } from "@/utils/grid";
+import { normalizeError } from "@/utils/helpers";
 
 const profileManager = useProfileManager();
 
@@ -102,7 +103,7 @@ export default {
         if (e instanceof InsufficientBalanceError) {
           createCustomToast(`Can't delete rent contract due to Insufficient balance`, ToastType.danger);
         } else {
-          createCustomToast(String(e), ToastType.danger);
+          createCustomToast(normalizeError(e, "Failed to delete rent contract."), ToastType.danger);
         }
         loadingUnreserveNode.value = false;
         openUnreserveDialog.value = false;
@@ -125,7 +126,7 @@ export default {
         }, 20000);
       } catch (e) {
         console.log("Error: ", e);
-        createCustomToast(String(e), ToastType.danger);
+        createCustomToast(normalizeError(e, "Failed to rent node."), ToastType.danger);
         loadingReserveNode.value = false;
       }
     }
