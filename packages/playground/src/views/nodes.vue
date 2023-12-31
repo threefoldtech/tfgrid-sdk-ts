@@ -6,12 +6,7 @@
   </div>
 
   <view-layout>
-    <filters
-      :form-disabled="isFormLoading"
-      v-model:model-value="filterInputs"
-      v-model:valid="isValidForm"
-      @update:model-value="inputFiltersReset"
-    />
+    <filters :form-disabled="isFormLoading" v-model:model-value="filterInputs" v-model:valid="isValidForm" />
     <div class="nodes mt-5">
       <div class="nodes-inner">
         <v-row>
@@ -172,12 +167,6 @@ export default {
       { deep: true },
     );
 
-    // The filters should reset to the default value again..
-    const inputFiltersReset = (filtersInputValues: FilterInputs) => {
-      filterInputs.value = filtersInputValues;
-      filterOptions.value = optionsInitializer();
-    };
-
     const paginationReset = () => {
       const options = mixedFilters.value.options;
       options.page = 1;
@@ -228,7 +217,6 @@ export default {
       openDialog,
       closeDialog,
       requestNodes,
-      inputFiltersReset,
     };
   },
 };
