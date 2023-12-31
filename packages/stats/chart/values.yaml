@@ -4,7 +4,7 @@ image:
   repository: ghcr.io/threefoldtech/stats
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v2.3.0-alpha3"
+  tag: "2.3.0-alpha3"
 
 imagePullSecrets: []
 nameOverride: ""
