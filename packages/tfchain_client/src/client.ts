@@ -129,13 +129,14 @@ class QueryClient {
     }
   }
 
-  async disconnect(): Promise<void> {
-    if (QueryClient.connections.has(this.url)) {
-      this.api = QueryClient.connections.get(this.url)!.api;
+  async disconnect(url?: string): Promise<void> {
+    const clientUrl = url || this.url;
+    if (QueryClient.connections.has(clientUrl)) {
+      this.api = QueryClient.connections.get(clientUrl)!.api;
     }
     if (this.api && this.api.isConnected) {
       console.log("disconnecting");
-      this.api.off("disconnected", QueryClient.connections.get(this.url)!.disconnectHandler);
+      this.api.off("disconnected", QueryClient.connections.get(clientUrl)!.disconnectHandler);
       await this.api.disconnect();
       await this.wait(false);
     }
@@ -143,8 +144,11 @@ class QueryClient {
 
   async disconnectAndExit(): Promise<void> {
     // this should be only used by nodejs process
-    // TODO: loop on map keys
-    await this.disconnect();
+
+    for (const [key] of QueryClient.connections) {
+      await this.disconnect(key);
+    }
+
     process.removeAllListeners();
     process.exit(0);
   }
