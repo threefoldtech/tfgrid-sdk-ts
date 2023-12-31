@@ -103,7 +103,8 @@ export default {
         if (e instanceof InsufficientBalanceError) {
           createCustomToast(`Can't delete rent contract due to Insufficient balance`, ToastType.danger);
         } else {
-          createCustomToast(normalizeError(e, "Failed to delete rent contract."), ToastType.danger);
+          console.log(e);
+          createCustomToast("Failed to delete rent contract.", ToastType.danger);
         }
         loadingUnreserveNode.value = false;
         openUnreserveDialog.value = false;
@@ -126,9 +127,10 @@ export default {
         }, 20000);
       } catch (e) {
         if (e instanceof InsufficientBalanceError) {
-          createCustomToast(`Can't delete rent contract due to Insufficient balance`, ToastType.danger);
+          createCustomToast(`Can't create rent contract due to Insufficient balance`, ToastType.danger);
         } else {
-          createCustomToast(normalizeError(e, "Failed to delete rent contract."), ToastType.danger);
+          console.log(e);
+          createCustomToast("Failed to create rent contract.", ToastType.danger);
         }
         loadingReserveNode.value = false;
       }
