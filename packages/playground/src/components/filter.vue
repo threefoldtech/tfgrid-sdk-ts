@@ -82,14 +82,17 @@ const emit = defineEmits(["update:model-value", "update:valid"]);
 const formRef = useFormRef();
 const panel = ref([0]);
 const isFiltersTouched = ref<boolean>(false);
-
+const delay = ref();
 watch(
   () => props.modelValue,
   (newValue: PropType<{ [key: string]: InputFilterType }>) => {
-    const hasNonEmptyValue = Object.keys(newValue).some(obj => {
-      return Reflect.get(newValue, obj).value && Reflect.get(newValue, obj).value.length >= 1;
-    });
-    emit("update:model-value", props.modelValue), (isFiltersTouched.value = hasNonEmptyValue);
+    clearTimeout(delay.value);
+    delay.value = setTimeout(() => {
+      const hasNonEmptyValue = Object.keys(newValue).some(obj => {
+        return Reflect.get(newValue, obj).value && Reflect.get(newValue, obj).value.length >= 1;
+      });
+      emit("update:model-value", props.modelValue), (isFiltersTouched.value = hasNonEmptyValue);
+    }, 1000);
   },
   { deep: true },
 );
