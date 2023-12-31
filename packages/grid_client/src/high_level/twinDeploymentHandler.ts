@@ -7,6 +7,7 @@ import {
   TimeoutError,
   ValidationError,
 } from "@threefold/types";
+import groupBy from "lodash/fp/groupBy.js";
 
 import { RMB } from "../clients";
 import { TFClient } from "../clients/tf-grid/client";
@@ -317,19 +318,24 @@ class TwinDeploymentHandler {
   }
 
   async checkNodesCapacity(twinDeployments: TwinDeployment[]) {
-    await Promise.all(twinDeployments.map(d => this.checkNodeCapacity(d)));
+    const deployments = groupBy(x => x.nodeId, twinDeployments);
+    await Promise.all(Object.keys(deployments).map(nodeId => this._checkNodeCapacity(+nodeId, deployments[nodeId])));
   }
 
-  async checkNodeCapacity(twinDeployment: TwinDeployment) {
-    let workloads: Workload[] = [];
+  private async _checkNodeCapacity(nodeId: number, twinDeployments: TwinDeployment[]) {
+    const workloads: Workload[] = [];
 
-    if (twinDeployment.operation == Operations.deploy) {
-      workloads = twinDeployment.deployment.workloads;
-    }
+    for (const twinDeployment of twinDeployments) {
+      if (twinDeployment.operation == Operations.deploy) {
+        workloads.push(...twinDeployment.deployment.workloads);
+      }
 
-    if (twinDeployment.operation == Operations.update) {
-      const deployment_version = twinDeployment.deployment.version;
-      workloads = twinDeployment.deployment.workloads.filter(workload => workload.version == deployment_version);
+      if (twinDeployment.operation == Operations.update) {
+        const deployment_version = twinDeployment.deployment.version;
+        workloads.push(
+          ...twinDeployment.deployment.workloads.filter(workload => workload.version == deployment_version),
+        );
+      }
     }
 
     let hru = 0;
@@ -358,18 +364,18 @@ class TwinDeploymentHandler {
 
     if (
       workloads.length !== 0 &&
-      !(await this.nodes.nodeHasResources(+twinDeployment.nodeId, {
+      !(await this.nodes.nodeHasResources(nodeId, {
         hru: hru / 1024 ** 3,
         sru: sru / 1024 ** 3,
         mru: mru / 1024 ** 3,
       }))
     ) {
       throw new GridClientErrors.Nodes.InvalidResourcesError(
-        `Node ${twinDeployment.nodeId} doesn't have enough resources: sru=${sru}, mru=${mru} .`,
+        `Node ${nodeId} doesn't have enough resources: sru=${sru}, mru=${mru} .`,
       );
     }
     if (workloads.length && (rootfsDisks.length || ssdDisks.length || hddDisks.length)) {
-      await this.nodes.verifyNodeStoragePoolCapacity(ssdDisks, hddDisks, rootfsDisks, +twinDeployment.nodeId);
+      await this.nodes.verifyNodeStoragePoolCapacity(ssdDisks, hddDisks, rootfsDisks, nodeId);
     }
   }
 
