@@ -121,8 +121,9 @@
 
           <v-spacer>
             <div class="d-flex align-center justify-start">
-              <TftSwapPrice class="pr-4" v-if="hasActiveProfile && hasGrid"></TftSwapPrice>
-              <FundsCard v-if="hasActiveProfile"></FundsCard>
+              <TfSwapPrice>
+                <FundsCard v-if="hasActiveProfile" />
+              </TfSwapPrice>
             </div>
           </v-spacer>
           <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
@@ -391,10 +392,10 @@ import DeploymentListManager from "./components/deployment_list_manager.vue";
 import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
 import FundsCard from "./components/funds_card.vue";
 import ProfileManagerController from "./components/profile_manager_controller.vue";
-import TftSwapPrice from "./components/swap_price.vue";
 import TFNotification from "./components/tf_notification.vue";
 import TfNavigationLoader from "./components/TfNavigationLoader.vue";
 import TfOfflineNotifier from "./components/TfOfflineNotifier.vue";
+import TfSwapPrice from "./components/TfSwapPrice.vue";
 import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
 
@@ -423,7 +424,7 @@ export default {
     AppTheme,
     ConnectWalletLanding,
     AppInfo,
-    TftSwapPrice,
+    TfSwapPrice,
     FundsCard,
     ProfileManagerController,
     TfNavigationLoader,

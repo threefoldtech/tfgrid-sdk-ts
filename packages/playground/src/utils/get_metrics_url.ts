@@ -1,4 +1,7 @@
-import GridProxyClient, { type GridNode, type TwinsQuery } from "@threefold/gridproxy_client";
+import type GridProxyClient from "@threefold/gridproxy_client";
+import type { GridNode, TwinsQuery } from "@threefold/gridproxy_client";
+
+import { gridProxyClient } from "@/clients";
 
 export interface IGrafanaArgs {
   farmID: number;
@@ -18,11 +21,11 @@ export class GrafanaStatistics {
   constructor(node: GridNode, orgID = 2) {
     this.node = node;
     const network = process.env.NETWORK || (window as any).env.NETWORK;
-    const client = new GridProxyClient(network);
+    const client = gridProxyClient;
     this.client = client;
     this.twinID = node.twinId;
     this.farmID = node.farmId;
-    this.network = process.env.NETWORK || (window as any).env.NETWORK;
+    this.network = network;
     this.updateNetwork();
     this.orgID = orgID;
     this.accountID = "";

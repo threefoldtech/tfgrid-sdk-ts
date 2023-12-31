@@ -1,3 +1,4 @@
+import { DeploymentKeyDeletionError, InsufficientBalanceError } from "@threefold/types";
 import * as PATH from "path";
 
 import { GqlNameContract, GqlNodeContract, GqlRentContract } from "../clients/tf-grid";
@@ -57,7 +58,15 @@ class Contracts {
     if (contractInfo) {
       baseModule.moduleName = contractInfo["moduleName"];
       baseModule.projectName = contractInfo["projectName"];
-      await baseModule._get(contractInfo["deploymentName"]);
+      try {
+        await baseModule._get(contractInfo["deploymentName"]);
+      } catch (e) {
+        if (e instanceof InsufficientBalanceError)
+          throw new DeploymentKeyDeletionError(
+            `Couldn't delete the deployment's cached data for contract ${contractInfo["deploymentName"]} due to \n\t${e}`,
+          );
+        else throw e;
+      }
     }
   }
 

@@ -1,5 +1,6 @@
 <template>
   <card-details
+    v-if="interfacesDetails"
     :loading="loading"
     title="Interfaces Details"
     :items="interfaceFields"
@@ -76,6 +77,7 @@ export default {
     return {
       interfaceFields,
       loading,
+      interfacesDetails,
     };
   },
 };

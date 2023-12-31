@@ -3,7 +3,6 @@ import { capitalize } from "vue";
 import type { VDataTable } from "vuetify/lib/labs/components";
 
 import type { AsyncRule, SyncRule } from "@/components/input_validator.vue";
-import type { INode } from "@/utils/filter_nodes";
 
 import type * as validators from "../utils/validators";
 // Input attrs
@@ -190,7 +189,7 @@ export type Validators = typeof validators;
 export type NodeInputFilterType = {
   label: string;
   placeholder: string;
-  value?: string | undefined;
+  value?: string;
   rules?: [syncRules: SyncRule[], asyncRules?: AsyncRule[]];
   error?: string;
   type: string;
@@ -204,9 +203,9 @@ export type MixedFilter = {
 
 // Status, GPU, Gateway, and any other option should be add here.
 export type FilterOptions = {
-  status: NodeStatus;
-  gpu: boolean | undefined;
-  gateway: boolean | undefined;
+  status?: NodeStatus;
+  gpu?: boolean;
+  gateway?: boolean;
   page: number;
   size: number;
 };
@@ -220,6 +219,9 @@ export type FilterInputs = {
   freeSru: NodeInputFilterType;
   freeHru: NodeInputFilterType;
   freeMru: NodeInputFilterType;
+  totalSru: NodeInputFilterType;
+  totalHru: NodeInputFilterType;
+  totalMru: NodeInputFilterType;
 };
 
 export const optionsInitializer: () => FilterOptions = () => ({
@@ -227,7 +229,7 @@ export const optionsInitializer: () => FilterOptions = () => ({
   gpu: undefined,
   page: 1,
   size: 10,
-  status: capitalize(NodeStatus.Up) as NodeStatus,
+  status: undefined,
 });
 
 import type { FilterFarmInputs } from "../utils/filter_farms";
@@ -239,8 +241,8 @@ import type { SelectionDetails } from "./nodeSelector";
 // Status, GPU, Gateway, and any other option should be add here.
 export type NodeFilterOptions = {
   status: NodeStatus;
-  gpu: boolean | undefined;
-  gateway: boolean | undefined;
+  gpu?: boolean;
+  gateway?: boolean;
   page: number;
   size: number;
 };
