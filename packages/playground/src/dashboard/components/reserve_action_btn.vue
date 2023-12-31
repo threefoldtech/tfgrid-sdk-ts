@@ -101,6 +101,8 @@ export default {
       } catch (e) {
         if (e instanceof InsufficientBalanceError) {
           createCustomToast(`Can't delete rent contract due to Insufficient balance`, ToastType.danger);
+        } else {
+          createCustomToast(String(e), ToastType.danger);
         }
         loadingUnreserveNode.value = false;
         openUnreserveDialog.value = false;
