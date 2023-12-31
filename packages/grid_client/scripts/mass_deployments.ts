@@ -177,7 +177,6 @@ async function main() {
     } catch (error) {
       errors.push(error);
       log(`Error handling contracts for twin deployments: ${error}`);
-      failedCount++;
     }
 
     console.timeEnd("Batch " + (batch + 1));
