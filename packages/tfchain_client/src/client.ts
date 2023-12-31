@@ -317,7 +317,6 @@ class Client extends QueryClient {
     const promise = new Promise(async (resolve, reject) => {
       function callback(res) {
         if (res instanceof Error) {
-          console.error(res);
           reject(res);
         }
         const { events = [], status } = res;
