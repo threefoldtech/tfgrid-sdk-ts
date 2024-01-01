@@ -6,7 +6,6 @@
   </div>
 
   <view-layout>
-
     <filters
       v-model:model-value="filterInputs"
       :loading="loading"
@@ -66,7 +65,6 @@
                           label="Select Nodes Status"
                           variant="underlined"
                           :disabled="isFormLoading"
-                          @update:model-value="paginationReset"
                           open-on-clear
                           clearable
                         ></v-select>
@@ -178,7 +176,6 @@ export default {
     };
 
     const statusReset = () => {
-
       const options = mixedFilters.value.options;
       options.page = 1;
       options.size = 10;
@@ -231,7 +228,6 @@ export default {
       statusReset,
       updateNodes,
 
-
       filterInputs,
       filterOptions,
       isDialogOpened,
@@ -241,7 +237,6 @@ export default {
       closeDialog,
       requestNodes,
       applyFilters,
-
     };
   },
 };
