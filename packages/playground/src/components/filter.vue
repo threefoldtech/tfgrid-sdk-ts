@@ -48,6 +48,9 @@
 
           <v-row>
             <v-col cols="12" sm="4" md="2" class="d-flex justify-start align-center mb-6 ml-4">
+              <v-btn :disabled="!isValidForm" :loading="loading" @click="resetFilters" variant="outlined" color="anchor"
+                >Clear</v-btn
+              >
               <v-btn
                 :disabled="!isValidForm"
                 :loading="loading"
@@ -56,9 +59,6 @@
                 color="secondary"
                 class="mr-4"
                 >Apply</v-btn
-              >
-              <v-btn :disabled="!isValidForm" :loading="loading" @click="resetFilters" variant="outlined" color="anchor"
-                >Clear</v-btn
               >
             </v-col>
           </v-row>
