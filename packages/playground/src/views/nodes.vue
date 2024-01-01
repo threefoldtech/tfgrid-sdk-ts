@@ -128,9 +128,9 @@ export default {
   },
   setup() {
     const filterInputs = ref<FilterInputs>(inputsInitializer());
-    const filterOptions = ref<FilterOptions>(optionsInitializer());
+    const filterOptions = ref<FilterOptions>(optionsInitializer(NodeStatus.Up));
     const mixedFilters = computed<MixedFilter>(() => ({ inputs: filterInputs.value, options: filterOptions.value }));
-    const status = NodeStatus.Up;
+
     const loading = ref<boolean>(true);
     const isFormLoading = ref<boolean>(true);
     const nodes = ref<GridNode[]>([]);
@@ -165,7 +165,7 @@ export default {
 
     const applyFilters = async (filtersInputValues: FilterInputs) => {
       filterInputs.value = filtersInputValues;
-      filterOptions.value = optionsInitializer();
+      filterOptions.value = optionsInitializer(filterOptions.value.status);
       if (isValidForm.value) {
         await updateNodes();
       }
@@ -220,7 +220,6 @@ export default {
 
       nodes,
       nodesCount,
-      status,
 
       selectedNodeId,
       nodeStatusOptions,

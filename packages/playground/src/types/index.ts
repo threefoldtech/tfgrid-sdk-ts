@@ -224,12 +224,14 @@ export type FilterInputs = {
   totalMru: NodeInputFilterType;
 };
 
-export const optionsInitializer: () => FilterOptions = () => ({
+export const optionsInitializer: (status: NodeStatus | undefined) => FilterOptions = (
+  status: NodeStatus | undefined,
+) => ({
   gateway: undefined,
   gpu: undefined,
   page: 1,
   size: 10,
-  status: undefined,
+  status: status,
 });
 
 import type { FilterFarmInputs } from "../utils/filter_farms";
