@@ -92,7 +92,7 @@ const mixedFarmFilters = computed<MixedFarmFilter>(() => ({
 }));
 
 const isFormLoading = ref<boolean>(true);
-const isValidForm = ref<boolean>(false);
+const isValidForm = ref<boolean>(true);
 const totalFarms = ref(0);
 
 const _getFarms = async (queries: Partial<FarmsQuery>) => {

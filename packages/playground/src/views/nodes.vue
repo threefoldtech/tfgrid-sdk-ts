@@ -7,10 +7,10 @@
 
   <view-layout>
     <filters
-      :form-disabled="isFormLoading"
       v-model:model-value="filterInputs"
+      :loading="loading"
       v-model:valid="isValidForm"
-      @update:model-value="inputFiltersReset"
+      @update:model-value="applyFilters"
     />
     <div class="nodes mt-5">
       <div class="nodes-inner">
@@ -131,7 +131,7 @@ export default {
     const filterInputs = ref<FilterInputs>(inputsInitializer());
     const filterOptions = ref<FilterOptions>(optionsInitializer());
     const mixedFilters = computed<MixedFilter>(() => ({ inputs: filterInputs.value, options: filterOptions.value }));
-
+    const status = NodeStatus.Up;
     const loading = ref<boolean>(true);
     const isFormLoading = ref<boolean>(true);
     const nodes = ref<GridNode[]>([]);
@@ -146,7 +146,7 @@ export default {
     });
 
     const isDialogOpened = ref<boolean>(false);
-    const isValidForm = ref<boolean>(false);
+    const isValidForm = ref<boolean>(true);
 
     const nodeStatusOptions = [capitalize(NodeStatus.Up), capitalize(NodeStatus.Standby), capitalize(NodeStatus.Down)];
     const route = useRoute();
@@ -169,20 +169,16 @@ export default {
     };
 
     const request = debounce(_requestNodes, 1000);
-
-    watch(
-      mixedFilters,
-      async () => {
-        const queries = getQueries(mixedFilters.value);
-        await request(queries, { loadFarm: true });
-      },
-      { deep: true },
-    );
-
-    // The filters should reset to the default value again..
-    const inputFiltersReset = (filtersInputValues: FilterInputs) => {
+    const applyFilters = async (filtersInputValues: FilterInputs) => {
       filterInputs.value = filtersInputValues;
       filterOptions.value = optionsInitializer();
+      if (isValidForm.value) {
+        await updateNodes();
+      }
+    };
+    const updateNodes = async () => {
+      const queries = getQueries(mixedFilters.value);
+      await request(queries, { loadFarm: true });
     };
 
     const statusReset = () => {
@@ -193,6 +189,14 @@ export default {
 
       filterInputs.value = inputsInitializer();
     };
+    watch(
+      filterOptions,
+      async () => {
+        const queries = getQueries(mixedFilters.value);
+        await request(queries, { loadFarm: true });
+      },
+      { deep: true },
+    );
     const checkSelectedNode = async () => {
       if (route.query.nodeId) {
         selectedNodeId.value = +route.query.nodeId;
@@ -215,6 +219,7 @@ export default {
 
     onMounted(async () => {
       await checkSelectedNode();
+      // filterOptions.value = optionsInitializer();
       const queries = getQueries(mixedFilters.value);
       await request(queries, { loadFarm: true });
     });
@@ -225,11 +230,13 @@ export default {
 
       nodes,
       nodesCount,
+      status,
 
       selectedNodeId,
       selectedNodeoptions,
       nodeStatusOptions,
       statusReset,
+      updateNodes,
 
       filterInputs,
       filterOptions,
@@ -239,7 +246,7 @@ export default {
       openDialog,
       closeDialog,
       requestNodes,
-      inputFiltersReset,
+      applyFilters,
     };
   },
 };
