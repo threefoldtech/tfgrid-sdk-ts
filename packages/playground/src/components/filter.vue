@@ -53,12 +53,12 @@
                 :loading="loading"
                 @click="applyFilters"
                 variant="outlined"
-                color="primary"
+                color="secondary"
+                class="mr-4"
                 >Apply</v-btn
               >
-              <v-btn :disabled="!isValidForm" :loading="loading" @click="resetFilters" variant="outlined" color="error"
+              <v-btn :disabled="!isValidForm" :loading="loading" @click="resetFilters" variant="outlined" color="anchor"
                 >Clear</v-btn
-
               >
             </v-col>
           </v-row>
