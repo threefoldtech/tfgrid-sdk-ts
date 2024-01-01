@@ -134,7 +134,7 @@ const profileManagerController = useProfileManagerController();
 const activeTab = ref(0);
 const recipientTwinId = ref("");
 const isValidTwinIDTransfer = ref(false);
-const transferAmount = ref(1);
+const transferAmount = ref();
 const loadingTwinIDTransfer = ref(false);
 const loadingAddressTransfer = ref(false);
 const isValidAddressTransfer = ref(false);
@@ -194,7 +194,7 @@ async function isValidAddress() {
   }
 }
 function clearInput() {
-  transferAmount.value = 1;
+  transferAmount.value = undefined;
   recipientTwinId.value = "";
   recipientAddress.value = "";
 }
@@ -212,6 +212,7 @@ async function transfer(recipientTwin: Twin) {
   try {
     if (grid) {
       await grid.balance.transfer({ address: recipientTwin.accountId, amount: transferAmount.value });
+      transferAmount.value = undefined;
       createCustomToast("Transaction Complete!", ToastType.success);
       profileManagerController.reloadBalance();
       await getFreeBalance();
