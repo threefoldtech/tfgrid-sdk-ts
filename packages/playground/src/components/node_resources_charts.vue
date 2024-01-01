@@ -28,14 +28,7 @@
 
     <v-row justify="center">
       <v-progress-circular v-if="loading" indeterminate color="primary" :size="50" class="mt-10 mb-10" />
-      <v-btn
-        rounded="md"
-        variant="flat"
-        color="primary"
-        v-if="isNodeReadyToVisit()"
-        class="mt-10"
-        @click="getNodeHealthUrl"
-      >
+      <v-btn rounded="md" variant="flat" color="primary" class="mt-10" @click="getNodeHealthUrl">
         Check Node Health
       </v-btn>
     </v-row>
@@ -103,14 +96,6 @@ export default {
       });
     };
 
-    // Return true if the node is up or standby
-    const isNodeReadyToVisit = () => {
-      return (
-        (!loading.value && props.node.status === NodeStatus.Up) ||
-        (!loading.value && props.node.status === NodeStatus.Standby)
-      );
-    };
-
     return {
       NodeStatus,
       resources,
@@ -118,7 +103,6 @@ export default {
 
       getNodeResources,
       getNodeHealthUrl,
-      isNodeReadyToVisit,
       getNodeStatusColor,
     };
   },
