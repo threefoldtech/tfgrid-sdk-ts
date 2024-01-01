@@ -192,8 +192,7 @@ export default {
     watch(
       filterOptions,
       async () => {
-        const queries = getQueries(mixedFilters.value);
-        await request(queries, { loadFarm: true });
+        await updateNodes();
       },
       { deep: true },
     );
