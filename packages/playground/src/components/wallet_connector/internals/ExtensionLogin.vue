@@ -65,7 +65,7 @@ export default {
 
     const loadingMessage = ref(_defaultLoadingMsg);
 
-    const installedTask = useAsync(ThreefoldWalletConnectorApi.isInstalled, { init: true });
+    const installedTask = useAsync(() => ThreefoldWalletConnectorApi.isInstalled(), { init: true });
     const loginTask = useAsync<void, string, [mnemonic?: string, keypairType?: string]>(
       async (mnemonic, keypairType) => {
         type LoginCredentials = { mnemonic: string; keypairType: KeypairType };

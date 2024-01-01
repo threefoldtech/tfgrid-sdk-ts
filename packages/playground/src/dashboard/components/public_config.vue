@@ -35,7 +35,16 @@
 
               <input-validator
                 :value="$props.modelValue.gw4"
-                :rules="[validators.required('Gateway is required.'), validators.isIP('Gateway is not valid.', 4)]"
+                :rules="[
+                  validators.required('Gateway is required.'),
+                  validators.isIP('Gateway is not valid.', 4),
+                  value =>
+                    validators.ipNotEqualGateway(
+                      $props.modelValue.ipv4,
+                      $props.modelValue.gw4,
+                      'Gateway IPv4 should not be equal to IPv4.',
+                    )(value),
+                ]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Gateway for the IP in ipv4 format">
@@ -49,7 +58,10 @@
               </input-validator>
               <input-validator
                 :value="$props.modelValue.ipv6"
-                :rules="[value => validators.isIPRange('IP is not valid.', 6)(value)]"
+                :rules="[
+                  value => ($props.modelValue.gw6 !== '' ? validators.required('IPv6 is required.')(value) : '') as RuleReturn,
+                  value => validators.isIPRange('IP is not valid.', 6)(value),
+                ]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IPV6 address in format x:x:x:x:x:x:x:x">
@@ -59,7 +71,15 @@
 
               <input-validator
                 :value="$props.modelValue.gw6"
-                :rules="[value => validators.isIP('Gateway is not valid.', 6)(value)]"
+                :rules="[
+                  value => ($props.modelValue.ipv6 !== '' ? validators.required('Gateway is required.')(value) : '') as RuleReturn,
+                  value => validators.isIP('Gateway is not valid.', 6)(value),
+                  value => validators.ipNotEqualGateway(
+                    $props.modelValue.ipv6!,
+                    $props.modelValue.gw6!,
+                    'Gateway IPv6 should not be equal to IPv6.',
+                  )(value),
+                ]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Gateway for the IP in ipv6 format">
@@ -91,16 +111,16 @@
           <v-card-actions class="justify-space-between px-5 pb-5 pt-0">
             <v-btn
               @click="showClearDialogue = true"
-              color="white"
-              class="bg-red-lighten-1"
+              color="error"
+              variant="outlined"
               :disabled="isRemoving || Object.values(config).every(value => value == '')"
               >Remove Config</v-btn
             >
             <div>
-              <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
+              <v-btn @click="showDialogue = false" variant="outlined" color="anchor">Close</v-btn>
               <v-btn
-                color="primary"
-                variant="tonal"
+                color="secondary"
+                variant="outlined"
                 @click="AddConfig"
                 :loading="isSaving"
                 :disabled="isSaving || !valid || (valid && !isConfigChanged)"
@@ -119,20 +139,20 @@
           <v-toolbar color="primary" dark class="custom-toolbar">
             <p class="mb-5">Remove Public Config</p>
           </v-toolbar>
-          <v-card-text> Are you certain you want to remove this node's public config? </v-card-text>
+          <v-card-text>Remove this node's public config? </v-card-text>
           <v-alert variant="tonal" type="warning" class="ma-4">
             <p>This action is reversible!</p>
           </v-alert>
           <v-card-actions class="justify-end px-5 pb-5 pt-0">
+            <v-btn text="Cancel" color="anchor" variant="outlined" @click="showClearDialogue = false"></v-btn>
             <v-btn
               text="Remove"
-              color="white"
+              color="error"
+              variant="outlined"
               :loading="isRemoving"
               :disabled="isRemoving"
-              class="bg-red-lighten-1"
               @click="removeConfig()"
             ></v-btn>
-            <v-btn text="Close" @click="showClearDialogue = false"></v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -146,6 +166,7 @@ import _ from "lodash";
 import { onMounted, type PropType, ref, watch } from "vue";
 
 import { gridProxyClient } from "@/clients";
+import type { RuleReturn } from "@/components/input_validator.vue";
 import { useFormRef } from "@/hooks/form_validator";
 import type { IPublicConfig } from "@/utils/types";
 

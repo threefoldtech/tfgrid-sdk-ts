@@ -30,6 +30,9 @@ export type FilterNodeInputs = {
   freeSru: InputFilterType;
   freeHru: InputFilterType;
   freeMru: InputFilterType;
+  totalSru: InputFilterType;
+  totalHru: InputFilterType;
+  totalMru: InputFilterType;
 };
 
 // Input fields for dedicated nodes
@@ -80,12 +83,49 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
     placeholder: "Filter by country.",
     type: "text",
   },
+  totalSru: {
+    label: "Total SSD (GB)",
+    placeholder: "Filter by total SSD.",
+    rules: [
+      [
+        isNumeric("This field accepts numbers only."),
+        min("The total ssd should be larger then zero.", 1),
+        validateResourceMaxNumber("This value is out of range."),
+      ],
+    ],
+    type: "text",
+  },
+  totalHru: {
+    label: "Total HDD (GB)",
+    placeholder: "Filter by total HDD.",
+    rules: [
+      [
+        isNumeric("This field accepts numbers only."),
+        min("The total hdd should be larger then zero.", 1),
+        validateResourceMaxNumber("This value is out of range."),
+      ],
+    ],
+    type: "text",
+  },
+  totalMru: {
+    label: "Total RAM (GB)",
+    placeholder: "Filter by total RAM.",
+    value: undefined,
+    rules: [
+      [
+        isNumeric("This field accepts numbers only."),
+        min("The total ram should be larger then zero.", 1),
+        validateResourceMaxNumber("This value is out of range."),
+      ],
+    ],
+    type: "text",
+  },
   freeSru: {
     label: "Free SSD (GB)",
     placeholder: "Filter by free SSD.",
     rules: [
       [
-        isNumeric("This field accepts numbers only.", { no_symbols: true }),
+        isNumeric("This field accepts numbers only."),
         min("The free ssd should be larger then zero.", 1),
         validateResourceMaxNumber("This value is out of range."),
       ],
@@ -97,7 +137,7 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
     placeholder: "Filter by free HDD.",
     rules: [
       [
-        isNumeric("This field accepts numbers only.", { no_symbols: true }),
+        isNumeric("This field accepts numbers only."),
         min("The free hdd should be larger then zero.", 1),
         validateResourceMaxNumber("This value is out of range."),
       ],
@@ -110,7 +150,7 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
     value: undefined,
     rules: [
       [
-        isNumeric("This field accepts numbers only.", { no_symbols: true }),
+        isNumeric("This field accepts numbers only."),
         min("The free ram should be larger then zero.", 1),
         validateResourceMaxNumber("This value is out of range."),
       ],
@@ -126,7 +166,7 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
     type: "text",
     rules: [
       [
-        isNumeric("This Field accepts only a valid number."),
+        isInt("This Field accepts only a valid number."),
         min("This Field must be a number larger than 0.", 1),
         validateResourceMaxNumber("This value is out of range."),
       ],

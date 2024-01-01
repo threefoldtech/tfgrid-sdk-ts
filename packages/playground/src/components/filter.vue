@@ -51,7 +51,7 @@
                 :disabled="!isFiltersTouched || formDisabled"
                 @click="resetFilters"
                 variant="outlined"
-                color="primary"
+                color="secondary"
                 >Reset Filters</v-btn
               >
             </v-col>
@@ -89,8 +89,7 @@ watch(
     const hasNonEmptyValue = Object.keys(newValue).some(obj => {
       return Reflect.get(newValue, obj).value && Reflect.get(newValue, obj).value.length >= 1;
     });
-
-    isFiltersTouched.value = hasNonEmptyValue;
+    emit("update:model-value", props.modelValue), (isFiltersTouched.value = hasNonEmptyValue);
   },
   { deep: true },
 );

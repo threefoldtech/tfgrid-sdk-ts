@@ -1,4 +1,4 @@
-import { GridClientErrors, TFChainError } from "@threefold/types";
+import { BaseError, GridClientErrors, TFChainError } from "@threefold/types";
 
 import { TFClient } from "../clients";
 import { GridClientConfig } from "../config";
@@ -38,6 +38,10 @@ class Nodes {
       return res;
     } catch (e) {
       //TODO Errors should be handled in tfchain
+      if (e instanceof BaseError) {
+        e.message = `Failed to create rent contract on node ${options.nodeId} due to ${e.message}`;
+        throw e;
+      }
       throw new TFChainError(`Failed to create rent contract on node ${options.nodeId} due to ${e}`);
     }
   }
@@ -56,6 +60,10 @@ class Nodes {
       events.emit("logs", `Rent contract for node ${options.nodeId} has been deleted`);
       return res;
     } catch (e) {
+      if (e instanceof BaseError) {
+        e.message = `Failed to delete rent contract on node ${options.nodeId} due to ${e.message}`;
+        throw e;
+      }
       throw new TFChainError(`Failed to delete rent contract on node ${options.nodeId} due to ${e}`);
     }
   }

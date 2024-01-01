@@ -37,14 +37,14 @@
               </v-col>
               <v-divider class="my-4" horizontal></v-divider>
             </v-row>
-            <v-alert type="warning" variant="tonal" class="d-flex row justify-start">
+            <v-alert type="warning" variant="tonal" class="d-flex row justify-start text-subtitle-1">
               <p :style="{ maxWidth: '880px' }">
                 Amount: should be larger than {{ depositFee }}TFT (deposit fee is: {{ depositFee }}TFT)
               </p>
             </v-alert>
           </v-container>
           <v-card-actions class="justify-end">
-            <v-btn variant="outlined" color="anchor" class="mr-2 text-subtitle-2" @click="closeDialog"> Close </v-btn>
+            <v-btn variant="outlined" color="anchor" class="mr-2 px-3" @click="closeDialog"> Close </v-btn>
           </v-card-actions>
         </v-card-text>
       </v-card>

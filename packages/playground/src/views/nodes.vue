@@ -1,17 +1,12 @@
 <template>
   <div class="hint">
     <v-alert type="info" variant="tonal">
-      Node statuses are updated every 90 minutes. For a realtime status, please click on the row.
+      Node status is updated every 90 minutes. For a realtime status, click on the row.
     </v-alert>
   </div>
 
   <view-layout>
-    <filters
-      :form-disabled="isFormLoading"
-      :model-value="filterInputs"
-      v-model:valid="isValidForm"
-      @update:model-value="inputFiltersReset"
-    />
+    <filters :form-disabled="isFormLoading" v-model:model-value="filterInputs" v-model:valid="isValidForm" />
     <div class="nodes mt-5">
       <div class="nodes-inner">
         <v-row>
@@ -64,6 +59,7 @@
                           label="Select Nodes Status"
                           variant="underlined"
                           :disabled="isFormLoading"
+                          @update:model-value="paginationReset"
                           open-on-clear
                           clearable
                         ></v-select>
@@ -92,7 +88,7 @@
       </div>
     </div>
     <node-details
-      :options="selectedNodeoptions"
+      :filter-options="filterOptions"
       :nodeId="selectedNodeId"
       :openDialog="isDialogOpened"
       @close-dialog="closeDialog"
@@ -104,8 +100,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
 import debounce from "lodash/debounce.js";
-import { capitalize, onMounted, ref, watch } from "vue";
-import { computed } from "vue";
+import { capitalize, computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import NodeDetails from "@/components/node_details.vue";
@@ -137,12 +132,6 @@ export default {
     const nodesCount = ref<number>(0);
 
     const selectedNodeId = ref<number>(0);
-    const selectedNodeoptions = ref<GridProxyRequestConfig>({
-      loadFarm: true,
-      loadTwin: true,
-      loadStats: true,
-      loadGpu: true,
-    });
 
     const isDialogOpened = ref<boolean>(false);
     const isValidForm = ref<boolean>(false);
@@ -178,19 +167,11 @@ export default {
       { deep: true },
     );
 
-    // The filters should reset to the default value again..
-    const inputFiltersReset = (filtersInputValues: FilterInputs) => {
-      filterInputs.value = filtersInputValues;
-      filterOptions.value = {
-        ...filterOptions.value,
-        status: NodeStatus.Up,
-        gpu: undefined,
-        gateway: undefined,
-        page: 1,
-        size: 10,
-      };
+    const paginationReset = () => {
+      const options = mixedFilters.value.options;
+      options.page = 1;
+      options.size = 10;
     };
-
     const checkSelectedNode = async () => {
       if (route.query.nodeId) {
         selectedNodeId.value = +route.query.nodeId;
@@ -225,8 +206,8 @@ export default {
       nodesCount,
 
       selectedNodeId,
-      selectedNodeoptions,
       nodeStatusOptions,
+      paginationReset,
 
       filterInputs,
       filterOptions,
@@ -236,7 +217,6 @@ export default {
       openDialog,
       closeDialog,
       requestNodes,
-      inputFiltersReset,
     };
   },
 };

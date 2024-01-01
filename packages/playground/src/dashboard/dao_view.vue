@@ -16,7 +16,7 @@
     <div v-else>
       <v-card>
         <h4 class="d-flex justify-center pa-4">
-          User, you can now vote on proposals!
+          You can now vote on proposals!
           <v-icon @click="openInfoModal = true" class="mx-3"> mdi-information-outline </v-icon>
         </h4>
         <v-tabs v-model="activeTab" align-tabs="center">
@@ -43,7 +43,9 @@
               <v-card-title class="pa-0 mb-5 font-weight-bold" v-if="proposal.action">
                 {{ proposal.action }}
               </v-card-title>
-              <v-btn variant="tonal" color="primary" v-bind:href="proposal.link" v-bind:target="'blank'">Details</v-btn>
+              <v-btn variant="outlined" color="secondary" v-bind:href="proposal.link" v-bind:target="'blank'"
+                >Details</v-btn
+              >
             </div>
             <v-divider class="mt-1 mb-5 text-red-700" />
 
@@ -78,10 +80,7 @@
                         >Threshold: {{ proposal.nayes.length + proposal.ayes.length }}/{{ proposal.threshold }}
                       </span>
                     </div>
-                    <v-btn
-                      color="grey lighten-2 text-black"
-                      @click="openVoteDialog(proposal.hash, false)"
-                      :disabled="loadingVote"
+                    <v-btn color="anchor" @click="openVoteDialog(proposal.hash, false)" :disabled="loadingVote"
                       >No <v-divider class="mx-3" vertical />{{ proposal.nayes.length }}
                     </v-btn>
                   </v-row>
@@ -148,7 +147,7 @@
                       v-else
                       rounded
                       v-model="proposal.nayesProgress"
-                      color="grey lighten-2"
+                      color="anchor"
                       backgroundColor="#e0e0e0"
                       height="24"
                       :style="{
@@ -189,8 +188,13 @@
             </form-validator>
           </v-card-text>
           <v-card-actions class="justify-end">
-            <v-btn @click="openVDialog = false" color="grey lighten-2 black--text">Close</v-btn>
-            <v-btn @click="castVote" :loading="loadingVote" color="primary white--text" :disabled="!isValidFarm"
+            <v-btn @click="openVDialog = false" variant="outlined" color="anchor">Close</v-btn>
+            <v-btn
+              @click="castVote"
+              :loading="loadingVote"
+              variant="outlined"
+              color="secondary"
+              :disabled="!isValidFarm"
               >Vote</v-btn
             >
           </v-card-actions>
@@ -198,24 +202,30 @@
       </v-dialog>
       <v-dialog v-model="openInfoModal" width="50vw">
         <v-card>
-          <v-card-title class="text-h5"> Proposals Information </v-card-title>
-
+          <v-card-title class="text-h5 my-2"> Proposals Information </v-card-title>
+          <v-divider></v-divider>
           <v-card-text>
             <div class="textContainer">
               <h2>General</h2>
-              <span>A proposal can be created by one of the council members of tfchain.</span>
-              <span> Once a proposal has reached it's timelimit, voting stops and a proposal can be closed.</span>
+              <span
+                >TFChain council members have exclusive authority to generate proposals, while owners of farms
+                containing one or more up nodes can cast votes.</span
+              >
+              <span> The voting process concludes at the designated maturity date and time of the proposal.</span>
               <span>
-                A proposal is either approved or dissapproved based on the majority of the weights of yes / no votes
-                (50%).</span
+                Decisions regarding the proposal's acceptance or rejection are determined by the majority of weighted
+                votes.</span
               >
               <span>
-                A minimal participation threshold must be met. If there are not enough votes and the timelimit is
-                reached, the proposal is dissapproved.</span
+                However, a minimum participation threshold must be attained in order for the voting process to be
+                considered valid.
+              </span>
+              <span>
+                If the vote count is insufficient and the time limit is reached, the proposal will be rejected.</span
               >
               <br />
               <br />
-              <h2>How do we count weight:</h2>
+              <h3>How do we count weight:</h3>
               <span
                 >Votes are weighted based on the farmers stake in the network. One vote by default is 1 weight.</span
               >
@@ -233,7 +243,7 @@
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn @click="openInfoModal = false"> Close </v-btn>
+            <v-btn @click="openInfoModal = false" class="my-1" color="anchor" variant="outlined"> Close </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

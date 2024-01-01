@@ -1,6 +1,6 @@
 {
   "name": "@threefold/graphql_client",
-  "version": "2.3.0-alpha2",
+  "version": "2.3.0-alpha3",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
@@ -8,7 +8,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@threefold/types": "^2.3.0-alpha2",
+    "@threefold/types": "^2.3.0-alpha3",
     "ts-mixer": "^6.0.2"
   },
   "devDependencies": {

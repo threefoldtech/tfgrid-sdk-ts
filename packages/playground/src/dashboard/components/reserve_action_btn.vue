@@ -44,11 +44,13 @@
 
 <script lang="ts">
 import type { GridNode } from "@threefold/gridproxy_client";
+import { InsufficientBalanceError } from "@threefold/types";
 import { type PropType, ref } from "vue";
 
 import { useProfileManager } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { getGrid } from "@/utils/grid";
+import { normalizeError } from "@/utils/helpers";
 
 const profileManager = useProfileManager();
 
@@ -98,8 +100,12 @@ export default {
           }, 20000);
         }
       } catch (e) {
-        console.log("Error: ", e);
-        createCustomToast(e as string, ToastType.danger);
+        if (e instanceof InsufficientBalanceError) {
+          createCustomToast(`Can't delete rent contract due to Insufficient balance`, ToastType.danger);
+        } else {
+          console.log(e);
+          createCustomToast("Failed to delete rent contract.", ToastType.danger);
+        }
         loadingUnreserveNode.value = false;
         openUnreserveDialog.value = false;
       }
@@ -120,8 +126,12 @@ export default {
           loadingReserveNode.value = false;
         }, 20000);
       } catch (e) {
-        console.log("Error: ", e);
-        createCustomToast(e as string, ToastType.danger);
+        if (e instanceof InsufficientBalanceError) {
+          createCustomToast(`Can't create rent contract due to Insufficient balance`, ToastType.danger);
+        } else {
+          console.log(e);
+          createCustomToast("Failed to create rent contract.", ToastType.danger);
+        }
         loadingReserveNode.value = false;
       }
     }

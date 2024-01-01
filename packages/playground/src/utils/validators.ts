@@ -4,8 +4,6 @@ import type { IsEmailOptions } from "validator/lib/isEmail";
 import type { IsFQDNOptions } from "validator/lib/isFQDN";
 import type { IsURLOptions } from "validator/lib/isURL";
 
-import { toBytes } from "@/utils/get_nodes";
-
 export function required(msg: string) {
   return (value: string) => {
     if (value === "" || value === undefined || value === null) {
@@ -701,6 +699,15 @@ export function isString(msg: string) {
   return (value: string) => {
     if (typeof value !== "string") {
       return { message: msg, isString: true };
+    }
+  };
+}
+
+export function ipNotEqualGateway(ip: string, gw: string, msg: string) {
+  return (value: string) => {
+    const address = ip.split("/")[0];
+    if (gw === address) {
+      return { message: msg, isNotEqualStrings: true };
     }
   };
 }
