@@ -576,7 +576,7 @@ const mnemonicInput = useInputRef();
 const isNonActiveMessage = ref(false);
 
 const shouldActivateAccount = computed(() => {
-  if (!mnemonicInput.value?.error) return false;
+  if (!mnemonicInput.value?.error || !mnemonic.value) return false;
 
   return isNonActiveMessage.value;
 });
