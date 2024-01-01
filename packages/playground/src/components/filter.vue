@@ -47,7 +47,7 @@
           </v-row>
 
           <v-row>
-            <v-col cols="12" sm="4" md="2" class="d-flex justify-start align-center mb-6 ml-4">
+            <v-col cols="12" sm="4" md="2" class="d-flex justify-start align-center mb-6 ml-auto mr-4">
               <v-btn
                 class="mr-4"
                 :disabled="!isValidForm"
