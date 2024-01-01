@@ -58,6 +58,7 @@
               >
               <v-btn :disabled="!isValidForm" :loading="loading" @click="resetFilters" variant="outlined" color="error"
                 >Clear</v-btn
+
               >
             </v-col>
           </v-row>

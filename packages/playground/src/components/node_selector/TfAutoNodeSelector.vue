@@ -15,7 +15,7 @@
           :items="loadedNodes"
           item-title="nodeId"
           return-object
-          :model-value="$props.modelValue"
+          :model-value="nodeInputValidateTask.initialized ? $props.modelValue : undefined"
           @update:model-value="bindModelValueAndValidate($event)"
           :disabled="!validFilters || filtersUpdated"
           :loading="nodeInputValidateTask.loading"
@@ -79,7 +79,7 @@
         </VAutocomplete>
 
         <VBtn
-          variant="tonal"
+          variant="outlined"
           color="secondary"
           class="mt-2 ml-2"
           @click="resetPageAndReloadNodes()"

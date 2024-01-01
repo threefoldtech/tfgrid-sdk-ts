@@ -6,7 +6,7 @@ CapRover is an extremely easy to use app/database deployment & web server manage
 <br />
 <br />
 
-#### CapRover root domain
+##### CapRover root domain
 
 You will need to point a wildcard DNS entry for the domain you entered above to this CapRover instance IP Address after deployment, otherwise, you won't be able to access the CapRover dashboard using this domain.
 

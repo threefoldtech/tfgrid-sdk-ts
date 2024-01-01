@@ -17,9 +17,11 @@
         </v-col>
       </v-row>
       <v-row class="pa-4 px-8">
-        <v-btn color="primary" class="mr-2" @click="openDepositDialog = true">Deposit</v-btn>
-        <v-btn variant="outlined" color="secondary" class="mr-2" @click="openWithdrawDialog = true">Withdraw</v-btn>
-        <v-btn color="blue" class="ml-auto" @click="navigation">Learn How?</v-btn>
+        <v-btn variant="outlined" color="secondary" @click="navigation">Learn How?</v-btn>
+        <div class="ml-auto">
+          <v-btn variant="outlined" color="secondary" class="mr-2" @click="openWithdrawDialog = true">Withdraw</v-btn>
+          <v-btn color="primary" class="mr-2" @click="openDepositDialog = true">Deposit</v-btn>
+        </div>
       </v-row>
     </v-card>
   </div>
@@ -75,9 +77,11 @@
           </v-form>
         </v-card-text>
         <v-card-actions class="justify-end pb-4 px-6">
-          <v-btn variant="outlined" color="anchor" class="bold-text" @click="openWithdrawDialog = false"> Close </v-btn>
+          <v-btn variant="outlined" color="anchor" class="px-3" @click="openWithdrawDialog = false"> Close </v-btn>
           <v-btn
-            class="white--text"
+            class="px-3"
+            color="secondary"
+            variant="outlined"
             @click="withdrawTFT(target, amount)"
             :disabled="!isValidSwap || validatingAddress"
             :loading="loadingWithdraw"

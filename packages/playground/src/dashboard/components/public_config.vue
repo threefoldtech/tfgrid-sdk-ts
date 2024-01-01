@@ -111,16 +111,16 @@
           <v-card-actions class="justify-space-between px-5 pb-5 pt-0">
             <v-btn
               @click="showClearDialogue = true"
-              color="white"
-              class="bg-red-lighten-1"
+              color="error"
+              variant="outlined"
               :disabled="isRemoving || Object.values(config).every(value => value == '')"
               >Remove Config</v-btn
             >
             <div>
-              <v-btn @click="showDialogue = false" class="grey lighten-2 black--text">Close</v-btn>
+              <v-btn @click="showDialogue = false" variant="outlined" color="anchor">Close</v-btn>
               <v-btn
-                color="primary"
-                variant="tonal"
+                color="secondary"
+                variant="outlined"
                 @click="AddConfig"
                 :loading="isSaving"
                 :disabled="isSaving || !valid || (valid && !isConfigChanged)"
@@ -139,20 +139,20 @@
           <v-toolbar color="primary" dark class="custom-toolbar">
             <p class="mb-5">Remove Public Config</p>
           </v-toolbar>
-          <v-card-text> Are you certain you want to remove this node's public config? </v-card-text>
+          <v-card-text>Remove this node's public config? </v-card-text>
           <v-alert variant="tonal" type="warning" class="ma-4">
             <p>This action is reversible!</p>
           </v-alert>
           <v-card-actions class="justify-end px-5 pb-5 pt-0">
+            <v-btn text="Cancel" color="anchor" variant="outlined" @click="showClearDialogue = false"></v-btn>
             <v-btn
               text="Remove"
-              color="white"
+              color="error"
+              variant="outlined"
               :loading="isRemoving"
               :disabled="isRemoving"
-              class="bg-red-lighten-1"
               @click="removeConfig()"
             ></v-btn>
-            <v-btn text="Close" @click="showClearDialogue = false"></v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>

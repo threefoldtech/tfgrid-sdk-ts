@@ -15,7 +15,7 @@
               v-for="(item, index) in contracts"
               :key="item.contractId"
               variant="tonal"
-              color="primary"
+              color="secondary"
               class="mx-2"
             >
               <v-tooltip location="bottom" :text="getTooltipText(item, index)" :disabled="!hasMaster(item)">
@@ -104,10 +104,10 @@
           </pre>
           </template>
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions class="my-1">
           <v-spacer />
-          <v-btn color="error" variant="tonal" @click="$emit('close')">Close</v-btn>
-          <v-btn color="secondary" variant="tonal" @click="copy">Copy</v-btn>
+          <v-btn color="anchor" variant="outlined" @click="$emit('close')">Close</v-btn>
+          <v-btn color="secondary" variant="outlined" @click="copy">Copy</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

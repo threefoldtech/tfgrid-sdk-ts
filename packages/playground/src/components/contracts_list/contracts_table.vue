@@ -69,7 +69,7 @@
     <template #footer-actions>
       <v-btn
         variant="outlined"
-        color="error"
+        color="anchor"
         prepend-icon="mdi-export-variant"
         :disabled="isExporting || !contracts || contracts.length === 0 || loadingDelete || deleting"
         @click="exportData"
@@ -89,9 +89,9 @@
     </template>
   </weblet-layout>
 
-  <v-dialog width="70%" v-model="deletingDialog">
+  <v-dialog width="800" v-model="deletingDialog">
     <v-card>
-      <v-card-title class="text-h5 mt-2"> Are you sure you want to delete the following contracts? </v-card-title>
+      <v-card-title class="text-h5 mt-2"> Delete the following contracts? </v-card-title>
       <v-alert class="ma-4" type="warning" variant="tonal"
         >It is advisable to remove the contract from its solution page, especially when multiple contracts may be linked
         to the same instance.</v-alert
@@ -105,8 +105,8 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="error" variant="tonal" @click="deletingDialog = false"> Cancel </v-btn>
-        <v-btn color="error" variant="text" @click="onDelete"> Delete </v-btn>
+        <v-btn color="anchor" variant="outlined" @click="deletingDialog = false"> Cancel </v-btn>
+        <v-btn color="error" variant="outlined" @click="onDelete"> Delete </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -117,7 +117,7 @@
 import { ContractStates, type GridClient } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
-import { DeploymentKeyDeletionError, InsufficientBalanceError } from "@threefold/types";
+import { DeploymentKeyDeletionError, InsufficientBalanceError, TFChainErrors } from "@threefold/types";
 import { defineComponent, type PropType, type Ref, ref } from "vue";
 import { capitalize } from "vue";
 
@@ -237,6 +237,11 @@ async function onDelete() {
       contracts.value = contracts.value.filter(c => !selectedContracts.value.includes(c));
       selectedContracts.value = [];
       createCustomToast("Failed to delete some keys, You don't have enough tokens", ToastType.danger);
+    } else if (e instanceof TFChainErrors.smartContractModule.NodeHasActiveContracts) {
+      layout.value.setStatus(
+        "failed",
+        "Some of the chosen rent contracts could not be deleted as there are active contracts linked to the rented node. Please ensure that any active contracts associated with a rented node are removed before attempting to delete its rent contract.",
+      );
     } else {
       layout.value.setStatus("failed", normalizeError(e, `Failed to delete some of the selected contracts.`));
     }

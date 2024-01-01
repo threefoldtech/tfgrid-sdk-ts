@@ -18,6 +18,9 @@
                 />
                 <v-card-title class="d-inline-block">
                   {{ card.title }}
+                  <v-chip v-if="card.flare" class="ml-2 pulse-animation" color="#1AA18F" small text-color="white">
+                    Community
+                  </v-chip>
                 </v-card-title>
                 <v-card-text class="mt-2"> {{ card.excerpt }} </v-card-text>
               </v-card>
@@ -35,6 +38,7 @@ interface Card {
   excerpt: string;
   icon: string;
   route: string;
+  flare?: string;
 }
 
 export default {
@@ -110,13 +114,14 @@ export default {
         icon: "owncloud.png",
         route: "/owncloud",
       },
-      // {
-      //   title: "Nextcloud",
-      //   excerpt:
-      //     "Nextcloud is a suite of client-server software for creating and using file hosting services. Nextcloud provides functionality similar to Dropbox, Office 365 or Google Drive.",
-      //   icon: "nextcloud.png",
-      //   route: "/nextcloud",
-      // },
+      {
+        title: "Nextcloud",
+        excerpt:
+          "Nextcloud is a suite of client-server software for creating and using file hosting services. Nextcloud provides functionality similar to Dropbox, Office 365 or Google Drive.",
+        icon: "nextcloud.png",
+        route: "/nextcloud",
+        flare: "Alpha",
+      },
       {
         title: "Presearch",
         excerpt:

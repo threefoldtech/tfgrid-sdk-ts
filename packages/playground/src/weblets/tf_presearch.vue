@@ -101,7 +101,7 @@
     </d-tabs>
 
     <template #footer-actions>
-      <v-btn color="primary" variant="tonal" :disabled="tabs?.invalid || network?.error" @click="deploy">
+      <v-btn color="secondary" variant="outlined" :disabled="tabs?.invalid || network?.error" @click="deploy">
         Deploy
       </v-btn>
     </template>
