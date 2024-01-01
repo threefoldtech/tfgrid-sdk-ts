@@ -573,18 +573,12 @@ const SSHKeyHint = ref("");
 const ssh = ref("");
 const mnemonicInput = useInputRef();
 
-function isNonActiveMessage(msg: string) {
-  msg = msg.toLowerCase();
-  return (
-    msg.includes("couldn't get the user twin for the provided mnemonic") ||
-    msg.includes("invalid twin id") ||
-    msg.includes("couldn't get the user twin")
-  );
-}
+const isNonActiveMessage = ref(false);
 
 const shouldActivateAccount = computed(() => {
-  const msg = mnemonicInput.value?.error || "";
-  return isNonActiveMessage(msg) || false;
+  if (!mnemonicInput.value?.error) return false;
+
+  return isNonActiveMessage.value;
 });
 
 let sshTimeout: any;
@@ -648,6 +642,7 @@ const loginError = ref<string | null>(null);
 const createAccountError = ref<string | null>(null);
 const activatingAccountError = ref<string | null>(null);
 function clearError() {
+  isNonActiveMessage.value = false;
   loginError.value = null;
   createAccountError.value = null;
   activatingAccountError.value = null;
@@ -676,14 +671,21 @@ async function activate(mnemonic: string, keypairType: KeypairType) {
 }
 
 function validateMnInput(mnemonic: string) {
+  isNonActiveMessage.value = false;
   return getGrid({ mnemonic, keypairType: keypairType.value })
     .then(() => undefined)
     .catch(e => {
-      const msg = normalizeError(e, "Something went wrong. please try again.");
+      if (e instanceof TwinNotExistError) {
+        isNonActiveMessage.value = true;
+        return {
+          message: `Couldn't get the user twin for the provided mnemonic in ${
+            process.env.NETWORK || window.env.NETWORK
+          }net.`,
+        };
+      }
+
       return {
-        message: isNonActiveMessage(msg)
-          ? `Couldn't get the user twin for the provided mnemonic in ${process.env.NETWORK || window.env.NETWORK}net.`
-          : msg,
+        message: normalizeError(e, "Something went wrong. please try again."),
       };
     });
 }
@@ -837,6 +839,8 @@ const apps = [
 </script>
 
 <script lang="ts">
+import { TwinNotExistError } from "@threefold/types";
+
 import QrcodeGenerator from "../components/qrcode_generator.vue";
 import type { Profile } from "../stores/profile_manager";
 
