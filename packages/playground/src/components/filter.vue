@@ -50,7 +50,7 @@
             <v-col class="d-flex justify-end align-center mb-6">
               <v-btn
                 class="mr-4"
-                :disabled="!isValidForm || loading"
+                :disabled="!isValidForm || loading || !filterTouched"
                 @click="resetFilters"
                 variant="outlined"
                 color="anchor"
@@ -73,7 +73,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineComponent, type PropType, ref } from "vue";
+import { defineComponent, type PropType, ref, watch } from "vue";
 
 import { useInputRef } from "@/hooks/input_validator";
 
@@ -93,11 +93,10 @@ const isValidForm = ref(false);
 const inputRef = useInputRef(true);
 const panel = ref([0]);
 const formRef = useFormRef();
-
+const filterTouched = ref(false);
 const applyFilters = () => {
   emit(
     "update:model-value",
-
     Object.keys(props.modelValue).reduce((res, key) => {
       res[key] = { ...props.modelValue[key] };
       return res;
@@ -105,14 +104,23 @@ const applyFilters = () => {
   );
 };
 const resetFilters = () => {
-  emit(
-    "update:model-value",
-    Object.keys(props.modelValue).reduce((res, key) => {
-      res[key] = { ...props.modelValue[key], value: undefined };
-      return res;
-    }, {} as any),
-  );
+  if (filterTouched.value) {
+    emit(
+      "update:model-value",
+      Object.keys(props.modelValue).reduce((res, key) => {
+        res[key] = { ...props.modelValue[key], value: undefined };
+        return res;
+      }, {} as any),
+    );
+  }
+  filterTouched.value = false;
 };
+watch(
+  props.modelValue,
+  () =>
+    (filterTouched.value =
+      Object.keys(props.modelValue).filter((k, i) => props.modelValue[k].value != undefined).length > 0 ? true : false),
+);
 </script>
 
 <script lang="ts">
