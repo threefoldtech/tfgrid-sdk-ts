@@ -573,12 +573,11 @@ const SSHKeyHint = ref("");
 const ssh = ref("");
 const mnemonicInput = useInputRef();
 
-const isNonActiveMessage = ref(false);
+const isNonActiveMnemonic = ref(false);
 
 const shouldActivateAccount = computed(() => {
   if (!mnemonicInput.value?.error || !mnemonic.value) return false;
-
-  return isNonActiveMessage.value;
+  return isNonActiveMnemonic.value;
 });
 
 let sshTimeout: any;
@@ -642,7 +641,7 @@ const loginError = ref<string | null>(null);
 const createAccountError = ref<string | null>(null);
 const activatingAccountError = ref<string | null>(null);
 function clearError() {
-  isNonActiveMessage.value = false;
+  isNonActiveMnemonic.value = false;
   loginError.value = null;
   createAccountError.value = null;
   activatingAccountError.value = null;
@@ -671,12 +670,12 @@ async function activate(mnemonic: string, keypairType: KeypairType) {
 }
 
 function validateMnInput(mnemonic: string) {
-  isNonActiveMessage.value = false;
+  isNonActiveMnemonic.value = false;
   return getGrid({ mnemonic, keypairType: keypairType.value })
     .then(() => undefined)
     .catch(e => {
       if (e instanceof TwinNotExistError) {
-        isNonActiveMessage.value = true;
+        isNonActiveMnemonic.value = true;
         return {
           message: `Couldn't get the user twin for the provided mnemonic in ${
             process.env.NETWORK || window.env.NETWORK
