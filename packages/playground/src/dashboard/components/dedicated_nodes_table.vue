@@ -6,6 +6,7 @@
       :loading="loading"
       v-model:valid="isValidForm"
       @update:model-value="applyFilters"
+      @reset="resetFilters"
     />
   </div>
   <div>
@@ -152,7 +153,7 @@ const loading = ref(false);
 const nodes = ref<any[]>();
 const nodesCount = ref(0);
 const filterInputs = ref<DedicatedNodeFilters>(DedicatedNodeInitializer());
-const filterOptions = ref<FilterOptions>(optionsInitializer(undefined));
+const filterOptions = ref<FilterOptions>(optionsInitializer(undefined, false));
 
 const isValidForm = ref<boolean>(false);
 const isFormLoading = ref<boolean>(true);
@@ -249,7 +250,16 @@ const _loadData = async () => {
 const applyFilters = async (filtersInputValues: DedicatedNodeFilters) => {
   filtering.value = true;
   filterInputs.value = filtersInputValues;
-  filterOptions.value = optionsInitializer(undefined);
+  filterOptions.value = optionsInitializer(undefined, filterOptions.value.gpu);
+  if (isValidForm.value) {
+    await _loadData();
+  }
+  filtering.value = false;
+};
+const resetFilters = async (filtersInputValues: DedicatedNodeFilters) => {
+  filtering.value = true;
+  filterInputs.value = filtersInputValues;
+  filterOptions.value = optionsInitializer(undefined, false);
   if (isValidForm.value) {
     await _loadData();
   }

@@ -7,6 +7,7 @@
           :loading="loading"
           v-model:valid="isValidForm"
           @update:model-value="applyFilters"
+          @reset="resetFilters"
         />
 
         <v-data-table-server
@@ -71,7 +72,7 @@ import { inputsInitializer, optionsInitializer } from "@/utils/filter_farms";
 import { getAllFarms, getFarmQueries } from "@/utils/get_farms";
 const loading = ref<boolean>(false);
 const farms = ref<Farm[]>();
-const isReset = ref(false);
+
 const selectedFarm = ref<Farm>();
 const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer());
 
@@ -139,6 +140,15 @@ watch(
 );
 
 const applyFilters = async (filtersInputValues: FilterFarmInputs) => {
+  filtering.value = true;
+  filterFarmInputs.value = filtersInputValues;
+  filterOptions.value = optionsInitializer();
+  if (isValidForm.value) {
+    await updateFarms();
+  }
+  filtering.value = false;
+};
+const resetFilters = async (filtersInputValues: FilterFarmInputs) => {
   filtering.value = true;
   filterFarmInputs.value = filtersInputValues;
   filterOptions.value = optionsInitializer();

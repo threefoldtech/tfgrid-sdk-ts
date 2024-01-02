@@ -57,7 +57,7 @@
                 >Clear</v-btn
               >
               <v-btn
-                :disabled="!isValidForm"
+                :disabled="!isValidForm || !filterTouched"
                 :loading="loading"
                 @click="applyFilters"
                 variant="outlined"
@@ -87,10 +87,9 @@ const props = defineProps({
   },
   loading: Boolean,
   valid: Boolean,
-  reset: Boolean,
 });
 
-const emit = defineEmits(["update:model-value", "update:valid"]);
+const emit = defineEmits(["update:model-value", "update:valid", "reset"]);
 const isValidForm = ref(false);
 const inputRef = useInputRef(true);
 const panel = ref([0]);
@@ -106,16 +105,13 @@ const applyFilters = () => {
   );
 };
 const resetFilters = () => {
-  if (filterTouched.value) {
-    emit(
-      "update:model-value",
-      Object.keys(props.modelValue).reduce((res, key) => {
-        res[key] = { ...props.modelValue[key], value: undefined };
-        return res;
-      }, {} as any),
-    );
-  }
-  filterTouched.value = false;
+  emit(
+    "reset",
+    Object.keys(props.modelValue).reduce((res, key) => {
+      res[key] = { ...props.modelValue[key], value: undefined };
+      return res;
+    }, {} as any),
+  );
 };
 watch(
   () => props.modelValue,
