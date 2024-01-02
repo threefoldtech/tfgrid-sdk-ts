@@ -171,7 +171,7 @@ const tabParams = {
 };
 
 onMounted(async () => {
-  await loadData();
+  await _loadData();
 });
 
 const _loadData = async () => {
@@ -245,19 +245,17 @@ const _loadData = async () => {
   }
 };
 
-const loadData = debounce(_loadData, 1000);
-
 const applyFilters = async (filtersInputValues: DedicatedNodeFilters) => {
   filterInputs.value = filtersInputValues;
   filterOptions.value = optionsInitializer(undefined);
   if (isValidForm.value) {
-    await loadData();
+    await _loadData();
   }
 };
 watch(
   [activeTab, filterOptions],
   async () => {
-    await loadData();
+    await _loadData();
   },
   { deep: true },
 );
@@ -265,13 +263,11 @@ async function reloadTable() {
   await new Promise(resolve => {
     setTimeout(resolve, 20000);
   });
-  await loadData();
+  await _loadData();
 }
 </script>
 
 <script lang="ts">
-import { debounce } from "lodash";
-
 import Filters from "@/components/filter.vue";
 import { type DedicatedNodeFilters, DedicatedNodeInitializer } from "@/utils/filter_nodes";
 

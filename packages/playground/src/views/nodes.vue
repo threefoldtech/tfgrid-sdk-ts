@@ -104,7 +104,6 @@
 <script lang="ts">
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
-import debounce from "lodash/debounce.js";
 import { capitalize, computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
@@ -161,8 +160,6 @@ export default {
       }
     };
 
-    const request = debounce(_requestNodes, 1000);
-
     const applyFilters = async (filtersInputValues: FilterInputs) => {
       filterInputs.value = filtersInputValues;
       filterOptions.value = optionsInitializer(undefined);
@@ -172,7 +169,7 @@ export default {
     };
     const updateNodes = async () => {
       const queries = getQueries(mixedFilters.value);
-      await request(queries, { loadFarm: true });
+      await _requestNodes(queries, { loadFarm: true });
     };
 
     watch(
@@ -204,9 +201,8 @@ export default {
 
     onMounted(async () => {
       await checkSelectedNode();
-      // filterOptions.value = optionsInitializer();
       const queries = getQueries(mixedFilters.value);
-      await request(queries, { loadFarm: true });
+      await _requestNodes(queries, { loadFarm: true });
     });
 
     return {

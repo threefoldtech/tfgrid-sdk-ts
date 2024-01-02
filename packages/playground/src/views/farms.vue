@@ -62,7 +62,6 @@
 
 <script lang="ts" setup>
 import type { Farm } from "@threefold/gridproxy_client";
-import debounce from "lodash/debounce.js";
 import { computed, onMounted, ref, watch } from "vue";
 
 import type { VDataTableHeader } from "@/types";
@@ -75,8 +74,6 @@ const farms = ref<Farm[]>();
 
 const selectedFarm = ref<Farm>();
 const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer());
-const size = ref(10);
-const page = ref(1);
 
 const dialog = ref(false);
 
@@ -124,12 +121,10 @@ onMounted(async () => {
   await updateFarms();
 });
 
-const request = debounce(_getFarms, 1000);
-
 const updateFarms = async () => {
   const queries = await getFarmQueries(mixedFarmFilters.value);
 
-  await request(queries);
+  await _getFarms(queries);
 };
 
 watch(
