@@ -165,7 +165,7 @@ export default {
 
     const applyFilters = async (filtersInputValues: FilterInputs) => {
       filterInputs.value = filtersInputValues;
-      filterOptions.value = optionsInitializer(filterOptions.value.status);
+      filterOptions.value = optionsInitializer(undefined);
       if (isValidForm.value) {
         await updateNodes();
       }
@@ -175,11 +175,6 @@ export default {
       await request(queries, { loadFarm: true });
     };
 
-    const statusReset = () => {
-      const options = mixedFilters.value.options;
-      options.page = 1;
-      options.size = 10;
-    };
     watch(
       filterOptions,
       async () => {
@@ -224,7 +219,6 @@ export default {
       selectedNodeId,
       nodeStatusOptions,
 
-      statusReset,
       updateNodes,
 
       filterInputs,
