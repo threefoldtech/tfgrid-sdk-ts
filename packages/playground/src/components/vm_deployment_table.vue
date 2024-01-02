@@ -239,6 +239,9 @@ const failedDeploymentList = computed(() => {
         nodeMessage + contractMessage === ""
           ? `<span class="ml-4 text-error font-weight-bold">Error:</span> Failed to decrypt deployment data.`
           : nodeMessage + contractMessage;
+      if (subtitle.includes("Failed to decrypt deployment data.")) {
+        showEncryption.value = true;
+      }
 
       const item: any[] = [{ title: name, subtitle }];
 
