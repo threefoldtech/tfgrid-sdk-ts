@@ -2,7 +2,7 @@
 title: Minting
 ---
 
-[Minting](https://manual.grid.tf/faq/faq.html?highlight=receipt%20hash#farming-rewards-and-related-notions) is based on blockchain data according to strict rules that are carried out by computers with humans involved only to check for errors and to sign the resulting transactions.
+[Minting](https://manual.grid.tf/faq/faq.html?highlight=receipt%20hash#what-is-the-tft-minting-process-is-it-fully-automated) is based on blockchain data according to strict rules that are carried out by computers with humans involved only to check for errors and to sign the resulting transactions.
 
 By connecting a 3Node to the Grid, you get Farming Rewards. If you set a public IP address for the Grid to use, you will receive additional rewards when your 3Node is being utilized by users on the Grid. Rewards are distributed once a month, around the 8th\*.
 
