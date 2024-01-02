@@ -156,6 +156,7 @@ const filterOptions = ref<FilterOptions>(optionsInitializer(undefined));
 
 const isValidForm = ref<boolean>(false);
 const isFormLoading = ref<boolean>(true);
+const filtering = ref(false);
 const gpuFilter = ref<boolean | undefined>();
 const tabParams = {
   0: {
@@ -246,16 +247,20 @@ const _loadData = async () => {
 };
 
 const applyFilters = async (filtersInputValues: DedicatedNodeFilters) => {
+  filtering.value = true;
   filterInputs.value = filtersInputValues;
   filterOptions.value = optionsInitializer(undefined);
   if (isValidForm.value) {
     await _loadData();
   }
+  filtering.value = false;
 };
 watch(
   [activeTab, filterOptions],
   async () => {
-    await _loadData();
+    if (!filtering.value) {
+      await _loadData();
+    }
   },
   { deep: true },
 );

@@ -134,7 +134,7 @@ export default {
     const isFormLoading = ref<boolean>(true);
     const nodes = ref<GridNode[]>([]);
     const nodesCount = ref<number>(0);
-
+    const filtering = ref(false);
     const selectedNodeId = ref<number>(0);
 
     const isDialogOpened = ref<boolean>(false);
@@ -161,11 +161,14 @@ export default {
     };
 
     const applyFilters = async (filtersInputValues: FilterInputs) => {
+      filtering.value = true;
       filterInputs.value = filtersInputValues;
       filterOptions.value = optionsInitializer(undefined);
+
       if (isValidForm.value) {
         await updateNodes();
       }
+      filtering.value = false;
     };
     const updateNodes = async () => {
       const queries = getQueries(mixedFilters.value);
@@ -175,7 +178,9 @@ export default {
     watch(
       filterOptions,
       async () => {
-        await updateNodes();
+        if (!filtering.value) {
+          await updateNodes();
+        }
       },
       { deep: true },
     );

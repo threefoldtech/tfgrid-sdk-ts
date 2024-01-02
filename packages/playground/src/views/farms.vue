@@ -87,6 +87,7 @@ const mixedFarmFilters = computed<MixedFarmFilter>(() => ({
 const isFormLoading = ref<boolean>(true);
 const isValidForm = ref<boolean>(true);
 const totalFarms = ref(0);
+const filtering = ref(false);
 
 const _getFarms = async (queries: Partial<FarmsQuery>) => {
   if (isValidForm.value) {
@@ -130,17 +131,21 @@ const updateFarms = async () => {
 watch(
   filterOptions,
   async () => {
-    updateFarms();
+    if (!filtering.value) {
+      updateFarms();
+    }
   },
   { deep: true },
 );
 
 const applyFilters = async (filtersInputValues: FilterFarmInputs) => {
+  filtering.value = true;
   filterFarmInputs.value = filtersInputValues;
   filterOptions.value = optionsInitializer();
   if (isValidForm.value) {
     await updateFarms();
   }
+  filtering.value = false;
 };
 const openSheet = (_e: any, { item }: any) => {
   openDialog(item.value);
