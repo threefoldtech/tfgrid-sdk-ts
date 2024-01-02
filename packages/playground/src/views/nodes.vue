@@ -128,7 +128,7 @@ export default {
   },
   setup() {
     const filterInputs = ref<FilterInputs>(inputsInitializer());
-    const filterOptions = ref<FilterOptions>(optionsInitializer(NodeStatus.Up));
+    const filterOptions = ref<FilterOptions>(optionsInitializer(undefined));
     const mixedFilters = computed<MixedFilter>(() => ({ inputs: filterInputs.value, options: filterOptions.value }));
 
     const loading = ref<boolean>(true);
