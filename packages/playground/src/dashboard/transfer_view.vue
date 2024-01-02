@@ -51,7 +51,9 @@
             </form-validator>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn @click="clearInput" color="anchor" variant="outlined">Clear</v-btn>
+              <v-btn @click="clearInput" color="anchor" :disabled="loadingTwinIDTransfer" variant="outlined"
+                >Clear</v-btn
+              >
               <v-btn
                 color="secondary"
                 variant="outlined"
@@ -102,7 +104,9 @@
             </form-validator>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn @click="clearInput" color="anchor" variant="outlined">Clear</v-btn>
+              <v-btn @click="clearInput" color="anchor" :disabled="loadingAddressTransfer" variant="outlined"
+                >Clear</v-btn
+              >
 
               <v-btn
                 color="secondary"
