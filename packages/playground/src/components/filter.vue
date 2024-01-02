@@ -90,7 +90,7 @@ const props = defineProps({
   reset: Boolean,
 });
 
-const emit = defineEmits(["update:model-value", "update:valid", "update:reset"]);
+const emit = defineEmits(["update:model-value", "update:valid"]);
 const isValidForm = ref(false);
 const inputRef = useInputRef(true);
 const panel = ref([0]);
@@ -107,7 +107,6 @@ const applyFilters = () => {
 };
 const resetFilters = () => {
   if (filterTouched.value) {
-    emit("update:reset", () => true);
     emit(
       "update:model-value",
       Object.keys(props.modelValue).reduce((res, key) => {
@@ -119,10 +118,14 @@ const resetFilters = () => {
   filterTouched.value = false;
 };
 watch(
-  props.modelValue,
-  () =>
-    (filterTouched.value =
-      Object.keys(props.modelValue).filter((k, i) => props.modelValue[k].value != undefined).length > 0 ? true : false),
+  () => props.modelValue,
+  (newValue: PropType<{ [key: string]: InputFilterType }>) => {
+    const hasNonEmptyValue = Object.keys(newValue).some(obj => {
+      return Reflect.get(newValue, obj).value && Reflect.get(newValue, obj).value.length >= 1;
+    });
+    filterTouched.value = hasNonEmptyValue;
+  },
+  { deep: true },
 );
 </script>
 

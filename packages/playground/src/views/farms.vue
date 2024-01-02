@@ -71,7 +71,7 @@ import { inputsInitializer, optionsInitializer } from "@/utils/filter_farms";
 import { getAllFarms, getFarmQueries } from "@/utils/get_farms";
 const loading = ref<boolean>(false);
 const farms = ref<Farm[]>();
-
+const isReset = ref(false);
 const selectedFarm = ref<Farm>();
 const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer());
 
