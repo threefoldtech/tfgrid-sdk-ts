@@ -306,7 +306,7 @@ function openVoteDialog(hash: any, vote: boolean) {
 function filteredProposals(proposals: Proposal[] | undefined) {
   if (searchTerm.value.length) {
     if (proposals) {
-      return proposals.filter(proposal => proposal.description.includes(searchTerm.value));
+      return proposals.filter(proposal => proposal.description.toLowerCase().includes(searchTerm.value.toLowerCase()));
     }
   }
   return proposals;
