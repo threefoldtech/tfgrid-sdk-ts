@@ -86,9 +86,11 @@ const props = defineProps({
     required: true,
   },
   loading: Boolean,
+  valid: Boolean,
+  reset: Boolean,
 });
 
-const emit = defineEmits(["update:model-value", "update:valid"]);
+const emit = defineEmits(["update:model-value", "update:valid", "update:reset"]);
 const isValidForm = ref(false);
 const inputRef = useInputRef(true);
 const panel = ref([0]);
@@ -105,6 +107,7 @@ const applyFilters = () => {
 };
 const resetFilters = () => {
   if (filterTouched.value) {
+    emit("update:reset", () => true);
     emit(
       "update:model-value",
       Object.keys(props.modelValue).reduce((res, key) => {

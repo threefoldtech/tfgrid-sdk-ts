@@ -11,6 +11,7 @@
       :loading="loading"
       v-model:valid="isValidForm"
       @update:model-value="applyFilters"
+      v-model:reset="isReset"
     />
 
     <div class="nodes mt-5">
@@ -142,7 +143,7 @@ export default {
 
     const nodeStatusOptions = [capitalize(NodeStatus.Up), capitalize(NodeStatus.Standby), capitalize(NodeStatus.Down)];
     const route = useRoute();
-
+    const isReset = ref(false);
     const _requestNodes = async (queries: Partial<NodesQuery> = {}, config: GridProxyRequestConfig) => {
       if (isValidForm.value) {
         loading.value = true;
@@ -163,7 +164,11 @@ export default {
     const applyFilters = async (filtersInputValues: FilterInputs) => {
       filtering.value = true;
       filterInputs.value = filtersInputValues;
-      filterOptions.value = optionsInitializer(undefined);
+      if (isReset.value) {
+        filterOptions.value = optionsInitializer(undefined);
+      } else {
+        filterOptions.value = optionsInitializer(filterOptions.value.status);
+      }
 
       if (isValidForm.value) {
         await updateNodes();
@@ -216,6 +221,7 @@ export default {
 
       nodes,
       nodesCount,
+      isReset,
 
       selectedNodeId,
       nodeStatusOptions,
