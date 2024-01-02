@@ -16,6 +16,16 @@
           <v-card-title style="color: #ffcc00; font-weight: bold">Failed Deployments</v-card-title>
           <v-divider color="#FFCC00" />
           <v-card-text>
+            Failed to load <strong>{{ count - items.length }}</strong> deployment{{
+              count - items.length > 1 ? "s" : ""
+            }}.
+
+            <span>
+              This might happen because the node is down or it's not reachable
+              <span v-if="showEncryption"
+                >or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span
+              >.
+            </span>
             <v-list :items="failedDeploymentList" item-props lines="three">
               <template v-slot:subtitle="{ subtitle }">
                 <div v-html="subtitle"></div>
