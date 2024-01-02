@@ -39,7 +39,7 @@
                     :label="$props.modelValue[key].label"
                     :placeholder="$props.modelValue[key].placeholder"
                     :type="$props.modelValue[key].type"
-                    :loading="loading"
+                    :disabled="loading"
                   ></v-text-field>
                 </input-validator>
               </v-col>
