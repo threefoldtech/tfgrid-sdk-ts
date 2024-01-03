@@ -45,7 +45,7 @@
             </li>
           </v-card-text>
           <v-card-actions class="justify-end">
-            <v-btn @click="showDialog = false" class="grey lighten-2 black--text" color="#FFCC00">Close</v-btn>
+            <v-btn @click="showDialog = false" variant="outlined" color="anchor">Close</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
