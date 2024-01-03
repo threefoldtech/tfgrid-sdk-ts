@@ -153,12 +153,12 @@ const loading = ref(false);
 const nodes = ref<any[]>();
 const nodesCount = ref(0);
 const filterInputs = ref<DedicatedNodeFilters>(DedicatedNodeInitializer());
-const filterOptions = ref<FilterOptions>(optionsInitializer(undefined, false, undefined));
+const filterOptions = ref<FilterOptions>(optionsInitializer(undefined, undefined, undefined));
 
 const isValidForm = ref<boolean>(false);
 const isFormLoading = ref<boolean>(true);
 const filtering = ref(false);
-const gpuFilter = ref<boolean | undefined>();
+
 const tabParams = {
   0: {
     rentable: true,
@@ -204,7 +204,7 @@ const _loadData = async () => {
       totalCru: totalCruValue ? +totalCruValue : undefined,
       gpuVendorName: filterInputs.value.gpu_vendor_name.value || "",
       gpuDeviceName: filterInputs.value.gpu_device_name.value || "",
-      hasGpu: gpuFilter.value,
+      hasGpu: filterOptions.value.gpu,
     });
 
     if (data.count === 0) {
@@ -259,7 +259,7 @@ const applyFilters = async (filtersInputValues: DedicatedNodeFilters) => {
 const resetFilters = async (filtersInputValues: DedicatedNodeFilters) => {
   filtering.value = true;
   filterInputs.value = filtersInputValues;
-  filterOptions.value = optionsInitializer(undefined, false, undefined);
+  filterOptions.value = optionsInitializer(undefined, undefined, undefined);
   if (isValidForm.value) {
     await _loadData();
   }
