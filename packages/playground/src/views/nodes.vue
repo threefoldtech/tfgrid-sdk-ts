@@ -128,7 +128,7 @@ export default {
   },
   setup() {
     const filterInputs = ref<FilterInputs>(inputsInitializer());
-    const filterOptions = ref<FilterOptions>(optionsInitializer(undefined, undefined));
+    const filterOptions = ref<FilterOptions>(optionsInitializer(undefined, undefined, undefined));
     const mixedFilters = computed<MixedFilter>(() => ({ inputs: filterInputs.value, options: filterOptions.value }));
 
     const loading = ref<boolean>(true);
@@ -165,7 +165,11 @@ export default {
       filtering.value = true;
       filterInputs.value = filtersInputValues;
 
-      filterOptions.value = optionsInitializer(filterOptions.value.status, undefined);
+      filterOptions.value = optionsInitializer(
+        filterOptions.value.status,
+        filterOptions.value.gpu,
+        filterOptions.value.gateway,
+      );
 
       if (isValidForm.value) {
         await updateNodes();
@@ -176,7 +180,7 @@ export default {
       filtering.value = true;
       filterInputs.value = filtersInputValues;
 
-      filterOptions.value = optionsInitializer(undefined, undefined);
+      filterOptions.value = optionsInitializer(undefined, undefined, undefined);
 
       if (isValidForm.value) {
         await updateNodes();

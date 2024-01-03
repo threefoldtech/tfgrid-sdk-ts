@@ -153,7 +153,7 @@ const loading = ref(false);
 const nodes = ref<any[]>();
 const nodesCount = ref(0);
 const filterInputs = ref<DedicatedNodeFilters>(DedicatedNodeInitializer());
-const filterOptions = ref<FilterOptions>(optionsInitializer(undefined, false));
+const filterOptions = ref<FilterOptions>(optionsInitializer(undefined, false, undefined));
 
 const isValidForm = ref<boolean>(false);
 const isFormLoading = ref<boolean>(true);
@@ -250,7 +250,7 @@ const _loadData = async () => {
 const applyFilters = async (filtersInputValues: DedicatedNodeFilters) => {
   filtering.value = true;
   filterInputs.value = filtersInputValues;
-  filterOptions.value = optionsInitializer(undefined, filterOptions.value.gpu);
+  filterOptions.value = optionsInitializer(undefined, filterOptions.value.gpu, filterOptions.value.gateway);
   if (isValidForm.value) {
     await _loadData();
   }
@@ -259,7 +259,7 @@ const applyFilters = async (filtersInputValues: DedicatedNodeFilters) => {
 const resetFilters = async (filtersInputValues: DedicatedNodeFilters) => {
   filtering.value = true;
   filterInputs.value = filtersInputValues;
-  filterOptions.value = optionsInitializer(undefined, false);
+  filterOptions.value = optionsInitializer(undefined, false, undefined);
   if (isValidForm.value) {
     await _loadData();
   }
