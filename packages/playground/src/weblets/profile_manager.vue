@@ -87,6 +87,7 @@
             clearFields();
           }
         "
+        destroy
       >
         <VContainer>
           <form @submit.prevent="activeTab === 0 ? login() : storeAndLogin()">
