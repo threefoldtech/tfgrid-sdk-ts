@@ -40,6 +40,7 @@
                     :placeholder="$props.modelValue[key].placeholder"
                     :type="$props.modelValue[key].type"
                     :disabled="loading"
+                    @update:model-value="checkInput"
                   ></v-text-field>
                 </input-validator>
               </v-col>
@@ -95,6 +96,11 @@ const inputRef = useInputRef(true);
 const panel = ref([0]);
 const formRef = useFormRef();
 const filterTouched = ref(false);
+const checkInput = (input: string) => {
+  if (input.length == 0) {
+    applyFilters();
+  }
+};
 const applyFilters = () => {
   emit(
     "update:model-value",
