@@ -6,6 +6,14 @@ export type FilterFarmInputs = {
   name: InputFilterType;
   freeIps: InputFilterType;
 };
+export type FilterFarmOptions = {
+  page: number;
+  size: number;
+};
+export const optionsInitializer: () => FilterFarmOptions = () => ({
+  page: 1,
+  size: 10,
+});
 
 export const inputsInitializer: () => FilterFarmInputs = () => ({
   farmId: {

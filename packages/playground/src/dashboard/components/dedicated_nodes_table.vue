@@ -2,10 +2,11 @@
   <!-- Filters -->
   <div class="pt-5">
     <filters
-      @update:model-value="inputFiltersReset"
-      :model-value="filterInputs"
-      :valid="isValidForm"
-      :form-disabled="isFormLoading"
+      v-model:model-value="filterInputs"
+      :loading="loading"
+      v-model:valid="isValidForm"
+      @update:model-value="applyFilters"
+      @reset="resetFilters"
     />
   </div>
   <div>
@@ -14,7 +15,8 @@
         color="primary"
         inset
         label="GPU Node (Only)"
-        v-model="gpuFilter"
+        v-model="filterOptions.gpu"
+        @update:model-value="updateGpu"
         hide-details
         :disabled="isFormLoading"
       />
@@ -37,7 +39,7 @@
         loading-text="Loading nodes..."
         :headers="headers"
         :items="nodes"
-        v-model:items-per-page="pageSize"
+        v-model:items-per-page="filterOptions.size"
         v-model:expanded="expanded"
         show-expand
         :hide-no-data="false"
@@ -50,7 +52,7 @@
           { value: 15, title: '15' },
           { value: 50, title: '50' },
         ]"
-        v-model:page="page"
+        v-model:page="filterOptions.page"
         return-object
       >
         <template v-slot:[`item.actions`]="{ item }">
@@ -103,6 +105,7 @@ import { VDataTableServer } from "vuetify/labs/VDataTable";
 
 import { gridProxyClient } from "@/clients";
 import { useProfileManager } from "@/stores";
+import { type FilterOptions, optionsInitializer } from "@/types";
 import formatResourceSize from "@/utils/format_resource_size";
 import { convert } from "@/utils/get_nodes";
 import { getGrid } from "@/utils/grid";
@@ -143,8 +146,7 @@ const headers: VDataTable["headers"] = [
   },
 ];
 const profileManager = useProfileManager();
-const pageSize = ref(10);
-const page = ref(1);
+
 const expanded = ref([]);
 const tabs = [{ label: "Rentable" }, { label: "Mine" }];
 const activeTab = ref(0);
@@ -152,9 +154,12 @@ const loading = ref(false);
 const nodes = ref<any[]>();
 const nodesCount = ref(0);
 const filterInputs = ref<DedicatedNodeFilters>(DedicatedNodeInitializer());
+const filterOptions = ref<FilterOptions>(optionsInitializer(undefined, undefined, undefined));
+
 const isValidForm = ref<boolean>(false);
 const isFormLoading = ref<boolean>(true);
-const gpuFilter = ref<boolean | undefined>();
+const filtering = ref(false);
+
 const tabParams = {
   0: {
     rentable: true,
@@ -168,16 +173,16 @@ const tabParams = {
   },
 };
 
-// The mixed filters should reset to the default value again..
-const inputFiltersReset = (filtersInputValues: DedicatedNodeFilters) => {
-  filterInputs.value = filtersInputValues;
-  gpuFilter.value = undefined;
-};
-
 onMounted(async () => {
-  await loadData();
+  await _loadData();
 });
-
+const updateGpu = (newGpu: boolean | undefined) => {
+  if (!newGpu) {
+    filterOptions.value.gpu = undefined;
+  } else {
+    filterOptions.value.gpu = newGpu;
+  }
+};
 const _loadData = async () => {
   const params = tabParams[activeTab.value as keyof typeof tabParams];
 
@@ -198,15 +203,15 @@ const _loadData = async () => {
     }
     const data = await gridProxyClient.nodes.list({
       ...params,
-      size: pageSize.value,
-      page: page.value,
+      size: filterOptions.value.size,
+      page: filterOptions.value.page,
       totalSru: convert(filterInputs.value.total_sru.value),
       totalMru: convert(filterInputs.value.total_mru.value),
       totalHru: convert(filterInputs.value.total_hru.value),
       totalCru: totalCruValue ? +totalCruValue : undefined,
       gpuVendorName: filterInputs.value.gpu_vendor_name.value || "",
       gpuDeviceName: filterInputs.value.gpu_device_name.value || "",
-      hasGpu: gpuFilter.value,
+      hasGpu: filterOptions.value.gpu,
     });
 
     if (data.count === 0) {
@@ -249,45 +254,42 @@ const _loadData = async () => {
   }
 };
 
-const loadData = debounce(_loadData, 1000);
-
+const applyFilters = async (filtersInputValues: DedicatedNodeFilters) => {
+  filtering.value = true;
+  filterInputs.value = filtersInputValues;
+  filterOptions.value = optionsInitializer(undefined, filterOptions.value.gpu, filterOptions.value.gateway);
+  if (isValidForm.value) {
+    await _loadData();
+  }
+  filtering.value = false;
+};
+const resetFilters = async (filtersInputValues: DedicatedNodeFilters) => {
+  filtering.value = true;
+  filterInputs.value = filtersInputValues;
+  filterOptions.value = optionsInitializer(undefined, undefined, undefined);
+  if (isValidForm.value) {
+    await _loadData();
+  }
+  filtering.value = false;
+};
 watch(
-  [filterInputs, gpuFilter, activeTab],
+  [activeTab, filterOptions],
   async () => {
-    if (!gpuFilter.value) {
-      gpuFilter.value = undefined;
+    if (!filtering.value) {
+      await _loadData();
     }
-    await loadData();
   },
   { deep: true },
 );
-
-watch(
-  [page, pageSize, isValidForm, filterInputs, gpuFilter],
-  async ([newPage, newPageSize, newIsValidForm]) => {
-    if (!gpuFilter.value) {
-      gpuFilter.value = undefined;
-    }
-    page.value = newPage;
-    pageSize.value = newPageSize;
-    if (newIsValidForm) {
-      await loadData();
-    }
-  },
-  { immediate: true },
-);
-
 async function reloadTable() {
   await new Promise(resolve => {
     setTimeout(resolve, 20000);
   });
-  await loadData();
+  await _loadData();
 }
 </script>
 
 <script lang="ts">
-import { debounce } from "lodash";
-
 import Filters from "@/components/filter.vue";
 import { type DedicatedNodeFilters, DedicatedNodeInitializer } from "@/utils/filter_nodes";
 

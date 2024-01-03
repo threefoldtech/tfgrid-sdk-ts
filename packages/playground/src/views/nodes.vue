@@ -6,7 +6,14 @@
   </div>
 
   <view-layout>
-    <filters :form-disabled="isFormLoading" v-model:model-value="filterInputs" v-model:valid="isValidForm" />
+    <filters
+      v-model:model-value="filterInputs"
+      :loading="loading"
+      v-model:valid="isValidForm"
+      @update:model-value="applyFilters"
+      @reset="resetFilters"
+    />
+
     <div class="nodes mt-5">
       <div class="nodes-inner">
         <v-row>
@@ -59,7 +66,6 @@
                           label="Select Nodes Status"
                           variant="underlined"
                           :disabled="isFormLoading"
-                          @update:model-value="paginationReset"
                           open-on-clear
                           clearable
                         ></v-select>
@@ -99,7 +105,6 @@
 <script lang="ts">
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
-import debounce from "lodash/debounce.js";
 import { capitalize, computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
@@ -123,18 +128,18 @@ export default {
   },
   setup() {
     const filterInputs = ref<FilterInputs>(inputsInitializer());
-    const filterOptions = ref<FilterOptions>(optionsInitializer());
+    const filterOptions = ref<FilterOptions>(optionsInitializer(undefined, undefined, undefined));
     const mixedFilters = computed<MixedFilter>(() => ({ inputs: filterInputs.value, options: filterOptions.value }));
 
     const loading = ref<boolean>(true);
     const isFormLoading = ref<boolean>(true);
     const nodes = ref<GridNode[]>([]);
     const nodesCount = ref<number>(0);
-
+    const filtering = ref(false);
     const selectedNodeId = ref<number>(0);
 
     const isDialogOpened = ref<boolean>(false);
-    const isValidForm = ref<boolean>(false);
+    const isValidForm = ref<boolean>(true);
 
     const nodeStatusOptions = [capitalize(NodeStatus.Up), capitalize(NodeStatus.Standby), capitalize(NodeStatus.Down)];
     const route = useRoute();
@@ -156,22 +161,47 @@ export default {
       }
     };
 
-    const request = debounce(_requestNodes, 1000);
+    const applyFilters = async (filtersInputValues: FilterInputs) => {
+      filtering.value = true;
+      filterInputs.value = filtersInputValues;
+
+      filterOptions.value = optionsInitializer(
+        filterOptions.value.status,
+        filterOptions.value.gpu,
+        filterOptions.value.gateway,
+      );
+
+      if (isValidForm.value) {
+        await updateNodes();
+      }
+      filtering.value = false;
+    };
+    const resetFilters = async (filtersInputValues: FilterInputs) => {
+      filtering.value = true;
+      filterInputs.value = filtersInputValues;
+
+      filterOptions.value = optionsInitializer(undefined, undefined, undefined);
+
+      if (isValidForm.value) {
+        await updateNodes();
+      }
+      filtering.value = false;
+    };
+
+    const updateNodes = async () => {
+      const queries = getQueries(mixedFilters.value);
+      await _requestNodes(queries, { loadFarm: true });
+    };
 
     watch(
-      mixedFilters,
+      filterOptions,
       async () => {
-        const queries = getQueries(mixedFilters.value);
-        await request(queries, { loadFarm: true });
+        if (!filtering.value) {
+          await updateNodes();
+        }
       },
       { deep: true },
     );
-
-    const paginationReset = () => {
-      const options = mixedFilters.value.options;
-      options.page = 1;
-      options.size = 10;
-    };
     const checkSelectedNode = async () => {
       if (route.query.nodeId) {
         selectedNodeId.value = +route.query.nodeId;
@@ -195,28 +225,26 @@ export default {
     onMounted(async () => {
       await checkSelectedNode();
       const queries = getQueries(mixedFilters.value);
-      await request(queries, { loadFarm: true });
+      await _requestNodes(queries, { loadFarm: true });
     });
 
     return {
       loading,
       isFormLoading,
-
       nodes,
       nodesCount,
-
       selectedNodeId,
       nodeStatusOptions,
-      paginationReset,
-
       filterInputs,
       filterOptions,
       isDialogOpened,
       isValidForm,
-
+      updateNodes,
       openDialog,
       closeDialog,
       requestNodes,
+      applyFilters,
+      resetFilters,
     };
   },
 };
