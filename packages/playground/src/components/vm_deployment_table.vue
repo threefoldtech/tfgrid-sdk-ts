@@ -13,19 +13,21 @@
 
       <v-dialog transition="dialog-bottom-transition" v-model="showDialog" max-width="500px" scrollable>
         <v-card>
-          <v-card-title style="color: #ffcc00; font-weight: bold">Failed Deployments</v-card-title>
+          <v-card-title style="font-weight: bold">Failed Deployments</v-card-title>
           <v-divider color="#FFCC00" />
           <v-card-text>
-            Failed to load <strong>{{ count - items.length }}</strong> deployment{{
-              count - items.length > 1 ? "s" : ""
-            }}.
+            <v-alert type="error" variant="tonal">
+              Failed to load <strong>{{ count - items.length }}</strong> deployment{{
+                count - items.length > 1 ? "s" : ""
+              }}.
 
-            <span>
-              This might happen because the node is down or it's not reachable
-              <span v-if="showEncryption"
-                >or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span
-              >.
-            </span>
+              <span>
+                This might happen because the node is down or it's not reachable
+                <span v-if="showEncryption"
+                  >or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span
+                >.
+              </span>
+            </v-alert>
             <v-list :items="failedDeploymentList" item-props lines="three">
               <template v-slot:subtitle="{ subtitle }">
                 <div v-html="subtitle"></div>
@@ -33,7 +35,9 @@
             </v-list>
           </v-card-text>
           <v-card-actions class="justify-end">
-            <v-btn @click="showDialog = false" class="grey lighten-2 black--text" color="#FFCC00">Close</v-btn>
+            <v-btn @click="showDialog = false" variant="outlined" color="anchor">Close</v-btn>
+
+            <!-- <v-btn @click="showDialog = false" class="grey lighten-2 black--text" color="#FFCC00">Close</v-btn> -->
           </v-card-actions>
         </v-card>
       </v-dialog>
