@@ -16,6 +16,7 @@
         inset
         label="GPU Node (Only)"
         v-model="filterOptions.gpu"
+        @update:model-value="updateGpu"
         hide-details
         :disabled="isFormLoading"
       />
@@ -175,7 +176,13 @@ const tabParams = {
 onMounted(async () => {
   await _loadData();
 });
-
+const updateGpu = (newGpu: boolean | undefined) => {
+  if (!newGpu) {
+    filterOptions.value.gpu = undefined;
+  } else {
+    filterOptions.value.gpu = newGpu;
+  }
+};
 const _loadData = async () => {
   const params = tabParams[activeTab.value as keyof typeof tabParams];
 
