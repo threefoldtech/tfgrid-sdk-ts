@@ -6,7 +6,7 @@
           <div class="d-flex justify-center">
             <v-btn-toggle divided v-model="showType" mandatory>
               <v-btn variant="outlined"> details </v-btn>
-              <v-btn variant="outlined"> json </v-btn>
+              <v-btn variant="outlined"> JSON</v-btn>
             </v-btn-toggle>
           </div>
 
