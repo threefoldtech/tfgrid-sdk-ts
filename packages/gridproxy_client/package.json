@@ -8,10 +8,14 @@
   "author": "MohamedElmdary <engm5081@gmail.com>",
   "license": "MIT",
   "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc"
   },
   "devDependencies": {
     "typescript": "^4.8.4"
   }
+  
 }
