@@ -59,6 +59,36 @@ const nodesDistribution = ref<string>("");
 
 let stats: Stats | null | undefined = null;
 
+function mergeNodeDistribution(stats: Stats["nodesDistribution"][]) {
+  const keys = new Set(stats.map(obj => Object.keys(obj)).flat());
+
+  return Array.from(keys).reduce((res, key) => {
+    res[key] = 0;
+    stats.forEach(country => {
+      res[key] += country[key] ?? 0;
+    });
+    return res;
+  }, {} as { [key: string]: number });
+}
+
+function mergeStatsData(stats: Stats[]): Stats {
+  const res = stats[0];
+  for (let i = 1; i < stats.length; i++) {
+    res.accessNodes += stats[i].accessNodes;
+    res.dedicatedNodes += stats[i].dedicatedNodes;
+    res.gateways += stats[i].gateways;
+    res.nodes += stats[i].nodes;
+    res.totalCru += stats[i].totalCru;
+    res.totalHru += stats[i].totalHru;
+    res.totalMru += stats[i].totalMru;
+    res.totalSru += stats[i].totalSru;
+    res.gpus += stats[i].gpus;
+    res.nodesDistribution = mergeNodeDistribution([res.nodesDistribution, stats[i].nodesDistribution]);
+    res.countries = Object.keys(res.nodesDistribution).length;
+  }
+
+  return res;
+}
 const fetchStats = async () => {
   let retryCount = 0;
 
@@ -66,9 +96,9 @@ const fetchStats = async () => {
     try {
       loading.value = true;
       failed.value = false;
-      const data = await gridProxyClient.stats.get({ status: NodeStatus.Up });
-
-      return data as Stats;
+      const upStats = await gridProxyClient.stats.get({ status: NodeStatus.Up });
+      const standbyStats = await gridProxyClient.stats.get({ status: NodeStatus.Standby });
+      return mergeStatsData([upStats, standbyStats]);
     } catch (error) {
       if (retryCount < 3) {
         console.log("Error fetching stats:", error);
