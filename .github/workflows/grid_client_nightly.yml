@@ -46,6 +46,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y git libtool tmux redis net-tools
+
       - name: Install
         run: |
           yarn
@@ -86,6 +87,7 @@ jobs:
         continue-on-error: true
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/zdb.ts
+
       - name: Cleanup - Delete all contracts
         id: deleteall
         run: |
@@ -102,10 +104,13 @@ jobs:
           # Read the Contracts line from the file
           contracts_json=$(awk 'NR==5' output.txt)
 
-          # Check if all three [Name - Node - Rent] contracts are empty
+          # Check if Node contracts are empty
           if [[ $contracts_json != *'nodeContracts: []'* ]]; then
             echo "Deletion failed; The Node Contract is not empty."
             exit 1
+          else
+            # Print the 
+            awk 'NR>4' output.txt
           fi
 
       - name: Test Results
