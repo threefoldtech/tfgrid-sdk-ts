@@ -2,7 +2,7 @@ import GridProxyClient, { Network, NodeStatus, type Stats } from "@threefold/gri
 
 import type { NetworkStats } from "@/types";
 
-function mergeStatsData(stats: Stats[]): Stats {
+function mergeAllStatsData(stats: Stats[]): Stats {
   const res = stats[0];
   for (let i = 1; i < stats.length; i++) {
     res.accessNodes += stats[i].accessNodes;
@@ -22,6 +22,24 @@ function mergeStatsData(stats: Stats[]): Stats {
     res.nodesDistribution = mergeNodeDistribution([res.nodesDistribution, stats[i].nodesDistribution]);
   }
 
+  return res;
+}
+
+function mergeStatsData(stats: Stats[]): Stats {
+  const res = stats[0];
+  for (let i = 1; i < stats.length; i++) {
+    res.accessNodes += stats[i].accessNodes;
+    res.dedicatedNodes += stats[i].dedicatedNodes;
+    res.gateways += stats[i].gateways;
+    res.nodes += stats[i].nodes;
+    res.totalCru += stats[i].totalCru;
+    res.totalHru += stats[i].totalHru;
+    res.totalMru += stats[i].totalMru;
+    res.totalSru += stats[i].totalSru;
+    res.gpus += stats[i].gpus;
+    res.nodesDistribution = mergeNodeDistribution([res.nodesDistribution, stats[i].nodesDistribution]);
+    res.countries = Object.keys(res.nodesDistribution).length;
+  }
   return res;
 }
 
@@ -75,7 +93,7 @@ export function formatData(network: Network[] = [Network.Main], totalStat: Netwo
     if (Number.isNaN(currentStats.gpus)) {
       currentStats.gpus = 0;
     }
-    res = mergeStatsData([res, currentStats]);
+    res = mergeAllStatsData([res, currentStats]);
   }
 
   return res;
