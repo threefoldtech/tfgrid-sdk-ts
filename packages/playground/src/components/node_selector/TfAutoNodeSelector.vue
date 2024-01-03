@@ -6,9 +6,13 @@
       </VAlert>
     </VFadeTransition>
 
+    <!-- <TfNodeDetailsCard :node="$props.modelValue" v-if="$props.modelValue" /> -->
+
     <input-tooltip tooltip="Select a node ID to deploy on.">
       <div class="d-flex w-100">
-        <VAutocomplete
+        <VSelect
+          class="node-selector"
+          eager
           ref="nodeInput"
           label="Node"
           placeholder="Select node"
@@ -47,18 +51,16 @@
           "
           :rules="[() => true]"
         >
+          <template #selection="{ item }">
+            <TfNodeDetailsCard :node="item.value" />
+          </template>
+
           <template #item="{ item, props }">
-            <VListItem v-bind="props">
-              <template #title> {{ item.value.nodeId }} </template>
-              <template #append>
-                <VChip class="mr-2" v-if="item.value.certificationType.toLowerCase() === 'certified'" color="primary">
-                  Certified
-                </VChip>
-                <VChip :color="item.value.rentedByTwinId === 0 ? 'secondary' : 'success'">
-                  {{ item.value.rentedByTwinId === 0 ? "Shared" : "Dedicated" }}
-                </VChip>
-              </template>
-            </VListItem>
+            <TfNodeDetailsCard
+              :node="item.value"
+              :append-divider="loadedNodes.indexOf(item.value) + 1 !== loadedNodes.length"
+              v-bind="props"
+            />
           </template>
 
           <template #append-item v-if="pagination.page !== -1">
@@ -76,7 +78,7 @@
               </VBtn>
             </VContainer>
           </template>
-        </VAutocomplete>
+        </VSelect>
 
         <VBtn
           variant="outlined"
@@ -112,9 +114,11 @@ import {
   normalizeNodeFilters,
   normalizeNodeOptions,
 } from "../../utils/nodeSelector";
+import TfNodeDetailsCard from "./TfNodeDetailsCard.vue";
 
 export default {
   name: "TfAutoNodeSelector",
+  components: { TfNodeDetailsCard },
   props: {
     modelValue: Object as PropType<NodeInfo>,
     validFilters: { type: Boolean, required: true },
@@ -256,3 +260,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.node-selector .v-select__selection {
+  width: 100%;
+}
+</style>

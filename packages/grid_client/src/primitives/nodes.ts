@@ -59,6 +59,7 @@ interface NodeInfo {
   extraFee: number;
   rentedByTwinId: number;
   rentContractId: number;
+  serialNumber?: string;
 }
 interface PublicConfig {
   domain: string;
