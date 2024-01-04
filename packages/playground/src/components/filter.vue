@@ -47,6 +47,9 @@
             </form-validator>
           </v-row>
 
+          <!-- Options slot can be any other filter option, like GPU option, Gateway option, Node Status select -->
+          <slot name="options"></slot>
+
           <v-row>
             <v-col class="d-flex justify-end align-center mb-6">
               <v-btn
@@ -79,11 +82,15 @@ import { defineComponent, type PropType, ref, watch } from "vue";
 import { useInputRef } from "@/hooks/input_validator";
 
 import { useFormRef } from "../hooks/form_validator";
-import type { InputFilterType } from "../types";
+import type { FilterOptions, InputFilterType } from "../types";
 
 const props = defineProps({
   modelValue: {
     type: Object as PropType<{ [key: string]: InputFilterType }>,
+    required: true,
+  },
+  options: {
+    type: Object as PropType<FilterOptions>,
     required: true,
   },
   loading: Boolean,
@@ -126,6 +133,16 @@ watch(
       return Reflect.get(newValue, obj).value && Reflect.get(newValue, obj).value.length >= 1;
     });
     filterTouched.value = hasNonEmptyValue;
+  },
+  { deep: true },
+);
+watch(
+  () => props.options,
+  (newValue: FilterOptions) => {
+    if (newValue.gateway || newValue.gpu || newValue.status) {
+      // We don't need to enable the clear button when changing the page or the size.
+      filterTouched.value = true;
+    }
   },
   { deep: true },
 );

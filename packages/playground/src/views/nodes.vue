@@ -8,72 +8,76 @@
   <view-layout>
     <filters
       v-model:model-value="filterInputs"
+      :options="filterOptions"
       :loading="loading"
       v-model:valid="isValidForm"
       @update:model-value="applyFilters"
       @reset="resetFilters"
-    />
+    >
+      <template #options>
+        <div class="table-filters">
+          <v-row>
+            <v-col>
+              <v-row>
+                <v-col cols="12" sm="6" md="6" lg="4">
+                  <input-tooltip inline tooltip="Enable filtering the nodes that have Gateway supported only.">
+                    <v-switch
+                      color="primary"
+                      inset
+                      label="Gateways (Only)"
+                      v-model="filterOptions.gateway"
+                      hide-details
+                      :disabled="isFormLoading"
+                    />
+                  </input-tooltip>
+                </v-col>
+                <v-col cols="12" sm="6" md="6" lg="4">
+                  <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
+                    <v-switch
+                      color="primary"
+                      inset
+                      label="GPU Node (Only)"
+                      v-model="filterOptions.gpu"
+                      hide-details
+                      :disabled="isFormLoading"
+                    />
+                  </input-tooltip>
+                </v-col>
+              </v-row>
+            </v-col>
+            <v-col cols="12" sm="12" md="12" lg="4">
+              <v-row
+                justify="start"
+                justify-md="start"
+                justify-sm="start"
+                justify-lg="end"
+                justify-xl="end"
+                justify-xxl="end"
+              >
+                <v-col cols="7">
+                  <v-select
+                    class="p-4"
+                    v-model="filterOptions.status"
+                    :items="nodeStatusOptions"
+                    label="Select Nodes Status"
+                    variant="underlined"
+                    :disabled="isFormLoading"
+                    open-on-clear
+                    clearable
+                  ></v-select>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+        </div>
+      </template>
+    </filters>
 
     <div class="nodes mt-5">
       <div class="nodes-inner">
         <v-row>
           <v-col cols="12">
             <div class="table">
-              <div class="table-filters">
-                <v-row>
-                  <v-col>
-                    <v-row>
-                      <v-col cols="12" sm="6" md="6" lg="4">
-                        <input-tooltip inline tooltip="Enable filtering the nodes that have Gateway supported only.">
-                          <v-switch
-                            color="primary"
-                            inset
-                            label="Gateways (Only)"
-                            v-model="filterOptions.gateway"
-                            hide-details
-                            :disabled="isFormLoading"
-                          />
-                        </input-tooltip>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6" lg="4">
-                        <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
-                          <v-switch
-                            color="primary"
-                            inset
-                            label="GPU Node (Only)"
-                            v-model="filterOptions.gpu"
-                            hide-details
-                            :disabled="isFormLoading"
-                          />
-                        </input-tooltip>
-                      </v-col>
-                    </v-row>
-                  </v-col>
-                  <v-col cols="12" sm="12" md="12" lg="4">
-                    <v-row
-                      justify="start"
-                      justify-md="start"
-                      justify-sm="start"
-                      justify-lg="end"
-                      justify-xl="end"
-                      justify-xxl="end"
-                    >
-                      <v-col cols="7">
-                        <v-select
-                          class="p-4"
-                          v-model="filterOptions.status"
-                          :items="nodeStatusOptions"
-                          label="Select Nodes Status"
-                          variant="underlined"
-                          :disabled="isFormLoading"
-                          open-on-clear
-                          clearable
-                        ></v-select>
-                      </v-col>
-                    </v-row>
-                  </v-col>
-                </v-row>
-              </div>
               <div class="hint mb-2">
                 <v-alert type="info" variant="tonal">
                   The nodes will be filtered and displayed after you enter the value by 1 second.
