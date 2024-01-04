@@ -1,5 +1,17 @@
 <template>
-  <VCard class="rounded-0 w-100" flat>
+  <VCard
+    class="rounded-0 w-100"
+    :class="{ 'selected-node': selected }"
+    :color="selected ? 'rgba(var(--v-theme-primary), 0.1)' : undefined"
+    flat
+    @click="
+      () => {
+        if (!selected) {
+          $emit('node:select', node);
+        }
+      }
+    "
+  >
     <template #prepend>
       <VTooltip :text="node.location.country">
         <template #activator="{ props }">
@@ -31,7 +43,7 @@
     </template>
 
     <template #append>
-      <VChip color="secondary" :text="(node.hasGPU ? 'Has' : 'No') + ' GPU'" />
+      <VChip v-if="node.hasGPU" color="secondary" text="Has GPU" />
       <VChip class="mx-2" color="primary" :text="node.certificationType" />
       <VChip
         :color="node.rentedByTwinId === 0 ? 'secondary' : 'success'"
@@ -40,48 +52,46 @@
     </template>
 
     <template #text>
-      <p class="font-weight-bold text-h6">Resources</p>
-
       <VRow>
         <VCol>
           <InputTooltip tooltip="CPU can be greater than 100% because overprovisioning." align-center>
-            <ResourceDetails name="CPU" :used="node.used_resources.cru" :total="node.total_resources.cru" />
+            <ResourceDetails
+              name="CPU"
+              :used="node.used_resources.cru"
+              :total="node.total_resources.cru"
+              :text="cruText"
+            />
           </InputTooltip>
         </VCol>
         <VCol>
-          <ResourceDetails name="Memory" :used="node.used_resources.mru" :total="node.total_resources.mru" />
-        </VCol>
-        <VCol>
-          <ResourceDetails name="SSD Disks" :used="node.used_resources.sru" :total="node.total_resources.sru" />
-        </VCol>
-        <VCol>
-          <ResourceDetails name="HDD Disks" :used="node.used_resources.hru" :total="node.total_resources.hru" />
+          <ResourceDetails
+            name="Memory"
+            :used="node.used_resources.mru"
+            :total="node.total_resources.mru"
+            :text="mruText"
+          />
         </VCol>
       </VRow>
 
-      <!-- <VContainer>
-        <VRow>
-          <span v-text="'CPU (Cores)'" />
-          <VSpacer />
-          <p class="font-weight-bold">
-            {{ parseInt(((node.used_resources.cru / node.total_resources.cru) * 10000).toString()) / 100 }} %
-          </p>
-        </VRow>
-      </VContainer>
-      <VProgressLinear model-value="20" color="primary" />
-
-      <VContainer class="mt-4">
-        <VRow>
-          <span v-text="'CPU (Cores)'" />
-          <VSpacer />
-          {{ node.used_resources.cru }} | {{ node.total_resources.cru }} |
-          <p>{{ node.used_resources.cru / node.total_resources.cru }}</p>
-        </VRow>
-      </VContainer>
-      <VProgressLinear model-value="20" color="primary" /> -->
+      <VRow>
+        <VCol>
+          <ResourceDetails
+            name="SSD Disks"
+            :used="node.used_resources.sru"
+            :total="node.total_resources.sru"
+            :text="sruText"
+          />
+        </VCol>
+        <VCol>
+          <ResourceDetails
+            name="HDD Disks"
+            :used="node.used_resources.hru"
+            :total="node.total_resources.hru"
+            :text="hruText"
+          />
+        </VCol>
+      </VRow>
     </template>
-
-    <VDivider v-if="appendDivider" />
   </VCard>
 </template>
 
@@ -90,6 +100,7 @@ import type { NodeInfo } from "@threefold/grid_client";
 import { byCountry } from "country-code-lookup";
 import { computed, type PropType } from "vue";
 
+import formatResourceSize from "../../utils/format_resource_size";
 import ResourceDetails from "./node_details_internals/ResourceDetails.vue";
 
 export default {
@@ -97,11 +108,12 @@ export default {
   components: { ResourceDetails },
   props: {
     node: { type: Object as PropType<NodeInfo>, required: true },
-    appendDivider: { type: Boolean, default: () => false },
+    selected: Boolean,
+  },
+  emits: {
+    "node:select": (node: NodeInfo) => true || node,
   },
   setup(props) {
-    // console.log(props.node);
-
     const flag = computed(() => {
       const { country } = props.node.location;
       const code = byCountry(country)?.internet || byCountry(country.toLowerCase())?.internet;
@@ -110,7 +122,23 @@ export default {
         : `https://placehold.co/30x20`;
     });
 
-    return { flag };
+    function normalizeBytesResourse(name: "mru" | "sru" | "hru") {
+      return () => {
+        const used = formatResourceSize(props.node.used_resources[name]);
+        const total = formatResourceSize(props.node.total_resources[name]);
+
+        if (total === "0") return "";
+
+        return `${used} / ${total}`;
+      };
+    }
+
+    const cruText = computed(() => `${props.node.used_resources.cru} / ${props.node.total_resources.cru} (Cores)`);
+    const mruText = computed(normalizeBytesResourse("mru"));
+    const sruText = computed(normalizeBytesResourse("sru"));
+    const hruText = computed(normalizeBytesResourse("hru"));
+
+    return { flag, cruText, mruText, sruText, hruText };
   },
 };
 </script>

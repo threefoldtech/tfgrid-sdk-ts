@@ -4,7 +4,11 @@
       <VRow>
         <span v-text="name" class="text-caption font-weight-bold" />
         <VSpacer />
-        <p class="font-weight-bold text-primary" v-text="usagePrecentage + ' %'" />
+        <template v-if="text">
+          <span v-text="text" class="text-caption font-weight-bold text-info" />
+          <VSpacer />
+        </template>
+        <p class="font-weight-bold text-primary" v-text="total === 0 ? 'N/A' : usagePrecentage + ' %'" />
       </VRow>
     </VContainer>
     <VProgressLinear :model-value="Math.min(100, usagePrecentage)" color="primary" />
@@ -20,6 +24,7 @@ export default {
     name: { type: String, required: true },
     used: { type: Number, required: true },
     total: { type: Number, required: true },
+    text: String,
   },
   setup(props) {
     const usagePrecentage = computed(() => {
