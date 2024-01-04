@@ -33,6 +33,7 @@
 
               <input-validator
                 :value="transferAmount"
+                ref="amountRef"
                 :rules="[
                   validators.required('Transfer amount is required '),
                   validators.isNumeric('Amount should be a number.'),
@@ -84,6 +85,7 @@
               </input-validator>
               <input-validator
                 :value="transferAmount"
+                ref="amountRef"
                 :rules="[
                   validators.required('Transfer amount is required '),
                   validators.isNumeric('Amount should be a number.'),
@@ -123,7 +125,7 @@
 <script lang="ts" setup>
 import { Keyring } from "@polkadot/keyring";
 import type { Twin } from "@threefold/tfchain_client";
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import { ref } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
@@ -135,6 +137,7 @@ const activeTab = ref(0);
 const recipientTwinId = ref("");
 const isValidTwinIDTransfer = ref(false);
 const transferAmount = ref();
+const amountRef = ref();
 const loadingTwinIDTransfer = ref(false);
 const loadingAddressTransfer = ref(false);
 const isValidAddressTransfer = ref(false);
@@ -145,6 +148,14 @@ const recepTwinFromAddress = ref<Twin>();
 const receptTwinFromTwinID = ref<Twin>();
 const balance = profileManagerController.balance;
 const freeBalance = computed(() => balance.value?.free ?? 0);
+
+watch(freeBalance, async () => {
+  if (transferAmount.value) {
+    await amountRef.value?.reset();
+    amountRef.value?.validate();
+  }
+});
+
 const tick = ref(0);
 function isSameTwinID(value: string) {
   if (parseInt(value.trim()) == profile.value?.twinId) {
