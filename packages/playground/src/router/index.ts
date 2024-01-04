@@ -91,6 +91,12 @@ const router = createRouter({
       meta: { title: "SSHKey" },
       children: [],
     },
+    {
+      path: "/orchestrators",
+      component: () => import("../views/orchestrators_view.vue"),
+      meta: { title: "Orchestrators" },
+      children: [],
+    },
 
     {
       path: "/solutions",

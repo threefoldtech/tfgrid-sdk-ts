@@ -277,6 +277,11 @@ const routes: AppRoute[] = [
         route: "/vms",
       },
       {
+        title: "Orchestrators",
+        icon: "mdi-group",
+        route: "/orchestrators",
+      },
+      {
         title: "Dedicated Machines",
         icon: "mdi-resistor-nodes",
         route: "/dashboard/dedicated-nodes",
