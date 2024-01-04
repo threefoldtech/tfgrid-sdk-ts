@@ -79,6 +79,12 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: "/vms",
+      component: () => import("../views/vms_view.vue"),
+      meta: { title: "Virtual Machines" },
+      children: [],
+    },
 
     {
       path: "/solutions",
