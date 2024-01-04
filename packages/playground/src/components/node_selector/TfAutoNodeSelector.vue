@@ -33,10 +33,9 @@
         <VCard
           max-height="450"
           flat
-          class="mb-4 overflow-auto border"
+          class="mb-4 border"
           :disabled="!validFilters || filtersUpdated"
           :style="{ opacity: !validFilters || filtersUpdated ? 0.5 : 1 }"
-          ref="nodesContainer"
         >
           <VContainer v-if="loadedNodes.length === 0 && (pageCountTask.loading || nodesTask.loading)">
             <VRow align="center" justify="center" class="pa-4">
@@ -48,14 +47,16 @@
             <VAlert type="error" text="No Nodes were found!" />
           </VContainer>
 
-          <template v-for="(node, index) in loadedNodes" :key="node.id">
-            <TfNodeDetailsCard
-              :node="node"
-              :selected="!validFilters || filtersUpdated ? false : $props.modelValue === node"
-              @node:select="bindModelValueAndValidate"
-            />
-            <div class="border-b" v-if="index + 1 !== loadedNodes.length" />
-          </template>
+          <div ref="nodesContainer" :style="{ maxHeight: '450px' }" class="overflow-auto" v-if="loadedNodes.length">
+            <template v-for="(node, index) in loadedNodes" :key="node.id">
+              <TfNodeDetailsCard
+                :node="node"
+                :selected="!validFilters || filtersUpdated ? false : $props.modelValue === node"
+                @node:select="bindModelValueAndValidate"
+              />
+              <div class="border-b" v-if="index + 1 !== loadedNodes.length" />
+            </template>
+          </div>
 
           <VContainer v-if="loadedNodes.length > 0 && pagination.page !== -1">
             <VBtn
@@ -75,6 +76,7 @@
 
         <VAlert
           :type="!validFilters ? 'error' : 'warning'"
+          variant="elevated"
           :style="{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 9 }"
           v-if="!validFilters || (filtersUpdated && validFilters)"
         >
@@ -94,6 +96,7 @@
 
         <VAlert
           type="error"
+          variant="elevated"
           v-if="!filtersUpdated && nodeInputValidateTask.error"
           :style="{ position: 'absolute', bottom: '15px', right: '31px', zIndex: 9 }"
           :text="nodeInputValidateTask.error"
@@ -227,11 +230,12 @@ export default {
         onBeforeTask: () => bindStatus(ValidatorStatus.Pending),
         onAfterTask({ data }) {
           bindStatus(data ? ValidatorStatus.Valid : ValidatorStatus.Invalid);
-          const container = nodesContainer.value?.$el as HTMLDivElement;
+          const container = nodesContainer.value as HTMLDivElement;
           if (container) {
             const card = container.querySelector(".selected-node") as HTMLDivElement;
 
-            if (card) {
+            if (card && container.getAttribute("data-scrolled") !== "scrolled") {
+              container.setAttribute("data-scrolled", "scrolled");
               container.scroll({
                 behavior: "smooth",
                 top: card.offsetTop - 100,
@@ -263,7 +267,7 @@ export default {
       ctx.emit("update:status", status || ValidatorStatus.Init);
     }
 
-    const nodesContainer = ref<VCard>();
+    const nodesContainer = ref<HTMLDivElement>();
 
     return {
       pageCountTask,
