@@ -270,7 +270,7 @@ const routes: AppRoute[] = [
         route: "/calculator/pricing",
       },
       { title: "Node Finder", icon: "mdi-access-point", route: "/nodes" },
-      /// need to add VMs
+
       {
         title: "Virtual Machines",
         icon: "vm.png",
@@ -292,6 +292,11 @@ const routes: AppRoute[] = [
         icon: "mdi-open-in-new",
         url: "https://hub.grid.tf/",
         tooltip: "Find or Publish your Flist on 0-Hub",
+      },
+      {
+        title: "SSHKey",
+        icon: "mdi-key-plus",
+        route: "/sshkey",
       },
     ],
   },
