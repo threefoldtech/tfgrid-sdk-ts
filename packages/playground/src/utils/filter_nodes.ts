@@ -161,7 +161,7 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
 
 export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
   total_cru: {
-    label: "Total CPU (Cores)",
+    label: "CPU (Cores)",
     placeholder: "Filter by total Cores.",
     type: "text",
     rules: [
@@ -173,7 +173,7 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
     ],
   },
   total_mru: {
-    label: "Total RAM (GB)",
+    label: "RAM (GB)",
     placeholder: "Filter by total Memory.",
     type: "text",
     rules: [
@@ -185,7 +185,7 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
     ],
   },
   total_sru: {
-    label: "Total SSD (GB)",
+    label: "SSD (GB)",
     placeholder: "Filter by total SSD.",
     type: "text",
     rules: [
@@ -197,7 +197,7 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
     ],
   },
   total_hru: {
-    label: "Total HDD (GB)",
+    label: "HDD (GB)",
     placeholder: "Filter by total HDD.",
     type: "text",
     rules: [
