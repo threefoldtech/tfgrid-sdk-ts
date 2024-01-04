@@ -56,22 +56,22 @@
               />
               <div class="border-b" v-if="index + 1 !== loadedNodes.length" />
             </template>
-          </div>
 
-          <VContainer v-if="loadedNodes.length > 0 && pagination.page !== -1">
-            <VBtn
-              @click="reloadNodes()"
-              block
-              color="secondary"
-              variant="tonal"
-              size="large"
-              :loading="nodesTask.loading"
-              prepend-icon="mdi-reload"
-              :disabled="nodeInputValidateTask.loading"
-            >
-              Load More Nodes
-            </VBtn>
-          </VContainer>
+            <VContainer v-if="loadedNodes.length > 0 && pagination.page !== -1">
+              <VBtn
+                @click="reloadNodes()"
+                block
+                color="secondary"
+                variant="tonal"
+                size="large"
+                :loading="nodesTask.loading"
+                prepend-icon="mdi-reload"
+                :disabled="nodeInputValidateTask.loading"
+              >
+                Load More Nodes
+              </VBtn>
+            </VContainer>
+          </div>
         </VCard>
 
         <VAlert
