@@ -3,7 +3,8 @@
 </template>
 
 <script lang="ts">
-import { inject, provide, type Ref, ref } from "vue";
+import type { Ref } from "vue";
+import { inject, provide, ref } from "vue";
 
 import type { Profile } from "@/stores/profile_manager";
 import type { Balance } from "@/utils/grid";

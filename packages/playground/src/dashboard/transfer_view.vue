@@ -125,7 +125,10 @@
 <script lang="ts" setup>
 import { Keyring } from "@polkadot/keyring";
 import type { Twin } from "@threefold/tfchain_client";
-import { computed, ref, watch } from "vue";
+import { computed } from "vue";
+import { ref } from "vue";
+
+import { ValidatorStatus } from "@/hooks/form_validator";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useGrid, useProfileManager } from "../stores";
@@ -147,15 +150,6 @@ const recepTwinFromAddress = ref<Twin>();
 const receptTwinFromTwinID = ref<Twin>();
 const balance = profileManagerController.balance;
 const freeBalance = computed(() => balance.value?.free ?? 0);
-
-watch(freeBalance, async () => {
-  if (transferAmount.value) {
-    await amountRef.value?.reset();
-    amountRef.value?.validate();
-  }
-});
-
-const tick = ref(0);
 function isSameTwinID(value: string) {
   if (parseInt(value.trim()) == profile.value?.twinId) {
     return { message: "Cannot transfer to yourself" };
@@ -210,7 +204,7 @@ async function transfer(recipientTwin: Twin) {
   try {
     if (gridStore) {
       await gridStore.client.balance.transfer({ address: recipientTwin.accountId, amount: transferAmount.value });
-      clearInput();
+      transferAmount.value = undefined;
       createCustomToast("Transaction Complete!", ToastType.success);
       profileManagerController.reloadBalance();
     }
@@ -232,7 +226,6 @@ async function submitFormTwinID() {
     if (twinDetails != null) {
       loadingTwinIDTransfer.value = true;
       await transfer(twinDetails);
-      loadingTwinIDTransfer.value = false;
     } else {
       createInvalidTransferToast("twin ID doesn't exist");
     }
