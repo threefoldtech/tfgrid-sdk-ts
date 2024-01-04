@@ -596,8 +596,9 @@ watch(SSHKeyHint, hint => {
     }, 3000);
   }
 });
+const profileManagerController = useProfileManagerController();
 
-const balance = ref<Balance>();
+const balance = profileManagerController.balance;
 
 const activeTab = ref(0);
 const password = ref("");
@@ -779,8 +780,6 @@ async function __loadBalance(profile?: Profile, tries = 1) {
     setTimeout(() => __loadBalance(profile, tries + 1), Math.floor(Math.exp(tries) * 1_000));
   }
 }
-
-const profileManagerController = useProfileManagerController();
 profileManagerController.set({ loadBalance: __loadBalance });
 
 function login() {
