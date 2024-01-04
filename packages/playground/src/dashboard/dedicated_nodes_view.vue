@@ -14,23 +14,32 @@
           @update:model-value="applyFilters"
           @reset="resetFilters"
           :options="filterOptions"
-        />
+        >
+          <template #options>
+            <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
+              <v-switch
+                color="primary"
+                inset
+                label="GPU Node (Only)"
+                v-model="filterOptions.gpu"
+                @update:model-value="updateGpu"
+                hide-details
+                :disabled="isFormLoading"
+              />
+            </input-tooltip>
+          </template>
+        </filters>
       </div>
-      <div>
-        <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
-          <v-switch
-            color="primary"
-            inset
-            label="GPU Node (Only)"
-            v-model="filterOptions.gpu"
-            @update:model-value="updateGpu"
-            hide-details
-            :disabled="isFormLoading"
-          />
-        </input-tooltip>
-      </div>
+
       <!-- Table -->
-      <nodes-table :options="filterOptions" :nodes="nodes" :nodes-count="nodesCount" />
+      <nodes-table
+        @update-active-tab-value="updateActiveTabValue"
+        @reload-table="reloadTable"
+        :options="filterOptions"
+        :nodes="nodes"
+        :nodes-count="nodesCount"
+        :loading="loading"
+      />
     </div>
   </div>
 </template>
@@ -90,6 +99,10 @@ const applyFilters = async (filtersInputValues: DedicatedNodeFilters) => {
     await _loadData();
   }
   filtering.value = false;
+};
+
+const updateActiveTabValue = (newValue: number) => {
+  activeTab.value = newValue;
 };
 
 const _loadData = async () => {

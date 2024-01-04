@@ -11,7 +11,7 @@
   <div>
     <v-card class="pa-5">
       <v-data-table-server
-        :loading="loading"
+        :loading="$props.loading"
         :items-length="$props.nodesCount"
         loading-text="Loading nodes..."
         :headers="headers"
@@ -106,7 +106,6 @@ const headers: VDataTable["headers"] = [
 const expanded = ref([]);
 const tabs = [{ label: "Rentable" }, { label: "Mine" }];
 const activeTab = ref(0);
-const loading = ref(false);
 const pageOptions: { value: number; title: string }[] = [
   { value: 5, title: "5" },
   { value: 10, title: "10" },
@@ -125,6 +124,10 @@ defineProps({
   },
   nodesCount: {
     type: Number,
+    required: true,
+  },
+  loading: {
+    type: Boolean,
     required: true,
   },
 });
