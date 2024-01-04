@@ -53,7 +53,7 @@
               variant="tonal"
               @click.stop="logout"
               v-if="profileManager.profile"
-              :disabled="updatingSSH || generatingSSH || loadingBalance"
+              :disabled="loadingBalance"
               class="ml-2"
               v-bind="props"
               icon="mdi-logout"
@@ -313,56 +313,6 @@
                 :disabled="activating || creatingAccount || activatingAccount"
               />
             </PasswordInputWrapper>
-            <VTooltip
-              text="SSH Keys are used to authenticate you to the deployment instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
-              location="bottom"
-              max-width="600px"
-            >
-              <template #activator="{ props }">
-                <CopyInputWrapper :data="profileManager.profile.ssh" #="{ props: copyInputProps }">
-                  <VTextarea
-                    label="Public SSH Key"
-                    no-resize
-                    :spellcheck="false"
-                    v-model.trim="ssh"
-                    v-bind="{ ...props, ...copyInputProps }"
-                    :disabled="updatingSSH || generatingSSH"
-                    :hint="
-                      updatingSSH
-                        ? 'Updating your public ssh key.'
-                        : generatingSSH
-                        ? 'Generating a new public ssh key.'
-                        : SSHKeyHint
-                    "
-                    :persistent-hint="updatingSSH || generatingSSH || !!SSHKeyHint"
-                    :rules="[value => !!value || 'SSH key is required']"
-                  />
-                </CopyInputWrapper>
-              </template>
-            </VTooltip>
-
-            <div class="d-flex justify-end mb-5">
-              <VBtn
-                class="mr-2 text-subtitle-2"
-                color="secondary"
-                variant="outlined"
-                :disabled="!!ssh || updatingSSH || generatingSSH || !isEnoughBalance(balance)"
-                :loading="generatingSSH"
-                @click="generateSSH"
-              >
-                Generate SSH Keys
-              </VBtn>
-              <VBtn
-                class="text-subtitle-2"
-                color="secondary"
-                variant="outlined"
-                @click="updateSSH"
-                :disabled="!ssh || profileManager.profile.ssh === ssh || updatingSSH || !isEnoughBalance(balance)"
-                :loading="updatingSSH"
-              >
-                Update Public SSH Key
-              </VBtn>
-            </div>
 
             <CopyInputWrapper :data="profileManager.profile.twinId.toString()" #="{ props }">
               <VTextField label="Twin ID" readonly v-model="profileManager.profile.twinId" v-bind="props" />
@@ -418,7 +368,7 @@
           @click="logout"
           variant="outlined"
           v-if="profileManager.profile"
-          :disabled="updatingSSH || generatingSSH || loadingBalance"
+          :disabled="loadingBalance"
         >
           Logout
         </VBtn>
@@ -436,7 +386,6 @@ import md5 from "md5";
 import { computed, onMounted, type Ref, ref, watch } from "vue";
 import { nextTick } from "vue";
 import { useTheme } from "vuetify";
-import { generateKeyPair } from "web-ssh-keygen";
 
 import { AppThemeSelection } from "@/utils/app_theme";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
@@ -452,10 +401,9 @@ import {
   getGrid,
   loadBalance,
   loadProfile,
-  storeSSH,
 } from "../utils/grid";
-import { isEnoughBalance, normalizeError } from "../utils/helpers";
-import { downloadAsFile, normalizeBalance } from "../utils/helpers";
+import { normalizeBalance, normalizeError } from "../utils/helpers";
+
 interface Credentials {
   passwordHash?: string;
   mnemonicHash?: string;
@@ -570,8 +518,7 @@ const profileManager = useProfileManager();
 const openAcceptTerms = ref(false);
 const mnemonic = ref("");
 const isValidForm = ref(false);
-const SSHKeyHint = ref("");
-const ssh = ref("");
+
 const mnemonicInput = useInputRef();
 
 const isNonActiveMnemonic = ref(false);
@@ -581,21 +528,9 @@ const shouldActivateAccount = computed(() => {
   return isNonActiveMnemonic.value;
 });
 
-let sshTimeout: any;
 const isValidConnectConfirmationPassword = computed(() =>
   !validateConfirmPassword(confirmPassword.value) ? false : true,
 );
-
-watch(SSHKeyHint, hint => {
-  if (hint) {
-    if (sshTimeout) {
-      clearTimeout(sshTimeout);
-    }
-    sshTimeout = setTimeout(() => {
-      SSHKeyHint.value = "";
-    }, 3000);
-  }
-});
 const profileManagerController = useProfileManagerController();
 
 const balance = profileManagerController.balance;
@@ -662,7 +597,7 @@ async function activate(mnemonic: string, keypairType: KeypairType) {
   try {
     const grid = await getGrid({ mnemonic, keypairType });
     const profile = await loadProfile(grid!);
-    ssh.value = profile.ssh;
+
     profileManager.set({ ...profile, mnemonic });
   } catch (e) {
     loginError.value = normalizeError(e, "Something went wrong while login.");
@@ -727,33 +662,6 @@ async function activateAccount() {
   }
 }
 
-const updatingSSH = ref(false);
-async function updateSSH() {
-  updatingSSH.value = true;
-  const grid = await getGrid(profileManager.profile!);
-  await storeSSH(grid!, ssh.value);
-  profileManager.updateSSH(ssh.value);
-  updatingSSH.value = false;
-  SSHKeyHint.value = "SSH key updated successfully.";
-}
-
-const generatingSSH = ref(false);
-async function generateSSH() {
-  generatingSSH.value = true;
-  const keys = await generateKeyPair({
-    alg: "RSASSA-PKCS1-v1_5",
-    hash: "SHA-256",
-    name: "Threefold",
-    size: 4096,
-  });
-  const grid = await getGrid(profileManager.profile!);
-  await storeSSH(grid!, keys.publicKey);
-  profileManager.updateSSH(keys.publicKey);
-  ssh.value = profileManager.profile!.ssh;
-  downloadAsFile("id_rsa", keys.privateKey);
-  generatingSSH.value = false;
-  SSHKeyHint.value = "SSH key generated successfully.";
-}
 let BalanceWarningRaised = false;
 const loadingBalance = ref(false);
 async function __loadBalance(profile?: Profile, tries = 1) {

@@ -236,42 +236,85 @@ function navigateToPrevRoute(path: any) {
 
 const routes: AppRoute[] = [
   {
-    title: "Dashboard",
-    icon: "mdi-account-convert-outline",
+    title: "TFGrid",
+    icon: "mdi-database-search-outline",
+
     items: [
       {
-        title: "Your Twin",
-        icon: "mdi-account-supervisor-outline",
-        route: "/dashboard/twin",
-      },
-      { title: "Your Farms", icon: "mdi-silo", route: "/dashboard/farms" },
-      {
-        title: "Your Contracts",
-        icon: "mdi-file-document-edit",
-        route: "/dashboard/contracts-list",
-      },
-      { title: "Bridge", icon: "mdi-swap-horizontal", route: "/dashboard/bridge" },
-      {
-        title: "Transfer",
-        icon: "mdi-account-arrow-right-outline",
-        route: "/dashboard/transfer",
+        title: "Grid Status",
+        icon: "mdi-grid-large",
+        url: "https://status.grid.tf/status/threefold",
+        tooltip: "Status of Threefold Grid",
       },
       {
-        title: "Dedicated Nodes",
-        icon: "mdi-resistor-nodes",
-        route: "/dashboard/dedicated-nodes",
+        title: "Node Statistics",
+        icon: "mdi-chart-scatter-plot",
+        route: "/stats",
+        tooltip: "View Node Statistics",
       },
-      { title: "DAO", icon: "mdi-note-check-outline", route: "/dashboard/dao" },
+      {
+        title: "Node Monitoring",
+        icon: "mdi-equalizer",
+        url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
+        tooltip: "Monitor Zero-OS Nodes",
+      },
     ],
   },
   {
-    title: "Calculators",
-    icon: "mdi-calculator",
+    title: "Deploy",
+    icon: "mdi-silo",
     items: [
       {
         title: "Pricing Calculator",
         icon: "mdi-currency-usd",
         route: "/calculator/pricing",
+      },
+      { title: "Node Finder", icon: "mdi-access-point", route: "/nodes" },
+
+      {
+        title: "Virtual Machines",
+        icon: "mdi-television",
+        route: "/vms",
+      },
+      {
+        title: "Orchestrators",
+        icon: "mdi-group",
+        route: "/orchestrators",
+      },
+      {
+        title: "Dedicated Machines",
+        icon: "mdi-resistor-nodes",
+        route: "/dashboard/dedicated-nodes",
+      },
+      { title: "Applications", icon: "mdi-lightbulb-on-outline", route: "/solutions" },
+      {
+        title: "Your Contracts",
+        icon: "mdi-file-document-edit",
+        route: "/dashboard/contracts-list",
+      },
+      {
+        title: "Images",
+        icon: "mdi-open-in-new",
+        url: "https://hub.grid.tf/",
+        tooltip: "Find or Publish your Flist on 0-Hub",
+      },
+      {
+        title: "SSHKey",
+        icon: "mdi-key-plus",
+        route: "/sshkey",
+      },
+    ],
+  },
+  {
+    title: "Farms",
+    icon: "mdi-access-point",
+    items: [
+      { title: "Farms", icon: "mdi-lan-connect", route: "/farms" },
+      {
+        title: "Node Installer",
+        icon: "mdi-earth",
+        url: "https://bootstrap.grid.tf/",
+        tooltip: "Download Zero-OS Images",
       },
       {
         title: "Simulator",
@@ -281,63 +324,26 @@ const routes: AppRoute[] = [
     ],
   },
   {
-    title: "Playground",
-    items: [{ title: "Solutions", icon: "mdi-lightbulb-on-outline", route: "/solutions" }],
-  },
-  {
-    icon: "mdi-database-search-outline",
-    title: "Statistics",
+    title: "TFChain",
+    icon: "mdi-account-convert-outline",
     items: [
       {
-        title: "Statistics",
-        icon: "mdi-chart-scatter-plot",
-        route: "/stats",
+        title: "My Profile",
+        icon: "mdi-account-supervisor-outline",
+        route: "/dashboard/twin",
       },
-    ],
-  },
-  {
-    icon: "mdi-access-point",
-    title: "Nodes",
-    items: [{ title: "Nodes", icon: "mdi-access-point", route: "/nodes" }],
-  },
-  {
-    icon: "mdi-access-point",
-    title: "Farms",
-    items: [{ title: "Farms", icon: "mdi-lan-connect", route: "/farms" }],
-  },
-  {
-    icon: "mdi-toolbox-outline",
-    title: "Services",
-    items: [
+      { title: "TF DAO", icon: "mdi-note-check-outline", route: "/dashboard/dao" },
+      { title: "TF Token Bridge", icon: "mdi-swap-horizontal", route: "/dashboard/bridge" },
       {
-        title: "0-Bootstrap",
-        icon: "mdi-earth",
-        url: "https://bootstrap.grid.tf/",
-        tooltip: "Download Zero-OS Images",
+        title: "TF Token Transfer",
+        icon: "mdi-account-arrow-right-outline",
+        route: "/dashboard/transfer",
       },
       {
-        title: "0-Hub",
-        icon: "mdi-open-in-new",
-        url: "https://hub.grid.tf/",
-        tooltip: "Find or Publish your Flist",
-      },
-      {
-        title: "Minting",
+        title: "TF Minting Reports",
         icon: "mdi-file-document-edit",
         route: "/minting",
         tooltip: "TFGrid Minting Explorer",
-      },
-      {
-        title: "Monitoring",
-        icon: "mdi-equalizer",
-        url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
-        tooltip: "Monitor Zero-OS nodes",
-      },
-      {
-        title: "Grid Health",
-        icon: "mdi-grid-large",
-        url: "https://status.grid.tf/status/threefold",
-        tooltip: "Status of Threefold Services",
       },
     ],
   },
@@ -368,7 +374,7 @@ function clickHandler({ route, url }: AppRouteItem): void {
 }
 
 function isAuthorized(route: string) {
-  const items = ["dashboard", "solutions"];
+  const items = ["dashboard", "solutions", "sshkey"];
   return !items.some(substr => route.startsWith(`/${substr}`));
 }
 
