@@ -273,7 +273,7 @@ const routes: AppRoute[] = [
 
       {
         title: "Virtual Machines",
-        icon: "vm.png",
+        icon: "mdi-television",
         route: "/vms",
       },
       {
