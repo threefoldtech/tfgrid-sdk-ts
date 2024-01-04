@@ -128,8 +128,6 @@ import type { Twin } from "@threefold/tfchain_client";
 import { computed } from "vue";
 import { ref } from "vue";
 
-import { ValidatorStatus } from "@/hooks/form_validator";
-
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useGrid, useProfileManager } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
@@ -150,6 +148,7 @@ const recepTwinFromAddress = ref<Twin>();
 const receptTwinFromTwinID = ref<Twin>();
 const balance = profileManagerController.balance;
 const freeBalance = computed(() => balance.value?.free ?? 0);
+const tick = ref(0);
 function isSameTwinID(value: string) {
   if (parseInt(value.trim()) == profile.value?.twinId) {
     return { message: "Cannot transfer to yourself" };
