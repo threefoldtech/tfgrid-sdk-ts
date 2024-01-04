@@ -161,7 +161,8 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
 
 export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
   total_cru: {
-    label: "Max CPU (Cores)",
+    label: "CPU (Cores)",
+    placeholder: "Filter by total Cores.",
     type: "text",
     rules: [
       [
@@ -173,7 +174,8 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
     tooltip: "Filter by the maximum total amount of CPU Cores in the node.",
   },
   total_mru: {
-    label: "Max RAM (GB)",
+    label: "RAM (GB)",
+    placeholder: "Filter by total Memory.",
     type: "text",
     rules: [
       [
@@ -185,7 +187,8 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
     tooltip: "Filter by the maximum total amount of RAM in the node.",
   },
   total_sru: {
-    label: "Max SSD (GB)",
+    label: "SSD (GB)",
+    placeholder: "Filter by total SSD.",
     type: "text",
     rules: [
       [
@@ -197,7 +200,8 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
     tooltip: "Filter by the maximum total amount of SSD in the node.",
   },
   total_hru: {
-    label: "Max HDD (GB)",
+    label: "HDD (GB)",
+    placeholder: "Filter by total HDD.",
     type: "text",
     rules: [
       [
