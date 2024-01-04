@@ -544,6 +544,18 @@ watch(SSHKeyHint, hint => {
 });
 const profileManagerController = useProfileManagerController();
 
+watch(SSHKeyHint, hint => {
+  if (hint) {
+    if (sshTimeout) {
+      clearTimeout(sshTimeout);
+    }
+    sshTimeout = setTimeout(() => {
+      SSHKeyHint.value = "";
+    }, 3000);
+  }
+});
+const profileManagerController = useProfileManagerController();
+
 const balance = profileManagerController.balance;
 
 const activeTab = ref(0);
