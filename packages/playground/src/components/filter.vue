@@ -19,9 +19,10 @@
             >
               <v-col
                 cols="12"
-                sm="4"
-                md="2"
-                class="d-flex justify-end align-center ml-2 mr-2 mb-2"
+                sm="5"
+                md="4"
+                lg="2"
+                class="justify-end align-center ml-8 mr-8 mb-5"
                 v-for="key in Object.keys($props.modelValue)"
                 :key="key"
               >
@@ -33,15 +34,18 @@
                   #="{ props }"
                   ref="inputRef"
                 >
-                  <v-text-field
-                    v-bind="props"
-                    v-model="$props.modelValue[key].value"
-                    :label="$props.modelValue[key].label"
-                    :placeholder="$props.modelValue[key].placeholder"
-                    :type="$props.modelValue[key].type"
-                    :disabled="loading"
-                    @update:model-value="checkInput"
-                  ></v-text-field>
+                  <input-tooltip :tooltip="$props.modelValue[key].tooltip">
+                    <v-responsive min-width="170">
+                      <v-text-field
+                        v-bind="props"
+                        v-model="$props.modelValue[key].value"
+                        :label="$props.modelValue[key].label"
+                        :type="$props.modelValue[key].type"
+                        :disabled="loading"
+                        @update:model-value="checkInput"
+                      ></v-text-field>
+                    </v-responsive>
+                  </input-tooltip>
                 </input-validator>
               </v-col>
             </form-validator>
