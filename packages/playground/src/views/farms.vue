@@ -3,6 +3,7 @@
     <v-row>
       <v-col>
         <filters
+          :options="filterOptions"
           v-model="filterFarmInputs"
           :loading="loading"
           v-model:valid="isValidForm"
@@ -66,7 +67,7 @@ import type { Farm } from "@threefold/gridproxy_client";
 import { computed, onMounted, ref, watch } from "vue";
 
 import type { VDataTableHeader } from "@/types";
-import type { FarmFilterOptions, MixedFarmFilter } from "@/types";
+import type { FilterOptions, MixedFarmFilter } from "@/types";
 import type { FilterFarmInputs } from "@/utils/filter_farms";
 import { inputsInitializer, optionsInitializer } from "@/utils/filter_farms";
 import { getAllFarms, getFarmQueries } from "@/utils/get_farms";
@@ -78,7 +79,7 @@ const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer());
 
 const dialog = ref(false);
 
-const filterOptions = ref<FarmFilterOptions>(optionsInitializer());
+const filterOptions = ref<FilterOptions>(optionsInitializer());
 
 const mixedFarmFilters = computed<MixedFarmFilter>(() => ({
   inputs: filterFarmInputs.value,

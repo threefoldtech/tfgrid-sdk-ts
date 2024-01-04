@@ -251,11 +251,6 @@ export type NodeFilterOptions = {
   size: number;
 };
 
-export type FarmFilterOptions = {
-  page?: number;
-  size?: number;
-};
-
 export const nodeOptionsInitializer: NodeFilterOptions = {
   gateway: undefined,
   gpu: undefined,
@@ -352,5 +347,5 @@ export type MixedNodeFilter = {
 
 export type MixedFarmFilter = {
   inputs?: FilterFarmInputs;
-  options?: FarmFilterOptions;
+  options?: FilterOptions;
 };
