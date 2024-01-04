@@ -13,7 +13,7 @@
         <!-- TwinID Transfer -->
         <v-window-item :value="0">
           <v-card class="pa-5 my-5" flat>
-            <form-validator v-model="isValidTwinIDTransfer">
+            <form-validator :key="tick" v-model="isValidTwinIDTransfer">
               <input-validator
                 :value="recipientTwinId"
                 :rules="[
@@ -67,7 +67,7 @@
 
         <v-window-item :value="1">
           <v-card class="pa-5 my-5" flat>
-            <form-validator v-model="isValidAddressTransfer">
+            <form-validator :key="tick" v-model="isValidAddressTransfer">
               <input-validator
                 :value="recipientAddress"
                 :rules="[
@@ -126,8 +126,6 @@ import type { Twin } from "@threefold/tfchain_client";
 import { computed } from "vue";
 import { ref } from "vue";
 
-import { ValidatorStatus } from "@/hooks/form_validator";
-
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useGrid, useProfileManager } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
@@ -147,6 +145,7 @@ const recepTwinFromAddress = ref<Twin>();
 const receptTwinFromTwinID = ref<Twin>();
 const balance = profileManagerController.balance;
 const freeBalance = computed(() => balance.value?.free ?? 0);
+const tick = ref(0);
 function isSameTwinID(value: string) {
   if (parseInt(value.trim()) == profile.value?.twinId) {
     return { message: "Cannot transfer to yourself" };
@@ -194,13 +193,14 @@ function clearInput() {
   transferAmount.value = undefined;
   recipientTwinId.value = "";
   recipientAddress.value = "";
+  tick.value++;
 }
 
 async function transfer(recipientTwin: Twin) {
   try {
     if (gridStore) {
       await gridStore.client.balance.transfer({ address: recipientTwin.accountId, amount: transferAmount.value });
-      transferAmount.value = undefined;
+      clearInput();
       createCustomToast("Transaction Complete!", ToastType.success);
       profileManagerController.reloadBalance();
     }
@@ -222,6 +222,7 @@ async function submitFormTwinID() {
     if (twinDetails != null) {
       loadingTwinIDTransfer.value = true;
       await transfer(twinDetails);
+      loadingTwinIDTransfer.value = false;
     } else {
       createInvalidTransferToast("twin ID doesn't exist");
     }
