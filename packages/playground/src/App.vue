@@ -369,7 +369,7 @@ function clickHandler({ route, url }: AppRouteItem): void {
 }
 
 function isAuthorized(route: string) {
-  const items = ["dashboard", "solutions"];
+  const items = ["dashboard", "solutions", "sshkey"];
   return !items.some(substr => route.startsWith(`/${substr}`));
 }
 
