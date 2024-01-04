@@ -78,8 +78,11 @@
                 </li>
                 <li>
                   You're receiving {{ item.raw.discount }}% discount as per the
-                  <a target="_blank" href="https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount">
-                    <p style="display: inline">discount levels</p>
+                  <a
+                    target="_blank"
+                    href="https://manual.grid.tf/wiki/cloudunits/pricing/staking_discount_levels.html#staking-discount-levels"
+                  >
+                    <p style="display: inline">staking discounts</p>
                   </a>
                 </li>
               </ul>
