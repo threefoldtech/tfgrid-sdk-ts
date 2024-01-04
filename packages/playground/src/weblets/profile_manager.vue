@@ -532,7 +532,19 @@ const isValidConnectConfirmationPassword = computed(() =>
   !validateConfirmPassword(confirmPassword.value) ? false : true,
 );
 
-const balance = ref<Balance>();
+watch(SSHKeyHint, hint => {
+  if (hint) {
+    if (sshTimeout) {
+      clearTimeout(sshTimeout);
+    }
+    sshTimeout = setTimeout(() => {
+      SSHKeyHint.value = "";
+    }, 3000);
+  }
+});
+const profileManagerController = useProfileManagerController();
+
+const balance = profileManagerController.balance;
 
 const activeTab = ref(0);
 const password = ref("");
@@ -687,8 +699,6 @@ async function __loadBalance(profile?: Profile, tries = 1) {
     setTimeout(() => __loadBalance(profile, tries + 1), Math.floor(Math.exp(tries) * 1_000));
   }
 }
-
-const profileManagerController = useProfileManagerController();
 profileManagerController.set({ loadBalance: __loadBalance });
 
 function login() {
