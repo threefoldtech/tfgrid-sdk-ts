@@ -1,34 +1,49 @@
 <template>
-  <input-tooltip tooltip="Node ID to deploy on.">
-    <VTextField
-      label="Node ID"
-      placeholder="Add your desired node id to validate"
-      class="w-100"
-      type="number"
-      v-model.number="nodeId"
-      :error="!!validationTask.error"
-      :error-messages="validationTask.error || undefined"
-      :disabled="!validFilters"
-      :persistent-hint="
-        (nodeId && !validationTask.initialized) ||
-        !validFilters ||
-        validationTask.loading ||
-        (validationTask.initialized && validationTask.data === true)
+  <div>
+    <TfNodeDetailsCard
+      :node="modelValue || placeholderNode"
+      :status="
+        validationTask.loading
+          ? 'Pending'
+          : validationTask.initialized
+          ? validationTask.error
+            ? 'Invalid'
+            : 'Valid'
+          : 'Init'
       "
-      :hint="
-        !validFilters
-          ? 'Please provide valid data.'
-          : nodeId && !validationTask.initialized
-          ? 'Preparing to validate node.'
-          : validationTask.loading
-          ? 'Validating node...'
-          : validationTask.data
-          ? `Node ${nodeId} is valid.`
-          : undefined
-      "
-      @blur="validationTask.initialized ? undefined : validationTask.run(nodeId)"
     />
-  </input-tooltip>
+
+    <input-tooltip tooltip="Node ID to deploy on." align-center>
+      <VTextField
+        label="Node ID"
+        placeholder="Add your desired node id to validate"
+        class="w-100 mt-4"
+        type="number"
+        v-model.number="nodeId"
+        :error="!!validationTask.error"
+        :error-messages="validationTask.error || undefined"
+        :disabled="!validFilters"
+        :persistent-hint="
+          (nodeId && !validationTask.initialized) ||
+          !validFilters ||
+          validationTask.loading ||
+          (validationTask.initialized && validationTask.data === true)
+        "
+        :hint="
+          !validFilters
+            ? 'Please provide valid data.'
+            : nodeId && !validationTask.initialized
+            ? 'Preparing to validate node.'
+            : validationTask.loading
+            ? 'Validating node...'
+            : validationTask.data
+            ? `Node ${nodeId} is valid.`
+            : undefined
+        "
+        @blur="validationTask.initialized ? undefined : validationTask.run(nodeId)"
+      />
+    </input-tooltip>
+  </div>
 </template>
 
 <script lang="ts">
@@ -43,12 +58,14 @@ import { useGrid } from "../../stores";
 import type { SelectionDetailsFilters } from "../../types/nodeSelector";
 import { normalizeError } from "../../utils/helpers";
 import { checkNodeCapacityPool, resolveAsync } from "../../utils/nodeSelector";
+import TfNodeDetailsCard from "./TfNodeDetailsCard.vue";
 
 const _defaultError =
   "Something went wrong while checking status of the node. Please check your connection and try again.";
 
 export default {
   name: "TfManualNodeSelector",
+  components: { TfNodeDetailsCard },
   props: {
     modelValue: Object as PropType<NodeInfo>,
     validFilters: { type: Boolean, required: true },
@@ -69,6 +86,8 @@ export default {
     // reset node to mark form as invalid
     watch(nodeId, () => bindModelValue());
 
+    const placeholderNode = ref<NodeInfo>();
+
     const validationTask = useAsync<true | string, string, [id: number | undefined]>(
       async nodeId => {
         if (typeof nodeId !== "number") {
@@ -87,6 +106,8 @@ export default {
         if (e0) {
           throw normalizeError(e0, _defaultError);
         }
+
+        placeholderNode.value = node;
 
         if (node === undefined || node === null) {
           throw `Node ${nodeId} is not on the grid`;
@@ -150,6 +171,8 @@ export default {
         await checkNodeCapacityPool(gridStore, node, props.filters);
 
         bindModelValue(node);
+        placeholderNode.value = undefined;
+
         return true;
       },
       {
@@ -193,7 +216,7 @@ export default {
       ctx.emit("update:status", status || ValidatorStatus.Init);
     }
 
-    return { nodeId, validationTask };
+    return { nodeId, validationTask, placeholderNode };
   },
 };
 </script>

@@ -35,7 +35,11 @@
           flat
           class="mb-4 border"
           :disabled="!validFilters || filtersUpdated"
-          :style="{ opacity: !validFilters || filtersUpdated ? 0.5 : 1 }"
+          :style="{
+            opacity: !validFilters || filtersUpdated ? 0.5 : 1,
+            borderWidth: '2px !important',
+            borderColor: nodeInputValidateTask.error ? 'rgba(var(--v-theme-error), 0.4) !important' : undefined,
+          }"
         >
           <VContainer v-if="loadedNodes.length === 0 && (pageCountTask.loading || nodesTask.loading)">
             <VRow align="center" justify="center" class="pa-4">
@@ -47,14 +51,29 @@
             <VAlert type="error" text="No Nodes were found!" />
           </VContainer>
 
-          <div ref="nodesContainer" :style="{ maxHeight: '450px' }" class="overflow-auto" v-if="loadedNodes.length">
-            <template v-for="(node, index) in loadedNodes" :key="node.id">
+          <div
+            ref="nodesContainer"
+            :style="{ maxHeight: '450px', paddingBottom: '100px' }"
+            class="overflow-auto"
+            v-if="loadedNodes.length"
+          >
+            <template v-for="node in loadedNodes" :key="node.id">
               <TfNodeDetailsCard
                 :node="node"
                 :selected="!validFilters || filtersUpdated ? false : $props.modelValue === node"
+                selectable
                 @node:select="bindModelValueAndValidate"
+                :status="
+                  $props.modelValue === node
+                    ? nodeInputValidateTask.loading
+                      ? 'Pending'
+                      : nodeInputValidateTask.data
+                      ? 'Valid'
+                      : 'Invalid'
+                    : 'Init'
+                "
               />
-              <div class="border-b" v-if="index + 1 !== loadedNodes.length" />
+              <div class="border-b" :style="{ borderBottomWidth: '2px !important' }" />
             </template>
 
             <VContainer v-if="loadedNodes.length > 0 && pagination.page !== -1">
@@ -89,7 +108,7 @@
         <VAlert
           type="info"
           variant="elevated"
-          :style="{ position: 'absolute', bottom: '15px', right: '31px', zIndex: 9 }"
+          :style="{ position: 'absolute', bottom: '31px', right: '31px', zIndex: 9 }"
           v-else-if="nodeInputValidateTask.loading"
           text="Checking if the disks will fit in the node's storage pools..."
         />
@@ -98,8 +117,9 @@
           type="error"
           variant="elevated"
           v-if="!filtersUpdated && nodeInputValidateTask.error"
-          :style="{ position: 'absolute', bottom: '15px', right: '31px', zIndex: 9 }"
+          :style="{ position: 'absolute', bottom: '31px', right: '31px', zIndex: 9 }"
           :text="nodeInputValidateTask.error"
+          closable
         />
       </div>
     </input-tooltip>

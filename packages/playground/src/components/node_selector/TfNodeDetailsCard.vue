@@ -1,30 +1,44 @@
 <template>
   <VCard
     class="rounded-0 w-100"
-    :class="{ 'selected-node': selected }"
-    :color="selected ? 'rgba(var(--v-theme-primary), 0.1)' : undefined"
-    flat
-    @click="
-      () => {
-        if (!selected) {
-          $emit('node:select', node);
-        }
-      }
+    :class="{ 'selected-node': status !== 'Init' }"
+    :color="
+      status === 'Valid'
+        ? 'rgba(var(--v-theme-primary), 0.1)'
+        : status === 'Invalid'
+        ? 'rgba(var(--v-theme-error), 0.1)'
+        : status === 'Pending'
+        ? 'rgba(var(--v-theme-warning), 0.01)'
+        : undefined
     "
+    flat
+    v-bind="{
+      onClick: selectable
+        ? () => {
+            if (status === 'Init' && node) {
+              $emit('node:select', node);
+            }
+          }
+        : undefined,
+    }"
   >
+    <template #loader>
+      <VProgressLinear indeterminate color="primary" height="2" v-if="status === 'Pending'" />
+    </template>
+
     <template #prepend>
-      <VTooltip :text="node.location.country">
+      <VTooltip :text="node?.location.country" :disabled="!node">
         <template #activator="{ props }">
           <VAvatar size="40">
-            <img :src="flag" class="h-100" :alt="node.location.country + '-flag'" v-bind="props" />
+            <img :src="flag" class="h-100" :alt="(node?.location.country ?? 'node') + '-flag'" v-bind="props" />
           </VAvatar>
         </template>
       </VTooltip>
     </template>
 
     <template #title>
-      Node ID({{ node.nodeId }})
-      <VTooltip text="Node Serial Number">
+      Node ID({{ node?.nodeId }})
+      <VTooltip text="Node Serial Number" v-if="node">
         <template #activator="{ props }">
           <VChip size="x-small" v-bind="props">
             <span class="font-weight-bold" v-text="node.serialNumber" />
@@ -34,21 +48,24 @@
     </template>
 
     <template #subtitle>
-      <span v-text="'Farm ID: ' + node.farmId + ' '" />
+      <span v-text="'Farm ID: ' + (node?.farmId ?? '') + ' '" />
       <VChip
-        :color="node.inDedicatedFarm ? 'success' : 'secondary'"
+        v-if="node"
+        :color="node?.inDedicatedFarm ? 'success' : 'secondary'"
         size="x-small"
-        :text="node.inDedicatedFarm ? 'Dedicated' : 'Shared'"
+        :text="node?.inDedicatedFarm ? 'Dedicated' : 'Shared'"
       />
     </template>
 
     <template #append>
-      <VChip v-if="node.hasGPU" color="secondary" text="Has GPU" />
-      <VChip class="mx-2" color="primary" :text="node.certificationType" />
-      <VChip
-        :color="node.rentedByTwinId === 0 ? 'secondary' : 'success'"
-        :text="node.rentedByTwinId === 0 ? 'Shared' : 'Dedicated'"
-      />
+      <template v-if="node">
+        <VChip v-if="node?.hasGPU" color="secondary" text="Has GPU" />
+        <VChip class="mx-2" color="primary" :text="node?.certificationType" />
+        <VChip
+          :color="node?.rentedByTwinId === 0 ? 'secondary' : 'success'"
+          :text="node?.rentedByTwinId === 0 ? 'Shared' : 'Dedicated'"
+        />
+      </template>
     </template>
 
     <template #text>
@@ -57,8 +74,8 @@
           <InputTooltip tooltip="CPU can be greater than 100% because overprovisioning." align-center>
             <ResourceDetails
               name="CPU"
-              :used="node.used_resources.cru"
-              :total="node.total_resources.cru"
+              :used="node?.used_resources.cru ?? 0"
+              :total="node?.total_resources.cru ?? 0"
               :text="cruText"
             />
           </InputTooltip>
@@ -66,8 +83,8 @@
         <VCol>
           <ResourceDetails
             name="Memory"
-            :used="node.used_resources.mru"
-            :total="node.total_resources.mru"
+            :used="node?.used_resources.mru ?? 0"
+            :total="node?.total_resources.mru ?? 0"
             :text="mruText"
           />
         </VCol>
@@ -77,16 +94,16 @@
         <VCol>
           <ResourceDetails
             name="SSD Disks"
-            :used="node.used_resources.sru"
-            :total="node.total_resources.sru"
+            :used="node?.used_resources.sru ?? 0"
+            :total="node?.total_resources.sru ?? 0"
             :text="sruText"
           />
         </VCol>
         <VCol>
           <ResourceDetails
             name="HDD Disks"
-            :used="node.used_resources.hru"
-            :total="node.total_resources.hru"
+            :used="node?.used_resources.hru ?? 0"
+            :total="node?.total_resources.hru ?? 0"
             :text="hruText"
           />
         </VCol>
@@ -107,23 +124,28 @@ export default {
   name: "TfNodeDetailsCard",
   components: { ResourceDetails },
   props: {
-    node: { type: Object as PropType<NodeInfo>, required: true },
-    selected: Boolean,
+    node: Object as PropType<NodeInfo>,
+    status: String as PropType<"Init" | "Pending" | "Invalid" | "Valid">,
+    selectable: Boolean,
   },
   emits: {
     "node:select": (node: NodeInfo) => true || node,
   },
   setup(props) {
     const flag = computed(() => {
-      const { country } = props.node.location;
+      const country = props.node?.location.country ?? "";
       const code = byCountry(country)?.internet || byCountry(country.toLowerCase())?.internet;
       return code
         ? `https://www.worldatlas.com/r/w425/img/flag/${code.toLowerCase()}-flag.jpg`
-        : `https://placehold.co/30x20`;
+        : `https://placehold.co/30x20?text=TF`;
     });
 
     function normalizeBytesResourse(name: "mru" | "sru" | "hru") {
       return () => {
+        if (!props.node) {
+          return "";
+        }
+
         const used = formatResourceSize(props.node.used_resources[name]);
         const total = formatResourceSize(props.node.total_resources[name]);
 
@@ -133,7 +155,9 @@ export default {
       };
     }
 
-    const cruText = computed(() => `${props.node.used_resources.cru} / ${props.node.total_resources.cru} (Cores)`);
+    const cruText = computed(() =>
+      props.node ? `${props.node.used_resources.cru} / ${props.node.total_resources.cru} (Cores)` : "",
+    );
     const mruText = computed(normalizeBytesResourse("mru"));
     const sruText = computed(normalizeBytesResourse("sru"));
     const hruText = computed(normalizeBytesResourse("hru"));
