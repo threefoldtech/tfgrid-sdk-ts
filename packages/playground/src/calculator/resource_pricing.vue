@@ -193,6 +193,7 @@ import { onMounted } from "vue";
 import { ref } from "vue";
 
 import { useProfileManager } from "@/stores/profile_manager";
+import { getGrid, loadBalance } from "@/utils/grid";
 
 import { calculator as Calculator } from "../../../grid_client/dist/es6";
 import { useGrid } from "../stores";
@@ -230,25 +231,30 @@ const calculator = computed(() => {
     ? gridStore.grid?.calculator
     : new Calculator(new QueryClient(window.env.SUBSTRATE_URL));
 });
-watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance, hasActiveProfile], async () => {
-  let pkgs: any;
-  if (!valid.value.error) {
-    if (currentbalance.value && hasActiveProfile.value && gridStore.grid) {
-      const accountBalance = await gridStore.grid?.balance.getMyBalance();
-      balance.value = accountBalance?.free;
+watch(
+  [CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance, hasActiveProfile],
+  async () => {
+    let pkgs: any;
+    if (!valid.value.error) {
+      if (currentbalance.value && hasActiveProfile.value && gridStore.grid) {
+        const profile = profileManager.profile!;
+        const grid = await getGrid(profile);
+        balance.value = (await loadBalance(grid!)).free;
+      }
+      pkgs = await calculator.value?.calculate({
+        cru: CRU.value,
+        mru: MRU.value,
+        hru: HRU.value,
+        sru: SRU.value,
+        ipv4u: ipv4.value,
+        certified: isCertified.value,
+        balance: balance.value || 0,
+      });
+      setPriceList(pkgs);
     }
-    pkgs = await calculator.value?.calculate({
-      cru: CRU.value,
-      mru: MRU.value,
-      hru: HRU.value,
-      sru: SRU.value,
-      ipv4u: ipv4.value,
-      certified: isCertified.value,
-      balance: balance.value || 0,
-    });
-    setPriceList(pkgs);
-  }
-});
+  },
+  { immediate: true },
+);
 
 watch(currentbalance, (newCurrentBalance, oldCurrentBalance) => {
   if (oldCurrentBalance && !newCurrentBalance) {
@@ -260,12 +266,13 @@ watch(
   hasActiveProfile,
   async newVal => {
     if (newVal) {
-      currentbalance.value = newVal;
-      const accountBalance = await gridStore.grid?.balance.getMyBalance();
-      balance.value = accountBalance?.free;
+      currentbalance.value = true;
+      const profile = profileManager.profile!;
+      const grid = await getGrid(profile);
+      balance.value = (await loadBalance(grid!)).free || 0;
     } else {
       balance.value = 0;
-      currentbalance.value = newVal;
+      currentbalance.value = false;
     }
   },
   { immediate: true },
