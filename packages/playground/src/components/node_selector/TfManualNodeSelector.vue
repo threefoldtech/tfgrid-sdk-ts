@@ -1,6 +1,7 @@
 <template>
   <div>
     <TfNodeDetailsCard
+      v-show="modelValue || placeholderNode"
       flat
       :node="modelValue || placeholderNode"
       :status="

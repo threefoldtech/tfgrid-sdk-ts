@@ -49,34 +49,22 @@
 
     <template #subtitle>
       <span v-text="'Farm ID: ' + (node?.farmId ?? '') + ' '" />
-      <VTooltip v-if="node" :text="'Farm is ' + (node?.inDedicatedFarm ? 'Dedicated' : 'Shared')">
-        <template #activator="{ props }">
-          <VChip
-            v-bind="props"
-            :color="node?.inDedicatedFarm ? 'success' : 'secondary'"
-            size="x-small"
-            :text="node?.inDedicatedFarm ? 'Dedicated' : 'Shared'"
-          />
-        </template>
-      </VTooltip>
+      <VChip
+        :color="node?.inDedicatedFarm ? 'success' : 'secondary'"
+        size="x-small"
+        :text="(node?.inDedicatedFarm ? 'Dedicated' : 'Shared') + ' Farm'"
+        v-if="node"
+      />
     </template>
 
     <template #append>
       <template v-if="node">
-        <VTooltip text="Node Details" location="left center">
-          <template #activator="{ props }">
-            <VContainer v-bind="props">
-              <VRow align="center">
-                <VChip v-if="node?.hasGPU" color="secondary" text="Has GPU" />
-                <VChip class="mx-2" color="primary" :text="node?.certificationType" />
-                <VChip
-                  :color="node?.rentedByTwinId === 0 ? 'secondary' : 'success'"
-                  :text="node?.rentedByTwinId === 0 ? 'Shared' : 'Dedicated'"
-                />
-              </VRow>
-            </VContainer>
-          </template>
-        </VTooltip>
+        <VChip v-if="node?.hasGPU" color="secondary" text="Node Has GPU" />
+        <VChip class="mx-2" color="primary" :text="node?.certificationType" />
+        <VChip
+          :color="node?.rentedByTwinId === 0 ? 'secondary' : 'success'"
+          :text="(node?.rentedByTwinId === 0 ? 'Shared' : 'Dedicated') + ' Node'"
+        />
       </template>
     </template>
 
