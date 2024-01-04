@@ -141,9 +141,9 @@ def test_invalid_amount(browser):
       transfer_page.amount_tft_input(case)
       assert transfer_page.wait_for('Transfer amount is required')
       assert transfer_page.get_address_submit().is_enabled() == False
-    # transfer_page.amount_tft_input(invalid_amount())
-    # assert transfer_page.wait_for('Amount must have 3 decimals only')
-    # assert transfer_page.get_address_submit().is_enabled() == False
+    transfer_page.amount_tft_input(invalid_amount())
+    assert transfer_page.wait_for('Amount can have 3 decimals only.')
+    assert transfer_page.get_address_submit().is_enabled() == False
     transfer_page.amount_tft_input(format(float(balance)+100,'.3f'))
     assert transfer_page.wait_for('Insufficient funds')
     assert transfer_page.get_address_submit().is_enabled() == False

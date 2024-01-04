@@ -1,4 +1,3 @@
-import pytest
 from pages.dashboard import DashboardPage
 from utils.utils import generate_string, get_seed, get_hex
 from utils.base import Base
@@ -23,9 +22,9 @@ def test_validate_homepage_links(browser):
     """
     dashboard_page = before_test_setup(browser)
     assert dashboard_page.navigate_to_find_more() == ('https://threefold.io/')
-    assert dashboard_page.navigate_to_explore_capacity() == ('https://dashboard.dev.grid.tf/explorer/statistics') #Base.base_url+'explorer/statistics'
     assert dashboard_page.navigate_to_learn_about_grid() == ('https://www.threefold.io/grid/')
     assert dashboard_page.navigate_to_use_grid_button() == ('https://www.threefold.io/build/')
+    assert dashboard_page.navigate_to_explore_capacity() == (Base.base_url + '#/stats')
 
 
 def test_tft_price(browser):
@@ -42,8 +41,10 @@ def test_tft_price(browser):
     browser.find_element(*dashboard_page.close_login_button).click()
     tft_in_usd = float(dashboard_page.tft_price_result()[:-4])
     dashboard_page.tft_price_swap()
-    usd_in_tft = float(dashboard_page.tft_price_result()[:-4])
-    assert tft_in_usd == dashboard_page.get_tft_price()
+    usd_in_tft = float(dashboard_page.usd_price_result()[:-4])
+    # Consider that the original value has a precision of 7 digits, but it's approximated to only 3 digits.
+    # An error of 0.001 is considered acceptable.
+    assert 0.001 <= dashboard_page.get_tft_price() - tft_in_usd >= -0.001
     assert 0.99 < tft_in_usd * usd_in_tft < 1.1
 
 
@@ -110,7 +111,7 @@ def test_account_validation(browser):
     dashboard_page.confirm_password('12345')
     assert dashboard_page.wait_for('Passwords should match')
     dashboard_page.click_button(dashboard_page.connect_your_wallet('123456'))
-    assert dashboard_page.get_hex() == get_hex()
+    assert dashboard_page.get_mnemonic() == get_seed()
     dashboard_page.logout_account()
     assert dashboard_page.login_account('12345').get_attribute("disabled") == 'true'
     assert dashboard_page.wait_for('Password must be at least 6 characters')

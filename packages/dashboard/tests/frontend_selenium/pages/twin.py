@@ -8,9 +8,9 @@ This module contains Twin page elements.
 """
 class TwinPage:
 
-    close_login_button = (By.XPATH, '/html/body/div[2]/div[25]/div[2]/div[2]/div[2]/v-tab-item/div/form/div[6]/button[1]')
+    close_login_button = (By.XPATH, '/html/body/div[2]/div[27]/div[2]/div[2]/div[2]/v-tab-item/div/form/div[7]/button[1]')
     twin_details_label = (By.XPATH, "//*[contains(text(), 'Twin Details')]")
-    get_tft_button = (By.XPATH, "/html/body/div[1]/div/div/main/header/div/div[2]/div/button")
+    get_tft_button = (By.XPATH, "/html/body/div[1]/div/div/main/header/div/div[2]/div/div/div/div/button")
     locked_info_button = (By.XPATH, '/html/body/div[1]/div/div/main/header/div/div[3]/div[2]/p[2]/a/span[3]/i')
     twin_id_label = (By.XPATH, '/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div/div[2]/div[2]/div/div[2]/div[1]/div')
     twin_address_text = (By.XPATH, '/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/span')

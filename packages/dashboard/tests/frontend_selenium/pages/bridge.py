@@ -10,15 +10,15 @@ This module contains Bridge page elements.
 
 class BridgePage:
 
-    close_login_button = (By.XPATH, '/html/body/div[2]/div[25]/div[2]/div[2]/div[2]/v-tab-item/div/form/div[6]/button[1]')
+    close_login_button = (By.XPATH, '/html/body/div[2]/div[27]/div[2]/div[2]/div[2]/v-tab-item/div/form/div[7]/button[1]')
     sidebar = (By.XPATH, '/html/body/div[1]/div/div/nav/div/div[1]/div/div/div[1]/div[1]/div[3]/i')
     twin_details = (By.XPATH, "//*[contains(text(), 'Twin Details')]")
     bridge_page=(By.XPATH, '/html/body/div[1]/div/div/nav/div/div[1]/div/div/div[1]/div[2]/div[4]')
     transfer_tft_title = (By.XPATH, "//*[contains(text(), 'Transfer TFT Across Chains')]")
-    stellar_choose=(By.XPATH, "//*[contains(text(), 'stellar')]") 
-    deposit=(By.XPATH, "/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/button[1]")   
-    withdraw=(By.XPATH, "/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/button[2]")
-    howdone=(By.XPATH, "/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/button[3]")
+    stellar_choose=(By.XPATH, "//*[contains(text(), 'stellar')]")
+    withdraw=(By.XPATH, "/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/div/button[1]")
+    deposit=(By.XPATH, "/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/div/button[2]")
+    howdone=(By.XPATH, "/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/button")
     deposite_bridge_address = (By.XPATH, "/html/body/div[2]/div[29]/div[2]/div/div[2]/div[1]/div[1]/div[1]/div[2]/div[1]/div/div[3]/input")
     twin_id_text = (By.XPATH,"/html/body/div[2]/div[29]/div[2]/div/div[2]/div[1]/div[1]/div[1]/div[3]/div[1]/div/div[3]/input")
     twin_address_text = (By.XPATH, '/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/span')

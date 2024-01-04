@@ -21,7 +21,7 @@ class TransferPage:
     twin_details = (By.XPATH, "//*[contains(text(), 'Twin Details')]")
     transfer_tft_title = (By.XPATH, "//*[contains(text(), 'Transfer TFTs on the TFChain')]")
     balance_text = (By.XPATH,'/html/body/div[1]/div/div/main/header/div/div[3]/div[2]/p[1]/strong')
-    close_login_button = (By.XPATH, '/html/body/div[2]/div[25]/div[2]/div[2]/div[2]/v-tab-item/div/form/div[6]/button[1]')
+    close_login_button = (By.XPATH, '/html/body/div[2]/div[27]/div[2]/div[2]/div[2]/v-tab-item/div/form/div[7]/button[1]')
     twin_address_text = (By.XPATH, '/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/span')
     twin_id_input = (By.XPATH, '/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/div/div[1]/div/div[2]/div/div/div[1]/div/div[3]/input')
     twin_id_amount_input = (By.XPATH, '/html/body/div[1]/div/div/main/div[1]/div[2]/div/div/div[2]/div[3]/div/div[1]/div/div[3]/div/div/div[1]/div/div[3]/input')
@@ -92,9 +92,6 @@ class TransferPage:
 
     def get_balance_transfer(self, balance):
         new_balance = self.browser.find_element(*self.balance_text).text[:-4]
-        self.browser.refresh()
-        alert = Alert(self.browser)
-        alert.accept()
         WebDriverWait(self.browser, 30).until(EC.visibility_of_element_located(self.transfer_tft_title))
         while(new_balance == balance or 'Loadin' in new_balance):
             new_balance = self.browser.find_element(*self.balance_text).text[:-4]
