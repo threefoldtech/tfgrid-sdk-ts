@@ -256,6 +256,21 @@ watch(currentbalance, (newCurrentBalance, oldCurrentBalance) => {
   }
 });
 
+watch(
+  hasActiveProfile,
+  async newVal => {
+    if (newVal) {
+      currentbalance.value = newVal;
+      const accountBalance = await gridStore.grid?.balance.getMyBalance();
+      balance.value = accountBalance?.free;
+    } else {
+      balance.value = 0;
+      currentbalance.value = newVal;
+    }
+  },
+  { immediate: true },
+);
+
 async function setPriceList(pkgs: any): Promise<PriceType[]> {
   TFTPrice.value = await calculator.value?.tftPrice();
   prices.value = [
