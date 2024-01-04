@@ -41,7 +41,7 @@ interface Card {
 }
 
 export default {
-  name: "VmsView",
+  name: "Orchestrators View",
   setup() {
     const cards: Card[] = [
       {
