@@ -27,6 +27,7 @@ export type FilterNodeInputs = {
   farmIds: InputFilterType;
   farmName: InputFilterType;
   country: InputFilterType;
+  region: InputFilterType;
   freeSru: InputFilterType;
   freeHru: InputFilterType;
   freeMru: InputFilterType;
@@ -81,6 +82,11 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
   country: {
     label: "Country Full Name",
     placeholder: "Filter by country.",
+    type: "text",
+  },
+  region: {
+    label: "Region Name",
+    placeholder: "Filter by region.",
     type: "text",
   },
   totalSru: {

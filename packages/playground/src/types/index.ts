@@ -216,6 +216,7 @@ export type FilterInputs = {
   farmIds: NodeInputFilterType;
   farmName: NodeInputFilterType;
   country: NodeInputFilterType;
+  region: NodeInputFilterType;
   freeSru: NodeInputFilterType;
   freeHru: NodeInputFilterType;
   freeMru: NodeInputFilterType;
@@ -308,6 +309,7 @@ export const nodeInitializer: GridNode = {
   farmId: 0,
   twinId: 0,
   country: "",
+  region: "",
   gridVersion: 0,
   city: "",
   uptime: 0,

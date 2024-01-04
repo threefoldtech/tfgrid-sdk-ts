@@ -53,6 +53,7 @@ export interface GridNode {
   farmId: number;
   twinId: number;
   country: string;
+  region: string;
   gridVersion: number;
   city: string;
   uptime: number;
