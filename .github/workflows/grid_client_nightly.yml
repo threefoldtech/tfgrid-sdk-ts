@@ -106,11 +106,10 @@ jobs:
 
           # Check if Node contracts are empty
           if [[ $contracts_json != *'nodeContracts: []'* ]]; then
-            echo "Deletion failed; The Node Contract is not empty."
-            exit 1
-          else
             # Print the contract that couldn't be deleted
+            echo "Deletion failed; The Node Contract is not empty."
             awk 'NR>4' output.txt
+            exit 1
           fi
 
       - name: Test Results
