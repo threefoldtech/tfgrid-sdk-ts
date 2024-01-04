@@ -71,7 +71,7 @@
     <template #text>
       <VRow>
         <VCol>
-          <InputTooltip tooltip="CPU can be greater than 100% because overprovisioning." align-center>
+          <InputTooltip tooltip="CPU can be greater than 100% due to overprovisioning." align-center>
             <ResourceDetails
               name="CPU"
               :used="node?.used_resources.cru ?? 0"
