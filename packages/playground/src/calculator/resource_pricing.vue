@@ -121,6 +121,7 @@
                 v-bind="props"
                 v-model.number="balance"
                 ref="valid"
+                :loading="loadingBalance"
               />
             </input-tooltip>
           </input-validator>
@@ -205,6 +206,7 @@ const SRU = ref<number>(25);
 const HRU = ref<number>(100);
 const balance = ref<number>(0);
 const TFTPrice = ref<number>(0);
+const loadingBalance = ref<boolean>(false);
 
 const isCertified = ref<boolean>(false);
 const ipv4 = ref<boolean>(false);
@@ -237,9 +239,11 @@ watch(
     let pkgs: any;
     if (!valid.value.error) {
       if (currentbalance.value && hasActiveProfile.value && gridStore.grid) {
+        loadingBalance.value = true;
         const profile = profileManager.profile!;
         const grid = await getGrid(profile);
         balance.value = (await loadBalance(grid!)).free;
+        loadingBalance.value = false;
       }
       pkgs = await calculator.value?.calculate({
         cru: CRU.value,
@@ -266,10 +270,13 @@ watch(
   hasActiveProfile,
   async newVal => {
     if (newVal) {
+      loadingBalance.value = true;
       currentbalance.value = true;
       const profile = profileManager.profile!;
       const grid = await getGrid(profile);
-      balance.value = (await loadBalance(grid!)).free || 0;
+      const x = await loadBalance(grid!);
+      balance.value = x.free || 0;
+      loadingBalance.value = false;
     } else {
       balance.value = 0;
       currentbalance.value = false;
