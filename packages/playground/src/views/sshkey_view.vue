@@ -1,57 +1,59 @@
 <template>
-  <VTooltip
-    text="SSH Keys are used to authenticate you to the deployment instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
-    location="bottom"
-    max-width="600px"
-  >
-    <template #activator="{ props }">
-      <CopyInputWrapper :data="profileManager.profile?.ssh" #="{ props: copyInputProps }">
-        <VTextarea
-          label="Public SSH Key"
-          no-resize
-          :spellcheck="false"
-          v-model.trim="ssh"
-          v-bind="{ ...props, ...copyInputProps }"
-          :disabled="updatingSSH || generatingSSH"
-          :hint="
-            updatingSSH
-              ? 'Updating your public ssh key.'
-              : generatingSSH
-              ? 'Generating a new public ssh key.'
-              : SSHKeyHint
-          "
-          :persistent-hint="updatingSSH || generatingSSH || !!SSHKeyHint"
-          :rules="[value => !!value || 'SSH key is required']"
-        />
-      </CopyInputWrapper>
+  <v-card>
+    <VTooltip
+      text="SSH Keys are used to authenticate you to the deployment instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
+      location="bottom"
+      max-width="600px"
+    >
+      <template #activator="{ props }">
+        <CopyInputWrapper :data="profileManager.profile?.ssh" #="{ props: copyInputProps }">
+          <VTextarea
+            label="Public SSH Key"
+            no-resize
+            :spellcheck="false"
+            v-model.trim="ssh"
+            v-bind="{ ...props, ...copyInputProps }"
+            :disabled="updatingSSH || generatingSSH"
+            :hint="
+              updatingSSH
+                ? 'Updating your public ssh key.'
+                : generatingSSH
+                ? 'Generating a new public ssh key.'
+                : SSHKeyHint
+            "
+            :persistent-hint="updatingSSH || generatingSSH || !!SSHKeyHint"
+            :rules="[value => !!value || 'SSH key is required']"
+          />
+        </CopyInputWrapper>
 
-      <div class="d-flex justify-end mb-5">
-        <VBtn
-          class="mr-2 text-subtitle-2"
-          color="secondary"
-          variant="outlined"
-          :disabled="!!ssh || updatingSSH || generatingSSH || !isEnoughBalance(balance)"
-          :loading="generatingSSH"
-          @click="generateSSH"
-        >
-          Generate SSH Keys
-        </VBtn>
-        <VBtn
-          class="text-subtitle-2"
-          color="secondary"
-          variant="outlined"
-          @click="updateSSH"
-          :disabled="!ssh || profileManager.profile?.ssh === ssh || updatingSSH || !isEnoughBalance(balance)"
-          :loading="updatingSSH"
-        >
-          Update Public SSH Key
-        </VBtn>
-      </div>
-    </template>
-  </VTooltip>
+        <div class="d-flex justify-end mb-5">
+          <VBtn
+            class="mr-2 text-subtitle-2"
+            color="secondary"
+            variant="outlined"
+            :disabled="!!ssh || updatingSSH || generatingSSH || !isEnoughBalance(balance)"
+            :loading="generatingSSH"
+            @click="generateSSH"
+          >
+            Generate SSH Keys
+          </VBtn>
+          <VBtn
+            class="text-subtitle-2"
+            color="secondary"
+            variant="outlined"
+            @click="updateSSH"
+            :disabled="!ssh || profileManager.profile?.ssh === ssh || updatingSSH || !isEnoughBalance(balance)"
+            :loading="updatingSSH"
+          >
+            Update Public SSH Key
+          </VBtn>
+        </div>
+      </template>
+    </VTooltip>
+  </v-card>
 </template>
 <script lang="ts" setup>
-import { onMounted, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
@@ -66,17 +68,13 @@ const balance = ref<Balance>();
 const SSHKeyHint = ref("");
 const generatingSSH = ref(false);
 const profileManager = useProfileManager();
-const ssh = ref("");
+const ssh = ref(profileManager.profile!.ssh);
 const updatingSSH = ref(false);
 let BalanceWarningRaised = false;
 const loadingBalance = ref(false);
-const profile = ref<Profile>();
+
 let interval: any;
-onMounted(async () => {
-  profile.value = profileManager.profile!;
-  if (!profile.value) return;
-  const grid = await getGrid(profile);
-});
+
 async function __loadBalance(profile?: Profile, tries = 1) {
   profile = profile || profileManager.profile!;
   if (!profile) return;
@@ -139,4 +137,9 @@ async function generateSSH() {
   generatingSSH.value = false;
   SSHKeyHint.value = "SSH key generated successfully.";
 }
+</script>
+<script lang="ts">
+export default {
+  name: "SSHkey",
+};
 </script>
