@@ -274,8 +274,7 @@ watch(
       currentbalance.value = true;
       const profile = profileManager.profile!;
       const grid = await getGrid(profile);
-      const x = await loadBalance(grid!);
-      balance.value = x.free || 0;
+      balance.value = (await loadBalance(grid!)).free || 0;
       loadingBalance.value = false;
     } else {
       balance.value = 0;
