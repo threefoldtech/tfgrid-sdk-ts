@@ -11,7 +11,7 @@
         ? 'rgba(var(--v-theme-warning), 0.01)'
         : undefined
     "
-    flat
+    :flat="flat"
     v-bind="{
       onClick: selectable
         ? () => {
@@ -49,22 +49,34 @@
 
     <template #subtitle>
       <span v-text="'Farm ID: ' + (node?.farmId ?? '') + ' '" />
-      <VChip
-        v-if="node"
-        :color="node?.inDedicatedFarm ? 'success' : 'secondary'"
-        size="x-small"
-        :text="node?.inDedicatedFarm ? 'Dedicated' : 'Shared'"
-      />
+      <VTooltip v-if="node" :text="'Farm is ' + (node?.inDedicatedFarm ? 'Dedicated' : 'Shared')">
+        <template #activator="{ props }">
+          <VChip
+            v-bind="props"
+            :color="node?.inDedicatedFarm ? 'success' : 'secondary'"
+            size="x-small"
+            :text="node?.inDedicatedFarm ? 'Dedicated' : 'Shared'"
+          />
+        </template>
+      </VTooltip>
     </template>
 
     <template #append>
       <template v-if="node">
-        <VChip v-if="node?.hasGPU" color="secondary" text="Has GPU" />
-        <VChip class="mx-2" color="primary" :text="node?.certificationType" />
-        <VChip
-          :color="node?.rentedByTwinId === 0 ? 'secondary' : 'success'"
-          :text="node?.rentedByTwinId === 0 ? 'Shared' : 'Dedicated'"
-        />
+        <VTooltip text="Node Details" location="left center">
+          <template #activator="{ props }">
+            <VContainer v-bind="props">
+              <VRow align="center">
+                <VChip v-if="node?.hasGPU" color="secondary" text="Has GPU" />
+                <VChip class="mx-2" color="primary" :text="node?.certificationType" />
+                <VChip
+                  :color="node?.rentedByTwinId === 0 ? 'secondary' : 'success'"
+                  :text="node?.rentedByTwinId === 0 ? 'Shared' : 'Dedicated'"
+                />
+              </VRow>
+            </VContainer>
+          </template>
+        </VTooltip>
       </template>
     </template>
 
@@ -127,6 +139,7 @@ export default {
     node: Object as PropType<NodeInfo>,
     status: String as PropType<"Init" | "Pending" | "Invalid" | "Valid">,
     selectable: Boolean,
+    flat: Boolean,
   },
   emits: {
     "node:select": (node: NodeInfo) => true || node,

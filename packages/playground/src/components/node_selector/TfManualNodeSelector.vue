@@ -1,6 +1,7 @@
 <template>
   <div>
     <TfNodeDetailsCard
+      flat
       :node="modelValue || placeholderNode"
       :status="
         validationTask.loading

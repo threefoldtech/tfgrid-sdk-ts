@@ -31,7 +31,6 @@
         />
 
         <VCard
-          max-height="450"
           flat
           class="mb-4 border"
           :disabled="!validFilters || filtersUpdated"
@@ -53,27 +52,29 @@
 
           <div
             ref="nodesContainer"
-            :style="{ maxHeight: '450px', paddingBottom: '100px' }"
-            class="overflow-auto"
+            :style="{ maxHeight: '450px', paddingBottom: '100px', backgroundColor: 'rgb(var(--v-theme-background))' }"
+            class="overflow-auto px-4"
             v-if="loadedNodes.length"
           >
             <template v-for="node in loadedNodes" :key="node.id">
-              <TfNodeDetailsCard
-                :node="node"
-                :selected="!validFilters || filtersUpdated ? false : $props.modelValue === node"
-                selectable
-                @node:select="bindModelValueAndValidate"
-                :status="
-                  $props.modelValue === node
-                    ? nodeInputValidateTask.loading
-                      ? 'Pending'
-                      : nodeInputValidateTask.data
-                      ? 'Valid'
-                      : 'Invalid'
-                    : 'Init'
-                "
-              />
-              <div class="border-b" :style="{ borderBottomWidth: '2px !important' }" />
+              <div class="my-4">
+                <TfNodeDetailsCard
+                  :node="node"
+                  :selected="!validFilters || filtersUpdated ? false : $props.modelValue === node"
+                  selectable
+                  @node:select="bindModelValueAndValidate"
+                  :status="
+                    $props.modelValue === node
+                      ? nodeInputValidateTask.loading
+                        ? 'Pending'
+                        : nodeInputValidateTask.data
+                        ? 'Valid'
+                        : 'Invalid'
+                      : 'Init'
+                  "
+                />
+              </div>
+              <!-- <div class="border-b" :style="{ borderBottomWidth: '2px !important' }" /> -->
             </template>
 
             <VContainer v-if="loadedNodes.length > 0 && pagination.page !== -1">
