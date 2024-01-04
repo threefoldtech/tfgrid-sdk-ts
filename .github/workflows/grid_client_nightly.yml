@@ -105,9 +105,9 @@ jobs:
           contracts_json=$(awk 'NR==5' output.txt)
 
           # Check if Node contracts are empty
-          if [[ $contracts_json != *'nodeContracts: []'* ]]; then
-            # Print the contract that couldn't be deleted
+          if grep -q 'nodeContracts: \[\]' output.txt; then
             echo "Deletion failed; The Node Contract is not empty."
+            # Print the contract that couldn't be deleted
             cat output.txt
             exit 1
           fi
