@@ -86,9 +86,12 @@ export default {
     const nodeId = ref<number>();
 
     // reset node to mark form as invalid
-    watch(nodeId, () => bindModelValue());
-
     const placeholderNode = ref<NodeInfo>();
+
+    watch(nodeId, () => {
+      bindModelValue();
+      placeholderNode.value = undefined;
+    });
 
     const validationTask = useAsync<true | string, string, [id: number | undefined]>(
       async nodeId => {
