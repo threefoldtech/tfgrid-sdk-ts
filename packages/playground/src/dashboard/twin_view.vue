@@ -34,22 +34,14 @@
       </v-card>
 
       <v-card>
-        <v-list class="custom-list">
-          <v-row>
-            <v-col cols="1" sm="2" class="column-style my-4" style="min-width: fit-content">
-              <v-list-item class="mr-auto"> ID </v-list-item>
-
-              <v-divider></v-divider>
-
-              <v-list-item class="mr-auto"> Address </v-list-item>
-
-              <v-divider></v-divider>
-
-              <v-list-item class="mr-auto"> Relay </v-list-item>
+        <v-list class="custom-list" density="compact">
+          <v-row class="row-style">
+            <v-col cols="1" sm="2" style="min-width: fit-content">
+              <v-list-item> ID :</v-list-item>
             </v-col>
-            <v-col class="my-4">
+            <v-col>
               <v-list-item>
-                <div style="display: flex; justify-content: space-between; align-items: center">
+                <div style="display: flex; justify-content: space-between">
                   {{ profileManager.profile?.twinId.toString() }}
                   <input-tooltip
                     tooltip="Your unique identifier for your twin on the ThreeFold chain."
@@ -59,7 +51,13 @@
                   />
                 </div>
               </v-list-item>
-              <v-divider></v-divider>
+            </v-col>
+          </v-row>
+          <v-row class="row-style">
+            <v-col cols="1" sm="2" style="min-width: fit-content">
+              <v-list-item> Address : </v-list-item>
+            </v-col>
+            <v-col>
               <v-list-item>
                 <div style="display: flex; justify-content: space-between; align-items: center">
                   <div class="pr-2" style="overflow: hidden; word-wrap: normal">
@@ -75,7 +73,11 @@
                   />
                 </div>
               </v-list-item>
-              <v-divider></v-divider>
+            </v-col>
+          </v-row>
+          <v-row class="row-style">
+            <v-col cols="1" sm="2"> <v-list-item class="mr-auto"> Relay : </v-list-item></v-col>
+            <v-col>
               <v-list-item>
                 <div style="display: flex; justify-content: space-between; align-items: center">
                   {{ profileManager.profile?.relay }}
@@ -84,9 +86,8 @@
                     :align-center="true"
                     :class="'d-flex align-center'"
                     location="end"
-                  /></div
-              ></v-list-item>
-            </v-col>
+                  /></div></v-list-item
+            ></v-col>
           </v-row>
         </v-list>
         <v-card-actions v-if="updateRelay" class="justify-end mx-4 mb-4">
@@ -208,8 +209,10 @@ function copy(id: string) {
   padding: 10px;
 }
 
-.column-style {
-  border-right: 0.1px solid #8a8a8a;
+.row-style {
+  border-bottom: 0.1px solid #8a8a8a;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .custom-button {
