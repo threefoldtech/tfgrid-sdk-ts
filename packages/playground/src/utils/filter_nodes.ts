@@ -92,7 +92,7 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-    tooltip: "Filter by max SSD.",
+    tooltip: "Filter by the maximum total amount of SSD in the node.",
     type: "text",
   },
   totalHru: {
@@ -104,7 +104,7 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-    tooltip: "Filter by max HDD.",
+    tooltip: "Filter by the maximum total amount of HDD in the node.",
     type: "text",
   },
   totalMru: {
@@ -117,7 +117,7 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-    tooltip: "Filter by max RAM.",
+    tooltip: "Filter by the maximum total amount of RAM in the node.",
     type: "text",
   },
   freeSru: {
@@ -129,7 +129,7 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-    tooltip: "Filter by min free SSD.",
+    tooltip: "Filter by the minimum available amount of SSD in the node.",
     type: "text",
   },
   freeHru: {
@@ -141,7 +141,7 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-    tooltip: "Filter by min free HDD.",
+    tooltip: "Filter by the minimum available amount of HDD in the node.",
     type: "text",
   },
   freeMru: {
@@ -154,7 +154,7 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-    tooltip: "Filter by min free RAM.",
+    tooltip: "Filter by the minimum available amount of RAM in the node.",
     type: "text",
   },
 });
@@ -170,7 +170,7 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-    tooltip: "Filter by max Cores.",
+    tooltip: "Filter by the maximum total amount of CPU Cores in the node.",
   },
   total_mru: {
     label: "Max RAM (GB)",
@@ -182,7 +182,7 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-    tooltip: "Filter by max Memory.",
+    tooltip: "Filter by the maximum total amount of RAM in the node.",
   },
   total_sru: {
     label: "Max SSD (GB)",
@@ -194,7 +194,7 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-    tooltip: "Filter by max SSD.",
+    tooltip: "Filter by the maximum total amount of SSD in the node.",
   },
   total_hru: {
     label: "Max HDD (GB)",
@@ -206,7 +206,7 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-    tooltip: "Filter by max HDD.",
+    tooltip: "Filter by the maximum total amount of HDD in the node.",
   },
 
   gpu_device_name: {
