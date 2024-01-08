@@ -8,7 +8,7 @@ import type * as validators from "../utils/validators";
 // Input attrs
 export type InputFilterType = {
   label: string;
-  placeholder: string;
+  tooltip: string;
   value?: string;
   rules?: [syncRules: SyncRule[], asyncRules?: AsyncRule[]];
   error?: string;
@@ -188,7 +188,7 @@ export type Validators = typeof validators;
 
 export type NodeInputFilterType = {
   label: string;
-  placeholder: string;
+  tooltip: string;
   value?: string;
   rules?: [syncRules: SyncRule[], asyncRules?: AsyncRule[]];
   error?: string;
