@@ -212,7 +212,7 @@ const ipv4 = ref<boolean>(false);
 const currentbalance = ref<boolean>(false);
 
 const profileManagerController = useProfileManagerController();
-const freeBalance = computed(() => profileManagerController.balance.value?.free ?? 0);
+const freeBalance = computed(() => +(profileManagerController.balance.value?.free?.toFixed(2) ?? 0));
 
 const valid = ref();
 interface PriceType {
