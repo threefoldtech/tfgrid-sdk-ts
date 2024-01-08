@@ -92,11 +92,7 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-<<<<<<< HEAD
     tooltip: "Filter by the maximum total amount of SSD in the node.",
-=======
-    tooltip: "Filter by max SSD.",
->>>>>>> c341226e (replace placeholders with tooltips and improve the styling)
     type: "text",
   },
   totalHru: {
@@ -108,11 +104,7 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-<<<<<<< HEAD
     tooltip: "Filter by the maximum total amount of HDD in the node.",
-=======
-    tooltip: "Filter by max HDD.",
->>>>>>> c341226e (replace placeholders with tooltips and improve the styling)
     type: "text",
   },
   totalMru: {
@@ -125,11 +117,7 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-<<<<<<< HEAD
     tooltip: "Filter by the maximum total amount of RAM in the node.",
-=======
-    tooltip: "Filter by max RAM.",
->>>>>>> c341226e (replace placeholders with tooltips and improve the styling)
     type: "text",
   },
   freeSru: {
@@ -141,11 +129,7 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-<<<<<<< HEAD
     tooltip: "Filter by the minimum available amount of SSD in the node.",
-=======
-    tooltip: "Filter by min free SSD.",
->>>>>>> c341226e (replace placeholders with tooltips and improve the styling)
     type: "text",
   },
   freeHru: {
@@ -157,11 +141,7 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-<<<<<<< HEAD
     tooltip: "Filter by the minimum available amount of HDD in the node.",
-=======
-    tooltip: "Filter by min free HDD.",
->>>>>>> c341226e (replace placeholders with tooltips and improve the styling)
     type: "text",
   },
   freeMru: {
@@ -174,11 +154,7 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-<<<<<<< HEAD
     tooltip: "Filter by the minimum available amount of RAM in the node.",
-=======
-    tooltip: "Filter by min free RAM.",
->>>>>>> c341226e (replace placeholders with tooltips and improve the styling)
     type: "text",
   },
 });
@@ -194,11 +170,7 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-<<<<<<< HEAD
     tooltip: "Filter by the maximum total amount of CPU Cores in the node.",
-=======
-    tooltip: "Filter by max Cores.",
->>>>>>> c341226e (replace placeholders with tooltips and improve the styling)
   },
   total_mru: {
     label: "Max RAM (GB)",
@@ -210,11 +182,7 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-<<<<<<< HEAD
     tooltip: "Filter by the maximum total amount of RAM in the node.",
-=======
-    tooltip: "Filter by max Memory.",
->>>>>>> c341226e (replace placeholders with tooltips and improve the styling)
   },
   total_sru: {
     label: "Max SSD (GB)",
@@ -226,11 +194,7 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-<<<<<<< HEAD
     tooltip: "Filter by the maximum total amount of SSD in the node.",
-=======
-    tooltip: "Filter by max SSD.",
->>>>>>> c341226e (replace placeholders with tooltips and improve the styling)
   },
   total_hru: {
     label: "Max HDD (GB)",
@@ -242,7 +206,7 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
-    tooltip: "Filter by max HDD.",
+    tooltip: "Filter by the maximum total amount of HDD in the node.",
   },
 
   gpu_device_name: {
