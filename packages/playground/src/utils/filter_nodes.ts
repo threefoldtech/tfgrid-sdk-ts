@@ -50,7 +50,6 @@ export type DedicatedNodeFilters = {
 export const inputsInitializer: () => FilterNodeInputs = () => ({
   nodeId: {
     label: "Node ID",
-    placeholder: "Filter by node id.",
     rules: [
       [
         isNumeric("This field accepts numbers only.", { no_symbols: true }),
@@ -59,11 +58,11 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This is not a valid ID."),
       ],
     ],
+    tooltip: "Filter by node id.",
     type: "text",
   },
   farmIds: {
     label: "Farm ID",
-    placeholder: "Filter by farm id",
     rules: [
       [
         isNumeric("This field accepts numbers only.", { no_symbols: true }),
@@ -72,17 +71,18 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This is not a valid ID."),
       ],
     ],
+    tooltip: "Filter by farm id",
     type: "text",
   },
   farmName: {
     label: "Farm Name",
-    placeholder: "Filter by farm name.",
     type: "text",
+    tooltip: "Filter by farm name.",
   },
   country: {
     label: "Country Full Name",
-    placeholder: "Filter by country.",
     type: "text",
+    tooltip: "Filter by country.",
   },
   region: {
     label: "Region Name",
@@ -90,8 +90,7 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
     type: "text",
   },
   totalSru: {
-    label: "Total SSD (GB)",
-    placeholder: "Filter by total SSD.",
+    label: "Max SSD (GB)",
     rules: [
       [
         isNumeric("This field accepts numbers only."),
@@ -99,11 +98,11 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
+    tooltip: "Filter by the maximum total amount of SSD in the node.",
     type: "text",
   },
   totalHru: {
-    label: "Total HDD (GB)",
-    placeholder: "Filter by total HDD.",
+    label: "Max HDD (GB)",
     rules: [
       [
         isNumeric("This field accepts numbers only."),
@@ -111,11 +110,11 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
+    tooltip: "Filter by the maximum total amount of HDD in the node.",
     type: "text",
   },
   totalMru: {
-    label: "Total RAM (GB)",
-    placeholder: "Filter by total RAM.",
+    label: "Max RAM (GB)",
     value: undefined,
     rules: [
       [
@@ -124,11 +123,11 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
+    tooltip: "Filter by the maximum total amount of RAM in the node.",
     type: "text",
   },
   freeSru: {
     label: "Free SSD (GB)",
-    placeholder: "Filter by free SSD.",
     rules: [
       [
         isNumeric("This field accepts numbers only."),
@@ -136,11 +135,11 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
+    tooltip: "Filter by the minimum available amount of SSD in the node.",
     type: "text",
   },
   freeHru: {
     label: "Free HDD (GB)",
-    placeholder: "Filter by free HDD.",
     rules: [
       [
         isNumeric("This field accepts numbers only."),
@@ -148,11 +147,11 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
+    tooltip: "Filter by the minimum available amount of HDD in the node.",
     type: "text",
   },
   freeMru: {
     label: "Free RAM (GB)",
-    placeholder: "Filter by free RAM.",
     value: undefined,
     rules: [
       [
@@ -161,14 +160,14 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
+    tooltip: "Filter by the minimum available amount of RAM in the node.",
     type: "text",
   },
 });
 
 export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
   total_cru: {
-    label: "Total CPU (Cores)",
-    placeholder: "Filter by total Cores.",
+    label: "Max CPU (Cores)",
     type: "text",
     rules: [
       [
@@ -177,10 +176,10 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
+    tooltip: "Filter by the maximum total amount of CPU Cores in the node.",
   },
   total_mru: {
-    label: "Total RAM (GB)",
-    placeholder: "Filter by total Memory.",
+    label: "Max RAM (GB)",
     type: "text",
     rules: [
       [
@@ -189,10 +188,10 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
+    tooltip: "Filter by the maximum total amount of RAM in the node.",
   },
   total_sru: {
-    label: "Total SSD (GB)",
-    placeholder: "Filter by total SSD.",
+    label: "Max SSD (GB)",
     type: "text",
     rules: [
       [
@@ -201,10 +200,10 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
+    tooltip: "Filter by the maximum total amount of SSD in the node.",
   },
   total_hru: {
-    label: "Total HDD (GB)",
-    placeholder: "Filter by total HDD.",
+    label: "Max HDD (GB)",
     type: "text",
     rules: [
       [
@@ -213,11 +212,11 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
         validateResourceMaxNumber("This value is out of range."),
       ],
     ],
+    tooltip: "Filter by the maximum total amount of HDD in the node.",
   },
 
   gpu_device_name: {
     label: "GPU's device name",
-    placeholder: "Filter by GPU's device name.",
     rules: [
       [
         (value: string) => {
@@ -228,11 +227,11 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
         },
       ],
     ],
+    tooltip: "Filter by GPU's device name.",
     type: "text",
   },
   gpu_vendor_name: {
     label: "GPU's vendor name",
-    placeholder: "Filter by GPU's vendor name.",
     type: "text",
     rules: [
       [
@@ -244,5 +243,6 @@ export const DedicatedNodeInitializer: () => DedicatedNodeFilters = () => ({
         },
       ],
     ],
+    tooltip: "Filter by GPU's vendor name.",
   },
 });
