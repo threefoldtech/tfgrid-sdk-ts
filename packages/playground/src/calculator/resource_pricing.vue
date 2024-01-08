@@ -121,7 +121,6 @@
                 v-bind="props"
                 v-model.number="balance"
                 ref="valid"
-                :loading="loadingBalance"
               />
             </input-tooltip>
           </input-validator>
@@ -193,6 +192,7 @@ import { capitalize, computed, watch } from "vue";
 import { onMounted } from "vue";
 import { ref } from "vue";
 
+import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
 import { useProfileManager } from "@/stores/profile_manager";
 import { getGrid, loadBalance } from "@/utils/grid";
 
@@ -206,11 +206,13 @@ const SRU = ref<number>(25);
 const HRU = ref<number>(100);
 const balance = ref<number>(0);
 const TFTPrice = ref<number>(0);
-const loadingBalance = ref<boolean>(false);
 
 const isCertified = ref<boolean>(false);
 const ipv4 = ref<boolean>(false);
 const currentbalance = ref<boolean>(false);
+
+const profileManagerController = useProfileManagerController();
+const freeBalance = computed(() => profileManagerController.balance.value?.free ?? 0);
 
 const valid = ref();
 interface PriceType {
@@ -239,11 +241,7 @@ watch(
     let pkgs: any;
     if (!valid.value.error) {
       if (currentbalance.value && hasActiveProfile.value && gridStore.grid) {
-        loadingBalance.value = true;
-        const profile = profileManager.profile!;
-        const grid = await getGrid(profile);
-        balance.value = (await loadBalance(grid!)).free;
-        loadingBalance.value = false;
+        balance.value = freeBalance.value;
       }
       pkgs = await calculator.value?.calculate({
         cru: CRU.value,
@@ -252,7 +250,7 @@ watch(
         sru: SRU.value,
         ipv4u: ipv4.value,
         certified: isCertified.value,
-        balance: balance.value || 0,
+        balance: balance.value,
       });
       setPriceList(pkgs);
     }
@@ -270,15 +268,23 @@ watch(
   hasActiveProfile,
   async newVal => {
     if (newVal) {
-      loadingBalance.value = true;
       currentbalance.value = true;
-      const profile = profileManager.profile!;
-      const grid = await getGrid(profile);
-      balance.value = (await loadBalance(grid!)).free || 0;
-      loadingBalance.value = false;
+      balance.value = freeBalance.value;
     } else {
       balance.value = 0;
       currentbalance.value = false;
+    }
+  },
+  { immediate: true },
+);
+
+watch(
+  freeBalance,
+  newVal => {
+    if (newVal && currentbalance) {
+      balance.value = freeBalance.value;
+    } else {
+      balance.value = 0;
     }
   },
   { immediate: true },
@@ -310,6 +316,7 @@ async function setPriceList(pkgs: any): Promise<PriceType[]> {
 }
 
 onMounted(async () => {
+  balance.value = freeBalance.value;
   const pkgs = await calculator.value.calculate({
     cru: CRU.value,
     mru: MRU.value,
