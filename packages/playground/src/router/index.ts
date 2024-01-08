@@ -14,7 +14,10 @@ export interface RouteMeta {
   title: string;
   info?: InfoMeta;
 }
-
+export function isAuthorized(route: string) {
+  const items = ["dashboard", "solutions", "sshkey", "vms", "orchestrators"];
+  return !items.some(substr => route.startsWith(`/${substr}`));
+}
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [

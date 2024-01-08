@@ -200,6 +200,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
+import { isAuthorized } from "./router";
 import { useProfileManager } from "./stores/profile_manager";
 
 const $route = useRoute();
@@ -371,11 +372,6 @@ function clickHandler({ route, url }: AppRouteItem): void {
   } else if (url) {
     window.open(url, "_blank");
   }
-}
-
-function isAuthorized(route: string) {
-  const items = ["dashboard", "solutions", "sshkey", "stats", "nodes"];
-  return !items.some(substr => route.startsWith(`/${substr}`));
 }
 </script>
 

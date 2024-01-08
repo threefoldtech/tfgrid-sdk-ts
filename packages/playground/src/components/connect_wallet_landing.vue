@@ -40,7 +40,7 @@
               class="px-3 py-3 box"
               @click="
                 () => {
-                  if (profileManager.profile) {
+                  if (isAuthorized(card.path)) {
                     $router.push(card.path);
                   }
                 }
@@ -85,6 +85,7 @@ import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
+import { isAuthorized } from "../router";
 import { useProfileManager } from "../stores";
 export default {
   name: "ConnectWalletLanding",
@@ -101,31 +102,31 @@ export default {
         title: "My Profile",
         icon: "mdi-account",
         text: "Your Profile includes your twin ID on the TFChain along with the account address and relay used. Click to view your profile details.",
-        path: "/dashboard/twin",
+        path: "dashboard/twin",
       },
       {
         title: "Deploy Virtual Machines",
         icon: "mdi-television",
         text: "Deploy Full or Micro Virtual Machines from available images or custom ones on the Threefold Grid.",
-        path: "/vms",
+        path: "vms",
       },
       {
         title: "Deploy Orchestrators",
         icon: "mdi-group",
         text: "Deploy Kubernetes clusters out of the box or Caprover app/database deployment & web server manager on the Threefold Grid.",
-        path: "/orchestrators",
+        path: "orchestrators",
       },
       {
         title: "Explore Grid Capacity",
         icon: "mdi-chart-scatter-plot",
         text: "View the CPU, SSD, RAM, HDD, GPU, Public IPs, Gateways capacity and more on the Threefold Grid.",
-        path: "/stats",
+        path: "stats",
       },
       {
         title: "Explore Grid Nodes",
         icon: "mdi-access-point",
         text: "Find nodes that fit your CPU, GPU, SSD, HDD and RAM capacity needs on the Threefold Grid.",
-        path: "/nodes",
+        path: "nodes",
       },
     ];
     return {
@@ -133,6 +134,7 @@ export default {
       pageTitle,
       cards,
       profileManager,
+      isAuthorized,
 
       stats: [
         {
