@@ -200,7 +200,7 @@ const resetFilters = async (filtersInputValues: DedicatedNodeFilters) => {
 };
 
 watch(
-  [activeTab, filterOptions],
+  [activeTab],
   async () => {
     if (!filtering.value) {
       await _loadData();

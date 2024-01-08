@@ -15,7 +15,7 @@
       @reset="resetFilters"
     >
       <template #options>
-        <v-col cols="12" sm="12" md="12" lg="2" class="ml-2">
+        <v-col cols="12" sm="4" md="2" class="ml-2 mr-4">
           <v-select
             class="p-4"
             v-model="filterOptions.status"
@@ -27,7 +27,7 @@
             clearable
           ></v-select>
         </v-col>
-        <v-col cols="12" sm="12" md="6" lg="2" class="ml-8">
+        <v-col cols="12" sm="12" md="8" lg="2">
           <input-tooltip inline tooltip="Enable filtering the nodes that have Gateway supported only.">
             <v-switch
               color="primary"
@@ -90,7 +90,7 @@
 <script lang="ts">
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
-import { capitalize, computed, onMounted, ref, watch } from "vue";
+import { capitalize, computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 import NodeDetails from "@/components/node_details.vue";
@@ -161,10 +161,10 @@ export default {
       }
       filtering.value = false;
     };
+
     const resetFilters = async (filtersInputValues: FilterInputs) => {
       filtering.value = true;
       filterInputs.value = filtersInputValues;
-
       filterOptions.value = optionsInitializer(undefined, undefined, undefined);
 
       if (isValidForm.value) {
@@ -178,15 +178,6 @@ export default {
       await _requestNodes(queries, { loadFarm: true });
     };
 
-    watch(
-      filterOptions,
-      async () => {
-        if (!filtering.value) {
-          await updateNodes();
-        }
-      },
-      { deep: true },
-    );
     const checkSelectedNode = async () => {
       if (route.query.nodeId) {
         selectedNodeId.value = +route.query.nodeId;

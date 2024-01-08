@@ -141,7 +141,8 @@ watch(
   (newValue: FilterOptions) => {
     if (newValue.gateway || newValue.gpu || newValue.status) {
       // We don't need to enable the clear button when changing the page or the size.
-      filterTouched.value = true;
+      const hasValue = !!newValue.gateway || !!newValue.gpu || !!newValue.status?.length;
+      filterTouched.value = hasValue;
     }
   },
   { deep: true },
