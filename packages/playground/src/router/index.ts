@@ -22,6 +22,7 @@ const router = createRouter({
   history: createWebHashHistory(),
   routes: [
     { path: "/", component: () => import("../components/connect_wallet_landing.vue") },
+    { path: "/overview", component: () => import("../components/logged_in_landing.vue") },
     {
       path: "/dashboard",
       children: [

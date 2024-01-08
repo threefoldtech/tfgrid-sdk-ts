@@ -219,9 +219,11 @@ watch(profileManager, () => {
   {
     if (profileManager.profile) {
       openProfile.value = false;
+      $router.push("/overview");
     }
   }
 });
+
 watch(
   () => $route.meta,
   meta => {

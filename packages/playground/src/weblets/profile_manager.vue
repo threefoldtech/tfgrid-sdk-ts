@@ -308,6 +308,7 @@ import { computed, onMounted, type Ref, ref, watch } from "vue";
 import { nextTick } from "vue";
 import { useTheme } from "vuetify";
 
+import router from "@/router";
 import { AppThemeSelection } from "@/utils/app_theme";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
@@ -491,6 +492,9 @@ watch(
 function logout() {
   sessionStorage.removeItem("password");
   profileManager.clear();
+  if (router.currentRoute.value.path.includes("/overview")) {
+    router.push("/");
+  }
 }
 
 const activating = ref(false);
