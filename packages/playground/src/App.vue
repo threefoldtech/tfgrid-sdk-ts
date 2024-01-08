@@ -234,13 +234,6 @@ onMounted(window.$$appLoader || noop);
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
 
-function navigateToPrevRoute(path: any) {
-  const firstItem = path[0];
-  if (firstItem && firstItem.to) {
-    $router.push(firstItem.to);
-  }
-}
-
 const routes: AppRoute[] = [
   {
     title: "TFGrid",
@@ -384,15 +377,6 @@ function isAuthorized(route: string) {
   const items = ["dashboard", "solutions", "sshkey"];
   return !items.some(substr => route.startsWith(`/${substr}`));
 }
-
-$router.beforeEach((to, from, next) => {
-  if (to.path === "/" && hasActiveProfile) {
-    next({ path: "dashboard/twin" });
-  } else {
-    next();
-  }
-  window.scrollTo(0, 0);
-});
 </script>
 
 <script lang="ts">

@@ -18,6 +18,7 @@ export interface RouteMeta {
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
+    { path: "/", component: () => import("../components/connect_wallet_landing.vue") },
     {
       path: "/dashboard",
       children: [
