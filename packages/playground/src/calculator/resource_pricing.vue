@@ -295,7 +295,7 @@ onMounted(async () => {
 });
 
 function openManual() {
-  window.open("https://manual.grid.tf/cloud/cloudunits_pricing.html", "_blank");
+  window.open("https://manual.grid.tf/wiki/cloudunits/pricing/pricing.html#cloud-unit-pricing", "_blank");
 }
 </script>
 
