@@ -37,46 +37,55 @@
         <v-list class="custom-list">
           <v-row>
             <v-col cols="1" sm="2" class="column-style my-4" style="min-width: fit-content">
-              <input-tooltip
-                tooltip="Your unique identifier for your twin on the ThreeFold chain."
-                :align-center="true"
-                :class="'d-flex align-center'"
-                location="right center"
-              >
-                <v-list-item class="mr-auto"> ID </v-list-item>
-              </input-tooltip>
+              <v-list-item class="mr-auto"> ID </v-list-item>
+
               <v-divider></v-divider>
-              <input-tooltip
-                tooltip="Your public address on the ThreeFold chain."
-                :align-center="true"
-                :class="'d-flex align-center'"
-                location="right center"
-              >
-                <v-list-item class="mr-auto"> Address </v-list-item>
-              </input-tooltip>
+
+              <v-list-item class="mr-auto"> Address </v-list-item>
+
               <v-divider></v-divider>
-              <input-tooltip
-                tooltip="A relay is a component that facilitates the reliable and secure transfer of messages between different entities within the ThreeFold ecosystem."
-                :align-center="true"
-                :class="'d-flex align-center'"
-                location="bottom end"
-              >
-                <v-list-item class="mr-auto"> Relay </v-list-item>
-              </input-tooltip>
+
+              <v-list-item class="mr-auto"> Relay </v-list-item>
             </v-col>
             <v-col class="my-4">
-              <v-list-item> {{ profileManager.profile?.twinId.toString() }} </v-list-item>
+              <v-list-item>
+                <div style="display: flex; justify-content: space-between; align-items: center">
+                  {{ profileManager.profile?.twinId.toString() }}
+                  <input-tooltip
+                    tooltip="Your unique identifier for your twin on the ThreeFold chain."
+                    :align-center="true"
+                    :class="'d-flex align-center'"
+                    location="right center"
+                  />
+                </div>
+              </v-list-item>
               <v-divider></v-divider>
               <v-list-item>
                 <div style="display: flex; justify-content: space-between; align-items: center">
                   <div class="pr-2" style="overflow: hidden; word-wrap: normal">
-                    <span>{{ profileManager.profile?.address }}</span>
+                    <span class="mr-2">{{ profileManager.profile?.address }}</span>
+                    <v-icon @click="copy(profileManager.profile?.address as string)"> mdi-content-copy </v-icon>
                   </div>
-                  <v-icon @click="copy(profileManager.profile?.address as string)"> mdi-content-copy </v-icon>
+
+                  <input-tooltip
+                    tooltip="Your public address on the ThreeFold chain."
+                    :align-center="true"
+                    :class="'d-flex align-center'"
+                    location="right center"
+                  />
                 </div>
               </v-list-item>
               <v-divider></v-divider>
-              <v-list-item> {{ profileManager.profile?.relay }} </v-list-item>
+              <v-list-item>
+                <div style="display: flex; justify-content: space-between; align-items: center">
+                  {{ profileManager.profile?.relay }}
+                  <input-tooltip
+                    tooltip="A relay is a component that facilitates the reliable and secure transfer of messages between different entities within the ThreeFold ecosystem."
+                    :align-center="true"
+                    :class="'d-flex align-center'"
+                    location="end"
+                  /></div
+              ></v-list-item>
             </v-col>
           </v-row>
         </v-list>
