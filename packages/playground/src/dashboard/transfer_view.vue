@@ -148,7 +148,6 @@ const receptTwinFromTwinID = ref<Twin>();
 const balance = profileManagerController.balance;
 const freeBalance = computed(() => balance.value?.free ?? 0);
 
-
 watch(freeBalance, async () => {
   if (transferAmount.value) {
     await amountRef.value?.reset();
