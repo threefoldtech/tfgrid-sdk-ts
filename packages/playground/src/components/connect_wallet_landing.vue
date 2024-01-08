@@ -35,7 +35,7 @@
       </v-col>
       <v-col lg="6" md="12" class="d-flex flex-wrap">
         <v-row>
-          <v-col :lg="idx == 0 ? 12 : 6" :md="12" v-for="(card, idx) in cards" :key="card.path">
+          <v-col :lg="6" :md="12" v-for="card in cards" :key="card.path">
             <v-card
               class="px-3 py-3 box"
               @click="

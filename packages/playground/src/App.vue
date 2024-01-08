@@ -374,7 +374,7 @@ function clickHandler({ route, url }: AppRouteItem): void {
 }
 
 function isAuthorized(route: string) {
-  const items = ["dashboard", "solutions", "sshkey"];
+  const items = ["dashboard", "solutions", "sshkey", "stats", "nodes"];
   return !items.some(substr => route.startsWith(`/${substr}`));
 }
 </script>
