@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-col lg="6" md="12" class="box">
+      <v-col lg="6" md="12" class="box mt-3">
         <div>
           <div class="d-flex justify-center mb-5">
             <h4 class="text-center text-h4">Live and Operational</h4>
@@ -55,7 +55,7 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-card class="mt-3 py-3 box mx-3">
+          <v-card class="mt-3 py-2 box mx-3">
             <div class="text-center">
               <v-card-title> The <strong>Layer Zero</strong> for a Decentralized World </v-card-title>
               <p class="w-75 mx-auto">
