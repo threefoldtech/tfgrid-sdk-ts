@@ -9,7 +9,7 @@
         </template>
       </v-expansion-panel-title>
       <v-expansion-panel-text>
-        <v-form>
+        <v-form class="mt-5">
           <v-row justify="center" justify-md="start" no-gutters>
             <form-validator
               v-model="isValidForm"
@@ -40,15 +40,15 @@
                     :placeholder="$props.modelValue[key].placeholder"
                     :type="$props.modelValue[key].type"
                     :disabled="loading"
+                    variant="outlined"
                     @update:model-value="checkInput"
                   ></v-text-field>
                 </input-validator>
               </v-col>
+              <!-- Options slot can be any other filter option, like GPU option, Gateway option, Node Status select -->
+              <slot name="options"></slot>
             </form-validator>
           </v-row>
-
-          <!-- Options slot can be any other filter option, like GPU option, Gateway option, Node Status select -->
-          <slot name="options"></slot>
 
           <v-row>
             <v-col class="d-flex justify-end align-center mb-6">

@@ -16,17 +16,19 @@
           :options="filterOptions"
         >
           <template #options>
-            <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
-              <v-switch
-                color="primary"
-                inset
-                label="GPU Node (Only)"
-                v-model="filterOptions.gpu"
-                @update:model-value="updateGpu"
-                hide-details
-                :disabled="isFormLoading"
-              />
-            </input-tooltip>
+            <v-col cols="12" sm="12" md="6" lg="2" class="ml-8">
+              <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
+                <v-switch
+                  color="primary"
+                  inset
+                  label="GPU Node (Only)"
+                  v-model="filterOptions.gpu"
+                  @update:model-value="updateGpu"
+                  hide-details
+                  :disabled="isFormLoading"
+                />
+              </input-tooltip>
+            </v-col>
           </template>
         </filters>
       </div>

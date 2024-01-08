@@ -15,46 +15,42 @@
       @reset="resetFilters"
     >
       <template #options>
-        <div class="table-filters">
-          <v-row>
-            <v-col cols="12" sm="12" md="6" lg="2">
-              <input-tooltip inline tooltip="Enable filtering the nodes that have Gateway supported only.">
-                <v-switch
-                  color="primary"
-                  inset
-                  label="Gateways (Only)"
-                  v-model="filterOptions.gateway"
-                  hide-details
-                  :disabled="isFormLoading"
-                />
-              </input-tooltip>
-            </v-col>
-            <v-col cols="12" sm="12" md="6" lg="2">
-              <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
-                <v-switch
-                  color="primary"
-                  inset
-                  label="GPU Node (Only)"
-                  v-model="filterOptions.gpu"
-                  hide-details
-                  :disabled="isFormLoading"
-                />
-              </input-tooltip>
-            </v-col>
-            <v-col cols="12" sm="12" md="12" lg="3">
-              <v-select
-                class="p-4"
-                v-model="filterOptions.status"
-                :items="nodeStatusOptions"
-                label="Select Nodes Status"
-                variant="underlined"
-                :disabled="isFormLoading"
-                open-on-clear
-                clearable
-              ></v-select>
-            </v-col>
-          </v-row>
-        </div>
+        <v-col cols="12" sm="12" md="12" lg="2" class="ml-2">
+          <v-select
+            class="p-4"
+            v-model="filterOptions.status"
+            :items="nodeStatusOptions"
+            label="Select Nodes Status"
+            variant="outlined"
+            :disabled="isFormLoading"
+            open-on-clear
+            clearable
+          ></v-select>
+        </v-col>
+        <v-col cols="12" sm="12" md="6" lg="2" class="ml-8">
+          <input-tooltip inline tooltip="Enable filtering the nodes that have Gateway supported only.">
+            <v-switch
+              color="primary"
+              inset
+              label="Gateways (Only)"
+              v-model="filterOptions.gateway"
+              hide-details
+              :disabled="isFormLoading"
+            />
+          </input-tooltip>
+        </v-col>
+        <v-col cols="12" sm="12" md="6" lg="2">
+          <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
+            <v-switch
+              color="primary"
+              inset
+              label="GPU Node (Only)"
+              v-model="filterOptions.gpu"
+              hide-details
+              :disabled="isFormLoading"
+            />
+          </input-tooltip>
+        </v-col>
       </template>
     </filters>
 
