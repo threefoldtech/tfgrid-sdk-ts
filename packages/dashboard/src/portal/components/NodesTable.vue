@@ -52,7 +52,7 @@
                 </li>
                 <li>
                   You're receiving {{ item.applyedDiscount.second }}% discount as per the
-                  <a target="_blank" href="https://manual.grid.tf/cloud/cloudunits_pricing.html#discount-levels">
+                  <a target="_blank" href="https://manual.grid.tf/wiki/cloudunits/pricing/pricing.html#staking-discount">
                     <p style="color: blue; display: inline">discount levels</p>
                   </a>
                 </li>

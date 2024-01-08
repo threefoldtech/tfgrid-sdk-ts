@@ -79,6 +79,24 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: "/vms",
+      component: () => import("../views/vms_view.vue"),
+      meta: { title: "Virtual Machines" },
+      children: [],
+    },
+    {
+      path: "/sshkey",
+      component: () => import("../views/sshkey_view.vue"),
+      meta: { title: "SSHKey" },
+      children: [],
+    },
+    {
+      path: "/orchestrators",
+      component: () => import("../views/orchestrators_view.vue"),
+      meta: { title: "Orchestrators" },
+      children: [],
+    },
 
     {
       path: "/solutions",
