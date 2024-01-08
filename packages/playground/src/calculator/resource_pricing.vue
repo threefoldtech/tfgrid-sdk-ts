@@ -239,7 +239,7 @@ watch(
   [CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance, hasActiveProfile],
   async () => {
     let pkgs: any;
-    if (!valid.value.error) {
+    if (!valid.value?.error) {
       if (currentbalance.value && hasActiveProfile.value && gridStore.grid) {
         balance.value = freeBalance.value;
       }
