@@ -232,6 +232,7 @@ async function submitFormTwinID() {
     if (twinDetails != null) {
       loadingTwinIDTransfer.value = true;
       await transfer(twinDetails);
+      loadingTwinIDTransfer.value = false;
     } else {
       createInvalidTransferToast("twin ID doesn't exist");
     }
