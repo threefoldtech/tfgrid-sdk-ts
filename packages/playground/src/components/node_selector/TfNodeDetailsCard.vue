@@ -38,7 +38,10 @@
 
     <template #title>
       Node ID({{ node?.nodeId }})
-      <VTooltip text="Node Serial Number" v-if="node">
+      <VTooltip
+        text="Node Serial Number"
+        v-if="node && node.serialNumber && node.serialNumber.toLowerCase() !== 'default string'"
+      >
         <template #activator="{ props }">
           <VChip size="x-small" v-bind="props">
             <span class="font-weight-bold" v-text="node.serialNumber" />
