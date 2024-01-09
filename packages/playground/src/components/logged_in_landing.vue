@@ -4,7 +4,7 @@
       <v-col lg="6" md="12" class="box mt-3">
         <div>
           <div class="d-flex justify-center mb-5">
-            <h4 class="text-center text-h4">Live and Operational</h4>
+            <h4 class="header">Live and Operational</h4>
           </div>
           <div
             :style="{
@@ -20,13 +20,13 @@
               <v-card class="my-10">
                 <v-img
                   cover
-                  width="150"
+                  width="100"
                   class="mx-auto"
                   :src="baseUrl + 'images/icons/live-and-operational/' + s.image"
                 />
                 <v-card-text>
-                  <p class="text-center font-weight-regular text-h5">{{ s.value }}</p>
-                  <p class="text-center font-weight-light text-h6">{{ s.label }}</p>
+                  <p class="text-center header font-weight-regular">{{ s.value }}</p>
+                  <p class="text-center font-weight-light sub-header">{{ s.label }}</p>
                 </v-card-text>
               </v-card>
             </div>
@@ -178,6 +178,12 @@ export default {
 }
 .statcards {
   margin-top: 50rem;
+}
+.header {
+  font-size: 1.25rem;
+}
+.sub-header {
+  font-size: 1rem;
 }
 .box {
   border: 1px solid #8a8a8a;
