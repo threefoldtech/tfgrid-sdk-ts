@@ -1,6 +1,6 @@
 <template>
-  <ConnectWalletLanding v-if="profileManager.profile" />
-  <LoggedInLanding v-else />
+  <LoggedInLanding v-if="profileManager.profile" />
+  <ConnectWalletLanding v-else />
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
