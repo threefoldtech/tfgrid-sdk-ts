@@ -116,6 +116,7 @@
                   : baseUrl + 'images/logoTF_light.png'
               }`"
               width="160px"
+              @click="navigateToHome"
             />
           </v-toolbar-title>
 
@@ -378,9 +379,13 @@ function isAuthorized(route: string) {
   return !items.some(substr => route.startsWith(`/${substr}`));
 }
 
+function navigateToHome() {
+  return $router.push("/");
+}
+
 $router.beforeEach((to, from, next) => {
   if (to.path === "/" && hasActiveProfile) {
-    next({ path: "dashboard/twin" });
+    next({ path: "/dashboard/twin" });
   } else {
     next();
   }
