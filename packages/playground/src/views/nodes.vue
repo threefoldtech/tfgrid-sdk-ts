@@ -14,8 +14,8 @@
       @update:model-value="applyFilters"
       @reset="resetFilters"
     >
-      <template #options>
-        <v-col cols="12" sm="4" md="2" class="ml-2 mr-4">
+      <template #options="{ props }">
+        <v-col v-bind="props">
           <v-select
             class="p-4"
             v-model="filterOptions.status"
@@ -27,7 +27,7 @@
             clearable
           ></v-select>
         </v-col>
-        <v-col cols="12" sm="12" md="8" lg="2">
+        <v-col v-bind="props">
           <input-tooltip inline tooltip="Enable filtering the nodes that have Gateway supported only.">
             <v-switch
               color="primary"
@@ -39,7 +39,7 @@
             />
           </input-tooltip>
         </v-col>
-        <v-col cols="12" sm="12" md="6" lg="2">
+        <v-col v-bind="{ ...props, class: `${props.class} py-0` }">
           <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
             <v-switch
               color="primary"

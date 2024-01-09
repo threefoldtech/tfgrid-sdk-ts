@@ -9,23 +9,15 @@
         </template>
       </v-expansion-panel-title>
       <v-expansion-panel-text>
-        <v-form class="mt-5">
-          <v-row justify="center" justify-md="start" no-gutters>
-            <form-validator
-              v-model="isValidForm"
-              valid-on-init
-              ref="formRef"
-              @update:model-value="$emit('update:valid', $event)"
-            >
-              <v-col
-                cols="12"
-                sm="5"
-                md="4"
-                lg="2"
-                class="justify-end align-center ml-8 mr-8 mb-5"
-                v-for="key in Object.keys($props.modelValue)"
-                :key="key"
-              >
+        <form-validator
+          v-model="isValidForm"
+          valid-on-init
+          ref="formRef"
+          @update:model-value="$emit('update:valid', $event)"
+        >
+          <VContainer fluid>
+            <VRow no-gutters>
+              <VCol v-for="key in Object.keys($props.modelValue)" :key="key" v-bind="fitlerColProps">
                 <input-validator
                   v-if="$props.modelValue[key].label"
                   :rules="$props.modelValue[key].value ? $props.modelValue[key].rules?.[0] ?? [] : []"
@@ -34,46 +26,50 @@
                   #="{ props }"
                   ref="inputRef"
                 >
-                  <input-tooltip :tooltip="$props.modelValue[key].tooltip">
-                    <v-responsive min-width="170">
-                      <v-text-field
-                        v-bind="props"
-                        v-model="$props.modelValue[key].value"
-                        :label="$props.modelValue[key].label"
-                        :type="$props.modelValue[key].type"
-                        :disabled="loading"
-                        @update:model-value="checkInput"
-                      ></v-text-field>
-                    </v-responsive>
-                  </input-tooltip>
+                  <v-text-field
+                    v-bind="props"
+                    variant="outlined"
+                    v-model="$props.modelValue[key].value"
+                    :label="$props.modelValue[key].label"
+                    :type="$props.modelValue[key].type"
+                    :disabled="loading"
+                    @update:model-value="checkInput"
+                  >
+                    <template #append-inner>
+                      <VTooltip :text="$props.modelValue[key].tooltip">
+                        <template #activator="{ props }">
+                          <VIcon icon="mdi-information-outline" v-bind="props" />
+                        </template>
+                      </VTooltip>
+                    </template>
+                  </v-text-field>
                 </input-validator>
-              </v-col>
-              <!-- Options slot can be any other filter option, like GPU option, Gateway option, Node Status select -->
-              <slot name="options"></slot>
-            </form-validator>
-          </v-row>
+              </VCol>
+              <slot name="options" :props="fitlerColProps"></slot>
+            </VRow>
+          </VContainer>
+        </form-validator>
 
-          <v-row>
-            <v-col class="d-flex justify-end align-center mb-6">
-              <v-btn
-                class="mr-4"
-                :disabled="!isValidForm || loading || !filterTouched"
-                @click="resetFilters"
-                variant="outlined"
-                color="anchor"
-                >Clear</v-btn
-              >
-              <v-btn
-                :disabled="!isValidForm || !filterTouched"
-                :loading="loading"
-                @click="applyFilters"
-                variant="outlined"
-                color="secondary"
-                >Apply</v-btn
-              >
-            </v-col>
-          </v-row>
-        </v-form>
+        <VContainer fluid>
+          <VRow justify="end">
+            <v-btn
+              :disabled="!isValidForm || loading || !filterTouched"
+              @click="resetFilters"
+              variant="outlined"
+              color="anchor"
+              text="Clear"
+            />
+            <v-btn
+              class="ml-4 mr-7"
+              :disabled="!isValidForm || !filterTouched"
+              :loading="loading"
+              @click="applyFilters"
+              variant="outlined"
+              color="secondary"
+              text="Apply"
+            />
+          </VRow>
+        </VContainer>
       </v-expansion-panel-text>
     </v-expansion-panel>
   </v-expansion-panels>
@@ -150,6 +146,8 @@ watch(
   },
   { deep: true },
 );
+
+const fitlerColProps = { class: "py-2 px-4", cols: 12, md: 6, lg: 3 };
 </script>
 
 <script lang="ts">

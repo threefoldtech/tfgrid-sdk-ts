@@ -15,8 +15,8 @@
           @reset="resetFilters"
           :options="filterOptions"
         >
-          <template #options>
-            <v-col cols="12" sm="12" md="6" lg="2" class="ml-8">
+          <template #options="{ props }">
+            <v-col v-bind="props">
               <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
                 <v-switch
                   color="primary"
