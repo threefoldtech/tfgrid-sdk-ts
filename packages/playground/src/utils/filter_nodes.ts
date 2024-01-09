@@ -86,7 +86,7 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
   },
   region: {
     label: "Region Name",
-    placeholder: "Filter by region.",
+    tooltip: "Filter by region.",
     type: "text",
   },
   totalSru: {
