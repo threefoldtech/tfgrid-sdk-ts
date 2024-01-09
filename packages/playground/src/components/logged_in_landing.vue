@@ -41,6 +41,7 @@
                 <v-card
                   class="px-3 py-3 border"
                   v-bind="props"
+                  :height="'165px'"
                   :class="isHovering ? 'card-opacity' : undefined"
                   @click="
                     () => {
