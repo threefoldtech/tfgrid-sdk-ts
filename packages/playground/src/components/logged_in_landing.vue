@@ -42,13 +42,7 @@
                   class="px-3 py-3 border"
                   v-bind="props"
                   :class="isHovering ? 'card-opacity' : undefined"
-                  @click="
-                    () => {
-                      if (isAuthorized(card.path)) {
-                        $router.push(card.path);
-                      }
-                    }
-                  "
+                  @click="$router.push(card.path)"
                 >
                   <v-card-title class="d-flex align-items-baseline"
                     ><v-icon class="mr-3">{{ card.icon }}</v-icon
@@ -91,7 +85,6 @@ import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
-import { isAuthorized } from "../router";
 import { useProfileManager } from "../stores";
 export default {
   name: "LoggedInLanding",
@@ -146,7 +139,6 @@ export default {
       pageTitle,
       cards,
       profileManager,
-      isAuthorized,
 
       stats: [
         {

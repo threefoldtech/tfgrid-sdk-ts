@@ -175,16 +175,7 @@
               </div>
             </div>
 
-            <div :style="{ position: 'relative' }">
-              <router-view v-slot="{ Component }">
-                <transition name="fade">
-                  <div :key="$route.path">
-                    <component :is="Component" v-if="isAuthorized($route.path)"></component>
-                    <component :is="Component" v-else-if="hasActiveProfile && hasGrid"></component>
-                  </div>
-                </transition>
-              </router-view>
-            </div>
+            <TfRouterView :isAuth="hasActiveProfile && hasGrid" />
           </v-container>
         </DeploymentListManager>
         <TFNotification v-if="hasActiveProfile && hasGrid" />
@@ -199,7 +190,6 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
-import { isAuthorized } from "./router";
 import { useProfileManager } from "./stores/profile_manager";
 
 const $route = useRoute();
@@ -378,17 +368,15 @@ function clickHandler({ route, url }: AppRouteItem): void {
 <script lang="ts">
 import { AppThemeSelection } from "@/utils/app_theme";
 
-import AppInfo from "./components/app_info.vue";
 import AppTheme from "./components/app_theme.vue";
-import ConnectWalletLanding from "./components/connect_wallet_landing.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
 import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
 import FundsCard from "./components/funds_card.vue";
-import LoggedInLanding from "./components/logged_in_landing.vue";
 import ProfileManagerController from "./components/profile_manager_controller.vue";
 import TFNotification from "./components/tf_notification.vue";
 import TfNavigationLoader from "./components/TfNavigationLoader.vue";
 import TfOfflineNotifier from "./components/TfOfflineNotifier.vue";
+import TfRouterView from "./components/TfRouterView.vue";
 import TfSwapPrice from "./components/TfSwapPrice.vue";
 import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
@@ -411,14 +399,12 @@ interface AppRouteItem {
 export default {
   name: "App",
   components: {
-    LoggedInLanding,
     TFNotification,
     DisclaimerToolbar,
     ProfileManager,
     DeploymentListManager,
     AppTheme,
-    ConnectWalletLanding,
-    AppInfo,
+    TfRouterView,
     TfSwapPrice,
     FundsCard,
     ProfileManagerController,
