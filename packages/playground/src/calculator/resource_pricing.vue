@@ -192,7 +192,9 @@ import { capitalize, computed, watch } from "vue";
 import { onMounted } from "vue";
 import { ref } from "vue";
 
+import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
 import { useProfileManager } from "@/stores/profile_manager";
+import { getGrid, loadBalance } from "@/utils/grid";
 
 import { calculator as Calculator } from "../../../grid_client/dist/es6";
 import { useGrid } from "../stores";
@@ -208,6 +210,9 @@ const TFTPrice = ref<number>(0);
 const isCertified = ref<boolean>(false);
 const ipv4 = ref<boolean>(false);
 const currentbalance = ref<boolean>(false);
+
+const profileManagerController = useProfileManagerController();
+const freeBalance = computed(() => +(profileManagerController.balance.value?.free?.toFixed(2) ?? 0));
 
 const valid = ref();
 interface PriceType {
@@ -230,31 +235,60 @@ const calculator = computed(() => {
     ? gridStore.grid?.calculator
     : new Calculator(new QueryClient(window.env.SUBSTRATE_URL));
 });
-watch([CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance, hasActiveProfile], async () => {
-  let pkgs: any;
-  if (!valid.value.error) {
-    if (currentbalance.value && hasActiveProfile.value && gridStore.grid) {
-      const accountBalance = await gridStore.grid?.balance.getMyBalance();
-      balance.value = accountBalance?.free;
+watch(
+  [CRU, MRU, SRU, HRU, balance, isCertified, ipv4, currentbalance, hasActiveProfile],
+  async () => {
+    let pkgs: any;
+    if (!valid.value?.error) {
+      if (currentbalance.value && hasActiveProfile.value && gridStore.grid) {
+        balance.value = freeBalance.value;
+      }
+      pkgs = await calculator.value?.calculate({
+        cru: CRU.value,
+        mru: MRU.value,
+        hru: HRU.value,
+        sru: SRU.value,
+        ipv4u: ipv4.value,
+        certified: isCertified.value,
+        balance: balance.value,
+      });
+      setPriceList(pkgs);
     }
-    pkgs = await calculator.value?.calculate({
-      cru: CRU.value,
-      mru: MRU.value,
-      hru: HRU.value,
-      sru: SRU.value,
-      ipv4u: ipv4.value,
-      certified: isCertified.value,
-      balance: balance.value || 0,
-    });
-    setPriceList(pkgs);
-  }
-});
+  },
+  { immediate: true },
+);
 
 watch(currentbalance, (newCurrentBalance, oldCurrentBalance) => {
   if (oldCurrentBalance && !newCurrentBalance) {
     balance.value = 0;
   }
 });
+
+watch(
+  hasActiveProfile,
+  async newVal => {
+    if (newVal) {
+      currentbalance.value = true;
+      balance.value = freeBalance.value;
+    } else {
+      balance.value = 0;
+      currentbalance.value = false;
+    }
+  },
+  { immediate: true },
+);
+
+watch(
+  freeBalance,
+  newVal => {
+    if (newVal && currentbalance) {
+      balance.value = freeBalance.value;
+    } else {
+      balance.value = 0;
+    }
+  },
+  { immediate: true },
+);
 
 async function setPriceList(pkgs: any): Promise<PriceType[]> {
   TFTPrice.value = await calculator.value?.tftPrice();
@@ -282,6 +316,7 @@ async function setPriceList(pkgs: any): Promise<PriceType[]> {
 }
 
 onMounted(async () => {
+  balance.value = freeBalance.value;
   const pkgs = await calculator.value.calculate({
     cru: CRU.value,
     mru: MRU.value,
@@ -295,7 +330,7 @@ onMounted(async () => {
 });
 
 function openManual() {
-  window.open("https://manual.grid.tf/cloud/cloudunits_pricing.html", "_blank");
+  window.open("https://manual.grid.tf/wiki/cloudunits/pricing/pricing.html#cloud-unit-pricing", "_blank");
 }
 </script>
 
