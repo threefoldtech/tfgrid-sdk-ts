@@ -311,6 +311,11 @@ const routes: AppRoute[] = [
     items: [
       { title: "Farm Finder", icon: "mdi-lan-connect", route: "/farms" },
       {
+        title: "My Farms",
+        icon: "mdi-silo",
+        route: "/dashboard/farms",
+      },
+      {
         title: "Node Installer",
         icon: "mdi-earth",
         url: "https://bootstrap.grid.tf/",
@@ -320,11 +325,6 @@ const routes: AppRoute[] = [
         title: "Simulator",
         icon: "mdi-chart-line",
         route: "/calculator/simulator",
-      },
-      {
-        title: "My Farms",
-        icon: "mdi-silo",
-        route: "/dashboard/farms",
       },
     ],
   },
