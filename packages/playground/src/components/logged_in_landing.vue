@@ -111,6 +111,12 @@ export default {
         path: "vms",
       },
       {
+        title: "Deploy Applications",
+        icon: "mdi-lightbulb-on-outline",
+        text: "Deploy from a wide range of in demand solutions such as Algorand, Funkwhale, Wordpress, Discourse and much more!",
+        path: "solutions",
+      },
+      {
         title: "Deploy Orchestrators",
         icon: "mdi-group",
         text: "Deploy Kubernetes clusters out of the box or Caprover app/database deployment & web server manager on the Threefold Grid.",
