@@ -94,7 +94,7 @@ import { useTheme } from "vuetify";
 import { isAuthorized } from "../router";
 import { useProfileManager } from "../stores";
 export default {
-  name: "ConnectWalletLanding",
+  name: "LoggedInLanding",
   setup() {
     const theme = useTheme();
     const baseUrl = import.meta.env.BASE_URL;

@@ -1,4 +1,3 @@
-import { NetworkEnv } from "@threefold/grid_client";
 import { createRouter, createWebHashHistory } from "vue-router";
 
 export interface InfoMeta {
@@ -15,14 +14,13 @@ export interface RouteMeta {
   info?: InfoMeta;
 }
 export function isAuthorized(route: string) {
-  const items = ["dashboard", "solutions", "sshkey", "vms", "orchestrators"];
+  const items = ["dashboard", "solutions", "sshkey", "vms", "orchestrators", "LoggedInLanding"];
   return !items.some(substr => route.startsWith(`/${substr}`));
 }
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
-    { path: "/", component: () => import("../components/connect_wallet_landing.vue") },
-    { path: "/overview", component: () => import("../components/logged_in_landing.vue") },
+    { path: "/", component: () => import("../components/landing.vue") },
     {
       path: "/dashboard",
       children: [

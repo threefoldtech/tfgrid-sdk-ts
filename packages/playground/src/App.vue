@@ -181,7 +181,6 @@
                   <div :key="$route.path">
                     <component :is="Component" v-if="isAuthorized($route.path)"></component>
                     <component :is="Component" v-else-if="hasActiveProfile && hasGrid"></component>
-                    <ConnectWalletLanding @openProfile="openProfile = true" v-else />
                   </div>
                 </transition>
               </router-view>
@@ -219,7 +218,6 @@ watch(profileManager, () => {
   {
     if (profileManager.profile) {
       openProfile.value = false;
-      $router.push("/overview");
     }
   }
 });
@@ -386,6 +384,7 @@ import ConnectWalletLanding from "./components/connect_wallet_landing.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
 import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
 import FundsCard from "./components/funds_card.vue";
+import LoggedInLanding from "./components/logged_in_landing.vue";
 import ProfileManagerController from "./components/profile_manager_controller.vue";
 import TFNotification from "./components/tf_notification.vue";
 import TfNavigationLoader from "./components/TfNavigationLoader.vue";
@@ -412,6 +411,7 @@ interface AppRouteItem {
 export default {
   name: "App",
   components: {
+    LoggedInLanding,
     TFNotification,
     DisclaimerToolbar,
     ProfileManager,
