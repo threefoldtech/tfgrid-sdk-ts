@@ -191,12 +191,7 @@ export default {
 .sub-header {
   font-size: 1rem;
 }
-.box {
-  border: 1px solid #8a8a8a;
-  border-radius: 7.5px;
-  padding: auto;
-  margin-left: auto;
-}
+
 .card-opacity {
   background-color: rgba(125, 227, 200, 0.12);
 }
