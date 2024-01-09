@@ -177,7 +177,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .stats {
   min-width: 160px;
   max-width: 200px;
