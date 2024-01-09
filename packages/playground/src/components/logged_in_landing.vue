@@ -25,7 +25,7 @@
                   :src="baseUrl + 'images/icons/live-and-operational/' + s.image"
                 />
                 <v-card-text>
-                  <p class="text-center header font-weight-regular">{{ s.value }}</p>
+                  <p class="text-center header font-weight-regular mb-2">{{ s.value }}</p>
                   <p class="text-center font-weight-light sub-header">{{ s.label }}</p>
                 </v-card-text>
               </v-card>
