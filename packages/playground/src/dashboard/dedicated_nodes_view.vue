@@ -15,7 +15,7 @@
           @reset="resetFilters"
           :options="filterOptions"
         >
-          <template #options="{ props }">
+          <template #options="{ props, applyFilters }">
             <v-col v-bind="props">
               <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
                 <v-switch
@@ -23,7 +23,7 @@
                   inset
                   label="GPU Node (Only)"
                   v-model="filterOptions.gpu"
-                  @update:model-value="updateGpu"
+                  @update:model-value="updateGpu($event, applyFilters)"
                   hide-details
                   :disabled="isFormLoading"
                 />
@@ -85,12 +85,14 @@ const tabParams = {
   },
 };
 
-const updateGpu = (newGpu: boolean | undefined) => {
+const updateGpu = (newGpu: boolean | undefined, fn: () => void) => {
   if (!newGpu) {
     filterOptions.value.gpu = undefined;
   } else {
     filterOptions.value.gpu = newGpu;
   }
+
+  fn();
 };
 
 const applyFilters = async (filtersInputValues: DedicatedNodeFilters) => {

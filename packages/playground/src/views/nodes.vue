@@ -14,38 +14,52 @@
       @update:model-value="applyFilters"
       @reset="resetFilters"
     >
-      <template #options="{ props }">
+      <template #options="{ props, applyFilters }">
         <v-col v-bind="props">
           <v-select
             class="p-4"
-            v-model="filterOptions.status"
+            :model-value="filterOptions.status"
+            @update:model-value="
+              filterOptions.status = $event;
+              applyFilters();
+            "
             :items="nodeStatusOptions"
             label="Select Nodes Status"
             variant="outlined"
             :disabled="isFormLoading"
             open-on-clear
             clearable
-          ></v-select>
+          />
         </v-col>
+
         <v-col v-bind="props">
           <input-tooltip inline tooltip="Enable filtering the nodes that have Gateway supported only.">
             <v-switch
               color="primary"
               inset
               label="Gateways (Only)"
-              v-model="filterOptions.gateway"
+              :model-value="filterOptions.gateway"
+              @update:model-value="
+                filterOptions.gateway = $event;
+                applyFilters();
+              "
               hide-details
               :disabled="isFormLoading"
             />
           </input-tooltip>
         </v-col>
+
         <v-col v-bind="{ ...props, class: `${props.class} py-0` }">
           <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
             <v-switch
               color="primary"
               inset
               label="GPU Node (Only)"
-              v-model="filterOptions.gpu"
+              :model-value="filterOptions.gpu"
+              @update:model-value="
+                filterOptions.gpu = $event;
+                applyFilters();
+              "
               hide-details
               :disabled="isFormLoading"
             />

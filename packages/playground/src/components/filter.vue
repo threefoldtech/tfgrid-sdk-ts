@@ -1,13 +1,10 @@
 <template>
   <v-expansion-panels v-model="panel" class="mb-3">
     <v-expansion-panel>
-      <v-expansion-panel-title>
-        <template v-slot:default="{}">
-          <v-row no-gutters>
-            <v-col cols="4" class="d-flex justify-start text-subtitle-1"> Filters</v-col>
-          </v-row>
-        </template>
-      </v-expansion-panel-title>
+      <template #title>
+        <span class="text-subtitle-1" v-text="'Filters'" />
+      </template>
+
       <v-expansion-panel-text>
         <form-validator
           v-model="isValidForm"
@@ -45,10 +42,16 @@
                   </v-text-field>
                 </input-validator>
               </VCol>
-              <slot name="options" :props="fitlerColProps"></slot>
+              <slot
+                name="options"
+                :props="fitlerColProps"
+                :applyFilters="!isValidForm || loading || !filterTouched ? () => {} : applyFilters"
+              ></slot>
             </VRow>
           </VContainer>
         </form-validator>
+
+        <VDivider class="mb-4 mx-8" />
 
         <VContainer fluid>
           <VRow justify="end">
