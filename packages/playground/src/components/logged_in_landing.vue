@@ -36,22 +36,28 @@
       <v-col lg="6" md="12" class="d-flex flex-wrap">
         <v-row>
           <v-col :lg="6" :md="12" v-for="card in cards" :key="card.path">
-            <v-card
-              class="px-3 py-3 box"
-              @click="
-                () => {
-                  if (isAuthorized(card.path)) {
-                    $router.push(card.path);
-                  }
-                }
-              "
-            >
-              <v-card-title class="d-flex align-items-baseline"
-                ><v-icon class="mr-3">{{ card.icon }}</v-icon
-                >{{ card.title }}</v-card-title
-              >
-              <v-card-text>{{ card.text }}</v-card-text>
-            </v-card>
+            <v-hover>
+              <template v-slot:default="{ isHovering, props }">
+                <v-card
+                  class="px-3 py-3 box"
+                  v-bind="props"
+                  :class="isHovering ? 'card-opacity' : undefined"
+                  @click="
+                    () => {
+                      if (isAuthorized(card.path)) {
+                        $router.push(card.path);
+                      }
+                    }
+                  "
+                >
+                  <v-card-title class="d-flex align-items-baseline"
+                    ><v-icon class="mr-3">{{ card.icon }}</v-icon
+                    >{{ card.title }}</v-card-title
+                  >
+                  <v-card-text>{{ card.text }}</v-card-text>
+                </v-card>
+              </template>
+            </v-hover>
           </v-col>
         </v-row>
         <v-row>
@@ -190,5 +196,8 @@ export default {
   border-radius: 7.5px;
   padding: auto;
   margin-left: auto;
+}
+.card-opacity {
+  background-color: rgba(125, 227, 200, 0.12);
 }
 </style>
