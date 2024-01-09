@@ -37,7 +37,7 @@
     </template>
 
     <template #title>
-      Node ID({{ node?.nodeId }})
+      Node ID: {{ node?.nodeId }}
       <VTooltip
         text="Node Serial Number"
         v-if="node && node.serialNumber && node.serialNumber.toLowerCase() !== 'default string'"
@@ -138,7 +138,8 @@ export default {
   setup(props) {
     const flag = computed(() => {
       const country = props.node?.location.country ?? "";
-      const code = byCountry(country)?.internet || byCountry(country.toLowerCase())?.internet;
+      const code =
+        country === "Czechia" ? "CZ" : byCountry(country)?.internet || byCountry(country.toLowerCase())?.internet;
       return code
         ? `https://www.worldatlas.com/r/w425/img/flag/${code.toLowerCase()}-flag.jpg`
         : `https://placehold.co/30x20?text=TF`;

@@ -134,6 +134,9 @@ export default {
           case props.filters.certified && node.certificationType.toLowerCase() !== "certified":
             throw `Node ${nodeId} is not Certified`;
 
+          case props.filters.dedicated && !node.dedicated:
+            throw `Node ${nodeId} is not dedicated`;
+
           case props.filters.dedicated && node.rentedByTwinId === 0:
             throw `Node ${nodeId} is not rented`;
 

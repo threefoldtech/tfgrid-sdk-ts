@@ -55,6 +55,7 @@ interface NodeInfo {
   publicConfig: PublicConfig;
   status: string;
   certificationType: string;
+  dedicated: boolean;
   hasGPU: boolean;
   extraFee: number;
   rentedByTwinId: number;

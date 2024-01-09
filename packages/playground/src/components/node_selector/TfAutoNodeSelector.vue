@@ -111,7 +111,7 @@
           variant="elevated"
           :style="{ position: 'absolute', bottom: '31px', right: '31px', zIndex: 9 }"
           v-else-if="nodeInputValidateTask.loading"
-          text="Checking if the disks will fit in the node's storage pools..."
+          text="Checking if the deployment will fit in the node's disks..."
         />
 
         <VAlert
