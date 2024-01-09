@@ -41,6 +41,7 @@
                 <v-card
                   class="px-3 py-3 border"
                   v-bind="props"
+                  :height="'165px'"
                   :class="isHovering ? 'card-opacity' : undefined"
                   @click="$router.push(card.path)"
                 >
@@ -64,11 +65,11 @@
                 Metaverse and more.
               </p>
 
-              <div class="d-flex justify-center align-center flex-wrap mt-8">
-                <v-btn class="mr-2" color="primary" target="_blank" href="https://www.threefold.io/grid/">
+              <div class="d-flex justify-center align-center flex-wrap my-4">
+                <v-btn color="primary" class="mr-2" target="_blank" href="https://www.threefold.io/grid/">
                   Learn about the grid
                 </v-btn>
-                <v-btn variant="outlined" color="secondary" target="_blank" href="https://www.threefold.io/build/">
+                <v-btn target="_blank" color="secondary" variant="outlined" href="https://www.threefold.io/build/">
                   Use The Grid
                 </v-btn>
               </div>

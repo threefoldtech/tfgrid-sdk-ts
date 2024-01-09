@@ -204,13 +204,6 @@ const theme = useTheme();
 const navbarConfig = ref();
 
 const hasGrid = computed(() => !!gridStore.grid);
-watch(profileManager, () => {
-  {
-    if (profileManager.profile) {
-      openProfile.value = false;
-    }
-  }
-});
 
 watch(
   () => $route.meta,
