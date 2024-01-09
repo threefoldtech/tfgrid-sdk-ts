@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-col lg="6" md="12" class="box mt-3">
+      <v-col lg="6" md="12" class="border mt-3">
         <div>
           <div class="d-flex justify-center mb-5">
             <h4 class="header">Live and Operational</h4>
@@ -39,7 +39,7 @@
             <v-hover>
               <template v-slot:default="{ isHovering, props }">
                 <v-card
-                  class="px-3 py-3 box"
+                  class="px-3 py-3 border"
                   v-bind="props"
                   :class="isHovering ? 'card-opacity' : undefined"
                   @click="
@@ -61,7 +61,7 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-card class="mt-3 py-2 box mx-3">
+          <v-card class="mt-3 py-2 border mx-3">
             <div class="text-center">
               <v-card-title> The <strong>Layer Zero</strong> for a Decentralized World </v-card-title>
               <p class="w-75 mx-auto">
