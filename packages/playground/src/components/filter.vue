@@ -50,14 +50,15 @@
         <v-container fluid>
           <v-row justify="end">
             <v-btn
-              :disabled="!valueChanged || loading"
+              :disabled="!valuesChanged || loading || isEmptyForm"
               @click="resetFilters"
               variant="outlined"
               color="anchor"
               text="Clear"
             />
+
             <v-btn
-              :disabled="!isValidForm || !valueChanged || loading"
+              :disabled="!isValidForm || !valuesChanged || loading || isEmptyForm"
               class="ml-4 mr-7"
               :loading="loading"
               @click="applyFilters"
@@ -73,12 +74,12 @@
 </template>
 
 <script lang="ts" setup>
-import { defineComponent, nextTick, type PropType, ref, watch } from "vue";
+import { computed, defineComponent, nextTick, type PropType, ref, watch } from "vue";
 
 import { useInputRef } from "@/hooks/input_validator";
+import type { FilterOptions, InputFilterType } from "@/types";
 
 import { useFormRef } from "../hooks/form_validator";
-import type { FilterOptions, InputFilterType } from "../types";
 
 const props = defineProps({
   modelValue: {
@@ -98,8 +99,18 @@ const isValidForm = ref(false);
 const inputRef = useInputRef(true);
 const panel = ref([0]);
 const formRef = useFormRef();
+const valuesChanged = ref(false);
+const inputsHasValues = ref(false);
+const filtersApplied = ref(false);
 
-const valueChanged = ref(false);
+const isEmptyForm = computed(
+  () =>
+    !inputsHasValues.value &&
+    !props.options.gateway &&
+    !props.options.gpu &&
+    !props.options.status?.length &&
+    filtersApplied.value,
+);
 
 const applyFilters = () => {
   emit(
@@ -109,6 +120,7 @@ const applyFilters = () => {
       return res;
     }, {} as any),
   );
+  nextTick(() => (filtersApplied.value = true));
 };
 
 const resetFilters = () => {
@@ -121,19 +133,29 @@ const resetFilters = () => {
   );
 
   nextTick(() => {
-    valueChanged.value = true;
+    valuesChanged.value = true;
+    filtersApplied.value = false;
   });
 };
 
 const fitlerColProps = { class: "py-2 px-4", cols: 12, md: 6, lg: 3 };
 
+watch(
+  () => ({ ...props.options }),
+  (newValue, oldValue) => {
+    if (newValue != oldValue) {
+      nextTick(() => (valuesChanged.value = true));
+    }
+  },
+);
+
 // Enable/Disable the [Apply, Clear] buttons.
 watch(
   [() => props.modelValue, () => props.options],
-  ([inputs, options]) => {
-    const optionsChanged = options.gateway || options.gpu || (options.status && options.status?.length >= 1);
-    const inputsHasValues = Object.values(inputs).some(obj => obj.value && obj.value.length >= 1);
-    valueChanged.value = inputsHasValues || !!optionsChanged;
+  ([inputs, _]) => {
+    filtersApplied.value = false;
+    inputsHasValues.value = Object.values(inputs).some(obj => obj.value && obj.value.length >= 1);
+    valuesChanged.value = inputsHasValues.value;
   },
   { deep: true, immediate: true },
 );

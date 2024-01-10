@@ -125,8 +125,7 @@ onMounted(async () => {
 });
 
 const updateFarms = async () => {
-  const queries = await getFarmQueries(mixedFarmFilters.value);
-
+  const queries = getFarmQueries(mixedFarmFilters.value);
   await _getFarms(queries);
 };
 
