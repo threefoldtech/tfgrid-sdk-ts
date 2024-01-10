@@ -55,10 +55,12 @@ interface NodeInfo {
   publicConfig: PublicConfig;
   status: string;
   certificationType: string;
+  dedicated: boolean;
   hasGPU: boolean;
   extraFee: number;
   rentedByTwinId: number;
   rentContractId: number;
+  serialNumber?: string;
 }
 interface PublicConfig {
   domain: string;
