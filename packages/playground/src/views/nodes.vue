@@ -86,7 +86,6 @@
 </template>
 
 <script lang="ts">
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
 import { capitalize, computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
@@ -160,10 +159,13 @@ export default {
       filtering.value = false;
     };
 
-    const resetFilters = async (filtersInputValues: FilterInputs) => {
+    const resetFilters = async (filtersInputValues: FilterInputs, reload: boolean) => {
       filtering.value = true;
       filterInputs.value = filtersInputValues;
       filterOptions.value = optionsInitializer(undefined, undefined, undefined);
+      if (reload && isValidForm.value) {
+        await updateNodes();
+      }
       filtering.value = false;
     };
 

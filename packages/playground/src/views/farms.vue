@@ -150,10 +150,13 @@ const applyFilters = async (filtersInputValues: FilterFarmInputs) => {
   filtering.value = false;
 };
 
-const resetFilters = async (filtersInputValues: FilterFarmInputs) => {
+const resetFilters = async (filtersInputValues: FilterFarmInputs, reload: boolean) => {
   filtering.value = true;
   filterFarmInputs.value = filtersInputValues;
   filterOptions.value = optionsInitializer();
+  if (reload && isValidForm.value) {
+    await updateFarms();
+  }
   filtering.value = false;
 };
 

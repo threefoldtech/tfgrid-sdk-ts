@@ -181,10 +181,13 @@ onMounted(async () => {
   await _loadData();
 });
 
-const resetFilters = async (filtersInputValues: DedicatedNodeFilters) => {
+const resetFilters = async (filtersInputValues: DedicatedNodeFilters, reload: boolean) => {
   filtering.value = true;
   filterInputs.value = filtersInputValues;
   filterOptions.value = optionsInitializer(undefined, undefined, undefined);
+  if (reload && isValidForm.value) {
+    await _loadData();
+  }
   filtering.value = false;
 };
 

@@ -49,11 +49,16 @@
         <v-divider class="mb-4 mx-8" />
         <v-container fluid>
           <v-row justify="end">
-            <!-- :disabled="!valuesChanged || loading || isEmptyForm || !switchesEnabled" -->
-            <v-btn @click="resetFilters" variant="outlined" color="anchor" text="Clear" />
-
-            <!-- :disabled="!isValidForm || !valuesChanged || loading || isEmptyForm" -->
             <v-btn
+              :disabled="!isValidForm || !(formHasValues || Object.keys(route.query).length > 0)"
+              @click="resetFilters"
+              variant="outlined"
+              color="anchor"
+              text="Clear"
+            />
+
+            <v-btn
+              :disabled="!isValidForm || !formHasValues"
               class="ml-4 mr-7"
               :loading="loading"
               @click="applyFilters"
@@ -70,14 +75,15 @@
 
 <script lang="ts" setup>
 import type { NodeStatus } from "@threefold/gridproxy_client";
-import { computed, defineComponent, nextTick, onMounted, type PropType, ref, watch } from "vue";
-import { type LocationQueryRaw, type LocationQueryValue, useRoute } from "vue-router";
+import { isEmpty } from "lodash";
+import { nextTick } from "process";
+import { computed, defineComponent, onMounted, type PropType, ref, watch } from "vue";
+import { type LocationQueryRaw, useRoute } from "vue-router";
 
+import { useFormRef } from "@/hooks/form_validator";
 import { useInputRef } from "@/hooks/input_validator";
 import router from "@/router";
 import type { FilterOptions, InputFilterType } from "@/types";
-
-import { useFormRef } from "../hooks/form_validator";
 
 const props = defineProps({
   modelValue: {
@@ -98,11 +104,29 @@ const inputRef = useInputRef(true);
 const panel = ref([0]);
 const formRef = useFormRef();
 const route = useRoute();
+const isClearButtonEnabled = ref();
+
+const formHasValues = computed(
+  () =>
+    Object.values(props.modelValue).some(obj => obj.value && obj.value.length >= 1) ||
+    props.options.status?.length ||
+    props.options.gpu ||
+    props.options.gateway,
+);
+
+watch(
+  [() => props.modelValue, () => props.options],
+  ([inputs, options]) => {
+    isClearButtonEnabled.value = Object.values(inputs).some(
+      obj => (obj.value?.length && options.gpu) || options.gateway || options.status?.length,
+    );
+  },
+  { deep: true, immediate: true },
+);
 
 onMounted(() => {
-  // for (const obj of Object.keys(props.modelValue)) {{}{}
   for (const obj of Object.keys({ ...props.modelValue, ...props.options })) {
-    const key = obj.toLowerCase();
+    const key = obj;
     if (Object.prototype.hasOwnProperty.call(route.query, key)) {
       emit("update:values", obj, Reflect.get(route.query, key));
     }
@@ -119,9 +143,9 @@ const setFilterQueries = () => {
 
   for (const [key, { value }] of Object.entries(props.modelValue)) {
     if (value) {
-      existingQuery[key.toLowerCase()] = value;
+      existingQuery[key] = value;
     } else {
-      delete existingQuery[key.toLowerCase()];
+      delete existingQuery[key];
     }
   }
 
@@ -142,50 +166,30 @@ const applyFilters = () => {
 };
 
 const resetFilters = () => {
-  emit(
-    "reset",
-    Object.keys(props.modelValue).reduce((res, key) => {
-      res[key] = { ...props.modelValue[key], value: undefined };
-      return res;
-    }, {} as any),
-  );
-  resetFilterQueries();
+  if (!isEmpty(route.query)) {
+    emit(
+      "reset",
+      Object.keys(props.modelValue).reduce((res, key) => {
+        res[key] = { ...props.modelValue[key], value: undefined };
+        return res;
+      }, {} as any),
+      true,
+    );
+  } else {
+    emit(
+      "reset",
+      Object.keys(props.modelValue).reduce((res, key) => {
+        res[key] = { ...props.modelValue[key], value: undefined };
+        return res;
+      }, {} as any),
+      false,
+    );
+  }
+
+  nextTick(() => resetFilterQueries());
 };
 
 const fitlerColProps = { class: "py-2 px-4", cols: 12, md: 6, lg: 3 };
-
-// watch(
-//   () => ({ ...props.options }),
-//   (newValue, oldValue) => {
-//     console.log("newValue != oldValue", newValue, oldValue);
-
-//     if (newValue != oldValue) {
-//       nextTick(() => (valuesChanged.value = true));
-//     }
-//   },
-// );
-
-// watch(
-//   () => ({ ...props.modelValue }),
-//   (newValue, oldValue) => {
-//     console.log("newValue != oldValue", newValue, oldValue);
-
-//     if (newValue != oldValue) {
-//       nextTick(() => (valuesChanged.value = true));
-//     }
-//   },
-// );
-
-// // Enable/Disable the [Apply, Clear] buttons.
-// watch(
-//   [() => props.modelValue, () => props.options],
-//   ([inputs, _]) => {
-//     filtersApplied.value = false;
-//     inputsHasValues.value = Object.values(inputs).some(obj => obj.value && obj.value.length >= 1);
-//     valuesChanged.value = inputsHasValues.value;
-//   },
-//   { deep: true, immediate: true },
-// );
 </script>
 
 <script lang="ts">
