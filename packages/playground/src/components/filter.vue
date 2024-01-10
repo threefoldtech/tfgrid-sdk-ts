@@ -12,9 +12,9 @@
           ref="formRef"
           @update:model-value="$emit('update:valid', $event)"
         >
-          <VContainer fluid>
-            <VRow no-gutters>
-              <VCol v-for="key in Object.keys($props.modelValue)" :key="key" v-bind="fitlerColProps">
+          <v-container fluid>
+            <v-row no-gutters>
+              <v-col v-for="key in Object.keys($props.modelValue)" :key="key" v-bind="fitlerColProps">
                 <input-validator
                   v-if="$props.modelValue[key].label"
                   :rules="$props.modelValue[key].value ? $props.modelValue[key].rules?.[0] ?? [] : []"
@@ -33,30 +33,31 @@
                     @update:model-value="checkInput"
                   >
                     <template #append-inner>
-                      <VTooltip :text="$props.modelValue[key].tooltip">
+                      <v-tooltip :text="$props.modelValue[key].tooltip">
                         <template #activator="{ props }">
                           <VIcon icon="mdi-information-outline" v-bind="props" />
                         </template>
-                      </VTooltip>
+                      </v-tooltip>
                     </template>
                   </v-text-field>
                 </input-validator>
-              </VCol>
+              </v-col>
               <slot
                 name="options"
                 :props="fitlerColProps"
-                :applyFilters="!isValidForm || loading || !filterTouched ? () => {} : applyFilters"
-              ></slot>
-            </VRow>
-          </VContainer>
+                :applyFilters="!isValidForm || loading || !valueChanged ? () => {} : applyFilters"
+              >
+              </slot>
+            </v-row>
+          </v-container>
         </form-validator>
 
-        <VDivider class="mb-4 mx-8" />
+        <v-divider class="mb-4 mx-8" />
 
-        <VContainer fluid>
-          <VRow justify="end">
+        <v-container fluid>
+          <v-row justify="end">
             <v-btn
-              :disabled="!isValidForm || loading || !filterTouched"
+              :disabled="!isValidForm || loading || !valueChanged"
               @click="resetFilters"
               variant="outlined"
               color="anchor"
@@ -64,15 +65,15 @@
             />
             <v-btn
               class="ml-4 mr-7"
-              :disabled="!isValidForm || !filterTouched"
+              :disabled="!isValidForm || !valueChanged"
               :loading="loading"
               @click="applyFilters"
               variant="outlined"
               color="secondary"
               text="Apply"
             />
-          </VRow>
-        </VContainer>
+          </v-row>
+        </v-container>
       </v-expansion-panel-text>
     </v-expansion-panel>
   </v-expansion-panels>
@@ -104,13 +105,16 @@ const isValidForm = ref(false);
 const inputRef = useInputRef(true);
 const panel = ref([0]);
 const formRef = useFormRef();
-const filterTouched = ref(false);
+const valueChanged = ref(false);
+
 const checkInput = (input: string) => {
   if (input.length == 0) {
     applyFilters();
   }
 };
+
 const applyFilters = () => {
+  valueChanged.value = false;
   emit(
     "update:model-value",
     Object.keys(props.modelValue).reduce((res, key) => {
@@ -119,7 +123,9 @@ const applyFilters = () => {
     }, {} as any),
   );
 };
+
 const resetFilters = () => {
+  valueChanged.value = false;
   emit(
     "reset",
     Object.keys(props.modelValue).reduce((res, key) => {
@@ -128,23 +134,25 @@ const resetFilters = () => {
     }, {} as any),
   );
 };
+
 watch(
   () => props.modelValue,
   (newValue: PropType<{ [key: string]: InputFilterType }>) => {
     const hasNonEmptyValue = Object.keys(newValue).some(obj => {
       return Reflect.get(newValue, obj).value && Reflect.get(newValue, obj).value.length >= 1;
     });
-    filterTouched.value = hasNonEmptyValue;
+    valueChanged.value = hasNonEmptyValue;
   },
   { deep: true },
 );
+
 watch(
   () => props.options,
   (newValue: FilterOptions) => {
     if (newValue.gateway || newValue.gpu || newValue.status) {
       // We don't need to enable the clear button when changing the page or the size.
       const hasValue = !!newValue.gateway || !!newValue.gpu || !!newValue.status?.length;
-      filterTouched.value = hasValue;
+      valueChanged.value = hasValue;
     }
   },
   { deep: true },
