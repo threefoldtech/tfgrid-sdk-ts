@@ -1,5 +1,5 @@
 <template>
-  <input-tooltip tooltip="The name of the farm that you want to deploy inside it.">
+  <input-tooltip :tooltip="($props.tooltip as string)" :disabled="!insetTooltip">
     <VAutocomplete
       label="Farm Name"
       placeholder="Select a farm"
@@ -34,6 +34,7 @@
         (searchQuery === '' && !menuOpened && focused)
       "
       :disabled="!validFilters"
+      v-bind="$attrs"
     >
       <template #no-data v-if="searchTask.loading">
         <div class="d-flex pa-2">
@@ -62,6 +63,14 @@
           </VBtn>
         </VContainer>
       </template>
+
+      <template #append-inner v-if="insetTooltip">
+        <VTooltip :text="$props.tooltip">
+          <template #activator="{ props }">
+            <VIcon icon="mdi-information-outline" v-bind="props" />
+          </template>
+        </VTooltip>
+      </template>
     </VAutocomplete>
   </input-tooltip>
 </template>
@@ -87,12 +96,14 @@ export default {
   name: "TfSelectFarm",
   props: {
     modelValue: Object as PropType<FarmInfo>,
-    validFilters: { type: Boolean, required: true },
+    validFilters: { type: Boolean, default: () => false },
     filters: {
       type: Object as PropType<SelectionDetailsFilters>,
       required: true,
     },
     location: Object as PropType<SelectedLocation>,
+    insetTooltip: Boolean,
+    tooltip: { type: String, default: () => "The name of the farm that you want to deploy inside it." },
   },
   emits: {
     "update:model-value": (farm?: FarmInfo) => true || farm,
