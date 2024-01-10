@@ -402,6 +402,7 @@ class Nodes {
       randomize: options.randomize,
       ret_count: options.ret_count,
       region: options.region,
+      healthy: options.healthy,
     };
     if (options.gateway) {
       params["ipv4"] = true;
