@@ -50,7 +50,7 @@
         <v-container fluid>
           <v-row justify="end">
             <v-btn
-              :disabled="!valuesChanged || loading || isEmptyForm"
+              :disabled="!valuesChanged || loading || isEmptyForm || !switchesEnabled"
               @click="resetFilters"
               variant="outlined"
               color="anchor"
@@ -103,6 +103,7 @@ const valuesChanged = ref(false);
 const inputsHasValues = ref(false);
 const filtersApplied = ref(false);
 
+const switchesEnabled = computed(() => props.options.gpu || props.options.gateway || inputsHasValues.value);
 const isEmptyForm = computed(
   () =>
     !inputsHasValues.value &&
