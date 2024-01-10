@@ -4,7 +4,7 @@ name: Grid Client Nightly
 
 on:
   schedule:
-    - cron: "0 6 * * *"
+    - cron: "0 4 * * *"
   workflow_dispatch:
 jobs:
   deployment-scripts:
@@ -46,6 +46,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y git libtool tmux redis net-tools
+
       - name: Install
         run: |
           yarn
@@ -86,10 +87,29 @@ jobs:
         continue-on-error: true
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/zdb.ts
+
       - name: Cleanup - Delete all contracts
         id: deleteall
         run: |
           yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/delete_all_contracts.ts
+
+      - name: Run check up - List all contracts
+        id: command_step
+        run: |
+          sleep 15
+          yarn run ts-node --project packages/grid_client/tsconfig-node.json packages/grid_client/scripts/list_all_contracts.ts > output.txt
+
+      - name: Check if contracts are Empty
+        run: |
+          # print the file content
+          cat output.txt
+
+          # Check if Node contracts are empty
+          if grep -q "nodeContracts: \[\]" output.txt && ! grep -q "nodeContracts: \[[[:space:]]*\]" output.txt; then
+            echo "Deletion failed; The Node Contract is not empty."
+            # Print the contract that couldn't be deleted
+            exit 1
+          fi
 
       - name: Test Results
         run: |
@@ -110,5 +130,6 @@ jobs:
           steps.vmqsfs.outcome != 'success' ||
           steps.kubernetesqsfs.outcome != 'success' ||
           steps.kvstore.outcome != 'success' ||
-          steps.zdb.outcome != 'success'
+          steps.zdb.outcome != 'success' ||
+          steps.deleteall.outcome != 'success' 
         run: exit 1

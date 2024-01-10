@@ -3,58 +3,38 @@ import { getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function getFarms(client) {
-  try {
-    const res = await client.capacity.getFarms();
-    log("================= Getting farms =================");
-    log(res);
-    log("================= Getting farms =================");
-  } catch (error) {
-    log("Error while getting farms " + error);
-  }
+  const res = await client.capacity.getFarms();
+  log("================= Getting farms =================");
+  log(res);
+  log("================= Getting farms =================");
 }
 
 async function getNodes(client) {
-  try {
-    const res = await client.capacity.getNodes();
-    log("================= Getting nodes =================");
-    log(res);
-    log("================= Getting nodes =================");
-  } catch (error) {
-    log("Error while getting nodes " + error);
-  }
+  const res = await client.capacity.getNodes();
+  log("================= Getting nodes =================");
+  log(res);
+  log("================= Getting nodes =================");
 }
 
 async function getNodesByFarmId(client, farmId) {
-  try {
-    const res = await client.capacity.getNodesByFarmId(farmId);
-    log("================= Getting nodes =================");
-    log(res);
-    log("================= Getting nodes =================");
-  } catch (error) {
-    log("Error while getting nodes " + error);
-  }
+  const res = await client.capacity.getNodesByFarmId(farmId);
+  log("================= Getting nodes =================");
+  log(res);
+  log("================= Getting nodes =================");
 }
 
 async function getNodeFreeResources(client, nodeId) {
-  try {
-    const res = await client.capacity.getNodeFreeResources(nodeId);
-    log("================= Getting resources =================");
-    log(res);
-    log("================= Getting resources =================");
-  } catch (error) {
-    log("Error while getting resources " + error);
-  }
+  const res = await client.capacity.getNodeFreeResources(nodeId);
+  log("================= Getting resources =================");
+  log(res);
+  log("================= Getting resources =================");
 }
 
 async function filterNodes(client, filterOptions) {
-  try {
-    const res = await client.capacity.filterNodes(filterOptions);
-    log("================= Filtering nodes =================");
-    log(res);
-    log("================= Filtering nodes =================");
-  } catch (error) {
-    log("Error while filtering nodes " + error);
-  }
+  const res = await client.capacity.filterNodes(filterOptions);
+  log("================= Filtering nodes =================");
+  log(res);
+  log("================= Filtering nodes =================");
 }
 
 async function main() {

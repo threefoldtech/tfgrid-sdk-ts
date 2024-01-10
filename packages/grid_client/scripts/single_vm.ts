@@ -3,36 +3,24 @@ import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function deploy(client, vms) {
-  try {
-    const res = await client.machines.deploy(vms);
-    log("================= Deploying VM =================");
-    log(res);
-    log("================= Deploying VM =================");
-  } catch (error) {
-    log("Error while Deploying the VM " + error);
-  }
+  const res = await client.machines.deploy(vms);
+  log("================= Deploying VM =================");
+  log(res);
+  log("================= Deploying VM =================");
 }
 
 async function getDeployment(client, vms) {
-  try {
-    const res = await client.machines.getObj(vms);
-    log("================= Getting deployment information =================");
-    log(res);
-    log("================= Getting deployment information =================");
-  } catch (error) {
-    log("Error while getting the deployment " + error);
-  }
+  const res = await client.machines.getObj(vms);
+  log("================= Getting deployment information =================");
+  log(res);
+  log("================= Getting deployment information =================");
 }
 
 async function cancel(client, vms) {
-  try {
-    const res = await client.machines.delete(vms);
-    log("================= Canceling the deployment =================");
-    log(res);
-    log("================= Canceling the deployment =================");
-  } catch (error) {
-    log("Error while canceling the deployment " + error);
-  }
+  const res = await client.machines.delete(vms);
+  log("================= Canceling the deployment =================");
+  log(res);
+  log("================= Canceling the deployment =================");
 }
 
 async function main() {

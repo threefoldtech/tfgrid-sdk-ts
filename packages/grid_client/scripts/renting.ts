@@ -18,59 +18,42 @@ import { log } from "./utils";
 
 // Get rent contract ID for a node
 async function getRentContract(client: GridClient, nodeId: number) {
-  try {
-    const rentContractId = await client.nodes.getRentContractId({ nodeId });
-    log("================= Rent Contract ID =================");
-    log(rentContractId);
-    log("================= Rent Contract ID =================");
-    return rentContractId;
-  } catch (error) {
-    console.error("Error fetching rent contract ID:", error);
-  }
+  const rentContractId = await client.nodes.getRentContractId({ nodeId });
+  log("================= Rent Contract ID =================");
+  log(rentContractId);
+  log("================= Rent Contract ID =================");
+  return rentContractId;
 }
 
 // Reserve a node
 async function reserveNode(client: GridClient, nodeId: number) {
-  try {
-    const reserved = await client.nodes.reserve({ nodeId });
-    log("================= Reserve Nodes =================");
-    log(reserved);
-    log("================= Reserve Nodes =================");
-    return reserved;
-  } catch (error) {
-    console.error("Error reserving node:", error);
-  }
+  const reserved = await client.nodes.reserve({ nodeId });
+  log("================= Reserve Nodes =================");
+  log(reserved);
+  log("================= Reserve Nodes =================");
+  return reserved;
 }
 
 // Get a list of rentable nodes
 async function getRentableNodes(client: GridClient) {
-  try {
-    const rentable = await client.capacity.filterNodes({ rentable: true });
-    if (rentable.length > 0) {
-      log("================= Rentable Nodes =================");
-      log(rentable);
-      log("================= Rentable Nodes =================");
-      return rentable;
-    } else {
-      console.error("No rentable nodes available.");
-      return [];
-    }
-  } catch (error) {
-    console.error("Error fetching rentable nodes:", error);
+  const rentable = await client.capacity.filterNodes({ rentable: true });
+  if (rentable.length > 0) {
+    log("================= Rentable Nodes =================");
+    log(rentable);
+    log("================= Rentable Nodes =================");
+    return rentable;
+  } else {
+    console.error("No rentable nodes available.");
     return [];
   }
 }
 
 // Unreserve a node
 async function unreserve(client: GridClient, nodeId: number) {
-  try {
-    const unreserved = await client.nodes.unreserve({ nodeId });
-    log("================= Unreserved Node =================");
-    log(unreserved);
-    log("================= Unreserved Node =================");
-  } catch (error) {
-    console.error("Error unreserving node:", error);
-  }
+  const unreserved = await client.nodes.unreserve({ nodeId });
+  log("================= Unreserved Node =================");
+  log(unreserved);
+  log("================= Unreserved Node =================");
 }
 
 // Main function
