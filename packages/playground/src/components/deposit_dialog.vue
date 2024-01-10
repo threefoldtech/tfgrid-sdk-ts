@@ -124,6 +124,13 @@ onBeforeUnmount(() => {
   destroyed = true;
 });
 </script>
+<script lang="ts">
+import { defineComponent } from "vue";
+
+export default defineComponent({
+  name: "DepositDialog",
+});
+</script>
 
 <style>
 .bold-text {
