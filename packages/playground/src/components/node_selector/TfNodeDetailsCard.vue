@@ -51,13 +51,7 @@
     </template>
 
     <template #subtitle>
-      <span v-text="'Farm ID: ' + (node?.farmId ?? '') + ' '" />
-      <VChip
-        :color="node?.inDedicatedFarm ? 'success' : 'secondary'"
-        size="x-small"
-        :text="(node?.inDedicatedFarm ? 'Dedicated' : 'Shared') + ' Farm'"
-        v-if="node"
-      />
+      <span v-if="node"> Farm: <span class="font-weight-bold" v-text="node.farmName" /> </span>
     </template>
 
     <template #append>
