@@ -116,6 +116,7 @@
                   : baseUrl + 'images/logoTF_light.png'
               }`"
               width="160px"
+              @click="navigateToHome"
             />
           </v-toolbar-title>
 
@@ -282,7 +283,7 @@ const routes: AppRoute[] = [
       },
       { title: "Applications", icon: "mdi-lightbulb-on-outline", route: "/solutions" },
       {
-        title: "Your Contracts",
+        title: "My Contracts",
         icon: "mdi-file-document-edit",
         route: "/dashboard/contracts-list",
       },
@@ -303,7 +304,12 @@ const routes: AppRoute[] = [
     title: "Farms",
     icon: "mdi-access-point",
     items: [
-      { title: "Farms", icon: "mdi-lan-connect", route: "/farms" },
+      { title: "Farm Finder", icon: "mdi-lan-connect", route: "/farms" },
+      {
+        title: "My Farms",
+        icon: "mdi-silo",
+        route: "/dashboard/farms",
+      },
       {
         title: "Node Installer",
         icon: "mdi-earth",
@@ -366,6 +372,7 @@ function clickHandler({ route, url }: AppRouteItem): void {
     window.open(url, "_blank");
   }
 }
+
 </script>
 
 <script lang="ts">

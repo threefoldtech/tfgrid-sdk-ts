@@ -46,34 +46,6 @@ export default {
   setup() {
     const cards: Card[] = [
       {
-        title: "Full Virtual Machine",
-        excerpt:
-          "Deploy a full virtual machine on Threefold Grid. Full VM allows you to have a complete image with a custom kernel optimized for your own usecase.",
-        icon: "vm.png",
-        route: "/fullvm",
-      },
-      {
-        title: "Micro Virtual Machine",
-        excerpt:
-          "Deploy a micro virtual machine on Threefold Grid. We provide few images managed by Threefold like Ubuntu 22.04, and NixOS, but you can still use a custom one.",
-        icon: "vm.png",
-        route: "/vm",
-      },
-      {
-        title: "Kubernetes",
-        excerpt:
-          "Kubernetes is the standard container orchestration tool. On the TF grid, Kubernetes clusters can be deployed out of the box. We have implemented K3S, a full-blown Kubernetes offering that uses only half of the memory footprint.",
-        icon: "kubernetes.png",
-        route: "/kubernetes",
-      },
-      {
-        title: "CapRover",
-        excerpt:
-          "CapRover is an extremely easy to use app/database deployment & web server manager for your NodeJS, Python, PHP, ASP.NET, Ruby, MySQL, MongoDB, Postgres, WordPress (and etc…) applications!",
-        icon: "caprover.png",
-        route: "/caprover",
-      },
-      {
         title: "Peertube",
         excerpt: "Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services.",
         icon: "peertube.png",
