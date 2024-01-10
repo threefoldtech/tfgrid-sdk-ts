@@ -7,7 +7,7 @@
           v-model="filterFarmInputs"
           :loading="loading"
           v-model:valid="isValidForm"
-          @update:model-value="applyFilters"
+          @apply="applyFilters"
           @reset="resetFilters"
         />
 
@@ -130,16 +130,6 @@ const updateFarms = async () => {
   await _getFarms(queries);
 };
 
-watch(
-  filterOptions,
-  async () => {
-    if (!filtering.value) {
-      updateFarms();
-    }
-  },
-  { deep: true },
-);
-
 const applyFilters = async (filtersInputValues: FilterFarmInputs) => {
   filtering.value = true;
   filterFarmInputs.value = filtersInputValues;
@@ -149,18 +139,18 @@ const applyFilters = async (filtersInputValues: FilterFarmInputs) => {
   }
   filtering.value = false;
 };
+
 const resetFilters = async (filtersInputValues: FilterFarmInputs) => {
   filtering.value = true;
   filterFarmInputs.value = filtersInputValues;
   filterOptions.value = optionsInitializer();
-  if (isValidForm.value) {
-    await updateFarms();
-  }
   filtering.value = false;
 };
+
 const openSheet = (_e: any, { item }: any) => {
   openDialog(item.value);
 };
+
 const openDialog = (item: Farm) => {
   selectedFarm.value = item;
   dialog.value = true;

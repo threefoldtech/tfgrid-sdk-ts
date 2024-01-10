@@ -11,11 +11,11 @@
           v-model:model-value="filterInputs"
           :loading="loading"
           v-model:valid="isValidForm"
-          @update:model-value="applyFilters"
+          @apply="applyFilters"
           @reset="resetFilters"
           :options="filterOptions"
         >
-          <template #options="{ props, applyFilters }">
+          <template #options="{ props }">
             <v-col v-bind="props">
               <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
                 <v-switch
@@ -23,7 +23,6 @@
                   inset
                   label="GPU Node (Only)"
                   v-model="filterOptions.gpu"
-                  @update:model-value="updateGpu($event, applyFilters)"
                   hide-details
                   :disabled="isFormLoading"
                 />
@@ -83,16 +82,6 @@ const tabParams = {
     rentedBy: profileManager.profile?.twinId,
     retCount: true,
   },
-};
-
-const updateGpu = (newGpu: boolean | undefined, fn: () => void) => {
-  if (!newGpu) {
-    filterOptions.value.gpu = undefined;
-  } else {
-    filterOptions.value.gpu = newGpu;
-  }
-
-  fn();
 };
 
 const applyFilters = async (filtersInputValues: DedicatedNodeFilters) => {
@@ -195,9 +184,6 @@ const resetFilters = async (filtersInputValues: DedicatedNodeFilters) => {
   filtering.value = true;
   filterInputs.value = filtersInputValues;
   filterOptions.value = optionsInitializer(undefined, undefined, undefined);
-  if (isValidForm.value) {
-    await _loadData();
-  }
   filtering.value = false;
 };
 
