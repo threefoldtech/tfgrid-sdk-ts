@@ -223,6 +223,9 @@ watch(
       (navbarConfig.value = meta.navbarConfig);
   },
 );
+function navigateToHome() {
+  return $router.push("/");
+}
 
 onMounted(window.$$appLoader || noop);
 
@@ -372,7 +375,6 @@ function clickHandler({ route, url }: AppRouteItem): void {
     window.open(url, "_blank");
   }
 }
-
 </script>
 
 <script lang="ts">
