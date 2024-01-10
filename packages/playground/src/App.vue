@@ -117,6 +117,7 @@
               }`"
               width="160px"
               @click="navigateToHome"
+              class="clickable-logo"
             />
           </v-toolbar-title>
 
@@ -448,3 +449,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.clickable-logo:hover {
+  cursor: pointer;
+}
+</style>
