@@ -1,4 +1,3 @@
-import { NetworkEnv } from "@threefold/grid_client";
 import { createRouter, createWebHashHistory } from "vue-router";
 
 export interface InfoMeta {
@@ -13,11 +12,18 @@ export interface InfoMeta {
 export interface RouteMeta {
   title: string;
   info?: InfoMeta;
+  publicPath?: boolean;
 }
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
+    {
+      name: "landing",
+      path: "/",
+      component: () => import("../components/logged_in_landing.vue"),
+      meta: { title: "Landing Page" },
+    },
     {
       path: "/dashboard",
       children: [
@@ -69,13 +75,13 @@ const router = createRouter({
         {
           path: "pricing",
           component: () => import("../calculator/resource_pricing.vue"),
-          meta: { title: "Resource Pricing" },
+          meta: { title: "Resource Pricing", publicPath: true },
         },
 
         {
           path: "simulator",
           component: () => import("../dashboard/simulator_view.vue"),
-          meta: { title: "Twin" },
+          meta: { title: "Twin", publicPath: true },
         },
       ],
     },
@@ -511,27 +517,27 @@ const router = createRouter({
     {
       path: "/minting",
       component: () => import("../views/minting_view.vue"),
-      meta: { title: "Minting", info: { page: "info/minting.md" } },
+      meta: { title: "Minting", info: { page: "info/minting.md" }, publicPath: true },
     },
     {
       path: "/nodes",
       component: () => import("@/views/nodes.vue"),
-      meta: { title: "Nodes" },
+      meta: { title: "Nodes", publicPath: true },
     },
     {
       path: "/farms",
       component: () => import("@/views/farms.vue"),
-      meta: { title: "Farms" },
+      meta: { title: "Farms", publicPath: true },
     },
     {
       path: "/stats",
       component: () => import("@/views/stats.vue"),
-      meta: { title: "Statistics" },
+      meta: { title: "Statistics", publicPath: true },
     },
     {
       path: "/:pathMatch(.*)*",
       component: () => import("../views/page_not_found.vue"),
-      meta: { title: "Page Not Found" },
+      meta: { title: "Page Not Found", publicPath: true },
     },
   ],
 });
