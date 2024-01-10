@@ -116,6 +116,7 @@
                   : baseUrl + 'images/logoTF_light.png'
               }`"
               width="160px"
+              @click="navigateToHome"
             />
           </v-toolbar-title>
 
@@ -288,7 +289,7 @@ const routes: AppRoute[] = [
       },
       { title: "Applications", icon: "mdi-lightbulb-on-outline", route: "/solutions" },
       {
-        title: "Your Contracts",
+        title: "My Contracts",
         icon: "mdi-file-document-edit",
         route: "/dashboard/contracts-list",
       },
@@ -309,7 +310,12 @@ const routes: AppRoute[] = [
     title: "Farms",
     icon: "mdi-access-point",
     items: [
-      { title: "Farms", icon: "mdi-lan-connect", route: "/farms" },
+      { title: "Farm Finder", icon: "mdi-lan-connect", route: "/farms" },
+      {
+        title: "My Farms",
+        icon: "mdi-silo",
+        route: "/dashboard/farms",
+      },
       {
         title: "Node Installer",
         icon: "mdi-earth",
@@ -378,9 +384,13 @@ function isAuthorized(route: string) {
   return !items.some(substr => route.startsWith(`/${substr}`));
 }
 
+function navigateToHome() {
+  return $router.push("/");
+}
+
 $router.beforeEach((to, from, next) => {
   if (to.path === "/" && hasActiveProfile) {
-    next({ path: "dashboard/twin" });
+    next({ path: "/dashboard/twin" });
   } else {
     next();
   }
