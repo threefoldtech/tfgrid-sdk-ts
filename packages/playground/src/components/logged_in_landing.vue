@@ -12,10 +12,10 @@
 
               backgroundSize: 'cover',
               backgroundPosition: 'center center',
-              minHeight: '350px',
+              minHeight: '450px',
             }"
           />
-          <div class="d-flex flex-wrap justify-center" style="statcards">
+          <div class="d-flex flex-wrap justify-space-between align-end" style="statcards">
             <div v-for="s in stats" :key="s.value" class="stats px-2">
               <v-card class="my-10">
                 <v-img
@@ -176,8 +176,8 @@ export default {
 
 <style scoped>
 .stats {
-  min-width: 160px;
-  max-width: 200px;
+  min-width: 180px;
+  max-width: 300px;
 }
 .statcards {
   margin-top: 50rem;
