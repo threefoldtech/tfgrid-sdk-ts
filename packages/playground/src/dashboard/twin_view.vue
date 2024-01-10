@@ -35,7 +35,7 @@
 
       <v-card>
         <v-row>
-          <v-col lg="8" md="12" sm="12">
+          <v-col xl="6" lg="7" md="12" sm="12" class="my-4">
             <v-list class="custom-list" density="compact">
               <v-row class="row-style">
                 <v-col cols="1" sm="2" style="min-width: fit-content">
@@ -93,41 +93,36 @@
               </v-row>
             </v-list>
           </v-col>
-          <v-divider class="" vertical></v-divider>
 
-          <v-col lg="4" md="12" sm="12" class="d-flex justify-center">
-            <template v-if="profileManager.profile">
-              <v-col>
-                <section class="d-flex flex-column align-center">
-                  <p class="mb-4 text-center">
-                    Scan the QR code using
-                    <a
-                      class="app-link"
-                      href="https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html"
-                      target="_blank"
-                    >
-                      ThreeFold Connect
-                    </a>
-                    to fund your account
-                  </p>
-                  <QrcodeGenerator
-                    :data="'TFT:' + bridge + '?message=twin_' + profileManager.profile.twinId + '&sender=me&amount=100'"
-                  />
-                  <div class="d-flex justify-center my-4">
-                    <a
-                      v-for="app in apps"
-                      :key="app.alt"
-                      :style="{ cursor: 'pointer', width: '9rem' }"
-                      class="app-btn mr-2"
-                      :title="app.alt"
-                      v-html="app.src"
-                      :href="app.url"
-                      target="_blank"
-                    />
-                  </div>
-                </section>
-              </v-col>
-            </template>
+          <v-divider vertical aria-colspan="1"></v-divider>
+
+          <v-col xl="5" lg="4" md="12" sm="12" class="my-4" v-if="profileManager.profile">
+            <div class="text-center my-3">
+              <p>
+                Scan the QR code using
+                <a class="app-link" href="https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html" target="_blank">
+                  ThreeFold Connect
+                </a>
+                to fund your account
+              </p>
+            </div>
+            <div class="d-flex justify-center">
+              <QrcodeGenerator
+                :data="'TFT:' + bridge + '?message=twin_' + profileManager.profile.twinId + '&sender=me&amount=100'"
+              />
+            </div>
+            <div class="d-flex justify-center my-4">
+              <a
+                v-for="app in apps"
+                :key="app.alt"
+                :style="{ cursor: 'pointer', width: '9rem' }"
+                class="app-btn mr-2"
+                :title="app.alt"
+                v-html="app.src"
+                :href="app.url"
+                target="_blank"
+              />
+            </div>
           </v-col>
         </v-row>
         <v-card-actions v-if="updateRelay" class="justify-end mx-4 mb-4">
