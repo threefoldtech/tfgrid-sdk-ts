@@ -1,5 +1,5 @@
 <template>
-  <VAutocomplete label="Region" placeholder="Select a region" v-bind="$props.countryProps" clearable />
+  <VAutocomplete label="Country" placeholder="Select a country" v-bind="$props.countryProps" clearable />
 </template>
 
 <script lang="ts">
