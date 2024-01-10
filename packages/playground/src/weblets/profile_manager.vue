@@ -4,8 +4,8 @@
     width="60%"
     :model-value="profileManager.profile ? false : $props.modelValue"
     @update:modelvalue="
-      if (profilemanager.profile) {
-        $router.push('/');
+      if (profileManager.profile) {
+        router.push('/');
       }
     "
   >
