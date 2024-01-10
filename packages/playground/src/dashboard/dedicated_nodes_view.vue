@@ -193,14 +193,18 @@ const resetFilters = async (filtersInputValues: DedicatedNodeFilters, reload: bo
 
 const updateValues = (label: string, value: string) => {
   if (label in filterOptions.value) {
-    filterOptions.value[label as keyof typeof filterOptions.value] =
-      value === "true" || value === "false" ? Boolean(value) : value;
+    if (label === "gpu") {
+      filterOptions.value.gpu = Boolean(value);
+    } else if (label === "gateway") {
+      filterOptions.value.gateway = Boolean(value);
+    } else {
+      filterOptions.value.status = value as NodeStatus;
+    }
   } else {
     const inputLabel = label as keyof typeof filterInputs.value;
     filterInputs.value[inputLabel].value = value;
   }
 };
-
 watch(
   [activeTab],
   async () => {

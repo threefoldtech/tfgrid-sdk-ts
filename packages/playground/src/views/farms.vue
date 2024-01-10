@@ -131,13 +131,8 @@ const updateFarms = async () => {
 };
 
 const updateValues = (label: string, value: string) => {
-  if (label in filterOptions.value) {
-    filterOptions.value[label as keyof typeof filterOptions.value] =
-      value === "true" || value === "false" ? Boolean(value) : value;
-  } else {
-    const inputLabel = label as keyof typeof filterFarmInputs.value;
-    filterFarmInputs.value[inputLabel].value = value;
-  }
+  const inputLabel = label as keyof typeof filterFarmInputs.value;
+  filterFarmInputs.value[inputLabel].value = value;
 };
 
 const applyFilters = async (filtersInputValues: FilterFarmInputs) => {
