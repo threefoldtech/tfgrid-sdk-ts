@@ -3,12 +3,13 @@
     <v-row>
       <v-col>
         <filters
-          :options="filterOptions"
-          v-model="filterFarmInputs"
-          :loading="loading"
           v-model:valid="isValidForm"
+          v-model="filterFarmInputs"
+          :options="filterOptions"
+          :loading="loading"
           @apply="applyFilters"
           @reset="resetFilters"
+          @update:values="updateValues"
         />
 
         <v-data-table-server
@@ -64,7 +65,7 @@
 
 <script lang="ts" setup>
 import type { Farm } from "@threefold/gridproxy_client";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 import type { VDataTableHeader } from "@/types";
 import type { FilterOptions, MixedFarmFilter } from "@/types";
@@ -127,6 +128,16 @@ onMounted(async () => {
 const updateFarms = async () => {
   const queries = getFarmQueries(mixedFarmFilters.value);
   await _getFarms(queries);
+};
+
+const updateValues = (label: string, value: string) => {
+  if (label in filterOptions.value) {
+    filterOptions.value[label as keyof typeof filterOptions.value] =
+      value === "true" || value === "false" ? Boolean(value) : value;
+  } else {
+    const inputLabel = label as keyof typeof filterFarmInputs.value;
+    filterFarmInputs.value[inputLabel].value = value;
+  }
 };
 
 const applyFilters = async (filtersInputValues: FilterFarmInputs) => {

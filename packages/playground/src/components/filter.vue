@@ -49,16 +49,11 @@
         <v-divider class="mb-4 mx-8" />
         <v-container fluid>
           <v-row justify="end">
-            <v-btn
-              :disabled="!valuesChanged || loading || isEmptyForm || !switchesEnabled"
-              @click="resetFilters"
-              variant="outlined"
-              color="anchor"
-              text="Clear"
-            />
+            <!-- :disabled="!valuesChanged || loading || isEmptyForm || !switchesEnabled" -->
+            <v-btn @click="resetFilters" variant="outlined" color="anchor" text="Clear" />
 
+            <!-- :disabled="!isValidForm || !valuesChanged || loading || isEmptyForm" -->
             <v-btn
-              :disabled="!isValidForm || !valuesChanged || loading || isEmptyForm"
               class="ml-4 mr-7"
               :loading="loading"
               @click="applyFilters"
@@ -74,9 +69,12 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineComponent, nextTick, type PropType, ref, watch } from "vue";
+import type { NodeStatus } from "@threefold/gridproxy_client";
+import { computed, defineComponent, nextTick, onMounted, type PropType, ref, watch } from "vue";
+import { type LocationQueryRaw, type LocationQueryValue, useRoute } from "vue-router";
 
 import { useInputRef } from "@/hooks/input_validator";
+import router from "@/router";
 import type { FilterOptions, InputFilterType } from "@/types";
 
 import { useFormRef } from "../hooks/form_validator";
@@ -94,24 +92,43 @@ const props = defineProps({
   valid: Boolean,
 });
 
-const emit = defineEmits(["apply", "update:valid", "reset"]);
+const emit = defineEmits(["apply", "update:valid", "reset", "update:values"]);
 const isValidForm = ref(false);
 const inputRef = useInputRef(true);
 const panel = ref([0]);
 const formRef = useFormRef();
-const valuesChanged = ref(false);
-const inputsHasValues = ref(false);
-const filtersApplied = ref(false);
+const route = useRoute();
 
-const switchesEnabled = computed(() => props.options.gpu || props.options.gateway || inputsHasValues.value);
-const isEmptyForm = computed(
-  () =>
-    !inputsHasValues.value &&
-    !props.options.gateway &&
-    !props.options.gpu &&
-    !props.options.status?.length &&
-    filtersApplied.value,
-);
+onMounted(() => {
+  // for (const obj of Object.keys(props.modelValue)) {{}{}
+  for (const obj of Object.keys({ ...props.modelValue, ...props.options })) {
+    const key = obj.toLowerCase();
+    if (Object.prototype.hasOwnProperty.call(route.query, key)) {
+      emit("update:values", obj, Reflect.get(route.query, key));
+    }
+  }
+});
+
+const setFilterQueries = () => {
+  const existingQuery: Record<string, string | (true | undefined) | NodeStatus | undefined> = {
+    ...route.query,
+    gpu: props.options.gpu || undefined,
+    gateway: props.options.gateway || undefined,
+    status: props.options.status || undefined,
+  };
+
+  for (const [key, { value }] of Object.entries(props.modelValue)) {
+    if (value) {
+      existingQuery[key.toLowerCase()] = value;
+    } else {
+      delete existingQuery[key.toLowerCase()];
+    }
+  }
+
+  router.push({ path: route.path, query: existingQuery as LocationQueryRaw });
+};
+
+const resetFilterQueries = () => router.push({ path: route.path, query: {} });
 
 const applyFilters = () => {
   emit(
@@ -121,7 +138,7 @@ const applyFilters = () => {
       return res;
     }, {} as any),
   );
-  nextTick(() => (filtersApplied.value = true));
+  setFilterQueries();
 };
 
 const resetFilters = () => {
@@ -132,34 +149,43 @@ const resetFilters = () => {
       return res;
     }, {} as any),
   );
-
-  nextTick(() => {
-    valuesChanged.value = true;
-    filtersApplied.value = false;
-  });
+  resetFilterQueries();
 };
 
 const fitlerColProps = { class: "py-2 px-4", cols: 12, md: 6, lg: 3 };
 
-watch(
-  () => ({ ...props.options }),
-  (newValue, oldValue) => {
-    if (newValue != oldValue) {
-      nextTick(() => (valuesChanged.value = true));
-    }
-  },
-);
+// watch(
+//   () => ({ ...props.options }),
+//   (newValue, oldValue) => {
+//     console.log("newValue != oldValue", newValue, oldValue);
 
-// Enable/Disable the [Apply, Clear] buttons.
-watch(
-  [() => props.modelValue, () => props.options],
-  ([inputs, _]) => {
-    filtersApplied.value = false;
-    inputsHasValues.value = Object.values(inputs).some(obj => obj.value && obj.value.length >= 1);
-    valuesChanged.value = inputsHasValues.value;
-  },
-  { deep: true, immediate: true },
-);
+//     if (newValue != oldValue) {
+//       nextTick(() => (valuesChanged.value = true));
+//     }
+//   },
+// );
+
+// watch(
+//   () => ({ ...props.modelValue }),
+//   (newValue, oldValue) => {
+//     console.log("newValue != oldValue", newValue, oldValue);
+
+//     if (newValue != oldValue) {
+//       nextTick(() => (valuesChanged.value = true));
+//     }
+//   },
+// );
+
+// // Enable/Disable the [Apply, Clear] buttons.
+// watch(
+//   [() => props.modelValue, () => props.options],
+//   ([inputs, _]) => {
+//     filtersApplied.value = false;
+//     inputsHasValues.value = Object.values(inputs).some(obj => obj.value && obj.value.length >= 1);
+//     valuesChanged.value = inputsHasValues.value;
+//   },
+//   { deep: true, immediate: true },
+// );
 </script>
 
 <script lang="ts">

@@ -9,11 +9,12 @@
       <div class="pt-5">
         <filters
           v-model:model-value="filterInputs"
-          :loading="loading"
           v-model:valid="isValidForm"
+          :loading="loading"
+          :options="filterOptions"
           @apply="applyFilters"
           @reset="resetFilters"
-          :options="filterOptions"
+          @update:values="updateValues"
         >
           <template #options="{ props }">
             <v-col v-bind="props">
@@ -185,6 +186,16 @@ const resetFilters = async (filtersInputValues: DedicatedNodeFilters) => {
   filterInputs.value = filtersInputValues;
   filterOptions.value = optionsInitializer(undefined, undefined, undefined);
   filtering.value = false;
+};
+
+const updateValues = (label: string, value: string) => {
+  if (label in filterOptions.value) {
+    filterOptions.value[label as keyof typeof filterOptions.value] =
+      value === "true" || value === "false" ? Boolean(value) : value;
+  } else {
+    const inputLabel = label as keyof typeof filterInputs.value;
+    filterInputs.value[inputLabel].value = value;
+  }
 };
 
 watch(

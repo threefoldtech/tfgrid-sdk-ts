@@ -13,6 +13,7 @@
       v-model:valid="isValidForm"
       @apply="applyFilters"
       @reset="resetFilters"
+      @update:values="updateValues"
     >
       <template #options="{ props }">
         <v-col v-bind="props">
@@ -197,6 +198,16 @@ export default {
       await _requestNodes(queries, { loadFarm: true });
     });
 
+    const updateValues = (label: string, value: string) => {
+      if (label in filterOptions.value) {
+        filterOptions.value[label as keyof typeof filterOptions.value] =
+          value === "true" || value === "false" ? Boolean(value) : value;
+      } else {
+        const inputLabel = label as keyof typeof filterInputs.value;
+        filterInputs.value[inputLabel].value = value;
+      }
+    };
+
     return {
       loading,
       isFormLoading,
@@ -214,6 +225,7 @@ export default {
       requestNodes,
       applyFilters,
       resetFilters,
+      updateValues,
     };
   },
 };
