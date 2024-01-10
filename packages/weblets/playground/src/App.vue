@@ -42,7 +42,7 @@ export default class App extends Vue {
     "discourse",
     "farmingcalculator",
     "funkwhale",
-    "peertube",
+    "funkwhale",
     "taiga",
     "owncloud",
     "contractslist",

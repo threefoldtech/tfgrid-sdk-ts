@@ -3,7 +3,7 @@ import { v4 } from "uuid";
 import generatePassword from "../utils/generatePassword";
 import VM, { Disk } from "./vm";
 const length = Math.floor(Math.random() * 5) + 10;
-export default class Peertube extends VM {
+export default class funkwhale extends VM {
   public name = `PT${v4().split("-")[0]}`;
   public adminEmail = "";
   public adminPassword = generatePassword(length); // prettier-ignore

@@ -26,7 +26,7 @@ export default async function deployDiscourse(data: Discourse, profile: IProfile
   try {
     await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
   } catch (error) {
-    // rollback peertube deployment if gateway deployment failed
+    // rollback funkwhale deployment if gateway deployment failed
     await destroy(profile, "Discourse", data.name);
     throw error;
   }

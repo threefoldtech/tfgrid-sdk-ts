@@ -104,11 +104,11 @@ export const deploymentListEnvironments = {
     NEXTCLOUD_DOMAIN: "Nextcloud Domain",
   },
 
-  peertube: {
+  funkwhale: {
     SSH_KEY: _ssh,
-    PEERTUBE_ADMIN_EMAIL: "Peertube Admin Email",
-    PT_INITIAL_ROOT_PASSWORD: { label: "Peertube Initial Root Password", type: "password" },
-    PEERTUBE_WEBSERVER_HOSTNAME: "Peertube Webserver Hostname",
+    funkwhale_ADMIN_EMAIL: "funkwhale Admin Email",
+    PT_INITIAL_ROOT_PASSWORD: { label: "funkwhale Initial Root Password", type: "password" },
+    funkwhale_WEBSERVER_HOSTNAME: "funkwhale Webserver Hostname",
   },
 
   presearch: {

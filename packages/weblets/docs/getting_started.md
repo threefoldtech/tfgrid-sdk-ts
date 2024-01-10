@@ -35,7 +35,7 @@ yarn serve:app      # to build, move, and serve the playground
 For targeted build you can export the `TARGET_WEBLETS` environment variable to build only the weblets you want. the value is the name of the folder in `src/elements/` directory seperated by space. for example:
 
 ```bash
-export TARGET_WEBLETS="vm peertube DeployedList"
+export TARGET_WEBLETS="vm funkwhale DeployedList"
 yarn serve:app
 ```
 
@@ -50,7 +50,7 @@ There is a several component in the weblets repo, you can find them in the `/src
   - [Kubernetes Cluster](/src/elements/kubernetes)
 - Comunity Solutions
   - [Caprover](/src/elements/caprover)
-  - [Peertube](/src/elements/peertube)
+  - [funkwhale](/src/elements/funkwhale)
   - [Funkwhale](/src/elements/funkwhale)
   - [Mattermost](/src/elements/Mattermost)
   - [Discourse](/src/elements/discourse)

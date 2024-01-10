@@ -191,11 +191,11 @@ const router = createRouter({
           },
         },
         {
-          path: "peertube",
-          component: () => import("../views/peertube_view.vue"),
+          path: "funkwhale",
+          component: () => import("../views/funkwhale_view.vue"),
           meta: {
-            title: "Peertube",
-            info: { page: "info/peertube.md" },
+            title: "funkwhale",
+            info: { page: "info/funkwhale.md" },
             navbarConfig: {
               back: true,
               path: [
@@ -205,7 +205,7 @@ const router = createRouter({
                   to: "/solutions",
                 },
                 {
-                  title: "Peertube",
+                  title: "funkwhale",
                 },
               ],
             },

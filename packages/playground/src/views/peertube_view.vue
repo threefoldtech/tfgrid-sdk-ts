@@ -1,9 +1,9 @@
 <template>
   <view-layout>
-    <TfPeertube />
+    <Tffunkwhale />
 
     <template #list>
-      <TfDeploymentList title="Peertube Instances" :project-name="name" />
+      <TfDeploymentList title="funkwhale Instances" :project-name="name" />
     </template>
   </view-layout>
 </template>
@@ -11,16 +11,16 @@
 <script lang="ts">
 import { ProjectName } from "../types";
 import TfDeploymentList from "../weblets/tf_deployment_list.vue";
-import TfPeertube from "../weblets/tf_peertube.vue";
+import Tffunkwhale from "../weblets/tf_funkwhale.vue";
 
 export default {
-  name: "PeertubeView",
+  name: "funkwhaleView",
   components: {
-    TfPeertube,
+    Tffunkwhale,
     TfDeploymentList,
   },
   setup() {
-    return { name: ProjectName.Peertube };
+    return { name: ProjectName.funkwhale };
   },
 };
 </script>

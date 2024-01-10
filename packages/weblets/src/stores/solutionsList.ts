@@ -3,7 +3,7 @@ import type { IStore } from "./currentDeployment";
 export const solutionList: {
   [key in IStore["type"]]?: string;
 } = {
-  Peertube: "pt",
+  funkwhale: "pt",
   Funkwhale: "fw",
   Taiga: "tg",
   Discourse: "dc",

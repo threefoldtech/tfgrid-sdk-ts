@@ -1,5 +1,5 @@
 import { Network } from "../types/kubernetes";
-import type { default as Peertube } from "../types/peertube";
+import type { default as funkwhale } from "../types/funkwhale";
 import type { IProfile } from "../types/Profile";
 import createNetwork from "./createNetwork";
 import deploy from "./deploy";
@@ -9,16 +9,16 @@ import checkVMExist, { checkGW } from "./prepareDeployment";
 import rootFs from "./rootFs";
 import { InternalSolutionProviderID } from "./solutionProvider";
 
-export default async function deployPeertube(data: Peertube, profile: IProfile, gateway: GatewayNodes) {
+export default async function deployfunkwhale(data: funkwhale, profile: IProfile, gateway: GatewayNodes) {
   // gateway model: <solution-type><twin-id><solution_name>
-  const domainName = await getUniqueDomainName(profile, data.name, "Peertube");
+  const domainName = await getUniqueDomainName(profile, data.name, "funkwhale");
 
   // Dynamically select node to deploy the gateway
   const [publicNodeId, nodeDomain] = selectSpecificGatewayNode(gateway);
   data.domain = `${domainName}.${nodeDomain}`;
 
-  // deploy peertube
-  const deploymentInfo = await deployPeertubeVM(profile, data);
+  // deploy funkwhale
+  const deploymentInfo = await deployfunkwhaleVM(profile, data);
 
   const planetaryIP = deploymentInfo["planetary"] as string;
 
@@ -26,15 +26,15 @@ export default async function deployPeertube(data: Peertube, profile: IProfile, 
     // deploy the gateway
     await deployPrefixGateway(profile, domainName, planetaryIP, publicNodeId);
   } catch (error) {
-    // rollback peertube deployment if gateway deployment failed
-    await destroy(profile, "Peertube", data.name);
+    // rollback funkwhale deployment if gateway deployment failed
+    await destroy(profile, "funkwhale", data.name);
     throw error;
   }
 
   return { deploymentInfo };
 }
 
-async function deployPeertubeVM(profile: IProfile, data: Peertube) {
+async function deployfunkwhaleVM(profile: IProfile, data: funkwhale) {
   const { DiskModel, MachineModel, MachinesModel, generateString } = window.configs.grid3_client;
 
   const {
@@ -73,13 +73,13 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
   vm.cpu = cpu;
   vm.memory = memory;
   vm.rootfs_size = rootFs(cpu, memory);
-  vm.flist = "https://hub.grid.tf/tf-official-apps/peertube-v3.1.1.flist";
+  vm.flist = "https://hub.grid.tf/tf-official-apps/funkwhale-v3.1.1.flist";
   vm.entrypoint = "/sbin/zinit init";
   vm.env = {
     SSH_KEY: profile.sshKey,
-    PEERTUBE_ADMIN_EMAIL: adminEmail,
+    funkwhale_ADMIN_EMAIL: adminEmail,
     PT_INITIAL_ROOT_PASSWORD: adminPassword,
-    PEERTUBE_WEBSERVER_HOSTNAME: domain,
+    funkwhale_WEBSERVER_HOSTNAME: domain,
   };
   vm.solutionProviderId = InternalSolutionProviderID;
 
@@ -92,13 +92,13 @@ async function deployPeertubeVM(profile: IProfile, data: Peertube) {
   const metadate = {
     type: "vm",
     name: name,
-    projectName: "Peertube",
+    projectName: "funkwhale",
   };
   vms.metadata = JSON.stringify(metadate);
 
   // deploy
-  return deploy(profile, "Peertube", name, async grid => {
-    await checkVMExist(grid, "Peertube", name); // change the project name of the grid to be peertube
+  return deploy(profile, "funkwhale", name, async grid => {
+    await checkVMExist(grid, "funkwhale", name); // change the project name of the grid to be funkwhale
     return grid.machines
       .deploy(vms)
       .then(() => grid.machines.getObj(name))
@@ -120,12 +120,12 @@ async function deployPrefixGateway(profile: IProfile, domainName: string, backen
   const metadate = {
     type: "gateway",
     name: domainName,
-    projectName: "Peertube",
+    projectName: "funkwhale",
   };
   gw.metadata = JSON.stringify(metadate);
 
   return deploy(profile, "GatewayName", domainName, async grid => {
-    await checkGW(grid, domainName, "Peertube");
+    await checkGW(grid, domainName, "funkwhale");
     return grid.gateway
       .deploy_name(gw)
       .then(() => grid.gateway.getObj(domainName))

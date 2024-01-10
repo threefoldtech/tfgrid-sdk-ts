@@ -75,7 +75,7 @@
           />
         </template>
 
-        <template #Peertube-actions="{ item }">
+        <template #funkwhale-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
@@ -85,7 +85,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value.env.PEERTUBE_WEBSERVER_HOSTNAME"
+            :href="'https://' + item.value.env.funkwhale_WEBSERVER_HOSTNAME"
           />
         </template>
 
@@ -373,7 +373,7 @@ const tabs: Tab[] = [
   { title: "Micro Virtual Machine", value: "VM", imgPath: "images/icons/vm.png" },
   { title: "Kubernetes", value: "Kubernetes", imgPath: "images/icons/kubernetes.png" },
   { title: "CapRover", value: "CapRover", imgPath: "images/icons/caprover.png" },
-  { title: "Peertube", value: "Peertube", imgPath: "images/icons/peertube.png" },
+  { title: "funkwhale", value: "funkwhale", imgPath: "images/icons/funkwhale.png" },
   { title: "Funkwhale", value: "Funkwhale", imgPath: "images/icons/funkwhale.png" },
   { title: "Mattermost", value: "Mattermost", imgPath: "images/icons/mattermost.png" },
   { title: "Discourse", value: "Discourse", imgPath: "images/icons/discourse.png" },

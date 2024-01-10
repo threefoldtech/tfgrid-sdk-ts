@@ -13,7 +13,7 @@
   import Mattermost from "./elements/Mattermost/Mattermost.wc.svelte";
   import NodePilot from "./elements/nodePilot/NodePilot.wc.svelte";
   import Owncloud from "./elements/owncloud/Owncloud.wc.svelte";
-  import Peertube from "./elements/peertube/Peertube.wc.svelte";
+  import funkwhale from "./elements/funkwhale/funkwhale.wc.svelte";
   import Presearch from "./elements/presearch/Presearch.wc.svelte";
   import ProfileManager from "./elements/profiles/Profiles.wc.svelte";
   import QVM from "./elements/qvm/Qvm.wc.svelte";
@@ -27,7 +27,7 @@
     { name: "Micro VM", cmp: Vm },
     { name: "Kubernetes", cmp: Kubernetes },
     { name: "Caprover", cmp: Caprover },
-    { name: "Peertube", cmp: Peertube },
+    { name: "funkwhale", cmp: funkwhale },
     { name: "Funkwhale", cmp: Funkwhale },
     { name: "Mattermost", cmp: Mattermost },
     // { name: "Mastodon", cmp: Mastodon },

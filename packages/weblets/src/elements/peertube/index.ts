@@ -1,1 +1,1 @@
-import "./Peertube.wc.svelte";
+import "./funkwhale.wc.svelte";

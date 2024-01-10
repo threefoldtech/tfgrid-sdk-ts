@@ -9,9 +9,9 @@
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
-    title-image="images/icons/peertube.png"
+    title-image="images/icons/funkwhale.png"
   >
-    <template #title>Deploy a Peertube Instance</template>
+    <template #title>Deploy a funkwhale Instance</template>
     <form-validator v-model="valid">
       <input-validator
         :value="name"
@@ -38,7 +38,7 @@
         ]"
         #="{ props }"
       >
-        <input-tooltip tooltip="Peertube admin email.">
+        <input-tooltip tooltip="funkwhale admin email.">
           <v-text-field label="Admin Email" v-model="email" v-bind="props" />
         </input-tooltip>
       </input-validator>
@@ -56,7 +56,7 @@
           ]"
           #="{ props: validatorProps }"
         >
-          <input-tooltip tooltip="Peertube admin password.">
+          <input-tooltip tooltip="funkwhale admin password.">
             <v-text-field label="Admin Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
           </input-tooltip>
         </input-validator>
@@ -117,7 +117,7 @@ const email = ref("");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
-  value: "https://hub.grid.tf/tf-official-apps/peertube-v3.1.1.flist",
+  value: "https://hub.grid.tf/tf-official-apps/funkwhale-v3.1.1.flist",
   entryPoint: "/sbin/zinit init",
 };
 const dedicated = ref(false);
@@ -128,13 +128,13 @@ const selectionDetails = ref<SelectionDetails>();
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed a peertube instance.");
-  layout.value.openDialog(deployment, deploymentListEnvironments.peertube);
+  layout.value.setStatus("success", "Successfully deployed a funkwhale instance.");
+  layout.value.openDialog(deployment, deploymentListEnvironments.funkwhale);
 }
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Peertube.toLowerCase() + "/" + name.value;
+  const projectName = ProjectName.funkwhale.toLowerCase() + "/" + name.value;
 
   const subdomain = getSubdomain({
     deploymentName: name.value,
@@ -178,9 +178,9 @@ async function deploy() {
           planetary: true,
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
-            { key: "PEERTUBE_ADMIN_EMAIL", value: email.value },
+            { key: "funkwhale_ADMIN_EMAIL", value: email.value },
             { key: "PT_INITIAL_ROOT_PASSWORD", value: password.value },
-            { key: "PEERTUBE_WEBSERVER_HOSTNAME", value: domain },
+            { key: "funkwhale_WEBSERVER_HOSTNAME", value: domain },
           ],
           nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
@@ -190,7 +190,7 @@ async function deploy() {
       ],
     });
   } catch (e) {
-    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a peertube instance."));
+    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a funkwhale instance."));
   }
 
   if (!selectionDetails.value?.domain?.enableSelectedDomain) {
@@ -214,7 +214,7 @@ async function deploy() {
     layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
     await rollbackDeployment(grid!, name.value);
-    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a peertube instance."));
+    layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a funkwhale instance."));
   }
 }
 </script>
@@ -228,7 +228,7 @@ import { normalizeError } from "../utils/helpers";
 import rootFs from "../utils/root_fs";
 
 export default {
-  name: "TfPeertube",
+  name: "Tffunkwhale",
   components: { SelectSolutionFlavor },
 };
 </script>

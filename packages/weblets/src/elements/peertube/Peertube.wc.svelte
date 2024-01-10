@@ -1,4 +1,4 @@
-<svelte:options tag="tf-peertube" />
+<svelte:options tag="tf-funkwhale" />
 
 <script lang="ts">
   // Types
@@ -13,11 +13,11 @@
   import SelectProfile from "../../components/SelectProfile.svelte";
   import Tabs from "../../components/Tabs.svelte";
   import { IFormField, IPackage, ITab, SelectCapacityUpdate } from "../../types";
-  import Peertube from "../../types/peertube";
+  import funkwhale from "../../types/funkwhale";
   import type { IProfile } from "../../types/Profile";
   // Modules
   import { Env } from "../../types/vm";
-  import deployPeertube from "../../utils/deployPeertube";
+  import deployfunkwhale from "../../utils/deployfunkwhale";
   import type { GatewayNodes } from "../../utils/gatewayHelpers";
   import hasEnoughBalance from "../../utils/hasEnoughBalance";
   import { noActiveProfile } from "../../utils/message";
@@ -29,7 +29,7 @@
   const tabs: ITab[] = [{ label: "Base", value: "base" }];
 
   const fields: IFormField[] = [
-    { label: "Name", placeholder: "Peertube Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }, // prettier-ignore
+    { label: "Name", placeholder: "funkwhale Instance Name", symbol: "name", type: "text", validator: validateName, invalid: false }, // prettier-ignore
     { label: "Email", placeholder: "Admin Email", symbol: "adminEmail", type: "text", validator: validateEmail, invalid: false }, // prettier-ignore
     { label: "Password", placeholder: "Admin Password", symbol: "adminPassword", type: "password", validator: validatePassword, invalid: false }, // prettier-ignore
   ];
@@ -43,7 +43,7 @@
   let selectCapacity = new SelectCapacityUpdate();
 
   const deploymentStore = window.configs?.deploymentStore;
-  const data = new Peertube();
+  const data = new funkwhale();
 
   let active = "base";
   let loading = false;
@@ -72,7 +72,7 @@
       message = "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
       return;
     }
-    deployPeertube(data, profile, gateway)
+    deployfunkwhale(data, profile, gateway)
       .then(data => {
         deploymentStore.set(0);
         success = true;
@@ -80,7 +80,7 @@
       })
       .catch((err: string) => {
         failed = true;
-        message = normalizeDeploymentErrorMessage(err, "Peertube");
+        message = normalizeDeploymentErrorMessage(err, "funkwhale");
       })
       .finally(() => {
         loading = false;
@@ -89,7 +89,7 @@
 
   $: logs = $currentDeployment;
 
-  $: showLogs = loading || (logs !== null && logs.type === "Peertube");
+  $: showLogs = loading || (logs !== null && logs.type === "funkwhale");
   $: showNoProfile = !showLogs && !profile;
   $: showSuccess = !showLogs && !showNoProfile && success;
   $: showFailed = !showLogs && !showNoProfile && failed;
@@ -108,10 +108,10 @@
 <div style="padding: 15px;">
   <!-- Container -->
   <form on:submit|preventDefault={onDeployVM} class="box">
-    <h4 class="is-size-4">Deploy a Peertube Instance</h4>
+    <h4 class="is-size-4">Deploy a funkwhale Instance</h4>
     <p>
-      Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services.
-      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_peertube.html"> Quick start documentation</a>
+      funkwhale aspires to be a decentralized and free/libre alternative to video broadcasting services.
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_funkwhale.html"> Quick start documentation</a>
     </p>
     <hr />
 
@@ -125,7 +125,7 @@
     </div>
 
     <div style:display={showSuccess ? "block" : "none"}>
-      <Alert type="success" message="Successfully Deployed Peertube." deployed={true} />
+      <Alert type="success" message="Successfully Deployed funkwhale." deployed={true} />
     </div>
 
     <div style:display={showFailed ? "block" : "none"}>

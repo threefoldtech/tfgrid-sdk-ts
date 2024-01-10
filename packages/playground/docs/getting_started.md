@@ -25,7 +25,7 @@ There is a several component in the weblets repo, you can find them in the `/src
   - [Kubernetes Cluster](../src/weblets/tf_kubernetes.vue)
 - Comunity Solutions
   - [Caprover](../src/weblets/tf_caprover.vue)
-  - [Peertube](../src/weblets/tf_peertube.vue)
+  - [funkwhale](../src/weblets/tf_funkwhale.vue)
   - [Funkwhale](../src/weblets/tf_funkwhale.vue)
   - [Mattermost](../src/weblets/tf_mattermost.vue)
   - [Discourse](../src/weblets/tf_discourse.vue)

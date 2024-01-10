@@ -5,7 +5,7 @@ export interface IStore {
     | "VM"
     | "CapRover"
     | "Discourse"
-    | "Peertube"
+    | "funkwhale"
     | "Funkwhale"
     | "GatewayName"
     | "Add Worker"

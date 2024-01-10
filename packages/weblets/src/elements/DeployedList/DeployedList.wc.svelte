@@ -30,7 +30,7 @@
     { label: "Micro Virtual Machine", value: "VM" },
     { label: "Kubernetes", value: "Kubernetes" },
     { label: "CapRover", value: "CapRover" },
-    { label: "Peertube", value: "Peertube" },
+    { label: "funkwhale", value: "funkwhale" },
     { label: "Funkwhale", value: "Funkwhale" },
     { label: "Mattermost", value: "Mattermost" },
     // { label: "Mastodon", value: "Mastodon" },
@@ -209,7 +209,7 @@
           },
         },
       ],
-      Peertube: rows => [
+      funkwhale: rows => [
         {
           type: "info",
           label: "Show Details",
@@ -221,12 +221,12 @@
           type: "warning",
           label: "Visit",
           click: (_, i) => {
-            const domain = rows[i].details.env.PEERTUBE_WEBSERVER_HOSTNAME;
+            const domain = rows[i].details.env.funkwhale_WEBSERVER_HOSTNAME;
             window.open("https://" + domain, "_blank").focus();
           },
           disabled: i => {
             const env = rows[i].details.env;
-            return !env || !env.PEERTUBE_WEBSERVER_HOSTNAME || removing !== null;
+            return !env || !env.funkwhale_WEBSERVER_HOSTNAME || removing !== null;
           },
         },
       ],

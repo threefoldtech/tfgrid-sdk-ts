@@ -15,7 +15,7 @@ const solutionWithGW: IStore["type"][] = [
   "Mastodon",
   "Mattermost",
   "Owncloud",
-  "Peertube",
+  "funkwhale",
   "Subsquid",
   "Taiga",
   "Wordpress",

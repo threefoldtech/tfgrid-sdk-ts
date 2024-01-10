@@ -19,7 +19,7 @@
       case "CapRover":
       case "Funkwhale":
       case "Kubernetes":
-      case "Peertube":
+      case "funkwhale":
       case "Owncloud":
       case "Fullvm":
       case "Algorand":

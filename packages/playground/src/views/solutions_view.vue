@@ -46,10 +46,10 @@ export default {
   setup() {
     const cards: Card[] = [
       {
-        title: "Peertube",
-        excerpt: "Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services.",
-        icon: "peertube.png",
-        route: "/peertube",
+        title: "funkwhale",
+        excerpt: "funkwhale aspires to be a decentralized and free/libre alternative to video broadcasting services.",
+        icon: "funkwhale.png",
+        route: "/funkwhale",
       },
       {
         title: "Funkwhale",

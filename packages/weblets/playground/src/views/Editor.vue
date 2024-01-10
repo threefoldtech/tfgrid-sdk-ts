@@ -118,7 +118,7 @@ export default class Editor extends Vue {
     new Weblet("Kubernetes", `kubernetes`, "Kubernetes", "deployment", "kubernetes.png"),
     new Weblet("CapRover", "caprover", "CapRover", "deployment", "caprover.png"),
 
-    new Weblet("Peertube", "peertube", "Peertube", "deployment", "peertube.png"),
+    new Weblet("funkwhale", "funkwhale", "funkwhale", "deployment", "funkwhale.png"),
     new Weblet("Funkwhale", "funkwhale", "Funkwhale", "deployment", "funkwhale.png"),
 
     new Weblet("Mattermost", "mattermost", "Mattermost", "deployment", "mattermost.png"),

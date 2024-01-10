@@ -89,7 +89,7 @@ export enum ProjectName {
   Mattermost = "Mattermost",
   Owncloud = "Owncloud",
   Nextcloud = "Nextcloud",
-  Peertube = "Peertube",
+  funkwhale = "funkwhale",
   Subsquid = "Subsquid",
   Taiga = "Taiga",
   Wordpress = "Wordpress",
@@ -108,7 +108,7 @@ export enum ProjectName {
 }
 
 export enum SolutionCode {
-  peertube = "pt",
+  funkwhale = "pt",
   funkwhale = "fw",
   taiga = "tg",
   discourse = "dc",
@@ -145,7 +145,7 @@ export const solutionType: { [key: string]: string } = {
   nodepilot: "Node Pilot",
   owncloud: "Owncloud",
   nextcloud: "Nextcloud",
-  peertube: "Peertube",
+  funkwhale: "funkwhale",
   presearch: "Presearch",
   subsquid: "Subsquid",
   taiga: "Taiga",
