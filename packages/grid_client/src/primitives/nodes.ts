@@ -39,6 +39,7 @@ interface NodeInfo {
   id: string;
   nodeId: number;
   farmId: number;
+  farmName: string;
   twinId: number;
   gridVersion: number;
   uptime: number;
