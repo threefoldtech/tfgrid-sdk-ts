@@ -11,18 +11,14 @@
       :options="filterOptions"
       :loading="loading"
       v-model:valid="isValidForm"
-      @update:model-value="applyFilters"
+      @apply="applyFilters"
       @reset="resetFilters"
     >
-      <template #options="{ props, applyFilters }">
+      <template #options="{ props }">
         <v-col v-bind="props">
           <v-select
             class="p-4"
-            :model-value="filterOptions.status"
-            @update:model-value="
-              filterOptions.status = $event;
-              applyFilters();
-            "
+            v-model="filterOptions.status"
             :items="nodeStatusOptions"
             label="Select Nodes Status"
             variant="outlined"
@@ -38,11 +34,7 @@
               color="primary"
               inset
               label="Gateways (Only)"
-              :model-value="filterOptions.gateway"
-              @update:model-value="
-                filterOptions.gateway = $event;
-                applyFilters();
-              "
+              v-model="filterOptions.gateway"
               hide-details
               :disabled="isFormLoading"
             />
@@ -55,11 +47,7 @@
               color="primary"
               inset
               label="GPU Node (Only)"
-              :model-value="filterOptions.gpu"
-              @update:model-value="
-                filterOptions.gpu = $event;
-                applyFilters();
-              "
+              v-model="filterOptions.gpu"
               hide-details
               :disabled="isFormLoading"
             />
@@ -99,7 +87,7 @@
 <script lang="ts">
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
-import { capitalize, computed, onMounted, ref } from "vue";
+import { capitalize, computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import NodeDetails from "@/components/node_details.vue";
@@ -175,10 +163,6 @@ export default {
       filtering.value = true;
       filterInputs.value = filtersInputValues;
       filterOptions.value = optionsInitializer(undefined, undefined, undefined);
-
-      if (isValidForm.value) {
-        await updateNodes();
-      }
       filtering.value = false;
     };
 

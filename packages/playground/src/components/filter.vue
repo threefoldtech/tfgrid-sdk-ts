@@ -30,7 +30,6 @@
                     :label="$props.modelValue[key].label"
                     :type="$props.modelValue[key].type"
                     :disabled="loading"
-                    @update:model-value="checkInput"
                   >
                     <template #append-inner>
                       <v-tooltip :text="$props.modelValue[key].tooltip">
@@ -42,30 +41,24 @@
                   </v-text-field>
                 </input-validator>
               </v-col>
-              <slot
-                name="options"
-                :props="fitlerColProps"
-                :applyFilters="!isValidForm || loading || !valueChanged ? () => {} : applyFilters"
-              >
-              </slot>
+              <slot name="options" :props="fitlerColProps"> </slot>
             </v-row>
           </v-container>
         </form-validator>
 
         <v-divider class="mb-4 mx-8" />
-
         <v-container fluid>
           <v-row justify="end">
             <v-btn
-              :disabled="!isValidForm || loading || !valueChanged"
+              :disabled="!valueChanged || loading"
               @click="resetFilters"
               variant="outlined"
               color="anchor"
               text="Clear"
             />
             <v-btn
+              :disabled="!isValidForm || !valueChanged || loading"
               class="ml-4 mr-7"
-              :disabled="!isValidForm || !valueChanged"
               :loading="loading"
               @click="applyFilters"
               variant="outlined"
@@ -80,7 +73,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineComponent, type PropType, ref, watch } from "vue";
+import { defineComponent, nextTick, type PropType, ref, watch } from "vue";
 
 import { useInputRef } from "@/hooks/input_validator";
 
@@ -100,23 +93,17 @@ const props = defineProps({
   valid: Boolean,
 });
 
-const emit = defineEmits(["update:model-value", "update:valid", "reset"]);
+const emit = defineEmits(["apply", "update:valid", "reset"]);
 const isValidForm = ref(false);
 const inputRef = useInputRef(true);
 const panel = ref([0]);
 const formRef = useFormRef();
+
 const valueChanged = ref(false);
 
-const checkInput = (input: string) => {
-  if (input.length == 0) {
-    applyFilters();
-  }
-};
-
 const applyFilters = () => {
-  valueChanged.value = false;
   emit(
-    "update:model-value",
+    "apply",
     Object.keys(props.modelValue).reduce((res, key) => {
       res[key] = { ...props.modelValue[key] };
       return res;
@@ -125,7 +112,6 @@ const applyFilters = () => {
 };
 
 const resetFilters = () => {
-  valueChanged.value = false;
   emit(
     "reset",
     Object.keys(props.modelValue).reduce((res, key) => {
@@ -133,32 +119,24 @@ const resetFilters = () => {
       return res;
     }, {} as any),
   );
+
+  nextTick(() => {
+    valueChanged.value = true;
+  });
 };
 
-watch(
-  () => props.modelValue,
-  (newValue: PropType<{ [key: string]: InputFilterType }>) => {
-    const hasNonEmptyValue = Object.keys(newValue).some(obj => {
-      return Reflect.get(newValue, obj).value && Reflect.get(newValue, obj).value.length >= 1;
-    });
-    valueChanged.value = hasNonEmptyValue;
-  },
-  { deep: true },
-);
-
-watch(
-  () => props.options,
-  (newValue: FilterOptions) => {
-    if (newValue.gateway || newValue.gpu || newValue.status) {
-      // We don't need to enable the clear button when changing the page or the size.
-      const hasValue = !!newValue.gateway || !!newValue.gpu || !!newValue.status?.length;
-      valueChanged.value = hasValue;
-    }
-  },
-  { deep: true },
-);
-
 const fitlerColProps = { class: "py-2 px-4", cols: 12, md: 6, lg: 3 };
+
+// Enable/Disable the [Apply, Clear] buttons.
+watch(
+  [() => props.modelValue, () => props.options],
+  ([inputs, options]) => {
+    const optionsChanged = options.gateway || options.gpu || (options.status && options.status?.length >= 1);
+    const inputsHasValues = Object.values(inputs).some(obj => obj.value && obj.value.length >= 1);
+    valueChanged.value = inputsHasValues || !!optionsChanged;
+  },
+  { deep: true, immediate: true },
+);
 </script>
 
 <script lang="ts">
