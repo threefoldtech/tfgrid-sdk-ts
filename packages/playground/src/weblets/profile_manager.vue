@@ -3,11 +3,7 @@
     scrollable
     width="60%"
     :model-value="profileManager.profile ? false : $props.modelValue"
-    @update:modelvalue="
-      if (profileManager.profile) {
-        router.push('/');
-      }
-    "
+    @update:model-value="$emit('update:model-value', $event)"
   >
     <template #activator="{ props }">
       <VCard v-bind="props" class="pa-3 d-inline-flex align-center">
@@ -345,14 +341,7 @@ import { useProfileManagerController } from "../components/profile_manager_contr
 import { useOnline } from "../hooks";
 import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
-import {
-  activateAccountAndCreateTwin,
-  type Balance,
-  createAccount,
-  getGrid,
-  loadBalance,
-  loadProfile,
-} from "../utils/grid";
+import { activateAccountAndCreateTwin, createAccount, getGrid, loadBalance, loadProfile } from "../utils/grid";
 import { normalizeBalance, normalizeError } from "../utils/helpers";
 
 interface Credentials {
