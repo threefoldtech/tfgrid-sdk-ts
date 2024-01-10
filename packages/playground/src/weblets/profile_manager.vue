@@ -278,7 +278,7 @@
             </FormValidator>
 
             <div class="d-flex justify-center mt-2">
-              <VBtn color="anchor" variant="outlined" @click="() => router.push('/')"> Close </VBtn>
+              <VBtn color="anchor" variant="outlined" @click="$emit('update:modelValue', false)"> Close </VBtn>
               <VBtn
                 class="ml-2"
                 type="submit"
