@@ -73,11 +73,6 @@
         <v-row>
           <v-col cols="12">
             <div class="table">
-              <div class="hint mb-2">
-                <v-alert type="info" variant="tonal">
-                  The nodes will be filtered and displayed after you enter the value by 1 second.
-                </v-alert>
-              </div>
               <nodes-table
                 v-model="nodes"
                 v-model:size="filterOptions.size"
