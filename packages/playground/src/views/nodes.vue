@@ -202,13 +202,11 @@ export default {
 
     const updateValues = (label: string, value: string) => {
       if (label in filterOptions.value) {
-        if (label === "gpu") {
-          filterOptions.value.gpu = Boolean(value);
-        } else if (label === "gateway") {
-          filterOptions.value.gateway = Boolean(value);
-        } else {
-          filterOptions.value.status = value as NodeStatus;
-        }
+        Reflect.set(
+          filterOptions.value,
+          label,
+          value === "true" ? true : value === "false" ? false : (value as unknown as boolean),
+        );
       } else {
         const inputLabel = label as keyof typeof filterInputs.value;
         filterInputs.value[inputLabel].value = value;
