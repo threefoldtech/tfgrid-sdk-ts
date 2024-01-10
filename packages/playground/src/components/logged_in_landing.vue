@@ -66,12 +66,16 @@
               </p>
 
               <div class="d-flex justify-center align-center flex-wrap my-4">
-                <v-btn color="primary" class="mr-2" target="_blank" href="https://www.threefold.io/grid/">
+                <v-btn
+                  color="secondary"
+                  variant="outlined"
+                  class="mr-2"
+                  target="_blank"
+                  href="https://www.threefold.io/grid/"
+                >
                   Learn about the grid
                 </v-btn>
-                <v-btn target="_blank" color="secondary" variant="outlined" href="https://www.threefold.io/build/">
-                  Use The Grid
-                </v-btn>
+                <v-btn color="primary" target="_blank" href="https://www.threefold.io/build/"> Use The Grid </v-btn>
               </div>
             </div>
           </v-card>

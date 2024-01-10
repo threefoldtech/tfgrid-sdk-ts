@@ -64,14 +64,17 @@
           decentralization. The ThreeFold Grid can support workloads from Blockchain to Web2 to Web3 to IoT and
           Metaverse and more.
         </p>
-
-        <div class="d-flex justify-center align-center flex-wrap mt-8">
-          <v-btn class="mr-2" color="primary" target="_blank" href="https://www.threefold.io/grid/">
+        <div class="d-flex justify-center align-center flex-wrap my-4">
+          <v-btn
+            color="secondary"
+            variant="outlined"
+            class="mr-2"
+            target="_blank"
+            href="https://www.threefold.io/grid/"
+          >
             Learn about the grid
           </v-btn>
-          <v-btn variant="outlined" color="secondary" target="_blank" href="https://www.threefold.io/build/">
-            Use The Grid
-          </v-btn>
+          <v-btn color="primary" target="_blank" href="https://www.threefold.io/build/"> Use The Grid </v-btn>
         </div>
       </div>
     </v-container>
