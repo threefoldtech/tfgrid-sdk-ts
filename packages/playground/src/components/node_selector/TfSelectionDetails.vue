@@ -10,7 +10,7 @@
       </v-radio-group>
 
       <template v-if="wayToSelect === 'automated'">
-        <TfSelectLocation v-model="location" v-if="wayToSelect === 'automated'" />
+        <TfSelectLocation v-model="location" v-if="wayToSelect === 'automated'" title="Choose a Location" />
         <TfSelectFarm
           :valid-filters="validFilters"
           :filters="filters"
