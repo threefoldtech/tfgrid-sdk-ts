@@ -238,7 +238,7 @@ const routes: AppRoute[] = [
       {
         title: "Node Statistics",
         icon: "mdi-chart-scatter-plot",
-        route: "/stats",
+        route: "/tf-grid/stats",
         tooltip: "View Node Statistics",
       },
       {
@@ -256,30 +256,30 @@ const routes: AppRoute[] = [
       {
         title: "Pricing Calculator",
         icon: "mdi-currency-usd",
-        route: "/calculator/pricing",
+        route: "/deploy/pricing-calculator",
       },
-      { title: "Node Finder", icon: "mdi-access-point", route: "/nodes" },
+      { title: "Node Finder", icon: "mdi-access-point", route: "/deploy/nodes" },
 
       {
         title: "Virtual Machines",
         icon: "mdi-television",
-        route: "/vms",
+        route: "/deploy/vms",
       },
       {
         title: "Orchestrators",
         icon: "mdi-group",
-        route: "/orchestrators",
+        route: "/deploy/orchestrators",
       },
       {
         title: "Dedicated Machines",
         icon: "mdi-resistor-nodes",
-        route: "/dashboard/dedicated-nodes",
+        route: "/deploy/dedicated-nodes",
       },
-      { title: "Applications", icon: "mdi-lightbulb-on-outline", route: "/solutions" },
+      { title: "Applications", icon: "mdi-lightbulb-on-outline", route: "/deploy/applications" },
       {
         title: "My Contracts",
         icon: "mdi-file-document-edit",
-        route: "/dashboard/contracts-list",
+        route: "/deploy/contracts-list",
       },
       {
         title: "Images",
@@ -290,7 +290,7 @@ const routes: AppRoute[] = [
       {
         title: "SSHKey",
         icon: "mdi-key-plus",
-        route: "/sshkey",
+        route: "/deploy/sshkey",
       },
     ],
   },
@@ -298,12 +298,12 @@ const routes: AppRoute[] = [
     title: "Farms",
     icon: "mdi-access-point",
     items: [
-      { title: "Farm Finder", icon: "mdi-lan-connect", route: "/farms" },
       {
         title: "My Farms",
         icon: "mdi-silo",
-        route: "/dashboard/farms",
+        route: "/farms",
       },
+      { title: "Farm Finder", icon: "mdi-lan-connect", route: "/farms/farm-finder" },
       {
         title: "Node Installer",
         icon: "mdi-earth",
@@ -313,7 +313,7 @@ const routes: AppRoute[] = [
       {
         title: "Simulator",
         icon: "mdi-chart-line",
-        route: "/calculator/simulator",
+        route: "/farms/simulator-calculator",
       },
     ],
   },
@@ -324,19 +324,19 @@ const routes: AppRoute[] = [
       {
         title: "My Profile",
         icon: "mdi-account-supervisor-outline",
-        route: "/dashboard/twin",
+        route: "/tf-chain/twin",
       },
-      { title: "TF DAO", icon: "mdi-note-check-outline", route: "/dashboard/dao" },
-      { title: "TF Token Bridge", icon: "mdi-swap-horizontal", route: "/dashboard/bridge" },
+      { title: "TF DAO", icon: "mdi-note-check-outline", route: "/tf-chain/dao" },
+      { title: "TF Token Bridge", icon: "mdi-swap-horizontal", route: "/tf-chain/bridge" },
       {
         title: "TF Token Transfer",
         icon: "mdi-account-arrow-right-outline",
-        route: "/dashboard/transfer",
+        route: "/tf-chain/transfer",
       },
       {
         title: "TF Minting Reports",
         icon: "mdi-file-document-edit",
-        route: "/minting",
+        route: "/tf-chain/minting",
         tooltip: "TFGrid Minting Explorer",
       },
     ],
