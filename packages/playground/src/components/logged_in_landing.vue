@@ -103,7 +103,7 @@ export default {
 
     const cards = [
       {
-        title: "My Profile",
+        title: "Your Profile",
         icon: "mdi-account",
         text: "Your Profile includes your twin ID on the TFChain along with the account address and relay used. Click to view your profile details.",
         path: "dashboard/twin",
