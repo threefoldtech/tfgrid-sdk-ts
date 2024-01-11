@@ -22,6 +22,10 @@
       />
     </input-tooltip>
   </div>
+  <v-alert type="info" variant="tonal">
+    Discounts are applied on hourly basis, you need to maintain at least the same balance you have or higher to unlock
+    the discounts.
+  </v-alert>
   <div class="pt-5">
     <v-card>
       <v-tabs v-model="activeTab" align-tabs="center">
