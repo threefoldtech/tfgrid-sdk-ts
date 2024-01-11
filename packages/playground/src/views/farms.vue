@@ -65,7 +65,7 @@
 
 <script lang="ts" setup>
 import type { Farm } from "@threefold/gridproxy_client";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 
 import type { VDataTableHeader } from "@/types";
 import type { FilterOptions, MixedFarmFilter } from "@/types";
@@ -192,6 +192,17 @@ const headers: VDataTableHeader = [
     sortable: false,
   },
 ];
+
+watch(
+  () => ({ ...filterOptions.value }),
+  async (newValue: FilterOptions, oldVal: FilterOptions) => {
+    if (oldVal.page != newValue.page || oldVal.size != newValue.size) {
+      loading.value = isFormLoading.value = true;
+      await updateFarms();
+      loading.value = isFormLoading.value = false;
+    }
+  },
+);
 </script>
 
 <script lang="ts">

@@ -87,7 +87,7 @@
 
 <script lang="ts">
 import { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
-import { capitalize, computed, onMounted, ref } from "vue";
+import { capitalize, computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import NodeDetails from "@/components/node_details.vue";
@@ -212,6 +212,17 @@ export default {
         filterInputs.value[inputLabel].value = value;
       }
     };
+
+    watch(
+      () => ({ ...filterOptions.value }),
+      async (newValue: FilterOptions, oldVal: FilterOptions) => {
+        if (oldVal.page != newValue.page || oldVal.size != newValue.size) {
+          loading.value = isFormLoading.value = true;
+          await updateNodes();
+          loading.value = isFormLoading.value = false;
+        }
+      },
+    );
 
     return {
       loading,

@@ -213,6 +213,17 @@ watch(
   },
   { deep: true },
 );
+
+watch(
+  () => ({ ...filterOptions.value }),
+  async (newValue: FilterOptions, oldVal: FilterOptions) => {
+    if (oldVal.page != newValue.page || oldVal.size != newValue.size) {
+      loading.value = isFormLoading.value = true;
+      await _loadData();
+      loading.value = isFormLoading.value = false;
+    }
+  },
+);
 </script>
 
 <script lang="ts">
