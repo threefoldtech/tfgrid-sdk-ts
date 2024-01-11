@@ -53,14 +53,14 @@
         <v-container fluid>
           <v-row justify="end">
             <v-btn
-              :disabled="!isValidForm || !(formHasValues || Object.keys(route.query).length > 0)"
+              :disabled="!isValidForm || loading || !(formHasValues || Object.keys(route.query).length > 0)"
               @click="resetFilters"
               variant="outlined"
               color="anchor"
               text="Clear"
             />
             <v-btn
-              :disabled="!isValidForm || !formHasValues || sameState"
+              :disabled="!isValidForm || loading || !formHasValues || sameState"
               class="ml-4 mr-7"
               :loading="loading"
               @click="applyFilters"
