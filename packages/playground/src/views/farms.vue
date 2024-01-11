@@ -3,11 +3,13 @@
     <v-row>
       <v-col>
         <filters
-          v-model="filterFarmInputs"
-          :loading="loading"
           v-model:valid="isValidForm"
-          @update:model-value="applyFilters"
+          v-model="filterFarmInputs"
+          :options="filterOptions"
+          :loading="loading"
+          @apply="applyFilters"
           @reset="resetFilters"
+          @update:values="updateValues"
         />
 
         <v-data-table-server
@@ -66,7 +68,7 @@ import type { Farm } from "@threefold/gridproxy_client";
 import { computed, onMounted, ref, watch } from "vue";
 
 import type { VDataTableHeader } from "@/types";
-import type { FarmFilterOptions, MixedFarmFilter } from "@/types";
+import type { FilterOptions, MixedFarmFilter } from "@/types";
 import type { FilterFarmInputs } from "@/utils/filter_farms";
 import { inputsInitializer, optionsInitializer } from "@/utils/filter_farms";
 import { getAllFarms, getFarmQueries } from "@/utils/get_farms";
@@ -78,7 +80,7 @@ const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer());
 
 const dialog = ref(false);
 
-const filterOptions = ref<FarmFilterOptions>(optionsInitializer());
+const filterOptions = ref<FilterOptions>(optionsInitializer());
 
 const mixedFarmFilters = computed<MixedFarmFilter>(() => ({
   inputs: filterFarmInputs.value,
@@ -124,20 +126,14 @@ onMounted(async () => {
 });
 
 const updateFarms = async () => {
-  const queries = await getFarmQueries(mixedFarmFilters.value);
-
+  const queries = getFarmQueries(mixedFarmFilters.value);
   await _getFarms(queries);
 };
 
-watch(
-  filterOptions,
-  async () => {
-    if (!filtering.value) {
-      updateFarms();
-    }
-  },
-  { deep: true },
-);
+const updateValues = (label: string, value: string) => {
+  const inputLabel = label as keyof typeof filterFarmInputs.value;
+  filterFarmInputs.value[inputLabel].value = value;
+};
 
 const applyFilters = async (filtersInputValues: FilterFarmInputs) => {
   filtering.value = true;
@@ -148,18 +144,21 @@ const applyFilters = async (filtersInputValues: FilterFarmInputs) => {
   }
   filtering.value = false;
 };
-const resetFilters = async (filtersInputValues: FilterFarmInputs) => {
+
+const resetFilters = async (filtersInputValues: FilterFarmInputs, reload: boolean) => {
   filtering.value = true;
   filterFarmInputs.value = filtersInputValues;
   filterOptions.value = optionsInitializer();
-  if (isValidForm.value) {
+  if (reload && isValidForm.value) {
     await updateFarms();
   }
   filtering.value = false;
 };
+
 const openSheet = (_e: any, { item }: any) => {
   openDialog(item.value);
 };
+
 const openDialog = (item: Farm) => {
   selectedFarm.value = item;
   dialog.value = true;
@@ -193,6 +192,17 @@ const headers: VDataTableHeader = [
     sortable: false,
   },
 ];
+
+watch(
+  () => ({ ...filterOptions.value }),
+  async (newValue: FilterOptions, oldVal: FilterOptions) => {
+    if (oldVal.page != newValue.page || oldVal.size != newValue.size) {
+      loading.value = isFormLoading.value = true;
+      await updateFarms();
+      loading.value = isFormLoading.value = false;
+    }
+  },
+);
 </script>
 
 <script lang="ts">

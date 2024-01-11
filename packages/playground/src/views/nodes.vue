@@ -8,77 +8,60 @@
   <view-layout>
     <filters
       v-model:model-value="filterInputs"
+      :options="filterOptions"
       :loading="loading"
       v-model:valid="isValidForm"
-      @update:model-value="applyFilters"
+      @apply="applyFilters"
       @reset="resetFilters"
-    />
+      @update:values="updateValues"
+    >
+      <template #options="{ props }">
+        <v-col v-bind="props">
+          <v-select
+            class="p-4"
+            v-model="filterOptions.status"
+            :items="nodeStatusOptions"
+            label="Select Nodes Status"
+            variant="outlined"
+            :disabled="isFormLoading"
+            open-on-clear
+            clearable
+          />
+        </v-col>
+
+        <v-col v-bind="props">
+          <input-tooltip inline tooltip="Enable filtering the nodes that have Gateway supported only.">
+            <v-switch
+              color="primary"
+              inset
+              label="Gateways (Only)"
+              v-model="filterOptions.gateway"
+              hide-details
+              :disabled="isFormLoading"
+            />
+          </input-tooltip>
+        </v-col>
+
+        <v-col v-bind="{ ...props, class: `${props.class} py-0` }">
+          <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
+            <v-switch
+              color="primary"
+              inset
+              label="GPU Node (Only)"
+              v-model="filterOptions.gpu"
+              hide-details
+              :disabled="isFormLoading"
+            />
+          </input-tooltip>
+        </v-col>
+      </template>
+    </filters>
 
     <div class="nodes mt-5">
       <div class="nodes-inner">
         <v-row>
           <v-col cols="12">
             <div class="table">
-              <div class="table-filters">
-                <v-row>
-                  <v-col>
-                    <v-row>
-                      <v-col cols="12" sm="6" md="6" lg="4">
-                        <input-tooltip inline tooltip="Enable filtering the nodes that have Gateway supported only.">
-                          <v-switch
-                            color="primary"
-                            inset
-                            label="Gateways (Only)"
-                            v-model="filterOptions.gateway"
-                            hide-details
-                            :disabled="isFormLoading"
-                          />
-                        </input-tooltip>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6" lg="4">
-                        <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
-                          <v-switch
-                            color="primary"
-                            inset
-                            label="GPU Node (Only)"
-                            v-model="filterOptions.gpu"
-                            hide-details
-                            :disabled="isFormLoading"
-                          />
-                        </input-tooltip>
-                      </v-col>
-                    </v-row>
-                  </v-col>
-                  <v-col cols="12" sm="12" md="12" lg="4">
-                    <v-row
-                      justify="start"
-                      justify-md="start"
-                      justify-sm="start"
-                      justify-lg="end"
-                      justify-xl="end"
-                      justify-xxl="end"
-                    >
-                      <v-col cols="7">
-                        <v-select
-                          class="p-4"
-                          v-model="filterOptions.status"
-                          :items="nodeStatusOptions"
-                          label="Select Nodes Status"
-                          variant="underlined"
-                          :disabled="isFormLoading"
-                          open-on-clear
-                          clearable
-                        ></v-select>
-                      </v-col>
-                    </v-row>
-                  </v-col>
-                </v-row>
-              </div>
-              <div class="hint mb-2">
-                <v-alert type="info" variant="tonal">
-                  The nodes will be filtered and displayed after you enter the value by 1 second.
-                </v-alert>
-              </div>
               <nodes-table
                 v-model="nodes"
                 v-model:size="filterOptions.size"
@@ -103,7 +86,6 @@
 </template>
 
 <script lang="ts">
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
 import { capitalize, computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
@@ -176,13 +158,12 @@ export default {
       }
       filtering.value = false;
     };
-    const resetFilters = async (filtersInputValues: FilterInputs) => {
+
+    const resetFilters = async (filtersInputValues: FilterInputs, reload: boolean) => {
       filtering.value = true;
       filterInputs.value = filtersInputValues;
-
       filterOptions.value = optionsInitializer(undefined, undefined, undefined);
-
-      if (isValidForm.value) {
+      if (reload && isValidForm.value) {
         await updateNodes();
       }
       filtering.value = false;
@@ -193,15 +174,6 @@ export default {
       await _requestNodes(queries, { loadFarm: true });
     };
 
-    watch(
-      filterOptions,
-      async () => {
-        if (!filtering.value) {
-          await updateNodes();
-        }
-      },
-      { deep: true },
-    );
     const checkSelectedNode = async () => {
       if (route.query.nodeId) {
         selectedNodeId.value = +route.query.nodeId;
@@ -228,6 +200,30 @@ export default {
       await _requestNodes(queries, { loadFarm: true });
     });
 
+    const updateValues = (label: string, value: string) => {
+      if (label in filterOptions.value) {
+        Reflect.set(
+          filterOptions.value,
+          label,
+          value === "true" ? true : value === "false" ? false : (value as unknown as boolean),
+        );
+      } else {
+        const inputLabel = label as keyof typeof filterInputs.value;
+        filterInputs.value[inputLabel].value = value;
+      }
+    };
+
+    watch(
+      () => ({ ...filterOptions.value }),
+      async (newValue: FilterOptions, oldVal: FilterOptions) => {
+        if (oldVal.page != newValue.page || oldVal.size != newValue.size) {
+          loading.value = isFormLoading.value = true;
+          await updateNodes();
+          loading.value = isFormLoading.value = false;
+        }
+      },
+    );
+
     return {
       loading,
       isFormLoading,
@@ -245,6 +241,7 @@ export default {
       requestNodes,
       applyFilters,
       resetFilters,
+      updateValues,
     };
   },
 };
