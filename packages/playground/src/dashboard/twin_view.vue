@@ -205,7 +205,7 @@ onMounted(async () => {
 });
 
 function redirectToDao() {
-  router.push({ path: "/dashboard/dao" });
+  router.push({ path: "/tf-chain/dao" });
 }
 onMounted(validateEdit);
 async function validateEdit() {
