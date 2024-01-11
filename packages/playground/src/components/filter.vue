@@ -60,7 +60,9 @@
               text="Clear"
             />
             <v-btn
-              :disabled="!isValidForm || loading || !formHasValues || sameState"
+              :disabled="
+                !isValidForm || loading || (!formHasValues && Object.keys(route.query).length == 0) || sameState
+              "
               class="ml-4 mr-7"
               :loading="loading"
               @click="applyFilters"
