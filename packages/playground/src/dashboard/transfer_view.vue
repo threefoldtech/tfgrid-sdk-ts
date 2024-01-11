@@ -166,11 +166,11 @@ async function isValidTwinID(value: string) {
     if (gridStore) {
       receptTwinFromTwinID.value = await gridStore.client.twins.get({ id: parseInt(value.trim()) });
       if (receptTwinFromTwinID.value == null) {
-        return { message: "Invalid Twin ID. This ID has no Twin." };
+        return { message: "This twin id doesn't exist" };
       }
     }
   } catch (err) {
-    return { message: "Invalid Twin ID. This ID has no Twin." };
+    return { message: "This twin id doesn't exist" };
   }
 }
 function isSameAddress(value: string) {
