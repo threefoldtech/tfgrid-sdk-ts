@@ -4,7 +4,7 @@
       <v-col lg="6" sm="12" class="border mt-3">
         <div>
           <div class="d-flex justify-center my-3">
-            <h4 class="header">Live and Operational</h4>
+            <h4 class="tf-header">Live and Operational</h4>
           </div>
           <div
             :style="{
@@ -26,7 +26,7 @@
                     :src="baseUrl + 'images/icons/live-and-operational/' + s.image"
                   />
                   <v-card-text>
-                    <p class="text-center header font-weight-regular mb-2">
+                    <p class="text-center tf-header font-weight-regular mb-2">
                       {{ s.value }}
                     </p>
                     <p class="text-center font-weight-light sub-header">
@@ -114,37 +114,37 @@ export default {
         title: "Your Profile",
         icon: "mdi-account",
         text: "Your Profile includes your twin ID on the TFChain along with the account address and relay used. Click to view your profile details.",
-        path: "dashboard/twin",
+        path: "/tf-chain/twin",
       },
       {
         title: "Deploy Virtual Machines",
         icon: "mdi-television",
         text: "Deploy Full or Micro Virtual Machines from available images or custom ones on the Threefold Grid.",
-        path: "vms",
+        path: "/deploy/vms",
       },
       {
         title: "Deploy Applications",
         icon: "mdi-lightbulb-on-outline",
         text: "Deploy from a wide range of in demand solutions such as Algorand, Funkwhale, Wordpress, Discourse and much more!",
-        path: "solutions",
+        path: "/deploy/applications",
       },
       {
         title: "Deploy Orchestrators",
         icon: "mdi-group",
         text: "Deploy Kubernetes clusters out of the box or Caprover app/database deployment & web server manager on the Threefold Grid.",
-        path: "orchestrators",
+        path: "/deploy/orchestrators",
       },
       {
         title: "Explore Grid Capacity",
         icon: "mdi-chart-scatter-plot",
         text: "View the CPU, SSD, RAM, HDD, GPU, Public IPs, Gateways capacity and more on the Threefold Grid.",
-        path: "stats",
+        path: "/tf-grid/stats",
       },
       {
         title: "Explore Grid Nodes",
         icon: "mdi-access-point",
         text: "Find nodes that fit your CPU, GPU, SSD, HDD and RAM capacity needs on the Threefold Grid.",
-        path: "nodes",
+        path: "/deploy/nodes",
       },
     ];
     return {
@@ -183,7 +183,7 @@ export default {
 </script>
 
 <style scoped>
-.header {
+.tf-header {
   font-size: 1rem;
 }
 

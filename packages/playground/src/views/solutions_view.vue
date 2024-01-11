@@ -2,7 +2,7 @@
   <view-layout>
     <v-row>
       <v-col cols="4" v-for="card in cards" :key="card.title">
-        <router-link :to="'/solutions' + card.route">
+        <router-link :to="'/deploy/applications' + card.route">
           <v-hover>
             <template v-slot:default="{ isHovering, props }">
               <v-card class="pa-3 pt-6" height="200" v-bind="props" :class="isHovering ? 'card-opacity' : undefined">

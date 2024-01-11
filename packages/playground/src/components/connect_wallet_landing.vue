@@ -56,7 +56,7 @@
         </div>
 
         <div class="d-flex justify-center mt-5">
-          <v-btn color="primary" target="_blank" @click="$router.push('/stats')">
+          <v-btn color="primary" target="_blank" @click="$router.push('/tf-grid/stats')">
             Explore ThreeFold Grid Capacity
           </v-btn>
         </div>
