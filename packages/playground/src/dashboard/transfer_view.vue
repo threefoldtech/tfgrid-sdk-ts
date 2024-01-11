@@ -125,6 +125,7 @@
 <script lang="ts" setup>
 import { Keyring } from "@polkadot/keyring";
 import type { Twin } from "@threefold/tfchain_client";
+import { TwinNotExistError } from "@threefold/types";
 import { computed, ref, watch } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
@@ -166,11 +167,12 @@ async function isValidTwinID(value: string) {
     if (gridStore) {
       receptTwinFromTwinID.value = await gridStore.client.twins.get({ id: parseInt(value.trim()) });
       if (receptTwinFromTwinID.value == null) {
-        return { message: "Invalid Twin ID. This ID has no Twin." };
+        return { message: "This twin id doesn't exist" };
       }
     }
   } catch (err) {
-    return { message: "Invalid Twin ID. This ID has no Twin." };
+    if (err instanceof TwinNotExistError) return { message: "This twin id doesn't exist" };
+    else return { message: "Couldn't validate twin id" };
   }
 }
 function isSameAddress(value: string) {

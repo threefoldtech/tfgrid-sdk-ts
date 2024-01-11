@@ -83,7 +83,7 @@
         <Networks v-model:ipv4="ipv4" />
         <input-tooltip
           inline
-          tooltip="Click to know more about dedicated nodes."
+          tooltip="Click to know more about dedicated machines."
           href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
         >
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />

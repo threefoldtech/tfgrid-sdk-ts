@@ -13,6 +13,7 @@ export interface RouteMeta {
   title: string;
   info?: InfoMeta;
   publicPath?: boolean;
+  requireSSH?: boolean;
 }
 
 const router = createRouter({
@@ -131,6 +132,7 @@ const router = createRouter({
                 },
               ],
             },
+            requireSSH: true,
           },
         },
         {
@@ -152,6 +154,7 @@ const router = createRouter({
                 },
               ],
             },
+            requireSSH: true,
           },
         },
         {
@@ -173,6 +176,7 @@ const router = createRouter({
                 },
               ],
             },
+            requireSSH: true,
           },
         },
         {

@@ -4,7 +4,8 @@
       class="mb-6"
       :style="{ opacity: $vuetify.theme.name === 'dark' ? 'var(--v-medium-emphasis-opacity)' : '' }"
       v-if="$slots.description"
-    ></div>
+    />
+
     <div
       class="position-absolute pa-1 rounded-circle border"
       :style="{
@@ -19,10 +20,14 @@
       <AppInfo />
     </div>
 
-    <slot></slot>
+    <template v-if="requireSSH && !ssh">
+      <VAlert variant="tonal" type="error" :text="title + ' requires public ssh key.'" class="mb-4" />
+      <SshkeyView />
+    </template>
+    <slot v-else />
 
     <div class="mt-4" v-if="$slots.list">
-      <slot name="list"></slot>
+      <slot name="list" />
     </div>
   </div>
 </template>
@@ -32,18 +37,22 @@ import { computed } from "vue";
 import { useRoute } from "vue-router";
 
 import { useProfileManager } from "@/stores";
+import SshkeyView from "@/views/sshkey_view.vue";
 
 import AppInfo from "./app_info.vue";
 
 export default {
   name: "ViewLayout",
-  components: { AppInfo },
+  components: { AppInfo, SshkeyView },
   setup() {
     const route = useRoute();
     const profileManager = useProfileManager();
 
     return {
+      title: computed(() => route.meta.title),
       hasInfo: computed(() => profileManager.profile && route.meta.info),
+      ssh: computed(() => profileManager.profile?.ssh),
+      requireSSH: computed(() => route.meta.requireSSH),
     };
   },
 };

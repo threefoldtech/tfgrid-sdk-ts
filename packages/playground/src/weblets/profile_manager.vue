@@ -89,6 +89,7 @@
         "
         destroy
       >
+
         <VContainer>
           <form @submit.prevent="activeTab === 0 ? login() : storeAndLogin()">
             <FormValidator v-model="isValidForm">
@@ -241,6 +242,7 @@
                     location="top right"
                     text="Used to encrypt your mnemonic on your local system, and is used to login from the same device."
                   >
+
                     <template #activator="{ props: tooltipProps }">
                       <div v-bind="tooltipProps">
                         <VTextField
@@ -261,6 +263,7 @@
                   :rules="[validators.required('A confirmation password is required.'), validateConfirmPassword]"
                   #="{ props: validationProps }"
                   ref="confirmPasswordInput"
+
                 >
                   <VTextField
                     label="Confirm Password"
