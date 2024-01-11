@@ -98,8 +98,8 @@
           <p v-text="'Couldn\'t load any of your ' + projectName + ' deployments.'" />
           <VBtn
             class="mt-4"
-            variant="tonal"
-            color="error"
+            variant="outlined"
+            color="secondary"
             prepend-icon="mdi-reload"
             text="Reload"
             @click="loadDeployments"
