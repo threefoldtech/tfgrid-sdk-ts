@@ -5,7 +5,7 @@
         variant="outlined"
         color="secondary"
         class="text-subtitle-1 px-6 mr-2"
-        v-bind:href="'https://v3.bootstrap.grid.tf/'"
+        v-bind:href="'https://bootstrap.grid.tf/'"
         target="blank"
         >Bootstrap Node Image</v-btn
       >
