@@ -56,7 +56,7 @@
               color="anchor"
               text="Clear"
             />
-            sameState = {{ sameState }}
+
             <v-btn
               :disabled="!isValidForm || !formHasValues || sameState"
               class="ml-4 mr-7"
