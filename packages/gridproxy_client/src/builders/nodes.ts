@@ -19,6 +19,7 @@ export interface NodesQuery {
   status: NodeStatus;
   city: string;
   country: string;
+  region: string;
   farmName: string;
   ipv4: boolean;
   ipv6: boolean;
@@ -53,6 +54,7 @@ const NODES_MAPPER: BuilderMapper<NodesQuery> = {
   status: "status",
   city: "city",
   country: "country",
+  region: "region",
   farmName: "farm_name",
   domain: "domain",
   ipv4: "ipv4",
@@ -94,6 +96,7 @@ const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
   },
   city: assertString,
   country: assertString,
+  region: assertString,
   farmName: assertString,
   domain: assertBoolean,
   ipv4: assertBoolean,

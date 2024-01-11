@@ -1,52 +1,58 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-col lg="6" md="12" class="border mt-3">
+      <v-col lg="6" sm="12" class="border mt-3">
         <div>
-          <div class="d-flex justify-center mb-5">
+          <div class="d-flex justify-center my-3">
             <h4 class="tf-header">Live and Operational</h4>
           </div>
           <div
             :style="{
               backgroundImage: 'url(' + baseUrl + 'images/live-and-operational-background.png)',
 
-              backgroundSize: 'cover',
+              backgroundSize: 'contain',
               backgroundPosition: 'center center',
               minHeight: '450px',
             }"
           />
-          <div class="d-flex flex-wrap justify-space-between align-end" style="statcards">
-            <div v-for="s in stats" :key="s.value" class="stats px-2">
-              <v-card class="my-10">
-                <v-img
-                  cover
-                  width="100"
-                  class="mx-auto"
-                  :src="baseUrl + 'images/icons/live-and-operational/' + s.image"
-                />
-                <v-card-text>
-                  <p class="text-center tf-header font-weight-regular mb-2">{{ s.value }}</p>
-                  <p class="text-center font-weight-light sub-header">{{ s.label }}</p>
-                </v-card-text>
-              </v-card>
-            </div>
+          <div class="d-flex flex-column justify-center">
+            <v-row>
+              <v-col cols="3" v-for="s in stats" :key="s.value" class="stats px-2">
+                <v-card class="mt-10">
+                  <v-img
+                    cover
+                    width="80"
+                    class="mx-auto"
+                    :src="baseUrl + 'images/icons/live-and-operational/' + s.image"
+                  />
+                  <v-card-text>
+                    <p class="text-center tf-header font-weight-regular mb-2">
+                      {{ s.value }}
+                    </p>
+                    <p class="text-center font-weight-light sub-header">
+                      {{ s.label }}
+                    </p>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
           </div>
         </div>
       </v-col>
       <v-col lg="6" md="12" class="d-flex flex-wrap">
         <v-row>
-          <v-col :lg="6" :md="12" v-for="card in cards" :key="card.path">
+          <v-col :lg="6" :md="6" :sm="12" v-for="card in cards" :key="card.path">
             <v-hover>
               <template v-slot:default="{ isHovering, props }">
                 <v-card
-                  class="px-3 py-3 border"
+                  class="p-1 border d-flex flex-wrap align-center h-100"
                   v-bind="props"
-                  :height="'165px'"
                   :class="isHovering ? 'card-opacity' : undefined"
                   @click="$router.push(card.path)"
+                  height="100%"
                 >
-                  <v-card-title class="d-flex align-items-baseline"
-                    ><v-icon class="mr-3">{{ card.icon }}</v-icon
+                  <v-card-title class="d-flex text-subtitle-1 align-baseline"
+                    ><v-icon size="small" class="mr-2">{{ card.icon }}</v-icon
                     >{{ card.title }}</v-card-title
                   >
                   <v-card-text>{{ card.text }}</v-card-text>
@@ -56,10 +62,12 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-card class="mt-3 py-2 border mx-3">
+          <v-card class="d-flex justify-center align-center mt-3 py-2 border mx-3">
             <div class="text-center">
-              <v-card-title> The <strong>Layer Zero</strong> for a Decentralized World </v-card-title>
-              <p class="w-75 mx-auto">
+              <v-card-title class="text-subtitle">
+                The <strong>Layer Zero</strong> for a Decentralized World
+              </v-card-title>
+              <p class="mx-auto px-4 text-subtitle-2" style="font-weight: 400">
                 Anything that runs on Linux can run on ThreeFold – with more security, more sustainably, and in true
                 decentralization. The ThreeFold Grid can support workloads from Blockchain to Web2 to Web3 to IoT and
                 Metaverse and more.
@@ -175,17 +183,7 @@ export default {
 </script>
 
 <style scoped>
-.stats {
-  min-width: 180px;
-  max-width: 300px;
-}
-.statcards {
-  margin-top: 50rem;
-}
 .tf-header {
-  font-size: 1.25rem;
-}
-.sub-header {
   font-size: 1rem;
 }
 
