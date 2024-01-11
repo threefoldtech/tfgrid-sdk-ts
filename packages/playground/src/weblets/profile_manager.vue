@@ -310,8 +310,10 @@
           </VContainer>
         </DTabs>
       </WebletLayout>
-      <WebletLayout v-else>
-        <div class="text-center my-3">
+    </VDialog>
+    <v-dialog v-model="openDepositDialog" class="text-center" v-if="profileManager.profile && openDepositDialog">
+      <v-card max-width="800" class="mx-auto py-8 px-10"
+        ><div class="text-center my-3">
           <p>
             Scan the QR code using
             <a class="app-link" href="https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html" target="_blank">
@@ -335,9 +337,8 @@
             v-html="app.src"
             :href="app.url"
             target="_blank"
-          /></div
-      ></WebletLayout>
-    </VDialog>
+          /></div></v-card
+    ></v-dialog>
   </div>
 </template>
 
