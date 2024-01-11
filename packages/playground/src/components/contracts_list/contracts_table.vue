@@ -117,7 +117,7 @@
 import { ContractStates, type GridClient } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
-import { DeploymentKeyDeletionError, InsufficientBalanceError, TFChainErrors } from "@threefold/types";
+import { DeploymentKeyDeletionError, TFChainErrors } from "@threefold/types";
 import { defineComponent, type PropType, type Ref, ref } from "vue";
 import { capitalize } from "vue";
 
@@ -160,7 +160,6 @@ const emits = defineEmits(["update:deleted-contracts"]);
 const layout = ref();
 const contractLocked = ref<ContractLock>();
 const deleting = ref<boolean>(false);
-const snackbar = ref<boolean>(false);
 const loadingShowDetails = ref<boolean>(false);
 const loadingDelete = ref<boolean>(false);
 const contractStateDialog = ref<boolean>(false);
@@ -213,7 +212,7 @@ async function contractLockDetails(contractId: number) {
 // Function to export contract data as JSON
 function exportData() {
   isExporting.value = true;
-  downloadAsJson(contracts.value);
+  downloadAsJson(contracts.value, `${props.contractsType}_contracts`);
   isExporting.value = false;
 }
 
