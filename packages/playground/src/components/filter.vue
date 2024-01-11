@@ -56,9 +56,9 @@
               color="anchor"
               text="Clear"
             />
-
+            sameState = {{ sameState }}
             <v-btn
-              :disabled="!isValidForm || !formHasValues"
+              :disabled="!isValidForm || !formHasValues || sameState"
               class="ml-4 mr-7"
               :loading="loading"
               @click="applyFilters"
@@ -75,7 +75,7 @@
 
 <script lang="ts" setup>
 import type { NodeStatus } from "@threefold/gridproxy_client";
-import { isEmpty } from "lodash";
+import { isEmpty, isEqual } from "lodash";
 import { nextTick } from "process";
 import { computed, defineComponent, onMounted, type PropType, ref, watch } from "vue";
 import { type LocationQueryRaw, useRoute } from "vue-router";
@@ -106,6 +106,10 @@ const formRef = useFormRef();
 const route = useRoute();
 const isClearButtonEnabled = ref();
 
+const sameState = ref(false);
+const defaultStateInputs = { ...props.modelValue };
+const defaultStateOptions = { ...props.options };
+
 const formHasValues = computed(
   () =>
     Object.values(props.modelValue).some(obj => obj.value && obj.value.length >= 1) ||
@@ -114,12 +118,47 @@ const formHasValues = computed(
     props.options.gateway,
 );
 
+const parseQueries = () => {
+  const queries = route.query;
+
+  for (const query of Object.keys(queries)) {
+    const currentStateValue =
+      Reflect.get(queries, query) === "false"
+        ? false
+        : Reflect.get(queries, query) === "true"
+        ? true
+        : Reflect.get(queries, query);
+
+    if (Reflect.get(props.options, query) && Reflect.get(props.options, query) === currentStateValue) {
+      Reflect.set(defaultStateOptions, query, currentStateValue);
+    }
+
+    if (props.modelValue[query] && props.modelValue[query].value === currentStateValue) {
+      defaultStateInputs[query].value = queries[query] as string;
+    }
+  }
+
+  console.log("defaultStateInputs", defaultStateInputs);
+  console.log("props.modelValue", props.modelValue);
+  const sameInputs = !!Object.keys(queries).length && isEqual(defaultStateInputs, props.modelValue);
+
+  console.log("defaultStateOptions", defaultStateOptions);
+  console.log("props.options", props.options);
+  const sameOptions = !!Object.keys(queries).length && isEqual(defaultStateOptions, props.options);
+
+  console.log("Same inputs: ", sameInputs);
+  console.log("Same options: ", sameOptions);
+
+  sameState.value = sameInputs && sameOptions;
+};
+
 watch(
   [() => props.modelValue, () => props.options],
   ([inputs, options]) => {
     isClearButtonEnabled.value = Object.values(inputs).some(
       obj => (obj.value?.length && options.gpu) || options.gateway || options.status?.length,
     );
+    parseQueries();
   },
   { deep: true, immediate: true },
 );
