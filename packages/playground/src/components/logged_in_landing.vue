@@ -12,7 +12,7 @@
 
               backgroundSize: 'contain',
               backgroundPosition: 'center center',
-              minHeight: '400px',
+              minHeight: '350px',
             }"
           />
           <div class="d-flex flex-wrap justify-center" style="statcards">
