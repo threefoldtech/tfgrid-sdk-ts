@@ -108,8 +108,8 @@ const route = useRoute();
 const isClearButtonEnabled = ref();
 
 const sameState = ref(false);
-const defaultStateInputs = cloneDeep(props.modelValue);
-const defaultStateOptions = cloneDeep(props.options);
+let defaultStateInputs = cloneDeep(props.modelValue);
+let defaultStateOptions = cloneDeep(props.options);
 
 const formHasValues = computed(
   () =>
@@ -133,7 +133,7 @@ const parseQueries = () => {
   };
 
   for (const query of Object.keys(queries)) {
-    const currentStateValue = queries[query] === "false" ? false : queries[query] === "true" ? true : queries[query];
+    const currentStateValue = queries[query] === "true";
     updateStateValue(query, currentStateValue as boolean | string);
   }
 
@@ -186,6 +186,9 @@ const resetFilterQueries = () => router.push({ path: route.path, query: {} });
 
 const applyFilters = () => {
   setFilterQueries();
+  defaultStateInputs = cloneDeep(props.modelValue);
+  defaultStateOptions = cloneDeep(props.options);
+
   setTimeout(() => {
     emit(
       "apply",
@@ -194,7 +197,7 @@ const applyFilters = () => {
         return res;
       }, {} as any),
     );
-  }, 100);
+  }, 200);
 };
 
 const resetFilters = () => {
