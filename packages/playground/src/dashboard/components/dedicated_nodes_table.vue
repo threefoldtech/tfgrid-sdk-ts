@@ -54,6 +54,7 @@
         ]"
         v-model:page="filterOptions.page"
         return-object
+        @click:row="toggleExpand"
       >
         <template v-slot:[`item.actions`]="{ item }">
           <reserve-btn :node="(item.raw as unknown as GridNode)" @updateTable="reloadTable" />
@@ -150,7 +151,7 @@ const headers: VDataTable["headers"] = [
 ];
 const profileManager = useProfileManager();
 
-const expanded = ref([]);
+const expanded = ref<any[]>([]);
 const tabs = [{ label: "Rentable" }, { label: "Mine" }];
 const activeTab = ref(0);
 const loading = ref(false);
@@ -289,6 +290,12 @@ async function reloadTable() {
     setTimeout(resolve, 20000);
   });
   await _loadData();
+}
+function toggleExpand(e: any, data: any) {
+  if (expanded.value.length) {
+    expanded.value = [];
+  }
+  expanded.value.push(data.item.props.title);
 }
 </script>
 
