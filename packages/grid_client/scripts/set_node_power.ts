@@ -3,14 +3,10 @@ import { getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function setNodePower(client, nodePower) {
-  try {
-    const res = await client.nodes.setNodePower(nodePower);
-    log("================= Setting node power =================");
-    log(res);
-    log("================= Setting node power =================");
-  } catch (error) {
-    log("Error while setting node power " + error);
-  }
+  const res = await client.nodes.setNodePower(nodePower);
+  log("================= Setting node power =================");
+  log(res);
+  log("================= Setting node power =================");
 }
 
 async function main() {

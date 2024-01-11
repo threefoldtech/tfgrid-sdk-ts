@@ -3,14 +3,10 @@ import { getClient } from "../client_loader";
 import { log } from "../utils";
 
 async function getAccount(client, account) {
-  try {
-    const res = await client.tfchain.get(account);
-    log("================= Getting account =================");
-    log(res);
-    log("================= Getting account =================");
-  } catch (error) {
-    log("Error while getting account" + error);
-  }
+  const res = await client.tfchain.get(account);
+  log("================= Getting account =================");
+  log(res);
+  log("================= Getting account =================");
 }
 
 async function main() {

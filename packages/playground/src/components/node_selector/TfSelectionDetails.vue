@@ -10,14 +10,8 @@
       </v-radio-group>
 
       <template v-if="wayToSelect === 'automated'">
-        <TfSelectLocation v-model="location" v-if="wayToSelect === 'automated'" />
-        <TfSelectFarm
-          :valid-filters="validFilters"
-          :filters="filters"
-          :location="location"
-          v-model="farm"
-          v-if="wayToSelect === 'automated'"
-        />
+        <TfSelectLocation v-model="location" title="Choose a Location" />
+        <TfSelectFarm :valid-filters="validFilters" :filters="filters" :location="location" v-model="farm" />
         <TfAutoNodeSelector
           :valid-filters="validFilters"
           :filters="filters"
@@ -25,9 +19,9 @@
           :farm="farm"
           v-model="node"
           v-model:status="nodeStatus"
-          v-if="wayToSelect === 'automated'"
         />
       </template>
+
       <TfManualNodeSelector
         :valid-filters="validFilters"
         :filters="filters"

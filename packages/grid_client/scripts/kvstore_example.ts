@@ -2,47 +2,31 @@ import { getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function setKey(client, key) {
-  try {
-    const res = await client.kvstore.set(key);
-    log("================= Setting the key =================");
-    log(res);
-    log("================= Setting the key =================");
-  } catch (error) {
-    log("Error while setting the key " + error);
-  }
+  const res = await client.kvstore.set(key);
+  log("================= Setting the key =================");
+  log(res);
+  log("================= Setting the key =================");
 }
 
 async function listAllKeys(client) {
-  try {
-    const res = await client.kvstore.list();
-    log("================= Listing all keys =================");
-    log(res);
-    log("================= Listing all keys =================");
-  } catch (error) {
-    log("Error while listing keys " + error);
-  }
+  const res = await client.kvstore.list();
+  log("================= Listing all keys =================");
+  log(res);
+  log("================= Listing all keys =================");
 }
 
 async function getKey(client, key) {
-  try {
-    const res = await client.kvstore.get(key);
-    log("================= Getting key =================");
-    log(res);
-    log("================= Getting key =================");
-  } catch (error) {
-    log("Error while getting key " + error);
-  }
+  const res = await client.kvstore.get(key);
+  log("================= Getting key =================");
+  log(res);
+  log("================= Getting key =================");
 }
 
 async function removeKey(client, key) {
-  try {
-    const res = await client.kvstore.remove(key);
-    log("================= Removing key =================");
-    log(res);
-    log("================= Removing key =================");
-  } catch (error) {
-    log("Error while removing key " + error);
-  }
+  const res = await client.kvstore.remove(key);
+  log("================= Removing key =================");
+  log(res);
+  log("================= Removing key =================");
 }
 
 /*

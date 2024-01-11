@@ -164,6 +164,7 @@ export function normalizeNodeFilters(
     region: options.location.region,
     country: options.location.country,
     gateway: options.gateway,
+    healthy: true,
   };
 }
 

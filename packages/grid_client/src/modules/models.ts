@@ -597,6 +597,7 @@ class FilterOptions {
   @Expose() @IsOptional() @IsBoolean() ret_count?: boolean;
   @Expose() @IsOptional() @Transform(({ value }) => NodeStatus[value]) @IsEnum(NodeStatus) status?: NodeStatus;
   @Expose() @IsOptional() @IsString() region?: string;
+  @Expose() @IsOptional() @IsBoolean() healthy?: boolean;
 }
 
 enum CertificationType {

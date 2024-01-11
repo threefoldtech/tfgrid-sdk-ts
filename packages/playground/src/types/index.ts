@@ -307,6 +307,7 @@ export const nodeInitializer: GridNode = {
   id: "",
   nodeId: 0,
   farmId: 0,
+  farmName: "",
   twinId: 0,
   country: "",
   region: "",
