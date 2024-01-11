@@ -95,7 +95,7 @@ class QueryClient {
       QueryClient.connections.set(this.url, { api: this.api, disconnectHandler: this.__disconnectHandler });
       this.api.on("disconnected", this.__disconnectHandler);
     } catch (e) {
-      const message = "Unable to establish a connection with the chain\n";
+      const message = `Unable to establish a connection with the chain ${this.url} \n`;
       if (e instanceof BaseError) {
         e.message = message + e.message;
         throw e;
