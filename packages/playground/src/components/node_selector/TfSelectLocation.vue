@@ -73,7 +73,7 @@ export default {
       items: regions.value,
       modelValue: selectedLocation.value.region || regions.value[0],
       "onUpdate:model-value": updateRegion,
-      "onClick:clear": bindModelValue,
+      "onClick:clear": () => bindModelValue(),
     }));
 
     const countryProps = computed(() => ({

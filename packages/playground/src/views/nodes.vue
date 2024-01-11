@@ -6,6 +6,47 @@
   </div>
 
   <view-layout>
+    {{ filtersData }}
+
+    <FiltersContainer>
+      <TfFilter
+        route-query="node-id"
+        v-model="filtersData.nodeId"
+        :rules="[
+          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.min('The node id should be larger then zero.', 1),
+          validators.startsWith('The node id start with zero.', '0'),
+          validators.validateResourceMaxNumber('This is not a valid ID.'),
+        ]"
+      >
+        <template #input="{ props }">
+          <VTextField
+            label="Node ID"
+            placeholder="Select node id"
+            variant="outlined"
+            v-model="filtersData.nodeId"
+            v-bind="props"
+          />
+        </template>
+      </TfFilter>
+
+      <TfSelectLocation v-model="filtersData.location">
+        <template #region="{ props }">
+          <TfFilter route-query="region" :model-value="filtersData.location?.region">
+            <TfSelectRegion :region-props="props" variant="outlined" />
+          </TfFilter>
+        </template>
+
+        <template #country="{ props }">
+          <TfFilter route-query="country" :model-value="filtersData.location?.country">
+            <TfSelectCountry :country-props="props" variant="outlined" />
+          </TfFilter>
+        </template>
+      </TfSelectLocation>
+    </FiltersContainer>
+
+    <br />
+
     <filters
       v-model:model-value="filterInputs"
       :options="filterOptions"
@@ -91,6 +132,7 @@ import { capitalize, computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 import NodeDetails from "@/components/node_details.vue";
+import TfSelectLocation from "@/components/node_selector/TfSelectLocation.vue";
 import NodesTable from "@/components/nodes_table.vue";
 import router from "@/router";
 import {
@@ -103,10 +145,16 @@ import {
 import { inputsInitializer } from "@/utils/filter_nodes";
 import { getQueries, requestNodes } from "@/utils/get_nodes";
 
+import FiltersContainer from "../components/filters/FiltersContainer.vue";
+import TfFilter from "../components/filters/TfFilter.vue";
+
 export default {
   components: {
     NodesTable,
     NodeDetails,
+    FiltersContainer,
+    TfFilter,
+    TfSelectLocation,
   },
   setup() {
     const filterInputs = ref<FilterInputs>(inputsInitializer());
@@ -213,6 +261,11 @@ export default {
       }
     };
 
+    const filtersData = ref<any>({
+      nodeId: undefined,
+      location: undefined,
+    });
+
     return {
       loading,
       isFormLoading,
@@ -231,6 +284,8 @@ export default {
       applyFilters,
       resetFilters,
       updateValues,
+
+      filtersData,
     };
   },
 };
