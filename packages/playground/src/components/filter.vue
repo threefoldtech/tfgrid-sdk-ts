@@ -75,7 +75,8 @@
 
 <script lang="ts" setup>
 import type { NodeStatus } from "@threefold/gridproxy_client";
-import { isEmpty, isEqual } from "lodash";
+import { cloneDeep, isEmpty } from "lodash";
+import equals from "lodash/fp/equals.js";
 import { nextTick } from "process";
 import { computed, defineComponent, onMounted, type PropType, ref, watch } from "vue";
 import { type LocationQueryRaw, useRoute } from "vue-router";
@@ -107,8 +108,8 @@ const route = useRoute();
 const isClearButtonEnabled = ref();
 
 const sameState = ref(false);
-const defaultStateInputs = { ...props.modelValue };
-const defaultStateOptions = { ...props.options };
+const defaultStateInputs = cloneDeep(props.modelValue);
+const defaultStateOptions = cloneDeep(props.options);
 
 const formHasValues = computed(
   () =>
@@ -121,34 +122,23 @@ const formHasValues = computed(
 const parseQueries = () => {
   const queries = route.query;
 
+  const updateStateValue = (key: string, value: boolean | string) => {
+    if (Reflect.get(props.options, key) && Reflect.get(props.options, key) === value) {
+      Reflect.set(defaultStateOptions, key, value);
+    }
+
+    if (props.modelValue[key] && props.modelValue[key].value === value) {
+      defaultStateInputs[key].value = queries[key] as string;
+    }
+  };
+
   for (const query of Object.keys(queries)) {
-    const currentStateValue =
-      Reflect.get(queries, query) === "false"
-        ? false
-        : Reflect.get(queries, query) === "true"
-        ? true
-        : Reflect.get(queries, query);
-
-    if (Reflect.get(props.options, query) && Reflect.get(props.options, query) === currentStateValue) {
-      Reflect.set(defaultStateOptions, query, currentStateValue);
-    }
-
-    if (props.modelValue[query] && props.modelValue[query].value === currentStateValue) {
-      defaultStateInputs[query].value = queries[query] as string;
-    }
+    const currentStateValue = queries[query] === "false" ? false : queries[query] === "true" ? true : queries[query];
+    updateStateValue(query, currentStateValue as boolean | string);
   }
 
-  console.log("defaultStateInputs", defaultStateInputs);
-  console.log("props.modelValue", props.modelValue);
-  const sameInputs = !!Object.keys(queries).length && isEqual(defaultStateInputs, props.modelValue);
-
-  console.log("defaultStateOptions", defaultStateOptions);
-  console.log("props.options", props.options);
-  const sameOptions = !!Object.keys(queries).length && isEqual(defaultStateOptions, props.options);
-
-  console.log("Same inputs: ", sameInputs);
-  console.log("Same options: ", sameOptions);
-
+  const sameInputs = !!Object.keys(queries).length && equals(defaultStateInputs, props.modelValue);
+  const sameOptions = !!Object.keys(queries).length && equals(defaultStateOptions, props.options);
   sameState.value = sameInputs && sameOptions;
 };
 
@@ -170,6 +160,7 @@ onMounted(() => {
       emit("update:values", obj, Reflect.get(route.query, key));
     }
   }
+  parseQueries();
 });
 
 const setFilterQueries = () => {
@@ -194,38 +185,32 @@ const setFilterQueries = () => {
 const resetFilterQueries = () => router.push({ path: route.path, query: {} });
 
 const applyFilters = () => {
-  emit(
-    "apply",
-    Object.keys(props.modelValue).reduce((res, key) => {
-      res[key] = { ...props.modelValue[key] };
-      return res;
-    }, {} as any),
-  );
   setFilterQueries();
+  setTimeout(() => {
+    emit(
+      "apply",
+      Object.keys(props.modelValue).reduce((res, key) => {
+        res[key] = { ...props.modelValue[key] };
+        return res;
+      }, {} as any),
+    );
+  }, 100);
 };
 
 const resetFilters = () => {
-  if (!isEmpty(route.query)) {
-    emit(
-      "reset",
-      Object.keys(props.modelValue).reduce((res, key) => {
-        res[key] = { ...props.modelValue[key], value: undefined };
-        return res;
-      }, {} as any),
-      true,
-    );
-  } else {
-    emit(
-      "reset",
-      Object.keys(props.modelValue).reduce((res, key) => {
-        res[key] = { ...props.modelValue[key], value: undefined };
-        return res;
-      }, {} as any),
-      false,
-    );
-  }
+  emit(
+    "reset",
+    Object.keys(props.modelValue).reduce((res, key) => {
+      res[key] = { ...props.modelValue[key], value: undefined };
+      return res;
+    }, {} as any),
+    // Reload nodes only if there are queries.
+    !isEmpty(route.query),
+  );
 
-  nextTick(() => resetFilterQueries());
+  nextTick(() => {
+    resetFilterQueries();
+  });
 };
 
 const fitlerColProps = { class: "py-2 px-4", cols: 12, md: 6, lg: 3 };
