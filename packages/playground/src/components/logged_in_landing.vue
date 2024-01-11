@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-row>
-      <v-col lg="6" md="12" sm="12" class="border mt-3">
+      <v-col lg="6" sm="12" class="border mt-3">
         <div>
           <div class="d-flex justify-center my-3">
             <h4 class="header">Live and Operational</h4>
@@ -12,24 +12,30 @@
 
               backgroundSize: 'contain',
               backgroundPosition: 'center center',
-              minHeight: '350px',
+              minHeight: '450px',
             }"
           />
-          <div class="d-flex flex-wrap justify-center" style="statcards">
-            <div v-for="s in stats" :key="s.value" class="stats px-2">
-              <v-card class="my-10">
-                <v-img
-                  cover
-                  width="80"
-                  class="mx-auto"
-                  :src="baseUrl + 'images/icons/live-and-operational/' + s.image"
-                />
-                <v-card-text>
-                  <p class="text-center header font-weight-regular mb-2">{{ s.value }}</p>
-                  <p class="text-center font-weight-light sub-header">{{ s.label }}</p>
-                </v-card-text>
-              </v-card>
-            </div>
+          <div class="d-flex flex-column justify-center">
+            <v-row>
+              <v-col cols="3" v-for="s in stats" :key="s.value" class="stats px-2">
+                <v-card class="mt-10">
+                  <v-img
+                    cover
+                    width="80"
+                    class="mx-auto"
+                    :src="baseUrl + 'images/icons/live-and-operational/' + s.image"
+                  />
+                  <v-card-text>
+                    <p class="text-center header font-weight-regular mb-2">
+                      {{ s.value }}
+                    </p>
+                    <p class="text-center font-weight-light sub-header">
+                      {{ s.label }}
+                    </p>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
           </div>
         </div>
       </v-col>
@@ -43,9 +49,10 @@
                   v-bind="props"
                   :class="isHovering ? 'card-opacity' : undefined"
                   @click="$router.push(card.path)"
+                  height="100%"
                 >
                   <v-card-title class="d-flex text-subtitle-1 align-baseline"
-                    ><v-icon size="small" class="mr-3">{{ card.icon }}</v-icon
+                    ><v-icon size="small" class="mr-2">{{ card.icon }}</v-icon
                     >{{ card.title }}</v-card-title
                   >
                   <v-card-text>{{ card.text }}</v-card-text>
@@ -176,16 +183,7 @@ export default {
 </script>
 
 <style scoped>
-.stats {
-  min-width: 130px;
-}
-.statcards {
-  margin-top: 2rem;
-}
 .header {
-  font-size: 1.25rem;
-}
-.sub-header {
   font-size: 1rem;
 }
 

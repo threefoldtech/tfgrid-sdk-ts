@@ -44,8 +44,12 @@
                 :src="baseUrl + 'images/icons/live-and-operational/' + s.image"
               />
               <v-card-text>
-                <p class="text-center font-weight-regular text-h5">{{ s.value }}</p>
-                <p class="text-center font-weight-light text-h6">{{ s.label }}</p>
+                <p class="text-center font-weight-regular text-h5">
+                  {{ s.value }}
+                </p>
+                <p class="text-center font-weight-light text-h6">
+                  {{ s.label }}
+                </p>
               </v-card-text>
             </v-card>
           </div>
@@ -126,7 +130,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .stats {
   min-width: 200px;
   max-width: 200px;
