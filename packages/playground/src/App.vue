@@ -277,7 +277,7 @@ const routes: AppRoute[] = [
       },
       { title: "Applications", icon: "mdi-lightbulb-on-outline", route: "/deploy/applications" },
       {
-        title: "My Contracts",
+        title: "Your Contracts",
         icon: "mdi-file-document-edit",
         route: "/deploy/contracts-list",
       },
@@ -299,7 +299,7 @@ const routes: AppRoute[] = [
     icon: "mdi-access-point",
     items: [
       {
-        title: "My Farms",
+        title: "Your Farms",
         icon: "mdi-silo",
         route: "/farms",
       },
@@ -322,7 +322,7 @@ const routes: AppRoute[] = [
     icon: "mdi-account-convert-outline",
     items: [
       {
-        title: "My Profile",
+        title: "Your Profile",
         icon: "mdi-account-supervisor-outline",
         route: "/tf-chain/twin",
       },
