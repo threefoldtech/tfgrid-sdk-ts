@@ -90,17 +90,17 @@ class QueryClient {
       await this.disconnect();
 
       const provider = new WsProvider(this.url);
-      this.api = await ApiPromise.create({ provider });
+      this.api = await ApiPromise.create({ provider, throwOnConnect: true });
       await this.wait();
       QueryClient.connections.set(this.url, { api: this.api, disconnectHandler: this.__disconnectHandler });
       this.api.on("disconnected", this.__disconnectHandler);
     } catch (e) {
-      const message = "Unable to establish a connection with the chain:\n";
+      const message = "Unable to establish a connection with the chain\n";
       if (e instanceof BaseError) {
         e.message = message + e.message;
         throw e;
       }
-      throw new TFChainError(message + e);
+      throw new TFChainError(message);
     } finally {
       QueryClient.connectingLock.release();
     }
