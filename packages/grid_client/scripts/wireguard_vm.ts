@@ -47,70 +47,46 @@ function createGwModel(node_id: number, ip: string, networkName: string, name: s
 }
 
 async function deployVM(client, vms) {
-  try {
-    const res = await client.machines.deploy(vms);
-    log("================= Deploying VM =================");
-    log(res);
-    log("================= Deploying VM =================");
-  } catch (error) {
-    log("Error while Deploying the VM " + error);
-  }
+  const res = await client.machines.deploy(vms);
+  log("================= Deploying VM =================");
+  log(res);
+  log("================= Deploying VM =================");
 }
 
 async function getVMDeployment(client, vms) {
-  try {
-    const res = await client.machines.getObj(vms);
-    log("================= Getting deployment information =================");
-    log(res);
-    log("================= Getting deployment information =================");
-    return res;
-  } catch (error) {
-    log("Error while getting the deployment " + error);
-  }
+  const res = await client.machines.getObj(vms);
+  log("================= Getting deployment information =================");
+  log(res);
+  log("================= Getting deployment information =================");
+  return res;
 }
 
 async function deployGw(client, gw) {
-  try {
-    const res = await client.gateway.deploy_name(gw);
-    log("================= Deploying name gateway =================");
-    log(res);
-    log("================= Deploying name gateway =================");
-  } catch (error) {
-    log("Error while Deploying the gateway " + error);
-  }
+  const res = await client.gateway.deploy_name(gw);
+  log("================= Deploying name gateway =================");
+  log(res);
+  log("================= Deploying name gateway =================");
 }
 
 async function getGwDeployment(client, gw) {
-  try {
-    const res = await client.gateway.getObj(gw);
-    log("================= Getting deployment information =================");
-    log(res);
-    log("================= Getting deployment information =================");
-  } catch (error) {
-    log("Error while getting the deployment " + error);
-  }
+  const res = await client.gateway.getObj(gw);
+  log("================= Getting deployment information =================");
+  log(res);
+  log("================= Getting deployment information =================");
 }
 
 async function deleteVM(client, vms) {
-  try {
-    const res = await client.machines.delete(vms);
-    log("================= Canceling the VM deployment =================");
-    log(res);
-    log("================= Canceling the VM deployment =================");
-  } catch (error) {
-    log("Error while canceling the deployment " + error);
-  }
+  const res = await client.machines.delete(vms);
+  log("================= Canceling the VM deployment =================");
+  log(res);
+  log("================= Canceling the VM deployment =================");
 }
 
 async function deleteGw(client, gw) {
-  try {
-    const res = await client.gateway.delete_name(gw);
-    log("================= Canceling the GW deployment =================");
-    log(res);
-    log("================= Canceling the GW deployment =================");
-  } catch (error) {
-    log("Error while canceling the deployment " + error);
-  }
+  const res = await client.gateway.delete_name(gw);
+  log("================= Canceling the GW deployment =================");
+  log(res);
+  log("================= Canceling the GW deployment =================");
 }
 
 async function main() {

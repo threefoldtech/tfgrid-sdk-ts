@@ -35,6 +35,7 @@
                 <span class="font-weight-bold">{{ contract.publicIP?.ip.split("/")[0] || contract.publicIP?.ip }}</span>
               </v-alert>
               <CopyReadonlyInput label="Name" :data="contract.name" />
+              <CopyReadonlyInput label="Node ID" :data="contract.nodeId" />
               <CopyReadonlyInput label="Contract ID" :data="contract.contractId" />
 
               <template v-if="contract.publicIP">

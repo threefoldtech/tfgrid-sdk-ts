@@ -3,14 +3,10 @@ import { getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function pingNode(client, nodeId) {
-  try {
-    const res = await client.zos.pingNode(nodeId);
-    log("================= Ping result =================");
-    log(res);
-    log("================= Ping result =================");
-  } catch (error) {
-    log(`Node ${nodeId.nodeId} is offline`);
-  }
+  const res = await client.zos.pingNode(nodeId);
+  log("================= Ping result =================");
+  log(res);
+  log("================= Ping result =================");
 }
 
 async function main() {

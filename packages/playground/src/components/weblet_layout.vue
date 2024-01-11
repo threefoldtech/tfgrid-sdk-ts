@@ -38,7 +38,7 @@
     <template v-if="dedicated && !status">
       <v-alert class="mb-4 mx-4" type="info" variant="tonal">
         You need to rent a node from the
-        <router-link to="/dashboard/dedicated-nodes" class="app-link">Dedicated Nodes page</router-link>
+        <router-link to="/dashboard/dedicated-nodes" class="app-link">Dedicated Machines page</router-link>
         before deploying on it.
       </v-alert>
     </template>
@@ -85,7 +85,11 @@
           </div>
         </div>
 
-        <a href="https://manual.grid.tf/wiki/cloudunits/pricing/pricing.html#cloud-unit-pricing" target="_blank" class="app-link">
+        <a
+          href="https://manual.grid.tf/wiki/cloudunits/pricing/pricing.html#cloud-unit-pricing"
+          target="_blank"
+          class="app-link"
+        >
           Learn more about the pricing and how to unlock discounts.
         </a>
       </v-alert>

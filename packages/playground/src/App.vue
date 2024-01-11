@@ -117,6 +117,7 @@
               }`"
               width="160px"
               @click="navigateToHome"
+              class="clickable-logo"
             />
           </v-toolbar-title>
 
@@ -176,17 +177,7 @@
               </div>
             </div>
 
-            <div :style="{ position: 'relative' }">
-              <router-view v-slot="{ Component }">
-                <transition name="fade">
-                  <div :key="$route.path">
-                    <component :is="Component" v-if="isAuthorized($route.path)"></component>
-                    <component :is="Component" v-else-if="hasActiveProfile && hasGrid"></component>
-                    <ConnectWalletLanding @openProfile="openProfile = true" v-else />
-                  </div>
-                </transition>
-              </router-view>
-            </div>
+            <TfRouterView :isAuth="hasActiveProfile && hasGrid" />
           </v-container>
         </DeploymentListManager>
         <TFNotification v-if="hasActiveProfile && hasGrid" />
@@ -215,6 +206,7 @@ const theme = useTheme();
 const navbarConfig = ref();
 
 const hasGrid = computed(() => !!gridStore.grid);
+
 watch(
   () => $route.meta,
   meta => {
@@ -222,18 +214,14 @@ watch(
       (navbarConfig.value = meta.navbarConfig);
   },
 );
+function navigateToHome() {
+  return $router.push("/");
+}
 
 onMounted(window.$$appLoader || noop);
 
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
-
-function navigateToPrevRoute(path: any) {
-  const firstItem = path[0];
-  if (firstItem && firstItem.to) {
-    $router.push(firstItem.to);
-  }
-}
 
 const routes: AppRoute[] = [
   {
@@ -289,7 +277,7 @@ const routes: AppRoute[] = [
       },
       { title: "Applications", icon: "mdi-lightbulb-on-outline", route: "/solutions" },
       {
-        title: "My Contracts",
+        title: "Your Contracts",
         icon: "mdi-file-document-edit",
         route: "/dashboard/contracts-list",
       },
@@ -312,7 +300,7 @@ const routes: AppRoute[] = [
     items: [
       { title: "Farm Finder", icon: "mdi-lan-connect", route: "/farms" },
       {
-        title: "My Farms",
+        title: "Your Farms",
         icon: "mdi-silo",
         route: "/dashboard/farms",
       },
@@ -334,7 +322,7 @@ const routes: AppRoute[] = [
     icon: "mdi-account-convert-outline",
     items: [
       {
-        title: "My Profile",
+        title: "Your Profile",
         icon: "mdi-account-supervisor-outline",
         route: "/dashboard/twin",
       },
@@ -378,32 +366,12 @@ function clickHandler({ route, url }: AppRouteItem): void {
     window.open(url, "_blank");
   }
 }
-
-function isAuthorized(route: string) {
-  const items = ["dashboard", "solutions", "sshkey"];
-  return !items.some(substr => route.startsWith(`/${substr}`));
-}
-
-function navigateToHome() {
-  return $router.push("/");
-}
-
-$router.beforeEach((to, from, next) => {
-  if (to.path === "/" && hasActiveProfile) {
-    next({ path: "/dashboard/twin" });
-  } else {
-    next();
-  }
-  window.scrollTo(0, 0);
-});
 </script>
 
 <script lang="ts">
 import { AppThemeSelection } from "@/utils/app_theme";
 
-import AppInfo from "./components/app_info.vue";
 import AppTheme from "./components/app_theme.vue";
-import ConnectWalletLanding from "./components/connect_wallet_landing.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
 import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
 import FundsCard from "./components/funds_card.vue";
@@ -411,6 +379,7 @@ import ProfileManagerController from "./components/profile_manager_controller.vu
 import TFNotification from "./components/tf_notification.vue";
 import TfNavigationLoader from "./components/TfNavigationLoader.vue";
 import TfOfflineNotifier from "./components/TfOfflineNotifier.vue";
+import TfRouterView from "./components/TfRouterView.vue";
 import TfSwapPrice from "./components/TfSwapPrice.vue";
 import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
@@ -438,8 +407,7 @@ export default {
     ProfileManager,
     DeploymentListManager,
     AppTheme,
-    ConnectWalletLanding,
-    AppInfo,
+    TfRouterView,
     TfSwapPrice,
     FundsCard,
     ProfileManagerController,
@@ -448,3 +416,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.clickable-logo:hover {
+  cursor: pointer;
+}
+</style>

@@ -5,36 +5,24 @@ import { log } from "./utils";
 // Please run kubernetes script first before running this one to create the cluster.
 
 async function addWorker(client, worker) {
-  try {
-    const res = await client.k8s.add_worker(worker);
-    log("================= Adding worker =================");
-    log(res);
-    log("================= Adding worker =================");
-  } catch (error) {
-    log("Error while adding the worker" + error);
-  }
+  const res = await client.k8s.add_worker(worker);
+  log("================= Adding worker =================");
+  log(res);
+  log("================= Adding worker =================");
 }
 
 async function getWorker(client, worker) {
-  try {
-    const res = await client.k8s.getObj(worker);
-    log("================= Getting worker information =================");
-    log(res);
-    log("================= Getting worker information =================");
-  } catch (error) {
-    log("Error while getting the worker" + error);
-  }
+  const res = await client.k8s.getObj(worker);
+  log("================= Getting worker information =================");
+  log(res);
+  log("================= Getting worker information =================");
 }
 
 async function deleteWorker(client, worker) {
-  try {
-    const res = await client.k8s.delete_worker(worker);
-    log("================= Deleting the worker =================");
-    log(res);
-    log("================= Deleting the worker =================");
-  } catch (error) {
-    log("Error while deleting the worker" + error);
-  }
+  const res = await client.k8s.delete_worker(worker);
+  log("================= Deleting the worker =================");
+  log(res);
+  log("================= Deleting the worker =================");
 }
 
 async function main() {

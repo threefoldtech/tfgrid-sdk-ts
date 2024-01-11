@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex">
+  <div class="d-flex" v-if="disabled">
     <v-tooltip :text="tooltip || 'None!'" :location="location">
       <template #activator="{ props }">
         {{ getPropsRef(props) }}
@@ -21,6 +21,7 @@
       </template>
     </v-tooltip>
   </div>
+  <slot v-else />
 </template>
 
 <script lang="ts">
@@ -50,6 +51,7 @@ export default {
       type: String as PropType<VTooltip["location"]>,
       required: false,
     },
+    disabled: Boolean,
   },
   setup() {
     const appendIcon = "mdi-information";
