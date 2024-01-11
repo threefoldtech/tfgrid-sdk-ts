@@ -41,7 +41,6 @@
         :items="nodes"
         v-model:items-per-page="filterOptions.size"
         v-model:expanded="expanded"
-        show-expand
         :hide-no-data="false"
         :disable-sort="true"
         class="elevation-1"
@@ -152,6 +151,7 @@ const headers: VDataTable["headers"] = [
 const profileManager = useProfileManager();
 
 const expanded = ref<any[]>([]);
+const expandedId = ref<string>("");
 const tabs = [{ label: "Rentable" }, { label: "Mine" }];
 const activeTab = ref(0);
 const loading = ref(false);
@@ -292,10 +292,19 @@ async function reloadTable() {
   await _loadData();
 }
 function toggleExpand(e: any, data: any) {
+  if (data.item.props.title.id === expandedId.value) {
+    expanded.value = [];
+    expandedId.value = "";
+    return;
+  }
+
   if (expanded.value.length) {
     expanded.value = [];
+    expandedId.value = "";
   }
+
   expanded.value.push(data.item.props.title);
+  expandedId.value = data.item.props.title.id;
 }
 </script>
 
