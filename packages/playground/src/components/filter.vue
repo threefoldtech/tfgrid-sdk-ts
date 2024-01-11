@@ -44,6 +44,9 @@
               <slot name="options" :props="fitlerColProps"> </slot>
             </v-row>
           </v-container>
+          <v-alert v-if="Object.keys(route.query).length > 0" class="mb-4 mx-8" type="info" variant="tonal">
+            You can click 'Clear' to reset your selected filters.
+          </v-alert>
         </form-validator>
 
         <v-divider class="mb-4 mx-8" />
@@ -56,7 +59,6 @@
               color="anchor"
               text="Clear"
             />
-
             <v-btn
               :disabled="!isValidForm || !formHasValues || sameState"
               class="ml-4 mr-7"
