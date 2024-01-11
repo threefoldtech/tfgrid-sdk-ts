@@ -4,7 +4,7 @@
       <v-col lg="6" md="12" class="border mt-3">
         <div>
           <div class="d-flex justify-center mb-5">
-            <h4 class="header">Live and Operational</h4>
+            <h4 class="tf-header">Live and Operational</h4>
           </div>
           <div
             :style="{
@@ -25,7 +25,7 @@
                   :src="baseUrl + 'images/icons/live-and-operational/' + s.image"
                 />
                 <v-card-text>
-                  <p class="text-center header font-weight-regular mb-2">{{ s.value }}</p>
+                  <p class="text-center tf-header font-weight-regular mb-2">{{ s.value }}</p>
                   <p class="text-center font-weight-light sub-header">{{ s.label }}</p>
                 </v-card-text>
               </v-card>
@@ -182,7 +182,7 @@ export default {
 .statcards {
   margin-top: 50rem;
 }
-.header {
+.tf-header {
   font-size: 1.25rem;
 }
 .sub-header {
