@@ -41,6 +41,8 @@
       </v-dialog>
     </v-alert>
 
+    <AccessDeploymentAlert />
+
     <ListTable
       :headers="filteredHeaders"
       :items="items"
@@ -276,12 +278,14 @@ defineExpose({ loadDeployments });
 <script lang="ts">
 import { ProjectName } from "../types";
 import { migrateModule } from "../utils/migration";
+import AccessDeploymentAlert from "./AccessDeploymentAlert.vue";
 import ListTable from "./list_table.vue";
 
 export default {
   name: "VmDeploymentTable",
   components: {
     ListTable,
+    AccessDeploymentAlert,
   },
   data() {
     return {
