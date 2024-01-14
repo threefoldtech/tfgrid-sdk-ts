@@ -157,7 +157,7 @@ const _loadData = async () => {
       return {
         ...item,
         price: (price?.dedicatedPrice ?? 0 + (fee || 0)).toFixed(3),
-        discount: price?.sharedPackage.discount ?? 0,
+        discount: price?.sharedPackage.discount,
       };
     });
 
