@@ -407,7 +407,6 @@ import { normalizeBalance, normalizeError } from "../utils/helpers";
 const items = ref([{ id: 1, name: "stellar" }]);
 const depositWallet = ref("");
 const selectedName = ref("");
-const openDepositDialog = ref(false);
 const selectedItem = ref(items.value[0]);
 const depositFee = ref(0);
 interface Credentials {
@@ -427,7 +426,7 @@ const props = defineProps({
     type: Boolean,
   },
 });
-defineEmits<{ (event: "update:modelValue", value: boolean): void }>();
+const emit = defineEmits<{ (event: "update:modelValue", value: boolean): void }>();
 const bridge = (window as any).env.BRIDGE_TFT_ADDRESS;
 
 const apps = [
@@ -486,6 +485,7 @@ async function mounted() {
     if (grid) {
       const DepositFee = await grid.bridge.getDepositFee();
       depositFee.value = DepositFee;
+      return;
     }
   } catch (e) {
     console.log(e);
@@ -609,6 +609,7 @@ function logout() {
   if (router.currentRoute.value.path.includes("/overview")) {
     router.push("/");
   }
+  emit("update:model-value", false);
 }
 
 const activating = ref(false);
@@ -637,6 +638,7 @@ async function activate(mnemonic: string, keypairType: KeypairType) {
     const profile = await loadProfile(grid!);
 
     profileManager.set({ ...profile, mnemonic });
+    emit("update:model-value", false);
   } catch (e) {
     loginError.value = normalizeError(e, "Something went wrong while login.");
   } finally {
