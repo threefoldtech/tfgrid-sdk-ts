@@ -10,7 +10,7 @@
       </v-radio-group>
 
       <template v-if="wayToSelect === 'automated'">
-        <TfSelectLocation v-model="location" title="Choose a Location" />
+        <TfSelectLocation :node-status="NodeStatus.Up" v-model="location" title="Choose a Location" />
         <TfSelectFarm :valid-filters="validFilters" :filters="filters" :location="location" v-model="farm" />
         <TfAutoNodeSelector
           :valid-filters="validFilters"
@@ -56,6 +56,7 @@
 
 <script lang="ts">
 import type { FarmInfo, GPUCardInfo, NodeInfo } from "@threefold/grid_client";
+import { NodeStatus } from "@threefold/gridproxy_client";
 import noop from "lodash/fp/noop.js";
 import type { DeepPartial } from "utility-types";
 import { computed, getCurrentInstance, onMounted, onUnmounted, type PropType, ref, watch } from "vue";
@@ -77,7 +78,6 @@ import TfManualNodeSelector from "./TfManualNodeSelector.vue";
 import TfSelectFarm from "./TfSelectFarm.vue";
 import TfSelectGpu from "./TfSelectGpu.vue";
 import TfSelectLocation from "./TfSelectLocation.vue";
-
 export default {
   name: "TfSelectionDetails",
   components: { TfSelectLocation, TfSelectFarm, TfAutoNodeSelector, TfManualNodeSelector, TfSelectGpu, TfDomainName },
@@ -206,6 +206,7 @@ export default {
       domain,
       domainStatus,
       selectionDetails,
+      NodeStatus,
     };
   },
 };
