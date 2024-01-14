@@ -51,6 +51,8 @@
       </v-dialog>
     </v-alert>
 
+    <AccessDeploymentAlert />
+
     <ListTable
       :headers="[
         { title: 'PLACEHOLDER', key: 'data-table-select' },
@@ -154,12 +156,14 @@ defineExpose({ loadDeployments });
 </script>
 
 <script lang="ts">
+import AccessDeploymentAlert from "./AccessDeploymentAlert.vue";
 import ListTable from "./list_table.vue";
 
 export default {
   name: "K8sDeploymentTable",
   components: {
     ListTable,
+    AccessDeploymentAlert,
   },
   data() {
     return {
