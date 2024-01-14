@@ -12,7 +12,13 @@ Search for similar issues first, if not complete the following template
 
 ### Description
 
-A clear description of the bug
+A clear description of the bug, including relevant identifiers like:
+
+- **Node ID**
+
+- **Farm ID**
+
+- **Contract ID**
 
 ### Steps to reproduce
 
