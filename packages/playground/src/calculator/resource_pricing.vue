@@ -26,7 +26,7 @@
               <v-text-field
                 label="CPU (vCores)"
                 suffix="vCores"
-                type="number"
+                type="text"
                 v-model.number="CRU"
                 v-bind="props"
                 ref="valid"
@@ -48,7 +48,7 @@
             <input-tooltip tooltip="The amount of RAM (Random Access Memory) in GB.">
               <v-text-field
                 label="Memory (GB)"
-                type="number"
+                type="text"
                 suffix="GB"
                 v-model.number="MRU"
                 v-bind="props"
@@ -98,7 +98,7 @@
               <v-text-field
                 label="Disk HDD"
                 suffix="GB"
-                type="number"
+                type="text"
                 v-model.number="HRU"
                 v-bind="props"
                 ref="valid"
