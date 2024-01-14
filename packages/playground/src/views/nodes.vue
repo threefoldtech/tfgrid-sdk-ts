@@ -44,7 +44,19 @@
           </template>
         </tf-select-location>
         <v-col v-bind="colProps">
-          <TfSelectFarm :filters="{}" valid-filters :location="location" v-model="farm" />
+          <TfSelectFarm
+            variant="outlined"
+            inset-tooltip
+            tooltip="Filter by a farm name"
+            :filters="{}"
+            valid-filters
+            :location="location"
+            :model-value="farm"
+            @update:model-value="
+              farm = $event;
+              filterOptions.farmName = farm.name;
+            "
+          />
         </v-col>
       </template>
       <template #options="{ props }">
@@ -146,7 +158,7 @@ export default {
   },
   setup() {
     const filterInputs = ref<FilterInputs>(inputsInitializer());
-    const filterOptions = ref<FilterOptions>(optionsInitializer(undefined, undefined, undefined, undefined, undefined));
+    const filterOptions = ref<FilterOptions>(optionsInitializer(undefined, undefined, undefined));
     const mixedFilters = computed<MixedFilter>(() => ({ inputs: filterInputs.value, options: filterOptions.value }));
 
     const loading = ref<boolean>(true);
@@ -189,6 +201,7 @@ export default {
         filterOptions.value.gateway,
         filterOptions.value.region,
         filterOptions.value.country,
+        filterOptions.value.farmName,
       );
 
       if (isValidForm.value) {
@@ -200,7 +213,9 @@ export default {
     const resetFilters = async (filtersInputValues: FilterInputs, reload: boolean) => {
       filtering.value = true;
       filterInputs.value = filtersInputValues;
-      filterOptions.value = optionsInitializer(undefined, undefined, undefined, undefined, undefined);
+      location.value = undefined;
+      farm.value = undefined;
+      filterOptions.value = optionsInitializer(undefined, undefined, undefined);
       if (reload && isValidForm.value) {
         await updateNodes();
       }

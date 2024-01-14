@@ -178,7 +178,7 @@ export const getQueries = (mixedFilters: MixedFilter): Partial<NodesQuery> => {
     retCount: true,
     nodeId: +mixedFilters.inputs.nodeId.value! || undefined,
     farmIds: mixedFilters.inputs.farmIds.value,
-    farmName: mixedFilters.inputs.farmName.value,
+    farmName: mixedFilters.options.farmName,
     country: mixedFilters.options.country,
     region: mixedFilters.options.region,
     status: mixedFilters.options.status ? (mixedFilters.options.status.toLocaleLowerCase() as NodeStatus) : undefined,

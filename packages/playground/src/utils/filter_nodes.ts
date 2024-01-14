@@ -25,7 +25,6 @@ export async function getNodeCards(grid: GridClient, nodeId: number): Promise<No
 export type FilterNodeInputs = {
   nodeId: InputFilterType;
   farmIds: InputFilterType;
-  farmName: InputFilterType;
   freeSru: InputFilterType;
   freeHru: InputFilterType;
   freeMru: InputFilterType;
@@ -46,19 +45,6 @@ export type DedicatedNodeFilters = {
 
 // Default input Initialization
 export const inputsInitializer: () => FilterNodeInputs = () => ({
-  nodeId: {
-    label: "Node ID",
-    rules: [
-      [
-        isNumeric("This field accepts numbers only.", { no_symbols: true }),
-        min("The node id should be larger then zero.", 1),
-        startsWith("The node id start with zero.", "0"),
-        validateResourceMaxNumber("This is not a valid ID."),
-      ],
-    ],
-    tooltip: "Filter by node id.",
-    type: "text",
-  },
   farmIds: {
     label: "Farm ID",
     rules: [
@@ -72,10 +58,18 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
     tooltip: "Filter by farm id",
     type: "text",
   },
-  farmName: {
-    label: "Farm Name",
+  nodeId: {
+    label: "Node ID",
+    rules: [
+      [
+        isNumeric("This field accepts numbers only.", { no_symbols: true }),
+        min("The node id should be larger then zero.", 1),
+        startsWith("The node id start with zero.", "0"),
+        validateResourceMaxNumber("This is not a valid ID."),
+      ],
+    ],
+    tooltip: "Filter by node id.",
     type: "text",
-    tooltip: "Filter by farm name.",
   },
   totalSru: {
     label: "Min SSD (GB)",

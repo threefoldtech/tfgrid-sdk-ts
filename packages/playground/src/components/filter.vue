@@ -123,7 +123,8 @@ const formHasValues = computed(
     props.options.gpu ||
     props.options.gateway ||
     props.options.country ||
-    props.options.region,
+    props.options.region ||
+    props.options.farmName,
 );
 
 const parseQueries = () => {
@@ -158,7 +159,8 @@ watch(
         options.gateway ||
         options.status?.length ||
         options.country?.length ||
-        options.region?.length,
+        options.region?.length ||
+        options.farmName,
     );
     parseQueries();
   },
@@ -183,6 +185,7 @@ const setFilterQueries = () => {
     status: props.options.status || undefined,
     region: props.options.region || undefined,
     country: props.options.country || undefined,
+    farmName: props.options.farmName || undefined,
   };
 
   for (const [key, { value }] of Object.entries(props.modelValue)) {
