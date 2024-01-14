@@ -206,6 +206,8 @@ export interface FilterOptions {
   status?: NodeStatus;
   gpu?: boolean;
   gateway?: boolean;
+  region?: string;
+  country?: string;
   page: number;
   size: number;
 }
@@ -215,8 +217,6 @@ export type FilterInputs = {
   nodeId: NodeInputFilterType;
   farmIds: NodeInputFilterType;
   farmName: NodeInputFilterType;
-  country: NodeInputFilterType;
-  region: NodeInputFilterType;
   freeSru: NodeInputFilterType;
   freeHru: NodeInputFilterType;
   freeMru: NodeInputFilterType;
@@ -229,9 +229,19 @@ export const optionsInitializer: (
   status: NodeStatus | undefined,
   gpu: boolean | undefined,
   gateway: boolean | undefined,
-) => FilterOptions = (status: NodeStatus | undefined, gpu: boolean | undefined, gateway: boolean | undefined) => ({
+  region: string | undefined,
+  country: string | undefined,
+) => FilterOptions = (
+  status: NodeStatus | undefined,
+  gpu: boolean | undefined,
+  gateway: boolean | undefined,
+  region?: string,
+  country?: string,
+) => ({
   gateway,
   gpu,
+  region,
+  country,
   page: 1,
   size: 10,
   status,
