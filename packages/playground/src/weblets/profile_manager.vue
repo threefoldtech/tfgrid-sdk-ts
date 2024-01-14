@@ -609,7 +609,7 @@ function logout() {
   if (router.currentRoute.value.path.includes("/overview")) {
     router.push("/");
   }
-  emit("update:model-value", false);
+  emit("update:modelValue", false);
 }
 
 const activating = ref(false);
@@ -638,7 +638,7 @@ async function activate(mnemonic: string, keypairType: KeypairType) {
     const profile = await loadProfile(grid!);
 
     profileManager.set({ ...profile, mnemonic });
-    emit("update:model-value", false);
+    emit("update:modelValue", false);
   } catch (e) {
     loginError.value = normalizeError(e, "Something went wrong while login.");
   } finally {
