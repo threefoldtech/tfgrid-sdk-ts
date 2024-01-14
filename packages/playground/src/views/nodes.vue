@@ -52,6 +52,7 @@
             valid-filters
             :location="location"
             :model-value="farm"
+            :disabled="isFormLoading"
             @update:model-value="
               farm = $event;
               filterOptions.farmName = farm.name;
