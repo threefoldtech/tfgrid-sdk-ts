@@ -26,8 +26,6 @@ export type FilterNodeInputs = {
   nodeId: InputFilterType;
   farmIds: InputFilterType;
   farmName: InputFilterType;
-  country: InputFilterType;
-  region: InputFilterType;
   freeSru: InputFilterType;
   freeHru: InputFilterType;
   freeMru: InputFilterType;
@@ -78,16 +76,6 @@ export const inputsInitializer: () => FilterNodeInputs = () => ({
     label: "Farm Name",
     type: "text",
     tooltip: "Filter by farm name.",
-  },
-  country: {
-    label: "Country Full Name",
-    type: "text",
-    tooltip: "Filter by country.",
-  },
-  region: {
-    label: "Region Name",
-    tooltip: "Filter by region.",
-    type: "text",
   },
   totalSru: {
     label: "Min SSD (GB)",
