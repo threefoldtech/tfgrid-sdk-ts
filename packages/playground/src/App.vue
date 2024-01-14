@@ -288,7 +288,7 @@ const routes: AppRoute[] = [
         title: "Applications",
         icon: "mdi-lightbulb-on-outline",
         route: "/deploy/applications",
-        tooltip: "Deploy ready community applications.",
+        tooltip: "Deploy ready applications on the ThreeFold grid.",
       },
       {
         title: "Your Contracts",
@@ -303,7 +303,7 @@ const routes: AppRoute[] = [
         tooltip: "Find or Publish your Flist on 0-Hub.",
       },
       {
-        title: "SSHKey",
+        title: "SSH Key",
         icon: "mdi-key-plus",
         route: "/deploy/sshkey",
         tooltip: "Generate or update your SSH Key.",
@@ -354,19 +354,19 @@ const routes: AppRoute[] = [
         title: "TF DAO",
         icon: "mdi-note-check-outline",
         route: "/tf-chain/dao",
-        tooltip: "Check and vote on DAO propsals.",
+        tooltip: "Check and vote on DAO proposals.",
       },
       {
         title: "TF Token Bridge",
         icon: "mdi-swap-horizontal",
         route: "/tf-chain/bridge",
-        tooltip: "Transfer TFTs through different chains.",
+        tooltip: "Transfer TFTs on different chains.",
       },
       {
         title: "TF Token Transfer",
         icon: "mdi-account-arrow-right-outline",
         route: "/tf-chain/transfer",
-        tooltip: "Transfer TFTs through TFChain.",
+        tooltip: "Transfer TFTs on TFChain.",
       },
       {
         title: "TF Minting Reports",
