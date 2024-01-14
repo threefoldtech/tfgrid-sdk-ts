@@ -14,6 +14,7 @@
         >
           <v-container fluid>
             <v-row no-gutters>
+              <slot name="prepend" :props="fitlerColProps"></slot>
               <v-col v-for="key in Object.keys($props.modelValue)" :key="key" v-bind="fitlerColProps">
                 <input-validator
                   v-if="$props.modelValue[key].label"
@@ -120,7 +121,9 @@ const formHasValues = computed(
     Object.values(props.modelValue).some(obj => obj.value && obj.value.length >= 1) ||
     props.options.status?.length ||
     props.options.gpu ||
-    props.options.gateway,
+    props.options.gateway ||
+    props.options.country ||
+    props.options.region,
 );
 
 const parseQueries = () => {
@@ -150,7 +153,12 @@ watch(
   [() => props.modelValue, () => props.options],
   ([inputs, options]) => {
     isClearButtonEnabled.value = Object.values(inputs).some(
-      obj => (obj.value?.length && options.gpu) || options.gateway || options.status?.length,
+      obj =>
+        (obj.value?.length && options.gpu) ||
+        options.gateway ||
+        options.status?.length ||
+        options.country?.length ||
+        options.region?.length,
     );
     parseQueries();
   },
@@ -173,6 +181,8 @@ const setFilterQueries = () => {
     gpu: props.options.gpu || undefined,
     gateway: props.options.gateway || undefined,
     status: props.options.status || undefined,
+    region: props.options.region || undefined,
+    country: props.options.country || undefined,
   };
 
   for (const [key, { value }] of Object.entries(props.modelValue)) {
