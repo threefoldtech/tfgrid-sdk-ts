@@ -16,11 +16,17 @@
       @update:values="updateValues"
     >
       <template #prepend="{ props: colProps }">
-        <tf-select-location v-model="location">
+        <tf-select-location
+          :model-value="location"
+          @update:model-value="
+            location = $event;
+            filterOptions.country = $event?.country;
+            filterOptions.region = $event?.region;
+          "
+        >
           <template #region="{ props: regionProps }">
             <v-col v-bind="colProps">
               <tf-select-region
-                v-model="filterOptions.region"
                 :disabled="isFormLoading"
                 variant="outlined"
                 :region-props="regionProps"
@@ -30,7 +36,6 @@
           <template #country="{ props: countryProps }">
             <v-col v-bind="colProps">
               <tf-select-country
-                v-model="filterOptions.country"
                 :disabled="isFormLoading"
                 variant="outlined"
                 :country-props="countryProps"
