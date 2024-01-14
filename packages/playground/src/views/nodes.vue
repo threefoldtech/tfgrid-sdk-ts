@@ -15,6 +15,30 @@
       @reset="resetFilters"
       @update:values="updateValues"
     >
+      <template #prepend="{ props: colProps }">
+        <tf-select-location v-model="location">
+          <template #region="{ props: regionProps }">
+            <v-col v-bind="colProps">
+              <tf-select-region
+                v-model="filterOptions.region"
+                :disabled="isFormLoading"
+                variant="outlined"
+                :region-props="regionProps"
+              ></tf-select-region>
+            </v-col>
+          </template>
+          <template #country="{ props: countryProps }">
+            <v-col v-bind="colProps">
+              <tf-select-country
+                v-model="filterOptions.country"
+                :disabled="isFormLoading"
+                variant="outlined"
+                :country-props="countryProps"
+              ></tf-select-country>
+            </v-col>
+          </template>
+        </tf-select-location>
+      </template>
       <template #options="{ props }">
         <v-col v-bind="props">
           <v-select
@@ -91,6 +115,7 @@ import { capitalize, computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import NodeDetails from "@/components/node_details.vue";
+import TfSelectLocation from "@/components/node_selector/TfSelectLocation.vue";
 import NodesTable from "@/components/nodes_table.vue";
 import router from "@/router";
 import {
@@ -107,10 +132,11 @@ export default {
   components: {
     NodesTable,
     NodeDetails,
+    TfSelectLocation,
   },
   setup() {
     const filterInputs = ref<FilterInputs>(inputsInitializer());
-    const filterOptions = ref<FilterOptions>(optionsInitializer(undefined, undefined, undefined));
+    const filterOptions = ref<FilterOptions>(optionsInitializer(undefined, undefined, undefined, undefined, undefined));
     const mixedFilters = computed<MixedFilter>(() => ({ inputs: filterInputs.value, options: filterOptions.value }));
 
     const loading = ref<boolean>(true);
@@ -122,7 +148,7 @@ export default {
 
     const isDialogOpened = ref<boolean>(false);
     const isValidForm = ref<boolean>(true);
-
+    const location = ref();
     const nodeStatusOptions = [capitalize(NodeStatus.Up), capitalize(NodeStatus.Standby), capitalize(NodeStatus.Down)];
     const route = useRoute();
 
@@ -151,6 +177,8 @@ export default {
         filterOptions.value.status,
         filterOptions.value.gpu,
         filterOptions.value.gateway,
+        filterOptions.value.region,
+        filterOptions.value.country,
       );
 
       if (isValidForm.value) {
@@ -162,7 +190,7 @@ export default {
     const resetFilters = async (filtersInputValues: FilterInputs, reload: boolean) => {
       filtering.value = true;
       filterInputs.value = filtersInputValues;
-      filterOptions.value = optionsInitializer(undefined, undefined, undefined);
+      filterOptions.value = optionsInitializer(undefined, undefined, undefined, undefined, undefined);
       if (reload && isValidForm.value) {
         await updateNodes();
       }
@@ -242,6 +270,7 @@ export default {
       applyFilters,
       resetFilters,
       updateValues,
+      location,
     };
   },
 };
