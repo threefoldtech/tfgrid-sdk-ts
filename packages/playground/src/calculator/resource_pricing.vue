@@ -26,7 +26,7 @@
               <v-text-field
                 label="CPU (vCores)"
                 suffix="vCores"
-                type="number"
+                type="text"
                 v-model.number="CRU"
                 v-bind="props"
                 ref="valid"
@@ -47,7 +47,7 @@
             <input-tooltip tooltip="The amount of RAM (Random Access Memory) in GB.">
               <v-text-field
                 label="Memory (GB)"
-                type="number"
+                type="text"
                 suffix="GB"
                 v-model.number="MRU"
                 v-bind="props"
@@ -70,14 +70,7 @@
             #="{ props }"
           >
             <input-tooltip tooltip="The SSD capacity storage.">
-              <v-text-field
-                label="Disk SSD"
-                suffix="GB"
-                type="number"
-                v-model.number="SRU"
-                v-bind="props"
-                ref="valid"
-              />
+              <v-text-field label="Disk SSD" suffix="GB" type="text" v-model.number="SRU" v-bind="props" ref="valid" />
             </input-tooltip>
           </input-validator>
         </v-col>
@@ -92,14 +85,7 @@
             #="{ props }"
           >
             <input-tooltip tooltip="The HDD capacity storage.">
-              <v-text-field
-                label="Disk HDD"
-                suffix="GB"
-                type="number"
-                v-model.number="HRU"
-                v-bind="props"
-                ref="valid"
-              />
+              <v-text-field label="Disk HDD" suffix="GB" type="text" v-model.number="HRU" v-bind="props" ref="valid" />
             </input-tooltip>
           </input-validator>
         </v-col>
