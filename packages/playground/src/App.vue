@@ -288,7 +288,7 @@ const routes: AppRoute[] = [
         title: "Applications",
         icon: "mdi-lightbulb-on-outline",
         route: "/deploy/applications",
-        tooltip: "Deploy ready community solutions.",
+        tooltip: "Deploy ready community applications.",
       },
       {
         title: "Your Contracts",
@@ -360,7 +360,7 @@ const routes: AppRoute[] = [
         title: "TF Token Bridge",
         icon: "mdi-swap-horizontal",
         route: "/tf-chain/bridge",
-        tooltip: "Transfer TFTs to and from stellar.",
+        tooltip: "Transfer TFTs through different chains.",
       },
       {
         title: "TF Token Transfer",
