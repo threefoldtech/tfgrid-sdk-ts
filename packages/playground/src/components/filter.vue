@@ -14,8 +14,8 @@
         >
           <v-container fluid>
             <v-row no-gutters>
-              <slot name="prepend" :props="fitlerColProps"></slot>
-              <v-col v-for="key in Object.keys($props.modelValue)" :key="key" v-bind="fitlerColProps">
+              <slot name="prepend" :props="filterColProps"></slot>
+              <v-col v-for="key in Object.keys($props.modelValue)" :key="key" v-bind="filterColProps">
                 <input-validator
                   v-if="$props.modelValue[key].label"
                   :rules="$props.modelValue[key].value ? $props.modelValue[key].rules?.[0] ?? [] : []"
@@ -42,7 +42,7 @@
                   </v-text-field>
                 </input-validator>
               </v-col>
-              <slot name="options" :props="fitlerColProps"> </slot>
+              <slot name="options" :props="filterColProps"> </slot>
             </v-row>
           </v-container>
           <v-alert v-if="Object.keys(route.query).length > 0" class="mb-4 mx-8" type="info" variant="tonal">
@@ -233,7 +233,7 @@ const resetFilters = () => {
   });
 };
 
-const fitlerColProps = { class: "py-2 px-4", cols: 12, md: 6, lg: 3 };
+const filterColProps = { class: "py-2 px-4", cols: 12, md: 6, lg: 3 };
 </script>
 
 <script lang="ts">
