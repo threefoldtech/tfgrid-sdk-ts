@@ -43,6 +43,9 @@
             </v-col>
           </template>
         </tf-select-location>
+        <v-col v-bind="colProps">
+          <TfSelectFarm :filters="{}" valid-filters :location="location" v-model="farm" />
+        </v-col>
       </template>
       <template #options="{ props }">
         <v-col v-bind="props">
@@ -120,6 +123,7 @@ import { capitalize, computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import NodeDetails from "@/components/node_details.vue";
+import TfSelectFarm from "@/components/node_selector/TfSelectFarm.vue";
 import TfSelectLocation from "@/components/node_selector/TfSelectLocation.vue";
 import NodesTable from "@/components/nodes_table.vue";
 import router from "@/router";
@@ -138,6 +142,7 @@ export default {
     NodesTable,
     NodeDetails,
     TfSelectLocation,
+    TfSelectFarm,
   },
   setup() {
     const filterInputs = ref<FilterInputs>(inputsInitializer());
@@ -150,7 +155,7 @@ export default {
     const nodesCount = ref<number>(0);
     const filtering = ref(false);
     const selectedNodeId = ref<number>(0);
-
+    const farm = ref();
     const isDialogOpened = ref<boolean>(false);
     const isValidForm = ref<boolean>(true);
     const location = ref();
@@ -276,6 +281,7 @@ export default {
       resetFilters,
       updateValues,
       location,
+      farm,
     };
   },
 };

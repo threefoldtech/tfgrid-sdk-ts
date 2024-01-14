@@ -39,7 +39,7 @@ export interface SelectionDetailsFiltersValidators {
 export interface NormalizeFarmFiltersOptions {
   size: number;
   page: number;
-  twinId: number;
+  twinId?: number;
   location: SelectedLocation;
 }
 
