@@ -147,12 +147,21 @@
                           </div>
                         </v-col>
                         <v-col cols="2">
-                          <v-autocomplete
-                            :items="[...keyType]"
-                            item-title="name"
-                            v-model="keypairType"
-                            v-if="activeTab === 1"
-                          />
+                          <v-tooltip
+                            location="top"
+                            text="Using different keypair types will lead to a completely different account."
+                          >
+                            <template #activator="{ props }">
+                              <v-autocomplete
+                                label="Keypair Type"
+                                v-bind="props"
+                                :items="[...keyType]"
+                                item-title="name"
+                                v-model="keypairType"
+                                v-if="activeTab === 1"
+                              />
+                            </template>
+                          </v-tooltip>
                         </v-col>
                       </v-row>
 
