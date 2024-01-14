@@ -147,6 +147,7 @@ import {
   getNodeMintingFixupReceipts,
   type NodeInterface,
 } from "@/utils/node";
+import { notifyDelaying } from "@/utils/notifications";
 
 import AddIP from "./add_ip.vue";
 import PublicIPsTable from "./public_ips_table.vue";
@@ -247,7 +248,7 @@ export default {
         await gridStore.grid.farms.addStellarAddress({ farmId, stellarAddress });
         createCustomToast("Address Added successfully!", ToastType.success);
         showDialogue.value = false;
-        createCustomToast("Table may take sometime to update the changes.", ToastType.info);
+        notifyDelaying();
         await reloadFarms();
       } catch (error) {
         console.log(error);
