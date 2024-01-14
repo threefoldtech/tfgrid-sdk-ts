@@ -282,9 +282,6 @@
               <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="loginError">
                 {{ loginError }}
               </v-alert>
-              <v-alert variant="tonal" type="warning" class="mb-6" v-if="activeTab === 1">
-                <p>Using different keypair types will lead to a completely different account.</p>
-              </v-alert>
             </FormValidator>
 
             <div class="d-flex justify-center mt-2">
