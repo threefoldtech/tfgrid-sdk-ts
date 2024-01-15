@@ -322,7 +322,7 @@
           <v-col cols="7" sm="12" md="12" lg="7">
             <PasswordInputWrapper #="{ props }">
               <VTextField
-                label="Your Mnemonic"
+                :label="profileManager.profile.mnemonic.startsWith('0x') ? 'Your Hex Seed' : 'Your Mnemonic'"
                 readonly
                 v-model="profileManager.profile.mnemonic"
                 v-bind="props"
