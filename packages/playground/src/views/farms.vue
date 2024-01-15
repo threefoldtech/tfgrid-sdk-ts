@@ -2,6 +2,26 @@
   <view-layout>
     <v-row>
       <v-col>
+        <TfFiltersContainer @apply="console.log('apply filters', filters)">
+          <TfFilter
+            query-route="farm-id"
+            v-model="filters.farmId"
+            :rules="[validators.isInt('Id must be more than 1', { min: 1 })]"
+          >
+            <template #input="{ props }">
+              <VTextField label="Farm ID" variant="outlined" type="number" v-model="filters.farmId" v-bind="props" />
+            </template>
+          </TfFilter>
+
+          <!-- <TfFilter>
+            <input-validator :rules="[]" value="" #="{ props }">
+              <VTextField label="Farm ID" variant="outlined" v-bind="props" />
+            </input-validator>
+          </TfFilter> -->
+        </TfFiltersContainer>
+
+        <br />
+
         <filters
           v-model:valid="isValidForm"
           v-model="filterFarmInputs"
@@ -74,6 +94,10 @@ import { inputsInitializer, optionsInitializer } from "@/utils/filter_farms";
 import { getAllFarms, getFarmQueries } from "@/utils/get_farms";
 const loading = ref<boolean>(false);
 const farms = ref<Farm[]>();
+
+const filters = ref({
+  farmId: "" as unknown as number,
+});
 
 const selectedFarm = ref<Farm>();
 const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer());
@@ -213,12 +237,17 @@ import FarmDetailsCard from "@/components/node_details_cards/farm_details_card.v
 import TwinDetailsCard from "@/components/node_details_cards/twin_details_card.vue";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
+import TfFilter from "../components/filters/TfFilter.vue";
+import TfFiltersContainer from "../components/filters/TfFiltersContainer.vue";
+
 export default {
   name: "Farms",
   components: {
     Filters,
     FarmDetailsCard,
     TwinDetailsCard,
+    TfFiltersContainer,
+    TfFilter,
   },
 };
 </script>
