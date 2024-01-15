@@ -26,11 +26,13 @@
               <v-text-field
                 label="CPU (vCores)"
                 suffix="vCores"
-                type="text"
+                type="number"
+                min="1"
+                max="256"
+                oninput="if(Number(this.value) > 256) this.value = 256;"
                 v-model.number="CRU"
                 v-bind="props"
                 ref="valid"
-                maxlength="3"
               />
             </input-tooltip>
           </input-validator>
@@ -48,12 +50,14 @@
             <input-tooltip tooltip="The amount of RAM (Random Access Memory) in GB.">
               <v-text-field
                 label="Memory (GB)"
-                type="text"
+                type="number"
                 suffix="GB"
+                min="1"
+                max="1024"
+                oninput="if(Number(this.value) > 1024) this.value = 1024;"
                 v-model.number="MRU"
                 v-bind="props"
                 ref="valid"
-                maxlength="4"
               />
             </input-tooltip>
           </input-validator>
@@ -75,11 +79,13 @@
               <v-text-field
                 label="Disk SSD"
                 suffix="GB"
-                type="text"
+                type="number"
+                min="1"
+                max="1000000"
+                oninput="if(Number(this.value) > 1000000) this.value = 1000000;"
                 v-model.number="SRU"
                 v-bind="props"
                 ref="valid"
-                maxlength="7"
               />
             </input-tooltip>
           </input-validator>
@@ -98,11 +104,13 @@
               <v-text-field
                 label="Disk HDD"
                 suffix="GB"
-                type="text"
+                type="number"
+                min="1"
+                max="1000000"
+                oninput="if(Number(this.value) > 1000000) this.value = 1000000;"
                 v-model.number="HRU"
                 v-bind="props"
                 ref="valid"
-                maxlength="7"
               />
             </input-tooltip>
           </input-validator>
