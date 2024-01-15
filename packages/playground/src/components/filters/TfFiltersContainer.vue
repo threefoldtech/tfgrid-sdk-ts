@@ -92,8 +92,8 @@ export default {
     provide(key, service);
 
     function clear() {
-      const cleared = services.value.some(s => s.value.clear());
-      cleared && ctx.emit("apply");
+      const clear = services.value.map(service => service.value.clear());
+      clear.some(c => c) && ctx.emit("apply");
     }
 
     function apply() {

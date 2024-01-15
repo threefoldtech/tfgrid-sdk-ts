@@ -40,7 +40,7 @@ export function normalizeFarmOptions(
     size: window.env.PAGE_SIZE,
     page: pagination.value.page,
     location: location || {},
-    twinId: gridStore.client.twinId,
+    twinId: gridStore.client?.twinId,
   };
 }
 

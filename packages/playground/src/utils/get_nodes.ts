@@ -173,6 +173,8 @@ export function convert(value: string | undefined) {
   return value ? Math.ceil(toBytes(+value)) : undefined;
 }
 
+export const convertToBytes = convert;
+
 export const getQueries = (mixedFilters: MixedFilter): Partial<NodesQuery> => {
   const options: Partial<NodesQuery> = {
     retCount: true,

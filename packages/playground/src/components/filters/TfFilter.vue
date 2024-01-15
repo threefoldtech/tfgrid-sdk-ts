@@ -32,7 +32,6 @@ export default {
   },
   emits: {
     "update:model-value": (value: string) => true || value,
-    reset: () => true,
   },
   setup(_props, ctx) {
     // eslint-disable-next-line vue/no-setup-props-destructure
@@ -45,7 +44,6 @@ export default {
     const baseValue = ref(props.value.modelValue);
 
     function clear() {
-      ctx.emit("reset");
       ctx.emit("update:model-value", initialValue);
       if (baseValue.value === initialValue) {
         return false;

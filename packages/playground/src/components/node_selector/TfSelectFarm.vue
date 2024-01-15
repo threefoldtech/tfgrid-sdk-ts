@@ -96,10 +96,10 @@ export default {
   name: "TfSelectFarm",
   props: {
     modelValue: Object as PropType<FarmInfo>,
-    validFilters: { type: Boolean, default: () => false },
+    validFilters: { type: Boolean, default: () => true },
     filters: {
       type: Object as PropType<SelectionDetailsFilters>,
-      required: true,
+      default: () => ({}),
     },
     location: Object as PropType<SelectedLocation>,
     insetTooltip: Boolean,
