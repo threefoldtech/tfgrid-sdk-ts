@@ -20,18 +20,18 @@ import { computed, type PropType, ref, toRef } from "vue";
 import type { AsyncRule, SyncRule } from "../input_validator.vue";
 import { useFiltersContainerService } from "./TfFiltersContainer.vue";
 
-const colProps = { cols: 12, md: 6, lg: 3 };
+const colProps = { class: "py-2 px-4", cols: 12, md: 6, lg: 3 };
 
 export default {
   name: "TfFilter",
   props: {
-    modelValue: { type: String as PropType<string | number>, required: true },
+    modelValue: { type: String as PropType<string>, required: true },
     rules: Array as PropType<SyncRule[]>,
     asyncRules: Array as PropType<AsyncRule[]>,
     queryRoute: { type: String, required: true },
   },
   emits: {
-    "update:model-value": (value: string | number) => true || value,
+    "update:model-value": (value: string) => true || value,
     reset: () => true,
   },
   setup(_props, ctx) {
