@@ -123,8 +123,10 @@
                             validateMnemonic(v) ||
                             ((v.length === 64 || v.length === 66) && isAddress(v.length === 66 ? v : `0x${v}`))
                           ) {
+                            isValidMnemonicOrHexSeed = true;
                             return;
                           }
+                          isValidMnemonicOrHexSeed = false;
                           return { message: 'Mnemonic or Hex Seed doesn\'t seem to be valid.' };
                         },
                       ]"
@@ -194,6 +196,15 @@
                           @click="openAcceptTerms = termsLoading = true"
                         >
                           create account
+                        </VBtn>
+                        <VBtn
+                          class="mt-2 ml-3"
+                          color="secondary"
+                          variant="outlined"
+                          v-if="!isValidMnemonicOrHexSeed && !activatingAccount"
+                          @click="reloadValidation"
+                        >
+                          Reload
                         </VBtn>
                       </div>
                     </InputValidator>
@@ -413,6 +424,7 @@ interface Credentials {
 }
 const keyType = ["sr25519", "ed25519"];
 const keypairType = ref(KeypairType.sr25519);
+const isValidMnemonicOrHexSeed = ref(true);
 
 const theme = useTheme();
 const qrCodeText = ref("");
@@ -626,6 +638,11 @@ function clearFields() {
   mnemonic.value = "";
 }
 
+function reloadValidation() {
+  isValidMnemonicOrHexSeed.value = true;
+  mnemonicInput.value.validate();
+}
+
 async function activate(mnemonic: string, keypairType: KeypairType) {
   clearError();
   activating.value = true;
@@ -645,17 +662,20 @@ async function activate(mnemonic: string, keypairType: KeypairType) {
 
 function validateMnInput(mnemonic: string) {
   isNonActiveMnemonic.value = false;
+  isValidMnemonicOrHexSeed.value = true;
   return getGrid({ mnemonic, keypairType: keypairType.value })
     .then(() => undefined)
     .catch(e => {
       if (e instanceof TwinNotExistError) {
         isNonActiveMnemonic.value = true;
+        isValidMnemonicOrHexSeed.value = false;
         return {
           message: `Couldn't get the user twin for the provided mnemonic in ${
             process.env.NETWORK || window.env.NETWORK
           }net.`,
         };
       }
+      isValidMnemonicOrHexSeed.value = false;
 
       return {
         message: normalizeError(e, "Something went wrong. please try again."),
