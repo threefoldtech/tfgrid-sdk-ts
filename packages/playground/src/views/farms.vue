@@ -14,10 +14,42 @@
           </TfFilter>
 
           <!-- <TfFilter>
-            <input-validator :rules="[]" value="" #="{ props }">
-              <VTextField label="Farm ID" variant="outlined" v-bind="props" />
-            </input-validator>
+            <TfSelectLocation>
+
+            </TfSelectLocation>
           </TfFilter> -->
+
+          <TfFilter
+            query-route="location"
+            :model-value="filters.location.region + ':' + filters.location.country"
+            @update:model-value="
+              filters.location.country = '';
+              filters.location.region = '';
+            "
+          >
+            <template #unwrap="{ colProps }">
+              <TfSelectLocation
+                :model-value="filters.location"
+                @update:model-value="
+                  console.log($event);
+                  filters.location.country = $event?.country || '';
+                  filters.location.region = $event?.region || '';
+                "
+              >
+                <template #region="{ props }">
+                  <VCol v-bind="colProps">
+                    <TfSelectRegion :region-props="props" variant="outlined" />
+                  </VCol>
+                </template>
+
+                <template #country="{ props }">
+                  <VCol v-bind="colProps">
+                    <TfSelectCountry :country-props="props" variant="outlined" />
+                  </VCol>
+                </template>
+              </TfSelectLocation>
+            </template>
+          </TfFilter>
         </TfFiltersContainer>
 
         <br />
@@ -96,7 +128,11 @@ const loading = ref<boolean>(false);
 const farms = ref<Farm[]>();
 
 const filters = ref({
-  farmId: "" as unknown as number,
+  farmId: "",
+  location: {
+    region: "",
+    country: "",
+  },
 });
 
 const selectedFarm = ref<Farm>();
@@ -235,6 +271,7 @@ import type { FarmsQuery } from "@threefold/gridproxy_client";
 import Filters from "@/components/filter.vue";
 import FarmDetailsCard from "@/components/node_details_cards/farm_details_card.vue";
 import TwinDetailsCard from "@/components/node_details_cards/twin_details_card.vue";
+import TfSelectLocation from "@/components/node_selector/TfSelectLocation.vue";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import TfFilter from "../components/filters/TfFilter.vue";
@@ -248,6 +285,7 @@ export default {
     TwinDetailsCard,
     TfFiltersContainer,
     TfFilter,
+    TfSelectLocation,
   },
 };
 </script>

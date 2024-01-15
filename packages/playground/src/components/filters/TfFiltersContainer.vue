@@ -85,7 +85,7 @@ export default {
       ctx.emit("apply");
     }
 
-    return { filters, empty, changed, clear, apply, valid };
+    return { empty, changed, clear, apply, valid };
   },
 };
 </script>
