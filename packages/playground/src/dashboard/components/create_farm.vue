@@ -68,6 +68,8 @@
 <script lang="ts">
 import { ref } from "vue";
 
+import { notifyDelaying } from "@/utils/notifications";
+
 import { useGrid } from "../../stores";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
 
@@ -93,7 +95,7 @@ export default {
         isCreating.value = true;
         await gridStore.grid.farms.create({ name: props.name });
         createCustomToast("Farm created successfully.", ToastType.success);
-        createCustomToast("Table may take sometime to update the changes.", ToastType.info);
+        notifyDelaying();
         showDialogue.value = false;
         await props.userFarms.reloadFarms();
       } catch (error) {
