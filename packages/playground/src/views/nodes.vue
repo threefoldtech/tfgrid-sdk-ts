@@ -252,17 +252,11 @@
         query-route="gateway"
         :model-value="filters.gateway ? 'true' : ''"
         @update:model-value="filters.gateway = false"
-        :style="{ marginTop: '-16px' }"
       >
         <v-switch color="primary" inset label="Gateways (Only)" v-model="filters.gateway" hide-details />
       </TfFilter>
 
-      <TfFilter
-        query-route="gpu"
-        :model-value="filters.gpu ? 'true' : ''"
-        @update:model-value="filters.gpu = false"
-        :style="{ marginTop: '-16px' }"
-      >
+      <TfFilter query-route="gpu" :model-value="filters.gpu ? 'true' : ''" @update:model-value="filters.gpu = false">
         <v-switch color="primary" inset label="GPU Node (Only)" v-model="filters.gpu" hide-details />
       </TfFilter>
     </TfFiltersContainer>
@@ -385,9 +379,9 @@ export default {
             freeHru: convertToBytes(filters.value.freeHDD),
             freeMru: convertToBytes(filters.value.freeRAM),
             freeSru: convertToBytes(filters.value.freeSSD),
-            // totalHru: convertToBytes(filters.value.totalHDD),
-            // totalMru: convertToBytes(filters.value.totalRAM),
-            // totalSru: convertToBytes(filters.value.totalSSD),
+            totalHru: convertToBytes(filters.value.minHDD),
+            totalMru: convertToBytes(filters.value.minRAM),
+            totalSru: convertToBytes(filters.value.minSSD),
             hasGpu: filters.value.gpu || undefined,
             domain: filters.value.gateway || undefined,
           },

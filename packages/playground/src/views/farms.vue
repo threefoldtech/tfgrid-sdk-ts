@@ -24,21 +24,17 @@
         </template>
       </TfFilter>
 
-      <TfFilter
-        query-route="farm-name"
-        v-model="filters.farmeName"
-        :rules="[validators.isString('Farm name should be made of either numbers or letters')]"
-      >
-        <template #input="{ props }">
-          <VTextField label="Farm Name" variant="outlined" v-model="filters.farmeName" v-bind="props">
-            <template #append-inner>
-              <VTooltip text="Farm name, e.g myfarm">
-                <template #activator="{ props }">
-                  <VIcon icon="mdi-information-outline" v-bind="props" />
-                </template>
-              </VTooltip>
-            </template>
-          </VTextField>
+      <TfFilter query-route="farm-name" v-model="filters.farmName">
+        <template #unwrap="{ colProps }">
+          <VCol v-bind="colProps">
+            <TfSelectFarm
+              inset-tooltip
+              variant="outlined"
+              tooltip="Filter by farm name."
+              :model-value="filters.farmName ? ({ name: filters.farmName } as any) : undefined"
+              @update:model-value="filters.farmName = $event?.name || ''"
+            />
+          </VCol>
         </template>
       </TfFilter>
 
@@ -137,7 +133,7 @@ const page = ref(1);
 const size = ref(window.env.PAGE_SIZE);
 const filters = ref({
   farmId: "",
-  farmeName: "",
+  farmName: "",
   freePublicIps: "",
 });
 
@@ -154,7 +150,7 @@ async function loadFarms() {
       retCount: true,
       farmId: +filters.value.farmId || undefined,
       freeIps: +filters.value.freePublicIps || undefined,
-      nameContains: filters.value.farmeName || undefined,
+      nameContains: filters.value.farmName || undefined,
       page: page.value,
       size: size.value,
     });
@@ -226,6 +222,7 @@ import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import TfFilter from "../components/filters/TfFilter.vue";
 import TfFiltersContainer from "../components/filters/TfFiltersContainer.vue";
+import TfSelectFarm from "../components/node_selector/TfSelectFarm.vue";
 
 export default {
   name: "Farms",
@@ -234,6 +231,7 @@ export default {
     TwinDetailsCard,
     TfFiltersContainer,
     TfFilter,
+    TfSelectFarm,
   },
 };
 </script>
