@@ -137,7 +137,7 @@
                       <v-row>
                         <div class="d-flex align-center justify-center pl-2">
                           <v-icon
-                            v-if="!isValidMnemonicOrHexSeed && !activatingAccount"
+                            v-if="!enableReload && !activatingAccount"
                             @click="reloadValidation"
                             style="cursor: pointer"
                             color="white"
@@ -424,7 +424,7 @@ interface Credentials {
 }
 const keyType = ["sr25519", "ed25519"];
 const keypairType = ref(KeypairType.sr25519);
-const isValidMnemonicOrHexSeed = ref(true);
+const enableReload = ref(true);
 
 const theme = useTheme();
 const qrCodeText = ref("");
@@ -639,7 +639,7 @@ function clearFields() {
 }
 
 function reloadValidation() {
-  isValidMnemonicOrHexSeed.value = true;
+  enableReload.value = true;
   mnemonicInput.value.validate();
 }
 
@@ -662,20 +662,20 @@ async function activate(mnemonic: string, keypairType: KeypairType) {
 
 function validateMnInput(mnemonic: string) {
   isNonActiveMnemonic.value = false;
-  isValidMnemonicOrHexSeed.value = true;
+  enableReload.value = true;
   return getGrid({ mnemonic, keypairType: keypairType.value })
     .then(() => undefined)
     .catch(e => {
       if (e instanceof TwinNotExistError) {
         isNonActiveMnemonic.value = true;
-        isValidMnemonicOrHexSeed.value = false;
+        enableReload.value = false;
         return {
           message: `Couldn't get the user twin for the provided mnemonic in ${
             process.env.NETWORK || window.env.NETWORK
           }net.`,
         };
       }
-      isValidMnemonicOrHexSeed.value = false;
+      enableReload.value = false;
 
       return {
         message: normalizeError(e, "Something went wrong. please try again."),
@@ -691,12 +691,14 @@ const creatingAccount = ref(false);
 async function createNewAccount() {
   openAcceptTerms.value = false;
   termsLoading.value = false;
+  enableReload.value = false;
   clearError();
   creatingAccount.value = true;
   try {
     const account = await createAccount();
     mnemonic.value = account.mnemonic;
   } catch (e) {
+    enableReload.value = true;
     createAccountError.value = normalizeError(e, "Something went wrong while creating new account.");
   } finally {
     creatingAccount.value = false;
@@ -707,12 +709,14 @@ const activatingAccount = ref(false);
 async function activateAccount() {
   openAcceptTerms.value = false;
   termsLoading.value = false;
+  enableReload.value = false;
   clearError();
   activatingAccount.value = true;
   try {
     await activateAccountAndCreateTwin(mnemonic.value);
     await mnemonicInput.value?.validate();
   } catch (e) {
+    enableReload.value = true;
     activatingAccountError.value = normalizeError(e, "Something went wrong while activating your account.");
   } finally {
     activatingAccount.value = false;
