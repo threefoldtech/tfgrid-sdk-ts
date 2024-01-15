@@ -123,10 +123,8 @@
                             validateMnemonic(v) ||
                             ((v.length === 64 || v.length === 66) && isAddress(v.length === 66 ? v : `0x${v}`))
                           ) {
-                            isValidMnemonicOrHexSeed = true;
                             return;
                           }
-                          isValidMnemonicOrHexSeed = false;
                           return { message: 'Mnemonic or Hex Seed doesn\'t seem to be valid.' };
                         },
                       ]"
@@ -137,7 +135,17 @@
                       :disable-validation="creatingAccount || activatingAccount || activating"
                     >
                       <v-row>
-                        <v-col cols="10">
+                        <div class="d-flex align-center justify-center pl-2">
+                          <v-icon
+                            v-if="!isValidMnemonicOrHexSeed && !activatingAccount"
+                            @click="reloadValidation"
+                            style="cursor: pointer"
+                            color="white"
+                            >mdi-reload</v-icon
+                          >
+                        </div>
+
+                        <v-col cols="!isValidMnemonicOrHexSeed && !activatingAccount ? 9 : 10">
                           <div v-bind="tooltipProps">
                             <VTextField
                               label="Mnemonic or Hex Seed"
@@ -188,7 +196,8 @@
 
                         <VBtn
                           class="mt-2 ml-3"
-                          color="primary"
+                          color="secondary"
+                          variant="outlined"
                           :disabled="
                             isValidForm || !!mnemonic || shouldActivateAccount || keypairType === KeypairType.ed25519
                           "
@@ -196,15 +205,6 @@
                           @click="openAcceptTerms = termsLoading = true"
                         >
                           create account
-                        </VBtn>
-                        <VBtn
-                          class="mt-2 ml-3"
-                          color="secondary"
-                          variant="outlined"
-                          v-if="!isValidMnemonicOrHexSeed && !activatingAccount"
-                          @click="reloadValidation"
-                        >
-                          Reload
                         </VBtn>
                       </div>
                     </InputValidator>
