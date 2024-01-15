@@ -1,53 +1,55 @@
 <template>
-  <VCard>
-    <VCardTitle v-text="'Filters'" class="bg-primary" />
-    <VCardText>
-      <VForm :disabled="loading">
-        <FormValidator valid-on-init v-model="valid">
-          <VContainer fluid>
-            <VRow no-gutters>
-              <slot />
-            </VRow>
+  <VExpansionPanels :model-value="[0]">
+    <VExpansionPanel eager>
+      <VExpansionPanelTitle class="text-h6"> Filters </VExpansionPanelTitle>
+      <VExpansionPanelText eager>
+        <VForm :disabled="loading">
+          <FormValidator valid-on-init v-model="valid">
+            <VContainer fluid>
+              <VRow no-gutters>
+                <slot />
+              </VRow>
 
-            <VRow class="mb-4" no-gutters v-show="valid && (changed || (!loading && !empty))">
-              <VAlert type="info" variant="tonal">
-                <span>
-                  {{ changed ? "Filtering options updated but not applied." : "" }} Click
-                  <VCard class="d-inline pa-1" v-text="changed ? 'Apply' : 'Clear'" flat />
-                  {{ changed ? "inorder to reloading your data." : "to reset your selected filters." }}
-                </span>
-              </VAlert>
-            </VRow>
+              <VRow class="mb-4" no-gutters v-show="valid && (changed || (!loading && !empty))">
+                <VAlert type="info" variant="tonal">
+                  <span>
+                    {{ changed ? "Filtering options updated but not applied." : "" }} Click
+                    <VCard class="d-inline pa-1" v-text="changed ? 'Apply' : 'Clear'" flat />
+                    {{ changed ? "inorder to reloading your data." : "to reset your selected filters." }}
+                  </span>
+                </VAlert>
+              </VRow>
 
-            <VRow no-gutters>
-              <VDivider />
-            </VRow>
-          </VContainer>
+              <VRow no-gutters>
+                <VDivider />
+              </VRow>
+            </VContainer>
 
-          <VContainer fluid>
-            <VRow no-gutters>
-              <VSpacer />
-              <VBtn
-                variant="outlined"
-                :disabled="loading || !valid || empty"
-                @click="clear"
-                text="Clear"
-                class="mr-2"
-              />
-              <VBtn
-                variant="outlined"
-                color="primary"
-                :disabled="!valid || !changed"
-                @click="apply"
-                text="Apply"
-                :loading="loading"
-              />
-            </VRow>
-          </VContainer>
-        </FormValidator>
-      </VForm>
-    </VCardText>
-  </VCard>
+            <VContainer fluid>
+              <VRow no-gutters>
+                <VSpacer />
+                <VBtn
+                  variant="outlined"
+                  :disabled="loading || !valid || empty"
+                  @click="clear"
+                  text="Clear"
+                  class="mr-2"
+                />
+                <VBtn
+                  variant="outlined"
+                  color="primary"
+                  :disabled="!valid || !changed"
+                  @click="apply"
+                  text="Apply"
+                  :loading="loading"
+                />
+              </VRow>
+            </VContainer>
+          </FormValidator>
+        </VForm>
+      </VExpansionPanelText>
+    </VExpansionPanel>
+  </VExpansionPanels>
 </template>
 
 <script lang="ts">
