@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex" v-if="disabled">
+  <div class="d-flex" v-if="!disabled">
     <v-tooltip :text="tooltip || 'None!'" :location="location">
       <template #activator="{ props }">
         {{ getPropsRef(props) }}
