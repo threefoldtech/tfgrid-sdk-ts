@@ -85,6 +85,7 @@ export default {
     const filters = ref(new Map<string, ComputedRef<FilterService>>());
 
     const valid = ref(false);
+    const queryNames = computed(() => [...filters.value.keys()]);
     const services = computed(() => [...filters.value.values()]);
 
     const empty = computed(() => services.value.every(s => s.value.empty));
@@ -103,8 +104,15 @@ export default {
     provide(key, service);
 
     function clear() {
-      const clear = services.value.map(service => service.value.clear());
-      clear.some(c => c) && ctx.emit("apply");
+      const clears = services.value.map(service => service.value.clear());
+
+      const query = { ...router.currentRoute.value.query };
+      for (const name of queryNames.value) {
+        delete query[name];
+      }
+
+      router.replace({ query });
+      clears.some(c => c) && ctx.emit("apply");
     }
 
     onMounted(apply);

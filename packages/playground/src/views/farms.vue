@@ -122,7 +122,7 @@
 
 <script lang="ts" setup>
 import type { Farm } from "@threefold/gridproxy_client";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 
 import type { VDataTableHeader } from "@/types";
 import { getAllFarms } from "@/utils/get_farms";
@@ -142,7 +142,6 @@ const dialog = ref(false);
 
 const totalFarms = ref(0);
 
-onMounted(loadFarms);
 async function loadFarms() {
   loading.value = true;
   try {

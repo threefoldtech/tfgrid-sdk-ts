@@ -139,7 +139,7 @@
           </template>
         </TfFilter>
 
-        <TfFilter query-route="gpu" :model-value="filters.gpu ? 'true' : ''" @update:model-value="filters.gpu = false">
+        <TfFilter query-route="gpu" v-model="filters.gpu">
           <v-switch color="primary" inset label="GPU Node (Only)" v-model="filters.gpu" hide-details />
         </TfFilter>
       </TfFiltersContainer>
@@ -164,7 +164,7 @@
 <script lang="ts" setup>
 import { NodeStatus } from "@threefold/gridproxy_client";
 import { CertificationType } from "@threefold/gridproxy_client";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import { useProfileManager } from "@/stores";
@@ -209,7 +209,6 @@ const updateActiveTabValue = (newValue: number) => {
   loadNodes();
 };
 
-onMounted(loadNodes);
 async function loadNodes() {
   const params = tabParams[activeTab.value as keyof typeof tabParams];
 
