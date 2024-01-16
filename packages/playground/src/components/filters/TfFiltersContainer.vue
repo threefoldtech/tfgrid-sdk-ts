@@ -53,8 +53,8 @@
 </template>
 
 <script lang="ts">
-import { computed, type ComputedRef } from "vue";
-import { inject, provide, ref } from "vue";
+import { computed, type ComputedRef, inject, onMounted, provide, ref } from "vue";
+import { useRouter } from "vue-router";
 
 const key = Symbol("key:filters-container");
 
@@ -62,7 +62,7 @@ export interface FilterService {
   empty: boolean;
   changed: boolean;
   clear(): boolean;
-  apply(): void;
+  apply(): [name: string, value?: string];
 }
 
 export interface FiltersContainerService {
@@ -81,6 +81,7 @@ export default {
     apply: () => true,
   },
   setup(_, ctx) {
+    const router = useRouter();
     const filters = ref(new Map<string, ComputedRef<FilterService>>());
 
     const valid = ref(false);
@@ -106,8 +107,17 @@ export default {
       clear.some(c => c) && ctx.emit("apply");
     }
 
+    onMounted(apply);
     function apply() {
-      services.value.forEach(s => s.value.apply());
+      const applys = services.value.map(service => service.value.apply());
+
+      router.replace({
+        query: applys.reduce((query, [name, value]) => {
+          query[name] = value;
+          return query;
+        }, {} as { [name: string]: string | undefined }),
+      });
+
       ctx.emit("apply");
     }
 

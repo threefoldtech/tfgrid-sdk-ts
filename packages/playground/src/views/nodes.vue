@@ -67,36 +67,25 @@
         </template>
       </TfFilter>
 
-      <TfFilter
-        query-route="location"
-        :model-value="location"
+      <TfSelectLocation
+        :model-value="{ region: filters.region, country: filters.country }"
         @update:model-value="
-          filters.location.country = '';
-          filters.location.region = '';
+          filters.country = $event?.country || '';
+          filters.region = $event?.region || '';
         "
       >
-        <template #unwrap="{ colProps }">
-          <TfSelectLocation
-            :model-value="filters.location"
-            @update:model-value="
-              filters.location.country = $event?.country || '';
-              filters.location.region = $event?.region || '';
-            "
-          >
-            <template #region="{ props }">
-              <VCol v-bind="colProps">
-                <TfSelectRegion :region-props="props" variant="outlined" />
-              </VCol>
-            </template>
-
-            <template #country="{ props }">
-              <VCol v-bind="colProps">
-                <TfSelectCountry :country-props="props" variant="outlined" />
-              </VCol>
-            </template>
-          </TfSelectLocation>
+        <template #region="{ props }">
+          <TfFilter query-route="region" v-model="filters.region">
+            <TfSelectRegion :region-props="props" variant="outlined" />
+          </TfFilter>
         </template>
-      </TfFilter>
+
+        <template #country="{ props }">
+          <TfFilter query-route="country" v-model="filters.country">
+            <TfSelectCountry :country-props="props" variant="outlined" />
+          </TfFilter>
+        </template>
+      </TfSelectLocation>
 
       <TfFilter
         query-route="min-ssd"
@@ -248,15 +237,11 @@
         />
       </TfFilter>
 
-      <TfFilter
-        query-route="gateway"
-        :model-value="filters.gateway ? 'true' : ''"
-        @update:model-value="filters.gateway = false"
-      >
+      <TfFilter query-route="gateway" v-model="filters.gateway">
         <v-switch color="primary" inset label="Gateways (Only)" v-model="filters.gateway" hide-details />
       </TfFilter>
 
-      <TfFilter query-route="gpu" :model-value="filters.gpu ? 'true' : ''" @update:model-value="filters.gpu = false">
+      <TfFilter query-route="gpu" v-model="filters.gpu">
         <v-switch color="primary" inset label="GPU Node (Only)" v-model="filters.gpu" hide-details />
       </TfFilter>
     </TfFiltersContainer>
@@ -300,7 +285,7 @@
 
 <script lang="ts">
 import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 import NodeDetails from "@/components/node_details.vue";
@@ -337,20 +322,11 @@ export default {
       freeSSD: "",
       freeHDD: "",
       freeRAM: "",
-      location: { region: "", country: "" },
+      region: "",
+      country: "",
       status: "",
       gateway: false,
       gpu: false,
-    });
-
-    const location = computed(() => {
-      const { region, country } = filters.value.location;
-
-      if (!country) {
-        return region;
-      }
-
-      return `${region}:${country}`;
     });
 
     const loading = ref<boolean>(true);
@@ -373,8 +349,8 @@ export default {
             nodeId: +filters.value.nodeId || undefined,
             farmIds: filters.value.farmId || undefined,
             farmName: filters.value.farmName || undefined,
-            country: filters.value.location.country,
-            region: filters.value.location.region,
+            country: filters.value.country,
+            region: filters.value.region,
             status: (filters.value.status as NodeStatus) || undefined,
             freeHru: convertToBytes(filters.value.freeHDD),
             freeMru: convertToBytes(filters.value.freeRAM),
@@ -403,14 +379,13 @@ export default {
       }
     };
 
-    onMounted(() => {
-      checkSelectedNode();
-      loadNodes();
-    });
+    onMounted(checkSelectedNode);
 
     const closeDialog = () => {
       if (route.query.nodeId) {
-        router.replace(route.path);
+        const query = { ...router.currentRoute.value.query };
+        delete query.nodeId;
+        router.replace({ query });
       }
       isDialogOpened.value = false;
       selectedNodeId.value = 0;
@@ -432,7 +407,6 @@ export default {
       isDialogOpened,
 
       filters,
-      location,
       NodeStatus,
       size,
       page,

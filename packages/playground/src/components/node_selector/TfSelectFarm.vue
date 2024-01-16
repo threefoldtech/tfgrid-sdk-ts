@@ -118,6 +118,14 @@ export default {
       onBeforeTask() {
         if (!searchTask.value.initialized) {
           const oldFarm = props.modelValue;
+
+          // Ignore unbind fake farms e.g ({ name: 'test' })
+          // fake farms are objects create by us (not from grid)
+          // used with other component e.g (filters, ...etc)
+          if (oldFarm && !oldFarm.farmId) {
+            return;
+          }
+
           bindModelValue();
           return oldFarm?.farmId;
         }
