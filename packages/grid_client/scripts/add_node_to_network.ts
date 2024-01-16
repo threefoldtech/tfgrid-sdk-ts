@@ -3,14 +3,10 @@ import { getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function addNode(client, node) {
-  try {
-    const res = await client.networks.addNode(node);
-    log("================= Adding node =================");
-    log(res);
-    log("================= Adding node =================");
-  } catch (error) {
-    log("Error while adding node " + error);
-  }
+  const res = await client.networks.addNode(node);
+  log("================= Adding node =================");
+  log(res);
+  log("================= Adding node =================");
 }
 
 async function main() {

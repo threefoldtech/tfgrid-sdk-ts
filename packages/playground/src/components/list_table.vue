@@ -62,9 +62,14 @@
         <v-progress-circular indeterminate color="primary" />
         <v-spacer />
       </v-row>
-      <p v-else-if="!loading && items.length === 0 && noDataText" class="text-center mt-8">
-        {{ noDataText }}
-      </p>
+      <template v-else-if="!loading && items.length === 0 && (noDataText || $slots['no-data-text'])">
+        <VContainer>
+          <VRow justify="center" align="center" class="mt-8">
+            <slot name="no-data-text" v-if="$slots['no-data-text']" />
+            <p v-else v-text="noDataText" />
+          </VRow>
+        </VContainer>
+      </template>
     </template>
   </v-data-table>
 </template>

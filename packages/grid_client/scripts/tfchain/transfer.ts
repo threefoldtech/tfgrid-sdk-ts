@@ -3,14 +3,10 @@ import { getClient } from "../client_loader";
 import { log } from "../utils";
 
 async function transfer(client, transfer) {
-  try {
-    const res = await client.tfchain.pay(transfer);
-    log("================= Transferring funds =================");
-    log(res);
-    log("================= Transferring funds =================");
-  } catch (error) {
-    log("Error while transferring funds " + error);
-  }
+  const res = await client.tfchain.pay(transfer);
+  log("================= Transferring funds =================");
+  log(res);
+  log("================= Transferring funds =================");
 }
 
 async function main() {

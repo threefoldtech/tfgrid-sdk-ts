@@ -51,6 +51,8 @@
       </v-dialog>
     </v-alert>
 
+    <AccessDeploymentAlert />
+
     <ListTable
       :headers="[
         { title: 'PLACEHOLDER', key: 'data-table-select' },
@@ -67,7 +69,6 @@
       :deleting="deleting"
       :model-value="$props.modelValue"
       @update:model-value="$emit('update:model-value', $event)"
-      :no-data-text="`No Kubernetes deployments found on this account.`"
       @click:row="$attrs['onClick:row']"
       :sort-by="sortBy"
     >
@@ -78,6 +79,21 @@
         <v-btn-group variant="tonal" v-else>
           <slot name="actions" :item="item"></slot>
         </v-btn-group>
+      </template>
+
+      <template #no-data-text>
+        <div v-if="true || failedDeployments.length > 0" class="text-center">
+          <p v-text="'Couldn\'t load any of your Kubernetes deployments.'" />
+          <VBtn
+            class="mt-4"
+            variant="outlined"
+            color="secondary"
+            prepend-icon="mdi-reload"
+            text="Reload"
+            @click="loadDeployments"
+          />
+        </div>
+        <p v-else v-text="'No Kubernetes deployments found on this account.'" />
       </template>
     </ListTable>
   </div>
@@ -140,12 +156,14 @@ defineExpose({ loadDeployments });
 </script>
 
 <script lang="ts">
+import AccessDeploymentAlert from "./AccessDeploymentAlert.vue";
 import ListTable from "./list_table.vue";
 
 export default {
   name: "K8sDeploymentTable",
   components: {
     ListTable,
+    AccessDeploymentAlert,
   },
   data() {
     return {

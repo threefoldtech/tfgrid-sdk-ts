@@ -4,25 +4,17 @@ import { getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function pingFarm(client, farm) {
-  try {
-    const res = await client.farmerbot.pingFarm(farm);
-    log("================= Pinging farm =================");
-    log(res);
-    log("================= Pinging farm =================");
-  } catch (error) {
-    log("Error while pinging farm " + error);
-  }
+  const res = await client.farmerbot.pingFarm(farm);
+  log("================= Pinging farm =================");
+  log(res);
+  log("================= Pinging farm =================");
 }
 
 async function findNode(client, FarmerBotFindNode) {
-  try {
-    const res = await client.farmerbot.findNode(FarmerBotFindNode);
-    log("================= Finding node =================");
-    log(res);
-    log("================= Finding node =================");
-  } catch (error) {
-    log("Error while finding node " + error);
-  }
+  const res = await client.farmerbot.findNode(FarmerBotFindNode);
+  log("================= Finding node =================");
+  log(res);
+  log("================= Finding node =================");
 }
 
 async function main() {

@@ -39,7 +39,7 @@ export default {
 
   setup(props) {
     const navigateToContractsList = () => {
-      router.push("/dashboard/contracts-list");
+      router.push("/deploy/contracts-list");
       if (props.toast) {
         props.toast.close();
       }

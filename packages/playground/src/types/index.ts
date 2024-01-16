@@ -202,13 +202,13 @@ export type MixedFilter = {
 };
 
 // Status, GPU, Gateway, and any other option should be add here.
-export type FilterOptions = {
+export interface FilterOptions {
   status?: NodeStatus;
   gpu?: boolean;
   gateway?: boolean;
   page: number;
   size: number;
-};
+}
 
 // Input fields
 export type FilterInputs = {
@@ -216,6 +216,7 @@ export type FilterInputs = {
   farmIds: NodeInputFilterType;
   farmName: NodeInputFilterType;
   country: NodeInputFilterType;
+  region: NodeInputFilterType;
   freeSru: NodeInputFilterType;
   freeHru: NodeInputFilterType;
   freeMru: NodeInputFilterType;
@@ -249,11 +250,6 @@ export type NodeFilterOptions = {
   gateway?: boolean;
   page: number;
   size: number;
-};
-
-export type FarmFilterOptions = {
-  page?: number;
-  size?: number;
 };
 
 export const nodeOptionsInitializer: NodeFilterOptions = {
@@ -311,8 +307,10 @@ export const nodeInitializer: GridNode = {
   id: "",
   nodeId: 0,
   farmId: 0,
+  farmName: "",
   twinId: 0,
   country: "",
+  region: "",
   gridVersion: 0,
   city: "",
   uptime: 0,
@@ -352,5 +350,5 @@ export type MixedNodeFilter = {
 
 export type MixedFarmFilter = {
   inputs?: FilterFarmInputs;
-  options?: FarmFilterOptions;
+  options?: FilterOptions;
 };
