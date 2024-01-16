@@ -195,13 +195,6 @@ export type NodeInputFilterType = {
   type: string;
 };
 
-// The input filters<nodeId, farmIds..etc> and the option filters<status, gpu...etc>
-export type MixedFilter = {
-  inputs: FilterInputs;
-  options: FilterOptions;
-};
-
-// Status, GPU, Gateway, and any other option should be add here.
 export interface FilterOptions {
   status?: NodeStatus;
   gpu?: boolean;
@@ -210,35 +203,6 @@ export interface FilterOptions {
   size: number;
 }
 
-// Input fields
-export type FilterInputs = {
-  nodeId: NodeInputFilterType;
-  farmIds: NodeInputFilterType;
-  farmName: NodeInputFilterType;
-  country: NodeInputFilterType;
-  region: NodeInputFilterType;
-  freeSru: NodeInputFilterType;
-  freeHru: NodeInputFilterType;
-  freeMru: NodeInputFilterType;
-  totalSru: NodeInputFilterType;
-  totalHru: NodeInputFilterType;
-  totalMru: NodeInputFilterType;
-};
-
-export const optionsInitializer: (
-  status: NodeStatus | undefined,
-  gpu: boolean | undefined,
-  gateway: boolean | undefined,
-) => FilterOptions = (status: NodeStatus | undefined, gpu: boolean | undefined, gateway: boolean | undefined) => ({
-  gateway,
-  gpu,
-  page: 1,
-  size: 10,
-  status,
-});
-
-import type { FilterFarmInputs } from "../utils/filter_farms";
-import type { FilterNodeInputs } from "../utils/filter_nodes";
 import type { SelectionDetails } from "./nodeSelector";
 
 // The input filters<nodeId, farmIds..etc> and the option filters<status, gpu...etc>
@@ -341,14 +305,4 @@ export const nodeInitializer: GridNode = {
   stats: nodeStatsInitializer,
   cards: [],
   num_gpu: 0,
-};
-// The input filters<nodeId, farmIds..etc> and the option filters<status, gpu...etc>
-export type MixedNodeFilter = {
-  inputs: FilterNodeInputs;
-  options: NodeFilterOptions;
-};
-
-export type MixedFarmFilter = {
-  inputs?: FilterFarmInputs;
-  options?: FilterOptions;
 };

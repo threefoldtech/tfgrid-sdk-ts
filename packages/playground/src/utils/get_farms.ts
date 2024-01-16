@@ -1,7 +1,6 @@
 import type { FarmFilterOptions, GridClient } from "@threefold/grid_client";
 import type { Farm, FarmsQuery, Pagination, Twin, TwinsQuery } from "@threefold/gridproxy_client";
 
-import type { MixedFarmFilter } from "@/types";
 import type { FarmInterface } from "@/types";
 
 import { gqlClient, gridProxyClient } from "../clients";
@@ -10,40 +9,6 @@ import { createCustomToast, ToastType } from "./custom_toast";
 export interface GetFarmsOptions {
   exclusiveFor?: string;
 }
-export const getFarmQueries = (mixedFilters: MixedFarmFilter): Partial<FarmsQuery> => {
-  let farmId, name, page, size, freeIps;
-  if (mixedFilters.inputs) {
-    if (mixedFilters.inputs.farmId.value) {
-      farmId = Number(mixedFilters.inputs.farmId.value);
-    }
-    if (mixedFilters.inputs.name.value) {
-      name = mixedFilters.inputs.name.value.toLowerCase().trim();
-    }
-
-    if (mixedFilters.inputs.freeIps.value) {
-      freeIps = Number(mixedFilters.inputs.freeIps.value);
-    }
-  }
-
-  if (mixedFilters.options) {
-    if (mixedFilters.options.page) {
-      page = +mixedFilters.options.page;
-    }
-    if (mixedFilters.options.size) {
-      size = +mixedFilters.options.size;
-    }
-  }
-  const options: Partial<FarmsQuery> = {
-    retCount: true,
-    farmId: farmId,
-    nameContains: name,
-    freeIps: freeIps,
-    page: page,
-    size: size,
-  };
-
-  return options;
-};
 export async function getAllFarms(queries: Partial<FarmsQuery>): Promise<Pagination<Farm[]>> {
   try {
     const farms = await gridProxyClient.farms.list(queries);
