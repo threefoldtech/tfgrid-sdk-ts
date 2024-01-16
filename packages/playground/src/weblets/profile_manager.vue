@@ -137,7 +137,7 @@
                       <v-row>
                         <div class="d-flex align-center justify-center pl-2">
                           <v-icon
-                            v-if="!enableReload && !activatingAccount"
+                            v-if="!enableReload && !activatingAccount && mnemonic !== ''"
                             @click="reloadValidation"
                             style="cursor: pointer"
                             color="white"
