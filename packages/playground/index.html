@@ -29,7 +29,7 @@
   <body>
     <div class="app-loader-dialog active">
       <div class="app-loader-container">
-        <div style="width: 60px" id="animation-container"></div>
+        <div style="width: 50px" id="animation-container"></div>
         <script>
           var animation = bodymovin.loadAnimation({
             container: document.getElementById("animation-container"),
@@ -40,7 +40,7 @@
             name: "Demo Animation",
           });
         </script>
-        <!-- <span class="app-loader active"></span> -->
+        <img class="logo_load" src="/images/logo_text.png" alt="logo" />
         <span class="app-loader-msg">Loading dashboard. Please wait...</span>
         <button class="app-loader-refresh">Refresh</button>
       </div>
@@ -50,3 +50,9 @@
     <script src="/loader/loader.js"></script>
   </body>
 </html>
+<style>
+  .logo_load{
+    margin-top: 20px;
+    width: 70%;
+  }
+</style>
