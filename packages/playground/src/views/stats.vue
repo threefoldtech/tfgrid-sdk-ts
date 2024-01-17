@@ -148,7 +148,7 @@ const fetchData = async () => {
 onMounted(fetchData);
 </script>
 
-<style>
+<style scoped>
 @media (max-width: 1280px) {
   .main_divider {
     visibility: hidden;
