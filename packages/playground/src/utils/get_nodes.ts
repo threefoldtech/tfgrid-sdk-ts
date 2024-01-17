@@ -11,7 +11,7 @@ import { byCountry } from "country-code-lookup";
 import { ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
-import type { MixedFilter, NodeAvailabilityColor, NodeStatusColor, NodeTypeColor } from "@/types";
+import type { MixedFilter, NodeStatusColor, NodeTypeColor } from "@/types";
 const requestPageNumber = ref<number>(1);
 const offlineNodes = ref<NodeInfo[]>([]);
 type NodeFilters = FilterOptions & {
