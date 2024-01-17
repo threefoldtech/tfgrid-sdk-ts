@@ -138,11 +138,13 @@
                         <v-col cols="10">
                           <div v-bind="tooltipProps">
                             <VTextField
+                              :append-icon="!enableReload && !activatingAccount && mnemonic !== '' ? 'mdi-reload' : ''"
                               label="Mnemonic or Hex Seed"
                               placeholder="Please insert your Mnemonic or Hex Seed"
                               v-model="mnemonic"
                               v-bind="{ ...passwordInputProps, ...validationProps }"
                               :disabled="creatingAccount || activatingAccount || activating"
+                              @click:append="reloadValidation"
                             />
                           </div>
                         </v-col>
@@ -186,7 +188,8 @@
 
                         <VBtn
                           class="mt-2 ml-3"
-                          color="primary"
+                          color="secondary"
+                          variant="outlined"
                           :disabled="
                             isValidForm || !!mnemonic || shouldActivateAccount || keypairType === KeypairType.ed25519
                           "
@@ -413,6 +416,7 @@ interface Credentials {
 }
 const keyType = ["sr25519", "ed25519"];
 const keypairType = ref(KeypairType.sr25519);
+const enableReload = ref(true);
 
 const theme = useTheme();
 const qrCodeText = ref("");
@@ -626,6 +630,11 @@ function clearFields() {
   mnemonic.value = "";
 }
 
+function reloadValidation() {
+  enableReload.value = true;
+  mnemonicInput.value.validate();
+}
+
 async function activate(mnemonic: string, keypairType: KeypairType) {
   clearError();
   activating.value = true;
@@ -645,17 +654,20 @@ async function activate(mnemonic: string, keypairType: KeypairType) {
 
 function validateMnInput(mnemonic: string) {
   isNonActiveMnemonic.value = false;
+  enableReload.value = true;
   return getGrid({ mnemonic, keypairType: keypairType.value })
     .then(() => undefined)
     .catch(e => {
       if (e instanceof TwinNotExistError) {
         isNonActiveMnemonic.value = true;
+        enableReload.value = false;
         return {
           message: `Couldn't get the user twin for the provided mnemonic in ${
             process.env.NETWORK || window.env.NETWORK
           }net.`,
         };
       }
+      enableReload.value = false;
 
       return {
         message: normalizeError(e, "Something went wrong. please try again."),
@@ -671,12 +683,14 @@ const creatingAccount = ref(false);
 async function createNewAccount() {
   openAcceptTerms.value = false;
   termsLoading.value = false;
+  enableReload.value = false;
   clearError();
   creatingAccount.value = true;
   try {
     const account = await createAccount();
     mnemonic.value = account.mnemonic;
   } catch (e) {
+    enableReload.value = true;
     createAccountError.value = normalizeError(e, "Something went wrong while creating new account.");
   } finally {
     creatingAccount.value = false;
@@ -687,12 +701,14 @@ const activatingAccount = ref(false);
 async function activateAccount() {
   openAcceptTerms.value = false;
   termsLoading.value = false;
+  enableReload.value = false;
   clearError();
   activatingAccount.value = true;
   try {
     await activateAccountAndCreateTwin(mnemonic.value);
     await mnemonicInput.value?.validate();
   } catch (e) {
+    enableReload.value = true;
     activatingAccountError.value = normalizeError(e, "Something went wrong while activating your account.");
   } finally {
     activatingAccount.value = false;
