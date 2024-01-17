@@ -1,5 +1,8 @@
 <template>
   <v-card>
+    <v-alert type="info" variant="tonal" class="ma-4">
+      Updating or generating SSH key will cost you up to 0.01 TFT
+    </v-alert>
     <VTooltip
       text="SSH Keys are used to authenticate you to the deployment instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
       location="bottom"
@@ -22,7 +25,10 @@
                 : SSHKeyHint
             "
             :persistent-hint="updatingSSH || generatingSSH || !!SSHKeyHint"
-            :rules="[value => !!value || 'SSH key is required']"
+            :rules="[
+              () => isEnoughBalance(balance) || 'Your balance is not enough to update your ssh key',
+              value => !!value || 'SSH key is required',
+            ]"
           />
         </CopyInputWrapper>
 
@@ -31,7 +37,7 @@
             class="mr-2 text-subtitle-2"
             color="secondary"
             variant="outlined"
-            :disabled="!!ssh || updatingSSH || generatingSSH || !isEnoughBalance(balance)"
+            :disabled="!!ssh || updatingSSH || generatingSSH || !isEnoughBalance(balance, 0.01)"
             :loading="generatingSSH"
             @click="generateSSH"
           >
@@ -42,7 +48,7 @@
             color="secondary"
             variant="outlined"
             @click="updateSSH"
-            :disabled="!ssh || profileManager.profile?.ssh === ssh || updatingSSH || !isEnoughBalance(balance)"
+            :disabled="!ssh || profileManager.profile?.ssh === ssh || updatingSSH || !isEnoughBalance(balance, 0.01)"
             :loading="updatingSSH"
           >
             Update Public SSH Key
