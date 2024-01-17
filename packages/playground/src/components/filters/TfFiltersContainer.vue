@@ -13,9 +13,14 @@
               <VRow class="mb-4" no-gutters v-show="valid && (changed || (!loading && !empty))">
                 <VAlert type="info" variant="tonal">
                   <span>
-                    {{ changed ? "Filtering options updated but not applied." : "" }} Click
-                    <VCard class="d-inline pa-1" v-text="changed ? 'Apply' : 'Clear'" flat />
-                    {{ changed ? "inorder to reloading your data." : "to reset your selected filters." }}
+                    {{ changed ? "Filter options were updated but not applied." : "" }} Click
+                    <VCard
+                      class="d-inline pa-1"
+                      v-text="changed ? 'Apply' : 'Clear'"
+                      flat
+                      :color="$vuetify.theme.global.name === 'light' ? 'info' : undefined"
+                    />
+                    {{ changed ? "in order to reload your data." : "to reset your selected filters." }}
                   </span>
                 </VAlert>
               </VRow>
