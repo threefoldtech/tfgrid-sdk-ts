@@ -135,24 +135,16 @@
                       :disable-validation="creatingAccount || activatingAccount || activating"
                     >
                       <v-row>
-                        <div class="d-flex align-center justify-center pl-2">
-                          <v-icon
-                            v-if="!enableReload && !activatingAccount && mnemonic !== ''"
-                            @click="reloadValidation"
-                            style="cursor: pointer"
-                            color="white"
-                            >mdi-reload</v-icon
-                          >
-                        </div>
-
-                        <v-col cols="!isValidMnemonicOrHexSeed && !activatingAccount ? 9 : 10">
+                        <v-col cols="10">
                           <div v-bind="tooltipProps">
                             <VTextField
+                              :append-icon="!enableReload && !activatingAccount && mnemonic !== '' ? 'mdi-reload' : ''"
                               label="Mnemonic or Hex Seed"
                               placeholder="Please insert your Mnemonic or Hex Seed"
                               v-model="mnemonic"
                               v-bind="{ ...passwordInputProps, ...validationProps }"
                               :disabled="creatingAccount || activatingAccount || activating"
+                              @click:append="reloadValidation"
                             />
                           </div>
                         </v-col>
