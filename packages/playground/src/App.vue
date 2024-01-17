@@ -291,6 +291,12 @@ const routes: AppRoute[] = [
         tooltip: "Deploy ready applications on the ThreeFold grid.",
       },
       {
+        title: "P2P Applications",
+        icon: "mdi-lightbulb-on",
+        route: "/deploy/p2p-applications",
+        tooltip: "Deploy P2P applications on the ThreeFold grid.",
+      },
+      {
         title: "Your Contracts",
         icon: "mdi-file-document-edit",
         route: "/deploy/contracts-list",

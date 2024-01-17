@@ -529,6 +529,56 @@ const router = createRouter({
           meta: { title: "SSHKey" },
           children: [],
         },
+        {
+          path: "p2p-applications",
+          children: [
+            {
+              path: "",
+              component: () => import("../views/p2p_solutions_view.vue"),
+              meta: { title: "p2p-applications" },
+            },
+            {
+              path: "holochain",
+              component: () => import("../views/holochain_view.vue"),
+              meta: {
+                title: "Holochain",
+                navbarConfig: {
+                  back: true,
+                  path: [
+                    { title: "Deploy" },
+                    {
+                      title: "P2P Applications",
+                      to: "/deploy/p2p-applications",
+                    },
+                    {
+                      title: "Holochain",
+                    },
+                  ],
+                },
+              },
+            },
+            {
+              path: "holohost",
+              component: () => import("../views/holohost_view.vue"),
+              meta: {
+                title: "Holohost",
+                navbarConfig: {
+                  back: true,
+                  path: [
+                    { title: "Deploy" },
+                    {
+                      title: "P2P Applications",
+                      to: "/deploy/p2p-applications",
+                    },
+                    {
+                      title: "Holohost",
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+        },
       ],
     },
 
