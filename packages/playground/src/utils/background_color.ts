@@ -10,7 +10,7 @@ export function color(pkg: string): string {
       break;
     case "silver":
       color =
-        "linear-gradient(270deg, #7d7d7d 0%, #ffffff 15%, #adadad 24.83%,#ffffff 50.32%, #adadad 71.83%, #ffffff 87.32%, #a0a0a0 100%)";
+        "linear-gradient(270deg, #7d7d7d 0%, #ffffff 15%, #adadad 24.83%, #ffffff 50.32%, #adadad 71.83%, #ffffff 87.32%, #a0a0a0 100%)";
       break;
     case "gold":
       color = "linear-gradient(270deg, #bf953f 0%, #fffce0 25%, #d7ae56 49.83%, #fffce0 77.32%, #aa771c 100%)";
