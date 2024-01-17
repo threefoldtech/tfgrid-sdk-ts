@@ -225,19 +225,6 @@ async function loadNodes() {
   loading.value = true;
 
   try {
-    console.log({
-      ...params,
-      size: size.value,
-      page: page.value,
-      totalSru: convert(filters.value.minSSD),
-      totalMru: convert(filters.value.minRAM),
-      totalHru: convert(filters.value.minHDD),
-      totalCru: +filters.value.minCPU || undefined,
-      gpuVendorName: filters.value.gpuVendorName || undefined,
-      gpuDeviceName: filters.value.gpuDeviceName || undefined,
-      hasGpu: filters.value.gpu,
-    });
-
     const data = await gridProxyClient.nodes.list({
       ...params,
       size: size.value,
