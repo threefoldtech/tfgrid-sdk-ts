@@ -39,7 +39,6 @@
           </input-tooltip>
         </input-validator>
 
-        <SelectVmImage :images="images" v-model="flist" />
         <SelectSolutionFlavor
           :small="{ cpu: 4, memory: 8, disk: 30 }"
           :medium="{ cpu: 6, memory: 16, disk: 60 }"
@@ -118,12 +117,7 @@
       </template>
 
       <template #disks>
-        <ExpandableLayout
-          v-model="disks"
-          @add="addDisk"
-          title="Add additional disk space to your micro virtual machine"
-          #="{ index }"
-        >
+        <ExpandableLayout v-model="disks" @add="addDisk" title="Add additional disk space" #="{ index }">
           <p class="text-h6 mb-4">Disk #{{ index + 1 }}</p>
           <input-validator
             :value="disks[index].name"
@@ -183,37 +177,11 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
-
-const images = [
-  {
-    name: "Ubuntu-22.04",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Debian-12",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-debian-12.flist",
-    entryPoint: "/sbin/zinit init",
-  },
-  {
-    name: "Alpine-3",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-alpine-3.flist",
-    entryPoint: "/entrypoint.sh",
-  },
-  {
-    name: "CentOS-8",
-    flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-centos-8.flist",
-    entryPoint: "/entrypoint.sh",
-  },
-  {
-    name: "Nixos",
-    flist: "https://hub.grid.tf/tf-official-vms/nixos-micro-latest.flist",
-    entryPoint: "/entrypoint.sh",
-  },
-];
-
-const name = ref(generateName({ prefix: "vm" }));
-const flist = ref<Flist>();
+const name = ref(generateName({ prefix: "hc" }));
+const flist: Flist = {
+  value: "https://hub.grid.tf/mariobassem1.3bot/threefolddev-holochain-latest.flist",
+  entryPoint: "/sbin/zinit init",
+};
 const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
@@ -266,8 +234,8 @@ async function deploy() {
           name: name.value,
           cpu: solution.value.cpu,
           memory: solution.value.memory,
-          flist: flist.value!.value,
-          entryPoint: flist.value!.entryPoint,
+          flist: flist.value,
+          entryPoint: flist.entryPoint,
           disks: disks.value,
           envs: envs.value,
           planetary: planetary.value,
@@ -292,7 +260,6 @@ async function deploy() {
 
 <script lang="ts">
 import ExpandableLayout from "../components/expandable_layout.vue";
-import SelectVmImage from "../components/select_vm_image.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { solutionFlavor as SolutionFlavor } from "../types";
 import type { SelectionDetails } from "../types/nodeSelector";
@@ -303,7 +270,6 @@ const solution = ref() as Ref<SolutionFlavor>;
 export default {
   name: "MicroVm",
   components: {
-    SelectVmImage,
     SelectSolutionFlavor,
     ExpandableLayout,
   },
