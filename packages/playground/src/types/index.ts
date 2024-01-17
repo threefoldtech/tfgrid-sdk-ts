@@ -293,11 +293,6 @@ export type NodeTypeColor = {
   type: string;
 };
 
-export type NodeAvailabilityColor = {
-  color: string;
-  type: string;
-};
-
 export const nodeStatsInitializer: NodeStats = {
   system: { cru: 0, hru: 0, ipv4u: 0, mru: 0, sru: 0 },
   total: { cru: 0, hru: 0, ipv4u: 0, mru: 0, sru: 0 },

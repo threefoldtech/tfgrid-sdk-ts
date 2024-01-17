@@ -92,17 +92,11 @@ export const getNodeStatusColor = (status: string): NodeStatusColor => {
   }
 };
 
-export const getNodeTypeColor = (dedicated: boolean): NodeTypeColor => {
-  if (dedicated) {
-    return { color: "primary", type: "dedicated" };
-  } else {
+export const getNodeTypeColor = (dedicated: boolean, rentedByTwinId: number): NodeTypeColor => {
+  if (!dedicated) {
     return { color: "success", type: "shared" };
-  }
-};
-
-export const getNodeAvailabilityColor = (rentedByTwinId: number): NodeAvailabilityColor => {
-  if (rentedByTwinId === 0) {
-    return { color: "success", type: "Rentable" };
+  } else if (dedicated && rentedByTwinId === 0) {
+    return { color: "primary", type: "Rentable" };
   } else {
     return { color: "warning", type: "Rented" };
   }
