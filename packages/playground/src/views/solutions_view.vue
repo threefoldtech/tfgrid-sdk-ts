@@ -18,8 +18,15 @@
                 />
                 <v-card-title class="d-inline-block">
                   {{ card.title }}
-                  <v-chip v-if="card.tag" class="ml-2 pulse-animation" color="#1AA18F" small text-color="white">
-                    {{ card.tag }}
+                  <v-chip
+                    v-for="tag in card.tags"
+                    :key="tag"
+                    class="ml-2 pulse-animation"
+                    color="#1AA18F"
+                    small
+                    text-color="white"
+                  >
+                    {{ tag }}
                   </v-chip>
                 </v-card-title>
                 <v-card-text class="mt-2"> {{ card.excerpt }} </v-card-text>
@@ -38,7 +45,7 @@ interface Card {
   excerpt: string;
   icon: string;
   route: string;
-  tag?: string;
+  tags?: string[];
 }
 
 export default {
@@ -64,7 +71,7 @@ export default {
           "Mattermost is an open-source, self-hostable online chat service with file sharing, search, and integrations. It is designed as an internal chat for organisations and companies.",
         icon: "mattermost.png",
         route: "/mattermost",
-        tag: "Alpha",
+        tags: ["Alpha"],
       },
       {
         title: "Discourse",
@@ -93,7 +100,7 @@ export default {
           "Nextcloud is a suite of client-server software for creating and using file hosting services. Nextcloud provides functionality similar to Dropbox, Office 365 or Google Drive.",
         icon: "nextcloud.png",
         route: "/nextcloud",
-        tag: "Community",
+        tags: ["Community"],
       },
       {
         title: "Presearch",
