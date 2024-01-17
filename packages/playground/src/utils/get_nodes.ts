@@ -11,7 +11,7 @@ import { byCountry } from "country-code-lookup";
 import { ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
-import type { MixedFilter, NodeStatusColor, NodeTypeColor } from "@/types";
+import type { MixedFilter, NodeAvailabilityColor, NodeStatusColor, NodeTypeColor } from "@/types";
 const requestPageNumber = ref<number>(1);
 const offlineNodes = ref<NodeInfo[]>([]);
 type NodeFilters = FilterOptions & {
@@ -97,6 +97,14 @@ export const getNodeTypeColor = (dedicated: boolean): NodeTypeColor => {
     return { color: "primary", type: "dedicated" };
   } else {
     return { color: "success", type: "shared" };
+  }
+};
+
+export const getNodeAvailabilityColor = (rentedByTwinId: number): NodeAvailabilityColor => {
+  if (rentedByTwinId === 0) {
+    return { color: "success", type: "Rentable" };
+  } else {
+    return { color: "warning", type: "Rented" };
   }
 };
 

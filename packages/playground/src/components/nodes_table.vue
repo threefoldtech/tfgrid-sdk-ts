@@ -46,6 +46,16 @@
               </v-chip>
             </p>
           </template>
+
+          <template v-slot:[`item.rentedByTwinId`]="{ item }">
+            <p class="text-left mt-1 mb-0">
+              <v-chip :color="getNodeAvailabilityColor(item.columns.rentedByTwinId as number).color">
+                <span>
+                  {{ capitalize(getNodeAvailabilityColor(item.columns.rentedByTwinId as number).type) }}
+                </span>
+              </v-chip>
+            </p>
+          </template>
         </v-data-table-server>
       </v-col>
     </v-row>
@@ -59,7 +69,7 @@ import { capitalize } from "vue";
 import type { VDataTable } from "vuetify/labs/VDataTable";
 
 import formatResourceSize from "@/utils/format_resource_size";
-import { getNodeStatusColor, getNodeTypeColor } from "@/utils/get_nodes";
+import { getNodeAvailabilityColor, getNodeStatusColor, getNodeTypeColor } from "@/utils/get_nodes";
 import toReadableDate from "@/utils/to_readable_data";
 
 export default {
@@ -125,6 +135,7 @@ export default {
       { title: "Uptime", key: "uptime", align: "start", sortable: false, value: item => toReadableDate(item.uptime) },
       { title: "Status", key: "status", align: "start", sortable: false },
       { title: "Type", key: "dedicated", align: "start", sortable: false },
+      { title: "Availability", key: "rentedByTwinId", align: "start", sortable: false },
     ];
 
     const openSheet = (_e: any, { item }: any) => {
@@ -134,6 +145,7 @@ export default {
     return {
       headers,
       nodeStatusOptions,
+      getNodeAvailabilityColor,
       getNodeStatusColor,
       getNodeTypeColor,
       openSheet,
