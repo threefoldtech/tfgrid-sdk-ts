@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { computed, type PropType, ref, toRef } from "vue";
+import { computed, onUnmounted, type PropType, ref, toRef } from "vue";
 import { useRouter } from "vue-router";
 
 import type { AsyncRule, SyncRule } from "../input_validator.vue";
@@ -45,11 +45,11 @@ export default {
     const router = useRouter();
 
     // Router Query
-    const query = router.currentRoute.value.query[_props.queryRoute];
+    const query = router.currentRoute.value.query[props.value.queryRoute];
     query && typeof query === "string" && ctx.emit("update:model-value", normalizeValue(query));
 
     // eslint-disable-next-line vue/no-setup-props-destructure
-    const initialValue = _props.modelValue;
+    const initialValue = props.value.modelValue;
 
     const filtersContainerService = useFiltersContainerService();
 
@@ -69,7 +69,7 @@ export default {
       baseValue.value = props.value.modelValue;
 
       return [
-        _props.queryRoute,
+        props.value.queryRoute,
         props.value.modelValue === initialValue ? undefined : props.value.modelValue.toString(),
       ];
     }
@@ -84,7 +84,8 @@ export default {
       empty: empty.value,
     }));
 
-    filtersContainerService.register(_props.queryRoute, service);
+    filtersContainerService.register(props.value.queryRoute, service);
+    onUnmounted(() => filtersContainerService.unregister(props.value.queryRoute));
 
     return { colProps };
   },
