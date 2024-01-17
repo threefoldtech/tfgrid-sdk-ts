@@ -24,12 +24,12 @@
               </v-btn>
             </v-alert>
           </v-col>
-          <v-col cols="7" class="mx-auto mt-15 pr-2">
+          <v-col xl="6" lg="6" md="12" cols="12" class="mx-auto mt-15 pr-2">
             <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
           </v-col>
-          <v-divider class="v-divider--vertical mx-2 my-4" sm="0" />
-          <v-col v-if="Istats.length !== 0" class="d-flex flex-wrap justify-center">
-            <v-col v-for="item of Istats" :key="item.title" xl="4" lg="6" md="12" sm="12" cols="12" class="px-2 py-2">
+          <v-divider class="main_divider mx-1 my-4" vertical></v-divider>
+          <v-col v-if="Istats.length !== 0" class="d-flex flex-wrap justify-start">
+            <v-col v-for="item of Istats" :key="item.title" xl="4" lg="6" md="6" cols="12" class="px-0 py-0">
               <StatisticsCard :item="item" />
             </v-col>
           </v-col>
@@ -147,3 +147,11 @@ const fetchData = async () => {
 
 onMounted(fetchData);
 </script>
+
+<style>
+@media (max-width: 1280px) {
+  .main_divider {
+    visibility: hidden;
+  }
+}
+</style>
