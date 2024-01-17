@@ -16,7 +16,7 @@ export function color(pkg: string): string {
       color = "linear-gradient(270deg, #bf953f 0%, #fffce0 25%, #d7ae56 49.83%, #fffce0 77.32%, #aa771c 100%)";
       break;
     default:
-      color = "#ffffff";
+      color = "#f3f3f3";
       break;
   }
   return color;
