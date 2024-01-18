@@ -3,7 +3,7 @@
     <v-alert v-if="hasEnoughBalance" type="info" variant="tonal" class="ma-4">
       Updating or generating SSH key will cost you up to 0.01 TFT
     </v-alert>
-    <v-alert v-else type="warning" variant="tonal" class="ma-4">
+    <v-alert v-else-if="balance" type="warning" variant="tonal" class="ma-4">
       Your balance is not enough to {{ profileManager.profile?.ssh ? "update the" : `generate a` }} SSH key; please make
       sure you have at least 0.01 TFT.
     </v-alert>
