@@ -177,7 +177,7 @@
               </div>
             </div>
 
-            <TfRouterView :isAuth="hasActiveProfile && hasGrid" />
+            <TfRouterView @openProfile="openProfile = true" :isAuth="hasActiveProfile && hasGrid" />
           </v-container>
         </DeploymentListManager>
         <TFNotification v-if="hasActiveProfile && hasGrid" />
