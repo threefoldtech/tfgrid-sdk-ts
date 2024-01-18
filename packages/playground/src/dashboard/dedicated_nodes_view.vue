@@ -131,7 +131,7 @@ const _loadData = async () => {
       totalCru: totalCruValue ? +totalCruValue : undefined,
       gpuVendorName: filterInputs.value.gpu_vendor_name.value || "",
       gpuDeviceName: filterInputs.value.gpu_device_name.value || "",
-      hasGpu: filterOptions.value.gpu,
+      hasGpu: filterOptions.value.gpu ? filterOptions.value.gpu : undefined,
     });
 
     if (data.count === 0) {
@@ -157,7 +157,7 @@ const _loadData = async () => {
       return {
         ...item,
         price: (price?.dedicatedPrice ?? 0 + (fee || 0)).toFixed(3),
-        discount: price?.sharedPackage.discount,
+        discount: price?.dedicatedPackage.discount,
       };
     });
 
