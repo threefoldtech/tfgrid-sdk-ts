@@ -14,13 +14,27 @@
               <v-col cols="6" class="mx-4">
                 <div class="mb-2">
                   <p class="mb-8">
-                    Send a
-                    {{ selectedName ? selectedName.charAt(0).toUpperCase() + selectedName.slice(1) : "" }} transaction
-                    with your TFT's to deposit to:
+                    Deposit your TFTs to Threefold Bridge using a
+                    {{ selectedName ? selectedName.charAt(0).toUpperCase() + selectedName.slice(1) : "" }} transaction.
                   </p>
                 </div>
-                <CopyReadonlyInput label="Destination" :data="depositWallet"></CopyReadonlyInput>
+                <input-tooltip
+                  v-if="selectedName == 'stellar'"
+                  tooltip="Threefold Staller account"
+                  href="https://stellar.expert/explorer/testnet/account/GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG"
+                  target="_blank"
+                >
+                  <CopyReadonlyInput label="Destination" :data="depositWallet"></CopyReadonlyInput>
+                </input-tooltip>
+                <CopyReadonlyInput v-else label="Destination" :data="depositWallet"></CopyReadonlyInput>
                 <CopyReadonlyInput label="Memo Text" :data="`twin_${twinId}`"></CopyReadonlyInput>
+                <v-btn
+                  variant="outlined"
+                  color="secondary"
+                  href="https://manual.grid.tf/threefold_token/tft_bridges/tft_bridges.html"
+                  target="_blank"
+                  >Learn more?</v-btn
+                >
                 <div style="position: absolute; bottom: 10rem">
                   <p :style="{ paddingBottom: '3rem', color: '#7de3c8' }">Waiting for receiving TFTs{{ dots }}</p>
                 </div>
