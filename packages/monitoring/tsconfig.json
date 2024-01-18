@@ -1,15 +1,19 @@
 {
   "compilerOptions": {
-    "target": "es2016",
-    "module": "ESNext",
-    "moduleResolution": "Node",
+    "module": "commonjs",
+    "target": "esnext",
+    "lib": ["ESNext", "DOM"],
+    "types": ["node", "jest"],
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true,
-    "outDir": "./dist",
+    "outDir": "./dist/node",
     "esModuleInterop": true,
-    "strict": true,
-    "stripInternal": true
+    "resolveJsonModule": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowJs": true,
+    "baseUrl": ".",
+    "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
-  "include": ["./src/**/*.ts"]
+  "include": ["src/**/*"]
 }
