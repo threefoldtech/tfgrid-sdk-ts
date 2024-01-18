@@ -180,7 +180,7 @@ const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "hh" }));
 const flist: Flist = {
   value: "https://hub.grid.tf/mariobassem1.3bot/threefolddev-holochain-latest.flist",
-  entryPoint: "/sbin/zinit init",
+  entryPoint: "/usr/local/bin/entrypoint.sh",
 };
 const ipv4 = ref(false);
 const ipv6 = ref(false);
