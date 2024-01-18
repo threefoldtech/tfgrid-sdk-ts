@@ -1,0 +1,23 @@
+{
+  "name": "monitoring",
+  "version": "1.0.0",
+  "description": "Threefold monitoring package",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "example": "yarn ts-node ./example/index.js",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Omar Kassem",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "@threefold/types": "^2.3.0-alpha6",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.1"
+  }
+}
