@@ -1,7 +1,11 @@
 <template>
   <v-card>
-    <v-alert type="info" variant="tonal" class="ma-4">
+    <v-alert v-if="hasEnoughBalance" type="info" variant="tonal" class="ma-4">
       Updating or generating SSH key will cost you up to 0.01 TFT
+    </v-alert>
+    <v-alert v-else type="warning" variant="tonal" class="ma-4">
+      Your balance is not enough to {{ profileManager.profile?.ssh ? "update the" : `generate a` }} SSH key; please make
+      sure you have at least 0.01 TFT.
     </v-alert>
     <VTooltip
       text="SSH Keys are used to authenticate you to the deployment instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
@@ -11,12 +15,13 @@
       <template #activator="{ props }">
         <CopyInputWrapper :data="profileManager.profile?.ssh" #="{ props: copyInputProps }">
           <VTextarea
+            class="mx-4"
             label="Public SSH Key"
             no-resize
             :spellcheck="false"
             v-model.trim="ssh"
             v-bind="{ ...props, ...copyInputProps }"
-            :disabled="updatingSSH || generatingSSH"
+            :disabled="updatingSSH || generatingSSH || !hasEnoughBalance"
             :hint="
               updatingSSH
                 ? 'Updating your public ssh key.'
@@ -25,19 +30,16 @@
                 : SSHKeyHint
             "
             :persistent-hint="updatingSSH || generatingSSH || !!SSHKeyHint"
-            :rules="[
-              () => isEnoughBalance(balance) || 'Your balance is not enough to update your ssh key',
-              value => !!value || 'SSH key is required',
-            ]"
+            :rules="[value => !!value || 'SSH key is required']"
           />
         </CopyInputWrapper>
 
-        <div class="d-flex justify-end mb-5">
+        <div class="d-flex justify-end mb-5 mx-4">
           <VBtn
             class="mr-2 text-subtitle-2"
             color="secondary"
             variant="outlined"
-            :disabled="!!ssh || updatingSSH || generatingSSH || !isEnoughBalance(balance, 0.01)"
+            :disabled="!!ssh || updatingSSH || generatingSSH || !hasEnoughBalance"
             :loading="generatingSSH"
             @click="generateSSH"
           >
@@ -48,7 +50,7 @@
             color="secondary"
             variant="outlined"
             @click="updateSSH"
-            :disabled="!ssh || profileManager.profile?.ssh === ssh || updatingSSH || !isEnoughBalance(balance, 0.01)"
+            :disabled="!ssh || profileManager.profile?.ssh === ssh || updatingSSH || !hasEnoughBalance"
             :loading="updatingSSH"
           >
             Update Public SSH Key
@@ -60,9 +62,8 @@
 </template>
 <script lang="ts" setup>
 import { ref, watch } from "vue";
+import { computed } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
-
-import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import { useProfileManager } from "../stores";
 import type { Profile } from "../stores/profile_manager";
@@ -76,9 +77,9 @@ const generatingSSH = ref(false);
 const profileManager = useProfileManager();
 const ssh = ref(profileManager.profile!.ssh);
 const updatingSSH = ref(false);
-let BalanceWarningRaised = false;
 const loadingBalance = ref(false);
 
+const hasEnoughBalance = computed(() => isEnoughBalance(balance.value, 0.01));
 let interval: any;
 
 async function __loadBalance(profile?: Profile, tries = 1) {
@@ -89,12 +90,6 @@ async function __loadBalance(profile?: Profile, tries = 1) {
     loadingBalance.value = true;
     const grid = await getGrid(profile);
     balance.value = await loadBalance(grid!);
-    if (!BalanceWarningRaised && balance.value?.free) {
-      if (balance.value?.free < 0.01) {
-        createCustomToast("Your balance is too low, Please fund your account.", ToastType.warning);
-        BalanceWarningRaised = true;
-      }
-    }
     loadingBalance.value = false;
   } catch {
     if (tries > 10) {
