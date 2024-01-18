@@ -152,7 +152,10 @@ function navigation() {
 
 function swapAddressCheck() {
   targetError.value = "";
-  if (!target.value) return true;
+  if (!target.value) {
+    isValidSwap.value = false;
+    return true;
+  }
   const isValid = StrKey.isValidEd25519PublicKey(target.value);
   const blockedAddresses = [
     "GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC",
@@ -164,11 +167,12 @@ function swapAddressCheck() {
   }
   if (!isValid || target.value.match(/\W/)) {
     targetError.value = "invalid address";
+    isValidSwap.value = false;
     return false;
   }
   targetError.value = "";
   validatingAddress.value = true;
-  isValidSwap.value = false;
+  isValidSwap.value = true;
   if (selectedName.value == "stellar") validateAddress();
   return true;
 }
@@ -194,6 +198,7 @@ async function validateAddress() {
   }
 
   validatingAddress.value = false;
+  isValidSwap.value = true;
   return;
 }
 
