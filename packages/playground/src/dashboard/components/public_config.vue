@@ -24,86 +24,71 @@
           <div class="pt-6 px-6">
             <form-validator v-model="valid" ref="formRef">
               <input-validator
-                :value="$props.modelValue.ipv4"
+                :value="config.ipv4"
                 :rules="[validators.required('IPv4 is required.'), validators.isIPRange('IP is not valid.', 4)]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IPV4 address in CIDR format xx.xx.xx.xx/xx">
-                  <v-text-field v-model="$props.modelValue.ipv4" v-bind="props" outlined label="IPv4"></v-text-field>
+                  <v-text-field v-model="config.ipv4" v-bind="props" outlined label="IPv4"></v-text-field>
                 </input-tooltip>
               </input-validator>
 
               <input-validator
-                :value="$props.modelValue.gw4"
+                :value="config.gw4"
                 :rules="[
                   validators.required('Gateway is required.'),
                   validators.isIP('Gateway is not valid.', 4),
                   value =>
                     validators.ipNotEqualGateway(
-                      $props.modelValue.ipv4,
-                      $props.modelValue.gw4,
+                      config.ipv4,
+                      config.gw4,
                       'Gateway IPv4 should not be equal to IPv4.',
                     )(value),
                 ]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Gateway for the IP in ipv4 format">
-                  <v-text-field
-                    v-model="$props.modelValue.gw4"
-                    v-bind:="props"
-                    outlined
-                    label="Gateway IPv4"
-                  ></v-text-field>
+                  <v-text-field v-model="config.gw4" v-bind:="props" outlined label="Gateway IPv4"></v-text-field>
                 </input-tooltip>
               </input-validator>
               <input-validator
-                :value="$props.modelValue.ipv6"
+                :value="config.ipv6"
                 :rules="[
-                  value => ($props.modelValue.gw6 !== '' ? validators.required('IPv6 is required.')(value) : '') as RuleReturn,
+                  value => (config.gw6 !== '' ? validators.required('IPv6 is required.')(value) : '') as RuleReturn,
                   value => validators.isIPRange('IP is not valid.', 6)(value),
                 ]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="IPV6 address in format x:x:x:x:x:x:x:x">
-                  <v-text-field v-model="$props.modelValue.ipv6" v-bind:="props" outlined label="IPv6"></v-text-field>
+                  <v-text-field v-model="config.ipv6" v-bind:="props" outlined label="IPv6"></v-text-field>
                 </input-tooltip>
               </input-validator>
 
               <input-validator
-                :value="$props.modelValue.gw6"
+                :value="config.gw6"
                 :rules="[
-                  value => ($props.modelValue.ipv6 !== '' ? validators.required('Gateway is required.')(value) : '') as RuleReturn,
+                  value => (config.ipv6 !== '' ? validators.required('Gateway is required.')(value) : '') as RuleReturn,
                   value => validators.isIP('Gateway is not valid.', 6)(value),
                   value => validators.ipNotEqualGateway(
-                    $props.modelValue.ipv6!,
-                    $props.modelValue.gw6!,
+                    config.ipv6!,
+                    config.gw6!,
                     'Gateway IPv6 should not be equal to IPv6.',
                   )(value),
                 ]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Gateway for the IP in ipv6 format">
-                  <v-text-field
-                    v-model="$props.modelValue.gw6"
-                    v-bind:="props"
-                    outlined
-                    label="Gateway IPv6"
-                  ></v-text-field>
+                  <v-text-field v-model="config.gw6" v-bind:="props" outlined label="Gateway IPv6"></v-text-field>
                 </input-tooltip>
               </input-validator>
 
               <input-validator
-                :value="$props.modelValue.domain"
+                :value="config.domain"
                 :rules="[domain => validators.isURL('Wrong domain format.')(domain)]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Domain for web gateway">
-                  <v-text-field
-                    v-model="$props.modelValue.domain"
-                    v-bind:="props"
-                    outlined
-                    label="Domain"
-                  ></v-text-field>
+                  <v-text-field v-model="config.domain" v-bind:="props" outlined label="Domain"></v-text-field>
                 </input-tooltip>
               </input-validator>
             </form-validator>
@@ -161,7 +146,7 @@
 </template>
 
 <script lang="ts">
-import type { GridNode } from "@threefold/gridproxy_client";
+import type { GridNode, PublicConfig } from "@threefold/gridproxy_client";
 import _ from "lodash";
 import { onMounted, type PropType, ref, watch } from "vue";
 
@@ -198,16 +183,20 @@ export default {
     const showClearDialogue = ref(false);
     const isRemoving = ref(false);
     const isSaving = ref(false);
-    const config = ref();
+    const config = ref<PublicConfig>(publicConfigInitializer());
     const isConfigChanged = ref(false);
     const formRef = useFormRef();
 
+    function publicConfigInitializer(): PublicConfig {
+      return { ipv4: "", ipv6: "", gw4: "", gw6: "", domain: "" };
+    }
+
     onMounted(async () => {
-      config.value = await getPublicConfig();
+      await getPublicConfig();
     });
 
     watch(
-      () => ({ ...props.modelValue }),
+      () => ({ ...config.value }),
       (old, newValue) => {
         isConfigChanged.value = !_.isEqual(old, newValue) && !_.isEqual(props.modelValue, config.value);
         formRef.value?.validate();
@@ -217,8 +206,7 @@ export default {
     async function getPublicConfig() {
       try {
         const node: GridNode = await gridProxyClient.nodes.byId(props.nodeId);
-        const config = node.publicConfig;
-        return config;
+        config.value = node.publicConfig;
       } catch (error) {
         console.log(`Failed to get node: ${error}`);
       }
@@ -231,16 +219,16 @@ export default {
           farmId: props.farmId,
           nodeId: props.nodeId,
           publicConfig: {
-            ip4: { ip: props.modelValue.ipv4, gw: props.modelValue.gw4 },
+            ip4: { ip: config.value.ipv4, gw: config.value.gw4 },
             ip6:
-              props.modelValue.ipv6 && props.modelValue.gw6
-                ? { ip: props.modelValue.ipv6 as string, gw: props.modelValue.gw6 as string }
+              config.value.ipv6 && config.value.gw6
+                ? { ip: config.value.ipv6 as string, gw: config.value.gw6 as string }
                 : null,
-            domain: props.modelValue.domain || null,
+            domain: config.value.domain || null,
           },
         });
         createCustomToast("Public config saved successfully.", ToastType.success);
-        context.emit("add-config", props.modelValue);
+        context.emit("add-config", config.value);
         showDialogue.value = false;
       } catch (error) {
         console.log(error);
@@ -258,13 +246,8 @@ export default {
           nodeId: props.nodeId,
         });
         createCustomToast("Public config removed successfully.", ToastType.success);
-        context.emit("remove-config", {
-          ipv4: "",
-          gw4: "",
-          ipv6: "",
-          gw6: "",
-          domain: "",
-        });
+        config.value = publicConfigInitializer();
+        context.emit("remove-config", config.value);
         showDialogue.value = false;
       } catch (error) {
         console.log(error);

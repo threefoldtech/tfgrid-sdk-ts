@@ -105,8 +105,8 @@
           :nodeId="item.raw.nodeId"
           :farmId="item.raw.farmId"
           v-model="item.raw.publicConfig"
-          @remove-config="(item.raw.publicConfig = $event), reloadNodes()"
-          @add-config="(item.raw.publicConfig = $event), reloadNodes()"
+          @remove-config="config => toggleConfig(item, config)"
+          @add-config="config => toggleConfig(item, config)"
         />
         <SetExtraFee class="me-2" :nodeId="item.raw.nodeId" />
       </template>
@@ -115,9 +115,9 @@
 </template>
 
 <script lang="ts">
+import type { PublicConfig as PublicConfigModel } from "@threefold/gridproxy_client";
 import moment from "moment";
-import { ref } from "vue";
-import { capitalize } from "vue";
+import { capitalize, ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import CardDetails from "@/components/node_details_cards/card_details.vue";
@@ -284,6 +284,11 @@ export default {
       }
     }
 
+    function toggleConfig(item: any, config: PublicConfigModel) {
+      item.raw.publicConfig = config;
+      reloadNodes();
+    }
+
     return {
       loading,
       page,
@@ -304,6 +309,7 @@ export default {
       getKey,
       capitalize,
       reloadNodes,
+      toggleConfig,
     };
   },
 };
