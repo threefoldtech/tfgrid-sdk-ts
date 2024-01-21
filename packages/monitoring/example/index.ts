@@ -1,8 +1,8 @@
-import { HealthCheckers } from "../src/index";
+import { servicesLiveChecker } from "../src/index";
 async function HealthCheck() {
-  const tfChain = new HealthCheckers.TFChainHealthCheck("wss://<chain_url>");
   try {
-    await tfChain.alive();
+    console.log(await servicesLiveChecker("heiaw", "", "wss://tfchain.dev.grid.tf/ws", "wss://relay.dev.grid.tf"));
+    process.exit(0);
   } catch (err) {
     console.log(err);
   }

@@ -1,3 +1,4 @@
 export { GridProxyHealthCheck } from "./gridproxy";
-export { HealthCheck } from "./healthChecker";
 export { TFChainHealthCheck } from "./tfChain";
+export { RMBHealthCheck } from "./rmb";
+export { servicesLiveChecker } from "./healthChecker";

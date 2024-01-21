@@ -1,1 +1,1 @@
-export * as HealthCheckers from "./healthCheckers/index";
+export * from "./healthCheckers/index";

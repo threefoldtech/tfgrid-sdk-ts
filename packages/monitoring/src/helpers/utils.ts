@@ -1,9 +1,9 @@
 import { RequestError } from "@threefold/types";
-import axios, { AxiosError, Method } from "axios";
+import axios, { AxiosError } from "axios";
 
-export async function sendWithFullResponse(method: Method, url: string, body: string, headers: Record<string, string>) {
+export async function SendGetRequest(url: string, body: string, headers: Record<string, string>) {
   const options = {
-    method: method,
+    method: "get",
     url: url,
     data: body,
     headers: headers,

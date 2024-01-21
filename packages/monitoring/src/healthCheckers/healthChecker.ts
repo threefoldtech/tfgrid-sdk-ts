@@ -1,16 +1,39 @@
-import { sendWithFullResponse } from "../helpers/utils";
+import { ILivenessChecker } from "src/types";
 
-export class HealthCheck {
-  constructor(public pingUrl: string, public serviceName = "Unknown") {}
-  public async alive(): Promise<boolean> {
-    try {
-      const response = await sendWithFullResponse("GET", this.pingUrl, "", {});
-      if (response.status === 200) return true;
-    } catch (e) {
-      console.log(`${this.serviceName} service seems to be down!`);
-      console.log(`*\tPing URL: ${this.pingUrl}`);
-      console.log(`*\tError: ${e.message}`);
-      return false;
-    }
+import { GraphQlHealthCheck } from "./graphql";
+import { GridProxyHealthCheck } from "./gridproxy";
+import { RMBHealthCheck } from "./rmb";
+import { TFChainHealthCheck } from "./tfChain";
+
+export async function servicesLiveChecker(
+  GraphQlURL?: string,
+  GridProxyURL?: string,
+  TFChainURL?: string,
+  RMBrelayURL?: string,
+) {
+  const LIVENESS = {};
+
+  if (GraphQlURL) {
+    LIVENESS["GraphQl"] = (await HealthChecker(new GraphQlHealthCheck(GridProxyURL))) ? "Alive" : `Down`;
   }
+  if (GridProxyURL) {
+    LIVENESS["GridProxy"] = (await HealthChecker(new GridProxyHealthCheck(GridProxyURL))) ? "Alive" : `Down`;
+  }
+  if (TFChainURL) {
+    LIVENESS["TFChain"] = (await HealthChecker(new TFChainHealthCheck(TFChainURL))) ? "Alive" : "Down";
+  }
+  if (RMBrelayURL && TFChainURL) {
+    LIVENESS["RMB"] = (await HealthChecker(new RMBHealthCheck(RMBrelayURL, TFChainURL, "sr25519"))) ? "Alive" : "Down";
+  }
+  return LIVENESS;
+}
+
+async function HealthChecker(HealthChecker: ILivenessChecker, retries = 2) {
+  let alive = false;
+  while (!alive && retries > 0) {
+    alive = await HealthChecker.LiveChecker();
+    retries--;
+  }
+  if ("disconnectHandler" in HealthChecker) HealthChecker.disconnectHandler();
+  return alive;
 }
