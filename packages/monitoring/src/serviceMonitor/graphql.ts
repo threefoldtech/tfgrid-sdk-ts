@@ -1,8 +1,8 @@
 import { SendGetRequest } from "../helpers/utils";
-import { ILivenessChecker } from "../types/index";
+import { IServiceMonitor } from "../types/index";
 
-export class GraphQlHealthCheck implements ILivenessChecker {
-  public ServiceName = "GraphQl";
+export class GraphQlMonitor implements IServiceMonitor {
+  public readonly ServiceName = "GraphQl";
   public ServiceURL: string;
   constructor(graphQlUrl: string) {
     this.ServiceURL = graphQlUrl;

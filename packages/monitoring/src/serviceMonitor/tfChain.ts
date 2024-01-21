@@ -1,8 +1,8 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
-import { ILivenessChecker } from "src/types";
+import { IServiceMonitor } from "src/types";
 
-export class TFChainHealthCheck implements ILivenessChecker {
-  public ServiceName: "TFChain";
+export class TFChainMonitor implements IServiceMonitor {
+  public readonly ServiceName = "TFChain";
   public ServiceURL: string;
   private _api: ApiPromise;
   constructor(TFchainUrl: string) {

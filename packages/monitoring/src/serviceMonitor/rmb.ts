@@ -1,12 +1,12 @@
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
-import { ILivenessChecker } from "src/types";
+import { IServiceMonitor } from "src/types";
 
-export class RMBHealthCheck implements ILivenessChecker {
-  public readonly ServiceName: "RMB";
+export class RMBMonitor implements IServiceMonitor {
+  public readonly ServiceName = "RMB";
   public ServiceURL: string;
   private rmbClient: RMBClient;
-  constructor(public relayUrl, chainUrl: string, keypairType: KeypairType) {
+  constructor(public relayUrl: string, chainUrl: string, keypairType: KeypairType) {
     this.ServiceURL = relayUrl;
     this.rmbClient = new RMBClient(
       chainUrl,

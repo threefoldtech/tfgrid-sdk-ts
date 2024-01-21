@@ -1,8 +1,8 @@
 import { SendGetRequest } from "../helpers/utils";
-import { ILivenessChecker } from "../types/index";
+import { IServiceMonitor } from "../types/index";
 
-export class GridProxyHealthCheck implements ILivenessChecker {
-  public ServiceName = "GridProxy";
+export class GridProxyMonitor implements IServiceMonitor {
+  public readonly ServiceName = "GridProxy";
   public ServiceURL: string;
   constructor(gridProxyUrl: string) {
     this.ServiceURL = gridProxyUrl;
