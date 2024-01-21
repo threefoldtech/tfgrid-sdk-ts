@@ -1,7 +1,6 @@
 <template>
   <weblet-layout
     ref="layout"
-    @mount="layoutMount"
     :cpu="solution?.cpu"
     :memory="solution?.memory"
     :disk="disks.reduce((total, disk) => total + disk.size, rootFilesystemSize)"
@@ -11,7 +10,7 @@
     :valid-filters="selectionDetails?.validFilters"
     title-image="images/icons/vm.png"
   >
-    <template #title>Deploy Holochain </template>
+    <template #title>Deploy Holochain</template>
 
     <d-tabs
       :tabs="[
