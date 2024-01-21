@@ -16,7 +16,6 @@
     <d-tabs
       :tabs="[
         { title: 'Config', value: 'config' },
-        { title: 'Environment Variables', value: 'env' },
         { title: 'Disks', value: 'disks' },
       ]"
       ref="tabs"
@@ -38,6 +37,25 @@
             <v-text-field label="Name" v-model="name" v-bind="props" />
           </input-tooltip>
         </input-validator>
+
+        <password-input-wrapper #="{ props }">
+          <input-validator
+            :value="password"
+            :rules="[
+              validators.required('Password is required.'),
+              validators.minLength('Password must be at least 6 characters.', 6),
+              validators.maxLength('Password cannot exceed 15 characters.', 15),
+              validators.pattern('Password should not contain whitespaces.', {
+                pattern: /^[^\s]+$/,
+              }),
+            ]"
+            #="{ props: validatorProps }"
+          >
+            <input-tooltip tooltip="Admin password.">
+              <v-text-field label="Password" v-model="password" v-bind="{ ...props, ...validatorProps }" />
+            </input-tooltip>
+          </input-validator>
+        </password-input-wrapper>
 
         <SelectSolutionFlavor
           :small="{ cpu: 4, memory: 8, disk: 30 }"
@@ -80,40 +98,6 @@
           }"
           v-model="selectionDetails"
         />
-      </template>
-
-      <template #env>
-        <ExpandableLayout
-          v-model="envs"
-          @add="envs.push({ key: '', value: '' })"
-          #="{ index, isRequired }"
-          :required="[0]"
-        >
-          <input-validator
-            :value="envs[index].key"
-            :rules="[
-              validators.required('Key name is required.'),
-              key => validators.isAlpha('Key must start with alphabet char.')(key[0]),
-              validators.pattern('Invalid key format.', { pattern: /^[^0-9_\s][a-zA-Z0-9_]+$/ }),
-              validators.maxLength('Key max length is 128 chars.', 128),
-            ]"
-            #="{ props }"
-          >
-            <input-tooltip tooltip="Environment key.">
-              <v-text-field label="Name" v-model="envs[index].key" :disabled="isRequired" v-bind="props" />
-            </input-tooltip>
-          </input-validator>
-
-          <input-validator
-            :value="envs[index].value"
-            :rules="[validators.required('Value is required.')]"
-            #="{ props }"
-          >
-            <input-tooltip tooltip="Environment Value.">
-              <v-textarea label="Value" v-model="envs[index].value" no-resize :spellcheck="false" />
-            </input-tooltip>
-          </input-validator>
-        </ExpandableLayout>
       </template>
 
       <template #disks>
@@ -172,12 +156,13 @@ import { useProfileManager } from "../stores";
 import { type Flist, ProjectName } from "../types";
 import { deployVM, type Disk, type Env } from "../utils/deploy_vm";
 import { getGrid } from "../utils/grid";
-import { generateName } from "../utils/strings";
+import { generateName, generatePassword } from "../utils/strings";
 
 const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "hh" }));
+const password = ref(generatePassword());
 const flist: Flist = {
   value: "https://hub.grid.tf/mariobassem1.3bot/threefolddev-holochain-latest.flist",
   entryPoint: "/usr/local/bin/entrypoint.sh",
@@ -186,24 +171,12 @@ const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
 const wireguard = ref(false);
-const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
 const network = ref();
 const dedicated = ref(false);
 const certified = ref(false);
 const rootFilesystemSize = computed(() => solution.value?.disk);
 const selectionDetails = ref<SelectionDetails>();
-
-function layoutMount() {
-  if (envs.value.length > 0) {
-    envs.value.splice(0, 1);
-  }
-
-  envs.value.unshift({
-    key: "SSH_KEY",
-    value: profileManager.profile!.ssh,
-  });
-}
 
 function addDisk() {
   const name = generateName();
@@ -237,7 +210,13 @@ async function deploy() {
           flist: flist.value,
           entryPoint: flist.entryPoint,
           disks: disks.value,
-          envs: envs.value,
+          envs: [
+            { key: "SSH_KEY", value: profileManager.profile!.ssh },
+            {
+              key: "CODE_SERVER_PASSWORD",
+              value: password.value,
+            },
+          ],
           planetary: planetary.value,
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
