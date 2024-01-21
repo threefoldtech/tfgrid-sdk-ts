@@ -1,11 +1,11 @@
 import { SendGetRequest } from "../helpers/utils";
 import { ILivenessChecker } from "../types/index";
 
-export class GridProxyHealthCheck implements ILivenessChecker {
-  public ServiceName = "GridProxy";
+export class GraphQlHealthCheck implements ILivenessChecker {
+  public ServiceName = "GraphQl";
   public ServiceURL: string;
-  constructor(gridProxyUrl: string) {
-    this.ServiceURL = gridProxyUrl;
+  constructor(graphQlUrl: string) {
+    this.ServiceURL = graphQlUrl;
   }
   async LiveChecker(): Promise<boolean> {
     try {

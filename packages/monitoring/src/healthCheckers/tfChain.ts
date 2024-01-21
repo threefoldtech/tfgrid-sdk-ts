@@ -1,25 +1,27 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
-import { TFChainError } from "@threefold/types";
+import { ILivenessChecker } from "src/types";
 
-import { HealthCheck } from "./healthChecker";
-
-export class TFChainHealthCheck extends HealthCheck {
+export class TFChainHealthCheck implements ILivenessChecker {
+  public ServiceName: "TFChain";
+  public ServiceURL: string;
   private _api: ApiPromise;
-  constructor(public pingUrl: string) {
-    super(pingUrl, "TFChain");
+  constructor(TFchainUrl: string) {
+    this.ServiceURL = TFchainUrl;
   }
   private async setUp() {
-    const provider = new WsProvider(this.pingUrl, false);
+    const provider = new WsProvider(this.ServiceURL, false);
     await provider.connect();
     this._api = await ApiPromise.create({ provider, throwOnConnect: true });
   }
-  public async alive(): Promise<boolean> {
+  public async LiveChecker(): Promise<boolean> {
     try {
       if (!this._api) await this.setUp();
       await this._api.rpc.system.version;
       return true;
     } catch (err) {
-      throw new TFChainError(`Failed to set up a TFChain connection`);
+      //TODO stream errors
+      console.log(err);
+      return false;
     }
   }
 }
