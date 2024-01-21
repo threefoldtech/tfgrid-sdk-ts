@@ -1,18 +1,19 @@
 <template>
   <VAlert type="info" variant="tonal" class="my-4">
     Access your deployments via SSH, with default username
-    <span
-      class="font-weight-bold"
-      :class="{
-        'text-grey': $vuetify.theme.global.name === 'dark',
-        'text-black': $vuetify.theme.global.name === 'light',
-      }"
-      v-text="'root'"
-    />.
+    <span class="font-weight-bold text-grey-darken-1" v-text="'root'" />.
 
     <ul :style="{ listStyle: 'square' }">
-      <li v-for="method in methods" :key="method" class="text-white my-1">
-        &blacksquare; ssh root@&lt;<span v-text="method" class="text-grey" />&gt;
+      <li
+        v-for="method in methods"
+        :key="method"
+        class="my-1"
+        :class="{
+          'text-white': $vuetify.theme.global.name === 'dark',
+          'text-grey-darken-3': $vuetify.theme.global.name === 'light',
+        }"
+      >
+        &blacksquare; ssh root@&lt;<span v-text="method" class="text-grey-darken-1" />&gt;
       </li>
     </ul>
   </VAlert>
