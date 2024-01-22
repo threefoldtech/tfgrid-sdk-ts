@@ -146,14 +146,12 @@
 </template>
 
 <script lang="ts">
-import type { GridNode, PublicConfig } from "@threefold/gridproxy_client";
+import type { PublicConfig } from "@threefold/grid_client";
 import _ from "lodash";
 import { onMounted, type PropType, ref, watch } from "vue";
 
-import { gridProxyClient } from "@/clients";
 import type { RuleReturn } from "@/components/input_validator.vue";
 import { useFormRef } from "@/hooks/form_validator";
-import type { IPublicConfig } from "@/utils/types";
 
 import { useGrid } from "../../stores";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
@@ -170,7 +168,7 @@ export default {
       required: true,
     },
     modelValue: {
-      type: Object as PropType<IPublicConfig>,
+      type: Object as PropType<PublicConfig>,
       required: true,
     },
   },
@@ -178,7 +176,6 @@ export default {
   setup(props, context) {
     const showDialogue = ref(false);
     const isAdding = ref(false);
-    const gridStore = useGrid();
     const valid = ref(false);
     const showClearDialogue = ref(false);
     const isRemoving = ref(false);
@@ -186,6 +183,7 @@ export default {
     const config = ref<PublicConfig>(publicConfigInitializer());
     const isConfigChanged = ref(false);
     const formRef = useFormRef();
+    const grid = useGrid();
 
     function publicConfigInitializer(): PublicConfig {
       return { ipv4: "", ipv6: "", gw4: "", gw6: "", domain: "" };
@@ -205,17 +203,26 @@ export default {
 
     async function getPublicConfig() {
       try {
-        const node: GridNode = await gridProxyClient.nodes.byId(props.nodeId);
-        config.value = node.publicConfig;
+        const node = await grid.client.nodes.get({ id: props.nodeId });
+
+        if (node.publicConfig) {
+          config.value = {
+            ipv4: node.publicConfig.ip4 ? node.publicConfig.ip4.ip : "",
+            gw4: node.publicConfig.ip4 ? node.publicConfig.ip4.gw : "",
+            ipv6: node.publicConfig.ip6 ? node.publicConfig.ip6.ip : "",
+            gw6: node.publicConfig.ip6 ? node.publicConfig.ip6.gw : "",
+            domain: node.publicConfig.domain ? node.publicConfig.domain : "",
+          };
+        }
       } catch (error) {
-        console.log(`Failed to get node: ${error}`);
+        createCustomToast(`Failed to get node: ${error}.`, ToastType.danger);
       }
     }
 
     async function AddConfig() {
       try {
         isSaving.value = true;
-        await gridStore.grid.nodes.addNodePublicConfig({
+        await grid.client.nodes.addNodePublicConfig({
           farmId: props.farmId,
           nodeId: props.nodeId,
           publicConfig: {
@@ -241,7 +248,7 @@ export default {
     async function removeConfig() {
       try {
         isRemoving.value = true;
-        await gridStore.grid.nodes.addNodePublicConfig({
+        await grid.client.nodes.addNodePublicConfig({
           farmId: props.farmId,
           nodeId: props.nodeId,
         });
