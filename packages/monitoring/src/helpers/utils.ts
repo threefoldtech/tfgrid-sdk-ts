@@ -1,6 +1,8 @@
 import { RequestError } from "@threefold/types";
 import axios, { AxiosError } from "axios";
 
+import { TextColor } from "../types";
+
 export async function sendGetRequest(url: string, body: string, headers: Record<string, string>) {
   const options = {
     method: "get",
@@ -28,4 +30,8 @@ export function generateString(length: number): string {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
+}
+
+export function colorizeText(text: string, color: TextColor): string {
+  return `${color}${text}${TextColor.Reset}`;
 }
