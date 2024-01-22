@@ -13,11 +13,7 @@ export class RMBMonitor implements IServiceAliveness {
     this.rmbClient = new RMBClient(chainUrl, relayUrl, mnemonic, generateString(10), keypairType, 0);
   }
   private async setUp() {
-    try {
-      await this.rmbClient.connect();
-    } catch (e) {
-      console.log(e);
-    }
+    await this.rmbClient.connect();
   }
   public async isAlive(): Promise<ServiceStatus> {
     try {
