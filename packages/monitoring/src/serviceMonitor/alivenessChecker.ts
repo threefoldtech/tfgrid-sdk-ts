@@ -29,11 +29,15 @@ export async function checkServiceAliveness(services: IServiceAliveness[], retri
   for (const service of services) {
     for (let retryCount = 1; retryCount <= retries; retryCount++) {
       const { alive, error } = await service.isAlive();
-      if (alive) break;
+      if (alive) {
+        events.emit("storeServiceStatus", service.ServiceName, alive);
+        break;
+      }
       if (retryCount < retries) {
         events.emit("logs", `${service.ServiceName} seems to be down; Retrying (${retryCount}/${retries})...`);
         await new Promise(resolve => setTimeout(resolve, retryInterval * 60));
       } else events.emit("serviceIsDown", service.ServiceName, error);
     }
   }
+  events.emit("summarize");
 }
