@@ -1,26 +1,21 @@
 <template>
   <VAlert type="info" variant="tonal" class="my-4">
     Access your deployments via SSH, with default username
-    <VCard flat class="d-inline pa-1 text-primary rounded-0" v-text="'root'" />.
+    <span class="font-weight-bold text-grey-darken-1" v-text="'root'" />.
 
-    <VContainer fluid>
-      <VRow no-gutters>
-        <VCol
-          cols="12"
-          md="6"
-          lg="4"
-          v-for="method in methods"
-          :key="method"
-          class="mb-2"
-          :style="{ whiteSpace: 'nowrap' }"
-        >
-          &rtrif;
-          <VCard class="d-inline pa-1" flat>
-            ssh root@&lt;<span :style="{ opacity: 'var(--v-medium-emphasis-opacity)' }" v-text="method" />&gt;
-          </VCard>
-        </VCol>
-      </VRow>
-    </VContainer>
+    <ul :style="{ listStyle: 'square' }">
+      <li
+        v-for="method in methods"
+        :key="method"
+        class="my-1"
+        :class="{
+          'text-white': $vuetify.theme.global.name === 'dark',
+          'text-grey-darken-3': $vuetify.theme.global.name === 'light',
+        }"
+      >
+        &blacksquare; ssh root@&lt;<span v-text="method" class="text-grey-darken-1" />&gt;
+      </li>
+    </ul>
   </VAlert>
 </template>
 

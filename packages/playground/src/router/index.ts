@@ -161,6 +161,7 @@ const router = createRouter({
                     },
                   ],
                 },
+                requireSSH: true,
               },
             },
           ],

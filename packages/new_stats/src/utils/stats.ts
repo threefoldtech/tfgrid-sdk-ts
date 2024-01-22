@@ -8,7 +8,6 @@ function mergeAllStatsData(stats: Stats[]): Stats {
     res.accessNodes += stats[i].accessNodes;
     res.dedicatedNodes += stats[i].dedicatedNodes;
     res.contracts += stats[i].contracts;
-    res.countries += stats[i].countries;
     res.farms += stats[i].farms;
     res.gateways += stats[i].gateways;
     res.nodes += stats[i].nodes;
@@ -20,6 +19,7 @@ function mergeAllStatsData(stats: Stats[]): Stats {
     res.gpus += stats[i].gpus;
     res.twins += stats[i].twins;
     res.nodesDistribution = mergeNodeDistribution([res.nodesDistribution, stats[i].nodesDistribution]);
+    res.countries = Object.keys(res.nodesDistribution).length;
   }
 
   return res;

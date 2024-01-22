@@ -260,7 +260,7 @@ async function loadNodes() {
       return {
         ...item,
         price: (price?.dedicatedPrice ?? 0 + (fee || 0)).toFixed(3),
-        discount: price?.sharedPackage.discount,
+        discount: price?.dedicatedPackage.discount,
       };
     });
 

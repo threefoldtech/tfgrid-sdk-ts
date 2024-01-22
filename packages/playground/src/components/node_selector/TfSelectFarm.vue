@@ -1,5 +1,5 @@
 <template>
-  <input-tooltip :tooltip="($props.tooltip as string)" :disabled="!insetTooltip">
+  <input-tooltip :tooltip="($props.tooltip as string)" :disabled="insetTooltip">
     <VAutocomplete
       label="Farm Name"
       placeholder="Select a farm"

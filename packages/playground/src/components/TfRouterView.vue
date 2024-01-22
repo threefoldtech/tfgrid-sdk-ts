@@ -4,7 +4,7 @@
       <transition name="fade">
         <div :key="route.path">
           <component :is="Component" v-if="isAuth || route.meta.publicPath" />
-          <ConnectWalletLanding v-else />
+          <ConnectWalletLanding @openProfile="$emit('openProfile')" v-else />
         </div>
       </transition>
     </router-view>
