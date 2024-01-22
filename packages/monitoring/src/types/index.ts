@@ -3,5 +3,10 @@ interface IServiceInfo {
 }
 
 export interface IServiceAliveness extends IServiceInfo {
-  isAlive: () => Promise<boolean>;
+  isAlive: () => Promise<ServiceStatus>;
 }
+
+export type ServiceStatus = {
+  alive: boolean;
+  error?: Error;
+};
