@@ -1,5 +1,6 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
-import { IServiceAliveness } from "src/types";
+
+import { IServiceAliveness, ServiceStatus } from "./types";
 
 export class TFChainMonitor implements IServiceAliveness {
   public readonly ServiceName = "TFChain";
@@ -13,15 +14,18 @@ export class TFChainMonitor implements IServiceAliveness {
     await provider.connect();
     this._api = await ApiPromise.create({ provider, throwOnConnect: true });
   }
-  public async isAlive(): Promise<boolean> {
+  public async isAlive(): Promise<ServiceStatus> {
     try {
       if (!this._api) await this.setUp();
       await this._api.rpc.system.version;
-      return true;
-    } catch (err) {
-      //TODO stream errors
-      console.log(err);
-      return false;
+      return {
+        alive: true,
+      };
+    } catch (error) {
+      return {
+        alive: false,
+        error,
+      };
     }
   }
 }

@@ -1,5 +1,5 @@
 import { sendGetRequest } from "../helpers/utils";
-import { IServiceAliveness } from "../types/index";
+import { IServiceAliveness, ServiceStatus } from "../types";
 
 export class GridProxyMonitor implements IServiceAliveness {
   public readonly ServiceName = "GridProxy";
@@ -7,13 +7,17 @@ export class GridProxyMonitor implements IServiceAliveness {
   constructor(gridProxyUrl: string) {
     this.ServiceURL = gridProxyUrl;
   }
-  async isAlive(): Promise<boolean> {
+  async isAlive(): Promise<ServiceStatus> {
     try {
       await sendGetRequest(this.ServiceURL, "", {});
-      return true;
-    } catch {
-      //stream error
-      return false;
+      return {
+        alive: true,
+      };
+    } catch (error) {
+      return {
+        alive: false,
+        error,
+      };
     }
   }
 }

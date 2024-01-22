@@ -1,7 +1,8 @@
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
-import { generateString } from "src/helpers/utils";
-import { IServiceAliveness } from "src/types";
+
+import { generateString } from "../helpers/utils";
+import { IServiceAliveness, ServiceStatus } from "./types/index";
 
 export class RMBMonitor implements IServiceAliveness {
   public readonly ServiceName = "RMB";
@@ -25,15 +26,18 @@ export class RMBMonitor implements IServiceAliveness {
       console.log(e);
     }
   }
-  public async isAlive(): Promise<boolean> {
+  public async isAlive(): Promise<ServiceStatus> {
     try {
       if (!this.rmbClient?.con?.OPEN) await this.setUp();
       await this.rmbClient.ping(2);
-      return true;
-    } catch (e) {
-      //stream error
-      console.log(e);
-      return false;
+      return {
+        alive: true,
+      };
+    } catch (error) {
+      return {
+        alive: false,
+        error,
+      };
     }
   }
 }
