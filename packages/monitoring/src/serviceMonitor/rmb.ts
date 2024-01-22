@@ -2,9 +2,9 @@ import { KeypairType } from "@polkadot/util-crypto/types";
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
 
 import { generateString } from "../helpers/utils";
-import { IServiceAliveness, ServiceStatus } from "../types";
+import { IDisconnectHandler, IServiceAliveness, ServiceStatus } from "../types";
 
-export class RMBMonitor implements IServiceAliveness {
+export class RMBMonitor implements IServiceAliveness, IDisconnectHandler {
   public readonly ServiceName = "RMB";
   public ServiceURL: string;
   private rmbClient: RMBClient;
@@ -28,5 +28,8 @@ export class RMBMonitor implements IServiceAliveness {
         error,
       };
     }
+  }
+  public async disconnect() {
+    await this.rmbClient.disconnect();
   }
 }

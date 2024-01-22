@@ -2,6 +2,9 @@ interface IServiceInfo {
   ServiceName: string;
 }
 
+export interface IDisconnectHandler {
+  disconnect: () => Promise<void>;
+}
 export interface IServiceAliveness extends IServiceInfo {
   isAlive: () => Promise<ServiceStatus>;
 }
