@@ -6,11 +6,11 @@ async function HealthCheck() {
     const services: IServiceAliveness[] = [];
     services.push(new GridProxyMonitor("<FakeURL>"));
     services.push(new TFChainMonitor("wss://tfchain.dev.grid.tf/ws"));
-    services.push(new RMBMonitor("wss://relay.dev.grid.tf", "wss://tfchain.dev.grid.tf/ws", "", "sr25519"));
+    services.push(new RMBMonitor("wss://relay.dev.grid.tf", "wss://tfchain.dev.grid.tf/ws", "FakeMnemonic", "sr25519"));
     // monitor some services once
     await checkServiceAliveness(services);
     // keep monitoring services with Interval
-    await monitorServiceAliveness(services, 5);
+    // await monitorServiceAliveness(services, 5);
 
     process.exit(0);
   } catch (err) {
