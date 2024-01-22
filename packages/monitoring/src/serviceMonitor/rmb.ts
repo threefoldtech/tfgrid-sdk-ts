@@ -8,16 +8,9 @@ export class RMBMonitor implements IServiceAliveness {
   public readonly ServiceName = "RMB";
   public ServiceURL: string;
   private rmbClient: RMBClient;
-  constructor(public relayUrl: string, chainUrl: string, keypairType: KeypairType) {
+  constructor(public relayUrl: string, chainUrl: string, mnemonic: string, keypairType: KeypairType) {
     this.ServiceURL = relayUrl;
-    this.rmbClient = new RMBClient(
-      chainUrl,
-      relayUrl,
-      "energy garage female trend guard pipe skill dumb drill defy crush genuine",
-      generateString(10),
-      keypairType,
-      0,
-    );
+    this.rmbClient = new RMBClient(chainUrl, relayUrl, mnemonic, generateString(10), keypairType, 0);
   }
   private async setUp() {
     try {
