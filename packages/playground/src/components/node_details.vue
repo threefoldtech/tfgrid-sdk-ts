@@ -150,7 +150,8 @@ export default {
           const _node: GridNode = await getNode(props.nodeId, nodeOptions);
           node.value = _node;
           isLiveStats.value = true;
-          router.push({ path: route.path, query: { nodeId: node.value.nodeId } });
+          const query = { ...router.currentRoute.value.query, nodeId: node.value.nodeId };
+          router.replace({ query });
         } catch (_) {
           isLiveStats.value = false;
           errorLoadingStatsMessage.value =
@@ -160,7 +161,8 @@ export default {
           try {
             const _node: GridNode = await getNode(props.nodeId, nodeOptions);
             node.value = _node;
-            router.push({ path: route.path, query: { nodeId: node.value.nodeId } });
+            const query = { ...router.currentRoute.value.query, nodeId: node.value.nodeId };
+            router.replace({ query });
           } catch (err: any) {
             isError.value = true;
             errorMessage.value = `Failed to load node with ID ${props.nodeId} due ${err.message}. The node might be offline or unresponsive. You can try requesting it again.`;

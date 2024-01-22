@@ -96,10 +96,10 @@ export default {
   name: "TfSelectFarm",
   props: {
     modelValue: Object as PropType<FarmInfo>,
-    validFilters: { type: Boolean, default: () => false },
+    validFilters: { type: Boolean, default: () => true },
     filters: {
       type: Object as PropType<SelectionDetailsFilters>,
-      required: true,
+      default: () => ({}),
     },
     location: Object as PropType<SelectedLocation>,
     insetTooltip: Boolean,
@@ -118,6 +118,14 @@ export default {
       onBeforeTask() {
         if (!searchTask.value.initialized) {
           const oldFarm = props.modelValue;
+
+          // Ignore unbind fake farms e.g ({ name: 'test' })
+          // fake farms are objects create by us (not from grid)
+          // used with other component e.g (filters, ...etc)
+          if (oldFarm && !oldFarm.farmId) {
+            return;
+          }
+
           bindModelValue();
           return oldFarm?.farmId;
         }
