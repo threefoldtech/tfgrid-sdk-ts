@@ -1,15 +1,15 @@
-import { SendGetRequest } from "../helpers/utils";
-import { IServiceMonitor } from "../types/index";
+import { sendGetRequest } from "../helpers/utils";
+import { IServiceAliveness } from "../types/index";
 
-export class GridProxyMonitor implements IServiceMonitor {
+export class GridProxyMonitor implements IServiceAliveness {
   public readonly ServiceName = "GridProxy";
   public ServiceURL: string;
   constructor(gridProxyUrl: string) {
     this.ServiceURL = gridProxyUrl;
   }
-  async LiveChecker(): Promise<boolean> {
+  async isAlive(): Promise<boolean> {
     try {
-      await SendGetRequest(this.ServiceURL, "", {});
+      await sendGetRequest(this.ServiceURL, "", {});
       return true;
     } catch {
       //stream error

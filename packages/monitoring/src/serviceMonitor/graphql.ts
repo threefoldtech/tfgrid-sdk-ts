@@ -1,15 +1,15 @@
-import { SendGetRequest } from "../helpers/utils";
-import { IServiceMonitor } from "../types/index";
+import { sendGetRequest } from "../helpers/utils";
+import { IServiceAliveness } from "../types/index";
 
-export class GraphQlMonitor implements IServiceMonitor {
+export class GraphQlMonitor implements IServiceAliveness {
   public readonly ServiceName = "GraphQl";
   public ServiceURL: string;
   constructor(graphQlUrl: string) {
     this.ServiceURL = graphQlUrl;
   }
-  async LiveChecker(): Promise<boolean> {
+  async isAlive(): Promise<boolean> {
     try {
-      await SendGetRequest(this.ServiceURL, "", {});
+      await sendGetRequest(this.ServiceURL, "", {});
       return true;
     } catch {
       //stream error

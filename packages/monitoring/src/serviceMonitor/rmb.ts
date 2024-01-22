@@ -1,8 +1,9 @@
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
-import { IServiceMonitor } from "src/types";
+import { generateString } from "src/helpers/utils";
+import { IServiceAliveness } from "src/types";
 
-export class RMBMonitor implements IServiceMonitor {
+export class RMBMonitor implements IServiceAliveness {
   public readonly ServiceName = "RMB";
   public ServiceURL: string;
   private rmbClient: RMBClient;
@@ -12,7 +13,7 @@ export class RMBMonitor implements IServiceMonitor {
       chainUrl,
       relayUrl,
       "energy garage female trend guard pipe skill dumb drill defy crush genuine",
-      this.generateString(10),
+      generateString(10),
       keypairType,
       0,
     );
@@ -24,10 +25,7 @@ export class RMBMonitor implements IServiceMonitor {
       console.log(e);
     }
   }
-  public disconnectHandler() {
-    this.rmbClient.disconnect();
-  }
-  public async LiveChecker(): Promise<boolean> {
+  public async isAlive(): Promise<boolean> {
     try {
       if (!this.rmbClient?.con?.OPEN) await this.setUp();
       await this.rmbClient.ping(2);
@@ -37,14 +35,5 @@ export class RMBMonitor implements IServiceMonitor {
       console.log(e);
       return false;
     }
-  }
-  generateString(length: number): string {
-    let result = "";
-    const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
-    const charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
   }
 }
