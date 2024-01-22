@@ -1,23 +1,21 @@
-import { ApiPromise, WsProvider } from "@polkadot/api";
+import { KeypairType } from "@polkadot/util-crypto/types";
+import { Client as TFClient } from "@threefold/tfchain_client";
 
-import { IServiceAliveness, ServiceStatus } from "../types";
+import { IDisconnectHandler, IServiceAliveness, ServiceStatus } from "../types";
 
-export class TFChainMonitor implements IServiceAliveness {
+export class TFChainMonitor implements IServiceAliveness, IDisconnectHandler {
   public readonly ServiceName = "TFChain";
-  public ServiceURL: string;
-  private _api: ApiPromise;
-  constructor(TFchainUrl: string) {
-    this.ServiceURL = TFchainUrl;
+  private _tfclient: TFClient;
+  constructor(TFchainUrl: string, mnemonic: string, keypairType: KeypairType) {
+    this._tfclient = new TFClient({ url: TFchainUrl, mnemonicOrSecret: mnemonic, keypairType: keypairType });
   }
   private async setUp() {
-    const provider = new WsProvider(this.ServiceURL, false);
-    await provider.connect();
-    this._api = await ApiPromise.create({ provider, throwOnConnect: true });
+    await this._tfclient?.connect();
   }
   public async isAlive(): Promise<ServiceStatus> {
     try {
-      if (!this._api) await this.setUp();
-      await this._api.rpc.system.version;
+      if (!this._tfclient.api) await this.setUp();
+      console.log(await this._tfclient.api.rpc.system.version());
       return {
         alive: true,
       };
@@ -27,5 +25,8 @@ export class TFChainMonitor implements IServiceAliveness {
         error,
       };
     }
+  }
+  public async disconnect() {
+    await this._tfclient.disconnect();
   }
 }
