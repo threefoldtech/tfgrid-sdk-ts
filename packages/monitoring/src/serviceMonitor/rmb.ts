@@ -2,7 +2,7 @@ import { KeypairType } from "@polkadot/util-crypto/types";
 import { Client as RMBClient } from "@threefold/rmb_direct_client";
 
 import { generateString } from "../helpers/utils";
-import { IServiceAliveness, ServiceStatus } from "./types/index";
+import { IServiceAliveness, ServiceStatus } from "../types";
 
 export class RMBMonitor implements IServiceAliveness {
   public readonly ServiceName = "RMB";

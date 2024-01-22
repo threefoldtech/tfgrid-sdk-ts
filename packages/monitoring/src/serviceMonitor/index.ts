@@ -1,4 +1,4 @@
 export { GridProxyMonitor } from "./gridproxy";
 export { TFChainMonitor } from "./tfChain";
 export { RMBMonitor } from "./rmb";
-export { TFservicesLiveChecker } from "./serviceMonitor";
+export { monitorServiceAliveness, checkServiceAliveness } from "./alivenessChecker";

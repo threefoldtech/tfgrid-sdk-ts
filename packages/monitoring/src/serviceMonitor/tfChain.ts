@@ -1,6 +1,6 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
 
-import { IServiceAliveness, ServiceStatus } from "./types";
+import { IServiceAliveness, ServiceStatus } from "../types";
 
 export class TFChainMonitor implements IServiceAliveness {
   public readonly ServiceName = "TFChain";
