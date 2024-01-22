@@ -20,6 +20,7 @@
 </template>
 
 <script lang="ts">
+import type { NodeStatus } from "@threefold/gridproxy_client";
 import { computed, onUnmounted, type PropType } from "vue";
 
 import { useAsync } from "../../hooks";
@@ -32,13 +33,14 @@ export default {
   props: {
     modelValue: Object as PropType<SelectedLocation>,
     title: String,
+    status: String as PropType<NodeStatus>,
   },
   emits: {
     "update:model-value": (value?: SelectedLocation) => true || value,
   },
   setup(props, ctx) {
     const selectedLocation = computed(() => props.modelValue || {});
-    const locationsTask = useAsync(getLocations, { init: true, default: {} });
+    const locationsTask = useAsync(getLocations, { init: true, default: {}, defaultArgs: [props.status] });
     const regions = computed(() => ["All Regions", ...Object.keys(locationsTask.value.data as Locations)]);
     const countries = computed(() => {
       const res = ["All Countries"];
@@ -73,7 +75,7 @@ export default {
       items: regions.value,
       modelValue: selectedLocation.value.region || regions.value[0],
       "onUpdate:model-value": updateRegion,
-      "onClick:clear": bindModelValue,
+      "onClick:clear": () => bindModelValue(),
     }));
 
     const countryProps = computed(() => ({

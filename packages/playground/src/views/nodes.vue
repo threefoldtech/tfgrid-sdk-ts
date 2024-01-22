@@ -6,56 +6,245 @@
   </div>
 
   <view-layout>
-    <filters
-      v-model:model-value="filterInputs"
-      :options="filterOptions"
-      :loading="loading"
-      v-model:valid="isValidForm"
-      @apply="applyFilters"
-      @reset="resetFilters"
-      @update:values="updateValues"
-    >
-      <template #options="{ props }">
-        <v-col v-bind="props">
-          <v-select
-            class="p-4"
-            v-model="filterOptions.status"
-            :items="nodeStatusOptions"
-            label="Select Nodes Status"
-            variant="outlined"
-            :disabled="isFormLoading"
-            open-on-clear
-            clearable
-          />
-        </v-col>
+    <TfFiltersContainer class="mb-4" @apply="loadNodes" :loading="loading">
+      <TfFilter
+        query-route="node-id"
+        :rules="[
+          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.min('The node id should be larger then zero.', 1),
+          validators.startsWith('The node id start with zero.', '0'),
+          validators.validateResourceMaxNumber('This is not a valid ID.'),
+        ]"
+        v-model="filters.nodeId"
+      >
+        <template #input="{ props }">
+          <VTextField label="Node ID" variant="outlined" v-model="filters.nodeId" v-bind="props">
+            <template #append-inner>
+              <VTooltip text="Filter by node id">
+                <template #activator="{ props }">
+                  <VIcon icon="mdi-information-outline" v-bind="props" />
+                </template>
+              </VTooltip>
+            </template>
+          </VTextField>
+        </template>
+      </TfFilter>
 
-        <v-col v-bind="props">
-          <input-tooltip inline tooltip="Enable filtering the nodes that have Gateway supported only.">
-            <v-switch
-              color="primary"
-              inset
-              label="Gateways (Only)"
-              v-model="filterOptions.gateway"
-              hide-details
-              :disabled="isFormLoading"
-            />
-          </input-tooltip>
-        </v-col>
+      <TfFilter
+        query-route="farm-id"
+        v-model="filters.farmId"
+        :rules="[
+          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.min('The ID should be larger than zero.', 1),
+          validators.isInt('should be an integer'),
+          validators.validateResourceMaxNumber('This is not a valid ID.'),
+        ]"
+      >
+        <template #input="{ props }">
+          <VTextField label="Farm ID" variant="outlined" v-model="filters.farmId" v-bind="props">
+            <template #append-inner>
+              <VTooltip text="Filter by farm id">
+                <template #activator="{ props }">
+                  <VIcon icon="mdi-information-outline" v-bind="props" />
+                </template>
+              </VTooltip>
+            </template>
+          </VTextField>
+        </template>
+      </TfFilter>
 
-        <v-col v-bind="{ ...props, class: `${props.class} py-0` }">
-          <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
-            <v-switch
-              color="primary"
-              inset
-              label="GPU Node (Only)"
-              v-model="filterOptions.gpu"
-              hide-details
-              :disabled="isFormLoading"
+      <TfFilter query-route="farm-name" v-model="filters.farmName">
+        <template #unwrap="{ colProps }">
+          <VCol v-bind="colProps">
+            <TfSelectFarm
+              inset-tooltip
+              variant="outlined"
+              tooltip="Filter by farm name."
+              :model-value="filters.farmName ? ({ name: filters.farmName } as any) : undefined"
+              @update:model-value="filters.farmName = $event?.name || ''"
             />
-          </input-tooltip>
-        </v-col>
-      </template>
-    </filters>
+          </VCol>
+        </template>
+      </TfFilter>
+
+      <TfSelectLocation
+        :model-value="{ region: filters.region, country: filters.country }"
+        @update:model-value="
+          filters.country = $event?.country || '';
+          filters.region = $event?.region || '';
+        "
+      >
+        <template #region="{ props }">
+          <TfFilter query-route="region" v-model="filters.region">
+            <TfSelectRegion :region-props="props" variant="outlined" />
+          </TfFilter>
+        </template>
+
+        <template #country="{ props }">
+          <TfFilter query-route="country" v-model="filters.country">
+            <TfSelectCountry :country-props="props" variant="outlined" />
+          </TfFilter>
+        </template>
+      </TfSelectLocation>
+
+      <TfFilter
+        query-route="min-ssd"
+        v-model="filters.minSSD"
+        :rules="[
+          validators.isNumeric('This field accepts numbers only.'),
+          validators.min('The total ssd should be larger then zero.', 1),
+          validators.validateResourceMaxNumber('This value is out of range.'),
+        ]"
+      >
+        <template #input="{ props }">
+          <VTextField label="Min SSD (GB)" variant="outlined" v-model="filters.minSSD" v-bind="props">
+            <template #append-inner>
+              <VTooltip text="Filter by the minimum total amount of SSD in the node.">
+                <template #activator="{ props }">
+                  <VIcon icon="mdi-information-outline" v-bind="props" />
+                </template>
+              </VTooltip>
+            </template>
+          </VTextField>
+        </template>
+      </TfFilter>
+
+      <TfFilter
+        query-route="min-hdd"
+        v-model="filters.minHDD"
+        :rules="[
+          validators.isNumeric('This field accepts numbers only.'),
+          validators.min('The total hdd should be larger then zero.', 1),
+          validators.validateResourceMaxNumber('This value is out of range.'),
+        ]"
+      >
+        <template #input="{ props }">
+          <VTextField label="Min HDD (GB)" variant="outlined" v-model="filters.minHDD" v-bind="props">
+            <template #append-inner>
+              <VTooltip text="Filter by the minimum total amount of HDD in the node.">
+                <template #activator="{ props }">
+                  <VIcon icon="mdi-information-outline" v-bind="props" />
+                </template>
+              </VTooltip>
+            </template>
+          </VTextField>
+        </template>
+      </TfFilter>
+
+      <TfFilter
+        query-route="min-ram"
+        v-model="filters.minRAM"
+        :rules="[
+          validators.isNumeric('This field accepts numbers only.'),
+          validators.min('The total ram should be larger then zero.', 1),
+          validators.validateResourceMaxNumber('This value is out of range.'),
+        ]"
+      >
+        <template #input="{ props }">
+          <VTextField label="Min RAM (GB)" variant="outlined" v-model="filters.minRAM" v-bind="props">
+            <template #append-inner>
+              <VTooltip text="Filter by the minimum total amount of RAM in the node.">
+                <template #activator="{ props }">
+                  <VIcon icon="mdi-information-outline" v-bind="props" />
+                </template>
+              </VTooltip>
+            </template>
+          </VTextField>
+        </template>
+      </TfFilter>
+
+      <TfFilter
+        query-route="free-ssd"
+        v-model="filters.freeSSD"
+        :rules="[
+          validators.isNumeric('This field accepts numbers only.'),
+          validators.min('The free ssd should be larger then zero.', 1),
+          validators.validateResourceMaxNumber('This value is out of range.'),
+        ]"
+      >
+        <template #input="{ props }">
+          <VTextField label="Free SSD (GB)" variant="outlined" v-model="filters.freeSSD" v-bind="props">
+            <template #append-inner>
+              <VTooltip text="Filter by the minimum available amount of SSD in the node.">
+                <template #activator="{ props }">
+                  <VIcon icon="mdi-information-outline" v-bind="props" />
+                </template>
+              </VTooltip>
+            </template>
+          </VTextField>
+        </template>
+      </TfFilter>
+
+      <TfFilter
+        query-route="free-hdd"
+        v-model="filters.freeHDD"
+        :rules="[
+          validators.isNumeric('This field accepts numbers only.'),
+          validators.min('The free hdd should be larger then zero.', 1),
+          validators.validateResourceMaxNumber('This value is out of range.'),
+        ]"
+      >
+        <template #input="{ props }">
+          <VTextField label="Free HDD (GB)" variant="outlined" v-model="filters.freeHDD" v-bind="props">
+            <template #append-inner>
+              <VTooltip text="Filter by the minimum available amount of HDD in the node.">
+                <template #activator="{ props }">
+                  <VIcon icon="mdi-information-outline" v-bind="props" />
+                </template>
+              </VTooltip>
+            </template>
+          </VTextField>
+        </template>
+      </TfFilter>
+
+      <TfFilter
+        query-route="free-ram"
+        v-model="filters.freeRAM"
+        :rules="[
+          validators.isNumeric('This field accepts numbers only.'),
+          validators.min('The free ram should be larger then zero.', 1),
+          validators.validateResourceMaxNumber('This value is out of range.'),
+        ]"
+      >
+        <template #input="{ props }">
+          <VTextField label="Free HDD (GB)" variant="outlined" v-model="filters.freeRAM" v-bind="props">
+            <template #append-inner>
+              <VTooltip text="Filter by the minimum available amount of RAM in the node.">
+                <template #activator="{ props }">
+                  <VIcon icon="mdi-information-outline" v-bind="props" />
+                </template>
+              </VTooltip>
+            </template>
+          </VTextField>
+        </template>
+      </TfFilter>
+
+      <TfFilter query-route="node-status" v-model="filters.status">
+        <v-select
+          :model-value="filters.status || undefined"
+          @update:model-value="filters.status = $event || ''"
+          :items="[
+            { title: 'Up', value: NodeStatus.Up },
+            { title: 'Down', value: NodeStatus.Down },
+            { title: 'Standby', value: NodeStatus.Standby },
+          ]"
+          label="Select Nodes Status"
+          item-title="title"
+          item-value="value"
+          variant="outlined"
+          clearable
+          @click:clear="filters.status = ''"
+        />
+      </TfFilter>
+
+      <TfFilter query-route="gateway" v-model="filters.gateway">
+        <v-switch color="primary" inset label="Gateways (Only)" v-model="filters.gateway" hide-details />
+      </TfFilter>
+
+      <TfFilter query-route="gpu" v-model="filters.gpu">
+        <v-switch color="primary" inset label="GPU Node (Only)" v-model="filters.gpu" hide-details />
+      </TfFilter>
+    </TfFiltersContainer>
 
     <div class="nodes mt-5">
       <div class="nodes-inner">
@@ -64,8 +253,16 @@
             <div class="table">
               <nodes-table
                 v-model="nodes"
-                v-model:size="filterOptions.size"
-                v-model:page="filterOptions.page"
+                :size="size"
+                @update:size="
+                  size = $event;
+                  loadNodes();
+                "
+                :page="page"
+                @update:page="
+                  page = $event;
+                  loadNodes();
+                "
                 :count="nodesCount"
                 :loading="loading"
                 v-model:selectedNode="selectedNodeId"
@@ -76,7 +273,6 @@
         </v-row>
       </div>
     </div>
-
     <div class="mx-auto mt-5 d-flex">
       <div class="mr-6">
         <v-chip color="success" class="mr-2">
@@ -99,8 +295,9 @@
         <span class="text-subtitle-2">You can rent it exclusively for your workloads</span>
       </div>
     </div>
+
     <node-details
-      :filter-options="filterOptions"
+      :filter-options="{ size, page, gpu: filters.gpu }"
       :nodeId="selectedNodeId"
       :openDialog="isDialogOpened"
       @close-dialog="closeDialog"
@@ -109,93 +306,93 @@
 </template>
 
 <script lang="ts">
-import { type GridNode, type NodesQuery, NodeStatus } from "@threefold/gridproxy_client";
-import { capitalize, computed, onMounted, ref, watch } from "vue";
+import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
+import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 import NodeDetails from "@/components/node_details.vue";
 import NodesTable from "@/components/nodes_table.vue";
 import router from "@/router";
-import {
-  type FilterInputs,
-  type FilterOptions,
-  type GridProxyRequestConfig,
-  type MixedFilter,
-  optionsInitializer,
-} from "@/types";
-import { inputsInitializer } from "@/utils/filter_nodes";
-import { getQueries, requestNodes } from "@/utils/get_nodes";
+import { requestNodes } from "@/utils/get_nodes";
+import { convertToBytes } from "@/utils/get_nodes";
+
+import TfFilter from "../components/filters/TfFilter.vue";
+import TfFiltersContainer from "../components/filters/TfFiltersContainer.vue";
+import TfSelectFarm from "../components/node_selector/TfSelectFarm.vue";
+import TfSelectLocation from "../components/node_selector/TfSelectLocation.vue";
 
 export default {
   components: {
     NodesTable,
     NodeDetails,
+    TfFiltersContainer,
+    TfFilter,
+    TfSelectFarm,
+    TfSelectLocation,
   },
   setup() {
-    const filterInputs = ref<FilterInputs>(inputsInitializer());
-    const filterOptions = ref<FilterOptions>(optionsInitializer(undefined, undefined, undefined));
-    const mixedFilters = computed<MixedFilter>(() => ({ inputs: filterInputs.value, options: filterOptions.value }));
+    const size = ref(window.env.PAGE_SIZE);
+    const page = ref(1);
+
+    const filters = ref({
+      nodeId: "",
+      farmId: "",
+      farmName: "",
+      minSSD: "",
+      minHDD: "",
+      minRAM: "",
+      freeSSD: "",
+      freeHDD: "",
+      freeRAM: "",
+      region: "",
+      country: "",
+      status: "",
+      gateway: false,
+      gpu: false,
+    });
 
     const loading = ref<boolean>(true);
-    const isFormLoading = ref<boolean>(true);
     const nodes = ref<GridNode[]>([]);
     const nodesCount = ref<number>(0);
-    const filtering = ref(false);
     const selectedNodeId = ref<number>(0);
 
     const isDialogOpened = ref<boolean>(false);
-    const isValidForm = ref<boolean>(true);
 
-    const nodeStatusOptions = [capitalize(NodeStatus.Up), capitalize(NodeStatus.Standby), capitalize(NodeStatus.Down)];
     const route = useRoute();
 
-    const _requestNodes = async (queries: Partial<NodesQuery> = {}, config: GridProxyRequestConfig) => {
-      if (isValidForm.value) {
-        loading.value = true;
-        isFormLoading.value = true;
-        try {
-          const { count, data } = await requestNodes(queries, config);
-          nodes.value = data;
-          nodesCount.value = count ?? 0;
-        } catch (err) {
-          console.log(err);
-        } finally {
-          loading.value = false;
-          isFormLoading.value = false;
-        }
+    async function loadNodes() {
+      loading.value = true;
+      try {
+        const { count, data } = await requestNodes(
+          {
+            page: page.value,
+            size: size.value,
+            retCount: true,
+            nodeId: +filters.value.nodeId || undefined,
+            farmIds: filters.value.farmId || undefined,
+            farmName: filters.value.farmName || undefined,
+            country: filters.value.country,
+            region: filters.value.region,
+            status: (filters.value.status as NodeStatus) || undefined,
+            freeHru: convertToBytes(filters.value.freeHDD),
+            freeMru: convertToBytes(filters.value.freeRAM),
+            freeSru: convertToBytes(filters.value.freeSSD),
+            totalHru: convertToBytes(filters.value.minHDD),
+            totalMru: convertToBytes(filters.value.minRAM),
+            totalSru: convertToBytes(filters.value.minSSD),
+            hasGpu: filters.value.gpu || undefined,
+            domain: filters.value.gateway || undefined,
+          },
+          { loadFarm: true },
+        );
+        nodes.value = data;
+        nodesCount.value = count ?? 0;
+      } catch (err) {
+        console.log(err);
+      } finally {
+        loading.value = false;
       }
-    };
-
-    const applyFilters = async (filtersInputValues: FilterInputs) => {
-      filtering.value = true;
-      filterInputs.value = filtersInputValues;
-
-      filterOptions.value = optionsInitializer(
-        filterOptions.value.status,
-        filterOptions.value.gpu,
-        filterOptions.value.gateway,
-      );
-
-      if (isValidForm.value) {
-        await updateNodes();
-      }
-      filtering.value = false;
-    };
-
-    const resetFilters = async (filtersInputValues: FilterInputs, reload: boolean) => {
-      filtering.value = true;
-      filterInputs.value = filtersInputValues;
-      filterOptions.value = optionsInitializer(undefined, undefined, undefined);
-      if (reload && isValidForm.value) {
-        await updateNodes();
-      }
-      filtering.value = false;
-    };
-
-    const updateNodes = async () => {
-      const queries = getQueries(mixedFilters.value);
-      await _requestNodes(queries, { loadFarm: true });
-    };
+    }
 
     const checkSelectedNode = async () => {
       if (route.query.nodeId) {
@@ -204,9 +401,13 @@ export default {
       }
     };
 
+    onMounted(checkSelectedNode);
+
     const closeDialog = () => {
       if (route.query.nodeId) {
-        router.replace(route.path);
+        const query = { ...router.currentRoute.value.query };
+        delete query.nodeId;
+        router.replace({ query });
       }
       isDialogOpened.value = false;
       selectedNodeId.value = 0;
@@ -217,54 +418,21 @@ export default {
       isDialogOpened.value = true;
     };
 
-    onMounted(async () => {
-      await checkSelectedNode();
-      const queries = getQueries(mixedFilters.value);
-      await _requestNodes(queries, { loadFarm: true });
-    });
-
-    const updateValues = (label: string, value: string) => {
-      if (label in filterOptions.value) {
-        Reflect.set(
-          filterOptions.value,
-          label,
-          value === "true" ? true : value === "false" ? false : (value as unknown as boolean),
-        );
-      } else {
-        const inputLabel = label as keyof typeof filterInputs.value;
-        filterInputs.value[inputLabel].value = value;
-      }
-    };
-
-    watch(
-      () => ({ ...filterOptions.value }),
-      async (newValue: FilterOptions, oldVal: FilterOptions) => {
-        if (oldVal.page != newValue.page || oldVal.size != newValue.size) {
-          loading.value = isFormLoading.value = true;
-          await updateNodes();
-          loading.value = isFormLoading.value = false;
-        }
-      },
-    );
-
     return {
       loading,
-      isFormLoading,
-      nodes,
       nodesCount,
+      nodes,
       selectedNodeId,
-      nodeStatusOptions,
-      filterInputs,
-      filterOptions,
-      isDialogOpened,
-      isValidForm,
-      updateNodes,
       openDialog,
       closeDialog,
       requestNodes,
-      applyFilters,
-      resetFilters,
-      updateValues,
+      isDialogOpened,
+
+      filters,
+      NodeStatus,
+      size,
+      page,
+      loadNodes,
     };
   },
 };
