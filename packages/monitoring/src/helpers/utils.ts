@@ -1,12 +1,11 @@
 import { RequestError } from "@threefold/types";
 import axios, { AxiosError } from "axios";
 
-export async function sendGetRequest(url: string, body: string, headers: Record<string, string>) {
+export async function sendGetRequest(url: string, headers?: Record<string, string>) {
   const options = {
     method: "get",
     url: url,
-    data: body,
-    headers: headers,
+    headers: headers || {},
   };
   try {
     return await axios(options);

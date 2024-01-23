@@ -9,7 +9,7 @@ export class GridProxyMonitor implements IServiceAliveness {
   }
   async isAlive(): Promise<ServiceStatus> {
     try {
-      await sendGetRequest(this.ServiceURL, "", {});
+      await sendGetRequest(this.ServiceURL);
       return {
         alive: true,
       };
