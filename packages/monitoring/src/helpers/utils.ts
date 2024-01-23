@@ -1,5 +1,6 @@
 import { RequestError } from "@threefold/types";
 import axios, { AxiosError } from "axios";
+import { ServiceStatus } from "src/types";
 
 export async function sendGetRequest(url: string, headers?: Record<string, string>) {
   const options = {
@@ -27,4 +28,13 @@ export function generateString(length: number): string {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
+}
+
+export async function resolveServiceStatus(promise: Promise<any>): Promise<ServiceStatus> {
+  try {
+    await promise;
+    return { alive: true };
+  } catch (error) {
+    return { alive: false, error };
+  }
 }

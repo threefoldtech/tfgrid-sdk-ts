@@ -1,4 +1,4 @@
-import { sendGetRequest } from "../helpers/utils";
+import { resolveServiceStatus, sendGetRequest } from "../helpers/utils";
 import { IServiceAliveness, ServiceStatus } from "../types";
 
 export class GraphQlMonitor implements IServiceAliveness {
@@ -8,16 +8,6 @@ export class GraphQlMonitor implements IServiceAliveness {
     this.ServiceURL = graphQlUrl;
   }
   async isAlive(): Promise<ServiceStatus> {
-    try {
-      await sendGetRequest(this.ServiceURL, "", {});
-      return {
-        alive: true,
-      };
-    } catch (error) {
-      return {
-        alive: false,
-        error,
-      };
-    }
+    return resolveServiceStatus(sendGetRequest(this.ServiceURL));
   }
 }
