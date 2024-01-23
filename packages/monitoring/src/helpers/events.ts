@@ -1,20 +1,19 @@
+import chalk from "chalk";
 import { EventEmitter } from "events";
 
-import { TextColor } from "../types";
-import { colorizeText } from "./utils";
 const events = new EventEmitter();
 type ServiceStatus = { [key: string]: boolean };
 
 const serviceStatusSummary: ServiceStatus = {};
-const ALIVE = colorizeText("Alive", TextColor.Green);
-const DOWN = colorizeText("Down", TextColor.Red);
+const ALIVE = chalk.green.bold("Alive");
+const DOWN = chalk.red.bold("Down");
 function logsHandler(msg) {
   console.log(msg);
 }
 
 function serviceDownHandler(serviceName: string, error: Error) {
-  console.log(`${colorizeText(serviceName + " is Down", TextColor.Red)}`);
-  console.log(colorizeText("* Error: " + error.message, TextColor.Gray));
+  console.log(`${chalk.red.bold(serviceName + " is Down")}`);
+  console.log(chalk.gray("* Error: " + error.message));
   serviceStatusSummary[serviceName] = false;
 }
 
@@ -25,7 +24,7 @@ function addToServiceSummary(serviceName: string, serviceIsAlive: boolean) {
 function printStatusSummary() {
   const serviceNames = Object.keys(serviceStatusSummary);
   const maxServiceNameLength = Math.max(...serviceNames.map(entry => entry.length));
-  console.log(colorizeText("Aliveness check summary:", TextColor.Blue));
+  console.log(chalk.blue.bold("Aliveness check summary:"));
   for (const service in serviceStatusSummary) {
     const padding = " ".repeat(maxServiceNameLength - service.length);
     console.log(`\t${service}${padding}: ${serviceStatusSummary[service] ? ALIVE : DOWN}`);
