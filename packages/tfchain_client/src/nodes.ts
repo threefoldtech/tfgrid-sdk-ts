@@ -35,7 +35,7 @@ interface IPConfigInterface {
   ip: string;
   gw: string;
 }
-interface PublicConfig {
+export interface PublicConfig {
   ip4: IPConfigInterface;
   ip6: IPConfigInterface;
   domain: string;
