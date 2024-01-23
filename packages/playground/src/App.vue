@@ -181,7 +181,7 @@
           </v-container>
         </DeploymentListManager>
         <TFNotification v-if="hasActiveProfile && hasGrid" />
-        <v-footer class="py-5">
+        <v-footer class="py-5 border">
           <v-container>
             <v-row justify="center" no-gutters>
               <v-col class="px-4 pr-10" cols="12" md="4" sm="12">
@@ -204,7 +204,7 @@
                 </div>
               </v-col>
               <v-col class="mx-3" cols="4" md="2">
-                <p class="text-subtitle-1" color="secondary">About Us</p>
+                <p color="primary" class="text-subtitle-1" >About Us</p>
                 <div>
                   <a
                     href="https://threefold.io/"
