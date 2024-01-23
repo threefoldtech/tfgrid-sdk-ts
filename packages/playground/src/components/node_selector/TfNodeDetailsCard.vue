@@ -38,13 +38,10 @@
 
     <template #title>
       Node ID: {{ node?.nodeId }}
-      <VTooltip
-        text="Node Serial Number"
-        v-if="node && node.serialNumber && node.serialNumber.toLowerCase() !== 'default string'"
-      >
+      <VTooltip text="Node Serial Number" v-if="node && node.serialNumber">
         <template #activator="{ props }">
           <VChip size="x-small" v-bind="props">
-            <span class="font-weight-bold" v-text="node.serialNumber" />
+            <span class="font-weight-bold" v-text="checkSerialNumber(node?.serialNumber)" />
           </VChip>
         </template>
       </VTooltip>
@@ -154,6 +151,14 @@ export default {
       };
     }
 
+    function checkSerialNumber(serialNumber: string) {
+      if (/\d/.test(serialNumber)) {
+        return serialNumber;
+      } else {
+        return "Unknown";
+      }
+    }
+
     const cruText = computed(() =>
       props.node ? `${props.node.used_resources.cru} / ${props.node.total_resources.cru} (Cores)` : "",
     );
@@ -161,7 +166,7 @@ export default {
     const sruText = computed(normalizeBytesResourse("sru"));
     const hruText = computed(normalizeBytesResourse("hru"));
 
-    return { flag, cruText, mruText, sruText, hruText };
+    return { flag, cruText, mruText, sruText, hruText, checkSerialNumber };
   },
 };
 </script>
