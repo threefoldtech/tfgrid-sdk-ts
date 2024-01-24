@@ -95,7 +95,7 @@
 
 <script lang="ts" setup>
 import { default as StellarSdk, StrKey } from "stellar-sdk";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useProfileManager } from "../stores";
@@ -140,6 +140,12 @@ onMounted(async () => {
     }
   } catch (e) {
     console.log(e);
+  }
+});
+
+watch(openWithdrawDialog, val => {
+  if (!val) {
+    resetForm();
   }
 });
 
@@ -222,6 +228,15 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
     loadingWithdraw.value = false;
     createCustomToast("Withdraw Failed!", ToastType.danger);
   }
+}
+
+function resetForm() {
+  openWithdrawDialog.value = false;
+  target.value = "";
+  amount.value = 2;
+  isValidSwap.value = false;
+  validatingAddress.value = false;
+  targetError.value = "";
 }
 </script>
 
