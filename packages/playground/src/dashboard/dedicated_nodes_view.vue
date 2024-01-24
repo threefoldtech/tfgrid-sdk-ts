@@ -5,43 +5,154 @@
         <v-icon size="30" class="pr-3">mdi-resistor-nodes</v-icon>
         <v-card-title class="pa-0" color="white">Dedicated Machines</v-card-title>
       </v-card>
-      <!-- Filters -->
-      <div class="pt-5">
-        <filters
-          v-model:model-value="filterInputs"
-          v-model:valid="isValidForm"
-          :loading="loading"
-          :options="filterOptions"
-          @apply="applyFilters"
-          @reset="resetFilters"
-          @update:values="updateValues"
-        >
-          <template #options="{ props }">
-            <v-col v-bind="props">
-              <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
-                <v-switch
-                  color="primary"
-                  inset
-                  label="GPU Node (Only)"
-                  v-model="filterOptions.gpu"
-                  hide-details
-                  :disabled="isFormLoading"
-                />
-              </input-tooltip>
-            </v-col>
-          </template>
-        </filters>
-      </div>
 
-      <!-- Table -->
+      <TfFiltersContainer class="my-6" @apply="loadNodes" :loading="loading">
+        <TfFilter
+          query-route="min-cpu"
+          v-model="filters.minCPU"
+          :rules="[
+            validators.isInt('This Field accepts only a valid number.'),
+            validators.min('This Field must be a number larger than 0.', 1),
+            validators.validateResourceMaxNumber('This value is out of range.'),
+          ]"
+        >
+          <template #input="{ props }">
+            <VTextField label="Min CPU (Cores)" variant="outlined" v-model="filters.minCPU" v-bind="props">
+              <template #append-inner>
+                <VTooltip text="Filter by the minimum total amount of CPU Cores in the node.">
+                  <template #activator="{ props }">
+                    <VIcon icon="mdi-information-outline" v-bind="props" />
+                  </template>
+                </VTooltip>
+              </template>
+            </VTextField>
+          </template>
+        </TfFilter>
+
+        <TfFilter
+          query-route="min-ram"
+          v-model="filters.minRAM"
+          :rules="[
+            validators.isNumeric('This field accepts numbers only.'),
+            validators.min('The total ram should be larger then zero.', 1),
+            validators.validateResourceMaxNumber('This value is out of range.'),
+          ]"
+        >
+          <template #input="{ props }">
+            <VTextField label="Min RAM (GB)" variant="outlined" v-model="filters.minRAM" v-bind="props">
+              <template #append-inner>
+                <VTooltip text="Filter by the minimum total amount of RAM in the node.">
+                  <template #activator="{ props }">
+                    <VIcon icon="mdi-information-outline" v-bind="props" />
+                  </template>
+                </VTooltip>
+              </template>
+            </VTextField>
+          </template>
+        </TfFilter>
+
+        <TfFilter
+          query-route="min-ssd"
+          v-model="filters.minSSD"
+          :rules="[
+            validators.isNumeric('This field accepts numbers only.'),
+            validators.min('The total ssd should be larger then zero.', 1),
+            validators.validateResourceMaxNumber('This value is out of range.'),
+          ]"
+        >
+          <template #input="{ props }">
+            <VTextField label="Min SSD (GB)" variant="outlined" v-model="filters.minSSD" v-bind="props">
+              <template #append-inner>
+                <VTooltip text="Filter by the minimum total amount of SSD in the node.">
+                  <template #activator="{ props }">
+                    <VIcon icon="mdi-information-outline" v-bind="props" />
+                  </template>
+                </VTooltip>
+              </template>
+            </VTextField>
+          </template>
+        </TfFilter>
+
+        <TfFilter
+          query-route="min-hdd"
+          v-model="filters.minHDD"
+          :rules="[
+            validators.isNumeric('This field accepts numbers only.'),
+            validators.min('The total hdd should be larger then zero.', 1),
+            validators.validateResourceMaxNumber('This value is out of range.'),
+          ]"
+        >
+          <template #input="{ props }">
+            <VTextField label="Min HDD (GB)" variant="outlined" v-model="filters.minHDD" v-bind="props">
+              <template #append-inner>
+                <VTooltip text="Filter by the minimum total amount of HDD in the node.">
+                  <template #activator="{ props }">
+                    <VIcon icon="mdi-information-outline" v-bind="props" />
+                  </template>
+                </VTooltip>
+              </template>
+            </VTextField>
+          </template>
+        </TfFilter>
+
+        <TfFilter
+          query-route="gpu-device-name"
+          v-model="filters.gpuDeviceName"
+          :rules="[
+            validators.pattern('GPU\'s device name only accepts letters and numbers.', {
+              pattern: /^[A-Za-z0-9[\]/,.]+$/,
+            }),
+          ]"
+        >
+          <template #input="{ props }">
+            <VTextField label="GPU's device name" variant="outlined" v-model="filters.gpuDeviceName" v-bind="props">
+              <template #append-inner>
+                <VTooltip text="Filter by GPU's device name.">
+                  <template #activator="{ props }">
+                    <VIcon icon="mdi-information-outline" v-bind="props" />
+                  </template>
+                </VTooltip>
+              </template>
+            </VTextField>
+          </template>
+        </TfFilter>
+
+        <TfFilter
+          query-route="gpu-device-vendor"
+          v-model="filters.gpuVendorName"
+          :rules="[
+            validators.pattern('GPU\'s device vendor only accepts letters and numbers.', {
+              pattern: /^[A-Za-z0-9[\]/,.]+$/,
+            }),
+          ]"
+        >
+          <template #input="{ props }">
+            <VTextField label="GPU's vendor name" variant="outlined" v-model="filters.gpuVendorName" v-bind="props">
+              <template #append-inner>
+                <VTooltip text="Filter by GPU's vendor name.">
+                  <template #activator="{ props }">
+                    <VIcon icon="mdi-information-outline" v-bind="props" />
+                  </template>
+                </VTooltip>
+              </template>
+            </VTextField>
+          </template>
+        </TfFilter>
+
+        <TfFilter query-route="gpu" v-model="filters.gpu">
+          <v-switch color="primary" inset label="GPU Node (Only)" v-model="filters.gpu" hide-details />
+        </TfFilter>
+      </TfFiltersContainer>
+
       <v-alert type="info" variant="tonal">
         Discounts are applied on hourly basis, you need to maintain at least the same balance you have or higher to
         unlock the discounts.
       </v-alert>
+
       <nodes-table
         @update-active-tab-value="updateActiveTabValue"
         @reload-table="reloadTable"
-        :options="filterOptions"
+        :options="{ page, size }"
         :nodes="nodes"
         :nodes-count="nodesCount"
         :loading="loading"
@@ -53,22 +164,14 @@
 <script lang="ts" setup>
 import { NodeStatus } from "@threefold/gridproxy_client";
 import { CertificationType } from "@threefold/gridproxy_client";
-import { onMounted, ref, watch } from "vue";
+import { ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import { useProfileManager } from "@/stores";
-import { type FilterOptions, optionsInitializer } from "@/types";
-import { type DedicatedNodeFilters, DedicatedNodeInitializer } from "@/utils/filter_nodes";
 import { convert } from "@/utils/get_nodes";
 import { getGrid } from "@/utils/grid";
 import { toGigaBytes } from "@/utils/helpers";
 
-const isValidForm = ref<boolean>(false);
-const filterInputs = ref<DedicatedNodeFilters>(DedicatedNodeInitializer());
-const filterOptions = ref<FilterOptions>(optionsInitializer(undefined, undefined, undefined));
-
-const isFormLoading = ref<boolean>(true);
-const filtering = ref(false);
 const loading = ref(false);
 
 const profileManager = useProfileManager();
@@ -89,56 +192,56 @@ const tabParams = {
   },
 };
 
-const applyFilters = async (filtersInputValues: DedicatedNodeFilters) => {
-  filtering.value = true;
-  filterInputs.value = filtersInputValues;
-  filterOptions.value = optionsInitializer(undefined, filterOptions.value.gpu, filterOptions.value.gateway);
-  if (isValidForm.value) {
-    await _loadData();
-  }
-  filtering.value = false;
-};
+const size = ref(window.env.PAGE_SIZE);
+const page = ref(1);
+const filters = ref({
+  minCPU: "",
+  minRAM: "",
+  minSSD: "",
+  minHDD: "",
+  gpuDeviceName: "",
+  gpuVendorName: "",
+  gpu: false,
+});
 
 const updateActiveTabValue = (newValue: number) => {
   activeTab.value = newValue;
+  loadNodes();
 };
 
-const _loadData = async () => {
+async function loadNodes() {
   const params = tabParams[activeTab.value as keyof typeof tabParams];
 
   if (!params) {
     return;
   }
 
+  if (filters.value.minCPU && !Number.isInteger(+filters.value.minCPU)) {
+    nodes.value = [];
+    nodesCount.value = 0;
+    return;
+  }
+
   loading.value = true;
-  isFormLoading.value = true;
+
   try {
-    const totalCruValue = filterInputs.value.total_cru.value;
-    if (totalCruValue !== undefined && !Number.isInteger(+totalCruValue)) {
-      loading.value = false;
-      nodes.value = [];
-      nodesCount.value = 0;
-      isFormLoading.value = false;
-      return;
-    }
     const data = await gridProxyClient.nodes.list({
       ...params,
-      size: filterOptions.value.size,
-      page: filterOptions.value.page,
-      totalSru: convert(filterInputs.value.total_sru.value),
-      totalMru: convert(filterInputs.value.total_mru.value),
-      totalHru: convert(filterInputs.value.total_hru.value),
-      totalCru: totalCruValue ? +totalCruValue : undefined,
-      gpuVendorName: filterInputs.value.gpu_vendor_name.value || "",
-      gpuDeviceName: filterInputs.value.gpu_device_name.value || "",
-      hasGpu: filterOptions.value.gpu ? filterOptions.value.gpu : undefined,
+      size: size.value,
+      page: page.value,
+      totalSru: convert(filters.value.minSSD),
+      totalMru: convert(filters.value.minRAM),
+      totalHru: convert(filters.value.minHDD),
+      totalCru: +filters.value.minCPU || undefined,
+      gpuVendorName: filters.value.gpuVendorName || undefined,
+      gpuDeviceName: filters.value.gpuDeviceName || undefined,
+      hasGpu: filters.value.gpu || undefined,
     });
 
     if (data.count === 0) {
       loading.value = false;
       nodes.value = [];
       nodesCount.value = 0;
-      isFormLoading.value = false;
       return;
     }
 
@@ -166,79 +269,29 @@ const _loadData = async () => {
 
     nodesCount.value = data.count ?? 0;
     loading.value = false;
-    isFormLoading.value = false;
   } catch (e) {
     console.log("Error: ", e);
     loading.value = false;
-    isFormLoading.value = false;
   }
-};
-
-async function reloadTable() {
-  await new Promise(resolve => {
-    setTimeout(resolve, 20000);
-  });
-  await _loadData();
 }
 
-onMounted(async () => {
-  await _loadData();
-});
-
-const resetFilters = async (filtersInputValues: DedicatedNodeFilters, reload: boolean) => {
-  filtering.value = true;
-  filterInputs.value = filtersInputValues;
-  filterOptions.value = optionsInitializer(undefined, undefined, undefined);
-  if (reload && isValidForm.value) {
-    await _loadData();
-  }
-  filtering.value = false;
-};
-
-const updateValues = (label: string, value: string) => {
-  if (label in filterOptions.value) {
-    Reflect.set(
-      filterOptions.value,
-      label,
-      value === "true" ? true : value === "false" ? false : (value as unknown as boolean),
-    );
-  } else {
-    const inputLabel = label as keyof typeof filterInputs.value;
-    filterInputs.value[inputLabel].value = value;
-  }
-};
-
-watch(
-  [activeTab],
-  async () => {
-    if (!filtering.value) {
-      await _loadData();
-    }
-  },
-  { deep: true },
-);
-
-watch(
-  () => ({ ...filterOptions.value }),
-  async (newValue: FilterOptions, oldVal: FilterOptions) => {
-    if (oldVal.page != newValue.page || oldVal.size != newValue.size) {
-      loading.value = isFormLoading.value = true;
-      await _loadData();
-      loading.value = isFormLoading.value = false;
-    }
-  },
-);
+function reloadTable() {
+  setTimeout(loadNodes, 20000);
+}
 </script>
 
 <script lang="ts">
-import Filters from "@/components/filter.vue";
 import NodesTable from "@/dashboard/components/dedicated_nodes_table.vue";
+
+import TfFilter from "../components/filters/TfFilter.vue";
+import TfFiltersContainer from "../components/filters/TfFiltersContainer.vue";
 
 export default {
   name: "Dedicated Node",
   components: {
     NodesTable,
-    Filters,
+    TfFiltersContainer,
+    TfFilter,
   },
 };
 </script>

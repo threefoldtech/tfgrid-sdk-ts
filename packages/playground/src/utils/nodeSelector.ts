@@ -1,5 +1,5 @@
 import type { FarmFilterOptions, FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
-import { NodeStatus } from "@threefold/gridproxy_client";
+import type { NodeStatus } from "@threefold/gridproxy_client";
 import type { DeepPartial } from "utility-types";
 import { z } from "zod";
 
@@ -16,9 +16,9 @@ import type {
   SelectionDetailsFiltersValidators,
 } from "../types/nodeSelector";
 
-export async function getLocations(): Promise<Locations> {
+export async function getLocations(status?: NodeStatus): Promise<Locations> {
   const countries = await gqlClient.countries({ name: true, subregion: true });
-  const stats = await gridProxyClient.stats.get({ status: NodeStatus.Up });
+  const stats = await gridProxyClient.stats.get({ status });
   const allowedCountriesList = Object.keys(stats.nodesDistribution);
 
   const locations: Locations = {};
@@ -40,7 +40,7 @@ export function normalizeFarmOptions(
     size: window.env.PAGE_SIZE,
     page: pagination.value.page,
     location: location || {},
-    twinId: gridStore.client.twinId,
+    twinId: gridStore.client?.twinId,
   };
 }
 
