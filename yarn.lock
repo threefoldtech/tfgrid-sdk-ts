@@ -13695,6 +13695,11 @@ log-update@^4.0.0:
     slice-ansi "^4.0.0"
     wrap-ansi "^6.2.0"
 
+logger-interceptor@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/logger-interceptor/-/logger-interceptor-1.0.0.tgz#2ff74b8c1017bfc2d15beb0027b906a086d2ad6a"
+  integrity sha512-dgL9YlR6GQRUdJI02/oKmtbCz4E5XcZOpw0xQ3qsFOx9geUZmd26cpO5j7+FODxLcClYVHKqym/1K0QW6bsufQ==
+
 loglevel@^1.6.8:
   version "1.8.1"
   resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.8.1.tgz#5c621f83d5b48c54ae93b6156353f555963377b4"
