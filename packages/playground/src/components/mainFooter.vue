@@ -17,13 +17,14 @@
             A peer-to-peer open-source Internet platform that connects users directly with local Internet capacity.
           </p>
           <div>
-            <v-btn v-for="icon in icons" :key="icon" class="" :icon="icon" variant="text"></v-btn>
+            <a href="https://github.com/threefoldtech/tfgrid-sdk-ts" target="_blank" :style="{ color: 'rgb(var(--v-footer-color)) !important' }"><v-btn  class="" icon="mdi-github" variant="text"></v-btn></a>
+            <a href="mailto:info@threefold.io" target="_blank" :style="{ color: 'rgb(var(--v-footer-color)) !important' }"><v-btn  class="" icon="mdi-email-outline" variant="text"></v-btn></a>
           </div>
         </v-col>
         <v-col class="mx-3" cols="4" md="2">
           <p color="primary" class="text-subtitle-1">About Us</p>
-          <div>
-            <a
+          <div >
+            <a 
               href="https://threefold.io/"
               color="anchor"
               variant="text"
@@ -46,8 +47,10 @@
           <p class="text-subtitle-1" color="secondary">Take Action</p>
           <div>
             <a
+            color="error"
               href="https://manual.grid.tf/threefold_token/buy_sell_tft/buy_sell_tft.html"
               class="app-link text-subtitle-2"
+              
               target="_blank"
               >Buy the Token</a
             >
@@ -120,4 +123,9 @@ export default {
   bottom: 0;
   width: 100%;
 }
+
+a {
+  color: 'rgb(var(--v-link-color))' !important;
+}
+
 </style>

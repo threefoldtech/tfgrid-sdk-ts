@@ -32,6 +32,9 @@ const vuetify = createVuetify({
           link: "#5695ff",
           anchor: "#d4d4d4",
         },
+        variables: {
+          "footer-color": "#fff",
+        },
       },
       light: {
         dark: false,
@@ -41,6 +44,9 @@ const vuetify = createVuetify({
           info: "#1AA18F",
           secondary: "#14A1B8",
           anchor: "#000000",
+        },
+        variables: {
+          "footer-color": "#333",
         },
       },
     },
