@@ -181,6 +181,7 @@
           </v-container>
         </DeploymentListManager>
         <TFNotification v-if="hasActiveProfile && hasGrid" />
+        <TfLogger />
       </v-main>
     </profile-manager-controller>
   </v-app>
@@ -192,8 +193,9 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
-import { useProfileManager } from "./stores/profile_manager";
+import TfLogger from "@/components/logger.vue";
 
+import { useProfileManager } from "./stores/profile_manager";
 const $route = useRoute();
 const $router = useRouter();
 const profileManager = useProfileManager();
