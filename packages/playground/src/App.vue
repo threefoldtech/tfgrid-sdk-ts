@@ -181,7 +181,7 @@
           </v-container>
         </DeploymentListManager>
         <TFNotification v-if="hasActiveProfile && hasGrid" />
-        <v-footer class="py-5 border">
+        <!-- <v-footer class="py-5 border">
           <v-container>
             <v-row justify="center" no-gutters>
               <v-col class="px-4 pr-10" cols="12" md="4" sm="12">
@@ -276,9 +276,11 @@
             <v-divider class="my-4" />
             <div class="text-center">{{ new Date().getFullYear() }} — ThreeFoldTech</div>
           </v-container>
-        </v-footer>
+        </v-footer> -->
+        <mainFooter />
       </v-main>
     </profile-manager-controller>
+    
   </v-app>
 </template>
 
@@ -515,6 +517,7 @@ import TfRouterView from "./components/TfRouterView.vue";
 import TfSwapPrice from "./components/TfSwapPrice.vue";
 import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
+import mainFooter from "./components/mainFooter.vue";
 
 interface AppRoute {
   title: string;
@@ -545,6 +548,7 @@ export default {
     ProfileManagerController,
     TfNavigationLoader,
     TfOfflineNotifier,
+    mainFooter,
   },
   data: () => ({
     icons: ["mdi-github", "mdi-email-outline"],
