@@ -1,20 +1,33 @@
 import { events } from "../helpers/events";
 import { IServiceAliveness } from "../types";
+import { disconnectServices } from "./disconnectHandler";
 
 /**
  * Monitors the aliveness of one or multiple services at a specified interval.
  *
- * @param services - An array of services to monitor.
- * @param interval - The interval, in minutes, between consecutive checks (default is 2 minutes).
+ * @param services - An array of services implementing the IServiceAliveness interface to be monitored.
+ * @param interval - The interval, in minutes, at which the services' aliveness will be checked. Defaults to 2 minutes.
+ *
+ * @throws Will throw an error if the provided services array is empty.
+ *
+ * @returns An object with a method `exitAndDisconnect` that can be used to stop the monitoring and disconnect services.
  *
  */
-export async function monitorServiceAliveness(services: IServiceAliveness[], interval = 2): Promise<void> {
-  // making sure we have at least one service to monitor
-  while (services.length) {
-    events.emit("logs", `Checking services status...`);
-    await checkServiceAliveness(services);
-    await new Promise(resolve => setTimeout(resolve, interval * 60 * 1000));
-  }
+export function monitorServiceAliveness(
+  services: IServiceAliveness[],
+  interval = 2,
+): { exitAndDisconnect: () => Promise<void> } {
+  if (!services.length) throw new Error("No services to monitor");
+
+  events.emit("logs", `Checking services status...`);
+  checkServiceAliveness(services);
+  const intervalId = setInterval(async () => await checkServiceAliveness(services), interval * 60 * 1000);
+
+  const exitAndDisconnect = async () => {
+    clearInterval(intervalId);
+    await disconnectServices(services);
+  };
+  return { exitAndDisconnect };
 }
 
 /**
