@@ -36,7 +36,8 @@
     "vuetify": "^3.1.15",
     "web-ssh-keygen": "^0.1.2",
     "zod": "^3.22.4",
-    "logger-interceptor": "1.0.0"
+    "logger-interceptor": "1.0.0",
+    "await-lock": "^2.2.2"
   },
   "devDependencies": {
     "@types/chart.js": "^2.9.38",

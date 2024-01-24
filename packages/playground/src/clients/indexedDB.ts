@@ -1,6 +1,9 @@
-type Indexed<T> = T extends object ? T & { id: number } : { id: number; data: T };
+import AwaitLock from "await-lock";
+
+export type Indexed<T> = { id: number; data: T };
 
 export class IndexedDBClient {
+  private readonly _lock = new AwaitLock();
   private readonly _name: string;
   private readonly _version: number;
   private readonly _storeName: string;
@@ -12,19 +15,27 @@ export class IndexedDBClient {
     this._storeName = storeName;
   }
 
-  public connect(): Promise<IDBDatabase> {
+  public async connect(): Promise<IDBDatabase> {
+    await this._lock.acquireAsync();
+
     return new Promise((res, rej) => {
       const request = indexedDB.open(this._name, this._version);
       request.onsuccess = () => {
         this._db = request.result;
+        this._lock.release();
         res(request.result);
       };
-      request.onerror = rej;
-      // request.onupgradeneeded = () => {
-      //   request.result.createObjectStore(this._storeName, {
-      //     autoIncrement: true,
-      //   });
-      // };
+
+      request.onerror = e => {
+        this._lock.release();
+        rej(e);
+      };
+
+      request.onupgradeneeded = () => {
+        request.result.createObjectStore(this._storeName, {
+          autoIncrement: true,
+        });
+      };
     });
   }
 
@@ -48,35 +59,45 @@ export class IndexedDBClient {
     });
   }
 
-  public write<T>(item: T): Promise<Indexed<T>> {
+  public async write<T>(item: T): Promise<Indexed<T>> {
+    await this._lock.acquireAsync();
     const store = this._createStore();
-    return this._promisify(store.put(item));
+    const id = await this._promisify<number>(store.put(item));
+    this._lock.release();
+    return { id, data: item };
   }
 
-  public count(): Promise<number> {
+  public async count(): Promise<number> {
+    await this._lock.acquireAsync();
     const store = this._createStore();
-    return this._promisify(store.count());
+    const res = await this._promisify<number>(store.count());
+    this._lock.release();
+    return res;
   }
 
-  public read<T>(id: number, size: number): Promise<Indexed<T>[]> {
+  public async read<T>(index: number, size: number): Promise<Indexed<T>[]> {
+    await this._lock.acquireAsync();
+
     return new Promise((res, rej) => {
       const store = this._createStore();
-      const query = store.openCursor(IDBKeyRange.bound(id, id + size));
+      const query = store.openCursor(IDBKeyRange.bound(index, index + size));
 
       const items: Indexed<T>[] = [];
       query.onsuccess = () => {
         const cursor = query.result;
         if (cursor) {
-          items.push(
-            typeof cursor.value === "object" ? { id: id++, ...cursor.value } : { id: id++, data: cursor.value },
-          );
+          items.push({ id: cursor.primaryKey as number, data: cursor.value });
           cursor.continue();
         } else {
+          this._lock.release();
           res(items);
         }
       };
 
-      query.onerror = rej;
+      query.onerror = e => {
+        this._lock.release();
+        rej(e);
+      };
     });
   }
 
