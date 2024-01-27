@@ -129,7 +129,11 @@ export default {
   cursor: pointer;
 }
 .v-footer {
-  position: sticky;
+  position: relative;
+  bottom: 0%;
+  left: 0%;
+  transform: translate(-0%, 38%);
+  width: 100%;
 }
 
 .mainfooter a {
