@@ -31,28 +31,6 @@
             ></a>
           </div>
         </v-col>
-        <v-col class="mx-3" cols="4" md="2">
-          <p color="primary" class="text-subtitle-1 footer_header">About Us</p>
-          <div>
-            <a
-              href="https://threefold.io/"
-              color="anchor"
-              variant="text"
-              class="app-link text-subtitle-2"
-              target="_blank"
-              >ThreeFold</a
-            >
-          </div>
-          <div>
-            <a href="https://www.threefold.io/blog/" class="app-link text-subtitle-2" target="_blank">Blog</a>
-          </div>
-          <div>
-            <a href="https://www.threefold.io/newsroom/" class="app-link text-subtitle-2" target="_blank">News Room</a>
-          </div>
-          <div>
-            <a href="https://www.threefold.io/community/" class="app-link text-subtitle-2" target="_blank">Community</a>
-          </div>
-        </v-col>
         <v-col class="" cols="4" md="2">
           <p class="text-subtitle-1 footer_header" color="secondary">Take Action</p>
           <div>
@@ -78,6 +56,29 @@
             >
           </div>
         </v-col>
+        <v-col class="mx-3" cols="4" md="2">
+          <p color="primary" class="text-subtitle-1 footer_header">About Us</p>
+          <div>
+            <a
+              href="https://threefold.io/"
+              color="anchor"
+              variant="text"
+              class="app-link text-subtitle-2"
+              target="_blank"
+              >ThreeFold</a
+            >
+          </div>
+          <div>
+            <a href="https://www.threefold.io/blog/" class="app-link text-subtitle-2" target="_blank">Blog</a>
+          </div>
+          <div>
+            <a href="https://www.threefold.io/newsroom/" class="app-link text-subtitle-2" target="_blank">News Room</a>
+          </div>
+          <div>
+            <a href="https://www.threefold.io/community/" class="app-link text-subtitle-2" target="_blank">Community</a>
+          </div>
+        </v-col>
+
         <v-col class="mx-3" cols="2">
           <p class="text-subtitle-1 footer_header" color="secondary">Contact</p>
           <div>
@@ -128,13 +129,14 @@ export default {
   cursor: pointer;
 }
 .v-footer {
-  position: relative;
-  bottom: 0;
-  width: 100%;
+  position: sticky;
 }
 
 .mainfooter a {
   color: rgb(var(--v-footer-color-link)) !important;
+}
+.mainfooter a:hover {
+  color: rgb(153, 153, 153) !important;
 }
 
 .footer_header {
