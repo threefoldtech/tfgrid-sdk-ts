@@ -1,5 +1,5 @@
 <template>
-  <v-footer class="py-5 border">
+  <v-footer class="py-5 mainfooter border">
     <v-container>
       <v-row justify="center" no-gutters>
         <v-col class="px-4 pr-10" cols="12" md="4" sm="12">
@@ -17,14 +17,24 @@
             A peer-to-peer open-source Internet platform that connects users directly with local Internet capacity.
           </p>
           <div>
-            <a href="https://github.com/threefoldtech/tfgrid-sdk-ts" target="_blank" :style="{ color: 'rgb(var(--v-footer-color)) !important' }"><v-btn  class="" icon="mdi-github" variant="text"></v-btn></a>
-            <a href="mailto:info@threefold.io" target="_blank" :style="{ color: 'rgb(var(--v-footer-color)) !important' }"><v-btn  class="" icon="mdi-email-outline" variant="text"></v-btn></a>
+            <a
+              href="https://github.com/threefoldtech/tfgrid-sdk-ts"
+              target="_blank"
+              :style="{ color: 'rgb(var(--v-footer-color-link)) !important' }"
+              ><v-btn class="" icon="mdi-github" variant="text"></v-btn
+            ></a>
+            <a
+              href="mailto:info@threefold.io"
+              target="_blank"
+              :style="{ color: 'rgb(var(--v-footer-color)) !important' }"
+              ><v-btn class="" icon="mdi-email-outline" variant="text"></v-btn
+            ></a>
           </div>
         </v-col>
         <v-col class="mx-3" cols="4" md="2">
-          <p color="primary" class="text-subtitle-1">About Us</p>
-          <div >
-            <a 
+          <p color="primary" class="text-subtitle-1 footer_header">About Us</p>
+          <div>
+            <a
               href="https://threefold.io/"
               color="anchor"
               variant="text"
@@ -44,13 +54,12 @@
           </div>
         </v-col>
         <v-col class="" cols="4" md="2">
-          <p class="text-subtitle-1" color="secondary">Take Action</p>
+          <p class="text-subtitle-1 footer_header" color="secondary">Take Action</p>
           <div>
             <a
-            color="error"
+              color="error"
               href="https://manual.grid.tf/threefold_token/buy_sell_tft/buy_sell_tft.html"
               class="app-link text-subtitle-2"
-              
               target="_blank"
               >Buy the Token</a
             >
@@ -70,7 +79,7 @@
           </div>
         </v-col>
         <v-col class="mx-3" cols="2">
-          <p class="text-subtitle-1" color="secondary">Contact</p>
+          <p class="text-subtitle-1 footer_header" color="secondary">Contact</p>
           <div>
             <a href="https://t.me/threefold" class="app-link text-subtitle-2" target="_blank">Main Chat</a>
           </div>
@@ -124,8 +133,12 @@ export default {
   width: 100%;
 }
 
-a {
-  color: 'rgb(var(--v-link-color))' !important;
+.mainfooter a {
+  color: rgb(var(--v-footer-color-link)) !important;
 }
 
+.footer_header {
+  color: rgb(var(--v-footer-color-header)) !important;
+  font-weight: 500;
+}
 </style>
