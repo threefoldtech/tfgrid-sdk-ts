@@ -100,7 +100,13 @@ export class IndexedDBClient {
       };
     });
   }
-
+  public async clear() {
+    await this._lock.acquireAsync();
+    const store = this._createStore();
+    const res = await this._promisify<number>(store.clear());
+    this._lock.release();
+    return res;
+  }
   public disconnect() {
     const db = this._assertConnection();
     db.close();

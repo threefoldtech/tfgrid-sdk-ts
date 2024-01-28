@@ -11,14 +11,38 @@
             ref="scroller"
             :items="logs"
             :min-item-size="54"
-            :style="{ height: openHeight - 64 + 'px', paddingBottom: '90px' }"
+            :style="{ height: openHeight - 64 + 'px' }"
             @resize="scrollToBottom()"
           >
+            <template #before>
+              <VContainer class="text-center pa-0">
+                <VBtn
+                  class="my-3"
+                  :disabled="logs.length === count"
+                  :loading="loadingLogs"
+                  @click="loadMoreLogs"
+                  color="secondary"
+                  variant="tonal"
+                  density="compact"
+                >
+                  Load More Logs
+                </VBtn>
+                <v-divider />
+              </VContainer>
+            </template>
             <template v-slot="{ item, index, active }">
               <DynamicScrollerItem :item="item" :active="active" :data-index="index" tag="v-list-item">
                 <LogMessage :log="item" />
                 <v-divider />
               </DynamicScrollerItem>
+            </template>
+            <template #after>
+              <VContainer class="text-center px-0 py-2">
+                <VBtn class="mr-4" :loading="loadingLogs" color="warning" variant="tonal" density="compact">
+                  Clear logs
+                </VBtn>
+                <VBtn :loading="loadingLogs" color="primary" variant="tonal" density="compact"> Download logs </VBtn>
+              </VContainer>
             </template>
           </DynamicScroller>
         </v-expansion-panel-text>
@@ -132,14 +156,25 @@ export default {
         scroller.value?.scrollToBottom();
       }
     }
-
+    const loadingLogs = ref(false);
+    function loadMoreLogs() {
+      if (!loadingLogs.value) {
+        loadingLogs.value = true;
+        loadLogs.value.run().finally(() => {
+          loadingLogs.value = false;
+        });
+      }
+    }
     return {
       scroller,
       logs,
+      count,
       debugOpened,
       bindDebugOpened,
       openHeight: OPEN_HEIGHT,
       scrollToBottom,
+      loadMoreLogs,
+      loadingLogs,
     };
   },
 };
