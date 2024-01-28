@@ -30,7 +30,12 @@
       />
     </VListItemSubtitle>
     <VListItemTitle class="text-wrap text-body-2 pb-3">
-      {{ normalizeLog(log.data.messages) }}
+      <LogMessageSerializer
+        v-for="(message, index) in log.data.messages"
+        :message="message"
+        :leading="index === 0"
+        :key="index"
+      />
     </VListItemTitle>
   </VListItem>
 </template>
@@ -41,9 +46,11 @@ import { type PropType, ref } from "vue";
 import type { Indexed } from "@/clients";
 
 import type { LoggerInstance } from "./logger.vue";
+import LogMessageSerializer from "./LogMessageSerializer.vue";
 
 export default {
   name: "LogMessage",
+  components: { LogMessageSerializer },
   props: {
     log: { type: Object as PropType<Indexed<LoggerInstance>>, required: true },
   },

@@ -1,8 +1,12 @@
 import AwaitLock from "await-lock";
 
+import { IndexedDBSerializer } from "./serializer";
+
 export type Indexed<T> = { id: number; data: T };
 
 export class IndexedDBClient {
+  public static readonly serializer = new IndexedDBSerializer();
+
   private readonly _lock = new AwaitLock();
   private readonly _name: string;
   private readonly _version: number;
