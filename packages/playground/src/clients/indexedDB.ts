@@ -100,6 +100,7 @@ export class IndexedDBClient {
       };
     });
   }
+
   public async clear() {
     await this._lock.acquireAsync();
     const store = this._createStore();
@@ -107,6 +108,7 @@ export class IndexedDBClient {
     this._lock.release();
     return res;
   }
+
   public disconnect() {
     const db = this._assertConnection();
     db.close();

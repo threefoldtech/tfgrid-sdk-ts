@@ -2,47 +2,49 @@
   <VBottomNavigation :height="debugOpened === 0 ? openHeight : undefined">
     <v-expansion-panels :model-value="debugOpened" @update:model-value="bindDebugOpened" :multiple="false">
       <v-expansion-panel eager>
-        <template #title>
+        <v-expansion-panel-title>
           <span class="text-subtitle-1">Console Logs ({{ logs.length }})</span>
-        </template>
+          <template v-slot:actions>
+            <VTooltip text="Download Logs">
+              <template #activator="{ props }">
+                <VBtn class="text-link" size="xs" v-bind="props" :disabled="debugOpened !== 0" @click.stop>
+                  <VIcon icon="mdi-download" />
+                </VBtn>
+              </template>
+            </VTooltip>
+            <VTooltip text="Clear Logs">
+              <template #activator="{ props }">
+                <VBtn class="text-error" size="xs" v-bind="props" :disabled="debugOpened !== 0" @click.stop>
+                  <VIcon icon="mdi-cancel" />
+                </VBtn>
+              </template>
+            </VTooltip>
+          </template>
+        </v-expansion-panel-title>
 
         <v-expansion-panel-text eager class="debug-container">
           <DynamicScroller
             ref="scroller"
             :items="logs"
-            :min-item-size="54"
-            :style="{ height: openHeight - 64 + 'px' }"
+            :min-item-size="1"
+            :style="{ height: openHeight - 64 + 'px', paddingBottom: '100px' }"
             @resize="scrollToBottom()"
           >
             <template #before>
-              <VContainer class="text-center pa-0">
-                <VBtn
-                  class="my-3"
-                  :disabled="logs.length === count"
-                  :loading="loadingLogs"
-                  @click="loadMoreLogs"
-                  color="secondary"
-                  variant="tonal"
-                  density="compact"
-                >
+              <div class="pa-2" v-if="page !== -1">
+                <VBtn class="w-100 text-secondary" :loading="loadLogs.loading" variant="tonal" @click="loadLogs.run()">
                   Load More Logs
                 </VBtn>
-                <v-divider />
-              </VContainer>
+              </div>
+
+              <v-divider />
             </template>
+
             <template v-slot="{ item, index, active }">
               <DynamicScrollerItem :item="item" :active="active" :data-index="index" tag="v-list-item">
                 <LogMessage :log="item" />
                 <v-divider />
               </DynamicScrollerItem>
-            </template>
-            <template #after>
-              <VContainer class="text-center px-0 py-2">
-                <VBtn class="mr-4" :loading="loadingLogs" color="warning" variant="tonal" density="compact">
-                  Clear logs
-                </VBtn>
-                <VBtn :loading="loadingLogs" color="primary" variant="tonal" density="compact"> Download logs </VBtn>
-              </VContainer>
             </template>
           </DynamicScroller>
         </v-expansion-panel-text>
@@ -119,11 +121,12 @@ export default {
 
     const page = ref(1);
     const loadLogs = useAsync(async () => {
-      const loadedLogs = await logsDBClient.read<LoggerInstance>(count.value - page.value * SIZE, SIZE);
+      const start = Math.max(1, count.value - page.value * SIZE);
+      const loadedLogs = await logsDBClient.read<LoggerInstance>(start, SIZE - 1);
       logs.value.unshift(...loadedLogs);
       page.value++;
 
-      if (count.value - page.value * SIZE <= 0) {
+      if (start === 1) {
         page.value = -1;
       }
     }, {});
@@ -136,10 +139,7 @@ export default {
         }
       }
 
-      _.log(...log.messages);
-
       const item = await logsDBClient.write(log);
-      count.value++;
       logs.value.push(item);
       scrollToBottom();
     });
@@ -156,15 +156,7 @@ export default {
         scroller.value?.scrollToBottom();
       }
     }
-    const loadingLogs = ref(false);
-    function loadMoreLogs() {
-      if (!loadingLogs.value) {
-        loadingLogs.value = true;
-        loadLogs.value.run().finally(() => {
-          loadingLogs.value = false;
-        });
-      }
-    }
+
     return {
       scroller,
       logs,
@@ -173,8 +165,8 @@ export default {
       bindDebugOpened,
       openHeight: OPEN_HEIGHT,
       scrollToBottom,
-      loadMoreLogs,
-      loadingLogs,
+      page,
+      loadLogs,
     };
   },
 };
