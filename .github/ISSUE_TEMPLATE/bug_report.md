@@ -12,15 +12,21 @@ Search for similar issues first, if not complete the following template
 
 ### Description
 
-A clear description of the bug, including relevant identifiers like:
+A clear description of the bug: 
 
-- **Twin ID**
+Must include any relevant identifiers like:
 
-- **Node ID**
+- **Network**:
 
-- **Farm ID**
+- **Version**:
 
-- **Contract ID**
+- **Twin ID**:
+
+- **Node ID**:
+
+- **Farm ID**:
+
+- **Contract ID**:
 
 ### Steps to reproduce
 
@@ -28,4 +34,14 @@ List of steps to reproduce the problem if it's a bug
 
 ### Logs/Alerts
 
-Logs/Alerts if available
+Must include if available:
+
+- Logs/Alerts.
+
+- Screenshots or screen records.
+ 
+- Contract or deployment details.
+  
+- if it's a solution error then SSH into the vm and run `zinit log`.
+  
+- Console Errors and Network Requests from developer tools (ctrl+shift+i or F12).
