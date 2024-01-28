@@ -162,7 +162,14 @@
         </v-toolbar>
 
         <DeploymentListManager>
-          <v-container fluid :style="{ paddingBottom: '100px' }">
+          <v-container
+            fluid
+            :style="{
+              paddingBottom: '100px',
+              minHeight: '70%',
+              maxHeight: '100%',
+            }"
+          >
             <div class="d-flex align-center">
               <v-btn
                 v-if="!openSidebar"
