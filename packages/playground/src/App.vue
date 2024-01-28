@@ -165,8 +165,8 @@
           <v-container
             fluid
             :style="{
-              paddingBottom: '100px',
-              minHeight: '70%',
+              paddingBottom: '50px',
+              minHeight: '85%',
               maxHeight: '100%',
             }"
           >
