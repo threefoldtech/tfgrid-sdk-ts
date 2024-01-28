@@ -188,7 +188,7 @@
           </v-container>
         </DeploymentListManager>
         <TFNotification v-if="hasActiveProfile && hasGrid" />
-        <mainFooter />
+        <main_footer />
       </v-main>
     </profile-manager-controller>
   </v-app>
@@ -419,7 +419,7 @@ import AppTheme from "./components/app_theme.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
 import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
 import FundsCard from "./components/funds_card.vue";
-import mainFooter from "./components/mainFooter.vue";
+import main_footer from "./components/main_footer.vue";
 import ProfileManagerController from "./components/profile_manager_controller.vue";
 import TFNotification from "./components/tf_notification.vue";
 import TfNavigationLoader from "./components/TfNavigationLoader.vue";
@@ -458,7 +458,7 @@ export default {
     ProfileManagerController,
     TfNavigationLoader,
     TfOfflineNotifier,
-    mainFooter,
+    main_footer,
   },
   data: () => ({
     icons: ["mdi-github", "mdi-email-outline"],
