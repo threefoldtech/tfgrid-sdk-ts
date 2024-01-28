@@ -7,45 +7,20 @@
         </template>
 
         <v-expansion-panel-text eager class="debug-container">
-          <v-virtual-scroll :items="logs" :height="openHeight - 64" :style="{ paddingBottom: '90px' }">
-            <template v-slot:default="{ item: log }">
-              <VListItem class="log-list-item py-0">
-                <template #prepend>
-                  <span
-                    class="text-uppercase mr-3 py-3 text-center border h-100"
-                    :class="{
-                      'text-primary': log.data.type === 'log',
-                      'text-error': log.data.type === 'error',
-                      'text-warning': log.data.type === 'warn',
-                      'text-blue': log.data.type === 'debug',
-                    }"
-                    :style="{
-                      width: '80px',
-                      borderTopWidth: '0 !important',
-                      borderBottomWidth: '0 !important',
-                      borderLeftWidth: '0 !important',
-                    }"
-                  >
-                    [{{ log.data.type }}]
-                  </span>
-                </template>
-                <VListItemSubtitle class="pt-3">{{ log.data.timestamp }}</VListItemSubtitle>
-                <VListItemTitle class="text-wrap pb-3">
-                  {{ normalizeLog(log.data.messages) }}
-                  <VBtn
-                    v-if="log.data.messages.join().length > 200"
-                    variant="plain"
-                    :text="collapsed ? 'Show More' : 'Show Less'"
-                    size="x-small"
-                    color="link"
-                    :ripple="false"
-                    @click="collapsed = !collapsed"
-                  />
-                </VListItemTitle>
-              </VListItem>
-              <v-divider />
+          <DynamicScroller
+            ref="scroller"
+            :items="logs"
+            :min-item-size="54"
+            :style="{ height: openHeight - 64 + 'px', paddingBottom: '90px' }"
+            @resize="scrollToBottom()"
+          >
+            <template v-slot="{ item, index, active }">
+              <DynamicScrollerItem :item="item" :active="active" :data-index="index" tag="v-list-item">
+                <LogMessage :log="item" />
+                <v-divider />
+              </DynamicScrollerItem>
             </template>
-          </v-virtual-scroll>
+          </DynamicScroller>
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
@@ -53,22 +28,29 @@
 </template>
 
 <script lang="ts">
+import "vue3-virtual-scroller/dist/vue3-virtual-scroller.css";
+
 import { type LoggerInstance as LI, LoggerInterceptor } from "logger-interceptor";
 import { ref } from "vue";
+import { DynamicScroller, DynamicScrollerItem } from "vue3-virtual-scroller";
 
 import { type Indexed, IndexedDBClient } from "@/clients";
 import { useAsync } from "@/hooks";
+
+import LogMessage from "./LogMessage.vue";
 
 const VERSION = 1;
 const KEY = "TF_LOGGER_V." + VERSION;
 const SIZE = window.env.PAGE_SIZE;
 const OPEN_HEIGHT = 600;
 
-type LoggerInstance = Omit<LI, "logger" | "date">;
+export type LoggerInstance = Omit<LI, "logger" | "date">;
 
 export default {
   name: "TfLogger",
+  components: { DynamicScroller, DynamicScrollerItem, LogMessage },
   setup() {
+    const scroller = ref();
     const debugOpened = ref<number>();
     function bindDebugOpened(value?: any): void {
       debugOpened.value = value;
@@ -135,24 +117,29 @@ export default {
       const item = await logsDBClient.write(log);
       count.value++;
       logs.value.push(item);
+      scrollToBottom();
     });
 
-    const collapsed = ref(true);
-    function normalizeLog(msgs: any[]): string {
-      const res = msgs.join(" ");
-      if (collapsed.value && res.length > 200) {
-        return res.slice(0, 200) + "...";
+    let _init_scroll = false;
+    function scrollToBottom() {
+      const el = scroller.value?.$el;
+      if (!el || el.scrollHeight === 0 || el.offsetHeight === 0) {
+        return;
       }
-      return res;
+
+      if (!_init_scroll || el.scrollTop === el.scrollHeight - el.offsetHeight) {
+        _init_scroll = true;
+        scroller.value?.scrollToBottom();
+      }
     }
 
     return {
+      scroller,
       logs,
-      collapsed,
-      normalizeLog,
       debugOpened,
       bindDebugOpened,
       openHeight: OPEN_HEIGHT,
+      scrollToBottom,
     };
   },
 };
