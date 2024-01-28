@@ -1,14 +1,14 @@
 <template>
-  <div :style="{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999 }">
-    <v-expansion-panels :model-value="[0]" class="mx-3" :style="{ width: '1050px' }">
+  <VBottomNavigation :height="debugOpened === 0 ? openHeight : undefined">
+    <v-expansion-panels :model-value="debugOpened" @update:model-value="bindDebugOpened" :multiple="false">
       <v-expansion-panel eager>
         <template #title>
           <span class="text-subtitle-1">Console Logs ({{ logs.length }})</span>
         </template>
 
-        <v-expansion-panel-text eager :style="{ maxHeight: '500px', overflowY: 'scroll' }">
-          <VList>
-            <template v-for="(log, index) in logs" :key="log.id">
+        <v-expansion-panel-text eager class="debug-container">
+          <v-virtual-scroll :items="logs" :height="openHeight - 64" :style="{ paddingBottom: '90px' }">
+            <template v-slot:default="{ item: log }">
               <VListItem class="log-list-item py-0">
                 <template #prepend>
                   <span
@@ -43,13 +43,13 @@
                   />
                 </VListItemTitle>
               </VListItem>
-              <v-divider v-if="logs.length - 1 !== index" />
+              <v-divider />
             </template>
-          </VList>
+          </v-virtual-scroll>
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
-  </div>
+  </VBottomNavigation>
 </template>
 
 <script lang="ts">
@@ -62,17 +62,31 @@ import { useAsync } from "@/hooks";
 const VERSION = 1;
 const KEY = "TF_LOGGER_V." + VERSION;
 const SIZE = window.env.PAGE_SIZE;
+const OPEN_HEIGHT = 600;
 
 type LoggerInstance = Omit<LI, "logger" | "date">;
 
 export default {
   name: "TfLogger",
   setup() {
+    const debugOpened = ref<number>();
+    function bindDebugOpened(value?: any): void {
+      debugOpened.value = value;
+
+      if (document !== null) {
+        if (value === 0) {
+          return document.querySelector("html")?.classList.add("v-overlay-scroll-blocked");
+        }
+
+        return document.querySelector("html")?.classList.remove("v-overlay-scroll-blocked");
+      }
+    }
+
     const logs = ref<Indexed<LoggerInstance>[]>([]);
     const interceptor = new LoggerInterceptor(console);
 
     const logsDBClient = new IndexedDBClient("TF_LOGGER_DB", VERSION, KEY);
-    const connectDB = useAsync(() => logsDBClient.connect(), {
+    /* const connectDB =  */ useAsync(() => logsDBClient.connect(), {
       init: true,
       onAfterTask({ error }) {
         if (error) {
@@ -136,6 +150,9 @@ export default {
       logs,
       collapsed,
       normalizeLog,
+      debugOpened,
+      bindDebugOpened,
+      openHeight: OPEN_HEIGHT,
     };
   },
 };
@@ -145,5 +162,9 @@ export default {
 .log-list-item .v-list-item__prepend {
   width: auto !important;
   height: 100%;
+}
+
+.debug-container .v-expansion-panel-text__wrapper {
+  padding: 0;
 }
 </style>
