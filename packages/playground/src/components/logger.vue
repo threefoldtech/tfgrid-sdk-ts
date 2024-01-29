@@ -14,7 +14,13 @@
             </VTooltip>
             <VTooltip text="Clear Logs">
               <template #activator="{ props }">
-                <VBtn class="text-error" size="xs" v-bind="props" :disabled="debugOpened !== 0" @click.stop>
+                <VBtn
+                  class="text-error"
+                  size="xs"
+                  v-bind="props"
+                  :disabled="debugOpened !== 0"
+                  @click.stop="clearLogs.run"
+                >
                   <VIcon icon="mdi-cancel" />
                 </VBtn>
               </template>
@@ -131,6 +137,14 @@ export default {
       }
     }, {});
 
+    const clearLogs = useAsync(async () => await logsDBClient.clear(), {
+      onAfterTask() {
+        page.value = 1;
+        logs.value = [];
+        logsCount.value.run();
+      },
+    });
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interceptor.on(async ({ logger: _, date: __, ...log }) => {
       if (import.meta.env.DEV) {
@@ -167,6 +181,7 @@ export default {
       scrollToBottom,
       page,
       loadLogs,
+      clearLogs,
     };
   },
 };
