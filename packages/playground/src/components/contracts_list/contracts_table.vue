@@ -93,13 +93,23 @@
     <v-card>
       <v-card-title class="text-h5 mt-2"> Contract lock Details</v-card-title>
       <v-card-text>
-        <v-row class="d-flex justify-center"> Amount Locked {{ contractLocked?.amountLocked.toFixed(4) }} TFTs. </v-row>
+        <v-row class="d-flex justify-center">
+          Amount Locked:
+          {{ contractLocked?.amountLocked ?? 0 > 0 ? contractLocked?.amountLocked.toFixed(4) : 0 }}
+          TFTs.
+        </v-row>
+
+        <v-alert v-if="contractLocked?.amountLocked == 0" class="ma-4" type="warning" variant="tonal"
+          >This contract is deployed on a dedicated node that is currently in a grace period and has no active billing
+          rate or locked TFTs.</v-alert
+        >
 
         <v-alert class="ma-4" type="info" variant="tonal"
           >The Contracts in Grace Period, which means that your workloads are suspended but not deleted; in order to
           resume your workloads and restore their functionality, Please fund your account with the amount mentioned
           above.</v-alert
         >
+
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn variant="outlined" color="anchor" class="mr-2 px-3" @click="contractStateDialog = false">
