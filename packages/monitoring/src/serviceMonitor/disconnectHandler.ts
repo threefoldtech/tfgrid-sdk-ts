@@ -1,11 +1,10 @@
 import { events } from "../helpers/events";
-import { RMBMonitor, TFChainMonitor } from "../index";
-import { IServiceAliveness } from "../types";
-export async function disconnectServices(services: IServiceAliveness[]): Promise<void> {
+import { IDisconnectHandler, ILivenessChecker } from "../types";
+export async function disconnectServices(services: ILivenessChecker[]): Promise<void> {
   for (const service of services) {
-    if (service instanceof RMBMonitor || service instanceof TFChainMonitor) {
-      events.emit("logs", `Disconnecting ${service.ServiceName}...`);
-      await service.disconnect();
+    if ("disconnect" in service) {
+      events.emit("logs", `Disconnecting ${service.disconnect}...`);
+      await (service as IDisconnectHandler).disconnect();
     }
   }
 }
