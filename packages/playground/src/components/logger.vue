@@ -11,7 +11,7 @@
                   class="text-link"
                   size="xs"
                   v-bind="props"
-                  :disabled="debugOpened !== 0"
+                  :disabled="debugOpened !== 0 || logs.length === 0"
                   @click.stop="downloadLogs"
                 >
                   <VIcon icon="mdi-download" />
@@ -24,8 +24,8 @@
                   class="text-error"
                   size="xs"
                   v-bind="props"
-                  :disabled="debugOpened !== 0"
-                  @click.stop="clearLogs.run"
+                  :disabled="debugOpened !== 0 || logs.length === 0"
+                  @click.stop="clearDialog = true"
                 >
                   <VIcon icon="mdi-cancel" />
                 </VBtn>
@@ -63,6 +63,17 @@
       </v-expansion-panel>
     </v-expansion-panels>
   </VBottomNavigation>
+  <v-dialog max-width="400px" v-model="clearDialog">
+    <v-card>
+      <v-card-title> Clear logs </v-card-title>
+      <v-card-item>This will delete all your logs. Be careful this operation is irreversible!</v-card-item>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn variant="outlined" @click="clearDialog = false"> Cancel </v-btn>
+        <v-btn variant="outlined" color="error" @click="clearLogs.run()"> clear </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script lang="ts">
@@ -77,7 +88,7 @@ import { useAsync } from "@/hooks";
 import { downloadAsFile } from "@/utils/helpers";
 
 import LogMessage from "./LogMessage.vue";
-
+const clearDialog = ref(false);
 const VERSION = 1;
 const KEY = "TF_LOGGER_V." + VERSION;
 const SIZE = window.env.PAGE_SIZE;
@@ -154,6 +165,8 @@ export default {
 
     const clearLogs = useAsync(async () => await logsDBClient.clear(), {
       onAfterTask() {
+        clearDialog.value = false;
+        debugOpened.value = undefined;
         page.value = 1;
         logs.value = [];
         logsCount.value.run();
@@ -206,6 +219,7 @@ export default {
 
     return {
       scroller,
+      clearDialog,
       logs,
       count,
       debugOpened,

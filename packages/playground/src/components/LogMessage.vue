@@ -58,7 +58,7 @@ export default {
   setup(_props) {
     const props = toRef(_props);
 
-    const collapsable = computed(() => props.value.log.data.message.length > 200);
+    const collapsable = computed(() => props.value.log.data.message?.length > 200);
     const collapsed = ref(true);
 
     return { collapsable, collapsed };
