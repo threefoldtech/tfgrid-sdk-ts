@@ -89,6 +89,27 @@
     </template>
   </weblet-layout>
 
+  <v-dialog width="800" v-model="contractStateDialog">
+    <v-card>
+      <v-card-title class="text-h5 mt-2"> Contract lock Details</v-card-title>
+      <v-card-text>
+        <v-row class="d-flex justify-center"> Amount Locked {{ contractLocked }} TFTs. </v-row>
+
+        <v-alert class="ma-4" type="info" variant="tonal"
+          >The Contracts in Grace Period, which means that your workloads are suspended but not deleted; in order to
+          resume your workloads and restore their functionality, Please fund your account with the amount mentioned
+          above.</v-alert
+        >
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn variant="outlined" color="anchor" class="mr-2 px-3" @click="contractStateDialog = false">
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+
   <v-dialog width="800" v-model="deletingDialog">
     <v-card>
       <v-card-title class="text-h5 mt-2"> Delete the following contracts? </v-card-title>
