@@ -6,120 +6,43 @@ export class IndexedDBSerializer {
     this.toString = this.toString.bind(this);
   }
 
-  public serialize(value: any): any {
+  public serialize(value: any): string {
     if (value === null) {
-      value = "OfType(`Null`)";
+      return "OfType(`Null`)";
     }
 
     if (value === undefined) {
-      value = "OfType(`undefined`)";
+      return "OfType(`undefined`)";
     }
 
     if (Array.isArray(value)) {
-      return this._of("Array", value.map(this.serialize));
+      return `Array(${value.length}) [${value.map(this.serialize).join(", ")}]`;
     }
 
     if (typeof value === "function") {
-      return this._of("Function", value.toString());
+      return `Function '${value.toString()}'`;
     }
 
     if (value instanceof Set) {
-      return this._of("Set", Array.from(value).map(this.serialize));
+      return `Set(${value.size}) {${Array.from(value).map(this.serialize).join(", ")}}`;
     }
 
     if (value instanceof Map) {
-      return this._of("Map", this._serializeMap(value));
-    }
-
-    if (typeof value === "object") {
-      return this._of("Object", this._serializeObj(value));
-    }
-
-    if (value && typeof value.toString === "string") {
-      return this._of("Literal", value.toString());
-    }
-
-    return this._of("Literal", String(value));
-  }
-
-  public isArray(value: any): value is { value: any[] } {
-    return this._isSerialized(value) && value.type === "Array";
-  }
-
-  public isFunction(value: any): value is { value: string } {
-    return this._isSerialized(value) && value.type === "Function";
-  }
-
-  public isObject(value: any): value is { value: [any, any][] } {
-    return this._isSerialized(value) && value.type === "Object";
-  }
-
-  public isSet(value: any): value is { value: any[] } {
-    return this._isSerialized(value) && value.type === "Set";
-  }
-
-  public isMap(value: any): value is { value: [any, any][] } {
-    return this._isSerialized(value) && value.type === "Map";
-  }
-
-  public isLiteral(value: any): value is { value: string } {
-    return this._isSerialized(value) && value.type === "Literal";
-  }
-
-  public ofType(type: SerializeTypes, value: any) {
-    return this._of(type, value);
-  }
-
-  public toString(message: any): string {
-    if (this.isLiteral(message) || this.isFunction(message)) {
-      return message.value;
-    }
-
-    if (this.isArray(message)) {
-      return `[${message.value.map(this.toString).join(", ")}]`;
-    }
-
-    if (this.isObject(message)) {
-      return `{${message.value.map(([key, value]) => this.toString(key) + ":" + this.toString(value)).join(", ")}}`;
-    }
-
-    if (this.isSet(message)) {
-      return `Set(${message.value.length}) [${message.value.map(this.toString).join(", ")}]`;
-    }
-
-    if (this.isMap(message)) {
-      return `Map(${message.value.length}) {${message.value
-        .map(([key, value]) => this.toString(key) + " => " + this.toString(value))
+      return `Map(${value.size}) {${Array.from(value)
+        .map(([k, v]) => `${this.serialize(k)} => ${this.serialize(v)}`)
         .join(", ")}}`;
     }
 
-    return `UnsupportedType(\`${message}\`)`;
-  }
-
-  private _of(type: SerializeTypes, value: any) {
-    return {
-      type,
-      value,
-    };
-  }
-
-  private _serializeObj(obj: object): any[] {
-    const res = [] as any[];
-    for (const [key, value] of Object.entries(obj)) {
-      res.push([this.serialize(key), this.serialize(value)]);
+    if (typeof value === "object") {
+      return `Object(${Object.keys(value).length}) {${Object.entries(value)
+        .map(([k, v]) => `"${this.serialize(k)}": ${this.serialize(v)}`)
+        .join(", ")}}`;
     }
-    return res;
-  }
 
-  private _serializeMap(map: Map<any, any>): any[] {
-    const res = [] as any[];
-    for (const [k, v] of map) {
-      res.push([this.serialize(k), this.serialize(v)]);
+    if (value && typeof value.toString === "string") {
+      return value.toString();
     }
-    return res;
-  }
 
-  private _isSerialized(obj: any): obj is { type: SerializeTypes; value: any } {
-    return typeof obj === "object" && typeof obj.type === "string";
+    return String(value);
   }
 }

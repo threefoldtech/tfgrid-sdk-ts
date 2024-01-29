@@ -23,19 +23,14 @@
       <span v-text="log.data.timestamp" />
       <VSpacer />
       <a
-        v-if="log.data.messages.join().length > 200"
+        v-if="log.data.message.length > 200"
         @click="collapsed = !collapsed"
         class="show-more-btn"
         v-text="collapsed ? 'show more' : 'show less'"
       />
     </VListItemSubtitle>
-    <VListItemTitle class="text-wrap text-body-2 pb-3">
-      <LogMessageSerializer
-        v-for="(message, index) in log.data.messages"
-        :message="message"
-        :leading="index === 0"
-        :key="index"
-      />
+    <VListItemTitle class="text-pre-wrap text-body-2 pb-3">
+      {{ log.data.message }}
     </VListItemTitle>
   </VListItem>
 </template>
@@ -46,11 +41,9 @@ import { type PropType, ref } from "vue";
 import type { Indexed } from "@/clients";
 
 import type { LoggerInstance } from "./logger.vue";
-import LogMessageSerializer from "./LogMessageSerializer.vue";
 
 export default {
   name: "LogMessage",
-  components: { LogMessageSerializer },
   props: {
     log: { type: Object as PropType<Indexed<LoggerInstance>>, required: true },
   },

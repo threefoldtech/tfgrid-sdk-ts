@@ -83,9 +83,7 @@ const KEY = "TF_LOGGER_V." + VERSION;
 const SIZE = window.env.PAGE_SIZE;
 const OPEN_HEIGHT = 600;
 
-export type LoggerInstance = Omit<LI, "logger" | "date">;
-
-const cLog = console.log.bind(console);
+export type LoggerInstance = Omit<LI & { message: string }, "logger" | "date" | "messages">;
 
 export default {
   name: "TfLogger",
@@ -171,8 +169,9 @@ export default {
       }
 
       const item = await logsDBClient.write({
-        ...log,
-        messages: log.messages.map(IndexedDBClient.serializer.serialize),
+        type: log.type,
+        timestamp: log.timestamp,
+        message: log.messages.map(IndexedDBClient.serializer.serialize).join(" ").replace(/\n\s/g, "\n"),
       });
 
       logs.value.push(item);
@@ -198,9 +197,8 @@ export default {
       let formatedLogs = "";
 
       for (const log of logs) {
-        formatedLogs += `[+] ${log.timestamp} [${log.type.toUpperCase()}] ${log.messages
-          .map(IndexedDBClient.serializer.toString)
-          .join(" ")}\n`;
+        const spaces = " ".repeat(5 - log.type.length);
+        formatedLogs += `[+] ${log.timestamp} [${log.type.toUpperCase()}]${spaces} ${log.message}\n`;
       }
 
       downloadAsFile("dashboard.logs", formatedLogs);
