@@ -2,8 +2,8 @@
   <VBottomNavigation :height="debugOpened === 0 ? openHeight : undefined">
     <v-expansion-panels :model-value="debugOpened" @update:model-value="bindDebugOpened" :multiple="false">
       <v-expansion-panel eager>
-        <v-expansion-panel-title>
-          <span class="text-subtitle-1">Dashboard Logs ({{ logs.length }})</span>
+        <v-expansion-panel-title :class="{ 'text-error': !!connectDB.error }">
+          <span class="text-subtitle-1"> Dashboard Logs ({{ logs.length }}) </span>
           <template v-slot:actions>
             <VTooltip text="Download Logs">
               <template #activator="{ props }">
@@ -11,7 +11,7 @@
                   class="text-link"
                   size="xs"
                   v-bind="props"
-                  :disabled="debugOpened !== 0 || logs.length === 0"
+                  :disabled="!!connectDB.error || debugOpened !== 0 || logs.length === 0"
                   @click.stop="downloadLogs"
                 >
                   <VIcon icon="mdi-download" />
@@ -24,7 +24,7 @@
                   class="text-error"
                   size="xs"
                   v-bind="props"
-                  :disabled="debugOpened !== 0 || logs.length === 0"
+                  :disabled="!!connectDB.error || debugOpened !== 0 || logs.length === 0"
                   @click.stop="clearDialog = true"
                 >
                   <VIcon icon="mdi-cancel" />
@@ -34,7 +34,7 @@
           </template>
         </v-expansion-panel-title>
 
-        <v-expansion-panel-text eager class="debug-container">
+        <v-expansion-panel-text eager class="debug-container" v-if="!connectDB.error">
           <DynamicScroller
             ref="scroller"
             :items="logs"
@@ -59,6 +59,16 @@
               </DynamicScrollerItem>
             </template>
           </DynamicScroller>
+        </v-expansion-panel-text>
+
+        <v-expansion-panel-text v-else>
+          <VAlert type="error" variant="tonal">
+            <span class="text-body-2">Failed to connect to logs database.</span>
+
+            <template #append>
+              <VBtn size="xs" variant="plain" @click="connectDB.run()" text="Reconnect" />
+            </template>
+          </VAlert>
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
@@ -119,16 +129,18 @@ export default {
     const interceptor = new LoggerInterceptor(console);
 
     const logsDBClient = new IndexedDBClient("TF_LOGGER_DB", VERSION, KEY);
-    /* const connectDB =  */ useAsync(() => logsDBClient.connect(), {
+    const connectDB = useAsync(() => logsDBClient.connect(), {
       init: true,
       async onAfterTask({ error }) {
         if (error) {
-          /* handle error */
           return;
         }
 
         await lastRecordIndex.value.run();
         await logsCount.value.run();
+
+        _interceptorQueue.forEach(interceptMessage);
+        _interceptorQueue = [];
       },
     });
 
@@ -150,6 +162,10 @@ export default {
 
     const page = ref(1);
     const loadLogs = useAsync(async () => {
+      if (connectDB.value.error) {
+        return;
+      }
+
       const lastIndex = lastRecordIndex.value.data as number;
       const countReset = Math.max(1, count.value - page.value * SIZE);
 
@@ -174,8 +190,20 @@ export default {
       },
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    interceptor.on(async ({ logger: _, date: __, ...log }) => {
+    interceptor.on(interceptMessage);
+
+    // This should be used if db failed to connect to be synced later
+    let _interceptorQueue: LI[] = [];
+
+    async function interceptMessage(instance: LI) {
+      if (connectDB.value.error) {
+        _interceptorQueue.push(instance);
+        return;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { logger: _, date: __, ...log } = instance;
+
       if (import.meta.env.DEV) {
         if (log.messages.map(String).join().includes("vite")) {
           return;
@@ -190,7 +218,7 @@ export default {
 
       logs.value.push(item);
       scrollToBottom();
-    });
+    }
 
     let _init_scroll = false;
     function scrollToBottom() {
@@ -219,6 +247,7 @@ export default {
     }
 
     return {
+      connectDB,
       scroller,
       clearDialog,
       logs,
