@@ -1,11 +1,12 @@
-interface IServiceInfo {
-  ServiceName: string;
+interface IServiceBase {
+  serviceName: () => string;
+  serviceUrl: () => string;
 }
 
 export interface IDisconnectHandler {
   disconnect: () => Promise<void>;
 }
-export interface IServiceAliveness extends IServiceInfo {
+export interface ILivenessChecker extends IServiceBase {
   isAlive: () => Promise<ServiceStatus>;
 }
 
