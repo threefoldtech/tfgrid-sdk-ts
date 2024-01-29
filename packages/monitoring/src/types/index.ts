@@ -1,12 +1,39 @@
+/**
+ * Represents a basic service interface.
+ */
 interface IServiceBase {
+  /**
+   * Returns the name of the service.
+   * @returns {string} The service name.
+   */
   serviceName: () => string;
+
+  /**
+   * Returns the URL of the service.
+   * @returns {string} The service URL.
+   */
   serviceUrl: () => string;
 }
 
+/**
+ * Represents a handler for disconnecting a service.
+ */
 export interface IDisconnectHandler {
+  /**
+   * Performs the disconnection from the service.
+   * @returns {Promise<void>} A promise that resolves when the disconnection is successful.
+   */
   disconnect: () => Promise<void>;
 }
+
+/**
+ * Represents a service with liveness checking capability.
+ */
 export interface ILivenessChecker extends IServiceBase {
+  /**
+   * Checks if the service is alive.
+   * @returns {Promise<ServiceStatus>} A promise that resolves with the current status of the service.
+   */
   isAlive: () => Promise<ServiceStatus>;
 }
 
