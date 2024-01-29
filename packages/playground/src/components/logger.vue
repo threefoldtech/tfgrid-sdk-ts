@@ -205,7 +205,7 @@ export default {
       const { logger: _, date: __, ...log } = instance;
 
       if (import.meta.env.DEV) {
-        if (log.messages.map(String).join().includes("vite")) {
+        if (log.messages.map(String).join().includes("vite") && log.type === "debug") {
           return;
         }
       }
