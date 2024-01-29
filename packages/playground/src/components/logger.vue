@@ -3,7 +3,7 @@
     <v-expansion-panels :model-value="debugOpened" @update:model-value="bindDebugOpened" :multiple="false">
       <v-expansion-panel eager>
         <v-expansion-panel-title :class="{ 'text-error': !!connectDB.error }">
-          <span class="text-subtitle-1"> Dashboard Logs ({{ logs.length }}) </span>
+          <span class="text-subtitle-1"> <VIcon icon="mdi-cog" /> Dashboard Logs ({{ logs.length }}) </span>
           <template v-slot:actions>
             <VTooltip text="Download Logs">
               <template #activator="{ props }">

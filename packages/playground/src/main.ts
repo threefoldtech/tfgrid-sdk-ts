@@ -17,8 +17,8 @@ app.config.errorHandler = error => {
   console.error(
     "[Uncaught Error]\n" +
       `- Message: ${normalizeError(error, "Something went wrong in dashboard app but we couldn't fetch it.")}\n` +
-      `- Stack: ${error && typeof error === "object" && "stack" in error ? error.stack : null}\n` +
-      `- Constructor: ${error && typeof error === "object" && "constructor" in error ? error.constructor.name : null}`,
+      `- Stack: ${error && typeof error === "object" ? Reflect.get(error, "stack") : null}\n` +
+      `- Constructor: ${error && typeof error === "object" ? error.constructor.name : null}`,
   );
 };
 
