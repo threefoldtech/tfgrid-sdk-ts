@@ -95,13 +95,14 @@
       <v-card-text>
         <v-row class="d-flex justify-center">
           Amount Locked:
-          {{ contractLocked?.amountLocked ?? 0 > 0 ? contractLocked?.amountLocked.toFixed(4) : 0 }}
+          {{ contractLocked?.amountLocked ?? 0 > 0 ? contractLocked?.amountLocked.toFixed(3) : 0 }}
           TFTs.
         </v-row>
 
         <v-alert v-if="contractLocked?.amountLocked == 0" class="ma-4" type="warning" variant="tonal"
-          >This contract is deployed on a dedicated node that is currently in a grace period and has no active billing
-          rate or locked TFTs.</v-alert
+          >This contract is deployed on a dedicated node currently in a grace period. The rent contract associated with
+          the node is also in a grace period, and there's no active billing rate or locked TFTs associated with
+          it.</v-alert
         >
 
         <v-alert class="ma-4" type="info" variant="tonal"
