@@ -3,6 +3,7 @@ export type SerializeTypes = "Array" | "Function" | "Object" | "Set" | "Map" | "
 export class IndexedDBSerializer {
   constructor() {
     this.serialize = this.serialize.bind(this);
+    this.toString = this.toString.bind(this);
   }
 
   public serialize(value: any): any {
@@ -67,6 +68,32 @@ export class IndexedDBSerializer {
 
   public ofType(type: SerializeTypes, value: any) {
     return this._of(type, value);
+  }
+
+  public toString(message: any): string {
+    if (this.isLiteral(message) || this.isFunction(message)) {
+      return message.value;
+    }
+
+    if (this.isArray(message)) {
+      return `[${message.value.map(this.toString).join(", ")}]`;
+    }
+
+    if (this.isObject(message)) {
+      return `{${message.value.map(([key, value]) => this.toString(key) + ":" + this.toString(value)).join(", ")}}`;
+    }
+
+    if (this.isSet(message)) {
+      return `Set(${message.value.length}) [${message.value.map(this.toString).join(", ")}]`;
+    }
+
+    if (this.isMap(message)) {
+      return `Map(${message.value.length}) {${message.value
+        .map(([key, value]) => this.toString(key) + " => " + this.toString(value))
+        .join(", ")}}`;
+    }
+
+    return `UnsupportedType(\`${message}\`)`;
   }
 
   private _of(type: SerializeTypes, value: any) {

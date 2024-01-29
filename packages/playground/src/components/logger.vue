@@ -7,7 +7,13 @@
           <template v-slot:actions>
             <VTooltip text="Download Logs">
               <template #activator="{ props }">
-                <VBtn class="text-link" size="xs" v-bind="props" :disabled="debugOpened !== 0" @click.stop>
+                <VBtn
+                  class="text-link"
+                  size="xs"
+                  v-bind="props"
+                  :disabled="debugOpened !== 0"
+                  @click.stop="downloadLogs"
+                >
                   <VIcon icon="mdi-download" />
                 </VBtn>
               </template>
@@ -68,6 +74,7 @@ import { DynamicScroller, DynamicScrollerItem } from "vue3-virtual-scroller";
 
 import { type Indexed, IndexedDBClient } from "@/clients";
 import { useAsync } from "@/hooks";
+import { downloadAsFile } from "@/utils/helpers";
 
 import LogMessage from "./LogMessage.vue";
 
@@ -77,6 +84,8 @@ const SIZE = window.env.PAGE_SIZE;
 const OPEN_HEIGHT = 600;
 
 export type LoggerInstance = Omit<LI, "logger" | "date">;
+
+const cLog = console.log.bind(console);
 
 export default {
   name: "TfLogger",
@@ -183,6 +192,20 @@ export default {
       }
     }
 
+    async function downloadLogs() {
+      const logs = await logsDBClient.readAll<LoggerInstance>();
+
+      let formatedLogs = "";
+
+      for (const log of logs) {
+        formatedLogs += `[+] ${log.timestamp} [${log.type.toUpperCase()}] ${log.messages
+          .map(IndexedDBClient.serializer.toString)
+          .join(" ")}\n`;
+      }
+
+      downloadAsFile("dashboard.logs", formatedLogs);
+    }
+
     return {
       scroller,
       logs,
@@ -194,6 +217,7 @@ export default {
       page,
       loadLogs,
       clearLogs,
+      downloadLogs,
     };
   },
 };

@@ -105,6 +105,14 @@ export class IndexedDBClient {
     });
   }
 
+  public async readAll<T>(): Promise<T[]> {
+    await this._lock.acquireAsync();
+    const store = this._createStore();
+    const res = await this._promisify<T[]>(store.getAll());
+    this._lock.release();
+    return res as any;
+  }
+
   public async getLastRecordIndex() {
     await this._lock.acquireAsync();
 
