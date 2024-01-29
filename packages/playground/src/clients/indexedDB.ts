@@ -101,6 +101,25 @@ export class IndexedDBClient {
     });
   }
 
+  public async getLastRecordIndex() {
+    await this._lock.acquireAsync();
+
+    return new Promise((res, rej) => {
+      const store = this._createStore();
+      const query = store.openCursor(null, "prev");
+
+      query.onsuccess = () => {
+        this._lock.release();
+        res(query.result?.primaryKey ?? 1);
+      };
+
+      query.onerror = e => {
+        this._lock.release();
+        rej(e);
+      };
+    });
+  }
+
   public async clear() {
     await this._lock.acquireAsync();
     const store = this._createStore();

@@ -102,14 +102,18 @@ export default {
     const logsDBClient = new IndexedDBClient("TF_LOGGER_DB", VERSION, KEY);
     /* const connectDB =  */ useAsync(() => logsDBClient.connect(), {
       init: true,
-      onAfterTask({ error }) {
+      async onAfterTask({ error }) {
         if (error) {
           /* handle error */
           return;
         }
-        logsCount.value.run();
+
+        await lastRecordIndex.value.run();
+        await logsCount.value.run();
       },
     });
+
+    const lastRecordIndex = useAsync(() => logsDBClient.getLastRecordIndex());
 
     const count = ref(0);
     const logsCount = useAsync(() => logsDBClient.count(), {
@@ -127,12 +131,16 @@ export default {
 
     const page = ref(1);
     const loadLogs = useAsync(async () => {
-      const start = Math.max(1, count.value - page.value * SIZE);
+      const lastIndex = lastRecordIndex.value.data as number;
+      const countReset = Math.max(1, count.value - page.value * SIZE);
+
+      const start = Math.max(1, lastIndex - page.value * SIZE + 1);
+
       const loadedLogs = await logsDBClient.read<LoggerInstance>(start, SIZE - 1);
       logs.value.unshift(...loadedLogs);
       page.value++;
 
-      if (start === 1) {
+      if (countReset === 1) {
         page.value = -1;
       }
     }, {});
