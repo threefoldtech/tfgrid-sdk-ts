@@ -1,13 +1,19 @@
 import { resolveServiceStatus, sendGetRequest } from "../helpers/utils";
-import { IServiceAliveness, ServiceStatus } from "../types";
+import { ILivenessChecker, ServiceStatus } from "../types";
 
-export class GridProxyMonitor implements IServiceAliveness {
-  public readonly ServiceName = "GridProxy";
-  public ServiceURL: string;
+export class GridProxyMonitor implements ILivenessChecker {
+  private _serviceName = "GridProxy";
+  private _serviceURL: string;
   constructor(gridProxyUrl: string) {
-    this.ServiceURL = gridProxyUrl;
+    this._serviceURL = gridProxyUrl;
+  }
+  serviceName() {
+    return this._serviceName;
+  }
+  serviceUrl() {
+    return this._serviceURL;
   }
   async isAlive(): Promise<ServiceStatus> {
-    return resolveServiceStatus(sendGetRequest(this.ServiceURL));
+    return resolveServiceStatus(sendGetRequest(this._serviceURL));
   }
 }

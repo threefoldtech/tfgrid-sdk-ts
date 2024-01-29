@@ -1,5 +1,5 @@
 import { events } from "../helpers/events";
-import { IServiceAliveness } from "../types";
+import { ILivenessChecker } from "../types";
 import { disconnectServices } from "./disconnectHandler";
 
 /**
