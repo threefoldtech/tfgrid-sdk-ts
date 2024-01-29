@@ -3,7 +3,7 @@
     <v-expansion-panels :model-value="debugOpened" @update:model-value="bindDebugOpened" :multiple="false">
       <v-expansion-panel eager>
         <v-expansion-panel-title>
-          <span class="text-subtitle-1">Console Logs ({{ logs.length }})</span>
+          <span class="text-subtitle-1">Dashboard Logs ({{ logs.length }})</span>
           <template v-slot:actions>
             <VTooltip text="Download Logs">
               <template #activator="{ props }">
@@ -63,14 +63,15 @@
       </v-expansion-panel>
     </v-expansion-panels>
   </VBottomNavigation>
+
   <v-dialog max-width="400px" v-model="clearDialog">
     <v-card>
-      <v-card-title> Clear logs </v-card-title>
-      <v-card-item>This will delete all your logs. Be careful this operation is irreversible!</v-card-item>
+      <VCardTitle v-text="'Clear Logs'" />
+      <VCardText v-text="'This will delete all your logs. Be careful this operation is irreversible!'" />
       <v-card-actions>
         <v-spacer />
-        <v-btn variant="outlined" @click="clearDialog = false"> Cancel </v-btn>
-        <v-btn variant="outlined" color="error" @click="clearLogs.run()"> clear </v-btn>
+        <v-btn variant="outlined" @click="clearDialog = false" text="Cancel" />
+        <v-btn variant="outlined" color="error" @click="clearLogs.run()" text="clear" />
       </v-card-actions>
     </v-card>
   </v-dialog>
