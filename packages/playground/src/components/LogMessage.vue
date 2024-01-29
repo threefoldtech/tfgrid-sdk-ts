@@ -23,20 +23,28 @@
       <span v-text="log.data.timestamp" />
       <VSpacer />
       <a
-        v-if="log.data.message.length > 200"
+        v-if="collapsable && !collapsed"
         @click="collapsed = !collapsed"
-        class="show-more-btn"
+        class="show-more-btn text-body-2"
         v-text="collapsed ? 'show more' : 'show less'"
       />
     </VListItemSubtitle>
     <VListItemTitle class="text-pre-wrap text-body-2 pb-3">
-      {{ log.data.message }}
+      {{ collapsable && collapsed ? log.data.message.slice(0, 200) : log.data.message }}
+      {{ collapsable && collapsed ? "..." : "" }}
+      <a
+        v-if="collapsable"
+        @click="collapsed = !collapsed"
+        class="show-more-btn"
+        v-text="collapsed ? 'show more' : 'show less'"
+      />
     </VListItemTitle>
   </VListItem>
 </template>
 
 <script lang="ts">
 import { type PropType, ref } from "vue";
+import { computed, toRef } from "vue";
 
 import type { Indexed } from "@/clients";
 
@@ -47,10 +55,13 @@ export default {
   props: {
     log: { type: Object as PropType<Indexed<LoggerInstance>>, required: true },
   },
-  setup() {
+  setup(_props) {
+    const props = toRef(_props);
+
+    const collapsable = computed(() => props.value.log.data.message.length > 200);
     const collapsed = ref(true);
 
-    return { collapsed };
+    return { collapsable, collapsed };
   },
 };
 </script>
