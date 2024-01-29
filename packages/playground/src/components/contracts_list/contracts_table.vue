@@ -93,7 +93,7 @@
     <v-card>
       <v-card-title class="text-h5 mt-2"> Contract lock Details</v-card-title>
       <v-card-text>
-        <v-row class="d-flex justify-center"> Amount Locked {{ contractLocked }} TFTs. </v-row>
+        <v-row class="d-flex justify-center"> Amount Locked {{ contractLocked?.amountLocked }} TFTs. </v-row>
 
         <v-alert class="ma-4" type="info" variant="tonal"
           >The Contracts in Grace Period, which means that your workloads are suspended but not deleted; in order to
