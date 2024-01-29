@@ -156,12 +156,16 @@ export default {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interceptor.on(async ({ logger: _, date: __, ...log }) => {
       if (import.meta.env.DEV) {
-        if (log.messages.join().includes("vite")) {
+        if (log.messages.map(String).join().includes("vite")) {
           return;
         }
       }
 
-      const item = await logsDBClient.write(log);
+      const item = await logsDBClient.write({
+        ...log,
+        messages: log.messages.map(IndexedDBClient.serializer.serialize),
+      });
+
       logs.value.push(item);
       scrollToBottom();
     });
