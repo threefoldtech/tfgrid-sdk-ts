@@ -1,12 +1,10 @@
 <template>
   <div :style="{ position: 'relative' }">
     <router-view v-slot="{ Component, route }">
-      <transition name="fade">
-        <div :key="route.path">
-          <component :is="Component" v-if="isAuth || route.meta.publicPath" />
-          <ConnectWalletLanding @openProfile="$emit('openProfile')" v-else />
-        </div>
-      </transition>
+      <div :key="route.path">
+        <component :is="Component" v-if="isAuth || route.meta.publicPath" />
+        <ConnectWalletLanding @openProfile="$emit('openProfile')" v-else />
+      </div>
     </router-view>
   </div>
 </template>

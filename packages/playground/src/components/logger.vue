@@ -116,12 +116,14 @@ export default {
     function bindDebugOpened(value?: any): void {
       debugOpened.value = value;
 
-      if (document !== null) {
+      const html = document?.querySelector("html");
+      if (html) {
         if (value === 0) {
-          return document.querySelector("html")?.classList.add("v-overlay-scroll-blocked");
+          return html.style.setProperty("overflow", "hidden");
         }
 
-        return document.querySelector("html")?.classList.remove("v-overlay-scroll-blocked");
+        html.style.removeProperty("overflow");
+        return;
       }
     }
 
