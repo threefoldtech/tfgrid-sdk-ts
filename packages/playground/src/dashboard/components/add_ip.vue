@@ -239,14 +239,25 @@ export default {
         if (IPs.value && IPs.value.length > 1) {
           const extrinsics: any[] = [];
           for (const ip in IPs.value) {
-            extrinsics.push(await gridStore.grid.tfchain.tfClient.farms.addFarmIp({ farmId, ip: IPs.value[ip], gw }));
+            extrinsics.push(
+              await gridStore.grid.tfchain.tfClient.farms.addFarmIp({
+                farmId,
+                ip: IPs.value[ip],
+                gw,
+              }),
+            );
           }
           await gridStore.grid.utility.batchAll({ extrinsics });
         } else {
-          await gridStore.grid.farms.addFarmIp({ farmId, ip: publicIP.value, gw });
+          await gridStore.grid.farms.addFarmIp({
+            farmId,
+            ip: publicIP.value,
+            gw,
+          });
         }
         context.emit("ip-added-successfully");
         createCustomToast("IP is added successfully.", ToastType.success);
+        showDialogue.value = false;
       } catch (error) {
         console.log(error);
         createCustomToast(`Failed to add IP. ${error}`, ToastType.danger);
