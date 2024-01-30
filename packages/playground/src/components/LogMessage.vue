@@ -23,14 +23,20 @@
       <span v-text="log.data.timestamp" />
       <VSpacer />
       <template v-if="collapsable">
-        <a
-          @click="collapsed = !collapsed"
-          class="show-more-btn text-body-2"
-          v-text="collapsed ? 'show more' : 'show less'"
-        />
+        <VBtn @click="collapsed = !collapsed" size="xs" class="pa-1 text-body-1 text-info">
+          <div class="d-flex align-center">
+            <VIcon :icon="collapsed ? 'mdi-chevron-down' : 'mdi-chevron-up'" class="mr-1 text-body-1" />
+            <span v-text="collapsed ? 'show more' : 'show less'" />
+          </div>
+        </VBtn>
         &nbsp;|&nbsp;
       </template>
-      <a @click="copyLog(log.data.message)" class="show-more-btn" v-text="'Copy'" />
+      <VBtn @click="copyLog(log.data.message)" size="xs" class="pa-1 text-link text-body-1">
+        <div class="d-flex align-center">
+          <VIcon icon="mdi-content-copy" size="xs" class="mr-1 text-caption" />
+          <span v-text="'Copy'" />
+        </div>
+      </VBtn>
     </VListItemSubtitle>
     <VListItemTitle class="text-pre-wrap text-body-2 pb-3">
       {{ log.data.message.slice(0, collapsable && collapsed ? 200 : 5_000) }}
