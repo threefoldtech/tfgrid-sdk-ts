@@ -107,7 +107,7 @@
       </v-navigation-drawer>
 
       <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
-        <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }">
+        <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1007, top: 0, left: 0, right: 0 }">
           <v-toolbar-title class="custom-toolbar-title">
             <v-img
               :src="`${
@@ -162,7 +162,14 @@
         </v-toolbar>
 
         <DeploymentListManager>
-          <v-container fluid :style="{ paddingBottom: '100px' }">
+          <v-container
+            fluid
+            :style="{
+              paddingBottom: '0px',
+              minHeight: '85%',
+              maxHeight: '100%',
+            }"
+          >
             <div class="d-flex align-center">
               <v-btn
                 v-if="!openSidebar"
@@ -181,6 +188,7 @@
           </v-container>
         </DeploymentListManager>
         <TFNotification v-if="hasActiveProfile && hasGrid" />
+        <MainFooter />
       </v-main>
     </profile-manager-controller>
   </v-app>
@@ -411,6 +419,7 @@ import AppTheme from "./components/app_theme.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
 import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
 import FundsCard from "./components/funds_card.vue";
+import MainFooter from "./components/main_footer.vue";
 import ProfileManagerController from "./components/profile_manager_controller.vue";
 import TFNotification from "./components/tf_notification.vue";
 import TfNavigationLoader from "./components/TfNavigationLoader.vue";
@@ -449,7 +458,11 @@ export default {
     ProfileManagerController,
     TfNavigationLoader,
     TfOfflineNotifier,
+    MainFooter,
   },
+  data: () => ({
+    icons: ["mdi-github", "mdi-email-outline"],
+  }),
 };
 </script>
 
