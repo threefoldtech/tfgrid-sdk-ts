@@ -191,15 +191,18 @@ const props = defineProps({
 });
 
 const rentContracts = ref<NormalizedContract[]>([]);
+const nodeIdsInRentContracts = ref<number[]>([]);
 
 onMounted(() => {
   rentContracts.value = props.contracts.value.filter(contract => contract.type === ContractType.RENT);
+  nodeIdsInRentContracts.value = rentContracts.value
+    .map(contract => contract.nodeId)
+    .filter(nodeId => nodeId !== undefined) as number[];
 });
 
 const isNodeInRentContracts = computed(() => {
   if (contractLocked.value && contractLocked.value.amountLocked === 0) {
-    const nodeIdsInRentContracts = rentContracts.value.map(contract => contract.nodeId);
-    return nodeIdsInRentContracts.includes(selectedItem.value.nodeId);
+    return nodeIdsInRentContracts.value.includes(selectedItem.value.nodeId);
   }
   return false;
 });
