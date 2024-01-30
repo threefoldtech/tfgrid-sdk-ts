@@ -116,6 +116,8 @@ export default {
     function bindDebugOpened(value?: any): void {
       debugOpened.value = value;
 
+      scroller.value?.scrollToBottom();
+
       const html = document?.querySelector("html");
       if (html) {
         if (value === 0) {
