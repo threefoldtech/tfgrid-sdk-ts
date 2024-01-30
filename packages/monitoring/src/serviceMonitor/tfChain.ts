@@ -4,25 +4,25 @@ import { Client as TFClient } from "@threefold/tfchain_client";
 import { IDisconnectHandler, ILivenessChecker, ServiceStatus } from "../types";
 
 export class TFChainMonitor implements ILivenessChecker, IDisconnectHandler {
-  private _serviceName = "TFChain";
-  private _serviceUrl: string;
-  private _tfclient: TFClient;
+  private name = "TFChain";
+  private url: string;
+  private tfClient: TFClient;
   constructor(tfChainUrl: string, mnemonic: string, keypairType: KeypairType) {
-    this._serviceUrl = tfChainUrl;
-    this._tfclient = new TFClient({ url: this._serviceUrl, mnemonicOrSecret: mnemonic, keypairType: keypairType });
+    this.url = tfChainUrl;
+    this.tfClient = new TFClient({ url: this.url, mnemonicOrSecret: mnemonic, keypairType: keypairType });
   }
   private async setUp() {
-    await this._tfclient?.connect();
+    await this.tfClient?.connect();
   }
   serviceName() {
-    return this._serviceName;
+    return this.name;
   }
   serviceUrl() {
-    return this._serviceUrl;
+    return this.url;
   }
   public async isAlive(): Promise<ServiceStatus> {
     try {
-      if (!this._tfclient.api) await this.setUp();
+      if (!this.tfClient.api) await this.setUp();
       return {
         alive: true,
       };
@@ -34,6 +34,6 @@ export class TFChainMonitor implements ILivenessChecker, IDisconnectHandler {
     }
   }
   public async disconnect() {
-    await this._tfclient.disconnect();
+    await this.tfClient.disconnect();
   }
 }

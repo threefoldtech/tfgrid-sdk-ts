@@ -2,19 +2,19 @@ import { resolveServiceStatus, sendGetRequest } from "../helpers/utils";
 import { ILivenessChecker, ServiceStatus } from "../types";
 
 export class GraphQlMonitor implements ILivenessChecker {
-  private _serviceName = "GraphQl";
-  private _serviceURL: string;
+  private readonly name = "GraphQl";
+  private readonly url: string;
   constructor(graphQlUrl: string) {
-    this._serviceURL = graphQlUrl;
+    this.url = graphQlUrl;
   }
   serviceName() {
-    return this._serviceName;
+    return this.name;
   }
   serviceUrl() {
-    return this._serviceURL;
+    return this.url;
   }
 
   async isAlive(): Promise<ServiceStatus> {
-    return resolveServiceStatus(sendGetRequest(this._serviceURL));
+    return resolveServiceStatus(sendGetRequest(this.url));
   }
 }

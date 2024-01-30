@@ -5,21 +5,21 @@ import { generateString, resolveServiceStatus } from "../helpers/utils";
 import { IDisconnectHandler, ILivenessChecker, ServiceStatus } from "../types";
 
 export class RMBMonitor implements ILivenessChecker, IDisconnectHandler {
-  private _serviceName = "RMB";
-  private _serviceURL: string;
+  private name = "RMB";
+  private url: string;
   private rmbClient: RMBClient;
   constructor(relayUrl: string, chainUrl: string, mnemonic: string, keypairType: KeypairType) {
-    this._serviceURL = relayUrl;
+    this.url = relayUrl;
     this.rmbClient = new RMBClient(chainUrl, relayUrl, mnemonic, generateString(10), keypairType, 0);
   }
   private async setUp() {
     await this.rmbClient.connect();
   }
   public serviceName() {
-    return this._serviceName;
+    return this.name;
   }
   public serviceUrl() {
-    return this._serviceURL;
+    return this.url;
   }
   public async isAlive(): Promise<ServiceStatus> {
     if (!this.rmbClient?.con?.OPEN) await this.setUp();
