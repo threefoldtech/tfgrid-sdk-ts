@@ -36,6 +36,18 @@ export class ServiceMonitor {
   }
 
   /**
+   * Disconnects services that implement the `IDisconnectHandler` interface.
+   * @returns A promise that resolves when all services are disconnected.
+   */
+  public async disconnect(): Promise<void> {
+    for (const service of this.services) {
+      if ("disconnect" in service) {
+        await (service as IDisconnectHandler).disconnect();
+      }
+    }
+  }
+
+  /**
    * Monitors the services at a regular interval and returns a function to exit and disconnect the monitoring.
    * @returns An object with a function `exitAndDisconnect` to stop the monitoring and disconnect services.
    */
@@ -52,7 +64,7 @@ export class ServiceMonitor {
      */
     const exitAndDisconnect = async (): Promise<void> => {
       clearInterval(intervalId);
-      await this.disconnectServices();
+      await this.disconnect();
     };
     return { exitAndDisconnect };
   }
@@ -62,18 +74,6 @@ export class ServiceMonitor {
    */
   public async pingService(): Promise<void> {
     await this.checkLivenessOnce();
-    await this.disconnectServices();
-  }
-
-  /**
-   * Disconnects services that implement the `IDisconnectHandler` interface.
-   * @returns A promise that resolves when all services are disconnected.
-   */
-  public async disconnectServices(): Promise<void> {
-    for (const service of this.services) {
-      if ("disconnect" in service) {
-        await (service as IDisconnectHandler).disconnect();
-      }
-    }
+    await this.disconnect();
   }
 }

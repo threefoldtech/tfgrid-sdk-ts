@@ -8,7 +8,7 @@ type ServiceStatus = { [key: string]: boolean };
 const ALIVE = chalk.green.bold("Alive");
 const DOWN = chalk.red.bold("Down");
 class MonitorEventEmitter extends EventEmitter {
-  private _summary: ServiceStatus = {};
+  private summary: ServiceStatus = {};
 
   constructor() {
     super();
@@ -36,20 +36,20 @@ class MonitorEventEmitter extends EventEmitter {
   private serviceDownHandler(serviceName: string, error: Error) {
     console.log(`${chalk.red.bold(serviceName + " is Down")}`);
     console.log(chalk.gray("* Error: " + error.message));
-    this._summary[serviceName] = false;
+    this.summary[serviceName] = false;
   }
 
   private addToServiceSummary(serviceName: string, serviceIsAlive: boolean) {
-    this._summary[serviceName] = serviceIsAlive;
+    this.summary[serviceName] = serviceIsAlive;
   }
 
   private printStatusSummary() {
-    const serviceNames = Object.keys(this._summary);
+    const serviceNames = Object.keys(this.summary);
     const maxServiceNameLength = Math.max(...serviceNames.map(entry => entry.length));
     console.log(chalk.blue.bold("Aliveness check summary:"));
-    for (const service in this._summary) {
+    for (const service in this.summary) {
       const padding = " ".repeat(maxServiceNameLength - service.length);
-      console.log(`\t${service}${padding}: ${this._summary[service] ? ALIVE : DOWN}`);
+      console.log(`\t${service}${padding}: ${this.summary[service] ? ALIVE : DOWN}`);
     }
   }
 }

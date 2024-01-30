@@ -3,17 +3,8 @@ async function HealthCheck() {
   try {
     const services = [
       new GridProxyMonitor("<FakeURL>"),
-      new TFChainMonitor(
-        "wss://tfchain.dev.grid.tf/ws",
-        "acoustic apology father noble strike brass print denial language effort measure carbon",
-        "sr25519",
-      ),
-      new RMBMonitor(
-        "wss://relay.dev.grid.tf",
-        "wss://tfchain.dev.grid.tf/ws",
-        "acoustic apology father noble strike brass print denial language effort measure carbon",
-        "sr25519",
-      ),
+      new TFChainMonitor("wss://tfchain.dev.grid.tf/ws", "mnemonic", "sr25519"),
+      new RMBMonitor("wss://relay.dev.grid.tf", "wss://tfchain.dev.grid.tf/ws", "mnemonic", "sr25519"),
     ];
     const serviceMonitor = new ServiceMonitor(services);
 
