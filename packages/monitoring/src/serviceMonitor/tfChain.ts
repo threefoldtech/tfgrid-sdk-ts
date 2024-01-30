@@ -23,7 +23,6 @@ export class TFChainMonitor implements ILivenessChecker, IDisconnectHandler {
   public async isAlive(): Promise<ServiceStatus> {
     try {
       if (!this._tfclient.api) await this.setUp();
-      console.log(await this._tfclient.api.rpc.system.version());
       return {
         alive: true,
       };
