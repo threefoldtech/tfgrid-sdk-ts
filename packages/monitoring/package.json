@@ -7,7 +7,7 @@
   "scripts": {
     "example": "yarn ts-node ./example/index.ts",
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest "
   },
   "author": "Omar Kassem",
   "private": false,
@@ -23,5 +23,10 @@
     "ts-node": "^10.9.1",
     "@threefold/tfchain_client": "^2.3.0-alpha6",
     "chalk": "4.1.2"
+  },
+  "devDependencies": {
+    "jest": "29.7.0",
+    "ts-jest": "29.1.2",
+    "@types/jest": "29.5.11"
   }
 }
