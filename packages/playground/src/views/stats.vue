@@ -24,12 +24,12 @@
               </v-btn>
             </v-alert>
           </v-col>
-          <v-col cols="7" class="mx-auto mt-15 pr-2">
+          <v-col xl="6" lg="6" md="12" cols="12" class="mx-auto mt-15 pr-2">
             <tf-map r="125" g="227" b="200" :nodes="nodesDistribution" />
           </v-col>
-          <v-divider class="v-divider--vertical mx-2 my-4" sm="0" />
-          <v-col v-if="Istats.length !== 0" class="d-flex flex-wrap justify-center">
-            <v-col v-for="item of Istats" :key="item.title" xl="4" lg="6" md="12" sm="12" cols="12" class="px-2 py-2">
+          <v-divider class="main_divider mx-1 my-4" vertical></v-divider>
+          <v-col v-if="Istats.length !== 0" class="d-flex flex-wrap justify-start">
+            <v-col v-for="item of Istats" :key="item.title" xl="4" lg="6" md="6" cols="12" class="px-0 py-0">
               <StatisticsCard :item="item" />
             </v-col>
           </v-col>
@@ -59,6 +59,36 @@ const nodesDistribution = ref<string>("");
 
 let stats: Stats | null | undefined = null;
 
+function mergeNodeDistribution(stats: Stats["nodesDistribution"][]) {
+  const keys = new Set(stats.map(obj => Object.keys(obj)).flat());
+
+  return Array.from(keys).reduce((res, key) => {
+    res[key] = 0;
+    stats.forEach(country => {
+      res[key] += country[key] ?? 0;
+    });
+    return res;
+  }, {} as { [key: string]: number });
+}
+
+function mergeStatsData(stats: Stats[]): Stats {
+  const res = stats[0];
+  for (let i = 1; i < stats.length; i++) {
+    res.accessNodes += stats[i].accessNodes;
+    res.dedicatedNodes += stats[i].dedicatedNodes;
+    res.gateways += stats[i].gateways;
+    res.nodes += stats[i].nodes;
+    res.totalCru += stats[i].totalCru;
+    res.totalHru += stats[i].totalHru;
+    res.totalMru += stats[i].totalMru;
+    res.totalSru += stats[i].totalSru;
+    res.gpus += stats[i].gpus;
+    res.nodesDistribution = mergeNodeDistribution([res.nodesDistribution, stats[i].nodesDistribution]);
+    res.countries = Object.keys(res.nodesDistribution).length;
+  }
+
+  return res;
+}
 const fetchStats = async () => {
   let retryCount = 0;
 
@@ -66,9 +96,9 @@ const fetchStats = async () => {
     try {
       loading.value = true;
       failed.value = false;
-      const data = await gridProxyClient.stats.get({ status: NodeStatus.Up });
-
-      return data as Stats;
+      const upStats = await gridProxyClient.stats.get({ status: NodeStatus.Up });
+      const standbyStats = await gridProxyClient.stats.get({ status: NodeStatus.Standby });
+      return mergeStatsData([upStats, standbyStats]);
     } catch (error) {
       if (retryCount < 3) {
         console.log("Error fetching stats:", error);
@@ -93,7 +123,7 @@ const fetchData = async () => {
       nodesDistribution.value = JSON.stringify(stats!.nodesDistribution);
       Istats.value = [
         { data: stats!.nodes, title: "Nodes Online", icon: "mdi-laptop" },
-        { data: stats!.dedicatedNodes, title: "Dedicated Nodes", icon: "mdi-resistor-nodes" },
+        { data: stats!.dedicatedNodes, title: "Dedicated Machines", icon: "mdi-resistor-nodes" },
         { data: stats!.farms, title: "Farms", icon: "mdi-tractor" },
         { data: stats!.countries, title: "Countries", icon: "mdi-earth" },
         { data: stats!.totalCru, title: "CPUs", icon: "mdi-cpu-64-bit" },
@@ -117,3 +147,11 @@ const fetchData = async () => {
 
 onMounted(fetchData);
 </script>
+
+<style scoped>
+@media (max-width: 1280px) {
+  .main_divider {
+    visibility: hidden;
+  }
+}
+</style>

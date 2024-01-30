@@ -18,13 +18,29 @@
         d.getElementsByTagName("head")[0].appendChild(s);
       })();
     </script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"
+      integrity="sha512-jEnuDt6jfecCjthQAJ+ed0MTVA++5ZKmlUcmDGBv2vUI/REn6FuIdixLNnQT+vKusE2hhTk2is3cFvv5wA+Sgg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <link rel="stylesheet" href="/loader/loader.css" />
   </head>
   <body>
     <div class="app-loader-dialog active">
       <div class="app-loader-container">
-        <img class="app-loader-logo" src="/images/logoTF.png" alt="logo" />
-        <span class="app-loader active"></span>
+        <div style="width: 50px" id="animation-container"></div>
+        <script>
+          var animation = bodymovin.loadAnimation({
+            container: document.getElementById("animation-container"),
+            path: "/images/tfloading.json",
+            renderer: "svg",
+            loop: true,
+            autoplay: true,
+            name: "Demo Animation",
+          });
+        </script>
+        <img class="logo_load" src="/images/logo_text.png" alt="logo" />
         <span class="app-loader-msg">Loading dashboard. Please wait...</span>
         <button class="app-loader-refresh">Refresh</button>
       </div>
@@ -34,3 +50,9 @@
     <script src="/loader/loader.js"></script>
   </body>
 </html>
+<style>
+  .logo_load{
+    margin-top: 20px;
+    width: 160px;
+  }
+</style>

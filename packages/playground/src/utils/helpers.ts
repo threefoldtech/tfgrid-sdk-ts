@@ -9,9 +9,16 @@ export function downloadAsFile(name: string, data: string) {
   a.remove();
 }
 
-export function downloadAsJson(data: object) {
+/**
+ * Downloads a file with the given name and data.
+ *
+ * @param data - The data to be included in the file.
+ * @param filename - The name of the file to be downloaded.
+ * @returns void
+ */
+export function downloadAsJson(data: object, filename: string) {
   const a = document.createElement("a");
-  a.download = "contracts.json";
+  a.download = `${filename}.json`;
   a.href = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data))}`;
   document.body.appendChild(a);
   a.click();

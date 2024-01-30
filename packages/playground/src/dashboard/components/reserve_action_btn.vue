@@ -50,7 +50,7 @@ import { type PropType, ref } from "vue";
 import { useProfileManager } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { getGrid } from "@/utils/grid";
-import { normalizeError } from "@/utils/helpers";
+import { notifyDelaying } from "@/utils/notifications";
 
 const profileManager = useProfileManager();
 
@@ -91,7 +91,7 @@ export default {
           loadingUnreserveNode.value = false;
           openUnreserveDialog.value = false;
           loadingUnreserveBtn.value = true;
-          createCustomToast("Table may take sometime to update the changes", ToastType.info);
+          notifyDelaying();
           emit("updateTable");
           disableButton.value = true;
           setTimeout(() => {
@@ -118,7 +118,7 @@ export default {
         createCustomToast("Transaction Submitted", ToastType.info);
         await grid?.nodes.reserve({ nodeId: +props.node.nodeId });
         createCustomToast(`Transaction succeeded node ${props.node.nodeId} Reserved`, ToastType.success);
-        createCustomToast("Table may take sometime to update the changes", ToastType.info);
+        notifyDelaying();
         emit("updateTable");
         disableButton.value = true;
         setTimeout(() => {

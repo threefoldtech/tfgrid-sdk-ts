@@ -5,14 +5,10 @@ import { getClient } from "../client_loader";
 import { log } from "../utils";
 
 async function createAccount(client, account) {
-  try {
-    const res = await client.tfchain.create(account);
-    log("================= Creating account =================");
-    log(res);
-    log("================= Creating account =================");
-  } catch (error) {
-    log("Error while creating account" + error);
-  }
+  const res = await client.tfchain.create(account);
+  log("================= Creating account =================");
+  log(res);
+  log("================= Creating account =================");
 }
 
 async function main() {

@@ -11,7 +11,7 @@ import { byCountry } from "country-code-lookup";
 import { ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
-import type { MixedFilter, NodeStatusColor, NodeTypeColor } from "@/types";
+import type { NodeStatusColor, NodeTypeColor } from "@/types";
 const requestPageNumber = ref<number>(1);
 const offlineNodes = ref<NodeInfo[]>([]);
 type NodeFilters = FilterOptions & {
@@ -92,11 +92,14 @@ export const getNodeStatusColor = (status: string): NodeStatusColor => {
   }
 };
 
-export const getNodeTypeColor = (dedicated: boolean): NodeTypeColor => {
-  if (dedicated) {
-    return { color: "primary", type: "dedicated" };
-  } else {
+export const getNodeTypeColor = (dedicated: boolean, rentedByTwinId: number): NodeTypeColor => {
+  if (!dedicated) {
     return { color: "success", type: "shared" };
+  }
+  if (dedicated && rentedByTwinId === 0) {
+    return { color: "primary", type: "Rentable" };
+  } else {
+    return { color: "warning", type: "Rented" };
   }
 };
 
@@ -173,27 +176,4 @@ export function convert(value: string | undefined) {
   return value ? Math.ceil(toBytes(+value)) : undefined;
 }
 
-export const getQueries = (mixedFilters: MixedFilter): Partial<NodesQuery> => {
-  const options: Partial<NodesQuery> = {
-    retCount: true,
-    nodeId: +mixedFilters.inputs.nodeId.value! || undefined,
-    farmIds: mixedFilters.inputs.farmIds.value,
-    farmName: mixedFilters.inputs.farmName.value,
-    country: mixedFilters.inputs.country.value,
-    status: mixedFilters.options.status ? (mixedFilters.options.status.toLocaleLowerCase() as NodeStatus) : undefined,
-    page: mixedFilters.options.page,
-    size: mixedFilters.options.size,
-    freeHru: convert(mixedFilters.inputs.freeHru.value),
-    freeMru: convert(mixedFilters.inputs.freeMru.value),
-    freeSru: convert(mixedFilters.inputs.freeSru.value),
-    totalHru: convert(mixedFilters.inputs.totalHru.value),
-    totalMru: convert(mixedFilters.inputs.totalMru.value),
-    totalSru: convert(mixedFilters.inputs.totalSru.value),
-    hasGpu: mixedFilters.options.gpu ? mixedFilters.options.gpu : undefined,
-  };
-  if (mixedFilters.options.gateway) {
-    options.domain = mixedFilters.options.gateway;
-    options.ipv4 = mixedFilters.options.gateway;
-  }
-  return options;
-};
+export const convertToBytes = convert;

@@ -8,7 +8,7 @@ import type * as validators from "../utils/validators";
 // Input attrs
 export type InputFilterType = {
   label: string;
-  placeholder: string;
+  tooltip: string;
   value?: string;
   rules?: [syncRules: SyncRule[], asyncRules?: AsyncRule[]];
   error?: string;
@@ -188,56 +188,21 @@ export type Validators = typeof validators;
 
 export type NodeInputFilterType = {
   label: string;
-  placeholder: string;
+  tooltip: string;
   value?: string;
   rules?: [syncRules: SyncRule[], asyncRules?: AsyncRule[]];
   error?: string;
   type: string;
 };
 
-// The input filters<nodeId, farmIds..etc> and the option filters<status, gpu...etc>
-export type MixedFilter = {
-  inputs: FilterInputs;
-  options: FilterOptions;
-};
-
-// Status, GPU, Gateway, and any other option should be add here.
-export type FilterOptions = {
+export interface FilterOptions {
   status?: NodeStatus;
   gpu?: boolean;
   gateway?: boolean;
   page: number;
   size: number;
-};
+}
 
-// Input fields
-export type FilterInputs = {
-  nodeId: NodeInputFilterType;
-  farmIds: NodeInputFilterType;
-  farmName: NodeInputFilterType;
-  country: NodeInputFilterType;
-  freeSru: NodeInputFilterType;
-  freeHru: NodeInputFilterType;
-  freeMru: NodeInputFilterType;
-  totalSru: NodeInputFilterType;
-  totalHru: NodeInputFilterType;
-  totalMru: NodeInputFilterType;
-};
-
-export const optionsInitializer: (
-  status: NodeStatus | undefined,
-  gpu: boolean | undefined,
-  gateway: boolean | undefined,
-) => FilterOptions = (status: NodeStatus | undefined, gpu: boolean | undefined, gateway: boolean | undefined) => ({
-  gateway,
-  gpu,
-  page: 1,
-  size: 10,
-  status,
-});
-
-import type { FilterFarmInputs } from "../utils/filter_farms";
-import type { FilterNodeInputs } from "../utils/filter_nodes";
 import type { SelectionDetails } from "./nodeSelector";
 
 // The input filters<nodeId, farmIds..etc> and the option filters<status, gpu...etc>
@@ -249,11 +214,6 @@ export type NodeFilterOptions = {
   gateway?: boolean;
   page: number;
   size: number;
-};
-
-export type FarmFilterOptions = {
-  page?: number;
-  size?: number;
 };
 
 export const nodeOptionsInitializer: NodeFilterOptions = {
@@ -311,8 +271,10 @@ export const nodeInitializer: GridNode = {
   id: "",
   nodeId: 0,
   farmId: 0,
+  farmName: "",
   twinId: 0,
   country: "",
+  region: "",
   gridVersion: 0,
   city: "",
   uptime: 0,
@@ -343,14 +305,4 @@ export const nodeInitializer: GridNode = {
   stats: nodeStatsInitializer,
   cards: [],
   num_gpu: 0,
-};
-// The input filters<nodeId, farmIds..etc> and the option filters<status, gpu...etc>
-export type MixedNodeFilter = {
-  inputs: FilterNodeInputs;
-  options: NodeFilterOptions;
-};
-
-export type MixedFarmFilter = {
-  inputs?: FilterFarmInputs;
-  options?: FarmFilterOptions;
 };

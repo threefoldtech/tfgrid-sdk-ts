@@ -19,6 +19,7 @@ export interface NodesQuery {
   status: NodeStatus;
   city: string;
   country: string;
+  region: string;
   farmName: string;
   ipv4: boolean;
   ipv6: boolean;
@@ -38,6 +39,7 @@ export interface NodesQuery {
   gpuVendorName: string;
   gpuAvailable: boolean;
   ownedBy: number;
+  healthy: boolean;
 }
 
 const NODES_MAPPER: BuilderMapper<NodesQuery> = {
@@ -52,6 +54,7 @@ const NODES_MAPPER: BuilderMapper<NodesQuery> = {
   status: "status",
   city: "city",
   country: "country",
+  region: "region",
   farmName: "farm_name",
   domain: "domain",
   ipv4: "ipv4",
@@ -76,6 +79,7 @@ const NODES_MAPPER: BuilderMapper<NodesQuery> = {
   totalSru: "total_sru",
   totalGpu: "total_gpu",
   ownedBy: "owned_by",
+  healthy: "healthy",
 };
 
 const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
@@ -92,6 +96,7 @@ const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
   },
   city: assertString,
   country: assertString,
+  region: assertString,
   farmName: assertString,
   domain: assertBoolean,
   ipv4: assertBoolean,
@@ -123,6 +128,7 @@ const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
   totalSru: assertInt,
   totalGpu: assertInt,
   ownedBy: assertInt,
+  healthy: assertBoolean,
 };
 
 export class NodesBuilder extends AbstractBuilder<NodesQuery> {

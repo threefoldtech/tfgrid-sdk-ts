@@ -18,8 +18,15 @@
                 />
                 <v-card-title class="d-inline-block">
                   {{ card.title }}
-                  <v-chip v-if="card.flare" class="ml-2 pulse-animation" color="#1AA18F" small text-color="white">
-                    Community
+                  <v-chip
+                    v-for="tag in card.tags"
+                    :key="tag"
+                    class="ml-2 pulse-animation"
+                    color="#1AA18F"
+                    small
+                    text-color="white"
+                  >
+                    {{ tag }}
                   </v-chip>
                 </v-card-title>
                 <v-card-text class="mt-2"> {{ card.excerpt }} </v-card-text>
@@ -38,41 +45,13 @@ interface Card {
   excerpt: string;
   icon: string;
   route: string;
-  flare?: string;
+  tags?: string[];
 }
 
 export default {
   name: "SolutionsView",
   setup() {
     const cards: Card[] = [
-      {
-        title: "Full Virtual Machine",
-        excerpt:
-          "Deploy a full virtual machine on Threefold Grid. Full VM allows you to have a complete image with a custom kernel optimized for your own usecase.",
-        icon: "vm.png",
-        route: "/fullvm",
-      },
-      {
-        title: "Micro Virtual Machine",
-        excerpt:
-          "Deploy a micro virtual machine on Threefold Grid. We provide few images managed by Threefold like Ubuntu 22.04, and NixOS, but you can still use a custom one.",
-        icon: "vm.png",
-        route: "/vm",
-      },
-      {
-        title: "Kubernetes",
-        excerpt:
-          "Kubernetes is the standard container orchestration tool. On the TF grid, Kubernetes clusters can be deployed out of the box. We have implemented K3S, a full-blown Kubernetes offering that uses only half of the memory footprint.",
-        icon: "kubernetes.png",
-        route: "/kubernetes",
-      },
-      {
-        title: "CapRover",
-        excerpt:
-          "CapRover is an extremely easy to use app/database deployment & web server manager for your NodeJS, Python, PHP, ASP.NET, Ruby, MySQL, MongoDB, Postgres, WordPress (and etc…) applications!",
-        icon: "caprover.png",
-        route: "/caprover",
-      },
       {
         title: "Peertube",
         excerpt: "Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services.",
@@ -92,6 +71,7 @@ export default {
           "Mattermost is an open-source, self-hostable online chat service with file sharing, search, and integrations. It is designed as an internal chat for organisations and companies.",
         icon: "mattermost.png",
         route: "/mattermost",
+        tags: ["Alpha"],
       },
       {
         title: "Discourse",
@@ -120,7 +100,7 @@ export default {
           "Nextcloud is a suite of client-server software for creating and using file hosting services. Nextcloud provides functionality similar to Dropbox, Office 365 or Google Drive.",
         icon: "nextcloud.png",
         route: "/nextcloud",
-        flare: "Alpha",
+        tags: ["Community"],
       },
       {
         title: "Presearch",

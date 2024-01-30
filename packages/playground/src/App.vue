@@ -107,7 +107,7 @@
       </v-navigation-drawer>
 
       <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
-        <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1005, top: 0, left: 0, right: 0 }">
+        <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1007, top: 0, left: 0, right: 0 }">
           <v-toolbar-title class="custom-toolbar-title">
             <v-img
               :src="`${
@@ -116,6 +116,8 @@
                   : baseUrl + 'images/logoTF_light.png'
               }`"
               width="160px"
+              @click="navigateToHome"
+              class="clickable-logo"
             />
           </v-toolbar-title>
 
@@ -160,7 +162,14 @@
         </v-toolbar>
 
         <DeploymentListManager>
-          <v-container fluid :style="{ paddingBottom: '100px' }">
+          <v-container
+            fluid
+            :style="{
+              paddingBottom: '0px',
+              minHeight: '85%',
+              maxHeight: '100%',
+            }"
+          >
             <div class="d-flex align-center">
               <v-btn
                 v-if="!openSidebar"
@@ -175,20 +184,11 @@
               </div>
             </div>
 
-            <div :style="{ position: 'relative' }">
-              <router-view v-slot="{ Component }">
-                <transition name="fade">
-                  <div :key="$route.path">
-                    <component :is="Component" v-if="isAuthorized($route.path)"></component>
-                    <component :is="Component" v-else-if="hasActiveProfile && hasGrid"></component>
-                    <ConnectWalletLanding @openProfile="openProfile = true" v-else />
-                  </div>
-                </transition>
-              </router-view>
-            </div>
+            <TfRouterView @openProfile="openProfile = true" :isAuth="hasActiveProfile && hasGrid" />
           </v-container>
         </DeploymentListManager>
         <TFNotification v-if="hasActiveProfile && hasGrid" />
+        <MainFooter />
       </v-main>
     </profile-manager-controller>
   </v-app>
@@ -214,6 +214,7 @@ const theme = useTheme();
 const navbarConfig = ref();
 
 const hasGrid = computed(() => !!gridStore.grid);
+
 watch(
   () => $route.meta,
   meta => {
@@ -221,123 +222,165 @@ watch(
       (navbarConfig.value = meta.navbarConfig);
   },
 );
+function navigateToHome() {
+  return $router.push("/");
+}
 
 onMounted(window.$$appLoader || noop);
 
 // eslint-disable-next-line no-undef
 const version = process.env.VERSION as any;
 
-function navigateToPrevRoute(path: any) {
-  const firstItem = path[0];
-  if (firstItem && firstItem.to) {
-    $router.push(firstItem.to);
-  }
-}
-
 const routes: AppRoute[] = [
   {
-    title: "Dashboard",
-    icon: "mdi-account-convert-outline",
+    title: "TFGrid",
+    icon: "mdi-database-search-outline",
+
     items: [
       {
-        title: "Your Twin",
-        icon: "mdi-account-supervisor-outline",
-        route: "/dashboard/twin",
-      },
-      { title: "Your Farms", icon: "mdi-silo", route: "/dashboard/farms" },
-      {
-        title: "Your Contracts",
-        icon: "mdi-file-document-edit",
-        route: "/dashboard/contracts-list",
-      },
-      { title: "Bridge", icon: "mdi-swap-horizontal", route: "/dashboard/bridge" },
-      {
-        title: "Transfer",
-        icon: "mdi-account-arrow-right-outline",
-        route: "/dashboard/transfer",
+        title: "Grid Status",
+        icon: "mdi-grid-large",
+        url: "https://status.grid.tf/status/threefold",
+        tooltip: "Status of Threefold Grid.",
       },
       {
-        title: "Dedicated Nodes",
-        icon: "mdi-resistor-nodes",
-        route: "/dashboard/dedicated-nodes",
+        title: "Node Statistics",
+        icon: "mdi-chart-scatter-plot",
+        route: "/tf-grid/stats",
+        tooltip: "View Node Statistics.",
       },
-      { title: "DAO", icon: "mdi-note-check-outline", route: "/dashboard/dao" },
+      {
+        title: "Node Monitoring",
+        icon: "mdi-equalizer",
+        url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
+        tooltip: "Monitor Zero-OS Nodes.",
+      },
     ],
   },
   {
-    title: "Calculators",
-    icon: "mdi-calculator",
+    title: "Deploy",
+    icon: "mdi-silo",
     items: [
       {
         title: "Pricing Calculator",
         icon: "mdi-currency-usd",
-        route: "/calculator/pricing",
+        route: "/deploy/pricing-calculator",
+        tooltip: "Calculate the cost of your deployments.",
+      },
+      {
+        title: "Node Finder",
+        icon: "mdi-access-point",
+        route: "/deploy/nodes",
+        tooltip: "Find nodes on the ThreeFold grid.",
+      },
+
+      {
+        title: "Virtual Machines",
+        icon: "mdi-television",
+        route: "/deploy/vms",
+        tooltip: "Deploy your Virtal Machine instances.",
+      },
+      {
+        title: "Orchestrators",
+        icon: "mdi-group",
+        route: "/deploy/orchestrators",
+        tooltip: "Deploy your orchestrator instances.",
+      },
+      {
+        title: "Dedicated Machines",
+        icon: "mdi-resistor-nodes",
+        route: "/deploy/dedicated-nodes",
+        tooltip: "Explore dedicated machines available on the ThreeFold grid.",
+      },
+      {
+        title: "Applications",
+        icon: "mdi-lightbulb-on-outline",
+        route: "/deploy/applications",
+        tooltip: "Deploy ready applications on the ThreeFold grid.",
+      },
+      {
+        title: "Your Contracts",
+        icon: "mdi-file-document-edit",
+        route: "/deploy/contracts-list",
+        tooltip: "Explore and modify your TFChain contracts.",
+      },
+      {
+        title: "Images",
+        icon: "mdi-open-in-new",
+        url: "https://hub.grid.tf/",
+        tooltip: "Find or Publish your Flist on 0-Hub.",
+      },
+      {
+        title: "SSH Key",
+        icon: "mdi-key-plus",
+        route: "/deploy/sshkey",
+        tooltip: "Generate or update your SSH Key.",
+      },
+    ],
+  },
+  {
+    title: "Farms",
+    icon: "mdi-access-point",
+    items: [
+      {
+        title: "Your Farms",
+        icon: "mdi-silo",
+        route: "/farms",
+        tooltip: "Create and manage farms and nodes.",
+      },
+      {
+        title: "Farm Finder",
+        icon: "mdi-lan-connect",
+        route: "/farms/farm-finder",
+        tooltip: "Find farms on the ThreeFold grid.",
+      },
+      {
+        title: "Node Installer",
+        icon: "mdi-earth",
+        url: "https://bootstrap.grid.tf/",
+        tooltip: "Download Zero-OS Images.",
       },
       {
         title: "Simulator",
         icon: "mdi-chart-line",
-        route: "/calculator/simulator",
+        route: "/farms/simulator-calculator",
+        tooltip: "Calculate and Simulate your farming rewards.",
       },
     ],
   },
   {
-    title: "Playground",
-    items: [{ title: "Solutions", icon: "mdi-lightbulb-on-outline", route: "/solutions" }],
-  },
-  {
-    icon: "mdi-database-search-outline",
-    title: "Statistics",
+    title: "TFChain",
+    icon: "mdi-account-convert-outline",
     items: [
       {
-        title: "Statistics",
-        icon: "mdi-chart-scatter-plot",
-        route: "/stats",
-      },
-    ],
-  },
-  {
-    icon: "mdi-access-point",
-    title: "Nodes",
-    items: [{ title: "Nodes", icon: "mdi-access-point", route: "/nodes" }],
-  },
-  {
-    icon: "mdi-access-point",
-    title: "Farms",
-    items: [{ title: "Farms", icon: "mdi-lan-connect", route: "/farms" }],
-  },
-  {
-    icon: "mdi-toolbox-outline",
-    title: "Services",
-    items: [
-      {
-        title: "0-Bootstrap",
-        icon: "mdi-earth",
-        url: "https://bootstrap.grid.tf/",
-        tooltip: "Download Zero-OS Images",
+        title: "Your Profile",
+        icon: "mdi-account-supervisor-outline",
+        route: "/tf-chain/twin",
+        tooltip: "Check your profile details.",
       },
       {
-        title: "0-Hub",
-        icon: "mdi-open-in-new",
-        url: "https://hub.grid.tf/",
-        tooltip: "Find or Publish your Flist",
+        title: "TF DAO",
+        icon: "mdi-note-check-outline",
+        route: "/tf-chain/dao",
+        tooltip: "Check and vote on DAO proposals.",
       },
       {
-        title: "Minting",
+        title: "TF Token Bridge",
+        icon: "mdi-swap-horizontal",
+        route: "/tf-chain/bridge",
+        tooltip: "Transfer TFTs on different chains.",
+      },
+      {
+        title: "TF Token Transfer",
+        icon: "mdi-account-arrow-right-outline",
+        route: "/tf-chain/transfer",
+        tooltip: "Transfer TFTs on TFChain.",
+      },
+      {
+        title: "TF Minting Reports",
         icon: "mdi-file-document-edit",
-        route: "/minting",
-        tooltip: "TFGrid Minting Explorer",
-      },
-      {
-        title: "Monitoring",
-        icon: "mdi-equalizer",
-        url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
-        tooltip: "Monitor Zero-OS nodes",
-      },
-      {
-        title: "Grid Health",
-        icon: "mdi-grid-large",
-        url: "https://status.grid.tf/status/threefold",
-        tooltip: "Status of Threefold Services",
+        route: "/tf-chain/minting",
+        tooltip: "TFGrid Minting Explorer.",
       },
     ],
   },
@@ -348,6 +391,7 @@ const routes: AppRoute[] = [
         title: "Manual",
         icon: "mdi-book-open-page-variant-outline",
         url: "https://manual.grid.tf/",
+        tooltip: "ThreeFold Manual.",
       },
     ],
   },
@@ -366,35 +410,21 @@ function clickHandler({ route, url }: AppRouteItem): void {
     window.open(url, "_blank");
   }
 }
-
-function isAuthorized(route: string) {
-  const items = ["dashboard", "solutions"];
-  return !items.some(substr => route.startsWith(`/${substr}`));
-}
-
-$router.beforeEach((to, from, next) => {
-  if (to.path === "/" && hasActiveProfile) {
-    next({ path: "dashboard/twin" });
-  } else {
-    next();
-  }
-  window.scrollTo(0, 0);
-});
 </script>
 
 <script lang="ts">
 import { AppThemeSelection } from "@/utils/app_theme";
 
-import AppInfo from "./components/app_info.vue";
 import AppTheme from "./components/app_theme.vue";
-import ConnectWalletLanding from "./components/connect_wallet_landing.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
 import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
 import FundsCard from "./components/funds_card.vue";
+import MainFooter from "./components/main_footer.vue";
 import ProfileManagerController from "./components/profile_manager_controller.vue";
 import TFNotification from "./components/tf_notification.vue";
 import TfNavigationLoader from "./components/TfNavigationLoader.vue";
 import TfOfflineNotifier from "./components/TfOfflineNotifier.vue";
+import TfRouterView from "./components/TfRouterView.vue";
 import TfSwapPrice from "./components/TfSwapPrice.vue";
 import { useGrid } from "./stores";
 import ProfileManager from "./weblets/profile_manager.vue";
@@ -422,13 +452,22 @@ export default {
     ProfileManager,
     DeploymentListManager,
     AppTheme,
-    ConnectWalletLanding,
-    AppInfo,
+    TfRouterView,
     TfSwapPrice,
     FundsCard,
     ProfileManagerController,
     TfNavigationLoader,
     TfOfflineNotifier,
+    MainFooter,
   },
+  data: () => ({
+    icons: ["mdi-github", "mdi-email-outline"],
+  }),
 };
 </script>
+
+<style>
+.clickable-logo:hover {
+  cursor: pointer;
+}
+</style>
