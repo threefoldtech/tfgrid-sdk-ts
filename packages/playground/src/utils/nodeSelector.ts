@@ -20,9 +20,29 @@ export async function getLocations(status?: NodeStatus): Promise<Locations> {
   const countries = await gqlClient.countries({ name: true, subregion: true });
   const stats = await gridProxyClient.stats.get({ status });
   const allowedCountriesList = Object.keys(stats.nodesDistribution);
+  const droppedCountries = [
+    {
+      title: "United States of America",
+      name: "United States",
+    },
+    {
+      title: "United Kingdom of Great Britain and Northern Ireland",
+      name: "United Kingdom",
+    },
+    {
+      title: "Czech Republic",
+      name: "Czechia",
+    },
+  ];
 
   const locations: Locations = {};
   for (const country of countries) {
+    droppedCountries.forEach(con => {
+      if (con.title == country.name) {
+        country.name = con.name;
+      }
+    });
+
     if (allowedCountriesList.includes(country.name)) {
       locations[country.subregion] = locations[country.subregion] || [];
       locations[country.subregion].push(country.name);
@@ -161,7 +181,7 @@ export function normalizeNodeFilters(
     rentedBy: filters.dedicated ? options.twinId : undefined,
     certified: filters.certified || undefined,
     availableFor: options.twinId,
-    region: options.location.region,
+    region: options.location.country ? undefined : options.location.region,
     country: options.location.country,
     gateway: options.gateway,
     healthy: true,
@@ -231,16 +251,36 @@ function normalizeFiltersValidators(
   validators: DeepPartial<SelectionDetailsFiltersValidators>,
 ): SelectionDetailsFiltersValidators {
   return {
-    cpu: normalizeNumericValidator(validators.cpu, { type: "int", min: 1, max: 32 }),
-    memory: normalizeNumericValidator(validators.memory, { type: "int", min: 256, max: 262144 }),
-    ssdDisks: normalizeNumericValidator(validators.ssdDisks, { type: "int", min: 1, max: 10000 }),
-    hddDisks: normalizeNumericValidator(validators.hddDisks, { type: "int", min: 1, max: 10000 }),
+    cpu: normalizeNumericValidator(validators.cpu, {
+      type: "int",
+      min: 1,
+      max: 32,
+    }),
+    memory: normalizeNumericValidator(validators.memory, {
+      type: "int",
+      min: 256,
+      max: 262144,
+    }),
+    ssdDisks: normalizeNumericValidator(validators.ssdDisks, {
+      type: "int",
+      min: 1,
+      max: 10000,
+    }),
+    hddDisks: normalizeNumericValidator(validators.hddDisks, {
+      type: "int",
+      min: 1,
+      max: 10000,
+    }),
     rootFilesystemSize: normalizeNumericValidator(validators.rootFilesystemSize, {
       type: "number",
       min: 500 / 1024,
       max: 10000,
     }),
-    solutionDisk: normalizeNumericValidator(validators.solutionDisk, { type: "int", min: 15, max: 10000 }),
+    solutionDisk: normalizeNumericValidator(validators.solutionDisk, {
+      type: "int",
+      min: 15,
+      max: 10000,
+    }),
   };
 }
 
