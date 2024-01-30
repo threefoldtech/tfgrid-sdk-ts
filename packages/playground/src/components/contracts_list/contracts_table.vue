@@ -194,13 +194,11 @@ const rentContracts = ref<NormalizedContract[]>([]);
 
 onMounted(() => {
   rentContracts.value = props.contracts.value.filter(contract => contract.type === ContractType.RENT);
-  console.log("Rent Contracts: ", rentContracts);
 });
 
 const isNodeInRentContracts = computed(() => {
   if (contractLocked.value && contractLocked.value.amountLocked === 0) {
     const nodeIdsInRentContracts = rentContracts.value.map(contract => contract.nodeId);
-    console.log(selectedItem.value);
     return nodeIdsInRentContracts.includes(selectedItem.value.nodeId);
   }
   return false;
@@ -247,11 +245,9 @@ async function showDetails(value: any) {
 
 // Function to fetch contract lock details
 async function contractLockDetails(item: any) {
-  console.log("Item: ", item);
   contractStateDialog.value = true;
   loadingShowDetails.value = true;
   selectedItem.value = item;
-  console.log("Selected Item: ", selectedItem.value);
   await props.grid.value?.contracts
     .contractLock({ id: item.contractId })
     .then((data: ContractLock) => {
