@@ -29,7 +29,7 @@
         >
           <template #activator="{ props }">
             <v-chip
-              @click.stop="contractLockDetails(item.value.contractId)"
+              @click.stop="contractLockDetails(item.value)"
               v-bind="props"
               :color="getStateColor(item.value.state)"
             >
@@ -98,12 +98,15 @@
           {{ contractLocked?.amountLocked ?? 0 > 0 ? contractLocked?.amountLocked.toFixed(3) : 0 }}
           TFTs.
         </v-row>
-
-        <v-alert v-if="contractLocked?.amountLocked == 0" class="ma-4" type="warning" variant="tonal"
-          >This contract is deployed on a dedicated node currently in a grace period. The rent contract associated with
-          the node is also in a grace period, and there's no active billing rate or locked TFTs associated with
-          it.</v-alert
+        <v-alert
+          v-if="contractLocked?.amountLocked == 0 && isNodeInRentContracts"
+          class="ma-4"
+          type="warning"
+          variant="tonal"
         >
+          This contract is in a grace period because it's on a dedicated machine also in a grace period. That's why this
+          node is locked with zero TFTS and no billing rate.
+        </v-alert>
 
         <v-alert class="ma-4" type="info" variant="tonal"
           >The Contracts in Grace Period, which means that your workloads are suspended but not deleted; in order to
@@ -150,8 +153,8 @@ import { ContractStates, type GridClient } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError, TFChainErrors } from "@threefold/types";
-import { defineComponent, type PropType, type Ref, ref } from "vue";
-import { capitalize } from "vue";
+import { computed, defineComponent, type PropType, type Ref, ref } from "vue";
+import { capitalize, onMounted } from "vue";
 
 import type { VDataTableHeader } from "@/types";
 import { ContractType, getNodeStateColor, getStateColor, type NormalizedContract } from "@/utils/contracts";
@@ -187,6 +190,22 @@ const props = defineProps({
   },
 });
 
+const rentContracts = ref<NormalizedContract[]>([]);
+
+onMounted(() => {
+  rentContracts.value = props.contracts.value.filter(contract => contract.type === ContractType.RENT);
+  console.log("Rent Contracts: ", rentContracts);
+});
+
+const isNodeInRentContracts = computed(() => {
+  if (contractLocked.value && contractLocked.value.amountLocked === 0) {
+    const nodeIdsInRentContracts = rentContracts.value.map(contract => contract.nodeId);
+    console.log(selectedItem.value);
+    return nodeIdsInRentContracts.includes(selectedItem.value.nodeId);
+  }
+  return false;
+});
+
 const emits = defineEmits(["update:deleted-contracts"]);
 
 const layout = ref();
@@ -201,6 +220,7 @@ const failedContractId = ref<number>();
 const loadingContractId = ref<number>();
 const selectedContracts = ref<NormalizedContract[]>([]);
 const contracts = ref<Ref<NormalizedContract[]>>(props.contracts);
+const selectedItem = ref();
 
 // Function to show details of a contract
 async function showDetails(value: any) {
@@ -226,16 +246,22 @@ async function showDetails(value: any) {
 }
 
 // Function to fetch contract lock details
-async function contractLockDetails(contractId: number) {
+async function contractLockDetails(item: any) {
+  console.log("Item: ", item);
   contractStateDialog.value = true;
   loadingShowDetails.value = true;
+  selectedItem.value = item;
+  console.log("Selected Item: ", selectedItem.value);
   await props.grid.value?.contracts
-    .contractLock({ id: contractId })
+    .contractLock({ id: item.contractId })
     .then((data: ContractLock) => {
       contractLocked.value = data;
     })
     .catch(err => {
-      layout.value.setStatus("failed", normalizeError(err, `Failed to fetch the contract ${contractId} lock details.`));
+      layout.value.setStatus(
+        "failed",
+        normalizeError(err, `Failed to fetch the contract ${item.contractId} lock details.`),
+      );
       contractStateDialog.value = false;
     });
   loadingShowDetails.value = false;
