@@ -1,20 +1,28 @@
-import { checkServiceAliveness, disconnectServices, GridProxyMonitor, monitorServiceAliveness } from "../src/";
-import { RMBMonitor, TFChainMonitor } from "../src/serviceMonitor";
-import { IServiceAliveness } from "../src/types";
+import { GridProxyMonitor, RMBMonitor, ServiceMonitor, TFChainMonitor } from "../src/";
 async function HealthCheck() {
   try {
-    const services: IServiceAliveness[] = [];
-    services.push(new GridProxyMonitor("<FakeURL>"));
-    services.push(new TFChainMonitor("wss://tfhain.dev.grid.tf/ws", "<MNEMONIC>", "sr25519"));
-    services.push(new RMBMonitor("wss://relay.dev.grid.tf", "wss://tfchain.dev.grid.tf/ws", "<MNEMONIC>", "sr25519"));
-    // monitor some services once
-    await checkServiceAliveness(services);
+    const services = [
+      new GridProxyMonitor("<FakeURL>"),
+      new TFChainMonitor(
+        "wss://tfchain.dev.grid.tf/ws",
+        "acoustic apology father noble strike brass print denial language effort measure carbon",
+        "sr25519",
+      ),
+      new RMBMonitor(
+        "wss://relay.dev.grid.tf",
+        "wss://tfchain.dev.grid.tf/ws",
+        "acoustic apology father noble strike brass print denial language effort measure carbon",
+        "sr25519",
+      ),
+    ];
+    const serviceMonitor = new ServiceMonitor(services);
 
-    // disconnect
-    await disconnectServices(services);
+    // ping some services to check their liveness
+    // await serviceMonitor.pingService();
 
     // keep monitoring services with Interval
-    const monitor = monitorServiceAliveness(services, 0.25);
+    serviceMonitor.interval = 0.25;
+    const monitor = serviceMonitor.monitorService();
     await new Promise(resolve => setTimeout(resolve, 0.5 * 60 * 1000));
     await monitor.exitAndDisconnect();
     process.exit(0);
