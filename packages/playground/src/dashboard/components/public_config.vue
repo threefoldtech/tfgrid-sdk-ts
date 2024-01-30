@@ -110,7 +110,9 @@
               Remove Config
             </v-btn>
 
-            <v-btn @click="fillFakeData" color="warning" variant="outlined"> Fill fake data </v-btn>
+            <v-btn v-if="runningInDevMode" @click="fillFakeData" color="warning" variant="outlined">
+              Fill fake data
+            </v-btn>
 
             <!-- Close and Save Buttons -->
             <div>
