@@ -41,3 +41,10 @@ export type ServiceStatus = {
   alive: boolean;
   error?: Error;
 };
+
+export enum MonitorEvents {
+  "log" = "MonitorLog",
+  "summarize" = "MonitorSummarize",
+  "storeStatus" = "MonitorStoreStatus",
+  "serviceDown" = "MonitorServiceDown",
+}

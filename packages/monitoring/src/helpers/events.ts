@@ -1,37 +1,58 @@
 import chalk from "chalk";
 import { EventEmitter } from "events";
 
-const events = new EventEmitter();
+import { MonitorEvents } from "../types";
+
 type ServiceStatus = { [key: string]: boolean };
 
-const serviceStatusSummary: ServiceStatus = {};
 const ALIVE = chalk.green.bold("Alive");
 const DOWN = chalk.red.bold("Down");
-function logsHandler(msg) {
-  console.log(msg);
-}
+class MonitorEventEmitter extends EventEmitter {
+  private summary: ServiceStatus = {};
 
-function serviceDownHandler(serviceName: string, error: Error) {
-  console.log(`${chalk.red.bold(serviceName + " is Down")}`);
-  console.log(chalk.gray("* Error: " + error.message));
-  serviceStatusSummary[serviceName] = false;
-}
+  constructor() {
+    super();
+    this.addListener(MonitorEvents.log, this.monitorLogsHandler);
+    this.addListener(MonitorEvents.serviceDown, this.serviceDownHandler);
+    this.addListener(MonitorEvents.storeStatus, this.addToServiceSummary);
+    this.addListener(MonitorEvents.summarize, this.printStatusSummary);
+  }
+  public log(message: string) {
+    this.emit("MonitorLog", message);
+  }
+  public summarize() {
+    this.emit("MonitorSummarize");
+  }
+  public storeStatus(serviceName: string, isAlive: boolean) {
+    this.emit("MonitorStoreStatus", serviceName, isAlive);
+  }
+  public serviceDown(serviceName: string, error: Error) {
+    this.emit("MonitorServiceDown", serviceName, error);
+  }
 
-function addToServiceSummary(serviceName: string, serviceIsAlive: boolean) {
-  serviceStatusSummary[serviceName] = serviceIsAlive;
-}
+  private monitorLogsHandler(msg) {
+    console.log(msg);
+  }
+  private serviceDownHandler(serviceName: string, error: Error) {
+    console.log(`${chalk.red.bold(serviceName + " is Down")}`);
+    console.log(chalk.gray("* Error: " + error.message));
+    this.summary[serviceName] = false;
+  }
 
-function printStatusSummary() {
-  const serviceNames = Object.keys(serviceStatusSummary);
-  const maxServiceNameLength = Math.max(...serviceNames.map(entry => entry.length));
-  console.log(chalk.blue.bold("Aliveness check summary:"));
-  for (const service in serviceStatusSummary) {
-    const padding = " ".repeat(maxServiceNameLength - service.length);
-    console.log(`\t${service}${padding}: ${serviceStatusSummary[service] ? ALIVE : DOWN}`);
+  private addToServiceSummary(serviceName: string, serviceIsAlive: boolean) {
+    this.summary[serviceName] = serviceIsAlive;
+  }
+
+  private printStatusSummary() {
+    const serviceNames = Object.keys(this.summary);
+    const maxServiceNameLength = Math.max(...serviceNames.map(entry => entry.length));
+    console.log(chalk.blue.bold("Aliveness check summary:"));
+    for (const service in this.summary) {
+      const padding = " ".repeat(maxServiceNameLength - service.length);
+      console.log(`\t${service}${padding}: ${this.summary[service] ? ALIVE : DOWN}`);
+    }
   }
 }
-events.addListener("logs", logsHandler);
-events.addListener("serviceIsDown", serviceDownHandler);
-events.addListener("storeServiceStatus", addToServiceSummary);
-events.addListener("summarize", printStatusSummary);
-export { events };
+
+const monitorEvents = new MonitorEventEmitter();
+export { monitorEvents };
