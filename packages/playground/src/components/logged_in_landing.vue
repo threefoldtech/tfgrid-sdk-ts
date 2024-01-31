@@ -98,6 +98,8 @@ import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
+import { useRequestStore } from "@/stores/stats";
+
 import { useProfileManager } from "../stores";
 export default {
   name: "LoggedInLanding",
@@ -108,7 +110,7 @@ export default {
     const $router = useRouter();
     const pageTitle = computed(() => route.meta.title);
     const profileManager = useProfileManager();
-
+    const statsStore = useRequestStore();
     const cards = [
       {
         title: "Your Profile",
@@ -152,26 +154,26 @@ export default {
       pageTitle,
       cards,
       profileManager,
-
+      statsStore,
       stats: [
         {
           label: "Capacity",
-          value: "33.46PB",
+          value: statsStore.data.capacity,
           image: "capacity.png",
         },
         {
           label: "Nodes",
-          value: "2420",
+          value: statsStore.data.nodes,
           image: "nodes.png",
         },
         {
           label: "Countries",
-          value: "60",
+          value: statsStore.data.countries,
           image: "countries.png",
         },
         {
           label: "Cores",
-          value: "56,530",
+          value: statsStore.data.cores,
           image: "cores.png",
         },
       ],
