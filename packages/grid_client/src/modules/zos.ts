@@ -105,6 +105,45 @@ class Zos {
     const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
     return await this.rmb.request([nodeTwinId], "zos.gpu.list", "");
   }
+
+  @expose
+  @validateInput
+  async getNodePerfTests(options: ZOSNodeModel) {
+    const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
+    return await this.rmb.request([nodeTwinId], "zos.perf.get_all", "");
+  }
+
+  @expose
+  @validateInput
+  async getNodeIPerfTest(options: ZOSNodeModel) {
+    const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
+    const payload = JSON.stringify({ name: "iperf" });
+    return await this.rmb.request([nodeTwinId], "zos.perf.get", payload);
+  }
+
+  @expose
+  @validateInput
+  async getNodeIPValidation(options: ZOSNodeModel) {
+    const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
+    const payload = JSON.stringify({ name: "public-ip-validation" });
+    return await this.rmb.request([nodeTwinId], "zos.perf.get", payload);
+  }
+
+  @expose
+  @validateInput
+  async getNodeCPUTest(options: ZOSNodeModel) {
+    const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
+    const payload = JSON.stringify({ name: "cpu-benchmark" });
+    return await this.rmb.request([nodeTwinId], "zos.perf.get", payload);
+  }
+
+  @expose
+  @validateInput
+  async getNodeHealthcheck(options: ZOSNodeModel) {
+    const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
+    const payload = JSON.stringify({ name: "healthcheck" });
+    return await this.rmb.request([nodeTwinId], "zos.perf.get", payload);
+  }
 }
 
 export { Zos as zos };

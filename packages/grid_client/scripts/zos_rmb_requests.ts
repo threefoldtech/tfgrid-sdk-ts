@@ -58,6 +58,41 @@ async function getNodeGPUInfo(client, nodeId) {
   log("================= Getting GPU info =================");
 }
 
+async function getNodePerfTests(client, nodeId) {
+  const res = await client.zos.getNodePerfTests(nodeId);
+  log("================= Getting perf tests =================");
+  log(res);
+  log("================= Getting perf tests =================");
+}
+
+async function getNodeIPerfTest(client, nodeId) {
+  const res = await client.zos.getNodeIPerfTest(nodeId);
+  log("================= Getting IPerf test =================");
+  log(res);
+  log("================= Getting IPerf test =================");
+}
+
+async function getNodeIPValidation(client, nodeId) {
+  const res = await client.zos.getNodeIPValidation(nodeId);
+  log("================= Getting Node IP Validation test =================");
+  log(res);
+  log("================= Getting Node IP Validation test =================");
+}
+
+async function getNodeCPUTest(client, nodeId) {
+  const res = await client.zos.getNodeCPUTest(nodeId);
+  log("================= Getting node CPU test =================");
+  log(res);
+  log("================= Getting node CPU test =================");
+}
+
+async function getNodeHealthcheck(client, nodeId) {
+  const res = await client.zos.getNodeHealthcheck(nodeId);
+  log("================= Getting Node Healthcheck =================");
+  log(res);
+  log("================= Getting Node Healthcheck =================");
+}
+
 async function main() {
   const grid3 = await getClient();
   const nodeId = 11;
@@ -94,6 +129,13 @@ async function main() {
 
   //Get GPU info
   await getNodeGPUInfo(grid3, node);
+
+  // Get perf tests
+  await getNodePerfTests(grid3, node);
+  await getNodeCPUTest(grid3, node);
+  await getNodeIPValidation(grid3, node);
+  await getNodeIPerfTest(grid3, node);
+  await getNodeHealthcheck(grid3, node);
 
   await grid3.disconnect();
 }
