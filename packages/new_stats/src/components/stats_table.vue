@@ -31,13 +31,12 @@
           <v-col
             v-for="item of Istats"
             :key="item.title"
-            xl="5"
-            lg="5"
-            md="3"
-            sm="9"
-            xs="9"
-            cols="9"
             class="text-center pt-1 pb-0"
+            cols="12"
+            sm="6"
+            md="4"
+            lg="12"
+            xl="6"
           >
             <StatisticsCard :item="item" />
           </v-col>
