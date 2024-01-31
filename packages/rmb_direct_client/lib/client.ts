@@ -167,9 +167,21 @@ class Client {
     }
   }
 
-  disconnect() {
+  private async waitForResponses(): Promise<void> {
+    const start = new Date().getTime();
+    while (new Date().getTime() < start + 2 * 60 * 1000) {
+      if (this.responses.size === 0) return;
+      console.debug("Waiting for the rmb responses to be received before closing the connection");
+      await new Promise(f => setTimeout(f, 1000));
+    }
+    this.responses.clear();
+  }
+
+  async disconnect() {
     if (this.__pingPongTimeout) clearTimeout(this.__pingPongTimeout);
-    this.tfclient.disconnect();
+    this.con.removeAllListeners();
+    await this.waitForResponses();
+    await this.tfclient.disconnect();
     if (this.con?.readyState !== this.con?.CLOSED) this.con.close();
   }
 
