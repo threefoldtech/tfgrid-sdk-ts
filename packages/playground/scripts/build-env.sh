@@ -6,6 +6,7 @@ STELLAR_NETWORK="${STELLAR_NETWORK:=test}"
 TIMEOUT="${TIMEOUT:=10000}"
 PAGE_SIZE="${PAGE_SIZE:=20}"
 MINTING_URL="https://alpha.minting.tfchain.grid.tf"
+STATS_URL="https://stats.grid.tf/"
 
 # Env vars must provide in `custom` mode
 REQUIRED_ENV_VARS=(
@@ -30,6 +31,7 @@ case $MODE in
     SUBSTRATE_URL='wss://tfchain.dev.grid.tf/ws'
     ACTIVATION_SERVICE_URL='https://activation.dev.grid.tf/activation/activate'
     RELAY_DOMAIN='wss://relay.dev.grid.tf'
+    STATS_URL='https://stats.dev.grid.tf'
     BRIDGE_TFT_ADDRESS=GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG
     STELLAR_NETWORK=test
   ;;
@@ -40,6 +42,7 @@ case $MODE in
     SUBSTRATE_URL='wss://tfchain.qa.grid.tf/ws'
     ACTIVATION_SERVICE_URL='https://activation.qa.grid.tf/activation/activate'
     RELAY_DOMAIN='wss://relay.qa.grid.tf'
+    STATS_URL='https://stats.qa.grid.tf'
     BRIDGE_TFT_ADDRESS=GAQH7XXFBRWXT2SBK6AHPOLXDCLXVFAKFSOJIRMRNCDINWKHGI6UYVKM
     STELLAR_NETWORK=test
   ;;
@@ -50,6 +53,7 @@ case $MODE in
     SUBSTRATE_URL='wss://tfchain.test.grid.tf/ws'
     ACTIVATION_SERVICE_URL='https://activation.test.grid.tf/activation/activate'
     RELAY_DOMAIN='wss://relay.test.grid.tf'
+    STATS_URL='https://stats.test.grid.tf'
     BRIDGE_TFT_ADDRESS=GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4
     STELLAR_NETWORK=main
   ;;
@@ -109,6 +113,7 @@ window.env = {
   STELLAR_NETWORK: '$STELLAR_NETWORK',
   STELLAR_HORIZON_URL: '$STELLAR_HORIZON_URL',
   TFT_ASSET_ISSUER: '$TFT_ASSET_ISSUER',
+  STATS_URL: '$STATS_URL',
   MINTING_URL: '$MINTING_URL',
   TIMEOUT: +'$TIMEOUT',
   PAGE_SIZE: +'$PAGE_SIZE'

@@ -49,6 +49,7 @@ declare global {
       STELLAR_NETWORK: string;
       STELLAR_HORIZON_URL: string;
       TFT_ASSET_ISSUER: string;
+      STATS_URL: string;
       MINTING_URL: string;
       TIMEOUT: number;
       PAGE_SIZE: number;
