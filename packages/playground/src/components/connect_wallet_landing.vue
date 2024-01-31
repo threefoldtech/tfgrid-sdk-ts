@@ -99,32 +99,34 @@ export default {
     const $router = useRouter();
     const statsStore = useRequestStore();
     const pageTitle = computed(() => route.meta.title);
+    const stats = computed(() => [
+      {
+        label: "Capacity",
+        value: statsStore.data.capacity,
+        image: "capacity.png",
+      },
+      {
+        label: "Nodes",
+        value: statsStore.data.nodes,
+        image: "nodes.png",
+      },
+      {
+        label: "Countries",
+        value: statsStore.data.countries,
+        image: "countries.png",
+      },
+      {
+        label: "Cores",
+        value: statsStore.data.cores,
+        image: "cores.png",
+      },
+    ]);
     return {
       theme,
+      statsStore,
       statsUrl: window.env.STATS_URL || "https://stats.grid.tf",
       pageTitle,
-      stats: [
-        {
-          label: "Capacity",
-          value: statsStore.data.capacity,
-          image: "capacity.png",
-        },
-        {
-          label: "Nodes",
-          value: statsStore.data.nodes,
-          image: "nodes.png",
-        },
-        {
-          label: "Countries",
-          value: statsStore.data.countries,
-          image: "countries.png",
-        },
-        {
-          label: "Cores",
-          value: statsStore.data.cores,
-          image: "cores.png",
-        },
-      ],
+      stats,
       baseUrl,
       $router,
     };

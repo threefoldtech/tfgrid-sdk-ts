@@ -13,10 +13,10 @@ const urls = [
 ];
 
 const DUMMY_DATA = {
-  capacity: "33.46PB",
-  nodes: 2420,
+  capacity: "32.59 PB",
+  nodes: 2552,
   countries: 60,
-  cores: 56530,
+  cores: 63706,
 };
 
 export const useRequestStore = defineStore("request-store", () => {

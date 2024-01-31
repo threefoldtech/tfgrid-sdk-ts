@@ -149,34 +149,35 @@ export default {
         path: "/deploy/nodes",
       },
     ];
+    const stats = computed(() => [
+      {
+        label: "Capacity",
+        value: statsStore.data.capacity,
+        image: "capacity.png",
+      },
+      {
+        label: "Nodes",
+        value: statsStore.data.nodes,
+        image: "nodes.png",
+      },
+      {
+        label: "Countries",
+        value: statsStore.data.countries,
+        image: "countries.png",
+      },
+      {
+        label: "Cores",
+        value: statsStore.data.cores,
+        image: "cores.png",
+      },
+    ]);
     return {
       theme,
       pageTitle,
       cards,
       profileManager,
       statsStore,
-      stats: [
-        {
-          label: "Capacity",
-          value: statsStore.data.capacity,
-          image: "capacity.png",
-        },
-        {
-          label: "Nodes",
-          value: statsStore.data.nodes,
-          image: "nodes.png",
-        },
-        {
-          label: "Countries",
-          value: statsStore.data.countries,
-          image: "countries.png",
-        },
-        {
-          label: "Cores",
-          value: statsStore.data.cores,
-          image: "cores.png",
-        },
-      ],
+      stats,
       baseUrl,
       $router,
     };
