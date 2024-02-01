@@ -207,7 +207,7 @@
         ]"
       >
         <template #input="{ props }">
-          <VTextField label="Free HDD (GB)" variant="outlined" v-model="filters.freeRAM" v-bind="props">
+          <VTextField label="Free RAM (GB)" variant="outlined" v-model="filters.freeRAM" v-bind="props">
             <template #append-inner>
               <VTooltip text="Filter by the minimum available amount of RAM in the node.">
                 <template #activator="{ props }">
