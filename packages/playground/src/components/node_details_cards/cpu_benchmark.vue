@@ -48,10 +48,10 @@ export default {
       const res = await gridStore.grid.zos.getNodeCPUTest({ nodeId: props.node.nodeId });
       const { multi, single, threads, workloads } = res.result;
       cpuBenchmark.value = [
-        { name: "Multi", value: multi || "-" },
-        { name: "Single", value: single || "-" },
-        { name: "Threads", value: threads || "-" },
-        { name: "Workloads", value: workloads || "-" },
+        { name: "Multi", value: multi.toString() || "-" },
+        { name: "Single", value: single.toString() || "-" },
+        { name: "Threads", value: threads.toString() || "-" },
+        { name: "Workloads", value: workloads.toString() || "-" },
       ];
       return cpuBenchmark.value;
     };

@@ -657,11 +657,25 @@ class ZOSNodeModel {
   @Expose() @IsInt() @Min(1) nodeId: number;
 }
 
-class PerfTest {
+class NodeCPUTest {
   @Expose() @IsNotEmpty() @IsString() name: string;
   @Expose() @IsNotEmpty() @IsString() description: string;
   @Expose() @IsNotEmpty() @IsNumber() timestamp: number;
-  @Expose() result: CPUBenchmark | IPerf[] | IPValidation | null;
+  @Expose() result: CPUBenchmark;
+}
+
+class NodeIPValidation {
+  @Expose() @IsNotEmpty() @IsString() name: string;
+  @Expose() @IsNotEmpty() @IsString() description: string;
+  @Expose() @IsNotEmpty() @IsNumber() timestamp: number;
+  @Expose() result: IPValidation;
+}
+
+class NodeIPerf {
+  @Expose() @IsNotEmpty() @IsString() name: string;
+  @Expose() @IsNotEmpty() @IsString() description: string;
+  @Expose() @IsNotEmpty() @IsNumber() timestamp: number;
+  @Expose() result: IPerf[];
 }
 
 class CPUReport {
@@ -933,5 +947,7 @@ export {
   AddPublicConfig,
   GetActiveContractsModel,
   GPUCardInfo,
-  PerfTest,
+  NodeCPUTest,
+  NodeIPValidation,
+  NodeIPerf,
 };
