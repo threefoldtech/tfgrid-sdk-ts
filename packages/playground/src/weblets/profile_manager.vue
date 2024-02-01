@@ -99,7 +99,12 @@
                 </p>
               </v-alert>
 
-              <v-alert variant="tonal" type="info" class="mb-6" v-if="keypairType === KeypairType.ed25519">
+              <v-alert
+                variant="tonal"
+                type="info"
+                class="mb-6"
+                v-if="keypairType === KeypairType.ed25519 && activeTab == 1"
+              >
                 <p>
                   Please note that generation or activation of ed25519 Keys isn't supported, you can only import pre
                   existing ones.
