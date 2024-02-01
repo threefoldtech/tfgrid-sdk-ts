@@ -72,7 +72,7 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn color="error" variant="tonal" @click="deployedDialog = false">Close</v-btn>
+        <v-btn color="anchor" variant="outlined" @click="deployedDialog = false">Close</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -147,6 +147,7 @@ async function deploy(layout: any) {
     const [leader, ...workers] = vm;
     leader.workers = workers;
     leader.projectName = props.projectName;
+    leader.deploymentName = leader.name;
     caproverData.value = leader;
     deployedDialog.value = true;
     layout.setStatus("success", `Successfully add a new worker to Caprover('${props.master.name}') Instance.`);
@@ -175,6 +176,7 @@ async function onDelete(cb: (workers: any[]) => void) {
   cb(data.slice(1));
   const [leader, ...workers] = data;
   leader.workers = workers;
+  leader.deploymentName = leader.name;
   leader.projectName = props.projectName;
   emits("update:caprover", leader);
   deleting.value = false;
