@@ -58,6 +58,13 @@
           <v-col v-if="node.publicConfig && node.publicConfig.domain" cols="12" md="6" sm="8">
             <public-config-details-card :node="node" />
           </v-col>
+
+          <v-col cols="12" md="6" sm="8">
+            <i-perf-card :node="node" />
+          </v-col>
+          <v-col cols="12" md="6" sm="8">
+            <cpu-benchmark-card :node="node" />
+          </v-col>
         </v-row>
       </v-card>
     </template>
@@ -70,6 +77,7 @@ import { type PropType, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import CountryDetailsCard from "@/components/node_details_cards/country_details_card.vue";
+import cpuBenchmarkCard from "@/components/node_details_cards/cpu_benchmark.vue";
 import FarmDetailsCard from "@/components/node_details_cards/farm_details_card.vue";
 import GpuDetailsCard from "@/components/node_details_cards/gpu_details_card.vue";
 import InterfacesDetailsCard from "@/components/node_details_cards/interfaces_details_card.vue";
@@ -82,6 +90,7 @@ import type { FilterOptions } from "@/types";
 import { type GridProxyRequestConfig, nodeInitializer } from "@/types";
 import { getNode, getNodeStatusColor } from "@/utils/get_nodes";
 
+import IPerfCard from "./node_details_cards/iperf_details.vue";
 import NodeResourcesCharts from "./node_resources_charts.vue";
 export default {
   props: {
@@ -109,6 +118,8 @@ export default {
     TwinDetailsCard,
     GpuDetailsCard,
     PublicConfigDetailsCard,
+    IPerfCard,
+    cpuBenchmarkCard,
   },
 
   setup(props, { emit }) {

@@ -86,13 +86,6 @@ async function getNodeCPUTest(client, nodeId) {
   log("================= Getting node CPU test =================");
 }
 
-async function getNodeHealthcheck(client, nodeId) {
-  const res = await client.zos.getNodeHealthcheck(nodeId);
-  log("================= Getting Node Healthcheck =================");
-  log(res);
-  log("================= Getting Node Healthcheck =================");
-}
-
 async function main() {
   const grid3 = await getClient();
   const nodeId = 11;
@@ -135,7 +128,6 @@ async function main() {
   await getNodeCPUTest(grid3, node);
   await getNodeIPValidation(grid3, node);
   await getNodeIPerfTest(grid3, node);
-  await getNodeHealthcheck(grid3, node);
 
   await grid3.disconnect();
 }

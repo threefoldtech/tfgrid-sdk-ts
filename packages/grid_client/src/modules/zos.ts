@@ -136,14 +136,6 @@ class Zos {
     const payload = JSON.stringify({ name: "cpu-benchmark" });
     return await this.rmb.request([nodeTwinId], "zos.perf.get", payload);
   }
-
-  @expose
-  @validateInput
-  async getNodeHealthcheck(options: ZOSNodeModel) {
-    const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
-    const payload = JSON.stringify({ name: "healthcheck" });
-    return await this.rmb.request([nodeTwinId], "zos.perf.get", payload);
-  }
 }
 
 export { Zos as zos };
