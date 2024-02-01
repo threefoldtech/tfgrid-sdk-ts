@@ -183,7 +183,7 @@ const router = createRouter({
             },
 
             {
-              path: "peertube",
+              path: "/solutions/peertube",
               component: () => import("../views/peertube_view.vue"),
               meta: {
                 title: "Peertube",
@@ -205,7 +205,7 @@ const router = createRouter({
               },
             },
             {
-              path: "funkwhale",
+              path: "/solutions/funkwhale",
               component: () => import("../views/funkwhale_view.vue"),
               meta: {
                 title: "Funkwhale",
@@ -227,7 +227,7 @@ const router = createRouter({
               },
             },
             {
-              path: "mattermost",
+              path: "/solutions/mattermost",
               component: () => import("../views/mattermost_view.vue"),
               meta: {
                 title: "Mattermost",
@@ -249,7 +249,7 @@ const router = createRouter({
               },
             },
             {
-              path: "discourse",
+              path: "/solutions/discourse",
               component: () => import("../views/discourse_view.vue"),
               meta: {
                 title: "Discourse",
@@ -271,7 +271,7 @@ const router = createRouter({
               },
             },
             {
-              path: "taiga",
+              path: "/solutions/taiga",
               component: () => import("../views/taiga_view.vue"),
               meta: {
                 title: "Taiga",
@@ -293,7 +293,7 @@ const router = createRouter({
               },
             },
             {
-              path: "owncloud",
+              path: "/solutions/owncloud",
               component: () => import("../views/owncloud_view.vue"),
               meta: {
                 title: "Owncloud",
@@ -315,7 +315,7 @@ const router = createRouter({
               },
             },
             {
-              path: "nextcloud",
+              path: "/solutions/nextcloud",
               component: () => import("../views/nextcloud_view.vue"),
               meta: {
                 title: "Nextcloud",
@@ -337,7 +337,7 @@ const router = createRouter({
               },
             },
             {
-              path: "presearch",
+              path: "/solutions/presearch",
               component: () => import("../views/presearch_view.vue"),
               meta: {
                 title: "Presearch",
@@ -359,7 +359,7 @@ const router = createRouter({
               },
             },
             {
-              path: "subsquid",
+              path: "/solutions/subsquid",
               component: () => import("../views/subsquid_view.vue"),
               meta: {
                 title: "Subsquid",
@@ -381,7 +381,7 @@ const router = createRouter({
               },
             },
             {
-              path: "casperlabs",
+              path: "/solutions/casperlabs",
               component: () => import("../views/casperlabs_view.vue"),
               meta: {
                 title: "Casperlabs",
@@ -403,7 +403,7 @@ const router = createRouter({
               },
             },
             {
-              path: "algorand",
+              path: "/solutions/algorand",
               component: () => import("../views/algorand_view.vue"),
               meta: {
                 title: "Algorand",
@@ -425,7 +425,7 @@ const router = createRouter({
               },
             },
             {
-              path: "nodepilot",
+              path: "/solutions/nodepilot",
               component: () => import("../views/node_pilot.vue"),
               meta: {
                 title: "Node Pilot",
@@ -447,7 +447,7 @@ const router = createRouter({
               },
             },
             {
-              path: "wordpress",
+              path: "/solutions/wordpress",
               component: () => import("../views/wordpress_view.vue"),
               meta: {
                 title: "Wordpress",
@@ -469,7 +469,7 @@ const router = createRouter({
               },
             },
             {
-              path: "umbrel",
+              path: "/solutions/umbrel",
               component: () => import("../views/umbrel_view.vue"),
               meta: {
                 title: "Umbrel",
@@ -491,7 +491,7 @@ const router = createRouter({
               },
             },
             {
-              path: "freeflow",
+              path: "/solutions/freeflow",
               component: () => import("../views/freeflow_view.vue"),
               meta: {
                 title: "Freeflow",
