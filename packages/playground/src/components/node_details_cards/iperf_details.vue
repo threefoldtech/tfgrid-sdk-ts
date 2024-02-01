@@ -2,7 +2,7 @@
   <card-details
     v-if="node.status === 'up'"
     :loading="loading"
-    title="IPerf Test"
+    title="Network Speed Test"
     :items="IperfDetails"
     icon="mdi-speedometer"
   />

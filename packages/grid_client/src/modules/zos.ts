@@ -7,7 +7,7 @@ import { TwinDeploymentHandler } from "../high_level/twinDeploymentHandler";
 import { DeploymentFactory } from "../primitives/deployment";
 import { Nodes } from "../primitives/nodes";
 import { WorkloadTypes } from "../zos/workload";
-import { GPUCardInfo, PingNodeOptionsModel, ZOSGetDeploymentModel, ZOSModel, ZOSNodeModel } from "./models";
+import { GPUCardInfo, PerfTest, PingNodeOptionsModel, ZOSGetDeploymentModel, ZOSModel, ZOSNodeModel } from "./models";
 import { checkBalance } from "./utils";
 
 class Zos {
@@ -115,7 +115,7 @@ class Zos {
 
   @expose
   @validateInput
-  async getNodeIPerfTest(options: ZOSNodeModel) {
+  async getNodeIPerfTest(options: ZOSNodeModel): Promise<PerfTest> {
     const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
     const payload = JSON.stringify({ name: "iperf" });
     return await this.rmb.request([nodeTwinId], "zos.perf.get", payload);
@@ -123,7 +123,7 @@ class Zos {
 
   @expose
   @validateInput
-  async getNodeIPValidation(options: ZOSNodeModel) {
+  async getNodeIPValidation(options: ZOSNodeModel): Promise<PerfTest> {
     const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
     const payload = JSON.stringify({ name: "public-ip-validation" });
     return await this.rmb.request([nodeTwinId], "zos.perf.get", payload);
@@ -131,7 +131,7 @@ class Zos {
 
   @expose
   @validateInput
-  async getNodeCPUTest(options: ZOSNodeModel) {
+  async getNodeCPUTest(options: ZOSNodeModel): Promise<PerfTest> {
     const nodeTwinId = await this.capacity.getNodeTwinId(options.nodeId);
     const payload = JSON.stringify({ name: "cpu-benchmark" });
     return await this.rmb.request([nodeTwinId], "zos.perf.get", payload);
