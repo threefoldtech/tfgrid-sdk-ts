@@ -508,28 +508,29 @@ const router = createRouter({
                 },
               },
             },
-            {
-              path: ApplicationRoute.freeflow,
-              component: () => import("../views/freeflow_view.vue"),
-              meta: {
-                title: "Freeflow",
-                info: { page: "info/freeflow.md" },
-                navbarConfig: {
-                  back: true,
-                  path: [
-                    { title: "Deploy" },
-                    {
-                      title: "Applications",
-                      disabled: false,
-                      to: "/deploy/applications",
-                    },
-                    {
-                      title: "Freeflow",
-                    },
-                  ],
-                },
-              },
-            },
+            // Commented for now and will be user later.
+            // {
+            //   path: ApplicationRoute.freeflow,
+            //   component: () => import("../views/freeflow_view.vue"),
+            //   meta: {
+            //     title: "Freeflow",
+            //     info: { page: "info/freeflow.md" },
+            //     navbarConfig: {
+            //       back: true,
+            //       path: [
+            //         { title: "Deploy" },
+            //         {
+            //           title: "Applications",
+            //           disabled: false,
+            //           to: "/deploy/applications",
+            //         },
+            //         {
+            //           title: "Freeflow",
+            //         },
+            //       ],
+            //     },
+            //   },
+            // },
           ],
         },
 
