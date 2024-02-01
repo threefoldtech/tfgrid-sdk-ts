@@ -40,7 +40,8 @@
               Discounts: <v-spacer />
               <ul class="pl-2">
                 <li>
-                  {{ activeTab == 1 ? "You receive " : "You'll be receiving " }} 50% discount if you reserve an entire
+                  {{ activeTab == 1 ? "You receive " : "You'll receive " }} 50% discount
+                  {{ activeTab == 1 ? " as you reserve the " : " if you reserve an " }} entire
                   <a
                     target="_blank"
                     href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html#billing--pricing"
