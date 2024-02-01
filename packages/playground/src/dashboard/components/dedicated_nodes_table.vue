@@ -40,7 +40,8 @@
               Discounts: <v-spacer />
               <ul class="pl-2">
                 <li>
-                  You receive 50% discount if you reserve an entire
+                  {{ activeTab == 1 ? "You receive " : "You'll receive " }} 50% discount
+                  {{ activeTab == 1 ? " as you reserve the " : " if you reserve an " }} entire
                   <a
                     target="_blank"
                     href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html#billing--pricing"
@@ -49,7 +50,8 @@
                   </a>
                 </li>
                 <li>
-                  You're receiving {{ item.raw.discount }}% discount as per the
+                  {{ activeTab == 1 ? "You're receiving " : "You'll be receiving " }} {{ item.raw.discount }}% discount
+                  as per the
                   <a
                     target="_blank"
                     href="https://manual.grid.tf/wiki/cloudunits/pricing/staking_discount_levels.html#staking-discount-levels"
