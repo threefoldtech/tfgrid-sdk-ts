@@ -167,17 +167,21 @@ class Client {
     }
   }
 
-  private async waitForResponses(): Promise<void> {
-    const start = new Date().getTime();
-    while (new Date().getTime() < start + 2 * 60 * 1000) {
-      if (this.responses.size === 0) return;
-      console.debug("Waiting for the rmb responses to be received before closing the connection");
-      for (const id of this.responses.keys()) {
-        const envelope = this.responses.get(id);
-        if (envelope?.request) {
-          console.debug(`- Response for ${envelope?.request.command} from twin ${envelope?.destination}`);
-        }
+  private logPendingResponses() {
+    console.debug("Waiting for the rmb responses to be received before closing the connection");
+    for (const id of this.responses.keys()) {
+      const envelope = this.responses.get(id);
+      if (envelope?.request) {
+        console.debug(`- Response for ${envelope?.request.command} from twin ${envelope?.destination}`);
       }
+    }
+  }
+
+  private async waitForResponses(timeoutInSeconds = 2 * 60): Promise<void> {
+    const start = new Date().getTime();
+    while (new Date().getTime() < start + timeoutInSeconds * 1000) {
+      if (this.responses.size === 0) return;
+      this.logPendingResponses();
       await new Promise(f => setTimeout(f, 1000));
     }
     this.responses.clear();
