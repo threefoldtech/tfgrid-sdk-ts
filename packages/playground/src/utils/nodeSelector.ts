@@ -17,7 +17,7 @@ import type {
 } from "../types/nodeSelector";
 
 export async function getLocations(status?: NodeStatus): Promise<Locations> {
-  const countries = await gqlClient.countries({ name: true, subregion: true });
+  const countries = await gqlClient.countries({ name: true, region: true });
   const stats = await gridProxyClient.stats.get({ status });
   const allowedCountriesList = Object.keys(stats.nodesDistribution);
   const droppedCountries = [
@@ -44,8 +44,8 @@ export async function getLocations(status?: NodeStatus): Promise<Locations> {
     });
 
     if (allowedCountriesList.includes(country.name)) {
-      locations[country.subregion] = locations[country.subregion] || [];
-      locations[country.subregion].push(country.name);
+      locations[country.region] = locations[country.region] || [];
+      locations[country.region].push(country.name);
     }
   }
   return locations;
