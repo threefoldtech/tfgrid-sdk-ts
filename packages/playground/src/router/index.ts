@@ -16,6 +16,24 @@ export interface RouteMeta {
   requireSSH?: boolean;
 }
 
+export enum ApplicationRoute {
+  peertube = "/deploy/applications/peertube",
+  funkwhale = "/deploy/applications/funkwhale",
+  mattermost = "/deploy/applications/mattermost",
+  discourse = "/deploy/applications/discourse",
+  taiga = "/deploy/applications/taiga",
+  owncloud = "/deploy/applications/owncloud",
+  nextcloud = "/deploy/applications/nextcloud",
+  presearch = "/deploy/applications/presearch",
+  subsquid = "/deploy/applications/subsquid",
+  casperlabs = "/deploy/applications/casperlabs",
+  algorand = "/deploy/applications/algorand",
+  nodepilot = "/deploy/applications/nodepilot",
+  wordpress = "/deploy/applications/wordpress",
+  umbrel = "/deploy/applications/umbrel",
+  freeflow = "/deploy/applications/freeflow",
+}
+
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
@@ -183,7 +201,7 @@ const router = createRouter({
             },
 
             {
-              path: "/solutions/peertube",
+              path: ApplicationRoute.peertube,
               component: () => import("../views/peertube_view.vue"),
               meta: {
                 title: "Peertube",
@@ -205,7 +223,7 @@ const router = createRouter({
               },
             },
             {
-              path: "/solutions/funkwhale",
+              path: ApplicationRoute.funkwhale,
               component: () => import("../views/funkwhale_view.vue"),
               meta: {
                 title: "Funkwhale",
@@ -227,7 +245,7 @@ const router = createRouter({
               },
             },
             {
-              path: "/solutions/mattermost",
+              path: ApplicationRoute.mattermost,
               component: () => import("../views/mattermost_view.vue"),
               meta: {
                 title: "Mattermost",
@@ -249,7 +267,7 @@ const router = createRouter({
               },
             },
             {
-              path: "/solutions/discourse",
+              path: ApplicationRoute.discourse,
               component: () => import("../views/discourse_view.vue"),
               meta: {
                 title: "Discourse",
@@ -271,7 +289,7 @@ const router = createRouter({
               },
             },
             {
-              path: "/solutions/taiga",
+              path: ApplicationRoute.taiga,
               component: () => import("../views/taiga_view.vue"),
               meta: {
                 title: "Taiga",
@@ -293,7 +311,7 @@ const router = createRouter({
               },
             },
             {
-              path: "/solutions/owncloud",
+              path: ApplicationRoute.owncloud,
               component: () => import("../views/owncloud_view.vue"),
               meta: {
                 title: "Owncloud",
@@ -315,7 +333,7 @@ const router = createRouter({
               },
             },
             {
-              path: "/solutions/nextcloud",
+              path: ApplicationRoute.nextcloud,
               component: () => import("../views/nextcloud_view.vue"),
               meta: {
                 title: "Nextcloud",
@@ -337,7 +355,7 @@ const router = createRouter({
               },
             },
             {
-              path: "/solutions/presearch",
+              path: ApplicationRoute.presearch,
               component: () => import("../views/presearch_view.vue"),
               meta: {
                 title: "Presearch",
@@ -359,7 +377,7 @@ const router = createRouter({
               },
             },
             {
-              path: "/solutions/subsquid",
+              path: ApplicationRoute.subsquid,
               component: () => import("../views/subsquid_view.vue"),
               meta: {
                 title: "Subsquid",
@@ -381,7 +399,7 @@ const router = createRouter({
               },
             },
             {
-              path: "/solutions/casperlabs",
+              path: ApplicationRoute.casperlabs,
               component: () => import("../views/casperlabs_view.vue"),
               meta: {
                 title: "Casperlabs",
@@ -403,7 +421,7 @@ const router = createRouter({
               },
             },
             {
-              path: "/solutions/algorand",
+              path: ApplicationRoute.algorand,
               component: () => import("../views/algorand_view.vue"),
               meta: {
                 title: "Algorand",
@@ -425,7 +443,7 @@ const router = createRouter({
               },
             },
             {
-              path: "/solutions/nodepilot",
+              path: ApplicationRoute.nodepilot,
               component: () => import("../views/node_pilot.vue"),
               meta: {
                 title: "Node Pilot",
@@ -447,7 +465,7 @@ const router = createRouter({
               },
             },
             {
-              path: "/solutions/wordpress",
+              path: ApplicationRoute.wordpress,
               component: () => import("../views/wordpress_view.vue"),
               meta: {
                 title: "Wordpress",
@@ -469,7 +487,7 @@ const router = createRouter({
               },
             },
             {
-              path: "/solutions/umbrel",
+              path: ApplicationRoute.umbrel,
               component: () => import("../views/umbrel_view.vue"),
               meta: {
                 title: "Umbrel",
@@ -491,7 +509,7 @@ const router = createRouter({
               },
             },
             {
-              path: "/solutions/freeflow",
+              path: ApplicationRoute.freeflow,
               component: () => import("../views/freeflow_view.vue"),
               meta: {
                 title: "Freeflow",
