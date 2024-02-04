@@ -15,6 +15,13 @@ export type InputFilterType = {
   type: string;
 };
 
+export type CPUBenchmark = {
+  multi: number;
+  single: number;
+  threads: number;
+  workloads: number;
+};
+
 export enum ProfileTypes {
   DIY,
   TITAN,

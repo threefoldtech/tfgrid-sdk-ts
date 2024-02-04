@@ -1,6 +1,6 @@
 <template>
   <card-details
-    v-if="node.status === 'up'"
+    v-if="node.healthy"
     :loading="loading"
     title="CPU Benchmark"
     :items="cpuBenchmark"
@@ -12,7 +12,7 @@
 import type { GridNode } from "@threefold/gridproxy_client";
 import { onMounted, type PropType, ref } from "vue";
 
-import type { NodeDetailsCard } from "@/types";
+import type { CPUBenchmark, NodeDetailsCard } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import { useGrid } from "../../stores";
@@ -33,28 +33,34 @@ export default {
     const loading = ref<boolean>(false);
     const cpuBenchmark = ref<NodeDetailsCard[]>();
 
-    onMounted(async () => {
-      try {
-        loading.value = true;
-        await getNodeCPUBenchmarkCard();
-      } catch (error) {
-        createCustomToast("Failed to load CPU Benchmark details. Please try again later.", ToastType.danger);
-      } finally {
-        loading.value = false;
-      }
-    });
-
+    function format(val: number | undefined) {
+      return val ? val.toString() : "-";
+    }
     const getNodeCPUBenchmarkCard = async (): Promise<NodeDetailsCard[]> => {
       const res = await gridStore.grid.zos.getNodeCPUTest({ nodeId: props.node.nodeId });
-      const { multi, single, threads, workloads } = res.result;
-      cpuBenchmark.value = [
-        { name: "Multi", value: multi.toString() || "-" },
-        { name: "Single", value: single.toString() || "-" },
-        { name: "Threads", value: threads.toString() || "-" },
-        { name: "Workloads", value: workloads.toString() || "-" },
-      ];
-      return cpuBenchmark.value;
+      let multi, single, threads;
+      if (res.result) {
+        ({ multi, single, threads } = res.result as CPUBenchmark);
+      }
+      return (cpuBenchmark.value = [
+        { name: "Multi", value: format(multi) },
+        { name: "Single", value: format(single) },
+        { name: "Threads", value: format(threads) },
+      ]);
     };
+
+    onMounted(async () => {
+      if (props.node.healthy) {
+        try {
+          loading.value = true;
+          await getNodeCPUBenchmarkCard();
+        } catch (error) {
+          createCustomToast("Failed to load CPU Benchmark details. Please try again later.", ToastType.danger);
+        } finally {
+          loading.value = false;
+        }
+      }
+    });
 
     return {
       cpuBenchmark,

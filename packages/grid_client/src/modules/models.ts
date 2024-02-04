@@ -661,21 +661,21 @@ class NodeCPUTest {
   @Expose() @IsNotEmpty() @IsString() name: string;
   @Expose() @IsNotEmpty() @IsString() description: string;
   @Expose() @IsNotEmpty() @IsNumber() timestamp: number;
-  @Expose() result: CPUBenchmark;
+  @Expose() result: CPUBenchmark | {};
 }
 
 class NodeIPValidation {
   @Expose() @IsNotEmpty() @IsString() name: string;
   @Expose() @IsNotEmpty() @IsString() description: string;
   @Expose() @IsNotEmpty() @IsNumber() timestamp: number;
-  @Expose() result: IPValidation;
+  @Expose() result: IPValidation | {};
 }
 
 class NodeIPerf {
   @Expose() @IsNotEmpty() @IsString() name: string;
   @Expose() @IsNotEmpty() @IsString() description: string;
   @Expose() @IsNotEmpty() @IsNumber() timestamp: number;
-  @Expose() result: IPerf[];
+  @Expose() result: IPerf[] | [];
 }
 
 class CPUReport {

@@ -1,6 +1,6 @@
 <template>
   <card-details
-    v-if="node.status === 'up'"
+    v-if="node.healthy"
     :loading="loading"
     title="Network Speed Test"
     :items="IperfDetails"
@@ -35,13 +35,15 @@ export default {
     const IperfDetails = ref<NodeDetailsCard[]>();
 
     onMounted(async () => {
-      try {
-        loading.value = true;
-        await getNodeIPerfCard();
-      } catch (error) {
-        createCustomToast("Failed to load IPerf details. Please try again later.", ToastType.danger);
-      } finally {
-        loading.value = false;
+      if (props.node.healthy) {
+        try {
+          loading.value = true;
+          await getNodeIPerfCard();
+        } catch (error) {
+          createCustomToast("Failed to load IPerf details. Please try again later.", ToastType.danger);
+        } finally {
+          loading.value = false;
+        }
       }
     });
 
