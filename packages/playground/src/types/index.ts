@@ -312,4 +312,5 @@ export const nodeInitializer: GridNode = {
   stats: nodeStatsInitializer,
   cards: [],
   num_gpu: 0,
+  healthy: false,
 };
