@@ -14,7 +14,7 @@
       <div :class="`items`" v-else>
         <slot name="gpu-hint-message" />
 
-        <v-row class="bb-gray mt-2" v-for="item in items" :key="item.name">
+        <v-row class="bb-gray" v-for="item in items" :key="item.name">
           <v-col class="d-flex justify-start align-center ml-3">
             <p class="font-14">{{ item.name }}</p>
             <v-chip class="ml-4" v-if="item.nameHint" :color="item.nameHintColor">{{ item.nameHint }}</v-chip>
