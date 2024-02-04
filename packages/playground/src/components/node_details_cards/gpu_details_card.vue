@@ -24,14 +24,14 @@
           </v-col>
         </v-row>
       </div>
-      <div v-if="isError">
+      <div v-else>
         <v-card class="d-flex justify-center align-center">
           <div class="text-center">
             <v-icon variant="tonal" color="error" style="font-size: 50px" icon="mdi-close-circle-outline" />
             <p class="mt-4 mb-4 font-weight-bold text-error">
               {{ errorMessage }}
             </p>
-            <v-btn class="mr-4" @click="RerequestNode" color="primary" text="Try Again" />
+            <v-btn :loading="loading" class="mr-4" @click="RerequestNode" color="primary" text="Try Again" />
           </div>
         </v-card>
       </div>
@@ -101,15 +101,13 @@ export default {
     onMounted(mount);
 
     async function RerequestNode() {
-      errorMessage.value = "";
-      isError.value = false;
       if (node.value.nodeId > 0 && nodeOptions.value) {
+        loading.value = true;
         nodeOptions.value.loadGpu = true;
         try {
-          loading.value = true;
-
           const _node: GridNode = await getNode(node.value.nodeId, nodeOptions.value);
           node.value = _node;
+          loading.value = false;
           mount();
         } catch (_) {
           isError.value = true;
@@ -117,6 +115,11 @@ export default {
         } finally {
           loading.value = false;
         }
+      } else {
+        loading.value = true;
+        setTimeout(() => {
+          loading.value = false;
+        }, 3000);
       }
     }
     const copy = (value: string) => {
