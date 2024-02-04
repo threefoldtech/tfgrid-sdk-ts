@@ -8,5 +8,6 @@ COPY . /app/
 RUN yarn install
 RUN yarn lerna run build --no-private && yarn workspace @threefold/newstats build
 
-FROM nginx:1.16.0-alpine
+FROM nginx
 COPY --from=build /app/packages/new_stats/dist /usr/share/nginx/html
+COPY --from=build /app/nginx /etc/nginx
