@@ -95,7 +95,7 @@
       <v-card-text>
         <v-row class="d-flex justify-center">
           Amount Locked:
-          {{ contractLocked?.amountLocked ?? 0 > 0 ? contractLocked?.amountLocked.toFixed(3) : 0 }}
+          {{ getAmountLocked() }}
           TFTs.
         </v-row>
         <v-alert
@@ -153,8 +153,7 @@ import { ContractStates, type GridClient } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError, TFChainErrors } from "@threefold/types";
-import { computed, defineComponent, type PropType, type Ref, ref } from "vue";
-import { capitalize, onMounted } from "vue";
+import { capitalize, computed, defineComponent, type PropType, type Ref, ref } from "vue";
 
 import type { VDataTableHeader } from "@/types";
 import { ContractType, getNodeStateColor, getStateColor, type NormalizedContract } from "@/utils/contracts";
@@ -190,19 +189,17 @@ const props = defineProps({
   },
 });
 
-const rentContracts = ref<NormalizedContract[]>([]);
-const nodeIdsInRentContracts = ref<number[]>([]);
-
-onMounted(() => {
-  rentContracts.value = props.contracts.value.filter(contract => contract.type === ContractType.RENT);
-  nodeIdsInRentContracts.value = rentContracts.value
-    .map(contract => contract.nodeId)
-    .filter(nodeId => nodeId !== undefined) as number[];
-});
+const getAmountLocked = (): number => {
+  const amountLocked = contractLocked?.value?.amountLocked ?? 0;
+  return amountLocked > 0 ? parseFloat(amountLocked.toFixed(3)) : 0;
+};
 
 const isNodeInRentContracts = computed(() => {
-  if (contractLocked.value && contractLocked.value.amountLocked === 0) {
-    return nodeIdsInRentContracts.value.includes(selectedItem.value.nodeId);
+  if (props.contractsType == "rent") {
+    const nodeIds = contracts.value.map(contract => contract.nodeId).filter(nodeId => nodeId !== undefined) as number[];
+    if (contractLocked.value && contractLocked.value.amountLocked === 0) {
+      return nodeIds.includes(selectedItem.value.nodeId);
+    }
   }
   return false;
 });
