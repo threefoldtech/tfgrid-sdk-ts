@@ -110,6 +110,14 @@
         />
         <SetExtraFee class="me-2" :nodeId="item.raw.nodeId" />
       </template>
+
+      <template v-slot:[`item.country`]="{ item }">
+        {{ item.raw.country || "-" }}
+      </template>
+
+      <template v-slot:[`item.serialNumber`]="{ item }">
+        {{ item.raw.serialNumber || "-" }}
+      </template>
     </v-data-table-server>
   </div>
 </template>
@@ -255,6 +263,10 @@ export default {
       return (capacity / 1024 / 1024 / 1024).toFixed(2);
     }
 
+    const country = "";
+    const city = "";
+    const serialNumber = "";
+
     function getNodeDetails(item: any): NodeDetailsCard[] {
       return [
         { name: "Node ID", value: item.nodeId },
@@ -263,9 +275,9 @@ export default {
         { name: "Certification", value: item.certificationType },
         { name: "First Boot at", value: moment(item.created * 1000).format("MM-DD-YY, HH:mm A") },
         { name: "Updated at", value: moment(item.updatedAt * 1000).format("MM-DD-YY, HH:mm A") },
-        { name: "Country", value: item.country },
-        { name: "City", value: item.city },
-        { name: "Serial Number", value: item.serialNumber },
+        { name: "Country", value: country || "-" },
+        { name: "City", value: city || "-" },
+        { name: "Serial Number", value: serialNumber || "-" },
         { name: "Pricing Policy", value: item.farmingPolicyId },
         { name: "Uptime", value: item.uptime + "%" },
       ];
