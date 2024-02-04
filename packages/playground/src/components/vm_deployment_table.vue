@@ -96,7 +96,7 @@
 
       <template #[`item.status`]="{ item }">
         <v-chip variant="flat" :color="getNodeHealthColor(item.columns.status as string).color">
-          <v-tooltip v-if="item.columns.status == 'error'" activator="parent" location="top">{{
+          <v-tooltip v-if="item.columns.status == NodeHealth.Error" activator="parent" location="top">{{
             item.columns.message
           }}</v-tooltip>
           <span>
@@ -126,11 +126,12 @@
 <script lang="ts" setup>
 import { capitalize, computed, onMounted, ref } from "vue";
 
-import { getNodeHealthColor } from "@/utils/get_nodes";
+import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
 import { useProfileManager } from "../stores";
 import { getGrid, updateGrid } from "../utils/grid";
 import { loadVms, mergeLoadedDeployments } from "../utils/load_deployment";
+
 const profileManager = useProfileManager();
 
 const props = defineProps<{
