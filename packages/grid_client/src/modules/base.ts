@@ -164,12 +164,9 @@ class BaseModule {
     }
     return this.contracts.filter(c => {
       const deploymentData = JSON.parse(c.deploymentData) as { type: string; name: string; projectName: string };
-      if (
-        (this.projectName === "" && deploymentData.projectName === this.projectName) ||
-        (this.projectName !== "" && deploymentData.projectName.startsWith(this.projectName))
-      )
-        if (deploymentData.type === modulesNames[this.moduleName]) return true;
-      return false;
+      return (
+        deploymentData.projectName.startsWith(this.projectName) && deploymentData.type === modulesNames[this.moduleName]
+      );
     });
   }
 
@@ -179,7 +176,6 @@ class BaseModule {
     const contracts = await this.getMyContracts(true);
     return contracts.map(c => {
       const deploymentData = JSON.parse(c.deploymentData) as { name: string };
-      console.log(this.projectName, deploymentData.name);
       return deploymentData.name;
     });
   }
