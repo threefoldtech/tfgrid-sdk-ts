@@ -5,8 +5,15 @@
       <p class="text-h6 mb-4 mt-2 ml-2">Choose a way to select Node</p>
 
       <v-radio-group v-model="wayToSelect" color="primary" inline>
-        <v-radio label="Automated" value="automated" class="mr-6"></v-radio>
-        <v-radio label="Manual" value="manual"></v-radio>
+        <InputTooltip
+          align-center
+          tooltip="Automatically select your node by filtering with Region, country, or farm name"
+        >
+          <v-radio label="Automated" value="automated"></v-radio>
+        </InputTooltip>
+        <InputTooltip align-center tooltip="Manually select your node by entering its id">
+          <v-radio label="Manual" value="manual" class="ml-5"></v-radio>
+        </InputTooltip>
       </v-radio-group>
 
       <template v-if="wayToSelect === 'automated'">
