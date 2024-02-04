@@ -95,7 +95,7 @@
       </template>
 
       <template #[`item.status`]="{ item }">
-        <v-chip variant="flat" :color="getNodeHealthColor(item.columns.status as string).color">
+        <v-chip :color="getNodeHealthColor(item.columns.status as string).color">
           <v-tooltip v-if="item.columns.status == NodeHealth.Error" activator="parent" location="top">{{
             item.columns.message
           }}</v-tooltip>
