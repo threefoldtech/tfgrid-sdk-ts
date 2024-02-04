@@ -110,10 +110,6 @@
               Remove Config
             </v-btn>
 
-            <v-btn v-if="runningInDevMode" @click="fillFakeData" color="warning" variant="outlined">
-              Fill fake data
-            </v-btn>
-
             <!-- Close and Save Buttons -->
             <div>
               <v-btn @click="showDialogue = false" variant="outlined" color="anchor">Close</v-btn>
@@ -194,7 +190,6 @@ export default {
     const isConfigChanged = ref(false);
     const formRef = useFormRef();
     const grid = useGrid();
-    const runningInDevMode = import.meta.env.DEV;
 
     const defualtNodeConfig = ref<PublicConfig>(publicConfigInitializer());
     const config = ref<PublicConfig>(publicConfigInitializer());
@@ -263,16 +258,6 @@ export default {
       }
     }
 
-    const fillFakeData = () => {
-      config.value = {
-        ipv4: "123.123.255.52/16",
-        gw4: "123.123.255.55",
-        ipv6: "::52/16",
-        gw6: "::54",
-        domain: "test.com",
-      };
-    };
-
     async function removeConfig() {
       try {
         isRemoving.value = true;
@@ -311,10 +296,8 @@ export default {
       config,
       isConfigChanged,
       formRef,
-      runningInDevMode,
       AddConfig,
       removeConfig,
-      fillFakeData,
       isNodeHasConfig,
     };
   },
