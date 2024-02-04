@@ -112,7 +112,7 @@ export const getNodeTypeColor = (dedicated: boolean, rentedByTwinId: number): No
 
 export const getNodeHealthColor = (health: string): NodeHealthColor => {
   if (health == NodeHealth.Ok) {
-    return { color: "success", type: NodeHealth.Ok };
+    return { color: "primary", type: NodeHealth.Ok };
   } else if (health == NodeHealth.Init) {
     return { color: "warning", type: NodeHealth.Init };
   } else {
