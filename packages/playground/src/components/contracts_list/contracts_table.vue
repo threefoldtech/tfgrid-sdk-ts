@@ -195,7 +195,7 @@ const getAmountLocked = (): number => {
 };
 
 const isNodeInRentContracts = computed(() => {
-  if (props.contractsType == "rent") {
+  if (props.contractsType == ContractType.RENT) {
     const nodeIds = contracts.value.map(contract => contract.nodeId).filter(nodeId => nodeId !== undefined) as number[];
     if (contractLocked.value && contractLocked.value.amountLocked === 0) {
       return nodeIds.includes(selectedItem.value.nodeId);
