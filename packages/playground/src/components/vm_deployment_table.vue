@@ -9,7 +9,13 @@
           >or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span
         >.
       </span>
-      <v-icon class="custom-icon" @click="showDialog = true">mdi-file-document-outline </v-icon>
+      <v-tooltip location="top" text="Show failed deployments">
+        <template #activator="{ props }">
+          <v-icon v-bind="props" class="custom-icon" @click="showDialog = true"
+            >mdi-file-document-refresh-outline
+          </v-icon>
+        </template>
+      </v-tooltip>
 
       <v-dialog transition="dialog-bottom-transition" v-model="showDialog" max-width="500px" scrollable>
         <v-card>
