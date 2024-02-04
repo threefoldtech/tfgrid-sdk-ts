@@ -7,20 +7,12 @@ const urls = [
   "https://gridproxy.dev.grid.tf/stats?status=standby",
 ];
 
-// Dummy data for fallback
-const DUMMY_DATA = {
-  capacity: "32.59 PB",
-  nodes: 2552,
-  countries: 60,
-  cores: 63706,
-};
-
 async function getStats(r) {
   const fetchPromises = [];
 
   for (let i = 0; i < urls.length; i++) {
     // eslint-disable-next-line no-undef
-    fetchPromises.push(ngx.fetch(urls[i], { method: "GET", verify: false })); // eslint-disable-line
+    fetchPromises.push(ngx.fetch(urls[i], { method: "GET", verify: false }));
   }
 
   try {
