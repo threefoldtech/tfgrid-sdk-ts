@@ -13,7 +13,7 @@ import { AddZDBModel, DeleteZDBModel, ZDBDeleteModel, ZDBGetModel, ZDBSModel } f
 import { checkBalance } from "./utils";
 
 class ZdbsModule extends BaseModule {
-  fileName = "zdbs.json";
+  moduleName = "zdb";
   workloadTypes = [WorkloadTypes.zdb];
   zdb: ZdbHL;
   constructor(public config: GridClientConfig) {

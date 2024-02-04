@@ -1,7 +1,7 @@
 import { GridClientErrors, ValidationError } from "@threefold/types";
 import * as PATH from "path";
 
-import { RMB } from "../clients";
+import { GqlNodeContract, RMB } from "../clients";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { formatErrorMessage } from "../helpers";
@@ -22,6 +22,13 @@ import { Workload, WorkloadTypes } from "../zos/workload";
 import { Zmachine, ZmachineResult } from "../zos/zmachine";
 import { Zmount } from "../zos/zmount";
 
+const modulesNames = {
+  machines: "vm",
+  kubernetes: "kubernetes",
+  gateways: "gateway",
+  qsfs_zdbs: "QSFS",
+  zdb: "zdb",
+};
 class BaseModule {
   moduleName = "";
   projectName = "";
@@ -31,6 +38,7 @@ class BaseModule {
   twinDeploymentHandler: TwinDeploymentHandler;
   backendStorage: BackendStorage;
   tfClient: TFClient;
+  contracts: GqlNodeContract[];
 
   constructor(public config: GridClientConfig) {
     this.projectName = config.projectName;
@@ -57,7 +65,7 @@ class BaseModule {
     return PATH.join(this.config.storePath, this.projectName, this.moduleName, name);
   }
 
-  async getDeploymentContracts(name: string) {
+  async getOldDeploymentContracts(name: string) {
     const path = this.getNewDeploymentPath(name, "contracts.json");
     const contracts = await this.backendStorage.load(path);
     if (!contracts) {
@@ -66,22 +74,25 @@ class BaseModule {
     return contracts;
   }
 
+  async getDeploymentContracts(name: string) {
+    const contracts = await this.getMyContracts();
+    const filteredContracts = contracts.filter(c => {
+      const deploymentData = JSON.parse(c.deploymentData) as { name: string };
+      return deploymentData.name === name;
+    });
+    if (!filteredContracts) {
+      return [];
+    }
+    return filteredContracts;
+  }
+
   async save(name: string, contracts: Record<string, unknown[]>) {
     const contractsPath = PATH.join(this.getNewDeploymentPath(name), "contracts.json");
     const wireguardPath = PATH.join(this.getDeploymentPath(name), `${name}.conf`);
-    const oldContracts = await this.getDeploymentContracts(name);
+    const oldContracts = await this.getOldDeploymentContracts(name);
     let StoreContracts = oldContracts;
     let backendOperations = [];
 
-    for (const contract of contracts["created"]) {
-      StoreContracts.push({
-        contract_id: contract["contractId"],
-        node_id: contract["contractType"]["nodeContract"]["nodeId"],
-      });
-      const contractPath = PATH.join(this.config.storePath, "contracts", `${contract["contractId"]}.json`);
-      const contractInfo = { projectName: this.projectName, moduleName: this.moduleName, deploymentName: name };
-      backendOperations = backendOperations.concat(await this.backendStorage.dump(contractPath, contractInfo));
-    }
     for (const contract of contracts["deleted"]) {
       StoreContracts = StoreContracts.filter(c => c["contract_id"] !== contract["contractId"]);
       const contractPath = PATH.join(this.config.storePath, "contracts", `${contract["contractId"]}.json`);
@@ -147,9 +158,30 @@ class BaseModule {
     await Promise.all(keys.map(__updatePath).flat(1));
   }
 
+  private async getMyContracts(fetch = false) {
+    if (fetch || !this.contracts) {
+      this.contracts = await this.tfClient.contracts.listMyNodeContracts({ graphqlURL: this.config.graphqlURL });
+    }
+    return this.contracts.filter(c => {
+      const deploymentData = JSON.parse(c.deploymentData) as { type: string; name: string; projectName: string };
+      if (
+        (this.projectName === "" && deploymentData.projectName === this.projectName) ||
+        (this.projectName !== "" && deploymentData.projectName.startsWith(this.projectName))
+      )
+        if (deploymentData.type === modulesNames[this.moduleName]) return true;
+      return false;
+    });
+  }
+
   async _list(): Promise<string[]> {
     await this._migrateListKeys();
-    return this.backendStorage.list(this.getNewDeploymentPath(""));
+    //TODO: optimize it by doing the filtering directly on graphql
+    const contracts = await this.getMyContracts(true);
+    return contracts.map(c => {
+      const deploymentData = JSON.parse(c.deploymentData) as { name: string };
+      console.log(this.projectName, deploymentData.name);
+      return deploymentData.name;
+    });
   }
 
   async exists(name: string): Promise<boolean> {
@@ -166,10 +198,10 @@ class BaseModule {
   }
 
   async _getDeploymentNodeIds(name: string): Promise<number[]> {
-    const nodeIds = [];
+    const nodeIds: number[] = [];
     const contracts = await this.getDeploymentContracts(name);
     for (const contract of contracts) {
-      nodeIds.push(contract["node_id"]);
+      nodeIds.push(contract.nodeID);
     }
     return nodeIds;
   }
@@ -177,18 +209,20 @@ class BaseModule {
   async _getContractIdFromNodeId(name: string, nodeId: number): Promise<number> {
     const contracts = await this.getDeploymentContracts(name);
     for (const contract of contracts) {
-      if (contract["node_id"] === nodeId) {
-        return contract["contract_id"];
+      if (contract.nodeID === nodeId) {
+        return +contract.contractID;
       }
     }
+    return 0;
   }
   async _getNodeIdFromContractId(name: string, contractId: number): Promise<number> {
     const contracts = await this.getDeploymentContracts(name);
     for (const contract of contracts) {
-      if (contract["contract_id"] === contractId) {
-        return contract["node_id"];
+      if (+contract.contractID === contractId) {
+        return contract.nodeID;
       }
     }
+    return 0;
   }
 
   async _getWorkloadsByTypes(deploymentName: string, deployments, types: WorkloadTypes[]): Promise<Workload[]> {
@@ -294,14 +328,14 @@ class BaseModule {
     }
     await this.tfClient.connect();
     for (const contract of contracts) {
-      const c = await this.tfClient.contracts.get({ id: contract["contract_id"] });
+      const c = await this.tfClient.contracts.get({ id: +contract.contractID });
       if (c === null) {
-        await this.save(name, { created: [], deleted: [{ contractId: contract["contract_id"] }] });
+        await this.save(name, { created: [], deleted: [{ contractId: +contract.contractID }] });
         continue;
       }
       const nodes = new Nodes(this.config.graphqlURL, this.config.proxyURL, this.config.rmbClient);
-      const node_twin_id = await nodes.getNodeTwinId(contract["node_id"]);
-      const payload = JSON.stringify({ contract_id: contract["contract_id"] });
+      const node_twin_id = await nodes.getNodeTwinId(contract.nodeID);
+      const payload = JSON.stringify({ contract_id: +contract.contractID });
       let deployment;
       try {
         deployment = await this.rmb.request([node_twin_id], "zos.deployment.get", payload);
@@ -318,7 +352,7 @@ class BaseModule {
       if (found) {
         deployments.push(deployment);
       } else {
-        await this.save(name, { created: [], deleted: [{ contractId: contract["contract_id"] }] });
+        await this.save(name, { created: [], deleted: [{ contractId: +contract.contractID }] });
       }
     }
     return deployments;
@@ -569,7 +603,6 @@ class BaseModule {
     }
     finalTwinDeployments.push(twinDeployment);
     const contracts = await this.twinDeploymentHandler.handle(finalTwinDeployments);
-    await this.save(deployment_name, contracts);
     return { contracts: contracts };
   }
 

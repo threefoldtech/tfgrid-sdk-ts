@@ -141,6 +141,34 @@ class TFContracts extends Contracts {
     }
   }
 
+  async listNodeContractsByTwinId(options: ListContractByTwinIdOptions): Promise<GqlNodeContract[]> {
+    options.stateList = options.stateList || [ContractStates.Created, ContractStates.GracePeriod];
+    const state = `[${options.stateList.join(", ")}]`;
+    const gqlClient = new Graphql(options.graphqlURL);
+    const opts = `(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, orderBy: twinID_ASC)`;
+    try {
+      const nodeContractsCount = await gqlClient.getItemTotalCount("nodeContracts", opts);
+      const body = `query getContracts($nodeContractsCount: Int!){
+                nodeContracts(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, limit: $nodeContractsCount) {
+                  contractID
+                  deploymentData
+                  state
+                  createdAt
+                  nodeID
+                  numberOfPublicIPs
+                }
+              }`;
+      const response = await gqlClient.query(body, {
+        nodeContractsCount,
+      });
+
+      return (response["data"] as GqlContracts).nodeContracts;
+    } catch (err) {
+      (err as Error).message = formatErrorMessage(`Error listing contracts by twin id ${options.twinId}.`, err);
+      throw err;
+    }
+  }
+
   /**
    * Get contract consumption per hour in TFT.
    *
@@ -215,6 +243,15 @@ class TFContracts extends Contracts {
   async listMyContracts(options: ListMyContractOptions): Promise<GqlContracts> {
     const twinId = await this.client.twins.getMyTwinId();
     return await this.listContractsByTwinId({
+      graphqlURL: options.graphqlURL,
+      twinId: twinId,
+      stateList: options.stateList,
+    });
+  }
+
+  async listMyNodeContracts(options: ListMyContractOptions): Promise<GqlNodeContract[]> {
+    const twinId = await this.client.twins.getMyTwinId();
+    return await this.listNodeContractsByTwinId({
       graphqlURL: options.graphqlURL,
       twinId: twinId,
       stateList: options.stateList,

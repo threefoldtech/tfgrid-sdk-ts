@@ -160,19 +160,15 @@ async function loadDeployments() {
     await migrateModule(grid!.gateway);
   }
 
-  const filter =
-    props.projectName.toLowerCase() === ProjectName.VM.toLowerCase()
-      ? undefined
-      : ([vm]: [{ flist: string }]) => vm.flist.replace(/-/g, "").includes(props.projectName.toLowerCase());
-
   const chunk3 =
-    props.projectName.toLowerCase() === ProjectName.Fullvm.toLowerCase()
-      ? { count: 0, items: [] }
-      : await loadVms(updateGrid(grid!, { projectName: "" }), { filter });
+    props.projectName.toLowerCase() === ProjectName.VM.toLowerCase()
+      ? await loadVms(updateGrid(grid!, { projectName: "" }))
+      : { count: 0, items: [] };
   if (chunk3.count > 0 && migrateGateways) {
     await migrateModule(grid!.gateway);
   }
 
+  console.log({ chunk1, chunk2, chunk3 });
   const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
   failedDeployments.value = [
     ...(Array.isArray((chunk1 as any).failedDeployments) ? (chunk1 as any).failedDeployments : []),
