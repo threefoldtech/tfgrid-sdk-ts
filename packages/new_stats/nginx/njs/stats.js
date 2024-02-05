@@ -8,12 +8,8 @@ const urls = [
 ];
 
 async function getStats(r) {
-  const fetchPromises = [];
-
-  for (let i = 0; i < urls.length; i++) {
-    // eslint-disable-next-line no-undef
-    fetchPromises.push(ngx.fetch(urls[i], { method: "GET", verify: false }));
-  }
+  //   eslint-disable-next-line no-undef
+  const fetchPromises = urls.map(url => ngx.fetch(url, { verify: false }));
 
   try {
     const responses = await Promise.all(fetchPromises);
@@ -30,10 +26,19 @@ async function getStats(r) {
 
     r.headersOut["Content-Type"] = "application/json";
     r.headersOut["Content-Disposition"] = "inline";
-    r.return(200, JSON.stringify(mergeStatsData(stats)), "application/json");
+    r.return(200, JSON.stringify(mergeStatsData(stats)));
   } catch (error) {
     r.error(error);
-    r.return(500);
+    const DUMMY_DATA = {
+      capacity: "32.74 PB",
+      nodes: 2569,
+      countries: 61,
+      cores: 63968,
+      notUpdated: true,
+    };
+    r.headersOut["Content-Type"] = "application/json";
+    r.headersOut["Content-Disposition"] = "inline";
+    r.return(200, JSON.stringify(DUMMY_DATA));
   }
 }
 
