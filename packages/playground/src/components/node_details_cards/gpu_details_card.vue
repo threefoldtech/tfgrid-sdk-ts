@@ -7,7 +7,7 @@
     icon="mdi-credit-card-settings-outline"
   >
     <template #gpu-hint-message>
-      <div v-if="node.cards?.length">
+      <div v-if="node.cards?.length" class="mb-3">
         <v-chip class="d-flex justify-center ma-4 mt-1" color="info">
           Select a GPU card ID from the below selection to load its data.
         </v-chip>
@@ -19,7 +19,15 @@
             </v-chip>
           </v-col>
           <v-col class="mr-3 d-flex justify-end align-center">
-            <v-select chips clearable hide-details="auto" v-model="cardId" :items="cardsIds" variant="outlined" />
+            <v-select
+              chips
+              density="compact"
+              clearable
+              hide-details="auto"
+              v-model="cardId"
+              :items="cardsIds"
+              variant="outlined"
+            />
             <v-icon class="ml-1" :icon="'mdi-content-copy'" @click="copy(cardId)" />
           </v-col>
         </v-row>
