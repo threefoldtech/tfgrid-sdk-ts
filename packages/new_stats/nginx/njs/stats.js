@@ -9,7 +9,7 @@ const urls = [
 
 async function getStats(r) {
   //   eslint-disable-next-line no-undef
-  const fetchPromises = urls.map(url => ngx.fetch(url, { verify: false }));
+  const fetchPromises = urls.map(url => ngx.fetch(url, { verify: r.headersIn["Host"] !== "localhost" })); // disable ssl on localhost
 
   try {
     const responses = await Promise.all(fetchPromises);
