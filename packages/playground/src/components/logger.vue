@@ -79,7 +79,7 @@
   <v-dialog max-width="400px" v-model="clearDialog">
     <v-card>
       <VCardTitle v-text="'Clear Logs'" />
-      <VCardText v-text="'This will delete all your logs. Be careful this operation is irreversible!'" />
+      <VCardText v-text="'This will delete all of your logs. Be careful this operation is irreversible!'" />
       <v-card-actions>
         <v-spacer />
         <v-btn variant="outlined" @click="clearDialog = false" text="Cancel" />
