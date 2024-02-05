@@ -92,7 +92,6 @@ class MachinesModule extends BaseModule {
     events.emit("logs", `Start creating the machine deployment with name ${options.name}`);
     const [twinDeployments, , wireguardConfig] = await this._createDeployment(options);
     const contracts = await this.twinDeploymentHandler.handle(twinDeployments);
-    await this.save(options.name, contracts);
     return { contracts: contracts, wireguard_config: wireguardConfig };
   }
 

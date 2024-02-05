@@ -60,7 +60,6 @@ class ZdbsModule extends BaseModule {
     events.emit("logs", `Start creating the ZDB deployment with name ${options.name}`);
     const twinDeployments = await this._createDeployment(options);
     const contracts = await this.twinDeploymentHandler.handle(twinDeployments);
-    await this.save(options.name, contracts);
     return { contracts: contracts };
   }
 
