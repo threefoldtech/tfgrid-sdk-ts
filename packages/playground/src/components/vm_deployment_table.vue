@@ -138,7 +138,7 @@ const failedDeployments = ref<
   {
     name: string;
     nodes?: number[];
-    contracts?: { contract_id: number; node_id: number }[];
+    contracts?: { contractID: number; node_id: number }[];
   }[]
 >([]);
 
@@ -245,7 +245,7 @@ const failedDeploymentList = computed(() => {
       const contractMessage =
         contracts.length > 0
           ? ` <span class="ml-4 text-primary font-weight-bold">With Contract ID:</span> ${contracts
-              .map(c => c.contract_id)
+              .map(c => c.contractID)
               .join(", ")}.`
           : "";
 
