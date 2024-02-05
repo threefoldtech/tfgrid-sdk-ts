@@ -5,32 +5,34 @@
         <v-expansion-panel-title :class="{ 'text-error': !!connectDB.error }">
           <span class="text-subtitle-1"> <VIcon icon="mdi-cog" /> Dashboard Logs ({{ logs.length }}) </span>
           <template v-slot:actions>
-            <VTooltip text="Download Logs">
-              <template #activator="{ props }">
-                <VBtn
-                  class="text-link"
-                  size="xs"
-                  v-bind="props"
-                  :disabled="!!connectDB.error || debugOpened !== 0 || logs.length === 0"
-                  @click.stop="downloadLogs"
-                >
-                  <VIcon icon="mdi-download" />
-                </VBtn>
-              </template>
-            </VTooltip>
-            <VTooltip text="Clear Logs">
-              <template #activator="{ props }">
-                <VBtn
-                  class="text-error"
-                  size="xs"
-                  v-bind="props"
-                  :disabled="!!connectDB.error || debugOpened !== 0 || logs.length === 0"
-                  @click.stop="clearDialog = true"
-                >
-                  <VIcon icon="mdi-cancel" />
-                </VBtn>
-              </template>
-            </VTooltip>
+            <div :class="{ 'pr-14': debugOpened !== 0 }">
+              <VTooltip text="Download Logs">
+                <template #activator="{ props }">
+                  <VBtn
+                    class="text-link"
+                    size="xs"
+                    v-bind="props"
+                    :disabled="!!connectDB.error || logs.length === 0"
+                    @click.stop="downloadLogs"
+                  >
+                    <VIcon icon="mdi-download" />
+                  </VBtn>
+                </template>
+              </VTooltip>
+              <VTooltip text="Clear Logs">
+                <template #activator="{ props }">
+                  <VBtn
+                    class="text-error"
+                    size="xs"
+                    v-bind="props"
+                    :disabled="!!connectDB.error || logs.length === 0"
+                    @click.stop="clearDialog = true"
+                  >
+                    <VIcon icon="mdi-cancel" />
+                  </VBtn>
+                </template>
+              </VTooltip>
+            </div>
           </template>
         </v-expansion-panel-title>
 
