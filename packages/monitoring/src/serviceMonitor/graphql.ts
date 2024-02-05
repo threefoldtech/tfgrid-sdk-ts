@@ -1,7 +1,7 @@
 import { resolveServiceStatus, sendGetRequest } from "../helpers/utils";
 import { ILivenessChecker, ServiceStatus } from "../types";
 
-export class GraphQlMonitor implements ILivenessChecker {
+export class GraphQLMonitor implements ILivenessChecker {
   private readonly name = "GraphQl";
   private readonly url: string;
   constructor(graphQlUrl: string) {
