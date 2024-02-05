@@ -18,6 +18,7 @@
       @update:focused="updateFocused($event)"
       v-model:search.trim="searchQuery"
       @keyup="searchForFarms"
+      spellcheck="false"
       :hint="
         !validFilters
           ? 'Please provide valid data.'

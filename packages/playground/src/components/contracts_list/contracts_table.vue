@@ -29,7 +29,7 @@
         >
           <template #activator="{ props }">
             <v-chip
-              @click.stop="contractLockDetails(item.value.contractId)"
+              @click.stop="contractLockDetails(item.value)"
               v-bind="props"
               :color="getStateColor(item.value.state)"
             >
@@ -89,6 +89,41 @@
     </template>
   </weblet-layout>
 
+  <v-dialog width="800" v-model="contractStateDialog">
+    <v-card>
+      <v-card-title class="text-h5 mt-2"> Contract lock Details</v-card-title>
+      <v-card-text>
+        <v-row class="d-flex justify-center">
+          Amount Locked:
+          {{ getAmountLocked() }}
+          TFTs.
+        </v-row>
+        <v-alert
+          v-if="contractLocked?.amountLocked == 0 && isNodeInRentContracts"
+          class="ma-4"
+          type="warning"
+          variant="tonal"
+        >
+          This contract is in a grace period because it's on a dedicated machine also in a grace period. That's why this
+          node is locked with zero TFTS and no billing rate.
+        </v-alert>
+
+        <v-alert class="ma-4" type="info" variant="tonal"
+          >The Contracts in Grace Period, which means that your workloads are suspended but not deleted; in order to
+          resume your workloads and restore their functionality, Please fund your account with the amount mentioned
+          above.</v-alert
+        >
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn variant="outlined" color="anchor" class="mr-2 px-3" @click="contractStateDialog = false">
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+
   <v-dialog width="800" v-model="deletingDialog">
     <v-card>
       <v-card-title class="text-h5 mt-2"> Delete the following contracts? </v-card-title>
@@ -118,8 +153,7 @@ import { ContractStates, type GridClient } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import type { ContractLock } from "@threefold/tfchain_client";
 import { DeploymentKeyDeletionError, TFChainErrors } from "@threefold/types";
-import { defineComponent, type PropType, type Ref, ref } from "vue";
-import { capitalize } from "vue";
+import { capitalize, computed, defineComponent, type PropType, type Ref, ref } from "vue";
 
 import type { VDataTableHeader } from "@/types";
 import { ContractType, getNodeStateColor, getStateColor, type NormalizedContract } from "@/utils/contracts";
@@ -155,6 +189,21 @@ const props = defineProps({
   },
 });
 
+const getAmountLocked = (): number => {
+  const amountLocked = contractLocked?.value?.amountLocked ?? 0;
+  return amountLocked > 0 ? parseFloat(amountLocked.toFixed(3)) : 0;
+};
+
+const isNodeInRentContracts = computed(() => {
+  if (props.contractsType == ContractType.RENT) {
+    const nodeIds = contracts.value.map(contract => contract.nodeId).filter(nodeId => nodeId !== undefined) as number[];
+    if (contractLocked.value && contractLocked.value.amountLocked === 0) {
+      return nodeIds.includes(selectedItem.value.nodeId);
+    }
+  }
+  return false;
+});
+
 const emits = defineEmits(["update:deleted-contracts"]);
 
 const layout = ref();
@@ -169,6 +218,7 @@ const failedContractId = ref<number>();
 const loadingContractId = ref<number>();
 const selectedContracts = ref<NormalizedContract[]>([]);
 const contracts = ref<Ref<NormalizedContract[]>>(props.contracts);
+const selectedItem = ref();
 
 // Function to show details of a contract
 async function showDetails(value: any) {
@@ -194,16 +244,20 @@ async function showDetails(value: any) {
 }
 
 // Function to fetch contract lock details
-async function contractLockDetails(contractId: number) {
+async function contractLockDetails(item: any) {
   contractStateDialog.value = true;
   loadingShowDetails.value = true;
+  selectedItem.value = item;
   await props.grid.value?.contracts
-    .contractLock({ id: contractId })
+    .contractLock({ id: item.contractId })
     .then((data: ContractLock) => {
       contractLocked.value = data;
     })
     .catch(err => {
-      layout.value.setStatus("failed", normalizeError(err, `Failed to fetch the contract ${contractId} lock details.`));
+      layout.value.setStatus(
+        "failed",
+        normalizeError(err, `Failed to fetch the contract ${item.contractId} lock details.`),
+      );
       contractStateDialog.value = false;
     });
   loadingShowDetails.value = false;
