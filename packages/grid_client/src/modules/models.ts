@@ -23,8 +23,6 @@ import {
 import { Deployment } from "../zos/deployment";
 import { ZdbModes } from "../zos/zdb";
 import { blockchainType } from "./blockchainInterface";
-// TODO: add optional field not importing zos model
-// import { MyceliumIP } from "../zos";
 const NameLength = 15;
 const FarmNameLength = 40;
 

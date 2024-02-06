@@ -131,8 +131,7 @@ class Network {
     if (this.nodeExists(node_id)) {
       return;
     }
-    // TODO: generate random seed for mycelium(HEx based ip provided from user)
-    // TODO: add checks on mycelium (length && hexbased)
+
     events.emit("logs", `Adding node ${node_id} to network ${this.name}`);
     const keypair = this.generateWireguardKeypair();
     let znet = new Znet();

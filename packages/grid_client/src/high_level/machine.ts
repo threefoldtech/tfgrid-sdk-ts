@@ -21,7 +21,6 @@ import { Workload, WorkloadTypes } from "../zos/workload";
 import { HighLevelBase } from "./base";
 import { Operations, TwinDeployment } from "./models";
 
-// TODO: add checks on mycelium seed provided from user
 class VMHL extends HighLevelBase {
   async create(
     name: string,
@@ -305,7 +304,6 @@ class VMHL extends HighLevelBase {
         memory,
         rootfs_size,
         diskMounts,
-        // network name to added form mycelium
         network.name,
         machine_ip,
         planetary,
