@@ -42,7 +42,12 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
 
-          <IconActionBtn icon="mdi-cog" tooltip="Manage Domains" @click="dialog = item.value.deploymentName" />
+          <IconActionBtn
+            icon="mdi-cog"
+            tooltip="Manage Domains"
+            :disabled="item.value.fromAnotherClient"
+            @click="dialog = item.value.deploymentName"
+          />
 
           <ManageGatewayDialog
             v-if="dialog === item.value.deploymentName"
