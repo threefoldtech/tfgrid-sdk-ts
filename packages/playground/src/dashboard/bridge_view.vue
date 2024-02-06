@@ -7,13 +7,7 @@
     <v-card class="pa-5 white--text">
       <v-row class="pa-5 text-center">
         <v-col cols="12">
-          <v-select
-            :items="items"
-            label="Please select a chain:"
-            item-title="name"
-            item-value="id"
-            v-model="selectedItem"
-          ></v-select>
+          <v-text-field model-value="Stellar" label="Selected Chain" variant="outlined" readonly></v-text-field>
         </v-col>
       </v-row>
       <v-row class="pa-4 px-8">
@@ -56,8 +50,6 @@ import { useProfileManager } from "../stores";
 import { getGrid, loadBalance } from "../utils/grid";
 
 const profileManager = useProfileManager();
-const items = ref([{ id: 1, name: "stellar" }]);
-const selectedItem = ref(items.value[0]);
 const openDepositDialog = ref(false);
 const openWithdrawDialog = ref(false);
 const selectedName = ref("");
@@ -68,7 +60,6 @@ const qrCodeText = ref("");
 const depositFee = ref(0);
 
 onMounted(async () => {
-  selectedName.value = items.value.filter(item => item.id === selectedItem.value.id)[0].name;
   depositWallet.value = window.env.BRIDGE_TFT_ADDRESS;
   qrCodeText.value = `TFT:${depositWallet.value}?message=twin_${profileManager.profile?.twinId}&sender=me`;
   try {
