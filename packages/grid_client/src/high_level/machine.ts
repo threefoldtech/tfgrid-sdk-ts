@@ -3,6 +3,7 @@ import { Addr } from "netaddr";
 
 import { events } from "../helpers/events";
 import { randomChoice } from "../helpers/utils";
+import { generateRandomHexSeed, validateHexSeed } from "../helpers/validator";
 import { DiskModel, QSFSDiskModel } from "../modules/models";
 import { qsfs_zdbs } from "../modules/qsfs_zdbs";
 import {
@@ -15,7 +16,7 @@ import {
   ZlogsPrimitive,
 } from "../primitives/index";
 import { QSFSPrimitive } from "../primitives/qsfs";
-import { Mount, MyceliumIP, ZdbGroup } from "../zos";
+import { Mount, ZdbGroup } from "../zos";
 import { Deployment } from "../zos/deployment";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { HighLevelBase } from "./base";
@@ -131,14 +132,9 @@ class VMHL extends HighLevelBase {
     // Validate mycelium seed If provided, if not generate it.
     if (mycelium) {
       if (myceliumSeed) {
-        const hexSeedRegex = /^[0-9A-Fa-f]{6}$/;
-        if (!hexSeedRegex.test(myceliumSeed)) {
-          throw new ValidationError("Invalid mycelium seed. It should be a 6-character hexadecimal string.");
-        }
+        validateHexSeed(myceliumSeed, 6);
       } else {
-        const crypto = require("crypto");
-        const bytes = crypto.randomBytes(6);
-        myceliumSeed = bytes.toString("hex");
+        myceliumSeed = generateRandomHexSeed(6);
       }
     }
 

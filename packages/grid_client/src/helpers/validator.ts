@@ -1,6 +1,7 @@
 import { ValidationError } from "@threefold/types";
 import { plainToInstance } from "class-transformer";
 import { validate } from "class-validator";
+import * as crypto from "crypto";
 
 async function validateObject(obj) {
   const errors = await validate(obj);
@@ -23,4 +24,17 @@ function validateInput(target, propertyKey: string, descriptor: PropertyDescript
   };
 }
 
-export { validateObject, validateInput };
+function generateRandomHexSeed(length: number) {
+  const bytes = crypto.randomBytes(length);
+  return bytes.toString("hex");
+}
+
+function validateHexSeed(seed: string, length: number): boolean {
+  const hexSeedRegex = new RegExp(`^[0-9A-Fa-f]{${length}}$`);
+  if (!hexSeedRegex.test(seed)) {
+    throw new ValidationError(`Invalid seed. It should be a ${length}-character hexadecimal string.`);
+  }
+  return true;
+}
+
+export { validateObject, validateInput, generateRandomHexSeed, validateHexSeed };

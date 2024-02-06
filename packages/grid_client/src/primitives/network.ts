@@ -1,7 +1,6 @@
 import { GridClientErrors, ValidationError } from "@threefold/types";
 import { Buffer } from "buffer";
 import { plainToInstance } from "class-transformer";
-import * as crypto from "crypto";
 import { Addr } from "netaddr";
 import * as PATH from "path";
 import { default as PrivateIp } from "private-ip";
@@ -12,6 +11,7 @@ import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
 import { formatErrorMessage, getRandomNumber, randomChoice } from "../helpers/utils";
+import { generateRandomHexSeed, validateHexSeed } from "../helpers/validator";
 import { BackendStorage, BackendStorageType } from "../storage/backend";
 import { Deployment } from "../zos/deployment";
 import { Workload, WorkloadTypes } from "../zos/workload";
@@ -147,17 +147,10 @@ class Network {
 
     if (mycelium) {
       if (networkSeed) {
-        const hexSeedRegex = /^[0-9A-Fa-f]{32}$/;
-        if (hexSeedRegex.test(networkSeed)) {
-          znet.mycelium.hex_key = networkSeed;
-        } else {
-          throw new ValidationError("Network Seed should be Hex of length 32");
-        }
+        validateHexSeed(networkSeed, 32);
       } else {
-        const bytes = crypto.randomBytes(32);
-        console.log("Bytes to hex: ", bytes);
         znet.mycelium = {
-          hex_key: bytes.toString("hex"),
+          hex_key: generateRandomHexSeed(32),
           peers: [],
         };
       }
