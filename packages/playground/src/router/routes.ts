@@ -1,4 +1,5 @@
 enum DeployRoutes {
+  BaseRoute = "/deploy/",
   PricingCalculator = "/deploy/pricing-calculator/",
   NodeFinder = "/deploy/node-finder/",
   VirtualMachines = "/deploy/virtual-machines/",
@@ -21,6 +22,7 @@ enum OrchestratorsRoutes {
 }
 
 enum FarmRoutes {
+  BaseRoute = "/farms/",
   YourFarms = "/farms/your-farms/",
   FarmFinder = "/farms/farm-finder/",
   NodeInstaller = "https://bootstrap.grid.tf/",
@@ -28,12 +30,14 @@ enum FarmRoutes {
 }
 
 enum TFGridRoutes {
+  BaseRoute = "/tf-grid/",
   GridStatus = "https://status.grid.tf/status/threefold/",
   NodeStatistics = "/tf-grid/node-statistics/",
   NodeMonitoring = "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s/",
 }
 
 enum TFChainRoutes {
+  BaseRoute = "/tf-chain/",
   YourProfile = "/tf-chain/your-profile/",
   TFDAO = "/tf-chain/dao/",
   TFTokenBridge = "/tf-chain/token-bridge/",
@@ -47,6 +51,7 @@ enum OtherRoutes {
 }
 
 enum ApplicationRoutes {
+  BaseRoute = "/deploy/applications/",
   Peertube = "/deploy/applications/peertube/",
   Funkwhale = "/deploy/applications/funkwhale/",
   Mattermost = "/deploy/applications/mattermost/",
