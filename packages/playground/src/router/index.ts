@@ -1,5 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
+import { DashboardRoutes } from "@/router/routes";
+
 export interface InfoMeta {
   /* Accepting md and html */
   // Example "info/full-vm-md"
@@ -16,30 +18,12 @@ export interface RouteMeta {
   requireSSH?: boolean;
 }
 
-export enum ApplicationRoute {
-  peertube = "/deploy/applications/peertube",
-  funkwhale = "/deploy/applications/funkwhale",
-  mattermost = "/deploy/applications/mattermost",
-  discourse = "/deploy/applications/discourse",
-  taiga = "/deploy/applications/taiga",
-  owncloud = "/deploy/applications/owncloud",
-  nextcloud = "/deploy/applications/nextcloud",
-  presearch = "/deploy/applications/presearch",
-  subsquid = "/deploy/applications/subsquid",
-  casperlabs = "/deploy/applications/casperlabs",
-  algorand = "/deploy/applications/algorand",
-  nodepilot = "/deploy/applications/nodepilot",
-  wordpress = "/deploy/applications/wordpress",
-  umbrel = "/deploy/applications/umbrel",
-  freeflow = "/deploy/applications/freeflow",
-}
-
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
     {
       name: "landing",
-      path: "/",
+      path: DashboardRoutes.Other.HomePage,
       component: () => import("../components/logged_in_landing.vue"),
       meta: { title: "Landing Page" },
     },
@@ -49,7 +33,7 @@ const router = createRouter({
       path: "/tf-grid",
       children: [
         {
-          path: "stats",
+          path: DashboardRoutes.TFGrid.NodeStatistics,
           component: () => import("@/views/stats.vue"),
           meta: { title: "Statistics", publicPath: true },
         },
@@ -61,17 +45,17 @@ const router = createRouter({
       path: "/deploy",
       children: [
         {
-          path: "pricing-calculator",
+          path: DashboardRoutes.Deploy.PricingCalculator,
           component: () => import("../calculator/resource_pricing.vue"),
           meta: { title: "Resource Pricing", publicPath: true },
         },
         {
-          path: "nodes",
+          path: DashboardRoutes.Deploy.NodeFinder,
           component: () => import("@/views/nodes.vue"),
           meta: { title: "Nodes", publicPath: true },
         },
         {
-          path: "vms",
+          path: DashboardRoutes.Deploy.VirtualMachines,
           children: [
             {
               path: "",
@@ -79,7 +63,7 @@ const router = createRouter({
               meta: { title: "Virtual Machines" },
             },
             {
-              path: "fullvm",
+              path: DashboardRoutes.VirtualMachines.FullVirtualMachine,
               component: () => import("../views/full_virtual_machine.vue"),
               meta: {
                 title: "Full Virtual Machine",
@@ -91,7 +75,7 @@ const router = createRouter({
                     {
                       title: "Virtual Machines",
                       disabled: false,
-                      to: "/deploy/vms",
+                      to: DashboardRoutes.Deploy.VirtualMachines,
                     },
                     {
                       title: "Full Virtual Machine",
@@ -102,7 +86,7 @@ const router = createRouter({
               },
             },
             {
-              path: "vm",
+              path: DashboardRoutes.VirtualMachines.MicroVirtualMachine,
               component: () => import("../views/micro_virtual_machine.vue"),
               meta: {
                 title: "Micro Virtual Machine",
@@ -114,7 +98,7 @@ const router = createRouter({
                     {
                       title: "Virtual Machines",
                       disabled: false,
-                      to: "/deploy/vms",
+                      to: DashboardRoutes.Deploy.VirtualMachines,
                     },
                     {
                       title: "Micro Virtual Machine",
@@ -128,7 +112,7 @@ const router = createRouter({
         },
 
         {
-          path: "orchestrators",
+          path: DashboardRoutes.Deploy.Orchestrators,
           children: [
             {
               path: "",
@@ -137,7 +121,7 @@ const router = createRouter({
             },
 
             {
-              path: "kubernetes",
+              path: DashboardRoutes.Orchestrators.Kubernetes,
               component: () => import("../views/kubernetes_view.vue"),
               meta: {
                 title: "Kubernetes",
@@ -149,7 +133,7 @@ const router = createRouter({
                     {
                       title: "Orchestrators",
                       disabled: false,
-                      to: "/deploy/orchestrators",
+                      to: DashboardRoutes.Deploy.Orchestrators,
                     },
                     {
                       title: "Kubernetes",
@@ -160,7 +144,7 @@ const router = createRouter({
               },
             },
             {
-              path: "caprover",
+              path: DashboardRoutes.Orchestrators.CapRover,
               component: () => import("../views/caprover_view.vue"),
               meta: {
                 title: "Caprover",
@@ -172,7 +156,7 @@ const router = createRouter({
                     {
                       title: "Orchestrators",
                       disabled: false,
-                      to: "/deploy/orchestrators",
+                      to: DashboardRoutes.Deploy.Orchestrators,
                     },
                     {
                       title: "Caprover",
@@ -186,13 +170,13 @@ const router = createRouter({
         },
 
         {
-          path: "dedicated-nodes",
+          path: DashboardRoutes.Deploy.DedicatedMachines,
           component: () => import("../dashboard/dedicated_nodes_view.vue"),
           meta: { title: "Dedicated Nodes" },
         },
 
         {
-          path: "applications",
+          path: DashboardRoutes.Deploy.Applications,
           meta: { title: "Applications" },
           children: [
             {
@@ -201,7 +185,7 @@ const router = createRouter({
             },
 
             {
-              path: ApplicationRoute.peertube,
+              path: DashboardRoutes.Applications.Peertube,
               component: () => import("../views/peertube_view.vue"),
               meta: {
                 title: "Peertube",
@@ -213,7 +197,7 @@ const router = createRouter({
                     {
                       title: "Applications",
                       disabled: false,
-                      to: "/deploy/applications",
+                      to: DashboardRoutes.Deploy.Applications,
                     },
                     {
                       title: "Peertube",
@@ -223,7 +207,7 @@ const router = createRouter({
               },
             },
             {
-              path: ApplicationRoute.funkwhale,
+              path: DashboardRoutes.Applications.Funkwhale,
               component: () => import("../views/funkwhale_view.vue"),
               meta: {
                 title: "Funkwhale",
@@ -235,7 +219,7 @@ const router = createRouter({
                     {
                       title: "Applications",
                       disabled: false,
-                      to: "/deploy/applications",
+                      to: DashboardRoutes.Deploy.Applications,
                     },
                     {
                       title: "Funkwhale",
@@ -245,7 +229,7 @@ const router = createRouter({
               },
             },
             {
-              path: ApplicationRoute.mattermost,
+              path: DashboardRoutes.Applications.Mattermost,
               component: () => import("../views/mattermost_view.vue"),
               meta: {
                 title: "Mattermost",
@@ -257,7 +241,7 @@ const router = createRouter({
                     {
                       title: "Applications",
                       disabled: false,
-                      to: "/deploy/applications",
+                      to: DashboardRoutes.Deploy.Applications,
                     },
                     {
                       title: "Mattermost",
@@ -267,7 +251,7 @@ const router = createRouter({
               },
             },
             {
-              path: ApplicationRoute.discourse,
+              path: DashboardRoutes.Applications.Discourse,
               component: () => import("../views/discourse_view.vue"),
               meta: {
                 title: "Discourse",
@@ -279,7 +263,7 @@ const router = createRouter({
                     {
                       title: "Applications",
                       disabled: false,
-                      to: "/deploy/applications",
+                      to: DashboardRoutes.Deploy.Applications,
                     },
                     {
                       title: "Discourse",
@@ -289,7 +273,7 @@ const router = createRouter({
               },
             },
             {
-              path: ApplicationRoute.taiga,
+              path: DashboardRoutes.Applications.Taiga,
               component: () => import("../views/taiga_view.vue"),
               meta: {
                 title: "Taiga",
@@ -301,7 +285,7 @@ const router = createRouter({
                     {
                       title: "Applications",
                       disabled: false,
-                      to: "/deploy/applications",
+                      to: DashboardRoutes.Deploy.Applications,
                     },
                     {
                       title: "Taiga",
@@ -311,7 +295,7 @@ const router = createRouter({
               },
             },
             {
-              path: ApplicationRoute.owncloud,
+              path: DashboardRoutes.Applications.Owncloud,
               component: () => import("../views/owncloud_view.vue"),
               meta: {
                 title: "Owncloud",
@@ -323,7 +307,7 @@ const router = createRouter({
                     {
                       title: "Applications",
                       disabled: false,
-                      to: "/deploy/applications",
+                      to: DashboardRoutes.Deploy.Applications,
                     },
                     {
                       title: "Owncloud",
@@ -333,7 +317,7 @@ const router = createRouter({
               },
             },
             {
-              path: ApplicationRoute.nextcloud,
+              path: DashboardRoutes.Applications.Nextcloud,
               component: () => import("../views/nextcloud_view.vue"),
               meta: {
                 title: "Nextcloud",
@@ -345,7 +329,7 @@ const router = createRouter({
                     {
                       title: "Applications",
                       disabled: false,
-                      to: "/deploy/applications",
+                      to: DashboardRoutes.Deploy.Applications,
                     },
                     {
                       title: "Nextcloud",
@@ -355,7 +339,7 @@ const router = createRouter({
               },
             },
             {
-              path: ApplicationRoute.presearch,
+              path: DashboardRoutes.Applications.Presearch,
               component: () => import("../views/presearch_view.vue"),
               meta: {
                 title: "Presearch",
@@ -367,7 +351,7 @@ const router = createRouter({
                     {
                       title: "Applications",
                       disabled: false,
-                      to: "/deploy/applications",
+                      to: DashboardRoutes.Deploy.Applications,
                     },
                     {
                       title: "Presearch",
@@ -377,7 +361,7 @@ const router = createRouter({
               },
             },
             {
-              path: ApplicationRoute.subsquid,
+              path: DashboardRoutes.Applications.Subsquid,
               component: () => import("../views/subsquid_view.vue"),
               meta: {
                 title: "Subsquid",
@@ -389,7 +373,7 @@ const router = createRouter({
                     {
                       title: "Applications",
                       disabled: false,
-                      to: "/deploy/applications",
+                      to: DashboardRoutes.Deploy.Applications,
                     },
                     {
                       title: "Subsquid",
@@ -399,7 +383,7 @@ const router = createRouter({
               },
             },
             {
-              path: ApplicationRoute.casperlabs,
+              path: DashboardRoutes.Applications.Casperlabs,
               component: () => import("../views/casperlabs_view.vue"),
               meta: {
                 title: "Casperlabs",
@@ -411,7 +395,7 @@ const router = createRouter({
                     {
                       title: "Applications",
                       disabled: false,
-                      to: "/deploy/applications",
+                      to: DashboardRoutes.Deploy.Applications,
                     },
                     {
                       title: "Casperlabs",
@@ -421,7 +405,7 @@ const router = createRouter({
               },
             },
             {
-              path: ApplicationRoute.algorand,
+              path: DashboardRoutes.Applications.Algorand,
               component: () => import("../views/algorand_view.vue"),
               meta: {
                 title: "Algorand",
@@ -433,7 +417,7 @@ const router = createRouter({
                     {
                       title: "Applications",
                       disabled: false,
-                      to: "/deploy/applications",
+                      to: DashboardRoutes.Deploy.Applications,
                     },
                     {
                       title: "Algorand",
@@ -443,7 +427,7 @@ const router = createRouter({
               },
             },
             {
-              path: ApplicationRoute.nodepilot,
+              path: DashboardRoutes.Applications.Nodepilot,
               component: () => import("../views/node_pilot.vue"),
               meta: {
                 title: "Node Pilot",
@@ -455,7 +439,7 @@ const router = createRouter({
                     {
                       title: "Applications",
                       disabled: false,
-                      to: "/deploy/applications",
+                      to: DashboardRoutes.Deploy.Applications,
                     },
                     {
                       title: "Node Pilot",
@@ -465,7 +449,7 @@ const router = createRouter({
               },
             },
             {
-              path: ApplicationRoute.wordpress,
+              path: DashboardRoutes.Applications.Wordpress,
               component: () => import("../views/wordpress_view.vue"),
               meta: {
                 title: "Wordpress",
@@ -477,7 +461,7 @@ const router = createRouter({
                     {
                       title: "Applications",
                       disabled: false,
-                      to: "/deploy/applications",
+                      to: DashboardRoutes.Deploy.Applications,
                     },
                     {
                       title: "Wordpress",
@@ -487,7 +471,7 @@ const router = createRouter({
               },
             },
             {
-              path: ApplicationRoute.umbrel,
+              path: DashboardRoutes.Applications.Umbrel,
               component: () => import("../views/umbrel_view.vue"),
               meta: {
                 title: "Umbrel",
@@ -499,7 +483,7 @@ const router = createRouter({
                     {
                       title: "Applications",
                       disabled: false,
-                      to: "/deploy/applications",
+                      to: DashboardRoutes.Deploy.Applications,
                     },
                     {
                       title: "Umbrel",
@@ -510,7 +494,7 @@ const router = createRouter({
             },
             // Commented for now and will be user later.
             // {
-            //   path: ApplicationRoute.freeflow,
+            //   path: DashboardRoutes.Applications.Freeflow,
             //   component: () => import("../views/freeflow_view.vue"),
             //   meta: {
             //     title: "Freeflow",
@@ -522,7 +506,7 @@ const router = createRouter({
             //         {
             //           title: "Applications",
             //           disabled: false,
-            //           to: "/deploy/applications",
+            //           to: DashboardRoutes.Deploy.Applications,
             //         },
             //         {
             //           title: "Freeflow",
@@ -535,7 +519,7 @@ const router = createRouter({
         },
 
         {
-          path: "contracts-list",
+          path: DashboardRoutes.Deploy.YourContracts,
           component: () => import("../dashboard/contracts_list.vue"),
           meta: {
             title: "Your Contracts List",
@@ -544,7 +528,7 @@ const router = createRouter({
         },
 
         {
-          path: "sshkey",
+          path: DashboardRoutes.Deploy.SSHKey,
           component: () => import("../views/sshkey_view.vue"),
           meta: { title: "SSHKey" },
           children: [],
@@ -553,7 +537,7 @@ const router = createRouter({
     },
 
     {
-      path: "/farms",
+      path: DashboardRoutes.Farms.YourFarms,
       children: [
         {
           path: "",
@@ -561,12 +545,12 @@ const router = createRouter({
           meta: { title: "Farms" },
         },
         {
-          path: "farm-finder",
+          path: DashboardRoutes.Farms.FarmFinder,
           component: () => import("@/views/farms.vue"),
           meta: { title: "Farm Finder", publicPath: true },
         },
         {
-          path: "simulator-calculator",
+          path: DashboardRoutes.Farms.Simulator,
           component: () => import("../dashboard/simulator_view.vue"),
           meta: { title: "Twin", publicPath: true },
         },
@@ -574,32 +558,32 @@ const router = createRouter({
     },
 
     {
-      path: "/tf-chain",
+      path: DashboardRoutes.TFChain.YourProfile,
       children: [
         {
           name: "Twin",
-          path: "twin",
+          path: "",
           component: () => import("../dashboard/twin_view.vue"),
           meta: { title: "Your Twin" },
         },
 
         {
-          path: "dao",
+          path: DashboardRoutes.TFChain.TFDAO,
           component: () => import("../dashboard/dao_view.vue"),
           meta: { title: "Dao" },
         },
         {
-          path: "bridge",
+          path: DashboardRoutes.TFChain.TFTokenBridge,
           component: () => import("../dashboard/bridge_view.vue"),
           meta: { title: "Bridge" },
         },
         {
-          path: "transfer",
+          path: DashboardRoutes.TFChain.TFTokenTransfer,
           component: () => import("../dashboard/transfer_view.vue"),
           meta: { title: "Transfer" },
         },
         {
-          path: "minting",
+          path: DashboardRoutes.TFChain.TFMintingReports,
           component: () => import("../views/minting_view.vue"),
           meta: { title: "Minting", info: { page: "info/minting.md" }, publicPath: true },
         },

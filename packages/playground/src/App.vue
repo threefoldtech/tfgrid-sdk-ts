@@ -240,19 +240,19 @@ const routes: AppRoute[] = [
       {
         title: "Grid Status",
         icon: "mdi-grid-large",
-        url: "https://status.grid.tf/status/threefold",
+        url: DashboardRoutes.TFGrid.GridStatus,
         tooltip: "Status of Threefold Grid.",
       },
       {
         title: "Node Statistics",
         icon: "mdi-chart-scatter-plot",
-        route: "/tf-grid/stats",
+        route: DashboardRoutes.TFGrid.NodeStatistics,
         tooltip: "View Node Statistics.",
       },
       {
         title: "Node Monitoring",
         icon: "mdi-equalizer",
-        url: "https://metrics.grid.tf/d/rYdddlPWkfqwf/zos-host-metrics?orgId=2&refresh=30s",
+        url: DashboardRoutes.TFGrid.NodeMonitoring,
         tooltip: "Monitor Zero-OS Nodes.",
       },
     ],
@@ -264,56 +264,56 @@ const routes: AppRoute[] = [
       {
         title: "Pricing Calculator",
         icon: "mdi-currency-usd",
-        route: "/deploy/pricing-calculator",
+        route: DashboardRoutes.Deploy.PricingCalculator,
         tooltip: "Calculate the cost of your deployments.",
       },
       {
         title: "Node Finder",
         icon: "mdi-access-point",
-        route: "/deploy/nodes",
+        route: DashboardRoutes.Deploy.NodeFinder,
         tooltip: "Find nodes on the ThreeFold grid.",
       },
 
       {
         title: "Virtual Machines",
         icon: "mdi-television",
-        route: "/deploy/vms",
+        route: DashboardRoutes.Deploy.VirtualMachines,
         tooltip: "Deploy your Virtal Machine instances.",
       },
       {
         title: "Orchestrators",
         icon: "mdi-group",
-        route: "/deploy/orchestrators",
+        route: DashboardRoutes.Deploy.Orchestrators,
         tooltip: "Deploy your orchestrator instances.",
       },
       {
         title: "Dedicated Machines",
         icon: "mdi-resistor-nodes",
-        route: "/deploy/dedicated-nodes",
+        route: DashboardRoutes.Deploy.DedicatedMachines,
         tooltip: "Explore dedicated machines available on the ThreeFold grid.",
       },
       {
         title: "Applications",
         icon: "mdi-lightbulb-on-outline",
-        route: "/deploy/applications",
+        route: DashboardRoutes.Deploy.Applications,
         tooltip: "Deploy ready applications on the ThreeFold grid.",
       },
       {
         title: "Your Contracts",
         icon: "mdi-file-document-edit",
-        route: "/deploy/contracts-list",
+        route: DashboardRoutes.Deploy.YourContracts,
         tooltip: "Explore and modify your TFChain contracts.",
       },
       {
         title: "Images",
         icon: "mdi-open-in-new",
-        url: "https://hub.grid.tf/",
+        url: DashboardRoutes.Deploy.Images,
         tooltip: "Find or Publish your Flist on 0-Hub.",
       },
       {
         title: "SSH Key",
         icon: "mdi-key-plus",
-        route: "/deploy/sshkey",
+        route: DashboardRoutes.Deploy.SSHKey,
         tooltip: "Generate or update your SSH Key.",
       },
     ],
@@ -325,25 +325,25 @@ const routes: AppRoute[] = [
       {
         title: "Your Farms",
         icon: "mdi-silo",
-        route: "/farms",
+        route: DashboardRoutes.Farms.YourFarms,
         tooltip: "Create and manage farms and nodes.",
       },
       {
         title: "Farm Finder",
         icon: "mdi-lan-connect",
-        route: "/farms/farm-finder",
+        route: DashboardRoutes.Farms.FarmFinder,
         tooltip: "Find farms on the ThreeFold grid.",
       },
       {
         title: "Node Installer",
         icon: "mdi-earth",
-        url: "https://bootstrap.grid.tf/",
+        url: DashboardRoutes.Farms.NodeInstaller,
         tooltip: "Download Zero-OS Images.",
       },
       {
         title: "Simulator",
         icon: "mdi-chart-line",
-        route: "/farms/simulator-calculator",
+        route: DashboardRoutes.Farms.Simulator,
         tooltip: "Calculate and Simulate your farming rewards.",
       },
     ],
@@ -355,31 +355,31 @@ const routes: AppRoute[] = [
       {
         title: "Your Profile",
         icon: "mdi-account-supervisor-outline",
-        route: "/tf-chain/twin",
+        route: DashboardRoutes.TFChain.YourProfile,
         tooltip: "Check your profile details.",
       },
       {
         title: "TF DAO",
         icon: "mdi-note-check-outline",
-        route: "/tf-chain/dao",
+        route: DashboardRoutes.TFChain.TFDAO,
         tooltip: "Check and vote on DAO proposals.",
       },
       {
         title: "TF Token Bridge",
         icon: "mdi-swap-horizontal",
-        route: "/tf-chain/bridge",
+        route: DashboardRoutes.TFChain.TFTokenBridge,
         tooltip: "Transfer TFTs on different chains.",
       },
       {
         title: "TF Token Transfer",
         icon: "mdi-account-arrow-right-outline",
-        route: "/tf-chain/transfer",
+        route: DashboardRoutes.TFChain.TFTokenTransfer,
         tooltip: "Transfer TFTs on TFChain.",
       },
       {
         title: "TF Minting Reports",
         icon: "mdi-file-document-edit",
-        route: "/tf-chain/minting",
+        route: DashboardRoutes.TFChain.TFMintingReports,
         tooltip: "TFGrid Minting Explorer.",
       },
     ],
@@ -390,7 +390,7 @@ const routes: AppRoute[] = [
       {
         title: "Manual",
         icon: "mdi-book-open-page-variant-outline",
-        url: "https://manual.grid.tf/",
+        url: DashboardRoutes.Other.Manual,
         tooltip: "ThreeFold Manual.",
       },
     ],
@@ -413,6 +413,7 @@ function clickHandler({ route, url }: AppRouteItem): void {
 </script>
 
 <script lang="ts">
+import { DashboardRoutes } from "@/router/routes";
 import { AppThemeSelection } from "@/utils/app_theme";
 
 import AppTheme from "./components/app_theme.vue";
