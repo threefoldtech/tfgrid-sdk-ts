@@ -1,4 +1,4 @@
-const urls = [
+const URLS = [
   "https://gridproxy.grid.tf/stats?status=up",
   "https://gridproxy.grid.tf/stats?status=standby",
   "https://gridproxy.test.grid.tf/stats?status=up",
@@ -6,36 +6,51 @@ const urls = [
   "https://gridproxy.dev.grid.tf/stats?status=up",
   "https://gridproxy.dev.grid.tf/stats?status=standby",
 ];
+const DUMMY_DATA = {
+  capacity: "32.74 PB",
+  nodes: 2569,
+  countries: 61,
+  cores: 63968,
+  notUpdated: true,
+};
 
+const RETRIES = 3;
+
+function initTargeRequests(urls, r) {
+  return urls.map(url =>
+    //   eslint-disable-next-line no-undef
+    ngx
+      .fetch(url, { verify: r.headersIn["Host"].split(":")[0] !== "localhost" }) // disable ssl on localhost
+      .then(res => res.json()),
+  );
+}
 async function getStats(r) {
-  //   eslint-disable-next-line no-undef
-  const fetchPromises = urls.map(url => ngx.fetch(url, { verify: r.headersIn["Host"] !== "localhost" })); // disable ssl on localhost
+  let reties = 0;
+  const stats = [];
 
   try {
-    const responses = await Promise.all(fetchPromises);
-
-    const stats = await Promise.all(
-      responses.map(async res => {
-        if (res.status === 200) {
-          const js = await res.json();
-          return js;
+    while (URLS.length !== 0 && reties < RETRIES) {
+      const responses = await Promise.allSettled(initTargeRequests(URLS, r));
+      const currentUrls = URLS;
+      responses.forEach((item, index) => {
+        if (item.status === "fulfilled") {
+          URLS.splice(URLS.indexOf(currentUrls[index]), 1);
+          stats.push(item.value);
         }
-        return null;
-      }),
-    );
-
+      });
+      if (URLS.length !== 0) reties++;
+    }
+    let result;
+    if (reties < 3) result = mergeStatsData(stats);
+    else {
+      r.error(`Failed to get response form ${URLS} after ${reties}; returning  DUMMY_DATA`);
+      result = DUMMY_DATA;
+    }
     r.headersOut["Content-Type"] = "application/json";
     r.headersOut["Content-Disposition"] = "inline";
-    r.return(200, JSON.stringify(mergeStatsData(stats)));
+    r.return(200, JSON.stringify(result));
   } catch (error) {
     r.error(error);
-    const DUMMY_DATA = {
-      capacity: "32.74 PB",
-      nodes: 2569,
-      countries: 61,
-      cores: 63968,
-      notUpdated: true,
-    };
     r.headersOut["Content-Type"] = "application/json";
     r.headersOut["Content-Disposition"] = "inline";
     r.return(200, JSON.stringify(DUMMY_DATA));
