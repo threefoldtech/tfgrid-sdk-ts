@@ -62,6 +62,7 @@
         { title: 'Planetary Network IP', key: 'planetary', sortable: false },
         { title: 'Workers', key: 'workersLength' },
         { title: 'Billing Rate', key: 'billing' },
+        { title: 'Health', key: 'status', sortable: false },
         { title: 'Actions', key: 'actions', sortable: false },
       ]"
       :items="items"
@@ -72,6 +73,17 @@
       @click:row="$attrs['onClick:row']"
       :sort-by="sortBy"
     >
+      <template #[`item.status`]="{ item }">
+        <v-chip :color="getNodeHealthColor(item.value.masters[0].status as string).color">
+          <v-tooltip v-if="item.value.masters[0].status == NodeHealth.Error" activator="parent" location="top">{{
+            item.value.masters[0].message
+          }}</v-tooltip>
+          <span>
+            {{ capitalize(getNodeHealthColor(item.value.masters[0].status as string).type) }}
+          </span>
+        </v-chip>
+      </template>
+
       <template #[`item.actions`]="{ item }">
         <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item.value)">
           Deleting...
@@ -100,12 +112,13 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { capitalize, onMounted, ref } from "vue";
+
+import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
 import { useProfileManager } from "../stores";
 import { getGrid, updateGrid } from "../utils/grid";
 import { loadK8s, mergeLoadedDeployments } from "../utils/load_deployment";
-
 const profileManager = useProfileManager();
 const showDialog = ref(false);
 const showEncryption = ref(false);
