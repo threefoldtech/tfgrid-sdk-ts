@@ -1,3 +1,4 @@
+const fs = require("fs");
 const URLS = [
   "https://gridproxy.grid.tf/stats?status=up",
   "https://gridproxy.grid.tf/stats?status=standby",
@@ -15,7 +16,17 @@ const DUMMY_DATA = {
 };
 
 const RETRIES = 3;
+const cache_path = "/tmp/statsSummary.json";
 
+function isLessThan24Hours(timestamp) {
+  const now = Date.now();
+
+  const difference = now - timestamp;
+
+  const twentyFourHoursInMillis = 24 * 60 * 60 * 1000;
+
+  return difference < twentyFourHoursInMillis;
+}
 function initTargeRequests(urls, r) {
   return urls.map(url =>
     //   eslint-disable-next-line no-undef
@@ -24,10 +35,17 @@ function initTargeRequests(urls, r) {
       .then(res => res.json()),
   );
 }
-async function getStats(r) {
+function updateCache(result) {
+  const cache = {
+    summary: result,
+    timestamp: Date.now(),
+    test: "yes",
+  };
+  fs.writeFileSync("/tmp/statsSummary.json", JSON.stringify(cache));
+}
+async function fetchStats(r) {
   let reties = 0;
   const stats = [];
-
   try {
     while (URLS.length !== 0 && reties < RETRIES) {
       const responses = await Promise.allSettled(initTargeRequests(URLS, r));
@@ -49,11 +67,31 @@ async function getStats(r) {
     r.headersOut["Content-Type"] = "application/json";
     r.headersOut["Content-Disposition"] = "inline";
     r.return(200, JSON.stringify(result));
+    try {
+      updateCache(result);
+    } catch (err) {
+      r.error(`Failed to update cache due to: ${err}`);
+    }
   } catch (error) {
     r.error(error);
     r.headersOut["Content-Type"] = "application/json";
     r.headersOut["Content-Disposition"] = "inline";
     r.return(200, JSON.stringify(DUMMY_DATA));
+  }
+}
+async function getStats(r) {
+  try {
+    const cache = JSON.parse(fs.readFileSync(cache_path));
+    if (cache.summary) {
+      const validCache = isLessThan24Hours(cache.timestamp || undefined);
+      if (validCache) {
+        r.log("returnig summary from cache");
+        r.return(200, JSON.stringify(cache));
+        return;
+      } else throw "invalid cache";
+    }
+  } catch (err) {
+    await fetchStats(r);
   }
 }
 
