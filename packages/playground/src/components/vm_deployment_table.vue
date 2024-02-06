@@ -95,12 +95,12 @@
       </template>
 
       <template #[`item.status`]="{ item }">
-        <v-chip :color="getNodeHealthColor(item.columns.status as string).color">
-          <v-tooltip v-if="item.columns.status == NodeHealth.Error" activator="parent" location="top">{{
-            item.columns.message
+        <v-chip :color="getNodeHealthColor(item.value.status as string).color">
+          <v-tooltip v-if="item.value.status == NodeHealth.Error" activator="parent" location="top">{{
+            item.value.message
           }}</v-tooltip>
           <span>
-            {{ capitalize(getNodeHealthColor(item.columns.status as string).type) }}
+            {{ capitalize(getNodeHealthColor(item.value.status as string).type) }}
           </span>
         </v-chip>
       </template>
