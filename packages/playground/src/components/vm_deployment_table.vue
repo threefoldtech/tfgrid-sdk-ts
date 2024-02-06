@@ -49,9 +49,17 @@
 
     <AccessDeploymentAlert />
 
+    <VSwitch
+      v-if="props.projectName.toLowerCase() === 'vm'"
+      inset
+      color="primary"
+      label="Show All Deployments"
+      v-model="showAllDeployments"
+    />
+
     <ListTable
       :headers="filteredHeaders"
-      :items="items"
+      :items="showAllDeployments ? items : items.filter(i => !i.fromAnotherClient)"
       :loading="loading"
       :deleting="deleting"
       :model-value="$props.modelValue"
@@ -124,6 +132,7 @@ import { computed, onMounted, ref } from "vue";
 
 import { useProfileManager } from "../stores";
 import { getGrid, updateGrid } from "../utils/grid";
+import { markAsFromAnotherClient } from "../utils/helpers";
 import { loadVms, mergeLoadedDeployments } from "../utils/load_deployment";
 
 const profileManager = useProfileManager();
@@ -140,6 +149,7 @@ const count = ref<number>();
 const items = ref<any[]>([]);
 const showDialog = ref(false);
 const showEncryption = ref(false);
+const showAllDeployments = ref(false);
 const failedDeployments = ref<
   {
     name: string;
@@ -170,9 +180,12 @@ async function loadDeployments() {
     props.projectName.toLowerCase() === ProjectName.VM.toLowerCase()
       ? await loadVms(updateGrid(grid!, { projectName: "" }))
       : { count: 0, items: [] };
+
   if (chunk3.count > 0 && migrateGateways) {
     await migrateModule(grid!.gateway);
   }
+
+  chunk3.items = chunk3.items.map(markAsFromAnotherClient);
 
   console.log({ chunk1, chunk2, chunk3 });
   const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
@@ -181,6 +194,8 @@ async function loadDeployments() {
     ...(Array.isArray((chunk2 as any).failedDeployments) ? (chunk2 as any).failedDeployments : []),
     ...(Array.isArray((chunk3 as any).failedDeployments) ? (chunk3 as any).failedDeployments : []),
   ];
+
+  console.log({ vms });
 
   count.value = vms.count;
   items.value = vms.items.map(([leader, ...workers]) => {
