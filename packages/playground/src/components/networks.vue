@@ -56,6 +56,13 @@
             />
           </input-tooltip>
           <input-tooltip
+            v-if="mycelium !== null"
+            inline
+            tooltip="Mycelium is an IPv6 overlay network. Each node that joins the overlay network will receive an overlay network IP."
+          >
+            <v-switch hide-details color="primary" inset label="mycelium" :modelValue="$props.mycelium" />
+          </input-tooltip>
+          <input-tooltip
             v-if="wireguard !== null"
             inline
             tooltip="Enabling WireGuard Access allows you to establish private, secure, and encrypted connections to your instance."
@@ -99,6 +106,10 @@ export default {
       type: Boolean,
       default: () => null,
     },
+    mycelium: {
+      type: Boolean,
+      default: () => null,
+    },
     wireguard: {
       type: Boolean,
       default: () => null,
@@ -109,6 +120,7 @@ export default {
     "update:ipv4": (value?: boolean) => value,
     "update:ipv6": (value?: boolean) => value,
     "update:planetary": (value?: boolean) => value,
+    "update:mycelium": (value?: boolean) => value,
     "update:wireguard": (value?: boolean) => value,
   },
   setup(props, { expose }) {

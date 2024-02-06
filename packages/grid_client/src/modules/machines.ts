@@ -59,7 +59,10 @@ class MachinesModule extends BaseModule {
         machine.public_ip,
         machine.public_ip6!,
         machine.planetary,
+        machine.mycelium,
+        machine.myceliumSeed,
         network,
+        options.network.network_seed!,
         machine.entrypoint,
         machine.env,
         options.metadata || metadata,
@@ -104,6 +107,7 @@ class MachinesModule extends BaseModule {
   async getObj(deploymentName: string) {
     const deployments = await this._get(deploymentName);
     const workloads = await this._getWorkloadsByTypes(deploymentName, deployments, [WorkloadTypes.zmachine]);
+    console.log("Deployments: ", workloads);
     const promises = workloads.map(
       async workload => await this._getZmachineData(deploymentName, deployments, workload),
     );
@@ -177,7 +181,11 @@ class MachinesModule extends BaseModule {
       options.public_ip,
       options.public_ip6!,
       options.planetary,
+      options.mycelium,
+      options.myceliumSeed!,
       network,
+      // TODO: how to get network seed
+      "",
       options.entrypoint,
       options.env,
       workload.metadata,

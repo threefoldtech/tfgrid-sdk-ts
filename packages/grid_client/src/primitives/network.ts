@@ -1,6 +1,7 @@
 import { GridClientErrors, ValidationError } from "@threefold/types";
 import { Buffer } from "buffer";
 import { plainToInstance } from "class-transformer";
+import * as crypto from "crypto";
 import { Addr } from "netaddr";
 import * as PATH from "path";
 import { default as PrivateIp } from "private-ip";
@@ -119,10 +120,19 @@ class Network {
     return this.wireguardConfig;
   }
 
-  async addNode(node_id: number, metadata = "", description = "", subnet = ""): Promise<Workload | undefined> {
+  async addNode(
+    node_id: number,
+    mycelium: boolean,
+    metadata = "",
+    description = "",
+    subnet = "",
+    networkSeed = "",
+  ): Promise<Workload | undefined> {
     if (this.nodeExists(node_id)) {
       return;
     }
+    // TODO: generate random seed for mycelium(HEx based ip provided from user)
+    // TODO: add checks on mycelium (length && hexbased)
     events.emit("logs", `Adding node ${node_id} to network ${this.name}`);
     const keypair = this.generateWireguardKeypair();
     let znet = new Znet();
@@ -135,6 +145,24 @@ class Network {
     znet.wireguard_private_key = keypair.privateKey;
     znet.wireguard_listen_port = await this.getFreePort(node_id);
     znet["node_id"] = node_id;
+
+    if (mycelium) {
+      if (networkSeed) {
+        const hexSeedRegex = /^[0-9A-Fa-f]{32}$/;
+        if (hexSeedRegex.test(networkSeed)) {
+          znet.mycelium.hex_key = networkSeed;
+        } else {
+          throw new ValidationError("Network Seed should be Hex of length 32");
+        }
+      } else {
+        const bytes = crypto.randomBytes(32);
+        console.log("Bytes to hex: ", bytes);
+        znet.mycelium = {
+          hex_key: bytes.toString("hex"),
+          peers: [],
+        };
+      }
+    }
 
     this.networks.push(znet);
     await this.generatePeers();

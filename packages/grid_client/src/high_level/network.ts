@@ -7,7 +7,16 @@ import { HighLevelBase } from "./base";
 import { Operations, TwinDeployment } from "./models";
 
 class NetworkHL extends HighLevelBase {
-  async addNode(networkName: string, ipRange: string, nodeId: number, solutionProviderId: number, description = "") {
+  async addNode(
+    networkName: string,
+    ipRange: string,
+    nodeId: number,
+    solutionProviderId: number,
+    mycelium: boolean,
+    description = "",
+    subnet = "",
+    networkSeed = "",
+  ) {
     const network = new Network(networkName, ipRange, this.config);
     await network.load();
     const networkMetadata = JSON.stringify({
@@ -16,7 +25,7 @@ class NetworkHL extends HighLevelBase {
       projectName: this.config.projectName,
     });
 
-    const workload = await network.addNode(nodeId, networkMetadata, description);
+    const workload = await network.addNode(nodeId, mycelium, networkMetadata, description, subnet, networkSeed);
     if (!workload) {
       throw new ValidationError(`Node ${nodeId} already exists on network ${networkName}.`);
     }

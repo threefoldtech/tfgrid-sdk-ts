@@ -15,12 +15,13 @@ import {
   ZlogsPrimitive,
 } from "../primitives/index";
 import { QSFSPrimitive } from "../primitives/qsfs";
-import { Mount, ZdbGroup } from "../zos";
+import { Mount, MyceliumIP, ZdbGroup } from "../zos";
 import { Deployment } from "../zos/deployment";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { HighLevelBase } from "./base";
 import { Operations, TwinDeployment } from "./models";
 
+// TODO: add checks on mycelium seed provided from user
 class VMHL extends HighLevelBase {
   async create(
     name: string,
@@ -33,7 +34,10 @@ class VMHL extends HighLevelBase {
     publicIp: boolean,
     publicIp6: boolean,
     planetary: boolean,
+    mycelium: boolean,
+    myceliumSeed: string,
     network: Network,
+    networkSeed: string,
     entrypoint: string,
     env: Record<string, unknown>,
     metadata = "",
@@ -125,6 +129,20 @@ class VMHL extends HighLevelBase {
       diskMounts.push(disk.createMount(d.name, d.mountpoint));
     }
 
+    // Validate mycelium seed If provided, if not generate it.
+    if (mycelium) {
+      if (myceliumSeed) {
+        const hexSeedRegex = /^[0-9A-Fa-f]{6}$/;
+        if (!hexSeedRegex.test(myceliumSeed)) {
+          throw new ValidationError("Invalid mycelium seed. It should be a 6-character hexadecimal string.");
+        }
+      } else {
+        const crypto = require("crypto");
+        const bytes = crypto.randomBytes(6);
+        myceliumSeed = bytes.toString("hex");
+      }
+    }
+
     // ipv4
     // TODO: make sure that the farm has a free public ip before continuing the deployment
     let ipName = "";
@@ -212,10 +230,25 @@ class VMHL extends HighLevelBase {
 
         access_node_id = accessNodeId;
       }
-      access_net_workload = await network.addNode(access_node_id, networkMetadata, description, accessNodeSubnet);
+      access_net_workload = await network.addNode(
+        access_node_id,
+        mycelium,
+        networkMetadata,
+        description,
+        accessNodeSubnet,
+        networkSeed,
+      );
       wgConfig = await network.addAccess(access_node_id, true);
     }
-    const znet_workload = await network.addNode(nodeId, networkMetadata, description, userIPsubnet);
+
+    const znet_workload = await network.addNode(
+      nodeId,
+      mycelium,
+      networkMetadata,
+      description,
+      userIPsubnet,
+      networkSeed,
+    );
     if ((await network.exists()) && (znet_workload || access_net_workload)) {
       // update network
       for (const deployment of network.deployments) {
@@ -272,9 +305,12 @@ class VMHL extends HighLevelBase {
         memory,
         rootfs_size,
         diskMounts,
+        // network name to added form mycelium
         network.name,
         machine_ip,
         planetary,
+        mycelium,
+        myceliumSeed,
         ipName,
         entrypoint,
         env,

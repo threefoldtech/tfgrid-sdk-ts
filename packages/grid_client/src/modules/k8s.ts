@@ -104,7 +104,10 @@ class K8sModule extends BaseModule {
         master.public_ip,
         master.public_ip6,
         master.planetary,
+        master.mycelium,
+        master.myceliumSeed!,
         network,
+        options.network.network_seed!,
         options.ssh_key,
         options.metadata || metadata,
         options.description,
@@ -148,7 +151,10 @@ class K8sModule extends BaseModule {
         worker.public_ip,
         worker.public_ip6,
         worker.planetary,
+        worker.mycelium,
+        worker.myceliumSeed!,
         network,
+        options.network.network_seed!,
         options.ssh_key,
         options.metadata || metadata,
         options.description,
@@ -274,6 +280,8 @@ class K8sModule extends BaseModule {
     const networkIpRange = Addr(masterWorkload.data["network"].interfaces[0].ip).mask(16).toString();
     const network = new Network(networkName, networkIpRange, this.config);
     await network.load();
+    console.log("===================");
+    console.log("Master Workload Data: ", masterWorkload.data);
     const [twinDeployments] = await this.kubernetes.add_worker(
       options.name,
       options.node_id,
@@ -286,7 +294,10 @@ class K8sModule extends BaseModule {
       options.public_ip,
       options.public_ip6,
       options.planetary,
+      options.mycelium,
+      options.myceliumSeed!,
       network,
+      masterWorkload.data["networkSeed"],
       masterWorkload.data["env"]["SSH_KEY"],
       masterWorkload.metadata,
       masterWorkload.description,

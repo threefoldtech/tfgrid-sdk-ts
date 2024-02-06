@@ -20,10 +20,16 @@ class ZNetworkInterface {
   @Expose() @IsIP() @IsNotEmpty() ip: string;
 }
 
+class MyceliumIP {
+  @Expose() @IsString() @IsNotEmpty() network: string;
+  @Expose() @IsString() hex_seed: string;
+}
+
 class ZmachineNetwork {
   @Expose() @IsString() @IsDefined() public_ip: string;
   @Expose() @Type(() => ZNetworkInterface) @ValidateNested({ each: true }) interfaces: ZNetworkInterface[];
   @Expose() @IsBoolean() planetary: boolean;
+  @Expose() @Type(() => MyceliumIP) @ValidateNested({ each: true }) mycelium: MyceliumIP;
 
   challenge(): string {
     let out = "";
@@ -33,6 +39,8 @@ class ZmachineNetwork {
       out += this.interfaces[i].network;
       out += this.interfaces[i].ip;
     }
+    out += this.mycelium.network;
+    out += this.mycelium.hex_seed;
     return out;
   }
 }
@@ -90,4 +98,4 @@ class ZmachineResult extends WorkloadDataResult {
   @Expose() ygg_ip: string;
 }
 
-export { Zmachine, ZmachineNetwork, ZNetworkInterface, Mount, ZmachineResult };
+export { Zmachine, ZmachineNetwork, ZNetworkInterface, Mount, ZmachineResult, MyceliumIP };

@@ -14,6 +14,7 @@ import {
   IsOptional,
   IsString,
   IsUrl,
+  Length,
   MaxLength,
   Min,
   ValidateNested,
@@ -22,6 +23,8 @@ import {
 import { Deployment } from "../zos/deployment";
 import { ZdbModes } from "../zos/zdb";
 import { blockchainType } from "./blockchainInterface";
+// TODO: add optional field not importing zos model
+// import { MyceliumIP } from "../zos";
 const NameLength = 15;
 const FarmNameLength = 40;
 
@@ -83,6 +86,7 @@ class NetworkModel {
   @Expose() @IsString() @IsNotEmpty() ip_range: string;
   @Expose() @IsBoolean() @IsOptional() addAccess?: boolean;
   @Expose() @IsInt() @Min(1) @IsOptional() accessNodeId?: number;
+  @Expose() @IsString() @IsOptional() network_seed?: string;
 }
 
 class BaseGetDeleteModel {
@@ -97,6 +101,8 @@ class MachineModel {
   @Expose() @IsBoolean() public_ip: boolean;
   @Expose() @IsOptional() @IsBoolean() public_ip6?: boolean;
   @Expose() @IsBoolean() planetary: boolean;
+  @Expose() @IsBoolean() mycelium: boolean;
+  @Expose() @IsOptional() @IsString() myceliumSeed?: string;
   @Expose() @IsInt() @Min(1) cpu: number;
   @Expose() @Min(256) memory: number; // in MB
   @Expose() rootfs_size: number; // in GB
@@ -142,6 +148,8 @@ class KubernetesNodeModel {
   @Expose() @IsBoolean() public_ip: boolean;
   @Expose() @IsOptional() @IsBoolean() public_ip6: boolean;
   @Expose() @IsBoolean() planetary: boolean;
+  @Expose() @IsBoolean() mycelium: boolean;
+  @Expose() @IsOptional() @IsString() myceliumSeed?: string;
   @Expose() @IsOptional() @IsIP() ip?: string;
   @Expose() @IsOptional() @IsBoolean() corex?: boolean;
   @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
@@ -719,8 +727,10 @@ class NetworkAddNodeModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() ipRange: string;
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+  @Expose() @IsBoolean() mycelium: boolean;
   @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
   @Expose() @IsString() @IsOptional() description?: string;
+  @Expose() @IsString() @IsOptional() networkSeed?: string;
 }
 
 class NetworkHasNodeModel {

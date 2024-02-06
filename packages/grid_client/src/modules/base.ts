@@ -230,6 +230,7 @@ class BaseModule {
       message: workload.result.message,
       flist: data.flist,
       publicIP: await this._getMachinePubIP(deploymentName, deployments, data.network.public_ip),
+      // TODO: instead of ygg_ip add plentary IP.
       planetary: data.network.planetary ? (workload.result.data as ZmachineResult).ygg_ip : "",
       interfaces: data.network.interfaces.map(n => ({
         network: n.network,
