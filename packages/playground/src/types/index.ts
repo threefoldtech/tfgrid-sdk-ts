@@ -245,6 +245,9 @@ export type NodeDetailsCard = {
   callback?: (value: string) => void;
   nameHint?: string; // v-chip hint beside the item name.
   nameHintColor?: string; // The v-chip color
+  type?: string;
+  downloadSpeed?: string;
+  uploadSpeed?: string;
 };
 
 export type GridProxyRequestConfig = {

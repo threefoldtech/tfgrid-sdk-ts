@@ -77,7 +77,7 @@ import { type PropType, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 import CountryDetailsCard from "@/components/node_details_cards/country_details_card.vue";
-import cpuBenchmarkCard from "@/components/node_details_cards/cpu_benchmark.vue";
+import cpuBenchmarkCard from "@/components/node_details_cards/cpu_benchmark_card.vue";
 import FarmDetailsCard from "@/components/node_details_cards/farm_details_card.vue";
 import GpuDetailsCard from "@/components/node_details_cards/gpu_details_card.vue";
 import InterfacesDetailsCard from "@/components/node_details_cards/interfaces_details_card.vue";
@@ -90,7 +90,7 @@ import type { FilterOptions } from "@/types";
 import { type GridProxyRequestConfig, nodeInitializer } from "@/types";
 import { getNode, getNodeStatusColor } from "@/utils/get_nodes";
 
-import IPerfCard from "./node_details_cards/iperf_details.vue";
+import IPerfCard from "./node_details_cards/iperf_details_card.vue";
 import NodeResourcesCharts from "./node_resources_charts.vue";
 export default {
   props: {
