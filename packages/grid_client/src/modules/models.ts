@@ -657,6 +657,58 @@ class ZOSNodeModel {
   @Expose() @IsInt() @Min(1) nodeId: number;
 }
 
+class NodeCPUTest {
+  @Expose() @IsNotEmpty() @IsString() name: string;
+  @Expose() @IsNotEmpty() @IsString() description: string;
+  @Expose() @IsNotEmpty() @IsNumber() timestamp: number;
+  @Expose() result: CPUBenchmark | {};
+}
+
+class NodeIPValidation {
+  @Expose() @IsNotEmpty() @IsString() name: string;
+  @Expose() @IsNotEmpty() @IsString() description: string;
+  @Expose() @IsNotEmpty() @IsNumber() timestamp: number;
+  @Expose() result: IPValidation | {};
+}
+
+class NodeIPerf {
+  @Expose() @IsNotEmpty() @IsString() name: string;
+  @Expose() @IsNotEmpty() @IsString() description: string;
+  @Expose() @IsNotEmpty() @IsNumber() timestamp: number;
+  @Expose() result: IPerf[] | [];
+}
+
+class CPUReport {
+  @Expose() @IsNotEmpty() @IsNumber() host_system: number;
+  @Expose() @IsNotEmpty() @IsNumber() host_total: number;
+  @Expose() @IsNotEmpty() @IsNumber() host_user: number;
+  @Expose() @IsNotEmpty() @IsNumber() remote_system: number;
+  @Expose() @IsNotEmpty() @IsNumber() remote_total: number;
+  @Expose() @IsNotEmpty() @IsNumber() remote_user: number;
+}
+
+class IPerf {
+  @Expose() @ValidateNested() cpu_report: CPUReport;
+  @Expose() @IsNotEmpty() @IsNumber() download_speed: number;
+  @Expose() @IsNotEmpty() @IsString() error: string;
+  @Expose() @IsNotEmpty() @IsInt() node_id: number;
+  @Expose() @IsNotEmpty() @IsString() node_ip: string;
+  @Expose() @IsNotEmpty() @IsString() test_type: string;
+  @Expose() @IsNotEmpty() @IsNumber() upload_speed: number;
+}
+
+class CPUBenchmark {
+  @Expose() @IsNotEmpty() @IsNumber() multi: number;
+  @Expose() @IsNotEmpty() @IsNumber() single: number;
+  @Expose() @IsNotEmpty() @IsNumber() threads: number;
+  @Expose() @IsNotEmpty() @IsNumber() workloads: number;
+}
+
+class IPValidation {
+  @Expose() @IsNotEmpty() @IsString() reason: string;
+  @Expose() @IsNotEmpty() @IsString() state: string;
+}
+
 class NodePowerModel {
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
   @Expose() @IsBoolean() @IsNotEmpty() power: boolean;
@@ -895,4 +947,7 @@ export {
   AddPublicConfig,
   GetActiveContractsModel,
   GPUCardInfo,
+  NodeCPUTest,
+  NodeIPValidation,
+  NodeIPerf,
 };

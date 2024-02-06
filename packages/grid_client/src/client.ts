@@ -212,8 +212,8 @@ class GridClient {
   }
 
   async disconnect(): Promise<void> {
-    if (this.tfclient) await this.tfclient.disconnect();
     if (this.rmbClient) await this.rmbClient.disconnect();
+    if (this.tfclient) await this.tfclient.disconnect();
   }
 
   async invoke(message, args) {
