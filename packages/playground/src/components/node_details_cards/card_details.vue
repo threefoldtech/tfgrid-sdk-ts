@@ -18,12 +18,12 @@
           <v-col v-if="$props.iperf" class="font-14 d-flex justify-space-between">
             <p class="ml-20 font-14">{{ item.name }}/{{ item.type }}</p>
             <div>
-              <v-icon icon="mdi-arrow-down"></v-icon>
-              <span class="mx-3">{{ item.downloadSpeed }}</span>
-            </div>
-            <div>
               <v-icon icon="mdi-arrow-up"></v-icon>
               <span class="mx-3">{{ item.uploadSpeed }}</span>
+            </div>
+            <div>
+              <v-icon icon="mdi-arrow-down"></v-icon>
+              <span class="mx-3">{{ item.downloadSpeed }}</span>
             </div>
           </v-col>
           <v-col v-if="!$props.iperf" class="d-flex justify-start align-center ml-3">
