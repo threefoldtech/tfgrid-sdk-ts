@@ -187,15 +187,12 @@ async function loadDeployments() {
 
   chunk3.items = chunk3.items.map(markAsFromAnotherClient);
 
-  console.log({ chunk1, chunk2, chunk3 });
   const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
   failedDeployments.value = [
     ...(Array.isArray((chunk1 as any).failedDeployments) ? (chunk1 as any).failedDeployments : []),
     ...(Array.isArray((chunk2 as any).failedDeployments) ? (chunk2 as any).failedDeployments : []),
     ...(Array.isArray((chunk3 as any).failedDeployments) ? (chunk3 as any).failedDeployments : []),
   ];
-
-  console.log({ vms });
 
   count.value = vms.count;
   items.value = vms.items.map(([leader, ...workers]) => {
