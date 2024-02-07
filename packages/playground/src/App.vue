@@ -223,7 +223,7 @@ watch(
   },
 );
 function navigateToHome() {
-  return $router.push("/");
+  return $router.push(DashboardRoutes.Other.HomePage);
 }
 
 onMounted(window.$$appLoader || noop);
