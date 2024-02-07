@@ -141,7 +141,7 @@ async function loadDeployments() {
   const chunk2 = await loadK8s(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }));
   const chunk3 = await loadK8s(updateGrid(grid!, { projectName: "" }));
 
-  chunk3.items = chunk3.items.map(markAsFromAnotherClient);
+  chunk3.items = chunk3.items.map(i => (!i.projectName ? markAsFromAnotherClient(i) : i));
 
   const clusters = mergeLoadedDeployments(chunk1, chunk2, chunk3);
   failedDeployments.value = [
