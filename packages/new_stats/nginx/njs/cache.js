@@ -14,13 +14,27 @@ function isLessThan24Hours(timestamp) {
   return difference < hours * 60 * 60 * 1000;
 }
 
-async function readCache(path) {
-  const cache = JSON.parse(fs.readFileSync(path));
-  if (cache.summary) {
-    const validCache = isLessThan24Hours(cache.timestamp || undefined);
+const DUMMY_DATA = {
+  capacity: "32.74 PB",
+  nodes: 2569,
+  countries: 61,
+  cores: 63968,
+};
+function readCache(path) {
+  try {
+    const cache = JSON.parse(fs.readFileSync(path));
+    if (cache.summary) {
+      const validCache = isLessThan24Hours(cache.timestamp || undefined);
+      return {
+        summary: cache.summary,
+        valid: validCache,
+      };
+    } else throw "Invalid cache";
+  } catch (error) {
     return {
-      cache,
-      validCache,
+      summary: DUMMY_DATA,
+      valid: false,
+      error,
     };
   }
 }
