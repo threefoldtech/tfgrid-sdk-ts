@@ -23,9 +23,8 @@
           <v-divider color="#FFCC00" />
           <v-card-text>
             <v-alert type="error" variant="tonal">
-              Failed to load <strong>{{ count - items.length }}</strong> deployment{{
-                count - items.length > 1 ? "s" : ""
-              }}.
+              Failed to load
+              <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
 
               <span>
                 This might happen because the node is down or it's not reachable
@@ -101,6 +100,17 @@
         </v-btn-group>
       </template>
 
+      <template #[`item.status`]="{ item }">
+        <v-chip :color="getNodeHealthColor(item.value.status as string).color">
+          <v-tooltip v-if="item.value.status == NodeHealth.Error" activator="parent" location="top">{{
+            item.value.message
+          }}</v-tooltip>
+          <span>
+            {{ capitalize(getNodeHealthColor(item.value.status as string).type) }}
+          </span>
+        </v-chip>
+      </template>
+
       <template #no-data-text>
         <div v-if="failedDeploymentList.length > 0" class="text-center">
           <p v-text="'Couldn\'t load any of your ' + projectName + ' deployments.'" />
@@ -120,7 +130,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue";
+import { capitalize, computed, onMounted, ref } from "vue";
+
+import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
 import { useProfileManager } from "../stores";
 import { getGrid, updateGrid } from "../utils/grid";
@@ -207,6 +219,7 @@ const filteredHeaders = computed(() => {
     { title: "WireGuard", key: "wireguard", sortable: false },
     { title: "Flist", key: "flist" },
     { title: "Cost", key: "billing" },
+    { title: "Health", key: "status", sortable: false },
     { title: "Actions", key: "actions", sortable: false },
   ];
 
