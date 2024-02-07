@@ -2,7 +2,7 @@
   <view-layout>
     <v-row>
       <v-col v-for="card in cards" :key="card.title">
-        <router-link :to="'/deploy/orchestrators' + card.route">
+        <router-link :to="card.route">
           <v-hover>
             <template v-slot:default="{ isHovering, props }">
               <v-card class="pa-3 pt-6" height="200" v-bind="props" :class="isHovering ? 'card-opacity' : undefined">
@@ -32,6 +32,8 @@
   </view-layout>
 </template>
 <script lang="ts">
+import { DashboardRoutes } from "@/router/routes";
+
 interface Card {
   title: string;
   excerpt: string;
@@ -49,14 +51,14 @@ export default {
         excerpt:
           "Kubernetes is the standard container orchestration tool. On the TF grid, Kubernetes clusters can be deployed out of the box. We have implemented K3S, a full-blown Kubernetes offering that uses only half of the memory footprint.",
         icon: "kubernetes.png",
-        route: "/kubernetes",
+        route: DashboardRoutes.Orchestrators.Kubernetes,
       },
       {
         title: "CapRover",
         excerpt:
           "CapRover is an extremely easy to use app/database deployment & web server manager for your NodeJS, Python, PHP, ASP.NET, Ruby, MySQL, MongoDB, Postgres, WordPress (and etc…) applications!",
         icon: "caprover.png",
-        route: "/caprover",
+        route: DashboardRoutes.Orchestrators.CapRover,
       },
     ];
     const baseURL = import.meta.env.BASE_URL;

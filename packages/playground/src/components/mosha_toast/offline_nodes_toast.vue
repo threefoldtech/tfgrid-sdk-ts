@@ -18,6 +18,7 @@
 import type { PropType } from "vue";
 
 import router from "@/router";
+import { DashboardRoutes } from "@/router/routes";
 
 export default {
   props: {
@@ -39,7 +40,7 @@ export default {
 
   setup(props) {
     const navigateToContractsList = () => {
-      router.push("/deploy/contracts-list");
+      router.push(DashboardRoutes.Deploy.YourContracts);
       if (props.toast) {
         props.toast.close();
       }
