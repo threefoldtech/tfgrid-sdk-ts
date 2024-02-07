@@ -129,15 +129,6 @@ class VMHL extends HighLevelBase {
       diskMounts.push(disk.createMount(d.name, d.mountpoint));
     }
 
-    // Validate mycelium seed If provided, if not generate it.
-    if (mycelium) {
-      if (myceliumSeed) {
-        validateHexSeed(myceliumSeed, 6);
-      } else {
-        myceliumSeed = generateRandomHexSeed(6);
-      }
-    }
-
     // ipv4
     // TODO: make sure that the farm has a free public ip before continuing the deployment
     let ipName = "";
@@ -291,6 +282,22 @@ class VMHL extends HighLevelBase {
     } else {
       machine_ip = network.getFreeIP(nodeId);
     }
+
+    // Split machine_ip to get last 2 numbers to be used in mycelium hex seed
+    const parts = machine_ip.split("/");
+    const ipPart = parts[0];
+    const ipNumbers = ipPart.split(".").map(part => parseInt(part, 10));
+    const lastTwoNumbers = ipNumbers.slice(-2);
+
+    // Validate mycelium seed If provided, if not generate it.
+    if (mycelium) {
+      if (myceliumSeed) {
+        validateHexSeed(myceliumSeed, 6);
+      } else {
+        myceliumSeed = generateRandomHexSeed(6, lastTwoNumbers);
+      }
+    }
+
     events.emit("logs", `Creating a vm on node: ${nodeId}, network: ${network.name} with private ip: ${machine_ip}`);
     workloads.push(
       vm.create(

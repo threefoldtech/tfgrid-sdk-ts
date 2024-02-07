@@ -170,9 +170,6 @@ class MachinesModule extends BaseModule {
     const network = new Network(networkName, networkIpRange, this.config);
     await network.load();
 
-    // TODO: test network seed
-    console.log("==================");
-    console.log("Workload data: ", workload.data);
     const [twinDeployments] = await this.vm.create(
       options.name,
       options.node_id,
@@ -187,7 +184,7 @@ class MachinesModule extends BaseModule {
       options.mycelium,
       options.myceliumSeed!,
       network,
-      workload.data["network_seed"],
+      "",
       options.entrypoint,
       options.env,
       workload.metadata,

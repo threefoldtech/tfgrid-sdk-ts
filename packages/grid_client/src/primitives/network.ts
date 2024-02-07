@@ -150,7 +150,7 @@ class Network {
         validateHexSeed(networkSeed, 32);
       } else {
         znet.mycelium = {
-          hex_key: generateRandomHexSeed(32),
+          hex_key: generateRandomHexSeed(32, []),
           peers: [],
         };
       }

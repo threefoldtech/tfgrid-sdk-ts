@@ -280,8 +280,6 @@ class K8sModule extends BaseModule {
     const networkIpRange = Addr(masterWorkload.data["network"].interfaces[0].ip).mask(16).toString();
     const network = new Network(networkName, networkIpRange, this.config);
     await network.load();
-    console.log("===================");
-    console.log("Master Workload Data: ", masterWorkload.data);
     const [twinDeployments] = await this.kubernetes.add_worker(
       options.name,
       options.node_id,
@@ -297,7 +295,7 @@ class K8sModule extends BaseModule {
       options.mycelium,
       options.myceliumSeed!,
       network,
-      masterWorkload.data["networkSeed"],
+      "",
       masterWorkload.data["env"]["SSH_KEY"],
       masterWorkload.metadata,
       masterWorkload.description,
