@@ -91,6 +91,10 @@
       <template #[`item.billing`]="{ item }">
         {{ item.value.billing }}
       </template>
+      <template #[`item.createdAt`]="{ item }">
+        {{ toHumanDate(item.value.created) }}
+        {{ console.log(item.value) }}
+      </template>
       <template #[`item.actions`]="{ item }">
         <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item.value)">
           Deleting...
@@ -219,6 +223,7 @@ const filteredHeaders = computed(() => {
     { title: "WireGuard", key: "wireguard", sortable: false },
     { title: "Flist", key: "flist" },
     { title: "Cost", key: "billing" },
+    { title: "Created At", key: "createdAt" },
     { title: "Health", key: "status", sortable: false },
     { title: "Actions", key: "actions", sortable: false },
   ];
@@ -295,6 +300,8 @@ defineExpose({ loadDeployments });
 </script>
 
 <script lang="ts">
+import toHumanDate from "@/utils/date";
+
 import { ProjectName } from "../types";
 import { migrateModule } from "../utils/migration";
 import AccessDeploymentAlert from "./AccessDeploymentAlert.vue";
@@ -312,6 +319,7 @@ export default {
         { key: "name", order: "asc" },
         { key: "flist", order: "asc" },
         { key: "billing", order: "asc" },
+        { key: "createdAt", order: "asc" },
       ],
     };
   },
