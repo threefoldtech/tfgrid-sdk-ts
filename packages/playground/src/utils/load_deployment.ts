@@ -151,7 +151,7 @@ export async function loadK8s(grid: GridClient) {
 
   const projectName = grid.clientOptions.projectName;
   const grids = (await Promise.all(
-    clusters.map(n => getGrid(grid.clientOptions, `${projectName}/${n}`)),
+    clusters.map(n => getGrid(grid.clientOptions, projectName ? `${projectName}/${n}` : n)),
   )) as GridClient[];
   const failedDeployments: FailedDeployment[] = [];
 
