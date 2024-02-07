@@ -38,7 +38,7 @@ class BaseModule {
   twinDeploymentHandler: TwinDeploymentHandler;
   backendStorage: BackendStorage;
   tfClient: TFClient;
-  contracts: GqlNodeContract[];
+  contracts: Required<GqlNodeContract>[];
 
   constructor(public config: GridClientConfig) {
     this.projectName = config.projectName;
@@ -76,14 +76,7 @@ class BaseModule {
 
   async getDeploymentContracts(name: string) {
     const contracts = await this.getMyContracts();
-    const filteredContracts = contracts.filter(c => {
-      const deploymentData = JSON.parse(c.deploymentData) as { name: string };
-      return deploymentData.name === name;
-    });
-    if (!filteredContracts) {
-      return [];
-    }
-    return filteredContracts;
+    return contracts.filter(c => c.parsedDeploymentData.name === name) || [];
   }
 
   async save(name: string, contracts: Record<string, unknown[]>) {
@@ -160,11 +153,24 @@ class BaseModule {
 
   private async getMyContracts(fetch = false) {
     if (fetch || !this.contracts) {
-      this.contracts = await this.tfClient.contracts.listMyNodeContracts({
+      const contracts = await this.tfClient.contracts.listMyNodeContracts({
         graphqlURL: this.config.graphqlURL,
         type: modulesNames[this.moduleName],
         projectName: this.projectName,
       });
+
+      const parsedContractsName = new Set<string>();
+      const parsedContracts: Required<GqlNodeContract>[] = [];
+
+      for (const contract of contracts) {
+        const parsedDeploymentData = JSON.parse(contract.deploymentData);
+        if (!parsedContractsName.has(parsedDeploymentData.name)) {
+          parsedContractsName.add(parsedDeploymentData.name);
+          parsedContracts.push({ ...contract, parsedDeploymentData });
+        }
+      }
+
+      this.contracts = parsedContracts;
     }
 
     return this.contracts;
@@ -173,10 +179,7 @@ class BaseModule {
   async _list(): Promise<string[]> {
     await this._migrateListKeys();
     const contracts = await this.getMyContracts(true);
-    return contracts.map(c => {
-      const deploymentData = JSON.parse(c.deploymentData) as { name: string };
-      return deploymentData.name;
-    });
+    return contracts.map(c => c.parsedDeploymentData.name);
   }
 
   async exists(name: string): Promise<boolean> {
