@@ -160,19 +160,18 @@ class BaseModule {
 
   private async getMyContracts(fetch = false) {
     if (fetch || !this.contracts) {
-      this.contracts = await this.tfClient.contracts.listMyNodeContracts({ graphqlURL: this.config.graphqlURL });
+      this.contracts = await this.tfClient.contracts.listMyNodeContracts({
+        graphqlURL: this.config.graphqlURL,
+        type: modulesNames[this.moduleName],
+        projectName: this.projectName,
+      });
     }
-    return this.contracts.filter(c => {
-      const deploymentData = JSON.parse(c.deploymentData) as { type: string; name: string; projectName: string };
-      return (
-        deploymentData.projectName.startsWith(this.projectName) && deploymentData.type === modulesNames[this.moduleName]
-      );
-    });
+
+    return this.contracts;
   }
 
   async _list(): Promise<string[]> {
     await this._migrateListKeys();
-    //TODO: optimize it by doing the filtering directly on graphql
     const contracts = await this.getMyContracts(true);
     return contracts.map(c => {
       const deploymentData = JSON.parse(c.deploymentData) as { name: string };

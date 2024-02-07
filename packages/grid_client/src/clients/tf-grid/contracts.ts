@@ -17,6 +17,8 @@ export interface ListContractByTwinIdOptions {
   graphqlURL: string;
   twinId: number;
   stateList?: ContractStates[];
+  type?: string;
+  projectName?: string;
 }
 
 export interface ContractUsedResources {
@@ -81,6 +83,8 @@ export interface ListContractByAddressOptions {
 export interface ListMyContractOptions {
   graphqlURL: string;
   stateList?: ContractStates[];
+  type?: string;
+  projectName?: string;
 }
 
 export interface GetConsumptionOptions {
@@ -146,10 +150,29 @@ class TFContracts extends Contracts {
     const state = `[${options.stateList.join(", ")}]`;
     const gqlClient = new Graphql(options.graphqlURL);
     const opts = `(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, orderBy: twinID_ASC)`;
+
+    // filter contracts based on deploymentData
+    let filterQuery = "";
+    if (options.type || options.projectName) {
+      filterQuery = " , AND: [";
+
+      if (options.type) {
+        // eslint-disable-next-line no-useless-escape
+        filterQuery += `{ deploymentData_contains: \"\\\"type\\\":\\\"${options.type}\\\"\" },`;
+      }
+
+      if (options.projectName) {
+        // eslint-disable-next-line no-useless-escape
+        filterQuery += `{ deploymentData_contains: \"\\\"projectName\\\":\\\"${options.projectName}\" }`;
+      }
+
+      filterQuery += "]";
+    }
+
     try {
       const nodeContractsCount = await gqlClient.getItemTotalCount("nodeContracts", opts);
       const body = `query getContracts($nodeContractsCount: Int!){
-                nodeContracts(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, limit: $nodeContractsCount) {
+                nodeContracts(where: {twinID_eq: ${options.twinId}, state_in: ${state}${filterQuery}}, limit: $nodeContractsCount) {
                   contractID
                   deploymentData
                   state
@@ -255,6 +278,8 @@ class TFContracts extends Contracts {
       graphqlURL: options.graphqlURL,
       twinId: twinId,
       stateList: options.stateList,
+      type: options.type,
+      projectName: options.projectName,
     });
   }
 
