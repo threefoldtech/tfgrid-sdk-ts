@@ -11,4 +11,3 @@ RUN yarn lerna run build --no-private && yarn workspace @threefold/newstats buil
 FROM nginx:alpine
 COPY --from=build /app/packages/new_stats/dist /usr/share/nginx/html
 COPY --from=build /app/packages/new_stats/nginx /etc/nginx
-COPY --from=build /app/packages/new_stats/tmp /tmp
