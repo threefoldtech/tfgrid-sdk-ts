@@ -93,7 +93,6 @@
       </template>
       <template #[`item.createdAt`]="{ item }">
         {{ toHumanDate(item.value.created) }}
-        {{ console.log(item.value) }}
       </template>
       <template #[`item.actions`]="{ item }">
         <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item.value)">
