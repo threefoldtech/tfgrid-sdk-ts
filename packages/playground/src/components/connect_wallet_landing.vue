@@ -56,7 +56,7 @@
         </div>
 
         <div class="d-flex justify-center mt-5">
-          <v-btn color="primary" target="_blank" @click="$router.push('/tf-grid/stats')">
+          <v-btn color="primary" target="_blank" @click="$router.push(DashboardRoutes.TFGrid.NodeStatistics)">
             Explore ThreeFold Grid Capacity
           </v-btn>
         </div>
@@ -90,6 +90,8 @@ import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
+import { DashboardRoutes } from "@/router/routes";
+
 export default {
   name: "ConnectWalletLanding",
   setup() {
@@ -101,6 +103,7 @@ export default {
     return {
       theme,
       pageTitle,
+      DashboardRoutes,
       stats: [
         {
           label: "Capacity",
