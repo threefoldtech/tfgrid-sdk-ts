@@ -1,4 +1,8 @@
 const fs = require("fs");
+import cache from "./cache.js";
+
+const RETRIES = 3;
+const cache_path = "/tmp/statsSummary.json";
 const URLS = [
   "https://gridproxy.grid.tf/stats?status=up",
   "https://gridproxy.grid.tf/stats?status=standby",
@@ -12,21 +16,34 @@ const DUMMY_DATA = {
   nodes: 2569,
   countries: 61,
   cores: 63968,
-  notUpdated: true,
 };
 
-const RETRIES = 3;
-const cache_path = "/tmp/statsSummary.json";
+async function getStats(r) {
+  let cachedData;
+  try {
+    cachedData = cache.readCache(cache_path);
+  } catch (error) {
+    r.error(`Failed to read cached data retuning Dummy data`);
+    cachedData = DUMMY_DATA;
+  }
+  if (cachedData.valid) {
+    r.return(200, JSON.stringify(cachedData.summary));
+    return;
+  }
+  r.log(`Outdated cache, trying to update it...`);
 
-function isLessThan24Hours(timestamp) {
-  const now = Date.now();
-
-  const difference = now - timestamp;
-
-  const twentyFourHoursInMillis = 24 * 60 * 60 * 1000;
-
-  return difference < twentyFourHoursInMillis;
+  try {
+    const stats = await fetchStats(r);
+    r.return(200, JSON.stringify(stats));
+    return;
+  } catch (error) {
+    r.error(`Failed to fetch stats: ${error}`);
+    cachedData.summary.outdated = true;
+    r.return(200, JSON.stringify(cachedData.summary));
+    return;
+  }
 }
+
 function initTargeRequests(urls, r) {
   return urls.map(url =>
     //   eslint-disable-next-line no-undef
@@ -35,64 +52,31 @@ function initTargeRequests(urls, r) {
       .then(res => res.json()),
   );
 }
-function updateCache(result) {
-  const cache = {
-    summary: result,
-    timestamp: Date.now(),
-    test: "yes",
-  };
-  fs.writeFileSync("/tmp/statsSummary.json", JSON.stringify(cache));
-}
 async function fetchStats(r) {
   let reties = 0;
   const stats = [];
-  try {
-    while (URLS.length !== 0 && reties < RETRIES) {
-      const responses = await Promise.allSettled(initTargeRequests(URLS, r));
-      const currentUrls = URLS;
-      responses.forEach((item, index) => {
-        if (item.status === "fulfilled") {
-          URLS.splice(URLS.indexOf(currentUrls[index]), 1);
-          stats.push(item.value);
-        }
-      });
-      if (URLS.length !== 0) reties++;
-    }
-    let result;
-    if (reties < 3) result = mergeStatsData(stats);
-    else {
-      r.error(`Failed to get response form ${URLS} after ${reties}; returning  DUMMY_DATA`);
-      result = DUMMY_DATA;
-    }
-    r.headersOut["Content-Type"] = "application/json";
-    r.headersOut["Content-Disposition"] = "inline";
-    r.return(200, JSON.stringify(result));
-    try {
-      updateCache(result);
-    } catch (err) {
-      r.error(`Failed to update cache due to: ${err}`);
-    }
-  } catch (error) {
-    r.error(error);
-    r.headersOut["Content-Type"] = "application/json";
-    r.headersOut["Content-Disposition"] = "inline";
-    r.return(200, JSON.stringify(DUMMY_DATA));
+  while (URLS.length !== 0 && reties < RETRIES) {
+    const responses = await Promise.allSettled(initTargeRequests(URLS, r));
+    const currentUrls = URLS;
+    responses.forEach((item, index) => {
+      if (item.status === "fulfilled") {
+        URLS.splice(URLS.indexOf(currentUrls[index]), 1);
+        stats.push(item.value);
+      }
+    });
+    if (URLS.length !== 0) reties++;
   }
-}
-async function getStats(r) {
+  let result;
+  if (reties < 3) result = mergeStatsData(stats);
+  else throw `Failed to get response form ${URLS} after ${reties}`;
+
   try {
-    const cache = JSON.parse(fs.readFileSync(cache_path));
-    if (cache.summary) {
-      const validCache = isLessThan24Hours(cache.timestamp || undefined);
-      if (validCache) {
-        r.log("returnig summary from cache");
-        r.return(200, JSON.stringify(cache));
-        return;
-      } else throw "invalid cache";
-    }
+    cache.updateCache(result, cache_path);
   } catch (err) {
-    await fetchStats(r);
+    r.error(`Failed to update cache due to: ${err}`);
   }
+
+  return result;
 }
 
 function mergeStatsData(stats) {
