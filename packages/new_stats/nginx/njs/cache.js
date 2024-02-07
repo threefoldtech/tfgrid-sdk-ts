@@ -24,7 +24,7 @@ function readCache(path) {
   try {
     const cache = JSON.parse(fs.readFileSync(path));
     if (cache.summary) {
-      const validCache = isLessThan24Hours(cache.timestamp || undefined);
+      const validCache = isLessThan24Hours(cache.updatedAt);
       return {
         summary: cache.summary,
         valid: validCache,

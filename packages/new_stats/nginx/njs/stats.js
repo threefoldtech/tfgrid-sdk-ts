@@ -57,7 +57,7 @@ async function fetchStats(r) {
     if (URLS.length !== 0) retries++;
   }
   let result;
-  if (retries >= 3 || URLS.length > 0) throw `Failed to get response form ${URLS} after ${retries} ret`;
+  if (retries >= 3 || URLS.length > 0) throw `Failed to get response form ${URLS} after ${retries} retries`;
   else result = mergeStatsData(stats);
   try {
     cache.updateCache(result, cache_path);
