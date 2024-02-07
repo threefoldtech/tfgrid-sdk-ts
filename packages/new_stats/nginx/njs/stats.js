@@ -1,9 +1,8 @@
-const fs = require("fs");
 import cache from "./cache.js";
 
 const RETRIES = 3;
 const cache_path = "/tmp/statsSummary.json";
-const URLS = [
+let URLS = [
   "https://gridproxy.grid.tf/stats?status=up",
   "https://gridproxy.grid.tf/stats?status=standby",
   "https://gridproxy.test.grid.tf/stats?status=up",
@@ -11,21 +10,9 @@ const URLS = [
   "https://gridproxy.dev.grid.tf/stats?status=up",
   "https://gridproxy.dev.grid.tf/stats?status=standby",
 ];
-const DUMMY_DATA = {
-  capacity: "32.74 PB",
-  nodes: 2569,
-  countries: 61,
-  cores: 63968,
-};
 
 async function getStats(r) {
-  let cachedData;
-  try {
-    cachedData = cache.readCache(cache_path);
-  } catch (error) {
-    r.error(`Failed to read cached data retuning Dummy data`);
-    cachedData = DUMMY_DATA;
-  }
+  const cachedData = cache.readCache(cache_path);
   if (cachedData.valid) {
     r.return(200, JSON.stringify(cachedData.summary));
     return;
@@ -39,6 +26,7 @@ async function getStats(r) {
   } catch (error) {
     r.error(`Failed to fetch stats: ${error}`);
     cachedData.summary.outdated = true;
+    if (cachedData.error) r.error(`Failed to read cached data due to ${cachedData.error} \nretuning Dummy data`);
     r.return(200, JSON.stringify(cachedData.summary));
     return;
   }
@@ -53,23 +41,24 @@ function initTargeRequests(urls, r) {
   );
 }
 async function fetchStats(r) {
-  let reties = 0;
+  let retries = 0;
   const stats = [];
-  while (URLS.length !== 0 && reties < RETRIES) {
+  while (URLS.length !== 0 && retries < RETRIES) {
     const responses = await Promise.allSettled(initTargeRequests(URLS, r));
-    const currentUrls = URLS;
+    const failedURls = [];
     responses.forEach((item, index) => {
       if (item.status === "fulfilled") {
-        URLS.splice(URLS.indexOf(currentUrls[index]), 1);
         stats.push(item.value);
+      } else {
+        failedURls.push(URLS[index]);
       }
     });
-    if (URLS.length !== 0) reties++;
+    URLS = failedURls;
+    if (URLS.length !== 0) retries++;
   }
   let result;
-  if (reties < 3) result = mergeStatsData(stats);
-  else throw `Failed to get response form ${URLS} after ${reties}`;
-
+  if (retries >= 3 || URLS.length > 0) throw `Failed to get response form ${URLS} after ${retries} ret`;
+  else result = mergeStatsData(stats);
   try {
     cache.updateCache(result, cache_path);
   } catch (err) {
