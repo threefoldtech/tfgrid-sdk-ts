@@ -170,6 +170,7 @@ async function loadDeployments() {
     item.planetary = item.masters[0].planetary || "None";
     item.workersLength = item.workers.length;
     item.billing = item.masters[0].billing;
+    item.createdAt = item.masters[0].created;
     return item;
   });
   loading.value = false;
