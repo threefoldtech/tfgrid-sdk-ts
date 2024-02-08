@@ -50,6 +50,8 @@ import { useProfileManager } from "../stores";
 import { getGrid, loadBalance } from "../utils/grid";
 
 const profileManager = useProfileManager();
+const items = ref([{ id: 1, name: "stellar" }]);
+const selectedItem = ref(items.value[0]);
 const openDepositDialog = ref(false);
 const openWithdrawDialog = ref(false);
 const selectedName = ref("");
@@ -60,6 +62,7 @@ const qrCodeText = ref("");
 const depositFee = ref(0);
 
 onMounted(async () => {
+  selectedName.value = items.value.filter(item => item.id === selectedItem.value.id)[0].name;
   depositWallet.value = window.env.BRIDGE_TFT_ADDRESS;
   qrCodeText.value = `TFT:${depositWallet.value}?message=twin_${profileManager.profile?.twinId}&sender=me`;
   try {
