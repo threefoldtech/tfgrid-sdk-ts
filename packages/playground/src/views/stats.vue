@@ -8,9 +8,7 @@
       <div class="text-center">
         <v-row align="center" justify="center">
           <v-col cols="12" sm="6" md="4">
-            <section class="loader" v-if="loading">
-              <v-progress-circular size="150" indeterminate />
-            </section>
+            <Loading v-if="loading" />
           </v-col>
         </v-row>
       </div>
