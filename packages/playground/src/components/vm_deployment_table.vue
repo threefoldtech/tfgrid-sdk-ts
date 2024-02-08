@@ -91,7 +91,7 @@
       <template #[`item.billing`]="{ item }">
         {{ item.value.billing }}
       </template>
-      <template #[`item.createdAt`]="{ item }">
+      <template #[`item.created`]="{ item }">
         {{ toHumanDate(item.value.created) }}
       </template>
       <template #[`item.actions`]="{ item }">
@@ -222,7 +222,7 @@ const filteredHeaders = computed(() => {
     { title: "WireGuard", key: "wireguard", sortable: false },
     { title: "Flist", key: "flist" },
     { title: "Cost", key: "billing" },
-    { title: "Created At", key: "createdAt" },
+    { title: "Created At", key: "created" },
     { title: "Health", key: "status", sortable: false },
     { title: "Actions", key: "actions", sortable: false },
   ];
@@ -318,7 +318,7 @@ export default {
         { key: "name", order: "asc" },
         { key: "flist", order: "asc" },
         { key: "billing", order: "asc" },
-        { key: "createdAt", order: "asc" },
+        { key: "created", order: "asc" },
       ],
     };
   },
