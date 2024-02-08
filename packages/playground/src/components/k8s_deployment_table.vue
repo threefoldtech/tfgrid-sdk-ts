@@ -68,6 +68,7 @@
         { title: 'Planetary Network IP', key: 'planetary', sortable: false },
         { title: 'Workers', key: 'workersLength' },
         { title: 'Billing Rate', key: 'billing' },
+        { title: 'Created At', key: 'created' },
         { title: 'Health', key: 'status', sortable: false },
         { title: 'Actions', key: 'actions', sortable: false },
       ]"
@@ -79,6 +80,9 @@
       @click:row="$attrs['onClick:row']"
       :sort-by="sortBy"
     >
+      <template #[`item.created`]="{ item }">
+        {{ toHumanDate(item.value.masters[0].created) }}
+      </template>
       <template #[`item.status`]="{ item }">
         <v-chip :color="getNodeHealthColor(item.value.masters[0].status as string).color">
           <v-tooltip v-if="item.value.masters[0].status == NodeHealth.Error" activator="parent" location="top">{{
@@ -166,6 +170,7 @@ async function loadDeployments() {
     item.planetary = item.masters[0].planetary || "None";
     item.workersLength = item.workers.length;
     item.billing = item.masters[0].billing;
+    item.created = item.masters[0].created;
     return item;
   });
   loading.value = false;
@@ -175,6 +180,8 @@ defineExpose({ loadDeployments });
 </script>
 
 <script lang="ts">
+import toHumanDate from "@/utils/date";
+
 import AccessDeploymentAlert from "./AccessDeploymentAlert.vue";
 import ListTable from "./list_table.vue";
 
@@ -190,6 +197,7 @@ export default {
         { key: "name", order: "asc" },
         { key: "workersLength", order: "asc" },
         { key: "billing", order: "asc" },
+        { key: "created", order: "asc" },
       ],
     };
   },
