@@ -58,7 +58,12 @@
           :medium="{ cpu: 2, memory: 4, disk: 50 }"
           :large="{ cpu: 4, memory: 16, disk: 100 }"
         />
-
+        <input-tooltip
+          inline
+          tooltip="Mycelium is an IPv6 overlay network. Each node that joins the overlay network will receive an overlay network IP."
+        >
+          <v-switch color="primary" inset label="Mycelium" v-model="mycelium" hide-details />
+        </input-tooltip>
         <input-tooltip
           inline
           tooltip="Click to know more about dedicated machines."
@@ -122,6 +127,7 @@ const name = ref(generateName({ prefix: "dc" }));
 const email = ref("");
 const solution = ref() as Ref<SolutionFlavor>;
 const ipv4 = ref(false);
+const mycelium = ref(false);
 const smtp = ref(createSMTPServer());
 const dedicated = ref(false);
 const certified = ref(false);
@@ -178,6 +184,7 @@ async function deploy() {
           rootFilesystemSize: rootFilesystemSize.value,
           publicIpv4: ipv4.value,
           planetary: true,
+          mycelium: mycelium.value,
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "DISCOURSE_HOSTNAME", value: domain },

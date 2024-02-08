@@ -75,6 +75,7 @@ export async function deployWorker(grid: GridClient, options: K8SWorker & { depl
   worker.public_ip = options.ipv4;
   worker.public_ip6 = options.ipv6;
   worker.planetary = options.planetary;
+  worker.mycelium = options.mycelium;
   worker.rootfs_size = options.rootFsSize;
   worker.node_id = options.selectionDetails!.node!.nodeId;
   worker.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;

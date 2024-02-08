@@ -51,6 +51,7 @@ export interface K8SWorker {
   ipv4: boolean;
   ipv6: boolean;
   planetary: boolean;
+  mycelium: boolean;
   rootFsSize: number;
   rentedBy?: number;
   dedicated: boolean;

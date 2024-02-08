@@ -28,6 +28,7 @@
           <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
+      <v-switch color="primary" inset label="Mycelium" v-model="mycelium" hide-details />
       <v-switch color="primary" inset label="IPv4" v-model="ipv4" hide-details />
 
       <AlgorandCapacity
@@ -199,6 +200,7 @@ const flist: Flist = {
 };
 const name = ref(generateName({ prefix: "al" }));
 const ipv4 = ref(false);
+const mycelium = ref(false);
 const cpu = ref() as Ref<number>;
 const memory = ref() as Ref<number>;
 const storage = ref() as Ref<number>;
@@ -246,6 +248,7 @@ async function deploy() {
               : [],
           rootFilesystemSize: rootFilesystemSize.value,
           publicIpv4: ipv4.value,
+          mycelium: mycelium.value,
           planetary: true,
           nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,

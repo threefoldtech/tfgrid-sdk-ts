@@ -249,6 +249,7 @@ async function deploy() {
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           planetary: planetary.value,
+          mycelium: mycelium.value,
           envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
           rootFilesystemSize,
           hasGPU: hasGPU.value,

@@ -10,6 +10,7 @@
           <v-chip v-if="ipv4" variant="outlined" size="small" class="ml-2"> IPV4 </v-chip>
           <v-chip v-if="ipv6" variant="outlined" size="small" class="ml-2"> IPV6 </v-chip>
           <v-chip v-if="planetary" variant="outlined" size="small" class="ml-2"> Planetary </v-chip>
+          <v-chip v-if="mycelium" variant="outlined" size="small" class="ml-2"> Mycelium </v-chip>
           <v-chip v-if="wireguard" variant="outlined" size="small" class="ml-2"> Wireguard </v-chip>
         </template>
         <v-expansion-panel-text>
@@ -60,7 +61,14 @@
             inline
             tooltip="Mycelium is an IPv6 overlay network. Each node that joins the overlay network will receive an overlay network IP."
           >
-            <v-switch hide-details color="primary" inset label="mycelium" :modelValue="$props.mycelium" />
+            <v-switch
+              hide-details
+              color="primary"
+              inset
+              label="mycelium"
+              :modelValue="$props.mycelium"
+              @update:modelValue="$emit('update:mycelium', $event)"
+            />
           </input-tooltip>
           <input-tooltip
             v-if="wireguard !== null"
@@ -86,7 +94,7 @@
 </template>
 
 <script lang="ts">
-import { computed } from "vue";
+import { computed, watch } from "vue";
 export default {
   name: "Network",
   props: {
@@ -123,11 +131,27 @@ export default {
     "update:mycelium": (value?: boolean) => value,
     "update:wireguard": (value?: boolean) => value,
   },
-  setup(props, { expose }) {
-    if (props.ipv4 === null && props.ipv6 === null && props.planetary === null && props.wireguard === null) {
+  setup(props, { expose, emit }) {
+    if (
+      props.ipv4 === null &&
+      props.ipv6 === null &&
+      props.planetary === null &&
+      props.wireguard === null &&
+      props.mycelium
+    ) {
       throw new Error("You must provide at least one network  option");
     }
-    const error = computed(() => !(props.ipv4 || props.ipv6 || props.planetary || props.wireguard) && props.required);
+    watch(
+      () => props.mycelium,
+      newValue => {
+        if (newValue) {
+          emit("update:planetary", true);
+        }
+      },
+    );
+    const error = computed(
+      () => !(props.ipv4 || props.ipv6 || props.planetary || props.wireguard || props.mycelium) && props.required,
+    );
     expose({
       error,
     });

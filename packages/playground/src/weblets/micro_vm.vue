@@ -52,6 +52,7 @@
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
+          v-model:mycelium="mycelium"
           v-model:wireguard="wireguard"
           ref="network"
         />
@@ -217,6 +218,7 @@ const flist = ref<Flist>();
 const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
+const mycelium = ref(false);
 const wireguard = ref(false);
 const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
@@ -271,6 +273,7 @@ async function deploy() {
           disks: disks.value,
           envs: envs.value,
           planetary: planetary.value,
+          mycelium: mycelium.value,
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           rootFilesystemSize: rootFilesystemSize.value,

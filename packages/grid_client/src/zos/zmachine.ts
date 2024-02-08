@@ -96,6 +96,7 @@ class ZmachineResult extends WorkloadDataResult {
   @Expose() id: string;
   @Expose() ip: string;
   @Expose() ygg_ip: string;
+  @Expose() planetary_ip: string;
 }
 
 export { Zmachine, ZmachineNetwork, ZNetworkInterface, Mount, ZmachineResult, MyceliumIP };

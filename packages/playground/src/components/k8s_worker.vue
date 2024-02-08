@@ -66,6 +66,7 @@
       v-model:ipv4="$props.modelValue.ipv4"
       v-model:ipv6="$props.modelValue.ipv6"
       v-model:planetary="$props.modelValue.planetary"
+      v-model:mycelium="$props.modelValue.mycelium"
     />
 
     <RootFsSize
@@ -73,6 +74,12 @@
       :memory="$props.modelValue.memory"
       v-model.number="$props.modelValue.rootFsSize"
     />
+    <input-tooltip
+      inline
+      tooltip="Mycelium is an IPv6 overlay network. Each node that joins the overlay network will receive an overlay network IP."
+    >
+      <v-switch color="primary" inset label="Mycelium" v-model="$props.modelValue.mycelium" hide-details />
+    </input-tooltip>
 
     <input-tooltip
       inline
@@ -122,6 +129,7 @@ export function createWorker(name: string = generateName({ prefix: "wr" })): K8S
     ipv4: false,
     ipv6: false,
     planetary: true,
+    mycelium: false,
     rootFsSize: 2,
     dedicated: false,
     certified: false,
