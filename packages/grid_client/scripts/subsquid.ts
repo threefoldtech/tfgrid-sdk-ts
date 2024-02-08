@@ -82,7 +82,7 @@ async function main() {
     description: "subsquid machine",
   };
 
-  //Deploy subsquid cluster
+  //Deploy subsquid
   await deploy(grid3, vms);
 
   //Get the deployment

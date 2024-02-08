@@ -5,9 +5,9 @@ import { log } from "./utils";
 async function deploy(client, vms) {
   try {
     const res = await client.machines.deploy(vms);
-    log("================= Deploying presearch =================");
+    log("================= Deploying casperlabs =================");
     log(res);
-    log("================= Deploying presearch =================");
+    log("================= Deploying casperlabs =================");
   } catch (error) {
     log("Error while Deploying the VM " + error);
   }
@@ -18,7 +18,7 @@ async function getDeployment(client, vms) {
     const res = await client.machines.getObj(vms);
     log("================= Getting deployment information =================");
     log(res);
-    log(`You can access presearch via the browser using: http://newVMS5.${res[0].env.PRESEARCH_WEBSERVER_HOSTNAME}`);
+    log(`You can access casperlabs via the browser using: http://newVMS5.${res[0].env.CASPERLABS_WEBSERVER_HOSTNAME}`);
     log("================= Getting deployment information =================");
   } catch (error) {
     log("Error while getting the deployment " + error);
@@ -69,21 +69,19 @@ async function main() {
         cpu: 4,
         memory: 1024 * 4,
         rootfs_size: 0,
-        flist: "https://hub.grid.tf/tf-official-apps/presearch-v2.3.flist",
+        flist: "https://hub.grid.tf/tf-official-apps/casperlabs-latest.flist",
         entrypoint: "/sbin/zinit init",
         env: {
           SSH_KEY: config.ssh_key,
-          PRESEARCH_REGISTRATION_CODE: "e5083a8d0a6362c6cf7a3078bfac81e3",
-          PRESEARCH_BACKUP_PRI_KEY: "",
-          PRESEARCH_BACKUP_PUB_KEY: "",
+          CASPERLABS_HOSTNAME: "",
         },
       },
     ],
     metadata: "",
-    description: "presearch machine",
+    description: "casperlabs machine",
   };
 
-  //Deploy presearch
+  //Deploy casperlabs
   await deploy(grid3, vms);
 
   //Get the deployment

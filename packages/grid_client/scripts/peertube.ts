@@ -83,7 +83,7 @@ async function main() {
     description: "peertube machine",
   };
 
-  //Deploy Caprover cluster
+  //Deploy Peertube
   await deploy(grid3, vms);
 
   //Get the deployment
