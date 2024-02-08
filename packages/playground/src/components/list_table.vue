@@ -16,7 +16,6 @@
       <div class="d-flex align-center justify-space-between">
         <span>#</span>
         <div class="d-flex">
-          <v-divider vertical class="ml-3 mr-1" />
           <v-checkbox-btn
             :model-value="selectedItems.length > 0 && selectedItems.length === items.length"
             :indeterminate="selectedItems.length > 0 && items.length !== selectedItems.length"
@@ -31,7 +30,6 @@
       <div class="d-flex align-center justify-space-between">
         <span>{{ index + 1 }}</span>
         <div class="d-flex" @click.stop>
-          <v-divider vertical class="ml-3 mr-1" />
           <v-progress-circular
             v-if="deleting && selectedItems.includes(item?.value)"
             class="ml-3"
