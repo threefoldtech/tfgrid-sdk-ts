@@ -45,9 +45,9 @@ class Znet extends WorkloadData {
     for (let i = 0; i < this.peers.length; i++) {
       out += this.peers[i].challenge();
     }
-    out += this.mycelium.hex_key || "";
-    for (let i = 0; i < this.mycelium.peers.length; i++) {
-      out += this.mycelium.peers[i];
+    out += this.mycelium?.hex_key || "";
+    for (let i = 0; i < this.mycelium?.peers.length; i++) {
+      out += this.mycelium?.peers[i] || "";
     }
     return out;
   }

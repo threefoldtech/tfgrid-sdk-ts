@@ -39,8 +39,8 @@ class ZmachineNetwork {
       out += this.interfaces[i].network;
       out += this.interfaces[i].ip;
     }
-    out += this.mycelium.network;
-    out += this.mycelium.hex_seed;
+    out += this.mycelium?.network || "";
+    out += this.mycelium?.hex_seed || "";
     return out;
   }
 }

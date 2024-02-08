@@ -12,6 +12,7 @@ import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
 import { formatErrorMessage, getRandomNumber, randomChoice } from "../helpers/utils";
 import { generateRandomHexSeed, validateHexSeed } from "../helpers/validator";
+import { DeploymentFactory } from "../primitives/deployment";
 import { BackendStorage, BackendStorageType } from "../storage/backend";
 import { Deployment } from "../zos/deployment";
 import { Workload, WorkloadTypes } from "../zos/workload";
@@ -118,6 +119,45 @@ class Network {
     this.updateNetworkDeployments();
     this.wireguardConfig = this.getWireguardConfig(accessPoint.subnet, keypair.privateKey, nodesWGPubkey, endpoint);
     return this.wireguardConfig;
+  }
+
+  // Check if network will be updated with mycelium or not
+  async checkMycelium(node_id: number, mycelium: boolean, networkSeed = "") {
+    // check if network has mycelium or not
+    const network = this.networks.find(network => {
+      return network["node_id"] === node_id;
+    });
+    if (network && network.mycelium && network.mycelium?.hex_key) {
+      if (networkSeed && networkSeed !== network.mycelium.hex_key) {
+        throw new ValidationError("Wrong Seed !! Please use existing one.");
+      }
+    } else {
+      // If network has no mycelium and user wanna update it and add mycelium.
+      if (mycelium) {
+        if (network) {
+          network.mycelium = {
+            hex_key: generateRandomHexSeed(32, []),
+            peers: [],
+          };
+          this.updateNetwork(network);
+          this.updateNetworkDeployments();
+
+          const deploymentFactory = new DeploymentFactory(this.config);
+          const filteredDeployments = this.deployments.filter(deployment => deployment["node_id"] === node_id);
+
+          for (const deployment of filteredDeployments) {
+            const d = await deploymentFactory.fromObj(deployment);
+            for (const workload of d["workloads"]) {
+              workload.data["mycelium"]["hex_key"] = generateRandomHexSeed(32, []);
+              workload.data = this.updateNetwork(workload["data"]);
+              workload.version += 1;
+            }
+            return d;
+          }
+        }
+      }
+    }
+    // If no seed provided, I wanna return used one
   }
 
   async addNode(

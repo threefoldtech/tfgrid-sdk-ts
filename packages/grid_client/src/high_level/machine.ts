@@ -226,6 +226,13 @@ class VMHL extends HighLevelBase {
       );
       wgConfig = await network.addAccess(access_node_id, true);
     }
+    // If node exits on network check if mycelium needs to be added or not
+    if (network.nodeExists(nodeId)) {
+      const deployment = await network.checkMycelium(nodeId, mycelium, networkSeed);
+      if (deployment) {
+        deployments.push(new TwinDeployment(deployment, Operations.update, 0, 0, network));
+      }
+    }
 
     const znet_workload = await network.addNode(
       nodeId,
