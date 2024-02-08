@@ -127,7 +127,7 @@ export default {
         value: item => formatResourceSize(item.total_resources.hru),
         sortable: false,
       },
-      { title: "GPU", key: "num_gpu", align: "start", sortable: false },
+      { title: "GPU", key: "num_gpu", align: "start" },
       { title: "Uptime", key: "uptime", align: "start", sortable: false, value: item => toReadableDate(item.uptime) },
       { title: "Status", key: "status", align: "start", sortable: false },
       { title: "Type", key: "dedicated", align: "start", sortable: false },
