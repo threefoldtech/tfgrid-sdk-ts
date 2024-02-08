@@ -8,7 +8,7 @@
       <div class="text-center">
         <v-row align="center" justify="center">
           <v-col cols="12" sm="6" md="4">
-            <Loading v-if="loading" />
+            <TfLoading v-if="loading" />
           </v-col>
         </v-row>
       </div>

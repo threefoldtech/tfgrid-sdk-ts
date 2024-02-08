@@ -5,7 +5,7 @@
       <v-card-title class="pa-0">DAO</v-card-title>
     </v-card>
 
-    <Loading v-if="loadingProposals" />
+    <TfLoading v-if="loadingProposals" />
 
     <div v-else-if="proposals?.active?.length == 0 && proposals?.inactive?.length == 0">
       <v-card class="my-3 pa-3 d-flex justify-center">
