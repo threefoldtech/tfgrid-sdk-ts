@@ -7,7 +7,10 @@
       </h4>
     </v-alert>
     <v-card-item :class="`mt-2 mb-2 ${$props.isMap ? 'map' : ''}`">
-      <div v-if="$props.isMap">
+      <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="$props.error">
+        {{ $props.error }}
+      </v-alert>
+      <div v-else-if="$props.isMap">
         <tf-map :nodes="transformedObject" r="76" g="187" b="217"></tf-map>
       </div>
 
@@ -114,6 +117,11 @@ export default {
 
     iperf: {
       type: Boolean,
+      required: false,
+    },
+
+    error: {
+      type: String,
       required: false,
     },
   },

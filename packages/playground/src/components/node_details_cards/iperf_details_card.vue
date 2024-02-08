@@ -6,6 +6,7 @@
     title="Network Speed Test"
     :items="IperfDetails"
     icon="mdi-speedometer"
+    :error="errorMessage"
   />
 </template>
 
@@ -34,14 +35,20 @@ export default {
     const gridStore = useGrid();
     const loading = ref<boolean>(false);
     const IperfDetails = ref<NodeDetailsCard[]>();
-
+    const errorMessage = ref("");
     onMounted(async () => {
+      if (!gridStore.grid) {
+        errorMessage.value = "Unable to load  IPerf details; please connect your wallet and try again.";
+        return;
+      }
       if (props.node.healthy) {
+        errorMessage.value = "";
         try {
           loading.value = true;
           await getNodeIPerfCard();
         } catch (error) {
-          createCustomToast("Failed to load IPerf details. Please try again later.", ToastType.danger);
+          console.log(error);
+          errorMessage.value = "Failed to load IPerf details. Please try again later.";
         } finally {
           loading.value = false;
         }
@@ -75,6 +82,7 @@ export default {
     return {
       IperfDetails,
       loading,
+      errorMessage,
     };
   },
 };

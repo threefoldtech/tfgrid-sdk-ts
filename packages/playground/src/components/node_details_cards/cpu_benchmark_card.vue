@@ -5,6 +5,7 @@
     title="CPU Benchmark"
     :items="cpuBenchmark"
     icon="mdi-cpu-64-bit"
+    :error="errorMessage"
   />
 </template>
 
@@ -32,7 +33,7 @@ export default {
     const gridStore = useGrid();
     const loading = ref<boolean>(false);
     const cpuBenchmark = ref<NodeDetailsCard[]>();
-
+    const errorMessage = ref("");
     function format(val: number | undefined) {
       return val ? val.toString() : "-";
     }
@@ -50,12 +51,18 @@ export default {
     };
 
     onMounted(async () => {
+      if (!gridStore.grid) {
+        errorMessage.value = "Unable to load CPU Benchmark details; please connect your wallet and try again.";
+        return;
+      }
       if (props.node.healthy) {
         try {
+          errorMessage.value = "";
           loading.value = true;
           await getNodeCPUBenchmarkCard();
         } catch (error) {
-          createCustomToast("Failed to load CPU Benchmark details. Please try again later.", ToastType.danger);
+          console.log(error);
+          errorMessage.value = "Failed to load CPU Benchmark details. Please try again later.";
         } finally {
           loading.value = false;
         }
@@ -65,6 +72,7 @@ export default {
     return {
       cpuBenchmark,
       loading,
+      errorMessage,
     };
   },
 };
