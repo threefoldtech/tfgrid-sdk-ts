@@ -41,22 +41,17 @@ export async function getLocations(status?: NodeStatus): Promise<Locations> {
   ];
 
   const locations: Locations = {};
+
   for (const country of countries) {
     droppedCountries.forEach(con => {
       if (con.title == country.name) {
         country.name = con.name;
       }
     });
-    if (country.region !== "unknown region") {
-      if (allowedCountriesList.includes(country.name)) {
-        locations[country.region] = locations[country.region] || [];
-        locations[country.region].push(country.name);
-      }
-    } else {
-      if (allowedCountriesList.includes(country.name)) {
-        locations[country.subregion] = locations[country.subregion] || [];
-        locations[country.subregion].push(country.name);
-      }
+    if (allowedCountriesList.includes(country.name)) {
+      const region = country.region !== "unknown region" ? country.region : country.subregion;
+      locations[region] = locations[region] || [];
+      locations[region].push(country.name);
     }
   }
   return locations;
