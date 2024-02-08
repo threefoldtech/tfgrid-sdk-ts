@@ -18,7 +18,11 @@ import type {
 import { normalizeError } from "./helpers";
 
 export async function getLocations(status?: NodeStatus): Promise<Locations> {
-  const countries = await gqlClient.countries({ name: true, region: true, subregion: true });
+  const countries = await gqlClient.countries({
+    name: true,
+    region: true,
+    subregion: true,
+  });
   const stats = await gridProxyClient.stats.get({ status });
   const allowedCountriesList = Object.keys(stats.nodesDistribution);
   const droppedCountries = [
@@ -43,13 +47,16 @@ export async function getLocations(status?: NodeStatus): Promise<Locations> {
         country.name = con.name;
       }
     });
-
-    if (country.region && allowedCountriesList.includes(country.name)) {
-      locations[country.region] = locations[country.region] || [];
-      locations[country.region].push(country.name);
+    if (country.region !== "unknown region") {
+      if (allowedCountriesList.includes(country.name)) {
+        locations[country.region] = locations[country.region] || [];
+        locations[country.region].push(country.name);
+      }
     } else {
-      locations[country.subregion] = locations[country.subregion] || [];
-      locations[country.subregion].push(country.name);
+      if (allowedCountriesList.includes(country.name)) {
+        locations[country.subregion] = locations[country.subregion] || [];
+        locations[country.subregion].push(country.name);
+      }
     }
   }
   return locations;
