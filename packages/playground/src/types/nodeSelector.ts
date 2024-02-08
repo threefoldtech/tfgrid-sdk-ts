@@ -4,7 +4,11 @@ export type Locations = {
   [region: string]: string[];
 };
 
-export type SelectedLocation = { country?: string; region?: string };
+export type SelectedLocation = {
+  subregion: string | undefined;
+  country?: string;
+  region?: string;
+};
 
 export interface SelectionDetailsFilters {
   ipv4?: boolean;

@@ -45,12 +45,15 @@ async function getLocations(tries = 1): Promise<Locations> {
       .countriesConnection({ totalCount: true }, { orderBy: ["name_ASC"] })
       .catch(() => ({ totalCount: 300 }));
 
-    const countries = await gqlClient.countries({ name: true, region: true }, { limit });
+    const countries = await gqlClient.countries({ name: true, region: true, subregion: true }, { limit });
     const locations: Locations = {};
-    for (const { name, region } of countries) {
-      if (allowedContries.includes(name)) {
+    for (const { name, region, subregion } of countries) {
+      if (region && allowedContries.includes(name)) {
         locations[region] = locations[region] || [];
         locations[region].push(name);
+      } else {
+        locations[subregion] = locations[subregion] || [];
+        locations[subregion].push(name);
       }
     }
 
