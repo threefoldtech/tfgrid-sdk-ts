@@ -5,7 +5,7 @@ export type Locations = {
 };
 
 export type SelectedLocation = {
-  subregion: string | undefined;
+  subregion?: string | undefined;
   country?: string;
   region?: string;
 };
