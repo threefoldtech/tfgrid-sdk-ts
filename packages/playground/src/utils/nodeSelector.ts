@@ -15,6 +15,7 @@ import type {
   SelectionDetailsFilters,
   SelectionDetailsFiltersValidators,
 } from "../types/nodeSelector";
+import { normalizeError } from "./helpers";
 
 export async function getLocations(status?: NodeStatus): Promise<Locations> {
   const countries = await gqlClient.countries({ name: true, region: true });
@@ -332,7 +333,12 @@ export async function checkNodeCapacityPool(
     });
     return true;
   } catch (error) {
-    if (error?.toString().includes("Cannot fit the required SSD disk with size")) {
+    const err = normalizeError(
+      error,
+      "Something went wrong while checking status of the node. Please check your connection and try again.",
+    );
+
+    if (err.toLowerCase().includes("cannot fit the required ssd disk with size")) {
       throw (
         "Although node " +
         node.nodeId +
@@ -341,6 +347,6 @@ export async function checkNodeCapacityPool(
       );
     }
 
-    throw "Something went wrong while checking status of the node. Please check your connection and try again.";
+    throw err;
   }
 }

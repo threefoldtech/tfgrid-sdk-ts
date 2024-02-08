@@ -15,6 +15,13 @@ export type InputFilterType = {
   type: string;
 };
 
+export type CPUBenchmark = {
+  multi: number;
+  single: number;
+  threads: number;
+  workloads: number;
+};
+
 export enum ProfileTypes {
   DIY,
   TITAN,
@@ -238,6 +245,9 @@ export type NodeDetailsCard = {
   callback?: (value: string) => void;
   nameHint?: string; // v-chip hint beside the item name.
   nameHintColor?: string; // The v-chip color
+  type?: string;
+  downloadSpeed?: string;
+  uploadSpeed?: string;
 };
 
 export type GridProxyRequestConfig = {
@@ -253,6 +263,11 @@ export type NodeStatusColor = {
 };
 
 export type NodeTypeColor = {
+  color: string;
+  type: string;
+};
+
+export type NodeHealthColor = {
   color: string;
   type: string;
 };
@@ -305,4 +320,5 @@ export const nodeInitializer: GridNode = {
   stats: nodeStatsInitializer,
   cards: [],
   num_gpu: 0,
+  healthy: false,
 };

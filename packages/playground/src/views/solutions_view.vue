@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { ApplicationRoute } from "@/router";
+import { DashboardRoutes } from "@/router/routes";
 
 interface Card {
   title: string;
@@ -58,21 +58,21 @@ export default {
         title: "Peertube",
         excerpt: "Peertube aspires to be a decentralized and free/libre alternative to video broadcasting services.",
         icon: "peertube.png",
-        route: ApplicationRoute.peertube,
+        route: DashboardRoutes.Applications.Peertube,
       },
       {
         title: "Funkwhale",
         excerpt:
           "Funkwhale is social platform to enjoy and share music. Funkwhale is a community-driven project that lets you listen and share music and audio within a decentralized, open network.",
         icon: "funkwhale.png",
-        route: ApplicationRoute.funkwhale,
+        route: DashboardRoutes.Applications.Funkwhale,
       },
       {
         title: "Mattermost",
         excerpt:
           "Mattermost is an open-source, self-hostable online chat service with file sharing, search, and integrations. It is designed as an internal chat for organisations and companies.",
         icon: "mattermost.png",
-        route: ApplicationRoute.mattermost,
+        route: DashboardRoutes.Applications.Mattermost,
         tags: ["Alpha"],
       },
       {
@@ -80,28 +80,28 @@ export default {
         excerpt:
           "Discourse is the 100% open source discussion platform built for the next decade of the Internet. Use it as a mailing list, discussion forum, long-form chat room, and more!",
         icon: "discourse.png",
-        route: ApplicationRoute.discourse,
+        route: DashboardRoutes.Applications.Discourse,
       },
       {
         title: "Taiga",
         excerpt:
           "Taiga is a project management application that can handle both simple and complex projects for startups, software developers, and other target teams. It tracks the progress of a project.",
         icon: "taiga.png",
-        route: ApplicationRoute.taiga,
+        route: DashboardRoutes.Applications.Taiga,
       },
       {
         title: "Owncloud",
         excerpt:
           "ownCloud develops and provides open-source software for content collaboration, allowing teams to easily share and work on files seamlessly regardless of device or location.",
         icon: "owncloud.png",
-        route: ApplicationRoute.owncloud,
+        route: DashboardRoutes.Applications.Owncloud,
       },
       {
         title: "Nextcloud",
         excerpt:
           "Nextcloud is a suite of client-server software for creating and using file hosting services. Nextcloud provides functionality similar to Dropbox, Office 365 or Google Drive.",
         icon: "nextcloud.png",
-        route: ApplicationRoute.nextcloud,
+        route: DashboardRoutes.Applications.Nextcloud,
         tags: ["Community"],
       },
       {
@@ -109,56 +109,56 @@ export default {
         excerpt:
           "Presearch is a community-powered, decentralized search engine that provides better results while protecting your privacy and rewarding you when you search. This weblet deploys a Presearch node. ",
         icon: "presearch.png",
-        route: ApplicationRoute.presearch,
+        route: DashboardRoutes.Applications.Presearch,
       },
       {
         title: "Subsquid",
         excerpt:
           "Subsquid indexer is a piece of software that reads all the blocks from a Substrate based blockchain, decodes and stores them for processing in a later stage.",
         icon: "subsquid.png",
-        route: ApplicationRoute.subsquid,
+        route: DashboardRoutes.Applications.Subsquid,
       },
       {
         title: "Casperlabs",
         excerpt:
           "Casper Network is a blockchain protocol built from the ground up to remain true to core Web3 principles and adapt to the needs of our evolving world.",
         icon: "casperlabs.png",
-        route: ApplicationRoute.casperlabs,
+        route: DashboardRoutes.Applications.Casperlabs,
       },
       {
         title: "Algorand",
         excerpt:
           "Algorand builds technology that accelerates the convergence between decentralized and traditional finance by enabling the simple creation of next-generation financial products, protocols, and exchange of value.",
         icon: "algorand.png",
-        route: ApplicationRoute.algorand,
+        route: DashboardRoutes.Applications.Algorand,
       },
       {
         title: "Node Pilot",
         excerpt:
           "Deploy, manage, and monetize crypto nodes with a few clicks. Seamless Docker integration brings enterprise-level security and scalability.",
         icon: "vm.png",
-        route: ApplicationRoute.nodepilot,
+        route: DashboardRoutes.Applications.Nodepilot,
       },
       {
         title: "Umbrel",
         excerpt:
           "Umbrel is an OS for running a personal server in your home. Self-host open source apps like Nextcloud, Bitcoin node, and more.",
         icon: "umbrel.png",
-        route: ApplicationRoute.umbrel,
+        route: DashboardRoutes.Applications.Umbrel,
       },
       //       {
       //         title: "Freeflow",
       //         excerpt: `Freeflow is a convenient ecosystem on top of a resilient internet grid. We bring you a new internet with a set of
       // productivity tools so you can enhance collaboration within your country, your company, your community.`,
       //         icon: "freeflow.png",
-      //         route: ApplicationRoute.freeflow,
+      //         route: DashboardRoutes.Applications.Freeflow,
       //       },
       {
         title: "Wordpress",
         excerpt:
           "Wordpress is the most popular CMS on the market, powering 65.2% of websites whose CMS we know. That translates to 42.4% of all websites – nearly half of the internet. It is a popular option for those who want to build a website or blog.",
         icon: "wordpress.png",
-        route: ApplicationRoute.wordpress,
+        route: DashboardRoutes.Applications.Wordpress,
       },
     ];
     const baseURL = import.meta.env.BASE_URL;

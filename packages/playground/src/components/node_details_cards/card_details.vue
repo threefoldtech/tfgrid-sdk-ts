@@ -15,11 +15,22 @@
         <slot name="gpu-hint-message" />
 
         <v-row class="bb-gray" v-for="item in items" :key="item.name">
-          <v-col class="d-flex justify-start align-center ml-3">
+          <v-col v-if="$props.iperf" class="font-14 d-flex justify-space-between">
+            <p class="ml-20 font-14">{{ item.name }}/{{ item.type }}</p>
+            <div>
+              <v-icon icon="mdi-arrow-up"></v-icon>
+              <span class="mx-3">{{ item.uploadSpeed }}</span>
+            </div>
+            <div>
+              <v-icon icon="mdi-arrow-down"></v-icon>
+              <span class="mx-3">{{ item.downloadSpeed }}</span>
+            </div>
+          </v-col>
+          <v-col v-if="!$props.iperf" class="d-flex justify-start align-center ml-3">
             <p class="font-14">{{ item.name }}</p>
             <v-chip class="ml-4" v-if="item.nameHint" :color="item.nameHintColor">{{ item.nameHint }}</v-chip>
           </v-col>
-          <v-col class="d-flex justify-end align-center mr-3">
+          <v-col v-if="!$props.iperf" class="d-flex justify-end align-center mr-3">
             <p class="font-14" v-if="!item.icon && !item.hint && !item.imgSrc">
               {{ item.value && item.value.length > maxLenChar ? item.value.slice(0, maxLenChar) + "..." : item.value }}
             </p>
@@ -97,6 +108,11 @@ export default {
     },
 
     isMap: {
+      type: Boolean,
+      required: false,
+    },
+
+    iperf: {
       type: Boolean,
       required: false,
     },
