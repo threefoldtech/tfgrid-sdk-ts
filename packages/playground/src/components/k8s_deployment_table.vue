@@ -68,7 +68,7 @@
         { title: 'Planetary Network IP', key: 'planetary', sortable: false },
         { title: 'Workers', key: 'workersLength' },
         { title: 'Billing Rate', key: 'billing' },
-        { title: 'Created At', key: 'createdAt' },
+        { title: 'Created At', key: 'created' },
         { title: 'Health', key: 'status', sortable: false },
         { title: 'Actions', key: 'actions', sortable: false },
       ]"
@@ -80,7 +80,7 @@
       @click:row="$attrs['onClick:row']"
       :sort-by="sortBy"
     >
-      <template #[`item.createdAt`]="{ item }">
+      <template #[`item.created`]="{ item }">
         {{ toHumanDate(item.value.masters[0].created) }}
       </template>
       <template #[`item.status`]="{ item }">
@@ -170,7 +170,7 @@ async function loadDeployments() {
     item.planetary = item.masters[0].planetary || "None";
     item.workersLength = item.workers.length;
     item.billing = item.masters[0].billing;
-    item.createdAt = item.masters[0].created;
+    item.created = item.masters[0].created;
     return item;
   });
   loading.value = false;
@@ -197,7 +197,7 @@ export default {
         { key: "name", order: "asc" },
         { key: "workersLength", order: "asc" },
         { key: "billing", order: "asc" },
-        { key: "createdAt", order: "asc" },
+        { key: "created", order: "asc" },
       ],
     };
   },
