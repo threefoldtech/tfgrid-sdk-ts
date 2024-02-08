@@ -14,6 +14,7 @@ const vuetify = createVuetify({
       size: 70,
       width: 7,
       indeterminate: true,
+      color: "primary",
     },
   },
   components: {
