@@ -98,6 +98,8 @@ import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
+import { DashboardRoutes } from "@/router/routes";
+
 import { useProfileManager } from "../stores";
 export default {
   name: "LoggedInLanding",
@@ -114,37 +116,37 @@ export default {
         title: "Your Profile",
         icon: "mdi-account",
         text: "Your Profile includes your twin ID on the TFChain along with the account address and relay used. Click to view your profile details.",
-        path: "/tf-chain/twin",
+        path: DashboardRoutes.TFChain.YourProfile,
       },
       {
         title: "Deploy Virtual Machines",
         icon: "mdi-television",
         text: "Deploy Full or Micro Virtual Machines from available images or custom ones on the Threefold Grid.",
-        path: "/deploy/vms",
+        path: DashboardRoutes.Deploy.VirtualMachines,
       },
       {
         title: "Deploy Applications",
         icon: "mdi-lightbulb-on-outline",
         text: "Deploy from a wide range of in demand solutions such as Algorand, Funkwhale, Wordpress, Discourse and much more!",
-        path: "/deploy/applications",
+        path: DashboardRoutes.Deploy.Applications,
       },
       {
         title: "Deploy Orchestrators",
         icon: "mdi-group",
         text: "Deploy Kubernetes clusters out of the box or Caprover app/database deployment & web server manager on the Threefold Grid.",
-        path: "/deploy/orchestrators",
+        path: DashboardRoutes.Deploy.Orchestrators,
       },
       {
         title: "Explore Grid Capacity",
         icon: "mdi-chart-scatter-plot",
         text: "View the CPU, SSD, RAM, HDD, GPU, Public IPs, Gateways capacity and more on the Threefold Grid.",
-        path: "/tf-grid/stats",
+        path: DashboardRoutes.TFGrid.NodeStatistics,
       },
       {
         title: "Explore Grid Nodes",
         icon: "mdi-access-point",
         text: "Find nodes that fit your CPU, GPU, SSD, HDD and RAM capacity needs on the Threefold Grid.",
-        path: "/deploy/nodes",
+        path: DashboardRoutes.Deploy.NodeFinder,
       },
     ];
     return {

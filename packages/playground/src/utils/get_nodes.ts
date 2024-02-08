@@ -11,7 +11,7 @@ import { byCountry } from "country-code-lookup";
 import { ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
-import type { NodeStatusColor, NodeTypeColor } from "@/types";
+import type { NodeHealthColor, NodeStatusColor, NodeTypeColor } from "@/types";
 const requestPageNumber = ref<number>(1);
 const offlineNodes = ref<NodeInfo[]>([]);
 type NodeFilters = FilterOptions & {
@@ -29,6 +29,13 @@ type NodeFilters = FilterOptions & {
  * @param {GridClient | null} grid - The GridClient instance to fetch nodes from.
  * @returns {Promise<NodeInfo[]>} A Promise that resolves to an array of offline NodeInfo objects.
  */
+
+export enum NodeHealth {
+  Ok = "ok",
+  Init = "init",
+  Error = "error",
+}
+
 export async function getAllNodes(grid: GridClient | null, options?: NodeFilters): Promise<NodeInfo[] | number[]> {
   const isFlat = options?.flat || false;
 
@@ -100,6 +107,16 @@ export const getNodeTypeColor = (dedicated: boolean, rentedByTwinId: number): No
     return { color: "primary", type: "Rentable" };
   } else {
     return { color: "warning", type: "Rented" };
+  }
+};
+
+export const getNodeHealthColor = (health: string): NodeHealthColor => {
+  if (health == NodeHealth.Ok) {
+    return { color: "success", type: NodeHealth.Ok };
+  } else if (health == NodeHealth.Init) {
+    return { color: "warning", type: NodeHealth.Init };
+  } else {
+    return { color: "error", type: NodeHealth.Error };
   }
 };
 
