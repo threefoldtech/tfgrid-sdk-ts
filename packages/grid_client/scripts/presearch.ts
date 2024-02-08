@@ -1,13 +1,13 @@
-import { FilterOptions, generateString, MachinesModel } from "../src";
+import { FilterOptions, MachinesModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function deploy(client, vms) {
   try {
     const res = await client.machines.deploy(vms);
-    log("================= Deploying discourse =================");
+    log("================= Deploying presearch =================");
     log(res);
-    log("================= Deploying discourse =================");
+    log("================= Deploying presearch =================");
   } catch (error) {
     log("Error while Deploying the VM " + error);
   }
@@ -18,7 +18,7 @@ async function getDeployment(client, vms) {
     const res = await client.machines.getObj(vms);
     log("================= Getting deployment information =================");
     log(res);
-    log(`You can access discourse via the browser using: http://captain.${res[0].env.CAPROVER_ROOT_DOMAIN}`);
+    log(`You can access presearch via the browser using: http://newVMS5.${res[0].env.PRESEARCH_WEBSERVER_HOSTNAME}`);
     log("================= Getting deployment information =================");
   } catch (error) {
     log("Error while getting the deployment " + error);
@@ -69,28 +69,21 @@ async function main() {
         cpu: 4,
         memory: 1024 * 4,
         rootfs_size: 0,
-        flist: "https://hub.grid.tf/tf-official-apps/funkwhale-v3.1.1.flist",
+        flist: "https://hub.grid.tf/tf-official-apps/presearch-v2.3.flist",
         entrypoint: "/sbin/zinit init",
         env: {
           SSH_KEY: config.ssh_key,
-          MATTERMOST_DOMAIN: "gent02.dev.grid.tf",
-          DISCOURSE_HOSTNAME: "",
-          DISCOURSE_DEVELOPER_EMAILS: "test12@gmail.com",
-          DISCOURSE_SMTP_ADDRESS: "",
-          DISCOURSE_SMTP_PORT: "",
-          DISCOURSE_SMTP_ENABLE_START_TLS: "",
-          DISCOURSE_SMTP_USER_NAME: "",
-          DISCOURSE_SMTP_PASSWORD: "",
-          THREEBOT_PRIVATE_KEY: "",
-          FLASK_SECRET_KEY: generateString(6),
+          PRESEARCH_REGISTRATION_CODE: "e5083a8d0a6362c6cf7a3078bfac81e3",
+          PRESEARCH_BACKUP_PRI_KEY: "",
+          PRESEARCH_BACKUP_PUB_KEY: "",
         },
       },
     ],
     metadata: "",
-    description: "discourse machine/node",
+    description: "presearch machine",
   };
 
-  //Deploy discourse
+  //Deploy presearch cluster
   await deploy(grid3, vms);
 
   //Get the deployment

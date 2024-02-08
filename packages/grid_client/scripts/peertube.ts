@@ -73,14 +73,14 @@ async function main() {
         entrypoint: "/sbin/zinit init",
         env: {
           SSH_KEY: config.ssh_key,
-          PEERTUBE_ADMIN_EMAIL:"test@gmail.com",
-          PT_INITIAL_ROOT_PASSWORD : "test123",
-          PEERTUBE_WEBSERVER_HOSTNAME : "gent01.dev.grid.tf"
-        }
+          PEERTUBE_ADMIN_EMAIL: "test@gmail.com",
+          PT_INITIAL_ROOT_PASSWORD: "test123",
+          PEERTUBE_WEBSERVER_HOSTNAME: "gent01.dev.grid.tf",
+        },
       },
     ],
     metadata: "",
-    description: "peertube machine/node",
+    description: "peertube machine",
   };
 
   //Deploy Caprover cluster
