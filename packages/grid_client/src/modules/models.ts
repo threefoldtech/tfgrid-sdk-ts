@@ -84,7 +84,7 @@ class NetworkModel {
   @Expose() @IsString() @IsNotEmpty() ip_range: string;
   @Expose() @IsBoolean() @IsOptional() addAccess?: boolean;
   @Expose() @IsInt() @Min(1) @IsOptional() accessNodeId?: number;
-  @Expose() @IsString() @IsOptional() network_seed?: string;
+  @Expose() @IsString() @IsOptional() @Length(32) myceliumSeed?: string;
 }
 
 class BaseGetDeleteModel {
@@ -100,7 +100,7 @@ class MachineModel {
   @Expose() @IsOptional() @IsBoolean() public_ip6?: boolean;
   @Expose() @IsBoolean() planetary: boolean;
   @Expose() @IsBoolean() mycelium: boolean;
-  @Expose() @IsOptional() @IsString() myceliumSeed?: string;
+  @Expose() @IsOptional() @IsString() @Length(6) myceliumSeed?: string;
   @Expose() @IsInt() @Min(1) cpu: number;
   @Expose() @Min(256) memory: number; // in MB
   @Expose() rootfs_size: number; // in GB
