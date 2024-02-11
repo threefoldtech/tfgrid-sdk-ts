@@ -1,10 +1,5 @@
 <template>
-  <VDialog
-    scrollable
-    width="60%"
-    :model-value="$props.modelValue"
-    @update:model-value="$emit('update:model-value', $event)"
-  >
+  <VDialog width="1024" :model-value="$props.modelValue" @update:model-value="$emit('update:model-value', $event)">
     <template #activator="{ props }">
       <VCard v-bind="props" class="pa-3 d-inline-flex align-center">
         <VProgressCircular v-if="activating" class="mr-2" indeterminate color="primary" size="25" />
@@ -131,7 +126,9 @@
                           ) {
                             return;
                           }
-                          return { message: 'Mnemonic or Hex Seed doesn\'t seem to be valid.' };
+                          return {
+                            message: 'Mnemonic or Hex Seed doesn\'t seem to be valid.',
+                          };
                         },
                       ]"
                       :async-rules="[validateMnInput]"
@@ -148,7 +145,10 @@
                               label="Mnemonic or Hex Seed"
                               placeholder="Please insert your Mnemonic or Hex Seed"
                               v-model="mnemonic"
-                              v-bind="{ ...passwordInputProps, ...validationProps }"
+                              v-bind="{
+                                ...passwordInputProps,
+                                ...validationProps,
+                              }"
                               :disabled="creatingAccount || activatingAccount || activating"
                               @click:append="reloadValidation"
                             />
@@ -283,7 +283,10 @@
                   <VTextField
                     label="Confirm Password"
                     v-model="confirmPassword"
-                    v-bind="{ ...confirmPasswordInputProps, ...validationProps }"
+                    v-bind="{
+                      ...confirmPasswordInputProps,
+                      ...validationProps,
+                    }"
                     :disabled="creatingAccount || activatingAccount || activating"
                   />
                 </InputValidator>
@@ -316,8 +319,8 @@
       </DTabs>
 
       <template v-if="profileManager.profile">
-        <v-row class="justify-space-around py-2 pb-5">
-          <v-col cols="7" sm="12" md="12" lg="7">
+        <v-row>
+          <v-col cols="12" sm="6">
             <PasswordInputWrapper #="{ props }">
               <VTextField
                 :label="profileManager.profile.mnemonic.startsWith('0x') ? 'Your Hex Seed' : 'Your Mnemonic'"
@@ -336,9 +339,9 @@
               <VTextField label="Address" readonly v-model="profileManager.profile.address" v-bind="props" />
             </CopyInputWrapper>
           </v-col>
-          <v-divider class="mx-4" vertical></v-divider>
+          <v-divider class="hidden-sm-and-down" vertical></v-divider>
 
-          <v-col cols="12" lg="4">
+          <v-col cols="12" sm="6">
             <section class="d-flex flex-column align-center">
               <p class="mb-4 text-center">
                 Scan the QR code using
