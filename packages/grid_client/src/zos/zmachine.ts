@@ -29,7 +29,7 @@ class ZmachineNetwork {
   @Expose() @IsString() @IsDefined() public_ip: string;
   @Expose() @Type(() => ZNetworkInterface) @ValidateNested({ each: true }) interfaces: ZNetworkInterface[];
   @Expose() @IsBoolean() planetary: boolean;
-  @Expose() @Type(() => MyceliumIP) @ValidateNested({ each: true }) mycelium: MyceliumIP;
+  @Expose() @Type(() => MyceliumIP) @ValidateNested() mycelium: MyceliumIP;
 
   challenge(): string {
     let out = "";

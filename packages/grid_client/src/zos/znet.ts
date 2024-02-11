@@ -23,7 +23,7 @@ class Peer {
 }
 
 class Mycelium {
-  @Expose() @IsString() hex_key: string;
+  @Expose() @IsString() @IsNotEmpty() hex_key: string;
   @Expose() @IsString({ each: true }) peers: string[];
 }
 
