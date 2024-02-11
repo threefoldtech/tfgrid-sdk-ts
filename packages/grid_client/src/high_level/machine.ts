@@ -290,14 +290,14 @@ class VMHL extends HighLevelBase {
       machine_ip = network.getFreeIP(nodeId);
     }
 
-    // Split machine_ip to get last 2 numbers to be used in mycelium hex seed
-    const parts = machine_ip.split("/");
-    const ipPart = parts[0];
-    const ipNumbers = ipPart.split(".").map(part => parseInt(part, 10));
-    const lastTwoNumbers = ipNumbers.slice(-2);
-
     // Validate mycelium seed If provided, if not generate it.
     if (mycelium) {
+      // Split machine_ip to get last 2 numbers to be used in mycelium hex seed
+      const parts = machine_ip.split("/");
+      const ipPart = parts[0];
+      const ipNumbers = ipPart.split(".").map(part => parseInt(part, 10));
+      const lastTwoNumbers = ipNumbers.slice(-2);
+
       if (myceliumSeed) {
         validateHexSeed(myceliumSeed, 6);
       } else {
