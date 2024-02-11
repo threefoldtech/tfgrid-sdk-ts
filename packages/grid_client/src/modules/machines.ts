@@ -183,7 +183,7 @@ class MachinesModule extends BaseModule {
       options.mycelium,
       options.myceliumSeed!,
       network,
-      options.mycelium_network_seed!,
+      options.myceliumNetworkSeed!,
       options.entrypoint,
       options.env,
       workload.metadata,

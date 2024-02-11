@@ -37,7 +37,7 @@ class VMHL extends HighLevelBase {
     mycelium: boolean,
     myceliumSeed: string,
     network: Network,
-    networkSeed: string,
+    myceliumNetworkSeed: string,
     entrypoint: string,
     env: Record<string, unknown>,
     metadata = "",
@@ -222,13 +222,13 @@ class VMHL extends HighLevelBase {
         networkMetadata,
         description,
         accessNodeSubnet,
-        networkSeed,
+        myceliumNetworkSeed,
       );
       wgConfig = await network.addAccess(access_node_id, true);
     }
     // If node exits on network check if mycelium needs to be added or not
     if (network.nodeExists(nodeId)) {
-      const deployment = await network.checkMycelium(nodeId, mycelium, networkSeed);
+      const deployment = await network.checkMycelium(nodeId, mycelium, myceliumNetworkSeed);
       if (deployment) {
         deployments.push(new TwinDeployment(deployment, Operations.update, 0, 0, network));
       }
@@ -240,7 +240,7 @@ class VMHL extends HighLevelBase {
       networkMetadata,
       description,
       userIPsubnet,
-      networkSeed,
+      myceliumNetworkSeed,
     );
     if ((await network.exists()) && (znet_workload || access_net_workload)) {
       // update network
