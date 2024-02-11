@@ -24,9 +24,8 @@ import type { NodeStatus } from "@threefold/gridproxy_client";
 import { computed, onUnmounted, type PropType } from "vue";
 
 import { useAsync } from "../../hooks";
-import type { SelectedLocation } from "../../types/nodeSelector";
+import type { Locations, SelectedLocation } from "../../types/nodeSelector";
 import { getLocations } from "../../utils/nodeSelector";
-import type { Locations } from "../select_location.vue";
 
 export default {
   name: "TfSelectLocation",

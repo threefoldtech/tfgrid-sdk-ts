@@ -18,7 +18,11 @@ import type {
 import { normalizeError } from "./helpers";
 
 export async function getLocations(status?: NodeStatus): Promise<Locations> {
-  const countries = await gqlClient.countries({ name: true, region: true });
+  const countries = await gqlClient.countries({
+    name: true,
+    region: true,
+    subregion: true,
+  });
   const stats = await gridProxyClient.stats.get({ status });
   const allowedCountriesList = Object.keys(stats.nodesDistribution);
   const droppedCountries = [
@@ -37,16 +41,17 @@ export async function getLocations(status?: NodeStatus): Promise<Locations> {
   ];
 
   const locations: Locations = {};
+
   for (const country of countries) {
     droppedCountries.forEach(con => {
       if (con.title == country.name) {
         country.name = con.name;
       }
     });
-
     if (allowedCountriesList.includes(country.name)) {
-      locations[country.region] = locations[country.region] || [];
-      locations[country.region].push(country.name);
+      const region = country.region !== "unknown region" ? country.region : country.subregion;
+      locations[region] = locations[region] || [];
+      locations[region].push(country.name);
     }
   }
   return locations;
@@ -182,7 +187,7 @@ export function normalizeNodeFilters(
     rentedBy: filters.dedicated ? options.twinId : undefined,
     certified: filters.certified || undefined,
     availableFor: options.twinId,
-    region: options.location.country ? undefined : options.location.region,
+    region: options.location.region ? options.location.region : options.location.subregion,
     country: options.location.country,
     gateway: options.gateway,
     healthy: true,
