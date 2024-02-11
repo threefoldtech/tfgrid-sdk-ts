@@ -76,7 +76,7 @@ class BaseModule {
 
   async getDeploymentContracts(name: string) {
     const contracts = await this.getMyContracts();
-    return contracts.filter(c => c.parsedDeploymentData.name === name) || [];
+    return contracts.filter(c => c.parsedDeploymentData.name === name);
   }
 
   async save(name: string, contracts: Record<string, unknown[]>) {
@@ -159,15 +159,11 @@ class BaseModule {
         projectName: this.projectName,
       });
 
-      const parsedContractsName = new Set<string>();
       const parsedContracts: Required<GqlNodeContract>[] = [];
 
       for (const contract of contracts) {
         const parsedDeploymentData = JSON.parse(contract.deploymentData);
-        if (!parsedContractsName.has(parsedDeploymentData.name)) {
-          parsedContractsName.add(parsedDeploymentData.name);
-          parsedContracts.push({ ...contract, parsedDeploymentData });
-        }
+        parsedContracts.push({ ...contract, parsedDeploymentData });
       }
 
       this.contracts = parsedContracts;
@@ -176,10 +172,14 @@ class BaseModule {
     return this.contracts;
   }
 
+  private _getContractsName(contracts: Required<GqlNodeContract>[]): string[] {
+    return Array.from(new Set(contracts.map(c => c.parsedDeploymentData.name)));
+  }
+
   async _list(): Promise<string[]> {
     await this._migrateListKeys();
     const contracts = await this.getMyContracts(true);
-    return contracts.map(c => c.parsedDeploymentData.name);
+    return this._getContractsName(contracts);
   }
 
   async exists(name: string): Promise<boolean> {
