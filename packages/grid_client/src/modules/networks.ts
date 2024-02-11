@@ -28,7 +28,7 @@ class NetworkModule extends BaseModule {
       options.solutionProviderId!,
       options.mycelium,
       options.description,
-      options.networkSeed!,
+      options.myceliumSeed!,
     );
     return { contracts: await this.twinDeploymentHandler.handle(twinDeployments) };
   }

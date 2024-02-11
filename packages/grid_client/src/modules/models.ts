@@ -730,7 +730,7 @@ class NetworkAddNodeModel {
   @Expose() @IsBoolean() mycelium: boolean;
   @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
   @Expose() @IsString() @IsOptional() description?: string;
-  @Expose() @IsString() @IsOptional() networkSeed?: string;
+  @Expose() @IsString() @IsOptional() @Length(32) myceliumSeed?: string;
 }
 
 class NetworkHasNodeModel {
