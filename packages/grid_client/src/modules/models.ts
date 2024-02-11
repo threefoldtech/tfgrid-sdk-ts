@@ -124,7 +124,7 @@ class MachinesModel {
 
 class AddMachineModel extends MachineModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) deployment_name: string;
-  @Expose() @IsString() @IsOptional() mycelium_network_seed?: string;
+  @Expose() @IsString() @IsOptional() myceliumNetworkSeed?: string;
 }
 
 class DeleteMachineModel {
@@ -173,7 +173,7 @@ class K8SDeleteModel extends BaseGetDeleteModel {}
 
 class AddWorkerModel extends KubernetesNodeModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) deployment_name: string;
-  @Expose() @IsString() @IsOptional() mycelium_network_seed: string;
+  @Expose() @IsString() @IsOptional() myceliumNetworkSeed: string;
 }
 
 class DeleteWorkerModel {
