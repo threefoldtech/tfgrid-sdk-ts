@@ -46,7 +46,7 @@ async function main() {
     public_ip: false,
     public_ip6: false,
     planetary: true,
-    mycelium: true,
+    mycelium: false,
   };
 
   //Add Worker
