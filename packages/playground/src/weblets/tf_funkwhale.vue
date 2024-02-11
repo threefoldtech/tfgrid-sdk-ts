@@ -89,7 +89,7 @@
         :small="{ cpu: 1, memory: 2, disk: 50 }"
         :medium="{ cpu: 2, memory: 4, disk: 100 }"
       />
-      <Networks v-model:ipv4="ipv4" />
+      <Networks v-model:ipv4="ipv4" v-model:mycelium="mycelium" />
 
       <input-tooltip
         inline
@@ -154,6 +154,7 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
+const mycelium = ref(false);
 const selectionDetails = ref<SelectionDetails>();
 
 function finalize(deployment: any) {
@@ -161,7 +162,6 @@ function finalize(deployment: any) {
   layout.value.setStatus("success", "Successfully deployed a funkwhale instance.");
   layout.value.openDialog(deployment, deploymentListEnvironments.funkwhale);
 }
-
 async function deploy() {
   layout.value.setStatus("deploy");
 
@@ -206,6 +206,7 @@ async function deploy() {
           flist: flist.value,
           entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
+          mycelium: mycelium.value,
           envs: [
             { key: "FUNKWHALE_HOSTNAME", value: domain },
             { key: "DJANGO_SUPERUSER_EMAIL", value: email.value },

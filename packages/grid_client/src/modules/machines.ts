@@ -60,7 +60,7 @@ class MachinesModule extends BaseModule {
         machine.public_ip6!,
         machine.planetary,
         machine.mycelium,
-        machine.myceliumSeed,
+        machine.myceliumSeed!,
         network,
         options.network.network_seed!,
         machine.entrypoint,

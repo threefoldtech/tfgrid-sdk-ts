@@ -62,7 +62,7 @@
       </input-tooltip>
     </input-validator>
 
-    <Network
+    <Networks
       v-model:ipv4="$props.modelValue.ipv4"
       v-model:ipv6="$props.modelValue.ipv6"
       v-model:planetary="$props.modelValue.planetary"
@@ -74,12 +74,6 @@
       :memory="$props.modelValue.memory"
       v-model.number="$props.modelValue.rootFsSize"
     />
-    <input-tooltip
-      inline
-      tooltip="Mycelium is an IPv6 overlay network. Each node that joins the overlay network will receive an overlay network IP."
-    >
-      <v-switch color="primary" inset label="Mycelium" v-model="$props.modelValue.mycelium" hide-details />
-    </input-tooltip>
 
     <input-tooltip
       inline
@@ -115,6 +109,7 @@
 <script lang="ts">
 import type { PropType } from "vue";
 
+import Networks from "../components/networks.vue";
 import type { K8SWorker } from "../types";
 import rootFs from "../utils/root_fs";
 import { generateName } from "../utils/strings";
@@ -139,7 +134,7 @@ export function createWorker(name: string = generateName({ prefix: "wr" })): K8S
 
 export default {
   name: "K8SWorker",
-  components: { RootFsSize },
+  components: { RootFsSize, Networks },
   props: {
     modelValue: {
       type: Object as PropType<K8SWorker>,

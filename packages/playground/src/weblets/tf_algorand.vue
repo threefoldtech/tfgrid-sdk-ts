@@ -28,7 +28,7 @@
           <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
-      <v-switch color="primary" inset label="Mycelium" v-model="mycelium" hide-details />
+      <Networks v-model:mycelium="mycelium" />
       <v-switch color="primary" inset label="IPv4" v-model="ipv4" hide-details />
 
       <AlgorandCapacity
@@ -294,12 +294,13 @@ function customLastRoundValidation(validators: Validators) {
 
 <script lang="ts">
 import AlgorandCapacity from "../components/algorand_capacity.vue";
+import Networks from "../components/networks.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { normalizeError } from "../utils/helpers";
 
 export default {
   name: "TfAlgorand",
-  components: { AlgorandCapacity },
+  components: { AlgorandCapacity, Networks },
 };
 </script>

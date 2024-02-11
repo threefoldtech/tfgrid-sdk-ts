@@ -58,12 +58,8 @@
           :medium="{ cpu: 2, memory: 4, disk: 50 }"
           :large="{ cpu: 4, memory: 16, disk: 100 }"
         />
-        <input-tooltip
-          inline
-          tooltip="Mycelium is an IPv6 overlay network. Each node that joins the overlay network will receive an overlay network IP."
-        >
-          <v-switch color="primary" inset label="Mycelium" v-model="mycelium" hide-details />
-        </input-tooltip>
+        <Networks v-model:mycelium="mycelium" />
+
         <input-tooltip
           inline
           tooltip="Click to know more about dedicated machines."
@@ -238,6 +234,7 @@ function generatePubKey(): string {
 </script>
 
 <script lang="ts">
+import Networks from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -245,6 +242,6 @@ import type { SelectionDetails } from "../types/nodeSelector";
 
 export default {
   name: "TfDiscourse",
-  components: { SmtpServer, SelectSolutionFlavor },
+  components: { SmtpServer, SelectSolutionFlavor, Networks },
 };
 </script>

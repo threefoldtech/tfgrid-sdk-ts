@@ -65,6 +65,7 @@ export interface CaproverWorker {
   dedicated?: boolean;
   certified?: boolean;
   selectionDetails?: SelectionDetails;
+  mycelium: boolean;
 }
 
 export interface FarmInterface {

@@ -51,6 +51,7 @@ async function createWorker(data: K8SWorker) {
   worker.public_ip6 = data.ipv6;
   worker.rootfs_size = data.rootFsSize;
   worker.planetary = data.planetary;
+  worker.mycelium = data.mycelium;
   worker.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
   return worker;
 }

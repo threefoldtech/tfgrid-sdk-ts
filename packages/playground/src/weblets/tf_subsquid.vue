@@ -49,6 +49,8 @@
         :medium="{ cpu: 2, memory: 4, disk: 100 }"
       />
 
+      <Networks v-model:mycelium="mycelium" />
+
       <input-tooltip
         inline
         tooltip="Click to know more about dedicated machines."
@@ -102,6 +104,7 @@ const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "ss" }));
 const endpoint = ref("");
 const ipv4 = ref(false);
+const mycelium = ref(false);
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/subsquid-latest.flist",
@@ -162,6 +165,7 @@ async function deploy() {
           flist: flist.value,
           entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
+          mycelium: mycelium.value,
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "CHAIN_ENDPOINT", value: endpoint.value },
@@ -204,6 +208,7 @@ async function deploy() {
 </script>
 
 <script lang="ts">
+import Networks from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
@@ -211,6 +216,6 @@ import rootFs from "../utils/root_fs";
 
 export default {
   name: "TfSubsquid",
-  components: { SelectSolutionFlavor },
+  components: { SelectSolutionFlavor, Networks },
 };
 </script>

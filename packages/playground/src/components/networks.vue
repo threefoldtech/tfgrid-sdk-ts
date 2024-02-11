@@ -149,6 +149,14 @@ export default {
         }
       },
     );
+    watch(
+      () => props.planetary,
+      val => {
+        if (!val && props.mycelium) {
+          emit("update:mycelium", false);
+        }
+      },
+    );
     const error = computed(
       () => !(props.ipv4 || props.ipv6 || props.planetary || props.wireguard || props.mycelium) && props.required,
     );

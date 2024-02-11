@@ -45,7 +45,7 @@ async function createMachine(machine: Machine): Promise<MachineModel> {
   vm.public_ip = machine.publicIpv4 || false;
   vm.public_ip6 = machine.publicIpv6 || false;
   vm.planetary = machine.planetary ?? true;
-  vm.mycelium = machine.mycelium ?? false;
+  vm.mycelium = machine.mycelium || false;
   vm.cpu = machine.cpu;
   vm.memory = machine.memory;
   vm.rootfs_size = machine.rootFilesystemSize || 0;
