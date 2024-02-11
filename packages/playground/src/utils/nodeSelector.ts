@@ -1,5 +1,6 @@
 import type { FarmFilterOptions, FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
+import { GridClientErrors } from "@threefold/types";
 import type { DeepPartial } from "utility-types";
 import { z } from "zod";
 
@@ -343,7 +344,7 @@ export async function checkNodeCapacityPool(
       "Something went wrong while checking status of the node. Please check your connection and try again.",
     );
 
-    if (err.toLowerCase().includes("cannot fit the required ssd disk with size")) {
+    if (error instanceof GridClientErrors.Nodes.DiskAllocationError) {
       throw (
         "Although node " +
         node.nodeId +
