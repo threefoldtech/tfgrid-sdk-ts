@@ -83,7 +83,7 @@
       </template>
 
       <template #[`item.wireguard`]="{ item }">
-        {{ item.value.interfaces[0].ip || "-" }}
+        {{ item.value.interfaces?.[0]?.ip || "-" }}
       </template>
 
       <template #[`item.flist`]="{ item }">
