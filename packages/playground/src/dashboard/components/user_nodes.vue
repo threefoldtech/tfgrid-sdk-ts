@@ -104,7 +104,6 @@
           class="me-2"
           :nodeId="item.raw.nodeId"
           :farmId="item.raw.farmId"
-          v-model="item.raw.publicConfig"
           @remove-config="config => toggleConfig(item, config)"
           @add-config="config => toggleConfig(item, config)"
         />
