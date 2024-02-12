@@ -301,7 +301,7 @@ class VMHL extends HighLevelBase {
       if (myceliumSeed) {
         validateHexSeed(myceliumSeed, 6);
       } else {
-        myceliumSeed = zeroPadding(6, lastTwoNumbers);
+        myceliumSeed = zeroPadding(6, lastTwoNumbers[0]) + zeroPadding(6, lastTwoNumbers[1]);
       }
     }
 

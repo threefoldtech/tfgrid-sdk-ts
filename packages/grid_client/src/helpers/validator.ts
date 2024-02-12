@@ -29,10 +29,8 @@ function generateRandomHexSeed(length: number) {
   return bytes.toString("hex");
 }
 
-function zeroPadding(length: number, numbers: number[]) {
-  const hexSeed = numbers[0].toString(16).padStart(length, "0") + numbers[1].toString(16).padStart(length, "0");
-
-  return hexSeed;
+function zeroPadding(length: number, num: number) {
+  return num.toString(16).padStart(length, "0");
 }
 
 function validateHexSeed(seed: string, length: number): boolean {
