@@ -3,6 +3,6 @@ import { ErrorModules } from "../modules";
 
 export class TFChainError extends BaseError {
   constructor(message: string) {
-    super(Generic.TFChainError, message, ErrorModules.Generic);
+    super("TFChainError", Generic.TFChainError, message, ErrorModules.Generic);
   }
 }
