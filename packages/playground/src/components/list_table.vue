@@ -32,14 +32,7 @@
         <span>{{ index + 1 }}</span>
         <div class="d-flex" @click.stop>
           <v-divider vertical class="ml-3 mr-1" />
-          <v-progress-circular
-            v-if="deleting && selectedItems.includes(item?.value)"
-            class="ml-3"
-            indeterminate
-            color="red"
-            :width="2"
-            :size="20"
-          />
+          <v-progress-circular v-if="deleting && selectedItems.includes(item?.value)" class="ml-3" color="red" />
           <v-checkbox-btn
             v-else
             color="primary"
@@ -59,7 +52,7 @@
     <template #bottom>
       <v-row class="mt-5" v-if="loading && items.length === 0">
         <v-spacer />
-        <v-progress-circular indeterminate color="primary" />
+        <v-progress-circular />
         <v-spacer />
       </v-row>
       <template v-else-if="!loading && items.length === 0 && (noDataText || $slots['no-data-text'])">
