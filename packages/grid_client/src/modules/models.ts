@@ -92,7 +92,7 @@ class NetworkModel {
 }
 
 class MyceliumNetworkModel {
-  @Expose() @IsString() @Length(32) myceliumSeed?: string;
+  @Expose() @IsString() @Length(32) seed?: string;
   @Expose() @IsInt() @Min(1) nodeId: number;
 }
 

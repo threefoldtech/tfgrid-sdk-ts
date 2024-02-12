@@ -131,16 +131,16 @@ class Network {
     });
     const myceliumNetworkSeed = myceliumSeeds.find(item => item.nodeId == nodeId);
     if (network && network.mycelium && network.mycelium?.hex_key) {
-      if (myceliumSeeds && myceliumNetworkSeed?.myceliumSeed !== network.mycelium.hex_key) {
+      if (myceliumSeeds && myceliumNetworkSeed?.seed !== network.mycelium.hex_key) {
         throw new ValidationError(`Another mycelium seed is used for this network ${this.name} on this ${nodeId}`);
       }
     } else {
       // If network has no mycelium and user wanna update it and add mycelium.
       let seed = generateRandomHexSeed(32);
       if (network) {
-        if (myceliumNetworkSeed?.myceliumSeed) {
-          validateHexSeed(myceliumNetworkSeed.myceliumSeed, 32);
-          seed = myceliumNetworkSeed.myceliumSeed;
+        if (myceliumNetworkSeed?.seed) {
+          validateHexSeed(myceliumNetworkSeed.seed, 32);
+          seed = myceliumNetworkSeed.seed;
         }
 
         network.mycelium = {
@@ -194,8 +194,8 @@ class Network {
     if (mycelium) {
       const myceliumNetworkSeed = myceliumSeeds.find(item => item.nodeId === nodeId);
       let seed = generateRandomHexSeed(32);
-      if (myceliumNetworkSeed?.myceliumSeed) {
-        seed = myceliumNetworkSeed.myceliumSeed;
+      if (myceliumNetworkSeed?.seed) {
+        seed = myceliumNetworkSeed.seed;
         validateHexSeed(seed, 32);
       }
 

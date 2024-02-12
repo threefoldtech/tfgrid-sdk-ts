@@ -33,18 +33,18 @@ async function main() {
       name: "monNetwork",
       ip_range: "10.238.0.0/16",
       addAccess: true,
-      myceliumSeed: [
+      myceliumSeeds: [
         {
           nodeId: 153,
-          myceliumSeed: "a5f0ea16a744af2c0c23fc878d727a6f355079f82d979ad4bc75dd8fb5ebc90e",
+          seed: "a5f0ea16a744af2c0c23fc878d727a6f355079f82d979ad4bc75dd8fb5ebc90e",
         },
         {
           nodeId: 31,
-          myceliumSeed: "7edd9c250f834cb326c3cf116040cf2214f38c669bf27a72e2f5b9e44fc7b27e",
+          seed: "7edd9c250f834cb326c3cf116040cf2214f38c669bf27a72e2f5b9e44fc7b27e",
         },
         {
           nodeId: 177,
-          myceliumSeed: "3162379d1d2530e2113ae2c7142370cc195628238fa1059f2f25ef51c113e892",
+          seed: "3162379d1d2530e2113ae2c7142370cc195628238fa1059f2f25ef51c113e892",
         },
       ],
     },

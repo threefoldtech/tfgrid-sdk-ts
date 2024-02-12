@@ -29,7 +29,7 @@ class NetworkModule extends BaseModule {
       options.mycelium,
       options.description,
       "",
-      [{ nodeId: options.nodeId, myceliumSeed: options.myceliumSeed! }],
+      [{ nodeId: options.nodeId, seed: options.myceliumSeed! }],
     );
     return { contracts: await this.twinDeploymentHandler.handle(twinDeployments) };
   }

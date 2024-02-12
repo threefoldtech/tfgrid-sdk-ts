@@ -31,10 +31,10 @@ async function main() {
     network: {
       name: "hellotest",
       ip_range: "10.249.0.0/16",
-      myceliumSeed: [
+      myceliumSeeds: [
         {
           nodeId: 168,
-          myceliumSeed: "050d109829d8492d48bfb33b711056080571c69e46bfde6b4294c4c5bf468a76",
+          seed: "050d109829d8492d48bfb33b711056080571c69e46bfde6b4294c4c5bf468a76",
         },
       ],
     },
