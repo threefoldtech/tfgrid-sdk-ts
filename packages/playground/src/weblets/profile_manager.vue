@@ -131,7 +131,9 @@
                           ) {
                             return;
                           }
-                          return { message: 'Mnemonic or Hex Seed doesn\'t seem to be valid.' };
+                          return {
+                            message: 'Mnemonic or Hex Seed doesn\'t seem to be valid.',
+                          };
                         },
                       ]"
                       :async-rules="[validateMnInput]"
@@ -148,10 +150,27 @@
                               label="Mnemonic or Hex Seed"
                               placeholder="Please insert your Mnemonic or Hex Seed"
                               v-model="mnemonic"
-                              v-bind="{ ...passwordInputProps, ...validationProps }"
+                              v-bind="{
+                                ...passwordInputProps,
+                                ...validationProps,
+                              }"
                               :disabled="creatingAccount || activatingAccount || activating"
                               @click:append="reloadValidation"
-                            />
+                            >
+                              <template v-slot:prepend-inner v-if="mnemonic.length > 0">
+                                <v-icon
+                                  v-if="
+                                    validateMnemonic(mnemonic) ||
+                                    ((mnemonic.length === 64 || mnemonic.length === 66) &&
+                                      isAddress(mnemonic.length === 66 ? mnemonic : `0x${mnemonic}`))
+                                  "
+                                  color="green"
+                                >
+                                  mdi-check
+                                </v-icon>
+                                <v-icon v-else color="red"> mdi-close </v-icon>
+                              </template></VTextField
+                            >
                           </div>
                         </v-col>
                         <v-col cols="2">
@@ -283,7 +302,10 @@
                   <VTextField
                     label="Confirm Password"
                     v-model="confirmPassword"
-                    v-bind="{ ...confirmPasswordInputProps, ...validationProps }"
+                    v-bind="{
+                      ...confirmPasswordInputProps,
+                      ...validationProps,
+                    }"
                     :disabled="creatingAccount || activatingAccount || activating"
                   />
                 </InputValidator>

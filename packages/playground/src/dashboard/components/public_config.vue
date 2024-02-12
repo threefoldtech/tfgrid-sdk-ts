@@ -23,16 +23,18 @@
           </v-toolbar>
           <div class="pt-6 px-6">
             <form-validator v-model="valid" ref="formRef">
+              <!-- IPv4 -->
               <input-validator
                 :value="config.ipv4"
                 :rules="[validators.required('IPv4 is required.'), validators.isIPRange('IP is not valid.', 4)]"
                 #="{ props }"
               >
-                <input-tooltip tooltip="IPV4 address in CIDR format xx.xx.xx.xx/xx">
+                <input-tooltip tooltip="IPv4 address in CIDR format xx.xx.xx.xx/xx">
                   <v-text-field v-model="config.ipv4" v-bind="props" outlined label="IPv4"></v-text-field>
                 </input-tooltip>
               </input-validator>
 
+              <!-- Gateway IPv4 -->
               <input-validator
                 :value="config.gw4"
                 :rules="[
@@ -47,10 +49,12 @@
                 ]"
                 #="{ props }"
               >
-                <input-tooltip tooltip="Gateway for the IP in ipv4 format">
-                  <v-text-field v-model="config.gw4" v-bind:="props" outlined label="Gateway IPv4"></v-text-field>
+                <input-tooltip tooltip="Gateway for the IP in IPv4 format">
+                  <v-text-field v-model="config.gw4" v-bind="props" outlined label="Gateway IPv4"></v-text-field>
                 </input-tooltip>
               </input-validator>
+
+              <!-- IPv6 -->
               <input-validator
                 :value="config.ipv6"
                 :rules="[
@@ -59,11 +63,12 @@
                 ]"
                 #="{ props }"
               >
-                <input-tooltip tooltip="IPV6 address in format x:x:x:x:x:x:x:x">
-                  <v-text-field v-model="config.ipv6" v-bind:="props" outlined label="IPv6"></v-text-field>
+                <input-tooltip tooltip="IPv6 address in format x:x:x:x:x:x:x:x">
+                  <v-text-field v-model="config.ipv6" v-bind="props" outlined label="IPv6"></v-text-field>
                 </input-tooltip>
               </input-validator>
 
+              <!-- Gateway IPv6 -->
               <input-validator
                 :value="config.gw6"
                 :rules="[
@@ -77,30 +82,35 @@
                 ]"
                 #="{ props }"
               >
-                <input-tooltip tooltip="Gateway for the IP in ipv6 format">
-                  <v-text-field v-model="config.gw6" v-bind:="props" outlined label="Gateway IPv6"></v-text-field>
+                <input-tooltip tooltip="Gateway for the IP in IPv6 format">
+                  <v-text-field v-model="config.gw6" v-bind="props" outlined label="Gateway IPv6"></v-text-field>
                 </input-tooltip>
               </input-validator>
 
+              <!-- Domain -->
               <input-validator
                 :value="config.domain"
                 :rules="[domain => validators.isURL('Wrong domain format.')(domain)]"
                 #="{ props }"
               >
                 <input-tooltip tooltip="Domain for web gateway">
-                  <v-text-field v-model="config.domain" v-bind:="props" outlined label="Domain"></v-text-field>
+                  <v-text-field v-model="config.domain" v-bind="props" outlined label="Domain"></v-text-field>
                 </input-tooltip>
               </input-validator>
             </form-validator>
           </div>
           <v-card-actions class="justify-space-between px-5 pb-5 pt-0">
+            <!-- Remove and Generate Config Buttons -->
             <v-btn
-              @click="showClearDialogue = true"
+              @click="isNodeHasConfig"
               color="error"
               variant="outlined"
               :disabled="isRemoving || Object.values(config).every(value => value == '')"
-              >Remove Config</v-btn
             >
+              Remove Config
+            </v-btn>
+
+            <!-- Close and Save Buttons -->
             <div>
               <v-btn @click="showDialogue = false" variant="outlined" color="anchor">Close</v-btn>
               <v-btn
@@ -118,6 +128,7 @@
       </v-dialog>
     </template>
 
+    <!-- Remove Config Dialog -->
     <template v-if="showClearDialogue">
       <v-dialog v-model="showClearDialogue" width="650">
         <v-card>
@@ -129,6 +140,7 @@
             <p>This action is reversible!</p>
           </v-alert>
           <v-card-actions class="justify-end px-5 pb-5 pt-0">
+            <!-- Cancel and Remove Buttons -->
             <v-btn text="Cancel" color="anchor" variant="outlined" @click="showClearDialogue = false"></v-btn>
             <v-btn
               text="Remove"
@@ -147,14 +159,13 @@
 
 <script lang="ts">
 import type { PublicConfig } from "@threefold/grid_client";
-import _ from "lodash";
-import { onMounted, type PropType, ref, watch } from "vue";
+import { isEqual } from "lodash";
+import { onMounted, ref, watch } from "vue";
 
 import type { RuleReturn } from "@/components/input_validator.vue";
 import { useFormRef } from "@/hooks/form_validator";
-
-import { useGrid } from "../../stores";
-import { createCustomToast, ToastType } from "../../utils/custom_toast";
+import { useGrid } from "@/stores";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 export default {
   name: "AddPublicConfig",
@@ -167,10 +178,6 @@ export default {
       type: Number,
       required: true,
     },
-    modelValue: {
-      type: Object as PropType<PublicConfig>,
-      required: true,
-    },
   },
 
   setup(props, context) {
@@ -180,10 +187,12 @@ export default {
     const showClearDialogue = ref(false);
     const isRemoving = ref(false);
     const isSaving = ref(false);
-    const config = ref<PublicConfig>(publicConfigInitializer());
     const isConfigChanged = ref(false);
     const formRef = useFormRef();
     const grid = useGrid();
+
+    const defualtNodeConfig = ref<PublicConfig>(publicConfigInitializer());
+    const config = ref<PublicConfig>(publicConfigInitializer());
 
     function publicConfigInitializer(): PublicConfig {
       return { ipv4: "", ipv6: "", gw4: "", gw6: "", domain: "" };
@@ -196,7 +205,9 @@ export default {
     watch(
       () => ({ ...config.value }),
       (old, newValue) => {
-        isConfigChanged.value = !_.isEqual(old, newValue) && !_.isEqual(props.modelValue, config.value);
+        isConfigChanged.value =
+          !isEqual(defualtNodeConfig.value, config.value) ||
+          (!isEqual(defualtNodeConfig.value, config.value) && !isEqual(old, newValue));
         formRef.value?.validate();
       },
     );
@@ -206,13 +217,14 @@ export default {
         const node = await grid.client.nodes.get({ id: props.nodeId });
 
         if (node.publicConfig) {
-          config.value = {
+          defualtNodeConfig.value = {
             ipv4: node.publicConfig.ip4 ? node.publicConfig.ip4.ip : "",
             gw4: node.publicConfig.ip4 ? node.publicConfig.ip4.gw : "",
             ipv6: node.publicConfig.ip6 ? node.publicConfig.ip6.ip : "",
             gw6: node.publicConfig.ip6 ? node.publicConfig.ip6.gw : "",
             domain: node.publicConfig.domain ? node.publicConfig.domain : "",
           };
+          config.value = { ...defualtNodeConfig.value };
         }
       } catch (error) {
         createCustomToast(`Failed to get node: ${error}.`, ToastType.danger);
@@ -236,6 +248,7 @@ export default {
         });
         createCustomToast("Public config saved successfully.", ToastType.success);
         context.emit("add-config", config.value);
+        getPublicConfig();
         showDialogue.value = false;
       } catch (error) {
         console.log(error);
@@ -253,7 +266,7 @@ export default {
           nodeId: props.nodeId,
         });
         createCustomToast("Public config removed successfully.", ToastType.success);
-        config.value = publicConfigInitializer();
+        defualtNodeConfig.value = config.value = publicConfigInitializer();
         context.emit("remove-config", config.value);
         showDialogue.value = false;
       } catch (error) {
@@ -264,6 +277,15 @@ export default {
         showClearDialogue.value = false;
       }
     }
+
+    function isNodeHasConfig() {
+      if (!Object.values(defualtNodeConfig.value).every(value => value == "")) {
+        showClearDialogue.value = true;
+        return;
+      }
+      config.value = defualtNodeConfig.value;
+    }
+
     return {
       showDialogue,
       isAdding,
@@ -276,6 +298,7 @@ export default {
       formRef,
       AddConfig,
       removeConfig,
+      isNodeHasConfig,
     };
   },
 };
