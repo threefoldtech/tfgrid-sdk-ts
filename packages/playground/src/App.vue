@@ -107,7 +107,7 @@
       </v-navigation-drawer>
 
       <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
-        <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 9000, top: 0, left: 0, right: 0 }">
+        <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1100, top: 0, left: 0, right: 0 }">
           <v-toolbar-title class="custom-toolbar-title">
             <v-img
               :src="`${
