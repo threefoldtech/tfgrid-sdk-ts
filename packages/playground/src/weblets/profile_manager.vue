@@ -1,5 +1,10 @@
 <template>
-  <VDialog width="1024" :model-value="$props.modelValue" @update:model-value="$emit('update:model-value', $event)">
+  <VDialog
+    width="1024"
+    class="mx-auto"
+    :model-value="$props.modelValue"
+    @update:model-value="$emit('update:model-value', $event)"
+  >
     <template #activator="{ props }">
       <VCard v-bind="props" class="pa-3 d-inline-flex align-center">
         <VProgressCircular v-if="activating" class="mr-2" indeterminate color="primary" size="25" />
@@ -138,7 +143,7 @@
                       :disable-validation="creatingAccount || activatingAccount || activating"
                     >
                       <v-row>
-                        <v-col cols="10">
+                        <v-col cols="12" md="9">
                           <div v-bind="tooltipProps">
                             <VTextField
                               :append-icon="!enableReload && !activatingAccount && mnemonic !== '' ? 'mdi-reload' : ''"
@@ -168,7 +173,7 @@
                             >
                           </div>
                         </v-col>
-                        <v-col cols="2">
+                        <v-col cols="12" md="3">
                           <v-tooltip
                             location="top"
                             text="Using different keypair types will lead to a completely different account."
