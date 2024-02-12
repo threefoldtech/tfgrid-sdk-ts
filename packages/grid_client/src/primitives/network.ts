@@ -161,18 +161,18 @@ class Network {
   }
 
   async addNode(
-    node_id: number,
+    nodeId: number,
     mycelium: boolean,
     metadata = "",
     description = "",
     subnet = "",
-    networkSeed = "",
+    myceliumSeed = "",
   ): Promise<Workload | undefined> {
-    if (this.nodeExists(node_id)) {
+    if (this.nodeExists(nodeId)) {
       return;
     }
 
-    events.emit("logs", `Adding node ${node_id} to network ${this.name}`);
+    events.emit("logs", `Adding node ${nodeId} to network ${this.name}`);
     const keypair = this.generateWireguardKeypair();
     let znet = new Znet();
     if (!subnet) {
@@ -182,12 +182,12 @@ class Network {
     }
     znet.ip_range = this.ipRange;
     znet.wireguard_private_key = keypair.privateKey;
-    znet.wireguard_listen_port = await this.getFreePort(node_id);
-    znet["node_id"] = node_id;
+    znet.wireguard_listen_port = await this.getFreePort(nodeId);
+    znet["node_id"] = nodeId;
 
     if (mycelium) {
-      if (networkSeed) {
-        validateHexSeed(networkSeed, 32);
+      if (myceliumSeed) {
+        validateHexSeed(myceliumSeed, 32);
       } else {
         znet.mycelium = {
           hex_key: generateRandomHexSeed(32, []),
@@ -210,7 +210,7 @@ class Network {
     znet_workload.description = description;
 
     const node = new Node();
-    node.node_id = node_id;
+    node.node_id = nodeId;
     this.nodes.push(node);
 
     return znet_workload;
