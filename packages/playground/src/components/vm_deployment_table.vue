@@ -9,7 +9,13 @@
           >or the deployment{{ count - items.length > 1 ? "s are" : " is" }} encrypted by another key</span
         >.
       </span>
-      <v-icon class="custom-icon" @click="showDialog = true">mdi-file-document-outline </v-icon>
+      <v-tooltip location="top" text="Show failed deployments">
+        <template #activator="{ props }">
+          <v-icon v-bind="props" class="custom-icon" @click="showDialog = true"
+            >mdi-file-document-refresh-outline
+          </v-icon>
+        </template>
+      </v-tooltip>
 
       <v-dialog transition="dialog-bottom-transition" v-model="showDialog" max-width="500px" scrollable>
         <v-card>
@@ -17,9 +23,8 @@
           <v-divider color="#FFCC00" />
           <v-card-text>
             <v-alert type="error" variant="tonal">
-              Failed to load <strong>{{ count - items.length }}</strong> deployment{{
-                count - items.length > 1 ? "s" : ""
-              }}.
+              Failed to load
+              <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
 
               <span>
                 This might happen because the node is down or it's not reachable
@@ -86,6 +91,9 @@
       <template #[`item.billing`]="{ item }">
         {{ item.value.billing }}
       </template>
+      <template #[`item.created`]="{ item }">
+        {{ toHumanDate(item.value.created) }}
+      </template>
       <template #[`item.actions`]="{ item }">
         <v-chip color="error" variant="tonal" v-if="deleting && ($props.modelValue || []).includes(item.value)">
           Deleting...
@@ -93,6 +101,17 @@
         <v-btn-group variant="tonal" v-else>
           <slot :name="projectName + '-actions'" :item="item"></slot>
         </v-btn-group>
+      </template>
+
+      <template #[`item.status`]="{ item }">
+        <v-chip :color="getNodeHealthColor(item.value.status as string).color">
+          <v-tooltip v-if="item.value.status == NodeHealth.Error" activator="parent" location="top">{{
+            item.value.message
+          }}</v-tooltip>
+          <span>
+            {{ capitalize(getNodeHealthColor(item.value.status as string).type) }}
+          </span>
+        </v-chip>
       </template>
 
       <template #no-data-text>
@@ -114,7 +133,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue";
+import { capitalize, computed, onMounted, ref } from "vue";
+
+import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
 import { useProfileManager } from "../stores";
 import { getGrid, updateGrid } from "../utils/grid";
@@ -201,6 +222,8 @@ const filteredHeaders = computed(() => {
     { title: "WireGuard", key: "wireguard", sortable: false },
     { title: "Flist", key: "flist" },
     { title: "Cost", key: "billing" },
+    { title: "Created At", key: "created" },
+    { title: "Health", key: "status", sortable: false },
     { title: "Actions", key: "actions", sortable: false },
   ];
 
@@ -276,6 +299,8 @@ defineExpose({ loadDeployments });
 </script>
 
 <script lang="ts">
+import toHumanDate from "@/utils/date";
+
 import { ProjectName } from "../types";
 import { migrateModule } from "../utils/migration";
 import AccessDeploymentAlert from "./AccessDeploymentAlert.vue";
@@ -293,6 +318,7 @@ export default {
         { key: "name", order: "asc" },
         { key: "flist", order: "asc" },
         { key: "billing", order: "asc" },
+        { key: "created", order: "asc" },
       ],
     };
   },

@@ -2,7 +2,7 @@
   <view-layout>
     <v-row>
       <v-col v-for="card in cards" :key="card.title">
-        <router-link :to="'/deploy/vms' + card.route">
+        <router-link :to="card.route">
           <v-hover>
             <template v-slot:default="{ isHovering, props }">
               <v-card class="pa-3 pt-6" height="200" v-bind="props" :class="isHovering ? 'card-opacity' : undefined">
@@ -32,6 +32,8 @@
   </view-layout>
 </template>
 <script lang="ts">
+import { DashboardRoutes } from "@/router/routes";
+
 interface Card {
   title: string;
   excerpt: string;
@@ -49,14 +51,14 @@ export default {
         excerpt:
           "Deploy a full virtual machine on Threefold Grid. Full VM allows you to have a complete image with a custom kernel optimized for your own usecase.",
         icon: "vm.png",
-        route: "/fullvm",
+        route: DashboardRoutes.VirtualMachines.FullVirtualMachine,
       },
       {
         title: "Micro Virtual Machine",
         excerpt:
           "Deploy a micro virtual machine on Threefold Grid. We provide few images managed by Threefold like Ubuntu 22.04, and NixOS, but you can still use a custom one.",
         icon: "vm.png",
-        route: "/vm",
+        route: DashboardRoutes.VirtualMachines.MicroVirtualMachine,
       },
     ];
     const baseURL = import.meta.env.BASE_URL;

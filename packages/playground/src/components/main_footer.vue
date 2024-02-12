@@ -105,6 +105,7 @@
 import { useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
+import { DashboardRoutes } from "@/router/routes";
 import { AppThemeSelection } from "@/utils/app_theme";
 
 const theme = useTheme();
@@ -113,7 +114,7 @@ const baseUrl = import.meta.env.BASE_URL;
 const $router = useRouter();
 
 function navigateToHome() {
-  return $router.push("/");
+  return $router.push(DashboardRoutes.Other.HomePage);
 }
 </script>
 <script lang="ts">

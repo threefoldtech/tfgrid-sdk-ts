@@ -7,13 +7,7 @@
     <v-card class="pa-5 white--text">
       <v-row class="pa-5 text-center">
         <v-col cols="12">
-          <v-select
-            :items="items"
-            label="Please select a chain:"
-            item-title="name"
-            item-value="id"
-            v-model="selectedItem"
-          ></v-select>
+          <v-text-field model-value="Stellar" label="Selected Chain" variant="outlined" readonly></v-text-field>
         </v-col>
       </v-row>
       <v-row class="pa-4 px-8">

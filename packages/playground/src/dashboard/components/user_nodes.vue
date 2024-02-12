@@ -104,11 +104,18 @@
           class="me-2"
           :nodeId="item.raw.nodeId"
           :farmId="item.raw.farmId"
-          v-model="item.raw.publicConfig"
           @remove-config="config => toggleConfig(item, config)"
           @add-config="config => toggleConfig(item, config)"
         />
         <SetExtraFee class="me-2" :nodeId="item.raw.nodeId" />
+      </template>
+
+      <template v-slot:[`item.country`]="{ item }">
+        {{ item.raw.country || "-" }}
+      </template>
+
+      <template v-slot:[`item.serialNumber`]="{ item }">
+        {{ item.raw.serialNumber || "-" }}
       </template>
     </v-data-table-server>
   </div>
@@ -263,9 +270,9 @@ export default {
         { name: "Certification", value: item.certificationType },
         { name: "First Boot at", value: moment(item.created * 1000).format("MM-DD-YY, HH:mm A") },
         { name: "Updated at", value: moment(item.updatedAt * 1000).format("MM-DD-YY, HH:mm A") },
-        { name: "Country", value: item.country },
-        { name: "City", value: item.city },
-        { name: "Serial Number", value: item.serialNumber },
+        { name: "Country", value: item.country || "-" },
+        { name: "City", value: item.city || "-" },
+        { name: "Serial Number", value: item.serialNumber || "-" },
         { name: "Pricing Policy", value: item.farmingPolicyId },
         { name: "Uptime", value: item.uptime + "%" },
       ];

@@ -259,7 +259,7 @@ function getType(key: string): string {
 
 function getDiskLabel(contract: any, disk: Disk) {
   if (contract.metadata.includes("fullvm") && contract.mounts.indexOf(disk) > 0) {
-    return "Disk";
+    return "Disk( " + disk.name + " ) GB";
   }
   return "Disk( " + disk.mountPoint + " ) GB";
 }

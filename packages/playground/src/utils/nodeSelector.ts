@@ -15,9 +15,14 @@ import type {
   SelectionDetailsFilters,
   SelectionDetailsFiltersValidators,
 } from "../types/nodeSelector";
+import { normalizeError } from "./helpers";
 
 export async function getLocations(status?: NodeStatus): Promise<Locations> {
-  const countries = await gqlClient.countries({ name: true, region: true });
+  const countries = await gqlClient.countries({
+    name: true,
+    region: true,
+    subregion: true,
+  });
   const stats = await gridProxyClient.stats.get({ status });
   const allowedCountriesList = Object.keys(stats.nodesDistribution);
   const droppedCountries = [
@@ -36,16 +41,17 @@ export async function getLocations(status?: NodeStatus): Promise<Locations> {
   ];
 
   const locations: Locations = {};
+
   for (const country of countries) {
     droppedCountries.forEach(con => {
       if (con.title == country.name) {
         country.name = con.name;
       }
     });
-
     if (allowedCountriesList.includes(country.name)) {
-      locations[country.region] = locations[country.region] || [];
-      locations[country.region].push(country.name);
+      const region = country.region !== "unknown region" ? country.region : country.subregion;
+      locations[region] = locations[region] || [];
+      locations[region].push(country.name);
     }
   }
   return locations;
@@ -181,7 +187,7 @@ export function normalizeNodeFilters(
     rentedBy: filters.dedicated ? options.twinId : undefined,
     certified: filters.certified || undefined,
     availableFor: options.twinId,
-    region: options.location.country ? undefined : options.location.region,
+    region: options.location.region ? options.location.region : options.location.subregion,
     country: options.location.country,
     gateway: options.gateway,
     healthy: true,
@@ -332,7 +338,12 @@ export async function checkNodeCapacityPool(
     });
     return true;
   } catch (error) {
-    if (error?.toString().includes("Cannot fit the required SSD disk with size")) {
+    const err = normalizeError(
+      error,
+      "Something went wrong while checking status of the node. Please check your connection and try again.",
+    );
+
+    if (err.toLowerCase().includes("cannot fit the required ssd disk with size")) {
       throw (
         "Although node " +
         node.nodeId +
@@ -341,6 +352,6 @@ export async function checkNodeCapacityPool(
       );
     }
 
-    throw "Something went wrong while checking status of the node. Please check your connection and try again.";
+    throw err;
   }
 }

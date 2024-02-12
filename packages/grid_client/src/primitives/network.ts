@@ -283,7 +283,9 @@ class Network {
 
     await this.tfClient.connect();
     for (const node of network["nodes"]) {
-      const contract = await this.tfClient.contracts.get({ id: node.contract_id });
+      const contract = await this.tfClient.contracts.get({
+        id: node.contract_id,
+      });
       if (contract === null) continue;
       const node_twin_id = await this.capacity.getNodeTwinId(node.node_id);
       const payload = JSON.stringify({ contract_id: node.contract_id });
@@ -550,7 +552,7 @@ class Network {
 
     let port = 0;
     while (!port || result.includes(port)) {
-      port = getRandomNumber(2000, 8000);
+      port = getRandomNumber(1024, 32767);
     }
     return port;
   }
