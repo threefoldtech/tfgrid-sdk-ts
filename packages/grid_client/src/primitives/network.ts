@@ -193,12 +193,10 @@ class Network {
 
     if (mycelium) {
       const myceliumNetworkSeed = myceliumSeeds.find(item => item.nodeId === nodeId);
-      let seed: string;
+      let seed = generateRandomHexSeed(32);
       if (myceliumNetworkSeed?.myceliumSeed) {
         seed = myceliumNetworkSeed.myceliumSeed;
         validateHexSeed(seed, 32);
-      } else {
-        seed = generateRandomHexSeed(32);
       }
 
       znet.mycelium = {
