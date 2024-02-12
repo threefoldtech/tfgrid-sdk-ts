@@ -151,7 +151,21 @@
                               }"
                               :disabled="creatingAccount || activatingAccount || activating"
                               @click:append="reloadValidation"
-                            />
+                            >
+                              <template v-slot:prepend-inner v-if="mnemonic.length > 0">
+                                <v-icon
+                                  v-if="
+                                    validateMnemonic(mnemonic) ||
+                                    ((mnemonic.length === 64 || mnemonic.length === 66) &&
+                                      isAddress(mnemonic.length === 66 ? mnemonic : `0x${mnemonic}`))
+                                  "
+                                  color="green"
+                                >
+                                  mdi-check
+                                </v-icon>
+                                <v-icon v-else color="red"> mdi-close </v-icon>
+                              </template></VTextField
+                            >
                           </div>
                         </v-col>
                         <v-col cols="2">
