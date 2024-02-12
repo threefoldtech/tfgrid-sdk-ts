@@ -286,7 +286,7 @@ function getTooltipText(contract: any, index: number) {
     return "Leader";
   }
 
-  if (index === 0 && getMetadata(contract).projectName === "kubernetes") {
+  if (index === 0 && getMetadata(contract).type === "kubernetes") {
     return "Master";
   }
 
