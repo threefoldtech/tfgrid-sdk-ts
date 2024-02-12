@@ -1,15 +1,14 @@
-import { KeypairType } from "@polkadot/util-crypto/types";
-import { Client as TFClient } from "@threefold/tfchain_client";
+import { QueryClient } from "@threefold/tfchain_client";
 
 import { IDisconnectHandler, ILivenessChecker, ServiceStatus } from "../types";
 
 export class TFChainMonitor implements ILivenessChecker, IDisconnectHandler {
   private name = "TFChain";
   private url: string;
-  private tfClient: TFClient;
-  constructor(tfChainUrl: string, mnemonic: string, keypairType: KeypairType) {
+  private tfClient: QueryClient;
+  constructor(tfChainUrl: string) {
     this.url = tfChainUrl;
-    this.tfClient = new TFClient({ url: this.url, mnemonicOrSecret: mnemonic, keypairType: keypairType });
+    this.tfClient = new QueryClient(this.url);
   }
   private async setUp() {
     await this.tfClient?.connect();
