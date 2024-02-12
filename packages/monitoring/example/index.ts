@@ -5,7 +5,7 @@ async function HealthCheck() {
       new GridProxyMonitor("<FakeURL>"),
       new GraphQLMonitor("https://graphql.dev.grid.tf/graphql"),
       new TFChainMonitor("wss://tfchain.dev.grid.tf/ws"),
-      // new RMBMonitor("wss://relay.dev.grid.tf", "wss://tfchain.dev.grid.tf/ws", "mnemonic", "sr25519"),
+      new RMBMonitor("wss://relay.dev.grid.tf", "wss://tfchain.dev.grid.tf/ws", "mnemonic", "sr25519"),
     ];
     const serviceMonitor = new ServiceMonitor(services);
 
