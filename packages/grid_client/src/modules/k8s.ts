@@ -295,7 +295,7 @@ class K8sModule extends BaseModule {
       options.mycelium,
       options.myceliumSeed!,
       network,
-      options.myceliumNetworkSeed!,
+      [{ nodeId: options.node_id, myceliumSeed: options.myceliumNetworkSeed! }],
       masterWorkload.data["env"]["SSH_KEY"],
       masterWorkload.metadata,
       masterWorkload.description,

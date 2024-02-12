@@ -1,6 +1,7 @@
 import { ValidationError } from "@threefold/types";
 import { Addr } from "netaddr";
 
+import { MyceliumNetworkModel } from "../modules";
 import { DeploymentFactory, Network } from "../primitives";
 import { WorkloadTypes, Znet } from "../zos";
 import { HighLevelBase } from "./base";
@@ -15,7 +16,7 @@ class NetworkHL extends HighLevelBase {
     mycelium: boolean,
     description = "",
     subnet = "",
-    networkSeed = "",
+    networkSeed: MyceliumNetworkModel[] = [],
   ) {
     const network = new Network(networkName, ipRange, this.config);
     await network.load();

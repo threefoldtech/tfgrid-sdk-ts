@@ -1,6 +1,6 @@
 import { events } from "../helpers/events";
 import { VMHL } from "../high_level//machine";
-import { QSFSDiskModel } from "../modules/models";
+import { MyceliumNetworkModel, QSFSDiskModel } from "../modules/models";
 import { Network } from "../primitives/network";
 import { Deployment } from "../zos/deployment";
 import { WorkloadTypes } from "../zos/workload";
@@ -23,7 +23,7 @@ class KubernetesHL extends HighLevelBase {
     mycelium: boolean,
     myceliumSeed: string,
     network: Network,
-    networkSeed: string,
+    networkSeed: MyceliumNetworkModel[] = [],
     sshKey: string,
     metadata = "",
     description = "",
@@ -99,7 +99,7 @@ class KubernetesHL extends HighLevelBase {
     mycelium: boolean,
     myceliumSeed: string,
     network: Network,
-    networkSeed: string,
+    networkSeed: MyceliumNetworkModel[] = [],
     sshKey: string,
     metadata = "",
     description = "",

@@ -84,7 +84,16 @@ class NetworkModel {
   @Expose() @IsString() @IsNotEmpty() ip_range: string;
   @Expose() @IsBoolean() @IsOptional() addAccess?: boolean;
   @Expose() @IsInt() @Min(1) @IsOptional() accessNodeId?: number;
-  @Expose() @IsString() @IsOptional() @Length(32) myceliumSeed?: string;
+  @Expose()
+  @IsOptional()
+  @Type(() => MyceliumNetworkModel)
+  @ValidateNested({ each: true })
+  myceliumSeed?: MyceliumNetworkModel[];
+}
+
+class MyceliumNetworkModel {
+  @Expose() @IsString() @Length(32) myceliumSeed?: string;
+  @Expose() @IsInt() @Min(1) nodeId: number;
 }
 
 class BaseGetDeleteModel {
@@ -905,4 +914,5 @@ export {
   AddPublicConfig,
   GetActiveContractsModel,
   GPUCardInfo,
+  MyceliumNetworkModel,
 };

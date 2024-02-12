@@ -12,6 +12,7 @@ import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
 import { formatErrorMessage, getRandomNumber, randomChoice } from "../helpers/utils";
 import { generateRandomHexSeed, validateHexSeed } from "../helpers/validator";
+import { MyceliumNetworkModel } from "../modules";
 import { DeploymentFactory } from "../primitives/deployment";
 import { BackendStorage, BackendStorageType } from "../storage/backend";
 import { Deployment } from "../zos/deployment";
@@ -122,42 +123,42 @@ class Network {
   }
 
   // Check if network will be updated with mycelium or not
-  async checkMycelium(node_id: number, mycelium: boolean, networkSeed = "") {
+  async checkMycelium(nodeId: number, mycelium: boolean, networkSeed: MyceliumNetworkModel[] = []) {
+    if (!mycelium) return;
     // check if network has mycelium or not
     const network = this.networks.find(network => {
-      return network["node_id"] === node_id;
+      return network["node_id"] === nodeId;
     });
+    const myceliumNetworkSeed = networkSeed.find(item => item.nodeId == nodeId);
     if (network && network.mycelium && network.mycelium?.hex_key) {
-      if (networkSeed && networkSeed !== network.mycelium.hex_key) {
-        throw new ValidationError("Wrong Seed !! Please use existing one.");
+      if (networkSeed && myceliumNetworkSeed?.myceliumSeed !== network.mycelium.hex_key) {
+        throw new ValidationError(`Another mycelium seed is used for this network ${this.name} on this ${nodeId}`);
       }
     } else {
       // If network has no mycelium and user wanna update it and add mycelium.
-      if (mycelium) {
-        if (network) {
-          network.mycelium = {
-            hex_key: generateRandomHexSeed(32, []),
-            peers: [],
-          };
-          this.updateNetwork(network);
-          this.updateNetworkDeployments();
+      const seed = generateRandomHexSeed(32);
+      if (network) {
+        network.mycelium = {
+          hex_key: myceliumNetworkSeed?.myceliumSeed || seed,
+          peers: [],
+        };
+        this.updateNetwork(network);
+        this.updateNetworkDeployments();
 
-          const deploymentFactory = new DeploymentFactory(this.config);
-          const filteredDeployments = this.deployments.filter(deployment => deployment["node_id"] === node_id);
+        const deploymentFactory = new DeploymentFactory(this.config);
+        const filteredDeployments = this.deployments.filter(deployment => deployment["node_id"] === nodeId);
 
-          for (const deployment of filteredDeployments) {
-            const d = await deploymentFactory.fromObj(deployment);
-            for (const workload of d["workloads"]) {
-              workload.data["mycelium"]["hex_key"] = generateRandomHexSeed(32, []);
-              workload.data = this.updateNetwork(workload["data"]);
-              workload.version += 1;
-            }
-            return d;
+        for (const deployment of filteredDeployments) {
+          const d = await deploymentFactory.fromObj(deployment);
+          for (const workload of d["workloads"]) {
+            workload.data["mycelium"]["hex_key"] = seed;
+            workload.data = this.updateNetwork(workload["data"]);
+            workload.version += 1;
           }
+          return d;
         }
       }
     }
-    // If no seed provided, I wanna return used one
   }
 
   async addNode(
@@ -166,7 +167,7 @@ class Network {
     metadata = "",
     description = "",
     subnet = "",
-    myceliumSeed = "",
+    myceliumSeed: MyceliumNetworkModel[] = [],
   ): Promise<Workload | undefined> {
     if (this.nodeExists(nodeId)) {
       return;
@@ -186,11 +187,12 @@ class Network {
     znet["node_id"] = nodeId;
 
     if (mycelium) {
-      if (myceliumSeed) {
-        validateHexSeed(myceliumSeed, 32);
+      const myceliumNetworkSeed = myceliumSeed.find(item => item.nodeId === nodeId);
+      if (myceliumNetworkSeed?.myceliumSeed) {
+        validateHexSeed(myceliumNetworkSeed.myceliumSeed, 32);
       } else {
         znet.mycelium = {
-          hex_key: generateRandomHexSeed(32, []),
+          hex_key: generateRandomHexSeed(32),
           peers: [],
         };
       }

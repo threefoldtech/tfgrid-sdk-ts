@@ -3,8 +3,8 @@ import { Addr } from "netaddr";
 
 import { events } from "../helpers/events";
 import { randomChoice } from "../helpers/utils";
-import { generateRandomHexSeed, validateHexSeed } from "../helpers/validator";
-import { DiskModel, QSFSDiskModel } from "../modules/models";
+import { generateHexSeed, validateHexSeed } from "../helpers/validator";
+import { DiskModel, MyceliumNetworkModel, QSFSDiskModel } from "../modules/models";
 import { qsfs_zdbs } from "../modules/qsfs_zdbs";
 import {
   DeploymentFactory,
@@ -37,7 +37,7 @@ class VMHL extends HighLevelBase {
     mycelium: boolean,
     myceliumSeed: string,
     network: Network,
-    myceliumNetworkSeed: string,
+    myceliumNetworkSeed: MyceliumNetworkModel[] = [],
     entrypoint: string,
     env: Record<string, unknown>,
     metadata = "",
@@ -301,7 +301,7 @@ class VMHL extends HighLevelBase {
       if (myceliumSeed) {
         validateHexSeed(myceliumSeed, 6);
       } else {
-        myceliumSeed = generateRandomHexSeed(6, lastTwoNumbers);
+        myceliumSeed = generateHexSeed(6, lastTwoNumbers);
       }
     }
 

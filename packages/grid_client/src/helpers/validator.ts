@@ -24,13 +24,12 @@ function validateInput(target, propertyKey: string, descriptor: PropertyDescript
   };
 }
 
-function generateRandomHexSeed(length: number, numbers: number[]) {
-  // If no given numbers, generate all random
-  if (numbers.length == 0) {
-    const bytes = crypto.randomBytes(length);
-    return bytes.toString("hex");
-  }
+function generateRandomHexSeed(length: number) {
+  const bytes = crypto.randomBytes(length);
+  return bytes.toString("hex");
+}
 
+function generateHexSeed(length: number, numbers: number[]) {
   const hexSeed = numbers[0].toString(16).padStart(length, "0") + numbers[1].toString(16).padStart(length, "0");
 
   return hexSeed;
@@ -44,4 +43,4 @@ function validateHexSeed(seed: string, length: number): boolean {
   return true;
 }
 
-export { validateObject, validateInput, generateRandomHexSeed, validateHexSeed };
+export { validateObject, validateInput, generateRandomHexSeed, validateHexSeed, generateHexSeed };
