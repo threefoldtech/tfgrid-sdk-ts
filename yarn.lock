@@ -13695,6 +13695,11 @@ log-update@^4.0.0:
     slice-ansi "^4.0.0"
     wrap-ansi "^6.2.0"
 
+logger-interceptor@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/logger-interceptor/-/logger-interceptor-1.0.0.tgz#2ff74b8c1017bfc2d15beb0027b906a086d2ad6a"
+  integrity sha512-dgL9YlR6GQRUdJI02/oKmtbCz4E5XcZOpw0xQ3qsFOx9geUZmd26cpO5j7+FODxLcClYVHKqym/1K0QW6bsufQ==
+
 loglevel@^1.6.8:
   version "1.8.1"
   resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.8.1.tgz#5c621f83d5b48c54ae93b6156353f555963377b4"
@@ -17497,6 +17502,11 @@ schema-utils@^4.0.0:
     ajv-formats "^2.1.1"
     ajv-keywords "^5.0.0"
 
+scrollparent@^2.0.1:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/scrollparent/-/scrollparent-2.1.0.tgz#6cae915c953835886a6ba0d77fdc2bb1ed09076d"
+  integrity sha512-bnnvJL28/Rtz/kz2+4wpBjHzWoEzXhVg/TE8BeVGJHUqE8THNIRnDxDWMktwM+qahvlRdvlLdsQfYe+cuqfZeA==
+
 scrypt-js@3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/scrypt-js/-/scrypt-js-3.0.1.tgz#d314a57c2aef69d1ad98a138a21fe9eafa9ee312"
@@ -20116,6 +20126,11 @@ vue-tsc@^1.8.8:
     "@vue/typescript" "1.8.11"
     semver "^7.3.8"
 
+vue3-observe-visibility2@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/vue3-observe-visibility2/-/vue3-observe-visibility2-0.0.3.tgz#de8b494dd9002d815dab455ab859306a08c3a6a7"
+  integrity sha512-yJL0G5RrI/uXdDrs+0fdlk/dYKhKBRZtkwJO0ar44NTIX+Rnw63iHgTz+p00M+yp6Avm1Q+o6y82h0hkTzmpHg==
+
 vue3-pdfjs@^0.1.6:
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/vue3-pdfjs/-/vue3-pdfjs-0.1.6.tgz#e88bac9e75427e163420ffd7af68dfe0f5ebafa9"
@@ -20123,6 +20138,21 @@ vue3-pdfjs@^0.1.6:
   dependencies:
     pdfjs-dist "^2.10.377"
     vue "^3.2.19"
+
+vue3-resize@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/vue3-resize/-/vue3-resize-0.2.0.tgz#a1f06468cb7add911dfe3cb980984fa865ea1c8b"
+  integrity sha512-vZkbEv4PjMEWFV0igAxCvdSIH9hrIJjXyJ9XPTxH0cS/L2/VW1dLVORMWJKU0VXHpHiYKwskB62ju7aBQMVpOQ==
+
+vue3-virtual-scroller@^0.2.3:
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/vue3-virtual-scroller/-/vue3-virtual-scroller-0.2.3.tgz#b08f2023578dddf3c399fee8880e1262c17622c5"
+  integrity sha512-iPBi0FocZGxVar46iLYzLMfdTMe/O3X8h1iTc21aPhAaGRyMMAZ64AN7Dn6FA+qYFam5f3wHIUktAnpgCFtNuw==
+  dependencies:
+    "@rollup/plugin-json" "^4.1.0"
+    scrollparent "^2.0.1"
+    vue3-observe-visibility2 "^0.0.3"
+    vue3-resize "^0.2.0"
 
 vue@^2.6.14:
   version "2.7.14"

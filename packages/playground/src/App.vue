@@ -107,7 +107,7 @@
       </v-navigation-drawer>
 
       <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
-        <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1007, top: 0, left: 0, right: 0 }">
+        <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1100, top: 0, left: 0, right: 0 }">
           <v-toolbar-title class="custom-toolbar-title">
             <v-img
               :src="`${
@@ -188,6 +188,7 @@
           </v-container>
         </DeploymentListManager>
         <TFNotification v-if="hasActiveProfile && hasGrid" />
+        <TfLogger />
         <MainFooter />
       </v-main>
     </profile-manager-controller>
@@ -200,8 +201,9 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
-import { useProfileManager } from "./stores/profile_manager";
+import TfLogger from "@/components/logger.vue";
 
+import { useProfileManager } from "./stores/profile_manager";
 const $route = useRoute();
 const $router = useRouter();
 const profileManager = useProfileManager();
