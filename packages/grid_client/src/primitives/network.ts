@@ -190,6 +190,10 @@ class Network {
       const myceliumNetworkSeed = myceliumSeed.find(item => item.nodeId === nodeId);
       if (myceliumNetworkSeed?.myceliumSeed) {
         validateHexSeed(myceliumNetworkSeed.myceliumSeed, 32);
+        znet.mycelium = {
+          hex_key: myceliumNetworkSeed?.myceliumSeed,
+          peers: [],
+        };
       } else {
         znet.mycelium = {
           hex_key: generateRandomHexSeed(32),

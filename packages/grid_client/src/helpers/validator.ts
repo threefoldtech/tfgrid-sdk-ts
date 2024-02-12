@@ -36,7 +36,7 @@ function generateHexSeed(length: number, numbers: number[]) {
 }
 
 function validateHexSeed(seed: string, length: number): boolean {
-  const hexSeedRegex = new RegExp(`^[0-9A-Fa-f]{${length}}$`);
+  const hexSeedRegex = new RegExp(`^[0-9A-Fa-f]{${length * 2}}$`);
   if (!hexSeedRegex.test(seed)) {
     throw new ValidationError(`Invalid seed. It should be a ${length}-character hexadecimal string.`);
   }
