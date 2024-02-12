@@ -29,7 +29,7 @@ function generateRandomHexSeed(length: number) {
   return bytes.toString("hex");
 }
 
-function generateHexSeed(length: number, numbers: number[]) {
+function zeroPadding(length: number, numbers: number[]) {
   const hexSeed = numbers[0].toString(16).padStart(length, "0") + numbers[1].toString(16).padStart(length, "0");
 
   return hexSeed;
@@ -43,4 +43,4 @@ function validateHexSeed(seed: string, length: number): boolean {
   return true;
 }
 
-export { validateObject, validateInput, generateRandomHexSeed, validateHexSeed, generateHexSeed };
+export { validateObject, validateInput, generateRandomHexSeed, validateHexSeed, zeroPadding };

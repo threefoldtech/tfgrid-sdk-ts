@@ -3,7 +3,7 @@ import { Addr } from "netaddr";
 
 import { events } from "../helpers/events";
 import { randomChoice } from "../helpers/utils";
-import { generateHexSeed, validateHexSeed } from "../helpers/validator";
+import { validateHexSeed, zeroPadding } from "../helpers/validator";
 import { DiskModel, MyceliumNetworkModel, QSFSDiskModel } from "../modules/models";
 import { qsfs_zdbs } from "../modules/qsfs_zdbs";
 import {
@@ -37,7 +37,7 @@ class VMHL extends HighLevelBase {
     mycelium: boolean,
     myceliumSeed: string,
     network: Network,
-    myceliumNetworkSeed: MyceliumNetworkModel[] = [],
+    myceliumNetworkSeeds: MyceliumNetworkModel[] = [],
     entrypoint: string,
     env: Record<string, unknown>,
     metadata = "",
@@ -222,13 +222,13 @@ class VMHL extends HighLevelBase {
         networkMetadata,
         description,
         accessNodeSubnet,
-        myceliumNetworkSeed,
+        myceliumNetworkSeeds,
       );
       wgConfig = await network.addAccess(access_node_id, true);
     }
     // If node exits on network check if mycelium needs to be added or not
     if (network.nodeExists(nodeId)) {
-      const deployment = await network.checkMycelium(nodeId, mycelium, myceliumNetworkSeed);
+      const deployment = await network.checkMycelium(nodeId, mycelium, myceliumNetworkSeeds);
       if (deployment) {
         deployments.push(new TwinDeployment(deployment, Operations.update, 0, 0, network));
       }
@@ -240,7 +240,7 @@ class VMHL extends HighLevelBase {
       networkMetadata,
       description,
       userIPsubnet,
-      myceliumNetworkSeed,
+      myceliumNetworkSeeds,
     );
     if ((await network.exists()) && (znet_workload || access_net_workload)) {
       // update network
@@ -301,7 +301,7 @@ class VMHL extends HighLevelBase {
       if (myceliumSeed) {
         validateHexSeed(myceliumSeed, 6);
       } else {
-        myceliumSeed = generateHexSeed(6, lastTwoNumbers);
+        myceliumSeed = zeroPadding(6, lastTwoNumbers);
       }
     }
 

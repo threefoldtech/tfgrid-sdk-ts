@@ -123,23 +123,28 @@ class Network {
   }
 
   // Check if network will be updated with mycelium or not
-  async checkMycelium(nodeId: number, mycelium: boolean, networkSeed: MyceliumNetworkModel[] = []) {
+  async checkMycelium(nodeId: number, mycelium: boolean, myceliumSeeds: MyceliumNetworkModel[] = []) {
     if (!mycelium) return;
     // check if network has mycelium or not
     const network = this.networks.find(network => {
       return network["node_id"] === nodeId;
     });
-    const myceliumNetworkSeed = networkSeed.find(item => item.nodeId == nodeId);
+    const myceliumNetworkSeed = myceliumSeeds.find(item => item.nodeId == nodeId);
     if (network && network.mycelium && network.mycelium?.hex_key) {
-      if (networkSeed && myceliumNetworkSeed?.myceliumSeed !== network.mycelium.hex_key) {
+      if (myceliumSeeds && myceliumNetworkSeed?.myceliumSeed !== network.mycelium.hex_key) {
         throw new ValidationError(`Another mycelium seed is used for this network ${this.name} on this ${nodeId}`);
       }
     } else {
       // If network has no mycelium and user wanna update it and add mycelium.
-      const seed = generateRandomHexSeed(32);
+      let seed = generateRandomHexSeed(32);
       if (network) {
+        if (myceliumNetworkSeed?.myceliumSeed) {
+          validateHexSeed(myceliumNetworkSeed.myceliumSeed, 32);
+          seed = myceliumNetworkSeed.myceliumSeed;
+        }
+
         network.mycelium = {
-          hex_key: myceliumNetworkSeed?.myceliumSeed || seed,
+          hex_key: seed,
           peers: [],
         };
         this.updateNetwork(network);
@@ -167,7 +172,7 @@ class Network {
     metadata = "",
     description = "",
     subnet = "",
-    myceliumSeed: MyceliumNetworkModel[] = [],
+    myceliumSeeds: MyceliumNetworkModel[] = [],
   ): Promise<Workload | undefined> {
     if (this.nodeExists(nodeId)) {
       return;
@@ -187,19 +192,19 @@ class Network {
     znet["node_id"] = nodeId;
 
     if (mycelium) {
-      const myceliumNetworkSeed = myceliumSeed.find(item => item.nodeId === nodeId);
+      const myceliumNetworkSeed = myceliumSeeds.find(item => item.nodeId === nodeId);
+      let seed: string;
       if (myceliumNetworkSeed?.myceliumSeed) {
-        validateHexSeed(myceliumNetworkSeed.myceliumSeed, 32);
-        znet.mycelium = {
-          hex_key: myceliumNetworkSeed?.myceliumSeed,
-          peers: [],
-        };
+        seed = myceliumNetworkSeed.myceliumSeed;
+        validateHexSeed(seed, 32);
       } else {
-        znet.mycelium = {
-          hex_key: generateRandomHexSeed(32),
-          peers: [],
-        };
+        seed = generateRandomHexSeed(32);
       }
+
+      znet.mycelium = {
+        hex_key: seed,
+        peers: [],
+      };
     }
 
     this.networks.push(znet);

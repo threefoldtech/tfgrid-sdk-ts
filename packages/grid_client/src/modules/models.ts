@@ -88,7 +88,7 @@ class NetworkModel {
   @IsOptional()
   @Type(() => MyceliumNetworkModel)
   @ValidateNested({ each: true })
-  myceliumSeed?: MyceliumNetworkModel[];
+  myceliumSeeds?: MyceliumNetworkModel[];
 }
 
 class MyceliumNetworkModel {

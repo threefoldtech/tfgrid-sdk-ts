@@ -16,7 +16,7 @@ class NetworkHL extends HighLevelBase {
     mycelium: boolean,
     description = "",
     subnet = "",
-    networkSeed: MyceliumNetworkModel[] = [],
+    myceliumNetworkSeeds: MyceliumNetworkModel[] = [],
   ) {
     const network = new Network(networkName, ipRange, this.config);
     await network.load();
@@ -26,7 +26,14 @@ class NetworkHL extends HighLevelBase {
       projectName: this.config.projectName,
     });
 
-    const workload = await network.addNode(nodeId, mycelium, networkMetadata, description, subnet, networkSeed);
+    const workload = await network.addNode(
+      nodeId,
+      mycelium,
+      networkMetadata,
+      description,
+      subnet,
+      myceliumNetworkSeeds,
+    );
     if (!workload) {
       throw new ValidationError(`Node ${nodeId} already exists on network ${networkName}.`);
     }
