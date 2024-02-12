@@ -5,7 +5,7 @@
         <v-expansion-panel-title :class="{ 'text-error': !!connectDB.error }">
           <span class="text-subtitle-1"> <VIcon icon="mdi-cog" /> Dashboard Logs ({{ logs.length }}) </span>
           <template v-slot:actions>
-            <div :class="{ 'pr-14': debugOpened !== 0 }">
+            <div>
               <VTooltip text="Download Logs">
                 <template #activator="{ props }">
                   <VBtn
