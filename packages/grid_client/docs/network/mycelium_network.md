@@ -2,13 +2,13 @@
 
 ## Overview
 
-Mycelium is a fresh approach to networking that aims to transform how we connect devices online, potentially replacing traditional protocols like IPv6. It's designed to create a more efficient and secure internet experience.
+Mycelium is a fresh approach to networking that aims to transform how we connect devices online. It's an IPv6 overlay network, designed to create a more efficient and secure internet experience.
 
-The primary goal is to revolutionize the way data travels between devices by prioritizing speed, security, and reliability. Unlike IPv6, which has limitations, Mycelium is built to handle communication more effectively. It's like upgrading from a regular road system to a superhighway with advanced traffic management.
+The primary goal is to revolutionize the way data travels between devices by prioritizing speed, security, and reliability. It's built to handle communication more effectively, like upgrading from a regular road system to a superhighway with advanced traffic management.
 
 By being really smart about how it sends data, Mycelium promises faster and smoother connections. It figures out the quickest paths for data to travel, ensuring minimal delays and optimal performance. Plus, everything sent between devices is encrypted, making it super secure.
 
-Ultimately, Mycelium's goal is to offer a more scalable, reliable, and adaptable networking solution that could eventually replace IPv6. Its innovative features and focus on user experience make it a promising contender in the future of internet connectivity.
+Ultimately, Mycelium's goal is to offer a more scalable, reliable, and adaptable networking solution above IPv6. Its innovative features and focus on user experience make it a promising contender in the future of internet connectivity.
 
 ## Configuration
 
@@ -19,7 +19,7 @@ In case user needs to support mycelium:
 - flag `mycelium` field in workload with true, also the `planetary` field should be flagged with true.
 - User can support hex seed which ip will be generated from or they'll be generated automatic.
 - providing seeds, that's what makes ip fixed from anywhere.
-- `Note that user can't use same network seed in multiple nodes.`
+  > Note user can't use same network seed in multiple nodes.
 
 ```ts
 const vms: MachinesModel = {
@@ -64,3 +64,5 @@ const vms: MachinesModel = {
   description: "test deploying single VM with mycelium via ts grid3 client",
 };
 ```
+
+- User can deploy vm without mycelium, then add machine on same network requesting mycelium.
