@@ -66,3 +66,79 @@ const vms: MachinesModel = {
 ```
 
 - User can deploy vm without mycelium, then add machine on same network requesting mycelium.
+
+```ts
+const vms: MachinesModel = {
+  name: "newVMS",
+  network: {
+    name: "wedtest",
+    ip_range: "10.249.0.0/16",
+  },
+  machines: [
+    {
+      name: "testvm1",
+      node_id: 11,
+      disks: [
+        {
+          name: "wedDisk",
+          size: 8,
+          mountpoint: "/testdisk",
+        },
+      ],
+      public_ip: false,
+      public_ip6: false,
+      planetary: true,
+      mycelium: false,
+      cpu: 1,
+      memory: 1024 * 2,
+      rootfs_size: 0,
+      flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
+      entrypoint: "/sbin/zinit init",
+      env: {
+        SSH_KEY: config.ssh_key,
+      },
+    },
+  ],
+  metadata: "",
+  description: "test deploying VMs via ts grid3 client",
+};
+```
+
+then add `testvm2` requesting `mycelium`:
+
+```ts
+const vms: MachinesModel = {
+  name: "newVMS2",
+  network: {
+    name: "wedtest",
+    ip_range: "10.249.0.0/16",
+  },
+  machines: [
+    {
+      name: "testvm2",
+      node_id: 11,
+      disks: [
+        {
+          name: "wedDisk",
+          size: 8,
+          mountpoint: "/testdisk",
+        },
+      ],
+      public_ip: false,
+      public_ip6: false,
+      planetary: true,
+      mycelium: true,
+      cpu: 1,
+      memory: 1024 * 2,
+      rootfs_size: 0,
+      flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
+      entrypoint: "/sbin/zinit init",
+      env: {
+        SSH_KEY: config.ssh_key,
+      },
+    },
+  ],
+  metadata: "",
+  description: "test deploying VMs via ts grid3 client",
+};
+```
