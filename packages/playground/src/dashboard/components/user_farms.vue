@@ -205,7 +205,7 @@ export default {
     const refreshPublicIPs = ref(false);
 
     const reloadFarms = debounce(getUserFarms, 20000);
-    context.expose({ reloadFarms });
+    // context.expose({ reloadFarms });
     function filter(items: Farm[]) {
       const start = (page.value - 1) * pageSize.value;
       const end = start + pageSize.value;
@@ -332,6 +332,11 @@ export default {
       refreshPublicIPs.value = !refreshPublicIPs.value;
     }
 
+    function getFarmsNames() {
+      return farms.value?.map(farm => farm.name.toLocaleLowerCase());
+    }
+
+    context.expose({ getFarmsNames, reloadFarms });
     return {
       gridStore,
       headers,
@@ -355,6 +360,7 @@ export default {
       downloadFarmReceipts,
       handleIpAdded,
       refreshPublicIPs,
+      getFarmsNames,
     };
   },
 };
