@@ -119,6 +119,7 @@ async function main() {
       vm.disks = [];
       vm.public_ip = publicIp;
       vm.planetary = true;
+      vm.mycelium = false;
       vm.cpu = cru;
       vm.memory = mru;
       vm.rootfs_size = rootFs;

@@ -63,6 +63,7 @@
       </password-input-wrapper>
 
       <SelectSolutionFlavor v-model="solution" />
+      <Networks v-model:mycelium="mycelium" />
 
       <input-tooltip
         inline
@@ -125,6 +126,7 @@ const certified = ref(false);
 const ipv4 = ref(false);
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
+const mycelium = ref(false);
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
@@ -176,6 +178,7 @@ async function deploy() {
           entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
           planetary: true,
+          mycelium: mycelium.value,
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "PEERTUBE_ADMIN_EMAIL", value: email.value },
@@ -220,6 +223,7 @@ async function deploy() {
 </script>
 
 <script lang="ts">
+import Networks from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
@@ -229,6 +233,6 @@ import rootFs from "../utils/root_fs";
 
 export default {
   name: "TfPeertube",
-  components: { SelectSolutionFlavor },
+  components: { SelectSolutionFlavor, Networks },
 };
 </script>

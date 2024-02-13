@@ -51,6 +51,7 @@ async function createWorker(data: K8SWorker) {
   worker.public_ip6 = data.ipv6;
   worker.rootfs_size = data.rootFsSize;
   worker.planetary = data.planetary;
+  worker.mycelium = data.mycelium;
   worker.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
   return worker;
 }
@@ -75,6 +76,7 @@ export async function deployWorker(grid: GridClient, options: K8SWorker & { depl
   worker.public_ip = options.ipv4;
   worker.public_ip6 = options.ipv6;
   worker.planetary = options.planetary;
+  worker.mycelium = options.mycelium;
   worker.rootfs_size = options.rootFsSize;
   worker.node_id = options.selectionDetails!.node!.nodeId;
   worker.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;

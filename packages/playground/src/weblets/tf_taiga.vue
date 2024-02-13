@@ -90,6 +90,7 @@
           :small="{ cpu: 2, memory: 4, disk: 100 }"
           :medium="{ cpu: 4, memory: 8, disk: 150 }"
         />
+        <Networks v-model:mycelium="mycelium" />
 
         <input-tooltip
           inline
@@ -160,7 +161,7 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
-
+const mycelium = ref(false);
 const smtp = ref(createSMTPServer());
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
@@ -217,6 +218,7 @@ async function deploy() {
           rootFilesystemSize: rootFilesystemSize.value,
           publicIpv4: ipv4.value,
           planetary: true,
+          mycelium: mycelium.value,
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "DOMAIN_NAME", value: domain },
@@ -270,6 +272,7 @@ async function deploy() {
 </script>
 
 <script lang="ts">
+import Networks from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -279,6 +282,6 @@ import rootFs from "../utils/root_fs";
 
 export default {
   name: "TfTaiga",
-  components: { SmtpServer, SelectSolutionFlavor },
+  components: { SmtpServer, SelectSolutionFlavor, Networks },
 };
 </script>

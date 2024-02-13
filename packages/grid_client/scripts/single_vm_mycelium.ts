@@ -1,4 +1,4 @@
-import { FilterOptions, MachinesModel } from "../src";
+import { MachinesModel } from "../src";
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
@@ -26,61 +26,46 @@ async function cancel(client, vms) {
 async function main() {
   const grid3 = await getClient();
 
-  const vmQueryOptions: FilterOptions = {
-    cru: 8,
-    mru: 16, // GB
-    sru: 1000,
-    availableFor: grid3.twinId,
-    hasGPU: true,
-    rentedBy: grid3.twinId,
-  };
-
-  const nodes = await grid3.capacity.filterNodes(vmQueryOptions);
-  if (nodes.length === 0) {
-    throw Error(`Couldn't find a node satisfying these filter options: ${JSON.stringify(vmQueryOptions)}`);
-  }
-  const nodeId = +nodes[0].nodeId;
-
-  let gpuList = await grid3.zos.getNodeGPUInfo({ nodeId: nodeId });
-  gpuList = gpuList.filter(g => g.contract === 0);
-  if (gpuList.length <= 0) {
-    throw Error(`Couldn't find GPU card available on node ${nodeId}`);
-  }
-
   const vms: MachinesModel = {
-    name: "vmgpu",
+    name: "newMY",
     network: {
-      name: "vmgpuNetwork",
+      name: "hellotest",
       ip_range: "10.249.0.0/16",
+      // myceliumSeeds: [
+      //   {
+      //     nodeId: 168,
+      //     seed: "050d109829d8492d48bfb33b711056080571c69e46bfde6b4294c4c5bf468a76", //(HexSeed of length 32)
+      //   },
+      // ],
     },
     machines: [
       {
-        name: "vmgpu",
-        node_id: nodeId,
+        name: "testvmMY",
+        node_id: 168,
         disks: [
           {
-            name: "vmgpuDisk",
-            size: 100,
+            name: "wedDisk",
+            size: 8,
             mountpoint: "/testdisk",
           },
         ],
         public_ip: false,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
-        cpu: 8,
-        memory: 1024 * 16,
+        mycelium: true,
+        // myceliumSeed: "1e1404279b3d", //(HexSeed of length 6)
+        cpu: 1,
+        memory: 1024 * 2,
         rootfs_size: 0,
-        flist: "https://hub.grid.tf/tf-official-vms/ubuntu-22.04.flist",
-        entrypoint: "/",
+        flist: "https://hub.grid.tf/tf-official-apps/base:latest.flist",
+        entrypoint: "/sbin/zinit init",
         env: {
           SSH_KEY: config.ssh_key,
         },
-        gpus: gpuList[0].id,
       },
     ],
     metadata: "",
-    description: "test deploying VM with GPU via ts grid3 client",
+    description: "test deploying single VM with mycelium via ts grid3 client",
   };
 
   //Deploy VMs

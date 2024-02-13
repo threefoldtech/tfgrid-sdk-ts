@@ -66,7 +66,14 @@
         </input-validator>
       </password-input-wrapper>
 
-      <Network required ref="network" v-model:ipv4="ipv4" v-model:planetary="planetary" v-model:wireguard="wireguard" />
+      <Network
+        required
+        ref="network"
+        v-model:ipv4="ipv4"
+        v-model:planetary="planetary"
+        v-model:wireguard="wireguard"
+        v-model:mycelium="mycelium"
+      />
 
       <SelectSolutionFlavor
         v-model="solution"
@@ -144,6 +151,7 @@ const dedicated = ref(false);
 const certified = ref(false);
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
+const mycelium = ref(false);
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -179,6 +187,7 @@ async function deploy() {
           flist: flist.value,
           entryPoint: flist.entryPoint,
           planetary: planetary.value,
+          mycelium: mycelium.value,
           publicIpv4: ipv4.value,
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },

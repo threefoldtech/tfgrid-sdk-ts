@@ -163,6 +163,7 @@ function normalizeCaproverWorker(worker: CW, envs: Env[]): Machine {
     entryPoint: "/sbin/zinit init",
     publicIpv4: true,
     planetary: true,
+    mycelium: worker.mycelium || false,
     rootFilesystemSize: rootFs(worker.solution!.cpu, worker.solution!.memory),
     disks: [
       {
