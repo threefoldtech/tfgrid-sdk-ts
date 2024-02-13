@@ -1,10 +1,10 @@
 <template>
   <card-details
-    v-if="node.healthy"
     :loading="loading"
     title="CPU Benchmark"
     :items="cpuBenchmark"
     icon="mdi-cpu-64-bit"
+    :error="errorMessage"
   />
 </template>
 
@@ -13,7 +13,6 @@ import type { GridNode } from "@threefold/gridproxy_client";
 import { onMounted, type PropType, ref } from "vue";
 
 import type { CPUBenchmark, NodeDetailsCard } from "@/types";
-import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import { useGrid } from "../../stores";
 import CardDetails from "./card_details.vue";
@@ -32,7 +31,7 @@ export default {
     const gridStore = useGrid();
     const loading = ref<boolean>(false);
     const cpuBenchmark = ref<NodeDetailsCard[]>();
-
+    const errorMessage = ref("");
     function format(val: number | undefined) {
       return val ? val.toString() : "-";
     }
@@ -52,10 +51,12 @@ export default {
     onMounted(async () => {
       if (props.node.healthy) {
         try {
+          errorMessage.value = "";
           loading.value = true;
           await getNodeCPUBenchmarkCard();
         } catch (error) {
-          createCustomToast("Failed to load CPU Benchmark details. Please try again later.", ToastType.danger);
+          console.log(error);
+          errorMessage.value = "Failed to load CPU Benchmark details. Please try again later.";
         } finally {
           loading.value = false;
         }
@@ -65,6 +66,7 @@ export default {
     return {
       cpuBenchmark,
       loading,
+      errorMessage,
     };
   },
 };
