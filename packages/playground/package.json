@@ -15,6 +15,7 @@
     "@threefold/graphql_client": "^2.3.0-alpha9",
     "@threefold/grid_client": "^2.3.0-alpha9",
     "@threefold/gridproxy_client": "^2.3.0-alpha9",
+    "@threefold/types": "^2.3.0-alpha9",
     "bip39": "^3.1.0",
     "chart.js": "^4.4.0",
     "cryptr": "^6.2.0",
