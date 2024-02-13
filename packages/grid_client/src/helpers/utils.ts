@@ -1,6 +1,7 @@
 import { mnemonicToMiniSecret } from "@polkadot/util-crypto";
 import { validateMnemonic } from "bip39";
 import { Buffer } from "buffer";
+import * as crypto from "crypto";
 import nacl, { randomBytes } from "tweetnacl";
 import utils from "tweetnacl-util";
 
@@ -53,6 +54,15 @@ function formatErrorMessage(prefix: string, error: Error) {
   return `${prefix}\n\t ${error.message}`;
 }
 
+function generateRandomHexSeed(length: number) {
+  const bytes = crypto.randomBytes(length);
+  return bytes.toString("hex");
+}
+
+function zeroPadding(length: number, num: number) {
+  return num.toString(16).padStart(length, "0");
+}
+
 export {
   generateString,
   getRandomNumber,
@@ -63,4 +73,6 @@ export {
   log,
   toHexSeed,
   formatErrorMessage,
+  generateRandomHexSeed,
+  zeroPadding,
 };

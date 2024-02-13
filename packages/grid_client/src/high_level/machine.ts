@@ -2,8 +2,8 @@ import { GridClientErrors, ValidationError } from "@threefold/types";
 import { Addr } from "netaddr";
 
 import { events } from "../helpers/events";
-import { randomChoice } from "../helpers/utils";
-import { validateHexSeed, zeroPadding } from "../helpers/validator";
+import { randomChoice, zeroPadding } from "../helpers/utils";
+import { validateHexSeed } from "../helpers/validator";
 import { DiskModel, MyceliumNetworkModel, QSFSDiskModel } from "../modules/models";
 import { qsfs_zdbs } from "../modules/qsfs_zdbs";
 import {
