@@ -17,7 +17,7 @@ This configuration is set on [workload data](../../src/zos/zmachine.ts) and [net
 In case user needs to support mycelium:
 
 - flag `mycelium` field in workload with true, also the `planetary` field should be flagged with true.
-- User can support hex seed which ip will be generated from or they'll be generated automatic.
+- User can support hex seed which ip will be generated from or they'll be generated automatically.
 - providing seeds, that's what makes ip fixed from anywhere.
   > Note user can't use same network seed in multiple nodes.
 
@@ -65,7 +65,7 @@ const vms: MachinesModel = {
 };
 ```
 
-- User can deploy vm without mycelium, then add machine on same network requesting mycelium.
+- User can deploy vm without mycelium, then add machine on the same network requesting mycelium.
 
 ```ts
 const vms: MachinesModel = {
