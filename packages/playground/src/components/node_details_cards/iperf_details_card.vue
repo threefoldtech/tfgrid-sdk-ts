@@ -62,7 +62,9 @@ export default {
       const res = await gridStore.grid.zos.getNodeIPerfTest({ nodeId: props.node.nodeId });
       // filter the returned result to show node other than the one being tested against
       const array = res.result
-        .filter((node: any) => !node.error && node.node_id !== props.node.nodeId)
+        .filter(
+          (node: any) => node.download_speed && node.upload_speed && !node.error && node.node_id !== props.node.nodeId,
+        )
         .map(node => ({
           name: node.test_type.toLocaleUpperCase(),
           type: isIPv4(node.node_ip) ? "IPv4" : "IPv6",
