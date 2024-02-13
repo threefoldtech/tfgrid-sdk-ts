@@ -168,7 +168,14 @@ export async function loadK8s(grid: GridClient) {
     }
 
     try {
-      const clusterPromise = grids[index].k8s.getObj(name);
+      const clusterPromise = grids[index].k8s.getObj(name).then(res => {
+        if (!projectName && res.masters.length === 0) {
+          grids[index] = updateGrid(grids[index], { projectName: "" });
+          return grids[index].k8s.getObj(name);
+        }
+
+        return res;
+      });
       const timeoutPromise = new Promise((resolve, reject) => {
         setTimeout(() => {
           reject(new Error("Timeout"));
