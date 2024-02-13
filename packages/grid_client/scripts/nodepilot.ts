@@ -81,13 +81,13 @@ async function main() {
   };
 
   //Deploy nodepilot
-  await deploy(grid3, vms);
+  // await deploy(grid3, vms);
 
   //Get the deployment
-  await getDeployment(grid3, vms.name);
+  // await getDeployment(grid3, vms.name);
 
   //Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name: vms.name });
+  await cancel(grid3, { name: vms.name });
 
   await grid3.disconnect();
 }

@@ -76,6 +76,7 @@ async function main() {
           PRESEARCH_REGISTRATION_CODE: "e5083a8d0a6362c6cf7a3078bfac81e3",
           PRESEARCH_BACKUP_PRI_KEY: "",
           PRESEARCH_BACKUP_PUB_KEY: "",
+          PRESEARCH_WEBSERVER_HOSTNAME: "gent01.dev.grid.tf",
         },
       },
     ],
@@ -84,13 +85,13 @@ async function main() {
   };
 
   //Deploy presearch
-  await deploy(grid3, vms);
+  // await deploy(grid3, vms);
 
   //Get the deployment
-  await getDeployment(grid3, vms.name);
+  // await getDeployment(grid3, vms.name);
 
   //Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name: vms.name });
+  await cancel(grid3, { name: vms.name });
 
   await grid3.disconnect();
 }

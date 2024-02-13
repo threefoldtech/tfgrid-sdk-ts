@@ -81,7 +81,7 @@ async function main() {
       },
     ],
     metadata: "",
-    description: "umbrel machine",
+    description: "wordpress machine",
   };
 
   //Deploy umbrel

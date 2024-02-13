@@ -18,7 +18,7 @@ async function getDeployment(client, vms) {
     const res = await client.machines.getObj(vms);
     log("================= Getting deployment information =================");
     log(res);
-    log(`You can access Taiga via the browser using: http://captain.${res[0].env.CAPROVER_ROOT_DOMAIN}`);
+    log(`You can access Taiga via the browser using: http://captain.${res[0].env.DOMAIN_NAME}`);
     log("================= Getting deployment information =================");
   } catch (error) {
     log("Error while getting the deployment " + error);
@@ -73,7 +73,7 @@ async function main() {
         entrypoint: "/sbin/zinit init",
         env: {
           SSH_KEY: config.ssh_key,
-          DOMAIN_NAME: "domain",
+          DOMAIN_NAME: "gent02.dev.grid.tf",
           ADMIN_USERNAME: "test1",
           ADMIN_PASSWORD: "123456",
           ADMIN_EMAIL: "test123@gmail.com",

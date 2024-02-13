@@ -1,6 +1,6 @@
 {
-  "network": "dev",
-  "mnemonic": "",
+  "network": "qa",
+  "mnemonic": "upon crystal cake ozone arrest cluster fan sea mistake lyrics wait flat",
   "storeSecret": "",
-  "ssh_key": ""
+  "ssh_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDOGC+q4UFmijIba/GOP3wbuGGEtd+AwKxw3sFcgcz/AV5dri6GSI36bQEC3Kv+GatRRI3y0PqyciqKmZrnjfON//LKd/5kQOLtz8VHY6FCan3aj+jtpB8r85bIJgw7PyMR7cyJ47RDQsIndehcQLiJcnmOmmmYbLITGoJXFSzlNMN1NlJaCXQszX+tE8kzcse+0xqB4CM9pJNfEnBgAVCygPZeiLgU/mytear+LtGWMoMl9Bkx2CzmPQfWPsq4Svh4Nb3I9BIfnLOB0o3bEM3LqlcuNkS46nPf0ehHIqSOHYpwtL9ryH3PdNpnvxyZD3a7EIbC1fINUsA2W50hoJINm/Tu04MF9GDqeWO1ZCj/lfUPTm+XgaWk0shUlcXJ4iqMprNgD2E3tNNEVMywJ2tJacdl8dJzQG4M+/3TqUx4vpgc1fFJSPSW0SxvPdZ2Gmqh4hGMgcg0kg+Gq4m/u6iW6q7QpdWe/ODLm7zbQ9hodtKVWFMUuugF49ahewyGSG0= khaledyoussef@Khaleds-Air"
 }

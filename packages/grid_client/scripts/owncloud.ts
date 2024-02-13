@@ -75,7 +75,7 @@ async function main() {
           SSH_KEY: config.ssh_key,
           OWNCLOUD_ADMIN_USERNAME: "test1",
           OWNCLOUD_ADMIN_PASSWORD: "123456",
-          OWNCLOUD_DOMAIN: "domain",
+          OWNCLOUD_DOMAIN: "gent01.dev.grid.tf",
         },
       },
     ],
@@ -83,10 +83,10 @@ async function main() {
     description: "owncloud deployment machine",
   };
 
-  // Deploy OwnCloud
+  // // Deploy OwnCloud
   await deploy(grid3, vms);
 
-  // Get the deployment
+  // // Get the deployment
   await getDeployment(grid3, vms.name);
 
   // Uncomment the line below to cancel the deployment

@@ -73,7 +73,7 @@ async function main() {
         entrypoint: "/sbin/zinit init",
         env: {
           SSH_KEY: config.ssh_key,
-          CASPERLABS_HOSTNAME: "",
+          CASPERLABS_HOSTNAME: "gent01.dev.grid.tf",
         },
       },
     ],
@@ -88,9 +88,9 @@ async function main() {
   await getDeployment(grid3, vms.name);
 
   //Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name: vms.name });
+  await cancel(grid3, { name: vms.name });
 
-  await grid3.disconnect();
+  // await grid3.disconnect();
 }
 
 main();

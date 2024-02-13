@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="0" failures="0" errors="1" time="2.339">
+  <testsuite name="tests/modules/casperlabs.test.ts" errors="1" failures="0" skipped="0" timestamp="1970-01-01T00:00:00" time="0" tests="0">
+    <testcase classname="Test suite failed to run" name="tests/modules/casperlabs.test.ts" time="0">
+      <error>  ● Test suite failed to run
+
+    src/storage/pkid.ts:44:52 - error TS2341: Property &apos;keyPair&apos; is private and only accessible within class &apos;Pkid&apos;.
+
+    44     const value = await this.pkid.getDoc(this.pkid.keyPair.publicKey, key);
+                                                          ~~~~~~~
+</error>
+    </testcase>
+    <testcase classname="Test suite failed to run" name="tests/modules/casperlabs.test.ts" time="0">
+      <failure>{&quot;diagnosticText&quot;:&quot;\u001b[96msrc/storage/pkid.ts\u001b[0m:\u001b[93m44\u001b[0m:\u001b[93m52\u001b[0m - \u001b[91merror\u001b[0m\u001b[90m TS2341: \u001b[0mProperty &apos;keyPair&apos; is private and only accessible within class &apos;Pkid&apos;.\n\n\u001b[7m44\u001b[0m     const value = await this.pkid.getDoc(this.pkid.keyPair.publicKey, key);\n\u001b[7m  \u001b[0m \u001b[91m                                                   ~~~~~~~\u001b[0m\n&quot;,&quot;diagnosticCodes&quot;:[2341]}</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

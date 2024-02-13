@@ -18,7 +18,7 @@ async function getDeployment(client, vms) {
     const res = await client.machines.getObj(vms);
     log("================= Getting deployment information =================");
     log(res);
-    log(`You can access mattermost via the browser using: http://captain.${res[0].env.CAPROVER_ROOT_DOMAIN}`);
+    log(`You can access mattermost via the browser using: http://captain.${res[0].env.MATTERMOST_DOMAIN}`);
     log("================= Getting deployment information =================");
   } catch (error) {
     log("Error while getting the deployment " + error);
@@ -69,13 +69,13 @@ async function main() {
         cpu: 4,
         memory: 1024 * 4,
         rootfs_size: 0,
-        flist: "https://hub.grid.tf/tf-official-apps/funkwhale-v3.1.1.flist",
+        flist: "https://hub.grid.tf/tf-official-apps/mattermost-latest.flist",
         entrypoint: "/sbin/zinit init",
         env: {
-            SSH_KEY: config.ssh_key,
-            MATTERMOST_DOMAIN:"gent02.dev.grid.tf",
-            SITE_URL:"",
-            DB_PASSWORD:"",
+          SSH_KEY: config.ssh_key,
+          MATTERMOST_DOMAIN: "gent02.dev.grid.tf",
+          SITE_URL: "https://gent02.dev.grid.tf",
+          DB_PASSWORD: "",
         },
       },
     ],
