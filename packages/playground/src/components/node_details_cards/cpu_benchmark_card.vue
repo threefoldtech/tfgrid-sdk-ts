@@ -1,6 +1,5 @@
 <template>
   <card-details
-    v-if="node.healthy"
     :loading="loading"
     title="CPU Benchmark"
     :items="cpuBenchmark"
@@ -14,7 +13,6 @@ import type { GridNode } from "@threefold/gridproxy_client";
 import { onMounted, type PropType, ref } from "vue";
 
 import type { CPUBenchmark, NodeDetailsCard } from "@/types";
-import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import { useGrid } from "../../stores";
 import CardDetails from "./card_details.vue";
@@ -51,10 +49,6 @@ export default {
     };
 
     onMounted(async () => {
-      if (!gridStore.grid) {
-        errorMessage.value = "Unable to load CPU Benchmark details; please connect your wallet and try again.";
-        return;
-      }
       if (props.node.healthy) {
         try {
           errorMessage.value = "";

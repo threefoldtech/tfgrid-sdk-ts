@@ -1,6 +1,5 @@
 <template>
   <card-details
-    v-if="node.healthy"
     :iperf="true"
     :loading="loading"
     title="Network Speed Test"
@@ -15,7 +14,6 @@ import type { GridNode } from "@threefold/gridproxy_client";
 import { onMounted, type PropType, ref } from "vue";
 
 import type { NodeDetailsCard } from "@/types";
-import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import { useGrid } from "../../stores";
 import formatResourceSize from "../../utils/format_resource_size";
@@ -37,10 +35,6 @@ export default {
     const IperfDetails = ref<NodeDetailsCard[]>();
     const errorMessage = ref("");
     onMounted(async () => {
-      if (!gridStore.grid) {
-        errorMessage.value = "Unable to load  IPerf details; please connect your wallet and try again.";
-        return;
-      }
       if (props.node.healthy) {
         errorMessage.value = "";
         try {
