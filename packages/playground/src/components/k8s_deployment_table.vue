@@ -59,7 +59,9 @@
 
     <AccessDeploymentAlert />
 
-    <VSwitch inset color="primary" label="Show All Deployments" v-model="showAllDeployments" />
+    <InputTooltip tooltip="List all deployments, including those created outside the Dashboard." inline>
+      <VSwitch inset color="primary" label="Show All Deployments" v-model="showAllDeployments" />
+    </InputTooltip>
 
     <ListTable
       :headers="[
