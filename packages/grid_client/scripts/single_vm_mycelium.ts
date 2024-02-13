@@ -31,12 +31,12 @@ async function main() {
     network: {
       name: "hellotest",
       ip_range: "10.249.0.0/16",
-      myceliumSeeds: [
-        {
-          nodeId: 168,
-          seed: "050d109829d8492d48bfb33b711056080571c69e46bfde6b4294c4c5bf468a76",
-        },
-      ],
+      // myceliumSeeds: [
+      //   {
+      //     nodeId: 168,
+      //     seed: "050d109829d8492d48bfb33b711056080571c69e46bfde6b4294c4c5bf468a76", //(HexSeed of length 32)
+      //   },
+      // ],
     },
     machines: [
       {
@@ -53,7 +53,7 @@ async function main() {
         public_ip6: false,
         planetary: true,
         mycelium: true,
-        myceliumSeed: "1e1404279b3d",
+        // myceliumSeed: "1e1404279b3d", //(HexSeed of length 6)
         cpu: 1,
         memory: 1024 * 2,
         rootfs_size: 0,

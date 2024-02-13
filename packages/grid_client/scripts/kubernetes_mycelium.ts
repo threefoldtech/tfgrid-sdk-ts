@@ -33,20 +33,20 @@ async function main() {
       name: "monNetwork",
       ip_range: "10.238.0.0/16",
       addAccess: true,
-      myceliumSeeds: [
-        {
-          nodeId: 153,
-          seed: "Hex Seed of length 32", // a5f0ea16a744af2c0c23fc878d727a6f355079f82d979ad4bc75dd8fb5ebc90e
-        },
-        {
-          nodeId: 31,
-          seed: "Hex Seed of length 32", //7edd9c250f834cb326c3cf116040cf2214f38c669bf27a72e2f5b9e44fc7b27e
-        },
-        {
-          nodeId: 177,
-          seed: "Hex Seed of length 32", //3162379d1d2530e2113ae2c7142370cc195628238fa1059f2f25ef51c113e892
-        },
-      ],
+      // myceliumSeeds: [
+      //   {
+      //     nodeId: 153,
+      //     seed: "a5f0ea16a744af2c0c23fc878d727a6f355079f82d979ad4bc75dd8fb5ebc90e", //(HexSeed of length 32)
+      //   },
+      //   {
+      //     nodeId: 31,
+      //     seed: "7edd9c250f834cb326c3cf116040cf2214f38c669bf27a72e2f5b9e44fc7b27e", //(HexSeed of length 32)
+      //   },
+      //   {
+      //     nodeId: 177,
+      //     seed: "3162379d1d2530e2113ae2c7142370cc195628238fa1059f2f25ef51c113e892", //(HexSeed of length 32)
+      //   },
+      // ],
     },
     masters: [
       {
@@ -60,7 +60,7 @@ async function main() {
         public_ip6: false,
         planetary: true,
         mycelium: true,
-        myceliumSeed: "Hex Seed of length 6", //1791fed39e0f
+        // myceliumSeed: "1791fed39e0f", //(HexSeed of length 6)
       },
     ],
     workers: [
@@ -75,7 +75,7 @@ async function main() {
         public_ip6: false,
         planetary: true,
         mycelium: true,
-        myceliumSeed: "Hex Seed of length 6", //580bafd349f5
+        // myceliumSeed: "580bafd349f5", //(HexSeed of length 6)
       },
       {
         name: "worker2",
@@ -88,7 +88,7 @@ async function main() {
         public_ip6: false,
         planetary: true,
         mycelium: true,
-        myceliumSeed: "Hex Seed of length 6", //0378c83a7e1f
+        // myceliumSeed: "0378c83a7e1f", //(HexSeed of length 6)
       },
     ],
     metadata: "",
