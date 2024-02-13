@@ -61,7 +61,13 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
       return;
     }
 
-    const machinePromise = grids[index].machines.getObj(name);
+    const machinePromise = grids[index].machines.getObj(name).then(res => {
+      if (!projectName && (!Array.isArray(res) || res.length === 0)) {
+        grids[index] = updateGrid(grids[index], { projectName: "" });
+        return grids[index].machines.getObj(name);
+      }
+      return res;
+    });
     const timeoutPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
         reject(new Error("Timeout"));
@@ -169,7 +175,7 @@ export async function loadK8s(grid: GridClient) {
 
     try {
       const clusterPromise = grids[index].k8s.getObj(name).then(res => {
-        if (!projectName && res.masters.length === 0) {
+        if (!projectName && res && res.masters && res.masters.length === 0) {
           grids[index] = updateGrid(grids[index], { projectName: "" });
           return grids[index].k8s.getObj(name);
         }
