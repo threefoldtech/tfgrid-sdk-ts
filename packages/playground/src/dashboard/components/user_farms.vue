@@ -205,7 +205,6 @@ export default {
     const refreshPublicIPs = ref(false);
 
     const reloadFarms = debounce(getUserFarms, 20000);
-    // context.expose({ reloadFarms });
     function filter(items: Farm[]) {
       const start = (page.value - 1) * pageSize.value;
       const end = start + pageSize.value;
