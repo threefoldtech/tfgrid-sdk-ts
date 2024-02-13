@@ -36,15 +36,15 @@ async function main() {
       myceliumSeeds: [
         {
           nodeId: 153,
-          seed: "a5f0ea16a744af2c0c23fc878d727a6f355079f82d979ad4bc75dd8fb5ebc90e",
+          seed: "Hex Seed of length 32", // a5f0ea16a744af2c0c23fc878d727a6f355079f82d979ad4bc75dd8fb5ebc90e
         },
         {
           nodeId: 31,
-          seed: "7edd9c250f834cb326c3cf116040cf2214f38c669bf27a72e2f5b9e44fc7b27e",
+          seed: "Hex Seed of length 32", //7edd9c250f834cb326c3cf116040cf2214f38c669bf27a72e2f5b9e44fc7b27e
         },
         {
           nodeId: 177,
-          seed: "3162379d1d2530e2113ae2c7142370cc195628238fa1059f2f25ef51c113e892",
+          seed: "Hex Seed of length 32", //3162379d1d2530e2113ae2c7142370cc195628238fa1059f2f25ef51c113e892
         },
       ],
     },
@@ -60,7 +60,7 @@ async function main() {
         public_ip6: false,
         planetary: true,
         mycelium: true,
-        myceliumSeed: "1791fed39e0f",
+        myceliumSeed: "Hex Seed of length 6", //1791fed39e0f
       },
     ],
     workers: [
@@ -75,7 +75,7 @@ async function main() {
         public_ip6: false,
         planetary: true,
         mycelium: true,
-        myceliumSeed: "580bafd349f5",
+        myceliumSeed: "Hex Seed of length 6", //580bafd349f5
       },
       {
         name: "worker2",
@@ -88,7 +88,7 @@ async function main() {
         public_ip6: false,
         planetary: true,
         mycelium: true,
-        myceliumSeed: "0378c83a7e1f",
+        myceliumSeed: "Hex Seed of length 6", //0378c83a7e1f
       },
     ],
     metadata: "",
