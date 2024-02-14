@@ -227,6 +227,7 @@
 </template>
 
 <script lang="ts">
+import { FailedToFreeIPs } from "@threefold/types/dist/errors/tfchain/smart_contract";
 import { onMounted, type PropType, ref } from "vue";
 
 import { useProfileManager } from "../stores";
@@ -303,6 +304,7 @@ export default {
           name: networkName,
           ipRange: `${x}.${y}.0.0/16`,
           nodeId: selectionDetails.value!.domain!.selectedDomain!.nodeId,
+          mycelium: false,
         };
 
         const hasNode = await grid!.networks.hasNode(data);
