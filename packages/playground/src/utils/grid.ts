@@ -103,6 +103,7 @@ export async function loadProfile(grid: GridClient): Promise<Profile> {
     relay: grid.getDefaultUrls(network).relay.slice(6),
     pk: (await grid.twins.get({ id: grid!.twinId })).pk,
     keypairType: grid.clientOptions!.keypairType,
+    email: await readEmail(grid),
   };
 }
 
@@ -130,6 +131,27 @@ export async function storeSSH(grid: GridClient, newSSH: string): Promise<void> 
     value: JSON.stringify({
       ...metadata,
       sshkey: newSSH,
+    }),
+  });
+}
+
+export async function readEmail(grid: GridClient): Promise<string> {
+  const metadata = await getMetadata(grid);
+  console.log(metadata.email);
+
+  return metadata.email || "";
+}
+
+export async function storeEmail(grid: GridClient, newEmail: string): Promise<void> {
+  const metadata = await getMetadata(grid);
+  const email = metadata.email;
+  if (email === newEmail) return;
+
+  return grid.kvstore.set({
+    key: "metadata",
+    value: JSON.stringify({
+      ...metadata,
+      email: newEmail,
     }),
   });
 }

@@ -57,6 +57,50 @@
               </v-row>
               <v-row class="row-style">
                 <v-col cols="1" sm="2" style="min-width: fit-content">
+                  <v-list-item> E-mail :</v-list-item>
+                </v-col>
+                <v-col cols="11" sm="10">
+                  <v-list-item v-if="!editEmail">
+                    <div style="display: flex; justify-content: space-between">
+                      {{ profileManager.profile?.email ? profileManager.profile?.email : "None" }}
+                      <v-icon @click="editEmail = true">mdi-pencil</v-icon>
+                    </div>
+                  </v-list-item>
+
+                  <v-list-item v-if="editEmail">
+                    <v-form style="display: flex; justify-content: space-between" v-model="isValid">
+                      <input-validator
+                        :value="email"
+                        :rules="[
+                          validators.required('Email is required.'),
+                          validators.isEmail('Please provide a valid email address.'),
+                        ]"
+                        #="{ props }"
+                      >
+                        <v-text-field
+                          class="mr-2"
+                          placeholder="email@example.com"
+                          v-model="email"
+                          v-bind="props"
+                          :loading="loading"
+                          autofocus
+                        />
+                      </input-validator>
+                      <v-btn
+                        type="submit"
+                        icon="mdi-content-save-all"
+                        class="mt-2"
+                        variant="text"
+                        :disabled="!isValid"
+                        @click="saveEmail"
+                      >
+                      </v-btn>
+                    </v-form>
+                  </v-list-item>
+                </v-col>
+              </v-row>
+              <v-row class="row-style">
+                <v-col cols="1" sm="2" style="min-width: fit-content">
                   <v-list-item> Address : </v-list-item>
                 </v-col>
                 <v-col>
@@ -142,7 +186,8 @@ import { useProfileManager } from "../stores";
 import type { FarmInterface } from "../types";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getFarms } from "../utils/get_farms";
-import { getGrid } from "../utils/grid";
+import { getGrid, readEmail, storeEmail } from "../utils/grid";
+
 const profileManager = useProfileManager();
 
 const editingTwin = ref(false);
@@ -154,6 +199,10 @@ const numberOfProposalsToVoteOn = ref(0);
 const userFarms = ref<FarmInterface[]>();
 const activeProposalsUserHasVotedOn = ref(0);
 const bridge = (window as any).env.BRIDGE_TFT_ADDRESS;
+const email = ref("");
+const loading = ref<boolean>(false);
+const editEmail = ref<boolean>(false);
+const isValid = ref<boolean>(false);
 
 const apps = [
   {
@@ -170,7 +219,6 @@ const apps = [
 onMounted(async () => {
   const profile = profileManager.profile!;
   const grid = await getGrid(profile);
-
   if (!grid) {
     createCustomToast("Fetch Grid Failed", ToastType.danger);
 
@@ -206,6 +254,19 @@ onMounted(async () => {
 
 function redirectToDao() {
   router.push({ path: "/tf-chain/dao" });
+}
+
+async function saveEmail() {
+  const grid = await getGrid(profileManager.profile!);
+  try {
+    loading.value = true;
+    await storeEmail(grid!, email.value);
+    profileManager.profile!.email = await readEmail(grid!);
+    editEmail.value = false;
+    loading.value = false;
+  } catch (e) {
+    console.log(e);
+  }
 }
 onMounted(validateEdit);
 async function validateEdit() {

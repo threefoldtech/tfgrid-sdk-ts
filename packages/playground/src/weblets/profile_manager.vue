@@ -263,6 +263,19 @@
                   You will need to provide the password used while connecting your wallet.
                 </p>
               </v-alert>
+
+              <input-validator
+                v-if="activeTab === 1"
+                :value="email"
+                :rules="[
+                  validators.required('Email is required.'),
+                  validators.isEmail('Please provide a valid email address.'),
+                ]"
+                #="{ props }"
+              >
+                <v-text-field label="Email" placeholder="email@example.com" v-model="email" v-bind="props" />
+              </input-validator>
+
               <PasswordInputWrapper #="{ props: passwordInputProps }">
                 <InputValidator
                   :value="password"
@@ -354,6 +367,9 @@
               <VTextField label="Twin ID" readonly v-model="profileManager.profile.twinId" v-bind="props" />
             </CopyInputWrapper>
 
+            <CopyInputWrapper v-if="profileManager.profile.email" :data="profileManager.profile.email" #="{ props }">
+              <VTextField label="Email" readonly v-model="profileManager.profile.email" v-bind="props" />
+            </CopyInputWrapper>
             <CopyInputWrapper :data="profileManager.profile.address" #="{ props }">
               <VTextField label="Address" readonly v-model="profileManager.profile.address" v-bind="props" />
             </CopyInputWrapper>
@@ -431,6 +447,7 @@ import { useOnline } from "../hooks";
 import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
 import { activateAccountAndCreateTwin, createAccount, getGrid, loadBalance, loadProfile } from "../utils/grid";
+import { storeEmail } from "../utils/grid";
 import { normalizeBalance, normalizeError } from "../utils/helpers";
 const items = ref([{ id: 1, name: "stellar" }]);
 const depositWallet = ref("");
@@ -441,6 +458,7 @@ interface Credentials {
   passwordHash?: string;
   mnemonicHash?: string;
   keypairTypeHash?: string;
+  emailHash?: string;
 }
 const keyType = ["sr25519", "ed25519"];
 const keypairType = ref(KeypairType.sr25519);
@@ -547,11 +565,17 @@ function getCredentials() {
   return credentials;
 }
 
-function setCredentials(passwordHash: string, mnemonicHash: string, keypairTypeHash: string): Credentials {
+function setCredentials(
+  passwordHash: string,
+  mnemonicHash: string,
+  keypairTypeHash: string,
+  emailHash: string,
+): Credentials {
   const credentials: Credentials = {
     passwordHash,
     mnemonicHash,
     keypairTypeHash,
+    emailHash,
   };
   localStorage.setItem(WALLET_KEY, JSON.stringify(credentials));
   return credentials;
@@ -594,6 +618,8 @@ const isValidConnectConfirmationPassword = computed(() =>
 const profileManagerController = useProfileManagerController();
 
 const balance = profileManagerController.balance;
+
+const email = ref("");
 
 const activeTab = ref(0);
 const password = ref("");
@@ -656,6 +682,7 @@ function clearFields() {
   password.value = "";
   confirmPassword.value = "";
   mnemonic.value = "";
+  email.value = "";
 }
 
 function reloadValidation() {
@@ -785,11 +812,13 @@ function login() {
   }
 }
 
-function storeAndLogin() {
+async function storeAndLogin() {
   const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
   const mnemonicHash = cryptr.encrypt(mnemonic.value);
   const keypairTypeHash = cryptr.encrypt(keypairType.value);
-  setCredentials(md5(password.value), mnemonicHash, keypairTypeHash);
+  const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
+  await storeEmail(grid!, email.value);
+  setCredentials(md5(password.value), mnemonicHash, keypairTypeHash, md5(email.value));
   activate(mnemonic.value, keypairType.value);
 }
 
