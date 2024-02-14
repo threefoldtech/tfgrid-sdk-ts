@@ -79,7 +79,7 @@
             item.value.masters[0].message
           }}</v-tooltip>
           <span>
-            {{ capitalize(getNodeHealthColor(item.value.masters[0].status as string).type) }}
+            {{ getNodeHealthColor(item.value.masters[0].status as string).type }}
           </span>
         </v-chip>
       </template>
