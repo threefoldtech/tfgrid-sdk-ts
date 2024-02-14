@@ -78,7 +78,7 @@
           <v-tooltip v-if="item.value.masters[0].status == NodeHealth.Error" activator="parent" location="top">{{
             item.value.masters[0].message
           }}</v-tooltip>
-          <span>
+          <span class="text-uppercase">
             {{ getNodeHealthColor(item.value.masters[0].status as string).type }}
           </span>
         </v-chip>
