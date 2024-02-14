@@ -1,6 +1,6 @@
 {
   "name": "@threefold/playground",
-  "version": "2.3.0-alpha9",
+  "version": "2.3.0-alpha10",
   "private": true,
   "scripts": {
     "dev": "vite",
@@ -12,10 +12,11 @@
   },
   "dependencies": {
     "@mdi/font": "^7.2.96",
-    "@threefold/graphql_client": "^2.3.0-alpha9",
-    "@threefold/grid_client": "^2.3.0-alpha9",
-    "@threefold/gridproxy_client": "^2.3.0-alpha9",
-    "@threefold/types": "^2.3.0-alpha9",
+    "@threefold/graphql_client": "^2.3.0-alpha10",
+    "@threefold/grid_client": "^2.3.0-alpha10",
+    "@threefold/gridproxy_client": "^2.3.0-alpha10",
+    "@threefold/types": "^2.3.0-alpha10",
+    "await-lock": "^2.2.2",
     "bip39": "^3.1.0",
     "chart.js": "^4.4.0",
     "cryptr": "^6.2.0",
@@ -24,6 +25,7 @@
     "get-ip-range": "^4.0.1",
     "highlight.js": "^11.7.0",
     "lodash": "^4.17.21",
+    "logger-interceptor": "1.0.0",
     "marked": "^5.0.4",
     "md5": "^2.3.0",
     "moment": "^2.29.4",
@@ -34,12 +36,10 @@
     "vue": "^3.2.47",
     "vue-chartjs": "^5.2.0",
     "vue-router": "^4.1.6",
+    "vue3-virtual-scroller": "^0.2.3",
     "vuetify": "^3.1.15",
     "web-ssh-keygen": "^0.1.2",
-    "zod": "^3.22.4",
-    "logger-interceptor": "1.0.0",
-    "await-lock": "^2.2.2",
-    "vue3-virtual-scroller": "^0.2.3"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/chart.js": "^2.9.38",
