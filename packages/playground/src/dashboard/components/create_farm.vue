@@ -93,13 +93,6 @@ export default {
     async function createFarm() {
       try {
         isCreating.value = true;
-        const names = props.userFarms.getFarmsNames();
-        if (names.includes(props.name.toLocaleLowerCase())) {
-          createCustomToast("Failed to create farm, name already exists.", ToastType.danger);
-          isCreating.value = false;
-          return;
-        }
-
         await gridStore.grid.farms.create({ name: props.name });
         createCustomToast("Farm created successfully.", ToastType.success);
         notifyDelaying();
@@ -115,6 +108,10 @@ export default {
     function validateFarmName(name: string) {
       if (!name.split("").every((c: string) => /[a-zA-Z0-9\-_]/.test(c))) {
         return { message: "Farm name can only contain alphabetic letters, numbers, '-' or '_'" };
+      }
+      const names = props.userFarms.getFarmsNames();
+      if (names.includes(props.name.toLocaleLowerCase())) {
+        return { message: "Farm name already exists!" };
       }
     }
     return {
