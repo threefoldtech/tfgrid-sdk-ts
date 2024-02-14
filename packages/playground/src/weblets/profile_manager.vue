@@ -192,7 +192,7 @@
                         </v-col>
                       </v-row>
 
-                      <div class="d-flex justify-end mb-10">
+                      <div class="d-flex flex-column flex-md-row justify-end mb-10">
                         <v-tooltip>
                           <template v-slot:activator="{ isActive, props }">
                             <VBtn
@@ -830,6 +830,13 @@ export default {
 @media only screen and (max-width: 1400px) {
   .app-btn {
     width: 8rem !important;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  html,
+  .v-btn {
+    font-size: 0.875rem !important;
   }
 }
 </style>
