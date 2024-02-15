@@ -67,6 +67,7 @@ async function main() {
         public_ip: false,
         public_ip6: false,
         planetary: true,
+        mycelium: false,
         cpu: 8,
         memory: 1024 * 16,
         rootfs_size: 0,

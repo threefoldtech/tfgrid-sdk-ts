@@ -7,24 +7,24 @@ export enum Errors {
 }
 
 class KVStoreError extends BaseError {
-  constructor(code: number, message: string) {
-    super(code, message, ErrorModules.TFKVStore);
+  constructor(name: string, code: number, message: string) {
+    super(name, code, message, ErrorModules.TFKVStore);
   }
 }
 export class NoValueStored extends KVStoreError {
   constructor(message: string) {
-    super(Errors.NoValueStored, message);
+    super("NoValueStored", Errors.NoValueStored, message);
   }
 }
 
 export class KeyIsTooLarge extends KVStoreError {
   constructor(message: string) {
-    super(Errors.NoValueStored, message);
+    super("KeyIsTooLarge", Errors.NoValueStored, message);
   }
 }
 
 export class ValueIsTooLarge extends KVStoreError {
   constructor(message: string) {
-    super(Errors.ValueIsTooLarge, message);
+    super("ValueIsTooLarge", Errors.ValueIsTooLarge, message);
   }
 }

@@ -62,10 +62,11 @@
       </input-tooltip>
     </input-validator>
 
-    <Network
+    <Networks
       v-model:ipv4="$props.modelValue.ipv4"
       v-model:ipv6="$props.modelValue.ipv6"
       v-model:planetary="$props.modelValue.planetary"
+      v-model:mycelium="$props.modelValue.mycelium"
     />
 
     <RootFsSize
@@ -108,6 +109,7 @@
 <script lang="ts">
 import type { PropType } from "vue";
 
+import Networks from "../components/networks.vue";
 import type { K8SWorker } from "../types";
 import rootFs from "../utils/root_fs";
 import { generateName } from "../utils/strings";
@@ -122,6 +124,7 @@ export function createWorker(name: string = generateName({ prefix: "wr" })): K8S
     ipv4: false,
     ipv6: false,
     planetary: true,
+    mycelium: false,
     rootFsSize: 2,
     dedicated: false,
     certified: false,
@@ -131,7 +134,7 @@ export function createWorker(name: string = generateName({ prefix: "wr" })): K8S
 
 export default {
   name: "K8SWorker",
-  components: { RootFsSize },
+  components: { RootFsSize, Networks },
   props: {
     modelValue: {
       type: Object as PropType<K8SWorker>,

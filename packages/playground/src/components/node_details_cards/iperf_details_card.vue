@@ -1,11 +1,11 @@
 <template>
   <card-details
-    v-if="node.healthy"
     :iperf="true"
     :loading="loading"
     title="Network Speed Test"
     :items="IperfDetails"
     icon="mdi-speedometer"
+    :error="errorMessage"
   />
 </template>
 
@@ -14,7 +14,6 @@ import type { GridNode } from "@threefold/gridproxy_client";
 import { onMounted, type PropType, ref } from "vue";
 
 import type { NodeDetailsCard } from "@/types";
-import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import { useGrid } from "../../stores";
 import formatResourceSize from "../../utils/format_resource_size";
@@ -34,14 +33,16 @@ export default {
     const gridStore = useGrid();
     const loading = ref<boolean>(false);
     const IperfDetails = ref<NodeDetailsCard[]>();
-
+    const errorMessage = ref("");
     onMounted(async () => {
       if (props.node.healthy) {
+        errorMessage.value = "";
         try {
           loading.value = true;
           await getNodeIPerfCard();
         } catch (error) {
-          createCustomToast("Failed to load IPerf details. Please try again later.", ToastType.danger);
+          console.log(error);
+          errorMessage.value = "Failed to load IPerf details. Please try again later.";
         } finally {
           loading.value = false;
         }
@@ -61,7 +62,9 @@ export default {
       const res = await gridStore.grid.zos.getNodeIPerfTest({ nodeId: props.node.nodeId });
       // filter the returned result to show node other than the one being tested against
       const array = res.result
-        .filter((node: any) => !node.error && node.node_id !== props.node.nodeId)
+        .filter(
+          (node: any) => node.download_speed && node.upload_speed && !node.error && node.node_id !== props.node.nodeId,
+        )
         .map(node => ({
           name: node.test_type.toLocaleUpperCase(),
           type: isIPv4(node.node_ip) ? "IPv4" : "IPv6",
@@ -75,6 +78,7 @@ export default {
     return {
       IperfDetails,
       loading,
+      errorMessage,
     };
   },
 };

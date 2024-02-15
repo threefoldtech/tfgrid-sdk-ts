@@ -26,133 +26,133 @@ export enum Errors {
 }
 
 class TFTBridge extends BaseError {
-  constructor(code: number, message: string) {
-    super(code, message, ErrorModules.TFTBridge);
+  constructor(name: string, code: number, message: string) {
+    super(name, code, message, ErrorModules.TFTBridge);
   }
 }
 
 export class ValidatorExists extends TFTBridge {
   constructor(message: string) {
-    super(Errors.ValidatorExists, message);
+    super("ValidatorExists", Errors.ValidatorExists, message);
   }
 }
 
 export class ValidatorNotExists extends TFTBridge {
   constructor(message: string) {
-    super(Errors.ValidatorNotExists, message);
+    super("ValidatorNotExists", Errors.ValidatorNotExists, message);
   }
 }
 
 export class TransactionValidatorExists extends TFTBridge {
   constructor(message: string) {
-    super(Errors.TransactionValidatorExists, message);
+    super("TransactionValidatorExists", Errors.TransactionValidatorExists, message);
   }
 }
 
 export class TransactionValidatorNotExists extends TFTBridge {
   constructor(message: string) {
-    super(Errors.TransactionValidatorNotExists, message);
+    super("TransactionValidatorNotExists", Errors.TransactionValidatorNotExists, message);
   }
 }
 
 export class MintTransactionExists extends TFTBridge {
   constructor(message: string) {
-    super(Errors.MintTransactionExists, message);
+    super("MintTransactionExists", Errors.MintTransactionExists, message);
   }
 }
 
 export class MintTransactionAlreadyExecuted extends TFTBridge {
   constructor(message: string) {
-    super(Errors.MintTransactionAlreadyExecuted, message);
+    super("MintTransactionAlreadyExecuted", Errors.MintTransactionAlreadyExecuted, message);
   }
 }
 
 export class MintTransactionNotExists extends TFTBridge {
   constructor(message: string) {
-    super(Errors.MintTransactionNotExists, message);
+    super("MintTransactionNotExists", Errors.MintTransactionNotExists, message);
   }
 }
 
 export class BurnTransactionExists extends TFTBridge {
   constructor(message: string) {
-    super(Errors.BurnTransactionExists, message);
+    super("BurnTransactionExists", Errors.BurnTransactionExists, message);
   }
 }
 
 export class BurnTransactionNotExists extends TFTBridge {
   constructor(message: string) {
-    super(Errors.BurnTransactionNotExists, message);
+    super("BurnTransactionNotExists", Errors.BurnTransactionNotExists, message);
   }
 }
 
 export class BurnSignatureExists extends TFTBridge {
   constructor(message: string) {
-    super(Errors.BurnSignatureExists, message);
+    super("BurnSignatureExists", Errors.BurnSignatureExists, message);
   }
 }
 
 export class EnoughBurnSignaturesPresent extends TFTBridge {
   constructor(message: string) {
-    super(Errors.EnoughBurnSignaturesPresent, message);
+    super("EnoughBurnSignaturesPresent", Errors.EnoughBurnSignaturesPresent, message);
   }
 }
 
 export class RefundSignatureExists extends TFTBridge {
   constructor(message: string) {
-    super(Errors.RefundSignatureExists, message);
+    super("RefundSignatureExists", Errors.RefundSignatureExists, message);
   }
 }
 
 export class BurnTransactionAlreadyExecuted extends TFTBridge {
   constructor(message: string) {
-    super(Errors.BurnTransactionAlreadyExecuted, message);
+    super("BurnTransactionAlreadyExecuted", Errors.BurnTransactionAlreadyExecuted, message);
   }
 }
 
 export class RefundTransactionNotExists extends TFTBridge {
   constructor(message: string) {
-    super(Errors.RefundTransactionNotExists, message);
+    super("RefundTransactionNotExists", Errors.RefundTransactionNotExists, message);
   }
 }
 
 export class RefundTransactionAlreadyExecuted extends TFTBridge {
   constructor(message: string) {
-    super(Errors.RefundTransactionAlreadyExecuted, message);
+    super("RefundTransactionAlreadyExecuted", Errors.RefundTransactionAlreadyExecuted, message);
   }
 }
 
 export class EnoughRefundSignaturesPresent extends TFTBridge {
   constructor(message: string) {
-    super(Errors.EnoughRefundSignaturesPresent, message);
+    super("EnoughRefundSignaturesPresent", Errors.EnoughRefundSignaturesPresent, message);
   }
 }
 
 export class NotEnoughBalanceToSwap extends TFTBridge {
   constructor(message: string) {
-    super(Errors.NotEnoughBalanceToSwap, message);
+    super("NotEnoughBalanceToSwap", Errors.NotEnoughBalanceToSwap, message);
   }
 }
 
 export class AmountIsLessThanWithdrawFee extends TFTBridge {
   constructor(message: string) {
-    super(Errors.AmountIsLessThanWithdrawFee, message);
+    super("AmountIsLessThanWithdrawFee", Errors.AmountIsLessThanWithdrawFee, message);
   }
 }
 
 export class AmountIsLessThanDepositFee extends TFTBridge {
   constructor(message: string) {
-    super(Errors.AmountIsLessThanDepositFee, message);
+    super("AmountIsLessThanDepositFee", Errors.AmountIsLessThanDepositFee, message);
   }
 }
 
 export class WrongParametersProvided extends TFTBridge {
   constructor(message: string) {
-    super(Errors.WrongParametersProvided, message);
+    super("WrongParametersProvided", Errors.WrongParametersProvided, message);
   }
 }
 
 export class InvalidStellarPublicKey extends TFTBridge {
   constructor(message: string) {
-    super(Errors.InvalidStellarPublicKey, message);
+    super("InvalidStellarPublicKey", Errors.InvalidStellarPublicKey, message);
   }
 }

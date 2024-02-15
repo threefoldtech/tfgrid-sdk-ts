@@ -2,8 +2,9 @@ import { GridClientErrors, ValidationError } from "@threefold/types";
 import { Addr } from "netaddr";
 
 import { events } from "../helpers/events";
-import { randomChoice } from "../helpers/utils";
-import { DiskModel, QSFSDiskModel } from "../modules/models";
+import { randomChoice, zeroPadding } from "../helpers/utils";
+import { validateHexSeed } from "../helpers/validator";
+import { DiskModel, MyceliumNetworkModel, QSFSDiskModel } from "../modules/models";
 import { qsfs_zdbs } from "../modules/qsfs_zdbs";
 import {
   DeploymentFactory,
@@ -33,7 +34,10 @@ class VMHL extends HighLevelBase {
     publicIp: boolean,
     publicIp6: boolean,
     planetary: boolean,
+    mycelium: boolean,
+    myceliumSeed: string,
     network: Network,
+    myceliumNetworkSeeds: MyceliumNetworkModel[] = [],
     entrypoint: string,
     env: Record<string, unknown>,
     metadata = "",
@@ -212,10 +216,32 @@ class VMHL extends HighLevelBase {
 
         access_node_id = accessNodeId;
       }
-      access_net_workload = await network.addNode(access_node_id, networkMetadata, description, accessNodeSubnet);
+      access_net_workload = await network.addNode(
+        access_node_id,
+        mycelium,
+        networkMetadata,
+        description,
+        accessNodeSubnet,
+        myceliumNetworkSeeds,
+      );
       wgConfig = await network.addAccess(access_node_id, true);
     }
-    const znet_workload = await network.addNode(nodeId, networkMetadata, description, userIPsubnet);
+    // If node exits on network check if mycelium needs to be added or not
+    if (network.nodeExists(nodeId)) {
+      const deployment = await network.checkMycelium(nodeId, mycelium, myceliumNetworkSeeds);
+      if (deployment) {
+        deployments.push(new TwinDeployment(deployment, Operations.update, 0, 0, network));
+      }
+    }
+
+    const znet_workload = await network.addNode(
+      nodeId,
+      mycelium,
+      networkMetadata,
+      description,
+      userIPsubnet,
+      myceliumNetworkSeeds,
+    );
     if ((await network.exists()) && (znet_workload || access_net_workload)) {
       // update network
       for (const deployment of network.deployments) {
@@ -263,6 +289,22 @@ class VMHL extends HighLevelBase {
     } else {
       machine_ip = network.getFreeIP(nodeId);
     }
+
+    // Validate mycelium seed If provided, if not generate it.
+    if (mycelium) {
+      // Split machine_ip to get last 2 numbers to be used in mycelium hex seed
+      const parts = machine_ip.split("/");
+      const ipPart = parts[0];
+      const ipNumbers = ipPart.split(".").map(part => parseInt(part, 10));
+      const lastTwoNumbers = ipNumbers.slice(-2);
+
+      if (myceliumSeed) {
+        validateHexSeed(myceliumSeed, 6);
+      } else {
+        myceliumSeed = zeroPadding(6, lastTwoNumbers[0]) + zeroPadding(6, lastTwoNumbers[1]);
+      }
+    }
+
     events.emit("logs", `Creating a vm on node: ${nodeId}, network: ${network.name} with private ip: ${machine_ip}`);
     workloads.push(
       vm.create(
@@ -275,6 +317,8 @@ class VMHL extends HighLevelBase {
         network.name,
         machine_ip,
         planetary,
+        mycelium,
+        myceliumSeed,
         ipName,
         entrypoint,
         env,

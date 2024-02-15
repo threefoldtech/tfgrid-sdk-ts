@@ -23,4 +23,12 @@ function validateInput(target, propertyKey: string, descriptor: PropertyDescript
   };
 }
 
-export { validateObject, validateInput };
+function validateHexSeed(seed: string, length: number): boolean {
+  const hexSeedRegex = new RegExp(`^[0-9A-Fa-f]{${length * 2}}$`);
+  if (!hexSeedRegex.test(seed)) {
+    throw new ValidationError(`Invalid seed. It should be a ${length}-character hexadecimal string.`);
+  }
+  return true;
+}
+
+export { validateObject, validateInput, validateHexSeed };

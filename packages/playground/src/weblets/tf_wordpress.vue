@@ -90,7 +90,7 @@
         :large="{ cpu: 4, memory: 16, disk: 100 }"
       />
 
-      <Networks v-model:ipv4="ipv4" />
+      <Networks v-model:ipv4="ipv4" v-model:mycelium="mycelium" />
 
       <input-tooltip
         inline
@@ -154,6 +154,7 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
+const mycelium = ref(false);
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
 
@@ -205,6 +206,7 @@ async function deploy() {
           flist: flist.value,
           entryPoint: flist.entryPoint,
           publicIpv4: ipv4.value,
+          mycelium: mycelium.value,
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "MYSQL_USER", value: username.value },

@@ -109,6 +109,10 @@ export default {
       if (!name.split("").every((c: string) => /[a-zA-Z0-9\-_]/.test(c))) {
         return { message: "Farm name can only contain alphabetic letters, numbers, '-' or '_'" };
       }
+      const names = props.userFarms.getFarmsNames();
+      if (names.includes(props.name.toLocaleLowerCase())) {
+        return { message: "Farm name already exists!" };
+      }
     }
     return {
       showDialogue,

@@ -1,7 +1,7 @@
 <template>
   <VDialog
-    scrollable
-    width="60%"
+    width="1024"
+    class="mx-auto"
     :model-value="$props.modelValue"
     @update:model-value="$emit('update:model-value', $event)"
   >
@@ -131,7 +131,9 @@
                           ) {
                             return;
                           }
-                          return { message: 'Mnemonic or Hex Seed doesn\'t seem to be valid.' };
+                          return {
+                            message: 'Mnemonic or Hex Seed doesn\'t seem to be valid.',
+                          };
                         },
                       ]"
                       :async-rules="[validateMnInput]"
@@ -141,20 +143,37 @@
                       :disable-validation="creatingAccount || activatingAccount || activating"
                     >
                       <v-row>
-                        <v-col cols="10">
+                        <v-col cols="12" md="9">
                           <div v-bind="tooltipProps">
                             <VTextField
                               :append-icon="!enableReload && !activatingAccount && mnemonic !== '' ? 'mdi-reload' : ''"
                               label="Mnemonic or Hex Seed"
                               placeholder="Please insert your Mnemonic or Hex Seed"
                               v-model="mnemonic"
-                              v-bind="{ ...passwordInputProps, ...validationProps }"
+                              v-bind="{
+                                ...passwordInputProps,
+                                ...validationProps,
+                              }"
                               :disabled="creatingAccount || activatingAccount || activating"
                               @click:append="reloadValidation"
-                            />
+                            >
+                              <template v-slot:prepend-inner v-if="mnemonic.length > 0">
+                                <v-icon
+                                  v-if="
+                                    validateMnemonic(mnemonic) ||
+                                    ((mnemonic.length === 64 || mnemonic.length === 66) &&
+                                      isAddress(mnemonic.length === 66 ? mnemonic : `0x${mnemonic}`))
+                                  "
+                                  color="green"
+                                >
+                                  mdi-check
+                                </v-icon>
+                                <v-icon v-else color="red"> mdi-close </v-icon>
+                              </template></VTextField
+                            >
                           </div>
                         </v-col>
-                        <v-col cols="2">
+                        <v-col cols="12" md="3">
                           <v-tooltip
                             location="top"
                             text="Using different keypair types will lead to a completely different account."
@@ -173,7 +192,7 @@
                         </v-col>
                       </v-row>
 
-                      <div class="d-flex justify-end mb-10">
+                      <div class="d-flex flex-column flex-md-row justify-end mb-10">
                         <v-tooltip>
                           <template v-slot:activator="{ isActive, props }">
                             <VBtn
@@ -283,7 +302,10 @@
                   <VTextField
                     label="Confirm Password"
                     v-model="confirmPassword"
-                    v-bind="{ ...confirmPasswordInputProps, ...validationProps }"
+                    v-bind="{
+                      ...confirmPasswordInputProps,
+                      ...validationProps,
+                    }"
                     :disabled="creatingAccount || activatingAccount || activating"
                   />
                 </InputValidator>
@@ -316,8 +338,8 @@
       </DTabs>
 
       <template v-if="profileManager.profile">
-        <v-row class="justify-space-around py-2 pb-5">
-          <v-col cols="7" sm="12" md="12" lg="7">
+        <v-row>
+          <v-col cols="12" sm="6">
             <PasswordInputWrapper #="{ props }">
               <VTextField
                 :label="profileManager.profile.mnemonic.startsWith('0x') ? 'Your Hex Seed' : 'Your Mnemonic'"
@@ -336,9 +358,9 @@
               <VTextField label="Address" readonly v-model="profileManager.profile.address" v-bind="props" />
             </CopyInputWrapper>
           </v-col>
-          <v-divider class="mx-4" vertical></v-divider>
+          <v-divider class="hidden-sm-and-down" vertical></v-divider>
 
-          <v-col cols="12" lg="4">
+          <v-col cols="12" sm="6">
             <section class="d-flex flex-column align-center">
               <p class="mb-4 text-center">
                 Scan the QR code using
@@ -808,6 +830,13 @@ export default {
 @media only screen and (max-width: 1400px) {
   .app-btn {
     width: 8rem !important;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  html,
+  .v-btn {
+    font-size: 0.875rem !important;
   }
 }
 </style>

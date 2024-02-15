@@ -55,318 +55,318 @@ export enum Errors {
   UnauthorizedToSetExtraFee,
 }
 class SmartContractError extends BaseError {
-  constructor(code: number, message: string) {
-    super(code, message, ErrorModules.SmartContract);
+  constructor(name: string, code: number, message: string) {
+    super(name, code, message, ErrorModules.SmartContract);
   }
 }
 export class TwinNotExists extends SmartContractError {
   constructor(message: string) {
-    super(Errors.TwinNotExists, message);
+    super("TwinNotExists", Errors.TwinNotExists, message);
   }
 }
 
 export class NodeNotExists extends SmartContractError {
   constructor(message: string) {
-    super(Errors.NodeNotExists, message);
+    super("NodeNotExists", Errors.NodeNotExists, message);
   }
 }
 
 export class FarmNotExists extends SmartContractError {
   constructor(message: string) {
-    super(Errors.FarmNotExists, message);
+    super("FarmNotExists", Errors.FarmNotExists, message);
   }
 }
 
 export class FarmHasNotEnoughPublicIPs extends SmartContractError {
   constructor(message: string) {
-    super(Errors.FarmHasNotEnoughPublicIPs, message);
+    super("FarmHasNotEnoughPublicIPs", Errors.FarmHasNotEnoughPublicIPs, message);
   }
 }
 
 export class FarmHasNotEnoughPublicIPsFree extends SmartContractError {
   constructor(message: string) {
-    super(Errors.FarmHasNotEnoughPublicIPsFree, message);
+    super("FarmHasNotEnoughPublicIPsFree", Errors.FarmHasNotEnoughPublicIPsFree, message);
   }
 }
 
 export class FailedToReserveIP extends SmartContractError {
   constructor(message: string) {
-    super(Errors.FailedToReserveIP, message);
+    super("FailedToReserveIP", Errors.FailedToReserveIP, message);
   }
 }
 
 export class FailedToFreeIPs extends SmartContractError {
   constructor(message: string) {
-    super(Errors.FailedToFreeIPs, message);
+    super("FailedToFreeIPs", Errors.FailedToFreeIPs, message);
   }
 }
 
 export class ContractNotExists extends SmartContractError {
   constructor(message: string) {
-    super(Errors.ContractNotExists, message);
+    super("ContractNotExists", Errors.ContractNotExists, message);
   }
 }
 
 export class TwinNotAuthorizedToUpdateContract extends SmartContractError {
   constructor(message: string) {
-    super(Errors.TwinNotAuthorizedToUpdateContract, message);
+    super("TwinNotAuthorizedToUpdateContract", Errors.TwinNotAuthorizedToUpdateContract, message);
   }
 }
 
 export class TwinNotAuthorizedToCancelContract extends SmartContractError {
   constructor(message: string) {
-    super(Errors.TwinNotAuthorizedToCancelContract, message);
+    super("TwinNotAuthorizedToCancelContract", Errors.TwinNotAuthorizedToCancelContract, message);
   }
 }
 
 export class NodeNotAuthorizedToDeployContract extends SmartContractError {
   constructor(message: string) {
-    super(Errors.NodeNotAuthorizedToDeployContract, message);
+    super("NodeNotAuthorizedToDeployContract", Errors.NodeNotAuthorizedToDeployContract, message);
   }
 }
 
 export class NodeNotAuthorizedToComputeReport extends SmartContractError {
   constructor(message: string) {
-    super(Errors.NodeNotAuthorizedToComputeReport, message);
+    super("NodeNotAuthorizedToComputeReport", Errors.NodeNotAuthorizedToComputeReport, message);
   }
 }
 
 export class PricingPolicyNotExists extends SmartContractError {
   constructor(message: string) {
-    super(Errors.PricingPolicyNotExists, message);
+    super("PricingPolicyNotExists", Errors.PricingPolicyNotExists, message);
   }
 }
 
 export class ContractIsNotUnique extends SmartContractError {
   constructor(message: string) {
-    super(Errors.ContractIsNotUnique, message);
+    super("ContractIsNotUnique", Errors.ContractIsNotUnique, message);
   }
 }
 
 export class ContractWrongBillingLoopIndex extends SmartContractError {
   constructor(message: string) {
-    super(Errors.ContractWrongBillingLoopIndex, message);
+    super("ContractWrongBillingLoopIndex", Errors.ContractWrongBillingLoopIndex, message);
   }
 }
 
 export class NameExists extends SmartContractError {
   constructor(message: string) {
-    super(Errors.NameExists, message);
+    super("NameExists", Errors.NameExists, message);
   }
 }
 
 export class NameNotValid extends SmartContractError {
   constructor(message: string) {
-    super(Errors.NameNotValid, message);
+    super("NameNotValid", Errors.NameNotValid, message);
   }
 }
 
 export class InvalidContractType extends SmartContractError {
   constructor(message: string) {
-    super(Errors.InvalidContractType, message);
+    super("InvalidContractType", Errors.InvalidContractType, message);
   }
 }
 
 export class TFTPriceValueError extends SmartContractError {
   constructor(message: string) {
-    super(Errors.TFTPriceValueError, message);
+    super("TFTPriceValueError", Errors.TFTPriceValueError, message);
   }
 }
 
 export class NotEnoughResourcesOnNode extends SmartContractError {
   constructor(message: string) {
-    super(Errors.NotEnoughResourcesOnNode, message);
+    super("NotEnoughResourcesOnNode", Errors.NotEnoughResourcesOnNode, message);
   }
 }
 
 export class NodeNotAuthorizedToReportResources extends SmartContractError {
   constructor(message: string) {
-    super(Errors.NodeNotAuthorizedToReportResources, message);
+    super("NodeNotAuthorizedToReportResources", Errors.NodeNotAuthorizedToReportResources, message);
   }
 }
 
 export class MethodIsDeprecated extends SmartContractError {
   constructor(message: string) {
-    super(Errors.MethodIsDeprecated, message);
+    super("MethodIsDeprecated", Errors.MethodIsDeprecated, message);
   }
 }
 
 export class NodeHasActiveContracts extends SmartContractError {
   constructor(message: string) {
-    super(Errors.NodeHasActiveContracts, message);
+    super("NodeHasActiveContracts", Errors.NodeHasActiveContracts, message);
   }
 }
 
 export class NodeHasRentContract extends SmartContractError {
   constructor(message: string) {
-    super(Errors.NodeHasRentContract, message);
+    super("NodeHasRentContract", Errors.NodeHasRentContract, message);
   }
 }
 
 export class FarmIsNotDedicated extends SmartContractError {
   constructor(message: string) {
-    super(Errors.FarmIsNotDedicated, message);
+    super("FarmIsNotDedicated", Errors.FarmIsNotDedicated, message);
   }
 }
 
 export class NodeNotAvailableToDeploy extends SmartContractError {
   constructor(message: string) {
-    super(Errors.NodeNotAvailableToDeploy, message);
+    super("NodeNotAvailableToDeploy", Errors.NodeNotAvailableToDeploy, message);
   }
 }
 
 export class CannotUpdateContractInGraceState extends SmartContractError {
   constructor(message: string) {
-    super(Errors.CannotUpdateContractInGraceState, message);
+    super("CannotUpdateContractInGraceState", Errors.CannotUpdateContractInGraceState, message);
   }
 }
 
 export class NumOverflow extends SmartContractError {
   constructor(message: string) {
-    super(Errors.NumOverflow, message);
+    super("NumOverflow", Errors.NumOverflow, message);
   }
 }
 
 export class OffchainSignedTxCannotSign extends SmartContractError {
   constructor(message: string) {
-    super(Errors.OffchainSignedTxCannotSign, message);
+    super("OffchainSignedTxCannotSign", Errors.OffchainSignedTxCannotSign, message);
   }
 }
 
 export class OffchainSignedTxAlreadySent extends SmartContractError {
   constructor(message: string) {
-    super(Errors.OffchainSignedTxAlreadySent, message);
+    super("OffchainSignedTxAlreadySent", Errors.OffchainSignedTxAlreadySent, message);
   }
 }
 
 export class OffchainSignedTxNoLocalAccountAvailable extends SmartContractError {
   constructor(message: string) {
-    super(Errors.OffchainSignedTxNoLocalAccountAvailable, message);
+    super("OffchainSignedTxNoLocalAccountAvailable", Errors.OffchainSignedTxNoLocalAccountAvailable, message);
   }
 }
 
 export class NameContractNameTooShort extends SmartContractError {
   constructor(message: string) {
-    super(Errors.NameContractNameTooShort, message);
+    super("NameContractNameTooShort", Errors.NameContractNameTooShort, message);
   }
 }
 
 export class NameContractNameTooLong extends SmartContractError {
   constructor(message: string) {
-    super(Errors.NameContractNameTooLong, message);
+    super("NameContractNameTooLong", Errors.NameContractNameTooLong, message);
   }
 }
 
 export class InvalidProviderConfiguration extends SmartContractError {
   constructor(message: string) {
-    super(Errors.InvalidProviderConfiguration, message);
+    super("InvalidProviderConfiguration", Errors.InvalidProviderConfiguration, message);
   }
 }
 
 export class NoSuchSolutionProvider extends SmartContractError {
   constructor(message: string) {
-    super(Errors.NoSuchSolutionProvider, message);
+    super("NoSuchSolutionProvider", Errors.NoSuchSolutionProvider, message);
   }
 }
 
 export class SolutionProviderNotApproved extends SmartContractError {
   constructor(message: string) {
-    super(Errors.SolutionProviderNotApproved, message);
+    super("SolutionProviderNotApproved", Errors.SolutionProviderNotApproved, message);
   }
 }
 
 export class TwinNotAuthorized extends SmartContractError {
   constructor(message: string) {
-    super(Errors.TwinNotAuthorized, message);
+    super("TwinNotAuthorized", Errors.TwinNotAuthorized, message);
   }
 }
 
 export class ServiceContractNotExists extends SmartContractError {
   constructor(message: string) {
-    super(Errors.ServiceContractNotExists, message);
+    super("ServiceContractNotExists", Errors.ServiceContractNotExists, message);
   }
 }
 
 export class ServiceContractCreationNotAllowed extends SmartContractError {
   constructor(message: string) {
-    super(Errors.ServiceContractCreationNotAllowed, message);
+    super("ServiceContractCreationNotAllowed", Errors.ServiceContractCreationNotAllowed, message);
   }
 }
 
 export class ServiceContractModificationNotAllowed extends SmartContractError {
   constructor(message: string) {
-    super(Errors.ServiceContractModificationNotAllowed, message);
+    super("ServiceContractModificationNotAllowed", Errors.ServiceContractModificationNotAllowed, message);
   }
 }
 
 export class ServiceContractApprovalNotAllowed extends SmartContractError {
   constructor(message: string) {
-    super(Errors.ServiceContractApprovalNotAllowed, message);
+    super("ServiceContractApprovalNotAllowed", Errors.ServiceContractApprovalNotAllowed, message);
   }
 }
 
 export class ServiceContractRejectionNotAllowed extends SmartContractError {
   constructor(message: string) {
-    super(Errors.ServiceContractRejectionNotAllowed, message);
+    super("ServiceContractRejectionNotAllowed", Errors.ServiceContractRejectionNotAllowed, message);
   }
 }
 
 export class ServiceContractBillingNotApprovedByBoth extends SmartContractError {
   constructor(message: string) {
-    super(Errors.ServiceContractBillingNotApprovedByBoth, message);
+    super("ServiceContractBillingNotApprovedByBoth", Errors.ServiceContractBillingNotApprovedByBoth, message);
   }
 }
 
 export class ServiceContractBillingVariableAmountTooHigh extends SmartContractError {
   constructor(message: string) {
-    super(Errors.ServiceContractBillingVariableAmountTooHigh, message);
+    super("ServiceContractBillingVariableAmountTooHigh", Errors.ServiceContractBillingVariableAmountTooHigh, message);
   }
 }
 
 export class ServiceContractBillMetadataTooLong extends SmartContractError {
   constructor(message: string) {
-    super(Errors.ServiceContractBillMetadataTooLong, message);
+    super("ServiceContractBillMetadataTooLong", Errors.ServiceContractBillMetadataTooLong, message);
   }
 }
 
 export class ServiceContractMetadataTooLong extends SmartContractError {
   constructor(message: string) {
-    super(Errors.ServiceContractMetadataTooLong, message);
+    super("ServiceContractMetadataTooLong", Errors.ServiceContractMetadataTooLong, message);
   }
 }
 
 export class ServiceContractNotEnoughFundsToPayBill extends SmartContractError {
   constructor(message: string) {
-    super(Errors.ServiceContractNotEnoughFundsToPayBill, message);
+    super("ServiceContractNotEnoughFundsToPayBill", Errors.ServiceContractNotEnoughFundsToPayBill, message);
   }
 }
 
 export class CanOnlyIncreaseFrequency extends SmartContractError {
   constructor(message: string) {
-    super(Errors.CanOnlyIncreaseFrequency, message);
+    super("CanOnlyIncreaseFrequency", Errors.CanOnlyIncreaseFrequency, message);
   }
 }
 
 export class IsNotAnAuthority extends SmartContractError {
   constructor(message: string) {
-    super(Errors.IsNotAnAuthority, message);
+    super("IsNotAnAuthority", Errors.IsNotAnAuthority, message);
   }
 }
 
 export class WrongAuthority extends SmartContractError {
   constructor(message: string) {
-    super(Errors.WrongAuthority, message);
+    super("WrongAuthority", Errors.WrongAuthority, message);
   }
 }
 
 export class UnauthorizedToChangeSolutionProviderId extends SmartContractError {
   constructor(message: string) {
-    super(Errors.UnauthorizedToChangeSolutionProviderId, message);
+    super("UnauthorizedToChangeSolutionProviderId", Errors.UnauthorizedToChangeSolutionProviderId, message);
   }
 }
 
 export class UnauthorizedToSetExtraFee extends SmartContractError {
   constructor(message: string) {
-    super(Errors.UnauthorizedToSetExtraFee, message);
+    super("UnauthorizedToSetExtraFee", Errors.UnauthorizedToSetExtraFee, message);
   }
 }

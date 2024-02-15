@@ -7,25 +7,25 @@ export enum Errors {
   NodeSelectionError,
 }
 class TFGridFarmsError extends BaseError {
-  constructor(code: number, message: string) {
-    super(code, message, ErrorModules.Farm);
+  constructor(name = "TFGridFarmsError", code: number, message: string) {
+    super(name, code, message, ErrorModules.Farm);
   }
 }
 
 export class InvalidResourcesError extends TFGridFarmsError {
   constructor(message: string) {
-    super(Errors.InvalidResourcesError, message);
+    super("InvalidResourcesError", Errors.InvalidResourcesError, message);
   }
 }
 
 export class FarmerBotError extends TFGridFarmsError {
   constructor(message: string) {
-    super(Errors.FarmerBotError, message);
+    super("FarmerBotError", Errors.FarmerBotError, message);
   }
 }
 
 export class NodeSelectionError extends TFGridFarmsError {
   constructor(message: string) {
-    super(Errors.NodeSelectionError, message);
+    super("NodeSelectionError", Errors.NodeSelectionError, message);
   }
 }

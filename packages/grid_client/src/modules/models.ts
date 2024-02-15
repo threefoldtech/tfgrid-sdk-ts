@@ -14,6 +14,7 @@ import {
   IsOptional,
   IsString,
   IsUrl,
+  Length,
   MaxLength,
   Min,
   ValidateNested,
@@ -83,6 +84,16 @@ class NetworkModel {
   @Expose() @IsString() @IsNotEmpty() ip_range: string;
   @Expose() @IsBoolean() @IsOptional() addAccess?: boolean;
   @Expose() @IsInt() @Min(1) @IsOptional() accessNodeId?: number;
+  @Expose()
+  @IsOptional()
+  @Type(() => MyceliumNetworkModel)
+  @ValidateNested({ each: true })
+  myceliumSeeds?: MyceliumNetworkModel[];
+}
+
+class MyceliumNetworkModel {
+  @Expose() @IsString() @Length(32) seed?: string;
+  @Expose() @IsInt() @Min(1) nodeId: number;
 }
 
 class BaseGetDeleteModel {
@@ -97,6 +108,8 @@ class MachineModel {
   @Expose() @IsBoolean() public_ip: boolean;
   @Expose() @IsOptional() @IsBoolean() public_ip6?: boolean;
   @Expose() @IsBoolean() planetary: boolean;
+  @Expose() @IsBoolean() mycelium: boolean;
+  @Expose() @IsOptional() @IsString() @Length(6) myceliumSeed?: string;
   @Expose() @IsInt() @Min(1) cpu: number;
   @Expose() @Min(256) memory: number; // in MB
   @Expose() rootfs_size: number; // in GB
@@ -120,6 +133,7 @@ class MachinesModel {
 
 class AddMachineModel extends MachineModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) deployment_name: string;
+  @Expose() @IsString() @IsOptional() myceliumNetworkSeed?: string;
 }
 
 class DeleteMachineModel {
@@ -142,6 +156,8 @@ class KubernetesNodeModel {
   @Expose() @IsBoolean() public_ip: boolean;
   @Expose() @IsOptional() @IsBoolean() public_ip6: boolean;
   @Expose() @IsBoolean() planetary: boolean;
+  @Expose() @IsBoolean() mycelium: boolean;
+  @Expose() @IsOptional() @IsString() myceliumSeed?: string;
   @Expose() @IsOptional() @IsIP() ip?: string;
   @Expose() @IsOptional() @IsBoolean() corex?: boolean;
   @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
@@ -166,6 +182,7 @@ class K8SDeleteModel extends BaseGetDeleteModel {}
 
 class AddWorkerModel extends KubernetesNodeModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) deployment_name: string;
+  @Expose() @IsString() @IsOptional() myceliumNetworkSeed: string;
 }
 
 class DeleteWorkerModel {
@@ -771,8 +788,10 @@ class NetworkAddNodeModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() ipRange: string;
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+  @Expose() @IsBoolean() mycelium: boolean;
   @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
   @Expose() @IsString() @IsOptional() description?: string;
+  @Expose() @IsString() @IsOptional() @Length(32) myceliumSeed?: string;
 }
 
 class NetworkHasNodeModel {
@@ -947,6 +966,7 @@ export {
   AddPublicConfig,
   GetActiveContractsModel,
   GPUCardInfo,
+  MyceliumNetworkModel,
   NodeCPUTest,
   NodeIPValidation,
   NodeIPerf,

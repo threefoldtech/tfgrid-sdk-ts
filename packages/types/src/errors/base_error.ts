@@ -13,62 +13,61 @@ export enum Generic {
   InsufficientBalanceError,
   DeploymentKeyDeletionError,
 }
-export class BaseError extends Error {
-  constructor(public code: number, message: string, public module: ErrorModules) {
-    super(message);
-    this.name = this.constructor.name;
+export abstract class BaseError extends Error {
+  constructor(name: string, public code: number, message: string, public module: ErrorModules) {
+    super(`${name}: ${message}`);
   }
 }
 
 export class ValidationError extends BaseError {
   constructor(message: string) {
-    super(Generic.ValidationError, message, ErrorModules.Generic);
+    super("ValidationError", Generic.ValidationError, message, ErrorModules.Generic);
   }
 }
 export class TimeoutError extends BaseError {
   constructor(message: string) {
-    super(Generic.TimeoutError, message, ErrorModules.Generic);
+    super("TimeoutError", Generic.TimeoutError, message, ErrorModules.Generic);
   }
 }
 
 export class ConnectionError extends BaseError {
   constructor(message: string) {
-    super(Generic.ConnectionError, message, ErrorModules.Generic);
+    super("ConnectionError", Generic.ConnectionError, message, ErrorModules.Generic);
   }
 }
 
 export class RMBError extends BaseError {
   constructor(message: string) {
-    super(Generic.RMBError, message, ErrorModules.Generic);
+    super("RMBError", Generic.RMBError, message, ErrorModules.Generic);
   }
 }
 
 export class InvalidResponse extends BaseError {
   constructor(message: string) {
-    super(Generic.InvalidResponse, message, ErrorModules.Generic);
+    super("InvalidResponse", Generic.InvalidResponse, message, ErrorModules.Generic);
   }
 }
 
 export class RequestError extends BaseError {
   constructor(message: string, public statusCode = -1) {
-    super(Generic.RequestError, message, ErrorModules.Generic);
+    super("RequestError", Generic.RequestError, message, ErrorModules.Generic);
   }
 }
 
 export class TwinNotExistError extends BaseError {
   constructor(message: string) {
-    super(Generic.TwinNotExistError, message, ErrorModules.Generic);
+    super("TwinNotExistError", Generic.TwinNotExistError, message, ErrorModules.Generic);
   }
 }
 
 export class InsufficientBalanceError extends BaseError {
   constructor(message: string) {
-    super(Generic.InsufficientBalanceError, message, ErrorModules.Generic);
+    super("InsufficientBalanceError", Generic.InsufficientBalanceError, message, ErrorModules.Generic);
   }
 }
 
 export class DeploymentKeyDeletionError extends BaseError {
   constructor(message: string) {
-    super(Generic.DeploymentKeyDeletionError, message, ErrorModules.Generic);
+    super("DeploymentKeyDeletionError", Generic.DeploymentKeyDeletionError, message, ErrorModules.Generic);
   }
 }

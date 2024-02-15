@@ -10,7 +10,10 @@ import { RMB } from "../clients/rmb/client";
 import { TFClient } from "../clients/tf-grid/client";
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
-import { formatErrorMessage, getRandomNumber, randomChoice } from "../helpers/utils";
+import { formatErrorMessage, generateRandomHexSeed, getRandomNumber, randomChoice } from "../helpers/utils";
+import { validateHexSeed } from "../helpers/validator";
+import { MyceliumNetworkModel } from "../modules";
+import { DeploymentFactory } from "../primitives/deployment";
 import { BackendStorage, BackendStorageType } from "../storage/backend";
 import { Deployment } from "../zos/deployment";
 import { Workload, WorkloadTypes } from "../zos/workload";
@@ -119,11 +122,63 @@ class Network {
     return this.wireguardConfig;
   }
 
-  async addNode(node_id: number, metadata = "", description = "", subnet = ""): Promise<Workload | undefined> {
-    if (this.nodeExists(node_id)) {
+  // Check if network will be updated with mycelium or not
+  async checkMycelium(nodeId: number, mycelium: boolean, myceliumSeeds: MyceliumNetworkModel[] = []) {
+    if (!mycelium) return;
+    // check if network has mycelium or not
+    const network = this.networks.find(network => {
+      return network["node_id"] === nodeId;
+    });
+    const myceliumNetworkSeed = myceliumSeeds.find(item => item.nodeId == nodeId);
+    if (network && network.mycelium && network.mycelium?.hex_key) {
+      if (myceliumSeeds && myceliumSeeds.length > 0 && myceliumNetworkSeed?.seed !== network.mycelium.hex_key) {
+        throw new ValidationError(`Another mycelium seed is used for this network ${this.name} on this ${nodeId}`);
+      }
+    } else {
+      // If network has no mycelium and user wanna update it and add mycelium.
+      let seed = generateRandomHexSeed(32);
+      if (network) {
+        if (myceliumNetworkSeed?.seed) {
+          validateHexSeed(myceliumNetworkSeed.seed, 32);
+          seed = myceliumNetworkSeed.seed;
+        }
+
+        network.mycelium = {
+          hex_key: seed,
+          peers: [],
+        };
+        this.updateNetwork(network);
+        this.updateNetworkDeployments();
+
+        const deploymentFactory = new DeploymentFactory(this.config);
+        const filteredDeployments = this.deployments.filter(deployment => deployment["node_id"] === nodeId);
+
+        for (const deployment of filteredDeployments) {
+          const d = await deploymentFactory.fromObj(deployment);
+          for (const workload of d["workloads"]) {
+            workload.data["mycelium"]["hex_key"] = seed;
+            workload.data = this.updateNetwork(workload["data"]);
+            workload.version += 1;
+          }
+          return d;
+        }
+      }
+    }
+  }
+
+  async addNode(
+    nodeId: number,
+    mycelium: boolean,
+    metadata = "",
+    description = "",
+    subnet = "",
+    myceliumSeeds: MyceliumNetworkModel[] = [],
+  ): Promise<Workload | undefined> {
+    if (this.nodeExists(nodeId)) {
       return;
     }
-    events.emit("logs", `Adding node ${node_id} to network ${this.name}`);
+
+    events.emit("logs", `Adding node ${nodeId} to network ${this.name}`);
     const keypair = this.generateWireguardKeypair();
     let znet = new Znet();
     if (!subnet) {
@@ -133,8 +188,22 @@ class Network {
     }
     znet.ip_range = this.ipRange;
     znet.wireguard_private_key = keypair.privateKey;
-    znet.wireguard_listen_port = await this.getFreePort(node_id);
-    znet["node_id"] = node_id;
+    znet.wireguard_listen_port = await this.getFreePort(nodeId);
+    znet["node_id"] = nodeId;
+
+    if (mycelium) {
+      const myceliumNetworkSeed = myceliumSeeds.find(item => item.nodeId === nodeId);
+      let seed = generateRandomHexSeed(32);
+      if (myceliumNetworkSeed?.seed) {
+        seed = myceliumNetworkSeed.seed;
+        validateHexSeed(seed, 32);
+      }
+
+      znet.mycelium = {
+        hex_key: seed,
+        peers: [],
+      };
+    }
 
     this.networks.push(znet);
     await this.generatePeers();
@@ -150,7 +219,7 @@ class Network {
     znet_workload.description = description;
 
     const node = new Node();
-    node.node_id = node_id;
+    node.node_id = nodeId;
     this.nodes.push(node);
 
     return znet_workload;

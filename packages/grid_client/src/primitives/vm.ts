@@ -15,11 +15,25 @@ class VMPrimitive {
     znetwork_interface.ip = ip;
     return znetwork_interface;
   }
-  _createMachineNetwork(networkName: string, ip: string, planetary: boolean, public_ip = ""): ZmachineNetwork {
+  _createMachineNetwork(
+    networkName: string,
+    ip: string,
+    planetary: boolean,
+    mycelium: boolean,
+    myceliumSeed: string,
+    public_ip = "",
+  ): ZmachineNetwork {
     const zmachine_network = new ZmachineNetwork();
     zmachine_network.planetary = planetary;
     zmachine_network.interfaces = [this._createNetworkInterface(networkName, ip)];
     zmachine_network.public_ip = public_ip;
+
+    if (mycelium) {
+      zmachine_network.mycelium = {
+        hex_seed: myceliumSeed,
+        network: networkName,
+      };
+    }
     return zmachine_network;
   }
   create(
@@ -32,6 +46,8 @@ class VMPrimitive {
     networkName: string,
     ip: string,
     planetary: boolean,
+    mycelium: boolean,
+    myceliumSeed: string,
     public_ip: string,
     entrypoint: string,
     env: Record<string, unknown>,
@@ -43,7 +59,7 @@ class VMPrimitive {
   ): Workload {
     const zmachine = new Zmachine();
     zmachine.flist = flist;
-    zmachine.network = this._createMachineNetwork(networkName, ip, planetary, public_ip);
+    zmachine.network = this._createMachineNetwork(networkName, ip, planetary, mycelium, myceliumSeed, public_ip);
     zmachine.size = rootfs_size * 1024 ** 3;
     zmachine.mounts = disks;
     zmachine.entrypoint = entrypoint;

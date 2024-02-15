@@ -3,6 +3,6 @@ import { ErrorModules } from "../modules";
 
 export class GridClientError extends BaseError {
   constructor(message: string) {
-    super(Generic.GridClientError, message, ErrorModules.Generic);
+    super("GridClientError", Generic.GridClientError, message, ErrorModules.Generic);
   }
 }

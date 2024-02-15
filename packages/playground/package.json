@@ -15,6 +15,7 @@
     "@threefold/graphql_client": "^2.3.0-alpha9",
     "@threefold/grid_client": "^2.3.0-alpha9",
     "@threefold/gridproxy_client": "^2.3.0-alpha9",
+    "@threefold/types": "^2.3.0-alpha9",
     "bip39": "^3.1.0",
     "chart.js": "^4.4.0",
     "cryptr": "^6.2.0",
@@ -35,7 +36,10 @@
     "vue-router": "^4.1.6",
     "vuetify": "^3.1.15",
     "web-ssh-keygen": "^0.1.2",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "logger-interceptor": "1.0.0",
+    "await-lock": "^2.2.2",
+    "vue3-virtual-scroller": "^0.2.3"
   },
   "devDependencies": {
     "@types/chart.js": "^2.9.38",

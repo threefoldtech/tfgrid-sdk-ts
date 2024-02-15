@@ -9,3 +9,4 @@ const gridProxyClient = new GridProxyClient(network as Network, window.env.GRIDP
 const queryClient = new QueryClient(window.env.SUBSTRATE_URL);
 
 export { gqlClient, gridProxyClient, queryClient };
+export * from "./indexedDB";

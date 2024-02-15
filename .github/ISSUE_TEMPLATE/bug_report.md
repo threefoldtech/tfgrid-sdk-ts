@@ -12,7 +12,7 @@ Search for similar issues first, if not complete the following template
 
 ### Description
 
-A clear description of the bug: 
+A clear description of the bug:
 
 Must include any relevant identifiers like:
 
@@ -39,9 +39,7 @@ Must include if available:
 - Logs/Alerts.
 
 - Screenshots or screen records.
- 
+
 - Contract or deployment details.
-  
 - if it's a solution error then SSH into the vm and run `zinit log`.
-  
 - Console Errors and Network Requests from developer tools (ctrl+shift+i or F12).
