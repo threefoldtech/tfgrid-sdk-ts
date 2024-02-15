@@ -108,8 +108,8 @@
           <v-tooltip v-if="item.value.status == NodeHealth.Error" activator="parent" location="top">{{
             item.value.message
           }}</v-tooltip>
-          <span>
-            {{ capitalize(getNodeHealthColor(item.value.status as string).type) }}
+          <span class="text-uppercase">
+            {{ getNodeHealthColor(item.value.status as string).type }}
           </span>
         </v-chip>
       </template>
