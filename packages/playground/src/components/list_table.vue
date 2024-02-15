@@ -62,7 +62,7 @@
       </v-row>
       <template v-else-if="!loading && items.length === 0 && (noDataText || $slots['no-data-text'])">
         <VContainer>
-          <VRow justify="center" align="center" class="mt-8">
+          <VRow justify="center" align="center" class="mt-5">
             <slot name="no-data-text" v-if="$slots['no-data-text']" />
             <p v-else v-text="noDataText" />
           </VRow>
