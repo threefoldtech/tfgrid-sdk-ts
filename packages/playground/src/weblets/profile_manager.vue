@@ -157,7 +157,7 @@
                               :disabled="creatingAccount || activatingAccount || activating"
                               @click:append="reloadValidation"
                             >
-                              <template v-slot:prepend-inner v-if="mnemonic.length > 0">
+                              <template v-slot:prepend-inner v-if="mnemonic && keypairType !== KeypairType.ed25519">
                                 <v-icon
                                   v-if="
                                     validateMnemonic(mnemonic) ||
@@ -168,7 +168,6 @@
                                 >
                                   mdi-check
                                 </v-icon>
-                                <v-icon v-else color="red"> mdi-close </v-icon>
                               </template></VTextField
                             >
                           </div>
