@@ -35,9 +35,7 @@ async function getStats(r) {
 function initTargeRequests(urls, r) {
   return urls.map(url =>
     //   eslint-disable-next-line no-undef
-    ngx
-      .fetch(url, { verify: r.headersIn["Host"].split(":")[0] !== "localhost" }) // disable ssl on localhost
-      .then(res => res.json()),
+    ngx.fetch(url, { verify: false }).then(res => res.json()),
   );
 }
 async function fetchStats(r) {

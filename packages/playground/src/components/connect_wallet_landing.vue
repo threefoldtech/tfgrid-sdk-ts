@@ -56,9 +56,7 @@
         </div>
 
         <div class="d-flex justify-center mt-5">
-          <v-btn color="primary" target="_blank" @click="$router.push(DashboardRoutes.TFGrid.NodeStatistics)">
-            Explore ThreeFold Grid Capacity
-          </v-btn>
+          <v-btn color="primary" target="_blank" :href="statsUrl"> Explore ThreeFold Grid Capacity </v-btn>
         </div>
       </div>
       <div class="text-center">
@@ -87,47 +85,48 @@
 
 <script lang="ts">
 import { computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { useTheme } from "vuetify";
 
 import { DashboardRoutes } from "@/router/routes";
-
+import { useRequestStore } from "@/stores/stats";
 export default {
   name: "ConnectWalletLanding",
   setup() {
     const theme = useTheme();
     const baseUrl = import.meta.env.BASE_URL;
     const route = useRoute();
-    const $router = useRouter();
     const pageTitle = computed(() => route.meta.title);
+    const statsStore = useRequestStore();
+    const stats = computed(() => [
+      {
+        label: "Capacity",
+        value: statsStore.data?.capacity,
+        image: "capacity.png",
+      },
+      {
+        label: "Nodes",
+        value: statsStore.data?.nodes,
+        image: "nodes.png",
+      },
+      {
+        label: "Countries",
+        value: statsStore.data?.countries,
+        image: "countries.png",
+      },
+      {
+        label: "Cores",
+        value: statsStore.data?.cores,
+        image: "cores.png",
+      },
+    ]);
     return {
       theme,
       pageTitle,
       DashboardRoutes,
-      stats: [
-        {
-          label: "Capacity",
-          value: "33.46PB",
-          image: "capacity.png",
-        },
-        {
-          label: "Nodes",
-          value: "2420",
-          image: "nodes.png",
-        },
-        {
-          label: "Countries",
-          value: "60",
-          image: "countries.png",
-        },
-        {
-          label: "Cores",
-          value: "56,530",
-          image: "cores.png",
-        },
-      ],
+      stats,
+      statsUrl: window.env.STATS_URL || "https://stats.grid.tf",
       baseUrl,
-      $router,
     };
   },
 };
