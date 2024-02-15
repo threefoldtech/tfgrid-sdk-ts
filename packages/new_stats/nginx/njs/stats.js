@@ -32,7 +32,7 @@ async function getStats(r) {
   }
 }
 
-function initTargeRequests(urls, r) {
+function initTargeRequests(urls) {
   return urls.map(url =>
     //   eslint-disable-next-line no-undef
     ngx.fetch(url, { verify: false }).then(res => res.json()),
@@ -42,7 +42,7 @@ async function fetchStats(r) {
   let retries = 0;
   const stats = [];
   while (URLS.length !== 0 && retries < RETRIES) {
-    const responses = await Promise.allSettled(initTargeRequests(URLS, r));
+    const responses = await Promise.allSettled(initTargeRequests(URLS));
     const failedURls = [];
     responses.forEach((item, index) => {
       if (item.status === "fulfilled") {
