@@ -67,7 +67,7 @@
       </template>
 
       <template #[`item.ipv6`]="{ item }">
-        {{ item.value.publicIP?.ip6 || "-" }}
+        {{ item.value.publicIP?.ip6.replace(/\/64$/, "") || "-" }}
       </template>
 
       <template #[`item.planetary`]="{ item }">
