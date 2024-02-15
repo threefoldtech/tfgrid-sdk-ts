@@ -8,6 +8,7 @@ import { default as TweetNACL } from "tweetnacl";
 
 import { RMB } from "../clients/rmb/client";
 import { TFClient } from "../clients/tf-grid/client";
+import { GqlNodeContract } from "../clients/tf-grid/contracts";
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
 import { formatErrorMessage, generateRandomHexSeed, getRandomNumber, randomChoice } from "../helpers/utils";
@@ -43,6 +44,7 @@ class Network {
   deployments: Deployment[] = [];
   reservedSubnets: string[] = [];
   networks: Znet[] = [];
+  contracts: Required<GqlNodeContract>[];
   accessPoints: AccessPoint[] = [];
   backendStorage: BackendStorage;
   _endpoints: Record<string, string> = {};
@@ -279,47 +281,52 @@ class Network {
       return;
     }
     events.emit("logs", `Loading network ${this.name}`);
-    const network = await this.getNetwork();
-    if (network["ip_range"] !== this.ipRange) {
-      throw new ValidationError(`The same network name ${this.name} with a different ip range already exists.`);
-    }
 
-    await this.tfClient.connect();
-    for (const node of network["nodes"]) {
-      const contract = await this.tfClient.contracts.get({
-        id: node.contract_id,
-      });
-      if (contract === null) continue;
-      const node_twin_id = await this.capacity.getNodeTwinId(node.node_id);
-      const payload = JSON.stringify({ contract_id: node.contract_id });
-      let res;
-      try {
-        res = await this.rmb.request([node_twin_id], "zos.deployment.get", payload);
-      } catch (e) {
-        (e as Error).message = formatErrorMessage(`Failed to load network deployment ${node.contract_id}`, e);
-        throw e;
+    if (await this.existOnNewNetwork()) {
+      // TODO: new network should load from contracts
+    } else {
+      const network = await this.getNetwork();
+      if (network["ip_range"] !== this.ipRange) {
+        throw new ValidationError(`The same network name ${this.name} with a different ip range already exists.`);
       }
-      res["node_id"] = node.node_id;
-      for (const workload of res["workloads"]) {
-        if (
-          workload["type"] !== WorkloadTypes.network ||
-          !Addr(this.ipRange).contains(Addr(workload["data"]["subnet"]))
-        ) {
-          continue;
+
+      await this.tfClient.connect();
+      for (const node of network["nodes"]) {
+        const contract = await this.tfClient.contracts.get({
+          id: node.contract_id,
+        });
+        if (contract === null) continue;
+        const node_twin_id = await this.capacity.getNodeTwinId(node.node_id);
+        const payload = JSON.stringify({ contract_id: node.contract_id });
+        let res;
+        try {
+          res = await this.rmb.request([node_twin_id], "zos.deployment.get", payload);
+        } catch (e) {
+          (e as Error).message = formatErrorMessage(`Failed to load network deployment ${node.contract_id}`, e);
+          throw e;
         }
-        if (workload.result.state === "deleted") {
-          continue;
+        res["node_id"] = node.node_id;
+        for (const workload of res["workloads"]) {
+          if (
+            workload["type"] !== WorkloadTypes.network ||
+            !Addr(this.ipRange).contains(Addr(workload["data"]["subnet"]))
+          ) {
+            continue;
+          }
+          if (workload.result.state === "deleted") {
+            continue;
+          }
+          const znet = this._fromObj(workload["data"]);
+          znet["node_id"] = node.node_id;
+          const n: Node = node;
+          this.nodes.push(n);
+          this.networks.push(znet);
+          this.deployments.push(res);
         }
-        const znet = this._fromObj(workload["data"]);
-        znet["node_id"] = node.node_id;
-        const n: Node = node;
-        this.nodes.push(n);
-        this.networks.push(znet);
-        this.deployments.push(res);
       }
+      await this.getAccessPoints();
+      await this.save();
     }
-    await this.getAccessPoints();
-    await this.save();
   }
 
   _fromObj(net: Znet): Znet {
@@ -537,9 +544,45 @@ class Network {
     return await this.backendStorage.load(PATH.join(path, this.name, "info.json"));
   }
 
+  private async getMyContracts(fetch = false) {
+    if (fetch || !this.contracts) {
+      const contracts = await this.tfClient.contracts.listMyNodeContracts({
+        graphqlURL: this.config.graphqlURL,
+        type: "network",
+      });
+
+      const parsedContracts: Required<GqlNodeContract>[] = [];
+
+      for (const contract of contracts) {
+        const parsedDeploymentData = JSON.parse(contract.deploymentData);
+        parsedContracts.push({ ...contract, parsedDeploymentData });
+      }
+
+      this.contracts = parsedContracts;
+    }
+
+    return this.contracts;
+  }
+
+  private getContractsName(contracts: Required<GqlNodeContract>[]): string[] {
+    return Array.from(new Set(contracts.map(c => c.parsedDeploymentData.name)));
+  }
+
+  private async listNewNetworks() {
+    const contracts = await this.getMyContracts(true);
+    return this.getContractsName(contracts);
+  }
+
+  private async existOnNewNetwork() {
+    return (await this.listNewNetworks()).includes(this.name);
+  }
+
   async getNetworkNames(): Promise<string[]> {
+    const newNames = await this.listNewNetworks();
+
     const path = this.getNetworksPath();
-    return await this.backendStorage.list(path);
+    const oldNames = await this.backendStorage.list(path);
+    return Array.from(new Set([...newNames, ...oldNames]));
   }
 
   async getFreePort(node_id: number): Promise<number> {
