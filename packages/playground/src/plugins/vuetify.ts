@@ -11,7 +11,7 @@ const vuetify = createVuetify({
       variant: "tonal",
     },
     VProgressCircular: {
-      size: 70,
+      size: 50,
       width: 7,
       indeterminate: true,
       color: "primary",
