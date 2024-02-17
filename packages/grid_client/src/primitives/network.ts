@@ -16,6 +16,7 @@ import { validateHexSeed } from "../helpers/validator";
 import { MyceliumNetworkModel } from "../modules";
 import { DeploymentFactory } from "../primitives/deployment";
 import { BackendStorage, BackendStorageType } from "../storage/backend";
+import { Zmachine } from "../zos";
 import { Deployment } from "../zos/deployment";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { Peer, Znet } from "../zos/znet";
@@ -359,7 +360,7 @@ class Network {
       res["node_id"] = contract.nodeID;
       for (const workload of res.workloads) {
         const data = workload.data as Znet;
-        if (workload["type"] !== WorkloadTypes.network || !Addr(this.ipRange).contains(Addr(data.subnet))) {
+        if (workload.type !== WorkloadTypes.network || workload.name !== this.name) {
           continue;
         }
         if (workload.result.state === "deleted") {
@@ -368,9 +369,12 @@ class Network {
         const znet = this._fromObj(data);
         znet["node_id"] = contract.nodeID;
         const parsedMetadata: NetworkMetadata = JSON.parse(workload.metadata);
-        const reservedIps = parsedMetadata.reserved_ips;
+        let reservedIps = parsedMetadata.reserved_ips;
         if (reservedIps.length === 0) {
-          // TODO: get the reserved ips from vms on this network
+          reservedIps = await this.getReservedIpsFromVms(contract.nodeID);
+        }
+        if (data.ip_range !== this.ipRange) {
+          throw new ValidationError(`The same network name ${this.name} with a different ip range already exists.`);
         }
 
         const n: Node = {
@@ -383,6 +387,7 @@ class Network {
         this.deployments.push(res);
       }
     }
+    await this.getAccessPoints();
   }
 
   _fromObj(net: Znet): Znet {
@@ -618,6 +623,48 @@ class Network {
     }
 
     return this.contracts;
+  }
+
+  private async getReservedIpsFromVms(nodeId: number): Promise<string[]> {
+    const reservedIps: string[] = [];
+    const contracts = await this.tfClient.contracts.listMyNodeContracts({
+      graphqlURL: this.config.graphqlURL,
+      nodeId: nodeId,
+    });
+
+    const parsedContracts: Required<GqlNodeContract>[] = [];
+
+    for (const contract of contracts) {
+      const parsedDeploymentData = JSON.parse(contract.deploymentData);
+      parsedContracts.push({ ...contract, parsedDeploymentData });
+    }
+
+    for (const contract of parsedContracts) {
+      const type = contract.parsedDeploymentData.type;
+      if (!(type === "vm" || type === "kubernetes")) continue;
+      const node_twin_id = await this.capacity.getNodeTwinId(contract.nodeID);
+      const payload = JSON.stringify({ contract_id: contract.contractID });
+      let res: Deployment;
+      try {
+        res = await this.rmb.request([node_twin_id], "zos.deployment.get", payload);
+      } catch (e) {
+        (e as Error).message = formatErrorMessage(`Failed to load network deployment ${contract.contractID}`, e);
+        throw e;
+      }
+      for (const workload of res.workloads) {
+        if (workload.type !== WorkloadTypes.zmachine) {
+          continue;
+        }
+        if (workload.result.state === "deleted") {
+          continue;
+        }
+        const data = workload.data as Zmachine;
+        for (const i of data.network.interfaces) {
+          if (i.network === this.name) reservedIps.push(i.ip);
+        }
+      }
+    }
+    return reservedIps;
   }
 
   private async getDeploymentContracts(name: string) {
