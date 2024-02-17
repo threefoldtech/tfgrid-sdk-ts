@@ -38,6 +38,13 @@ class AccessPoint {
   node_id: number;
 }
 
+interface NetworkMetadata {
+  ip: string;
+  priv_key: string;
+  node_id: number;
+  reserved_ips: string[];
+}
+
 class Network {
   capacity: Nodes;
   nodes: Node[] = [];
@@ -80,6 +87,14 @@ class Network {
       if (extrinsics.length > 0) {
         await this.tfClient.connect();
         await this.tfClient.applyAllExtrinsics(extrinsics);
+      }
+    }
+  }
+
+  private updateMetadata(nodeId: number, metadata: string) {
+    for (const network of this.networks) {
+      if (network["node_id"] === nodeId) {
+        //TODO: update the metadata here
       }
     }
   }
@@ -217,7 +232,7 @@ class Network {
     znet_workload.name = this.name;
     znet_workload.type = WorkloadTypes.network;
     znet_workload.data = znet;
-    znet_workload.metadata = metadata;
+    znet_workload.metadata = "";
     znet_workload.description = description;
 
     const node = new Node();
@@ -283,7 +298,7 @@ class Network {
     events.emit("logs", `Loading network ${this.name}`);
 
     if (await this.existOnNewNetwork()) {
-      // TODO: new network should load from contracts
+      await this.loadNetworkFromContracts();
     } else {
       const network = await this.getNetwork();
       if (network["ip_range"] !== this.ipRange) {
@@ -326,6 +341,47 @@ class Network {
       }
       await this.getAccessPoints();
       await this.save();
+    }
+  }
+
+  private async loadNetworkFromContracts() {
+    const contracts = await this.getDeploymentContracts(this.name);
+    for (const contract of contracts) {
+      const node_twin_id = await this.capacity.getNodeTwinId(contract.nodeID);
+      const payload = JSON.stringify({ contract_id: contract.contractID });
+      let res: Deployment;
+      try {
+        res = await this.rmb.request([node_twin_id], "zos.deployment.get", payload);
+      } catch (e) {
+        (e as Error).message = formatErrorMessage(`Failed to load network deployment ${contract.contractID}`, e);
+        throw e;
+      }
+      res["node_id"] = contract.nodeID;
+      for (const workload of res.workloads) {
+        const data = workload.data as Znet;
+        if (workload["type"] !== WorkloadTypes.network || !Addr(this.ipRange).contains(Addr(data.subnet))) {
+          continue;
+        }
+        if (workload.result.state === "deleted") {
+          continue;
+        }
+        const znet = this._fromObj(data);
+        znet["node_id"] = contract.nodeID;
+        const parsedMetadata: NetworkMetadata = JSON.parse(workload.metadata);
+        const reservedIps = parsedMetadata.reserved_ips;
+        if (reservedIps.length === 0) {
+          // TODO: get the reserved ips from vms on this network
+        }
+
+        const n: Node = {
+          contract_id: +contract.contractID,
+          node_id: contract.nodeID,
+          reserved_ips: reservedIps,
+        };
+        this.nodes.push(n);
+        this.networks.push(znet);
+        this.deployments.push(res);
+      }
     }
   }
 
@@ -544,7 +600,7 @@ class Network {
     return await this.backendStorage.load(PATH.join(path, this.name, "info.json"));
   }
 
-  private async getMyContracts(fetch = false) {
+  private async getMyNetworkContracts(fetch = false) {
     if (fetch || !this.contracts) {
       const contracts = await this.tfClient.contracts.listMyNodeContracts({
         graphqlURL: this.config.graphqlURL,
@@ -564,12 +620,17 @@ class Network {
     return this.contracts;
   }
 
+  private async getDeploymentContracts(name: string) {
+    const contracts = await this.getMyNetworkContracts();
+    return contracts.filter(c => c.parsedDeploymentData.name === name);
+  }
+
   private getContractsName(contracts: Required<GqlNodeContract>[]): string[] {
     return Array.from(new Set(contracts.map(c => c.parsedDeploymentData.name)));
   }
 
   private async listNewNetworks() {
-    const contracts = await this.getMyContracts(true);
+    const contracts = await this.getMyNetworkContracts(true);
     return this.getContractsName(contracts);
   }
 
