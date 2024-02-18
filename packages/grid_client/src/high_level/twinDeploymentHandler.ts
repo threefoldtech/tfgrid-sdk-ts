@@ -518,7 +518,7 @@ class TwinDeploymentHandler {
         }
         if (workload.type === WorkloadTypes.network) {
           events.emit("logs", `Updating network workload with name: ${workload.name}`);
-          workload["data"] = twinDeployment.network.updateNetwork(workload.data);
+          twinDeployment.network.updateWorkload(twinDeployment.nodeId, workload);
         }
       }
       const extrinsics = await this.PrepareExtrinsic(twinDeployment, contracts);

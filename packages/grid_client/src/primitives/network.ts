@@ -92,12 +92,21 @@ class Network {
     }
   }
 
-  private updateMetadata(nodeId: number, metadata: string) {
-    for (const network of this.networks) {
-      if (network["node_id"] === nodeId) {
-        //TODO: update the metadata here
+  private getUpdatedMetadata(nodeId: number, metadata: string): string {
+    for (const node of this.nodes) {
+      if (node.node_id === nodeId) {
+        const parsedMetadata: NetworkMetadata = JSON.parse(metadata);
+        parsedMetadata.reserved_ips = node.reserved_ips;
+        return JSON.stringify(parsedMetadata);
       }
     }
+    return metadata;
+  }
+
+  updateWorkload(nodeId: number, workload: Workload): Workload {
+    workload.data = this.getUpdatedNetwork(workload.data);
+    workload.metadata = this.getUpdatedMetadata(nodeId, workload.metadata);
+    return workload;
   }
 
   async addAccess(node_id: number, ipv4: boolean): Promise<string> {
@@ -165,7 +174,7 @@ class Network {
           hex_key: seed,
           peers: [],
         };
-        this.updateNetwork(network);
+        this.getUpdatedNetwork(network);
         this.updateNetworkDeployments();
 
         const deploymentFactory = new DeploymentFactory(this.config);
@@ -175,7 +184,7 @@ class Network {
           const d = await deploymentFactory.fromObj(deployment);
           for (const workload of d["workloads"]) {
             workload.data["mycelium"]["hex_key"] = seed;
-            workload.data = this.updateNetwork(workload["data"]);
+            workload.data = this.getUpdatedNetwork(workload["data"]);
             workload.version += 1;
           }
           return d;
@@ -187,7 +196,6 @@ class Network {
   async addNode(
     nodeId: number,
     mycelium: boolean,
-    metadata = "",
     description = "",
     subnet = "",
     myceliumSeeds: MyceliumNetworkModel[] = [],
@@ -226,7 +234,7 @@ class Network {
     this.networks.push(znet);
     await this.generatePeers();
     this.updateNetworkDeployments();
-    znet = this.updateNetwork(znet);
+    znet = this.getUpdatedNetwork(znet);
 
     const znet_workload = new Workload();
     znet_workload.version = 0;
@@ -265,7 +273,7 @@ class Network {
     return contract_id;
   }
 
-  updateNetwork(znet): Znet {
+  getUpdatedNetwork(znet): Znet {
     for (const net of this.networks) {
       if (net.subnet === znet.subnet) {
         return net;
