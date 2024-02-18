@@ -6,7 +6,7 @@
 #### 1. Deploying the TFGrid Chart and set host domain_name
 
 ```bash
-    helm install <helm_name> ./tfgrid-stats/ --values ./tfgrid-stats/values.yaml --set ingress.hosts[0].host=<domain_name>
+    helm install <helm_name> ./tfgrid-newstats/ --values ./tfgrid-newstats/values.yaml --set ingress.hosts[0].host=<domain_name>
 ```
 
 #### 2. Test it, and check the results
@@ -17,7 +17,7 @@
 
 #### 3. Using traefik ingress controller
 
-```yaml 
+```yaml
     # Make sure traefik is installed.
     # Just replace the annotations with:
     annotations:
@@ -26,6 +26,6 @@
 
 #### 4. Deploying with nginx ingress and https
 
-```bash 
-    helm install <helm_name> ./tfgrid-stats/ --values ./tfgrid-stats/values.yaml --set ingress.hosts[0].host=<domain_name> --set ingress.tls[0].hosts[0]=<domain_name> --set ingress.tls[0].secretName=<secret_name>
+```bash
+    helm install <helm_name> ./tfgrid-newstats/ --values ./tfgrid-newstats/values.yaml --set ingress.hosts[0].host=<domain_name> --set ingress.tls[0].hosts[0]=<domain_name> --set ingress.tls[0].secretName=<secret_name>
 ```
