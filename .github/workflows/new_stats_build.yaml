@@ -4,13 +4,11 @@ name: New Stats Build
 
 on:
   push:
-    branches:
-      - development
+    branches: [development, development_314]
     paths:
       - "packages/new_stats/**"
   pull_request:
-    branches:
-      - development
+    branches: [development, development_314]
     paths:
       - "packages/new_stats/**"
 
