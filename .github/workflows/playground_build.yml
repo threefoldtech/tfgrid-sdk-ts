@@ -4,11 +4,15 @@ name: Playground Build
 
 on:
   push:
-    branches: [ development, development_314 ]
+    branches: 
+      - development
+      - development_314
     paths:
       - "packages/playground/**"
   pull_request:
-    branches: [ development, development_314 ]
+    branches: 
+      - development
+      - development_314
     paths:
       - "packages/playground/**"
 
