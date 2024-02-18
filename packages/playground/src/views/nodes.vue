@@ -382,9 +382,13 @@ export default {
             totalSru: convertToBytes(filters.value.minSSD),
             hasGpu: filters.value.gpu || undefined,
             domain: filters.value.gateway || undefined,
+            sortBy: "status",
+            sortOrder: "asc",
           },
           { loadFarm: true },
         );
+        console.log(data);
+
         nodes.value = data;
         nodesCount.value = count ?? 0;
       } catch (err) {

@@ -40,6 +40,8 @@ export interface NodesQuery {
   gpuAvailable: boolean;
   ownedBy: number;
   healthy: boolean;
+  sortBy: string;
+  sortOrder: string;
 }
 
 const NODES_MAPPER: BuilderMapper<NodesQuery> = {
@@ -80,6 +82,8 @@ const NODES_MAPPER: BuilderMapper<NodesQuery> = {
   totalGpu: "total_gpu",
   ownedBy: "owned_by",
   healthy: "healthy",
+  sortBy: "sort_by",
+  sortOrder: "sort_order",
 };
 
 const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
@@ -129,6 +133,8 @@ const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
   totalGpu: assertInt,
   ownedBy: assertInt,
   healthy: assertBoolean,
+  sortBy: assertString,
+  sortOrder: assertString,
 };
 
 export class NodesBuilder extends AbstractBuilder<NodesQuery> {
@@ -138,6 +144,7 @@ export class NodesBuilder extends AbstractBuilder<NodesQuery> {
       validator: NODES_VALIDATOR,
       queries,
     });
+    console.log("queries", queries);
   }
 }
 
