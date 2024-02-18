@@ -1,5 +1,5 @@
 {
-  "name": "@threefold/newstats",
+  "name": "@threefold/stats",
   "version": "2.3.0-alpha11",
   "private": true,
   "scripts": {

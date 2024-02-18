@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "tfgrid-newstats.fullname" . }}
+  name: {{ include "tfgrid-stats.fullname" . }}
   labels:
-    {{- include "tfgrid-newstats.labels" . | nindent 4 }}
+    {{- include "tfgrid-stats.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "tfgrid-newstats.fullname" . }}
+    name: {{ include "tfgrid-stats.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:

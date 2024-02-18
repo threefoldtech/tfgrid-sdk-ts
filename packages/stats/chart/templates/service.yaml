@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "tfgrid-newstats.fullname" . }}
+  name: {{ include "tfgrid-stats.fullname" . }}
   labels:
-    {{- include "tfgrid-newstats.labels" . | nindent 4 }}
+    {{- include "tfgrid-stats.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -12,4 +12,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "tfgrid-newstats.selectorLabels" . | nindent 4 }}
+    {{- include "tfgrid-stats.selectorLabels" . | nindent 4 }}

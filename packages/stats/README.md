@@ -31,7 +31,7 @@ yarn install
 You can now run the project in development mode using
 
 ```bash
-yarn workspace @threefold/newstats dev
+yarn workspace @threefold/stats dev
 ```
 
 ## Building and running in production mode
@@ -39,7 +39,7 @@ yarn workspace @threefold/newstats dev
 To create an optimised version of the app:
 
 ```bash
-yarn workspace @threefold/newstats  build
+yarn workspace @threefold/stats build
 ```
 
 This will generate the production build in the [dist](./dist/) directory, which can be served using [Caddy](https://caddyserver.com/) or [NGINX](https://www.nginx.com/)
