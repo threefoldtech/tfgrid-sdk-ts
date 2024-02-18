@@ -219,6 +219,28 @@
         </template>
       </TfFilter>
 
+      <TfFilter
+        query-route="num-gpu"
+        v-model="filters.numGpu"
+        :rules="[
+          validators.isNumeric('This field accepts numbers only.'),
+          validators.min('The number of gpus should be larger than zero.', 1),
+          validators.validateResourceMaxNumber('This value is out of range.'),
+        ]"
+      >
+        <template #input="{ props }">
+          <VTextField label="Num GPU" variant="outlined" v-model="filters.numGpu" v-bind="props">
+            <template #append-inner>
+              <VTooltip text="Filter by the number of gpus in the node.">
+                <template #activator="{ props }">
+                  <VIcon icon="mdi-information-outline" v-bind="props" />
+                </template>
+              </VTooltip>
+            </template>
+          </VTextField>
+        </template>
+      </TfFilter>
+
       <TfFilter query-route="node-status" v-model="filters.status">
         <v-select
           :model-value="filters.status || undefined"
@@ -344,6 +366,7 @@ export default {
       freeSSD: "",
       freeHDD: "",
       freeRAM: "",
+      numGpu: "",
       region: "",
       country: "",
       status: "",
@@ -380,6 +403,7 @@ export default {
             totalHru: convertToBytes(filters.value.minHDD),
             totalMru: convertToBytes(filters.value.minRAM),
             totalSru: convertToBytes(filters.value.minSSD),
+            numGpu: +filters.value.numGpu || undefined,
             hasGpu: filters.value.gpu || undefined,
             domain: filters.value.gateway || undefined,
           },

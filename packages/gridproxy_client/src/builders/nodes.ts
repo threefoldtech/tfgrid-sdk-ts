@@ -40,6 +40,7 @@ export interface NodesQuery {
   gpuAvailable: boolean;
   ownedBy: number;
   healthy: boolean;
+  numGpu: number;
 }
 
 const NODES_MAPPER: BuilderMapper<NodesQuery> = {
@@ -80,6 +81,7 @@ const NODES_MAPPER: BuilderMapper<NodesQuery> = {
   totalGpu: "total_gpu",
   ownedBy: "owned_by",
   healthy: "healthy",
+  numGpu: "num_gpu",
 };
 
 const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
@@ -129,6 +131,7 @@ const NODES_VALIDATOR: BuilderValidator<NodesQuery> = {
   totalGpu: assertInt,
   ownedBy: assertInt,
   healthy: assertBoolean,
+  numGpu: assertInt,
 };
 
 export class NodesBuilder extends AbstractBuilder<NodesQuery> {
