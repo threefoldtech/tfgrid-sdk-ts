@@ -88,7 +88,7 @@
       </template>
 
       <template #mail>
-        <SmtpServer v-model="smtp" :persistent="true" :tls="true">
+        <SmtpServer v-model="smtp" :persistent="true" :tls="true" :is-discourse="true">
           Discourse needs SMTP service so please configure these settings properly.
         </SmtpServer>
       </template>
