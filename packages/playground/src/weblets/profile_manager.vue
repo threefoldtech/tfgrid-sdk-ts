@@ -157,7 +157,7 @@
                               :disabled="creatingAccount || activatingAccount || activating"
                               @click:append="reloadValidation"
                             >
-                              <template v-slot:prepend-inner v-if="mnemonic && keypairType !== KeypairType.ed25519">
+                              <template v-slot:prepend-inner v-if="mnemonic && !isNonActiveMnemonic">
                                 <v-icon
                                   v-if="
                                     validateMnemonic(mnemonic) ||
