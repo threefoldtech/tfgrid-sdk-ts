@@ -253,6 +253,7 @@ class BaseModule {
       rootfs_size: data.size,
       corex: data.corex,
       gpu: data.gpu,
+      mycelium: data.network.mycelium ? true : false,
     };
   }
 
