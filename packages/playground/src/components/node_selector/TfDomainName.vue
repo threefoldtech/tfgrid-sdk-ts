@@ -43,7 +43,7 @@
             v-model="selectedDomain"
             :error-messages="domainsTask.error?.message"
             @vue:mounted="selectedDomain && ($refs.domainInput as VInput).validate()"
-            :rules="[d => (d ? d : 'Domain is required.')]"
+            :rules="[d => (d ? true : 'Domain is required.')]"
             @update:menu="opened => !opened && $nextTick().then(($refs.domainInput as VInput).validate)"
             @blur="$nextTick().then(($refs.domainInput as VInput).validate)"
             return-object
