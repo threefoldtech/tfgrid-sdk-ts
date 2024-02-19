@@ -48,6 +48,7 @@ class NetworkModule extends BaseModule {
   @expose
   @validateInput
   async getWireGuardConfigs(options: NetworkGetModel) {
+    //TODO: load it from the network metadata otherwise from the key/value store.
     const path = PATH.join(this.config.storePath, this.moduleName, options.name, "info.json");
     const networkInfo = await this.backendStorage.load(path);
     return networkInfo["wireguardConfigs"];

@@ -31,6 +31,7 @@ class Node {
   node_id: number;
   contract_id: number;
   reserved_ips: string[] = [];
+  user_access: UserAccess[] = [];
 }
 
 class AccessPoint {
@@ -39,11 +40,16 @@ class AccessPoint {
   node_id: number;
 }
 
-interface NetworkMetadata {
-  ip: string;
-  priv_key: string;
+interface UserAccess {
+  subnet: string;
+  private_key: string;
   node_id: number;
-  reserved_ips: string[];
+}
+
+interface NetworkMetadata {
+  version: number;
+  user_access: UserAccess[];
+  reserved_ips: number[]; // the least byte in the ip is only stored
 }
 
 class Network {
@@ -96,7 +102,9 @@ class Network {
     for (const node of this.nodes) {
       if (node.node_id === nodeId) {
         const parsedMetadata: NetworkMetadata = JSON.parse(metadata);
-        parsedMetadata.reserved_ips = node.reserved_ips;
+        parsedMetadata.reserved_ips = node.reserved_ips.map(i => +i.split(".")[3]);
+        parsedMetadata.version = 3;
+        parsedMetadata.user_access = node.user_access;
         return JSON.stringify(parsedMetadata);
       }
     }
@@ -377,7 +385,11 @@ class Network {
         const znet = this._fromObj(data);
         znet["node_id"] = contract.nodeID;
         const parsedMetadata: NetworkMetadata = JSON.parse(workload.metadata);
-        let reservedIps = parsedMetadata.reserved_ips;
+        let reservedIps = parsedMetadata.reserved_ips.map(ip => {
+          const parts = znet.subnet.split("/")[0].split(".");
+          parts[3] = String(ip);
+          return parts.join(".");
+        });
         if (reservedIps.length === 0) {
           reservedIps = await this.getReservedIpsFromVms(contract.nodeID);
         }
@@ -388,6 +400,7 @@ class Network {
         const n: Node = {
           contract_id: +contract.contractID,
           node_id: contract.nodeID,
+          user_access: parsedMetadata.user_access,
           reserved_ips: reservedIps,
         };
         this.nodes.push(n);
