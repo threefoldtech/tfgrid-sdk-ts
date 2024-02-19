@@ -21,24 +21,16 @@
     To Access mycelium IP, you should disable yggdrasil.
     <ul :style="{ listStyle: 'square' }">
       <li
+        v-for="method in myceliumMethods"
+        :key="method"
+        class="my-1"
         :style="{ listStyle: 'square' }"
         :class="{
           'text-white': $vuetify.theme.global.name === 'dark',
           'text-grey-darken-3': $vuetify.theme.global.name === 'light',
         }"
       >
-        &blacksquare; systemctl stop yggdrasil (linux)
-      </li>
-    </ul>
-    <ul :style="{ listStyle: 'square' }">
-      <li
-        :style="{ listStyle: 'square' }"
-        :class="{
-          'text-white': $vuetify.theme.global.name === 'dark',
-          'text-grey-darken-3': $vuetify.theme.global.name === 'light',
-        }"
-      >
-        &blacksquare; launchctl kill yggdrasil (macos)
+        &blacksquare; {{ method }}
       </li>
     </ul>
   </VAlert>
@@ -46,11 +38,12 @@
 
 <script lang="ts">
 const methods = ["public-ipv4", "planetary-network-ip", "public-ipv6", "wireguard-ip"];
+const myceliumMethods = ["systemctl stop yggdrasil (linux)", "launchctl kill yggdrasil (macos)"];
 
 export default {
   name: "AccessDeploymentAlert",
   setup() {
-    return { methods };
+    return { methods, myceliumMethods };
   },
 };
 </script>
