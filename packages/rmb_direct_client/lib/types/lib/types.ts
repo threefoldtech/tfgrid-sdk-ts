@@ -933,3 +933,11 @@ export class Envelope extends pb_1.Message {
     return Envelope.deserialize(bytes);
   }
 }
+
+export interface Twin {
+  id: number;
+  accountId: string;
+  relay: string;
+  entities: string[];
+  pk: string;
+}

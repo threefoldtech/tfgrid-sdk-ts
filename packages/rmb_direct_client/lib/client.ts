@@ -21,7 +21,7 @@ import type { WebSocket as WSConnection } from "ws";
 
 import ClientEnvelope from "./envelope";
 import { KPType, sign } from "./sign";
-import { Address, Envelope, Error, Ping, Pong, Request } from "./types/lib/types";
+import { Address, Envelope, Ping, Request, Twin } from "./types/lib/types";
 import { generatePublicKey } from "./util";
 
 class Client {
@@ -34,6 +34,7 @@ class Client {
   twin: any;
   destTwin: any;
   tfclient: TFClient;
+  twins = new Map<number, Twin>();
 
   constructor(
     public chainUrl: string,
@@ -119,6 +120,7 @@ class Client {
       }
 
       this.twin = await this.tfclient.twins.get({ id: twinId });
+      this.twins.set(Math.round(Date.now() / 1000), this.twin);
       try {
         this.updateSource();
         this.createConnection();
@@ -272,8 +274,15 @@ class Client {
     retries: number = this.retries,
   ) {
     try {
-      // need to check if destination twinId exists by fetching dest twin from chain first
-      this.destTwin = await this.tfclient.twins.get({ id: destinationTwinId });
+      const now = new Date().getTime();
+      const [key, value] =
+        [...this.twins.entries()].find(([_, value]) => Object.values(value).includes(destinationTwinId)) || [];
+
+      if (key && value && new Date().getTime() < now + expirationMinutes * 60 * 1000) {
+        this.destTwin = value;
+      } else {
+        this.destTwin = await this.tfclient.twins.get({ id: destinationTwinId });
+      }
 
       // create new envelope with given data and destination
       const envelope = new Envelope({
