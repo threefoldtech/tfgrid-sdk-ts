@@ -81,6 +81,7 @@ class QueryClient {
   }
 
   async newProvider() {
+    let provider: WsProvider;
     try {
       await QueryClient.connectingLock.acquireAsync();
       if (QueryClient.connections.has(this.url)) {
@@ -89,12 +90,13 @@ class QueryClient {
       }
       await this.disconnect();
 
-      const provider = new WsProvider(this.url);
+      provider = new WsProvider(this.url);
       this.api = await ApiPromise.create({ provider, throwOnConnect: true });
       await this.wait();
       QueryClient.connections.set(this.url, { api: this.api, disconnectHandler: this.__disconnectHandler });
       this.api.on("disconnected", this.__disconnectHandler);
     } catch (e) {
+      if (provider) provider.disconnect();
       const message = `Unable to establish a connection with the chain ${this.url} \n`;
       if (e instanceof BaseError) {
         e.message = message + e.message;
