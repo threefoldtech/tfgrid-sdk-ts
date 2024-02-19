@@ -99,7 +99,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
 import { DashboardRoutes } from "@/router/routes";
-import { useRequestStore } from "@/stores/stats";
+import { useStatsStore } from "@/stores/stats";
 
 import { useProfileManager } from "../stores";
 export default {
@@ -111,29 +111,8 @@ export default {
     const $router = useRouter();
     const pageTitle = computed(() => route.meta.title);
     const profileManager = useProfileManager();
-    const statsStore = useRequestStore();
-    const stats = computed(() => [
-      {
-        label: "Capacity",
-        value: statsStore.data?.capacity,
-        image: "capacity.png",
-      },
-      {
-        label: "Nodes",
-        value: statsStore.data?.nodes,
-        image: "nodes.png",
-      },
-      {
-        label: "Countries",
-        value: statsStore.data?.countries,
-        image: "countries.png",
-      },
-      {
-        label: "Cores",
-        value: statsStore.data?.cores,
-        image: "cores.png",
-      },
-    ]);
+    const statsStore = useStatsStore();
+
     const cards = [
       {
         title: "Your Profile",
@@ -177,7 +156,7 @@ export default {
       pageTitle,
       cards,
       profileManager,
-      stats,
+      stats: computed(() => statsStore.stats),
       baseUrl,
       $router,
     };

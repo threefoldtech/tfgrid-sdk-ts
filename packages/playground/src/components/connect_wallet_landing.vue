@@ -89,7 +89,7 @@ import { useRoute } from "vue-router";
 import { useTheme } from "vuetify";
 
 import { DashboardRoutes } from "@/router/routes";
-import { useRequestStore } from "@/stores/stats";
+import { useStatsStore } from "@/stores/stats";
 export default {
   name: "ConnectWalletLanding",
   setup() {
@@ -97,34 +97,12 @@ export default {
     const baseUrl = import.meta.env.BASE_URL;
     const route = useRoute();
     const pageTitle = computed(() => route.meta.title);
-    const statsStore = useRequestStore();
-    const stats = computed(() => [
-      {
-        label: "Capacity",
-        value: statsStore.data?.capacity,
-        image: "capacity.png",
-      },
-      {
-        label: "Nodes",
-        value: statsStore.data?.nodes,
-        image: "nodes.png",
-      },
-      {
-        label: "Countries",
-        value: statsStore.data?.countries,
-        image: "countries.png",
-      },
-      {
-        label: "Cores",
-        value: statsStore.data?.cores,
-        image: "cores.png",
-      },
-    ]);
+    const statsStore = useStatsStore();
     return {
       theme,
       pageTitle,
       DashboardRoutes,
-      stats,
+      stats: computed(() => statsStore.stats),
       statsUrl: window.env.STATS_URL || "https://stats.grid.tf",
       baseUrl,
     };
