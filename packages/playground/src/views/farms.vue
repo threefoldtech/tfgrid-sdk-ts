@@ -100,7 +100,7 @@
 
         <template v-if="loading">
           <div color="transparent" class="text-center">
-            <v-progress-circular />
+            <tf-loading />
             <p>Loading farm details...</p>
           </div>
         </template>

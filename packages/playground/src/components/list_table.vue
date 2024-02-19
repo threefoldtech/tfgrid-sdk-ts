@@ -57,7 +57,7 @@
     <template #bottom>
       <v-row class="mt-5" v-if="loading && items.length === 0">
         <v-spacer />
-        <v-progress-circular />
+        <tf-loading />
         <v-spacer />
       </v-row>
       <template v-else-if="!loading && items.length === 0 && (noDataText || $slots['no-data-text'])">

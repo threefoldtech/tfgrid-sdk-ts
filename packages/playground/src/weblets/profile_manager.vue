@@ -245,7 +245,7 @@
                 </v-btn>
                 <v-card v-show="termsLoading" :style="{ height: '100%' }">
                   <v-card-text class="d-flex justify-center align-center" :style="{ height: '100%' }">
-                    <v-progress-circular />
+                    <tf-loading />
                   </v-card-text>
                 </v-card>
               </v-dialog>

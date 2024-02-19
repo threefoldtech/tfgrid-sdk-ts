@@ -1,7 +1,7 @@
 <template>
   <td :colspan="columnsLen" v-if="dNodeLoading" style="text-align: center">
     <div class="pa-1">
-      <v-progress-circular model-value="20"></v-progress-circular>
+      <tf-loading :size="20" />
     </div>
   </td>
   <td :colspan="columnsLen" v-else-if="dNodeError" style="text-align: center">

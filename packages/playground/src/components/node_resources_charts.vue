@@ -19,15 +19,14 @@
       <div v-for="item in resources" :key="item.name" class="mx-6 d-flex flex-column pt-2 mt-2 align-center">
         <div class="mb-2">{{ item.name }}</div>
         <div class="text-center">
-          <v-progress-circular :model-value="item.value"
-            >{{ item.value !== "NaN" ? item.value + "%" : "N/A" }}
-          </v-progress-circular>
+          <tf-loading :model-value="item.value"> {{ item.value !== "NaN" ? item.value + "%" : "N/A" }}</tf-loading>
         </div>
       </div>
     </v-row>
 
     <v-row justify="center">
-      <v-progress-circular v-if="loading" indeterminate color="primary" :size="50" class="mt-10 mb-10" />
+      <tf-loading v-if="loading" class="mt-10 mb-10" />
+
       <v-btn rounded="md" variant="flat" color="primary" class="mt-10" @click="getNodeHealthUrl">
         Check Node Health
       </v-btn>
