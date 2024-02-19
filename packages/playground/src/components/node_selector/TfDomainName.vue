@@ -41,6 +41,7 @@
             :loading="domainsTask.loading"
             item-title="publicConfig.domain"
             v-model="selectedDomain"
+            :error-messages="domainsTask.error?.message"
             @vue:mounted="selectedDomain && ($refs.domainInput as VInput).validate()"
             :rules="[d => (d ? true : 'Domain is required.')]"
             @update:menu="opened => !opened && $nextTick().then(($refs.domainInput as VInput).validate)"
@@ -60,6 +61,11 @@
                   Load More Domains
                 </VBtn>
               </VContainer>
+            </template>
+            <template v-slot:append>
+              <v-slide-x-reverse-transition mode="out-in">
+                <v-icon icon="mdi-reload" @click="reloadDomains()"></v-icon>
+              </v-slide-x-reverse-transition>
             </template>
           </VAutocomplete>
         </input-tooltip>
@@ -125,7 +131,6 @@ export default {
       },
       default: [],
     });
-
     const pageCountTask = useAsync(getNodePageCount, { default: 1 });
     const pagination = usePagination();
 
