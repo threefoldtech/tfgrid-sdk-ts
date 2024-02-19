@@ -80,6 +80,13 @@
       @click:row="$attrs['onClick:row']"
       :sort-by="sortBy"
     >
+      <template #[`item.planetary`]="{ item }">
+        <div class="d-flex align-center">
+          {{ item.masters[0].planetary || "-" }}
+          <v-chip v-if="item.value.mycelium" color="primary" class="text-capitalize"> Mycelium </v-chip>
+        </div>
+      </template>
+
       <template #[`item.created`]="{ item }">
         {{ toHumanDate(item.value.masters[0].created) }}
       </template>
