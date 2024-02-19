@@ -4,7 +4,7 @@
     <v-alert variant="tonal" type="warning" class="mb-4 pa-2">
       <p>All data subject to change</p>
     </v-alert>
-    <v-form @submit.prevent="mintingHash()" class="d-inline-flex w-100">
+    <v-form class="d-inline-flex w-100">
       <FormValidator v-model="isValidForm">
         <InputValidator
           :value="receiptHash"
@@ -13,6 +13,7 @@
             validators.equal('Receipt hash must be 64 characters long.', 64),
             validators.isHash('Invalid hash', 'sha256'),
           ]"
+          :asyncRules="[mintingHash()]"
           #="{ props: validationProps }"
           ref="hashInput"
         >
@@ -23,10 +24,6 @@
             v-bind="{ ...validationProps }"
             :loading="loading"
         /></InputValidator>
-
-        <VBtn type="submit" color="secondary" variant="outlined" :disabled="!isValidForm" :loading="loading">
-          View
-        </VBtn>
       </FormValidator>
     </v-form>
     <v-container class="mt-8" v-if="item && item.Minting">
@@ -183,8 +180,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
+import type { AsyncRule, RuleReturn } from "@/components/input_validator.vue";
 import { useInputRef } from "@/hooks/input_validator";
 
 import { normalizeError } from "../utils/helpers";
@@ -207,17 +205,30 @@ function reset() {
   item.value = null;
   noData.value = null;
 }
-async function mintingHash() {
-  loading.value = true;
-  reset();
-  try {
-    item.value = await getMintingData(receiptHash.value);
-  } catch (e) {
-    noData.value = normalizeError(e, "Something went wrong while fetching data.");
-  } finally {
-    loading.value = false;
-  }
+function mintingHash(): AsyncRule {
+  const asyncValidator: AsyncRule = async (): Promise<RuleReturn> => {
+    loading.value = true;
+    reset();
+    try {
+      item.value = await getMintingData(receiptHash.value);
+      return { message: "" };
+    } catch (e) {
+      noData.value = normalizeError(e, "Something went wrong while fetching data.");
+      return { message: "Failed to fetch minting data" };
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  return asyncValidator;
 }
+
+watch(
+  () => receiptHash.value,
+  () => {
+    reset();
+  },
+);
 </script>
 
 <style scoped>
