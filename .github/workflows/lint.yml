@@ -5,9 +5,9 @@ name: Full Clients Lint
 
 on:
   push:
-    branches: [development]
+    branches: [development, development_314]
   pull_request:
-    branches: [development]
+    branches: [development, development_314]
 
 jobs:
   lint:
