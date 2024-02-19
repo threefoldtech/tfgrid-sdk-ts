@@ -23,6 +23,7 @@
             v-model="receiptHash"
             v-bind="{ ...validationProps }"
             :loading="loading"
+            @update:modelValue="reset"
         /></InputValidator>
       </FormValidator>
     </v-form>
@@ -176,7 +177,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from "vue";
+import { ref } from "vue";
 
 import type { AsyncRule, RuleReturn } from "@/components/input_validator.vue";
 import { useInputRef } from "@/hooks/input_validator";
@@ -214,13 +215,6 @@ function mintingHash(): AsyncRule {
 
   return asyncValidator;
 }
-
-watch(
-  () => receiptHash.value,
-  () => {
-    reset();
-  },
-);
 </script>
 
 <style scoped>
