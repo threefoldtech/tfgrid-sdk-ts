@@ -153,6 +153,13 @@ class Network {
     this.accessPoints.push(accessPoint);
     await this.generatePeers();
     this.updateNetworkDeployments();
+    // should be always there as we check at the top if the node exist on the network
+    const node = this.nodes.filter(node => node.node_id === node_id)[0];
+    node.user_access.push({
+      node_id,
+      private_key: keypair.privateKey,
+      subnet: accessPoint.subnet,
+    });
     this.wireguardConfig = this.getWireguardConfig(accessPoint.subnet, keypair.privateKey, nodesWGPubkey, endpoint);
     return this.wireguardConfig;
   }
