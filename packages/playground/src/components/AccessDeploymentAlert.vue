@@ -17,6 +17,31 @@
       </li>
     </ul>
   </VAlert>
+  <VAlert type="info" variant="tonal" class="my-4">
+    To Access mycelium IP, you should disable yggdrasil.
+    <ul :style="{ listStyle: 'square' }">
+      <li
+        :style="{ listStyle: 'square' }"
+        :class="{
+          'text-white': $vuetify.theme.global.name === 'dark',
+          'text-grey-darken-3': $vuetify.theme.global.name === 'light',
+        }"
+      >
+        &blacksquare; systemctl stop yggdrasil (linux)
+      </li>
+    </ul>
+    <ul :style="{ listStyle: 'square' }">
+      <li
+        :style="{ listStyle: 'square' }"
+        :class="{
+          'text-white': $vuetify.theme.global.name === 'dark',
+          'text-grey-darken-3': $vuetify.theme.global.name === 'light',
+        }"
+      >
+        &blacksquare; launchctl kill yggdrasil (macos)
+      </li>
+    </ul>
+  </VAlert>
 </template>
 
 <script lang="ts">
