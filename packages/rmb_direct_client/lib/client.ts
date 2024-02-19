@@ -16,6 +16,7 @@ import {
 import AwaitLock from "await-lock";
 import base64url from "base64url";
 import { Buffer } from "buffer";
+import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
 import type { WebSocket as WSConnection } from "ws";
 
@@ -34,7 +35,7 @@ class Client {
   twin: any;
   destTwin: any;
   tfclient: TFClient;
-  twins = new Map<number, Twin>();
+  twins = new Map<number, { twin: Twin; timeStamp: number }>();
 
   constructor(
     public chainUrl: string,
@@ -120,7 +121,7 @@ class Client {
       }
 
       this.twin = await this.tfclient.twins.get({ id: twinId });
-      this.twins.set(Math.round(Date.now() / 1000), this.twin);
+      this.twins.set(this.twin.id, { twin: this.twin, timeStamp: Math.round(Date.now() / 1000) });
       try {
         this.updateSource();
         this.createConnection();
@@ -274,14 +275,14 @@ class Client {
     retries: number = this.retries,
   ) {
     try {
-      const now = new Date().getTime();
-      const [key, value] =
-        [...this.twins.entries()].find(([_, value]) => Object.values(value).includes(destinationTwinId)) || [];
+      const twin = this.twins.get(destinationTwinId);
+      const isValid = moment(twin?.timeStamp).isBefore(moment().subtract(10, "minutes"));
 
-      if (key && value && new Date().getTime() < now + expirationMinutes * 60 * 1000) {
-        this.destTwin = value;
+      if (twin && isValid) {
+        this.destTwin = twin;
       } else {
         this.destTwin = await this.tfclient.twins.get({ id: destinationTwinId });
+        this.twins.set(destinationTwinId, { twin: this.destTwin, timeStamp: Math.round(Date.now() / 1000) });
       }
 
       // create new envelope with given data and destination
@@ -290,6 +291,7 @@ class Client {
         timestamp: Math.round(Date.now() / 1000),
         expiration: expirationMinutes * 60,
         source: this.source,
+        twins: this.twins,
       });
       envelope.destination = new Address({ twin: this.destTwin.id });
 

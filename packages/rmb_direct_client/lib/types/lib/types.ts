@@ -397,6 +397,7 @@ export class Envelope extends pb_1.Message {
           expiration?: number;
           source?: Address;
           destination?: Address;
+          twins?: Map<number, { twin: Twin; timeStamp: number }>;
         } & (
           | (
               | {
