@@ -172,10 +172,6 @@
         </v-list>
       </v-card>
     </v-container>
-
-    <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="noData">
-      {{ noData }}
-    </v-alert>
   </view-layout>
 </template>
 
@@ -185,14 +181,12 @@ import { ref, watch } from "vue";
 import type { AsyncRule, RuleReturn } from "@/components/input_validator.vue";
 import { useInputRef } from "@/hooks/input_validator";
 
-import { normalizeError } from "../utils/helpers";
 import { getMintingData } from "../utils/mintings";
 
 const receiptHash = ref();
 const isValidForm = ref(false);
 const hashInput = useInputRef();
 const loading = ref(false);
-const noData = ref<string | null>(null);
 const item = ref();
 const mintNodeInfoHeaders = ["ID", "Farm", "Measured Uptime"];
 const fixupNodeInfoHeaders = ["ID", "Farm"];
@@ -203,7 +197,6 @@ const fixupPayoutHeaders = ["TFT Received", "TFT Owed", "Additional TFT Minted",
 
 function reset() {
   item.value = null;
-  noData.value = null;
 }
 function mintingHash(): AsyncRule {
   const asyncValidator: AsyncRule = async (): Promise<RuleReturn> => {
@@ -213,8 +206,7 @@ function mintingHash(): AsyncRule {
       item.value = await getMintingData(receiptHash.value);
       return { message: "" };
     } catch (e) {
-      noData.value = normalizeError(e, "Something went wrong while fetching data.");
-      return { message: "Failed to fetch minting data" };
+      return { message: "Receipt not found." };
     } finally {
       loading.value = false;
     }
