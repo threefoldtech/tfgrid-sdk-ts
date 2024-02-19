@@ -72,6 +72,7 @@
 
       <template #[`item.planetary`]="{ item }">
         {{ item.value.planetary || "-" }}
+        <v-chip v-if="item.value.mycelium" color="primary" class="text-capitalize"> Mycelium </v-chip>
       </template>
 
       <template #[`item.wireguard`]="{ item }">
