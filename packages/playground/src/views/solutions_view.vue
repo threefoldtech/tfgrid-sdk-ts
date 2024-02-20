@@ -178,7 +178,9 @@ export default {
     const searchItem = ref();
     function filterCards(search: any) {
       searchItem.value = search;
-      filteredCards.value = searchItem.value ? cards.filter(n => n.title.includes(searchItem.value)) : cards;
+      filteredCards.value = searchItem.value
+        ? cards.filter(n => n.title.toLocaleLowerCase().includes(searchItem.value.toLocaleLowerCase()))
+        : cards;
     }
 
     return {
