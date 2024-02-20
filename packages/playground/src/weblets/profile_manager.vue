@@ -157,14 +157,14 @@
                               :disabled="creatingAccount || activatingAccount || activating"
                               @click:append="reloadValidation"
                             >
-                              <template v-slot:prepend-inner v-if="mnemonic && !isNonActiveMnemonic">
+                              <template v-slot:prepend-inner v-if="isValid">
                                 <v-icon
+                                  color="green"
                                   v-if="
-                                    validateMnemonic(mnemonic) ||
+                                    (mnemonic && validateMnemonic(mnemonic)) ||
                                     ((mnemonic.length === 64 || mnemonic.length === 66) &&
                                       isAddress(mnemonic.length === 66 ? mnemonic : `0x${mnemonic}`))
                                   "
-                                  color="green"
                                 >
                                   mdi-check
                                 </v-icon>
@@ -431,6 +431,7 @@ import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
 import { activateAccountAndCreateTwin, createAccount, getGrid, loadBalance, loadProfile } from "../utils/grid";
 import { normalizeBalance, normalizeError } from "../utils/helpers";
+
 const items = ref([{ id: 1, name: "stellar" }]);
 const depositWallet = ref("");
 const selectedName = ref("");
@@ -447,6 +448,7 @@ const enableReload = ref(true);
 
 const theme = useTheme();
 const qrCodeText = ref("");
+const isValid = ref<boolean>(false);
 const props = defineProps({
   modelValue: {
     required: false,
@@ -683,11 +685,15 @@ function validateMnInput(mnemonic: string) {
   isNonActiveMnemonic.value = false;
   enableReload.value = true;
   return getGrid({ mnemonic, keypairType: keypairType.value })
-    .then(() => undefined)
+    .then(() => {
+      isValid.value = true;
+      return undefined;
+    })
     .catch(e => {
       if (e instanceof TwinNotExistError) {
         isNonActiveMnemonic.value = true;
         enableReload.value = false;
+        isValid.value = false;
         return {
           message: `Couldn't get the user twin for the provided mnemonic in ${
             process.env.NETWORK || window.env.NETWORK
@@ -695,7 +701,7 @@ function validateMnInput(mnemonic: string) {
         };
       }
       enableReload.value = false;
-
+      isValid.value = false;
       return {
         message: normalizeError(e, "Something went wrong. please try again."),
       };
