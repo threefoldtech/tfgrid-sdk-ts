@@ -59,7 +59,7 @@
                 <v-col cols="1" sm="2" style="min-width: fit-content">
                   <v-list-item> E-mail :</v-list-item>
                 </v-col>
-                <v-col cols="11" sm="10">
+                <v-col>
                   <v-list-item v-if="!editEmail">
                     <div style="display: flex; justify-content: space-between">
                       {{ profileManager.profile?.email ? profileManager.profile?.email : "None" }}
