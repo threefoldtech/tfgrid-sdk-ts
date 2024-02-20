@@ -8,10 +8,10 @@ class RMB {
     this.client = rmbClient;
   }
 
-  async request(destTwinIds: number[], cmd: string, payload: string, expiration = 20, retires = 1) {
+  async request(destTwinIds: number[], cmd: string, payload: string, expiration = 20, retries = 1) {
     let result;
     try {
-      const requestId = await this.client.send(cmd, payload, destTwinIds[0], expiration / 60);
+      const requestId = await this.client.send(cmd, payload, destTwinIds[0], expiration / 60, retries);
       result = await this.client.read(requestId);
     } catch (e) {
       if (e instanceof BaseError) {
