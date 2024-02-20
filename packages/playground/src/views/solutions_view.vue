@@ -1,12 +1,6 @@
 <template>
   <view-layout>
-    <v-autocomplete
-      label="Search Applications"
-      v-model="searchItem"
-      :items="titles"
-      class="mb-5"
-      @update:search="filterCards"
-    ></v-autocomplete>
+    <v-text-field label="Search Applications" v-model="searchItem" class="mb-5" @input="filterCards"></v-text-field>
     <v-row>
       <v-col sm="12" md="6" lg="4" v-for="card in filteredCards" :key="card.title">
         <router-link :to="card.route">
@@ -175,12 +169,11 @@ export default {
       title,
     }));
     const baseURL = import.meta.env.BASE_URL;
-    const searchItem = ref();
-    function filterCards(search: any) {
-      searchItem.value = search;
-      filteredCards.value = searchItem.value
-        ? cards.filter(n => n.title.toLocaleLowerCase().includes(searchItem.value.toLocaleLowerCase()))
-        : cards;
+    const searchItem = ref("");
+    function filterCards() {
+      filteredCards.value = cards.filter(n =>
+        n.title.toLocaleLowerCase().includes(searchItem.value.toLocaleLowerCase()),
+      );
     }
 
     return {
