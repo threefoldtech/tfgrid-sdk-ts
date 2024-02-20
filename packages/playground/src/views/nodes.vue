@@ -218,6 +218,28 @@
           </VTextField>
         </template>
       </TfFilter>
+      <TfFilter
+        query-route="free-public-ips"
+        :rules="[
+          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.min('The node id should be larger then zero.', 1),
+          validators.startsWith('The node id start with zero.', '0'),
+          validators.validateResourceMaxNumber('This value is out of range.'),
+        ]"
+        v-model="filters.publicIPs"
+      >
+        <template #input="{ props }">
+          <VTextField label="Free Public IPs" variant="outlined" v-model="filters.publicIPs" v-bind="props">
+            <template #append-inner>
+              <VTooltip text="Filter by free Public IPs">
+                <template #activator="{ props }">
+                  <VIcon icon="mdi-information-outline" v-bind="props" />
+                </template>
+              </VTooltip>
+            </template>
+          </VTextField>
+        </template>
+      </TfFilter>
 
       <TfFilter query-route="node-status" v-model="filters.status">
         <v-select
@@ -349,6 +371,7 @@ export default {
       status: "",
       gateway: false,
       gpu: false,
+      publicIPs: "",
     });
 
     const loading = ref<boolean>(true);
@@ -382,6 +405,7 @@ export default {
             totalSru: convertToBytes(filters.value.minSSD),
             hasGpu: filters.value.gpu || undefined,
             domain: filters.value.gateway || undefined,
+            freeIps: +filters.value.publicIPs || undefined,
           },
           { loadFarm: true },
         );
