@@ -397,7 +397,6 @@ export class Envelope extends pb_1.Message {
           expiration?: number;
           source?: Address;
           destination?: Address;
-          twins?: Map<number, { twin: Twin; timeStamp: number }>;
         } & (
           | (
               | {
@@ -933,12 +932,4 @@ export class Envelope extends pb_1.Message {
   static deserializeBinary(bytes: Uint8Array): Envelope {
     return Envelope.deserialize(bytes);
   }
-}
-
-export interface Twin {
-  id: number;
-  accountId: string;
-  relay: string;
-  entities: string[];
-  pk: string;
 }
