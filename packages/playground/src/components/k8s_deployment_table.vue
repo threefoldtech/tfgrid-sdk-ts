@@ -166,7 +166,7 @@ async function loadDeployments() {
   items.value = clusters.items.map((item: any) => {
     item.name = item.deploymentName;
     item.ipv4 = item.masters[0].publicIP?.ip?.split("/")?.[0] || item.masters[0].publicIP?.ip || "None";
-    item.ipv6 = item.masters[0].publicIP?.ip6 || "None";
+    item.ipv6 = item.masters[0].publicIP?.ip6.replace(/\/64$/, "") || "None";
     item.planetary = item.masters[0].planetary || "None";
     item.workersLength = item.workers.length;
     item.billing = item.masters[0].billing;
