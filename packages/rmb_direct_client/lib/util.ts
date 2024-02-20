@@ -1,9 +1,11 @@
 import * as secp from "@noble/secp256k1";
 import { mnemonicToMiniSecret } from "@polkadot/util-crypto";
+import type { Client, Twin } from "@threefold/tfchain_client";
 import { ValidationError } from "@threefold/types";
 import * as bip39 from "bip39";
 import { Buffer } from "buffer";
 import * as cryptoJs from "crypto-js";
+import moment from "moment";
 
 function isValidSeed(seed: string) {
   const hexRegex = /^[0-9a-fA-F]+$/;
@@ -67,4 +69,21 @@ export function wordArrayToUint8Array(data: cryptoJs.lib.WordArray) {
     dataArray[i] = (data.words[i >>> 0x2] >>> (0x18 - (i % 0x4) * 0x8)) & 0xff;
   }
   return new Uint8Array(dataArray);
+}
+
+export async function getTwin(id: number, twins: Map<number, { twin: Twin; timestamp: number }>, tfclient: Client) {
+  let twin;
+  const mappedTwin = twins.get(id);
+  const isValid = mappedTwin?.timestamp
+    ? moment(mappedTwin?.timestamp).isBefore(moment().subtract(10, "minutes"))
+    : false;
+
+  if (mappedTwin && isValid) {
+    twin = mappedTwin.twin;
+  } else {
+    twin = await tfclient.twins.get({ id });
+    twins.set(id, { twin: twin, timestamp: Math.round(Date.now() / 1000) });
+  }
+
+  return twin;
 }
