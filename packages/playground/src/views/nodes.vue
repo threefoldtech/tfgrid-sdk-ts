@@ -163,7 +163,7 @@
         ]"
       >
         <template #input="{ props }">
-          <VTextField label="Min CPU " variant="outlined" v-model="filters.minCRU" v-bind="props">
+          <VTextField label="Min CPU (vCores)" variant="outlined" v-model="filters.minCRU" v-bind="props">
             <template #append-inner>
               <VTooltip text="Filter by the minimum total number of CPUs in the node.">
                 <template #activator="{ props }">
