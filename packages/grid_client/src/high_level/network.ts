@@ -1,13 +1,30 @@
 import { ValidationError } from "@threefold/types";
 import { Addr } from "netaddr";
+import * as PATH from "path";
 
+import { GridClientConfig } from "../config";
 import { MyceliumNetworkModel } from "../modules";
-import { DeploymentFactory, Network } from "../primitives";
+import { DeploymentFactory, Network, UserAccess } from "../primitives";
+import { BackendStorage } from "../storage";
 import { WorkloadTypes, Znet } from "../zos";
 import { HighLevelBase } from "./base";
 import { Operations, TwinDeployment } from "./models";
 
 class NetworkHL extends HighLevelBase {
+  backendStorage: BackendStorage;
+  constructor(public config: GridClientConfig) {
+    super(config);
+    this.backendStorage = new BackendStorage(
+      config.backendStorageType,
+      config.substrateURL,
+      config.mnemonic,
+      config.storeSecret,
+      config.keypairType,
+      config.backendStorage,
+      config.seed,
+    );
+  }
+
   async addNode(
     networkName: string,
     ipRange: string,
@@ -26,14 +43,7 @@ class NetworkHL extends HighLevelBase {
       projectName: this.config.projectName,
     });
 
-    const workload = await network.addNode(
-      nodeId,
-      mycelium,
-      networkMetadata,
-      description,
-      subnet,
-      myceliumNetworkSeeds,
-    );
+    const workload = await network.addNode(nodeId, mycelium, description, subnet, myceliumNetworkSeeds);
     if (!workload) {
       throw new ValidationError(`Node ${nodeId} already exists on network ${networkName}.`);
     }
@@ -56,7 +66,7 @@ class NetworkHL extends HighLevelBase {
         if (workload.type !== WorkloadTypes.network || !Addr(network.ipRange).contains(Addr(data.subnet))) {
           continue;
         }
-        workload.data = network.updateNetwork(data);
+        workload.data = network.getUpdatedNetwork(data);
         workload.version += 1;
         break;
       }
@@ -69,6 +79,32 @@ class NetworkHL extends HighLevelBase {
     const network = new Network(networkName, ipRange, this.config);
     await network.load();
     return network.nodeExists(nodeId);
+  }
+
+  async getWireguardConfigs(networkName: string, ipRange: string, nodeId?: number): Promise<string[]> {
+    const configs: string[] = [];
+    const network = new Network(networkName, ipRange, this.config);
+    await network.load();
+    if (nodeId && !network.nodeExists(nodeId)) {
+      return configs;
+    }
+    const node = network.nodes[0];
+    let userAccesses: UserAccess[] = [];
+    if (node.user_access && node.user_access.length > 0) {
+      if (nodeId && network.nodeExists(nodeId)) {
+        userAccesses = node.user_access.filter(userAccess => userAccess.node_id === nodeId);
+      }
+      for (const userAccess of userAccesses) {
+        const nodesWGPubkey = await network.getNodeWGPublicKey(userAccess.node_id);
+        const endpoint = await network.getAccessNodeEndpoint(userAccess.node_id);
+        configs.push(network.getWireguardConfig(userAccess.subnet, userAccess.private_key, nodesWGPubkey, endpoint));
+      }
+      return configs;
+    } else {
+      const path = PATH.join(this.config.storePath, "networks", networkName, "info.json");
+      const networkInfo = await this.backendStorage.load(path);
+      return networkInfo["wireguardConfigs"];
+    }
   }
 }
 

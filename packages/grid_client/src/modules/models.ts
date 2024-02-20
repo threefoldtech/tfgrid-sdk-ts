@@ -802,6 +802,7 @@ class NetworkHasNodeModel {
 
 class NetworkGetModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() ipRange: string;
 }
 
 class SetDedicatedNodeExtraFeesModel {

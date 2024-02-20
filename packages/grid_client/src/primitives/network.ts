@@ -40,7 +40,7 @@ class AccessPoint {
   node_id: number;
 }
 
-interface UserAccess {
+export interface UserAccess {
   subnet: string;
   private_key: string;
   node_id: number;
@@ -117,31 +117,36 @@ class Network {
     return workload;
   }
 
+  async getAccessNodeEndpoint(nodeId: number, ipv4 = true): Promise<string> {
+    const accessNodes = await this.capacity.getAccessNodes(this.config.twinId);
+    if (Object.keys(accessNodes).includes(nodeId.toString())) {
+      if (ipv4 && !accessNodes[nodeId]["ipv4"]) {
+        throw new GridClientErrors.Nodes.InvalidResourcesError(`Node ${nodeId} does not have ipv4 public config.`);
+      }
+    } else {
+      throw new GridClientErrors.Nodes.AccessNodeError(`Node ${nodeId} is not an access node.`);
+    }
+
+    const nodeWGListeningPort = this.getNodeWGListeningPort(nodeId);
+    let endpoint = "";
+    if (accessNodes[nodeId]["ipv4"]) {
+      endpoint = `${accessNodes[nodeId]["ipv4"].split("/")[0]}:${nodeWGListeningPort}`;
+    } else if (accessNodes[nodeId]["ipv6"]) {
+      endpoint = `[${accessNodes[nodeId]["ipv6"].split("/")[0]}]:${nodeWGListeningPort}`;
+    } else {
+      throw new GridClientErrors.Nodes.InvalidResourcesError(
+        `Couldn't find ipv4 or ipv6 in the public config of node ${nodeId}.`,
+      );
+    }
+    return endpoint;
+  }
+
   async addAccess(node_id: number, ipv4: boolean): Promise<string> {
     if (!this.nodeExists(node_id)) {
       throw new ValidationError(`Node ${node_id} does not exist in the network. Please add it first.`);
     }
     events.emit("logs", `Adding access to node ${node_id}`);
-    const accessNodes = await this.capacity.getAccessNodes(this.config.twinId);
-    if (Object.keys(accessNodes).includes(node_id.toString())) {
-      if (ipv4 && !accessNodes[node_id]["ipv4"]) {
-        throw new GridClientErrors.Nodes.InvalidResourcesError(`Node ${node_id} does not have ipv4 public config.`);
-      }
-    } else {
-      throw new GridClientErrors.Nodes.AccessNodeError(`Node ${node_id} is not an access node.`);
-    }
-
-    const nodeWGListeningPort = this.getNodeWGListeningPort(node_id);
-    let endpoint = "";
-    if (accessNodes[node_id]["ipv4"]) {
-      endpoint = `${accessNodes[node_id]["ipv4"].split("/")[0]}:${nodeWGListeningPort}`;
-    } else if (accessNodes[node_id]["ipv6"]) {
-      endpoint = `[${accessNodes[node_id]["ipv6"].split("/")[0]}]:${nodeWGListeningPort}`;
-    } else {
-      throw new GridClientErrors.Nodes.InvalidResourcesError(
-        `Couldn't find ipv4 or ipv6 in the public config of node ${node_id}.`,
-      );
-    }
+    const endpoint = await this.getAccessNodeEndpoint(node_id, ipv4);
 
     const nodesWGPubkey = await this.getNodeWGPublicKey(node_id);
     const keypair = this.generateWireguardKeypair();
