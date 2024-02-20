@@ -74,7 +74,9 @@ export function wordArrayToUint8Array(data: cryptoJs.lib.WordArray) {
 export async function getTwin(id: number, twins: Map<number, { twin: Twin; timestamp: number }>, tfclient: Client) {
   let twin;
   const mappedTwin = twins.get(id);
-  const isValid = moment(mappedTwin?.timestamp).isBefore(moment().subtract(10, "minutes"));
+  const isValid = mappedTwin?.timestamp
+    ? moment(mappedTwin?.timestamp).isBefore(moment().subtract(10, "minutes"))
+    : false;
 
   if (mappedTwin && isValid) {
     twin = mappedTwin.twin;
