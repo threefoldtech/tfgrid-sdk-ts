@@ -231,7 +231,7 @@ async function listNodes(params: any) {
 }
 
 async function loadNodes() {
-  let params = tabParams[activeTab.value as keyof typeof tabParams];
+  const params = tabParams[activeTab.value as keyof typeof tabParams];
 
   if (!params) {
     return;
@@ -248,8 +248,7 @@ async function loadNodes() {
   try {
     if (activeTab.value === 0) {
       const onlineNodes = await listNodes(params);
-      params = tabParams[2];
-      const standbyNodes = await listNodes(params);
+      const standbyNodes = await listNodes(tabParams[2]);
       const allNodes = onlineNodes.data.concat(standbyNodes.data);
       data = {
         count: (onlineNodes.count ?? 0) + (standbyNodes.count ?? 0),
