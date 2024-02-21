@@ -69,11 +69,11 @@ export default {
       return [
         { name: "ID", value: twinId || "-" },
         {
-          name: "Account ID",
+          name: "Account Address",
           value: accountId || "-",
           icon: "mdi-content-copy",
           callback: copy,
-          hint: "Copy the account id to the clipboard.",
+          hint: "Copy the account address to the clipboard.",
         },
         { name: "Relay", value: relay || "-" },
       ];
