@@ -123,7 +123,9 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     }),
   );
   const wireguards = await Promise.all(
-    vms.map((vm, index) => getWireguardConfig(grids[index], vm[0].interfaces[0].network).catch(() => [])),
+    vms.map((vm, index) =>
+      getWireguardConfig(grids[index], vm[0].interfaces[0].network, vm[0].interfaces[0].ip).catch(() => []),
+    ),
   );
 
   const data = vms.map((vm, index) => {
@@ -141,10 +143,10 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     failedDeployments,
   };
 }
-export function getWireguardConfig(grid: GridClient, name: string) {
+export function getWireguardConfig(grid: GridClient, name: string, ipRange: string) {
   const projectName = grid.clientOptions!.projectName;
   return updateGrid(grid, { projectName: "" })
-    .networks.getWireGuardConfigs({ name })
+    .networks.getWireGuardConfigs({ name, ipRange })
     .finally(() => updateGrid(grid, { projectName }));
 }
 
@@ -224,7 +226,11 @@ export async function loadK8s(grid: GridClient) {
 
   const wireguards = await Promise.all(
     k8s.map((cluster, index) =>
-      getWireguardConfig(grids[index], cluster.masters[0].interfaces[0].network).catch(() => []),
+      getWireguardConfig(
+        grids[index],
+        cluster.masters[0].interfaces[0].network,
+        cluster.masters[0].interfaces[0].ip,
+      ).catch(() => []),
     ),
   );
   const data = k8s.map((cluster, index) => {
