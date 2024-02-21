@@ -23,7 +23,7 @@
       :disabled="disableButton"
       v-if="node.rentedByTwinId === 0"
       color="primary"
-      @click="reserveNode"
+      @click.stop="reserveNode"
     >
       Reserve
     </v-btn>
@@ -35,9 +35,19 @@
       :loading="loadingUnreserveBtn"
       :disabled="disableButton"
       v-if="node.rentedByTwinId === profileManager.profile?.twinId"
-      @click="removeReserve"
+      @click.stop="removeReserve"
     >
       Unreserve
+    </v-btn>
+
+    <v-btn
+      size="small"
+      outlined
+      disabled
+      v-if="node.rentedByTwinId !== 0 && node.rentedByTwinId !== profileManager.profile?.twinId"
+      color="primary"
+    >
+      Reserved
     </v-btn>
   </container>
 </template>

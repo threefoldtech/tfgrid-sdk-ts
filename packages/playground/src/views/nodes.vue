@@ -10,7 +10,9 @@
       <TfFilter
         query-route="node-id"
         :rules="[
-          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.isNumeric('This field accepts numbers only.', {
+            no_symbols: true,
+          }),
           validators.min('The node id should be larger then zero.', 1),
           validators.startsWith('The node id start with zero.', '0'),
           validators.validateResourceMaxNumber('This is not a valid ID.'),
@@ -34,7 +36,9 @@
         query-route="farm-id"
         v-model="filters.farmId"
         :rules="[
-          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.isNumeric('This field accepts numbers only.', {
+            no_symbols: true,
+          }),
           validators.min('The ID should be larger than zero.', 1),
           validators.isInt('should be an integer'),
           validators.validateResourceMaxNumber('This is not a valid ID.'),
@@ -288,6 +292,10 @@
       <TfFilter query-route="gpu" v-model="filters.gpu">
         <v-switch color="primary" inset label="GPU Node (Only)" v-model="filters.gpu" hide-details />
       </TfFilter>
+
+      <TfFilter query-route="dedicated" v-model="filters.dedicated">
+        <v-switch color="primary" inset label="Dedicated Nodes (Only)" v-model="filters.dedicated" hide-details />
+      </TfFilter>
     </TfFiltersContainer>
 
     <div class="nodes mt-5">
@@ -307,6 +315,7 @@
                   page = $event;
                   loadNodes();
                 "
+                @reload-table="reloadTable"
                 :count="nodesCount"
                 :loading="loading"
                 v-model:selectedNode="selectedNodeId"
@@ -395,6 +404,7 @@ export default {
       gateway: false,
       gpu: false,
       publicIPs: "",
+      dedicated: false,
     });
 
     const loading = ref<boolean>(true);
@@ -430,6 +440,7 @@ export default {
             hasGpu: filters.value.gpu || undefined,
             domain: filters.value.gateway || undefined,
             freeIps: +filters.value.publicIPs || undefined,
+            dedicated: filters.value.dedicated || undefined,
           },
           { loadFarm: true },
         );
@@ -466,6 +477,9 @@ export default {
       isDialogOpened.value = true;
     };
 
+    function reloadTable() {
+      setTimeout(loadNodes, 20000);
+    }
     return {
       loading,
       nodesCount,
@@ -475,7 +489,7 @@ export default {
       closeDialog,
       requestNodes,
       isDialogOpened,
-
+      reloadTable,
       filters,
       NodeStatus,
       size,
