@@ -130,7 +130,6 @@ class VMHL extends HighLevelBase {
     }
 
     // ipv4
-    // TODO: make sure that the farm has a free public ip before continuing the deployment
     let ipName = "";
     let publicIps = 0;
     if (publicIp || publicIp6) {
@@ -138,6 +137,15 @@ class VMHL extends HighLevelBase {
       ipName = `${name}_pubip`;
       workloads.push(ip.create(ipName, metadata, description, 0, publicIp, publicIp6));
       if (publicIp) {
+        const node = await this.nodes.getNode(nodeId);
+        const _farm = await this.config.tfclient.farms.get({ id: node.farmId });
+        const freeIps = _farm.publicIps.filter(res => res.contractId === 0).length;
+        if (freeIps < 1) {
+          throw new GridClientErrors.Farms.InvalidResourcesError(
+            `Farm ${_farm.id} doesn't have enough public IPs: requested IPs=1 for machine with name: ${name},
+            , available IPs=${freeIps}.`,
+          );
+        }
         publicIps++;
       }
     }
