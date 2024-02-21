@@ -357,6 +357,10 @@
             <CopyInputWrapper :data="profileManager.profile.address" #="{ props }">
               <VTextField label="Address" readonly v-model="profileManager.profile.address" v-bind="props" />
             </CopyInputWrapper>
+
+            <CopyInputWrapper :data="freeBalance.toString()" #="{ props }">
+              <VTextField label="Balance" readonly v-model="freeBalance" v-bind="props" />
+            </CopyInputWrapper>
           </v-col>
           <v-divider class="hidden-sm-and-down" vertical></v-divider>
 
@@ -594,6 +598,7 @@ const isValidConnectConfirmationPassword = computed(() =>
 const profileManagerController = useProfileManagerController();
 
 const balance = profileManagerController.balance;
+let freeBalance = balance.value?.free ?? 0;
 
 const activeTab = ref(0);
 const password = ref("");
@@ -753,6 +758,7 @@ async function __loadBalance(profile?: Profile, tries = 1) {
     loadingBalance.value = true;
     const grid = await getGrid(profile);
     balance.value = await loadBalance(grid!);
+    freeBalance = balance.value.free ?? 0;
     if (!BalanceWarningRaised && balance.value?.free) {
       if (balance.value?.free < 0.01) {
         createCustomToast("Your balance is too low, Please fund your account.", ToastType.warning);
