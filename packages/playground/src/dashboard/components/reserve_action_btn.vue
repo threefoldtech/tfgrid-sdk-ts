@@ -121,19 +121,24 @@ export default {
     }
 
     async function reserveNode() {
-      loadingReserveNode.value = true;
+      const isLogged = profileManager.profile;
       try {
-        const grid = await getGrid(profileManager.profile!);
-        createCustomToast("Transaction Submitted", ToastType.info);
-        await grid?.nodes.reserve({ nodeId: +props.node.nodeId });
-        createCustomToast(`Transaction succeeded node ${props.node.nodeId} Reserved`, ToastType.success);
-        notifyDelaying();
-        emit("updateTable");
-        disableButton.value = true;
-        setTimeout(() => {
-          disableButton.value = false;
-          loadingReserveNode.value = false;
-        }, 20000);
+        if (isLogged) {
+          loadingReserveNode.value = true;
+          const grid = await getGrid(profileManager.profile!);
+          createCustomToast("Transaction Submitted", ToastType.info);
+          await grid?.nodes.reserve({ nodeId: +props.node.nodeId });
+          createCustomToast(`Transaction succeeded node ${props.node.nodeId} Reserved`, ToastType.success);
+          notifyDelaying();
+          emit("updateTable");
+          disableButton.value = true;
+          setTimeout(() => {
+            disableButton.value = false;
+            loadingReserveNode.value = false;
+          }, 20000);
+        } else {
+          createCustomToast("Please Login first to continue.", ToastType.danger);
+        }
       } catch (e) {
         if (e instanceof InsufficientBalanceError) {
           createCustomToast(`Can't create rent contract due to Insufficient balance`, ToastType.danger);
@@ -144,6 +149,7 @@ export default {
         loadingReserveNode.value = false;
       }
     }
+
     return {
       openUnreserveDialog,
       loadingUnreserveNode,
