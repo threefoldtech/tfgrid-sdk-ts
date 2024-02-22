@@ -1,12 +1,6 @@
 <template>
   <view-layout>
-    <v-text-field
-      label="Search Applications"
-      v-model="searchItem"
-      class="mb-5"
-      @input="filterCards"
-      clearable
-    ></v-text-field>
+    <v-text-field label="Search Applications" v-model="searchItem" class="mb-5" clearable></v-text-field>
     <v-row>
       <v-col sm="12" md="6" lg="4" v-for="card in filteredCards" :key="card.title">
         <router-link :to="card.route">
@@ -42,12 +36,13 @@
           >
         </router-link>
       </v-col>
+      <p v-if="filteredCards.length === 0" class="mx-3 mb-3">No solution was found with the provided search query.</p>
     </v-row>
   </view-layout>
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 import { DashboardRoutes } from "@/router/routes";
 
@@ -170,17 +165,14 @@ export default {
         route: DashboardRoutes.Applications.Wordpress,
       },
     ];
-    const filteredCards = ref(cards);
     const titles = cards.map(({ title }) => ({
       title,
     }));
     const baseURL = import.meta.env.BASE_URL;
     const searchItem = ref("");
-    function filterCards() {
-      filteredCards.value = cards.filter(n =>
-        n.title.toLocaleLowerCase().includes(searchItem.value.toLocaleLowerCase()),
-      );
-    }
+    const filteredCards = computed(() =>
+      cards.filter(n => n.title.toLocaleLowerCase().includes(searchItem.value.toLocaleLowerCase())),
+    );
 
     return {
       cards,
@@ -188,7 +180,6 @@ export default {
       searchItem,
       titles,
       filteredCards,
-      filterCards,
     };
   },
 };
