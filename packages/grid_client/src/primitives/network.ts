@@ -49,7 +49,6 @@ export interface UserAccess {
 interface NetworkMetadata {
   version: number;
   user_access: UserAccess[];
-  reserved_ips: number[]; // the least byte in the ip is only stored
 }
 
 class Network {
@@ -102,7 +101,6 @@ class Network {
     for (const node of this.nodes) {
       if (node.node_id === nodeId) {
         const parsedMetadata: NetworkMetadata = JSON.parse(metadata);
-        parsedMetadata.reserved_ips = node.reserved_ips.map(i => +i.split(".")[3]);
         parsedMetadata.version = 3;
         parsedMetadata.user_access = node.user_access;
         return JSON.stringify(parsedMetadata);
@@ -397,15 +395,9 @@ class Network {
         const znet = this._fromObj(data);
         znet["node_id"] = contract.nodeID;
         const parsedMetadata: NetworkMetadata = JSON.parse(workload.metadata);
-        let reservedIps = parsedMetadata.reserved_ips.map(ip => {
-          const parts = znet.subnet.split("/")[0].split(".");
-          parts[3] = String(ip);
-          return parts.join(".");
-        });
-        if (reservedIps.length === 0) {
-          reservedIps = await this.getReservedIpsFromVms(contract.nodeID);
-        }
-        if (data.ip_range !== this.ipRange) {
+        const reservedIps = await this.getReservedIps(contract.nodeID);
+
+        if (znet.ip_range !== this.ipRange) {
           throw new ValidationError(`The same network name ${this.name} with a different ip range already exists.`);
         }
 
@@ -658,44 +650,15 @@ class Network {
     return this.contracts;
   }
 
-  private async getReservedIpsFromVms(nodeId: number): Promise<string[]> {
-    const reservedIps: string[] = [];
-    const contracts = await this.tfClient.contracts.listMyNodeContracts({
-      graphqlURL: this.config.graphqlURL,
-      nodeId: nodeId,
-    });
-
-    const parsedContracts: Required<GqlNodeContract>[] = [];
-
-    for (const contract of contracts) {
-      const parsedDeploymentData = JSON.parse(contract.deploymentData);
-      parsedContracts.push({ ...contract, parsedDeploymentData });
-    }
-
-    for (const contract of parsedContracts) {
-      const type = contract.parsedDeploymentData.type;
-      if (!(type === "vm" || type === "kubernetes")) continue;
-      const node_twin_id = await this.capacity.getNodeTwinId(contract.nodeID);
-      const payload = JSON.stringify({ contract_id: contract.contractID });
-      let res: Deployment;
-      try {
-        res = await this.rmb.request([node_twin_id], "zos.deployment.get", payload);
-      } catch (e) {
-        (e as Error).message = formatErrorMessage(`Failed to load network deployment ${contract.contractID}`, e);
-        throw e;
-      }
-      for (const workload of res.workloads) {
-        if (workload.type !== WorkloadTypes.zmachine) {
-          continue;
-        }
-        if (workload.result.state === "deleted") {
-          continue;
-        }
-        const data = workload.data as Zmachine;
-        for (const i of data.network.interfaces) {
-          if (i.network === this.name) reservedIps.push(i.ip);
-        }
-      }
+  private async getReservedIps(nodeId: number): Promise<string[]> {
+    const node_twin_id = await this.capacity.getNodeTwinId(nodeId);
+    const payload = JSON.stringify({ network_name: this.name });
+    let reservedIps: string[];
+    try {
+      reservedIps = await this.rmb.request([node_twin_id], "zos.network.list_private_ips", payload);
+    } catch (e) {
+      (e as Error).message = formatErrorMessage(`Failed to list reserved ips from node ${nodeId}`, e);
+      throw e;
     }
     return reservedIps;
   }
