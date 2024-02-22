@@ -1,6 +1,12 @@
 <template>
   <view-layout>
-    <v-text-field label="Search Applications" v-model="searchItem" class="mb-5" @input="filterCards"></v-text-field>
+    <v-text-field
+      label="Search Applications"
+      v-model="searchItem"
+      class="mb-5"
+      @input="filterCards"
+      clearable
+    ></v-text-field>
     <v-row>
       <v-col sm="12" md="6" lg="4" v-for="card in filteredCards" :key="card.title">
         <router-link :to="card.route">
