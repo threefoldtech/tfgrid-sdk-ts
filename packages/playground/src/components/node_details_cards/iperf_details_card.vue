@@ -61,7 +61,7 @@ export default {
     const getNodeIPerfCard = async (): Promise<NodeDetailsCard[]> => {
       const res = await gridStore.grid.zos.getNodeIPerfTest({ nodeId: props.node.nodeId });
       // filter the returned result to show node other than the one being tested against
-      let array = res.result
+      const array = res.result
         .filter(
           (node: any) => node.download_speed && node.upload_speed && !node.error && node.node_id !== props.node.nodeId,
         )
@@ -71,10 +71,6 @@ export default {
           downloadSpeed: format(node.download_speed),
           uploadSpeed: format(node.upload_speed),
         }));
-
-      if (array.length > 4) {
-        array = array.slice(4);
-      }
       IperfDetails.value = array;
       return IperfDetails.value;
     };
