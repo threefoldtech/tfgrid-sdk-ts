@@ -165,9 +165,7 @@ export default {
         route: DashboardRoutes.Applications.Wordpress,
       },
     ];
-    const titles = cards.map(({ title }) => ({
-      title,
-    }));
+
     const baseURL = import.meta.env.BASE_URL;
     const searchItem = ref("");
     const filteredCards = computed(() =>
@@ -178,7 +176,6 @@ export default {
       cards,
       baseURL,
       searchItem,
-      titles,
       filteredCards,
     };
   },
