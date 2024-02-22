@@ -192,6 +192,7 @@ export default {
         debugOpened.value = undefined;
         page.value = 1;
         logs.value = [];
+        document?.querySelector("html")?.style.removeProperty("overflow");
         logsCount.value.run();
       },
     });
