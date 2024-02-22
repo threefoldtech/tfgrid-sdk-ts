@@ -68,7 +68,11 @@
                   </v-list-item>
 
                   <v-list-item v-if="editEmail">
-                    <v-form style="display: flex; justify-content: space-between" v-model="isValid">
+                    <v-form
+                      @submit.prevent="saveEmail"
+                      style="display: flex; justify-content: space-between"
+                      v-model="isValid"
+                    >
                       <input-validator
                         :value="email"
                         :rules="[
@@ -86,14 +90,7 @@
                           autofocus
                         />
                       </input-validator>
-                      <v-btn
-                        type="submit"
-                        icon="mdi-content-save-all"
-                        class="mt-2"
-                        variant="text"
-                        :disabled="!isValid"
-                        @click="saveEmail"
-                      >
+                      <v-btn type="submit" icon="mdi-content-save-all" class="mt-2" variant="text" :disabled="!isValid">
                       </v-btn>
                     </v-form>
                   </v-list-item>
@@ -261,7 +258,7 @@ async function saveEmail() {
   try {
     loading.value = true;
     await storeEmail(grid!, email.value);
-    profileManager.profile!.email = await readEmail(grid!);
+    profileManager.profile!.email = email.value;
     editEmail.value = false;
     loading.value = false;
   } catch (e) {

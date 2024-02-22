@@ -275,7 +275,6 @@
               >
                 <v-text-field label="Email" placeholder="email@example.com" v-model="email" v-bind="props" />
               </input-validator>
-
               <PasswordInputWrapper #="{ props: passwordInputProps }">
                 <InputValidator
                   :value="password"
@@ -817,7 +816,7 @@ async function storeAndLogin() {
   const mnemonicHash = cryptr.encrypt(mnemonic.value);
   const keypairTypeHash = cryptr.encrypt(keypairType.value);
   const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
-  await storeEmail(grid!, email.value);
+  storeEmail(grid!, email.value);
   setCredentials(md5(password.value), mnemonicHash, keypairTypeHash, md5(email.value));
   activate(mnemonic.value, keypairType.value);
 }
