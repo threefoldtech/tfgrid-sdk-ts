@@ -158,3 +158,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.v-btn.text-error:hover > .v-btn__overlay {
+  opacity: none;
+}
+</style>
