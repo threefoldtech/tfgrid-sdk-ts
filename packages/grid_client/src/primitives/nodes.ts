@@ -386,7 +386,6 @@ class Nodes {
       free_ips: options.publicIPs ? 1 : "",
       ipv4: options.accessNodeV4,
       ipv6: options.accessNodeV6,
-      gateway: options.gateway,
       certification_type: options.certified ? "Certified" : "",
       farm_ids: options.farmId ? [options.farmId] : options.farmIds,
       farm_name: options.farmName,
