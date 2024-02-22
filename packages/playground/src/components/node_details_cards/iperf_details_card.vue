@@ -61,10 +61,11 @@ export default {
     const getNodeIPerfCard = async (): Promise<NodeDetailsCard[]> => {
       const res = await gridStore.grid.zos.getNodeIPerfTest({ nodeId: props.node.nodeId });
       // filter the returned result to show node other than the one being tested against
-      let array = res.result
+      const array = res.result
         .filter(
           (node: any) => node.download_speed && node.upload_speed && !node.error && node.node_id !== props.node.nodeId,
         )
+        .slice(0, 4)
         .map(node => ({
           name: node.test_type.toLocaleUpperCase(),
           type: isIPv4(node.node_ip) ? "IPv4" : "IPv6",
@@ -72,9 +73,6 @@ export default {
           uploadSpeed: format(node.upload_speed),
         }));
 
-      if (array.length > 4) {
-        array = array.slice(4);
-      }
       IperfDetails.value = array;
       return IperfDetails.value;
     };
