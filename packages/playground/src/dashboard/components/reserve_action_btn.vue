@@ -42,10 +42,9 @@
 
     <v-btn
       size="small"
-      outlined
-      disabled
+      variant="text"
       v-if="node.rentedByTwinId !== 0 && node.rentedByTwinId !== profileManager.profile?.twinId"
-      color="primary"
+      color="error"
     >
       Reserved
     </v-btn>
