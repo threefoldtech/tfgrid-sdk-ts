@@ -161,6 +161,6 @@ export default {
 
 <style scoped>
 .v-btn.text-error:hover > .v-btn__overlay {
-  opacity: none;
+  opacity: 0;
 }
 </style>
