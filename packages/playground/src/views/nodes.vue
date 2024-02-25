@@ -10,7 +10,9 @@
       <TfFilter
         query-route="node-id"
         :rules="[
-          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.isNumeric('This field accepts numbers only.', {
+            no_symbols: true,
+          }),
           validators.min('The node id should be larger then zero.', 1),
           validators.startsWith('The node id start with zero.', '0'),
           validators.validateResourceMaxNumber('This is not a valid ID.'),
@@ -34,7 +36,9 @@
         query-route="farm-id"
         v-model="filters.farmId"
         :rules="[
-          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.isNumeric('This field accepts numbers only.', {
+            no_symbols: true,
+          }),
           validators.min('The ID should be larger than zero.', 1),
           validators.isInt('should be an integer'),
           validators.validateResourceMaxNumber('This is not a valid ID.'),
@@ -86,72 +90,6 @@
           </TfFilter>
         </template>
       </TfSelectLocation>
-
-      <TfFilter
-        query-route="min-ssd"
-        v-model="filters.minSSD"
-        :rules="[
-          validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The total ssd should be larger then zero.', 1),
-          validators.validateResourceMaxNumber('This value is out of range.'),
-        ]"
-      >
-        <template #input="{ props }">
-          <VTextField label="Min SSD (GB)" variant="outlined" v-model="filters.minSSD" v-bind="props">
-            <template #append-inner>
-              <VTooltip text="Filter by the minimum total amount of SSD in the node.">
-                <template #activator="{ props }">
-                  <VIcon icon="mdi-information-outline" v-bind="props" />
-                </template>
-              </VTooltip>
-            </template>
-          </VTextField>
-        </template>
-      </TfFilter>
-
-      <TfFilter
-        query-route="min-hdd"
-        v-model="filters.minHDD"
-        :rules="[
-          validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The total hdd should be larger then zero.', 1),
-          validators.validateResourceMaxNumber('This value is out of range.'),
-        ]"
-      >
-        <template #input="{ props }">
-          <VTextField label="Min HDD (GB)" variant="outlined" v-model="filters.minHDD" v-bind="props">
-            <template #append-inner>
-              <VTooltip text="Filter by the minimum total amount of HDD in the node.">
-                <template #activator="{ props }">
-                  <VIcon icon="mdi-information-outline" v-bind="props" />
-                </template>
-              </VTooltip>
-            </template>
-          </VTextField>
-        </template>
-      </TfFilter>
-
-      <TfFilter
-        query-route="min-ram"
-        v-model="filters.minRAM"
-        :rules="[
-          validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The total ram should be larger then zero.', 1),
-          validators.validateResourceMaxNumber('This value is out of range.'),
-        ]"
-      >
-        <template #input="{ props }">
-          <VTextField label="Min RAM (GB)" variant="outlined" v-model="filters.minRAM" v-bind="props">
-            <template #append-inner>
-              <VTooltip text="Filter by the minimum total amount of RAM in the node.">
-                <template #activator="{ props }">
-                  <VIcon icon="mdi-information-outline" v-bind="props" />
-                </template>
-              </VTooltip>
-            </template>
-          </VTextField>
-        </template>
-      </TfFilter>
 
       <TfFilter
         query-route="min-cpu"
@@ -243,7 +181,9 @@
       <TfFilter
         query-route="free-public-ips"
         :rules="[
-          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.isNumeric('This field accepts numbers only.', {
+            no_symbols: true,
+          }),
           validators.min('The node id should be larger then zero.', 1),
           validators.startsWith('The node id start with zero.', '0'),
           validators.validateResourceMaxNumber('This value is out of range.'),
@@ -382,9 +322,6 @@ export default {
       nodeId: "",
       farmId: "",
       farmName: "",
-      minSSD: "",
-      minHDD: "",
-      minRAM: "",
       minCRU: "",
       freeSSD: "",
       freeHDD: "",
@@ -423,9 +360,6 @@ export default {
             freeHru: convertToBytes(filters.value.freeHDD),
             freeMru: convertToBytes(filters.value.freeRAM),
             freeSru: convertToBytes(filters.value.freeSSD),
-            totalHru: convertToBytes(filters.value.minHDD),
-            totalMru: convertToBytes(filters.value.minRAM),
-            totalSru: convertToBytes(filters.value.minSSD),
             totalCru: +filters.value.minCRU || undefined,
             hasGpu: filters.value.gpu || undefined,
             domain: filters.value.gateway || undefined,
