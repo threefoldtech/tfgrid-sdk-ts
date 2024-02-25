@@ -775,55 +775,10 @@ AllowedIPs = ${this.ipRange}, ${networkIP}
 PersistentKeepalive = 25\nEndpoint = ${endpoint}`;
   }
 
-  async save(contract_id = 0, node_id = 0) {
-    let network;
-    if (await this.exists()) {
-      network = await this.getNetwork();
-    } else {
-      network = {
-        ip_range: this.ipRange,
-        nodes: [],
-        wireguardConfigs: [],
-      };
-    }
-
-    if (this.wireguardConfig && !network.wireguardConfigs.includes(this.wireguardConfig)) {
-      network.wireguardConfigs.push(this.wireguardConfig);
-    }
-
+  async save() {
     if (this.nodes.length === 0) {
       await this.delete();
       return;
-    }
-
-    const nodes = [];
-    for (const node of this.nodes) {
-      if (!node.contract_id && node.node_id === node_id) {
-        node.contract_id = contract_id;
-      }
-      if (!node.contract_id) {
-        continue;
-      }
-      nodes.push({
-        contract_id: node.contract_id,
-        node_id: node.node_id,
-        reserved_ips: this.getNodeReservedIps(node.node_id),
-      });
-    }
-    network.nodes = nodes;
-    if (nodes.length !== 0) {
-      await this._save(network);
-    } else {
-      await this.delete();
-    }
-  }
-
-  async _save(network): Promise<void> {
-    const path = PATH.join(this.getNetworksPath(), this.name, "info.json");
-    const current = await this.backendStorage.load(path);
-    if (JSON.stringify(current) !== JSON.stringify(network)) {
-      const updateOperations = await this.backendStorage.dump(path, network);
-      await this.saveIfKVStoreBackend(updateOperations);
     }
   }
 

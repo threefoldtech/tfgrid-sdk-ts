@@ -136,14 +136,13 @@ class TwinDeploymentHandler {
   }
 
   async saveNetworks(twinDeployments: TwinDeployment[]) {
+    // left just to delete the old keys
     for (const twinDeployment of twinDeployments) {
       if (twinDeployment.network) {
         if (twinDeployment.operation === Operations.delete) {
           await twinDeployment.network.save();
           continue;
         }
-        // deploy or update operations
-        await twinDeployment.network.save(twinDeployment.deployment.contract_id, twinDeployment.nodeId);
       }
     }
   }
