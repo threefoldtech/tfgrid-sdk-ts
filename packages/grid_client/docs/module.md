@@ -17,132 +17,266 @@ Module should be:
 "relay.${network}.grid.tf" in all networks except for main. It would be "relay.grid.tf".
 
 - **Create**
-
-  cmd: `twinserver.twins.create`
+  cmd: `client.twins.create`
 
   payload: `'{"relay": "<relay>"}'`
 
 - **Update**
-
-  cmd: `twinserver.twins.update`
+  cmd: `client.twins.update`
 
   payload: `'{"relay": "<relay>"}'`
 
 - **Get**
 
-  cmd: `twinserver.twins.get`
+  cmd: `client.twins.get`
 
   payload: `'{"id": <twin id>}'`
 
 - **Get my twin id**
-
-  cmd: `twinserver.twins.get_my_twin_id`
+  cmd: `client.twins.get_my_twin_id`
 
   payload: `""`
 
 - **Get twin id by account id**
 
-  cmd: `twinserver.twins.get_twin_id_by_account_id`
+  cmd: `client.twins.get_twin_id_by_account_id`
 
   payload: `'{"public_key": <substrate account id>}'`
 
 ### Contracts
 
-- **Create Node**
+- **Create Node Contract**
 
-  cmd: `twinserver.contracts.create_node`
+  cmd: `client.contracts.create_node`
 
-  payload: `'{"node_id": "<zos node id>", "hash": "<deployment challenge hash>", "data": "<deployment data>", "public_ip": <number of public IPs>}'`
+  payload: `'{"node_id": "<zos node id>", "hash": "<deployment challenge hash>", "data": "<deployment data>", "public_ip": <number of public IPs>, "solutionProviderId": "<solution provider id(optional)>"}'`
 
-- **Create Name**
+- **Create Name Contract**
 
-  cmd: `twinserver.contracts.create_name`
+  cmd: `client.contracts.create_name`
 
   payload: `'{"name": "<contract name>"}'`
 
+- **Create Rent Contract**
+
+  cmd: `client.contracts.createRent`
+
+  payload: `'{"nodeId": "<zos node id>", "solutionProviderId": "<solution provider id(optional)>"}'`
+
 - **Get**
 
-  cmd: `twinserver.contracts.get`
+  cmd: `client.contracts.get`
 
   payload: `'{"id": <contract id>}'`
 
 - **Get contract id by node id and hash**
 
-  cmd: `twinserver.contracts.get_contract_id_by_node_id_and_hash`
+  cmd: `client.contracts.get_contract_id_by_node_id_and_hash`
 
-  payload: `'{"node_id": 1, "hash": <deployment challenge hash>}'`
-
-- **Get node contracts**
-
-  cmd: `twinserver.contracts.get_node_contracts`
-
-  payload: `'{"node_id": 1, "state": <contracts state should be "Created", "Deleted", or "OutOfFunds">}'`
+  payload: `'{"node_id":  "<zos node id>, "hash": <deployment challenge hash>}'`
 
 - **Get name contract**
 
-  cmd: `twinserver.contracts.get_name_contract`
+  cmd: `client.contracts.get_name_contract`
 
   payload: `'{"name": <contract name>}'`
 
+- **Get Extra fee for dedicated node**
+
+  cmd: `client.contracts.getDedicatedNodeExtraFee`
+
+  payload: `'{"nodeId":  "<zos node id>", "extraFee" : "< extrea fee for dedicated node>"}'`
+
+- **Set Extra fee for dedicated node**
+
+  cmd: `client.contracts.setDedicatedNodeExtraFee`
+
+  payload: `'{"nodeId":  "<zos node id>"}'`
+
+- **Get Active contracts**
+
+  cmd: `client.contracts.getActiveContracts`
+
+  payload: `'{"nodeId":  "<zos node id>"}'`
+
+- **Get Active Rent contracts for a node**
+
+  cmd: `client.contracts.activeRentContractForNode`
+
+  payload: `'{"nodeId":  "<zos node id>"}'`
+
 - **Update Node**
 
-  cmd: `twinserver.contracts.update_node`
+  cmd: `client.contracts.update_node`
 
   payload: `'{"id": <contract id>, "hash": "<deployment challenge hash>", "data": "<deployment data>"}'`
 
 - **Cancel**
 
-  cmd: `twinserver.contracts.cancel`
+  cmd: `client.contracts.cancel`
 
   payload: `'{"id": <contract id>}'`
 
+- **List all my contracts**
+
+  cmd: `client.contracts.listMyContracts`
+
+  payload: `'{""}'`
+
+- **List all my contracts**
+
+  cmd: `client.contracts.listMyContracts`
+
+  payload: `'{""}'`
+
+- **Cancel all my contracts**
+
+  cmd: `client.contracts.cancelMyContracts`
+
+  payload: `'{""}'`
+
+- **List contracts by wallet TwinId**
+
+  cmd: `client.contracts.listContractsByTwinId`
+
+  payload: `'{"twinId": <twin id>}'`
+
+- **List contracts by wallet address**
+
+  cmd: `client.contracts.listContractsByAddress`
+
+  payload: `'{"address": <wallet address>}'`
+
 - **Create Service Contract**
 
-  cmd: `twinserver.contracts.createServiceContract`
+  cmd: `client.contracts.createServiceContract`
 
   payload: `'{"serviceAccount": <service account address>, "consumerAccount": <consumer account address>}'`
 
 - **Approve Service Contract**
 
-  cmd: `twinserver.contracts.approveServiceContract`
+  cmd: `client.contracts.approveServiceContract`
 
   payload: `'{"serviceId": <service contract id>, "approve": <approval of service contract>}'`
 
 - **Bill Service Contract**
 
-  cmd: `twinserver.contracts.billServiceContract`
+  cmd: `client.contracts.billServiceContract`
 
   payload: `'{"serviceId": <service contract id>, "variableAmount": <bill amount>, "metadata": <metadata>}'`
 
 - **Cancel Service Contract**
 
-  cmd: `twinserver.contracts.cancelServiceContract`
+  cmd: `client.contracts.cancelServiceContract`
 
   payload: `'{"serviceId": <service contract id>}'`
 
 - **Set Fees of Service Contract**
 
-  cmd: `twinserver.contracts.setFeesServiceContract`
+  cmd: `client.contracts.setFeesServiceContract`
 
   payload: `'{"serviceId": <service contract id>, "baseFee": <base fee of serivce contract>, "variableFee": <variable fee of serivce contract>}'`
 
 - **Set Metadata of Service Contract**
 
-  cmd: `twinserver.contracts.setMetadataServiceContract`
+  cmd: `client.contracts.setMetadataServiceContract`
 
   payload: `'{"serviceId": <service contract id>, "metadata": <metadata>}'`
 
 - **Get Service Contract**
 
-  cmd: `twinserver.contracts.getServiceContract`
+  cmd: `client.contracts.getServiceContract`
 
   payload: `'{"serviceId": <service contract id>}'`
+
+### Nodes
+
+- **Reserve Node**
+  cmd: `client.nodes.reserve`
+
+  payload: `'{"nodeId": "<zos node id>"}'`
+
+- **Unreserve Node**
+  cmd: `client.nodes.unreserve`
+
+  payload: `'{"nodeId": "<zos node id>"}'`
+
+- **Get Rent Contract by id**
+  cmd: `client.nodes.getRentContractId`
+
+  payload: `'{"nodeId": "<zos node id>"}'`
+
+- **Set Node Power**
+  cmd: `client.nodes.setNodePower`
+
+  payload: `'{"nodeId": "<zos node id>" , "power": "<node power to be true or false>"}'`
+
+- **Add Node PublicConfig**
+
+  cmd: `client.nodes.addNodePublicConfig`
+
+  payload: `'{"farmId": "<farm id>" , "node Id": "<zos node id>" , "ip4": "<public ip4(optional)>" , "ip6": "<public ip6(optional)>", "domain": "<domain(optional)>"}'`
+
+- **Get all nodes**
+  cmd: `client.nodes.all`
+
+  payload: `""`
+
+### Farms
+
+- **Create Farm**
+  cmd: `client.farms.create`
+
+  payload: `'{"name": "<farm name>" , "publicIps": "<list of public ips(optional)>"}'`
+
+- **Add Farm Ip**
+  cmd: `client.farms.addFarmIp`
+
+  payload: `'{"farmId": "<farm id>" , "ip": "<public ip>" , "gw": "<gateway>"}'`
+
+- **Remove Farm Ip**
+  cmd: `client.farms.removeFarmIp`
+
+  payload: `'{"farmId": "<farm id>" , "ip": "<public ip>" }'`
+
+- **Add Stellar Address**
+  cmd: `client.farms.addStellarAddress`
+
+  payload: `'{"farmId": "<farm id>" , "stellarAddress": "<stellar address>" }'`
+
+- **Get Fram By Id**
+
+  cmd: `client.farms.getFarmByID`
+
+  payload: `'{"id": "<farm id>"}'`
+
+### Networks
+
+- **Add Node to network**
+  cmd: `client.networks.addNode`
+
+  payload: `'{"name": "<network name>" , "ipRange": "<Public ips range>", "nodeId": "<zos node id>", "mycelium": "<Flag for mycelium>"}'`
+
+- **List**
+  cmd: `client.networks.list`
+
+  payload: `''`
+
+- **Check if network has Node**
+  cmd: `client.networks.hasNode`
+
+  payload: `'{"name": "<network name>" , "ipRange": "<Public ips range>", "nodeId": "<zos node id>" }'`
+
+- **Get WireGaurd Configs**
+  cmd: `client.networks.getWireGuardConfigs`
+
+  payload: `'{"name": "<network name>" , "ipRange": "<Public ips range>", "nodeId": "<zos node id>" }'`
 
 ### ZOS
 
 - **Deploy**
 
-  cmd: `twinserver.zos.deploy`
+  cmd: `client.zos.deploy`
 
   payload: the same as zos deployment without signing with additional parameter `'{"node_id": <zos node id> }'`
 
@@ -150,15 +284,81 @@ Module should be:
 
 - **Get deployment**
 
-  cmd: `twinserver.zos.getDeployment`
+  cmd: `client.zos.getDeployment`
 
   payload: `'{"contractId": <your contract id>}'`
+
+- **Ping Node**
+
+  cmd: `client.zos.pingNode`
+
+  payload: `'{"nodeId": <zos node id>}'`
+
+- **Get Node Statistics**
+
+  cmd: `client.zos.getNodeStatistics`
+
+  payload: `'{"nodeId": <zos node id>}'`
+
+- **Check if node has PublicIPv6**
+
+  cmd: `client.zos.hasPublicIPv6`
+
+  payload: `'{"nodeId": <zos node id>}'`
+
+- **List Network Interfaces**
+
+  cmd: `client.zos.listNetworkInterfaces`
+
+  payload: `'{"nodeId": <zos node id>}'`
+
+- **List Network PublicIPs**
+
+  cmd: `client.zos.listNetworkPublicIPs`
+
+  payload: `'{"nodeId": <zos node id>}'`
+
+- **Get Network PublicConfig**
+
+  cmd: `client.zos.getNetworkPublicConfig`
+
+  payload: `'{"nodeId": <zos node id>}'`
+
+- **Get Storage Pools**
+
+  cmd: `client.zos.getStoragePools`
+
+  payload: `'{"nodeId": <zos node id>}'`
+
+- **Get Node GPU Info**
+
+  cmd: `client.zos.getNodeGPUInfo`
+
+  payload: `'{"nodeId": <zos node id>}'`
+
+- **Get Node PerfTests**
+
+  cmd: `client.zos.getNodePerfTests`
+
+  payload: `'{"nodeId": <zos node id>}'`
+
+- **Get Node IP Validation**
+
+  cmd: `client.zos.getNodeIPValidation`
+
+  payload: `'{"nodeId": <zos node id>}'`
+
+- **Get Node CPU Test**
+
+  cmd: `client.zos.getNodeCPUTest`
+
+  payload: `'{"nodeId": <zos node id>}'`
 
 ### Generic Machines
 
 - **Deploy**
 
-  cmd: `twinserver.machines.deploy`
+  cmd: `client.machines.deploy`
 
   payload:
 
@@ -210,27 +410,33 @@ Module should be:
 
   > **Note:** disk size and rootfs_size in GB, memory in MB, disk name should be different than the machine name
 
+- **Update**
+
+  cmd: `client.machines.update`
+
+  payload: `same as deploy method`
+
 - **List**
 
-  cmd: `twinserver.machines.list`
+  cmd: `client.machines.list`
 
   payload: `""`
 
 - **Get**
 
-  cmd: `twinserver.machines.get`
+  cmd: `client.machines.get`
 
   payload: `{"name": "<deployment name>"}`
 
 - **Delete**
 
-  cmd: `twinserver.machines.delete`
+  cmd: `client.machines.delete`
 
   payload: `{"name": "<deployment name>"}`
 
 - **Add machine**
 
-  cmd: `twinserver.machines.add_machine`
+  cmd: `client.machines.add_machine`
 
   payload:
 
@@ -261,7 +467,7 @@ Module should be:
 
 - **Delete machine**
 
-  cmd: `twinserver.machines.delete_machine`
+  cmd: `client.machines.delete_machine`
 
   payload:
 
@@ -278,7 +484,7 @@ single master and multiple workers.
 
 - **Deploy**
 
-  cmd: `twinserver.k8s.deploy`
+  cmd: `client.k8s.deploy`
 
   payload:
 
@@ -324,25 +530,25 @@ single master and multiple workers.
 
 - **List**
 
-  cmd: `twinserver.k8s.list`
+  cmd: `client.k8s.list`
 
   payload: `""`
 
 - **Get**
 
-  cmd: `twinserver.k8s.get`
+  cmd: `client.k8s.get`
 
   payload: `{"name": "<deployment name>"}`
 
 - **Delete**
 
-  cmd: `twinserver.k8s.delete`
+  cmd: `client.k8s.delete`
 
   payload: `{"name": "<deployment name>"}`
 
 - **Add worker**
 
-  cmd: `twinserver.k8s.add_worker`
+  cmd: `client.k8s.add_worker`
 
   payload:
 
@@ -356,13 +562,14 @@ single master and multiple workers.
     "rootfs_size": 1,
     "disk_size": 15,
     "public_ip": false,
-    "planetary": true
+    "planetary": true,
+    "myceliumNetworkSeed": ""
   }
   ```
 
 - **Delete worker**
 
-  cmd: `twinserver.k8s.delete_worker`
+  cmd: `client.k8s.delete_worker`
 
   payload:
 
@@ -377,7 +584,7 @@ single master and multiple workers.
 
 - **Deploy**
 
-  cmd: `twinserver.zdbs.deploy`
+  cmd: `client.zdbs.deploy`
 
   payload:
 
@@ -411,25 +618,25 @@ single master and multiple workers.
 
 - **List**
 
-  cmd: `twinserver.zdbs.list`
+  cmd: `client.zdbs.list`
 
   payload: `""`
 
 - **Get**
 
-  cmd: `twinserver.zdbs.get`
+  cmd: `client.zdbs.get`
 
   payload: `{"name": "<deployment name>"}`
 
 - **Delete**
 
-  cmd: `twinserver.zdbs.delete`
+  cmd: `client.zdbs.delete`
 
   payload: `{"name": "<deployment name>"}`
 
 - **Add zdb**
 
-  cmd: `twinserver.zdbs.add_zdb`
+  cmd: `client.zdbs.add_zdb`
 
   payload:
 
@@ -447,7 +654,7 @@ single master and multiple workers.
 
 - **Delete zdb**
 
-  cmd: `twinserver.zdbs.delete_zdb`
+  cmd: `client.zdbs.delete_zdb`
 
   payload:
 
@@ -462,7 +669,7 @@ single master and multiple workers.
 
 - **Deploy**
 
-  cmd: `twinserver.qsfs_zdbs.deploy`
+  cmd: `client.qsfs_zdbs.deploy`
 
   payload:
 
@@ -482,19 +689,19 @@ single master and multiple workers.
 
 - **List**
 
-  cmd: `twinserver.qsfs_zdbs.list`
+  cmd: `client.qsfs_zdbs.list`
 
   payload: `""`
 
 - **Get**
 
-  cmd: `twinserver.qsfs_zdbs.get`
+  cmd: `client.qsfs_zdbs.get`
 
   payload: `{"name": "<deployment name>"}`
 
 - **Delete**
 
-  cmd: `twinserver.qsfs_zdbs.delete`
+  cmd: `client.qsfs_zdbs.delete`
 
   payload: `{"name": "<deployment name>"}`
 
@@ -503,7 +710,7 @@ single master and multiple workers.
 - **Create**
   It will create a new account on the given blockchain type `<stellar, algorand or tfchain>`.
 
-  cmd: `twinserver.blockchain.create`
+  cmd: `client.blockchain.create`
 
   payload:
 
@@ -530,7 +737,7 @@ single master and multiple workers.
 - **Select**
   It will select a wallet to be used.
 
-  cmd: `twinserver.blockchain.select`
+  cmd: `client.blockchain.select`
 
   payload:
 
@@ -543,7 +750,7 @@ single master and multiple workers.
 - **Init**
   It will return the wallet address after importing the wallet and saving it.
 
-  cmd: `twinserver.blockchain.init`
+  cmd: `client.blockchain.init`
 
   payload:
 
@@ -558,7 +765,7 @@ single master and multiple workers.
 - **Get**
   It will return the wallet.
 
-  cmd: `twinserver.blockchain.get`
+  cmd: `client.blockchain.get`
 
   payload: `""`
 
@@ -576,13 +783,13 @@ single master and multiple workers.
 
 - **Exist**
 
-  cmd: `twinserver.blockchain.exist`
+  cmd: `client.blockchain.exist`
 
   payload: `{"name": "<wallet name>"}`
 
 - **List**
 
-  cmd: `twinserver.blockchain.list`
+  cmd: `client.blockchain.list`
 
   payload:
 
@@ -609,7 +816,7 @@ single master and multiple workers.
 - **Assets**
   It will list all the assets in a given wallet
 
-  cmd: `twinserver.blockchain.assets`
+  cmd: `client.blockchain.assets`
 
   payload: `""`
 
@@ -634,7 +841,7 @@ single master and multiple workers.
 
 - **Pay**
 
-  cmd: `twinserver.blockchain.pay`
+  cmd: `client.blockchain.pay`
 
   payload: `""`
 
@@ -651,13 +858,13 @@ single master and multiple workers.
 
 - **Delete**
 
-  cmd: `twinserver.blockchain.delete`
+  cmd: `client.blockchain.delete`
 
   payload: `""`
 
 - **Sign**
 
-  cmd: `twinserver.blockchain.sign`
+  cmd: `client.blockchain.sign`
 
   payload: `""`
 
@@ -672,7 +879,7 @@ single master and multiple workers.
 - **Create**
   It will create a new account on stellar testnet.
 
-  cmd: `twinserver.stellar.create`
+  cmd: `client.stellar.create`
 
   payload:
 
@@ -696,7 +903,7 @@ single master and multiple workers.
 - **Init**
   It will return the wallet address after importing the wallet and saving it.
 
-  cmd: `twinserver.stellar.init`
+  cmd: `client.stellar.init`
 
   payload:
 
@@ -710,7 +917,7 @@ single master and multiple workers.
 - **Get**
   It will return the wallet.
 
-  cmd: `twinserver.stellar.get`
+  cmd: `client.stellar.get`
 
   payload: `{"name": "<wallet name>"}`
 
@@ -728,7 +935,7 @@ single master and multiple workers.
 - **Update**
   It will return the new wallet address after updating the wallet and saving it.
 
-  cmd: `twinserver.stellar.update`
+  cmd: `client.stellar.update`
 
   payload:
 
@@ -741,13 +948,13 @@ single master and multiple workers.
 
 - **Exist**
 
-  cmd: `twinserver.stellar.exist`
+  cmd: `client.stellar.exist`
 
   payload: `{"name": "<wallet name>"}`
 
 - **List**
 
-  cmd: `twinserver.stellar.list`
+  cmd: `client.stellar.list`
 
   payload: `""`
 
@@ -767,7 +974,7 @@ single master and multiple workers.
 - **Assets**
   It will list all the assets in a given wallet
 
-  cmd: `twinserver.stellar.assets`
+  cmd: `client.stellar.assets`
 
   payload: `{"name": "<wallet name>"}`
 
@@ -790,9 +997,9 @@ single master and multiple workers.
   ```
 
 - **Balance by address**
-  It will list all the assets given a wallet address.
+  It will list all the balances given a wallet address.
 
-  cmd: `twinserver.stellar.balance_by_address`
+  cmd: `client.stellar.balance_by_address`
 
   payload: `{"address": "<wallet address>"}`
 
@@ -810,7 +1017,7 @@ single master and multiple workers.
 
 - **Pay**
 
-  cmd: `twinserver.stellar.pay`
+  cmd: `client.stellar.pay`
 
   payload:
 
@@ -826,13 +1033,13 @@ single master and multiple workers.
 
 - **Delete**
 
-  cmd: `twinserver.stellar.delete`
+  cmd: `client.stellar.delete`
 
   payload: `{"name": "<wallet name>"}`
 
 - **Sign**
 
-  cmd: `twinserver.stellar.sign`
+  cmd: `client.stellar.sign`
 
   payload:
 
@@ -846,7 +1053,7 @@ single master and multiple workers.
 - **Verify**
   It will verify if the signed content is the same as the original content
 
-  cmd: `twinserver.stellar.verify`
+  cmd: `client.stellar.verify`
 
   payload:
 
@@ -863,7 +1070,7 @@ single master and multiple workers.
 - **Create**
   It will create a new account on algorand testnet.
 
-  cmd: `twinserver.algorand.create`
+  cmd: `client.algorand.create`
 
   payload:
 
@@ -887,7 +1094,7 @@ single master and multiple workers.
 - **Init**
   It will return the wallet address after importing the wallet and saving it.
 
-  cmd: `twinserver.algorand.init`
+  cmd: `client.algorand.init`
 
   payload:
 
@@ -901,7 +1108,7 @@ single master and multiple workers.
 - **Get**
   It will return the wallet.
 
-  cmd: `twinserver.algorand.get`
+  cmd: `client.algorand.get`
 
   payload: `{"name": "<wallet name>"}`
 
@@ -916,29 +1123,15 @@ single master and multiple workers.
   }
   ```
 
-- **Update**
-  It will return the new wallet address after updating the wallet and saving it.
-
-  cmd: `twinserver.algorand.update`
-
-  payload:
-
-  ```json
-  {
-    "name": "mywallet",
-    "secret": "<wallet mnemonic>"
-  }
-  ```
-
 - **Exist**
 
-  cmd: `twinserver.algorand.exist`
+  cmd: `client.algorand.exist`
 
   payload: `{"name": "<wallet name>"}`
 
 - **List**
 
-  cmd: `twinserver.algorand.list`
+  cmd: `client.algorand.list`
 
   payload: `""`
 
@@ -958,7 +1151,7 @@ single master and multiple workers.
 - **Assets**
   It will list all the assets in a given wallet
 
-  cmd: `twinserver.algorand.assets`
+  cmd: `client.algorand.assets`
 
   payload: `{"name": "<wallet name>"}`
 
@@ -980,10 +1173,10 @@ single master and multiple workers.
   }
   ```
 
-- **Balance by address**
+- **Assets by address**
   It will list all the assets given a wallet address.
 
-  cmd: `twinserver.algorand.balance_by_address`
+  cmd: `client.algorand.assetsByAddress`
 
   payload: `{"address": "<wallet address>"}`
 
@@ -1001,7 +1194,7 @@ single master and multiple workers.
 
 - **Pay**
 
-  cmd: `twinserver.algorand.pay`
+  cmd: `client.algorand.pay`
 
   payload:
 
@@ -1016,13 +1209,13 @@ single master and multiple workers.
 
 - **Delete**
 
-  cmd: `twinserver.algorand.delete`
+  cmd: `client.algorand.delete`
 
   payload: `{"name": "<wallet name>"}`
 
 - **Sign**
 
-  cmd: `twinserver.algorand.sign`
+  cmd: `client.algorand.sign`
 
   payload:
 
@@ -1041,7 +1234,7 @@ single master and multiple workers.
   **Note:** Each network has its own relay. So, the relay would be
   "relay.${network}.grid.tf" in all networks except for main. It would be "relay.grid.tf".
 
-  cmd: `twinserver.tfchain.create`
+  cmd: `client.tfchain.create`
 
   payload:
 
@@ -1067,7 +1260,7 @@ single master and multiple workers.
 - **Init**
   It will return the wallet address after importing the wallet and saving it.
 
-  cmd: `twinserver.tfchain.init`
+  cmd: `client.tfchain.init`
 
   payload:
 
@@ -1081,7 +1274,7 @@ single master and multiple workers.
 - **Get**
   It will return the wallet.
 
-  cmd: `twinserver.tfchain.get`
+  cmd: `client.tfchain.get`
 
   payload: `{"name": "<wallet name>"}`
 
@@ -1099,7 +1292,7 @@ single master and multiple workers.
 - **Update**
   It will return the new wallet address after updating the wallet and saving it.
 
-  cmd: `twinserver.tfchain.update`
+  cmd: `client.tfchain.update`
 
   payload:
 
@@ -1112,13 +1305,13 @@ single master and multiple workers.
 
 - **Exist**
 
-  cmd: `twinserver.tfchain.exist`
+  cmd: `client.tfchain.exist`
 
   payload: `{"name": "<wallet name>"}`
 
 - **List**
 
-  cmd: `twinserver.tfchain.list`
+  cmd: `client.tfchain.list`
 
   payload: `""`
 
@@ -1138,7 +1331,7 @@ single master and multiple workers.
 - **Assets**
   It will list all the assets in a given wallet
 
-  cmd: `twinserver.tfchain.assets`
+  cmd: `client.tfchain.assets`
 
   payload: `{"name": "<wallet name>"}`
 
@@ -1163,7 +1356,7 @@ single master and multiple workers.
 - **Balance by address**
   It will list all the assets given a wallet address.
 
-  cmd: `twinserver.tfchain.balance_by_address`
+  cmd: `client.tfchain.balance_by_address`
 
   payload: `{"address": "<wallet address>"}`
 
@@ -1181,7 +1374,7 @@ single master and multiple workers.
 
 - **Pay**
 
-  cmd: `twinserver.tfchain.pay`
+  cmd: `client.tfchain.pay`
 
   payload:
 
@@ -1195,13 +1388,13 @@ single master and multiple workers.
 
 - **Delete**
 
-  cmd: `twinserver.tfchain.delete`
+  cmd: `client.tfchain.delete`
 
   payload: `{"name": "<wallet name>"}`
 
 - **Sign**
 
-  cmd: `twinserver.tfchain.sign`
+  cmd: `client.tfchain.sign`
 
   payload:
 
@@ -1212,29 +1405,45 @@ single master and multiple workers.
   }
   ```
 
+- **Vote**
+
+  cmd: `client.tfchain.vote`
+
+  payload:
+
+  ```json
+  {
+    "name": "<wallet name>",
+    "address": "<wallet address>",
+    "farmId": "<Farm id>",
+    "approve": "<approval of vote>",
+    "hash": "<hash>"
+  }
+  ```
+
 ### KVSotre
 
 - **Set**
 
-  cmd: `twinserver.kvstore.set`
+  cmd: `client.kvstore.set`
 
   payload: `'{"key": "<your key>", "value": "<key's value>"}'`
 
 - **Get**
 
-  cmd: `twinserver.kvstore.get`
+  cmd: `client.kvstore.get`
 
   payload: `'{"key": "<your key>"}'`
 
 - **List**
 
-  cmd: `twinserver.kvstore.list`
+  cmd: `client.kvstore.list`
 
   payload: `""`
 
 - **Remove**
 
-  cmd: `twinserver.kvstore.remove`
+  cmd: `client.kvstore.remove`
 
   payload: `'{"key": "<your key>"}'`
 
@@ -1242,19 +1451,25 @@ single master and multiple workers.
 
 - **Get My Balance**
 
-  cmd: `twinserver.balance.getMyBalance`
+  cmd: `client.balance.getMyBalance`
+
+  payload: `""`
+
+- **Get More Funds**
+
+  cmd: `client.balance.getMoreFunds`
 
   payload: `""`
 
 - **Get**
 
-  cmd: `twinserver.balance.get`
+  cmd: `client.balance.get`
 
   payload: `'{"address": "<Substrate account address>"}'`
 
 - **Transfer**
 
-  cmd: `twinserver.balance.transfer`
+  cmd: `client.balance.transfer`
 
   payload: `'{"address": "<Substrate account address>", "amount": 1}'`
 
@@ -1262,7 +1477,7 @@ single master and multiple workers.
 
 - **Get Farms**
 
-  cmd: `twinserver.capacity.getFarms`
+  cmd: `client.capacity.getFarms`
 
   payload: `'{"page": <page number>, "maxResult": <result count per page>}'`
 
@@ -1270,13 +1485,13 @@ single master and multiple workers.
 
 - **Get All Farms**
 
-  cmd: `twinserver.capacity.getAllFarms`
+  cmd: `client.capacity.getAllFarms`
 
   payload: `""`
 
 - **Get Nodes**
 
-  cmd: `twinserver.capacity.getNodes`
+  cmd: `client.capacity.getNodes`
 
   payload: `'{"page": <page number>, "maxResult": <result count per page>}'`
 
@@ -1284,13 +1499,13 @@ single master and multiple workers.
 
 - **Get All Nodes**
 
-  cmd: `twinserver.capacity.getAllNodes`
+  cmd: `client.capacity.getAllNodes`
 
   payload: `""`
 
 - **Filter Nodes**
 
-  cmd: `twinserver.capacity.filterNodes`
+  cmd: `client.capacity.filterNodes`
 
   payload:
 
@@ -1330,26 +1545,51 @@ single master and multiple workers.
   > All filter options are optional.
   > It filters nodes with status(up or down) by default.
 
+- **Filter Farms**
+
+  cmd: `client.capacity.filterNodes`
+
+  payload:
+
+  ```json
+      {
+     "nodeCRU": <nodes with free cores>,
+      "nodeMRU": <nodes with free memory in GB>,
+      "nodeSRU": <nodes with free SSD storage in GB>,
+      "nodeHRU": <nodes with free HDD storage in GB>,
+      "publicIPs": <farms with nodes with free public ips>,
+      "certificationType": <certificationType4>,
+      "farmName": "<farm name>",
+      "country": "<nodes in a specific country>",
+      "dedicated": "<dedicated nodes in a farm>",
+      "nodeCertified": "<farms that have certified nodes>",
+      "nodeHasGPU": "<farms that have nodes with GPU>"
+      }
+  ```
+
+  > **Notes:**
+  > All filter options are optional.
+
 - **Check Farm Has Free Public IPs**
 
-  cmd: `twinserver.capacity.checkFarmHasFreePublicIps`
+  cmd: `client.capacity.checkFarmHasFreePublicIps`
 
   payload: `'{"farmId": 1}'`
 
 - **Get Nodes By FarmId**
 
-  cmd: `twinserver.capacity.getNodesByFarmId`
+  cmd: `client.capacity.getNodesByFarmId`
 
   payload: `'{"farmId": 1}'`
 
 - **Get Node Free Resources**
 
-  cmd: `twinserver.capacity.getNodeFreeResources`
+  cmd: `client.capacity.getNodeFreeResources`
 
   payload: `'{"nodeId": 7}'`
 
 - **Get FarmId From Farm Name**
 
-  cmd: `twinserver.capacity.getFarmIdFromFarmName`
+  cmd: `client.capacity.getFarmIdFromFarmName`
 
   payload: `'{"farmName": "freefarm"}'`
