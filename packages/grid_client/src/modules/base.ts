@@ -105,6 +105,7 @@ class BaseModule {
         state: ContractStates.Created,
         twinID: String(contract.twinId),
         parsedDeploymentData: JSON.parse(contract.contractType.nodeContract.deploymentData),
+        resourcesUsed: undefined,
       });
     }
 
@@ -184,6 +185,8 @@ class BaseModule {
       for (const contract of this.newContracts) {
         if (contract.parsedDeploymentData?.projectName !== this.projectName) continue;
         if (contract.parsedDeploymentData.type !== modulesNames[this.moduleName]) continue;
+        const c = contracts.filter(c => +c.contractID === +contract.contractID);
+        if (c.length) continue;
         contracts.push(contract);
       }
 
@@ -356,13 +359,13 @@ class BaseModule {
     }
     const contracts = await this.getDeploymentContracts(name);
     if (contracts.length === 0) {
-      await this.save(name, { created: [], deleted: [] });
+      await this.save(name, { created: [], updated: [], deleted: [] });
     }
     await this.tfClient.connect();
     for (const contract of contracts) {
       const c = await this.tfClient.contracts.get({ id: +contract.contractID });
       if (c === null) {
-        await this.save(name, { created: [], deleted: [{ contractId: +contract.contractID }] });
+        await this.save(name, { created: [], updated: [], deleted: [{ contractId: +contract.contractID }] });
         continue;
       }
       const nodes = new Nodes(this.config.graphqlURL, this.config.proxyURL, this.config.rmbClient);
@@ -384,7 +387,7 @@ class BaseModule {
       if (found) {
         deployments.push(deployment);
       } else {
-        await this.save(name, { created: [], deleted: [{ contractId: +contract.contractID }] });
+        await this.save(name, { created: [], updated: [], deleted: [{ contractId: +contract.contractID }] });
       }
     }
     return deployments;
