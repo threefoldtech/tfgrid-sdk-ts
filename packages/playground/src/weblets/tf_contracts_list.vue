@@ -126,7 +126,7 @@ async function onMount() {
         nodeStatus.value = await getNodeStatus(nodeIDs.value);
         totalCost.value = getTotalCost(contracts.value);
         const TFTInUSD = await queryClient.tftPrice.get();
-        totalCostUSD.value = totalCost.value * TFTInUSD;
+        totalCostUSD.value = totalCost.value * (TFTInUSD / 1000);
       } catch (error: any) {
         // Handle errors and display toast messages
         loadingErrorMessage.value = error.message;
