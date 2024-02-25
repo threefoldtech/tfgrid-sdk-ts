@@ -506,8 +506,16 @@ class TwinDeploymentHandler {
     await this.checkNodesCapacity(twinDeployments);
     await this.checkFarmIps(twinDeployments);
 
-    const contracts = { created: [], updated: [], deleted: [] };
-    const resultContracts = { created: [], updated: [], deleted: [] };
+    const contracts: { created: Contract[]; updated: Contract[]; deleted: { contractId: number }[] } = {
+      created: [],
+      updated: [],
+      deleted: [],
+    };
+    const resultContracts: { created: Contract[]; updated: Contract[]; deleted: { contractId: number }[] } = {
+      created: [],
+      updated: [],
+      deleted: [],
+    };
     let nodeExtrinsics: ExtrinsicResult<Contract>[] = [];
     let nameExtrinsics: ExtrinsicResult<Contract>[] = [];
     let deletedExtrinsics: ExtrinsicResult<number>[] = [];

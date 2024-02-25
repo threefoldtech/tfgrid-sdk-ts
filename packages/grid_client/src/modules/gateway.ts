@@ -55,6 +55,7 @@ class GWModule extends BaseModule {
       options.solutionProviderId,
     );
     const contracts = await this.twinDeploymentHandler.handle(twinDeployments);
+    await this.save(options.name, contracts);
     return { contracts: contracts };
   }
 
@@ -85,6 +86,7 @@ class GWModule extends BaseModule {
       options.solutionProviderId,
     );
     const contracts = await this.twinDeploymentHandler.handle(twinDeployments);
+    await this.save(options.name, contracts);
     return { contracts: contracts };
   }
 

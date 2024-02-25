@@ -192,6 +192,7 @@ class K8sModule extends BaseModule {
     events.emit("logs", `Start creating the cluster with name ${options.name}`);
     const [deployments, , wireguardConfig] = await this._createDeployment(options);
     const contracts = await this.twinDeploymentHandler.handle(deployments);
+    await this.save(options.name, contracts);
     return { contracts: contracts, wireguard_config: wireguardConfig };
   }
 

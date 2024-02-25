@@ -49,7 +49,7 @@ export interface GqlNodeContract extends GqlBaseContract {
   deploymentData: string;
   deploymentHash: string;
   numberOfPublicIPs: number;
-  resourcesUsed: ContractUsedResources;
+  resourcesUsed?: ContractUsedResources;
   parsedDeploymentData?: { type: string; name: string; projectName: string };
 }
 
