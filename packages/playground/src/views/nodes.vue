@@ -247,7 +247,9 @@
       <TfFilter
         query-route="free-public-ips"
         :rules="[
-          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.isNumeric('This field accepts numbers only.', {
+            no_symbols: true,
+          }),
           validators.min('The node id should be larger then zero.', 1),
           validators.startsWith('The node id start with zero.', '0'),
           validators.validateResourceMaxNumber('This value is out of range.'),
@@ -366,14 +368,14 @@ import { useRoute } from "vue-router";
 import NodeDetails from "@/components/node_details.vue";
 import NodesTable from "@/components/nodes_table.vue";
 import router from "@/router";
-import { requestNodes } from "@/utils/get_nodes";
+import type { GridProxyRequestConfig } from "@/types";
+import { getNode, requestNodes } from "@/utils/get_nodes";
 import { convertToBytes } from "@/utils/get_nodes";
 
 import TfFilter from "../components/filters/TfFilter.vue";
 import TfFiltersContainer from "../components/filters/TfFiltersContainer.vue";
 import TfSelectFarm from "../components/node_selector/TfSelectFarm.vue";
 import TfSelectLocation from "../components/node_selector/TfSelectLocation.vue";
-
 export default {
   components: {
     NodesTable,
@@ -386,7 +388,7 @@ export default {
   setup() {
     const size = ref(window.env.PAGE_SIZE);
     const page = ref(1);
-
+    const nodeId = ref<number>(0);
     const filters = ref({
       nodeId: "",
       farmId: "",
@@ -415,6 +417,13 @@ export default {
     const isDialogOpened = ref<boolean>(false);
 
     const route = useRoute();
+
+    const nodeOptions: GridProxyRequestConfig = {
+      loadTwin: true,
+      loadFarm: true,
+      loadStats: true,
+      loadGpu: false,
+    };
 
     async function loadNodes() {
       loading.value = true;
@@ -453,6 +462,19 @@ export default {
       }
     }
 
+    async function requestNode() {
+      loading.value = true;
+      try {
+        const node = await getNode(nodeId.value, nodeOptions);
+        const index = nodes.value.findIndex(node => node.nodeId === nodeId.value);
+        nodes.value[index] = node;
+      } catch (error) {
+        console.log(error);
+      } finally {
+        loading.value = false;
+      }
+    }
+
     const checkSelectedNode = async () => {
       if (route.query.nodeId) {
         selectedNodeId.value = +route.query.nodeId;
@@ -477,9 +499,11 @@ export default {
       isDialogOpened.value = true;
     };
 
-    function reloadTable() {
-      setTimeout(loadNodes, 20000);
+    function reloadTable(id: number) {
+      nodeId.value = id;
+      setTimeout(requestNode, 20000);
     }
+
     return {
       loading,
       nodesCount,

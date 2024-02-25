@@ -57,7 +57,7 @@
             <reserve-btn
               v-if="item.columns.dedicated && item.columns.status !== 'down'"
               :node="(item.raw as unknown as GridNode)"
-              @updateTable="$emit('reloadTable')"
+              @updateTable="$emit('reloadTable', item.raw.nodeId)"
             />
             <span v-else>-</span>
           </template>
