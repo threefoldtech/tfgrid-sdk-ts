@@ -37,6 +37,7 @@ class GWModule extends BaseModule {
     }
     events.emit("logs", `Start creating the gateway deployment with name ${options.name}`);
     const metadata = JSON.stringify({
+      version: 3,
       type: "gateway",
       name: options.name,
       projectName: this.config.projectName,
@@ -65,6 +66,7 @@ class GWModule extends BaseModule {
     }
     events.emit("logs", `Start creating the gateway deployment with name ${options.name}`);
     const metadata = JSON.stringify({
+      version: 3,
       type: "gateway",
       name: options.name,
       projectName: this.config.projectName,

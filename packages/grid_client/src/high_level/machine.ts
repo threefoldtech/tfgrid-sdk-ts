@@ -177,6 +177,7 @@ class VMHL extends HighLevelBase {
     }
     // network
     const networkMetadata = JSON.stringify({
+      version: 3,
       type: "network",
       name: network.name,
       projectName: this.config.projectName,

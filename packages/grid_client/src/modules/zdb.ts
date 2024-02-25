@@ -25,6 +25,7 @@ class ZdbsModule extends BaseModule {
     const twinDeployments: TwinDeployment[] = [];
     const zdbs_names: string[] = [];
     const metadata = JSON.stringify({
+      version: 3,
       type: "zdb",
       name: options.name,
       projectName: this.config.projectName,

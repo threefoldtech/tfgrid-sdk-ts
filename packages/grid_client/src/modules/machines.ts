@@ -36,6 +36,7 @@ class MachinesModule extends BaseModule {
     let twinDeployments: TwinDeployment[] = [];
     let wireguardConfig = "";
     const metadata = JSON.stringify({
+      version: 3,
       type: "vm",
       name: options.name,
       projectName: this.config.projectName,

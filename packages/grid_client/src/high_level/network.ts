@@ -38,6 +38,7 @@ class NetworkHL extends HighLevelBase {
     const network = new Network(networkName, ipRange, this.config);
     await network.load();
     const networkMetadata = JSON.stringify({
+      version: 3,
       type: "network",
       name: networkName,
       projectName: this.config.projectName,

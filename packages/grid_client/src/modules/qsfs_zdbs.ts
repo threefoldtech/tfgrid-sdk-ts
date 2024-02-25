@@ -29,7 +29,8 @@ class QSFSZdbsModule extends BaseModule {
     const count = options.count + 4; // 4 zdbs for meta
     const twinDeployments = [];
     const metadata = JSON.stringify({
-      type: "QSFS",
+      version: 3,
+      type: "qsfs",
       name: options.name,
       projectName: this.config.projectName,
     });

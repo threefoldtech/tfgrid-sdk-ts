@@ -82,6 +82,7 @@ class K8sModule extends BaseModule {
     let deployments: TwinDeployment[] = [];
     let wireguardConfig = "";
     const metadata = JSON.stringify({
+      version: 3,
       type: "kubernetes",
       name: options.name,
       projectName: this.config.projectName,
