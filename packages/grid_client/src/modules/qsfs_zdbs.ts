@@ -7,8 +7,8 @@ import { validateInput } from "../helpers/validator";
 import { TwinDeployment } from "../high_level/models";
 import { ZdbHL } from "../high_level/zdb";
 import { ZdbBackend } from "../zos/qsfs";
-import { WorkloadTypes } from "../zos/workload";
-import { ZdbModes } from "../zos/zdb";
+import { Workload, WorkloadTypes } from "../zos/workload";
+import { Zdb, ZdbModes, ZdbResult } from "../zos/zdb";
 import { BaseModule } from "./base";
 import { QSFSZDBDeleteModel, QSFSZDBGetModel, QSFSZDBSModel } from "./models";
 import { checkBalance } from "./utils";
@@ -27,8 +27,8 @@ class QSFSZdbsModule extends BaseModule {
       throw new ValidationError("QSFS zdbs count can't be less than 3.");
     }
     const count = options.count + 4; // 4 zdbs for meta
-    const twinDeployments = [];
-    const metadata = JSON.stringify({
+    const twinDeployments: TwinDeployment[] = [];
+    const contractMetadata = JSON.stringify({
       version: 3,
       type: "qsfs",
       name: options.name,
@@ -48,7 +48,8 @@ class QSFSZdbsModule extends BaseModule {
         mode as ZdbModes,
         options.password,
         true,
-        options.metadata || metadata,
+        contractMetadata,
+        options.metadata,
         options.description,
         options.solutionProviderId,
       );
@@ -91,7 +92,7 @@ class QSFSZdbsModule extends BaseModule {
 
   async getZdbs(name: string) {
     const deployments = await this._get(name);
-    const zdbs = [];
+    const zdbs: Workload[] = [];
     for (const deployment of deployments) {
       for (const workload of deployment.workloads) {
         if (workload.type !== WorkloadTypes.zdb) {
@@ -102,16 +103,18 @@ class QSFSZdbsModule extends BaseModule {
         zdbs.push(workload);
       }
     }
-    const qsfsZdbs = { meta: [], groups: [] };
+    const qsfsZdbs: { meta: ZdbBackend[]; groups: ZdbBackend[] } = { meta: [], groups: [] };
     for (const zdb of zdbs) {
+      const data = zdb.data as Zdb;
+      const result = zdb.result.data as ZdbResult;
       const zdbBackend = new ZdbBackend();
-      zdbBackend.namespace = zdb.result.data.Namespace;
-      zdbBackend.password = zdb.data.password;
-      zdbBackend.address = `[${zdb.result.data.IPs[1]}]:${zdb.result.data.Port}`;
-      zdbBackend["size"] = zdb.data.size;
+      zdbBackend.namespace = result.Namespace;
+      zdbBackend.password = data.password;
+      zdbBackend.address = `[${result.IPs[1]}]:${result.Port}`;
+      zdbBackend["size"] = data.size;
       zdbBackend["contractId"] = zdb["contractId"];
       zdbBackend["nodeId"] = zdb["nodeId"];
-      if (zdb.data.mode === ZdbModes.user) {
+      if (data.mode === ZdbModes.user) {
         qsfsZdbs.meta.push(zdbBackend);
       } else {
         qsfsZdbs.groups.push(zdbBackend);

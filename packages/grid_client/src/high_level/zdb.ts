@@ -17,6 +17,7 @@ class ZdbHL extends HighLevelBase {
     mode: ZdbModes,
     password: string,
     publicNamespace: boolean,
+    contractMetadata: string,
     metadata = "",
     description = "",
     solutionProviderId?: number,
@@ -31,7 +32,7 @@ class ZdbHL extends HighLevelBase {
     const zdbFactory = new ZdbPrimitive();
     const zdbWorkload = zdbFactory.create(name, disk_size, mode, password, publicNamespace, metadata, description);
     const deployment = deploymentFactory.create([zdbWorkload], 1626394539, metadata, description, 0);
-    return new TwinDeployment(deployment, Operations.deploy, 0, node_id, null, solutionProviderId);
+    return new TwinDeployment(deployment, Operations.deploy, 0, node_id, contractMetadata, null, solutionProviderId);
   }
   async delete(deployment: Deployment, names: string[]) {
     return await this._delete(deployment, names, [WorkloadTypes.zdb]);

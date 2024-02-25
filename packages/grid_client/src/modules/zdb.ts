@@ -24,7 +24,7 @@ class ZdbsModule extends BaseModule {
   async _createDeployment(options: ZDBSModel): Promise<TwinDeployment[]> {
     const twinDeployments: TwinDeployment[] = [];
     const zdbs_names: string[] = [];
-    const metadata = JSON.stringify({
+    const contractMetadata = JSON.stringify({
       version: 3,
       type: "zdb",
       name: options.name,
@@ -42,7 +42,8 @@ class ZdbsModule extends BaseModule {
         instance.mode,
         instance.password,
         instance.publicNamespace,
-        options.metadata || metadata,
+        contractMetadata,
+        options.metadata,
         options.description,
         instance.solutionProviderId,
       );
@@ -133,6 +134,12 @@ class ZdbsModule extends BaseModule {
       throw new ValidationError(
         `There is another zdb with the same name "${options.name}" in this deployment ${options.deployment_name}.`,
       );
+    const contractMetadata = JSON.stringify({
+      version: 3,
+      type: "zdb",
+      name: options.deployment_name,
+      projectName: this.config.projectName,
+    });
     events.emit("logs", `Start adding ZDB instance: ${options.name} to deployment: ${options.deployment_name}`);
     const twinDeployment = await this.zdb.create(
       options.name,
@@ -141,8 +148,9 @@ class ZdbsModule extends BaseModule {
       options.mode,
       options.password,
       options.publicNamespace,
+      contractMetadata,
       oldDeployments[0].metadata,
-      oldDeployments[0].metadata,
+      oldDeployments[0].description,
       options.solutionProviderId,
     );
 

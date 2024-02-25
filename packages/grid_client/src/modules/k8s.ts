@@ -81,7 +81,7 @@ class K8sModule extends BaseModule {
 
     let deployments: TwinDeployment[] = [];
     let wireguardConfig = "";
-    const metadata = JSON.stringify({
+    const contractMetadata = JSON.stringify({
       version: 3,
       type: "kubernetes",
       name: options.name,
@@ -110,7 +110,8 @@ class K8sModule extends BaseModule {
         network,
         options.network.myceliumSeeds!,
         options.ssh_key,
-        options.metadata || metadata,
+        contractMetadata,
+        options.metadata,
         options.description,
         master.qsfs_disks,
         this.config.projectName,
@@ -157,7 +158,8 @@ class K8sModule extends BaseModule {
         network,
         options.network.myceliumSeeds!,
         options.ssh_key,
-        options.metadata || metadata,
+        contractMetadata,
+        options.metadata,
         options.description,
         worker.qsfs_disks,
         this.config.projectName,
@@ -280,6 +282,12 @@ class K8sModule extends BaseModule {
     const networkIpRange = Addr(masterWorkload.data["network"].interfaces[0].ip).mask(16).toString();
     const network = new Network(networkName, networkIpRange, this.config);
     await network.load();
+    const contractMetadata = JSON.stringify({
+      version: 3,
+      type: "kubernetes",
+      name: options.deployment_name,
+      projectName: this.config.projectName,
+    });
     const [twinDeployments] = await this.kubernetes.add_worker(
       options.name,
       options.node_id,
@@ -297,6 +305,7 @@ class K8sModule extends BaseModule {
       network,
       [{ nodeId: options.node_id, seed: options.myceliumNetworkSeed! }],
       masterWorkload.data["env"]["SSH_KEY"],
+      contractMetadata,
       masterWorkload.metadata,
       masterWorkload.description,
       options.qsfs_disks,

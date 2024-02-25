@@ -37,7 +37,7 @@ class NetworkHL extends HighLevelBase {
   ) {
     const network = new Network(networkName, ipRange, this.config);
     await network.load();
-    const networkMetadata = JSON.stringify({
+    const contractMetadata = JSON.stringify({
       version: 3,
       type: "network",
       name: networkName,
@@ -51,9 +51,9 @@ class NetworkHL extends HighLevelBase {
 
     const twinDeployments: TwinDeployment[] = [];
     const deploymentFactory = new DeploymentFactory(this.config);
-    const deployment = deploymentFactory.create([workload], 0, networkMetadata, description, 0);
+    const deployment = deploymentFactory.create([workload], 0, contractMetadata, description, 0);
     twinDeployments.push(
-      new TwinDeployment(deployment, Operations.deploy, 0, nodeId, network, solutionProviderId, true),
+      new TwinDeployment(deployment, Operations.deploy, 0, nodeId, contractMetadata, network, solutionProviderId, true),
     );
 
     if (!(await network.exists())) {
@@ -71,7 +71,9 @@ class NetworkHL extends HighLevelBase {
         workload.version += 1;
         break;
       }
-      twinDeployments.push(new TwinDeployment(d, Operations.update, 0, 0, network, solutionProviderId, true));
+      twinDeployments.push(
+        new TwinDeployment(d, Operations.update, 0, 0, contractMetadata, network, solutionProviderId, true),
+      );
     }
     return twinDeployments;
   }

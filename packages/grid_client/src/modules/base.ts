@@ -395,7 +395,7 @@ class BaseModule {
         if (!updateOldDeployment) {
           continue;
         }
-        finalTwinDeployments.push(new TwinDeployment(updateOldDeployment, Operations.update, 0, 0, network));
+        finalTwinDeployments.push(new TwinDeployment(updateOldDeployment, Operations.update, 0, 0, "", network));
       }
       if (!doneDeploymentIPWorkloadNames.includes(pubIPOLdWorkload)) {
         const tDeployments = await module.delete(oldDeployment, []);
@@ -440,7 +440,7 @@ class BaseModule {
         if (!updateOldDeployment) {
           continue;
         }
-        finalTwinDeployments.push(new TwinDeployment(updateOldDeployment, Operations.update, 0, 0, network));
+        finalTwinDeployments.push(new TwinDeployment(updateOldDeployment, Operations.update, 0, 0, "", network));
         break;
       }
       if (!deploymentFound) {

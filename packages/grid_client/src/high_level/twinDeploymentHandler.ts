@@ -433,6 +433,7 @@ class TwinDeploymentHandler {
             Operations.update,
             0,
             old_contract.contractType.nodeContract.nodeId,
+            "",
           ),
         );
       }
@@ -459,7 +460,7 @@ class TwinDeploymentHandler {
       }
       const extrinsic = await this.tfclient.contracts.createNode({
         hash: twinDeployment.deployment.challenge_hash(),
-        data: twinDeployment.deployment.metadata,
+        data: twinDeployment.metadata,
         nodeId: twinDeployment.nodeId,
         numberOfPublicIps: twinDeployment.publicIps,
         solutionProviderId: twinDeployment.solutionProviderId,
