@@ -92,8 +92,8 @@
           <v-tooltip v-if="item.value.masters[0].status == NodeHealth.Error" activator="parent" location="top">{{
             item.value.masters[0].message
           }}</v-tooltip>
-          <span>
-            {{ capitalize(getNodeHealthColor(item.value.masters[0].status as string).type) }}
+          <span class="text-uppercase">
+            {{ getNodeHealthColor(item.value.masters[0].status as string).type }}
           </span>
         </v-chip>
       </template>
@@ -108,7 +108,7 @@
       </template>
 
       <template #no-data-text>
-        <div v-if="true || failedDeployments.length > 0" class="text-center">
+        <div v-if="failedDeployments.length > 0" class="text-center">
           <p v-text="'Couldn\'t load any of your Kubernetes deployments.'" />
           <VBtn
             class="mt-4"

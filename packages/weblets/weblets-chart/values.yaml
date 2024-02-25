@@ -8,7 +8,7 @@ image:
   repository: ghcr.io/threefoldtech/weblets
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "2.3.0-alpha9"
+  tag: "2.3.0-alpha12"
   
   env:
     - name: "MODE"
