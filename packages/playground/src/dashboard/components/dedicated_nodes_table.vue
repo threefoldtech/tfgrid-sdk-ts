@@ -16,15 +16,16 @@
         loading-text="Loading nodes..."
         :headers="headers"
         :items="nodes"
-        v-model:items-per-page="$props.options.size"
+        :items-per-page="$props.options.size"
         v-model:expanded="expanded"
         :hide-no-data="false"
         :disable-sort="true"
         class="elevation-1"
         :hover="true"
         :items-per-page-options="pageOptions"
-        v-model:page="$props.options.page"
+        :page="$props.options.page"
         return-object
+        @update:options="emits('updateOptions', $event)"
         @click:row="toggleExpand"
       >
         <template v-slot:[`item.actions`]="{ item }">
@@ -138,7 +139,7 @@ defineProps({
   },
 });
 
-const emits = defineEmits(["reload-table", "update-active-tab-value"]);
+const emits = defineEmits(["reload-table", "update-active-tab-value", "updateOptions"]);
 
 watch(
   activeTab,
