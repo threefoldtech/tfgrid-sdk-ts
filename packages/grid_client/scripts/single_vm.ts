@@ -27,15 +27,15 @@ async function main() {
   const grid3 = await getClient();
 
   const vms: MachinesModel = {
-    name: "newVMS",
+    name: "aanewVMS",
     network: {
-      name: "wedtest",
+      name: "aawedtest",
       ip_range: "10.249.0.0/16",
     },
     machines: [
       {
-        name: "testvm",
-        node_id: 11,
+        name: "aatestvm",
+        node_id: 174,
         disks: [
           {
             name: "wedDisk",
