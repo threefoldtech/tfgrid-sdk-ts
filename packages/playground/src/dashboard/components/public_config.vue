@@ -135,7 +135,7 @@
           <v-toolbar color="primary" dark class="custom-toolbar">
             <p class="mb-5">Remove Public Config</p>
           </v-toolbar>
-          <v-card-text class="my-3">Are you sure you want to remove this node's public config? </v-card-text>
+          <v-card-text class="mb-3">Are you sure you want to remove this node's public config? </v-card-text>
 
           <v-card-actions class="justify-end px-5 pb-5 pt-0">
             <!-- Cancel and Remove Buttons -->
