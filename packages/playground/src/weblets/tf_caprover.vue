@@ -122,7 +122,7 @@ async function deploy() {
 
     await layout.value.validateBalance(grid!);
     if (leader.value.selectionDetails?.node?.dedicated) {
-      await layout.value?.validateRentContract(grid!, leader.value.selectionDetails?.node.rentContractId);
+      await layout.value?.validateRentContract(grid!, leader.value.selectionDetails?.node);
     }
 
     for (const worker of workers.value) {
