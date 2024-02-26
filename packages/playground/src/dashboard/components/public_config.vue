@@ -269,6 +269,7 @@ export default {
         defualtNodeConfig.value = config.value = publicConfigInitializer();
         context.emit("remove-config", config.value);
         showDialogue.value = false;
+        config.value = publicConfigInitializer();
       } catch (error) {
         console.log(error);
         createCustomToast(`Failed to remove config. ${error}`, ToastType.danger);
