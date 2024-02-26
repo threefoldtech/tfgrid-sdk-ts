@@ -66,6 +66,7 @@
         { title: 'Public IPv4', key: 'ipv4', sortable: false },
         { title: 'Public IPv6', key: 'ipv6', sortable: false },
         { title: 'Planetary Network IP', key: 'planetary', sortable: false },
+        { title: 'Mycelium Network IP', key: 'mycelium', sortable: false },
         { title: 'Workers', key: 'workersLength' },
         { title: 'Billing Rate', key: 'billing' },
         { title: 'Created At', key: 'created' },
@@ -83,6 +84,11 @@
       <template #[`item.created`]="{ item }">
         {{ toHumanDate(item.value.masters[0].created) }}
       </template>
+
+      <template #[`item.mycelium`]="{ item }">
+        {{ item.value.myceliumIP || "-" }}
+      </template>
+
       <template #[`item.status`]="{ item }">
         <v-chip :color="getNodeHealthColor(item.value.masters[0].status as string).color">
           <v-tooltip v-if="item.value.masters[0].status == NodeHealth.Error" activator="parent" location="top">{{

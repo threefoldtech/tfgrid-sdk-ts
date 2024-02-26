@@ -231,8 +231,9 @@ class BaseModule {
       flist: data.flist,
       publicIP: await this._getMachinePubIP(deploymentName, deployments, data.network.public_ip),
       planetary: data.network.planetary
-        ? (workload.result.data as ZmachineResult).ygg_ip || (workload.result.data as ZmachineResult).planetary_ip
-        : "",
+        ? (workload.result.data as ZmachineResult).planetary_ip
+        : (workload.result.data as ZmachineResult).ygg_ip,
+      myceliumIP: data.network.mycelium.hex_seed ? (workload.result.data as ZmachineResult).mycelium_ip : "",
       interfaces: data.network.interfaces.map(n => ({
         network: n.network,
         ip: n.ip,

@@ -27,14 +27,14 @@ async function main() {
   const grid3 = await getClient();
 
   const vms: MachinesModel = {
-    name: "newVMS",
+    name: "newVMS220",
     network: {
-      name: "wedtest",
+      name: "wedtest220",
       ip_range: "10.249.0.0/16",
     },
     machines: [
       {
-        name: "testvm",
+        name: "testvm220",
         node_id: 11,
         disks: [
           {
@@ -46,7 +46,7 @@ async function main() {
         public_ip: false,
         public_ip6: false,
         planetary: true,
-        mycelium: false,
+        mycelium: true,
         cpu: 1,
         memory: 1024 * 2,
         rootfs_size: 0,
@@ -62,7 +62,7 @@ async function main() {
   };
 
   //Deploy VMs
-  await deploy(grid3, vms);
+  // await deploy(grid3, vms);
 
   //Get the deployment
   await getDeployment(grid3, vms.name);

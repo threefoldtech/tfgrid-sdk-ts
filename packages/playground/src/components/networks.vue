@@ -141,22 +141,6 @@ export default {
     ) {
       throw new Error("You must provide at least one network  option");
     }
-    watch(
-      () => props.mycelium,
-      newValue => {
-        if (newValue) {
-          emit("update:planetary", true);
-        }
-      },
-    );
-    watch(
-      () => props.planetary,
-      val => {
-        if (!val && props.mycelium) {
-          emit("update:mycelium", false);
-        }
-      },
-    );
     const error = computed(
       () => !(props.ipv4 || props.ipv6 || props.planetary || props.wireguard || props.mycelium) && props.required,
     );
