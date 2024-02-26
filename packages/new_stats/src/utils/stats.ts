@@ -43,12 +43,15 @@ function mergeStatsData(stats: Stats[]): Stats {
   return res;
 }
 
-export async function getStats(network: Network): Promise<Stats> {
+export async function getStats(network: Network): Promise<{ network: Network; stats: Stats }> {
   try {
     const client = new GridProxyClient(network);
     const upStats = await client.stats.get({ status: NodeStatus.Up });
     const standbyStats = await client.stats.get({ status: NodeStatus.Standby });
-    return mergeStatsData([upStats, standbyStats]);
+    return {
+      network,
+      stats: mergeStatsData([upStats, standbyStats]),
+    };
   } catch (error) {
     throw new Error(`Failed to retrieve ${network} network statistics: ${error}`);
   }

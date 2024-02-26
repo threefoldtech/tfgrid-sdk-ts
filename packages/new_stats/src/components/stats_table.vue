@@ -100,18 +100,27 @@ const Istats = computed((): IStatistics[] => {
   }
 });
 async function getStatsData(refresh = false) {
-  props.networks!.forEach(async (network: Network) => {
-    if (!networkStats.value[network] || refresh)
-      try {
-        failed.value = false;
-        loading.value = true;
-        networkStats.value[network] = await getStats(network.toLowerCase() as Network);
-      } catch (error) {
-        failed.value = true;
-      } finally {
-        loading.value = false;
+  try {
+    failed.value = false;
+    loading.value = true;
+    const result = await Promise.allSettled(
+      props.networks!.map((network: Network) => {
+        if (!networkStats.value[network] || refresh) {
+          return getStats(network.toLowerCase() as Network);
+        }
+      }),
+    );
+    result.forEach(item => {
+      if (item.status == "rejected") failed.value = true;
+      else if (item.value) {
+        networkStats.value[item.value.network as Network] = item.value.stats;
       }
-  });
+    });
+  } catch (error) {
+    failed.value = true;
+  } finally {
+    loading.value = false;
+  }
 }
 watch(
   () => props.networks,
