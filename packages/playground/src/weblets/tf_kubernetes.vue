@@ -110,6 +110,14 @@ async function deploy() {
     const grid = await getGrid(profileManager.profile!, name.value);
 
     await layout.value.validateBalance(grid!);
+    if (master.value?.selectionDetails?.node?.dedicated) {
+      await layout.value?.validateRentContract(grid!, master.value?.selectionDetails?.node);
+    }
+    for (const worker of workers.value) {
+      if (worker.selectionDetails?.node?.dedicated) {
+        await layout.value?.validateRentContract(grid!, worker.selectionDetails?.node);
+      }
+    }
 
     const k8s = await deployK8s(grid!, {
       name: name.value,

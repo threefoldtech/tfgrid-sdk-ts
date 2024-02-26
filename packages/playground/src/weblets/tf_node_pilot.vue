@@ -122,13 +122,14 @@ async function deploy() {
   layout.value.setStatus("deploy");
 
   const projectName = ProjectName.NodePilot.toLowerCase() + "/" + name.value;
-
   try {
     layout.value?.validateSSH();
     const grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);
-
+    if (selectionDetails.value?.node?.dedicated) {
+      await layout.value?.validateRentContract(grid!, selectionDetails.value?.node);
+    }
     const vm = await deployVM(grid!, {
       name: name.value,
       machines: [

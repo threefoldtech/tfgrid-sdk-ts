@@ -194,6 +194,13 @@ defineExpose({
     return balance;
   },
 
+  async validateRentContract(grid: GridClient, node: NodeInfo) {
+    const contractInfo = await grid.contracts.get({ id: node.rentContractId });
+    if (contractInfo.state.gracePeriod) {
+      throw new Error(`You can't deploy on node ${node.nodeId}, its rent contract in grace period. `);
+    }
+  },
+
   setStatus(s: WebletStatus, m?: string) {
     if (s !== "deploy" && !m) {
       throw new Error("Message need to be passed while settingStatus.");
@@ -341,6 +348,7 @@ export interface WebletLayout {
   status: ComputedRef<WebletStatus> | string;
   reloadDeploymentsList(): void;
   validateSSH(): void;
+  validateRentContract(grid: GridClient, node: NodeInfo): void;
 }
 
 export function useLayout() {

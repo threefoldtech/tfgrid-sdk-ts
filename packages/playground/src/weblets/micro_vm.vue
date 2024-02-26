@@ -257,6 +257,9 @@ async function deploy() {
     const grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);
+    if (selectionDetails.value?.node?.dedicated) {
+      await layout.value?.validateRentContract(grid!, selectionDetails.value?.node);
+    }
 
     const vm = await deployVM(grid!, {
       name: name.value,
