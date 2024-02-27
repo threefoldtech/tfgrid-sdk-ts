@@ -10,7 +10,9 @@
       <TfFilter
         query-route="node-id"
         :rules="[
-          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.isNumeric('This field accepts numbers only.', {
+            no_symbols: true,
+          }),
           validators.min('The node id should be larger then zero.', 1),
           validators.startsWith('The node id start with zero.', '0'),
           validators.validateResourceMaxNumber('This is not a valid ID.'),
@@ -34,7 +36,9 @@
         query-route="farm-id"
         v-model="filters.farmId"
         :rules="[
-          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.isNumeric('This field accepts numbers only.', {
+            no_symbols: true,
+          }),
           validators.min('The ID should be larger than zero.', 1),
           validators.isInt('should be an integer'),
           validators.validateResourceMaxNumber('This is not a valid ID.'),
@@ -243,7 +247,9 @@
       <TfFilter
         query-route="free-public-ips"
         :rules="[
-          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.isNumeric('This field accepts numbers only.', {
+            no_symbols: true,
+          }),
           validators.min('The node id should be larger then zero.', 1),
           validators.startsWith('The node id start with zero.', '0'),
           validators.validateResourceMaxNumber('This value is out of range.'),
@@ -288,6 +294,10 @@
       <TfFilter query-route="gpu" v-model="filters.gpu">
         <v-switch color="primary" inset label="GPU Node (Only)" v-model="filters.gpu" hide-details />
       </TfFilter>
+
+      <TfFilter query-route="dedicated" v-model="filters.dedicated">
+        <v-switch color="primary" inset label="Dedicated Nodes (Only)" v-model="filters.dedicated" hide-details />
+      </TfFilter>
     </TfFiltersContainer>
 
     <div class="nodes mt-5">
@@ -307,6 +317,7 @@
                   page = $event;
                   loadNodes();
                 "
+                @reload-table="reloadTable"
                 :count="nodesCount"
                 :loading="loading"
                 v-model:selectedNode="selectedNodeId"
@@ -357,14 +368,14 @@ import { useRoute } from "vue-router";
 import NodeDetails from "@/components/node_details.vue";
 import NodesTable from "@/components/nodes_table.vue";
 import router from "@/router";
-import { requestNodes } from "@/utils/get_nodes";
+import type { GridProxyRequestConfig } from "@/types";
+import { getNode, requestNodes } from "@/utils/get_nodes";
 import { convertToBytes } from "@/utils/get_nodes";
 
 import TfFilter from "../components/filters/TfFilter.vue";
 import TfFiltersContainer from "../components/filters/TfFiltersContainer.vue";
 import TfSelectFarm from "../components/node_selector/TfSelectFarm.vue";
 import TfSelectLocation from "../components/node_selector/TfSelectLocation.vue";
-
 export default {
   components: {
     NodesTable,
@@ -377,7 +388,7 @@ export default {
   setup() {
     const size = ref(window.env.PAGE_SIZE);
     const page = ref(1);
-
+    const nodeId = ref<number>(0);
     const filters = ref({
       nodeId: "",
       farmId: "",
@@ -395,6 +406,7 @@ export default {
       gateway: false,
       gpu: false,
       publicIPs: "",
+      dedicated: false,
     });
 
     const loading = ref<boolean>(true);
@@ -405,6 +417,13 @@ export default {
     const isDialogOpened = ref<boolean>(false);
 
     const route = useRoute();
+
+    const nodeOptions: GridProxyRequestConfig = {
+      loadTwin: true,
+      loadFarm: true,
+      loadStats: true,
+      loadGpu: false,
+    };
 
     async function loadNodes() {
       loading.value = true;
@@ -430,6 +449,7 @@ export default {
             hasGpu: filters.value.gpu || undefined,
             domain: filters.value.gateway || undefined,
             freeIps: +filters.value.publicIPs || undefined,
+            dedicated: filters.value.dedicated || undefined,
           },
           { loadFarm: true },
         );
@@ -437,6 +457,19 @@ export default {
         nodesCount.value = count ?? 0;
       } catch (err) {
         console.log(err);
+      } finally {
+        loading.value = false;
+      }
+    }
+
+    async function requestNode() {
+      loading.value = true;
+      try {
+        const node = await getNode(nodeId.value, nodeOptions);
+        const index = nodes.value.findIndex(node => node.nodeId === nodeId.value);
+        nodes.value[index] = node;
+      } catch (error) {
+        console.log(error);
       } finally {
         loading.value = false;
       }
@@ -466,6 +499,11 @@ export default {
       isDialogOpened.value = true;
     };
 
+    function reloadTable(id: number) {
+      nodeId.value = id;
+      setTimeout(requestNode, 20000);
+    }
+
     return {
       loading,
       nodesCount,
@@ -475,7 +513,7 @@ export default {
       closeDialog,
       requestNodes,
       isDialogOpened,
-
+      reloadTable,
       filters,
       NodeStatus,
       size,
