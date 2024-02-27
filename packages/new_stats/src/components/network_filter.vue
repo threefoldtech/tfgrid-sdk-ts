@@ -40,6 +40,7 @@
             style="min-width: fit-content"
             hide-details
             color="primary"
+            :disabled="loading"
             :model-value="network.value"
             @update:model-value="updateNetworks($event, index)"
             inset
