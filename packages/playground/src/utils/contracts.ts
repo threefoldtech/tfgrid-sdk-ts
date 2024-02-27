@@ -57,6 +57,13 @@ async function normalizeContract(
     consumption = 0;
   }
 
+  let farmId: number;
+  try {
+    farmId = (await grid.nodes.get({ id: c.nodeID })).farmId;
+  } catch {
+    farmId = 0;
+  }
+
   return {
     contractId: id,
     twinID: c.twinID,
@@ -64,6 +71,7 @@ async function normalizeContract(
     state: c.state,
     createdAt: new Date(+c.createdAt * 1000).toLocaleString(),
     nodeId: c.nodeID || "-",
+    farmId,
     solutionProviderID: c.solutionProviderID,
     solutionName: data.name || "-",
     solutionType: data.projectName || data.type || "-",
@@ -117,6 +125,7 @@ export interface NormalizedContract {
   state: ContractStates;
   createdAt: string;
   nodeId?: number;
+  farmId?: number;
   solutionName?: string;
   solutionType?: string;
   expiration?: string;
