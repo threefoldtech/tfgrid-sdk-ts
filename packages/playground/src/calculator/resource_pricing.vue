@@ -95,9 +95,9 @@
           <input-validator
             :value="HRU"
             :rules="[
-              validators.required('HDD Storage size is required.'),
               validators.isInt('HDD Storage size must be a valid integer.'),
               validators.max('Maximum allowed hdd storage size is 1000000 GB.', 1000000),
+              validators.min('Minimum allowed hdd storage size is 0 GB.', 0),
             ]"
             #="{ props }"
           >
