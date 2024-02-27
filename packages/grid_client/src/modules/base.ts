@@ -41,8 +41,8 @@ class BaseModule {
   backendStorage: BackendStorage;
   tfClient: TFClient;
   contracts: Required<GqlNodeContract>[];
-  newContracts: GqlNodeContract[];
-  deletedContracts: number[];
+  static newContracts: GqlNodeContract[] = [];
+  static deletedContracts: number[] = [];
 
   constructor(public config: GridClientConfig) {
     this.projectName = config.projectName;
@@ -92,7 +92,7 @@ class BaseModule {
 
     for (const contract of contracts["created"]) {
       if (!contract.contractType.nodeContract) continue;
-      this.newContracts.push({
+      BaseModule.newContracts.push({
         contractID: String(contract.contractId),
         createdAt: Date.now().toString(),
         deploymentData: contract.contractType.nodeContract.deploymentData,
@@ -110,7 +110,7 @@ class BaseModule {
     }
 
     for (const contract of contracts["deleted"]) {
-      this.deletedContracts.push(contract.contractId);
+      BaseModule.deletedContracts.push(contract.contractId);
       StoreContracts = StoreContracts.filter(c => c["contract_id"] !== contract["contractId"]);
       const contractPath = PATH.join(this.config.storePath, "contracts", `${contract["contractId"]}.json`);
       backendOperations = backendOperations.concat(await this.backendStorage.dump(contractPath, ""));
@@ -182,20 +182,26 @@ class BaseModule {
         type: modulesNames[this.moduleName],
         projectName: this.projectName,
       });
-      for (const contract of this.newContracts) {
+      const alreadyFetchedContracts: GqlNodeContract[] = [];
+      for (const contract of BaseModule.newContracts) {
         if (contract.parsedDeploymentData?.projectName !== this.projectName) continue;
         if (contract.parsedDeploymentData.type !== modulesNames[this.moduleName]) continue;
         const c = contracts.filter(c => +c.contractID === +contract.contractID);
-        if (c.length) continue;
+        if (c.length > 0) {
+          alreadyFetchedContracts.push(contract);
+          continue;
+        }
         contracts.push(contract);
       }
 
-      for (const contract of this.deletedContracts) {
-        contracts = contracts.filter(c => !this.deletedContracts.includes(+c.contractID));
+      for (const contract of alreadyFetchedContracts) {
+        const index = BaseModule.newContracts.indexOf(contract);
+        if (index > -1) BaseModule.newContracts.splice(index, 1);
       }
 
-      const parsedContracts: Required<GqlNodeContract>[] = [];
+      contracts = contracts.filter(c => !BaseModule.deletedContracts.includes(+c.contractID));
 
+      const parsedContracts: Required<GqlNodeContract>[] = [];
       for (const contract of contracts) {
         const parsedDeploymentData = JSON.parse(contract.deploymentData);
         parsedContracts.push({ ...contract, parsedDeploymentData });

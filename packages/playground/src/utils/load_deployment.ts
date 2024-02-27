@@ -145,6 +145,11 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
 }
 export function getWireguardConfig(grid: GridClient, name: string, ipRange: string) {
   const projectName = grid.clientOptions!.projectName;
+  if (!ipRange.endsWith("/16")) {
+    const parts = ipRange.split(".");
+    parts[2] = parts[3] = "0";
+    ipRange = parts.join(".") + "/16";
+  }
   return updateGrid(grid, { projectName: "" })
     .networks.getWireGuardConfigs({ name, ipRange })
     .finally(() => updateGrid(grid, { projectName }));

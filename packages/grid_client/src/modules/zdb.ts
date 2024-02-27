@@ -28,7 +28,7 @@ class ZdbsModule extends BaseModule {
       version: 3,
       type: "zdb",
       name: options.name,
-      projectName: this.config.projectName,
+      projectName: this.config.projectName || `zdb/${options.name}`,
     });
     for (const instance of options.zdbs) {
       if (zdbs_names.includes(instance.name))
@@ -139,7 +139,7 @@ class ZdbsModule extends BaseModule {
       version: 3,
       type: "zdb",
       name: options.deployment_name,
-      projectName: this.config.projectName,
+      projectName: this.config.projectName || `zdb/${options.name}`,
     });
     events.emit("logs", `Start adding ZDB instance: ${options.name} to deployment: ${options.deployment_name}`);
     const twinDeployment = await this.zdb.create(

@@ -39,7 +39,7 @@ class MachinesModule extends BaseModule {
       version: 3,
       type: "vm",
       name: options.name,
-      projectName: this.config.projectName,
+      projectName: this.config.projectName || `vm/${options.name}`,
     });
 
     const machines_names: string[] = [];
@@ -174,7 +174,7 @@ class MachinesModule extends BaseModule {
       version: 3,
       type: "vm",
       name: options.deployment_name,
-      projectName: this.config.projectName,
+      projectName: this.config.projectName || `vm/${options.name}`,
     });
     const [twinDeployments] = await this.vm.create(
       options.name,

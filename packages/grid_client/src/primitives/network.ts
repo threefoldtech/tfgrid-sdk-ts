@@ -31,7 +31,6 @@ class Node {
   node_id: number;
   contract_id: number;
   reserved_ips: string[] = [];
-  user_access: UserAccess[] = [];
 }
 
 class AccessPoint {
@@ -48,7 +47,7 @@ export interface UserAccess {
 
 interface NetworkMetadata {
   version: number;
-  user_access: UserAccess[];
+  user_accesses: UserAccess[];
 }
 
 class Network {
@@ -59,6 +58,7 @@ class Network {
   networks: Znet[] = [];
   contracts: Required<GqlNodeContract>[];
   accessPoints: AccessPoint[] = [];
+  userAccesses: UserAccess[] = [];
   backendStorage: BackendStorage;
   _endpoints: Record<string, string> = {};
   _accessNodes: number[] = [];
@@ -100,9 +100,9 @@ class Network {
   private getUpdatedMetadata(nodeId: number, metadata: string): string {
     for (const node of this.nodes) {
       if (node.node_id === nodeId) {
-        const parsedMetadata: NetworkMetadata = JSON.parse(metadata);
+        const parsedMetadata: NetworkMetadata = JSON.parse(metadata || "{}");
         parsedMetadata.version = 3;
-        parsedMetadata.user_access = node.user_access;
+        parsedMetadata.user_accesses = this.userAccesses;
         return JSON.stringify(parsedMetadata);
       }
     }
@@ -156,9 +156,7 @@ class Network {
     this.accessPoints.push(accessPoint);
     await this.generatePeers();
     this.updateNetworkDeployments();
-    // should be always there as we check at the top if the node exist on the network
-    const node = this.nodes.filter(node => node.node_id === node_id)[0];
-    node.user_access.push({
+    this.userAccesses.push({
       node_id,
       private_key: keypair.privateKey,
       subnet: accessPoint.subnet,
@@ -375,7 +373,7 @@ class Network {
     const contracts = await this.getDeploymentContracts(this.name);
     for (const contract of contracts) {
       const node_twin_id = await this.capacity.getNodeTwinId(contract.nodeID);
-      const payload = JSON.stringify({ contract_id: contract.contractID });
+      const payload = JSON.stringify({ contract_id: +contract.contractID });
       let res: Deployment;
       try {
         res = await this.rmb.request([node_twin_id], "zos.deployment.get", payload);
@@ -400,11 +398,10 @@ class Network {
         if (znet.ip_range !== this.ipRange) {
           throw new ValidationError(`The same network name ${this.name} with a different ip range already exists.`);
         }
-
+        this.userAccesses = parsedMetadata.user_accesses;
         const n: Node = {
           contract_id: +contract.contractID,
           node_id: contract.nodeID,
-          user_access: parsedMetadata.user_access,
           reserved_ips: reservedIps,
         };
         this.nodes.push(n);

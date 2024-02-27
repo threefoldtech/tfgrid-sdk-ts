@@ -85,7 +85,7 @@ class K8sModule extends BaseModule {
       version: 3,
       type: "kubernetes",
       name: options.name,
-      projectName: this.config.projectName,
+      projectName: this.config.projectName || options.name,
     });
     const masters_names: string[] = [];
     const workers_names: string[] = [];
@@ -287,7 +287,7 @@ class K8sModule extends BaseModule {
       version: 3,
       type: "kubernetes",
       name: options.deployment_name,
-      projectName: this.config.projectName,
+      projectName: this.config.projectName || options.deployment_name,
     });
     const [twinDeployments] = await this.kubernetes.add_worker(
       options.name,

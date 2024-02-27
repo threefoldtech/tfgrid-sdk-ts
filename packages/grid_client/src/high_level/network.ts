@@ -91,11 +91,10 @@ class NetworkHL extends HighLevelBase {
     if (nodeId && !network.nodeExists(nodeId)) {
       return configs;
     }
-    const node = network.nodes[0];
-    let userAccesses: UserAccess[] = [];
-    if (node.user_access && node.user_access.length > 0) {
+    let userAccesses: UserAccess[] = network.userAccesses;
+    if (network.userAccesses && network.userAccesses.length > 0) {
       if (nodeId && network.nodeExists(nodeId)) {
-        userAccesses = node.user_access.filter(userAccess => userAccess.node_id === nodeId);
+        userAccesses = network.userAccesses.filter(userAccess => userAccess.node_id === nodeId);
       }
       for (const userAccess of userAccesses) {
         const nodesWGPubkey = await network.getNodeWGPublicKey(userAccess.node_id);
