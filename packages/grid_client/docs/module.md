@@ -85,13 +85,13 @@ Module should be:
 
   cmd: `client.contracts.getDedicatedNodeExtraFee`
 
-  payload: `'{"nodeId":  "<zos node id>", "extraFee" : "< extrea fee for dedicated node>"}'`
+  payload: `'{"nodeId":  "<zos node id>"}'`
 
 - **Set Extra fee for dedicated node**
 
   cmd: `client.contracts.setDedicatedNodeExtraFee`
 
-  payload: `'{"nodeId":  "<zos node id>"}'`
+  payload: `'{"nodeId":  "<zos node id>", "extraFee" : "< extre fee for dedicated node>"}'`
 
 - **Get Active contracts**
 
@@ -255,7 +255,7 @@ Module should be:
 - **Add Node to network**
   cmd: `client.networks.addNode`
 
-  payload: `'{"name": "<network name>" , "ipRange": "<Public ips range>", "nodeId": "<zos node id>", "mycelium": "<Flag for mycelium>"}'`
+  payload: `'{"name": "<network name>" , "ipRange": "<Public ips range>", "nodeId": "<zos node id>", "mycelium": "<Flag for mycelium>", "solutionProviderId": "<solution provider id>(optional)", "description": "<description>(optional)", "myceliumSeed": "<Hex mycelium seed>(optional)"}'`
 
 - **List**
   cmd: `client.networks.list`
@@ -279,8 +279,6 @@ Module should be:
   cmd: `client.zos.deploy`
 
   payload: the same as zos deployment without signing with additional parameter `'{"node_id": <zos node id> }'`
-
-  > **Note:** `node_id` will be optional when the grid3_proxy_server is ready to be used.
 
 - **Get deployment**
 
@@ -367,7 +365,13 @@ Module should be:
           "name": "wed1310t1",
           "network": {
               "ip_range": "10.203.0.0/16",
-              "name": "wed159n3"
+              "name": "wed159n3",
+               "myceliumSeeds": [
+                {
+                  "nodeId": 3,
+                  "seed": "050d109829d8492d48bfb33b711056080571c69e46bfde6b4294c4c5bf468a76", //(HexSeed of length 32)
+                },
+              ],
           },
           "machines": [{
               "name": "wed1310t2",
@@ -393,6 +397,8 @@ Module should be:
               ],
               "public_ip": false,
               "planetary": true,
+              "mycelium": false,
+              "myceliumSeed": "1e1404279b3d", //(HexSeed of length 6)
               "cpu": 1,
               "memory": 1024,
               "rootfs_size": 1,
@@ -402,6 +408,7 @@ Module should be:
                   "SSH_KEY": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDmm8OzLt+lTdGaMUwMFcw0P+vr+a/h/UsR//EzzeQsgNtC0bdls4MawVEhb3hNcycEQNd2P/+tXdLC4qcaJ6iABYip4xqqAeY098owGDYhUKYwmnMyo+NwSgpjZs8taOhMxh5XHRI+Ifr4l/GmzbqExS0KVD21PI+4sdiLspbcnVBlg9Eg9enM///zx6rSkulrca/+MnSYHboC5+y4XLYboArD/gpWy3zwIUyxX/1MjJwPeSnd5LFBIWvPGrm3cl+dAtADwTZRkt5Yuet8y5HI73Q5/NSlCdYXMtlsKBLpJu3Ar8nz1QfSQL7dB8pa7/sf/s8wO17rXqWQgZG6JzvZ root@ahmed-Inspiron-3576"
               }
           }],
+          "gpus": ["0000:03:00.0/1002/15d8"],  //gpus ids
           "metadata": "",
           "description": ""
       };
@@ -494,7 +501,18 @@ single master and multiple workers.
     "secret": "hamadaellol",
     "network": {
       "name": "hamadanet",
-      "ip_range": "10.201.0.0/16"
+      "ip_range": "10.201.0.0/16",
+      "addAccess": true,
+      "myceliumSeeds": [
+        {
+          "nodeId": 3,
+          "seed": "a5f0ea16a744af2c0c23fc878d727a6f355079f82d979ad4bc75dd8fb5ebc90e" //(HexSeed of length 32)
+        },
+        {
+          "nodeId": 2,
+          "seed": "7edd9c250f834cb326c3cf116040cf2214f38c669bf27a72e2f5b9e44fc7b27e" //(HexSeed of length 32)
+        }
+      ]
     },
     "masters": [
       {
@@ -505,7 +523,10 @@ single master and multiple workers.
         "rootfs_size": 1,
         "disk_size": 15,
         "public_ip": true,
-        "planetary": true
+        "public_ip6": false,
+        "planetary": true,
+        "mycelium": true,
+        "myceliumSeed": "1791fed39e0f" //(HexSeed of length 6)
       }
     ],
     "workers": [
@@ -517,7 +538,10 @@ single master and multiple workers.
         "rootfs_size": 1,
         "disk_size": 15,
         "public_ip": false,
-        "planetary": true
+        "public_ip6": false,
+        "planetary": true,
+        "mycelium": true,
+        "myceliumSeed": "580bafd349f5" //(HexSeed of length 6)
       }
     ],
     "metadata": "",
@@ -563,7 +587,8 @@ single master and multiple workers.
     "disk_size": 15,
     "public_ip": false,
     "planetary": true,
-    "myceliumNetworkSeed": ""
+    "mycelium": true,
+    "myceliumSeed": "580bafd349f5" //(HexSeed of length 6)
   }
   ```
 
@@ -997,7 +1022,7 @@ single master and multiple workers.
   ```
 
 - **Balance by address**
-  It will list all the balances given a wallet address.
+  It will list the balance for all assets given a wallet address.
 
   cmd: `client.stellar.balance_by_address`
 
@@ -1553,10 +1578,10 @@ single master and multiple workers.
 
   ```json
       {
-     "nodeCRU": <nodes with free cores>,
-      "nodeMRU": <nodes with free memory in GB>,
-      "nodeSRU": <nodes with free SSD storage in GB>,
-      "nodeHRU": <nodes with free HDD storage in GB>,
+     "nodeCRU": <nodes with total cores>,
+      "nodeMRU": <nodes with total memory in GB>,
+      "nodeSRU": <nodes with total SSD storage in GB>,
+      "nodeHRU": <nodes with total HDD storage in GB>,
       "publicIPs": <farms with nodes with free public ips>,
       "certificationType": <certificationType4>,
       "farmName": "<farm name>",
