@@ -121,15 +121,6 @@ async function deploy() {
     const grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);
-    if (leader.value.selectionDetails?.node?.dedicated) {
-      await layout.value?.validateRentContract(grid!, leader.value.selectionDetails?.node);
-    }
-
-    for (const worker of workers.value) {
-      if (worker.selectionDetails?.node?.dedicated) {
-        await layout.value?.validateRentContract(grid!, worker.selectionDetails?.node);
-      }
-    }
 
     const vm = await deployVM(grid!, {
       name: leader.value.name,
