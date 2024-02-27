@@ -143,7 +143,7 @@ const valid = ref(false);
 const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "fw" }));
 const username = ref("admin");
-const email = ref("");
+const email = ref(profileManager.profile?.email || "");
 const password = ref(generatePassword(12));
 const solution = ref() as Ref<SolutionFlavor>;
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
