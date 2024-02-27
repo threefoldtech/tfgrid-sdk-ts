@@ -6,7 +6,7 @@ import type { IsURLOptions } from "validator/lib/isURL";
 
 export function required(msg: string) {
   return (value: string) => {
-    if (value === "" || value === undefined || value === null) {
+    if (value === undefined || value === null) {
       return { message: msg, required: true };
     }
   };

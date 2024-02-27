@@ -7,7 +7,8 @@
     <v-card class="pa-3">
       <v-row class="mt-3 px-3 pl-6">
         <v-alert type="info" variant="tonal">
-          For more information about Threefold Pricing check <a class="app-link" @click="openManual()">here</a>
+          For more information about Threefold Pricing check
+          <a class="app-link" @click="openManual()">here</a>
         </v-alert>
       </v-row>
       <v-row class="mt-3 px-3">
@@ -105,7 +106,7 @@
                 label="Disk HDD"
                 suffix="GB"
                 type="number"
-                min="1"
+                min="0"
                 max="1000000"
                 oninput="if(Number(this.value) > 1000000) this.value = 1000000;"
                 v-model.number="HRU"
@@ -206,7 +207,6 @@ import { ref } from "vue";
 
 import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
 import { useProfileManager } from "@/stores/profile_manager";
-import { getGrid, loadBalance } from "@/utils/grid";
 
 import { calculator as Calculator } from "../../../grid_client/dist/es6";
 import { useGrid } from "../stores";
@@ -258,7 +258,7 @@ watch(
       pkgs = await calculator.value?.calculate({
         cru: CRU.value,
         mru: MRU.value,
-        hru: HRU.value,
+        hru: HRU.value ? HRU.value : 0,
         sru: SRU.value,
         ipv4u: ipv4.value,
         certified: isCertified.value,
@@ -332,7 +332,7 @@ onMounted(async () => {
   const pkgs = await calculator.value.calculate({
     cru: CRU.value,
     mru: MRU.value,
-    hru: HRU.value,
+    hru: HRU.value ? HRU.value : 0,
     sru: SRU.value,
     ipv4u: ipv4.value,
     certified: isCertified.value,
