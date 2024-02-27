@@ -91,7 +91,7 @@
             >{{ item.value.masters[0].message }}</v-tooltip
           >
           <v-tooltip v-if="item.value.masters[0].status == NodeHealth.Paused" activator="parent" location="top"
-            >This node contract is in the grace period</v-tooltip
+            >The deployment contract is in grace period</v-tooltip
           >
           <span class="text-uppercase">
             {{ getNodeHealthColor(item.value.masters[0].status as string).type }}
