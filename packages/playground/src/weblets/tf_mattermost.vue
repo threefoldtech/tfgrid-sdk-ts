@@ -142,6 +142,7 @@ async function deploy() {
     grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);
+
     await deployVM(grid!, {
       name: name.value,
       network: {

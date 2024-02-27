@@ -273,31 +273,6 @@ export default {
       },
     );
 
-    // const nodeInputValidateTask = useAsync<true, string, [NodeInfo | undefined]>(
-    //   node => checkNodeCapacityPool(gridStore, node, props.filters),
-    //   {
-    //     tries: 1,
-    //     shouldRun: () => props.validFilters,
-    //     onBeforeTask: () => bindStatus(ValidatorStatus.Pending),
-    //     onAfterTask({ data }) {
-    //       bindStatus(data ? ValidatorStatus.Valid : ValidatorStatus.Invalid);
-    //       const container = nodesContainer.value as HTMLDivElement;
-    //       if (container) {
-    //         const card = container.querySelector(".selected-node") as HTMLDivElement;
-
-    //         if (card && container.getAttribute("data-scrolled") !== "scrolled") {
-    //           container.setAttribute("data-scrolled", "scrolled");
-    //           container.scroll({
-    //             behavior: "smooth",
-    //             top: card.offsetTop - 100,
-    //           });
-    //         }
-    //       }
-    //     },
-    //     onReset: bindStatus,
-    //   },
-    // );
-
     const touched = ref(false);
     function bindModelValueAndValidate(node?: NodeInfo) {
       bindModelValue(node);
