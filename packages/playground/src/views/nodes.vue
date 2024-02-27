@@ -430,9 +430,13 @@ export default {
             hasGpu: filters.value.gpu || undefined,
             domain: filters.value.gateway || undefined,
             freeIps: +filters.value.publicIPs || undefined,
+            sortBy: "status",
+            sortOrder: "asc",
           },
           { loadFarm: true },
         );
+        console.log(data);
+
         nodes.value = data;
         nodesCount.value = count ?? 0;
       } catch (err) {
