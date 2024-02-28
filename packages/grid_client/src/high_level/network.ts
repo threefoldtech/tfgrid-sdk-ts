@@ -105,7 +105,7 @@ class NetworkHL extends HighLevelBase {
     } else {
       const path = PATH.join(this.config.storePath, "networks", networkName, "info.json");
       const networkInfo = await this.backendStorage.load(path);
-      return networkInfo["wireguardConfigs"];
+      return networkInfo["wireguardConfigs"] || [];
     }
   }
 }
