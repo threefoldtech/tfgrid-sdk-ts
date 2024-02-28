@@ -14,16 +14,11 @@ export async function getGrid(
     backendStorageType: BackendStorageType.tfkvstore,
     keypairType: profile.keypairType || KeypairType.sr25519,
     projectName,
-
-    ...(import.meta.env.DEV && network !== NetworkEnv.custom
-      ? {}
-      : {
-          substrateURL: window.env.SUBSTRATE_URL,
-          proxyURL: window.env.GRIDPROXY_URL,
-          graphqlURL: window.env.GRAPHQL_URL,
-          activationURL: window.env.ACTIVATION_SERVICE_URL,
-          relayURL: window.env.RELAY_DOMAIN,
-        }),
+    substrateURL: window.env.SUBSTRATE_URL,
+    proxyURL: window.env.GRIDPROXY_URL,
+    graphqlURL: window.env.GRAPHQL_URL,
+    activationURL: window.env.ACTIVATION_SERVICE_URL,
+    relayURL: window.env.RELAY_DOMAIN,
   });
   try {
     await grid.connect();
