@@ -314,11 +314,13 @@ class BaseModule {
         cpu: data.compute_capacity.cpu,
         memory: data.compute_capacity.memory / 1024 ** 2, // MB
       },
-      mounts: data.mounts.map(m => ({
-        name: m.name,
-        mountPoint: m.mountpoint,
-        ...this._getDiskData(deployments, m.name, workload["contractId"]),
-      })),
+      mounts: data.mounts
+        ? data.mounts.map(m => ({
+            name: m.name,
+            mountPoint: m.mountpoint,
+            ...this._getDiskData(deployments, m.name, workload["contractId"]),
+          }))
+        : [],
       env: data.env,
       entrypoint: data.entrypoint,
       metadata: workload.metadata,
