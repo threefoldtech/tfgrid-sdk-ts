@@ -121,13 +121,7 @@ Module should be:
 
   cmd: `client.contracts.listMyContracts`
 
-  payload: `'{""}'`
-
-- **List all my contracts**
-
-  cmd: `client.contracts.listMyContracts`
-
-  payload: `'{""}'`
+  payload: `'{"address": "<wallet address>"}'`
 
 - **Cancel all my contracts**
 
@@ -408,6 +402,7 @@ Module should be:
                   "SSH_KEY": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDmm8OzLt+lTdGaMUwMFcw0P+vr+a/h/UsR//EzzeQsgNtC0bdls4MawVEhb3hNcycEQNd2P/+tXdLC4qcaJ6iABYip4xqqAeY098owGDYhUKYwmnMyo+NwSgpjZs8taOhMxh5XHRI+Ifr4l/GmzbqExS0KVD21PI+4sdiLspbcnVBlg9Eg9enM///zx6rSkulrca/+MnSYHboC5+y4XLYboArD/gpWy3zwIUyxX/1MjJwPeSnd5LFBIWvPGrm3cl+dAtADwTZRkt5Yuet8y5HI73Q5/NSlCdYXMtlsKBLpJu3Ar8nz1QfSQL7dB8pa7/sf/s8wO17rXqWQgZG6JzvZ root@ahmed-Inspiron-3576"
               }
           }],
+          "corex": true,
           "gpus": ["0000:03:00.0/1002/15d8"],  //gpus ids
           "metadata": "",
           "description": ""
@@ -1579,9 +1574,9 @@ single master and multiple workers.
   ```json
       {
      "nodeCRU": <nodes with total cores>,
-      "nodeMRU": <nodes with total memory in GB>,
-      "nodeSRU": <nodes with total SSD storage in GB>,
-      "nodeHRU": <nodes with total HDD storage in GB>,
+      "nodeMRU": <nodes with free memory in GB>,
+      "nodeSRU": <nodes with free SSD storage in GB>,
+      "nodeHRU": <nodes with free HDD storage in GB>,
       "publicIPs": <farms with nodes with free public ips>,
       "certificationType": <certificationType4>,
       "farmName": "<farm name>",
