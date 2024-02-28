@@ -16,6 +16,7 @@
           { title: 'Contract ID', key: 'contractId' },
           { title: 'Name', key: 'name' },
           { title: 'Planetary Network IP', key: 'planetary' },
+          { title: 'Mycelium Network IP', key: 'mycelium' },
           { title: 'CPU(vCores)', key: 'capacity.cpu' },
           { title: 'Memory(MB)', key: 'capacity.memory' },
           { title: 'Disk(GB)', key: 'disk' },
@@ -31,6 +32,9 @@
 
         <template #[`item.disk`]="{ item }">
           {{ calcDiskSize(item.value.mounts) }}
+        </template>
+        <template #[`item.mycelium`]="{ item }">
+          {{ item.value.myceliumIP || "-" }}
         </template>
       </ListTable>
     </template>

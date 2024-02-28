@@ -220,6 +220,7 @@ class BaseModule {
 
   async _getZmachineData(deploymentName: string, deployments, workload: Workload): Promise<Record<string, unknown>> {
     const data = workload.data as Zmachine;
+    const resultData = workload.result.data as ZmachineResult;
     return {
       version: workload.version,
       contractId: workload["contractId"],
@@ -230,9 +231,8 @@ class BaseModule {
       message: workload.result.message,
       flist: data.flist,
       publicIP: await this._getMachinePubIP(deploymentName, deployments, data.network.public_ip),
-      planetary: data.network.planetary
-        ? (workload.result.data as ZmachineResult).ygg_ip || (workload.result.data as ZmachineResult).planetary_ip
-        : "",
+      planetary: data.network.planetary ? resultData.planetary_ip : resultData.ygg_ip,
+      myceliumIP: data.network.mycelium?.hex_seed ? resultData.mycelium_ip : "",
       interfaces: data.network.interfaces.map(n => ({
         network: n.network,
         ip: n.ip,

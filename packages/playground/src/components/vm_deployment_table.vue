@@ -74,6 +74,10 @@
         {{ item.value.planetary || "-" }}
       </template>
 
+      <template #[`item.mycelium`]="{ item }">
+        {{ item.value.myceliumIP || "-" }}
+      </template>
+
       <template #[`item.wireguard`]="{ item }">
         {{ item.value.interfaces[0].ip || "-" }}
       </template>
@@ -219,6 +223,7 @@ const filteredHeaders = computed(() => {
     { title: "Public IPv4", key: "ipv4", sortable: false },
     { title: "Public IPv6", key: "ipv6", sortable: false },
     { title: "Planetary Network IP", key: "planetary", sortable: false },
+    { title: "Mycelium Network IP", key: "mycelium", sortable: false },
     { title: "WireGuard", key: "wireguard", sortable: false },
     { title: "Flist", key: "flist" },
     { title: "Cost", key: "billing" },
