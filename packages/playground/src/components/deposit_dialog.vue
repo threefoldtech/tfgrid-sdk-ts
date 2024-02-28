@@ -15,7 +15,8 @@
                 <div class="mb-2">
                   <p class="mb-8">
                     Deposit your TFTs to Threefold Bridge using a
-                    {{ selectedName ? selectedName.charAt(0).toUpperCase() + selectedName.slice(1) : "" }} transaction.
+                    {{ selectedName ? selectedName.charAt(0).toUpperCase() + selectedName.slice(1) : "" }}
+                    transaction.
                   </p>
                 </div>
                 <input-tooltip
@@ -31,7 +32,7 @@
                 <v-btn
                   variant="outlined"
                   color="secondary"
-                  href="https://manual.grid.tf/threefold_token/tft_bridges/tft_bridges.html"
+                  href="https://manual.grid.tf/threefold_token/tft_bridges/tfchain_stellar_bridge.html#how-to-use-the-tfchain-stellar-bridge"
                   target="_blank"
                   >Learn more?</v-btn
                 >
@@ -137,7 +138,9 @@ onMounted(async () => {
     loading.value = true;
     const grid = await getGrid(profileManager.profile!);
     const address = profileManager.profile?.address as string;
-    const receivedDeposit = await grid!.bridge.listenToMintCompleted({ address: address });
+    const receivedDeposit = await grid!.bridge.listenToMintCompleted({
+      address: address,
+    });
     loading.value = false;
     if (destroyed) return;
     const DecimalDeposit = new Decimal(receivedDeposit);
