@@ -350,7 +350,7 @@
 
       <template v-if="profileManager.profile">
         <v-row>
-          <v-col cols="12" sm="6">
+          <v-col cols="12" md="6" lg="6" xl="6">
             <PasswordInputWrapper #="{ props }">
               <VTextField
                 :label="profileManager.profile.mnemonic.startsWith('0x') ? 'Your Hex Seed' : 'Your Mnemonic'"
@@ -376,10 +376,9 @@
               <VTextField label="Balance" readonly v-model="freeBalance" v-bind="props" />
             </CopyInputWrapper>
           </v-col>
-          <v-divider class="hidden-sm-and-down" vertical></v-divider>
 
-          <v-col cols="12" sm="6">
-            <section class="d-flex flex-column align-center">
+          <v-col cols="12" md="6" lg="6" xl="6">
+            <section class="qr d-flex flex-column align-center">
               <p class="mb-4 text-center">
                 Scan the QR code using
                 <a class="app-link" href="https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html" target="_blank">
@@ -866,9 +865,20 @@ export default {
 .v-field__input {
   font-size: small;
 }
+
+.qr {
+  border-left: 1px solid #3a3b3c;
+}
+
 @media only screen and (max-width: 1400px) {
   .app-btn {
     width: 8rem !important;
+  }
+}
+
+@media only screen and (max-width: 960px) {
+  .qr {
+    border-left: none;
   }
 }
 
