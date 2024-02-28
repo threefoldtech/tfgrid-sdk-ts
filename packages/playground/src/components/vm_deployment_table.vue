@@ -112,6 +112,9 @@
           <v-tooltip v-if="item.value.status == NodeHealth.Error" activator="parent" location="top">{{
             item.value.message
           }}</v-tooltip>
+          <v-tooltip v-if="item.value.status == NodeHealth.Paused" activator="parent" location="top"
+            >The deployment contract is in grace period</v-tooltip
+          >
           <span class="text-uppercase">
             {{ getNodeHealthColor(item.value.status as string).type }}
           </span>

@@ -23,9 +23,8 @@
           <v-divider color="#FFCC00" />
           <v-card-text>
             <v-alert type="error" variant="tonal">
-              Failed to load <strong>{{ count - items.length }}</strong> deployment{{
-                count - items.length > 1 ? "s" : ""
-              }}.
+              Failed to load
+              <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
 
               <span>
                 This might happen because the node is down or it's not reachable
@@ -94,6 +93,9 @@
           <v-tooltip v-if="item.value.masters[0].status == NodeHealth.Error" activator="parent" location="top">{{
             item.value.masters[0].message
           }}</v-tooltip>
+          <v-tooltip v-if="item.value.masters[0].status == NodeHealth.Paused" activator="parent" location="top"
+            >The deployment contract is in grace period</v-tooltip
+          >
           <span class="text-uppercase">
             {{ getNodeHealthColor(item.value.masters[0].status as string).type }}
           </span>
