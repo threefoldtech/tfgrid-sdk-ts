@@ -84,12 +84,9 @@
       </template>
       <template #[`item.status`]="{ item }">
         <v-chip :color="getNodeHealthColor(item.value.masters[0].status as string).color">
-          <v-tooltip
-            v-if="item.value.masters[0].status == NodeHealth.Error || item.value.masters[0].status == NodeHealth.Paused"
-            activator="parent"
-            location="top"
-            >{{ item.value.masters[0].message }}</v-tooltip
-          >
+          <v-tooltip v-if="item.value.masters[0].status == NodeHealth.Error" activator="parent" location="top">{{
+            item.value.masters[0].message
+          }}</v-tooltip>
           <v-tooltip v-if="item.value.masters[0].status == NodeHealth.Paused" activator="parent" location="top"
             >The deployment contract is in grace period</v-tooltip
           >
