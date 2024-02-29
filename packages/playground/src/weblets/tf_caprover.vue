@@ -124,6 +124,7 @@ async function deploy() {
 
     const vm = await deployVM(grid!, {
       name: leader.value.name,
+      network: createNetwork({ addAccess: true }),
       machines: [
         normalizeCaproverWorker(leader.value, [
           { key: "SWM_NODE_MODE", value: "leader" },
@@ -181,6 +182,8 @@ function normalizeCaproverWorker(worker: CW, envs: Env[]): Machine {
 </script>
 
 <script lang="ts">
+import { createNetwork } from "@/utils/deploy_helpers";
+
 import CaproverWorker, { createWorker } from "../components/caprover_worker.vue";
 import ExpandableLayout from "../components/expandable_layout.vue";
 import { deploymentListEnvironments } from "../constants";
