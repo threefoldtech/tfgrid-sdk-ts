@@ -152,7 +152,7 @@ const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "tg" }));
 const username = ref("admin");
 const password = ref(generatePassword());
-const email = ref("");
+const email = ref(profileManager.profile?.email || "");
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/grid3_taiga_docker-latest.flist",
