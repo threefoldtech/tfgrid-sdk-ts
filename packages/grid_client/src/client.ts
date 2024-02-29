@@ -80,7 +80,7 @@ class GridClient {
       this.clientOptions.activationURL = clientOptions.activationURL;
       this.clientOptions.relayURL = clientOptions.relayURL;
     } else {
-      throw new Error("Unknown NETWORK selected! Acceptable networks are [dev | qa | test | main ]");
+      throw new GridClientError(`Unknown NETWORK selected! Acceptable networks are [dev | qa | test | main ]`);
     }
   }
   async connect(): Promise<void> {
