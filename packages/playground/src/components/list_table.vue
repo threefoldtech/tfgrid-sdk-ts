@@ -30,10 +30,9 @@
       <div class="d-flex align-center justify-space-between">
         <span>{{ index + 1 }}</span>
         <div class="d-flex" @click.stop>
-          <v-progress-circular
+          <TfLoading
             v-if="deleting && selectedItems.includes(item?.value)"
             class="ml-3"
-            indeterminate
             color="red"
             :width="2"
             :size="20"
