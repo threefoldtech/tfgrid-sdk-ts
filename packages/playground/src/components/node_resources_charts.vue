@@ -19,7 +19,14 @@
       <div v-for="item in resources" :key="item.name" class="mx-6 d-flex flex-column pt-2 mt-2 align-center">
         <div class="mb-2">{{ item.name }}</div>
         <div class="text-center">
-          <tf-loading :model-value="item.value"> {{ item.value !== "NaN" ? item.value + "%" : "N/A" }}</tf-loading>
+          <v-progress-circular
+            :model-value="item.value"
+            :size="100"
+            :width="10"
+            :indeterminate="indeterminate"
+            color="info"
+            >{{ item.value !== "NaN" ? item.value + "%" : "N/A" }}
+          </v-progress-circular>
         </div>
       </div>
     </v-row>
@@ -67,7 +74,7 @@ export default {
     const resources = ref<ResourceWrapper[]>([]);
     const renamedResources = ["CPU", "RAM", "SSD", "HDD"];
     const loading = ref<boolean>(false);
-
+    const indeterminate = ref<boolean>(false);
     const getNodeHealthUrl = async () => {
       const grafana = new GrafanaStatistics(props.node);
       const nodeHealthUrl = await grafana.getUrl();
@@ -99,7 +106,7 @@ export default {
       NodeStatus,
       resources,
       loading,
-
+      indeterminate,
       getNodeResources,
       getNodeHealthUrl,
       getNodeStatusColor,
