@@ -257,10 +257,24 @@ export async function loadK8s(grid: GridClient) {
 export function mergeLoadedDeployments<T>(...deployments: LoadedDeployments<T>[]) {
   return deployments.reduce(
     (res, current) => {
-      res.count += current.count;
-      res.items = res.items.concat(current.items);
+      insertIfNotFound(current, res);
+      res.count = res.items.length;
       return res;
     },
     { count: 0, items: [] },
   );
+}
+
+function insertIfNotFound<T>(newItems: LoadedDeployments<T>, oldItems: LoadedDeployments<T>): LoadedDeployments<T> {
+  for (const item of newItems.items) {
+    let found = false;
+    for (const i of oldItems.items) {
+      if (item.deploymentName === i.deploymentName) {
+        found = true;
+      }
+    }
+    if (!found) {
+      oldItems.items.push(item);
+    }
+  }
 }
