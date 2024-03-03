@@ -265,7 +265,7 @@ export function mergeLoadedDeployments<T>(...deployments: LoadedDeployments<T>[]
   );
 }
 
-function insertIfNotFound<T>(newItems: LoadedDeployments<T>, oldItems: LoadedDeployments<T>): LoadedDeployments<T> {
+function insertIfNotFound(newItems: LoadedDeployments<any>, oldItems: LoadedDeployments<any>) {
   for (const item of newItems.items) {
     let found = false;
     for (const i of oldItems.items) {
