@@ -57,13 +57,6 @@ async function normalizeContract(
     consumption = 0;
   }
 
-  let farmId: number;
-  try {
-    farmId = (await grid.nodes.get({ id: c.nodeID })).farmId;
-  } catch {
-    farmId = 0;
-  }
-
   return {
     contractId: id,
     twinID: c.twinID,
@@ -71,7 +64,6 @@ async function normalizeContract(
     state: c.state,
     createdAt: new Date(+c.createdAt * 1000).toLocaleString(),
     nodeId: c.nodeID || "-",
-    farmId,
     solutionProviderID: c.solutionProviderID,
     solutionName: data.name || "-",
     solutionType: data.projectName || data.type || "-",
@@ -110,8 +102,8 @@ export function formatConsumption(value: number): string {
 export async function getNodeStatus(nodeIDs: (number | undefined)[]) {
   const resultPromises = nodeIDs.map(async nodeId => {
     if (typeof nodeId !== "number") return {};
-    const status = (await gridProxyClient.nodes.byId(nodeId)).status;
-    return { [nodeId]: status };
+    const nodeInfo = await gridProxyClient.nodes.byId(nodeId);
+    return { [nodeId]: { status: nodeInfo.status, farmId: nodeInfo.farmId } };
   });
 
   const resultsArray = await Promise.all(resultPromises);
