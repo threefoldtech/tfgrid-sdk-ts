@@ -14,10 +14,10 @@ bash ../scripts/build-env.sh
 - By default, it runs on dev mode. the values already sat on the config file. if you want to change the mode
 
   ```bash
-  export MODE=dev | qa | test | main | custom
+  export MODE=dev | qa | test | main
   ```
 
-- In case you chose `custom` you will need to provide all the needed values which is
+- In case the user wants to use different urls, he can chose change any of the following urls, In case a url wasn't provided by the user, the default network's url will be used
 
   - GRAPHQL_URL
   - GRIDPROXY_URL
