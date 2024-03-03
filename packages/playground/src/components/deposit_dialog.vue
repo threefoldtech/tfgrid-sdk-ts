@@ -22,7 +22,7 @@
                 <input-tooltip
                   v-if="selectedName == 'stellar'"
                   tooltip="Threefold Staller account"
-                  href="https://stellar.expert/explorer/testnet/account/GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG"
+                  :href="`https://stellar.expert/explorer/testnet/account/${depositWallet}`"
                   target="_blank"
                 >
                   <CopyReadonlyInput label="Destination" :data="depositWallet"></CopyReadonlyInput>
