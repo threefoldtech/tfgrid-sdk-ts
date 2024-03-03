@@ -123,7 +123,9 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     }),
   );
   const wireguards = await Promise.all(
-    vms.map((vm, index) => getWireguardConfig(grids[index], vm[0].interfaces[0].network).catch(() => [])),
+    vms.map((vm, index) =>
+      getWireguardConfig(grids[index], vm[0].interfaces[0].network, vm[0].interfaces[0].ip).catch(() => []),
+    ),
   );
 
   const data = vms.map((vm, index) => {
@@ -141,10 +143,15 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     failedDeployments,
   };
 }
-export function getWireguardConfig(grid: GridClient, name: string) {
+export function getWireguardConfig(grid: GridClient, name: string, ipRange: string) {
   const projectName = grid.clientOptions!.projectName;
+  if (!ipRange.endsWith("/16")) {
+    const parts = ipRange.split(".");
+    parts[2] = parts[3] = "0";
+    ipRange = parts.join(".") + "/16";
+  }
   return updateGrid(grid, { projectName: "" })
-    .networks.getWireGuardConfigs({ name })
+    .networks.getWireGuardConfigs({ name, ipRange })
     .finally(() => updateGrid(grid, { projectName }));
 }
 
@@ -224,7 +231,11 @@ export async function loadK8s(grid: GridClient) {
 
   const wireguards = await Promise.all(
     k8s.map((cluster, index) =>
-      getWireguardConfig(grids[index], cluster.masters[0].interfaces[0].network).catch(() => []),
+      getWireguardConfig(
+        grids[index],
+        cluster.masters[0].interfaces[0].network,
+        cluster.masters[0].interfaces[0].ip,
+      ).catch(() => []),
     ),
   );
   const data = k8s.map((cluster, index) => {
@@ -246,10 +257,24 @@ export async function loadK8s(grid: GridClient) {
 export function mergeLoadedDeployments<T>(...deployments: LoadedDeployments<T>[]) {
   return deployments.reduce(
     (res, current) => {
-      res.count += current.count;
-      res.items = res.items.concat(current.items);
+      insertIfNotFound(current, res);
+      res.count = res.items.length;
       return res;
     },
     { count: 0, items: [] },
   );
+}
+
+function insertIfNotFound<T>(newItems: LoadedDeployments<T>, oldItems: LoadedDeployments<T>): LoadedDeployments<T> {
+  for (const item of newItems.items) {
+    let found = false;
+    for (const i of oldItems.items) {
+      if (item.deploymentName === i.deploymentName) {
+        found = true;
+      }
+    }
+    if (!found) {
+      oldItems.items.push(item);
+    }
+  }
 }

@@ -85,7 +85,7 @@ import { ref } from "vue";
 import { createWorker } from "../components/k8s_worker.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
-import type { K8SWorker as K8sWorker } from "../types";
+import { K8SWorker as K8sWorker, ProjectName } from "../types";
 import { deployK8s } from "../utils/deploy_k8s";
 import { getGrid } from "../utils/grid";
 import { generateName, generatePassword } from "../utils/strings";
@@ -107,7 +107,8 @@ async function deploy() {
 
   try {
     layout.value?.validateSSH();
-    const grid = await getGrid(profileManager.profile!, name.value);
+    const projectName = ProjectName.Kubernetes.toLowerCase() + "/" + name.value;
+    const grid = await getGrid(profileManager.profile!, projectName);
 
     await layout.value.validateBalance(grid!);
 

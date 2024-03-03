@@ -36,7 +36,8 @@ class GWModule extends BaseModule {
       throw new ValidationError(`Another gateway deployment with the same name ${options.name} already exists.`);
     }
     events.emit("logs", `Start creating the gateway deployment with name ${options.name}`);
-    const metadata = JSON.stringify({
+    const contractMetadata = JSON.stringify({
+      version: 3,
       type: "gateway",
       name: options.name,
       projectName: this.config.projectName,
@@ -47,12 +48,14 @@ class GWModule extends BaseModule {
       options.tls_passthrough,
       options.backends,
       options.network,
-      options.metadata || metadata,
+      contractMetadata,
+      options.metadata,
       options.description,
       options.fqdn,
       options.solutionProviderId,
     );
     const contracts = await this.twinDeploymentHandler.handle(twinDeployments);
+    await this.save(options.name, contracts);
     return { contracts: contracts };
   }
 
@@ -64,7 +67,8 @@ class GWModule extends BaseModule {
       throw new ValidationError(`Another gateway deployment with the same name ${options.name} already exists.`);
     }
     events.emit("logs", `Start creating the gateway deployment with name ${options.name}`);
-    const metadata = JSON.stringify({
+    const contractMetadata = JSON.stringify({
+      version: 3,
       type: "gateway",
       name: options.name,
       projectName: this.config.projectName,
@@ -75,12 +79,14 @@ class GWModule extends BaseModule {
       options.tls_passthrough,
       options.backends,
       options.network,
-      options.metadata || metadata,
+      contractMetadata,
+      options.metadata,
       options.description,
       "",
       options.solutionProviderId,
     );
     const contracts = await this.twinDeploymentHandler.handle(twinDeployments);
+    await this.save(options.name, contracts);
     return { contracts: contracts };
   }
 

@@ -35,10 +35,11 @@ class MachinesModule extends BaseModule {
 
     let twinDeployments: TwinDeployment[] = [];
     let wireguardConfig = "";
-    const metadata = JSON.stringify({
+    const contractMetadata = JSON.stringify({
+      version: 3,
       type: "vm",
       name: options.name,
-      projectName: this.config.projectName,
+      projectName: this.config.projectName || `vm/${options.name}`,
     });
 
     const machines_names: string[] = [];
@@ -65,7 +66,8 @@ class MachinesModule extends BaseModule {
         options.network.myceliumSeeds!,
         machine.entrypoint,
         machine.env,
-        options.metadata || metadata,
+        contractMetadata,
+        options.metadata,
         options.description,
         machine.qsfs_disks,
         this.config.projectName,
@@ -95,6 +97,7 @@ class MachinesModule extends BaseModule {
     events.emit("logs", `Start creating the machine deployment with name ${options.name}`);
     const [twinDeployments, , wireguardConfig] = await this._createDeployment(options);
     const contracts = await this.twinDeploymentHandler.handle(twinDeployments);
+    await this.save(options.name, contracts);
     return { contracts: contracts, wireguard_config: wireguardConfig };
   }
 
@@ -167,7 +170,12 @@ class MachinesModule extends BaseModule {
     const networkIpRange = Addr(workload.data["network"].interfaces[0].ip).mask(16).toString();
     const network = new Network(networkName, networkIpRange, this.config);
     await network.load();
-
+    const contractMetadata = JSON.stringify({
+      version: 3,
+      type: "vm",
+      name: options.deployment_name,
+      projectName: this.config.projectName || `vm/${options.name}`,
+    });
     const [twinDeployments] = await this.vm.create(
       options.name,
       options.node_id,
@@ -185,6 +193,7 @@ class MachinesModule extends BaseModule {
       [{ nodeId: options.node_id, seed: options.myceliumNetworkSeed! }],
       options.entrypoint,
       options.env,
+      contractMetadata,
       workload.metadata,
       workload.description,
       options.qsfs_disks,

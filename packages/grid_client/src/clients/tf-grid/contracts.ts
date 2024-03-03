@@ -19,6 +19,7 @@ export interface ListContractByTwinIdOptions {
   stateList?: ContractStates[];
   type?: string;
   projectName?: string;
+  nodeId?: number;
 }
 
 export interface ContractUsedResources {
@@ -48,7 +49,7 @@ export interface GqlNodeContract extends GqlBaseContract {
   deploymentData: string;
   deploymentHash: string;
   numberOfPublicIPs: number;
-  resourcesUsed: ContractUsedResources;
+  resourcesUsed: ContractUsedResources | undefined;
   parsedDeploymentData?: { type: string; name: string; projectName: string };
 }
 
@@ -86,6 +87,7 @@ export interface ListMyContractOptions {
   stateList?: ContractStates[];
   type?: string;
   projectName?: string;
+  nodeId?: number;
 }
 
 export interface GetConsumptionOptions {
@@ -154,8 +156,11 @@ class TFContracts extends Contracts {
 
     // filter contracts based on deploymentData
     let filterQuery = "";
+    if (options.nodeId) {
+      filterQuery += ` , nodeID_eq: ${options.nodeId}`;
+    }
     if (options.type || options.projectName) {
-      filterQuery = " , AND: [";
+      filterQuery += " , AND: [";
 
       if (options.type) {
         // eslint-disable-next-line no-useless-escape
@@ -281,6 +286,7 @@ class TFContracts extends Contracts {
       stateList: options.stateList,
       type: options.type,
       projectName: options.projectName,
+      nodeId: options.nodeId,
     });
   }
 
