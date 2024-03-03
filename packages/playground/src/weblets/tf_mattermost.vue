@@ -143,7 +143,7 @@ async function deploy() {
 
     await layout.value.validateBalance(grid!);
 
-    await deployVM(grid!, {
+    vm = await deployVM(grid!, {
       name: name.value,
       network: {
         addAccess: selectionDetails.value!.domain!.enableSelectedDomain,
