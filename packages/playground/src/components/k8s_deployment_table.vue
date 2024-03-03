@@ -43,8 +43,8 @@
               }}
               <template v-if="deployment.contracts && deployment.contracts.length > 0">
                 with contract id:
-                <span v-for="contract in deployment.contracts" :key="contract.contract_id">
-                  {{ contract.contract_id }} .
+                <span v-for="contract in deployment.contracts" :key="contract.contractID">
+                  {{ contract.contractID }} .
                 </span>
               </template>
             </li>
@@ -57,6 +57,10 @@
     </v-alert>
 
     <AccessDeploymentAlert />
+
+    <InputTooltip tooltip="List all deployments, including those created outside the Dashboard." inline>
+      <VSwitch inset color="primary" label="Show All Deployments" v-model="showAllDeployments" />
+    </InputTooltip>
 
     <ListTable
       :headers="[
@@ -72,7 +76,7 @@
         { title: 'Health', key: 'status', sortable: false },
         { title: 'Actions', key: 'actions', sortable: false },
       ]"
-      :items="items"
+      :items="showAllDeployments ? items : items.filter(i => !i.fromAnotherClient)"
       :loading="loading"
       :deleting="deleting"
       :model-value="$props.modelValue"
@@ -136,10 +140,12 @@ import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
 import { useProfileManager } from "../stores";
 import { getGrid, updateGrid } from "../utils/grid";
+import { markAsFromAnotherClient } from "../utils/helpers";
 import { loadK8s, mergeLoadedDeployments } from "../utils/load_deployment";
 const profileManager = useProfileManager();
 const showDialog = ref(false);
 const showEncryption = ref(false);
+const showAllDeployments = ref(false);
 const failedDeployments = ref<any[]>([]);
 
 const props = defineProps<{
@@ -152,7 +158,6 @@ defineEmits<{ (event: "update:model-value", value: any[]): void }>();
 const count = ref<number>();
 const items = ref<any[]>([]);
 const loading = ref(false);
-const namesOfFailedDeployments = ref("");
 
 onMounted(loadDeployments);
 async function loadDeployments() {
@@ -162,6 +167,10 @@ async function loadDeployments() {
   const chunk1 = await loadK8s(grid!);
   const chunk2 = await loadK8s(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }));
   const chunk3 = await loadK8s(updateGrid(grid!, { projectName: "" }));
+
+  chunk3.items = chunk3.items.map(i => {
+    return !i.projectName || i.projectName === "Kubernetes" ? markAsFromAnotherClient(i) : i;
+  });
 
   const clusters = mergeLoadedDeployments(chunk1, chunk2, chunk3);
   failedDeployments.value = [

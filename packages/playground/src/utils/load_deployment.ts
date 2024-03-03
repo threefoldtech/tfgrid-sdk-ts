@@ -61,7 +61,13 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
       return;
     }
 
-    const machinePromise = grids[index].machines.getObj(name);
+    const machinePromise = grids[index].machines.getObj(name).then(res => {
+      if (!projectName && (!Array.isArray(res) || res.length === 0)) {
+        grids[index] = updateGrid(grids[index], { projectName: "" });
+        return grids[index].machines.getObj(name);
+      }
+      return res;
+    });
     const timeoutPromise = new Promise((resolve, reject) => {
       setTimeout(() => {
         reject(new Error("Timeout"));
@@ -117,7 +123,9 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     }),
   );
   const wireguards = await Promise.all(
-    vms.map((vm, index) => getWireguardConfig(grids[index], vm[0].interfaces[0].network).catch(() => [])),
+    vms.map((vm, index) =>
+      getWireguardConfig(grids[index], vm[0].interfaces[0].network, vm[0].interfaces[0].ip).catch(() => []),
+    ),
   );
 
   const data = vms.map((vm, index) => {
@@ -135,10 +143,15 @@ export async function loadVms(grid: GridClient, options: LoadVMsOptions = {}) {
     failedDeployments,
   };
 }
-export function getWireguardConfig(grid: GridClient, name: string) {
+export function getWireguardConfig(grid: GridClient, name: string, ipRange: string) {
   const projectName = grid.clientOptions!.projectName;
+  if (!ipRange.endsWith("/16")) {
+    const parts = ipRange.split(".");
+    parts[2] = parts[3] = "0";
+    ipRange = parts.join(".") + "/16";
+  }
   return updateGrid(grid, { projectName: "" })
-    .networks.getWireGuardConfigs({ name })
+    .networks.getWireGuardConfigs({ name, ipRange })
     .finally(() => updateGrid(grid, { projectName }));
 }
 
@@ -151,7 +164,7 @@ export async function loadK8s(grid: GridClient) {
 
   const projectName = grid.clientOptions.projectName;
   const grids = (await Promise.all(
-    clusters.map(n => getGrid(grid.clientOptions, `${projectName}/${n}`)),
+    clusters.map(n => getGrid(grid.clientOptions, projectName ? `${projectName}/${n}` : n)),
   )) as GridClient[];
   const failedDeployments: FailedDeployment[] = [];
 
@@ -168,7 +181,14 @@ export async function loadK8s(grid: GridClient) {
     }
 
     try {
-      const clusterPromise = grids[index].k8s.getObj(name);
+      const clusterPromise = grids[index].k8s.getObj(name).then(res => {
+        if (!projectName && res && res.masters && res.masters.length === 0) {
+          grids[index] = updateGrid(grids[index], { projectName: "" });
+          return grids[index].k8s.getObj(name);
+        }
+
+        return res;
+      });
       const timeoutPromise = new Promise((resolve, reject) => {
         setTimeout(() => {
           reject(new Error("Timeout"));
@@ -211,7 +231,11 @@ export async function loadK8s(grid: GridClient) {
 
   const wireguards = await Promise.all(
     k8s.map((cluster, index) =>
-      getWireguardConfig(grids[index], cluster.masters[0].interfaces[0].network).catch(() => []),
+      getWireguardConfig(
+        grids[index],
+        cluster.masters[0].interfaces[0].network,
+        cluster.masters[0].interfaces[0].ip,
+      ).catch(() => []),
     ),
   );
   const data = k8s.map((cluster, index) => {
@@ -233,10 +257,24 @@ export async function loadK8s(grid: GridClient) {
 export function mergeLoadedDeployments<T>(...deployments: LoadedDeployments<T>[]) {
   return deployments.reduce(
     (res, current) => {
-      res.count += current.count;
-      res.items = res.items.concat(current.items);
+      insertIfNotFound(current, res);
+      res.count = res.items.length;
       return res;
     },
     { count: 0, items: [] },
   );
+}
+
+function insertIfNotFound(newItems: LoadedDeployments<any>, oldItems: LoadedDeployments<any>) {
+  for (const item of newItems.items) {
+    let found = false;
+    for (const i of oldItems.items) {
+      if (item.deploymentName === i.deploymentName) {
+        found = true;
+      }
+    }
+    if (!found) {
+      oldItems.items.push(item);
+    }
+  }
 }

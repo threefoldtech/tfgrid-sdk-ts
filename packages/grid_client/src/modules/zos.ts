@@ -45,7 +45,7 @@ class Zos {
       }
     }
     console.log(`Deploying on node_id: ${node_id} with number of public IPs: ${publicIps}`);
-    const twinDeployment = new TwinDeployment(deployment, Operations.deploy, publicIps, node_id);
+    const twinDeployment = new TwinDeployment(deployment, Operations.deploy, publicIps, node_id, deployment.metadata);
     const twinDeploymentHandler = new TwinDeploymentHandler(this.config);
     return await twinDeploymentHandler.handle([twinDeployment]);
   }
