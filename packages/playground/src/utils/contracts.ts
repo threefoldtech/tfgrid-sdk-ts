@@ -99,7 +99,7 @@ export function formatConsumption(value: number): string {
   return normalizeBalance(value) + " TFT/hour";
 }
 
-export async function getNodeStatus(nodeIDs: (number | undefined)[]) {
+export async function getNodeInfo(nodeIDs: (number | undefined)[]) {
   const resultPromises = nodeIDs.map(async nodeId => {
     if (typeof nodeId !== "number") return {};
     const nodeInfo = await gridProxyClient.nodes.byId(nodeId);

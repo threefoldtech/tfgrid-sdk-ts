@@ -74,7 +74,7 @@ import type { VDataTableHeader } from "@/types";
 import {
   type ContractsTableType,
   ContractType,
-  getNodeStatus,
+  getNodeInfo,
   getUserContracts,
   type NormalizedContract,
 } from "@/utils/contracts";
@@ -120,7 +120,7 @@ async function onMount() {
       try {
         // Fetch user contracts, node status, and calculate total cost
         contracts.value = await getUserContracts(grid.value);
-        nodeInfo.value = await getNodeStatus(nodeIDs.value);
+        nodeInfo.value = await getNodeInfo(nodeIDs.value);
         contracts.value.map(contract => {
           const { nodeId } = contract;
           if (nodeId && nodeInfo.value[nodeId]) {
