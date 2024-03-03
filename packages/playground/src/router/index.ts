@@ -469,7 +469,7 @@ function createDeployRoutes(): RouteRecordRaw[] {
       children: [
         {
           path: DashboardRoutes.Deploy.PricingCalculator,
-          component: () => import("../calculator/resource_pricing.vue"),
+          component: () => import("../calculator/PricingCalculator.vue"),
           meta: { title: "Resource Pricing", publicPath: true },
         },
         {
