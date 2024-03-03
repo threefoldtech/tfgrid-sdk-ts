@@ -17,18 +17,28 @@
             />
           </VAlert>
 
-          <VForm v-model="valid">
+          <VForm
+            ref="form"
+            @vue:mounted="($refs.form as VForm).validate()"
+            :model-value="valid"
+            @update:model-value="
+              valid = $event as boolean;
+              if ($event) {
+                priceTask.run();
+              }
+            "
+            @input="priceTask.run()"
+          >
             <VRow>
               <VCol cols="6">
                 <InputTooltip tooltip="The number of virtual cores.">
                   <VTextField
                     label="CPU (vCores)"
                     suffix="vCores"
-                    type="number"
                     min="1"
                     max="256"
                     :rules="[cruRules]"
-                    v-model.number="resources.cru"
+                    v-model="resources.cru"
                   />
                 </InputTooltip>
               </VCol>
@@ -37,12 +47,11 @@
                 <InputTooltip tooltip="The amount of RAM (Random Access Memory) in GB.">
                   <VTextField
                     label="Memory (GB)"
-                    type="number"
                     suffix="GB"
                     min="1"
                     max="1024"
                     :rules="[mruRules]"
-                    v-model.number="resources.mru"
+                    v-model="resources.mru"
                   />
                 </InputTooltip>
               </VCol>
@@ -52,11 +61,10 @@
                   <VTextField
                     label="Disk SSD"
                     suffix="GB"
-                    type="number"
                     min="1"
                     max="1000000"
                     :rules="[sruRules]"
-                    v-model.number="resources.sru"
+                    v-model="resources.sru"
                   />
                 </InputTooltip>
               </VCol>
@@ -66,11 +74,10 @@
                   <VTextField
                     label="Disk HDD"
                     suffix="GB"
-                    type="number"
                     min="0"
                     max="1000000"
                     :rules="[hruRules]"
-                    v-model.number="resources.hru"
+                    v-model="resources.hru"
                   />
                 </InputTooltip>
               </VCol>
@@ -80,9 +87,10 @@
                   <VTextField
                     label="Balance"
                     suffix="TFT"
-                    type="number"
                     :rules="[balanceRules]"
-                    v-model.number="resources.balance"
+                    :disabled="userBalance && resources.useCurrentBalance"
+                    :model-value="userBalance && resources.useCurrentBalance ? userBalance.free : resources.balance"
+                    @update:model-value="resources.balance = $event"
                   />
                 </InputTooltip>
               </VCol>
@@ -105,7 +113,14 @@
                 </InputTooltip>
               </VCol>
 
-              <VCol cols="4">
+              <VCol
+                cols="4"
+                v-if="userBalance"
+                @vue:unmounted="
+                  resources.useCurrentBalance = false;
+                  priceTask.run();
+                "
+              >
                 <input-tooltip inline tooltip="Use current balance to calculate the discount.">
                   <VSwitch
                     color="primary"
@@ -120,25 +135,50 @@
           </VForm>
 
           <VDivider class="my-8" />
+          <VRow v-if="valid && priceTask.error">
+            <VCol cols="12">
+              <VAlert type="error" :text="normalizeError(priceTask.error, 'Failed to calculate price.')" />
+            </VCol>
+          </VRow>
 
-          <VRow class="text-center text-body-1">
+          <VRow v-else-if="valid && priceTask.loading">
+            <VCol cols="12" class="d-flex justify-center align-center">
+              <VProgressCircular color="primary" indeterminate />
+            </VCol>
+          </VRow>
+
+          <VRow class="text-center text-body-1 text-black" v-else-if="valid && priceTask.data">
             <VCol cols="6">
-              <div class="rounded bg-white pa-4 h-100 d-flex justify-center align-center">
+              <div
+                class="rounded pa-4 h-100 d-flex justify-center align-center"
+                :style="{ background: computePackageColor(priceTask.data.dedicatedPackage.package) }"
+              >
                 <p>
                   Cost of reserving a <strong v-text="'Dedicated Node'" /> of the same specifications<br />
-                  <strong v-text="'$2.1750/month, 120.8300 TFT/month'" />. A user can reserve an entire node then use it
-                  exclusively to deploy solutions
+                  <strong v-text="dedicatedPriceUSD + ' USD/month, ' + dedicatedPriceTFT + ' TFT/month'" />. A user can
+                  reserve an entire node then use it exclusively to deploy solutions
                 </p>
               </div>
             </VCol>
             <VCol cols="6">
-              <div class="rounded bg-white pa-4 h-100 d-flex justify-center align-center">
+              <div
+                class="rounded pa-4 h-100 d-flex justify-center align-center"
+                :style="{ background: computePackageColor(priceTask.data.sharedPackage.package) }"
+              >
                 <p>
                   Cost of reservation on a <strong v-text="'Shared Node'" /><br />
-                  <strong v-text="'$4.3500/month, 241.6700 TFT/month'" />. Shared Nodes allow several users to host
-                  various workloads on a single node
+                  <strong v-text="sharedPriceUSD + ' USD/month, ' + sharedPriceTFT + ' TFT/month'" />. Shared Nodes
+                  allow several users to host various workloads on a single node
                 </p>
               </div>
+            </VCol>
+          </VRow>
+
+          <VRow v-else>
+            <VCol cols="12">
+              <VAlert type="error">
+                Please provide a valid data inorder to calculate your deployment price correctly.
+              </VAlert>
             </VCol>
           </VRow>
         </VContainer>
@@ -148,23 +188,91 @@
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import { QueryClient } from "@threefold/tfchain_client";
+import { computed, ref } from "vue";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { VForm } from "vuetify/components/VForm";
 
+import { calculator as Calculator } from "../../../grid_client/dist/es6";
+import { useProfileManagerController } from "../components/profile_manager_controller.vue";
+import { useAsync } from "../hooks";
+import { useProfileManager } from "../stores";
+import { normalizeError } from "../utils/helpers";
 import { balanceRules, cruRules, hruRules, mruRules, sruRules } from "../utils/pricing_calculator";
+import { computePackageColor, normalizePrice } from "../utils/pricing_calculator";
 
 export default {
   name: "PricingCalculator",
   setup() {
-    const valid = ref(false);
+    const calculator = new Calculator(new QueryClient(window.env.SUBSTRATE_URL));
+    const profileManager = useProfileManager();
+    const userBalance = useProfileManagerController().balance;
+    const valid = ref(true);
     const resources = ref({
-      cru: 1,
-      mru: 1,
-      sru: 25,
-      hru: 100,
-      balance: 0,
+      cru: "1",
+      mru: "1",
+      sru: "25",
+      hru: "100",
+      balance: "1",
       certified: false,
       ipv4: false,
       useCurrentBalance: false,
+    });
+
+    const tftPriceTask = useAsync(() => calculator.tftPrice(), { init: true, default: 0 });
+    const priceTask = useAsync(
+      () => {
+        return calculator.calculate({
+          cru: +resources.value.cru,
+          mru: +resources.value.mru,
+          hru: +resources.value.hru,
+          sru: +resources.value.sru,
+          ipv4u: resources.value.ipv4,
+          certified: resources.value.certified,
+          balance:
+            userBalance.value && resources.value.useCurrentBalance ? userBalance.value.free : +resources.value.balance,
+        });
+      },
+      {
+        init: true,
+        shouldRun: () => valid.value,
+      },
+    );
+
+    const dedicatedPriceUSD = computed(() => {
+      const price = priceTask.value.data?.dedicatedPrice;
+      if (price) {
+        return normalizePrice(price);
+      }
+      return 0;
+    });
+
+    const dedicatedPriceTFT = computed(() => {
+      const tftPrice = tftPriceTask.value.data;
+      const dedicatedPrice = dedicatedPriceUSD.value;
+      if (dedicatedPrice && tftPrice) {
+        const price = dedicatedPrice / tftPrice;
+        return normalizePrice(price);
+      }
+      return 0;
+    });
+
+    const sharedPriceUSD = computed(() => {
+      const price = priceTask.value.data?.sharedPrice;
+      if (price) {
+        return normalizePrice(price);
+      }
+      return 0;
+    });
+
+    const sharedPriceTFT = computed(() => {
+      const tftPrice = tftPriceTask.value.data;
+      const sharedPrice = sharedPriceUSD.value;
+      if (sharedPrice && tftPrice) {
+        const price = sharedPrice / tftPrice;
+        return normalizePrice(price);
+      }
+      return 0;
     });
 
     return {
@@ -174,7 +282,17 @@ export default {
       sruRules,
       hruRules,
       balanceRules,
+      userBalance,
       resources,
+      priceTask,
+
+      dedicatedPriceUSD,
+      dedicatedPriceTFT,
+      sharedPriceUSD,
+      sharedPriceTFT,
+      computePackageColor,
+      normalizeError,
+      profileManager,
     };
   },
 };

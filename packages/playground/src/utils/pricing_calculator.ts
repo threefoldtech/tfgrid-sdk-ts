@@ -38,3 +38,22 @@ export const hruRules = _applyRules([
 ]);
 
 export const balanceRules = _applyRules([min("Balance should be a positive integer.", 1)]);
+
+export function normalizePrice(price: number) {
+  return parseInt(String(price * 1000)) / 1000;
+}
+
+export function computePackageColor(packageName: string): string {
+  switch (packageName) {
+    case "default":
+      return "#74DDC3";
+    case "bronze":
+      return "linear-gradient(270deg, #AF6114 0%, #ffc58b 25%, #DC8E41 49.83%, #f9d1a9 77.32%, #AF6114 100%)";
+    case "silver":
+      return "linear-gradient(270deg, #7d7d7d 0%, #ffffff 15%, #adadad 24.83%, #ffffff 50.32%, #adadad 71.83%, #ffffff 87.32%, #a0a0a0 100%)";
+    case "gold":
+      return "linear-gradient(270deg, #bf953f 0%, #fffce0 25%, #d7ae56 49.83%, #fffce0 77.32%, #aa771c 100%)";
+    default:
+      return "#f3f3f3";
+  }
+}
