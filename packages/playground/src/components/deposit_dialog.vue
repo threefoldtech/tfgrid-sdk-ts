@@ -22,7 +22,7 @@
                 <input-tooltip
                   v-if="selectedName == 'stellar'"
                   tooltip="Threefold Staller account"
-                  :href="`https://stellar.expert/explorer/testnet/account/${stellarAddresses[network]}`"
+                  :href="`https://stellar.expert/explorer/testnet/account/${depositWallet}`"
                   target="_blank"
                 >
                   <CopyReadonlyInput label="Destination" :data="depositWallet"></CopyReadonlyInput>
@@ -97,14 +97,6 @@ const loading = ref(false);
 const dots = ref(".");
 const interval = ref<number | null>(null);
 const ProfileManagerController = useProfileManagerController();
-const network: keyof typeof stellarAddresses = process.env.NETWORK || (window as any).env.NETWORK;
-
-const stellarAddresses = {
-  dev: "GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG",
-  qa: "GAQH7XXFBRWXT2SBK6AHPOLXDCLXVFAKFSOJIRMRNCDINWKHGI6UYVKM",
-  test: "GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4",
-  main: "GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC",
-} as const;
 
 const apps = [
   {
