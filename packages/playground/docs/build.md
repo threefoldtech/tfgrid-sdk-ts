@@ -17,7 +17,7 @@ bash ../scripts/build-env.sh
   export MODE=dev | qa | test | main
   ```
 
-- In case the user wants to use different urls, he can chose change any of the following urls, In case a url wasn't provided by the user, the default network's url will be used
+- In case the user wants to use different urls, he can change any of the following urls, In case a url wasn't provided by the user, the default network's url will be used
 
   - GRAPHQL_URL
   - GRIDPROXY_URL
