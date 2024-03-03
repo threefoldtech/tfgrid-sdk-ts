@@ -45,7 +45,7 @@
                   {{ activeTab == 1 ? " as you reserve the " : " if you reserve an " }} entire
                   <a
                     target="_blank"
-                    href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html#billing--pricing"
+                    href="https://manual.grid.tf/dashboard/deploy/dedicated_machines.html#billing--pricing"
                   >
                     node
                   </a>
