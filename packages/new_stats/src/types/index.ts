@@ -1,4 +1,4 @@
-import type { Network, Stats } from "@threefold/gridproxy_client";
+import type { Stats } from "@threefold/gridproxy_client";
 
 export interface IStatistics {
   data: number | string;
@@ -6,5 +6,5 @@ export interface IStatistics {
   icon: string;
 }
 export type NetworkStats = {
-  [network in Network]?: Stats;
+  [network: string]: Stats;
 };
