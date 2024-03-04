@@ -1,7 +1,7 @@
 {
   "name": "@threefold/types",
   "version": "2.3.0-rc1",
-  "main": "dist/index.js",
+  "main": "dist/node/index.js",
   "types": "dist/es6/index.d.ts",
   "scripts": {
     "build": "npm-run-all es6-build node-build",
