@@ -152,6 +152,7 @@
       <nodes-table
         @update-active-tab-value="updateActiveTabValue"
         @reload-table="reloadTable"
+        @update-options="updateOptions($event)"
         :options="{ page, size }"
         :nodes="nodes"
         :nodes-count="nodesCount"
@@ -209,6 +210,12 @@ const updateActiveTabValue = (newValue: number) => {
   loadNodes();
 };
 
+function updateOptions(options: { page: number; itemsPerPage: number }) {
+  if (options.page !== page.value || options.itemsPerPage !== size.value) {
+    (page.value = options.page), (size.value = options.itemsPerPage);
+    loadNodes();
+  }
+}
 async function loadNodes() {
   const params = tabParams[activeTab.value as keyof typeof tabParams];
 

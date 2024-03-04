@@ -65,12 +65,14 @@ export default {
         .filter(
           (node: any) => node.download_speed && node.upload_speed && !node.error && node.node_id !== props.node.nodeId,
         )
+        .slice(0, 4)
         .map(node => ({
           name: node.test_type.toLocaleUpperCase(),
           type: isIPv4(node.node_ip) ? "IPv4" : "IPv6",
           downloadSpeed: format(node.download_speed),
           uploadSpeed: format(node.upload_speed),
         }));
+
       IperfDetails.value = array;
       return IperfDetails.value;
     };

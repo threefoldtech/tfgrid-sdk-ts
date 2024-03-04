@@ -49,7 +49,11 @@
 
           <p class="font-weight-bold mt-4">
             If you don't know what the Captain root domain is, make sure to read the
-            <a target="_blank" href="https://manual.grid.tf/playground/caprover.html" :style="{ color: 'inherit' }">
+            <a
+              target="_blank"
+              href="https://manual.grid.tf/dashboard/solutions/caprover.html"
+              :style="{ color: 'inherit' }"
+            >
               quick start documentation.
             </a>
           </p>
@@ -124,6 +128,7 @@ async function deploy() {
 
     const vm = await deployVM(grid!, {
       name: leader.value.name,
+      network: createNetwork({ addAccess: true }),
       machines: [
         normalizeCaproverWorker(leader.value, [
           { key: "SWM_NODE_MODE", value: "leader" },
@@ -181,6 +186,8 @@ function normalizeCaproverWorker(worker: CW, envs: Env[]): Machine {
 </script>
 
 <script lang="ts">
+import { createNetwork } from "@/utils/deploy_helpers";
+
 import CaproverWorker, { createWorker } from "../components/caprover_worker.vue";
 import ExpandableLayout from "../components/expandable_layout.vue";
 import { deploymentListEnvironments } from "../constants";

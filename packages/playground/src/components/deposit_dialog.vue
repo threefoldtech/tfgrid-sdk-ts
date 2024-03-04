@@ -15,13 +15,14 @@
                 <div class="mb-2">
                   <p class="mb-8">
                     Deposit your TFTs to Threefold Bridge using a
-                    {{ selectedName ? selectedName.charAt(0).toUpperCase() + selectedName.slice(1) : "" }} transaction.
+                    {{ selectedName ? selectedName.charAt(0).toUpperCase() + selectedName.slice(1) : "" }}
+                    transaction.
                   </p>
                 </div>
                 <input-tooltip
                   v-if="selectedName == 'stellar'"
                   tooltip="Threefold Staller account"
-                  href="https://stellar.expert/explorer/testnet/account/GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG"
+                  :href="`https://stellar.expert/explorer/testnet/account/${depositWallet}`"
                   target="_blank"
                 >
                   <CopyReadonlyInput label="Destination" :data="depositWallet"></CopyReadonlyInput>
@@ -31,7 +32,7 @@
                 <v-btn
                   variant="outlined"
                   color="secondary"
-                  href="https://manual.grid.tf/threefold_token/tft_bridges/tft_bridges.html"
+                  href="https://manual.grid.tf/threefold_token/tft_bridges/tfchain_stellar_bridge.html#how-to-use-the-tfchain-stellar-bridge"
                   target="_blank"
                   >Learn more?</v-btn
                 >
@@ -137,7 +138,9 @@ onMounted(async () => {
     loading.value = true;
     const grid = await getGrid(profileManager.profile!);
     const address = profileManager.profile?.address as string;
-    const receivedDeposit = await grid!.bridge.listenToMintCompleted({ address: address });
+    const receivedDeposit = await grid!.bridge.listenToMintCompleted({
+      address: address,
+    });
     loading.value = false;
     if (destroyed) return;
     const DecimalDeposit = new Decimal(receivedDeposit);

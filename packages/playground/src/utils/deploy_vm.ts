@@ -30,7 +30,7 @@ export async function loadVM(grid: GridClient, name: string) {
   const vm = (await grid.machines.getObj(name)) as any;
   vm.deploymentName = name;
   vm.projectName = grid.clientOptions.projectName;
-  const wireguard = await getWireguardConfig(grid, vm[0].interfaces[0].network).catch(() => []);
+  const wireguard = await getWireguardConfig(grid, vm[0].interfaces[0].network, vm[0].interfaces[0].ip).catch(() => []);
   vm.wireguard = wireguard[0];
   return vm;
 }

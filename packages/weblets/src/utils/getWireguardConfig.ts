@@ -9,8 +9,11 @@ export default async function getWireguardConfig(network: NetworkGetModel) {
     const profile = get(window.configs.baseConfig);
     if (!profile) return;
     const client = await getGrid(profile as unknown as IProfile, c => c, "");
+    const parts = network.ipRange.split(".");
+    parts[2] = parts[3] = "0";
+    network.ipRange = parts.join(".") + "/16";
 
-    const wireguard = await client.networks.getWireGuardConfigs({ name: network.name });
+    const wireguard = await client.networks.getWireGuardConfigs({ name: network.name, ipRange: network.ipRange });
     return wireguard;
   } catch (error) {
     console.log("error", error);

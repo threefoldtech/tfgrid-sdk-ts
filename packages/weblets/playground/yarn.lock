@@ -1529,16 +1529,16 @@
   resolved "https://registry.yarnpkg.com/@substrate/ss58-registry/-/ss58-registry-1.45.0.tgz#8ed56847557413dadb6410c28075c223ed730fbb"
   integrity sha512-NHmOkILimbLRPKvpnR+JGVckc1q4AJjxz9FnzZ3dKAVBL17AKknDy2FxXcwlJbmOXl9u7W3FS3bLDHgfKi4tQw==
 
-"@threefold/grid_client@2.3.0-alpha12":
-  version "2.3.0-alpha12"
-  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.3.0-alpha12.tgz#22547e73a250f479ee15a26be8dcd221be930d88"
-  integrity sha512-iExcwIgGWjXr88OGrcMbt8QHZ6zj+x640LuaIHT9iHVb5KKVsmi4mpOqA4FN65Ai9N9cN6DkCGK45TvHw548kw==
+"@threefold/grid_client@2.3.0-rc1":
+  version "2.3.0-rc1"
+  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.3.0-rc1.tgz#916cd0e3ef24d469f5957dc43851ed9d05fae0bf"
+  integrity sha512-WBzA4R0XTUdsd8OONDKvKj0kGvCvWQCkWWjvXdYv3EHsIoU7xw4VTrCair/OUnFzKtpsMKlOEQG1KS2+bIabIA==
   dependencies:
     "@jimber/pkid" "1.0.4"
     "@noble/secp256k1" "^1.7.1"
-    "@threefold/rmb_direct_client" "^2.3.0-alpha12"
-    "@threefold/tfchain_client" "^2.3.0-alpha12"
-    "@threefold/types" "^2.3.0-alpha12"
+    "@threefold/rmb_direct_client" "^2.3.0-rc1"
+    "@threefold/tfchain_client" "^2.3.0-rc1"
+    "@threefold/types" "^2.3.0-rc1"
     algosdk "^1.19.0"
     appdata-path "^1.0.0"
     await-lock "^2.2.2"
@@ -1561,15 +1561,15 @@
     url-parse "^1.5.10"
     uuid4 "^2.0.2"
 
-"@threefold/rmb_direct_client@^2.3.0-alpha12":
-  version "2.3.0-alpha9"
-  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-2.3.0-alpha9.tgz#6703b67fce2e45ba585310c4cb8dc754953ab7a5"
-  integrity sha512-BuW53MER9M/PhgR2+vLF1FPZpp3dy5Q/aPULGYKXajZigpUqx8PVCQybMz0nq2VJtnh+oL5QMHlTNvEVV2wzMQ==
+"@threefold/rmb_direct_client@^2.3.0-rc1":
+  version "2.3.0-rc1"
+  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-2.3.0-rc1.tgz#f88efda74ddb4644d9bc42bfc032a001f158796d"
+  integrity sha512-2RhlTObff20oqSEDIAnGX81B7uKg1pvqgZmejnxNU3OognJW/HS8xxl9hcqOXFvqWeJJdXlmOmrV9uf7bAZ8gA==
   dependencies:
     "@noble/secp256k1" "^1.7.1"
     "@polkadot/api" "^8.9.1"
-    "@threefold/tfchain_client" "^2.3.0-alpha9"
-    "@threefold/types" "^2.3.0-alpha9"
+    "@threefold/tfchain_client" "^2.3.0-rc1"
+    "@threefold/types" "^2.3.0-rc1"
     base64url "^3.0.1"
     bip39 "^3.1.0"
     buffer "^6.0.3"
@@ -1579,25 +1579,20 @@
     uuid "^8.3.2"
     ws "^8.12.0"
 
-"@threefold/tfchain_client@^2.3.0-alpha12", "@threefold/tfchain_client@^2.3.0-alpha9":
-  version "2.3.0-alpha9"
-  resolved "https://registry.yarnpkg.com/@threefold/tfchain_client/-/tfchain_client-2.3.0-alpha9.tgz#295399e3ce8c0d4d53a6be31a2fdca769afd644e"
-  integrity sha512-A5OvQ5jb43wcygHbkKEHYOY7IlLczL9hs3a/99oRLTVss3BV2UX4HQKlzzw/XVXawaFcXxPDBa6BsCrYyPBBFA==
+"@threefold/tfchain_client@^2.3.0-rc1":
+  version "2.3.0-rc1"
+  resolved "https://registry.yarnpkg.com/@threefold/tfchain_client/-/tfchain_client-2.3.0-rc1.tgz#853014ddc92bfa5941a4e49ed84ea817ebc954bd"
+  integrity sha512-ReScHAsSH2d7Q8uwU0OQJg43H7rJ2VVlTfq5niDC1yIzKY8KnWca+QLM2hq+hjby+Eh+pIPB2+K5n4jGLRewVA==
   dependencies:
     "@polkadot/api" "^8.9.1"
-    "@threefold/types" "^2.3.0-alpha9"
+    "@threefold/types" "^2.3.0-rc1"
     await-lock "^2.2.2"
     bip39 "^3.1.0"
 
-"@threefold/types@^2.3.0-alpha12":
-  version "2.3.0-alpha2"
-  resolved "https://registry.yarnpkg.com/@threefold/types/-/types-2.3.0-alpha2.tgz#322374b08f11c40e5f337b0fa03e98fe0686323f"
-  integrity sha512-8TZ8VCxkHIy5vUMyMeOFOfjDGKHK9g+7HnR7pyxyUo1P2vG5qWGLeiybWdn/UOV15YuS6sMZEAHTOI4BqpWAhA==
-
-"@threefold/types@^2.3.0-alpha9":
-  version "2.3.0-alpha9"
-  resolved "https://registry.yarnpkg.com/@threefold/types/-/types-2.3.0-alpha9.tgz#c9df983980ad8557b65d8dd0ab3ccbcdb8db32f3"
-  integrity sha512-DsUdYMG6En8Z9N0jmKy33spJJbZj+7NCQDEHSA+/4SBT/4AQFNlMbzftttT7o9QIM8pyDIBjhwIOr5BWuLG0xA==
+"@threefold/types@^2.3.0-rc1":
+  version "2.3.0-rc1"
+  resolved "https://registry.yarnpkg.com/@threefold/types/-/types-2.3.0-rc1.tgz#0973ac6081a0d0431db326c1569683abba12f162"
+  integrity sha512-ZrAtM0pzXWHLzGDwAEOaJ/PO15OwaLKX+V0r7X3fon6Xohh59IebPMy1q+5XMPsydN3G0aaQX1C4+AnjBfqShw==
 
 "@types/babel__core@^7.1.0":
   version "7.1.16"

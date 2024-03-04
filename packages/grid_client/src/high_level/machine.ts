@@ -40,6 +40,7 @@ class VMHL extends HighLevelBase {
     myceliumNetworkSeeds: MyceliumNetworkModel[] = [],
     entrypoint: string,
     env: Record<string, unknown>,
+    contractMetadata: string,
     metadata = "",
     description = "",
     qsfsDisks: QSFSDiskModel[] = [],
@@ -61,7 +62,7 @@ class VMHL extends HighLevelBase {
     const disk = new DiskPrimitive();
     for (const d of disks) {
       totalDisksSize += d.size;
-      workloads.push(disk.create(d.size, d.name, metadata, description));
+      workloads.push(disk.create(d.size, d.name, "", description));
       diskMounts.push(disk.createMount(d.name, d.mountpoint));
     }
 
@@ -136,7 +137,7 @@ class VMHL extends HighLevelBase {
     if (publicIp || publicIp6) {
       const ip = new PublicIPPrimitive();
       ipName = `${name}_pubip`;
-      workloads.push(ip.create(ipName, metadata, description, 0, publicIp, publicIp6));
+      workloads.push(ip.create(ipName, "", description, 0, publicIp, publicIp6));
       if (publicIp) {
         publicIps++;
       }
@@ -176,7 +177,8 @@ class VMHL extends HighLevelBase {
       accessNodeSubnet = network.getFreeSubnet();
     }
     // network
-    const networkMetadata = JSON.stringify({
+    const networkContractMetadata = JSON.stringify({
+      version: 3,
       type: "network",
       name: network.name,
       projectName: this.config.projectName,
@@ -219,7 +221,6 @@ class VMHL extends HighLevelBase {
       access_net_workload = await network.addNode(
         access_node_id,
         mycelium,
-        networkMetadata,
         description,
         accessNodeSubnet,
         myceliumNetworkSeeds,
@@ -230,55 +231,78 @@ class VMHL extends HighLevelBase {
     if (network.nodeExists(nodeId)) {
       const deployment = await network.checkMycelium(nodeId, mycelium, myceliumNetworkSeeds);
       if (deployment) {
-        deployments.push(new TwinDeployment(deployment, Operations.update, 0, 0, network));
+        deployments.push(new TwinDeployment(deployment, Operations.update, 0, 0, networkContractMetadata, network));
       }
     }
 
-    const znet_workload = await network.addNode(
-      nodeId,
-      mycelium,
-      networkMetadata,
-      description,
-      userIPsubnet,
-      myceliumNetworkSeeds,
-    );
+    const znet_workload = await network.addNode(nodeId, mycelium, description, userIPsubnet, myceliumNetworkSeeds);
     if ((await network.exists()) && (znet_workload || access_net_workload)) {
       // update network
       for (const deployment of network.deployments) {
         const d = await deploymentFactory.fromObj(deployment);
         for (const workload of d["workloads"]) {
           if (
-            workload["type"] !== WorkloadTypes.network ||
-            !Addr(network.ipRange).contains(Addr(workload["data"]["subnet"]))
+            workload.type !== WorkloadTypes.network ||
+            !Addr(network.ipRange).contains(Addr(workload.data["subnet"]))
           ) {
             continue;
           }
-          workload.data = network.updateNetwork(workload["data"]);
+          workload.data = network.getUpdatedNetwork(workload["data"]);
           workload.version += 1;
           break;
         }
-        deployments.push(new TwinDeployment(d, Operations.update, 0, 0, network));
+        deployments.push(new TwinDeployment(d, Operations.update, 0, 0, networkContractMetadata, network));
       }
       if (znet_workload) {
-        const deployment = deploymentFactory.create([znet_workload], 0, networkMetadata, description, 0);
-        deployments.push(new TwinDeployment(deployment, Operations.deploy, 0, nodeId, network, solutionProviderId));
+        const deployment = deploymentFactory.create([znet_workload], 0, networkContractMetadata, description, 0);
+        deployments.push(
+          new TwinDeployment(
+            deployment,
+            Operations.deploy,
+            0,
+            nodeId,
+            networkContractMetadata,
+            network,
+            solutionProviderId,
+          ),
+        );
       }
     } else if (znet_workload) {
       // node not exist on the network
       if (!access_net_workload && !hasAccessNode && addAccess) {
         // this node is access node, so add access point on it
         wgConfig = await network.addAccess(nodeId, true);
-        znet_workload["data"] = network.updateNetwork(znet_workload.data);
+        znet_workload["data"] = network.getUpdatedNetwork(znet_workload.data);
       }
-      const deployment = deploymentFactory.create([znet_workload], 0, networkMetadata, description, 0);
-      deployments.push(new TwinDeployment(deployment, Operations.deploy, 0, nodeId, network, solutionProviderId));
+      const deployment = deploymentFactory.create([znet_workload], 0, networkContractMetadata, description, 0);
+      deployments.push(
+        new TwinDeployment(
+          deployment,
+          Operations.deploy,
+          0,
+          nodeId,
+          networkContractMetadata,
+          network,
+          solutionProviderId,
+        ),
+      );
     }
     if (access_net_workload) {
       // network is not exist, and the node provide is not an access node
       const accessNodeId = access_net_workload.data["node_id"];
-      access_net_workload["data"] = network.updateNetwork(access_net_workload.data);
-      const deployment = deploymentFactory.create([access_net_workload], 0, networkMetadata, description, 0);
-      deployments.push(new TwinDeployment(deployment, Operations.deploy, 0, accessNodeId, network, solutionProviderId));
+      access_net_workload["data"] = network.getUpdatedNetwork(access_net_workload.data);
+      const deployment = deploymentFactory.create([access_net_workload], 0, networkContractMetadata, description, 0);
+      deployments.push(
+        new TwinDeployment(
+          deployment,
+          Operations.deploy,
+          0,
+          accessNodeId,
+          networkContractMetadata,
+          network,
+          solutionProviderId,
+        ),
+      );
     }
 
     // vm
@@ -322,7 +346,7 @@ class VMHL extends HighLevelBase {
         ipName,
         entrypoint,
         env,
-        metadata,
+        "",
         description,
         0,
         corex,
@@ -332,14 +356,24 @@ class VMHL extends HighLevelBase {
 
     if (zlogsOutput) {
       const zlogs = new ZlogsPrimitive();
-      workloads.push(zlogs.create(name, zlogsOutput, metadata, description));
+      workloads.push(zlogs.create(name, zlogsOutput, "", description));
     }
 
     // deployment
     // NOTE: expiration is not used for zos deployment
     const deployment = deploymentFactory.create(workloads, 0, metadata, description, 0);
 
-    deployments.push(new TwinDeployment(deployment, Operations.deploy, publicIps, nodeId, network, solutionProviderId));
+    deployments.push(
+      new TwinDeployment(
+        deployment,
+        Operations.deploy,
+        publicIps,
+        nodeId,
+        contractMetadata,
+        network,
+        solutionProviderId,
+      ),
+    );
     return [deployments, wgConfig];
   }
 
