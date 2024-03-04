@@ -62,7 +62,7 @@ class QueryClient {
   nodes: QueryNodes = new QueryNodes(this);
   __disconnectHandler = this.newProvider.bind(this);
 
-  constructor(public url: string) {}
+  constructor(public url: string, public keepReconnecting: boolean = false) {}
 
   async loadKeyPairOrSigner(): Promise<void> {} // to be overridden in the full client
   checkInputs(): void {
@@ -90,7 +90,7 @@ class QueryClient {
       await this.disconnect();
 
       const provider = new WsProvider(this.url);
-      this.api = await ApiPromise.create({ provider, throwOnConnect: true });
+      this.api = await ApiPromise.create({ provider, throwOnConnect: !this.keepReconnecting });
       await this.wait();
       QueryClient.connections.set(this.url, { api: this.api, disconnectHandler: this.__disconnectHandler });
       this.api.on("disconnected", this.__disconnectHandler);
@@ -241,6 +241,7 @@ export interface ClientOptions {
   mnemonicOrSecret?: string;
   keypairType?: KeypairType;
   extSigner?: ExtSigner;
+  keepReconnecting?: boolean;
 }
 
 class Client extends QueryClient {
@@ -263,7 +264,7 @@ class Client extends QueryClient {
   extSigner?: ExtSigner;
 
   constructor(options: ClientOptions) {
-    super(options.url);
+    super(options.url, options.keepReconnecting || false);
     this.extSigner = options.extSigner;
     this.keypairType = options.keypairType || "sr25519";
     this.mnemonicOrSecret = options.mnemonicOrSecret;
