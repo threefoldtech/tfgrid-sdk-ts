@@ -1,5 +1,5 @@
 <template>
-  <v-footer class="py-5 mainfooter border">
+  <v-footer class="py-5 mainfooter border mt-5">
     <v-container>
       <v-row justify="center" no-gutters>
         <v-col class="px-4 pr-10" cols="12" md="4" sm="12">
