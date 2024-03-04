@@ -1,4 +1,4 @@
-import GridProxyClient, { Network, NodeStatus, type Stats } from "@threefold/gridproxy_client";
+import GridProxyClient, { NodeStatus, type Stats } from "@threefold/gridproxy_client";
 
 import type { NetworkStats } from "@/types";
 
@@ -43,9 +43,9 @@ function mergeStatsData(stats: Stats[]): Stats {
   return res;
 }
 
-export async function getStats(network: Network): Promise<{ network: Network; stats: Stats }> {
+export async function getStats(network: string, url: string): Promise<{ network: string; stats: Stats }> {
   try {
-    const client = new GridProxyClient(network);
+    const client = new GridProxyClient(url);
     const upStats = await client.stats.get({ status: NodeStatus.Up });
     const standbyStats = await client.stats.get({ status: NodeStatus.Standby });
     return {
@@ -69,7 +69,7 @@ function mergeNodeDistribution(stats: Stats["nodesDistribution"][]) {
   }, {} as { [key: string]: number });
 }
 
-export function formatData(network: Network[] = [Network.Main], totalStat: NetworkStats) {
+export function formatData(network: string[] = ["main"], totalStat: NetworkStats) {
   let res: Stats = {
     nodes: 0,
     farms: 0,

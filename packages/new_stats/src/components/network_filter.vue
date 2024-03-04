@@ -66,7 +66,6 @@
 </template>
 
 <script lang="ts" setup>
-import { Network } from "@threefold/gridproxy_client";
 import { onMounted, ref } from "vue";
 defineProps({
   loading: Boolean,
@@ -85,12 +84,12 @@ const networks = ref([
 ]);
 
 // initial state; all network selected
-const selectedNetworks = ref([Network.Dev, Network.Main, Network.Test]);
+const selectedNetworks = ref(["dev", "main", "test"]);
 
 onMounted(() => emits("update:modelValue", selectedNetworks.value));
 
 function updateNetworks(event: Event | undefined, index: number) {
-  const network = networks.value[index].label.toLowerCase() as Network;
+  const network = networks.value[index].label.toLowerCase() as any;
   if (event) {
     if (!selectedNetworks.value.includes(network)) {
       selectedNetworks.value.push(network);

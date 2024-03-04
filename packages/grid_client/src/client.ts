@@ -131,6 +131,7 @@ class GridClient {
       keypairType: this.clientOptions.keypairType!,
       storePath: storePath,
       graphqlURL: urls.graphql,
+      relayURL: urls.relay,
       proxyURL: urls.rmbProxy,
       substrateURL: urls.substrate,
       activationURL: urls.activation,

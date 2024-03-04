@@ -1,2 +1,2 @@
 export * from "./types";
-export { TFGridGqlClient as default, Networks } from "./clients/client";
+export { TFGridGqlClient as default } from "./clients/client";

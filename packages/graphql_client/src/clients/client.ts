@@ -3,14 +3,6 @@ import { BY_ID_QUERIES, ByIdQueries } from "./by_id_queries";
 import { CONNECTION_QUERIES, ConnectionQueries } from "./connection_queries";
 import { LIST_QUERIES, ListQueries } from "./list_queries";
 
-export enum Networks {
-  Dev = "dev",
-  Test = "test",
-  Qa = "qa",
-  Main = "main",
-  Custom = "custom",
-}
-
 type _Merge = ListQueries & ByIdQueries & ConnectionQueries;
 
 export type MergableQuery = {
@@ -20,15 +12,10 @@ export type MergableQuery = {
 export class TFGridGqlClient extends AbstractClient {
   private readonly __uri: string;
 
-  constructor(network: Networks, url?: string) {
+  constructor(url: string) {
     super();
 
-    if (network === Networks.Custom && url) {
-      this.__uri = url;
-    } else {
-      this.__uri =
-        network === Networks.Main ? "https://graphql.grid.tf/graphql" : `https://graphql.${network}.grid.tf/graphql`;
-    }
+    this.__uri = url;
   }
 
   protected async _request<T>(options: RequestOptions): Promise<T> {
