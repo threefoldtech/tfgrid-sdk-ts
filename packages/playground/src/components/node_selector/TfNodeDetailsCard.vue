@@ -30,8 +30,10 @@
       <VTooltip :text="node?.location.country" :disabled="!node">
         <template #activator="{ props }">
           <VAvatar size="40">
+            <span v-if="countryFlagSrc.length === 0" class="flag-avatar">NA</span>
             <img
-              :src="getCountryFlagSrc()"
+              v-else
+              :src="countryFlagSrc"
               class="h-100"
               :alt="(node?.location.country ?? 'node') + '-flag'"
               v-bind="props"
@@ -121,7 +123,7 @@
 <script lang="ts">
 import type { NodeInfo } from "@threefold/grid_client";
 import type { GridNode } from "@threefold/gridproxy_client";
-import { computed, type PropType } from "vue";
+import { computed, type PropType, ref } from "vue";
 
 import { getCountryCode } from "@/utils/get_nodes";
 
@@ -141,12 +143,20 @@ export default {
     "node:select": (node: NodeInfo) => true || node,
   },
   setup(props) {
-    const getCountryFlagSrc = () => {
+    const countryFlagSrc = computed(() => {
       const conuntryCode = getCountryCode(props.node as unknown as GridNode);
-      return conuntryCode.toLocaleLowerCase() != "ch"
-        ? `https://www.worldatlas.com/r/w425/img/flag/${conuntryCode?.toLocaleLowerCase()}-flag.jpg`
-        : `https://www.worldatlas.com/r/w425/img/flag/${conuntryCode?.toLocaleLowerCase()}-flag.png`;
-    };
+
+      if (conuntryCode.length > 2) {
+        return "";
+      }
+
+      const imageUrl =
+        conuntryCode.toLocaleLowerCase() != "ch"
+          ? `https://www.worldatlas.com/r/w425/img/flag/${conuntryCode?.toLocaleLowerCase()}-flag.jpg`
+          : `https://www.worldatlas.com/r/w425/img/flag/${conuntryCode?.toLocaleLowerCase()}-flag.png`;
+
+      return imageUrl;
+    });
 
     function normalizeBytesResourse(name: "mru" | "sru" | "hru") {
       return () => {
@@ -178,7 +188,17 @@ export default {
     const sruText = computed(normalizeBytesResourse("sru"));
     const hruText = computed(normalizeBytesResourse("hru"));
 
-    return { cruText, mruText, sruText, hruText, checkSerialNumber, getCountryFlagSrc };
+    return { cruText, mruText, sruText, hruText, checkSerialNumber, countryFlagSrc };
   },
 };
 </script>
+
+<style scoped>
+.flag-avatar {
+  padding: 20px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  color: white;
+  font-weight: 700;
+}
+</style>
