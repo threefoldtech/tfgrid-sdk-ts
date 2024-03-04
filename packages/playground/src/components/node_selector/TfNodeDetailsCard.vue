@@ -30,7 +30,12 @@
       <VTooltip :text="node?.location.country" :disabled="!node">
         <template #activator="{ props }">
           <VAvatar size="40">
-            <img :src="flag" class="h-100" :alt="(node?.location.country ?? 'node') + '-flag'" v-bind="props" />
+            <img
+              :src="getCountryFlagSrc()"
+              class="h-100"
+              :alt="(node?.location.country ?? 'node') + '-flag'"
+              v-bind="props"
+            />
           </VAvatar>
         </template>
       </VTooltip>
@@ -42,6 +47,13 @@
         <template #activator="{ props }">
           <VChip size="x-small" v-bind="props">
             <span class="font-weight-bold" v-text="checkSerialNumber(node?.serialNumber)" />
+          </VChip>
+        </template>
+      </VTooltip>
+      <VTooltip text="Node Country" v-if="node && node.location.country" location="left">
+        <template #activator="{ props }">
+          <VChip class="ml-2" size="x-small" v-bind="props">
+            <span class="font-weight-bold" v-text="node?.location.country" />
           </VChip>
         </template>
       </VTooltip>
@@ -108,8 +120,10 @@
 
 <script lang="ts">
 import type { NodeInfo } from "@threefold/grid_client";
-import { byCountry } from "country-code-lookup";
+import { GridNode } from "@threefold/gridproxy_client";
 import { computed, type PropType } from "vue";
+
+import { getCountryCode } from "@/utils/get_nodes";
 
 import formatResourceSize from "../../utils/format_resource_size";
 import ResourceDetails from "./node_details_internals/ResourceDetails.vue";
@@ -127,14 +141,12 @@ export default {
     "node:select": (node: NodeInfo) => true || node,
   },
   setup(props) {
-    const flag = computed(() => {
-      const country = props.node?.location.country ?? "";
-      const code =
-        country === "Czechia" ? "CZ" : byCountry(country)?.internet || byCountry(country.toLowerCase())?.internet;
-      return code
-        ? `https://www.worldatlas.com/r/w425/img/flag/${code.toLowerCase()}-flag.jpg`
-        : `https://placehold.co/30x20?text=TF`;
-    });
+    const getCountryFlagSrc = () => {
+      const conuntryCode = getCountryCode(props.node as unknown as GridNode);
+      return conuntryCode.toLocaleLowerCase() != "ch"
+        ? `https://www.worldatlas.com/r/w425/img/flag/${conuntryCode?.toLocaleLowerCase()}-flag.jpg`
+        : `https://www.worldatlas.com/r/w425/img/flag/${conuntryCode?.toLocaleLowerCase()}-flag.png`;
+    };
 
     function normalizeBytesResourse(name: "mru" | "sru" | "hru") {
       return () => {
@@ -166,7 +178,7 @@ export default {
     const sruText = computed(normalizeBytesResourse("sru"));
     const hruText = computed(normalizeBytesResourse("hru"));
 
-    return { flag, cruText, mruText, sruText, hruText, checkSerialNumber };
+    return { cruText, mruText, sruText, hruText, checkSerialNumber, getCountryFlagSrc };
   },
 };
 </script>
