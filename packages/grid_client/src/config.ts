@@ -24,6 +24,7 @@ class GridClientConfig {
   keypairType: KeypairType;
   storePath: string;
   graphqlURL: string;
+  relayURL: string;
   proxyURL: string;
   substrateURL: string;
   activationURL: string;
