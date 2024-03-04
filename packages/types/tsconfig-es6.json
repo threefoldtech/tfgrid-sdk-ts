@@ -6,7 +6,7 @@
     "types": ["node", "jest"],
     "declaration": true,
     "declarationMap": true,
-    "outDir": "./dist",
+    "outDir": "./dist/es6",
     "esModuleInterop": true,
     "moduleResolution": "Node",
     "allowJs": true,
