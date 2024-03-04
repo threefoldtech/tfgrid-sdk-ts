@@ -17,7 +17,7 @@ bash ../scripts/build-env.sh
   export MODE=dev | qa | test | main
   ```
 
-- In case the user wants to use different urls, he can change any of the following urls, In case a url wasn't provided by the user, the default network's url will be used
+- The user is now restricted to using only the following four networks main, dev, qa and test. If not set the network's default urls will be used
 
   - GRAPHQL_URL
   - GRIDPROXY_URL
@@ -25,6 +25,8 @@ bash ../scripts/build-env.sh
   - ACTIVATION_SERVICE_URL
   - RELAY_DOMAIN
   - BRIDGE_TFT_ADDRESS
+  - STATS_URL
+  - STELLAR_NETWORK
 
 - The backend payments are done with stellar so you need to decide which network of stellar you want to connect to
 
