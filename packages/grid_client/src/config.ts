@@ -48,6 +48,7 @@ class ClientOptions {
     public relayURL?: string,
     public activationURL?: string,
     public deploymentTimeoutMinutes?: number,
+    public keepReconnectingToChain?: boolean,
   ) {}
 }
 
