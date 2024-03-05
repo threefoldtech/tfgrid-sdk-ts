@@ -1529,16 +1529,16 @@
   resolved "https://registry.yarnpkg.com/@substrate/ss58-registry/-/ss58-registry-1.45.0.tgz#8ed56847557413dadb6410c28075c223ed730fbb"
   integrity sha512-NHmOkILimbLRPKvpnR+JGVckc1q4AJjxz9FnzZ3dKAVBL17AKknDy2FxXcwlJbmOXl9u7W3FS3bLDHgfKi4tQw==
 
-"@threefold/grid_client@2.3.0-rc2":
-  version "2.3.0-rc2"
-  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.3.0-rc2.tgz#c114b609023820d75fb1b91d3784881eec5c1c8e"
-  integrity sha512-yGHRepZ/5o4taplZzYf2iXcyih7Fvxh5+pF8svD1C3Gr5jGQWEqmIefznfnqdCMR/Y0FU5GCCsbOvNA41wkHxA==
+"@threefold/grid_client@2.3.0-rc3":
+  version "2.3.0-rc3"
+  resolved "https://registry.yarnpkg.com/@threefold/grid_client/-/grid_client-2.3.0-rc3.tgz#f105c5bf833ea95a34f972de91b1ff31bf05b2da"
+  integrity sha512-B2v8In0nvcjQ1I9jJTz8Knmqx1BcknGNNDJkw70ZaKW9IXhRkaenOj3FYeqzHFN3HhXgIwSBbnHEonZPATrYpQ==
   dependencies:
     "@jimber/pkid" "1.0.4"
     "@noble/secp256k1" "^1.7.1"
-    "@threefold/rmb_direct_client" "^2.3.0-rc2"
-    "@threefold/tfchain_client" "^2.3.0-rc2"
-    "@threefold/types" "^2.3.0-rc2"
+    "@threefold/rmb_direct_client" "^2.3.0-rc3"
+    "@threefold/tfchain_client" "^2.3.0-rc3"
+    "@threefold/types" "^2.3.0-rc3"
     algosdk "^1.19.0"
     appdata-path "^1.0.0"
     await-lock "^2.2.2"
@@ -1561,15 +1561,15 @@
     url-parse "^1.5.10"
     uuid4 "^2.0.2"
 
-"@threefold/rmb_direct_client@^2.3.0-rc2":
-  version "2.3.0-rc2"
-  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-2.3.0-rc2.tgz#1b33a12a08f682993dc3fdd4cee9d9eda0cdd30b"
-  integrity sha512-gX+e3GvvNA5AD1N9QcJBeINrKuhPMkNW7W3/5mL7ua6sGE06Qgmj+NpQ1kF6rPPyBufyU8BAZcAi33cuLulK9w==
+"@threefold/rmb_direct_client@^2.3.0-rc3":
+  version "2.3.0-rc3"
+  resolved "https://registry.yarnpkg.com/@threefold/rmb_direct_client/-/rmb_direct_client-2.3.0-rc3.tgz#b4f0276181042c300738fba8513073b29e8e92d8"
+  integrity sha512-kM409Pm1A/7aKvpaxYZxUNz7dDh8k9pI7UTq1D7sA2g4tQ+xaEDG/HfToJkt1WDU6uGeIPa6UWKlxw6uQApqFw==
   dependencies:
     "@noble/secp256k1" "^1.7.1"
     "@polkadot/api" "^8.9.1"
-    "@threefold/tfchain_client" "^2.3.0-rc2"
-    "@threefold/types" "^2.3.0-rc2"
+    "@threefold/tfchain_client" "^2.3.0-rc3"
+    "@threefold/types" "^2.3.0-rc3"
     base64url "^3.0.1"
     bip39 "^3.1.0"
     buffer "^6.0.3"
@@ -1579,20 +1579,21 @@
     uuid "^8.3.2"
     ws "^8.12.0"
 
-"@threefold/tfchain_client@^2.3.0-rc2":
-  version "2.3.0-rc2"
-  resolved "https://registry.yarnpkg.com/@threefold/tfchain_client/-/tfchain_client-2.3.0-rc2.tgz#f563db454d172bd4a985e59cebfff138e4aa6b12"
-  integrity sha512-5ph5dJ7DrDojw4cyo4GoabmlJjA11CBvMEGkC0s+NC49vSM6PCyX8emd2dKdb68Yb8ngMb2TCdFAQuyuzbFTOA==
+"@threefold/tfchain_client@^2.3.0-rc3":
+  version "2.3.0-rc3"
+  resolved "https://registry.yarnpkg.com/@threefold/tfchain_client/-/tfchain_client-2.3.0-rc3.tgz#6244be003bcba6682345b5f08ec1deed92630a5a"
+  integrity sha512-fygXO0OVB6k4+SmbDZFKIUi2Q/s15NwaOd8SVXtDUvhDNndBRT04qFJkyKPAjNHDi7Zo12fqY0gGI7TYltzHXA==
   dependencies:
     "@polkadot/api" "^8.9.1"
-    "@threefold/types" "^2.3.0-rc2"
+    "@threefold/types" "^2.3.0-rc3"
     await-lock "^2.2.2"
     bip39 "^3.1.0"
+    moment "^2.30.1"
 
-"@threefold/types@^2.3.0-rc2":
-  version "2.3.0-rc2"
-  resolved "https://registry.yarnpkg.com/@threefold/types/-/types-2.3.0-rc2.tgz#2ce8ddb29f5e9e77de41039f927108b09e75986e"
-  integrity sha512-pIkGCwI1yW9CCIt3pOYJ16SsIadJ40QnmPd8+cLdUe0+NIYQ/JAlpirotGQEFFEZW38ZkEiNK5trXY0kAJJdsA==
+"@threefold/types@^2.3.0-rc3":
+  version "2.3.0-rc3"
+  resolved "https://registry.yarnpkg.com/@threefold/types/-/types-2.3.0-rc3.tgz#917a9bb74a41cc4edc71b38b6d75b5bf272a6d7e"
+  integrity sha512-X1nvvlU7gTa2FoQ2r6xzT9KPsUyI8AeVrsqAHhxYOr1ox/lqY2jQuVCWjBg1NzBWM0SqTvadtXO8SaqpGDd0uw==
 
 "@types/babel__core@^7.1.0":
   version "7.1.16"
@@ -7687,6 +7688,11 @@ mock-socket@^9.1.5:
   version "9.3.1"
   resolved "https://registry.yarnpkg.com/mock-socket/-/mock-socket-9.3.1.tgz#24fb00c2f573c84812aa4a24181bb025de80cc8e"
   integrity sha512-qxBgB7Qa2sEQgHFjj0dSigq7fX4k6Saisd5Nelwp2q8mlbAFh5dHV9JTTlF8viYJLSSWgMCZFUom8PJcMNBoJw==
+
+moment@^2.30.1:
+  version "2.30.1"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.30.1.tgz#f8c91c07b7a786e30c59926df530b4eac96974ae"
+  integrity sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==
 
 move-concurrently@^1.0.1:
   version "1.0.1"
