@@ -117,7 +117,7 @@
                 cols="4"
                 v-if="userBalance"
                 @vue:unmounted="
-                  resources.useCurrentBalance = false;
+                  resources.useCurrentBalance = true;
                   priceTask.run();
                 "
               >
@@ -212,7 +212,7 @@ export default {
       balance: "1",
       certified: false,
       ipv4: false,
-      useCurrentBalance: false,
+      useCurrentBalance: true,
     });
 
     const tftPriceTask = useAsync(() => calculator.tftPrice(), { init: true, default: 0 });
