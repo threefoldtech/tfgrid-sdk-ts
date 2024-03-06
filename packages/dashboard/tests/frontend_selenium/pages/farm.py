@@ -47,7 +47,7 @@ class FarmPage:
     node_expand_details = '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[1]/table/tbody/tr[2]/td/div/div['
     rows_per_page = (By.XPATH, '//*[@id="app"]/div[1]/div[2]/div/div[1]/div[4]/div[2]/div[1]/div/div/div/div[1]/div[2]/div/i')
     all_rows_per_page = (By.XPATH, '/html/body/div[1]/div[3]/div/div[4]/div/div')   
-    close_login_button = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div[4]/button')
+    close_login_button = (By.XPATH, '/html/body/div[1]/div[3]/div/div/div[4]/button[2]')
 
 
     def __init__(self, browser):
