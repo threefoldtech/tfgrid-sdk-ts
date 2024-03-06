@@ -141,34 +141,30 @@
             </VCol>
           </VRow>
 
-          <VRow v-else-if="valid && priceTask.loading">
-            <VCol cols="12" class="d-flex justify-center align-center">
-              <VProgressCircular color="primary" indeterminate />
-            </VCol>
-          </VRow>
-
-          <VRow class="text-center text-body-1 text-black" v-else-if="valid && priceTask.data">
+          <VRow class="text-center text-body-1 text-black" v-else-if="valid">
             <VCol cols="6">
               <div
                 class="rounded pa-4 h-100 d-flex justify-center align-center"
-                :style="{ background: computePackageColor(priceTask.data.dedicatedPackage.package) }"
+                :style="{ background: computePackageColor(priceTask.data?.dedicatedPackage.package) }"
               >
                 <p>
                   Cost of reserving a <strong v-text="'Dedicated Node'" /> of the same specifications<br />
-                  <strong v-text="dedicatedPriceUSD + ' USD/month, ' + dedicatedPriceTFT + ' TFT/month'" />. A user can
-                  reserve an entire node then use it exclusively to deploy solutions
+                  <strong v-text="'Loading...'" v-if="priceTask.loading" />
+                  <strong v-else v-text="dedicatedPriceUSD + ' USD/month, ' + dedicatedPriceTFT + ' TFT/month'" />. A
+                  user can reserve an entire node then use it exclusively to deploy solutions
                 </p>
               </div>
             </VCol>
             <VCol cols="6">
               <div
                 class="rounded pa-4 h-100 d-flex justify-center align-center"
-                :style="{ background: computePackageColor(priceTask.data.sharedPackage.package) }"
+                :style="{ background: computePackageColor(priceTask.data?.sharedPackage.package) }"
               >
                 <p>
                   Cost of reservation on a <strong v-text="'Shared Node'" /><br />
-                  <strong v-text="sharedPriceUSD + ' USD/month, ' + sharedPriceTFT + ' TFT/month'" />. Shared Nodes
-                  allow several users to host various workloads on a single node
+                  <strong v-text="'Loading...'" v-if="priceTask.loading" />
+                  <strong v-else v-text="sharedPriceUSD + ' USD/month, ' + sharedPriceTFT + ' TFT/month'" />. Shared
+                  Nodes allow several users to host various workloads on a single node
                 </p>
               </div>
             </VCol>

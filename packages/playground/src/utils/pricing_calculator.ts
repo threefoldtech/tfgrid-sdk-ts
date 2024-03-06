@@ -43,7 +43,7 @@ export function normalizePrice(price: number) {
   return parseInt(String(price * 1000)) / 1000;
 }
 
-export function computePackageColor(packageName: string): string {
+export function computePackageColor(packageName?: string): string {
   switch (packageName) {
     case "default":
       return "#74DDC3";
