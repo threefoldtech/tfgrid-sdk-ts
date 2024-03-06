@@ -145,6 +145,7 @@ import {
   loadValidNodes,
   normalizeNodeFilters,
   normalizeNodeOptions,
+  validateRentContract,
 } from "../../utils/nodeSelector";
 import TfNodeDetailsCard from "./TfNodeDetailsCard.vue";
 
@@ -244,7 +245,11 @@ export default {
     }
 
     const nodeInputValidateTask = useAsync<true, string, [NodeInfo | undefined]>(
-      node => checkNodeCapacityPool(gridStore, node, props.filters),
+      async node => {
+        const nodeCapacityValid = await checkNodeCapacityPool(gridStore, node, props.filters);
+        const rentContractValid = props.filters.dedicated ? await validateRentContract(gridStore, node) : true;
+        return nodeCapacityValid && rentContractValid;
+      },
       {
         tries: 1,
         shouldRun: () => props.validFilters,
