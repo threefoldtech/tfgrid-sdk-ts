@@ -19,7 +19,7 @@
       <div v-for="item in resources" :key="item.name" class="mx-6 d-flex flex-column pt-2 mt-2 align-center">
         <div class="mb-2">{{ item.name }}</div>
         <div class="text-center">
-          <v-progress-circular :model-value="item.value" :size="150" :width="15" color="info"
+          <v-progress-circular :model-value="item.value" :size="100" :width="7" color="info"
             >{{ item.value !== "NaN" ? item.value + "%" : "N/A" }}
           </v-progress-circular>
         </div>

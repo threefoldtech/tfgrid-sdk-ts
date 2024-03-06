@@ -1,6 +1,6 @@
 <template>
   <v-card :loading="loading">
-    <v-alert class="pa-5" style="height: 20px">
+    <v-alert class="pa-5" style="height: 20px" v-if="title">
       <h4 class="text-center font-weight-medium">
         <v-icon :icon="icon" size="large" />
         {{ title }}
@@ -88,7 +88,7 @@ export default {
   props: {
     title: {
       type: String,
-      required: true,
+      required: false,
     },
 
     icon: {
