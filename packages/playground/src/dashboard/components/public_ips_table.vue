@@ -1,6 +1,27 @@
 <template>
   <div>
-    <v-data-table v-if="publicIps?.length > 0" :headers="headers" :items="publicIps" class="elevation-1">
+    <v-data-table-server
+      :loading="loading"
+      loading-text="Loading nodes..."
+      :headers="headers"
+      :items="publicIps"
+      :items-length="publicIps.length"
+      :items-per-page="size"
+      :items-per-page-options="[
+        { value: 5, title: '5' },
+        { value: 10, title: '10' },
+        { value: 15, title: '15' },
+        { value: 20, title: '20' },
+        { value: 50, title: '50' },
+      ]"
+      :page="page"
+      @update:items-per-page="page => updateIPPage(page)"
+      class="elevation-1 v-data-table-header"
+      density="compact"
+      :disable-sort="true"
+      hide-default-header
+      :hover="true"
+    >
       <template v-slot:top>
         <v-alert class="pa-5" style="height: 20px">
           <h4 class="text-center font-weight-medium">Public IPs</h4>
@@ -33,8 +54,7 @@
           Delete IP
         </v-btn>
       </template>
-      <template #bottom></template>
-    </v-data-table>
+    </v-data-table-server>
     <v-dialog v-model="showDialogue" max-width="600">
       <v-card>
         <v-toolbar color="primary" class="custom-toolbar">
@@ -59,6 +79,7 @@
 
 <script lang="ts">
 import type { RemoveFarmIPModel } from "@threefold/grid_client";
+import { type PublicIp } from "@threefold/tfchain_client";
 import { onMounted, ref, watch } from "vue";
 
 import { useGrid } from "@/stores";
@@ -91,27 +112,38 @@ export default {
       {
         title: "Deployed Contract ID",
         align: "center",
-        key: "contract_id",
+        key: "contractId",
       },
       { title: "Actions", align: "center", sortable: false, key: "actions" },
     ] as any;
-    const publicIps = ref();
+    const publicIps = ref<PublicIp[]>([]);
     const loading = ref(false);
     const showDialogue = ref(false);
     const type = ref(IPType.single);
-    const publicIP = ref();
+    const publicIP = ref<PublicIp>();
     const toPublicIP = ref();
     const gateway = ref();
     const isRemoving = ref(false);
     const itemToDelete = ref();
+    const farmID = ref<number>(0);
+    const size = ref(5);
+    const page = ref(1);
 
     onMounted(async () => {
       await getFarmByID(props.farmId);
     });
+
+    async function updateIPPage(page: number) {
+      const farm = await gridStore.grid.farms.getFarmByID({ id: farmID.value });
+      size.value = page;
+      publicIps.value = farm.publicIps.slice(0, size.value);
+    }
+
     async function getFarmByID(id: number) {
+      farmID.value = id;
       try {
         const farm = await gridStore.grid.farms.getFarmByID({ id });
-        publicIps.value = farm.publicIps;
+        publicIps.value = farm.publicIps.slice(0, size.value);
       } catch (error) {
         createCustomToast(`Failed to get public IPs! ${error}`, ToastType.danger);
       }
@@ -151,6 +183,9 @@ export default {
       isRemoving,
       itemToDelete,
       removeFarmIp,
+      page,
+      size,
+      updateIPPage,
     };
   },
 };

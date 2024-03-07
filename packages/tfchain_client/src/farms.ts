@@ -1,4 +1,5 @@
 import { Client, QueryClient } from "./client";
+import { PublicIp } from "./types";
 import { checkConnection } from "./utils";
 
 enum Certification {
@@ -29,12 +30,6 @@ interface Farm {
 
 interface QueryFarmsGetOptions {
   id: number;
-}
-
-interface PublicIp {
-  ip: string;
-  gw: string;
-  contractId?: number;
 }
 
 interface CreateFarmOptions {
