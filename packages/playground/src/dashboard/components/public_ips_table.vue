@@ -1,10 +1,10 @@
 <template>
   <div>
     <v-data-table-server
-      :loading="loading"
-      loading-text="Loading nodes..."
+      :loading="loadingIps"
+      loading-text="Loading farm IPs..."
       :headers="headers"
-      :items="publicIps"
+      :items="copyPublicIps"
       :items-length="publicIps.length"
       :items-per-page="size"
       :items-per-page-options="[
@@ -117,7 +117,9 @@ export default {
       { title: "Actions", align: "center", sortable: false, key: "actions" },
     ] as any;
     const publicIps = ref<PublicIp[]>([]);
+    const copyPublicIps = ref<PublicIp[]>([]);
     const loading = ref(false);
+    const loadingIps = ref(false);
     const showDialogue = ref(false);
     const type = ref(IPType.single);
     const publicIP = ref();
@@ -125,7 +127,6 @@ export default {
     const gateway = ref();
     const isRemoving = ref(false);
     const itemToDelete = ref();
-    const farmID = ref<number>(0);
     const size = ref(5);
     const page = ref(1);
 
@@ -134,19 +135,22 @@ export default {
     });
 
     async function updateIPPage(page: number) {
-      const farm = await gridStore.grid.farms.getFarmByID({ id: farmID.value });
+      loadingIps.value = true;
       size.value = page;
-      publicIps.value = farm.publicIps.slice(0, size.value) as unknown as PublicIp[];
+      copyPublicIps.value = publicIps.value.slice(0, size.value) as unknown as PublicIp[];
+      loadingIps.value = false;
     }
 
     async function getFarmByID(id: number) {
-      farmID.value = id;
+      loadingIps.value = true;
       try {
         const farm = await gridStore.grid.farms.getFarmByID({ id });
-        publicIps.value = farm.publicIps.slice(0, size.value) as unknown as PublicIp[];
+        publicIps.value = farm.publicIps as unknown as PublicIp[];
+        copyPublicIps.value = publicIps.value.slice(0, size.value);
       } catch (error) {
         createCustomToast(`Failed to get public IPs! ${error}`, ToastType.danger);
       }
+      loadingIps.value = false;
     }
     async function removeFarmIp(options: RemoveFarmIPModel, index: number) {
       try {
@@ -186,6 +190,8 @@ export default {
       page,
       size,
       updateIPPage,
+      copyPublicIps,
+      loadingIps,
     };
   },
 };
