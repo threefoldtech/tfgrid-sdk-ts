@@ -14,7 +14,7 @@
       </div>
     </v-toolbar>
     <template v-if="loading">
-      <v-card class="d-flex justify-center align-center h-screen">
+      <v-card class="d-flex justify-center align-center h-screen w-75 mx-auto">
         <v-progress-circular color="primary" indeterminate :size="128" :width="5" />
         <p class="mt-2">Loading node details...</p>
       </v-card>
@@ -36,7 +36,7 @@
       <v-card class="w-75 mx-auto">
         <node-resources-charts :node="node" :is-live-stats="isLiveStats" :hint-message="errorLoadingStatsMessage" />
         <v-row class="pa-8 mt-5" justify-md="start" justify-sm="center">
-          <v-col cols="12" md="6" sm="8">
+          <v-col cols="12" md="6">
             <node-details-card :node="node" />
             <farm-details-card class="mt-5" :node="node" />
             <interfaces-details-card class="mt-5" :node="node" />
@@ -48,7 +48,7 @@
 
             <cpu-benchmark-card v-if="hasActiveProfile && node.healthy" class="mt-5" :node="node" />
           </v-col>
-          <v-col cols="12" md="6" sm="8">
+          <v-col cols="12" md="6">
             <country-details-card :node="node" />
             <twin-details-card class="mt-3" :node="node" />
             <gpu-details-card
