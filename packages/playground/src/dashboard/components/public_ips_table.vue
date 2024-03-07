@@ -79,7 +79,7 @@
 
 <script lang="ts">
 import type { RemoveFarmIPModel } from "@threefold/grid_client";
-import { type PublicIp } from "@threefold/tfchain_client";
+import type { PublicIp } from "@threefold/tfchain_client";
 import { onMounted, ref, watch } from "vue";
 
 import { useGrid } from "@/stores";
