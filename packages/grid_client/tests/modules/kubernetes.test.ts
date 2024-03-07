@@ -204,7 +204,6 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
   expect(result.masters[0].mounts[0]["size"]).toBe(bytesToGB(masterDiskSize));
   expect(result.masters[0].mounts[0]["state"]).toBe("ok");
   expect(result.masters[0].env["K3S_NODE_NAME"]).toBe(masterName);
-  // expect(result.masters[0].metadata).toBe(metadata);
   expect(result.masters[0].description).toBe(description);
 
   //Worker Assertions
@@ -220,7 +219,6 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
   expect(result.workers[0].mounts[0]["size"]).toBe(bytesToGB(workerDiskSize));
   expect(result.workers[0].mounts[0]["state"]).toBe("ok");
   expect(result.workers[0].env["K3S_NODE_NAME"]).toBe(workerName);
-  // expect(result.workers[0].metadata).toBe(metadata);
   expect(result.workers[0].description).toBe(description);
 
   const masterPlanetaryIp = result.masters[0].planetary;
@@ -286,7 +284,7 @@ test("TC1231 - Kubernetes: Deploy a Kubernetes Cluster", async () => {
   }
 });
 
-test.skip("TC1232 - Kubernetes: Add Worker", async () => {
+test("TC1232 - Kubernetes: Add Worker", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
      Test Cases: TC1232 - Kubernetes: Add Worker
@@ -499,7 +497,6 @@ test.skip("TC1232 - Kubernetes: Add Worker", async () => {
   expect(newResult.workers[1].capacity["memory"]).toBe(workerMemory);
   expect(newResult.workers[1].mounts[0]["size"]).toBe(bytesToGB(workerDiskSize));
   expect(newResult.workers[1].mounts[0]["state"]).toBe("ok");
-  // expect(newResult.workers[1].metadata).toBe(metadata);
   expect(newResult.workers[1].description).toBe(description);
 
   const newWorkerPlanetaryIp = newResult.workers[1].planetary;
@@ -546,7 +543,7 @@ test.skip("TC1232 - Kubernetes: Add Worker", async () => {
   }
 });
 
-test.skip("TC1233 - Kubernetes: Delete Worker", async () => {
+test("TC1233 - Kubernetes: Delete Worker", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
      Test Cases: TC1233 - Kubernetes: Delete Worker
