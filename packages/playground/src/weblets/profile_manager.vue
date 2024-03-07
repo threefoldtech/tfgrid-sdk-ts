@@ -233,8 +233,11 @@
                 </template>
               </VTooltip>
               <v-dialog v-model="openAcceptTerms" fullscreen>
-                <iframe
-                  v-show="!termsLoading"
+                <v-card v-if="!termsLoading">
+                  <v-card-text class="pa-15" v-html="acceptTermsContent"></v-card-text>
+                </v-card>
+                <!-- <iframe
+                  v-show=""
                   src="https://library.threefold.me/info/legal/#/"
                   frameborder="0"
                   style="background-color: white"
@@ -243,7 +246,7 @@
                   width="100%"
                   sandbox="allow-forms allow-modals allow-scripts allow-popups allow-same-origin "
                   @load="termsLoading = false"
-                ></iframe>
+                ></iframe> -->
                 <v-btn @click="shouldActivateAccount ? activateAccount() : createNewAccount()" v-show="!termsLoading">
                   accept terms and conditions
                 </v-btn>
@@ -422,6 +425,7 @@ import { isAddress } from "@polkadot/util-crypto";
 import { KeypairType } from "@threefold/grid_client";
 import { validateMnemonic } from "bip39";
 import Cryptr from "cryptr";
+import { marked } from "marked";
 import md5 from "md5";
 import { computed, onMounted, type Ref, ref, watch } from "vue";
 import { nextTick } from "vue";
@@ -437,6 +441,7 @@ import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
 import { activateAccountAndCreateTwin, createAccount, getGrid, loadBalance, loadProfile } from "../utils/grid";
 import { normalizeBalance, normalizeError } from "../utils/helpers";
+
 const items = ref([{ id: 1, name: "stellar" }]);
 const depositWallet = ref("");
 const selectedName = ref("");
@@ -581,6 +586,7 @@ function getTabs() {
 const termsLoading = ref(false);
 const profileManager = useProfileManager();
 const openAcceptTerms = ref(false);
+const acceptTermsContent = ref("");
 const mnemonic = ref("");
 const isValidForm = ref(false);
 
@@ -814,6 +820,41 @@ function validateConfirmPassword(value: string) {
     return { message: "Passwords should match." };
   }
 }
+
+watch(openAcceptTerms, async () => {
+  if (openAcceptTerms.value) {
+    try {
+      const response = await fetch("https://library.threefold.me/info/legal/readme.md");
+      const mdContent = await response.text();
+      const parsedContent = marked.parse(mdContent);
+
+      // Create a DOM element to hold the parsed HTML
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = parsedContent;
+
+      // Find all image elements in the parsed HTML
+      const imageElements = tempDiv.querySelectorAll("img");
+
+      // Update the href attribute of each image element
+      imageElements.forEach(imgElement => {
+        // Assuming you want to update the href attribute, modify this line accordingly
+        imgElement.setAttribute("src", "https://library.threefold.me/info/legal/legal__legal_header_.jpg");
+        imgElement.setAttribute("class", "info-legal-image");
+      });
+
+      // Get the updated HTML content
+      const updatedHtmlContent = tempDiv.innerHTML;
+
+      // Update acceptTermsContent.value with the modified HTML
+      acceptTermsContent.value = updatedHtmlContent;
+      setTimeout(() => {}, 3000);
+    } catch (error) {
+      console.error("Error fetching or parsing Markdown content:", error);
+    } finally {
+      termsLoading.value = false;
+    }
+  }
+});
 </script>
 
 <script lang="ts">
@@ -843,5 +884,11 @@ export default {
   .v-btn {
     font-size: 0.875rem !important;
   }
+}
+.info-legal-image {
+  width: 100%;
+  box-shadow: 0px 0px 5px 0px #ffffff75;
+  border-radius: 5px;
+  margin-bottom: 30px;
 }
 </style>
