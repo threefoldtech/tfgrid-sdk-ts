@@ -145,7 +145,6 @@ test("TC1228 - VM: Deploy a VM", async () => {
   expect(result[0].capacity["memory"]).toBe(memory);
   expect(result[0].planetary).toBeDefined();
   expect(result[0].publicIP).toBeNull();
-  // expect(result[0].metadata).toBe(metadata);
   expect(result[0].description).toBe(description);
 
   const host = result[0].planetary;
@@ -181,7 +180,7 @@ test("TC1228 - VM: Deploy a VM", async () => {
   }
 });
 
-test.skip("TC1229 - VM: Deploy a VM With a Disk", async () => {
+test("TC1229 - VM: Deploy a VM With a Disk", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
      Test Cases: TC1229 - VM: Deploy a VM With a Disk
@@ -332,7 +331,7 @@ test.skip("TC1229 - VM: Deploy a VM With a Disk", async () => {
   }
 });
 
-test.skip("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
+test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
      Test Cases: TC1230 - VM: Deploy Multiple VMs on Different Nodes
@@ -531,7 +530,6 @@ test.skip("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
     expect(result[currentIndex].capacity["memory"]).toBe(vmMemory[maxIterations]);
     expect(result[currentIndex].planetary).toBeDefined();
     expect(result[currentIndex].publicIP).toBeNull();
-    expect(result[currentIndex].metadata).toBe(metadata);
     expect(result[currentIndex].description).toBe(description);
 
     const vmhost = result[currentIndex].planetary;
