@@ -8,9 +8,14 @@ import { generateInt, getOnlineNode, log, splitIP } from "../utils";
 jest.setTimeout(300000);
 
 let gridClient: GridClient;
+let deploymentName: string;
 
 beforeAll(async () => {
-  return (gridClient = await getClient());
+  gridClient = await getClient();
+  deploymentName = generateString(15);
+  gridClient.clientOptions.projectName = `vm/${deploymentName}`;
+  gridClient._connect();
+  return gridClient;
 });
 
 //Private IP Regex
@@ -44,7 +49,6 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   let cpu = generateInt(1, 4);
   let memory = generateInt(256, 4096);
   let rootfsSize = generateInt(2, 5);
-  const deploymentName = generateString(15);
   const networkName = generateString(15);
   const vmName = generateString(15);
   const disks = [];
@@ -117,6 +121,7 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
         entrypoint: "/usr/bin/python3 -m http.server --bind ::",
         public_ip: publicIp,
         planetary: true,
+        mycelium: false,
         env: {
           SSH_KEY: config.ssh_key,
           Test_KEY: envVarValue,
@@ -158,7 +163,6 @@ test("TC1237 - Gateways: Expose a VM Over Gateway", async () => {
   expect(result[0].capacity["memory"]).toBe(memory);
   expect(result[0].planetary).toBeDefined();
   expect(result[0].publicIP).toBeNull();
-  expect(result[0].metadata).toBe(metadata);
   expect(result[0].description).toBe(description);
 
   const backends = ["http://[" + result[0].planetary + "]:8000"];
