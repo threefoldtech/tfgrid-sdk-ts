@@ -120,7 +120,7 @@ export default {
     const loading = ref(false);
     const showDialogue = ref(false);
     const type = ref(IPType.single);
-    const publicIP = ref<PublicIp>();
+    const publicIP = ref();
     const toPublicIP = ref();
     const gateway = ref();
     const isRemoving = ref(false);
@@ -136,14 +136,14 @@ export default {
     async function updateIPPage(page: number) {
       const farm = await gridStore.grid.farms.getFarmByID({ id: farmID.value });
       size.value = page;
-      publicIps.value = farm.publicIps.slice(0, size.value);
+      publicIps.value = farm.publicIps.slice(0, size.value) as unknown as PublicIp[];
     }
 
     async function getFarmByID(id: number) {
       farmID.value = id;
       try {
         const farm = await gridStore.grid.farms.getFarmByID({ id });
-        publicIps.value = farm.publicIps.slice(0, size.value);
+        publicIps.value = farm.publicIps.slice(0, size.value) as unknown as PublicIp[];
       } catch (error) {
         createCustomToast(`Failed to get public IPs! ${error}`, ToastType.danger);
       }

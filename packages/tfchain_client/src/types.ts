@@ -4,7 +4,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 export interface PublicIp {
   ip: string;
   gateway: string;
-  contractId?: number;
+  contractId: number;
 }
 
 export interface PatchExtrinsicOptions<T> {

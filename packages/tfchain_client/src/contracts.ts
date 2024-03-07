@@ -1,7 +1,7 @@
 import { TFChainError } from "@threefold/types";
 
 import { Client, QueryClient } from "./client";
-import type { PublicIp } from "./types";
+import { PublicIp } from "./types";
 import { checkConnection } from "./utils";
 
 const TWO_WEEKS = 1209600000;
