@@ -250,7 +250,7 @@ export default {
         formatedLogs += `[+] ${log.timestamp} [${log.type.toUpperCase()}]${spaces} ${log.message}\n`;
       }
 
-      downloadAsFile("dashboard.logs", formatedLogs);
+      downloadAsFile("dashboard.log", formatedLogs);
     }
 
     return {
