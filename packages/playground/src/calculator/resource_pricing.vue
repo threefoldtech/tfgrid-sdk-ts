@@ -342,7 +342,7 @@ onMounted(async () => {
 });
 
 function openManual() {
-  window.open("https://manual.grid.tf/wiki/cloudunits/pricing/pricing.html#cloud-unit-pricing", "_blank");
+  window.open("https://www.manual.grid.tf/knowledge_base/cloud/pricing/pricing.html", "_blank");
 }
 </script>
 

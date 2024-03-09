@@ -15,7 +15,7 @@
                     icon
                     small
                     @click.stop
-                    href="https://manual.grid.tf/tfchain/tfchain.html?highlight=locked#contract-locking"
+                    href="https://www.manual.grid.tf/documentation/developers/tfchain/tfchain.html#contract-locking"
                     target="_blank"
                     ><v-icon>mdi-information-outline</v-icon></v-btn
                   ></span
@@ -35,7 +35,7 @@
         <v-card-title class="mb-2">Connect your TFChain Wallet</v-card-title>
         <v-card-subtitle>
           Please visit
-          <a href="https://manual.grid.tf/dashboard/dashboard.html#tfchain-wallet" target="_blank">the manual</a> get
+          <a href="https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html" target="_blank">the manual</a> get
           started.
         </v-card-subtitle>
         <v-divider />
@@ -55,7 +55,7 @@
             <section class="d-flex flex-column align-center">
               <p class="font-weight-bold mb-4">
                 Scan the QRcode using
-                <a class="app-link" href="https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html" target="_blank">
+                <a class="app-link" href="https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html" target="_blank">
                   ThreeFold Connect
                 </a>
                 to fund your account

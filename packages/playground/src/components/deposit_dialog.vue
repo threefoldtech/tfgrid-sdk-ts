@@ -31,7 +31,7 @@
                 <v-btn
                   variant="outlined"
                   color="secondary"
-                  href="https://manual.grid.tf/threefold_token/tft_bridges/tft_bridges.html"
+                  href="https://www.manual.grid.tf/documentation/threefold_token/tft_bridges/tft_bridges.html"
                   target="_blank"
                   >Learn more?</v-btn
                 >

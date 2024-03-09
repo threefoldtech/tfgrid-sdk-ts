@@ -6,7 +6,7 @@
         <i class="fa fa-calculator" aria-hidden="true"></i>
       </h1>
       <span class="link">
-        <a href="https://manual.grid.tf/wiki/cloudunits/pricing/pricing.html#cloud-unit-pricing" target="_blank">Threefold Pricing</a>
+        <a href="https://www.manual.grid.tf/knowledge_base/cloud/pricing/pricing.html" target="_blank">Threefold Pricing</a>
       </span>
     </div>
 

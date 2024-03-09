@@ -147,7 +147,7 @@
             <div class="text-center my-3">
               <p>
                 Scan the QR code using
-                <a class="app-link" href="https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html" target="_blank">
+                <a class="app-link" href="https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html" target="_blank">
                   ThreeFold Connect
                 </a>
                 to fund your account
