@@ -7,7 +7,7 @@
 
 ## Introduction
 
-Playground is a Vue application that helps with deploying solutions on TF Grid v3. The backend for the playground is introduced with [grid client](https://manual.grid.tf/javascript/grid3_javascript_readme.html) which communicates to TF Chain and TF Grid over RMB.
+Playground is a Vue application that helps with deploying solutions on TF Grid v3. The backend for the playground is introduced with [grid client](https://www.manual.grid.tf/documentation/developers/javascript/grid3_javascript_readme.html) which communicates to TF Chain and TF Grid over RMB.
 
 ## Installation
 
@@ -64,5 +64,5 @@ More illustration on the build-env script [here](docs/build.md)
 ## Related Documentations
 
 - [Contributing Guide](./docs/contributing.md)
-- [playground Documentation](https://manual.grid.tf/weblets/weblets_home.html)
+- [Playground Documentation](https://www.manual.grid.tf/documentation/dashboard/deploy/applications.html)
 - [Troubleshooting](./docs/config.md)

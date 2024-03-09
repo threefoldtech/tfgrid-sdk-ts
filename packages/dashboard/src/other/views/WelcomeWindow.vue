@@ -62,7 +62,7 @@ export default class WelcomeWindow extends Vue {
     {
       text: "Your Guide to The ThreeFold Grid",
       button: "Learn More",
-      link: "https://manual.grid.tf/getstarted/tfgrid3_getstarted.html",
+      link: "https://www.manual.grid.tf/documentation/system_administrators/getstarted/tfgrid3_getstarted.html",
       img: require("../../assets/guide_to_gride.png"),
     },
   ];

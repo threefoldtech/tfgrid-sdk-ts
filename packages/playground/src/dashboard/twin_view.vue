@@ -100,10 +100,9 @@
             <div class="text-center my-3">
               <p>
                 Scan the QR code using
-                <!-- TODO: -->
                 <a
                   class="app-link"
-                  href="https://manual.grid.tf/threefold_token/storing_tft/tf_connect_app.html"
+                  href="https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html"
                   target="_blank"
                 >
                   ThreeFold Connect

@@ -59,7 +59,7 @@
         <input-tooltip
           inline
           tooltip="Click to know more about dedicated machines."
-          href="https://manual.grid.tf/dashboard/deploy/dedicated_machines.html"
+          href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
         >
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>

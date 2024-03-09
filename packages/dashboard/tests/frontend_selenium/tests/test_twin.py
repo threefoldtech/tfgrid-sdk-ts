@@ -66,4 +66,4 @@ def test_get_tft(browser):
     twin_page.get_tft()
     assert '/html' in browser.page_source
     # NO checking as devnet don't direct to TF Connect page https://gettft.com/auth/login?next_url=/gettft/shop/#/buy
-    assert twin_page.press_locked_info() == 'https://manual.grid.tf/tfchain/tfchain.html?highlight=locked#contract-locking'
+    assert twin_page.press_locked_info() == 'https://www.manual.grid.tf/documentation/developers/tfchain/tfchain.html#contract-locking'
