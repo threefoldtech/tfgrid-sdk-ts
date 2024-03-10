@@ -40,8 +40,15 @@ export function defineGlobals(app: App<Element>): void {
         const margin = Math.max(7 - level, 3);
         return `<h${level} class="text-h${level} mb-${margin}">${text}</h${level}>`;
       },
+      list(body) {
+        return `<ul style="list-style: none;padding: 10px;">${body}</ul>`;
+      },
       blockquote(quote) {
-        console.log("quote", quote);
+        return `
+          <blockquote class="md-blockquote">
+            <p>${quote}</p>
+          </blockquote>
+        `;
       },
       link(href, title, text) {
         const t = title ? `title="${title}"` : "";
