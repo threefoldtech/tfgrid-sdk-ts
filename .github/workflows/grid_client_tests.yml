@@ -46,6 +46,7 @@ jobs:
           sudo systemctl enable yggdrasil
           PEERS=$(curl https://raw.githubusercontent.com/AhmedHanafy725/yggdrasil-config/main/config.json | jq '.yggdrasil.peers[]' -r | sed 's/\//\\\//g' | sed -z 's/\n/\\n/g')
           sudo  sed -i -- 's/Peers\: \[\]/Peers: [\n'"$PEERS"']/g' /etc/yggdrasil/yggdrasil.conf
+          sudo systemctl stop yggdrasil
           sudo systemctl start yggdrasil
       - name: Generate SSH Key
         run: |
