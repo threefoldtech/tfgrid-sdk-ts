@@ -28,7 +28,7 @@ const modulesNames = {
   machines: "vm",
   kubernetes: "kubernetes",
   gateways: "gateway",
-  qsfs_zdbs: "QSFS",
+  qsfs_zdbs: "qsfs",
   zdb: "zdb",
 };
 class BaseModule {
