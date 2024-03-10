@@ -834,7 +834,10 @@ function parseAcceptTermsLink(tempDiv: HTMLDivElement) {
   const linkElements = tempDiv.querySelectorAll("a");
   linkElements.forEach(linkElement => {
     const currentDomainMatch = linkElement.href.match(/^(https?:\/\/[^\\/]+)/);
-    if (currentDomainMatch) {
+    if (
+      (currentDomainMatch && linkElement.href.includes("localhost")) ||
+      (currentDomainMatch && linkElement.href.includes("dashboard")) // To update only internal links
+    ) {
       const currentDomain = currentDomainMatch[1];
       linkElement.href = linkElement.href.replace(currentDomain, url);
     }
