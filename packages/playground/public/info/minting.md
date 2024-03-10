@@ -17,4 +17,4 @@ The TFT minting address on Stellar Chain:
 
 <br />
 
-For more questions about minting, please contact the [support team](https://threefold.io/support/) or click on the chat icon.
+For more questions about minting, please contact the [support team](https://threefold.io/) or click on the chat icon.
