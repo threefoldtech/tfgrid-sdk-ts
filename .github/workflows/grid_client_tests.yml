@@ -44,7 +44,7 @@ jobs:
           wget https://github.com/yggdrasil-network/yggdrasil-go/releases/download/v0.5.4/yggdrasil-0.5.4-amd64.deb
           sudo dpkg -i yggdrasil-0.5.4-amd64.deb
           sudo systemctl enable yggdrasil
-          PEERS=$(curl https://raw.githubusercontent.com/threefoldtech/zos-config/main/development.json | jq '.yggdrasil.peers[]' -r | sed 's/\//\\\//g' | sed -z 's/\n/\\n/g')
+          PEERS=$(curl https://raw.githubusercontent.com/AhmedHanafy725/yggdrasil-config/main/config.json | jq '.yggdrasil.peers[]' -r | sed 's/\//\\\//g' | sed -z 's/\n/\\n/g')
           sudo  sed -i -- 's/Peers\: \[\]/Peers: [\n'"$PEERS"']/g' /etc/yggdrasil/yggdrasil.conf
           sudo systemctl start yggdrasil
       - name: Generate SSH Key
