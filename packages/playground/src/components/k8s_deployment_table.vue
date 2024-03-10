@@ -58,7 +58,7 @@
 
     <AccessDeploymentAlert />
 
-    <InputTooltip tooltip="Didn't find your deployments in the list? Toggle to show all deployments." inline>
+    <InputTooltip tooltip="Didn't find your deployments in the list? Enable to show all deployments." inline>
       <VSwitch inset color="primary" label="Show All Deployments" v-model="showAllDeployments" />
     </InputTooltip>
 
