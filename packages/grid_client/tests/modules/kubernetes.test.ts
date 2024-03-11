@@ -18,7 +18,7 @@ let deploymentName: string;
 beforeAll(async () => {
   gridClient = await getClient();
   deploymentName = generateString(15);
-  gridClient.clientOptions.projectName = `vm/${deploymentName}`;
+  gridClient.clientOptions.projectName = `kubernetes/${deploymentName}`;
   gridClient._connect();
   return gridClient;
 });
