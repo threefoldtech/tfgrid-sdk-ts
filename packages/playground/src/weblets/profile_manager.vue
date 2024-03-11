@@ -3,7 +3,7 @@
     width="1024"
     class="mx-auto"
     :model-value="$props.modelValue"
-    @update:model-value="$emit('update:model-value', $event)"
+    @update:model-value="handleProfileDialog($event)"
   >
     <template #activator="{ props }">
       <VCard v-bind="props" class="pa-3 d-inline-flex align-center">
@@ -742,6 +742,10 @@ onMounted(async () => {
   await mounted();
 });
 
+async function handleProfileDialog(value: boolean) {
+  emit("update:modelValue", value);
+  if (profileManager?.profile) __loadBalance(profileManager.profile);
+}
 const creatingAccount = ref(false);
 async function createNewAccount() {
   openAcceptTerms.value = false;
