@@ -744,7 +744,7 @@ onMounted(async () => {
 
 async function handleProfileDialog(value: boolean) {
   emit("update:modelValue", value);
-  if (profileManager?.profile) __loadBalance(profileManager.profile);
+  if (profileManager?.profile && value) __loadBalance(profileManager.profile);
 }
 const creatingAccount = ref(false);
 async function createNewAccount() {
