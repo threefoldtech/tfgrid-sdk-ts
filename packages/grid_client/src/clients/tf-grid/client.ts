@@ -24,8 +24,9 @@ class TFClient extends Client {
     public mnemonic: string,
     public storeSecret: string | Uint8Array,
     public keypairType: KeypairType = KeypairType.sr25519,
+    public keepReconnecting: boolean = false,
   ) {
-    super({ url, mnemonicOrSecret: mnemonic, keypairType });
+    super({ url, mnemonicOrSecret: mnemonic, keypairType, keepReconnecting });
 
     if (!storeSecret) {
       throw new ValidationError("Couldn't create TFClient without store secret.");

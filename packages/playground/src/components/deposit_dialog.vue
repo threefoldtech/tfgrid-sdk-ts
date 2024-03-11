@@ -22,7 +22,7 @@
                 <input-tooltip
                   v-if="selectedName == 'stellar'"
                   tooltip="Threefold Staller account"
-                  :href="`https://stellar.expert/explorer/testnet/account/${depositWallet}`"
+                  :href="stellarLink"
                   target="_blank"
                 >
                   <CopyReadonlyInput label="Destination" :data="depositWallet"></CopyReadonlyInput>
@@ -81,7 +81,7 @@
 
 <script setup lang="ts">
 import { Decimal } from "decimal.js";
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import QrcodeGenerator from "../components/qrcode_generator.vue";
@@ -126,6 +126,13 @@ function loadingDots() {
     dots.value += ".";
   }
 }
+
+const stellarLink = computed(() => {
+  if (window.env.NETWORK !== "dev" && window.env.NETWORK !== "qa") {
+    return `https://stellar.expert/explorer/public/account/${props.depositWallet}`;
+  }
+  return `https://stellar.expert/explorer/testnet/account/${props.depositWallet}`;
+});
 
 onMounted(async () => {
   if (!props.openDepositDialog) return;

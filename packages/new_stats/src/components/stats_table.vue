@@ -47,8 +47,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Network } from "@threefold/gridproxy_client";
-import { computed, type Ref, ref, watch } from "vue";
+import { computed, type PropType, type Ref, ref, watch } from "vue";
 
 import type { IStatistics, NetworkStats } from "../types/index";
 import { formatData, getStats } from "../utils/stats";
@@ -57,7 +56,7 @@ import StatisticsCard from "./statistics_card.vue";
 
 const props = defineProps({
   networks: {
-    type: Object,
+    type: Array as PropType<string[]>,
     require: true,
   },
 });
@@ -65,14 +64,14 @@ const props = defineProps({
 const loading = ref(true);
 const failed = ref(false);
 
-const networkStats: Ref<NetworkStats> = ref({
+const networkStats = ref({
   dev: undefined,
   main: undefined,
   test: undefined,
-});
+}) as unknown as Ref<NetworkStats>;
 
 const formattedStats = computed(() => {
-  return formatData(props.networks as Network[], networkStats.value);
+  return formatData(props.networks, networkStats.value);
 });
 const nodesDistribution = computed(() => JSON.stringify(formattedStats.value.nodesDistribution));
 const Istats = computed((): IStatistics[] => {
@@ -104,16 +103,21 @@ async function getStatsData(refresh = false) {
     failed.value = false;
     loading.value = true;
     const result = await Promise.allSettled(
-      props.networks!.map((network: Network) => {
+      props.networks!.map((network: string) => {
         if (!networkStats.value[network] || refresh) {
-          return getStats(network.toLowerCase() as Network);
+          return getStats(
+            network.toLowerCase(),
+            network.toLowerCase() === "main"
+              ? "https://gridproxy.grid.tf"
+              : `https://gridproxy.${network.toLowerCase()}.grid.tf`,
+          );
         }
       }),
     );
     result.forEach(item => {
       if (item.status == "rejected") failed.value = true;
       else if (item.value) {
-        networkStats.value[item.value.network as Network] = item.value.stats;
+        networkStats.value[item.value.network] = item.value.stats;
       }
     });
   } catch (error) {

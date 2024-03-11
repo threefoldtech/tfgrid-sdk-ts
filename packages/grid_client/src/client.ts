@@ -66,6 +66,7 @@ class GridClient {
       keypairType: clientOptions.keypairType ? clientOptions.keypairType : KeypairType.sr25519,
       backendStorageType: clientOptions.backendStorageType ? clientOptions.backendStorageType : BackendStorageType.auto,
       deploymentTimeoutMinutes: clientOptions.deploymentTimeoutMinutes ? clientOptions.deploymentTimeoutMinutes : 10,
+      keepReconnectingToChain: clientOptions.keepReconnectingToChain ? clientOptions.keepReconnectingToChain : false,
     };
 
     if (
@@ -91,6 +92,7 @@ class GridClient {
       this.clientOptions.mnemonic,
       this.clientOptions.storeSecret!,
       this.clientOptions.keypairType,
+      this.clientOptions.keepReconnectingToChain,
     );
 
     this.rmbClient = new RMBClient(
@@ -131,6 +133,7 @@ class GridClient {
       keypairType: this.clientOptions.keypairType!,
       storePath: storePath,
       graphqlURL: urls.graphql,
+      relayURL: urls.relay,
       proxyURL: urls.rmbProxy,
       substrateURL: urls.substrate,
       activationURL: urls.activation,
