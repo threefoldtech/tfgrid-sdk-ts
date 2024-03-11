@@ -62,7 +62,7 @@ async function main() {
         public_ip: false,
         public_ip6: false,
         planetary: true,
-        mycelium: true,
+        mycelium: false,
       },
     ],
     workers: [
@@ -76,7 +76,7 @@ async function main() {
         public_ip: false,
         public_ip6: false,
         planetary: true,
-        mycelium: true,
+        mycelium: false,
       },
     ],
     metadata: "",
