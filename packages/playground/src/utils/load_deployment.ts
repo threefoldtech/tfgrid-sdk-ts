@@ -8,6 +8,7 @@ import { migrateModule } from "./migration";
 export interface LoadedDeployments<T> {
   count: number;
   items: T[];
+  failedDeployments: FailedDeployment[];
 }
 
 interface FailedDeployment {
@@ -258,10 +259,10 @@ export function mergeLoadedDeployments<T>(...deployments: LoadedDeployments<T>[]
   return deployments.reduce(
     (res, current) => {
       insertIfNotFound(current, res);
-      res.count = res.items.length;
+      res.count += current.count;
       return res;
     },
-    { count: 0, items: [] },
+    { count: 0, items: [], failedDeployments: [] },
   );
 }
 
@@ -275,6 +276,18 @@ function insertIfNotFound(newItems: LoadedDeployments<any>, oldItems: LoadedDepl
     }
     if (!found) {
       oldItems.items.push(item);
+    }
+  }
+  for (const item of newItems.failedDeployments) {
+    let found = false;
+    for (const i of oldItems.failedDeployments) {
+      if (item.name === i.name) {
+        found = true;
+        newItems.count--;
+      }
+    }
+    if (!found) {
+      oldItems.failedDeployments.push(item);
     }
   }
 }
