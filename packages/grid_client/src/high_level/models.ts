@@ -1,3 +1,5 @@
+import { Contract } from "@threefold/tfchain_client";
+
 import { Network } from "../primitives/network";
 import { Deployment } from "../zos/deployment";
 
@@ -20,4 +22,10 @@ class TwinDeployment {
   ) {}
 }
 
-export { TwinDeployment, Operations };
+class DeploymentResultContracts {
+  created: Contract[];
+  updated: Contract[];
+  deleted: { contractId: number }[];
+}
+
+export { TwinDeployment, Operations, DeploymentResultContracts };

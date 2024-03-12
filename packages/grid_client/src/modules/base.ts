@@ -9,7 +9,7 @@ import { formatErrorMessage } from "../helpers";
 import { HighLevelBase } from "../high_level/base";
 import { KubernetesHL } from "../high_level/kubernetes";
 import { VMHL } from "../high_level/machine";
-import { Operations, TwinDeployment } from "../high_level/models";
+import { DeploymentResultContracts, Operations, TwinDeployment } from "../high_level/models";
 import { TwinDeploymentHandler } from "../high_level/twinDeploymentHandler";
 import { ZdbHL } from "../high_level/zdb";
 import { DeploymentFactory } from "../primitives/deployment";
@@ -83,14 +83,14 @@ class BaseModule {
     return contracts.filter(c => c.parsedDeploymentData.name === name);
   }
 
-  async save(name: string, contracts: { created: Contract[]; updated: Contract[]; deleted: { contractId: number }[] }) {
+  async save(name: string, contracts: DeploymentResultContracts) {
     const contractsPath = PATH.join(this.getNewDeploymentPath(name), "contracts.json");
     const wireguardPath = PATH.join(this.getDeploymentPath(name), `${name}.conf`);
     const oldContracts = await this.getOldDeploymentContracts(name);
     let StoreContracts = oldContracts;
     let backendOperations = [];
 
-    for (const contract of contracts["created"]) {
+    for (const contract of contracts.created) {
       if (!contract.contractType.nodeContract) continue;
       BaseModule.newContracts.push({
         contractID: String(contract.contractId),
@@ -109,10 +109,10 @@ class BaseModule {
       });
     }
 
-    for (const contract of contracts["deleted"]) {
+    for (const contract of contracts.deleted) {
       BaseModule.deletedContracts.push(contract.contractId);
-      StoreContracts = StoreContracts.filter(c => c["contract_id"] !== contract["contractId"]);
-      const contractPath = PATH.join(this.config.storePath, "contracts", `${contract["contractId"]}.json`);
+      StoreContracts = StoreContracts.filter(c => c["contract_id"] !== contract.contractId);
+      const contractPath = PATH.join(this.config.storePath, "contracts", `${contract.contractId}.json`);
       backendOperations = backendOperations.concat(await this.backendStorage.dump(contractPath, ""));
     }
     if (StoreContracts.length !== 0) {
