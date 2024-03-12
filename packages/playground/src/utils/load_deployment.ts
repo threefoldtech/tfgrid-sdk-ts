@@ -272,6 +272,7 @@ function insertIfNotFound(newItems: LoadedDeployments<any>, oldItems: LoadedDepl
     for (const i of oldItems.items) {
       if (item.deploymentName === i.deploymentName) {
         found = true;
+        newItems.count--;
       }
     }
     if (!found) {
