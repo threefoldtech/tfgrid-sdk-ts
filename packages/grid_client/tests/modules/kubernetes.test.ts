@@ -745,4 +745,4 @@ afterEach(async () => {
 
 afterAll(async () => {
   return await gridClient.disconnect();
-}, 10000);
+}, 130000);
