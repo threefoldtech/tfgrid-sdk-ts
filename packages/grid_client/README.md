@@ -51,7 +51,7 @@ yarn install
 
 - Network environment: should select dev environment, qa, test or main.
 
-- Mnemonic: 12 words for your account. [create one](https://manual.grid.tf/getstarted/TF_Dashboard/TF_Dashboard.html#create-polkadot-extension-account)
+- Mnemonic: 12 words for your account. [create one](https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html)
 
 - Store secret: it's any word that will be used for encrypting/decrypting the keys on threefold key-value store.
 
