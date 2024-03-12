@@ -52,7 +52,7 @@
           </div>
           <div>
             <a
-              href="https://www.manual.grid.tf/knowledge_base/about/threefold_history.html"
+              href="https://manual.grid.tf/knowledge_base/about/governance.html"
               class="app-link text-subtitle-2"
               target="_blank"
               >Governance</a
