@@ -19,7 +19,6 @@
           @update:page="$emit('update:page', $event)"
           @update:items-per-page="$emit('update:size', $event)"
           class="elevation-1 v-data-table-header"
-          density="compact"
           :disable-sort="true"
           hide-default-header
           :hover="true"
@@ -166,9 +165,6 @@ export default {
 .v-data-table-header td {
   white-space: nowrap;
   font-size: 14px;
-}
-.v-data-table__tr {
-  line-height: 55px;
 }
 .v-data-table__thead {
   line-height: 60px;
