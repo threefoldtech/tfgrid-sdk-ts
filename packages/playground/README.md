@@ -64,5 +64,5 @@ More illustration on the build-env script [here](docs/build.md)
 ## Related Documentations
 
 - [Contributing Guide](./docs/contributing.md)
-- [Playground Documentation](https://www.manual.grid.tf/documentation/dashboard/deploy/applications.html)
+- [Playground Documentation](https://www.manual.grid.tf/documentation/dashboard/dashboard.html)
 - [Troubleshooting](./docs/config.md)

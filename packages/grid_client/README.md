@@ -51,11 +51,11 @@ yarn install
 
 - Network environment: should select dev environment, qa, test or main.
 
-- Mnemonic: 12 words for your account. [create one](https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html)
+- Profile: a wallet connector to interact with the chain. [Create one](https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html)
 
 - Store secret: it's any word that will be used for encrypting/decrypting the keys on threefold key-value store.
 
-- project name: it's a name to isolate the deployments into a namespace.
+- Project name: it's a name to isolate the deployments into a namespace.
 
   **Note:** only network can't be isolated, all project can see the same network.
 
