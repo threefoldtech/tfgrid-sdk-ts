@@ -404,12 +404,19 @@ class Nodes {
       region: options.region,
       healthy: options.healthy,
     };
+
+    const filteredParams = Object.fromEntries(
+      Object.entries(params)
+        .filter(([_, value]) => value !== undefined)
+        .filter(([_, value]) => value !== undefined && value?.toString().length > 0),
+    );
+
     if (options.gateway) {
       params["ipv4"] = true;
       params["ipv6"] = true;
       params["domain"] = true;
     }
-    return Object.entries(params)
+    return Object.entries(filteredParams)
       .map(param => param.join("="))
       .join("&");
   }
@@ -438,7 +445,14 @@ class Nodes {
       ret_count: options.ret_count,
       region: options.region,
     };
-    return Object.entries(params)
+
+    const filteredParams = Object.fromEntries(
+      Object.entries(params)
+        .filter(([_, value]) => value !== undefined)
+        .filter(([_, value]) => value !== undefined && value?.toString().length > 0),
+    );
+
+    return Object.entries(filteredParams)
       .map(param => param.join("="))
       .join("&");
   }
