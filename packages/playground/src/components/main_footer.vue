@@ -2,7 +2,7 @@
   <v-footer class="py-5 mainfooter border mt-5">
     <v-container>
       <v-row justify="center" no-gutters>
-        <v-col class="px-4 pr-10" cols="12" md="4" sm="12">
+        <v-col class="px-4" cols="12" md="4">
           <v-img
             :src="`${
               theme.name.value === AppThemeSelection.light
@@ -31,7 +31,7 @@
             ></a>
           </div>
         </v-col>
-        <v-col class="" cols="4" md="2">
+        <v-col class="mb-2" cols="12" sm="3" md="2">
           <p class="text-subtitle-1 footer_header" color="secondary">Take Action</p>
           <div>
             <a
@@ -56,7 +56,7 @@
             >
           </div>
         </v-col>
-        <v-col class="mx-3" cols="4" md="2">
+        <v-col class="mx-3 mb-3" cols="12" sm="3" md="2">
           <p color="primary" class="text-subtitle-1 footer_header">About Us</p>
           <div>
             <a
@@ -79,7 +79,7 @@
           </div>
         </v-col>
 
-        <v-col class="mx-3" cols="2">
+        <v-col class="mx-3" cols="12" sm="3" md="2">
           <p class="text-subtitle-1 footer_header" color="secondary">Contact</p>
           <div>
             <a href="https://t.me/threefold" class="app-link text-subtitle-2" target="_blank">Main Chat</a>
@@ -143,5 +143,14 @@ export default {
 .footer_header {
   color: rgb(var(--v-footer-color-header)) !important;
   font-weight: 500;
+}
+
+@media only screen and (max-width: 992px) {
+  .v-footer {
+    text-align: center !important;
+  }
+  .v-img {
+    margin: auto;
+  }
 }
 </style>
