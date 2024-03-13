@@ -8,7 +8,7 @@
   const network = NetworkEnv.dev;
   ```
 
-- Profile: a wallet connector to interact with the chain. [Create one](https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html)
+- Wallet connector: mnemonics for your account to interact with the chain. [Create one](https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html)
 
 - Store secret: it's any word that will be used for encrypting/decrypting the keys on threefold key-value store.
 
