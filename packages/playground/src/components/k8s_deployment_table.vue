@@ -134,7 +134,7 @@
 </template>
 
 <script lang="ts" setup>
-import { capitalize, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
@@ -173,11 +173,7 @@ async function loadDeployments() {
   });
 
   const clusters = mergeLoadedDeployments(chunk1, chunk2, chunk3);
-  failedDeployments.value = [
-    ...(Array.isArray((chunk1 as any).failedDeployments) ? (chunk1 as any).failedDeployments : []),
-    ...(Array.isArray((chunk2 as any).failedDeployments) ? (chunk2 as any).failedDeployments : []),
-    ...(Array.isArray((chunk3 as any).failedDeployments) ? (chunk3 as any).failedDeployments : []),
-  ];
+  failedDeployments.value = clusters.failedDeployments;
 
   count.value = clusters.count;
   items.value = clusters.items.map((item: any) => {
