@@ -375,7 +375,6 @@ class Network {
 
   private async loadNetworkFromContracts() {
     const contracts = await this.getDeploymentContracts(this.name);
-    console.log(contracts);
     for (const contract of contracts) {
       const node_twin_id = await this.capacity.getNodeTwinId(contract.nodeID);
       const payload = JSON.stringify({ contract_id: +contract.contractID });
