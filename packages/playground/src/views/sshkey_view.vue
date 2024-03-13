@@ -9,7 +9,7 @@
     </v-alert>
     <VTooltip
       text="SSH Keys are used to authenticate you to the deployment instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
-      location="bottom"
+      location="top right"
       max-width="600px"
     >
       <template #activator="{ props }">
