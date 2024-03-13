@@ -215,7 +215,7 @@ import { color } from "../utils/background_color";
 const CRU = ref<number>(1);
 const MRU = ref<number>(1);
 const SRU = ref<number>(25);
-const HRU = ref<number>(100);
+const HRU = ref<number>(0);
 const balance = ref<number>(0);
 const TFTPrice = ref<number>(0);
 
