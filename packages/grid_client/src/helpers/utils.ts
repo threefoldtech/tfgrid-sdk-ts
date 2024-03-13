@@ -64,12 +64,22 @@ function zeroPadding(length: number, num: number) {
 }
 
 /**
- * Removes any key-value pairs from an object where the value is either undefined or an empty string.
- * @param obj - The input object from which to remove undefined and empty string values.
- * @returns A new object with the same keys as the input object, but without any key-value pairs where the value is either undefined or an empty string.
+ * Converts an object into a query string format.
+ * @param obj - The object to be converted into a query string.
+ * @returns A string representing the object in query string format.
  */
-function removeUndefinedAndEmptyString(obj: Record<string, any>): Record<string, any> {
-  return Object.fromEntries(Object.entries(obj).filter(([_, value]) => value !== undefined && value !== ""));
+function convertObjectToQueryString(obj: Record<string, any>): string {
+  // Filter out undefined or empty string values
+  const filteredParams = Object.fromEntries(
+    Object.entries(obj).filter(([_, value]) => value !== undefined && value !== ""),
+  );
+
+  // Convert object to query string format
+  const queryString = Object.entries(filteredParams)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .join("&");
+
+  return queryString;
 }
 
 export {
@@ -84,5 +94,5 @@ export {
   formatErrorMessage,
   generateRandomHexSeed,
   zeroPadding,
-  removeUndefinedAndEmptyString,
+  convertObjectToQueryString,
 };

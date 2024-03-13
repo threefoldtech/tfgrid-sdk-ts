@@ -15,7 +15,7 @@ import { RMB } from "../clients";
 import { Graphql } from "../clients/graphql/client";
 import { formatErrorMessage } from "../helpers";
 import { send, sendWithFullResponse } from "../helpers/requests";
-import { removeUndefinedAndEmptyString } from "../helpers/utils";
+import { convertObjectToQueryString } from "../helpers/utils";
 import { FarmFilterOptions, FilterOptions, NodeStatus } from "../modules/models";
 
 interface FarmInfo {
@@ -406,15 +406,12 @@ class Nodes {
       healthy: options.healthy,
     };
 
-    const filteredParams = removeUndefinedAndEmptyString(params);
     if (options.gateway) {
       params["ipv4"] = true;
       params["ipv6"] = true;
       params["domain"] = true;
     }
-    return Object.entries(filteredParams)
-      .map(param => param.join("="))
-      .join("&");
+    return convertObjectToQueryString(params);
   }
 
   getFarmUrlQuery(options: FarmFilterOptions = {}) {
@@ -442,10 +439,7 @@ class Nodes {
       region: options.region,
     };
 
-    const filteredParams = removeUndefinedAndEmptyString(params);
-    return Object.entries(filteredParams)
-      .map(param => param.join("="))
-      .join("&");
+    return convertObjectToQueryString(params);
   }
 
   async nodeHasResources(nodeId: number, options: FilterOptions): Promise<boolean> {
