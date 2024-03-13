@@ -63,6 +63,15 @@ function zeroPadding(length: number, num: number) {
   return num.toString(16).padStart(length, "0");
 }
 
+/**
+ * Removes any key-value pairs from an object where the value is either undefined or an empty string.
+ * @param obj - The input object from which to remove undefined and empty string values.
+ * @returns A new object with the same keys as the input object, but without any key-value pairs where the value is either undefined or an empty string.
+ */
+function removeUndefinedAndEmptyString(obj: Record<string, any>): Record<string, any> {
+  return Object.fromEntries(Object.entries(obj).filter(([_, value]) => value !== undefined && value !== ""));
+}
+
 export {
   generateString,
   getRandomNumber,
@@ -75,4 +84,5 @@ export {
   formatErrorMessage,
   generateRandomHexSeed,
   zeroPadding,
+  removeUndefinedAndEmptyString,
 };
