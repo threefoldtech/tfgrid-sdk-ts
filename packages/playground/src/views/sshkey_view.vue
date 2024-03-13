@@ -31,7 +31,7 @@
                 : SSHKeyHint
             "
             :persistent-hint="updatingSSH || generatingSSH || !!SSHKeyHint"
-            :rules="[value => !!value || 'SSH key is required']"
+            :rules="sshRules(ssh)"
           />
         </CopyInputWrapper>
 
@@ -65,6 +65,8 @@
 import { ref, watch } from "vue";
 import { computed } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
+
+import { isValidSSHKey } from "@/utils/validators";
 
 import { useProfileManager } from "../stores";
 import type { Profile } from "../stores/profile_manager";
@@ -138,6 +140,15 @@ async function generateSSH() {
   downloadAsFile("id_rsa", keys.privateKey);
   generatingSSH.value = false;
   SSHKeyHint.value = "SSH key generated successfully.";
+}
+
+function sshRules(value: any) {
+  return [
+    (v: any) => !!v || "SSH key is required.",
+    (v: string) =>
+      isValidSSHKey(v) ||
+      "The SSH key you provided is not valid. Please double-check that it is copied correctly and follows the correct format.",
+  ];
 }
 </script>
 <script lang="ts">
