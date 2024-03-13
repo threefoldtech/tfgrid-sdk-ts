@@ -10,6 +10,10 @@ List of changes this PR includes
 
 List of related issues
 
+### Documentation PR
+
+For UI changes, Plaese provide the Documetation PR on [info_grid](https://github.com/threefoldtech/info_grid)
+
 ### Checklist
 
 - [ ] Tests included

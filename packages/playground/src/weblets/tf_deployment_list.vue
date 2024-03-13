@@ -42,7 +42,12 @@
             @click="openDialog(tabs[activeTab].value, item)"
           />
 
-          <IconActionBtn icon="mdi-cog" tooltip="Manage Domains" @click="dialog = item.value.deploymentName" />
+          <IconActionBtn
+            icon="mdi-cog"
+            tooltip="Manage Domains"
+            :disabled="item.value.fromAnotherClient"
+            @click="dialog = item.value.deploymentName"
+          />
 
           <ManageGatewayDialog
             v-if="dialog === item.value.deploymentName"
@@ -306,7 +311,13 @@
               icon="mdi-eye-outline"
               @click="openDialog(tabs[activeTab].value, item)"
             />
-            <IconActionBtn icon="mdi-cog" tooltip="Manage Workers" @click="dialog = item.value.deploymentName" />
+
+            <IconActionBtn
+              icon="mdi-cog"
+              :disabled="item.value.fromAnotherClient"
+              tooltip="Manage Workers"
+              @click="dialog = item.value.deploymentName"
+            />
 
             <ManageK8SWorkerDialog
               v-if="dialog === item.value.deploymentName"

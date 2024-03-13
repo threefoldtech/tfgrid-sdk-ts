@@ -67,16 +67,9 @@
           Metaverse and more.
         </p>
         <div class="d-flex justify-center align-center flex-wrap my-4">
-          <v-btn
-            color="secondary"
-            variant="outlined"
-            class="mr-2"
-            target="_blank"
-            href="https://www.threefold.io/grid/"
-          >
+          <v-btn color="secondary" variant="outlined" class="mr-2" target="_blank" href="https://manual.grid.tf/">
             Learn about the grid
           </v-btn>
-          <v-btn color="primary" target="_blank" href="https://www.threefold.io/build/"> Use The Grid </v-btn>
         </div>
       </div>
     </v-container>

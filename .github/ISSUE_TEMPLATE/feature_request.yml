@@ -1,0 +1,49 @@
+name: Feature request
+description: Suggest an idea for this project
+labels: ["type_feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Don't forget to add the right label
+  
+  - type: dropdown
+    id: package
+    attributes:
+      label: Which package/s are you suggesting this feature for?
+      multiple: true
+      options:
+        - Dashboard
+        - Stats
+        - graphql_client
+        - grid_client
+        - grid_http_server
+        - gridproxy_client
+        - grid_rmb_server
+        - Monitoring
+        - rmb_direct_client
+        - rmb_peer_client
+        - rmb_peer_server
+        - tfchain_client
+        - types
+        - UI
+
+  - type: textarea
+    id: describe
+    attributes:
+      label: Is your feature request related to a problem? Please describe
+      placeholder: A clear and concise description of what the problem is. Ex. I'm always frustrated when \[...]
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Describe the solution you'd like
+      placeholder: A clear and concise description of what you want to happen. If you've a specific approach to discuss, describe it here clearly.
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        ### Thanks for taking the time to fill out this bug report!

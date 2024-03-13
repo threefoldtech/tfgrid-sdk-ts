@@ -16,7 +16,7 @@ import { events } from "../helpers/events";
 import { validateObject } from "../helpers/validator";
 import { DeploymentFactory, Nodes } from "../primitives/index";
 import { Workload, WorkloadTypes } from "../zos/workload";
-import { Operations, TwinDeployment } from "./models";
+import { DeploymentResultContracts, Operations, TwinDeployment } from "./models";
 class TwinDeploymentHandler {
   tfclient: TFClient;
   rmb: RMB;
@@ -135,15 +135,21 @@ class TwinDeploymentHandler {
     return Promise.all(promises);
   }
 
-  async saveNetworks(twinDeployments: TwinDeployment[]) {
+  async saveNetworks(twinDeployments: TwinDeployment[], contracts: DeploymentResultContracts) {
     for (const twinDeployment of twinDeployments) {
-      if (twinDeployment.network) {
-        if (twinDeployment.operation === Operations.delete) {
-          await twinDeployment.network.save();
-          continue;
+      if (!twinDeployment.network) {
+        return;
+      }
+      if (twinDeployment.operation === Operations.deploy) {
+        for (const workload of twinDeployment.deployment.workloads) {
+          if (workload.type !== WorkloadTypes.network) continue;
+          const contract = contracts.created.filter(c => c.contractId === twinDeployment.deployment.contract_id);
+          twinDeployment.network.save(contract[0]);
         }
-        // deploy or update operations
-        await twinDeployment.network.save(twinDeployment.deployment.contract_id, twinDeployment.nodeId);
+      }
+      // left just to delete the old keys
+      else if (twinDeployment.operation === Operations.delete) {
+        await twinDeployment.network.save(undefined, twinDeployment.deployment.contract_id);
       }
     }
   }
@@ -433,6 +439,7 @@ class TwinDeploymentHandler {
             Operations.update,
             0,
             old_contract.contractType.nodeContract.nodeId,
+            "",
           ),
         );
       }
@@ -459,7 +466,7 @@ class TwinDeploymentHandler {
       }
       const extrinsic = await this.tfclient.contracts.createNode({
         hash: twinDeployment.deployment.challenge_hash(),
-        data: twinDeployment.deployment.metadata,
+        data: twinDeployment.metadata,
         nodeId: twinDeployment.nodeId,
         numberOfPublicIps: twinDeployment.publicIps,
         solutionProviderId: twinDeployment.solutionProviderId,
@@ -505,8 +512,16 @@ class TwinDeploymentHandler {
     await this.checkNodesCapacity(twinDeployments);
     await this.checkFarmIps(twinDeployments);
 
-    const contracts = { created: [], updated: [], deleted: [] };
-    const resultContracts = { created: [], updated: [], deleted: [] };
+    const contracts: DeploymentResultContracts = {
+      created: [],
+      updated: [],
+      deleted: [],
+    };
+    const resultContracts: DeploymentResultContracts = {
+      created: [],
+      updated: [],
+      deleted: [],
+    };
     let nodeExtrinsics: ExtrinsicResult<Contract>[] = [];
     let nameExtrinsics: ExtrinsicResult<Contract>[] = [];
     let deletedExtrinsics: ExtrinsicResult<number>[] = [];
@@ -518,7 +533,7 @@ class TwinDeploymentHandler {
         }
         if (workload.type === WorkloadTypes.network) {
           events.emit("logs", `Updating network workload with name: ${workload.name}`);
-          workload["data"] = twinDeployment.network.updateNetwork(workload.data);
+          twinDeployment.network.updateWorkload(twinDeployment.nodeId, workload);
         }
       }
       const extrinsics = await this.PrepareExtrinsic(twinDeployment, contracts);
@@ -589,7 +604,7 @@ class TwinDeploymentHandler {
         }
       }
       await this.waitForDeployments(twinDeployments);
-      await this.saveNetworks(twinDeployments);
+      await this.saveNetworks(twinDeployments, contracts);
     } catch (e) {
       await this.rollback(contracts);
       if (e instanceof BaseError) throw e;

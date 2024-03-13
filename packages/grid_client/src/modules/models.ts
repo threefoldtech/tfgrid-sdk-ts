@@ -182,7 +182,7 @@ class K8SDeleteModel extends BaseGetDeleteModel {}
 
 class AddWorkerModel extends KubernetesNodeModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) deployment_name: string;
-  @Expose() @IsString() @IsOptional() myceliumNetworkSeed: string;
+  @Expose() @IsString() @IsOptional() myceliumNetworkSeed?: string;
 }
 
 class DeleteWorkerModel {
@@ -802,6 +802,7 @@ class NetworkHasNodeModel {
 
 class NetworkGetModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() ipRange: string;
 }
 
 class SetDedicatedNodeExtraFeesModel {

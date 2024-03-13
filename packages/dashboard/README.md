@@ -8,7 +8,7 @@
 
 ## Introduction
 
-The Dashboard is a unified admin interface for everything related to Threefold Grid such as Portal, Explorer, Calculators, Zero-OS Bootstrap & Playground. For more details, check [Dashboard Manual](https://manual.grid.tf/getstarted/TF_Dashboard/TF_Dashboard.html)
+The Dashboard is a unified admin interface for everything related to Threefold Grid such as Portal, Explorer, Calculators, Zero-OS Bootstrap & Playground. For more details, check [Dashboard Manual](https://www.manual.grid.tf/documentation/dashboard/dashboard.html)
 
 ## Getting Started
 
@@ -48,4 +48,4 @@ This will generate the production build in the `dist` directory, which can be se
 ## Related Documentations
 
 - [Contribution Guide](./docs/Contribution.md)
-- [Dashboard Documentation](https://manual.grid.tf/getstarted/TF_Dashboard/TF_Dashboard.html)
+- [Dashboard Documentation](https://www.manual.grid.tf/documentation/dashboard/dashboard.html)
