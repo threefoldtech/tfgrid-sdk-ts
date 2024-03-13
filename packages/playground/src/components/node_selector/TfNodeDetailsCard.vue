@@ -1,6 +1,6 @@
 <template>
   <VCard
-    class="rounded-0 w-100"
+    class="rounded-0 w-100 pb-3"
     :class="{ 'selected-node': status !== 'Init' }"
     :color="
       status === 'Valid'
@@ -108,6 +108,7 @@
 
 <script lang="ts">
 import type { NodeInfo } from "@threefold/grid_client";
+import type { GridNode } from "@threefold/gridproxy_client";
 import { byCountry } from "country-code-lookup";
 import { computed, type PropType } from "vue";
 
@@ -118,7 +119,7 @@ export default {
   name: "TfNodeDetailsCard",
   components: { ResourceDetails },
   props: {
-    node: Object as PropType<NodeInfo>,
+    node: Object as PropType<NodeInfo | GridNode>,
     status: String as PropType<"Init" | "Pending" | "Invalid" | "Valid">,
     selectable: Boolean,
     flat: Boolean,

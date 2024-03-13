@@ -26,40 +26,11 @@
         >
           <template #loading />
 
-          <template v-slot:[`item.status`]="{ item }">
-            <p class="text-left mt-1 mb-0">
-              <v-chip :color="getNodeStatusColor(item.columns.status as string).color">
-                <span>
-                  {{ capitalize(getNodeStatusColor(item.columns.status as string).status) }}
-                </span>
-              </v-chip>
-            </p>
-          </template>
-
-          <template v-slot:[`item.dedicated`]="{ item }">
-            <p class="text-left mt-1 mb-0">
-              <v-chip
-                :color="getNodeTypeColor(item.columns.dedicated as boolean, item.raw.rentedByTwinId as number).color"
-              >
-                <span>
-                  {{
-                    capitalize(
-                      getNodeTypeColor(item.columns.dedicated as boolean, item.raw.rentedByTwinId as number).type,
-                    )
-                  }}
-                </span>
-              </v-chip>
-            </p>
-          </template>
-
-          <template v-slot:[`item.actions`]="{ item }">
-            <reserve-btn
-              v-if="item.columns.dedicated && item.columns.status !== 'down'"
-              :node="(item.raw as unknown as GridNode)"
-              @updateTable="$emit('reloadTable', item.raw.nodeId)"
-            />
-            <span v-else>-</span>
-          </template>
+          <tbody class="mx-4 my-4">
+            <tr v-for="node in modelValue" v-bind:key="node.id">
+              <TfNodeDetailsCard :node="node" />
+            </tr>
+          </tbody>
         </v-data-table-server>
       </v-col>
     </v-row>
@@ -72,10 +43,11 @@ import type { PropType } from "vue";
 import { capitalize } from "vue";
 import type { VDataTable } from "vuetify/labs/VDataTable";
 
-import ReserveBtn from "@/dashboard/components/reserve_action_btn.vue";
 import formatResourceSize from "@/utils/format_resource_size";
 import { getNodeStatusColor, getNodeTypeColor } from "@/utils/get_nodes";
 import toReadableDate from "@/utils/to_readable_data";
+
+import TfNodeDetailsCard from "./node_selector/TfNodeDetailsCard.vue";
 export default {
   emits: ["update:page", "update:size", "open-dialog", "reloadTable"],
   props: {
@@ -101,7 +73,7 @@ export default {
     },
   },
   components: {
-    ReserveBtn,
+    TfNodeDetailsCard,
   },
   setup(_, { emit }) {
     const nodeStatusOptions = [NodeStatus.Up, NodeStatus.Down];
@@ -168,5 +140,25 @@ export default {
 }
 .v-data-table__thead {
   line-height: 60px;
+}
+</style>
+
+<style scoped>
+.v-data-table__thead {
+  display: none;
+}
+
+.v-data-table tbody tr {
+  position: relative;
+}
+
+.v-data-table tbody tr::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 0.5rem;
+  background-color: rgb(var(--v-theme-background));
 }
 </style>
