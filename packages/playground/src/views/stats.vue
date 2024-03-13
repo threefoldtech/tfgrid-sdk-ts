@@ -8,7 +8,9 @@
       <div class="text-center">
         <v-row align="center" justify="center">
           <v-col cols="12" sm="6" md="4">
-            <TfLoading v-if="loading" />
+            <div class="d-flex my-6 align-center justify-center">
+              <v-progress-circular v-if="loading" />
+            </div>
           </v-col>
         </v-row>
       </div>

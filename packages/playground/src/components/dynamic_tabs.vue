@@ -14,7 +14,7 @@
       />
       {{ tab.title }}
       <v-chip color="info" v-if="forms[tabs.indexOf(tab)]?.pending" class="ml-1">
-        Validating <tf-loading class="ml-1" />
+        Validating <v-progress-circular class="ml-1" />
       </v-chip>
       <v-chip color="error" v-else-if="forms[tabs.indexOf(tab)]?.invalid" class="ml-1">invalid</v-chip>
     </v-tab>

@@ -30,7 +30,7 @@
       <div class="d-flex align-center justify-space-between">
         <span>{{ index + 1 }}</span>
         <div class="d-flex" @click.stop>
-          <TfLoading
+          <v-progress-circular
             v-if="deleting && selectedItems.includes(item?.value)"
             class="ml-3"
             color="red"
@@ -56,7 +56,9 @@
     <template #bottom>
       <v-row class="mt-5" v-if="loading && items.length === 0">
         <v-spacer />
-        <tf-loading />
+        <div class="d-flex my-6 align-center justify-center">
+          <v-progress-circular :width="3" :size="30" />
+        </div>
         <v-spacer />
       </v-row>
       <template v-else-if="!loading && items.length === 0 && (noDataText || $slots['no-data-text'])">

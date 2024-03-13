@@ -5,7 +5,9 @@
         query-route="farm-id"
         v-model="filters.farmId"
         :rules="[
-          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.isNumeric('This field accepts numbers only.', {
+            no_symbols: true,
+          }),
           validators.min('The ID should be larger than zero.', 1),
           validators.isInt('should be an integer'),
           validators.validateResourceMaxNumber('This is not a valid ID.'),
@@ -42,7 +44,9 @@
         query-route="free-public-ips"
         v-model="filters.freePublicIps"
         :rules="[
-          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.isNumeric('This field accepts numbers only.', {
+            no_symbols: true,
+          }),
           validators.min('Free Public IP should be larger than zero.', 1),
           validators.isInt('should be an integer'),
           validators.validateResourceMaxNumber('This is not a valid public IP.'),
@@ -100,7 +104,7 @@
 
         <template v-if="loading">
           <div color="transparent" class="text-center">
-            <tf-loading />
+            <v-progress-circular />
             <p>Loading farm details...</p>
           </div>
         </template>

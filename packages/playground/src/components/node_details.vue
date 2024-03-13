@@ -15,7 +15,9 @@
     </v-toolbar>
     <template v-if="loading">
       <v-card class="d-flex justify-center align-center h-screen">
-        <TfLoading />
+        <div class="d-flex my-6 align-center justify-center">
+          <v-progress-circular />
+        </div>
         <p>Loading node details...</p>
       </v-card>
     </template>
