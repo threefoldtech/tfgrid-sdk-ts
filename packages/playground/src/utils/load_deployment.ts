@@ -161,7 +161,6 @@ export async function loadK8s(grid: GridClient) {
   await migrateModule(grid.k8s);
 
   const clusters = await grid.k8s.list();
-  const failedK8s: string[] = [];
 
   const projectName = grid.clientOptions.projectName;
   const grids = (await Promise.all(
