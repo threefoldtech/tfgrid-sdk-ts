@@ -32,7 +32,7 @@
                 <v-btn
                   variant="outlined"
                   color="secondary"
-                  href="https://manual.grid.tf/threefold_token/tft_bridges/tfchain_stellar_bridge.html#how-to-use-the-tfchain-stellar-bridge"
+                  href="https://www.manual.grid.tf/documentation/threefold_token/tft_bridges/tft_bridges.html"
                   target="_blank"
                   >Learn more?</v-btn
                 >

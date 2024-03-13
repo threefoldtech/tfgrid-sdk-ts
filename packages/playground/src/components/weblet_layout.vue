@@ -85,11 +85,7 @@
           </div>
         </div>
 
-        <a
-          href="https://manual.grid.tf/wiki/cloudunits/pricing/pricing.html#cloud-unit-pricing"
-          target="_blank"
-          class="app-link"
-        >
+        <a href="https://www.manual.grid.tf/knowledge_base/cloud/pricing/pricing.html" target="_blank" class="app-link">
           Learn more about the pricing and how to unlock discounts.
         </a>
       </v-alert>

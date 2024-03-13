@@ -51,7 +51,7 @@
             If you don't know what the Captain root domain is, make sure to read the
             <a
               target="_blank"
-              href="https://manual.grid.tf/dashboard/solutions/caprover.html"
+              href="https://www.manual.grid.tf/documentation/dashboard/solutions/caprover.html"
               :style="{ color: 'inherit' }"
             >
               quick start documentation.

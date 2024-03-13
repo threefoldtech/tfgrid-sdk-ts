@@ -38,7 +38,7 @@
                     height="24px"
                     width="24px"
                     class="ml-2"
-                    href="https://manual.grid.tf/tfchain/tfchain.html?highlight=locked#contract-locking"
+                    href="https://www.manual.grid.tf/documentation/developers/tfchain/tfchain.html#contract-locking"
                     target="_blank"
                   />
                 </template>
@@ -368,8 +368,11 @@
             <section class="d-flex flex-column align-center">
               <p class="mb-4 text-center">
                 Scan the QR code using
-                <!-- TODO: -->
-                <a class="app-link" href="https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html" target="_blank">
+                <a
+                  class="app-link"
+                  href="https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html"
+                  target="_blank"
+                >
                   ThreeFold Connect
                 </a>
                 to fund your account
