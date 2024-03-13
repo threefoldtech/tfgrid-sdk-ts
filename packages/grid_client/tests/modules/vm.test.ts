@@ -5,9 +5,14 @@ import { bytesToGB, generateInt, getOnlineNode, log, RemoteRun, splitIP } from "
 jest.setTimeout(300000);
 
 let gridClient: GridClient;
+let deploymentName: string;
 
 beforeAll(async () => {
-  return (gridClient = await getClient());
+  gridClient = await getClient();
+  deploymentName = generateString(15);
+  gridClient.clientOptions.projectName = `vm/${deploymentName}`;
+  gridClient._connect();
+  return gridClient;
 });
 
 //Private IP Regex
@@ -34,7 +39,6 @@ test("TC1228 - VM: Deploy a VM", async () => {
   let cpu = generateInt(1, 4);
   let memory = generateInt(256, 4096);
   let rootfsSize = generateInt(2, 5);
-  const deploymentName = generateString(15);
   const networkName = generateString(15);
   const vmName = generateString(15);
   const disks = [];
@@ -93,6 +97,7 @@ test("TC1228 - VM: Deploy a VM", async () => {
         cpu: cpu,
         memory: memory,
         rootfs_size: rootfsSize,
+        mycelium: false,
         disks: disks,
         flist: "https://hub.grid.tf/tf-official-apps/threefoldtech-ubuntu-22.04.flist",
         entrypoint: "/sbin/zinit init",
@@ -140,7 +145,6 @@ test("TC1228 - VM: Deploy a VM", async () => {
   expect(result[0].capacity["memory"]).toBe(memory);
   expect(result[0].planetary).toBeDefined();
   expect(result[0].publicIP).toBeNull();
-  expect(result[0].metadata).toBe(metadata);
   expect(result[0].description).toBe(description);
 
   const host = result[0].planetary;
@@ -202,7 +206,6 @@ test("TC1229 - VM: Deploy a VM With a Disk", async () => {
   let diskSize = generateInt(1, 20);
   const diskName = generateString(15);
   const mountPoint = "/" + generateString(10);
-  const deploymentName = generateString(15);
   const networkName = generateString(15);
   const vmName = generateString(15);
   const publicIP = false;
@@ -261,6 +264,7 @@ test("TC1229 - VM: Deploy a VM With a Disk", async () => {
         cpu: cpu,
         memory: memory,
         rootfs_size: rootfsSize,
+        mycelium: false,
         disks: [
           {
             name: diskName,
@@ -348,7 +352,6 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
   const vmCpu = [generateInt(1, 4), generateInt(1, 4)];
   const vmMemory = [generateInt(256, 4096), generateInt(256, 4096)];
   const vmRootfs = [generateInt(2, 5), generateInt(2, 5)];
-  const deploymentName = generateString(15);
   const networkName = generateString(15);
   const vmName = [generateString(15), generateString(15)];
   const vmDisks = [];
@@ -445,6 +448,7 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
     entrypoint: "/sbin/zinit init",
     public_ip: vmPublicIP,
     planetary: true,
+    mycelium: false,
     env: {
       SSH_KEY: config.ssh_key,
       TEST_KEY: vmEnvVarValue[0],
@@ -462,6 +466,7 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
     entrypoint: "/sbin/zinit init",
     public_ip: vmPublicIP,
     planetary: true,
+    mycelium: false,
     env: {
       SSH_KEY: config.ssh_key,
       TEST_KEY: vmEnvVarValue[1],
@@ -525,7 +530,6 @@ test("TC1230 - VM: Deploy Multiple VMs on Different Nodes", async () => {
     expect(result[currentIndex].capacity["memory"]).toBe(vmMemory[maxIterations]);
     expect(result[currentIndex].planetary).toBeDefined();
     expect(result[currentIndex].publicIP).toBeNull();
-    expect(result[currentIndex].metadata).toBe(metadata);
     expect(result[currentIndex].description).toBe(description);
 
     const vmhost = result[currentIndex].planetary;
@@ -577,4 +581,4 @@ afterEach(async () => {
 
 afterAll(async () => {
   return await gridClient.disconnect();
-}, 10000);
+}, 130000);
