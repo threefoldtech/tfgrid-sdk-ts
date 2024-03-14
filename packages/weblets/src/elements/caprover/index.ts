@@ -1,0 +1,1 @@
+import "./Caprover.wc.svelte";

@@ -1,0 +1,1 @@
+import "./Kubernetes.wc.svelte";

@@ -1,0 +1,214 @@
+<svelte:options tag="tf-presearch" />
+
+<script lang="ts">
+  import Alert from "../../components/Alert.svelte";
+  import DeployBtn from "../../components/DeployBtn.svelte";
+  import Modal from "../../components/DeploymentModal.svelte";
+  import Input from "../../components/Input.svelte";
+  import SelectNodeId from "../../components/SelectNodeId.svelte";
+  // Components
+  import SelectProfile from "../../components/SelectProfile.svelte";
+  import Tabs from "../../components/Tabs.svelte";
+  import type { IFormField, ITab } from "../../types";
+  import Presearch from "../../types/presearch";
+  import type { IProfile } from "../../types/Profile";
+  import deployPresearch from "../../utils/deployPresearch";
+  import { display } from "../../utils/display";
+  // utils
+  import hasEnoughBalance from "../../utils/hasEnoughBalance";
+  import { noActiveProfile } from "../../utils/message";
+  import normalizeDeploymentErrorMessage from "../../utils/normalizeDeploymentErrorMessage";
+  import rootFs from "../../utils/rootFs";
+  import validateName, { isInvalid, validatePreCode} from "../../utils/validateName"; // prettier-ignore
+
+  const data = new Presearch();
+  let profile: IProfile;
+
+  let loading = false;
+  let success = false;
+  let failed = false;
+
+  let status: "valid" | "invalid";
+
+  const deploymentStore = window.configs?.deploymentStore;
+  const currentDeployment = window.configs?.currentDeploymentStore;
+
+  // Tabs
+  const tabs: ITab[] = [
+    { label: "Base", value: "base" },
+    { label: "Restore", value: "restore" },
+  ];
+  let active = "base";
+
+  // Fields
+  // prettier-ignore
+  const fields: IFormField[] = [
+    { label: "Name", symbol: "name", placeholder: "Presearch Instance Name", type: "text", validator: validateName, invalid: false },
+    { label: "Presearch Registeration Code", symbol: "preCode", placeholder: "Presearch Registeration Code", type: "password", validator: validatePreCode, invalid: false },
+    { label: "Planetary Network", symbol: "planetary", placeholder: "Enable planetary network", type: 'checkbox' },
+    { label: "Public IP", symbol: "publicIp", placeholder: "Enable Public Ip", type: 'checkbox' },
+  ];
+
+  const restoreFields: IFormField[] = [
+    {
+      label: "Private Presearch Restore Key",
+      symbol: "privateRestoreKey",
+      placeholder: "Restore Previous Presearch Node",
+      type: "textarea",
+      invalid: false,
+    },
+    {
+      label: "Public Presearch Restore Key",
+      symbol: "publicRestoreKey",
+      placeholder: "Restore Previous Presearch Node",
+      type: "textarea",
+      invalid: false,
+    },
+  ];
+
+  $: disabled = ((loading || !data.valid) && !(success || failed)) || !profile || status !== "valid" || isInvalid(fields); // prettier-ignore
+
+  let message: string;
+  let modalData: object;
+
+  async function deployPresearchHandler() {
+    loading = true;
+    success = false;
+    failed = false;
+    message = undefined;
+
+    if (!hasEnoughBalance()) {
+      failed = true;
+      loading = false;
+      message = "No enough balance to execute! Transaction requires 2 TFT at least in your wallet.";
+      return;
+    }
+
+    deployPresearch(data, profile)
+      .then(data => {
+        modalData = data.deploymentInfo;
+        deploymentStore.set(0);
+        success = true;
+      })
+      .catch((err: string) => {
+        failed = true;
+        message = normalizeDeploymentErrorMessage(err, "Presearch");
+      })
+      .finally(() => {
+        loading = false;
+      });
+  }
+
+  $: logs = $currentDeployment;
+
+  $: showLogs = loading || (logs !== null && logs.type === "Presearch");
+  $: showNoProfile = !showLogs && !profile;
+  $: showSuccess = !showLogs && !showNoProfile && success;
+  $: showFailed = !showLogs && !showNoProfile && failed;
+  $: showContent = !showLogs && !showNoProfile && !showSuccess && !showFailed;
+</script>
+
+<SelectProfile
+  on:profile={({ detail }) => {
+    profile = detail;
+  }}
+/>
+
+<div style="padding: 15px;">
+  <form class="box" on:submit|preventDefault={deployPresearchHandler}>
+    <h4 class="is-size-4 mb-4">Deploy a Presearch Instance</h4>
+    <p>
+      Presearch is a community-powered, decentralized search engine that provides better results while protecting your
+      privacy and rewarding you when you search. This weblet deploys a Presearch node. Presearch Nodes are used to
+      process user search requests, and node operators earn Presearch PRE tokens for joining and supporting the network.
+      <a target="_blank" href="https://manual.grid.tf/weblets/weblets_presearch.html"> Quick start documentation</a>
+    </p>
+
+    <hr />
+
+    <div style:display={showLogs ? "block" : "none"}>
+      <Alert type="info" message={logs?.message ?? "Loading..."} />
+    </div>
+
+    <div style:display={showNoProfile ? "block" : "none"}>
+      <Alert type="info" message={noActiveProfile} />
+    </div>
+
+    <div style:display={showSuccess ? "block" : "none"}>
+      <Alert type="success" message="Successfully Deployed PreSearch." deployed={true} />
+    </div>
+
+    <div style:display={showFailed ? "block" : "none"}>
+      <Alert type="danger" {message} />
+    </div>
+
+    <div style:display={showContent ? "block" : "none"}>
+      <Tabs bind:active {tabs} />
+
+      <section style={display(active, "base")}>
+        {#each fields as field (field.symbol)}
+          {#if field.invalid !== undefined}
+            <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
+          {:else}
+            <Input bind:data={data[field.symbol]} {field} />
+          {/if}
+        {/each}
+
+        <SelectNodeId
+          cpu={data.cpu}
+          memory={data.memory}
+          publicIp={data.publicIp}
+          ssd={data.diskSize + rootFs(data.cpu, data.memory)}
+          bind:data={data.nodeId}
+          bind:nodeSelection={data.selection.type}
+          bind:status
+          filters={data.selection.filters}
+          {profile}
+          on:fetch={({ detail }) => (data.selection.nodes = detail)}
+          nodes={data.selection.nodes}
+          exclusiveFor="research"
+        />
+      </section>
+      <section style={display(active, "restore")}>
+        <div class="notification is-warning is-light">
+          <p>
+            Only configure these Presearch Restore Keys fields if you want to restore previous node. see backup steps <a
+              href="https://docs.presearch.org/nodes/backing-up-and-migrating-nodes"
+              target="_blank">here</a
+            >.
+          </p>
+        </div>
+        {#each restoreFields as field (field.symbol)}
+          {#if field.invalid !== undefined}
+            <Input bind:data={data[field.symbol]} bind:invalid={field.invalid} {field} />
+          {:else}
+            <Input bind:data={data[field.symbol]} {field} />
+          {/if}
+        {/each}
+      </section>
+    </div>
+
+    <DeployBtn
+      {disabled}
+      {loading}
+      {success}
+      {failed}
+      on:click={e => {
+        if (success || failed) {
+          e.preventDefault();
+          success = false;
+          failed = false;
+          loading = false;
+        }
+      }}
+    />
+  </form>
+</div>
+
+{#if modalData}
+  <Modal data={modalData} on:closed={() => (modalData = null)} />
+{/if}
+
+<style lang="scss" scoped>
+  @import url("https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css");
+</style>

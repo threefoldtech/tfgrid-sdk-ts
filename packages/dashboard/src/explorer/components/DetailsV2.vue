@@ -1,0 +1,184 @@
+<template>
+  <v-bottom-sheet v-model="open" persistent no-click-animation @click:outside="$emit('close-sheet')">
+    <v-sheet :class="{ 'text-center': true, loading: loading }" height="90vh">
+      <div class="content" v-if="!loading">
+        <v-row>
+          <v-col v-if="node">
+            <NodeUsedResources :nodeStatistics="nodeStatistics" :nodeStatus="node.status" :grafanaUrl="grafanaUrl" />
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="node">
+            <NodeDetails :node="node" :nodeStatistics="nodeStatistics" />
+          </v-col>
+
+          <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="data.farm">
+            <FarmDetails :farm="data.farm" />
+          </v-col>
+
+          <v-col
+            :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4"
+            v-if="node && node.country && node.location"
+          >
+            <LocationDetails :country="node.country" :location="node.location" />
+          </v-col>
+
+          <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="nodePublicConfig()">
+            <PublicConfigDetails :config="node.publicConfig" />
+          </v-col>
+
+          <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="country">
+            <CountryDetails :country="node.country" :city="node.city" :location="node.location" :code="country.code" />
+          </v-col>
+
+          <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="data.twin">
+            <TwinDetails :twin="data.twin" :title="node ? 'Node Twin Details' : 'Farm Twin Details'" />
+          </v-col>
+
+          <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="node && interfaces">
+            <InterfacesDetails :interfaces="interfaces" />
+          </v-col>
+
+          <v-col :cols="screen_max_700.matches ? 12 : screen_max_1200.matches ? 6 : 4" v-if="node && node.num_gpu > 0">
+            <GPUDetails :nodeId="nodeId" />
+          </v-col>
+        </v-row>
+      </div>
+      <div v-if="loading" class="d-flex justify-center" style="height: 100%">
+        <div class="align-self-center">
+          <v-progress-circular indeterminate color="primary" :size="100" />
+          <p class="pt-4">Loading Node {{ nodeId ?? "" }} details</p>
+        </div>
+      </div>
+    </v-sheet>
+  </v-bottom-sheet>
+</template>
+
+<script lang="ts">
+import axios from "axios";
+import { DocumentNode } from "graphql";
+import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+
+import { ICountry, INode, INodeStatistics } from "../graphql/api";
+import { GrafanaStatistics } from "../utils/getMetricsUrl";
+import mediaMatcher from "../utils/mediaMatcher";
+import CountryDetails from "./CountryDetails.vue";
+import FarmDetails from "./FarmDetails.vue";
+import GPUDetails from "./GPUDetails.vue";
+import InterfacesDetails from "./InterfacesDetails.vue";
+import LocationDetails from "./LocationDetails.vue";
+import NodeDetails from "./NodeDetails.vue";
+import NodeUsedResources from "./NodeUsedResources.vue";
+import PublicConfigDetails from "./PublicConfigDetails.vue";
+import TwinDetails from "./TwinDetails.vue";
+
+@Component({
+  components: {
+    CountryDetails,
+    NodeDetails,
+    FarmDetails,
+    LocationDetails,
+    TwinDetails,
+    PublicConfigDetails,
+    InterfacesDetails,
+    GPUDetails,
+    NodeUsedResources,
+  },
+})
+export default class Details extends Vue {
+  @Prop({ required: true }) open!: boolean;
+  @Prop({ required: true }) query!: DocumentNode;
+  @Prop({ required: true }) variables!: { [key: string]: any };
+  @Prop() nodeId: any;
+
+  loading = false;
+  grafanaUrl = "";
+  interfaces = undefined;
+  data: any = {};
+
+  get node(): INode {
+    return this.data.node;
+  }
+
+  get nodeStatistics(): INodeStatistics {
+    return this.data.nodeStatistics;
+  }
+
+  get country(): ICountry {
+    return this.data.country;
+  }
+
+  screen_max_1200 = mediaMatcher("(max-width: 1200px)");
+  screen_max_700 = mediaMatcher("(max-width: 700px)");
+
+  @Watch("open", { immediate: true })
+  onOpenChange() {
+    if (!this.open) return;
+    this.loading = true;
+    const { query, variables } = this;
+    this.$apollo
+      .query({ query, variables })
+      .then(async ({ data }) => {
+        this.data = Object.keys(data).reduce((res, key) => {
+          res[key] = res[key][0];
+          return res;
+        }, data);
+        // update with the data from grid proxy
+        this.interfaces = data.node.interfaces;
+        if (this.nodeId) {
+          this.data.node = await fetch(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}`).then(res =>
+            res.json(),
+          );
+          try {
+            this.data.nodeStatistics = await (
+              await axios.get(`${window.configs.APP_GRIDPROXY_URL}/nodes/${this.nodeId}/statistics`, {
+                timeout: 5000,
+              })
+            ).data;
+          } catch (error) {
+            console.log(error);
+          }
+          this.data.node.status = this.data.node.status === "up";
+          const grafana: GrafanaStatistics = new GrafanaStatistics(this.data.node, this.data.twin.accountId);
+          this.grafanaUrl = grafana.getUrl();
+        }
+      })
+      .catch(() => {
+        /* pass */
+      })
+      .finally(() => {
+        this.loading = false;
+      });
+  }
+  destroyed() {
+    this.screen_max_1200.destry();
+    this.screen_max_700.destry();
+  }
+
+  nodePublicConfig() {
+    return this.node &&
+      this.node.publicConfig &&
+      this.node.publicConfig?.domain.length > 0 &&
+      this.node.publicConfig?.gw4.length > 0 &&
+      this.node.publicConfig?.gw6.length > 0 &&
+      this.node.publicConfig?.ipv4.length > 0 &&
+      this.node.publicConfig?.ipv6.length > 0
+      ? true
+      : false;
+  }
+}
+</script>
+<style lang="scss" scoped>
+.content {
+  text-align: left;
+  overflow-x: hidden;
+  overflow-y: auto;
+  will-change: transform;
+  height: 100%;
+  padding: 20px;
+}
+.loading {
+  cursor: wait;
+}
+</style>

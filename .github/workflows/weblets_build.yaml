@@ -1,0 +1,48 @@
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code using yarn build:app
+
+name: Weblets Build
+
+on:
+  push:
+    branches:
+      - development
+    paths:
+      - "packages/weblets/**"
+  pull_request:
+    branches:
+      - development
+    paths:
+      - "packages/weblets/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: ["18.16.0"]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+          cache-dependency-path: "**/yarn.lock"
+
+      - name: Install dependencies
+        run: |
+          yarn install
+          cd packages/weblets/playground
+          yarn install
+
+      - name: Build
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192 --openssl-legacy-provider"
+        run: |
+          lerna run build --no-private
+          cd packages/weblets
+          yarn build:app
