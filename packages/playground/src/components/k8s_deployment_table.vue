@@ -178,9 +178,9 @@ async function loadDeployments() {
   count.value = clusters.count;
   items.value = clusters.items.map((item: any) => {
     item.name = item.deploymentName;
-    item.ipv4 = item.masters[0].publicIP?.ip?.split("/")?.[0] || item.masters[0].publicIP?.ip || "None";
-    item.ipv6 = item.masters[0].publicIP?.ip6 || "None";
-    item.planetary = item.masters[0].planetary || "None";
+    item.ipv4 = item.masters[0].publicIP?.ip?.split("/")?.[0] || item.masters[0].publicIP?.ip || "-";
+    item.ipv6 = item.masters[0].publicIP?.ip6.replace(/\/64$/, "") || "-";
+    item.planetary = item.masters[0].planetary || "-";
     item.workersLength = item.workers.length;
     item.billing = item.masters[0].billing;
     item.created = item.masters[0].created;

@@ -16,7 +16,7 @@
     </v-tooltip>
 
     <template v-if="showDialogue">
-      <v-dialog v-model="showDialogue" max-width="600">
+      <v-dialog v-model="showDialogue" max-width="600" @click:outside="reset">
         <v-card>
           <v-toolbar color="primary" dark class="custom-toolbar">
             <p class="mb-5">Add a public config to your node with ID: {{ $props.nodeId }}</p>
@@ -112,7 +112,15 @@
 
             <!-- Close and Save Buttons -->
             <div>
-              <v-btn @click="showDialogue = false" variant="outlined" color="anchor">Close</v-btn>
+              <v-btn
+                @click="
+                  showDialogue = false;
+                  reset();
+                "
+                variant="outlined"
+                color="anchor"
+                >Close</v-btn
+              >
               <v-btn
                 color="secondary"
                 variant="outlined"
@@ -239,7 +247,10 @@ export default {
             ip4: { ip: config.value.ipv4, gw: config.value.gw4 },
             ip6:
               config.value.ipv6 && config.value.gw6
-                ? { ip: config.value.ipv6 as string, gw: config.value.gw6 as string }
+                ? {
+                    ip: config.value.ipv6 as string,
+                    gw: config.value.gw6 as string,
+                  }
                 : null,
             domain: config.value.domain || null,
           },
@@ -285,6 +296,13 @@ export default {
       config.value = defualtNodeConfig.value;
     }
 
+    function reset() {
+      config.value.ipv4 = defualtNodeConfig.value.ipv4;
+      config.value.ipv6 = defualtNodeConfig.value.ipv6;
+      config.value.gw4 = defualtNodeConfig.value.gw4;
+      config.value.gw6 = defualtNodeConfig.value.gw6;
+      config.value.domain = defualtNodeConfig.value.domain;
+    }
     return {
       showDialogue,
       isAdding,
@@ -298,6 +316,7 @@ export default {
       AddConfig,
       removeConfig,
       isNodeHasConfig,
+      reset,
     };
   },
 };
