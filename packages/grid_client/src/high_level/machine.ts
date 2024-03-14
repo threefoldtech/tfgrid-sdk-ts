@@ -81,7 +81,12 @@ class VMHL extends HighLevelBase {
       // If Available for twinId (dedicated), check it's not in grace period
       const nodeInfo = await this.nodes.getNode(nodeId);
       if (nodeInfo.rentContractId !== 0) {
-        await this.config.tfclient.contracts.get({ id: nodeInfo.rentContractId });
+        const contract = await this.config.tfclient.contracts.get({ id: nodeInfo.rentContractId });
+        if (contract && contract.state.gracePeriod) {
+          throw new GridClientErrors.Nodes.UnavailableNodeError(
+            `Can't deploy on node: ${nodeId}, its rent contract in grace period.`,
+          );
+        }
       }
     }
 
