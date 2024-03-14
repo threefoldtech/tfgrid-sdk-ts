@@ -201,7 +201,7 @@ async function loadDeployments() {
   const chunk3 =
     props.projectName.toLowerCase() === ProjectName.VM.toLowerCase()
       ? await loadVms(updateGrid(grid!, { projectName: "" }))
-      : { count: 0, items: [] };
+      : { count: 0, items: [], failedDeployments: [] };
 
   if (chunk3.count > 0 && migrateGateways) {
     await migrateModule(grid!.gateway);
