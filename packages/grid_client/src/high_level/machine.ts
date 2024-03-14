@@ -73,6 +73,7 @@ class VMHL extends HighLevelBase {
     }
 
     const twinId = this.config.twinId;
+    let contract;
     if (!(await this.nodes.nodeAvailableForTwinId(nodeId, twinId))) {
       throw new GridClientErrors.Nodes.UnavailableNodeError(
         `Node ${nodeId} is not available for user with twinId: ${twinId}, maybe it's rented by another user or node is dedicated. use capacity planning with availableFor option.`,
@@ -80,7 +81,9 @@ class VMHL extends HighLevelBase {
     } else {
       // If Available for twinId (dedicated), check it's not in grace period
       const nodeInfo = await this.nodes.getNode(nodeId);
-      const contract = await this.config.tfclient.contracts.get({ id: nodeInfo.rentContractId });
+      if (nodeInfo.rentContractId !== 0) {
+        contract = await this.config.tfclient.contracts.get({ id: nodeInfo.rentContractId });
+      }
       if (contract && contract.state.gracePeriod) {
         throw new GridClientErrors.Nodes.UnavailableNodeError(
           `Can't deploy on node: ${nodeId}, its rent contract in grace period.`,
