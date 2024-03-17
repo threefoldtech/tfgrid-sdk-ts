@@ -53,7 +53,13 @@
       tooltip="Didn't find your deployments in the list? Enable to show all deployments."
       inline
     >
-      <VSwitch inset color="primary" label="Show All Deployments" v-model="showAllDeployments" />
+      <VSwitch
+        inset
+        color="primary"
+        label="Show All Deployments"
+        v-model="showAllDeployments"
+        @update:model-value="loadDeployments"
+      />
     </InputTooltip>
 
     <ListTable
@@ -155,7 +161,7 @@ import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 import { useProfileManager } from "../stores";
 import { getGrid, updateGrid } from "../utils/grid";
 import { markAsFromAnotherClient } from "../utils/helpers";
-import { loadVms, mergeLoadedDeployments } from "../utils/load_deployment";
+import { type LoadedDeployments, loadVms, mergeLoadedDeployments } from "../utils/load_deployment";
 
 const profileManager = useProfileManager();
 
@@ -197,17 +203,19 @@ async function loadDeployments() {
   if (chunk2.count > 0 && migrateGateways) {
     await migrateModule(grid!.gateway);
   }
+  let chunk3: LoadedDeployments<any[]> = { count: 0, items: [], failedDeployments: [] };
+  if (showAllDeployments.value) {
+    chunk3 =
+      props.projectName.toLowerCase() === ProjectName.VM.toLowerCase()
+        ? await loadVms(updateGrid(grid!, { projectName: "" }))
+        : { count: 0, items: [], failedDeployments: [] };
 
-  const chunk3 =
-    props.projectName.toLowerCase() === ProjectName.VM.toLowerCase()
-      ? await loadVms(updateGrid(grid!, { projectName: "" }))
-      : { count: 0, items: [], failedDeployments: [] };
+    if (chunk3.count > 0 && migrateGateways) {
+      await migrateModule(grid!.gateway);
+    }
 
-  if (chunk3.count > 0 && migrateGateways) {
-    await migrateModule(grid!.gateway);
+    chunk3.items = chunk3.items.map(markAsFromAnotherClient);
   }
-
-  chunk3.items = chunk3.items.map(markAsFromAnotherClient);
 
   const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
   failedDeployments.value = vms.failedDeployments;
