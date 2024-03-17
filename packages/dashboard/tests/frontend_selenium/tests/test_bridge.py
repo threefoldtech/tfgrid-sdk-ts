@@ -92,7 +92,7 @@ def test_how_it_done(browser):
     """
     bridge_page = before_test_setup(browser)
     bridge_page.transfer_chain()
-    assert bridge_page.how_it_done() in 'https://manual.grid.tf/threefold_token/tft_bridges/tfchain_stellar_bridge.html#how-to-use-the-tfchain-stellar-bridge'
+    assert bridge_page.how_it_done() in 'https://www.manual.grid.tf/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge.html'
 
 
 def test_check_deposit(browser):

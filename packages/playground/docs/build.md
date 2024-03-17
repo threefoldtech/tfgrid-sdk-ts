@@ -14,10 +14,10 @@ bash ../scripts/build-env.sh
 - By default, it runs on dev mode. the values already sat on the config file. if you want to change the mode
 
   ```bash
-  export MODE=dev | qa | test | main | custom
+  export MODE=dev | qa | test | main
   ```
 
-- In case you chose `custom` you will need to provide all the needed values which is
+- The user is now restricted to using only the following four networks main, dev, qa and test. If not set the network's default urls will be used.
 
   - GRAPHQL_URL
   - GRIDPROXY_URL
@@ -25,6 +25,8 @@ bash ../scripts/build-env.sh
   - ACTIVATION_SERVICE_URL
   - RELAY_DOMAIN
   - BRIDGE_TFT_ADDRESS
+  - STATS_URL
+  - STELLAR_NETWORK
 
 - The backend payments are done with stellar so you need to decide which network of stellar you want to connect to
 

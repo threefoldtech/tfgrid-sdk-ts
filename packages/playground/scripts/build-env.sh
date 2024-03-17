@@ -8,16 +8,6 @@ PAGE_SIZE="${PAGE_SIZE:=20}"
 MINTING_URL="https://alpha.minting.tfchain.grid.tf"
 STATS_URL="https://stats.grid.tf"
 
-# Env vars must provide in `custom` mode
-REQUIRED_ENV_VARS=(
-    GRAPHQL_URL
-    GRIDPROXY_URL
-    SUBSTRATE_URL
-    ACTIVATION_SERVICE_URL
-    RELAY_DOMAIN
-    BRIDGE_TFT_ADDRESS
-    MINTING_URL
-)
 
 STELLAR_ENV_Vars=(
     STELLAR_HORIZON_URL
@@ -25,66 +15,53 @@ STELLAR_ENV_Vars=(
 )
 
 case $MODE in
-  "dev")
-    GRAPHQL_URL='https://graphql.dev.grid.tf/graphql'
-    GRIDPROXY_URL='https://gridproxy.dev.grid.tf'
-    SUBSTRATE_URL='wss://tfchain.dev.grid.tf/ws'
-    ACTIVATION_SERVICE_URL='https://activation.dev.grid.tf/activation/activate'
-    RELAY_DOMAIN='wss://relay.dev.grid.tf'
-    BRIDGE_TFT_ADDRESS=GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG
-    STATS_URL='https://stats.dev.grid.tf'
-    STELLAR_NETWORK=test
-  ;;
-
-  "qa")
-    GRAPHQL_URL='https://graphql.qa.grid.tf/graphql'
-    GRIDPROXY_URL='https://gridproxy.qa.grid.tf'
-    SUBSTRATE_URL='wss://tfchain.qa.grid.tf/ws'
-    ACTIVATION_SERVICE_URL='https://activation.qa.grid.tf/activation/activate'
-    RELAY_DOMAIN='wss://relay.qa.grid.tf'
-    BRIDGE_TFT_ADDRESS=GAQH7XXFBRWXT2SBK6AHPOLXDCLXVFAKFSOJIRMRNCDINWKHGI6UYVKM
-    STATS_URL='https://stats.qa.grid.tf'
-    STELLAR_NETWORK=test
-  ;;
-
-  "test")
-    GRAPHQL_URL='https://graphql.test.grid.tf/graphql'
-    GRIDPROXY_URL='https://gridproxy.test.grid.tf'
-    SUBSTRATE_URL='wss://tfchain.test.grid.tf/ws'
-    ACTIVATION_SERVICE_URL='https://activation.test.grid.tf/activation/activate'
-    RELAY_DOMAIN='wss://relay.test.grid.tf'
-    BRIDGE_TFT_ADDRESS=GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4
-    STATS_URL='https://stats.test.grid.tf'
-    STELLAR_NETWORK=main
-  ;;
-
-  "main")
-    GRAPHQL_URL='https://graphql.grid.tf/graphql'
-    GRIDPROXY_URL='https://gridproxy.grid.tf'
-    SUBSTRATE_URL='wss://tfchain.grid.tf/ws'
-    ACTIVATION_SERVICE_URL='https://activation.grid.tf/activation/activate'
-    RELAY_DOMAIN='wss://relay.grid.tf'
-    BRIDGE_TFT_ADDRESS=GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC
-    STELLAR_NETWORK=main
-  ;;
-
-  "custom")
-    for i in "${REQUIRED_ENV_VARS[@]}"
-    do
-      if ! [[ -v $i ]]; then
-        echo -e "\n\e[1;50m \e[1;31m$i is required!\e[0m\n \e[1;3mPlease set it by executing the following command."
-        echo -e "\e[1;31m export\e[0m \e[1;32m$i\e[0m=\e[1;38m'Your Value Here'\n"
+    "dev")
+        GRAPHQL_URL="${GRAPHQL_URL:-https://graphql.dev.grid.tf/graphql}"
+        GRIDPROXY_URL="${GRIDPROXY_URL:-https://gridproxy.dev.grid.tf}"
+        SUBSTRATE_URL="${SUBSTRATE_URL:-wss://tfchain.dev.grid.tf/ws}"
+        ACTIVATION_SERVICE_URL="${ACTIVATION_SERVICE_URL:-https://activation.dev.grid.tf/activation/activate}"
+        RELAY_DOMAIN="${RELAY_DOMAIN:-wss://relay.dev.grid.tf}"
+        BRIDGE_TFT_ADDRESS="${BRIDGE_TFT_ADDRESS:-GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG}"
+        STATS_URL="${STATS_URL:-https://stats.dev.grid.tf}"
+        STELLAR_NETWORK="${STELLAR_NETWORK:-test}"
+    ;;
+    "qa")
+        GRAPHQL_URL="${GRAPHQL_URL:-https://graphql.qa.grid.tf/graphql}"
+        GRIDPROXY_URL="${GRIDPROXY_URL:-https://gridproxy.qa.grid.tf}"
+        SUBSTRATE_URL="${SUBSTRATE_URL:-wss://tfchain.qa.grid.tf/ws}"
+        ACTIVATION_SERVICE_URL="${ACTIVATION_SERVICE_URL:-https://activation.qa.grid.tf/activation/activate}"
+        RELAY_DOMAIN="${RELAY_DOMAIN:-wss://relay.qa.grid.tf}"
+        BRIDGE_TFT_ADDRESS="${BRIDGE_TFT_ADDRESS:-GAQH7XXFBRWXT2SBK6AHPOLXDCLXVFAKFSOJIRMRNCDINWKHGI6UYVKM}"
+        STATS_URL="${STATS_URL:-https://stats.qa.grid.tf}"
+        STELLAR_NETWORK="${STELLAR_NETWORK:-test}"
+    ;;
+    "test")
+        GRAPHQL_URL="${GRAPHQL_URL:-https://graphql.test.grid.tf/graphql}"
+        GRIDPROXY_URL="${GRIDPROXY_URL:-https://gridproxy.test.grid.tf}"
+        SUBSTRATE_URL="${SUBSTRATE_URL:-wss://tfchain.test.grid.tf/ws}"
+        ACTIVATION_SERVICE_URL="${ACTIVATION_SERVICE_URL:-https://activation.test.grid.tf/activation/activate}"
+        RELAY_DOMAIN="${RELAY_DOMAIN:-wss://relay.test.grid.tf}"
+        BRIDGE_TFT_ADDRESS="${BRIDGE_TFT_ADDRESS:-GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4}"
+        STATS_URL="${STATS_URL:-https://stats.test.grid.tf}"
+        STELLAR_NETWORK="${STELLAR_NETWORK:-main}"
+    ;;
+    "main")
+        GRAPHQL_URL="${GRAPHQL_URL:-https://graphql.grid.tf/graphql}"
+        GRIDPROXY_URL="${GRIDPROXY_URL:-https://gridproxy.grid.tf}"
+        SUBSTRATE_URL="${SUBSTRATE_URL:-wss://tfchain.grid.tf/ws}"
+        ACTIVATION_SERVICE_URL="${ACTIVATION_SERVICE_URL:-https://activation.grid.tf/activation/activate}"
+        RELAY_DOMAIN="${RELAY_DOMAIN:-wss://relay.grid.tf}"
+        BRIDGE_TFT_ADDRESS="${BRIDGE_TFT_ADDRESS:-GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC}"
+        STATS_URL="${STATS_URL:-https://stats.grid.tf}"
+        STELLAR_NETWORK="${STELLAR_NETWORK:-main}"
+    ;;
+    *)
+        echo "Unknown 'MODE' selected! Acceptable modes are [dev | qa | test | main ]"
         return
-      fi
-    done
-    echo -e "\e[1;33mEnvironment variables were exported before, if you want to change any of them maybe you have to re-export them or close the terminal window and start from scratch."
-  ;;
-
-  *)
-    echo "Unknown 'MODE' selected!, Acceptable modes are [dev | qa | test | main | custom]\n"
-    return
-  ;;
+    ;;
 esac
+
+
 
 case $STELLAR_NETWORK in
   "test")

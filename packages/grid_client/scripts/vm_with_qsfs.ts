@@ -38,10 +38,10 @@ async function deleteQsfs(client, qsfs) {
 }
 
 async function main() {
-  const grid3 = await getClient();
+  const name = "wed2710t1";
+  const grid3 = await getClient(`vm/${name}`);
 
   const qsfs_name = "wed2710q1";
-  const machines_name = "wed2710t1";
 
   const vmQueryOptions: FilterOptions = {
     cru: 1,
@@ -57,7 +57,7 @@ async function main() {
     farmId: 1,
   };
 
-  const qsfsNodes = [];
+  const qsfsNodes: number[] = [];
 
   const allNodes = await grid3.capacity.filterNodes(qsfsQueryOptions);
   if (allNodes.length >= 2) {
@@ -79,7 +79,7 @@ async function main() {
   };
 
   const vms: MachinesModel = {
-    name: machines_name,
+    name,
     network: {
       name: "wed2710n1",
       ip_range: "10.201.0.0/16",
@@ -132,10 +132,10 @@ async function main() {
   await deploy(grid3, vms);
 
   //Get the deployment
-  await getDeployment(grid3, vms.name);
+  await getDeployment(grid3, name);
 
   //Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name: machines_name });
+  // await cancel(grid3, { name });
   // await deleteQsfs(grid3, { name: qsfs_name });
 
   await grid3.disconnect();

@@ -28,7 +28,7 @@ export async function deployK8s(grid: GridClient, options: DeployK8SOptions) {
   k8s.ssh_key = options.sshKey;
   await grid.k8s.deploy(k8s);
   const data = (await loadK8S(grid, k8s.name)) as { masters: any[]; workers: any[]; wireguard?: string };
-  const wireguard = await getWireguardConfig(grid, k8s.network.name).catch(() => []);
+  const wireguard = await getWireguardConfig(grid, k8s.network.name, k8s.network.ip_range).catch(() => []);
   data.wireguard = wireguard[0];
   return data;
 }

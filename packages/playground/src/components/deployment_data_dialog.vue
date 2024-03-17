@@ -52,6 +52,7 @@
               </template>
 
               <CopyReadonlyInput label="Planetary Network IP" :data="contract.planetary" v-if="contract.planetary" />
+              <CopyReadonlyInput label="Mycelium Network IP" :data="contract.myceliumIP" v-if="contract.myceliumIP" />
 
               <CopyReadonlyInput label="Network Name" :data="contract.interfaces[0].network" />
               <CopyReadonlyInput label="CPU (vCores)" :data="contract.capacity.cpu" />
