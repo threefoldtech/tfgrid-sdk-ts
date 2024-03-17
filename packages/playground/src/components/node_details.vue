@@ -36,7 +36,7 @@
       <v-card class="w-75 mx-auto">
         <node-resources-charts :node="node" :is-live-stats="isLiveStats" :hint-message="errorLoadingStatsMessage" />
         <v-row class="pa-8 mt-5" justify-md="start" justify-sm="center">
-          <v-col cols="12" md="6">
+          <v-col cols="12" md="6" sm="12">
             <node-details-card :node="node" />
             <farm-details-card class="mt-5" :node="node" />
             <interfaces-details-card class="mt-5" :node="node" />
@@ -48,16 +48,31 @@
 
             <cpu-benchmark-card v-if="hasActiveProfile && node.healthy" class="mt-5" :node="node" />
           </v-col>
-          <v-col cols="12" md="6">
+          <v-col cols="12" md="6" sm="12">
             <country-details-card :node="node" />
-            <twin-details-card class="mt-3" :node="node" />
-            <gpu-details-card
-              class="mt-4"
-              v-if="node.cards?.length || node.num_gpu > 0"
-              :node="node"
-              :nodeOptions="nodeOptions"
-            />
-            <i-perf-card class="mt-5" v-if="hasActiveProfile && node.healthy" :node="node" />
+            <location-details-card class="mt-5" :node="node" />
+          </v-col>
+          <v-col cols="12" md="6" sm="12">
+            <farm-details-card :node="node" />
+          </v-col>
+          <v-col cols="12" md="6" sm="12">
+            <twin-details-card :node="node" />
+          </v-col>
+          <v-col cols="12" md="6" sm="12">
+            <interfaces-details-card :node="node" />
+          </v-col>
+          <v-col v-if="node.cards?.length || node.num_gpu > 0" cols="12" md="6" sm="12">
+            <gpu-details-card :node="node" :nodeOptions="nodeOptions" />
+          </v-col>
+          <v-col v-if="node.publicConfig && node.publicConfig.domain" cols="12" md="6" sm="12">
+            <public-config-details-card :node="node" />
+          </v-col>
+
+          <v-col v-if="hasActiveProfile && node.healthy" cols="12" md="6" sm="12">
+            <i-perf-card :node="node" />
+          </v-col>
+          <v-col v-if="hasActiveProfile && node.healthy" cols="12" md="6" sm="12">
+            <cpu-benchmark-card :node="node" />
           </v-col>
         </v-row>
       </v-card>
