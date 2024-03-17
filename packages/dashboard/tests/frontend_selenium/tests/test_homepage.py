@@ -36,7 +36,7 @@ def test_manual_page(browser):
       Result: User should be navigated to the manual page.
     """
     dashboard_page = before_test_setup(browser)
-    assert dashboard_page.navigate_to_manual() == 'https://manual.grid.tf/getstarted/tfgrid3_getstarted.html'
+    assert dashboard_page.navigate_to_manual() == 'https://www.manual.grid.tf/documentation/system_administrators/getstarted/tfgrid3_getstarted.html'
 
 
 def test_create_account(browser):
@@ -145,7 +145,7 @@ def test_login_links(browser):
     password = generate_string()
     dashboard_page.import_account(get_seed())
     dashboard_page.connect_your_wallet(password).click()
-    assert dashboard_page.manual_link() == 'https://manual.grid.tf/dashboard/dashboard.html#tfchain-wallet'
-    assert dashboard_page.connect_manual_link() == 'https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html'
+    assert dashboard_page.manual_link() == 'https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html'
+    assert dashboard_page.connect_manual_link() == 'https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html'
     assert dashboard_page.get_connect_google_link() == 'https://play.google.com/store/apps/details?id=org.jimber.threebotlogin&hl=en&gl=US'
     assert dashboard_page.get_connect_apple_link() == 'https://apps.apple.com/us/app/threefold-connect/id1459845885'

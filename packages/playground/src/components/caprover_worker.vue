@@ -22,11 +22,12 @@
       :small="{ cpu: 1, memory: 2, disk: 50 }"
       :medium="{ cpu: 2, memory: 4, disk: 100 }"
     />
+    <Networks v-model:mycelium="$props.modelValue.mycelium" />
 
     <input-tooltip
       inline
       tooltip="Click to know more about dedicated machines."
-      href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+      href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
     >
       <v-switch color="primary" inset label="Dedicated" v-model="$props.modelValue.dedicated" />
     </input-tooltip>
@@ -52,18 +53,19 @@
 <script lang="ts">
 import { computed, type PropType } from "vue";
 
+import Networks from "../components/networks.vue";
 import type { CaproverWorker } from "../types";
 import rootFs from "../utils/root_fs";
 import { generateName } from "../utils/strings";
 import SelectSolutionFlavor from "./select_solution_flavor.vue";
 
 export function createWorker(name: string = generateName({ prefix: "wr" })): CaproverWorker {
-  return { name };
+  return { name, mycelium: false };
 }
 
 export default {
   name: "CaproverWorker",
-  components: { SelectSolutionFlavor },
+  components: { SelectSolutionFlavor, Networks },
   props: { modelValue: { type: Object as PropType<CaproverWorker>, required: true } },
   setup(props) {
     const rootFilesystemSize = computed(() => {

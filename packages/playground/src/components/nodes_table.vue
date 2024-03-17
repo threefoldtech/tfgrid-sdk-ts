@@ -19,7 +19,6 @@
           @update:page="$emit('update:page', $event)"
           @update:items-per-page="$emit('update:size', $event)"
           class="elevation-1 v-data-table-header"
-          density="compact"
           :disable-sort="true"
           hide-default-header
           :hover="true"
@@ -52,6 +51,15 @@
               </v-chip>
             </p>
           </template>
+
+          <template v-slot:[`item.actions`]="{ item }">
+            <reserve-btn
+              v-if="item.columns.dedicated && item.columns.status !== 'down'"
+              :node="(item.raw as unknown as GridNode)"
+              @updateTable="$emit('reloadTable', item.raw.nodeId)"
+            />
+            <span v-else>-</span>
+          </template>
         </v-data-table-server>
       </v-col>
     </v-row>
@@ -64,12 +72,12 @@ import type { PropType } from "vue";
 import { capitalize } from "vue";
 import type { VDataTable } from "vuetify/labs/VDataTable";
 
+import ReserveBtn from "@/dashboard/components/reserve_action_btn.vue";
 import formatResourceSize from "@/utils/format_resource_size";
 import { getNodeStatusColor, getNodeTypeColor } from "@/utils/get_nodes";
 import toReadableDate from "@/utils/to_readable_data";
-
 export default {
-  emits: ["update:page", "update:size", "open-dialog"],
+  emits: ["update:page", "update:size", "open-dialog", "reloadTable"],
   props: {
     size: {
       required: true,
@@ -92,9 +100,11 @@ export default {
       type: Boolean,
     },
   },
+  components: {
+    ReserveBtn,
+  },
   setup(_, { emit }) {
     const nodeStatusOptions = [NodeStatus.Up, NodeStatus.Down];
-
     const headers: VDataTable["headers"] = [
       { title: "ID", key: "nodeId", sortable: false },
       { title: "Farm ID", key: "farmId", align: "start", sortable: false },
@@ -131,6 +141,7 @@ export default {
       { title: "Uptime", key: "uptime", align: "start", sortable: false, value: item => toReadableDate(item.uptime) },
       { title: "Status", key: "status", align: "start", sortable: false },
       { title: "Type", key: "dedicated", align: "start", sortable: false },
+      { title: "Actions", key: "actions", align: "start", sortable: false },
     ];
 
     const openSheet = (_e: any, { item }: any) => {
@@ -154,9 +165,6 @@ export default {
 .v-data-table-header td {
   white-space: nowrap;
   font-size: 14px;
-}
-.v-data-table__tr {
-  line-height: 55px;
 }
 .v-data-table__thead {
   line-height: 60px;

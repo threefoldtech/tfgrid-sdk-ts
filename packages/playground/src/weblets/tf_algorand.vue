@@ -28,6 +28,7 @@
           <v-text-field label="Name" v-model="name" v-bind="props" />
         </input-tooltip>
       </input-validator>
+      <Networks v-model:mycelium="mycelium" />
       <v-switch color="primary" inset label="IPv4" v-model="ipv4" hide-details />
 
       <AlgorandCapacity
@@ -140,7 +141,7 @@
       <input-tooltip
         inline
         tooltip="Click to know more about dedicated machines."
-        href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+        href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
       >
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
       </input-tooltip>
@@ -199,6 +200,7 @@ const flist: Flist = {
 };
 const name = ref(generateName({ prefix: "al" }));
 const ipv4 = ref(false);
+const mycelium = ref(false);
 const cpu = ref() as Ref<number>;
 const memory = ref() as Ref<number>;
 const storage = ref() as Ref<number>;
@@ -246,6 +248,7 @@ async function deploy() {
               : [],
           rootFilesystemSize: rootFilesystemSize.value,
           publicIpv4: ipv4.value,
+          mycelium: mycelium.value,
           planetary: true,
           nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
@@ -291,12 +294,13 @@ function customLastRoundValidation(validators: Validators) {
 
 <script lang="ts">
 import AlgorandCapacity from "../components/algorand_capacity.vue";
+import Networks from "../components/networks.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { normalizeError } from "../utils/helpers";
 
 export default {
   name: "TfAlgorand",
-  components: { AlgorandCapacity },
+  components: { AlgorandCapacity, Networks },
 };
 </script>

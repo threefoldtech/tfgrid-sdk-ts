@@ -23,11 +23,12 @@ if (network === undefined || mnemonic === undefined || ssh_key === undefined) {
   };
 }
 
-async function getClient(): Promise<GridClient> {
+async function getClient(projectName = ""): Promise<GridClient> {
   const gridClient = new GridClient({
     network: config.network,
     mnemonic: config.mnemonic,
     storeSecret: config.storeSecret,
+    projectName,
   });
   await gridClient.connect();
   return gridClient;

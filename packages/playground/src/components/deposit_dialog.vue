@@ -15,13 +15,14 @@
                 <div class="mb-2">
                   <p class="mb-8">
                     Deposit your TFTs to Threefold Bridge using a
-                    {{ selectedName ? selectedName.charAt(0).toUpperCase() + selectedName.slice(1) : "" }} transaction.
+                    {{ selectedName ? selectedName.charAt(0).toUpperCase() + selectedName.slice(1) : "" }}
+                    transaction.
                   </p>
                 </div>
                 <input-tooltip
                   v-if="selectedName == 'stellar'"
                   tooltip="Threefold Staller account"
-                  href="https://stellar.expert/explorer/testnet/account/GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG"
+                  :href="stellarLink"
                   target="_blank"
                 >
                   <CopyReadonlyInput label="Destination" :data="depositWallet"></CopyReadonlyInput>
@@ -31,7 +32,7 @@
                 <v-btn
                   variant="outlined"
                   color="secondary"
-                  href="https://manual.grid.tf/threefold_token/tft_bridges/tft_bridges.html"
+                  href="https://www.manual.grid.tf/documentation/threefold_token/tft_bridges/tft_bridges.html"
                   target="_blank"
                   >Learn more?</v-btn
                 >
@@ -80,7 +81,7 @@
 
 <script setup lang="ts">
 import { Decimal } from "decimal.js";
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import QrcodeGenerator from "../components/qrcode_generator.vue";
@@ -126,6 +127,13 @@ function loadingDots() {
   }
 }
 
+const stellarLink = computed(() => {
+  if (window.env.NETWORK !== "dev" && window.env.NETWORK !== "qa") {
+    return `https://stellar.expert/explorer/public/account/${props.depositWallet}`;
+  }
+  return `https://stellar.expert/explorer/testnet/account/${props.depositWallet}`;
+});
+
 onMounted(async () => {
   if (!props.openDepositDialog) return;
   if (interval.value !== null) {
@@ -137,7 +145,9 @@ onMounted(async () => {
     loading.value = true;
     const grid = await getGrid(profileManager.profile!);
     const address = profileManager.profile?.address as string;
-    const receivedDeposit = await grid!.bridge.listenToMintCompleted({ address: address });
+    const receivedDeposit = await grid!.bridge.listenToMintCompleted({
+      address: address,
+    });
     loading.value = false;
     if (destroyed) return;
     const DecimalDeposit = new Decimal(receivedDeposit);

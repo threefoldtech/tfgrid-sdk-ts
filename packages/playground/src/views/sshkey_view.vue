@@ -21,7 +21,8 @@
             :spellcheck="false"
             v-model.trim="ssh"
             v-bind="{ ...props, ...copyInputProps }"
-            :disabled="updatingSSH || generatingSSH || !hasEnoughBalance"
+            :readonly="!hasEnoughBalance"
+            :disabled="updatingSSH || generatingSSH"
             :hint="
               updatingSSH
                 ? 'Updating your public ssh key.'

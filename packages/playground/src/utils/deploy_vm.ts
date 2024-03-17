@@ -30,7 +30,7 @@ export async function loadVM(grid: GridClient, name: string) {
   const vm = (await grid.machines.getObj(name)) as any;
   vm.deploymentName = name;
   vm.projectName = grid.clientOptions.projectName;
-  const wireguard = await getWireguardConfig(grid, vm[0].interfaces[0].network).catch(() => []);
+  const wireguard = await getWireguardConfig(grid, vm[0].interfaces[0].network, vm[0].interfaces[0].ip).catch(() => []);
   vm.wireguard = wireguard[0];
   return vm;
 }
@@ -45,6 +45,7 @@ async function createMachine(machine: Machine): Promise<MachineModel> {
   vm.public_ip = machine.publicIpv4 || false;
   vm.public_ip6 = machine.publicIpv6 || false;
   vm.planetary = machine.planetary ?? true;
+  vm.mycelium = machine.mycelium || false;
   vm.cpu = machine.cpu;
   vm.memory = machine.memory;
   vm.rootfs_size = machine.rootFilesystemSize || 0;
@@ -113,6 +114,7 @@ export interface Machine {
   publicIpv4?: boolean;
   publicIpv6?: boolean;
   planetary?: boolean;
+  mycelium?: boolean;
   cpu: number;
   memory: number;
   rootFilesystemSize?: number;
@@ -166,6 +168,7 @@ export async function addMachine(grid: GridClient, options: AddMachineOptions) {
   machine.public_ip6 = options.publicIpv6 || false;
   machine.name = options.name;
   machine.planetary = options.planetary || true;
+  machine.mycelium = options.mycelium || false;
   machine.flist = options.flist;
   machine.entrypoint = options.entryPoint;
   machine.qsfs_disks = createQsfsDisks(options.qsfsDisks);

@@ -10,43 +10,43 @@ export enum Errors {
   GPULockedError,
 }
 class TFGridNodesError extends BaseError {
-  constructor(code: number, message: string) {
-    super(code, message, ErrorModules.Node);
+  constructor(name = "TFGridNodesError", code: number, message: string) {
+    super(name, code, message, ErrorModules.Node);
   }
 }
 
 export class InvalidResourcesError extends TFGridNodesError {
   constructor(message: string) {
-    super(Errors.InvalidResourcesError, message);
+    super("InvalidResourcesError", Errors.InvalidResourcesError, message);
   }
 }
 
 export class DiskAllocationError extends TFGridNodesError {
   constructor(message: string) {
-    super(Errors.DiskAllocationError, message);
+    super("DiskAllocationError", Errors.DiskAllocationError, message);
   }
 }
 
 export class AccessNodeError extends TFGridNodesError {
   constructor(message: string) {
-    super(Errors.AccessNodeError, message);
+    super("AccessNodeError", Errors.AccessNodeError, message);
   }
 }
 
 export class UnavailableNodeError extends TFGridNodesError {
   constructor(message: string) {
-    super(Errors.UnavailableNodeError, message);
+    super("UnavailableNodeError", Errors.UnavailableNodeError, message);
   }
 }
 
 export class GPUNotFoundError extends TFGridNodesError {
   constructor(message: string) {
-    super(Errors.GPUNotFoundError, message);
+    super("GPUNotFoundError", Errors.GPUNotFoundError, message);
   }
 }
 
 export class GPULockedError extends TFGridNodesError {
   constructor(message: string) {
-    super(Errors.GPULockedError, message);
+    super("GPULockedError", Errors.GPULockedError, message);
   }
 }

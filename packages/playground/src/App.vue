@@ -107,7 +107,7 @@
       </v-navigation-drawer>
 
       <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
-        <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1007, top: 0, left: 0, right: 0 }">
+        <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1100, top: 0, left: 0, right: 0 }">
           <v-toolbar-title class="custom-toolbar-title">
             <v-img
               :src="`${
@@ -179,15 +179,13 @@
                 variant="tonal"
                 class="mr-2"
               />
-              <div :style="{ width: '100%' }" class="mb-4">
-                <DisclaimerToolbar />
-              </div>
             </div>
 
             <TfRouterView @openProfile="openProfile = true" :isAuth="hasActiveProfile && hasGrid" />
           </v-container>
         </DeploymentListManager>
         <TFNotification v-if="hasActiveProfile && hasGrid" />
+        <TfLogger />
         <MainFooter />
       </v-main>
     </profile-manager-controller>
@@ -200,8 +198,9 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
-import { useProfileManager } from "./stores/profile_manager";
+import TfLogger from "@/components/logger.vue";
 
+import { useProfileManager } from "./stores/profile_manager";
 const $route = useRoute();
 const $router = useRouter();
 const profileManager = useProfileManager();
@@ -418,7 +417,6 @@ import { AppThemeSelection } from "@/utils/app_theme";
 
 import AppTheme from "./components/app_theme.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
-import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
 import FundsCard from "./components/funds_card.vue";
 import MainFooter from "./components/main_footer.vue";
 import ProfileManagerController from "./components/profile_manager_controller.vue";
@@ -449,7 +447,6 @@ export default {
   name: "App",
   components: {
     TFNotification,
-    DisclaimerToolbar,
     ProfileManager,
     DeploymentListManager,
     AppTheme,

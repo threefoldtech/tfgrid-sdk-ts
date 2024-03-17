@@ -263,8 +263,16 @@ export default {
         createCustomToast(`Failed to add IP. ${error}`, ToastType.danger);
       } finally {
         isAdding.value = false;
+        reset();
       }
     }
+
+    function reset() {
+      publicIP.value = "";
+      toPublicIP.value = "";
+      gateway.value = "";
+    }
+
     return {
       showDialogue,
       valid,

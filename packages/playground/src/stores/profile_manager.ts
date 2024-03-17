@@ -11,6 +11,7 @@ export interface Profile {
   relay: string;
   pk: string;
   keypairType: KeypairType | undefined;
+  email: string;
 }
 
 interface State {

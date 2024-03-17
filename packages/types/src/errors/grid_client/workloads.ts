@@ -8,31 +8,31 @@ export enum Errors {
   WorkloadCreateError,
 }
 class TFGridWorkloadError extends BaseError {
-  constructor(code: number, message: string) {
-    super(code, message, ErrorModules.Workloads);
+  constructor(name = "TFGridWorkloadError", code: number, message: string) {
+    super(name, code, message, ErrorModules.Workloads);
   }
 }
 
 export class WorkloadDeleteError extends TFGridWorkloadError {
   constructor(message: string) {
-    super(Errors.WorkloadDeleteError, message);
+    super("WorkloadDeleteError", Errors.WorkloadDeleteError, message);
   }
 }
 
 export class WorkloadDeployError extends TFGridWorkloadError {
   constructor(message: string) {
-    super(Errors.WorkloadDeployError, message);
+    super("WorkloadDeployError", Errors.WorkloadDeployError, message);
   }
 }
 
 export class WorkloadUpdateError extends TFGridWorkloadError {
   constructor(message: string) {
-    super(Errors.WorkloadUpdateError, message);
+    super("WorkloadUpdateError", Errors.WorkloadUpdateError, message);
   }
 }
 
 export class WorkloadCreateError extends TFGridWorkloadError {
   constructor(message: string) {
-    super(Errors.WorkloadCreateError, message);
+    super("WorkloadCreateError", Errors.WorkloadCreateError, message);
   }
 }

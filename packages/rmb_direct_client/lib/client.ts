@@ -2,7 +2,7 @@ import { Keyring } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { waitReady } from "@polkadot/wasm-crypto";
-import { Client as TFClient } from "@threefold/tfchain_client";
+import { Client as TFClient, Twin } from "@threefold/tfchain_client";
 import {
   BaseError,
   ConnectionError,
@@ -21,8 +21,8 @@ import type { WebSocket as WSConnection } from "ws";
 
 import ClientEnvelope from "./envelope";
 import { KPType, sign } from "./sign";
-import { Address, Envelope, Error, Ping, Pong, Request } from "./types/lib/types";
-import { generatePublicKey } from "./util";
+import { Address, Envelope, Ping, Request } from "./types/lib/types";
+import { generatePublicKey, getTwin } from "./util";
 
 class Client {
   static connections = new Map<string, Client>();
@@ -34,6 +34,7 @@ class Client {
   twin: any;
   destTwin: any;
   tfclient: TFClient;
+  twins = new Map<number, { twin: Twin; timestamp: number }>();
 
   constructor(
     public chainUrl: string,
@@ -94,7 +95,13 @@ class Client {
         const receivedEnvelope = Envelope.deserializeBinary(data);
         // cast received enevelope to client envelope
         await this.tfclient?.connect();
-        const castedEnvelope = new ClientEnvelope(undefined, receivedEnvelope, this.chainUrl, this.tfclient);
+        const castedEnvelope = new ClientEnvelope(
+          undefined,
+          receivedEnvelope,
+          this.chainUrl,
+          this.tfclient,
+          this.twins,
+        );
 
         //verify
         if (this.responses.get(receivedEnvelope.uid)) {
@@ -119,6 +126,7 @@ class Client {
       }
 
       this.twin = await this.tfclient.twins.get({ id: twinId });
+      this.twins.set(this.twin.id, { twin: this.twin, timestamp: Math.round(Date.now() / 1000) });
       try {
         this.updateSource();
         this.createConnection();
@@ -239,7 +247,7 @@ class Client {
       // need to check if destination twinId exists by fetching dest twin from chain first
 
       envelope.destination = new Address();
-      const clientEnvelope = new ClientEnvelope(this.signer, envelope, this.chainUrl, this.tfclient);
+      const clientEnvelope = new ClientEnvelope(this.signer, envelope, this.chainUrl, this.tfclient, this.twins);
 
       let retriesCount = 0;
       while (this.con.readyState != this.con.OPEN && retries >= retriesCount++) {
@@ -272,8 +280,7 @@ class Client {
     retries: number = this.retries,
   ) {
     try {
-      // need to check if destination twinId exists by fetching dest twin from chain first
-      this.destTwin = await this.tfclient.twins.get({ id: destinationTwinId });
+      this.destTwin = await getTwin(destinationTwinId, this.twins, this.tfclient);
 
       // create new envelope with given data and destination
       const envelope = new Envelope({
@@ -288,7 +295,7 @@ class Client {
         envelope.request = new Request({ command: requestCommand });
       }
 
-      const clientEnvelope = new ClientEnvelope(this.signer, envelope, this.chainUrl, this.tfclient);
+      const clientEnvelope = new ClientEnvelope(this.signer, envelope, this.chainUrl, this.tfclient, this.twins);
       let retriesCount = 0;
 
       if (requestData) {

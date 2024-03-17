@@ -1,6 +1,6 @@
 import { events } from "../helpers/events";
 import { VMHL } from "../high_level//machine";
-import { QSFSDiskModel } from "../modules/models";
+import { MyceliumNetworkModel, QSFSDiskModel } from "../modules/models";
 import { Network } from "../primitives/network";
 import { Deployment } from "../zos/deployment";
 import { WorkloadTypes } from "../zos/workload";
@@ -20,8 +20,12 @@ class KubernetesHL extends HighLevelBase {
     publicIp: boolean,
     publicIp6: boolean,
     planetary: boolean,
+    mycelium: boolean,
+    myceliumSeed: string,
     network: Network,
+    myceliumNetworkSeeds: MyceliumNetworkModel[] = [],
     sshKey: string,
+    contractMetadata: string,
     metadata = "",
     description = "",
     qsfs_disks: QSFSDiskModel[] = [],
@@ -61,9 +65,13 @@ class KubernetesHL extends HighLevelBase {
       publicIp,
       publicIp6,
       planetary,
+      mycelium,
+      myceliumSeed!,
       network,
+      myceliumNetworkSeeds!,
       "/sbin/zinit init",
       env,
+      contractMetadata,
       metadata,
       description,
       qsfs_disks,
@@ -90,8 +98,12 @@ class KubernetesHL extends HighLevelBase {
     publicIp: boolean,
     publicIp6: boolean,
     planetary: boolean,
+    mycelium: boolean,
+    myceliumSeed: string,
     network: Network,
+    myceliumNetworkSeeds: MyceliumNetworkModel[] = [],
     sshKey: string,
+    contractMetadata,
     metadata = "",
     description = "",
     qsfs_disks: QSFSDiskModel[] = [],
@@ -131,9 +143,13 @@ class KubernetesHL extends HighLevelBase {
       publicIp,
       publicIp6,
       planetary,
+      mycelium,
+      myceliumSeed,
       network,
+      myceliumNetworkSeeds,
       "/sbin/zinit init",
       env,
+      contractMetadata,
       metadata,
       description,
       qsfs_disks,

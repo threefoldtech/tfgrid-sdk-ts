@@ -52,13 +52,14 @@
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
+          v-model:mycelium="mycelium"
           v-model:wireguard="wireguard"
           ref="network"
         />
         <input-tooltip
           inline
           tooltip="Click to know more about dedicated machines."
-          href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+          href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
         >
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>
@@ -156,6 +157,20 @@
               <v-text-field label="Size (GB)" type="number" v-model.number="disks[index].size" v-bind="props" />
             </input-tooltip>
           </input-validator>
+          <input-validator
+            :value="disks[index].mountPoint"
+            :rules="[
+              validators.required('Mount Point is required.'),
+              validators.pattern('Mount Point should start with / and have additional characters', {
+                pattern: /^\/.+/,
+              }),
+            ]"
+            #="{ props }"
+          >
+            <input-tooltip tooltip="Disk Size.">
+              <v-text-field label="Mount Point" type="text" v-model="disks[index].mountPoint" v-bind="props" />
+            </input-tooltip>
+          </input-validator>
         </ExpandableLayout>
       </template>
     </d-tabs>
@@ -217,6 +232,7 @@ const flist = ref<Flist>();
 const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
+const mycelium = ref(false);
 const wireguard = ref(false);
 const envs = ref<Env[]>([]);
 const disks = ref<Disk[]>([]);
@@ -271,6 +287,7 @@ async function deploy() {
           disks: disks.value,
           envs: envs.value,
           planetary: planetary.value,
+          mycelium: mycelium.value,
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           rootFilesystemSize: rootFilesystemSize.value,

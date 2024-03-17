@@ -24,7 +24,8 @@ async function cancel(client, vms) {
 }
 
 async function main() {
-  const grid3 = await getClient();
+  const name = "dynamicVMS";
+  const grid3 = await getClient(`vm/${name}`);
 
   const vmQueryOptions: FilterOptions = {
     cru: 1,
@@ -35,7 +36,7 @@ async function main() {
   };
 
   const vms: MachinesModel = {
-    name: "dynamicVMS",
+    name,
     network: {
       name: "dynamictest",
       ip_range: "10.249.0.0/16",
@@ -54,6 +55,7 @@ async function main() {
         public_ip: false,
         public_ip6: false,
         planetary: true,
+        mycelium: false,
         cpu: 1,
         memory: 1024,
         rootfs_size: 0,
@@ -72,10 +74,10 @@ async function main() {
   await deploy(grid3, vms);
 
   //Get the deployment
-  await getDeployment(grid3, vms.name);
+  await getDeployment(grid3, name);
 
   //Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name: vms.name });
+  // await cancel(grid3, { name });
 
   await grid3.disconnect();
 }

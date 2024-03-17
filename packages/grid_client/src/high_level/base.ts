@@ -102,7 +102,7 @@ class HighLevelBase {
       events.emit("logs", `Deleting ip: ${machineIp} from node: ${node_id}, network ${network.name}`);
       const deletedIp = network.deleteReservedIp(node_id, machineIp);
       if (remainingWorkloads.length === 0) {
-        twinDeployments.push(new TwinDeployment(deployment, Operations.delete, 0, 0, network));
+        twinDeployments.push(new TwinDeployment(deployment, Operations.delete, 0, 0, "", network));
       }
       const numberOfIps = network.getNodeReservedIps(node_id).length;
       if (numberOfIps !== 0) {
@@ -122,7 +122,7 @@ class HighLevelBase {
       const contract_id = await network.deleteNode(node_id);
       if (contract_id === deployment.contract_id) {
         if (remainingWorkloads.length === 1) {
-          twinDeployments.push(new TwinDeployment(deployment, Operations.delete, 0, 0, network));
+          twinDeployments.push(new TwinDeployment(deployment, Operations.delete, 0, 0, "", network));
           remainingWorkloads = [];
         } else {
           remainingWorkloads = remainingWorkloads.filter(item => item.name !== network?.name);
@@ -137,10 +137,10 @@ class HighLevelBase {
             continue;
           }
           if (d.workloads.length === 1) {
-            twinDeployments.push(new TwinDeployment(d, Operations.delete, 0, 0, network));
+            twinDeployments.push(new TwinDeployment(d, Operations.delete, 0, 0, "", network));
           } else {
             d.workloads = d.workloads.filter(item => item.name !== network?.name);
-            twinDeployments.push(new TwinDeployment(d, Operations.update, 0, 0, network));
+            twinDeployments.push(new TwinDeployment(d, Operations.update, 0, 0, "", network));
           }
         }
       }
@@ -153,10 +153,10 @@ class HighLevelBase {
             continue;
           }
           if (d.workloads.length === 1) {
-            twinDeployments.push(new TwinDeployment(d, Operations.delete, 0, 0, network));
+            twinDeployments.push(new TwinDeployment(d, Operations.delete, 0, 0, "", network));
           } else {
             d.workloads = d.workloads.filter(item => item.name !== network?.name);
-            twinDeployments.push(new TwinDeployment(d, Operations.update, 0, 0, network));
+            twinDeployments.push(new TwinDeployment(d, Operations.update, 0, 0, "", network));
           }
         }
       }
@@ -193,7 +193,7 @@ class HighLevelBase {
     const deletedMachineWorkloads = filteredWorkloads[1];
 
     if (remainingWorkloads.length === 0 && deletedMachineWorkloads.length === 0) {
-      twinDeployments.push(new TwinDeployment(deployment, Operations.delete, 0, 0));
+      twinDeployments.push(new TwinDeployment(deployment, Operations.delete, 0, 0, ""));
     }
     const [newTwinDeployments, newRemainingWorkloads, deletedNodes, deletedIps, network] =
       await this._deleteMachineNetwork(deployment, remainingWorkloads, deletedMachineWorkloads, node_id);
@@ -207,7 +207,7 @@ class HighLevelBase {
         network!.deleteReservedIp(node_id, deleteIp);
       }
       deployment.workloads = remainingWorkloads;
-      twinDeployments.push(new TwinDeployment(deployment, Operations.update, 0, 0, network!));
+      twinDeployments.push(new TwinDeployment(deployment, Operations.update, 0, 0, "", network!));
     }
     return twinDeployments;
   }

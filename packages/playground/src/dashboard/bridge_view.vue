@@ -84,7 +84,7 @@ onMounted(async () => {
 
 function navigation() {
   window.open(
-    "https://manual.grid.tf/threefold_token/tft_bridges/tfchain_stellar_bridge.html#how-to-use-the-tfchain-stellar-bridge",
+    "https://www.manual.grid.tf/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge.html",
     "_blank",
   );
 }

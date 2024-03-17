@@ -38,7 +38,8 @@ async function deleteQsfs(client, qsfs) {
 }
 
 async function main() {
-  const grid3 = await getClient();
+  const name = "testk8sqsfs";
+  const grid3 = await getClient(`kubernetes/${name}`);
 
   const qsfs_name = "testQsfsK8sq1";
 
@@ -64,7 +65,7 @@ async function main() {
     farmId: 1,
   };
 
-  const qsfsNodes = [];
+  const qsfsNodes: number[] = [];
 
   const allNodes = await grid3.capacity.filterNodes(qsfsQueryOptions);
   if (allNodes.length >= 2) {
@@ -85,7 +86,7 @@ async function main() {
   };
 
   const k: K8SModel = {
-    name: "testk8sqsfs",
+    name,
     secret: "secret",
     network: {
       name: "k8sqsfsNetwork",
@@ -102,6 +103,7 @@ async function main() {
         public_ip: false,
         public_ip6: false,
         planetary: true,
+        mycelium: false,
         qsfs_disks: [
           {
             qsfs_zdbs_name: qsfs_name,
@@ -127,6 +129,7 @@ async function main() {
         public_ip: false,
         public_ip6: false,
         planetary: true,
+        mycelium: false,
       },
     ],
     metadata: "",
@@ -141,7 +144,7 @@ async function main() {
   await deploy(grid3, k);
 
   //Get the deployment
-  await getDeployment(grid3, k.name);
+  await getDeployment(grid3, name);
 
   // //Uncomment the line below to cancel the deployment
   // await cancel(grid3, { name: k.name });

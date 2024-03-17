@@ -42,11 +42,12 @@
           :medium="{ cpu: 2, memory: 4, disk: 50 }"
           :large="{ cpu: 4, memory: 16, disk: 100 }"
         />
+        <Networks v-model:mycelium="mycelium" />
 
         <input-tooltip
           inline
           tooltip="Click to know more about dedicated machines."
-          href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+          href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
         >
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>
@@ -110,6 +111,7 @@ const ipv4 = ref(false);
 const smtp = ref(createSMTPServer());
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
+const mycelium = ref(false);
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
@@ -163,6 +165,7 @@ async function deploy() {
           rootFilesystemSize: rootFilesystemSize.value,
           publicIpv4: ipv4.value,
           planetary: true,
+          mycelium: mycelium.value,
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "DB_PASSWORD", value: generatePassword() },
@@ -213,6 +216,7 @@ async function deploy() {
 </script>
 
 <script lang="ts">
+import Networks from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -222,6 +226,6 @@ import rootFs from "../utils/root_fs";
 
 export default {
   name: "TfMattermost",
-  components: { SmtpServer, SelectSolutionFlavor },
+  components: { SmtpServer, SelectSolutionFlavor, Networks },
 };
 </script>

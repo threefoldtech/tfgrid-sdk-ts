@@ -24,7 +24,8 @@ async function cancel(client, vms) {
 }
 
 async function main() {
-  const grid3 = await getClient();
+  const name = "vmgpu";
+  const grid3 = await getClient(`vm/${name}`);
 
   const vmQueryOptions: FilterOptions = {
     cru: 8,
@@ -48,7 +49,7 @@ async function main() {
   }
 
   const vms: MachinesModel = {
-    name: "vmgpu",
+    name,
     network: {
       name: "vmgpuNetwork",
       ip_range: "10.249.0.0/16",
@@ -67,6 +68,7 @@ async function main() {
         public_ip: false,
         public_ip6: false,
         planetary: true,
+        mycelium: false,
         cpu: 8,
         memory: 1024 * 16,
         rootfs_size: 0,
@@ -75,7 +77,7 @@ async function main() {
         env: {
           SSH_KEY: config.ssh_key,
         },
-        gpus: gpuList[0].id,
+        gpus: [gpuList[0].id],
       },
     ],
     metadata: "",
@@ -86,10 +88,10 @@ async function main() {
   await deploy(grid3, vms);
 
   //Get the deployment
-  await getDeployment(grid3, vms.name);
+  await getDeployment(grid3, name);
 
   //Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name: vms.name });
+  // await cancel(grid3, { name });
 
   await grid3.disconnect();
 }

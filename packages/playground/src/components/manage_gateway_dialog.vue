@@ -303,6 +303,7 @@ export default {
           name: networkName,
           ipRange: `${x}.${y}.0.0/16`,
           nodeId: selectionDetails.value!.domain!.selectedDomain!.nodeId,
+          mycelium: false,
         };
 
         const hasNode = await grid!.networks.hasNode(data);

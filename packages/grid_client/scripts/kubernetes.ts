@@ -24,7 +24,8 @@ async function cancel(client, k8s) {
 }
 
 async function main() {
-  const grid3 = await getClient();
+  const name = "testk8s";
+  const grid3 = await getClient(`kubernetes/${name}`);
 
   const masterQueryOptions: FilterOptions = {
     cru: 2,
@@ -43,7 +44,7 @@ async function main() {
   };
 
   const k: K8SModel = {
-    name: "testk8s",
+    name,
     secret: "secret",
     network: {
       name: "monNetwork",
@@ -61,6 +62,7 @@ async function main() {
         public_ip: false,
         public_ip6: false,
         planetary: true,
+        mycelium: false,
       },
     ],
     workers: [
@@ -74,6 +76,7 @@ async function main() {
         public_ip: false,
         public_ip6: false,
         planetary: true,
+        mycelium: false,
       },
     ],
     metadata: "",
@@ -85,10 +88,10 @@ async function main() {
   await deploy(grid3, k);
 
   //Get the deployment
-  await getDeployment(grid3, k.name);
+  await getDeployment(grid3, name);
 
   //Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name: k.name });
+  // await cancel(grid3, { name });
 
   await grid3.disconnect();
 }

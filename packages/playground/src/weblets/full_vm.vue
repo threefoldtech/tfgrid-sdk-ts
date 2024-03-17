@@ -51,6 +51,7 @@
           v-model:ipv4="ipv4"
           v-model:ipv6="ipv6"
           v-model:planetary="planetary"
+          v-model:mycelium="mycelium"
           v-model:wireguard="wireguard"
         />
         <input-tooltip
@@ -65,7 +66,7 @@
         <input-tooltip
           inline
           tooltip="Click to know more about dedicated machines."
-          href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+          href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
         >
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>
@@ -187,6 +188,7 @@ const flist = ref<Flist>();
 const ipv4 = ref(false);
 const ipv6 = ref(false);
 const planetary = ref(true);
+const mycelium = ref(false);
 const wireguard = ref(false);
 const dedicated = ref(false);
 const certified = ref(false);
@@ -247,6 +249,7 @@ async function deploy() {
           publicIpv4: ipv4.value,
           publicIpv6: ipv6.value,
           planetary: planetary.value,
+          mycelium: mycelium.value,
           envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
           rootFilesystemSize,
           hasGPU: hasGPU.value,

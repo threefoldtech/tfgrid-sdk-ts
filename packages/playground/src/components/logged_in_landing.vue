@@ -74,16 +74,9 @@
               </p>
 
               <div class="d-flex justify-center align-center flex-wrap my-4">
-                <v-btn
-                  color="secondary"
-                  variant="outlined"
-                  class="mr-2"
-                  target="_blank"
-                  href="https://www.threefold.io/grid/"
-                >
+                <v-btn color="secondary" variant="outlined" class="mr-2" target="_blank" href="https://manual.grid.tf/">
                   Learn about the grid
                 </v-btn>
-                <v-btn color="primary" target="_blank" href="https://www.threefold.io/build/"> Use The Grid </v-btn>
               </div>
             </div>
           </v-card>
@@ -99,6 +92,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
 import { DashboardRoutes } from "@/router/routes";
+import { useStatsStore } from "@/stores/stats";
 
 import { useProfileManager } from "../stores";
 export default {
@@ -110,6 +104,7 @@ export default {
     const $router = useRouter();
     const pageTitle = computed(() => route.meta.title);
     const profileManager = useProfileManager();
+    const statsStore = useStatsStore();
 
     const cards = [
       {
@@ -154,29 +149,7 @@ export default {
       pageTitle,
       cards,
       profileManager,
-
-      stats: [
-        {
-          label: "Capacity",
-          value: "33.46PB",
-          image: "capacity.png",
-        },
-        {
-          label: "Nodes",
-          value: "2420",
-          image: "nodes.png",
-        },
-        {
-          label: "Countries",
-          value: "60",
-          image: "countries.png",
-        },
-        {
-          label: "Cores",
-          value: "56,530",
-          image: "cores.png",
-        },
-      ],
+      stats: computed(() => statsStore.stats),
       baseUrl,
       $router,
     };

@@ -26,7 +26,8 @@ async function deleteWorker(client, worker) {
 }
 
 async function main() {
-  const grid3 = await getClient();
+  const name = "testk8s";
+  const grid3 = await getClient(`kubernetes/${name}`);
 
   const workerQueryOptions: FilterOptions = {
     cru: 2,
@@ -36,7 +37,7 @@ async function main() {
   };
 
   const worker: AddWorkerModel = {
-    deployment_name: "testk8s",
+    deployment_name: name,
     name: "worker2",
     node_id: +(await grid3.capacity.filterNodes(workerQueryOptions))[0].nodeId,
     cpu: 2,
@@ -46,16 +47,17 @@ async function main() {
     public_ip: false,
     public_ip6: false,
     planetary: true,
+    mycelium: false,
   };
 
   //Add Worker
   await addWorker(grid3, worker);
 
   //Get worker information
-  await getWorker(grid3, worker.deployment_name);
+  await getWorker(grid3, name);
 
   //Uncomment the line below to delete the worker
-  // await deleteWorker(grid3, { name: worker.name, deployment_name: worker.deployment_name });
+  // await deleteWorker(grid3, { name: worker.name, deployment_name: name });
 
   await grid3.disconnect();
 }

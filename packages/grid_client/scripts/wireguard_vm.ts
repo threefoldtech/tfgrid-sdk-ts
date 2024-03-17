@@ -2,6 +2,8 @@ import { FilterOptions, GatewayNameModel, MachineModel, MachinesModel, NetworkMo
 import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
+const name = "newVMs";
+
 function createNetworkModel(gwNode: number, name: string): NetworkModel {
   return {
     name,
@@ -16,6 +18,7 @@ function createMachineModel(node: number) {
     node_id: node,
     public_ip: false,
     planetary: true,
+    mycelium: false,
     cpu: 1,
     memory: 1024 * 2,
     rootfs_size: 0,
@@ -29,7 +32,7 @@ function createMachineModel(node: number) {
 }
 function createMachinesModel(vm: MachineModel, network: NetworkModel): MachinesModel {
   return {
-    name: "newVMs",
+    name,
     network,
     machines: [vm],
     metadata: "",
@@ -90,7 +93,7 @@ async function deleteGw(client, gw) {
 }
 
 async function main() {
-  const grid3 = await getClient();
+  const grid3 = await getClient(`vm/${name}`);
 
   const gwNode = +(await grid3.capacity.filterNodes({ gateway: true }))[0].nodeId;
 
@@ -111,7 +114,7 @@ async function main() {
   await deployVM(grid3, machines);
 
   //Get VM deployment
-  const deployedVm = await getVMDeployment(grid3, machines.name);
+  const deployedVm = await getVMDeployment(grid3, name);
 
   const vmPrivateIP = (deployedVm as { interfaces: { ip: string }[] }[])[0].interfaces[0].ip;
   const gateway = createGwModel(gwNode, vmPrivateIP, network.name, "pyserver1", 8000);
@@ -124,7 +127,7 @@ async function main() {
   await getGwDeployment(grid3, gateway.name);
 
   // delete
-  // await deleteVM(grid3, { name: machines.name });
+  await deleteVM(grid3, { name });
   // await deleteGw(grid3, { name: gateway.name });
 
   await grid3.disconnect();

@@ -1,7 +1,8 @@
 <template>
   <view-layout>
+    <v-text-field label="Search Applications" v-model="searchItem" class="mb-5" clearable></v-text-field>
     <v-row>
-      <v-col sm="12" md="6" lg="4" v-for="card in cards" :key="card.title">
+      <v-col sm="12" md="6" lg="4" v-for="card in filteredCards" :key="card.title">
         <router-link :to="card.route">
           <v-hover>
             <template v-slot:default="{ isHovering, props }">
@@ -35,11 +36,14 @@
           >
         </router-link>
       </v-col>
+      <p v-if="filteredCards.length === 0" class="mx-3 mb-3">No solution was found with the provided search query.</p>
     </v-row>
   </view-layout>
 </template>
 
 <script lang="ts">
+import { computed, ref } from "vue";
+
 import { DashboardRoutes } from "@/router/routes";
 
 interface Card {
@@ -89,13 +93,13 @@ export default {
         icon: "taiga.png",
         route: DashboardRoutes.Applications.Taiga,
       },
-      {
-        title: "Owncloud",
-        excerpt:
-          "ownCloud develops and provides open-source software for content collaboration, allowing teams to easily share and work on files seamlessly regardless of device or location.",
-        icon: "owncloud.png",
-        route: DashboardRoutes.Applications.Owncloud,
-      },
+      // {
+      //   title: "Owncloud",
+      //   excerpt:
+      //     "ownCloud develops and provides open-source software for content collaboration, allowing teams to easily share and work on files seamlessly regardless of device or location.",
+      //   icon: "owncloud.png",
+      //   route: DashboardRoutes.Applications.Owncloud,
+      // },
       {
         title: "Nextcloud",
         excerpt:
@@ -161,11 +165,18 @@ export default {
         route: DashboardRoutes.Applications.Wordpress,
       },
     ];
+
     const baseURL = import.meta.env.BASE_URL;
+    const searchItem = ref("");
+    const filteredCards = computed(() =>
+      cards.filter(n => n.title.toLocaleLowerCase().includes(searchItem.value.toLocaleLowerCase())),
+    );
 
     return {
       cards,
       baseURL,
+      searchItem,
+      filteredCards,
     };
   },
 };

@@ -61,10 +61,10 @@
             <public-config-details-card :node="node" />
           </v-col>
 
-          <v-col cols="12" md="6" sm="8">
+          <v-col v-if="hasActiveProfile && node.healthy" cols="12" md="6" sm="8">
             <i-perf-card :node="node" />
           </v-col>
-          <v-col cols="12" md="6" sm="8">
+          <v-col v-if="hasActiveProfile && node.healthy" cols="12" md="6" sm="8">
             <cpu-benchmark-card :node="node" />
           </v-col>
         </v-row>
@@ -76,6 +76,7 @@
 <script lang="ts">
 import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
 import { type PropType, ref, watch } from "vue";
+import { computed } from "vue";
 import { useRoute } from "vue-router";
 
 import CountryDetailsCard from "@/components/node_details_cards/country_details_card.vue";
@@ -88,6 +89,7 @@ import NodeDetailsCard from "@/components/node_details_cards/node_details_card.v
 import PublicConfigDetailsCard from "@/components/node_details_cards/public_config_details_card.vue";
 import TwinDetailsCard from "@/components/node_details_cards/twin_details_card.vue";
 import router from "@/router";
+import { useProfileManager } from "@/stores";
 import type { FilterOptions } from "@/types";
 import { type GridProxyRequestConfig, nodeInitializer } from "@/types";
 import { getNode, getNodeStatusColor } from "@/utils/get_nodes";
@@ -133,6 +135,10 @@ export default {
     const errorLoadingStatsMessage = ref<string>();
     const errorMessage = ref<string>("");
     const route = useRoute();
+    const profileManager = useProfileManager();
+    const hasActiveProfile = computed(() => {
+      return !!profileManager.profile;
+    });
     const node = ref<GridNode>(nodeInitializer);
 
     const nodeOptions: GridProxyRequestConfig = {
@@ -206,6 +212,7 @@ export default {
       isLiveStats,
       errorLoadingStatsMessage,
       nodeOptions,
+      hasActiveProfile,
       requestNode,
       closeDialog,
       getNodeStatusColor,
