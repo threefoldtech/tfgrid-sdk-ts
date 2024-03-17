@@ -45,14 +45,17 @@
                   You receive {{ item.applyedDiscount.first }}% discount if you reserve an entire
                   <a
                     target="_blank"
-                    href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html#billing--pricing"
+                    href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html#billing--pricing"
                     style="color: blue"
                     >node</a
                   >
                 </li>
                 <li>
                   You're receiving {{ item.applyedDiscount.second }}% discount as per the
-                  <a target="_blank" href="https://manual.grid.tf/wiki/cloudunits/pricing/pricing.html#staking-discount">
+                  <a
+                    target="_blank"
+                    href="https://www.manual.grid.tf/knowledge_base/cloud/pricing/staking_discount_levels.html"
+                  >
                     <p style="color: blue; display: inline">discount levels</p>
                   </a>
                 </li>

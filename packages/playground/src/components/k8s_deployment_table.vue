@@ -58,7 +58,7 @@
 
     <AccessDeploymentAlert />
 
-    <InputTooltip tooltip="List all deployments, including those created outside the Dashboard." inline>
+    <InputTooltip tooltip="Didn't find your deployments in the list? Enable to show all deployments." inline>
       <VSwitch inset color="primary" label="Show All Deployments" v-model="showAllDeployments" />
     </InputTooltip>
 
@@ -134,7 +134,7 @@
 </template>
 
 <script lang="ts" setup>
-import { capitalize, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
@@ -173,18 +173,14 @@ async function loadDeployments() {
   });
 
   const clusters = mergeLoadedDeployments(chunk1, chunk2, chunk3);
-  failedDeployments.value = [
-    ...(Array.isArray((chunk1 as any).failedDeployments) ? (chunk1 as any).failedDeployments : []),
-    ...(Array.isArray((chunk2 as any).failedDeployments) ? (chunk2 as any).failedDeployments : []),
-    ...(Array.isArray((chunk3 as any).failedDeployments) ? (chunk3 as any).failedDeployments : []),
-  ];
+  failedDeployments.value = clusters.failedDeployments;
 
   count.value = clusters.count;
   items.value = clusters.items.map((item: any) => {
     item.name = item.deploymentName;
-    item.ipv4 = item.masters[0].publicIP?.ip?.split("/")?.[0] || item.masters[0].publicIP?.ip || "None";
-    item.ipv6 = item.masters[0].publicIP?.ip6 || "None";
-    item.planetary = item.masters[0].planetary || "None";
+    item.ipv4 = item.masters[0].publicIP?.ip?.split("/")?.[0] || item.masters[0].publicIP?.ip || "-";
+    item.ipv6 = item.masters[0].publicIP?.ip6.replace(/\/64$/, "") || "-";
+    item.planetary = item.masters[0].planetary || "-";
     item.workersLength = item.workers.length;
     item.billing = item.masters[0].billing;
     item.created = item.masters[0].created;

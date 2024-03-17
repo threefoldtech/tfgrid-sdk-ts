@@ -63,7 +63,7 @@
         <input-tooltip
           inline
           tooltip="Click to know more about dedicated machines."
-          href="https://manual.grid.tf/dashboard/deploy/dedicated_machines.html"
+          href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
         >
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>
@@ -88,7 +88,7 @@
       </template>
 
       <template #mail>
-        <SmtpServer v-model="smtp" :persistent="true" :tls="true">
+        <SmtpServer v-model="smtp" :persistent="true" :tls="true" :is-discourse="true">
           Discourse needs SMTP service so please configure these settings properly.
         </SmtpServer>
       </template>
@@ -120,7 +120,7 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "dc" }));
-const email = ref("");
+const email = ref(profileManager.profile?.email || "");
 const solution = ref() as Ref<SolutionFlavor>;
 const ipv4 = ref(false);
 const mycelium = ref(false);

@@ -1,3 +1,4 @@
+import { Contract } from "@threefold/tfchain_client";
 import { GridClientErrors, ValidationError } from "@threefold/types";
 import { Buffer } from "buffer";
 import { plainToInstance } from "class-transformer";
@@ -13,7 +14,7 @@ import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
 import { formatErrorMessage, generateRandomHexSeed, getRandomNumber, randomChoice } from "../helpers/utils";
 import { validateHexSeed } from "../helpers/validator";
-import { MyceliumNetworkModel } from "../modules";
+import { ContractStates, MyceliumNetworkModel } from "../modules";
 import { DeploymentFactory } from "../primitives/deployment";
 import { BackendStorage, BackendStorageType } from "../storage/backend";
 import { Zmachine } from "../zos";
@@ -62,6 +63,8 @@ class Network {
   backendStorage: BackendStorage;
   _endpoints: Record<string, string> = {};
   _accessNodes: number[] = [];
+  static newContracts: GqlNodeContract[] = [];
+  static deletedContracts: number[] = [];
   rmb: RMB;
   wireguardConfig: string;
   tfClient: TFClient;
@@ -323,6 +326,7 @@ class Network {
     events.emit("logs", `Loading network ${this.name}`);
 
     if (await this.existOnNewNetwork()) {
+      await new Promise(f => setTimeout(f, 60000));
       await this.loadNetworkFromContracts();
     } else {
       const network = await this.getNetwork();
@@ -629,10 +633,27 @@ class Network {
 
   private async getMyNetworkContracts(fetch = false) {
     if (fetch || !this.contracts) {
-      const contracts = await this.tfClient.contracts.listMyNodeContracts({
+      let contracts = await this.tfClient.contracts.listMyNodeContracts({
         graphqlURL: this.config.graphqlURL,
         type: "network",
       });
+      const alreadyFetchedContracts: GqlNodeContract[] = [];
+      for (const contract of Network.newContracts) {
+        if (contract.parsedDeploymentData!.type !== "network") continue;
+        const c = contracts.filter(c => +c.contractID === +contract.contractID);
+        if (c.length > 0) {
+          alreadyFetchedContracts.push(contract);
+          continue;
+        }
+        contracts.push(contract);
+      }
+
+      for (const contract of alreadyFetchedContracts) {
+        const index = Network.newContracts.indexOf(contract);
+        if (index > -1) Network.newContracts.splice(index, 1);
+      }
+
+      contracts = contracts.filter(c => !Network.deletedContracts.includes(+c.contractID));
 
       const parsedContracts: Required<GqlNodeContract>[] = [];
 
@@ -661,7 +682,7 @@ class Network {
   }
 
   private async getDeploymentContracts(name: string) {
-    const contracts = await this.getMyNetworkContracts();
+    const contracts = await this.getMyNetworkContracts(true);
     return contracts.filter(c => c.parsedDeploymentData.name === name);
   }
 
@@ -772,10 +793,28 @@ AllowedIPs = ${this.ipRange}, ${networkIP}
 PersistentKeepalive = 25\nEndpoint = ${endpoint}`;
   }
 
-  async save() {
+  async save(AddedContract?: Contract, deletedContract?: number) {
+    if (AddedContract?.contractType.nodeContract)
+      Network.newContracts.push({
+        contractID: String(AddedContract.contractId),
+        createdAt: Date.now().toString(),
+        deploymentData: AddedContract.contractType.nodeContract.deploymentData,
+        deploymentHash: AddedContract.contractType.nodeContract.deploymentHash,
+        gridVersion: "4",
+        id: "",
+        nodeID: AddedContract.contractType.nodeContract.nodeId,
+        numberOfPublicIPs: AddedContract.contractType.nodeContract.publicIps,
+        solutionProviderID: String(AddedContract.solutionProviderId),
+        state: ContractStates.Created,
+        twinID: String(AddedContract.twinId),
+        parsedDeploymentData: JSON.parse(AddedContract.contractType.nodeContract.deploymentData),
+        resourcesUsed: undefined,
+      });
+
+    if (deletedContract) Network.deletedContracts.push(deletedContract);
+
     if (this.nodes.length === 0) {
       await this.delete();
-      return;
     }
   }
 

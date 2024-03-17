@@ -50,7 +50,7 @@
 
     <InputTooltip
       v-if="props.projectName.toLowerCase() === 'vm'"
-      tooltip="List all deployments, including those created outside the Dashboard."
+      tooltip="Didn't find your deployments in the list? Enable to show all deployments."
       inline
     >
       <VSwitch inset color="primary" label="Show All Deployments" v-model="showAllDeployments" />
@@ -75,7 +75,7 @@
       </template>
 
       <template #[`item.ipv6`]="{ item }">
-        {{ item.value.publicIP?.ip6 || "-" }}
+        {{ item.value.publicIP?.ip6.replace(/\/64$/, "") || "-" }}
       </template>
 
       <template #[`item.planetary`]="{ item }">
@@ -201,7 +201,7 @@ async function loadDeployments() {
   const chunk3 =
     props.projectName.toLowerCase() === ProjectName.VM.toLowerCase()
       ? await loadVms(updateGrid(grid!, { projectName: "" }))
-      : { count: 0, items: [] };
+      : { count: 0, items: [], failedDeployments: [] };
 
   if (chunk3.count > 0 && migrateGateways) {
     await migrateModule(grid!.gateway);
@@ -210,11 +210,7 @@ async function loadDeployments() {
   chunk3.items = chunk3.items.map(markAsFromAnotherClient);
 
   const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
-  failedDeployments.value = [
-    ...(Array.isArray((chunk1 as any).failedDeployments) ? (chunk1 as any).failedDeployments : []),
-    ...(Array.isArray((chunk2 as any).failedDeployments) ? (chunk2 as any).failedDeployments : []),
-    ...(Array.isArray((chunk3 as any).failedDeployments) ? (chunk3 as any).failedDeployments : []),
-  ];
+  failedDeployments.value = vms.failedDeployments;
 
   count.value = vms.count;
   items.value = vms.items.map(([leader, ...workers]) => {

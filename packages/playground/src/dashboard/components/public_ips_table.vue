@@ -15,7 +15,8 @@
         { value: 50, title: '50' },
       ]"
       :page="page"
-      @update:items-per-page="page => updateIPPage(page)"
+      @update:items-per-page="size => updateIPPageSize(size)"
+      @update:page="page => updateIPPage(page)"
       class="elevation-1 v-data-table-header"
       density="compact"
       :disable-sort="true"
@@ -134,10 +135,18 @@ export default {
       await getFarmByID(props.farmId);
     });
 
-    async function updateIPPage(page: number) {
+    function updateIPPageSize(pageSize: number) {
       loadingIps.value = true;
-      size.value = page;
+      size.value = pageSize;
       copyPublicIps.value = publicIps.value.slice(0, size.value) as unknown as PublicIp[];
+      loadingIps.value = false;
+    }
+    function updateIPPage(pageNumber: number) {
+      page.value = pageNumber;
+      loadingIps.value = true;
+      const startIndex = (pageNumber - 1) * size.value;
+      const endIndex = startIndex + size.value;
+      copyPublicIps.value = publicIps.value.slice(startIndex, endIndex) as unknown as PublicIp[];
       loadingIps.value = false;
     }
 
@@ -192,6 +201,7 @@ export default {
       updateIPPage,
       copyPublicIps,
       loadingIps,
+      updateIPPageSize,
     };
   },
 };

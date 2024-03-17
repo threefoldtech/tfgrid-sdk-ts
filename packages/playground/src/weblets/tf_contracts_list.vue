@@ -74,7 +74,7 @@ import type { VDataTableHeader } from "@/types";
 import {
   type ContractsTableType,
   ContractType,
-  getNodeStatus,
+  getNodeInfo,
   getUserContracts,
   type NormalizedContract,
 } from "@/utils/contracts";
@@ -96,7 +96,7 @@ const totalCost = ref<number>();
 const totalCostUSD = ref<number>();
 
 const panel = ref<number[]>([0, 1, 2]);
-const nodeStatus = ref() as Ref<{ [x: number]: NodeStatus }>;
+const nodeInfo: Ref<{ [nodeId: number]: { status: NodeStatus; farmId: number } }> = ref({});
 
 // Computed property to get unique node IDs from contracts
 const nodeIDs = computed(() => {
@@ -120,10 +120,17 @@ async function onMount() {
       try {
         // Fetch user contracts, node status, and calculate total cost
         contracts.value = await getUserContracts(grid.value);
+        nodeInfo.value = await getNodeInfo(nodeIDs.value);
+        contracts.value.map(contract => {
+          const { nodeId } = contract;
+          if (nodeId && nodeInfo.value[nodeId]) {
+            contract.farmId = nodeInfo.value[nodeId].farmId;
+          }
+          return contract;
+        });
         nodeContracts.value = contracts.value.filter(c => c.type === ContractType.NODE);
         nameContracts.value = contracts.value.filter(c => c.type === ContractType.NAME);
         rentContracts.value = contracts.value.filter(c => c.type === ContractType.RENT);
-        nodeStatus.value = await getNodeStatus(nodeIDs.value);
         totalCost.value = getTotalCost(contracts.value);
         const TFTInUSD = await queryClient.tftPrice.get();
         totalCostUSD.value = totalCost.value * (TFTInUSD / 1000);
@@ -149,6 +156,16 @@ async function onMount() {
   // Update UI
   isLoading.value = false;
 }
+
+const nodeStatus = computed(() => {
+  const statusObject: { [x: number]: NodeStatus } = {};
+  for (const nodeId in nodeInfo.value) {
+    if (Object.prototype.hasOwnProperty.call(nodeInfo.value, nodeId)) {
+      statusObject[nodeId] = nodeInfo.value[nodeId].status;
+    }
+  }
+  return statusObject;
+});
 
 // Calculate the total cost of contracts
 function getTotalCost(contracts: NormalizedContract[]) {
@@ -182,6 +199,7 @@ const nodeTableHeaders: VDataTableHeader = [
   { title: "Solution Name", key: "solutionName" },
   { title: "Expiration", key: "expiration" },
   { title: "Node ID", key: "nodeId" },
+  { title: "Farm ID", key: "farmId" },
   { title: "Node Status", key: "nodeStatus", sortable: false },
   { title: "Details", key: "actions", sortable: false },
 ];
@@ -196,6 +214,7 @@ const nameTableHeaders: VDataTableHeader = [
 const RentTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
   { title: "Node ID", key: "nodeId" },
+  { title: "Farm ID", key: "farmId" },
   { title: "Node Status", key: "nodeStatus", sortable: false },
   { title: "Details", key: "actions", sortable: false },
 ];

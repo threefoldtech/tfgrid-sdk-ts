@@ -163,7 +163,7 @@
 </template>
 
 <script lang="ts" setup>
-import { NodeStatus } from "@threefold/gridproxy_client";
+import { type GridNode, NodeStatus, type Pagination } from "@threefold/gridproxy_client";
 import { CertificationType } from "@threefold/gridproxy_client";
 import { ref } from "vue";
 
@@ -191,6 +191,11 @@ const tabParams = {
     rentedBy: profileManager.profile?.twinId,
     retCount: true,
   },
+  2: {
+    rentable: true,
+    status: NodeStatus.Standby,
+    retCount: true,
+  },
 };
 
 const size = ref(window.env.PAGE_SIZE);
@@ -209,6 +214,22 @@ const updateActiveTabValue = (newValue: number) => {
   activeTab.value = newValue;
   loadNodes();
 };
+
+async function listNodes(params: any) {
+  const response = await gridProxyClient.nodes.list({
+    ...params,
+    size: size.value,
+    page: page.value,
+    totalSru: convert(filters.value.minSSD),
+    totalMru: convert(filters.value.minRAM),
+    totalHru: convert(filters.value.minHDD),
+    totalCru: +filters.value.minCPU || undefined,
+    gpuVendorName: filters.value.gpuVendorName || undefined,
+    gpuDeviceName: filters.value.gpuDeviceName || undefined,
+    hasGpu: filters.value.gpu || undefined,
+  });
+  return response || [];
+}
 
 function updateOptions(options: { page: number; itemsPerPage: number }) {
   if (options.page !== page.value || options.itemsPerPage !== size.value) {
@@ -230,20 +251,19 @@ async function loadNodes() {
   }
 
   loading.value = true;
-
+  let data: Pagination<GridNode[]>;
   try {
-    const data = await gridProxyClient.nodes.list({
-      ...params,
-      size: size.value,
-      page: page.value,
-      totalSru: convert(filters.value.minSSD),
-      totalMru: convert(filters.value.minRAM),
-      totalHru: convert(filters.value.minHDD),
-      totalCru: +filters.value.minCPU || undefined,
-      gpuVendorName: filters.value.gpuVendorName || undefined,
-      gpuDeviceName: filters.value.gpuDeviceName || undefined,
-      hasGpu: filters.value.gpu || undefined,
-    });
+    if (activeTab.value === 0) {
+      const onlineNodes = await listNodes(params);
+      const standbyNodes = await listNodes(tabParams[2]);
+      const allNodes = onlineNodes.data.concat(standbyNodes.data);
+      data = {
+        count: (onlineNodes.count ?? 0) + (standbyNodes.count ?? 0),
+        data: allNodes,
+      };
+    } else {
+      data = await listNodes(params);
+    }
 
     if (data.count === 0) {
       loading.value = false;

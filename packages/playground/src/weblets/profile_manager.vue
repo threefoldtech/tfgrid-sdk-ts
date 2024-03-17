@@ -3,7 +3,7 @@
     width="1024"
     class="mx-auto"
     :model-value="$props.modelValue"
-    @update:model-value="$emit('update:modelValue', $event)"
+    @update:model-value="handleProfileDialog($event)"
   >
     <template #activator="{ props }">
       <VCard v-bind="props" class="pa-3 d-inline-flex align-center">
@@ -38,7 +38,7 @@
                     height="24px"
                     width="24px"
                     class="ml-2"
-                    href="https://manual.grid.tf/tfchain/tfchain.html?highlight=locked#contract-locking"
+                    href="https://www.manual.grid.tf/documentation/developers/tfchain/tfchain.html#contract-locking"
                     target="_blank"
                   />
                 </template>
@@ -161,18 +161,17 @@
                               :disabled="creatingAccount || activatingAccount || activating"
                               @click:append="reloadValidation"
                             >
-                              <template v-slot:prepend-inner v-if="mnemonic.length > 0">
+                              <template v-slot:prepend-inner v-if="isValid">
                                 <v-icon
+                                  color="green"
                                   v-if="
-                                    validateMnemonic(mnemonic) ||
+                                    (mnemonic && validateMnemonic(mnemonic)) ||
                                     ((mnemonic.length === 64 || mnemonic.length === 66) &&
                                       isAddress(mnemonic.length === 66 ? mnemonic : `0x${mnemonic}`))
                                   "
-                                  color="green"
                                 >
                                   mdi-check
                                 </v-icon>
-                                <v-icon v-else color="red"> mdi-close </v-icon>
                               </template></VTextField
                             >
                           </div>
@@ -268,6 +267,18 @@
                   You will need to provide the password used while connecting your wallet.
                 </p>
               </v-alert>
+
+              <input-validator
+                v-if="activeTab === 1"
+                :value="email"
+                :rules="[
+                  validators.required('Email is required.'),
+                  validators.isEmail('Please provide a valid email address.'),
+                ]"
+                #="{ props }"
+              >
+                <v-text-field label="Email" placeholder="email@example.com" v-model="email" v-bind="props" />
+              </input-validator>
               <PasswordInputWrapper #="{ props: passwordInputProps }">
                 <InputValidator
                   :value="password"
@@ -344,7 +355,7 @@
 
       <template v-if="profileManager.profile">
         <v-row>
-          <v-col cols="12" sm="6">
+          <v-col cols="12" md="6" lg="6" xl="6">
             <PasswordInputWrapper #="{ props }">
               <VTextField
                 :label="profileManager.profile.mnemonic.startsWith('0x') ? 'Your Hex Seed' : 'Your Mnemonic'"
@@ -359,18 +370,27 @@
               <VTextField label="Twin ID" readonly v-model="profileManager.profile.twinId" v-bind="props" />
             </CopyInputWrapper>
 
+            <CopyInputWrapper v-if="profileManager.profile.email" :data="profileManager.profile.email" #="{ props }">
+              <VTextField label="Email" readonly v-model="profileManager.profile.email" v-bind="props" />
+            </CopyInputWrapper>
             <CopyInputWrapper :data="profileManager.profile.address" #="{ props }">
               <VTextField label="Address" readonly v-model="profileManager.profile.address" v-bind="props" />
             </CopyInputWrapper>
-          </v-col>
-          <v-divider class="hidden-sm-and-down" vertical></v-divider>
 
-          <v-col cols="12" sm="6">
-            <section class="d-flex flex-column align-center">
+            <CopyInputWrapper :data="freeBalance.toString()" #="{ props }">
+              <VTextField label="Balance" readonly v-model="freeBalance" v-bind="props" />
+            </CopyInputWrapper>
+          </v-col>
+
+          <v-col cols="12" md="6" lg="6" xl="6">
+            <section class="qr d-flex flex-column align-center">
               <p class="mb-4 text-center">
                 Scan the QR code using
-                <!-- TODO: -->
-                <a class="app-link" href="https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html" target="_blank">
+                <a
+                  class="app-link"
+                  href="https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html"
+                  target="_blank"
+                >
                   ThreeFold Connect
                 </a>
                 to fund your account
@@ -438,6 +458,7 @@ import { useOnline } from "../hooks";
 import { useInputRef } from "../hooks/input_validator";
 import { useProfileManager } from "../stores";
 import { activateAccountAndCreateTwin, createAccount, getGrid, loadBalance, loadProfile } from "../utils/grid";
+import { storeEmail } from "../utils/grid";
 import { normalizeBalance, normalizeError } from "../utils/helpers";
 
 const items = ref([{ id: 1, name: "stellar" }]);
@@ -449,6 +470,7 @@ interface Credentials {
   passwordHash?: string;
   mnemonicHash?: string;
   keypairTypeHash?: string;
+  emailHash?: string;
 }
 const keyType = ["sr25519", "ed25519"];
 const keypairType = ref(KeypairType.sr25519);
@@ -457,6 +479,7 @@ const disableTermsBtn = ref(true);
 
 const theme = useTheme();
 const qrCodeText = ref("");
+const isValid = ref<boolean>(false);
 const props = defineProps({
   modelValue: {
     required: false,
@@ -556,11 +579,17 @@ function getCredentials() {
   return credentials;
 }
 
-function setCredentials(passwordHash: string, mnemonicHash: string, keypairTypeHash: string): Credentials {
+function setCredentials(
+  passwordHash: string,
+  mnemonicHash: string,
+  keypairTypeHash: string,
+  emailHash: string,
+): Credentials {
   const credentials: Credentials = {
     passwordHash,
     mnemonicHash,
     keypairTypeHash,
+    emailHash,
   };
   localStorage.setItem(WALLET_KEY, JSON.stringify(credentials));
   return credentials;
@@ -604,6 +633,9 @@ const isValidConnectConfirmationPassword = computed(() =>
 const profileManagerController = useProfileManagerController();
 
 const balance = profileManagerController.balance;
+let freeBalance = balance.value?.free ?? 0;
+
+const email = ref("");
 
 const activeTab = ref(0);
 const password = ref("");
@@ -666,6 +698,7 @@ function clearFields() {
   password.value = "";
   confirmPassword.value = "";
   mnemonic.value = "";
+  email.value = "";
 }
 
 function reloadValidation() {
@@ -694,11 +727,15 @@ function validateMnInput(mnemonic: string) {
   isNonActiveMnemonic.value = false;
   enableReload.value = true;
   return getGrid({ mnemonic, keypairType: keypairType.value })
-    .then(() => undefined)
+    .then(() => {
+      isValid.value = true;
+      return undefined;
+    })
     .catch(e => {
       if (e instanceof TwinNotExistError) {
         isNonActiveMnemonic.value = true;
         enableReload.value = false;
+        isValid.value = false;
         return {
           message: `Couldn't get the user twin for the provided mnemonic in ${
             process.env.NETWORK || window.env.NETWORK
@@ -706,7 +743,7 @@ function validateMnInput(mnemonic: string) {
         };
       }
       enableReload.value = false;
-
+      isValid.value = false;
       return {
         message: normalizeError(e, "Something went wrong. please try again."),
       };
@@ -717,6 +754,10 @@ onMounted(async () => {
   await mounted();
 });
 
+async function handleProfileDialog(value: boolean) {
+  emit("update:modelValue", value);
+  if (profileManager?.profile && value) __loadBalance(profileManager.profile);
+}
 const creatingAccount = ref(false);
 async function createNewAccount() {
   openAcceptTerms.value = false;
@@ -763,6 +804,7 @@ async function __loadBalance(profile?: Profile, tries = 1) {
     loadingBalance.value = true;
     const grid = await getGrid(profile);
     balance.value = await loadBalance(grid!);
+    freeBalance = balance.value.free ?? 0;
     if (!BalanceWarningRaised && balance.value?.free) {
       if (balance.value?.free < 0.01) {
         createCustomToast("Your balance is too low, Please fund your account.", ToastType.warning);
@@ -795,11 +837,13 @@ function login() {
   }
 }
 
-function storeAndLogin() {
+async function storeAndLogin() {
   const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
   const mnemonicHash = cryptr.encrypt(mnemonic.value);
   const keypairTypeHash = cryptr.encrypt(keypairType.value);
-  setCredentials(md5(password.value), mnemonicHash, keypairTypeHash);
+  const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
+  storeEmail(grid!, email.value);
+  setCredentials(md5(password.value), mnemonicHash, keypairTypeHash, md5(email.value));
   activate(mnemonic.value, keypairType.value);
 }
 
@@ -893,9 +937,20 @@ export default {
 .v-field__input {
   font-size: small;
 }
+
+.qr {
+  border-left: 1px solid #3a3b3c;
+}
+
 @media only screen and (max-width: 1400px) {
   .app-btn {
     width: 8rem !important;
+  }
+}
+
+@media only screen and (max-width: 960px) {
+  .qr {
+    border-left: none;
   }
 }
 

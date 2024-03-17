@@ -8,6 +8,7 @@ import { migrateModule } from "./migration";
 export interface LoadedDeployments<T> {
   count: number;
   items: T[];
+  failedDeployments: FailedDeployment[];
 }
 
 interface FailedDeployment {
@@ -160,7 +161,6 @@ export async function loadK8s(grid: GridClient) {
   await migrateModule(grid.k8s);
 
   const clusters = await grid.k8s.list();
-  const failedK8s: string[] = [];
 
   const projectName = grid.clientOptions.projectName;
   const grids = (await Promise.all(
@@ -258,10 +258,10 @@ export function mergeLoadedDeployments<T>(...deployments: LoadedDeployments<T>[]
   return deployments.reduce(
     (res, current) => {
       insertIfNotFound(current, res);
-      res.count = res.items.length;
+      res.count += current.count;
       return res;
     },
-    { count: 0, items: [] },
+    { count: 0, items: [], failedDeployments: [] },
   );
 }
 
@@ -271,10 +271,23 @@ function insertIfNotFound(newItems: LoadedDeployments<any>, oldItems: LoadedDepl
     for (const i of oldItems.items) {
       if (item.deploymentName === i.deploymentName) {
         found = true;
+        newItems.count--;
       }
     }
     if (!found) {
       oldItems.items.push(item);
+    }
+  }
+  for (const item of newItems.failedDeployments) {
+    let found = false;
+    for (const i of oldItems.failedDeployments) {
+      if (item.name === i.name) {
+        found = true;
+        newItems.count--;
+      }
+    }
+    if (!found) {
+      oldItems.failedDeployments.push(item);
     }
   }
 }

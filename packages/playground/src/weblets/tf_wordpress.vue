@@ -95,7 +95,7 @@
       <input-tooltip
         inline
         tooltip="Click to know more about dedicated machines."
-        href="https://manual.grid.tf/dashboard/deploy/dedicated_machines.html"
+        href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
       >
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
       </input-tooltip>
@@ -144,7 +144,7 @@ const valid = ref(false);
 const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "wp" }));
 const username = ref("admin");
-const email = ref("");
+const email = ref(profileManager.profile?.email || "");
 const password = ref(generatePassword());
 const solution = ref() as Ref<SolutionFlavor>;
 const flist: Flist = {

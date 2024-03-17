@@ -8,11 +8,11 @@
   const network = NetworkEnv.dev;
   ```
 
-- Mnemonic: 12 words for your account. [create one](https://manual.grid.tf/getstarted/TF_Dashboard/TF_Dashboard.html#create-polkadot-extension-account)
+- Wallet connector: mnemonics (12 random words in a unique order) for your account to interact with the chain. [Create one](https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html)
 
 - Store secret: it's any word that will be used for encrypting/decrypting the keys on threefold key-value store.
 
-- project name: it's a name to isolate the deployments into a namespace.
+- Project name: it's a name to isolate the deployments into a namespace.
 
   **Note:** only network can't be isolated, all project can see the same network.
 

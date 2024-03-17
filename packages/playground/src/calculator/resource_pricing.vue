@@ -7,7 +7,8 @@
     <v-card class="pa-3">
       <v-row class="mt-3 px-3 pl-6">
         <v-alert type="info" variant="tonal">
-          For more information about Threefold Pricing check <a class="app-link" @click="openManual()">here</a>
+          For more information about Threefold Pricing check
+          <a class="app-link" @click="openManual()">here</a>
         </v-alert>
       </v-row>
       <v-row class="mt-3 px-3">
@@ -94,9 +95,9 @@
           <input-validator
             :value="HRU"
             :rules="[
-              validators.required('HDD Storage size is required.'),
               validators.isInt('HDD Storage size must be a valid integer.'),
               validators.max('Maximum allowed hdd storage size is 1000000 GB.', 1000000),
+              validators.min('Minimum allowed hdd storage size is 0 GB.', 0),
             ]"
             #="{ props }"
           >
@@ -105,7 +106,7 @@
                 label="Disk HDD"
                 suffix="GB"
                 type="number"
-                min="1"
+                min="0"
                 max="1000000"
                 oninput="if(Number(this.value) > 1000000) this.value = 1000000;"
                 v-model.number="HRU"
@@ -206,7 +207,6 @@ import { ref } from "vue";
 
 import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
 import { useProfileManager } from "@/stores/profile_manager";
-import { getGrid, loadBalance } from "@/utils/grid";
 
 import { calculator as Calculator } from "../../../grid_client/dist/es6";
 import { useGrid } from "../stores";
@@ -215,7 +215,7 @@ import { color } from "../utils/background_color";
 const CRU = ref<number>(1);
 const MRU = ref<number>(1);
 const SRU = ref<number>(25);
-const HRU = ref<number>(100);
+const HRU = ref<number>(0);
 const balance = ref<number>(0);
 const TFTPrice = ref<number>(0);
 
@@ -258,7 +258,7 @@ watch(
       pkgs = await calculator.value?.calculate({
         cru: CRU.value,
         mru: MRU.value,
-        hru: HRU.value,
+        hru: HRU.value ? HRU.value : 0,
         sru: SRU.value,
         ipv4u: ipv4.value,
         certified: isCertified.value,
@@ -332,7 +332,7 @@ onMounted(async () => {
   const pkgs = await calculator.value.calculate({
     cru: CRU.value,
     mru: MRU.value,
-    hru: HRU.value,
+    hru: HRU.value ? HRU.value : 0,
     sru: SRU.value,
     ipv4u: ipv4.value,
     certified: isCertified.value,
@@ -342,7 +342,7 @@ onMounted(async () => {
 });
 
 function openManual() {
-  window.open("https://manual.grid.tf/wiki/cloudunits/pricing/pricing.html#cloud-unit-pricing", "_blank");
+  window.open("https://www.manual.grid.tf/knowledge_base/cloud/pricing/pricing.html", "_blank");
 }
 </script>
 

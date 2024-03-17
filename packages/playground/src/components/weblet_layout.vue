@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card ref="webletLayoutContainer">
     <section class="d-flex align-center">
       <div>
         <v-card-title v-if="$slots.title" class="font-weight-bold d-flex align-center title">
@@ -85,11 +85,7 @@
           </div>
         </div>
 
-        <a
-          href="https://manual.grid.tf/wiki/cloudunits/pricing/pricing.html#cloud-unit-pricing"
-          target="_blank"
-          class="app-link"
-        >
+        <a href="https://www.manual.grid.tf/knowledge_base/cloud/pricing/pricing.html" target="_blank" class="app-link">
           Learn more about the pricing and how to unlock discounts.
         </a>
       </v-alert>
@@ -158,7 +154,7 @@ const props = defineProps({
 const emits = defineEmits<{ (event: "mount"): void; (event: "back"): void }>();
 const baseUrl = import.meta.env.BASE_URL;
 const profileManager = useProfileManager();
-
+const webletLayoutContainer = ref<VCard>();
 const status = ref<WebletStatus>();
 const message = ref<string>();
 function onLogMessage(msg: string) {
@@ -220,6 +216,12 @@ defineExpose({
 });
 
 function reset() {
+  if (status.value === "success") {
+    const element = webletLayoutContainer.value?.$el as HTMLElement;
+    if (element) {
+      element.dispatchEvent(new CustomEvent("render:solution", { bubbles: true, cancelable: true, composed: true }));
+    }
+  }
   status.value = undefined;
   message.value = undefined;
   emits("back");
@@ -316,6 +318,7 @@ async function loadCost(profile: { mnemonic: string }) {
 
 <script lang="ts">
 import type { ComputedRef, PropType, Ref } from "vue";
+import type { VCard } from "vuetify/components/VCard";
 
 import type { Balance } from "../utils/grid";
 import DeploymentDataDialog from "./deployment_data_dialog.vue";

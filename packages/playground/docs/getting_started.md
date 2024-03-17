@@ -14,7 +14,7 @@ yarn
 yarn dev           # to install the dependencies
 ```
 
-To read about each weblet and how to use it, and also how to config your twin id and activate your profile on the playground you can go to the [weblets documentation](https://manual.grid.tf/weblets/weblets_profile_manager.html?highlight=profile#profile-manager).
+To read about each weblet and how to use it, and also how to config your twin id and activate your profile on the playground you can go to the [weblets documentation](https://www.manual.grid.tf/documentation/dashboard/wallet_connector.html).
 
 ## Weblet List
 

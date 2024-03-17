@@ -18,13 +18,15 @@
         :value="$props.modelValue.username"
         :rules="[
           validators.required('Email is required.'),
-          validators.isEmail('Please provide a valid email address.'),
+          v => {
+            return isDiscourse ? undefined : validators.isEmail('Please provide a valid email address.')(v);
+          },
         ]"
         #="{ props }"
       >
         <input-tooltip tooltip="SMTP admin email.">
           <v-text-field
-            label="Admin Email"
+            :label="isDiscourse ? 'Admin Email/Username' : 'Admin Email'"
             placeholder="email@example.com"
             v-model="$props.modelValue.username"
             v-bind="props"
@@ -39,7 +41,7 @@
           :rules="[
             validators.required('Password is required.'),
             validators.minLength('Password must be at least 6 characters.', 6),
-            validators.maxLength('Password cannot exceed 15 characters.', 15),
+            validators.maxLength('Password cannot exceed 50 characters.', 50),
             validators.pattern('Password should not contain whitespaces.', {
               pattern: /^[^\s]+$/,
             }),
@@ -132,6 +134,7 @@ defineProps<{
   tls?: boolean;
   email?: boolean;
   persistent?: boolean;
+  isDiscourse?: boolean;
 }>();
 </script>
 

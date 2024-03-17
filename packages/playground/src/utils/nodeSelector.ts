@@ -1,4 +1,4 @@
-import type { FarmFilterOptions, FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
+import type { FarmFilterOptions, FarmInfo, FilterOptions, GridClient, NodeInfo } from "@threefold/grid_client";
 import type { NodeStatus } from "@threefold/gridproxy_client";
 import { GridClientErrors } from "@threefold/types";
 import type { DeepPartial } from "utility-types";
@@ -199,6 +199,30 @@ export function loadNodes(gridStore: ReturnType<typeof useGrid>, filters: Filter
   return gridStore.client.capacity.filterNodes(filters);
 }
 
+export async function validateRentContract(
+  gridStore: ReturnType<typeof useGrid>,
+  node: NodeInfo | undefined | null,
+): Promise<true> | never {
+  if (!node || !node.nodeId) {
+    throw "Node ID is required.";
+  }
+
+  try {
+    const contractInfo = await gridStore.grid.contracts.get({ id: node.rentContractId });
+    if (contractInfo.state.gracePeriod) {
+      throw `You can't deploy on node ${node.nodeId}, its rent contract in grace period. `;
+    }
+
+    return true;
+  } catch (error) {
+    const err = normalizeError(
+      error,
+      "Something went wrong while checking status of the node. Please check your connection and try again.",
+    );
+
+    throw err;
+  }
+}
 export async function loadValidNodes(
   gridStore: ReturnType<typeof useGrid>,
   selectionFitlers: SelectionDetailsFilters,

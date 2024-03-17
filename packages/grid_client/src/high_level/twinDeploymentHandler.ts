@@ -16,7 +16,7 @@ import { events } from "../helpers/events";
 import { validateObject } from "../helpers/validator";
 import { DeploymentFactory, Nodes } from "../primitives/index";
 import { Workload, WorkloadTypes } from "../zos/workload";
-import { Operations, TwinDeployment } from "./models";
+import { DeploymentResultContracts, Operations, TwinDeployment } from "./models";
 class TwinDeploymentHandler {
   tfclient: TFClient;
   rmb: RMB;
@@ -135,14 +135,21 @@ class TwinDeploymentHandler {
     return Promise.all(promises);
   }
 
-  async saveNetworks(twinDeployments: TwinDeployment[]) {
-    // left just to delete the old keys
+  async saveNetworks(twinDeployments: TwinDeployment[], contracts: DeploymentResultContracts) {
     for (const twinDeployment of twinDeployments) {
-      if (twinDeployment.network) {
-        if (twinDeployment.operation === Operations.delete) {
-          await twinDeployment.network.save();
-          continue;
+      if (!twinDeployment.network) {
+        return;
+      }
+      if (twinDeployment.operation === Operations.deploy) {
+        for (const workload of twinDeployment.deployment.workloads) {
+          if (workload.type !== WorkloadTypes.network) continue;
+          const contract = contracts.created.filter(c => c.contractId === twinDeployment.deployment.contract_id);
+          twinDeployment.network.save(contract[0]);
         }
+      }
+      // left just to delete the old keys
+      else if (twinDeployment.operation === Operations.delete) {
+        await twinDeployment.network.save(undefined, twinDeployment.deployment.contract_id);
       }
     }
   }
@@ -505,12 +512,12 @@ class TwinDeploymentHandler {
     await this.checkNodesCapacity(twinDeployments);
     await this.checkFarmIps(twinDeployments);
 
-    const contracts: { created: Contract[]; updated: Contract[]; deleted: { contractId: number }[] } = {
+    const contracts: DeploymentResultContracts = {
       created: [],
       updated: [],
       deleted: [],
     };
-    const resultContracts: { created: Contract[]; updated: Contract[]; deleted: { contractId: number }[] } = {
+    const resultContracts: DeploymentResultContracts = {
       created: [],
       updated: [],
       deleted: [],
@@ -597,7 +604,7 @@ class TwinDeploymentHandler {
         }
       }
       await this.waitForDeployments(twinDeployments);
-      await this.saveNetworks(twinDeployments);
+      await this.saveNetworks(twinDeployments, contracts);
     } catch (e) {
       await this.rollback(contracts);
       if (e instanceof BaseError) throw e;
