@@ -50,29 +50,9 @@
           </v-col>
           <v-col cols="12" md="6" sm="12">
             <country-details-card :node="node" />
-            <location-details-card class="mt-5" :node="node" />
-          </v-col>
-          <v-col cols="12" md="6" sm="12">
-            <farm-details-card :node="node" />
-          </v-col>
-          <v-col cols="12" md="6" sm="12">
             <twin-details-card :node="node" />
-          </v-col>
-          <v-col cols="12" md="6" sm="12">
-            <interfaces-details-card :node="node" />
-          </v-col>
-          <v-col v-if="node.cards?.length || node.num_gpu > 0" cols="12" md="6" sm="12">
-            <gpu-details-card :node="node" :nodeOptions="nodeOptions" />
-          </v-col>
-          <v-col v-if="node.publicConfig && node.publicConfig.domain" cols="12" md="6" sm="12">
-            <public-config-details-card :node="node" />
-          </v-col>
-
-          <v-col v-if="hasActiveProfile && node.healthy" cols="12" md="6" sm="12">
-            <i-perf-card :node="node" />
-          </v-col>
-          <v-col v-if="hasActiveProfile && node.healthy" cols="12" md="6" sm="12">
-            <cpu-benchmark-card :node="node" />
+            <gpu-details-card v-if="node.cards?.length || node.num_gpu > 0" :node="node" :nodeOptions="nodeOptions" />
+            <i-perf-card v-if="hasActiveProfile && node.healthy" :node="node" />
           </v-col>
         </v-row>
       </v-card>
