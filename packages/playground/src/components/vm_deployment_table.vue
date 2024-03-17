@@ -48,9 +48,17 @@
 
     <AccessDeploymentAlert />
 
+    <InputTooltip
+      v-if="props.projectName.toLowerCase() === 'vm'"
+      tooltip="Didn't find your deployments in the list? Enable to show all deployments."
+      inline
+    >
+      <VSwitch inset color="primary" label="Show All Deployments" v-model="showAllDeployments" />
+    </InputTooltip>
+
     <ListTable
       :headers="filteredHeaders"
-      :items="items"
+      :items="showAllDeployments ? items : items.filter(i => !i.fromAnotherClient)"
       :loading="loading"
       :deleting="deleting"
       :model-value="$props.modelValue"
@@ -74,8 +82,12 @@
         {{ item.value.planetary || "-" }}
       </template>
 
+      <template #[`item.mycelium`]="{ item }">
+        {{ item.value.myceliumIP || "-" }}
+      </template>
+
       <template #[`item.wireguard`]="{ item }">
-        {{ item.value.interfaces[0].ip || "-" }}
+        {{ item.value.interfaces?.[0]?.ip || "-" }}
       </template>
 
       <template #[`item.flist`]="{ item }">
@@ -108,6 +120,9 @@
           <v-tooltip v-if="item.value.status == NodeHealth.Error" activator="parent" location="top">{{
             item.value.message
           }}</v-tooltip>
+          <v-tooltip v-if="item.value.status == NodeHealth.Paused" activator="parent" location="top"
+            >The deployment contract is in grace period</v-tooltip
+          >
           <span class="text-uppercase">
             {{ getNodeHealthColor(item.value.status as string).type }}
           </span>
@@ -139,6 +154,7 @@ import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
 import { useProfileManager } from "../stores";
 import { getGrid, updateGrid } from "../utils/grid";
+import { markAsFromAnotherClient } from "../utils/helpers";
 import { loadVms, mergeLoadedDeployments } from "../utils/load_deployment";
 
 const profileManager = useProfileManager();
@@ -155,11 +171,12 @@ const count = ref<number>();
 const items = ref<any[]>([]);
 const showDialog = ref(false);
 const showEncryption = ref(false);
+const showAllDeployments = ref(false);
 const failedDeployments = ref<
   {
     name: string;
     nodes?: number[];
-    contracts?: { contract_id: number; node_id: number }[];
+    contracts?: { contractID: number; node_id: number }[];
   }[]
 >([]);
 
@@ -181,25 +198,19 @@ async function loadDeployments() {
     await migrateModule(grid!.gateway);
   }
 
-  const filter =
-    props.projectName.toLowerCase() === ProjectName.VM.toLowerCase()
-      ? undefined
-      : ([vm]: [{ flist: string }]) => vm.flist.replace(/-/g, "").includes(props.projectName.toLowerCase());
-
   const chunk3 =
-    props.projectName.toLowerCase() === ProjectName.Fullvm.toLowerCase()
-      ? { count: 0, items: [] }
-      : await loadVms(updateGrid(grid!, { projectName: "" }), { filter });
+    props.projectName.toLowerCase() === ProjectName.VM.toLowerCase()
+      ? await loadVms(updateGrid(grid!, { projectName: "" }))
+      : { count: 0, items: [], failedDeployments: [] };
+
   if (chunk3.count > 0 && migrateGateways) {
     await migrateModule(grid!.gateway);
   }
 
+  chunk3.items = chunk3.items.map(markAsFromAnotherClient);
+
   const vms = mergeLoadedDeployments(chunk1, chunk2, chunk3 as any);
-  failedDeployments.value = [
-    ...(Array.isArray((chunk1 as any).failedDeployments) ? (chunk1 as any).failedDeployments : []),
-    ...(Array.isArray((chunk2 as any).failedDeployments) ? (chunk2 as any).failedDeployments : []),
-    ...(Array.isArray((chunk3 as any).failedDeployments) ? (chunk3 as any).failedDeployments : []),
-  ];
+  failedDeployments.value = vms.failedDeployments;
 
   count.value = vms.count;
   items.value = vms.items.map(([leader, ...workers]) => {
@@ -219,6 +230,7 @@ const filteredHeaders = computed(() => {
     { title: "Public IPv4", key: "ipv4", sortable: false },
     { title: "Public IPv6", key: "ipv6", sortable: false },
     { title: "Planetary Network IP", key: "planetary", sortable: false },
+    { title: "Mycelium Network IP", key: "mycelium", sortable: false },
     { title: "WireGuard", key: "wireguard", sortable: false },
     { title: "Flist", key: "flist" },
     { title: "Cost", key: "billing" },
@@ -272,7 +284,7 @@ const failedDeploymentList = computed(() => {
       const contractMessage =
         contracts.length > 0
           ? ` <span class="ml-4 text-primary font-weight-bold">With Contract ID:</span> ${contracts
-              .map(c => c.contract_id)
+              .map(c => c.contractID)
               .join(", ")}.`
           : "";
 

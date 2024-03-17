@@ -24,7 +24,8 @@ async function cancel(client, zdb) {
 }
 
 async function main() {
-  const grid3 = await getClient();
+  const name = "tttzdbs";
+  const grid3 = await getClient(`zdb/${name}`);
 
   const zdbQueryOptions: FilterOptions = {
     sru: 1,
@@ -34,7 +35,7 @@ async function main() {
   };
 
   const zdbs: ZDBSModel = {
-    name: "tttzdbs",
+    name,
     zdbs: [
       {
         name: "hamada",
@@ -53,10 +54,10 @@ async function main() {
   await deploy(grid3, zdbs);
 
   //Get the deployment
-  await getDeployment(grid3, zdbs.name);
+  await getDeployment(grid3, name);
 
   //Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name: zdbs.name });
+  // await cancel(grid3, { name });
 
   await grid3.disconnect();
 }

@@ -34,6 +34,7 @@ export enum NodeHealth {
   Ok = "ok",
   Init = "init",
   Error = "error",
+  Paused = "paused",
 }
 
 export async function getAllNodes(grid: GridClient | null, options?: NodeFilters): Promise<NodeInfo[] | number[]> {
@@ -114,7 +115,9 @@ export const getNodeHealthColor = (health: string): NodeHealthColor => {
   if (health == NodeHealth.Ok) {
     return { color: "success", type: NodeHealth.Ok };
   } else if (health == NodeHealth.Init) {
-    return { color: "warning", type: NodeHealth.Init };
+    return { color: "primary", type: NodeHealth.Init };
+  } else if (health == NodeHealth.Paused) {
+    return { color: "warning", type: NodeHealth.Paused };
   } else {
     return { color: "error", type: NodeHealth.Error };
   }

@@ -24,7 +24,8 @@ async function cancel(client, vms) {
 }
 
 async function main() {
-  const grid3 = await getClient();
+  const name = "newVMS5";
+  const grid3 = await getClient(`caprover/${name}`);
 
   const vmQueryOptions: FilterOptions = {
     cru: 4,
@@ -34,7 +35,7 @@ async function main() {
   };
 
   const vms: MachinesModel = {
-    name: "newVMS6",
+    name,
     network: {
       name: "wedtest",
       ip_range: "10.249.0.0/16",
@@ -76,10 +77,10 @@ async function main() {
   await deploy(grid3, vms);
 
   //Get the deployment
-  await getDeployment(grid3, vms.name);
+  await getDeployment(grid3, name);
 
   //Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name: vms.name });
+  // await cancel(grid3, { name });
 
   await grid3.disconnect();
 }

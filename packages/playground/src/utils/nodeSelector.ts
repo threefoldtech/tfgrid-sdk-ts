@@ -162,7 +162,7 @@ export function normalizeNodeOptions(
     size: window.env.PAGE_SIZE,
     page: pagination.value.page,
     location: location || {},
-    twinId: gridStore.client.twinId,
+    twinId: gridStore.client?.twinId,
     farm,
   };
 }

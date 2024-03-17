@@ -10,10 +10,8 @@
       <TfFilter
         query-route="node-id"
         :rules="[
-          validators.isNumeric('This field accepts numbers only.', {
-            no_symbols: true,
-          }),
-          validators.min('The node id should be larger then zero.', 1),
+          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.min('The node id should be larger than zero.', 1),
           validators.startsWith('The node id start with zero.', '0'),
           validators.validateResourceMaxNumber('This is not a valid ID.'),
         ]"
@@ -96,7 +94,7 @@
         v-model="filters.minSSD"
         :rules="[
           validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The total ssd should be larger then zero.', 1),
+          validators.min('The total ssd should be larger than zero.', 1),
           validators.validateResourceMaxNumber('This value is out of range.'),
         ]"
       >
@@ -118,7 +116,7 @@
         v-model="filters.minHDD"
         :rules="[
           validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The total hdd should be larger then zero.', 1),
+          validators.min('The total hdd should be larger than zero.', 1),
           validators.validateResourceMaxNumber('This value is out of range.'),
         ]"
       >
@@ -140,7 +138,7 @@
         v-model="filters.minRAM"
         :rules="[
           validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The total ram should be larger then zero.', 1),
+          validators.min('The total ram should be larger than zero.', 1),
           validators.validateResourceMaxNumber('This value is out of range.'),
         ]"
       >
@@ -184,7 +182,7 @@
         v-model="filters.freeSSD"
         :rules="[
           validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The free ssd should be larger then zero.', 1),
+          validators.min('The free ssd should be larger than zero.', 1),
           validators.validateResourceMaxNumber('This value is out of range.'),
         ]"
       >
@@ -206,7 +204,7 @@
         v-model="filters.freeHDD"
         :rules="[
           validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The free hdd should be larger then zero.', 1),
+          validators.min('The free hdd should be larger than zero.', 1),
           validators.validateResourceMaxNumber('This value is out of range.'),
         ]"
       >
@@ -228,7 +226,7 @@
         v-model="filters.freeRAM"
         :rules="[
           validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The free ram should be larger then zero.', 1),
+          validators.min('The free ram should be larger than zero.', 1),
           validators.validateResourceMaxNumber('This value is out of range.'),
         ]"
       >

@@ -133,7 +133,7 @@ async function onMount() {
         rentContracts.value = contracts.value.filter(c => c.type === ContractType.RENT);
         totalCost.value = getTotalCost(contracts.value);
         const TFTInUSD = await queryClient.tftPrice.get();
-        totalCostUSD.value = totalCost.value / TFTInUSD;
+        totalCostUSD.value = totalCost.value * (TFTInUSD / 1000);
       } catch (error: any) {
         // Handle errors and display toast messages
         loadingErrorMessage.value = error.message;
