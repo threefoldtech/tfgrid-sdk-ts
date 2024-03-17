@@ -50,9 +50,14 @@
           </v-col>
           <v-col cols="12" md="6" sm="12">
             <country-details-card :node="node" />
-            <twin-details-card :node="node" />
-            <gpu-details-card v-if="node.cards?.length || node.num_gpu > 0" :node="node" :nodeOptions="nodeOptions" />
-            <i-perf-card v-if="hasActiveProfile && node.healthy" :node="node" />
+            <twin-details-card class="mt-3" :node="node" />
+            <gpu-details-card
+              class="mt-3"
+              v-if="node.cards?.length || node.num_gpu > 0"
+              :node="node"
+              :nodeOptions="nodeOptions"
+            />
+            <i-perf-card class="mt-3" v-if="hasActiveProfile && node.healthy" :node="node" />
           </v-col>
         </v-row>
       </v-card>
