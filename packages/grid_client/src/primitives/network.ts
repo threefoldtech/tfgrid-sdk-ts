@@ -326,7 +326,6 @@ class Network {
     events.emit("logs", `Loading network ${this.name}`);
 
     if (await this.existOnNewNetwork()) {
-      await new Promise(f => setTimeout(f, 60000));
       await this.loadNetworkFromContracts();
     } else {
       const network = await this.getNetwork();
