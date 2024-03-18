@@ -8,11 +8,13 @@
         class="mr-2"
         :alt="tab.title"
         v-else-if="tab.imgPath"
-        :style="{ filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})` }"
+        :style="{
+          filter: `brightness(${$vuetify.theme.global.name === 'light' ? 0.2 : 1})`,
+        }"
       />
       {{ tab.title }}
       <v-chip color="info" v-if="forms[tabs.indexOf(tab)]?.pending" class="ml-1">
-        Validating <v-progress-circular class="ml-1" indeterminate size="15" width="3" />
+        Validating <v-progress-circular class="ml-1" />
       </v-chip>
       <v-chip color="error" v-else-if="forms[tabs.indexOf(tab)]?.invalid" class="ml-1">invalid</v-chip>
     </v-tab>

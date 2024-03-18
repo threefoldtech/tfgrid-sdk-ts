@@ -15,8 +15,10 @@
     </v-toolbar>
     <template v-if="loading">
       <v-card class="d-flex justify-center align-center h-screen">
-        <v-progress-circular color="primary" indeterminate :size="128" :width="5" />
-        <p class="mt-2">Loading node details...</p>
+        <div class="d-flex my-6 align-center justify-center">
+          <v-progress-circular />
+        </div>
+        <p>Loading node details...</p>
       </v-card>
     </template>
     <template v-else-if="isError">
