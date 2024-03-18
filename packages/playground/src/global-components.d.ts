@@ -13,7 +13,6 @@ import PasswordInputWrapper from "./components/password_input_wrapper.vue";
 import ViewLayout from "./components/view_layout.vue";
 import WebletLayout from "./components/weblet_layout.vue";
 import type * as validators from "./utils/validators";
-
 declare module "@vue/runtime-core" {
   export interface GlobalComponents {
     PasswordInputWrapper: typeof PasswordInputWrapper;

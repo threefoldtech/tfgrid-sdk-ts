@@ -27,7 +27,9 @@
     </v-row>
 
     <v-row justify="center">
-      <v-progress-circular v-if="loading" indeterminate color="primary" :size="50" class="mt-10 mb-10" />
+      <div class="d-flex my-6 align-center justify-center">
+        <v-progress-circular v-if="loading" class="mt-10 mb-10" />
+      </div>
       <v-btn rounded="md" variant="flat" color="primary" class="mt-10" @click="getNodeHealthUrl">
         Check Node Health
       </v-btn>
@@ -68,7 +70,7 @@ export default {
     const resources = ref<ResourceWrapper[]>([]);
     const renamedResources = ["CPU", "RAM", "SSD", "HDD"];
     const loading = ref<boolean>(false);
-
+    const indeterminate = ref<boolean>(false);
     const getNodeHealthUrl = async () => {
       const grafana = new GrafanaStatistics(props.node);
       const nodeHealthUrl = await grafana.getUrl();
@@ -100,7 +102,7 @@ export default {
       NodeStatus,
       resources,
       loading,
-
+      indeterminate,
       getNodeResources,
       getNodeHealthUrl,
       getNodeStatusColor,

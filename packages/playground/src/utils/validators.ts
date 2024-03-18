@@ -4,9 +4,14 @@ import type { IsEmailOptions } from "validator/lib/isEmail";
 import type { IsFQDNOptions } from "validator/lib/isFQDN";
 import type { IsURLOptions } from "validator/lib/isURL";
 
+/**
+ * Checks if a value is empty, undefined, or null.
+ * @param msg - The error message to be returned if the value is empty.
+ * @returns A validation function that takes in a value and returns an object with the error message and a `required` property set to `true` if the value is empty, undefined, or null.
+ */
 export function required(msg: string) {
   return (value: string) => {
-    if (value === "" || value === undefined || value === null) {
+    if (!value) {
       return { message: msg, required: true };
     }
   };
@@ -723,4 +728,14 @@ export function pattern(msg: string, config: RegexPattern) {
       return { message: msg, pattern: String(regex) };
     }
   };
+}
+
+/**
+ * Checks if a given string is a valid SSH key.
+ * @param key - The SSH key string to be validated.
+ * @returns True if the key is a valid SSH key, false otherwise.
+ */
+export function isValidSSHKey(key: string): boolean {
+  const sshKeyRegex = /^(ssh-rsa|ssh-dss|ecdsa-[a-zA-Z0-9-]+|ssh-ed25519)\s+(\S+)\s+(\S+)/;
+  return sshKeyRegex.test(key);
 }
