@@ -78,7 +78,12 @@
             <a href="https://www.threefold.io/newsroom/" class="app-link text-subtitle-2" target="_blank">News Room</a>
           </div>
           <div>
-            <a href="https://www.threefold.io/community/" class="app-link text-subtitle-2" target="_blank">Community</a>
+            <a
+              href="https://manual.grid.tf/knowledge_base/about/about.html"
+              class="app-link text-subtitle-2"
+              target="_blank"
+              >About Us</a
+            >
           </div>
         </v-col>
 
