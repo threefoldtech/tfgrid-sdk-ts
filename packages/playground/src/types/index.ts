@@ -324,3 +324,12 @@ export const nodeInitializer: GridNode = {
   num_gpu: 0,
   healthy: false,
 };
+
+export interface SSHKeyData {
+  id: number;
+  name: string;
+  createdAt: string;
+  lastUsed: string;
+  fingerPrint: string;
+  isActive: boolean;
+}
