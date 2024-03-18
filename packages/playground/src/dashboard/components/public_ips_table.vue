@@ -104,11 +104,13 @@ export default {
         title: "IP",
         align: "center",
         key: "ip",
+        sortable: false,
       },
       {
         title: "Gateway",
         align: "center",
         key: "gateway",
+        sortable: false,
       },
       {
         title: "Deployed Contract ID",
