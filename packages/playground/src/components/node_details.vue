@@ -6,7 +6,7 @@
     transition="dialog-bottom-transition"
     hide-overlay
   >
-    <v-toolbar color="primary">
+    <v-toolbar color="primary" class="w-75 mx-auto">
       <div class="d-flex justify-center">
         <v-btn icon dark @click="() => $emit('close-dialog', false)">
           <v-icon>mdi-close</v-icon>
@@ -35,37 +35,31 @@
     </template>
 
     <template v-else>
-      <v-card>
+      <v-card class="w-75 mx-auto">
         <node-resources-charts :node="node" :is-live-stats="isLiveStats" :hint-message="errorLoadingStatsMessage" />
         <v-row class="pa-8 mt-5" justify-md="start" justify-sm="center">
-          <v-col cols="12" md="6" sm="8">
+          <v-col cols="12" md="6" sm="12">
             <node-details-card :node="node" />
-          </v-col>
-          <v-col cols="12" md="6" sm="8">
-            <country-details-card :node="node" />
-            <location-details-card class="mt-5" :node="node" />
-          </v-col>
-          <v-col cols="12" md="6" sm="8">
-            <farm-details-card :node="node" />
-          </v-col>
-          <v-col cols="12" md="6" sm="8">
-            <twin-details-card :node="node" />
-          </v-col>
-          <v-col cols="12" md="6" sm="8">
-            <interfaces-details-card :node="node" />
-          </v-col>
-          <v-col v-if="node.cards?.length || node.num_gpu > 0" cols="12" md="6" sm="8">
-            <gpu-details-card :node="node" :nodeOptions="nodeOptions" />
-          </v-col>
-          <v-col v-if="node.publicConfig && node.publicConfig.domain" cols="12" md="6" sm="8">
-            <public-config-details-card :node="node" />
-          </v-col>
+            <farm-details-card class="mt-5" :node="node" />
+            <interfaces-details-card class="mt-5" :node="node" />
+            <public-config-details-card
+              v-if="node.publicConfig && node.publicConfig.domain"
+              class="mt-5"
+              :node="node"
+            />
 
-          <v-col v-if="hasActiveProfile && node.healthy" cols="12" md="6" sm="8">
-            <i-perf-card :node="node" />
+            <cpu-benchmark-card v-if="hasActiveProfile && node.healthy" class="mt-5" :node="node" />
           </v-col>
-          <v-col v-if="hasActiveProfile && node.healthy" cols="12" md="6" sm="8">
-            <cpu-benchmark-card :node="node" />
+          <v-col cols="12" md="6" sm="12">
+            <country-details-card :node="node" />
+            <twin-details-card class="mt-3" :node="node" />
+            <gpu-details-card
+              class="mt-3"
+              v-if="node.cards?.length || node.num_gpu > 0"
+              :node="node"
+              :nodeOptions="nodeOptions"
+            />
+            <i-perf-card class="mt-3" v-if="hasActiveProfile && node.healthy" :node="node" />
           </v-col>
         </v-row>
       </v-card>
@@ -84,7 +78,6 @@ import cpuBenchmarkCard from "@/components/node_details_cards/cpu_benchmark_card
 import FarmDetailsCard from "@/components/node_details_cards/farm_details_card.vue";
 import GpuDetailsCard from "@/components/node_details_cards/gpu_details_card.vue";
 import InterfacesDetailsCard from "@/components/node_details_cards/interfaces_details_card.vue";
-import LocationDetailsCard from "@/components/node_details_cards/location_details_card.vue";
 import NodeDetailsCard from "@/components/node_details_cards/node_details_card.vue";
 import PublicConfigDetailsCard from "@/components/node_details_cards/public_config_details_card.vue";
 import TwinDetailsCard from "@/components/node_details_cards/twin_details_card.vue";
@@ -117,7 +110,6 @@ export default {
     NodeDetailsCard,
     FarmDetailsCard,
     CountryDetailsCard,
-    LocationDetailsCard,
     InterfacesDetailsCard,
     TwinDetailsCard,
     GpuDetailsCard,
