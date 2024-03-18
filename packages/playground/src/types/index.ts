@@ -327,9 +327,12 @@ export const nodeInitializer: GridNode = {
 
 export interface SSHKeyData {
   id: number;
+  key: string;
   name: string;
   createdAt: string;
   lastUsed: string;
   fingerPrint: string;
   isActive: boolean;
+  deleting: boolean;
+  activating: boolean;
 }

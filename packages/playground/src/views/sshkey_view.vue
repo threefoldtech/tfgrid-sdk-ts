@@ -23,11 +23,31 @@
     </v-col>
   </v-card>
 
-  <ssh-table :header-icon="'mdi-key-chain-variant'" :header-title="'Active Keys'" :ssh-keys="activeKeys" />
-  <ssh-table :header-icon="'mdi-key-chain'" :header-title="'All Keys'" :ssh-keys="allKeys" />
+  <ssh-table
+    @active="setActiveKey"
+    @inactive="setInactiveKey"
+    @delete="deleteKey"
+    :header-icon="'mdi-key-chain-variant'"
+    :header-title="'Active Keys'"
+    :ssh-keys="activeKeys"
+  />
+
+  <ssh-table
+    @active="setActiveKey"
+    @inactive="setInactiveKey"
+    @delete="deleteKey"
+    :header-icon="'mdi-key-chain'"
+    :header-title="'All Keys'"
+    :ssh-keys="allKeys"
+  />
 
   <!-- Dialogs -->
-  <add-new-ssh-key-dialog :open="openAddNewSSHDialog" @close="() => (openAddNewSSHDialog = false)" />
+  <add-new-ssh-key-dialog
+    :open="openAddNewSSHDialog"
+    :all-keys="allKeys"
+    @save="addKey($event)"
+    @close="() => (openAddNewSSHDialog = false)"
+  />
 </template>
 
 <script lang="ts">
@@ -45,32 +65,62 @@ export default defineComponent({
     AddNewSshKeyDialog,
   },
 
+  methods: {
+    addKey(key: SSHKeyData) {
+      console.log("New added key, ", key);
+    },
+
+    updateKeys(key: SSHKeyData, isDeleted?: boolean) {},
+
+    setActiveKey(key: SSHKeyData) {
+      key.isActive = true;
+      this.updateKeys(key);
+    },
+
+    setInactiveKey(key: SSHKeyData) {
+      key.isActive = false;
+      this.updateKeys(key);
+    },
+
+    deleteKey(key: SSHKeyData) {
+      this.updateKeys(key, true);
+    },
+  },
   setup() {
     const openAddNewSSHDialog = ref<boolean>(false);
     const allKeys: SSHKeyData[] = [
       {
         id: 1,
+        key: "",
         name: "Test key",
         createdAt: "2011-05-14",
         lastUsed: "2014-09-15",
         fingerPrint: "524sad#!@$$@s4ad#@$saj4h5@asf",
         isActive: false,
+        activating: false,
+        deleting: false,
       },
       {
         id: 2,
+        key: "",
         name: "Mahmoud's key",
         createdAt: "2020-09-25",
         lastUsed: "2022-02-02",
         fingerPrint: "524sad#!@$$@s4ad@asf",
         isActive: true,
+        activating: false,
+        deleting: false,
       },
       {
         id: 3,
+        key: "",
         name: "Adham's key",
         createdAt: "2018-01-01",
         lastUsed: "2020-01-01",
         fingerPrint: "@$$@s4ad#@$saj4h5@asf",
         isActive: false,
+        activating: false,
+        deleting: false,
       },
     ];
 

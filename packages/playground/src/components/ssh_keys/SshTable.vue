@@ -10,7 +10,7 @@
     <div class="table">
       <list-table
         class="pa-5 mt-3"
-        :deleting="deleting"
+        :deleting="false"
         v-model="selectedKeys"
         :loading="loading"
         :headers="headers"
@@ -50,22 +50,35 @@
         </template>
 
         <template #[`item.activation`]="{ item }">
-          <v-tooltip v-if="item.value.isActive" :text="`The ${item.value.name} key is activated!`">
+          <v-tooltip
+            v-if="item.value.isActive"
+            :text="`The '${item.value.name}' key is currently activated and will be utilized in deployments.`"
+          >
             <template #activator="{ props }">
-              <v-chip @click="activateKey(item.value)" class="activation" v-bind="props" color="green">
-                <v-icon>mdi-check</v-icon>
-                Activated
-              </v-chip>
+              <v-btn
+                v-bind="props"
+                :loading="item.value.activating"
+                color="green"
+                variant="tonal"
+                @click="activateKey(item.value)"
+                prepend-icon="mdi-check"
+              >
+                Active
+              </v-btn>
             </template>
           </v-tooltip>
 
-          <v-tooltip v-else :text="`Click to active ${item.value.name} key.`">
+          <v-tooltip v-else :text="`Click to activate the '${item.value.name}' for use in deployments.`">
             <template #activator="{ props }">
-              <v-progress-circular v-if="activating" color="primary" indeterminate></v-progress-circular>
-              <v-chip v-else @click="activateKey(item.value)" class="activation" v-bind="props" color="error">
-                <v-icon>mdi-close</v-icon>
-                Not Activated
-              </v-chip>
+              <v-btn
+                v-bind="props"
+                :loading="item.value.activating"
+                color="grey-lighten-1"
+                variant="tonal"
+                @click="activateKey(item.value)"
+              >
+                Inactive
+              </v-btn>
             </template>
           </v-tooltip>
         </template>
@@ -74,8 +87,8 @@
           <v-tooltip :text="`Delete ${item.value.name}`">
             <template #activator="{ props }">
               <v-btn
-                :disabled="loading || deleting"
-                :loading="deleting"
+                :disabled="loading || item.value.deleting"
+                :loading="item.value.deleting"
                 color="error"
                 @click="deleteKey(item.value)"
                 variant="tonal"
@@ -128,6 +141,7 @@ import { defineComponent, PropType, ref } from "vue";
 
 import ListTable from "@/components/list_table.vue";
 import { SSHKeyData, VDataTableHeader } from "@/types";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 export default defineComponent({
   props: {
@@ -149,22 +163,35 @@ export default defineComponent({
     ListTable,
   },
 
+  emits: ["inactive", "active", "delete"],
+
   methods: {
-    deleteKey(item: any) {
-      this.deleting = true;
-      this.loading = true;
-      console.log("Item", item.id);
+    deleteKey(item: SSHKeyData) {
+      item.deleting = true;
+      setTimeout(() => {
+        this.$emit("delete", item);
+        item.deleting = false;
+        createCustomToast(`${item.name} key has been successfully removed.`, ToastType.success);
+      }, 3000);
     },
-    activateKey(item: any) {
-      this.activating = true;
-      console.log("Item", item.id);
+
+    activateKey(item: SSHKeyData) {
+      item.activating = true;
+      setTimeout(() => {
+        if (item.isActive) {
+          this.$emit("inactive", item);
+          createCustomToast(`The activation of ${item.name} key has been disabled.`, ToastType.success);
+        } else {
+          this.$emit("active", item);
+          createCustomToast(`The activation of ${item.name} key has been enabled.`, ToastType.success);
+        }
+        item.activating = false;
+      }, 3000);
     },
   },
 
   setup() {
     const loading = ref<boolean>(false);
-    const deleting = ref<boolean>(false);
-    const activating = ref<boolean>(false);
     const selectedKeys = ref<SSHKeyData[]>([]);
 
     const headers: VDataTableHeader = [
@@ -198,7 +225,7 @@ export default defineComponent({
       },
     ];
 
-    return { headers, loading, selectedKeys, deleting, activating };
+    return { headers, loading, selectedKeys };
   },
 });
 </script>
