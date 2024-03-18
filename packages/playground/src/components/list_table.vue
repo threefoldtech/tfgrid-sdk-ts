@@ -33,7 +33,6 @@
           <v-progress-circular
             v-if="deleting && selectedItems.includes(item?.value)"
             class="ml-3"
-            indeterminate
             color="red"
             :width="2"
             :size="20"
@@ -57,12 +56,14 @@
     <template #bottom>
       <v-row class="mt-5" v-if="loading && items.length === 0">
         <v-spacer />
-        <v-progress-circular indeterminate color="primary" />
+        <div class="d-flex my-6 align-center justify-center">
+          <v-progress-circular :width="3" :size="30" />
+        </div>
         <v-spacer />
       </v-row>
       <template v-else-if="!loading && items.length === 0 && (noDataText || $slots['no-data-text'])">
         <VContainer>
-          <VRow justify="center" align="center" class="mt-8">
+          <VRow justify="center" align="center" class="mt-5">
             <slot name="no-data-text" v-if="$slots['no-data-text']" />
             <p v-else v-text="noDataText" />
           </VRow>
