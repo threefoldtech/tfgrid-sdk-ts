@@ -212,7 +212,7 @@ class GridClient {
       urls.rmbProxy = this.clientOptions.proxyURL ? this.clientOptions.proxyURL : "https://gridproxy.grid.tf";
       urls.relay = this.clientOptions.relayURL ? this.clientOptions.relayURL : "wss://relay.grid.tf";
       urls.substrate = this.clientOptions.substrateURL ? this.clientOptions.substrateURL : "wss://tfchain.grid.tf/ws";
-      urls.graphql = this.clientOptions.graphqlURL ? this.clientOptions.graphqlURL : "https://graph.grid.tf/graphql";
+      urls.graphql = this.clientOptions.graphqlURL ? this.clientOptions.graphqlURL : "https://graphql.grid.tf/graphql";
       urls.activation = this.clientOptions.activationURL
         ? this.clientOptions.activationURL
         : "https://activation.grid.tf/activation/activate";
