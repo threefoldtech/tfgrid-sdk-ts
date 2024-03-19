@@ -5,9 +5,9 @@ name: Full Clients Build
 
 on:
   push:
-    branches: [development, development_314]
+    branches: [development]
   pull_request:
-    branches: [development, development_314]
+    branches: [development]
 
 jobs:
   build:
