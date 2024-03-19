@@ -52,7 +52,7 @@
           :disabled="loading"
           :loading="loading"
         >
-          Delete IP
+          Delete
         </v-btn>
       </template>
     </v-data-table-server>

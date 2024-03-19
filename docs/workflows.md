@@ -24,56 +24,6 @@ Runs daily for the last code and installs dependencies, runs tests and checks if
 
 Runs daily on all networks for the relevant release and it will check if the latest version runs without errors.
 
-## Dashboard
-
-### [Build](/.github/workflows/dashboard_build.yaml)
-
-On **Pull Request**, and **Push** to development branch that has changes in the dashboard package: It will do a clean install of node dependencies, cache/restore them to make the process faster, and build the source code using `yarn workspace @threefold/dashboard build`.
-
-### [Docker](/.github/workflows/dashboard_docker.yaml)
-
-On **Release** published: It will build and push a new docker image based on project release tag.
-
-The current VERSION (Which is passed by the Operations team) and GQL_URL environment variables will be propagated into the builds [build-env.sh](../packages/dashboard/scripts/build-env.sh), The values of those arguments could be as follows:
-
-```bash
-TFCHAIN_NETWORK = "dev | qa | test | main | custom";
-VERSION = "release tag";
-```
-
-### [Cypress](/.github/workflows/dashboard_cypress.yaml)
-
-Runs daily for the last code and it will check if the code in Explorer passed the test cases using Cypress.
-
-### [Selenium](/.github/workflows/dashboard_selenium.yaml)
-
-Runs daily for the last code and it will check if the code in Portal passed the test cases using Selenium.
-
-## Weblets
-
-### [Build](/.github/workflows/weblets_build.yaml)
-
-On **Pull Request**, and **Push** to development branch that has changes in the weblets package: It will do a clean install of node dependencies, cache/restore them to make the process faster, and build the source code using `yarn build:app`.
-
-### [Docker](/.github/workflows/weblets_docker.yml)
-
-On **Release** published: It will build and push a new docker image based on project release tag.
-
-We are using _VERSION_, and _NETWORK_ arguments in this workflow that will be propagated into the builds [config](/packages/weblets/scripts/build-env.sh), The values of those arguments could be as follows:
-
-```js
-NETWORK = "dev" | "qa" | "test" | "main" (default: dev)
-VERSION = "release tag or the first 7 chars of commit hash"
-```
-
-### [CD](/.github/workflows/weblets_cd.yml)
-
-On **Push** to development branch: It will do a clean install of node dependencies, cache/restore them, build the source code and deploy to staging server by Copying the artifacts using ssh to `play.dev.grid.tf`.
-
-### [Cypress](/.github/workflows/weblets_cypress.yaml)
-
-Runs daily for the last code and it will check if the code passed the test cases using Cypress.
-
 ## Playground
 
 ### [Build](/.github/workflows/playground_build.yml)
