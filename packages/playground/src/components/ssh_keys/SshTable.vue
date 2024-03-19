@@ -9,6 +9,7 @@
 
     <div class="table">
       <list-table
+        :no-data-text="capitalize(`No data found.`)"
         class="pa-5 mt-3"
         :deleting="false"
         v-model="selectedKeys"
@@ -20,7 +21,7 @@
           <v-tooltip location="top" :text="`The most recent deployment activity associated with this SSH key.`">
             <template #activator="{ props }">
               <v-chip color="primary" v-bind="props">
-                {{ item.value.lastUsed }}
+                {{ item.raw.lastUsed }}
               </v-chip>
             </template>
           </v-tooltip>
@@ -30,7 +31,7 @@
           <v-tooltip location="top" :text="`The date when this SSH key was created.`">
             <template #activator="{ props }">
               <v-chip color="primary" v-bind="props">
-                {{ item.value.createdAt }}
+                {{ item.raw.createdAt }}
               </v-chip>
             </template>
           </v-tooltip>
@@ -43,7 +44,7 @@
           >
             <template #activator="{ props }">
               <p v-bind="props">
-                {{ item.value.fingerPrint }}
+                {{ item.raw.fingerPrint }}
               </p>
             </template>
           </v-tooltip>
@@ -51,16 +52,16 @@
 
         <template #[`item.activation`]="{ item }">
           <v-tooltip
-            v-if="item.value.isActive"
-            :text="`The '${item.value.name}' key is currently activated and will be utilized in deployments.`"
+            v-if="item.raw.isActive"
+            :text="`The '${item.raw.name}' key is currently activated and will be utilized in deployments.`"
           >
             <template #activator="{ props }">
               <v-btn
                 v-bind="props"
-                :loading="item.value.activating"
+                :loading="item.raw.activating"
                 color="green"
                 variant="tonal"
-                @click="activateKey(item.value)"
+                @click="activateKey(item.raw)"
                 prepend-icon="mdi-check"
               >
                 Active
@@ -68,14 +69,14 @@
             </template>
           </v-tooltip>
 
-          <v-tooltip v-else :text="`Click to activate the '${item.value.name}' for use in deployments.`">
+          <v-tooltip v-else :text="`Click to activate the '${item.raw.name}' for use in deployments.`">
             <template #activator="{ props }">
               <v-btn
                 v-bind="props"
-                :loading="item.value.activating"
+                :loading="item.raw.activating"
                 color="grey-lighten-1"
                 variant="tonal"
-                @click="activateKey(item.value)"
+                @click="activateKey(item.raw)"
               >
                 Inactive
               </v-btn>
@@ -84,13 +85,13 @@
         </template>
 
         <template #[`item.deletion`]="{ item }">
-          <v-tooltip :text="`Delete ${item.value.name}`">
+          <v-tooltip :text="`Delete ${item.raw.name}`">
             <template #activator="{ props }">
               <v-btn
-                :disabled="loading || item.value.deleting"
-                :loading="item.value.deleting"
+                :disabled="loading || item.raw.deleting"
+                :loading="item.raw.deleting"
                 color="error"
-                @click="deleteKey(item.value)"
+                @click="deleteKey(item.raw)"
                 variant="tonal"
                 v-bind="props"
                 class="ml-2"
@@ -107,7 +108,7 @@
       <v-tooltip location="bottom" text="Export all selected keys.">
         <template #activator="{ props }">
           <v-btn
-            :disabled="selectedKeys.length !== sshKeys.length"
+            :disabled="selectedKeys.length === 0 || selectedKeys.length !== sshKeys.length"
             class="mr-2"
             v-bind="props"
             prepend-icon="mdi-export"
@@ -122,7 +123,7 @@
       <v-tooltip location="bottom" text="Delete all selected keys.">
         <template #activator="{ props }">
           <v-btn
-            :disabled="selectedKeys.length !== sshKeys.length"
+            :disabled="selectedKeys.length === 0 || selectedKeys.length !== sshKeys.length"
             v-bind="props"
             variant="tonal"
             prepend-icon="mdi-trash-can-outline"
@@ -137,7 +138,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref } from "vue";
+import { capitalize, defineComponent, PropType, ref } from "vue";
 
 import ListTable from "@/components/list_table.vue";
 import { SSHKeyData, VDataTableHeader } from "@/types";
@@ -166,26 +167,28 @@ export default defineComponent({
   emits: ["inactive", "active", "delete"],
 
   methods: {
-    deleteKey(item: SSHKeyData) {
-      item.deleting = true;
+    deleteKey(key: SSHKeyData) {
+      key.deleting = true;
       setTimeout(() => {
-        this.$emit("delete", item);
-        item.deleting = false;
-        createCustomToast(`${item.name} key has been successfully removed.`, ToastType.success);
+        this.$emit("delete", key);
+        key.deleting = false;
+        createCustomToast(`${key.name} key has been successfully removed.`, ToastType.success);
       }, 3000);
     },
 
-    activateKey(item: SSHKeyData) {
-      item.activating = true;
+    activateKey(key: SSHKeyData) {
+      console.log("key", key);
+
+      key.activating = true;
       setTimeout(() => {
-        if (item.isActive) {
-          this.$emit("inactive", item);
-          createCustomToast(`The activation of ${item.name} key has been disabled.`, ToastType.success);
+        if (key.isActive) {
+          this.$emit("inactive", key);
+          createCustomToast(`The activation of ${key.name} key has been disabled.`, ToastType.success);
         } else {
-          this.$emit("active", item);
-          createCustomToast(`The activation of ${item.name} key has been enabled.`, ToastType.success);
+          this.$emit("active", key);
+          createCustomToast(`The activation of ${key.name} key has been enabled.`, ToastType.success);
         }
-        item.activating = false;
+        key.activating = false;
       }, 3000);
     },
   },
@@ -225,7 +228,7 @@ export default defineComponent({
       },
     ];
 
-    return { headers, loading, selectedKeys };
+    return { headers, loading, selectedKeys, capitalize };
   },
 });
 </script>

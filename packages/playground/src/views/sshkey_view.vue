@@ -65,12 +65,30 @@ export default defineComponent({
     AddNewSshKeyDialog,
   },
 
+  data() {
+    return {
+      openAddNewSSHDialog: false,
+    };
+  },
+
   methods: {
     addKey(key: SSHKeyData) {
-      console.log("New added key, ", key);
+      this.allKeys.push(key);
+      this.updateKeys(key);
     },
 
-    updateKeys(key: SSHKeyData, isDeleted?: boolean) {},
+    updateKeys(key: SSHKeyData, isDeleted?: boolean) {
+      if (key.isActive) {
+        this.activeKeys.push(key);
+      } else {
+        this.activeKeys = this.activeKeys.filter(_key => _key.id !== key.id);
+      }
+
+      if (isDeleted) {
+        this.activeKeys = this.activeKeys.filter(_key => _key.id !== key.id);
+        this.allKeys = this.allKeys.filter(_key => _key.id !== key.id);
+      }
+    },
 
     setActiveKey(key: SSHKeyData) {
       key.isActive = true;
@@ -87,8 +105,7 @@ export default defineComponent({
     },
   },
   setup() {
-    const openAddNewSSHDialog = ref<boolean>(false);
-    const allKeys: SSHKeyData[] = [
+    const allKeys = ref<SSHKeyData[]>([
       {
         id: 1,
         key: "",
@@ -122,11 +139,11 @@ export default defineComponent({
         activating: false,
         deleting: false,
       },
-    ];
+    ]);
 
-    const activeKeys: SSHKeyData[] = allKeys.filter(key => key.isActive === true);
+    const activeKeys = ref<SSHKeyData[]>(allKeys.value.filter(key => key.isActive === true));
 
-    return { allKeys, activeKeys, openAddNewSSHDialog };
+    return { allKeys, activeKeys };
   },
 });
 </script>
