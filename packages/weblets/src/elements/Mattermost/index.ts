@@ -1,1 +1,0 @@
-import "./Mattermost.wc.svelte";

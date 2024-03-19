@@ -1,1 +1,0 @@
-import "./Funkwhale.wc.svelte";
