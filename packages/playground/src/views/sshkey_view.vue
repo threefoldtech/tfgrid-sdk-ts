@@ -27,18 +27,22 @@
     @active="setActiveKey"
     @inactive="setInactiveKey"
     @delete="deleteKey"
+    @update:keys="updateKeys($event)"
     :header-icon="'mdi-key-chain-variant'"
     :header-title="'Active Keys'"
     :ssh-keys="activeKeys"
+    :loading="loading"
   />
 
   <ssh-table
     @active="setActiveKey"
     @inactive="setInactiveKey"
     @delete="deleteKey"
+    @update:keys="updateKeys({ keys: $event, removeSelected: true })"
     :header-icon="'mdi-key-chain'"
     :header-title="'All Keys'"
     :ssh-keys="allKeys"
+    :loading="loading"
   />
 
   <!-- Dialogs -->
@@ -51,7 +55,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { computed, defineComponent } from "vue";
 import { ref } from "vue";
 
 import AddNewSshKeyDialog from "@/components/ssh_keys/AddNewSshKeyDialog.vue";
@@ -74,37 +78,42 @@ export default defineComponent({
   methods: {
     addKey(key: SSHKeyData) {
       this.allKeys.push(key);
-      this.updateKeys(key);
     },
 
-    updateKeys(key: SSHKeyData, isDeleted?: boolean) {
-      if (key.isActive) {
-        this.activeKeys.push(key);
-      } else {
-        this.activeKeys = this.activeKeys.filter(_key => _key.id !== key.id);
+    updateKeys(options: { key?: SSHKeyData; keys?: SSHKeyData[]; isDeleted?: boolean; removeSelected?: boolean }) {
+      this.loading = true;
+      if (options.keys && options.removeSelected) {
+        setTimeout(() => {
+          if (options.keys && options.removeSelected) {
+            console.log("options.keys", options.keys);
+
+            this.allKeys = options.keys;
+            this.loading = false;
+          }
+        }, 3000);
       }
 
-      if (isDeleted) {
-        this.activeKeys = this.activeKeys.filter(_key => _key.id !== key.id);
-        this.allKeys = this.allKeys.filter(_key => _key.id !== key.id);
+      if (options.key && options.isDeleted) {
+        this.allKeys = this.allKeys.filter(_key => _key.id !== options.key?.id);
       }
     },
 
     setActiveKey(key: SSHKeyData) {
       key.isActive = true;
-      this.updateKeys(key);
+      this.updateKeys({ key });
     },
 
     setInactiveKey(key: SSHKeyData) {
       key.isActive = false;
-      this.updateKeys(key);
+      this.updateKeys({ key });
     },
 
     deleteKey(key: SSHKeyData) {
-      this.updateKeys(key, true);
+      this.updateKeys({ key, isDeleted: true });
     },
   },
   setup() {
+    const loading = ref<boolean>(false);
     const allKeys = ref<SSHKeyData[]>([
       {
         id: 1,
@@ -141,9 +150,11 @@ export default defineComponent({
       },
     ]);
 
-    const activeKeys = ref<SSHKeyData[]>(allKeys.value.filter(key => key.isActive === true));
+    const activeKeys = computed(() => {
+      return allKeys.value.filter(key => key.isActive === true);
+    });
 
-    return { allKeys, activeKeys };
+    return { allKeys, activeKeys, loading };
   },
 });
 </script>
