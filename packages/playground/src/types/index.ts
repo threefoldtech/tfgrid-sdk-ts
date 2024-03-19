@@ -335,3 +335,8 @@ export interface SSHKeyData {
   deleting: boolean;
   activating: boolean;
 }
+
+export enum SSHCreationMethod {
+  new = "new",
+  import = "import",
+}

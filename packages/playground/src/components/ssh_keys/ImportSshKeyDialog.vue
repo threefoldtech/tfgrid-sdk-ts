@@ -3,7 +3,7 @@
     <template v-slot:default>
       <v-card>
         <v-toolbar color="primary" class="custom-toolbar">
-          <p class="mb-5">Add new SSH Key</p>
+          <p class="mb-5">Import an exact SSH Key</p>
         </v-toolbar>
         <v-card-text>
           <input-tooltip
@@ -23,18 +23,6 @@
               label="name"
             />
           </input-tooltip>
-
-          <div class="create" v-if="sshCreationMethod == SSHCreationMethod.new">
-            <v-btn
-              class="mt-2 mb-2"
-              width="95%"
-              @click="() => $emit('generate', keyName)"
-              variant="flat"
-              color="primary"
-            >
-              Generate key pair
-            </v-btn>
-          </div>
 
           <input-tooltip
             class="mt-4"

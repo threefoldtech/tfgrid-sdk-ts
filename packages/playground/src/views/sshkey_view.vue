@@ -1,7 +1,7 @@
 <template>
   <v-card class="pa-6 mb-4">
     <div>
-      <h2 class="text-info">
+      <h2 class="text-light">
         <v-icon> mdi-cog-sync </v-icon>
         Manage SSH Keys
       </h2>
@@ -14,11 +14,20 @@
     </div>
   </v-card>
 
-  <v-card class="mb-3 pa-3">
-    <v-col class="d-flex justify-start">
-      <v-btn variant="tonal" class="mr-2" prepend-icon="mdi-export" color="primary"> Export all keys </v-btn>
-      <v-btn variant="tonal" @click="() => (openAddNewSSHDialog = true)" prepend-icon="mdi-key-plus" color="primary">
-        Generate SSH Keys
+  <v-card class="mb-3 pa-3" color="transparent">
+    <v-col class="d-flex justify-end">
+      <v-btn
+        variant="outlined"
+        class="mr-2"
+        @click="() => (openImportSSHDialog = true)"
+        prepend-icon="mdi-key-plus"
+        color="secondary"
+      >
+        Import
+      </v-btn>
+      <v-btn variant="outlined" class="mr-2" prepend-icon="mdi-export" color="secondary"> Export </v-btn>
+      <v-btn class="mr-2" @click="() => (openAddNewSSHDialog = true)" prepend-icon="mdi-key-plus" color="primary">
+        Generate
       </v-btn>
     </v-col>
   </v-card>
@@ -49,29 +58,48 @@
   <add-new-ssh-key-dialog
     :open="openAddNewSSHDialog"
     :all-keys="allKeys"
+    :generated-sshkey="userSshKey"
     @save="addKey($event)"
     @close="() => (openAddNewSSHDialog = false)"
+    @generate="generateSSHKeys($event)"
+  />
+
+  <import-ssh-key-dialog
+    :open="openImportSSHDialog"
+    :all-keys="allKeys"
+    :generated-sshkey="userSshKey"
+    @save="addKey($event)"
+    @close="() => (openImportSSHDialog = false)"
+    @generate="generateSSHKeys($event)"
   />
 </template>
 
 <script lang="ts">
 import { computed, defineComponent } from "vue";
 import { ref } from "vue";
+import { generateKeyPair } from "web-ssh-keygen";
 
 import AddNewSshKeyDialog from "@/components/ssh_keys/AddNewSshKeyDialog.vue";
+import ImportSshKeyDialog from "@/components/ssh_keys/ImportSshKeyDialog.vue";
 import SshTable from "@/components/ssh_keys/SshTable.vue";
+import { useProfileManager } from "@/stores";
 import { SSHKeyData } from "@/types";
+import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import { getGrid, storeSSH } from "@/utils/grid";
+import { downloadAsFile } from "@/utils/helpers";
 
 export default defineComponent({
   props: [],
   components: {
     SshTable,
     AddNewSshKeyDialog,
+    ImportSshKeyDialog,
   },
 
   data() {
     return {
       openAddNewSSHDialog: false,
+      openImportSSHDialog: false,
     };
   },
 
@@ -101,19 +129,45 @@ export default defineComponent({
     setActiveKey(key: SSHKeyData) {
       key.isActive = true;
       this.updateKeys({ key });
+      createCustomToast(`The activation of ${key.name} key has been enabled.`, ToastType.success);
     },
 
     setInactiveKey(key: SSHKeyData) {
       key.isActive = false;
       this.updateKeys({ key });
+      createCustomToast(`The activation of ${key.name} key has been disabled.`, ToastType.success);
     },
 
     deleteKey(key: SSHKeyData) {
       this.updateKeys({ key, isDeleted: true });
+      createCustomToast(`${key.name} key has been successfully removed.`, ToastType.success);
+    },
+
+    async generateSSHKeys(keyName: string) {
+      this.generatingSSH = true;
+      const keys = await generateKeyPair({
+        alg: "RSASSA-PKCS1-v1_5",
+        hash: "SHA-256",
+        name: keyName,
+        size: 4096,
+      });
+      const grid = await getGrid(this.profileManager.profile!);
+      await storeSSH(grid!, keys.publicKey);
+      this.profileManager.updateSSH(keys.publicKey);
+      this.userSshKey = this.profileManager.profile!.ssh;
+      downloadAsFile("id_rsa", keys.privateKey);
+      this.generatingSSH = false;
+      createCustomToast(`${keyName} key has been generated successfully.`, ToastType.success);
     },
   },
   setup() {
     const loading = ref<boolean>(false);
+    const profileManager = useProfileManager();
+    const userSshKey = ref(profileManager.profile!.ssh);
+    const generatingSSH = ref<boolean>(false);
+
+    console.log("userSshKey", userSshKey);
+
     const allKeys = ref<SSHKeyData[]>([
       {
         id: 1,
@@ -151,7 +205,7 @@ export default defineComponent({
       return allKeys.value.filter(key => key.isActive === true);
     });
 
-    return { allKeys, activeKeys, loading };
+    return { allKeys, activeKeys, loading, generatingSSH, profileManager, userSshKey };
   },
 });
 </script>

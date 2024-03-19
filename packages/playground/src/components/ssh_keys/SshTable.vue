@@ -1,7 +1,7 @@
 <template>
   <v-card class="pt-6 pl-6 pr-6 mb-4">
     <div class="head">
-      <h2 class="text-info">
+      <h2 class="text-light">
         <v-icon> {{ headerIcon }} </v-icon>
         {{ headerTitle }}
       </h2>
@@ -56,10 +56,11 @@
                 :disabled="loading"
                 v-bind="props"
                 :loading="item.raw.activating"
-                color="green"
-                variant="outlined"
+                color="secondary"
+                variant="elevated"
                 @click="activateKey(item.raw)"
                 prepend-icon="mdi-check"
+                width="100"
               >
                 Active
               </v-btn>
@@ -73,8 +74,9 @@
                 v-bind="props"
                 :loading="item.raw.activating"
                 :color="theme.name.value === AppThemeSelection.light ? '' : 'grey-lighten-1'"
-                variant="outlined"
+                variant="tonal"
                 @click="activateKey(item.raw)"
+                width="100"
               >
                 Inactive
               </v-btn>
@@ -88,13 +90,13 @@
               <v-btn
                 :disabled="loading || item.raw.deleting"
                 :loading="item.raw.deleting"
-                color="error"
+                color="grey-lighten-1"
                 @click="deleteKey(item.raw)"
-                variant="outlined"
+                variant="text"
                 v-bind="props"
                 class="ml-2"
+                icon="mdi-trash-can-outline"
               >
-                <v-icon class="pt-1">mdi-trash-can-outline</v-icon>
               </v-btn>
             </template>
           </v-tooltip>
@@ -143,7 +145,6 @@ import { useTheme } from "vuetify";
 
 import { SSHKeyData, VDataTableHeader } from "@/types";
 import { AppThemeSelection } from "@/utils/app_theme";
-import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 export default defineComponent({
   props: {
@@ -183,7 +184,6 @@ export default defineComponent({
       setTimeout(() => {
         this.$emit("delete", key);
         key.deleting = false;
-        createCustomToast(`${key.name} key has been successfully removed.`, ToastType.success);
       }, 3000);
     },
 
@@ -192,10 +192,8 @@ export default defineComponent({
       setTimeout(() => {
         if (key.isActive) {
           this.$emit("inactive", key);
-          createCustomToast(`The activation of ${key.name} key has been disabled.`, ToastType.success);
         } else {
           this.$emit("active", key);
-          createCustomToast(`The activation of ${key.name} key has been enabled.`, ToastType.success);
         }
         key.activating = false;
       }, 3000);
