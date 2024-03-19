@@ -1,154 +1,148 @@
 <template>
-  <weblet-layout ref="layout" @mount="() => {}">
-    <v-card class="pt-6 pl-6 pr-6 mb-4" variant="tonal">
-      <div class="head">
-        <h2 class="text-info">
-          <v-icon> {{ headerIcon }} </v-icon>
-          {{ headerTitle }}
-        </h2>
-      </div>
+  <v-card class="pt-6 pl-6 pr-6 mb-4">
+    <div class="head">
+      <h2 class="text-info">
+        <v-icon> {{ headerIcon }} </v-icon>
+        {{ headerTitle }}
+      </h2>
+    </div>
 
-      <div class="table">
-        <v-data-table
-          show-select
-          :no-data-text="capitalize(`No keys found.`)"
-          class="pa-5"
-          :deleting="deleting"
-          v-model="selectedKeys"
-          :loading="loading"
-          :headers="headers"
-          :items="sshKeys"
-          v-bind:onClick:row="loading || deleting ? undefined : onClickRow"
-        >
-          <template #[`item.lastUsed`]="{ item }">
-            <v-tooltip location="top" :text="`The most recent deployment activity associated with this SSH key.`">
-              <template #activator="{ props }">
-                <v-chip color="primary" v-bind="props">
-                  {{ item.raw.lastUsed }}
-                </v-chip>
-              </template>
-            </v-tooltip>
-          </template>
+    <div class="table mt-3">
+      <v-alert type="info">
+        Clicking on the <strong>Active</strong> or <strong>Inactive</strong> status will toggle the
+        <strong>activation</strong>/<strong>deactivation</strong> of the key.
+      </v-alert>
 
-          <template #[`item.createdAt`]="{ item }">
-            <v-tooltip location="top" :text="`The date when this SSH key was created.`">
-              <template #activator="{ props }">
-                <v-chip color="primary" v-bind="props">
-                  {{ item.raw.createdAt }}
-                </v-chip>
-              </template>
-            </v-tooltip>
-          </template>
+      <v-data-table
+        show-select
+        :no-data-text="capitalize(`No keys found.`)"
+        class="pa-5"
+        :deleting="deleting"
+        v-model="selectedKeys"
+        :loading="loading"
+        :headers="headers"
+        :items="sshKeys"
+      >
+        <template #[`item.createdAt`]="{ item }">
+          <v-tooltip location="top" :text="`The date when this SSH key was created.`">
+            <template #activator="{ props }">
+              <v-chip color="primary" v-bind="props">
+                {{ item.raw.createdAt }}
+              </v-chip>
+            </template>
+          </v-tooltip>
+        </template>
 
-          <template #[`item.fingerPrint`]="{ item }">
-            <v-tooltip
-              location="top"
-              :text="`The fingerprint of an SSH key is a unique identifier generated from the key's contents. It's displayed as a sequence of hexadecimal characters and serves to verify the key's authenticity.`"
-            >
-              <template #activator="{ props }">
-                <p v-bind="props">
-                  {{ item.raw.fingerPrint }}
-                </p>
-              </template>
-            </v-tooltip>
-          </template>
+        <template #[`item.fingerPrint`]="{ item }">
+          <v-tooltip
+            location="top"
+            :text="`The fingerprint of an SSH key is a unique identifier generated from the key's contents. It's displayed as a sequence of hexadecimal characters and serves to verify the key's authenticity.`"
+          >
+            <template #activator="{ props }">
+              <p v-bind="props">
+                {{ item.raw.fingerPrint }}
+              </p>
+            </template>
+          </v-tooltip>
+        </template>
 
-          <template #[`item.activation`]="{ item }">
-            <v-tooltip
-              v-if="item.raw.isActive"
-              :text="`The '${item.raw.name}' key is currently activated and will be utilized in deployments.`"
-            >
-              <template #activator="{ props }">
-                <v-btn
-                  :disabled="loading"
-                  v-bind="props"
-                  :loading="item.raw.activating"
-                  color="green"
-                  variant="tonal"
-                  @click="activateKey(item.raw)"
-                  prepend-icon="mdi-check"
-                >
-                  Active
-                </v-btn>
-              </template>
-            </v-tooltip>
+        <template #[`item.activation`]="{ item }">
+          <v-tooltip
+            v-if="item.raw.isActive"
+            :text="`The '${item.raw.name}' key is currently activated and will be utilized in deployments.`"
+          >
+            <template #activator="{ props }">
+              <v-btn
+                :disabled="loading"
+                v-bind="props"
+                :loading="item.raw.activating"
+                color="green"
+                variant="outlined"
+                @click="activateKey(item.raw)"
+                prepend-icon="mdi-check"
+              >
+                Active
+              </v-btn>
+            </template>
+          </v-tooltip>
 
-            <v-tooltip v-else :text="`Click to activate the '${item.raw.name}' for use in deployments.`">
-              <template #activator="{ props }">
-                <v-btn
-                  :disabled="loading"
-                  v-bind="props"
-                  :loading="item.raw.activating"
-                  color="grey-lighten-1"
-                  variant="tonal"
-                  @click="activateKey(item.raw)"
-                >
-                  Inactive
-                </v-btn>
-              </template>
-            </v-tooltip>
-          </template>
+          <v-tooltip v-else :text="`Click to activate the '${item.raw.name}' for use in deployments.`">
+            <template #activator="{ props }">
+              <v-btn
+                :disabled="loading"
+                v-bind="props"
+                :loading="item.raw.activating"
+                :color="theme.name.value === AppThemeSelection.light ? '' : 'grey-lighten-1'"
+                variant="outlined"
+                @click="activateKey(item.raw)"
+              >
+                Inactive
+              </v-btn>
+            </template>
+          </v-tooltip>
+        </template>
 
-          <template #[`item.deletion`]="{ item }">
-            <v-tooltip :text="`Delete ${item.raw.name}`">
-              <template #activator="{ props }">
-                <v-btn
-                  :disabled="loading || item.raw.deleting"
-                  :loading="item.raw.deleting"
-                  color="error"
-                  @click="deleteKey(item.raw)"
-                  variant="tonal"
-                  v-bind="props"
-                  class="ml-2"
-                >
-                  <v-icon class="pt-1">mdi-trash-can-outline</v-icon>
-                </v-btn>
-              </template>
-            </v-tooltip>
-          </template>
-          <template #bottom></template>
-        </v-data-table>
-      </div>
+        <template #[`item.deletion`]="{ item }">
+          <v-tooltip :text="`Delete ${item.raw.name}`">
+            <template #activator="{ props }">
+              <v-btn
+                :disabled="loading || item.raw.deleting"
+                :loading="item.raw.deleting"
+                color="error"
+                @click="deleteKey(item.raw)"
+                variant="outlined"
+                v-bind="props"
+                class="ml-2"
+              >
+                <v-icon class="pt-1">mdi-trash-can-outline</v-icon>
+              </v-btn>
+            </template>
+          </v-tooltip>
+        </template>
+        <template #bottom></template>
+      </v-data-table>
+    </div>
 
-      <div class="bottom mt-3">
-        <v-tooltip location="bottom" text="Export all selected keys.">
-          <template #activator="{ props }">
-            <v-btn
-              :disabled="loading || selectedKeys.length === 0"
-              class="mr-2"
-              v-bind="props"
-              prepend-icon="mdi-export"
-              color="primary"
-              variant="tonal"
-            >
-              Export
-            </v-btn>
-          </template>
-        </v-tooltip>
+    <div class="bottom mt-3">
+      <v-tooltip location="bottom" text="Export all selected keys.">
+        <template #activator="{ props }">
+          <v-btn
+            :disabled="loading || selectedKeys.length === 0"
+            class="mr-2"
+            v-bind="props"
+            prepend-icon="mdi-export"
+            color="primary"
+            variant="tonal"
+          >
+            Export
+          </v-btn>
+        </template>
+      </v-tooltip>
 
-        <v-tooltip location="bottom" text="Delete all selected keys.">
-          <template #activator="{ props }">
-            <v-btn
-              :disabled="loading || selectedKeys.length === 0"
-              v-bind="props"
-              variant="tonal"
-              prepend-icon="mdi-trash-can-outline"
-              color="error"
-              @click="deleteSelected"
-            >
-              Delete
-            </v-btn>
-          </template>
-        </v-tooltip>
-      </div>
-    </v-card>
-  </weblet-layout>
+      <v-tooltip location="bottom" text="Delete all selected keys.">
+        <template #activator="{ props }">
+          <v-btn
+            :disabled="loading || selectedKeys.length === 0"
+            v-bind="props"
+            variant="tonal"
+            prepend-icon="mdi-trash-can-outline"
+            color="error"
+            @click="deleteSelected"
+          >
+            Delete
+          </v-btn>
+        </template>
+      </v-tooltip>
+    </div>
+  </v-card>
 </template>
 
 <script lang="ts">
 import { capitalize, defineComponent, PropType, ref } from "vue";
+import { useTheme } from "vuetify";
 
 import { SSHKeyData, VDataTableHeader } from "@/types";
+import { AppThemeSelection } from "@/utils/app_theme";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 export default defineComponent({
@@ -184,10 +178,6 @@ export default defineComponent({
       this.selectedKeys = [];
     },
 
-    onClickRow(_: any, data: any) {
-      console.log(data.item.raw);
-    },
-
     deleteKey(key: SSHKeyData) {
       key.deleting = true;
       setTimeout(() => {
@@ -215,6 +205,7 @@ export default defineComponent({
   setup() {
     const deleting = ref<boolean>(false);
     const selectedKeys = ref<number[]>([]); // IDs
+    const theme = useTheme();
 
     const headers: VDataTableHeader = [
       {
@@ -230,10 +221,6 @@ export default defineComponent({
         key: "createdAt",
       },
       {
-        title: "Last Used",
-        key: "lastUsed",
-      },
-      {
         title: "Key Fingerprint",
         key: "fingerPrint",
       },
@@ -247,7 +234,7 @@ export default defineComponent({
       },
     ];
 
-    return { headers, selectedKeys, capitalize, deleting };
+    return { headers, selectedKeys, capitalize, deleting, theme, AppThemeSelection };
   },
 });
 </script>

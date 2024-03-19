@@ -1,5 +1,5 @@
 <template>
-  <v-card variant="tonal" class="pa-6 mb-4">
+  <v-card class="pa-6 mb-4">
     <div>
       <h2 class="text-info">
         <v-icon> mdi-cog-sync </v-icon>
@@ -14,7 +14,7 @@
     </div>
   </v-card>
 
-  <v-card class="mb-3" variant="outlined">
+  <v-card class="mb-3 pa-3">
     <v-col class="d-flex justify-start">
       <v-btn variant="tonal" class="mr-2" prepend-icon="mdi-export" color="primary"> Export all keys </v-btn>
       <v-btn variant="tonal" @click="() => (openAddNewSSHDialog = true)" prepend-icon="mdi-key-plus" color="primary">
@@ -120,7 +120,6 @@ export default defineComponent({
         key: "",
         name: "Test key",
         createdAt: "2011-05-14",
-        lastUsed: "2014-09-15",
         fingerPrint: "524sad#!@$$@s4ad#@$saj4h5@asf",
         isActive: false,
         activating: false,
@@ -131,7 +130,6 @@ export default defineComponent({
         key: "",
         name: "Mahmoud's key",
         createdAt: "2020-09-25",
-        lastUsed: "2022-02-02",
         fingerPrint: "524sad#!@$$@s4ad@asf",
         isActive: true,
         activating: false,
@@ -142,7 +140,6 @@ export default defineComponent({
         key: "",
         name: "Adham's key",
         createdAt: "2018-01-01",
-        lastUsed: "2020-01-01",
         fingerPrint: "@$$@s4ad#@$saj4h5@asf",
         isActive: false,
         activating: false,

@@ -330,7 +330,6 @@ export interface SSHKeyData {
   key: string;
   name: string;
   createdAt: string;
-  lastUsed: string;
   fingerPrint: string;
   isActive: boolean;
   deleting: boolean;

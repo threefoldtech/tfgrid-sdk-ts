@@ -79,7 +79,6 @@ export default defineComponent({
             key: "",
             activating: false,
             createdAt: `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}`,
-            lastUsed: "-",
             deleting: false,
             fingerPrint: fingerPrint.value,
             name: keyName.value.length === 0 ? generateUniqueSSHKeyName() : keyName.value,
