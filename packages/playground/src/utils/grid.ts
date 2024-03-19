@@ -124,7 +124,6 @@ export async function storeSSH(grid: GridClient, newSSH: string): Promise<void> 
 
 export async function readEmail(grid: GridClient): Promise<string> {
   const metadata = await getMetadata(grid);
-  console.log(metadata.email);
 
   return metadata.email || "";
 }
