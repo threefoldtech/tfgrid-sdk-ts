@@ -13,38 +13,49 @@
           {{ selectedName?.charAt(0).toUpperCase() + selectedName!.slice(1) }} (withdraw fee is: {{ withdrawFee }} TFT)
         </v-card-text>
         <v-card-text>
-          <InputValidator
-            v-model="isValidSwap"
-            :value="target"
-            :rules="[validators.required('This field is required'), () => swapAddressCheck()]"
-            :async-rules="[validateAddress]"
-            #="{ props: validationProps }"
-          >
-            <v-text-field
-              v-bind="{ ...validationProps }"
-              v-model="target"
-              :label="selectedName?.charAt(0).toUpperCase() + selectedName!.slice(1) + ' Target Wallet Address'"
-              :disabled="validatingAddress"
-              :loading="validationProps.loading"
+          <FormValidator v-model="valid">
+            <InputValidator
+              :value="target"
+              :rules="[validators.required('This field is required'), () => swapAddressCheck()]"
+              :async-rules="[validateAddress]"
+              #="{ props: validationProps }"
             >
-            </v-text-field>
-          </InputValidator>
-          <v-text-field
-            @paste.prevent
-            label="Amount (TFT)"
-            v-model="amount"
-            type="number"
-            onkeydown="javascript: return event.keyCode == 69 || /^\+$/.test(event.key) ? false : true"
-            :rules="[
-                () => !!amount || 'This field is required',
-                () =>
-                  (amount.toString().split('.').length > 1 ? amount.toString().split('.')[1].length <= 3 : true) ||
-                  'Amount must have 3 decimals only',
-                () => amount >= 2 || 'Amount should be at least 2 TFT',
-                () => amount < freeBalance! || 'Amount cannot exceed balance',
-              ]"
-          >
-          </v-text-field>
+              <v-text-field
+                v-bind="{ ...validationProps }"
+                v-model="target"
+                :label="selectedName?.charAt(0).toUpperCase() + selectedName!.slice(1) + ' Target Wallet Address'"
+                :disabled="validatingAddress"
+                :loading="validationProps.loading"
+              >
+              </v-text-field>
+            </InputValidator>
+            <InputValidator
+              :value="amount"
+              #="{ props: validationProps }"
+              :rules="[
+              validators.required('This field is required'),
+              validators.min('Amount should be at least 2 TFT', 2),
+              validators.max( 'Amount cannot exceed balance',freeBalance!),
+              () => {
+                if(!(amount.toString().split('.').length > 1 ? amount.toString().split('.')[1].length <= 3 : true)){
+                  return {
+                    message:  'Amount must have 3 decimals only'
+                  }
+                }
+              }
+            ]"
+            >
+              <v-text-field
+                v-bind="{ ...validationProps }"
+                @paste.prevent
+                label="Amount (TFT)"
+                v-model="amount"
+                type="number"
+                onkeydown="javascript: return event.keyCode == 69 || /^\+$/.test(event.key) ? false : true"
+              >
+              </v-text-field>
+            </InputValidator>
+          </FormValidator>
         </v-card-text>
         <v-card-actions class="justify-end pb-4 px-6">
           <v-btn variant="outlined" color="anchor" class="px-3" @click="closeDialog"> Close </v-btn>
@@ -53,7 +64,7 @@
             color="secondary"
             variant="outlined"
             @click="withdrawTFT(target, amount)"
-            :disabled="!isValidSwap || validatingAddress"
+            :disabled="!valid || validatingAddress"
             :loading="loadingWithdraw"
             >Send</v-btn
           >
@@ -64,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { default as StellarSdk, StrKey } from "stellar-sdk";
+import { StrKey } from "stellar-sdk";
 import { onMounted, ref } from "vue";
 
 import { useProfileManagerController } from "../components/profile_manager_controller.vue";
@@ -75,7 +86,7 @@ import { isValidStellarAddress } from "../utils/validators";
 const withdrawDialog = ref(false);
 const targetError = ref("");
 const target = ref("");
-const isValidSwap = ref(false);
+const valid = ref(false);
 const validatingAddress = ref(false);
 const loadingWithdraw = ref(false);
 const ProfileManagerController = useProfileManagerController();
