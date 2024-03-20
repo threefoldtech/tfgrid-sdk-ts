@@ -7,7 +7,7 @@
   >
     <template #activator="{ props }">
       <VCard v-bind="props" class="pa-3 d-inline-flex align-center">
-        <VProgressCircular v-if="activating" class="mr-2" indeterminate color="primary" size="25" />
+        <VProgressCircular v-if="activating" class="mr-2" indeterminate color="primary" size="25" width="2" />
         <VIcon icon="mdi-account" size="x-large" class="mr-2" v-else />
         <div>
           <p v-if="!profileManager.profile">
