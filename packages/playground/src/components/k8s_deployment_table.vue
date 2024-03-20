@@ -59,7 +59,13 @@
     <AccessDeploymentAlert />
 
     <InputTooltip tooltip="Didn't find your deployments in the list? Enable to show all deployments." inline>
-      <VSwitch inset color="primary" label="Show All Deployments" v-model="showAllDeployments" />
+      <VSwitch
+        inset
+        color="primary"
+        label="Show All Deployments"
+        @update:model-value="loadDeployments"
+        v-model="showAllDeployments"
+      />
     </InputTooltip>
 
     <ListTable
@@ -141,7 +147,7 @@ import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 import { useProfileManager } from "../stores";
 import { getGrid, updateGrid } from "../utils/grid";
 import { markAsFromAnotherClient } from "../utils/helpers";
-import { loadK8s, mergeLoadedDeployments } from "../utils/load_deployment";
+import { type K8S, type LoadedDeployments, loadK8s, mergeLoadedDeployments } from "../utils/load_deployment";
 const profileManager = useProfileManager();
 const showDialog = ref(false);
 const showEncryption = ref(false);
@@ -166,11 +172,14 @@ async function loadDeployments() {
   const grid = await getGrid(profileManager.profile!, props.projectName);
   const chunk1 = await loadK8s(grid!);
   const chunk2 = await loadK8s(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }));
-  const chunk3 = await loadK8s(updateGrid(grid!, { projectName: "" }));
+  let chunk3: LoadedDeployments<K8S> = { count: 0, items: [], failedDeployments: [] };
 
-  chunk3.items = chunk3.items.map(i => {
-    return !i.projectName || i.projectName === "Kubernetes" ? markAsFromAnotherClient(i) : i;
-  });
+  if (showAllDeployments.value) {
+    chunk3 = await loadK8s(updateGrid(grid!, { projectName: "" }));
+    chunk3.items = chunk3.items.map(i => {
+      return !i.projectName || i.projectName === "Kubernetes" ? markAsFromAnotherClient(i) : i;
+    });
+  }
 
   const clusters = mergeLoadedDeployments(chunk1, chunk2, chunk3);
   failedDeployments.value = clusters.failedDeployments;

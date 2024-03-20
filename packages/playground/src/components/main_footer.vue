@@ -77,9 +77,6 @@
           <div>
             <a href="https://www.threefold.io/newsroom/" class="app-link text-subtitle-2" target="_blank">News Room</a>
           </div>
-          <div>
-            <a href="https://www.threefold.io/community/" class="app-link text-subtitle-2" target="_blank">Community</a>
-          </div>
         </v-col>
 
         <v-col class="mx-3" cols="12" sm="3" md="2">

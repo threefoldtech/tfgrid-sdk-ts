@@ -9,8 +9,6 @@ This repo contains the typescript clients and projects for Threefold grid.
 
 ## Packages
 
-- [dashboard](./packages/dashboard/README.md)
-- [weblets](./packages/weblets/README.md)
 - [stats](./packages/stats/README.md)
 - [grid client](./packages/grid_client/README.md)
 - [grid http server](./packages/grid_http_server/README.md)
