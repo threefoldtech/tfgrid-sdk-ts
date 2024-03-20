@@ -65,7 +65,7 @@
     :generating="generatingSSH"
     :generated-ssh-key="generatedSSHKey"
     @save="addKey($event)"
-    @close="() => (isNewDialogOpen = false)"
+    @close="closeFormDialog"
     @generate="generateSSHKeys($event)"
   />
 
@@ -114,17 +114,24 @@ export default defineComponent({
   },
 
   methods: {
-    addKey(key: SSHKeyData) {
-      key.fingerPrint = this.createdKeyFingerPrint;
-      this.allKeys.push(key);
-      // Close the opened dialog
+    closeFormDialog() {
+      // this.createdKeyFingerPrint = "";
+      this.generatedSSHKey = "";
+      this.isNewDialogOpen = false;
       if (this.isNewDialogOpen) {
         this.isNewDialogOpen = false;
       } else if (this.isImportDialogOpen) {
         this.isImportDialogOpen = false;
       }
+    },
+
+    addKey(key: SSHKeyData) {
+      this.allKeys.push(key);
+      // Close the opened dialog
+      // this.closeFormDialog();
 
       createCustomToast(`The created ${key.name} key has been saved.`, ToastType.success);
+      // this.createdKeyFingerPrint = "";
     },
 
     viewSelectedKey(key: SSHKeyData) {
@@ -165,13 +172,12 @@ export default defineComponent({
       createCustomToast(`${key.name} key has been successfully removed.`, ToastType.success);
     },
 
-    async generateSSHKeys(keyName: string) {
-      this.createdKeyFingerPrint = "";
+    async generateSSHKeys(key: SSHKeyData) {
       this.generatingSSH = true;
       const keys = await generateKeyPair({
         alg: "RSASSA-PKCS1-v1_5",
         hash: "SHA-256",
-        name: keyName,
+        name: key.name,
         size: 4096,
       });
 
@@ -180,11 +186,11 @@ export default defineComponent({
       this.generatedSSHKey = keys.publicKey;
       await storeSSH(grid!, keys.publicKey);
       downloadAsFile("id_rsa", keys.privateKey);
-      this.createdKeyFingerPrint = this.calculateFingerprint(keys.publicKey);
-      createCustomToast(`${keyName} key has been generated successfully.`, ToastType.success);
+      key.fingerPrint = this.calculateFingerprint(keys.publicKey);
+      createCustomToast(`${key.name} key has been generated successfully.`, ToastType.success);
+      this.generatingSSH = false;
       // this.profileManager.updateSSH(keys.publicKey);
       // this.userSshKey = this.profileManager.profile!.ssh;
-      this.generatingSSH = false;
     },
 
     parsePublicKey(publicKey: string) {
@@ -207,13 +213,13 @@ export default defineComponent({
       return fingerprint;
     },
   },
+
   setup() {
     const loading = ref<boolean>(false);
     const profileManager = useProfileManager();
     const userSshKey = ref<string>(profileManager.profile!.ssh);
     const generatedSSHKey = ref<string>("");
     const generatingSSH = ref<boolean>(false);
-    const createdKeyFingerPrint = ref<string>("");
     const selectedKey = ref<SSHKeyData>({
       id: 0,
       key: "",
@@ -271,7 +277,6 @@ export default defineComponent({
       allKeys,
       activeKeys,
       SSHCreationMethod,
-      createdKeyFingerPrint,
       selectedKey,
     };
   },

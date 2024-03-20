@@ -26,20 +26,12 @@
             />
           </input-tooltip>
 
-          <div v-if="isNewSSHKey" class="create">
-            <v-btn
-              class="mt-2 mb-2"
-              width="95%"
-              @click="() => $emit('generate', keyName)"
-              :loading="generating"
-              :disabled="generating"
-              variant="flat"
-              color="primary"
-            >
-              Generate key pair
-            </v-btn>
+          <v-alert width="95%" class="mb-4" type="info">
+            Updating or generating SSH key will cost you up to 0.01 TFT
+          </v-alert>
 
-            <v-alert type="info" class="mt-4">
+          <div v-if="isNewSSHKey" class="create">
+            <v-alert width="95%" type="info" class="mt-4">
               We will not keep your private key information. Be sure to save the private key downloaded after creation.
             </v-alert>
           </div>
@@ -66,13 +58,26 @@
           </div>
         </v-card-text>
 
-        <v-card-actions class="mb-3">
+        <v-card-actions class="custom-actions">
           <v-spacer></v-spacer>
-          <div class="mr-4">
+          <div class="mt-3">
             <v-btn color="white" variant="outlined" text="Close" @click="$emit('close')"></v-btn>
+
             <v-btn
+              v-if="isNewSSHKey"
+              @click="generateSSHKey"
+              :loading="generating"
+              :disabled="generating || !!generatedSshKey"
+              variant="outlined"
               color="secondary"
-              :disabled="generating"
+            >
+              Generate and Save
+            </v-btn>
+
+            <v-btn
+              v-if="isImportSSHKey"
+              color="secondary"
+              :disabled="!sshKey"
               variant="outlined"
               text="Save"
               @click="createNewSSHKey"
@@ -155,6 +160,20 @@ export default defineComponent({
       { deep: true },
     );
 
+    watch(
+      () => props.generatedSshKey,
+      () => {
+        if (props.generatedSshKey?.length) {
+          createNewSSHKey();
+        }
+      },
+      { deep: true },
+    );
+
+    function generateSSHKey() {
+      emit("generate", createdKey.value);
+    }
+
     function createNewSSHKey() {
       if (createdKey.value) {
         createdKey.value.key = isNewSSHKey.value ? props.generatedSshKey || "" : sshKey.value;
@@ -213,10 +232,12 @@ export default defineComponent({
       createdKey,
       hasEnoughBalance,
       sshKey,
-      generateUniqueSSHKeyName,
-      createNewSSHKey,
       isNewSSHKey,
       isImportSSHKey,
+
+      generateUniqueSSHKeyName,
+      createNewSSHKey,
+      generateSSHKey,
     };
   },
 });
@@ -226,5 +247,11 @@ export default defineComponent({
 .custom-toolbar {
   height: 2.5rem !important;
   padding-left: 10px;
+}
+.custom-actions {
+  border-top: 1px solid rgb(101 99 99);
+  display: flex;
+  justify-content: center;
+  margin: 13px;
 }
 </style>
