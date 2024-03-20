@@ -334,6 +334,7 @@ export interface SSHKeyData {
   isActive: boolean;
   deleting: boolean;
   activating: boolean;
+  // view: SSHKeyData;
 }
 
 export enum SSHCreationMethod {

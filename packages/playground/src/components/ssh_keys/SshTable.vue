@@ -22,6 +22,7 @@
         :loading="loading"
         :headers="headers"
         :items="sshKeys"
+        :on-click:row="() => {}"
       >
         <template #[`item.createdAt`]="{ item }">
           <v-tooltip location="top" :text="`The date when this SSH key was created.`">
@@ -44,6 +45,17 @@
               </p>
             </template>
           </v-tooltip>
+        </template>
+
+        <template #[`item.viewing`]="{ item }">
+          <v-btn
+            @click="$emit('view', item.raw)"
+            color="grey-lighten-1"
+            variant="text"
+            :disabled="loading"
+            v-bind="item"
+            icon="mdi-eye"
+          ></v-btn>
         </template>
 
         <template #[`item.activation`]="{ item }">
@@ -90,8 +102,8 @@
               <v-btn
                 :disabled="loading || item.raw.deleting"
                 :loading="item.raw.deleting"
-                color="grey-lighten-1"
                 @click="deleteKey(item.raw)"
+                color="grey-lighten-1"
                 variant="text"
                 v-bind="props"
                 class="ml-2"
@@ -168,7 +180,7 @@ export default defineComponent({
 
   components: {},
 
-  emits: ["inactive", "active", "delete", "update:keys"],
+  emits: ["inactive", "active", "delete", "view", "update:keys"],
 
   methods: {
     deleteSelected() {
@@ -225,6 +237,10 @@ export default defineComponent({
       {
         title: "Activation",
         key: "activation",
+      },
+      {
+        title: "Viewing",
+        key: "viewing",
       },
       {
         title: "Deletion",

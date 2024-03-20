@@ -1,10 +1,12 @@
 <template>
-  <v-dialog v-model="$props.open" max-width="750">
+  <v-dialog @keydown.esc="$emit('close')" v-model="$props.open" max-width="750">
     <template v-slot:default>
       <v-card>
         <v-toolbar color="primary" class="custom-toolbar">
-          <p class="mb-5">Add new SSH Key</p>
+          <p v-if="isNewSSHKey" class="mb-5">Add new SSH Key</p>
+          <p v-else-if="isImportSSHKey" class="mb-5">Import an exact SSH Key</p>
         </v-toolbar>
+
         <v-card-text>
           <input-tooltip
             width="500"
@@ -24,50 +26,43 @@
             />
           </input-tooltip>
 
-          <div class="create" v-if="sshCreationMethod == SSHCreationMethod.new">
+          <div v-if="isNewSSHKey" class="create">
             <v-btn
               class="mt-2 mb-2"
               width="95%"
               @click="() => $emit('generate', keyName)"
+              :loading="generating"
+              :disabled="generating"
               variant="flat"
               color="primary"
             >
               Generate key pair
             </v-btn>
+
+            <v-alert type="info" class="mt-4">
+              We will not keep your private key information. Be sure to save the private key downloaded after creation.
+            </v-alert>
           </div>
 
-          <input-tooltip
-            class="mt-4"
-            width="500"
-            location="top right"
-            #="{ props }"
-            tooltip="This key will be used for authentication when accessing remote servers securely via SSH protocol."
-          >
-            <CopyInputWrapper :data="$props.generatedSshkey" #="{ props: copyInputProps }">
-              <v-textarea
-                hide-details="auto"
-                v-model.trim="userSSHKey"
-                no-resize
-                :readonly="!hasEnoughBalance || sshCreationMethod === SSHCreationMethod.new"
-                :label="sshCreationMethod === SSHCreationMethod.new ? 'Generated public ssh key' : 'Public ssh key'"
-                v-bind="{ ...props, ...copyInputProps }"
-              >
-              </v-textarea>
-            </CopyInputWrapper>
-          </input-tooltip>
-
-          <v-alert v-if="sshCreationMethod == SSHCreationMethod.new" type="info" class="mt-4">
-            We will not keep your private key information. Be sure to save the private key downloaded after creation.
-          </v-alert>
-
-          <div class="import" v-else>
-            <v-switch
-              color="primary"
-              v-model="setKeyActive"
-              :label="setKeyActive ? 'Active' : 'Inactive'"
-              hide-details
-              inset
-            ></v-switch>
+          <div class="import" v-if="isImportSSHKey">
+            <input-tooltip
+              class="mt-4"
+              width="500"
+              location="top right"
+              #="{ props }"
+              tooltip="This key will be used for authentication when accessing remote servers securely via SSH protocol."
+            >
+              <CopyInputWrapper :data="sshKey" #="{ props: copyInputProps }">
+                <v-textarea
+                  hide-details="auto"
+                  v-model.trim="sshKey"
+                  no-resize
+                  label="Public ssh key"
+                  v-bind="{ ...props, ...copyInputProps }"
+                >
+                </v-textarea>
+              </CopyInputWrapper>
+            </input-tooltip>
           </div>
         </v-card-text>
 
@@ -75,7 +70,13 @@
           <v-spacer></v-spacer>
           <div class="mr-4">
             <v-btn color="white" variant="outlined" text="Close" @click="$emit('close')"></v-btn>
-            <v-btn color="secondary" variant="outlined" text="Save" @click="createNewSSHKey"></v-btn>
+            <v-btn
+              color="secondary"
+              :disabled="generating"
+              variant="outlined"
+              text="Save"
+              @click="createNewSSHKey"
+            ></v-btn>
           </div>
         </v-card-actions>
       </v-card>
@@ -99,40 +100,37 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
+    generating: {
+      type: Boolean,
+      required: false,
+    },
+    generatedSshKey: {
+      type: String,
+      required: false,
+    },
     allKeys: {
       type: Object as PropType<SSHKeyData[]>,
       required: true,
     },
-    generatedSshkey: {
-      type: String,
+    dialogType: {
+      type: Object as PropType<SSHCreationMethod>,
       required: true,
     },
   },
 
   setup(props, { emit }) {
+    const isNewSSHKey = ref<boolean>(props.dialogType === SSHCreationMethod.new);
+    const isImportSSHKey = ref<boolean>(props.dialogType === SSHCreationMethod.import);
+
     const profileManager = useProfileManager();
-    const sshCreationMethod = ref<SSHCreationMethod>(SSHCreationMethod.new);
-    const userSSHKey = ref<string>(props.generatedSshkey);
+    const sshKey = ref<string>("");
     const fingerPrint = ref<string>("");
     const keyName = ref<string>(generateUniqueSSHKeyName());
     const createdKey = ref<SSHKeyData | null>(null); // Initialize createdKey with null
     const balance = ref<Balance>();
     const hasEnoughBalance = computed(() => isEnoughBalance(balance.value, 0.01));
     const loadingBalance = ref<boolean>(false);
-    const setKeyActive = ref<boolean>(true);
     let interval: any;
-
-    watch(
-      sshCreationMethod,
-      () => {
-        if (sshCreationMethod.value === SSHCreationMethod.import) {
-          userSSHKey.value = "";
-        } else {
-          userSSHKey.value = props.generatedSshkey;
-        }
-      },
-      { deep: true },
-    );
 
     watch(
       () => props.open,
@@ -159,6 +157,7 @@ export default defineComponent({
 
     function createNewSSHKey() {
       if (createdKey.value) {
+        createdKey.value.key = isNewSSHKey.value ? props.generatedSshKey || "" : sshKey.value;
         emit("save", createdKey.value);
       }
     }
@@ -212,14 +211,12 @@ export default defineComponent({
       fingerPrint,
       keyName,
       createdKey,
-      sshCreationMethod,
-      SSHCreationMethod,
       hasEnoughBalance,
-      userSSHKey,
-      setKeyActive,
-
+      sshKey,
       generateUniqueSSHKeyName,
       createNewSSHKey,
+      isNewSSHKey,
+      isImportSSHKey,
     };
   },
 });

@@ -19,14 +19,14 @@
       <v-btn
         variant="outlined"
         class="mr-2"
-        @click="() => (openImportSSHDialog = true)"
+        @click="() => (isImportDialogOpen = true)"
         prepend-icon="mdi-key-plus"
         color="secondary"
       >
         Import
       </v-btn>
       <v-btn variant="outlined" class="mr-2" prepend-icon="mdi-export" color="secondary"> Export </v-btn>
-      <v-btn class="mr-2" @click="() => (openAddNewSSHDialog = true)" prepend-icon="mdi-key-plus" color="primary">
+      <v-btn class="mr-2" @click="() => (isNewDialogOpen = true)" prepend-icon="mdi-key-plus" color="primary">
         Generate
       </v-btn>
     </v-col>
@@ -37,6 +37,7 @@
     @inactive="setInactiveKey"
     @delete="deleteKey"
     @update:keys="updateKeys($event)"
+    @view="viewSelectedKey"
     :header-icon="'mdi-key-chain-variant'"
     :header-title="'Active Keys'"
     :ssh-keys="activeKeys"
@@ -48,6 +49,7 @@
     @inactive="setInactiveKey"
     @delete="deleteKey"
     @update:keys="updateKeys({ keys: $event, removeSelected: true })"
+    @view="viewSelectedKey"
     :header-icon="'mdi-key-chain'"
     :header-title="'All Keys'"
     :ssh-keys="allKeys"
@@ -55,57 +57,79 @@
   />
 
   <!-- Dialogs -->
-  <add-new-ssh-key-dialog
-    :open="openAddNewSSHDialog"
+  <!-- Generate -->
+  <ssh-form-dialog
+    :open="isNewDialogOpen"
     :all-keys="allKeys"
-    :generated-sshkey="userSshKey"
+    :dialog-type="SSHCreationMethod.new"
+    :generating="generatingSSH"
+    :generated-ssh-key="generatedSSHKey"
     @save="addKey($event)"
-    @close="() => (openAddNewSSHDialog = false)"
+    @close="() => (isNewDialogOpen = false)"
     @generate="generateSSHKeys($event)"
   />
 
-  <import-ssh-key-dialog
-    :open="openImportSSHDialog"
+  <!-- Import -->
+  <ssh-form-dialog
+    :open="isImportDialogOpen"
     :all-keys="allKeys"
-    :generated-sshkey="userSshKey"
+    :dialog-type="SSHCreationMethod.import"
     @save="addKey($event)"
-    @close="() => (openImportSSHDialog = false)"
-    @generate="generateSSHKeys($event)"
+    @close="() => (isImportDialogOpen = false)"
   />
+
+  <!-- View -->
+  <ssh-data-dialog :open="isViewKey" :selected-key="selectedKey" @close="() => (isViewKey = false)" />
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from "vue";
-import { ref } from "vue";
+import crypto from "crypto";
+import { computed, defineComponent, ref } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
-import AddNewSshKeyDialog from "@/components/ssh_keys/AddNewSshKeyDialog.vue";
-import ImportSshKeyDialog from "@/components/ssh_keys/ImportSshKeyDialog.vue";
+import SshDataDialog from "@/components/ssh_keys/SshDataDialog.vue";
+import SshFormDialog from "@/components/ssh_keys/SshFormDialog.vue";
 import SshTable from "@/components/ssh_keys/SshTable.vue";
 import { useProfileManager } from "@/stores";
-import { SSHKeyData } from "@/types";
+import { SSHCreationMethod, SSHKeyData } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { getGrid, storeSSH } from "@/utils/grid";
 import { downloadAsFile } from "@/utils/helpers";
 
 export default defineComponent({
+  name: "SSHView",
   props: [],
   components: {
     SshTable,
-    AddNewSshKeyDialog,
-    ImportSshKeyDialog,
+    SshFormDialog,
+    SshDataDialog,
   },
 
   data() {
     return {
-      openAddNewSSHDialog: false,
-      openImportSSHDialog: false,
+      isNewDialogOpen: false,
+      isImportDialogOpen: false,
+      isViewKey: false,
     };
   },
 
   methods: {
     addKey(key: SSHKeyData) {
+      key.fingerPrint = this.createdKeyFingerPrint;
       this.allKeys.push(key);
+      // Close the opened dialog
+      if (this.isNewDialogOpen) {
+        this.isNewDialogOpen = false;
+      } else if (this.isImportDialogOpen) {
+        this.isImportDialogOpen = false;
+      }
+
+      createCustomToast(`The created ${key.name} key has been saved.`, ToastType.success);
+    },
+
+    viewSelectedKey(key: SSHKeyData) {
+      this.selectedKey = key;
+      this.isViewKey = true;
     },
 
     updateKeys(options: { key?: SSHKeyData; keys?: SSHKeyData[]; isDeleted?: boolean; removeSelected?: boolean }) {
@@ -113,13 +137,11 @@ export default defineComponent({
       if (options.keys && options.removeSelected) {
         setTimeout(() => {
           if (options.keys && options.removeSelected) {
-            console.log("options.keys", options.keys);
-
             this.allKeys = options.keys;
-            this.loading = false;
           }
         }, 3000);
       }
+      this.loading = false;
 
       if (options.key && options.isDeleted) {
         this.allKeys = this.allKeys.filter(_key => _key.id !== options.key?.id);
@@ -144,6 +166,7 @@ export default defineComponent({
     },
 
     async generateSSHKeys(keyName: string) {
+      this.createdKeyFingerPrint = "";
       this.generatingSSH = true;
       const keys = await generateKeyPair({
         alg: "RSASSA-PKCS1-v1_5",
@@ -151,20 +174,56 @@ export default defineComponent({
         name: keyName,
         size: 4096,
       });
-      const grid = await getGrid(this.profileManager.profile!);
+
+      const profileManager = useProfileManager();
+      const grid = await getGrid(profileManager.profile!);
+      this.generatedSSHKey = keys.publicKey;
       await storeSSH(grid!, keys.publicKey);
-      this.profileManager.updateSSH(keys.publicKey);
-      this.userSshKey = this.profileManager.profile!.ssh;
       downloadAsFile("id_rsa", keys.privateKey);
-      this.generatingSSH = false;
+      this.createdKeyFingerPrint = this.calculateFingerprint(keys.publicKey);
       createCustomToast(`${keyName} key has been generated successfully.`, ToastType.success);
+      // this.profileManager.updateSSH(keys.publicKey);
+      // this.userSshKey = this.profileManager.profile!.ssh;
+      this.generatingSSH = false;
+    },
+
+    parsePublicKey(publicKey: string) {
+      const parts = publicKey.split(" ");
+      return {
+        type: parts[0],
+        data: parts[1],
+        comment: parts[2],
+      };
+    },
+
+    calculateFingerprint(publicKey: any) {
+      const sshPublicKey = this.parsePublicKey(publicKey);
+      const md5 = crypto.createHash("md5");
+      md5.update(sshPublicKey.data);
+      const fingerprint = md5
+        .digest("hex")
+        .replace(/(.{2})(?=.)/g, "$1:")
+        .toUpperCase();
+      return fingerprint;
     },
   },
   setup() {
     const loading = ref<boolean>(false);
     const profileManager = useProfileManager();
-    const userSshKey = ref(profileManager.profile!.ssh);
+    const userSshKey = ref<string>(profileManager.profile!.ssh);
+    const generatedSSHKey = ref<string>("");
     const generatingSSH = ref<boolean>(false);
+    const createdKeyFingerPrint = ref<string>("");
+    const selectedKey = ref<SSHKeyData>({
+      id: 0,
+      key: "",
+      name: "",
+      createdAt: "",
+      fingerPrint: "",
+      isActive: false,
+      deleting: false,
+      activating: false,
+    });
 
     console.log("userSshKey", userSshKey);
 
@@ -205,7 +264,16 @@ export default defineComponent({
       return allKeys.value.filter(key => key.isActive === true);
     });
 
-    return { allKeys, activeKeys, loading, generatingSSH, profileManager, userSshKey };
+    return {
+      loading,
+      generatedSSHKey,
+      generatingSSH,
+      allKeys,
+      activeKeys,
+      SSHCreationMethod,
+      createdKeyFingerPrint,
+      selectedKey,
+    };
   },
 });
 </script>
