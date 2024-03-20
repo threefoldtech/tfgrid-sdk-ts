@@ -339,6 +339,29 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
         },
       },
     },
+
+    {
+      path: DashboardRoutes.Applications.Caddy,
+      component: () => import("../views/caddy_view.vue"),
+      meta: {
+        title: "Caddy",
+        info: { page: "info/umbrel.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Caddy",
+            },
+          ],
+        },
+      },
+    },
     // Commented for now and will be user later.
     // {
     //   path: DashboardRoutes.Applications.Freeflow,
