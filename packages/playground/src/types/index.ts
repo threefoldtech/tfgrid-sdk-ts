@@ -332,8 +332,8 @@ export interface SSHKeyData {
   createdAt: string;
   fingerPrint: string;
   isActive: boolean;
-  deleting: boolean;
-  activating: boolean;
+  deleting?: boolean;
+  activating?: boolean;
   // view: SSHKeyData;
 }
 

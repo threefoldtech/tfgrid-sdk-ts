@@ -1,5 +1,10 @@
 <template>
-  <v-dialog @keydown.esc="$emit('close')" v-model="$props.open" max-width="750">
+  <v-dialog
+    @click:outside="() => $emit('close')"
+    @keydown.esc="() => $emit('close')"
+    v-model="$props.open"
+    max-width="750"
+  >
     <template v-slot:default>
       <v-card>
         <v-toolbar color="primary" class="custom-toolbar">
@@ -9,7 +14,9 @@
         <v-card-text>
           <template v-for="[_key, value] of Object.entries(selectedKey).sort()" :key="_key">
             <template v-if="!notNeededFields.includes(_key)">
-              <v-text-field v-if="_key !== 'key'" :label="_key" :model-value="value" :readonly="true" />
+              <CopyInputWrapper v-if="_key !== 'key'" :data="value" #="{ props: copyInputProps }">
+                <v-text-field v-bind="{ ...copyInputProps }" :label="_key" :model-value="value" :readonly="true" />
+              </CopyInputWrapper>
               <CopyInputWrapper v-else :data="value" #="{ props: copyInputProps }">
                 <v-textarea
                   :class="value.length ? 'ssh-key' : ''"
@@ -40,7 +47,7 @@
 
         <v-card-actions class="mb-3 custom-actions">
           <v-spacer></v-spacer>
-          <div class="mr-4">
+          <div class="mt-2">
             <v-btn color="white" variant="outlined" text="Close" @click="$emit('close')"></v-btn>
           </div>
         </v-card-actions>

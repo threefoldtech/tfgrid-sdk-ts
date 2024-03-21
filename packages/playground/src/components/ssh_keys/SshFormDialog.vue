@@ -1,5 +1,10 @@
 <template>
-  <v-dialog @keydown.esc="$emit('close')" v-model="$props.open" max-width="750">
+  <v-dialog
+    @click:outside="() => $emit('close')"
+    @keydown.esc="() => $emit('close')"
+    v-model="$props.open"
+    max-width="750"
+  >
     <template v-slot:default>
       <v-card>
         <v-toolbar color="primary" class="custom-toolbar">
@@ -94,6 +99,7 @@ import { computed, defineComponent, PropType, ref, watch } from "vue";
 
 import { type Profile, useProfileManager } from "@/stores/profile_manager";
 import { SSHCreationMethod, SSHKeyData } from "@/types";
+import { formatSSHKeyTableCreatedAt } from "@/utils/date";
 import { Balance, getGrid, loadBalance } from "@/utils/grid";
 import { isEnoughBalance } from "@/utils/helpers";
 import { generateSSHKeyName } from "@/utils/strings";
@@ -149,7 +155,7 @@ export default defineComponent({
             id: lastID + 1,
             key: "",
             activating: false,
-            createdAt: `${now.getDate()}-${now.getMonth() + 1}-${now.getFullYear()}`,
+            createdAt: formatSSHKeyTableCreatedAt(now),
             deleting: false,
             fingerPrint: fingerPrint.value,
             name: keyName.value.length === 0 ? generateUniqueSSHKeyName() : keyName.value,

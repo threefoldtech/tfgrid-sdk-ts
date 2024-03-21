@@ -127,6 +127,7 @@
             prepend-icon="mdi-export"
             color="primary"
             variant="tonal"
+            @click="() => $emit('export', selectedKeys)"
           >
             Export
           </v-btn>
@@ -180,7 +181,7 @@ export default defineComponent({
 
   components: {},
 
-  emits: ["inactive", "active", "delete", "view", "update:keys"],
+  emits: ["inactive", "active", "delete", "view", "update:keys", "export"],
 
   methods: {
     deleteSelected() {

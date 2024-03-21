@@ -25,7 +25,16 @@
       >
         Import
       </v-btn>
-      <v-btn variant="outlined" class="mr-2" prepend-icon="mdi-export" color="secondary"> Export </v-btn>
+      <v-btn
+        :loading="isExporting"
+        @click="() => exportData(allKeys)"
+        variant="outlined"
+        class="mr-2"
+        prepend-icon="mdi-export"
+        color="secondary"
+      >
+        Export
+      </v-btn>
       <v-btn class="mr-2" @click="() => (isNewDialogOpen = true)" prepend-icon="mdi-key-plus" color="primary">
         Generate
       </v-btn>
@@ -38,6 +47,7 @@
     @delete="deleteKey"
     @update:keys="updateKeys($event)"
     @view="viewSelectedKey"
+    @export="exportData($event)"
     :header-icon="'mdi-key-chain-variant'"
     :header-title="'Active Keys'"
     :ssh-keys="activeKeys"
@@ -50,6 +60,7 @@
     @delete="deleteKey"
     @update:keys="updateKeys({ keys: $event, removeSelected: true })"
     @view="viewSelectedKey"
+    @export="exportData($event)"
     :header-icon="'mdi-key-chain'"
     :header-title="'All Keys'"
     :ssh-keys="allKeys"
@@ -83,6 +94,7 @@
 </template>
 
 <script lang="ts">
+import { GridClient } from "@threefold/grid_client";
 import crypto from "crypto";
 import { computed, defineComponent, ref } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
@@ -93,8 +105,10 @@ import SshTable from "@/components/ssh_keys/SshTable.vue";
 import { useProfileManager } from "@/stores";
 import { SSHCreationMethod, SSHKeyData } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
+import { formatSSHKeyTableCreatedAt } from "@/utils/date";
 import { getGrid, storeSSH } from "@/utils/grid";
-import { downloadAsFile } from "@/utils/helpers";
+import { downloadAsFile, downloadAsJson } from "@/utils/helpers";
+import { generateSSHKeyName } from "@/utils/strings";
 
 export default defineComponent({
   name: "SSHView",
@@ -181,16 +195,11 @@ export default defineComponent({
         size: 4096,
       });
 
-      const profileManager = useProfileManager();
-      const grid = await getGrid(profileManager.profile!);
       this.generatedSSHKey = keys.publicKey;
-      await storeSSH(grid!, keys.publicKey);
-      downloadAsFile("id_rsa", keys.privateKey);
       key.fingerPrint = this.calculateFingerprint(keys.publicKey);
+      downloadAsFile("id_rsa", keys.privateKey);
       createCustomToast(`${key.name} key has been generated successfully.`, ToastType.success);
       this.generatingSSH = false;
-      // this.profileManager.updateSSH(keys.publicKey);
-      // this.userSshKey = this.profileManager.profile!.ssh;
     },
 
     parsePublicKey(publicKey: string) {
@@ -212,14 +221,90 @@ export default defineComponent({
         .toUpperCase();
       return fingerprint;
     },
+
+    exportData(keys: SSHKeyData[] | number[]) {
+      this.isExporting = true;
+      let exportKeys: SSHKeyData[] = [];
+
+      if (Array.isArray(keys) && keys.length > 0 && typeof keys[0] === "number") {
+        // If keys is an array of numbers, filter out keys with matching IDs
+        exportKeys = this.allKeys.filter(key => keys.includes(key.id as unknown as SSHKeyData & number));
+      } else {
+        // If keys is an array of SSHKeyData objects, directly assign it to exportKeys
+        exportKeys = keys as SSHKeyData[];
+      }
+
+      // Remove 'deleting' and 'activating' properties from each key
+      exportKeys.forEach(key => {
+        delete key.deleting;
+        delete key.activating;
+      });
+
+      downloadAsJson(exportKeys, `ssh_keys.json`);
+      this.isExporting = false;
+    },
+
+    async migrateOldKey(publicSSHKey: string) {
+      const now = new Date();
+      // Get the name from the exacting ssh key.
+      const parts = publicSSHKey.split(" ");
+      const keyName = parts[parts.length - 1];
+
+      const newKey: SSHKeyData = {
+        createdAt: formatSSHKeyTableCreatedAt(now),
+        name: keyName,
+        id: 1,
+        isActive: true,
+        key: publicSSHKey,
+        fingerPrint: this.calculateFingerprint(publicSSHKey),
+      };
+
+      return await this.storeSSHKey(newKey);
+    },
+
+    async storeSSHKey(sshKey: SSHKeyData) {
+      const profileManager = useProfileManager();
+      const grid = await getGrid(profileManager.profile!);
+      const key = JSON.stringify(sshKey);
+      // console.log("key: ", key);
+
+      await storeSSH(
+        grid!,
+        key,
+        // "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCF3JezThwSchTvkF2oPtn8X6chevNsfE58dIY3/eg5zK9tKgNYIB2saoFh12a0AJU424sAeLO0HghhNhe/Co62xkzHhk6EpXWNSFkrlzw+FVn1FKDZbbOZH47sC3n6p5a3YhM4dALssZ/aZdpaKBgXkzk91usJ+GVa+eOnpMRBlHgi9PpvowyzPSKeH9ZcVRBPnVU+nQGyV+kd6RahNBoNgNrHu/QFI92yg/y/7Szus1IS0U92cWKf/K/Sot7O10kSjmj06lMGOO8zdENk/xrtUtRHzemCj+mq0Q/3KUMCGvdb/tH0TDeNenxvibummiym4VTcnYqbm+RDXWG8HUc/RPfEVBl8p1NGZnkBt6QJl5hddHaYwx8CCmf3maSrQFcmrWYtlUDBXYkPyrv0qmy2gM1PScntF/X9zhIfnELlyAVAKXfzVwixrBh7oOIAqefydSVcwWtCXoH38F5q/zo9bQv+eHntI83mZrUUT7JGirQF64fpJKbCZPhv0kUm9bF7DVQMiyRZdk748cgVp7dEzMVlrfZ2eIvZag5zmuJTPB7bw00+Ik9jNaOIhEoCWEaYBw7KmrLonesV8rWUkEAwWPe28bXCVmUZlgZbWJi7BFWCst2Z/j2WgScHbdAv28gAcneDW4yQmt2YaYqXqmwgSVCaD/irq5FSO4upmo5u0Q== mahmmoud.hassanein@gmail.com",
+      );
+      profileManager.updateSSH(
+        key,
+        // "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCF3JezThwSchTvkF2oPtn8X6chevNsfE58dIY3/eg5zK9tKgNYIB2saoFh12a0AJU424sAeLO0HghhNhe/Co62xkzHhk6EpXWNSFkrlzw+FVn1FKDZbbOZH47sC3n6p5a3YhM4dALssZ/aZdpaKBgXkzk91usJ+GVa+eOnpMRBlHgi9PpvowyzPSKeH9ZcVRBPnVU+nQGyV+kd6RahNBoNgNrHu/QFI92yg/y/7Szus1IS0U92cWKf/K/Sot7O10kSjmj06lMGOO8zdENk/xrtUtRHzemCj+mq0Q/3KUMCGvdb/tH0TDeNenxvibummiym4VTcnYqbm+RDXWG8HUc/RPfEVBl8p1NGZnkBt6QJl5hddHaYwx8CCmf3maSrQFcmrWYtlUDBXYkPyrv0qmy2gM1PScntF/X9zhIfnELlyAVAKXfzVwixrBh7oOIAqefydSVcwWtCXoH38F5q/zo9bQv+eHntI83mZrUUT7JGirQF64fpJKbCZPhv0kUm9bF7DVQMiyRZdk748cgVp7dEzMVlrfZ2eIvZag5zmuJTPB7bw00+Ik9jNaOIhEoCWEaYBw7KmrLonesV8rWUkEAwWPe28bXCVmUZlgZbWJi7BFWCst2Z/j2WgScHbdAv28gAcneDW4yQmt2YaYqXqmwgSVCaD/irq5FSO4upmo5u0Q== mahmmoud.hassanein@gmail.com",
+      );
+    },
+
+    async loadKeys() {
+      const profileManager = useProfileManager();
+      console.log("User key is", JSON.parse(profileManager.profile!.ssh));
+    },
+  },
+
+  async mounted() {
+    const profileManager = useProfileManager();
+    const userSshKey = ref<string>(profileManager.profile!.ssh);
+
+    try {
+      JSON.parse(userSshKey.value);
+    } catch (e) {
+      // Old key is still string.
+      this.migrateOldKey(userSshKey.value);
+    }
+
+    this.loadKeys();
   },
 
   setup() {
-    const loading = ref<boolean>(false);
     const profileManager = useProfileManager();
-    const userSshKey = ref<string>(profileManager.profile!.ssh);
+    const loading = ref<boolean>(false);
     const generatedSSHKey = ref<string>("");
     const generatingSSH = ref<boolean>(false);
+    const isExporting = ref<boolean>(false);
     const selectedKey = ref<SSHKeyData>({
       id: 0,
       key: "",
@@ -231,40 +316,7 @@ export default defineComponent({
       activating: false,
     });
 
-    console.log("userSshKey", userSshKey);
-
-    const allKeys = ref<SSHKeyData[]>([
-      {
-        id: 1,
-        key: "",
-        name: "Test key",
-        createdAt: "2011-05-14",
-        fingerPrint: "524sad#!@$$@s4ad#@$saj4h5@asf",
-        isActive: false,
-        activating: false,
-        deleting: false,
-      },
-      {
-        id: 2,
-        key: "",
-        name: "Mahmoud's key",
-        createdAt: "2020-09-25",
-        fingerPrint: "524sad#!@$$@s4ad@asf",
-        isActive: true,
-        activating: false,
-        deleting: false,
-      },
-      {
-        id: 3,
-        key: "",
-        name: "Adham's key",
-        createdAt: "2018-01-01",
-        fingerPrint: "@$$@s4ad#@$saj4h5@asf",
-        isActive: false,
-        activating: false,
-        deleting: false,
-      },
-    ]);
+    const allKeys = ref<SSHKeyData[]>([JSON.parse(profileManager.profile!.ssh)]);
 
     const activeKeys = computed(() => {
       return allKeys.value.filter(key => key.isActive === true);
@@ -278,6 +330,7 @@ export default defineComponent({
       activeKeys,
       SSHCreationMethod,
       selectedKey,
+      isExporting,
     };
   },
 });
