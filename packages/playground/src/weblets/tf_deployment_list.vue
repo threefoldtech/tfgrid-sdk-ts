@@ -235,7 +235,7 @@
           />
         </template>
 
-        <template #Caddy-actions="{ item }">
+        <template #StaticWebsite-actions="{ item }">
           <IconActionBtn
             tooltip="Show Details"
             icon="mdi-eye-outline"
@@ -245,7 +245,7 @@
             tooltip="Visit"
             icon="mdi-web"
             color="anchor"
-            :href="'https://' + item.value.env.CADDY_DOMAIN"
+            :href="'https://' + item.value.env.STATICWEBSITE_DOMAIN"
           />
         </template>
 
@@ -413,7 +413,7 @@ const tabs: Tab[] = [
   { title: "Umbrel", value: "Umbrel", imgPath: "images/icons/umbrel.png" },
   { title: "Freeflow", value: "Freeflow", imgPath: "images/icons/freeflow.png" },
   { title: "Wordpress", value: "Wordpress", imgPath: "images/icons/wordpress.png" },
-  { title: "Caddy", value: "Caddy", imgPath: "images/icons/wordpress.png" },
+  { title: "StaticWebsite", value: "StaticWebsite", imgPath: "images/icons/wordpress.png" },
 ];
 
 const profileManager = useProfileManager();

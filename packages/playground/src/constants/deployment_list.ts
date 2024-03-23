@@ -124,7 +124,7 @@ export const deploymentListEnvironments = {
     CHAIN_ENDPOINT: "Chain Endpoint",
   },
 
-  caddy: {
+  static_website: {
     SSH_KEY: _ssh,
     GITHUB_URL: "Clonned Repository URL",
     ROOT: "Root of clonned Repository ",

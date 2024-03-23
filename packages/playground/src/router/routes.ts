@@ -53,7 +53,7 @@ enum OtherRoutes {
 enum ApplicationRoutes {
   BaseRoute = "/deploy/applications/",
   Peertube = "/deploy/applications/peertube/",
-  Caddy = "/deploy/applications/caddy/",
+  StaticWebsite = "/deploy/applications/static_website/",
   Funkwhale = "/deploy/applications/funkwhale/",
   Mattermost = "/deploy/applications/mattermost/",
   Discourse = "/deploy/applications/discourse/",

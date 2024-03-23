@@ -341,11 +341,11 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
     },
 
     {
-      path: DashboardRoutes.Applications.Caddy,
-      component: () => import("../views/caddy_view.vue"),
+      path: DashboardRoutes.Applications.StaticWebsite,
+      component: () => import("../views/staticwebsite_view.vue"),
       meta: {
-        title: "Caddy",
-        info: { page: "info/umbrel.md" },
+        title: "Static Website",
+        info: { page: "info/static_website.md" },
         navbarConfig: {
           back: true,
           path: [
@@ -356,7 +356,7 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
               to: DashboardRoutes.Deploy.Applications,
             },
             {
-              title: "Caddy",
+              title: "Static Website",
             },
           ],
         },

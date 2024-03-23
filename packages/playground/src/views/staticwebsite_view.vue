@@ -1,27 +1,26 @@
 <template>
   <view-layout>
-    {{ name }}
-    <Caddy />
+    <StaticWebsite />
 
     <template #list>
-      <TfDeploymentList title="Caddy Instances" :project-name="name" />
+      <TfDeploymentList title="Static Website Instances" :project-name="name" />
     </template>
   </view-layout>
 </template>
 
 <script lang="ts">
 import { ProjectName } from "../types";
-import Caddy from "../weblets/tf_caddy.vue";
 import TfDeploymentList from "../weblets/tf_deployment_list.vue";
+import StaticWebsite from "../weblets/tf_staticwebsite.vue";
 
 export default {
   name: "CaddyView",
   components: {
-    Caddy,
+    StaticWebsite,
     TfDeploymentList,
   },
   setup() {
-    return { name: ProjectName.Caddy };
+    return { name: ProjectName.StaticWebsite };
   },
 };
 </script>

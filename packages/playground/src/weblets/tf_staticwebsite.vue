@@ -8,9 +8,9 @@
     :dedicated="dedicated"
     :SelectedNode="selectionDetails?.node"
     :valid-filters="selectionDetails?.validFilters"
-    title-image="images/icons/subsquid.png"
+    title-image="images/icons/static_website.png"
   >
-    <template #title>Deploy a Caddy Instance </template>
+    <template #title>Deploy a Static Website Instance </template>
 
     <form-validator v-model="valid">
       <input-validator
@@ -57,7 +57,7 @@
         :medium="{ cpu: 2, memory: 4, disk: 100 }"
       />
 
-      <Networks ref="network" v-model:ipv4="ipv4" v-model:mycelium="mycelium" />
+      <Networks ref="network" v-model:mycelium="mycelium" />
 
       <input-tooltip
         inline
@@ -109,7 +109,7 @@ import { generateName } from "../utils/strings";
 const layout = useLayout();
 const valid = ref(false);
 const profileManager = useProfileManager();
-const name = ref(generateName({ prefix: "ca" }));
+const name = ref(generateName({ prefix: "sw" }));
 const githubUrl = ref("");
 const root = ref("");
 const domain = ref();
@@ -129,14 +129,14 @@ const selectionDetails = ref<SelectionDetails>();
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
-  layout.value.setStatus("success", "Successfully deployed a Caddy instance.");
-  layout.value.openDialog(deployment, deploymentListEnvironments.caddy);
+  layout.value.setStatus("success", "Successfully deployed a Static Website instance.");
+  layout.value.openDialog(deployment, deploymentListEnvironments.static_website);
 }
 
 async function deploy() {
   layout.value.setStatus("deploy");
 
-  const projectName = ProjectName.Caddy.toLowerCase() + "/" + name.value;
+  const projectName = ProjectName.StaticWebsite.toLowerCase() + "/" + name.value;
 
   const subdomain = getSubdomain({
     deploymentName: name.value,
@@ -195,7 +195,7 @@ async function deploy() {
             { key: "GITHUB_URL", value: githubUrl.value },
             { key: "ROOT", value: root.value },
             { key: "USER_DOMAIN", value: selectionDetails.value?.domain?.enabledCustomDomain ? domain.value : "" },
-            { key: "CADDY_DOMAIN", value: domain.value },
+            { key: "STATICWEBSITE_DOMAIN", value: domain.value },
           ],
           nodeId: selectionDetails.value!.node!.nodeId,
           rentedBy: dedicated.value ? grid!.twinId : undefined,
@@ -205,7 +205,7 @@ async function deploy() {
       ],
     });
   } catch (e) {
-    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Subsquid instance."));
+    return layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Static Website instance."));
   }
   if (domain.value) {
     if (!selectionDetails.value?.domain?.enableSelectedDomain) {
@@ -227,7 +227,7 @@ async function deploy() {
       layout.value.setStatus("deploy", "Rollbacking back due to fail to deploy gateway...");
 
       await rollbackDeployment(grid!, name.value);
-      layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Caddy instance."));
+      layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Static Website instance."));
     }
   }
   finalize(vm);
@@ -242,7 +242,7 @@ import type { SelectionDetails } from "../types/nodeSelector";
 import rootFs from "../utils/root_fs";
 
 export default {
-  name: "TfCaddy",
+  name: "TfStaticWebsite",
   components: { SelectSolutionFlavor, Networks },
 };
 </script>

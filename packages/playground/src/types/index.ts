@@ -114,7 +114,7 @@ export enum ProjectName {
   Qvm = "Qvm",
   Umbrel = "Umbrel",
   FreeFlow = "Freeflow",
-  Caddy = "Caddy",
+  StaticWebsite = "StaticWebsite",
 }
 
 export enum SolutionCode {
@@ -140,7 +140,7 @@ export enum SolutionCode {
   qvm = "qvm",
   umbrel = "um",
   wordpress = "wp",
-  caddy = "ca",
+  staticwebsite = "sw",
 }
 
 export const solutionType: { [key: string]: string } = {
@@ -163,7 +163,7 @@ export const solutionType: { [key: string]: string } = {
   umbrel: "Umbrel",
   vm: "Micro Virtual Machine",
   wordpress: "Wordpress",
-  caddy: "Caddy",
+  staticwebsite: "StaticWebsite",
 };
 
 export interface solutionFlavor {
