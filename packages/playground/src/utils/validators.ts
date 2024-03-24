@@ -1,4 +1,4 @@
-import { default as StellarSdk, StrKey } from "stellar-sdk";
+import StellarSdk from "stellar-sdk";
 import validator from "validator";
 import type { Options } from "validator/lib/isBoolean";
 import type { IsEmailOptions } from "validator/lib/isEmail";

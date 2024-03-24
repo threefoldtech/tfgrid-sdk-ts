@@ -99,7 +99,7 @@
                   <input-validator
                     :value="address"
                     :rules="[validators.required('Address is required.'), customStellarValidation]"
-                    :async-rules="[() => validators.isValidStellarAddress(address)]"
+                    :async-rules="[validators.isValidStellarAddress]"
                     #="{ props }"
                   >
                     <v-text-field
