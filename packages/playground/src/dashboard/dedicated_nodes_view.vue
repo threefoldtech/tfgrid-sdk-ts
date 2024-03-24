@@ -144,9 +144,13 @@
         </TfFilter>
       </TfFiltersContainer>
 
-      <v-alert type="info" variant="tonal">
+      <v-alert type="info" variant="tonal" class="mb-3">
         Discounts are applied on hourly basis, you need to maintain at least the same balance you have or higher to
         unlock the discounts.
+      </v-alert>
+
+      <v-alert type="info" variant="tonal">
+        You must acquire a minimum of 2 TFTs in order to reserve any node.
       </v-alert>
 
       <nodes-table

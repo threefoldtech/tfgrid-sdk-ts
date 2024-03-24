@@ -20,8 +20,8 @@
       size="small"
       outlined
       :loading="loadingReserveNode"
-      :disabled="disableButton"
       v-if="node.rentedByTwinId === 0"
+      :disabled="disableButton || hasInsufficientBalance"
       color="primary"
       @click.stop="reserveNode"
     >
@@ -54,11 +54,11 @@
 <script lang="ts">
 import type { GridNode } from "@threefold/gridproxy_client";
 import { InsufficientBalanceError } from "@threefold/types";
-import { type PropType, ref } from "vue";
+import { onMounted, type PropType, ref } from "vue";
 
 import { useProfileManager } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
-import { getGrid } from "@/utils/grid";
+import { getGrid, loadBalance } from "@/utils/grid";
 import { notifyDelaying } from "@/utils/notifications";
 
 const profileManager = useProfileManager();
@@ -77,6 +77,15 @@ export default {
     const loadingUnreserveBtn = ref(false);
     const loadingReserveNode = ref(false);
     const disableButton = ref(false);
+    const hasInsufficientBalance = ref(false);
+    onMounted(async () => {
+      const grid = await getGrid(profileManager.profile!);
+      const balance = await loadBalance(grid!);
+      const b = balance.free - balance.locked;
+      if (b < 2) {
+        hasInsufficientBalance.value = true;
+      }
+    });
 
     function removeReserve() {
       openUnreserveDialog.value = true;
@@ -160,6 +169,7 @@ export default {
       disableButton,
       loadingUnreserveBtn,
       profileManager,
+      hasInsufficientBalance,
     };
   },
 };
