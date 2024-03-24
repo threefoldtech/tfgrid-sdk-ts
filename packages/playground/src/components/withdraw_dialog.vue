@@ -36,13 +36,7 @@
               validators.required('This field is required'),
               validators.min('Amount should be at least 2 TFT', 2),
               validators.max( 'Amount cannot exceed balance',freeBalance!),
-              () => {
-                if(!(amount.toString().split('.').length > 1 ? amount.toString().split('.')[1].length <= 3 : true)){
-                  return {
-                    message:  'Amount must have 3 decimals only'
-                  }
-                }
-              }
+              validators.isValidDecimalNumber(3,'Amount must have 3 decimals only')
             ]"
             >
               <v-text-field

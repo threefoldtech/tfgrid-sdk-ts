@@ -742,6 +742,16 @@ export function isValidSSHKey(key: string): boolean {
   const sshKeyRegex = /^(ssh-rsa|ssh-dss|ecdsa-[a-zA-Z0-9-]+|ssh-ed25519)\s+(\S+)\s+(\S+)/;
   return sshKeyRegex.test(key);
 }
+
+export function isValidDecimalNumber(length: number, msg: string) {
+  return (value: string) => {
+    if (!(value.toString().split(".").length > 1 ? value.toString().split(".")[1].length <= length : true)) {
+      return {
+        message: msg,
+      };
+    }
+  };
+}
 export async function isValidStellarAddress(target: string): Promise<RuleReturn> {
   const server = new StellarSdk.Server(window.env.STELLAR_HORIZON_URL);
   try {
