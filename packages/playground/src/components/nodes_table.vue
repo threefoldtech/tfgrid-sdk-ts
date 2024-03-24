@@ -27,7 +27,7 @@
           <template #loading />
 
           <template v-slot:[`item.status`]="{ item }">
-            <p class="text-left mt-1 mb-0">
+            <p class="mt-1 mb-0">
               <v-chip :color="getNodeStatusColor(item.columns.status as string).color">
                 <span>
                   {{ capitalize(getNodeStatusColor(item.columns.status as string).status) }}
@@ -37,7 +37,7 @@
           </template>
 
           <template v-slot:[`item.dedicated`]="{ item }">
-            <p class="text-left mt-1 mb-0">
+            <p class="mt-1 mb-0">
               <v-chip
                 :color="getNodeTypeColor(item.columns.dedicated as boolean, item.raw.rentedByTwinId as number).color"
               >
