@@ -3,7 +3,7 @@
     width="1024"
     class="mx-auto"
     :model-value="$props.modelValue"
-    @update:model-value="$emit('update:model-value', $event)"
+    @update:model-value="handleProfileDialog($event)"
   >
     <template #activator="{ props }">
       <VCard v-bind="props" class="pa-3 d-inline-flex align-center">
@@ -38,7 +38,7 @@
                     height="24px"
                     width="24px"
                     class="ml-2"
-                    href="https://manual.grid.tf/tfchain/tfchain.html?highlight=locked#contract-locking"
+                    href="https://www.manual.grid.tf/documentation/developers/tfchain/tfchain.html#contract-locking"
                     target="_blank"
                   />
                 </template>
@@ -69,7 +69,11 @@
       <v-alert variant="tonal" class="mb-6">
         <p :style="{ maxWidth: '880px' }">
           Please visit
-          <a class="app-link" href="https://manual.grid.tf/playground/wallet_connector.html" target="_blank">
+          <a
+            class="app-link"
+            href="https://manual.grid.tf/threefold_token/storing_tft/tf_connect_app.html"
+            target="_blank"
+          >
             the manual
           </a>
           get started.
@@ -244,7 +248,7 @@
                 </v-btn>
                 <v-card v-show="termsLoading" :style="{ height: '100%' }">
                   <v-card-text class="d-flex justify-center align-center" :style="{ height: '100%' }">
-                    <v-progress-circular indeterminate color="primary" />
+                    <v-progress-circular />
                   </v-card-text>
                 </v-card>
               </v-dialog>
@@ -381,7 +385,11 @@
             <section class="qr d-flex flex-column align-center">
               <p class="mb-4 text-center">
                 Scan the QR code using
-                <a class="app-link" href="https://manual.grid.tf/getstarted/TF_Connect/TF_Connect.html" target="_blank">
+                <a
+                  class="app-link"
+                  href="https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html"
+                  target="_blank"
+                >
                   ThreeFold Connect
                 </a>
                 to fund your account
@@ -742,6 +750,10 @@ onMounted(async () => {
   await mounted();
 });
 
+async function handleProfileDialog(value: boolean) {
+  emit("update:modelValue", value);
+  if (profileManager?.profile && value) __loadBalance(profileManager.profile);
+}
 const creatingAccount = ref(false);
 async function createNewAccount() {
   openAcceptTerms.value = false;

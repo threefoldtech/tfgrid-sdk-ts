@@ -9,7 +9,7 @@
     </v-alert>
     <VTooltip
       text="SSH Keys are used to authenticate you to the deployment instance for management purposes. If you don't have an SSH Key or are not familiar, we can generate one for you."
-      location="bottom"
+      location="top right"
       max-width="600px"
     >
       <template #activator="{ props }">
@@ -21,7 +21,8 @@
             :spellcheck="false"
             v-model.trim="ssh"
             v-bind="{ ...props, ...copyInputProps }"
-            :disabled="updatingSSH || generatingSSH || !hasEnoughBalance"
+            :readonly="!hasEnoughBalance"
+            :disabled="updatingSSH || generatingSSH"
             :hint="
               updatingSSH
                 ? 'Updating your public ssh key.'
@@ -30,7 +31,7 @@
                 : SSHKeyHint
             "
             :persistent-hint="updatingSSH || generatingSSH || !!SSHKeyHint"
-            :rules="[value => !!value || 'SSH key is required']"
+            :rules="sshRules(ssh)"
           />
         </CopyInputWrapper>
 
@@ -64,6 +65,8 @@
 import { ref, watch } from "vue";
 import { computed } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
+
+import { isValidSSHKey } from "@/utils/validators";
 
 import { useProfileManager } from "../stores";
 import type { Profile } from "../stores/profile_manager";
@@ -137,6 +140,15 @@ async function generateSSH() {
   downloadAsFile("id_rsa", keys.privateKey);
   generatingSSH.value = false;
   SSHKeyHint.value = "SSH key generated successfully.";
+}
+
+function sshRules(value: any) {
+  return [
+    (v: any) => !!v || "SSH key is required.",
+    (v: string) =>
+      isValidSSHKey(v) ||
+      "The SSH key you provided is not valid. Please double-check that it is copied correctly and follows the correct format.",
+  ];
 }
 </script>
 <script lang="ts">

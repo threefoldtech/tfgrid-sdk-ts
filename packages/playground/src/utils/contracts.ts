@@ -99,11 +99,11 @@ export function formatConsumption(value: number): string {
   return normalizeBalance(value) + " TFT/hour";
 }
 
-export async function getNodeStatus(nodeIDs: (number | undefined)[]) {
+export async function getNodeInfo(nodeIDs: (number | undefined)[]) {
   const resultPromises = nodeIDs.map(async nodeId => {
     if (typeof nodeId !== "number") return {};
-    const status = (await gridProxyClient.nodes.byId(nodeId)).status;
-    return { [nodeId]: status };
+    const nodeInfo = await gridProxyClient.nodes.byId(nodeId);
+    return { [nodeId]: { status: nodeInfo.status, farmId: nodeInfo.farmId } };
   });
 
   const resultsArray = await Promise.all(resultPromises);
@@ -117,6 +117,7 @@ export interface NormalizedContract {
   state: ContractStates;
   createdAt: string;
   nodeId?: number;
+  farmId?: number;
   solutionName?: string;
   solutionType?: string;
   expiration?: string;

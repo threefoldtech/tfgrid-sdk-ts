@@ -15,21 +15,9 @@
 
     <input-tooltip tooltip="Select a node ID to deploy on." align-center>
       <div class="w-100" :style="{ position: 'relative' }">
-        <VProgressLinear
-          v-if="loadedNodes.length > 0 && (pageCountTask.loading || nodesTask.loading)"
-          indeterminate
-          :style="{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            zIndex: 9,
-            transform: 'none',
-            width: 'calc(100% - 16px)',
-          }"
-          height="2px"
-          color="primary"
-        />
-
+        <div class="d-flex my-6 align-center justify-center">
+          <v-progress-circular v-if="loadedNodes.length > 0 && (pageCountTask.loading || nodesTask.loading)" />
+        </div>
         <VCard
           flat
           class="mb-4 border"
@@ -42,7 +30,8 @@
         >
           <VContainer v-if="loadedNodes.length === 0 && (pageCountTask.loading || nodesTask.loading)">
             <VRow align="center" justify="center" class="pa-4">
-              <VProgressCircular color="primary" indeterminate class="mr-2" /> Loading Nodes...
+              <v-progress-circular class="mr-2" />
+              Loading Nodes...
             </VRow>
           </VContainer>
 
@@ -52,7 +41,11 @@
 
           <div
             ref="nodesContainer"
-            :style="{ maxHeight: '450px', paddingBottom: '100px', backgroundColor: 'rgb(var(--v-theme-background))' }"
+            :style="{
+              maxHeight: '450px',
+              paddingBottom: '100px',
+              backgroundColor: 'rgb(var(--v-theme-background))',
+            }"
             class="overflow-auto px-4"
             v-if="loadedNodes.length"
           >
@@ -97,7 +90,13 @@
         <VAlert
           :type="!validFilters ? 'error' : 'warning'"
           variant="elevated"
-          :style="{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 9 }"
+          :style="{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 9,
+          }"
           v-if="!validFilters || (filtersUpdated && validFilters)"
         >
           <span v-if="!validFilters" v-text="'Please provide valid data.'" />
@@ -109,7 +108,12 @@
         <VAlert
           type="info"
           variant="elevated"
-          :style="{ position: 'absolute', bottom: '31px', right: '31px', zIndex: 9 }"
+          :style="{
+            position: 'absolute',
+            bottom: '31px',
+            right: '31px',
+            zIndex: 9,
+          }"
           v-else-if="nodeInputValidateTask.loading"
           text="Checking if the deployment will fit in the node's disks..."
         />
@@ -118,7 +122,12 @@
           type="error"
           variant="elevated"
           v-if="!filtersUpdated && nodeInputValidateTask.error"
-          :style="{ position: 'absolute', bottom: '31px', right: '31px', zIndex: 9 }"
+          :style="{
+            position: 'absolute',
+            bottom: '31px',
+            right: '31px',
+            zIndex: 9,
+          }"
           :text="nodeInputValidateTask.error"
           closable
         />
@@ -145,6 +154,7 @@ import {
   loadValidNodes,
   normalizeNodeFilters,
   normalizeNodeOptions,
+  validateRentContract,
 } from "../../utils/nodeSelector";
 import TfNodeDetailsCard from "./TfNodeDetailsCard.vue";
 
@@ -244,7 +254,11 @@ export default {
     }
 
     const nodeInputValidateTask = useAsync<true, string, [NodeInfo | undefined]>(
-      node => checkNodeCapacityPool(gridStore, node, props.filters),
+      async node => {
+        const nodeCapacityValid = await checkNodeCapacityPool(gridStore, node, props.filters);
+        const rentContractValid = props.filters.dedicated ? await validateRentContract(gridStore, node) : true;
+        return nodeCapacityValid && rentContractValid;
+      },
       {
         tries: 1,
         shouldRun: () => props.validFilters,

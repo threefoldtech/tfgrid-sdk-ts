@@ -141,28 +141,28 @@ function createApplicationsRoutes(): RouteRecordRaw[] {
         },
       },
     },
-    {
-      path: DashboardRoutes.Applications.Owncloud,
-      component: () => import("../views/owncloud_view.vue"),
-      meta: {
-        title: "Owncloud",
-        info: { page: "info/owncloud.md" },
-        navbarConfig: {
-          back: true,
-          path: [
-            { title: "Deploy" },
-            {
-              title: "Applications",
-              disabled: false,
-              to: DashboardRoutes.Deploy.Applications,
-            },
-            {
-              title: "Owncloud",
-            },
-          ],
-        },
-      },
-    },
+    // {
+    //   path: DashboardRoutes.Applications.Owncloud,
+    //   component: () => import("../views/owncloud_view.vue"),
+    //   meta: {
+    //     title: "Owncloud",
+    //     info: { page: "info/owncloud.md" },
+    //     navbarConfig: {
+    //       back: true,
+    //       path: [
+    //         { title: "Deploy" },
+    //         {
+    //           title: "Applications",
+    //           disabled: false,
+    //           to: DashboardRoutes.Deploy.Applications,
+    //         },
+    //         {
+    //           title: "Owncloud",
+    //         },
+    //       ],
+    //     },
+    //   },
+    // },
     {
       path: DashboardRoutes.Applications.Nextcloud,
       component: () => import("../views/nextcloud_view.vue"),

@@ -56,11 +56,8 @@
                           <v-progress-circular
                             v-bind="props"
                             :rotate="-90"
-                            :size="150"
-                            :width="12"
                             :model-value="getPercentage(item.raw, key)"
                             class="my-3"
-                            color="primary"
                           />
                           <template v-if="item.raw.used_resources">
                             <p v-if="item.raw.total_resources[key] > 1000">

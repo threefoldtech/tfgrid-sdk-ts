@@ -1,1 +1,0 @@
-import "./Base.wc.svelte";

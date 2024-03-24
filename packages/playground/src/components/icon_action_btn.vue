@@ -10,6 +10,7 @@
         variant="tonal"
         :height="height"
         class="my-1 mr-1"
+        :disabled="disabled"
       >
         <v-icon> {{ icon }}</v-icon>
       </v-btn>
@@ -24,6 +25,7 @@ defineProps<{
   color?: string;
   href?: string;
   height?: string;
+  disabled?: boolean;
 }>();
 defineEmits(["click"]);
 </script>
