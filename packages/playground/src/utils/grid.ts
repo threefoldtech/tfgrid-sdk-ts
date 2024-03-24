@@ -96,8 +96,9 @@ export async function loadProfile(grid: GridClient): Promise<Profile> {
 
 export async function getMetadata(grid: GridClient): Promise<{ [key: string]: any }> {
   try {
-    const metadata = await grid.kvstore.get({ key: "metadata" });
-    return JSON.parse(metadata);
+    const metadata = await grid.tfchain.backendStorage.load("metadata");
+    console.log("load metadata: ", metadata);
+    return metadata;
   } catch {
     return {};
   }
@@ -110,16 +111,24 @@ export async function readSSH(grid: GridClient): Promise<string> {
 
 export async function storeSSH(grid: GridClient, newSSH: string): Promise<void> {
   const metadata = await getMetadata(grid);
+
   const ssh = metadata.sshkey;
   if (ssh === newSSH) return;
 
-  return grid.kvstore.set({
-    key: "metadata",
-    value: JSON.stringify({
-      ...metadata,
-      sshkey: newSSH,
-    }),
+  // console.log("metadata", metadata);
+  // await grid.kvstore.removeAll();
+
+  console.log("metadata: ", {
+    ...metadata,
+    sshkey: newSSH,
   });
+
+  const ext = await grid.tfchain.backendStorage.dump("metadata", {
+    ...metadata,
+    sshkey: newSSH,
+  });
+
+  await grid.tfclient.applyAllExtrinsics(ext);
 }
 
 export async function readEmail(grid: GridClient): Promise<string> {

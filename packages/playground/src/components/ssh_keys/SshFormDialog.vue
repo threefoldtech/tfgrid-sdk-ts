@@ -8,8 +8,8 @@
     <template v-slot:default>
       <v-card>
         <v-toolbar color="primary" class="custom-toolbar">
-          <p v-if="isNewSSHKey" class="mb-5">Add new SSH Key</p>
-          <p v-else-if="isImportSSHKey" class="mb-5">Import an exact SSH Key</p>
+          <p v-if="$props.dialogType === SSHCreationMethod.Generate" class="mb-5">Add new SSH Key</p>
+          <p v-else-if="$props.dialogType === SSHCreationMethod.Import" class="mb-5">Import an exact SSH Key</p>
         </v-toolbar>
 
         <v-card-text>
@@ -35,13 +35,13 @@
             Updating or generating SSH key will cost you up to 0.01 TFT
           </v-alert>
 
-          <div v-if="isNewSSHKey" class="create">
+          <div v-if="$props.dialogType === SSHCreationMethod.Generate" class="create">
             <v-alert width="95%" type="info" class="mt-4">
               We will not keep your private key information. Be sure to save the private key downloaded after creation.
             </v-alert>
           </div>
 
-          <div class="import" v-if="isImportSSHKey">
+          <div class="import" v-if="$props.dialogType === SSHCreationMethod.Import">
             <input-tooltip
               class="mt-4"
               width="500"
@@ -69,7 +69,7 @@
             <v-btn color="white" variant="outlined" text="Close" @click="$emit('close')"></v-btn>
 
             <v-btn
-              v-if="isNewSSHKey"
+              v-if="$props.dialogType === SSHCreationMethod.Generate"
               @click="generateSSHKey"
               :loading="generating"
               :disabled="generating || !!generatedSshKey"
@@ -80,7 +80,7 @@
             </v-btn>
 
             <v-btn
-              v-if="isImportSSHKey"
+              v-if="$props.dialogType === SSHCreationMethod.Import"
               color="secondary"
               :disabled="!sshKey"
               variant="outlined"
@@ -130,9 +130,6 @@ export default defineComponent({
   },
 
   setup(props, { emit }) {
-    const isNewSSHKey = ref<boolean>(props.dialogType === SSHCreationMethod.new);
-    const isImportSSHKey = ref<boolean>(props.dialogType === SSHCreationMethod.import);
-
     const profileManager = useProfileManager();
     const sshKey = ref<string>("");
     const fingerPrint = ref<string>("");
@@ -153,10 +150,8 @@ export default defineComponent({
           keyName.value = generateUniqueSSHKeyName();
           createdKey.value = {
             id: lastID + 1,
-            key: "",
-            activating: false,
+            key: props.generatedSshKey as string,
             createdAt: formatSSHKeyTableCreatedAt(now),
-            deleting: false,
             fingerPrint: fingerPrint.value,
             name: keyName.value.length === 0 ? generateUniqueSSHKeyName() : keyName.value,
             isActive: true,
@@ -182,6 +177,7 @@ export default defineComponent({
 
     function createNewSSHKey() {
       if (createdKey.value) {
+        const isNewSSHKey = ref<boolean>(props.dialogType === SSHCreationMethod.Generate);
         createdKey.value.key = isNewSSHKey.value ? props.generatedSshKey || "" : sshKey.value;
         emit("save", createdKey.value);
       }
@@ -238,8 +234,7 @@ export default defineComponent({
       createdKey,
       hasEnoughBalance,
       sshKey,
-      isNewSSHKey,
-      isImportSSHKey,
+      SSHCreationMethod,
 
       generateUniqueSSHKeyName,
       createNewSSHKey,

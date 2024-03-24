@@ -338,6 +338,7 @@ export interface SSHKeyData {
 }
 
 export enum SSHCreationMethod {
-  new = "new",
-  import = "import",
+  None = "",
+  Generate = "generate",
+  Import = "import",
 }
