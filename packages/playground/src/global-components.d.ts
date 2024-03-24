@@ -31,6 +31,7 @@ declare module "@vue/runtime-core" {
 
   interface ComponentCustomProperties {
     validators: typeof validators;
+    MANUAL_URL: typeof MANUAL_URL;
   }
 }
 
