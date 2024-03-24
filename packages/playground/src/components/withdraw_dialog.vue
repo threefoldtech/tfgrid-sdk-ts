@@ -123,7 +123,7 @@ function swapAddressCheck() {
   }
   if (!isValid || target.value.match(/\W/)) {
     return {
-      message: "invalid address",
+      message: "Invalid address",
     };
   }
   targetError.value = "";
