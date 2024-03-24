@@ -752,10 +752,10 @@ export async function isValidStellarAddress(target: string): Promise<RuleReturn>
       (b: { asset_code: string; asset_issuer: string }) =>
         b.asset_code === "TFT" && b.asset_issuer === window.env.TFT_ASSET_ISSUER,
     );
-    if (!includes) throw new Error("invalid trustline");
+    if (!includes) throw new Error("Invalid trustline");
   } catch (e) {
     const message =
-      (e as Error).message === "invalid trustline"
+      (e as Error).message === "Invalid trustline"
         ? "Address does not have a valid trustline to TFT"
         : "Address not found";
     return { message };
