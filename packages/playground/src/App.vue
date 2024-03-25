@@ -6,6 +6,7 @@
       <v-navigation-drawer
         width="280"
         :permanent="permanent"
+        :temporary="!permanent"
         :model-value="openSidebar"
         @update:model-value="openSidebar = $event"
       >
@@ -171,14 +172,7 @@
             }"
           >
             <div class="d-flex align-center">
-              <v-btn
-                v-if="!openSidebar"
-                color="secondary"
-                @click="openSidebar = true"
-                icon="mdi-menu"
-                variant="tonal"
-                class="mr-2"
-              />
+              <v-btn color="secondary" @click="openSidebar = true" icon="mdi-menu" variant="tonal" class="mr-2" />
             </div>
 
             <TfRouterView @openProfile="openProfile = true" :isAuth="hasActiveProfile && hasGrid" />
@@ -397,7 +391,7 @@ const routes: AppRoute[] = [
 ];
 
 // eslint-disable-next-line no-undef
-const permanent = window.innerWidth > 980;
+const permanent = window.innerWidth > 2000; /* 980 */
 const openSidebar = ref(permanent);
 
 const baseUrl = import.meta.env.BASE_URL;

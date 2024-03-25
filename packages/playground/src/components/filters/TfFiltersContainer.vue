@@ -1,11 +1,11 @@
 <template>
-  <VExpansionPanels :model-value="[0]">
+  <VExpansionPanels :model-value="[0]" :style="{ minWidth: '280px', maxWidth: '280px' }">
     <VExpansionPanel eager>
       <VExpansionPanelTitle class="text-h6"> Filters </VExpansionPanelTitle>
       <VExpansionPanelText eager>
         <VForm :disabled="loading">
           <FormValidator valid-on-init v-model="valid">
-            <VContainer fluid>
+            <VContainer fluid class="px-0">
               <VRow no-gutters>
                 <slot />
               </VRow>
