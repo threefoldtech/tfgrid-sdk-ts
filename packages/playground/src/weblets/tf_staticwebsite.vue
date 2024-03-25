@@ -45,9 +45,9 @@
         </input-tooltip>
       </input-validator>
 
-      <input-validator :value="root" :rules="[validators.required('Repository title is required.')]" #="{ props }">
-        <input-tooltip tooltip="Title of Github Repository.">
-          <v-text-field label="Repository Title" v-model="root" v-bind="props" />
+      <input-validator :value="root" :rules="[validators.required('HTML Directory is required.')]" #="{ props }">
+        <input-tooltip tooltip="HTML Directory to serve.">
+          <v-text-field label="HTML Directory" v-model="root" v-bind="props" />
         </input-tooltip>
       </input-validator>
 
@@ -148,13 +148,6 @@ async function deploy() {
     selectionDetails.value?.domain?.customDomain ||
     selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain
   ) {
-    console.log(
-      "selectionDetails.value?.domain?.enabledCustomDomain",
-      selectionDetails.value?.domain?.enabledCustomDomain,
-    );
-    console.log("selectionDetails.value.domain.customDomain", selectionDetails.value.domain.customDomain);
-    console.log("selectionDetails.value.domain.customDomain", selectionDetails.value.domain.customDomain);
-
     domain.value = selectionDetails.value?.domain?.enabledCustomDomain
       ? selectionDetails.value.domain.customDomain
       : subdomain + "." + selectionDetails.value?.domain?.selectedDomain?.publicConfig.domain;

@@ -413,7 +413,7 @@ const tabs: Tab[] = [
   { title: "Umbrel", value: "Umbrel", imgPath: "images/icons/umbrel.png" },
   { title: "Freeflow", value: "Freeflow", imgPath: "images/icons/freeflow.png" },
   { title: "Wordpress", value: "Wordpress", imgPath: "images/icons/wordpress.png" },
-  { title: "StaticWebsite", value: "StaticWebsite", imgPath: "images/icons/wordpress.png" },
+  { title: "Static Website", value: "StaticWebsite", imgPath: "images/icons/wordpress.png" },
 ];
 
 const profileManager = useProfileManager();
