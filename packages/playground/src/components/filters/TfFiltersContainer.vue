@@ -1,7 +1,7 @@
 <template>
   <VExpansionPanels :model-value="[0]">
     <VExpansionPanel eager>
-      <VExpansionPanelTitle class="text-h6"> Filters </VExpansionPanelTitle>
+      <VExpansionPanelTitle class="text-lg font-bold"> Filters </VExpansionPanelTitle>
       <VExpansionPanelText eager>
         <VForm :disabled="loading">
           <FormValidator valid-on-init v-model="valid">
@@ -42,7 +42,7 @@
                 />
                 <VBtn
                   variant="outlined"
-                  color="primary"
+                  color="secondary"
                   :disabled="!valid || !changed"
                   @click="apply"
                   text="Apply"

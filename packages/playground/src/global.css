@@ -138,3 +138,23 @@ a {
 .v-label--clickable {
   font-size: 0.875rem !important;
 }
+
+.v-label {
+  font-size: 0.875rem !important;
+}
+
+/* .v-field__input {
+  min-height :50px !important
+} */
+
+.v-expansion-panel-text__wrapper {
+  padding: 0% !important;
+}
+
+.v-expansion-panel--active > .v-expansion-panel-title {
+  min-height: 45px !important;
+}
+
+.v-expansion-panel-title {
+  padding: 10px 24px !important;
+}

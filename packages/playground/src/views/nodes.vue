@@ -297,7 +297,28 @@
         <v-switch color="primary" inset label="Dedicated Nodes (Only)" v-model="filters.dedicated" hide-details />
       </TfFilter>
     </TfFiltersContainer>
+    <div class="mx-auto mt-5 d-flex">
+      <div class="mr-6">
+        <v-chip color="success" class="mr-2">
+          <span class="text-subtitle-2"> Shared </span>
+        </v-chip>
+        <span class="text-subtitle-2">Multiple users can deploy on that node</span>
+      </div>
 
+      <div class="mr-6">
+        <v-chip color="warning" class="mr-2">
+          <span class="text-subtitle-2"> Rented </span>
+        </v-chip>
+        <span class="text-subtitle-2">Rented as full node for a single user</span>
+      </div>
+
+      <div class="mr-6">
+        <v-chip color="primary" class="mr-2">
+          <span class="text-subtitle-2"> Rentable </span>
+        </v-chip>
+        <span class="text-subtitle-2">You can rent it exclusively for your workloads</span>
+      </div>
+    </div>
     <div class="nodes mt-5">
       <div class="nodes-inner">
         <v-row>
@@ -324,28 +345,6 @@
             </div>
           </v-col>
         </v-row>
-      </div>
-    </div>
-    <div class="mx-auto mt-5 d-flex">
-      <div class="mr-6">
-        <v-chip color="success" class="mr-2">
-          <span class="text-subtitle-2"> Shared </span>
-        </v-chip>
-        <span class="text-subtitle-2">Multiple users can deploy on that node</span>
-      </div>
-
-      <div class="mr-6">
-        <v-chip color="warning" class="mr-2">
-          <span class="text-subtitle-2"> Rented </span>
-        </v-chip>
-        <span class="text-subtitle-2">Rented as full node for a single user</span>
-      </div>
-
-      <div class="mr-6">
-        <v-chip color="primary" class="mr-2">
-          <span class="text-subtitle-2"> Rentable </span>
-        </v-chip>
-        <span class="text-subtitle-2">You can rent it exclusively for your workloads</span>
       </div>
     </div>
 

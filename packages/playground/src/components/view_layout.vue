@@ -1,7 +1,7 @@
 <template>
   <div
-    class="border px-4 pb-4 rounded position-relative mt-10"
-    :class="{ 'pt-10': hasInfo, 'pt-6': !hasInfo }"
+    class="border px-4 pb-4 rounded position-relative mt-3"
+    :class="{ 'pt-10': hasInfo, 'pt-3': !hasInfo }"
     ref="viewLayoutContainer"
   >
     <div
