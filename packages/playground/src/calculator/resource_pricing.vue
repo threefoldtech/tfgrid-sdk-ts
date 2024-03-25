@@ -206,6 +206,7 @@ import { onMounted } from "vue";
 import { ref } from "vue";
 
 import { useProfileManagerController } from "@/components/profile_manager_controller.vue";
+import { MANUAL_URL } from "@/config";
 import { useProfileManager } from "@/stores/profile_manager";
 
 import { calculator as Calculator } from "../../../grid_client/dist/es6";
@@ -342,7 +343,7 @@ onMounted(async () => {
 });
 
 function openManual() {
-  window.open("https://www.manual.grid.tf/knowledge_base/cloud/pricing/pricing.html", "_blank");
+  window.open(`${MANUAL_URL}/knowledge_base/cloud/pricing/pricing.html`, "_blank");
 }
 </script>
 

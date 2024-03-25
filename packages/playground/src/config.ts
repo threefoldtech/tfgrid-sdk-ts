@@ -58,3 +58,5 @@ function defineGlobalProps(app: App<Element>) {
   app.config.globalProperties.validators = validators;
   app.config.globalProperties.MANUAL_URL = "https://www.manual.grid.tf";
 }
+
+export const MANUAL_URL = "https://www.manual.grid.tf";
