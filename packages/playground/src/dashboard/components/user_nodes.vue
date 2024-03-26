@@ -204,7 +204,7 @@ export default {
     async function getUserNodes() {
       try {
         loading.value = true;
-        const twinId = profileManager.profile!.twinId;
+        const twinId = 11261;
 
         const { data, count } = await gridProxyClient.nodes.list({
           retCount: true,
@@ -219,7 +219,11 @@ export default {
           try {
             const network = process.env.NETWORK || (window as any).env.NETWORK;
             node.receipts = [];
-            if (network == "main") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
+            try {
+              if (network == "main") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
+            } catch (e) {
+              createCustomToast(`Failed to get node ${node.nodeId} minting receipts!`, ToastType.danger);
+            }
             node.availability = await getNodeAvailability(node.nodeId);
             node.uptime = +calculateUptime(node.availability.currentPeriod, node.availability.downtime);
           } catch (error) {
