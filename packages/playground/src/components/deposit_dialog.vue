@@ -21,7 +21,7 @@
                 </div>
                 <input-tooltip
                   v-if="selectedName == 'stellar'"
-                  tooltip="Threefold Staller account"
+                  tooltip="Threefold Stellar account"
                   :href="stellarLink"
                   target="_blank"
                 >

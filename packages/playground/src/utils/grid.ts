@@ -123,6 +123,7 @@ export async function storeSSH(grid: GridClient, newSSH: SSHKeyData[]): Promise<
 
 export async function readEmail(grid: GridClient): Promise<string> {
   const metadata = await getMetadata(grid);
+
   return metadata.email || "";
 }
 

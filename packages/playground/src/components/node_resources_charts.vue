@@ -68,7 +68,7 @@ export default {
   },
   setup(props) {
     const resources = ref<ResourceWrapper[]>([]);
-    const renamedResources = ["CPU", "RAM", "SSD", "HDD"];
+    const renamedResources = ["CPU", "SSD", "HDD", "RAM"];
     const loading = ref<boolean>(false);
     const indeterminate = ref<boolean>(false);
     const getNodeHealthUrl = async () => {
@@ -79,7 +79,7 @@ export default {
 
     const getNodeResources = async () => {
       loading.value = true;
-      return ["cru", "mru", "sru", "hru"].map((i, idx) => {
+      return ["cru", "sru", "hru", "mru"].map((i, idx) => {
         let value;
         if (props.node.stats && props.node.stats.system) {
           value =

@@ -6,7 +6,7 @@
   </div>
 
   <view-layout>
-    <TfFiltersContainer class="mb-4" @apply="loadNodes" :loading="loading">
+    <TfFiltersContainer class="mb-4" @apply="loadNodes(true)" :loading="loading">
       <TfFilter
         query-route="node-id"
         :rules="[
@@ -423,14 +423,15 @@ export default {
       loadGpu: false,
     };
 
-    async function loadNodes() {
+    async function loadNodes(retCount = false) {
       loading.value = true;
+      if (retCount) page.value = 1;
       try {
         const { count, data } = await requestNodes(
           {
             page: page.value,
             size: size.value,
-            retCount: true,
+            retCount,
             nodeId: +filters.value.nodeId || undefined,
             farmIds: filters.value.farmId || undefined,
             farmName: filters.value.farmName || undefined,
@@ -452,7 +453,7 @@ export default {
           { loadFarm: true },
         );
         nodes.value = data;
-        nodesCount.value = count ?? 0;
+        if (retCount) nodesCount.value = count ?? 0;
       } catch (err) {
         console.log(err);
       } finally {
