@@ -8,13 +8,13 @@
     <template v-slot:default>
       <v-card>
         <v-toolbar color="primary" class="custom-toolbar">
-          <p class="mb-5">{{ capitalize(selectedKey.name || "") }} Detials</p>
+          <p class="mb-5">SSH-Key Detials</p>
         </v-toolbar>
 
         <v-card-text>
           <template v-for="[_key, value] of Object.entries(selectedKey).sort()" :key="_key">
             <template v-if="!notNeededFields.includes(_key)">
-              <CopyInputWrapper v-if="_key !== 'key'" :data="value" #="{ props: copyInputProps }">
+              <CopyInputWrapper v-if="_key !== 'publicKey'" :data="value" #="{ props: copyInputProps }">
                 <v-text-field v-bind="{ ...copyInputProps }" :label="_key" :model-value="value" :readonly="true" />
               </CopyInputWrapper>
               <CopyInputWrapper v-else :data="value" #="{ props: copyInputProps }">

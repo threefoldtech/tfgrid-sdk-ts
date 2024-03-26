@@ -56,6 +56,7 @@
                   no-resize
                   label="Public ssh key"
                   v-bind="{ ...props, ...copyInputProps }"
+                  :rules="sshRules(sshKey)"
                 >
                 </v-textarea>
               </CopyInputWrapper>
@@ -81,8 +82,8 @@
 
             <v-btn
               v-if="$props.dialogType === SSHCreationMethod.Import"
+              :disabled="!sshKey || !isValidSSHKey(sshKey)"
               color="secondary"
-              :disabled="!sshKey"
               variant="outlined"
               text="Save"
               @click="createNewSSHKey"
@@ -103,6 +104,7 @@ import { formatSSHKeyTableCreatedAt } from "@/utils/date";
 import { Balance, getGrid, loadBalance } from "@/utils/grid";
 import { isEnoughBalance } from "@/utils/helpers";
 import { generateSSHKeyName } from "@/utils/strings";
+import { isValidSSHKey } from "@/utils/validators";
 
 export default defineComponent({
   emits: ["close", "save", "generate"],
@@ -132,7 +134,6 @@ export default defineComponent({
   setup(props, { emit }) {
     const profileManager = useProfileManager();
     const sshKey = ref<string>("");
-    const fingerPrint = ref<string>("");
     const keyName = ref<string>(generateUniqueSSHKeyName());
     const createdKey = ref<SSHKeyData | null>(null); // Initialize createdKey with null
     const balance = ref<Balance>();
@@ -150,9 +151,8 @@ export default defineComponent({
           keyName.value = generateUniqueSSHKeyName();
           createdKey.value = {
             id: lastID + 1,
-            key: props.generatedSshKey as string,
+            publicKey: props.generatedSshKey as string,
             createdAt: formatSSHKeyTableCreatedAt(now),
-            fingerPrint: fingerPrint.value,
             name: keyName.value.length === 0 ? generateUniqueSSHKeyName() : keyName.value,
             isActive: true,
           };
@@ -178,13 +178,18 @@ export default defineComponent({
     function createNewSSHKey() {
       if (createdKey.value) {
         const isNewSSHKey = ref<boolean>(props.dialogType === SSHCreationMethod.Generate);
-        createdKey.value.key = isNewSSHKey.value ? props.generatedSshKey || "" : sshKey.value;
+        createdKey.value.publicKey = isNewSSHKey.value ? props.generatedSshKey || "" : sshKey.value;
         emit("save", createdKey.value);
       }
+      sshKey.value = "";
     }
 
     function generateUniqueSSHKeyName(depth = 0): string {
       const keyName: string = generateSSHKeyName();
+      if (!props.allKeys.length) {
+        return keyName;
+      }
+
       const exists: boolean = props.allKeys.some(key => key.name === keyName);
 
       if (exists && depth < 100) {
@@ -228,8 +233,16 @@ export default defineComponent({
       { immediate: true, deep: true },
     );
 
+    function sshRules(value: any) {
+      return [
+        (v: any) => !!v || "SSH key is required.",
+        (v: string) =>
+          isValidSSHKey(v) ||
+          "The SSH key you provided is not valid. Please double-check that it is copied correctly and follows the correct format.",
+      ];
+    }
+
     return {
-      fingerPrint,
       keyName,
       createdKey,
       hasEnoughBalance,
@@ -238,7 +251,9 @@ export default defineComponent({
 
       generateUniqueSSHKeyName,
       createNewSSHKey,
+      sshRules,
       generateSSHKey,
+      isValidSSHKey,
     };
   },
 });

@@ -48,38 +48,34 @@
     </v-col>
   </v-card>
 
-  <v-alert v-if="isMigratingError" type="warning" class="mb-3">
-    We apologize for the inconvenience. The keys currently displayed here are your old keys and have not yet been
-    migrated to our new system. To access your updated keys, please refresh the page or reach out to our support team
-    for assistance. Thank you for your patience.
-  </v-alert>
-
+  <!-- @update:keys="updateKeys($event)" -->
   <ssh-table
     v-if="!migrating"
     @active="setActiveKey"
     @inactive="setInactiveKey"
-    @delete="deleteKey"
-    @update:keys="updateKeys($event)"
+    @delete="deleteKey($event)"
     @view="viewSelectedKey"
     @export="exportKeys($event)"
     :header-icon="'mdi-key-chain-variant'"
     :header-title="'Active Keys'"
     :ssh-keys="activeKeys"
     :loading="loading"
+    :deleting="deleting"
   />
 
+  <!-- @update:keys="updateKeys({ keys: $event, removeSelected: true })" -->
   <ssh-table
     v-if="!migrating"
     @active="setActiveKey"
     @inactive="setInactiveKey"
-    @delete="deleteKey"
-    @update:keys="updateKeys({ keys: $event, removeSelected: true })"
+    @delete="deleteKey($event)"
     @view="viewSelectedKey"
     @export="exportKeys($event)"
     :header-icon="'mdi-key-chain'"
     :header-title="'All Keys'"
     :ssh-keys="allKeys"
-    :loading="loading || migrating"
+    :loading="loading"
+    :deleting="deleting"
   />
 
   <!-- Dialogs -->
@@ -104,17 +100,15 @@
     :generated-ssh-key="generatedSSHKey"
     @save="addKey($event)"
     @close="closeDialog"
-    @generate="generateSSHKeys($event)"
   />
 
   <!-- View -->
-  <ssh-data-dialog :open="isViewKey" :selected-key="selectedKey" @close="closeDialog" />
+  <ssh-data-dialog :open="isViewKey" :selected-key="selectedKey" @close="isViewKey = false" />
 </template>
 
 <script lang="ts">
-import { Buffer } from "buffer";
 import crypto from "crypto";
-import { computed, defineComponent, ref } from "vue";
+import { computed, defineComponent, ref, watch } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
 import SshDataDialog from "@/components/ssh_keys/SshDataDialog.vue";
@@ -143,10 +137,9 @@ export default defineComponent({
       generatedSSHKey: "",
       selectedKey: {
         id: 0,
-        key: "",
+        publicKey: "",
         name: "",
         createdAt: "",
-        fingerPrint: "",
         isActive: false,
       },
       migrating: false,
@@ -164,8 +157,12 @@ export default defineComponent({
     },
 
     async addKey(key: SSHKeyData) {
-      this.storeSSHKey(key);
+      if (!key.fingerPrint) {
+        key.fingerPrint = this.calculateFingerprint(key.publicKey);
+      }
+      this.allKeys.push(key);
       createCustomToast(`The created ${key.name} key has been saved.`, ToastType.success);
+      this.closeDialog();
     },
 
     viewSelectedKey(key: SSHKeyData) {
@@ -173,31 +170,27 @@ export default defineComponent({
       this.isViewKey = true;
     },
 
-    updateKeys(options: { key?: SSHKeyData; keys?: SSHKeyData[]; isDeleted?: boolean; removeSelected?: boolean }) {
-      if (options.keys && options.removeSelected) {
-        this.allKeys = options.keys;
-      }
-
-      if (options.key && options.isDeleted) {
-        this.allKeys = this.allKeys.filter(_key => _key.id !== options.key?.id);
-      }
-    },
-
     setActiveKey(key: SSHKeyData) {
       key.isActive = true;
-      this.updateKeys({ key });
       createCustomToast(`The activation of ${key.name} key has been enabled.`, ToastType.success);
     },
 
     setInactiveKey(key: SSHKeyData) {
       key.isActive = false;
-      this.updateKeys({ key });
       createCustomToast(`The activation of ${key.name} key has been disabled.`, ToastType.success);
     },
 
-    deleteKey(key: SSHKeyData) {
-      this.updateKeys({ key, isDeleted: true });
-      createCustomToast(`${key.name} key has been successfully removed.`, ToastType.success);
+    deleteKey(selectedKeys: SSHKeyData[]) {
+      this.deleting = true;
+      const ids: number[] = selectedKeys.map(key => key.id);
+      setTimeout(() => {
+        this.allKeys = this.allKeys.filter(_key => !ids.includes(_key.id));
+        createCustomToast(
+          `The selected ${selectedKeys.length > 1 ? "keys" : "key"} has been deleted successfully.`,
+          ToastType.success,
+        );
+        this.deleting = false;
+      }, 3000);
     },
 
     async generateSSHKeys(key: SSHKeyData) {
@@ -229,12 +222,15 @@ export default defineComponent({
       if (publicKey.length) {
         const sshPublicKey = this.parsePublicKey(publicKey);
         const md5 = crypto.createHash("md5");
-        md5.update(sshPublicKey.data);
-        const fingerprint = md5
-          .digest("hex")
-          .replace(/(.{2})(?=.)/g, "$1:")
-          .toUpperCase();
-        return fingerprint;
+
+        if (sshPublicKey.data) {
+          md5.update(sshPublicKey.data);
+          const fingerprint = md5
+            .digest("hex")
+            .replace(/(.{2})(?=.)/g, "$1:")
+            .toUpperCase();
+          return fingerprint;
+        }
       }
       return "-";
     },
@@ -260,7 +256,6 @@ export default defineComponent({
 
     async migrateOldKey(publicSSHKey: string) {
       this.migrating = true;
-      this.isMigratingError = false;
       const parts = publicSSHKey.split(" ");
       const keyName = parts[parts.length - 1];
 
@@ -269,67 +264,75 @@ export default defineComponent({
         name: keyName,
         id: 1,
         isActive: true,
-        key: publicSSHKey,
-        fingerPrint: this.calculateFingerprint(publicSSHKey),
+        publicKey: publicSSHKey,
       };
 
+      this.allKeys.push(newKey);
+
       try {
-        await this.storeSSHKey(newKey);
+        // await this.updateSSHKeysInChain();
       } catch (error: any) {
-        this.isMigratingError = true;
         createCustomToast("Error while migrating the old keys to the chain due: " + error.message, ToastType.danger);
       } finally {
         this.migrating = false;
       }
     },
-
-    async storeSSHKey(sshKey: SSHKeyData) {
-      this.allKeys.push(sshKey);
-      const profileManager = useProfileManager();
-      const grid = await getGrid(profileManager.profile!);
-      await getMetadata(grid!);
-      await storeSSH(grid!, this.allKeys);
-      profileManager.updateSSH(this.allKeys);
-    },
-
-    // async loadKeys() {
-    //   const profileManager = useProfileManager();
-    //   const userKeys = JSON.parse(profileManager.profile!.ssh);
-    //   this.allKeys = userKeys;
-    // },
   },
 
   async mounted() {
     const profileManager = useProfileManager();
-    // const grid = await getGrid(profileManager.profile!);
-    // let metadata = await grid!.kvstore.get({ key: "metadata" });
-    // await grid!.kvstore.remove({ key: "metadata" });
-    // metadata = await grid!.kvstore.get({ key: "metadata" });
-    // console.log("metadata: ", metadata);
-
     const userSshKey: SSHKeyData[] | string = profileManager.profile!.ssh;
-    console.log("userSshKey.value", profileManager.profile!.ssh);
+
+    if (!userSshKey) {
+      profileManager.updateSSH(this.allKeys);
+      // this.updateSSHKeysInChain();
+    }
+
     if (typeof userSshKey === "string") {
       await this.migrateOldKey(userSshKey);
       return;
     }
-    this.allKeys = profileManager.profile!.ssh as unknown as SSHKeyData[];
-  },
 
+    this.allKeys = userSshKey || [];
+    if (this.allKeys) {
+      this.allKeys.forEach(keyData => (keyData.fingerPrint = this.calculateFingerprint(keyData.publicKey)));
+    }
+  },
   setup() {
     const loading = ref<boolean>(false);
-    const isMigratingError = ref<boolean>(false);
+    const deleting = ref<boolean>(false);
+
     const allKeys = ref<SSHKeyData[]>([]);
-    const activeKeys = computed(() => allKeys.value.filter(key => key.isActive));
+    const activeKeys = computed(() => (allKeys.value.length ? allKeys.value.filter(key => key.isActive) : []));
     const dialogType = ref(SSHCreationMethod.None);
+    const profileManager = useProfileManager();
+
+    async function updateSSHKeysInChain() {
+      // Update the chain with the current sshkeys => this.allkeys
+      const grid = await getGrid(profileManager.profile!);
+      await getMetadata(grid!);
+      // await storeSSH(grid!, this.allKeys);
+      // profileManager.updateSSH(allKeys);
+    }
+
+    // update the chain with the new ssh-kyes
+    watch(
+      allKeys,
+      () => {
+        // createCustomToast("The chain has been updated with the recent changes.", ToastType.success);
+        // updateSSHKeysInChain();
+        console.log("allKeys: ", allKeys.value);
+      },
+      { deep: true },
+    );
 
     return {
       loading,
+      deleting,
       allKeys,
       activeKeys,
       SSHCreationMethod,
       dialogType,
-      isMigratingError,
     };
   },
 });

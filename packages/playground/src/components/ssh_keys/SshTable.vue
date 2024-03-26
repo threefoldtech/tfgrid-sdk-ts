@@ -17,15 +17,14 @@
         show-select
         :no-data-text="capitalize(`No keys found.`)"
         class="pa-5"
-        :deleting="deleting"
         v-model="selectedKeys"
         :loading="loading"
         :headers="headers"
         :items="sshKeys"
-        :on-click:row="() => {}"
       >
+        <!-- :on-click:row="() => {}" -->
         <template #[`item.createdAt`]="{ item }">
-          <v-tooltip location="top" :text="`The date when this SSH key was created.`">
+          <v-tooltip location="bottom" :text="`The date when this SSH key was created.`">
             <template #activator="{ props }">
               <v-chip color="primary" v-bind="props">
                 {{ item.raw.createdAt }}
@@ -34,32 +33,50 @@
           </v-tooltip>
         </template>
 
+        <template #[`item.name`]="{ item }">
+          <v-tooltip
+            location="bottom"
+            :text="`This name is used to associate between the key and its corresponding system or deployment.`"
+          >
+            <template #activator="{ props }">
+              <p v-bind="props">
+                {{ item.raw.name || "-" }}
+              </p>
+            </template>
+          </v-tooltip>
+        </template>
+
         <template #[`item.fingerPrint`]="{ item }">
           <v-tooltip
-            location="top"
+            location="bottom"
             :text="`The fingerprint of an SSH key is a unique identifier generated from the key's contents. It's displayed as a sequence of hexadecimal characters and serves to verify the key's authenticity.`"
           >
             <template #activator="{ props }">
               <p v-bind="props">
-                {{ item.raw.fingerPrint }}
+                {{ item.raw.fingerPrint || "-" }}
               </p>
             </template>
           </v-tooltip>
         </template>
 
         <template #[`item.viewing`]="{ item }">
-          <v-btn
-            @click="$emit('view', item.raw)"
-            color="grey-lighten-1"
-            variant="text"
-            :disabled="loading"
-            v-bind="item"
-            icon="mdi-eye"
-          ></v-btn>
+          <v-tooltip :text="`View ${item.raw.name}'s key.`" location="bottom">
+            <template #activator="{ props }">
+              <v-btn
+                @click="$emit('view', item.raw)"
+                v-bind="props"
+                color="grey-lighten-1"
+                variant="text"
+                :disabled="loading"
+                icon="mdi-eye"
+              ></v-btn>
+            </template>
+          </v-tooltip>
         </template>
 
         <template #[`item.activation`]="{ item }">
           <v-tooltip
+            location="bottom"
             v-if="item.raw.isActive"
             :text="`The '${item.raw.name}' key is currently activated and will be utilized in deployments.`"
           >
@@ -79,7 +96,11 @@
             </template>
           </v-tooltip>
 
-          <v-tooltip v-else :text="`Click to activate the '${item.raw.name}' for use in deployments.`">
+          <v-tooltip
+            location="bottom"
+            v-else
+            :text="`Click to activate the '${item.raw.name}' for use in deployments.`"
+          >
             <template #activator="{ props }">
               <v-btn
                 :disabled="loading"
@@ -97,7 +118,7 @@
         </template>
 
         <template #[`item.deletion`]="{ item }">
-          <v-tooltip :text="`Delete ${item.raw.name}`">
+          <v-tooltip location="bottom" :text="`Delete ${item.raw.name}`">
             <template #activator="{ props }">
               <v-btn
                 :disabled="loading || item.raw.deleting"
@@ -121,8 +142,9 @@
       <v-tooltip location="bottom" text="Export all selected keys.">
         <template #activator="{ props }">
           <v-btn
-            :disabled="loading || selectedKeys.length === 0"
+            :disabled="loading || selectedKeys.length === 0 || $props.sshKeys.length === 0 || deleting"
             class="mr-2"
+            :loading="loading"
             v-bind="props"
             prepend-icon="mdi-export"
             color="primary"
@@ -137,7 +159,8 @@
       <v-tooltip location="bottom" text="Delete all selected keys.">
         <template #activator="{ props }">
           <v-btn
-            :disabled="loading || selectedKeys.length === 0"
+            :disabled="loading || selectedKeys.length === 0 || deleting"
+            :loading="deleting"
             v-bind="props"
             variant="tonal"
             prepend-icon="mdi-trash-can-outline"
@@ -177,6 +200,10 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
+    deleting: {
+      type: Boolean,
+      required: true,
+    },
   },
 
   components: {},
@@ -185,17 +212,18 @@ export default defineComponent({
 
   methods: {
     deleteSelected() {
-      const filteredKeys = this.$props.sshKeys.filter(key => !this.selectedKeys.includes(key.id));
-      console.log("filteredKeys, ", filteredKeys);
+      const ids: number[] = [];
+      Object.keys(this.selectedKeys).forEach(key => ids.push(this.selectedKeys[key as any]));
 
-      this.$emit("update:keys", filteredKeys);
+      const filteredKeys = this.$props.sshKeys.filter(_key => ids.includes(_key.id));
+      this.$emit("delete", filteredKeys);
       this.selectedKeys = [];
     },
 
     deleteKey(key: SSHKeyData) {
       key.deleting = true;
+      this.$emit("delete", [key]);
       setTimeout(() => {
-        this.$emit("delete", key);
         key.deleting = false;
       }, 3000);
     },
@@ -214,7 +242,6 @@ export default defineComponent({
   },
 
   setup() {
-    const deleting = ref<boolean>(false);
     const selectedKeys = ref<number[]>([]); // IDs
     const theme = useTheme();
 
@@ -249,7 +276,7 @@ export default defineComponent({
       },
     ];
 
-    return { headers, selectedKeys, capitalize, deleting, theme, AppThemeSelection };
+    return { headers, selectedKeys, capitalize, theme, AppThemeSelection };
   },
 });
 </script>

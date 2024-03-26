@@ -1,6 +1,8 @@
 import { BackendStorageType, GridClient, KeypairType, NetworkEnv } from "@threefold/grid_client";
 import { InsufficientBalanceError } from "@threefold/types";
 
+import type { SSHKeyData } from "@/types";
+
 import type { Profile } from "../stores/profile_manager";
 const network = (process.env.NETWORK as NetworkEnv) || window.env.NETWORK;
 export async function getGrid(
@@ -104,25 +106,13 @@ export async function getMetadata(grid: GridClient): Promise<{ [key: string]: an
   }
 }
 
-export async function readSSH(grid: GridClient): Promise<string> {
+export async function readSSH(grid: GridClient): Promise<SSHKeyData[]> {
   const metadata = await getMetadata(grid);
-  return metadata.sshkey || "";
+  return metadata.sshkey;
 }
 
-export async function storeSSH(grid: GridClient, newSSH: string): Promise<void> {
+export async function storeSSH(grid: GridClient, newSSH: SSHKeyData[]): Promise<void> {
   const metadata = await getMetadata(grid);
-
-  const ssh = metadata.sshkey;
-  if (ssh === newSSH) return;
-
-  // console.log("metadata", metadata);
-  // await grid.kvstore.removeAll();
-
-  console.log("metadata: ", {
-    ...metadata,
-    sshkey: newSSH,
-  });
-
   const ext = await grid.tfchain.backendStorage.dump("metadata", {
     ...metadata,
     sshkey: newSSH,
@@ -133,8 +123,6 @@ export async function storeSSH(grid: GridClient, newSSH: string): Promise<void> 
 
 export async function readEmail(grid: GridClient): Promise<string> {
   const metadata = await getMetadata(grid);
-  console.log(metadata.email);
-
   return metadata.email || "";
 }
 
