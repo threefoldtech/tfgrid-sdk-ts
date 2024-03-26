@@ -101,7 +101,8 @@ export async function getMetadata(grid: GridClient): Promise<{ [key: string]: an
     const metadata = await grid.tfchain.backendStorage.load("metadata");
     console.log("load metadata: ", metadata);
     return metadata;
-  } catch {
+  } catch (e) {
+    console.log("Error: ", e);
     return {};
   }
 }

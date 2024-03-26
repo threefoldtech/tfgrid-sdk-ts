@@ -27,29 +27,39 @@
           The keys you've chosen will be forwarded to your deployment. To make changes, simply tap on the key you wish
           to cancel or add.
         </v-alert>
+
+        <v-alert v-if="selectedKeys.length === 0" type="warning" class="mb-5">
+          Attention: It appears that no SSH keys have been selected. In order to access your deployment, you must send
+          at least one SSH key. You can manage your SSH keys from the
+          <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH keys management page</router-link> and add more as
+          needed.
+        </v-alert>
         <v-row>
-          <v-col cols="6" v-for="_key of sshKeys" :key="_key.id">
-            <v-card class="pa-5" :variant="'tonal'" color="info">
-              <div class="d-flex mb-3 justify-center">
-                <v-icon>mdi-key-variant</v-icon>
-              </div>
-              <div class="d-flex mb-3 justify-center">
-                {{ capitalize(_key.name) }}
-              </div>
-              <div class="d-flex mb-3 justify-center">
-                <v-btn
-                  class="mr-3"
-                  width="150"
-                  :variant="selectedKeys.includes(_key) ? 'flat' : 'outlined'"
-                  :color="selectedKeys.includes(_key) ? 'primary' : 'white'"
-                  @click="selectKey(_key)"
-                >
-                  {{ selectedKeys.includes(_key) ? "Selected" : "Select" }}
-                </v-btn>
-                <v-btn @click="onSelectKey(_key)" width="150" color="white" variant="outlined">View</v-btn>
-              </div>
-            </v-card>
-          </v-col>
+          <v-tooltip
+            v-for="_key of sshKeys"
+            :key="_key.id"
+            :text="selectedKeys.includes(_key) ? 'Selected' : 'Not selected'"
+            location="bottom"
+          >
+            <template #activator="{ props }">
+              <v-chip
+                class="pa-5 ml-5 mt-5"
+                :variant="selectedKeys.includes(_key) ? 'flat' : 'outlined'"
+                :color="selectedKeys.includes(_key) ? 'primary' : 'white'"
+                v-bind="props"
+                @click="selectKey(_key)"
+              >
+                <div class="d-flex justify-center">
+                  <v-icon>mdi-key-variant</v-icon>
+                </div>
+                <div class="d-flex justify-center">
+                  <p class="ml-2">
+                    {{ capitalize(_key.name) }}
+                  </p>
+                </div>
+              </v-chip>
+            </template>
+          </v-tooltip>
         </v-row>
       </v-card-text>
 
@@ -68,6 +78,7 @@
 import { capitalize, defineComponent, nextTick, ref } from "vue";
 
 import SshDataDialog from "@/components/ssh_keys/SshDataDialog.vue";
+import { DashboardRoutes } from "@/router/routes";
 import { useProfileManager } from "@/stores";
 import { SSHKeyData } from "@/types";
 
@@ -130,6 +141,7 @@ export default defineComponent({
       isViewSSHKey,
       defaultKeyData,
       selectedKeysString,
+      DashboardRoutes,
       capitalize,
     };
   },

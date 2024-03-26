@@ -179,6 +179,7 @@ export default defineComponent({
       if (createdKey.value) {
         const isNewSSHKey = ref<boolean>(props.dialogType === SSHCreationMethod.Generate);
         createdKey.value.publicKey = isNewSSHKey.value ? props.generatedSshKey || "" : sshKey.value;
+        createdKey.value.name = keyName.value;
         emit("save", createdKey.value);
       }
       sshKey.value = "";

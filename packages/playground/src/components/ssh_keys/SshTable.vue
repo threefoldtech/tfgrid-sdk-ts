@@ -21,7 +21,9 @@
         :loading="loading"
         :headers="headers"
         :items="sshKeys"
+        loading-text="Loading..."
       >
+        <template #loading> </template>
         <!-- :on-click:row="() => {}" -->
         <template #[`item.createdAt`]="{ item }">
           <v-tooltip location="bottom" :text="`The date when this SSH key was created.`">

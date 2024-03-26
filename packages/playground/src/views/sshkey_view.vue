@@ -29,6 +29,7 @@
         @click="() => openDialog(SSHCreationMethod.Import)"
         prepend-icon="mdi-key-plus"
         color="secondary"
+        :disabled="loading"
       >
         Import
       </v-btn>
@@ -39,11 +40,17 @@
         class="mr-2"
         prepend-icon="mdi-export"
         color="secondary"
-        :disabled="!allKeys || allKeys.length === 0"
+        :disabled="!allKeys || allKeys.length === 0 || loading"
       >
         Export
       </v-btn>
-      <v-btn class="mr-2" @click="openDialog(SSHCreationMethod.Generate)" prepend-icon="mdi-key-plus" color="primary">
+      <v-btn
+        class="mr-2"
+        :disabled="loading"
+        @click="openDialog(SSHCreationMethod.Generate)"
+        prepend-icon="mdi-key-plus"
+        color="primary"
+      >
         Generate
       </v-btn>
     </v-col>
@@ -274,8 +281,11 @@ export default defineComponent({
   },
 
   async mounted() {
+    this.loading = true;
     const profileManager = useProfileManager();
     const userSshKey: SSHKeyData[] | string = profileManager.profile!.ssh;
+    const grid = await getGrid(profileManager.profile!);
+    await getMetadata(grid!);
 
     if (!userSshKey) {
       profileManager.updateSSH(this.allKeys);
@@ -290,6 +300,7 @@ export default defineComponent({
     if (this.allKeys) {
       this.allKeys.forEach(keyData => (keyData.fingerPrint = this.calculateFingerprint(keyData.publicKey)));
     }
+    this.loading = false;
   },
   setup() {
     const loading = ref<boolean>(false);
