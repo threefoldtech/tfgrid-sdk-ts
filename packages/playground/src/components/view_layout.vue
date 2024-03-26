@@ -1,6 +1,6 @@
 <template>
   <div
-    class="border px-4 pb-4 rounded position-relative mt-10"
+    class="border px-4 pb-4 rounded position-relative mt-2"
     :class="{ 'pt-10': hasInfo, 'pt-6': !hasInfo }"
     ref="viewLayoutContainer"
   >

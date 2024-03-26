@@ -135,6 +135,13 @@ a {
 }
 
 .v-list-item-title,
-.v-label--clickable {
+.v-label--clickable,
+.v-btn,
+.v-field__input,
+.v-label {
   font-size: 0.875rem !important;
+}
+
+.v-expansion-panel-text__wrapper {
+  padding: 8px 16px 16px !important;
 }

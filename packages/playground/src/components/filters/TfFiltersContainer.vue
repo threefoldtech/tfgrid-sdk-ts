@@ -1,7 +1,30 @@
 <template>
   <VExpansionPanels :model-value="[0]" :style="{ minWidth: '280px', maxWidth: '280px' }">
     <VExpansionPanel eager>
-      <VExpansionPanelTitle class="text-h6"> Filters </VExpansionPanelTitle>
+      <v-alert class="pa-5" style="height: 20px">
+        <h4 class="text-center font-weight-medium">Filter</h4>
+      </v-alert>
+      <VContainer fluid>
+        <VRow no-gutters>
+          <VBtn
+            variant="outlined"
+            :disabled="loading || !valid || empty"
+            @click="clear"
+            size="small"
+            text="Clear"
+            class="mr-2"
+          />
+          <VBtn
+            variant="outlined"
+            color="secondary"
+            size="small"
+            :disabled="!valid || !changed"
+            @click="apply"
+            text="Apply"
+            :loading="loading"
+          />
+        </VRow>
+      </VContainer>
       <VExpansionPanelText eager>
         <VForm :disabled="loading">
           <FormValidator valid-on-init v-model="valid">
@@ -27,27 +50,6 @@
 
               <VRow no-gutters>
                 <VDivider />
-              </VRow>
-            </VContainer>
-
-            <VContainer fluid>
-              <VRow no-gutters>
-                <VSpacer />
-                <VBtn
-                  variant="outlined"
-                  :disabled="loading || !valid || empty"
-                  @click="clear"
-                  text="Clear"
-                  class="mr-2"
-                />
-                <VBtn
-                  variant="outlined"
-                  color="primary"
-                  :disabled="!valid || !changed"
-                  @click="apply"
-                  text="Apply"
-                  :loading="loading"
-                />
               </VRow>
             </VContainer>
           </FormValidator>

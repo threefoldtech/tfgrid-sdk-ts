@@ -6,8 +6,30 @@
   </div>
 
   <view-layout>
+    <div class="mx-auto mb-5 d-flex">
+      <div class="mr-6">
+        <v-chip color="success" class="mr-2">
+          <span class="text-subtitle-2"> Shared </span>
+        </v-chip>
+        <span class="text-subtitle-2">Multiple users can deploy on that node</span>
+      </div>
+
+      <div class="mr-6">
+        <v-chip color="warning" class="mr-2">
+          <span class="text-subtitle-2"> Rented </span>
+        </v-chip>
+        <span class="text-subtitle-2">Rented as full node for a single user</span>
+      </div>
+
+      <div class="mr-6">
+        <v-chip color="primary" class="mr-2">
+          <span class="text-subtitle-2"> Rentable </span>
+        </v-chip>
+        <span class="text-subtitle-2">You can rent it exclusively for your workloads</span>
+      </div>
+    </div>
     <div class="d-flex">
-      <div class="mr-4" :style="{ height: '50vh', overflowY: 'auto', overflowX: 'hidden' }">
+      <div class="mr-4" :style="{ height: '100vh', overflowY: 'auto', overflowX: 'hidden' }">
         <TfFiltersContainer @apply="loadNodes" :loading="loading">
           <TfFilter
             query-route="node-id"
@@ -130,7 +152,13 @@
             ]"
           >
             <template #input="{ props }">
-              <VTextField label="Min HDD (GB)" variant="outlined" v-model="filters.minHDD" v-bind="props">
+              <VTextField
+                label="Min HDD (GB)"
+                variant="outlined"
+                density="compact"
+                v-model="filters.minHDD"
+                v-bind="props"
+              >
                 <template #append-inner>
                   <VTooltip text="Filter by the minimum total amount of HDD in the node.">
                     <template #activator="{ props }">
@@ -152,7 +180,13 @@
             ]"
           >
             <template #input="{ props }">
-              <VTextField label="Min RAM (GB)" variant="outlined" v-model="filters.minRAM" v-bind="props">
+              <VTextField
+                label="Min RAM (GB)"
+                variant="outlined"
+                density="compact"
+                v-model="filters.minRAM"
+                v-bind="props"
+              >
                 <template #append-inner>
                   <VTooltip text="Filter by the minimum total amount of RAM in the node.">
                     <template #activator="{ props }">
@@ -174,7 +208,13 @@
             ]"
           >
             <template #input="{ props }">
-              <VTextField label="Min CPU (vCores)" variant="outlined" v-model="filters.minCRU" v-bind="props">
+              <VTextField
+                label="Min CPU (vCores)"
+                variant="outlined"
+                density="compact"
+                v-model="filters.minCRU"
+                v-bind="props"
+              >
                 <template #append-inner>
                   <VTooltip text="Filter by the minimum total number of CPUs in the node.">
                     <template #activator="{ props }">
@@ -196,7 +236,13 @@
             ]"
           >
             <template #input="{ props }">
-              <VTextField label="Free SSD (GB)" variant="outlined" v-model="filters.freeSSD" v-bind="props">
+              <VTextField
+                label="Free SSD (GB)"
+                variant="outlined"
+                density="compact"
+                v-model="filters.freeSSD"
+                v-bind="props"
+              >
                 <template #append-inner>
                   <VTooltip text="Filter by the minimum available amount of SSD in the node.">
                     <template #activator="{ props }">
@@ -218,7 +264,13 @@
             ]"
           >
             <template #input="{ props }">
-              <VTextField label="Free HDD (GB)" variant="outlined" v-model="filters.freeHDD" v-bind="props">
+              <VTextField
+                label="Free HDD (GB)"
+                variant="outlined"
+                density="compact"
+                v-model="filters.freeHDD"
+                v-bind="props"
+              >
                 <template #append-inner>
                   <VTooltip text="Filter by the minimum available amount of HDD in the node.">
                     <template #activator="{ props }">
@@ -240,7 +292,13 @@
             ]"
           >
             <template #input="{ props }">
-              <VTextField label="Free RAM (GB)" variant="outlined" v-model="filters.freeRAM" v-bind="props">
+              <VTextField
+                label="Free RAM (GB)"
+                variant="outlined"
+                density="compact"
+                v-model="filters.freeRAM"
+                v-bind="props"
+              >
                 <template #append-inner>
                   <VTooltip text="Filter by the minimum available amount of RAM in the node.">
                     <template #activator="{ props }">
@@ -264,7 +322,13 @@
             v-model="filters.publicIPs"
           >
             <template #input="{ props }">
-              <VTextField label="Free Public IPs" variant="outlined" v-model="filters.publicIPs" v-bind="props">
+              <VTextField
+                label="Free Public IPs"
+                variant="outlined"
+                density="compact"
+                v-model="filters.publicIPs"
+                v-bind="props"
+              >
                 <template #append-inner>
                   <VTooltip text="Filter by free Public IPs">
                     <template #activator="{ props }">
@@ -276,7 +340,7 @@
             </template>
           </TfFilter>
 
-          <TfFilter query-route="node-status" v-model="filters.status">
+          <TfFilter query-route="node-status" density="compact" v-model="filters.status">
             <v-select
               :model-value="filters.status || undefined"
               @update:model-value="filters.status = $event || ''"
@@ -286,6 +350,7 @@
                 { title: 'Standby', value: NodeStatus.Standby },
               ]"
               label="Select Nodes Status"
+              density="compact"
               item-title="title"
               item-value="value"
               variant="outlined"
@@ -335,29 +400,6 @@
             </v-col>
           </v-row>
         </div>
-      </div>
-    </div>
-
-    <div class="mx-auto mt-5 d-flex">
-      <div class="mr-6">
-        <v-chip color="success" class="mr-2">
-          <span class="text-subtitle-2"> Shared </span>
-        </v-chip>
-        <span class="text-subtitle-2">Multiple users can deploy on that node</span>
-      </div>
-
-      <div class="mr-6">
-        <v-chip color="warning" class="mr-2">
-          <span class="text-subtitle-2"> Rented </span>
-        </v-chip>
-        <span class="text-subtitle-2">Rented as full node for a single user</span>
-      </div>
-
-      <div class="mr-6">
-        <v-chip color="primary" class="mr-2">
-          <span class="text-subtitle-2"> Rentable </span>
-        </v-chip>
-        <span class="text-subtitle-2">You can rent it exclusively for your workloads</span>
       </div>
     </div>
 
