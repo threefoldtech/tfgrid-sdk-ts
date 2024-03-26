@@ -83,16 +83,14 @@ onMounted(async () => {
 });
 
 function navigation() {
-  window.open(
-    "https://www.manual.grid.tf/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge.html",
-    "_blank",
-  );
+  window.open(`${MANUAL_URL}/documentation/threefold_token/tft_bridges/tfchain_stellar_bridge.html`, "_blank");
 }
 </script>
 
 <script lang="ts">
 import DepositDialog from "@/components/deposit_dialog.vue";
 import WithdrawDialog from "@/components/withdraw_dialog.vue";
+import { MANUAL_URL } from "@/config";
 
 export default {
   name: "Bridge",

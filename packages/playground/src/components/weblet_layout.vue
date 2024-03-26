@@ -85,7 +85,7 @@
           </div>
         </div>
 
-        <a href="https://www.manual.grid.tf/knowledge_base/cloud/pricing/pricing.html" target="_blank" class="app-link">
+        <a :href="`${MANUAL_URL}/knowledge_base/cloud/pricing/pricing.html`" target="_blank" class="app-link">
           Learn more about the pricing and how to unlock discounts.
         </a>
       </v-alert>

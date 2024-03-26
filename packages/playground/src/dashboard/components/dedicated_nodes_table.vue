@@ -43,10 +43,7 @@
                 <li>
                   {{ activeTab == 1 ? "You receive " : "You'll receive " }} 50% discount
                   {{ activeTab == 1 ? " as you reserve the " : " if you reserve an " }} entire
-                  <a
-                    target="_blank"
-                    href="https://manual.grid.tf/dashboard/deploy/dedicated_machines.html#billing--pricing"
-                  >
+                  <a target="_blank" :href="`${MANUAL_URL}/dashboard/deploy/dedicated_machines.html#billing--pricing`">
                     node
                   </a>
                 </li>
@@ -55,7 +52,7 @@
                   as per the
                   <a
                     target="_blank"
-                    href="https://manual.grid.tf/wiki/cloudunits/pricing/staking_discount_levels.html#staking-discount-levels"
+                    :href="`${MANUAL_URL}/wiki/cloudunits/pricing/staking_discount_levels.html#staking-discount-levels`"
                   >
                     <p style="display: inline">staking discounts</p>
                   </a>

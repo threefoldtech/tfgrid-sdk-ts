@@ -38,7 +38,7 @@
                     height="24px"
                     width="24px"
                     class="ml-2"
-                    href="https://www.manual.grid.tf/documentation/developers/tfchain/tfchain.html#contract-locking"
+                    :href="`${MANUAL_URL}/documentation/developers/tfchain/tfchain.html#contract-locking`"
                     target="_blank"
                   />
                 </template>
@@ -69,11 +69,7 @@
       <v-alert variant="tonal" class="mb-6">
         <p :style="{ maxWidth: '880px' }">
           Please visit
-          <a
-            class="app-link"
-            href="https://manual.grid.tf/threefold_token/storing_tft/tf_connect_app.html"
-            target="_blank"
-          >
+          <a class="app-link" :href="`${MANUAL_URL}/threefold_token/storing_tft/tf_connect_app.html`" target="_blank">
             the manual
           </a>
           get started.
@@ -387,7 +383,7 @@
                 Scan the QR code using
                 <a
                   class="app-link"
-                  href="https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html"
+                  :href="`${MANUAL_URL}/documentation/threefold_token/storing_tft/tf_connect_app.html`"
                   target="_blank"
                 >
                   ThreeFold Connect

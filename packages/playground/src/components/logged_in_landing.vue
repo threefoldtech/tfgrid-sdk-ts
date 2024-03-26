@@ -74,7 +74,7 @@
               </p>
 
               <div class="d-flex justify-center align-center flex-wrap my-4">
-                <v-btn color="secondary" variant="outlined" class="mr-2" target="_blank" href="https://manual.grid.tf/">
+                <v-btn color="secondary" variant="outlined" class="mr-2" target="_blank" :href="MANUAL_URL">
                   Learn about the grid
                 </v-btn>
               </div>

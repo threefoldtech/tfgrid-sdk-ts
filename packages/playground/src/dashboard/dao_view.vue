@@ -226,9 +226,7 @@
               <span>
                 If the vote count is insufficient and the time limit is reached, the proposal will be rejected.
               </span>
-              <a href="https://www.manual.grid.tf/documentation/dashboard/tfchain/tf_dao.html" target="_blank"
-                >How to vote?</a
-              >
+              <a :href="`${MANUAL_URL}/documentation/dashboard/tfchain/tf_dao.html`" target="_blank">How to vote?</a>
               <br />
               <br />
               <h3>How do we count weight:</h3>

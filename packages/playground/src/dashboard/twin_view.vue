@@ -149,7 +149,7 @@
                 Scan the QR code using
                 <a
                   class="app-link"
-                  href="https://www.manual.grid.tf/documentation/threefold_token/storing_tft/tf_connect_app.html"
+                  :href="`${MANUAL_URL}/documentation/threefold_token/storing_tft/tf_connect_app.html`"
                   target="_blank"
                 >
                   ThreeFold Connect
