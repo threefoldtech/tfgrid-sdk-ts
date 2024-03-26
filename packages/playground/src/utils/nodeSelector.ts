@@ -208,9 +208,11 @@ export async function validateRentContract(
   }
 
   try {
-    const contractInfo = await gridStore.grid.contracts.get({ id: node.rentContractId });
-    if (contractInfo.state.gracePeriod) {
-      throw `You can't deploy on node ${node.nodeId}, its rent contract in grace period. `;
+    if (node.rentContractId !== 0) {
+      const contractInfo = await gridStore.grid.contracts.get({ id: node.rentContractId });
+      if (contractInfo.state.gracePeriod) {
+        throw `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`;
+      }
     }
 
     return true;
@@ -219,7 +221,6 @@ export async function validateRentContract(
       error,
       "Something went wrong while checking status of the node. Please check your connection and try again.",
     );
-
     throw err;
   }
 }
