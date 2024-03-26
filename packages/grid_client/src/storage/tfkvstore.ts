@@ -36,10 +36,11 @@ class TFKVStoreBackend implements BackendStorageInterface {
     }
     let i = 0;
     let val = value;
+    let k = key;
     while (val) {
       i++;
-      key = `${key}.${i}`;
-      val = await this.client.kvStore.get({ key });
+      k = `${key}.${i}`;
+      val = await this.client.kvStore.get({ key: k });
       value = `${value}${val}`;
     }
     return value;
