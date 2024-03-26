@@ -204,7 +204,7 @@ export default {
     async function getUserNodes() {
       try {
         loading.value = true;
-        const twinId = 11261;
+        const twinId = profileManager.profile!.twinId;
 
         const { data, count } = await gridProxyClient.nodes.list({
           retCount: true,
