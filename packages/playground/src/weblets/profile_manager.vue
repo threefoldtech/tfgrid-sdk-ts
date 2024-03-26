@@ -227,7 +227,7 @@
                   sandbox="allow-forms allow-modals allow-scripts allow-popups allow-same-origin "
                   @load="termsLoading = false"
                 ></iframe>
-                <v-btn @click="shouldActivateAccount ? activateAccount() : createNewAccount()" v-show="!termsLoading">
+                <v-btn @click="isNonActiveMnemonic ? activateAccount() : createNewAccount()" v-show="!termsLoading">
                   accept terms and conditions
                 </v-btn>
                 <v-card v-show="termsLoading" :style="{ height: '100%' }">
