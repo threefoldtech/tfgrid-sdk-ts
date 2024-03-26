@@ -1,5 +1,14 @@
 import { Expose, Type } from "class-transformer";
-import { ArrayNotEmpty, IsDefined, IsInt, IsNotEmpty, IsString, Length, ValidateNested } from "class-validator";
+import {
+  ArrayNotEmpty,
+  IsDefined,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Length,
+  ValidateNested,
+} from "class-validator";
 
 import { WorkloadData } from "./workload_base";
 
@@ -24,7 +33,7 @@ class Peer {
 
 class Mycelium {
   @Expose() @IsString() @IsNotEmpty() hex_key: string;
-  @Expose() @IsString({ each: true }) peers: string[];
+  @Expose() @IsOptional() @IsString({ each: true }) peers?: string[];
 }
 
 class Znet extends WorkloadData {
@@ -46,7 +55,7 @@ class Znet extends WorkloadData {
       out += this.peers[i].challenge();
     }
     out += this.mycelium?.hex_key || "";
-    for (let i = 0; i < this.mycelium?.peers.length; i++) {
+    for (let i = 0; i < this.mycelium?.peers?.length; i++) {
       out += this.mycelium?.peers[i] || "";
     }
     return out;

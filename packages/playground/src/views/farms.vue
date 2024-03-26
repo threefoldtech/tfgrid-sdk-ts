@@ -1,11 +1,13 @@
 <template>
   <view-layout>
-    <TfFiltersContainer @apply="loadFarms" class="mb-4" :loading="loading">
+    <TfFiltersContainer @apply="loadFarms(true)" class="mb-4" :loading="loading">
       <TfFilter
         query-route="farm-id"
         v-model="filters.farmId"
         :rules="[
-          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.isNumeric('This field accepts numbers only.', {
+            no_symbols: true,
+          }),
           validators.min('The ID should be larger than zero.', 1),
           validators.isInt('should be an integer'),
           validators.validateResourceMaxNumber('This is not a valid ID.'),
@@ -42,7 +44,9 @@
         query-route="free-public-ips"
         v-model="filters.freePublicIps"
         :rules="[
-          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.isNumeric('This field accepts numbers only.', {
+            no_symbols: true,
+          }),
           validators.min('Free Public IP should be larger than zero.', 1),
           validators.isInt('should be an integer'),
           validators.validateResourceMaxNumber('This is not a valid public IP.'),
@@ -100,7 +104,7 @@
 
         <template v-if="loading">
           <div color="transparent" class="text-center">
-            <v-progress-circular color="primary" indeterminate :size="50" :width="5" />
+            <v-progress-circular />
             <p>Loading farm details...</p>
           </div>
         </template>
@@ -142,11 +146,12 @@ const dialog = ref(false);
 
 const totalFarms = ref(0);
 
-async function loadFarms() {
+async function loadFarms(retCount = false) {
   loading.value = true;
+  if (retCount) page.value = 1;
   try {
     const { count, data } = await getAllFarms({
-      retCount: true,
+      retCount,
       farmId: +filters.value.farmId || undefined,
       freeIps: +filters.value.freePublicIps || undefined,
       nameContains: filters.value.farmName || undefined,
@@ -155,7 +160,7 @@ async function loadFarms() {
     });
 
     if (data) {
-      totalFarms.value = count || 0;
+      if (retCount) totalFarms.value = count || 0;
       farms.value = data.map(farm => {
         const ips = farm.publicIps;
         const total = ips.length;

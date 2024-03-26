@@ -1,1 +1,0 @@
-import "./Fullvm.wc.svelte";

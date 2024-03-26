@@ -19,7 +19,7 @@
       <div v-for="item in resources" :key="item.name" class="mx-6 d-flex flex-column pt-2 mt-2 align-center">
         <div class="mb-2">{{ item.name }}</div>
         <div class="text-center">
-          <v-progress-circular :model-value="item.value" :size="150" :width="15" color="info"
+          <v-progress-circular :model-value="item.value !== 'NaN' ? item.value : 0" :size="150" :width="15" color="info"
             >{{ item.value !== "NaN" ? item.value + "%" : "N/A" }}
           </v-progress-circular>
         </div>
@@ -27,7 +27,9 @@
     </v-row>
 
     <v-row justify="center">
-      <v-progress-circular v-if="loading" indeterminate color="primary" :size="50" class="mt-10 mb-10" />
+      <div class="d-flex my-6 align-center justify-center">
+        <v-progress-circular v-if="loading" class="mt-10 mb-10" />
+      </div>
       <v-btn rounded="md" variant="flat" color="primary" class="mt-10" @click="getNodeHealthUrl">
         Check Node Health
       </v-btn>
@@ -66,9 +68,9 @@ export default {
   },
   setup(props) {
     const resources = ref<ResourceWrapper[]>([]);
-    const renamedResources = ["CPU", "RAM", "SSD", "HDD"];
+    const renamedResources = ["CPU", "SSD", "HDD", "RAM"];
     const loading = ref<boolean>(false);
-
+    const indeterminate = ref<boolean>(false);
     const getNodeHealthUrl = async () => {
       const grafana = new GrafanaStatistics(props.node);
       const nodeHealthUrl = await grafana.getUrl();
@@ -77,7 +79,7 @@ export default {
 
     const getNodeResources = async () => {
       loading.value = true;
-      return ["cru", "mru", "sru", "hru"].map((i, idx) => {
+      return ["cru", "sru", "hru", "mru"].map((i, idx) => {
         let value;
         if (props.node.stats && props.node.stats.system) {
           value =
@@ -100,7 +102,7 @@ export default {
       NodeStatus,
       resources,
       loading,
-
+      indeterminate,
       getNodeResources,
       getNodeHealthUrl,
       getNodeStatusColor,

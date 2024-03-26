@@ -6,14 +6,12 @@
   </div>
 
   <view-layout>
-    <TfFiltersContainer class="mb-4" @apply="loadNodes" :loading="loading">
+    <TfFiltersContainer class="mb-4" @apply="loadNodes(true)" :loading="loading">
       <TfFilter
         query-route="node-id"
         :rules="[
-          validators.isNumeric('This field accepts numbers only.', {
-            no_symbols: true,
-          }),
-          validators.min('The node id should be larger then zero.', 1),
+          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.min('The node id should be larger than zero.', 1),
           validators.startsWith('The node id start with zero.', '0'),
           validators.validateResourceMaxNumber('This is not a valid ID.'),
         ]"
@@ -96,7 +94,7 @@
         v-model="filters.minSSD"
         :rules="[
           validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The total ssd should be larger then zero.', 1),
+          validators.min('The total ssd should be larger than zero.', 1),
           validators.validateResourceMaxNumber('This value is out of range.'),
         ]"
       >
@@ -118,7 +116,7 @@
         v-model="filters.minHDD"
         :rules="[
           validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The total hdd should be larger then zero.', 1),
+          validators.min('The total hdd should be larger than zero.', 1),
           validators.validateResourceMaxNumber('This value is out of range.'),
         ]"
       >
@@ -140,7 +138,7 @@
         v-model="filters.minRAM"
         :rules="[
           validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The total ram should be larger then zero.', 1),
+          validators.min('The total ram should be larger than zero.', 1),
           validators.validateResourceMaxNumber('This value is out of range.'),
         ]"
       >
@@ -184,7 +182,7 @@
         v-model="filters.freeSSD"
         :rules="[
           validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The free ssd should be larger then zero.', 1),
+          validators.min('The free ssd should be larger than zero.', 1),
           validators.validateResourceMaxNumber('This value is out of range.'),
         ]"
       >
@@ -206,7 +204,7 @@
         v-model="filters.freeHDD"
         :rules="[
           validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The free hdd should be larger then zero.', 1),
+          validators.min('The free hdd should be larger than zero.', 1),
           validators.validateResourceMaxNumber('This value is out of range.'),
         ]"
       >
@@ -228,7 +226,7 @@
         v-model="filters.freeRAM"
         :rules="[
           validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The free ram should be larger then zero.', 1),
+          validators.min('The free ram should be larger than zero.', 1),
           validators.validateResourceMaxNumber('This value is out of range.'),
         ]"
       >
@@ -425,14 +423,15 @@ export default {
       loadGpu: false,
     };
 
-    async function loadNodes() {
+    async function loadNodes(retCount = false) {
       loading.value = true;
+      if (retCount) page.value = 1;
       try {
         const { count, data } = await requestNodes(
           {
             page: page.value,
             size: size.value,
-            retCount: true,
+            retCount,
             nodeId: +filters.value.nodeId || undefined,
             farmIds: filters.value.farmId || undefined,
             farmName: filters.value.farmName || undefined,
@@ -454,7 +453,7 @@ export default {
           { loadFarm: true },
         );
         nodes.value = data;
-        nodesCount.value = count ?? 0;
+        if (retCount) nodesCount.value = count ?? 0;
       } catch (err) {
         console.log(err);
       } finally {

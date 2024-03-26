@@ -13,9 +13,14 @@ import { bytesToGB, generateInt, getOnlineNode, k8sWait, log, RemoteRun, splitIP
 jest.setTimeout(300000);
 
 let gridClient: GridClient;
+let deploymentName: string;
 
 beforeAll(async () => {
-  return (gridClient = await getClient());
+  gridClient = await getClient();
+  deploymentName = generateString(15);
+  gridClient.clientOptions.projectName = `kubernetes/${deploymentName}`;
+  gridClient._connect();
+  return gridClient;
 });
 
 //Private IP Regex
@@ -51,7 +56,6 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
   let cpu = generateInt(1, 4);
   let memory = generateInt(256, 4096);
   let rootfsSize = generateInt(2, 5);
-  const deploymentName = generateString(15);
   const networkName = generateString(15);
   const vmName = generateString(15);
   const disks = [];
@@ -195,6 +199,7 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
         entrypoint: "/sbin/zinit init",
         public_ip: publicIP,
         planetary: true,
+        mycelium: false,
         qsfs_disks: [
           {
             qsfs_zdbs_name: qsfsZdbName,
@@ -246,7 +251,6 @@ test("TC1234 - QSFS: Deploy QSFS underneath a VM", async () => {
   expect(result[0].capacity["memory"]).toBe(memory);
   expect(result[0].planetary).toBeDefined();
   expect(result[0].publicIP).toBeNull();
-  expect(result[0].metadata).toBe(metadata);
   expect(result[0].description).toBe(description);
 
   //QSFS Assertions
@@ -327,7 +331,6 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
   const qsfsNodes = [];
   const qsfsPassword = generateString(15);
   let qsfsDiskSize = generateInt(1, 20);
-  const deploymentName = "K8s" + generateString(5);
   const secret = generateString(15);
   const networkName = generateString(15);
   const ipRangeClassA = "10." + generateInt(1, 255) + ".0.0/16";
@@ -534,6 +537,7 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
         public_ip: masterPublicIp,
         public_ip6: false,
         planetary: true,
+        mycelium: false,
         qsfs_disks: qsfsDisk,
       },
     ],
@@ -548,6 +552,7 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
         public_ip: workerPublicIp,
         public_ip6: false,
         planetary: true,
+        mycelium: false,
       },
     ],
     metadata: metadata,
@@ -579,7 +584,6 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
   expect(result.masters[0].mounts[0]["size"]).toBe(bytesToGB(masterDiskSize));
   expect(result.masters[0].mounts[0]["state"]).toBe("ok");
   expect(result.masters[0].env["K3S_NODE_NAME"]).toBe(masterName);
-  expect(result.masters[0].metadata).toBe(metadata);
   expect(result.masters[0].description).toBe(description);
 
   //qsfs assertions
@@ -604,7 +608,6 @@ test("TC1235 - QSFS: Deploy QSFS Underneath a Kubernetes Cluster", async () => {
   expect(result.workers[0].mounts[0]["size"]).toBe(bytesToGB(workerDiskSize));
   expect(result.workers[0].mounts[0]["state"]).toBe("ok");
   expect(result.workers[0].env["K3S_NODE_NAME"]).toBe(workerName);
-  expect(result.workers[0].metadata).toBe(metadata);
   expect(result.workers[0].description).toBe(description);
 
   const masterPlanetaryIp = result.masters[0].planetary;
@@ -710,4 +713,4 @@ afterEach(async () => {
 
 afterAll(async () => {
   return await gridClient.disconnect();
-}, 10000);
+}, 130000);

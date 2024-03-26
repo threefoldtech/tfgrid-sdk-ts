@@ -36,20 +36,23 @@
           <div>
             <a
               color="error"
-              href="https://manual.grid.tf/threefold_token/buy_sell_tft/buy_sell_tft.html"
+              href="https://www.manual.grid.tf/documentation/threefold_token/buy_sell_tft/buy_sell_tft.html"
               class="app-link text-subtitle-2"
               target="_blank"
               >Buy the Token</a
             >
           </div>
           <div>
-            <a href="https://manual.grid.tf/farmers/farmers.html" class="app-link text-subtitle-2" target="_blank"
+            <a
+              href="https://www.manual.grid.tf/documentation/farmers/farmers.html"
+              class="app-link text-subtitle-2"
+              target="_blank"
               >Start Farming</a
             >
           </div>
           <div>
             <a
-              href="https://library.threefold.me/info/threefold#/threefold__governance"
+              href="https://manual.grid.tf/knowledge_base/about/governance.html"
               class="app-link text-subtitle-2"
               target="_blank"
               >Governance</a
@@ -73,9 +76,6 @@
           </div>
           <div>
             <a href="https://www.threefold.io/newsroom/" class="app-link text-subtitle-2" target="_blank">News Room</a>
-          </div>
-          <div>
-            <a href="https://www.threefold.io/community/" class="app-link text-subtitle-2" target="_blank">Community</a>
           </div>
         </v-col>
 
