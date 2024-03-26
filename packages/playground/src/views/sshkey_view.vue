@@ -39,6 +39,7 @@
         class="mr-2"
         prepend-icon="mdi-export"
         color="secondary"
+        :disabled="!allKeys || allKeys.length === 0"
       >
         Export
       </v-btn>
@@ -268,14 +269,7 @@ export default defineComponent({
       };
 
       this.allKeys.push(newKey);
-
-      try {
-        // await this.updateSSHKeysInChain();
-      } catch (error: any) {
-        createCustomToast("Error while migrating the old keys to the chain due: " + error.message, ToastType.danger);
-      } finally {
-        this.migrating = false;
-      }
+      this.migrating = false;
     },
   },
 
@@ -285,7 +279,6 @@ export default defineComponent({
 
     if (!userSshKey) {
       profileManager.updateSSH(this.allKeys);
-      // this.updateSSHKeysInChain();
     }
 
     if (typeof userSshKey === "string") {
@@ -311,17 +304,15 @@ export default defineComponent({
       // Update the chain with the current sshkeys => this.allkeys
       const grid = await getGrid(profileManager.profile!);
       await getMetadata(grid!);
-      // await storeSSH(grid!, this.allKeys);
-      // profileManager.updateSSH(allKeys);
+      await storeSSH(grid!, allKeys.value);
+      profileManager.updateSSH(allKeys.value);
     }
 
     // update the chain with the new ssh-kyes
     watch(
       allKeys,
       () => {
-        // createCustomToast("The chain has been updated with the recent changes.", ToastType.success);
-        // updateSSHKeysInChain();
-        console.log("allKeys: ", allKeys.value);
+        updateSSHKeysInChain();
       },
       { deep: true },
     );

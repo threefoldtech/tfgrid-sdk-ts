@@ -63,6 +63,7 @@ import { SSHKeyData } from "@/types";
 
 export default defineComponent({
   name: "SSHDataDialog",
+  emits: ["close"],
   props: {
     open: {
       type: Boolean,

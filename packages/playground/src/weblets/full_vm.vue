@@ -90,6 +90,9 @@
           }"
           v-model="selectionDetails"
         />
+
+        <!-- Manage the selected keys and send them to the deployment as env var -->
+        <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
       </template>
 
       <template #disks>
@@ -145,6 +148,7 @@
 import { type Ref, ref, watch } from "vue";
 
 import Network from "../components/networks.vue";
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import type { solutionFlavor as SolutionFlavor } from "../types";
@@ -183,6 +187,7 @@ const images: VmImage[] = [
   },
 ];
 
+const selectedSSHKeys = ref("");
 const name = ref(generateName({ prefix: "vm" }));
 const flist = ref<Flist>();
 const ipv4 = ref(false);
@@ -250,7 +255,7 @@ async function deploy() {
           publicIpv6: ipv6.value,
           planetary: planetary.value,
           mycelium: mycelium.value,
-          envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
+          envs: [{ key: "SSH_KEY", value: selectedSSHKeys.value }],
           rootFilesystemSize,
           hasGPU: hasGPU.value,
           nodeId: selectionDetails.value?.node?.nodeId,
@@ -268,6 +273,10 @@ async function deploy() {
   } catch (e) {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a full virtual machine instance."));
   }
+}
+
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
 }
 </script>
 
