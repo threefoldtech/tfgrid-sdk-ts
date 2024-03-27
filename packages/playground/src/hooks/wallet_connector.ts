@@ -22,6 +22,7 @@ export interface WalletService {
   locked: Ref<boolean>;
   activeTab: Ref<number>;
   reloadBalance(): Promise<void>;
+  balance: Ref<{ free: string; frozen: string }>;
 }
 
 export function provideWalletService(app: App<Element>, service: WalletService) {

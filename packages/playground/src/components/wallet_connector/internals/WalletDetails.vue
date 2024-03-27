@@ -5,14 +5,22 @@
         <VTextField label="Your Mnemonic" :model-value="profile.mnemonic" readonly v-bind="props" />
       </PasswordInputWrapper>
 
-      <WalletSSHManager :ssh="profile.ssh" />
+      <!-- <WalletSSHManager :ssh="profile.ssh" /> -->
 
       <CopyInputWrapper #="{ props }" :data="profile.twinId.toString()">
-        <VTextField class="mt-4" label="Twin ID" :model-value="profile.twinId" v-bind="props" readonly />
+        <VTextField label="Twin ID" :model-value="profile.twinId" v-bind="props" readonly />
+      </CopyInputWrapper>
+
+      <CopyInputWrapper #="{ props }" :data="profile.email">
+        <VTextField label="Twin ID" :model-value="profile.email" v-bind="props" readonly />
       </CopyInputWrapper>
 
       <CopyInputWrapper #="{ props }" :data="profile.address">
         <VTextField label="Address" :model-value="profile.address" v-bind="props" readonly />
+      </CopyInputWrapper>
+
+      <CopyInputWrapper #="{ props }" :data="walletService.balance.value.free">
+        <VTextField label="Address" :model-value="walletService.balance.value.free" v-bind="props" readonly />
       </CopyInputWrapper>
     </VCol>
 
@@ -75,13 +83,13 @@ import type { Profile } from "../../../stores/profile_manager";
 import QrcodeGenerator from "../../qrcode_generator.vue";
 import android from "./apps/android.svg";
 import ios from "./apps/ios.svg";
-import WalletSSHManager from "./WalletSSHManager.vue";
+// import WalletSSHManager from "./WalletSSHManager.vue";
 
 const bridge = window.env.BRIDGE_TFT_ADDRESS;
 
 export default {
   name: "WalletDetails",
-  components: { WalletSSHManager, QrcodeGenerator },
+  components: { /* WalletSSHManager, */ QrcodeGenerator },
   props: {
     profile: {
       type: Object as PropType<Profile>,

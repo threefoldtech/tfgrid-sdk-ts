@@ -3,8 +3,8 @@
     <template #activator="{ props }">
       <VBtn variant="flat" v-bind="props">
         <template #prepend>
-          <VProgressCircular indeterminate size="35" color="secondary" v-if="balanceTask.loading" />
-          <VIcon v-else icon="mdi-account" size="35" />
+          <VProgressCircular indeterminate size="30" color="secondary" width="2" v-if="balanceTask.loading" />
+          <VIcon v-else icon="mdi-account" size="30" />
         </template>
         <span class="font-weight-bold" v-text="'Connect your TFChain Wallet'" v-if="!gridStore.client" />
 
@@ -124,6 +124,7 @@ export default {
       reloadBalance() {
         return balanceTask.value.run();
       },
+      balance,
     });
 
     ctx.expose(walletService);
