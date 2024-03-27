@@ -72,18 +72,18 @@
 import { StrKey } from "stellar-sdk";
 import { onMounted, ref } from "vue";
 
-import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useProfileManager } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid } from "../utils/grid";
 import { isValidStellarAddress } from "../utils/validators";
+
 const withdrawDialog = ref(false);
 const targetError = ref("");
 const target = ref("");
 const valid = ref(false);
 const validatingAddress = ref(false);
 const loadingWithdraw = ref(false);
-const ProfileManagerController = useProfileManagerController();
+const walletService = useWalletService();
 const profileManager = useProfileManager();
 const amount = ref(2);
 const emits = defineEmits(["close"]);
@@ -133,7 +133,7 @@ async function withdrawTFT(targetAddress: string, withdrawAmount: number) {
     const grid = await getGrid(profileManager.profile!);
     await grid?.bridge.swapToStellar({ amount: +withdrawAmount, target: targetAddress });
 
-    await ProfileManagerController.reloadBalance();
+    await walletService.reloadBalance();
     createCustomToast("Transaction Succeeded", ToastType.success);
     closeDialog();
   } catch (e) {
@@ -151,6 +151,8 @@ const closeDialog = () => {
 </script>
 <script lang="ts">
 import { defineComponent } from "vue";
+
+import { useWalletService } from "../hooks/wallet_connector";
 
 export default defineComponent({
   name: "WithdrawDialog",

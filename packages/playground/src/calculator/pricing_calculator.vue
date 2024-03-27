@@ -190,8 +190,8 @@ import { computed, ref } from "vue";
 import type { VForm } from "vuetify/components/VForm";
 
 import { calculator as Calculator } from "../../../grid_client/dist/es6";
-import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import { useAsync } from "../hooks";
+import { useWalletService } from "../hooks/wallet_connector";
 import { useProfileManager } from "../stores";
 import { normalizeError } from "../utils/helpers";
 import { balanceRules, cruRules, hruRules, mruRules, sruRules } from "../utils/pricing_calculator";
@@ -202,7 +202,7 @@ export default {
   setup() {
     const calculator = new Calculator(new QueryClient(window.env.SUBSTRATE_URL));
     const profileManager = useProfileManager();
-    const userBalance = useProfileManagerController().balance;
+    const userBalance = useWalletService().balance;
     const valid = ref(true);
     const resources = ref({
       cru: "1",
