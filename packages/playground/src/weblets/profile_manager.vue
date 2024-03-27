@@ -121,6 +121,7 @@
                 location="bottom"
                 max-width="700px"
               >
+                <!-- Mnemonic Input -->
                 <template #activator="{ props: tooltipProps }">
                   <PasswordInputWrapper #="{ props: passwordInputProps }">
                     <InputValidator
@@ -196,24 +197,6 @@
                       </v-row>
 
                       <div class="d-flex flex-column flex-md-row justify-end mb-10">
-                        <v-tooltip>
-                          <template v-slot:activator="{ isActive, props }">
-                            <VBtn
-                              class="mt-2 ml-3"
-                              color="secondary"
-                              variant="outlined"
-                              :disabled="!shouldActivateAccount || keypairType === KeypairType.ed25519"
-                              :loading="activatingAccount"
-                              @click="openAcceptTerms = termsLoading = true"
-                              v-bind="props"
-                              v-on="isActive"
-                            >
-                              Activate account
-                            </VBtn>
-                          </template>
-                          <span>To connect to your wallet, you should accept terms and conditions first.</span>
-                        </v-tooltip>
-
                         <VBtn
                           class="mt-2 ml-3"
                           color="secondary"
@@ -231,6 +214,7 @@
                   </PasswordInputWrapper>
                 </template>
               </VTooltip>
+              <!-- Terms Dialog -->
               <v-dialog v-model="openAcceptTerms" fullscreen>
                 <iframe
                   v-show="!termsLoading"
@@ -252,6 +236,8 @@
                   </v-card-text>
                 </v-card>
               </v-dialog>
+
+              <!-- Alerts -->
               <v-alert
                 type="error"
                 variant="tonal"
@@ -267,6 +253,7 @@
                 </p>
               </v-alert>
 
+              <!-- Email -->
               <input-validator
                 v-if="activeTab === 1"
                 :value="email"
@@ -276,8 +263,16 @@
                 ]"
                 #="{ props }"
               >
-                <v-text-field label="Email" placeholder="email@example.com" v-model="email" v-bind="props" />
+                <v-text-field
+                  label="Email"
+                  placeholder="email@example.com"
+                  v-model="email"
+                  v-bind="props"
+                  :disabled="creatingAccount || activatingAccount || activating"
+                />
               </input-validator>
+
+              <!-- Password Input -->
               <PasswordInputWrapper #="{ props: passwordInputProps }">
                 <InputValidator
                   :value="password"
@@ -325,6 +320,7 @@
                   />
                 </InputValidator>
               </PasswordInputWrapper>
+
               <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="loginError">
                 {{ loginError }}
               </v-alert>
@@ -619,7 +615,7 @@ const mnemonicInput = useInputRef();
 const isNonActiveMnemonic = ref(false);
 
 const shouldActivateAccount = computed(() => {
-  if (!mnemonicInput.value?.error || !mnemonic.value) return false;
+  if (!mnemonic.value) return false;
   return isNonActiveMnemonic.value;
 });
 
@@ -730,13 +726,8 @@ function validateMnInput(mnemonic: string) {
     .catch(e => {
       if (e instanceof TwinNotExistError) {
         isNonActiveMnemonic.value = true;
-        enableReload.value = false;
-        isValid.value = false;
-        return {
-          message: `Couldn't get the user twin for the provided mnemonic in ${
-            process.env.NETWORK || window.env.NETWORK
-          }net.`,
-        };
+        isValid.value = true;
+        return undefined;
       }
       enableReload.value = false;
       isValid.value = false;
@@ -779,14 +770,16 @@ async function activateAccount() {
   enableReload.value = false;
   clearError();
   activatingAccount.value = true;
+  activating.value = true;
   try {
     await activateAccountAndCreateTwin(mnemonic.value);
-    await mnemonicInput.value?.validate();
+    await storeAndLogin();
   } catch (e) {
     enableReload.value = true;
     activatingAccountError.value = normalizeError(e, "Something went wrong while activating your account.");
   } finally {
     activatingAccount.value = false;
+    activating.value = false;
   }
 }
 
@@ -834,6 +827,10 @@ function login() {
 }
 
 async function storeAndLogin() {
+  if (shouldActivateAccount.value) {
+    openAcceptTerms.value = true;
+    termsLoading.value = true;
+  }
   const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
   const mnemonicHash = cryptr.encrypt(mnemonic.value);
   const keypairTypeHash = cryptr.encrypt(keypairType.value);
