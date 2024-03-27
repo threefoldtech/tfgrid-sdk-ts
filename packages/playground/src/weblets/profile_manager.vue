@@ -227,7 +227,7 @@
                   sandbox="allow-forms allow-modals allow-scripts allow-popups allow-same-origin "
                   @load="termsLoading = false"
                 ></iframe>
-                <v-btn @click="isNonActiveMnemonic ? activateAccount() : createNewAccount()" v-show="!termsLoading">
+                <v-btn @click="shouldActivateAccount ? activateAccount() : createNewAccount()" v-show="!termsLoading">
                   accept terms and conditions
                 </v-btn>
                 <v-card v-show="termsLoading" :style="{ height: '100%' }">
@@ -263,7 +263,13 @@
                 ]"
                 #="{ props }"
               >
-                <v-text-field label="Email" placeholder="email@example.com" v-model="email" v-bind="props" />
+                <v-text-field
+                  label="Email"
+                  placeholder="email@example.com"
+                  v-model="email"
+                  v-bind="props"
+                  :disabled="creatingAccount || activatingAccount || activating"
+                />
               </input-validator>
 
               <!-- Password Input -->
@@ -609,7 +615,7 @@ const mnemonicInput = useInputRef();
 const isNonActiveMnemonic = ref(false);
 
 const shouldActivateAccount = computed(() => {
-  if (!mnemonicInput.value?.error || !mnemonic.value) return false;
+  if (!mnemonic.value) return false;
   return isNonActiveMnemonic.value;
 });
 
@@ -720,6 +726,7 @@ function validateMnInput(mnemonic: string) {
     .catch(e => {
       if (e instanceof TwinNotExistError) {
         isNonActiveMnemonic.value = true;
+        isValid.value = true;
         return undefined;
       }
       enableReload.value = false;
@@ -763,14 +770,16 @@ async function activateAccount() {
   enableReload.value = false;
   clearError();
   activatingAccount.value = true;
+  activating.value = true;
   try {
     await activateAccountAndCreateTwin(mnemonic.value);
-    await mnemonicInput.value?.validate();
+    await storeAndLogin();
   } catch (e) {
     enableReload.value = true;
     activatingAccountError.value = normalizeError(e, "Something went wrong while activating your account.");
   } finally {
     activatingAccount.value = false;
+    activating.value = false;
   }
 }
 
@@ -818,7 +827,7 @@ function login() {
 }
 
 async function storeAndLogin() {
-  if (isNonActiveMnemonic.value) {
+  if (shouldActivateAccount.value) {
     openAcceptTerms.value = true;
     termsLoading.value = true;
   }
