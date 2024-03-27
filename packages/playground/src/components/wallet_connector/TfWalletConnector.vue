@@ -11,9 +11,11 @@
         <template v-else>
           <p class="font-weight-bold" v-text="'Loading...'" v-if="balanceTask.loading" />
           <div v-else class="text-left">
-            <p class="mb-1">Balance: <span class="font-weight-bold text-secondary" v-text="balance.free + ' TFT'" /></p>
+            <p class="mb-1">
+              Balance: <span class="font-weight-bold text-secondary" v-text="normalizedBalance.free + ' TFT'" />
+            </p>
             <p class="d-flex align-center">
-              Locked: <span class="font-weight-bold text-secondary ml-2" v-text="balance.frozen + ' TFT'" />
+              Locked: <span class="font-weight-bold text-secondary ml-2" v-text="normalizedBalance.frozen + ' TFT'" />
               <VTooltip text="Locked balance documentation">
                 <template #activator="{ props }">
                   <VBtn
@@ -59,7 +61,7 @@
 </template>
 
 <script lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 import { useApp, useAsync, useSessionStorage } from "../../hooks";
 import { $key, provideWalletService, useExtensionCredentials, useLocalCredentials } from "../../hooks/wallet_connector";
@@ -82,17 +84,18 @@ export default {
     const localCredentials = useLocalCredentials();
     const passwordStorage = useSessionStorage("password");
 
-    const balance = ref({ free: "0", frozen: "0" });
+    const balance = ref({ free: 0, frozen: 0 });
+    const normalizedBalance = computed(() => {
+      return { free: normalizeBalance(balance.value.free, true), frozen: normalizeBalance(balance.value.frozen, true) };
+    });
+
     const balanceTask = useAsync(
       () => new Promise(res => setTimeout(res, 1000)).then(() => gridStore.client.balance.getMyBalance()),
       {
         shouldRun: () => !!gridStore.client,
         pollingTime: 60_000,
-        map: d => ({ free: normalizeBalance(d.free, true), frozen: normalizeBalance(d.frozen, true) }),
         onAfterTask({ data }) {
-          if (data) {
-            balance.value = data;
-          }
+          balance.value = data || { free: 0, frozen: 0 };
         },
       },
     );
@@ -102,7 +105,7 @@ export default {
       extensionCredentials.remove();
       passwordStorage.remove();
       balanceTask.value.stopPolling();
-      balance.value = { free: "0", frozen: "0" };
+      balance.value = { free: 0, frozen: 0 };
       activeTab.value = 0;
     }
 
@@ -125,11 +128,12 @@ export default {
         return balanceTask.value.run();
       },
       balance,
+      normalizedBalance,
     });
 
     ctx.expose(walletService);
 
-    return { walletService, gridStore, profileManager, active, logout, balanceTask, balance };
+    return { walletService, gridStore, profileManager, active, logout, balanceTask, normalizedBalance };
   },
 };
 </script>

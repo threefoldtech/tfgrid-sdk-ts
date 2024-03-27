@@ -39,7 +39,7 @@
                   validators.isNumeric('Amount should be a number.'),
                   validators.min('Amount must be greater than 0.001', 0.001),
                   validators.isDecimal('Amount can have 3 decimals only.', { decimal_digits: '0,3' }),
-                  validators.max('Insufficient funds.', /* freeBalance // - */ 1 - 0.01),
+                  validators.max('Insufficient funds.', freeBalance - 0.01),
                 ]"
                 #="{ props }"
               >
@@ -91,7 +91,7 @@
                   validators.isNumeric('Amount should be a number.'),
                   validators.min('Amount must be greater than 0.001', 0.001),
                   validators.isDecimal('Amount can have 3 decimals only.', { decimal_digits: '0,3' }),
-                  validators.max('Insufficient funds.', /* freeBalance // - */ 1 - 0.01),
+                  validators.max('Insufficient funds.', freeBalance - 0.01),
                 ]"
                 #="{ props }"
               >
@@ -133,10 +133,8 @@ import { useGrid, useProfileManager } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
 
 const walletService = useWalletService();
-// import { useProfileManagerController } from "../components/profile_manager_controller.vue"; // -
 
 const gridStore = useGrid();
-// const profileManagerController = useProfileManagerController(); // -
 const activeTab = ref(0);
 const recipientTwinId = ref("");
 const isValidTwinIDTransfer = ref(false);
@@ -150,15 +148,15 @@ const profileManager = useProfileManager();
 const profile = ref(profileManager.profile!);
 const recepTwinFromAddress = ref<Twin>();
 const receptTwinFromTwinID = ref<Twin>();
-// const balance = profileManagerController.balance; // -
-// const freeBalance = computed(() => balance.value?.free ?? 0); // -
+const balance = walletService.balance;
+const freeBalance = computed(() => balance.value?.free ?? 0);
 
-// watch(freeBalance, async () => {
-//   if (transferAmount.value) {
-//     await amountRef.value?.reset();
-//     amountRef.value?.validate();
-//   }
-// }); // -
+watch(freeBalance, async () => {
+  if (transferAmount.value) {
+    await amountRef.value?.reset();
+    amountRef.value?.validate();
+  }
+});
 
 const tick = ref(0);
 function isSameTwinID(value: string) {
@@ -218,7 +216,7 @@ async function transfer(recipientTwin: Twin) {
       await gridStore.client.balance.transfer({ address: recipientTwin.accountId, amount: transferAmount.value });
       clearInput();
       createCustomToast("Transaction Complete!", ToastType.success);
-      // profileManagerController.reloadBalance(); // -
+      walletService.reloadBalance();
     }
   } catch (err) {
     createInvalidTransferToast("transfer failed!");

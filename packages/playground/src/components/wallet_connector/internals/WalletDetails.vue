@@ -19,8 +19,8 @@
         <VTextField label="Address" :model-value="profile.address" v-bind="props" readonly />
       </CopyInputWrapper>
 
-      <CopyInputWrapper #="{ props }" :data="walletService.balance.value.free">
-        <VTextField label="Address" :model-value="walletService.balance.value.free" v-bind="props" readonly />
+      <CopyInputWrapper #="{ props }" :data="walletService.normalizedBalance.value.free">
+        <VTextField label="Address" :model-value="walletService.normalizedBalance.value.free" v-bind="props" readonly />
       </CopyInputWrapper>
     </VCol>
 

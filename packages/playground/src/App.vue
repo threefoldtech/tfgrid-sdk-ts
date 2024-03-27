@@ -184,7 +184,7 @@
             />
           </div>
 
-          <TfRouterView @openProfile="console.log('//- openProfile = true')" :isAuth="hasActiveProfile && hasGrid" />
+          <TfRouterView @openProfile="walletServiceCmp.active = true" :isAuth="hasActiveProfile && hasGrid" />
         </v-container>
       </DeploymentListManager>
       <TFNotification v-if="hasActiveProfile && hasGrid" />
