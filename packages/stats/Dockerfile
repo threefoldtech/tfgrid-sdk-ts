@@ -11,3 +11,10 @@ RUN yarn lerna run build --no-private && yarn workspace @threefold/stats build
 FROM nginx:1.25.3-alpine
 COPY --from=build /app/packages/stats/dist /usr/share/nginx/html
 COPY --from=build /app/packages/stats/nginx /etc/nginx
+
+RUN curl --location  https://github.com/threefoldtech/zinit/releases/download/v0.2.10/zinit -o /sbin/zinit && \
+    chmod +x /sbin/zinit
+RUN echo "* * * * * curl localhost/api/stats-update" > /var/spool/cron/crontabs/root
+RUN mkdir -p /etc/zinit;
+COPY zinit /etc/zinit
+ENTRYPOINT [ "/sbin/zinit", "init" ]

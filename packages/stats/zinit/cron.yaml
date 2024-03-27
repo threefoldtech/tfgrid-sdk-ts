@@ -1,0 +1,3 @@
+exec: crond -f
+test: ps | grep crond
+after: nginx
