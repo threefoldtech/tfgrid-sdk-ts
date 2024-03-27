@@ -20,14 +20,12 @@
           @update:items-per-page="$emit('update:size', $event)"
           class="elevation-1 v-data-table-header"
           :disable-sort="true"
-          hide-default-header
           :hover="true"
-          @click:row="openSheet"
         >
           <template #loading />
 
           <tbody class="mx-4 my-4">
-            <tr v-for="node in modelValue" v-bind:key="node.id">
+            <tr v-for="node in modelValue" v-bind:key="node.id" @click="openSheet($event, node)">
               <TfNodeDetailsCard :node="node" />
             </tr>
           </tbody>
@@ -116,8 +114,8 @@ export default {
       { title: "Actions", key: "actions", align: "start", sortable: false },
     ];
 
-    const openSheet = (_e: any, { item }: any) => {
-      emit("open-dialog", item);
+    const openSheet = (_e: any, node: any) => {
+      emit("open-dialog", node);
     };
 
     return {
