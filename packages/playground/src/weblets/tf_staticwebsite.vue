@@ -45,6 +45,9 @@
         </input-tooltip>
       </input-validator>
 
+      <input-tooltip tooltip="Github Branch to serve (optional).">
+        <v-text-field label="Github Branch" v-model="githubBranch" />
+      </input-tooltip>
       <input-validator :value="root" :rules="[validators.required('HTML Directory is required.')]" #="{ props }">
         <input-tooltip tooltip="HTML Directory to serve.">
           <v-text-field label="HTML Directory" v-model="root" v-bind="props" />
@@ -57,7 +60,7 @@
         :medium="{ cpu: 2, memory: 4, disk: 100 }"
       />
 
-      <Networks ref="network" v-model:mycelium="mycelium" />
+      <Networks ref="network" v-model:ipv4="ipv4" v-model:mycelium="mycelium" />
 
       <input-tooltip
         inline
@@ -111,6 +114,7 @@ const valid = ref(false);
 const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "sw" }));
 const githubUrl = ref("");
+const githubBranch = ref("");
 const root = ref("");
 const domain = ref();
 
@@ -186,6 +190,7 @@ async function deploy() {
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "GITHUB_URL", value: githubUrl.value },
+            { key: "GITHUB_BRANCH", value: githubBranch.value },
             { key: "ROOT", value: root.value },
             { key: "USER_DOMAIN", value: selectionDetails.value?.domain?.enabledCustomDomain ? domain.value : "" },
             { key: "STATICWEBSITE_DOMAIN", value: domain.value },
