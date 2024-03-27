@@ -61,6 +61,7 @@ async function normalizeContract(
     contractId: id,
     twinID: c.twinID,
     type,
+    deploymentType: data.type,
     state: c.state,
     createdAt: new Date(+c.createdAt * 1000).toLocaleString(),
     nodeId: c.nodeID || "-",
@@ -114,6 +115,7 @@ export async function getNodeInfo(nodeIDs: (number | undefined)[]) {
 export interface NormalizedContract {
   contractId: number;
   type: "name" | "node" | "rent";
+  deploymentType?: string;
   state: ContractStates;
   createdAt: string;
   nodeId?: number;
