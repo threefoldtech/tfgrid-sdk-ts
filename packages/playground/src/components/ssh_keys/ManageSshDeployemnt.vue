@@ -80,7 +80,7 @@ import { capitalize, defineComponent, nextTick, ref } from "vue";
 import SshDataDialog from "@/components/ssh_keys/SshDataDialog.vue";
 import { DashboardRoutes } from "@/router/routes";
 import { useProfileManager } from "@/stores";
-import { SSHKeyData } from "@/types";
+import type { SSHKeyData } from "@/types";
 
 export default defineComponent({
   name: "ManageSshDeployemnt",

@@ -96,12 +96,12 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType, ref, watch } from "vue";
+import { computed, defineComponent, type PropType, ref, watch } from "vue";
 
 import { type Profile, useProfileManager } from "@/stores/profile_manager";
-import { SSHCreationMethod, SSHKeyData } from "@/types";
+import { SSHCreationMethod, type SSHKeyData } from "@/types";
 import { formatSSHKeyTableCreatedAt } from "@/utils/date";
-import { Balance, getGrid, loadBalance } from "@/utils/grid";
+import { type Balance, getGrid, loadBalance } from "@/utils/grid";
 import { isEnoughBalance } from "@/utils/helpers";
 import { generateSSHKeyName } from "@/utils/strings";
 import { isValidSSHKey } from "@/utils/validators";

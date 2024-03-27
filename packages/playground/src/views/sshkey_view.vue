@@ -123,7 +123,7 @@ import SshDataDialog from "@/components/ssh_keys/SshDataDialog.vue";
 import SshFormDialog from "@/components/ssh_keys/SshFormDialog.vue";
 import SshTable from "@/components/ssh_keys/SshTable.vue";
 import { useProfileManager } from "@/stores";
-import { SSHCreationMethod, SSHKeyData } from "@/types";
+import { SSHCreationMethod, type SSHKeyData } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { formatSSHKeyTableCreatedAt } from "@/utils/date";
 import { getGrid, getMetadata, storeSSH } from "@/utils/grid";

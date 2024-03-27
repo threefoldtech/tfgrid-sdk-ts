@@ -57,9 +57,9 @@
 </template>
 
 <script lang="ts">
-import { capitalize, defineComponent, PropType } from "vue";
+import { capitalize, defineComponent, type PropType } from "vue";
 
-import { SSHKeyData } from "@/types";
+import type { SSHKeyData } from "@/types";
 
 export default defineComponent({
   name: "SSHDataDialog",

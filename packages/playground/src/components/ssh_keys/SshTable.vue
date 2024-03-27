@@ -178,10 +178,10 @@
 </template>
 
 <script lang="ts">
-import { capitalize, defineComponent, PropType, ref } from "vue";
+import { capitalize, defineComponent, type PropType, ref } from "vue";
 import { useTheme } from "vuetify";
 
-import { SSHKeyData, VDataTableHeader } from "@/types";
+import type { SSHKeyData, VDataTableHeader } from "@/types";
 import { AppThemeSelection } from "@/utils/app_theme";
 
 export default defineComponent({
