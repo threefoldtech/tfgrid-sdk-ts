@@ -79,9 +79,9 @@
             >
               Generate and Save
             </v-btn>
-
             <v-btn
               v-if="$props.dialogType === SSHCreationMethod.Import"
+              :loading="$props.savingKey"
               :disabled="!sshKey || !isValidSSHKey(sshKey)"
               color="secondary"
               variant="outlined"
@@ -121,6 +121,10 @@ export default defineComponent({
       type: String,
       required: false,
     },
+    savingKey: {
+      type: Boolean,
+      required: false,
+    },
     allKeys: {
       type: Object as PropType<SSHKeyData[]>,
       required: true,
@@ -149,6 +153,7 @@ export default defineComponent({
           const lastID = props.allKeys.length ? props.allKeys[props.allKeys.length - 1].id : 1;
 
           keyName.value = generateUniqueSSHKeyName();
+          sshKey.value = "";
           createdKey.value = {
             id: lastID + 1,
             publicKey: props.generatedSshKey as string,
@@ -182,7 +187,6 @@ export default defineComponent({
         createdKey.value.name = keyName.value;
         emit("save", createdKey.value);
       }
-      sshKey.value = "";
     }
 
     function generateUniqueSSHKeyName(depth = 0): string {

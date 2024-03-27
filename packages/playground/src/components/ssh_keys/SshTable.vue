@@ -140,7 +140,7 @@
       </v-data-table>
     </div>
 
-    <div class="bottom mt-3">
+    <div class="bottom mt-3 d-flex justify-end">
       <v-tooltip location="bottom" text="Export all selected keys.">
         <template #activator="{ props }">
           <v-btn
@@ -223,23 +223,15 @@ export default defineComponent({
     },
 
     deleteKey(key: SSHKeyData) {
-      key.deleting = true;
       this.$emit("delete", [key]);
-      setTimeout(() => {
-        key.deleting = false;
-      }, 3000);
     },
 
     activateKey(key: SSHKeyData) {
-      key.activating = true;
-      setTimeout(() => {
-        if (key.isActive) {
-          this.$emit("inactive", key);
-        } else {
-          this.$emit("active", key);
-        }
-        key.activating = false;
-      }, 3000);
+      if (key.isActive) {
+        this.$emit("inactive", key);
+      } else {
+        this.$emit("active", key);
+      }
     },
   },
 

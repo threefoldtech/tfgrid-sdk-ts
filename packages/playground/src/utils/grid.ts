@@ -99,10 +99,9 @@ export async function loadProfile(grid: GridClient): Promise<Profile> {
 export async function getMetadata(grid: GridClient): Promise<{ [key: string]: any }> {
   try {
     const metadata = await grid.tfchain.backendStorage.load("metadata");
-    console.log("load metadata: ", metadata);
     return metadata;
   } catch (e) {
-    console.log("Error: ", e);
+    console.log(`Error while trying to get metadata due: ${e}`);
     return {};
   }
 }
@@ -133,11 +132,10 @@ export async function storeEmail(grid: GridClient, newEmail: string): Promise<vo
   const email = metadata.email;
   if (email === newEmail) return;
 
-  return grid.kvstore.set({
-    key: "metadata",
-    value: JSON.stringify({
-      ...metadata,
-      email: newEmail,
-    }),
+  const ext = await grid.tfchain.backendStorage.dump("metadata", {
+    ...metadata,
+    email: newEmail,
   });
+
+  await grid.tfclient.applyAllExtrinsics(ext);
 }
