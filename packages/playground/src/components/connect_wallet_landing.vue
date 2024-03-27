@@ -6,9 +6,9 @@
       to view {{ pageTitle }}
     </v-alert>
     <v-container class="custom-container">
-      <h4 class="text-center text-h3 mt-16">A Co-Owned Global Sovereign Internet</h4>
-      <v-container class="d-flex justify-center mt-4">
-        <p class="text-center w-75">
+      <h4 class="text-center text-h4 mt-4">A Co-Owned Global Sovereign Internet</h4>
+      <v-container class="d-flex justify-center">
+        <p class="text-center text-subtitle w-75">
           ThreeFold is
           <strong
             >a peer-to-peer open-source Internet platform that connects users directly with local Internet
@@ -31,7 +31,7 @@
       >
         <!-- class="d-flex justify-center align-center" -->
         <div class="d-flex justify-center mb-10">
-          <h4 class="text-center text-h4">Live and Operational</h4>
+          <h4 class="text-center text-h5">Live and Operational</h4>
         </div>
 
         <div class="d-flex flex-wrap justify-center">
@@ -39,38 +39,36 @@
             <v-card class="my-10">
               <v-img
                 cover
-                width="150"
+                width="100"
                 class="mx-auto"
                 :src="baseUrl + 'images/icons/live-and-operational/' + s.image"
               />
               <v-card-text>
-                <p class="text-center font-weight-regular text-h4">{{ s.value }}</p>
-                <p class="text-center font-weight-light text-h6">{{ s.label }}</p>
+                <p class="text-center font-weight-regular text-h5">
+                  {{ s.value }}
+                </p>
+                <p class="text-center font-weight-light text-h6">
+                  {{ s.label }}
+                </p>
               </v-card-text>
             </v-card>
           </div>
         </div>
 
         <div class="d-flex justify-center mt-5">
-          <v-btn color="primary" target="_blank" @click="$router.push('/stats')">
-            Explore ThreeFold Grid Capacity
-          </v-btn>
+          <v-btn color="primary" target="_blank" :href="statsUrl"> Explore ThreeFold Grid Capacity </v-btn>
         </div>
       </div>
       <div class="text-center">
-        <h4 class="text-h4 mb-8">The <strong>Layer Zero</strong> for a Decentralized World</h4>
-        <p class="w-75 mx-auto">
+        <h4 class="text-h5 mb-8">The <strong>Layer Zero</strong> for a Decentralized World</h4>
+        <p class="w-75 mx-auto text-subtitle-1">
           Anything that runs on Linux can run on ThreeFold – with more security, more sustainably, and in true
           decentralization. The ThreeFold Grid can support workloads from Blockchain to Web2 to Web3 to IoT and
           Metaverse and more.
         </p>
-
-        <div class="d-flex justify-center align-center flex-wrap mt-8">
-          <v-btn class="mr-2" color="primary" target="_blank" href="https://www.threefold.io/grid/">
+        <div class="d-flex justify-center align-center flex-wrap my-4">
+          <v-btn color="secondary" variant="outlined" class="mr-2" target="_blank" href="https://manual.grid.tf/">
             Learn about the grid
-          </v-btn>
-          <v-btn variant="outlined" color="secondary" target="_blank" href="https://www.threefold.io/build/">
-            Use The Grid
           </v-btn>
         </div>
       </div>
@@ -80,52 +78,34 @@
 
 <script lang="ts">
 import { computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { useTheme } from "vuetify";
 
+import { DashboardRoutes } from "@/router/routes";
+import { useStatsStore } from "@/stores/stats";
 export default {
   name: "ConnectWalletLanding",
   setup() {
     const theme = useTheme();
     const baseUrl = import.meta.env.BASE_URL;
     const route = useRoute();
-    const $router = useRouter();
     const pageTitle = computed(() => route.meta.title);
+    const statsStore = useStatsStore();
     return {
       theme,
       pageTitle,
-      stats: [
-        {
-          label: "Capacity",
-          value: "33.46PB",
-          image: "capacity.png",
-        },
-        {
-          label: "Nodes",
-          value: "2420",
-          image: "nodes.png",
-        },
-        {
-          label: "Countries",
-          value: "60",
-          image: "countries.png",
-        },
-        {
-          label: "Cores",
-          value: "56,530",
-          image: "cores.png",
-        },
-      ],
+      DashboardRoutes,
+      stats: computed(() => statsStore.stats),
+      statsUrl: window.env.STATS_URL || "https://stats.grid.tf",
       baseUrl,
-      $router,
     };
   },
 };
 </script>
 
-<style>
+<style scoped>
 .stats {
-  min-width: 280px;
-  max-width: 300px;
+  min-width: 200px;
+  max-width: 200px;
 }
 </style>

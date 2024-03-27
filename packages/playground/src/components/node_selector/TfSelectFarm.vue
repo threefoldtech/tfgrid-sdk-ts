@@ -1,5 +1,5 @@
 <template>
-  <input-tooltip tooltip="The name of the farm that you want to deploy inside it.">
+  <input-tooltip :tooltip="($props.tooltip as string)" :disabled="insetTooltip">
     <VAutocomplete
       label="Farm Name"
       placeholder="Select a farm"
@@ -18,6 +18,7 @@
       @update:focused="updateFocused($event)"
       v-model:search.trim="searchQuery"
       @keyup="searchForFarms"
+      spellcheck="false"
       :hint="
         !validFilters
           ? 'Please provide valid data.'
@@ -34,6 +35,7 @@
         (searchQuery === '' && !menuOpened && focused)
       "
       :disabled="!validFilters"
+      v-bind="$attrs"
     >
       <template #no-data v-if="searchTask.loading">
         <div class="d-flex pa-2">
@@ -62,6 +64,14 @@
           </VBtn>
         </VContainer>
       </template>
+
+      <template #append-inner v-if="insetTooltip">
+        <VTooltip :text="$props.tooltip">
+          <template #activator="{ props }">
+            <VIcon icon="mdi-information-outline" v-bind="props" />
+          </template>
+        </VTooltip>
+      </template>
     </VAutocomplete>
   </input-tooltip>
 </template>
@@ -87,12 +97,14 @@ export default {
   name: "TfSelectFarm",
   props: {
     modelValue: Object as PropType<FarmInfo>,
-    validFilters: { type: Boolean, required: true },
+    validFilters: { type: Boolean, default: () => true },
     filters: {
       type: Object as PropType<SelectionDetailsFilters>,
-      required: true,
+      default: () => ({}),
     },
     location: Object as PropType<SelectedLocation>,
+    insetTooltip: Boolean,
+    tooltip: { type: String, default: () => "The name of the farm that you want to deploy inside it." },
   },
   emits: {
     "update:model-value": (farm?: FarmInfo) => true || farm,
@@ -107,6 +119,14 @@ export default {
       onBeforeTask() {
         if (!searchTask.value.initialized) {
           const oldFarm = props.modelValue;
+
+          // Ignore unbind fake farms e.g ({ name: 'test' })
+          // fake farms are objects create by us (not from grid)
+          // used with other component e.g (filters, ...etc)
+          if (oldFarm && !oldFarm.farmId) {
+            return;
+          }
+
           bindModelValue();
           return oldFarm?.farmId;
         }

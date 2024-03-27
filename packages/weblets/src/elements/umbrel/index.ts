@@ -1,1 +1,0 @@
-import "./umbrel.wc.svelte";

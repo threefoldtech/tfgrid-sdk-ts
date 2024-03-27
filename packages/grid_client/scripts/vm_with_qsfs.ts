@@ -3,65 +3,45 @@ import { config, getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function deployQsfs(client, qsfs) {
-  try {
-    const res = await client.qsfs_zdbs.deploy(qsfs);
-    log("================= Deploying QSFS =================");
-    log(res);
-    log("================= Deploying QSFS =================");
-  } catch (error) {
-    log("Error while Deploying QSFS " + error);
-  }
+  const res = await client.qsfs_zdbs.deploy(qsfs);
+  log("================= Deploying QSFS =================");
+  log(res);
+  log("================= Deploying QSFS =================");
 }
 
 async function deploy(client, vms) {
-  try {
-    const res = await client.machines.deploy(vms);
-    log("================= Deploying VM =================");
-    log(res);
-    log("================= Deploying VM =================");
-  } catch (error) {
-    log("Error while Deploying the VM " + error);
-  }
+  const res = await client.machines.deploy(vms);
+  log("================= Deploying VM =================");
+  log(res);
+  log("================= Deploying VM =================");
 }
 
 async function getDeployment(client, vms) {
-  try {
-    const res = await client.machines.getObj(vms);
-    log("================= Getting deployment information =================");
-    log(res);
-    log("================= Getting deployment information =================");
-  } catch (error) {
-    log("Error while getting the deployment " + error);
-  }
+  const res = await client.machines.getObj(vms);
+  log("================= Getting deployment information =================");
+  log(res);
+  log("================= Getting deployment information =================");
 }
 
 async function cancel(client, vms) {
-  try {
-    const res = await client.machines.delete(vms);
-    log("================= Canceling the deployment =================");
-    log(res);
-    log("================= Canceling the deployment =================");
-  } catch (error) {
-    log("Error while canceling the deployment " + error);
-  }
+  const res = await client.machines.delete(vms);
+  log("================= Canceling the deployment =================");
+  log(res);
+  log("================= Canceling the deployment =================");
 }
 
 async function deleteQsfs(client, qsfs) {
-  try {
-    const res = await client.qsfs_zdbs.delete(qsfs);
-    log("================= Deleting QSFS =================");
-    log(res);
-    log("================= Deleting QSFS =================");
-  } catch (error) {
-    log("Error while deleting qsfs " + error);
-  }
+  const res = await client.qsfs_zdbs.delete(qsfs);
+  log("================= Deleting QSFS =================");
+  log(res);
+  log("================= Deleting QSFS =================");
 }
 
 async function main() {
-  const grid3 = await getClient();
+  const name = "wed2710t1";
+  const grid3 = await getClient(`vm/${name}`);
 
   const qsfs_name = "wed2710q1";
-  const machines_name = "wed2710t1";
 
   const vmQueryOptions: FilterOptions = {
     cru: 1,
@@ -77,7 +57,7 @@ async function main() {
     farmId: 1,
   };
 
-  const qsfsNodes = [];
+  const qsfsNodes: number[] = [];
 
   const allNodes = await grid3.capacity.filterNodes(qsfsQueryOptions);
   if (allNodes.length >= 2) {
@@ -99,7 +79,7 @@ async function main() {
   };
 
   const vms: MachinesModel = {
-    name: machines_name,
+    name,
     network: {
       name: "wed2710n1",
       ip_range: "10.201.0.0/16",
@@ -130,6 +110,7 @@ async function main() {
         public_ip: false,
         public_ip6: false,
         planetary: true,
+        mycelium: false,
         cpu: 1,
         memory: 1024,
         rootfs_size: 0,
@@ -151,10 +132,10 @@ async function main() {
   await deploy(grid3, vms);
 
   //Get the deployment
-  await getDeployment(grid3, vms.name);
+  await getDeployment(grid3, name);
 
   //Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name: machines_name });
+  // await cancel(grid3, { name });
   // await deleteQsfs(grid3, { name: qsfs_name });
 
   await grid3.disconnect();

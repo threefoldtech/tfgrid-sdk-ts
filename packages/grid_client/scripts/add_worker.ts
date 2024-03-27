@@ -5,40 +5,29 @@ import { log } from "./utils";
 // Please run kubernetes script first before running this one to create the cluster.
 
 async function addWorker(client, worker) {
-  try {
-    const res = await client.k8s.add_worker(worker);
-    log("================= Adding worker =================");
-    log(res);
-    log("================= Adding worker =================");
-  } catch (error) {
-    log("Error while adding the worker" + error);
-  }
+  const res = await client.k8s.add_worker(worker);
+  log("================= Adding worker =================");
+  log(res);
+  log("================= Adding worker =================");
 }
 
 async function getWorker(client, worker) {
-  try {
-    const res = await client.k8s.getObj(worker);
-    log("================= Getting worker information =================");
-    log(res);
-    log("================= Getting worker information =================");
-  } catch (error) {
-    log("Error while getting the worker" + error);
-  }
+  const res = await client.k8s.getObj(worker);
+  log("================= Getting worker information =================");
+  log(res);
+  log("================= Getting worker information =================");
 }
 
 async function deleteWorker(client, worker) {
-  try {
-    const res = await client.k8s.delete_worker(worker);
-    log("================= Deleting the worker =================");
-    log(res);
-    log("================= Deleting the worker =================");
-  } catch (error) {
-    log("Error while deleting the worker" + error);
-  }
+  const res = await client.k8s.delete_worker(worker);
+  log("================= Deleting the worker =================");
+  log(res);
+  log("================= Deleting the worker =================");
 }
 
 async function main() {
-  const grid3 = await getClient();
+  const name = "testk8s";
+  const grid3 = await getClient(`kubernetes/${name}`);
 
   const workerQueryOptions: FilterOptions = {
     cru: 2,
@@ -48,7 +37,7 @@ async function main() {
   };
 
   const worker: AddWorkerModel = {
-    deployment_name: "testk8s",
+    deployment_name: name,
     name: "worker2",
     node_id: +(await grid3.capacity.filterNodes(workerQueryOptions))[0].nodeId,
     cpu: 2,
@@ -58,16 +47,17 @@ async function main() {
     public_ip: false,
     public_ip6: false,
     planetary: true,
+    mycelium: false,
   };
 
   //Add Worker
   await addWorker(grid3, worker);
 
   //Get worker information
-  await getWorker(grid3, worker.deployment_name);
+  await getWorker(grid3, name);
 
   //Uncomment the line below to delete the worker
-  // await deleteWorker(grid3, { name: worker.name, deployment_name: worker.deployment_name });
+  // await deleteWorker(grid3, { name: worker.name, deployment_name: name });
 
   await grid3.disconnect();
 }

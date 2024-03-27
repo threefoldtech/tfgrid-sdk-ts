@@ -51,8 +51,10 @@ export interface GridNode {
   id: string;
   nodeId: number;
   farmId: number;
+  farmName: string;
   twinId: number;
   country: string;
+  region: string;
   gridVersion: number;
   city: string;
   uptime: number;
@@ -74,6 +76,7 @@ export interface GridNode {
   stats: NodeStats;
   cards: GPUCard[];
   num_gpu: number;
+  healthy: boolean;
 }
 
 export class GatewaysClient extends AbstractClient<GatewayBuilder, GatewaysQuery> {

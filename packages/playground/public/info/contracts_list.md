@@ -2,10 +2,10 @@
 title: Contracts
 ---
 
-For more details about Contract Types, Billing Cycle & Grace Period, check [Contract Documentation](https://manual.grid.tf/tfchain/tfchain.html)
+For more details about Contract Types, Billing Cycle & Grace Period, check [Contract Documentation](https://www.manual.grid.tf/documentation/developers/tfchain/tfchain.html)
 <br />
 
-To explore further contract details, check [Node Contract Documentation](https://manual.grid.tf/playground/contracts_list.html)
+To explore further contract details, check [Node Contract Documentation](https://www.manual.grid.tf/documentation/dashboard/deploy/your_contracts.html)
 <br />
 
 - Contract State provides you with the following information:

@@ -57,12 +57,12 @@
           </password-input-wrapper>
         </input-validator>
 
-        <Network required v-model:ipv4="ipv4" v-model:planetary="planetary" ref="network" />
+        <Network required v-model:ipv4="ipv4" v-model:planetary="planetary" v-model:mycelium="mycelium" ref="network" />
 
         <input-tooltip
           inline
-          tooltip="Click to know more about dedicated nodes."
-          href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+          tooltip="Click to know more about dedicated machines."
+          href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
         >
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>
@@ -142,6 +142,7 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const selectionDetails = ref<SelectionDetails>();
+const mycelium = ref(false);
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -172,6 +173,7 @@ async function deploy() {
           ],
           planetary: planetary.value,
           publicIpv4: ipv4.value,
+          mycelium: mycelium.value,
           envs: [
             {
               key: "SSH_KEY",

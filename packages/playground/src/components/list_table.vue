@@ -16,7 +16,6 @@
       <div class="d-flex align-center justify-space-between">
         <span>#</span>
         <div class="d-flex">
-          <v-divider vertical class="ml-3 mr-1" />
           <v-checkbox-btn
             :model-value="selectedItems.length > 0 && selectedItems.length === items.length"
             :indeterminate="selectedItems.length > 0 && items.length !== selectedItems.length"
@@ -31,11 +30,9 @@
       <div class="d-flex align-center justify-space-between">
         <span>{{ index + 1 }}</span>
         <div class="d-flex" @click.stop>
-          <v-divider vertical class="ml-3 mr-1" />
           <v-progress-circular
             v-if="deleting && selectedItems.includes(item?.value)"
             class="ml-3"
-            indeterminate
             color="red"
             :width="2"
             :size="20"
@@ -59,12 +56,19 @@
     <template #bottom>
       <v-row class="mt-5" v-if="loading && items.length === 0">
         <v-spacer />
-        <v-progress-circular indeterminate color="primary" />
+        <div class="d-flex my-6 align-center justify-center">
+          <v-progress-circular :width="3" :size="30" />
+        </div>
         <v-spacer />
       </v-row>
-      <p v-else-if="!loading && items.length === 0 && noDataText" class="text-center mt-8">
-        {{ noDataText }}
-      </p>
+      <template v-else-if="!loading && items.length === 0 && (noDataText || $slots['no-data-text'])">
+        <VContainer>
+          <VRow justify="center" align="center" class="mt-5">
+            <slot name="no-data-text" v-if="$slots['no-data-text']" />
+            <p v-else v-text="noDataText" />
+          </VRow>
+        </VContainer>
+      </template>
     </template>
   </v-data-table>
 </template>

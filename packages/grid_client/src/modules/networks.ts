@@ -26,7 +26,10 @@ class NetworkModule extends BaseModule {
       options.ipRange,
       options.nodeId,
       options.solutionProviderId!,
+      options.mycelium,
       options.description,
+      "",
+      [{ nodeId: options.nodeId, seed: options.myceliumSeed! }],
     );
     return { contracts: await this.twinDeploymentHandler.handle(twinDeployments) };
   }
@@ -45,9 +48,7 @@ class NetworkModule extends BaseModule {
   @expose
   @validateInput
   async getWireGuardConfigs(options: NetworkGetModel) {
-    const path = PATH.join(this.config.storePath, this.moduleName, options.name, "info.json");
-    const networkInfo = await this.backendStorage.load(path);
-    return networkInfo["wireguardConfigs"];
+    return await this.network.getWireguardConfigs(options.name, options.ipRange);
   }
 }
 

@@ -1,5 +1,14 @@
 import { Expose, Type } from "class-transformer";
-import { ArrayNotEmpty, IsDefined, IsInt, IsNotEmpty, IsString, ValidateNested } from "class-validator";
+import {
+  ArrayNotEmpty,
+  IsDefined,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Length,
+  ValidateNested,
+} from "class-validator";
 
 import { WorkloadData } from "./workload_base";
 
@@ -22,12 +31,18 @@ class Peer {
   }
 }
 
+class Mycelium {
+  @Expose() @IsString() @IsNotEmpty() hex_key: string;
+  @Expose() @IsOptional() @IsString({ each: true }) peers?: string[];
+}
+
 class Znet extends WorkloadData {
   @Expose() @IsString() @IsNotEmpty() subnet: string;
   @Expose() @IsString() @IsNotEmpty() ip_range: string;
   @Expose() @IsString() @IsNotEmpty() wireguard_private_key: string;
   @Expose() @IsInt() @IsNotEmpty() wireguard_listen_port: number;
   @Expose() @Type(() => Peer) @ValidateNested({ each: true }) peers: Peer[];
+  @Expose() @Type(() => Mycelium) @ValidateNested() mycelium: Mycelium;
 
   challenge(): string {
     let out = "";
@@ -38,6 +53,10 @@ class Znet extends WorkloadData {
 
     for (let i = 0; i < this.peers.length; i++) {
       out += this.peers[i].challenge();
+    }
+    out += this.mycelium?.hex_key || "";
+    for (let i = 0; i < this.mycelium?.peers?.length; i++) {
+      out += this.mycelium?.peers[i] || "";
     }
     return out;
   }

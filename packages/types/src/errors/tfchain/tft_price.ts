@@ -13,54 +13,54 @@ export enum Errors {
 }
 
 class TFTPrice extends BaseError {
-  constructor(code: number, message: string) {
-    super(code, message, ErrorModules.TFTPrice);
+  constructor(name: string, code: number, message: string) {
+    super(name, code, message, ErrorModules.TFTPrice);
   }
 }
 export class ErrFetchingPrice extends TFTPrice {
   constructor(message: string) {
-    super(Errors.ErrFetchingPrice, message);
+    super("ErrFetchingPrice", Errors.ErrFetchingPrice, message);
   }
 }
 
 export class OffchainSignedTxError extends TFTPrice {
   constructor(message: string) {
-    super(Errors.OffchainSignedTxError, message);
+    super("OffchainSignedTxError", Errors.OffchainSignedTxError, message);
   }
 }
 
 export class NoLocalAcctForSigning extends TFTPrice {
   constructor(message: string) {
-    super(Errors.NoLocalAcctForSigning, message);
+    super("NoLocalAcctForSigning", Errors.NoLocalAcctForSigning, message);
   }
 }
 
 export class AccountUnauthorizedToSetPrice extends TFTPrice {
   constructor(message: string) {
-    super(Errors.AccountUnauthorizedToSetPrice, message);
+    super("AccountUnauthorizedToSetPrice", Errors.AccountUnauthorizedToSetPrice, message);
   }
 }
 
 export class MaxPriceBelowMinPriceError extends TFTPrice {
   constructor(message: string) {
-    super(Errors.MaxPriceBelowMinPriceError, message);
+    super("MaxPriceBelowMinPriceError", Errors.MaxPriceBelowMinPriceError, message);
   }
 }
 
 export class MinPriceAboveMaxPriceError extends TFTPrice {
   constructor(message: string) {
-    super(Errors.MinPriceAboveMaxPriceError, message);
+    super("MinPriceAboveMaxPriceError", Errors.MinPriceAboveMaxPriceError, message);
   }
 }
 
 export class IsNotAnAuthority extends TFTPrice {
   constructor(message: string) {
-    super(Errors.IsNotAnAuthority, message);
+    super("IsNotAnAuthority", Errors.IsNotAnAuthority, message);
   }
 }
 
 export class WrongAuthority extends TFTPrice {
   constructor(message: string) {
-    super(Errors.WrongAuthority, message);
+    super("WrongAuthority", Errors.WrongAuthority, message);
   }
 }

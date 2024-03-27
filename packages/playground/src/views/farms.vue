@@ -1,34 +1,97 @@
 <template>
   <view-layout>
-    <v-row>
-      <v-col>
-        <filters
-          v-model="filterFarmInputs"
-          @update:model-value="inputFiltersReset"
-          :form-disabled="isFormLoading"
-          v-model:valid="isValidForm"
-        />
+    <TfFiltersContainer @apply="loadFarms(true)" class="mb-4" :loading="loading">
+      <TfFilter
+        query-route="farm-id"
+        v-model="filters.farmId"
+        :rules="[
+          validators.isNumeric('This field accepts numbers only.', {
+            no_symbols: true,
+          }),
+          validators.min('The ID should be larger than zero.', 1),
+          validators.isInt('should be an integer'),
+          validators.validateResourceMaxNumber('This is not a valid ID.'),
+        ]"
+      >
+        <template #input="{ props }">
+          <VTextField label="Farm ID" variant="outlined" v-model="filters.farmId" v-bind="props">
+            <template #append-inner>
+              <VTooltip text="Filter by farm id">
+                <template #activator="{ props }">
+                  <VIcon icon="mdi-information-outline" v-bind="props" />
+                </template>
+              </VTooltip>
+            </template>
+          </VTextField>
+        </template>
+      </TfFilter>
 
-        <v-data-table-server
-          :loading="loading"
-          :headers="headers"
-          :items="farms"
-          :items-length="totalFarms"
-          :items-per-page-options="[
-            { value: 5, title: '5' },
-            { value: 10, title: '10' },
-            { value: 15, title: '15' },
-          ]"
-          v-model:items-per-page="size"
-          v-model:page="page"
-          :disable-sort="true"
-          :on-update:model-value="updateQueries"
-          @click:row="openSheet"
-        >
-          <template #loading />
-        </v-data-table-server>
-      </v-col>
-    </v-row>
+      <TfFilter query-route="farm-name" v-model="filters.farmName">
+        <template #unwrap="{ colProps }">
+          <VCol v-bind="colProps">
+            <TfSelectFarm
+              inset-tooltip
+              variant="outlined"
+              tooltip="Filter by farm name."
+              :model-value="filters.farmName ? ({ name: filters.farmName } as any) : undefined"
+              @update:model-value="filters.farmName = $event?.name || ''"
+            />
+          </VCol>
+        </template>
+      </TfFilter>
+
+      <TfFilter
+        query-route="free-public-ips"
+        v-model="filters.freePublicIps"
+        :rules="[
+          validators.isNumeric('This field accepts numbers only.', {
+            no_symbols: true,
+          }),
+          validators.min('Free Public IP should be larger than zero.', 1),
+          validators.isInt('should be an integer'),
+          validators.validateResourceMaxNumber('This is not a valid public IP.'),
+        ]"
+      >
+        <template #input="{ props }">
+          <VTextField label="Free Public IPs" variant="outlined" v-model="filters.freePublicIps" v-bind="props">
+            <template #append-inner>
+              <VTooltip text="Filter by free public IPs">
+                <template #activator="{ props }">
+                  <VIcon icon="mdi-information-outline" v-bind="props" />
+                </template>
+              </VTooltip>
+            </template>
+          </VTextField>
+        </template>
+      </TfFilter>
+    </TfFiltersContainer>
+
+    <v-data-table-server
+      :loading="loading"
+      :headers="headers"
+      :items="farms"
+      :items-length="totalFarms"
+      :items-per-page-options="[
+        { value: 5, title: '5' },
+        { value: 10, title: '10' },
+        { value: 15, title: '15' },
+      ]"
+      :items-per-page="size"
+      @update:items-per-page="
+        size = $event;
+        loadFarms();
+      "
+      :page="page"
+      @update:page="
+        page = $event;
+        loadFarms();
+      "
+      :disable-sort="true"
+      @click:row="openSheet"
+    >
+      <template #loading />
+    </v-data-table-server>
+
     <v-dialog v-model="dialog" hide-overlay transition="dialog-bottom-transition">
       <v-container>
         <v-toolbar :height="35">
@@ -41,7 +104,7 @@
 
         <template v-if="loading">
           <div color="transparent" class="text-center">
-            <v-progress-circular color="primary" indeterminate :size="50" :width="5" />
+            <v-progress-circular />
             <p>Loading farm details...</p>
           </div>
         </template>
@@ -63,118 +126,64 @@
 
 <script lang="ts" setup>
 import type { Farm } from "@threefold/gridproxy_client";
-import debounce from "lodash/debounce.js";
-import { computed, onMounted, ref, watch } from "vue";
+import { ref } from "vue";
 
 import type { VDataTableHeader } from "@/types";
-import type { FarmFilterOptions, MixedFarmFilter } from "@/types";
-import type { FilterFarmInputs } from "@/utils/filter_farms";
-import { inputsInitializer } from "@/utils/filter_farms";
-import { getAllFarms, getFarmQueries } from "@/utils/get_farms";
+import { getAllFarms } from "@/utils/get_farms";
 const loading = ref<boolean>(false);
 const farms = ref<Farm[]>();
 
-const selectedFarm = ref<Farm>();
-const filterFarmInputs = ref<FilterFarmInputs>(inputsInitializer());
-const size = ref(10);
 const page = ref(1);
+const size = ref(window.env.PAGE_SIZE);
+const filters = ref({
+  farmId: "",
+  farmName: "",
+  freePublicIps: "",
+});
 
+const selectedFarm = ref<Farm>();
 const dialog = ref(false);
 
-const filterOptions = ref<FarmFilterOptions>({
-  size: size.value,
-  page: page.value,
-});
-
-const mixedFarmFilters = computed<MixedFarmFilter>(() => ({
-  inputs: filterFarmInputs.value,
-  options: filterOptions.value,
-}));
-
-const isFormLoading = ref<boolean>(true);
-const isValidForm = ref<boolean>(false);
 const totalFarms = ref(0);
 
-const _getFarms = async (queries: Partial<FarmsQuery>) => {
-  if (isValidForm.value) {
-    loading.value = true;
-    isFormLoading.value = true;
-    try {
-      const { count, data } = await getAllFarms(queries);
+async function loadFarms(retCount = false) {
+  loading.value = true;
+  if (retCount) page.value = 1;
+  try {
+    const { count, data } = await getAllFarms({
+      retCount,
+      farmId: +filters.value.farmId || undefined,
+      freeIps: +filters.value.freePublicIps || undefined,
+      nameContains: filters.value.farmName || undefined,
+      page: page.value,
+      size: size.value,
+    });
 
-      if (data) {
-        totalFarms.value = count || 0;
-        farms.value = data.map(farm => {
-          const ips = farm.publicIps;
-          const total = ips.length;
-          const used = ips.filter(x => x.contract_id !== 0).length;
-          return {
-            ...farm,
-            totalPublicIp: total,
-            freePublicIp: total - used,
-          };
-        });
-      }
-    } catch (err) {
-      console.log("could not get farms:", err);
-      createCustomToast("Failed to get farms!", ToastType.danger);
-    } finally {
-      isFormLoading.value = false;
-      loading.value = false;
+    if (data) {
+      if (retCount) totalFarms.value = count || 0;
+      farms.value = data.map(farm => {
+        const ips = farm.publicIps;
+        const total = ips.length;
+        const used = ips.filter(x => x.contract_id !== 0).length;
+        return {
+          ...farm,
+          totalPublicIp: total,
+          freePublicIp: total - used,
+        };
+      });
     }
+  } catch (err) {
+    console.log("could not get farms:", err);
+    createCustomToast("Failed to get farms!", ToastType.danger);
+  } finally {
+    loading.value = false;
   }
-};
-onMounted(async () => {
-  await updateFarms();
-});
-
-const request = debounce(_getFarms, 1000);
-
-const updateFarms = async () => {
-  const queries = await getFarmQueries(mixedFarmFilters.value);
-
-  await request(queries);
-};
-
-const updateQueries = async () => {
-  const inputs = mixedFarmFilters.value.inputs;
-  if (inputs && filterFarmInputs.value) {
-    const filtersInputValues = filterFarmInputs.value;
-    if (filtersInputValues.farmId) {
-      inputs.farmId.value = filtersInputValues.farmId.value;
-    }
-    if (filtersInputValues.name) {
-      inputs.name.value = filtersInputValues.name.value;
-    }
-    if (filtersInputValues.freeIps) {
-      inputs.freeIps.value = filtersInputValues.freeIps.value;
-    }
-  }
-  const options = mixedFarmFilters.value.options;
-  if (options) {
-    options.page = page.value;
-    options.size = size.value;
-  }
-  await updateFarms();
-};
-
-watch(mixedFarmFilters, updateFarms, { deep: true });
-watch(filterFarmInputs, updateQueries, { deep: true });
-watch(page, updateQueries);
-watch(size, updateQueries);
-
-// The filters should reset to the default value again..
-const inputFiltersReset = (filtersInputValues: FilterFarmInputs) => {
-  filterFarmInputs.value = filtersInputValues;
-  filterOptions.value = {
-    page: 1,
-    size: 10,
-  };
-};
+}
 
 const openSheet = (_e: any, { item }: any) => {
   openDialog(item.value);
 };
+
 const openDialog = (item: Farm) => {
   selectedFarm.value = item;
   dialog.value = true;
@@ -211,18 +220,22 @@ const headers: VDataTableHeader = [
 </script>
 
 <script lang="ts">
-import type { FarmsQuery } from "@threefold/gridproxy_client";
-
-import Filters from "@/components/filter.vue";
 import FarmDetailsCard from "@/components/node_details_cards/farm_details_card.vue";
 import TwinDetailsCard from "@/components/node_details_cards/twin_details_card.vue";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
+
+import TfFilter from "../components/filters/TfFilter.vue";
+import TfFiltersContainer from "../components/filters/TfFiltersContainer.vue";
+import TfSelectFarm from "../components/node_selector/TfSelectFarm.vue";
+
 export default {
   name: "Farms",
   components: {
-    Filters,
     FarmDetailsCard,
     TwinDetailsCard,
+    TfFiltersContainer,
+    TfFilter,
+    TfSelectFarm,
   },
 };
 </script>

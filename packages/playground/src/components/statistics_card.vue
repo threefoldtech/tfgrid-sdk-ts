@@ -8,7 +8,7 @@
         </span>
       </div>
 
-      <v-divider class="mt-1 text-red-700" />
+      <v-divider class="mt-1" />
 
       <v-card-text class="card-body"> {{ item.data }} </v-card-text>
     </v-card>

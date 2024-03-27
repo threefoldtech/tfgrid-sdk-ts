@@ -99,12 +99,14 @@
                   <input-validator
                     :value="address"
                     :rules="[validators.required('Address is required.'), customStellarValidation]"
+                    :async-rules="[validators.isValidStellarAddress]"
                     #="{ props }"
                   >
                     <v-text-field
                       v-model="address"
                       v-bind="props"
                       outlined
+                      :loading="props.loading"
                       label="Stellar Wallet Address"
                     ></v-text-field>
                   </input-validator>
@@ -147,6 +149,7 @@ import {
   getNodeMintingFixupReceipts,
   type NodeInterface,
 } from "@/utils/node";
+import { notifyDelaying } from "@/utils/notifications";
 
 import AddIP from "./add_ip.vue";
 import PublicIPsTable from "./public_ips_table.vue";
@@ -204,7 +207,6 @@ export default {
     const refreshPublicIPs = ref(false);
 
     const reloadFarms = debounce(getUserFarms, 20000);
-    context.expose({ reloadFarms });
     function filter(items: Farm[]) {
       const start = (page.value - 1) * pageSize.value;
       const end = start + pageSize.value;
@@ -247,7 +249,7 @@ export default {
         await gridStore.grid.farms.addStellarAddress({ farmId, stellarAddress });
         createCustomToast("Address Added successfully!", ToastType.success);
         showDialogue.value = false;
-        createCustomToast("Table may take sometime to update the changes.", ToastType.info);
+        notifyDelaying();
         await reloadFarms();
       } catch (error) {
         console.log(error);
@@ -331,6 +333,11 @@ export default {
       refreshPublicIPs.value = !refreshPublicIPs.value;
     }
 
+    function getFarmsNames() {
+      return farms.value?.map(farm => farm.name.toLocaleLowerCase());
+    }
+
+    context.expose({ getFarmsNames, reloadFarms });
     return {
       gridStore,
       headers,
@@ -354,6 +361,7 @@ export default {
       downloadFarmReceipts,
       handleIpAdded,
       refreshPublicIPs,
+      getFarmsNames,
     };
   },
 };

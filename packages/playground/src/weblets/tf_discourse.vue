@@ -58,11 +58,12 @@
           :medium="{ cpu: 2, memory: 4, disk: 50 }"
           :large="{ cpu: 4, memory: 16, disk: 100 }"
         />
+        <Networks v-model:mycelium="mycelium" />
 
         <input-tooltip
           inline
-          tooltip="Click to know more about dedicated nodes."
-          href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+          tooltip="Click to know more about dedicated machines."
+          href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
         >
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>
@@ -87,7 +88,7 @@
       </template>
 
       <template #mail>
-        <SmtpServer v-model="smtp" :persistent="true" :tls="true">
+        <SmtpServer v-model="smtp" :persistent="true" :tls="true" :is-discourse="true">
           Discourse needs SMTP service so please configure these settings properly.
         </SmtpServer>
       </template>
@@ -119,9 +120,10 @@ const layout = useLayout();
 const tabs = ref();
 const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "dc" }));
-const email = ref("");
+const email = ref(profileManager.profile?.email || "");
 const solution = ref() as Ref<SolutionFlavor>;
 const ipv4 = ref(false);
+const mycelium = ref(false);
 const smtp = ref(createSMTPServer());
 const dedicated = ref(false);
 const certified = ref(false);
@@ -178,6 +180,7 @@ async function deploy() {
           rootFilesystemSize: rootFilesystemSize.value,
           publicIpv4: ipv4.value,
           planetary: true,
+          mycelium: mycelium.value,
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "DISCOURSE_HOSTNAME", value: domain },
@@ -231,6 +234,7 @@ function generatePubKey(): string {
 </script>
 
 <script lang="ts">
+import Networks from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
 import { deploymentListEnvironments } from "../constants";
@@ -238,6 +242,6 @@ import type { SelectionDetails } from "../types/nodeSelector";
 
 export default {
   name: "TfDiscourse",
-  components: { SmtpServer, SelectSolutionFlavor },
+  components: { SmtpServer, SelectSolutionFlavor, Networks },
 };
 </script>

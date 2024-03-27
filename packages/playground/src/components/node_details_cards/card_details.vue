@@ -1,13 +1,16 @@
 <template>
   <v-card :loading="loading">
-    <v-alert class="pa-5" style="height: 20px">
+    <v-alert class="pa-5" style="height: 20px" v-if="title">
       <h4 class="text-center font-weight-medium">
         <v-icon :icon="icon" size="large" />
         {{ title }}
       </h4>
     </v-alert>
     <v-card-item :class="`mt-2 mb-2 ${$props.isMap ? 'map' : ''}`">
-      <div v-if="$props.isMap">
+      <v-alert type="error" variant="tonal" class="mt-2 mb-4" v-if="$props.error">
+        {{ $props.error }}
+      </v-alert>
+      <div v-else-if="$props.isMap">
         <tf-map :nodes="transformedObject" r="76" g="187" b="217"></tf-map>
       </div>
 
@@ -15,16 +18,27 @@
         <slot name="gpu-hint-message" />
 
         <v-row class="bb-gray" v-for="item in items" :key="item.name">
-          <v-col class="d-flex justify-start align-center ml-3">
+          <v-col v-if="$props.iperf" class="font-14 d-flex justify-space-between">
+            <p class="ml-20 font-14">{{ item.name }}/{{ item.type }}</p>
+            <div>
+              <v-icon icon="mdi-arrow-up"></v-icon>
+              <span class="mx-3">{{ item.uploadSpeed }}</span>
+            </div>
+            <div>
+              <v-icon icon="mdi-arrow-down"></v-icon>
+              <span class="mx-3">{{ item.downloadSpeed }}</span>
+            </div>
+          </v-col>
+          <v-col v-if="!$props.iperf" class="d-flex justify-start align-center ml-3">
             <p class="font-14">{{ item.name }}</p>
             <v-chip class="ml-4" v-if="item.nameHint" :color="item.nameHintColor">{{ item.nameHint }}</v-chip>
           </v-col>
-          <v-col class="d-flex justify-end align-center mr-3">
+          <v-col v-if="!$props.iperf" class="d-flex overflowText justify-end align-center mr-3">
             <p class="font-14" v-if="!item.icon && !item.hint && !item.imgSrc">
               {{ item.value && item.value.length > maxLenChar ? item.value.slice(0, maxLenChar) + "..." : item.value }}
             </p>
 
-            <v-tooltip v-if="item.hint && !item.icon" location="top" :text="item.hint">
+            <v-tooltip class="overflowText" v-if="item.hint && !item.icon" location="top" :text="item.hint">
               <template #activator="{ props }">
                 <p class="font-14" v-bind="props">
                   {{
@@ -34,7 +48,7 @@
               </template>
             </v-tooltip>
 
-            <v-tooltip v-if="item.hint && item.icon" location="top" :text="item.hint">
+            <v-tooltip class="overflowText" v-if="item.hint && item.icon" location="top" :text="item.hint">
               <template #activator="{ props }">
                 <p class="font-14" v-bind="props">
                   {{
@@ -74,7 +88,7 @@ export default {
   props: {
     title: {
       type: String,
-      required: true,
+      required: false,
     },
 
     icon: {
@@ -98,6 +112,16 @@ export default {
 
     isMap: {
       type: Boolean,
+      required: false,
+    },
+
+    iperf: {
+      type: Boolean,
+      required: false,
+    },
+
+    error: {
+      type: String,
       required: false,
     },
   },
@@ -128,5 +152,11 @@ export default {
   overflow: hidden;
   display: flex;
   justify-content: center;
+}
+
+.overflowText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

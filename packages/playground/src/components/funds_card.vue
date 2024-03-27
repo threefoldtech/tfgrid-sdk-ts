@@ -21,7 +21,7 @@
         icon
         small
         @click.stop
-        href="https://manual.grid.tf/threefold_token/buy_sell_tft/gettft.html"
+        href="https://www.manual.grid.tf/documentation/threefold_token/buy_sell_tft/buy_sell_tft.html"
         target="_blank"
         ><v-icon>mdi-information-outline</v-icon></v-btn
       >

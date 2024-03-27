@@ -13,7 +13,7 @@
         <!-- TwinID Transfer -->
         <v-window-item :value="0">
           <v-card class="pa-5 my-5" flat>
-            <form-validator v-model="isValidTwinIDTransfer">
+            <form-validator :key="tick" v-model="isValidTwinIDTransfer">
               <input-validator
                 :value="recipientTwinId"
                 :rules="[
@@ -32,14 +32,14 @@
               </input-validator>
 
               <input-validator
-                v-if="!loadingBalance"
                 :value="transferAmount"
+                ref="amountRef"
                 :rules="[
                   validators.required('Transfer amount is required '),
                   validators.isNumeric('Amount should be a number.'),
                   validators.min('Amount must be greater than 0.001', 0.001),
                   validators.isDecimal('Amount can have 3 decimals only.', { decimal_digits: '0,3' }),
-                  validators.max('Insufficient funds.', freeBalance - 0.01),
+                  validators.max('Insufficient funds.', /* freeBalance // - */ 1 - 0.01),
                 ]"
                 #="{ props }"
               >
@@ -47,11 +47,12 @@
                   <v-text-field label="Transfer Amount:" v-bind="props" v-model.number="transferAmount"></v-text-field>
                 </input-tooltip>
               </input-validator>
-              <strong v-else>Loading...</strong>
             </form-validator>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn @click="clearInput" color="anchor" variant="outlined">Clear</v-btn>
+              <v-btn @click="clearInput" color="anchor" :disabled="loadingTwinIDTransfer" variant="outlined"
+                >Clear</v-btn
+              >
               <v-btn
                 color="secondary"
                 variant="outlined"
@@ -67,7 +68,7 @@
 
         <v-window-item :value="1">
           <v-card class="pa-5 my-5" flat>
-            <form-validator v-model="isValidAddressTransfer">
+            <form-validator :key="tick" v-model="isValidAddressTransfer">
               <input-validator
                 :value="recipientAddress"
                 :rules="[
@@ -83,14 +84,14 @@
                 </input-tooltip>
               </input-validator>
               <input-validator
-                v-if="!loadingBalance"
                 :value="transferAmount"
+                ref="amountRef"
                 :rules="[
                   validators.required('Transfer amount is required '),
                   validators.isNumeric('Amount should be a number.'),
                   validators.min('Amount must be greater than 0.001', 0.001),
                   validators.isDecimal('Amount can have 3 decimals only.', { decimal_digits: '0,3' }),
-                  validators.max('Insufficient funds.', freeBalance - 0.01),
+                  validators.max('Insufficient funds.', /* freeBalance // - */ 1 - 0.01),
                 ]"
                 #="{ props }"
               >
@@ -98,11 +99,12 @@
                   <v-text-field label="Transfer Amount:" v-bind="props" v-model.number="transferAmount"></v-text-field>
                 </input-tooltip>
               </input-validator>
-              <strong v-else>Loading...</strong>
             </form-validator>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn @click="clearInput" color="anchor" variant="outlined">Clear</v-btn>
+              <v-btn @click="clearInput" color="anchor" :disabled="loadingAddressTransfer" variant="outlined"
+                >Clear</v-btn
+              >
 
               <v-btn
                 color="secondary"
@@ -123,47 +125,58 @@
 <script lang="ts" setup>
 import { Keyring } from "@polkadot/keyring";
 import type { Twin } from "@threefold/tfchain_client";
-import { onMounted, ref } from "vue";
+import { TwinNotExistError } from "@threefold/types";
+import { computed, ref, watch } from "vue";
 
 import { useWalletService } from "../hooks/wallet_connector";
-import { useProfileManager } from "../stores";
+import { useGrid, useProfileManager } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
-import { getGrid, loadBalance } from "../utils/grid";
 
 const walletService = useWalletService();
+// import { useProfileManagerController } from "../components/profile_manager_controller.vue"; // -
+
+const gridStore = useGrid();
+// const profileManagerController = useProfileManagerController(); // -
 const activeTab = ref(0);
 const recipientTwinId = ref("");
 const isValidTwinIDTransfer = ref(false);
-const transferAmount = ref(1);
+const transferAmount = ref();
+const amountRef = ref();
 const loadingTwinIDTransfer = ref(false);
 const loadingAddressTransfer = ref(false);
 const isValidAddressTransfer = ref(false);
 const recipientAddress = ref("");
 const profileManager = useProfileManager();
 const profile = ref(profileManager.profile!);
-const loadingBalance = ref(true);
 const recepTwinFromAddress = ref<Twin>();
 const receptTwinFromTwinID = ref<Twin>();
-const freeBalance = ref(0);
-onMounted(async () => {
-  await getFreeBalance();
-});
+// const balance = profileManagerController.balance; // -
+// const freeBalance = computed(() => balance.value?.free ?? 0); // -
+
+// watch(freeBalance, async () => {
+//   if (transferAmount.value) {
+//     await amountRef.value?.reset();
+//     amountRef.value?.validate();
+//   }
+// }); // -
+
+const tick = ref(0);
 function isSameTwinID(value: string) {
   if (parseInt(value.trim()) == profile.value?.twinId) {
     return { message: "Cannot transfer to yourself" };
   }
 }
 async function isValidTwinID(value: string) {
-  const grid = await getGrid(profile.value);
   try {
-    if (grid) {
-      receptTwinFromTwinID.value = await grid.twins.get({ id: parseInt(value.trim()) });
+    if (gridStore) {
+      receptTwinFromTwinID.value = await gridStore.client.twins.get({ id: parseInt(value.trim()) });
       if (receptTwinFromTwinID.value == null) {
-        return { message: "Invalid Twin ID. This ID has no Twin." };
+        return { message: "This twin id doesn't exist" };
       }
     }
   } catch (err) {
-    return { message: "Invalid Twin ID. This ID has no Twin." };
+    if (err instanceof TwinNotExistError) return { message: "This twin id doesn't exist" };
+    else return { message: "Couldn't validate twin id" };
   }
 }
 function isSameAddress(value: string) {
@@ -172,7 +185,6 @@ function isSameAddress(value: string) {
   }
 }
 async function isValidAddress() {
-  const grid = await getGrid(profile.value);
   const keyring = new Keyring({ type: "sr25519" });
   try {
     keyring.addFromAddress(recipientAddress.value.trim());
@@ -180,11 +192,11 @@ async function isValidAddress() {
     return { message: "Invalid address." };
   }
   try {
-    if (grid) {
-      const twinId = await grid.twins.get_twin_id_by_account_id({
+    if (gridStore) {
+      const twinId = await gridStore.client.twins.get_twin_id_by_account_id({
         public_key: recipientAddress.value.trim(),
       });
-      recepTwinFromAddress.value = await grid.twins.get({ id: twinId });
+      recepTwinFromAddress.value = await gridStore.client.twins.get({ id: twinId });
       if (recepTwinFromAddress.value == null) {
         return { message: "Twin ID doesn't exist" };
       }
@@ -194,27 +206,19 @@ async function isValidAddress() {
   }
 }
 function clearInput() {
-  transferAmount.value = 1;
+  transferAmount.value = undefined;
   recipientTwinId.value = "";
   recipientAddress.value = "";
+  tick.value++;
 }
-async function getFreeBalance() {
-  const grid = await getGrid(profile.value);
-  if (grid) {
-    loadingBalance.value = true;
-    const balance = await loadBalance(grid);
-    freeBalance.value = balance.free;
-    loadingBalance.value = false;
-  }
-}
+
 async function transfer(recipientTwin: Twin) {
-  const grid = await getGrid(profile.value);
   try {
-    if (grid) {
-      await grid.balance.transfer({ address: recipientTwin.accountId, amount: transferAmount.value });
+    if (gridStore) {
+      await gridStore.client.balance.transfer({ address: recipientTwin.accountId, amount: transferAmount.value });
+      clearInput();
       createCustomToast("Transaction Complete!", ToastType.success);
-      walletService.reloadBalance();
-      await getFreeBalance();
+      // profileManagerController.reloadBalance(); // -
     }
   } catch (err) {
     createInvalidTransferToast("transfer failed!");
@@ -229,16 +233,14 @@ function createInvalidTransferToast(message: string) {
   createCustomToast(message, ToastType.danger);
 }
 async function submitFormTwinID() {
-  const grid = await getGrid(profile.value);
-  if (grid) {
-    const twinDetails = await grid.twins.get({ id: parseInt(recipientTwinId.value.trim()) });
+  if (gridStore) {
+    const twinDetails = await gridStore.client.twins.get({ id: parseInt(recipientTwinId.value.trim()) });
     if (twinDetails != null) {
       loadingTwinIDTransfer.value = true;
       await transfer(twinDetails);
       loadingTwinIDTransfer.value = false;
     } else {
       createInvalidTransferToast("twin ID doesn't exist");
-      loadingTwinIDTransfer.value = false;
     }
   }
 }

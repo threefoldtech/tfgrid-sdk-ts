@@ -80,11 +80,11 @@
           :medium="{ cpu: 4, memory: 16, disk: 500 }"
           :large="{ cpu: 8, memory: 32, disk: 1000 }"
         />
-        <Networks v-model:ipv4="ipv4" />
+        <Networks v-model:ipv4="ipv4" v-model:mycelium="mycelium" />
         <input-tooltip
           inline
-          tooltip="Click to know more about dedicated nodes."
-          href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+          tooltip="Click to know more about dedicated machines."
+          href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
         >
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>
@@ -151,7 +151,7 @@ const flist: Flist = {
 const dedicated = ref(false);
 const certified = ref(false);
 const ipv4 = ref(false);
-
+const mycelium = ref(false);
 const smtp = ref(createSMTPServer());
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 
@@ -206,6 +206,7 @@ async function deploy() {
           rootFilesystemSize: rootFilesystemSize.value,
           publicIpv4: ipv4.value,
           planetary: true,
+          mycelium: mycelium.value,
           envs: [
             { key: "SSH_KEY", value: profileManager.profile!.ssh },
             { key: "OWNCLOUD_ADMIN_USERNAME", value: username.value },

@@ -1,5 +1,6 @@
-import type { FarmFilterOptions, FarmInfo, FilterOptions, NodeInfo } from "@threefold/grid_client";
-import { NodeStatus } from "@threefold/gridproxy_client";
+import type { FarmFilterOptions, FarmInfo, FilterOptions, GridClient, NodeInfo } from "@threefold/grid_client";
+import type { NodeStatus } from "@threefold/gridproxy_client";
+import { GridClientErrors } from "@threefold/types";
 import type { DeepPartial } from "utility-types";
 import { z } from "zod";
 
@@ -15,17 +16,43 @@ import type {
   SelectionDetailsFilters,
   SelectionDetailsFiltersValidators,
 } from "../types/nodeSelector";
+import { normalizeError } from "./helpers";
 
-export async function getLocations(): Promise<Locations> {
-  const countries = await gqlClient.countries({ name: true, subregion: true });
-  const stats = await gridProxyClient.stats.get({ status: NodeStatus.Up });
+export async function getLocations(status?: NodeStatus): Promise<Locations> {
+  const countries = await gqlClient.countries({
+    name: true,
+    region: true,
+    subregion: true,
+  });
+  const stats = await gridProxyClient.stats.get({ status });
   const allowedCountriesList = Object.keys(stats.nodesDistribution);
+  const droppedCountries = [
+    {
+      title: "United States of America",
+      name: "United States",
+    },
+    {
+      title: "United Kingdom of Great Britain and Northern Ireland",
+      name: "United Kingdom",
+    },
+    {
+      title: "Czech Republic",
+      name: "Czechia",
+    },
+  ];
 
   const locations: Locations = {};
+
   for (const country of countries) {
+    droppedCountries.forEach(con => {
+      if (con.title == country.name) {
+        country.name = con.name;
+      }
+    });
     if (allowedCountriesList.includes(country.name)) {
-      locations[country.subregion] = locations[country.subregion] || [];
-      locations[country.subregion].push(country.name);
+      const region = country.region !== "unknown region" ? country.region : country.subregion;
+      locations[region] = locations[region] || [];
+      locations[region].push(country.name);
     }
   }
   return locations;
@@ -40,7 +67,7 @@ export function normalizeFarmOptions(
     size: window.env.PAGE_SIZE,
     page: pagination.value.page,
     location: location || {},
-    twinId: gridStore.client.twinId,
+    twinId: gridStore.client?.twinId,
   };
 }
 
@@ -135,7 +162,7 @@ export function normalizeNodeOptions(
     size: window.env.PAGE_SIZE,
     page: pagination.value.page,
     location: location || {},
-    twinId: gridStore.client.twinId,
+    twinId: gridStore.client?.twinId,
     farm,
   };
 }
@@ -161,9 +188,10 @@ export function normalizeNodeFilters(
     rentedBy: filters.dedicated ? options.twinId : undefined,
     certified: filters.certified || undefined,
     availableFor: options.twinId,
-    region: options.location.region,
+    region: options.location.region ? options.location.region : options.location.subregion,
     country: options.location.country,
     gateway: options.gateway,
+    healthy: true,
   };
 }
 
@@ -171,6 +199,31 @@ export function loadNodes(gridStore: ReturnType<typeof useGrid>, filters: Filter
   return gridStore.client.capacity.filterNodes(filters);
 }
 
+export async function validateRentContract(
+  gridStore: ReturnType<typeof useGrid>,
+  node: NodeInfo | undefined | null,
+): Promise<true> | never {
+  if (!node || !node.nodeId) {
+    throw "Node ID is required.";
+  }
+
+  try {
+    if (node.rentContractId !== 0) {
+      const contractInfo = await gridStore.grid.contracts.get({ id: node.rentContractId });
+      if (contractInfo.state.gracePeriod) {
+        throw `You can't deploy on node ${node.nodeId}, its rent contract is in grace period.`;
+      }
+    }
+
+    return true;
+  } catch (error) {
+    const err = normalizeError(
+      error,
+      "Something went wrong while checking status of the node. Please check your connection and try again.",
+    );
+    throw err;
+  }
+}
 export async function loadValidNodes(
   gridStore: ReturnType<typeof useGrid>,
   selectionFitlers: SelectionDetailsFilters,
@@ -230,16 +283,36 @@ function normalizeFiltersValidators(
   validators: DeepPartial<SelectionDetailsFiltersValidators>,
 ): SelectionDetailsFiltersValidators {
   return {
-    cpu: normalizeNumericValidator(validators.cpu, { type: "int", min: 1, max: 32 }),
-    memory: normalizeNumericValidator(validators.memory, { type: "int", min: 256, max: 262144 }),
-    ssdDisks: normalizeNumericValidator(validators.ssdDisks, { type: "int", min: 1, max: 10000 }),
-    hddDisks: normalizeNumericValidator(validators.hddDisks, { type: "int", min: 1, max: 10000 }),
+    cpu: normalizeNumericValidator(validators.cpu, {
+      type: "int",
+      min: 1,
+      max: 32,
+    }),
+    memory: normalizeNumericValidator(validators.memory, {
+      type: "int",
+      min: 256,
+      max: 262144,
+    }),
+    ssdDisks: normalizeNumericValidator(validators.ssdDisks, {
+      type: "int",
+      min: 1,
+      max: 10000,
+    }),
+    hddDisks: normalizeNumericValidator(validators.hddDisks, {
+      type: "int",
+      min: 1,
+      max: 10000,
+    }),
     rootFilesystemSize: normalizeNumericValidator(validators.rootFilesystemSize, {
       type: "number",
       min: 500 / 1024,
       max: 10000,
     }),
-    solutionDisk: normalizeNumericValidator(validators.solutionDisk, { type: "int", min: 15, max: 10000 }),
+    solutionDisk: normalizeNumericValidator(validators.solutionDisk, {
+      type: "int",
+      min: 15,
+      max: 10000,
+    }),
   };
 }
 
@@ -291,7 +364,12 @@ export async function checkNodeCapacityPool(
     });
     return true;
   } catch (error) {
-    if (error?.toString().includes("Cannot fit the required SSD disk with size")) {
+    const err = normalizeError(
+      error,
+      "Something went wrong while checking status of the node. Please check your connection and try again.",
+    );
+
+    if (error instanceof GridClientErrors.Nodes.DiskAllocationError) {
       throw (
         "Although node " +
         node.nodeId +
@@ -300,6 +378,6 @@ export async function checkNodeCapacityPool(
       );
     }
 
-    throw "Something went wrong while checking status of the node. Please check your connection and try again.";
+    throw err;
   }
 }

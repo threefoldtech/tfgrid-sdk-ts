@@ -7,9 +7,14 @@ import { bytesToGB, generateInt, getOnlineNode, log } from "../utils";
 jest.setTimeout(300000);
 
 let gridClient: GridClient;
+let deploymentName: string;
 
 beforeAll(async () => {
-  return (gridClient = await getClient());
+  gridClient = await getClient();
+  deploymentName = generateString(15);
+  gridClient.clientOptions.projectName = `zdb/${deploymentName}`;
+  gridClient._connect();
+  return gridClient;
 });
 
 test("TC1236 - ZDB: Deploy ZDBs", async () => {
@@ -36,7 +41,6 @@ test("TC1236 - ZDB: Deploy ZDBs", async () => {
     **********************************************/
 
   //TestData
-  const name = generateString(15);
   const mode = ZdbModes.user;
   let diskSize = generateInt(1, 20);
   const publicNamespace = false;
@@ -75,7 +79,7 @@ test("TC1236 - ZDB: Deploy ZDBs", async () => {
 
   //Zdb Model
   const zdb: ZDBModel = {
-    name: name,
+    name: deploymentName,
     node_id: nodeId,
     mode: mode,
     disk_size: diskSize,
@@ -111,7 +115,7 @@ test("TC1236 - ZDB: Deploy ZDBs", async () => {
   expect(result[0].password).toBe(password);
   expect(result[0].metadata).toBe(metadata);
   expect(result[0].description).toBe(description);
-  expect(result[0].resData["Namespace"]).toContain(name);
+  expect(result[0].resData["Namespace"]).toContain(deploymentName);
   expect(result[0].resData["IPs"]).toBeDefined();
   expect(result[0].resData["Port"]).toBeDefined();
 
@@ -182,4 +186,4 @@ afterEach(async () => {
 
 afterAll(async () => {
   return await gridClient.disconnect();
-}, 10000);
+}, 130000);

@@ -39,6 +39,7 @@ interface NodeInfo {
   id: string;
   nodeId: number;
   farmId: number;
+  farmName: string;
   twinId: number;
   gridVersion: number;
   uptime: number;
@@ -55,10 +56,12 @@ interface NodeInfo {
   publicConfig: PublicConfig;
   status: string;
   certificationType: string;
+  dedicated: boolean;
   hasGPU: boolean;
   extraFee: number;
   rentedByTwinId: number;
   rentContractId: number;
+  serialNumber?: string;
 }
 interface PublicConfig {
   domain: string;
@@ -383,7 +386,6 @@ class Nodes {
       free_ips: options.publicIPs ? 1 : "",
       ipv4: options.accessNodeV4,
       ipv6: options.accessNodeV6,
-      gateway: options.gateway,
       certification_type: options.certified ? "Certified" : "",
       farm_ids: options.farmId ? [options.farmId] : options.farmIds,
       farm_name: options.farmName,
@@ -400,6 +402,7 @@ class Nodes {
       randomize: options.randomize,
       ret_count: options.ret_count,
       region: options.region,
+      healthy: options.healthy,
     };
     if (options.gateway) {
       params["ipv4"] = true;

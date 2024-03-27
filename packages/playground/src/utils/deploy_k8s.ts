@@ -28,7 +28,7 @@ export async function deployK8s(grid: GridClient, options: DeployK8SOptions) {
   k8s.ssh_key = options.sshKey;
   await grid.k8s.deploy(k8s);
   const data = (await loadK8S(grid, k8s.name)) as { masters: any[]; workers: any[]; wireguard?: string };
-  const wireguard = await getWireguardConfig(grid, k8s.network.name).catch(() => []);
+  const wireguard = await getWireguardConfig(grid, k8s.network.name, k8s.network.ip_range).catch(() => []);
   data.wireguard = wireguard[0];
   return data;
 }
@@ -51,6 +51,7 @@ async function createWorker(data: K8SWorker) {
   worker.public_ip6 = data.ipv6;
   worker.rootfs_size = data.rootFsSize;
   worker.planetary = data.planetary;
+  worker.mycelium = data.mycelium;
   worker.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;
   return worker;
 }
@@ -75,6 +76,7 @@ export async function deployWorker(grid: GridClient, options: K8SWorker & { depl
   worker.public_ip = options.ipv4;
   worker.public_ip6 = options.ipv6;
   worker.planetary = options.planetary;
+  worker.mycelium = options.mycelium;
   worker.rootfs_size = options.rootFsSize;
   worker.node_id = options.selectionDetails!.node!.nodeId;
   worker.solutionProviderId = +process.env.INTERNAL_SOLUTION_PROVIDER_ID!;

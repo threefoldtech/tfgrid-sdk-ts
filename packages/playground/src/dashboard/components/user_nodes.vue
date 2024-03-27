@@ -56,11 +56,8 @@
                           <v-progress-circular
                             v-bind="props"
                             :rotate="-90"
-                            :size="150"
-                            :width="12"
                             :model-value="getPercentage(item.raw, key)"
                             class="my-3"
-                            color="primary"
                           />
                           <template v-if="item.raw.used_resources">
                             <p v-if="item.raw.total_resources[key] > 1000">
@@ -104,20 +101,27 @@
           class="me-2"
           :nodeId="item.raw.nodeId"
           :farmId="item.raw.farmId"
-          v-model="item.raw.publicConfig"
-          @remove-config="(item.raw.publicConfig = $event), reloadNodes()"
-          @add-config="(item.raw.publicConfig = $event), reloadNodes()"
+          @remove-config="config => toggleConfig(item, config)"
+          @add-config="config => toggleConfig(item, config)"
         />
         <SetExtraFee class="me-2" :nodeId="item.raw.nodeId" />
+      </template>
+
+      <template v-slot:[`item.country`]="{ item }">
+        {{ item.raw.country || "-" }}
+      </template>
+
+      <template v-slot:[`item.serialNumber`]="{ item }">
+        {{ item.raw.serialNumber || "-" }}
       </template>
     </v-data-table-server>
   </div>
 </template>
 
 <script lang="ts">
+import type { PublicConfig as PublicConfigModel } from "@threefold/gridproxy_client";
 import moment from "moment";
-import { ref } from "vue";
-import { capitalize } from "vue";
+import { capitalize, ref } from "vue";
 
 import { gridProxyClient } from "@/clients";
 import CardDetails from "@/components/node_details_cards/card_details.vue";
@@ -263,9 +267,9 @@ export default {
         { name: "Certification", value: item.certificationType },
         { name: "First Boot at", value: moment(item.created * 1000).format("MM-DD-YY, HH:mm A") },
         { name: "Updated at", value: moment(item.updatedAt * 1000).format("MM-DD-YY, HH:mm A") },
-        { name: "Country", value: item.country },
-        { name: "City", value: item.city },
-        { name: "Serial Number", value: item.serialNumber },
+        { name: "Country", value: item.country || "-" },
+        { name: "City", value: item.city || "-" },
+        { name: "Serial Number", value: item.serialNumber || "-" },
         { name: "Pricing Policy", value: item.farmingPolicyId },
         { name: "Uptime", value: item.uptime + "%" },
       ];
@@ -282,6 +286,11 @@ export default {
         case "cru":
           return "CPU";
       }
+    }
+
+    function toggleConfig(item: any, config: PublicConfigModel) {
+      item.raw.publicConfig = config;
+      reloadNodes();
     }
 
     return {
@@ -304,6 +313,7 @@ export default {
       getKey,
       capitalize,
       reloadNodes,
+      toggleConfig,
     };
   },
 };

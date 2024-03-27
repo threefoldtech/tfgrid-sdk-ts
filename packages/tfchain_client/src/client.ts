@@ -62,7 +62,7 @@ class QueryClient {
   nodes: QueryNodes = new QueryNodes(this);
   __disconnectHandler = this.newProvider.bind(this);
 
-  constructor(public url: string) {}
+  constructor(public url: string, public keepReconnecting: boolean = false) {}
 
   async loadKeyPairOrSigner(): Promise<void> {} // to be overridden in the full client
   checkInputs(): void {
@@ -81,6 +81,7 @@ class QueryClient {
   }
 
   async newProvider() {
+    let provider: WsProvider;
     try {
       await QueryClient.connectingLock.acquireAsync();
       if (QueryClient.connections.has(this.url)) {
@@ -89,18 +90,20 @@ class QueryClient {
       }
       await this.disconnect();
 
-      const provider = new WsProvider(this.url);
-      this.api = await ApiPromise.create({ provider });
+      provider = new WsProvider(this.url);
+      this.api = await ApiPromise.create({ provider, throwOnConnect: !this.keepReconnecting });
       await this.wait();
       QueryClient.connections.set(this.url, { api: this.api, disconnectHandler: this.__disconnectHandler });
       this.api.on("disconnected", this.__disconnectHandler);
+      this.api.on("error", this.__disconnectHandler);
     } catch (e) {
-      const message = "Unable to establish a connection with the chain:\n";
+      if (provider) provider.disconnect();
+      const message = `Unable to establish a connection with the chain ${this.url} \n`;
       if (e instanceof BaseError) {
         e.message = message + e.message;
         throw e;
       }
-      throw new TFChainError(message + e);
+      throw new TFChainError(message);
     } finally {
       QueryClient.connectingLock.release();
     }
@@ -129,13 +132,14 @@ class QueryClient {
     }
   }
 
-  async disconnect(): Promise<void> {
-    if (QueryClient.connections.has(this.url)) {
-      this.api = QueryClient.connections.get(this.url)!.api;
+  async disconnect(url?: string): Promise<void> {
+    const clientUrl = url || this.url;
+    if (QueryClient.connections.has(clientUrl)) {
+      this.api = QueryClient.connections.get(clientUrl)!.api;
     }
     if (this.api && this.api.isConnected) {
       console.log("disconnecting");
-      this.api.off("disconnected", QueryClient.connections.get(this.url)!.disconnectHandler);
+      this.api.off("disconnected", QueryClient.connections.get(clientUrl)!.disconnectHandler);
       await this.api.disconnect();
       await this.wait(false);
     }
@@ -143,7 +147,12 @@ class QueryClient {
 
   async disconnectAndExit(): Promise<void> {
     // this should be only used by nodejs process
-    await this.disconnect();
+
+    for (const [key] of QueryClient.connections) {
+      await this.disconnect(key);
+    }
+
+    process.removeAllListeners();
     process.exit(0);
   }
 
@@ -234,6 +243,7 @@ export interface ClientOptions {
   mnemonicOrSecret?: string;
   keypairType?: KeypairType;
   extSigner?: ExtSigner;
+  keepReconnecting?: boolean;
 }
 
 class Client extends QueryClient {
@@ -256,7 +266,7 @@ class Client extends QueryClient {
   extSigner?: ExtSigner;
 
   constructor(options: ClientOptions) {
-    super(options.url);
+    super(options.url, options.keepReconnecting || false);
     this.extSigner = options.extSigner;
     this.keypairType = options.keypairType || "sr25519";
     this.mnemonicOrSecret = options.mnemonicOrSecret;
@@ -315,7 +325,6 @@ class Client extends QueryClient {
     const promise = new Promise(async (resolve, reject) => {
       function callback(res) {
         if (res instanceof Error) {
-          console.error(res);
           reject(res);
         }
         const { events = [], status } = res;

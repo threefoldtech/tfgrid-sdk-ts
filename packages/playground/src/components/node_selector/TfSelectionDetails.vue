@@ -5,19 +5,20 @@
       <p class="text-h6 mb-4 mt-2 ml-2">Choose a way to select Node</p>
 
       <v-radio-group v-model="wayToSelect" color="primary" inline>
-        <v-radio label="Automated" value="automated" class="mr-6"></v-radio>
-        <v-radio label="Manual" value="manual"></v-radio>
+        <InputTooltip
+          align-center
+          tooltip="Automatically select your node by filtering with Region, country, or farm name"
+        >
+          <v-radio label="Automated" value="automated"></v-radio>
+        </InputTooltip>
+        <InputTooltip align-center tooltip="Manually select your node by entering its id">
+          <v-radio label="Manual" value="manual" class="ml-5"></v-radio>
+        </InputTooltip>
       </v-radio-group>
 
       <template v-if="wayToSelect === 'automated'">
-        <TfSelectLocation v-model="location" v-if="wayToSelect === 'automated'" />
-        <TfSelectFarm
-          :valid-filters="validFilters"
-          :filters="filters"
-          :location="location"
-          v-model="farm"
-          v-if="wayToSelect === 'automated'"
-        />
+        <TfSelectLocation v-model="location" title="Choose a Location" :status="NodeStatus.Up" />
+        <TfSelectFarm :valid-filters="validFilters" :filters="filters" :location="location" v-model="farm" />
         <TfAutoNodeSelector
           :valid-filters="validFilters"
           :filters="filters"
@@ -25,9 +26,9 @@
           :farm="farm"
           v-model="node"
           v-model:status="nodeStatus"
-          v-if="wayToSelect === 'automated'"
         />
       </template>
+
       <TfManualNodeSelector
         :valid-filters="validFilters"
         :filters="filters"
@@ -62,6 +63,7 @@
 
 <script lang="ts">
 import type { FarmInfo, GPUCardInfo, NodeInfo } from "@threefold/grid_client";
+import { NodeStatus } from "@threefold/gridproxy_client";
 import noop from "lodash/fp/noop.js";
 import type { DeepPartial } from "utility-types";
 import { computed, getCurrentInstance, onMounted, onUnmounted, type PropType, ref, watch } from "vue";
@@ -212,6 +214,7 @@ export default {
       domain,
       domainStatus,
       selectionDetails,
+      NodeStatus,
     };
   },
 };

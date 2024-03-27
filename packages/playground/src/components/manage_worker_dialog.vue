@@ -25,7 +25,7 @@
       </form-validator>
 
       <template #footer-actions>
-        <v-btn color="error" variant="tonal" v-if="!deleting" @click="$emit('close')"> Close </v-btn>
+        <v-btn color="anchor" variant="outlined" v-if="!deleting" @click="$emit('close')"> Close </v-btn>
         <v-btn
           color="error"
           variant="outlined"
@@ -37,8 +37,8 @@
           Delete
         </v-btn>
         <v-btn
-          color="primary"
-          variant="tonal"
+          color="secondary"
+          variant="outlined"
           :disabled="!valid"
           @click="$emit('deploy', layout)"
           v-if="showType === 1"

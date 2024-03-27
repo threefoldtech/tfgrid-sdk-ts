@@ -5,7 +5,7 @@
         variant="outlined"
         color="secondary"
         class="text-subtitle-1 px-6 mr-2"
-        v-bind:href="'https://v3.bootstrap.grid.tf/'"
+        v-bind:href="'https://bootstrap.grid.tf/'"
         target="blank"
         >Bootstrap Node Image</v-btn
       >
@@ -68,6 +68,8 @@
 <script lang="ts">
 import { ref } from "vue";
 
+import { notifyDelaying } from "@/utils/notifications";
+
 import { useGrid } from "../../stores";
 import { createCustomToast, ToastType } from "../../utils/custom_toast";
 
@@ -93,7 +95,7 @@ export default {
         isCreating.value = true;
         await gridStore.grid.farms.create({ name: props.name });
         createCustomToast("Farm created successfully.", ToastType.success);
-        createCustomToast("Table may take sometime to update the changes.", ToastType.info);
+        notifyDelaying();
         showDialogue.value = false;
         await props.userFarms.reloadFarms();
       } catch (error) {
@@ -106,6 +108,10 @@ export default {
     function validateFarmName(name: string) {
       if (!name.split("").every((c: string) => /[a-zA-Z0-9\-_]/.test(c))) {
         return { message: "Farm name can only contain alphabetic letters, numbers, '-' or '_'" };
+      }
+      const names = props.userFarms.getFarmsNames();
+      if (names.includes(props.name.toLocaleLowerCase())) {
+        return { message: "Farm name already exists!" };
       }
     }
     return {

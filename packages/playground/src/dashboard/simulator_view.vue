@@ -25,6 +25,7 @@
         />
       </v-col>
     </v-row>
+    <v-alert type="warning"> Farming stops at 1 Billion TFT on Stellar network. </v-alert>
     <SimulatorFarming :profile="activeProfile" :chosenConfig="chosenConfig" v-if="chosenConfig != ''" />
   </div>
 </template>

@@ -1,7 +1,9 @@
 <template>
   <td :colspan="columnsLen" v-if="dNodeLoading" style="text-align: center">
     <div class="pa-1">
-      <v-progress-circular indeterminate model-value="20" :width="3"></v-progress-circular>
+      <div class="d-flex my-6 align-center justify-center">
+        <v-progress-circular :size="20" />
+      </div>
     </div>
   </td>
   <td :colspan="columnsLen" v-else-if="dNodeError" style="text-align: center">
@@ -53,7 +55,13 @@
     <v-row class="d-flex" style="justify-content: center">
       <div class="pa-1 pb-4" v-if="gpuLoading">
         <div style="bottom: 10rem; top: 10rem">
-          <p :style="{ paddingBottom: '3rem', color: '#7de3c8', fontSize: '1.25rem' }">
+          <p
+            :style="{
+              paddingBottom: '3rem',
+              color: '#7de3c8',
+              fontSize: '1.25rem',
+            }"
+          >
             Loading Node gpu details{{ dots }}
           </p>
         </div>

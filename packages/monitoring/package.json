@@ -1,0 +1,32 @@
+{
+  "name": "@threefold/monitoring",
+  "version": "2.3.3",
+  "description": "Threefold monitoring package",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "example": "yarn run ts-node --project tsconfig.json example/index.ts",
+    "build": "tsc",
+    "test": "jest "
+  },
+  "author": "Omar Kassem",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@threefold/rmb_direct_client": "^2.3.3",
+    "@threefold/tfchain_client": "^2.3.3",
+    "@threefold/types": "^2.3.3",
+    "axios": "^0.27.2",
+    "chalk": "4.1.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/jest": "29.5.11",
+    "jest": "29.7.0",
+    "ts-jest": "29.1.2"
+  }
+}

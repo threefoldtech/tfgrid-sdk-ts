@@ -2,7 +2,7 @@ import { Keyring } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { KeypairType } from "@polkadot/util-crypto/types";
 import { waitReady } from "@polkadot/wasm-crypto";
-import { Client as TFClient } from "@threefold/tfchain_client";
+import { Client as TFClient, Twin } from "@threefold/tfchain_client";
 import {
   BaseError,
   ConnectionError,
@@ -21,8 +21,8 @@ import type { WebSocket as WSConnection } from "ws";
 
 import ClientEnvelope from "./envelope";
 import { KPType, sign } from "./sign";
-import { Address, Envelope, Error, Ping, Pong, Request } from "./types/lib/types";
-import { generatePublicKey } from "./util";
+import { Address, Envelope, Ping, Request } from "./types/lib/types";
+import { generatePublicKey, getTwin } from "./util";
 
 class Client {
   static connections = new Map<string, Client>();
@@ -34,6 +34,7 @@ class Client {
   twin: any;
   destTwin: any;
   tfclient: TFClient;
+  twins = new Map<number, { twin: Twin; timestamp: number }>();
 
   constructor(
     public chainUrl: string,
@@ -94,7 +95,13 @@ class Client {
         const receivedEnvelope = Envelope.deserializeBinary(data);
         // cast received enevelope to client envelope
         await this.tfclient?.connect();
-        const castedEnvelope = new ClientEnvelope(undefined, receivedEnvelope, this.chainUrl, this.tfclient);
+        const castedEnvelope = new ClientEnvelope(
+          undefined,
+          receivedEnvelope,
+          this.chainUrl,
+          this.tfclient,
+          this.twins,
+        );
 
         //verify
         if (this.responses.get(receivedEnvelope.uid)) {
@@ -119,6 +126,7 @@ class Client {
       }
 
       this.twin = await this.tfclient.twins.get({ id: twinId });
+      this.twins.set(this.twin.id, { twin: this.twin, timestamp: Math.round(Date.now() / 1000) });
       try {
         this.updateSource();
         this.createConnection();
@@ -143,11 +151,9 @@ class Client {
           this.twin.pk = pk;
         }
       } catch (err) {
-        const c = this.con as WSConnection;
-        if (c && c.readyState == c.OPEN) {
-          c.close();
-        }
-        if (err instanceof TwinNotExistError || err instanceof InsufficientBalanceError) throw err;
+        if (err instanceof InsufficientBalanceError) throw err;
+        this.disconnect();
+        if (err instanceof TwinNotExistError) throw err;
         if (err instanceof BaseError) {
           err.message = `Unable to establish a connection with the RMB server ${this.relayUrl.replace(
             "wss://",
@@ -169,25 +175,45 @@ class Client {
     }
   }
 
-  disconnect() {
-    this.tfclient.disconnect();
-    for (const connection of Client.connections.values()) {
-      connection.con.close();
+  private logPendingResponses() {
+    console.debug("Waiting for the rmb responses to be received before closing the connection");
+    for (const id of this.responses.keys()) {
+      const envelope = this.responses.get(id);
+      if (envelope?.request) {
+        console.debug(`- Response for ${envelope?.request.command} from twin ${envelope?.destination}`);
+      }
     }
   }
 
+  private async waitForResponses(timeoutInSeconds = 2 * 60): Promise<void> {
+    const start = new Date().getTime();
+    while (new Date().getTime() < start + timeoutInSeconds * 1000) {
+      if (this.responses.size === 0) return;
+      this.logPendingResponses();
+      await new Promise(f => setTimeout(f, 1000));
+    }
+    this.responses.clear();
+  }
+
+  async disconnect() {
+    if (this.__pingPongTimeout) clearTimeout(this.__pingPongTimeout);
+    this.con.removeAllListeners();
+    await this.waitForResponses();
+    await this.tfclient.disconnect();
+    if (this.con?.readyState !== this.con?.CLOSED) this.con.close();
+  }
+
   disconnectAndExit() {
-    this.disconnect();
+    if (this.__pingPongTimeout) clearTimeout(this.__pingPongTimeout);
+    for (const connection of Client.connections.values()) {
+      connection.con.close();
+    }
+    process.removeAllListeners();
     process.exit(0);
   }
 
   reconnect() {
     this.connect();
-  }
-  close() {
-    if (this.__pingPongTimeout) clearTimeout(this.__pingPongTimeout);
-    this.tfclient.disconnect();
-    if (this.con?.readyState !== this.con?.CLOSED) this.con.close();
   }
   waitForOpenConnection() {
     return new Promise((resolve, reject) => {
@@ -221,7 +247,7 @@ class Client {
       // need to check if destination twinId exists by fetching dest twin from chain first
 
       envelope.destination = new Address();
-      const clientEnvelope = new ClientEnvelope(this.signer, envelope, this.chainUrl, this.tfclient);
+      const clientEnvelope = new ClientEnvelope(this.signer, envelope, this.chainUrl, this.tfclient, this.twins);
 
       let retriesCount = 0;
       while (this.con.readyState != this.con.OPEN && retries >= retriesCount++) {
@@ -254,8 +280,7 @@ class Client {
     retries: number = this.retries,
   ) {
     try {
-      // need to check if destination twinId exists by fetching dest twin from chain first
-      this.destTwin = await this.tfclient.twins.get({ id: destinationTwinId });
+      this.destTwin = await getTwin(destinationTwinId, this.twins, this.tfclient);
 
       // create new envelope with given data and destination
       const envelope = new Envelope({
@@ -270,7 +295,7 @@ class Client {
         envelope.request = new Request({ command: requestCommand });
       }
 
-      const clientEnvelope = new ClientEnvelope(this.signer, envelope, this.chainUrl, this.tfclient);
+      const clientEnvelope = new ClientEnvelope(this.signer, envelope, this.chainUrl, this.tfclient, this.twins);
       let retriesCount = 0;
 
       if (requestData) {

@@ -6,7 +6,7 @@
           <div class="d-flex justify-center">
             <v-btn-toggle divided v-model="showType" mandatory>
               <v-btn variant="outlined"> details </v-btn>
-              <v-btn variant="outlined"> json </v-btn>
+              <v-btn variant="outlined"> JSON</v-btn>
             </v-btn-toggle>
           </div>
 
@@ -35,6 +35,7 @@
                 <span class="font-weight-bold">{{ contract.publicIP?.ip.split("/")[0] || contract.publicIP?.ip }}</span>
               </v-alert>
               <CopyReadonlyInput label="Name" :data="contract.name" />
+              <CopyReadonlyInput label="Node ID" :data="contract.nodeId" />
               <CopyReadonlyInput label="Contract ID" :data="contract.contractId" />
 
               <template v-if="contract.publicIP">
@@ -43,10 +44,15 @@
                   :data="contract.publicIP.ip.split('/')[0] || contract.publicIP.ip"
                   v-if="contract.publicIP.ip"
                 />
-                <CopyReadonlyInput label="Public IPv6" :data="contract.publicIP.ip6" v-if="contract.publicIP.ip6" />
+                <CopyReadonlyInput
+                  label="Public IPv6"
+                  :data="contract.publicIP.ip6 ? contract.publicIP.ip6.replace(/\/64$/, '') : '-'"
+                  v-if="contract.publicIP.ip6"
+                />
               </template>
 
               <CopyReadonlyInput label="Planetary Network IP" :data="contract.planetary" v-if="contract.planetary" />
+              <CopyReadonlyInput label="Mycelium Network IP" :data="contract.myceliumIP" v-if="contract.myceliumIP" />
 
               <CopyReadonlyInput label="Network Name" :data="contract.interfaces[0].network" />
               <CopyReadonlyInput label="CPU (vCores)" :data="contract.capacity.cpu" />
@@ -258,7 +264,7 @@ function getType(key: string): string {
 
 function getDiskLabel(contract: any, disk: Disk) {
   if (contract.metadata.includes("fullvm") && contract.mounts.indexOf(disk) > 0) {
-    return "Disk";
+    return "Disk( " + disk.name + " ) GB";
   }
   return "Disk( " + disk.mountPoint + " ) GB";
 }
@@ -285,7 +291,7 @@ function getTooltipText(contract: any, index: number) {
     return "Leader";
   }
 
-  if (index === 0 && getMetadata(contract).projectName === "kubernetes") {
+  if (index === 0 && getMetadata(contract).type === "kubernetes") {
     return "Master";
   }
 

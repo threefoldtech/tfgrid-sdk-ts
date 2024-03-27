@@ -1,73 +1,82 @@
 <template>
   <section>
-    <VFadeTransition>
-      <VAlert type="warning" class="mb-4 mt-1" v-if="filtersUpdated && validFilters">
-        Please press on <strong>Load Nodes</strong> button to list nodes matching your new requirements.
-      </VAlert>
-    </VFadeTransition>
+    <VBtn
+      variant="tonal"
+      color="secondary"
+      class="mb-4"
+      size="x-large"
+      block
+      @click="resetPageAndReloadNodes()"
+      :loading="pageCountTask.loading || nodesTask.loading"
+      :disabled="nodeInputValidateTask.loading || !validFilters"
+    >
+      Load Nodes
+    </VBtn>
 
-    <input-tooltip tooltip="Select a node ID to deploy on.">
-      <div class="d-flex w-100">
-        <VAutocomplete
-          ref="nodeInput"
-          label="Node"
-          placeholder="Select node"
-          :items="loadedNodes"
-          item-title="nodeId"
-          return-object
-          :model-value="nodeInputValidateTask.initialized ? $props.modelValue : undefined"
-          @update:model-value="bindModelValueAndValidate($event)"
+    <input-tooltip tooltip="Select a node ID to deploy on." align-center>
+      <div class="w-100" :style="{ position: 'relative' }">
+        <div class="d-flex my-6 align-center justify-center">
+          <v-progress-circular v-if="loadedNodes.length > 0 && (pageCountTask.loading || nodesTask.loading)" />
+        </div>
+        <VCard
+          flat
+          class="mb-4 border"
           :disabled="!validFilters || filtersUpdated"
-          :loading="nodeInputValidateTask.loading"
-          required
-          :hint="
-            !validFilters
-              ? 'Please provide valid data.'
-              : nodeInputValidateTask.loading
-              ? `Checking if the disks will fit in the node's storage pools...`
-              : undefined
-          "
-          :persistent-hint="!validFilters || nodeInputValidateTask.loading"
-          clearable
-          @click:clear="
-            bindModelValueAndValidate();
-            ($refs.nodeInput as VInput)?.$el.querySelector('input').blur();
-            nodeInputValidateTask.reset();
-            touched = false;
-          "
-          :error="!!nodeInputValidateTask.error && !filtersUpdated"
-          :error-messages="!filtersUpdated ? nodeInputValidateTask.error || undefined : undefined"
-          @blur="
-            touched
-              ? undefined
-              : (() => {
-                  touched = true;
-                  !nodeInputValidateTask.initialized && nodeInputValidateTask.run($props.modelValue);
-                })()
-          "
-          :rules="[() => true]"
+          :style="{
+            opacity: !validFilters || filtersUpdated ? 0.5 : 1,
+            borderWidth: '2px !important',
+            borderColor: nodeInputValidateTask.error ? 'rgba(var(--v-theme-error), 0.4) !important' : undefined,
+          }"
         >
-          <template #item="{ item, props }">
-            <VListItem v-bind="props">
-              <template #title> {{ item.value.nodeId }} </template>
-              <template #append>
-                <VChip class="mr-2" v-if="item.value.certificationType.toLowerCase() === 'certified'" color="primary">
-                  Certified
-                </VChip>
-                <VChip :color="item.value.rentedByTwinId === 0 ? 'secondary' : 'success'">
-                  {{ item.value.rentedByTwinId === 0 ? "Shared" : "Dedicated" }}
-                </VChip>
-              </template>
-            </VListItem>
-          </template>
+          <VContainer v-if="loadedNodes.length === 0 && (pageCountTask.loading || nodesTask.loading)">
+            <VRow align="center" justify="center" class="pa-4">
+              <v-progress-circular class="mr-2" />
+              Loading Nodes...
+            </VRow>
+          </VContainer>
 
-          <template #append-item v-if="pagination.page !== -1">
-            <VContainer>
+          <VContainer v-if="loadedNodes.length === 0 && !(pageCountTask.loading || nodesTask.loading)">
+            <VAlert type="error" text="No Nodes were found!" />
+          </VContainer>
+
+          <div
+            ref="nodesContainer"
+            :style="{
+              maxHeight: '450px',
+              paddingBottom: '100px',
+              backgroundColor: 'rgb(var(--v-theme-background))',
+            }"
+            class="overflow-auto px-4"
+            v-if="loadedNodes.length"
+          >
+            <template v-for="node in loadedNodes" :key="node.id">
+              <div class="my-4">
+                <TfNodeDetailsCard
+                  :node="node"
+                  :selected="!validFilters || filtersUpdated ? false : $props.modelValue === node"
+                  selectable
+                  @node:select="bindModelValueAndValidate"
+                  :status="
+                    $props.modelValue === node
+                      ? nodeInputValidateTask.loading
+                        ? 'Pending'
+                        : nodeInputValidateTask.data
+                        ? 'Valid'
+                        : 'Invalid'
+                      : 'Init'
+                  "
+                />
+              </div>
+              <!-- <div class="border-b" :style="{ borderBottomWidth: '2px !important' }" /> -->
+            </template>
+
+            <VContainer v-if="loadedNodes.length > 0 && pagination.page !== -1">
               <VBtn
                 @click="reloadNodes()"
                 block
                 color="secondary"
                 variant="tonal"
+                size="large"
                 :loading="nodesTask.loading"
                 prepend-icon="mdi-reload"
                 :disabled="nodeInputValidateTask.loading"
@@ -75,19 +84,53 @@
                 Load More Nodes
               </VBtn>
             </VContainer>
-          </template>
-        </VAutocomplete>
+          </div>
+        </VCard>
 
-        <VBtn
-          variant="outlined"
-          color="secondary"
-          class="mt-2 ml-2"
-          @click="resetPageAndReloadNodes()"
-          :loading="pageCountTask.loading || nodesTask.loading"
-          :disabled="nodeInputValidateTask.loading || !validFilters"
+        <VAlert
+          :type="!validFilters ? 'error' : 'warning'"
+          variant="elevated"
+          :style="{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 9,
+          }"
+          v-if="!validFilters || (filtersUpdated && validFilters)"
         >
-          Load Nodes
-        </VBtn>
+          <span v-if="!validFilters" v-text="'Please provide valid data.'" />
+          <template v-else>
+            Please press on <strong>Load Nodes</strong> button to list nodes matching your new requirements.
+          </template>
+        </VAlert>
+
+        <VAlert
+          type="info"
+          variant="elevated"
+          :style="{
+            position: 'absolute',
+            bottom: '31px',
+            right: '31px',
+            zIndex: 9,
+          }"
+          v-else-if="nodeInputValidateTask.loading"
+          text="Checking if the deployment will fit in the node's disks..."
+        />
+
+        <VAlert
+          type="error"
+          variant="elevated"
+          v-if="!filtersUpdated && nodeInputValidateTask.error"
+          :style="{
+            position: 'absolute',
+            bottom: '31px',
+            right: '31px',
+            zIndex: 9,
+          }"
+          :text="nodeInputValidateTask.error"
+          closable
+        />
       </div>
     </input-tooltip>
   </section>
@@ -99,7 +142,7 @@ import equals from "lodash/fp/equals.js";
 import sample from "lodash/fp/sample.js";
 import { computed, nextTick, onMounted, onUnmounted, type PropType, ref } from "vue";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { VInput } from "vuetify/components/VInput";
+import type { VCard } from "vuetify/components/VCard";
 
 import { useAsync, usePagination, useWatchDeep } from "../../hooks";
 import { ValidatorStatus } from "../../hooks/form_validator";
@@ -111,10 +154,13 @@ import {
   loadValidNodes,
   normalizeNodeFilters,
   normalizeNodeOptions,
+  validateRentContract,
 } from "../../utils/nodeSelector";
+import TfNodeDetailsCard from "./TfNodeDetailsCard.vue";
 
 export default {
   name: "TfAutoNodeSelector",
+  components: { TfNodeDetailsCard },
   props: {
     modelValue: Object as PropType<NodeInfo>,
     validFilters: { type: Boolean, required: true },
@@ -208,12 +254,30 @@ export default {
     }
 
     const nodeInputValidateTask = useAsync<true, string, [NodeInfo | undefined]>(
-      node => checkNodeCapacityPool(gridStore, node, props.filters),
+      async node => {
+        const nodeCapacityValid = await checkNodeCapacityPool(gridStore, node, props.filters);
+        const rentContractValid = props.filters.dedicated ? await validateRentContract(gridStore, node) : true;
+        return nodeCapacityValid && rentContractValid;
+      },
       {
         tries: 1,
         shouldRun: () => props.validFilters,
         onBeforeTask: () => bindStatus(ValidatorStatus.Pending),
-        onAfterTask: ({ data }) => bindStatus(data ? ValidatorStatus.Valid : ValidatorStatus.Invalid),
+        onAfterTask({ data }) {
+          bindStatus(data ? ValidatorStatus.Valid : ValidatorStatus.Invalid);
+          const container = nodesContainer.value as HTMLDivElement;
+          if (container) {
+            const card = container.querySelector(".selected-node") as HTMLDivElement;
+
+            if (card && container.getAttribute("data-scrolled") !== "scrolled") {
+              container.setAttribute("data-scrolled", "scrolled");
+              container.scroll({
+                behavior: "smooth",
+                top: card.offsetTop - 100,
+              });
+            }
+          }
+        },
         onReset: bindStatus,
       },
     );
@@ -238,6 +302,8 @@ export default {
       ctx.emit("update:status", status || ValidatorStatus.Init);
     }
 
+    const nodesContainer = ref<HTMLDivElement>();
+
     return {
       pageCountTask,
       nodesTask,
@@ -252,7 +318,15 @@ export default {
       touched,
       bindModelValueAndValidate,
       bindStatus,
+
+      nodesContainer,
     };
   },
 };
 </script>
+
+<style>
+.node-selector .v-select__selection {
+  width: 100%;
+}
+</style>

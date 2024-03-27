@@ -3,40 +3,29 @@ import { getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function deploy(client, zdb) {
-  try {
-    const res = await client.zdbs.deploy(zdb);
-    log("================= Deploying ZDBs =================");
-    log(res);
-    log("================= Deploying ZDBs =================");
-  } catch (error) {
-    log("Error while Deploying the ZDBs " + error);
-  }
+  const res = await client.zdbs.deploy(zdb);
+  log("================= Deploying ZDBs =================");
+  log(res);
+  log("================= Deploying ZDBs =================");
 }
 
 async function getDeployment(client, zdb) {
-  try {
-    const res = await client.zdbs.getObj(zdb);
-    log("================= Getting deployment information =================");
-    log(res);
-    log("================= Getting deployment information =================");
-  } catch (error) {
-    log("Error while getting the deployment " + error);
-  }
+  const res = await client.zdbs.getObj(zdb);
+  log("================= Getting deployment information =================");
+  log(res);
+  log("================= Getting deployment information =================");
 }
 
 async function cancel(client, zdb) {
-  try {
-    const res = await client.zdbs.delete(zdb);
-    log("================= Canceling the deployment =================");
-    log(res);
-    log("================= Canceling the deployment =================");
-  } catch (error) {
-    log("Error while canceling the deployment " + error);
-  }
+  const res = await client.zdbs.delete(zdb);
+  log("================= Canceling the deployment =================");
+  log(res);
+  log("================= Canceling the deployment =================");
 }
 
 async function main() {
-  const grid3 = await getClient();
+  const name = "tttzdbs";
+  const grid3 = await getClient(`zdb/${name}`);
 
   const zdbQueryOptions: FilterOptions = {
     sru: 1,
@@ -46,7 +35,7 @@ async function main() {
   };
 
   const zdbs: ZDBSModel = {
-    name: "tttzdbs",
+    name,
     zdbs: [
       {
         name: "hamada",
@@ -65,10 +54,10 @@ async function main() {
   await deploy(grid3, zdbs);
 
   //Get the deployment
-  await getDeployment(grid3, zdbs.name);
+  await getDeployment(grid3, name);
 
   //Uncomment the line below to cancel the deployment
-  // await cancel(grid3, { name: zdbs.name });
+  // await cancel(grid3, { name });
 
   await grid3.disconnect();
 }

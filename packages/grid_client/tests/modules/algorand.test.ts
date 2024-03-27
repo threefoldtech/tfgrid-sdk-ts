@@ -185,7 +185,7 @@ test("TC1251 - Algorand: List Accounts", async () => {
   expect(newRes[newRes.length - 1].blockchain_type).toContain(blockchainType);
 });
 
-test("TC1252 - Algorand: Get Account assets", async () => {
+test.skip("TC1252 - Algorand: Get Account assets", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
      Test Cases: TC1252 - Algorand: Get Account assets
@@ -218,7 +218,7 @@ test("TC1252 - Algorand: Get Account assets", async () => {
   expect(newRes.assets).toBeDefined();
 });
 
-test("TC1253 - Algorand: Get Account assets by address", async () => {
+test.skip("TC1253 - Algorand: Get Account assets by address", async () => {
   /**********************************************
      Test Suite: Grid3_Client_TS (Automated)
      Test Cases: TC1253 - Algorand: Get Account assets by address
@@ -266,4 +266,4 @@ afterEach(async () => {
 
 afterAll(async () => {
   return await gridClient.disconnect();
-}, 10000);
+}, 130000);

@@ -23,7 +23,7 @@
       :disabled="disableButton"
       v-if="node.rentedByTwinId === 0"
       color="primary"
-      @click="reserveNode"
+      @click.stop="reserveNode"
     >
       Reserve
     </v-btn>
@@ -35,9 +35,18 @@
       :loading="loadingUnreserveBtn"
       :disabled="disableButton"
       v-if="node.rentedByTwinId === profileManager.profile?.twinId"
-      @click="removeReserve"
+      @click.stop="removeReserve"
     >
       Unreserve
+    </v-btn>
+
+    <v-btn
+      size="small"
+      variant="text"
+      v-if="node.rentedByTwinId !== 0 && node.rentedByTwinId !== profileManager.profile?.twinId"
+      color="error"
+    >
+      Reserved
     </v-btn>
   </container>
 </template>
@@ -50,7 +59,7 @@ import { type PropType, ref } from "vue";
 import { useProfileManager } from "@/stores";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { getGrid } from "@/utils/grid";
-import { normalizeError } from "@/utils/helpers";
+import { notifyDelaying } from "@/utils/notifications";
 
 const profileManager = useProfileManager();
 
@@ -91,7 +100,7 @@ export default {
           loadingUnreserveNode.value = false;
           openUnreserveDialog.value = false;
           loadingUnreserveBtn.value = true;
-          createCustomToast("Table may take sometime to update the changes", ToastType.info);
+          notifyDelaying();
           emit("updateTable");
           disableButton.value = true;
           setTimeout(() => {
@@ -112,19 +121,24 @@ export default {
     }
 
     async function reserveNode() {
-      loadingReserveNode.value = true;
+      const isLogged = profileManager.profile;
       try {
-        const grid = await getGrid(profileManager.profile!);
-        createCustomToast("Transaction Submitted", ToastType.info);
-        await grid?.nodes.reserve({ nodeId: +props.node.nodeId });
-        createCustomToast(`Transaction succeeded node ${props.node.nodeId} Reserved`, ToastType.success);
-        createCustomToast("Table may take sometime to update the changes", ToastType.info);
-        emit("updateTable");
-        disableButton.value = true;
-        setTimeout(() => {
-          disableButton.value = false;
-          loadingReserveNode.value = false;
-        }, 20000);
+        if (isLogged) {
+          loadingReserveNode.value = true;
+          const grid = await getGrid(profileManager.profile!);
+          createCustomToast("Transaction Submitted", ToastType.info);
+          await grid?.nodes.reserve({ nodeId: +props.node.nodeId });
+          createCustomToast(`Transaction succeeded node ${props.node.nodeId} Reserved`, ToastType.success);
+          notifyDelaying();
+          emit("updateTable");
+          disableButton.value = true;
+          setTimeout(() => {
+            disableButton.value = false;
+            loadingReserveNode.value = false;
+          }, 20000);
+        } else {
+          createCustomToast("Please Login first to continue.", ToastType.danger);
+        }
       } catch (e) {
         if (e instanceof InsufficientBalanceError) {
           createCustomToast(`Can't create rent contract due to Insufficient balance`, ToastType.danger);
@@ -135,6 +149,7 @@ export default {
         loadingReserveNode.value = false;
       }
     }
+
     return {
       openUnreserveDialog,
       loadingUnreserveNode,
@@ -149,3 +164,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.v-btn.text-error:hover > .v-btn__overlay {
+  opacity: 0;
+}
+</style>

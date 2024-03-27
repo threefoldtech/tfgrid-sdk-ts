@@ -4,8 +4,9 @@
       <v-icon size="30" class="pr-3">mdi-note-check-outline</v-icon>
       <v-card-title class="pa-0">DAO</v-card-title>
     </v-card>
-    <div class="d-flex my-12 align-center justify-center" v-if="loadingProposals">
-      <v-progress-circular :size="70" :width="7" indeterminate color="primary"></v-progress-circular>
+
+    <div class="d-flex my-6 align-center justify-center" v-if="loadingProposals">
+      <v-progress-circular />
     </div>
 
     <div v-else-if="proposals?.active?.length == 0 && proposals?.inactive?.length == 0">
@@ -38,7 +39,9 @@
           <v-card class="my-3 pa-5" v-for="(proposal, i) in filteredProposals(tab.content.value)" :key="i">
             <div
               class="d-flex align-center"
-              :style="{ justifyContent: proposal.action ? 'space-between' : 'flex-end' }"
+              :style="{
+                justifyContent: proposal.action ? 'space-between' : 'flex-end',
+              }"
             >
               <v-card-title class="pa-0 mb-5 font-weight-bold" v-if="proposal.action">
                 {{ proposal.action }}
@@ -221,7 +224,10 @@
                 considered valid.
               </span>
               <span>
-                If the vote count is insufficient and the time limit is reached, the proposal will be rejected.</span
+                If the vote count is insufficient and the time limit is reached, the proposal will be rejected.
+              </span>
+              <a href="https://www.manual.grid.tf/documentation/dashboard/tfchain/tf_dao.html" target="_blank"
+                >How to vote?</a
               >
               <br />
               <br />
@@ -306,7 +312,7 @@ function openVoteDialog(hash: any, vote: boolean) {
 function filteredProposals(proposals: Proposal[] | undefined) {
   if (searchTerm.value.length) {
     if (proposals) {
-      return proposals.filter(proposal => proposal.description.includes(searchTerm.value));
+      return proposals.filter(proposal => proposal.description.toLowerCase().includes(searchTerm.value.toLowerCase()));
     }
   }
   return proposals;

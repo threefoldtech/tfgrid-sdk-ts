@@ -1,5 +1,7 @@
-import { NetworkEnv } from "@threefold/grid_client";
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHashHistory, type RouteRecordRaw } from "vue-router";
+
+import LoggedInLanding from "@/components/logged_in_landing.vue";
+import { DashboardRoutes } from "@/router/routes";
 
 export interface InfoMeta {
   /* Accepting md and html */
@@ -13,509 +15,657 @@ export interface InfoMeta {
 export interface RouteMeta {
   title: string;
   info?: InfoMeta;
+  publicPath?: boolean;
+  requireSSH?: boolean;
 }
 
-const router = createRouter({
-  history: createWebHashHistory(),
-  routes: [
+/**
+ * Creates the routes for Applications section.
+ *
+ * @returns An array of route records for Applications.
+ */
+function createApplicationsRoutes(): RouteRecordRaw[] {
+  return [
     {
-      path: "/dashboard",
+      path: DashboardRoutes.Applications.BaseRoute,
+      component: () => import("../views/solutions_view.vue"),
+    },
+
+    {
+      path: DashboardRoutes.Applications.Peertube,
+      component: () => import("../views/peertube_view.vue"),
+      meta: {
+        title: "Peertube",
+        info: { page: "info/peertube.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Peertube",
+            },
+          ],
+        },
+      },
+    },
+    {
+      path: DashboardRoutes.Applications.Funkwhale,
+      component: () => import("../views/funkwhale_view.vue"),
+      meta: {
+        title: "Funkwhale",
+        info: { page: "info/funkwhale.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Funkwhale",
+            },
+          ],
+        },
+      },
+    },
+    {
+      path: DashboardRoutes.Applications.Mattermost,
+      component: () => import("../views/mattermost_view.vue"),
+      meta: {
+        title: "Mattermost",
+        info: { page: "info/mattermost.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Mattermost",
+            },
+          ],
+        },
+      },
+    },
+    {
+      path: DashboardRoutes.Applications.Discourse,
+      component: () => import("../views/discourse_view.vue"),
+      meta: {
+        title: "Discourse",
+        info: { page: "info/discourse.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Discourse",
+            },
+          ],
+        },
+      },
+    },
+    {
+      path: DashboardRoutes.Applications.Taiga,
+      component: () => import("../views/taiga_view.vue"),
+      meta: {
+        title: "Taiga",
+        info: { page: "info/taiga.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Taiga",
+            },
+          ],
+        },
+      },
+    },
+    // {
+    //   path: DashboardRoutes.Applications.Owncloud,
+    //   component: () => import("../views/owncloud_view.vue"),
+    //   meta: {
+    //     title: "Owncloud",
+    //     info: { page: "info/owncloud.md" },
+    //     navbarConfig: {
+    //       back: true,
+    //       path: [
+    //         { title: "Deploy" },
+    //         {
+    //           title: "Applications",
+    //           disabled: false,
+    //           to: DashboardRoutes.Deploy.Applications,
+    //         },
+    //         {
+    //           title: "Owncloud",
+    //         },
+    //       ],
+    //     },
+    //   },
+    // },
+    {
+      path: DashboardRoutes.Applications.Nextcloud,
+      component: () => import("../views/nextcloud_view.vue"),
+      meta: {
+        title: "Nextcloud",
+        info: { page: "info/nextcloud.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Nextcloud",
+            },
+          ],
+        },
+      },
+    },
+    {
+      path: DashboardRoutes.Applications.Presearch,
+      component: () => import("../views/presearch_view.vue"),
+      meta: {
+        title: "Presearch",
+        info: { page: "info/presearch.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Presearch",
+            },
+          ],
+        },
+      },
+    },
+    {
+      path: DashboardRoutes.Applications.Subsquid,
+      component: () => import("../views/subsquid_view.vue"),
+      meta: {
+        title: "Subsquid",
+        info: { page: "info/subsquid.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Subsquid",
+            },
+          ],
+        },
+      },
+    },
+    {
+      path: DashboardRoutes.Applications.Casperlabs,
+      component: () => import("../views/casperlabs_view.vue"),
+      meta: {
+        title: "Casperlabs",
+        info: { page: "info/casperlabs.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Casperlabs",
+            },
+          ],
+        },
+      },
+    },
+    {
+      path: DashboardRoutes.Applications.Algorand,
+      component: () => import("../views/algorand_view.vue"),
+      meta: {
+        title: "Algorand",
+        info: { page: "info/algorand.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Algorand",
+            },
+          ],
+        },
+      },
+    },
+    {
+      path: DashboardRoutes.Applications.Nodepilot,
+      component: () => import("../views/node_pilot.vue"),
+      meta: {
+        title: "Node Pilot",
+        info: { page: "info/nodepilot.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Node Pilot",
+            },
+          ],
+        },
+      },
+    },
+    {
+      path: DashboardRoutes.Applications.Wordpress,
+      component: () => import("../views/wordpress_view.vue"),
+      meta: {
+        title: "Wordpress",
+        info: { page: "info/wordpress.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Wordpress",
+            },
+          ],
+        },
+      },
+    },
+    {
+      path: DashboardRoutes.Applications.Umbrel,
+      component: () => import("../views/umbrel_view.vue"),
+      meta: {
+        title: "Umbrel",
+        info: { page: "info/umbrel.md" },
+        navbarConfig: {
+          back: true,
+          path: [
+            { title: "Deploy" },
+            {
+              title: "Applications",
+              disabled: false,
+              to: DashboardRoutes.Deploy.Applications,
+            },
+            {
+              title: "Umbrel",
+            },
+          ],
+        },
+      },
+    },
+    // Commented for now and will be user later.
+    // {
+    //   path: DashboardRoutes.Applications.Freeflow,
+    //   component: () => import("../views/freeflow_view.vue"),
+    //   meta: {
+    //     title: "Freeflow",
+    //     info: { page: "info/freeflow.md" },
+    //     navbarConfig: {
+    //       back: true,
+    //       path: [
+    //         { title: "Deploy" },
+    //         {
+    //           title: "Applications",
+    //           disabled: false,
+    //           to: DashboardRoutes.Deploy.Applications,
+    //         },
+    //         {
+    //           title: "Freeflow",
+    //         },
+    //       ],
+    //     },
+    //   },
+    // },
+  ];
+}
+
+/**
+ * Creates the routes for TFGrid section.
+ *
+ * @returns An array of route records for TFGrid.
+ */
+function createTFGridRoutes(): RouteRecordRaw[] {
+  return [
+    {
+      path: DashboardRoutes.TFGrid.BaseRoute,
       children: [
         {
-          name: "Twin",
-          path: "twin",
-          component: () => import("../dashboard/twin_view.vue"),
-          meta: { title: "Your Twin" },
+          path: DashboardRoutes.TFGrid.NodeStatistics,
+          component: () => import("@/views/stats.vue"),
+          meta: { title: "Statistics", publicPath: true },
         },
+      ],
+    },
+  ];
+}
+
+/**
+ * Creates the routes for TFFarms section.
+ *
+ * @returns An array of route records for TFFarms.
+ */
+function createTFFarmsRoutes(): RouteRecordRaw[] {
+  return [
+    {
+      path: DashboardRoutes.Farms.BaseRoute,
+      children: [
         {
-          path: "farms",
+          path: DashboardRoutes.Farms.YourFarms,
           component: () => import("../dashboard/farms_view.vue"),
-          meta: { title: "Your Farms" },
+          meta: { title: "Farms" },
         },
         {
-          path: "contracts-list",
+          path: DashboardRoutes.Farms.FarmFinder,
+          component: () => import("@/views/farms.vue"),
+          meta: { title: "Farm Finder", publicPath: true },
+        },
+        {
+          path: DashboardRoutes.Farms.Simulator,
+          component: () => import("../dashboard/simulator_view.vue"),
+          meta: { title: "Twin", publicPath: true },
+        },
+      ],
+    },
+  ];
+}
+
+/**
+ * Creates the routes for TFChain section.
+ *
+ * @returns An array of route records for TFChain.
+ */
+function createTFChainRoutes(): RouteRecordRaw[] {
+  return [
+    {
+      path: DashboardRoutes.TFChain.BaseRoute,
+      children: [
+        {
+          name: "Profile",
+          path: DashboardRoutes.TFChain.YourProfile,
+          component: () => import("../dashboard/twin_view.vue"),
+          meta: { title: "Your Profile" },
+        },
+
+        {
+          path: DashboardRoutes.TFChain.TFDAO,
+          component: () => import("../dashboard/dao_view.vue"),
+          meta: { title: "Dao" },
+        },
+        {
+          path: DashboardRoutes.TFChain.TFTokenBridge,
+          component: () => import("../dashboard/bridge_view.vue"),
+          meta: { title: "Bridge" },
+        },
+        {
+          path: DashboardRoutes.TFChain.TFTokenTransfer,
+          component: () => import("../dashboard/transfer_view.vue"),
+          meta: { title: "Transfer" },
+        },
+        {
+          path: DashboardRoutes.TFChain.TFMintingReports,
+          component: () => import("../views/minting_view.vue"),
+          meta: { title: "Minting", info: { page: "info/minting.md" }, publicPath: true },
+        },
+      ],
+    },
+  ];
+}
+
+/**
+ * Creates the routes for Deploy section.
+ *
+ * @returns An array of route records for Deploy.
+ */
+function createDeployRoutes(): RouteRecordRaw[] {
+  return [
+    {
+      path: DashboardRoutes.Deploy.BaseRoute,
+      children: [
+        {
+          path: DashboardRoutes.Deploy.PricingCalculator,
+          component: () => import("../calculator/pricing_calculator.vue"),
+          meta: { title: "Resource Pricing", publicPath: true },
+        },
+        {
+          path: DashboardRoutes.Deploy.NodeFinder,
+          component: () => import("@/views/nodes.vue"),
+          meta: { title: "Nodes", publicPath: true },
+        },
+        {
+          path: DashboardRoutes.Deploy.VirtualMachines,
+          children: [
+            {
+              path: "",
+              component: () => import("../views/vms_view.vue"),
+              meta: { title: "Virtual Machines" },
+            },
+            {
+              path: DashboardRoutes.VirtualMachines.FullVirtualMachine,
+              component: () => import("../views/full_virtual_machine.vue"),
+              meta: {
+                title: "Full Virtual Machine",
+                info: { page: "info/full_vm.md" },
+                navbarConfig: {
+                  back: true,
+                  path: [
+                    { title: "Deploy" },
+                    {
+                      title: "Virtual Machines",
+                      disabled: false,
+                      to: DashboardRoutes.Deploy.VirtualMachines,
+                    },
+                    {
+                      title: "Full Virtual Machine",
+                    },
+                  ],
+                },
+                requireSSH: true,
+              },
+            },
+            {
+              path: DashboardRoutes.VirtualMachines.MicroVirtualMachine,
+              component: () => import("../views/micro_virtual_machine.vue"),
+              meta: {
+                title: "Micro Virtual Machine",
+                info: { page: "info/vm.md" },
+                navbarConfig: {
+                  back: true,
+                  path: [
+                    { title: "Deploy" },
+                    {
+                      title: "Virtual Machines",
+                      disabled: false,
+                      to: DashboardRoutes.Deploy.VirtualMachines,
+                    },
+                    {
+                      title: "Micro Virtual Machine",
+                    },
+                  ],
+                },
+                requireSSH: true,
+              },
+            },
+          ],
+        },
+
+        {
+          path: DashboardRoutes.Deploy.Orchestrators,
+          children: [
+            {
+              path: "",
+              component: () => import("../views/orchestrators_view.vue"),
+              meta: { title: "Orchestrators" },
+            },
+
+            {
+              path: DashboardRoutes.Orchestrators.Kubernetes,
+              component: () => import("../views/kubernetes_view.vue"),
+              meta: {
+                title: "Kubernetes",
+                info: { page: "info/kubernetes.md" },
+                navbarConfig: {
+                  back: true,
+                  path: [
+                    { title: "Deploy" },
+                    {
+                      title: "Orchestrators",
+                      disabled: false,
+                      to: DashboardRoutes.Deploy.Orchestrators,
+                    },
+                    {
+                      title: "Kubernetes",
+                    },
+                  ],
+                },
+                requireSSH: true,
+              },
+            },
+            {
+              path: DashboardRoutes.Orchestrators.CapRover,
+              component: () => import("../views/caprover_view.vue"),
+              meta: {
+                title: "Caprover",
+                info: { page: "info/caprover.md" },
+                navbarConfig: {
+                  back: true,
+                  path: [
+                    { title: "Deploy" },
+                    {
+                      title: "Orchestrators",
+                      disabled: false,
+                      to: DashboardRoutes.Deploy.Orchestrators,
+                    },
+                    {
+                      title: "Caprover",
+                    },
+                  ],
+                },
+                requireSSH: true,
+              },
+            },
+          ],
+        },
+
+        {
+          path: DashboardRoutes.Deploy.DedicatedMachines,
+          component: () => import("../dashboard/dedicated_nodes_view.vue"),
+          meta: { title: "Dedicated Nodes" },
+        },
+
+        {
+          path: DashboardRoutes.Deploy.Applications,
+          meta: { title: "Applications" },
+          children: createApplicationsRoutes(),
+        },
+
+        {
+          path: DashboardRoutes.Deploy.YourContracts,
           component: () => import("../dashboard/contracts_list.vue"),
           meta: {
             title: "Your Contracts List",
             info: { page: "info/contracts_list.md" },
           },
         },
+
         {
-          path: "dao",
-          component: () => import("../dashboard/dao_view.vue"),
-          meta: { title: "Dao" },
-        },
-        {
-          path: "bridge",
-          component: () => import("../dashboard/bridge_view.vue"),
-          meta: { title: "Bridge" },
-        },
-        {
-          path: "transfer",
-          component: () => import("../dashboard/transfer_view.vue"),
-          meta: { title: "Transfer" },
-        },
-        {
-          path: "dedicated-nodes",
-          component: () => import("../dashboard/dedicated_nodes_view.vue"),
-          meta: { title: "Dedicated Nodes" },
+          path: DashboardRoutes.Deploy.SSHKey,
+          component: () => import("../views/sshkey_view.vue"),
+          meta: { title: "SSHKey" },
+          children: [],
         },
       ],
     },
+  ];
+}
 
-    {
-      path: "/calculator",
-      children: [
-        {
-          path: "pricing",
-          component: () => import("../calculator/resource_pricing.vue"),
-          meta: { title: "Resource Pricing" },
-        },
+/**
+ * Main array of route records for the application, including Home, TFGrid, Deploy, TFChain, Applications, TFFarms, and NotFound routes.
+ */
+const mainRoutes: RouteRecordRaw[] = [
+  // Home Routes
+  {
+    name: "landing",
+    path: DashboardRoutes.Other.HomePage,
+    component: LoggedInLanding,
+    meta: { title: "Landing Page" },
+  },
+  // TFGrid Routes
+  {
+    path: DashboardRoutes.TFGrid.BaseRoute,
+    children: createTFGridRoutes(),
+  },
+  // Deploy Routes
+  {
+    path: DashboardRoutes.Deploy.BaseRoute,
+    children: createDeployRoutes(),
+  },
+  // TFFarms Routes
+  {
+    path: DashboardRoutes.Farms.BaseRoute,
+    children: createTFFarmsRoutes(),
+  },
+  // TFChain Routes
+  {
+    path: DashboardRoutes.TFChain.BaseRoute,
+    children: createTFChainRoutes(),
+  },
+  // NotFound
+  {
+    path: "/:pathMatch(.*)*",
+    component: () => import("../views/page_not_found.vue"),
+    meta: { title: "Page Not Found", publicPath: true },
+  },
+];
 
-        {
-          path: "simulator",
-          component: () => import("../dashboard/simulator_view.vue"),
-          meta: { title: "Twin" },
-        },
-      ],
-    },
-
-    {
-      path: "/solutions",
-      meta: { title: "Solutions" },
-      children: [
-        {
-          path: "",
-          component: () => import("../views/solutions_view.vue"),
-        },
-        {
-          path: "fullvm",
-          component: () => import("../views/full_virtual_machine.vue"),
-          meta: {
-            title: "Full Virtual Machine",
-            info: { page: "info/full_vm.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Full Virtual Machine",
-                },
-              ],
-            },
-          },
-        },
-        {
-          path: "vm",
-          component: () => import("../views/micro_virtual_machine.vue"),
-          meta: {
-            title: "Micro Virtual Machine",
-            info: { page: "info/vm.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Micro Virtual Machine",
-                },
-              ],
-            },
-          },
-        },
-        {
-          path: "kubernetes",
-          component: () => import("../views/kubernetes_view.vue"),
-          meta: {
-            title: "Kubernetes",
-            info: { page: "info/kubernetes.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Kubernetes",
-                },
-              ],
-            },
-          },
-        },
-        {
-          path: "caprover",
-          component: () => import("../views/caprover_view.vue"),
-          meta: {
-            title: "Caprover",
-            info: { page: "info/caprover.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Caprover",
-                },
-              ],
-            },
-          },
-        },
-        {
-          path: "peertube",
-          component: () => import("../views/peertube_view.vue"),
-          meta: {
-            title: "Peertube",
-            info: { page: "info/peertube.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Peertube",
-                },
-              ],
-            },
-          },
-        },
-        {
-          path: "funkwhale",
-          component: () => import("../views/funkwhale_view.vue"),
-          meta: {
-            title: "Funkwhale",
-            info: { page: "info/funkwhale.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Funkwhale",
-                },
-              ],
-            },
-          },
-        },
-        {
-          path: "mattermost",
-          component: () => import("../views/mattermost_view.vue"),
-          meta: {
-            title: "Mattermost",
-            info: { page: "info/mattermost.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Mattermost",
-                },
-              ],
-            },
-          },
-        },
-        {
-          path: "discourse",
-          component: () => import("../views/discourse_view.vue"),
-          meta: {
-            title: "Discourse",
-            info: { page: "info/discourse.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Discourse",
-                },
-              ],
-            },
-          },
-        },
-        {
-          path: "taiga",
-          component: () => import("../views/taiga_view.vue"),
-          meta: {
-            title: "Taiga",
-            info: { page: "info/taiga.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Taiga",
-                },
-              ],
-            },
-          },
-        },
-        {
-          path: "owncloud",
-          component: () => import("../views/owncloud_view.vue"),
-          meta: {
-            title: "Owncloud",
-            info: { page: "info/owncloud.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Owncloud",
-                },
-              ],
-            },
-          },
-        },
-        {
-          path: "nextcloud",
-          component: () => import("../views/nextcloud_view.vue"),
-          meta: {
-            title: "Nextcloud",
-            info: { page: "info/nextcloud.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Nextcloud",
-                },
-              ],
-            },
-          },
-        },
-        {
-          path: "presearch",
-          component: () => import("../views/presearch_view.vue"),
-          meta: {
-            title: "Presearch",
-            info: { page: "info/presearch.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Presearch",
-                },
-              ],
-            },
-          },
-        },
-        {
-          path: "subsquid",
-          component: () => import("../views/subsquid_view.vue"),
-          meta: {
-            title: "Subsquid",
-            info: { page: "info/subsquid.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Subsquid",
-                },
-              ],
-            },
-          },
-        },
-        {
-          path: "casperlabs",
-          component: () => import("../views/casperlabs_view.vue"),
-          meta: {
-            title: "Casperlabs",
-            info: { page: "info/casperlabs.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Casperlabs",
-                },
-              ],
-            },
-          },
-        },
-        {
-          path: "algorand",
-          component: () => import("../views/algorand_view.vue"),
-          meta: {
-            title: "Algorand",
-            info: { page: "info/algorand.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Algorand",
-                },
-              ],
-            },
-          },
-        },
-        {
-          path: "nodepilot",
-          component: () => import("../views/node_pilot.vue"),
-          meta: {
-            title: "Node Pilot",
-            info: { page: "info/nodepilot.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Node Pilot",
-                },
-              ],
-            },
-          },
-        },
-        {
-          path: "wordpress",
-          component: () => import("../views/wordpress_view.vue"),
-          meta: {
-            title: "Wordpress",
-            info: { page: "info/wordpress.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Wordpress",
-                },
-              ],
-            },
-          },
-        },
-        {
-          path: "umbrel",
-          component: () => import("../views/umbrel_view.vue"),
-          meta: {
-            title: "Umbrel",
-            info: { page: "info/umbrel.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Umbrel",
-                },
-              ],
-            },
-          },
-        },
-        {
-          path: "freeflow",
-          component: () => import("../views/freeflow_view.vue"),
-          meta: {
-            title: "Freeflow",
-            info: { page: "info/freeflow.md" },
-            navbarConfig: {
-              back: true,
-              path: [
-                {
-                  title: "Solutions",
-                  disabled: false,
-                  to: "/solutions",
-                },
-                {
-                  title: "Freeflow",
-                },
-              ],
-            },
-          },
-        },
-      ],
-    },
-
-    {
-      path: "/minting",
-      component: () => import("../views/minting_view.vue"),
-      meta: { title: "Minting", info: { page: "info/minting.md" } },
-    },
-    {
-      path: "/nodes",
-      component: () => import("@/views/nodes.vue"),
-      meta: { title: "Nodes" },
-    },
-    {
-      path: "/farms",
-      component: () => import("@/views/farms.vue"),
-      meta: { title: "Farms" },
-    },
-    {
-      path: "/stats",
-      component: () => import("@/views/stats.vue"),
-      meta: { title: "Statistics" },
-    },
-    {
-      path: "/:pathMatch(.*)*",
-      component: () => import("../views/page_not_found.vue"),
-      meta: { title: "Page Not Found" },
-    },
-  ],
+const router = createRouter({
+  history: createWebHashHistory(),
+  routes: mainRoutes,
 });
 
 export default router;

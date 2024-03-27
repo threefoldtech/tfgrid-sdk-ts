@@ -1,25 +1,4 @@
 <template>
-  <!-- Filters -->
-  <div class="pt-5">
-    <filters
-      @update:model-value="inputFiltersReset"
-      :model-value="filterInputs"
-      :valid="isValidForm"
-      :form-disabled="isFormLoading"
-    />
-  </div>
-  <div>
-    <input-tooltip inline tooltip="Enable filtering the nodes that have GPU card supported only.">
-      <v-switch
-        color="primary"
-        inset
-        label="GPU Node (Only)"
-        v-model="gpuFilter"
-        hide-details
-        :disabled="isFormLoading"
-      />
-    </input-tooltip>
-  </div>
   <div class="pt-5">
     <v-card>
       <v-tabs v-model="activeTab" align-tabs="center">
@@ -32,29 +11,25 @@
   <div>
     <v-card class="pa-5">
       <v-data-table-server
-        :loading="loading"
-        :items-length="nodesCount"
+        :loading="$props.loading"
+        :items-length="$props.nodesCount"
         loading-text="Loading nodes..."
         :headers="headers"
         :items="nodes"
-        v-model:items-per-page="pageSize"
+        :items-per-page="$props.options.size"
         v-model:expanded="expanded"
-        show-expand
         :hide-no-data="false"
         :disable-sort="true"
         class="elevation-1"
         :hover="true"
-        :items-per-page-options="[
-          { value: 5, title: '5' },
-          { value: 10, title: '10' },
-          { value: 15, title: '15' },
-          { value: 50, title: '50' },
-        ]"
-        v-model:page="page"
+        :items-per-page-options="pageOptions"
+        :page="$props.options.page"
         return-object
+        @update:options="emits('updateOptions', $event)"
+        @click:row="toggleExpand"
       >
         <template v-slot:[`item.actions`]="{ item }">
-          <reserve-btn :node="(item.raw as unknown as GridNode)" @updateTable="reloadTable" />
+          <reserve-btn :node="(item.raw as unknown as GridNode)" @updateTable="emits('reload-table')" />
         </template>
 
         <template v-slot:[`item.price`]="{ item }">
@@ -66,18 +41,23 @@
               Discounts: <v-spacer />
               <ul class="pl-2">
                 <li>
-                  You receive 50% discount if you reserve an entire
+                  {{ activeTab == 1 ? "You receive " : "You'll receive " }} 50% discount
+                  {{ activeTab == 1 ? " as you reserve the " : " if you reserve an " }} entire
                   <a
                     target="_blank"
-                    href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html#billing--pricing"
+                    href="https://manual.grid.tf/dashboard/deploy/dedicated_machines.html#billing--pricing"
                   >
                     node
                   </a>
                 </li>
                 <li>
-                  You're receiving {{ item.raw.discount }}% discount as per the
-                  <a target="_blank" href="https://manual.grid.tf/cloud/cloudunits_pricing.html#staking-discount">
-                    <p style="display: inline">discount levels</p>
+                  {{ activeTab == 1 ? "You're receiving " : "You'll be receiving " }} {{ item.raw.discount }}% discount
+                  as per the
+                  <a
+                    target="_blank"
+                    href="https://manual.grid.tf/wiki/cloudunits/pricing/staking_discount_levels.html#staking-discount-levels"
+                  >
+                    <p style="display: inline">staking discounts</p>
                   </a>
                 </li>
               </ul>
@@ -94,20 +74,6 @@
 </template>
 
 <script setup lang="ts">
-import type { GridNode } from "@threefold/gridproxy_client";
-import { NodeStatus } from "@threefold/gridproxy_client";
-import { CertificationType } from "@threefold/gridproxy_client";
-import { onMounted, ref, watch } from "vue";
-import type { VDataTable } from "vuetify/labs/VDataTable";
-import { VDataTableServer } from "vuetify/labs/VDataTable";
-
-import { gridProxyClient } from "@/clients";
-import { useProfileManager } from "@/stores";
-import formatResourceSize from "@/utils/format_resource_size";
-import { convert } from "@/utils/get_nodes";
-import { getGrid } from "@/utils/grid";
-import { toGigaBytes } from "@/utils/helpers";
-
 const headers: VDataTable["headers"] = [
   { title: "Node ID", key: "nodeId", sortable: false },
   { title: "Location", key: "location.country", sortable: false },
@@ -142,154 +108,72 @@ const headers: VDataTable["headers"] = [
     sortable: false,
   },
 ];
-const profileManager = useProfileManager();
-const pageSize = ref(10);
-const page = ref(1);
-const expanded = ref([]);
+
+const expanded = ref<any[]>([]);
+const expandedId = ref<string>("");
 const tabs = [{ label: "Rentable" }, { label: "Mine" }];
 const activeTab = ref(0);
-const loading = ref(false);
-const nodes = ref<any[]>();
-const nodesCount = ref(0);
-const filterInputs = ref<DedicatedNodeFilters>(DedicatedNodeInitializer());
-const isValidForm = ref<boolean>(false);
-const isFormLoading = ref<boolean>(true);
-const gpuFilter = ref<boolean | undefined>();
-const tabParams = {
-  0: {
-    rentable: true,
-    status: NodeStatus.Up,
-    retCount: true,
-  },
-  1: {
-    rented: true,
-    rentedBy: profileManager.profile?.twinId,
-    retCount: true,
-  },
-};
+const pageOptions: { value: number; title: string }[] = [
+  { value: 5, title: "5" },
+  { value: 10, title: "10" },
+  { value: 15, title: "15" },
+  { value: 50, title: "50" },
+];
 
-// The mixed filters should reset to the default value again..
-const inputFiltersReset = (filtersInputValues: DedicatedNodeFilters) => {
-  filterInputs.value = filtersInputValues;
-  gpuFilter.value = undefined;
-};
-
-onMounted(async () => {
-  await loadData();
+defineProps({
+  options: {
+    type: Object as PropType<FilterOptions>,
+    required: true,
+  },
+  nodes: {
+    type: Object as PropType<any[]>,
+    required: true,
+  },
+  nodesCount: {
+    type: Number,
+    required: true,
+  },
+  loading: {
+    type: Boolean,
+    required: true,
+  },
 });
 
-const _loadData = async () => {
-  const params = tabParams[activeTab.value as keyof typeof tabParams];
-
-  if (!params) {
-    return;
-  }
-
-  loading.value = true;
-  isFormLoading.value = true;
-  try {
-    const totalCruValue = filterInputs.value.total_cru.value;
-    if (totalCruValue !== undefined && !Number.isInteger(+totalCruValue)) {
-      loading.value = false;
-      nodes.value = [];
-      nodesCount.value = 0;
-      isFormLoading.value = false;
-      return;
-    }
-    const data = await gridProxyClient.nodes.list({
-      ...params,
-      size: pageSize.value,
-      page: page.value,
-      totalSru: convert(filterInputs.value.total_sru.value),
-      totalMru: convert(filterInputs.value.total_mru.value),
-      totalHru: convert(filterInputs.value.total_hru.value),
-      totalCru: totalCruValue ? +totalCruValue : undefined,
-      gpuVendorName: filterInputs.value.gpu_vendor_name.value || "",
-      gpuDeviceName: filterInputs.value.gpu_device_name.value || "",
-      hasGpu: gpuFilter.value,
-    });
-
-    if (data.count === 0) {
-      loading.value = false;
-      nodes.value = [];
-      nodesCount.value = 0;
-      isFormLoading.value = false;
-      return;
-    }
-
-    const grid = await getGrid(profileManager.profile!);
-
-    const pricePromises = data.data.map(async item => {
-      const fee = await grid?.contracts.getDedicatedNodeExtraFee({ nodeId: item.nodeId });
-      const price = await grid?.calculator.calculateWithMyBalance({
-        cru: item.total_resources.cru,
-        hru: toGigaBytes(item.total_resources.hru),
-        mru: toGigaBytes(item.total_resources.mru),
-        sru: toGigaBytes(item.total_resources.sru),
-        ipv4u: false,
-        certified: item.certificationType === CertificationType.Certified,
-      });
-      return {
-        ...item,
-        price: (price?.dedicatedPrice ?? 0 + (fee || 0)).toFixed(3),
-        discount: price?.sharedPackage.discount ?? 0,
-      };
-    });
-
-    const pricedNodes = await Promise.all(pricePromises);
-    nodes.value = pricedNodes;
-
-    nodesCount.value = data.count ?? 0;
-    loading.value = false;
-    isFormLoading.value = false;
-  } catch (e) {
-    console.log("Error: ", e);
-    loading.value = false;
-    isFormLoading.value = false;
-  }
-};
-
-const loadData = debounce(_loadData, 1000);
+const emits = defineEmits(["reload-table", "update-active-tab-value", "updateOptions"]);
 
 watch(
-  [filterInputs, gpuFilter, activeTab],
-  async () => {
-    if (!gpuFilter.value) {
-      gpuFilter.value = undefined;
-    }
-    await loadData();
+  activeTab,
+  () => {
+    emits("update-active-tab-value", activeTab.value);
   },
   { deep: true },
 );
 
-watch(
-  [page, pageSize, isValidForm, filterInputs, gpuFilter],
-  async ([newPage, newPageSize, newIsValidForm]) => {
-    if (!gpuFilter.value) {
-      gpuFilter.value = undefined;
-    }
-    page.value = newPage;
-    pageSize.value = newPageSize;
-    if (newIsValidForm) {
-      await loadData();
-    }
-  },
-  { immediate: true },
-);
+function toggleExpand(e: any, data: any) {
+  if (data.item.props.title.id === expandedId.value) {
+    expanded.value = [];
+    expandedId.value = "";
+    return;
+  }
 
-async function reloadTable() {
-  await new Promise(resolve => {
-    setTimeout(resolve, 20000);
-  });
-  await loadData();
+  if (expanded.value.length) {
+    expanded.value = [];
+    expandedId.value = "";
+  }
+
+  expanded.value.push(data.item.props.title);
+  expandedId.value = data.item.props.title.id;
 }
 </script>
 
 <script lang="ts">
-import { debounce } from "lodash";
+import type { GridNode } from "@threefold/gridproxy_client";
+import { type PropType, ref, watch } from "vue";
+import type { VDataTable } from "vuetify/labs/VDataTable";
+import { VDataTableServer } from "vuetify/labs/VDataTable";
 
-import Filters from "@/components/filter.vue";
-import { type DedicatedNodeFilters, DedicatedNodeInitializer } from "@/utils/filter_nodes";
+import type { FilterOptions } from "@/types";
+import formatResourceSize from "@/utils/format_resource_size";
 
 import NodeDetails from "./node_details.vue";
 import ReserveBtn from "./reserve_action_btn.vue";
@@ -299,7 +183,6 @@ export default {
   components: {
     ReserveBtn,
     NodeDetails,
-    Filters,
   },
 };
 </script>

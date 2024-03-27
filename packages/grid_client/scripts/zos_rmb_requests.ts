@@ -3,91 +3,87 @@ import { getClient } from "./client_loader";
 import { log } from "./utils";
 
 async function pingNode(client, nodeId) {
-  try {
-    const res = await client.zos.pingNode(nodeId);
-    log("================= Pinging node =================");
-    log(res);
-    log("================= Pinging node =================");
-  } catch (error) {
-    log("Error while pinging node " + error);
-  }
+  const res = await client.zos.pingNode(nodeId);
+  log("================= Pinging node =================");
+  log(res);
+  log("================= Pinging node =================");
 }
 
 async function getDeployment(client, contractId) {
-  try {
-    const res = await client.zos.getDeployment(contractId);
-    log("================= Getting deployment =================");
-    log(res);
-    log("================= Getting deployment =================");
-  } catch (error) {
-    log("Error while getting deployment " + error);
-  }
+  const res = await client.zos.getDeployment(contractId);
+  log("================= Getting deployment =================");
+  log(res);
+  log("================= Getting deployment =================");
 }
 
 async function hasPublicIPv6(client, nodeId) {
-  try {
-    const res = await client.zos.hasPublicIPv6(nodeId);
-    log("================= Checking public ipv6 =================");
-    log(res);
-    log("================= Checking public ipv6 =================");
-  } catch (error) {
-    log("Error while checking public ipv6 " + error);
-  }
+  const res = await client.zos.hasPublicIPv6(nodeId);
+  log("================= Checking public ipv6 =================");
+  log(res);
+  log("================= Checking public ipv6 =================");
 }
 
 async function listNetworkInterfaces(client, nodeId) {
-  try {
-    const res = await client.zos.listNetworkInterfaces(nodeId);
-    log("================= Listing network interfaces =================");
-    log(res);
-    log("================= Listing network interfaces =================");
-  } catch (error) {
-    log("Error while listing network interfaces " + error);
-  }
+  const res = await client.zos.listNetworkInterfaces(nodeId);
+  log("================= Listing network interfaces =================");
+  log(res);
+  log("================= Listing network interfaces =================");
 }
 
 async function listNetworkPublicIPs(client, nodeId) {
-  try {
-    const res = await client.zos.listNetworkPublicIPs(nodeId);
-    log("================= Listing public ips =================");
-    log(res);
-    log("================= Listing public ips =================");
-  } catch (error) {
-    log("Error while listing public ips " + error);
-  }
+  const res = await client.zos.listNetworkPublicIPs(nodeId);
+  log("================= Listing public ips =================");
+  log(res);
+  log("================= Listing public ips =================");
 }
 
 async function getNetworkPublicConfig(client, nodeId) {
-  try {
-    const res = await client.zos.getNetworkPublicConfig(nodeId);
-    log("================= Getting public config =================");
-    log(res);
-    log("================= Getting public config =================");
-  } catch (error) {
-    log("Error while getting public config " + error);
-  }
+  const res = await client.zos.getNetworkPublicConfig(nodeId);
+  log("================= Getting public config =================");
+  log(res);
+  log("================= Getting public config =================");
 }
 
 async function getStoragePools(client, nodeId) {
-  try {
-    const res = await client.zos.getStoragePools(nodeId);
-    log("================= Getting storage pools =================");
-    log(res);
-    log("================= Getting storage pools =================");
-  } catch (error) {
-    log("Error while getting storage pools " + error);
-  }
+  const res = await client.zos.getStoragePools(nodeId);
+  log("================= Getting storage pools =================");
+  log(res);
+  log("================= Getting storage pools =================");
 }
 
 async function getNodeGPUInfo(client, nodeId) {
-  try {
-    const res = await client.zos.getNodeGPUInfo(nodeId);
-    log("================= Getting GPU info =================");
-    log(res);
-    log("================= Getting GPU info =================");
-  } catch (error) {
-    log("Error while getting GPU info " + error);
-  }
+  const res = await client.zos.getNodeGPUInfo(nodeId);
+  log("================= Getting GPU info =================");
+  log(res);
+  log("================= Getting GPU info =================");
+}
+
+async function getNodePerfTests(client, nodeId) {
+  const res = await client.zos.getNodePerfTests(nodeId);
+  log("================= Getting perf tests =================");
+  log(res);
+  log("================= Getting perf tests =================");
+}
+
+async function getNodeIPerfTest(client, nodeId) {
+  const res = await client.zos.getNodeIPerfTest(nodeId);
+  log("================= Getting IPerf test =================");
+  log(res);
+  log("================= Getting IPerf test =================");
+}
+
+async function getNodeIPValidation(client, nodeId) {
+  const res = await client.zos.getNodeIPValidation(nodeId);
+  log("================= Getting Node IP Validation test =================");
+  log(res);
+  log("================= Getting Node IP Validation test =================");
+}
+
+async function getNodeCPUTest(client, nodeId) {
+  const res = await client.zos.getNodeCPUTest(nodeId);
+  log("================= Getting node CPU test =================");
+  log(res);
+  log("================= Getting node CPU test =================");
 }
 
 async function main() {
@@ -126,6 +122,12 @@ async function main() {
 
   //Get GPU info
   await getNodeGPUInfo(grid3, node);
+
+  // Get perf tests
+  await getNodePerfTests(grid3, node);
+  await getNodeCPUTest(grid3, node);
+  await getNodeIPValidation(grid3, node);
+  await getNodeIPerfTest(grid3, node);
 
   await grid3.disconnect();
 }

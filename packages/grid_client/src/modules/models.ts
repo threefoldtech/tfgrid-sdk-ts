@@ -14,6 +14,7 @@ import {
   IsOptional,
   IsString,
   IsUrl,
+  Length,
   MaxLength,
   Min,
   ValidateNested,
@@ -83,6 +84,16 @@ class NetworkModel {
   @Expose() @IsString() @IsNotEmpty() ip_range: string;
   @Expose() @IsBoolean() @IsOptional() addAccess?: boolean;
   @Expose() @IsInt() @Min(1) @IsOptional() accessNodeId?: number;
+  @Expose()
+  @IsOptional()
+  @Type(() => MyceliumNetworkModel)
+  @ValidateNested({ each: true })
+  myceliumSeeds?: MyceliumNetworkModel[];
+}
+
+class MyceliumNetworkModel {
+  @Expose() @IsString() @Length(32) seed?: string;
+  @Expose() @IsInt() @Min(1) nodeId: number;
 }
 
 class BaseGetDeleteModel {
@@ -97,6 +108,8 @@ class MachineModel {
   @Expose() @IsBoolean() public_ip: boolean;
   @Expose() @IsOptional() @IsBoolean() public_ip6?: boolean;
   @Expose() @IsBoolean() planetary: boolean;
+  @Expose() @IsBoolean() mycelium: boolean;
+  @Expose() @IsOptional() @IsString() @Length(6) myceliumSeed?: string;
   @Expose() @IsInt() @Min(1) cpu: number;
   @Expose() @Min(256) memory: number; // in MB
   @Expose() rootfs_size: number; // in GB
@@ -120,6 +133,7 @@ class MachinesModel {
 
 class AddMachineModel extends MachineModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) deployment_name: string;
+  @Expose() @IsString() @IsOptional() myceliumNetworkSeed?: string;
 }
 
 class DeleteMachineModel {
@@ -142,6 +156,8 @@ class KubernetesNodeModel {
   @Expose() @IsBoolean() public_ip: boolean;
   @Expose() @IsOptional() @IsBoolean() public_ip6: boolean;
   @Expose() @IsBoolean() planetary: boolean;
+  @Expose() @IsBoolean() mycelium: boolean;
+  @Expose() @IsOptional() @IsString() myceliumSeed?: string;
   @Expose() @IsOptional() @IsIP() ip?: string;
   @Expose() @IsOptional() @IsBoolean() corex?: boolean;
   @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
@@ -166,6 +182,7 @@ class K8SDeleteModel extends BaseGetDeleteModel {}
 
 class AddWorkerModel extends KubernetesNodeModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) deployment_name: string;
+  @Expose() @IsString() @IsOptional() myceliumNetworkSeed?: string;
 }
 
 class DeleteWorkerModel {
@@ -597,6 +614,7 @@ class FilterOptions {
   @Expose() @IsOptional() @IsBoolean() ret_count?: boolean;
   @Expose() @IsOptional() @Transform(({ value }) => NodeStatus[value]) @IsEnum(NodeStatus) status?: NodeStatus;
   @Expose() @IsOptional() @IsString() region?: string;
+  @Expose() @IsOptional() @IsBoolean() healthy?: boolean;
 }
 
 enum CertificationType {
@@ -654,6 +672,58 @@ class BatchModel<T> {
 
 class ZOSNodeModel {
   @Expose() @IsInt() @Min(1) nodeId: number;
+}
+
+class NodeCPUTest {
+  @Expose() @IsNotEmpty() @IsString() name: string;
+  @Expose() @IsNotEmpty() @IsString() description: string;
+  @Expose() @IsNotEmpty() @IsNumber() timestamp: number;
+  @Expose() result: CPUBenchmark | {};
+}
+
+class NodeIPValidation {
+  @Expose() @IsNotEmpty() @IsString() name: string;
+  @Expose() @IsNotEmpty() @IsString() description: string;
+  @Expose() @IsNotEmpty() @IsNumber() timestamp: number;
+  @Expose() result: IPValidation | {};
+}
+
+class NodeIPerf {
+  @Expose() @IsNotEmpty() @IsString() name: string;
+  @Expose() @IsNotEmpty() @IsString() description: string;
+  @Expose() @IsNotEmpty() @IsNumber() timestamp: number;
+  @Expose() result: IPerf[] | [];
+}
+
+class CPUReport {
+  @Expose() @IsNotEmpty() @IsNumber() host_system: number;
+  @Expose() @IsNotEmpty() @IsNumber() host_total: number;
+  @Expose() @IsNotEmpty() @IsNumber() host_user: number;
+  @Expose() @IsNotEmpty() @IsNumber() remote_system: number;
+  @Expose() @IsNotEmpty() @IsNumber() remote_total: number;
+  @Expose() @IsNotEmpty() @IsNumber() remote_user: number;
+}
+
+class IPerf {
+  @Expose() @ValidateNested() cpu_report: CPUReport;
+  @Expose() @IsNotEmpty() @IsNumber() download_speed: number;
+  @Expose() @IsNotEmpty() @IsString() error: string;
+  @Expose() @IsNotEmpty() @IsInt() node_id: number;
+  @Expose() @IsNotEmpty() @IsString() node_ip: string;
+  @Expose() @IsNotEmpty() @IsString() test_type: string;
+  @Expose() @IsNotEmpty() @IsNumber() upload_speed: number;
+}
+
+class CPUBenchmark {
+  @Expose() @IsNotEmpty() @IsNumber() multi: number;
+  @Expose() @IsNotEmpty() @IsNumber() single: number;
+  @Expose() @IsNotEmpty() @IsNumber() threads: number;
+  @Expose() @IsNotEmpty() @IsNumber() workloads: number;
+}
+
+class IPValidation {
+  @Expose() @IsNotEmpty() @IsString() reason: string;
+  @Expose() @IsNotEmpty() @IsString() state: string;
 }
 
 class NodePowerModel {
@@ -718,8 +788,10 @@ class NetworkAddNodeModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
   @Expose() @IsString() @IsNotEmpty() ipRange: string;
   @Expose() @IsInt() @IsNotEmpty() @Min(1) nodeId: number;
+  @Expose() @IsBoolean() mycelium: boolean;
   @Expose() @IsInt() @IsOptional() solutionProviderId?: number;
   @Expose() @IsString() @IsOptional() description?: string;
+  @Expose() @IsString() @IsOptional() @Length(32) myceliumSeed?: string;
 }
 
 class NetworkHasNodeModel {
@@ -730,6 +802,7 @@ class NetworkHasNodeModel {
 
 class NetworkGetModel {
   @Expose() @IsString() @IsNotEmpty() @IsAlphanumeric() @MaxLength(NameLength) name: string;
+  @Expose() @IsString() @IsNotEmpty() ipRange: string;
 }
 
 class SetDedicatedNodeExtraFeesModel {
@@ -894,4 +967,8 @@ export {
   AddPublicConfig,
   GetActiveContractsModel,
   GPUCardInfo,
+  MyceliumNetworkModel,
+  NodeCPUTest,
+  NodeIPValidation,
+  NodeIPerf,
 };
