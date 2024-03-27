@@ -16,8 +16,8 @@ export default {
   },
   emits: { "update:modelValue": (value: boolean) => value },
   setup(props, { emit, expose }) {
-    const statusMap = ref(new Map<number, ValidatorStatus>());
-    const serviceMap = new Map<number, InputValidatorService>();
+    const statusMap = ref(new Map<string, ValidatorStatus>());
+    const serviceMap = new Map<string, InputValidatorService>();
 
     const valid = computed(() =>
       [...statusMap.value.values()].every(status => {
@@ -53,6 +53,8 @@ export default {
       reset() {
         [...serviceMap.values()].map(({ reset }) => reset());
       },
+
+      get: uid => serviceMap.get(uid),
 
       valid,
       invalid: computed(() => [...statusMap.value.values()].some(status => status === ValidatorStatus.Invalid)),

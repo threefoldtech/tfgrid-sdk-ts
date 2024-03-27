@@ -43,6 +43,7 @@ export default {
     hint: String,
     disableValidation: Boolean,
     debounceTime: Number,
+    inputName: String,
   },
   emits: {
     "update:modelValue": (valid: boolean) => valid,
@@ -50,7 +51,8 @@ export default {
     "update:error": (error: string | null) => true || error,
   },
   setup(props, { emit, expose }) {
-    const { uid } = getCurrentInstance() as { uid: number };
+    const { uid: _uid } = getCurrentInstance() as { uid: number };
+    const uid = props.inputName || _uid.toString();
     const form = useForm();
 
     const required = computed(() => props.rules.some(rule => "required" in (rule("") || {})));
