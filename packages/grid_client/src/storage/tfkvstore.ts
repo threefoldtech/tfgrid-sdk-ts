@@ -65,19 +65,13 @@ class TFKVStoreBackend implements BackendStorageInterface {
 
   @crop
   async remove(key: string) {
-    let value = await this.client.kvStore.get({ key });
+    const value = await this.client.kvStore.get({ key });
     if (!value) {
       return;
     }
-    let i = 0;
-    let k = key;
-    const extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = [];
-    while (value) {
-      extrinsics.push(await this.client.kvStore.delete({ key: k }));
-      i++;
-      k = `${key}.${i}`;
-      value = await this.client.kvStore.get({ key: k });
-    }
+
+    const extrinsics: SubmittableExtrinsic<"promise", ISubmittableResult>[] = await this.cleanFragments(key, 1);
+    extrinsics.push(await this.client.kvStore.delete({ key }));
     return extrinsics;
   }
 
