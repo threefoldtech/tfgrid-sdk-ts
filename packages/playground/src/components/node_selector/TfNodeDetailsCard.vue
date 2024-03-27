@@ -71,27 +71,79 @@
     <template #append>
       <template v-if="node">
         <div class="d-flex">
-          <VChip class="mr-2" :color="dedicated ? 'success' : 'secondary'" :text="dedicated ? 'Dedicated' : 'Shared'" />
-          <VChip :color="node?.status === 'up' ? 'success' : 'error'" class="mr-2" :text="capitalize(node?.status)" />
+          <VTooltip
+            :text="dedicated ? 'This node is dedicated for one user only' : 'Multiple users can deploy on this node'"
+            location="top"
+            v-if="node"
+          >
+            <template #activator="{ props }">
+              <VChip
+                v-bind="props"
+                class="mr-2"
+                :color="dedicated ? 'success' : 'secondary'"
+                :text="dedicated ? 'Dedicated' : 'Shared'"
+              />
+            </template>
+          </VTooltip>
+
+          <VTooltip text="Node Status" location="top" v-if="node && node.status">
+            <template #activator="{ props }">
+              <VChip
+                v-bind="props"
+                :color="node?.status === 'up' ? 'success' : 'error'"
+                class="mr-2"
+                :text="capitalize(node.status)"
+              />
+            </template>
+          </VTooltip>
+
+          <VTooltip
+            v-if="rentable || rented"
+            location="top"
+            :text="
+              rentable ? 'You can rent it exclusively for your workloads' : 'Rented as full node for a single user'
+            "
+          >
+            <template #activator="{ props }">
+              <VChip
+                v-if="rentable || rented"
+                v-bind="props"
+                class="mr-2"
+                color="secondary"
+                :text="rentable ? 'Rentable' : 'Rented'"
+              />
+            </template>
+          </VTooltip>
 
           <VChip v-if="num_gpu" class="mr-2" color="secondary" :text="num_gpu + ' GPU'" />
-          <VChip v-if="rentable || rented" class="mr-2" color="secondary" :text="rentable ? 'Rentable' : 'Rented'" />
 
-          <VChip
-            class="mr-2"
-            color="primary"
-            :text="node?.certificationType === 'Diy' ? node?.certificationType.toUpperCase() : node?.certificationType"
-          />
-          <span v-if="speed?.upload && speed?.download" class="speed-chip mr-2 grey-darken-3">
-            <span>
-              <v-icon icon="mdi-arrow-up"></v-icon>
-              <span class="mx-1"> {{ formatSpeed(speed.upload) }}</span>
-            </span>
-            <span>
-              <v-icon icon="mdi-arrow-down"></v-icon>
-              <span class="mx-1">{{ formatSpeed(speed.download) }}</span>
-            </span>
-          </span>
+          <VTooltip v-if="node && node.certificationType" location="top" text="Certification type">
+            <template #activator="{ props }">
+              <VChip
+                v-bind="props"
+                class="mr-2"
+                color="primary"
+                :text="
+                  node?.certificationType === 'Diy' ? node?.certificationType.toUpperCase() : node?.certificationType
+                "
+              />
+            </template>
+          </VTooltip>
+
+          <VTooltip v-if="speed" location="top" text="Network Speed Test">
+            <template #activator="{ props }">
+              <span v-bind="props" v-if="speed?.upload && speed?.download" class="speed-chip mr-2 grey-darken-3">
+                <span>
+                  <v-icon icon="mdi-arrow-up"></v-icon>
+                  <span class="mx-1"> {{ formatSpeed(speed.upload) }}</span>
+                </span>
+                <span>
+                  <v-icon icon="mdi-arrow-down"></v-icon>
+                  <span class="mx-1">{{ formatSpeed(speed.download) }}</span>
+                </span>
+              </span>
+            </template>
+          </VTooltip>
         </div>
       </template>
     </template>
@@ -282,7 +334,7 @@ export default {
     const hruText = computed(normalizeBytesResource("hru"));
 
     function formatSpeed(speed: number): string {
-      return formatResourceSize(speed).toLocaleLowerCase() + "ps";
+      return formatResourceSize(speed, true).toLocaleLowerCase() + "ps";
     }
 
     return {
@@ -322,6 +374,7 @@ export default {
   display: flex;
   flex-direction: column !important;
   font-size: 0.7rem;
+  font-weight: bold;
   background-color: #424242;
   padding: 5px 12px;
   border-radius: 9999px;

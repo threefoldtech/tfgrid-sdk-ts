@@ -3,30 +3,6 @@
     <v-alert type="info" variant="tonal">
       Node status is updated every 90 minutes. For a realtime status, click on the row.
     </v-alert>
-    <v-alert class="mt-5">
-      <div class="mx-auto d-flex">
-        <div class="mr-6">
-          <v-chip color="success" class="mr-2">
-            <span class="text-subtitle-2"> Shared </span>
-          </v-chip>
-          <span class="text-subtitle-2">Multiple users can deploy on that node</span>
-        </div>
-
-        <div class="mr-6">
-          <v-chip color="warning" class="mr-2">
-            <span class="text-subtitle-2"> Rented </span>
-          </v-chip>
-          <span class="text-subtitle-2">Rented as full node for a single user</span>
-        </div>
-
-        <div class="mr-6">
-          <v-chip color="primary" class="mr-2">
-            <span class="text-subtitle-2"> Rentable </span>
-          </v-chip>
-          <span class="text-subtitle-2">You can rent it exclusively for your workloads</span>
-        </div>
-      </div>
-    </v-alert>
   </div>
 
   <view-layout>
