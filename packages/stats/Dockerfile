@@ -16,5 +16,5 @@ RUN curl --location  https://github.com/threefoldtech/zinit/releases/download/v0
     chmod +x /sbin/zinit
 RUN echo "* * * * * curl localhost/api/stats-update" > /var/spool/cron/crontabs/root
 RUN mkdir -p /etc/zinit;
-COPY zinit /etc/zinit
+COPY --from=build /app/packages/stats/zinit /etc/zinit
 ENTRYPOINT [ "/sbin/zinit", "init" ]

@@ -1,2 +1,2 @@
-exec: nginx
+exec: nginx -g 'daemon off;'
 test: ps | grep nginx
