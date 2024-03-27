@@ -84,7 +84,6 @@ import { SSHKeyData } from "@/types";
 
 export default defineComponent({
   name: "ManageSshDeployemnt",
-  props: {},
   emits: ["selectedKeys"],
   components: {
     SshDataDialog,

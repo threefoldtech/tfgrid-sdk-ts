@@ -148,7 +148,6 @@
 import { type Ref, ref, watch } from "vue";
 
 import Network from "../components/networks.vue";
-import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { useLayout } from "../components/weblet_layout.vue";
 import { useProfileManager } from "../stores";
 import type { solutionFlavor as SolutionFlavor } from "../types";
@@ -284,6 +283,7 @@ function updateSSHkeyEnv(selectedKeys: string) {
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 
@@ -293,6 +293,7 @@ export default {
     SelectVmImage,
     SelectSolutionFlavor,
     ExpandableLayout,
+    ManageSshDeployemnt,
   },
 };
 </script>
