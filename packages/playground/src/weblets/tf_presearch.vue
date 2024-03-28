@@ -83,6 +83,8 @@
           }"
           v-model="selectionDetails"
         />
+
+        <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
       </template>
 
       <template #restore>
@@ -143,6 +145,7 @@ const dedicated = ref(false);
 const certified = ref(false);
 const selectionDetails = ref<SelectionDetails>();
 const mycelium = ref(false);
+const selectedSSHKeys = ref("");
 
 async function deploy() {
   layout.value.setStatus("deploy");
@@ -177,7 +180,7 @@ async function deploy() {
           envs: [
             {
               key: "SSH_KEY",
-              value: profileManager.profile!.ssh,
+              value: selectedSSHKeys.value,
             },
             {
               key: "PRESEARCH_REGISTRATION_CODE",
@@ -207,13 +210,19 @@ async function deploy() {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Presearch instance."));
   }
 }
+
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
+}
 </script>
 
 <script lang="ts">
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 
 export default {
   name: "TFPresearch",
+  component: { ManageSshDeployemnt },
 };
 </script>

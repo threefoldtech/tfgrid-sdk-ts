@@ -1,11 +1,13 @@
 import type { KeypairType } from "@threefold/grid_client";
 import { defineStore } from "pinia";
 
+import type { SSHKeyData } from "@/types";
+
 import { useGrid } from "./grid";
 
 export interface Profile {
   mnemonic: string;
-  ssh: string;
+  ssh: SSHKeyData[];
   twinId: number;
   address: string;
   relay: string;
@@ -28,7 +30,7 @@ const useProfileManager = defineStore("profile-manager", {
       this.profile = profile;
       useGrid().set(profile);
     },
-    updateSSH(ssh: string) {
+    updateSSH(ssh: SSHKeyData[]) {
       if (this.profile) {
         this.profile.ssh = ssh;
       }

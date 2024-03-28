@@ -69,6 +69,8 @@
           require-domain
           v-model="selectionDetails"
         />
+
+        <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
       </template>
 
       <template #smtp>
@@ -112,6 +114,7 @@ const smtp = ref(createSMTPServer());
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
 const mycelium = ref(false);
+const selectedSSHKeys = ref("");
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
@@ -167,7 +170,7 @@ async function deploy() {
           planetary: true,
           mycelium: mycelium.value,
           envs: [
-            { key: "SSH_KEY", value: profileManager.profile!.ssh },
+            { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "DB_PASSWORD", value: generatePassword() },
             { key: "SITE_URL", value: "https://" + domain },
             { key: "MATTERMOST_DOMAIN", value: domain },
@@ -213,12 +216,17 @@ async function deploy() {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a mattermost instance."));
   }
 }
+
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
+}
 </script>
 
 <script lang="ts">
 import Networks from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { normalizeError } from "../utils/helpers";
@@ -226,6 +234,6 @@ import rootFs from "../utils/root_fs";
 
 export default {
   name: "TfMattermost",
-  components: { SmtpServer, SelectSolutionFlavor, Networks },
+  components: { SmtpServer, SelectSolutionFlavor, Networks, ManageSshDeployemnt },
 };
 </script>

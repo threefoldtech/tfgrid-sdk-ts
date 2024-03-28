@@ -90,6 +90,9 @@
           }"
           v-model="selectionDetails"
         />
+
+        <!-- Manage the selected keys and send them to the deployment as env var -->
+        <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
       </template>
 
       <template #disks>
@@ -183,6 +186,7 @@ const images: VmImage[] = [
   },
 ];
 
+const selectedSSHKeys = ref("");
 const name = ref(generateName({ prefix: "vm" }));
 const flist = ref<Flist>();
 const ipv4 = ref(false);
@@ -250,7 +254,7 @@ async function deploy() {
           publicIpv6: ipv6.value,
           planetary: planetary.value,
           mycelium: mycelium.value,
-          envs: [{ key: "SSH_KEY", value: profileManager.profile!.ssh }],
+          envs: [{ key: "SSH_KEY", value: selectedSSHKeys.value }],
           rootFilesystemSize,
           hasGPU: hasGPU.value,
           nodeId: selectionDetails.value?.node?.nodeId,
@@ -269,12 +273,17 @@ async function deploy() {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a full virtual machine instance."));
   }
 }
+
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
+}
 </script>
 
 <script lang="ts">
 import ExpandableLayout from "../components/expandable_layout.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SelectVmImage, { type VmImage } from "../components/select_vm_image.vue";
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 
@@ -284,6 +293,7 @@ export default {
     SelectVmImage,
     SelectSolutionFlavor,
     ExpandableLayout,
+    ManageSshDeployemnt,
   },
 };
 </script>

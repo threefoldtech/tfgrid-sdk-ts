@@ -63,6 +63,8 @@
         require-domain
         v-model="selectionDetails"
       />
+
+      <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
     </form-validator>
 
     <template #footer-actions>
@@ -101,6 +103,7 @@ const ipv4 = ref(false);
 const mycelium = ref(false);
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
+const selectedSSHKeys = ref("");
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
@@ -160,7 +163,7 @@ async function deploy() {
           publicIpv4: ipv4.value,
           mycelium: mycelium.value,
           envs: [
-            { key: "SSH_KEY", value: profileManager.profile!.ssh },
+            { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "NEXTCLOUD_DOMAIN", value: domain },
             { key: "NEXTCLOUD_AIO_LINK", value: aio_link },
             { key: "GATEWAY", value: String(has_gateway) },
@@ -201,17 +204,22 @@ async function deploy() {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a Nextcloud instance."));
   }
 }
+
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
+}
 </script>
 
 <script lang="ts">
 import Networks from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import rootFs from "../utils/root_fs";
 
 export default {
   name: "TFNextcloud",
-  components: { SelectSolutionFlavor, Networks },
+  components: { SelectSolutionFlavor, Networks, ManageSshDeployemnt },
 };
 </script>

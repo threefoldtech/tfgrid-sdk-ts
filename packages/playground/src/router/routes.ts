@@ -69,7 +69,7 @@ enum ApplicationRoutes {
   Freeflow = "/deploy/applications/freeflow/",
 }
 
-export const DashboardRoutes = {
+const DashboardRoutes = {
   TFGrid: { ...TFGridRoutes },
   TFChain: { ...TFChainRoutes },
   Deploy: { ...DeployRoutes },
@@ -78,4 +78,16 @@ export const DashboardRoutes = {
   Other: { ...OtherRoutes },
   VirtualMachines: { ...VirtualMachinesRoutes },
   Orchestrators: { ...OrchestratorsRoutes },
-} as const;
+};
+
+export {
+  DashboardRoutes,
+  VirtualMachinesRoutes,
+  TFGridRoutes,
+  TFChainRoutes,
+  OtherRoutes,
+  OrchestratorsRoutes,
+  FarmRoutes,
+  DeployRoutes,
+  ApplicationRoutes,
+};

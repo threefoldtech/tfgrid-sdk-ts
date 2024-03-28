@@ -173,6 +173,8 @@
         }"
         v-model="selectionDetails"
       />
+
+      <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
     </form-validator>
     <template #footer-actions>
       <v-btn color="secondary" variant="outlined" @click="deploy" :disabled="!valid"> Deploy </v-btn>
@@ -214,6 +216,7 @@ const dedicated = ref(false);
 const certified = ref(false);
 const rootFilesystemSize = computed(() => storage.value);
 const selectionDetails = ref<SelectionDetails>();
+const selectedSSHKeys = ref("");
 
 watch(firstRound, () => lastRoundInput.value.validate(lastRound.value.toString()));
 
@@ -255,7 +258,7 @@ async function deploy() {
           certified: certified.value,
 
           envs: [
-            { key: "SSH_KEY", value: profileManager.profile!.ssh },
+            { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "NETWORK", value: network.value },
             { key: "NODE_TYPE", value: type.value },
             ...(type.value === "participant"
@@ -290,17 +293,22 @@ function customLastRoundValidation(validators: Validators) {
     return validators.min(`Last round must be greater than ${min}`, min + 1)(value);
   };
 }
+
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
+}
 </script>
 
 <script lang="ts">
 import AlgorandCapacity from "../components/algorand_capacity.vue";
 import Networks from "../components/networks.vue";
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { normalizeError } from "../utils/helpers";
 
 export default {
   name: "TfAlgorand",
-  components: { AlgorandCapacity, Networks },
+  components: { AlgorandCapacity, Networks, ManageSshDeployemnt },
 };
 </script>

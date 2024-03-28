@@ -1,9 +1,13 @@
 <template>
   <slot
-    :props="{
-      'append-inner-icon': 'mdi-content-copy',
-      'onClick:append-inner': copy,
-    }"
+    :props="
+      props.data
+        ? {
+            'append-inner-icon': 'mdi-content-copy',
+            'onClick:append-inner': copy,
+          }
+        : {}
+    "
   ></slot>
 </template>
 

@@ -117,6 +117,8 @@
           require-domain
           v-model="selectionDetails"
         />
+
+        <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
       </template>
 
       <template #smtp>
@@ -165,6 +167,7 @@ const mycelium = ref(false);
 const smtp = ref(createSMTPServer());
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));
 const selectionDetails = ref<SelectionDetails>();
+const selectedSSHKeys = ref("");
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
@@ -220,7 +223,7 @@ async function deploy() {
           planetary: true,
           mycelium: mycelium.value,
           envs: [
-            { key: "SSH_KEY", value: profileManager.profile!.ssh },
+            { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "DOMAIN_NAME", value: domain },
             { key: "ADMIN_USERNAME", value: username.value },
             { key: "ADMIN_PASSWORD", value: password.value },
@@ -269,12 +272,17 @@ async function deploy() {
     layout.value.setStatus("failed", normalizeError(e, "Failed to deploy a taiga instance."));
   }
 }
+
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
+}
 </script>
 
 <script lang="ts">
 import Networks from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 import { normalizeError } from "../utils/helpers";
@@ -282,6 +290,6 @@ import rootFs from "../utils/root_fs";
 
 export default {
   name: "TfTaiga",
-  components: { SmtpServer, SelectSolutionFlavor, Networks },
+  components: { SmtpServer, SelectSolutionFlavor, Networks, ManageSshDeployemnt },
 };
 </script>

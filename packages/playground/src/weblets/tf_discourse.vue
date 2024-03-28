@@ -85,6 +85,8 @@
           require-domain
           v-model="selectionDetails"
         />
+
+        <manage-ssh-deployemnt @selected-keys="updateSSHkeyEnv($event)" />
       </template>
 
       <template #mail>
@@ -133,6 +135,7 @@ const flist: Flist = {
   value: "https://hub.grid.tf/tf-official-apps/forum-docker-v3.1.2.flist",
   entryPoint: "/sbin/zinit init",
 };
+const selectedSSHKeys = ref("");
 
 function finalize(deployment: any) {
   layout.value.reloadDeploymentsList();
@@ -182,7 +185,7 @@ async function deploy() {
           planetary: true,
           mycelium: mycelium.value,
           envs: [
-            { key: "SSH_KEY", value: profileManager.profile!.ssh },
+            { key: "SSH_KEY", value: selectedSSHKeys.value },
             { key: "DISCOURSE_HOSTNAME", value: domain },
             { key: "DISCOURSE_DEVELOPER_EMAILS", value: email.value },
             { key: "DISCOURSE_SMTP_ADDRESS", value: smtp.value.hostname },
@@ -231,17 +234,22 @@ function generatePubKey(): string {
   const keypair = TweetNACL.box.keyPair();
   return Buffer.from(keypair.publicKey).toString("base64");
 }
+
+function updateSSHkeyEnv(selectedKeys: string) {
+  selectedSSHKeys.value = selectedKeys;
+}
 </script>
 
 <script lang="ts">
 import Networks from "../components/networks.vue";
 import SelectSolutionFlavor from "../components/select_solution_flavor.vue";
 import SmtpServer, { createSMTPServer } from "../components/smtp_server.vue";
+import ManageSshDeployemnt from "../components/ssh_keys/ManageSshDeployemnt.vue";
 import { deploymentListEnvironments } from "../constants";
 import type { SelectionDetails } from "../types/nodeSelector";
 
 export default {
   name: "TfDiscourse",
-  components: { SmtpServer, SelectSolutionFlavor, Networks },
+  components: { SmtpServer, SelectSolutionFlavor, Networks, ManageSshDeployemnt },
 };
 </script>
