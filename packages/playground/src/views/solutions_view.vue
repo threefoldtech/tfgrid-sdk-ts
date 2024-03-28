@@ -93,6 +93,13 @@ export default {
         icon: "taiga.png",
         route: DashboardRoutes.Applications.Taiga,
       },
+      {
+        title: "Static Website",
+        excerpt:
+          "Static Website is an application where a user provide a github repository url and it's automatically served using caddy.",
+        icon: "static_website.png",
+        route: DashboardRoutes.Applications.StaticWebsite,
+      },
       // {
       //   title: "Owncloud",
       //   excerpt:

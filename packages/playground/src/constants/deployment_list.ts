@@ -124,6 +124,12 @@ export const deploymentListEnvironments = {
     CHAIN_ENDPOINT: "Chain Endpoint",
   },
 
+  static_website: {
+    SSH_KEY: _ssh,
+    GITHUB_URL: "Cloned Repository URL",
+    ROOT: "Html Directory",
+  },
+
   taiga: {
     SSH_KEY: _ssh,
     DOMAIN_NAME: "Domain Name",
