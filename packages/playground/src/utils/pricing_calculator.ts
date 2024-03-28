@@ -23,12 +23,14 @@ export const mruRules = _applyRules([
   required("Memory is required."),
   isInt("Memory must be a valid integer."),
   max("Maximum allowed memory is 1024 GB.", 1024),
+  min("Minimum allowed memory storage size is 1 GB.", 1),
 ]);
 
 export const sruRules = _applyRules([
   required("SSD Storage size is required."),
   isInt("SSD Storage size must be a valid integer."),
   max("Maximum allowed ssd storage size is 1000000 GB.", 1000000),
+  min("Minimum allowed ssd storage size is 1 GB.", 1),
 ]);
 
 export const hruRules = _applyRules([
