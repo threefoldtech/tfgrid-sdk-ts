@@ -12,6 +12,7 @@
             @mouseleave="propsRef?.onMouseleave"
             @focus="propsRef?.onFocus"
             @blur="propsRef?.onBlur"
+            @click.stop
           >
             <a :href="href" target="_blank">
               <v-icon>mdi-information-outline</v-icon>
@@ -19,6 +20,8 @@
           </span>
         </div>
       </template>
+
+      <p :style="{ maxWidth: '700px' }" v-text="tooltip || 'None!'" />
     </v-tooltip>
   </div>
   <slot v-else />

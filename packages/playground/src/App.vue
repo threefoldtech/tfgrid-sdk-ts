@@ -2,74 +2,42 @@
   <v-app>
     <TfNavigationLoader />
     <TfOfflineNotifier />
-    <profile-manager-controller>
-      <v-navigation-drawer
-        width="280"
-        :permanent="permanent"
-        :model-value="openSidebar"
-        @update:model-value="openSidebar = $event"
-      >
-        <div :style="{ paddingTop: '64px' }">
-          <div
-            :style="{
-              maxHeight: 'calc(100vh - 64px)',
-              overflowY: 'auto',
-            }"
-          >
-            <v-list>
-              <template v-for="route in routes" :key="route.title">
-                <v-list-group v-if="route.items.length > 1" :value="route.title">
-                  <template v-slot:activator="{ props }">
-                    <v-list-item style="font-weight: 500" v-bind="props" :prepend-icon="route.icon">
-                      <v-list-item-title class="font-weight-bold">
-                        <v-tooltip :text="route.tooltip" :disabled="!route.tooltip">
-                          <template #activator="{ props }">
-                            <span v-bind="props">
-                              {{ route.title }}
-                            </span>
-                          </template>
-                        </v-tooltip>
-                      </v-list-item-title>
-                    </v-list-item>
-                  </template>
-                  <v-list-item
-                    v-for="item in route.items"
-                    :key="item.route"
-                    :value="item.route"
-                    @click="clickHandler(item)"
-                    :color="theme.name.value === AppThemeSelection.light ? 'primary' : 'info'"
-                    :active="$route.path === item.route"
-                  >
-                    <template v-slot:prepend v-if="item.icon">
-                      <v-img
-                        v-if="item.icon.includes('.')"
-                        class="mr-7"
-                        width="24"
-                        :src="baseUrl + 'images/icons/' + item.icon"
-                        :alt="item.title"
-                      />
-                      <v-icon v-else width="26">{{ item.icon }}</v-icon>
-                    </template>
-
+    <v-navigation-drawer
+      width="280"
+      :permanent="permanent"
+      :model-value="openSidebar"
+      @update:model-value="openSidebar = $event"
+    >
+      <div :style="{ paddingTop: '64px' }">
+        <div
+          :style="{
+            maxHeight: 'calc(100vh - 64px)',
+            overflowY: 'auto',
+          }"
+        >
+          <v-list>
+            <template v-for="route in routes" :key="route.title">
+              <v-list-group v-if="route.items.length > 1" :value="route.title">
+                <template v-slot:activator="{ props }">
+                  <v-list-item style="font-weight: 500" v-bind="props" :prepend-icon="route.icon">
                     <v-list-item-title class="font-weight-bold">
-                      <v-tooltip :text="item.tooltip" :disabled="!item.tooltip">
+                      <v-tooltip :text="route.tooltip" :disabled="!route.tooltip">
                         <template #activator="{ props }">
                           <span v-bind="props">
-                            {{ item.title }}
+                            {{ route.title }}
                           </span>
                         </template>
                       </v-tooltip>
                     </v-list-item-title>
                   </v-list-item>
-                </v-list-group>
+                </template>
                 <v-list-item
-                  v-else
                   v-for="item in route.items"
                   :key="item.route"
                   :value="item.route"
                   @click="clickHandler(item)"
-                  :active="$route.path === item.route"
                   :color="theme.name.value === AppThemeSelection.light ? 'primary' : 'info'"
+                  :active="$route.path === item.route"
                 >
                   <template v-slot:prepend v-if="item.icon">
                     <v-img
@@ -92,103 +60,137 @@
                     </v-tooltip>
                   </v-list-item-title>
                 </v-list-item>
-              </template>
-            </v-list>
-          </div>
+              </v-list-group>
+              <v-list-item
+                v-else
+                v-for="item in route.items"
+                :key="item.route"
+                :value="item.route"
+                @click="clickHandler(item)"
+                :active="$route.path === item.route"
+                :color="theme.name.value === AppThemeSelection.light ? 'primary' : 'info'"
+              >
+                <template v-slot:prepend v-if="item.icon">
+                  <v-img
+                    v-if="item.icon.includes('.')"
+                    class="mr-7"
+                    width="24"
+                    :src="baseUrl + 'images/icons/' + item.icon"
+                    :alt="item.title"
+                  />
+                  <v-icon v-else width="26">{{ item.icon }}</v-icon>
+                </template>
+
+                <v-list-item-title class="font-weight-bold">
+                  <v-tooltip :text="item.tooltip" :disabled="!item.tooltip">
+                    <template #activator="{ props }">
+                      <span v-bind="props">
+                        {{ item.title }}
+                      </span>
+                    </template>
+                  </v-tooltip>
+                </v-list-item-title>
+              </v-list-item>
+            </template>
+          </v-list>
         </div>
+      </div>
 
-        <template v-if="version">
-          <div class="version">
-            <v-chip color="secondary">
-              {{ version }}
-            </v-chip>
+      <template v-if="version">
+        <div class="version">
+          <v-chip color="secondary">
+            {{ version }}
+          </v-chip>
+        </div>
+      </template>
+    </v-navigation-drawer>
+
+    <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
+      <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1100, top: 0, left: 0, right: 0 }">
+        <v-toolbar-title class="custom-toolbar-title">
+          <v-img
+            :src="`${
+              theme.name.value === AppThemeSelection.light
+                ? baseUrl + 'images/logoTF_dark.png'
+                : baseUrl + 'images/logoTF_light.png'
+            }`"
+            width="160px"
+            @click="navigateToHome"
+            class="clickable-logo"
+          />
+        </v-toolbar-title>
+
+        <v-spacer>
+          <div class="d-flex align-center justify-start">
+            <TfSwapPrice>
+              <FundsCard v-if="hasActiveProfile" />
+            </TfSwapPrice>
           </div>
-        </template>
-      </v-navigation-drawer>
+        </v-spacer>
 
-      <v-main :style="{ paddingTop: navbarConfig ? '140px' : '70px' }">
-        <v-toolbar class="border position-fixed pr-2" :style="{ zIndex: 1100, top: 0, left: 0, right: 0 }">
-          <v-toolbar-title class="custom-toolbar-title">
-            <v-img
-              :src="`${
-                theme.name.value === AppThemeSelection.light
-                  ? baseUrl + 'images/logoTF_dark.png'
-                  : baseUrl + 'images/logoTF_light.png'
-              }`"
-              width="160px"
-              @click="navigateToHome"
-              class="clickable-logo"
-            />
-          </v-toolbar-title>
+        <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
+        <v-divider vertical class="mx-2" />
+        <AppTheme />
+        <v-divider vertical class="mx-2" />
 
-          <v-spacer>
-            <div class="d-flex align-center justify-start">
-              <TfSwapPrice>
-                <FundsCard v-if="hasActiveProfile" />
-              </TfSwapPrice>
-            </div>
-          </v-spacer>
-          <v-btn class="capitalize" :style="{ pointerEvents: 'none' }" variant="text"> {{ network }}net </v-btn>
-          <v-divider vertical class="mx-2" />
-          <AppTheme />
-          <v-divider vertical class="mx-2" />
-          <ProfileManager v-model="openProfile" />
-        </v-toolbar>
+        <VToolbarItems>
+          <TfWalletConnector ref="walletServiceCmp" />
+        </VToolbarItems>
+      </v-toolbar>
 
-        <v-toolbar
-          v-if="navbarConfig && hasActiveProfile"
-          :color="theme.name.value === AppThemeSelection.dark ? '#121212' : 'background'"
-          class="border position-fixed py-0 d-flex pr-2"
+      <v-toolbar
+        v-if="navbarConfig && hasActiveProfile"
+        :color="theme.name.value === AppThemeSelection.dark ? '#121212' : 'background'"
+        class="border position-fixed py-0 d-flex pr-2"
+        :style="{
+          zIndex: 1005,
+          top: '65.5px',
+          right: 0,
+          width: openSidebar && hasActiveProfile ? 'calc(100% - 280px)' : '100%',
+        }"
+        height="50"
+      >
+        <v-row>
+          <v-breadcrumbs class="ma-3" :items="navbarConfig.path" active-color="secondary">
+            <template v-slot:divider>
+              <v-icon icon="mdi-chevron-right"></v-icon>
+            </template>
+            <template v-slot:item="{ item }">
+              <router-link :to="item.to" :class="{ 'clickable-item': !item.disabled }">
+                {{ item.title }}
+              </router-link>
+            </template>
+          </v-breadcrumbs>
+        </v-row>
+      </v-toolbar>
+
+      <DeploymentListManager>
+        <v-container
+          fluid
           :style="{
-            zIndex: 1005,
-            top: '65.5px',
-            right: 0,
-            width: openSidebar && hasActiveProfile ? 'calc(100% - 280px)' : '100%',
+            paddingBottom: '0px',
+            minHeight: '85%',
+            maxHeight: '100%',
           }"
-          height="50"
         >
-          <v-row>
-            <v-breadcrumbs class="ma-3" :items="navbarConfig.path" active-color="secondary">
-              <template v-slot:divider>
-                <v-icon icon="mdi-chevron-right"></v-icon>
-              </template>
-              <template v-slot:item="{ item }">
-                <router-link :to="item.to" :class="{ 'clickable-item': !item.disabled }">
-                  {{ item.title }}
-                </router-link>
-              </template>
-            </v-breadcrumbs>
-          </v-row>
-        </v-toolbar>
+          <div class="d-flex align-center">
+            <v-btn
+              v-if="!openSidebar"
+              color="secondary"
+              @click="openSidebar = true"
+              icon="mdi-menu"
+              variant="tonal"
+              class="mr-2"
+            />
+          </div>
 
-        <DeploymentListManager>
-          <v-container
-            fluid
-            :style="{
-              paddingBottom: '0px',
-              minHeight: '85%',
-              maxHeight: '100%',
-            }"
-          >
-            <div class="d-flex align-center">
-              <v-btn
-                v-if="!openSidebar"
-                color="secondary"
-                @click="openSidebar = true"
-                icon="mdi-menu"
-                variant="tonal"
-                class="mr-2"
-              />
-            </div>
-
-            <TfRouterView @openProfile="openProfile = true" :isAuth="hasActiveProfile && hasGrid" />
-          </v-container>
-        </DeploymentListManager>
-        <TFNotification v-if="hasActiveProfile && hasGrid" />
-        <TfLogger />
-        <MainFooter />
-      </v-main>
-    </profile-manager-controller>
+          <TfRouterView @openProfile="walletServiceCmp.active = true" :isAuth="hasActiveProfile && hasGrid" />
+        </v-container>
+      </DeploymentListManager>
+      <TFNotification v-if="hasActiveProfile && hasGrid" />
+      <TfLogger />
+      <MainFooter />
+    </v-main>
   </v-app>
 </template>
 
@@ -200,14 +202,17 @@ import { useTheme } from "vuetify";
 
 import TfLogger from "@/components/logger.vue";
 
+import { useWalletServiceCmp } from "./hooks/wallet_connector";
 import { useProfileManager } from "./stores/profile_manager";
 const $route = useRoute();
 const $router = useRouter();
 const profileManager = useProfileManager();
 const gridStore = useGrid();
+
+const walletServiceCmp = useWalletServiceCmp();
+
 const network = process.env.NETWORK || (window as any).env.NETWORK;
 
-const openProfile = ref(true);
 const hasActiveProfile = computed(() => !!profileManager.profile);
 const theme = useTheme();
 const navbarConfig = ref();
@@ -419,14 +424,13 @@ import AppTheme from "./components/app_theme.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
 import FundsCard from "./components/funds_card.vue";
 import MainFooter from "./components/main_footer.vue";
-import ProfileManagerController from "./components/profile_manager_controller.vue";
 import TFNotification from "./components/tf_notification.vue";
 import TfNavigationLoader from "./components/TfNavigationLoader.vue";
 import TfOfflineNotifier from "./components/TfOfflineNotifier.vue";
 import TfRouterView from "./components/TfRouterView.vue";
 import TfSwapPrice from "./components/TfSwapPrice.vue";
+import TfWalletConnector from "./components/wallet_connector/TfWalletConnector.vue";
 import { useGrid } from "./stores";
-import ProfileManager from "./weblets/profile_manager.vue";
 
 interface AppRoute {
   title: string;
@@ -447,14 +451,13 @@ export default {
   name: "App",
   components: {
     TFNotification,
-    ProfileManager,
     DeploymentListManager,
     AppTheme,
     TfRouterView,
     TfSwapPrice,
     FundsCard,
-    ProfileManagerController,
     TfNavigationLoader,
+    TfWalletConnector,
     TfOfflineNotifier,
     MainFooter,
   },

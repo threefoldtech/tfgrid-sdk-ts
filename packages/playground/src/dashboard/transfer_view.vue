@@ -128,11 +128,13 @@ import type { Twin } from "@threefold/tfchain_client";
 import { TwinNotExistError } from "@threefold/types";
 import { computed, ref, watch } from "vue";
 
-import { useProfileManagerController } from "../components/profile_manager_controller.vue";
+import { useWalletService } from "../hooks/wallet_connector";
 import { useGrid, useProfileManager } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
+
+const walletService = useWalletService();
+
 const gridStore = useGrid();
-const profileManagerController = useProfileManagerController();
 const activeTab = ref(0);
 const recipientTwinId = ref("");
 const isValidTwinIDTransfer = ref(false);
@@ -146,7 +148,7 @@ const profileManager = useProfileManager();
 const profile = ref(profileManager.profile!);
 const recepTwinFromAddress = ref<Twin>();
 const receptTwinFromTwinID = ref<Twin>();
-const balance = profileManagerController.balance;
+const balance = walletService.balance;
 const freeBalance = computed(() => balance.value?.free ?? 0);
 
 watch(freeBalance, async () => {
@@ -214,7 +216,7 @@ async function transfer(recipientTwin: Twin) {
       await gridStore.client.balance.transfer({ address: recipientTwin.accountId, amount: transferAmount.value });
       clearInput();
       createCustomToast("Transaction Complete!", ToastType.success);
-      profileManagerController.reloadBalance();
+      walletService.reloadBalance();
     }
   } catch (err) {
     createInvalidTransferToast("transfer failed!");

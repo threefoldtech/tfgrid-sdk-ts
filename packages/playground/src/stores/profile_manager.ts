@@ -14,7 +14,7 @@ export interface Profile {
   email: string;
 }
 
-interface State {
+export interface State {
   profile: Profile | null;
 }
 
@@ -26,7 +26,7 @@ const useProfileManager = defineStore("profile-manager", {
   actions: {
     set(profile: Profile | null) {
       this.profile = profile;
-      useGrid().set(profile);
+      return useGrid().set(profile);
     },
     updateSSH(ssh: string) {
       if (this.profile) {

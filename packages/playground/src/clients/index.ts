@@ -2,7 +2,7 @@ import TFGridGqlClient from "@threefold/graphql_client";
 import GridProxyClient from "@threefold/gridproxy_client";
 import { QueryClient } from "@threefold/tfchain_client";
 
-const network = process.env.NETWORK || window.env.NETWORK;
+export const network = process.env.NETWORK || window.env.NETWORK;
 
 const gqlClient = new TFGridGqlClient(window.env.GRAPHQL_URL);
 const gridProxyClient = new GridProxyClient(window.env.GRIDPROXY_URL);

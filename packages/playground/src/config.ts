@@ -46,6 +46,8 @@ export function defineGlobals(app: App<Element>): void {
       },
     },
   });
+
+  app.provide("root:app", app);
 }
 
 function defineGlobalComponents(app: App<Element>) {

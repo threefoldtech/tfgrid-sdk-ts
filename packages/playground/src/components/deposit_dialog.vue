@@ -83,8 +83,8 @@
 import { Decimal } from "decimal.js";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
-import { useProfileManagerController } from "../components/profile_manager_controller.vue";
 import QrcodeGenerator from "../components/qrcode_generator.vue";
+import { useWalletService } from "../hooks/wallet_connector";
 import { useProfileManager } from "../stores";
 import { createCustomToast, ToastType } from "../utils/custom_toast";
 import { getGrid } from "../utils/grid";
@@ -96,7 +96,7 @@ let destroyed = false;
 const loading = ref(false);
 const dots = ref(".");
 const interval = ref<number | null>(null);
-const ProfileManagerController = useProfileManagerController();
+const walletService = useWalletService();
 
 const apps = [
   {
@@ -153,7 +153,7 @@ onMounted(async () => {
     const DecimalDeposit = new Decimal(receivedDeposit);
     const divisor = new Decimal(10000000);
     createCustomToast(`You have received ${DecimalDeposit.dividedBy(divisor)} TFT`, ToastType.success);
-    await ProfileManagerController.reloadBalance();
+    await walletService.reloadBalance();
     closeDialog();
   } catch (e) {
     if (destroyed) return;
