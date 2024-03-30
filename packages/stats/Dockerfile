@@ -14,7 +14,7 @@ COPY --from=build /app/packages/stats/nginx /etc/nginx
 RUN mkdir -p /etc/zinit;
 COPY --from=build /app/packages/stats/zinit /etc/zinit
 
-RUN curl --location  https://github.com/threefoldtech/zinit/releases/download/v0.2.10/zinit -o /sbin/zinit && \
+RUN curl --location  https://github.com/threefoldtech/zinit/releases/download/v0.2.14/zinit -o /sbin/zinit && \
     chmod +x /sbin/zinit
 RUN echo "* */6 * * * curl localhost/api/stats-update" >> /var/spool/cron/crontabs/root
 
