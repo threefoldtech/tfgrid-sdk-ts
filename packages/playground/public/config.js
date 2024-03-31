@@ -10,7 +10,8 @@ window.env = {
   STELLAR_HORIZON_URL: "https://horizon-testnet.stellar.org",
   TFT_ASSET_ISSUER: "GA47YZA3PKFUZMPLQ3B5F2E3CJIB57TGGU7SPCQT2WAEYKN766PWIMB3",
   MINTING_URL: "https://alpha.minting.tfchain.grid.tf",
-  STATS_URL: "https://stats.dev.grid.tf",
+  STATS_URL: "https://stats.grid.tf",
   TIMEOUT: +"10000",
   PAGE_SIZE: +"20",
+  MANUAL_URL: "https://www.manual.grid.tf",
 };
