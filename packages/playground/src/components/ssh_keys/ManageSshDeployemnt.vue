@@ -75,7 +75,7 @@
 </template>
 
 <script lang="ts">
-import { capitalize, defineComponent, nextTick, ref } from "vue";
+import { capitalize, defineComponent, nextTick, onMounted, ref } from "vue";
 
 import SshDataDialog from "@/components/ssh_keys/SshDataDialog.vue";
 import { DashboardRoutes } from "@/router/routes";
@@ -88,19 +88,26 @@ export default defineComponent({
   components: {
     SshDataDialog,
   },
+
   setup(_, { emit }) {
     const defaultKeyData = { createdAt: "", id: 0, publicKey: "", name: "", isActive: false };
-    const openManageDialog = ref(false);
+    const openManageDialog = ref<boolean>(false);
     const profileManager = useProfileManager();
-    const sshKeys = ref<SSHKeyData[]>(profileManager.profile?.ssh || []);
+    const sshKeys = profileManager.profile?.ssh as SSHKeyData[];
     const selectedKey = ref<SSHKeyData>(defaultKeyData);
     const selectedKeys = ref<SSHKeyData[]>([]);
-    const isViewSSHKey = ref(false);
+    const isViewSSHKey = ref<boolean>(false);
 
     // Each key will be added then add `\n` as a new line.
-    const selectedKeysString = ref("");
+    const selectedKeysString = ref<string>("");
 
-    const selectKey = (key: SSHKeyData) => {
+    onMounted(() => {
+      selectedKeys.value = sshKeys.filter(_key => _key.isActive === true);
+      handleKeys();
+      emit("selectedKeys", selectedKeysString.value);
+    });
+
+    function selectKey(key: SSHKeyData) {
       if (selectedKeys.value.includes(key)) {
         const index = selectedKeys.value.indexOf(key);
         if (index !== -1) {
@@ -110,30 +117,24 @@ export default defineComponent({
         selectedKeys.value.push(key);
       }
       handleKeys();
-      emitSelectedKeys();
-    };
+      emit("selectedKeys", selectedKeysString.value);
+    }
 
-    const onSelectKey = (key: SSHKeyData) => {
+    function onSelectKey(key: SSHKeyData) {
       selectedKey.value = key;
       isViewSSHKey.value = true;
-    };
+    }
 
-    const onCloseSelectKey = () => {
+    function onCloseSelectKey() {
       isViewSSHKey.value = false;
       nextTick(() => {
         selectedKey.value = defaultKeyData;
       });
-    };
+    }
 
-    const handleKeys = () => {
+    function handleKeys() {
       selectedKeysString.value = selectedKeys.value.map(_key => _key.publicKey).join("\n\n");
-    };
-
-    const emitSelectedKeys = () => {
-      nextTick(() => {
-        emit("selectedKeys", selectedKeysString.value);
-      });
-    };
+    }
 
     return {
       openManageDialog,
@@ -141,12 +142,14 @@ export default defineComponent({
       selectedKeys,
       selectedKey,
       isViewSSHKey,
+      defaultKeyData,
       selectedKeysString,
       DashboardRoutes,
-      selectKey,
+
+      capitalize,
       onSelectKey,
       onCloseSelectKey,
-      capitalize,
+      selectKey,
     };
   },
 });
