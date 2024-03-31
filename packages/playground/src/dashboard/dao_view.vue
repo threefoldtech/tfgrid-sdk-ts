@@ -150,8 +150,7 @@
                       v-else
                       rounded
                       v-model="proposal.nayesProgress"
-                      color="anchor"
-                      backgroundColor="#e0e0e0"
+                      color="disable"
                       height="24"
                       :style="{
                         width: '100%',
