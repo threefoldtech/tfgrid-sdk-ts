@@ -378,7 +378,7 @@ export default {
       freeRAM: "",
       region: "",
       country: "",
-      status: "",
+      status: "up",
       gateway: false,
       gpu: false,
       publicIPs: "",
@@ -430,7 +430,6 @@ export default {
           },
           { loadFarm: true },
         );
-        console.log(data);
 
         nodes.value = data;
         if (retCount) nodesCount.value = count ?? 0;

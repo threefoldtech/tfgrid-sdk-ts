@@ -144,7 +144,6 @@ export class NodesBuilder extends AbstractBuilder<NodesQuery> {
       validator: NODES_VALIDATOR,
       queries,
     });
-    console.log("queries", queries);
   }
 }
 
