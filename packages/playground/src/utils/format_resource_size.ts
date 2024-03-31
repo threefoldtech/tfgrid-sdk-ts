@@ -3,7 +3,7 @@
  * @param sizeInBytes - The size of the resource in bytes.
  * @returns A formatted string representing the size of the resource.
  */
-export default function formatResourceSize(sizeInBytes?: number): string {
+export default function formatResourceSize(sizeInBytes?: number, speed?: boolean): string {
   if (sizeInBytes === undefined || sizeInBytes === null || isNaN(sizeInBytes) || sizeInBytes === 0) {
     return "0";
   }
@@ -20,28 +20,32 @@ export default function formatResourceSize(sizeInBytes?: number): string {
 
   if (sizeInBytes < mega) {
     const sizeInKilo = sizeInBytes / kilo;
-    return toFixedTwo(sizeInKilo) + " KB";
+    return (speed ? formatSpeed(sizeInKilo) : toFixedTwo(sizeInKilo)) + " KB";
   }
 
   if (sizeInBytes < giga) {
     const sizeInMega = sizeInBytes / mega;
-    return toFixedTwo(sizeInMega) + " MB";
+    return (speed ? formatSpeed(sizeInMega) : toFixedTwo(sizeInMega)) + " MB";
   }
 
   if (sizeInBytes < tera) {
     const sizeInGB = sizeInBytes / giga;
-    return toFixedTwo(sizeInGB) + " GB";
+    return (speed ? formatSpeed(sizeInGB) : toFixedTwo(sizeInGB)) + " GB";
   }
 
   if (sizeInBytes < peta) {
     const sizeInTB = sizeInBytes / tera;
-    return toFixedTwo(sizeInTB) + " TB";
+    return (speed ? formatSpeed(sizeInTB) : toFixedTwo(sizeInTB)) + " TB";
   }
 
   const sizeInPB = sizeInBytes / peta;
-  return toFixedTwo(sizeInPB) + " PB";
+  return (speed ? formatSpeed(sizeInPB) : toFixedTwo(sizeInPB)) + " PB";
 }
 
 function toFixedTwo(val: number) {
   return Math.floor(val * 100) / 100;
+}
+
+function formatSpeed(val: number) {
+  return Math.round(val);
 }
