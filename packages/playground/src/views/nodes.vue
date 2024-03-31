@@ -6,12 +6,12 @@
   </div>
 
   <view-layout>
-    <TfFiltersContainer class="mb-4" @apply="loadNodes" :loading="loading">
+    <TfFiltersContainer class="mb-4" @apply="loadNodes(true)" :loading="loading">
       <TfFilter
         query-route="node-id"
         :rules="[
           validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
-          validators.min('The node id should be larger then zero.', 1),
+          validators.min('The node id should be larger than zero.', 1),
           validators.startsWith('The node id start with zero.', '0'),
           validators.validateResourceMaxNumber('This is not a valid ID.'),
         ]"
@@ -34,7 +34,9 @@
         query-route="farm-id"
         v-model="filters.farmId"
         :rules="[
-          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.isNumeric('This field accepts numbers only.', {
+            no_symbols: true,
+          }),
           validators.min('The ID should be larger than zero.', 1),
           validators.isInt('should be an integer'),
           validators.validateResourceMaxNumber('This is not a valid ID.'),
@@ -92,7 +94,7 @@
         v-model="filters.minSSD"
         :rules="[
           validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The total ssd should be larger then zero.', 1),
+          validators.min('The total ssd should be larger than zero.', 1),
           validators.validateResourceMaxNumber('This value is out of range.'),
         ]"
       >
@@ -114,7 +116,7 @@
         v-model="filters.minHDD"
         :rules="[
           validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The total hdd should be larger then zero.', 1),
+          validators.min('The total hdd should be larger than zero.', 1),
           validators.validateResourceMaxNumber('This value is out of range.'),
         ]"
       >
@@ -136,7 +138,7 @@
         v-model="filters.minRAM"
         :rules="[
           validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The total ram should be larger then zero.', 1),
+          validators.min('The total ram should be larger than zero.', 1),
           validators.validateResourceMaxNumber('This value is out of range.'),
         ]"
       >
@@ -180,7 +182,7 @@
         v-model="filters.freeSSD"
         :rules="[
           validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The free ssd should be larger then zero.', 1),
+          validators.min('The free ssd should be larger than zero.', 1),
           validators.validateResourceMaxNumber('This value is out of range.'),
         ]"
       >
@@ -202,7 +204,7 @@
         v-model="filters.freeHDD"
         :rules="[
           validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The free hdd should be larger then zero.', 1),
+          validators.min('The free hdd should be larger than zero.', 1),
           validators.validateResourceMaxNumber('This value is out of range.'),
         ]"
       >
@@ -224,7 +226,7 @@
         v-model="filters.freeRAM"
         :rules="[
           validators.isNumeric('This field accepts numbers only.'),
-          validators.min('The free ram should be larger then zero.', 1),
+          validators.min('The free ram should be larger than zero.', 1),
           validators.validateResourceMaxNumber('This value is out of range.'),
         ]"
       >
@@ -243,7 +245,9 @@
       <TfFilter
         query-route="free-public-ips"
         :rules="[
-          validators.isNumeric('This field accepts numbers only.', { no_symbols: true }),
+          validators.isNumeric('This field accepts numbers only.', {
+            no_symbols: true,
+          }),
           validators.min('The node id should be larger then zero.', 1),
           validators.startsWith('The node id start with zero.', '0'),
           validators.validateResourceMaxNumber('This value is out of range.'),
@@ -288,6 +292,10 @@
       <TfFilter query-route="gpu" v-model="filters.gpu">
         <v-switch color="primary" inset label="GPU Node (Only)" v-model="filters.gpu" hide-details />
       </TfFilter>
+
+      <TfFilter query-route="dedicated" v-model="filters.dedicated">
+        <v-switch color="primary" inset label="Dedicated Nodes (Only)" v-model="filters.dedicated" hide-details />
+      </TfFilter>
     </TfFiltersContainer>
 
     <div class="nodes mt-5">
@@ -307,6 +315,7 @@
                   page = $event;
                   loadNodes();
                 "
+                @reload-table="reloadTable"
                 :count="nodesCount"
                 :loading="loading"
                 v-model:selectedNode="selectedNodeId"
@@ -315,28 +324,6 @@
             </div>
           </v-col>
         </v-row>
-      </div>
-    </div>
-    <div class="mx-auto mt-5 d-flex">
-      <div class="mr-6">
-        <v-chip color="success" class="mr-2">
-          <span class="text-subtitle-2"> Shared </span>
-        </v-chip>
-        <span class="text-subtitle-2">Multiple users can deploy on that node</span>
-      </div>
-
-      <div class="mr-6">
-        <v-chip color="warning" class="mr-2">
-          <span class="text-subtitle-2"> Rented </span>
-        </v-chip>
-        <span class="text-subtitle-2">Rented as full node for a single user</span>
-      </div>
-
-      <div class="mr-6">
-        <v-chip color="primary" class="mr-2">
-          <span class="text-subtitle-2"> Rentable </span>
-        </v-chip>
-        <span class="text-subtitle-2">You can rent it exclusively for your workloads</span>
       </div>
     </div>
 
@@ -357,14 +344,14 @@ import { useRoute } from "vue-router";
 import NodeDetails from "@/components/node_details.vue";
 import NodesTable from "@/components/nodes_table.vue";
 import router from "@/router";
-import { requestNodes } from "@/utils/get_nodes";
+import type { GridProxyRequestConfig } from "@/types";
+import { getNode, requestNodes } from "@/utils/get_nodes";
 import { convertToBytes } from "@/utils/get_nodes";
 
 import TfFilter from "../components/filters/TfFilter.vue";
 import TfFiltersContainer from "../components/filters/TfFiltersContainer.vue";
 import TfSelectFarm from "../components/node_selector/TfSelectFarm.vue";
 import TfSelectLocation from "../components/node_selector/TfSelectLocation.vue";
-
 export default {
   components: {
     NodesTable,
@@ -377,7 +364,7 @@ export default {
   setup() {
     const size = ref(window.env.PAGE_SIZE);
     const page = ref(1);
-
+    const nodeId = ref<number>(0);
     const filters = ref({
       nodeId: "",
       farmId: "",
@@ -395,6 +382,7 @@ export default {
       gateway: false,
       gpu: false,
       publicIPs: "",
+      dedicated: false,
     });
 
     const loading = ref<boolean>(true);
@@ -406,14 +394,22 @@ export default {
 
     const route = useRoute();
 
-    async function loadNodes() {
+    const nodeOptions: GridProxyRequestConfig = {
+      loadTwin: true,
+      loadFarm: true,
+      loadStats: true,
+      loadGpu: false,
+    };
+
+    async function loadNodes(retCount = false) {
       loading.value = true;
+      if (retCount) page.value = 1;
       try {
         const { count, data } = await requestNodes(
           {
             page: page.value,
             size: size.value,
-            retCount: true,
+            retCount,
             nodeId: +filters.value.nodeId || undefined,
             farmIds: filters.value.farmId || undefined,
             farmName: filters.value.farmName || undefined,
@@ -430,17 +426,29 @@ export default {
             hasGpu: filters.value.gpu || undefined,
             domain: filters.value.gateway || undefined,
             freeIps: +filters.value.publicIPs || undefined,
-            sortBy: "status",
-            sortOrder: "asc",
+            dedicated: filters.value.dedicated || undefined,
           },
           { loadFarm: true },
         );
         console.log(data);
 
         nodes.value = data;
-        nodesCount.value = count ?? 0;
+        if (retCount) nodesCount.value = count ?? 0;
       } catch (err) {
         console.log(err);
+      } finally {
+        loading.value = false;
+      }
+    }
+
+    async function requestNode() {
+      loading.value = true;
+      try {
+        const node = await getNode(nodeId.value, nodeOptions);
+        const index = nodes.value.findIndex(node => node.nodeId === nodeId.value);
+        nodes.value[index] = node;
+      } catch (error) {
+        console.log(error);
       } finally {
         loading.value = false;
       }
@@ -465,10 +473,15 @@ export default {
       selectedNodeId.value = 0;
     };
 
-    const openDialog = async (item: { props: { title: GridNode } }) => {
-      selectedNodeId.value = item.props.title.nodeId;
+    const openDialog = async (item: GridNode) => {
+      selectedNodeId.value = item.nodeId;
       isDialogOpened.value = true;
     };
+
+    function reloadTable(id: number) {
+      nodeId.value = id;
+      setTimeout(requestNode, 20000);
+    }
 
     return {
       loading,
@@ -479,7 +492,7 @@ export default {
       closeDialog,
       requestNodes,
       isDialogOpened,
-
+      reloadTable,
       filters,
       NodeStatus,
       size,

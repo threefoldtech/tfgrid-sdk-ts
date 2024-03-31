@@ -34,7 +34,7 @@
           v-model="filters.minRAM"
           :rules="[
             validators.isNumeric('This field accepts numbers only.'),
-            validators.min('The total ram should be larger then zero.', 1),
+            validators.min('The total ram should be larger than zero.', 1),
             validators.validateResourceMaxNumber('This value is out of range.'),
           ]"
         >
@@ -56,7 +56,7 @@
           v-model="filters.minSSD"
           :rules="[
             validators.isNumeric('This field accepts numbers only.'),
-            validators.min('The total ssd should be larger then zero.', 1),
+            validators.min('The total ssd should be larger than zero.', 1),
             validators.validateResourceMaxNumber('This value is out of range.'),
           ]"
         >
@@ -78,7 +78,7 @@
           v-model="filters.minHDD"
           :rules="[
             validators.isNumeric('This field accepts numbers only.'),
-            validators.min('The total hdd should be larger then zero.', 1),
+            validators.min('The total hdd should be larger than zero.', 1),
             validators.validateResourceMaxNumber('This value is out of range.'),
           ]"
         >
@@ -152,6 +152,7 @@
       <nodes-table
         @update-active-tab-value="updateActiveTabValue"
         @reload-table="reloadTable"
+        @update-options="updateOptions($event)"
         :options="{ page, size }"
         :nodes="nodes"
         :nodes-count="nodesCount"
@@ -162,7 +163,7 @@
 </template>
 
 <script lang="ts" setup>
-import { NodeStatus } from "@threefold/gridproxy_client";
+import { type GridNode, NodeStatus, type Pagination } from "@threefold/gridproxy_client";
 import { CertificationType } from "@threefold/gridproxy_client";
 import { ref } from "vue";
 
@@ -190,6 +191,11 @@ const tabParams = {
     rentedBy: profileManager.profile?.twinId,
     retCount: true,
   },
+  2: {
+    rentable: true,
+    status: NodeStatus.Standby,
+    retCount: true,
+  },
 };
 
 const size = ref(window.env.PAGE_SIZE);
@@ -209,6 +215,28 @@ const updateActiveTabValue = (newValue: number) => {
   loadNodes();
 };
 
+async function listNodes(params: any) {
+  const response = await gridProxyClient.nodes.list({
+    ...params,
+    size: size.value,
+    page: page.value,
+    totalSru: convert(filters.value.minSSD),
+    totalMru: convert(filters.value.minRAM),
+    totalHru: convert(filters.value.minHDD),
+    totalCru: +filters.value.minCPU || undefined,
+    gpuVendorName: filters.value.gpuVendorName || undefined,
+    gpuDeviceName: filters.value.gpuDeviceName || undefined,
+    hasGpu: filters.value.gpu || undefined,
+  });
+  return response || [];
+}
+
+function updateOptions(options: { page: number; itemsPerPage: number }) {
+  if (options.page !== page.value || options.itemsPerPage !== size.value) {
+    (page.value = options.page), (size.value = options.itemsPerPage);
+    loadNodes();
+  }
+}
 async function loadNodes() {
   const params = tabParams[activeTab.value as keyof typeof tabParams];
 
@@ -223,20 +251,19 @@ async function loadNodes() {
   }
 
   loading.value = true;
-
+  let data: Pagination<GridNode[]>;
   try {
-    const data = await gridProxyClient.nodes.list({
-      ...params,
-      size: size.value,
-      page: page.value,
-      totalSru: convert(filters.value.minSSD),
-      totalMru: convert(filters.value.minRAM),
-      totalHru: convert(filters.value.minHDD),
-      totalCru: +filters.value.minCPU || undefined,
-      gpuVendorName: filters.value.gpuVendorName || undefined,
-      gpuDeviceName: filters.value.gpuDeviceName || undefined,
-      hasGpu: filters.value.gpu || undefined,
-    });
+    if (activeTab.value === 0) {
+      const onlineNodes = await listNodes(params);
+      const standbyNodes = await listNodes(tabParams[2]);
+      const allNodes = onlineNodes.data.concat(standbyNodes.data);
+      data = {
+        count: (onlineNodes.count ?? 0) + (standbyNodes.count ?? 0),
+        data: allNodes,
+      };
+    } else {
+      data = await listNodes(params);
+    }
 
     if (data.count === 0) {
       loading.value = false;

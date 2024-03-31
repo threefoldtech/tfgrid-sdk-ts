@@ -13,25 +13,21 @@ let URLS = [
 
 async function getStats(r) {
   const cachedData = cache.readCache(cache_path);
-  if (cachedData.valid) {
-    r.return(200, JSON.stringify(cachedData.summary));
-    return;
-  }
-  r.log(`Outdated cache, trying to update it...`);
 
+  r.return(200, JSON.stringify(cachedData.summary));
+}
+
+async function updateStats(r) {
   try {
     const stats = await fetchStats(r);
     r.return(200, JSON.stringify(stats));
     return;
   } catch (error) {
     r.error(`Failed to fetch stats: ${error}`);
-    cachedData.summary.outdated = true;
-    if (cachedData.error) r.error(`Failed to read cached data due to ${cachedData.error} \nretuning Dummy data`);
-    r.return(200, JSON.stringify(cachedData.summary));
+    r.return(500, `Failed to fetch stats: ${error}`);
     return;
   }
 }
-
 function initTargeRequests(urls) {
   return urls.map(url =>
     //   eslint-disable-next-line no-undef
@@ -136,4 +132,4 @@ function toTeraOrGiga(value) {
 }
 
 // Exporting the main function for Nginx
-export default { getStats };
+export default { getStats, updateStats };

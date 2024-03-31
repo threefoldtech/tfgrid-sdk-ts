@@ -56,11 +56,8 @@
                           <v-progress-circular
                             v-bind="props"
                             :rotate="-90"
-                            :size="150"
-                            :width="12"
                             :model-value="getPercentage(item.raw, key)"
                             class="my-3"
-                            color="primary"
                           />
                           <template v-if="item.raw.used_resources">
                             <p v-if="item.raw.total_resources[key] > 1000">
@@ -222,7 +219,11 @@ export default {
           try {
             const network = process.env.NETWORK || (window as any).env.NETWORK;
             node.receipts = [];
-            if (network == "main") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
+            try {
+              if (network == "main") node.receipts = await getNodeMintingFixupReceipts(node.nodeId);
+            } catch (e) {
+              createCustomToast(`Failed to get node ${node.nodeId} minting receipts!`, ToastType.danger);
+            }
             node.availability = await getNodeAvailability(node.nodeId);
             node.uptime = +calculateUptime(node.availability.currentPeriod, node.availability.downtime);
           } catch (error) {

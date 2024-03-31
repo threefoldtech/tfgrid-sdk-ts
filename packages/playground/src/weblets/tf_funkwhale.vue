@@ -94,7 +94,7 @@
       <input-tooltip
         inline
         tooltip="Click to know more about dedicated machines."
-        href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+        href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
       >
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
       </input-tooltip>
@@ -143,7 +143,7 @@ const valid = ref(false);
 const profileManager = useProfileManager();
 const name = ref(generateName({ prefix: "fw" }));
 const username = ref("admin");
-const email = ref("");
+const email = ref(profileManager.profile?.email || "");
 const password = ref(generatePassword(12));
 const solution = ref() as Ref<SolutionFlavor>;
 const rootFilesystemSize = computed(() => rootFs(solution.value?.cpu ?? 0, solution.value?.memory ?? 0));

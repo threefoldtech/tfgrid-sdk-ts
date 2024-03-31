@@ -1,1 +1,0 @@
-import "./Disclaimer.wc.svelte";

@@ -192,6 +192,7 @@ export default {
         debugOpened.value = undefined;
         page.value = 1;
         logs.value = [];
+        document?.querySelector("html")?.style.removeProperty("overflow");
         logsCount.value.run();
       },
     });
@@ -249,7 +250,7 @@ export default {
         formatedLogs += `[+] ${log.timestamp} [${log.type.toUpperCase()}]${spaces} ${log.message}\n`;
       }
 
-      downloadAsFile("dashboard.logs", formatedLogs);
+      downloadAsFile("dashboard.log", formatedLogs);
     }
 
     return {

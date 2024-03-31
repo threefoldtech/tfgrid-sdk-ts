@@ -54,7 +54,7 @@
       <input-tooltip
         inline
         tooltip="Click to know more about dedicated machines."
-        href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+        href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
       >
         <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
       </input-tooltip>
@@ -194,7 +194,7 @@ async function deploy() {
     await deployGatewayName(grid, selectionDetails.value.domain, {
       subdomain,
       ip: vm[0].interfaces[0].ip,
-      port: 80,
+      port: 4444,
       network: vm[0].interfaces[0].network,
     });
     finalize(vm);

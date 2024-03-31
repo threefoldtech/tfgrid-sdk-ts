@@ -59,7 +59,7 @@
         <input-tooltip
           inline
           tooltip="Click to know more about dedicated machines."
-          href="https://manual.grid.tf/dashboard/portal/dashboard_portal_dedicated_nodes.html"
+          href="https://www.manual.grid.tf/documentation/dashboard/deploy/dedicated_machines.html"
         >
           <v-switch color="primary" inset label="Dedicated" v-model="dedicated" hide-details />
         </input-tooltip>
@@ -155,6 +155,20 @@
           >
             <input-tooltip tooltip="Disk Size.">
               <v-text-field label="Size (GB)" type="number" v-model.number="disks[index].size" v-bind="props" />
+            </input-tooltip>
+          </input-validator>
+          <input-validator
+            :value="disks[index].mountPoint"
+            :rules="[
+              validators.required('Mount Point is required.'),
+              validators.pattern('Mount Point should start with / and have additional characters', {
+                pattern: /^\/.+/,
+              }),
+            ]"
+            #="{ props }"
+          >
+            <input-tooltip tooltip="Disk Size.">
+              <v-text-field label="Mount Point" type="text" v-model="disks[index].mountPoint" v-bind="props" />
             </input-tooltip>
           </input-validator>
         </ExpandableLayout>

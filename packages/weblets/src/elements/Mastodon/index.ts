@@ -1,1 +1,0 @@
-import "./Mastodon.wc.svelte";

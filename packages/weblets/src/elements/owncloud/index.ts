@@ -1,1 +1,0 @@
-import "./Owncloud.wc.svelte";

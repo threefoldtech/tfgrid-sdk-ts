@@ -179,9 +179,6 @@
                 variant="tonal"
                 class="mr-2"
               />
-              <div :style="{ width: '100%' }" class="mb-4">
-                <DisclaimerToolbar />
-              </div>
             </div>
 
             <TfRouterView @openProfile="openProfile = true" :isAuth="hasActiveProfile && hasGrid" />
@@ -420,7 +417,6 @@ import { AppThemeSelection } from "@/utils/app_theme";
 
 import AppTheme from "./components/app_theme.vue";
 import DeploymentListManager from "./components/deployment_list_manager.vue";
-import DisclaimerToolbar from "./components/disclaimer_toolbar.vue";
 import FundsCard from "./components/funds_card.vue";
 import MainFooter from "./components/main_footer.vue";
 import ProfileManagerController from "./components/profile_manager_controller.vue";
@@ -451,7 +447,6 @@ export default {
   name: "App",
   components: {
     TFNotification,
-    DisclaimerToolbar,
     ProfileManager,
     DeploymentListManager,
     AppTheme,

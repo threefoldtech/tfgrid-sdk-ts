@@ -18,24 +18,24 @@
     </v-dialog>
     <v-btn
       size="small"
-      outlined
+      variant="outlined"
       :loading="loadingReserveNode"
       :disabled="disableButton"
       v-if="node.rentedByTwinId === 0"
       color="primary"
-      @click="reserveNode"
+      @click.stop="reserveNode"
     >
       Reserve
     </v-btn>
 
     <v-btn
       size="small"
-      outlined
       color="error"
+      variant="outlined"
       :loading="loadingUnreserveBtn"
       :disabled="disableButton"
-      v-if="node.rentedByTwinId === profileManager.profile?.twinId"
-      @click="removeReserve"
+      v-if="node.rentedByTwinId === profile?.twinId"
+      @click.stop="removeReserve"
     >
       Unreserve
     </v-btn>
@@ -52,8 +52,6 @@ import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { getGrid } from "@/utils/grid";
 import { notifyDelaying } from "@/utils/notifications";
 
-const profileManager = useProfileManager();
-
 export default {
   name: "ReserveBtn",
   props: {
@@ -63,6 +61,8 @@ export default {
     },
   },
   setup(props, { emit }) {
+    const profileManager = useProfileManager();
+    const profile = profileManager.profile;
     const openUnreserveDialog = ref(false);
     const loadingUnreserveNode = ref(false);
     const loadingUnreserveBtn = ref(false);
@@ -76,7 +76,7 @@ export default {
     async function unReserveNode() {
       loadingUnreserveNode.value = true;
       try {
-        const grid = await getGrid(profileManager.profile!);
+        const grid = await getGrid(profile!);
         createCustomToast(`Verify contracts for node ${props.node.nodeId}`, ToastType.info);
 
         const result = (await grid?.contracts.getActiveContracts({ nodeId: +props.node.nodeId })) as any;
@@ -112,19 +112,23 @@ export default {
     }
 
     async function reserveNode() {
-      loadingReserveNode.value = true;
       try {
-        const grid = await getGrid(profileManager.profile!);
-        createCustomToast("Transaction Submitted", ToastType.info);
-        await grid?.nodes.reserve({ nodeId: +props.node.nodeId });
-        createCustomToast(`Transaction succeeded node ${props.node.nodeId} Reserved`, ToastType.success);
-        notifyDelaying();
-        emit("updateTable");
-        disableButton.value = true;
-        setTimeout(() => {
-          disableButton.value = false;
-          loadingReserveNode.value = false;
-        }, 20000);
+        if (profile) {
+          loadingReserveNode.value = true;
+          const grid = await getGrid(profile);
+          createCustomToast("Transaction Submitted", ToastType.info);
+          await grid?.nodes.reserve({ nodeId: +props.node.nodeId });
+          createCustomToast(`Transaction succeeded node ${props.node.nodeId} Reserved`, ToastType.success);
+          notifyDelaying();
+          emit("updateTable");
+          disableButton.value = true;
+          setTimeout(() => {
+            disableButton.value = false;
+            loadingReserveNode.value = false;
+          }, 20000);
+        } else {
+          createCustomToast("Please Login first to continue.", ToastType.danger);
+        }
       } catch (e) {
         if (e instanceof InsufficientBalanceError) {
           createCustomToast(`Can't create rent contract due to Insufficient balance`, ToastType.danger);
@@ -135,17 +139,24 @@ export default {
         loadingReserveNode.value = false;
       }
     }
+
     return {
       openUnreserveDialog,
       loadingUnreserveNode,
-      unReserveNode,
       loadingReserveNode,
+      unReserveNode,
       reserveNode,
       removeReserve,
       disableButton,
       loadingUnreserveBtn,
-      profileManager,
+      profile,
     };
   },
 };
 </script>
+
+<style scoped>
+.v-btn.text-error:hover > .v-btn__overlay {
+  opacity: 0;
+}
+</style>

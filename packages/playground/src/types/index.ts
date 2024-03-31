@@ -323,4 +323,33 @@ export const nodeInitializer: GridNode = {
   cards: [],
   num_gpu: 0,
   healthy: false,
+  rentable: false,
+  rented: false,
+  dmi: {
+    bios: {
+      vendor: "",
+      version: "",
+    },
+    baseboard: {
+      manufacturer: "",
+      product_name: "",
+    },
+    processor: [
+      {
+        version: "",
+        thread_count: "",
+      },
+    ],
+    memory: [
+      {
+        manufacturer: "",
+        type: "",
+      },
+    ],
+  },
+  speed: {
+    upload: 0,
+    download: 0,
+  },
+  price_usd: 0,
 };

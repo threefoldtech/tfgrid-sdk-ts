@@ -17,6 +17,9 @@ export interface ListContractByTwinIdOptions {
   graphqlURL: string;
   twinId: number;
   stateList?: ContractStates[];
+  type?: string;
+  projectName?: string;
+  nodeId?: number;
 }
 
 export interface ContractUsedResources {
@@ -46,7 +49,8 @@ export interface GqlNodeContract extends GqlBaseContract {
   deploymentData: string;
   deploymentHash: string;
   numberOfPublicIPs: number;
-  resourcesUsed: ContractUsedResources;
+  resourcesUsed: ContractUsedResources | undefined;
+  parsedDeploymentData?: { type: string; name: string; projectName: string };
 }
 
 export interface GqlRentContract extends GqlBaseContract {
@@ -81,6 +85,9 @@ export interface ListContractByAddressOptions {
 export interface ListMyContractOptions {
   graphqlURL: string;
   stateList?: ContractStates[];
+  type?: string;
+  projectName?: string;
+  nodeId?: number;
 }
 
 export interface GetConsumptionOptions {
@@ -135,6 +142,56 @@ class TFContracts extends Contracts {
       });
 
       return response["data"] as GqlContracts;
+    } catch (err) {
+      (err as Error).message = formatErrorMessage(`Error listing contracts by twin id ${options.twinId}.`, err);
+      throw err;
+    }
+  }
+
+  async listNodeContractsByTwinId(options: ListContractByTwinIdOptions): Promise<GqlNodeContract[]> {
+    options.stateList = options.stateList || [ContractStates.Created, ContractStates.GracePeriod];
+    const state = `[${options.stateList.join(", ")}]`;
+    const gqlClient = new Graphql(options.graphqlURL);
+    const opts = `(where: {twinID_eq: ${options.twinId}, state_in: ${state}}, orderBy: twinID_ASC)`;
+
+    // filter contracts based on deploymentData
+    let filterQuery = "";
+    if (options.nodeId) {
+      filterQuery += ` , nodeID_eq: ${options.nodeId}`;
+    }
+    if (options.type || options.projectName) {
+      filterQuery += " , AND: [";
+
+      if (options.type) {
+        // eslint-disable-next-line no-useless-escape
+        filterQuery += `{ deploymentData_contains: \"\\\"type\\\":\\\"${options.type}\\\"\" },`;
+      }
+
+      if (options.projectName) {
+        // eslint-disable-next-line no-useless-escape
+        filterQuery += `{ deploymentData_contains: \"\\\"projectName\\\":\\\"${options.projectName}\" }`;
+      }
+
+      filterQuery += "]";
+    }
+
+    try {
+      const nodeContractsCount = await gqlClient.getItemTotalCount("nodeContracts", opts);
+      const body = `query getContracts($nodeContractsCount: Int!){
+                nodeContracts(where: {twinID_eq: ${options.twinId}, state_in: ${state}${filterQuery}}, limit: $nodeContractsCount) {
+                  contractID
+                  deploymentData
+                  state
+                  createdAt
+                  nodeID
+                  numberOfPublicIPs
+                }
+              }`;
+      const response = await gqlClient.query(body, {
+        nodeContractsCount,
+      });
+
+      return (response["data"] as GqlContracts).nodeContracts;
     } catch (err) {
       (err as Error).message = formatErrorMessage(`Error listing contracts by twin id ${options.twinId}.`, err);
       throw err;
@@ -218,6 +275,18 @@ class TFContracts extends Contracts {
       graphqlURL: options.graphqlURL,
       twinId: twinId,
       stateList: options.stateList,
+    });
+  }
+
+  async listMyNodeContracts(options: ListMyContractOptions): Promise<GqlNodeContract[]> {
+    const twinId = await this.client.twins.getMyTwinId();
+    return await this.listNodeContractsByTwinId({
+      graphqlURL: options.graphqlURL,
+      twinId: twinId,
+      stateList: options.stateList,
+      type: options.type,
+      projectName: options.projectName,
+      nodeId: options.nodeId,
     });
   }
 

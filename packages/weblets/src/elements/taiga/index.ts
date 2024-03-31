@@ -1,1 +1,0 @@
-import "./Taiga.wc.svelte";
