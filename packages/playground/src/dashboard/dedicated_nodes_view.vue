@@ -149,10 +149,6 @@
         unlock the discounts.
       </v-alert>
 
-      <v-alert type="info" variant="tonal">
-        You must acquire a minimum of 2 TFTs in order to reserve any node.
-      </v-alert>
-
       <nodes-table
         @update-active-tab-value="updateActiveTabValue"
         @reload-table="reloadTable"
