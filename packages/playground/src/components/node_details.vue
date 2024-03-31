@@ -16,7 +16,7 @@
     <template v-if="loading">
       <v-card class="d-flex justify-center align-center h-screen">
         <div class="d-flex my-6 align-center justify-center">
-          <v-progress-circular />
+          <v-progress-circular indeterminate />
         </div>
         <p>Loading node details...</p>
       </v-card>

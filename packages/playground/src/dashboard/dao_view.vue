@@ -6,7 +6,7 @@
     </v-card>
 
     <div class="d-flex my-6 align-center justify-center" v-if="loadingProposals">
-      <v-progress-circular />
+      <v-progress-circular indeterminate />
     </div>
 
     <div v-else-if="proposals?.active?.length == 0 && proposals?.inactive?.length == 0">

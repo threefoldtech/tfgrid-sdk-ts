@@ -1,6 +1,6 @@
 <template>
   <view-layout>
-    <TfFiltersContainer @apply="loadFarms" class="mb-4" :loading="loading">
+    <TfFiltersContainer @apply="loadFarms(true)" class="mb-4" :loading="loading">
       <TfFilter
         query-route="farm-id"
         v-model="filters.farmId"
@@ -104,7 +104,7 @@
 
         <template v-if="loading">
           <div color="transparent" class="text-center">
-            <v-progress-circular />
+            <v-progress-circular indeterminate />
             <p>Loading farm details...</p>
           </div>
         </template>
@@ -146,11 +146,12 @@ const dialog = ref(false);
 
 const totalFarms = ref(0);
 
-async function loadFarms() {
+async function loadFarms(retCount = false) {
   loading.value = true;
+  if (retCount) page.value = 1;
   try {
     const { count, data } = await getAllFarms({
-      retCount: true,
+      retCount,
       farmId: +filters.value.farmId || undefined,
       freeIps: +filters.value.freePublicIps || undefined,
       nameContains: filters.value.farmName || undefined,
@@ -159,7 +160,7 @@ async function loadFarms() {
     });
 
     if (data) {
-      totalFarms.value = count || 0;
+      if (retCount) totalFarms.value = count || 0;
       farms.value = data.map(farm => {
         const ips = farm.publicIps;
         const total = ips.length;
