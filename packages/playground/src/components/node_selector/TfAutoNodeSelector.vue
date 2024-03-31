@@ -16,7 +16,10 @@
     <input-tooltip tooltip="Select a node ID to deploy on." align-center>
       <div class="w-100" :style="{ position: 'relative' }">
         <div class="d-flex my-6 align-center justify-center">
-          <v-progress-circular v-if="loadedNodes.length > 0 && (pageCountTask.loading || nodesTask.loading)" />
+          <v-progress-circular
+            indeterminate
+            v-if="loadedNodes.length > 0 && (pageCountTask.loading || nodesTask.loading)"
+          />
         </div>
         <VCard
           flat
@@ -30,7 +33,7 @@
         >
           <VContainer v-if="loadedNodes.length === 0 && (pageCountTask.loading || nodesTask.loading)">
             <VRow align="center" justify="center" class="pa-4">
-              <v-progress-circular class="mr-2" />
+              <v-progress-circular indeterminate class="mr-2" />
               Loading Nodes...
             </VRow>
           </VContainer>

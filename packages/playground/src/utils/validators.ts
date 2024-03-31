@@ -1,8 +1,11 @@
+import StellarSdk from "stellar-sdk";
 import validator from "validator";
 import type { Options } from "validator/lib/isBoolean";
 import type { IsEmailOptions } from "validator/lib/isEmail";
 import type { IsFQDNOptions } from "validator/lib/isFQDN";
 import type { IsURLOptions } from "validator/lib/isURL";
+
+import type { RuleReturn } from "@/components/input_validator.vue";
 
 /**
  * Checks if a value is empty, undefined, or null.
@@ -738,4 +741,33 @@ export function pattern(msg: string, config: RegexPattern) {
 export function isValidSSHKey(key: string): boolean {
   const sshKeyRegex = /^(ssh-rsa|ssh-dss|ecdsa-[a-zA-Z0-9-]+|ssh-ed25519)\s+(\S+)\s+(\S+)/;
   return sshKeyRegex.test(key);
+}
+
+export function isValidDecimalNumber(length: number, msg: string) {
+  return (value: string) => {
+    if (!(value.toString().split(".").length > 1 ? value.toString().split(".")[1].length <= length : true)) {
+      return {
+        message: msg,
+      };
+    }
+  };
+}
+export async function isValidStellarAddress(target: string): Promise<RuleReturn> {
+  const server = new StellarSdk.Server(window.env.STELLAR_HORIZON_URL);
+  try {
+    // check if the account provided exists on stellar
+    const account = await server.loadAccount(target);
+    // check if the account provided has the appropriate trustlines
+    const includes = account.balances.find(
+      (b: { asset_code: string; asset_issuer: string }) =>
+        b.asset_code === "TFT" && b.asset_issuer === window.env.TFT_ASSET_ISSUER,
+    );
+    if (!includes) throw new Error("Invalid trustline");
+  } catch (e) {
+    const message =
+      (e as Error).message === "Invalid trustline"
+        ? "Address does not have a valid trustline to TFT"
+        : "Address not found";
+    return { message };
+  }
 }
