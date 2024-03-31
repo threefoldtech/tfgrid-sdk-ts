@@ -1,6 +1,6 @@
 import { convertObjectToQueryString } from "../../src/helpers/utils";
 
-describe("convertObjectToQueryString", () => {
+describe("Convert object to query string", () => {
   it("should return an empty string when given an empty object", () => {
     const obj = {};
     const queryString = convertObjectToQueryString(obj);
