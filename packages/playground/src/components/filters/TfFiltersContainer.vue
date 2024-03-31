@@ -1,60 +1,54 @@
 <template>
-  <VExpansionPanels :model-value="[0]">
-    <VExpansionPanel eager>
-      <VExpansionPanelTitle class="text-h6"> Filters </VExpansionPanelTitle>
-      <VExpansionPanelText eager>
-        <VForm :disabled="loading">
-          <FormValidator valid-on-init v-model="valid">
-            <VContainer fluid>
-              <VRow no-gutters>
-                <slot />
-              </VRow>
+  <VCard>
+    <VCardTitle class="d-flex align-center">
+      <span>Filters</span>
+      <VSpacer />
+      <VBtn
+        variant="outlined"
+        :disabled="loading || !valid || empty"
+        @click="clear"
+        text="Clear"
+        class="mr-2"
+        density="compact"
+      />
+      <VBtn
+        variant="outlined"
+        color="primary"
+        density="compact"
+        :disabled="!valid || !changed"
+        @click="apply"
+        text="Apply"
+        :loading="loading"
+      />
+    </VCardTitle>
 
-              <VRow class="mb-4" no-gutters v-show="valid && (changed || (!loading && !empty))">
-                <VAlert type="info" variant="tonal">
-                  <span>
-                    {{ changed ? "Filter options were updated but not applied." : "" }} Click
-                    <VCard
-                      class="d-inline pa-1"
-                      v-text="changed ? 'Apply' : 'Clear'"
-                      flat
-                      :color="$vuetify.theme.global.name === 'light' ? 'info' : undefined"
-                    />
-                    {{ changed ? "in order to reload your data." : "to reset your selected filters." }}
-                  </span>
-                </VAlert>
-              </VRow>
+    <VRow no-gutters v-show="valid && (changed || (!loading && !empty))">
+      <VAlert color="info" variant="tonal" class="rounded-0">
+        <span>
+          {{ changed ? "Filter options were updated but not applied." : "" }} Click
+          <VCard
+            class="d-inline pa-1"
+            v-text="changed ? 'Apply' : 'Clear'"
+            flat
+            :color="$vuetify.theme.global.name === 'light' ? 'info' : undefined"
+          />
+          {{ changed ? "in order to reload your data." : "to reset your selected filters." }}
+        </span>
+      </VAlert>
+    </VRow>
 
-              <VRow no-gutters>
-                <VDivider />
-              </VRow>
-            </VContainer>
-
-            <VContainer fluid>
-              <VRow no-gutters>
-                <VSpacer />
-                <VBtn
-                  variant="outlined"
-                  :disabled="loading || !valid || empty"
-                  @click="clear"
-                  text="Clear"
-                  class="mr-2"
-                />
-                <VBtn
-                  variant="outlined"
-                  color="primary"
-                  :disabled="!valid || !changed"
-                  @click="apply"
-                  text="Apply"
-                  :loading="loading"
-                />
-              </VRow>
-            </VContainer>
-          </FormValidator>
-        </VForm>
-      </VExpansionPanelText>
-    </VExpansionPanel>
-  </VExpansionPanels>
+    <VCardText :style="{ maxHeight: '700px', overflowY: 'auto' }">
+      <VForm :disabled="loading">
+        <FormValidator valid-on-init v-model="valid">
+          <VContainer fluid>
+            <VRow no-gutters>
+              <slot />
+            </VRow>
+          </VContainer>
+        </FormValidator>
+      </VForm>
+    </VCardText>
+  </VCard>
 </template>
 
 <script lang="ts">

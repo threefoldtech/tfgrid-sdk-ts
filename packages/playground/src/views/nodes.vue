@@ -18,7 +18,7 @@
         v-model="filters.nodeId"
       >
         <template #input="{ props }">
-          <VTextField label="Node ID" variant="outlined" v-model="filters.nodeId" v-bind="props">
+          <VTextField label="Node ID" variant="outlined" v-model="filters.nodeId" density="compact" v-bind="props">
             <template #append-inner>
               <VTooltip text="Filter by node id">
                 <template #activator="{ props }">
@@ -43,7 +43,7 @@
         ]"
       >
         <template #input="{ props }">
-          <VTextField label="Farm ID" variant="outlined" v-model="filters.farmId" v-bind="props">
+          <VTextField label="Farm ID" variant="outlined" v-model="filters.farmId" density="compact" v-bind="props">
             <template #append-inner>
               <VTooltip text="Filter by farm id">
                 <template #activator="{ props }">
@@ -64,6 +64,7 @@
               tooltip="Filter by farm name."
               :model-value="filters.farmName ? ({ name: filters.farmName } as any) : undefined"
               @update:model-value="filters.farmName = $event?.name || ''"
+              density="compact"
             />
           </VCol>
         </template>
@@ -78,13 +79,13 @@
       >
         <template #region="{ props }">
           <TfFilter query-route="region" v-model="filters.region">
-            <TfSelectRegion :region-props="props" variant="outlined" />
+            <TfSelectRegion :region-props="props" variant="outlined" density="compact" />
           </TfFilter>
         </template>
 
         <template #country="{ props }">
           <TfFilter query-route="country" v-model="filters.country">
-            <TfSelectCountry :country-props="props" variant="outlined" />
+            <TfSelectCountry :country-props="props" variant="outlined" density="compact" />
           </TfFilter>
         </template>
       </TfSelectLocation>
@@ -99,7 +100,7 @@
         ]"
       >
         <template #input="{ props }">
-          <VTextField label="Min SSD (GB)" variant="outlined" v-model="filters.minSSD" v-bind="props">
+          <VTextField label="Min SSD (GB)" variant="outlined" v-model="filters.minSSD" density="compact" v-bind="props">
             <template #append-inner>
               <VTooltip text="Filter by the minimum total amount of SSD in the node.">
                 <template #activator="{ props }">
@@ -121,7 +122,7 @@
         ]"
       >
         <template #input="{ props }">
-          <VTextField label="Min HDD (GB)" variant="outlined" v-model="filters.minHDD" v-bind="props">
+          <VTextField label="Min HDD (GB)" variant="outlined" v-model="filters.minHDD" density="compact" v-bind="props">
             <template #append-inner>
               <VTooltip text="Filter by the minimum total amount of HDD in the node.">
                 <template #activator="{ props }">
@@ -143,7 +144,7 @@
         ]"
       >
         <template #input="{ props }">
-          <VTextField label="Min RAM (GB)" variant="outlined" v-model="filters.minRAM" v-bind="props">
+          <VTextField label="Min RAM (GB)" variant="outlined" v-model="filters.minRAM" density="compact" v-bind="props">
             <template #append-inner>
               <VTooltip text="Filter by the minimum total amount of RAM in the node.">
                 <template #activator="{ props }">
@@ -165,7 +166,13 @@
         ]"
       >
         <template #input="{ props }">
-          <VTextField label="Min CPU (vCores)" variant="outlined" v-model="filters.minCRU" v-bind="props">
+          <VTextField
+            label="Min CPU (vCores)"
+            variant="outlined"
+            v-model="filters.minCRU"
+            density="compact"
+            v-bind="props"
+          >
             <template #append-inner>
               <VTooltip text="Filter by the minimum total number of CPUs in the node.">
                 <template #activator="{ props }">
@@ -187,7 +194,13 @@
         ]"
       >
         <template #input="{ props }">
-          <VTextField label="Free SSD (GB)" variant="outlined" v-model="filters.freeSSD" v-bind="props">
+          <VTextField
+            label="Free SSD (GB)"
+            variant="outlined"
+            v-model="filters.freeSSD"
+            density="compact"
+            v-bind="props"
+          >
             <template #append-inner>
               <VTooltip text="Filter by the minimum available amount of SSD in the node.">
                 <template #activator="{ props }">
@@ -209,7 +222,13 @@
         ]"
       >
         <template #input="{ props }">
-          <VTextField label="Free HDD (GB)" variant="outlined" v-model="filters.freeHDD" v-bind="props">
+          <VTextField
+            label="Free HDD (GB)"
+            variant="outlined"
+            v-model="filters.freeHDD"
+            density="compact"
+            v-bind="props"
+          >
             <template #append-inner>
               <VTooltip text="Filter by the minimum available amount of HDD in the node.">
                 <template #activator="{ props }">
@@ -231,7 +250,13 @@
         ]"
       >
         <template #input="{ props }">
-          <VTextField label="Free RAM (GB)" variant="outlined" v-model="filters.freeRAM" v-bind="props">
+          <VTextField
+            label="Free RAM (GB)"
+            variant="outlined"
+            v-model="filters.freeRAM"
+            density="compact"
+            v-bind="props"
+          >
             <template #append-inner>
               <VTooltip text="Filter by the minimum available amount of RAM in the node.">
                 <template #activator="{ props }">
@@ -255,7 +280,13 @@
         v-model="filters.publicIPs"
       >
         <template #input="{ props }">
-          <VTextField label="Free Public IPs" variant="outlined" v-model="filters.publicIPs" v-bind="props">
+          <VTextField
+            label="Free Public IPs"
+            variant="outlined"
+            v-model="filters.publicIPs"
+            density="compact"
+            v-bind="props"
+          >
             <template #append-inner>
               <VTooltip text="Filter by free Public IPs">
                 <template #activator="{ props }">
@@ -282,19 +313,34 @@
           variant="outlined"
           clearable
           @click:clear="filters.status = ''"
+          density="compact"
         />
       </TfFilter>
 
       <TfFilter query-route="gateway" v-model="filters.gateway">
-        <v-switch color="primary" inset label="Gateways (Only)" v-model="filters.gateway" hide-details />
+        <v-switch
+          color="primary"
+          inset
+          label="Gateways (Only)"
+          v-model="filters.gateway"
+          density="compact"
+          hide-details
+        />
       </TfFilter>
 
       <TfFilter query-route="gpu" v-model="filters.gpu">
-        <v-switch color="primary" inset label="GPU Node (Only)" v-model="filters.gpu" hide-details />
+        <v-switch color="primary" inset label="GPU Node (Only)" v-model="filters.gpu" density="compact" hide-details />
       </TfFilter>
 
       <TfFilter query-route="dedicated" v-model="filters.dedicated">
-        <v-switch color="primary" inset label="Dedicated Nodes (Only)" v-model="filters.dedicated" hide-details />
+        <v-switch
+          color="primary"
+          inset
+          label="Dedicated Nodes (Only)"
+          v-model="filters.dedicated"
+          density="compact"
+          hide-details
+        />
       </TfFilter>
     </TfFiltersContainer>
 
