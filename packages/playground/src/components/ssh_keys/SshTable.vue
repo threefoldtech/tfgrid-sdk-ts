@@ -2,7 +2,7 @@
   <v-card class="pt-6 pl-6 pr-6 mb-4">
     <div class="head">
       <h2 class="text-light">
-        <v-icon> {{ headerIcon }} </v-icon>
+        <v-icon>{{ headerIcon }}</v-icon>
         {{ headerTitle }}
       </h2>
     </div>
@@ -17,7 +17,7 @@
         show-select
         :no-data-text="capitalize(`No keys found.`)"
         class="pa-5"
-        v-model="selectedKeys"
+        v-model:selectedKeys="selectedKeys"
         :loading="loading"
         :headers="headers"
         :items="sshKeys"
@@ -178,7 +178,7 @@
 </template>
 
 <script lang="ts">
-import { capitalize, defineComponent, type PropType, ref } from "vue";
+import { capitalize, defineComponent, PropType, ref } from "vue";
 import { useTheme } from "vuetify";
 
 import type { SSHKeyData, VDataTableHeader } from "@/types";
@@ -187,7 +187,7 @@ import { AppThemeSelection } from "@/utils/app_theme";
 export default defineComponent({
   props: {
     sshKeys: {
-      type: Object as PropType<SSHKeyData[]>,
+      type: Array as PropType<SSHKeyData[]>,
       required: true,
     },
     headerTitle: {
@@ -208,34 +208,9 @@ export default defineComponent({
     },
   },
 
-  components: {},
-
   emits: ["inactive", "active", "delete", "view", "update:keys", "export"],
 
-  methods: {
-    deleteSelected() {
-      const ids: number[] = [];
-      Object.keys(this.selectedKeys).forEach(key => ids.push(this.selectedKeys[key as any]));
-
-      const filteredKeys = this.$props.sshKeys.filter(_key => ids.includes(_key.id));
-      this.$emit("delete", filteredKeys);
-      this.selectedKeys = [];
-    },
-
-    deleteKey(key: SSHKeyData) {
-      this.$emit("delete", [key]);
-    },
-
-    activateKey(key: SSHKeyData) {
-      if (key.isActive) {
-        this.$emit("inactive", key);
-      } else {
-        this.$emit("active", key);
-      }
-    },
-  },
-
-  setup() {
+  setup(props, { emit }) {
     const selectedKeys = ref<number[]>([]); // IDs
     const theme = useTheme();
 
@@ -270,7 +245,28 @@ export default defineComponent({
       },
     ];
 
-    return { headers, selectedKeys, capitalize, theme, AppThemeSelection };
+    const deleteSelected = () => {
+      const ids: number[] = [];
+      Object.keys(selectedKeys.value).forEach(key => ids.push(selectedKeys.value[key as any]));
+
+      const filteredKeys = props.sshKeys.filter(_key => ids.includes(_key.id));
+      emit("delete", filteredKeys);
+      selectedKeys.value = [];
+    };
+
+    const deleteKey = (key: SSHKeyData) => {
+      emit("delete", [key]);
+    };
+
+    const activateKey = (key: SSHKeyData) => {
+      if (key.isActive) {
+        emit("inactive", key);
+      } else {
+        emit("active", key);
+      }
+    };
+
+    return { headers, selectedKeys, capitalize, theme, AppThemeSelection, deleteSelected, deleteKey, activateKey };
   },
 });
 </script>
