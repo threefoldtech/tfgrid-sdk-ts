@@ -144,7 +144,7 @@
         </TfFilter>
       </TfFiltersContainer>
 
-      <v-alert type="info" variant="tonal" class="mb-3">
+      <v-alert type="info" variant="tonal">
         Discounts are applied on hourly basis, you need to maintain at least the same balance you have or higher to
         unlock the discounts.
       </v-alert>
