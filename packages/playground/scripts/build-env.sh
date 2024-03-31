@@ -6,7 +6,6 @@ STELLAR_NETWORK="${STELLAR_NETWORK:=test}"
 TIMEOUT="${TIMEOUT:=10000}"
 PAGE_SIZE="${PAGE_SIZE:=20}"
 MINTING_URL="https://alpha.minting.tfchain.grid.tf"
-STATS_URL="https://stats.grid.tf"
 MANUAL_URL="https://www.manual.grid.tf"
 
 STELLAR_ENV_Vars=(
@@ -24,7 +23,6 @@ case $MODE in
         BRIDGE_TFT_ADDRESS="${BRIDGE_TFT_ADDRESS:-GDHJP6TF3UXYXTNEZ2P36J5FH7W4BJJQ4AYYAXC66I2Q2AH5B6O6BCFG}"
         STATS_URL="${STATS_URL:-https://stats.dev.grid.tf}"
         STELLAR_NETWORK="${STELLAR_NETWORK:-test}"
-        MANUAL_URL="${MANUAL_URL:-https://www.manual.grid.tf}"
     ;;
     "qa")
         GRAPHQL_URL="${GRAPHQL_URL:-https://graphql.qa.grid.tf/graphql}"
@@ -35,7 +33,6 @@ case $MODE in
         BRIDGE_TFT_ADDRESS="${BRIDGE_TFT_ADDRESS:-GAQH7XXFBRWXT2SBK6AHPOLXDCLXVFAKFSOJIRMRNCDINWKHGI6UYVKM}"
         STATS_URL="${STATS_URL:-https://stats.qa.grid.tf}"
         STELLAR_NETWORK="${STELLAR_NETWORK:-test}"
-        MANUAL_URL="${MANUAL_URL:-https://www.manual.grid.tf}"
     ;;
     "test")
         GRAPHQL_URL="${GRAPHQL_URL:-https://graphql.test.grid.tf/graphql}"
@@ -46,7 +43,6 @@ case $MODE in
         BRIDGE_TFT_ADDRESS="${BRIDGE_TFT_ADDRESS:-GA2CWNBUHX7NZ3B5GR4I23FMU7VY5RPA77IUJTIXTTTGKYSKDSV6LUA4}"
         STATS_URL="${STATS_URL:-https://stats.test.grid.tf}"
         STELLAR_NETWORK="${STELLAR_NETWORK:-main}"
-        MANUAL_URL="${MANUAL_URL:-https://www.manual.grid.tf}"
     ;;
     "main")
         GRAPHQL_URL="${GRAPHQL_URL:-https://graphql.grid.tf/graphql}"
@@ -57,7 +53,6 @@ case $MODE in
         BRIDGE_TFT_ADDRESS="${BRIDGE_TFT_ADDRESS:-GBNOTAYUMXVO5QDYWYO2SOCOYIJ3XFIP65GKOQN7H65ZZSO6BK4SLWSC}"
         STATS_URL="${STATS_URL:-https://stats.grid.tf}"
         STELLAR_NETWORK="${STELLAR_NETWORK:-main}"
-        MANUAL_URL="${MANUAL_URL:-https://www.manual.grid.tf}"
     ;;
     *)
         echo "Unknown 'MODE' selected! Acceptable modes are [dev | qa | test | main ]"
