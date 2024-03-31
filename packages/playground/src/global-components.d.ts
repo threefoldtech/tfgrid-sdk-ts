@@ -53,6 +53,7 @@ declare global {
       STATS_URL: string;
       TIMEOUT: number;
       PAGE_SIZE: number;
+      MANUAL_URL: string;
     };
   }
 }
