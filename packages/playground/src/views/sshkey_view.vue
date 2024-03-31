@@ -118,13 +118,14 @@
 <script lang="ts">
 import crypto from "crypto";
 import { computed, defineComponent, ref } from "vue";
+import { onMounted } from "vue";
 import { generateKeyPair } from "web-ssh-keygen";
 
 import SshDataDialog from "@/components/ssh_keys/SshDataDialog.vue";
 import SshFormDialog from "@/components/ssh_keys/SshFormDialog.vue";
 import SshTable from "@/components/ssh_keys/SshTable.vue";
 import { useProfileManager } from "@/stores";
-import { SSHCreationMethod, type SSHKeyData } from "@/types";
+import { SSHCreationMethod, SSHKeyData } from "@/types";
 import { createCustomToast, ToastType } from "@/utils/custom_toast";
 import { formatSSHKeyTableCreatedAt } from "@/utils/date";
 import { getGrid, getMetadata, storeSSH } from "@/utils/grid";
@@ -138,84 +139,80 @@ export default defineComponent({
     SshDataDialog,
   },
 
-  data() {
-    return {
-      isViewKey: false,
-      isExporting: false,
-      generatingSSH: false,
-      generatedSSHKey: "",
-      selectedKey: {
-        id: 0,
-        publicKey: "",
-        name: "",
-        createdAt: "",
-        isActive: false,
-      },
-      migrating: false,
+  setup() {
+    const isViewKey = ref(false);
+    const isExporting = ref(false);
+    const generatingSSH = ref(false);
+    const generatedSSHKey = ref("");
+    const selectedKey = ref<SSHKeyData>({
+      id: 0,
+      publicKey: "",
+      name: "",
+      createdAt: "",
+      isActive: false,
+    });
+    const migrating = ref(false);
+
+    const openDialog = (type: SSHCreationMethod) => {
+      dialogType.value = type;
     };
-  },
 
-  methods: {
-    openDialog(type: SSHCreationMethod) {
-      this.dialogType = type;
-    },
-
-    closeDialog() {
-      this.dialogType = SSHCreationMethod.None;
-      this.generatedSSHKey = "";
-    },
+    const closeDialog = () => {
+      dialogType.value = SSHCreationMethod.None;
+      generatedSSHKey.value = "";
+    };
 
     // Add SSH key
-    async addKey(key: SSHKeyData) {
-      this.savingKey = true;
+    const addKey = async (key: SSHKeyData) => {
+      savingKey.value = true;
       if (!key.fingerPrint) {
-        key.fingerPrint = this.calculateFingerprint(key.publicKey);
+        key.fingerPrint = calculateFingerprint(key.publicKey);
       }
 
-      this.allKeys.push(key);
-      await this.updateSSHKeysInChain();
+      allKeys.value.push(key);
+      await updateSSHKeysInChain();
       createCustomToast(`The created ${key.name} key has been saved.`, ToastType.success);
-      this.savingKey = false;
-      this.closeDialog();
-    },
+      savingKey.value = false;
+      closeDialog();
+    };
 
-    viewSelectedKey(key: SSHKeyData) {
-      this.selectedKey = key;
-      this.isViewKey = true;
-    },
+    const viewSelectedKey = (key: SSHKeyData) => {
+      selectedKey.value = key;
+      isViewKey.value = true;
+    };
 
-    async setActiveKey(key: SSHKeyData) {
+    const setActiveKey = async (key: SSHKeyData) => {
       key.activating = true;
       key.isActive = true;
-      await this.updateSSHKeysInChain();
+      await updateSSHKeysInChain();
       createCustomToast(`The activation of ${key.name} key has been enabled.`, ToastType.success);
       key.activating = false;
-    },
+    };
 
-    async setInactiveKey(key: SSHKeyData) {
+    const setInactiveKey = async (key: SSHKeyData) => {
       key.activating = true;
       key.isActive = false;
-      await this.updateSSHKeysInChain();
+      await updateSSHKeysInChain();
       createCustomToast(`The activation of ${key.name} key has been disabled.`, ToastType.success);
       key.activating = false;
-    },
+    };
 
-    async deleteKey(selectedKeys: SSHKeyData[]) {
-      this.deleting = true;
+    const deleteKey = async (selectedKeys: SSHKeyData[]) => {
+      deleting.value = true;
       const ids: number[] = selectedKeys.map(key => key.id);
-      this.allKeys = this.allKeys.filter(_key => !ids.includes(_key.id));
+      allKeys.value = allKeys.value.filter(_key => !ids.includes(_key.id));
       selectedKeys.map(key => (key.deleting = true));
-      await this.updateSSHKeysInChain();
+      await updateSSHKeysInChain();
       selectedKeys.map(key => (key.deleting = false));
       createCustomToast(
         `The selected ${selectedKeys.length > 1 ? "keys" : "key"} has been deleted successfully.`,
         ToastType.success,
       );
-      this.deleting = false;
-    },
+      deleting.value = false;
+    };
 
-    async generateSSHKeys(key: SSHKeyData) {
-      this.generatingSSH = true;
+    const generateSSHKeys = async (key: SSHKeyData) => {
+      generatingSSH.value = true;
       const keys = await generateKeyPair({
         alg: "RSASSA-PKCS1-v1_5",
         hash: "SHA-256",
@@ -223,19 +220,19 @@ export default defineComponent({
         size: 4096,
       });
 
-      this.generatedSSHKey = keys.publicKey;
-      key.fingerPrint = this.calculateFingerprint(keys.publicKey);
+      generatedSSHKey.value = keys.publicKey;
+      key.fingerPrint = calculateFingerprint(keys.publicKey);
       downloadAsFile("id_rsa", keys.privateKey);
       createCustomToast(`${key.name} key has been generated successfully.`, ToastType.success);
-      this.generatingSSH = false;
-    },
+      generatingSSH.value = false;
+    };
 
-    async exportKeys(keys: SSHKeyData[] | number[]) {
-      this.isExporting = true;
+    const exportKeys = async (keys: SSHKeyData[] | number[]) => {
+      isExporting.value = true;
       let exportKeys: SSHKeyData[] = [];
 
       if (Array.isArray(keys) && keys.length > 0 && typeof keys[0] === "number") {
-        exportKeys = this.allKeys.filter(key => keys.includes(key.id as SSHKeyData & number));
+        exportKeys = allKeys.value.filter(key => keys.includes(key.id as SSHKeyData & number));
       } else {
         exportKeys = keys as SSHKeyData[];
       }
@@ -246,11 +243,11 @@ export default defineComponent({
       });
 
       downloadAsJson(exportKeys, `ssh_keys.json`);
-      this.isExporting = false;
-    },
+      isExporting.value = false;
+    };
 
-    async migrateOldKey(publicSSHKey: string) {
-      this.migrating = true;
+    const migrateOldKey = async (publicSSHKey: string) => {
+      migrating.value = true;
       const parts = publicSSHKey.split(" ");
       const keyName = parts[parts.length - 1];
 
@@ -262,61 +259,32 @@ export default defineComponent({
         publicKey: publicSSHKey,
       };
 
-      this.allKeys.push(newKey);
-      await this.updateSSHKeysInChain();
-      newKey.fingerPrint = this.calculateFingerprint(publicSSHKey);
-      this.migrating = false;
-    },
-  },
+      allKeys.value.push(newKey);
+      await updateSSHKeysInChain();
+      newKey.fingerPrint = calculateFingerprint(publicSSHKey);
+      migrating.value = false;
+    };
 
-  async mounted() {
     const profileManager = useProfileManager();
-    const userSshKey: SSHKeyData[] | string = profileManager.profile!.ssh;
+    const userSshKey = ref<SSHKeyData[] | string>(profileManager.profile!.ssh);
 
-    if (typeof userSshKey === "string") {
-      this.migrateOldKey(userSshKey);
-      return;
-    }
-
-    this.loading = true;
-    if (!userSshKey) {
-      profileManager.updateSSH(this.allKeys);
-    }
-
-    const grid = await getGrid(profileManager.profile!);
-    await getMetadata(grid!);
-
-    this.allKeys = userSshKey || [];
-    if (this.allKeys) {
-      // Calculate the fingerprint for each key after saving them to the chain
-      this.allKeys = this.allKeys.map(key => {
-        const fingerprint = this.calculateFingerprint(key.publicKey);
-        return { ...key, fingerPrint: fingerprint };
-      });
-    }
-    this.loading = false;
-  },
-
-  setup() {
-    const savingKey = ref<boolean>(false);
     const loading = ref<boolean>(false);
+    const savingKey = ref<boolean>(false);
     const deleting = ref<boolean>(false);
-
     const allKeys = ref<SSHKeyData[]>([]);
     const activeKeys = computed(() => (allKeys.value.length ? allKeys.value.filter(key => key.isActive) : []));
-    const dialogType = ref(SSHCreationMethod.None);
-    const profileManager = useProfileManager();
+    const dialogType = ref<SSHCreationMethod>(SSHCreationMethod.None);
 
-    function parsePublicKey(publicKey: string) {
+    const parsePublicKey = (publicKey: string) => {
       const parts = publicKey.split(" ");
       return {
         type: parts[0],
         data: parts[1],
         comment: parts[2],
       };
-    }
+    };
 
-    function calculateFingerprint(publicKey: string) {
+    const calculateFingerprint = (publicKey: string) => {
       if (publicKey.length) {
         const sshPublicKey = parsePublicKey(publicKey);
         const md5 = crypto.createHash("md5");
@@ -331,9 +299,9 @@ export default defineComponent({
         }
       }
       return "-";
-    }
+    };
 
-    async function updateSSHKeysInChain() {
+    const updateSSHKeysInChain = async () => {
       const copiedKeys = allKeys.value.map(key => {
         // Remove the fingerprint, activating, and deleting before saving the key to the chain
         const { fingerPrint, activating, deleting, ...keyWithoutSensitiveProps } = key;
@@ -345,7 +313,31 @@ export default defineComponent({
       await getMetadata(grid!);
       await storeSSH(grid!, copiedKeys);
       profileManager.updateSSH(copiedKeys);
-    }
+    };
+
+    onMounted(async () => {
+      if (typeof userSshKey.value === "string") {
+        migrateOldKey(userSshKey.value);
+      } else {
+        loading.value = true;
+        if (!userSshKey.value) {
+          profileManager.updateSSH(allKeys.value);
+        }
+
+        const grid = await getGrid(profileManager.profile!);
+        await getMetadata(grid!);
+
+        allKeys.value = userSshKey.value || [];
+        if (allKeys.value) {
+          // Calculate the fingerprint for each key after saving them to the chain
+          allKeys.value = allKeys.value.map(key => {
+            const fingerprint = calculateFingerprint(key.publicKey);
+            return { ...key, fingerPrint: fingerprint };
+          });
+        }
+        loading.value = false;
+      }
+    });
 
     return {
       loading,
@@ -355,7 +347,23 @@ export default defineComponent({
       SSHCreationMethod,
       dialogType,
       savingKey,
+      generatingSSH,
+      migrating,
+      isExporting,
+      generatedSSHKey,
+      isViewKey,
+      selectedKey,
 
+      openDialog,
+      closeDialog,
+      addKey,
+      viewSelectedKey,
+      setActiveKey,
+      setInactiveKey,
+      deleteKey,
+      generateSSHKeys,
+      exportKeys,
+      migrateOldKey,
       calculateFingerprint,
       updateSSHKeysInChain,
     };
