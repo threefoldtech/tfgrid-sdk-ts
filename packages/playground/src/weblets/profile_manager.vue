@@ -237,14 +237,22 @@
                   <v-card-text class="pa-15" v-html="acceptTermsContent"></v-card-text>
                   <div class="terms-footer">
                     <v-btn
+                      class="mr-2"
+                      @click="openAcceptTerms = termsLoading = false"
+                      v-show="!termsLoading"
+                      color="white"
+                      variant="outlined"
+                      id="accept-terms-and-condation"
+                      :text="capitalize('go back')"
+                    />
+                    <v-btn
                       @click="shouldActivateAccount ? activateAccount() : createNewAccount()"
                       v-show="!termsLoading"
                       color="primary"
                       id="accept-terms-and-condation"
                       :disabled="disableTermsBtn"
-                    >
-                      accept terms and conditions
-                    </v-btn>
+                      :text="capitalize('accept terms and conditions')"
+                    />
                   </div>
                 </v-card>
                 <v-card v-else :style="{ height: '100%' }">
@@ -923,6 +931,7 @@ function onScroll(e: UIEvent) {
 
 <script lang="ts">
 import { TwinNotExistError } from "@threefold/types";
+import { capitalize } from "vue";
 
 import QrcodeGenerator from "../components/qrcode_generator.vue";
 import type { Profile } from "../stores/profile_manager";
