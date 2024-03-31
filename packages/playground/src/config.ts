@@ -14,7 +14,6 @@ import PasswordInputWrapper from "./components/password_input_wrapper.vue";
 import ViewLayout from "./components/view_layout.vue";
 import WebletLayout from "./components/weblet_layout.vue";
 import * as validators from "./utils/validators";
-
 const GLOBAL_COMPONENTS: { [key: string]: Component } = {
   PasswordInputWrapper,
   WebletLayout,

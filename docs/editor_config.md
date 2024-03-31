@@ -3,8 +3,6 @@
 We recommend [Visual Studio Code](https://code.visualstudio.com/) as it has many extensions that will help, there are some of them:
 
 - [Vue Language Features](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
-- [Svelte for VS Code](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode)
-- [Svelte 3 Snippets](https://marketplace.visualstudio.com/items?itemName=fivethree.vscode-svelte-snippets)
 - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 
   Configuration files:

@@ -110,6 +110,18 @@ a {
   font-weight: 600 !important;
 }
 
+.v-data-table-header__content {
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+.v-data-table__td {
+  text-align: center;
+}
+.v-data-table__tbody {
+  text-align: center !important;
+}
+
 .font-14 {
   font-size: 14px !important;
 }

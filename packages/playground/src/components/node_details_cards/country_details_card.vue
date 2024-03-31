@@ -1,5 +1,6 @@
 <template>
-  <card-details :loading="loading" title="Country Details" :items="countryFields" icon="mdi-map-outline" />
+  <location-details :node="node" />
+  <card-details :loading="loading" :items="countryFields" />
 </template>
 
 <script lang="ts">
@@ -10,10 +11,10 @@ import type { NodeDetailsCard } from "@/types";
 import { getCountryCode } from "@/utils/get_nodes";
 
 import CardDetails from "./card_details.vue";
-
+import locationDetails from "./location_details_card.vue";
 export default {
   name: "CountryDetailsCard",
-  components: { CardDetails },
+  components: { CardDetails, locationDetails },
   props: {
     node: {
       type: Object as PropType<GridNode>,
