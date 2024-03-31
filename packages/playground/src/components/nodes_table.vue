@@ -3,6 +3,7 @@
     <v-row>
       <v-col>
         <v-data-table-server
+          height="750px"
           :loading="loading"
           loading-text="Loading nodes..."
           :headers="headers"

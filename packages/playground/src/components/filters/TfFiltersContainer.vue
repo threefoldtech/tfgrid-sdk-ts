@@ -22,6 +22,8 @@
       />
     </VCardTitle>
 
+    <VDivider />
+
     <VRow no-gutters v-show="valid && (changed || (!loading && !empty))">
       <VAlert color="info" variant="tonal" class="rounded-0">
         <span>
@@ -37,7 +39,7 @@
       </VAlert>
     </VRow>
 
-    <VCardText :style="{ maxHeight: '700px', overflowY: 'auto' }">
+    <VCardText :style="{ maxHeight: '750px', overflowY: 'auto' }">
       <VForm :disabled="loading">
         <FormValidator valid-on-init v-model="valid">
           <VContainer fluid>
