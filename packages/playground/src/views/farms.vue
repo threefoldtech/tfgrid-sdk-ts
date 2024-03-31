@@ -1,96 +1,109 @@
 <template>
   <view-layout>
-    <TfFiltersContainer @apply="loadFarms(true)" class="mb-4" :loading="loading">
-      <TfFilter
-        query-route="farm-id"
-        v-model="filters.farmId"
-        :rules="[
-          validators.isNumeric('This field accepts numbers only.', {
-            no_symbols: true,
-          }),
-          validators.min('The ID should be larger than zero.', 1),
-          validators.isInt('should be an integer'),
-          validators.validateResourceMaxNumber('This is not a valid ID.'),
-        ]"
-      >
-        <template #input="{ props }">
-          <VTextField label="Farm ID" variant="outlined" v-model="filters.farmId" v-bind="props">
-            <template #append-inner>
-              <VTooltip text="Filter by farm id">
-                <template #activator="{ props }">
-                  <VIcon icon="mdi-information-outline" v-bind="props" />
+    <TfFiltersLayout>
+      <template #filters>
+        <TfFiltersContainer @apply="loadFarms(true)" class="mb-4" :loading="loading">
+          <TfFilter
+            query-route="farm-id"
+            v-model="filters.farmId"
+            :rules="[
+              validators.isNumeric('This field accepts numbers only.', {
+                no_symbols: true,
+              }),
+              validators.min('The ID should be larger than zero.', 1),
+              validators.isInt('should be an integer'),
+              validators.validateResourceMaxNumber('This is not a valid ID.'),
+            ]"
+          >
+            <template #input="{ props }">
+              <VTextField label="Farm ID" variant="outlined" v-model="filters.farmId" density="compact" v-bind="props">
+                <template #append-inner>
+                  <VTooltip text="Filter by farm id">
+                    <template #activator="{ props }">
+                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    </template>
+                  </VTooltip>
                 </template>
-              </VTooltip>
+              </VTextField>
             </template>
-          </VTextField>
-        </template>
-      </TfFilter>
+          </TfFilter>
 
-      <TfFilter query-route="farm-name" v-model="filters.farmName">
-        <template #unwrap="{ colProps }">
-          <VCol v-bind="colProps">
-            <TfSelectFarm
-              inset-tooltip
-              variant="outlined"
-              tooltip="Filter by farm name."
-              :model-value="filters.farmName ? ({ name: filters.farmName } as any) : undefined"
-              @update:model-value="filters.farmName = $event?.name || ''"
-            />
-          </VCol>
-        </template>
-      </TfFilter>
+          <TfFilter query-route="farm-name" v-model="filters.farmName">
+            <template #unwrap="{ colProps }">
+              <VCol v-bind="colProps">
+                <TfSelectFarm
+                  inset-tooltip
+                  variant="outlined"
+                  tooltip="Filter by farm name."
+                  :model-value="filters.farmName ? ({ name: filters.farmName } as any) : undefined"
+                  @update:model-value="filters.farmName = $event?.name || ''"
+                  density="compact"
+                />
+              </VCol>
+            </template>
+          </TfFilter>
 
-      <TfFilter
-        query-route="free-public-ips"
-        v-model="filters.freePublicIps"
-        :rules="[
-          validators.isNumeric('This field accepts numbers only.', {
-            no_symbols: true,
-          }),
-          validators.min('Free Public IP should be larger than zero.', 1),
-          validators.isInt('should be an integer'),
-          validators.validateResourceMaxNumber('This is not a valid public IP.'),
-        ]"
-      >
-        <template #input="{ props }">
-          <VTextField label="Free Public IPs" variant="outlined" v-model="filters.freePublicIps" v-bind="props">
-            <template #append-inner>
-              <VTooltip text="Filter by free public IPs">
-                <template #activator="{ props }">
-                  <VIcon icon="mdi-information-outline" v-bind="props" />
+          <TfFilter
+            query-route="free-public-ips"
+            v-model="filters.freePublicIps"
+            :rules="[
+              validators.isNumeric('This field accepts numbers only.', {
+                no_symbols: true,
+              }),
+              validators.min('Free Public IP should be larger than zero.', 1),
+              validators.isInt('should be an integer'),
+              validators.validateResourceMaxNumber('This is not a valid public IP.'),
+            ]"
+          >
+            <template #input="{ props }">
+              <VTextField
+                label="Free Public IPs"
+                variant="outlined"
+                v-model="filters.freePublicIps"
+                density="compact"
+                v-bind="props"
+              >
+                <template #append-inner>
+                  <VTooltip text="Filter by free public IPs">
+                    <template #activator="{ props }">
+                      <VIcon icon="mdi-information-outline" v-bind="props" />
+                    </template>
+                  </VTooltip>
                 </template>
-              </VTooltip>
+              </VTextField>
             </template>
-          </VTextField>
-        </template>
-      </TfFilter>
-    </TfFiltersContainer>
+          </TfFilter>
+        </TfFiltersContainer>
+      </template>
 
-    <v-data-table-server
-      :loading="loading"
-      :headers="headers"
-      :items="farms"
-      :items-length="totalFarms"
-      :items-per-page-options="[
-        { value: 5, title: '5' },
-        { value: 10, title: '10' },
-        { value: 15, title: '15' },
-      ]"
-      :items-per-page="size"
-      @update:items-per-page="
-        size = $event;
-        loadFarms();
-      "
-      :page="page"
-      @update:page="
-        page = $event;
-        loadFarms();
-      "
-      :disable-sort="true"
-      @click:row="openSheet"
-    >
-      <template #loading />
-    </v-data-table-server>
+      <v-data-table-server
+        height="750px"
+        fixed-header
+        :loading="loading"
+        :headers="headers"
+        :items="farms"
+        :items-length="totalFarms"
+        :items-per-page-options="[
+          { value: 5, title: '5' },
+          { value: 10, title: '10' },
+          { value: 15, title: '15' },
+        ]"
+        :items-per-page="size"
+        @update:items-per-page="
+          size = $event;
+          loadFarms();
+        "
+        :page="page"
+        @update:page="
+          page = $event;
+          loadFarms();
+        "
+        :disable-sort="true"
+        @click:row="openSheet"
+      >
+        <template #loading />
+      </v-data-table-server>
+    </TfFiltersLayout>
 
     <v-dialog v-model="dialog" hide-overlay transition="dialog-bottom-transition">
       <v-container>
@@ -226,6 +239,7 @@ import { createCustomToast, ToastType } from "@/utils/custom_toast";
 
 import TfFilter from "../components/filters/TfFilter.vue";
 import TfFiltersContainer from "../components/filters/TfFiltersContainer.vue";
+import TfFiltersLayout from "../components/filters/TfFiltersLayout.vue";
 import TfSelectFarm from "../components/node_selector/TfSelectFarm.vue";
 
 export default {
@@ -234,6 +248,7 @@ export default {
     FarmDetailsCard,
     TwinDetailsCard,
     TfFiltersContainer,
+    TfFiltersLayout,
     TfFilter,
     TfSelectFarm,
   },
