@@ -7,7 +7,7 @@
     icon="mdi-credit-card-settings-outline"
   >
     <template #gpu-hint-message>
-      <div v-if="node.cards?.length" class="mb-3">
+      <div v-if="cardsLength > 0" class="mb-3">
         <v-chip class="d-flex justify-center ma-4 mt-1" color="info">
           Select a GPU card ID from the below selection to load its data.
         </v-chip>
@@ -83,6 +83,7 @@ export default {
     const errorMessage = ref<string>("");
     const node = ref(props.node);
     const nodeOptions = ref(props.nodeOptions);
+    const cardsLength = ref(0);
 
     watch(cardId, newCardId => {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -93,12 +94,15 @@ export default {
     const mount = () => {
       loading.value = true;
       if (node.value.cards?.length > 0) {
+        cardsLength.value = node.value.cards?.length;
         selectedCard.value = node.value.cards[0];
         node.value.cards.map((card: GPUCard) => {
           cardsIds.value.push(card.id);
         });
         cardId.value = cardsIds.value[0];
         gpuFields.value = getNodeTwinDetailsCard();
+        isError.value = false;
+        errorMessage.value = ``;
       } else {
         isError.value = true;
         errorMessage.value = `Failed to load node with ID ${node.value.nodeId}. The node might be offline or unresponsive. You can try requesting it again.`;
@@ -162,6 +166,7 @@ export default {
       selectedCard,
       isError,
       errorMessage,
+      cardsLength,
       copy,
       RerequestNode,
     };

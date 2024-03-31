@@ -99,12 +99,14 @@
                   <input-validator
                     :value="address"
                     :rules="[validators.required('Address is required.'), customStellarValidation]"
+                    :async-rules="[validators.isValidStellarAddress]"
                     #="{ props }"
                   >
                     <v-text-field
                       v-model="address"
                       v-bind="props"
                       outlined
+                      :loading="props.loading"
                       label="Stellar Wallet Address"
                     ></v-text-field>
                   </input-validator>

@@ -1,10 +1,12 @@
-import App from "./App.svelte";
+import "@mdi/font/css/materialdesignicons.css";
+import "vuetify/styles";
 
-const app = new App({
-  target: document.body,
-  props: {
-    name: "world",
-  },
-});
+import { createApp } from "vue";
 
-export default app;
+import App from "./App.vue";
+import vuetify from "./plugins/vuetify";
+
+const app = createApp(App);
+
+app.use(vuetify);
+app.mount("#app");

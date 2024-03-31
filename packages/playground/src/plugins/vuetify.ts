@@ -10,6 +10,11 @@ const vuetify = createVuetify({
     VAlert: {
       variant: "tonal",
     },
+    VProgressCircular: {
+      size: 50,
+      width: 7,
+      color: "primary",
+    },
   },
   components: {
     ...components,

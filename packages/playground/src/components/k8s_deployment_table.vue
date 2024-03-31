@@ -23,9 +23,8 @@
           <v-divider color="#FFCC00" />
           <v-card-text>
             <v-alert type="error" variant="tonal">
-              Failed to load <strong>{{ count - items.length }}</strong> deployment{{
-                count - items.length > 1 ? "s" : ""
-              }}.
+              Failed to load
+              <strong>{{ count - items.length }}</strong> deployment{{ count - items.length > 1 ? "s" : "" }}.
 
               <span>
                 This might happen because the node is down or it's not reachable
@@ -44,8 +43,8 @@
               }}
               <template v-if="deployment.contracts && deployment.contracts.length > 0">
                 with contract id:
-                <span v-for="contract in deployment.contracts" :key="contract.contract_id">
-                  {{ contract.contract_id }} .
+                <span v-for="contract in deployment.contracts" :key="contract.contractID">
+                  {{ contract.contractID }} .
                 </span>
               </template>
             </li>
@@ -59,6 +58,16 @@
 
     <AccessDeploymentAlert />
 
+    <InputTooltip tooltip="Didn't find your deployments in the list? Enable to show all deployments." inline>
+      <VSwitch
+        inset
+        color="primary"
+        label="Show All Deployments"
+        @update:model-value="loadDeployments"
+        v-model="showAllDeployments"
+      />
+    </InputTooltip>
+
     <ListTable
       :headers="[
         { title: 'PLACEHOLDER', key: 'data-table-select' },
@@ -66,13 +75,14 @@
         { title: 'Public IPv4', key: 'ipv4', sortable: false },
         { title: 'Public IPv6', key: 'ipv6', sortable: false },
         { title: 'Planetary Network IP', key: 'planetary', sortable: false },
+        { title: 'Mycelium Network IP', key: 'mycelium', sortable: false },
         { title: 'Workers', key: 'workersLength' },
         { title: 'Billing Rate', key: 'billing' },
         { title: 'Created At', key: 'created' },
         { title: 'Health', key: 'status', sortable: false },
         { title: 'Actions', key: 'actions', sortable: false },
       ]"
-      :items="items"
+      :items="showAllDeployments ? items : items.filter(i => !i.fromAnotherClient)"
       :loading="loading"
       :deleting="deleting"
       :model-value="$props.modelValue"
@@ -83,11 +93,19 @@
       <template #[`item.created`]="{ item }">
         {{ toHumanDate(item.value.masters[0].created) }}
       </template>
+
+      <template #[`item.mycelium`]="{ item }">
+        {{ item.value.myceliumIP || "-" }}
+      </template>
+
       <template #[`item.status`]="{ item }">
         <v-chip :color="getNodeHealthColor(item.value.masters[0].status as string).color">
           <v-tooltip v-if="item.value.masters[0].status == NodeHealth.Error" activator="parent" location="top">{{
             item.value.masters[0].message
           }}</v-tooltip>
+          <v-tooltip v-if="item.value.masters[0].status == NodeHealth.Paused" activator="parent" location="top"
+            >The deployment contract is in grace period</v-tooltip
+          >
           <span class="text-uppercase">
             {{ getNodeHealthColor(item.value.masters[0].status as string).type }}
           </span>
@@ -104,7 +122,7 @@
       </template>
 
       <template #no-data-text>
-        <div v-if="true || failedDeployments.length > 0" class="text-center">
+        <div v-if="failedDeployments.length > 0" class="text-center">
           <p v-text="'Couldn\'t load any of your Kubernetes deployments.'" />
           <VBtn
             class="mt-4"
@@ -122,16 +140,18 @@
 </template>
 
 <script lang="ts" setup>
-import { capitalize, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 
 import { getNodeHealthColor, NodeHealth } from "@/utils/get_nodes";
 
 import { useProfileManager } from "../stores";
 import { getGrid, updateGrid } from "../utils/grid";
-import { loadK8s, mergeLoadedDeployments } from "../utils/load_deployment";
+import { markAsFromAnotherClient } from "../utils/helpers";
+import { type K8S, type LoadedDeployments, loadK8s, mergeLoadedDeployments } from "../utils/load_deployment";
 const profileManager = useProfileManager();
 const showDialog = ref(false);
 const showEncryption = ref(false);
+const showAllDeployments = ref(false);
 const failedDeployments = ref<any[]>([]);
 
 const props = defineProps<{
@@ -144,7 +164,6 @@ defineEmits<{ (event: "update:model-value", value: any[]): void }>();
 const count = ref<number>();
 const items = ref<any[]>([]);
 const loading = ref(false);
-const namesOfFailedDeployments = ref("");
 
 onMounted(loadDeployments);
 async function loadDeployments() {
@@ -153,21 +172,24 @@ async function loadDeployments() {
   const grid = await getGrid(profileManager.profile!, props.projectName);
   const chunk1 = await loadK8s(grid!);
   const chunk2 = await loadK8s(updateGrid(grid!, { projectName: props.projectName.toLowerCase() }));
-  const chunk3 = await loadK8s(updateGrid(grid!, { projectName: "" }));
+  let chunk3: LoadedDeployments<K8S> = { count: 0, items: [], failedDeployments: [] };
+
+  if (showAllDeployments.value) {
+    chunk3 = await loadK8s(updateGrid(grid!, { projectName: "" }));
+    chunk3.items = chunk3.items.map(i => {
+      return !i.projectName || i.projectName === "Kubernetes" ? markAsFromAnotherClient(i) : i;
+    });
+  }
 
   const clusters = mergeLoadedDeployments(chunk1, chunk2, chunk3);
-  failedDeployments.value = [
-    ...(Array.isArray((chunk1 as any).failedDeployments) ? (chunk1 as any).failedDeployments : []),
-    ...(Array.isArray((chunk2 as any).failedDeployments) ? (chunk2 as any).failedDeployments : []),
-    ...(Array.isArray((chunk3 as any).failedDeployments) ? (chunk3 as any).failedDeployments : []),
-  ];
+  failedDeployments.value = clusters.failedDeployments;
 
   count.value = clusters.count;
   items.value = clusters.items.map((item: any) => {
     item.name = item.deploymentName;
-    item.ipv4 = item.masters[0].publicIP?.ip?.split("/")?.[0] || item.masters[0].publicIP?.ip || "None";
-    item.ipv6 = item.masters[0].publicIP?.ip6 || "None";
-    item.planetary = item.masters[0].planetary || "None";
+    item.ipv4 = item.masters[0].publicIP?.ip?.split("/")?.[0] || item.masters[0].publicIP?.ip || "-";
+    item.ipv6 = item.masters[0].publicIP?.ip6.replace(/\/64$/, "") || "-";
+    item.planetary = item.masters[0].planetary || "-";
     item.workersLength = item.workers.length;
     item.billing = item.masters[0].billing;
     item.created = item.masters[0].created;

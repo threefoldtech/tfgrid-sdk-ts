@@ -44,10 +44,15 @@
                   :data="contract.publicIP.ip.split('/')[0] || contract.publicIP.ip"
                   v-if="contract.publicIP.ip"
                 />
-                <CopyReadonlyInput label="Public IPv6" :data="contract.publicIP.ip6" v-if="contract.publicIP.ip6" />
+                <CopyReadonlyInput
+                  label="Public IPv6"
+                  :data="contract.publicIP.ip6 ? contract.publicIP.ip6.replace(/\/64$/, '') : '-'"
+                  v-if="contract.publicIP.ip6"
+                />
               </template>
 
               <CopyReadonlyInput label="Planetary Network IP" :data="contract.planetary" v-if="contract.planetary" />
+              <CopyReadonlyInput label="Mycelium Network IP" :data="contract.myceliumIP" v-if="contract.myceliumIP" />
 
               <CopyReadonlyInput label="Network Name" :data="contract.interfaces[0].network" />
               <CopyReadonlyInput label="CPU (vCores)" :data="contract.capacity.cpu" />

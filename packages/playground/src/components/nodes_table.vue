@@ -19,39 +19,16 @@
           @update:page="$emit('update:page', $event)"
           @update:items-per-page="$emit('update:size', $event)"
           class="elevation-1 v-data-table-header"
-          density="compact"
           :disable-sort="true"
-          hide-default-header
           :hover="true"
-          @click:row="openSheet"
         >
           <template #loading />
 
-          <template v-slot:[`item.status`]="{ item }">
-            <p class="text-left mt-1 mb-0">
-              <v-chip :color="getNodeStatusColor(item.columns.status as string).color">
-                <span>
-                  {{ capitalize(getNodeStatusColor(item.columns.status as string).status) }}
-                </span>
-              </v-chip>
-            </p>
-          </template>
-
-          <template v-slot:[`item.dedicated`]="{ item }">
-            <p class="text-left mt-1 mb-0">
-              <v-chip
-                :color="getNodeTypeColor(item.columns.dedicated as boolean, item.raw.rentedByTwinId as number).color"
-              >
-                <span>
-                  {{
-                    capitalize(
-                      getNodeTypeColor(item.columns.dedicated as boolean, item.raw.rentedByTwinId as number).type,
-                    )
-                  }}
-                </span>
-              </v-chip>
-            </p>
-          </template>
+          <tbody class="mx-4 my-4">
+            <tr v-for="node in modelValue" v-bind:key="node.id" @click="openSheet($event, node)">
+              <TfNodeDetailsCard :node="node" />
+            </tr>
+          </tbody>
         </v-data-table-server>
       </v-col>
     </v-row>
@@ -68,8 +45,9 @@ import formatResourceSize from "@/utils/format_resource_size";
 import { getNodeStatusColor, getNodeTypeColor } from "@/utils/get_nodes";
 import toReadableDate from "@/utils/to_readable_data";
 
+import TfNodeDetailsCard from "./node_selector/TfNodeDetailsCard.vue";
 export default {
-  emits: ["update:page", "update:size", "open-dialog"],
+  emits: ["update:page", "update:size", "open-dialog", "reloadTable"],
   props: {
     size: {
       required: true,
@@ -92,9 +70,11 @@ export default {
       type: Boolean,
     },
   },
+  components: {
+    TfNodeDetailsCard,
+  },
   setup(_, { emit }) {
     const nodeStatusOptions = [NodeStatus.Up, NodeStatus.Down];
-
     const headers: VDataTable["headers"] = [
       { title: "ID", key: "nodeId", sortable: false },
       { title: "Farm ID", key: "farmId", align: "start", sortable: false },
@@ -131,10 +111,11 @@ export default {
       { title: "Uptime", key: "uptime", align: "start", sortable: false, value: item => toReadableDate(item.uptime) },
       { title: "Status", key: "status", align: "start", sortable: false },
       { title: "Type", key: "dedicated", align: "start", sortable: false },
+      { title: "Actions", key: "actions", align: "start", sortable: false },
     ];
 
-    const openSheet = (_e: any, { item }: any) => {
-      emit("open-dialog", item);
+    const openSheet = (_e: any, node: any) => {
+      emit("open-dialog", node);
     };
 
     return {
@@ -155,10 +136,27 @@ export default {
   white-space: nowrap;
   font-size: 14px;
 }
-.v-data-table__tr {
-  line-height: 55px;
-}
 .v-data-table__thead {
   line-height: 60px;
+}
+</style>
+
+<style scoped>
+.v-data-table__thead {
+  display: none;
+}
+
+.v-data-table tbody tr {
+  position: relative;
+}
+
+.v-data-table tbody tr::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 0.5rem;
+  background-color: rgb(var(--v-theme-background));
 }
 </style>

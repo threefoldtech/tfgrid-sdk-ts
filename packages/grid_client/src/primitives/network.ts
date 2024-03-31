@@ -1,3 +1,4 @@
+import { Contract } from "@threefold/tfchain_client";
 import { GridClientErrors, ValidationError } from "@threefold/types";
 import { Buffer } from "buffer";
 import { plainToInstance } from "class-transformer";
@@ -8,13 +9,15 @@ import { default as TweetNACL } from "tweetnacl";
 
 import { RMB } from "../clients/rmb/client";
 import { TFClient } from "../clients/tf-grid/client";
+import { GqlNodeContract } from "../clients/tf-grid/contracts";
 import { GridClientConfig } from "../config";
 import { events } from "../helpers/events";
 import { formatErrorMessage, generateRandomHexSeed, getRandomNumber, randomChoice } from "../helpers/utils";
 import { validateHexSeed } from "../helpers/validator";
-import { MyceliumNetworkModel } from "../modules";
+import { ContractStates, MyceliumNetworkModel } from "../modules";
 import { DeploymentFactory } from "../primitives/deployment";
 import { BackendStorage, BackendStorageType } from "../storage/backend";
+import { Zmachine } from "../zos";
 import { Deployment } from "../zos/deployment";
 import { Workload, WorkloadTypes } from "../zos/workload";
 import { Peer, Znet } from "../zos/znet";
@@ -37,16 +40,31 @@ class AccessPoint {
   node_id: number;
 }
 
+export interface UserAccess {
+  subnet: string;
+  private_key: string;
+  node_id: number;
+}
+
+interface NetworkMetadata {
+  version: number;
+  user_accesses: UserAccess[];
+}
+
 class Network {
   capacity: Nodes;
   nodes: Node[] = [];
   deployments: Deployment[] = [];
   reservedSubnets: string[] = [];
   networks: Znet[] = [];
+  contracts: Required<GqlNodeContract>[];
   accessPoints: AccessPoint[] = [];
+  userAccesses: UserAccess[] = [];
   backendStorage: BackendStorage;
   _endpoints: Record<string, string> = {};
   _accessNodes: number[] = [];
+  static newContracts: GqlNodeContract[] = [];
+  static deletedContracts: number[] = [];
   rmb: RMB;
   wireguardConfig: string;
   tfClient: TFClient;
@@ -82,31 +100,54 @@ class Network {
     }
   }
 
+  private getUpdatedMetadata(nodeId: number, metadata: string): string {
+    for (const node of this.nodes) {
+      if (node.node_id === nodeId) {
+        const parsedMetadata: NetworkMetadata = JSON.parse(metadata || "{}");
+        parsedMetadata.version = 3;
+        parsedMetadata.user_accesses = this.userAccesses;
+        return JSON.stringify(parsedMetadata);
+      }
+    }
+    return metadata;
+  }
+
+  updateWorkload(nodeId: number, workload: Workload): Workload {
+    workload.data = this.getUpdatedNetwork(workload.data);
+    workload.metadata = this.getUpdatedMetadata(nodeId, workload.metadata);
+    return workload;
+  }
+
+  async getAccessNodeEndpoint(nodeId: number, ipv4 = true): Promise<string> {
+    const accessNodes = await this.capacity.getAccessNodes(this.config.twinId);
+    if (Object.keys(accessNodes).includes(nodeId.toString())) {
+      if (ipv4 && !accessNodes[nodeId]["ipv4"]) {
+        throw new GridClientErrors.Nodes.InvalidResourcesError(`Node ${nodeId} does not have ipv4 public config.`);
+      }
+    } else {
+      throw new GridClientErrors.Nodes.AccessNodeError(`Node ${nodeId} is not an access node.`);
+    }
+
+    const nodeWGListeningPort = this.getNodeWGListeningPort(nodeId);
+    let endpoint = "";
+    if (accessNodes[nodeId]["ipv4"]) {
+      endpoint = `${accessNodes[nodeId]["ipv4"].split("/")[0]}:${nodeWGListeningPort}`;
+    } else if (accessNodes[nodeId]["ipv6"]) {
+      endpoint = `[${accessNodes[nodeId]["ipv6"].split("/")[0]}]:${nodeWGListeningPort}`;
+    } else {
+      throw new GridClientErrors.Nodes.InvalidResourcesError(
+        `Couldn't find ipv4 or ipv6 in the public config of node ${nodeId}.`,
+      );
+    }
+    return endpoint;
+  }
+
   async addAccess(node_id: number, ipv4: boolean): Promise<string> {
     if (!this.nodeExists(node_id)) {
       throw new ValidationError(`Node ${node_id} does not exist in the network. Please add it first.`);
     }
     events.emit("logs", `Adding access to node ${node_id}`);
-    const accessNodes = await this.capacity.getAccessNodes(this.config.twinId);
-    if (Object.keys(accessNodes).includes(node_id.toString())) {
-      if (ipv4 && !accessNodes[node_id]["ipv4"]) {
-        throw new GridClientErrors.Nodes.InvalidResourcesError(`Node ${node_id} does not have ipv4 public config.`);
-      }
-    } else {
-      throw new GridClientErrors.Nodes.AccessNodeError(`Node ${node_id} is not an access node.`);
-    }
-
-    const nodeWGListeningPort = this.getNodeWGListeningPort(node_id);
-    let endpoint = "";
-    if (accessNodes[node_id]["ipv4"]) {
-      endpoint = `${accessNodes[node_id]["ipv4"].split("/")[0]}:${nodeWGListeningPort}`;
-    } else if (accessNodes[node_id]["ipv6"]) {
-      endpoint = `[${accessNodes[node_id]["ipv6"].split("/")[0]}]:${nodeWGListeningPort}`;
-    } else {
-      throw new GridClientErrors.Nodes.InvalidResourcesError(
-        `Couldn't find ipv4 or ipv6 in the public config of node ${node_id}.`,
-      );
-    }
+    const endpoint = await this.getAccessNodeEndpoint(node_id, ipv4);
 
     const nodesWGPubkey = await this.getNodeWGPublicKey(node_id);
     const keypair = this.generateWireguardKeypair();
@@ -118,6 +159,11 @@ class Network {
     this.accessPoints.push(accessPoint);
     await this.generatePeers();
     this.updateNetworkDeployments();
+    this.userAccesses.push({
+      node_id,
+      private_key: keypair.privateKey,
+      subnet: accessPoint.subnet,
+    });
     this.wireguardConfig = this.getWireguardConfig(accessPoint.subnet, keypair.privateKey, nodesWGPubkey, endpoint);
     return this.wireguardConfig;
   }
@@ -147,7 +193,7 @@ class Network {
           hex_key: seed,
           peers: [],
         };
-        this.updateNetwork(network);
+        this.getUpdatedNetwork(network);
         this.updateNetworkDeployments();
 
         const deploymentFactory = new DeploymentFactory(this.config);
@@ -157,7 +203,7 @@ class Network {
           const d = await deploymentFactory.fromObj(deployment);
           for (const workload of d["workloads"]) {
             workload.data["mycelium"]["hex_key"] = seed;
-            workload.data = this.updateNetwork(workload["data"]);
+            workload.data = this.getUpdatedNetwork(workload["data"]);
             workload.version += 1;
           }
           return d;
@@ -169,7 +215,6 @@ class Network {
   async addNode(
     nodeId: number,
     mycelium: boolean,
-    metadata = "",
     description = "",
     subnet = "",
     myceliumSeeds: MyceliumNetworkModel[] = [],
@@ -208,14 +253,14 @@ class Network {
     this.networks.push(znet);
     await this.generatePeers();
     this.updateNetworkDeployments();
-    znet = this.updateNetwork(znet);
+    znet = this.getUpdatedNetwork(znet);
 
     const znet_workload = new Workload();
     znet_workload.version = 0;
     znet_workload.name = this.name;
     znet_workload.type = WorkloadTypes.network;
     znet_workload.data = znet;
-    znet_workload.metadata = metadata;
+    znet_workload.metadata = "";
     znet_workload.description = description;
 
     const node = new Node();
@@ -247,7 +292,7 @@ class Network {
     return contract_id;
   }
 
-  updateNetwork(znet): Znet {
+  getUpdatedNetwork(znet): Znet {
     for (const net of this.networks) {
       if (net.subnet === znet.subnet) {
         return net;
@@ -279,47 +324,95 @@ class Network {
       return;
     }
     events.emit("logs", `Loading network ${this.name}`);
-    const network = await this.getNetwork();
-    if (network["ip_range"] !== this.ipRange) {
-      throw new ValidationError(`The same network name ${this.name} with a different ip range already exists.`);
-    }
 
-    await this.tfClient.connect();
-    for (const node of network["nodes"]) {
-      const contract = await this.tfClient.contracts.get({
-        id: node.contract_id,
-      });
-      if (contract === null) continue;
-      const node_twin_id = await this.capacity.getNodeTwinId(node.node_id);
-      const payload = JSON.stringify({ contract_id: node.contract_id });
-      let res;
+    if (await this.existOnNewNetwork()) {
+      await this.loadNetworkFromContracts();
+    } else {
+      const network = await this.getNetwork();
+      if (network["ip_range"] !== this.ipRange) {
+        throw new ValidationError(`The same network name ${this.name} with a different ip range already exists.`);
+      }
+
+      await this.tfClient.connect();
+      for (const node of network["nodes"]) {
+        const contract = await this.tfClient.contracts.get({
+          id: node.contract_id,
+        });
+        if (contract === null) continue;
+        const node_twin_id = await this.capacity.getNodeTwinId(node.node_id);
+        const payload = JSON.stringify({ contract_id: node.contract_id });
+        let res;
+        try {
+          res = await this.rmb.request([node_twin_id], "zos.deployment.get", payload);
+        } catch (e) {
+          (e as Error).message = formatErrorMessage(`Failed to load network deployment ${node.contract_id}`, e);
+          throw e;
+        }
+        res["node_id"] = node.node_id;
+        for (const workload of res["workloads"]) {
+          if (
+            workload["type"] !== WorkloadTypes.network ||
+            !Addr(this.ipRange).contains(Addr(workload["data"]["subnet"]))
+          ) {
+            continue;
+          }
+          if (workload.result.state === "deleted") {
+            continue;
+          }
+          const znet = this._fromObj(workload["data"]);
+          znet["node_id"] = node.node_id;
+          const n: Node = node;
+          this.nodes.push(n);
+          this.networks.push(znet);
+          this.deployments.push(res);
+        }
+      }
+      await this.getAccessPoints();
+      await this.save();
+    }
+  }
+
+  private async loadNetworkFromContracts() {
+    const contracts = await this.getDeploymentContracts(this.name);
+    for (const contract of contracts) {
+      const node_twin_id = await this.capacity.getNodeTwinId(contract.nodeID);
+      const payload = JSON.stringify({ contract_id: +contract.contractID });
+      let res: Deployment;
       try {
         res = await this.rmb.request([node_twin_id], "zos.deployment.get", payload);
       } catch (e) {
-        (e as Error).message = formatErrorMessage(`Failed to load network deployment ${node.contract_id}`, e);
+        (e as Error).message = formatErrorMessage(`Failed to load network deployment ${contract.contractID}`, e);
         throw e;
       }
-      res["node_id"] = node.node_id;
-      for (const workload of res["workloads"]) {
-        if (
-          workload["type"] !== WorkloadTypes.network ||
-          !Addr(this.ipRange).contains(Addr(workload["data"]["subnet"]))
-        ) {
+      res["node_id"] = contract.nodeID;
+      for (const workload of res.workloads) {
+        const data = workload.data as Znet;
+        if (workload.type !== WorkloadTypes.network || workload.name !== this.name) {
           continue;
         }
         if (workload.result.state === "deleted") {
           continue;
         }
-        const znet = this._fromObj(workload["data"]);
-        znet["node_id"] = node.node_id;
-        const n: Node = node;
+        const znet = this._fromObj(data);
+        znet["node_id"] = contract.nodeID;
+        const parsedMetadata: NetworkMetadata = JSON.parse(workload.metadata);
+        const reservedIps = await this.getReservedIps(contract.nodeID);
+
+        if (znet.ip_range !== this.ipRange) {
+          throw new ValidationError(`The same network name ${this.name} with a different ip range already exists.`);
+        }
+        this.userAccesses = parsedMetadata.user_accesses;
+        const n: Node = {
+          contract_id: +contract.contractID,
+          node_id: contract.nodeID,
+          reserved_ips: reservedIps,
+        };
         this.nodes.push(n);
         this.networks.push(znet);
         this.deployments.push(res);
       }
     }
     await this.getAccessPoints();
-    await this.save();
   }
 
   _fromObj(net: Znet): Znet {
@@ -537,9 +630,80 @@ class Network {
     return await this.backendStorage.load(PATH.join(path, this.name, "info.json"));
   }
 
+  private async getMyNetworkContracts(fetch = false) {
+    if (fetch || !this.contracts) {
+      let contracts = await this.tfClient.contracts.listMyNodeContracts({
+        graphqlURL: this.config.graphqlURL,
+        type: "network",
+      });
+      const alreadyFetchedContracts: GqlNodeContract[] = [];
+      for (const contract of Network.newContracts) {
+        if (contract.parsedDeploymentData!.type !== "network") continue;
+        const c = contracts.filter(c => +c.contractID === +contract.contractID);
+        if (c.length > 0) {
+          alreadyFetchedContracts.push(contract);
+          continue;
+        }
+        contracts.push(contract);
+      }
+
+      for (const contract of alreadyFetchedContracts) {
+        const index = Network.newContracts.indexOf(contract);
+        if (index > -1) Network.newContracts.splice(index, 1);
+      }
+
+      contracts = contracts.filter(c => !Network.deletedContracts.includes(+c.contractID));
+
+      const parsedContracts: Required<GqlNodeContract>[] = [];
+
+      for (const contract of contracts) {
+        const parsedDeploymentData = JSON.parse(contract.deploymentData);
+        parsedContracts.push({ ...contract, parsedDeploymentData });
+      }
+
+      this.contracts = parsedContracts;
+    }
+
+    return this.contracts;
+  }
+
+  private async getReservedIps(nodeId: number): Promise<string[]> {
+    const node_twin_id = await this.capacity.getNodeTwinId(nodeId);
+    const payload = JSON.stringify({ network_name: this.name });
+    let reservedIps: string[];
+    try {
+      reservedIps = await this.rmb.request([node_twin_id], "zos.network.list_private_ips", payload);
+    } catch (e) {
+      (e as Error).message = formatErrorMessage(`Failed to list reserved ips from node ${nodeId}`, e);
+      throw e;
+    }
+    return reservedIps;
+  }
+
+  private async getDeploymentContracts(name: string) {
+    const contracts = await this.getMyNetworkContracts(true);
+    return contracts.filter(c => c.parsedDeploymentData.name === name);
+  }
+
+  private getContractsName(contracts: Required<GqlNodeContract>[]): string[] {
+    return Array.from(new Set(contracts.map(c => c.parsedDeploymentData.name)));
+  }
+
+  private async listNewNetworks() {
+    const contracts = await this.getMyNetworkContracts(true);
+    return this.getContractsName(contracts);
+  }
+
+  private async existOnNewNetwork() {
+    return (await this.listNewNetworks()).includes(this.name);
+  }
+
   async getNetworkNames(): Promise<string[]> {
+    const newNames = await this.listNewNetworks();
+
     const path = this.getNetworksPath();
-    return await this.backendStorage.list(path);
+    const oldNames = await this.backendStorage.list(path);
+    return Array.from(new Set([...newNames, ...oldNames]));
   }
 
   async getFreePort(node_id: number): Promise<number> {
@@ -628,55 +792,28 @@ AllowedIPs = ${this.ipRange}, ${networkIP}
 PersistentKeepalive = 25\nEndpoint = ${endpoint}`;
   }
 
-  async save(contract_id = 0, node_id = 0) {
-    let network;
-    if (await this.exists()) {
-      network = await this.getNetwork();
-    } else {
-      network = {
-        ip_range: this.ipRange,
-        nodes: [],
-        wireguardConfigs: [],
-      };
-    }
+  async save(AddedContract?: Contract, deletedContract?: number) {
+    if (AddedContract?.contractType.nodeContract)
+      Network.newContracts.push({
+        contractID: String(AddedContract.contractId),
+        createdAt: Date.now().toString(),
+        deploymentData: AddedContract.contractType.nodeContract.deploymentData,
+        deploymentHash: AddedContract.contractType.nodeContract.deploymentHash,
+        gridVersion: "4",
+        id: "",
+        nodeID: AddedContract.contractType.nodeContract.nodeId,
+        numberOfPublicIPs: AddedContract.contractType.nodeContract.publicIps,
+        solutionProviderID: String(AddedContract.solutionProviderId),
+        state: ContractStates.Created,
+        twinID: String(AddedContract.twinId),
+        parsedDeploymentData: JSON.parse(AddedContract.contractType.nodeContract.deploymentData),
+        resourcesUsed: undefined,
+      });
 
-    if (this.wireguardConfig && !network.wireguardConfigs.includes(this.wireguardConfig)) {
-      network.wireguardConfigs.push(this.wireguardConfig);
-    }
+    if (deletedContract) Network.deletedContracts.push(deletedContract);
 
     if (this.nodes.length === 0) {
       await this.delete();
-      return;
-    }
-
-    const nodes = [];
-    for (const node of this.nodes) {
-      if (!node.contract_id && node.node_id === node_id) {
-        node.contract_id = contract_id;
-      }
-      if (!node.contract_id) {
-        continue;
-      }
-      nodes.push({
-        contract_id: node.contract_id,
-        node_id: node.node_id,
-        reserved_ips: this.getNodeReservedIps(node.node_id),
-      });
-    }
-    network.nodes = nodes;
-    if (nodes.length !== 0) {
-      await this._save(network);
-    } else {
-      await this.delete();
-    }
-  }
-
-  async _save(network): Promise<void> {
-    const path = PATH.join(this.getNetworksPath(), this.name, "info.json");
-    const current = await this.backendStorage.load(path);
-    if (JSON.stringify(current) !== JSON.stringify(network)) {
-      const updateOperations = await this.backendStorage.dump(path, network);
-      await this.saveIfKVStoreBackend(updateOperations);
     }
   }
 
