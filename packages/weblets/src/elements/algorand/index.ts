@@ -1,1 +1,0 @@
-import "./Algorand.wc.svelte";

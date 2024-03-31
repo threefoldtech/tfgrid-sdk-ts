@@ -52,7 +52,7 @@
           :disabled="loading"
           :loading="loading"
         >
-          Delete IP
+          Delete
         </v-btn>
       </template>
     </v-data-table-server>
@@ -104,11 +104,13 @@ export default {
         title: "IP",
         align: "center",
         key: "ip",
+        sortable: false,
       },
       {
         title: "Gateway",
         align: "center",
         key: "gateway",
+        sortable: false,
       },
       {
         title: "Deployed Contract ID",

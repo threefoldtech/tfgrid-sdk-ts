@@ -1,6 +1,6 @@
 <template>
   <v-card :loading="loading">
-    <v-alert class="pa-5" style="height: 20px">
+    <v-alert class="pa-5" style="height: 20px" v-if="title">
       <h4 class="text-center font-weight-medium">
         <v-icon :icon="icon" size="large" />
         {{ title }}
@@ -33,12 +33,12 @@
             <p class="font-14">{{ item.name }}</p>
             <v-chip class="ml-4" v-if="item.nameHint" :color="item.nameHintColor">{{ item.nameHint }}</v-chip>
           </v-col>
-          <v-col v-if="!$props.iperf" class="d-flex justify-end align-center mr-3">
+          <v-col v-if="!$props.iperf" class="d-flex overflowText justify-end align-center mr-3">
             <p class="font-14" v-if="!item.icon && !item.hint && !item.imgSrc">
               {{ item.value && item.value.length > maxLenChar ? item.value.slice(0, maxLenChar) + "..." : item.value }}
             </p>
 
-            <v-tooltip v-if="item.hint && !item.icon" location="top" :text="item.hint">
+            <v-tooltip class="overflowText" v-if="item.hint && !item.icon" location="top" :text="item.hint">
               <template #activator="{ props }">
                 <p class="font-14" v-bind="props">
                   {{
@@ -48,7 +48,7 @@
               </template>
             </v-tooltip>
 
-            <v-tooltip v-if="item.hint && item.icon" location="top" :text="item.hint">
+            <v-tooltip class="overflowText" v-if="item.hint && item.icon" location="top" :text="item.hint">
               <template #activator="{ props }">
                 <p class="font-14" v-bind="props">
                   {{
@@ -88,7 +88,7 @@ export default {
   props: {
     title: {
       type: String,
-      required: true,
+      required: false,
     },
 
     icon: {
@@ -152,5 +152,11 @@ export default {
   overflow: hidden;
   display: flex;
   justify-content: center;
+}
+
+.overflowText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
