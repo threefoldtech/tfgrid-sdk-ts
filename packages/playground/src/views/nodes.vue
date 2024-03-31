@@ -378,7 +378,7 @@ export default {
       freeRAM: "",
       region: "",
       country: "",
-      status: "up",
+      status: "",
       gateway: false,
       gpu: false,
       publicIPs: "",
@@ -427,6 +427,8 @@ export default {
             domain: filters.value.gateway || undefined,
             freeIps: +filters.value.publicIPs || undefined,
             dedicated: filters.value.dedicated || undefined,
+            sortBy: "status",
+            sortOrder: "asc",
           },
           { loadFarm: true },
         );
