@@ -6,7 +6,7 @@ import { expose } from "../helpers/expose";
 import { validateInput } from "../helpers/validator";
 import { CalculatorModel, CUModel, SUModel } from "./models";
 
-interface PricingInfo {
+export interface PricingInfo {
   dedicatedPrice: number;
   dedicatedPackage: {
     package: string;
