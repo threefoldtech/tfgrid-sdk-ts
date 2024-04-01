@@ -163,7 +163,7 @@ export const solutionType: { [key: string]: string } = {
   umbrel: "Umbrel",
   vm: "Micro Virtual Machine",
   wordpress: "Wordpress",
-  staticwebsite: "StaticWebsite",
+  staticwebsite: "Static Website",
 };
 
 export interface solutionFlavor {

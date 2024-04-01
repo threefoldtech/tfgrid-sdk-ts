@@ -127,7 +127,7 @@ export const deploymentListEnvironments = {
   static_website: {
     SSH_KEY: _ssh,
     GITHUB_URL: "Cloned Repository URL",
-    ROOT: "Html Directory",
+    ROOT: "HTML Directory",
   },
 
   taiga: {

@@ -49,7 +49,9 @@
         <v-text-field label="Github Branch" v-model="githubBranch" />
       </input-tooltip>
       <input-validator :value="root" :rules="[validators.required('HTML Directory is required.')]" #="{ props }">
-        <input-tooltip tooltip="HTML Directory to serve.">
+        <input-tooltip
+          tooltip="HTML Directory to serve. Note that this field is case-sensitive so make sure you provide the correct directory"
+        >
           <v-text-field label="HTML Directory" v-model="root" v-bind="props" />
         </input-tooltip>
       </input-validator>

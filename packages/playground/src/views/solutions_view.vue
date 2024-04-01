@@ -96,7 +96,7 @@ export default {
       {
         title: "Static Website",
         excerpt:
-          "Static Website is an application where a user provide a github repository url and it's automatically served using caddy.",
+          "Static Website is an application where a user provides a Github repository url and it's automatically served using Caddy.",
         icon: "static_website.png",
         route: DashboardRoutes.Applications.StaticWebsite,
       },
