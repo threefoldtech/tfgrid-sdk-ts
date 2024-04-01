@@ -2,6 +2,36 @@ import { assertBoolean, assertId, assertIn, assertInt, assertNatural, assertPatt
 import { AbstractBuilder, BuilderMapper, BuilderMethods, BuilderValidator } from "./abstract_builder";
 import { ID_PATTERN, NodeStatus } from "./gateways";
 
+export enum SortBy {
+  NodeId = "node_id",
+  FarmId = "farm_id",
+  FarmName = "farm_name",
+  TwinId = "twin_id",
+  Uptime = "uptime",
+  Created = "created",
+  UpdatedAt = "updated_at",
+  Country = "country",
+  City = "city",
+  RentContractId = "rent_contract_id",
+  DedicatedFarm = "dedicated_farm",
+  TotalCRU = "total_cru",
+  TotalSRU = "total_sru",
+  TotalHRU = "total_hru",
+  TotalMRU = "total_mru",
+  UsedCRU = "used_cru",
+  UsedSRU = "used_sru",
+  UsedHRU = "used_hru",
+  UsedMRU = "used_mru",
+  NumGPU = "num_gpu",
+  ExtraFee = "extra_fee",
+  Status = "status",
+}
+
+export enum SortOrder {
+  Desc = "desc",
+  Asc = "asc",
+}
+
 export interface NodesQuery {
   page: number;
   size: number;
@@ -40,8 +70,8 @@ export interface NodesQuery {
   gpuAvailable: boolean;
   ownedBy: number;
   healthy: boolean;
-  sortBy: string;
-  sortOrder: string;
+  sortBy: SortBy;
+  sortOrder: SortOrder;
 }
 
 const NODES_MAPPER: BuilderMapper<NodesQuery> = {

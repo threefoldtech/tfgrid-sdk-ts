@@ -337,7 +337,7 @@
 </template>
 
 <script lang="ts">
-import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
+import { type GridNode, NodeStatus, SortBy, SortOrder } from "@threefold/gridproxy_client";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
@@ -427,8 +427,8 @@ export default {
             domain: filters.value.gateway || undefined,
             freeIps: +filters.value.publicIPs || undefined,
             dedicated: filters.value.dedicated || undefined,
-            sortBy: "status",
-            sortOrder: "asc",
+            sortBy: SortBy.Status,
+            sortOrder: SortOrder.Asc,
           },
           { loadFarm: true },
         );
