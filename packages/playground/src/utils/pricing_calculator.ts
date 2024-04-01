@@ -34,6 +34,7 @@ export const sruRules = _applyRules([
 ]);
 
 export const hruRules = _applyRules([
+  required("HDD Storage size is required."),
   isInt("HDD Storage size must be a valid integer."),
   max("Maximum allowed hdd storage size is 1000000 GB.", 1000000),
   min("Minimum allowed hdd storage size is 0 GB.", 0),
