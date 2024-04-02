@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-const WIDTH_SIZE = 350;
+const WIDTH_SIZE = 320;
 
 export default {
   name: "TfFiltersLayout",

@@ -580,3 +580,29 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+@media (max-width: 1350px) {
+  .tf-node-card {
+    .v-card-item {
+      grid-template-areas:
+        "prepend content"
+        "append append";
+
+      .v-card-item__append {
+        display: flex;
+        padding-inline-start: 0;
+        padding: 1rem 0;
+
+        > .d-flex {
+          flex-direction: row-reverse;
+        }
+      }
+    }
+
+    .tf-node-resource {
+      flex-basis: 100%;
+    }
+  }
+}
+</style>
