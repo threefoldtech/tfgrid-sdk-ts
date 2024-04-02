@@ -6,9 +6,18 @@
     </v-card-title>
     <v-card-text>
       SSH grants secure remote access to your deployed machine for seamless management and execution of commands.
+      <v-alert v-if="selectedKeys.length === 0" type="warning" class="mt-2">
+        Attention: It appears that no SSH keys have been selected. In order to access your deployment, you must send at
+        least one SSH key. You can manage your SSH keys from the
+        <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH keys management page</router-link> and add more as needed.
+      </v-alert>
     </v-card-text>
+
+    <VDivider />
+
     <v-card-actions>
-      <v-btn color="primary" variant="flat" @click="openManageDialog = true">Manage SSH keys</v-btn>
+      <VSpacer />
+      <v-btn color="primary" variant="flat" @click="openManageDialog = true" class="mr-2">Manage SSH keys</v-btn>
     </v-card-actions>
   </v-card>
 
@@ -27,12 +36,6 @@
           to cancel or add.
         </v-alert>
 
-        <v-alert v-if="selectedKeys.length === 0" type="warning" class="mb-5">
-          Attention: It appears that no SSH keys have been selected. In order to access your deployment, you must send
-          at least one SSH key. You can manage your SSH keys from the
-          <router-link :to="DashboardRoutes.Deploy.SSHKey">SSH keys management page</router-link> and add more as
-          needed.
-        </v-alert>
         <v-row>
           <v-tooltip
             v-for="_key of sshKeys"
@@ -74,9 +77,13 @@
 </template>
 
 <script lang="ts">
-import { capitalize, defineComponent, nextTick, onMounted, ref } from "vue";
+import { noop } from "lodash";
+import { capitalize, defineComponent, getCurrentInstance, nextTick, onMounted, ref, watch } from "vue";
+import { onUnmounted } from "vue";
 
 import SshDataDialog from "@/components/ssh_keys/SshDataDialog.vue";
+import { useForm, ValidatorStatus } from "@/hooks/form_validator";
+import type { InputValidatorService } from "@/hooks/input_validator";
 import { DashboardRoutes } from "@/router/routes";
 import { useProfileManager } from "@/stores";
 import type { SSHKeyData } from "@/types";
@@ -134,6 +141,29 @@ export default defineComponent({
     function handleKeys() {
       selectedKeysString.value = selectedKeys.value.map(_key => _key.publicKey).join("\n\n");
     }
+
+    /* interact with form_validator */
+    const { uid } = getCurrentInstance() as { uid: number };
+    const form = useForm();
+
+    const fakeService: InputValidatorService = {
+      validate: () => Promise.resolve(true),
+      setStatus: noop,
+      reset: noop,
+      status: ValidatorStatus.Init,
+      error: null,
+    };
+
+    onMounted(() => form?.register(uid, fakeService));
+    onUnmounted(() => form?.unregister(uid));
+
+    watch(
+      () => selectedKeys.value.length,
+      num => {
+        form?.updateStatus(uid, num === 0 ? ValidatorStatus.Invalid : ValidatorStatus.Valid);
+      },
+      { immediate: true },
+    );
 
     return {
       openManageDialog,
