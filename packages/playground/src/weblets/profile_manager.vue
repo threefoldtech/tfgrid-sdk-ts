@@ -137,7 +137,6 @@
                           };
                         },
                       ]"
-                      :async-rules="[validateMnInput]"
                       valid-message="Mnemonic or Hex Seed is valid."
                       #="{ props: validationProps }"
                       ref="mnemonicInput"
@@ -158,17 +157,15 @@
                               :disabled="creatingAccount || activatingAccount || activating"
                               @click:append="reloadValidation"
                             >
-                              <template v-slot:prepend-inner v-if="isValid">
-                                <v-icon
-                                  color="green"
-                                  v-if="
-                                    (mnemonic && validateMnemonic(mnemonic)) ||
-                                    ((mnemonic.length === 64 || mnemonic.length === 66) &&
-                                      isAddress(mnemonic.length === 66 ? mnemonic : `0x${mnemonic}`))
-                                  "
-                                >
-                                  mdi-check
-                                </v-icon>
+                              <template
+                                v-slot:prepend-inner
+                                v-if="
+                                  (mnemonic && validateMnemonic(mnemonic)) ||
+                                  ((mnemonic.length === 64 || mnemonic.length === 66) &&
+                                    isAddress(mnemonic.length === 66 ? mnemonic : `0x${mnemonic}`))
+                                "
+                              >
+                                <v-icon color="green"> mdi-check </v-icon>
                               </template></VTextField
                             >
                           </div>
@@ -210,6 +207,7 @@
                   </PasswordInputWrapper>
                 </template>
               </VTooltip>
+
               <v-dialog v-model="openAcceptTerms" fullscreen>
                 <v-card @scroll="onScroll" v-if="!termsLoading">
                   <v-card-text class="pa-15" v-html="acceptTermsContent"></v-card-text>
@@ -721,28 +719,6 @@ async function activate(mnemonic: string, keypairType: KeypairType) {
   }
 }
 
-function validateMnInput(mnemonic: string) {
-  isNonActiveMnemonic.value = false;
-  enableReload.value = true;
-  return getGrid({ mnemonic, keypairType: keypairType.value })
-    .then(() => {
-      isValid.value = true;
-      return undefined;
-    })
-    .catch(e => {
-      if (e instanceof TwinNotExistError) {
-        isNonActiveMnemonic.value = true;
-        isValid.value = true;
-        return undefined;
-      }
-      enableReload.value = false;
-      isValid.value = false;
-      return {
-        message: normalizeError(e, "Something went wrong. please try again."),
-      };
-    });
-}
-
 onMounted(async () => {
   await mounted();
 });
@@ -833,17 +809,27 @@ function login() {
 }
 
 async function storeAndLogin() {
-  if (shouldActivateAccount.value) {
-    openAcceptTerms.value = true;
-    termsLoading.value = true;
-  }
   const cryptr = new Cryptr(password.value, { pbkdf2Iterations: 10, saltLength: 10 });
   const mnemonicHash = cryptr.encrypt(mnemonic.value);
   const keypairTypeHash = cryptr.encrypt(keypairType.value);
-  const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
-  storeEmail(grid!, email.value);
-  setCredentials(md5(password.value), mnemonicHash, keypairTypeHash, md5(email.value));
-  activate(mnemonic.value, keypairType.value);
+  try {
+    const grid = await getGrid({ mnemonic: mnemonic.value, keypairType: keypairType.value });
+    storeEmail(grid!, email.value);
+    setCredentials(md5(password.value), mnemonicHash, keypairTypeHash, md5(email.value));
+    activate(mnemonic.value, keypairType.value);
+  } catch (e) {
+    if (e instanceof TwinNotExistError) {
+      isNonActiveMnemonic.value = true;
+      isValid.value = true;
+      openAcceptTerms.value = true;
+      termsLoading.value = true;
+    }
+    enableReload.value = false;
+    isValid.value = false;
+    return {
+      message: normalizeError(e, "Something went wrong. please try again."),
+    };
+  }
 }
 
 function validatePassword(value: string) {
