@@ -31,6 +31,7 @@ declare module "@vue/runtime-core" {
 
   interface ComponentCustomProperties {
     validators: typeof validators;
+    MANUAL_URL: typeof MANUAL_URL;
   }
 }
 
@@ -52,6 +53,7 @@ declare global {
       STATS_URL: string;
       TIMEOUT: number;
       PAGE_SIZE: number;
+      MANUAL_URL: string;
     };
   }
 }

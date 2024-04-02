@@ -6,7 +6,7 @@
   </div>
 
   <view-layout>
-    <TfFiltersContainer class="mb-4" @apply="loadNodes" :loading="loading">
+    <TfFiltersContainer class="mb-4" @apply="loadNodes(true)" :loading="loading">
       <TfFilter
         query-route="node-id"
         :rules="[
@@ -326,28 +326,6 @@
         </v-row>
       </div>
     </div>
-    <div class="mx-auto mt-5 d-flex">
-      <div class="mr-6">
-        <v-chip color="success" class="mr-2">
-          <span class="text-subtitle-2"> Shared </span>
-        </v-chip>
-        <span class="text-subtitle-2">Multiple users can deploy on that node</span>
-      </div>
-
-      <div class="mr-6">
-        <v-chip color="warning" class="mr-2">
-          <span class="text-subtitle-2"> Rented </span>
-        </v-chip>
-        <span class="text-subtitle-2">Rented as full node for a single user</span>
-      </div>
-
-      <div class="mr-6">
-        <v-chip color="primary" class="mr-2">
-          <span class="text-subtitle-2"> Rentable </span>
-        </v-chip>
-        <span class="text-subtitle-2">You can rent it exclusively for your workloads</span>
-      </div>
-    </div>
 
     <node-details
       :filter-options="{ size, page, gpu: filters.gpu }"
@@ -359,7 +337,7 @@
 </template>
 
 <script lang="ts">
-import { type GridNode, NodeStatus } from "@threefold/gridproxy_client";
+import { type GridNode, NodeStatus, SortBy, SortOrder } from "@threefold/gridproxy_client";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
@@ -423,14 +401,15 @@ export default {
       loadGpu: false,
     };
 
-    async function loadNodes() {
+    async function loadNodes(retCount = false) {
       loading.value = true;
+      if (retCount) page.value = 1;
       try {
         const { count, data } = await requestNodes(
           {
             page: page.value,
             size: size.value,
-            retCount: true,
+            retCount,
             nodeId: +filters.value.nodeId || undefined,
             farmIds: filters.value.farmId || undefined,
             farmName: filters.value.farmName || undefined,
@@ -448,11 +427,14 @@ export default {
             domain: filters.value.gateway || undefined,
             freeIps: +filters.value.publicIPs || undefined,
             dedicated: filters.value.dedicated || undefined,
+            sortBy: SortBy.Status,
+            sortOrder: SortOrder.Asc,
           },
           { loadFarm: true },
         );
+
         nodes.value = data;
-        nodesCount.value = count ?? 0;
+        if (retCount) nodesCount.value = count ?? 0;
       } catch (err) {
         console.log(err);
       } finally {
@@ -492,8 +474,8 @@ export default {
       selectedNodeId.value = 0;
     };
 
-    const openDialog = async (item: { props: { title: GridNode } }) => {
-      selectedNodeId.value = item.props.title.nodeId;
+    const openDialog = async (item: GridNode) => {
+      selectedNodeId.value = item.nodeId;
       isDialogOpened.value = true;
     };
 

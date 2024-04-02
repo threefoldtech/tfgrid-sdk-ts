@@ -13,7 +13,6 @@ const vuetify = createVuetify({
     VProgressCircular: {
       size: 50,
       width: 7,
-      indeterminate: true,
       color: "primary",
     },
   },
@@ -37,6 +36,7 @@ const vuetify = createVuetify({
           warning: "#FFCC00",
           link: "#5695ff",
           anchor: "#d4d4d4",
+          disable: "#d4d4d4",
         },
         variables: {
           "footer-color-link": "#fff",
@@ -51,6 +51,7 @@ const vuetify = createVuetify({
           info: "#1AA18F",
           secondary: "#14A1B8",
           anchor: "#000000",
+          disable: "#d4d4d4",
         },
         variables: {
           "footer-color-link": "#333",

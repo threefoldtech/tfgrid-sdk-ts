@@ -63,6 +63,25 @@ function zeroPadding(length: number, num: number) {
   return num.toString(16).padStart(length, "0");
 }
 
+/**
+ * Converts an object into a query string format.
+ * @param obj - The object to be converted into a query string.
+ * @returns A string representing the object in query string format.
+ */
+function convertObjectToQueryString(obj: Record<string, any>): string {
+  // Filter out undefined or empty string values
+  const filteredParams = Object.fromEntries(
+    Object.entries(obj).filter(([_, value]) => value !== undefined && value !== ""),
+  );
+
+  // Convert object to query string format
+  const queryString = Object.entries(filteredParams)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .join("&");
+
+  return queryString;
+}
+
 export {
   generateString,
   getRandomNumber,
@@ -75,4 +94,5 @@ export {
   formatErrorMessage,
   generateRandomHexSeed,
   zeroPadding,
+  convertObjectToQueryString,
 };

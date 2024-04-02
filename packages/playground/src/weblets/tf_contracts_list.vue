@@ -197,6 +197,7 @@ const nodeTableHeaders: VDataTableHeader = [
   ...baseTableHeaders,
   { title: "Solution Type", key: "solutionType" },
   { title: "Solution Name", key: "solutionName" },
+  { title: "Type", key: "deploymentType" },
   { title: "Expiration", key: "expiration" },
   { title: "Node ID", key: "nodeId" },
   { title: "Farm ID", key: "farmId" },
