@@ -9,7 +9,6 @@
     </v-card-text>
     <v-card-actions>
       <v-btn color="primary" variant="flat" @click="openManageDialog = true">Manage SSH keys</v-btn>
-      <v-btn>Learn more</v-btn>
     </v-card-actions>
   </v-card>
 
