@@ -13,4 +13,5 @@ window.env = {
   STATS_URL: "https://stats.dev.grid.tf",
   TIMEOUT: +"10000",
   PAGE_SIZE: +"20",
+  MANUAL_URL: "https://www.manual.grid.tf",
 };
